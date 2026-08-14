@@ -30,14 +30,16 @@ From the repository root, run:
 Set `-AudioOutput PDM` for the I2S0 hardware PCM-to-PDM/sigma-delta output on GPIO26. DAC is the default. The script:
 
 - builds `yoRadio/yoRadio.ino` for ESP32 Dev Module, 4 MB flash, Minimal SPIFFS;
+- installs `yoRadio/fonts/glcdfont.c` into the repository-local Adafruit GFX copy before compiling, enabling YoRadio icons and Cyrillic text;
 - adds both C and C++ `I2S_INTERNAL_OUTPUT=1` overrides for PDM;
-- creates the SPIFFS image from `yoRadio/data`;
-- writes bootloader, partition table, OTA boot selector, application, and SPIFFS;
+- writes bootloader, partition table, OTA boot selector, and application while preserving NVS and SPIFFS settings by default;
 - uses the verified custom CH340C reset sequence;
 - retries at 115200 baud if the requested faster baud fails;
 - leaves the board running through esptool's final hard reset.
 
 Use `-SkipBuild` only when the selected DAC/PDM build directory already contains matching current artifacts. Use `-WhatIf` to inspect the planned operation without building or touching the board.
+
+Do not pass `-FlashFilesystem` during a normal firmware update. Saved Wi-Fi networks and playlists are stored in SPIFFS. Use `-FlashFilesystem` only for a first installation or when the user explicitly authorizes replacing those settings; it creates the SPIFFS image from `yoRadio/data` and writes it at `0x3D0000`. NVS at `0x9000` is never included in the flash image list.
 
 Accept a flash as successful only when esptool exits successfully after reporting verified hashes and the final hard reset. Report the COM port, audio mode, build directory, baud rate, and verification result.
 

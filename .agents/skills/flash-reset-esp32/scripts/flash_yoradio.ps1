@@ -12,6 +12,8 @@ param(
 
     [switch]$SkipBuild,
 
+    [switch]$FlashFilesystem,
+
     [string]$ArduinoCli
 )
 
@@ -73,13 +75,43 @@ function Find-Esp32Tool {
     return $tool
 }
 
+function Install-YoRadioGfxFont {
+    param(
+        [Parameter(Mandatory)][string]$Source,
+        [Parameter(Mandatory)][string]$Destination
+    )
+
+    if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) {
+        throw "YoRadio GFX font is missing: $Source"
+    }
+    if (-not (Test-Path -LiteralPath $Destination -PathType Leaf)) {
+        throw "Adafruit GFX glcdfont.c is missing: $Destination"
+    }
+
+    $sourceHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $Source).Hash
+    $destinationHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $Destination).Hash
+    if ($sourceHash -ne $destinationHash) {
+        Copy-Item -LiteralPath $Source -Destination $Destination -Force
+        $destinationHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $Destination).Hash
+        if ($destinationHash -ne $sourceHash) {
+            throw "Failed to install the YoRadio GFX font at $Destination"
+        }
+        Write-Host "Installed the YoRadio Cyrillic/icon font in the local Adafruit GFX library."
+    } else {
+        Write-Host "YoRadio Cyrillic/icon font is already installed in the local Adafruit GFX library."
+    }
+}
+
 if (-not $SkipBuild) {
     $resolvedArduinoCli = Resolve-ArduinoCli $ArduinoCli
+    $localLibraries = Join-Path $repository ".build\libraries"
+    $yoRadioFont = Join-Path $sketch "fonts\glcdfont.c"
+    $adafruitFont = Join-Path $localLibraries "Adafruit_GFX_Library\glcdfont.c"
     $compileArguments = @(
         "compile",
         "--fqbn", $fqbn,
         "--build-path", $buildDirectory,
-        "--libraries", (Join-Path $repository ".build\libraries")
+        "--libraries", $localLibraries
     )
     if ($AudioOutput -eq "PDM") {
         $compileArguments += @(
@@ -90,6 +122,7 @@ if (-not $SkipBuild) {
     $compileArguments += $sketch
 
     if ($PSCmdlet.ShouldProcess($buildDirectory, "build the $AudioOutput YoRadio firmware")) {
+        Install-YoRadioGfxFont -Source $yoRadioFont -Destination $adafruitFont
         & $resolvedArduinoCli @compileArguments
         if ($LASTEXITCODE -ne 0) {
             throw "Arduino build failed with exit code $LASTEXITCODE"
@@ -110,7 +143,6 @@ if (-not (Test-Path -LiteralPath $esp32Hardware -PathType Container)) {
 }
 $packageRoot = [IO.Path]::GetFullPath((Join-Path $esp32Hardware "..\..\.."))
 $esptool = Find-Esp32Tool -PackageRoot $packageRoot -ToolDirectory "esptool_py" -Executable "esptool.exe"
-$mkspiffs = Find-Esp32Tool -PackageRoot $packageRoot -ToolDirectory "mkspiffs" -Executable "mkspiffs.exe"
 $bootApp = Join-Path $esp32Hardware "tools\partitions\boot_app0.bin"
 
 $images = [ordered]@{
@@ -125,21 +157,29 @@ foreach ($image in $images.Values) {
     }
 }
 
-if ($PSCmdlet.ShouldProcess($spiffsImage, "create a 128 KiB SPIFFS image from yoRadio/data")) {
-    & $mkspiffs -c (Join-Path $sketch "data") -p 256 -b 4096 -s $spiffsSize $spiffsImage
-    if ($LASTEXITCODE -ne 0) {
-        throw "mkspiffs failed with exit code $LASTEXITCODE"
+if ($FlashFilesystem) {
+    $mkspiffs = Find-Esp32Tool -PackageRoot $packageRoot -ToolDirectory "mkspiffs" -Executable "mkspiffs.exe"
+    if ($PSCmdlet.ShouldProcess($spiffsImage, "create a 128 KiB SPIFFS image from yoRadio/data")) {
+        & $mkspiffs -c (Join-Path $sketch "data") -p 256 -b 4096 -s $spiffsSize $spiffsImage
+        if ($LASTEXITCODE -ne 0) {
+            throw "mkspiffs failed with exit code $LASTEXITCODE"
+        }
+    } else {
+        return
     }
-} else {
-    return
+    $images[$spiffsOffset] = $spiffsImage
 }
-$images[$spiffsOffset] = $spiffsImage
 
 Write-Host "YoRadio flash plan:"
 Write-Host "  Port:         $Port"
 Write-Host "  Audio output: $AudioOutput"
 Write-Host "  Build:        $buildDirectory"
 Write-Host "  Baud:         $Baud"
+if ($FlashFilesystem) {
+    Write-Warning "SPIFFS will be overwritten; saved Wi-Fi networks and playlists may be lost."
+} else {
+    Write-Host "  Settings:     preserved (NVS and SPIFFS are not written)"
+}
 foreach ($entry in $images.GetEnumerator()) {
     $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $entry.Value).Hash
     Write-Host ("  {0}: {1} (SHA256 {2})" -f $entry.Key, $entry.Value, $hash)
@@ -160,7 +200,12 @@ foreach ($entry in $images.GetEnumerator()) {
     $flashArguments += @($entry.Key, $entry.Value)
 }
 
-if (-not $PSCmdlet.ShouldProcess($Port, "erase affected sectors and flash $AudioOutput YoRadio plus SPIFFS")) {
+$flashOperation = if ($FlashFilesystem) {
+    "erase affected sectors and flash $AudioOutput YoRadio plus SPIFFS"
+} else {
+    "flash $AudioOutput YoRadio while preserving NVS and SPIFFS settings"
+}
+if (-not $PSCmdlet.ShouldProcess($Port, $flashOperation)) {
     return
 }
 
@@ -187,4 +232,8 @@ try {
     $env:ESPTOOL_OPEN_PORT_ATTEMPTS = $savedAttempts
 }
 
-Write-Host "YoRadio $AudioOutput firmware and SPIFFS were flashed and hash-verified on $Port."
+if ($FlashFilesystem) {
+    Write-Host "YoRadio $AudioOutput firmware and SPIFFS were flashed and hash-verified on $Port."
+} else {
+    Write-Host "YoRadio $AudioOutput firmware was flashed and hash-verified on $Port; NVS and SPIFFS settings were preserved."
+}
