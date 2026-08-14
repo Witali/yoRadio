@@ -14,6 +14,9 @@
 #include "mp3_decoder/mp3_decoder.h"
 #include "aac_decoder/aac_decoder.h"
 #include "flac_decoder/flac_decoder.h"
+#if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+#include "PdmOutput.h"
+#endif
 #include "../core/config.h"
 
 #ifdef SDFATFS_USED
@@ -201,6 +204,16 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
 
         #ifdef CONFIG_IDF_TARGET_ESP32  // ESP32S3 has no DAC
 
+          #if I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+            log_i("internal I2S PDM on GPIO%d", I2S_PDM_DOUT);
+            const esp_err_t result = pdmOutputBegin(
+                m_i2s_num, I2S_PDM_DOUT, m_i2s_config.sample_rate);
+            if (result != ESP_OK) {
+                log_e("PDM output initialization failed: %s",
+                      esp_err_to_name(result));
+            }
+            m_f_forceMono = true;
+          #else
             log_i("internal DAC");
             m_i2s_config.mode             = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN );
 
@@ -215,11 +228,15 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
             if(m_f_channelEnabled != I2S_DAC_CHANNEL_BOTH_EN) {
                 m_f_forceMono = true;
             }
+          #endif
 
         #endif
 
     }
     else {
+      #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+        log_e("External I2S output is unavailable in an internal PDM build");
+      #else
         m_i2s_config.mode             = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX);
 
         #if ESP_ARDUINO_VERSION_MAJOR >= 2
@@ -230,9 +247,14 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
 
         i2s_driver_install((i2s_port_t)m_i2s_num, &m_i2s_config, 0, NULL);
         m_f_forceMono = false;
+      #endif
     }
 
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    pdmOutputClear();
+  #else
     i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
+  #endif
 
     for(int i = 0; i <3; i++) {
         m_filter[i].a0  = 1;
@@ -265,11 +287,19 @@ void Audio::initInBuff() {
 esp_err_t Audio::I2Sstart(uint8_t i2s_num) {
     // It is not necessary to call this function after i2s_driver_install() (it is started automatically),
     // however it is necessary to call it after i2s_stop()
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    return pdmOutputStart();
+  #else
     return i2s_start((i2s_port_t) i2s_num);
+  #endif
 }
 
 esp_err_t Audio::I2Sstop(uint8_t i2s_num) {
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    return pdmOutputStop();
+  #else
     return i2s_stop((i2s_port_t) i2s_num);
+  #endif
 }
 //---------------------------------------------------------------------------------------------------------------------
 esp_err_t Audio::i2s_mclk_pin_select(const uint8_t pin) {
@@ -307,7 +337,11 @@ Audio::~Audio() {
     //InBuff.~AudioBuffer(); #215 the AudioBuffer is automatically destroyed by the destructor
     setDefaults();
     if(m_playlistBuff) {free(m_playlistBuff); m_playlistBuff = NULL;}
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    pdmOutputEnd();
+  #else
     i2s_driver_uninstall((i2s_port_t)m_i2s_num); // #215 free I2S buffer
+  #endif
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::setDefaults() {
@@ -2364,7 +2398,11 @@ bool Audio::pauseResume() {
         retVal = true;
         if(!m_f_running) {
             memset(m_outBuff, 0, sizeof(m_outBuff));               //Clear OutputBuffer
+          #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+            pdmOutputClear();
+          #else
             i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
+          #endif
         }
     }
     return retVal;
@@ -4109,7 +4147,11 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
     }
     if(ret < 0) { // Error, skip the frame...
         if(m_f_Log) if(m_codec == CODEC_M4A){log_i("begin not found"); return 1;}
+      #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+        pdmOutputClear();
+      #else
         i2s_zero_dma_buffer((i2s_port_t)m_i2s_num);
+      #endif
         if(!getChannels() && (ret == -2)) {
              ; // suppress errorcode MAINDATA_UNDERFLOW
         }
@@ -4295,6 +4337,13 @@ void Audio::printDecodeError(int r) {
 }
 //---------------------------------------------------------------------------------------------------------------------
 bool Audio::setPinout(uint8_t BCLK, uint8_t LRC, uint8_t DOUT, int8_t DIN, int8_t MCK) {
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    (void)BCLK;
+    (void)LRC;
+    (void)DIN;
+    (void)MCK;
+    return DOUT == I2S_PDM_DOUT;
+  #else
     m_pin_config.bck_io_num   = BCLK;
     m_pin_config.ws_io_num    = LRC; //  wclk
     m_pin_config.data_out_num = DOUT;
@@ -4304,6 +4353,7 @@ bool Audio::setPinout(uint8_t BCLK, uint8_t LRC, uint8_t DOUT, int8_t DIN, int8_
 #endif
     const esp_err_t result = i2s_set_pin((i2s_port_t) m_i2s_num, &m_pin_config);
     return (result == ESP_OK);
+  #endif
 }
 //---------------------------------------------------------------------------------------------------------------------
 uint32_t Audio::getFileSize() {
@@ -4401,13 +4451,21 @@ bool Audio::audioFileSeek(const float speed) {
     if((speed > 1.5f) || (speed < 0.25f)) return false;
 
     uint32_t srate = getSampleRate() * speed;
-    i2s_set_sample_rates((i2s_port_t)m_i2s_num, srate);
-    return true;
+    return setSampleRate(srate);
 }
 //---------------------------------------------------------------------------------------------------------------------
 bool Audio::setSampleRate(uint32_t sampRate) {
     if(!sampRate) sampRate = 16000; // fuse, if there is no value -> set default #209
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    const esp_err_t result = pdmOutputSetSampleRate(sampRate);
+    if (result != ESP_OK) {
+        log_e("PDM sample rate %u Hz rejected: %s", sampRate,
+              esp_err_to_name(result));
+        return false;
+    }
+  #else
     i2s_set_sample_rates((i2s_port_t)m_i2s_num, sampRate);
+  #endif
     m_sampleRate = sampRate;
     IIR_calculateCoefficients(m_gain0, m_gain1, m_gain2); // must be recalculated after each samplerate change
     return true;
@@ -4453,6 +4511,10 @@ void Audio::setI2SCommFMT_LSB(bool commFMT) {
     // true:  changed to I2S_COMM_FORMAT_I2S_LSB for some DACs (PT8211)
     //        Japanese or called LSBJ (Least Significant Bit Justified) format
 
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    (void)commFMT;
+    AUDIO_INFO("I2S communication format is fixed in PDM mode");
+  #else
     if (commFMT) {
         if(m_f_Log) log_i("commFMT LSB");
 
@@ -4476,6 +4538,7 @@ void Audio::setI2SCommFMT_LSB(bool commFMT) {
     AUDIO_INFO("commFMT = %i", m_i2s_config.communication_format);
     i2s_driver_uninstall((i2s_port_t)m_i2s_num);
     i2s_driver_install  ((i2s_port_t)m_i2s_num, &m_i2s_config, 0, NULL);
+  #endif
 }
 //---------------------------------------------------------------------------------------------------------------------
 bool Audio::playSample(int16_t sample[2]) {
@@ -4496,16 +4559,30 @@ bool Audio::playSample(int16_t sample[2]) {
     _computeVUlevel(sample);
     uint32_t s32 = Gain(sample); // vosample2lume;
 
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    const int16_t left = static_cast<int16_t>(s32 >> 16);
+    const int16_t right = static_cast<int16_t>(s32 & 0xffff);
+    const int16_t mono = static_cast<int16_t>(
+        (static_cast<int32_t>(left) + right) / 2);
+    m_i2s_bytesWritten = 0;
+    esp_err_t err = pdmOutputWriteSample(mono);
+    if (err == ESP_OK) m_i2s_bytesWritten = sizeof(mono);
+  #else
     if(m_f_internalDAC) {
         s32 += 0x80008000;
     }
     m_i2s_bytesWritten = 0;
     esp_err_t err = i2s_write((i2s_port_t) m_i2s_num, (const char*) &s32, sizeof(uint32_t), &m_i2s_bytesWritten, 100);
+  #endif
     if(err != ESP_OK) {
         log_e("ESP32 Errorcode %i", err);
         return false;
     }
-    if(m_i2s_bytesWritten < 4) {
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    if(m_i2s_bytesWritten < sizeof(int16_t)) {
+  #else
+    if(m_i2s_bytesWritten < sizeof(uint32_t)) {
+  #endif
         log_e("Can't stuff any more in I2S..."); // increase waitingtime or outputbuffer
         return false;
     }

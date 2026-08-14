@@ -26,7 +26,11 @@
 /* Feed only DAC2/GPIO26; DAC1/GPIO25 is the touch clock. */
 #define I2S_DOUT              255
 #define I2S_INTERNAL          true
+#ifndef I2S_INTERNAL_OUTPUT
+#define I2S_INTERNAL_OUTPUT   AUDIO_OUTPUT_DAC
+#endif
 #define I2S_INTERNAL_CHANNEL  2
+#define I2S_PDM_DOUT          26
 #define PLAYER_FORCE_MONO     true
 
 /* No external VS1053. The microSD bus is intentionally disabled; see docs. */

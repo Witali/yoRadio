@@ -158,7 +158,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 //#define BRIGHTNESS_PIN    255               /*  Pin for adjusting the brightness of the display (output 0 - 3v3) */
 //#define PLAYER_FORCE_MONO false             /*  mono option on boot - false stereo, true mono  */
 //#define I2S_INTERNAL      false             /*  If true - use esp32 internal DAC  */
+//#define I2S_INTERNAL_OUTPUT AUDIO_OUTPUT_DAC /*  AUDIO_OUTPUT_DAC or AUDIO_OUTPUT_PDM  */
 //#define I2S_INTERNAL_CHANNEL 3              /*  Internal DAC: 1=GPIO25, 2=GPIO26, 3=both  */
+//#define I2S_PDM_DOUT      26                /*  PDM data output; PDM clock is not pinned  */
 //#define ROTATE_90         false             /*  Optional 90 degree rotation for square displays */
 //#define WAKE_PIN          255               /*  Wake Pin (for manual wakeup from sleep mode. can match with BTN_XXXX, ENC_BTNB, ENC2_BTNB.  must be one of: 0,2,4,12,13,14,15,25,26,27,32,33,34,35,36,39) */
                                               /*  For sample #define ENC_BTNB 36 - next line - #define WAKE_PIN ENC_BTNB  */

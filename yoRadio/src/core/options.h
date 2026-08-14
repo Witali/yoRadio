@@ -313,8 +313,16 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef I2S_INTERNAL
   #define I2S_INTERNAL      false  // If true - use esp32 internal DAC
 #endif
+#define AUDIO_OUTPUT_DAC    0
+#define AUDIO_OUTPUT_PDM    1
+#ifndef I2S_INTERNAL_OUTPUT
+  #define I2S_INTERNAL_OUTPUT AUDIO_OUTPUT_DAC  // Internal DAC or hardware PCM-to-PDM
+#endif
 #ifndef I2S_INTERNAL_CHANNEL
   #define I2S_INTERNAL_CHANNEL  3  // 1: DAC1/GPIO25, 2: DAC2/GPIO26, 3: both
+#endif
+#ifndef I2S_PDM_DOUT
+  #define I2S_PDM_DOUT      26  // PDM data pin; clock stays inside the ESP32
 #endif
 #ifndef ROTATE_90
   #define ROTATE_90         false  // Optional 90 degree rotation for square displays
