@@ -149,9 +149,9 @@ $flashArguments = @(
     "--chip", "esp32",
     "--port", $Port,
     "--baud", $Baud.ToString(),
-    "--before", "default_reset",
-    "--after", "hard_reset",
-    "write_flash",
+    "--before", "default-reset",
+    "--after", "hard-reset",
+    "write-flash",
     "--flash-mode", "dio",
     "--flash-freq", "80m",
     "--flash-size", "4MB"
