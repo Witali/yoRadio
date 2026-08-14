@@ -29,7 +29,7 @@ From the repository root, run:
 
 Set `-AudioOutput PDM` for the I2S0 hardware PCM-to-PDM/sigma-delta output on GPIO26. DAC is the default. The script:
 
-- builds `yoRadio/yoRadio.ino` for ESP32 Dev Module, 4 MB flash, Minimal SPIFFS;
+- performs a clean build of `yoRadio/yoRadio.ino` for ESP32 Dev Module, 4 MB flash, Minimal SPIFFS so changes in included font data cannot be hidden by Arduino's object cache;
 - installs `yoRadio/fonts/glcdfont.c` into the repository-local Adafruit GFX copy before compiling, enabling YoRadio icons and Cyrillic text;
 - adds both C and C++ `I2S_INTERNAL_OUTPUT=1` overrides for PDM;
 - writes bootloader, partition table, OTA boot selector, and application while preserving NVS and SPIFFS settings by default;

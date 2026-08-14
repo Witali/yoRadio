@@ -109,6 +109,7 @@ if (-not $SkipBuild) {
     $adafruitFont = Join-Path $localLibraries "Adafruit_GFX_Library\glcdfont.c"
     $compileArguments = @(
         "compile",
+        "--clean",
         "--fqbn", $fqbn,
         "--build-path", $buildDirectory,
         "--libraries", $localLibraries
