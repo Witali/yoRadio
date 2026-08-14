@@ -31,7 +31,7 @@ QueueHandle_t playerQueue;
   #if !I2S_INTERNAL
     Player::Player() {}
   #else
-    Player::Player(): Audio(true, I2S_DAC_CHANNEL_BOTH_EN)  {}
+    Player::Player(): Audio(true, I2S_INTERNAL_CHANNEL)  {}
   #endif
 #endif
 
@@ -48,10 +48,10 @@ void Player::init() {
   memset(burl, 0, MQTT_BURL_SIZE);
 #endif
   if(MUTE_PIN!=255) pinMode(MUTE_PIN, OUTPUT);
-  #if I2S_DOUT!=255
-    #if !I2S_INTERNAL
-      setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
-    #endif
+  #if I2S_INTERNAL
+    // The built-in DAC is routed by I2S_INTERNAL_CHANNEL and has no I2S pins.
+  #elif I2S_DOUT!=255
+    setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
   #else
     SPI.begin();
     if(VS1053_RST>0) ResetChip();

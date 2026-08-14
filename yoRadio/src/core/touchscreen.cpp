@@ -25,7 +25,7 @@
 
 #if TS_MODEL==TS_MODEL_XPT2046
   #ifdef TS_SPIPINS
-    SPIClass  TSSPI(HSPI);
+    SPIClass  TSSPI(TS_SPI_HOST);
   #endif
   #include <XPT2046_Touchscreen.h>
   XPT2046_Touchscreen ts(TS_CS);

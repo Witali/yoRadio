@@ -235,6 +235,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef TS_HSPI
   #define TS_HSPI   false      // use HSPI for touchscreen (miso=12, mosi=13, clk=14) instead of VSPI (by default)
 #endif
+#ifndef TS_SPI_HOST
+  #define TS_SPI_HOST HSPI     // SPI host used with custom TS_SPIPINS (HSPI or VSPI)
+#endif
 
 /*        LCD DISPLAY            */
 #ifndef LCD_RS
@@ -309,6 +312,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #endif
 #ifndef I2S_INTERNAL
   #define I2S_INTERNAL      false  // If true - use esp32 internal DAC
+#endif
+#ifndef I2S_INTERNAL_CHANNEL
+  #define I2S_INTERNAL_CHANNEL  3  // 1: DAC1/GPIO25, 2: DAC2/GPIO26, 3: both
 #endif
 #ifndef ROTATE_90
   #define ROTATE_90         false  // Optional 90 degree rotation for square displays

@@ -1,5 +1,5 @@
 #include "../core/options.h"
-#if I2S_DOUT==255
+#if I2S_DOUT==255 && !I2S_INTERNAL
 /*
  *  vs1053_ext.cpp
  *
@@ -2641,4 +2641,4 @@ void Audio::urlencode(char* buff, uint16_t buffLen, bool spacesOnly){
     buff[j] ='\0';
     free(tmpbuff);
 }
-#endif  //  if I2S_DOUT==255
+#endif  //  if I2S_DOUT==255 && !I2S_INTERNAL
