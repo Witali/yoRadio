@@ -161,6 +161,25 @@ _\*this step can be skipped if you add WiFiSSID WiFiPassword pairs to the [yoRad
 **See [wiki](https://github.com/e2002/yoradio/wiki/How-to-flash#build--flash) for details**
 
 ---
+## Station list collector
+
+The repository includes a Python utility that collects and verifies direct
+streams from Radio Record, 101.ru, Zaycev.FM, Relax FM, and Radio Caprice. It
+creates a tab-separated `playlist.csv` ready for import through the yoRadio web
+playlist editor.
+
+From the repository root:
+
+```powershell
+python -m pip install -r tools/radio_stream_collector/requirements-radio-streams.txt
+python tools/radio_stream_collector/radio_stream_collector.py --quality low --verify -v --out .build/radio_output
+```
+
+The generated playlist is `.build/radio_output/playlist.csv`. See the
+[collector documentation](tools/radio_stream_collector/README.md) for site
+selection, verification, and offline self-test options.
+
+---
 ## Update
 1. Backup your settings: \
 download _http://\<yoradioip\>/data/playlist.csv_ and _http://\<yoradioip\>/data/wifi.csv_ and place them in the yoRadio/data/data/ folder
