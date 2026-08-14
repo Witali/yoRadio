@@ -991,7 +991,13 @@ def looks_like_stream(url: str, stream_hosts: Iterable[str] = ()) -> bool:
     host = parts.hostname.lower()
     known_host = host_matches(host, tuple(stream_hosts) + STREAM_HOST_HINTS)
     path_hint = any(hint in path for hint in STREAM_PATH_HINTS)
-    port_hint = parts.port not in {None, 80, 443}
+    try:
+        port_hint = parts.port not in {None, 80, 443}
+    except ValueError:
+        # Minified JavaScript can contain URL-like fragments such as
+        # "https://host:new/path". They are not valid stream URLs and must not
+        # abort collection of the remaining candidates.
+        return False
     # Avoid accepting an ordinary station webpage merely because its domain is known.
     page_like = suffix in {".html", ".htm", ".php"} or path in {"/", "/stations", "/channels"}
     # Non-standard ports are very common for Icecast/Shoutcast and RADCAP
@@ -1640,6 +1646,7 @@ def run_self_test() -> None:
     assert low[0].endswith("low.m3u8")
     assert high[0].endswith("high.m3u8")
     assert looks_like_stream("http://79.120.39.202:8000/dubtechno", ("radcap.ru",))
+    assert not looks_like_stream("https://example.net:new/stream", ("example.net",))
     print("Self-test passed")
 
 
