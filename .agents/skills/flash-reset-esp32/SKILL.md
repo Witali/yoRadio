@@ -39,7 +39,9 @@ Set `-AudioOutput PDM` for the I2S0 hardware PCM-to-PDM/sigma-delta output on GP
 
 Use `-SkipBuild` only when the selected DAC/PDM build directory already contains matching current artifacts. Use `-WhatIf` to inspect the planned operation without building or touching the board.
 
-Do not pass `-FlashFilesystem` during a normal firmware update. Saved Wi-Fi networks and playlists are stored in SPIFFS. Use `-FlashFilesystem` only for a first installation or when the user explicitly authorizes replacing those settings; it creates the SPIFFS image from `yoRadio/data` and writes it at `0x3D0000`. NVS at `0x9000` is never included in the flash image list.
+Do not pass `-FlashFilesystem` during a normal firmware update. Saved Wi-Fi networks and playlists are stored in SPIFFS. Use `-FlashFilesystem` only for a first installation, partition migration, or when the user explicitly authorizes replacing those settings. The custom board table provides 512 KiB of SPIFFS at `0x370000`; each OTA application slot is `0x1B0000` bytes. The script checks the application size before flashing.
+
+For a partition migration, download `/data/wifi.csv` and `/data/playlist.csv` from the running board first. Copy `yoRadio/data` to a temporary staging directory, place the backups in its `data` subdirectory, and pass that directory with `-FilesystemSource`. Never print the contents of `wifi.csv`. NVS at `0x9000` is never included in the flash image list.
 
 Accept a flash as successful only when esptool exits successfully after reporting verified hashes and the final hard reset. Report the COM port, audio mode, build directory, baud rate, and verification result.
 

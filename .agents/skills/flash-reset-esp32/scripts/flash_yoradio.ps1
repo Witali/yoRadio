@@ -14,6 +14,8 @@ param(
 
     [switch]$FlashFilesystem,
 
+    [string]$FilesystemSource,
+
     [string]$ArduinoCli
 )
 
@@ -21,11 +23,12 @@ $ErrorActionPreference = "Stop"
 $repository = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\..\.."))
 $sketch = Join-Path $repository "yoRadio"
 $fqbn = "esp32:esp32:esp32:FlashSize=4M,PartitionScheme=min_spiffs,PSRAM=disabled"
-$buildName = if ($AudioOutput -eq "PDM") { "cyd2usb-pdm" } else { "cyd2usb-min-spiffs" }
+$buildName = if ($AudioOutput -eq "PDM") { "cyd2usb-pdm-spiffs512" } else { "cyd2usb-spiffs512" }
 $buildDirectory = Join-Path $repository ".build\$buildName"
 $spiffsImage = Join-Path $buildDirectory "yoRadio.spiffs.bin"
-$spiffsOffset = "0x3D0000"
-$spiffsSize = 0x20000
+$spiffsOffset = "0x370000"
+$spiffsSize = 0x80000
+$appPartitionSize = 0x1B0000
 
 function Resolve-ArduinoCli {
     param([string]$ExplicitPath)
@@ -157,11 +160,24 @@ foreach ($image in $images.Values) {
         throw "Required flash image is missing: $image"
     }
 }
+$applicationImage = $images["0x10000"]
+$applicationSize = (Get-Item -LiteralPath $applicationImage).Length
+if ($applicationSize -gt $appPartitionSize) {
+    throw "Application image is $applicationSize bytes but each OTA partition is only $appPartitionSize bytes."
+}
 
 if ($FlashFilesystem) {
+    $spiffsSource = if ($FilesystemSource) {
+        [IO.Path]::GetFullPath($FilesystemSource)
+    } else {
+        Join-Path $sketch "data"
+    }
+    if (-not (Test-Path -LiteralPath $spiffsSource -PathType Container)) {
+        throw "SPIFFS source directory was not found: $spiffsSource"
+    }
     $mkspiffs = Find-Esp32Tool -PackageRoot $packageRoot -ToolDirectory "mkspiffs" -Executable "mkspiffs.exe"
-    if ($PSCmdlet.ShouldProcess($spiffsImage, "create a 128 KiB SPIFFS image from yoRadio/data")) {
-        & $mkspiffs -c (Join-Path $sketch "data") -p 256 -b 4096 -s $spiffsSize $spiffsImage
+    if ($PSCmdlet.ShouldProcess($spiffsImage, "create a 512 KiB SPIFFS image from $spiffsSource")) {
+        & $mkspiffs -c $spiffsSource -p 256 -b 4096 -s $spiffsSize $spiffsImage
         if ($LASTEXITCODE -ne 0) {
             throw "mkspiffs failed with exit code $LASTEXITCODE"
         }
@@ -176,8 +192,9 @@ Write-Host "  Port:         $Port"
 Write-Host "  Audio output: $AudioOutput"
 Write-Host "  Build:        $buildDirectory"
 Write-Host "  Baud:         $Baud"
+Write-Host "  App slot:     $appPartitionSize bytes ($applicationSize bytes used)"
 if ($FlashFilesystem) {
-    Write-Warning "SPIFFS will be overwritten; saved Wi-Fi networks and playlists may be lost."
+    Write-Warning "SPIFFS will be replaced with a 512 KiB image from $spiffsSource."
 } else {
     Write-Host "  Settings:     preserved (NVS and SPIFFS are not written)"
 }
