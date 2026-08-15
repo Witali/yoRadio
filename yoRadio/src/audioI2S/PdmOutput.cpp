@@ -13,6 +13,7 @@
 #include <driver/gpio.h>
 #include <driver/i2s_pdm.h>
 #include <limits.h>
+#include <math.h>
 
 namespace {
 
@@ -24,6 +25,10 @@ constexpr size_t kDmaSamples = 512;
 constexpr uint32_t kDmaDescriptors = 8;
 constexpr uint32_t kBiasRampMs = 100;
 constexpr uint32_t kBiasSettleMs = 2;
+constexpr uint32_t kLowPassMinimumSampleRate = 40000;
+constexpr float kLowPassCutoffHz = 15000.0F;
+constexpr float kButterworthQ = 0.70710678118F;
+constexpr float kTwoPi = 6.28318530718F;
 
 i2s_chan_handle_t outputChannel = nullptr;
 uint8_t outputPort = I2S_NUM_0;
@@ -32,6 +37,45 @@ uint32_t outputSampleRate = 0;
 bool outputRunning = false;
 size_t bufferedSamples = 0;
 int16_t sampleBuffer[kDmaSamples] = {};
+
+struct LowPassState {
+  float b0 = 1.0F;
+  float b1 = 0.0F;
+  float b2 = 0.0F;
+  float a1 = 0.0F;
+  float a2 = 0.0F;
+  float z1 = 0.0F;
+  float z2 = 0.0F;
+  bool enabled = false;
+};
+
+LowPassState lowPass;
+
+void configureLowPass(uint32_t sampleRate) {
+  lowPass = {};
+  if (sampleRate < kLowPassMinimumSampleRate) return;
+
+  const float omega = kTwoPi * kLowPassCutoffHz / sampleRate;
+  const float cosine = cosf(omega);
+  const float alpha = sinf(omega) / (2.0F * kButterworthQ);
+  const float inverseA0 = 1.0F / (1.0F + alpha);
+  lowPass.b0 = ((1.0F - cosine) * 0.5F) * inverseA0;
+  lowPass.b1 = (1.0F - cosine) * inverseA0;
+  lowPass.b2 = lowPass.b0;
+  lowPass.a1 = (-2.0F * cosine) * inverseA0;
+  lowPass.a2 = (1.0F - alpha) * inverseA0;
+  lowPass.enabled = true;
+}
+
+int16_t filterSample(int16_t sample) {
+  if (!lowPass.enabled) return sample;
+  const float output = lowPass.b0 * sample + lowPass.z1;
+  lowPass.z1 = lowPass.b1 * sample - lowPass.a1 * output + lowPass.z2;
+  lowPass.z2 = lowPass.b2 * sample - lowPass.a2 * output;
+  if (output >= INT16_MAX) return INT16_MAX;
+  if (output <= INT16_MIN) return INT16_MIN;
+  return static_cast<int16_t>(output);
+}
 
 uint32_t rampSamples(uint32_t sampleRate) {
   const uint64_t scaled = static_cast<uint64_t>(sampleRate) * kBiasRampMs;
@@ -99,6 +143,7 @@ esp_err_t releaseChannel(bool rampDown) {
   }
   holdOutputLow();
   outputSampleRate = 0;
+  configureLowPass(0);
   return firstError;
 }
 
@@ -131,6 +176,7 @@ esp_err_t pdmOutputBegin(uint8_t port, uint8_t dataPin,
   outputPin = dataPin;
   outputSampleRate = sampleRate;
   bufferedSamples = 0;
+  configureLowPass(sampleRate);
 
   i2s_chan_config_t channelConfig = I2S_CHANNEL_DEFAULT_CONFIG(
       static_cast<i2s_port_t>(outputPort), I2S_ROLE_MASTER);
@@ -247,7 +293,12 @@ esp_err_t pdmOutputSetSampleRate(uint32_t sampleRate) {
 
 esp_err_t pdmOutputWriteSample(int16_t sample) {
   if (!outputChannel || !outputRunning) return ESP_ERR_INVALID_STATE;
-  sampleBuffer[bufferedSamples++] = sample;
+  // HLV's normal production profile uses a 32 kHz sample clock.  Internet
+  // radio commonly uses 44.1/48 kHz, exposing more high-frequency residue
+  // from low-bitrate codecs through this board's simple analog input filter.
+  // Preserve the useful band while attenuating only that extra bandwidth in
+  // PDM mode.
+  sampleBuffer[bufferedSamples++] = filterSample(sample);
   if (bufferedSamples < kDmaSamples) return ESP_OK;
   const esp_err_t result = writeBlock(sampleBuffer, bufferedSamples);
   bufferedSamples = 0;
