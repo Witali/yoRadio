@@ -136,6 +136,14 @@ void initControls() {
 
 void loopControls() {
   if(display.mode()==UPDATING || display.mode()==SDCHANGE) return;
+#if (TS_MODEL!=TS_MODEL_UNDEFINED) && (DSP_MODEL!=DSP_DUMMY)
+  // The access-point screen normally disables all player controls, but a tap
+  // is used as an explicit request to retry the saved Wi-Fi networks.
+  if(network.status == SOFT_AP) {
+    touchscreen.loop();
+    return;
+  }
+#endif
   if(SDC_CS==255 && display.mode()==LOST) return;
   if(ctrls_on_loop) ctrls_on_loop();
 #if ENC_BTNL!=255

@@ -5,6 +5,7 @@
 #include "config.h"
 #include "controls.h"
 #include "display.h"
+#include "network.h"
 #include "player.h"
 
 #ifndef TS_X_MIN
@@ -104,6 +105,14 @@ void TouchScreen::loop(){
   ts.read();
 #endif
   bool istouched = _istouched();
+  if (network.status == SOFT_AP) {
+    if (istouched && !wastouched) {
+      network.reconnectFromSoftAP();
+    }
+    direct = TSD_STAY;
+    wastouched = istouched;
+    return;
+  }
   if(istouched){
   #if TS_MODEL==TS_MODEL_XPT2046
     TSPoint p = ts.getPoint();

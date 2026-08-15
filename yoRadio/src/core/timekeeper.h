@@ -19,6 +19,7 @@ class TimeKeeper {
     void weatherTask();
     void waitAndReturnPlayer(uint8_t time_s);
     void waitAndDo(uint8_t time_s, void (*callback)());
+    void cancelWaitAndDo();
   private:
     uint32_t _returnPlayerTime, _doAfterTime;
     void (*_aftercallback)();

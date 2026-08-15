@@ -106,6 +106,26 @@ void setup() {
 }
 
 void loop() {
+  if (network.takeSoftAPReconnectReady()) {
+    // The AP boot path returned before the playlist, telnet, OTA and player
+    // startup stages.  Finish those stages once, on the normal Arduino task,
+    // after the background Wi-Fi connection has succeeded.
+    if (network_on_connect) network_on_connect();
+    pm.on_connect();
+    config.initPlaylistMode();
+    telnet.begin(true);
+  #if USE_OTA
+    setupOTA();
+  #endif
+    player.lockOutput = false;
+    display.putRequest(NEWMODE, CLEAR);
+    display.putRequest(NEWMODE, PLAYER);
+    display.putRequest(NEWIP, 0);
+    if (config.lastStation() > 0) {
+      player.sendCommand({PR_PLAY, config.lastStation()});
+    }
+    pm.on_end_setup();
+  }
   timekeeper.loop1();
   telnet.loop();
   if (network.status == CONNECTED || network.status==SDREADY) {

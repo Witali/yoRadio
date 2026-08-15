@@ -111,6 +111,51 @@ void searchWiFi(void * pvParameters){
   vTaskDelete( NULL );
 }
 
+bool MyNetwork::reconnectFromSoftAP() {
+  if (status != SOFT_AP || _softAPReconnectRunning || config.ssidsCount == 0) {
+    return false;
+  }
+  _softAPReconnectRunning = true;
+  _softAPReconnectReady = false;
+  Serial.println("Touch requested Wi-Fi station reconnect");
+  const BaseType_t taskCreated = xTaskCreatePinnedToCore(
+      SoftAPReconnectTask, "ap-to-station", 1024 * 4, nullptr, 1, nullptr,
+      SEARCH_WIFI_CORE_ID);
+  if (taskCreated != pdPASS) {
+    _softAPReconnectRunning = false;
+    Serial.println("Failed to start Wi-Fi reconnect task");
+    return false;
+  }
+  return true;
+}
+
+void MyNetwork::SoftAPReconnectTask(void *pvParameters) {
+  (void)pvParameters;
+  WiFi.softAPdisconnect(true);
+  WiFi.mode(WIFI_STA);
+
+  if (network.wifiBegin(true)) {
+    network.setWifiParams();
+    timekeeper.cancelWaitAndDo();
+    network.status = CONNECTED;
+    network._softAPReconnectReady = true;
+    display.putRequest(NEWIP, 0);
+    Serial.printf("Wi-Fi station reconnect succeeded: %s\n",
+                  config.ipToStr(WiFi.localIP()));
+  } else {
+    Serial.println("Wi-Fi station reconnect failed; restoring access point");
+    network.raiseSoftAP();
+  }
+  network._softAPReconnectRunning = false;
+  vTaskDelete(nullptr);
+}
+
+bool MyNetwork::takeSoftAPReconnectReady() {
+  if (!_softAPReconnectReady) return false;
+  _softAPReconnectReady = false;
+  return true;
+}
+
 #define DBGAP false
 
 void MyNetwork::begin() {

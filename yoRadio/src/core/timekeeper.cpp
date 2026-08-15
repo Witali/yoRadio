@@ -169,6 +169,10 @@ void TimeKeeper::waitAndDo(uint8_t time_s, void (*callback)()){
   _doAfterTime = millis()+time_s*1000;
   _aftercallback = callback;
 }
+void TimeKeeper::cancelWaitAndDo(){
+  _doAfterTime = 0;
+  _aftercallback = nullptr;
+}
 void TimeKeeper::_doAfterWait(){
   if(_doAfterTime>0 && millis()>=_doAfterTime){
     _doAfterTime = 0;

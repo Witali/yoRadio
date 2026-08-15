@@ -16,8 +16,13 @@ class MyNetwork {
     void requestWeatherSync();
     void setWifiParams();
     bool wifiBegin(bool silent=false);
+    bool reconnectFromSoftAP();
+    bool takeSoftAPReconnectReady();
   private:
+    volatile bool _softAPReconnectRunning = false;
+    volatile bool _softAPReconnectReady = false;
     void raiseSoftAP();
+    static void SoftAPReconnectTask(void *pvParameters);
     static void WiFiLostConnection(WiFiEvent_t event, WiFiEventInfo_t info);
     static void WiFiReconnected(WiFiEvent_t event, WiFiEventInfo_t info);
 };
