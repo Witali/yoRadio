@@ -2648,15 +2648,8 @@ bool Audio::playChunk() {
             while(m_validSamples) {
                 uint8_t x =  m_outBuff[m_curSample] & 0x00FF;
                 uint8_t y = (m_outBuff[m_curSample] & 0xFF00) >> 8;
-                if(!m_f_forceMono) { // stereo mode
-                    sample[LEFTCHANNEL]  = x;
-                    sample[RIGHTCHANNEL] = y;
-                }
-                else { // force mono
-                    uint8_t xy = (x + y) / 2;
-                    sample[LEFTCHANNEL]  = xy;
-                    sample[RIGHTCHANNEL] = xy;
-                }
+                sample[LEFTCHANNEL]  = x;
+                sample[RIGHTCHANNEL] = y;
                 while(1) {
                     if(playSample(sample)) break;
                 } // Can't send?
@@ -2684,15 +2677,8 @@ bool Audio::playChunk() {
         if(getChannels() == 2) {
             m_curSample = 0;
             while(m_validSamples) {
-                if(!m_f_forceMono) { // stereo mode
-                    sample[LEFTCHANNEL]  = m_outBuff[m_curSample * 2];
-                    sample[RIGHTCHANNEL] = m_outBuff[m_curSample * 2 + 1];
-                }
-                else { // mono mode, #100
-                    int16_t xy = (m_outBuff[m_curSample * 2] + m_outBuff[m_curSample * 2 + 1]) / 2;
-                    sample[LEFTCHANNEL] = xy;
-                    sample[RIGHTCHANNEL] = xy;
-                }
+                sample[LEFTCHANNEL]  = m_outBuff[m_curSample * 2];
+                sample[RIGHTCHANNEL] = m_outBuff[m_curSample * 2 + 1];
                 playSample(sample);
                 m_validSamples--;
                 m_curSample++;
@@ -4821,14 +4807,25 @@ bool Audio::playSample(int16_t sample[2]) {
     sample = IIR_filterChain2(sample);
     //-------------------------------------------
     applyFade(sample);
+
+    // Measure the decoded stereo channels before a single-channel output
+    // folds them to mono.  Otherwise both VU bars receive the same mixed
+    // sample on boards that use only one internal DAC/PDM channel.
     _computeVUlevel(sample);
+
+    if(m_f_forceMono && getChannels() == 2) {
+        const int32_t mixed =
+            static_cast<int32_t>(sample[LEFTCHANNEL]) +
+            static_cast<int32_t>(sample[RIGHTCHANNEL]);
+        sample[LEFTCHANNEL] = static_cast<int16_t>(mixed / 2);
+        sample[RIGHTCHANNEL] = sample[LEFTCHANNEL];
+    }
 
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
     int16_t mono;
     if (getChannels() == 1 || m_f_forceMono) {
-        // Mono input is already duplicated by playChunk(), and forceMono has
-        // already folded stereo to mono there. Scale that one signal instead
-        // of averaging the same channel a second time.
+        // Mono input is duplicated by playChunk(), and forced stereo has been
+        // folded only after the independent L/R VU levels were measured.
         const int32_t scaled =
             static_cast<int32_t>(sample[LEFTCHANNEL]) * m_vol;
         mono = static_cast<int16_t>(scaled >> 8);
