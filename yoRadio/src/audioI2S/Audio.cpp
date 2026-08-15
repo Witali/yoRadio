@@ -369,7 +369,15 @@ void Audio::setDefaults() {
       if(_client) _client->stop();
       _client = static_cast<WiFiClient*>(&client); /* default to *something* so that no NULL deref can happen */
     }
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    // stopSong() has already ramped down, disabled and deleted the PDM
+    // channel.  Trying to feed the legacy I2S silence tail after that leaves
+    // mono streams retrying a write to a non-existent channel forever.
+    m_validSamples = 0;
+    m_curSample = 0;
+  #else
     playI2Sremains();
+  #endif
     ts_parsePacket(0, 0, 0); // reset ts routine
 
     AUDIO_INFO("buffers freed, free Heap: %lu bytes", ESP.getFreeHeap());
