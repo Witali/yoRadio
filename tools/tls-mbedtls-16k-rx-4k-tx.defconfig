@@ -1,0 +1,6 @@
+# Keep the incoming TLS record size at the interoperable maximum while
+# reducing the mostly-idle radio client transmit buffer by 12 KiB.
+CONFIG_MBEDTLS_ASYMMETRIC_CONTENT_LEN=y
+CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384
+CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN=4096
+

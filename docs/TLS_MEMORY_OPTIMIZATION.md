@@ -41,8 +41,12 @@ would make the sketch and precompiled mbedTLS library ABI-incompatible.
   and authentication before the TLS handshake.
 - [ ] Measure whether public HTTPS playlist entries also work over plain HTTP;
   document safe replacements but never silently downgrade arbitrary URLs.
-- [ ] Determine whether a custom Arduino-ESP32/ESP-IDF build with asymmetric
-  8 KiB RX and 2 KiB TX mbedTLS buffers is reproducible in this repository.
+- [ ] Produce a reproducible custom Arduino-ESP32/ESP-IDF library build with
+  asymmetric TLS buffers: 16 KiB RX and 4 KiB TX. RX stays at the protocol-safe
+  maximum because arbitrary radio servers may send full-size records.
+- [ ] Evaluate Espressif's dynamic TX/RX buffer mode and freeing TLS config data
+  after the handshake. Prefer releasing an idle TX allocation over aliasing RX
+  and TX memory; mbedTLS needs both directions concurrently during handshake.
 - [ ] If the custom core is reproducible, test certificate-heavy HTTPS hosts,
   redirects, chunked streams, 64/128/320 kbit/s MP3, and HTTP AAC.
 - [ ] Compare stopped/playing free heap and largest block against the baseline.
@@ -58,4 +62,3 @@ would make the sketch and precompiled mbedTLS library ABI-incompatible.
    a largest free block of at least 50 KiB.
 4. DAC fade-in/fade-out behavior remains unchanged.
 5. Firmware image fits the 0x1B0000-byte application slot.
-
