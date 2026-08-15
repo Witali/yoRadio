@@ -20,6 +20,7 @@ struct ParsedMp3Header {
 };
 
 uint8_t selectedBackend = MP3_DECODER_HELIX;
+mp3dec_t miniDecoderStorage = {};
 mp3dec_t *miniDecoder = nullptr;
 MP3FrameInfo_t miniFrameInfo = {};
 
@@ -90,18 +91,32 @@ const char* Mp3DecoderName() {
 }
 
 bool Mp3DecoderAllocateBuffers() {
-    if(selectedBackend == MP3_DECODER_HELIX) return MP3Decoder_AllocateBuffers();
-    if(miniDecoder) free(miniDecoder);
-    miniDecoder = static_cast<mp3dec_t*>(calloc(1, sizeof(mp3dec_t)));
-    if(!miniDecoder) return false;
+    if(selectedBackend == MP3_DECODER_HELIX) {
+        if(MP3Decoder_AllocateBuffers()) return true;
+
+        // Helix uses several sizeable heap allocations.  TLS streams can
+        // leave enough total memory but no contiguous blocks large enough
+        // for Helix, so retry with the more compact minimp3 backend.
+        selectedBackend = MP3_DECODER_MINIMP3;
+        log_w("Helix MP3 decoder allocation failed; retrying with minimp3");
+    }
+    // Allocate the larger scratch block first and keep an existing decoder
+    // reservation intact.  This lets HTTPS connections reserve minimp3 before
+    // the TLS heap allocations fragment the remaining memory.
     if(!mp3dec_alloc_scratch()) {
-        free(miniDecoder);
-        miniDecoder = nullptr;
         return false;
     }
+    // Keep the small decoder state out of the fragmented runtime heap.  The
+    // classic ESP32 still has ample static DRAM, while some TLS handshakes
+    // leave no contiguous dynamic block large enough even for mp3dec_t.
+    miniDecoder = &miniDecoderStorage;
     mp3dec_init(miniDecoder);
     clearMiniFrameInfo();
     return true;
+}
+
+bool Mp3DecoderReserveScratch() {
+    return mp3dec_alloc_scratch();
 }
 
 void Mp3DecoderFreeBuffers() {
@@ -109,8 +124,8 @@ void Mp3DecoderFreeBuffers() {
         MP3Decoder_FreeBuffers();
         return;
     }
-    if(miniDecoder) free(miniDecoder);
     miniDecoder = nullptr;
+    memset(&miniDecoderStorage, 0, sizeof(miniDecoderStorage));
     mp3dec_free_scratch();
     clearMiniFrameInfo();
 }

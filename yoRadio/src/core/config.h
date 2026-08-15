@@ -30,7 +30,7 @@
   #define ESP_ARDUINO_3 1
 #endif
 
-#define CONFIG_VERSION  6
+#define CONFIG_VERSION  7
 
 enum playMode_e      : uint8_t  { PM_WEB=0, PM_SDCARD=1 };
 

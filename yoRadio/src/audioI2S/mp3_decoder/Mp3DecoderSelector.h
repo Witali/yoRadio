@@ -13,6 +13,7 @@ uint8_t Mp3DecoderSelected();
 const char* Mp3DecoderName();
 
 bool Mp3DecoderAllocateBuffers();
+bool Mp3DecoderReserveScratch();
 void Mp3DecoderFreeBuffers();
 void Mp3DecoderClearBuffer();
 int Mp3DecoderDecode(unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize);

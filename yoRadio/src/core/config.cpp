@@ -136,6 +136,9 @@ void Config::_setupVersion(){
     case 5:
       saveValue(&store.mp3Decoder, (uint8_t)0); // Helix legacy
       break;
+    case 6:
+      saveValue(&store.mp3Decoder, (uint8_t)1); // minimp3
+      break;
     default:
       break;
   }
@@ -482,7 +485,7 @@ void Config::resetSystem(const char *val, uint8_t clientId){
     saveValue(&store.abuff, (uint16_t)(VS1053_CS==255?7:10), false);
     saveValue(&store.telnet, true);
     saveValue(&store.watchdog, true, false);
-    saveValue(&store.mp3Decoder, (uint8_t)0);
+    saveValue(&store.mp3Decoder, (uint8_t)1);
     snprintf(store.mdnsname, MDNS_LENGTH, "yoradio-%x", (unsigned int)getChipId());
     saveValue(store.mdnsname, store.mdnsname, MDNS_LENGTH, true, true);
     display.putRequest(NEWMODE, CLEAR); display.putRequest(NEWMODE, PLAYER);
@@ -616,7 +619,7 @@ void Config::setDefaults() {
   store.timeSyncInterval = 60;    //min
   store.timeSyncIntervalRTC = 24; //hour
   store.weatherSyncInterval = 30; //min
-  store.mp3Decoder = 0; // Helix legacy
+  store.mp3Decoder = 1; // minimp3
   eepromWrite(EEPROM_START, store);
 }
 

@@ -519,6 +519,16 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     if(startsWith(l_host, "https")) m_f_ssl = true;
     else                            m_f_ssl = false;
 
+    if(m_f_ssl) {
+        // Reserve minimp3's largest block while the heap is still contiguous.
+        // Keep the smaller decoder object unallocated until the response says
+        // this really is MP3, leaving more headroom for the TLS handshake.
+        Mp3DecoderSelect(MP3_DECODER_MINIMP3);
+        if(!Mp3DecoderReserveScratch()) {
+            AUDIO_INFO("Unable to reserve minimp3 scratch before TLS handshake");
+        }
+    }
+
     // authentification
     uint8_t auth = strlen(user) + strlen(pwd);
     char toEncode[auth + 4];
@@ -3847,9 +3857,20 @@ bool Audio::parseHttpResponseHeader() { // this is the response to a GET / reque
 }
 //---------------------------------------------------------------------------------------------------------------------
 bool Audio:: initializeDecoder(){
+    if(m_codec != CODEC_MP3) {
+        // HTTPS pre-reserves minimp3 before the response content type is known.
+        // Release that reservation when the stream turns out to use AAC or a
+        // different codec.
+        Mp3DecoderFreeBuffers();
+    }
     switch(m_codec){
         case CODEC_MP3:
-            Mp3DecoderSelect(config.store.mp3Decoder);
+            // The TLS connection itself consumes a large contiguous part of
+            // the classic ESP32 heap.  Prefer minimp3 for HTTPS so decoder
+            // allocation does not fail after the TLS handshake.  Keep the
+            // configured backend for plain HTTP streams.
+            Mp3DecoderSelect(m_f_ssl ? MP3_DECODER_MINIMP3
+                                     : config.store.mp3Decoder);
             if(!Mp3DecoderAllocateBuffers()) goto exit;
             AUDIO_INFO("MP3 decoder %s has been initialized, free Heap: %lu bytes", Mp3DecoderName(), ESP.getFreeHeap());
             InBuff.changeMaxBlockSize(m_frameSizeMP3);
