@@ -80,6 +80,17 @@ size_t AudioBuffer::init() {
 }
 
 void AudioBuffer::changeMaxBlockSize(uint16_t mbs){
+    // getReadPtr() mirrors a wrapped block into the reserved tail behind the
+    // ring. Never allow a block larger than that tail: WAV asks for 8192
+    // bytes, while RAM-only boards reserve 1600 bytes, which used to copy
+    // beyond the allocation and corrupt the heap on every wrap.
+    const size_t reservedSize = m_f_psram ? m_resBuffSizePSRAM
+                                         : m_resBuffSizeRAM;
+    if(mbs > reservedSize) {
+        log_w("Audio block size %u exceeds %u-byte wrap reserve; clamping",
+              mbs, reservedSize);
+        mbs = reservedSize;
+    }
     m_maxBlockSize = mbs;
     return;
 }
@@ -1398,11 +1409,15 @@ int Audio::read_WAV_Header(uint8_t* data, size_t len) {
 
     if(m_controlCounter == 8){
         m_controlCounter ++;
-        size_t cs =  *(data + 0) + (*(data + 1) << 8) + (*(data + 2) << 16) + (*(data + 3) << 24); //read chunkSize
+        const uint32_t dataSize = static_cast<uint32_t>(data[0]) |
+                                  (static_cast<uint32_t>(data[1]) << 8) |
+                                  (static_cast<uint32_t>(data[2]) << 16) |
+                                  (static_cast<uint32_t>(data[3]) << 24);
         headerSize += 4;
         if(getDatamode() == AUDIO_LOCALFILE) m_contentlength = getFileSize();
-        if(cs){
-            m_audioDataSize = cs  - 44;
+        if(dataSize){
+            // The RIFF data chunk size already contains PCM bytes only.
+            m_audioDataSize = dataSize;
         }
         else { // sometimes there is nothing here
             if(getDatamode() == AUDIO_LOCALFILE) m_audioDataSize = getFileSize() - headerSize;
@@ -3252,6 +3267,7 @@ void Audio::processWebFile() {
     static uint32_t byteCounter;                                // count received data
     static uint32_t chunkSize;                                  // chunkcount read from stream
     static size_t   audioDataCount;                             // counts the decoded audiodata only
+    static uint8_t  playCounter;
 
     // first call, set some values to default - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     if(m_f_firstCall) { // runs only ont time per connection, prepare for start
@@ -3261,6 +3277,7 @@ void Audio::processWebFile() {
         byteCounter = 0;
         chunkSize = 0;
         audioDataCount = 0;
+        playCounter = 0;
     }
 
     if(!m_contentlength) {log_e("webfile without contentlength!"); stopSong(); return;} // guard
@@ -3280,10 +3297,19 @@ void Audio::processWebFile() {
     }
 
     availableBytes = min((uint32_t)InBuff.writeSpace(), availableBytes);
-    availableBytes = min(m_contentlength - byteCounter, availableBytes);
-    if(m_audioDataSize) availableBytes = min(m_audioDataSize - (byteCounter - m_audioDataStart), availableBytes);
+    const uint32_t contentRemaining = byteCounter < m_contentlength
+                                      ? m_contentlength - byteCounter : 0;
+    availableBytes = min(contentRemaining, availableBytes);
+    if(m_audioDataSize && m_audioDataStart && byteCounter >= m_audioDataStart) {
+        const uint32_t audioBytesRead = byteCounter - m_audioDataStart;
+        const uint32_t audioBytesRemaining = audioBytesRead < m_audioDataSize
+                                             ? m_audioDataSize - audioBytesRead : 0;
+        availableBytes = min(audioBytesRemaining, availableBytes);
+    }
 
-    int16_t bytesAddedToBuffer = _client->read(InBuff.getWritePtr(), availableBytes);
+    int16_t bytesAddedToBuffer = availableBytes
+                                 ? _client->read(InBuff.getWritePtr(), availableBytes)
+                                 : 0;
 
     if(bytesAddedToBuffer > 0) {
         byteCounter  += bytesAddedToBuffer;  // Pull request #42
@@ -3327,18 +3353,20 @@ void Audio::processWebFile() {
         return;
     }
 
-    if(byteCounter == m_contentlength)                    {f_webFileDataComplete = true;}
-    if(byteCounter - m_audioDataStart == m_audioDataSize) {f_webFileDataComplete = true;}
+    if(byteCounter >= m_contentlength) {f_webFileDataComplete = true;}
+    if(m_audioDataSize && m_audioDataStart && byteCounter >= m_audioDataStart &&
+       byteCounter - m_audioDataStart >= m_audioDataSize) {
+        f_webFileDataComplete = true;
+    }
 
     // play audio data - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     if(f_stream){
-        static uint8_t cnt = 0;
         uint8_t compression;
         if(m_codec == CODEC_WAV)  compression = 1;
-        if(m_codec == CODEC_FLAC) compression = 2;
+        else if(m_codec == CODEC_FLAC) compression = 2;
         else compression = 6;
-        cnt++;
-        if(cnt == compression){playAudioData(); cnt = 0;}
+        playCounter++;
+        if(playCounter >= compression){playAudioData(); playCounter = 0;}
     }
     return;
 }
@@ -4148,10 +4176,17 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
     int bytesDecoded = 0;
 
     switch(m_codec){
-        case CODEC_WAV:      memmove(m_outBuff, data , len); //copy len data in outbuff and set validsamples and bytesdecoded=len
-                             if(getBitsPerSample() == 16) m_validSamples = len / (2 * getChannels());
-                             if(getBitsPerSample() == 8 ) m_validSamples = len / 2;
-                             bytesLeft = 0; break;
+        case CODEC_WAV: {
+            const size_t alignment = getBitsPerSample() == 16
+                                     ? 2U * getChannels() : 2U;
+            size_t copyBytes = min(len, sizeof(m_outBuff));
+            copyBytes -= copyBytes % alignment;
+            if(copyBytes) memmove(m_outBuff, data, copyBytes);
+            if(getBitsPerSample() == 16) m_validSamples = copyBytes / (2 * getChannels());
+            if(getBitsPerSample() == 8 ) m_validSamples = copyBytes / 2;
+            bytesLeft = len - copyBytes;
+            break;
+        }
         case CODEC_MP3:      ret = Mp3DecoderDecode(data, &bytesLeft, m_outBuff, 0); break;
         case CODEC_AAC:      ret = AACDecode(data, &bytesLeft, m_outBuff);    break;
         case CODEC_M4A:      ret = AACDecode(data, &bytesLeft, m_outBuff);    break;
