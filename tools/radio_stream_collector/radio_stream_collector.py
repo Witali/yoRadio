@@ -117,6 +117,7 @@ STREAM_HOST_HINTS = (
 )
 URL_RE = re.compile(r"(?:(?:https?:)?//)[^\s\"'<>\\]+", re.IGNORECASE)
 CHANNEL_101_RE = re.compile(r"/radio/channel/(\d+)(?:\D|$)")
+GENERIC_101_NAME_RE = re.compile(r"^(?:101\.ru\s*[—:-]\s*)?Канал\s+\d+$", re.IGNORECASE)
 RECORD_STATION_RE = re.compile(r"/station/([a-zA-Z0-9_-]+)(?:[/?#]|$)")
 RELAX_CHANNEL_RE = re.compile(r"/channels/(\d+)(?:\D|$)")
 
@@ -276,6 +277,10 @@ class PageParser(HTMLParser):
         value = self.meta_title or " ".join(self._title_parts)
         return clean_title(value)
 
+    @property
+    def document_title(self) -> str:
+        return clean_title(" ".join(self._title_parts))
+
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attr = {k.lower(): (v or "") for k, v in attrs}
         tag = tag.lower()
@@ -378,7 +383,10 @@ class StreamCollector:
             result = await self.crawl_site(spec)
             crawl_results[key] = result
             all_candidates.extend(result.candidates)
-            all_candidates.extend(self.derive_site_candidates(spec, result))
+            derived_candidates = self.derive_site_candidates(spec, result)
+            if spec.key == "101":
+                await self.enrich_101_candidate_names(derived_candidates)
+            all_candidates.extend(derived_candidates)
             self.logger.info(
                 "%s: %d pages, %d raw candidates",
                 spec.title,
@@ -435,9 +443,14 @@ class StreamCollector:
         verified.sort(key=lambda x: (x.site.lower(), x.name.lower(), not x.ok, x.url))
         return verified
 
-    async def fetch_text(self, url: str) -> tuple[str, str, int]:
+    async def fetch_text(
+        self,
+        url: str,
+        *,
+        accept: str = "text/html,application/json,text/javascript,*/*;q=0.5",
+    ) -> tuple[str, str, int]:
         await self.rate_limiter.wait()
-        headers = {"Accept": "text/html,application/json,text/javascript,*/*;q=0.5"}
+        headers = {"Accept": accept}
         async with self.client.stream("GET", url, headers=headers) as response:
             response.raise_for_status()
             content_type = response.headers.get("content-type", "").split(";", 1)[0].strip().lower()
@@ -585,6 +598,50 @@ class StreamCollector:
         # Radio Browser is used as a fallback if static extraction misses it.
         return []
 
+    async def enrich_101_candidate_names(self, candidates: list[Candidate]) -> None:
+        """Resolve generic 101.ru channel IDs through their official pages."""
+        pages = list(dict.fromkeys(
+            candidate.source_page
+            for candidate in candidates
+            if is_generic_101_name(candidate.name) and candidate.source_page
+        ))
+        if not pages:
+            return
+
+        name_semaphore = asyncio.Semaphore(min(4, self.args.concurrency))
+
+        async def resolve(page: str) -> tuple[str, str]:
+            for attempt in range(3):
+                try:
+                    if attempt:
+                        await asyncio.sleep(0.15 * attempt)
+                    async with name_semaphore:
+                        # 101.ru returns its raw PHP template when JSON is accepted.
+                        text, _, _ = await self.fetch_text(page, accept="text/html")
+                    parser = PageParser()
+                    parser.feed(decode_embedded_text(text))
+                    for page_title in (parser.title, parser.document_title):
+                        title = extract_101_channel_name(page_title)
+                        if title:
+                            return page, title
+                except Exception as exc:
+                    self.logger.debug(
+                        "101.ru channel name lookup failed %s (attempt %d): %s",
+                        page,
+                        attempt + 1,
+                        exc,
+                    )
+            return page, ""
+
+        resolved = dict(await asyncio.gather(*(resolve(page) for page in pages)))
+        enriched = 0
+        for candidate in candidates:
+            title = resolved.get(candidate.source_page, "")
+            if title and is_generic_101_name(candidate.name):
+                candidate.name = format_101_station_name(title)
+                enriched += 1
+        self.logger.info("101.ru: resolved %d/%d generic channel names", enriched, len(pages))
+
     async def collect_radio_browser(self, spec: SiteSpec) -> list[Candidate]:
         results: list[Candidate] = []
         api_hosts = (
@@ -662,6 +719,10 @@ class StreamCollector:
         display_name = candidate.name
         if normalize_station_name(display_name) in {"radio", "stream", "live", "online"} and best.icy_name.strip():
             display_name = best.icy_name.strip()
+        elif candidate.site == "101" and is_generic_101_name(display_name):
+            icy_name = usable_101_icy_name(best.icy_name)
+            if icy_name:
+                display_name = format_101_station_name(icy_name)
         return FinalStream(
             site=candidate.site,
             name=display_name,
@@ -922,10 +983,44 @@ def clean_title(value: str) -> str:
     return value[:180]
 
 
+def is_generic_101_name(name: str) -> bool:
+    return bool(GENERIC_101_NAME_RE.fullmatch(clean_title(name)))
+
+
+def extract_101_channel_name(page_title: str) -> str:
+    """Extract a station label from the verbose title used by 101.ru pages."""
+    value = clean_title(page_title)
+    listen_match = re.search(r"(?:^|[.!?]\s+)Слушайте\s+(.+)$", value, re.IGNORECASE)
+    if listen_match:
+        value = clean_title(listen_match.group(1))
+    value = re.sub(r"\s*[|—-]\s*101\.ru(?:\s.*)?$", "", value, flags=re.IGNORECASE).strip()
+    if not value or is_generic_101_name(value) or not is_sane_station_name(value):
+        return ""
+    lowered = value.lower()
+    if lowered in {"101.ru", "радио онлайн слушать бесплатно", "радио онлайн"}:
+        return ""
+    return value
+
+
+def usable_101_icy_name(icy_name: str) -> str:
+    value = clean_title(icy_name)
+    normalized = normalize_station_name(value)
+    if normalized in {"", "101 ru", "radio101", "relax life"}:
+        return ""
+    return re.sub(r"^101\.ru\s*[:—-]\s*", "", value, flags=re.IGNORECASE).strip()
+
+
+def format_101_station_name(name: str) -> str:
+    value = re.sub(r"^101\.ru\s*[:—-]\s*", "", clean_title(name), flags=re.IGNORECASE).strip()
+    return f"101.ru — {value}"
+
+
 def is_sane_station_name(name: str) -> bool:
     """Reject source-code fragments and loading placeholders as station names."""
     lowered = (name or "").strip().lower()
     if not lowered or lowered.startswith(("http://", "https://", "www.")):
+        return False
+    if is_generic_101_name(name):
         return False
     markers = ("<?", "?>", "<script", "loading...", "function(", "function ")
     return not any(marker in lowered for marker in markers)
@@ -1690,6 +1785,23 @@ def run_self_test() -> None:
     parser = PageParser()
     parser.feed(decoded)
     assert parser.title == "Test Radio"
+    assert extract_101_channel_name(
+        "Радио онлайн слушать бесплатно - 101.ru. Слушайте Дискотека 80-х"
+    ) == "Дискотека 80-х"
+    assert extract_101_channel_name(
+        "Виктор Цой и группа «КИНО» - радио онлайн. Слушать бесплатно"
+    ) == "Виктор Цой и группа «КИНО»"
+    broken_meta = PageParser()
+    broken_meta.feed(
+        "<html><head><title>Радио онлайн - 101.ru. Слушайте КИНО</title>"
+        "<meta property='og:title' content=\"<?php echo Meta::title(); ?>\"></head></html>"
+    )
+    assert extract_101_channel_name(broken_meta.title) == ""
+    assert extract_101_channel_name(broken_meta.document_title) == "КИНО"
+    assert is_generic_101_name("101.ru — Канал 103")
+    assert not is_sane_station_name("101.ru — Канал 103")
+    assert usable_101_icy_name("Radio101") == ""
+    assert usable_101_icy_name("101.ru: Deep House") == "Deep House"
     from_json = candidates_from_json_block(
         parser.json_blocks[0],
         base_url="https://example.org/",
