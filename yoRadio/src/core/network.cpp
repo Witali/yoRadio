@@ -16,6 +16,12 @@
   #define WIFI_ATTEMPTS  16
 #endif
 
+#ifndef WIFI_EXTRA_RETRY_ROUNDS
+  // After the first pass through all saved networks, retry the whole list
+  // before giving up and starting the configuration access point.
+  #define WIFI_EXTRA_RETRY_ROUNDS  3
+#endif
+
 #ifndef SEARCH_WIFI_CORE_ID
   #define SEARCH_WIFI_CORE_ID  0
 #endif
@@ -55,9 +61,12 @@ void MyNetwork::WiFiLostConnection(WiFiEvent_t event, WiFiEventInfo_t info){
 }
 
 bool MyNetwork::wifiBegin(bool silent){
+  if (config.ssidsCount == 0) return false;
+
   uint8_t ls = (config.store.lastSSID == 0 || config.store.lastSSID > config.ssidsCount) ? 0 : config.store.lastSSID - 1;
   uint8_t startedls = ls;
   uint8_t errcnt = 0;
+  uint8_t retryRound = 0;
   //WiFi.mode(WIFI_STA);
   while (true) {
     if(!silent){
@@ -76,15 +85,23 @@ bool MyNetwork::wifiBegin(bool silent){
       errcnt++;
       if (errcnt > WIFI_ATTEMPTS) {
         errcnt = 0;
+        WiFi.disconnect(false, false);
+        WiFi.mode(WIFI_OFF);
+        delay(250);
         ls++;
         if (ls > config.ssidsCount - 1) ls = 0;
         if(!silent) Serial.println();
-        WiFi.mode(WIFI_OFF);
         break;
       }
     }
     if (WiFi.status() != WL_CONNECTED && ls == startedls) {
-      return false; break;
+      if (retryRound >= WIFI_EXTRA_RETRY_ROUNDS) return false;
+      retryRound++;
+      if (!silent) {
+        Serial.printf("##[BOOT]#\tWi-Fi retry round %u of %u\n",
+                      retryRound, WIFI_EXTRA_RETRY_ROUNDS);
+      }
+      delay(1000);
     }
     if (WiFi.status() == WL_CONNECTED) {
       config.setLastSSID(ls + 1);
