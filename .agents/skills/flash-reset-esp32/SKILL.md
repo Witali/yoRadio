@@ -27,6 +27,12 @@ From the repository root, run:
 & .\.agents\skills\flash-reset-esp32\scripts\flash_yoradio.ps1 -Port COM8 -AudioOutput DAC
 ```
 
+Pass `-Esp32Sdk <path>` to compile against an isolated custom
+`esp32-arduino-libs/esp32` tree. The script selects a separate
+`*-custom-sdk` build directory, validates the SDK layout, and does not modify
+the Boards Manager installation. Keep passing the same SDK path when using
+`-SkipBuild` so the matching custom build directory is selected.
+
 Set `-AudioOutput PDM` for the I2S0 hardware PCM-to-PDM/sigma-delta output on GPIO26. DAC is the default. The script:
 
 - performs a clean build of `yoRadio/yoRadio.ino` for ESP32 Dev Module, 4 MB flash, Minimal SPIFFS so changes in included font data cannot be hidden by Arduino's object cache;

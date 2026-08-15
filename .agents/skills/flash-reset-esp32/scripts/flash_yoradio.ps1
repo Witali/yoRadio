@@ -16,6 +16,8 @@ param(
 
     [string]$FilesystemSource,
 
+    [string]$Esp32Sdk,
+
     [string]$ArduinoCli
 )
 
@@ -24,6 +26,9 @@ $repository = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\..\.."))
 $sketch = Join-Path $repository "yoRadio"
 $fqbn = "esp32:esp32:esp32:FlashSize=4M,PartitionScheme=min_spiffs,PSRAM=disabled"
 $buildName = if ($AudioOutput -eq "PDM") { "cyd2usb-pdm-spiffs512" } else { "cyd2usb-spiffs512" }
+if ($Esp32Sdk) {
+    $buildName = "$buildName-custom-sdk"
+}
 $buildDirectory = Join-Path $repository ".build\$buildName"
 $spiffsImage = Join-Path $buildDirectory "yoRadio.spiffs.bin"
 $spiffsOffset = "0x370000"
@@ -117,6 +122,22 @@ if (-not $SkipBuild) {
         "--build-path", $buildDirectory,
         "--libraries", $localLibraries
     )
+    if ($Esp32Sdk) {
+        $resolvedEsp32Sdk = [IO.Path]::GetFullPath($Esp32Sdk)
+        $requiredSdkFiles = @(
+            (Join-Path $resolvedEsp32Sdk "sdkconfig"),
+            (Join-Path $resolvedEsp32Sdk "flags\ld_libs"),
+            (Join-Path $resolvedEsp32Sdk "qio_qspi\include\sdkconfig.h")
+        )
+        foreach ($requiredSdkFile in $requiredSdkFiles) {
+            if (-not (Test-Path -LiteralPath $requiredSdkFile -PathType Leaf)) {
+                throw "ESP32 SDK is incomplete: missing $requiredSdkFile"
+            }
+        }
+        $compileArguments += @(
+            "--build-property", "compiler.sdk.path=$resolvedEsp32Sdk"
+        )
+    }
     if ($AudioOutput -eq "PDM") {
         $compileArguments += @(
             "--build-property", "compiler.c.extra_flags=-DI2S_INTERNAL_OUTPUT=1",
