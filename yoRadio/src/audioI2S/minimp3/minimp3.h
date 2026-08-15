@@ -244,14 +244,15 @@ static mp3dec_scratch_t *minimp3_scratch;
 static int mp3dec_alloc_scratch(void)
 {
     if (!minimp3_scratch)
-        minimp3_scratch = (mp3dec_scratch_t *)calloc(1, sizeof(mp3dec_scratch_t));
+        minimp3_scratch = (mp3dec_scratch_t *)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(mp3dec_scratch_t));
     return minimp3_scratch != 0;
 }
 
 static void mp3dec_free_scratch(void)
 {
-    free(minimp3_scratch);
+    CodecArenaFree(minimp3_scratch);
     minimp3_scratch = 0;
+    CodecArenaRelease(CODEC_ARENA_MP3);
 }
 #endif
 

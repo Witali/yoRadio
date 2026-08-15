@@ -6,6 +6,7 @@
  *  Updated on: 27.05.2022
  */
 #include "mp3_decoder.h"
+#include "../CodecMemoryArena.h"
 /* clip to range [-2^n, 2^n - 1] */
 #if 0 //Fast on ARM:
 #define CLIP_2N(y, n) { \
@@ -1528,26 +1529,16 @@ void MP3Decoder_ClearBuffer(void) {
  *
  **********************************************************************************************************************/
 
-#ifdef CONFIG_IDF_TARGET_ESP32S3
-    // ESP32-S3: If there is PSRAM, prefer it
-    #define __malloc_heap_psram(size) \
-        heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_SPIRAM, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL)
-#else
-    // ESP32, PSRAM is too slow, prefer SRAM
-    #define __malloc_heap_psram(size) \
-        heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL, MALLOC_CAP_DEFAULT|MALLOC_CAP_SPIRAM)
-#endif
-
 bool MP3Decoder_AllocateBuffers(void) {
-    if(!m_MP3DecInfo)       {m_MP3DecInfo    = (MP3DecInfo_t*)    __malloc_heap_psram(sizeof(MP3DecInfo_t)   );}
-    if(!m_FrameHeader)      {m_FrameHeader   = (FrameHeader_t*)   __malloc_heap_psram(sizeof(FrameHeader_t)  );}
-    if(!m_SideInfo)         {m_SideInfo      = (SideInfo_t*)      __malloc_heap_psram(sizeof(SideInfo_t)     );}
-    if(!m_ScaleFactorJS)    {m_ScaleFactorJS = (ScaleFactorJS_t*) __malloc_heap_psram(sizeof(ScaleFactorJS_t));}
-    if(!m_HuffmanInfo)      {m_HuffmanInfo   = (HuffmanInfo_t*)   __malloc_heap_psram(sizeof(HuffmanInfo_t)  );}
-    if(!m_DequantInfo)      {m_DequantInfo   = (DequantInfo_t*)   __malloc_heap_psram(sizeof(DequantInfo_t)  );}
-    if(!m_IMDCTInfo)        {m_IMDCTInfo     = (IMDCTInfo_t*)     __malloc_heap_psram(sizeof(IMDCTInfo_t)    );}
-    if(!m_SubbandInfo)      {m_SubbandInfo   = (SubbandInfo_t*)   __malloc_heap_psram(sizeof(SubbandInfo_t)  );}
-    if(!m_MP3FrameInfo)     {m_MP3FrameInfo  = (MP3FrameInfo_t*)  __malloc_heap_psram(sizeof(MP3FrameInfo_t) );}
+    if(!m_MP3DecInfo)       {m_MP3DecInfo = (MP3DecInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(MP3DecInfo_t));}
+    if(!m_FrameHeader)      {m_FrameHeader = (FrameHeader_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(FrameHeader_t));}
+    if(!m_SideInfo)         {m_SideInfo = (SideInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(SideInfo_t));}
+    if(!m_ScaleFactorJS)    {m_ScaleFactorJS = (ScaleFactorJS_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(ScaleFactorJS_t));}
+    if(!m_HuffmanInfo)      {m_HuffmanInfo = (HuffmanInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(HuffmanInfo_t));}
+    if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
+    if(!m_IMDCTInfo)        {m_IMDCTInfo = (IMDCTInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(IMDCTInfo_t));}
+    if(!m_SubbandInfo)      {m_SubbandInfo = (SubbandInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(SubbandInfo_t));}
+    if(!m_MP3FrameInfo)     {m_MP3FrameInfo = (MP3FrameInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(MP3FrameInfo_t));}
 
     if(!m_MP3DecInfo || !m_FrameHeader || !m_SideInfo || !m_ScaleFactorJS || !m_HuffmanInfo ||
        !m_DequantInfo || !m_IMDCTInfo || !m_SubbandInfo || !m_MP3FrameInfo) {
@@ -1575,15 +1566,17 @@ void MP3Decoder_FreeBuffers()
 {
 //    uint32_t i = ESP.getFreeHeap();
 
-    if(m_MP3DecInfo)        {free(m_MP3DecInfo);      m_MP3DecInfo=NULL;}
-    if(m_FrameHeader)       {free(m_FrameHeader);     m_FrameHeader=NULL;}
-    if(m_SideInfo)          {free(m_SideInfo);        m_SideInfo=NULL;}
-    if(m_ScaleFactorJS )    {free(m_ScaleFactorJS);   m_ScaleFactorJS=NULL;}
-    if(m_HuffmanInfo)       {free(m_HuffmanInfo);     m_HuffmanInfo=NULL;}
-    if(m_DequantInfo)       {free(m_DequantInfo);     m_DequantInfo=0;}
-    if(m_IMDCTInfo)         {free(m_IMDCTInfo);       m_IMDCTInfo=0;}
-    if(m_SubbandInfo)       {free(m_SubbandInfo);     m_SubbandInfo=0;}
-    if(m_MP3FrameInfo)      {free(m_MP3FrameInfo);    m_MP3FrameInfo=0;}
+    if(m_MP3DecInfo)        {CodecArenaFree(m_MP3DecInfo);    m_MP3DecInfo=NULL;}
+    if(m_FrameHeader)       {CodecArenaFree(m_FrameHeader);   m_FrameHeader=NULL;}
+    if(m_SideInfo)          {CodecArenaFree(m_SideInfo);      m_SideInfo=NULL;}
+    if(m_ScaleFactorJS )    {CodecArenaFree(m_ScaleFactorJS); m_ScaleFactorJS=NULL;}
+    if(m_HuffmanInfo)       {CodecArenaFree(m_HuffmanInfo);   m_HuffmanInfo=NULL;}
+    if(m_DequantInfo)       {CodecArenaFree(m_DequantInfo);   m_DequantInfo=0;}
+    if(m_IMDCTInfo)         {CodecArenaFree(m_IMDCTInfo);     m_IMDCTInfo=0;}
+    if(m_SubbandInfo)       {CodecArenaFree(m_SubbandInfo);   m_SubbandInfo=0;}
+    if(m_MP3FrameInfo)      {CodecArenaFree(m_MP3FrameInfo);  m_MP3FrameInfo=0;}
+
+    CodecArenaRelease(CODEC_ARENA_MP3);
 
 //    log_i("MP3Decoder: %lu bytes memory was freed", ESP.getFreeHeap() - i);
 }

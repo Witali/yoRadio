@@ -11,6 +11,7 @@
  *
  */
 #include "AudioEx.h"
+#include "CodecMemoryArena.h"
 #include "mp3_decoder/Mp3DecoderSelector.h"
 #include "aac_decoder/aac_decoder.h"
 #include "flac_decoder/flac_decoder.h"
@@ -43,9 +44,18 @@ AudioBuffer::AudioBuffer(size_t maxBlockSize) {
 }
 
 AudioBuffer::~AudioBuffer() {
-    if(m_buffer)
-        free(m_buffer);
+    release();
+}
+
+void AudioBuffer::release() {
+    if(m_buffer) free(m_buffer);
     m_buffer = NULL;
+    m_writePtr = NULL;
+    m_readPtr = NULL;
+    m_endPtr = NULL;
+    m_buffSize = 0;
+    m_f_init = false;
+    m_f_start = true;
 }
 
 void AudioBuffer::setBufsize(int ram, int psram) {
@@ -56,8 +66,7 @@ void AudioBuffer::setBufsize(int ram, int psram) {
 }
 
 size_t AudioBuffer::init() {
-    if(m_buffer) free(m_buffer);
-    m_buffer = NULL;
+    release();
     if(psramInit() && m_buffSizePSRAM > 0) {
         // PSRAM found, AudioBuffer will be allocated in PSRAM
         m_f_psram = true;
@@ -68,9 +77,23 @@ size_t AudioBuffer::init() {
     if(m_buffer == NULL) {
         // PSRAM not found, not configured or not enough available
         m_f_psram = false;
-        m_buffSize = m_buffSizeRAM * config.store.abuff;
-        m_buffer = (uint8_t*) calloc(m_buffSize, sizeof(uint8_t));
-        m_buffSize = m_buffSizeRAM * config.store.abuff - m_resBuffSizeRAM;
+        const size_t requestedSize = m_buffSizeRAM * config.store.abuff;
+        const size_t minimumSize = m_resBuffSizeRAM + m_maxBlockSize;
+        size_t allocationSize = requestedSize;
+        while(allocationSize >= minimumSize) {
+            m_buffer = (uint8_t*)calloc(allocationSize, sizeof(uint8_t));
+            if(m_buffer) break;
+            if(allocationSize < minimumSize + m_buffSizeRAM) break;
+            allocationSize -= m_buffSizeRAM;
+        }
+        if(m_buffer) {
+            if(allocationSize != requestedSize) {
+                log_w("Audio input buffer reduced from %u to %u bytes due to heap fragmentation",
+                      static_cast<unsigned>(requestedSize),
+                      static_cast<unsigned>(allocationSize));
+            }
+            m_buffSize = allocationSize - m_resBuffSizeRAM;
+        }
     }
     if(!m_buffer)
         return 0;
@@ -299,6 +322,9 @@ void Audio::setBufsize(int rambuf_sz, int psrambuf_sz) {
 };
 
 void Audio::initInBuff() {
+    // Reserve decoder storage before the input buffer and TLS allocations can
+    // split the remaining internal heap into smaller non-contiguous blocks.
+    CodecArenaReserve();
     if(!InBuff.isInitialized()) {
         size_t size = InBuff.init();
         if (size > 0) {
@@ -369,10 +395,18 @@ Audio::~Audio() {
   #endif
 }
 //---------------------------------------------------------------------------------------------------------------------
-void Audio::setDefaults() {
+void Audio::setDefaults(bool initializeInputBuffer) {
     stopSong();
-    initInBuff(); // initialize InputBuffer if not already done
-    InBuff.resetBuffer();
+    CodecArenaReserve();
+    if(initializeInputBuffer) {
+        initInBuff(); // initialize InputBuffer if not already done
+        InBuff.resetBuffer();
+    } else {
+        // TLS has a much higher temporary peak during the handshake. The
+        // stream buffer is not used until the HTTP response arrives, so lend
+        // this memory to TLS and recreate it immediately after connect().
+        InBuff.release();
+    }
     Mp3DecoderFreeBuffers();
     FLACDecoder_FreeBuffers();
     AACDecoder_FreeBuffers();
@@ -487,7 +521,7 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     // parsing buffers. This lets the heap coalesce before the next handshake.
     // l_host is a stack copy because host can point into state cleared here.
     AUDIO_INFO("Connect to new host: \"%s\"", l_host);
-    setDefaults();
+    setDefaults(!useTls);
 
     char* h_host = useTls ? l_host + 8 : l_host + 7;
     char* path = strchr(h_host, '/');
@@ -589,9 +623,18 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     }
     if(res){
         uint32_t dt = millis() - t;
-        AUDIO_INFO("%s has been established in %lu ms, free Heap: %lu bytes",
-                    m_f_ssl?"SSL":"Connection", dt, ESP.getFreeHeap());
+        AUDIO_INFO("%s has been established in %lu ms, free Heap: %lu bytes, largest block: %lu bytes",
+                    m_f_ssl?"SSL":"Connection", dt, ESP.getFreeHeap(), ESP.getMaxAllocHeap());
         m_f_running = true;
+        if(m_f_ssl) {
+            initInBuff();
+            if(!InBuff.isInitialized()) {
+                AUDIO_ERROR("Unable to allocate the audio input buffer after TLS handshake");
+                _client->stop();
+                m_f_running = false;
+                res = false;
+            }
+        }
     }
 
     m_expectedCodec = CODEC_NONE;
@@ -4002,20 +4045,26 @@ bool Audio:: initializeDecoder(){
             Mp3DecoderSelect(m_f_ssl ? MP3_DECODER_MINIMP3
                                      : config.store.mp3Decoder);
             if(!Mp3DecoderAllocateBuffers()) goto exit;
-            AUDIO_INFO("MP3 decoder %s has been initialized, free Heap: %lu bytes", Mp3DecoderName(), ESP.getFreeHeap());
+            AUDIO_INFO("MP3 decoder %s has been initialized, arena: %u/%u bytes, free Heap: %lu bytes",
+                       Mp3DecoderName(), static_cast<unsigned>(CodecArenaUsed()),
+                       static_cast<unsigned>(CodecArenaCapacity()), ESP.getFreeHeap());
             InBuff.changeMaxBlockSize(m_frameSizeMP3);
             break;
         case CODEC_AAC:
             if(!AACDecoder_IsInit()){
                 if(!AACDecoder_AllocateBuffers()) goto exit;
-                AUDIO_INFO("AACDecoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
+                AUDIO_INFO("AACDecoder has been initialized, arena: %u/%u bytes, free Heap: %lu bytes",
+                           static_cast<unsigned>(CodecArenaUsed()),
+                           static_cast<unsigned>(CodecArenaCapacity()), ESP.getFreeHeap());
                 InBuff.changeMaxBlockSize(m_frameSizeAAC);
             }
             break;
         case CODEC_M4A:
             if(!AACDecoder_IsInit()){
                 if(!AACDecoder_AllocateBuffers()) goto exit;
-                AUDIO_INFO("AACDecoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
+                AUDIO_INFO("AACDecoder has been initialized, arena: %u/%u bytes, free Heap: %lu bytes",
+                           static_cast<unsigned>(CodecArenaUsed()),
+                           static_cast<unsigned>(CodecArenaCapacity()), ESP.getFreeHeap());
                 InBuff.changeMaxBlockSize(m_frameSizeAAC);
             }
             break;

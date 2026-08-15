@@ -7,6 +7,7 @@
  ************************************************************************************/
 
 #include "aac_decoder.h"
+#include "../CodecMemoryArena.h"
 
 const uint32_t SQRTHALF             = 0x5a82799a;    /* sqrt(0.5), format = Q31 */
 const uint32_t Q28_2                = 0x20000000;    /* Q28: 2.0 */
@@ -1655,21 +1656,11 @@ static const int8_t negMask[3] = {~0x03, ~0x07, ~0x0f};
  *
  **********************************************************************************************************************/
 
-#ifdef CONFIG_IDF_TARGET_ESP32S3
-    // ESP32-S3: If there is PSRAM, prefer it
-    #define __malloc_heap_psram(size) \
-        heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_SPIRAM, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL)
-#else
-    // ESP32, PSRAM is too slow, prefer SRAM
-    #define __malloc_heap_psram(size) \
-        heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL, MALLOC_CAP_DEFAULT|MALLOC_CAP_SPIRAM)
-#endif
-
 bool AACDecoder_AllocateBuffers(void){
 
-    /* here, sizes are: AACDecInfo_t:96 PSInfoBase_t:27364 ProgConfigElement_t*16:1312 PSInfoSBR_t:50788 */
+    /* Allocations share the codec arena; Audio logs actual usage at runtime. */
 #ifdef AAC_ENABLE_SBR
-    if(!m_PSInfoSBR) {m_PSInfoSBR   = (PSInfoSBR_t*)__malloc_heap_psram(sizeof(PSInfoSBR_t));}
+    if(!m_PSInfoSBR) {m_PSInfoSBR = (PSInfoSBR_t*)CodecArenaCalloc(CODEC_ARENA_AAC, 1, sizeof(PSInfoSBR_t));}
 
     if(!m_PSInfoSBR) {
         log_e("OOM in SBR, can't allocate %d bytes\n", sizeof(PSInfoSBR_t));
@@ -1680,10 +1671,9 @@ bool AACDecoder_AllocateBuffers(void){
     }
 #endif
 
-    /* these could fall back to PSRAM if not enough heap available */
-    if(!m_AACDecInfo) {m_AACDecInfo = (AACDecInfo_t*)        __malloc_heap_psram(sizeof(AACDecInfo_t));}
-    if(!m_PSInfoBase) {m_PSInfoBase = (PSInfoBase_t*)        __malloc_heap_psram(sizeof(PSInfoBase_t));}
-    if(!m_pce[0])     {m_pce[0]     = (ProgConfigElement_t*) __malloc_heap_psram(sizeof(ProgConfigElement_t)*16);}
+    if(!m_AACDecInfo) {m_AACDecInfo = (AACDecInfo_t*)CodecArenaCalloc(CODEC_ARENA_AAC, 1, sizeof(AACDecInfo_t));}
+    if(!m_PSInfoBase) {m_PSInfoBase = (PSInfoBase_t*)CodecArenaCalloc(CODEC_ARENA_AAC, 1, sizeof(PSInfoBase_t));}
+    if(!m_pce[0])     {m_pce[0] = (ProgConfigElement_t*)CodecArenaCalloc(CODEC_ARENA_AAC, 16, sizeof(ProgConfigElement_t));}
 
     if(!m_AACDecInfo || !m_PSInfoBase || !m_pce[0]) {
             log_e("not enough memory to allocate aacdecoder buffers");
@@ -1770,13 +1760,15 @@ void AACDecoder_FreeBuffers(void) {
 
 //    uint32_t i = ESP.getFreeHeap();
 
-    if(m_AACDecInfo)                         {free(m_AACDecInfo);    m_AACDecInfo=NULL;}
-    if(m_PSInfoBase)                         {free(m_PSInfoBase);    m_PSInfoBase=NULL;}
-    if(m_pce[0])                             {free(m_pce[0]);        m_pce[0]=NULL;}
+    if(m_AACDecInfo)                         {CodecArenaFree(m_AACDecInfo); m_AACDecInfo=NULL;}
+    if(m_PSInfoBase)                         {CodecArenaFree(m_PSInfoBase); m_PSInfoBase=NULL;}
+    if(m_pce[0])                             {CodecArenaFree(m_pce[0]);     m_pce[0]=NULL;}
 
 #ifdef AAC_ENABLE_SBR
-    if(m_PSInfoSBR)                           {free(m_PSInfoSBR);    m_PSInfoSBR=NULL;}               //Clear AACDecInfo
+    if(m_PSInfoSBR)                           {CodecArenaFree(m_PSInfoSBR); m_PSInfoSBR=NULL;}         //Clear AACDecInfo
 #endif
+
+    CodecArenaRelease(CODEC_ARENA_AAC);
 
 //    log_i("AACDecoder: %lu bytes memory was freed", ESP.getFreeHeap() - i);
 }

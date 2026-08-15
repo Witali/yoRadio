@@ -130,6 +130,7 @@ public:
     AudioBuffer(size_t maxBlockSize = 0);       // constructor
     ~AudioBuffer();                             // frees the buffer
     size_t   init();                            // set default values
+    void     release();                         // temporarily return storage to the heap
     bool     isInitialized() { return m_f_init; };
     void     setBufsize(int ram, int psram);
     void     changeMaxBlockSize(uint16_t mbs);  // is default 1600 for mp3 and aac, set 16384 for FLAC
@@ -214,7 +215,7 @@ public:
     uint32_t getAudioCurrentTime();
     uint32_t getTotalPlayingTime();
 
-    void setDefaults();
+    void setDefaults(bool initializeInputBuffer = true);
     /* VU METER */
     void     setVUmeter() {};
     void     getVUlevel() {};

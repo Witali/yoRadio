@@ -1,4 +1,5 @@
 #include "Mp3DecoderSelector.h"
+#include "../CodecMemoryArena.h"
 
 #include <stdlib.h>
 #include <string.h>
