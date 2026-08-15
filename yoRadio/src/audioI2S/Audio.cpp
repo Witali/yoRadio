@@ -207,7 +207,10 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
 #endif
     m_i2s_config.dma_buf_len          = psramInit()?512:DMA_BUFLEN;
     m_i2s_config.use_apll             = APLL_DISABLE; // must be disabled in V2.0.1-RC1
-    m_i2s_config.tx_desc_auto_clear   = true;   // new in V1.0.1
+    // Clearing an underrun descriptor to 0 is silence for external signed
+    // I2S, but it drives the unsigned built-in DAC to its lower rail.  Keep
+    // DAC descriptors intact and refill them with the 0x80 midpoint below.
+    m_i2s_config.tx_desc_auto_clear   = !internalDAC;   // new in V1.0.1
     m_i2s_config.fixed_mclk           = I2S_PIN_NO_CHANGE;
 
 
@@ -260,7 +263,8 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
     // PDM is initialized later from Player::init().
   #else
-    i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
+    if(m_f_internalDAC) fillDacSilence(true);
+    else                i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
   #endif
 
     for(int i = 0; i <3; i++) {
@@ -2420,9 +2424,39 @@ uint32_t Audio::stopSong() {
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
     pdmOutputEnd();
   #else
-    i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
+    if(m_f_internalDAC) fillDacSilence(true);
+    else                i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
   #endif
     return pos;
+}
+//---------------------------------------------------------------------------------------------------------------------
+void Audio::fillDacSilence(bool primeDma) {
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    (void)primeDma;
+  #else
+    if(!m_f_internalDAC) return;
+
+    // The legacy ESP32 DAC consumes the upper eight bits of each unsigned
+    // 16-bit channel.  0x80 is therefore the electrical midpoint (zero audio).
+    constexpr uint32_t dacSilence = 0x80008000UL;
+    constexpr size_t silenceFrames = 128;
+    uint32_t silence[silenceFrames];
+    for(size_t i = 0; i < silenceFrames; ++i) silence[i] = dacSilence;
+
+    size_t framesRemaining = primeDma
+        ? static_cast<size_t>(m_i2s_config.dma_buf_count) * m_i2s_config.dma_buf_len
+        : silenceFrames;
+    while(framesRemaining) {
+        const size_t framesToWrite = min(framesRemaining, silenceFrames);
+        size_t bytesWritten = 0;
+        const esp_err_t result = i2s_write(
+            (i2s_port_t)m_i2s_num, silence,
+            framesToWrite * sizeof(uint32_t), &bytesWritten, 0);
+        if(result != ESP_OK || bytesWritten == 0) break;
+        framesRemaining -= bytesWritten / sizeof(uint32_t);
+        if(bytesWritten < framesToWrite * sizeof(uint32_t)) break;
+    }
+  #endif
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::playI2Sremains() { // returns true if all dma_buffs flushed
@@ -2448,7 +2482,8 @@ bool Audio::pauseResume() {
           #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
             pdmOutputClear();
           #else
-            i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
+            if(m_f_internalDAC) fillDacSilence(true);
+            else                i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
           #endif
         }
     }
@@ -2498,6 +2533,7 @@ bool Audio::playChunk() {
             }
         }
         m_curSample = 0;
+        if(m_f_internalDAC) m_lastDacAudioWriteMs = millis();
         return true;
     }
     if(getBitsPerSample() == 16) {
@@ -2531,6 +2567,7 @@ bool Audio::playChunk() {
             }
         }
         m_curSample = 0;
+        if(m_f_internalDAC) m_lastDacAudioWriteMs = millis();
         return true;
     }
     log_e("BitsPer Sample must be 8 or 16!");
@@ -2617,6 +2654,7 @@ uint16_t Audio::get_VUlevel(uint16_t dimension){
 
 void Audio::loop() {
     if(!m_f_running) {
+      fillDacSilence();
       vuLeft=0; vuRight=0;
       vTaskDelay(2);
       return;
@@ -2691,6 +2729,9 @@ void Audio::loop() {
                 }
                 break;
         }
+    }
+    if(m_f_internalDAC && millis() - m_lastDacAudioWriteMs >= 5) {
+        fillDacSilence();
     }
 }
 //---------------------------------------------------------------------------------------------------------------------
@@ -4229,7 +4270,8 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
       #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
         pdmOutputClear();
       #else
-        i2s_zero_dma_buffer((i2s_port_t)m_i2s_num);
+        if(m_f_internalDAC) fillDacSilence(true);
+        else                i2s_zero_dma_buffer((i2s_port_t)m_i2s_num);
       #endif
         if(!getChannels() && (ret == -2)) {
              ; // suppress errorcode MAINDATA_UNDERFLOW
