@@ -2699,73 +2699,52 @@ bool Audio::playChunk() {
  */
 void Audio::_computeVUlevel(int16_t sample[2]) {
   if(!config.store.vumeter) return;
-  static uint8_t sampleArray[2][4][8] = {0};
-  static uint8_t cnt0 = 0, cnt1 = 0, cnt2 = 0, cnt3 = 0, cnt4 = 0;
-  static bool    f_vu = false;
+  constexpr uint16_t windowSamples = 256;
+  static uint32_t magnitudeSum[2] = {0, 0};
+  static uint16_t sampleCount = 0;
 
-  auto avg = [&](uint8_t* sampArr) { // lambda, inner function, compute the average of 8 samples
-    uint16_t av = 0;
-    for(int i = 0; i < 8; i++) { av += sampArr[i]; }
-    return av >> 3;
+  auto magnitude = [](int16_t value) -> uint16_t {
+    int32_t wide = value;
+    if(wide < 0) wide = -wide;
+    return static_cast<uint16_t>(wide > 32767 ? 32767 : wide);
   };
 
-  auto largest = [&](uint8_t* sampArr) { // lambda, inner function, compute the largest of 8 samples
-    uint16_t maxValue = 0;
-    for(int i = 0; i < 8; i++) {
-      if(maxValue < sampArr[i]) maxValue = sampArr[i];
+  magnitudeSum[LEFTCHANNEL] += magnitude(sample[LEFTCHANNEL]);
+  magnitudeSum[RIGHTCHANNEL] += magnitude(sample[RIGHTCHANNEL]);
+  if(++sampleCount < windowSamples) return;
+
+  auto smoothLevel = [](uint16_t current, uint32_t sum) -> uint16_t {
+    // playSample() halves PCM before the filters, so dividing the mean
+    // magnitude by 32 gives useful movement over the ten display bands.
+    const uint32_t meanMagnitude = sum / windowSamples;
+    const uint16_t target = static_cast<uint16_t>(
+        min(static_cast<uint32_t>(255), (meanMagnitude + 16U) >> 5));
+    if(target >= current) {
+      // Fast attack: reach a new transient in roughly two VU windows.
+      return current + ((target - current) * 3U + 3U) / 4U;
     }
-    return maxValue;
+    // Slower release avoids flicker; the widget adds its own visual decay.
+    return current - ((current - target) + 7U) / 8U;
   };
 
-  if(cnt0 == 64) {
-    cnt0 = 0;
-    cnt1++;
-  }
-  if(cnt1 == 8) {
-    cnt1 = 0;
-    cnt2++;
-  }
-  if(cnt2 == 8) {
-    cnt2 = 0;
-    cnt3++;
-  }
-  if(cnt3 == 8) {
-    cnt3 = 0;
-    cnt4++;
-    f_vu = true;
-  }
-  if(cnt4 == 8) { cnt4 = 0; }
-
-  if(!cnt0) { // store every 64th sample in the array[0]
-    sampleArray[LEFTCHANNEL][0][cnt1] = abs(sample[LEFTCHANNEL] >> 7);
-    sampleArray[RIGHTCHANNEL][0][cnt1] = abs(sample[RIGHTCHANNEL] >> 7);
-  }
-  if(!cnt1) { // store argest from 64 * 8 samples in the array[1]
-    sampleArray[LEFTCHANNEL][1][cnt2] = largest(sampleArray[LEFTCHANNEL][0]);
-    sampleArray[RIGHTCHANNEL][1][cnt2] = largest(sampleArray[RIGHTCHANNEL][0]);
-  }
-  if(!cnt2) { // store avg from 64 * 8 * 8 samples in the array[2]
-    sampleArray[LEFTCHANNEL][2][cnt3] = largest(sampleArray[LEFTCHANNEL][1]);
-    sampleArray[RIGHTCHANNEL][2][cnt3] = largest(sampleArray[RIGHTCHANNEL][1]);
-  }
-  if(!cnt3) { // store avg from 64 * 8 * 8 * 8 samples in the array[3]
-    sampleArray[LEFTCHANNEL][3][cnt4] = avg(sampleArray[LEFTCHANNEL][2]);
-    sampleArray[RIGHTCHANNEL][3][cnt4] = avg(sampleArray[RIGHTCHANNEL][2]);
-  }
-  if(f_vu) {
-    f_vu = false;
-    vuLeft = avg(sampleArray[LEFTCHANNEL][3]);
-    if(vuLeft>config.vuThreshold)  config.vuThreshold = vuLeft;
-    vuRight = avg(sampleArray[RIGHTCHANNEL][3]);
-    if(vuRight>config.vuThreshold) config.vuThreshold = vuRight;
-  }
-  cnt1++;
+  vuLeft = smoothLevel(vuLeft, magnitudeSum[LEFTCHANNEL]);
+  vuRight = smoothLevel(vuRight, magnitudeSum[RIGHTCHANNEL]);
+  config.vuThreshold = max(vuLeft, vuRight);
+  magnitudeSum[LEFTCHANNEL] = 0;
+  magnitudeSum[RIGHTCHANNEL] = 0;
+  sampleCount = 0;
 }
 
 uint16_t Audio::get_VUlevel(uint16_t dimension){
-  if(!config.store.vumeter || config.vuThreshold==0) return 0;
-  uint8_t L = map(vuLeft, config.vuThreshold, 0, 0, dimension);
-  uint8_t R = map(vuRight, config.vuThreshold, 0, 0, dimension);
+  if(!config.store.vumeter) return 0;
+  const uint16_t span = min(static_cast<uint16_t>(255), dimension);
+  auto hiddenPixels = [span](uint16_t level) -> uint8_t {
+    const uint16_t clamped = min(static_cast<uint16_t>(255), level);
+    const uint16_t lit = (clamped * span + 127U) / 255U;
+    return static_cast<uint8_t>(span - lit);
+  };
+  const uint8_t L = hiddenPixels(vuLeft);
+  const uint8_t R = hiddenPixels(vuRight);
   return (L << 8) | R;
 }
 //---------------------------------------------------------------------------------------------------------------------
