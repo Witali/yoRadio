@@ -69,7 +69,7 @@ except ImportError as exc:  # pragma: no cover - friendly startup error
     ) from exc
 
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 DEFAULT_USER_AGENT = f"yoRadio-stream-collector/{VERSION} (+local playlist utility)"
 
 MAX_STREAM_URL_LENGTH = 2048
@@ -104,7 +104,7 @@ PLAYLIST_MIMES = {
 }
 REJECT_EXTENSIONS = {
     ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico",
-    ".css", ".woff", ".woff2", ".ttf", ".map", ".pdf", ".zip",
+    ".css", ".js", ".json", ".xml", ".woff", ".woff2", ".ttf", ".map", ".pdf", ".zip",
     ".apk", ".exe", ".dmg", ".webmanifest",
 }
 STREAM_PATH_HINTS = (
@@ -1695,6 +1695,7 @@ def run_self_test() -> None:
     assert high[0].endswith("high.m3u8")
     assert looks_like_stream("http://79.120.39.202:8000/dubtechno", ("radcap.ru",))
     assert not looks_like_stream("https://example.net:new/stream", ("example.net",))
+    assert not looks_like_stream("https://radcap.ru/meta/3/stream39063.js", ("radcap.ru",))
     assert not looks_like_stream(
         "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview/test.m4a",
         ("zaycev.fm",),
