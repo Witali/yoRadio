@@ -132,7 +132,11 @@ esp_err_t pdmOutputBegin(uint8_t port, uint8_t dataPin,
       static_cast<i2s_port_t>(outputPort), I2S_ROLE_MASTER);
   channelConfig.dma_desc_num = kDmaDescriptors;
   channelConfig.dma_frame_num = kDmaSamples;
-  channelConfig.auto_clear_after_cb = false;
+  // Unlike the HLV player, YoRadio feeds I2S with blocking writes and has no
+  // on_sent callback to refill a completed descriptor immediately. Clear each
+  // transmitted descriptor so a temporary decoder/network gap produces PCM
+  // silence instead of repeating stale audio from the DMA ring.
+  channelConfig.auto_clear_after_cb = true;
   channelConfig.auto_clear_before_cb = false;
 
   esp_err_t result = i2s_new_channel(&channelConfig, &outputChannel, nullptr);
