@@ -132,6 +132,10 @@ void Config::_setupVersion(){
       saveValue(&store.timeSyncInterval, (uint16_t)60);    //min
       saveValue(&store.timeSyncIntervalRTC, (uint16_t)24); //hours
       saveValue(&store.weatherSyncInterval, (uint16_t)30); // min
+      break;
+    case 5:
+      saveValue(&store.mp3Decoder, (uint8_t)0); // Helix legacy
+      break;
     default:
       break;
   }
@@ -477,7 +481,8 @@ void Config::resetSystem(const char *val, uint8_t clientId){
     saveValue(&store.softapdelay, (uint8_t)0, false);
     saveValue(&store.abuff, (uint16_t)(VS1053_CS==255?7:10), false);
     saveValue(&store.telnet, true);
-    saveValue(&store.watchdog, true);
+    saveValue(&store.watchdog, true, false);
+    saveValue(&store.mp3Decoder, (uint8_t)0);
     snprintf(store.mdnsname, MDNS_LENGTH, "yoradio-%x", (unsigned int)getChipId());
     saveValue(store.mdnsname, store.mdnsname, MDNS_LENGTH, true, true);
     display.putRequest(NEWMODE, CLEAR); display.putRequest(NEWMODE, PLAYER);
@@ -611,6 +616,7 @@ void Config::setDefaults() {
   store.timeSyncInterval = 60;    //min
   store.timeSyncIntervalRTC = 24; //hour
   store.weatherSyncInterval = 30; //min
+  store.mp3Decoder = 0; // Helix legacy
   eepromWrite(EEPROM_START, store);
 }
 

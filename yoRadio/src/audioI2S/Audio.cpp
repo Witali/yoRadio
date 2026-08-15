@@ -11,7 +11,7 @@
  *
  */
 #include "AudioEx.h"
-#include "mp3_decoder/mp3_decoder.h"
+#include "mp3_decoder/Mp3DecoderSelector.h"
 #include "aac_decoder/aac_decoder.h"
 #include "flac_decoder/flac_decoder.h"
 #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
@@ -358,7 +358,7 @@ void Audio::setDefaults() {
     stopSong();
     initInBuff(); // initialize InputBuffer if not already done
     InBuff.resetBuffer();
-    MP3Decoder_FreeBuffers();
+    Mp3DecoderFreeBuffers();
     FLACDecoder_FreeBuffers();
     AACDecoder_FreeBuffers();
     if(m_playlistBuff)   {free(m_playlistBuff);     m_playlistBuff = NULL;} // free if stream is not m3u8
@@ -3145,7 +3145,7 @@ void Audio::processLocalFile() {
         char *afn =strdup(audiofile.name()); // store temporary the name
 #endif
         stopSong();
-        if(m_codec == CODEC_MP3)   MP3Decoder_FreeBuffers();
+        if(m_codec == CODEC_MP3)   Mp3DecoderFreeBuffers();
         if(m_codec == CODEC_AAC)   AACDecoder_FreeBuffers();
         if(m_codec == CODEC_M4A)   AACDecoder_FreeBuffers();
         if(m_codec == CODEC_FLAC) FLACDecoder_FreeBuffers();
@@ -3813,8 +3813,9 @@ bool Audio::parseHttpResponseHeader() { // this is the response to a GET / reque
 bool Audio:: initializeDecoder(){
     switch(m_codec){
         case CODEC_MP3:
-            if(!MP3Decoder_AllocateBuffers()) goto exit;
-            AUDIO_INFO("MP3Decoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
+            Mp3DecoderSelect(config.store.mp3Decoder);
+            if(!Mp3DecoderAllocateBuffers()) goto exit;
+            AUDIO_INFO("MP3 decoder %s has been initialized, free Heap: %lu bytes", Mp3DecoderName(), ESP.getFreeHeap());
             InBuff.changeMaxBlockSize(m_frameSizeMP3);
             break;
         case CODEC_AAC:
@@ -4080,7 +4081,7 @@ int Audio::findNextSync(uint8_t* data, size_t len){
         m_f_playing = true; nextSync = 0;
     }
     if(m_codec == CODEC_MP3) {
-        nextSync = MP3FindSyncWord(data, len);
+        nextSync = Mp3DecoderFindSyncWord(data, len);
     }
     if(m_codec == CODEC_AAC) {
         nextSync = AACFindSyncWord(data, len);
@@ -4143,7 +4144,7 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
                              if(getBitsPerSample() == 16) m_validSamples = len / (2 * getChannels());
                              if(getBitsPerSample() == 8 ) m_validSamples = len / 2;
                              bytesLeft = 0; break;
-        case CODEC_MP3:      ret = MP3Decode(data, &bytesLeft, m_outBuff, 0); break;
+        case CODEC_MP3:      ret = Mp3DecoderDecode(data, &bytesLeft, m_outBuff, 0); break;
         case CODEC_AAC:      ret = AACDecode(data, &bytesLeft, m_outBuff);    break;
         case CODEC_M4A:      ret = AACDecode(data, &bytesLeft, m_outBuff);    break;
         case CODEC_FLAC:     ret = FLACDecode(data, &bytesLeft, m_outBuff);   break;
@@ -4182,10 +4183,10 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
             m_PlayingStartTime = millis();
 
             if(m_codec == CODEC_MP3){
-                setChannels(MP3GetChannels());
-                setSampleRate(MP3GetSampRate());
-                setBitsPerSample(MP3GetBitsPerSample());
-                setBitrate(MP3GetBitrate());
+                setChannels(Mp3DecoderGetChannels());
+                setSampleRate(Mp3DecoderGetSampRate());
+                setBitsPerSample(Mp3DecoderGetBitsPerSample());
+                setBitrate(Mp3DecoderGetBitrate());
             }
             if(m_codec == CODEC_AAC || m_codec == CODEC_M4A){
                 setChannels(AACGetChannels());
@@ -4202,7 +4203,7 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
             showCodecParams();
         }
         if(m_codec == CODEC_MP3){
-            m_validSamples = MP3GetOutputSamps() / getChannels();
+            m_validSamples = Mp3DecoderGetOutputSamps() / getChannels();
         }
         if((m_codec == CODEC_AAC) || (m_codec == CODEC_M4A)){
             m_validSamples = AACGetOutputSamps() / getChannels();
@@ -4232,7 +4233,7 @@ void Audio::compute_audioCurrentTime(int bd) {
     static uint64_t sum_bitrate = 0;
     static boolean f_CBR = true; // constant bitrate
 
-    if(m_codec == CODEC_MP3) {setBitrate(MP3GetBitrate()) ;} // if not CBR, bitrate can be changed
+    if(m_codec == CODEC_MP3) {setBitrate(Mp3DecoderGetBitrate()) ;} // if not CBR, bitrate can be changed
     if(m_codec == CODEC_M4A) {setBitrate(AACGetBitrate()) ;} // if not CBR, bitrate can be changed
     if(m_codec == CODEC_AAC) {setBitrate(AACGetBitrate()) ;} // if not CBR, bitrate can be changed
     if(m_codec == CODEC_FLAC){setBitrate(FLACGetBitRate());} // if not CBR, bitrate can be changed
@@ -4448,7 +4449,7 @@ bool Audio::setFilePos(uint32_t pos) {
 //    if(!m_avr_bitrate) return false;
     if(m_codec == CODEC_M4A) return false;
     m_f_playing = false;
-    if(m_codec == CODEC_MP3) MP3Decoder_ClearBuffer();
+    if(m_codec == CODEC_MP3) Mp3DecoderClearBuffer();
     if(m_codec == CODEC_WAV) {while((pos % 4) != 0) pos++;} // must be divisible by four
     if(m_codec == CODEC_FLAC) FLACDecoderReset();
     InBuff.resetBuffer();
