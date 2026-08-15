@@ -69,8 +69,10 @@ except ImportError as exc:  # pragma: no cover - friendly startup error
     ) from exc
 
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 DEFAULT_USER_AGENT = f"yoRadio-stream-collector/{VERSION} (+local playlist utility)"
+
+MAX_STREAM_URL_LENGTH = 2048
 
 AUDIO_EXTENSIONS = {
     ".mp3": "MP3",
@@ -87,7 +89,6 @@ PLAYLIST_EXTENSIONS = {".m3u", ".m3u8", ".pls", ".asx", ".xspf"}
 AUDIO_MIME_PREFIXES = ("audio/",)
 AUDIO_MIME_EXACT = {
     "application/ogg",
-    "application/octet-stream",
     "video/mp2t",  # HLS transport stream
 }
 PLAYLIST_MIMES = {
@@ -622,8 +623,9 @@ class StreamCollector:
                     continue
                 name = str(item.get("name") or query).strip()
                 homepage = str(item.get("homepage") or "").strip()
-                haystack = " ".join((name, homepage, url)).lower()
-                if not radio_browser_matches_site(spec.key, haystack):
+                if not is_sane_stream_url(url):
+                    continue
+                if not radio_browser_matches_site(spec, name=name, homepage=homepage, url=url):
                     continue
                 if intish(item.get("lastcheckok")) != 1 and not self.args.include_unverified:
                     continue
@@ -781,12 +783,11 @@ class StreamCollector:
         ok_status = 200 <= status < 300
         audio_header = content_type.startswith(AUDIO_MIME_PREFIXES) or content_type in AUDIO_MIME_EXACT
         has_stream_header = bool(icy_name or icy_bitrate or response_header_stream_hint(content_type))
-        has_audio_magic = codec not in {"", "Playlist", "Unknown"}
+        has_audio_magic = body_has_audio_signature(body)
         enough_data = len(body) >= min(512, self.args.probe_bytes)
         ok = ok_status and (
             (playlist and bool(entries))
-            or audio_header
-            or has_stream_header
+            or ((audio_header or has_stream_header) and enough_data)
             or (has_audio_magic and enough_data)
         )
         error = ""
@@ -870,10 +871,11 @@ class StreamCollector:
         icy_name = headers.get("icy-name", "")
         icy_bitrate = intish(headers.get("icy-br"))
         codec = detect_codec(content_type, body, url)
-        ok = 200 <= status < 300 and (
+        enough_data = len(body) >= min(512, self.args.probe_bytes)
+        ok = 200 <= status < 300 and enough_data and (
             content_type.startswith("audio/")
             or bool(icy_name)
-            or codec not in {"", "Unknown", "Playlist"}
+            or body_has_audio_signature(body)
         )
         return ProbeResult(
             ok=ok,
@@ -934,7 +936,25 @@ def clean_joined_url(base: str, raw: str) -> str:
         return ""
     if parts.scheme not in {"http", "https"} or not parts.hostname:
         return ""
-    return urlunsplit((parts.scheme, parts.netloc, parts.path or "/", parts.query, ""))
+    url = urlunsplit((parts.scheme, parts.netloc, parts.path or "/", parts.query, ""))
+    return url if is_sane_stream_url(url) else ""
+
+
+def is_sane_stream_url(url: str) -> bool:
+    """Reject malformed/concatenated URLs before probing or exporting them."""
+    if not url or len(url) > MAX_STREAM_URL_LENGTH or any(char.isspace() for char in url):
+        return False
+    try:
+        parts = urlsplit(url)
+        _ = parts.port
+    except ValueError:
+        return False
+    if parts.scheme not in {"http", "https"} or not parts.hostname:
+        return False
+    # Poisoned directory entries and minified JS can contain many URLs glued
+    # together in one query/path. A valid HTTP URL has only its leading scheme.
+    remainder = url.split("://", 1)[1]
+    return re.search(r"https?://", remainder, re.IGNORECASE) is None
 
 
 def canonical_page_url(url: str) -> str:
@@ -976,6 +996,8 @@ def should_fetch_asset(url: str, spec: SiteSpec) -> bool:
 
 
 def looks_like_stream(url: str, stream_hosts: Iterable[str] = ()) -> bool:
+    if not is_sane_stream_url(url):
+        return False
     try:
         parts = urlsplit(url)
     except ValueError:
@@ -986,8 +1008,6 @@ def looks_like_stream(url: str, stream_hosts: Iterable[str] = ()) -> bool:
     suffix = Path(path).suffix.lower()
     if suffix in REJECT_EXTENSIONS:
         return False
-    if suffix in AUDIO_EXTENSIONS or suffix in PLAYLIST_EXTENSIONS:
-        return True
     host = parts.hostname.lower()
     known_host = host_matches(host, tuple(stream_hosts) + STREAM_HOST_HINTS)
     path_hint = any(hint in path for hint in STREAM_PATH_HINTS)
@@ -1004,6 +1024,13 @@ def looks_like_stream(url: str, stream_hosts: Iterable[str] = ()) -> bool:
     # streams, including numeric IP hosts. False positives are removed by the
     # subsequent audio probe.
     non_root_path = path not in {"", "/"}
+    if suffix in PLAYLIST_EXTENSIONS:
+        return True
+    if suffix in AUDIO_EXTENSIONS:
+        # Track previews and other finite media files are commonly embedded in
+        # station pages. Only accept a file URL when its host/path/port also
+        # looks like a continuous stream.
+        return known_host or path_hint or port_hint
     return not page_like and (
         (known_host and (path_hint or port_hint))
         or (path_hint and port_hint)
@@ -1295,15 +1322,25 @@ def quality_bitrates(quality: str, preferred: int, available: Sequence[int]) -> 
     return sorted(values, key=lambda x: (abs(x - preferred), x > preferred, x))
 
 
-def radio_browser_matches_site(site: str, haystack: str) -> bool:
-    checks = {
-        "record": ("radio record", "radiorecord", "hostingradio.ru/rr_", "hostingradio.ru/deep"),
-        "101": ("101.ru", ".101.ru/", "gpmradio.ru"),
-        "zaycev": ("zaycev",),
-        "relax": ("relax fm", "relax-fm.ru"),
-        "caprice": ("radio caprice", "radcap"),
-    }
-    return any(token in haystack for token in checks[site])
+def radio_browser_matches_site(spec: SiteSpec, *, name: str, homepage: str, url: str) -> bool:
+    """Require a directory result to be tied to the requested official site."""
+    try:
+        homepage_host = urlsplit(homepage).hostname or ""
+        stream_host = urlsplit(url).hostname or ""
+    except ValueError:
+        return False
+    if host_matches(homepage_host, spec.page_hosts) or host_matches(stream_host, spec.stream_hosts):
+        return True
+
+    # Some genuine Radio Caprice directory rows expose only a numeric Icecast
+    # address. Keep those when no conflicting homepage is supplied, but reject
+    # similarly named stations and poisoned rows belonging to another site.
+    return (
+        spec.key == "caprice"
+        and not homepage_host
+        and "radio caprice" in name.lower()
+        and looks_like_stream(url, spec.stream_hosts)
+    )
 
 
 def merge_candidates(candidates: Iterable[Candidate]) -> list[Candidate]:
@@ -1421,6 +1458,17 @@ def detect_codec(content_type: str, body: bytes, url: str) -> str:
     return AUDIO_EXTENSIONS.get(suffix, "Unknown")
 
 
+def body_has_audio_signature(body: bytes) -> bool:
+    sample = body[:8192]
+    if sample.startswith((b"ID3", b"OggS", b"fLaC")):
+        return True
+    if sample.startswith(b"RIFF") and sample[8:12] == b"WAVE":
+        return True
+    if len(sample) >= 2 and sample[0] == 0xFF and (sample[1] & 0xE0) == 0xE0:
+        return True
+    return len(sample) >= 564 and sample[0] == 0x47 and sample[188] == 0x47 and sample[376] == 0x47
+
+
 def is_playlist_response(content_type: str, url: str, body: bytes) -> bool:
     path = urlsplit(url).path.lower()
     if content_type in PLAYLIST_MIMES or Path(path).suffix.lower() in PLAYLIST_EXTENSIONS:
@@ -1504,7 +1552,7 @@ def utc_now() -> str:
 
 def write_outputs(streams: list[FinalStream], out_dir: Path, include_unverified: bool) -> dict[str, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
-    selected = [s for s in streams if s.ok or include_unverified]
+    selected = [s for s in streams if (s.ok or include_unverified) and is_sane_stream_url(s.url)]
     selected.sort(key=lambda s: (s.site.lower(), s.name.lower()))
 
     json_path = out_dir / "streams.json"
@@ -1647,6 +1695,25 @@ def run_self_test() -> None:
     assert high[0].endswith("high.m3u8")
     assert looks_like_stream("http://79.120.39.202:8000/dubtechno", ("radcap.ru",))
     assert not looks_like_stream("https://example.net:new/stream", ("example.net",))
+    assert not looks_like_stream(
+        "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview/test.m4a",
+        ("zaycev.fm",),
+    )
+    assert not is_sane_stream_url(
+        "https://example.net/test.mp3?next=https://example.net/other.mp3"
+    )
+    assert radio_browser_matches_site(
+        SITE_SPECS["record"],
+        name="Radio Record — Trancemission",
+        homepage="https://www.radiorecord.ru/station/trancemission",
+        url="https://radiorecord.hostingradio.ru/tm96.aacp",
+    )
+    assert not radio_browser_matches_site(
+        SITE_SPECS["record"],
+        name="Radio Record Brazil",
+        homepage="https://radiorecord.com.br/",
+        url="https://example.net/live.mp3",
+    )
     print("Self-test passed")
 
 
