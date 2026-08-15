@@ -118,9 +118,10 @@ void loop() {
     setupOTA();
   #endif
     player.lockOutput = false;
-    display.putRequest(NEWMODE, CLEAR);
-    display.putRequest(NEWMODE, PLAYER);
-    display.putRequest(NEWIP, 0);
+    // The AP screen is built without the player widgets.  Run the regular
+    // display startup now that Wi-Fi is connected so those widgets are fully
+    // initialized before any station metadata is drawn.
+    display.putRequest(DSP_START);
     if (config.lastStation() > 0) {
       player.sendCommand({PR_PLAY, config.lastStation()});
     }

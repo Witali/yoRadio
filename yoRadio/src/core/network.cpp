@@ -139,7 +139,6 @@ void MyNetwork::SoftAPReconnectTask(void *pvParameters) {
     timekeeper.cancelWaitAndDo();
     network.status = CONNECTED;
     network._softAPReconnectReady = true;
-    display.putRequest(NEWIP, 0);
     Serial.printf("Wi-Fi station reconnect succeeded: %s\n",
                   config.ipToStr(WiFi.localIP()));
   } else {
