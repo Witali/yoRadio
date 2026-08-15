@@ -4580,17 +4580,30 @@ bool Audio::playSample(int16_t sample[2]) {
     sample = IIR_filterChain2(sample);
     //-------------------------------------------
     _computeVUlevel(sample);
-    uint32_t s32 = Gain(sample); // vosample2lume;
 
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
-    const int16_t left = static_cast<int16_t>(s32 >> 16);
-    const int16_t right = static_cast<int16_t>(s32 & 0xffff);
-    const int16_t mono = static_cast<int16_t>(
-        (static_cast<int32_t>(left) + right) / 2);
+    int16_t mono;
+    if (getChannels() == 1 || m_f_forceMono) {
+        // Mono input is already duplicated by playChunk(), and forceMono has
+        // already folded stereo to mono there. Scale that one signal instead
+        // of averaging the same channel a second time.
+        const int32_t scaled =
+            static_cast<int32_t>(sample[LEFTCHANNEL]) * m_vol;
+        mono = static_cast<int16_t>(scaled >> 8);
+    } else {
+        // PDM has one physical output. If stereo was intentionally retained,
+        // apply its per-channel gain/balance first and downmix exactly once.
+        const uint32_t stereo = static_cast<uint32_t>(Gain(sample));
+        const int16_t left = static_cast<int16_t>(stereo >> 16);
+        const int16_t right = static_cast<int16_t>(stereo & 0xffff);
+        const int32_t sum = static_cast<int32_t>(left) + right;
+        mono = static_cast<int16_t>(sum / 2);
+    }
     m_i2s_bytesWritten = 0;
     esp_err_t err = pdmOutputWriteSample(mono);
     if (err == ESP_OK) m_i2s_bytesWritten = sizeof(mono);
   #else
+    uint32_t s32 = Gain(sample); // vosample2lume;
     if(m_f_internalDAC) {
         s32 += 0x80008000;
     }
