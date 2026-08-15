@@ -5,7 +5,7 @@
 
 #define MINIMP3_ONLY_MP3
 #define MINIMP3_NO_SIMD
-#define MINIMP3_STATIC_SCRATCH
+#define MINIMP3_EXTERNAL_SCRATCH
 #define MINIMP3_IMPLEMENTATION
 #include "../minimp3/minimp3.h"
 
@@ -94,6 +94,11 @@ bool Mp3DecoderAllocateBuffers() {
     if(miniDecoder) free(miniDecoder);
     miniDecoder = static_cast<mp3dec_t*>(calloc(1, sizeof(mp3dec_t)));
     if(!miniDecoder) return false;
+    if(!mp3dec_alloc_scratch()) {
+        free(miniDecoder);
+        miniDecoder = nullptr;
+        return false;
+    }
     mp3dec_init(miniDecoder);
     clearMiniFrameInfo();
     return true;
@@ -106,6 +111,7 @@ void Mp3DecoderFreeBuffers() {
     }
     if(miniDecoder) free(miniDecoder);
     miniDecoder = nullptr;
+    mp3dec_free_scratch();
     clearMiniFrameInfo();
 }
 

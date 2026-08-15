@@ -238,6 +238,23 @@ typedef struct
     uint8_t ist_pos[2][39];
 } mp3dec_scratch_t;
 
+#ifdef MINIMP3_EXTERNAL_SCRATCH
+static mp3dec_scratch_t *minimp3_scratch;
+
+static int mp3dec_alloc_scratch(void)
+{
+    if (!minimp3_scratch)
+        minimp3_scratch = (mp3dec_scratch_t *)calloc(1, sizeof(mp3dec_scratch_t));
+    return minimp3_scratch != 0;
+}
+
+static void mp3dec_free_scratch(void)
+{
+    free(minimp3_scratch);
+    minimp3_scratch = 0;
+}
+#endif
+
 static void bs_init(bs_t *bs, const uint8_t *data, int bytes)
 {
     bs->buf   = data;
@@ -1715,11 +1732,13 @@ int mp3dec_decode_frame(mp3dec_t *dec, const uint8_t *mp3, int mp3_bytes, mp3d_s
     int i = 0, igr, frame_size = 0, success = 1;
     const uint8_t *hdr;
     bs_t bs_frame[1];
-#ifdef MINIMP3_STATIC_SCRATCH
-    /* YoRadio decodes on Arduino's loop task, whose stack is too small for
-       minimp3's roughly 13 KiB scratch area. Audio decoding is single-threaded,
-       so a static scratch area is safe here and avoids a stack overflow. */
-    static mp3dec_scratch_t scratch;
+#ifdef MINIMP3_EXTERNAL_SCRATCH
+    if (!minimp3_scratch)
+    {
+        info->frame_bytes = 0;
+        return 0;
+    }
+#define scratch (*minimp3_scratch)
 #else
     mp3dec_scratch_t scratch;
 #endif
@@ -1809,6 +1828,9 @@ int mp3dec_decode_frame(mp3dec_t *dec, const uint8_t *mp3, int mp3_bytes, mp3d_s
         }
 #endif /* MINIMP3_ONLY_MP3 */
     }
+#ifdef MINIMP3_EXTERNAL_SCRATCH
+#undef scratch
+#endif
     return success*hdr_frame_samples(dec->header);
 }
 
