@@ -496,14 +496,12 @@ private:
     std::vector<uint32_t> m_hashQueue;
     
     struct ConnectParams {
-      char *hostwoext = nullptr;
+      const char *hostwoext = nullptr;
       uint16_t port = 80;
       Audio* instance = nullptr;
-      
-      ConnectParams(char* h, uint16_t p, Audio* a)
-        : hostwoext(h), port(p), instance(a) {}
     };
-    volatile bool _connectionResult;
+    ConnectParams _connectParams;
+    volatile bool _connectionResult = false;
     TaskHandle_t _connectTaskHandle = nullptr;
     
     const size_t    m_frameSizeWav  = 1024 * 8;
@@ -544,7 +542,7 @@ private:
     uint16_t        m_datamode = 0;                 // Statemaschine
     uint16_t        m_streamTitleHash = 0;          // remember streamtitle, ignore multiple occurence in metadata
     uint16_t        m_timeout_ms = 250;
-    uint16_t        m_timeout_ms_ssl = 2700;
+    uint16_t        m_timeout_ms_ssl = 5000;
     uint8_t         m_flacBitsPerSample = 0;        // bps should be 16
     uint8_t         m_flacNumChannels = 0;          // can be read out in the FLAC file header
     uint32_t        m_flacSampleRate = 0;           // can be read out in the FLAC file header

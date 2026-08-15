@@ -395,7 +395,8 @@ void Audio::setDefaults() {
   #endif
     ts_parsePacket(0, 0, 0); // reset ts routine
 
-    AUDIO_INFO("buffers freed, free Heap: %lu bytes", ESP.getFreeHeap());
+    AUDIO_INFO("buffers freed, free Heap: %lu bytes, largest block: %lu bytes",
+               ESP.getFreeHeap(), ESP.getMaxAllocHeap());
 
     m_f_chunked = false;                                    // Assume not chunked
     m_f_firstmetabyte = false;
@@ -450,8 +451,6 @@ void Audio::connectTask(void* pvParams) {
   }else{
     self->_connectionResult = false;
   }
-  free((void*)params->hostwoext);
-  delete params;
   self->_connectTaskHandle = nullptr;
   vTaskDelete(nullptr);
 }
@@ -475,13 +474,17 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     }
 
     int idx = indexOf(host, "http");
-    char* l_host = (char*)malloc(lenHost + 10);
+    char l_host[512] = {};
     if(idx < 0){strcpy(l_host, "http://"); strcat(l_host, host); } // amend "http;//" if not found
     else       {strcpy(l_host, (host + idx));}                     // trim left if necessary
 
-    char* h_host = NULL; // pointer of l_host without http:// or https://
-    if(startsWith(l_host, "https")) h_host = strdup(l_host + 8);
-    else                            h_host = strdup(l_host + 7);
+    // Release the previous TLS session and decoder before allocating URL
+    // parsing buffers. This lets the heap coalesce before the next handshake.
+    // l_host is a stack copy because host can point into state cleared here.
+    AUDIO_INFO("Connect to new host: \"%s\"", l_host);
+    setDefaults();
+
+    char* h_host = startsWith(l_host, "https") ? l_host + 8 : l_host + 7;
 
     // initializationsequence
     int16_t pos_slash;                                        // position of "/" in hostname
@@ -500,25 +503,36 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
 
     if(pos_slash > 1) {
         hostwoext = (char*)malloc(pos_slash + 2);
-        memcpy(hostwoext, h_host, pos_slash);
-        hostwoext[pos_slash] = '\0';
-        uint16_t extLen =  urlencode_expected_len(h_host + pos_slash);
-        extension = (char *)malloc(extLen + 20);
-        memcpy(extension, h_host + pos_slash, extLen);
-        urlencode(extension, extLen, true);
+        if(hostwoext) {
+            memcpy(hostwoext, h_host, pos_slash);
+            hostwoext[pos_slash] = '\0';
+        }
+        const char* extensionSource = h_host + pos_slash;
+        const uint16_t extensionSourceLen = strlen(extensionSource);
+        const uint16_t extensionCapacity = urlencode_expected_len(extensionSource) + 1;
+        extension = (char *)malloc(extensionCapacity);
+        if(extension) {
+            memcpy(extension, extensionSource, extensionSourceLen + 1);
+            urlencode(extension, extensionCapacity, true);
+        }
     }
     else{  // url has no extension
         hostwoext = strdup(h_host);
         extension = strdup("/");
     }
 
+    if(!hostwoext || !extension) {
+        AUDIO_ERROR("Not enough memory to prepare host request: %lu bytes free", ESP.getFreeHeap());
+        if(hostwoext) free(hostwoext);
+        if(extension) free(extension);
+        Mp3DecoderFreeBuffers();
+        return false;
+    }
+
     if((pos_colon >= 0) && ((pos_ampersand == -1) or (pos_ampersand > pos_colon))){
         port = atoi(h_host + pos_colon + 1);// Get portnumber as integer
         hostwoext[pos_colon] = '\0';// Host without portnumber
     }
-
-    AUDIO_INFO("Connect to new host: \"%s\"", l_host);
-    setDefaults(); // no need to stop clients if connection is established (default is true)
 
     if(startsWith(l_host, "https")) m_f_ssl = true;
     else                            m_f_ssl = false;
@@ -574,23 +588,44 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     if(m_f_ssl){ _client = static_cast<WiFiClient*>(&clientsecure); if(port == 80) port = 443;}
     else       { _client = static_cast<WiFiClient*>(&client);}
 
-    uint32_t t = millis();
     if(m_f_Log) AUDIO_INFO("connect to %s on port %d path %s", hostwoext, port, extension);
-    if(!config.store.watchdog){
-      res = _client->connect(hostwoext, port, m_f_ssl ? m_timeout_ms_ssl : m_timeout_ms);
-    }else{
-      ConnectParams* params = new ConnectParams{ strdup(hostwoext), port, this }; _connectionResult = false;
-      xTaskCreatePinnedToCore(connectTask, "ConnectTask", WATCHDOG_TASK_SIZE, params, WATCHDOG_TASK_PRIORITY, &_connectTaskHandle, WATCHDOG_TASK_CORE_ID);
-      for(;;){
-        if(millis()-t>(m_f_ssl ? m_timeout_ms_ssl : m_timeout_ms) || _connectionResult) break;
-        vTaskDelay(10);
+    uint32_t t = millis();
+    const uint8_t maxConnectAttempts = 2;
+    for(uint8_t attempt = 1; attempt <= maxConnectAttempts; ++attempt) {
+      if(attempt > 1) {
+        AUDIO_INFO("Host connection retry %u/%u", attempt, maxConnectAttempts);
+        _client->stop();
+        vTaskDelay(pdMS_TO_TICKS(150));
       }
-      res = _connectionResult;
-      if (_connectTaskHandle!=nullptr) {
-        vTaskDelete(_connectTaskHandle);
-        _connectTaskHandle = nullptr;
-        AUDIO_INFO("WATCH DOG HAS FINISHED A WORK, BYE!");
+
+      const uint32_t attemptStarted = millis();
+      if(!config.store.watchdog){
+        res = _client->connect(hostwoext, port, m_f_ssl ? m_timeout_ms_ssl : m_timeout_ms);
+      }else{
+        _connectionResult = false;
+        _connectParams = {hostwoext, port, this};
+        const BaseType_t taskCreated = xTaskCreatePinnedToCore(
+            connectTask, "ConnectTask", WATCHDOG_TASK_SIZE, &_connectParams,
+            WATCHDOG_TASK_PRIORITY, &_connectTaskHandle, WATCHDOG_TASK_CORE_ID);
+        if(taskCreated != pdPASS) {
+          _connectTaskHandle = nullptr;
+          AUDIO_INFO("Unable to start host connection task, free Heap: %lu bytes", ESP.getFreeHeap());
+          res = false;
+        } else {
+          const uint32_t timeout = m_f_ssl ? m_timeout_ms_ssl : m_timeout_ms;
+          while(_connectTaskHandle != nullptr && !_connectionResult && millis() - attemptStarted <= timeout) {
+            vTaskDelay(pdMS_TO_TICKS(10));
+          }
+          res = _connectionResult;
+          if(_connectTaskHandle != nullptr) {
+            vTaskDelete(_connectTaskHandle);
+            _connectTaskHandle = nullptr;
+            AUDIO_INFO("Host connection watchdog timed out after %lu ms", timeout);
+          }
+        }
       }
+      if(res) break;
+      _client->stop();
     }
     if(res){
         uint32_t dt = millis() - t;
@@ -619,6 +654,10 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
         m_streamType = ST_WEBSTREAM;
     }
     else{
+        // HTTPS reserves minimp3 scratch before connecting. Do not leave it
+        // occupying the heap after a failed handshake.
+        Mp3DecoderFreeBuffers();
+        if(_client) _client->stop();
         AUDIO_INFO("Request %s failed!", l_host);
         AUDIO_ERROR("Request %s failed!", l_host);
         if(audio_showstation) audio_showstation("");
@@ -629,8 +668,6 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     }
     if(hostwoext) {free(hostwoext); hostwoext = NULL;}
     if(extension) {free(extension); extension = NULL;}
-    if(l_host   ) {free(l_host);    l_host    = NULL;}
-    if(h_host   ) {free(h_host);    h_host    = NULL;}
     return res;
 }
 //---------------------------------------------------------------------------------------------------------------------
@@ -4014,7 +4051,12 @@ bool Audio:: initializeDecoder(){
     return true;
 
     exit:
-        AUDIO_ERROR("Not enough free memory to initialize the decoder: %lu bytes free", ESP.getFreeHeap());
+        const uint8_t failedCodec = m_codec;
+        Mp3DecoderFreeBuffers();
+        AACDecoder_FreeBuffers();
+        FLACDecoder_FreeBuffers();
+        AUDIO_ERROR("Decoder %u initialization failed: %lu bytes free, largest block %lu bytes",
+                    failedCodec, ESP.getFreeHeap(), ESP.getMaxAllocHeap());
         stopSong();
         return false;
 }

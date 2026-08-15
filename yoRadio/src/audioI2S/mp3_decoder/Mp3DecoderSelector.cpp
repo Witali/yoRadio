@@ -120,10 +120,10 @@ bool Mp3DecoderReserveScratch() {
 }
 
 void Mp3DecoderFreeBuffers() {
-    if(selectedBackend == MP3_DECODER_HELIX) {
-        MP3Decoder_FreeBuffers();
-        return;
-    }
+    // Selection can change before cleanup (for example HTTPS forces
+    // minimp3). Release both backends so the previously active decoder can
+    // never survive a codec or station switch.
+    MP3Decoder_FreeBuffers();
     miniDecoder = nullptr;
     memset(&miniDecoderStorage, 0, sizeof(miniDecoderStorage));
     mp3dec_free_scratch();

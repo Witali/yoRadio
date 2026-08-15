@@ -51,6 +51,7 @@ bool FLACDecoder_AllocateBuffers(void){
     }
     if(!FLACFrameHeader || !FLACMetadataBlock || !FLACsubFramesBuff ){
         log_e("not enough memory to allocate flacdecoder buffers");
+        FLACDecoder_FreeBuffers();
         return false;
     }
     FLACDecoder_ClearBuffer();
@@ -69,6 +70,7 @@ void FLACDecoder_FreeBuffers(){
     if(FLACFrameHeader)    {free(FLACFrameHeader);   FLACFrameHeader   = NULL;}
     if(FLACMetadataBlock)  {free(FLACMetadataBlock); FLACMetadataBlock = NULL;}
     if(FLACsubFramesBuff)  {free(FLACsubFramesBuff); FLACsubFramesBuff = NULL;}
+    vector<int32_t>().swap(coefs);
 }
 //----------------------------------------------------------------------------------------------------------------------
 //            B I T R E A D E R
