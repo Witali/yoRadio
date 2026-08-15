@@ -2374,7 +2374,11 @@ uint32_t Audio::stopSong() {
         log_w("Closing audio file");  // for debug
     }
     memset(m_outBuff, 0, sizeof(m_outBuff));     //Clear OutputBuffer
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    pdmOutputClear();
+  #else
     i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
+  #endif
     return pos;
 }
 //---------------------------------------------------------------------------------------------------------------------
