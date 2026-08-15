@@ -263,9 +263,9 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
 //---------------------------------------------------------------------------------------------------------------------
 bool Audio::beginOutput() {
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
-    log_i("internal I2S PDM on GPIO%d", I2S_PDM_DOUT);
-    const esp_err_t result = pdmOutputBegin(
-        m_i2s_num, I2S_PDM_DOUT, m_i2s_config.sample_rate);
+    log_i("internal I2S PDM on GPIO%d (deferred until audio starts)",
+          I2S_PDM_DOUT);
+    const esp_err_t result = pdmOutputPrepare(m_i2s_num, I2S_PDM_DOUT);
     if (result != ESP_OK) {
         log_e("PDM output initialization failed: %s",
               esp_err_to_name(result));
@@ -2385,7 +2385,7 @@ uint32_t Audio::stopSong() {
     }
     memset(m_outBuff, 0, sizeof(m_outBuff));     //Clear OutputBuffer
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
-    pdmOutputClear();
+    pdmOutputEnd();
   #else
     i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
   #endif

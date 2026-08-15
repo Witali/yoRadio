@@ -5,6 +5,7 @@
 
 esp_err_t pdmOutputBegin(uint8_t port, uint8_t dataPin,
                          uint32_t sampleRate);
+esp_err_t pdmOutputPrepare(uint8_t port, uint8_t dataPin);
 esp_err_t pdmOutputEnd();
 esp_err_t pdmOutputStart();
 esp_err_t pdmOutputStop();

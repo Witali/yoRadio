@@ -100,6 +100,19 @@ esp_err_t releaseChannel(bool rampDown) {
 
 }  // namespace
 
+esp_err_t pdmOutputPrepare(uint8_t port, uint8_t dataPin) {
+  if (outputChannel) {
+    const esp_err_t result = releaseChannel(true);
+    if (result != ESP_OK) return result;
+  }
+  outputPort = port;
+  outputPin = dataPin;
+  outputSampleRate = 0;
+  bufferedSamples = 0;
+  holdOutputLow();
+  return ESP_OK;
+}
+
 esp_err_t pdmOutputBegin(uint8_t port, uint8_t dataPin,
                          uint32_t sampleRate) {
   if (sampleRate < 8000U || sampleRate > 48000U) {
@@ -220,7 +233,7 @@ esp_err_t pdmOutputStop() {
 }
 
 esp_err_t pdmOutputSetSampleRate(uint32_t sampleRate) {
-  if (sampleRate == outputSampleRate) return ESP_OK;
+  if (outputChannel && sampleRate == outputSampleRate) return ESP_OK;
   return pdmOutputBegin(outputPort, outputPin, sampleRate);
 }
 
