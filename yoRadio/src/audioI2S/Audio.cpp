@@ -496,6 +496,13 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
         ++path;
     }
 
+    // Decoder scratch must be reserved before TLS only when the URL can
+    // actually contain MP3.  Reserving minimp3 for a known AAC stream and
+    // freeing it after the handshake splits the remaining heap into blocks
+    // that are too small for the AAC decoder on non-PSRAM ESP32 boards.
+    const bool pathIsAac = path &&
+        (endsWith(path, ".aac") || endsWith(path, ".aacp"));
+
     uint16_t port = useTls ? 443 : 80;
     char* portSeparator = strrchr(h_host, ':');
     if(portSeparator && isdigit((unsigned char)portSeparator[1])) {
@@ -511,7 +518,7 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
 
     m_f_ssl = useTls;
 
-    if(m_f_ssl) {
+    if(m_f_ssl && !pathIsAac) {
         // Reserve minimp3's largest block while the heap is still contiguous.
         // Keep the smaller decoder object unallocated until the response says
         // this really is MP3, leaving more headroom for the TLS handshake.
@@ -629,6 +636,7 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
         const char* extension = path ? path : "";
         if(endsWith(extension, ".mp3"))   m_expectedCodec = CODEC_MP3;
         if(endsWith(extension, ".aac"))   m_expectedCodec = CODEC_AAC;
+        if(endsWith(extension, ".aacp"))  m_expectedCodec = CODEC_AAC;
         if(endsWith(extension, ".wav"))   m_expectedCodec = CODEC_WAV;
         if(endsWith(extension, ".m4a"))   m_expectedCodec = CODEC_M4A;
         if(endsWith(extension, ".flac"))  m_expectedCodec = CODEC_FLAC;
