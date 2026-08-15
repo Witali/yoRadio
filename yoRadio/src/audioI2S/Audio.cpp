@@ -478,64 +478,38 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     if(idx < 0){strcpy(l_host, "http://"); strcat(l_host, host); } // amend "http;//" if not found
     else       {strcpy(l_host, (host + idx));}                     // trim left if necessary
 
+    const bool useTls = startsWith(l_host, "https");
+    // Preserve the normalized URL before splitting the stack copy into host,
+    // optional port and path. setDefaults() deliberately leaves m_lastHost.
+    strlcpy(m_lastHost, l_host, sizeof(m_lastHost));
+
     // Release the previous TLS session and decoder before allocating URL
     // parsing buffers. This lets the heap coalesce before the next handshake.
     // l_host is a stack copy because host can point into state cleared here.
     AUDIO_INFO("Connect to new host: \"%s\"", l_host);
     setDefaults();
 
-    char* h_host = startsWith(l_host, "https") ? l_host + 8 : l_host + 7;
-
-    // initializationsequence
-    int16_t pos_slash;                                        // position of "/" in hostname
-    int16_t pos_colon;                                        // position of ":" in hostname
-    int16_t pos_ampersand;                                    // position of "&" in hostname
-    uint16_t port = 80;                                       // port number
-
-    // In the URL there may be an extension, like noisefm.ru:8000/play.m3u&t=.m3u
-    pos_slash     = indexOf(h_host, "/", 0);
-    pos_colon     = indexOf(h_host, ":", 0);
-        if(isalpha(h_host[pos_colon + 1])) pos_colon = -1; // no portnumber follows
-    pos_ampersand = indexOf(h_host, "&", 0);
-
-    char *hostwoext = NULL;                                  // "skonto.ls.lv:8002" in "skonto.ls.lv:8002/mp3"
-    char *extension = NULL;                                  // "/mp3" in "skonto.ls.lv:8002/mp3"
-
-    if(pos_slash > 1) {
-        hostwoext = (char*)malloc(pos_slash + 2);
-        if(hostwoext) {
-            memcpy(hostwoext, h_host, pos_slash);
-            hostwoext[pos_slash] = '\0';
-        }
-        const char* extensionSource = h_host + pos_slash;
-        const uint16_t extensionSourceLen = strlen(extensionSource);
-        const uint16_t extensionCapacity = urlencode_expected_len(extensionSource) + 1;
-        extension = (char *)malloc(extensionCapacity);
-        if(extension) {
-            memcpy(extension, extensionSource, extensionSourceLen + 1);
-            urlencode(extension, extensionCapacity, true);
-        }
-    }
-    else{  // url has no extension
-        hostwoext = strdup(h_host);
-        extension = strdup("/");
+    char* h_host = useTls ? l_host + 8 : l_host + 7;
+    char* path = strchr(h_host, '/');
+    if(path) {
+        *path = '\0';
+        ++path;
     }
 
-    if(!hostwoext || !extension) {
-        AUDIO_ERROR("Not enough memory to prepare host request: %lu bytes free", ESP.getFreeHeap());
-        if(hostwoext) free(hostwoext);
-        if(extension) free(extension);
+    uint16_t port = useTls ? 443 : 80;
+    char* portSeparator = strrchr(h_host, ':');
+    if(portSeparator && isdigit((unsigned char)portSeparator[1])) {
+        port = atoi(portSeparator + 1);
+        *portSeparator = '\0';
+    }
+    if(!h_host[0]) {
+        AUDIO_ERROR("Hostaddress has no hostname");
         Mp3DecoderFreeBuffers();
+        m_lastHost[0] = '\0';
         return false;
     }
 
-    if((pos_colon >= 0) && ((pos_ampersand == -1) or (pos_ampersand > pos_colon))){
-        port = atoi(h_host + pos_colon + 1);// Get portnumber as integer
-        hostwoext[pos_colon] = '\0';// Host without portnumber
-    }
-
-    if(startsWith(l_host, "https")) m_f_ssl = true;
-    else                            m_f_ssl = false;
+    m_f_ssl = useTls;
 
     if(m_f_ssl) {
         // Reserve minimp3's largest block while the heap is still contiguous.
@@ -558,37 +532,16 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     authorization[0] = '\0';
     b64encode((const char*)toEncode, strlen(toEncode), authorization);
 
-    //  AUDIO_INFO("Connect to \"%s\" on port %d, extension \"%s\"", hostwoext, port, extension);
-
-    char rqh[strlen(h_host) + strlen(authorization) + 200]; // http request header
-    rqh[0] = '\0';
-
-    strcat(rqh, "GET ");
-    strcat(rqh, extension);
-    strcat(rqh, " HTTP/1.1\r\n");
-    strcat(rqh, "Host: ");
-    strcat(rqh, hostwoext);
-    strcat(rqh, "\r\n");
-    strcat(rqh, "Icy-MetaData:1\r\n");
-    if (auth > 0) {
-      strcat(rqh, "Authorization: Basic ");
-      strcat(rqh, authorization);
-      strcat(rqh, "\r\n");
-    }
-    strcat(rqh, "Accept-Encoding: identity;q=1,*;q=0\r\n");
-    strcat(rqh, "User-Agent: Mozilla/5.0\r\n");
-    strcat(rqh, "Connection: keep-alive\r\n\r\n");
-
     if(ESP_ARDUINO_VERSION_MAJOR == 2 && ESP_ARDUINO_VERSION_MINOR == 0 && ESP_ARDUINO_VERSION_PATCH >= 3 && MAX_AUDIO_SOCKET_TIMEOUT){
         m_timeout_ms_ssl = UINT16_MAX;  // bug in v2.0.3 if hostwoext is a IPaddr not a name
         m_timeout_ms = UINT16_MAX;  // [WiFiClient.cpp:253] connect(): select returned due to timeout 250 ms for fd 48
     }
     bool res = true; // no need to reconnect if connection exists
 
-    if(m_f_ssl){ _client = static_cast<WiFiClient*>(&clientsecure); if(port == 80) port = 443;}
+    if(m_f_ssl){ _client = static_cast<WiFiClient*>(&clientsecure);}
     else       { _client = static_cast<WiFiClient*>(&client);}
 
-    if(m_f_Log) AUDIO_INFO("connect to %s on port %d path %s", hostwoext, port, extension);
+    if(m_f_Log) AUDIO_INFO("connect to %s on port %d path /%s", h_host, port, path ? path : "");
     uint32_t t = millis();
     const uint8_t maxConnectAttempts = 2;
     for(uint8_t attempt = 1; attempt <= maxConnectAttempts; ++attempt) {
@@ -600,10 +553,10 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
 
       const uint32_t attemptStarted = millis();
       if(!config.store.watchdog){
-        res = _client->connect(hostwoext, port, m_f_ssl ? m_timeout_ms_ssl : m_timeout_ms);
+        res = _client->connect(h_host, port, m_f_ssl ? m_timeout_ms_ssl : m_timeout_ms);
       }else{
         _connectionResult = false;
-        _connectParams = {hostwoext, port, this};
+        _connectParams = {h_host, port, this};
         const BaseType_t taskCreated = xTaskCreatePinnedToCore(
             connectTask, "ConnectTask", WATCHDOG_TASK_SIZE, &_connectParams,
             WATCHDOG_TASK_PRIORITY, &_connectTaskHandle, WATCHDOG_TASK_CORE_ID);
@@ -629,7 +582,6 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     }
     if(res){
         uint32_t dt = millis() - t;
-        strcpy(m_lastHost, l_host);
         AUDIO_INFO("%s has been established in %lu ms, free Heap: %lu bytes",
                     m_f_ssl?"SSL":"Connection", dt, ESP.getFreeHeap());
         m_f_running = true;
@@ -639,7 +591,42 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     m_expectedPlsFmt = FORMAT_NONE;
 
     if(res){
-        _client->print(rqh);
+        // Stream the request instead of assembling it in heap-backed URL and
+        // header buffers. Spaces are the only characters encoded by the old
+        // request path logic, so encode them in a small stack chunk.
+        _client->print("GET /");
+        if(path) {
+            char pathChunk[96];
+            size_t chunkLength = 0;
+            for(const char* p = path; *p; ++p) {
+                const char* encoded = *p == ' ' ? "%20" : nullptr;
+                const size_t encodedLength = encoded ? 3 : 1;
+                if(chunkLength + encodedLength > sizeof(pathChunk)) {
+                    _client->write((const uint8_t*)pathChunk, chunkLength);
+                    chunkLength = 0;
+                }
+                if(encoded) {
+                    memcpy(pathChunk + chunkLength, encoded, encodedLength);
+                } else {
+                    pathChunk[chunkLength] = *p;
+                }
+                chunkLength += encodedLength;
+            }
+            if(chunkLength) _client->write((const uint8_t*)pathChunk, chunkLength);
+        }
+        _client->print(" HTTP/1.1\r\nHost: ");
+        _client->print(h_host);
+        _client->print("\r\nIcy-MetaData:1\r\n");
+        if(auth > 0) {
+            _client->print("Authorization: Basic ");
+            _client->print(authorization);
+            _client->print("\r\n");
+        }
+        _client->print("Accept-Encoding: identity;q=1,*;q=0\r\n"
+                       "User-Agent: Mozilla/5.0\r\n"
+                       "Connection: keep-alive\r\n\r\n");
+
+        const char* extension = path ? path : "";
         if(endsWith(extension, ".mp3"))   m_expectedCodec = CODEC_MP3;
         if(endsWith(extension, ".aac"))   m_expectedCodec = CODEC_AAC;
         if(endsWith(extension, ".wav"))   m_expectedCodec = CODEC_WAV;
@@ -658,16 +645,14 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
         // occupying the heap after a failed handshake.
         Mp3DecoderFreeBuffers();
         if(_client) _client->stop();
-        AUDIO_INFO("Request %s failed!", l_host);
-        AUDIO_ERROR("Request %s failed!", l_host);
+        AUDIO_INFO("Request %s failed!", m_lastHost);
+        AUDIO_ERROR("Request %s failed!", m_lastHost);
         if(audio_showstation) audio_showstation("");
         if(audio_showstreamtitle) audio_showstreamtitle("");
         if(audio_icydescription) audio_icydescription("");
         if(audio_icyurl) audio_icyurl("");
         m_lastHost[0] = 0;
     }
-    if(hostwoext) {free(hostwoext); hostwoext = NULL;}
-    if(extension) {free(extension); extension = NULL;}
     return res;
 }
 //---------------------------------------------------------------------------------------------------------------------

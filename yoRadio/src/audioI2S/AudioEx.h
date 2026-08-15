@@ -405,19 +405,13 @@ private:
         return result;
     }
     bool b64encode(const char* source, uint16_t sourceLength, char* dest){
-        size_t size = base64_encode_expected_len(sourceLength) + 1;
-        char * buffer = (char *) malloc(size);
-        if(buffer) {
-            base64_encodestate _state;
-            base64_init_encodestate(&_state);
-            int len = base64_encode_block(&source[0], sourceLength, &buffer[0], &_state);
-            len = base64_encode_blockend((buffer + len), &_state);
-            memcpy(dest, buffer, strlen(buffer));
-            dest[strlen(buffer)] = '\0';
-            free(buffer);
-            return true;
-        }
-        return false;
+        if(!source || !dest) return false;
+        base64_encodestate state;
+        base64_init_encodestate(&state);
+        int len = base64_encode_block(source, sourceLength, dest, &state);
+        len += base64_encode_blockend(dest + len, &state);
+        dest[len] = '\0';
+        return true;
     }
     size_t urlencode_expected_len(const char* source){
         size_t expectedLen = strlen(source);
