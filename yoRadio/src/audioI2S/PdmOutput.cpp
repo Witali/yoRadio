@@ -16,8 +16,12 @@
 
 namespace {
 
-constexpr size_t kDmaSamples = 256;
-constexpr uint32_t kDmaDescriptors = 4;
+// The network, decoder and display share the Arduino task.  Keep enough PCM
+// queued in hardware to ride through an occasional long Wi-Fi/display pass
+// without replacing part of the waveform with silence.  At 44.1 kHz this is
+// about 93 ms, close to the input preroll and still short enough for controls.
+constexpr size_t kDmaSamples = 512;
+constexpr uint32_t kDmaDescriptors = 8;
 constexpr uint32_t kBiasRampMs = 100;
 constexpr uint32_t kBiasSettleMs = 2;
 
