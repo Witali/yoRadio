@@ -2490,6 +2490,65 @@ bool Audio::pauseResume() {
     return retVal;
 }
 //---------------------------------------------------------------------------------------------------------------------
+void Audio::startFadeIn(uint16_t durationMs) {
+    if(durationMs == 0) {
+        m_fadeMode = FADE_NONE;
+        return;
+    }
+    // The stream sample rate is not known until its first frame is decoded.
+    // Defer calculating the sample count so network connection time does not
+    // consume any part of the audible fade-in.
+    m_fadeDurationMs = durationMs;
+    m_fadeTotalSamples = 0;
+    m_fadeSamplesRemaining = 0;
+    m_fadeStartGainQ15 = 0;
+    m_fadeCurrentGainQ15 = 0;
+    m_fadeMode = FADE_IN;
+}
+//---------------------------------------------------------------------------------------------------------------------
+void Audio::startFadeOut(uint16_t durationMs) {
+    if(durationMs == 0 || !m_f_running) {
+        finishFadeOut();
+        return;
+    }
+
+    m_fadeDurationMs = durationMs;
+    m_fadeTotalSamples =
+        (static_cast<uint64_t>(getSampleRate()) * durationMs) / 1000U;
+    if(m_fadeTotalSamples == 0) m_fadeTotalSamples = 1;
+    m_fadeSamplesRemaining = m_fadeTotalSamples;
+    m_fadeStartGainQ15 = m_fadeCurrentGainQ15;
+    m_fadeStartedMs = millis();
+    m_fadeMode = FADE_OUT;
+}
+//---------------------------------------------------------------------------------------------------------------------
+void Audio::finishFadeOut() {
+    m_fadeMode = FADE_MUTED;
+    m_fadeSamplesRemaining = 0;
+    m_fadeCurrentGainQ15 = 0;
+
+    // playSample() writes ahead into the legacy I2S DMA ring.  Wait until the
+    // complete fade has physically reached the output before the caller closes
+    // the old stream or asserts an external mute signal.
+    const uint32_t sampleRate = getSampleRate() ? getSampleRate() : 16000U;
+    const uint32_t drainMs = static_cast<uint32_t>(
+        (static_cast<uint64_t>(m_i2s_config.dma_buf_count) *
+         m_i2s_config.dma_buf_len * 1000U + sampleRate - 1U) / sampleRate);
+    m_fadeDrainUntilMs = millis() + drainMs + 2U;
+}
+//---------------------------------------------------------------------------------------------------------------------
+bool Audio::fadeOutComplete() {
+    // A dead source cannot provide samples to finish its envelope.  Force the
+    // output to zero after a bounded grace period so station switching never
+    // hangs indefinitely.
+    if(m_fadeMode == FADE_OUT &&
+       millis() - m_fadeStartedMs >= m_fadeDurationMs + 50U) {
+        finishFadeOut();
+    }
+    return m_fadeMode == FADE_MUTED &&
+           static_cast<int32_t>(millis() - m_fadeDrainUntilMs) >= 0;
+}
+//---------------------------------------------------------------------------------------------------------------------
 bool Audio::playChunk() {
     // If we've got data, try and pump it out..
     int16_t sample[2];
@@ -4677,6 +4736,7 @@ bool Audio::playSample(int16_t sample[2]) {
     sample = IIR_filterChain1(sample);
     sample = IIR_filterChain2(sample);
     //-------------------------------------------
+    applyFade(sample);
     _computeVUlevel(sample);
 
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
@@ -4721,6 +4781,53 @@ bool Audio::playSample(int16_t sample[2]) {
         return false;
     }
     return true;
+}
+//---------------------------------------------------------------------------------------------------------------------
+void Audio::applyFade(int16_t sample[2]) {
+    if(m_fadeMode == FADE_NONE) return;
+    if(m_fadeMode == FADE_MUTED) {
+        sample[LEFTCHANNEL] = 0;
+        sample[RIGHTCHANNEL] = 0;
+        return;
+    }
+
+    if(m_fadeMode == FADE_IN && m_fadeTotalSamples == 0) {
+        m_fadeTotalSamples =
+            (static_cast<uint64_t>(getSampleRate()) * m_fadeDurationMs) / 1000U;
+        if(m_fadeTotalSamples == 0) m_fadeTotalSamples = 1;
+        m_fadeSamplesRemaining = m_fadeTotalSamples;
+    }
+
+    const uint32_t linearScale = m_fadeMode == FADE_IN
+        ? m_fadeTotalSamples - m_fadeSamplesRemaining
+        : m_fadeSamplesRemaining;
+    const uint32_t xQ15 = static_cast<uint32_t>(
+        (static_cast<uint64_t>(linearScale) * 32768U) /
+        m_fadeTotalSamples);
+    // Smoothstep gives zero slope at both ends, avoiding a sharp perceived
+    // onset while never increasing the original sample level.
+    uint32_t gainQ15 = static_cast<uint32_t>(
+        (static_cast<uint64_t>(xQ15) * xQ15 *
+         (3U * 32768U - 2U * xQ15)) >> 30);
+    if(m_fadeMode == FADE_OUT) {
+        gainQ15 = static_cast<uint32_t>(
+            (static_cast<uint64_t>(gainQ15) * m_fadeStartGainQ15) >> 15);
+    }
+    m_fadeCurrentGainQ15 = gainQ15;
+    sample[LEFTCHANNEL] = static_cast<int16_t>(
+        (static_cast<int32_t>(sample[LEFTCHANNEL]) * gainQ15) >> 15);
+    sample[RIGHTCHANNEL] = static_cast<int16_t>(
+        (static_cast<int32_t>(sample[RIGHTCHANNEL]) * gainQ15) >> 15);
+
+    if(m_fadeSamplesRemaining > 0) --m_fadeSamplesRemaining;
+    if(m_fadeSamplesRemaining == 0) {
+        if(m_fadeMode == FADE_IN) {
+            m_fadeMode = FADE_NONE;
+            m_fadeCurrentGainQ15 = 32768;
+        } else {
+            finishFadeOut();
+        }
+    }
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::setTone(int8_t gainLowPass, int8_t gainBandPass, int8_t gainHighPass){

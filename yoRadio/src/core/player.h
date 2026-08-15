@@ -28,12 +28,17 @@ class Player: public Audio {
   private:
     uint32_t    _volTicks;   /* delayed volume save  */
     bool        _volTimer;   /* delayed volume save  */
+    bool        _fadeTransitionPending = false;
     uint32_t    _resumeFilePos;
+    playerRequestParams_t _pendingTransition = {PR_STOP, 0};
     plStatus_e  _status;
     //char        _plError[PLERR_LN];
   private:
     void _stop(bool alreadyStopped = false);
     void _play(uint16_t stationId);
+    void _playRequest(int stationId);
+    bool _queueFadeTransition(playerRequestParams_t request);
+    void _finishFadeTransition();
     void _loadVol(uint8_t volume);
     bool _hasError;
   public:

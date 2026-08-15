@@ -14,6 +14,10 @@
 Player player;
 QueueHandle_t playerQueue;
 
+#ifndef AUDIO_SWITCH_FADE_MS
+  #define AUDIO_SWITCH_FADE_MS 100
+#endif
+
 #if VS1053_CS!=255 && !I2S_INTERNAL
   #if VS_HSPI
     Player::Player(): Audio(VS1053_CS, VS1053_DCS, VS1053_DREQ, &SPI2) {}
@@ -148,14 +152,11 @@ void Player::loop() {
   playerRequestParams_t requestP;
   if(xQueueReceive(playerQueue, &requestP, isRunning()?PL_QUEUE_TICKS:PL_QUEUE_TICKS_ST)){
     switch (requestP.type){
-      case PR_STOP: _stop(); break;
+      case PR_STOP:
+        if(!_queueFadeTransition(requestP)) _stop();
+        break;
       case PR_PLAY: {
-        if (requestP.payload>0) {
-          config.setLastStation((uint16_t)requestP.payload);
-        }
-        _play((uint16_t)abs(requestP.payload)); 
-        if (player_on_station_change) player_on_station_change(); 
-        pm.on_station_change();
+        if(!_queueFadeTransition(requestP)) _playRequest(requestP.payload);
         break;
       }
       case PR_TOGGLE: {
@@ -184,7 +185,7 @@ void Player::loop() {
       }
       case PR_BURL: {
       #ifdef MQTT_ROOT_TOPIC
-        if(strlen(burl)>0){
+        if(strlen(burl)>0 && !_queueFadeTransition(requestP)){
           browseUrl();
         }
       #endif
@@ -195,6 +196,7 @@ void Player::loop() {
     }
   }
   Audio::loop();
+  _finishFadeTransition();
   if(!isRunning() && _status==PLAYING) _stop(true);
   if(_volTimer){
     if((millis()-_volTicks)>3000){
@@ -208,6 +210,51 @@ void Player::loop() {
     browseUrl();
   }
 #endif*/
+}
+
+bool Player::_queueFadeTransition(playerRequestParams_t request) {
+  #if I2S_DOUT!=255 || I2S_INTERNAL
+    if(_fadeTransitionPending) {
+      // A newer station/stop request supersedes the pending destination, but
+      // the already-running envelope must not jump back to full volume.
+      _pendingTransition = request;
+      return true;
+    }
+    if(isRunning()) {
+      _pendingTransition = request;
+      _fadeTransitionPending = true;
+      startFadeOut(AUDIO_SWITCH_FADE_MS);
+      return true;
+    }
+  #endif
+  return false;
+}
+
+void Player::_finishFadeTransition() {
+  #if I2S_DOUT!=255 || I2S_INTERNAL
+    if(!_fadeTransitionPending) return;
+    if(isRunning() && !fadeOutComplete()) return;
+
+    const playerRequestParams_t request = _pendingTransition;
+    _fadeTransitionPending = false;
+    if(request.type == PR_STOP) {
+      _stop();
+    } else if(request.type == PR_PLAY) {
+      _playRequest(request.payload);
+    }
+    #ifdef MQTT_ROOT_TOPIC
+      else if(request.type == PR_BURL && strlen(burl)>0) {
+        browseUrl();
+      }
+    #endif
+  #endif
+}
+
+void Player::_playRequest(int stationId) {
+  if(stationId > 0) config.setLastStation((uint16_t)stationId);
+  _play((uint16_t)abs(stationId));
+  if (player_on_station_change) player_on_station_change();
+  pm.on_station_change();
 }
 
 void Player::setOutputPins(bool isPlaying) {
@@ -237,6 +284,9 @@ void Player::_play(uint16_t stationId) {
   if(config.getMode()==PM_WEB) isConnected=connecttohost(config.station.url);
   connproc = true;
   if(isConnected){
+    #if I2S_DOUT!=255 || I2S_INTERNAL
+      startFadeIn(AUDIO_SWITCH_FADE_MS);
+    #endif
     _status = PLAYING;
     config.configPostPlaying(stationId);
     setOutputPins(true);
@@ -259,6 +309,9 @@ void Player::browseUrl(){
   setOutputPins(false);
   config.setTitle(LANG::const_PlConnect);
   if (connecttohost(burl)){
+    #if I2S_DOUT!=255 || I2S_INTERNAL
+      startFadeIn(AUDIO_SWITCH_FADE_MS);
+    #endif
     _status = PLAYING;
     config.setTitle("");
     netserver.requestOnChange(MODE, 0);

@@ -192,6 +192,9 @@ public:
     bool setPinout(uint8_t BCLK, uint8_t LRC, uint8_t DOUT, int8_t DIN = I2S_PIN_NO_CHANGE, int8_t MCK = I2S_PIN_NO_CHANGE);
     bool pauseResume();
     bool isRunning() {return m_f_running;}
+    void startFadeIn(uint16_t durationMs);
+    void startFadeOut(uint16_t durationMs);
+    bool fadeOutComplete();
     void loop();
     uint32_t stopSong();
     void forceMono(bool m);
@@ -289,6 +292,8 @@ private:
     void IIR_calculateCoefficients(int8_t G1, int8_t G2, int8_t G3);
     bool ts_parsePacket(uint8_t* packet, uint8_t* packetStart, uint8_t* packetLength);
     void _computeVUlevel(int16_t sample[2]);
+    void applyFade(int16_t sample[2]);
+    void finishFadeOut();
     static void connectTask(void* pvParams);
 
     //+++ W E B S T R E A M  -  H E L P   F U N C T I O N S +++
@@ -449,6 +454,7 @@ private:
     const char *codecname[9] = {"unknown", "WAV", "MP3", "AAC", "M4A", "FLAC", "OGG", "OGG FLAC", "OPUS"};
     enum : int { APLL_AUTO = -1, APLL_ENABLE = 1, APLL_DISABLE = 0 };
     enum : int { EXTERNAL_I2S = 0, INTERNAL_DAC = 1, INTERNAL_PDM = 2 };
+    enum : uint8_t { FADE_NONE = 0, FADE_IN = 1, FADE_OUT = 2, FADE_MUTED = 3 };
     enum : int { FORMAT_NONE = 0, FORMAT_M3U = 1, FORMAT_PLS = 2, FORMAT_ASX = 3, FORMAT_M3U8 = 4};
     enum : int { AUDIO_NONE, HTTP_RESPONSE_HEADER, AUDIO_DATA, AUDIO_LOCALFILE,
                  AUDIO_PLAYLISTINIT, AUDIO_PLAYLISTHEADER,  AUDIO_PLAYLISTDATA};
@@ -552,7 +558,14 @@ private:
     uint32_t        m_bytesNotDecoded = 0;          // pictures or something else that comes with the stream
     uint32_t        m_PlayingStartTime = 0;         // Stores the milliseconds after the start of the audio
     uint32_t        m_lastDacAudioWriteMs = 0;      // Distinguish a real stream gap from normal decoder work
+    uint32_t        m_fadeTotalSamples = 0;
+    uint32_t        m_fadeSamplesRemaining = 0;
+    uint32_t        m_fadeStartedMs = 0;
+    uint32_t        m_fadeDrainUntilMs = 0;
     uint32_t        m_resumeFilePos = 0;            // the return value from stopSong() can be entered here
+    uint16_t        m_fadeDurationMs = 0;
+    uint16_t        m_fadeStartGainQ15 = 32768;
+    uint16_t        m_fadeCurrentGainQ15 = 32768;
     uint16_t        m_m3u8_targetDuration = 10;     //
     bool            m_f_metadata = false;           // assume stream without metadata
     bool            m_f_unsync = false;             // set within ID3 tag but not used
@@ -572,6 +585,7 @@ private:
     bool            m_f_Log = false;                // set in platformio.ini  -DAUDIO_LOG and -DCORE_DEBUG_LEVEL=3 or 4
     bool            m_f_continue = false;           // next m3u8 chunk is available
     bool            m_f_ts = true;                  // transport stream
+    uint8_t         m_fadeMode = FADE_NONE;
     uint8_t         m_f_channelEnabled = 3;         // internal DAC, both channels
     uint32_t        m_audioFileDuration = 0;
     float           m_audioCurrentTime = 0;
