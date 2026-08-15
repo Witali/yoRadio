@@ -42,6 +42,9 @@ void Player::init() {
   _resumeFilePos = 0;
   _hasError=false;
   playerQueue = xQueueCreate( 5, sizeof( playerRequestParams_t ) );
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    beginOutput();
+  #endif
   setOutputPins(false);
   delay(50);
 #ifdef MQTT_ROOT_TOPIC

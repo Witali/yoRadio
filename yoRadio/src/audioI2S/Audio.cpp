@@ -205,13 +205,9 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
         #ifdef CONFIG_IDF_TARGET_ESP32  // ESP32S3 has no DAC
 
           #if I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
-            log_i("internal I2S PDM on GPIO%d", I2S_PDM_DOUT);
-            const esp_err_t result = pdmOutputBegin(
-                m_i2s_num, I2S_PDM_DOUT, m_i2s_config.sample_rate);
-            if (result != ESP_OK) {
-                log_e("PDM output initialization failed: %s",
-                      esp_err_to_name(result));
-            }
+            // The new I2S driver requires the FreeRTOS scheduler. Player::init()
+            // starts PDM after Arduino setup has begun instead of doing it from
+            // this global object's constructor.
             m_f_forceMono = true;
           #else
             log_i("internal DAC");
@@ -251,7 +247,7 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
     }
 
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
-    pdmOutputClear();
+    // PDM is initialized later from Player::init().
   #else
     i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
   #endif
@@ -263,6 +259,20 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
         m_filter[i].b1  = 0;
         m_filter[i].b2  = 0;
     }
+}
+//---------------------------------------------------------------------------------------------------------------------
+bool Audio::beginOutput() {
+  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+    log_i("internal I2S PDM on GPIO%d", I2S_PDM_DOUT);
+    const esp_err_t result = pdmOutputBegin(
+        m_i2s_num, I2S_PDM_DOUT, m_i2s_config.sample_rate);
+    if (result != ESP_OK) {
+        log_e("PDM output initialization failed: %s",
+              esp_err_to_name(result));
+        return false;
+    }
+  #endif
+    return true;
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::setBufsize(int rambuf_sz, int psrambuf_sz) {
