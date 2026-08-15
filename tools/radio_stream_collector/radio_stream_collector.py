@@ -69,7 +69,7 @@ except ImportError as exc:  # pragma: no cover - friendly startup error
     ) from exc
 
 
-VERSION = "1.0.2"
+VERSION = "1.0.3"
 DEFAULT_USER_AGENT = f"yoRadio-stream-collector/{VERSION} (+local playlist utility)"
 
 MAX_STREAM_URL_LENGTH = 2048
@@ -922,6 +922,15 @@ def clean_title(value: str) -> str:
     return value[:180]
 
 
+def is_sane_station_name(name: str) -> bool:
+    """Reject source-code fragments and loading placeholders as station names."""
+    lowered = (name or "").strip().lower()
+    if not lowered or lowered.startswith(("http://", "https://", "www.")):
+        return False
+    markers = ("<?", "?>", "<script", "loading...", "function(", "function ")
+    return not any(marker in lowered for marker in markers)
+
+
 def clean_joined_url(base: str, raw: str) -> str:
     raw = html.unescape((raw or "").strip())
     if not raw or raw.startswith(("javascript:", "mailto:", "tel:", "data:", "#")):
@@ -1552,7 +1561,12 @@ def utc_now() -> str:
 
 def write_outputs(streams: list[FinalStream], out_dir: Path, include_unverified: bool) -> dict[str, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
-    selected = [s for s in streams if (s.ok or include_unverified) and is_sane_stream_url(s.url)]
+    selected = [
+        s for s in streams
+        if (s.ok or include_unverified)
+        and is_sane_stream_url(s.url)
+        and is_sane_station_name(s.name)
+    ]
     selected.sort(key=lambda s: (s.site.lower(), s.name.lower()))
 
     json_path = out_dir / "streams.json"
@@ -1696,6 +1710,7 @@ def run_self_test() -> None:
     assert looks_like_stream("http://79.120.39.202:8000/dubtechno", ("radcap.ru",))
     assert not looks_like_stream("https://example.net:new/stream", ("example.net",))
     assert not looks_like_stream("https://radcap.ru/meta/3/stream39063.js", ("radcap.ru",))
+    assert not is_sane_station_name("<?php echo Meta::getInstance()->getVar(")
     assert not looks_like_stream(
         "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview/test.m4a",
         ("zaycev.fm",),
