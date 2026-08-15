@@ -42,7 +42,17 @@ char* utf8Rus(const char* str, bool uppercase) {
 #endif
   for (int i = 0; str[i] && outPos < BUFLEN - 1; i++) {
     uint8_t c = (uint8_t)str[i];
-    if (c == 0xD0 && str[i+1]) {
+    if (c == 0xE2 && str[i+1] && str[i+2] &&
+        ((((uint8_t)str[i+1] == 0x80) &&
+          ((uint8_t)str[i+2] >= 0x90 && (uint8_t)str[i+2] <= 0x95)) ||
+         (((uint8_t)str[i+1] == 0x88) && (uint8_t)str[i+2] == 0x92))) {
+      // U+2010..U+2015 (hyphen/dash variants) and U+2212 (minus sign).
+      // The fixed 5x7 display font has no Unicode glyph table, so collapse the
+      // three-byte sequence to its full-width ASCII dash instead of rendering
+      // each UTF-8 byte as an unrelated pseudographic character.
+      out[outPos++] = '-';
+      i += 2;
+    } else if (c == 0xD0 && str[i+1]) {
       uint8_t n = (uint8_t)str[++i];
       if (n == 0x81) {                  // Ё
       #if defined(DSP_LCD) && !defined(LCD_RUS)
