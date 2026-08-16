@@ -87,5 +87,16 @@ $script = $script.Replace(
     "const uiRevision = typeof webUiRevision === 'undefined' ? (params.get('ui') || yoVersion) : webUiRevision;"
 )
 
+$navigationReplacements = @(
+    @('window.location.href=`http://${hostname}/`', "window.location.href=uiResource('/')"),
+    @('location.href=`http://${hostname}/`', "location.href=uiResource('/')"),
+    @('window.location.href=`http://${hostname}/settings.html`', "window.location.href=uiResource('/settings.html')"),
+    @('window.location.href=`http://${hostname}/update.html`', "window.location.href=uiResource('/update.html')"),
+    @('window.location.href=`http://${hostname}/ir.html`', "window.location.href=uiResource('/ir.html')")
+)
+foreach($replacement in $navigationReplacements) {
+    $script = $script.Replace($replacement[0], $replacement[1])
+}
+
 Write-GzipText $scriptPath $script
 Write-Host "Updated WebUI cache busting in $scriptPath"

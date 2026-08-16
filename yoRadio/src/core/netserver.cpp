@@ -689,7 +689,8 @@ void handleIndex(AsyncWebServerRequest * request) {
       return request->requestAuthentication();
     }
 #endif
-  if (strcmp(request->url().c_str(), "/") == 0 && request->params() == 0) {
+  const bool isVersionedIndex = request->params() == 1 && request->hasParam("ui");
+  if (strcmp(request->url().c_str(), "/") == 0 && (request->params() == 0 || isVersionedIndex)) {
     if(network.status == CONNECTED) {
       AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", index_html);
       addNoCacheHeaders(response);

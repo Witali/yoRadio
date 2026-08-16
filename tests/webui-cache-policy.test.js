@@ -40,6 +40,27 @@ test("UI revision propagates to dynamically loaded settings", () => {
   assert.match(script, /fetch\(uiResource\('player\.html'\), \{cache: 'no-store'\}\)/);
 });
 
+test("UI revision survives navigation between player and settings", () => {
+  const compressed = fs.readFileSync(
+    path.join(repository, "yoRadio", "data", "www", "script.js.gz")
+  );
+  const script = zlib.gunzipSync(compressed).toString("utf8");
+
+  assert.match(script, /window\.location\.href=uiResource\('\/settings\.html'\)/);
+  assert.match(script, /window\.location\.href=uiResource\('\/'\)/);
+  assert.doesNotMatch(script, /window\.location\.href=`http:\/\/\$\{hostname\}\/(?:settings\.html)?`/);
+});
+
+test("firmware serves the index shell for a versioned root URL", () => {
+  const server = fs.readFileSync(
+    path.join(repository, "yoRadio", "src", "core", "netserver.cpp"),
+    "utf8"
+  );
+
+  assert.match(server, /request->params\(\) == 1 && request->hasParam\("ui"\)/);
+  assert.match(server, /request->params\(\) == 0 \|\| isVersionedIndex/);
+});
+
 test("firmware computes the UI revision from SPIFFS file contents", () => {
   const server = fs.readFileSync(
     path.join(repository, "yoRadio", "src", "core", "netserver.cpp"),
