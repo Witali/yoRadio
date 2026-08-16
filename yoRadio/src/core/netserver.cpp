@@ -47,6 +47,15 @@ NetServer netserver;
 AsyncWebServer webserver(80);
 AsyncWebSocket websocket("/ws");
 
+static const char WEBUI_CACHE_CONTROL[] =
+    "no-store, no-cache, must-revalidate, max-age=0";
+
+void addNoCacheHeaders(AsyncWebServerResponse *response) {
+  response->addHeader("Cache-Control", WEBUI_CACHE_CONTROL);
+  response->addHeader("Pragma", "no-cache");
+  response->addHeader("Expires", "0");
+}
+
 void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 void handleIndex(AsyncWebServerRequest * request);
 void handleNotFound(AsyncWebServerRequest * request);
@@ -69,12 +78,42 @@ char* updateError() {
   return netserver.nsBuf;
 }
 
+void NetServer::refreshWebUiRevision() {
+  static const char* files[] = {
+    "/www/dragpl.js.gz", "/www/ir.css.gz", "/www/ir.js.gz",
+    "/www/irrecord.html.gz", "/www/logo.svg.gz", "/www/options.html.gz",
+    "/www/player.html.gz", "/www/script.js.gz", "/www/style.css.gz",
+    "/www/theme.css", "/www/updform.html.gz"
+  };
+  uint32_t hash = 2166136261U; // FNV-1a over file names and compressed contents.
+  uint8_t buffer[256];
+  for(const char* path : files) {
+    for(const char* current = path; *current; ++current) {
+      hash ^= static_cast<uint8_t>(*current);
+      hash *= 16777619U;
+    }
+    File file = SPIFFS.open(path, "r");
+    while(file) {
+      const size_t length = file.read(buffer, sizeof(buffer));
+      if(length == 0) break;
+      for(size_t index = 0; index < length; ++index) {
+        hash ^= buffer[index];
+        hash *= 16777619U;
+      }
+    }
+    if(file) file.close();
+  }
+  snprintf(webUiRevision, sizeof(webUiRevision), "%08lx",
+           static_cast<unsigned long>(hash));
+}
+
 bool NetServer::begin(bool quiet) {
   if(network.status==SDREADY) return true;
   if(!quiet) Serial.print("##[BOOT]#\tnetserver.begin\t");
   importRequest = IMDONE;
   irRecordEnable = false;
   playerBufMax = psramInit()?300000:1600 * config.store.abuff;
+  refreshWebUiRevision();
   nsQueue = xQueueCreate( 20, sizeof( nsRequestParams_t ) );
   while(nsQueue==NULL){;}
 
@@ -82,7 +121,7 @@ bool NetServer::begin(bool quiet) {
   webserver.onNotFound(handleNotFound);
   webserver.onFileUpload(handleUpload);
 
-  webserver.serveStatic("/", SPIFFS, "/www/").setCacheControl("max-age=31536000");
+  webserver.serveStatic("/", SPIFFS, "/www/").setCacheControl(WEBUI_CACHE_CONTROL);
 #ifdef CORS_DEBUG
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Origin"), F("*"));
   DefaultHeaders::Instance().addHeader(F("Access-Control-Allow-Headers"), F("content-type"));
@@ -133,7 +172,7 @@ void NetServer::chunkedHtmlPage(const String& contentType, AsyncWebServerRequest
   display.lock();
   #endif
   response = request->beginChunkedResponse(contentType, chunkedHtmlPageCallback);
-  response->addHeader("Cache-Control","max-age=31536000");
+  addNoCacheHeaders(response);
   request->send(response);
 }
 
@@ -524,6 +563,9 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
     if (final) {
       request->_tempFile.close();
       if(filename=="playlist.csv") config.indexPlaylist();
+      if(filename!="playlist.csv" && filename!="wifi.csv") {
+        netserver.refreshWebUiRevision();
+      }
     }
   }
 }
@@ -599,14 +641,16 @@ void handleNotFound(AsyncWebServerRequest * request) {
     return;
   }
   if (request->url() == "/variables.js") {
-    sprintf (netserver.nsBuf, "var yoVersion='%s';\nvar formAction='%s';\nvar playMode='%s';\n", YOVERSION, (network.status == CONNECTED && !config.emptyFS)?"webboard":"", (network.status == CONNECTED)?"player":"ap");
-    request->send(200, "text/html", netserver.nsBuf);
+    sprintf (netserver.nsBuf, "var yoVersion='%s';\nvar webUiRevision='%s';\nvar formAction='%s';\nvar playMode='%s';\n", YOVERSION, netserver.webUiRevision, (network.status == CONNECTED && !config.emptyFS)?"webboard":"", (network.status == CONNECTED)?"player":"ap");
+    AsyncWebServerResponse *response = request->beginResponse(200, "application/javascript", netserver.nsBuf);
+    addNoCacheHeaders(response);
+    request->send(response);
     return;
   }
   if (strcmp(request->url().c_str(), "/settings.html") == 0 || strcmp(request->url().c_str(), "/update.html") == 0 || strcmp(request->url().c_str(), "/ir.html") == 0){
     //request->send_P(200, "text/html", index_html);
     AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", index_html);
-    response->addHeader("Cache-Control","max-age=31536000");
+    addNoCacheHeaders(response);
     request->send(response);
     return;
   }
@@ -648,7 +692,7 @@ void handleIndex(AsyncWebServerRequest * request) {
   if (strcmp(request->url().c_str(), "/") == 0 && request->params() == 0) {
     if(network.status == CONNECTED) {
       AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", index_html);
-      response->addHeader("Cache-Control","max-age=31536000");
+      addNoCacheHeaders(response);
       request->send(response);
       //request->send_P(200, "text/html", index_html); 
     } else request->redirect("/settings.html");

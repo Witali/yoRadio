@@ -63,11 +63,21 @@ const char index_html[] PROGMEM = R"(
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAYFBMVEUAAADYw1PcyVjYxFTaxlXYxFTbx1bcyVjZxVXbyFfcyFfaxlbax1bcyVjcyVjbyFfbyFfZxVXaxlbbx1fcyFjcyVjbx1fZxVXcyFjcyVjax1bbyFfcyVjbyFfax1bWwVKMlHGzAAAAH3RSTlMA+wv0zu6dBeVqSryjMRaCU97Fjz8liNk5HbFdDnWsEHoUsAAAAeFJREFUWMPtlllyrDAMRS1P2NjMQzc9RPvf5Ut1IPYjDRbJR1KVnD8Z7i1ZsgXsh1JW3usrC9Ta+2og620DiCjaaY65U4AIpqLqBb7R3B5xJucYRpI+U7jgHwsVLgjSLu74DmSvMTdhQVMMHAYeBhiQFAO5Y3CiGFzWBhDilmKQ4zsqm5uwQGvkCRfsytFkJIOhWWo+vz8uCfWMRqEVAJwsn+PsKgFA+YJR4UWe50Oc1Gt8vrFfyGC19153+afUvVMA+ADAaH5QXhvA/wB3yEICfgAqsvys8BngiPor4AaSpM8BN7lQRrrAbcBSLvMeKqmvVhtYh8mxqjCi7Tnnk4YDKYzRy9DPA2Uy9CoYDBShsCrKitxCnUUnm7qHFwyUYTlOAXYHWxP0TTzBbm1UBGIPfMkDZRcMur1bFPdAxEQPXhI1TNLSj+HxK9l9u8H41RrcKQZub5THbdxA7M3WAZL/EvRp0PDPGEgM9CxBqo9mYMcpAAPyzNZMx2aysUUWzYSi7lzSwALGGG3rvO/zurajM4BQJh0aXAGglACYg2v6uw64h2ZJfOIcp2lxh4ZgkEncRjAKF8AtYCI53M2mQc1IlNrAM7lyZ0akHKURsVaokxuLYxfD6ot8w+nOFuyP5/wDsZKME0E1GogAAAAASUVORK5CYII=">
-  <link rel="stylesheet" href="theme.css" type="text/css" />
-  <link rel="stylesheet" href="style.css" type="text/css" />
-  <script type="text/javascript" src="variables.js"></script>
-  <script type="text/javascript" src="script.js"></script>
-  <script type="text/javascript" src="dragpl.js"></script>
+  <script>
+    const bootToken = Date.now().toString(36);
+    document.write(`<script type="text/javascript" src="variables.js?boot=${bootToken}"><\/script>`);
+  </script>
+  <script>
+    const uiSuffix = `?ui=${encodeURIComponent(webUiRevision)}`;
+    const requestedUi = new URLSearchParams(window.location.search).get('ui');
+    if(requestedUi !== webUiRevision) {
+      window.history.replaceState(null, '', `${window.location.pathname}${uiSuffix}`);
+    }
+    document.write(`<link rel="stylesheet" href="theme.css${uiSuffix}" type="text/css" />`);
+    document.write(`<link rel="stylesheet" href="style.css${uiSuffix}" type="text/css" />`);
+    document.write(`<script type="text/javascript" src="script.js${uiSuffix}"><\/script>`);
+    document.write(`<script type="text/javascript" src="dragpl.js${uiSuffix}"><\/script>`);
+  </script>
   </head>
 <body>
 <div id="content" class="hidden progmem">
@@ -100,6 +110,7 @@ class NetServer {
   public:
     NetServer() {};
     bool begin(bool quiet=false);
+    void refreshWebUiRevision();
     void loop();
     void requestOnChange(requestType_e request, uint8_t clientId);
     void setRSSI(int val) { rssi = val; };
@@ -112,6 +123,7 @@ class NetServer {
     void irValsToWs(); 
 #endif
     void resetQueue();
+    char webUiRevision[9] = "00000000";
   private:
     requestType_e request;
     QueueHandle_t nsQueue;
