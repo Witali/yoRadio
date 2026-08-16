@@ -139,6 +139,10 @@ void Config::_setupVersion(){
     case 6:
       saveValue(&store.mp3Decoder, (uint8_t)1); // minimp3
       break;
+    case 7:
+      saveValue(&store.audioNormalization, true, false);
+      saveValue(&store.normalizationMaxGainDb, (uint8_t)20);
+      break;
     default:
       break;
   }
@@ -486,6 +490,11 @@ void Config::resetSystem(const char *val, uint8_t clientId){
     saveValue(&store.telnet, true);
     saveValue(&store.watchdog, true, false);
     saveValue(&store.mp3Decoder, (uint8_t)1);
+    saveValue(&store.audioNormalization, true, false);
+    saveValue(&store.normalizationMaxGainDb, (uint8_t)20);
+    #if I2S_DOUT!=255 || I2S_INTERNAL
+      player.setNormalization(store.audioNormalization, store.normalizationMaxGainDb);
+    #endif
     snprintf(store.mdnsname, MDNS_LENGTH, "yoradio-%x", (unsigned int)getChipId());
     saveValue(store.mdnsname, store.mdnsname, MDNS_LENGTH, true, true);
     display.putRequest(NEWMODE, CLEAR); display.putRequest(NEWMODE, PLAYER);
@@ -620,6 +629,8 @@ void Config::setDefaults() {
   store.timeSyncIntervalRTC = 24; //hour
   store.weatherSyncInterval = 30; //min
   store.mp3Decoder = 1; // minimp3
+  store.audioNormalization = true;
+  store.normalizationMaxGainDb = 20;
   eepromWrite(EEPROM_START, store);
 }
 

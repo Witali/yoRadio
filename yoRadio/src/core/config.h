@@ -30,7 +30,7 @@
   #define ESP_ARDUINO_3 1
 #endif
 
-#define CONFIG_VERSION  7
+#define CONFIG_VERSION  8
 
 enum playMode_e      : uint8_t  { PM_WEB=0, PM_SDCARD=1 };
 
@@ -134,7 +134,12 @@ struct config_t
   uint16_t  timeSyncIntervalRTC;
   uint16_t  weatherSyncInterval;
   uint8_t   mp3Decoder;
+  bool      audioNormalization;
+  uint8_t   normalizationMaxGainDb;
 };
+
+static_assert(sizeof(config_t) <= EEPROM_SIZE - EEPROM_START,
+              "config_t does not fit in the reserved EEPROM area");
 
 #if IR_PIN!=255
 struct ircodes_t

@@ -15,6 +15,7 @@
 #include <Arduino.h>
 #include <libb64/cencode.h>
 #include <esp32-hal-log.h>
+#include "AudioNormalizer.h"
 
 #include <SPI.h>
 #include <WiFi.h>
@@ -200,6 +201,7 @@ public:
     uint32_t stopSong();
     void forceMono(bool m);
     void setBalance(int8_t bal = 0);
+    void setNormalization(bool enabled, uint8_t maxBoostDb = 20);
     void setVolume(uint8_t vol);
     uint8_t getVolume();
     uint8_t getI2sPort();
@@ -591,6 +593,7 @@ private:
     int8_t          m_gain0 = 0;                    // cut or boost filters (EQ)
     int8_t          m_gain1 = 0;
     int8_t          m_gain2 = 0;
+    AudioNormalizer m_normalizer;
 
     pid_array       m_pidsOfPMT;
     int16_t         m_pidOfAAC;

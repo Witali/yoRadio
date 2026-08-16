@@ -66,6 +66,9 @@ void Player::init() {
   #endif
   setBalance(config.store.balance);
   setTone(config.store.bass, config.store.middle, config.store.trebble);
+  #if I2S_DOUT!=255 || I2S_INTERNAL
+    setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb);
+  #endif
   setVolume(0);
   _status = STOPPED;
   _volTimer=false;

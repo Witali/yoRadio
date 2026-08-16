@@ -236,7 +236,7 @@ void NetServer::processQueue(){
           return; 
           break;
         }
-      case GETSYSTEM:     sprintf (wsBuf, "{\"sst\":%d,\"aif\":%d,\"vu\":%d,\"softr\":%d,\"vut\":%d,\"mdns\":\"%s\",\"ipaddr\":\"%s\", \"abuff\": %d, \"mp3decoder\": %d, \"telnet\": %d, \"watchdog\": %d }",
+      case GETSYSTEM:     sprintf (wsBuf, "{\"sst\":%d,\"aif\":%d,\"vu\":%d,\"softr\":%d,\"vut\":%d,\"mdns\":\"%s\",\"ipaddr\":\"%s\", \"abuff\": %d, \"mp3decoder\": %d, \"normalize\": %d, \"normgain\": %d, \"telnet\": %d, \"watchdog\": %d }",
                                   config.store.smartstart != 2, 
                                   config.store.audioinfo, 
                                   config.store.vumeter, 
@@ -246,6 +246,8 @@ void NetServer::processQueue(){
                                   config.ipToStr(WiFi.localIP()),
                                   config.store.abuff,
                                   config.store.mp3Decoder,
+                                  config.store.audioNormalization,
+                                  config.store.normalizationMaxGainDb,
                                   config.store.telnet,
                                   config.store.watchdog); 
                                   break;

@@ -80,6 +80,23 @@ bool CommandHandler::exec(const char *command, const char *value, uint8_t cid) {
     }
     return true;
   }
+  if (strEquals(command, "normalization")){
+    config.saveValue(&config.store.audioNormalization, static_cast<bool>(atoi(value)));
+    #if I2S_DOUT!=255 || I2S_INTERNAL
+      player.setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb);
+    #endif
+    return true;
+  }
+  if (strEquals(command, "normgain")){
+    int gain = atoi(value);
+    if(gain < 0) gain = 0;
+    if(gain > 20) gain = 20;
+    config.saveValue(&config.store.normalizationMaxGainDb, static_cast<uint8_t>(gain));
+    #if I2S_DOUT!=255 || I2S_INTERNAL
+      player.setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb);
+    #endif
+    return true;
+  }
   if (strEquals(command, "telnet")){ config.saveValue(&config.store.telnet, static_cast<bool>(atoi(value))); telnet.toggle(); return true; }
   if (strEquals(command, "watchdog")){ config.saveValue(&config.store.watchdog, static_cast<bool>(atoi(value))); return true; }
   

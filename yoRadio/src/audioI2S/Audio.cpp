@@ -469,6 +469,7 @@ void Audio::setDefaults(bool initializeInputBuffer) {
     m_streamTitleHash = 0;
     m_file_size = 0;
     m_ID3Size = 0;
+    m_normalizer.reset();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -4717,6 +4718,7 @@ bool Audio::setSampleRate(uint32_t sampRate) {
     i2s_set_sample_rates((i2s_port_t)m_i2s_num, sampRate);
   #endif
     m_sampleRate = sampRate;
+    m_normalizer.setSampleRate(sampRate);
     IIR_calculateCoefficients(m_gain0, m_gain1, m_gain2); // must be recalculated after each samplerate change
     return true;
 }
@@ -4806,6 +4808,7 @@ bool Audio::playSample(int16_t sample[2]) {
     sample = IIR_filterChain1(sample);
     sample = IIR_filterChain2(sample);
     //-------------------------------------------
+    m_normalizer.process(sample);
     applyFade(sample);
 
     // Measure the decoded stereo channels before a single-channel output
@@ -4943,6 +4946,10 @@ void Audio::setBalance(int8_t bal){ // bal -16...16
     if(bal < -16) bal = -16;
     if(bal >  16) bal =  16;
     m_balance = bal;
+}
+//---------------------------------------------------------------------------------------------------------------------
+void Audio::setNormalization(bool enabled, uint8_t maxBoostDb) {
+    m_normalizer.configure(enabled, maxBoostDb, getSampleRate());
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::setVolume(uint8_t vol) { // vol 22 steps, 0...21
