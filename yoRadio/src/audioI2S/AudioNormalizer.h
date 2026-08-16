@@ -14,8 +14,8 @@ private:
     static int16_t softLimit(int32_t value);
     void updateGainTarget();
 
-    uint32_t m_gainQ16 = 65536;
-    uint32_t m_maxGainQ16 = 65536;
+    uint16_t m_gainQ12 = 4096;
+    uint16_t m_maxGainQ12 = 4096;
     uint32_t m_sampleRate = 16000;
     uint16_t m_targetPeak = 23198;
     uint16_t m_timeConstantMs = 2000;

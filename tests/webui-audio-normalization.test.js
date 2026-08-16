@@ -64,7 +64,27 @@ test("normalizer uses one time constant for gain increase and decrease", () => {
 
   assert.match(source, /m_targetPeak/);
   assert.match(source, /m_timeConstantMs/);
-  assert.match(source, /moveTowards\(m_gainQ16, targetGain, smoothingBlocks\)/);
-  assert.doesNotMatch(source, /targetGain < m_gainQ16 \?/);
+  assert.match(source, /moveTowards\(m_gainQ12, targetGain, smoothingBlocks\)/);
+  assert.doesNotMatch(source, /targetGain < m_gainQ12 \?/);
   assert.doesNotMatch(source, /attackSamples/);
+});
+
+test("normalizer hot path avoids 64-bit sample arithmetic", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "yoRadio", "src", "audioI2S", "AudioNormalizer.cpp"),
+    "utf8"
+  );
+  const processBody = source.match(
+    /void AudioNormalizer::process\(int16_t sample\[2\]\) \{([\s\S]*?)\n\}/
+  )?.[1];
+  const limiterBody = source.match(
+    /int16_t AudioNormalizer::softLimit\(int32_t value\) \{([\s\S]*?)\n\}/
+  )?.[1];
+
+  assert.ok(processBody, "normalizer process body is missing");
+  assert.ok(limiterBody, "soft limiter body is missing");
+  assert.match(processBody, /\* m_gainQ12\) >> 12/);
+  assert.doesNotMatch(processBody, /int64_t/);
+  assert.doesNotMatch(limiterBody, /int64_t/);
+  assert.match(source, /soft limiter numerator must fit in int32_t/);
 });
