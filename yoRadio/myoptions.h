@@ -15,6 +15,7 @@
 #define TFT_CS                15
 #define TFT_DC                2
 #define TFT_RST               -1
+#define TFT_SPI_FREQUENCY     80000000UL
 #define BRIGHTNESS_PIN        21
 
 /* XPT2046 has dedicated, non-default SPI pins on this board. */

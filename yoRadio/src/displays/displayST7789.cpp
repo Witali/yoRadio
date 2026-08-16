@@ -17,6 +17,9 @@ void DspCore::initDisplay() {
   }else{
     init(240,(DSP_MODEL==DSP_ST7789)?320:240);
   }
+#ifdef TFT_SPI_FREQUENCY
+  setSPISpeed(TFT_SPI_FREQUENCY);
+#endif
   invert();
   cp437(true);
   flip();
