@@ -30,7 +30,8 @@
   #define ESP_ARDUINO_3 1
 #endif
 
-#define CONFIG_VERSION  9
+#define CONFIG_VERSION  10
+#define DEFAULT_AUDIO_BUFFER_BLOCKS 9
 
 enum playMode_e      : uint8_t  { PM_WEB=0, PM_SDCARD=1 };
 

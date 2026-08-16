@@ -3351,6 +3351,8 @@ void Audio::processLocalFile() {
 void Audio::processWebStream() {
 
     const uint16_t  maxFrameSize = InBuff.getMaxBlockSize();    // every mp3/aac frame is not bigger
+    const size_t startupBufferTarget =
+        max(static_cast<size_t>(maxFrameSize), InBuff.capacity() * 60U / 100U);
     static bool     f_tmr_1s;
     static bool     f_stream;                                   // first audio data received
     static uint8_t  cnt_slow;
@@ -3414,9 +3416,11 @@ void Audio::processWebStream() {
             InBuff.bytesWritten(bytesAddedToBuffer);
         }
 
-        if(InBuff.bufferFilled() > maxFrameSize && !f_stream) {  // waiting for buffer filled
+        if(InBuff.bufferFilled() >= startupBufferTarget && !f_stream) {
             f_stream = true;  // ready to play the audio data
-            AUDIO_INFO("stream ready");
+            AUDIO_INFO("stream ready, buffered %u/%u bytes",
+                       static_cast<unsigned>(InBuff.bufferFilled()),
+                       static_cast<unsigned>(InBuff.capacity()));
         }
         if(!f_stream) return;
     }

@@ -126,7 +126,7 @@ void Config::_setupVersion(){
       saveValue(&store.screensaverPlayingBlank, false);
       break;
     case 4:
-      saveValue(&store.abuff, (uint16_t)(VS1053_CS==255?7:10));
+      saveValue(&store.abuff, (uint16_t)(VS1053_CS==255?DEFAULT_AUDIO_BUFFER_BLOCKS:10));
       saveValue(&store.telnet, true);
       saveValue(&store.watchdog, true);
       saveValue(&store.timeSyncInterval, (uint16_t)60);    //min
@@ -146,6 +146,11 @@ void Config::_setupVersion(){
     case 8:
       saveValue(&store.normalizationTargetDbfs, (int8_t)-3, false);
       saveValue(&store.normalizationTimeMs, (uint16_t)2000);
+      break;
+    case 9:
+      if(VS1053_CS==255 && store.abuff < DEFAULT_AUDIO_BUFFER_BLOCKS) {
+        saveValue(&store.abuff, (uint16_t)DEFAULT_AUDIO_BUFFER_BLOCKS);
+      }
       break;
     default:
       break;
@@ -490,7 +495,7 @@ void Config::resetSystem(const char *val, uint8_t clientId){
     saveValue(&store.audioinfo, false, false);
     saveValue(&store.vumeter, false, false);
     saveValue(&store.softapdelay, (uint8_t)0, false);
-    saveValue(&store.abuff, (uint16_t)(VS1053_CS==255?7:10), false);
+    saveValue(&store.abuff, (uint16_t)(VS1053_CS==255?DEFAULT_AUDIO_BUFFER_BLOCKS:10), false);
     saveValue(&store.telnet, true);
     saveValue(&store.watchdog, true, false);
     saveValue(&store.mp3Decoder, (uint8_t)1);
@@ -629,7 +634,7 @@ void Config::setDefaults() {
   store.screensaverPlayingEnabled = false;
   store.screensaverPlayingTimeout = 5;
   store.screensaverPlayingBlank = false;
-  store.abuff = VS1053_CS==255?7:10;
+  store.abuff = VS1053_CS==255?DEFAULT_AUDIO_BUFFER_BLOCKS:10;
   store.telnet = true;
   store.watchdog = true;
   store.timeSyncInterval = 60;    //min
