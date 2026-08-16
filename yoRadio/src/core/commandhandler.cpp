@@ -83,7 +83,8 @@ bool CommandHandler::exec(const char *command, const char *value, uint8_t cid) {
   if (strEquals(command, "normalization")){
     config.saveValue(&config.store.audioNormalization, static_cast<bool>(atoi(value)));
     #if I2S_DOUT!=255 || I2S_INTERNAL
-      player.setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb);
+      player.setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb,
+                              config.store.normalizationTargetDbfs, config.store.normalizationTimeMs);
     #endif
     return true;
   }
@@ -93,7 +94,30 @@ bool CommandHandler::exec(const char *command, const char *value, uint8_t cid) {
     if(gain > 20) gain = 20;
     config.saveValue(&config.store.normalizationMaxGainDb, static_cast<uint8_t>(gain));
     #if I2S_DOUT!=255 || I2S_INTERNAL
-      player.setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb);
+      player.setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb,
+                              config.store.normalizationTargetDbfs, config.store.normalizationTimeMs);
+    #endif
+    return true;
+  }
+  if (strEquals(command, "normtarget")){
+    int target = atoi(value);
+    if(target < -20) target = -20;
+    if(target > 0) target = 0;
+    config.saveValue(&config.store.normalizationTargetDbfs, static_cast<int8_t>(target));
+    #if I2S_DOUT!=255 || I2S_INTERNAL
+      player.setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb,
+                              config.store.normalizationTargetDbfs, config.store.normalizationTimeMs);
+    #endif
+    return true;
+  }
+  if (strEquals(command, "normtime")){
+    int timeMs = atoi(value);
+    if(timeMs < 100) timeMs = 100;
+    if(timeMs > 10000) timeMs = 10000;
+    config.saveValue(&config.store.normalizationTimeMs, static_cast<uint16_t>(timeMs));
+    #if I2S_DOUT!=255 || I2S_INTERNAL
+      player.setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb,
+                              config.store.normalizationTargetDbfs, config.store.normalizationTimeMs);
     #endif
     return true;
   }

@@ -143,6 +143,10 @@ void Config::_setupVersion(){
       saveValue(&store.audioNormalization, true, false);
       saveValue(&store.normalizationMaxGainDb, (uint8_t)20);
       break;
+    case 8:
+      saveValue(&store.normalizationTargetDbfs, (int8_t)-3, false);
+      saveValue(&store.normalizationTimeMs, (uint16_t)2000);
+      break;
     default:
       break;
   }
@@ -491,9 +495,12 @@ void Config::resetSystem(const char *val, uint8_t clientId){
     saveValue(&store.watchdog, true, false);
     saveValue(&store.mp3Decoder, (uint8_t)1);
     saveValue(&store.audioNormalization, true, false);
-    saveValue(&store.normalizationMaxGainDb, (uint8_t)20);
+    saveValue(&store.normalizationMaxGainDb, (uint8_t)20, false);
+    saveValue(&store.normalizationTargetDbfs, (int8_t)-3, false);
+    saveValue(&store.normalizationTimeMs, (uint16_t)2000);
     #if I2S_DOUT!=255 || I2S_INTERNAL
-      player.setNormalization(store.audioNormalization, store.normalizationMaxGainDb);
+      player.setNormalization(store.audioNormalization, store.normalizationMaxGainDb,
+                              store.normalizationTargetDbfs, store.normalizationTimeMs);
     #endif
     snprintf(store.mdnsname, MDNS_LENGTH, "yoradio-%x", (unsigned int)getChipId());
     saveValue(store.mdnsname, store.mdnsname, MDNS_LENGTH, true, true);
@@ -631,6 +638,8 @@ void Config::setDefaults() {
   store.mp3Decoder = 1; // minimp3
   store.audioNormalization = true;
   store.normalizationMaxGainDb = 20;
+  store.normalizationTargetDbfs = -3;
+  store.normalizationTimeMs = 2000;
   eepromWrite(EEPROM_START, store);
 }
 

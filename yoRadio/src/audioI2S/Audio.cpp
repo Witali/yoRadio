@@ -4948,8 +4948,10 @@ void Audio::setBalance(int8_t bal){ // bal -16...16
     m_balance = bal;
 }
 //---------------------------------------------------------------------------------------------------------------------
-void Audio::setNormalization(bool enabled, uint8_t maxBoostDb) {
-    m_normalizer.configure(enabled, maxBoostDb, getSampleRate());
+void Audio::setNormalization(bool enabled, uint8_t maxBoostDb,
+                             int8_t targetDbfs, uint16_t timeConstantMs) {
+    m_normalizer.configure(enabled, maxBoostDb, targetDbfs,
+                           timeConstantMs, getSampleRate());
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::setVolume(uint8_t vol) { // vol 22 steps, 0...21

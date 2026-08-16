@@ -66,5 +66,28 @@ if(-not $options.Contains('id="normalize"')) {
         $options.Substring($index + $anchor.Length)
 }
 
+if(-not $options.Contains('id="normtarget"')) {
+    $anchor = @'
+          <div class="hr">&nbsp;</div>
+'@
+    $replacement = @'
+          <div class="flex-row">
+            <div class="inputwrap">
+              <span class="inputtitle">target peak level (dBFS)</span>
+              <input type="number" id="normtarget" data-command="normtarget" value="-3" min="-20" max="0" step="1" />
+            </div>
+            <div class="inputwrap">
+              <span class="inputtitle">time constant (ms)</span>
+              <input type="number" id="normtime" data-command="normtime" value="2000" min="100" max="10000" step="100" />
+            </div>
+          </div>
+          <div class="hr">&nbsp;</div>
+'@
+    $index = $options.IndexOf($anchor, $options.IndexOf('id="normgain"'), [StringComparison]::Ordinal)
+    if($index -lt 0) { throw "Could not find normalization settings insertion point" }
+    $options = $options.Substring(0, $index) + $replacement +
+        $options.Substring($index + $anchor.Length)
+}
+
 Write-GzipText $optionsPath $options
 Write-Host "Updated audio normalization controls in $optionsPath"

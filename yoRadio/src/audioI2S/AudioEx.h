@@ -201,7 +201,8 @@ public:
     uint32_t stopSong();
     void forceMono(bool m);
     void setBalance(int8_t bal = 0);
-    void setNormalization(bool enabled, uint8_t maxBoostDb = 20);
+    void setNormalization(bool enabled, uint8_t maxBoostDb = 20,
+                          int8_t targetDbfs = -3, uint16_t timeConstantMs = 2000);
     void setVolume(uint8_t vol);
     uint8_t getVolume();
     uint8_t getI2sPort();
