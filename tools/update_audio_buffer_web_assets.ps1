@@ -41,13 +41,13 @@ function Write-GzipText {
 }
 
 $options = Read-GzipText $optionsPath
-$current = '<input type="number" id="abuff" data-command="abuff" value="9"'
+$current = '<input type="number" id="abuff" data-command="abuff" value="14"'
 if($options.Contains($current)) {
     Write-Host "Audio buffer default is already current in $optionsPath"
     return
 }
 $pattern = '(<input type="number" id="abuff" data-command="abuff" value=")\d+("[^>]*>)'
-$updated = [regex]::Replace($options, $pattern, '${1}9$2', 1)
+$updated = [regex]::Replace($options, $pattern, '${1}14$2', 1)
 if($updated -eq $options) { throw "Could not update the audio buffer default" }
 
 Write-GzipText $optionsPath $updated

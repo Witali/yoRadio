@@ -152,6 +152,11 @@ void Config::_setupVersion(){
         saveValue(&store.abuff, (uint16_t)DEFAULT_AUDIO_BUFFER_BLOCKS);
       }
       break;
+    case 10:
+      if(VS1053_CS==255 && store.abuff < DEFAULT_AUDIO_BUFFER_BLOCKS) {
+        saveValue(&store.abuff, (uint16_t)DEFAULT_AUDIO_BUFFER_BLOCKS);
+      }
+      break;
     default:
       break;
   }

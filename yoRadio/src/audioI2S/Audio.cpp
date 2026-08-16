@@ -3352,7 +3352,7 @@ void Audio::processWebStream() {
 
     const uint16_t  maxFrameSize = InBuff.getMaxBlockSize();    // every mp3/aac frame is not bigger
     const size_t startupBufferTarget =
-        max(static_cast<size_t>(maxFrameSize), InBuff.capacity() * 60U / 100U);
+        max(static_cast<size_t>(maxFrameSize), InBuff.capacity() * 80U / 100U);
     static bool     f_tmr_1s;
     static bool     f_stream;                                   // first audio data received
     static uint8_t  cnt_slow;
