@@ -188,6 +188,7 @@ public:
     bool connecttoSD(const char* path, uint32_t resumeFilePos = 0);
     bool setFileLoop(bool input);//TEST loop
     void setConnectionTimeout(uint16_t timeout_ms, uint16_t timeout_ms_ssl);
+    void setConnectionTaskEnabled(bool enabled);
     bool setAudioPlayPosition(uint16_t sec);
     bool setFilePos(uint32_t pos);
     bool audioFileSeek(const float speed);
@@ -502,6 +503,7 @@ private:
     ConnectParams _connectParams;
     volatile bool _connectionResult = false;
     TaskHandle_t _connectTaskHandle = nullptr;
+    bool _connectionTaskEnabled = true;
     
     const size_t    m_frameSizeWav  = 1024 * 8;
     const size_t    m_frameSizeMP3  = 1600;

@@ -14,6 +14,59 @@
 Player player;
 QueueHandle_t playerQueue;
 
+#ifndef PLAYER_TASK_STACK_SIZE
+  #define PLAYER_TASK_STACK_SIZE 1024 * 8
+#endif
+#ifndef PLAYER_TASK_PRIORITY
+  #define PLAYER_TASK_PRIORITY 2
+#endif
+#ifndef PLAYER_TASK_CORE_ID
+  #define PLAYER_TASK_CORE_ID 1
+#endif
+#ifndef PLAYER_TASK_DELAY
+  #define PLAYER_TASK_DELAY pdMS_TO_TICKS(1)
+#endif
+#ifndef PLAYER_TASK_STATS_INTERVAL_MS
+  #define PLAYER_TASK_STATS_INTERVAL_MS 10000U
+#endif
+
+static TaskHandle_t playerTaskHandle = nullptr;
+static StaticTask_t playerTaskControlBlock;
+static StackType_t playerTaskStack[PLAYER_TASK_STACK_SIZE];
+
+static void loopPlayerTask(void* pvParameters) {
+  (void)pvParameters;
+  Serial.printf("##[TASK]# AudioTask core=%d priority=%u stack=%u\n",
+                xPortGetCoreID(), static_cast<unsigned>(uxTaskPriorityGet(nullptr)),
+                static_cast<unsigned>(PLAYER_TASK_STACK_SIZE));
+
+  uint32_t loops = 0;
+  uint32_t maximumLoopUs = 0;
+  uint32_t statsStarted = millis();
+  while(true) {
+    const uint32_t started = micros();
+    player.loop();
+    const uint32_t elapsed = micros() - started;
+    if(elapsed > maximumLoopUs) maximumLoopUs = elapsed;
+    ++loops;
+
+    const uint32_t now = millis();
+    if(now - statsStarted >= PLAYER_TASK_STATS_INTERVAL_MS) {
+      if(config.store.audioinfo) {
+        telnet.printf("##AUDIO.TASK#: core=%d priority=%u loops=%lu max_loop_us=%lu stack_free=%u\n",
+                      xPortGetCoreID(), static_cast<unsigned>(uxTaskPriorityGet(nullptr)),
+                      static_cast<unsigned long>(loops),
+                      static_cast<unsigned long>(maximumLoopUs),
+                      static_cast<unsigned>(uxTaskGetStackHighWaterMark(nullptr)));
+      }
+      loops = 0;
+      maximumLoopUs = 0;
+      statsStarted = now;
+    }
+    vTaskDelay(PLAYER_TASK_DELAY);
+  }
+}
+
 #ifndef AUDIO_SWITCH_FADE_MS
   #define AUDIO_SWITCH_FADE_MS 100
 #endif
@@ -82,6 +135,24 @@ void Player::init() {
   Serial.println("done");
 }
 
+bool Player::startTask() {
+  if(playerTaskHandle != nullptr) return true;
+  playerTaskHandle = xTaskCreateStaticPinnedToCore(
+      loopPlayerTask, "AudioTask", PLAYER_TASK_STACK_SIZE, nullptr,
+      PLAYER_TASK_PRIORITY, playerTaskStack, &playerTaskControlBlock,
+      PLAYER_TASK_CORE_ID);
+  if(playerTaskHandle == nullptr) {
+    Serial.println("##[ERROR]# Failed to create AudioTask; using loopTask fallback");
+    return false;
+  }
+  setConnectionTaskEnabled(false);
+  return true;
+}
+
+bool Player::taskRunning() const {
+  return playerTaskHandle != nullptr;
+}
+
 void Player::sendCommand(playerRequestParams_t request){
   if(playerQueue==NULL) return;
   xQueueSend(playerQueue, &request, PLQ_SEND_DELAY);
@@ -142,7 +213,7 @@ void resetPlayer(){
   if(!config.store.watchdog) return;
   player.resetQueue();
   player.sendCommand({PR_STOP, 0});
-  player.loop();
+  if(!player.taskRunning()) player.loop();
 }
 
 #ifndef PL_QUEUE_TICKS

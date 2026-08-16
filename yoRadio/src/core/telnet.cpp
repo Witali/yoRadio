@@ -13,6 +13,11 @@ bool Telnet::_isIPSet(IPAddress ip) {
 }
 
 bool Telnet::begin(bool quiet) {
+  if(_logQueue == nullptr) {
+    _logQueue = xQueueCreateStatic(
+        TELNET_LOG_QUEUE_LENGTH, TELNET_LOG_ITEM_SIZE,
+        _logQueueStorage, &_logQueueControl);
+  }
   if(network.status==SDREADY) {
     BOOTLOG("Ready in SD Mode!");
     BOOTLOG("------------------------------------------------");
@@ -79,6 +84,7 @@ void Telnet::handleSerial(){
 }
 
 void Telnet::loop() {
+  drainLogQueue();
   if(network.status==SDREADY || network.status!=CONNECTED) {
     handleSerial();
     return;
@@ -132,12 +138,8 @@ void Telnet::loop() {
 }
 
 void Telnet::print(const char *buf) {
-  for (int id = 0; id < MAX_TLN_CLIENTS; id++) {
-    if (clients[id] && clients[id].connected()) {
-      print(id, buf);
-    }
-  }
   Serial.print(buf);
+  enqueueLog(buf);
 }
 
 void Telnet::print(uint8_t id, const char *buf) {
@@ -147,20 +149,36 @@ void Telnet::print(uint8_t id, const char *buf) {
 }
 
 void Telnet::printf(const char *format, ...) {
+  char logBuf[TELNET_LOG_ITEM_SIZE];
   va_list args;
   va_start (args, format );
-  vsnprintf(cmBuf, sizeof(cmBuf), format, args);
+  vsnprintf(logBuf, sizeof(logBuf), format, args);
   va_end (args);
-  for (int id = 0; id < MAX_TLN_CLIENTS; id++) {
-    if (clients[id] && clients[id].connected()) {
-      clients[id].print(cmBuf);
+  enqueueLog(logBuf);
+  if (strcmp(logBuf, "> ") == 0) return;
+  //if(strstr(buf,"\n> ")==NULL) Serial.print(buf);
+  char *nl = strstr(logBuf, "\n> ");
+  if (nl != NULL) { logBuf[nl-logBuf+1] = '\0'; }
+  Serial.print(logBuf);
+}
+
+void Telnet::enqueueLog(const char *buf) {
+  if(_logQueue == nullptr || buf == nullptr) return;
+  char item[TELNET_LOG_ITEM_SIZE] = {};
+  strlcpy(item, buf, sizeof(item));
+  xQueueSend(_logQueue, item, 0);
+}
+
+void Telnet::drainLogQueue() {
+  if(_logQueue == nullptr) return;
+  char item[TELNET_LOG_ITEM_SIZE];
+  while(xQueueReceive(_logQueue, item, 0) == pdTRUE) {
+    for(int id = 0; id < MAX_TLN_CLIENTS; ++id) {
+      if(clients[id] && clients[id].connected()) {
+        clients[id].print(item);
+      }
     }
   }
-  if (strcmp(cmBuf, "> ") == 0) return;
-  //if(strstr(buf,"\n> ")==NULL) Serial.print(buf);
-  char *nl = strstr(cmBuf, "\n> ");
-  if (nl != NULL) { cmBuf[nl-cmBuf+1] = '\0'; }
-  Serial.print(cmBuf);
 }
 
 void Telnet::printf(uint8_t id, const char *format, ...) {

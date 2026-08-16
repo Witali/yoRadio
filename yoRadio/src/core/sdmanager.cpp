@@ -85,7 +85,7 @@ void SDManager::listSD(File &plSDfile, File &plSDindex, const char* dirname, uin
     char* filePath;
     while (true) {
         vTaskDelay(2);
-        player.loop();
+        if(!player.taskRunning()) player.loop();
         bool isDir;
         String fileName = root.getNextFileName(&isDir);
         if (fileName.isEmpty()) break;

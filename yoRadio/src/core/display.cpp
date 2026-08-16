@@ -43,6 +43,9 @@ Nextion nextion;
 QueueHandle_t displayQueue;
 
 static void loopDspTask(void * pvParameters){
+  Serial.printf("##[TASK]# DspTask core=%d priority=%u stack=%u\n",
+                xPortGetCoreID(), static_cast<unsigned>(uxTaskPriorityGet(nullptr)),
+                static_cast<unsigned>(CORE_STACK_SIZE));
   while(true){
   #ifndef DUMMYDISPLAY
     if(displayQueue==NULL) break;

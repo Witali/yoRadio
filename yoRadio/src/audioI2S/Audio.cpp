@@ -478,6 +478,10 @@ void Audio::setConnectionTimeout(uint16_t timeout_ms, uint16_t timeout_ms_ssl){
     if(timeout_ms_ssl) m_timeout_ms_ssl = timeout_ms_ssl;
 }
 
+void Audio::setConnectionTaskEnabled(bool enabled) {
+    _connectionTaskEnabled = enabled;
+}
+
 void Audio::connectTask(void* pvParams) {
   ConnectParams* params = static_cast<ConnectParams*>(pvParams);
   Audio* self = params->instance;
@@ -594,7 +598,7 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
       }
 
       const uint32_t attemptStarted = millis();
-      if(!config.store.watchdog){
+      if(!config.store.watchdog || !_connectionTaskEnabled){
         res = _client->connect(h_host, port, m_f_ssl ? m_timeout_ms_ssl : m_timeout_ms);
       }else{
         _connectionResult = false;
@@ -3352,7 +3356,7 @@ void Audio::processWebStream() {
 
     const uint16_t  maxFrameSize = InBuff.getMaxBlockSize();    // every mp3/aac frame is not bigger
     const size_t startupBufferTarget =
-        max(static_cast<size_t>(maxFrameSize), InBuff.capacity() * 80U / 100U);
+        max(static_cast<size_t>(maxFrameSize), InBuff.capacity() * 95U / 100U);
     static bool     f_tmr_1s;
     static bool     f_stream;                                   // first audio data received
     static uint8_t  cnt_slow;

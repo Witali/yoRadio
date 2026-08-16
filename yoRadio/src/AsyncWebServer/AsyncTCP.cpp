@@ -200,6 +200,9 @@ static void _handle_async_event(lwip_event_packet_t * e){
 }
 
 static void _async_service_task(void *pvParameters){
+    Serial.printf("##[TASK]# async_tcp core=%d priority=%u stack=%u\n",
+                  xPortGetCoreID(), static_cast<unsigned>(uxTaskPriorityGet(nullptr)),
+                  static_cast<unsigned>(XTASK_MEM_SIZE));
     lwip_event_packet_t * packet = NULL;
     for (;;) {
         if(_get_async_event(&packet)){

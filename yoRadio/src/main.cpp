@@ -98,6 +98,7 @@ void setup() {
     setupOTA();
   #endif
   if (config.getMode()==PM_SDCARD) player.initHeaders(config.station.url);
+  player.startTask();
   player.lockOutput=false;
   if (config.store.smartstart == 1) {
     player.sendCommand({PR_PLAY, config.lastStation()});
@@ -114,9 +115,10 @@ void loop() {
     pm.on_connect();
     config.initPlaylistMode();
     telnet.begin(true);
-  #if USE_OTA
+    #if USE_OTA
     setupOTA();
-  #endif
+    #endif
+    player.startTask();
     player.lockOutput = false;
     // The AP screen is built without the player widgets.  Run the regular
     // display startup now that Wi-Fi is connected so those widgets are fully
@@ -130,7 +132,7 @@ void loop() {
   timekeeper.loop1();
   telnet.loop();
   if (network.status == CONNECTED || network.status==SDREADY) {
-    player.loop();
+    if(!player.taskRunning()) player.loop();
 #if USE_OTA
     ArduinoOTA.handle();
 #endif
@@ -139,6 +141,7 @@ void loop() {
   #ifdef NETSERVER_LOOP1
   netserver.loop();
   #endif
+  if(player.taskRunning()) vTaskDelay(pdMS_TO_TICKS(1));
 }
 
 #include "core/audiohandlers.h"

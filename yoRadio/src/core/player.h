@@ -52,6 +52,8 @@ class Player: public Audio {
   public:
     Player();
     void init();
+    bool startTask();
+    bool taskRunning() const;
     void loop();
     void initHeaders(const char *file);
     void setError();

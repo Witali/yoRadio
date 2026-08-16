@@ -10,10 +10,10 @@ function read(...parts) {
   return fs.readFileSync(path.join(root, ...parts), "utf8");
 }
 
-test("web radio waits for an 80 percent startup buffer", () => {
+test("web radio waits for a 95 percent startup buffer", () => {
   const source = read("yoRadio", "src", "audioI2S", "Audio.cpp");
 
-  assert.match(source, /InBuff\.capacity\(\) \* 80U \/ 100U/);
+  assert.match(source, /InBuff\.capacity\(\) \* 95U \/ 100U/);
   assert.match(source, /bufferFilled\(\) >= startupBufferTarget/);
   assert.match(source, /stream ready, buffered %u\/%u bytes/);
 });

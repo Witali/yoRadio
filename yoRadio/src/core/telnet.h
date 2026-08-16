@@ -3,6 +3,8 @@
 #include <WiFi.h>
 
 #define MAX_TLN_CLIENTS 5
+#define TELNET_LOG_QUEUE_LENGTH 8
+#define TELNET_LOG_ITEM_SIZE 220
 #define BOOTLOG( ... ) { char buf[120]; sprintf( buf, __VA_ARGS__ ) ; telnet.printf("##[BOOT]#\t%s\n",buf); }
 
 class Telnet {
@@ -26,10 +28,15 @@ class Telnet {
     void on_connect(const char* str, uint8_t clientId);
     void on_input(const char* str, uint8_t clientId);
   private:
-    char cmBuf[220];
+    char cmBuf[TELNET_LOG_ITEM_SIZE];
+    QueueHandle_t _logQueue = nullptr;
+    StaticQueue_t _logQueueControl = {};
+    uint8_t _logQueueStorage[TELNET_LOG_QUEUE_LENGTH * TELNET_LOG_ITEM_SIZE] = {};
     bool _isIPSet(IPAddress ip);
     void handleSerial();
     void printHeapFragmentationInfo(uint8_t id);
+    void enqueueLog(const char *buf);
+    void drainLogQueue();
 };
 
 extern Telnet telnet;
