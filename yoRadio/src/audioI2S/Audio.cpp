@@ -3612,7 +3612,10 @@ void Audio::processWebFile() {
 
     // we have a webfile, read the file header first - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     if(m_controlCounter != 100){
-        InBuff.bytesWasRead(readAudioHeader(availableBytes));
+        // availableBytes describes only the network read performed above and
+        // is commonly zero once the ring is full. Header readers need the
+        // bytes that are already buffered at the current read position.
+        InBuff.bytesWasRead(readAudioHeader(InBuff.bufferFilled()));
         return;
     }
 

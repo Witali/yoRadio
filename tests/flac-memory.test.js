@@ -53,6 +53,15 @@ test('large wrapped audio frames are linearized without another buffer', () => {
   assert.match(getReadPointer[0], /m_writePtr = m_buffer \+ filled/);
 });
 
+test('web-file headers inspect buffered bytes after network input pauses', () => {
+  assert.match(
+    audioSource,
+    /readAudioHeader\(InBuff\.bufferFilled\(\)\)/,
+    'header parsing must use bytes already stored in the ring',
+  );
+  assert.doesNotMatch(audioSource, /readAudioHeader\(availableBytes\)/);
+});
+
 test('FLAC prediction avoids heap churn and 32-bit accumulation overflow', () => {
   assert.match(decoderSource, /int32_t coefs\[32\]/);
   assert.doesNotMatch(decoderSource, /vector<int32_t>\s*coefs/);
