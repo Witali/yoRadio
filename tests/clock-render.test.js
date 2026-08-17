@@ -34,3 +34,19 @@ test("clock advances before the first network time synchronization", () => {
   );
   assert.doesNotMatch(source, /network\.timeinfo\.tm_year\s*>\s*100/);
 });
+
+test("Wi-Fi startup and reconnection request immediate SNTP correction", () => {
+  const source = fs.readFileSync(
+    path.join(root, "yoRadio", "src", "core", "network.cpp"),
+    "utf8"
+  );
+
+  assert.match(
+    source,
+    /MyNetwork::setWifiParams\(\)[\s\S]*config\.setTimeConf\(\)[\s\S]*timekeeper\.forceTimeSync = true/
+  );
+  assert.match(
+    source,
+    /MyNetwork::WiFiReconnected[\s\S]*config\.setTimeConf\(\)[\s\S]*timekeeper\.forceTimeSync = true/
+  );
+});

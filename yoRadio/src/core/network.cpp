@@ -31,6 +31,8 @@ MyNetwork network;
 
 void MyNetwork::WiFiReconnected(WiFiEvent_t event, WiFiEventInfo_t info){
   network.beginReconnect = false;
+  config.setTimeConf();
+  timekeeper.forceTimeSync = true;
   player.lockOutput = false;
   delay(100);
   display.putRequest(NEWMODE, PLAYER);
@@ -218,7 +220,11 @@ void MyNetwork::setWifiParams(){
   WiFi.setSleep(false);
   WiFi.onEvent(WiFiReconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
   WiFi.onEvent(WiFiLostConnection, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
-  //config.setTimeConf(); //??
+  // configTime() may have been called before Wi-Fi was available. Restart
+  // SNTP after an address is assigned and request an immediate correction;
+  // the configured numeric interval still controls later synchronizations.
+  config.setTimeConf();
+  timekeeper.forceTimeSync = true;
   #ifndef YORADIO_ESP_IDF_MINIMAL
     if(strlen(config.store.mdnsname)>0)
       MDNS.begin(config.store.mdnsname);
