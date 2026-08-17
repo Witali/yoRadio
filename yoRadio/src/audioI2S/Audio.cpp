@@ -104,16 +104,10 @@ size_t AudioBuffer::init() {
 }
 
 void AudioBuffer::changeMaxBlockSize(uint16_t mbs){
-    // getReadPtr() mirrors a wrapped block into the reserved tail behind the
-    // ring. Never allow a block larger than that tail: WAV asks for 8192
-    // bytes, while RAM-only boards reserve 1600 bytes, which used to copy
-    // beyond the allocation and corrupt the heap on every wrap.
-    const size_t reservedSize = m_f_psram ? m_resBuffSizePSRAM
-                                         : m_resBuffSizeRAM;
-    if(mbs > reservedSize) {
-        log_w("Audio block size %u exceeds %u-byte wrap reserve; clamping",
-              mbs, reservedSize);
-        mbs = reservedSize;
+    if(m_buffSize && mbs > m_buffSize) {
+        log_w("Audio block size %u exceeds %u-byte input capacity; clamping",
+              mbs, static_cast<unsigned>(m_buffSize));
+        mbs = m_buffSize;
     }
     m_maxBlockSize = mbs;
     return;
@@ -181,7 +175,30 @@ uint8_t* AudioBuffer::getWritePtr() {
 uint8_t* AudioBuffer::getReadPtr() {
     size_t len = m_endPtr - m_readPtr;
     if(len < m_maxBlockSize) { // be sure the last frame is completed
-        memcpy(m_endPtr, m_buffer, m_maxBlockSize - len);  // cpy from m_buffer to m_endPtr with len
+        const size_t reservedSize = m_f_psram ? m_resBuffSizePSRAM
+                                             : m_resBuffSizeRAM;
+        if(m_maxBlockSize <= reservedSize) {
+            memcpy(m_endPtr, m_buffer, m_maxBlockSize - len);
+        } else if(m_writePtr < m_readPtr) {
+            // Large FLAC/WAV frames do not fit in the small wrap reserve used
+            // by RAM-only boards. Rotate the ring in place so all unread data
+            // is contiguous without allocating a second frame buffer.
+            const size_t filled = bufferFilled();
+            auto reverseRange = [](uint8_t* first, uint8_t* last) {
+                while(first < last) {
+                    --last;
+                    if(first >= last) break;
+                    const uint8_t value = *first;
+                    *first++ = *last;
+                    *last = value;
+                }
+            };
+            reverseRange(m_buffer, m_readPtr);
+            reverseRange(m_readPtr, m_endPtr);
+            reverseRange(m_buffer, m_endPtr);
+            m_readPtr = m_buffer;
+            m_writePtr = m_buffer + filled;
+        }
     }
     return m_readPtr;
 }
@@ -1642,6 +1659,13 @@ int Audio::read_FLAC_Header(uint8_t *data, size_t len) {
             retvalue = 1;
             return 0;
         }
+        if(!FLACDecoder_AllocateBuffers(m_flacMaxBlockSize, m_flacNumChannels)) {
+            stopSong();
+            return -1;
+        }
+        AUDIO_INFO("FLAC decoder buffer: %u bytes for %u samples x %u channels",
+                   static_cast<unsigned>(FLACDecoder_GetAllocatedBytes()),
+                   m_flacMaxBlockSize, m_flacNumChannels);
         m_controlCounter = FLAC_OKAY;
         eofHeader = true;
         m_audioDataStart = headerSize;
@@ -1660,7 +1684,7 @@ int Audio::read_FLAC_Header(uint8_t *data, size_t len) {
         vTaskDelay(2);
         m_flacMaxFrameSize = bigEndian(data + 10, 3);
         if(m_flacMaxFrameSize){
-            AUDIO_INFO("FLAC maxFrameSize: %u", m_flacMaxFrameSize);
+            AUDIO_INFO("FLAC maxFrameSize: %lu", static_cast<unsigned long>(m_flacMaxFrameSize));
         }
         else {
             AUDIO_INFO("FLAC maxFrameSize: N/A");
@@ -2422,7 +2446,7 @@ int Audio::read_OGG_Header(uint8_t *data, size_t len){
         m_flacMaxFrameSize = bigEndian(data + i, 3);
         i += 3;
         if(m_flacMaxFrameSize){
-            AUDIO_INFO("FLAC maxFrameSize: %u", m_flacMaxFrameSize);
+            AUDIO_INFO("FLAC maxFrameSize: %lu", static_cast<unsigned long>(m_flacMaxFrameSize));
         }
         else {
             AUDIO_INFO("FLAC maxFrameSize: N/A");
@@ -2473,14 +2497,12 @@ int Audio::read_OGG_Header(uint8_t *data, size_t len){
         return 0;
     }
     if(m_controlCounter == OGG_AMRDY){ // ogg almost ready
-        if(!psramFound()){
-            AUDIO_INFO("FLAC works only with PSRAM!");
-            m_f_running = false; stopSong();
-            return -1;
+        if(!FLACDecoder_AllocateBuffers(m_flacMaxBlockSize, m_flacNumChannels)) {
+            m_f_running = false; stopSong(); return -1;
         }
-        if(!FLACDecoder_AllocateBuffers()) {m_f_running = false; stopSong(); return -1;}
         InBuff.changeMaxBlockSize(m_frameSizeFLAC);
-        AUDIO_INFO("FLACDecoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
+        AUDIO_INFO("FLACDecoder has been initialized, buffer: %u bytes, free Heap: %lu bytes",
+                   static_cast<unsigned>(FLACDecoder_GetAllocatedBytes()), ESP.getFreeHeap());
 
         m_controlCounter = OGG_OKAY; // 100
         eofHeader = true;
@@ -4160,13 +4182,13 @@ bool Audio:: initializeDecoder(){
             }
             break;
         case CODEC_FLAC:
-            if(!psramFound()){
-                AUDIO_INFO("FLAC works only with PSRAM!");
-                goto exit;
-            }
-            if(!FLACDecoder_AllocateBuffers()) goto exit;
+            // STREAMINFO contains the actual block size. Delay the decoder
+            // allocation until the header has been parsed so RAM-only boards
+            // do not reserve the old fixed 64 KiB sample matrix.
+            AACDecoder_FreeBuffers();
+            if(!CodecArenaDiscard()) goto exit;
             InBuff.changeMaxBlockSize(m_frameSizeFLAC);
-            AUDIO_INFO("FLACDecoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
+            AUDIO_INFO("FLAC header reader initialized, free Heap: %lu bytes", ESP.getFreeHeap());
             break;
         case CODEC_WAV:
             InBuff.changeMaxBlockSize(m_frameSizeWav);

@@ -555,7 +555,7 @@ private:
     uint8_t         m_flacBitsPerSample = 0;        // bps should be 16
     uint8_t         m_flacNumChannels = 0;          // can be read out in the FLAC file header
     uint32_t        m_flacSampleRate = 0;           // can be read out in the FLAC file header
-    uint16_t        m_flacMaxFrameSize = 0;         // can be read out in the FLAC file header
+    uint32_t        m_flacMaxFrameSize = 0;         // can be read out in the FLAC file header
     uint16_t        m_flacMaxBlockSize = 0;         // can be read out in the FLAC file header
     uint32_t        m_flacTotalSamplesInStream = 0; // can be read out in the FLAC file header
     uint32_t        m_metaint = 0;                  // Number of databytes between metadata

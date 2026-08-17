@@ -23,11 +23,6 @@
 #define APLL_DISABLE 0
 #define EXTERNAL_I2S  0
 
-
-typedef struct FLACsubFramesBuff_t{
-    int32_t samplesBuffer[MAX_CHANNELS][MAX_BLOCKSIZE];
-}FLACsubframesBuffer_t;
-
 enum : uint8_t {FLACDECODER_INIT, FLACDECODER_READ_IN, FLACDECODER_WRITE_OUT};
 enum : uint8_t {DECODE_FRAME, DECODE_SUBFRAMES, OUT_SAMPLES};
 enum : int8_t  {GIVE_NEXT_LOOP = +1,
@@ -148,9 +143,10 @@ typedef struct FLACFrameHeader_t {
 int      FLACFindSyncWord(unsigned char *buf, int nBytes);
 int      FLACFindOggSyncWord(unsigned char *buf, int nBytes);
 int      FLACparseOggHeader(unsigned char *buf);
-bool     FLACDecoder_AllocateBuffers(void);
+bool     FLACDecoder_AllocateBuffers(uint16_t maxBlockSize, uint8_t channels);
 void     FLACDecoder_ClearBuffer();
 void     FLACDecoder_FreeBuffers();
+size_t   FLACDecoder_GetAllocatedBytes();
 void     FLACSetRawBlockParams(uint8_t Chans, uint32_t SampRate, uint8_t BPS, uint32_t tsis, uint32_t AuDaLength);
 void     FLACDecoderReset();
 int8_t   FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf);
