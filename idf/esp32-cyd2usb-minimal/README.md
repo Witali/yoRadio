@@ -27,6 +27,24 @@ The third `pdm` backend uses the ESP-IDF 6 `i2s_pdm` API and the ESP32 hardware
 PCM-to-PDM converter. Its one-bit stream is routed to GPIO26, with mono mixing,
 DMA buffering and bias ramps already handled by YoRadio's PDM output path.
 
+### Confirmed PDM clock fix
+
+ESP-IDF 6.0.2 calculates the PCM-to-PDM bit clock after reducing the `fp/fs`
+ratio to an integer. With Espressif's fixed-carrier DAC profile this changes
+the requested 6.144 MHz carrier to 5.6448 MHz for a 44.1 kHz stream, while a
+48 kHz stream still receives 6.144 MHz. On this board the mismatch produced
+clearly audible extra noise on stereo 44.1 kHz stations (for example,
+Sputnik), although stereo 48 kHz stations such as Vesti FM remained clean.
+
+The PDM build replaces only that calculation in a build-local copy of
+`i2s_pdm.c`: multiplication is performed in 64 bits before division by `fs`.
+It keeps the carrier at 6.144 MHz for both 44.1 and 48 kHz while retaining the
+sample-rate-dependent `fp/fs` converter settings. Listening tests confirmed
+that this fix eliminated the extra station-dependent PDM noise. The pinned
+ESP-IDF checkout is not modified, and CMake deliberately stops with an error
+if a future SDK changes the original expression and the workaround needs to
+be reviewed.
+
 ## Reproducible setup
 
 Run from this directory:
