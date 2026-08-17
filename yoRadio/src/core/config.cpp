@@ -288,6 +288,12 @@ void Config::configPostPlaying(uint16_t stationId){
     sdResumePos = 0;
     saveValue(&store.lastSdStation, stationId);
   }
+  if(getMode()==PM_WEB && strcmp(station.title, LANG::const_PlConnect) == 0) {
+    // Some streams (notably OGG without metadata) never emit a title event.
+    // Once the connection succeeded, replace the transient status while
+    // preserving any real metadata that may already have arrived.
+    setTitle(station.name);
+  }
   if(store.smartstart!=2) setSmartStart(1);
   netserver.requestOnChange(MODE, 0);
   //display.putRequest(NEWMODE, PLAYER);
