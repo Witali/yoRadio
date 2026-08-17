@@ -1231,6 +1231,14 @@ def derive_zaycev_candidates(crawl: CrawlResult, quality: str) -> list[Candidate
     return output
 
 
+def quality_101_profiles(quality: str) -> list[tuple[str, str, int]]:
+    aac_64 = ("pro", "aac", 64)
+    mp3_128 = ("trust", "mp3", 128)
+    if quality == "low":
+        return [aac_64, mp3_128]
+    return [mp3_128, aac_64]
+
+
 def derive_101_candidates(crawl: CrawlResult, quality: str, max_channels: int) -> list[Candidate]:
     channels: dict[int, tuple[str, str]] = {}
     for link in sorted(crawl.links | set(crawl.pages)):
@@ -1245,11 +1253,7 @@ def derive_101_candidates(crawl: CrawlResult, quality: str, max_channels: int) -
         if len(channels) >= max_channels:
             break
 
-    profiles = (
-        [("pro", "aac", 64), ("trust", "mp3", 128)]
-        if quality in {"low", "auto"}
-        else [("trust", "mp3", 128), ("pro", "aac", 64)]
-    )
+    profiles = quality_101_profiles(quality)
     bases = (
         "https://pub0101.101.ru:8443",
         "https://pub0201.101.ru:8443",
@@ -1645,6 +1649,9 @@ def run_self_test() -> None:
     high = parse_playlist(m3u, "https://example.org/master.m3u8", "application/vnd.apple.mpegurl", "high")
     assert low[0].endswith("low.m3u8")
     assert high[0].endswith("high.m3u8")
+    assert quality_101_profiles("low")[0] == ("pro", "aac", 64)
+    assert quality_101_profiles("auto")[0] == ("trust", "mp3", 128)
+    assert quality_101_profiles("high")[0] == ("trust", "mp3", 128)
     assert looks_like_stream("http://79.120.39.202:8000/dubtechno", ("radcap.ru",))
     assert not looks_like_stream("https://example.net:new/stream", ("example.net",))
     print("Self-test passed")
