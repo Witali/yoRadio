@@ -492,15 +492,6 @@ void Display::loop() {
             if(_streaminfo) {
               char streamInfo[40] = {0};
               if(config.station.sampleRate && config.station.channels) {
-                const char *format = "AUDIO";
-                switch(config.configFmt) {
-                  case BF_MP3:  format = "MP3";  break;
-                  case BF_AAC:  format = "AAC";  break;
-                  case BF_FLAC: format = "FLAC"; break;
-                  case BF_OGG:  format = "OGG";  break;
-                  case BF_WAV:  format = "WAV";  break;
-                  default: break;
-                }
                 const uint32_t khz = config.station.sampleRate / 1000U;
                 const uint32_t fraction = config.station.sampleRate % 1000U;
                 char rate[12];
@@ -512,8 +503,8 @@ void Display::loop() {
                   snprintf(rate, sizeof(rate), "%lu.%02lu", static_cast<unsigned long>(khz), static_cast<unsigned long>(fraction / 10U));
                 else
                   snprintf(rate, sizeof(rate), "%lu.%03lu", static_cast<unsigned long>(khz), static_cast<unsigned long>(fraction));
-                snprintf(streamInfo, sizeof(streamInfo), "%s %s kHz %s (%u ch)",
-                         format, rate, config.station.channels == 1U ? "mono" : "stereo",
+                snprintf(streamInfo, sizeof(streamInfo), "%s kHz %s (%u ch)",
+                         rate, config.station.channels == 1U ? "mono" : "stereo",
                          config.station.channels);
               }
               _streaminfo->setText(streamInfo);
