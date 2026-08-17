@@ -7,7 +7,8 @@ component while CMake compiles only the yoRadio modules and libraries required
 by this board.
 
 The profile keeps Wi-Fi station/AP fallback, HTTP/HTTPS streams, TLS, SPIFFS,
-WebUI, OTA web updates, ST7789, touch, MP3/AAC/FLAC and DAC/PDM output. It
+WebUI, OTA web updates, ST7789, touch, MP3/AAC/FLAC, OGG Vorbis/Opus and
+DAC/PDM output. It
 excludes MQTT, IRremote, VS1053, alternate displays, Nextion, GT911, Bluetooth/BLE,
 Ethernet, PPP, IPv6, Zigbee, Matter, RainMaker, Insights and Arduino OTA.
 
@@ -65,6 +66,8 @@ directory and does not require an existing Python or ESP-IDF installation:
 - official ESP-IDF v6.0.2 and its pinned submodules;
 - official ESP-IDF v5.5.4 source for the optional legacy DAC backend;
 - official Arduino-ESP32 4.0.0-alpha1, the first release line supporting IDF 6;
+- official Espressif `esp_audio_codec` 2.6.2 source and ESP32 libraries, pinned
+  to an exact commit and sparsely checked out for OGG Vorbis/Opus only;
 - Adafruit BusIO 1.17.4;
 - Adafruit GFX 1.12.6;
 - Adafruit ST7735/ST7789 1.11.0;
@@ -98,6 +101,13 @@ authority for offsets. The tested application image occupies about 1.12 MiB
 of each 1.69 MiB OTA slot. `continuous` remains the default; the serial boot
 log identifies the backend compiled into the image. The former `-DacBackend`
 parameter remains an alias for `-AudioBackend`.
+
+The classic ESP32 keeps the shared MP3/AAC codec arena at 24 KiB: all existing
+decoders fit, so enlarging it would permanently reduce TLS headroom. OGG uses
+the official decoder's own allocations; before it opens, yoRadio releases the
+shared arena, and restores it after OGG closes. Its PCM output buffer grows on
+demand up to 64 KiB, so long Opus/Vorbis frames do not overflow the fixed
+8 KiB legacy output buffer.
 
 ## Flash without erasing settings
 

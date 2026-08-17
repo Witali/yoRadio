@@ -540,6 +540,9 @@ private:
     uint8_t         m_streamType = ST_NONE;
     uint8_t         m_ID3Size = 0;                  // lengt of ID3frame - ID3header
     int16_t         m_outBuff[2048*2];              // Interleaved L/R
+    int16_t*        m_decodeBuff = nullptr;          // Static buffer, or a larger OGG PCM frame
+    uint8_t*        m_oggOutBuff = nullptr;
+    size_t          m_oggOutBuffSize = 0;
     int16_t         m_validSamples = 0;
     int16_t         m_curSample = 0;
     uint16_t        m_datamode = 0;                 // Statemaschine

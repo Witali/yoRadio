@@ -57,6 +57,18 @@ bool CodecArenaReserve() {
     return true;
 }
 
+bool CodecArenaDiscard() {
+    if(activeOwner != CODEC_ARENA_NONE) {
+        log_e("Cannot discard codec arena owned by decoder %u",
+              static_cast<unsigned>(activeOwner));
+        return false;
+    }
+    free(arena);
+    arena = nullptr;
+    used = 0;
+    return true;
+}
+
 void* CodecArenaCalloc(CodecArenaOwner owner, size_t count, size_t size) {
     if(owner == CODEC_ARENA_NONE || !count || !size || size > SIZE_MAX / count) {
         return nullptr;

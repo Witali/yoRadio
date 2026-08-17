@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 foreach(required_env
     YORADIO_ARDUINO_COMPONENT
+    YORADIO_AUDIO_CODEC_COMPONENT
     YORADIO_ARDUINO_LIBRARIES)
   if(NOT DEFINED ENV{${required_env}})
     message(FATAL_ERROR "${required_env} is not set; use build.ps1")
@@ -22,7 +23,8 @@ endif()
 # component manager is deliberately disabled: this profile must not pull in
 # Arduino's optional Matter, Zigbee, RainMaker and speech dependencies.
 set(EXTRA_COMPONENT_DIRS
-    "$ENV{YORADIO_ARDUINO_COMPONENT}")
+    "$ENV{YORADIO_ARDUINO_COMPONENT}"
+    "$ENV{YORADIO_AUDIO_CODEC_COMPONENT}")
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yoradio_cyd2usb_minimal)
