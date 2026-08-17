@@ -11,7 +11,7 @@ class Page {
     std::list<Page*> _pages;
     bool _active;
   public:
-    //Page();
+    Page() : _active(false) {}
     ~Page();
     void loop();
     Widget& addWidget(Widget* widget);

@@ -20,10 +20,10 @@ Page& Pager::addPage(Page* page, bool setNow){
 }
 
 bool Pager::removePage(Page* page){
-  page->setActive(false);
-  dsp.clearDsp();
   auto i = std::find_if(_pages.begin(), _pages.end(), [&page](const Page* pn){ return page == pn; });
   if (i != _pages.end()){
+    (*i)->setActive(false);
+    dsp.clearDsp();
     delete (*i);
     (*i) = nullptr;
     _pages.erase(i);
@@ -47,7 +47,7 @@ void Pager::setPage(Page* page, bool black){
 //}
 
 Page::~Page() {
-  for (const auto& w : _widgets) removeWidget(w);
+  while (!_widgets.empty()) removeWidget(_widgets.front());
   // what about deleting _pages ???
 }
 

@@ -24,13 +24,20 @@
 #include <libb64/cencode.h>
 
 #ifndef ESP8266
+#include "esp_idf_version.h"
+#if ESP_IDF_VERSION_MAJOR >= 6
+#include "psa/crypto.h"
+#else
 #include "mbedtls/sha1.h"
+#endif
 #else
 #include <Hash.h>
 #endif
 //https://github.com/me-no-dev/ESPAsyncWebServer/issues/1410
 #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+#if ESP_IDF_VERSION_MAJOR < 6
 #include "mbedtls/compat-2.x.h"
+#endif
 #include "rom/ets_sys.h"
 #endif
 
@@ -1264,12 +1271,25 @@ AsyncWebSocketResponse::AsyncWebSocketResponse(const String& key, AsyncWebSocket
   sha1(key + WS_STR_UUID, hash);
 #else
   (String&)key += WS_STR_UUID;
+#if ESP_IDF_VERSION_MAJOR >= 6
+  size_t hashLength = 0;
+  const psa_status_t hashStatus = psa_hash_compute(
+      PSA_ALG_SHA_1, reinterpret_cast<const uint8_t *>(key.c_str()),
+      key.length(), hash, 20, &hashLength);
+  if(hashStatus != PSA_SUCCESS || hashLength != 20){
+    free(buffer);
+    free(hash);
+    _state = RESPONSE_FAILED;
+    return;
+  }
+#else
   mbedtls_sha1_context ctx;
   mbedtls_sha1_init(&ctx);
   mbedtls_sha1_starts_ret(&ctx);
   mbedtls_sha1_update_ret(&ctx, (const unsigned char*)key.c_str(), key.length());
   mbedtls_sha1_finish_ret(&ctx, hash);
   mbedtls_sha1_free(&ctx);
+#endif
 #endif
   base64_encodestate _state;
   base64_init_encodestate(&_state);

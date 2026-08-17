@@ -46,7 +46,7 @@ void Player::init() {
   _resumeFilePos = 0;
   _hasError=false;
   playerQueue = xQueueCreate( 5, sizeof( playerRequestParams_t ) );
-  #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
+  #if (I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM) || defined(YORADIO_ESP_IDF_MINIMAL)
     beginOutput();
   #endif
   setOutputPins(false);

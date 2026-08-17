@@ -27,6 +27,7 @@
 #include <functional>
 extern "C" {
     #include "freertos/semphr.h"
+    #include "lwip/ip_addr.h"
     #include "lwip/pbuf.h"
 }
 
@@ -72,7 +73,6 @@ typedef std::function<void(void*, AsyncClient*, struct pbuf *pb)> AcPacketHandle
 typedef std::function<void(void*, AsyncClient*, uint32_t time)> AcTimeoutHandler;
 
 struct tcp_pcb;
-struct ip_addr;
 
 class AsyncClient {
   public:
@@ -156,7 +156,7 @@ class AsyncClient {
     static void _s_error(void *arg, int8_t err);
     static int8_t _s_sent(void *arg, struct tcp_pcb *tpcb, uint16_t len);
     static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
-    static void _s_dns_found(const char *name, struct ip_addr *ipaddr, void *arg);
+    static void _s_dns_found(const char *name, const ip_addr_t *ipaddr, void *arg);
 
     int8_t _recv(tcp_pcb* pcb, pbuf* pb, int8_t err);
     tcp_pcb * pcb(){ return _pcb; }
@@ -200,7 +200,7 @@ class AsyncClient {
     int8_t _sent(tcp_pcb* pcb, uint16_t len);
     int8_t _fin(tcp_pcb* pcb, int8_t err);
     int8_t _lwip_fin(tcp_pcb* pcb, int8_t err);
-    void _dns_found(struct ip_addr *ipaddr);
+    void _dns_found(const ip_addr_t *ipaddr);
 
   public:
     AsyncClient* prev;

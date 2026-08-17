@@ -24,7 +24,11 @@
 //TODO
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcpp"
+#ifdef YORADIO_ESP_IDF_MINIMAL
+#include "idf6_i2s_compat.h"
+#else
 #include <driver/i2s.h>
+#endif
 #pragma GCC diagnostic pop
 
 #ifdef SDFATFS_USED

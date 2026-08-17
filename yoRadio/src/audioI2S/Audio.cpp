@@ -32,7 +32,7 @@ fs::SDFATFS SD_SDFAT;
 #if defined(ESP_ARDUINO_3)
 #include "soc/io_mux_reg.h"
 #endif
-#ifdef ESP_ARDUINO_3
+#if defined(ESP_ARDUINO_3) && !defined(YORADIO_ESP_IDF_MINIMAL)
 #define dma_buf_count dma_desc_num
 #define dma_buf_len dma_frame_num
 #endif
@@ -256,8 +256,13 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
                 m_i2s_config.communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_I2S_MSB);
             #endif
 
+          #ifdef YORADIO_ESP_IDF_MINIMAL
+            idf6_dac_output_configure(
+                &m_i2s_config, (i2s_dac_mode_t)m_f_channelEnabled);
+          #else
             i2s_driver_install((i2s_port_t)m_i2s_num, &m_i2s_config, 0, NULL);
             i2s_set_dac_mode((i2s_dac_mode_t)m_f_channelEnabled);
+          #endif
             if(m_f_channelEnabled != I2S_DAC_CHANNEL_BOTH_EN) {
                 m_f_forceMono = true;
             }
@@ -278,13 +283,19 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
             m_i2s_config.communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB);
         #endif
 
+      #ifdef YORADIO_ESP_IDF_MINIMAL
+        log_e("External I2S is disabled in the minimal built-in DAC profile");
+      #else
         i2s_driver_install((i2s_port_t)m_i2s_num, &m_i2s_config, 0, NULL);
+      #endif
         m_f_forceMono = false;
       #endif
     }
 
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
     // PDM is initialized later from Player::init().
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    if(m_f_internalDAC) fillDacSilence(true);
   #else
     if(m_f_internalDAC) fillDacSilence(true);
     else                i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
@@ -309,6 +320,14 @@ bool Audio::beginOutput() {
               esp_err_to_name(result));
         return false;
     }
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    const esp_err_t result = idf6_dac_output_begin();
+    if (result != ESP_OK) {
+        log_e("IDF 6 DAC output initialization failed: %s",
+              esp_err_to_name(result));
+        return false;
+    }
+    fillDacSilence(true);
   #endif
     return true;
 }
@@ -340,6 +359,9 @@ esp_err_t Audio::I2Sstart(uint8_t i2s_num) {
     // however it is necessary to call it after i2s_stop()
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
     return pdmOutputStart();
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    (void)i2s_num;
+    return idf6_dac_output_start();
   #else
     return i2s_start((i2s_port_t) i2s_num);
   #endif
@@ -348,6 +370,9 @@ esp_err_t Audio::I2Sstart(uint8_t i2s_num) {
 esp_err_t Audio::I2Sstop(uint8_t i2s_num) {
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
     return pdmOutputStop();
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    (void)i2s_num;
+    return idf6_dac_output_stop();
   #else
     return i2s_stop((i2s_port_t) i2s_num);
   #endif
@@ -390,6 +415,8 @@ Audio::~Audio() {
     if(m_playlistBuff) {free(m_playlistBuff); m_playlistBuff = NULL;}
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
     pdmOutputEnd();
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    idf6_dac_output_end();
   #else
     i2s_driver_uninstall((i2s_port_t)m_i2s_num); // #215 free I2S buffer
   #endif
@@ -424,6 +451,9 @@ void Audio::setDefaults(bool initializeInputBuffer) {
     // mono streams retrying a write to a non-existent channel forever.
     m_validSamples = 0;
     m_curSample = 0;
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    if(m_f_internalDAC) fillDacSilence(true);
+    else                idf6_dac_output_clear();
   #else
     playI2Sremains();
   #endif
@@ -2497,6 +2527,9 @@ uint32_t Audio::stopSong() {
     memset(m_outBuff, 0, sizeof(m_outBuff));     //Clear OutputBuffer
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
     pdmOutputEnd();
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    if(m_f_internalDAC) fillDacSilence(true);
+    else                idf6_dac_output_clear();
   #else
     if(m_f_internalDAC) fillDacSilence(true);
     else                i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
@@ -2517,15 +2550,28 @@ void Audio::fillDacSilence(bool primeDma) {
     uint32_t silence[silenceFrames];
     for(size_t i = 0; i < silenceFrames; ++i) silence[i] = dacSilence;
 
+  #ifdef YORADIO_ESP_IDF_MINIMAL
+    // dac_continuous owns and primes its descriptors. One midpoint block is
+    // sufficient; filling the complete legacy I2S ring can outrun the new
+    // driver's descriptor queue during boot.
+    size_t framesRemaining = silenceFrames;
+    (void)primeDma;
+  #else
     size_t framesRemaining = primeDma
         ? static_cast<size_t>(m_i2s_config.dma_buf_count) * m_i2s_config.dma_buf_len
         : silenceFrames;
+  #endif
     while(framesRemaining) {
         const size_t framesToWrite = min(framesRemaining, silenceFrames);
         size_t bytesWritten = 0;
+      #ifdef YORADIO_ESP_IDF_MINIMAL
+        const esp_err_t result = idf6_dac_output_write(
+            silence, framesToWrite * sizeof(uint32_t), &bytesWritten, 20);
+      #else
         const esp_err_t result = i2s_write(
             (i2s_port_t)m_i2s_num, silence,
             framesToWrite * sizeof(uint32_t), &bytesWritten, 0);
+      #endif
         if(result != ESP_OK || bytesWritten == 0) break;
         framesRemaining -= bytesWritten / sizeof(uint32_t);
         if(bytesWritten < framesToWrite * sizeof(uint32_t)) break;
@@ -2555,6 +2601,9 @@ bool Audio::pauseResume() {
             memset(m_outBuff, 0, sizeof(m_outBuff));               //Clear OutputBuffer
           #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
             pdmOutputClear();
+          #elif defined(YORADIO_ESP_IDF_MINIMAL)
+            if(m_f_internalDAC) fillDacSilence(true);
+            else                idf6_dac_output_clear();
           #else
             if(m_f_internalDAC) fillDacSilence(true);
             else                i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
@@ -4403,6 +4452,9 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
         if(m_f_Log) if(m_codec == CODEC_M4A){log_i("begin not found"); return 1;}
       #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
         pdmOutputClear();
+      #elif defined(YORADIO_ESP_IDF_MINIMAL)
+        if(m_f_internalDAC) fillDacSilence(true);
+        else                idf6_dac_output_clear();
       #else
         if(m_f_internalDAC) fillDacSilence(true);
         else                i2s_zero_dma_buffer((i2s_port_t)m_i2s_num);
@@ -4598,6 +4650,13 @@ bool Audio::setPinout(uint8_t BCLK, uint8_t LRC, uint8_t DOUT, int8_t DIN, int8_
     (void)DIN;
     (void)MCK;
     return DOUT == I2S_PDM_DOUT;
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    (void)BCLK;
+    (void)LRC;
+    (void)DOUT;
+    (void)DIN;
+    (void)MCK;
+    return m_f_internalDAC;
   #else
     m_pin_config.bck_io_num   = BCLK;
     m_pin_config.ws_io_num    = LRC; //  wclk
@@ -4718,6 +4777,13 @@ bool Audio::setSampleRate(uint32_t sampRate) {
               esp_err_to_name(result));
         return false;
     }
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    const esp_err_t result = idf6_dac_output_set_sample_rate(sampRate);
+    if (result != ESP_OK) {
+        log_e("DAC sample rate %u Hz rejected: %s", sampRate,
+              esp_err_to_name(result));
+        return false;
+    }
   #else
     i2s_set_sample_rates((i2s_port_t)m_i2s_num, sampRate);
   #endif
@@ -4770,6 +4836,9 @@ void Audio::setI2SCommFMT_LSB(bool commFMT) {
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
     (void)commFMT;
     AUDIO_INFO("I2S communication format is fixed in PDM mode");
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
+    (void)commFMT;
+    AUDIO_INFO("I2S communication format is not used by the IDF 6 DAC driver");
   #else
     if (commFMT) {
         if(m_f_Log) log_i("commFMT LSB");
@@ -4854,7 +4923,12 @@ bool Audio::playSample(int16_t sample[2]) {
         s32 += 0x80008000;
     }
     m_i2s_bytesWritten = 0;
+  #ifdef YORADIO_ESP_IDF_MINIMAL
+    esp_err_t err = idf6_dac_output_write(
+        &s32, sizeof(uint32_t), &m_i2s_bytesWritten, 100);
+  #else
     esp_err_t err = i2s_write((i2s_port_t) m_i2s_num, (const char*) &s32, sizeof(uint32_t), &m_i2s_bytesWritten, 100);
+  #endif
   #endif
     if(err != ESP_OK) {
         log_e("ESP32 Errorcode %i", err);
@@ -5483,7 +5557,7 @@ size_t Audio::chunkedDataTransfer(uint8_t* bytes){
             return 0;
         }
         b = _client->read();
-        *bytes++;
+        ++bytes;
         if(b < 0) continue;  // -1 no data available
         if(b == '\n') break;
         if(b < '0') continue;

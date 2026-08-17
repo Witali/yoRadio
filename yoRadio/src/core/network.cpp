@@ -1,5 +1,7 @@
 #include "options.h"
+#ifndef YORADIO_ESP_IDF_MINIMAL
 #include <ESPmDNS.h>
+#endif
 #include "time.h"
 #include "rtcsupport.h"
 #include "network.h"
@@ -217,8 +219,10 @@ void MyNetwork::setWifiParams(){
   WiFi.onEvent(WiFiReconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
   WiFi.onEvent(WiFiLostConnection, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
   //config.setTimeConf(); //??
-  if(strlen(config.store.mdnsname)>0)
-    MDNS.begin(config.store.mdnsname);
+  #ifndef YORADIO_ESP_IDF_MINIMAL
+    if(strlen(config.store.mdnsname)>0)
+      MDNS.begin(config.store.mdnsname);
+  #endif
 }
 
 void MyNetwork::requestTimeSync(bool withTelnetOutput, uint8_t clientId) {

@@ -246,7 +246,10 @@ void Display::_buildPager(){
 }
 
 void Display::_apScreen() {
-  if(_boot) _pager->removePage(_boot);
+  if(_boot) {
+    _pager->removePage(_boot);
+    _boot = nullptr;
+  }
   #ifndef DSP_LCD
     _boot = new Page();
     #if DSP_MODEL!=DSP_NOKIA5110
@@ -276,7 +279,10 @@ void Display::_apScreen() {
 }
 
 void Display::_start() {
-  if(_boot) _pager->removePage(_boot);
+  if(_boot) {
+    _pager->removePage(_boot);
+    _boot = nullptr;
+  }
   #ifdef USE_NEXTION
     nextion.wake();
   #endif

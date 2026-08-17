@@ -21,9 +21,14 @@
 #include "WebAuthentication.h"
 #include <libb64/cencode.h>
 #ifdef ESP32
+#include "esp_idf_version.h"
+#if ESP_IDF_VERSION_MAJOR >= 6
+#include "psa/crypto.h"
+#else
 #include "mbedtls/md5.h"
 #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
 #include "mbedtls/compat-2.x.h"
+#endif
 #endif
 #else
 #include "md5.h"
@@ -62,7 +67,7 @@ bool checkBasicAuthentication(const char * hash, const char * username, const ch
 }
 
 static bool getMD5(uint8_t * data, uint16_t len, char * output){//33 bytes or more
-#ifdef ESP32
+#if defined(ESP32) && ESP_IDF_VERSION_MAJOR < 6
     mbedtls_md5_context _ctx;
 #else
     md5_context_t _ctx;
@@ -72,7 +77,14 @@ static bool getMD5(uint8_t * data, uint16_t len, char * output){//33 bytes or mo
   if(_buf == NULL)
     return false;
   memset(_buf, 0x00, 16);
-#ifdef ESP32
+#if defined(ESP32) && ESP_IDF_VERSION_MAJOR >= 6
+  size_t hashLength = 0;
+  if(psa_hash_compute(PSA_ALG_MD5, data, len, _buf, 16, &hashLength) !=
+         PSA_SUCCESS || hashLength != 16){
+    free(_buf);
+    return false;
+  }
+#elif defined(ESP32)
   mbedtls_md5_init(&_ctx);
 #if ESP_IDF_VERSION_MAJOR < 5
   mbedtls_md5_starts_ret(&_ctx);
@@ -91,6 +103,7 @@ static bool getMD5(uint8_t * data, uint16_t len, char * output){//33 bytes or mo
   for(i = 0; i < 16; i++) {
     sprintf(output + (i * 2), "%02x", _buf[i]);
   }
+  output[32] = '\0';
   free(_buf);
   return true;
 }

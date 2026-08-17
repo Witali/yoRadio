@@ -139,6 +139,12 @@ void loop() {
   #ifdef NETSERVER_LOOP1
   netserver.loop();
   #endif
+  // Arduino 4 no longer yields the dual-core loop task automatically. Let the
+  // idle task run so the IDF watchdog is serviced even in AP mode, where no
+  // player/network call blocks the loop naturally.
+  #ifdef YORADIO_ESP_IDF_MINIMAL
+  delay(1);
+  #endif
 }
 
 #include "core/audiohandlers.h"

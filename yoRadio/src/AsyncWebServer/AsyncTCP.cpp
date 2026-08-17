@@ -90,7 +90,7 @@ typedef struct {
         };
 } lwip_event_packet_t;
 
-static xQueueHandle _async_queue;
+static QueueHandle_t _async_queue;
 static TaskHandle_t _async_service_task_handle = NULL;
 
 
@@ -329,14 +329,14 @@ static void _tcp_error(void * arg, int8_t err) {
     }
 }
 
-static void _tcp_dns_found(const char * name, struct ip_addr * ipaddr, void * arg) {
+static void _tcp_dns_found(const char * name, const ip_addr_t * ipaddr, void * arg) {
     lwip_event_packet_t * e = (lwip_event_packet_t *)malloc(sizeof(lwip_event_packet_t));
     //ets_printf("+DNS: name=%s ipaddr=0x%08x arg=%x\n", name, ipaddr, arg);
     e->event = LWIP_TCP_DNS;
     e->arg = arg;
     e->dns.name = name;
     if (ipaddr) {
-        memcpy(&e->dns.addr, ipaddr, sizeof(struct ip_addr));
+        memcpy(&e->dns.addr, ipaddr, sizeof(ip_addr_t));
     } else {
         memset(&e->dns.addr, 0, sizeof(e->dns.addr));
     }
@@ -702,8 +702,7 @@ bool AsyncClient::connect(IPAddress ip, uint16_t port){
     }
 
     ip_addr_t addr;
-    addr.type = IPADDR_TYPE_V4;
-    addr.u_addr.ip4.addr = ip;
+    ip_addr_set_ip4_u32(&addr, (uint32_t)ip);
     TCP_MUTEX_LOCK();
     tcp_pcb* pcb = tcp_new_ip_type(IPADDR_TYPE_V4);
     if (!pcb){
@@ -731,10 +730,10 @@ bool AsyncClient::connect(const char* host, uint16_t port){
       return false;
     }
     TCP_MUTEX_LOCK();
-    err_t err = dns_gethostbyname(host, &addr, (dns_found_callback)&_tcp_dns_found, this);
+    err_t err = dns_gethostbyname(host, &addr, _tcp_dns_found, this);
     TCP_MUTEX_UNLOCK();
     if(err == ERR_OK) {
-        return connect(IPAddress(addr.u_addr.ip4.addr), port);
+        return connect(IPAddress(ip_addr_get_ip4_u32(&addr)), port);
     } else if(err == ERR_INPROGRESS) {
         _connect_port = port;
         return true;
@@ -1001,9 +1000,9 @@ int8_t AsyncClient::_poll(tcp_pcb* pcb){
     return ERR_OK;
 }
 
-void AsyncClient::_dns_found(struct ip_addr *ipaddr){
-    if(ipaddr && ipaddr->u_addr.ip4.addr){
-        connect(IPAddress(ipaddr->u_addr.ip4.addr), _connect_port);
+void AsyncClient::_dns_found(const ip_addr_t *ipaddr){
+    if(ipaddr && ip_addr_get_ip4_u32(ipaddr)){
+        connect(IPAddress(ip_addr_get_ip4_u32(ipaddr)), _connect_port);
     } else {
         if(_error_cb) {
             _error_cb(_error_cb_arg, this, -55);
@@ -1092,7 +1091,7 @@ uint32_t AsyncClient::getRemoteAddress() {
     if(!_pcb) {
         return 0;
     }
-    return _pcb->remote_ip.u_addr.ip4.addr;
+    return ip_addr_get_ip4_u32(&_pcb->remote_ip);
 }
 
 uint16_t AsyncClient::getRemotePort() {
@@ -1106,7 +1105,7 @@ uint32_t AsyncClient::getLocalAddress() {
     if(!_pcb) {
         return 0;
     }
-    return _pcb->local_ip.u_addr.ip4.addr;
+    return ip_addr_get_ip4_u32(&_pcb->local_ip);
 }
 
 uint16_t AsyncClient::getLocalPort() {
@@ -1222,7 +1221,7 @@ const char * AsyncClient::stateToString(){
  * Static Callbacks (LwIP C2C++ interconnect)
  * */
 
-void AsyncClient::_s_dns_found(const char * name, struct ip_addr * ipaddr, void * arg){
+void AsyncClient::_s_dns_found(const char * name, const ip_addr_t * ipaddr, void * arg){
     reinterpret_cast<AsyncClient*>(arg)->_dns_found(ipaddr);
 }
 
@@ -1304,8 +1303,7 @@ void AsyncServer::begin(){
     }
     TCP_MUTEX_UNLOCK();
     ip_addr_t local_addr;
-    local_addr.type = IPADDR_TYPE_V4;
-    local_addr.u_addr.ip4.addr = (uint32_t) _addr;
+    ip_addr_set_ip4_u32(&local_addr, (uint32_t)_addr);
     err = _tcp_bind(_pcb, &local_addr, _port);
 
     if (err != ERR_OK) {
