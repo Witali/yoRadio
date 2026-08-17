@@ -32,7 +32,7 @@ test('broadcast snapshots clients without holding the lock while sending', () =>
   assert.match(body, /AsyncWebLockGuard\s+l\(_lock\)/);
   assert.match(body, /clients\[clientCount\+\+\]\s*=\s*c/);
   assert.match(body, /clients\[i\]->text\(buffer\)/);
-  const lockEnd = body.indexOf('\n  }\n  buffer->lock()');
+  const lockEnd = body.search(/\r?\n  }\r?\n  buffer->lock\(\)/);
   const send = body.indexOf('clients[i]->text(buffer)');
   assert.ok(lockEnd > 0 && send > lockEnd, 'send must happen after releasing the list lock');
 });
