@@ -1476,8 +1476,8 @@ int Audio::read_WAV_Header(uint8_t* data, size_t len) {
         uint16_t bps = (uint16_t) (*(data + 14) + (*(data + 15) << 8));         // Bits per sample
 
         AUDIO_INFO("FormatCode: %u", fc);
-        // AUDIO_INFO("Channel: %u", nic);
-        // AUDIO_INFO("SampleRate: %u", sr);
+        AUDIO_INFO("Channels: %u", nic);
+        AUDIO_INFO("SampleRate: %lu", sr);
         AUDIO_INFO("DataRate: %lu", dr);
         AUDIO_INFO("DataBlockSize: %u", dbs);
         AUDIO_INFO("BitsPerSample: %u", bps);

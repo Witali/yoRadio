@@ -158,6 +158,8 @@ struct station_t
   char url[BUFLEN];
   char title[BUFLEN];
   uint16_t bitrate;
+  uint32_t sampleRate;
+  uint8_t channels;
   int  ovol;
 };
 
