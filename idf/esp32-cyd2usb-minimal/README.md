@@ -13,6 +13,9 @@ Ethernet, PPP, IPv6, Zigbee, Matter, RainMaker, Insights and Arduino OTA.
 ESP-IDF 6 removed the legacy built-in-DAC I2S driver. This profile writes DAC
 audio through the supported `dac_continuous` API. It does not include or call
 `driver/i2s.h`; a future external digital-I2S profile should use `i2s_std.h`.
+The DAC backend keeps a dedicated 8-bit PCM queue and a continuously supplied
+DMA ring. Brief decoder/network gaps are filled with the `0x80` midpoint, so
+the converter never holds an arbitrary last sample and resumes with a DC step.
 
 ## Reproducible setup
 

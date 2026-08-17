@@ -74,6 +74,11 @@ CONFIG_HEAP_POISONING_DISABLED=y
 CONFIG_FREERTOS_USE_TRACE_FACILITY=n
 CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=n
 
+# Keep the internal DAC DMA serviceable during SPI flash/cache stalls and let
+# the IDF driver expand the mono 8-bit queue into ESP32's 16-bit DAC slots.
+CONFIG_DAC_ISR_IRAM_SAFE=y
+CONFIG_DAC_DMA_AUTO_16BIT_ALIGN=y
+
 # Wireless features not used by an Internet radio.
 CONFIG_BT_ENABLED=n
 CONFIG_BT_BLUEDROID_ENABLED=n
