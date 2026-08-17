@@ -8,17 +8,22 @@ const source = fs.readFileSync(
   "utf8",
 );
 
-test("PDM carrier tracks the current PCM sample rate", () => {
+test("PDM converter adapts to PCM rate while keeping a 6.144 MHz carrier", () => {
   assert.match(
     source,
-    /I2S_PDM_TX_CLK_DEFAULT_CONFIG\(sampleRate\)/,
-    "PDM must use Espressif's fixed 128x upsampling profile",
-  );
-  assert.doesNotMatch(
-    source,
     /I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG\(sampleRate\)/,
-    "the fixed-carrier DAC profile is inconsistent at 44.1 kHz in the new driver",
+    "PDM must use Espressif's fixed-carrier high-SNR DAC profile",
   );
-  assert.match(source, /pdmClockConfig\.bclk_div\s*=\s*13/);
 });
 
+test("minimal IDF build corrects fractional fp/fs PDM clock calculation", () => {
+  const cmake = fs.readFileSync(
+    path.join(__dirname, "..", "idf", "esp32-cyd2usb-minimal", "CMakeLists.txt"),
+    "utf8",
+  );
+
+  assert.match(cmake, /YORADIO_DAC_BACKEND STREQUAL "pdm"/);
+  assert.match(cmake, /uint64_t\)rate \* I2S_LL_PDM_BCK_FACTOR/);
+  assert.match(cmake, /pdm_tx_clk->up_sample_fp\) \/[\s\S]*pdm_tx_clk->up_sample_fs/);
+  assert.match(cmake, /list\(FILTER i2s_driver_sources EXCLUDE REGEX/);
+});
