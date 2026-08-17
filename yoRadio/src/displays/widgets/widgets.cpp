@@ -675,21 +675,48 @@ void ClockWidget::_printClock(bool force){
   gfx.setFont(Clock_GFXfontPtr);
   bool clockInTitle=!config.isScreensaver && _config.top<_timeheight; //DSP_SSD1306x32
   if(force){
-    _clearClock();
+    // Custom GFX fonts cannot overwrite their background.  Without a
+    // framebuffer the old implementation therefore cleared the complete
+    // clock before drawing it again.  A task switch between those operations
+    // made all digits visibly disappear.  Monospace seven-segment clocks can
+    // be updated safely one digit at a time by painting the complete "8"
+    // pattern in the inactive-segment colour and immediately drawing the new
+    // digit over it.
+    const bool incrementalClockRedraw = CLOCKFONT_MONO && !_fb->ready();
+    if(!incrementalClockRedraw) _clearClock();
     _getTimeBounds();
-    #ifndef DSP_OLED
-    if(CLOCKFONT_MONO) {
-      gfx.setTextColor(config.theme.clockbg, config.theme.background);
+    const uint16_t clockColor = clockInTitle
+                                ? config.theme.meta : config.theme.clock;
+    const uint16_t clockBackground = clockInTitle
+                                     ? config.theme.metabg
+                                     : config.theme.background;
+    if(incrementalClockRedraw) {
+      uint16_t digitLeft = _left();
+      for(const char* digit = _timebuffer; *digit; ++digit) {
+        if(*digit != ':') {
+          #ifndef DSP_OLED
+          gfx.setTextColor(config.theme.clockbg, config.theme.background);
+          gfx.setCursor(digitLeft, _top());
+          gfx.print('8');
+          #endif
+          gfx.setTextColor(clockColor, clockBackground);
+          gfx.setCursor(digitLeft, _top());
+          gfx.print(*digit);
+        }
+        digitLeft += _charWidth(static_cast<unsigned char>(*digit));
+      }
+    } else {
+      #ifndef DSP_OLED
+      if(CLOCKFONT_MONO) {
+        gfx.setTextColor(config.theme.clockbg, config.theme.background);
+        gfx.setCursor(_left(), _top());
+        gfx.print("88:88");
+      }
+      #endif
+      gfx.setTextColor(clockColor, clockBackground);
       gfx.setCursor(_left(), _top());
-      gfx.print("88:88");
+      gfx.print(_timebuffer);
     }
-    #endif
-    if(clockInTitle)
-      gfx.setTextColor(config.theme.meta, config.theme.metabg);
-    else
-      gfx.setTextColor(config.theme.clock, config.theme.background);
-    gfx.setCursor(_left(), _top());
-    gfx.print(_timebuffer);
     if(_fullclock){
       // lines, date & dow
       bool fullClockOnScreensaver = (!config.isScreensaver || (_fb->ready() && FULL_SCR_CLOCK));
