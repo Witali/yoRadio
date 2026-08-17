@@ -503,9 +503,13 @@ void Display::loop() {
                   snprintf(rate, sizeof(rate), "%lu.%02lu", static_cast<unsigned long>(khz), static_cast<unsigned long>(fraction / 10U));
                 else
                   snprintf(rate, sizeof(rate), "%lu.%03lu", static_cast<unsigned long>(khz), static_cast<unsigned long>(fraction));
-                snprintf(streamInfo, sizeof(streamInfo), "%s kHz %s (%u ch)",
-                         rate, config.station.channels == 1U ? "mono" : "stereo",
-                         config.station.channels);
+                if(config.station.channels == 1U)
+                  snprintf(streamInfo, sizeof(streamInfo), "%s kHz mono", rate);
+                else if(config.station.channels == 2U)
+                  snprintf(streamInfo, sizeof(streamInfo), "%s kHz stereo", rate);
+                else
+                  snprintf(streamInfo, sizeof(streamInfo), "%s kHz %u channels",
+                           rate, config.station.channels);
               }
               _streaminfo->setText(streamInfo);
             }

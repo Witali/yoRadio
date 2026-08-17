@@ -24,12 +24,15 @@ test("audio callbacks retain decoder sample rate and channel count", () => {
   assert.match(handlers, /config\.station\.channels = value/);
 });
 
-test("player shows kHz and mono or stereo channel layout without codec", () => {
+test("player shows compact mono, stereo, or multichannel stream layout without codec", () => {
   const display = read("yoRadio", "src", "core", "display.cpp");
 
-  assert.match(display, /"%s kHz %s \(%u ch\)"/);
-  assert.match(display, /config\.station\.channels == 1U \? "mono" : "stereo"/);
-  assert.doesNotMatch(display, /"%s %s kHz %s \(%u ch\)"/);
+  assert.match(display, /"%s kHz mono"/);
+  assert.match(display, /"%s kHz stereo"/);
+  assert.match(display, /"%s kHz %u channels"/);
+  assert.match(display, /config\.station\.channels == 1U/);
+  assert.match(display, /config\.station\.channels == 2U/);
+  assert.doesNotMatch(display, /\(%u ch\)/);
 });
 
 test("stream information is cleared between stations", () => {
