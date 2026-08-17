@@ -155,7 +155,10 @@ void MyNetwork::SoftAPReconnectTask(void *pvParameters) {
   WiFi.softAPdisconnect(true);
   WiFi.mode(WIFI_STA);
 
-  if (network.wifiBegin(true)) {
+  // A touch-triggered AP-to-station transition is an explicit user action.
+  // Show the same SSID connection progress as during normal startup instead
+  // of leaving the access-point screen unchanged while retries run.
+  if (network.wifiBegin(false)) {
     network.setWifiParams();
     timekeeper.cancelWaitAndDo();
     network.status = CONNECTED;
