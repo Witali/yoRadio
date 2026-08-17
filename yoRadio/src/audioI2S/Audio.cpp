@@ -478,6 +478,8 @@ void Audio::setDefaults(bool initializeInputBuffer) {
     m_f_decoderParamsKnown = false;
     m_f_ssl = false;
     m_f_metadata = false;
+    m_headerWaitStartedMs = 0;
+    m_headerRetryCount = 0;
     m_f_tts = false;
     m_f_firstCall = true;                                   // InitSequence for processWebstream and processLokalFile
     m_f_running = false;
@@ -3871,12 +3873,23 @@ void Audio::playAudioData(){
 }
 //---------------------------------------------------------------------------------------------------------------------
 bool Audio::parseHttpResponseHeader() { // this is the response to a GET / request
-    static uint32_t notavailablefor = 0;
     if(getDatamode() != HTTP_RESPONSE_HEADER) return false;
     if(_client->available() == 0) {
-      if (notavailablefor == 0) notavailablefor = millis();
-      if (millis() - notavailablefor > HEADER_TIMEOUT) {
-        notavailablefor = 0;
+      if (m_headerWaitStartedMs == 0) m_headerWaitStartedMs = millis();
+      if (millis() - m_headerWaitStartedMs > HEADER_TIMEOUT) {
+        constexpr uint8_t maxHeaderRetries = 2;
+        if(m_headerRetryCount < maxHeaderRetries && m_lastHost[0]) {
+          ++m_headerRetryCount;
+          AUDIO_INFO("No HTTP response header, retry %u/%u",
+                     m_headerRetryCount, maxHeaderRetries);
+          _client->stop();
+          if(httpPrint(m_lastHost)) {
+            m_headerWaitStartedMs = millis();
+            return false;
+          }
+        }
+        m_headerWaitStartedMs = 0;
+        m_headerRetryCount = 0;
         if(audio_showstation) audio_showstation("");
         if(audio_icydescription) audio_icydescription("");
         if(audio_icyurl) audio_icyurl("");
@@ -3887,7 +3900,8 @@ bool Audio::parseHttpResponseHeader() { // this is the response to a GET / reque
       }
       return false;
     }
-    notavailablefor = 0;
+    m_headerWaitStartedMs = 0;
+    m_headerRetryCount = 0;
     char rhl[512]; // responseHeaderline
     bool ct_seen = false;
     uint32_t ctime = millis();

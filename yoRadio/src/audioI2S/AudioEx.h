@@ -507,6 +507,8 @@ private:
     ConnectParams _connectParams;
     volatile bool _connectionResult = false;
     TaskHandle_t _connectTaskHandle = nullptr;
+    uint32_t        m_headerWaitStartedMs = 0;
+    uint8_t         m_headerRetryCount = 0;
     
     const size_t    m_frameSizeWav  = 1024 * 8;
     const size_t    m_frameSizeMP3  = 1600;
