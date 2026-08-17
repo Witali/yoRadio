@@ -180,11 +180,11 @@ void AsyncWebServerRequest::_onData(void *buf, size_t len){
 
 void AsyncWebServerRequest::_removeNotInterestingHeaders(){
   if (_interestingHeaders.containsIgnoreCase("ANY")) return; // nothing to do
-  for(const auto& header: _headers){
-      if(!_interestingHeaders.containsIgnoreCase(header->name().c_str())){
-        _headers.remove(header);
-      }
-  }
+  // Removing the current node invalidates LinkedList's range iterator. This
+  // became a repeatable crash when a browser contacted the restored WebUI.
+  while (_headers.remove_first([this](AsyncWebHeader* const& header) {
+    return !_interestingHeaders.containsIgnoreCase(header->name().c_str());
+  })) {}
 }
 
 void AsyncWebServerRequest::_onPoll(){
