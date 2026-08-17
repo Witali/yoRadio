@@ -150,8 +150,18 @@ esp_err_t pdmOutputBegin(uint8_t port, uint8_t dataPin,
     return result;
   }
 
+  // Track the decoded PCM rate with the official fixed-upsampling profile:
+  // Fpdm = 128 * Fpcm.  The DAC helper instead requests a fixed 6.144 MHz
+  // carrier through fp=960, fs=sampleRate/100.  The new IDF driver reduces
+  // fp/fs to an integer before calculating BCLK, so that profile becomes
+  // internally inconsistent at rates such as 44.1 kHz.  Keep the DAC
+  // helper's higher-SNR divider while using the rate-consistent fp/fs pair.
+  i2s_pdm_tx_clk_config_t pdmClockConfig =
+      I2S_PDM_TX_CLK_DEFAULT_CONFIG(sampleRate);
+  pdmClockConfig.bclk_div = 13;
+
   i2s_pdm_tx_config_t pdmConfig = {
-      .clk_cfg = I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG(sampleRate),
+      .clk_cfg = pdmClockConfig,
       .slot_cfg = I2S_PDM_TX_SLOT_DEFAULT_CONFIG(
           I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
       .gpio_cfg = {
