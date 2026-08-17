@@ -13,7 +13,9 @@ CONFIG_FREERTOS_UNICORE=n
 CONFIG_FREERTOS_HZ=1000
 CONFIG_AUTOSTART_ARDUINO=y
 CONFIG_ARDUINO_VARIANT="esp32"
-CONFIG_ARDUINO_LOOP_STACK_SIZE=8192
+# The official esp_audio_codec decoder needs about 20 KiB of task stack for
+# codecs such as Opus. Audio::loop() runs directly on Arduino's loop task.
+CONFIG_ARDUINO_LOOP_STACK_SIZE=20480
 
 # Compile only the Arduino libraries used by this CYD profile.  SD/FFat types
 # remain enabled for source compatibility, while SDC_CS=255 keeps the feature

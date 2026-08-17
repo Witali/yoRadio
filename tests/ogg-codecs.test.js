@@ -28,6 +28,12 @@ test("minimal IDF build pins the official OGG Vorbis and Opus component", () => 
   assert.match(config, /CONFIG_AUDIO_ENCODER_OPUS_SUPPORT=n/);
 });
 
+test("Arduino audio loop reserves the stack required by the Opus decoder", () => {
+  const config = read("idf", "esp32-cyd2usb-minimal", "sdkconfig.defaults");
+
+  assert.match(config, /CONFIG_ARDUINO_LOOP_STACK_SIZE=20480/);
+});
+
 test("audio source recognizes common OGG extensions and MIME types", () => {
   const source = read("yoRadio", "src", "audioI2S", "Audio.cpp");
 
