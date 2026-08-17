@@ -38,12 +38,17 @@ Sputnik), although stereo 48 kHz stations such as Vesti FM remained clean.
 
 The PDM build replaces only that calculation in a build-local copy of
 `i2s_pdm.c`: multiplication is performed in 64 bits before division by `fs`.
-It keeps the carrier at 6.144 MHz for both 44.1 and 48 kHz while retaining the
-sample-rate-dependent `fp/fs` converter settings. Listening tests confirmed
-that this fix eliminated the extra station-dependent PDM noise. The pinned
-ESP-IDF checkout is not modified, and CMake deliberately stops with an error
-if a future SDK changes the original expression and the workaround needs to
-be reviewed.
+Listening tests confirmed that this fix eliminated the extra
+station-dependent PDM noise. The pinned ESP-IDF checkout is not modified, and
+CMake deliberately stops with an error if a future SDK changes the original
+expression and the workaround needs to be reviewed.
+
+The output path now keeps the hardware PCM side at 48 kHz and the physical PDM
+carrier at 6.144 MHz for every stream. Source PCM below 48 kHz is converted to
+48 kHz with linear interpolation and an exact integer phase accumulator; a
+48 kHz source bypasses interpolation. This avoids changing the PDM clock when
+switching between 44.1 and 48 kHz stations and also covers lower-rate streams
+without accumulating timing drift.
 
 ## Reproducible setup
 
