@@ -21,3 +21,16 @@ test("clock redraw keeps existing digits visible without a framebuffer", () => {
     /if\(incrementalClockRedraw\)[\s\S]*gfx\.print\('8'\)[\s\S]*gfx\.print\(\*digit\)/
   );
 });
+
+test("clock advances before the first network time synchronization", () => {
+  const source = fs.readFileSync(
+    path.join(root, "yoRadio", "src", "core", "timekeeper.cpp"),
+    "utf8"
+  );
+
+  assert.match(
+    source,
+    /TimeKeeper::_upClock\(\)[\s\S]*network\.timeinfo\.tm_sec\+\+[\s\S]*mktime\(&network\.timeinfo\)/
+  );
+  assert.doesNotMatch(source, /network\.timeinfo\.tm_year\s*>\s*100/);
+});
