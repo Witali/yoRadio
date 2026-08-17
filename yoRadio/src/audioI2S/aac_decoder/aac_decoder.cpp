@@ -1832,6 +1832,7 @@ int AACFindSyncWord(uint8_t *buf, int nBytes)
 }
 //**************************************************************************************
 int AACGetSampRate(){return m_AACDecInfo->sampRate * (m_AACDecInfo->sbrEnabled ? 2 : 1);}
+int AACGetStreamSampRate(){return m_AACDecInfo->sampRate * (m_AACDecInfo->sbrPresent ? 2 : 1);}
 int AACGetChannels(){return m_AACDecInfo->nChans;}
 int AACGetBitsPerSample(){return 16;}
 int AACGetID() {return m_AACDecInfo->id;} // 0-MPEG4, 1-MPEG2
@@ -2505,7 +2506,6 @@ int DecodeFillElement()
     m_AACDecInfo->currInstTag = -1;    /* fill elements don't have instance tag */
     m_AACDecInfo->fillExtType = 0;
 
-#ifdef AAC_ENABLE_SBR
     /* check for SBR
      * aacDecInfo->sbrEnabled is sticky (reset each raw_data_block), so for multichannel
      *    need to verify that all SCE/CPE/ICCE have valid SBR fill element following, and
@@ -2513,10 +2513,13 @@ int DecodeFillElement()
      */
     if (m_PSInfoBase->fillCount > 0) {
         m_AACDecInfo->fillExtType = (int)((m_PSInfoBase->fillBuf[0] >> 4) & 0x0f);
-        if (m_AACDecInfo->fillExtType == EXT_SBR_DATA || m_AACDecInfo->fillExtType == EXT_SBR_DATA_CRC)
+        if (m_AACDecInfo->fillExtType == EXT_SBR_DATA || m_AACDecInfo->fillExtType == EXT_SBR_DATA_CRC) {
+            m_AACDecInfo->sbrPresent = 1;
+#ifdef AAC_ENABLE_SBR
             m_AACDecInfo->sbrEnabled = 1;
-    }
 #endif
+        }
+    }
 
 
     m_AACDecInfo->fillBuf = m_PSInfoBase->fillBuf;
@@ -4588,6 +4591,7 @@ int UnpackADTSHeader(uint8_t **buf, int *bitOffset, int *bitsAvail)
     m_AACDecInfo->id = m_fhADTS.id;
     m_AACDecInfo->profile = m_fhADTS.profile;
     m_AACDecInfo->sbrEnabled = 0;
+    m_AACDecInfo->sbrPresent = 0;
     m_AACDecInfo->adtsBlocksLeft = m_fhADTS.numRawDataBlocks;
 
     /* update bitstream reader */
@@ -4800,6 +4804,7 @@ int UnpackADIFHeader(uint8_t **buf, int *bitOffset, int *bitsAvail)
     m_AACDecInfo->sampRate = sampRateTab[m_PSInfoBase->sampRateIdx];
     m_AACDecInfo->profile = m_pce[0]->profile;
     m_AACDecInfo->sbrEnabled = 0;
+    m_AACDecInfo->sbrPresent = 0;
 
     /* update bitstream reader */
     bitsUsed = CalcBitsUsed(*buf, *bitOffset);
@@ -4880,6 +4885,7 @@ int PrepareRawBlock()
     /* fill in user-accessible data */
     m_AACDecInfo->bitRate = 0;
     m_AACDecInfo->sbrEnabled = 0;
+    m_AACDecInfo->sbrPresent = 0;
 
     return ERR_AAC_NONE;
 }

@@ -65,3 +65,14 @@ test("audio output is reconfigured only when decoded layout changes", () => {
   assert.match(source, /firstParameters \|\| bitsPerSample != getBitsPerSample\(\)[\s\S]*setBitsPerSample\(bitsPerSample\)/);
   assert.match(source, /Stream parameters changed:[\s\S]*showCodecParams\(\)/);
 });
+
+test("HE-AAC reports the nominal stream rate without changing the decoded PCM rate", () => {
+  const audio = read("yoRadio", "src", "audioI2S", "Audio.cpp");
+  const decoder = read("yoRadio", "src", "audioI2S", "aac_decoder", "aac_decoder.cpp");
+
+  assert.match(audio, /streamSampleRate = AACGetStreamSampRate\(\)/);
+  assert.match(audio, /SampleRate: %lu", streamSampleRate/);
+  assert.match(decoder, /AACGetSampRate\(\).*sbrEnabled/);
+  assert.match(decoder, /AACGetStreamSampRate\(\).*sbrPresent/);
+  assert.match(decoder, /sbrPresent = 1;[\s\S]*#ifdef AAC_ENABLE_SBR[\s\S]*sbrEnabled = 1/);
+});

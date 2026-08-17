@@ -114,6 +114,7 @@ typedef struct _AACDecInfo_t {
     int   profile;    /* 0: Main profile, 1: LowComplexity (LC), 2: ScalableSamplingRate (SSR), 3: reserved */
     int   format;
     int   sbrEnabled;
+    int   sbrPresent;
     int   tnsUsed;
     int   pnsUsed;
     int   frameCount;
@@ -439,6 +440,7 @@ int AACFindSyncWord(uint8_t *buf, int nBytes);
 int AACSetRawBlockParams(int copyLast, int nChans, int sampRateCore, int profile);
 int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf);
 int AACGetSampRate();
+int AACGetStreamSampRate();
 int AACGetChannels();
 int AACGetID(); // 0-MPEG4, 1-MPEG2
 uint8_t AACGetProfile(); // 0-Main, 1-LC, 2-SSR, 3-reserved

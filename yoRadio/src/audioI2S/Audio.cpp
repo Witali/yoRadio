@@ -4399,8 +4399,12 @@ void Audio::showstreamtitle(const char* ml) {
 void Audio::showCodecParams(){
     // print Codec Parameter (mp3, aac) in audio_info()
 
+    uint32_t streamSampleRate = getSampleRate();
+    if(m_codec == CODEC_AAC || m_codec == CODEC_M4A) {
+        streamSampleRate = AACGetStreamSampRate();
+    }
     AUDIO_INFO("Channels: %i", getChannels());
-    AUDIO_INFO("SampleRate: %lu", getSampleRate());
+    AUDIO_INFO("SampleRate: %lu", streamSampleRate);
     AUDIO_INFO("BitsPerSample: %i", getBitsPerSample());
     if(getBitRate()) {AUDIO_INFO("BitRate: %lu", getBitRate());}
     else             {AUDIO_INFO("BitRate: N/A");}
