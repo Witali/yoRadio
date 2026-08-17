@@ -475,6 +475,7 @@ void Audio::setDefaults(bool initializeInputBuffer) {
     m_f_chunked = false;                                    // Assume not chunked
     m_f_firstmetabyte = false;
     m_f_playing = false;
+    m_f_decoderParamsKnown = false;
     m_f_ssl = false;
     m_f_metadata = false;
     m_f_tts = false;
@@ -4408,6 +4409,88 @@ void Audio::showCodecParams(){
     }
 }
 //---------------------------------------------------------------------------------------------------------------------
+bool Audio::updateDecoderParameters(bool pcmAvailable) {
+    if(m_codec == CODEC_WAV) {
+        // WAV parameters come from its file header and cannot change inside
+        // the raw PCM payload.
+        m_f_decoderParamsKnown = true;
+        return true;
+    }
+    if(!pcmAvailable) return true;
+
+    uint32_t sampleRate = 0;
+    uint32_t bitrate = 0;
+    int channels = 0;
+    int bitsPerSample = 0;
+
+    if(m_codec == CODEC_MP3) {
+        channels = Mp3DecoderGetChannels();
+        sampleRate = Mp3DecoderGetSampRate();
+        bitsPerSample = Mp3DecoderGetBitsPerSample();
+        bitrate = Mp3DecoderGetBitrate();
+    } else if(m_codec == CODEC_AAC || m_codec == CODEC_M4A) {
+        channels = AACGetChannels();
+        sampleRate = AACGetSampRate();
+        bitsPerSample = AACGetBitsPerSample();
+        bitrate = AACGetBitrate();
+    } else if(m_codec == CODEC_FLAC || m_codec == CODEC_OGG_FLAC) {
+        channels = FLACGetChannels();
+        sampleRate = FLACGetSampRate();
+        bitsPerSample = FLACGetBitsPerSample();
+        bitrate = FLACGetBitRate();
+    } else if(m_codec == CODEC_OGG) {
+        uint8_t oggChannels = 0;
+        uint8_t oggBitsPerSample = 0;
+        if(!OggDecoderGetInfo(&sampleRate, &oggChannels, &oggBitsPerSample,
+                              &bitrate)) {
+            log_e("OGG produced PCM without stream parameters");
+            return false;
+        }
+        channels = oggChannels;
+        bitsPerSample = oggBitsPerSample;
+    } else {
+        return true;
+    }
+
+    if(!sampleRate || channels < 1 || channels > 2 ||
+       (bitsPerSample != 8 && bitsPerSample != 16)) {
+        AUDIO_ERROR("Unsupported stream parameters: %lu Hz, %d channels, %d bits",
+                    sampleRate, channels, bitsPerSample);
+        return false;
+    }
+
+    const bool firstParameters = !m_f_decoderParamsKnown;
+    const bool layoutChanged = firstParameters ||
+        sampleRate != getSampleRate() ||
+        channels != getChannels() ||
+        bitsPerSample != getBitsPerSample();
+
+    if(firstParameters || sampleRate != getSampleRate()) {
+        // DAC/PDM is reconfigured before the first PCM frame with the new
+        // rate is sent. PDM retains its fixed 48 kHz hardware side and resets
+        // only the source-rate resampler.
+        if(!setSampleRate(sampleRate)) return false;
+    }
+    if(firstParameters || channels != getChannels()) {
+        if(!setChannels(channels)) return false;
+    }
+    if(firstParameters || bitsPerSample != getBitsPerSample()) {
+        if(!setBitsPerSample(bitsPerSample)) return false;
+    }
+    setBitrate(bitrate);
+
+    if(firstParameters) m_PlayingStartTime = millis();
+    m_f_decoderParamsKnown = true;
+    if(layoutChanged) {
+        if(!firstParameters) {
+            AUDIO_INFO("Stream parameters changed: %lu Hz, %d channels, %d bits",
+                       sampleRate, channels, bitsPerSample);
+        }
+        showCodecParams();
+    }
+    return true;
+}
+//---------------------------------------------------------------------------------------------------------------------
 int Audio::findNextSync(uint8_t* data, size_t len){
     // Mp3 and aac audio data are divided into frames. At the beginning of each frame there is a sync word.
     // The sync word is 0xFFF. This is followed by information about the structure of the frame.
@@ -4472,11 +4555,10 @@ int Audio::findNextSync(uint8_t* data, size_t len){
 //---------------------------------------------------------------------------------------------------------------------
 int Audio::sendBytes(uint8_t* data, size_t len) {
     int bytesLeft;
-    static bool f_setDecodeParamsOnce = true;
     size_t oggDecodedBytes = 0;
     int nextSync = 0;
     if(!m_f_playing) {
-        f_setDecodeParamsOnce = true;
+        m_f_decoderParamsKnown = false;
         nextSync = findNextSync(data, len);
         if(nextSync == 0) { m_f_playing = true;}
         return nextSync;
@@ -4587,45 +4669,13 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
         return bytesDecoded;
     }
     else{  // ret>=0
-        if(f_setDecodeParamsOnce &&
-           (m_codec != CODEC_OGG || oggDecodedBytes > 0)){
-            m_PlayingStartTime = millis();
-
-            if(m_codec == CODEC_MP3){
-                setChannels(Mp3DecoderGetChannels());
-                setSampleRate(Mp3DecoderGetSampRate());
-                setBitsPerSample(Mp3DecoderGetBitsPerSample());
-                setBitrate(Mp3DecoderGetBitrate());
-            }
-            if(m_codec == CODEC_AAC || m_codec == CODEC_M4A){
-                setChannels(AACGetChannels());
-                setSampleRate(AACGetSampRate());
-                setBitsPerSample(AACGetBitsPerSample());
-                setBitrate(AACGetBitrate());
-            }
-            if(m_codec == CODEC_FLAC || m_codec == CODEC_OGG_FLAC){
-                setChannels(FLACGetChannels());
-                setSampleRate(FLACGetSampRate());
-                setBitsPerSample(FLACGetBitsPerSample());
-                setBitrate(FLACGetBitRate());
-            }
-            if(m_codec == CODEC_OGG){
-                uint32_t sampleRate = 0;
-                uint32_t bitrate = 0;
-                uint8_t channels = 0;
-                uint8_t bitsPerSample = 0;
-                if(OggDecoderGetInfo(&sampleRate, &channels, &bitsPerSample,
-                                     &bitrate)) {
-                    setChannels(channels);
-                    setSampleRate(sampleRate);
-                    setBitsPerSample(bitsPerSample);
-                    setBitrate(bitrate);
-                } else {
-                    return bytesDecoded;
-                }
-            }
-            f_setDecodeParamsOnce = false;
-            showCodecParams();
+        const bool pcmAvailable = m_codec == CODEC_OGG
+            ? oggDecodedBytes > 0
+            : m_codec != CODEC_WAV;
+        if(!updateDecoderParameters(pcmAvailable)) {
+            m_validSamples = 0;
+            stopSong();
+            return bytesDecoded ? bytesDecoded : -1;
         }
         if(m_codec == CODEC_MP3){
             m_validSamples = Mp3DecoderGetOutputSamps() / getChannels();

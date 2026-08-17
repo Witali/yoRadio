@@ -44,3 +44,24 @@ test("stream information is cleared between stations", () => {
     assert.match(source, /station\.channels\s*=\s*0/);
   }
 });
+
+test("decoded stream parameters are checked after every audio frame", () => {
+  const source = read("yoRadio", "src", "audioI2S", "Audio.cpp");
+
+  assert.doesNotMatch(source, /f_setDecodeParamsOnce/);
+  assert.match(source, /updateDecoderParameters\(pcmAvailable\)/);
+  assert.match(source, /updateDecoderParameters\(pcmAvailable\)[\s\S]*m_validSamples = Mp3DecoderGetOutputSamps/);
+  assert.match(source, /Mp3DecoderGetSampRate\(\)/);
+  assert.match(source, /AACGetSampRate\(\)/);
+  assert.match(source, /FLACGetSampRate\(\)/);
+  assert.match(source, /OggDecoderGetInfo\(/);
+});
+
+test("audio output is reconfigured only when decoded layout changes", () => {
+  const source = read("yoRadio", "src", "audioI2S", "Audio.cpp");
+
+  assert.match(source, /firstParameters \|\| sampleRate != getSampleRate\(\)[\s\S]*setSampleRate\(sampleRate\)/);
+  assert.match(source, /firstParameters \|\| channels != getChannels\(\)[\s\S]*setChannels\(channels\)/);
+  assert.match(source, /firstParameters \|\| bitsPerSample != getBitsPerSample\(\)[\s\S]*setBitsPerSample\(bitsPerSample\)/);
+  assert.match(source, /Stream parameters changed:[\s\S]*showCodecParams\(\)/);
+});

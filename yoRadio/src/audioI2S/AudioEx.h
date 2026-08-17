@@ -289,6 +289,7 @@ private:
     bool parseContentType(char* ct);
     bool parseHttpResponseHeader();
     bool initializeDecoder();
+    bool updateDecoderParameters(bool pcmAvailable);
     esp_err_t I2Sstart(uint8_t i2s_num);
     esp_err_t I2Sstop(uint8_t i2s_num);
     void urlencode(char* buff, uint16_t buffLen, bool spacesOnly = false);
@@ -580,6 +581,7 @@ private:
     bool            m_f_chunked = false ;           // Station provides chunked transfer
     bool            m_f_firstmetabyte = false;      // True if first metabyte (counter)
     bool            m_f_playing = false;            // valid mp3 stream recognized
+    bool            m_f_decoderParamsKnown = false; // output matches the current decoded frame
     bool            m_f_tts = false;                // text to speech
     bool            m_f_loop = false;               // Set if audio file should loop
     bool            m_f_forceMono = false;          // if true stereo -> mono
