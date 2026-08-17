@@ -9,12 +9,13 @@ foreach(required_env
 endforeach()
 
 set(YORADIO_DAC_BACKEND "continuous" CACHE STRING
-    "Built-in DAC backend: continuous or legacy")
-set_property(CACHE YORADIO_DAC_BACKEND PROPERTY STRINGS continuous legacy)
+    "Internal audio backend: continuous, legacy, or pdm")
+set_property(CACHE YORADIO_DAC_BACKEND PROPERTY STRINGS continuous legacy pdm)
 if(NOT YORADIO_DAC_BACKEND STREQUAL "continuous" AND
-   NOT YORADIO_DAC_BACKEND STREQUAL "legacy")
+   NOT YORADIO_DAC_BACKEND STREQUAL "legacy" AND
+   NOT YORADIO_DAC_BACKEND STREQUAL "pdm")
   message(FATAL_ERROR
-    "YORADIO_DAC_BACKEND must be 'continuous' or 'legacy'")
+    "YORADIO_DAC_BACKEND must be 'continuous', 'legacy', or 'pdm'")
 endif()
 
 # Use the locally installed Arduino core as an ESP-IDF component.  The

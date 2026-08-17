@@ -1,8 +1,9 @@
 [CmdletBinding(PositionalBinding = $false)]
 param(
     [string]$BuildDirectory = "build",
-    [ValidateSet("continuous", "legacy")]
-    [string]$DacBackend = "continuous",
+    [Alias("DacBackend")]
+    [ValidateSet("continuous", "legacy", "pdm")]
+    [string]$AudioBackend = "continuous",
     [switch]$Setup,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")
@@ -31,7 +32,7 @@ $required = @(
     (Join-Path $arduinoLibraries "Adafruit_ST7735_and_ST7789_Library\Adafruit_ST7789.cpp"),
     (Join-Path $arduinoLibraries "XPT2046_Touchscreen\XPT2046_Touchscreen.cpp")
 )
-if ($DacBackend -eq "legacy") {
+if ($AudioBackend -eq "legacy") {
     $required += (Join-Path $legacyIdf "components\driver\deprecated\i2s_legacy.c")
 }
 $missing = @($required | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
@@ -85,7 +86,7 @@ try {
             (Join-Path $idf "tools\idf.py"),
             "-B", $BuildDirectory,
             "--no-ccache",
-            "-D", "YORADIO_DAC_BACKEND=$DacBackend"
+            "-D", "YORADIO_DAC_BACKEND=$AudioBackend"
         ) + $IdfArguments
         $idfProcess = Start-Process -Wait -PassThru -NoNewWindow `
             -FilePath $idfPython `

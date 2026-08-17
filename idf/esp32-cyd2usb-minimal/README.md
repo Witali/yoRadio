@@ -2,12 +2,13 @@
 
 This profile builds yoRadio with the current stable ESP-IDF 6.0.2 for the
 dual-USB CYD board: original dual-core ESP32, ST7789 display, XPT2046 touch and
-the internal DAC on GPIO26. Arduino is retained as an ESP-IDF component while
-CMake compiles only the yoRadio modules and libraries required by this board.
+internal DAC or PDM output on GPIO26. Arduino is retained as an ESP-IDF
+component while CMake compiles only the yoRadio modules and libraries required
+by this board.
 
 The profile keeps Wi-Fi station/AP fallback, HTTP/HTTPS streams, TLS, SPIFFS,
-WebUI, OTA web updates, ST7789, touch, MP3/AAC/FLAC and DAC output. It excludes
-MQTT, IRremote, VS1053, PDM, alternate displays, Nextion, GT911, Bluetooth/BLE,
+WebUI, OTA web updates, ST7789, touch, MP3/AAC/FLAC and DAC/PDM output. It
+excludes MQTT, IRremote, VS1053, alternate displays, Nextion, GT911, Bluetooth/BLE,
 Ethernet, PPP, IPv6, Zigbee, Matter, RainMaker, Insights and Arduino OTA.
 
 ESP-IDF 6 removed the legacy built-in-DAC I2S driver. The default `continuous`
@@ -21,6 +22,10 @@ pins the official ESP-IDF v5.5.4 tree and CMake compiles its original
 `components/driver/deprecated/i2s_legacy.c` inside the IDF 6 application. A
 small DAC-only compatibility wrapper supplies renamed SDK definitions; RX/ADC
 and external digital I2S are deliberately unsupported by this backend.
+
+The third `pdm` backend uses the ESP-IDF 6 `i2s_pdm` API and the ESP32 hardware
+PCM-to-PDM converter. Its one-bit stream is routed to GPIO26, with mono mixing,
+DMA buffering and bias ramps already handled by YoRadio's PDM output path.
 
 ## Reproducible setup
 
@@ -56,15 +61,20 @@ the ESP-IDF tool installer.
 .\build.ps1 size-components
 
 # Build and inspect the optional ESP-IDF 5.5.4 legacy I2S/DAC backend.
-.\build.ps1 -BuildDirectory build-legacy -DacBackend legacy
-.\build.ps1 size -BuildDirectory build-legacy -DacBackend legacy
+.\build.ps1 -BuildDirectory build-legacy -AudioBackend legacy
+.\build.ps1 size -BuildDirectory build-legacy -AudioBackend legacy
+
+# Build the hardware I2S PDM/sigma-delta output on GPIO26.
+.\build.ps1 -BuildDirectory build-pdm -AudioBackend pdm
+.\build.ps1 size -BuildDirectory build-pdm -AudioBackend pdm
 ```
 
 `build.ps1` calls setup automatically when a required dependency is missing.
 Generated images are stored in `build/`; `build/flasher_args.json` is the
 authority for offsets. The tested application image occupies about 1.12 MiB
 of each 1.69 MiB OTA slot. `continuous` remains the default; the serial boot
-log identifies the backend compiled into the image.
+log identifies the backend compiled into the image. The former `-DacBackend`
+parameter remains an alias for `-AudioBackend`.
 
 ## Flash without erasing settings
 

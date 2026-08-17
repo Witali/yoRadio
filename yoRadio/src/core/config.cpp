@@ -1067,7 +1067,9 @@ void Config::bootInfo() {
   BOOTLOG("chip:\t\tmodel: %s | rev: %d | id: %lu | cores: %d | psram: %lu", ESP.getChipModel(), ESP.getChipRevision(), chipId, ESP.getChipCores(), ESP.getPsramSize());
   BOOTLOG("display:\t%d", DSP_MODEL);
   if(VS1053_CS==255) {
-  #if defined(YORADIO_DAC_BACKEND_LEGACY)
+  #if defined(YORADIO_AUDIO_BACKEND_PDM)
+    BOOTLOG("audio:\t\thardware I2S PDM (GPIO%d)", I2S_PDM_DOUT);
+  #elif defined(YORADIO_DAC_BACKEND_LEGACY)
     BOOTLOG("audio:\t\tlegacy I2S DAC from ESP-IDF 5.5.4 (GPIO26)");
   #elif defined(YORADIO_ESP_IDF_MINIMAL)
     BOOTLOG("audio:\t\tDAC continuous (GPIO26)");

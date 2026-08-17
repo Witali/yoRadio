@@ -68,6 +68,9 @@ if(YORADIO_DAC_BACKEND STREQUAL "legacy")
     "${LEGACY_IDF}/components/driver/deprecated/i2s_legacy.c"
     PROPERTIES COMPILE_OPTIONS
       "-include;hal/i2s_periph.h;-Wno-error=unused-but-set-parameter")
+elseif(YORADIO_DAC_BACKEND STREQUAL "pdm")
+  list(APPEND YORADIO_SRCS
+    "${YORADIO_ROOT}/src/audioI2S/PdmOutput.cpp")
 else()
   list(APPEND YORADIO_SRCS "compat/idf6_i2s_compat.cpp")
 endif()
@@ -111,6 +114,10 @@ if(YORADIO_DAC_BACKEND STREQUAL "legacy")
     SOC_I2S_SUPPORTS_ADC_DAC=1
     SOC_I2S_SUPPORTS_ADC=0
     SOC_I2S_SUPPORTS_DAC=1)
+elseif(YORADIO_DAC_BACKEND STREQUAL "pdm")
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_AUDIO_BACKEND_PDM=1
+    I2S_INTERNAL_OUTPUT=1)
 else()
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_DAC_BACKEND_CONTINUOUS=1)
