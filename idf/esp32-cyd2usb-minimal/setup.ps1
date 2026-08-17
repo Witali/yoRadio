@@ -8,6 +8,7 @@ $project = $PSScriptRoot
 $worktreeRoot = [IO.Path]::GetFullPath((Join-Path $project "..\.."))
 $dependencyRoot = Join-Path $worktreeRoot ".idf"
 $idfPath = Join-Path $dependencyRoot "v6.0.2"
+$legacyIdfPath = Join-Path $dependencyRoot "v5.5.4"
 $idfToolsPath = Join-Path $dependencyRoot "tools-v6.0.2"
 $arduinoPath = Join-Path $dependencyRoot "arduino"
 $librariesPath = Join-Path $dependencyRoot "libraries"
@@ -95,6 +96,14 @@ Install-GitDependency `
     -Destination $idfPath `
     -Submodules
 
+# Keep the final pre-IDF-6 legacy I2S/DAC implementation available as source.
+# It is compiled only by the optional legacy DAC build; its toolchain and
+# submodules are deliberately not installed.
+Install-GitDependency `
+    -Url "https://github.com/espressif/esp-idf.git" `
+    -Revision "v5.5.4" `
+    -Destination $legacyIdfPath
+
 # ESP-IDF 6 support is not in a stable Arduino release yet.  Pin the official
 # 4.0 alpha instead of following master, so builds remain reproducible.
 Install-GitDependency `
@@ -145,4 +154,4 @@ if (-not $SkipToolchain) {
     }
 }
 
-Write-Host "ESP-IDF v6.0.2 dependencies are ready in $dependencyRoot"
+Write-Host "ESP-IDF v6.0.2 and legacy DAC source dependencies are ready in $dependencyRoot"

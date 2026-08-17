@@ -2550,7 +2550,11 @@ void Audio::fillDacSilence(bool primeDma) {
     uint32_t silence[silenceFrames];
     for(size_t i = 0; i < silenceFrames; ++i) silence[i] = dacSilence;
 
-  #ifdef YORADIO_ESP_IDF_MINIMAL
+  #if defined(YORADIO_DAC_BACKEND_LEGACY)
+    size_t framesRemaining = primeDma
+        ? static_cast<size_t>(m_i2s_config.dma_buf_count) * m_i2s_config.dma_buf_len
+        : silenceFrames;
+  #elif defined(YORADIO_ESP_IDF_MINIMAL)
     // dac_continuous owns and primes its descriptors. One midpoint block is
     // sufficient; filling the complete legacy I2S ring can outrun the new
     // driver's descriptor queue during boot.

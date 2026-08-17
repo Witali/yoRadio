@@ -10,12 +10,17 @@ WebUI, OTA web updates, ST7789, touch, MP3/AAC/FLAC and DAC output. It excludes
 MQTT, IRremote, VS1053, PDM, alternate displays, Nextion, GT911, Bluetooth/BLE,
 Ethernet, PPP, IPv6, Zigbee, Matter, RainMaker, Insights and Arduino OTA.
 
-ESP-IDF 6 removed the legacy built-in-DAC I2S driver. This profile writes DAC
-audio through the supported `dac_continuous` API. It does not include or call
-`driver/i2s.h`; a future external digital-I2S profile should use `i2s_std.h`.
-The DAC backend keeps a dedicated 8-bit PCM queue and a continuously supplied
-DMA ring. Brief decoder/network gaps are filled with the `0x80` midpoint, so
-the converter never holds an arbitrary last sample and resumes with a DC step.
+ESP-IDF 6 removed the legacy built-in-DAC I2S driver. The default `continuous`
+backend therefore writes DAC audio through the supported `dac_continuous` API.
+It keeps a dedicated 8-bit PCM queue and a continuously supplied DMA ring.
+Brief decoder/network gaps are filled with the `0x80` midpoint, so the
+converter never holds an arbitrary last sample and resumes with a DC step.
+
+For comparison and fallback, the profile also has a `legacy` backend. Setup
+pins the official ESP-IDF v5.5.4 tree and CMake compiles its original
+`components/driver/deprecated/i2s_legacy.c` inside the IDF 6 application. A
+small DAC-only compatibility wrapper supplies renamed SDK definitions; RX/ADC
+and external digital I2S are deliberately unsupported by this backend.
 
 ## Reproducible setup
 
@@ -30,6 +35,7 @@ directory and does not require an existing Python or ESP-IDF installation:
 
 - official portable CPython 3.12.10, verified by SHA-256;
 - official ESP-IDF v6.0.2 and its pinned submodules;
+- official ESP-IDF v5.5.4 source for the optional legacy DAC backend;
 - official Arduino-ESP32 4.0.0-alpha1, the first release line supporting IDF 6;
 - Adafruit BusIO 1.17.4;
 - Adafruit GFX 1.12.6;
@@ -48,12 +54,17 @@ the ESP-IDF tool installer.
 .\build.ps1
 .\build.ps1 size
 .\build.ps1 size-components
+
+# Build and inspect the optional ESP-IDF 5.5.4 legacy I2S/DAC backend.
+.\build.ps1 -BuildDirectory build-legacy -DacBackend legacy
+.\build.ps1 size -BuildDirectory build-legacy -DacBackend legacy
 ```
 
 `build.ps1` calls setup automatically when a required dependency is missing.
 Generated images are stored in `build/`; `build/flasher_args.json` is the
 authority for offsets. The tested application image occupies about 1.12 MiB
-of each 1.69 MiB OTA slot.
+of each 1.69 MiB OTA slot. `continuous` remains the default; the serial boot
+log identifies the backend compiled into the image.
 
 ## Flash without erasing settings
 

@@ -8,6 +8,15 @@ foreach(required_env
   endif()
 endforeach()
 
+set(YORADIO_DAC_BACKEND "continuous" CACHE STRING
+    "Built-in DAC backend: continuous or legacy")
+set_property(CACHE YORADIO_DAC_BACKEND PROPERTY STRINGS continuous legacy)
+if(NOT YORADIO_DAC_BACKEND STREQUAL "continuous" AND
+   NOT YORADIO_DAC_BACKEND STREQUAL "legacy")
+  message(FATAL_ERROR
+    "YORADIO_DAC_BACKEND must be 'continuous' or 'legacy'")
+endif()
+
 # Use the locally installed Arduino core as an ESP-IDF component.  The
 # component manager is deliberately disabled: this profile must not pull in
 # Arduino's optional Matter, Zigbee, RainMaker and speech dependencies.

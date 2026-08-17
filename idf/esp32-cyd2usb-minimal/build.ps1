@@ -1,6 +1,8 @@
-[CmdletBinding()]
+[CmdletBinding(PositionalBinding = $false)]
 param(
     [string]$BuildDirectory = "build",
+    [ValidateSet("continuous", "legacy")]
+    [string]$DacBackend = "continuous",
     [switch]$Setup,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")
@@ -11,6 +13,7 @@ $project = $PSScriptRoot
 $worktreeRoot = [IO.Path]::GetFullPath((Join-Path $project "..\.."))
 $dependencyRoot = Join-Path $worktreeRoot ".idf"
 $idf = Join-Path $dependencyRoot "v6.0.2"
+$legacyIdf = Join-Path $dependencyRoot "v5.5.4"
 $idfTools = Join-Path $dependencyRoot "tools-v6.0.2"
 $bootstrapPython = Join-Path $dependencyRoot "python-3.12.10\tools"
 $ninjaExe = Join-Path $idfTools "tools\ninja\1.12.1\ninja.exe"
@@ -28,6 +31,9 @@ $required = @(
     (Join-Path $arduinoLibraries "Adafruit_ST7735_and_ST7789_Library\Adafruit_ST7789.cpp"),
     (Join-Path $arduinoLibraries "XPT2046_Touchscreen\XPT2046_Touchscreen.cpp")
 )
+if ($DacBackend -eq "legacy") {
+    $required += (Join-Path $legacyIdf "components\driver\deprecated\i2s_legacy.c")
+}
 $missing = @($required | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
 if ($Setup -or ($missing.Count -gt 0)) {
     Write-Host "Installing pinned ESP-IDF dependencies..."
@@ -49,6 +55,7 @@ $saved = @{
     PYTHONUTF8 = $env:PYTHONUTF8
     YORADIO_ARDUINO_COMPONENT = $env:YORADIO_ARDUINO_COMPONENT
     YORADIO_ARDUINO_LIBRARIES = $env:YORADIO_ARDUINO_LIBRARIES
+    YORADIO_LEGACY_IDF = $env:YORADIO_LEGACY_IDF
 }
 try {
     $env:IDF_TOOLS_PATH = $idfTools
@@ -58,6 +65,7 @@ try {
     $env:PYTHONUTF8 = "1"
     $env:YORADIO_ARDUINO_COMPONENT = $arduinoComponent
     $env:YORADIO_ARDUINO_LIBRARIES = $arduinoLibraries
+    $env:YORADIO_LEGACY_IDF = $legacyIdf
     $env:Path = "$bootstrapPython;$bootstrapPython\Scripts;$env:Path"
     . (Join-Path $idf "export.ps1")
     $idfPython = (Get-Command python.exe -CommandType Application |
@@ -76,7 +84,8 @@ try {
         $idfProcessArguments = @(
             (Join-Path $idf "tools\idf.py"),
             "-B", $BuildDirectory,
-            "--no-ccache"
+            "--no-ccache",
+            "-D", "YORADIO_DAC_BACKEND=$DacBackend"
         ) + $IdfArguments
         $idfProcess = Start-Process -Wait -PassThru -NoNewWindow `
             -FilePath $idfPython `

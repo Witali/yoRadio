@@ -35,8 +35,6 @@ set(YORADIO_SRCS
   "${YORADIO_ROOT}/src/audioI2S/mp3_decoder/mp3_decoder.cpp"
   "${YORADIO_ROOT}/src/audioI2S/mp3_decoder/Mp3DecoderSelector.cpp"
 
-  "compat/idf6_i2s_compat.cpp"
-
   "${YORADIO_ROOT}/src/displays/displayST7789.cpp"
   "${YORADIO_ROOT}/src/displays/fonts/yofont10x14.c"
   "${YORADIO_ROOT}/src/displays/fonts/yofont5x7.c"
@@ -58,6 +56,22 @@ set(YORADIO_SRCS
   "${ARDUINO_LIBRARIES}/Adafruit_ST7735_and_ST7789_Library/Adafruit_ST7789.cpp"
   "${ARDUINO_LIBRARIES}/XPT2046_Touchscreen/XPT2046_Touchscreen.cpp")
 
+if(YORADIO_DAC_BACKEND STREQUAL "legacy")
+  if(NOT DEFINED ENV{YORADIO_LEGACY_IDF})
+    message(FATAL_ERROR "YORADIO_LEGACY_IDF is not set; use build.ps1")
+  endif()
+  file(TO_CMAKE_PATH "$ENV{YORADIO_LEGACY_IDF}" LEGACY_IDF)
+  list(APPEND YORADIO_SRCS
+    "compat/idf5_legacy_dac_backend.cpp"
+    "${LEGACY_IDF}/components/driver/deprecated/i2s_legacy.c")
+  set_source_files_properties(
+    "${LEGACY_IDF}/components/driver/deprecated/i2s_legacy.c"
+    PROPERTIES COMPILE_OPTIONS
+      "-include;hal/i2s_periph.h;-Wno-error=unused-but-set-parameter")
+else()
+  list(APPEND YORADIO_SRCS "compat/idf6_i2s_compat.cpp")
+endif()
+
 idf_component_register(
   SRCS ${YORADIO_SRCS}
   INCLUDE_DIRS
@@ -70,14 +84,37 @@ idf_component_register(
     "${ARDUINO_LIBRARIES}/XPT2046_Touchscreen"
   REQUIRES
     arduino
+    efuse
+    esp_adc
     esp_driver_dac
+    esp_driver_i2s
     esp_driver_gpio
     esp_driver_sdmmc
     esp_driver_sdspi
+    esp_hw_support
     esp_netif
+    esp_pm
+    esp_ringbuf
     esp_wifi
     mbedtls
     wear_levelling)
+
+if(YORADIO_DAC_BACKEND STREQUAL "legacy")
+  target_include_directories(${COMPONENT_LIB} BEFORE PRIVATE
+    "${LEGACY_IDF}/components/driver/deprecated"
+    "${LEGACY_IDF}/components/esp_driver_i2s/include")
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_DAC_BACKEND_LEGACY=1
+    CONFIG_I2S_SUPPRESS_DEPRECATE_WARN=1
+    I2S_MODE_ADC_BUILT_IN=32
+    SOC_I2S_NUM=2
+    SOC_I2S_SUPPORTS_ADC_DAC=1
+    SOC_I2S_SUPPORTS_ADC=0
+    SOC_I2S_SUPPORTS_DAC=1)
+else()
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_DAC_BACKEND_CONTINUOUS=1)
+endif()
 
 # Give this build an explicit identity without changing the Arduino branch.
 target_compile_definitions(${COMPONENT_LIB} PRIVATE

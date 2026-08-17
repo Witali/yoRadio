@@ -1,8 +1,8 @@
 #pragma once
 
 // ESP-IDF 6 removed the legacy built-in-DAC I2S path. The shared Audio class
-// keeps its configuration value types, but all hardware calls go directly to
-// the new dac_continuous driver through this profile-specific backend.
+// keeps one adapter API which can be backed either by dac_continuous or by the
+// vendored ESP-IDF 5.5.4 legacy I2S/DAC source.
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -11,9 +11,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#if defined(YORADIO_DAC_BACKEND_LEGACY)
+#include "driver/i2s.h"
+#else
 
 typedef int i2s_port_t;
 typedef int i2s_mode_t;
@@ -61,6 +61,11 @@ typedef struct {
     int data_in_num;
     int mck_io_num;
 } i2s_pin_config_t;
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 esp_err_t idf6_dac_output_configure(const i2s_config_t *config,
                                     i2s_dac_mode_t mode);
