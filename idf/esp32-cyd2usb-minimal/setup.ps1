@@ -17,8 +17,6 @@ $pythonVersion = "3.12.10"
 $pythonPackageRoot = Join-Path $dependencyRoot "python-$pythonVersion"
 $pythonPath = Join-Path $pythonPackageRoot "tools"
 $pythonExe = Join-Path $pythonPath "python.exe"
-$radioCollectorRequirements = Join-Path $worktreeRoot "tools\radio_stream_collector\requirements-radio-streams.txt"
-$radioCollectorStamp = Join-Path $pythonPackageRoot "radio-streams-requirements.sha256"
 $downloadPath = Join-Path $dependencyRoot "downloads"
 $pythonPackage = Join-Path $downloadPath "python.$pythonVersion.nupkg"
 $pythonPackageUrl = "https://www.nuget.org/api/v2/package/python/$pythonVersion"
@@ -119,30 +117,6 @@ if (-not (Test-Path -LiteralPath $pythonExe -PathType Leaf)) {
 }
 & $pythonExe --version
 if ($LASTEXITCODE -ne 0) { throw "Local Python installation is unusable: $pythonExe" }
-
-if (-not (Test-Path -LiteralPath $radioCollectorRequirements -PathType Leaf)) {
-    throw "Radio collector requirements are missing: $radioCollectorRequirements"
-}
-$radioCollectorRequirementsHash = (Get-FileHash -LiteralPath $radioCollectorRequirements -Algorithm SHA256).Hash
-$installedRadioCollectorHash = if (Test-Path -LiteralPath $radioCollectorStamp -PathType Leaf) {
-    (Get-Content -Raw -LiteralPath $radioCollectorStamp).Trim()
-} else {
-    ""
-}
-if ($installedRadioCollectorHash -ne $radioCollectorRequirementsHash) {
-    & $pythonExe -m pip --version
-    if ($LASTEXITCODE -ne 0) {
-        & $pythonExe -m ensurepip --upgrade
-        if ($LASTEXITCODE -ne 0) { throw "Failed to install pip into local Python: $pythonExe" }
-    }
-    & $pythonExe -m pip install --disable-pip-version-check -r $radioCollectorRequirements
-    if ($LASTEXITCODE -ne 0) {
-        throw "Radio collector dependency installation failed with exit code $LASTEXITCODE"
-    }
-    [IO.File]::WriteAllText($radioCollectorStamp, "$radioCollectorRequirementsHash`n")
-} else {
-    Write-Host "Radio collector Python dependencies are already installed."
-}
 
 # Official stable ESP-IDF.  Clone first and initialize submodules in a separate
 # command so core.longpaths is active for the very deep Mbed TLS tree.

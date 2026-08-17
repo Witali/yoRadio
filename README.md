@@ -171,8 +171,8 @@ playlist editor.
 From the repository root:
 
 ```powershell
-python -m pip install -r tools/radio_stream_collector/requirements-radio-streams.txt
-python tools/radio_stream_collector/radio_stream_collector.py --quality low --verify -v --out .build/radio_output
+.\tools\radio_stream_collector\setup.ps1
+& .\.build\radio-stream-collector-venv\Scripts\python.exe tools\radio_stream_collector\radio_stream_collector.py --quality low --verify -v --out .build/radio_output
 ```
 
 The generated playlist is `.build/radio_output/playlist.csv`. See the

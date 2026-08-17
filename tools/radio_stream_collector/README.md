@@ -12,15 +12,18 @@
 
 ## Установка
 
+На Windows из каталога сборщика:
+
+```powershell
+.\setup.ps1
+& ..\..\.build\radio-stream-collector-venv\Scripts\python.exe .\radio_stream_collector.py --verify -v
+```
+
+На Linux/macOS:
+
 ```bash
 python -m venv .venv
-
-# Linux/macOS
 source .venv/bin/activate
-
-# Windows PowerShell
-# .venv\Scripts\Activate.ps1
-
 python -m pip install -r requirements-radio-streams.txt
 ```
 
