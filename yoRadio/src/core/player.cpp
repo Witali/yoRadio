@@ -114,6 +114,8 @@ void Player::_stop(bool alreadyStopped){
   setOutputPins(false);
   if(!_hasError) config.setTitle((display.mode()==LOST || display.mode()==UPDATING)?"":LANG::const_PlStopped);
   config.station.bitrate = 0;
+  config.station.sampleRate = 0;
+  config.station.channels = 0;
   config.setBitrateFormat(BF_UNKNOWN);
   #ifdef USE_NEXTION
     nextion.bitrate(config.station.bitrate);

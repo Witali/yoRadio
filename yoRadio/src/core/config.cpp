@@ -269,6 +269,8 @@ bool Config::prepareForPlaying(uint16_t stationId){
   if(!loadStation(stationId)) return false;
   setTitle(getMode()==PM_WEB?LANG::const_PlConnect:"[next track]");
   station.bitrate=0;
+  station.sampleRate=0;
+  station.channels=0;
   setBitrateFormat(BF_UNKNOWN);
   display.putRequest(DBITRATE);
   display.putRequest(NEWSTATION);
@@ -285,6 +287,12 @@ void Config::configPostPlaying(uint16_t stationId){
   if(getMode()==PM_SDCARD) {
     sdResumePos = 0;
     saveValue(&store.lastSdStation, stationId);
+  }
+  if(getMode()==PM_WEB && strcmp(station.title, LANG::const_PlConnect) == 0) {
+    // Some streams (notably OGG without metadata) never emit a title event.
+    // Once the connection succeeded, replace the transient status while
+    // preserving any real metadata that may already have arrived.
+    setTitle(station.name);
   }
   if(store.smartstart!=2) setSmartStart(1);
   netserver.requestOnChange(MODE, 0);

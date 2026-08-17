@@ -11,6 +11,7 @@ $idfPath = Join-Path $dependencyRoot "v6.0.2"
 $legacyIdfPath = Join-Path $dependencyRoot "v5.5.4"
 $idfToolsPath = Join-Path $dependencyRoot "tools-v6.0.2"
 $arduinoPath = Join-Path $dependencyRoot "arduino"
+$audioCodecRepoPath = Join-Path $dependencyRoot "esp-adf-libs"
 $librariesPath = Join-Path $dependencyRoot "libraries"
 $pythonVersion = "3.12.10"
 $pythonPackageRoot = Join-Path $dependencyRoot "python-$pythonVersion"
@@ -68,6 +69,35 @@ function Install-GitDependency {
     }
 }
 
+function Install-GitSparseCommitDependency {
+    param(
+        [Parameter(Mandatory)][string]$Url,
+        [Parameter(Mandatory)][string]$Revision,
+        [Parameter(Mandatory)][string]$SparsePath,
+        [Parameter(Mandatory)][string]$Destination
+    )
+    if (Test-Path -LiteralPath (Join-Path $Destination ".git")) {
+        $actualRevision = (& git -C $Destination rev-parse HEAD).Trim()
+        if (($LASTEXITCODE -ne 0) -or ($actualRevision -ne $Revision)) {
+            throw "Dependency at $Destination is not the pinned commit $Revision"
+        }
+        if (-not (Test-Path -LiteralPath (Join-Path $Destination $SparsePath))) {
+            throw "Sparse dependency is missing $SparsePath at $Destination"
+        }
+        Write-Host "Using existing dependency: $Destination"
+        return
+    }
+    if (Test-Path -LiteralPath $Destination) {
+        throw "Dependency path exists but is not a Git checkout: $Destination"
+    }
+    New-Item -ItemType Directory -Force -Path $Destination | Out-Null
+    Invoke-Git -C $Destination init
+    Invoke-Git -C $Destination remote add origin $Url
+    Invoke-Git -C $Destination sparse-checkout set $SparsePath
+    Invoke-Git -C $Destination fetch --depth 1 origin $Revision
+    Invoke-Git -C $Destination checkout --detach FETCH_HEAD
+}
+
 New-Item -ItemType Directory -Force -Path $dependencyRoot, $librariesPath, $downloadPath |
     Out-Null
 
@@ -110,6 +140,14 @@ Install-GitDependency `
     -Url "https://github.com/espressif/arduino-esp32.git" `
     -Revision "4.0.0-alpha1" `
     -Destination $arduinoPath
+
+# Official Espressif OGG parser and Vorbis/Opus decoders.  Sparse checkout
+# avoids downloading the unrelated ADF binary components.
+Install-GitSparseCommitDependency `
+    -Url "https://github.com/espressif/esp-adf-libs.git" `
+    -Revision "67b8d0e98f58c774b8652480893037273190e8dc" `
+    -SparsePath "esp_audio_codec" `
+    -Destination $audioCodecRepoPath
 
 Install-GitDependency `
     -Url "https://github.com/adafruit/Adafruit_BusIO.git" `
@@ -154,4 +192,4 @@ if (-not $SkipToolchain) {
     }
 }
 
-Write-Host "ESP-IDF v6.0.2 and legacy DAC source dependencies are ready in $dependencyRoot"
+Write-Host "ESP-IDF v6.0.2, audio codecs, and legacy DAC source dependencies are ready in $dependencyRoot"

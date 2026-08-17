@@ -8,12 +8,23 @@ const source = fs.readFileSync(
   "utf8",
 );
 
-test("PDM converter adapts to PCM rate while keeping a 6.144 MHz carrier", () => {
+test("PDM hardware always runs at 48 kHz with a 6.144 MHz carrier", () => {
+  assert.match(source, /kPdmOutputSampleRate\s*=\s*48000/);
+  assert.match(source, /kPdmCarrierRate\s*=\s*6144000/);
   assert.match(
     source,
-    /I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG\(sampleRate\)/,
-    "PDM must use Espressif's fixed-carrier high-SNR DAC profile",
+    /I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG\(kPdmOutputSampleRate\)/,
+    "PDM must use the fixed 48 kHz high-SNR DAC profile",
   );
+});
+
+test("PDM linearly upsamples source rates below 48 kHz", () => {
+  assert.match(source, /inputSampleRate == kPdmOutputSampleRate/);
+  assert.match(source, /while \(phase <= kPdmOutputSampleRate\)/);
+  assert.match(source, /phase \* kInterpolationScale/);
+  assert.doesNotMatch(source, /(?:^|\s)int64_t scaled/);
+  assert.match(source, /resamplerNextPhase = phase - kPdmOutputSampleRate/);
+  assert.match(source, /resetResampler\(\);[\s\S]*memset\(sampleBuffer/);
 });
 
 test("minimal IDF build corrects fractional fp/fs PDM clock calculation", () => {

@@ -184,10 +184,12 @@ void TimeKeeper::_upClock(){
 #if RTCSUPPORTED
   if(config.isRTCFound()) rtc.getTime(&network.timeinfo);
 #else
-  if(network.timeinfo.tm_year>100 || network.status == SDREADY) {
-    network.timeinfo.tm_sec++;
-    mktime(&network.timeinfo);
-  }
+  // Keep the local clock moving even before the first SNTP response.  The
+  // previous year guard left the display permanently frozen at the boot-time
+  // 1970 value when Wi-Fi connected only after a retry; SNTP can still replace
+  // this provisional time as soon as synchronization succeeds.
+  network.timeinfo.tm_sec++;
+  mktime(&network.timeinfo);
 #endif
   if(display.ready()) display.putRequest(CLOCK);
 }

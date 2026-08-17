@@ -289,6 +289,7 @@ private:
     bool parseContentType(char* ct);
     bool parseHttpResponseHeader();
     bool initializeDecoder();
+    bool updateDecoderParameters(bool pcmAvailable);
     esp_err_t I2Sstart(uint8_t i2s_num);
     esp_err_t I2Sstop(uint8_t i2s_num);
     void urlencode(char* buff, uint16_t buffLen, bool spacesOnly = false);
@@ -506,6 +507,8 @@ private:
     ConnectParams _connectParams;
     volatile bool _connectionResult = false;
     TaskHandle_t _connectTaskHandle = nullptr;
+    uint32_t        m_headerWaitStartedMs = 0;
+    uint8_t         m_headerRetryCount = 0;
     
     const size_t    m_frameSizeWav  = 1024 * 8;
     const size_t    m_frameSizeMP3  = 1600;
@@ -540,6 +543,9 @@ private:
     uint8_t         m_streamType = ST_NONE;
     uint8_t         m_ID3Size = 0;                  // lengt of ID3frame - ID3header
     int16_t         m_outBuff[2048*2];              // Interleaved L/R
+    int16_t*        m_decodeBuff = nullptr;          // Static buffer, or a larger OGG PCM frame
+    uint8_t*        m_oggOutBuff = nullptr;
+    size_t          m_oggOutBuffSize = 0;
     int16_t         m_validSamples = 0;
     int16_t         m_curSample = 0;
     uint16_t        m_datamode = 0;                 // Statemaschine
@@ -557,6 +563,8 @@ private:
     uint32_t        m_t0 = 0;                       // store millis(), is needed for a small delay
     uint32_t        m_contentlength = 0;            // Stores the length if the stream comes from fileserver
     uint32_t        m_bytesNotDecoded = 0;          // pictures or something else that comes with the stream
+    uint32_t        m_oggBitrateCompressedBytes = 0;
+    uint32_t        m_oggBitratePcmFrames = 0;
     uint32_t        m_PlayingStartTime = 0;         // Stores the milliseconds after the start of the audio
     uint32_t        m_lastDacAudioWriteMs = 0;      // Distinguish a real stream gap from normal decoder work
     uint32_t        m_fadeTotalSamples = 0;
@@ -577,6 +585,7 @@ private:
     bool            m_f_chunked = false ;           // Station provides chunked transfer
     bool            m_f_firstmetabyte = false;      // True if first metabyte (counter)
     bool            m_f_playing = false;            // valid mp3 stream recognized
+    bool            m_f_decoderParamsKnown = false; // output matches the current decoded frame
     bool            m_f_tts = false;                // text to speech
     bool            m_f_loop = false;               // Set if audio file should loop
     bool            m_f_forceMono = false;          // if true stereo -> mono

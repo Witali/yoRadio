@@ -13,6 +13,7 @@ enum CodecArenaOwner : uint8_t {
 // ESP32 heap. Only one software audio decoder is active at a time, so MP3 and
 // AAC can safely reuse the same storage.
 bool CodecArenaReserve();
+bool CodecArenaDiscard();
 void* CodecArenaCalloc(CodecArenaOwner owner, size_t count, size_t size);
 void CodecArenaFree(void* pointer);
 void CodecArenaRelease(CodecArenaOwner owner);

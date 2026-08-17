@@ -19,6 +19,7 @@ $idfTools = Join-Path $dependencyRoot "tools-v6.0.2"
 $bootstrapPython = Join-Path $dependencyRoot "python-3.12.10\tools"
 $ninjaExe = Join-Path $idfTools "tools\ninja\1.12.1\ninja.exe"
 $arduinoComponent = Join-Path $dependencyRoot "arduino"
+$audioCodecComponent = Join-Path $dependencyRoot "esp-adf-libs\esp_audio_codec"
 $arduinoLibraries = Join-Path $dependencyRoot "libraries"
 
 $required = @(
@@ -28,6 +29,8 @@ $required = @(
     (Join-Path $idfTools "idf-env.json"),
     $ninjaExe,
     (Join-Path $arduinoComponent "CMakeLists.txt"),
+    (Join-Path $audioCodecComponent "CMakeLists.txt"),
+    (Join-Path $audioCodecComponent "lib\esp32\libesp_audio_codec.a"),
     (Join-Path $arduinoLibraries "Adafruit_GFX_Library\Adafruit_GFX.cpp"),
     (Join-Path $arduinoLibraries "Adafruit_ST7735_and_ST7789_Library\Adafruit_ST7789.cpp"),
     (Join-Path $arduinoLibraries "XPT2046_Touchscreen\XPT2046_Touchscreen.cpp")
@@ -55,6 +58,7 @@ $saved = @{
     PYTHONIOENCODING = $env:PYTHONIOENCODING
     PYTHONUTF8 = $env:PYTHONUTF8
     YORADIO_ARDUINO_COMPONENT = $env:YORADIO_ARDUINO_COMPONENT
+    YORADIO_AUDIO_CODEC_COMPONENT = $env:YORADIO_AUDIO_CODEC_COMPONENT
     YORADIO_ARDUINO_LIBRARIES = $env:YORADIO_ARDUINO_LIBRARIES
     YORADIO_LEGACY_IDF = $env:YORADIO_LEGACY_IDF
 }
@@ -65,6 +69,7 @@ try {
     $env:PYTHONIOENCODING = "utf-8"
     $env:PYTHONUTF8 = "1"
     $env:YORADIO_ARDUINO_COMPONENT = $arduinoComponent
+    $env:YORADIO_AUDIO_CODEC_COMPONENT = $audioCodecComponent
     $env:YORADIO_ARDUINO_LIBRARIES = $arduinoLibraries
     $env:YORADIO_LEGACY_IDF = $legacyIdf
     $env:Path = "$bootstrapPython;$bootstrapPython\Scripts;$env:Path"

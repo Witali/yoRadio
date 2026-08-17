@@ -193,6 +193,7 @@ const char *getFormat(BitrateFormat _format) {
     case BF_AAC:  return "AAC";
     case BF_FLAC: return "FLC";
     case BF_OGG:  return "OGG";
+    case BF_OPUS: return "OPUS";
     case BF_WAV:  return "WAV";
     default:      return "bitrate";
   }

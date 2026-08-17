@@ -363,6 +363,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef BITRATE_FULL
   #define BITRATE_FULL     true   // display bitreta badget
 #endif
+#ifndef SHOW_STREAM_INFO
+  #define SHOW_STREAM_INFO false  // codec, sample rate and channels on player
+#endif
 #ifndef SD_AUTOPLAY
   #define SD_AUTOPLAY      true   // auto play from SD card when inserted
 #endif

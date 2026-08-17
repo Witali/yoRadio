@@ -221,6 +221,10 @@ void Display::_buildPager(){
     _bitrate = new TextWidget(bitrateConf, 30, false, config.theme.bitrate, config.theme.background);
     pages[PG_PLAYER]->addWidget( _bitrate);
   #endif
+  #if SHOW_STREAM_INFO && BITRATE_FULL
+    _streaminfo = new TextWidget(bitrateConf, 40, false, config.theme.bitrate, config.theme.background);
+    pages[PG_PLAYER]->addWidget(_streaminfo);
+  #endif
   if(_vuwidget) pages[PG_PLAYER]->addWidget( _vuwidget);
   pages[PG_PLAYER]->addWidget(_clock);
   pages[PG_SCREENSAVER]->addWidget(_clock);
@@ -484,6 +488,32 @@ void Display::loop() {
               _fullbitrate->setBitrate(config.station.bitrate); 
               _fullbitrate->setFormat(config.configFmt); 
             } 
+          #if SHOW_STREAM_INFO && BITRATE_FULL
+            if(_streaminfo) {
+              char streamInfo[40] = {0};
+              if(config.station.sampleRate && config.station.channels) {
+                const uint32_t khz = config.station.sampleRate / 1000U;
+                const uint32_t fraction = config.station.sampleRate % 1000U;
+                char rate[12];
+                if(fraction == 0U)
+                  snprintf(rate, sizeof(rate), "%lu", static_cast<unsigned long>(khz));
+                else if(fraction % 100U == 0U)
+                  snprintf(rate, sizeof(rate), "%lu.%01lu", static_cast<unsigned long>(khz), static_cast<unsigned long>(fraction / 100U));
+                else if(fraction % 10U == 0U)
+                  snprintf(rate, sizeof(rate), "%lu.%02lu", static_cast<unsigned long>(khz), static_cast<unsigned long>(fraction / 10U));
+                else
+                  snprintf(rate, sizeof(rate), "%lu.%03lu", static_cast<unsigned long>(khz), static_cast<unsigned long>(fraction));
+                if(config.station.channels == 1U)
+                  snprintf(streamInfo, sizeof(streamInfo), "%s kHz mono", rate);
+                else if(config.station.channels == 2U)
+                  snprintf(streamInfo, sizeof(streamInfo), "%s kHz stereo", rate);
+                else
+                  snprintf(streamInfo, sizeof(streamInfo), "%s kHz %u channels",
+                           rate, config.station.channels);
+              }
+              _streaminfo->setText(streamInfo);
+            }
+          #endif
           }
           break;
         case AUDIOINFO: if(_heapbar)  { _heapbar->lock(!config.store.audioinfo); _heapbar->setValue(player.inBufferFilled()); } break;

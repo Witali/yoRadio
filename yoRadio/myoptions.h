@@ -34,6 +34,9 @@
 #define I2S_PDM_DOUT          26
 #define PLAYER_FORCE_MONO     true
 
+/* Show decoded source format, sample rate and channel layout on the player. */
+#define SHOW_STREAM_INFO      true
+
 /* No external VS1053. The microSD bus is intentionally disabled; see docs. */
 #define VS1053_CS             255
 #define SDC_CS                255

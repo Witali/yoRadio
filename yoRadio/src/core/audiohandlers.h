@@ -11,10 +11,31 @@ void audio_info(const char *info) {
   #ifdef USE_NEXTION
     nextion.audioinfo(info);
   #endif
-  if (strstr(info, "format is aac")  != NULL) { config.setBitrateFormat(BF_AAC); display.putRequest(DBITRATE); }
-  if (strstr(info, "format is flac") != NULL) { config.setBitrateFormat(BF_FLAC); display.putRequest(DBITRATE); }
-  if (strstr(info, "format is mp3")  != NULL) { config.setBitrateFormat(BF_MP3); display.putRequest(DBITRATE); }
-  if (strstr(info, "format is wav")  != NULL) { config.setBitrateFormat(BF_WAV); display.putRequest(DBITRATE); }
+  bool streamInfoChanged = false;
+  if (strstr(info, "format is aac")  != NULL) { config.setBitrateFormat(BF_AAC);  streamInfoChanged = true; }
+  if (strstr(info, "format is flac") != NULL) { config.setBitrateFormat(BF_FLAC); streamInfoChanged = true; }
+  if (strstr(info, "format is mp3")  != NULL) { config.setBitrateFormat(BF_MP3);  streamInfoChanged = true; }
+  if (strstr(info, "format is wav")  != NULL) { config.setBitrateFormat(BF_WAV);  streamInfoChanged = true; }
+  if (strstr(info, "format is ogg")  != NULL) { config.setBitrateFormat(BF_OGG);  streamInfoChanged = true; }
+  if (strstr(info, "format is opus") != NULL) { config.setBitrateFormat(BF_OPUS); streamInfoChanged = true; }
+
+  const char *sampleRate = strstr(info, "SampleRate: ");
+  if(sampleRate) {
+    const uint32_t value = strtoul(sampleRate + 12, nullptr, 10);
+    if(value >= 1000U) {
+      config.station.sampleRate = value;
+      streamInfoChanged = true;
+    }
+  }
+  const char *channels = strstr(info, "Channels: ");
+  if(channels) {
+    const uint8_t value = static_cast<uint8_t>(atoi(channels + 10));
+    if(value == 1U || value == 2U) {
+      config.station.channels = value;
+      streamInfoChanged = true;
+    }
+  }
+  if(streamInfoChanged) display.putRequest(DBITRATE);
   if (strstr(info, "skip metadata") != NULL) config.setTitle(config.station.name);
   if (strstr(info, "Account already in use") != NULL || strstr(info, "HTTP/1.0 401") != NULL) {
     player.setError(info);
@@ -22,8 +43,10 @@ void audio_info(const char *info) {
   }
   char* ici; char b[20]={0};
   if ((ici = strstr(info, "BitRate: ")) != NULL) {
-    strlcpy(b, ici + 9, 50);
-    audio_bitrate(b);
+    strlcpy(b, ici + 9, sizeof(b));
+    // A decoder may not know the nominal bitrate even though icy-br already
+    // supplied it. Do not erase that valid value on "BitRate: N/A".
+    if(strtoul(b, nullptr, 10) > 0U) audio_bitrate(b);
   }
 }
 

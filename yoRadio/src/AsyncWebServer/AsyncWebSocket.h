@@ -158,6 +158,7 @@ public:
 class AsyncWebSocketClient {
   private:
     AsyncClient *_client;
+    AsyncClient *_disconnectedClient;
     AsyncWebSocket *_server;
     uint32_t _clientId;
     AwsClientStatus _status;
@@ -234,7 +235,7 @@ class AsyncWebSocketClient {
     void _onError(int8_t);
     void _onPoll();
     void _onTimeout(uint32_t time);
-    void _onDisconnect();
+    void _onDisconnect(AsyncClient *client);
     void _onData(void *pbuf, size_t plen);
 };
 

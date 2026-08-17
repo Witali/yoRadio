@@ -675,21 +675,48 @@ void ClockWidget::_printClock(bool force){
   gfx.setFont(Clock_GFXfontPtr);
   bool clockInTitle=!config.isScreensaver && _config.top<_timeheight; //DSP_SSD1306x32
   if(force){
-    _clearClock();
+    // Custom GFX fonts cannot overwrite their background.  Without a
+    // framebuffer the old implementation therefore cleared the complete
+    // clock before drawing it again.  A task switch between those operations
+    // made all digits visibly disappear.  Monospace seven-segment clocks can
+    // be updated safely one digit at a time by painting the complete "8"
+    // pattern in the inactive-segment colour and immediately drawing the new
+    // digit over it.
+    const bool incrementalClockRedraw = CLOCKFONT_MONO && !_fb->ready();
+    if(!incrementalClockRedraw) _clearClock();
     _getTimeBounds();
-    #ifndef DSP_OLED
-    if(CLOCKFONT_MONO) {
-      gfx.setTextColor(config.theme.clockbg, config.theme.background);
+    const uint16_t clockColor = clockInTitle
+                                ? config.theme.meta : config.theme.clock;
+    const uint16_t clockBackground = clockInTitle
+                                     ? config.theme.metabg
+                                     : config.theme.background;
+    if(incrementalClockRedraw) {
+      uint16_t digitLeft = _left();
+      for(const char* digit = _timebuffer; *digit; ++digit) {
+        if(*digit != ':') {
+          #ifndef DSP_OLED
+          gfx.setTextColor(config.theme.clockbg, config.theme.background);
+          gfx.setCursor(digitLeft, _top());
+          gfx.print('8');
+          #endif
+          gfx.setTextColor(clockColor, clockBackground);
+          gfx.setCursor(digitLeft, _top());
+          gfx.print(*digit);
+        }
+        digitLeft += _charWidth(static_cast<unsigned char>(*digit));
+      }
+    } else {
+      #ifndef DSP_OLED
+      if(CLOCKFONT_MONO) {
+        gfx.setTextColor(config.theme.clockbg, config.theme.background);
+        gfx.setCursor(_left(), _top());
+        gfx.print("88:88");
+      }
+      #endif
+      gfx.setTextColor(clockColor, clockBackground);
       gfx.setCursor(_left(), _top());
-      gfx.print("88:88");
+      gfx.print(_timebuffer);
     }
-    #endif
-    if(clockInTitle)
-      gfx.setTextColor(config.theme.meta, config.theme.metabg);
-    else
-      gfx.setTextColor(config.theme.clock, config.theme.background);
-    gfx.setCursor(_left(), _top());
-    gfx.print(_timebuffer);
     if(_fullclock){
       // lines, date & dow
       bool fullClockOnScreensaver = (!config.isScreensaver || (_fb->ready() && FULL_SCR_CLOCK));
@@ -848,25 +875,38 @@ void BitrateWidget::_charSize(uint8_t textsize, uint8_t& width, uint16_t& height
 
 void BitrateWidget::_draw(){
   _clear();
-  if(!_active || _format == BF_UNKNOWN || _bitrate==0) return;
+  if(!_active || _format == BF_UNKNOWN) return;
   dsp.drawRect(_config.left, _config.top, _dimension, _dimension, _fgcolor);
   dsp.fillRect(_config.left, _config.top + _dimension/2, _dimension, _dimension/2, _fgcolor);
   dsp.setFont();
   dsp.setTextSize(_config.textsize);
   dsp.setTextColor(_fgcolor, _bgcolor);
-  snprintf(_buf, 6, "%d", _bitrate);
+  if(_bitrate) snprintf(_buf, 6, "%d", _bitrate);
+  else         strlcpy(_buf, "---", sizeof(_buf));
   dsp.setCursor(_config.left + _dimension/2 - _charWidth*strlen(_buf)/2 + 1, _config.top + _dimension/4 - _textheight/2+1);
   dsp.print(_buf);
-  dsp.setTextColor(_bgcolor, _fgcolor);
-  dsp.setCursor(_config.left + _dimension/2 - _charWidth*3/2 + 1, _config.top + _dimension - _dimension/4 - _textheight/2);
+  const char* formatText = "";
   switch(_format){
-    case BF_MP3:  dsp.print("MP3"); break;
-    case BF_AAC:  dsp.print("AAC"); break;
-    case BF_FLAC: dsp.print("FLC"); break;
-    case BF_OGG:  dsp.print("OGG"); break;
-    case BF_WAV:  dsp.print("WAV"); break;
-    default:                        break;
+    case BF_MP3:  formatText = "MP3";  break;
+    case BF_AAC:  formatText = "AAC";  break;
+    case BF_FLAC: formatText = "FLC";  break;
+    case BF_OGG:  formatText = "OGG";  break;
+    case BF_OPUS: formatText = "OPUS"; break;
+    case BF_WAV:  formatText = "WAV";  break;
+    default:                         break;
   }
+  uint8_t formatSize = _config.textsize;
+  uint8_t formatWidth = _charWidth;
+  uint16_t formatHeight = _textheight;
+  if(formatWidth * strlen(formatText) > _dimension && formatSize > 1) {
+    --formatSize;
+    _charSize(formatSize, formatWidth, formatHeight);
+  }
+  dsp.setTextSize(formatSize);
+  dsp.setTextColor(_bgcolor, _fgcolor);
+  dsp.setCursor(_config.left + _dimension/2 - formatWidth*strlen(formatText)/2 + 1,
+                _config.top + _dimension - _dimension/4 - formatHeight/2);
+  dsp.print(formatText);
 }
 
 void BitrateWidget::_clear() {

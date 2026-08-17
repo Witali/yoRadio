@@ -30,6 +30,7 @@ set(YORADIO_SRCS
   "${YORADIO_ROOT}/src/audioI2S/Audio.cpp"
   "${YORADIO_ROOT}/src/audioI2S/AudioNormalizer.cpp"
   "${YORADIO_ROOT}/src/audioI2S/CodecMemoryArena.cpp"
+  "${YORADIO_ROOT}/src/audioI2S/OggDecoder.cpp"
   "${YORADIO_ROOT}/src/audioI2S/aac_decoder/aac_decoder.cpp"
   "${YORADIO_ROOT}/src/audioI2S/flac_decoder/flac_decoder.cpp"
   "${YORADIO_ROOT}/src/audioI2S/mp3_decoder/mp3_decoder.cpp"
@@ -100,6 +101,7 @@ idf_component_register(
     esp_ringbuf
     esp_wifi
     mbedtls
+    esp_audio_codec
     wear_levelling)
 
 if(YORADIO_DAC_BACKEND STREQUAL "legacy")
