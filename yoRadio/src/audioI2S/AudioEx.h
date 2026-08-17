@@ -563,6 +563,8 @@ private:
     uint32_t        m_t0 = 0;                       // store millis(), is needed for a small delay
     uint32_t        m_contentlength = 0;            // Stores the length if the stream comes from fileserver
     uint32_t        m_bytesNotDecoded = 0;          // pictures or something else that comes with the stream
+    uint32_t        m_oggBitrateCompressedBytes = 0;
+    uint32_t        m_oggBitratePcmFrames = 0;
     uint32_t        m_PlayingStartTime = 0;         // Stores the milliseconds after the start of the audio
     uint32_t        m_lastDacAudioWriteMs = 0;      // Distinguish a real stream gap from normal decoder work
     uint32_t        m_fadeTotalSamples = 0;

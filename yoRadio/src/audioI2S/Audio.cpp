@@ -502,6 +502,8 @@ void Audio::setDefaults(bool initializeInputBuffer) {
     m_avr_bitrate = 0;                                      // the same as m_bitrate if CBR, median if VBR
     m_bitRate = 0;                                          // Bitrate still unknown
     m_bytesNotDecoded = 0;                                  // counts all not decodable bytes
+    m_oggBitrateCompressedBytes = 0;
+    m_oggBitratePcmFrames = 0;
     m_chunkcount = 0;                                       // for chunked streams
     m_contentlength = 0;                                    // If Content-Length is known, count it
     m_curSample = 0;
@@ -4580,6 +4582,7 @@ int Audio::findNextSync(uint8_t* data, size_t len){
 int Audio::sendBytes(uint8_t* data, size_t len) {
     int bytesLeft;
     size_t oggDecodedBytes = 0;
+    size_t oggConsumedBytes = 0;
     int nextSync = 0;
     if(!m_f_playing) {
         m_f_decoderParamsKnown = false;
@@ -4656,6 +4659,7 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
             }
             m_decodeBuff = m_oggOutBuff
                 ? reinterpret_cast<int16_t*>(m_oggOutBuff) : m_outBuff;
+            oggConsumedBytes = min(consumed, len);
             bytesLeft = static_cast<int>(len - min(consumed, len));
             break;
         }
@@ -4714,7 +4718,32 @@ int Audio::sendBytes(uint8_t* data, size_t len) {
             const size_t bytesPerFrame =
                 (static_cast<size_t>(getBitsPerSample()) / 8U) * getChannels();
             if(bytesPerFrame) {
-                m_validSamples = static_cast<int16_t>(oggDecodedBytes / bytesPerFrame);
+                const uint32_t pcmFrames = oggDecodedBytes / bytesPerFrame;
+                m_validSamples = static_cast<int16_t>(pcmFrames);
+                // OGG/Icecast servers often omit icy-br, and the official
+                // Vorbis/Opus parser does not always expose a nominal rate.
+                // Estimate it from two seconds of consumed compressed data
+                // and decoded PCM so the format/bitrate badge still works.
+                if(!getBitRate() && getSampleRate()) {
+                    m_oggBitrateCompressedBytes += oggConsumedBytes;
+                    m_oggBitratePcmFrames += pcmFrames;
+                    if(m_oggBitratePcmFrames >= getSampleRate() * 2U) {
+                        const uint64_t numerator =
+                            static_cast<uint64_t>(m_oggBitrateCompressedBytes) *
+                            8U * getSampleRate();
+                        uint32_t estimated = static_cast<uint32_t>(
+                            (numerator + m_oggBitratePcmFrames / 2U) /
+                            m_oggBitratePcmFrames);
+                        estimated = ((estimated + 500U) / 1000U) * 1000U;
+                        if(estimated >= 8000U && estimated <= 1000000U) {
+                            setBitrate(estimated);
+                            char bitrateText[16];
+                            snprintf(bitrateText, sizeof(bitrateText), "%lu",
+                                     static_cast<unsigned long>(estimated));
+                            if(audio_bitrate) audio_bitrate(bitrateText);
+                        }
+                    }
+                }
             }
         }
     }

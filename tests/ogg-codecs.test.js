@@ -80,4 +80,9 @@ test("Vorbis and Opus retain server bitrate and use distinct bitrate badges", ()
   assert.match(widgets, /case BF_OGG:\s+formatText = "OGG"/);
   assert.match(widgets, /case BF_OPUS:\s+formatText = "OPUS"/);
   assert.match(server, /case BF_OPUS:\s+return "OPUS"/);
+  assert.match(audio, /m_oggBitrateCompressedBytes[\s\S]*m_oggBitratePcmFrames/);
+  assert.match(audio, /m_oggBitratePcmFrames >= getSampleRate\(\) \* 2U/);
+  assert.match(audio, /if\(audio_bitrate\) audio_bitrate\(bitrateText\)/);
+  assert.match(widgets, /_format == BF_UNKNOWN\) return/);
+  assert.match(widgets, /strlcpy\(_buf, "---"/);
 });

@@ -875,13 +875,14 @@ void BitrateWidget::_charSize(uint8_t textsize, uint8_t& width, uint16_t& height
 
 void BitrateWidget::_draw(){
   _clear();
-  if(!_active || _format == BF_UNKNOWN || _bitrate==0) return;
+  if(!_active || _format == BF_UNKNOWN) return;
   dsp.drawRect(_config.left, _config.top, _dimension, _dimension, _fgcolor);
   dsp.fillRect(_config.left, _config.top + _dimension/2, _dimension, _dimension/2, _fgcolor);
   dsp.setFont();
   dsp.setTextSize(_config.textsize);
   dsp.setTextColor(_fgcolor, _bgcolor);
-  snprintf(_buf, 6, "%d", _bitrate);
+  if(_bitrate) snprintf(_buf, 6, "%d", _bitrate);
+  else         strlcpy(_buf, "---", sizeof(_buf));
   dsp.setCursor(_config.left + _dimension/2 - _charWidth*strlen(_buf)/2 + 1, _config.top + _dimension/4 - _textheight/2+1);
   dsp.print(_buf);
   const char* formatText = "";
