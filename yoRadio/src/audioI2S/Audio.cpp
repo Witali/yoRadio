@@ -4477,11 +4477,21 @@ bool Audio::updateDecoderParameters(bool pcmAvailable) {
     if(firstParameters || bitsPerSample != getBitsPerSample()) {
         if(!setBitsPerSample(bitsPerSample)) return false;
     }
-    setBitrate(bitrate);
+    // OGG parsers do not always expose a nominal bitrate, especially for
+    // Opus. Keep a non-zero icy-br value already received from the server.
+    if(bitrate) setBitrate(bitrate);
 
     if(firstParameters) m_PlayingStartTime = millis();
     m_f_decoderParamsKnown = true;
     if(layoutChanged) {
+        if(firstParameters && m_codec == CODEC_OGG) {
+            const OggCodecType oggCodec = OggDecoderGetCodecType();
+            if(oggCodec == OGG_CODEC_OPUS) {
+                AUDIO_INFO("format is opus");
+            } else if(oggCodec == OGG_CODEC_VORBIS) {
+                AUDIO_INFO("format is ogg");
+            }
+        }
         if(!firstParameters) {
             AUDIO_INFO("Stream parameters changed: %lu Hz, %d channels, %d bits",
                        sampleRate, channels, bitsPerSample);

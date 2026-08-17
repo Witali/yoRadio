@@ -17,6 +17,7 @@ void audio_info(const char *info) {
   if (strstr(info, "format is mp3")  != NULL) { config.setBitrateFormat(BF_MP3);  streamInfoChanged = true; }
   if (strstr(info, "format is wav")  != NULL) { config.setBitrateFormat(BF_WAV);  streamInfoChanged = true; }
   if (strstr(info, "format is ogg")  != NULL) { config.setBitrateFormat(BF_OGG);  streamInfoChanged = true; }
+  if (strstr(info, "format is opus") != NULL) { config.setBitrateFormat(BF_OPUS); streamInfoChanged = true; }
 
   const char *sampleRate = strstr(info, "SampleRate: ");
   if(sampleRate) {
@@ -42,8 +43,10 @@ void audio_info(const char *info) {
   }
   char* ici; char b[20]={0};
   if ((ici = strstr(info, "BitRate: ")) != NULL) {
-    strlcpy(b, ici + 9, 50);
-    audio_bitrate(b);
+    strlcpy(b, ici + 9, sizeof(b));
+    // A decoder may not know the nominal bitrate even though icy-br already
+    // supplied it. Do not erase that valid value on "BitRate: N/A".
+    if(strtoul(b, nullptr, 10) > 0U) audio_bitrate(b);
   }
 }
 

@@ -62,3 +62,22 @@ test("OGG owns decoder memory exclusively and grows only its PCM frame buffer", 
   assert.match(source, /maxOggPcmFrame = 64U \* 1024U/);
   assert.match(arena, /Cannot discard codec arena owned by decoder/);
 });
+
+test("Vorbis and Opus retain server bitrate and use distinct bitrate badges", () => {
+  const decoder = read("yoRadio", "src", "audioI2S", "OggDecoder.cpp");
+  const audio = read("yoRadio", "src", "audioI2S", "Audio.cpp");
+  const handlers = read("yoRadio", "src", "core", "audiohandlers.h");
+  const widgets = read("yoRadio", "src", "displays", "widgets", "widgets.cpp");
+  const config = read("yoRadio", "src", "displays", "widgets", "widgetsconfig.h");
+  const server = read("yoRadio", "src", "core", "netserver.cpp");
+
+  assert.match(decoder, /opusSignature\[\].*'O'.*'p'.*'u'.*'s'.*'H'.*'e'.*'a'.*'d'/s);
+  assert.match(decoder, /vorbisSignature\[\].*0x01.*'v'.*'o'.*'r'.*'b'.*'i'.*'s'/s);
+  assert.match(audio, /if\(bitrate\) setBitrate\(bitrate\)/);
+  assert.match(handlers, /strtoul\(b, nullptr, 10\) > 0U/);
+  assert.match(handlers, /format is opus.*BF_OPUS/);
+  assert.match(config, /BF_OGG, BF_OPUS/);
+  assert.match(widgets, /case BF_OGG:\s+formatText = "OGG"/);
+  assert.match(widgets, /case BF_OPUS:\s+formatText = "OPUS"/);
+  assert.match(server, /case BF_OPUS:\s+return "OPUS"/);
+});

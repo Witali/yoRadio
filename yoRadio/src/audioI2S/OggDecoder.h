@@ -9,6 +9,12 @@ enum OggDecodeResult : int {
     OGG_DECODE_ERROR = -1
 };
 
+enum OggCodecType : uint8_t {
+    OGG_CODEC_UNKNOWN = 0,
+    OGG_CODEC_VORBIS,
+    OGG_CODEC_OPUS
+};
+
 bool OggDecoderOpen();
 void OggDecoderClose();
 OggDecodeResult OggDecoderDecode(uint8_t* input, size_t inputSize,
@@ -17,3 +23,4 @@ OggDecodeResult OggDecoderDecode(uint8_t* input, size_t inputSize,
                                  size_t* requiredOutputSize);
 bool OggDecoderGetInfo(uint32_t* sampleRate, uint8_t* channels,
                        uint8_t* bitsPerSample, uint32_t* bitrate);
+OggCodecType OggDecoderGetCodecType();

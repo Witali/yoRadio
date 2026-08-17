@@ -11,6 +11,27 @@ namespace {
 
 esp_audio_simple_dec_handle_t decoder = nullptr;
 bool registered = false;
+OggCodecType codecType = OGG_CODEC_UNKNOWN;
+
+bool containsSignature(const uint8_t* data, size_t size,
+                       const uint8_t* signature, size_t signatureSize) {
+    if(!data || !signature || signatureSize > size) return false;
+    for(size_t offset = 0; offset <= size - signatureSize; ++offset) {
+        if(memcmp(data + offset, signature, signatureSize) == 0) return true;
+    }
+    return false;
+}
+
+void detectCodecType(const uint8_t* data, size_t size) {
+    if(codecType != OGG_CODEC_UNKNOWN) return;
+    static const uint8_t opusSignature[] = {'O', 'p', 'u', 's', 'H', 'e', 'a', 'd'};
+    static const uint8_t vorbisSignature[] = {0x01, 'v', 'o', 'r', 'b', 'i', 's'};
+    if(containsSignature(data, size, opusSignature, sizeof(opusSignature))) {
+        codecType = OGG_CODEC_OPUS;
+    } else if(containsSignature(data, size, vorbisSignature, sizeof(vorbisSignature))) {
+        codecType = OGG_CODEC_VORBIS;
+    }
+}
 
 bool registerDecoders() {
     if(registered) return true;
@@ -47,6 +68,7 @@ void OggDecoderClose() {
         esp_audio_simple_dec_close(decoder);
         decoder = nullptr;
     }
+    codecType = OGG_CODEC_UNKNOWN;
 }
 
 OggDecodeResult OggDecoderDecode(uint8_t* input, size_t inputSize,
@@ -59,6 +81,8 @@ OggDecodeResult OggDecoderDecode(uint8_t* input, size_t inputSize,
     if(!decoder || !input || !inputSize || !output || !outputSize) {
         return OGG_DECODE_ERROR;
     }
+
+    detectCodecType(input, inputSize);
 
     esp_audio_simple_dec_raw_t raw = {};
     raw.buffer = input;
@@ -95,6 +119,10 @@ bool OggDecoderGetInfo(uint32_t* sampleRate, uint8_t* channels,
     return info.sample_rate && info.channel && info.bits_per_sample;
 }
 
+OggCodecType OggDecoderGetCodecType() {
+    return codecType;
+}
+
 #else
 
 bool OggDecoderOpen() { return false; }
@@ -106,5 +134,6 @@ OggDecodeResult OggDecoderDecode(uint8_t*, size_t, uint8_t*, size_t,
 bool OggDecoderGetInfo(uint32_t*, uint8_t*, uint8_t*, uint32_t*) {
     return false;
 }
+OggCodecType OggDecoderGetCodecType() { return OGG_CODEC_UNKNOWN; }
 
 #endif

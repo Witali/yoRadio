@@ -884,16 +884,28 @@ void BitrateWidget::_draw(){
   snprintf(_buf, 6, "%d", _bitrate);
   dsp.setCursor(_config.left + _dimension/2 - _charWidth*strlen(_buf)/2 + 1, _config.top + _dimension/4 - _textheight/2+1);
   dsp.print(_buf);
-  dsp.setTextColor(_bgcolor, _fgcolor);
-  dsp.setCursor(_config.left + _dimension/2 - _charWidth*3/2 + 1, _config.top + _dimension - _dimension/4 - _textheight/2);
+  const char* formatText = "";
   switch(_format){
-    case BF_MP3:  dsp.print("MP3"); break;
-    case BF_AAC:  dsp.print("AAC"); break;
-    case BF_FLAC: dsp.print("FLC"); break;
-    case BF_OGG:  dsp.print("OGG"); break;
-    case BF_WAV:  dsp.print("WAV"); break;
-    default:                        break;
+    case BF_MP3:  formatText = "MP3";  break;
+    case BF_AAC:  formatText = "AAC";  break;
+    case BF_FLAC: formatText = "FLC";  break;
+    case BF_OGG:  formatText = "OGG";  break;
+    case BF_OPUS: formatText = "OPUS"; break;
+    case BF_WAV:  formatText = "WAV";  break;
+    default:                         break;
   }
+  uint8_t formatSize = _config.textsize;
+  uint8_t formatWidth = _charWidth;
+  uint16_t formatHeight = _textheight;
+  if(formatWidth * strlen(formatText) > _dimension && formatSize > 1) {
+    --formatSize;
+    _charSize(formatSize, formatWidth, formatHeight);
+  }
+  dsp.setTextSize(formatSize);
+  dsp.setTextColor(_bgcolor, _fgcolor);
+  dsp.setCursor(_config.left + _dimension/2 - formatWidth*strlen(formatText)/2 + 1,
+                _config.top + _dimension - _dimension/4 - formatHeight/2);
+  dsp.print(formatText);
 }
 
 void BitrateWidget::_clear() {
