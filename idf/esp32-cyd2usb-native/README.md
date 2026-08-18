@@ -78,6 +78,14 @@ It reuses the `idf6_i2s_compat`/`idf5_legacy_dac_backend` adapter contract from
 the existing `esp32-cyd2usb-minimal` profile instead of duplicating the old
 driver lifecycle inside the native audio pipeline.
 
+The legacy DAC profile applies x16 oversampling with continuous fractional
+error diffusion. A 48 kHz PCM stream therefore drives the 8-bit DAC at
+768 kHz; 44.1 kHz becomes 705.6 kHz, and other supported 8-48 kHz streams use
+the same `Fs x 16` rule. Each input sample is expanded on the fly into adjacent
+8-bit DAC codes, so the existing 6 KiB conversion buffer is reused and no
+full oversampled stream is stored in RAM. The error accumulator is preserved
+between PCM samples and reset only when the input sample rate changes.
+
 The pipeline uses 8 KiB compressed and 8 KiB PCM rings and logs free heap
 after allocating them. Ring-buffer items
 are acquired in place instead of being allocated for every audio block, so

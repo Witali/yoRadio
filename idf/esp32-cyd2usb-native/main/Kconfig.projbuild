@@ -20,8 +20,10 @@ menu "yoRadio native firmware"
             bool "Legacy ESP-IDF 5.5 I2S/DAC on GPIO26"
             help
                 Compile Espressif's final legacy I2S built-in-DAC driver from
-                the pinned ESP-IDF v5.5.4 source tree. This is intended as a
-                compatibility and audio-quality comparison backend.
+                the pinned ESP-IDF v5.5.4 source tree. PCM is oversampled x16
+                and its fractional low byte is noise-shaped between adjacent
+                8-bit DAC codes. This is intended as a compatibility and
+                audio-quality comparison backend.
 
     endchoice
 
