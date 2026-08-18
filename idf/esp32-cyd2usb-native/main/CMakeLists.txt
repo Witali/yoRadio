@@ -4,6 +4,7 @@ get_filename_component(YORADIO_ROOT
 idf_component_register(
   SRCS
     "app_main.c"
+    "audio_service.c"
     "cyd_display.c"
     "native_state.c"
     "network_service.c"
@@ -15,11 +16,14 @@ idf_component_register(
     esp_driver_i2s
     esp_driver_dac
     esp_event
+    esp_http_client
     esp_http_server
     esp_lcd
     esp_netif
     esp_timer
     esp_wifi
+    esp_ringbuf
+    mbedtls
     nvs_flash
     spiffs
     esp_audio_codec)

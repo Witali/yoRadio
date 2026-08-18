@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include "audio_service.h"
 #include "cyd_display.h"
 #include "esp_check.h"
 #include "esp_log.h"
@@ -67,19 +68,16 @@ static void display_task(void *argument) {
     }
 }
 
-static void audio_task(void *argument) {
-    (void)argument;
-    // The decoder/output pipeline is kept on core 1. Until a station is
-    // selected it sleeps and consumes no decoder heap or CPU time.
-    while (true) vTaskDelay(pdMS_TO_TICKS(1000));
-}
-
 static void network_task(void *argument) {
     (void)argument;
     esp_err_t result = network_service_start(&s_state);
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Network failed: %s", esp_err_to_name(result));
         native_state_set_network(&s_state, NATIVE_NETWORK_ERROR, 0);
+    }
+    result = audio_service_start(&s_state);
+    if (result != ESP_OK) {
+        ESP_LOGE(TAG, "Audio service failed: %s", esp_err_to_name(result));
     }
     result = web_service_start(&s_state);
     if (result != ESP_OK) {
@@ -107,6 +105,4 @@ void app_main(void) {
 
     xTaskCreatePinnedToCore(display_task, "display", 3072, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(network_task, "network", 6144, NULL, 3, NULL, 0);
-    xTaskCreatePinnedToCore(audio_task, "audio", 8192, NULL, 5, NULL, 1);
 }
-
