@@ -1,0 +1,28 @@
+menu "yoRadio native firmware"
+
+    choice YORADIO_NATIVE_AUDIO_OUTPUT
+        prompt "Default audio output"
+        default YORADIO_NATIVE_AUDIO_OUTPUT_PDM
+
+        config YORADIO_NATIVE_AUDIO_OUTPUT_PDM
+            bool "I2S hardware PCM-to-PDM on GPIO26"
+            help
+                Use the ESP32 I2S0 PCM-to-PDM converter. The hardware side
+                runs at 48 kHz with a 6.144 MHz PDM carrier; lower-rate input
+                streams are resampled to 48 kHz.
+
+        config YORADIO_NATIVE_AUDIO_OUTPUT_DAC
+            bool "Internal 8-bit DAC on GPIO26"
+            help
+                Use the ESP32 internal DAC continuous-mode driver.
+
+        config YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC
+            bool "Legacy ESP-IDF 5.5 I2S/DAC on GPIO26"
+            help
+                Compile Espressif's final legacy I2S built-in-DAC driver from
+                the pinned ESP-IDF v5.5.4 source tree. This is intended as a
+                compatibility and audio-quality comparison backend.
+
+    endchoice
+
+endmenu

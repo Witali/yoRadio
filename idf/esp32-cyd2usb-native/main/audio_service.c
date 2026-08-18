@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "driver/dac_continuous.h"
 #include "esp_audio_dec_default.h"
 #include "esp_audio_simple_dec.h"
 #include "esp_audio_simple_dec_default.h"
+#include "esp_check.h"
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 #include "esp_heap_caps.h"
@@ -15,6 +15,7 @@
 #include "freertos/queue.h"
 #include "freertos/ringbuf.h"
 #include "freertos/task.h"
+#include "native_audio_output.h"
 
 #define STREAM_CHUNK_SIZE 2048
 #define DECODE_BUFFER_INITIAL 12288
@@ -315,78 +316,23 @@ static void decoder_task(void *argument) {
     }
 }
 
-static esp_err_t configure_dac(dac_continuous_handle_t *handle,
-                               uint32_t sample_rate) {
-    if (*handle) {
-        dac_continuous_disable(*handle);
-        dac_continuous_del_channels(*handle);
-        *handle = NULL;
-    }
-    dac_continuous_config_t config = {
-        .chan_mask = DAC_CHANNEL_MASK_CH1,
-        .desc_num = 6,
-        .buf_size = 1024,
-        .freq_hz = sample_rate,
-        .offset = 0,
-        .clk_src = DAC_DIGI_CLK_SRC_APLL,
-        .chan_mode = DAC_CHANNEL_MODE_SIMUL,
-    };
-    esp_err_t result = dac_continuous_new_channels(&config, handle);
-    if (result != ESP_OK) return result;
-    result = dac_continuous_enable(*handle);
-    if (result != ESP_OK) return result;
-    uint8_t silence[1024];
-    memset(silence, 0x80, sizeof(silence));
-    size_t written;
-    return dac_continuous_write(*handle, silence, sizeof(silence), &written,
-                                1000);
-}
-
-static size_t pcm_to_dac(const pcm_packet_t *packet, uint8_t *output,
-                         size_t output_capacity) {
-    if (packet->bits_per_sample != 16 || packet->channels == 0) return 0;
-    size_t frame_bytes = (size_t)packet->channels * 2;
-    size_t frames = packet->data_size / frame_bytes;
-    if (frames > output_capacity) frames = output_capacity;
-    const int16_t *samples = (const int16_t *)packet->data;
-    for (size_t frame = 0; frame < frames; ++frame) {
-        int32_t mono = samples[frame * packet->channels];
-        if (packet->channels >= 2) {
-            mono = (mono + samples[frame * packet->channels + 1]) / 2;
-        }
-        int32_t value = (mono >> 8) + 128;
-        if (value < 0) value = 0;
-        if (value > 255) value = 255;
-        output[frame] = (uint8_t)value;
-    }
-    return frames;
-}
-
 static void output_task(void *argument) {
     (void)argument;
-    dac_continuous_handle_t dac = NULL;
     uint32_t sample_rate = 0;
-    uint8_t *dac_data = malloc(PCM_PACKET_DATA_SIZE);
-    if (!dac_data) {
-        ESP_LOGE(TAG, "No memory for DAC conversion buffer");
-        vTaskDelete(NULL);
-    }
     while (true) {
         size_t item_size = 0;
         pcm_packet_t *packet = xRingbufferReceive(s_pcm, &item_size,
-                                                  pdMS_TO_TICKS(20));
+                                                  pdMS_TO_TICKS(5));
         if (!packet) {
-            if (dac) {
-                memset(dac_data, 0x80, 256);
-                size_t written;
-                dac_continuous_write(dac, dac_data, 256, &written, 100);
-            }
+            native_audio_output_idle();
             continue;
         }
         if (packet->sample_rate != sample_rate) {
-            esp_err_t result = configure_dac(&dac, packet->sample_rate);
+            esp_err_t result =
+                native_audio_output_configure(packet->sample_rate);
             if (result != ESP_OK) {
-                ESP_LOGE(TAG, "DAC %lu Hz setup failed: %s",
+                ESP_LOGE(TAG, "%s %lu Hz setup failed: %s",
+                         native_audio_output_name(),
                          (unsigned long)packet->sample_rate,
                          esp_err_to_name(result));
                 vRingbufferReturnItem(s_pcm, packet);
@@ -394,10 +340,12 @@ static void output_task(void *argument) {
             }
             sample_rate = packet->sample_rate;
         }
-        size_t size = pcm_to_dac(packet, dac_data, PCM_PACKET_DATA_SIZE);
-        if (size && dac) {
-            size_t written;
-            dac_continuous_write(dac, dac_data, size, &written, 1000);
+        esp_err_t result = native_audio_output_write_pcm(
+            packet->data, packet->data_size, packet->bits_per_sample,
+            packet->channels);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),
+                     esp_err_to_name(result));
         }
         vRingbufferReturnItem(s_pcm, packet);
     }
@@ -405,6 +353,8 @@ static void output_task(void *argument) {
 
 esp_err_t audio_service_start(native_state_t *state) {
     s_state = state;
+    ESP_RETURN_ON_ERROR(native_audio_output_init(), TAG,
+                        "initialize audio output");
     atomic_init(&s_generation, 0);
     s_commands = xQueueCreate(1, sizeof(play_command_t));
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
@@ -418,7 +368,9 @@ esp_err_t audio_service_start(native_state_t *state) {
                                 NULL, 1) != pdPASS) {
         return ESP_ERR_NO_MEM;
     }
-    ESP_LOGI(TAG, "Pipeline ready: 8 KiB compressed + 8 KiB PCM, free heap %u",
+    ESP_LOGI(TAG,
+             "Pipeline ready: %s, 8 KiB compressed + 8 KiB PCM, free heap %u",
+             native_audio_output_name(),
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
     return ESP_OK;
 }
