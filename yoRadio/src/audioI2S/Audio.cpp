@@ -268,6 +268,10 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
             m_f_forceMono = true;
           #else
             log_i("internal DAC (deferred startup)");
+            // IDF 5 legacy DAC clock division cannot start reliably at the
+            // generic 16 kHz constructor default. Use a safe bootstrap rate;
+            // the first decoded frame will select the stream rate later.
+            m_i2s_config.sample_rate      = 48000;
             m_i2s_config.mode             = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN );
 
             #if ESP_ARDUINO_VERSION_MAJOR >= 2
@@ -394,6 +398,7 @@ bool Audio::writeDacBiasRamp() {
 
     constexpr uint32_t rampDurationMs = 100;
     constexpr size_t rampChunkFrames = 64;
+    const TickType_t rampWriteTimeout = pdMS_TO_TICKS(250);
     const size_t calculatedFrames = static_cast<size_t>(
         (static_cast<uint64_t>(m_i2s_config.sample_rate) * rampDurationMs + 999U) / 1000U);
     const size_t rampFrames = calculatedFrames < 2U ? 2U : calculatedFrames;
@@ -410,11 +415,11 @@ bool Audio::writeDacBiasRamp() {
         size_t bytesWritten = 0;
       #ifdef YORADIO_ESP_IDF_MINIMAL
         const esp_err_t result = idf6_dac_output_write(
-            ramp, count * sizeof(uint32_t), &bytesWritten, portMAX_DELAY);
+            ramp, count * sizeof(uint32_t), &bytesWritten, rampWriteTimeout);
       #else
         const esp_err_t result = i2s_write(
             (i2s_port_t)m_i2s_num, ramp, count * sizeof(uint32_t),
-            &bytesWritten, portMAX_DELAY);
+            &bytesWritten, rampWriteTimeout);
       #endif
         if(result != ESP_OK || bytesWritten != count * sizeof(uint32_t)) return false;
     }

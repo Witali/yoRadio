@@ -53,6 +53,18 @@ test("DAC bias ramp lasts 100 ms and ends at unsigned midpoint", () => {
   assert.match(ramp, /\(code << 24\) \| \(code << 8\)/);
   assert.match(ramp, /idf6_dac_output_write/);
   assert.match(ramp, /i2s_write/);
+  assert.doesNotMatch(ramp, /portMAX_DELAY/);
+});
+
+test("legacy DAC starts at a clock-safe bootstrap rate", () => {
+  const constructor = audio.slice(
+    audio.indexOf("Audio::Audio("),
+    audio.indexOf("bool Audio::beginOutput()"),
+  );
+  assert.match(
+    constructor,
+    /internal DAC \(deferred startup\)[\s\S]*m_i2s_config\.sample_rate\s*=\s*48000/,
+  );
 });
 
 test("sample-rate changes keep the DAC at midpoint", () => {
