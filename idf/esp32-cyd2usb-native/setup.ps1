@@ -12,6 +12,7 @@ if ([string]::IsNullOrWhiteSpace($DependencyRoot)) {
 }
 $DependencyRoot = [IO.Path]::GetFullPath($DependencyRoot)
 $idfPath = Join-Path $DependencyRoot "v6.0.2"
+$legacyIdfPath = Join-Path $DependencyRoot "v5.5.4"
 $idfToolsPath = Join-Path $DependencyRoot "tools-v6.0.2"
 $audioCodecPath = Join-Path $DependencyRoot "esp-adf-libs"
 $pythonVersion = "3.12.10"
@@ -105,6 +106,13 @@ Install-GitDependency `
     -Revision "v6.0.2" `
     -Destination $idfPath `
     -Submodules
+# ESP-IDF 6 removed the legacy I2S built-in-DAC driver. Keep the final IDF 5
+# source available for the optional comparison backend; its toolchain and
+# submodules are not needed.
+Install-GitDependency `
+    -Url "https://github.com/espressif/esp-idf.git" `
+    -Revision "v5.5.4" `
+    -Destination $legacyIdfPath
 Install-AudioCodec -Destination $audioCodecPath
 
 if (-not $SkipToolchain) {
@@ -125,5 +133,4 @@ if (-not $SkipToolchain) {
     }
 }
 
-Write-Host "Native dependencies are ready in $DependencyRoot"
-
+Write-Host "Native dependencies, including legacy DAC source, are ready in $DependencyRoot"

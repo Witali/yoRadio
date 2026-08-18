@@ -2,6 +2,9 @@
 param(
     [string]$BuildDirectory = "build",
     [string]$DependencyRoot = "",
+    [Alias("DacBackend")]
+    [ValidateSet("pdm", "continuous", "legacy")]
+    [string]$AudioBackend = "pdm",
     [switch]$Setup,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")
@@ -15,6 +18,7 @@ if ([string]::IsNullOrWhiteSpace($DependencyRoot)) {
 }
 $DependencyRoot = [IO.Path]::GetFullPath($DependencyRoot)
 $idf = Join-Path $DependencyRoot "v6.0.2"
+$legacyIdf = Join-Path $DependencyRoot "v5.5.4"
 $idfTools = Join-Path $DependencyRoot "tools-v6.0.2"
 $bootstrapPython = Join-Path $DependencyRoot "python-3.12.10\tools"
 $audioCodec = Join-Path $DependencyRoot "esp-adf-libs\esp_audio_codec"
@@ -26,6 +30,9 @@ $required = @(
     (Join-Path $audioCodec "CMakeLists.txt"),
     (Join-Path $audioCodec "lib\esp32\libesp_audio_codec.a")
 )
+if ($AudioBackend -eq "legacy") {
+    $required += (Join-Path $legacyIdf "components\driver\deprecated\i2s_legacy.c")
+}
 $missing = @($required | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
 if ($Setup -or $missing.Count) {
     & (Join-Path $project "setup.ps1") -DependencyRoot $DependencyRoot
@@ -43,6 +50,7 @@ $saved = @{
     PYTHONIOENCODING = $env:PYTHONIOENCODING
     PYTHONUTF8 = $env:PYTHONUTF8
     YORADIO_AUDIO_CODEC_COMPONENT = $env:YORADIO_AUDIO_CODEC_COMPONENT
+    YORADIO_LEGACY_IDF = $env:YORADIO_LEGACY_IDF
 }
 try {
     $env:IDF_TOOLS_PATH = $idfTools
@@ -51,6 +59,7 @@ try {
     $env:PYTHONIOENCODING = "utf-8"
     $env:PYTHONUTF8 = "1"
     $env:YORADIO_AUDIO_CODEC_COMPONENT = $audioCodec
+    $env:YORADIO_LEGACY_IDF = $legacyIdf
     $env:Path = "$bootstrapPython;$bootstrapPython\Scripts;$env:Path"
     . (Join-Path $idf "export.ps1")
     $idfPython = (Get-Command python.exe -CommandType Application |
@@ -61,11 +70,22 @@ try {
     if ($idfPathValue.Count -ne 1) { throw "ESP-IDF toolchain PATH was not exported" }
     Push-Location $project
     try {
+        $profileArguments = switch ($AudioBackend) {
+            "continuous" {
+                @("-D", "SDKCONFIG=sdkconfig.dac", "-D",
+                  "SDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.dac.defaults")
+            }
+            "legacy" {
+                @("-D", "SDKCONFIG=sdkconfig.legacy-dac", "-D",
+                  "SDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.legacy-dac.defaults")
+            }
+            default { @("-D", "SDKCONFIG=sdkconfig") }
+        }
         $arguments = @(
             (Join-Path $idf "tools\idf.py"),
             "-B", $BuildDirectory,
             "--no-ccache"
-        ) + $IdfArguments
+        ) + $profileArguments + $IdfArguments
         $process = Start-Process -Wait -PassThru -NoNewWindow `
             -FilePath $idfPython `
             -ArgumentList $arguments `
@@ -83,4 +103,3 @@ try {
         }
     }
 }
-

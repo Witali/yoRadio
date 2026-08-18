@@ -9,4 +9,3 @@ set(EXTRA_COMPONENT_DIRS "$ENV{YORADIO_AUDIO_CODEC_COMPONENT}")
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yoradio_cyd2usb_native)
-

@@ -21,6 +21,20 @@ To reuse a previously installed dependency cache:
 .\build.ps1 -DependencyRoot C:\path\to\.idf
 ```
 
+PDM is the normal build. To make a separate internal-DAC build without
+changing that default:
+
+```powershell
+.\build.ps1 -BuildDirectory build-dac -AudioBackend continuous
+```
+
+The original ESP-IDF 5.5 I2S/DAC implementation is also available as an
+isolated comparison build:
+
+```powershell
+.\build.ps1 -BuildDirectory build-legacy-dac -AudioBackend legacy
+```
+
 To flash only the application and preserve Wi-Fi/SPIFFS:
 
 ```powershell
@@ -48,9 +62,21 @@ Arduino WebSocket protocol:
 
 Supported decoder selections are `auto`, `mp3`, `aac`, `flac`, `ogg`,
 `vorbis`, and `opus` (Vorbis and Opus are detected inside the OGG container).
-Network streaming runs on core 0. Decode and DAC output run as two independent
+Network streaming runs on core 0. Decode and audio output run as two independent
 tasks on core 1. Compressed and PCM ring buffers prevent display/WebUI work
 from blocking the audio pipeline.
+
+I2S hardware PCM-to-PDM on GPIO26 is selected by default. It uses the new
+ESP-IDF channel API and starts once at a fixed 48 kHz hardware rate with a
+6.144 MHz carrier. Changing stations does not reconfigure PDM: input streams
+below 48 kHz are linearly resampled and only the resampler state changes. The
+internal 8-bit DAC remains available as the alternative
+`YORADIO_NATIVE_AUDIO_OUTPUT_DAC` choice in `menuconfig`. A third
+`YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC` choice compiles the final official
+ESP-IDF 5.5.4 legacy I2S/DAC driver for comparison, still without Arduino.
+It reuses the `idf6_i2s_compat`/`idf5_legacy_dac_backend` adapter contract from
+the existing `esp32-cyd2usb-minimal` profile instead of duplicating the old
+driver lifecycle inside the native audio pipeline.
 
 The pipeline uses 8 KiB compressed and 8 KiB PCM rings and logs free heap
 after allocating them. Ring-buffer items
