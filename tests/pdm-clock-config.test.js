@@ -27,6 +27,13 @@ test("PDM linearly upsamples source rates below 48 kHz", () => {
   assert.match(source, /resetResampler\(\);[\s\S]*memset\(sampleBuffer/);
 });
 
+test("PDM channel configuration uses the typed I2S port required by IDF 5", () => {
+  assert.match(
+    source,
+    /I2S_CHANNEL_DEFAULT_CONFIG\(\s*static_cast<i2s_port_t>\(outputPort\)/,
+  );
+});
+
 test("minimal IDF build corrects fractional fp/fs PDM clock calculation", () => {
   const cmake = fs.readFileSync(
     path.join(__dirname, "..", "idf", "esp32-cyd2usb-minimal", "CMakeLists.txt"),

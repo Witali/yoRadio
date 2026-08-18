@@ -160,7 +160,7 @@ esp_err_t pdmOutputBegin(uint8_t port, uint8_t dataPin,
   resetResampler();
 
   i2s_chan_config_t channelConfig = I2S_CHANNEL_DEFAULT_CONFIG(
-      outputPort, I2S_ROLE_MASTER);
+      static_cast<i2s_port_t>(outputPort), I2S_ROLE_MASTER);
   channelConfig.dma_desc_num = kDmaDescriptors;
   channelConfig.dma_frame_num = kDmaSamples;
   // Unlike the HLV player, YoRadio feeds I2S with blocking writes and has no
