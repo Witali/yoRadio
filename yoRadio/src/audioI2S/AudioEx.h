@@ -453,6 +453,8 @@ private:
   }
 
 private:
+    bool startDacOutput();
+    bool writeDacBiasRamp();
     void fillDacSilence(bool primeDma = false);
 
     const char *codecname[9] = {"unknown", "WAV", "MP3", "AAC", "M4A", "FLAC", "OGG", "OGG FLAC", "OPUS"};
@@ -590,6 +592,7 @@ private:
     bool            m_f_loop = false;               // Set if audio file should loop
     bool            m_f_forceMono = false;          // if true stereo -> mono
     bool            m_f_internalDAC = false;        // false: output vis I2S, true output via internal DAC
+    bool            m_f_outputReady = false;        // output hardware has been installed and routed
     bool            m_f_rtsp = false;               // set if RTSP is used (m3u8 stream)
     bool            m_f_m3u8data = false;           // used in processM3U8entries
     bool            m_f_Log = false;                // set in platformio.ini  -DAUDIO_LOG and -DCORE_DEBUG_LEVEL=3 or 4
