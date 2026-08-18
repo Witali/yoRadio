@@ -368,10 +368,51 @@ const char *native_audio_output_name(void) {
 #define LEGACY_DMA_DESCRIPTORS 8
 #define LEGACY_DMA_FRAMES 512
 #define LEGACY_OUTPUT_BYTES (OUTPUT_PACKET_BYTES * 2)
+#define LEGACY_OVERSAMPLE_FACTOR 16U
+#define LEGACY_MIN_INPUT_SAMPLE_RATE 8000U
+#define LEGACY_MAX_INPUT_SAMPLE_RATE 48000U
 
 static bool s_legacy_installed;
 static uint32_t s_legacy_sample_rate;
+static uint32_t s_legacy_output_sample_rate;
 static uint32_t *s_legacy_frames;
+static uint16_t s_legacy_fractional_error;
+
+static uint32_t legacy_pack_dac_code(uint8_t code) {
+    uint16_t slot = (uint16_t)code << 8;
+    return ((uint32_t)slot << 16) | slot;
+}
+
+// Diffuse the discarded low byte of 16-bit PCM across the x16 DAC updates.
+// The accumulator is intentionally continuous between PCM samples: resetting
+// it per sample would turn the remainder into correlated quantization error.
+static uint8_t legacy_fractional_dac_step(int16_t pcm) {
+    uint16_t value = (uint16_t)((int32_t)pcm + 32768);
+    uint16_t base = value >> 8;
+    if (base == UINT8_MAX) {
+        // There is no code above 255. Avoid retaining an impossible positive
+        // error while the signal is clipped at the upper DAC rail.
+        s_legacy_fractional_error = 0;
+        return UINT8_MAX;
+    }
+
+    s_legacy_fractional_error += value & UINT8_MAX;
+    if (s_legacy_fractional_error >= 256U) {
+        s_legacy_fractional_error -= 256U;
+        ++base;
+    }
+    return (uint8_t)base;
+}
+
+static esp_err_t legacy_write_frames(size_t frames) {
+    if (!frames) return ESP_OK;
+    size_t written = 0;
+    esp_err_t result = idf6_dac_output_write(
+        s_legacy_frames, frames * sizeof(uint32_t), &written,
+        pdMS_TO_TICKS(1000));
+    if (result != ESP_OK) return result;
+    return written == frames * sizeof(uint32_t) ? ESP_OK : ESP_FAIL;
+}
 
 static esp_err_t legacy_write_silence(size_t frames) {
     size_t capacity = LEGACY_OUTPUT_BYTES / sizeof(uint32_t);
@@ -380,12 +421,8 @@ static esp_err_t legacy_write_silence(size_t frames) {
     }
     while (frames) {
         size_t chunk = frames > capacity ? capacity : frames;
-        size_t written = 0;
-        esp_err_t result = idf6_dac_output_write(
-            s_legacy_frames, chunk * sizeof(uint32_t), &written,
-            pdMS_TO_TICKS(1000));
-        if (result != ESP_OK) return result;
-        if (written != chunk * sizeof(uint32_t)) return ESP_FAIL;
+        ESP_RETURN_ON_ERROR(legacy_write_frames(chunk), TAG,
+                            "write legacy DAC silence");
         frames -= chunk;
     }
     return ESP_OK;
@@ -397,18 +434,31 @@ esp_err_t native_audio_output_init(void) {
 }
 
 esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
-    if (!input_sample_rate) return ESP_ERR_INVALID_ARG;
+    if (input_sample_rate < LEGACY_MIN_INPUT_SAMPLE_RATE ||
+        input_sample_rate > LEGACY_MAX_INPUT_SAMPLE_RATE) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    uint32_t output_sample_rate =
+        input_sample_rate * LEGACY_OVERSAMPLE_FACTOR;
     if (s_legacy_installed) {
         if (input_sample_rate == s_legacy_sample_rate) return ESP_OK;
-        ESP_RETURN_ON_ERROR(idf6_dac_output_set_sample_rate(input_sample_rate),
+        ESP_RETURN_ON_ERROR(idf6_dac_output_set_sample_rate(output_sample_rate),
                             TAG, "set legacy DAC clock");
         s_legacy_sample_rate = input_sample_rate;
+        s_legacy_output_sample_rate = output_sample_rate;
+        s_legacy_fractional_error = 0;
+        ESP_RETURN_ON_ERROR(
+            legacy_write_silence(LEGACY_DMA_DESCRIPTORS * LEGACY_DMA_FRAMES),
+            TAG, "prime resampled legacy DAC");
+        ESP_LOGI(TAG, "Legacy DAC input %lu Hz, x%u output %lu Hz",
+                 (unsigned long)input_sample_rate, LEGACY_OVERSAMPLE_FACTOR,
+                 (unsigned long)output_sample_rate);
         return ESP_OK;
     }
 
     i2s_config_t config = {
         .mode = I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN,
-        .sample_rate = input_sample_rate,
+        .sample_rate = output_sample_rate,
         .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
         .communication_format = I2S_COMM_FORMAT_STAND_MSB,
@@ -426,11 +476,16 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
                         "start legacy DAC adapter");
     s_legacy_installed = true;
     s_legacy_sample_rate = input_sample_rate;
+    s_legacy_output_sample_rate = output_sample_rate;
+    s_legacy_fractional_error = 0;
     ESP_RETURN_ON_ERROR(
         legacy_write_silence(LEGACY_DMA_DESCRIPTORS * LEGACY_DMA_FRAMES), TAG,
         "prime legacy DAC with midpoint");
-    ESP_LOGI(TAG, "Legacy ESP-IDF 5.5 I2S/DAC at %lu Hz on GPIO26",
-             (unsigned long)input_sample_rate);
+    ESP_LOGI(TAG,
+             "Legacy ESP-IDF 5.5 I2S/DAC: input %lu Hz, x%u output %lu Hz "
+             "on GPIO26",
+             (unsigned long)input_sample_rate, LEGACY_OVERSAMPLE_FACTOR,
+             (unsigned long)output_sample_rate);
     return ESP_OK;
 }
 
@@ -444,28 +499,33 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
     size_t capacity = LEGACY_OUTPUT_BYTES / sizeof(uint32_t);
-    if (frames > capacity) frames = capacity;
+    size_t buffered = 0;
     for (size_t frame = 0; frame < frames; ++frame) {
-        uint16_t unsigned_sample = (uint16_t)(
-            (int32_t)pcm_mono_sample(data + frame * frame_bytes, channels) +
-            32768);
-        s_legacy_frames[frame] =
-            ((uint32_t)unsigned_sample << 16) | unsigned_sample;
+        int16_t pcm =
+            pcm_mono_sample(data + frame * frame_bytes, channels);
+        for (uint32_t phase = 0; phase < LEGACY_OVERSAMPLE_FACTOR; ++phase) {
+            uint8_t code = legacy_fractional_dac_step(pcm);
+            s_legacy_frames[buffered++] = legacy_pack_dac_code(code);
+            if (buffered == capacity) {
+                ESP_RETURN_ON_ERROR(legacy_write_frames(buffered), TAG,
+                                    "write oversampled legacy DAC");
+                buffered = 0;
+            }
+        }
     }
-    size_t written = 0;
-    esp_err_t result = idf6_dac_output_write(
-        s_legacy_frames, frames * sizeof(uint32_t), &written,
-        pdMS_TO_TICKS(1000));
-    if (result != ESP_OK) return result;
-    return written == frames * sizeof(uint32_t) ? ESP_OK : ESP_FAIL;
+    return legacy_write_frames(buffered);
 }
 
 void native_audio_output_idle(void) {
-    if (s_legacy_installed) legacy_write_silence(128);
+    if (!s_legacy_installed) return;
+    // output_task wakes after 5 ms without PCM. Supply the corresponding
+    // amount of midpoint data at the oversampled DAC clock.
+    size_t frames = (s_legacy_output_sample_rate + 199U) / 200U;
+    legacy_write_silence(frames);
 }
 
 const char *native_audio_output_name(void) {
-    return "legacy I2S/DAC";
+    return "legacy I2S/DAC x16";
 }
 
 #else
