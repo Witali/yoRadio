@@ -52,6 +52,7 @@ Network streaming runs on core 0. Decode and DAC output run as two independent
 tasks on core 1. Compressed and PCM ring buffers prevent display/WebUI work
 from blocking the audio pipeline.
 
-The runtime logs free heap after allocating the pipeline. Ring-buffer items
+The pipeline uses 8 KiB compressed and 8 KiB PCM rings and logs free heap
+after allocating them. Ring-buffer items
 are acquired in place instead of being allocated for every audio block, so
 continuous playback does not churn the general heap.
