@@ -18,9 +18,9 @@
 
 #define STREAM_CHUNK_SIZE 2048
 #define DECODE_BUFFER_INITIAL 12288
-#define ENCODED_RING_SIZE (12 * 1024)
-#define PCM_RING_SIZE (12 * 1024)
-#define PCM_PACKET_DATA_SIZE 4096
+#define ENCODED_RING_SIZE (8 * 1024)
+#define PCM_RING_SIZE (8 * 1024)
+#define PCM_PACKET_DATA_SIZE 3072
 
 typedef struct {
     uint32_t generation;
@@ -418,7 +418,7 @@ esp_err_t audio_service_start(native_state_t *state) {
                                 NULL, 1) != pdPASS) {
         return ESP_ERR_NO_MEM;
     }
-    ESP_LOGI(TAG, "Pipeline ready: 12 KiB compressed + 12 KiB PCM, free heap %u",
+    ESP_LOGI(TAG, "Pipeline ready: 8 KiB compressed + 8 KiB PCM, free heap %u",
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
     return ESP_OK;
 }
