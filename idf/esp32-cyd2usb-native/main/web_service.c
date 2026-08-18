@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "audio_service.h"
 #include "esp_check.h"
 #include "esp_http_server.h"
 #include "esp_log.h"
@@ -40,6 +41,50 @@ static esp_err_t reconnect_handler(httpd_req_t *request) {
     }
     httpd_resp_set_type(request, "application/json");
     return httpd_resp_sendstr(request, "{\"reconnecting\":true}");
+}
+
+static native_codec_t parse_codec(httpd_req_t *request) {
+    char query[80];
+    char value[16];
+    if (httpd_req_get_url_query_str(request, query, sizeof(query)) == ESP_OK &&
+        httpd_query_key_value(query, "codec", value, sizeof(value)) == ESP_OK) {
+        if (strcasecmp(value, "mp3") == 0) return NATIVE_CODEC_MP3;
+        if (strcasecmp(value, "aac") == 0) return NATIVE_CODEC_AAC;
+        if (strcasecmp(value, "flac") == 0) return NATIVE_CODEC_FLAC;
+        if (strcasecmp(value, "ogg") == 0 ||
+            strcasecmp(value, "opus") == 0 ||
+            strcasecmp(value, "vorbis") == 0) return NATIVE_CODEC_OGG;
+    }
+    return NATIVE_CODEC_AUTO;
+}
+
+static esp_err_t play_handler(httpd_req_t *request) {
+    if (request->content_len <= 0 || request->content_len >= 512) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
+                                   "Body must contain a stream URL");
+    }
+    char url[512];
+    size_t total = 0;
+    while (total < (size_t)request->content_len) {
+        int received = httpd_req_recv(request, url + total,
+                                      request->content_len - total);
+        if (received <= 0) return ESP_FAIL;
+        total += received;
+    }
+    url[total] = '\0';
+    esp_err_t result = audio_service_play(url, parse_codec(request));
+    if (result != ESP_OK) {
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
+                                   "Invalid stream URL");
+    }
+    httpd_resp_set_type(request, "application/json");
+    return httpd_resp_sendstr(request, "{\"playing\":true}");
+}
+
+static esp_err_t stop_handler(httpd_req_t *request) {
+    audio_service_stop();
+    httpd_resp_set_type(request, "application/json");
+    return httpd_resp_sendstr(request, "{\"playing\":false}");
 }
 
 static const char *content_type(const char *path) {
@@ -114,6 +159,16 @@ esp_err_t web_service_start(native_state_t *state) {
         .method = HTTP_POST,
         .handler = reconnect_handler,
     };
+    httpd_uri_t play = {
+        .uri = "/api/native/play*",
+        .method = HTTP_POST,
+        .handler = play_handler,
+    };
+    httpd_uri_t stop = {
+        .uri = "/api/native/stop",
+        .method = HTTP_POST,
+        .handler = stop_handler,
+    };
     httpd_uri_t files = {
         .uri = "/*",
         .method = HTTP_GET,
@@ -123,6 +178,10 @@ esp_err_t web_service_start(native_state_t *state) {
                         "Status route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &reconnect), TAG,
                         "Reconnect route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &play), TAG,
+                        "Play route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &stop), TAG,
+                        "Stop route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &files), TAG,
                         "Static route registration failed");
     if (state->lock && xSemaphoreTake(state->lock, pdMS_TO_TICKS(100))) {

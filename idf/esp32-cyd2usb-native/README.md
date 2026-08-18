@@ -36,3 +36,22 @@ To install or restore the WebUI explicitly:
 The display driver is a native ESP-IDF ST7789/SPI-DMA port taken from the
 HLV-codec CYD firmware and kept locally in `main/cyd_display.*`.
 
+## Native service API
+
+The first native port exposes small endpoints independently of the legacy
+Arduino WebSocket protocol:
+
+- `GET /api/native/status`
+- `POST /api/native/reconnect`
+- `POST /api/native/play?codec=auto` with the stream URL as request body
+- `POST /api/native/stop`
+
+Supported decoder selections are `auto`, `mp3`, `aac`, `flac`, `ogg`,
+`vorbis`, and `opus` (Vorbis and Opus are detected inside the OGG container).
+Network streaming runs on core 0. Decode and DAC output run as two independent
+tasks on core 1. Compressed and PCM ring buffers prevent display/WebUI work
+from blocking the audio pipeline.
+
+The runtime logs free heap after allocating the pipeline. Ring-buffer items
+are acquired in place instead of being allocated for every audio block, so
+continuous playback does not churn the general heap.

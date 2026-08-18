@@ -40,8 +40,10 @@ esp_err_t cyd_display_init(cyd_display_t *display) {
         xSemaphoreCreateCounting(CYD_DISPLAY_DMA_BUFFER_COUNT, 0);
     ESP_RETURN_ON_FALSE(display->transfer_done, ESP_ERR_NO_MEM, TAG,
                         "LCD completion semaphore allocation failed");
-    ESP_RETURN_ON_ERROR(cyd_display_set_double_buffered(display, true), TAG,
-                        "LCD secondary DMA buffer allocation failed");
+    // This status-oriented native UI does not redraw full frames at video
+    // rate. A single split DMA buffer saves 10 KiB for TLS and audio codecs.
+    ESP_RETURN_ON_ERROR(cyd_display_set_double_buffered(display, false), TAG,
+                        "LCD DMA buffer setup failed");
 
     bus.mosi_io_num = BOARD_TFT_MOSI;
     bus.miso_io_num = BOARD_TFT_MISO;
@@ -193,4 +195,3 @@ esp_err_t cyd_display_clear(cyd_display_t *display, uint16_t rgb565) {
     }
     return cyd_display_flush(display);
 }
-
