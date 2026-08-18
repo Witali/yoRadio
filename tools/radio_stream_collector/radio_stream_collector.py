@@ -12,7 +12,8 @@ The collector uses three layers:
 
 1. Crawl public HTML/JSON/JavaScript and extract stream-like URLs.
 2. Apply site-specific URL templates where the site exposes channel IDs/slugs.
-3. Optionally query the public Radio Browser directory as a fallback.
+3. Merge a curated baseline playlist with stable, human-readable station names.
+4. Optionally query the public Radio Browser directory as a fallback.
 
 Outputs:
 
@@ -69,8 +70,9 @@ except ImportError as exc:  # pragma: no cover - friendly startup error
     ) from exc
 
 
-VERSION = "1.0.3"
+VERSION = "1.0.4"
 DEFAULT_USER_AGENT = f"yoRadio-stream-collector/{VERSION} (+local playlist utility)"
+DEFAULT_CURATED_PLAYLIST = Path(__file__).with_name("curated_stations.m3u")
 
 MAX_STREAM_URL_LENGTH = 2048
 
@@ -377,6 +379,15 @@ class StreamCollector:
         all_candidates: list[Candidate] = []
         crawl_results: dict[str, CrawlResult] = {}
 
+        if self.args.curated:
+            curated = load_curated_candidates(self.args.curated_playlist)
+            all_candidates.extend(curated)
+            self.logger.info(
+                "Loaded %d curated stations from %s",
+                len(curated),
+                self.args.curated_playlist,
+            )
+
         for key in site_keys:
             spec = SITE_SPECS[key]
             self.logger.info("Collecting %s", spec.title)
@@ -440,6 +451,7 @@ class StreamCollector:
                 self.logger.info("Verified %d/%d", completed, len(tasks))
 
         verified = choose_best_per_station(verified)
+        verified = dedupe_final_streams_by_url(verified)
         verified.sort(key=lambda x: (x.site.lower(), x.name.lower(), not x.ok, x.url))
         return verified
 
@@ -909,17 +921,47 @@ class StreamCollector:
         )
         writer.write(request.encode("ascii", errors="ignore"))
         await writer.drain()
-        raw = await asyncio.wait_for(reader.read(self.args.probe_bytes + 16384), timeout=self.args.timeout)
+        raw = bytearray()
+        header_end = -1
+        separator_size = 0
+        while len(raw) < 16384:
+            chunk = await asyncio.wait_for(reader.read(1024), timeout=self.args.timeout)
+            if not chunk:
+                break
+            raw.extend(chunk)
+            header_end = raw.find(b"\r\n\r\n")
+            separator_size = 4
+            if header_end < 0:
+                header_end = raw.find(b"\n\n")
+                separator_size = 2
+            if header_end >= 0:
+                break
+        if header_end < 0:
+            writer.close()
+            try:
+                await writer.wait_closed()
+            except Exception:
+                pass
+            raise ValueError("no HTTP/ICY header terminator")
+
+        body = bytearray(raw[header_end + separator_size:])
+        while len(body) < self.args.probe_bytes:
+            chunk = await asyncio.wait_for(
+                reader.read(self.args.probe_bytes - len(body)),
+                timeout=self.args.timeout,
+            )
+            if not chunk:
+                break
+            body.extend(chunk)
         writer.close()
         try:
             await writer.wait_closed()
         except Exception:
             pass
 
-        header_blob, sep, body = raw.partition(b"\r\n\r\n")
-        if not sep:
-            raise ValueError("no HTTP/ICY header terminator")
-        lines = header_blob.decode("latin-1", errors="replace").split("\r\n")
+        header_blob = bytes(raw[:header_end])
+        body_bytes = bytes(body[: self.args.probe_bytes])
+        lines = header_blob.decode("latin-1", errors="replace").splitlines()
         status_line = lines[0]
         status_match = re.search(r"\s(\d{3})\s", status_line + " ")
         status = int(status_match.group(1)) if status_match else 0
@@ -931,12 +973,12 @@ class StreamCollector:
         content_type = headers.get("content-type", "").split(";", 1)[0].lower()
         icy_name = headers.get("icy-name", "")
         icy_bitrate = intish(headers.get("icy-br"))
-        codec = detect_codec(content_type, body, url)
-        enough_data = len(body) >= min(512, self.args.probe_bytes)
+        codec = detect_codec(content_type, body_bytes, url)
+        enough_data = len(body_bytes) >= min(512, self.args.probe_bytes)
         ok = 200 <= status < 300 and enough_data and (
             content_type.startswith("audio/")
             or bool(icy_name)
-            or body_has_audio_signature(body)
+            or body_has_audio_signature(body_bytes)
         )
         return ProbeResult(
             ok=ok,
@@ -946,7 +988,7 @@ class StreamCollector:
             content_type=content_type,
             codec=codec,
             bitrate_kbps=icy_bitrate,
-            bytes_read=len(body),
+            bytes_read=len(body_bytes),
             icy_name=icy_name,
             icy_bitrate=icy_bitrate,
             error="" if ok else f"raw ICY response did not look like audio: {status_line}",
@@ -1055,6 +1097,19 @@ def is_sane_stream_url(url: str) -> bool:
         return False
     if parts.scheme not in {"http", "https"} or not parts.hostname:
         return False
+    query_keys = {key.lower() for key, _ in parse_qsl(parts.query, keep_blank_values=True)}
+    # Directory mirrors often retain expired per-listener links. They may still
+    # return a short audio response during probing, but are not stable radio URLs.
+    if query_keys & {"token", "access_token", "auth", "signature", "sig", "expires", "expiry", "hlssid"}:
+        return False
+    # 101.ru archive fragments use a dated hash on the site root. These are finite
+    # recordings rather than continuous station streams.
+    if (
+        (parts.hostname or "").lower().rstrip(".") == "101.ru"
+        and (parts.path or "/") == "/"
+        and {"date", "hash", "start"}.issubset(query_keys)
+    ):
+        return False
     # Poisoned directory entries and minified JS can contain many URLs glued
     # together in one query/path. A valid HTTP URL has only its leading scheme.
     remainder = url.split("://", 1)[1]
@@ -1076,6 +1131,15 @@ def canonical_stream_url(url: str) -> str:
     if path != "/":
         path = path.rstrip("/")
     return urlunsplit((parts.scheme.lower(), parts.netloc.lower(), path, parts.query, ""))
+
+
+def canonical_stream_endpoint(url: str) -> str:
+    """Identify equivalent final URLs, including HTTP/HTTPS variants."""
+    parts = urlsplit(url.strip())
+    path = parts.path or "/"
+    if path != "/":
+        path = path.rstrip("/")
+    return urlunsplit(("", parts.netloc.lower(), path, parts.query, ""))
 
 
 def host_matches(host: str, suffixes: Iterable[str]) -> bool:
@@ -1238,6 +1302,62 @@ def candidates_from_json_block(
 
     walk(obj)
     return found
+
+
+def load_curated_candidates(path: Path) -> list[Candidate]:
+    return candidates_from_m3u_text(
+        path.read_text(encoding="utf-8-sig", errors="replace"),
+        source=str(path.resolve()),
+    )
+
+
+def candidates_from_m3u_text(text: str, *, source: str) -> list[Candidate]:
+    output: list[Candidate] = []
+    pending_name = ""
+    pending_group = ""
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if line.startswith("#EXTINF:"):
+            pending_name = clean_title(line.split(",", 1)[1] if "," in line else "")
+            group_match = re.search(r'group-title="([^"]*)"', line, re.IGNORECASE)
+            pending_group = clean_title(group_match.group(1)) if group_match else ""
+            continue
+        if not pending_name or not line or line.startswith("#"):
+            continue
+        if not is_sane_stream_url(line) or not is_sane_station_name(pending_name):
+            pending_name = ""
+            pending_group = ""
+            continue
+        site = infer_curated_site(pending_name, line, pending_group)
+        output.append(
+            Candidate(
+                site=site,
+                name=pending_name,
+                url=line,
+                source_page=source,
+                discovered_by="curated-m3u",
+                metadata={"curated": True, "curated_group": pending_group},
+            )
+        )
+        pending_name = ""
+        pending_group = ""
+    return output
+
+
+def infer_curated_site(name: str, url: str, group: str = "") -> str:
+    lowered_name = name.lower()
+    host = (urlsplit(url).hostname or "").lower()
+    if "relax fm" in lowered_name:
+        return "relax"
+    if "radiorecord" in host or lowered_name.startswith(("record ", "radio record")):
+        return "record"
+    if host_matches(host, ("101.ru", "gpmradio.ru")) or lowered_name.startswith("101.ru"):
+        return "101"
+    if "zaycev" in host or "zaycev" in lowered_name:
+        return "zaycev"
+    if "caprice" in lowered_name or re.fullmatch(r"\d+(?:\.\d+){3}", host):
+        return "caprice"
+    return normalize_station_name(group) if group else "curated"
 
 
 def guess_name_from_context(context: str) -> str:
@@ -1463,7 +1583,16 @@ def merge_candidates(candidates: Iterable[Candidate]) -> list[Candidate]:
             candidate.alternatives = unique_preserve(candidate.alternatives)
             by_url[key] = candidate
             continue
-        if len(candidate.name) > len(current.name) and not candidate.name.lower().startswith(("http", "www")):
+        current_curated = bool(current.metadata.get("curated"))
+        candidate_curated = bool(candidate.metadata.get("curated"))
+        if candidate_curated and not current_curated:
+            current.name = clean_title(candidate.name)
+            current.site = candidate.site
+        elif (
+            not current_curated
+            and len(candidate.name) > len(current.name)
+            and not candidate.name.lower().startswith(("http", "www"))
+        ):
             current.name = clean_title(candidate.name)
         current.alternatives = unique_preserve([*current.alternatives, *candidate.alternatives])
         if not current.source_page and candidate.source_page:
@@ -1484,12 +1613,56 @@ def choose_best_per_station(streams: list[FinalStream]) -> list[FinalStream]:
     output: list[FinalStream] = []
     for group in grouped.values():
         group.sort(key=final_stream_score, reverse=True)
-        output.append(group[0])
         # Preserve additional verified streams only when their URLs are materially
-        # different and the names are generic enough that they may be separate channels.
-        if len(group) > 1 and normalize_station_name(group[0].name) in {"radio", "stream", "record"}:
-            output.extend(group[1:])
+        # different and either their bitrates differ or the generic names may
+        # describe separate channels.
+        if normalize_station_name(group[0].name) in {"radio", "stream", "record"}:
+            output.extend(group)
+            continue
+        best_by_quality: dict[tuple[str, int], FinalStream] = {}
+        for stream in group:
+            quality_key = stream_quality_key(stream)
+            if quality_key not in best_by_quality:
+                best_by_quality[quality_key] = stream
+        output.extend(best_by_quality.values())
     return output
+
+
+def dedupe_final_streams_by_url(streams: list[FinalStream]) -> list[FinalStream]:
+    """Keep one best entry when verified candidates resolve to the same stream."""
+    by_endpoint: dict[str, FinalStream] = {}
+    for stream in streams:
+        key = canonical_stream_endpoint(stream.url)
+        current = by_endpoint.get(key)
+        if current is None or final_url_entry_score(stream) > final_url_entry_score(current):
+            by_endpoint[key] = stream
+    return list(by_endpoint.values())
+
+
+def final_url_entry_score(stream: FinalStream) -> tuple[int, int, int, int, int, int, int, int]:
+    return (
+        1 if stream.metadata.get("curated") else 0,
+        *final_stream_score(stream),
+        1 if is_sane_station_name(stream.name) else 0,
+        len(stream.name),
+    )
+
+
+def stream_quality_key(stream: FinalStream) -> tuple[str, int]:
+    bitrate = stream.bitrate_kbps
+    if not bitrate:
+        path = urlsplit(stream.url).path.lower()
+        matches = re.findall(
+            r"(?:^|[/_.-])(32|48|64|96|128|192|256|320)(?:k|kbps)?(?=[/_.-]|$)",
+            path,
+        )
+        if not matches:
+            matches = re.findall(
+                r"(32|48|64|96|128|192|256|320)(?:k|kbps)?(?=\.(?:aacp?|mp3|ogg|opus|flac|m4a)$)",
+                path,
+            )
+        bitrate = int(matches[-1]) if matches else 0
+    return stream.codec.lower(), bitrate
 
 
 def normalize_station_name(name: str) -> str:
@@ -1738,6 +1911,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Use Radio Browser as a fallback source",
     )
     parser.add_argument(
+        "--curated",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Merge and verify the curated baseline playlist",
+    )
+    parser.add_argument(
+        "--curated-playlist",
+        type=Path,
+        default=DEFAULT_CURATED_PLAYLIST,
+        help="M3U file containing curated baseline stations",
+    )
+    parser.add_argument(
         "--include-unverified",
         action="store_true",
         help="Include failed/unverified URLs in M3U and yoRadio playlist; report always contains all",
@@ -1773,6 +1958,8 @@ def validate_args(args: argparse.Namespace) -> list[str]:
         raise SystemExit("--concurrency must be >= 1")
     if args.probe_bytes < 512:
         raise SystemExit("--probe-bytes must be >= 512")
+    if args.curated and not args.curated_playlist.is_file():
+        raise SystemExit(f"Curated playlist not found: {args.curated_playlist}")
     return unique_preserve(keys)
 
 
@@ -1806,6 +1993,16 @@ def run_self_test() -> None:
     assert not is_sane_station_name("101.ru — Канал 103")
     assert usable_101_icy_name("Radio101") == ""
     assert usable_101_icy_name("101.ru: Deep House") == "Deep House"
+    curated = candidates_from_m3u_text(
+        "#EXTM3U\n"
+        "#EXTINF:-1,Record — Deep\n"
+        "https://radiorecord.hostingradio.ru/deep96.aacp\n"
+        "#EXTINF:-1,Радио Маяк\n"
+        "https://icecast-vgtrk.cdnvideo.ru/mayakfm\n",
+        source="curated-test.m3u",
+    )
+    assert [candidate.site for candidate in curated] == ["record", "curated"]
+    assert all(candidate.metadata.get("curated") for candidate in curated)
     from_json = candidates_from_json_block(
         parser.json_blocks[0],
         base_url="https://example.org/",
@@ -1836,6 +2033,17 @@ def run_self_test() -> None:
     )
     assert not is_sane_stream_url(
         "https://example.net/test.mp3?next=https://example.net/other.mp3"
+    )
+    assert not is_sane_stream_url("https://example.net/live.mp3?token=expired")
+    assert not is_sane_stream_url(
+        "https://101.ru:8143/?date=201405&hash=abc&start=209"
+    )
+    assert is_sane_stream_url("http://example.net/live?type=.mp3")
+    assert canonical_stream_endpoint("http://EXAMPLE.net/live/") == canonical_stream_endpoint(
+        "https://example.net/live"
+    )
+    assert canonical_stream_endpoint("http://example.net/live96.aacp") != canonical_stream_endpoint(
+        "http://example.net/live128.aacp"
     )
     assert radio_browser_matches_site(
         SITE_SPECS["record"],
