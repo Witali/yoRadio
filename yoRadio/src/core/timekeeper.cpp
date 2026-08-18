@@ -25,7 +25,9 @@
 #define WEATHER_SYNC_INTERVAL config.store.weatherSyncInterval*60*1000
 
 #define SYNC_STACK_SIZE       1024 * 4
-#define SYNC_TASK_CORE        0
+#ifndef SYNC_TASK_CORE
+  #define SYNC_TASK_CORE      0
+#endif
 #define SYNC_TASK_PRIORITY    3
 #define WEATHER_STRING_L      254
 

@@ -1,6 +1,12 @@
 #ifndef myoptions_h
 #define myoptions_h
 
+#if defined(YORADIO_BOARD_ESP32C3_OLED_042)
+
+#include "boards/esp32c3_oled_042.h"
+
+#else
+
 /*
  * Hardware profile for the two-USB ESP32-2432S028 CYD2USB board.
  * This revision uses an ST7789 display and the onboard mono amplifier on
@@ -42,5 +48,7 @@
 #define SDC_CS                255
 
 #define LED_BUILTIN           255
+
+#endif /* YORADIO_BOARD_ESP32C3_OLED_042 */
 
 #endif

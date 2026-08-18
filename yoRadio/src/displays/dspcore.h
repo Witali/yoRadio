@@ -21,6 +21,11 @@
   #define DSP_OLED
   #include "displaySSD1306.h"
 
+#elif DSP_MODEL==DSP_SSD1306_72X40
+  #define TIME_SIZE           1
+  #define DSP_OLED
+  #include "displaySSD1306.h"
+
 #elif DSP_MODEL==DSP_NOKIA5110    // https://k210.org/images/content/uploads/yoradio/NOKIA5110.jpg
   #define TIME_SIZE           19
   #define DSP_OLED

@@ -30,8 +30,10 @@ class DspCore: public yoDisplay {
       #endif
     }
     inline void drawLogo(uint16_t top) {
-      #if DSP_MODEL!=DSP_SSD1306x32
+      #if DSP_MODEL!=DSP_SSD1306x32 && DSP_MODEL!=DSP_SSD1306_72X40
         drawBitmap((width()  - LOGO_WIDTH ) / 2, top, logo, LOGO_WIDTH, LOGO_HEIGHT, 1);
+      #elif DSP_MODEL==DSP_SSD1306_72X40
+        setTextSize(1); setCursor((width() - 6*6) / 2, 0); setTextColor(1, 0); print(utf8Rus("ёRadio", false));
       #else
         setTextSize(1); setCursor((width() - 6*CHARWIDTH) / 2, 0); setTextColor(TFT_FG, TFT_BG); print(utf8Rus("ёRadio", false));
       #endif

@@ -3,14 +3,22 @@
 
 #include "Arduino.h"
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#if DSP_MODEL==DSP_SSD1306_72X40
+  #include "SSD1306_72x40.h"
+#else
+  #include <Adafruit_SSD1306.h>
+#endif
 
 #if DSP_MODEL==DSP_SSD1306
   #include "fonts/bootlogo21x32.h"
 #endif
 
 typedef GFXcanvas1 Canvas;
-typedef Adafruit_SSD1306 yoDisplay;
+#if DSP_MODEL==DSP_SSD1306_72X40
+  typedef SSD1306_72x40 yoDisplay;
+#else
+  typedef Adafruit_SSD1306 yoDisplay;
+#endif
 
 #include "tools/commongfx.h"
 
@@ -19,6 +27,8 @@ typedef Adafruit_SSD1306 yoDisplay;
 #else
   #if DSP_MODEL==DSP_SSD1306
     #include "conf/displaySSD1306conf.h"
+  #elif DSP_MODEL==DSP_SSD1306_72X40
+    #include "conf/displaySSD1306_72x40conf.h"
   #else
     #include "conf/displaySSD1306x32conf.h"
   #endif
