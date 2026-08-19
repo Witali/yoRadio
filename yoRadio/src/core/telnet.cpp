@@ -4,6 +4,7 @@
 #include "player.h"
 #include "network.h"
 #include "telnet.h"
+#include "freertos_stats.h"
 //#include "esp_heap_caps.h"
 
 Telnet telnet;
@@ -211,6 +212,15 @@ void Telnet::printHeapFragmentationInfo(uint8_t id){
 }
 void Telnet::on_input(const char* str, uint8_t clientId) {
   if (strlen(str) == 0) return;
+  if (strcmp(str, "sys.tasks") == 0 || strcmp(str, "tasks") == 0) {
+    if (clientId < MAX_TLN_CLIENTS && clients[clientId] && clients[clientId].connected()) {
+      printRunningTasks(clients[clientId]);
+    } else {
+      printRunningTasks(Serial);
+    }
+    printf(clientId, "> ");
+    return;
+  }
   if(network.status == CONNECTED){
     if (strcmp(str, "cli.prev") == 0 || strcmp(str, "prev") == 0) {
       player.prev();
