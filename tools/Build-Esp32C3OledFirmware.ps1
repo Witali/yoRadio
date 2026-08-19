@@ -20,17 +20,13 @@ function Resolve-ArduinoCli {
         return [IO.Path]::GetFullPath($ExplicitPath)
     }
 
-    $command = Get-Command arduino-cli.exe -CommandType Application -ErrorAction SilentlyContinue |
+    $command = Get-Command arduino-cli -CommandType Application -ErrorAction SilentlyContinue |
         Select-Object -First 1
     if ($command) { return $command.Source }
 
-    foreach ($candidate in @(
-        (Join-Path $repository "local_tools\arduino-cli\arduino-cli.exe"),
-        "C:\Work\HLV-codec\local_tools\arduino-cli\arduino-cli.exe"
-    )) {
-        if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
-    }
-    throw "arduino-cli.exe was not found. Pass its full path with -ArduinoCli."
+    $candidate = Join-Path $sharedRoot "local_tools\arduino-cli\arduino-cli.exe"
+    if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
+    return $null
 }
 
 function Resolve-SharedRepositoryRoot {
@@ -44,13 +40,42 @@ function Resolve-SharedRepositoryRoot {
     return Split-Path -Parent $absoluteCommonDir
 }
 
-$resolvedArduinoCli = Resolve-ArduinoCli $ArduinoCli
 $sharedRoot = Resolve-SharedRepositoryRoot
+$setupScript = Join-Path $repository "setup.ps1"
+$resolvedArduinoCli = Resolve-ArduinoCli $ArduinoCli
+$configPath = Join-Path $sharedRoot ".build\arduino-cli.yaml"
+$coreDirectory = Join-Path $sharedRoot ".build\arduino\data\packages\esp32\hardware\esp32\3.3.8"
+$defaultLibraries = Join-Path $sharedRoot ".build\arduino\user\libraries"
+$requiredLibraryDirectories = @(
+    "Adafruit_BusIO",
+    "Adafruit_GFX_Library",
+    "Adafruit_ST7735_and_ST7789_Library",
+    "RTClib",
+    "XPT2046_Touchscreen"
+)
+$librariesReady = @($requiredLibraryDirectories | Where-Object {
+    -not (Test-Path -LiteralPath (Join-Path $defaultLibraries $_) -PathType Container)
+}).Count -eq 0
+
+$toolchainReady = $resolvedArduinoCli -and
+    (Test-Path -LiteralPath $configPath -PathType Leaf) -and
+    (Test-Path -LiteralPath $coreDirectory -PathType Container) -and
+    $librariesReady
+if (-not $toolchainReady) {
+    Write-Host "Preparing the repository-local ESP32-C3 toolchain..."
+    $setupArguments = @()
+    if ($resolvedArduinoCli) { $setupArguments += @("-ArduinoCli", $resolvedArduinoCli) }
+    & $setupScript @setupArguments
+    if ($LASTEXITCODE -ne 0) { throw "Toolchain setup failed with exit code $LASTEXITCODE" }
+    $resolvedArduinoCli = Resolve-ArduinoCli $ArduinoCli
+}
+if (-not $resolvedArduinoCli) { throw "Arduino CLI setup did not produce a usable executable" }
+
 $buildDirectory = Join-Path $sharedRoot ".build\esp32c3-oled-042"
 $localLibraries = if ($Libraries) {
     [IO.Path]::GetFullPath($Libraries)
 } else {
-    Join-Path $sharedRoot ".build\libraries"
+    $defaultLibraries
 }
 if (-not (Test-Path -LiteralPath $localLibraries -PathType Container)) {
     throw "Local Arduino libraries were not found at $localLibraries"
@@ -72,12 +97,13 @@ $arguments += @(
     "--fqbn", $fqbn,
     "--build-path", $buildDirectory,
     "--libraries", $localLibraries,
+    "--build-property", "compiler.optimization_flags=-O3",
     "--build-property", "compiler.c.extra_flags=-DYORADIO_BOARD_ESP32C3_OLED_042=1",
     "--build-property", "compiler.cpp.extra_flags=-DYORADIO_BOARD_ESP32C3_OLED_042=1",
     $sketch
 )
 
-& $resolvedArduinoCli @arguments
+& $resolvedArduinoCli --config-file $configPath @arguments
 if ($LASTEXITCODE -ne 0) { throw "ESP32-C3 build failed with exit code $LASTEXITCODE" }
 
 Write-Host "ESP32-C3 OLED firmware built successfully:"
