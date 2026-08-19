@@ -298,6 +298,21 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
     #endif
     #define REAL_LEDBUILTIN LED_BUILTIN
 #endif
+#ifndef AUDIO_LEVEL_LED_PIN
+  #define AUDIO_LEVEL_LED_PIN 255
+#endif
+#ifndef AUDIO_LEVEL_LED_MAX_BRIGHTNESS
+  #define AUDIO_LEVEL_LED_MAX_BRIGHTNESS 64
+#endif
+#ifndef AUDIO_LEVEL_LED_UPDATE_MS
+  #define AUDIO_LEVEL_LED_UPDATE_MS 50
+#endif
+#ifndef AUDIO_LEVEL_LED_PWM_HZ
+  #define AUDIO_LEVEL_LED_PWM_HZ 5000
+#endif
+#ifndef AUDIO_LEVEL_LED_DECAY_STEP
+  #define AUDIO_LEVEL_LED_DECAY_STEP 8
+#endif
 /*        Other settings. You can overwrite them in the myoptions.h file        */
 #ifndef MUTE_PIN
   #define MUTE_PIN      255   // MUTE Pin

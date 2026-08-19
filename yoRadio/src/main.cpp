@@ -11,6 +11,7 @@
 //#include "core/mqtt.h"
 #include "core/optionschecker.h"
 #include "core/timekeeper.h"
+#include "core/audiolevelled.h"
 #ifdef USE_NEXTION
 #include "displays/nextion.h"
 #endif
@@ -70,6 +71,7 @@ void setupOTA(){
 
 void setup() {
   Serial.begin(115200);
+  audioLevelLed::begin();
   if(REAL_LEDBUILTIN!=255) pinMode(REAL_LEDBUILTIN, OUTPUT);
   if (yoradio_on_setup) yoradio_on_setup();
   pm.on_setup();
@@ -136,6 +138,7 @@ void loop() {
 #endif
   }
   loopControls();
+  audioLevelLed::loop();
   #ifdef NETSERVER_LOOP1
   netserver.loop();
   #endif

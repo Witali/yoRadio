@@ -42,7 +42,9 @@
 #define SYNC_TASK_CORE        0
 #define CONFIG_ASYNC_TCP_RUNNING_CORE 0
 
-/* GPIO8 is the onboard addressable LED and is intentionally left unused. */
+/* GPIO8 drives the onboard active-low blue LED through hardware PWM. */
+#define AUDIO_LEVEL_LED_PIN   8
+#define AUDIO_LEVEL_LED_MAX_BRIGHTNESS 255
 #define USE_BUILTIN_LED       false
 #define LED_BUILTIN_S3        255
 
