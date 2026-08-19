@@ -277,6 +277,7 @@ static void decoder_task(void *argument) {
                 .buffer = output,
                 .len = output_size,
             };
+            raw.consumed = 0;
             esp_audio_err_t result =
                 esp_audio_simple_dec_process(decoder, &raw, &frame);
             if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
@@ -294,6 +295,14 @@ static void decoder_task(void *argument) {
                          result);
                 break;
             }
+            if (raw.consumed > raw.len) {
+                ESP_LOGE(TAG, "%s decoder consumed invalid input size %lu/%lu",
+                         codec_name(codec), (unsigned long)raw.consumed,
+                         (unsigned long)raw.len);
+                break;
+            }
+            raw.buffer += raw.consumed;
+            raw.len -= raw.consumed;
             if (frame.decoded_size) {
                 esp_audio_simple_dec_info_t info = {0};
                 if (esp_audio_simple_dec_get_info(decoder, &info) ==
@@ -309,6 +318,11 @@ static void decoder_task(void *argument) {
                         break;
                     }
                 }
+            }
+            if (!raw.consumed && !frame.decoded_size && !raw.eos) {
+                ESP_LOGE(TAG, "%s decoder made no input progress",
+                         codec_name(codec));
+                break;
             }
             if (packet->end_of_stream || raw.len == 0) break;
         }

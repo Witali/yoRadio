@@ -430,6 +430,7 @@ static void decoder_task(void *argument) {
                 .buffer = output,
                 .len = output_size,
             };
+            raw.consumed = 0;
             esp_audio_err_t result =
                 esp_audio_simple_dec_process(decoder, &raw, &frame);
             // A continuously fed decoder is always runnable. On the
@@ -455,6 +456,16 @@ static void decoder_task(void *argument) {
                 failed_generation = generation;
                 break;
             }
+            if (raw.consumed > raw.len) {
+                ESP_LOGE(TAG, "%s decoder consumed invalid input size %lu/%lu",
+                         codec_name(codec), (unsigned long)raw.consumed,
+                         (unsigned long)raw.len);
+                state_set_audio(false, "decoder input error");
+                failed_generation = generation;
+                break;
+            }
+            raw.buffer += raw.consumed;
+            raw.len -= raw.consumed;
             if (frame.decoded_size) {
                 esp_audio_simple_dec_info_t info = {0};
                 if (esp_audio_simple_dec_get_info(decoder, &info) ==
@@ -470,6 +481,13 @@ static void decoder_task(void *argument) {
                         break;
                     }
                 }
+            }
+            if (!raw.consumed && !frame.decoded_size && !raw.eos) {
+                ESP_LOGE(TAG, "%s decoder made no input progress",
+                         codec_name(codec));
+                state_set_audio(false, "decoder stalled");
+                failed_generation = generation;
+                break;
             }
             if (packet->end_of_stream || raw.len == 0) break;
         }
@@ -527,9 +545,11 @@ esp_err_t audio_service_start(native_state_t *state) {
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     if (!s_commands || !s_encoded || !s_pcm) return ESP_ERR_NO_MEM;
-    // ESP32-C3 has one core. Priorities keep output ahead of decode and
-    // networking while ordinary xTaskCreate avoids an invalid core-1 pin.
-    if (xTaskCreate(stream_task, "radio_stream", 6144, NULL, 3, NULL) !=
+    // ESP32-C3 has one core. Give networking and decoding equal time slices;
+    // unlike the dual-core CYD, a lower-priority stream task can otherwise be
+    // starved before it reaches an ICY metadata boundary. Output stays one
+    // priority higher to keep the PDM DMA fed.
+    if (xTaskCreate(stream_task, "radio_stream", 6144, NULL, 5, NULL) !=
             pdPASS ||
         xTaskCreate(decoder_task, "audio_decode", 16384, NULL, 5, NULL) !=
             pdPASS ||

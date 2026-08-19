@@ -118,6 +118,25 @@ test("single-core decoder yields to idle and drops obsolete station data", () =>
   assert.match(audio, /failed_generation = generation/);
 });
 
+test("native ESP-IDF decoders advance past consumed compressed input", () => {
+  const sources = [
+    read("main", "audio_service.c"),
+    fs.readFileSync(
+      path.join(root, "idf", "esp32-cyd2usb-native", "main", "audio_service.c"),
+      "utf8",
+    ),
+  ];
+
+  for (const audio of sources) {
+    assert.match(
+      audio,
+      /raw\.consumed = 0;[\s\S]*esp_audio_simple_dec_process[\s\S]*raw\.buffer \+= raw\.consumed;[\s\S]*raw\.len -= raw\.consumed;/,
+    );
+    assert.match(audio, /raw\.consumed > raw\.len/);
+    assert.match(audio, /decoder made no input progress/);
+  }
+});
+
 test("native partition table stays compatible with min_spiffs", () => {
   const partitions = read("partitions.csv");
 
