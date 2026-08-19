@@ -109,8 +109,6 @@ void Display::init() {
   displayQueue=NULL;
   displayQueue = xQueueCreate( 5, sizeof( requestParams_t ) );
   while(displayQueue==NULL){;}
-  _createDspTask();
-  while(!_bootStep==0) { delay(10); }
   //_pager.begin();
   //_bootScreen();
   _pager = new Pager();
@@ -121,6 +119,10 @@ void Display::init() {
   _meta = new ScrollWidget();
   _title1 = new ScrollWidget();
   _plcurrent = new ScrollWidget();
+  // The display task calls _bootScreen() immediately.  Construct every
+  // object it touches before making the task runnable, especially on a
+  // single-core target where it can preempt this setup code right away.
+  _createDspTask();
   Serial.println("done");
 }
 

@@ -46,6 +46,19 @@ test("72x40 driver uses the controller-specific geometry and init sequence", () 
   assert.match(source, /static_cast<uint8_t>\(0xb0 \| page\)/);
 });
 
+test("display objects exist before the single-core display task starts", () => {
+  const source = read("yoRadio", "src", "core", "display.cpp");
+  const init = source.match(/void Display::init\(\) \{([\s\S]*?)\n\}/);
+
+  assert.ok(init, "Display::init() must exist");
+  assert.ok(init[1].indexOf("_pager = new Pager()") >= 0);
+  assert.ok(init[1].indexOf("_createDspTask()") >= 0);
+  assert.ok(
+    init[1].indexOf("_pager = new Pager()") < init[1].indexOf("_createDspTask()"),
+    "the display task must not run before Pager construction",
+  );
+});
+
 test("the C3 profile is opt-in and leaves the CYD profile as the default", () => {
   const options = read("yoRadio", "myoptions.h");
   const boardInclude = options.indexOf("YORADIO_BOARD_ESP32C3_OLED_042");
