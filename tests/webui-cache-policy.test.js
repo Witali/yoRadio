@@ -40,6 +40,17 @@ test("UI revision propagates to dynamically loaded settings", () => {
   assert.match(script, /fetch\(uiResource\('player\.html'\), \{cache: 'no-store'\}\)/);
 });
 
+test("all SPIFFS WebUI assets are stored compressed", () => {
+  const webRoot = path.join(repository, "yoRadio", "data", "www");
+  const files = fs.readdirSync(webRoot);
+
+  assert.ok(files.length > 0);
+  assert.ok(files.every((file) => file.endsWith(".gz")), files.join(", "));
+  for (const file of files) {
+    assert.ok(zlib.gunzipSync(fs.readFileSync(path.join(webRoot, file))).length > 0);
+  }
+});
+
 test("UI revision survives navigation between player and settings", () => {
   const compressed = fs.readFileSync(
     path.join(repository, "yoRadio", "data", "www", "script.js.gz")

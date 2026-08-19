@@ -8,6 +8,7 @@ set(NATIVE_SRCS
   "native_state.c"
   "network_service.c"
   "oled_display.c"
+  "web_pages_bridge.cpp"
   "web_service.c"
   "websocket_service.c")
 

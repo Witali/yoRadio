@@ -192,6 +192,9 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   assert.match(web, /strcmp\(uri, "\/variables\.js"\)/);
   assert.match(web, /equalizerEnabled=false/);
   assert.match(web, /\.uri = "\/upload"/);
+  assert.match(web, /\.uri = "\/webboard"/);
+  assert.match(web, /webboard_upload_handler/);
+  assert.match(web, /receive_multipart/);
   assert.match(websocket, /\.uri = "\/ws"/);
   assert.match(websocket, /\.is_websocket = true/);
   assert.match(websocket, /httpd_ws_recv_frame/);
@@ -200,6 +203,40 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   assert.match(websocket, /strcmp\(command, "next"\)/);
   assert.match(websocket, /strcmp\(command, "prev"\)/);
   assert.doesNotMatch(web + websocket, /AsyncWebServer|AsyncWebSocket|Arduino/);
+});
+
+test("native WebUI reuses shared pages and recovers an empty filesystem", () => {
+  const component = read("main", "CMakeLists.txt");
+  const bridge = read("main", "web_pages_bridge.cpp");
+  const web = read("main", "web_service.c");
+  const sharedPages = fs.readFileSync(
+    path.join(root, "yoRadio", "src", "core", "netserver.h"),
+    "utf8",
+  );
+
+  assert.match(component, /web_pages_bridge\.cpp/);
+  assert.match(bridge, /YORADIO_WEB_PAGES_ONLY/);
+  assert.match(bridge, /yoRadio\/src\/core\/netserver\.h/);
+  assert.match(sharedPages, /const char emptyfs_html\[\]/);
+  assert.match(sharedPages, /const char index_html\[\]/);
+  assert.match(web, /!web_ui_available\(\)[\s\S]*send_recovery_page/);
+  assert.match(web, /yoradio_emptyfs_html\(\)/);
+  assert.match(web, /yoradio_index_html\(\)/);
+  assert.match(web, /open_nonempty_file/);
+  assert.match(web, /Rejecting uncompressed WebUI asset/);
+  assert.match(web, /\/spiffs\/www\/%s\.gz/);
+  assert.match(web, /Content-Encoding", "gzip"/);
+  assert.match(web, /strcmp\(field, "www"\)/);
+  assert.match(web, /strcmp\(field, "data"\)/);
+  assert.match(web, /\.uri = "\/emergency"/);
+});
+
+test("shared playlist editor reloads an uploaded native playlist", () => {
+  const websocket = read("main", "websocket_service.c");
+
+  assert.match(websocket, /strcmp\(command, "submitplaylist"\)/);
+  assert.match(websocket, /\/data\/playlist\.csv/);
+  assert.match(websocket, /strcmp\(command, "submitplaylistdone"\)/);
 });
 
 test("native SPIFFS image contains the shared WebUI and repository playlist", () => {

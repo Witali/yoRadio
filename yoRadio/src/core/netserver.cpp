@@ -83,7 +83,7 @@ void NetServer::refreshWebUiRevision() {
     "/www/dragpl.js.gz", "/www/ir.css.gz", "/www/ir.js.gz",
     "/www/irrecord.html.gz", "/www/logo.svg.gz", "/www/options.html.gz",
     "/www/player.html.gz", "/www/script.js.gz", "/www/style.css.gz",
-    "/www/theme.css", "/www/updform.html.gz"
+    "/www/theme.css.gz", "/www/updform.html.gz"
   };
   uint32_t hash = 2166136261U; // FNV-1a over file names and compressed contents.
   uint8_t buffer[256];

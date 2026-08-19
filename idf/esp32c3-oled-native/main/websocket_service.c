@@ -166,6 +166,11 @@ static void handle_command(httpd_req_t *request, char *command) {
         send_initial_state(request);
     } else if (strcmp(command, "getactive") == 0) {
         ws_send_request(request, "{\"act\":[\"group_wifi\"]}");
+    } else if (strcmp(command, "submitplaylist") == 0) {
+        ws_send_request(request,
+                        "{\"file\":\"/data/playlist.csv\"}");
+    } else if (strcmp(command, "submitplaylistdone") == 0) {
+        // The shared WebUI acknowledges that it has reloaded playlist.csv.
     } else if (strcmp(command, "play") == 0) {
         play_station((uint16_t)strtoul(value, NULL, 10));
         send_initial_state(request);

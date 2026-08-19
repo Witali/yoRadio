@@ -30,7 +30,7 @@ void u8fix(char *src){
 
 bool Config::_isFSempty() {
   const char* reqiredFiles[] = {"dragpl.js.gz","ir.css.gz","irrecord.html.gz","ir.js.gz","logo.svg.gz","options.html.gz","player.html.gz","script.js.gz",
-                                "style.css.gz","updform.html.gz","theme.css"};
+                                "style.css.gz","updform.html.gz","theme.css.gz"};
   const uint8_t reqiredFilesSize = 11;
   char fullpath[28];
   if(SPIFFS.exists("/www/settings.html")) SPIFFS.remove("/www/settings.html");

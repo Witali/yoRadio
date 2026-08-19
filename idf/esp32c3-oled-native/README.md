@@ -96,6 +96,12 @@ multipart Wi-Fi and playlist uploads, exposes the native REST API, and runs
 the built-in ESP-IDF WebSocket endpoint at `/ws`. No Arduino networking layer,
 AsyncWebServer, AsyncTCP, or third-party WebSocket library is linked.
 
+All static WebUI resources under `/www` are stored only as `.gz` files. A
+request such as `/script.js` reads `/www/script.js.gz` and returns the compressed
+bytes with `Content-Encoding: gzip`; decompression is performed by the browser.
+Uncompressed WebUI uploads are rejected so they cannot shadow a compressed
+asset. Mutable `/data/wifi.csv` and `/data/playlist.csv` remain plain text.
+
 The repository playlist is included in the SPIFFS image as
 `/data/playlist.csv`. The WebSocket compatibility adapter supports playback,
 stop/toggle, previous/next station, volume and balance commands used by the
