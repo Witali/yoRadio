@@ -216,24 +216,20 @@ void Display::_buildPager(){
   pages[PG_PLAYER]->addWidget(_title1);
   if(_title2) pages[PG_PLAYER]->addWidget(_title2);
   if(_weather) pages[PG_PLAYER]->addWidget(_weather);
-  #ifndef HIDE_BITRATE
-    #if BITRATE_FULL
-      _fullbitrate = new BitrateWidget(fullbitrateConf, config.theme.bitrate, config.theme.background);
-      pages[PG_PLAYER]->addWidget( _fullbitrate);
-    #else
-      _bitrate = new TextWidget(bitrateConf, 30, false, config.theme.bitrate, config.theme.background);
-      pages[PG_PLAYER]->addWidget( _bitrate);
-    #endif
-    #if SHOW_STREAM_INFO && BITRATE_FULL
-      _streaminfo = new TextWidget(bitrateConf, 40, false, config.theme.bitrate, config.theme.background);
-      pages[PG_PLAYER]->addWidget(_streaminfo);
-    #endif
+  #if BITRATE_FULL
+    _fullbitrate = new BitrateWidget(fullbitrateConf, config.theme.bitrate, config.theme.background);
+    pages[PG_PLAYER]->addWidget( _fullbitrate);
+  #else
+    _bitrate = new TextWidget(bitrateConf, 30, false, config.theme.bitrate, config.theme.background);
+    pages[PG_PLAYER]->addWidget( _bitrate);
+  #endif
+  #if SHOW_STREAM_INFO && BITRATE_FULL
+    _streaminfo = new TextWidget(bitrateConf, 40, false, config.theme.bitrate, config.theme.background);
+    pages[PG_PLAYER]->addWidget(_streaminfo);
   #endif
   if(_vuwidget) pages[PG_PLAYER]->addWidget( _vuwidget);
-  #ifndef HIDE_CLOCK
-    pages[PG_PLAYER]->addWidget(_clock);
-    pages[PG_SCREENSAVER]->addWidget(_clock);
-  #endif
+  pages[PG_PLAYER]->addWidget(_clock);
+  pages[PG_SCREENSAVER]->addWidget(_clock);
   pages[PG_PLAYER]->addPage(_footer);
 
   if(_metabackground) pages[PG_DIALOG]->addWidget( _metabackground);

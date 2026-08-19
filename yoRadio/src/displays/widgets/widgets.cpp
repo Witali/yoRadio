@@ -9,23 +9,6 @@
 #include "../tools/l10n.h"
 #include "../tools/psframebuffer.h"
 
-#if DSP_MODEL==DSP_SSD1306_72X40
-#include "../fonts/C3Terminal12.h"
-#include "../fonts/TinyFont6.h"
-
-static const GFXfont* c3TextFont(uint8_t textsize) {
-  if(textsize == C3_TITLE_FONT_SIZE) return &C3Terminal12;
-  if(textsize == C3_IP_FONT_SIZE) return &TinyFont6;
-  return nullptr;
-}
-
-static uint8_t c3TextAscent(uint8_t textsize) {
-  if(textsize == C3_TITLE_FONT_SIZE) return 10;
-  if(textsize == C3_IP_FONT_SIZE) return 5;
-  return 0;
-}
-#endif
-
 /************************
       FILL WIDGET
  ************************/
@@ -55,24 +38,11 @@ TextWidget::~TextWidget() {
 
 void TextWidget::_charSize(uint8_t textsize, uint8_t& width, uint16_t& height){
 #ifndef DSP_LCD
-  #if DSP_MODEL==DSP_SSD1306_72X40
-  if(textsize == C3_TITLE_FONT_SIZE) { width = 7; height = 12; return; }
-  if(textsize == C3_IP_FONT_SIZE) { width = 5; height = 7; return; }
-  #endif
   width = textsize * CHARWIDTH;
   height = textsize * CHARHEIGHT;
 #else
   width = 1;
   height = 1;
-#endif
-}
-
-uint16_t TextWidget::_cursorY(bool local) {
-  uint16_t top = local ? 0 : _config.top;
-#if DSP_MODEL==DSP_SSD1306_72X40
-  return top + c3TextAscent(_config.textsize);
-#else
-  return top;
 #endif
 }
 
@@ -122,15 +92,9 @@ uint16_t TextWidget::_realLeft(bool w_fb) {
 void TextWidget::_draw() {
   if(!_active) return;
   dsp.setTextColor(_fgcolor, _bgcolor);
-  #if DSP_MODEL==DSP_SSD1306_72X40
-  const GFXfont* font = c3TextFont(_config.textsize);
-  dsp.setFont(font);
-  dsp.setTextSize(font ? 1 : _config.textsize);
-  #else
+  dsp.setCursor(_realLeft(), _config.top);
   dsp.setFont();
   dsp.setTextSize(_config.textsize);
-  #endif
-  dsp.setCursor(_realLeft(), _cursorY());
   dsp.print(_text);
   strlcpy(_oldtext, _text, _buffsize);
 }
@@ -179,13 +143,7 @@ void ScrollWidget::_setTextParams() {
     _fb->setTextColor(_fgcolor, _bgcolor);
   #endif
   }else{
-    #if DSP_MODEL==DSP_SSD1306_72X40
-    const GFXfont* font = c3TextFont(_config.textsize);
-    dsp.setFont(font);
-    dsp.setTextSize(font ? 1 : _config.textsize);
-    #else
     dsp.setTextSize(_config.textsize);
-    #endif
     dsp.setTextColor(_fgcolor, _bgcolor);
   }
 }
@@ -208,14 +166,14 @@ void ScrollWidget::setText(const char* txt) {
       if(_fb->ready()){
       #ifdef PSFBUFFER
         _fb->fillRect(0, 0, _width, _textheight, _bgcolor);
-        _fb->setCursor(0, _cursorY(true));
+        _fb->setCursor(0, 0);
         snprintf(_window, _width / _charWidth + 1, "%s", _text); //TODO
         _fb->print(_window);
         _fb->display();
       #endif
       } else {
         dsp.fillRect(_config.left,  _config.top, _width, _textheight, _bgcolor);
-        dsp.setCursor(_config.left, _cursorY());
+        dsp.setCursor(_config.left, _config.top);
         snprintf(_window, _width / _charWidth + 1, "%s", _text); //TODO
         dsp.setClipping({_config.left, _config.top, _width, _textheight});
         dsp.print(_window);
@@ -225,13 +183,13 @@ void ScrollWidget::setText(const char* txt) {
       if(_fb->ready()){
       #ifdef PSFBUFFER
         _fb->fillRect(0, 0, _width, _textheight, _bgcolor);
-        _fb->setCursor(_realLeft(true), _cursorY(true));
+        _fb->setCursor(_realLeft(true), 0);
         _fb->print(_text);
         _fb->display();
       #endif
       } else {
         dsp.fillRect(_config.left, _config.top, _width, _textheight, _bgcolor);
-        dsp.setCursor(_realLeft(), _cursorY());
+        dsp.setCursor(_realLeft(), _config.top);
         //dsp.setClipping({_config.left, _config.top, _width, _textheight});
         dsp.print(_text);
         //dsp.clearClipping();
@@ -290,12 +248,12 @@ void ScrollWidget::_draw() {
     if(_fb->ready()){
     #ifdef PSFBUFFER
       _fb->fillRect(0, 0, _width, _textheight, _bgcolor);
-      _fb->setCursor(_x + hiddenChars * _charWidth, _cursorY(true));
+      _fb->setCursor(_x + hiddenChars * _charWidth, 0);
       _fb->print(_window);
       _fb->display();
     #endif
     } else {
-      dsp.setCursor(_x + hiddenChars * _charWidth, _cursorY());
+      dsp.setCursor(_x + hiddenChars * _charWidth, _config.top);
       dsp.setClipping({_config.left, _config.top, _width, _textheight});
       dsp.print(_window);
       #ifndef DSP_LCD
@@ -307,13 +265,13 @@ void ScrollWidget::_draw() {
     if(_fb->ready()){
     #ifdef PSFBUFFER
       _fb->fillRect(0, 0, _width, _textheight, _bgcolor);
-      _fb->setCursor(_realLeft(true), _cursorY(true));
+      _fb->setCursor(_realLeft(true), 0);
       _fb->print(_text);
       _fb->display();
     #endif
     } else {
       dsp.fillRect(_config.left, _config.top, _width, _textheight, _bgcolor);
-      dsp.setCursor(_realLeft(), _cursorY());
+      dsp.setCursor(_realLeft(), _config.top);
       dsp.setClipping({_realLeft(), _config.top, _width, _textheight});
       dsp.print(_text);
       dsp.clearClipping();
