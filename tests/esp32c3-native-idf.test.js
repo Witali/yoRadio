@@ -141,6 +141,10 @@ test("native stream connection reports HTTP failures and follows redirects", () 
   assert.match(audio, /esp_http_client_get_status_code\(client\)/);
   assert.match(audio, /esp_http_client_set_redirection\(client\)/);
   assert.match(audio, /Stream response: HTTP %d/);
+  assert.match(
+    read("sdkconfig.defaults"),
+    /CONFIG_ESP_HTTP_CLIENT_MAX_SAVED_RESPONSE_HEADERS=24/,
+  );
 });
 
 test("native audio buffers backpressure instead of dropping a live stream", () => {
