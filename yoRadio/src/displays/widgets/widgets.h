@@ -84,6 +84,7 @@ class TextWidget: public Widget {
   protected:
     void _draw();
     uint16_t _realLeft(bool w_fb=false);
+    uint16_t _cursorY(bool local=false);
     void _charSize(uint8_t textsize, uint8_t& width, uint16_t& height);
 };
 

@@ -61,6 +61,40 @@ test("72x40 OLED applies the saved 0..100 contrast setting", () => {
   assert.match(controller, /DSP_MODEL==DSP_NOKIA5110 \|\| DSP_MODEL==DSP_SSD1306_72X40/);
 });
 
+test("72x40 player uses large station and song rows with a small IP footer", () => {
+  const layout = read(
+    "yoRadio",
+    "src",
+    "displays",
+    "conf",
+    "displaySSD1306_72x40conf.h",
+  );
+  const widgets = read("yoRadio", "src", "displays", "widgets", "widgets.cpp");
+  const font = read("yoRadio", "src", "displays", "fonts", "C3Terminal12.h");
+  const display = read("yoRadio", "src", "core", "display.cpp");
+
+  assert.match(layout, /C3_TITLE_FONT_SIZE\s+3/);
+  assert.match(layout, /metaConf[\s\S]*C3_TITLE_FONT_SIZE/);
+  assert.match(layout, /title1Conf[\s\S]*C3_TITLE_FONT_SIZE/);
+  assert.match(layout, /iptxtConf[\s\S]*C3_IP_FONT_SIZE/);
+  assert.doesNotMatch(layout, /#define HIDE_IP/);
+  assert.match(layout, /#define HIDE_CLOCK/);
+  assert.match(layout, /#define HIDE_BITRATE/);
+  assert.match(widgets, /C3Terminal12/);
+  assert.match(font, /0x00, 0xFF, 13/);
+  assert.match(display, /#ifndef HIDE_CLOCK/);
+  assert.match(display, /#ifndef HIDE_BITRATE/);
+});
+
+test("unsupported UTF-8 uses the C3 font's boxed question-mark glyph", () => {
+  const unicode = read("yoRadio", "src", "displays", "tools", "utf8Rus.cpp");
+  const generator = read("tools", "Generate-Esp32C3OledFont.ps1");
+
+  assert.match(unicode, /DSP_MODEL==DSP_SSD1306_72X40[\s\S]*0x7F/);
+  assert.match(generator, /function Set-ReplacementGlyph/);
+  assert.match(generator, /\$code -eq 0x7F/);
+});
+
 test("display objects exist before the single-core display task starts", () => {
   const source = read("yoRadio", "src", "core", "display.cpp");
   const init = source.match(/void Display::init\(\) \{([\s\S]*?)\n\}/);
