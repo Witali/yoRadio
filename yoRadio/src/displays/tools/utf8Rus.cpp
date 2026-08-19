@@ -269,7 +269,14 @@ char* utf8Rus(const char* text, bool uppercase) {
 
     const char* replacement = normalizedText(codePoint);
     if (replacement) appendText(replacement);
-    else appendAscii('?');
+    else {
+#if DSP_MODEL==DSP_SSD1306_72X40
+      // The C3 terminal font reserves 0x7f for a boxed question mark.
+      out[outPos++] = (char)0x7F;
+#else
+      appendAscii('?');
+#endif
+    }
   }
 
   out[outPos] = 0;
