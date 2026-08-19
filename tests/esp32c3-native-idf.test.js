@@ -153,6 +153,18 @@ test("native C3 uses wifi.csv as its only persistent credential source", () => {
   assert.doesNotMatch(network, /esp_wifi_get_config/);
 });
 
+test("native C3 refreshes Wi-Fi signal strength for WebSocket status", () => {
+  const network = read("main", "network_service.c");
+  const websocket = read("main", "websocket_service.c");
+
+  assert.match(network, /static void rssi_task/);
+  assert.match(network, /esp_wifi_sta_get_ap_info\(&access_point\)/);
+  assert.match(network, /native_state_set_wifi_rssi\(s_state, access_point\.rssi\)/);
+  assert.match(network, /xTaskCreate\(rssi_task, "wifi_rssi"/);
+  assert.match(websocket, /WS_STATUS_INTERVAL_MS 2000/);
+  assert.match(websocket, /\{\\"id\\":\\"rssi\\",\\"value\\":%d\}/);
+});
+
 test("native stream connection reports HTTP failures and follows redirects", () => {
   const audio = read("main", "audio_service.c");
 

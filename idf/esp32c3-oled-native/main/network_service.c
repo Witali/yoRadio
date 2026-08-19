@@ -10,10 +10,12 @@
 #include "esp_netif.h"
 #include "esp_wifi.h"
 #include "freertos/event_groups.h"
+#include "freertos/task.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
 #define WIFI_MAX_RETRIES 8
+#define WIFI_RSSI_INTERVAL_MS 2000
 
 static const char *const TAG = "network";
 static EventGroupHandle_t s_wifi_events;
@@ -23,6 +25,17 @@ static native_state_t *s_state;
 static wifi_config_t s_station_config;
 static int s_retries;
 static bool s_have_credentials;
+
+static void rssi_task(void *argument) {
+    (void)argument;
+    while (true) {
+        vTaskDelay(pdMS_TO_TICKS(WIFI_RSSI_INTERVAL_MS));
+        wifi_ap_record_t access_point = {0};
+        if (esp_wifi_sta_get_ap_info(&access_point) == ESP_OK) {
+            native_state_set_wifi_rssi(s_state, access_point.rssi);
+        }
+    }
+}
 
 static void prepare_station_config(wifi_config_t *config) {
     config->sta.threshold.authmode = WIFI_AUTH_OPEN;
@@ -145,6 +158,9 @@ esp_err_t network_service_start(native_state_t *state) {
                             "Station mode failed");
     }
     ESP_RETURN_ON_ERROR(esp_wifi_start(), TAG, "Wi-Fi start failed");
+    ESP_RETURN_ON_FALSE(xTaskCreate(rssi_task, "wifi_rssi", 2048, NULL, 2,
+                                    NULL) == pdPASS,
+                        ESP_ERR_NO_MEM, TAG, "RSSI task allocation failed");
 
     if (s_have_credentials) {
         EventBits_t bits = xEventGroupWaitBits(
