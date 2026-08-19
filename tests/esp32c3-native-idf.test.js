@@ -95,6 +95,36 @@ test("native partition table stays compatible with min_spiffs", () => {
   assert.match(partitions, /spiffs,\s+data,\s+spiffs,\s+0x3D0000,\s+0x20000/);
 });
 
+test("native C3 uses wifi.csv as its only persistent credential source", () => {
+  const network = read("main", "network_service.c");
+
+  assert.match(network, /read_credentials\(&s_station_config\)/);
+  assert.match(network, /esp_wifi_set_storage\(WIFI_STORAGE_RAM\)/);
+  assert.doesNotMatch(network, /esp_wifi_get_config/);
+});
+
+test("native stream connection reports HTTP failures and follows redirects", () => {
+  const audio = read("main", "audio_service.c");
+
+  assert.match(audio, /esp_http_client_get_errno\(client\)/);
+  assert.match(audio, /esp_http_client_get_status_code\(client\)/);
+  assert.match(audio, /esp_http_client_set_redirection\(client\)/);
+  assert.match(audio, /Stream response: HTTP %d/);
+});
+
+test("native audio buffers backpressure instead of dropping a live stream", () => {
+  const audio = read("main", "audio_service.c");
+
+  assert.match(
+    audio,
+    /xRingbufferSendAcquire\(s_encoded[\s\S]*pdMS_TO_TICKS\(250\)[\s\S]*atomic_load\(&s_generation\) != generation/,
+  );
+  assert.match(
+    audio,
+    /xRingbufferSendAcquire\(s_pcm[\s\S]*pdMS_TO_TICKS\(250\)[\s\S]*atomic_load\(&s_generation\) != generation/,
+  );
+});
+
 test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", () => {
   const component = read("main", "CMakeLists.txt");
   const config = read("sdkconfig.defaults");

@@ -22,6 +22,7 @@
 #define ENCODED_RING_SIZE (8 * 1024)
 #define PCM_RING_SIZE (8 * 1024)
 #define PCM_PACKET_DATA_SIZE 3072
+#define MAX_HTTP_REDIRECTS 5
 
 typedef struct {
     uint32_t generation;
@@ -115,12 +116,62 @@ static void state_set_audio(bool running, const char *format) {
     }
 }
 
+static bool http_status_is_redirect(int status) {
+    return status == 301 || status == 302 || status == 303 || status == 307 ||
+           status == 308;
+}
+
+static esp_err_t open_stream(esp_http_client_handle_t client,
+                             const char *requested_url) {
+    for (unsigned redirect = 0; redirect <= MAX_HTTP_REDIRECTS; ++redirect) {
+        ESP_LOGI(TAG, "Opening stream%s: %s",
+                 redirect ? " after redirect" : "", requested_url);
+        esp_err_t result = esp_http_client_open(client, 0);
+        if (result != ESP_OK) {
+            ESP_LOGE(TAG, "Stream transport open failed: %s (errno %d)",
+                     esp_err_to_name(result), esp_http_client_get_errno(client));
+            return result;
+        }
+
+        int64_t headers = esp_http_client_fetch_headers(client);
+        int status = esp_http_client_get_status_code(client);
+        if (headers < 0) {
+            ESP_LOGE(TAG,
+                     "Stream response headers failed: status %d, errno %d",
+                     status, esp_http_client_get_errno(client));
+            esp_http_client_close(client);
+            return ESP_ERR_HTTP_FETCH_HEADER;
+        }
+        ESP_LOGI(TAG, "Stream response: HTTP %d, length %lld", status,
+                 (long long)headers);
+
+        if (status >= 200 && status < 300) return ESP_OK;
+        if (!http_status_is_redirect(status) || redirect == MAX_HTTP_REDIRECTS) {
+            esp_http_client_close(client);
+            return http_status_is_redirect(status) ? ESP_ERR_HTTP_MAX_REDIRECT
+                                                   : ESP_FAIL;
+        }
+        result = esp_http_client_set_redirection(client);
+        esp_http_client_close(client);
+        if (result != ESP_OK) {
+            ESP_LOGE(TAG, "Stream redirect failed: %s",
+                     esp_err_to_name(result));
+            return result;
+        }
+    }
+    return ESP_ERR_HTTP_MAX_REDIRECT;
+}
+
 static bool send_encoded(uint32_t generation, native_codec_t codec,
                          const uint8_t *data, size_t size, bool eos) {
     size_t packet_size = sizeof(encoded_packet_t) + size;
     encoded_packet_t *packet = NULL;
-    if (xRingbufferSendAcquire(s_encoded, (void **)&packet, packet_size,
-                               pdMS_TO_TICKS(1000)) != pdTRUE) return false;
+    while (xRingbufferSendAcquire(s_encoded, (void **)&packet, packet_size,
+                                  pdMS_TO_TICKS(250)) != pdTRUE) {
+        // A slow decoder must apply TCP backpressure, not terminate the
+        // station. Short waits still let a station change cancel promptly.
+        if (atomic_load(&s_generation) != generation) return false;
+    }
     packet->generation = generation;
     packet->codec = codec;
     packet->data_size = (uint16_t)size;
@@ -148,7 +199,7 @@ static void stream_task(void *argument) {
             .buffer_size_tx = 4096,
             .crt_bundle_attach = esp_crt_bundle_attach,
             .disable_auto_redirect = false,
-            .max_redirection_count = 5,
+            .max_redirection_count = MAX_HTTP_REDIRECTS,
             .keep_alive_enable = true,
             .user_agent = "yoRadio-native/1",
         };
@@ -158,14 +209,14 @@ static void stream_task(void *argument) {
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "0");
-        esp_err_t result = esp_http_client_open(client, 0);
+        esp_err_t result = open_stream(client, command.url);
         if (result != ESP_OK) {
-            ESP_LOGE(TAG, "Stream open failed: %s", esp_err_to_name(result));
+            ESP_LOGE(TAG, "Stream connection failed for %s: %s", command.url,
+                     esp_err_to_name(result));
             state_set_audio(false, "connection failed");
             esp_http_client_cleanup(client);
             continue;
         }
-        esp_http_client_fetch_headers(client);
         native_codec_t codec = command.requested_codec;
         if (codec == NATIVE_CODEC_AUTO) {
             char *content_type = NULL;
@@ -214,8 +265,10 @@ static bool send_pcm(uint32_t generation,
                                                    : size;
         size_t packet_size = sizeof(pcm_packet_t) + chunk;
         pcm_packet_t *packet = NULL;
-        if (xRingbufferSendAcquire(s_pcm, (void **)&packet, packet_size,
-                                   pdMS_TO_TICKS(1000)) != pdTRUE) return false;
+        while (xRingbufferSendAcquire(s_pcm, (void **)&packet, packet_size,
+                                      pdMS_TO_TICKS(250)) != pdTRUE) {
+            if (atomic_load(&s_generation) != generation) return false;
+        }
         packet->generation = generation;
         packet->sample_rate = info->sample_rate;
         packet->bits_per_sample = info->bits_per_sample;

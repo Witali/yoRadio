@@ -51,6 +51,9 @@ static bool read_credentials(wifi_config_t *config) {
         break;
     }
     fclose(file);
+    if (found) {
+        ESP_LOGI(TAG, "Loaded Wi-Fi credentials from /data/wifi.csv");
+    }
     return found;
 }
 
@@ -117,6 +120,10 @@ esp_err_t network_service_start(native_state_t *state) {
                         "Station network interface allocation failed");
     wifi_init_config_t init = WIFI_INIT_CONFIG_DEFAULT();
     ESP_RETURN_ON_ERROR(esp_wifi_init(&init), TAG, "Wi-Fi init failed");
+    // wifi.csv is the only persistent source of credentials. Keep the
+    // driver's working copy in RAM so it cannot silently override the file.
+    ESP_RETURN_ON_ERROR(esp_wifi_set_storage(WIFI_STORAGE_RAM), TAG,
+                        "Wi-Fi RAM storage selection failed");
     ESP_RETURN_ON_ERROR(esp_event_handler_register(
                             WIFI_EVENT, ESP_EVENT_ANY_ID, event_handler, NULL),
                         TAG, "Wi-Fi event registration failed");
