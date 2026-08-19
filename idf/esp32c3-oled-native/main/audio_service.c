@@ -237,6 +237,7 @@ static void decoder_task(void *argument) {
     size_t output_size = DECODE_BUFFER_INITIAL;
     esp_audio_simple_dec_handle_t decoder = NULL;
     uint32_t generation = 0;
+    uint32_t failed_generation = 0;
     native_codec_t codec = NATIVE_CODEC_AUTO;
 
     while (true) {
@@ -244,6 +245,14 @@ static void decoder_task(void *argument) {
         encoded_packet_t *packet = xRingbufferReceive(
             s_encoded, &item_size, portMAX_DELAY);
         if (!packet) continue;
+        if (packet->generation != atomic_load(&s_generation)) {
+            vRingbufferReturnItem(s_encoded, packet);
+            continue;
+        }
+        if (packet->generation == failed_generation) {
+            vRingbufferReturnItem(s_encoded, packet);
+            continue;
+        }
         if (packet->generation != generation || packet->codec != codec) {
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
@@ -279,6 +288,12 @@ static void decoder_task(void *argument) {
             };
             esp_audio_err_t result =
                 esp_audio_simple_dec_process(decoder, &raw, &frame);
+            // A continuously fed decoder is always runnable. On the
+            // single-core C3, give the idle task one tick per decode call so
+            // it can service the task watchdog without reducing audio task
+            // priority or starving the PDM output task.
+            vTaskDelay(1);
+            if (generation != atomic_load(&s_generation)) break;
             if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
                 uint8_t *larger = realloc(output, frame.needed_size);
                 if (!larger) {
@@ -292,6 +307,8 @@ static void decoder_task(void *argument) {
             if (result != ESP_AUDIO_ERR_OK) {
                 ESP_LOGW(TAG, "%s decode error: %d", codec_name(codec),
                          result);
+                state_set_audio(false, "decode failed");
+                failed_generation = generation;
                 break;
             }
             if (frame.decoded_size) {
@@ -325,6 +342,10 @@ static void output_task(void *argument) {
                                                   pdMS_TO_TICKS(5));
         if (!packet) {
             native_audio_output_idle();
+            continue;
+        }
+        if (packet->generation != atomic_load(&s_generation)) {
+            vRingbufferReturnItem(s_pcm, packet);
             continue;
         }
         if (packet->sample_rate != sample_rate) {

@@ -61,6 +61,22 @@ test("single-core pipeline never pins work to nonexistent core 1", () => {
   assert.match(audio, /xTaskCreate\(output_task/);
 });
 
+test("single-core decoder yields to idle and drops obsolete station data", () => {
+  const audio = read("main", "audio_service.c");
+
+  assert.match(audio, /vTaskDelay\(1\);[\s\S]*generation != atomic_load\(&s_generation\)/);
+  assert.match(
+    audio,
+    /packet->generation != atomic_load\(&s_generation\)[\s\S]*vRingbufferReturnItem\(s_encoded, packet\)/,
+  );
+  assert.match(
+    audio,
+    /packet->generation != atomic_load\(&s_generation\)[\s\S]*vRingbufferReturnItem\(s_pcm, packet\)/,
+  );
+  assert.match(audio, /packet->generation == failed_generation/);
+  assert.match(audio, /failed_generation = generation/);
+});
+
 test("native partition table stays compatible with min_spiffs", () => {
   const partitions = read("partitions.csv");
 
