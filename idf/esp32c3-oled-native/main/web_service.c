@@ -651,7 +651,10 @@ esp_err_t web_service_start(native_state_t *state) {
     s_state = state;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.stack_size = 6144;
-    config.max_open_sockets = 4;
+    // Browsers commonly fetch six assets in parallel. Keep those connections
+    // plus the persistent WebSocket alive; with four sockets the LRU purge
+    // closed /ws during page startup and the shared UI spinner never stopped.
+    config.max_open_sockets = 7;
     config.max_uri_handlers = 14;
     config.lru_purge_enable = true;
     config.uri_match_fn = httpd_uri_match_wildcard;

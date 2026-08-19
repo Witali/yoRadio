@@ -189,6 +189,7 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   assert.match(component, /websocket_service\.c/);
   assert.match(config, /CONFIG_HTTPD_WS_SUPPORT=y/);
   assert.match(web, /websocket_service_register\(server, state\)/);
+  assert.match(web, /config\.max_open_sockets = 7/);
   assert.match(web, /strcmp\(uri, "\/variables\.js"\)/);
   assert.match(web, /equalizerEnabled=false/);
   assert.match(web, /\.uri = "\/upload"/);
