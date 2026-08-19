@@ -81,7 +81,9 @@ test("72x40 player uses large station and song rows with a small IP footer", () 
   assert.match(layout, /#define HIDE_CLOCK/);
   assert.match(layout, /#define HIDE_BITRATE/);
   assert.match(widgets, /C3Terminal12/);
+  assert.match(widgets, /width = 6; height = 12/);
   assert.match(font, /0x00, 0xFF, 13/);
+  assert.match(font, /Spleen 6x12/);
   assert.match(display, /#ifndef HIDE_CLOCK/);
   assert.match(display, /#ifndef HIDE_BITRATE/);
 });
@@ -93,6 +95,7 @@ test("unsupported UTF-8 uses the C3 font's boxed question-mark glyph", () => {
   assert.match(unicode, /DSP_MODEL==DSP_SSD1306_72X40[\s\S]*0x7F/);
   assert.match(generator, /function Set-ReplacementGlyph/);
   assert.match(generator, /\$code -eq 0x7F/);
+  assert.match(generator, /spleen-6x12\.bdf/);
 });
 
 test("display objects exist before the single-core display task starts", () => {

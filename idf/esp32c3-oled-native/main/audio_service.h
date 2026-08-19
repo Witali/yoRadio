@@ -13,5 +13,6 @@ typedef enum {
 
 esp_err_t audio_service_start(native_state_t *state);
 esp_err_t audio_service_play(const char *url, native_codec_t codec);
+esp_err_t audio_service_resume(void);
 void audio_service_stop(void);
 

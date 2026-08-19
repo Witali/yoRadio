@@ -9,6 +9,7 @@
 #include "esp_check.h"
 #include "esp_log.h"
 #include "font5x7.h"
+#include "font6x12.h"
 
 #define OLED_PAGES (OLED_DISPLAY_HEIGHT / 8)
 #define OLED_COLUMN_OFFSET 28
@@ -113,6 +114,109 @@ void oled_display_draw_text(oled_display_t *display, int x, int y,
             for (int row = 0; row < 7; ++row) {
                 draw_pixel(display, x + column, y + row,
                            (bits & (1U << row)) != 0);
+            }
+        }
+        x += 6;
+    }
+}
+
+void oled_display_draw_compact_text(oled_display_t *display, int x, int y,
+                                    const char *text) {
+    if (!display || !text) return;
+    while (*text && x < OLED_DISPLAY_WIDTH) {
+        uint8_t character = (uint8_t)*text++;
+        for (int column = 0; column < 5; ++column) {
+            uint8_t bits = font[(size_t)character * 5U + (size_t)column];
+            for (int row = 0; row < 7; ++row) {
+                draw_pixel(display, x + column, y + row,
+                           (bits & (1U << row)) != 0);
+            }
+        }
+        x += 5;
+    }
+}
+
+static const char *next_large_glyph(const char *text, uint8_t *glyph) {
+    const uint8_t *bytes = (const uint8_t *)text;
+    uint32_t codepoint = 0;
+    size_t length = 1;
+    if (bytes[0] < 0x80) {
+        codepoint = bytes[0];
+    } else if ((bytes[0] & 0xe0) == 0xc0 &&
+               (bytes[1] & 0xc0) == 0x80) {
+        codepoint = ((uint32_t)(bytes[0] & 0x1f) << 6) |
+                    (uint32_t)(bytes[1] & 0x3f);
+        length = codepoint >= 0x80 ? 2 : 1;
+    } else if ((bytes[0] & 0xf0) == 0xe0 && bytes[1] && bytes[2] &&
+               (bytes[1] & 0xc0) == 0x80 &&
+               (bytes[2] & 0xc0) == 0x80) {
+        codepoint = ((uint32_t)(bytes[0] & 0x0f) << 12) |
+                    ((uint32_t)(bytes[1] & 0x3f) << 6) |
+                    (uint32_t)(bytes[2] & 0x3f);
+        length = codepoint >= 0x800 ? 3 : 1;
+    } else if ((bytes[0] & 0xf8) == 0xf0 && bytes[1] && bytes[2] &&
+               bytes[3] && (bytes[1] & 0xc0) == 0x80 &&
+               (bytes[2] & 0xc0) == 0x80 &&
+               (bytes[3] & 0xc0) == 0x80) {
+        codepoint = ((uint32_t)(bytes[0] & 0x07) << 18) |
+                    ((uint32_t)(bytes[1] & 0x3f) << 12) |
+                    ((uint32_t)(bytes[2] & 0x3f) << 6) |
+                    (uint32_t)(bytes[3] & 0x3f);
+        length = codepoint >= 0x10000 && codepoint <= 0x10ffff ? 4 : 1;
+    } else {
+        codepoint = 0xffffffff;
+    }
+
+    if (codepoint < 0x7f) {
+        *glyph = (uint8_t)codepoint;
+    } else if (codepoint == 0x0401) {
+        *glyph = 0xa8;
+    } else if (codepoint == 0x0451) {
+        *glyph = 0xb8;
+    } else if (codepoint >= 0x0410 && codepoint <= 0x044f) {
+        *glyph = (uint8_t)(0xc0 + codepoint - 0x0410);
+    } else {
+        for (size_t index = 0; index < 64; ++index) {
+            if (font6x12_unicode_80_bf[index] == codepoint) {
+                *glyph = (uint8_t)(0x80 + index);
+                return text + length;
+            }
+        }
+        // 0x7f is a dedicated question mark inside a rectangular border.
+        *glyph = 0x7f;
+    }
+    return text + length;
+}
+
+size_t oled_display_large_text_length(const char *text) {
+    size_t length = 0;
+    if (!text) return 0;
+    while (*text) {
+        uint8_t glyph;
+        text = next_large_glyph(text, &glyph);
+        ++length;
+    }
+    return length;
+}
+
+void oled_display_draw_large_text(oled_display_t *display, int x, int y,
+                                  const char *text, size_t first_glyph) {
+    if (!display || !text) return;
+    while (*text && first_glyph) {
+        uint8_t glyph;
+        text = next_large_glyph(text, &glyph);
+        --first_glyph;
+    }
+    while (*text && x < OLED_DISPLAY_WIDTH) {
+        uint8_t glyph;
+        text = next_large_glyph(text, &glyph);
+        const uint8_t *bitmap = font6x12 + (size_t)glyph * 9U;
+        for (int row = 0; row < 12; ++row) {
+            for (int column = 0; column < 6; ++column) {
+                unsigned bit = (unsigned)(row * 6 + column);
+                draw_pixel(display, x + column, y + row,
+                           (bitmap[bit >> 3] &
+                            (uint8_t)(0x80U >> (bit & 7U))) != 0);
             }
         }
         x += 6;

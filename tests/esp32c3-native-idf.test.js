@@ -62,6 +62,37 @@ test("native OLED driver uses the 72x40 geometry and controller offset", () => {
   assert.match(source, /BOARD_OLED_CONTRAST/);
 });
 
+test("native OLED shows station and song in the shared Spleen font", () => {
+  const header = read("main", "oled_display.h");
+  const source = read("main", "oled_display.c");
+  const app = read("main", "app_main.c");
+  const font = read("main", "font6x12.h");
+
+  assert.match(header, /oled_display_draw_large_text/);
+  assert.match(source, /font6x12 \+ \(size_t\)glyph \* 9U/);
+  assert.match(source, /font6x12_unicode_80_bf/);
+  assert.match(source, /\*glyph = 0x7f/);
+  assert.match(font, /Spleen 6x12/);
+  assert.match(font, /font6x12\[2304\]/);
+  assert.match(app, /state->station[\s\S]*state->title/);
+  assert.match(app, /IPSTR[\s\S]*oled_display_draw_compact_text/);
+  assert.doesNotMatch(app, /state->stream_format[\s\S]*oled_display_draw/);
+});
+
+test("native radio requests and publishes ICY song metadata", () => {
+  const audio = read("main", "audio_service.c");
+  const state = read("main", "native_state.h");
+  const websocket = read("main", "websocket_service.c");
+
+  assert.match(audio, /Icy-MetaData", "1"/);
+  assert.match(audio, /icy-metaint/);
+  assert.match(audio, /StreamTitle='/);
+  assert.match(audio, /native_state_set_title\(s_state, title\)/);
+  assert.match(state, /char title\[192\]/);
+  assert.match(websocket, /json_escape\(state\.title, title/);
+  assert.match(websocket, /native_state_set_station\(s_state, name\)/);
+});
+
 test("single-core pipeline never pins work to nonexistent core 1", () => {
   const app = read("main", "app_main.c");
   const audio = read("main", "audio_service.c");

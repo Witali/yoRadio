@@ -6,6 +6,7 @@
 #include "driver/gpio.h"
 #include "esp_check.h"
 #include "esp_log.h"
+#include "esp_netif.h"
 #include "esp_spiffs.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -30,40 +31,40 @@ static esp_err_t mount_spiffs(void) {
     return esp_vfs_spiffs_register(&config);
 }
 
-static void draw_status(const native_state_t *state) {
-    // Keep formatting storage wider than the 12 visible columns so values such
-    // as a three-digit negative RSSI are never truncated by snprintf itself.
-    // The display driver performs the intentional clipping at the panel edge.
-    char line[24];
+static size_t scroll_position(const char *text, uint32_t frame) {
+    const size_t visible = OLED_DISPLAY_WIDTH / 6;
+    size_t length = oled_display_large_text_length(text);
+    if (length <= visible) return 0;
+    // Hold the first frame, move at two pixels/second, and leave a short blank
+    // tail before restarting from the beginning.
+    return (frame / 2) % (length - visible + 4);
+}
+
+static void draw_status(const native_state_t *state, uint32_t frame) {
+    char line[24] = {0};
     oled_display_clear(&s_display);
-    oled_display_draw_text(&s_display, 0, 0, "yoRadio IDF");
+    oled_display_draw_large_text(
+        &s_display, 0, 0, state->station,
+        scroll_position(state->station, frame));
+    oled_display_draw_large_text(
+        &s_display, 0, 14, state->title,
+        scroll_position(state->title, frame));
 
-    switch (state->network_mode) {
-        case NATIVE_NETWORK_CLIENT:
-            snprintf(line, sizeof(line), "WiFi %d dBm", state->wifi_rssi);
-            break;
-        case NATIVE_NETWORK_ACCESS_POINT:
-            strcpy(line, "AP mode");
-            break;
-        case NATIVE_NETWORK_ERROR:
-            strcpy(line, "WiFi error");
-            break;
-        default:
-            strcpy(line, "WiFi start");
-            break;
+    if (state->network_mode == NATIVE_NETWORK_CLIENT && state->ipv4) {
+        esp_ip4_addr_t address = {.addr = state->ipv4};
+        snprintf(line, sizeof(line), IPSTR, IP2STR(&address));
+    } else if (state->network_mode == NATIVE_NETWORK_ACCESS_POINT) {
+        strcpy(line, "AP mode");
+    } else if (state->network_mode == NATIVE_NETWORK_ERROR) {
+        strcpy(line, "WiFi error");
+    } else {
+        strcpy(line, "WiFi start");
     }
-    oled_display_draw_text(&s_display, 0, 8, line);
-
-    snprintf(line, sizeof(line), "%.12s", state->stream_format);
-    oled_display_draw_text(&s_display, 0, 16, line);
-    oled_display_draw_text(&s_display, 0, 24,
-                           state->audio_running ? "Playing" : "Stopped");
-
-    const char *station = state->station;
-    if (strncmp(station, "http://", 7) == 0) station += 7;
-    if (strncmp(station, "https://", 8) == 0) station += 8;
-    snprintf(line, sizeof(line), "%.12s", station);
-    oled_display_draw_text(&s_display, 0, 32, line);
+    size_t width = strlen(line) * 5U;
+    int left = width < OLED_DISPLAY_WIDTH
+                   ? (OLED_DISPLAY_WIDTH - (int)width) / 2
+                   : 0;
+    oled_display_draw_compact_text(&s_display, left, 33, line);
     ESP_ERROR_CHECK_WITHOUT_ABORT(oled_display_present(&s_display));
 }
 
@@ -71,13 +72,15 @@ static void display_task(void *argument) {
     (void)argument;
     native_state_t previous = {0};
     previous.network_mode = (native_network_mode_t)-1;
+    uint32_t frame = 0;
     while (true) {
         native_state_t state;
         native_state_snapshot(&s_state, &state);
         if (memcmp(&state, &previous, sizeof(state)) != 0) {
-            draw_status(&state);
+            frame = 0;
             previous = state;
         }
+        draw_status(&state, frame++);
         vTaskDelay(pdMS_TO_TICKS(250));
     }
 }
@@ -105,9 +108,8 @@ static void button_task(void *argument) {
                 native_state_snapshot(&s_state, &state);
                 if (state.audio_running) {
                     audio_service_stop();
-                } else if (strncmp(state.station, "http://", 7) == 0 ||
-                           strncmp(state.station, "https://", 8) == 0) {
-                    audio_service_play(state.station, NATIVE_CODEC_AUTO);
+                } else {
+                    audio_service_resume();
                 }
             }
         }
@@ -149,7 +151,7 @@ void app_main(void) {
                  esp_err_to_name(result));
     }
     ESP_ERROR_CHECK(oled_display_init(&s_display));
-    draw_status(&s_state);
+    draw_status(&s_state, 0);
 
     ESP_ERROR_CHECK(xTaskCreate(display_task, "display", 3072, NULL, 1, NULL) ==
                             pdPASS

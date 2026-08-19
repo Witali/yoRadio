@@ -29,6 +29,23 @@ void native_state_set_wifi_rssi(native_state_t *state, int8_t rssi) {
     }
 }
 
+void native_state_set_station(native_state_t *state, const char *station) {
+    if (!state || !state->lock || !station) return;
+    if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
+        strlcpy(state->station, station, sizeof(state->station));
+        state->title[0] = '\0';
+        xSemaphoreGive(state->lock);
+    }
+}
+
+void native_state_set_title(native_state_t *state, const char *title) {
+    if (!state || !state->lock || !title) return;
+    if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
+        strlcpy(state->title, title, sizeof(state->title));
+        xSemaphoreGive(state->lock);
+    }
+}
+
 void native_state_snapshot(native_state_t *state, native_state_t *snapshot) {
     if (!state || !snapshot) return;
     memset(snapshot, 0, sizeof(*snapshot));

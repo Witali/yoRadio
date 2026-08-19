@@ -23,6 +23,7 @@
 #define PCM_RING_SIZE (8 * 1024)
 #define PCM_PACKET_DATA_SIZE 3072
 #define MAX_HTTP_REDIRECTS 5
+#define ICY_METADATA_MAX 4080
 
 typedef struct {
     uint32_t generation;
@@ -53,6 +54,8 @@ static QueueHandle_t s_commands;
 static RingbufHandle_t s_encoded;
 static RingbufHandle_t s_pcm;
 static atomic_uint s_generation;
+static char s_last_url[sizeof(((play_command_t *)0)->url)];
+static native_codec_t s_last_codec;
 
 static native_codec_t codec_from_content_type(const char *content_type) {
     if (!content_type) return NATIVE_CODEC_AUTO;
@@ -180,6 +183,33 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
     return xRingbufferSendComplete(s_encoded, packet) == pdTRUE;
 }
 
+static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
+                              const uint8_t *data, size_t size,
+                              bool *first_chunk) {
+    if (*first_chunk) {
+        *first_chunk = false;
+        if (*codec == NATIVE_CODEC_AUTO) {
+            *codec = codec_from_signature(data, size);
+        }
+        state_set_audio(false, codec_name(*codec));
+    }
+    return send_encoded(generation, *codec, data, size, false);
+}
+
+static void parse_icy_metadata(char *metadata, size_t size) {
+    if (!metadata || !size) return;
+    metadata[size] = '\0';
+    char *title = strstr(metadata, "StreamTitle='");
+    if (!title) return;
+    title += strlen("StreamTitle='");
+    char *end = strstr(title, "';");
+    if (!end) end = strchr(title, '\'');
+    if (!end) return;
+    *end = '\0';
+    native_state_set_title(s_state, title);
+    ESP_LOGI(TAG, "Stream title: %s", title);
+}
+
 static void stream_task(void *argument) {
     (void)argument;
     uint8_t *buffer = malloc(STREAM_CHUNK_SIZE);
@@ -208,7 +238,7 @@ static void stream_task(void *argument) {
             state_set_audio(false, "HTTP allocation failed");
             continue;
         }
-        esp_http_client_set_header(client, "Icy-MetaData", "0");
+        esp_http_client_set_header(client, "Icy-MetaData", "1");
         esp_err_t result = open_stream(client, command.url);
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Stream connection failed for %s: %s", command.url,
@@ -225,7 +255,24 @@ static void stream_task(void *argument) {
                 codec = codec_from_content_type(content_type);
             }
         }
+        size_t metadata_interval = 0;
+        char *metadata_interval_text = NULL;
+        if (esp_http_client_get_response_header(
+                client, "icy-metaint", &metadata_interval_text) == ESP_OK &&
+            metadata_interval_text) {
+            metadata_interval = strtoul(metadata_interval_text, NULL, 10);
+            ESP_LOGI(TAG, "ICY metadata interval: %u",
+                     (unsigned)metadata_interval);
+        }
+        char *metadata = metadata_interval ? malloc(ICY_METADATA_MAX + 1) : NULL;
+        if (metadata_interval && !metadata) {
+            ESP_LOGW(TAG, "No memory for ICY metadata; titles disabled");
+        }
+        size_t audio_until_metadata = metadata_interval;
+        size_t metadata_remaining = 0;
+        size_t metadata_written = 0;
         bool first_chunk = true;
+        bool stream_stalled = false;
         while (atomic_load(&s_generation) == command.generation) {
             int received = esp_http_client_read(client, (char *)buffer,
                                                 STREAM_CHUNK_SIZE);
@@ -238,19 +285,63 @@ static void stream_task(void *argument) {
                 vTaskDelay(pdMS_TO_TICKS(10));
                 continue;
             }
-            if (first_chunk) {
-                first_chunk = false;
-                if (codec == NATIVE_CODEC_AUTO) {
-                    codec = codec_from_signature(buffer, received);
+            size_t offset = 0;
+            while (offset < (size_t)received) {
+                if (!metadata_interval) {
+                    if (!send_stream_audio(command.generation, &codec,
+                                           buffer + offset,
+                                           (size_t)received - offset,
+                                           &first_chunk)) {
+                        stream_stalled = true;
+                        break;
+                    }
+                    offset = (size_t)received;
+                } else if (audio_until_metadata) {
+                    size_t available = (size_t)received - offset;
+                    size_t chunk = available < audio_until_metadata
+                                       ? available
+                                       : audio_until_metadata;
+                    if (!send_stream_audio(command.generation, &codec,
+                                           buffer + offset, chunk,
+                                           &first_chunk)) {
+                        stream_stalled = true;
+                        break;
+                    }
+                    offset += chunk;
+                    audio_until_metadata -= chunk;
+                } else if (!metadata_remaining) {
+                    metadata_remaining = (size_t)buffer[offset++] * 16U;
+                    metadata_written = 0;
+                    if (!metadata_remaining) {
+                        audio_until_metadata = metadata_interval;
+                    }
+                } else {
+                    size_t available = (size_t)received - offset;
+                    size_t chunk = available < metadata_remaining
+                                       ? available
+                                       : metadata_remaining;
+                    if (metadata && metadata_written + chunk <=
+                                        ICY_METADATA_MAX) {
+                        memcpy(metadata + metadata_written, buffer + offset,
+                               chunk);
+                    }
+                    metadata_written += chunk;
+                    metadata_remaining -= chunk;
+                    offset += chunk;
+                    if (!metadata_remaining) {
+                        if (metadata && metadata_written <= ICY_METADATA_MAX) {
+                            parse_icy_metadata(metadata, metadata_written);
+                        }
+                        audio_until_metadata = metadata_interval;
+                    }
                 }
-                state_set_audio(false, codec_name(codec));
             }
-            if (!send_encoded(command.generation, codec, buffer, received,
-                              false)) {
+            if (stream_stalled) {
                 ESP_LOGW(TAG, "Compressed audio buffer stalled");
                 break;
             }
         }
+        free(metadata);
         send_encoded(command.generation, codec, NULL, 0, true);
         esp_http_client_close(client);
         esp_http_client_cleanup(client);
@@ -430,6 +521,8 @@ esp_err_t audio_service_start(native_state_t *state) {
     ESP_RETURN_ON_ERROR(native_audio_output_init(), TAG,
                         "initialize audio output");
     atomic_init(&s_generation, 0);
+    s_last_url[0] = '\0';
+    s_last_codec = NATIVE_CODEC_AUTO;
     s_commands = xQueueCreate(1, sizeof(play_command_t));
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
@@ -460,13 +553,22 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
         .requested_codec = codec,
     };
     strlcpy(command.url, url, sizeof(command.url));
-    if (s_state && s_state->lock &&
-        xSemaphoreTake(s_state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
-        strlcpy(s_state->station, url, sizeof(s_state->station));
-        xSemaphoreGive(s_state->lock);
-    }
+    strlcpy(s_last_url, url, sizeof(s_last_url));
+    s_last_codec = codec;
+    native_state_set_station(s_state, url);
     return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
                                                             : ESP_FAIL;
+}
+
+esp_err_t audio_service_resume(void) {
+    if (!s_last_url[0]) return ESP_ERR_INVALID_STATE;
+    char url[sizeof(s_last_url)];
+    native_state_t state;
+    native_state_snapshot(s_state, &state);
+    strlcpy(url, s_last_url, sizeof(url));
+    esp_err_t result = audio_service_play(url, s_last_codec);
+    if (result == ESP_OK) native_state_set_station(s_state, state.station);
+    return result;
 }
 
 void audio_service_stop(void) {

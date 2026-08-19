@@ -20,7 +20,7 @@ static const GFXfont* c3TextFont(uint8_t textsize) {
 }
 
 static uint8_t c3TextAscent(uint8_t textsize) {
-  if(textsize == C3_TITLE_FONT_SIZE) return 10;
+  if(textsize == C3_TITLE_FONT_SIZE) return 9;
   if(textsize == C3_IP_FONT_SIZE) return 5;
   return 0;
 }
@@ -56,7 +56,7 @@ TextWidget::~TextWidget() {
 void TextWidget::_charSize(uint8_t textsize, uint8_t& width, uint16_t& height){
 #ifndef DSP_LCD
   #if DSP_MODEL==DSP_SSD1306_72X40
-  if(textsize == C3_TITLE_FONT_SIZE) { width = 7; height = 12; return; }
+  if(textsize == C3_TITLE_FONT_SIZE) { width = 6; height = 12; return; }
   if(textsize == C3_IP_FONT_SIZE) { width = 5; height = 7; return; }
   #endif
   width = textsize * CHARWIDTH;

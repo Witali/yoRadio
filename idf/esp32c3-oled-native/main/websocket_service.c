@@ -100,8 +100,10 @@ static void format_status(char *output, size_t output_size) {
     native_state_t state;
     native_state_snapshot(s_state, &state);
     char name[300];
+    char title[400];
     char format[120];
     json_escape(s_current_name, name, sizeof(name));
+    json_escape(state.title, title, sizeof(title));
     json_escape(state.stream_format, format, sizeof(format));
     snprintf(output, output_size,
              "{\"payload\":[{\"id\":\"nameset\",\"value\":\"%s\"},"
@@ -113,14 +115,14 @@ static void format_status(char *output, size_t output_size) {
              "{\"id\":\"bitrate\",\"value\":0},"
              "{\"id\":\"fmt\",\"value\":\"%s\"},"
              "{\"id\":\"playerwrap\",\"value\":\"%s\"}]}",
-             name, format, native_audio_output_get_volume(),
+             name, title, native_audio_output_get_volume(),
              native_audio_output_get_balance(), state.wifi_rssi,
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT), format,
              state.audio_running ? "playing" : "stopped");
 }
 
 static esp_err_t send_initial_state(httpd_req_t *request) {
-    char status[1024];
+    char status[1280];
     char current[48];
     format_status(status, sizeof(status));
     ESP_RETURN_ON_ERROR(ws_send_request(request, status), TAG,
@@ -145,6 +147,7 @@ static esp_err_t play_station(uint16_t item) {
                         "Station %u is absent from playlist", item);
     ESP_RETURN_ON_ERROR(audio_service_play(url, NATIVE_CODEC_AUTO), TAG,
                         "start station %u", item);
+    native_state_set_station(s_state, name);
     s_current_item = item;
     strlcpy(s_current_name, name, sizeof(s_current_name));
     strlcpy(s_current_url, url, sizeof(s_current_url));
@@ -176,6 +179,7 @@ static void handle_command(httpd_req_t *request, char *command) {
             audio_service_stop();
         } else if (s_current_url[0]) {
             audio_service_play(s_current_url, NATIVE_CODEC_AUTO);
+            native_state_set_station(s_state, s_current_name);
         } else {
             play_station(s_current_item);
         }
@@ -238,7 +242,7 @@ static esp_err_t websocket_handler(httpd_req_t *request) {
 
 static void status_task(void *argument) {
     (void)argument;
-    char status[1024];
+    char status[1280];
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(WS_STATUS_INTERVAL_MS));
         format_status(status, sizeof(status));

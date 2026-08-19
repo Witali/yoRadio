@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "esp_err.h"
@@ -18,5 +19,10 @@ esp_err_t oled_display_init(oled_display_t *display);
 void oled_display_clear(oled_display_t *display);
 void oled_display_draw_text(oled_display_t *display, int x, int y,
                             const char *text);
+void oled_display_draw_compact_text(oled_display_t *display, int x, int y,
+                                    const char *text);
+size_t oled_display_large_text_length(const char *text);
+void oled_display_draw_large_text(oled_display_t *display, int x, int y,
+                                  const char *text, size_t first_glyph);
 esp_err_t oled_display_present(oled_display_t *display);
 
