@@ -1,0 +1,97 @@
+# Native ESP-IDF firmware for ESP32-C3 0.42-inch OLED
+
+This is a separate Arduino-free firmware target for the compact ESP32-C3
+SuperMini OLED / 01Space-style board. It uses ESP-IDF APIs directly and does
+not include Arduino Core, Arduino libraries, Adafruit GFX, or the Arduino
+yoRadio runtime.
+
+A separate target directory is intentional. The CYD and C3 boards have
+different CPU topology, display buses, controls, audio hardware and partition
+layouts. Keeping independent `sdkconfig`, board code and images avoids making
+the proven `esp32-cyd2usb-native` build depend on C3 conditionals. The native
+network, WebUI and audio pipeline sources were carried over from that target.
+
+## Hardware profile
+
+- ESP32-C3, one RISC-V core at 160 MHz, 4 MiB flash;
+- native USB Serial/JTAG console;
+- SSD1306 72x40 OLED at I2C address `0x3c`, SDA GPIO5, SCL GPIO6;
+- hardware two-line PCM-to-PDM stereo: left GPIO10, right GPIO3;
+- active-low audio-level LED on GPIO8;
+- active-low BOOT/radio button on GPIO9.
+
+PDM hardware stays at 48 kHz with a 6.144 MHz carrier. Lower-rate decoded PCM
+is linearly resampled with a shared exact phase and independent left/right
+samples. The channels are never folded to mono. Use the two identical passive
+filters and amplifier connection documented in
+[`docs/ESP32-C3-0.42-OLED.md`](../../docs/ESP32-C3-0.42-OLED.md). Never connect
+a speaker or headphones directly to either GPIO.
+
+The OLED uses the controller-specific 28-column RAM offset and a reduced
+contrast. It displays network state, RSSI, decoder format, playback state and
+the current stream. The GPIO8 PWM LED follows the stronger channel peak. A
+short BOOT-button release stops or resumes the current stream; holding BOOT
+while resetting still enters the ROM downloader.
+
+## Reproducible setup and build
+
+Run from this directory:
+
+```powershell
+.\setup.ps1
+.\build.ps1
+```
+
+`build.ps1` automatically invokes setup when dependencies are missing. Setup
+downloads into the repository-local ignored `.idf` directory:
+
+- portable CPython 3.12.10, verified by SHA-256;
+- official ESP-IDF v6.0.2 and its pinned submodules;
+- the ESP32-C3 RISC-V compiler, CMake, Ninja, esptool and IDF Python packages;
+- official Espressif `esp_audio_codec` at commit
+  `67b8d0e98f58c774b8652480893037273190e8dc`, including native ESP32-C3
+  MP3, AAC, FLAC, Vorbis and Opus decoder libraries.
+
+Application sources compile with `-O3`. The ESP-IDF component manager is
+disabled, so builds cannot silently update dependencies.
+
+Useful commands:
+
+```powershell
+.\build.ps1 size
+.\build.ps1 size-components
+.\build.ps1 -IdfArguments @('-p', 'COM7', 'app-flash')
+.\build.ps1 -IdfArguments @('-p', 'COM7', 'monitor')
+```
+
+## Storage compatibility
+
+The partition table matches Arduino-ESP32's 4 MiB `min_spiffs` layout:
+
+- NVS at `0x9000`;
+- OTA application slots at `0x10000` and `0x1f0000`;
+- SPIFFS at `0x3d0000`, size 128 KiB;
+- coredump partition at `0x3f0000`.
+
+Flashing only `app-flash` preserves Wi-Fi settings, playlists and WebUI. Use
+`spiffs-flash` only when the filesystem should be replaced explicitly.
+
+Wi-Fi client credentials are read from `/data/wifi.csv` in the existing
+tab-separated yoRadio format. If the file is absent or the connection fails,
+the firmware starts an open `yoRadio-XXXXXX` access point on channel 1.
+
+## Native HTTP API
+
+The native service exposes:
+
+- `GET /api/native/status`;
+- `POST /api/native/reconnect`;
+- `POST /api/native/play?codec=auto`, with a stream URL in the request body;
+- `POST /api/native/stop`.
+
+Codec selection may be `auto`, `mp3`, `aac`, `flac`, `ogg`, `vorbis` or
+`opus`. Static files are served from SPIFFS. The legacy Arduino WebSocket
+command protocol is deliberately not linked into this firmware; clients
+should use the native endpoints above until a shared protocol-independent
+WebUI adapter is added.
+

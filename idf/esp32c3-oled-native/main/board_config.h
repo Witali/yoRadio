@@ -1,0 +1,18 @@
+#pragma once
+
+#include "driver/gpio.h"
+
+// ESP32-C3 SuperMini OLED / 01Space-style 0.42-inch board.
+#define BOARD_OLED_SDA GPIO_NUM_5
+#define BOARD_OLED_SCL GPIO_NUM_6
+#define BOARD_OLED_ADDRESS 0x3c
+#define BOARD_OLED_CLOCK_HZ 400000
+#define BOARD_OLED_CONTRAST 0x60
+
+#define BOARD_AUDIO_LEFT_DATA GPIO_NUM_10
+#define BOARD_AUDIO_RIGHT_DATA GPIO_NUM_3
+
+#define BOARD_BOOT_BUTTON GPIO_NUM_9
+#define BOARD_AUDIO_LED GPIO_NUM_8
+#define BOARD_AUDIO_LED_ACTIVE_LOW 1
+
