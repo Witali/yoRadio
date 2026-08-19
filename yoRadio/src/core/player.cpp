@@ -65,7 +65,11 @@ void Player::init() {
     begin();
   #endif
   setBalance(config.store.balance);
-  setTone(config.store.bass, config.store.middle, config.store.trebble);
+  #if YORADIO_EQUALIZER_ENABLED
+    setTone(config.store.bass, config.store.middle, config.store.trebble);
+  #elif I2S_DOUT!=255 || I2S_INTERNAL
+    setEqualizerEnabled(false);
+  #endif
   #if I2S_DOUT!=255 || I2S_INTERNAL
     setNormalization(config.store.audioNormalization, config.store.normalizationMaxGainDb,
                      config.store.normalizationTargetDbfs, config.store.normalizationTimeMs);

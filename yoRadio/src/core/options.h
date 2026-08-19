@@ -313,6 +313,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef AUDIO_LEVEL_LED_DECAY_STEP
   #define AUDIO_LEVEL_LED_DECAY_STEP 8
 #endif
+#ifndef YORADIO_EQUALIZER_ENABLED
+  #define YORADIO_EQUALIZER_ENABLED 1
+#endif
 /*        Other settings. You can overwrite them in the myoptions.h file        */
 #ifndef MUTE_PIN
   #define MUTE_PIN      255   // MUTE Pin

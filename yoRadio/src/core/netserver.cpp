@@ -270,7 +270,9 @@ void NetServer::processQueue(){
           requestOnChange(STATION, clientId); 
           requestOnChange(TITLE, clientId); 
           requestOnChange(VOLUME, clientId); 
+        #if YORADIO_EQUALIZER_ENABLED
           requestOnChange(EQUALIZER, clientId); 
+        #endif
           requestOnChange(BALANCE, clientId); 
           requestOnChange(BITRATE, clientId); 
           requestOnChange(MODE, clientId); 
@@ -351,7 +353,11 @@ void NetServer::processQueue(){
       case SDSNUFFLE:     sprintf (wsBuf, "{\"snuffle\": %d}", config.store.sdsnuffle); break;
       case BITRATE:       sprintf (wsBuf, "{\"payload\":[{\"id\":\"bitrate\", \"value\": %d}, {\"id\":\"fmt\", \"value\": \"%s\"}]}", config.station.bitrate, getFormat(config.configFmt)); break;
       case MODE:          sprintf (wsBuf, "{\"payload\":[{\"id\":\"playerwrap\", \"value\": \"%s\"}]}", player.status() == PLAYING ? "playing" : "stopped"); telnet.info(); break;
-      case EQUALIZER:     sprintf (wsBuf, "{\"payload\":[{\"id\":\"bass\", \"value\": %d}, {\"id\": \"middle\", \"value\": %d}, {\"id\": \"trebble\", \"value\": %d}]}", config.store.bass, config.store.middle, config.store.trebble); break;
+      case EQUALIZER:
+        #if YORADIO_EQUALIZER_ENABLED
+          sprintf (wsBuf, "{\"payload\":[{\"id\":\"bass\", \"value\": %d}, {\"id\": \"middle\", \"value\": %d}, {\"id\": \"trebble\", \"value\": %d}]}", config.store.bass, config.store.middle, config.store.trebble);
+        #endif
+          break;
       case BALANCE:       sprintf (wsBuf, "{\"payload\":[{\"id\": \"balance\", \"value\": %d}]}", config.store.balance); break;
       case SDINIT:        sprintf (wsBuf, "{\"sdinit\": %d}", SDC_CS!=255); break;
       case GETPLAYERMODE: sprintf (wsBuf, "{\"playermode\": \"%s\"}", config.getMode()==PM_SDCARD?"modesd":"modeweb"); break;
@@ -410,6 +416,7 @@ void NetServer::onWsMessage(void *arg, uint8_t *data, size_t len, uint8_t client
         websocket.text(clientId, "{\"pong\": 1}");
         return;
       }
+    #if YORADIO_EQUALIZER_ENABLED
       if (strcmp(_wscmd, "trebble") == 0) {
         int8_t valb = atoi(_wsval);
         config.setTone(config.store.bass, config.store.middle, valb);
@@ -425,6 +432,7 @@ void NetServer::onWsMessage(void *arg, uint8_t *data, size_t len, uint8_t client
         config.setTone(valb, config.store.middle, config.store.trebble);
         return;
       }
+    #endif
       if (strcmp(_wscmd, "submitplaylistdone") == 0) {
 #ifdef MQTT_ROOT_TOPIC
         //mqttplaylistticker.attach(5, mqttplaylistSend);
@@ -648,7 +656,7 @@ void handleNotFound(AsyncWebServerRequest * request) {
     return;
   }
   if (request->url() == "/variables.js") {
-    sprintf (netserver.nsBuf, "var yoVersion='%s';\nvar webUiRevision='%s';\nvar formAction='%s';\nvar playMode='%s';\n", YOVERSION, netserver.webUiRevision, (network.status == CONNECTED && !config.emptyFS)?"webboard":"", (network.status == CONNECTED)?"player":"ap");
+    sprintf (netserver.nsBuf, "var yoVersion='%s';\nvar webUiRevision='%s';\nvar formAction='%s';\nvar playMode='%s';\nvar equalizerEnabled=%s;\n", YOVERSION, netserver.webUiRevision, (network.status == CONNECTED && !config.emptyFS)?"webboard":"", (network.status == CONNECTED)?"player":"ap", YORADIO_EQUALIZER_ENABLED ? "true" : "false");
     AsyncWebServerResponse *response = request->beginResponse(200, "application/javascript", netserver.nsBuf);
     addNoCacheHeaders(response);
     request->send(response);
@@ -717,11 +725,13 @@ void handleIndex(AsyncWebServerRequest * request) {
         return;
       }
     }
+  #if YORADIO_EQUALIZER_ENABLED
     if (request->hasArg("trebble") && request->hasArg("middle") && request->hasArg("bass")) {
       config.setTone(request->getParam("bass")->value().toInt(), request->getParam("middle")->value().toInt(), request->getParam("trebble")->value().toInt());
       request->send(200, "text/plain", "");
       return;
     }
+  #endif
     if (request->hasArg("sleep")) {
       int sford = request->getParam("sleep")->value().toInt();
       int safterd = request->hasArg("after")?request->getParam("after")->value().toInt():0;

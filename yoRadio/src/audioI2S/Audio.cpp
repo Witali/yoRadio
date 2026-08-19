@@ -5149,7 +5149,9 @@ bool Audio::setSampleRate(uint32_t sampRate) {
   #endif
     m_sampleRate = sampRate;
     m_normalizer.setSampleRate(sampRate);
-    IIR_calculateCoefficients(m_gain0, m_gain1, m_gain2); // must be recalculated after each samplerate change
+    if(m_equalizerEnabled) {
+        IIR_calculateCoefficients(m_gain0, m_gain1, m_gain2); // must be recalculated after each samplerate change
+    }
     return true;
 }
 uint32_t Audio::getSampleRate(){
@@ -5236,10 +5238,11 @@ bool Audio::playSample(int16_t sample[2]) {
     sample[LEFTCHANNEL]  = sample[LEFTCHANNEL]  >> 1; // half Vin so we can boost up to 6dB in filters
     sample[RIGHTCHANNEL] = sample[RIGHTCHANNEL] >> 1;
 
-    // Filterchain, can commented out if not used
-    sample = IIR_filterChain0(sample);
-    sample = IIR_filterChain1(sample);
-    sample = IIR_filterChain2(sample);
+    if(m_equalizerEnabled) {
+        sample = IIR_filterChain0(sample);
+        sample = IIR_filterChain1(sample);
+        sample = IIR_filterChain2(sample);
+    }
     //-------------------------------------------
     m_normalizer.process(sample);
     applyFade(sample);
@@ -5356,6 +5359,8 @@ void Audio::setTone(int8_t gainLowPass, int8_t gainBandPass, int8_t gainHighPass
     // see https://www.earlevel.com/main/2013/10/13/biquad-calculator-v2/
     // values can be between -40 ... +6 (dB)
 
+    if(!m_equalizerEnabled) return;
+
     m_gain0 = gainLowPass;
     m_gain1 = gainBandPass;
     m_gain2 = gainHighPass;
@@ -5374,6 +5379,16 @@ void Audio::setTone(int8_t gainLowPass, int8_t gainBandPass, int8_t gainHighPass
     IIR_filterChain1(tmp, true ); // flush the filter
     IIR_filterChain2(tmp, true ); // flush the filter
     */
+}
+//---------------------------------------------------------------------------------------------------------------------
+void Audio::setEqualizerEnabled(bool enabled){
+    m_equalizerEnabled = enabled;
+    if(!enabled) {
+        m_gain0 = 0;
+        m_gain1 = 0;
+        m_gain2 = 0;
+        memset(m_filterBuff, 0, sizeof(m_filterBuff));
+    }
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::forceMono(bool m) { // #100 mono option

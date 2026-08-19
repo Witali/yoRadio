@@ -234,6 +234,7 @@ public:
     uint32_t inBufferFilled(); // returns the number of stored bytes in the inputbuffer
     uint32_t inBufferFree();   // returns the number of free bytes in the inputbuffer
     void setTone(int8_t gainLowPass, int8_t gainBandPass, int8_t gainHighPass);
+    void setEqualizerEnabled(bool enabled);
     void setI2SCommFMT_LSB(bool commFMT);
     int getCodec() {return m_codec;}
     const char *getCodecname() {return codecname[m_codec];}
@@ -591,6 +592,7 @@ private:
     bool            m_f_tts = false;                // text to speech
     bool            m_f_loop = false;               // Set if audio file should loop
     bool            m_f_forceMono = false;          // if true stereo -> mono
+    bool            m_equalizerEnabled = true;      // run the three software IIR tone filters
     bool            m_f_internalDAC = false;        // false: output vis I2S, true output via internal DAC
     bool            m_f_outputReady = false;        // output hardware has been installed and routed
     bool            m_f_rtsp = false;               // set if RTSP is used (m3u8 stream)

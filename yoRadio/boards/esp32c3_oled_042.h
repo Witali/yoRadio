@@ -24,6 +24,9 @@
 #define I2S_DOUT              10
 #define I2S_INTERNAL          false
 
+/* The single-core C3 build bypasses the three software IIR tone filters. */
+#define YORADIO_EQUALIZER_ENABLED 0
+
 #define VS1053_CS             255
 #define SDC_CS                255
 

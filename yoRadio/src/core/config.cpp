@@ -697,11 +697,17 @@ uint8_t Config::setVolume(uint8_t val) {
 }
 
 void Config::setTone(int8_t bass, int8_t middle, int8_t trebble) {
+#if YORADIO_EQUALIZER_ENABLED
   saveValue(&store.bass, bass, false);
   saveValue(&store.middle, middle, false);
   saveValue(&store.trebble, trebble);
   player.setTone(store.bass, store.middle, store.trebble);
   netserver.requestOnChange(EQUALIZER, 0);
+#else
+  (void)bass;
+  (void)middle;
+  (void)trebble;
+#endif
 }
 
 void Config::setSmartStart(uint8_t ss) {
