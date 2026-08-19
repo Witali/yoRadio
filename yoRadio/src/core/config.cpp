@@ -922,6 +922,12 @@ bool Config::parseWsCommand(const char* line, char* cmd, char* val, uint8_t cSiz
   return true;
 }
 
+bool Config::ssidHasEdgeSpaces(const char* ssid) {
+  if (ssid == nullptr || ssid[0] == '\0') return false;
+  const size_t length = strlen(ssid);
+  return ssid[0] == ' ' || ssid[length - 1] == ' ';
+}
+
 bool Config::parseSsid(const char* line, char* ssid, char* pass) {
   char *tmpe;
   tmpe = strstr(line, "\t");
@@ -932,6 +938,9 @@ bool Config::parseSsid(const char* line, char* ssid, char* pass) {
   strlcpy(ssid, line, pos + 1);
   memset(pass, 0, 40);
   strlcpy(pass, line + pos + 1, strlen(line) - pos);
+  if (ssidHasEdgeSpaces(ssid)) {
+    Serial.printf("##[WIFI]#\tWARNING: SSID [%s] has a leading or trailing space; spaces are significant\n", ssid);
+  }
   return true;
 }
 

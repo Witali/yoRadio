@@ -48,6 +48,13 @@ input[type=text],input[type=password]{width:170px;background:#272727;color:#e3d2
 </body>
 <script>
 document.wifiform.action = `/${formAction}`;
+document.wifiform.addEventListener('submit', function(event) {
+  const ssid = document.getElementById('ssid').value;
+  if(ssid !== ssid.trim() && !window.confirm(
+      'Warning: this Wi-Fi name starts or ends with whitespace. Spaces are part of an SSID, so it will be treated as a different network. Save exactly as entered?')) {
+    event.preventDefault();
+  }
+});
 if(playMode=='player') document.getElementById("wupload").classList.add("hidden");
 document.getElementById("version").innerHTML=` | v${yoVersion}`;
 </script>

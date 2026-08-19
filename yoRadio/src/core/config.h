@@ -215,6 +215,7 @@ class Config {
     bool parseCSV(const char* line, char* name, char* url, int &ovol);
     bool parseJSON(const char* line, char* name, char* url, int &ovol);
     bool parseWsCommand(const char* line, char* cmd, char* val, uint8_t cSize);
+    static bool ssidHasEdgeSpaces(const char* ssid);
     bool parseSsid(const char* line, char* ssid, char* pass);
     bool loadStation(uint16_t station);
     bool initNetwork();

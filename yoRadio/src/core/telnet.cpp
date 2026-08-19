@@ -464,7 +464,10 @@ void Telnet::on_input(const char* str, uint8_t clientId) {
       sscanf(str, "wifi.con(%[^,],%[^)])", ssidbuf, passbuff) == 2 || 
       sscanf(str, "wifi.con(%[^ ] %[^)])", ssidbuf, passbuff) == 2 || 
       sscanf(str, "wifi %[^ ] %s", ssidbuf, passbuff) == 2) {
-    snprintf(cmBuf, sizeof(cmBuf), "New SSID: \"%s\" with PASS: \"%s\" for next boot\n> ", ssidbuf, passbuff);
+    if (Config::ssidHasEdgeSpaces(ssidbuf)) {
+      printf(clientId, "##WIFI.WARNING# SSID [%s] has a leading or trailing space; it is a different network name.\n", ssidbuf);
+    }
+    snprintf(cmBuf, sizeof(cmBuf), "New SSID: [%s] for next boot\n> ", ssidbuf);
     printf(clientId, cmBuf);
     printf(clientId, "...REBOOTING...\n> ");
     memset(cmBuf, 0, sizeof(cmBuf));
