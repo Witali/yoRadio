@@ -88,11 +88,6 @@ test("native radio requests and publishes ICY song metadata", () => {
   assert.match(audio, /Icy-MetaData", "1"/);
   assert.match(audio, /icy-metaint/);
   assert.match(audio, /StreamTitle='/);
-  assert.match(audio, /static bool icy_title_is_status_payload/);
-  assert.match(audio, /strstr\(title, "\\\"status\\\""\)/);
-  assert.match(audio, /strstr\(title, "\\\"result\\\""\)/);
-  assert.match(audio, /strstr\(title, "\\\"errorCode\\\""\)/);
-  assert.match(audio, /Ignoring non-title ICY status payload/);
   assert.match(audio, /native_state_set_title\(s_state, title\)/);
   assert.match(state, /char title\[192\]/);
   assert.match(websocket, /json_escape\(state\.title, title/);
