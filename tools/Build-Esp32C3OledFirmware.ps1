@@ -41,7 +41,7 @@ function Resolve-SharedRepositoryRoot {
 }
 
 $sharedRoot = Resolve-SharedRepositoryRoot
-$setupScript = Join-Path $repository "setup.ps1"
+$setupScript = Join-Path $repository "tools\Setup-Esp32C3OledArduino.ps1"
 $resolvedArduinoCli = Resolve-ArduinoCli $ArduinoCli
 $configPath = Join-Path $sharedRoot ".build\arduino-cli.yaml"
 $coreDirectory = Join-Path $sharedRoot ".build\arduino\data\packages\esp32\hardware\esp32\3.3.8"

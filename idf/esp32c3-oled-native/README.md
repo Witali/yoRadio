@@ -35,7 +35,15 @@ while resetting still enters the ROM downloader.
 
 ## Reproducible setup and build
 
-Run from this directory:
+This is the repository's default firmware target. From the repository root,
+run:
+
+```powershell
+.\setup.ps1
+.\build.ps1
+```
+
+The same scripts can be run directly from this directory:
 
 ```powershell
 .\setup.ps1

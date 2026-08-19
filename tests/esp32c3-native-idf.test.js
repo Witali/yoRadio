@@ -8,6 +8,16 @@ const nativeRoot = path.join(root, "idf", "esp32c3-oled-native");
 const read = (...parts) =>
   fs.readFileSync(path.join(nativeRoot, ...parts), "utf8");
 
+test("repository default setup and build select native ESP-IDF firmware", () => {
+  const setup = fs.readFileSync(path.join(root, "setup.ps1"), "utf8");
+  const build = fs.readFileSync(path.join(root, "build.ps1"), "utf8");
+
+  assert.match(setup, /idf\\esp32c3-oled-native\\setup\.ps1/);
+  assert.match(build, /idf\\esp32c3-oled-native\\build\.ps1/);
+  assert.match(build, /IdfArguments = @\("build"\)/);
+  assert.doesNotMatch(setup + build, /arduino-cli/);
+});
+
 test("ESP32-C3 native target is Arduino-free and selects the RISC-V chip", () => {
   const project = read("CMakeLists.txt");
   const component = read("main", "CMakeLists.txt");

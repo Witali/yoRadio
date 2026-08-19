@@ -2,6 +2,13 @@
 <img src="images/yologo.png" width="190" height="142">
 
 ##### Web-radio based on [ESP32-audioI2S](https://github.com/schreibfaul1/ESP32-audioI2S) or/and [ESP32-vs1053_ext](https://github.com/schreibfaul1/ESP32-vs1053_ext) library
+
+The repository's default firmware target is the native, Arduino-free ESP-IDF
+build for the ESP32-C3 0.42-inch OLED board. From the repository root, run
+`.\setup.ps1` once or simply `.\build.ps1`; the build command prepares missing
+dependencies automatically. The legacy Arduino target remains available via
+`.\tools\Build-Esp32C3OledFirmware.ps1`.
+
 ---
 - [Hardware](#hardware)
 - [ESP32-C3 0.42-inch OLED board](docs/ESP32-C3-0.42-OLED.md)

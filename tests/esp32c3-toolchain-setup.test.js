@@ -7,7 +7,7 @@ const root = path.resolve(__dirname, "..");
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8");
 
 test("setup reuses Arduino CLI from PATH before downloading a local copy", () => {
-  const setup = read("setup.ps1");
+  const setup = read("tools", "Setup-Esp32C3OledArduino.ps1");
   const pathLookup = setup.indexOf("Get-Command arduino-cli");
   const localLookup = setup.indexOf("Test-Path -LiteralPath $LocalPath");
   const download = setup.indexOf("Invoke-WebRequest");
@@ -20,7 +20,7 @@ test("setup reuses Arduino CLI from PATH before downloading a local copy", () =>
 });
 
 test("setup pins the repository-local ESP32 core and Arduino libraries", () => {
-  const setup = read("setup.ps1");
+  const setup = read("tools", "Setup-Esp32C3OledArduino.ps1");
 
   assert.match(setup, /esp32CoreVersion = "3\.3\.8"/);
   assert.match(setup, /\.build\\arduino/);
@@ -35,7 +35,7 @@ test("setup pins the repository-local ESP32 core and Arduino libraries", () => {
 test("ESP32-C3 build bootstraps its local toolchain without another repository", () => {
   const build = read("tools", "Build-Esp32C3OledFirmware.ps1");
 
-  assert.match(build, /Join-Path \$repository "setup\.ps1"/);
+  assert.match(build, /Join-Path \$repository "tools\\Setup-Esp32C3OledArduino\.ps1"/);
   assert.match(build, /\.build\\arduino-cli\.yaml/);
   assert.match(build, /--config-file \$configPath/);
   assert.match(build, /compiler\.optimization_flags=-O3/);
