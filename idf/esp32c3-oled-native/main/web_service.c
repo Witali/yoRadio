@@ -571,6 +571,18 @@ static const char *content_type(const char *path) {
     return "application/octet-stream";
 }
 
+static esp_err_t finish_static_response(httpd_req_t *request,
+                                        esp_err_t result) {
+    if (result == ESP_OK) {
+        // The WebSocket is the only connection the UI needs to keep open.
+        // Reclaim each short-lived asset socket as soon as its response has
+        // been queued, leaving descriptors available to the audio client.
+        httpd_sess_trigger_close(request->handle,
+                                 httpd_req_to_sockfd(request));
+    }
+    return result;
+}
+
 static esp_err_t static_handler(httpd_req_t *request) {
     char uri[160];
     const char *query = strchr(request->uri, '?');
@@ -590,7 +602,9 @@ static esp_err_t static_handler(httpd_req_t *request) {
         }
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
-        return httpd_resp_sendstr(request, yoradio_index_html());
+        httpd_resp_set_hdr(request, "Connection", "close");
+        return finish_static_response(
+            request, httpd_resp_sendstr(request, yoradio_index_html()));
     }
     if (strcmp(uri, "/variables.js") == 0) {
         native_state_t state;
@@ -611,7 +625,9 @@ static esp_err_t static_handler(httpd_req_t *request) {
                                                               : "ap");
         httpd_resp_set_type(request, "application/javascript; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
-        return httpd_resp_sendstr(request, variables);
+        httpd_resp_set_hdr(request, "Connection", "close");
+        return finish_static_response(request,
+                                      httpd_resp_sendstr(request, variables));
     }
 
     char path[224];
@@ -633,6 +649,7 @@ static esp_err_t static_handler(httpd_req_t *request) {
     }
     httpd_resp_set_type(request, content_type(uri));
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
+    httpd_resp_set_hdr(request, "Connection", "close");
     if (gzip) httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
     char chunk[2048];
     size_t count;
@@ -644,7 +661,8 @@ static esp_err_t static_handler(httpd_req_t *request) {
         }
     }
     fclose(file);
-    return httpd_resp_send_chunk(request, NULL, 0);
+    return finish_static_response(
+        request, httpd_resp_send_chunk(request, NULL, 0));
 }
 
 esp_err_t web_service_start(native_state_t *state) {
