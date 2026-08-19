@@ -41,7 +41,6 @@ uint8_t  m_status = 0;
 uint8_t* m_inptr;
 int32_t  m_bytesAvail;
 int32_t  m_bytesDecoded = 0;
-float    m_compressionRatio = 0;
 uint16_t m_rIndex=0;
 uint64_t m_bitBuffer = 0;
 uint8_t  m_bitBufferLen = 0;
@@ -421,8 +420,11 @@ uint32_t FLACGetSampRate(){
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t FLACGetBitRate(){
     if(FLACMetadataBlock->totalSamples){
-        float BitsPerSamp = (float)FLACMetadataBlock->audioDataLength / (float)FLACMetadataBlock->totalSamples * 8;
-        return ((uint32_t)BitsPerSamp * FLACMetadataBlock->sampleRate);
+        const uint64_t encodedBits =
+            static_cast<uint64_t>(FLACMetadataBlock->audioDataLength) * 8U;
+        return static_cast<uint32_t>(
+            encodedBits * FLACMetadataBlock->sampleRate /
+            FLACMetadataBlock->totalSamples);
     }
     return 0;
 }

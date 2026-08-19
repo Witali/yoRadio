@@ -515,7 +515,7 @@ void NetServer::resetQueue(){
 }
 
 void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
-  static int freeSpace = 0;
+  static size_t freeSpace = 0;
   if(request->url()=="/upload"){
     if (!index) {
       if(filename!="tempwifi.csv"){
@@ -525,13 +525,17 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
         if(SPIFFS.exists(PLAYLIST_SD_PATH)) SPIFFS.remove(PLAYLIST_SD_PATH);
         if(SPIFFS.exists(INDEX_SD_PATH)) SPIFFS.remove(INDEX_SD_PATH);
       }
-      freeSpace = (float)SPIFFS.totalBytes()/100*68-SPIFFS.usedBytes();
+      const size_t uploadLimit = static_cast<size_t>(
+          (static_cast<uint64_t>(SPIFFS.totalBytes()) * 68U) / 100U);
+      freeSpace = uploadLimit > SPIFFS.usedBytes()
+                      ? uploadLimit - SPIFFS.usedBytes()
+                      : 0;
       request->_tempFile = SPIFFS.open(TMP_PATH , "w");
     }else{
       
     }
     if (len) {
-      if(freeSpace>index+len){
+      if(index < freeSpace && len <= freeSpace - index){
         request->_tempFile.write(data, len);
       }
     }

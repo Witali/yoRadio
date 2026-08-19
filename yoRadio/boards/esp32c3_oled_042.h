@@ -13,6 +13,7 @@
 #define L10N_LANGUAGE         RU
 
 #define DSP_MODEL             DSP_SSD1306_72X40
+#define HIDE_WEATHER
 #define I2C_SDA               5
 #define I2C_SCL               6
 #define I2C_RST               -1

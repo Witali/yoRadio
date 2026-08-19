@@ -50,23 +50,25 @@
 TimeKeeper timekeeper;
 
 void _syncTask(void *pvParameters) {
-  if (timekeeper.forceWeather && timekeeper.forceTimeSync) {
-    timekeeper.timeTask();
-    timekeeper.weatherTask();
-  } 
-  else if (timekeeper.forceWeather) {
-    timekeeper.weatherTask();
-  }
-  else if (timekeeper.forceTimeSync) {
+  if (timekeeper.forceTimeSync) {
     timekeeper.timeTask();
   }
+  #ifndef HIDE_WEATHER
+  if (timekeeper.forceWeather) {
+    timekeeper.weatherTask();
+  }
+  #endif
   timekeeper.busy = false;
   vTaskDelete(NULL);
 }
 
 TimeKeeper::TimeKeeper(){
   busy          = false;
-  forceWeather  = true;
+  #ifdef HIDE_WEATHER
+    forceWeather = false;
+  #else
+    forceWeather = true;
+  #endif
   forceTimeSync = true;
   _returnPlayerTime = _doAfterTime = 0;
   weatherBuf=NULL;
@@ -130,17 +132,24 @@ bool TimeKeeper::loop1(){ // core1 (player)
   return true;
   #endif
   // Sync weather & time
-  static uint32_t lastWeatherTime = 0;
-  if (currentTime - lastWeatherTime >= WEATHER_SYNC_INTERVAL) {
-    lastWeatherTime = currentTime;
-    forceWeather = true;
-  }
+  #ifndef HIDE_WEATHER
+    static uint32_t lastWeatherTime = 0;
+    if (currentTime - lastWeatherTime >= WEATHER_SYNC_INTERVAL) {
+      lastWeatherTime = currentTime;
+      forceWeather = true;
+    }
+  #endif
   static uint32_t lastTimeTime = 0;
   if (currentTime - lastTimeTime >= TIME_SYNC_INTERVAL) {
     lastTimeTime = currentTime;
     forceTimeSync = true;
   }
-  if (!busy && (forceWeather || forceTimeSync) && network.status == CONNECTED) {
+  #ifdef HIDE_WEATHER
+    const bool syncPending = forceTimeSync;
+  #else
+    const bool syncPending = forceWeather || forceTimeSync;
+  #endif
+  if (!busy && syncPending && network.status == CONNECTED) {
     busy = true;
     //config.setTimeConf();
     xTaskCreatePinnedToCore(

@@ -11,6 +11,7 @@
 
 #pragma once
 #pragma GCC optimize ("Ofast")
+#include "../core/options.h"
 #include <vector>
 #include <Arduino.h>
 #include <libb64/cencode.h>
@@ -194,7 +195,7 @@ public:
     void setConnectionTimeout(uint16_t timeout_ms, uint16_t timeout_ms_ssl);
     bool setAudioPlayPosition(uint16_t sec);
     bool setFilePos(uint32_t pos);
-    bool audioFileSeek(const float speed);
+    bool audioFileSeek(uint16_t speedPermille);
     bool setTimeOffset(int sec);
     bool setPinout(uint8_t BCLK, uint8_t LRC, uint8_t DOUT, int8_t DIN = I2S_PIN_NO_CHANGE, int8_t MCK = I2S_PIN_NO_CHANGE);
     bool pauseResume();
@@ -294,13 +295,17 @@ private:
     esp_err_t I2Sstart(uint8_t i2s_num);
     esp_err_t I2Sstop(uint8_t i2s_num);
     void urlencode(char* buff, uint16_t buffLen, bool spacesOnly = false);
+  #if YORADIO_EQUALIZER_ENABLED
     int16_t* IIR_filterChain0(int16_t iir_in[2], bool clear = false);
     int16_t* IIR_filterChain1(int16_t* iir_in, bool clear = false);
     int16_t* IIR_filterChain2(int16_t* iir_in, bool clear = false);
+  #endif
     inline void setDatamode(uint8_t dm){m_datamode=dm;}
     inline uint8_t getDatamode(){return m_datamode;}
     inline uint32_t streamavail(){ return _client ? _client->available() : 0;}
+  #if YORADIO_EQUALIZER_ENABLED
     void IIR_calculateCoefficients(int8_t G1, int8_t G2, int8_t G3);
+  #endif
     bool ts_parsePacket(uint8_t* packet, uint8_t* packetStart, uint8_t* packetLength);
     void _computeVUlevel(int16_t sample[2]);
     void applyFade(int16_t sample[2]);
@@ -479,6 +484,7 @@ private:
     const uint8_t volumetable[22]={   0,  1,  2,  3,  4 , 6 , 8, 10, 12, 14, 17,
                                      20, 23, 27, 30 ,34, 38, 43 ,48, 52, 58, 64}; //22 elements
 
+  #if YORADIO_EQUALIZER_ENABLED
     typedef struct _filter{
         float a0;
         float a1;
@@ -486,6 +492,7 @@ private:
         float b1;
         float b2;
     } filter_t;
+  #endif
 
     typedef struct _pis_array{
         int number;
@@ -525,7 +532,9 @@ private:
     char            m_lastHost[512];                // Store the last URL to a webstream
     char*           m_playlistBuff = NULL;          // stores playlistdata
     const uint16_t  m_plsBuffEntryLen = 256;        // length of each entry in playlistBuff
+  #if YORADIO_EQUALIZER_ENABLED
     filter_t        m_filter[3];                    // digital filters
+  #endif
     int             m_LFcount = 0;                  // Detection of end of header
     uint32_t        m_sampleRate=16000;
     uint32_t        m_bitRate=0;                    // current bitrate given fom decoder
@@ -592,7 +601,9 @@ private:
     bool            m_f_tts = false;                // text to speech
     bool            m_f_loop = false;               // Set if audio file should loop
     bool            m_f_forceMono = false;          // if true stereo -> mono
+  #if YORADIO_EQUALIZER_ENABLED
     bool            m_equalizerEnabled = true;      // run the three software IIR tone filters
+  #endif
     bool            m_f_internalDAC = false;        // false: output vis I2S, true output via internal DAC
     bool            m_f_outputReady = false;        // output hardware has been installed and routed
     bool            m_f_rtsp = false;               // set if RTSP is used (m3u8 stream)
@@ -603,16 +614,18 @@ private:
     uint8_t         m_fadeMode = FADE_NONE;
     uint8_t         m_f_channelEnabled = 3;         // internal DAC, both channels
     uint32_t        m_audioFileDuration = 0;
-    float           m_audioCurrentTime = 0;
+    uint64_t        m_audioCurrentTimeUs = 0;       // fixed point: microseconds
     uint32_t        m_audioDataStart = 0;           // in bytes
     size_t          m_audioDataSize = 0;            //
-    float           m_filterBuff[3][2][2][2];       // IIR filters memory for Audio DSP
     size_t          m_i2s_bytesWritten = 0;         // set in i2s_write() but not used
     size_t          m_file_size = 0;                // size of the file
     uint16_t        m_filterFrequency[2];
+  #if YORADIO_EQUALIZER_ENABLED
+    float           m_filterBuff[3][2][2][2];       // IIR filters memory for Audio DSP
     int8_t          m_gain0 = 0;                    // cut or boost filters (EQ)
     int8_t          m_gain1 = 0;
     int8_t          m_gain2 = 0;
+  #endif
     AudioNormalizer m_normalizer;
 
     pid_array       m_pidsOfPMT;

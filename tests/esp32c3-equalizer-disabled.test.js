@@ -16,8 +16,8 @@ test("ESP32-C3 OLED profile disables equalizer processing", () => {
   assert.match(profile, /YORADIO_EQUALIZER_ENABLED\s+0/);
   assert.match(options, /YORADIO_EQUALIZER_ENABLED\s+1/);
   assert.match(player, /#elif I2S_DOUT!=255 \|\| I2S_INTERNAL\s+setEqualizerEnabled\(false\)/);
-  assert.match(audio, /if\(m_equalizerEnabled\) \{\s+sample = IIR_filterChain0/);
-  assert.match(audio, /if\(!m_equalizerEnabled\) return;/);
+  assert.match(audio, /#if YORADIO_EQUALIZER_ENABLED\s+if\(m_equalizerEnabled\) \{\s+sample = IIR_filterChain0/);
+  assert.match(audio, /#if YORADIO_EQUALIZER_ENABLED\s+void Audio::IIR_calculateCoefficients/);
 });
 
 test("disabled equalizer commands are blocked by firmware", () => {

@@ -320,6 +320,7 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
     if(!m_f_internalDAC) i2s_zero_dma_buffer((i2s_port_t) m_i2s_num);
   #endif
 
+  #if YORADIO_EQUALIZER_ENABLED
     for(int i = 0; i <3; i++) {
         m_filter[i].a0  = 1;
         m_filter[i].a1  = 0;
@@ -327,6 +328,7 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
         m_filter[i].b1  = 0;
         m_filter[i].b2  = 0;
     }
+  #endif
 }
 //---------------------------------------------------------------------------------------------------------------------
 bool Audio::beginOutput() {
@@ -590,7 +592,7 @@ void Audio::setDefaults(bool initializeInputBuffer) {
     m_codec = CODEC_NONE;
     m_playlistFormat = FORMAT_NONE;
     m_datamode = AUDIO_NONE;
-    m_audioCurrentTime = 0;                                 // Reset playtimer
+    m_audioCurrentTimeUs = 0;                               // Reset playtimer
     m_audioFileDuration = 0;
     m_audioDataStart = 0;
     m_audioDataSize = 0;
@@ -2633,7 +2635,7 @@ size_t Audio::process_m3u8_ID3_Header(uint8_t* packet){
     // if tag PRIV exists assume content is "com.apple.streaming.transportStreamTimestamp"
     // a time stamp is expected in the header.
 
-    current_timestamp = (double)bigEndian(&packet[69], 4) / 90000; // seconds
+    current_timestamp = bigEndian(&packet[69], 4) / 90000U; // seconds
 
     return id3Size;
 }
@@ -3447,7 +3449,11 @@ void Audio::processLocalFile() {
         AUDIO_INFO("stream ready");
         if(m_resumeFilePos){
             if(m_resumeFilePos < m_audioDataStart) m_resumeFilePos = m_audioDataStart;
-            if(m_avr_bitrate) m_audioCurrentTime = ((m_resumeFilePos - m_audioDataStart) / m_avr_bitrate) * 8;
+            if(m_avr_bitrate) {
+                m_audioCurrentTimeUs =
+                    static_cast<uint64_t>(m_resumeFilePos - m_audioDataStart) *
+                    8000000U / m_avr_bitrate;
+            }
             audiofile.seek(m_resumeFilePos);
             InBuff.resetBuffer();
             if(m_f_Log) log_i("m_resumeFilePos %i", m_resumeFilePos);
@@ -3514,7 +3520,7 @@ void Audio::processLocalFile() {
                 For example: current time   ====progress bar====>  total audio duration
                                 3:43        ====================>        3:33
             */
-            m_audioCurrentTime = 0;
+            m_audioCurrentTimeUs = 0;
             return;
         } //TEST loop
         f_stream = false;
@@ -4907,7 +4913,10 @@ void Audio::compute_audioCurrentTime(int bd) {
             sum_bitrate += getBitRate();
             m_avr_bitrate = sum_bitrate / (loop_counter - 20);
             if(loop_counter == 199 && m_resumeFilePos){
-                m_audioCurrentTime = ((getFilePos() - m_audioDataStart - inBufferFilled()) / m_avr_bitrate) * 8; // #293
+                m_audioCurrentTimeUs =
+                    static_cast<uint64_t>(getFilePos() - m_audioDataStart -
+                                          inBufferFilled()) * 8000000U /
+                    m_avr_bitrate; // #293
             }
         }
     }
@@ -4915,11 +4924,15 @@ void Audio::compute_audioCurrentTime(int bd) {
         if(loop_counter == 2){
             m_avr_bitrate = getBitRate();
             if(m_resumeFilePos){  // if connecttoFS() is called with resumeFilePos != 0
-                m_audioCurrentTime = ((getFilePos() - m_audioDataStart - inBufferFilled()) / m_avr_bitrate) * 8; // #293
+                m_audioCurrentTimeUs =
+                    static_cast<uint64_t>(getFilePos() - m_audioDataStart -
+                                          inBufferFilled()) * 8000000U /
+                    m_avr_bitrate; // #293
             }
         }
     }
-    m_audioCurrentTime += ((float)bd / m_avr_bitrate) * 8;
+    m_audioCurrentTimeUs += static_cast<uint64_t>(bd) * 8000000U /
+                            m_avr_bitrate;
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::printDecodeError(int r) {
@@ -5051,7 +5064,7 @@ uint32_t Audio::getAudioFileDuration() {
 }
 //---------------------------------------------------------------------------------------------------------------------
 uint32_t Audio::getAudioCurrentTime() {  // return current time in seconds
-    return (uint32_t) m_audioCurrentTime;
+    return static_cast<uint32_t>(m_audioCurrentTimeUs / 1000000U);
 }
 //---------------------------------------------------------------------------------------------------------------------
 bool Audio::setAudioPlayPosition(uint16_t sec){
@@ -5103,18 +5116,22 @@ bool Audio::setFilePos(uint32_t pos) {
     if(m_codec == CODEC_FLAC) FLACDecoderReset();
     InBuff.resetBuffer();
     if(pos < m_audioDataStart) pos = m_audioDataStart; // issue #96
-    if(m_avr_bitrate) m_audioCurrentTime = ((pos-m_audioDataStart) / m_avr_bitrate) * 8; // #96
+    if(m_avr_bitrate) {
+        m_audioCurrentTimeUs =
+            static_cast<uint64_t>(pos - m_audioDataStart) * 8000000U /
+            m_avr_bitrate; // #96
+    }
     uint32_t sk = audiofile.seek(pos);
     return sk;
 }
 //---------------------------------------------------------------------------------------------------------------------
-bool Audio::audioFileSeek(const float speed) {
-    // 0.5 is half speed
-    // 1.0 is normal speed
-    // 1.5 is one and half speed
-    if((speed > 1.5f) || (speed < 0.25f)) return false;
+bool Audio::audioFileSeek(uint16_t speedPermille) {
+    // 500 is half speed, 1000 is normal, 1500 is one and a half.
+    if(speedPermille > 1500U || speedPermille < 250U) return false;
 
-    uint32_t srate = getSampleRate() * speed;
+    const uint32_t srate = static_cast<uint32_t>(
+        (static_cast<uint64_t>(getSampleRate()) * speedPermille + 500U) /
+        1000U);
     return setSampleRate(srate);
 }
 //---------------------------------------------------------------------------------------------------------------------
@@ -5150,9 +5167,11 @@ bool Audio::setSampleRate(uint32_t sampRate) {
   #endif
     m_sampleRate = sampRate;
     m_normalizer.setSampleRate(sampRate);
+  #if YORADIO_EQUALIZER_ENABLED
     if(m_equalizerEnabled) {
-        IIR_calculateCoefficients(m_gain0, m_gain1, m_gain2); // must be recalculated after each samplerate change
+        IIR_calculateCoefficients(m_gain0, m_gain1, m_gain2);
     }
+  #endif
     return true;
 }
 uint32_t Audio::getSampleRate(){
@@ -5239,11 +5258,13 @@ bool Audio::playSample(int16_t sample[2]) {
     sample[LEFTCHANNEL]  = sample[LEFTCHANNEL]  >> 1; // half Vin so we can boost up to 6dB in filters
     sample[RIGHTCHANNEL] = sample[RIGHTCHANNEL] >> 1;
 
+  #if YORADIO_EQUALIZER_ENABLED
     if(m_equalizerEnabled) {
         sample = IIR_filterChain0(sample);
         sample = IIR_filterChain1(sample);
         sample = IIR_filterChain2(sample);
     }
+  #endif
     //-------------------------------------------
     m_normalizer.process(sample);
     applyFade(sample);
@@ -5357,6 +5378,7 @@ void Audio::setTone(int8_t gainLowPass, int8_t gainBandPass, int8_t gainHighPass
     // see https://www.earlevel.com/main/2013/10/13/biquad-calculator-v2/
     // values can be between -40 ... +6 (dB)
 
+  #if YORADIO_EQUALIZER_ENABLED
     if(!m_equalizerEnabled) return;
 
     m_gain0 = gainLowPass;
@@ -5377,9 +5399,15 @@ void Audio::setTone(int8_t gainLowPass, int8_t gainBandPass, int8_t gainHighPass
     IIR_filterChain1(tmp, true ); // flush the filter
     IIR_filterChain2(tmp, true ); // flush the filter
     */
+  #else
+    (void)gainLowPass;
+    (void)gainBandPass;
+    (void)gainHighPass;
+  #endif
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::setEqualizerEnabled(bool enabled){
+  #if YORADIO_EQUALIZER_ENABLED
     m_equalizerEnabled = enabled;
     if(!enabled) {
         m_gain0 = 0;
@@ -5387,6 +5415,9 @@ void Audio::setEqualizerEnabled(bool enabled){
         m_gain2 = 0;
         memset(m_filterBuff, 0, sizeof(m_filterBuff));
     }
+  #else
+    (void)enabled;
+  #endif
 }
 //---------------------------------------------------------------------------------------------------------------------
 void Audio::forceMono(bool m) { // #100 mono option
@@ -5427,20 +5458,16 @@ uint8_t Audio::getI2sPort() {
 //---------------------------------------------------------------------------------------------------------------------
 int32_t Audio::Gain(int16_t s[2]) {
     int32_t v[2];
-    float step = (float)m_vol /254;
-    uint8_t l = 0, r = 0;
+    uint16_t leftGain = m_vol;
+    uint16_t rightGain = m_vol;
+    const uint16_t attenuation = static_cast<uint16_t>(
+        (static_cast<uint16_t>(m_vol) * abs(m_balance) + 8U) / 16U);
 
-    if(m_balance < 0){
-        step = step * (float)(abs(m_balance) * 16);
-        l = (uint8_t)(step);
-    }
-    if(m_balance > 0){
-        step = step * m_balance * 16;
-        r = (uint8_t)(step);
-    }
+    if(m_balance < 0) leftGain -= attenuation;
+    if(m_balance > 0) rightGain -= attenuation;
 
-    v[LEFTCHANNEL] = (s[LEFTCHANNEL]  * (m_vol - l)) >> 8;
-    v[RIGHTCHANNEL]= (s[RIGHTCHANNEL] * (m_vol - r)) >> 8;
+    v[LEFTCHANNEL] = (s[LEFTCHANNEL] * leftGain) >> 8;
+    v[RIGHTCHANNEL]= (s[RIGHTCHANNEL] * rightGain) >> 8;
 
     return (v[LEFTCHANNEL] << 16) | (v[RIGHTCHANNEL] & 0xffff);
 }
@@ -5457,6 +5484,7 @@ uint32_t Audio::inBufferFree() {
 //---------------------------------------------------------------------------------------------------------------------
 //            ***     D i g i t a l   b i q u a d r a t i c     f i l t e r     ***
 //---------------------------------------------------------------------------------------------------------------------
+#if YORADIO_EQUALIZER_ENABLED
 void Audio::IIR_calculateCoefficients(int8_t G0, int8_t G1, int8_t G2){  // Infinite Impulse Response (IIR) filters
 
     // G1 - gain low shelf   set between -40 ... +6 dB
@@ -5694,6 +5722,7 @@ int16_t* Audio::IIR_filterChain2(int16_t iir_in[2], bool clear){  // Infinite Im
 
     return iir_out;
 }
+#endif
 //----------------------------------------------------------------------------------------------------------------------
 //    AAC - T R A N S P O R T S T R E A M
 //----------------------------------------------------------------------------------------------------------------------

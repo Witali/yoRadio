@@ -336,10 +336,12 @@ void AsyncMqttClient::_onPoll() {
     return;
   }
   // send ping to ensure the server will receive at least one message inside keepalive window
-  if (_state == CONNECTED && _lastPingRequestTime == 0 && (millis() - _lastClientActivity) >= (_keepAlive * 1000 * 0.7)) {
+  const uint32_t pingInterval =
+      (static_cast<uint32_t>(_keepAlive) * 1000U * 7U) / 10U;
+  if (_state == CONNECTED && _lastPingRequestTime == 0 && (millis() - _lastClientActivity) >= pingInterval) {
     _sendPing();
   // send ping to verify if the server is still there (ensure this is not a half connection)
-  } else if (_state == CONNECTED && _lastPingRequestTime == 0 && (millis() - _lastServerActivity) >= (_keepAlive * 1000 * 0.7)) {
+  } else if (_state == CONNECTED && _lastPingRequestTime == 0 && (millis() - _lastServerActivity) >= pingInterval) {
     _sendPing();
   }
   _handleQueue();

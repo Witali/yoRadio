@@ -4,6 +4,7 @@
 #include "player.h"
 #include "network.h"
 #include "telnet.h"
+#include "fixedpoint.h"
 #include "freertos_stats.h"
 //#include "esp_heap_caps.h"
 
@@ -203,11 +204,13 @@ void Telnet::info() {
 void Telnet::printHeapFragmentationInfo(uint8_t id){
   size_t freeHeap = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
   size_t largestBlock = heap_caps_get_largest_free_block(MALLOC_CAP_DEFAULT);
-  float fragmentation = 100.0 * (1.0 - ((float)largestBlock / (float)freeHeap));
+  const size_t fragmented = largestBlock < freeHeap ? freeHeap - largestBlock : 0;
+  const uint32_t fragmentation = fixedpoint::ratio(fragmented, freeHeap, 10000U);
   printf(id, "\n*************************************\n");
   printf(id, "* Free heap: %u bytes\n", freeHeap);
   printf(id, "* Largest free block: %u bytes\n", largestBlock);
-  printf(id, "* Fragmentation: %.2f%%\n", fragmentation);
+  printf(id, "* Fragmentation: %u.%02u%%\n", fragmentation / 100U,
+         fragmentation % 100U);
   printf(id, "*************************************\n\n");
 }
 void Telnet::on_input(const char* str, uint8_t clientId) {

@@ -922,7 +922,7 @@ void PlayListWidget::init(ScrollWidget* current){
   _current = current;
   #ifndef DSP_LCD
   _plItemHeight = playlistConf.widget.textsize*(CHARHEIGHT-1)+playlistConf.widget.textsize*4;
-  _plTtemsCount = round((float)dsp.height()/_plItemHeight);
+  _plTtemsCount = (dsp.height() + _plItemHeight / 2U) / _plItemHeight;
   if(_plTtemsCount%2==0) _plTtemsCount++;
   _plCurrentPos = _plTtemsCount/2;
   _plYStart = (dsp.height() / 2 - _plItemHeight / 2) - _plItemHeight * (_plTtemsCount - 1) / 2 + playlistConf.widget.textsize*2;

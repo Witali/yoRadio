@@ -109,7 +109,7 @@ typedef struct _AACDecInfo_t {
     int   bitRate;    /* user-accessible info */
     int   nChans;
     int   sampRate;
-    float compressionRatio;
+    uint32_t frameBytes;
     int   id;         /* 0: MPEG-4, 1: MPEG2 */
     int   profile;    /* 0: Main profile, 1: LowComplexity (LC), 2: ScalableSamplingRate (SSR), 3: reserved */
     int   format;

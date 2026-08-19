@@ -1840,8 +1840,12 @@ uint8_t AACGetProfile() {return (uint8_t)m_AACDecInfo->profile;} // 0-Main, 1-LC
 uint8_t AACGetFormat() {return (uint8_t)m_AACDecInfo->format;}   // 0-unknown 1-ADTS 2-ADIF, 3-RAW
 int AACGetOutputSamps(){return m_AACDecInfo->nChans * AAC_MAX_NSAMPS  * (m_AACDecInfo->sbrEnabled ? 2 : 1);}
 int AACGetBitrate() {
-    uint32_t br = AACGetBitsPerSample() * AACGetChannels() *  AACGetSampRate();
-    return (br / m_AACDecInfo->compressionRatio);
+    const uint32_t outputBytes = AACGetOutputSamps() * 2U;
+    if (!outputBytes) return 0;
+    const uint64_t pcmBitrate = static_cast<uint64_t>(AACGetBitsPerSample()) *
+                                AACGetChannels() * AACGetSampRate();
+    return static_cast<int>(pcmBitrate * m_AACDecInfo->frameBytes /
+                            outputBytes);
 }
 /**************************************************************************************
  * Function:    AACSetRawBlockParams
@@ -2054,7 +2058,7 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
             return ERR_AAC_INDATA_UNDERFLOW;
     }
 
-    m_AACDecInfo->compressionRatio = (float)(AACGetOutputSamps()) * 2 / (inptr - inbuf);
+    m_AACDecInfo->frameBytes = static_cast<uint32_t>(inptr - inbuf);
 
     /* update pointers */
     m_AACDecInfo->frameCount++;
