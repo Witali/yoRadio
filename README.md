@@ -4,6 +4,7 @@
 ##### Web-radio based on [ESP32-audioI2S](https://github.com/schreibfaul1/ESP32-audioI2S) or/and [ESP32-vs1053_ext](https://github.com/schreibfaul1/ESP32-vs1053_ext) library
 ---
 - [Hardware](#hardware)
+- [ESP32-C3 0.42-inch OLED board](docs/ESP32-C3-0.42-OLED.md)
 - [Connection tables](#connection-tables)
 - [Software dependencies](#dependencies)
 - [Hardware setup](#hardware-setup)
@@ -32,6 +33,9 @@ https://github.com/e2002/yopcb
 
 ---
 ## Hardware
+The compact ESP32-C3 board with a built-in 0.42-inch OLED has a dedicated
+[hardware description, pinout, schematic and build guide](docs/ESP32-C3-0.42-OLED.md).
+
 #### Required:
 **ESP32 board**: https://aliexpress.com/item/32847027609.html \
 **I2S DAC**, roughly like this one: https://aliexpress.com/item/1005001993192815.html \
