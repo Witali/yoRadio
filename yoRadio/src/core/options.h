@@ -346,6 +346,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef I2S_PDM_DOUT
   #define I2S_PDM_DOUT      26  // PDM data pin; clock stays inside the ESP32
 #endif
+#ifndef I2S_PDM_DOUT2
+  #define I2S_PDM_DOUT2     255 // optional right-channel PDM data pin
+#endif
 #ifndef ROTATE_90
   #define ROTATE_90         false  // Optional 90 degree rotation for square displays
 #endif

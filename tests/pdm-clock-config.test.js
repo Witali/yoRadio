@@ -34,6 +34,17 @@ test("PDM channel configuration uses the typed I2S port required by IDF 5", () =
   );
 });
 
+test("PDM stereo uses two DAC lines and keeps channels interleaved", () => {
+  assert.match(source, /I2S_PDM_TX_SLOT_DAC_DEFAULT_CONFIG/);
+  assert.match(source, /I2S_SLOT_MODE_STEREO/);
+  assert.match(source, /\.dout2 = stereoOutput\(\)/);
+  assert.match(source, /sampleBuffer\[offset\] = left/);
+  assert.match(source, /sampleBuffer\[offset \+ 1U\] = right/);
+  assert.match(source, /pdmOutputWriteFrame\(int16_t left, int16_t right\)/);
+  assert.match(source, /resamplerPreviousLeft/);
+  assert.match(source, /resamplerPreviousRight/);
+});
+
 test("minimal IDF build corrects fractional fp/fs PDM clock calculation", () => {
   const cmake = fs.readFileSync(
     path.join(__dirname, "..", "idf", "esp32-cyd2usb-minimal", "CMakeLists.txt"),

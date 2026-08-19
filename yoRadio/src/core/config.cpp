@@ -1091,7 +1091,12 @@ void Config::bootInfo() {
   BOOTLOG("display:\t%d", DSP_MODEL);
   if(VS1053_CS==255) {
   #if defined(YORADIO_AUDIO_BACKEND_PDM)
-    BOOTLOG("audio:\t\thardware I2S PDM (GPIO%d)", I2S_PDM_DOUT);
+    #if I2S_PDM_DOUT2 == 255
+      BOOTLOG("audio:\t\thardware I2S PDM mono (GPIO%d)", I2S_PDM_DOUT);
+    #else
+      BOOTLOG("audio:\t\thardware I2S PDM stereo (L=GPIO%d, R=GPIO%d)",
+              I2S_PDM_DOUT, I2S_PDM_DOUT2);
+    #endif
   #elif defined(YORADIO_DAC_BACKEND_LEGACY)
     BOOTLOG("audio:\t\tlegacy I2S DAC from ESP-IDF 5.5.4 (GPIO26)");
   #elif defined(YORADIO_ESP_IDF_MINIMAL)

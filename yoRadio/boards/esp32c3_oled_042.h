@@ -4,11 +4,10 @@
 /*
  * 01Space-style ESP32-C3 board with the onboard 0.42 inch 72x40 SSD1306 OLED.
  *
- * The ESP32-C3 has no internal analogue DAC. This profile therefore drives an
- * external I2S DAC/amplifier (for example MAX98357A or PCM5102A):
- *   GPIO1  -> BCLK
- *   GPIO3  -> LRC / WS
- *   GPIO10 -> DIN
+ * The ESP32-C3 has no internal analogue DAC. Its I2S peripheral converts the
+ * decoded stereo PCM to two independent PDM bit streams for passive filtering:
+ *   GPIO10 -> left PDM output
+ *   GPIO3  -> right PDM output
  */
 
 #define L10N_LANGUAGE         RU
@@ -19,10 +18,13 @@
 #define I2C_RST               -1
 #define I2CFREQ_HZ            400000UL
 
-#define I2S_BCLK              1
-#define I2S_LRC               3
-#define I2S_DOUT              10
-#define I2S_INTERNAL          false
+#define I2S_BCLK              255
+#define I2S_LRC               255
+#define I2S_DOUT              255
+#define I2S_INTERNAL          true
+#define I2S_INTERNAL_OUTPUT   AUDIO_OUTPUT_PDM
+#define I2S_PDM_DOUT          10
+#define I2S_PDM_DOUT2         3
 
 /* The single-core C3 build bypasses the three software IIR tone filters. */
 #define YORADIO_EQUALIZER_ENABLED 0

@@ -19,9 +19,14 @@ test("ESP32-C3 board documentation covers the supported hardware", () => {
   assert.match(document, /OLED SDA \| 5/);
   assert.match(document, /OLED SCL \| 6/);
   assert.match(document, /BOOT \/ radio control \| 9/);
-  assert.match(document, /I2S BCLK \| 1/);
-  assert.match(document, /I2S LRC \/ WS \| 3/);
-  assert.match(document, /I2S DATA \| 10/);
+  assert.match(document, /Right PDM audio \| 3/);
+  assert.match(document, /Left PDM audio \| 10/);
+  assert.match(document, /GPIO10 for the left[\s\S]*GPIO3 for the right/);
+  assert.match(document, /R1 1 kOhm[\s\S]*R2 1 kOhm/);
+  assert.match(document, /C1 4\.7 nF[\s\S]*C2 4\.7 nF/);
+  assert.match(document, /C3 1\.\.4\.7 uF/);
+  assert.match(document, /R3 \| 47 to 100 kOhm/);
+  assert.match(document, /Never connect a[\s\S]*low-impedance load directly/);
   assert.match(document, /no fitted or\s+usable WS2812 LED/);
   assert.match(document, /github\.com\/01Space\/ESP32-C3-0\.42LCD/);
   assert.match(document, /michiel\.vanderwulp\.be\/domotica\/Modules\/ESP32-C3-SuperMini-OLED/);

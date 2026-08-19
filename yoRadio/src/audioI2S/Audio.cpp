@@ -331,9 +331,10 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
 //---------------------------------------------------------------------------------------------------------------------
 bool Audio::beginOutput() {
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
-    log_i("internal I2S PDM on GPIO%d (deferred until audio starts)",
-          I2S_PDM_DOUT);
-    const esp_err_t result = pdmOutputPrepare(m_i2s_num, I2S_PDM_DOUT);
+    log_i("internal I2S PDM on GPIO%d/%d (deferred until audio starts)",
+          I2S_PDM_DOUT, I2S_PDM_DOUT2);
+    const esp_err_t result = pdmOutputPrepare(
+        m_i2s_num, I2S_PDM_DOUT, I2S_PDM_DOUT2);
     if (result != ESP_OK) {
         log_e("PDM output initialization failed: %s",
               esp_err_to_name(result));
@@ -5261,25 +5262,22 @@ bool Audio::playSample(int16_t sample[2]) {
     }
 
   #if I2S_INTERNAL && I2S_INTERNAL_OUTPUT == AUDIO_OUTPUT_PDM
-    int16_t mono;
-    if (getChannels() == 1 || m_f_forceMono) {
-        // Mono input is duplicated by playChunk(), and forced stereo has been
-        // folded only after the independent L/R VU levels were measured.
-        const int32_t scaled =
-            static_cast<int32_t>(sample[LEFTCHANNEL]) * m_vol;
-        mono = static_cast<int16_t>(scaled >> 8);
-    } else {
-        // PDM has one physical output. If stereo was intentionally retained,
-        // apply its per-channel gain/balance first and downmix exactly once.
-        const uint32_t stereo = static_cast<uint32_t>(Gain(sample));
-        const int16_t left = static_cast<int16_t>(stereo >> 16);
-        const int16_t right = static_cast<int16_t>(stereo & 0xffff);
-        const int32_t sum = static_cast<int32_t>(left) + right;
-        mono = static_cast<int16_t>(sum / 2);
-    }
+    const uint32_t stereo = static_cast<uint32_t>(Gain(sample));
+    int16_t left = static_cast<int16_t>(stereo >> 16);
+    int16_t right = static_cast<int16_t>(stereo & 0xffff);
+    #if I2S_PDM_DOUT2 == 255
+      // Preserve the legacy one-line PDM output on boards without dout2.
+      const int16_t mono = static_cast<int16_t>(
+          (static_cast<int32_t>(left) + right) / 2);
+      left = mono;
+      right = mono;
+    #endif
     m_i2s_bytesWritten = 0;
-    esp_err_t err = pdmOutputWriteSample(mono);
-    if (err == ESP_OK) m_i2s_bytesWritten = sizeof(mono);
+    esp_err_t err = pdmOutputWriteFrame(left, right);
+    if (err == ESP_OK) {
+        m_i2s_bytesWritten = I2S_PDM_DOUT2 == 255
+            ? sizeof(left) : sizeof(left) + sizeof(right);
+    }
   #else
     uint32_t s32 = Gain(sample); // vosample2lume;
     if(m_f_internalDAC) {

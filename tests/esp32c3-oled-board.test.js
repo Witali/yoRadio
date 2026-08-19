@@ -6,16 +6,19 @@ const test = require("node:test");
 const root = path.resolve(__dirname, "..");
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8");
 
-test("ESP32-C3 profile selects the onboard OLED and external I2S pins", () => {
+test("ESP32-C3 profile selects the onboard OLED and stereo PDM pins", () => {
   const profile = read("yoRadio", "boards", "esp32c3_oled_042.h");
 
   assert.match(profile, /DSP_MODEL\s+DSP_SSD1306_72X40/);
   assert.match(profile, /I2C_SDA\s+5/);
   assert.match(profile, /I2C_SCL\s+6/);
-  assert.match(profile, /I2S_BCLK\s+1/);
-  assert.match(profile, /I2S_LRC\s+3/);
-  assert.match(profile, /I2S_DOUT\s+10/);
-  assert.match(profile, /I2S_INTERNAL\s+false/);
+  assert.match(profile, /I2S_BCLK\s+255/);
+  assert.match(profile, /I2S_LRC\s+255/);
+  assert.match(profile, /I2S_DOUT\s+255/);
+  assert.match(profile, /I2S_INTERNAL\s+true/);
+  assert.match(profile, /I2S_INTERNAL_OUTPUT\s+AUDIO_OUTPUT_PDM/);
+  assert.match(profile, /I2S_PDM_DOUT\s+10/);
+  assert.match(profile, /I2S_PDM_DOUT2\s+3/);
   assert.match(profile, /BTN_CENTER\s+9/);
 });
 
