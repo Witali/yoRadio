@@ -196,6 +196,25 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
     return send_encoded(generation, *codec, data, size, false);
 }
 
+static char *trim_icy_title(char *title) {
+    while (*title == ' ' || *title == '\t' || *title == '\r' ||
+           *title == '\n') {
+        ++title;
+    }
+    char *end = title + strlen(title);
+    while (end > title &&
+           (end[-1] == ' ' || end[-1] == '\t' || end[-1] == '\r' ||
+            end[-1] == '\n')) {
+        *--end = '\0';
+    }
+    return title;
+}
+
+static bool icy_title_is_status_payload(const char *title) {
+    return title[0] == '{' && strstr(title, "\"status\"") &&
+           strstr(title, "\"result\"") && strstr(title, "\"errorCode\"");
+}
+
 static void parse_icy_metadata(char *metadata, size_t size) {
     if (!metadata || !size) return;
     metadata[size] = '\0';
@@ -206,6 +225,12 @@ static void parse_icy_metadata(char *metadata, size_t size) {
     if (!end) end = strchr(title, '\'');
     if (!end) return;
     *end = '\0';
+    title = trim_icy_title(title);
+    if (icy_title_is_status_payload(title)) {
+        native_state_set_title(s_state, "");
+        ESP_LOGW(TAG, "Ignoring non-title ICY status payload");
+        return;
+    }
     native_state_set_title(s_state, title);
     ESP_LOGI(TAG, "Stream title: %s", title);
 }
