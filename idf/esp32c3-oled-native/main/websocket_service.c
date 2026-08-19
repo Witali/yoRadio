@@ -1,6 +1,5 @@
 #include "websocket_service.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -11,16 +10,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_audio_output.h"
+#include "radio_control.h"
 
-#define PLAYLIST_PATH "/spiffs/data/playlist.csv"
 #define WS_STATUS_INTERVAL_MS 2000
 
 static const char *const TAG = "websocket";
 static httpd_handle_t s_server;
 static native_state_t *s_state;
-static uint16_t s_current_item = 1;
-static char s_current_name[144] = "yoRadio native";
-static char s_current_url[512];
 
 static void json_escape(const char *source, char *target, size_t target_size) {
     size_t written = 0;
@@ -34,44 +30,6 @@ static void json_escape(const char *source, char *target, size_t target_size) {
         }
     }
     target[written] = '\0';
-}
-
-static bool playlist_station(uint16_t requested, char *name,
-                             size_t name_size, char *url, size_t url_size) {
-    FILE *file = fopen(PLAYLIST_PATH, "r");
-    if (!file) return false;
-    char line[768];
-    uint16_t item = 0;
-    bool found = false;
-    while (fgets(line, sizeof(line), file)) {
-        char *first_tab = strchr(line, '\t');
-        if (!first_tab) continue;
-        char *second_tab = strchr(first_tab + 1, '\t');
-        if (!second_tab) continue;
-        ++item;
-        if (item != requested) continue;
-        *first_tab = '\0';
-        *second_tab = '\0';
-        strlcpy(name, line, name_size);
-        strlcpy(url, first_tab + 1, url_size);
-        found = name[0] && url[0];
-        break;
-    }
-    fclose(file);
-    return found;
-}
-
-static uint16_t playlist_count(void) {
-    FILE *file = fopen(PLAYLIST_PATH, "r");
-    if (!file) return 0;
-    char line[768];
-    uint16_t count = 0;
-    while (fgets(line, sizeof(line), file)) {
-        char *first_tab = strchr(line, '\t');
-        if (first_tab && strchr(first_tab + 1, '\t')) ++count;
-    }
-    fclose(file);
-    return count;
 }
 
 static esp_err_t ws_send_request(httpd_req_t *request, const char *text) {
@@ -102,7 +60,9 @@ static void format_status(char *output, size_t output_size) {
     char name[300];
     char title[400];
     char format[120];
-    json_escape(s_current_name, name, sizeof(name));
+    char current_name[144];
+    radio_control_current_name(current_name, sizeof(current_name));
+    json_escape(current_name, name, sizeof(name));
     json_escape(state.title, title, sizeof(title));
     json_escape(state.stream_format, format, sizeof(format));
     snprintf(output, output_size,
@@ -127,7 +87,8 @@ static esp_err_t send_initial_state(httpd_req_t *request) {
     format_status(status, sizeof(status));
     ESP_RETURN_ON_ERROR(ws_send_request(request, status), TAG,
                         "send WebUI status");
-    snprintf(current, sizeof(current), "{\"current\":%u}", s_current_item);
+    snprintf(current, sizeof(current), "{\"current\":%u}",
+             radio_control_current_item());
     ESP_RETURN_ON_ERROR(ws_send_request(request, current), TAG,
                         "send WebUI station index");
     ESP_RETURN_ON_ERROR(ws_send_request(request, "{\"sdinit\":0}"), TAG,
@@ -135,23 +96,6 @@ static esp_err_t send_initial_state(httpd_req_t *request) {
     ESP_RETURN_ON_ERROR(
         ws_send_request(request, "{\"playermode\":\"modeweb\"}"), TAG,
         "send WebUI player mode");
-    return ESP_OK;
-}
-
-static esp_err_t play_station(uint16_t item) {
-    char name[sizeof(s_current_name)];
-    char url[sizeof(s_current_url)];
-    ESP_RETURN_ON_FALSE(playlist_station(item, name, sizeof(name), url,
-                                         sizeof(url)),
-                        ESP_ERR_NOT_FOUND, TAG,
-                        "Station %u is absent from playlist", item);
-    ESP_RETURN_ON_ERROR(audio_service_play(url, NATIVE_CODEC_AUTO), TAG,
-                        "start station %u", item);
-    native_state_set_station(s_state, name);
-    s_current_item = item;
-    strlcpy(s_current_name, name, sizeof(s_current_name));
-    strlcpy(s_current_url, url, sizeof(s_current_url));
-    ESP_LOGI(TAG, "WebUI selected station %u: %s", item, name);
     return ESP_OK;
 }
 
@@ -172,36 +116,19 @@ static void handle_command(httpd_req_t *request, char *command) {
     } else if (strcmp(command, "submitplaylistdone") == 0) {
         // The shared WebUI acknowledges that it has reloaded playlist.csv.
     } else if (strcmp(command, "play") == 0) {
-        play_station((uint16_t)strtoul(value, NULL, 10));
+        radio_control_play((uint16_t)strtoul(value, NULL, 10));
         send_initial_state(request);
     } else if (strcmp(command, "stop") == 0) {
         audio_service_stop();
         send_initial_state(request);
     } else if (strcmp(command, "toggle") == 0) {
-        native_state_t state;
-        native_state_snapshot(s_state, &state);
-        if (state.audio_running) {
-            audio_service_stop();
-        } else if (s_current_url[0]) {
-            audio_service_play(s_current_url, NATIVE_CODEC_AUTO);
-            native_state_set_station(s_state, s_current_name);
-        } else {
-            play_station(s_current_item);
-        }
+        radio_control_toggle();
         send_initial_state(request);
     } else if (strcmp(command, "prev") == 0 ||
                strcmp(command, "next") == 0) {
-        uint16_t count = playlist_count();
-        if (count) {
-            uint16_t item = s_current_item;
-            if (strcmp(command, "prev") == 0) {
-                item = item > 1 ? item - 1 : count;
-            } else {
-                item = item < count ? item + 1 : 1;
-            }
-            play_station(item);
-            send_initial_state(request);
-        }
+        if (strcmp(command, "prev") == 0) radio_control_previous();
+        else radio_control_next();
+        send_initial_state(request);
     } else if (strcmp(command, "volume") == 0) {
         unsigned volume = strtoul(value, NULL, 10);
         native_audio_output_set_volume(volume > 254 ? 254 : (uint8_t)volume);

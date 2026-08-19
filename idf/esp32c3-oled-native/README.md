@@ -28,10 +28,10 @@ filters and amplifier connection documented in
 a speaker or headphones directly to either GPIO.
 
 The OLED uses the controller-specific 28-column RAM offset and a reduced
-contrast. It displays network state, RSSI, decoder format, playback state and
-the current stream. The GPIO8 PWM LED follows the stronger channel peak. A
-short BOOT-button release stops or resumes the current stream; holding BOOT
-while resetting still enters the ROM downloader.
+contrast. It displays the station, current song and IP address. The GPIO8 PWM
+LED follows the stronger channel peak. One BOOT click pauses or resumes, two
+clicks select the next station, and a hold selects the previous station.
+Holding BOOT while resetting still enters the ROM downloader.
 
 ## Reproducible setup and build
 

@@ -14,7 +14,12 @@
 #include "network_service.h"
 #include "nvs_flash.h"
 #include "oled_display.h"
+#include "radio_control.h"
 #include "web_service.h"
+
+#define BUTTON_DEBOUNCE_MS 35
+#define BUTTON_CLICK_WINDOW_MS 400
+#define BUTTON_HOLD_MS 800
 
 static const char *const TAG = "yoradio_c3";
 static native_state_t s_state;
@@ -95,23 +100,43 @@ static void button_task(void *argument) {
         .intr_type = GPIO_INTR_DISABLE,
     };
     ESP_ERROR_CHECK(gpio_config(&config));
-    bool previous = gpio_get_level(BOARD_BOOT_BUTTON) == 0;
-    TickType_t changed_at = xTaskGetTickCount();
+    bool raw_pressed = gpio_get_level(BOARD_BOOT_BUTTON) == 0;
+    bool stable_pressed = raw_pressed;
+    TickType_t raw_changed_at = xTaskGetTickCount();
+    TickType_t pressed_at = 0;
+    TickType_t released_at = 0;
+    uint8_t clicks = 0;
+    bool hold_handled = false;
     while (true) {
         bool pressed = gpio_get_level(BOARD_BOOT_BUTTON) == 0;
         TickType_t now = xTaskGetTickCount();
-        if (pressed != previous && now - changed_at >= pdMS_TO_TICKS(35)) {
-            previous = pressed;
-            changed_at = now;
-            if (!pressed) {
-                native_state_t state;
-                native_state_snapshot(&s_state, &state);
-                if (state.audio_running) {
-                    audio_service_stop();
-                } else {
-                    audio_service_resume();
-                }
+        if (pressed != raw_pressed) {
+            raw_pressed = pressed;
+            raw_changed_at = now;
+        }
+        if (raw_pressed != stable_pressed &&
+            now - raw_changed_at >= pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS)) {
+            stable_pressed = raw_pressed;
+            if (stable_pressed) {
+                pressed_at = now;
+                hold_handled = false;
+            } else if (!hold_handled) {
+                if (clicks < UINT8_MAX) ++clicks;
+                released_at = now;
             }
+        }
+        if (stable_pressed && !hold_handled &&
+            now - pressed_at >= pdMS_TO_TICKS(BUTTON_HOLD_MS)) {
+            ESP_ERROR_CHECK_WITHOUT_ABORT(radio_control_previous());
+            hold_handled = true;
+            clicks = 0;
+        }
+        if (!stable_pressed && clicks &&
+            now - released_at >= pdMS_TO_TICKS(BUTTON_CLICK_WINDOW_MS)) {
+            esp_err_t result = clicks >= 2 ? radio_control_next()
+                                           : radio_control_toggle();
+            ESP_ERROR_CHECK_WITHOUT_ABORT(result);
+            clicks = 0;
         }
         vTaskDelay(pdMS_TO_TICKS(10));
     }
@@ -127,6 +152,10 @@ static void services_task(void *argument) {
     result = audio_service_start(&s_state);
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Audio service failed: %s", esp_err_to_name(result));
+    }
+    result = radio_control_init(&s_state);
+    if (result != ESP_OK) {
+        ESP_LOGE(TAG, "Radio control failed: %s", esp_err_to_name(result));
     }
     result = web_service_start(&s_state);
     if (result != ESP_OK) {
