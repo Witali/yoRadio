@@ -8,7 +8,8 @@ set(NATIVE_SRCS
   "native_state.c"
   "network_service.c"
   "oled_display.c"
-  "web_service.c")
+  "web_service.c"
+  "websocket_service.c")
 
 idf_component_register(
   SRCS ${NATIVE_SRCS}
@@ -37,4 +38,11 @@ idf_component_register(
 target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
 
-spiffs_create_partition_image(spiffs "${YORADIO_ROOT}/data" FLASH_IN_PROJECT)
+set(NATIVE_SPIFFS_ROOT "${CMAKE_CURRENT_BINARY_DIR}/spiffs-root")
+file(REMOVE_RECURSE "${NATIVE_SPIFFS_ROOT}")
+file(MAKE_DIRECTORY "${NATIVE_SPIFFS_ROOT}")
+file(COPY "${YORADIO_ROOT}/data/" DESTINATION "${NATIVE_SPIFFS_ROOT}")
+configure_file("${YORADIO_ROOT}/../playlist.csv"
+               "${NATIVE_SPIFFS_ROOT}/data/playlist.csv" COPYONLY)
+
+spiffs_create_partition_image(spiffs "${NATIVE_SPIFFS_ROOT}" FLASH_IN_PROJECT)

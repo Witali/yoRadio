@@ -2,6 +2,7 @@
 
 #include <limits.h>
 #include <stdbool.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -37,6 +38,15 @@ static int16_t s_previous_left;
 static int16_t s_previous_right;
 static uint32_t s_resampler_next_phase;
 static uint8_t s_led_envelope;
+static atomic_uchar s_volume;
+static atomic_schar s_balance;
+
+static int16_t scale_sample(int16_t sample, uint16_t numerator,
+                            uint16_t denominator) {
+    int32_t scaled = (int32_t)sample * numerator;
+    scaled += scaled >= 0 ? denominator / 2 : -(int32_t)(denominator / 2);
+    return (int16_t)(scaled / denominator);
+}
 
 static void decode_pcm_frame(const uint8_t *frame, uint8_t channels,
                              int16_t *left, int16_t *right) {
@@ -272,6 +282,8 @@ static void audio_led_update(uint16_t peak) {
 esp_err_t native_audio_output_init(void) {
     hold_pdm_low();
     s_led_envelope = 0;
+    atomic_init(&s_volume, 192);
+    atomic_init(&s_balance, 0);
     return audio_led_init();
 }
 
@@ -299,10 +311,19 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
     uint16_t peak = 0;
+    uint8_t volume = atomic_load(&s_volume);
+    int8_t balance = atomic_load(&s_balance);
     for (size_t frame = 0; frame < frames; ++frame) {
         int16_t left;
         int16_t right;
         decode_pcm_frame(data + frame * frame_bytes, channels, &left, &right);
+        left = scale_sample(left, volume, 254);
+        right = scale_sample(right, volume, 254);
+        if (balance < 0) {
+            right = scale_sample(right, (uint16_t)(16 + balance), 16);
+        } else if (balance > 0) {
+            left = scale_sample(left, (uint16_t)(16 - balance), 16);
+        }
         uint16_t left_peak = left == INT16_MIN ? 32768U
                                                : (uint16_t)abs(left);
         uint16_t right_peak = right == INT16_MIN ? 32768U
@@ -316,6 +337,24 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     return ESP_OK;
 }
 
+void native_audio_output_set_volume(uint8_t volume) {
+    atomic_store(&s_volume, volume);
+}
+
+uint8_t native_audio_output_get_volume(void) {
+    return atomic_load(&s_volume);
+}
+
+void native_audio_output_set_balance(int8_t balance) {
+    if (balance < -16) balance = -16;
+    if (balance > 16) balance = 16;
+    atomic_store(&s_balance, balance);
+}
+
+int8_t native_audio_output_get_balance(void) {
+    return atomic_load(&s_balance);
+}
+
 void native_audio_output_idle(void) {
     // DMA descriptors auto-clear to PCM zero; only the level LED must decay.
     audio_led_update(0);
@@ -324,4 +363,3 @@ void native_audio_output_idle(void) {
 const char *native_audio_output_name(void) {
     return "stereo I2S PDM (GPIO10/GPIO3)";
 }
-

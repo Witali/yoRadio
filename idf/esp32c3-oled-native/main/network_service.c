@@ -24,6 +24,12 @@ static wifi_config_t s_station_config;
 static int s_retries;
 static bool s_have_credentials;
 
+static void prepare_station_config(wifi_config_t *config) {
+    config->sta.threshold.authmode = WIFI_AUTH_OPEN;
+    config->sta.pmf_cfg.capable = true;
+    config->sta.pmf_cfg.required = false;
+}
+
 static bool read_credentials(wifi_config_t *config) {
     FILE *file = fopen("/spiffs/data/wifi.csv", "r");
     if (!file) return false;
@@ -121,9 +127,7 @@ esp_err_t network_service_start(native_state_t *state) {
     memset(&s_station_config, 0, sizeof(s_station_config));
     s_have_credentials = read_credentials(&s_station_config);
     if (s_have_credentials) {
-        s_station_config.sta.threshold.authmode = WIFI_AUTH_OPEN;
-        s_station_config.sta.pmf_cfg.capable = true;
-        s_station_config.sta.pmf_cfg.required = false;
+        prepare_station_config(&s_station_config);
         ESP_RETURN_ON_ERROR(esp_wifi_set_mode(WIFI_MODE_STA), TAG,
                             "Station mode failed");
         ESP_RETURN_ON_ERROR(
@@ -155,4 +159,48 @@ esp_err_t network_service_retry_client(void) {
                         TAG, "Station configuration restore failed");
     native_state_set_network(s_state, NATIVE_NETWORK_STARTING, 0);
     return esp_wifi_connect();
+}
+
+esp_err_t network_service_save_credentials(const char *ssid,
+                                           const char *password) {
+    ESP_RETURN_ON_FALSE(ssid && password && ssid[0], ESP_ERR_INVALID_ARG, TAG,
+                        "Wi-Fi credentials are empty");
+    ESP_RETURN_ON_FALSE(strlen(ssid) < sizeof(s_station_config.sta.ssid) &&
+                            strlen(password) <
+                                sizeof(s_station_config.sta.password),
+                        ESP_ERR_INVALID_SIZE, TAG,
+                        "Wi-Fi credentials are too long");
+    ESP_RETURN_ON_FALSE(!strpbrk(ssid, "\t\r\n") &&
+                            !strpbrk(password, "\t\r\n"),
+                        ESP_ERR_INVALID_ARG, TAG,
+                        "Wi-Fi credentials contain a line separator");
+
+    const char *path = "/spiffs/data/wifi.csv";
+    const char *temporary_path = "/spiffs/data/wifi.csv.tmp";
+    FILE *file = fopen(temporary_path, "w");
+    ESP_RETURN_ON_FALSE(file, ESP_FAIL, TAG,
+                        "Cannot create Wi-Fi credentials file");
+    bool written = fprintf(file, "%s\t%s\n", ssid, password) > 0;
+    bool flushed = fflush(file) == 0;
+    bool closed = fclose(file) == 0;
+    if (!written || !flushed || !closed) {
+        remove(temporary_path);
+        return ESP_FAIL;
+    }
+    remove(path);
+    if (rename(temporary_path, path) != 0) {
+        remove(temporary_path);
+        return ESP_FAIL;
+    }
+
+    memset(&s_station_config, 0, sizeof(s_station_config));
+    strlcpy((char *)s_station_config.sta.ssid, ssid,
+            sizeof(s_station_config.sta.ssid));
+    strlcpy((char *)s_station_config.sta.password, password,
+            sizeof(s_station_config.sta.password));
+    prepare_station_config(&s_station_config);
+    s_have_credentials = true;
+    ESP_LOGI(TAG, "Saved Wi-Fi client configuration for SSID length %u",
+             (unsigned)strlen(ssid));
+    return ESP_OK;
 }

@@ -69,3 +69,33 @@ test("native partition table stays compatible with min_spiffs", () => {
   assert.match(partitions, /spiffs,\s+data,\s+spiffs,\s+0x3D0000,\s+0x20000/);
 });
 
+test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", () => {
+  const component = read("main", "CMakeLists.txt");
+  const config = read("sdkconfig.defaults");
+  const web = read("main", "web_service.c");
+  const websocket = read("main", "websocket_service.c");
+
+  assert.match(component, /esp_http_server/);
+  assert.match(component, /websocket_service\.c/);
+  assert.match(config, /CONFIG_HTTPD_WS_SUPPORT=y/);
+  assert.match(web, /websocket_service_register\(server, state\)/);
+  assert.match(web, /strcmp\(uri, "\/variables\.js"\)/);
+  assert.match(web, /equalizerEnabled=false/);
+  assert.match(web, /\.uri = "\/upload"/);
+  assert.match(websocket, /\.uri = "\/ws"/);
+  assert.match(websocket, /\.is_websocket = true/);
+  assert.match(websocket, /httpd_ws_recv_frame/);
+  assert.match(websocket, /httpd_ws_send_frame/);
+  assert.match(websocket, /httpd_ws_send_data/);
+  assert.match(websocket, /strcmp\(command, "next"\)/);
+  assert.match(websocket, /strcmp\(command, "prev"\)/);
+  assert.doesNotMatch(web + websocket, /AsyncWebServer|AsyncWebSocket|Arduino/);
+});
+
+test("native SPIFFS image contains the shared WebUI and repository playlist", () => {
+  const component = read("main", "CMakeLists.txt");
+
+  assert.match(component, /file\(COPY "\$\{YORADIO_ROOT\}\/data\/"/);
+  assert.match(component, /playlist\.csv" COPYONLY/);
+  assert.match(component, /spiffs_create_partition_image\(spiffs "\$\{NATIVE_SPIFFS_ROOT\}"/);
+});

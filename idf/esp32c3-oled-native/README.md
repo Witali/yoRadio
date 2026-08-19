@@ -80,7 +80,26 @@ Wi-Fi client credentials are read from `/data/wifi.csv` in the existing
 tab-separated yoRadio format. If the file is absent or the connection fails,
 the firmware starts an open `yoRadio-XXXXXX` access point on channel 1.
 
-## Native HTTP API
+## Native HTTP server and WebUI
+
+The firmware uses ESP-IDF's standard `esp_http_server` for the complete web
+stack. It serves the shared yoRadio WebUI and gzip assets from SPIFFS, handles
+multipart Wi-Fi and playlist uploads, exposes the native REST API, and runs
+the built-in ESP-IDF WebSocket endpoint at `/ws`. No Arduino networking layer,
+AsyncWebServer, AsyncTCP, or third-party WebSocket library is linked.
+
+The repository playlist is included in the SPIFFS image as
+`/data/playlist.csv`. The WebSocket compatibility adapter supports playback,
+stop/toggle, previous/next station, volume and balance commands used by the
+shared WebUI. It also publishes the current station, decoder state, RSSI and
+free heap periodically. Equalizer controls remain disabled for this board.
+
+In access-point mode, open `http://192.168.4.1/`. Saving Wi-Fi credentials in
+the shared UI writes `/data/wifi.csv` and restarts the board. SSIDs and
+passwords are stored exactly as entered; names beginning or ending with spaces
+are therefore preserved rather than silently changed.
+
+### Native REST API
 
 The native service exposes:
 
@@ -90,8 +109,5 @@ The native service exposes:
 - `POST /api/native/stop`.
 
 Codec selection may be `auto`, `mp3`, `aac`, `flac`, `ogg`, `vorbis` or
-`opus`. Static files are served from SPIFFS. The legacy Arduino WebSocket
-command protocol is deliberately not linked into this firmware; clients
-should use the native endpoints above until a shared protocol-independent
-WebUI adapter is added.
-
+`opus`. These endpoints and the shared WebSocket protocol are served by the
+same native ESP-IDF HTTP server.
