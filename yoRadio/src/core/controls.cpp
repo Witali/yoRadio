@@ -376,7 +376,12 @@ void onBtnLongPressStart(int id) {
         lpId = id;
         break;
       }
-    case EVT_BTNCENTER:
+    case EVT_BTNCENTER: {
+#       if BTN_CENTER_ONEBUTTON_RADIO
+        if (network.status == CONNECTED || network.status == SDREADY) player.prev();
+        break;
+#       endif
+      }
     case EVT_ENCBTNB: {
 #       if defined(DUMMYDISPLAY) && !defined(USE_NEXTION)
         break;
@@ -578,7 +583,14 @@ void onBtnDoubleClick(int id) {
         player.prev();
         break;
       }
-    case EVT_BTNCENTER:
+    case EVT_BTNCENTER: {
+#       if BTN_CENTER_ONEBUTTON_RADIO
+        if (display.mode() != PLAYER) return;
+        if (network.status != CONNECTED && network.status != SDREADY) return;
+        player.next();
+        break;
+#       endif
+      }
     case EVT_ENCBTNB:
     case EVT_ENC2BTNB: {
         //display.putRequest(NEWMODE, display.mode() == PLAYER ? VOL : PLAYER);

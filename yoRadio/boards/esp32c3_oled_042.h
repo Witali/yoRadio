@@ -31,6 +31,8 @@
  * intentionally enters the ROM bootloader. */
 #define BTN_CENTER            9
 #define BTN_INTERNALPULLUP    true
+/* Click: play/pause; double click: next station; long press: previous. */
+#define BTN_CENTER_ONEBUTTON_RADIO 1
 
 /* The board is single-core. Keep every explicitly pinned task on core 0. */
 #define PLAYER_TASK_CORE_ID   0
