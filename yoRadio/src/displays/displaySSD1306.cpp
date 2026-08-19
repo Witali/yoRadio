@@ -30,6 +30,9 @@ void DspCore::initDisplay() {
     Serial.println(F("SSD1306 allocation failed"));
     for (;;); // Don't proceed, loop forever
   }
+  #if DSP_MODEL==DSP_SSD1306_72X40
+  setContrast(config.store.contrast);
+  #endif
 #include "tools/oledcolorfix.h"
   cp437(true);
   flip();

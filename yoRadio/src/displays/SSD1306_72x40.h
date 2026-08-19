@@ -27,6 +27,7 @@ class SSD1306_72x40 : public Adafruit_GFX {
                      uint16_t color) override;
   void invertDisplay(bool inverted);
   void setFlip(bool flipped);
+  void setContrast(uint8_t percent);
   void command(uint8_t value);
 
  private:

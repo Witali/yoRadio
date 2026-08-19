@@ -92,6 +92,14 @@ void SSD1306_72x40::invertDisplay(bool inverted) {
   command(inverted ? 0xa7 : 0xa6);
 }
 
+void SSD1306_72x40::setContrast(uint8_t percent) {
+  if (percent > 100) percent = 100;
+  const uint8_t controllerContrast = static_cast<uint8_t>(
+      (static_cast<uint16_t>(percent) * 255U + 50U) / 100U);
+  const uint8_t values[] = {0x81, controllerContrast};
+  commands(values, sizeof(values));
+}
+
 void SSD1306_72x40::setFlip(bool flipped) {
   const uint8_t values[] = {
       static_cast<uint8_t>(flipped ? 0xa0 : 0xa1),
