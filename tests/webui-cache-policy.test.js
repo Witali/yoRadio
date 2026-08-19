@@ -51,6 +51,16 @@ test("all SPIFFS WebUI assets are stored compressed", () => {
   }
 });
 
+test("startup spinner cannot be confused with the playlist spinner", () => {
+  const compressed = fs.readFileSync(
+    path.join(repository, "yoRadio", "data", "www", "script.js.gz")
+  );
+  const script = zlib.gunzipSync(compressed).toString("utf8");
+
+  assert.match(script, /document\.querySelector\('body > #progress'\)/);
+  assert.doesNotMatch(script, /getId\("progress"\)\.classList\.add\("hidden"\)/);
+});
+
 test("UI revision survives navigation between player and settings", () => {
   const compressed = fs.readFileSync(
     path.join(repository, "yoRadio", "data", "www", "script.js.gz")
