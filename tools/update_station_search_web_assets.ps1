@@ -87,7 +87,8 @@ function setCurrentItem(item){
   currentItem=item;
   const playlist = getId("playlist");
   let activeItem = null;
-  playlist.querySelectorAll('li.play').forEach(row => {
+  playlist.querySelectorAll('li[attr-id]').forEach(row => {
+    row.classList.add('play');
     const active = Number(row.attr('attr-id')) === Number(currentItem);
     row.classList.toggle('active', active);
     if(active && !row.classList.contains('filtered')) activeItem = row;
@@ -150,6 +151,37 @@ function filterPlaylist(value){
     Write-GzipText $scriptPath $script
 }
 
+$scriptChanged = $false
+$oldCurrentSelection = @'
+  playlist.querySelectorAll('li.play').forEach(row => {
+    const active = Number(row.attr('attr-id')) === Number(currentItem);
+'@
+$newCurrentSelection = @'
+  playlist.querySelectorAll('li[attr-id]').forEach(row => {
+    row.classList.add('play');
+    const active = Number(row.attr('attr-id')) === Number(currentItem);
+'@
+if($script.Contains($oldCurrentSelection)) {
+    $script = Replace-Once $script $oldCurrentSelection $newCurrentSelection `
+        "current station row selection"
+    $scriptChanged = $true
+}
+
+$oldPlaylistRow = @'
+      const active=(i+1==currentItem)?' class="active"':'';
+      li=`<li${active} attr-id="${i+1}" class="play" data-name="${line[0].trim()}" data-url="${line[1].trim()}" data-ovol="${line[2].trim()}"><span class="text">${line[0].trim()}</span><span class="count">${i+1}</span></li>`;
+'@
+$newPlaylistRow = @'
+      const active=(i+1==currentItem)?' active':'';
+      li=`<li attr-id="${i+1}" class="play${active}" data-name="${line[0].trim()}" data-url="${line[1].trim()}" data-ovol="${line[2].trim()}"><span class="text">${line[0].trim()}</span><span class="count">${i+1}</span></li>`;
+'@
+if($script.Contains($oldPlaylistRow)) {
+    $script = Replace-Once $script $oldPlaylistRow $newPlaylistRow `
+        "playlist current station class"
+    $scriptChanged = $true
+}
+if($scriptChanged) { Write-GzipText $scriptPath $script }
+
 $stylePath = Join-Path $www "style.css.gz"
 $style = Read-GzipText $stylePath
 if(-not $style.Contains("#playlistsearch")) {
@@ -162,10 +194,28 @@ if(-not $style.Contains("#playlistsearch")) {
   outline: none; background: var(--odd-bg-color); color: var(--accent-color); font: 18px Times, "Times New Roman", serif; user-select: text; }
 #playlistfilter::placeholder { color: var(--main-hl-color); opacity: .75; }
 #playlistfilter:focus { border-color: var(--accent-color); }
+#playlistfilter::-webkit-search-cancel-button { -webkit-appearance: none; width: 22px; height: 22px; margin-right: -4px; cursor: pointer;
+  background: linear-gradient(45deg, transparent 44%, var(--accent-color) 44%, var(--accent-color) 56%, transparent 56%),
+              linear-gradient(-45deg, transparent 44%, var(--accent-color) 44%, var(--accent-color) 56%, transparent 56%); }
 #playlistempty { width: 100%; padding: 10px 0; color: var(--main-hl-color); text-align: center; }
 #playlist li.filtered { display: none; }
 #playlist {
 '@ "playlist styles"
+    Write-GzipText $stylePath $style
+}
+
+$cancelButtonStyle = @'
+#playlistfilter::-webkit-search-cancel-button { -webkit-appearance: none; width: 22px; height: 22px; margin-right: -4px; cursor: pointer;
+  background: linear-gradient(45deg, transparent 44%, var(--accent-color) 44%, var(--accent-color) 56%, transparent 56%),
+              linear-gradient(-45deg, transparent 44%, var(--accent-color) 44%, var(--accent-color) 56%, transparent 56%); }
+'@
+if(-not $style.Contains('#playlistfilter::-webkit-search-cancel-button')) {
+    $style = Replace-Once $style @'
+#playlistfilter:focus { border-color: var(--accent-color); }
+'@ @"
+#playlistfilter:focus { border-color: var(--accent-color); }
+$cancelButtonStyle
+"@ "playlist search clear button"
     Write-GzipText $stylePath $style
 }
 
