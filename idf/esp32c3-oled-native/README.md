@@ -36,12 +36,11 @@ stronger channel peak and is configurable or removable under
 clicks select the next station, and a hold selects the previous station.
 Holding BOOT while resetting still enters the ROM downloader.
 
-`CONFIG_YORADIO_OLED_HW_SCROLL` is enabled for this board by default. Text
-between 10 and 15 large glyphs is loaded into the SSD1306's hidden 128-column
-GDDRAM and scrolled by the controller without repeated framebuffer transfers.
-Longer station and track names automatically retain the software scrolling
-path and are never truncated. Disable the option in `menuconfig` for direct
-A/B builds.
+Software text scrolling is enabled for this board by default so every station
+and track name follows the same timing and separator rules. The optional
+`CONFIG_YORADIO_OLED_HW_SCROLL` experiment can be enabled in `menuconfig` for
+A/B builds; eligible 10-to-15-glyph strings then use the SSD1306 scroll engine,
+while longer strings continue to use software scrolling without truncation.
 
 ## Reproducible setup and build
 
