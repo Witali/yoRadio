@@ -297,10 +297,18 @@ test("native radio requests and publishes ICY song metadata", () => {
   );
   assert.match(
     audio,
-    /audio_service_stop[\s\S]*state_set_audio\(false, "stopped"\)[\s\S]*close_active_http_stream\(\)/,
+    /audio_service_stop[\s\S]*atomic_fetch_add\(&s_generation, 1\)[\s\S]*state_set_audio\(false, "stopped"\)/,
   );
-  assert.match(audio, /esp_http_client_close\(s_active_http_client\)/);
-  assert.match(audio, /s_active_http_client == client[\s\S]*s_active_http_client = NULL/);
+  assert.doesNotMatch(audio, /close_active_http_stream/);
+  assert.match(audio, /#define STREAM_READ_TIMEOUT_MS 250/);
+  assert.match(
+    audio,
+    /open_stream\(client, command\.url\)[\s\S]*esp_http_client_set_timeout_ms\(client, STREAM_READ_TIMEOUT_MS\)/,
+  );
+  assert.match(
+    audio,
+    /esp_http_client_read\(client,[\s\S]*atomic_load\(&s_generation\) != command\.generation[\s\S]*received == -ESP_ERR_HTTP_EAGAIN/,
+  );
   assert.match(
     audio,
     /atomic_load\(&s_generation\) != command\.generation[\s\S]*dispose_http_client\(client\)/,
@@ -308,6 +316,32 @@ test("native radio requests and publishes ICY song metadata", () => {
   assert.match(state, /char title\[192\]/);
   assert.match(websocket, /json_escape\(state\.title, title/);
   assert.match(controls, /native_state_set_station\(s_state, s_candidate_name\)/);
+});
+
+test("native HTTPS station switching releases decoder RAM before TLS", () => {
+  const audio = read("main", "audio_service.c");
+  const sdkconfig = fs.readFileSync(
+    path.join(nativeRoot, "sdkconfig.defaults"),
+    "utf8",
+  );
+
+  assert.match(audio, /\.crt_bundle_attach = esp_crt_bundle_attach/);
+  assert.match(sdkconfig, /CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=y/);
+  assert.match(sdkconfig, /CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384/);
+  assert.match(sdkconfig, /CONFIG_MBEDTLS_DYNAMIC_BUFFER=y/);
+  assert.match(audio, /atomic_uint s_decoder_released_generation/);
+  assert.match(
+    audio,
+    /atomic_load\(&s_decoder_released_generation\) !=[\s\S]*command\.generation[\s\S]*esp_http_client_config_t config/,
+  );
+  assert.match(
+    audio,
+    /generation != current_generation[\s\S]*esp_audio_simple_dec_close\(decoder\)[\s\S]*free\(output\)[\s\S]*atomic_store\(&s_decoder_released_generation/,
+  );
+  assert.match(
+    audio,
+    /xRingbufferReceive\([\s\S]*pdMS_TO_TICKS\(20\)\)/,
+  );
 });
 
 test("native WebUI publishes ICY or decoder bitrate instead of a constant zero", () => {

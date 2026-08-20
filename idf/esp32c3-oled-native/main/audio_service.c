@@ -34,6 +34,7 @@
 #include "native_audio_output.h"
 
 #define STREAM_CHUNK_SIZE 2048
+#define STREAM_READ_TIMEOUT_MS 250
 #define DECODE_BUFFER_INITIAL 12288
 #define ENCODED_RING_SIZE (8 * 1024)
 #define PCM_RING_SIZE (16 * 1024)
@@ -106,10 +107,9 @@ static native_state_t *s_state;
 static QueueHandle_t s_commands;
 static RingbufHandle_t s_encoded;
 static RingbufHandle_t s_pcm;
-static SemaphoreHandle_t s_http_client_lock;
-static esp_http_client_handle_t s_active_http_client;
 static size_t s_encoded_usable_size;
 static atomic_uint s_generation;
+static atomic_uint s_decoder_released_generation;
 static char s_last_url[sizeof(((play_command_t *)0)->url)];
 static native_codec_t s_last_codec;
 // Decoder callbacks run only in decoder_task. These fields rate-limit VBR
@@ -118,44 +118,10 @@ static uint32_t s_published_bitrate_bps;
 static int64_t s_bitrate_updated_us;
 static atomic_bool s_measured_bitrate_ready;
 
-static bool register_active_http_client(esp_http_client_handle_t client) {
-    if (!s_http_client_lock ||
-        xSemaphoreTake(s_http_client_lock, pdMS_TO_TICKS(250)) != pdTRUE) {
-        return false;
-    }
-    s_active_http_client = client;
-    xSemaphoreGive(s_http_client_lock);
-    return true;
-}
-
 static void dispose_http_client(esp_http_client_handle_t client) {
     if (!client) return;
-    if (s_http_client_lock &&
-        xSemaphoreTake(s_http_client_lock, portMAX_DELAY) == pdTRUE) {
-        if (s_active_http_client == client) s_active_http_client = NULL;
-        esp_http_client_close(client);
-        esp_http_client_cleanup(client);
-        xSemaphoreGive(s_http_client_lock);
-        return;
-    }
     esp_http_client_close(client);
     esp_http_client_cleanup(client);
-}
-
-static void close_active_http_stream(void) {
-    if (!s_http_client_lock ||
-        xSemaphoreTake(s_http_client_lock, pdMS_TO_TICKS(250)) != pdTRUE) {
-        ESP_LOGW(TAG, "Could not lock active HTTP stream for stop");
-        return;
-    }
-    if (s_active_http_client) {
-        esp_err_t result = esp_http_client_close(s_active_http_client);
-        if (result != ESP_OK) {
-            ESP_LOGW(TAG, "Active HTTP stream close failed: %s",
-                     esp_err_to_name(result));
-        }
-    }
-    xSemaphoreGive(s_http_client_lock);
 }
 
 static native_codec_t codec_from_content_type(const char *content_type) {
@@ -477,6 +443,16 @@ static void stream_task(void *argument) {
         }
 #endif
 
+        // A decoder can retain considerably more RAM than a TLS session.
+        // Wait until the decoder task has released the previous station before
+        // allocating the next HTTP/TLS transport.
+        while (atomic_load(&s_generation) == command.generation &&
+               atomic_load(&s_decoder_released_generation) !=
+                   command.generation) {
+            vTaskDelay(pdMS_TO_TICKS(1));
+        }
+        if (atomic_load(&s_generation) != command.generation) continue;
+
         esp_http_client_config_t config = {
             .url = command.url,
             .timeout_ms = 10000,
@@ -493,12 +469,6 @@ static void stream_task(void *argument) {
             state_set_audio(false, "HTTP allocation failed");
             continue;
         }
-        if (!register_active_http_client(client)) {
-            ESP_LOGE(TAG, "Could not register active HTTP stream");
-            esp_http_client_cleanup(client);
-            state_set_audio(false, "HTTP state failed");
-            continue;
-        }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
         esp_err_t result = open_stream(client, command.url);
         if (result != ESP_OK) {
@@ -508,6 +478,10 @@ static void stream_task(void *argument) {
             dispose_http_client(client);
             continue;
         }
+        // Keep the long timeout for TCP/TLS setup, then poll the stream often
+        // enough that Stop can be handled without closing an HTTP client from
+        // a different task (esp_http_client handles are not thread-safe).
+        esp_http_client_set_timeout_ms(client, STREAM_READ_TIMEOUT_MS);
         if (atomic_load(&s_generation) != command.generation) {
             dispose_http_client(client);
             continue;
@@ -559,11 +533,13 @@ static void stream_task(void *argument) {
         while (atomic_load(&s_generation) == command.generation) {
             int received = esp_http_client_read(client, (char *)buffer,
                                                 STREAM_CHUNK_SIZE);
+            // Stop/station change may happen while the socket read is blocked.
+            // Never pass data returned by that obsolete read to ICY or audio.
+            if (atomic_load(&s_generation) != command.generation) break;
+            if (received == -ESP_ERR_HTTP_EAGAIN) continue;
             if (received < 0) {
-                if (atomic_load(&s_generation) == command.generation) {
-                    ESP_LOGW(TAG, "Stream read failed");
-                    stream_read_failed = true;
-                }
+                ESP_LOGW(TAG, "Stream read failed");
+                stream_read_failed = true;
                 break;
             }
             if (received == 0) {
@@ -773,9 +749,32 @@ static void decoder_task(void *argument) {
     bool stream_info_ready = false;
 
     while (true) {
+        uint32_t current_generation = atomic_load(&s_generation);
+        if (generation != current_generation) {
+            if (decoder) esp_audio_simple_dec_close(decoder);
+            decoder = NULL;
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+            if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
+            flac_decoder = NULL;
+#endif
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
+            legacy_decoder = NULL;
+#endif
+            free(output);
+            output = NULL;
+            output_size = 0;
+            generation = current_generation;
+            failed_generation = 0;
+            codec = NATIVE_CODEC_AUTO;
+            memset(&stream_info, 0, sizeof(stream_info));
+            stream_info_ready = false;
+            atomic_store(&s_decoder_released_generation,
+                         current_generation);
+        }
         size_t item_size = 0;
         encoded_packet_t *packet = xRingbufferReceive(
-            s_encoded, &item_size, portMAX_DELAY);
+            s_encoded, &item_size, pdMS_TO_TICKS(20));
         if (!packet) continue;
         if (packet->generation != atomic_load(&s_generation)) {
             vRingbufferReturnItem(s_encoded, packet);
@@ -1084,17 +1083,16 @@ esp_err_t audio_service_start(native_state_t *state) {
     ESP_RETURN_ON_ERROR(audio_level_led_init(), TAG,
                         "initialize audio level LED");
     atomic_init(&s_generation, 0);
+    atomic_init(&s_decoder_released_generation, 0);
     atomic_init(&s_measured_bitrate_ready, false);
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;
     s_commands = xQueueCreate(1, sizeof(play_command_t));
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
-    s_http_client_lock = xSemaphoreCreateMutex();
-    if (!s_commands || !s_encoded || !s_pcm || !s_http_client_lock) {
+    if (!s_commands || !s_encoded || !s_pcm) {
         return ESP_ERR_NO_MEM;
     }
-    s_active_http_client = NULL;
     s_encoded_usable_size = xRingbufferGetCurFreeSize(s_encoded);
     // ESP32-C3 has one core. Give networking and decoding equal time slices;
     // unlike the dual-core CYD, a lower-priority stream task can otherwise be
@@ -1211,7 +1209,6 @@ void audio_service_stop(void) {
     native_state_set_bitrate(s_state, 0);
     native_state_set_stream_info(s_state, "", 0, 0);
     state_set_audio(false, "stopped");
-    close_active_http_stream();
 }
 
 uint8_t audio_service_buffer_fill_percent(void) {

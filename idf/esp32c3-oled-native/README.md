@@ -102,6 +102,22 @@ no independent alternative for them. The yoRadio backends compile directly
 from the shared sources through a small ESP-IDF compatibility layer; Arduino
 Core is not linked.
 
+### Network stream transports
+
+The native player accepts continuous HTTP and HTTPS radio streams containing
+MP3, AAC/AAC+, FLAC, Ogg Vorbis or Ogg Opus. HTTPS uses ESP-IDF's TLS 1.2
+client, validates the server hostname and certificate against the full
+Espressif root-CA bundle, supports standard and custom TLS ports, and follows
+up to five HTTP redirects. TLS record buffers are allocated dynamically so a
+second protected station can be opened after the PDM DMA and decoder have
+already consumed RAM.
+
+An invalid, expired or privately signed certificate is rejected. TLS 1.3-only
+servers, HLS/DASH manifests (`.m3u8`/`.mpd`), RTSP, RTMP, MMS and WebSocket
+audio are not stream transports in this target. Playlist entries must resolve
+to the continuous encoded audio response itself; HTTPS does not by itself turn
+an HLS manifest into a supported stream.
+
 ## Storage compatibility
 
 The partition table matches Arduino-ESP32's 4 MiB `min_spiffs` layout:
