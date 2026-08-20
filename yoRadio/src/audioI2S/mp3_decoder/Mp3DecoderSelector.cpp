@@ -20,7 +20,7 @@ struct ParsedMp3Header {
     int version;
 };
 
-uint8_t selectedBackend = MP3_DECODER_HELIX;
+uint8_t selectedBackend = MP3_DECODER_MINIMP3;
 mp3dec_t miniDecoderStorage = {};
 mp3dec_t *miniDecoder = nullptr;
 MP3FrameInfo_t miniFrameInfo = {};

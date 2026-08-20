@@ -1,5 +1,5 @@
 set(YORADIO_AUDIO_DIR
-    "${CMAKE_CURRENT_LIST_DIR}/../../../../yoRadio/src/audioI2S")
+    "${CMAKE_CURRENT_LIST_DIR}/../../../yoRadio/src/audioI2S")
 
 idf_component_register(
   SRCS "${YORADIO_AUDIO_DIR}/CodecMemoryArena.cpp"

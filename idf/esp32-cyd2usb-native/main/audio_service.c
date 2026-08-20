@@ -15,6 +15,12 @@
 #include "freertos/queue.h"
 #include "freertos/ringbuf.h"
 #include "freertos/task.h"
+#if defined(CONFIG_YORADIO_AAC_DECODER_HELIX) || \
+    defined(CONFIG_YORADIO_MP3_DECODER_HELIX) || \
+    defined(CONFIG_YORADIO_MP3_DECODER_MINIMP3)
+#define YORADIO_CUSTOM_LEGACY_DECODER 1
+#include "custom_legacy_adapter.h"
+#endif
 #include "native_audio_output.h"
 
 #define STREAM_CHUNK_SIZE 2048
@@ -229,13 +235,56 @@ static bool send_pcm(uint32_t generation,
     return true;
 }
 
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+typedef struct {
+    uint32_t generation;
+    esp_audio_simple_dec_info_t stream_info;
+    bool stream_info_ready;
+} custom_legacy_output_context_t;
+
+static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
+                                 const uint8_t *pcm, size_t pcm_size) {
+    custom_legacy_output_context_t *context = user;
+    if (context->generation != atomic_load(&s_generation)) return false;
+    if (!context->stream_info_ready) {
+        context->stream_info = (esp_audio_simple_dec_info_t){
+            .sample_rate = info->sample_rate,
+            .bits_per_sample = info->bits_per_sample,
+            .channel = info->channels,
+            .bitrate = info->bitrate,
+        };
+        context->stream_info_ready = true;
+        char format[48];
+        snprintf(format, sizeof(format), "%lu kHz %s",
+                 (unsigned long)(info->sample_rate / 1000),
+                 info->channels == 1 ? "mono" : "stereo");
+        state_set_audio(true, format);
+    }
+    return send_pcm(context->generation, &context->stream_info, pcm, pcm_size);
+}
+#endif
+
 static void decoder_task(void *argument) {
     (void)argument;
-    esp_audio_dec_register_default();
+    // Register only the selected Espressif codecs. The custom minimp3/Helix
+    // implementation is linked directly and does not use this registry.
+#ifdef CONFIG_YORADIO_MP3_DECODER_ESPRESSIF
+    esp_mp3_dec_register();
+#endif
+#ifdef CONFIG_YORADIO_AAC_DECODER_ESPRESSIF
+    esp_aac_dec_register();
+#endif
+    esp_flac_dec_register();
+    esp_vorbis_dec_register();
+    esp_opus_dec_register();
     esp_audio_simple_dec_register_default();
-    uint8_t *output = malloc(DECODE_BUFFER_INITIAL);
-    size_t output_size = DECODE_BUFFER_INITIAL;
+    uint8_t *output = NULL;
+    size_t output_size = 0;
     esp_audio_simple_dec_handle_t decoder = NULL;
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+    custom_legacy_decoder_t *legacy_decoder = NULL;
+    custom_legacy_output_context_t legacy_context = {0};
+#endif
     uint32_t generation = 0;
     native_codec_t codec = NATIVE_CODEC_AUTO;
 
@@ -247,22 +296,89 @@ static void decoder_task(void *argument) {
         if (packet->generation != generation || packet->codec != codec) {
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
+            legacy_decoder = NULL;
+#endif
             generation = packet->generation;
             codec = packet->codec;
-            esp_audio_simple_dec_cfg_t cfg = {
-                .dec_type = simple_decoder_type(codec),
-                .dec_cfg = NULL,
-                .cfg_size = 0,
-                .use_frame_dec = false,
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            legacy_context = (custom_legacy_output_context_t){
+                .generation = generation,
             };
-            esp_audio_err_t open_result =
-                esp_audio_simple_dec_open(&cfg, &decoder);
-            if (open_result != ESP_AUDIO_ERR_OK) {
-                ESP_LOGE(TAG, "%s decoder open failed: %d", codec_name(codec),
-                         open_result);
-                state_set_audio(false, "decoder allocation failed");
+            if (
+#ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
+                codec == NATIVE_CODEC_AAC ||
+#endif
+#if defined(CONFIG_YORADIO_MP3_DECODER_HELIX) || defined(CONFIG_YORADIO_MP3_DECODER_MINIMP3)
+                codec == NATIVE_CODEC_MP3 ||
+#endif
+                false) {
+                free(output);
+                output = NULL;
+                output_size = 0;
+                legacy_decoder = custom_legacy_decoder_create(
+                    codec == NATIVE_CODEC_AAC ? CUSTOM_LEGACY_AAC
+                                              : CUSTOM_LEGACY_MP3);
+                if (!legacy_decoder) {
+                    ESP_LOGE(TAG, "Custom %s decoder allocation failed",
+                             codec_name(codec));
+                    state_set_audio(false, "decoder allocation failed");
+                }
+            } else
+#endif
+            {
+                uint8_t *resized = realloc(output, DECODE_BUFFER_INITIAL);
+                if (!resized) {
+                    ESP_LOGE(TAG, "%s PCM buffer allocation failed",
+                             codec_name(codec));
+                    state_set_audio(false, "PCM allocation failed");
+                    vRingbufferReturnItem(s_encoded, packet);
+                    continue;
+                }
+                output = resized;
+                output_size = DECODE_BUFFER_INITIAL;
+                esp_audio_simple_dec_cfg_t cfg = {
+                    .dec_type = simple_decoder_type(codec),
+                    .dec_cfg = NULL,
+                    .cfg_size = 0,
+                    .use_frame_dec = false,
+                };
+                esp_audio_err_t open_result =
+                    esp_audio_simple_dec_open(&cfg, &decoder);
+                if (open_result != ESP_AUDIO_ERR_OK) {
+                    ESP_LOGE(TAG, "%s decoder open failed: %d",
+                             codec_name(codec), open_result);
+                    state_set_audio(false, "decoder allocation failed");
+                }
             }
         }
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+        if (
+#ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
+            codec == NATIVE_CODEC_AAC ||
+#endif
+#if defined(CONFIG_YORADIO_MP3_DECODER_HELIX) || defined(CONFIG_YORADIO_MP3_DECODER_MINIMP3)
+            codec == NATIVE_CODEC_MP3 ||
+#endif
+            false) {
+            if (legacy_decoder) {
+                custom_legacy_feed_stats_t feed_stats = {0};
+                int result = custom_legacy_decoder_feed(
+                    legacy_decoder, packet->data, packet->data_size,
+                    packet->end_of_stream, custom_legacy_output,
+                    &legacy_context, &feed_stats);
+                if (result < 0 &&
+                    generation == atomic_load(&s_generation)) {
+                    ESP_LOGW(TAG, "Custom %s decode error: %d",
+                             codec_name(codec), result);
+                    state_set_audio(false, "decode failed");
+                }
+            }
+            vRingbufferReturnItem(s_encoded, packet);
+            continue;
+        }
+#endif
         if (!decoder) {
             vRingbufferReturnItem(s_encoded, packet);
             continue;

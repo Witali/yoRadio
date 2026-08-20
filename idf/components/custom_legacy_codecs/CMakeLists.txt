@@ -1,5 +1,5 @@
 set(YORADIO_AUDIO_DIR
-    "${CMAKE_CURRENT_LIST_DIR}/../../../../yoRadio/src/audioI2S")
+    "${CMAKE_CURRENT_LIST_DIR}/../../../yoRadio/src/audioI2S")
 
 set(CUSTOM_CODEC_SRCS "custom_legacy_adapter.cpp")
 if(CONFIG_YORADIO_AAC_DECODER_HELIX)

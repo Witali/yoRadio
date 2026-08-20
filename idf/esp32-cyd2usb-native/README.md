@@ -62,6 +62,8 @@ Arduino WebSocket protocol:
 
 Supported decoder selections are `auto`, `mp3`, `aac`, `flac`, `ogg`,
 `vorbis`, and `opus` (Vorbis and Opus are detected inside the OGG container).
+MP3 uses yoRadio minimp3 by default. Espressif MP3 and yoRadio Helix MP3 remain
+available as compile-time alternatives in `menuconfig`.
 Network streaming runs on core 0. Decode and audio output run as two independent
 tasks on core 1. Compressed and PCM ring buffers prevent display/WebUI work
 from blocking the audio pipeline.

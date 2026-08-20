@@ -242,18 +242,31 @@ test("native FLAC decoder is selectable at compile time", () => {
 });
 
 test("native MP3 and AAC alternatives are selectable at compile time", () => {
-  const kconfig = read("main", "Kconfig.projbuild");
+  const kconfig = fs.readFileSync(
+    path.join(root, "idf", "components", "custom_legacy_codecs", "Kconfig"),
+    "utf8",
+  );
   const defaults = read("sdkconfig.defaults");
   const audio = read("main", "audio_service.c");
-  const component = read(
-    "components",
-    "custom_legacy_codecs",
-    "CMakeLists.txt",
+  const component = fs.readFileSync(
+    path.join(
+      root,
+      "idf",
+      "components",
+      "custom_legacy_codecs",
+      "CMakeLists.txt",
+    ),
+    "utf8",
   );
-  const adapter = read(
-    "components",
-    "custom_legacy_codecs",
-    "custom_legacy_adapter.cpp",
+  const adapter = fs.readFileSync(
+    path.join(
+      root,
+      "idf",
+      "components",
+      "custom_legacy_codecs",
+      "custom_legacy_adapter.cpp",
+    ),
+    "utf8",
   );
 
   for (const symbol of [
@@ -265,7 +278,8 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
   ]) {
     assert.match(kconfig, new RegExp(symbol));
   }
-  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
+  assert.match(kconfig, /default YORADIO_MP3_DECODER_MINIMP3/);
+  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/);
   assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y/);
   assert.match(component, /aac_decoder\/aac_decoder\.cpp/);
   assert.match(component, /mp3_decoder\/mp3_decoder\.cpp/);
@@ -274,6 +288,49 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
   assert.match(adapter, /MP3Decode\(decoder->input/);
   assert.match(adapter, /mp3dec_decode_frame/);
   assert.match(audio, /custom_legacy_decoder_feed/);
+});
+
+test("minimp3 is the default for every Arduino and native board path", () => {
+  const selector = fs.readFileSync(
+    path.join(
+      root,
+      "yoRadio",
+      "src",
+      "audioI2S",
+      "mp3_decoder",
+      "Mp3DecoderSelector.cpp",
+    ),
+    "utf8",
+  );
+  const config = fs.readFileSync(
+    path.join(root, "yoRadio", "src", "core", "config.cpp"),
+    "utf8",
+  );
+  const c3Defaults = read("sdkconfig.defaults");
+  const cydDefaults = fs.readFileSync(
+    path.join(root, "idf", "esp32-cyd2usb-native", "sdkconfig.defaults"),
+    "utf8",
+  );
+  const cydAudio = fs.readFileSync(
+    path.join(
+      root,
+      "idf",
+      "esp32-cyd2usb-native",
+      "main",
+      "audio_service.c",
+    ),
+    "utf8",
+  );
+
+  assert.match(selector, /selectedBackend = MP3_DECODER_MINIMP3/);
+  assert.match(config, /store\.mp3Decoder = 1; \/\/ minimp3/);
+  assert.match(c3Defaults, /CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/);
+  assert.match(cydDefaults, /CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/);
+  assert.match(cydAudio, /custom_legacy_decoder_feed/);
+  assert.doesNotMatch(
+    c3Defaults + cydDefaults,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/m,
+  );
 });
 
 test("native benchmark build reads codec fixtures only from dedicated flash", () => {

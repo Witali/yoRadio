@@ -79,7 +79,7 @@ alternative implementation in this repository:
 
 | Codec | Implementations | Default |
 |---|---|---|
-| MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | Espressif |
+| MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | minimp3 |
 | AAC | Espressif, yoRadio Helix AAC-LC | Espressif |
 | FLAC | optimized yoRadio FLAC, Espressif | yoRadio |
 
