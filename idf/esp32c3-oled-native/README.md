@@ -28,8 +28,10 @@ filters and amplifier connection documented in
 a speaker or headphones directly to either GPIO.
 
 The OLED uses the controller-specific 28-column RAM offset and a reduced
-contrast. It displays the station, current song and IP address. The GPIO8 PWM
-LED follows the stronger channel peak and is configurable or removable under
+default brightness. It displays the station, current song and IP address. The
+shared WebUI `brightness` slider maps its 0..100 value to SSD1306 hardware
+contrast and stores the selection in NVS. The GPIO8 PWM LED follows the
+stronger channel peak and is configurable or removable under
 `menuconfig -> yoRadio audio level LED`. One BOOT click pauses or resumes, two
 clicks select the next station, and a hold selects the previous station.
 Holding BOOT while resetting still enters the ROM downloader.

@@ -344,6 +344,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef BRIGHTNESS_PIN
   #define BRIGHTNESS_PIN 255   // BRIGHTNESS Pin
 #endif
+#ifndef DISPLAY_BRIGHTNESS_DEFAULT
+  #define DISPLAY_BRIGHTNESS_DEFAULT 100
+#endif
 #ifndef PLAYER_FORCE_MONO
   #define PLAYER_FORCE_MONO      false  // mono option - false stereo, true mono
 #endif

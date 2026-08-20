@@ -690,8 +690,10 @@ void Display::flip(){ dsp.flip(); }
 void Display::invert(){ dsp.invert(); }
 
 void  Display::setContrast(){
-  #if DSP_MODEL==DSP_NOKIA5110 || DSP_MODEL==DSP_SSD1306_72X40
+  #if DSP_MODEL==DSP_NOKIA5110
     dsp.setContrast(config.store.contrast);
+  #elif DSP_MODEL==DSP_SSD1306_72X40
+    dsp.setContrast(config.store.brightness);
   #endif
 }
 

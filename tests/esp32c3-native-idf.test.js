@@ -64,6 +64,30 @@ test("native OLED driver uses the 72x40 geometry and controller offset", () => {
   assert.match(source, /BOARD_OLED_CONTRAST/);
 });
 
+test("native OLED brightness uses the shared 0..100 setting and persists it", () => {
+  const component = read("main", "CMakeLists.txt");
+  const header = read("main", "oled_display.h");
+  const display = read("main", "oled_display.c");
+  const settings = read("main", "display_settings.c");
+  const app = read("main", "app_main.c");
+  const websocket = read("main", "websocket_service.c");
+
+  assert.match(component, /display_settings\.c/);
+  assert.match(header, /oled_display_set_brightness/);
+  assert.match(display, /brightness \* 255U \+ 50U\) \/ 100U/);
+  assert.match(display, /\{0x81, controller_contrast\}/);
+  assert.match(settings, /DISPLAY_NVS_NAMESPACE "display"/);
+  assert.match(settings, /DISPLAY_NVS_BRIGHTNESS "brightness"/);
+  assert.match(settings, /nvs_get_u8/);
+  assert.match(settings, /nvs_set_u8/);
+  assert.match(settings, /nvs_commit/);
+  assert.match(app, /display_settings_init\(&s_display\)/);
+  assert.match(websocket, /display_settings_get_brightness\(\)/);
+  assert.match(websocket, /strcmp\(command, "brightness"\)/);
+  assert.match(websocket, /display_settings_set_brightness[\s\S]*true/);
+  assert.match(websocket, /\\"br\\":%u/);
+});
+
 test("native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll", () => {
   const header = read("main", "oled_display.h");
   const source = read("main", "oled_display.c");

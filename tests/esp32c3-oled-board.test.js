@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
+const zlib = require("node:zlib");
 
 const root = path.resolve(__dirname, "..");
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8");
@@ -49,16 +50,36 @@ test("72x40 driver uses the controller-specific geometry and init sequence", () 
   assert.match(source, /static_cast<uint8_t>\(0xb0 \| page\)/);
 });
 
-test("72x40 OLED applies the saved 0..100 contrast setting", () => {
+test("72x40 OLED applies the saved 0..100 brightness setting", () => {
   const driver = read("yoRadio", "src", "displays", "SSD1306_72x40.cpp");
   const display = read("yoRadio", "src", "displays", "displaySSD1306.cpp");
   const controller = read("yoRadio", "src", "core", "display.cpp");
+  const config = read("yoRadio", "src", "core", "config.cpp");
+  const profile = read("yoRadio", "boards", "esp32c3_oled_042.h");
 
   assert.match(driver, /void SSD1306_72x40::setContrast\(uint8_t percent\)/);
   assert.match(driver, /percent\) \* 255U \+ 50U\) \/ 100U/);
   assert.match(driver, /\{0x81, controllerContrast\}/);
-  assert.match(display, /DSP_MODEL==DSP_SSD1306_72X40[\s\S]*setContrast\(config\.store\.contrast\)/);
-  assert.match(controller, /DSP_MODEL==DSP_NOKIA5110 \|\| DSP_MODEL==DSP_SSD1306_72X40/);
+  assert.match(display, /DSP_MODEL==DSP_SSD1306_72X40[\s\S]*setContrast\(config\.store\.brightness\)/);
+  assert.match(controller, /DSP_MODEL==DSP_SSD1306_72X40[\s\S]*dsp\.setContrast\(config\.store\.brightness\)/);
+  assert.match(config, /case 11:[\s\S]*saveValue\(&store\.brightness, store\.contrast\)/);
+  assert.match(profile, /DISPLAY_BRIGHTNESS_DEFAULT\s+38/);
+});
+
+test("shared WebUI keeps the TFT brightness command for the OLED", () => {
+  const compressed = fs.readFileSync(
+    path.join(root, "yoRadio", "data", "www", "options.html.gz"),
+  );
+  const html = zlib.gunzipSync(compressed).toString("utf8");
+  const row = html.match(
+    /<div class="flex-row group group_brightness group_oled hidden">[\s\S]*?<\/div>\s*<\/div>/,
+  )?.[0];
+
+  assert.ok(row, "OLED brightness row is missing");
+  assert.match(row, /<span class="inputtitle">brightness<\/span>/);
+  assert.match(row, /id="br"/);
+  assert.match(row, /data-command="brightness"/);
+  assert.match(row, /min="0" max="100"/);
 });
 
 test("72x40 player uses large station and song rows with a small IP footer", () => {

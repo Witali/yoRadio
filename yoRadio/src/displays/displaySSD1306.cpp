@@ -31,7 +31,7 @@ void DspCore::initDisplay() {
     for (;;); // Don't proceed, loop forever
   }
   #if DSP_MODEL==DSP_SSD1306_72X40
-  setContrast(config.store.contrast);
+  setContrast(config.store.brightness);
   #endif
 #include "tools/oledcolorfix.h"
   cp437(true);

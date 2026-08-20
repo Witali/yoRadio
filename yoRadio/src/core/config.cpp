@@ -157,6 +157,11 @@ void Config::_setupVersion(){
         saveValue(&store.abuff, (uint16_t)DEFAULT_AUDIO_BUFFER_BLOCKS);
       }
       break;
+    case 11:
+      #if DSP_MODEL==DSP_SSD1306_72X40
+        saveValue(&store.brightness, store.contrast);
+      #endif
+      break;
     default:
       break;
   }
@@ -532,7 +537,7 @@ void Config::resetSystem(const char *val, uint8_t clientId){
     saveValue(&store.invertdisplay, false, false);
     display.invert();
     saveValue(&store.dspon, true, false);
-    store.brightness = 100;
+    store.brightness = DISPLAY_BRIGHTNESS_DEFAULT;
     setBrightness(false);
     saveValue(&store.contrast, (uint8_t)55, false);
     display.setContrast();
@@ -613,7 +618,7 @@ void Config::setDefaults() {
   store.fliptouch=false;
   store.dbgtouch=false;
   store.dspon=true;
-  store.brightness=100;
+  store.brightness=DISPLAY_BRIGHTNESS_DEFAULT;
   store.contrast=55;
   strlcpy(store.sntp1,"pool.ntp.org", 35);
   strlcpy(store.sntp2,"1.ru.pool.ntp.org", 35);
@@ -1003,6 +1008,15 @@ void Config::setBrightness(bool dosave){
     display.wakeup();
   }
   analogWrite(BRIGHTNESS_PIN, map(store.brightness, 0, 100, 0, 255));
+  if(!store.dspon) store.dspon = true;
+  if(dosave){
+    saveValue(&store.brightness, store.brightness, false, true);
+    saveValue(&store.dspon, store.dspon, true, true);
+  }
+#endif
+#if DSP_MODEL==DSP_SSD1306_72X40 && BRIGHTNESS_PIN==255 && !defined(USE_NEXTION)
+  if(!store.dspon && dosave) display.wakeup();
+  display.setContrast();
   if(!store.dspon) store.dspon = true;
   if(dosave){
     saveValue(&store.brightness, store.brightness, false, true);

@@ -3,6 +3,7 @@
 
 #include "audio_service.h"
 #include "board_config.h"
+#include "display_settings.h"
 #include "driver/gpio.h"
 #include "esp_check.h"
 #include "esp_log.h"
@@ -276,6 +277,7 @@ void app_main(void) {
                  esp_err_to_name(result));
     }
     ESP_ERROR_CHECK(oled_display_init(&s_display));
+    ESP_ERROR_CHECK(display_settings_init(&s_display));
     const display_scroll_t initial_scroll = {0};
     draw_status(&s_state, &initial_scroll, &initial_scroll);
 

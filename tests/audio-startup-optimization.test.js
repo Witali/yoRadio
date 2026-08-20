@@ -22,7 +22,7 @@ test("I2S audio buffer defaults and migrates to fourteen blocks", () => {
   const header = read("yoRadio", "src", "core", "config.h");
   const source = read("yoRadio", "src", "core", "config.cpp");
 
-  assert.match(header, /#define CONFIG_VERSION\s+11/);
+  assert.match(header, /#define CONFIG_VERSION\s+12/);
   assert.match(header, /#define DEFAULT_AUDIO_BUFFER_BLOCKS 14/);
   assert.match(source, /case 9:[\s\S]*store\.abuff < DEFAULT_AUDIO_BUFFER_BLOCKS/);
   assert.match(source, /case 10:[\s\S]*store\.abuff < DEFAULT_AUDIO_BUFFER_BLOCKS/);

@@ -5,6 +5,7 @@
 
 #include "audio_service.h"
 #include "board_config.h"
+#include "display_settings.h"
 #include "esp_check.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
@@ -122,14 +123,13 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
 
 static esp_err_t send_screen_settings(httpd_req_t *request) {
     char settings[256];
-    unsigned contrast =
-        ((unsigned)BOARD_OLED_CONTRAST * 100U + 127U) / 255U;
+    unsigned brightness = display_settings_get_brightness();
     snprintf(settings, sizeof(settings),
              "{\"flip\":0,\"inv\":0,\"nump\":0,\"tsf\":0,"
-             "\"tsd\":0,\"dspon\":1,\"br\":100,\"con\":%u,"
+             "\"tsd\":0,\"dspon\":1,\"br\":%u,\"con\":55,"
              "\"scre\":0,\"scrt\":30,\"scrb\":0,\"scrpe\":0,"
              "\"scrpt\":5,\"scrpb\":0}",
-             contrast);
+             brightness);
     return ws_send_request(request, settings);
 }
 
@@ -211,6 +211,17 @@ static void handle_command(httpd_req_t *request, char *command) {
         unsigned volume = strtoul(value, NULL, 10);
         native_audio_output_set_volume(volume > 254 ? 254 : (uint8_t)volume);
         send_initial_state(request);
+    } else if (strcmp(command, "brightness") == 0 ||
+               strcmp(command, "dim") == 0) {
+        unsigned brightness = strtoul(value, NULL, 10);
+        if (brightness > 100) brightness = 100;
+        esp_err_t result = display_settings_set_brightness(
+            (uint8_t)brightness, true);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Brightness update failed: %s",
+                     esp_err_to_name(result));
+        }
+        send_screen_settings(request);
     } else if (strcmp(command, "volp") == 0 ||
                strcmp(command, "volm") == 0) {
         int volume = native_audio_output_get_volume();

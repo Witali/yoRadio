@@ -4,6 +4,7 @@ get_filename_component(YORADIO_ROOT
 set(NATIVE_SRCS
   "app_main.c"
   "audio_service.c"
+  "display_settings.c"
   "native_audio_output.c"
   "native_state.c"
   "network_service.c"

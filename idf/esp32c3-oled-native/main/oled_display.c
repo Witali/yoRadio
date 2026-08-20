@@ -100,6 +100,18 @@ esp_err_t oled_display_init(oled_display_t *display) {
     return ESP_OK;
 }
 
+esp_err_t oled_display_set_brightness(oled_display_t *display,
+                                      uint8_t brightness) {
+    ESP_RETURN_ON_FALSE(display && display->device, ESP_ERR_INVALID_STATE, TAG,
+                        "OLED is not initialized");
+    ESP_RETURN_ON_FALSE(brightness <= 100, ESP_ERR_INVALID_ARG, TAG,
+                        "Brightness must be between 0 and 100");
+    uint8_t controller_contrast =
+        (uint8_t)(((unsigned)brightness * 255U + 50U) / 100U);
+    const uint8_t commands[] = {0x81, controller_contrast};
+    return send_commands(display, commands, sizeof(commands));
+}
+
 void oled_display_clear(oled_display_t *display) {
     if (display) memset(display->framebuffer, 0, sizeof(display->framebuffer));
 }
