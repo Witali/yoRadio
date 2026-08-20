@@ -39,6 +39,8 @@
 #define MAX_HTTP_REDIRECTS 5
 #define ICY_METADATA_MAX 4080
 #define DECODE_STATS_INTERVAL_US 5000000LL
+#define BITRATE_UPDATE_INTERVAL_US 1000000LL
+#define STREAM_BITRATE_INTERVAL_US 5000000LL
 #ifdef YORADIO_CODEC_BENCHMARK
 #define CODEC_FIXTURE_MAGIC 0x59434658UL
 #endif
@@ -81,6 +83,11 @@ typedef struct {
     uint32_t pcm_bytes;
 } decode_stats_t;
 
+typedef struct {
+    int64_t started_us;
+    uint64_t audio_bytes;
+} stream_bitrate_meter_t;
+
 #ifdef YORADIO_CODEC_BENCHMARK
 typedef struct {
     uint32_t magic;
@@ -100,6 +107,11 @@ static RingbufHandle_t s_pcm;
 static atomic_uint s_generation;
 static char s_last_url[sizeof(((play_command_t *)0)->url)];
 static native_codec_t s_last_codec;
+// Decoder callbacks run only in decoder_task. These fields rate-limit VBR
+// updates without requiring another lock on the single-core C3.
+static uint32_t s_published_bitrate_bps;
+static int64_t s_bitrate_updated_us;
+static atomic_bool s_measured_bitrate_ready;
 
 static native_codec_t codec_from_content_type(const char *content_type) {
     if (!content_type) return NATIVE_CODEC_AUTO;
@@ -291,6 +303,50 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
     return send_encoded(generation, *codec, data, size, false);
 }
 
+static void stream_bitrate_add(uint32_t generation,
+                               stream_bitrate_meter_t *meter,
+                               size_t audio_bytes) {
+    if (!meter || !audio_bytes) return;
+    int64_t now_us = esp_timer_get_time();
+    if (!meter->started_us) meter->started_us = now_us;
+    meter->audio_bytes += audio_bytes;
+    int64_t elapsed_us = now_us - meter->started_us;
+    if (elapsed_us < STREAM_BITRATE_INTERVAL_US) return;
+
+    uint64_t bitrate = meter->audio_bytes * 8000000ULL /
+                       (uint64_t)elapsed_us;
+    if (bitrate && bitrate <= UINT32_MAX &&
+        generation == atomic_load(&s_generation)) {
+        atomic_store(&s_measured_bitrate_ready, true);
+        native_state_set_bitrate(s_state,
+                                 ((uint32_t)bitrate + 500U) / 1000U);
+        ESP_LOGI(TAG, "Measured stream bitrate: %llu bit/s",
+                 (unsigned long long)bitrate);
+    }
+    meter->started_us = now_us;
+    meter->audio_bytes = 0;
+}
+
+static void reset_decoder_bitrate_tracking(void) {
+    s_published_bitrate_bps = 0;
+    s_bitrate_updated_us = 0;
+}
+
+static void state_set_decoder_bitrate(uint32_t bitrate_bps) {
+    if (!bitrate_bps || atomic_load(&s_measured_bitrate_ready)) return;
+    if (bitrate_bps == s_published_bitrate_bps) return;
+    int64_t now_us = esp_timer_get_time();
+    if (s_bitrate_updated_us &&
+        now_us - s_bitrate_updated_us < BITRATE_UPDATE_INTERVAL_US) {
+        return;
+    }
+    s_published_bitrate_bps = bitrate_bps;
+    s_bitrate_updated_us = now_us;
+    native_state_set_bitrate(s_state, (bitrate_bps + 500U) / 1000U);
+    ESP_LOGI(TAG, "Decoder bitrate: %lu bit/s",
+             (unsigned long)bitrate_bps);
+}
+
 static void parse_icy_metadata(char *metadata, size_t size) {
     if (!metadata || !size) return;
     metadata[size] = '\0';
@@ -410,6 +466,17 @@ static void stream_task(void *argument) {
             ESP_LOGI(TAG, "ICY metadata interval: %u",
                      (unsigned)metadata_interval);
         }
+        char *icy_bitrate_text = NULL;
+        if (esp_http_client_get_response_header(
+                client, "icy-br", &icy_bitrate_text) == ESP_OK &&
+            icy_bitrate_text) {
+            unsigned long icy_bitrate =
+                strtoul(icy_bitrate_text, NULL, 10);
+            if (icy_bitrate > 0 && icy_bitrate <= UINT32_MAX) {
+                native_state_set_bitrate(s_state, (uint32_t)icy_bitrate);
+                ESP_LOGI(TAG, "ICY bitrate: %lu kbit/s", icy_bitrate);
+            }
+        }
         char *metadata = metadata_interval ? malloc(ICY_METADATA_MAX + 1) : NULL;
         if (metadata_interval && !metadata) {
             ESP_LOGW(TAG, "No memory for ICY metadata; titles disabled");
@@ -419,6 +486,9 @@ static void stream_task(void *argument) {
         size_t metadata_written = 0;
         bool first_chunk = true;
         bool stream_stalled = false;
+        stream_bitrate_meter_t bitrate_meter = {
+            .started_us = esp_timer_get_time(),
+        };
         while (atomic_load(&s_generation) == command.generation) {
             int received = esp_http_client_read(client, (char *)buffer,
                                                 STREAM_CHUNK_SIZE);
@@ -441,6 +511,8 @@ static void stream_task(void *argument) {
                         stream_stalled = true;
                         break;
                     }
+                    stream_bitrate_add(command.generation, &bitrate_meter,
+                                       (size_t)received - offset);
                     offset = (size_t)received;
                 } else if (audio_until_metadata) {
                     size_t available = (size_t)received - offset;
@@ -453,6 +525,8 @@ static void stream_task(void *argument) {
                         stream_stalled = true;
                         break;
                     }
+                    stream_bitrate_add(command.generation, &bitrate_meter,
+                                       chunk);
                     offset += chunk;
                     audio_until_metadata -= chunk;
                 } else if (!metadata_remaining) {
@@ -545,6 +619,7 @@ static bool custom_flac_output(void *user, const custom_flac_info_t *info,
                  info->channels == 1 ? "mono" : "stereo");
         state_set_audio(true, format);
     }
+    state_set_decoder_bitrate(info->bitrate);
     decode_stats_add_audio(context->stats, context->stream_info, pcm_size);
     return send_pcm(context->generation, context->stream_info, pcm, pcm_size);
 }
@@ -576,6 +651,7 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
                  info->channels == 1 ? "mono" : "stereo");
         state_set_audio(true, format);
     }
+    state_set_decoder_bitrate(info->bitrate);
     decode_stats_add_audio(context->stats, context->stream_info, pcm_size);
     return send_pcm(context->generation, context->stream_info, pcm, pcm_size);
 }
@@ -640,6 +716,7 @@ static void decoder_task(void *argument) {
             generation = packet->generation;
             codec = packet->codec;
             stream_info_ready = false;
+            reset_decoder_bitrate_tracking();
             decode_stats_reset(&stats, generation, codec, esp_timer_get_time());
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (codec == NATIVE_CODEC_FLAC) {
@@ -834,15 +911,21 @@ static void decoder_task(void *argument) {
             raw.buffer += raw.consumed;
             raw.len -= raw.consumed;
             if (frame.decoded_size) {
-                if (!stream_info_ready &&
-                    esp_audio_simple_dec_get_info(decoder, &stream_info) ==
-                        ESP_AUDIO_ERR_OK) {
-                    stream_info_ready = true;
-                    char format[48];
-                    snprintf(format, sizeof(format), "%lu kHz %s",
-                             (unsigned long)(stream_info.sample_rate / 1000),
-                             stream_info.channel == 1 ? "mono" : "stereo");
-                    state_set_audio(true, format);
+                esp_audio_simple_dec_info_t latest_info = {0};
+                if (esp_audio_simple_dec_get_info(decoder, &latest_info) ==
+                    ESP_AUDIO_ERR_OK) {
+                    if (!stream_info_ready) {
+                        stream_info = latest_info;
+                        stream_info_ready = true;
+                        char format[48];
+                        snprintf(format, sizeof(format), "%lu kHz %s",
+                                 (unsigned long)(stream_info.sample_rate / 1000),
+                                 stream_info.channel == 1 ? "mono" : "stereo");
+                        state_set_audio(true, format);
+                    } else if (latest_info.bitrate) {
+                        stream_info.bitrate = latest_info.bitrate;
+                    }
+                    state_set_decoder_bitrate(latest_info.bitrate);
                 }
                 if (stream_info_ready) {
                     decode_stats_add_audio(&stats, &stream_info,
@@ -914,6 +997,7 @@ esp_err_t audio_service_start(native_state_t *state) {
     ESP_RETURN_ON_ERROR(audio_level_led_init(), TAG,
                         "initialize audio level LED");
     atomic_init(&s_generation, 0);
+    atomic_init(&s_measured_bitrate_ready, false);
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;
     s_commands = xQueueCreate(1, sizeof(play_command_t));
@@ -954,6 +1038,8 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     strlcpy(command.url, url, sizeof(command.url));
     strlcpy(s_last_url, url, sizeof(s_last_url));
     s_last_codec = codec;
+    atomic_store(&s_measured_bitrate_ready, false);
+    native_state_set_bitrate(s_state, 0);
     native_state_set_station(s_state, url);
     return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
                                                             : ESP_FAIL;
@@ -977,6 +1063,7 @@ static esp_err_t audio_service_play_fixture(size_t size,
     };
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;
+    atomic_store(&s_measured_bitrate_ready, false);
     native_state_set_station(s_state, "flash:codec_test benchmark");
     return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
                                                             : ESP_FAIL;
@@ -1021,5 +1108,6 @@ esp_err_t audio_service_resume(void) {
 
 void audio_service_stop(void) {
     atomic_fetch_add(&s_generation, 1);
+    native_state_set_bitrate(s_state, 0);
     state_set_audio(false, "stopped");
 }

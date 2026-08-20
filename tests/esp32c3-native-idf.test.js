@@ -153,6 +153,46 @@ test("native radio requests and publishes ICY song metadata", () => {
   assert.match(controls, /native_state_set_station\(s_state, s_candidate_name\)/);
 });
 
+test("native WebUI publishes ICY or decoder bitrate instead of a constant zero", () => {
+  const audio = read("main", "audio_service.c");
+  const stateHeader = read("main", "native_state.h");
+  const stateSource = read("main", "native_state.c");
+  const websocket = read("main", "websocket_service.c");
+
+  assert.match(stateHeader, /uint32_t bitrate_kbps/);
+  assert.match(stateHeader, /native_state_set_bitrate/);
+  assert.match(stateSource, /state->bitrate_kbps = bitrate_kbps/);
+  assert.match(audio, /get_response_header[\s\S]*"icy-br"/);
+  assert.match(audio, /ICY bitrate: %lu kbit\/s/);
+  assert.match(audio, /state_set_decoder_bitrate\(info->bitrate\)/);
+  assert.match(audio, /state_set_decoder_bitrate\(latest_info\.bitrate\)/);
+  assert.match(audio, /BITRATE_UPDATE_INTERVAL_US 1000000LL/);
+  assert.match(audio, /STREAM_BITRATE_INTERVAL_US 5000000LL/);
+  assert.match(
+    audio,
+    /meter->audio_bytes \* 8000000ULL[\s\S]*elapsed_us/,
+  );
+  assert.match(audio, /stream_bitrate_add\(command\.generation, &bitrate_meter/);
+  assert.match(audio, /atomic_store\(&s_measured_bitrate_ready, true\)/);
+  assert.match(audio, /Measured stream bitrate: %llu bit\/s/);
+  assert.match(
+    audio,
+    /state_set_decoder_bitrate[\s\S]*atomic_load\(&s_measured_bitrate_ready\)[\s\S]*return/,
+  );
+  assert.match(
+    audio,
+    /frame\.decoded_size[\s\S]*esp_audio_simple_dec_get_info\(decoder, &latest_info\)[\s\S]*state_set_decoder_bitrate\(latest_info\.bitrate\)/,
+  );
+  assert.ok(
+    audio.indexOf('client, "icy-br"') <
+      audio.indexOf("state_set_decoder_bitrate(latest_info.bitrate)"),
+    "decoder bitrate must override the earlier ICY fallback",
+  );
+  assert.match(websocket, /\\"bitrate\\",\\"value\\":%lu/);
+  assert.match(websocket, /state\.bitrate_kbps/);
+  assert.doesNotMatch(websocket, /\\"bitrate\\",\\"value\\":0/);
+});
+
 test("native BOOT gestures match the documented one-button controls", () => {
   const app = read("main", "app_main.c");
   const component = read("main", "CMakeLists.txt");
@@ -235,7 +275,7 @@ test("native audio pipeline batches PCM and caches stable stream layout", () => 
   assert.match(audio, /bool stream_info_ready = false/);
   assert.match(
     audio,
-    /!stream_info_ready[\s\S]*esp_audio_simple_dec_get_info[\s\S]*stream_info_ready = true/,
+    /esp_audio_simple_dec_get_info\(decoder, &latest_info\)[\s\S]*!stream_info_ready[\s\S]*stream_info = latest_info[\s\S]*stream_info_ready = true/,
   );
   assert.match(output, /scale_sample_q15/);
   assert.match(output, /channel_gain_q15/);

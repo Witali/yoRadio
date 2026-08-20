@@ -75,12 +75,13 @@ static void format_status(char *output, size_t output_size) {
              "{\"id\":\"balance\",\"value\":%d},"
              "{\"id\":\"rssi\",\"value\":%d},"
              "{\"id\":\"heap\",\"value\":%u},"
-             "{\"id\":\"bitrate\",\"value\":0},"
+             "{\"id\":\"bitrate\",\"value\":%lu},"
              "{\"id\":\"fmt\",\"value\":\"%s\"},"
              "{\"id\":\"playerwrap\",\"value\":\"%s\"}]}",
              name, title, native_audio_output_get_volume(),
              native_audio_output_get_balance(), state.wifi_rssi,
-             (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT), format,
+             (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT),
+             (unsigned long)state.bitrate_kbps, format,
              state.audio_running ? "playing" : "stopped");
 }
 

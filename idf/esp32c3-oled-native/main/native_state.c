@@ -29,6 +29,14 @@ void native_state_set_wifi_rssi(native_state_t *state, int8_t rssi) {
     }
 }
 
+void native_state_set_bitrate(native_state_t *state, uint32_t bitrate_kbps) {
+    if (!state || !state->lock) return;
+    if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
+        state->bitrate_kbps = bitrate_kbps;
+        xSemaphoreGive(state->lock);
+    }
+}
+
 void native_state_set_station(native_state_t *state, const char *station) {
     if (!state || !state->lock || !station) return;
     if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
