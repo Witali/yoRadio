@@ -29,6 +29,9 @@
 #define MAX_HTTP_REDIRECTS 5
 #define ICY_METADATA_MAX 4080
 #define DECODE_STATS_INTERVAL_US 5000000LL
+#ifdef YORADIO_CODEC_BENCHMARK
+#define CODEC_FIXTURE_MAGIC 0x59434658UL
+#endif
 
 typedef struct {
     uint32_t generation;
@@ -67,6 +70,17 @@ typedef struct {
     uint32_t input_bytes;
     uint32_t pcm_bytes;
 } decode_stats_t;
+
+#ifdef YORADIO_CODEC_BENCHMARK
+typedef struct {
+    uint32_t magic;
+    uint32_t codec;
+    uint32_t size;
+    uint32_t reserved;
+} codec_fixture_header_t;
+
+static esp_err_t benchmark_autostart(void);
+#endif
 
 static const char *const TAG = "audio";
 static native_state_t *s_state;
@@ -305,7 +319,8 @@ static void play_flash_fixture(const play_command_t *command,
            atomic_load(&s_generation) == command->generation) {
         size_t chunk = command->fixture_size - offset;
         if (chunk > STREAM_CHUNK_SIZE) chunk = STREAM_CHUNK_SIZE;
-        esp_err_t result = esp_partition_read(partition, offset, buffer, chunk);
+        esp_err_t result = esp_partition_read(
+            partition, sizeof(codec_fixture_header_t) + offset, buffer, chunk);
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Codec fixture read failed at %lu: %s",
                      (unsigned long)offset, esp_err_to_name(result));
@@ -696,6 +711,10 @@ esp_err_t audio_service_start(native_state_t *state) {
              "Pipeline ready: %s, 8 KiB compressed + 8 KiB PCM, free heap %u",
              native_audio_output_name(),
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
+#ifdef YORADIO_CODEC_BENCHMARK
+    ESP_RETURN_ON_ERROR(benchmark_autostart(), TAG,
+                        "start codec flash fixture");
+#endif
     return ESP_OK;
 }
 
@@ -716,11 +735,13 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
 }
 
 #ifdef YORADIO_CODEC_BENCHMARK
-esp_err_t audio_service_play_fixture(size_t size, native_codec_t codec) {
+static esp_err_t audio_service_play_fixture(size_t size,
+                                            native_codec_t codec) {
     const esp_partition_t *partition = esp_partition_find_first(
         ESP_PARTITION_TYPE_DATA, (esp_partition_subtype_t)0x40,
         "codec_test");
-    if (!partition || !size || size > partition->size ||
+    if (!partition || !size ||
+        size > partition->size - sizeof(codec_fixture_header_t) ||
         codec == NATIVE_CODEC_AUTO) {
         return ESP_ERR_INVALID_ARG;
     }
@@ -734,6 +755,31 @@ esp_err_t audio_service_play_fixture(size_t size, native_codec_t codec) {
     native_state_set_station(s_state, "flash:codec_test benchmark");
     return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
                                                             : ESP_FAIL;
+}
+
+static esp_err_t benchmark_autostart(void) {
+    const esp_partition_t *partition = esp_partition_find_first(
+        ESP_PARTITION_TYPE_DATA, (esp_partition_subtype_t)0x40,
+        "codec_test");
+    if (!partition) return ESP_ERR_NOT_FOUND;
+    codec_fixture_header_t header = {0};
+    ESP_RETURN_ON_ERROR(esp_partition_read(partition, 0, &header,
+                                            sizeof(header)), TAG,
+                        "read codec fixture header");
+    if (header.magic != CODEC_FIXTURE_MAGIC ||
+        header.codec <= NATIVE_CODEC_AUTO ||
+        header.codec > NATIVE_CODEC_OGG || !header.size ||
+        header.size > partition->size - sizeof(header)) {
+        ESP_LOGE(TAG,
+                 "Invalid codec fixture header: magic %08lx codec %lu size %lu",
+                 (unsigned long)header.magic, (unsigned long)header.codec,
+                 (unsigned long)header.size);
+        return ESP_ERR_INVALID_ARG;
+    }
+    ESP_LOGI(TAG, "Autostarting %s codec fixture from local flash",
+             codec_name((native_codec_t)header.codec));
+    return audio_service_play_fixture(header.size,
+                                      (native_codec_t)header.codec);
 }
 #endif
 

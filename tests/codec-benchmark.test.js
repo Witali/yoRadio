@@ -33,7 +33,8 @@ test('codec benchmark flashes and runs the same checked fixture matrix', () => {
   }
   assert.match(runner, /0x190000/);
   assert.match(runner, /0x240000/);
-  assert.match(runner, /api\/native\/benchmark\?codec=/);
+  assert.match(runner, /0x59434658/);
+  assert.match(runner, /IO\.BinaryWriter/);
   assert.match(runner, /System\.IO\.Ports\.SerialPort/);
   assert.match(document, /## MP3 320 kbit\/s/);
   assert.match(document, /## Ogg Opus 510 kbit\/s/);

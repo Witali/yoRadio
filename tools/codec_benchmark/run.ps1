@@ -1,7 +1,6 @@
 [CmdletBinding()]
 param(
     [string]$Port = "COM9",
-    [string]$BoardUrl = "http://192.168.100.4",
     [string]$FixtureDirectory = "",
     [ValidateRange(8, 30)]
     [int]$TestSeconds = 14
@@ -19,11 +18,11 @@ if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
 }
 
 $fixtures = @(
-    @{ Name = "MP3 320"; Codec = "mp3"; File = "mp3-320.mp3" }
-    @{ Name = "AAC-LC 320"; Codec = "aac"; File = "aac-lc-320.aac" }
-    @{ Name = "FLAC level 8"; Codec = "flac"; File = "flac-level8.flac" }
-    @{ Name = "Vorbis q10"; Codec = "ogg"; File = "vorbis-q10.ogg" }
-    @{ Name = "Opus 510"; Codec = "ogg"; File = "opus-510.ogg" }
+    @{ Name = "MP3 320"; CodecId = 1; File = "mp3-320.mp3" }
+    @{ Name = "AAC-LC 320"; CodecId = 2; File = "aac-lc-320.aac" }
+    @{ Name = "FLAC level 8"; CodecId = 3; File = "flac-level8.flac" }
+    @{ Name = "Vorbis q10"; CodecId = 4; File = "vorbis-q10.ogg" }
+    @{ Name = "Opus 510"; CodecId = 4; File = "opus-510.ogg" }
 )
 $resultDirectory = Join-Path $FixtureDirectory "results"
 New-Item -ItemType Directory -Force -Path $resultDirectory | Out-Null
@@ -34,28 +33,33 @@ foreach ($fixture in $fixtures) {
         throw "Missing fixture: $file"
     }
     $size = (Get-Item -LiteralPath $file).Length
-    if ($size -gt 0x240000) {
+    if ($size + 16 -gt 0x240000) {
         throw "$($fixture.File) exceeds the 0x240000-byte codec_test partition"
+    }
+
+    $staged = Join-Path $FixtureDirectory "fixture.bin"
+    $output = [IO.File]::Open($staged, [IO.FileMode]::Create,
+                              [IO.FileAccess]::Write, [IO.FileShare]::None)
+    try {
+        $writer = [IO.BinaryWriter]::new($output)
+        $writer.Write([uint32]0x59434658)
+        $writer.Write([uint32]$fixture.CodecId)
+        $writer.Write([uint32]$size)
+        $writer.Write([uint32]0)
+        $writer.Flush()
+        $input = [IO.File]::OpenRead($file)
+        try { $input.CopyTo($output) } finally { $input.Dispose() }
+        $writer.Dispose()
+    } finally {
+        $output.Dispose()
     }
 
     Write-Host "Writing $($fixture.Name) to codec_test flash"
     & $python -m esptool --chip esp32c3 -p $Port -b 460800 `
         --before default-reset --after hard-reset write-flash `
         --flash-mode dio --flash-size 4MB --flash-freq 80m `
-        0x190000 $file
+        0x190000 $staged
     if ($LASTEXITCODE -ne 0) { throw "Fixture flash failed" }
-
-    $deadline = [DateTime]::UtcNow.AddSeconds(25)
-    do {
-        Start-Sleep -Milliseconds 500
-        try {
-            $status = Invoke-WebRequest -UseBasicParsing -TimeoutSec 2 `
-                -Uri "$BoardUrl/api/native/status"
-        } catch {
-            $status = $null
-        }
-    } until ($status -or [DateTime]::UtcNow -ge $deadline)
-    if (-not $status) { throw "Board did not return after flashing fixture" }
 
     $serial = [System.IO.Ports.SerialPort]::new($Port, 115200)
     $serial.ReadTimeout = 200
@@ -63,9 +67,6 @@ foreach ($fixture in $fixtures) {
     $serial.RtsEnable = $false
     $serial.Open()
     try {
-        $serial.DiscardInBuffer()
-        Invoke-WebRequest -UseBasicParsing -Method Post `
-            -Uri "$BoardUrl/api/native/benchmark?codec=$($fixture.Codec)&size=$size" | Out-Null
         $end = [DateTime]::UtcNow.AddSeconds($TestSeconds)
         $log = ""
         while ([DateTime]::UtcNow -lt $end) {
@@ -86,4 +87,3 @@ foreach ($fixture in $fixtures) {
         $perf | ForEach-Object { Write-Host $_ }
     }
 }
-

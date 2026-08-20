@@ -17,16 +17,17 @@ Build and flash the special non-OTA firmware, then generate the fixtures:
 Run the automated flash and serial-log sequence:
 
 ```powershell
-.\tools\codec_benchmark\run.ps1 -Port COM9 `
-  -BoardUrl http://192.168.100.4
+.\tools\codec_benchmark\run.ps1 -Port COM9
 ```
 
 The benchmark layout has one `0x180000` factory application and uses every byte
 between it and the unchanged SPIFFS partition as a `0x240000` `codec_test`
 partition. The runner writes one fixture at a time at `0x190000`, resets the
-board, starts playback from flash, and captures the console result. This layout
-has no OTA slots. SPIFFS remains at `0x3D0000`, so the WebUI, playlist and
-`wifi.csv` stay available.
+board, and captures the automatically started local playback. A 16-byte header
+before the encoded data identifies its codec and exact length. This layout has
+no OTA slots. To keep the measurement isolated, the benchmark build does not
+start Wi-Fi, WebUI, SPIFFS, OLED or button tasks. The normal firmware is not
+affected by these compile-time exclusions.
 
 `decode/audio` below is pure decoder CPU time divided by the duration of PCM it
 produced. Values below 100% keep up in isolation; lower is better. The maximum

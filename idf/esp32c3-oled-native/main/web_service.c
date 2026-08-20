@@ -138,29 +138,6 @@ static esp_err_t play_handler(httpd_req_t *request) {
     return httpd_resp_sendstr(request, "{\"playing\":true}");
 }
 
-#ifdef YORADIO_CODEC_BENCHMARK
-static esp_err_t benchmark_handler(httpd_req_t *request) {
-    char query[96];
-    char size_text[16];
-    if (httpd_req_get_url_query_str(request, query, sizeof(query)) != ESP_OK ||
-        httpd_query_key_value(query, "size", size_text,
-                              sizeof(size_text)) != ESP_OK) {
-        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
-                                   "Missing fixture size");
-    }
-    char *end = NULL;
-    unsigned long size = strtoul(size_text, &end, 10);
-    native_codec_t codec = parse_codec(request);
-    if (!end || *end || codec == NATIVE_CODEC_AUTO ||
-        audio_service_play_fixture(size, codec) != ESP_OK) {
-        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
-                                   "Invalid codec fixture");
-    }
-    httpd_resp_set_type(request, "application/json");
-    return httpd_resp_sendstr(request, "{\"benchmark\":true}");
-}
-#endif
-
 static esp_err_t stop_handler(httpd_req_t *request) {
     audio_service_stop();
     httpd_resp_set_type(request, "application/json");
@@ -722,13 +699,6 @@ esp_err_t web_service_start(native_state_t *state) {
         .method = HTTP_POST,
         .handler = stop_handler,
     };
-#ifdef YORADIO_CODEC_BENCHMARK
-    httpd_uri_t benchmark = {
-        .uri = "/api/native/benchmark*",
-        .method = HTTP_POST,
-        .handler = benchmark_handler,
-    };
-#endif
     httpd_uri_t upload = {
         .uri = "/upload",
         .method = HTTP_POST,
@@ -767,10 +737,6 @@ esp_err_t web_service_start(native_state_t *state) {
                         "Play route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &stop), TAG,
                         "Stop route registration failed");
-#ifdef YORADIO_CODEC_BENCHMARK
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &benchmark), TAG,
-                        "Benchmark route registration failed");
-#endif
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &upload), TAG,
                         "Upload route registration failed");
     ESP_RETURN_ON_ERROR(

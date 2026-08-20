@@ -23,6 +23,7 @@
 
 static const char *const TAG = "yoradio_c3";
 static native_state_t s_state;
+#ifndef YORADIO_CODEC_BENCHMARK
 static oled_display_t s_display;
 
 static esp_err_t mount_spiffs(void) {
@@ -163,11 +164,16 @@ static void services_task(void *argument) {
     }
     vTaskDelete(NULL);
 }
+#endif
 
 void app_main(void) {
     ESP_LOGI(TAG, "Starting pure ESP-IDF ESP32-C3 OLED yoRadio");
     native_state_init(&s_state);
 
+#ifdef YORADIO_CODEC_BENCHMARK
+    ESP_LOGI(TAG, "Codec benchmark mode: network, WebUI and display disabled");
+    ESP_ERROR_CHECK(audio_service_start(&s_state));
+#else
     esp_err_t result = nvs_flash_init();
     if (result != ESP_OK) {
         // Existing settings are more important than automatic recovery.
@@ -194,4 +200,5 @@ void app_main(void) {
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);
+#endif
 }

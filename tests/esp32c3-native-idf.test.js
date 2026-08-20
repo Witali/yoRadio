@@ -162,13 +162,14 @@ test("native decoder reports measured real-time headroom", () => {
 
 test("native benchmark build reads codec fixtures only from dedicated flash", () => {
   const audio = read("main", "audio_service.c");
-  const web = read("main", "web_service.c");
+  const app = read("main", "app_main.c");
 
   assert.match(audio, /#ifdef YORADIO_CODEC_BENCHMARK/);
   assert.match(audio, /ESP_PARTITION_TYPE_DATA[\s\S]*"codec_test"/);
-  assert.match(audio, /esp_partition_read\(partition, offset, buffer, chunk\)/);
-  assert.match(web, /\.uri = "\/api\/native\/benchmark\*"/);
-  assert.match(web, /audio_service_play_fixture\(size, codec\)/);
+  assert.match(audio, /CODEC_FIXTURE_MAGIC 0x59434658UL/);
+  assert.match(audio, /sizeof\(codec_fixture_header_t\) \+ offset/);
+  assert.match(audio, /benchmark_autostart\(\)/);
+  assert.match(app, /Codec benchmark mode: network, WebUI and display disabled/);
 });
 
 test("native partition table stays compatible with min_spiffs", () => {
