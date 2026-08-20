@@ -86,6 +86,32 @@ test("native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll",
   assert.doesNotMatch(app, /state->stream_format[\s\S]*oled_display_draw/);
 });
 
+test("native OLED normalizes dash variants before the replacement glyph", () => {
+  const source = read("main", "oled_display.c");
+  const normalization = source.indexOf("is_ascii_dash_equivalent(codepoint)");
+  const unicodeLookup = source.indexOf("font8x15_unicode_80_bf[index]");
+  const fallback = source.indexOf("*glyph = 0x7f");
+
+  for (const codepoint of [
+    "0x2010",
+    "0x2011",
+    "0x2012",
+    "0x2013",
+    "0x2014",
+    "0x2015",
+    "0x2212",
+  ]) {
+    assert.match(source, new RegExp(`case ${codepoint}:`));
+  }
+  assert.match(
+    source,
+    /is_ascii_dash_equivalent\(codepoint\)[\s\S]*\*glyph = '-'/,
+  );
+  assert.ok(normalization >= 0);
+  assert.ok(normalization < unicodeLookup);
+  assert.ok(unicodeLookup < fallback);
+});
+
 test("native radio requests and publishes ICY song metadata", () => {
   const audio = read("main", "audio_service.c");
   const state = read("main", "native_state.h");

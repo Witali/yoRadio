@@ -103,10 +103,20 @@ test("72x40 player uses large station and song rows with a small IP footer", () 
   assert.match(oledColors, /theme\.metafill\s*=\s*TFT_FG/);
 });
 
-test("unsupported UTF-8 uses the C3 font's boxed question-mark glyph", () => {
+test("typographic dashes are normalized before unsupported UTF-8 fallback", () => {
   const unicode = read("yoRadio", "src", "displays", "tools", "utf8Rus.cpp");
   const generator = read("tools", "Generate-Esp32C3OledFont.ps1");
 
+  const dashNormalization = unicode.indexOf("case 0x2010:");
+  const replacementLookup = unicode.indexOf("normalizedText(codePoint)");
+  const boxedFallback = unicode.indexOf("out[outPos++] = (char)0x7F");
+  assert.match(
+    unicode,
+    /case 0x2010:[\s\S]*case 0x2015:[\s\S]*case 0x2212:[\s\S]*return "-"/,
+  );
+  assert.ok(dashNormalization >= 0);
+  assert.ok(dashNormalization < replacementLookup);
+  assert.ok(replacementLookup < boxedFallback);
   assert.match(unicode, /DSP_MODEL==DSP_SSD1306_72X40[\s\S]*0x7F/);
   assert.match(generator, /function Set-ReplacementGlyph/);
   assert.match(generator, /\$code -eq 0x7F/);

@@ -136,6 +136,21 @@ void oled_display_draw_compact_text(oled_display_t *display, int x, int y,
     }
 }
 
+static bool is_ascii_dash_equivalent(uint32_t codepoint) {
+    switch (codepoint) {
+        case 0x2010:  // hyphen
+        case 0x2011:  // non-breaking hyphen
+        case 0x2012:  // figure dash
+        case 0x2013:  // en dash
+        case 0x2014:  // em dash
+        case 0x2015:  // horizontal bar
+        case 0x2212:  // minus sign
+            return true;
+        default:
+            return false;
+    }
+}
+
 static const char *next_large_glyph(const char *text, uint8_t *glyph) {
     const uint8_t *bytes = (const uint8_t *)text;
     uint32_t codepoint = 0;
@@ -167,7 +182,11 @@ static const char *next_large_glyph(const char *text, uint8_t *glyph) {
         codepoint = 0xffffffff;
     }
 
-    if (codepoint < 0x7f) {
+    // Normalize typography before consulting the font's Unicode table. Only
+    // genuinely unsupported characters reach the boxed-question fallback.
+    if (is_ascii_dash_equivalent(codepoint)) {
+        *glyph = '-';
+    } else if (codepoint < 0x7f) {
         *glyph = (uint8_t)codepoint;
     } else if (codepoint == 0x0401) {
         *glyph = 0xa8;
