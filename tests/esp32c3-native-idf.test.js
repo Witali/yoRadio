@@ -150,6 +150,16 @@ test("native ESP-IDF decoders advance past consumed compressed input", () => {
   }
 });
 
+test("native decoder reports measured real-time headroom", () => {
+  const audio = read("main", "audio_service.c");
+
+  assert.match(audio, /esp_timer_get_time\(\)/);
+  assert.match(audio, /stats\.decode_us \+= decode_call_us/);
+  assert.match(audio, /stats->audio_us \+= frames \* 1000000ULL \/ info->sample_rate/);
+  assert.match(audio, /"PERF %s: window %llu ms, audio %llu ms, decode %llu ms "/);
+  assert.match(audio, /stats->audio_us \* 100ULL \/[\s\S]*stats->decode_us/);
+});
+
 test("native partition table stays compatible with min_spiffs", () => {
   const partitions = read("partitions.csv");
 

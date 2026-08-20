@@ -12,6 +12,7 @@
 #include "esp_http_client.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "freertos/queue.h"
 #include "freertos/ringbuf.h"
 #include "freertos/task.h"
@@ -24,6 +25,7 @@
 #define PCM_PACKET_DATA_SIZE 3072
 #define MAX_HTTP_REDIRECTS 5
 #define ICY_METADATA_MAX 4080
+#define DECODE_STATS_INTERVAL_US 10000000LL
 
 typedef struct {
     uint32_t generation;
@@ -47,6 +49,18 @@ typedef struct {
     uint16_t data_size;
     uint8_t data[];
 } pcm_packet_t;
+
+typedef struct {
+    uint32_t generation;
+    native_codec_t codec;
+    int64_t window_started_us;
+    uint64_t decode_us;
+    uint64_t audio_us;
+    uint32_t calls;
+    uint32_t max_call_us;
+    uint32_t input_bytes;
+    uint32_t pcm_bytes;
+} decode_stats_t;
 
 static const char *const TAG = "audio";
 static native_state_t *s_state;
@@ -107,6 +121,57 @@ static const char *codec_name(native_codec_t codec) {
         case NATIVE_CODEC_MP3: return "MP3";
         default: return "auto";
     }
+}
+
+static void decode_stats_reset(decode_stats_t *stats, uint32_t generation,
+                               native_codec_t codec, int64_t now_us) {
+    *stats = (decode_stats_t){
+        .generation = generation,
+        .codec = codec,
+        .window_started_us = now_us,
+    };
+}
+
+static void decode_stats_add_audio(decode_stats_t *stats,
+                                   const esp_audio_simple_dec_info_t *info,
+                                   size_t pcm_bytes) {
+    size_t sample_bytes = (info->bits_per_sample + 7U) / 8U;
+    size_t frame_bytes = sample_bytes * info->channel;
+    if (!frame_bytes || !info->sample_rate) return;
+    uint64_t frames = pcm_bytes / frame_bytes;
+    stats->audio_us += frames * 1000000ULL / info->sample_rate;
+    stats->pcm_bytes += (uint32_t)pcm_bytes;
+}
+
+static void decode_stats_report(decode_stats_t *stats, int64_t now_us) {
+    int64_t window_us = now_us - stats->window_started_us;
+    if (window_us < DECODE_STATS_INTERVAL_US || !stats->calls) return;
+
+    uint32_t load_tenths = stats->audio_us
+                               ? (uint32_t)(stats->decode_us * 1000ULL /
+                                            stats->audio_us)
+                               : 0;
+    uint32_t speed_hundredths = stats->decode_us
+                                    ? (uint32_t)(stats->audio_us * 100ULL /
+                                                 stats->decode_us)
+                                    : 0;
+    ESP_LOGI(TAG,
+             "PERF %s: window %llu ms, audio %llu ms, decode %llu ms "
+             "(%lu.%lu%%, x%lu.%02lu), calls %lu, max %lu us, in %lu, "
+             "pcm %lu",
+             codec_name(stats->codec),
+             (unsigned long long)(window_us / 1000),
+             (unsigned long long)(stats->audio_us / 1000),
+             (unsigned long long)(stats->decode_us / 1000),
+             (unsigned long)(load_tenths / 10U),
+             (unsigned long)(load_tenths % 10U),
+             (unsigned long)(speed_hundredths / 100U),
+             (unsigned long)(speed_hundredths % 100U),
+             (unsigned long)stats->calls,
+             (unsigned long)stats->max_call_us,
+             (unsigned long)stats->input_bytes,
+             (unsigned long)stats->pcm_bytes);
+    decode_stats_reset(stats, stats->generation, stats->codec, now_us);
 }
 
 static void state_set_audio(bool running, const char *format) {
@@ -383,6 +448,7 @@ static void decoder_task(void *argument) {
     uint32_t generation = 0;
     uint32_t failed_generation = 0;
     native_codec_t codec = NATIVE_CODEC_AUTO;
+    decode_stats_t stats = {0};
 
     while (true) {
         size_t item_size = 0;
@@ -402,6 +468,7 @@ static void decoder_task(void *argument) {
             decoder = NULL;
             generation = packet->generation;
             codec = packet->codec;
+            decode_stats_reset(&stats, generation, codec, esp_timer_get_time());
             esp_audio_simple_dec_cfg_t cfg = {
                 .dec_type = simple_decoder_type(codec),
                 .dec_cfg = NULL,
@@ -431,8 +498,16 @@ static void decoder_task(void *argument) {
                 .len = output_size,
             };
             raw.consumed = 0;
+            int64_t decode_started_us = esp_timer_get_time();
             esp_audio_err_t result =
                 esp_audio_simple_dec_process(decoder, &raw, &frame);
+            uint32_t decode_call_us =
+                (uint32_t)(esp_timer_get_time() - decode_started_us);
+            stats.decode_us += decode_call_us;
+            ++stats.calls;
+            if (decode_call_us > stats.max_call_us) {
+                stats.max_call_us = decode_call_us;
+            }
             // A continuously fed decoder is always runnable. On the
             // single-core C3, give the idle task one tick per decode call so
             // it can service the task watchdog without reducing audio task
@@ -464,12 +539,15 @@ static void decoder_task(void *argument) {
                 failed_generation = generation;
                 break;
             }
+            stats.input_bytes += (uint32_t)raw.consumed;
             raw.buffer += raw.consumed;
             raw.len -= raw.consumed;
             if (frame.decoded_size) {
                 esp_audio_simple_dec_info_t info = {0};
                 if (esp_audio_simple_dec_get_info(decoder, &info) ==
                     ESP_AUDIO_ERR_OK) {
+                    decode_stats_add_audio(&stats, &info,
+                                           frame.decoded_size);
                     char format[48];
                     snprintf(format, sizeof(format), "%lu kHz %s",
                              (unsigned long)(info.sample_rate / 1000),
@@ -482,6 +560,7 @@ static void decoder_task(void *argument) {
                     }
                 }
             }
+            decode_stats_report(&stats, esp_timer_get_time());
             if (!raw.consumed && !frame.decoded_size && !raw.eos) {
                 ESP_LOGE(TAG, "%s decoder made no input progress",
                          codec_name(codec));
