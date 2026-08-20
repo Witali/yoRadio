@@ -7,7 +7,6 @@
 #include "board_config.h"
 #include "display_settings.h"
 #include "esp_check.h"
-#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "freertos/FreeRTOS.h"
@@ -15,11 +14,34 @@
 #include "native_audio_output.h"
 #include "radio_control.h"
 
-#define WS_STATUS_INTERVAL_MS 2000
+#define WS_STATUS_POLL_MS 100
+#define WS_STATUS_HEARTBEAT_MS 2000
 
 static const char *const TAG = "websocket";
 static httpd_handle_t s_server;
 static native_state_t *s_state;
+
+typedef struct {
+    bool audio_running;
+    uint8_t volume;
+    int8_t balance;
+    uint32_t bitrate_kbps;
+    uint32_t sample_rate_hz;
+    uint8_t channels;
+    uint16_t current_item;
+    bool station_uppercase;
+    char station[144];
+    char title[192];
+    char codec[8];
+    char stream_format[48];
+} webui_status_key_t;
+
+// Keep persistent broadcast workspace in BSS so the board-configured task
+// stack remains headroom for nested HTTP/WebSocket calls.
+static char s_broadcast_status[1280];
+static char s_broadcast_current[48];
+static webui_status_key_t s_previous_status_key;
+static webui_status_key_t s_current_status_key;
 
 static void json_escape(const char *source, char *target, size_t target_size) {
     size_t written = 0;
@@ -81,10 +103,31 @@ static void format_status(char *output, size_t output_size) {
              "{\"id\":\"playerwrap\",\"value\":\"%s\"}]}",
              name, title, native_audio_output_get_volume(),
              native_audio_output_get_balance(), state.wifi_rssi,
-             (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT),
+             (unsigned)(state.audio_running
+                            ? audio_service_buffer_fill_percent()
+                            : 0U),
              (unsigned long)state.bitrate_kbps, format,
              display_settings_get_station_uppercase() ? 1U : 0U,
              state.audio_running ? "playing" : "stopped");
+}
+
+static void capture_status_key(webui_status_key_t *key) {
+    native_state_t state;
+    memset(key, 0, sizeof(*key));
+    native_state_snapshot(s_state, &state);
+    key->audio_running = state.audio_running;
+    key->volume = native_audio_output_get_volume();
+    key->balance = native_audio_output_get_balance();
+    key->bitrate_kbps = state.bitrate_kbps;
+    key->sample_rate_hz = state.sample_rate_hz;
+    key->channels = state.channels;
+    key->current_item = radio_control_current_item();
+    key->station_uppercase = display_settings_get_station_uppercase();
+    radio_control_current_name(key->station, sizeof(key->station));
+    strlcpy(key->title, state.title, sizeof(key->title));
+    strlcpy(key->codec, state.codec, sizeof(key->codec));
+    strlcpy(key->stream_format, state.stream_format,
+            sizeof(key->stream_format));
 }
 
 static esp_err_t send_initial_state(httpd_req_t *request) {
@@ -275,19 +318,42 @@ static esp_err_t websocket_handler(httpd_req_t *request) {
 
 static void status_task(void *argument) {
     (void)argument;
-    char status[1280];
+    bool have_previous = false;
+    TickType_t last_sent = 0;
     while (true) {
-        vTaskDelay(pdMS_TO_TICKS(WS_STATUS_INTERVAL_MS));
-        format_status(status, sizeof(status));
+        vTaskDelay(pdMS_TO_TICKS(WS_STATUS_POLL_MS));
+        capture_status_key(&s_current_status_key);
+        TickType_t now = xTaskGetTickCount();
+        bool changed = !have_previous ||
+                       memcmp(&s_current_status_key, &s_previous_status_key,
+                              sizeof(s_current_status_key)) != 0;
+        bool heartbeat = !last_sent ||
+                         now - last_sent >=
+                             pdMS_TO_TICKS(WS_STATUS_HEARTBEAT_MS);
+        if (!changed && !heartbeat) continue;
+        bool station_changed = !have_previous ||
+                               s_current_status_key.current_item !=
+                                   s_previous_status_key.current_item;
+        format_status(s_broadcast_status, sizeof(s_broadcast_status));
+        if (station_changed) {
+            snprintf(s_broadcast_current, sizeof(s_broadcast_current),
+                     "{\"current\":%u}", s_current_status_key.current_item);
+        }
         size_t count = CONFIG_LWIP_MAX_SOCKETS;
         int sockets[CONFIG_LWIP_MAX_SOCKETS];
         if (httpd_get_client_list(s_server, &count, sockets) != ESP_OK) continue;
         for (size_t index = 0; index < count; ++index) {
             if (httpd_ws_get_fd_info(s_server, sockets[index]) ==
                 HTTPD_WS_CLIENT_WEBSOCKET) {
-                ws_send_async(sockets[index], status);
+                ws_send_async(sockets[index], s_broadcast_status);
+                if (station_changed) {
+                    ws_send_async(sockets[index], s_broadcast_current);
+                }
             }
         }
+        s_previous_status_key = s_current_status_key;
+        have_previous = true;
+        last_sent = now;
     }
 }
 
@@ -304,7 +370,8 @@ esp_err_t websocket_service_register(httpd_handle_t server,
     };
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &websocket), TAG,
                         "register native WebSocket route");
-    ESP_RETURN_ON_FALSE(xTaskCreate(status_task, "websocket_status", 4096,
+    ESP_RETURN_ON_FALSE(xTaskCreate(status_task, "websocket_status",
+                                    BOARD_TASK_STACK_WEBSOCKET_STATUS,
                                     NULL, 2, NULL) == pdPASS,
                         ESP_ERR_NO_MEM, TAG, "start WebSocket status task");
     return ESP_OK;

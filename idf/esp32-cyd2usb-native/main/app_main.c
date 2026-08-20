@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "audio_service.h"
+#include "board_config.h"
 #include "cyd_display.h"
 #include "esp_check.h"
 #include "esp_log.h"
@@ -103,6 +104,8 @@ void app_main(void) {
     }
     ESP_ERROR_CHECK(cyd_display_init(&s_display));
 
-    xTaskCreatePinnedToCore(display_task, "display", 3072, NULL, 1, NULL, 0);
-    xTaskCreatePinnedToCore(network_task, "network", 6144, NULL, 3, NULL, 0);
+    xTaskCreatePinnedToCore(display_task, "display", BOARD_TASK_STACK_DISPLAY,
+                            NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(network_task, "network", BOARD_TASK_STACK_NETWORK,
+                            NULL, 3, NULL, 0);
 }

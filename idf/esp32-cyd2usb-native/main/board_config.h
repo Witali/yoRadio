@@ -20,3 +20,10 @@
 
 #define BOARD_DISPLAY_CLOCK_HZ 80000000
 
+// FreeRTOS stack sizes are expressed in bytes and belong to this board profile.
+#define BOARD_TASK_STACK_DISPLAY 3072
+#define BOARD_TASK_STACK_NETWORK 6144
+#define BOARD_TASK_STACK_RADIO_STREAM 6144
+#define BOARD_TASK_STACK_AUDIO_DECODER 16384
+#define BOARD_TASK_STACK_AUDIO_OUTPUT 4096
+

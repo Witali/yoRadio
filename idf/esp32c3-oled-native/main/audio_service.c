@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "audio_level_led.h"
+#include "board_config.h"
 #include "esp_audio_dec_default.h"
 #include "esp_audio_simple_dec.h"
 #include "esp_audio_simple_dec_default.h"
@@ -104,6 +105,7 @@ static native_state_t *s_state;
 static QueueHandle_t s_commands;
 static RingbufHandle_t s_encoded;
 static RingbufHandle_t s_pcm;
+static size_t s_encoded_usable_size;
 static atomic_uint s_generation;
 static char s_last_url[sizeof(((play_command_t *)0)->url)];
 static native_codec_t s_last_codec;
@@ -299,7 +301,7 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
             *codec = codec_from_signature(data, size);
         }
         native_state_set_stream_info(s_state, codec_name(*codec), 0, 0);
-        state_set_audio(false, codec_name(*codec));
+        state_set_audio(true, codec_name(*codec));
     }
     return send_encoded(generation, *codec, data, size, false);
 }
@@ -417,7 +419,6 @@ static void stream_task(void *argument) {
     while (true) {
         play_command_t command;
         xQueueReceive(s_commands, &command, portMAX_DELAY);
-        state_set_audio(false, "connecting");
 #ifdef YORADIO_CODEC_BENCHMARK
         if (command.fixture_size) {
             play_flash_fixture(&command, buffer);
@@ -450,6 +451,9 @@ static void stream_task(void *argument) {
             esp_http_client_cleanup(client);
             continue;
         }
+        // Match the original yoRadio player state: a successfully opened
+        // HTTP/ICY stream is playing even before its first PCM frame arrives.
+        state_set_audio(true, "connected");
         native_codec_t codec = command.requested_codec;
         if (codec == NATIVE_CODEC_AUTO) {
             char *content_type = NULL;
@@ -487,6 +491,7 @@ static void stream_task(void *argument) {
         size_t metadata_written = 0;
         bool first_chunk = true;
         bool stream_stalled = false;
+        bool stream_read_failed = false;
         stream_bitrate_meter_t bitrate_meter = {
             .started_us = esp_timer_get_time(),
         };
@@ -495,6 +500,7 @@ static void stream_task(void *argument) {
                                                 STREAM_CHUNK_SIZE);
             if (received < 0) {
                 ESP_LOGW(TAG, "Stream read failed");
+                stream_read_failed = true;
                 break;
             }
             if (received == 0) {
@@ -566,6 +572,13 @@ static void stream_task(void *argument) {
         send_encoded(command.generation, codec, NULL, 0, true);
         esp_http_client_close(client);
         esp_http_client_cleanup(client);
+        if (atomic_load(&s_generation) == command.generation) {
+            state_set_audio(false, stream_stalled
+                                       ? "buffer stalled"
+                                       : (stream_read_failed
+                                              ? "stream read failed"
+                                              : "stream ended"));
+        }
     }
 }
 
@@ -1015,15 +1028,19 @@ esp_err_t audio_service_start(native_state_t *state) {
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     if (!s_commands || !s_encoded || !s_pcm) return ESP_ERR_NO_MEM;
+    s_encoded_usable_size = xRingbufferGetCurFreeSize(s_encoded);
     // ESP32-C3 has one core. Give networking and decoding equal time slices;
     // unlike the dual-core CYD, a lower-priority stream task can otherwise be
     // starved before it reaches an ICY metadata boundary. Output stays one
     // priority higher to keep the PDM DMA fed.
-    if (xTaskCreate(stream_task, "radio_stream", 6144, NULL, 5, NULL) !=
+    if (xTaskCreate(stream_task, "radio_stream",
+                    BOARD_TASK_STACK_RADIO_STREAM, NULL, 5, NULL) !=
             pdPASS ||
-        xTaskCreate(decoder_task, "audio_decode", 16384, NULL, 5, NULL) !=
+        xTaskCreate(decoder_task, "audio_decode",
+                    BOARD_TASK_STACK_AUDIO_DECODER, NULL, 5, NULL) !=
             pdPASS ||
-        xTaskCreate(output_task, "audio_output", 4096, NULL, 6, NULL) !=
+        xTaskCreate(output_task, "audio_output",
+                    BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6, NULL) !=
             pdPASS) {
         return ESP_ERR_NO_MEM;
     }
@@ -1053,6 +1070,9 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     native_state_set_bitrate(s_state, 0);
     native_state_set_stream_info(s_state, "", 0, 0);
     native_state_set_station(s_state, url);
+    // Clear a previous station's playing state before the command is queued.
+    // The stream task switches it back after open_stream() succeeds.
+    state_set_audio(false, "connecting");
     return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
                                                             : ESP_FAIL;
 }
@@ -1123,4 +1143,14 @@ void audio_service_stop(void) {
     native_state_set_bitrate(s_state, 0);
     native_state_set_stream_info(s_state, "", 0, 0);
     state_set_audio(false, "stopped");
+}
+
+uint8_t audio_service_buffer_fill_percent(void) {
+    if (!s_encoded || !s_encoded_usable_size) return 0;
+    size_t free_size = xRingbufferGetCurFreeSize(s_encoded);
+    if (free_size >= s_encoded_usable_size) return 0;
+    size_t used_size = s_encoded_usable_size - free_size;
+    unsigned percent =
+        (unsigned)((used_size * 100U) / s_encoded_usable_size);
+    return (uint8_t)(percent > 100U ? 100U : percent);
 }

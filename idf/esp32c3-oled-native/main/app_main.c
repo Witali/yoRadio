@@ -385,15 +385,18 @@ void app_main(void) {
     draw_status(&s_state, "stream info...", &initial_scroll,
                 &initial_scroll, display_settings_get_station_uppercase());
 
-    ESP_ERROR_CHECK(xTaskCreate(display_task, "display", 4096, NULL, 1, NULL) ==
+    ESP_ERROR_CHECK(xTaskCreate(display_task, "display",
+                                BOARD_TASK_STACK_DISPLAY, NULL, 1, NULL) ==
                             pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);
-    ESP_ERROR_CHECK(xTaskCreate(button_task, "boot_button", 4096, NULL, 2,
+    ESP_ERROR_CHECK(xTaskCreate(button_task, "boot_button",
+                                BOARD_TASK_STACK_BOOT_BUTTON, NULL, 2,
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);
-    ESP_ERROR_CHECK(xTaskCreate(services_task, "services", 6144, NULL, 3,
+    ESP_ERROR_CHECK(xTaskCreate(services_task, "services",
+                                BOARD_TASK_STACK_SERVICES, NULL, 3,
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "board_config.h"
 #include "esp_event.h"
 #include "esp_check.h"
 #include "esp_log.h"
@@ -158,7 +159,8 @@ esp_err_t network_service_start(native_state_t *state) {
                             "Station mode failed");
     }
     ESP_RETURN_ON_ERROR(esp_wifi_start(), TAG, "Wi-Fi start failed");
-    ESP_RETURN_ON_FALSE(xTaskCreate(rssi_task, "wifi_rssi", 2048, NULL, 2,
+    ESP_RETURN_ON_FALSE(xTaskCreate(rssi_task, "wifi_rssi",
+                                    BOARD_TASK_STACK_WIFI_RSSI, NULL, 2,
                                     NULL) == pdPASS,
                         ESP_ERR_NO_MEM, TAG, "RSSI task allocation failed");
 

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "audio_level_led.h"
+#include "board_config.h"
 #include "esp_audio_dec_default.h"
 #include "esp_audio_simple_dec.h"
 #include "esp_audio_simple_dec_default.h"
@@ -497,11 +498,14 @@ esp_err_t audio_service_start(native_state_t *state) {
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     if (!s_commands || !s_encoded || !s_pcm) return ESP_ERR_NO_MEM;
-    if (xTaskCreatePinnedToCore(stream_task, "radio_stream", 6144, NULL, 3,
+    if (xTaskCreatePinnedToCore(stream_task, "radio_stream",
+                                BOARD_TASK_STACK_RADIO_STREAM, NULL, 3,
                                 NULL, 0) != pdPASS ||
-        xTaskCreatePinnedToCore(decoder_task, "audio_decode", 16384, NULL, 5,
+        xTaskCreatePinnedToCore(decoder_task, "audio_decode",
+                                BOARD_TASK_STACK_AUDIO_DECODER, NULL, 5,
                                 NULL, 1) != pdPASS ||
-        xTaskCreatePinnedToCore(output_task, "audio_output", 4096, NULL, 6,
+        xTaskCreatePinnedToCore(output_task, "audio_output",
+                                BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6,
                                 NULL, 1) != pdPASS) {
         return ESP_ERR_NO_MEM;
     }

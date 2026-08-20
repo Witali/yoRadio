@@ -83,6 +83,16 @@ esp_err_t radio_control_init(native_state_t *state) {
     if (!s_lock) s_lock = xSemaphoreCreateMutex();
     ESP_RETURN_ON_FALSE(s_lock, ESP_ERR_NO_MEM, TAG, "control mutex allocation");
     s_state = state;
+    if (playlist_station(s_current_item, s_candidate_name,
+                         sizeof(s_candidate_name), s_candidate_url,
+                         sizeof(s_candidate_url))) {
+        strlcpy(s_current_name, s_candidate_name, sizeof(s_current_name));
+        strlcpy(s_current_url, s_candidate_url, sizeof(s_current_url));
+        native_state_set_station(s_state, s_current_name);
+    } else {
+        ESP_LOGW(TAG, "Initial station %u is absent from playlist",
+                 s_current_item);
+    }
     return ESP_OK;
 }
 

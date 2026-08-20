@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "audio_service.h"
+#include "board_config.h"
 #include "esp_check.h"
 #include "esp_http_server.h"
 #include "esp_log.h"
@@ -438,7 +439,8 @@ static esp_err_t webboard_upload_handler(httpd_req_t *request) {
     ESP_RETURN_ON_ERROR(httpd_resp_sendstr(request, "Files imported"), TAG,
                         "send WebUI import redirect");
     if (upload.wifi_saved) {
-        xTaskCreate(reboot_task, "wifi_reboot", 2048, NULL, 3, NULL);
+        xTaskCreate(reboot_task, "wifi_reboot",
+                    BOARD_TASK_STACK_WIFI_REBOOT, NULL, 3, NULL);
     }
     return ESP_OK;
 }
@@ -501,7 +503,8 @@ static esp_err_t recovery_wifi_handler(httpd_req_t *request) {
             "<!doctype html><meta charset=utf-8><meta http-equiv=refresh "
             "content='5;url=/'><p>Wi-Fi saved. Rebooting...</p>"),
         TAG, "send Wi-Fi recovery response");
-    xTaskCreate(reboot_task, "wifi_reboot", 2048, NULL, 3, NULL);
+    xTaskCreate(reboot_task, "wifi_reboot", BOARD_TASK_STACK_WIFI_REBOOT,
+                NULL, 3, NULL);
     return ESP_OK;
 }
 
@@ -556,7 +559,8 @@ static esp_err_t upload_handler(httpd_req_t *request) {
     ESP_RETURN_ON_ERROR(httpd_resp_sendstr(request, "OK"), TAG,
                         "send upload response");
     if (is_wifi) {
-        xTaskCreate(reboot_task, "wifi_reboot", 2048, NULL, 3, NULL);
+        xTaskCreate(reboot_task, "wifi_reboot",
+                    BOARD_TASK_STACK_WIFI_REBOOT, NULL, 3, NULL);
     }
     return ESP_OK;
 }

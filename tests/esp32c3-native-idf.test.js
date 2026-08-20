@@ -52,6 +52,36 @@ test("native board profile maps OLED, controls and stereo PDM pins", () => {
   assert.doesNotMatch(audio, /pcm_mono_sample/);
 });
 
+test("native task stacks are configured by each board profile", () => {
+  const c3Board = read("main", "board_config.h");
+  const c3Sources = [
+    read("main", "app_main.c"),
+    read("main", "audio_service.c"),
+    read("main", "network_service.c"),
+    read("main", "web_service.c"),
+    read("main", "websocket_service.c"),
+  ].join("\n");
+  const cydRoot = path.join(root, "idf", "esp32-cyd2usb-native", "main");
+  const cydBoard = fs.readFileSync(path.join(cydRoot, "board_config.h"), "utf8");
+  const cydSources = ["app_main.c", "audio_service.c"]
+    .map((file) => fs.readFileSync(path.join(cydRoot, file), "utf8"))
+    .join("\n");
+
+  for (const symbol of [
+    "BOARD_TASK_STACK_DISPLAY",
+    "BOARD_TASK_STACK_RADIO_STREAM",
+    "BOARD_TASK_STACK_AUDIO_DECODER",
+    "BOARD_TASK_STACK_AUDIO_OUTPUT",
+  ]) {
+    assert.match(c3Board, new RegExp(`#define ${symbol} \\d+`));
+    assert.match(cydBoard, new RegExp(`#define ${symbol} \\d+`));
+    assert.match(c3Sources, new RegExp(symbol));
+    assert.match(cydSources, new RegExp(symbol));
+  }
+  assert.match(c3Board, /BOARD_TASK_STACK_WEBSOCKET_STATUS 8192/);
+  assert.match(c3Sources, /BOARD_TASK_STACK_WEBSOCKET_STATUS/);
+});
+
 test("native OLED driver uses the 72x40 geometry and controller offset", () => {
   const header = read("main", "oled_display.h");
   const source = read("main", "oled_display.c");
@@ -249,7 +279,10 @@ test("native BOOT gestures match the documented one-button controls", () => {
   assert.match(app, /next \? radio_control_next\(\)/);
   assert.match(app, /: radio_control_toggle\(\)/);
   assert.match(app, /radio_control_previous\(\)/);
-  assert.match(app, /xTaskCreate\(button_task, "boot_button", 4096/);
+  assert.match(
+    app,
+    /xTaskCreate\(button_task, "boot_button",[\s\S]*BOARD_TASK_STACK_BOOT_BUTTON/,
+  );
   assert.match(app, /BOOT two clicks: next station/);
   assert.match(controls, /static char s_playlist_line\[768\]/);
   assert.match(controls, /static char s_candidate_url\[512\]/);
@@ -486,8 +519,61 @@ test("native C3 refreshes Wi-Fi signal strength for WebSocket status", () => {
   assert.match(network, /esp_wifi_sta_get_ap_info\(&access_point\)/);
   assert.match(network, /native_state_set_wifi_rssi\(s_state, access_point\.rssi\)/);
   assert.match(network, /xTaskCreate\(rssi_task, "wifi_rssi"/);
-  assert.match(websocket, /WS_STATUS_INTERVAL_MS 2000/);
+  assert.match(websocket, /WS_STATUS_HEARTBEAT_MS 2000/);
   assert.match(websocket, /\{\\"id\\":\\"rssi\\",\\"value\\":%d\}/);
+});
+
+test("native WebUI publishes player changes promptly and uses buffer percent", () => {
+  const audio = read("main", "audio_service.c");
+  const audioHeader = read("main", "audio_service.h");
+  const controls = read("main", "radio_control.c");
+  const websocket = read("main", "websocket_service.c");
+
+  assert.match(
+    audio,
+    /audio_service_play[\s\S]*state_set_audio\(false, "connecting"\)/,
+  );
+  assert.match(audio, /open_stream[\s\S]*state_set_audio\(true, "connected"\)/);
+  assert.match(audio, /state_set_audio\(true, codec_name\(\*codec\)\)/);
+  assert.match(
+    audio,
+    /command\.generation[\s\S]*state_set_audio\(false,[\s\S]*"stream ended"/,
+  );
+  assert.match(audioHeader, /audio_service_buffer_fill_percent/);
+  assert.match(
+    audio,
+    /s_encoded_usable_size = xRingbufferGetCurFreeSize\(s_encoded\)/,
+  );
+  assert.match(
+    audio,
+    /audio_service_buffer_fill_percent[\s\S]*used_size \* 100U/,
+  );
+  assert.match(websocket, /WS_STATUS_POLL_MS 100/);
+  assert.match(websocket, /WS_STATUS_HEARTBEAT_MS 2000/);
+  assert.match(websocket, /BOARD_TASK_STACK_WEBSOCKET_STATUS/);
+  assert.match(websocket, /capture_status_key/);
+  assert.match(
+    websocket,
+    /memcmp\(&s_current_status_key, &s_previous_status_key/,
+  );
+  assert.match(websocket, /static char s_broadcast_status\[1280\]/);
+  assert.match(websocket, /static char s_broadcast_current\[48\]/);
+  assert.match(websocket, /static webui_status_key_t s_previous_status_key/);
+  assert.match(
+    websocket,
+    /station_changed[\s\S]*\\"current\\":%u[\s\S]*ws_send_async\(sockets\[index\], s_broadcast_current\)/,
+  );
+  assert.match(websocket, /audio_service_buffer_fill_percent\(\)/);
+  assert.match(
+    websocket,
+    /state\.audio_running[\s\S]*audio_service_buffer_fill_percent\(\)/,
+  );
+  assert.doesNotMatch(websocket, /heap_caps_get_free_size/);
+  assert.match(
+    controls,
+    /radio_control_init[\s\S]*playlist_station\(s_current_item/,
+  );
+  assert.match(controls, /native_state_set_station\(s_state, s_current_name\)/);
 });
 
 test("native stream connection reports HTTP failures and follows redirects", () => {
