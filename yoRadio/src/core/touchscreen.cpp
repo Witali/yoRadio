@@ -25,12 +25,18 @@
 #endif
 
 #if TS_MODEL==TS_MODEL_XPT2046
+  #if TS_SOFTSPI
+    #include "softxpt2046.h"
+    SoftXPT2046Touchscreen ts(TS_CS, TS_SPIPINS);
+    typedef SoftXPT2046Point TSPoint;
+  #else
   #ifdef TS_SPIPINS
     SPIClass  TSSPI(TS_SPI_HOST);
   #endif
   #include <XPT2046_Touchscreen.h>
   XPT2046_Touchscreen ts(TS_CS);
   typedef TS_Point TSPoint;
+  #endif
 #elif TS_MODEL==TS_MODEL_GT911
   #include "../GT911_Touchscreen/TAMC_GT911.h"
   TAMC_GT911 ts = TAMC_GT911(TS_SDA, TS_SCL, TS_INT, TS_RST, 0, 0);
@@ -40,6 +46,9 @@
 void TouchScreen::init(uint16_t w, uint16_t h){
   
 #if TS_MODEL==TS_MODEL_XPT2046
+  #if TS_SOFTSPI
+    ts.begin();
+  #else
   #ifdef TS_SPIPINS
     TSSPI.begin(TS_SPIPINS);
     ts.begin(TSSPI);
@@ -49,6 +58,7 @@ void TouchScreen::init(uint16_t w, uint16_t h){
     #else
       ts.begin();
     #endif
+  #endif
   #endif
   ts.setRotation(config.store.fliptouch?3:1);
 #endif
