@@ -340,9 +340,20 @@ test("native BOOT gestures match the documented one-button controls", () => {
   assert.match(app, /BUTTON_CLICK_WINDOW_MS 400/);
   assert.match(app, /BUTTON_HOLD_MS 800/);
   assert.match(app, /const bool next = clicks >= 2/);
-  assert.match(app, /next \? radio_control_next\(\)/);
-  assert.match(app, /: radio_control_toggle\(\)/);
-  assert.match(app, /radio_control_previous\(\)/);
+  assert.match(app, /BUTTON_ACTION_NEXT[\s\S]*return radio_control_next\(\)/);
+  assert.match(app, /BUTTON_ACTION_TOGGLE[\s\S]*return radio_control_toggle\(\)/);
+  assert.match(app, /BUTTON_ACTION_PREVIOUS[\s\S]*return radio_control_previous\(\)/);
+  assert.match(app, /result == ESP_ERR_INVALID_STATE/);
+  assert.match(app, /BUTTON_ACTION_RETRY_MS 100/);
+  assert.match(app, /Deferred BOOT action executed/);
+  assert.match(app, /BUTTON_STATUS_DISPLAY_MS 2000U/);
+  assert.match(app, /executing_action == BUTTON_ACTION_TOGGLE/);
+  assert.match(app, /state_before_action\.audio_running/);
+  assert.match(
+    app,
+    /button_status_playing \? "playing" : "stopped"/,
+  );
+  assert.match(app, /button_status_visible[\s\S]*button_status_scroll/);
   assert.match(
     app,
     /xTaskCreate\(button_task, "boot_button",[\s\S]*BOARD_TASK_STACK_BOOT_BUTTON/,

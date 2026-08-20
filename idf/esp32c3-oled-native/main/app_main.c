@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdatomic.h>
 #include <string.h>
 
 #include "audio_service.h"
@@ -22,6 +23,9 @@
 #define BUTTON_DEBOUNCE_MS 35
 #define BUTTON_CLICK_WINDOW_MS 400
 #define BUTTON_HOLD_MS 800
+#define BUTTON_ACTION_RETRY_MS 100
+#define BUTTON_ACTION_TIMEOUT_MS 30000
+#define BUTTON_STATUS_DISPLAY_MS 2000U
 #define DISPLAY_SCROLL_HOLD_MS 3500U
 #define DISPLAY_SCROLL_STEP_MS 35U
 #define DISPLAY_SCROLL_SEPARATOR_GLYPHS 3U
@@ -34,6 +38,36 @@ static native_state_t s_state;
 #ifndef YORADIO_CODEC_BENCHMARK
 static oled_display_t s_display;
 static int64_t s_boot_logo_until_us;
+static atomic_uint_fast32_t s_button_status_revision;
+static atomic_uint_fast32_t s_button_status_until_ms;
+static atomic_bool s_button_status_playing;
+
+typedef enum {
+    BUTTON_ACTION_NONE,
+    BUTTON_ACTION_TOGGLE,
+    BUTTON_ACTION_NEXT,
+    BUTTON_ACTION_PREVIOUS,
+} button_action_t;
+
+static esp_err_t execute_button_action(button_action_t action) {
+    switch (action) {
+        case BUTTON_ACTION_TOGGLE:
+            return radio_control_toggle();
+        case BUTTON_ACTION_NEXT:
+            return radio_control_next();
+        case BUTTON_ACTION_PREVIOUS:
+            return radio_control_previous();
+        default:
+            return ESP_ERR_INVALID_ARG;
+    }
+}
+
+static void show_button_playback_status(bool playing, uint32_t now_ms) {
+    atomic_store(&s_button_status_playing, playing);
+    atomic_store(&s_button_status_until_ms,
+                 now_ms + BUTTON_STATUS_DISPLAY_MS);
+    atomic_fetch_add(&s_button_status_revision, 1U);
+}
 
 typedef struct {
     size_t glyph_count;
@@ -247,11 +281,29 @@ static void display_task(void *argument) {
     bool secondary_initialized = false;
     bool previous_station_uppercase =
         display_settings_get_station_uppercase();
+    uint32_t button_status_revision =
+        (uint32_t)atomic_load(&s_button_status_revision);
+    uint32_t button_status_until_ms = 0;
+    bool button_status_playing = false;
+    bool button_status_was_visible = false;
+    const display_scroll_t button_status_scroll = {0};
     while (true) {
         native_state_t state;
         native_state_snapshot(&s_state, &state);
         uint32_t now_ms = (uint32_t)(esp_timer_get_time() / 1000U);
         bool redraw = display_state_changed(&state, &previous);
+        uint32_t current_button_status_revision =
+            (uint32_t)atomic_load(&s_button_status_revision);
+        if (current_button_status_revision != button_status_revision) {
+            button_status_revision = current_button_status_revision;
+            button_status_until_ms =
+                (uint32_t)atomic_load(&s_button_status_until_ms);
+            button_status_playing = atomic_load(&s_button_status_playing);
+            redraw = true;
+        }
+        bool button_status_visible =
+            (int32_t)(button_status_until_ms - now_ms) > 0;
+        if (button_status_visible != button_status_was_visible) redraw = true;
         bool station_uppercase = display_settings_get_station_uppercase();
         if (station_uppercase != previous_station_uppercase) redraw = true;
         char stream_details[96];
@@ -363,10 +415,17 @@ static void display_task(void *argument) {
             redraw = true;
         }
         if (redraw) {
-            draw_status(&state, secondary_text, &station_scroll,
-                        &title_scroll, station_uppercase);
+            const char *display_secondary =
+                button_status_visible
+                    ? (button_status_playing ? "playing" : "stopped")
+                    : secondary_text;
+            draw_status(&state, display_secondary, &station_scroll,
+                        button_status_visible ? &button_status_scroll
+                                              : &title_scroll,
+                        station_uppercase);
             previous = state;
             previous_station_uppercase = station_uppercase;
+            button_status_was_visible = button_status_visible;
         }
 #if CONFIG_YORADIO_OLED_HW_SCROLL
         if (start_hardware_scroll) {
@@ -419,6 +478,10 @@ static void button_task(void *argument) {
     TickType_t released_at = 0;
     uint8_t clicks = 0;
     bool hold_handled = false;
+    button_action_t pending_action = BUTTON_ACTION_NONE;
+    TickType_t action_queued_at = 0;
+    TickType_t action_retry_at = 0;
+    bool action_deferred = false;
     while (true) {
         bool pressed = gpio_get_level(BOARD_BOOT_BUTTON) == 0;
         TickType_t now = xTaskGetTickCount();
@@ -440,11 +503,10 @@ static void button_task(void *argument) {
         if (stable_pressed && !hold_handled &&
             now - pressed_at >= pdMS_TO_TICKS(BUTTON_HOLD_MS)) {
             ESP_LOGI(TAG, "BOOT long press: previous station");
-            esp_err_t result = radio_control_previous();
-            if (result != ESP_OK) {
-                ESP_LOGW(TAG, "BOOT previous failed: %s",
-                         esp_err_to_name(result));
-            }
+            pending_action = BUTTON_ACTION_PREVIOUS;
+            action_queued_at = now;
+            action_retry_at = now;
+            action_deferred = false;
             hold_handled = true;
             clicks = 0;
         }
@@ -453,13 +515,42 @@ static void button_task(void *argument) {
             const bool next = clicks >= 2;
             ESP_LOGI(TAG, "%s", next ? "BOOT two clicks: next station"
                                       : "BOOT click: play/pause");
-            esp_err_t result = next ? radio_control_next()
-                                    : radio_control_toggle();
-            if (result != ESP_OK) {
+            pending_action = next ? BUTTON_ACTION_NEXT : BUTTON_ACTION_TOGGLE;
+            action_queued_at = now;
+            action_retry_at = now;
+            action_deferred = false;
+            clicks = 0;
+        }
+        if (pending_action != BUTTON_ACTION_NONE && now >= action_retry_at) {
+            native_state_t state_before_action;
+            native_state_snapshot(&s_state, &state_before_action);
+            button_action_t executing_action = pending_action;
+            esp_err_t result = execute_button_action(pending_action);
+            if (result == ESP_OK) {
+                if (executing_action == BUTTON_ACTION_TOGGLE) {
+                    show_button_playback_status(!state_before_action.audio_running,
+                                                (uint32_t)(esp_timer_get_time() /
+                                                           1000U));
+                }
+                if (action_deferred) {
+                    ESP_LOGI(TAG, "Deferred BOOT action executed");
+                }
+                pending_action = BUTTON_ACTION_NONE;
+            } else if (result == ESP_ERR_INVALID_STATE &&
+                       now - action_queued_at <
+                           pdMS_TO_TICKS(BUTTON_ACTION_TIMEOUT_MS)) {
+                if (!action_deferred) {
+                    ESP_LOGI(TAG,
+                             "Radio is starting; deferring BOOT action");
+                    action_deferred = true;
+                }
+                action_retry_at =
+                    now + pdMS_TO_TICKS(BUTTON_ACTION_RETRY_MS);
+            } else {
                 ESP_LOGW(TAG, "BOOT action failed: %s",
                          esp_err_to_name(result));
+                pending_action = BUTTON_ACTION_NONE;
             }
-            clicks = 0;
         }
         vTaskDelay(pdMS_TO_TICKS(10));
     }

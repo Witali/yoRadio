@@ -34,6 +34,8 @@ contrast and stores the selection in NVS. The GPIO8 PWM LED follows the
 stronger channel peak and is configurable or removable under
 `menuconfig -> yoRadio audio level LED`. One BOOT click pauses or resumes, two
 clicks select the next station, and a hold selects the previous station.
+After a single click, the OLED second row shows `playing` or `stopped` for two
+seconds to confirm the resulting playback state.
 Holding BOOT while resetting still enters the ROM downloader.
 
 Software text scrolling is enabled for this board by default so every station
