@@ -1,5 +1,6 @@
 #include "websocket_service.h"
 
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -42,6 +43,7 @@ static char s_broadcast_status[1280];
 static char s_broadcast_current[48];
 static webui_status_key_t s_previous_status_key;
 static webui_status_key_t s_current_status_key;
+static atomic_bool s_playlist_changed_pending;
 
 static void json_escape(const char *source, char *target, size_t target_size) {
     size_t written = 0;
@@ -77,6 +79,19 @@ static esp_err_t ws_send_async(int socket, const char *text) {
         .len = strlen(text),
     };
     return httpd_ws_send_data(s_server, socket, &frame);
+}
+
+static void broadcast_text(const char *text) {
+    if (!s_server || !text) return;
+    size_t count = CONFIG_LWIP_MAX_SOCKETS;
+    int sockets[CONFIG_LWIP_MAX_SOCKETS];
+    if (httpd_get_client_list(s_server, &count, sockets) != ESP_OK) return;
+    for (size_t index = 0; index < count; ++index) {
+        if (httpd_ws_get_fd_info(s_server, sockets[index]) ==
+            HTTPD_WS_CLIENT_WEBSOCKET) {
+            ws_send_async(sockets[index], text);
+        }
+    }
 }
 
 static void format_status(char *output, size_t output_size) {
@@ -236,8 +251,8 @@ static void handle_command(httpd_req_t *request, char *command) {
     } else if (strcmp(command, "getcontrols") == 0) {
         send_control_settings(request);
     } else if (strcmp(command, "submitplaylist") == 0) {
-        ws_send_request(request,
-                        "{\"file\":\"/data/playlist.csv\"}");
+        // The HTTP upload handler emits the file event only after the new
+        // playlist has been written successfully.
     } else if (strcmp(command, "submitplaylistdone") == 0) {
         // The shared WebUI acknowledges that it has reloaded playlist.csv.
     } else if (strcmp(command, "play") == 0) {
@@ -330,6 +345,10 @@ static void status_task(void *argument) {
         bool heartbeat = !last_sent ||
                          now - last_sent >=
                              pdMS_TO_TICKS(WS_STATUS_HEARTBEAT_MS);
+        if (atomic_exchange(&s_playlist_changed_pending, false)) {
+            ESP_LOGI(TAG, "Broadcasting playlist changed event");
+            broadcast_text("{\"file\":\"/data/playlist.csv\"}");
+        }
         if (!changed && !heartbeat) continue;
         bool station_changed = !have_previous ||
                                s_current_status_key.current_item !=
@@ -339,22 +358,16 @@ static void status_task(void *argument) {
             snprintf(s_broadcast_current, sizeof(s_broadcast_current),
                      "{\"current\":%u}", s_current_status_key.current_item);
         }
-        size_t count = CONFIG_LWIP_MAX_SOCKETS;
-        int sockets[CONFIG_LWIP_MAX_SOCKETS];
-        if (httpd_get_client_list(s_server, &count, sockets) != ESP_OK) continue;
-        for (size_t index = 0; index < count; ++index) {
-            if (httpd_ws_get_fd_info(s_server, sockets[index]) ==
-                HTTPD_WS_CLIENT_WEBSOCKET) {
-                ws_send_async(sockets[index], s_broadcast_status);
-                if (station_changed) {
-                    ws_send_async(sockets[index], s_broadcast_current);
-                }
-            }
-        }
+        broadcast_text(s_broadcast_status);
+        if (station_changed) broadcast_text(s_broadcast_current);
         s_previous_status_key = s_current_status_key;
         have_previous = true;
         last_sent = now;
     }
+}
+
+void websocket_service_notify_playlist_changed(void) {
+    atomic_store(&s_playlist_changed_pending, true);
 }
 
 esp_err_t websocket_service_register(httpd_handle_t server,

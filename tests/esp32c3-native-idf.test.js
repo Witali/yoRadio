@@ -707,7 +707,7 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
   assert.match(websocket, /static webui_status_key_t s_previous_status_key/);
   assert.match(
     websocket,
-    /station_changed[\s\S]*\\"current\\":%u[\s\S]*ws_send_async\(sockets\[index\], s_broadcast_current\)/,
+    /station_changed[\s\S]*\\"current\\":%u[\s\S]*broadcast_text\(s_broadcast_current\)/,
   );
   assert.match(websocket, /audio_service_buffer_fill_percent\(\)/);
   assert.match(
@@ -847,12 +847,34 @@ test("native WebUI reuses shared pages and recovers an empty filesystem", () => 
   assert.match(web, /\.uri = "\/emergency"/);
 });
 
-test("shared playlist editor reloads an uploaded native playlist", () => {
+test("native playlist reload event is emitted only after a successful upload", () => {
   const websocket = read("main", "websocket_service.c");
+  const websocketHeader = read("main", "websocket_service.h");
+  const web = read("main", "web_service.c");
 
   assert.match(websocket, /strcmp\(command, "submitplaylist"\)/);
-  assert.match(websocket, /\/data\/playlist\.csv/);
   assert.match(websocket, /strcmp\(command, "submitplaylistdone"\)/);
+  assert.match(websocketHeader, /websocket_service_notify_playlist_changed/);
+  assert.match(
+    websocket,
+    /static atomic_bool s_playlist_changed_pending/,
+  );
+  assert.match(
+    websocket,
+    /atomic_exchange\(&s_playlist_changed_pending, false\)[\s\S]*?"\{\\"file\\":\\"\/data\/playlist\.csv\\"\}"/,
+  );
+  assert.match(
+    websocket,
+    /websocket_service_notify_playlist_changed[\s\S]*?atomic_store\(&s_playlist_changed_pending, true\)/,
+  );
+  assert.match(
+    web,
+    /httpd_resp_sendstr\(request, "OK"\)[\s\S]*?if \(is_playlist\) websocket_service_notify_playlist_changed\(\)/,
+  );
+  assert.match(
+    web,
+    /if \(upload\.playlist_saved\)[\s\S]*?websocket_service_notify_playlist_changed\(\)/,
+  );
 });
 
 test("native SPIFFS image contains the shared WebUI and repository playlist", () => {

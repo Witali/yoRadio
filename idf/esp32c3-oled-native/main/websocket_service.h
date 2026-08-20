@@ -6,3 +6,4 @@
 
 esp_err_t websocket_service_register(httpd_handle_t server,
                                      native_state_t *state);
+void websocket_service_notify_playlist_changed(void);

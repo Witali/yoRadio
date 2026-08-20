@@ -375,6 +375,7 @@ static void clear_web_assets_for_recovery(void) {
 typedef struct {
     unsigned saved;
     bool wifi_saved;
+    bool playlist_saved;
     bool web_storage_prepared;
 } webboard_upload_t;
 
@@ -398,6 +399,7 @@ static esp_err_t webboard_part(const char *field, const char *filename,
         }
         if (strcmp(name, "playlist.csv") == 0) {
             result = save_playlist(data, size);
+            upload->playlist_saved = result == ESP_OK;
         } else if (strcmp(name, "wifi.csv") == 0) {
             result = save_wifi(data, size);
             upload->wifi_saved = result == ESP_OK;
@@ -438,6 +440,9 @@ static esp_err_t webboard_upload_handler(httpd_req_t *request) {
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     ESP_RETURN_ON_ERROR(httpd_resp_sendstr(request, "Files imported"), TAG,
                         "send WebUI import redirect");
+    if (upload.playlist_saved) {
+        websocket_service_notify_playlist_changed();
+    }
     if (upload.wifi_saved) {
         xTaskCreate(reboot_task, "wifi_reboot",
                     BOARD_TASK_STACK_WIFI_REBOOT, NULL, 3, NULL);
@@ -558,6 +563,7 @@ static esp_err_t upload_handler(httpd_req_t *request) {
     httpd_resp_set_type(request, "text/plain");
     ESP_RETURN_ON_ERROR(httpd_resp_sendstr(request, "OK"), TAG,
                         "send upload response");
+    if (is_playlist) websocket_service_notify_playlist_changed();
     if (is_wifi) {
         xTaskCreate(reboot_task, "wifi_reboot",
                     BOARD_TASK_STACK_WIFI_REBOOT, NULL, 3, NULL);
