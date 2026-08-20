@@ -171,6 +171,26 @@ test("playlist reload preserves the user's scroll position", async () => {
   assert.equal(playlist.scrollTop, 4321);
 });
 
+test("repeated player status does not rebuild the station list", () => {
+  const script = readAsset("script.js.gz");
+  const helper = script.slice(
+    script.indexOf("function shouldReloadPlaylist"),
+    script.indexOf("function setupElement"),
+  );
+  const context = { loadedPlaylistMode: null, results: null };
+
+  vm.runInNewContext(
+    `${helper}\nresults = [shouldReloadPlaylist('modeweb'), shouldReloadPlaylist('modeweb'), shouldReloadPlaylist('modesd')];`,
+    context,
+  );
+
+  assert.deepEqual(Array.from(context.results), [true, false, true]);
+  assert.match(
+    script,
+    /if\(shouldReloadPlaylist\(data\.playermode\)\) \{[\s\S]*?generatePlaylist/,
+  );
+});
+
 test("a physical station change scrolls once after initial synchronization", () => {
   const script = readAsset("script.js.gz");
   const helpers = script.slice(

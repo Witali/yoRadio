@@ -300,6 +300,44 @@ function generatePlaylist(path){
     Write-GzipText $scriptPath $script
 }
 
+if(-not $script.Contains("function shouldReloadPlaylist(mode)")) {
+    $script = Replace-Once $script @'
+var currentItemSynchronized = false;
+var stationChangeScrollFrom = null;
+'@ @'
+var currentItemSynchronized = false;
+var loadedPlaylistMode = null;
+var stationChangeScrollFrom = null;
+'@ "loaded playlist mode state"
+
+    $script = Replace-Once $script @'
+function setupElement(id,value){
+'@ @'
+function shouldReloadPlaylist(mode){
+  const changed = loadedPlaylistMode !== mode;
+  loadedPlaylistMode = mode;
+  return changed;
+}
+function setupElement(id,value){
+'@ "playlist reload decision helper"
+
+    $script = Replace-Once $script @'
+      getId('toggleplaylist').classList.remove('active');
+      setPlaylistMod();
+      generatePlaylist(`http://${hostname}/data/playlist.csv`+"?"+playlistmod);
+      return;
+'@ @'
+      getId('toggleplaylist').classList.remove('active');
+      if(shouldReloadPlaylist(data.playermode)) {
+        setPlaylistMod();
+        generatePlaylist(`http://${hostname}/data/playlist.csv`+"?"+playlistmod);
+      }
+      return;
+'@ "play mode playlist reload"
+
+    Write-GzipText $scriptPath $script
+}
+
 $stylePath = Join-Path $www "style.css.gz"
 $style = Read-GzipText $stylePath
 if(-not $style.Contains("#playbutton.connecting")) {
