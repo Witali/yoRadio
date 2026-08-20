@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "audio_level_led.h"
 #include "esp_audio_dec_default.h"
 #include "esp_audio_simple_dec.h"
 #include "esp_audio_simple_dec_default.h"
@@ -454,6 +455,7 @@ static void output_task(void *argument) {
         pcm_packet_t *packet = xRingbufferReceive(s_pcm, &item_size,
                                                   pdMS_TO_TICKS(5));
         if (!packet) {
+            audio_level_led_update_peak(0);
             native_audio_output_idle();
             continue;
         }
@@ -470,6 +472,9 @@ static void output_task(void *argument) {
             }
             sample_rate = packet->sample_rate;
         }
+        audio_level_led_update_pcm(packet->data, packet->data_size,
+                                   packet->bits_per_sample,
+                                   packet->channels);
         esp_err_t result = native_audio_output_write_pcm(
             packet->data, packet->data_size, packet->bits_per_sample,
             packet->channels);
@@ -485,6 +490,8 @@ esp_err_t audio_service_start(native_state_t *state) {
     s_state = state;
     ESP_RETURN_ON_ERROR(native_audio_output_init(), TAG,
                         "initialize audio output");
+    ESP_RETURN_ON_ERROR(audio_level_led_init(), TAG,
+                        "initialize audio level LED");
     atomic_init(&s_generation, 0);
     s_commands = xQueueCreate(1, sizeof(play_command_t));
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);

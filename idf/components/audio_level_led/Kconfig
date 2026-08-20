@@ -1,0 +1,46 @@
+menu "yoRadio audio level LED"
+
+menuconfig YORADIO_AUDIO_LEVEL_LED
+    bool "Enable PWM audio level LED"
+    default n
+    help
+        Drive an ordinary single-color LED from the strongest decoded audio
+        peak. Keep this disabled unless the selected GPIO is safe on the
+        target board. This is not a WS2812/addressable-LED driver.
+
+if YORADIO_AUDIO_LEVEL_LED
+
+config YORADIO_AUDIO_LEVEL_LED_GPIO
+    int "LED GPIO"
+    range 0 48
+    default 8
+
+config YORADIO_AUDIO_LEVEL_LED_ACTIVE_LOW
+    bool "LED is active low"
+    default y
+    help
+        Enable when a lower PWM duty at the GPIO produces more light.
+
+config YORADIO_AUDIO_LEVEL_LED_PWM_HZ
+    int "PWM frequency (Hz)"
+    range 100 40000
+    default 5000
+
+config YORADIO_AUDIO_LEVEL_LED_MAX_BRIGHTNESS
+    int "Maximum brightness (1..255 duty)"
+    range 1 255
+    default 255
+
+config YORADIO_AUDIO_LEVEL_LED_UPDATE_MS
+    int "Peak update interval (ms)"
+    range 10 1000
+    default 50
+
+config YORADIO_AUDIO_LEVEL_LED_DECAY_STEP
+    int "Envelope decay per update (0..255)"
+    range 1 255
+    default 8
+
+endif
+
+endmenu

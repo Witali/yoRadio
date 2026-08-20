@@ -298,8 +298,14 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
     #endif
     #define REAL_LEDBUILTIN LED_BUILTIN
 #endif
+#ifndef AUDIO_LEVEL_LED_ENABLED
+  #define AUDIO_LEVEL_LED_ENABLED 0
+#endif
 #ifndef AUDIO_LEVEL_LED_PIN
   #define AUDIO_LEVEL_LED_PIN 255
+#endif
+#ifndef AUDIO_LEVEL_LED_ACTIVE_LOW
+  #define AUDIO_LEVEL_LED_ACTIVE_LOW 0
 #endif
 #ifndef AUDIO_LEVEL_LED_MAX_BRIGHTNESS
   #define AUDIO_LEVEL_LED_MAX_BRIGHTNESS 64
@@ -312,6 +318,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #endif
 #ifndef AUDIO_LEVEL_LED_DECAY_STEP
   #define AUDIO_LEVEL_LED_DECAY_STEP 8
+#endif
+#if AUDIO_LEVEL_LED_ENABLED && AUDIO_LEVEL_LED_PIN == 255
+  #error "AUDIO_LEVEL_LED_ENABLED requires a valid AUDIO_LEVEL_LED_PIN"
 #endif
 #ifndef YORADIO_EQUALIZER_ENABLED
   #define YORADIO_EQUALIZER_ENABLED 1

@@ -46,6 +46,7 @@ idf_component_register(
     mbedtls
     nvs_flash
     spiffs
+    audio_level_led
     custom_legacy_codecs
     esp_audio_codec)
 

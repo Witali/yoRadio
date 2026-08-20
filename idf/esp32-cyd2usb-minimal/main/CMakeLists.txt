@@ -4,6 +4,7 @@ file(TO_CMAKE_PATH "$ENV{YORADIO_ARDUINO_LIBRARIES}" ARDUINO_LIBRARIES)
 
 set(YORADIO_SRCS
   "${YORADIO_ROOT}/src/main.cpp"
+  "${YORADIO_ROOT}/src/core/audiolevelled.cpp"
   "${YORADIO_ROOT}/src/core/commandhandler.cpp"
   "${YORADIO_ROOT}/src/core/config.cpp"
   "${YORADIO_ROOT}/src/core/controls.cpp"

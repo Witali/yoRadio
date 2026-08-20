@@ -167,6 +167,15 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 //#define LIGHT_SENSOR      255               /*  Light sensor  */
 //#define AUTOBACKLIGHT(x)  *function*        /*  Autobacklight function. See options.h for example  */
 //#define DSP_INVERT_TITLE  true              /* Invert title colors for OLED displays ?  */
+/* Optional ordinary PWM LED that follows the strongest decoded audio peak.
+ * Keep disabled unless the selected GPIO is safe on the target board. */
+//#define AUDIO_LEVEL_LED_ENABLED        1
+//#define AUDIO_LEVEL_LED_PIN            8
+//#define AUDIO_LEVEL_LED_ACTIVE_LOW     1
+//#define AUDIO_LEVEL_LED_PWM_HZ         5000
+//#define AUDIO_LEVEL_LED_MAX_BRIGHTNESS 255
+//#define AUDIO_LEVEL_LED_UPDATE_MS      50
+//#define AUDIO_LEVEL_LED_DECAY_STEP     8
 /******************************************/
 
 /*  IR control  */

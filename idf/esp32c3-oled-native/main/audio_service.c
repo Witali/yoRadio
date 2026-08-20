@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "audio_level_led.h"
 #include "esp_audio_dec_default.h"
 #include "esp_audio_simple_dec.h"
 #include "esp_audio_simple_dec_default.h"
@@ -910,6 +911,8 @@ esp_err_t audio_service_start(native_state_t *state) {
     s_state = state;
     ESP_RETURN_ON_ERROR(native_audio_output_init(), TAG,
                         "initialize audio output");
+    ESP_RETURN_ON_ERROR(audio_level_led_init(), TAG,
+                        "initialize audio level LED");
     atomic_init(&s_generation, 0);
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;

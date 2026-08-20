@@ -2889,7 +2889,7 @@ bool Audio::playChunk() {
  * Shamelessly borrowed from @schreibfaul1 https://github.com/schreibfaul1/ESP32-audioI2S/blob/1296374fc513a6d6bfaa3b1ca08f6ba938b18d99/src/Audio.cpp#L5030
  */
 void Audio::_computeVUlevel(int16_t sample[2]) {
-  if(!config.store.vumeter && AUDIO_LEVEL_LED_PIN == 255) return;
+  if(!config.store.vumeter && !AUDIO_LEVEL_LED_ENABLED) return;
   static uint8_t sampleArray[2][4][8] = {0};
   static uint8_t cnt0 = 0, cnt1 = 0, cnt2 = 0, cnt3 = 0, cnt4 = 0;
   static bool    f_vu = false;
@@ -2954,7 +2954,7 @@ void Audio::_computeVUlevel(int16_t sample[2]) {
 }
 
 uint16_t Audio::get_VUlevel(uint16_t dimension){
-  if((!config.store.vumeter && AUDIO_LEVEL_LED_PIN == 255) || config.vuThreshold==0) return 0;
+  if((!config.store.vumeter && !AUDIO_LEVEL_LED_ENABLED) || config.vuThreshold==0) return 0;
   uint8_t L = map(vuLeft, config.vuThreshold, 0, 0, dimension);
   uint8_t R = map(vuRight, config.vuThreshold, 0, 0, dimension);
   return (L << 8) | R;

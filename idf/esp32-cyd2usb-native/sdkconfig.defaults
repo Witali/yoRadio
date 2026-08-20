@@ -28,6 +28,10 @@ CONFIG_HEAP_POISONING_DISABLED=y
 CONFIG_FREERTOS_USE_TRACE_FACILITY=n
 CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=n
 
+# CYD has no dedicated audio-level LED. It can be enabled for a custom board
+# revision in menuconfig after selecting a verified free output GPIO.
+# CONFIG_YORADIO_AUDIO_LEVEL_LED is not set
+
 # Native decoder set. Only one decoder instance is created at a time.
 # minimp3 is the default MP3 implementation; alternatives stay selectable in
 # menuconfig for reproducible comparison builds.

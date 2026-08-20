@@ -49,7 +49,9 @@
 #define CONFIG_ASYNC_TCP_RUNNING_CORE 0
 
 /* GPIO8 drives the onboard active-low blue LED through hardware PWM. */
+#define AUDIO_LEVEL_LED_ENABLED 1
 #define AUDIO_LEVEL_LED_PIN   8
+#define AUDIO_LEVEL_LED_ACTIVE_LOW 1
 #define AUDIO_LEVEL_LED_MAX_BRIGHTNESS 255
 #define USE_BUILTIN_LED       false
 #define LED_BUILTIN_S3        255

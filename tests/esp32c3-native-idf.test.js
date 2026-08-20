@@ -36,13 +36,15 @@ test("ESP32-C3 native target is Arduino-free and selects the RISC-V chip", () =>
 test("native board profile maps OLED, controls and stereo PDM pins", () => {
   const board = read("main", "board_config.h");
   const audio = read("main", "native_audio_output.c");
+  const defaults = read("sdkconfig.defaults");
 
   assert.match(board, /BOARD_OLED_SDA GPIO_NUM_5/);
   assert.match(board, /BOARD_OLED_SCL GPIO_NUM_6/);
   assert.match(board, /BOARD_AUDIO_LEFT_DATA GPIO_NUM_10/);
   assert.match(board, /BOARD_AUDIO_RIGHT_DATA GPIO_NUM_3/);
   assert.match(board, /BOARD_BOOT_BUTTON GPIO_NUM_9/);
-  assert.match(board, /BOARD_AUDIO_LED GPIO_NUM_8/);
+  assert.match(defaults, /CONFIG_YORADIO_AUDIO_LEVEL_LED_GPIO=8/);
+  assert.match(audio, /audio_level_led_update_peak\(peak\)/);
   assert.match(audio, /I2S_PDM_TX_SLOT_DAC_DEFAULT_CONFIG/);
   assert.match(audio, /I2S_SLOT_MODE_STEREO/);
   assert.match(audio, /\.dout2 = BOARD_AUDIO_RIGHT_DATA/);

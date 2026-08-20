@@ -6,10 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "audio_level_led.h"
 #include "board_config.h"
 #include "driver/gpio.h"
 #include "driver/i2s_pdm.h"
-#include "driver/ledc.h"
 #include "esp_check.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -40,7 +40,6 @@ static bool s_resampler_has_previous;
 static int16_t s_previous_left;
 static int16_t s_previous_right;
 static uint32_t s_resampler_next_phase;
-static uint8_t s_led_envelope;
 static atomic_uchar s_volume;
 static atomic_schar s_balance;
 
@@ -254,50 +253,11 @@ static esp_err_t pdm_write_resampled(int16_t left, int16_t right) {
     return ESP_OK;
 }
 
-static esp_err_t audio_led_init(void) {
-    ledc_timer_config_t timer = {
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .duty_resolution = LEDC_TIMER_8_BIT,
-        .timer_num = LEDC_TIMER_0,
-        .freq_hz = 5000,
-        .clk_cfg = LEDC_AUTO_CLK,
-    };
-    ESP_RETURN_ON_ERROR(ledc_timer_config(&timer), TAG,
-                        "audio LED timer setup");
-    ledc_channel_config_t channel = {
-        .gpio_num = BOARD_AUDIO_LED,
-        .speed_mode = LEDC_LOW_SPEED_MODE,
-        .channel = LEDC_CHANNEL_0,
-        .intr_type = LEDC_INTR_DISABLE,
-        .timer_sel = LEDC_TIMER_0,
-        .duty = BOARD_AUDIO_LED_ACTIVE_LOW ? 255 : 0,
-        .hpoint = 0,
-    };
-    return ledc_channel_config(&channel);
-}
-
-static void audio_led_update(uint16_t peak) {
-    uint8_t target = (uint8_t)(((uint32_t)peak * 255U + 16384U) / 32768U);
-    if (target >= s_led_envelope) {
-        s_led_envelope = target;
-    } else if (s_led_envelope > 4U) {
-        s_led_envelope -= 4U;
-    } else {
-        s_led_envelope = 0;
-    }
-    uint32_t duty = BOARD_AUDIO_LED_ACTIVE_LOW
-                        ? 255U - s_led_envelope
-                        : s_led_envelope;
-    ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
-    ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-}
-
 esp_err_t native_audio_output_init(void) {
     hold_pdm_low();
-    s_led_envelope = 0;
     atomic_init(&s_volume, 192);
     atomic_init(&s_balance, 0);
-    return audio_led_init();
+    return ESP_OK;
 }
 
 esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
@@ -349,7 +309,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
         ESP_RETURN_ON_ERROR(pdm_write_resampled(left, right), TAG,
                             "write stereo PDM PCM");
     }
-    audio_led_update(peak);
+    audio_level_led_update_peak(peak);
     return ESP_OK;
 }
 
@@ -374,7 +334,7 @@ int8_t native_audio_output_get_balance(void) {
 
 void native_audio_output_idle(void) {
     // DMA descriptors auto-clear to PCM zero; only the level LED must decay.
-    audio_led_update(0);
+    audio_level_led_update_peak(0);
 }
 
 const char *native_audio_output_name(void) {

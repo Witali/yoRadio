@@ -6,7 +6,7 @@
 
 namespace audioLevelLed {
 
-#if AUDIO_LEVEL_LED_PIN != 255
+#if AUDIO_LEVEL_LED_ENABLED
 namespace {
 uint32_t lastUpdateMs = 0;
 uint8_t envelope = 0;
@@ -30,13 +30,16 @@ void writeEnvelope() {
   if(brightness == lastBrightness) return;
 
   lastBrightness = brightness;
-  ledcWrite(AUDIO_LEVEL_LED_PIN, 255U - brightness);
+  const uint8_t duty = AUDIO_LEVEL_LED_ACTIVE_LOW
+                           ? static_cast<uint8_t>(255U - brightness)
+                           : brightness;
+  ledcWrite(AUDIO_LEVEL_LED_PIN, duty);
 }
 } // namespace
 #endif
 
 void begin() {
-#if AUDIO_LEVEL_LED_PIN != 255
+#if AUDIO_LEVEL_LED_ENABLED
   pwmReady = ledcAttach(AUDIO_LEVEL_LED_PIN, AUDIO_LEVEL_LED_PWM_HZ, 8);
   if(!pwmReady) {
     Serial.println("##ERROR#:\tAudio level LED PWM initialization failed");
@@ -49,7 +52,7 @@ void begin() {
 }
 
 void loop() {
-#if AUDIO_LEVEL_LED_PIN != 255
+#if AUDIO_LEVEL_LED_ENABLED
   const uint32_t now = millis();
   if(now - lastUpdateMs < AUDIO_LEVEL_LED_UPDATE_MS) return;
   lastUpdateMs = now;
