@@ -242,6 +242,12 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef TS_SPI_HOST
   #define TS_SPI_HOST HSPI     // SPI host used with custom TS_SPIPINS (HSPI or VSPI)
 #endif
+#ifndef TS_SOFTSPI
+  #define TS_SOFTSPI false     // bit-bang XPT2046 and leave both hardware SPI hosts available
+#endif
+#if TS_SOFTSPI && !defined(TS_SPIPINS)
+  #error "TS_SOFTSPI requires TS_SPIPINS (SCK, MISO, MOSI)"
+#endif
 
 /*        LCD DISPLAY            */
 #ifndef LCD_RS

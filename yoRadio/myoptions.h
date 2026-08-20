@@ -24,11 +24,15 @@
 #define TFT_SPI_FREQUENCY     80000000UL
 #define BRIGHTNESS_PIN        21
 
-/* XPT2046 has dedicated, non-default SPI pins on this board. */
+/*
+ * XPT2046 has dedicated, non-default SPI pins on this board.  Use a small
+ * software SPI implementation so the ESP32 VSPI controller remains available
+ * for the separately wired microSD socket.
+ */
 #define TS_MODEL              TS_MODEL_XPT2046
 #define TS_CS                 33
 #define TS_SPIPINS            25, 39, 32  /* SCK, MISO, MOSI */
-#define TS_SPI_HOST           VSPI
+#define TS_SOFTSPI            true
 
 /* Feed only DAC2/GPIO26; DAC1/GPIO25 is the touch clock. */
 #define I2S_DOUT              255
@@ -43,9 +47,10 @@
 /* Show decoded source format, sample rate and channel layout on the player. */
 #define SHOW_STREAM_INFO      true
 
-/* No external VS1053. The microSD bus is intentionally disabled; see docs. */
+/* No external VS1053. The onboard microSD socket uses the default VSPI pins. */
 #define VS1053_CS             255
-#define SDC_CS                255
+#define SDC_CS                5
+#define SDSPISPEED            20000000
 
 #define LED_BUILTIN           255
 

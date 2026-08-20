@@ -24,7 +24,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repository = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\..\.."))
 $sketch = Join-Path $repository "yoRadio"
-$fqbn = "esp32:esp32:esp32:FlashSize=4M,PartitionScheme=min_spiffs,PSRAM=disabled"
+$fqbn = "esp32:esp32:esp32:FlashMode=qio,FlashFreq=80,FlashSize=4M,PartitionScheme=min_spiffs,PSRAM=disabled"
 $buildName = if ($AudioOutput -eq "PDM") { "cyd2usb-pdm-spiffs512" } else { "cyd2usb-spiffs512" }
 if ($Esp32Sdk) {
     $buildName = "$buildName-custom-sdk"
@@ -231,6 +231,9 @@ $flashArguments = @(
     "--before", "default-reset",
     "--after", "hard-reset",
     "write-flash",
+    # The Arduino ESP32 "QIO" profile deliberately keeps the image header in
+    # DIO mode so the ROM can load the QIO-aware bootloader on every supported
+    # module. The bootloader then enables the verified 80 MHz QIO runtime mode.
     "--flash-mode", "dio",
     "--flash-freq", "80m",
     "--flash-size", "4MB"

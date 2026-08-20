@@ -62,12 +62,14 @@ bool SDManager::_checkNoMedia(const char* path){
 }
 
 bool SDManager::_endsWith (const char* base, const char* str) {
-  int slen = strlen(str) - 1;
-  const char *p = base + strlen(base) - 1;
-  while(p > base && isspace(*p)) p--;
-  p -= slen;
-  if (p < base) return false;
-  return (strncmp(p, str, slen) == 0);
+  if (!base || !str) return false;
+  size_t baseLength = strlen(base);
+  const size_t suffixLength = strlen(str);
+  while (baseLength && isspace(static_cast<unsigned char>(base[baseLength - 1]))) {
+    baseLength--;
+  }
+  if (baseLength < suffixLength) return false;
+  return strncasecmp(base + baseLength - suffixLength, str, suffixLength) == 0;
 }
 
 void SDManager::listSD(File &plSDfile, File &plSDindex, const char* dirname, uint8_t levels) {
@@ -101,8 +103,9 @@ void SDManager::listSD(File &plSDfile, File &plSDindex, const char* dirname, uin
                 listSD(plSDfile, plSDindex, filePath, levels - 1);
             }
         } else {
-            if (_endsWith(strlwr((char*)fn), ".mp3") || _endsWith(fn, ".m4a") || _endsWith(fn, ".aac") ||
-                _endsWith(fn, ".wav") || _endsWith(fn, ".flac")) {
+            if (_endsWith(fn, ".mp3") || _endsWith(fn, ".m4a") || _endsWith(fn, ".aac") ||
+                _endsWith(fn, ".wav") || _endsWith(fn, ".flac") || _endsWith(fn, ".ogg") ||
+                _endsWith(fn, ".oga") || _endsWith(fn, ".opus")) {
                 pos = plSDfile.position();
                 plSDfile.printf("%s\t%s\t0\n", fn, filePath);
                 plSDindex.write((uint8_t*)&pos, 4);
