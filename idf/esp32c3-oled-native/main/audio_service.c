@@ -12,6 +12,9 @@
 #include "esp_http_client.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#ifdef YORADIO_CODEC_BENCHMARK
+#include "esp_partition.h"
+#endif
 #include "esp_timer.h"
 #include "freertos/queue.h"
 #include "freertos/ringbuf.h"
@@ -25,11 +28,14 @@
 #define PCM_PACKET_DATA_SIZE 3072
 #define MAX_HTTP_REDIRECTS 5
 #define ICY_METADATA_MAX 4080
-#define DECODE_STATS_INTERVAL_US 10000000LL
+#define DECODE_STATS_INTERVAL_US 5000000LL
 
 typedef struct {
     uint32_t generation;
     native_codec_t requested_codec;
+#ifdef YORADIO_CODEC_BENCHMARK
+    uint32_t fixture_size;
+#endif
     char url[512];
 } play_command_t;
 
@@ -275,6 +281,50 @@ static void parse_icy_metadata(char *metadata, size_t size) {
     ESP_LOGI(TAG, "Stream title: %s", title);
 }
 
+#ifdef YORADIO_CODEC_BENCHMARK
+static void play_flash_fixture(const play_command_t *command,
+                               uint8_t *buffer) {
+    const esp_partition_t *partition = esp_partition_find_first(
+        ESP_PARTITION_TYPE_DATA, (esp_partition_subtype_t)0x40,
+        "codec_test");
+    if (!partition || !command->fixture_size ||
+        command->fixture_size > partition->size) {
+        ESP_LOGE(TAG, "Invalid codec fixture size %lu",
+                 (unsigned long)command->fixture_size);
+        state_set_audio(false, "invalid flash fixture");
+        return;
+    }
+
+    ESP_LOGI(TAG, "Reading %lu-byte %s fixture from codec_test flash",
+             (unsigned long)command->fixture_size,
+             codec_name(command->requested_codec));
+    native_codec_t codec = command->requested_codec;
+    bool first_chunk = true;
+    uint32_t offset = 0;
+    while (offset < command->fixture_size &&
+           atomic_load(&s_generation) == command->generation) {
+        size_t chunk = command->fixture_size - offset;
+        if (chunk > STREAM_CHUNK_SIZE) chunk = STREAM_CHUNK_SIZE;
+        esp_err_t result = esp_partition_read(partition, offset, buffer, chunk);
+        if (result != ESP_OK) {
+            ESP_LOGE(TAG, "Codec fixture read failed at %lu: %s",
+                     (unsigned long)offset, esp_err_to_name(result));
+            state_set_audio(false, "flash read failed");
+            break;
+        }
+        if (!send_stream_audio(command->generation, &codec, buffer, chunk,
+                               &first_chunk)) {
+            ESP_LOGW(TAG, "Compressed codec fixture buffer stalled");
+            break;
+        }
+        offset += (uint32_t)chunk;
+    }
+    send_encoded(command->generation, codec, NULL, 0, true);
+    ESP_LOGI(TAG, "Codec fixture complete: %lu/%lu bytes",
+             (unsigned long)offset, (unsigned long)command->fixture_size);
+}
+#endif
+
 static void stream_task(void *argument) {
     (void)argument;
     uint8_t *buffer = malloc(STREAM_CHUNK_SIZE);
@@ -286,6 +336,12 @@ static void stream_task(void *argument) {
         play_command_t command;
         xQueueReceive(s_commands, &command, portMAX_DELAY);
         state_set_audio(false, "connecting");
+#ifdef YORADIO_CODEC_BENCHMARK
+        if (command.fixture_size) {
+            play_flash_fixture(&command, buffer);
+            continue;
+        }
+#endif
 
         esp_http_client_config_t config = {
             .url = command.url,
@@ -658,6 +714,28 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
                                                             : ESP_FAIL;
 }
+
+#ifdef YORADIO_CODEC_BENCHMARK
+esp_err_t audio_service_play_fixture(size_t size, native_codec_t codec) {
+    const esp_partition_t *partition = esp_partition_find_first(
+        ESP_PARTITION_TYPE_DATA, (esp_partition_subtype_t)0x40,
+        "codec_test");
+    if (!partition || !size || size > partition->size ||
+        codec == NATIVE_CODEC_AUTO) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    play_command_t command = {
+        .generation = atomic_fetch_add(&s_generation, 1) + 1,
+        .requested_codec = codec,
+        .fixture_size = (uint32_t)size,
+    };
+    s_last_url[0] = '\0';
+    s_last_codec = NATIVE_CODEC_AUTO;
+    native_state_set_station(s_state, "flash:codec_test benchmark");
+    return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
+                                                            : ESP_FAIL;
+}
+#endif
 
 esp_err_t audio_service_resume(void) {
     if (!s_last_url[0]) return ESP_ERR_INVALID_STATE;

@@ -29,6 +29,7 @@ idf_component_register(
     esp_hw_support
     esp_lcd
     esp_netif
+    esp_partition
     esp_timer
     esp_wifi
     esp_ringbuf
@@ -38,6 +39,10 @@ idf_component_register(
     esp_audio_codec)
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)
+if(YORADIO_CODEC_BENCHMARK)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_CODEC_BENCHMARK=1)
+endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
 
 set(NATIVE_SPIFFS_ROOT "${CMAKE_CURRENT_BINARY_DIR}/spiffs-root")

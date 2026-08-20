@@ -160,6 +160,17 @@ test("native decoder reports measured real-time headroom", () => {
   assert.match(audio, /stats->audio_us \* 100ULL \/[\s\S]*stats->decode_us/);
 });
 
+test("native benchmark build reads codec fixtures only from dedicated flash", () => {
+  const audio = read("main", "audio_service.c");
+  const web = read("main", "web_service.c");
+
+  assert.match(audio, /#ifdef YORADIO_CODEC_BENCHMARK/);
+  assert.match(audio, /ESP_PARTITION_TYPE_DATA[\s\S]*"codec_test"/);
+  assert.match(audio, /esp_partition_read\(partition, offset, buffer, chunk\)/);
+  assert.match(web, /\.uri = "\/api\/native\/benchmark\*"/);
+  assert.match(web, /audio_service_play_fixture\(size, codec\)/);
+});
+
 test("native partition table stays compatible with min_spiffs", () => {
   const partitions = read("partitions.csv");
 

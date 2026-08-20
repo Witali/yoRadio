@@ -2,6 +2,8 @@
 param(
     [string]$BuildDirectory = "build",
     [string]$DependencyRoot = "",
+    [string]$Sdkconfig = "sdkconfig",
+    [string[]]$SdkconfigDefaults = @("sdkconfig.defaults"),
     [switch]$Setup,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")
@@ -71,8 +73,8 @@ try {
             (Join-Path $idf "tools\idf.py"),
             "-B", $BuildDirectory,
             "--no-ccache",
-            "-D", "SDKCONFIG=sdkconfig",
-            "-D", "SDKCONFIG_DEFAULTS=sdkconfig.defaults"
+            "-D", "SDKCONFIG=$Sdkconfig",
+            "-D", "SDKCONFIG_DEFAULTS=$($SdkconfigDefaults -join ';')"
         ) + $IdfArguments
         $process = Start-Process -Wait -PassThru -NoNewWindow `
             -FilePath $idfPython `
