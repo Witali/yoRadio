@@ -212,6 +212,57 @@ function shouldScrollCurrentItem(item){
     Write-GzipText $scriptPath $script
 }
 
+if(-not $script.Contains("const startingPlayback =")) {
+    $script = Replace-Once $script @'
+          if(target.id === 'playbutton') {
+            if(target.classList.contains('connecting')) return;
+            stationChangeScrollFrom = null;
+            setCurrentItem(currentItem, true);
+            const player = getId('playerwrap');
+            if(player && player.classList.contains('stopped')) setPlaybackPending(true);
+          }
+'@ @'
+          if(target.id === 'playbutton') {
+            if(target.classList.contains('connecting')) return;
+            const player = getId('playerwrap');
+            const startingPlayback = player && player.classList.contains('stopped');
+            if(startingPlayback) {
+              stationChangeScrollFrom = null;
+              setCurrentItem(currentItem, true);
+              setPlaybackPending(true);
+            }
+          }
+'@ "Play-only playlist scroll"
+
+    Write-GzipText $scriptPath $script
+}
+
+if(-not $script.Contains("const previousScrollTop = ul.scrollTop;")) {
+    $script = Replace-Once $script @'
+function handlePlaylistData(fileData) {
+  const ul = getId('playlist');
+  ul.innerHTML='';
+'@ @'
+function handlePlaylistData(fileData) {
+  const ul = getId('playlist');
+  const previousScrollTop = ul.scrollTop;
+  ul.innerHTML='';
+'@ "playlist scroll position capture"
+
+    $script = Replace-Once $script @'
+  const filter = getId('playlistfilter');
+  filterPlaylist(filter ? filter.value : '');
+  if(!modesd) initPLEditor();
+'@ @'
+  const filter = getId('playlistfilter');
+  filterPlaylist(filter ? filter.value : '');
+  ul.scrollTop = previousScrollTop;
+  if(!modesd) initPLEditor();
+'@ "playlist scroll position restore"
+
+    Write-GzipText $scriptPath $script
+}
+
 $stylePath = Join-Path $www "style.css.gz"
 $style = Read-GzipText $stylePath
 if(-not $style.Contains("#playbutton.connecting")) {

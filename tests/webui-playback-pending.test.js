@@ -22,7 +22,11 @@ test("Play is disabled visually until playback actually starts", () => {
   assert.match(script, /setTimeout\(\(\) => setPlaybackPending\(false\), 15000\)/);
   assert.match(
     script,
-    /player && player\.classList\.contains\('stopped'\)\) setPlaybackPending\(true\)/,
+    /const startingPlayback = player && player\.classList\.contains\('stopped'\)/,
+  );
+  assert.match(
+    script,
+    /if\(startingPlayback\) \{[\s\S]*?setCurrentItem\(currentItem, true\);[\s\S]*?setPlaybackPending\(true\);[\s\S]*?\}/,
   );
   assert.match(
     script,
@@ -32,6 +36,21 @@ test("Play is disabled visually until playback actually starts", () => {
   assert.match(
     style,
     /#playbutton\.connecting \{[^}]*opacity: \.45;[^}]*cursor: wait;[^}]*pointer-events: none;/,
+  );
+});
+
+test("Pause leaves the playlist scroll position unchanged", () => {
+  const script = readAsset("script.js.gz");
+  const playButtonHandler = script.slice(
+    script.indexOf("if(target.id === 'playbutton')"),
+    script.indexOf("if(target.id === 'prevbutton'"),
+  );
+
+  assert.match(playButtonHandler, /const startingPlayback =/);
+  assert.match(playButtonHandler, /if\(startingPlayback\)/);
+  assert.doesNotMatch(
+    playButtonHandler,
+    /setCurrentItem\(currentItem, true\);[\s\S]*?const startingPlayback/,
   );
 });
 

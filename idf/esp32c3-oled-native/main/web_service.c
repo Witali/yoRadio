@@ -616,7 +616,7 @@ static esp_err_t static_handler(httpd_req_t *request) {
         char variables[256];
         snprintf(variables, sizeof(variables),
                  "var yoVersion='idf-%s';\n"
-                 "var webUiRevision='native01';\n"
+                 "var webUiRevision='native02';\n"
                  "var formAction='%s';\n"
                  "var playMode='%s';\n"
                  "var equalizerEnabled=false;\n",

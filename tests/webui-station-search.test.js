@@ -101,7 +101,7 @@ test("current station stays selectable without unsolicited scrolling", () => {
   assert.equal(scrollOptions.behavior, "smooth");
 });
 
-test("playlist scroll is requested only by playback navigation", () => {
+test("playlist scroll is requested only by user navigation and Play", () => {
   const script = readAsset("script.js.gz");
 
   assert.match(script, /function setCurrentItem\(item, shouldScroll=false\)/);
@@ -111,7 +111,10 @@ test("playlist scroll is requested only by playback navigation", () => {
     /setCurrentItem\(data\.current, shouldScrollCurrentItem\(data\.current\)\)/,
   );
   assert.match(script, /id=='meta' \|\| id=='nameset'\) setCurrentItem\(currentItem, false\)/);
-  assert.match(script, /setCurrentItem\(currentItem, true\)/);
+  assert.match(
+    script,
+    /if\(startingPlayback\) \{[\s\S]*?setCurrentItem\(currentItem, true\)/,
+  );
   assert.match(
     script,
     /target\.id === 'nameset'\) \{ setCurrentItem\(currentItem, true\); return; \}/,
@@ -126,6 +129,40 @@ test("playlist scroll is requested only by playback navigation", () => {
     /const changed = currentItemSynchronized && Number\(item\) !== Number\(currentItem\)/,
   );
   assert.match(script, /currentItemSynchronized = true/);
+});
+
+test("playlist reload preserves the user's scroll position", () => {
+  const script = readAsset("script.js.gz");
+  const handlePlaylistData = script.slice(
+    script.indexOf("function handlePlaylistData"),
+    script.indexOf("function generatePlaylist"),
+  );
+  let html = "existing playlist";
+  const playlist = {
+    scrollTop: 4321,
+    get innerHTML() {
+      return html;
+    },
+    set innerHTML(value) {
+      html = value;
+      this.scrollTop = 0;
+    },
+  };
+
+  vm.runInNewContext(
+    `${handlePlaylistData}\nhandlePlaylistData("Station\\tstream\\t0");`,
+    {
+      bigplaylist: true,
+      currentItem: 1,
+      filterPlaylist: () => {},
+      getId: (id) =>
+        id === "playlist" ? playlist : { value: "" },
+      modesd: true,
+      setCurrentItem: () => {},
+    },
+  );
+
+  assert.equal(playlist.scrollTop, 4321);
 });
 
 test("a physical station change scrolls once after initial synchronization", () => {
