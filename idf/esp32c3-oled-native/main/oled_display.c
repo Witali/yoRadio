@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "board_config.h"
+#include "boot_logo_72x40.h"
 #include "driver/i2c_master.h"
 #include "esp_check.h"
 #include "esp_log.h"
@@ -322,4 +323,14 @@ esp_err_t oled_display_present(oled_display_t *display) {
         }
     }
     return ESP_OK;
+}
+
+esp_err_t oled_display_show_boot_logo(oled_display_t *display) {
+    ESP_RETURN_ON_FALSE(display && display->device, ESP_ERR_INVALID_STATE, TAG,
+                        "OLED is not initialized");
+    _Static_assert(sizeof(boot_logo_72x40) == sizeof(display->framebuffer),
+                   "Boot logo must fill the 72x40 framebuffer");
+    memcpy(display->framebuffer, boot_logo_72x40,
+           sizeof(display->framebuffer));
+    return oled_display_present(display);
 }

@@ -94,6 +94,37 @@ test("native OLED driver uses the 72x40 geometry and controller offset", () => {
   assert.match(source, /BOARD_OLED_CONTRAST/);
 });
 
+test("native OLED presents a legible full-screen yoRadio boot logo first", () => {
+  const header = read("main", "oled_display.h");
+  const display = read("main", "oled_display.c");
+  const logo = read("main", "boot_logo_72x40.h");
+  const app = read("main", "app_main.c");
+  const bytes = [...logo.matchAll(/0x([0-9a-f]{2})/gi)].map((match) =>
+    Number.parseInt(match[1], 16),
+  );
+
+  assert.equal(bytes.length, 72 * 40 / 8);
+  assert.ok(bytes.filter(Boolean).length > 100);
+  assert.match(logo, /original 21x32 `ё` mark/);
+  assert.match(logo, /crisp Spleen bitmap face/);
+  assert.match(header, /oled_display_show_boot_logo/);
+  assert.match(
+    display,
+    /memcpy\(display->framebuffer, boot_logo_72x40,[\s\S]*oled_display_present\(display\)/,
+  );
+
+  const init = app.indexOf("oled_display_init(&s_display)");
+  const bootLogo = app.indexOf("oled_display_show_boot_logo(&s_display)");
+  const settings = app.indexOf("display_settings_init(&s_display)");
+  const displayTask = app.indexOf('xTaskCreate(display_task, "display"');
+  assert.ok(init >= 0);
+  assert.ok(init < bootLogo);
+  assert.ok(bootLogo < settings);
+  assert.ok(settings < displayTask);
+  assert.match(app, /DISPLAY_BOOT_LOGO_MS 1500U/);
+  assert.match(app, /esp_timer_get_time\(\) < s_boot_logo_until_us/);
+});
+
 test("native OLED brightness uses the shared 0..100 setting and persists it", () => {
   const component = read("main", "CMakeLists.txt");
   const header = read("main", "oled_display.h");

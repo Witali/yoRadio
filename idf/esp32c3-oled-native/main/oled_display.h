@@ -21,6 +21,7 @@ typedef struct {
 esp_err_t oled_display_init(oled_display_t *display);
 esp_err_t oled_display_set_brightness(oled_display_t *display,
                                       uint8_t brightness);
+esp_err_t oled_display_show_boot_logo(oled_display_t *display);
 void oled_display_clear(oled_display_t *display);
 void oled_display_draw_text(oled_display_t *display, int x, int y,
                             const char *text);

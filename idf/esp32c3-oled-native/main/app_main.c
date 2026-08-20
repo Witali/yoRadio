@@ -26,11 +26,13 @@
 #define DISPLAY_SCROLL_STEP_MS 35U
 #define DISPLAY_SCROLL_SEPARATOR_GLYPHS 3U
 #define DISPLAY_SECONDARY_PAGE_MS 5000U
+#define DISPLAY_BOOT_LOGO_MS 1500U
 
 static const char *const TAG = "yoradio_c3";
 static native_state_t s_state;
 #ifndef YORADIO_CODEC_BENCHMARK
 static oled_display_t s_display;
+static int64_t s_boot_logo_until_us;
 
 typedef struct {
     size_t glyph_count;
@@ -188,6 +190,9 @@ static void draw_status(const native_state_t *state,
 
 static void display_task(void *argument) {
     (void)argument;
+    while (esp_timer_get_time() < s_boot_logo_until_us) {
+        vTaskDelay(pdMS_TO_TICKS(20));
+    }
     native_state_t previous = {0};
     previous.network_mode = (native_network_mode_t)-1;
     display_scroll_t station_scroll = {0};
@@ -380,10 +385,10 @@ void app_main(void) {
                  esp_err_to_name(result));
     }
     ESP_ERROR_CHECK(oled_display_init(&s_display));
+    ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));
+    s_boot_logo_until_us =
+        esp_timer_get_time() + (int64_t)DISPLAY_BOOT_LOGO_MS * 1000LL;
     ESP_ERROR_CHECK(display_settings_init(&s_display));
-    const display_scroll_t initial_scroll = {0};
-    draw_status(&s_state, "stream info...", &initial_scroll,
-                &initial_scroll, display_settings_get_station_uppercase());
 
     ESP_ERROR_CHECK(xTaskCreate(display_task, "display",
                                 BOARD_TASK_STACK_DISPLAY, NULL, 1, NULL) ==
