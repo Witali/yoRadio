@@ -36,6 +36,8 @@ idf_component_register(
     mbedtls
     nvs_flash
     spiffs
+    custom_flac
+    custom_legacy_codecs
     esp_audio_codec)
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)

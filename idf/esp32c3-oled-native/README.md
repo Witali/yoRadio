@@ -72,6 +72,25 @@ Useful commands:
 .\build.ps1 -IdfArguments @('-p', 'COM7', 'monitor')
 ```
 
+### Decoder selection
+
+The native build exposes one compile-time choice for every codec that has an
+alternative implementation in this repository:
+
+| Codec | Implementations | Default |
+|---|---|---|
+| MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | Espressif |
+| AAC | Espressif, yoRadio Helix AAC-LC | Espressif |
+| FLAC | optimized yoRadio FLAC, Espressif | yoRadio |
+
+The choices are under **yoRadio ESP32-C3 OLED** in `menuconfig`, and can also
+be selected with the corresponding `CONFIG_YORADIO_*_DECODER_*` symbol in an
+SDK defaults file. Only the chosen backend is registered and linked. Vorbis
+and Opus keep their single Espressif implementation because the repository has
+no independent alternative for them. The yoRadio backends compile directly
+from the shared sources through a small ESP-IDF compatibility layer; Arduino
+Core is not linked.
+
 ## Storage compatibility
 
 The partition table matches Arduino-ESP32's 4 MiB `min_spiffs` layout:

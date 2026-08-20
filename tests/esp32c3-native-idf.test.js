@@ -183,6 +183,73 @@ test("native audio pipeline batches PCM and caches stable stream layout", () => 
   assert.doesNotMatch(output, /scale_sample\([^_]/);
 });
 
+test("native FLAC reuses the optimized yoRadio decoder without Arduino Core", () => {
+  const audio = read("main", "audio_service.c");
+  const cmake = read("components", "custom_flac", "CMakeLists.txt");
+  const adapter = read("components", "custom_flac", "custom_flac_adapter.cpp");
+
+  assert.match(cmake, /yoRadio\/src\/audioI2S\/flac_decoder/);
+  assert.match(cmake, /flac_decoder\.cpp/);
+  assert.match(adapter, /FLACDecoder_AllocateBuffers\(max_block_size/);
+  assert.match(adapter, /FLACDecode\(decoder->input/);
+  assert.match(audio, /custom_flac_decoder_feed/);
+  assert.doesNotMatch(adapter, /#include\s+[<"]Arduino\.h[>"]/);
+});
+
+test("native FLAC decoder is selectable at compile time", () => {
+  const kconfig = read("main", "Kconfig.projbuild");
+  const defaults = read("sdkconfig.defaults");
+  const audio = read("main", "audio_service.c");
+
+  assert.match(kconfig, /choice YORADIO_FLAC_DECODER/);
+  assert.match(kconfig, /YORADIO_FLAC_DECODER_CUSTOM/);
+  assert.match(kconfig, /YORADIO_FLAC_DECODER_ESPRESSIF/);
+  assert.match(defaults, /CONFIG_YORADIO_FLAC_DECODER_CUSTOM=y/);
+  assert.match(
+    audio,
+    /CONFIG_YORADIO_FLAC_DECODER_ESPRESSIF[\s\S]*esp_flac_dec_register/,
+  );
+  assert.match(
+    audio,
+    /CONFIG_YORADIO_FLAC_DECODER_CUSTOM[\s\S]*custom_flac_decoder_feed/,
+  );
+});
+
+test("native MP3 and AAC alternatives are selectable at compile time", () => {
+  const kconfig = read("main", "Kconfig.projbuild");
+  const defaults = read("sdkconfig.defaults");
+  const audio = read("main", "audio_service.c");
+  const component = read(
+    "components",
+    "custom_legacy_codecs",
+    "CMakeLists.txt",
+  );
+  const adapter = read(
+    "components",
+    "custom_legacy_codecs",
+    "custom_legacy_adapter.cpp",
+  );
+
+  for (const symbol of [
+    "YORADIO_MP3_DECODER_ESPRESSIF",
+    "YORADIO_MP3_DECODER_HELIX",
+    "YORADIO_MP3_DECODER_MINIMP3",
+    "YORADIO_AAC_DECODER_ESPRESSIF",
+    "YORADIO_AAC_DECODER_HELIX",
+  ]) {
+    assert.match(kconfig, new RegExp(symbol));
+  }
+  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
+  assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y/);
+  assert.match(component, /aac_decoder\/aac_decoder\.cpp/);
+  assert.match(component, /mp3_decoder\/mp3_decoder\.cpp/);
+  assert.match(adapter, /MINIMP3_IMPLEMENTATION/);
+  assert.match(adapter, /AACDecode\(decoder->input/);
+  assert.match(adapter, /MP3Decode\(decoder->input/);
+  assert.match(adapter, /mp3dec_decode_frame/);
+  assert.match(audio, /custom_legacy_decoder_feed/);
+});
+
 test("native benchmark build reads codec fixtures only from dedicated flash", () => {
   const audio = read("main", "audio_service.c");
   const app = read("main", "app_main.c");

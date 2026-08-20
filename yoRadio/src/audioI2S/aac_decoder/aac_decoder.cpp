@@ -2427,8 +2427,11 @@ int DecodeProgramConfigElement(uint8_t idx)
     m_pce[idx]->numFCE =        GetBits(4);
     m_pce[idx]->numSCE =        GetBits(4);
     m_pce[idx]->numBCE =        GetBits(4);
-    m_pce[idx]->numLCE =        GetBits(2);
-    m_pce[idx]->numADE =        GetBits(3);
+    // Preserve the bitstream-defined range explicitly. Besides documenting
+    // the array bounds, this prevents an optimizing compiler from assuming a
+    // malformed GetBits() result can index past lce[] or ade[].
+    m_pce[idx]->numLCE =        GetBits(2) & 0x03;
+    m_pce[idx]->numADE =        GetBits(3) & 0x07;
     m_pce[idx]->numCCE =        GetBits(4);
 
     m_pce[idx]->monoMixdown = GetBits(1) << 4;    /* present flag */
@@ -2460,10 +2463,10 @@ int DecodeProgramConfigElement(uint8_t idx)
         m_pce[idx]->bce[i] |= GetBits(4);            /* tag select */
     }
 
-    for (i = 0; i < m_pce[idx]->numLCE; i++)
+    for (i = 0; i < m_pce[idx]->numLCE && i < 3; i++)
         m_pce[idx]->lce[i] = GetBits(4);            /* tag select */
 
-    for (i = 0; i < m_pce[idx]->numADE; i++)
+    for (i = 0; i < m_pce[idx]->numADE && i < 7; i++)
         m_pce[idx]->ade[i] = GetBits(4);            /* tag select */
 
     for (i = 0; i < m_pce[idx]->numCCE; i++) {
@@ -4257,9 +4260,9 @@ void DecodePulseInfo(uint8_t ch)
 {
     int i;
 
-    m_pulseInfo[ch].numPulse = GetBits(2) + 1;        /* add 1 here */
+    m_pulseInfo[ch].numPulse = (GetBits(2) & 0x03) + 1; /* add 1 here */
     m_pulseInfo[ch].startSFB = GetBits(6);
-    for (i = 0; i < m_pulseInfo[ch].numPulse; i++) {
+    for (i = 0; i < m_pulseInfo[ch].numPulse && i < 4; i++) {
         m_pulseInfo[ch].offset[i] = GetBits(5);
         m_pulseInfo[ch].amp[i] = GetBits(4);
     }
@@ -9809,7 +9812,7 @@ void UnpackSBRGrid(SBRHeader *sbrHdr, SBRGrid *sbrGrid) {
     switch(sbrGrid->frameClass){
 
         case SBR_GRID_FIXFIX:
-            numEnvRaw = GetBits(2);
+            numEnvRaw = GetBits(2) & 0x03;
             sbrGrid->numEnv = (1 << numEnvRaw);
             if(sbrGrid->numEnv == 1) sbrGrid->ampResFrame = 0;
 
@@ -9841,7 +9844,7 @@ void UnpackSBRGrid(SBRHeader *sbrHdr, SBRGrid *sbrGrid) {
 
         case SBR_GRID_FIXVAR:
             absBorder = GetBits(2) + NUM_TIME_SLOTS;
-            numRelBorder = GetBits(2);
+            numRelBorder = GetBits(2) & 0x03;
             sbrGrid->numEnv = numRelBorder + 1;
             for(rel = 0; rel < numRelBorder; rel++)
                 relBorder[rel] = 2 * GetBits(2) + 2;
@@ -9849,7 +9852,8 @@ void UnpackSBRGrid(SBRHeader *sbrHdr, SBRGrid *sbrGrid) {
             pBits = cLog2[sbrGrid->numEnv + 1];
             sbrGrid->pointer = GetBits(pBits);
 
-            for(env = sbrGrid->numEnv - 1; env >= 0; env--)
+            for(env = sbrGrid->numEnv - 1;
+                env >= 0 && env < MAX_NUM_ENV; env--)
                 sbrGrid->freqRes[env] = GetBits(1);
 
             absBordLead = 0;
@@ -9869,7 +9873,7 @@ void UnpackSBRGrid(SBRHeader *sbrHdr, SBRGrid *sbrGrid) {
 
         case SBR_GRID_VARFIX:
             absBorder = GetBits(2);
-            numRelBorder = GetBits(2);
+            numRelBorder = GetBits(2) & 0x03;
             sbrGrid->numEnv = numRelBorder + 1;
             for(rel = 0; rel < numRelBorder; rel++)
                 relBorder[rel] = 2 * GetBits(2) + 2;
@@ -9877,7 +9881,7 @@ void UnpackSBRGrid(SBRHeader *sbrHdr, SBRGrid *sbrGrid) {
             pBits = cLog2[sbrGrid->numEnv + 1];
             sbrGrid->pointer = GetBits(pBits);
 
-            for(env = 0; env < sbrGrid->numEnv; env++)
+            for(env = 0; env < sbrGrid->numEnv && env < MAX_NUM_ENV; env++)
                 sbrGrid->freqRes[env] = GetBits(1);
 
             absBordLead = absBorder;
@@ -9900,11 +9904,14 @@ void UnpackSBRGrid(SBRHeader *sbrHdr, SBRGrid *sbrGrid) {
         case SBR_GRID_VARVAR:
             absBordLead = GetBits(2); /* absBorder0 */
             absBordTrail = GetBits(2) + NUM_TIME_SLOTS; /* absBorder1 */
-            numRelBorder0 = GetBits(2);
-            numRelBorder1 = GetBits(2);
+            numRelBorder0 = GetBits(2) & 0x03;
+            numRelBorder1 = GetBits(2) & 0x03;
 
             sbrGrid->numEnv = numRelBorder0 + numRelBorder1 + 1;
-            ASSERT(sbrGrid->numEnv <= 5);
+            if(sbrGrid->numEnv > MAX_NUM_ENV) {
+                sbrGrid->numEnv = 0;
+                return;
+            }
 
             for(rel = 0; rel < numRelBorder0; rel++)
                 relBorder0[rel] = 2 * GetBits(2) + 2;
@@ -9915,7 +9922,7 @@ void UnpackSBRGrid(SBRHeader *sbrHdr, SBRGrid *sbrGrid) {
             pBits = cLog2[numRelBorder0 + numRelBorder1 + 2];
             sbrGrid->pointer = GetBits(pBits);
 
-            for(env = 0; env < sbrGrid->numEnv; env++)
+            for(env = 0; env < sbrGrid->numEnv && env < MAX_NUM_ENV; env++)
                 sbrGrid->freqRes[env] = GetBits(1);
 
             numRelLead = numRelBorder0;

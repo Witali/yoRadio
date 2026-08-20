@@ -1,0 +1,49 @@
+menu "yoRadio ESP32-C3 OLED"
+
+choice YORADIO_MP3_DECODER
+    prompt "MP3 decoder implementation"
+    default YORADIO_MP3_DECODER_ESPRESSIF
+    help
+        Select one MP3 decoder at build time. Helix and minimp3 reuse the
+        codec sources shipped with yoRadio; Espressif uses esp_audio_codec.
+
+    config YORADIO_MP3_DECODER_ESPRESSIF
+        bool "Espressif esp_audio_codec MP3 (recommended)"
+
+    config YORADIO_MP3_DECODER_HELIX
+        bool "yoRadio Helix MP3"
+
+    config YORADIO_MP3_DECODER_MINIMP3
+        bool "yoRadio minimp3"
+endchoice
+
+choice YORADIO_AAC_DECODER
+    prompt "AAC decoder implementation"
+    default YORADIO_AAC_DECODER_ESPRESSIF
+    help
+        Select one AAC decoder at build time. The yoRadio decoder is the
+        fixed-point Helix AAC-LC implementation and does not enable SBR on C3.
+
+    config YORADIO_AAC_DECODER_ESPRESSIF
+        bool "Espressif esp_audio_codec AAC (recommended)"
+
+    config YORADIO_AAC_DECODER_HELIX
+        bool "yoRadio Helix AAC-LC"
+endchoice
+
+choice YORADIO_FLAC_DECODER
+    prompt "FLAC decoder implementation"
+    default YORADIO_FLAC_DECODER_CUSTOM
+    help
+        Select the FLAC decoder used by the native audio pipeline. The custom
+        decoder reuses yoRadio's O3-optimized, block-sized implementation.
+        The Espressif decoder remains available for comparison and fallback.
+
+    config YORADIO_FLAC_DECODER_CUSTOM
+        bool "yoRadio custom FLAC (recommended)"
+
+    config YORADIO_FLAC_DECODER_ESPRESSIF
+        bool "Espressif esp_audio_codec FLAC"
+endchoice
+
+endmenu

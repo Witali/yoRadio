@@ -708,7 +708,8 @@ static void L3_decode_scalefactors(const uint8_t *hdr, uint8_t *ist_pos, bs_t *b
     if (gr->n_short_sfb)
     {
         int sh = 3 - scf_shift;
-        for (i = 0; i < gr->n_short_sfb; i += 3)
+        for (i = 0; i < gr->n_short_sfb &&
+                    gr->n_long_sfb + i + 2 < (int)sizeof(iscf); i += 3)
         {
             iscf[gr->n_long_sfb + i + 0] += gr->subblock_gain[0] << sh;
             iscf[gr->n_long_sfb + i + 1] += gr->subblock_gain[1] << sh;
@@ -725,7 +726,8 @@ static void L3_decode_scalefactors(const uint8_t *hdr, uint8_t *ist_pos, bs_t *b
 
     gain_exp = gr->global_gain + BITS_DEQUANTIZER_OUT*4 - 210 - (HDR_IS_MS_STEREO(hdr) ? 2 : 0);
     gain = L3_ldexp_q2(1 << (MAX_SCFI/4),  MAX_SCFI - gain_exp);
-    for (i = 0; i < (int)(gr->n_long_sfb + gr->n_short_sfb); i++)
+    for (i = 0; i < (int)(gr->n_long_sfb + gr->n_short_sfb) &&
+                i < (int)sizeof(iscf); i++)
     {
         scf[i] = L3_ldexp_q2(gain, iscf[i] << scf_shift);
     }
