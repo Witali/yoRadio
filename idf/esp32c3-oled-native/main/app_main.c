@@ -8,6 +8,7 @@
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_spiffs.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_state.h"
@@ -20,11 +21,28 @@
 #define BUTTON_DEBOUNCE_MS 35
 #define BUTTON_CLICK_WINDOW_MS 400
 #define BUTTON_HOLD_MS 800
+#define DISPLAY_SCROLL_HOLD_MS 3500U
+#define DISPLAY_SCROLL_STEP_MS 35U
+#define DISPLAY_SCROLL_SEPARATOR_GLYPHS 3U
 
 static const char *const TAG = "yoradio_c3";
 static native_state_t s_state;
 #ifndef YORADIO_CODEC_BENCHMARK
 static oled_display_t s_display;
+
+typedef struct {
+    size_t glyph_count;
+    size_t pixel_offset;
+    uint32_t wait_started_ms;
+    uint32_t last_step_ms;
+    bool enabled;
+} display_scroll_t;
+
+typedef enum {
+    DISPLAY_SCROLL_NONE,
+    DISPLAY_SCROLL_STATION,
+    DISPLAY_SCROLL_TITLE,
+} display_scroll_owner_t;
 
 static esp_err_t mount_spiffs(void) {
     esp_vfs_spiffs_conf_t config = {
@@ -37,24 +55,66 @@ static esp_err_t mount_spiffs(void) {
     return esp_vfs_spiffs_register(&config);
 }
 
-static size_t scroll_position(const char *text, uint32_t frame) {
-    const size_t visible = OLED_DISPLAY_WIDTH / 6;
-    size_t length = oled_display_large_text_length(text);
-    if (length <= visible) return 0;
-    // Hold the first frame, move at two pixels/second, and leave a short blank
-    // tail before restarting from the beginning.
-    return (frame / 2) % (length - visible + 4);
+static void reset_scroll(display_scroll_t *scroll, const char *text,
+                         uint32_t now_ms) {
+    scroll->glyph_count = oled_display_large_text_length(text);
+    scroll->pixel_offset = 0;
+    scroll->wait_started_ms = now_ms;
+    scroll->last_step_ms = now_ms;
+    scroll->enabled =
+        scroll->glyph_count * OLED_LARGE_GLYPH_WIDTH > OLED_DISPLAY_WIDTH;
 }
 
-static void draw_status(const native_state_t *state, uint32_t frame) {
+static bool advance_scroll(display_scroll_t *station,
+                           display_scroll_t *title,
+                           display_scroll_owner_t *owner,
+                           uint32_t now_ms) {
+    display_scroll_t *active = NULL;
+    if (*owner == DISPLAY_SCROLL_STATION && station->enabled) active = station;
+    if (*owner == DISPLAY_SCROLL_TITLE && title->enabled) active = title;
+    if (!active) {
+        *owner = DISPLAY_SCROLL_NONE;
+        if (station->enabled &&
+            now_ms - station->wait_started_ms >= DISPLAY_SCROLL_HOLD_MS) {
+            *owner = DISPLAY_SCROLL_STATION;
+            active = station;
+        } else if (title->enabled &&
+                   now_ms - title->wait_started_ms >= DISPLAY_SCROLL_HOLD_MS) {
+            *owner = DISPLAY_SCROLL_TITLE;
+            active = title;
+        }
+        if (!active) return false;
+        active->last_step_ms = now_ms;
+    }
+
+    uint32_t elapsed = now_ms - active->last_step_ms;
+    size_t steps = elapsed / DISPLAY_SCROLL_STEP_MS;
+    if (!steps) return false;
+    active->last_step_ms += (uint32_t)(steps * DISPLAY_SCROLL_STEP_MS);
+    active->pixel_offset += steps;
+    size_t cycle_pixels =
+        (active->glyph_count + DISPLAY_SCROLL_SEPARATOR_GLYPHS) *
+        OLED_LARGE_GLYPH_WIDTH;
+    if (active->pixel_offset >= cycle_pixels) {
+        active->pixel_offset = 0;
+        active->wait_started_ms = now_ms;
+        active->last_step_ms = now_ms;
+        *owner = DISPLAY_SCROLL_NONE;
+    }
+    return true;
+}
+
+static void draw_status(const native_state_t *state,
+                        const display_scroll_t *station_scroll,
+                        const display_scroll_t *title_scroll) {
     char line[24] = {0};
     oled_display_clear(&s_display);
     oled_display_draw_large_text(
         &s_display, 0, 0, state->station,
-        scroll_position(state->station, frame));
+        station_scroll->pixel_offset, station_scroll->enabled, true);
     oled_display_draw_large_text(
-        &s_display, 0, 14, state->title,
-        scroll_position(state->title, frame));
+        &s_display, 0, 15, state->title,
+        title_scroll->pixel_offset, title_scroll->enabled, false);
 
     if (state->network_mode == NATIVE_NETWORK_CLIENT && state->ipv4) {
         esp_ip4_addr_t address = {.addr = state->ipv4};
@@ -78,16 +138,35 @@ static void display_task(void *argument) {
     (void)argument;
     native_state_t previous = {0};
     previous.network_mode = (native_network_mode_t)-1;
-    uint32_t frame = 0;
+    display_scroll_t station_scroll = {0};
+    display_scroll_t title_scroll = {0};
+    display_scroll_owner_t scroll_owner = DISPLAY_SCROLL_NONE;
     while (true) {
         native_state_t state;
         native_state_snapshot(&s_state, &state);
-        if (memcmp(&state, &previous, sizeof(state)) != 0) {
-            frame = 0;
+        uint32_t now_ms = (uint32_t)(esp_timer_get_time() / 1000U);
+        bool redraw = memcmp(&state, &previous, sizeof(state)) != 0;
+        if (strcmp(state.station, previous.station) != 0) {
+            reset_scroll(&station_scroll, state.station, now_ms);
+            if (scroll_owner == DISPLAY_SCROLL_STATION) {
+                scroll_owner = DISPLAY_SCROLL_NONE;
+            }
+        }
+        if (strcmp(state.title, previous.title) != 0) {
+            reset_scroll(&title_scroll, state.title, now_ms);
+            if (scroll_owner == DISPLAY_SCROLL_TITLE) {
+                scroll_owner = DISPLAY_SCROLL_NONE;
+            }
+        }
+        if (advance_scroll(&station_scroll, &title_scroll, &scroll_owner,
+                           now_ms)) {
+            redraw = true;
+        }
+        if (redraw) {
+            draw_status(&state, &station_scroll, &title_scroll);
             previous = state;
         }
-        draw_status(&state, frame++);
-        vTaskDelay(pdMS_TO_TICKS(250));
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 
@@ -186,7 +265,8 @@ void app_main(void) {
                  esp_err_to_name(result));
     }
     ESP_ERROR_CHECK(oled_display_init(&s_display));
-    draw_status(&s_state, 0);
+    const display_scroll_t initial_scroll = {0};
+    draw_status(&s_state, &initial_scroll, &initial_scroll);
 
     ESP_ERROR_CHECK(xTaskCreate(display_task, "display", 3072, NULL, 1, NULL) ==
                             pdPASS

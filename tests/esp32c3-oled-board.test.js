@@ -70,22 +70,37 @@ test("72x40 player uses large station and song rows with a small IP footer", () 
     "displaySSD1306_72x40conf.h",
   );
   const widgets = read("yoRadio", "src", "displays", "widgets", "widgets.cpp");
-  const font = read("yoRadio", "src", "displays", "fonts", "C3Terminal12.h");
+  const font = read("yoRadio", "src", "displays", "fonts", "C3Terminal15.h");
   const display = read("yoRadio", "src", "core", "display.cpp");
+  const options = read("yoRadio", "src", "core", "options.h");
+  const oledColors = read(
+    "yoRadio",
+    "src",
+    "displays",
+    "tools",
+    "oledcolorfix.h",
+  );
 
   assert.match(layout, /C3_TITLE_FONT_SIZE\s+3/);
   assert.match(layout, /metaConf[\s\S]*C3_TITLE_FONT_SIZE/);
   assert.match(layout, /title1Conf[\s\S]*C3_TITLE_FONT_SIZE/);
+  assert.match(layout, /title1Conf[^\n]*\{ 0, 15,/);
+  assert.match(layout, /metaBGConf[^\n]*72, 15/);
   assert.match(layout, /iptxtConf[\s\S]*C3_IP_FONT_SIZE/);
   assert.doesNotMatch(layout, /#define HIDE_IP/);
   assert.match(layout, /#define HIDE_CLOCK/);
   assert.match(layout, /#define HIDE_BITRATE/);
-  assert.match(widgets, /C3Terminal12/);
-  assert.match(widgets, /width = 6; height = 12/);
-  assert.match(font, /0x00, 0xFF, 13/);
-  assert.match(font, /Spleen 6x12/);
+  assert.match(widgets, /C3Terminal15/);
+  assert.match(widgets, /width = 8; height = 15/);
+  assert.match(font, /0x00, 0xFF, 16/);
+  assert.match(font, /Spleen 8x16/);
+  assert.match(font, /Fixed 8x15 cells/);
   assert.match(display, /#ifndef HIDE_CLOCK/);
   assert.match(display, /#ifndef HIDE_BITRATE/);
+  assert.match(options, /#define DSP_INVERT_TITLE\s+true/);
+  assert.match(oledColors, /theme\.meta\s*=\s*TFT_BG/);
+  assert.match(oledColors, /theme\.metabg\s*=\s*TFT_FG/);
+  assert.match(oledColors, /theme\.metafill\s*=\s*TFT_FG/);
 });
 
 test("unsupported UTF-8 uses the C3 font's boxed question-mark glyph", () => {
@@ -95,7 +110,8 @@ test("unsupported UTF-8 uses the C3 font's boxed question-mark glyph", () => {
   assert.match(unicode, /DSP_MODEL==DSP_SSD1306_72X40[\s\S]*0x7F/);
   assert.match(generator, /function Set-ReplacementGlyph/);
   assert.match(generator, /\$code -eq 0x7F/);
-  assert.match(generator, /spleen-6x12\.bdf/);
+  assert.match(generator, /spleen-8x16\.bdf/);
+  assert.match(generator, /\$cellHeight = 15/);
 });
 
 test("display objects exist before the single-core display task starts", () => {

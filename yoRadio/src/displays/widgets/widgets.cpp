@@ -10,17 +10,17 @@
 #include "../tools/psframebuffer.h"
 
 #if DSP_MODEL==DSP_SSD1306_72X40
-#include "../fonts/C3Terminal12.h"
+#include "../fonts/C3Terminal15.h"
 #include "../fonts/TinyFont6.h"
 
 static const GFXfont* c3TextFont(uint8_t textsize) {
-  if(textsize == C3_TITLE_FONT_SIZE) return &C3Terminal12;
+  if(textsize == C3_TITLE_FONT_SIZE) return &C3Terminal15;
   if(textsize == C3_IP_FONT_SIZE) return &TinyFont6;
   return nullptr;
 }
 
 static uint8_t c3TextAscent(uint8_t textsize) {
-  if(textsize == C3_TITLE_FONT_SIZE) return 9;
+  if(textsize == C3_TITLE_FONT_SIZE) return 12;
   if(textsize == C3_IP_FONT_SIZE) return 5;
   return 0;
 }
@@ -56,7 +56,7 @@ TextWidget::~TextWidget() {
 void TextWidget::_charSize(uint8_t textsize, uint8_t& width, uint16_t& height){
 #ifndef DSP_LCD
   #if DSP_MODEL==DSP_SSD1306_72X40
-  if(textsize == C3_TITLE_FONT_SIZE) { width = 6; height = 12; return; }
+  if(textsize == C3_TITLE_FONT_SIZE) { width = 8; height = 15; return; }
   if(textsize == C3_IP_FONT_SIZE) { width = 5; height = 7; return; }
   #endif
   width = textsize * CHARWIDTH;

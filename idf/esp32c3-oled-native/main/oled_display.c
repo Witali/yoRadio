@@ -9,7 +9,7 @@
 #include "esp_check.h"
 #include "esp_log.h"
 #include "font5x7.h"
-#include "font6x12.h"
+#include "font8x15.h"
 
 #define OLED_PAGES (OLED_DISPLAY_HEIGHT / 8)
 #define OLED_COLUMN_OFFSET 28
@@ -177,7 +177,7 @@ static const char *next_large_glyph(const char *text, uint8_t *glyph) {
         *glyph = (uint8_t)(0xc0 + codepoint - 0x0410);
     } else {
         for (size_t index = 0; index < 64; ++index) {
-            if (font6x12_unicode_80_bf[index] == codepoint) {
+            if (font8x15_unicode_80_bf[index] == codepoint) {
                 *glyph = (uint8_t)(0x80 + index);
                 return text + length;
             }
@@ -200,26 +200,56 @@ size_t oled_display_large_text_length(const char *text) {
 }
 
 void oled_display_draw_large_text(oled_display_t *display, int x, int y,
-                                  const char *text, size_t first_glyph) {
+                                  const char *text, size_t pixel_offset,
+                                  bool wrap, bool inverted) {
     if (!display || !text) return;
-    while (*text && first_glyph) {
-        uint8_t glyph;
-        text = next_large_glyph(text, &glyph);
-        --first_glyph;
+    for (int row = 0; row < OLED_LARGE_GLYPH_HEIGHT; ++row) {
+        for (int column = 0; column < OLED_DISPLAY_WIDTH; ++column) {
+            draw_pixel(display, column, y + row, inverted);
+        }
     }
-    while (*text && x < OLED_DISPLAY_WIDTH) {
+
+    uint8_t glyphs[256];
+    size_t glyph_count = 0;
+    while (*text && glyph_count < sizeof(glyphs)) {
         uint8_t glyph;
         text = next_large_glyph(text, &glyph);
-        const uint8_t *bitmap = font6x12 + (size_t)glyph * 9U;
-        for (int row = 0; row < 12; ++row) {
-            for (int column = 0; column < 6; ++column) {
-                unsigned bit = (unsigned)(row * 6 + column);
+        glyphs[glyph_count++] = glyph;
+    }
+    if (!glyph_count) return;
+
+    size_t cycle_glyphs = glyph_count + (wrap ? 3U : 0U);
+    size_t cycle_pixels = cycle_glyphs * OLED_LARGE_GLYPH_WIDTH;
+    if (wrap && cycle_pixels) pixel_offset %= cycle_pixels;
+    size_t glyph_index = pixel_offset / OLED_LARGE_GLYPH_WIDTH;
+    x -= (int)(pixel_offset % OLED_LARGE_GLYPH_WIDTH);
+
+    while (x < OLED_DISPLAY_WIDTH) {
+        uint8_t glyph;
+        if (glyph_index < glyph_count) {
+            glyph = glyphs[glyph_index];
+        } else if (wrap && glyph_index == glyph_count + 1U) {
+            glyph = '*';
+        } else if (wrap && glyph_index < cycle_glyphs) {
+            glyph = ' ';
+        } else {
+            break;
+        }
+        const uint8_t *bitmap =
+            font8x15 + (size_t)glyph * OLED_LARGE_GLYPH_HEIGHT;
+        for (int row = 0; row < OLED_LARGE_GLYPH_HEIGHT; ++row) {
+            for (int column = 0; column < OLED_LARGE_GLYPH_WIDTH; ++column) {
+                unsigned bit =
+                    (unsigned)(row * OLED_LARGE_GLYPH_WIDTH + column);
+                bool set = (bitmap[bit >> 3] &
+                            (uint8_t)(0x80U >> (bit & 7U))) != 0;
                 draw_pixel(display, x + column, y + row,
-                           (bitmap[bit >> 3] &
-                            (uint8_t)(0x80U >> (bit & 7U))) != 0);
+                           inverted ? !set : set);
             }
         }
-        x += 6;
+        x += OLED_LARGE_GLYPH_WIDTH;
+        ++glyph_index;
+        if (wrap && glyph_index == cycle_glyphs) glyph_index = 0;
     }
 }
 

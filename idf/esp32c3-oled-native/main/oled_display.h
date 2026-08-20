@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -8,6 +9,8 @@
 #define OLED_DISPLAY_WIDTH 72
 #define OLED_DISPLAY_HEIGHT 40
 #define OLED_DISPLAY_TEXT_COLUMNS 12
+#define OLED_LARGE_GLYPH_WIDTH 8
+#define OLED_LARGE_GLYPH_HEIGHT 15
 
 typedef struct {
     void *bus;
@@ -23,6 +26,7 @@ void oled_display_draw_compact_text(oled_display_t *display, int x, int y,
                                     const char *text);
 size_t oled_display_large_text_length(const char *text);
 void oled_display_draw_large_text(oled_display_t *display, int x, int y,
-                                  const char *text, size_t first_glyph);
+                                  const char *text, size_t pixel_offset,
+                                  bool wrap, bool inverted);
 esp_err_t oled_display_present(oled_display_t *display);
 
