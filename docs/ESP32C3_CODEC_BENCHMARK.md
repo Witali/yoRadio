@@ -37,11 +37,19 @@ single call and uninterrupted playback must also pass.
 
 | Codec fixture | Encoded limit | Baseline | Optimized | Stable |
 | --- | ---: | ---: | ---: | :---: |
-| MP3 | CBR 320 kbit/s | pending | pending | [ ] |
-| AAC-LC | CBR 320 kbit/s | pending | pending | [ ] |
-| FLAC | level 8, noise-heavy source | pending | pending | [ ] |
-| Ogg Vorbis | quality 10 | pending | pending | [ ] |
-| Ogg Opus | CBR 510 kbit/s, 20 ms frames | pending | pending | [ ] |
+| MP3 | CBR 320 kbit/s | 26.3%, x3.79 | 26.1%, x3.82 | [x] |
+| AAC-LC | CBR 320 kbit/s | 18.7%, x5.32 | 18.7%, x5.32 | [x] |
+| FLAC | level 8, noise-heavy source | 13.5-13.7%, x7.28-7.39 | 13.4-13.7%, x7.28-7.45 | [x] |
+| Ogg Vorbis | quality 10 | 36.4-36.9%, x2.70-2.74 | 36.3-36.8%, x2.71-2.74 | [x] |
+| Ogg Opus | CBR 510 kbit/s, 20 ms frames | 42.2%, x2.36 | 42.1-42.2%, x2.36-2.37 | [x] |
+
+The measured ratio covers the prebuilt Espressif decoder call itself. The
+library's C3 archive is already compiled, so common pipeline changes are not
+expected to materially change that number. Their benefit is outside the
+decoder call: fewer task delays, state-lock operations, PCM copies and integer
+operations. The optimized run retains 259396 bytes of free heap after the
+larger PCM ring is allocated. All fixtures completed twice without decode
+errors, restarts, watchdog reports or underruns.
 
 ## Common pipeline
 
@@ -49,51 +57,58 @@ single call and uninterrupted playback must also pass.
 - [x] Measure decoder calls with `esp_timer_get_time()` in 5-second windows.
 - [x] Report decoded audio duration, CPU time, real-time ratio, speed multiple,
       maximum call time and input/PCM byte counts.
-- [ ] Reduce unconditional one-tick delays without starving the idle task or
+- [x] Reduce unconditional one-tick delays without starving the idle task or
       triggering the task watchdog.
-- [ ] Avoid querying unchanged stream information for every decoded frame.
-- [ ] Reduce PCM packet copies and ring-buffer operations.
-- [ ] Replace divisions in per-sample volume, balance and resampling paths with
-      fixed-point multiplies or precomputed coefficients.
-- [ ] Compare the same fixtures after every change and reject regressions.
+- [x] Avoid querying unchanged stream information for every decoded frame.
+- [x] Reduce PCM packet copies and ring-buffer operations.
+- [x] Combine volume and balance into per-buffer Q15 channel gains, leaving no
+      division in the per-sample gain path. The lower-rate resampler still has
+      one constant-denominator phase calculation per generated sample.
+- [x] Compare the same fixtures after every change and reject regressions.
 
 ## MP3 320 kbit/s
 
-- [ ] Baseline measured for two complete 5-second windows.
-- [ ] Optimized measurement completed without decode errors or restarts.
+- [x] Baseline measured for two complete 5-second windows.
+- [x] Optimized measurement completed without decode errors or restarts.
 - Possible: reduce wrapper/scheduling overhead; batch decoded PCM; use a faster
   decoder library only if the prebuilt Espressif decoder is the limiting cost.
-- Applied: global/component `-O3`; integer output path; performance counters.
+- Applied: global/component `-O3`; cached stream layout; 7168-byte PCM packets;
+  batched decoder yields; combined Q15 output gain; performance counters.
 
 ## AAC-LC 320 kbit/s
 
-- [ ] Baseline measured for two complete 5-second windows.
-- [ ] Optimized measurement completed without decode errors or restarts.
+- [x] Baseline measured for two complete 5-second windows.
+- [x] Optimized measurement completed without decode errors or restarts.
 - Possible: keep AAC-LC separate from HE-AAC/SBR tests; reduce scheduling and
   PCM-copy overhead; replace the decoder only if measured CPU dominates.
-- Applied: global/component `-O3`; integer output path; performance counters.
+- Applied: global/component `-O3`; AAC-LC-only fixture; cached stream layout;
+  larger PCM batches; batched yields; combined Q15 output gain; counters.
 
 ## FLAC level 8
 
-- [ ] Baseline measured for two complete 5-second windows.
-- [ ] Optimized measurement completed without decode errors or restarts.
+- [x] Baseline measured for two complete 5-second windows.
+- [x] Optimized measurement completed without decode errors or restarts.
 - Possible: enlarge output only on a measured `BUFF_NOT_ENOUGH`; reduce copies;
   test predictor-heavy and noise-heavy sources because bitrate alone does not
   determine FLAC decode complexity.
-- Applied: global/component `-O3`; dynamically sized decode buffer; counters.
+- Applied: global/component `-O3`; dynamically sized decode buffer; cached
+  layout; larger PCM batches; batched yields; combined Q15 gain; counters.
 
 ## Ogg Vorbis quality 10
 
-- [ ] Baseline measured for two complete 5-second windows.
-- [ ] Optimized measurement completed without decode errors or restarts.
+- [x] Baseline measured for two complete 5-second windows.
+- [x] Optimized measurement completed without decode errors or restarts.
 - Possible: separate Ogg container overhead from Vorbis decoding; reduce PCM
   copies and scheduling delays; compare another decoder only if CPU-bound.
-- Applied: official Espressif Ogg decoder, `-O3`, integer output, counters.
+- Applied: official Espressif Ogg/Vorbis decoder; `-O3`; cached layout; larger
+  PCM batches; batched yields; combined Q15 output gain; counters.
 
 ## Ogg Opus 510 kbit/s
 
-- [ ] Baseline measured for two complete 5-second windows.
-- [ ] Optimized measurement completed without decode errors or restarts.
+- [x] Baseline measured for two complete 5-second windows.
+- [x] Optimized measurement completed without decode errors or restarts.
 - Possible: test fixed 20 ms frames; reduce container, scheduling and PCM-copy
   overhead; evaluate decoder complexity settings with the same PCM source.
-- Applied: official Espressif Ogg decoder, `-O3`, integer output, counters.
+- Applied: official Espressif Ogg/Opus decoder; fixed 20 ms test frames; `-O3`;
+  cached layout; larger PCM batches; batched yields; combined Q15 gain;
+  counters.

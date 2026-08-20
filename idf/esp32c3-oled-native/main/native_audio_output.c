@@ -26,6 +26,9 @@
 #define PDM_BIAS_RAMP_MS 100U
 #define PDM_BIAS_SETTLE_MS 2U
 #define RESAMPLER_SCALE 32768U
+#define SAMPLE_GAIN_SCALE 32768U
+#define VOLUME_DENOMINATOR 254U
+#define BALANCE_DENOMINATOR 16U
 
 static const char *const TAG = "audio_output";
 static i2s_chan_handle_t s_pdm;
@@ -41,11 +44,21 @@ static uint8_t s_led_envelope;
 static atomic_uchar s_volume;
 static atomic_schar s_balance;
 
-static int16_t scale_sample(int16_t sample, uint16_t numerator,
-                            uint16_t denominator) {
-    int32_t scaled = (int32_t)sample * numerator;
-    scaled += scaled >= 0 ? denominator / 2 : -(int32_t)(denominator / 2);
-    return (int16_t)(scaled / denominator);
+static int16_t scale_sample_q15(int16_t sample, uint32_t gain_q15) {
+    int32_t scaled = (int32_t)sample * (int32_t)gain_q15;
+    if (scaled >= 0) {
+        return (int16_t)((scaled + SAMPLE_GAIN_SCALE / 2U) /
+                         SAMPLE_GAIN_SCALE);
+    }
+    return (int16_t)-(((-scaled) + SAMPLE_GAIN_SCALE / 2U) /
+                      SAMPLE_GAIN_SCALE);
+}
+
+static uint32_t channel_gain_q15(uint8_t volume, uint8_t balance_gain) {
+    const uint32_t denominator =
+        VOLUME_DENOMINATOR * BALANCE_DENOMINATOR;
+    uint32_t numerator = (uint32_t)volume * balance_gain;
+    return (numerator * SAMPLE_GAIN_SCALE + denominator / 2U) / denominator;
 }
 
 static void decode_pcm_frame(const uint8_t *frame, uint8_t channels,
@@ -313,17 +326,20 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     uint16_t peak = 0;
     uint8_t volume = atomic_load(&s_volume);
     int8_t balance = atomic_load(&s_balance);
+    uint8_t left_balance =
+        balance > 0 ? (uint8_t)(BALANCE_DENOMINATOR - balance)
+                    : BALANCE_DENOMINATOR;
+    uint8_t right_balance =
+        balance < 0 ? (uint8_t)((int)BALANCE_DENOMINATOR + balance)
+                    : BALANCE_DENOMINATOR;
+    uint32_t left_gain_q15 = channel_gain_q15(volume, left_balance);
+    uint32_t right_gain_q15 = channel_gain_q15(volume, right_balance);
     for (size_t frame = 0; frame < frames; ++frame) {
         int16_t left;
         int16_t right;
         decode_pcm_frame(data + frame * frame_bytes, channels, &left, &right);
-        left = scale_sample(left, volume, 254);
-        right = scale_sample(right, volume, 254);
-        if (balance < 0) {
-            right = scale_sample(right, (uint16_t)(16 + balance), 16);
-        } else if (balance > 0) {
-            left = scale_sample(left, (uint16_t)(16 - balance), 16);
-        }
+        left = scale_sample_q15(left, left_gain_q15);
+        right = scale_sample_q15(right, right_gain_q15);
         uint16_t left_peak = left == INT16_MIN ? 32768U
                                                : (uint16_t)abs(left);
         uint16_t right_peak = right == INT16_MIN ? 32768U
@@ -338,6 +354,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
 }
 
 void native_audio_output_set_volume(uint8_t volume) {
+    if (volume > VOLUME_DENOMINATOR) volume = VOLUME_DENOMINATOR;
     atomic_store(&s_volume, volume);
 }
 

@@ -118,7 +118,7 @@ test("single-core pipeline never pins work to nonexistent core 1", () => {
 test("single-core decoder yields to idle and drops obsolete station data", () => {
   const audio = read("main", "audio_service.c");
 
-  assert.match(audio, /vTaskDelay\(1\);[\s\S]*generation != atomic_load\(&s_generation\)/);
+  assert.match(audio, /\(stats\.calls & 31U\) == 0U[\s\S]*vTaskDelay\(1\)/);
   assert.match(
     audio,
     /packet->generation != atomic_load\(&s_generation\)[\s\S]*vRingbufferReturnItem\(s_encoded, packet\)/,
@@ -158,6 +158,22 @@ test("native decoder reports measured real-time headroom", () => {
   assert.match(audio, /stats->audio_us \+= frames \* 1000000ULL \/ info->sample_rate/);
   assert.match(audio, /"PERF %s: window %llu ms, audio %llu ms, decode %llu ms "/);
   assert.match(audio, /stats->audio_us \* 100ULL \/[\s\S]*stats->decode_us/);
+});
+
+test("native audio pipeline batches PCM and caches stable stream layout", () => {
+  const audio = read("main", "audio_service.c");
+  const output = read("main", "native_audio_output.c");
+
+  assert.match(audio, /#define PCM_RING_SIZE \(16 \* 1024\)/);
+  assert.match(audio, /#define PCM_PACKET_DATA_SIZE 7168/);
+  assert.match(audio, /bool stream_info_ready = false/);
+  assert.match(
+    audio,
+    /!stream_info_ready[\s\S]*esp_audio_simple_dec_get_info[\s\S]*stream_info_ready = true/,
+  );
+  assert.match(output, /scale_sample_q15/);
+  assert.match(output, /channel_gain_q15/);
+  assert.doesNotMatch(output, /scale_sample\([^_]/);
 });
 
 test("native benchmark build reads codec fixtures only from dedicated flash", () => {

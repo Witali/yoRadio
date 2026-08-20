@@ -24,8 +24,8 @@
 #define STREAM_CHUNK_SIZE 2048
 #define DECODE_BUFFER_INITIAL 12288
 #define ENCODED_RING_SIZE (8 * 1024)
-#define PCM_RING_SIZE (8 * 1024)
-#define PCM_PACKET_DATA_SIZE 3072
+#define PCM_RING_SIZE (16 * 1024)
+#define PCM_PACKET_DATA_SIZE 7168
 #define MAX_HTTP_REDIRECTS 5
 #define ICY_METADATA_MAX 4080
 #define DECODE_STATS_INTERVAL_US 5000000LL
@@ -520,6 +520,8 @@ static void decoder_task(void *argument) {
     uint32_t failed_generation = 0;
     native_codec_t codec = NATIVE_CODEC_AUTO;
     decode_stats_t stats = {0};
+    esp_audio_simple_dec_info_t stream_info = {0};
+    bool stream_info_ready = false;
 
     while (true) {
         size_t item_size = 0;
@@ -539,6 +541,7 @@ static void decoder_task(void *argument) {
             decoder = NULL;
             generation = packet->generation;
             codec = packet->codec;
+            stream_info_ready = false;
             decode_stats_reset(&stats, generation, codec, esp_timer_get_time());
             esp_audio_simple_dec_cfg_t cfg = {
                 .dec_type = simple_decoder_type(codec),
@@ -579,11 +582,10 @@ static void decoder_task(void *argument) {
             if (decode_call_us > stats.max_call_us) {
                 stats.max_call_us = decode_call_us;
             }
-            // A continuously fed decoder is always runnable. On the
-            // single-core C3, give the idle task one tick per decode call so
-            // it can service the task watchdog without reducing audio task
-            // priority or starving the PDM output task.
-            vTaskDelay(1);
+            // PCM backpressure normally blocks this task every few frames.
+            // Keep a bounded fallback yield for malformed streams that keep
+            // consuming input without producing PCM.
+            if ((stats.calls & 31U) == 0U) vTaskDelay(1);
             if (generation != atomic_load(&s_generation)) break;
             if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
                 uint8_t *larger = realloc(output, frame.needed_size);
@@ -614,17 +616,20 @@ static void decoder_task(void *argument) {
             raw.buffer += raw.consumed;
             raw.len -= raw.consumed;
             if (frame.decoded_size) {
-                esp_audio_simple_dec_info_t info = {0};
-                if (esp_audio_simple_dec_get_info(decoder, &info) ==
-                    ESP_AUDIO_ERR_OK) {
-                    decode_stats_add_audio(&stats, &info,
-                                           frame.decoded_size);
+                if (!stream_info_ready &&
+                    esp_audio_simple_dec_get_info(decoder, &stream_info) ==
+                        ESP_AUDIO_ERR_OK) {
+                    stream_info_ready = true;
                     char format[48];
                     snprintf(format, sizeof(format), "%lu kHz %s",
-                             (unsigned long)(info.sample_rate / 1000),
-                             info.channel == 1 ? "mono" : "stereo");
+                             (unsigned long)(stream_info.sample_rate / 1000),
+                             stream_info.channel == 1 ? "mono" : "stereo");
                     state_set_audio(true, format);
-                    if (!send_pcm(generation, &info, output,
+                }
+                if (stream_info_ready) {
+                    decode_stats_add_audio(&stats, &stream_info,
+                                           frame.decoded_size);
+                    if (!send_pcm(generation, &stream_info, output,
                                   frame.decoded_size)) {
                         ESP_LOGW(TAG, "PCM buffer stalled");
                         break;
@@ -708,7 +713,7 @@ esp_err_t audio_service_start(native_state_t *state) {
         return ESP_ERR_NO_MEM;
     }
     ESP_LOGI(TAG,
-             "Pipeline ready: %s, 8 KiB compressed + 8 KiB PCM, free heap %u",
+             "Pipeline ready: %s, 8 KiB compressed + 16 KiB PCM, free heap %u",
              native_audio_output_name(),
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
 #ifdef YORADIO_CODEC_BENCHMARK
