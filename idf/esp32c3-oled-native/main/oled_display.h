@@ -11,6 +11,7 @@
 #define OLED_DISPLAY_TEXT_COLUMNS 12
 #define OLED_LARGE_GLYPH_WIDTH 8
 #define OLED_LARGE_GLYPH_HEIGHT 15
+#define OLED_HARDWARE_SCROLL_MAX_GLYPHS 15
 
 typedef struct {
     void *bus;
@@ -31,5 +32,10 @@ size_t oled_display_large_text_length(const char *text);
 void oled_display_draw_large_text(oled_display_t *display, int x, int y,
                                   const char *text, size_t pixel_offset,
                                   bool wrap, bool inverted, bool uppercase);
+esp_err_t oled_display_start_text_scroll(oled_display_t *display,
+                                         uint8_t first_page,
+                                         const char *text, bool inverted,
+                                         bool uppercase);
+esp_err_t oled_display_stop_scroll(oled_display_t *display);
 esp_err_t oled_display_present(oled_display_t *display);
 

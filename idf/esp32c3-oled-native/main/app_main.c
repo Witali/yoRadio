@@ -27,6 +27,7 @@
 #define DISPLAY_SCROLL_SEPARATOR_GLYPHS 3U
 #define DISPLAY_SECONDARY_PAGE_MS 5000U
 #define DISPLAY_BOOT_LOGO_MS 1500U
+#define DISPLAY_HARDWARE_SCROLL_RUN_MS 4000U
 
 static const char *const TAG = "yoradio_c3";
 static native_state_t s_state;
@@ -47,6 +48,15 @@ typedef enum {
     DISPLAY_SCROLL_STATION,
     DISPLAY_SCROLL_TITLE,
 } display_scroll_owner_t;
+
+#if CONFIG_YORADIO_OLED_HW_SCROLL
+typedef struct {
+    display_scroll_owner_t owner;
+    uint32_t started_ms;
+    bool active;
+    bool available;
+} display_hardware_scroll_t;
+#endif
 
 static esp_err_t mount_spiffs(void) {
     esp_vfs_spiffs_conf_t config = {
@@ -111,6 +121,34 @@ static bool advance_scroll(display_scroll_t *station,
     return true;
 }
 
+static bool display_state_changed(const native_state_t *current,
+                                  const native_state_t *previous) {
+    // Stream parameters are deliberately frozen for one complete secondary
+    // page. They are sampled again when that page changes, so live bitrate
+    // updates do not interrupt an autonomous station-title scroll.
+    return strcmp(current->station, previous->station) != 0 ||
+           strcmp(current->title, previous->title) != 0 ||
+           current->network_mode != previous->network_mode ||
+           current->ipv4 != previous->ipv4;
+}
+
+#if CONFIG_YORADIO_OLED_HW_SCROLL
+static bool hardware_scroll_candidate(const display_scroll_t *scroll,
+                                      uint32_t now_ms) {
+    return scroll->enabled &&
+           scroll->glyph_count <= OLED_HARDWARE_SCROLL_MAX_GLYPHS &&
+           now_ms - scroll->wait_started_ms >= DISPLAY_SCROLL_HOLD_MS;
+}
+
+static display_scroll_t *scroll_for_owner(display_scroll_owner_t owner,
+                                          display_scroll_t *station,
+                                          display_scroll_t *title) {
+    if (owner == DISPLAY_SCROLL_STATION) return station;
+    if (owner == DISPLAY_SCROLL_TITLE) return title;
+    return NULL;
+}
+#endif
+
 static void format_stream_details(const native_state_t *state, char *output,
                                   size_t output_size) {
     char bitrate[20] = "";
@@ -167,7 +205,7 @@ static void draw_status(const native_state_t *state,
         station_scroll->pixel_offset, station_scroll->enabled, true,
         station_uppercase);
     oled_display_draw_large_text(
-        &s_display, 0, 15, secondary_text,
+        &s_display, 0, 16, secondary_text,
         title_scroll->pixel_offset, title_scroll->enabled, false, false);
 
     if (state->network_mode == NATIVE_NETWORK_CLIENT && state->ipv4) {
@@ -198,6 +236,12 @@ static void display_task(void *argument) {
     display_scroll_t station_scroll = {0};
     display_scroll_t title_scroll = {0};
     display_scroll_owner_t scroll_owner = DISPLAY_SCROLL_NONE;
+#if CONFIG_YORADIO_OLED_HW_SCROLL
+    display_hardware_scroll_t hardware_scroll = {.available = true};
+    bool hardware_scroll_reported = false;
+    ESP_LOGI(TAG, "SSD1306 hardware text scroll enabled (up to %u glyphs)",
+             OLED_HARDWARE_SCROLL_MAX_GLYPHS);
+#endif
     bool show_stream_info = true;
     uint32_t secondary_started_ms = 0;
     char secondary_text[192] = "";
@@ -207,7 +251,7 @@ static void display_task(void *argument) {
         native_state_t state;
         native_state_snapshot(&s_state, &state);
         uint32_t now_ms = (uint32_t)(esp_timer_get_time() / 1000U);
-        bool redraw = memcmp(&state, &previous, sizeof(state)) != 0;
+        bool redraw = display_state_changed(&state, &previous);
         bool station_uppercase = display_settings_get_station_uppercase();
         if (station_uppercase != previous_station_uppercase) redraw = true;
         char stream_details[96];
@@ -238,8 +282,55 @@ static void display_task(void *argument) {
             secondary_started_ms = now_ms;
             redraw = true;
         }
-        display_scroll_owner_t completed;
-        if (advance_scroll(&station_scroll, &title_scroll, &scroll_owner,
+        display_scroll_owner_t completed = DISPLAY_SCROLL_NONE;
+#if CONFIG_YORADIO_OLED_HW_SCROLL
+        bool start_hardware_scroll = false;
+        if (hardware_scroll.active) {
+            display_scroll_t *active = scroll_for_owner(
+                hardware_scroll.owner, &station_scroll, &title_scroll);
+            if (redraw) {
+                ESP_ERROR_CHECK_WITHOUT_ABORT(
+                    oled_display_stop_scroll(&s_display));
+                hardware_scroll.active = false;
+                scroll_owner = DISPLAY_SCROLL_NONE;
+                if (active) {
+                    active->pixel_offset = 0;
+                    active->wait_started_ms = now_ms;
+                    active->last_step_ms = now_ms;
+                }
+            } else if (now_ms - hardware_scroll.started_ms >=
+                       DISPLAY_HARDWARE_SCROLL_RUN_MS) {
+                ESP_ERROR_CHECK_WITHOUT_ABORT(
+                    oled_display_stop_scroll(&s_display));
+                hardware_scroll.active = false;
+                completed = hardware_scroll.owner;
+                scroll_owner = DISPLAY_SCROLL_NONE;
+                if (active) {
+                    active->pixel_offset = 0;
+                    active->wait_started_ms = now_ms;
+                    active->last_step_ms = now_ms;
+                }
+                redraw = true;
+            }
+        }
+        if (!hardware_scroll.active && hardware_scroll.available &&
+            completed == DISPLAY_SCROLL_NONE &&
+            scroll_owner == DISPLAY_SCROLL_NONE) {
+            if (hardware_scroll_candidate(&station_scroll, now_ms)) {
+                scroll_owner = DISPLAY_SCROLL_STATION;
+                start_hardware_scroll = true;
+            } else if (hardware_scroll_candidate(&title_scroll, now_ms)) {
+                scroll_owner = DISPLAY_SCROLL_TITLE;
+                start_hardware_scroll = true;
+            }
+        }
+#endif
+        if (
+#if CONFIG_YORADIO_OLED_HW_SCROLL
+            !hardware_scroll.active && !start_hardware_scroll &&
+#endif
+            completed == DISPLAY_SCROLL_NONE &&
+            advance_scroll(&station_scroll, &title_scroll, &scroll_owner,
                            now_ms, &completed)) {
             redraw = true;
         }
@@ -275,6 +366,36 @@ static void display_task(void *argument) {
             previous = state;
             previous_station_uppercase = station_uppercase;
         }
+#if CONFIG_YORADIO_OLED_HW_SCROLL
+        if (start_hardware_scroll) {
+            const bool station =
+                scroll_owner == DISPLAY_SCROLL_STATION;
+            esp_err_t result = oled_display_start_text_scroll(
+                &s_display, station ? 0 : 2,
+                station ? state.station : secondary_text, station,
+                station && station_uppercase);
+            if (result == ESP_OK) {
+                hardware_scroll.active = true;
+                hardware_scroll.owner = scroll_owner;
+                hardware_scroll.started_ms = now_ms;
+                if (!hardware_scroll_reported) {
+                    display_scroll_t *active = scroll_for_owner(
+                        scroll_owner, &station_scroll, &title_scroll);
+                    ESP_LOGI(TAG,
+                             "SSD1306 hardware scroll started for %s (%u glyphs)",
+                             station ? "station" : "title",
+                             active ? (unsigned)active->glyph_count : 0U);
+                    hardware_scroll_reported = true;
+                }
+            } else {
+                ESP_LOGW(TAG,
+                         "Hardware text scroll failed, using software: %s",
+                         esp_err_to_name(result));
+                hardware_scroll.available = false;
+                scroll_owner = DISPLAY_SCROLL_NONE;
+            }
+        }
+#endif
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }

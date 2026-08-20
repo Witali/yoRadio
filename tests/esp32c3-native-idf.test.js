@@ -173,6 +173,36 @@ test("native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll",
   assert.doesNotMatch(app, /state->stream_format[\s\S]*oled_display_draw/);
 });
 
+test("native OLED hardware text scroll is optional and enabled for this board", () => {
+  const kconfig = read("main", "Kconfig.projbuild");
+  const defaults = read("sdkconfig.defaults");
+  const header = read("main", "oled_display.h");
+  const display = read("main", "oled_display.c");
+  const app = read("main", "app_main.c");
+  const readme = read("README.md");
+
+  assert.match(kconfig, /config YORADIO_OLED_HW_SCROLL[\s\S]*default y/);
+  assert.match(defaults, /CONFIG_YORADIO_OLED_HW_SCROLL=y/);
+  assert.match(header, /OLED_HARDWARE_SCROLL_MAX_GLYPHS 15/);
+  assert.match(header, /oled_display_start_text_scroll/);
+  assert.match(header, /oled_display_stop_scroll/);
+  assert.match(display, /OLED_CONTROLLER_WIDTH 128/);
+  assert.match(
+    display,
+    /0x27,[\s\S]*OLED_SCROLL_INTERVAL_5_FRAMES[\s\S]*0x2f/,
+  );
+  assert.match(display, /const uint8_t command = 0x2e/);
+  assert.match(
+    display,
+    /glyph_count <= OLED_HARDWARE_SCROLL_MAX_GLYPHS/,
+  );
+  assert.match(app, /#if CONFIG_YORADIO_OLED_HW_SCROLL/);
+  assert.match(app, /oled_display_start_text_scroll/);
+  assert.match(app, /advance_scroll\(&station_scroll/);
+  assert.match(app, /&s_display, 0, 16, secondary_text/);
+  assert.match(readme, /Longer station and track names[\s\S]*software scrolling/);
+});
+
 test("native OLED alternates ICY title with live stream parameters", () => {
   const app = read("main", "app_main.c");
   const audio = read("main", "audio_service.c");

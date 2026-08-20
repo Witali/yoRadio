@@ -13,8 +13,10 @@
 #include "font8x15.h"
 
 #define OLED_PAGES (OLED_DISPLAY_HEIGHT / 8)
+#define OLED_CONTROLLER_WIDTH 128
 #define OLED_COLUMN_OFFSET 28
 #define OLED_TRANSFER_CHUNK 24
+#define OLED_SCROLL_INTERVAL_5_FRAMES 0x00
 
 static const char *const TAG = "oled";
 
@@ -296,31 +298,123 @@ void oled_display_draw_large_text(oled_display_t *display, int x, int y,
     }
 }
 
+static esp_err_t write_page(oled_display_t *display, uint8_t page,
+                            uint8_t column, const uint8_t *data,
+                            size_t count) {
+    const uint8_t commands[] = {
+        (uint8_t)(0x10 | (column >> 4)),
+        (uint8_t)(column & 0x0f),
+        (uint8_t)(0xb0 | page),
+    };
+    ESP_RETURN_ON_ERROR(send_commands(display, commands, sizeof(commands)),
+                        TAG, "OLED page selection failed");
+
+    uint8_t transfer[OLED_TRANSFER_CHUNK + 1];
+    transfer[0] = 0x40;
+    for (size_t sent = 0; sent < count; sent += OLED_TRANSFER_CHUNK) {
+        size_t chunk = count - sent;
+        if (chunk > OLED_TRANSFER_CHUNK) chunk = OLED_TRANSFER_CHUNK;
+        memcpy(transfer + 1, data + sent, chunk);
+        ESP_RETURN_ON_ERROR(
+            i2c_master_transmit(display_device(display), transfer, chunk + 1,
+                                100),
+            TAG, "OLED data transfer failed");
+    }
+    return ESP_OK;
+}
+
+static void draw_scroll_pixel(uint8_t *canvas, int x, int y, bool on) {
+    if (x < 0 || x >= OLED_CONTROLLER_WIDTH || y < 0 || y >= 16) return;
+    uint8_t *value = &canvas[x + (y / 8) * OLED_CONTROLLER_WIDTH];
+    uint8_t mask = (uint8_t)(1U << (y & 7));
+    if (on) {
+        *value |= mask;
+    } else {
+        *value &= (uint8_t)~mask;
+    }
+}
+
+esp_err_t oled_display_start_text_scroll(oled_display_t *display,
+                                         uint8_t first_page,
+                                         const char *text, bool inverted,
+                                         bool uppercase) {
+    ESP_RETURN_ON_FALSE(display && display->device && text,
+                        ESP_ERR_INVALID_ARG, TAG,
+                        "Display and scroll text are required");
+    ESP_RETURN_ON_FALSE(first_page + 1U < OLED_PAGES, ESP_ERR_INVALID_ARG,
+                        TAG, "Scroll requires two display pages");
+    size_t glyph_count = oled_display_large_text_length(text);
+    ESP_RETURN_ON_FALSE(glyph_count > 0 &&
+                            glyph_count <= OLED_HARDWARE_SCROLL_MAX_GLYPHS,
+                        ESP_ERR_NOT_SUPPORTED, TAG,
+                        "Text does not fit the SSD1306 scroll buffer");
+
+    uint8_t canvas[OLED_CONTROLLER_WIDTH * 2];
+    memset(canvas, 0, sizeof(canvas));
+    if (inverted) {
+        // Keep row 15 black so adjacent 15-pixel lines never share a page.
+        memset(canvas, 0xff, OLED_CONTROLLER_WIDTH);
+        memset(canvas + OLED_CONTROLLER_WIDTH, 0x7f,
+               OLED_CONTROLLER_WIDTH);
+    }
+
+    size_t glyph_index = 0;
+    while (*text) {
+        uint8_t glyph;
+        text = next_large_glyph(text, &glyph, uppercase);
+        const uint8_t *bitmap =
+            font8x15 + (size_t)glyph * OLED_LARGE_GLYPH_HEIGHT;
+        for (int row = 0; row < OLED_LARGE_GLYPH_HEIGHT; ++row) {
+            for (int column = 0; column < OLED_LARGE_GLYPH_WIDTH; ++column) {
+                unsigned bit =
+                    (unsigned)(row * OLED_LARGE_GLYPH_WIDTH + column);
+                bool set = (bitmap[bit >> 3] &
+                            (uint8_t)(0x80U >> (bit & 7U))) != 0;
+                int x = (OLED_COLUMN_OFFSET +
+                         (int)(glyph_index * OLED_LARGE_GLYPH_WIDTH) +
+                         column) %
+                        OLED_CONTROLLER_WIDTH;
+                draw_scroll_pixel(canvas, x, row, inverted ? !set : set);
+            }
+        }
+        ++glyph_index;
+    }
+
+    ESP_RETURN_ON_ERROR(oled_display_stop_scroll(display), TAG,
+                        "Could not stop previous OLED scroll");
+    ESP_RETURN_ON_ERROR(write_page(display, first_page, 0, canvas,
+                                   OLED_CONTROLLER_WIDTH),
+                        TAG, "Could not load first OLED scroll page");
+    ESP_RETURN_ON_ERROR(
+        write_page(display, first_page + 1U, 0,
+                   canvas + OLED_CONTROLLER_WIDTH, OLED_CONTROLLER_WIDTH),
+        TAG, "Could not load second OLED scroll page");
+
+    const uint8_t commands[] = {
+        0x27,  // left horizontal scroll
+        0x00, first_page, OLED_SCROLL_INTERVAL_5_FRAMES,
+        (uint8_t)(first_page + 1U), 0x00, 0xff,
+        0x2f,  // activate scroll
+    };
+    return send_commands(display, commands, sizeof(commands));
+}
+
+esp_err_t oled_display_stop_scroll(oled_display_t *display) {
+    ESP_RETURN_ON_FALSE(display && display->device, ESP_ERR_INVALID_STATE, TAG,
+                        "OLED is not initialized");
+    const uint8_t command = 0x2e;
+    return send_commands(display, &command, 1);
+}
+
 esp_err_t oled_display_present(oled_display_t *display) {
     ESP_RETURN_ON_FALSE(display && display->device, ESP_ERR_INVALID_STATE, TAG,
                         "OLED is not initialized");
-    uint8_t transfer[OLED_TRANSFER_CHUNK + 1];
-    transfer[0] = 0x40;
     for (uint8_t page = 0; page < OLED_PAGES; ++page) {
-        const uint8_t commands[] = {
-            (uint8_t)(0x10 | (OLED_COLUMN_OFFSET >> 4)),
-            (uint8_t)(OLED_COLUMN_OFFSET & 0x0f),
-            (uint8_t)(0xb0 | page),
-        };
-        ESP_RETURN_ON_ERROR(send_commands(display, commands, sizeof(commands)),
-                            TAG, "OLED page selection failed");
         const uint8_t *data =
             display->framebuffer + page * OLED_DISPLAY_WIDTH;
-        for (size_t sent = 0; sent < OLED_DISPLAY_WIDTH;
-             sent += OLED_TRANSFER_CHUNK) {
-            size_t chunk = OLED_DISPLAY_WIDTH - sent;
-            if (chunk > OLED_TRANSFER_CHUNK) chunk = OLED_TRANSFER_CHUNK;
-            memcpy(transfer + 1, data + sent, chunk);
-            ESP_RETURN_ON_ERROR(
-                i2c_master_transmit(display_device(display), transfer,
-                                    chunk + 1, 100),
-                TAG, "OLED data transfer failed");
-        }
+        ESP_RETURN_ON_ERROR(write_page(display, page, OLED_COLUMN_OFFSET, data,
+                                       OLED_DISPLAY_WIDTH),
+                            TAG, "OLED page transfer failed");
     }
     return ESP_OK;
 }

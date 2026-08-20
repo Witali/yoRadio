@@ -1,5 +1,13 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_OLED_HW_SCROLL
+    bool "Use SSD1306 hardware text scrolling"
+    default y
+    help
+        Use the SSD1306 horizontal scroll engine for text that fits its
+        128-column GDDRAM. Longer text automatically keeps the software
+        scrolling path so metadata is never truncated.
+
 choice YORADIO_FLAC_DECODER
     prompt "FLAC decoder implementation"
     default YORADIO_FLAC_DECODER_CUSTOM
