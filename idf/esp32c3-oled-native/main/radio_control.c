@@ -17,16 +17,21 @@ static native_state_t *s_state;
 static uint16_t s_current_item = 1;
 static char s_current_name[144] = "yoRadio native";
 static char s_current_url[512];
+// Playlist access is serialized by s_lock. Keep the parsing and candidate
+// station buffers off caller task stacks: BOOT has to remain safe while the
+// single-core C3 is also decoding audio.
+static char s_playlist_line[768];
+static char s_candidate_name[144];
+static char s_candidate_url[512];
 
 static bool playlist_station(uint16_t requested, char *name,
                              size_t name_size, char *url, size_t url_size) {
     FILE *file = fopen(PLAYLIST_PATH, "r");
     if (!file) return false;
-    char line[768];
     uint16_t item = 0;
     bool found = false;
-    while (fgets(line, sizeof(line), file)) {
-        char *first_tab = strchr(line, '\t');
+    while (fgets(s_playlist_line, sizeof(s_playlist_line), file)) {
+        char *first_tab = strchr(s_playlist_line, '\t');
         if (!first_tab) continue;
         char *second_tab = strchr(first_tab + 1, '\t');
         if (!second_tab) continue;
@@ -34,7 +39,7 @@ static bool playlist_station(uint16_t requested, char *name,
         if (item != requested) continue;
         *first_tab = '\0';
         *second_tab = '\0';
-        strlcpy(name, line, name_size);
+        strlcpy(name, s_playlist_line, name_size);
         strlcpy(url, first_tab + 1, url_size);
         found = name[0] && url[0];
         break;
@@ -46,10 +51,9 @@ static bool playlist_station(uint16_t requested, char *name,
 static uint16_t playlist_count(void) {
     FILE *file = fopen(PLAYLIST_PATH, "r");
     if (!file) return 0;
-    char line[768];
     uint16_t count = 0;
-    while (fgets(line, sizeof(line), file)) {
-        char *first_tab = strchr(line, '\t');
+    while (fgets(s_playlist_line, sizeof(s_playlist_line), file)) {
+        char *first_tab = strchr(s_playlist_line, '\t');
         if (first_tab && strchr(first_tab + 1, '\t')) ++count;
     }
     fclose(file);
@@ -57,19 +61,20 @@ static uint16_t playlist_count(void) {
 }
 
 static esp_err_t play_locked(uint16_t item) {
-    char name[sizeof(s_current_name)];
-    char url[sizeof(s_current_url)];
-    ESP_RETURN_ON_FALSE(playlist_station(item, name, sizeof(name), url,
-                                         sizeof(url)),
+    ESP_RETURN_ON_FALSE(playlist_station(item, s_candidate_name,
+                                         sizeof(s_candidate_name),
+                                         s_candidate_url,
+                                         sizeof(s_candidate_url)),
                         ESP_ERR_NOT_FOUND, TAG,
                         "Station %u is absent from playlist", item);
-    ESP_RETURN_ON_ERROR(audio_service_play(url, NATIVE_CODEC_AUTO), TAG,
-                        "start station %u", item);
-    native_state_set_station(s_state, name);
+    ESP_RETURN_ON_ERROR(
+        audio_service_play(s_candidate_url, NATIVE_CODEC_AUTO), TAG,
+        "start station %u", item);
+    native_state_set_station(s_state, s_candidate_name);
     s_current_item = item;
-    strlcpy(s_current_name, name, sizeof(s_current_name));
-    strlcpy(s_current_url, url, sizeof(s_current_url));
-    ESP_LOGI(TAG, "Selected station %u: %s", item, name);
+    strlcpy(s_current_name, s_candidate_name, sizeof(s_current_name));
+    strlcpy(s_current_url, s_candidate_url, sizeof(s_current_url));
+    ESP_LOGI(TAG, "Selected station %u: %s", item, s_candidate_name);
     return ESP_OK;
 }
 

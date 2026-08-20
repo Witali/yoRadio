@@ -207,15 +207,26 @@ static void button_task(void *argument) {
         }
         if (stable_pressed && !hold_handled &&
             now - pressed_at >= pdMS_TO_TICKS(BUTTON_HOLD_MS)) {
-            ESP_ERROR_CHECK_WITHOUT_ABORT(radio_control_previous());
+            ESP_LOGI(TAG, "BOOT long press: previous station");
+            esp_err_t result = radio_control_previous();
+            if (result != ESP_OK) {
+                ESP_LOGW(TAG, "BOOT previous failed: %s",
+                         esp_err_to_name(result));
+            }
             hold_handled = true;
             clicks = 0;
         }
         if (!stable_pressed && clicks &&
             now - released_at >= pdMS_TO_TICKS(BUTTON_CLICK_WINDOW_MS)) {
-            esp_err_t result = clicks >= 2 ? radio_control_next()
-                                           : radio_control_toggle();
-            ESP_ERROR_CHECK_WITHOUT_ABORT(result);
+            const bool next = clicks >= 2;
+            ESP_LOGI(TAG, "%s", next ? "BOOT two clicks: next station"
+                                      : "BOOT click: play/pause");
+            esp_err_t result = next ? radio_control_next()
+                                    : radio_control_toggle();
+            if (result != ESP_OK) {
+                ESP_LOGW(TAG, "BOOT action failed: %s",
+                         esp_err_to_name(result));
+            }
             clicks = 0;
         }
         vTaskDelay(pdMS_TO_TICKS(10));
@@ -272,7 +283,7 @@ void app_main(void) {
                             pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);
-    ESP_ERROR_CHECK(xTaskCreate(button_task, "boot_button", 2048, NULL, 2,
+    ESP_ERROR_CHECK(xTaskCreate(button_task, "boot_button", 4096, NULL, 2,
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);

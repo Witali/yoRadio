@@ -124,19 +124,26 @@ test("native radio requests and publishes ICY song metadata", () => {
   assert.match(audio, /native_state_set_title\(s_state, title\)/);
   assert.match(state, /char title\[192\]/);
   assert.match(websocket, /json_escape\(state\.title, title/);
-  assert.match(controls, /native_state_set_station\(s_state, name\)/);
+  assert.match(controls, /native_state_set_station\(s_state, s_candidate_name\)/);
 });
 
 test("native BOOT gestures match the documented one-button controls", () => {
   const app = read("main", "app_main.c");
   const component = read("main", "CMakeLists.txt");
+  const controls = read("main", "radio_control.c");
 
   assert.match(component, /radio_control\.c/);
   assert.match(app, /BUTTON_CLICK_WINDOW_MS 400/);
   assert.match(app, /BUTTON_HOLD_MS 800/);
-  assert.match(app, /clicks >= 2 \? radio_control_next\(\)/);
+  assert.match(app, /const bool next = clicks >= 2/);
+  assert.match(app, /next \? radio_control_next\(\)/);
   assert.match(app, /: radio_control_toggle\(\)/);
   assert.match(app, /radio_control_previous\(\)/);
+  assert.match(app, /xTaskCreate\(button_task, "boot_button", 4096/);
+  assert.match(app, /BOOT two clicks: next station/);
+  assert.match(controls, /static char s_playlist_line\[768\]/);
+  assert.match(controls, /static char s_candidate_url\[512\]/);
+  assert.doesNotMatch(controls, /char line\[768\]/);
 });
 
 test("single-core pipeline never pins work to nonexistent core 1", () => {
