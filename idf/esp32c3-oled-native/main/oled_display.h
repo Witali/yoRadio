@@ -29,6 +29,6 @@ void oled_display_draw_compact_text(oled_display_t *display, int x, int y,
 size_t oled_display_large_text_length(const char *text);
 void oled_display_draw_large_text(oled_display_t *display, int x, int y,
                                   const char *text, size_t pixel_offset,
-                                  bool wrap, bool inverted);
+                                  bool wrap, bool inverted, bool uppercase);
 esp_err_t oled_display_present(oled_display_t *display);
 

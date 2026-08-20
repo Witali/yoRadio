@@ -30,7 +30,7 @@
   #define ESP_ARDUINO_3 1
 #endif
 
-#define CONFIG_VERSION  12
+#define CONFIG_VERSION  13
 #define DEFAULT_AUDIO_BUFFER_BLOCKS 14
 
 enum playMode_e      : uint8_t  { PM_WEB=0, PM_SDCARD=1 };
@@ -139,6 +139,7 @@ struct config_t
   uint8_t   normalizationMaxGainDb;
   int8_t    normalizationTargetDbfs;
   uint16_t  normalizationTimeMs;
+  bool      stationUppercase;
 };
 
 static_assert(sizeof(config_t) <= EEPROM_SIZE - EEPROM_START,

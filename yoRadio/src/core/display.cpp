@@ -361,6 +361,7 @@ void Display::_swichMode(displayMode_e newmode) {
       _meta->moveBack();
     #endif
     _meta->setAlign(metaConf.widget.align);
+    _meta->setUppercase(config.store.stationUppercase);
     _meta->setText(config.station.name);
     _nums->setText("");
     config.isScreensaver = false;
@@ -416,6 +417,7 @@ void Display::_drawPlaylist() {
 
 void Display::_drawNextStationNum(uint16_t num) {
   timekeeper.waitAndReturnPlayer(30);
+  _meta->setUppercase(config.store.stationUppercase);
   _meta->setText(config.stationByNum(num));
   _nums->setText(num, "%d");
 }
@@ -607,6 +609,7 @@ void Display::_setRSSI(int rssi) {
 
 void Display::_station() {
   _meta->setAlign(metaConf.widget.align);
+  _meta->setUppercase(config.store.stationUppercase);
   _meta->setText(config.station.name);
 /*#ifdef USE_NEXTION
   nextion.newNameset(config.station.name);

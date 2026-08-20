@@ -163,7 +163,8 @@ static bool is_ascii_dash_equivalent(uint32_t codepoint) {
     }
 }
 
-static const char *next_large_glyph(const char *text, uint8_t *glyph) {
+static const char *next_large_glyph(const char *text, uint8_t *glyph,
+                                    bool uppercase) {
     const uint8_t *bytes = (const uint8_t *)text;
     uint32_t codepoint = 0;
     size_t length = 1;
@@ -192,6 +193,16 @@ static const char *next_large_glyph(const char *text, uint8_t *glyph) {
         length = codepoint >= 0x10000 && codepoint <= 0x10ffff ? 4 : 1;
     } else {
         codepoint = 0xffffffff;
+    }
+
+    if (uppercase) {
+        if (codepoint >= 'a' && codepoint <= 'z') {
+            codepoint -= 'a' - 'A';
+        } else if (codepoint >= 0x0430 && codepoint <= 0x044f) {
+            codepoint -= 0x20;
+        } else if (codepoint == 0x0451) {
+            codepoint = 0x0401;
+        }
     }
 
     // Normalize typography before consulting the font's Unicode table. Only
@@ -224,7 +235,7 @@ size_t oled_display_large_text_length(const char *text) {
     if (!text) return 0;
     while (*text) {
         uint8_t glyph;
-        text = next_large_glyph(text, &glyph);
+        text = next_large_glyph(text, &glyph, false);
         ++length;
     }
     return length;
@@ -232,7 +243,7 @@ size_t oled_display_large_text_length(const char *text) {
 
 void oled_display_draw_large_text(oled_display_t *display, int x, int y,
                                   const char *text, size_t pixel_offset,
-                                  bool wrap, bool inverted) {
+                                  bool wrap, bool inverted, bool uppercase) {
     if (!display || !text) return;
     for (int row = 0; row < OLED_LARGE_GLYPH_HEIGHT; ++row) {
         for (int column = 0; column < OLED_DISPLAY_WIDTH; ++column) {
@@ -244,7 +255,7 @@ void oled_display_draw_large_text(oled_display_t *display, int x, int y,
     size_t glyph_count = 0;
     while (*text && glyph_count < sizeof(glyphs)) {
         uint8_t glyph;
-        text = next_large_glyph(text, &glyph);
+        text = next_large_glyph(text, &glyph, uppercase);
         glyphs[glyph_count++] = glyph;
     }
     if (!glyph_count) return;

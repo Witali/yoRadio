@@ -9,10 +9,12 @@
 
 #define DISPLAY_NVS_NAMESPACE "display"
 #define DISPLAY_NVS_BRIGHTNESS "brightness"
+#define DISPLAY_NVS_STATION_UPPERCASE "station_upper"
 
 static const char *const TAG = "display_settings";
 static oled_display_t *s_display;
 static atomic_uchar s_brightness;
+static atomic_bool s_station_uppercase;
 
 static uint8_t default_brightness(void) {
     return (uint8_t)(((unsigned)BOARD_OLED_CONTRAST * 100U + 127U) / 255U);
@@ -40,9 +42,42 @@ esp_err_t display_settings_init(oled_display_t *display) {
                  esp_err_to_name(result));
     }
     atomic_init(&s_brightness, brightness);
+    bool station_uppercase = false;
+    result = nvs_open(DISPLAY_NVS_NAMESPACE, NVS_READONLY, &handle);
+    if (result == ESP_OK) {
+        uint8_t saved = 0;
+        result = nvs_get_u8(handle, DISPLAY_NVS_STATION_UPPERCASE, &saved);
+        nvs_close(handle);
+        if (result == ESP_OK) station_uppercase = saved != 0;
+    }
+    atomic_init(&s_station_uppercase, station_uppercase);
     ESP_RETURN_ON_ERROR(oled_display_set_brightness(display, brightness), TAG,
                         "Apply display brightness");
     ESP_LOGI(TAG, "OLED brightness %u%%", brightness);
+    ESP_LOGI(TAG, "Station uppercase %s",
+             station_uppercase ? "enabled" : "disabled");
+    return ESP_OK;
+}
+
+bool display_settings_get_station_uppercase(void) {
+    return atomic_load(&s_station_uppercase);
+}
+
+esp_err_t display_settings_set_station_uppercase(bool enabled, bool persist) {
+    atomic_store(&s_station_uppercase, enabled);
+    if (!persist) return ESP_OK;
+
+    nvs_handle_t handle;
+    ESP_RETURN_ON_ERROR(
+        nvs_open(DISPLAY_NVS_NAMESPACE, NVS_READWRITE, &handle), TAG,
+        "Open display settings storage");
+    esp_err_t result = nvs_set_u8(handle, DISPLAY_NVS_STATION_UPPERCASE,
+                                  enabled ? 1U : 0U);
+    if (result == ESP_OK) result = nvs_commit(handle);
+    nvs_close(handle);
+    ESP_RETURN_ON_ERROR(result, TAG, "Save station uppercase setting");
+    ESP_LOGI(TAG, "Station uppercase saved: %s",
+             enabled ? "enabled" : "disabled");
     return ESP_OK;
 }
 

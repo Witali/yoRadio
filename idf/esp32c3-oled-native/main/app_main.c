@@ -156,15 +156,17 @@ static void format_stream_details(const native_state_t *state, char *output,
 static void draw_status(const native_state_t *state,
                         const char *secondary_text,
                         const display_scroll_t *station_scroll,
-                        const display_scroll_t *title_scroll) {
+                        const display_scroll_t *title_scroll,
+                        bool station_uppercase) {
     char line[24] = {0};
     oled_display_clear(&s_display);
     oled_display_draw_large_text(
         &s_display, 0, 0, state->station,
-        station_scroll->pixel_offset, station_scroll->enabled, true);
+        station_scroll->pixel_offset, station_scroll->enabled, true,
+        station_uppercase);
     oled_display_draw_large_text(
         &s_display, 0, 15, secondary_text,
-        title_scroll->pixel_offset, title_scroll->enabled, false);
+        title_scroll->pixel_offset, title_scroll->enabled, false, false);
 
     if (state->network_mode == NATIVE_NETWORK_CLIENT && state->ipv4) {
         esp_ip4_addr_t address = {.addr = state->ipv4};
@@ -194,11 +196,15 @@ static void display_task(void *argument) {
     bool show_stream_info = true;
     uint32_t secondary_started_ms = 0;
     char secondary_text[192] = "";
+    bool previous_station_uppercase =
+        display_settings_get_station_uppercase();
     while (true) {
         native_state_t state;
         native_state_snapshot(&s_state, &state);
         uint32_t now_ms = (uint32_t)(esp_timer_get_time() / 1000U);
         bool redraw = memcmp(&state, &previous, sizeof(state)) != 0;
+        bool station_uppercase = display_settings_get_station_uppercase();
+        if (station_uppercase != previous_station_uppercase) redraw = true;
         char stream_details[96];
         format_stream_details(&state, stream_details, sizeof(stream_details));
         if (strcmp(state.station, previous.station) != 0) {
@@ -260,8 +266,9 @@ static void display_task(void *argument) {
         }
         if (redraw) {
             draw_status(&state, secondary_text, &station_scroll,
-                        &title_scroll);
+                        &title_scroll, station_uppercase);
             previous = state;
+            previous_station_uppercase = station_uppercase;
         }
         vTaskDelay(pdMS_TO_TICKS(10));
     }
@@ -376,7 +383,7 @@ void app_main(void) {
     ESP_ERROR_CHECK(display_settings_init(&s_display));
     const display_scroll_t initial_scroll = {0};
     draw_status(&s_state, "stream info...", &initial_scroll,
-                &initial_scroll);
+                &initial_scroll, display_settings_get_station_uppercase());
 
     ESP_ERROR_CHECK(xTaskCreate(display_task, "display", 4096, NULL, 1, NULL) ==
                             pdPASS

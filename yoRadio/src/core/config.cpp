@@ -162,6 +162,9 @@ void Config::_setupVersion(){
         saveValue(&store.brightness, store.contrast);
       #endif
       break;
+    case 12:
+      saveValue(&store.stationUppercase, false);
+      break;
     default:
       break;
   }
@@ -542,6 +545,7 @@ void Config::resetSystem(const char *val, uint8_t clientId){
     saveValue(&store.contrast, (uint8_t)55, false);
     display.setContrast();
     saveValue(&store.numplaylist, false);
+    saveValue(&store.stationUppercase, false);
     saveValue(&store.screensaverEnabled, false);
     saveValue(&store.screensaverTimeout, (uint16_t)20);
     saveValue(&store.screensaverBlank, false);
@@ -663,6 +667,7 @@ void Config::setDefaults() {
   store.normalizationMaxGainDb = 20;
   store.normalizationTargetDbfs = -3;
   store.normalizationTimeMs = 2000;
+  store.stationUppercase = false;
   eepromWrite(EEPROM_START, store);
 }
 

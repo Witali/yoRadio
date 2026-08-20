@@ -77,11 +77,13 @@ static void format_status(char *output, size_t output_size) {
              "{\"id\":\"heap\",\"value\":%u},"
              "{\"id\":\"bitrate\",\"value\":%lu},"
              "{\"id\":\"fmt\",\"value\":\"%s\"},"
+             "{\"id\":\"upst\",\"value\":%u},"
              "{\"id\":\"playerwrap\",\"value\":\"%s\"}]}",
              name, title, native_audio_output_get_volume(),
              native_audio_output_get_balance(), state.wifi_rssi,
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT),
              (unsigned long)state.bitrate_kbps, format,
+             display_settings_get_station_uppercase() ? 1U : 0U,
              state.audio_running ? "playing" : "stopped");
 }
 
@@ -127,9 +129,10 @@ static esp_err_t send_screen_settings(httpd_req_t *request) {
     unsigned brightness = display_settings_get_brightness();
     snprintf(settings, sizeof(settings),
              "{\"flip\":0,\"inv\":0,\"nump\":0,\"tsf\":0,"
-             "\"tsd\":0,\"dspon\":1,\"br\":%u,\"con\":55,"
+             "\"tsd\":0,\"upst\":%u,\"dspon\":1,\"br\":%u,\"con\":55,"
              "\"scre\":0,\"scrt\":30,\"scrb\":0,\"scrpe\":0,"
              "\"scrpt\":5,\"scrpb\":0}",
+             display_settings_get_station_uppercase() ? 1U : 0U,
              brightness);
     return ws_send_request(request, settings);
 }
@@ -220,6 +223,14 @@ static void handle_command(httpd_req_t *request, char *command) {
             (uint8_t)brightness, true);
         if (result != ESP_OK) {
             ESP_LOGW(TAG, "Brightness update failed: %s",
+                     esp_err_to_name(result));
+        }
+        send_screen_settings(request);
+    } else if (strcmp(command, "stationuppercase") == 0) {
+        esp_err_t result = display_settings_set_station_uppercase(
+            strtoul(value, NULL, 10) != 0, true);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Station uppercase update failed: %s",
                      esp_err_to_name(result));
         }
         send_screen_settings(request);

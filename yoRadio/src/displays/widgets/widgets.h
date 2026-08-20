@@ -75,6 +75,7 @@ class TextWidget: public Widget {
     void setText(int val, const char *format);
     void setText(const char* txt, const char *format);
     bool uppercase() { return _uppercase; }
+    void setUppercase(bool uppercase) { _uppercase = uppercase; }
   protected:
     char *_text;
     char *_oldtext;
