@@ -105,6 +105,23 @@ test("native OLED presents a legible full-screen yoRadio boot logo first", () =>
 
   assert.equal(bytes.length, 72 * 40 / 8);
   assert.ok(bytes.filter(Boolean).length > 100);
+  const verticalCentroid = (firstX, lastX) => {
+    let pixels = 0;
+    let yTotal = 0;
+    for (let y = 0; y < 40; ++y) {
+      for (let x = firstX; x <= lastX; ++x) {
+        if ((bytes[Math.floor(y / 8) * 72 + x] >> (y % 8)) & 1) {
+          ++pixels;
+          yTotal += y;
+        }
+      }
+    }
+    return yTotal / pixels;
+  };
+  assert.ok(
+    Math.abs(verticalCentroid(0, 25) - verticalCentroid(28, 71)) < 1,
+    "Radio word must be vertically centered with the ё mark",
+  );
   assert.match(logo, /original 21x32 `ё` mark/);
   assert.match(logo, /crisp Spleen bitmap face/);
   assert.match(header, /oled_display_show_boot_logo/);
