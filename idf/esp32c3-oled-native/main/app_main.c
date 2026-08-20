@@ -190,7 +190,6 @@ static void format_stream_details(const native_state_t *state, char *output,
                        ? added
                        : output_size - written - 1;
     }
-    if (!output[0]) strlcpy(output, "stream info...", output_size);
 }
 
 static void draw_status(const native_state_t *state,
@@ -245,6 +244,7 @@ static void display_task(void *argument) {
     bool show_stream_info = true;
     uint32_t secondary_started_ms = 0;
     char secondary_text[192] = "";
+    bool secondary_initialized = false;
     bool previous_station_uppercase =
         display_settings_get_station_uppercase();
     while (true) {
@@ -273,13 +273,15 @@ static void display_task(void *argument) {
                 show_stream_info ? stream_details : state.title;
             strlcpy(secondary_text, wanted_secondary, sizeof(secondary_text));
             reset_scroll(&title_scroll, secondary_text, now_ms);
+            secondary_initialized = true;
             redraw = true;
-        } else if (!secondary_text[0]) {
+        } else if (!secondary_initialized) {
             const char *wanted_secondary =
                 show_stream_info ? stream_details : state.title;
             strlcpy(secondary_text, wanted_secondary, sizeof(secondary_text));
             reset_scroll(&title_scroll, secondary_text, now_ms);
             secondary_started_ms = now_ms;
+            secondary_initialized = true;
             redraw = true;
         }
         display_scroll_owner_t completed = DISPLAY_SCROLL_NONE;

@@ -231,6 +231,9 @@ test("native OLED alternates ICY title with live stream parameters", () => {
   assert.match(app, /DISPLAY_SECONDARY_PAGE_MS 5000U/);
   assert.match(app, /strlcpy\(secondary_text, stream_details[\s\S]*reset_scroll/);
   assert.doesNotMatch(app, /update_scroll_dimensions/);
+  assert.doesNotMatch(app, /stream info\.\.\./i);
+  assert.match(app, /bool secondary_initialized = false/);
+  assert.match(app, /else if \(!secondary_initialized\)/);
 });
 
 test("native WebUI format keeps the codec after decoder discovery", () => {
