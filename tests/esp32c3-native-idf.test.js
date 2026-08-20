@@ -286,6 +286,25 @@ test("native radio requests and publishes ICY song metadata", () => {
   assert.match(audio, /icy-metaint/);
   assert.match(audio, /StreamTitle='/);
   assert.match(audio, /native_state_set_title\(s_state, title\)/);
+  assert.match(audio, /parse_icy_metadata\(uint32_t generation/);
+  assert.match(
+    audio,
+    /generation != atomic_load\(&s_generation\)[\s\S]*native_state_set_title\(s_state, ""\)/,
+  );
+  assert.match(
+    audio,
+    /audio_service_stop[\s\S]*atomic_fetch_add\(&s_generation, 1\)[\s\S]*native_state_set_title\(s_state, ""\)/,
+  );
+  assert.match(
+    audio,
+    /audio_service_stop[\s\S]*state_set_audio\(false, "stopped"\)[\s\S]*close_active_http_stream\(\)/,
+  );
+  assert.match(audio, /esp_http_client_close\(s_active_http_client\)/);
+  assert.match(audio, /s_active_http_client == client[\s\S]*s_active_http_client = NULL/);
+  assert.match(
+    audio,
+    /atomic_load\(&s_generation\) != command\.generation[\s\S]*dispose_http_client\(client\)/,
+  );
   assert.match(state, /char title\[192\]/);
   assert.match(websocket, /json_escape\(state\.title, title/);
   assert.match(controls, /native_state_set_station\(s_state, s_candidate_name\)/);
@@ -353,6 +372,7 @@ test("native BOOT gestures match the documented one-button controls", () => {
     app,
     /button_status_playing \? "playing" : "stopped"/,
   );
+  assert.match(app, /state\.audio_running \? secondary_text : ""/);
   assert.match(app, /button_status_visible[\s\S]*button_status_scroll/);
   assert.match(
     app,

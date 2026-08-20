@@ -418,7 +418,7 @@ static void display_task(void *argument) {
             const char *display_secondary =
                 button_status_visible
                     ? (button_status_playing ? "playing" : "stopped")
-                    : secondary_text;
+                    : (state.audio_running ? secondary_text : "");
             draw_status(&state, display_secondary, &station_scroll,
                         button_status_visible ? &button_status_scroll
                                               : &title_scroll,
