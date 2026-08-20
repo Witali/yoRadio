@@ -142,6 +142,20 @@ test("native OLED alternates ICY title with live stream parameters", () => {
   assert.doesNotMatch(app, /update_scroll_dimensions/);
 });
 
+test("native WebUI format keeps the codec after decoder discovery", () => {
+  const audio = read("main", "audio_service.c");
+
+  assert.match(audio, /"FLAC %lu kHz %s"/);
+  assert.match(
+    audio,
+    /custom_legacy_output[\s\S]*"%s %lu kHz %s"[\s\S]*codec_name\(context->stats->codec\)/,
+  );
+  assert.match(
+    audio,
+    /esp_audio_simple_dec_get_info[\s\S]*"%s %lu kHz %s"[\s\S]*codec_name\(codec\)/,
+  );
+});
+
 test("native OLED normalizes dash variants before the replacement glyph", () => {
   const source = read("main", "oled_display.c");
   const normalization = source.indexOf("is_ascii_dash_equivalent(codepoint)");

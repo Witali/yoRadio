@@ -615,7 +615,7 @@ static bool custom_flac_output(void *user, const custom_flac_info_t *info,
         };
         *context->stream_info_ready = true;
         char format[48];
-        snprintf(format, sizeof(format), "%lu kHz %s",
+        snprintf(format, sizeof(format), "FLAC %lu kHz %s",
                  (unsigned long)(info->sample_rate / 1000),
                  info->channels == 1 ? "mono" : "stereo");
         native_state_set_stream_info(s_state, "FLAC", info->sample_rate,
@@ -649,7 +649,8 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
         };
         *context->stream_info_ready = true;
         char format[48];
-        snprintf(format, sizeof(format), "%lu kHz %s",
+        snprintf(format, sizeof(format), "%s %lu kHz %s",
+                 codec_name(context->stats->codec),
                  (unsigned long)(info->sample_rate / 1000),
                  info->channels == 1 ? "mono" : "stereo");
         native_state_set_stream_info(
@@ -924,7 +925,8 @@ static void decoder_task(void *argument) {
                         stream_info = latest_info;
                         stream_info_ready = true;
                         char format[48];
-                        snprintf(format, sizeof(format), "%lu kHz %s",
+                        snprintf(format, sizeof(format), "%s %lu kHz %s",
+                                 codec_name(codec),
                                  (unsigned long)(stream_info.sample_rate / 1000),
                                  stream_info.channel == 1 ? "mono" : "stereo");
                         native_state_set_stream_info(
