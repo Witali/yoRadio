@@ -271,6 +271,50 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   assert.doesNotMatch(web + websocket, /AsyncWebServer|AsyncWebSocket|Arduino/);
 });
 
+test("native settings page is complete in client mode and Wi-Fi-only in AP mode", () => {
+  const websocket = read("main", "websocket_service.c");
+  const original = fs.readFileSync(
+    path.join(root, "yoRadio", "src", "core", "netserver.cpp"),
+    "utf8",
+  );
+
+  assert.match(
+    original,
+    /APPEND_GROUP\("group_wifi"\);[\s\S]*if \(network\.status == CONNECTED\) \{[\s\S]*APPEND_GROUP\("group_system"\)/,
+  );
+
+  for (const group of [
+    "group_system",
+    "group_display",
+    "group_oled",
+    "group_controls",
+    "group_timezone",
+    "group_wifi",
+    "group_buffer",
+    "group_wortc",
+  ]) {
+    assert.match(websocket, new RegExp(`\\\\\"${group}\\\\\"`));
+  }
+  assert.match(
+    websocket,
+    /!client_mode[\s\S]*\{\\"act\\":\[\\"group_wifi\\"\]\}/,
+  );
+  assert.match(
+    websocket,
+    /getactive[\s\S]*state\.network_mode == NATIVE_NETWORK_CLIENT[\s\S]*send_active_settings\(request, client_mode\)/,
+  );
+  assert.doesNotMatch(websocket, /send_settings_snapshot/);
+  for (const command of [
+    "getsystem",
+    "getscreen",
+    "gettimezone",
+    "getweather",
+    "getcontrols",
+  ]) {
+    assert.match(websocket, new RegExp(`strcmp\\(command, \"${command}\"\\)`));
+  }
+});
+
 test("native WebUI reuses shared pages and recovers an empty filesystem", () => {
   const component = read("main", "CMakeLists.txt");
   const bridge = read("main", "web_pages_bridge.cpp");

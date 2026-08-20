@@ -4,9 +4,11 @@
 #include <string.h>
 
 #include "audio_service.h"
+#include "board_config.h"
 #include "esp_check.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "esp_netif.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_audio_output.h"
@@ -99,6 +101,69 @@ static esp_err_t send_initial_state(httpd_req_t *request) {
     return ESP_OK;
 }
 
+static esp_err_t send_system_settings(httpd_req_t *request) {
+    native_state_t state;
+    native_state_snapshot(s_state, &state);
+    char address[20] = "192.168.4.1";
+    if (state.network_mode == NATIVE_NETWORK_CLIENT && state.ipv4) {
+        esp_ip4_addr_t ip = {.addr = state.ipv4};
+        snprintf(address, sizeof(address), IPSTR, IP2STR(&ip));
+    }
+    char settings[512];
+    snprintf(settings, sizeof(settings),
+             "{\"sst\":0,\"aif\":1,\"vu\":0,\"softr\":0,\"vut\":0,"
+             "\"mdns\":\"yoradio\",\"ipaddr\":\"%s\",\"abuff\":16,"
+             "\"mp3decoder\":0,\"normalize\":0,\"normgain\":20,"
+             "\"normtarget\":-3,\"normtime\":2000,\"telnet\":0,"
+             "\"watchdog\":1}",
+             address);
+    return ws_send_request(request, settings);
+}
+
+static esp_err_t send_screen_settings(httpd_req_t *request) {
+    char settings[256];
+    unsigned contrast =
+        ((unsigned)BOARD_OLED_CONTRAST * 100U + 127U) / 255U;
+    snprintf(settings, sizeof(settings),
+             "{\"flip\":0,\"inv\":0,\"nump\":0,\"tsf\":0,"
+             "\"tsd\":0,\"dspon\":1,\"br\":100,\"con\":%u,"
+             "\"scre\":0,\"scrt\":30,\"scrb\":0,\"scrpe\":0,"
+             "\"scrpt\":5,\"scrpb\":0}",
+             contrast);
+    return ws_send_request(request, settings);
+}
+
+static esp_err_t send_timezone_settings(httpd_req_t *request) {
+    return ws_send_request(
+        request,
+        "{\"tzh\":0,\"tzm\":0,\"sntp1\":\"pool.ntp.org\","
+        "\"sntp2\":\"time.nist.gov\",\"timeint\":60,"
+        "\"timeintrtc\":24}");
+}
+
+static esp_err_t send_weather_settings(httpd_req_t *request) {
+    return ws_send_request(request,
+                           "{\"wen\":0,\"wlat\":\"\",\"wlon\":\"\","
+                           "\"wkey\":\"\",\"wint\":60}");
+}
+
+static esp_err_t send_control_settings(httpd_req_t *request) {
+    return ws_send_request(
+        request, "{\"vols\":8,\"enca\":0,\"irtl\":10,\"skipup\":1}");
+}
+
+static esp_err_t send_active_settings(httpd_req_t *request, bool client_mode) {
+    if (!client_mode) {
+        return ws_send_request(request, "{\"act\":[\"group_wifi\"]}");
+    }
+    // Weather is intentionally excluded by the ESP32-C3 OLED build profile.
+    return ws_send_request(
+        request,
+        "{\"act\":[\"group_wifi\",\"group_system\",\"group_display\","
+        "\"group_oled\",\"group_timezone\",\"group_controls\","
+        "\"group_buffer\",\"group_wortc\"]}");
+}
+
 static void handle_command(httpd_req_t *request, char *command) {
     char *separator = strchr(command, '=');
     char *value = separator ? separator + 1 : (char *)"";
@@ -109,7 +174,20 @@ static void handle_command(httpd_req_t *request, char *command) {
     } else if (strcmp(command, "getindex") == 0) {
         send_initial_state(request);
     } else if (strcmp(command, "getactive") == 0) {
-        ws_send_request(request, "{\"act\":[\"group_wifi\"]}");
+        native_state_t state;
+        native_state_snapshot(s_state, &state);
+        bool client_mode = state.network_mode == NATIVE_NETWORK_CLIENT;
+        send_active_settings(request, client_mode);
+    } else if (strcmp(command, "getsystem") == 0) {
+        send_system_settings(request);
+    } else if (strcmp(command, "getscreen") == 0) {
+        send_screen_settings(request);
+    } else if (strcmp(command, "gettimezone") == 0) {
+        send_timezone_settings(request);
+    } else if (strcmp(command, "getweather") == 0) {
+        send_weather_settings(request);
+    } else if (strcmp(command, "getcontrols") == 0) {
+        send_control_settings(request);
     } else if (strcmp(command, "submitplaylist") == 0) {
         ws_send_request(request,
                         "{\"file\":\"/data/playlist.csv\"}");
