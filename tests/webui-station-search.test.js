@@ -38,7 +38,7 @@ test("station search filters rendered rows by normalized name", () => {
   assert.match(script, /filterPlaylist\(filter \? filter\.value : ''\)/);
 });
 
-test("current station stays selectable and scrolls into view after rendering", () => {
+test("current station stays selectable without unsolicited scrolling", () => {
   const script = readAsset("script.js.gz");
   const setCurrentItem = script.slice(
     script.indexOf("function setCurrentItem"),
@@ -92,8 +92,60 @@ test("current station stays selectable and scrolls into view after rendering", (
 
   assert.deepEqual([...oldRow.classes].sort(), ["play"]);
   assert.deepEqual([...currentRow.classes].sort(), ["active", "play"]);
+  assert.equal(scrollOptions, null);
+
+  vm.runInNewContext(`${setCurrentItem}\nsetCurrentItem(42, true);`, {
+    getId: () => playlist,
+  });
   assert.equal(scrollOptions.top, 330);
   assert.equal(scrollOptions.behavior, "smooth");
+});
+
+test("playlist scroll is requested only by playback navigation", () => {
+  const script = readAsset("script.js.gz");
+
+  assert.match(script, /function setCurrentItem\(item, shouldScroll=false\)/);
+  assert.match(script, /if\(activeItem && shouldScroll\)/);
+  assert.match(
+    script,
+    /setCurrentItem\(data\.current, shouldScrollCurrentItem\(data\.current\)\)/,
+  );
+  assert.match(script, /id=='meta' \|\| id=='nameset'\) setCurrentItem\(currentItem, false\)/);
+  assert.match(script, /setCurrentItem\(currentItem, true\)/);
+  assert.match(
+    script,
+    /target\.id === 'nameset'\) \{ setCurrentItem\(currentItem, true\); return; \}/,
+  );
+  assert.match(script, /setCurrentItem\(item, false\)/);
+  assert.match(
+    script,
+    /target\.id === 'prevbutton' \|\| target\.id === 'nextbutton'\) requestStationChangeScroll\(\)/,
+  );
+  assert.match(
+    script,
+    /const changed = currentItemSynchronized && Number\(item\) !== Number\(currentItem\)/,
+  );
+  assert.match(script, /currentItemSynchronized = true/);
+});
+
+test("a physical station change scrolls once after initial synchronization", () => {
+  const script = readAsset("script.js.gz");
+  const helpers = script.slice(
+    script.indexOf("function requestStationChangeScroll"),
+    script.indexOf("function setupElement"),
+  );
+  const context = {
+    currentItem: 11,
+    currentItemSynchronized: false,
+    stationChangeScrollFrom: null,
+  };
+
+  vm.runInNewContext(helpers, context);
+  assert.equal(context.shouldScrollCurrentItem(11), false);
+  assert.equal(context.shouldScrollCurrentItem(11), false);
+  assert.equal(context.shouldScrollCurrentItem(12), true);
+  context.currentItem = 12;
+  assert.equal(context.shouldScrollCurrentItem(12), false);
 });
 
 test("station search has compact responsive styling", () => {
