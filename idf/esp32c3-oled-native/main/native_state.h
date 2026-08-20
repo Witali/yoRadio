@@ -21,8 +21,11 @@ typedef struct {
     int8_t wifi_rssi;
     uint32_t ipv4;
     uint32_t bitrate_kbps;
+    uint32_t sample_rate_hz;
+    uint8_t channels;
     char station[144];
     char title[192];
+    char codec[8];
     char stream_format[48];
 } native_state_t;
 
@@ -32,6 +35,8 @@ void native_state_set_network(native_state_t *state,
                               uint32_t ipv4);
 void native_state_set_wifi_rssi(native_state_t *state, int8_t rssi);
 void native_state_set_bitrate(native_state_t *state, uint32_t bitrate_kbps);
+void native_state_set_stream_info(native_state_t *state, const char *codec,
+                                  uint32_t sample_rate_hz, uint8_t channels);
 void native_state_set_station(native_state_t *state, const char *station);
 void native_state_set_title(native_state_t *state, const char *title);
 void native_state_snapshot(native_state_t *state, native_state_t *snapshot);

@@ -298,6 +298,7 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
         if (*codec == NATIVE_CODEC_AUTO) {
             *codec = codec_from_signature(data, size);
         }
+        native_state_set_stream_info(s_state, codec_name(*codec), 0, 0);
         state_set_audio(false, codec_name(*codec));
     }
     return send_encoded(generation, *codec, data, size, false);
@@ -617,6 +618,8 @@ static bool custom_flac_output(void *user, const custom_flac_info_t *info,
         snprintf(format, sizeof(format), "%lu kHz %s",
                  (unsigned long)(info->sample_rate / 1000),
                  info->channels == 1 ? "mono" : "stereo");
+        native_state_set_stream_info(s_state, "FLAC", info->sample_rate,
+                                     info->channels);
         state_set_audio(true, format);
     }
     state_set_decoder_bitrate(info->bitrate);
@@ -649,6 +652,9 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
         snprintf(format, sizeof(format), "%lu kHz %s",
                  (unsigned long)(info->sample_rate / 1000),
                  info->channels == 1 ? "mono" : "stereo");
+        native_state_set_stream_info(
+            s_state, codec_name(context->stats->codec), info->sample_rate,
+            info->channels);
         state_set_audio(true, format);
     }
     state_set_decoder_bitrate(info->bitrate);
@@ -921,6 +927,9 @@ static void decoder_task(void *argument) {
                         snprintf(format, sizeof(format), "%lu kHz %s",
                                  (unsigned long)(stream_info.sample_rate / 1000),
                                  stream_info.channel == 1 ? "mono" : "stereo");
+                        native_state_set_stream_info(
+                            s_state, codec_name(codec), stream_info.sample_rate,
+                            stream_info.channel);
                         state_set_audio(true, format);
                     } else if (latest_info.bitrate) {
                         stream_info.bitrate = latest_info.bitrate;
@@ -1040,6 +1049,7 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     s_last_codec = codec;
     atomic_store(&s_measured_bitrate_ready, false);
     native_state_set_bitrate(s_state, 0);
+    native_state_set_stream_info(s_state, "", 0, 0);
     native_state_set_station(s_state, url);
     return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
                                                             : ESP_FAIL;
@@ -1109,5 +1119,6 @@ esp_err_t audio_service_resume(void) {
 void audio_service_stop(void) {
     atomic_fetch_add(&s_generation, 1);
     native_state_set_bitrate(s_state, 0);
+    native_state_set_stream_info(s_state, "", 0, 0);
     state_set_audio(false, "stopped");
 }

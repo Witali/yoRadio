@@ -37,6 +37,17 @@ void native_state_set_bitrate(native_state_t *state, uint32_t bitrate_kbps) {
     }
 }
 
+void native_state_set_stream_info(native_state_t *state, const char *codec,
+                                  uint32_t sample_rate_hz, uint8_t channels) {
+    if (!state || !state->lock) return;
+    if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
+        strlcpy(state->codec, codec ? codec : "", sizeof(state->codec));
+        state->sample_rate_hz = sample_rate_hz;
+        state->channels = channels;
+        xSemaphoreGive(state->lock);
+    }
+}
+
 void native_state_set_station(native_state_t *state, const char *station) {
     if (!state || !state->lock || !station) return;
     if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {

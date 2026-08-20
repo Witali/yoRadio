@@ -25,6 +25,7 @@
 #define DISPLAY_SCROLL_HOLD_MS 3500U
 #define DISPLAY_SCROLL_STEP_MS 35U
 #define DISPLAY_SCROLL_SEPARATOR_GLYPHS 3U
+#define DISPLAY_SECONDARY_PAGE_MS 5000U
 
 static const char *const TAG = "yoradio_c3";
 static native_state_t s_state;
@@ -69,7 +70,9 @@ static void reset_scroll(display_scroll_t *scroll, const char *text,
 static bool advance_scroll(display_scroll_t *station,
                            display_scroll_t *title,
                            display_scroll_owner_t *owner,
-                           uint32_t now_ms) {
+                           uint32_t now_ms,
+                           display_scroll_owner_t *completed) {
+    *completed = DISPLAY_SCROLL_NONE;
     display_scroll_t *active = NULL;
     if (*owner == DISPLAY_SCROLL_STATION && station->enabled) active = station;
     if (*owner == DISPLAY_SCROLL_TITLE && title->enabled) active = title;
@@ -100,12 +103,58 @@ static bool advance_scroll(display_scroll_t *station,
         active->pixel_offset = 0;
         active->wait_started_ms = now_ms;
         active->last_step_ms = now_ms;
+        *completed = *owner;
         *owner = DISPLAY_SCROLL_NONE;
     }
     return true;
 }
 
+static void format_stream_details(const native_state_t *state, char *output,
+                                  size_t output_size) {
+    char bitrate[20] = "";
+    char sample_rate[20] = "";
+    char channels[16] = "";
+    if (state->bitrate_kbps) {
+        snprintf(bitrate, sizeof(bitrate), "%lu kbps",
+                 (unsigned long)state->bitrate_kbps);
+    }
+    if (state->sample_rate_hz) {
+        uint32_t tenths_khz = (state->sample_rate_hz + 50U) / 100U;
+        if (tenths_khz % 10U) {
+            snprintf(sample_rate, sizeof(sample_rate), "%lu.%lu kHz",
+                     (unsigned long)(tenths_khz / 10U),
+                     (unsigned long)(tenths_khz % 10U));
+        } else {
+            snprintf(sample_rate, sizeof(sample_rate), "%lu kHz",
+                     (unsigned long)(tenths_khz / 10U));
+        }
+    }
+    if (state->channels == 1) {
+        strcpy(channels, "mono");
+    } else if (state->channels == 2) {
+        strcpy(channels, "stereo");
+    } else if (state->channels) {
+        snprintf(channels, sizeof(channels), "%u channels", state->channels);
+    }
+
+    const char *parts[] = {state->codec, bitrate, sample_rate, channels};
+    size_t written = 0;
+    output[0] = '\0';
+    for (size_t index = 0; index < sizeof(parts) / sizeof(parts[0]); ++index) {
+        if (!parts[index][0] || written + 1 >= output_size) continue;
+        int result = snprintf(output + written, output_size - written,
+                              "%s%s", written ? " " : "", parts[index]);
+        if (result < 0) break;
+        size_t added = (size_t)result;
+        written += added < output_size - written
+                       ? added
+                       : output_size - written - 1;
+    }
+    if (!output[0]) strlcpy(output, "stream info...", output_size);
+}
+
 static void draw_status(const native_state_t *state,
+                        const char *secondary_text,
                         const display_scroll_t *station_scroll,
                         const display_scroll_t *title_scroll) {
     char line[24] = {0};
@@ -114,7 +163,7 @@ static void draw_status(const native_state_t *state,
         &s_display, 0, 0, state->station,
         station_scroll->pixel_offset, station_scroll->enabled, true);
     oled_display_draw_large_text(
-        &s_display, 0, 15, state->title,
+        &s_display, 0, 15, secondary_text,
         title_scroll->pixel_offset, title_scroll->enabled, false);
 
     if (state->network_mode == NATIVE_NETWORK_CLIENT && state->ipv4) {
@@ -142,29 +191,76 @@ static void display_task(void *argument) {
     display_scroll_t station_scroll = {0};
     display_scroll_t title_scroll = {0};
     display_scroll_owner_t scroll_owner = DISPLAY_SCROLL_NONE;
+    bool show_stream_info = true;
+    uint32_t secondary_started_ms = 0;
+    char secondary_text[192] = "";
     while (true) {
         native_state_t state;
         native_state_snapshot(&s_state, &state);
         uint32_t now_ms = (uint32_t)(esp_timer_get_time() / 1000U);
         bool redraw = memcmp(&state, &previous, sizeof(state)) != 0;
+        char stream_details[96];
+        format_stream_details(&state, stream_details, sizeof(stream_details));
         if (strcmp(state.station, previous.station) != 0) {
             reset_scroll(&station_scroll, state.station, now_ms);
             if (scroll_owner == DISPLAY_SCROLL_STATION) {
                 scroll_owner = DISPLAY_SCROLL_NONE;
             }
         }
-        if (strcmp(state.title, previous.title) != 0) {
-            reset_scroll(&title_scroll, state.title, now_ms);
+        bool title_changed = strcmp(state.title, previous.title) != 0;
+        if (title_changed) {
+            show_stream_info = !state.title[0];
+            secondary_started_ms = now_ms;
             if (scroll_owner == DISPLAY_SCROLL_TITLE) {
                 scroll_owner = DISPLAY_SCROLL_NONE;
             }
+            const char *wanted_secondary =
+                show_stream_info ? stream_details : state.title;
+            strlcpy(secondary_text, wanted_secondary, sizeof(secondary_text));
+            reset_scroll(&title_scroll, secondary_text, now_ms);
+            redraw = true;
+        } else if (!secondary_text[0]) {
+            const char *wanted_secondary =
+                show_stream_info ? stream_details : state.title;
+            strlcpy(secondary_text, wanted_secondary, sizeof(secondary_text));
+            reset_scroll(&title_scroll, secondary_text, now_ms);
+            secondary_started_ms = now_ms;
+            redraw = true;
         }
+        display_scroll_owner_t completed;
         if (advance_scroll(&station_scroll, &title_scroll, &scroll_owner,
-                           now_ms)) {
+                           now_ms, &completed)) {
+            redraw = true;
+        }
+        if (state.title[0] &&
+            (completed == DISPLAY_SCROLL_TITLE ||
+             (!title_scroll.enabled &&
+              now_ms - secondary_started_ms >= DISPLAY_SECONDARY_PAGE_MS))) {
+            show_stream_info = !show_stream_info;
+            secondary_started_ms = now_ms;
+            const char *wanted_secondary =
+                show_stream_info ? stream_details : state.title;
+            strlcpy(secondary_text, wanted_secondary, sizeof(secondary_text));
+            reset_scroll(&title_scroll, secondary_text, now_ms);
+            if (scroll_owner == DISPLAY_SCROLL_TITLE) {
+                scroll_owner = DISPLAY_SCROLL_NONE;
+            }
+            redraw = true;
+        } else if (!state.title[0] &&
+                   (completed == DISPLAY_SCROLL_TITLE ||
+                    (!title_scroll.enabled &&
+                     now_ms - secondary_started_ms >=
+                         DISPLAY_SECONDARY_PAGE_MS))) {
+            // Freeze one stream-details snapshot for a complete display pass.
+            // Live bitrate updates remain available to WebUI in native_state.
+            secondary_started_ms = now_ms;
+            strlcpy(secondary_text, stream_details, sizeof(secondary_text));
+            reset_scroll(&title_scroll, secondary_text, now_ms);
             redraw = true;
         }
         if (redraw) {
-            draw_status(&state, &station_scroll, &title_scroll);
+            draw_status(&state, secondary_text, &station_scroll,
+                        &title_scroll);
             previous = state;
         }
         vTaskDelay(pdMS_TO_TICKS(10));
@@ -279,9 +375,10 @@ void app_main(void) {
     ESP_ERROR_CHECK(oled_display_init(&s_display));
     ESP_ERROR_CHECK(display_settings_init(&s_display));
     const display_scroll_t initial_scroll = {0};
-    draw_status(&s_state, &initial_scroll, &initial_scroll);
+    draw_status(&s_state, "stream info...", &initial_scroll,
+                &initial_scroll);
 
-    ESP_ERROR_CHECK(xTaskCreate(display_task, "display", 3072, NULL, 1, NULL) ==
+    ESP_ERROR_CHECK(xTaskCreate(display_task, "display", 4096, NULL, 1, NULL) ==
                             pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);

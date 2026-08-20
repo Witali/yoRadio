@@ -103,13 +103,43 @@ test("native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll",
   assert.match(font, /Spleen 8x16/);
   assert.match(font, /Fixed 8x15 cells/);
   assert.match(font, /font8x15\[3840\]/);
-  assert.match(app, /state->station[\s\S]*state->title/);
+  assert.match(app, /state->station[\s\S]*secondary_text/);
   assert.match(app, /state->station[\s\S]*station_scroll->enabled, true/);
-  assert.match(app, /state->title[\s\S]*title_scroll->enabled, false/);
+  assert.match(app, /secondary_text[\s\S]*title_scroll->enabled, false/);
   assert.match(app, /DISPLAY_SCROLL_HOLD_MS 3500U/);
   assert.match(app, /DISPLAY_SCROLL_STEP_MS 35U/);
   assert.match(app, /IPSTR[\s\S]*oled_display_draw_compact_text/);
   assert.doesNotMatch(app, /state->stream_format[\s\S]*oled_display_draw/);
+});
+
+test("native OLED alternates ICY title with live stream parameters", () => {
+  const app = read("main", "app_main.c");
+  const audio = read("main", "audio_service.c");
+  const stateHeader = read("main", "native_state.h");
+  const stateSource = read("main", "native_state.c");
+
+  assert.match(stateHeader, /uint32_t sample_rate_hz/);
+  assert.match(stateHeader, /uint8_t channels/);
+  assert.match(stateHeader, /char codec\[8\]/);
+  assert.match(stateHeader, /native_state_set_stream_info/);
+  assert.match(stateSource, /state->sample_rate_hz = sample_rate_hz/);
+  assert.match(stateSource, /state->channels = channels/);
+  assert.match(audio, /native_state_set_stream_info\(s_state, codec_name\(\*codec\), 0, 0\)/);
+  assert.match(
+    audio,
+    /native_state_set_stream_info\([\s\S]*codec_name\(codec\)[\s\S]*stream_info\.sample_rate[\s\S]*stream_info\.channel/,
+  );
+
+  assert.match(app, /const char \*parts\[\] = \{state->codec, bitrate, sample_rate, channels\}/);
+  assert.match(app, /state->bitrate_kbps[\s\S]*"%lu kbps"/);
+  assert.match(app, /state->sample_rate_hz[\s\S]*"%lu\.%lu kHz"/);
+  assert.match(app, /state->channels == 1[\s\S]*"mono"/);
+  assert.match(app, /state->channels == 2[\s\S]*"stereo"/);
+  assert.match(app, /show_stream_info = !state\.title\[0\]/);
+  assert.match(app, /completed == DISPLAY_SCROLL_TITLE[\s\S]*show_stream_info = !show_stream_info/);
+  assert.match(app, /DISPLAY_SECONDARY_PAGE_MS 5000U/);
+  assert.match(app, /strlcpy\(secondary_text, stream_details[\s\S]*reset_scroll/);
+  assert.doesNotMatch(app, /update_scroll_dimensions/);
 });
 
 test("native OLED normalizes dash variants before the replacement glyph", () => {
