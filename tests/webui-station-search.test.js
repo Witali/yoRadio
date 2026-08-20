@@ -131,11 +131,11 @@ test("playlist scroll is requested only by user navigation and Play", () => {
   assert.match(script, /currentItemSynchronized = true/);
 });
 
-test("playlist reload preserves the user's scroll position", () => {
+test("playlist reload preserves the user's scroll position", async () => {
   const script = readAsset("script.js.gz");
-  const handlePlaylistData = script.slice(
+  const playlistFunctions = script.slice(
     script.indexOf("function handlePlaylistData"),
-    script.indexOf("function generatePlaylist"),
+    script.indexOf("function plAdd"),
   );
   let html = "existing playlist";
   const playlist = {
@@ -150,17 +150,23 @@ test("playlist reload preserves the user's scroll position", () => {
   };
 
   vm.runInNewContext(
-    `${handlePlaylistData}\nhandlePlaylistData("Station\\tstream\\t0");`,
+    `${playlistFunctions}\ngeneratePlaylist("http://source/playlist.csv");`,
     {
       bigplaylist: true,
       currentItem: 1,
+      fetch: async () => ({
+        text: async () => "Station\tstream\t0",
+      }),
       filterPlaylist: () => {},
       getId: (id) =>
         id === "playlist" ? playlist : { value: "" },
+      hostname: "device",
       modesd: true,
       setCurrentItem: () => {},
     },
   );
+  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => setImmediate(resolve));
 
   assert.equal(playlist.scrollTop, 4321);
 });

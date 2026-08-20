@@ -237,7 +237,7 @@ if(-not $script.Contains("const startingPlayback =")) {
     Write-GzipText $scriptPath $script
 }
 
-if(-not $script.Contains("const previousScrollTop = ul.scrollTop;")) {
+if(-not $script.Contains("ul.scrollTop = previousScrollTop;")) {
     $script = Replace-Once $script @'
 function handlePlaylistData(fileData) {
   const ul = getId('playlist');
@@ -259,6 +259,43 @@ function handlePlaylistData(fileData) {
   ul.scrollTop = previousScrollTop;
   if(!modesd) initPLEditor();
 '@ "playlist scroll position restore"
+
+    Write-GzipText $scriptPath $script
+}
+
+if(-not $script.Contains("function handlePlaylistData(fileData, previousScrollTop = null)")) {
+    $script = Replace-Once $script @'
+function handlePlaylistData(fileData) {
+  const ul = getId('playlist');
+  const previousScrollTop = ul.scrollTop;
+'@ @'
+function handlePlaylistData(fileData, previousScrollTop = null) {
+  const ul = getId('playlist');
+  if(previousScrollTop === null) previousScrollTop = ul.scrollTop;
+'@ "playlist reload scroll argument"
+
+    $script = Replace-Once $script @'
+function generatePlaylist(path){
+  path = path.replace(/:\/\/.+?\//, `://${hostname}/`);
+'@ @'
+function generatePlaylist(path){
+  path = path.replace(/:\/\/.+?\//, `://${hostname}/`);
+  const playlist = getId('playlist');
+  const previousScrollTop = playlist.scrollTop;
+'@ "playlist reload scroll capture"
+
+    $script = Replace-Once $script @'
+  getId('playlist').innerHTML='<div id="progress"><span id="loader"></span></div>';
+'@ @'
+  playlist.innerHTML='<div id="progress"><span id="loader"></span></div>';
+'@ "playlist reload target"
+
+    $script = Replace-Once $script "handlePlaylistData(plcontent);" `
+        "handlePlaylistData(plcontent, previousScrollTop);" `
+        "playlist reload success position"
+    $script = Replace-Once $script "handlePlaylistData(null);" `
+        "handlePlaylistData(null, previousScrollTop);" `
+        "playlist reload failure position"
 
     Write-GzipText $scriptPath $script
 }
