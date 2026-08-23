@@ -494,6 +494,7 @@ test("native audio pipeline batches PCM and caches stable stream layout", () => 
   const audio = read("main", "audio_service.c");
   const output = read("main", "native_audio_output.c");
 
+  assert.match(audio, /#define ENCODED_RING_SIZE \(16 \* 1024\)/);
   assert.match(audio, /#define PCM_RING_SIZE \(16 \* 1024\)/);
   assert.match(audio, /#define PCM_PACKET_DATA_SIZE 7168/);
   assert.match(audio, /bool stream_info_ready = false/);
