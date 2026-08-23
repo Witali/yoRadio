@@ -145,6 +145,7 @@ static int decode_aac(custom_legacy_decoder *decoder,
         return 1;
     }
     if (sync) consume_input(decoder, static_cast<size_t>(sync), stats);
+    if (decoder->input_size < 7) return 1;
     size_t frame_size = adts_frame_size(decoder->input, decoder->input_size);
     if (!frame_size || frame_size > kMaximumInputCapacity) return -11;
     if (decoder->input_size < frame_size) return 1;
@@ -328,9 +329,13 @@ extern "C" int custom_legacy_decoder_feed(
         int result = decoder->kind == CUSTOM_LEGACY_AAC
                          ? decode_aac(decoder, callback, user, stats)
                          : decode_mp3(decoder, callback, user, stats);
-        if (result < 0 || result == 1) return result;
+        if (result < 0) return result;
+        if (result == 1) {
+            if (!eos) return 1;
+            consume_input(decoder, decoder->input_size, stats);
+            return 0;
+        }
         if (decoder->input_size >= before) return -3;
     }
-    (void)eos;
     return 0;
 }
