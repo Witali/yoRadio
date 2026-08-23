@@ -173,11 +173,12 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
     }
     char settings[512];
     snprintf(settings, sizeof(settings),
-             "{\"sst\":0,\"aif\":1,\"vu\":0,\"softr\":0,\"vut\":0,"
+             "{\"sst\":%u,\"aif\":1,\"vu\":0,\"softr\":0,\"vut\":0,"
              "\"mdns\":\"yoradio\",\"ipaddr\":\"%s\",\"abuff\":16,"
              "\"mp3decoder\":0,\"normalize\":0,\"normgain\":20,"
              "\"normtarget\":-3,\"normtime\":2000,\"telnet\":0,"
              "\"watchdog\":1}",
+             radio_control_smartstart_enabled() ? 1U : 0U,
              address);
     return ws_send_request(request, settings);
 }
@@ -259,7 +260,7 @@ static void handle_command(httpd_req_t *request, char *command) {
         radio_control_play((uint16_t)strtoul(value, NULL, 10));
         send_initial_state(request);
     } else if (strcmp(command, "stop") == 0) {
-        audio_service_stop();
+        radio_control_stop();
         send_initial_state(request);
     } else if (strcmp(command, "toggle") == 0) {
         radio_control_toggle();
@@ -273,6 +274,15 @@ static void handle_command(httpd_req_t *request, char *command) {
         unsigned volume = strtoul(value, NULL, 10);
         native_audio_output_set_volume(volume > 254 ? 254 : (uint8_t)volume);
         send_initial_state(request);
+    } else if (strcmp(command, "smartstart") == 0) {
+        esp_err_t result = radio_control_set_smartstart_enabled(
+            strtoul(value, NULL, 10) != 0);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Smart Start update failed: %s",
+                     esp_err_to_name(result));
+        }
+        send_system_settings(request);
+
     } else if (strcmp(command, "brightness") == 0 ||
                strcmp(command, "dim") == 0) {
         unsigned brightness = strtoul(value, NULL, 10);

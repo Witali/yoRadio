@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "esp_err.h"
@@ -8,8 +9,11 @@
 
 esp_err_t radio_control_init(native_state_t *state);
 esp_err_t radio_control_play(uint16_t item);
+esp_err_t radio_control_stop(void);
 esp_err_t radio_control_toggle(void);
 esp_err_t radio_control_next(void);
 esp_err_t radio_control_previous(void);
+bool radio_control_smartstart_enabled(void);
+esp_err_t radio_control_set_smartstart_enabled(bool enabled);
 uint16_t radio_control_current_item(void);
 void radio_control_current_name(char *name, size_t name_size);

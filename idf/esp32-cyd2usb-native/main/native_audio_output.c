@@ -11,19 +11,52 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "native_audio_settings.h"
 #include "sdkconfig.h"
 
 #define OUTPUT_PACKET_BYTES 3072
+#define SAMPLE_GAIN_SCALE 32768U
+#define VOLUME_DENOMINATOR 254U
+#define BALANCE_DENOMINATOR 16U
 
 static const char *const TAG = "audio_output";
 
-static int16_t pcm_mono_sample(const uint8_t *frame, uint8_t channels) {
+static int16_t scale_sample_q15(int16_t sample, uint32_t gain_q15) {
+    int32_t scaled = (int32_t)sample * (int32_t)gain_q15;
+    if (scaled >= 0) {
+        return (int16_t)((scaled + SAMPLE_GAIN_SCALE / 2U) /
+                         SAMPLE_GAIN_SCALE);
+    }
+    return (int16_t)-(((-scaled) + SAMPLE_GAIN_SCALE / 2U) /
+                      SAMPLE_GAIN_SCALE);
+}
+
+static uint32_t channel_gain_q15(uint8_t volume, uint8_t balance_gain) {
+    const uint32_t denominator =
+        VOLUME_DENOMINATOR * BALANCE_DENOMINATOR;
+    uint32_t numerator = (uint32_t)volume * balance_gain;
+    return (numerator * SAMPLE_GAIN_SCALE + denominator / 2U) / denominator;
+}
+
+static int16_t pcm_mono_sample(const uint8_t *frame, uint8_t channels,
+                               uint8_t volume, int8_t balance) {
     int16_t left;
     memcpy(&left, frame, sizeof(left));
-    if (channels < 2) return left;
+    if (channels < 2) {
+        return scale_sample_q15(
+            left, channel_gain_q15(volume, BALANCE_DENOMINATOR));
+    }
 
     int16_t right;
     memcpy(&right, frame + sizeof(right), sizeof(right));
+    uint8_t left_balance =
+        balance < 0 ? (uint8_t)((int)BALANCE_DENOMINATOR + balance)
+                    : BALANCE_DENOMINATOR;
+    uint8_t right_balance =
+        balance > 0 ? (uint8_t)(BALANCE_DENOMINATOR - balance)
+                    : BALANCE_DENOMINATOR;
+    left = scale_sample_q15(left, channel_gain_q15(volume, left_balance));
+    right = scale_sample_q15(right, channel_gain_q15(volume, right_balance));
     return (int16_t)(((int32_t)left + (int32_t)right) / 2);
 }
 
@@ -274,10 +307,12 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     }
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
+    uint8_t volume = native_audio_settings_get_volume();
+    int8_t balance = native_audio_settings_get_balance();
     for (size_t frame = 0; frame < frames; ++frame) {
         ESP_RETURN_ON_ERROR(
             pdm_write_resampled(pcm_mono_sample(data + frame * frame_bytes,
-                                                channels)),
+                                                channels, volume, balance)),
             TAG, "write PDM PCM");
     }
     return ESP_OK;
@@ -338,10 +373,12 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     }
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
+    uint8_t volume = native_audio_settings_get_volume();
+    int8_t balance = native_audio_settings_get_balance();
     if (frames > OUTPUT_PACKET_BYTES) frames = OUTPUT_PACKET_BYTES;
     for (size_t frame = 0; frame < frames; ++frame) {
-        int32_t value = (pcm_mono_sample(data + frame * frame_bytes, channels)
-                         >> 8) + 128;
+        int32_t value = (pcm_mono_sample(data + frame * frame_bytes, channels,
+                                         volume, balance) >> 8) + 128;
         if (value < 0) value = 0;
         if (value > 255) value = 255;
         s_dac_data[frame] = (uint8_t)value;
@@ -500,9 +537,11 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t frames = size / frame_bytes;
     size_t capacity = LEGACY_OUTPUT_BYTES / sizeof(uint32_t);
     size_t buffered = 0;
+    uint8_t volume = native_audio_settings_get_volume();
+    int8_t balance = native_audio_settings_get_balance();
     for (size_t frame = 0; frame < frames; ++frame) {
-        int16_t pcm =
-            pcm_mono_sample(data + frame * frame_bytes, channels);
+        int16_t pcm = pcm_mono_sample(data + frame * frame_bytes, channels,
+                                      volume, balance);
         for (uint32_t phase = 0; phase < LEGACY_OVERSAMPLE_FACTOR; ++phase) {
             uint8_t code = legacy_fractional_dac_step(pcm);
             s_legacy_frames[buffered++] = legacy_pack_dac_code(code);
@@ -531,3 +570,26 @@ const char *native_audio_output_name(void) {
 #else
 #error Select a yoRadio native audio output backend
 #endif
+
+void native_audio_output_set_volume(uint8_t volume) {
+    esp_err_t result = native_audio_settings_set_volume(volume);
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "Schedule volume save failed: %s",
+                 esp_err_to_name(result));
+    }
+}
+
+uint8_t native_audio_output_get_volume(void) {
+    return native_audio_settings_get_volume();
+}
+
+void native_audio_output_set_balance(int8_t balance) {
+    esp_err_t result = native_audio_settings_set_balance(balance);
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "Balance save failed: %s", esp_err_to_name(result));
+    }
+}
+
+int8_t native_audio_output_get_balance(void) {
+    return native_audio_settings_get_balance();
+}

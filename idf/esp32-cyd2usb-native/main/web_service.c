@@ -1,6 +1,7 @@
 #include "web_service.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "audio_service.h"
@@ -8,6 +9,7 @@
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "esp_netif.h"
+#include "native_audio_output.h"
 #include "network_service.h"
 
 static const char *const TAG = "web";
@@ -24,9 +26,10 @@ static esp_err_t status_handler(httpd_req_t *request) {
     snprintf(body, sizeof(body),
              "{\"firmware\":\"esp-idf-native\",\"arduino\":false,"
              "\"network\":\"%s\",\"audio\":%s,\"station\":\"%s\","
-             "\"format\":\"%s\"}",
+             "\"format\":\"%s\",\"volume\":%u,\"balance\":%d}",
              mode, state.audio_running ? "true" : "false", state.station,
-             state.stream_format);
+             state.stream_format, native_audio_output_get_volume(),
+             native_audio_output_get_balance());
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return httpd_resp_sendstr(request, body);
@@ -85,6 +88,35 @@ static esp_err_t stop_handler(httpd_req_t *request) {
     audio_service_stop();
     httpd_resp_set_type(request, "application/json");
     return httpd_resp_sendstr(request, "{\"playing\":false}");
+}
+
+static esp_err_t settings_handler(httpd_req_t *request) {
+    if (request->method == HTTP_POST) {
+        char query[80];
+        char value[16];
+        if (httpd_req_get_url_query_str(request, query, sizeof(query)) != ESP_OK) {
+            return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
+                                       "Missing settings query");
+        }
+        if (httpd_query_key_value(query, "volume", value, sizeof(value)) == ESP_OK) {
+            unsigned long volume = strtoul(value, NULL, 10);
+            if (volume > 254U) volume = 254U;
+            native_audio_output_set_volume((uint8_t)volume);
+        }
+        if (httpd_query_key_value(query, "balance", value, sizeof(value)) == ESP_OK) {
+            long balance = strtol(value, NULL, 10);
+            if (balance < -16) balance = -16;
+            if (balance > 16) balance = 16;
+            native_audio_output_set_balance((int8_t)balance);
+        }
+    }
+
+    char body[64];
+    snprintf(body, sizeof(body), "{\"volume\":%u,\"balance\":%d}",
+             native_audio_output_get_volume(), native_audio_output_get_balance());
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return httpd_resp_sendstr(request, body);
 }
 
 static const char *content_type(const char *path) {
@@ -169,6 +201,16 @@ esp_err_t web_service_start(native_state_t *state) {
         .method = HTTP_POST,
         .handler = stop_handler,
     };
+    httpd_uri_t settings_get = {
+        .uri = "/api/native/settings",
+        .method = HTTP_GET,
+        .handler = settings_handler,
+    };
+    httpd_uri_t settings_post = {
+        .uri = "/api/native/settings*",
+        .method = HTTP_POST,
+        .handler = settings_handler,
+    };
     httpd_uri_t files = {
         .uri = "/*",
         .method = HTTP_GET,
@@ -182,6 +224,10 @@ esp_err_t web_service_start(native_state_t *state) {
                         "Play route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &stop), TAG,
                         "Stop route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &settings_get), TAG,
+                        "Settings GET route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &settings_post), TAG,
+                        "Settings POST route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &files), TAG,
                         "Static route registration failed");
     if (state->lock && xSemaphoreTake(state->lock, pdMS_TO_TICKS(100))) {

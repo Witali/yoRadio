@@ -14,6 +14,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_state.h"
+#include "native_audio_settings.h"
 #include "network_service.h"
 #include "nvs_flash.h"
 #include "oled_display.h"
@@ -593,6 +594,7 @@ void app_main(void) {
         ESP_LOGE(TAG, "NVS init failed without erase: %s",
                  esp_err_to_name(result));
     }
+    ESP_ERROR_CHECK(native_audio_settings_init());
     result = mount_spiffs();
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "SPIFFS mount failed without format: %s",

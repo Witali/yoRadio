@@ -2,7 +2,6 @@
 
 #include <limits.h>
 #include <stdbool.h>
-#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,6 +13,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "native_audio_settings.h"
 #include "soc/soc_caps.h"
 
 #if SOC_I2S_PDM_MAX_TX_LINES < 2
@@ -40,8 +40,6 @@ static bool s_resampler_has_previous;
 static int16_t s_previous_left;
 static int16_t s_previous_right;
 static uint32_t s_resampler_next_phase;
-static atomic_uchar s_volume;
-static atomic_schar s_balance;
 
 static int16_t scale_sample_q15(int16_t sample, uint32_t gain_q15) {
     int32_t scaled = (int32_t)sample * (int32_t)gain_q15;
@@ -255,8 +253,6 @@ static esp_err_t pdm_write_resampled(int16_t left, int16_t right) {
 
 esp_err_t native_audio_output_init(void) {
     hold_pdm_low();
-    atomic_init(&s_volume, 192);
-    atomic_init(&s_balance, 0);
     return ESP_OK;
 }
 
@@ -284,13 +280,13 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
     uint16_t peak = 0;
-    uint8_t volume = atomic_load(&s_volume);
-    int8_t balance = atomic_load(&s_balance);
+    uint8_t volume = native_audio_settings_get_volume();
+    int8_t balance = native_audio_settings_get_balance();
     uint8_t left_balance =
-        balance > 0 ? (uint8_t)(BALANCE_DENOMINATOR - balance)
+        balance < 0 ? (uint8_t)((int)BALANCE_DENOMINATOR + balance)
                     : BALANCE_DENOMINATOR;
     uint8_t right_balance =
-        balance < 0 ? (uint8_t)((int)BALANCE_DENOMINATOR + balance)
+        balance > 0 ? (uint8_t)(BALANCE_DENOMINATOR - balance)
                     : BALANCE_DENOMINATOR;
     uint32_t left_gain_q15 = channel_gain_q15(volume, left_balance);
     uint32_t right_gain_q15 = channel_gain_q15(volume, right_balance);
@@ -314,22 +310,26 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
 }
 
 void native_audio_output_set_volume(uint8_t volume) {
-    if (volume > VOLUME_DENOMINATOR) volume = VOLUME_DENOMINATOR;
-    atomic_store(&s_volume, volume);
+    esp_err_t result = native_audio_settings_set_volume(volume);
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "Schedule volume save failed: %s",
+                 esp_err_to_name(result));
+    }
 }
 
 uint8_t native_audio_output_get_volume(void) {
-    return atomic_load(&s_volume);
+    return native_audio_settings_get_volume();
 }
 
 void native_audio_output_set_balance(int8_t balance) {
-    if (balance < -16) balance = -16;
-    if (balance > 16) balance = 16;
-    atomic_store(&s_balance, balance);
+    esp_err_t result = native_audio_settings_set_balance(balance);
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "Balance save failed: %s", esp_err_to_name(result));
+    }
 }
 
 int8_t native_audio_output_get_balance(void) {
-    return atomic_load(&s_balance);
+    return native_audio_settings_get_balance();
 }
 
 void native_audio_output_idle(void) {
