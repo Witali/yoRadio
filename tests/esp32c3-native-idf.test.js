@@ -884,3 +884,26 @@ test("native SPIFFS image contains the shared WebUI and repository playlist", ()
   assert.match(component, /playlist\.csv" COPYONLY/);
   assert.match(component, /spiffs_create_partition_image\(spiffs "\$\{NATIVE_SPIFFS_ROOT\}"/);
 });
+
+test("native radio persists and restores the last selected station", () => {
+  const controls = read("main", "radio_control.c");
+
+  assert.match(controls, /RADIO_NVS_NAMESPACE "radio"/);
+  assert.match(controls, /RADIO_NVS_LAST_STATION "last_station"/);
+  assert.match(
+    controls,
+    /load_last_station\(&saved_item\)[\s\S]*s_current_item = saved_item/,
+  );
+  assert.match(
+    controls,
+    /audio_service_play\(s_candidate_url,[\s\S]*s_current_item = item[\s\S]*save_last_station\(item\)/,
+  );
+  assert.match(
+    controls,
+    /nvs_set_u16\(handle, RADIO_NVS_LAST_STATION, item\)[\s\S]*nvs_commit\(handle\)/,
+  );
+  assert.match(
+    controls,
+    /playlist_station\(s_current_item,[\s\S]*s_current_item = 1/,
+  );
+});

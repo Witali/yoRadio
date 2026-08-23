@@ -8,8 +8,11 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#include "nvs.h"
 
 #define PLAYLIST_PATH "/spiffs/data/playlist.csv"
+#define RADIO_NVS_NAMESPACE "radio"
+#define RADIO_NVS_LAST_STATION "last_station"
 
 static const char *const TAG = "radio_control";
 static SemaphoreHandle_t s_lock;
@@ -23,6 +26,46 @@ static char s_current_url[512];
 static char s_playlist_line[768];
 static char s_candidate_name[144];
 static char s_candidate_url[512];
+
+static bool load_last_station(uint16_t *item) {
+    nvs_handle_t handle;
+    esp_err_t result = nvs_open(RADIO_NVS_NAMESPACE, NVS_READONLY, &handle);
+    if (result == ESP_ERR_NVS_NOT_FOUND) return false;
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "Last station storage unavailable: %s",
+                 esp_err_to_name(result));
+        return false;
+    }
+
+    uint16_t saved = 0;
+    result = nvs_get_u16(handle, RADIO_NVS_LAST_STATION, &saved);
+    nvs_close(handle);
+    if (result == ESP_ERR_NVS_NOT_FOUND) return false;
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "Could not read last station: %s",
+                 esp_err_to_name(result));
+        return false;
+    }
+    if (!saved) {
+        ESP_LOGW(TAG, "Ignoring invalid saved station 0");
+        return false;
+    }
+    *item = saved;
+    return true;
+}
+
+static esp_err_t save_last_station(uint16_t item) {
+    nvs_handle_t handle;
+    ESP_RETURN_ON_ERROR(
+        nvs_open(RADIO_NVS_NAMESPACE, NVS_READWRITE, &handle), TAG,
+        "Open last station storage");
+    esp_err_t result = nvs_set_u16(handle, RADIO_NVS_LAST_STATION, item);
+    if (result == ESP_OK) result = nvs_commit(handle);
+    nvs_close(handle);
+    ESP_RETURN_ON_ERROR(result, TAG, "Save last station");
+    ESP_LOGI(TAG, "Saved last station: %u", item);
+    return ESP_OK;
+}
 
 static bool playlist_station(uint16_t requested, char *name,
                              size_t name_size, char *url, size_t url_size) {
@@ -74,6 +117,13 @@ static esp_err_t play_locked(uint16_t item) {
     s_current_item = item;
     strlcpy(s_current_name, s_candidate_name, sizeof(s_current_name));
     strlcpy(s_current_url, s_candidate_url, sizeof(s_current_url));
+    esp_err_t save_result = save_last_station(item);
+    if (save_result != ESP_OK) {
+        // Playback has already started successfully. Keep it running and make
+        // the persistence failure visible in the diagnostic log.
+        ESP_LOGW(TAG, "Station %u is playing but was not saved: %s", item,
+                 esp_err_to_name(save_result));
+    }
     ESP_LOGI(TAG, "Selected station %u: %s", item, s_candidate_name);
     return ESP_OK;
 }
@@ -83,6 +133,11 @@ esp_err_t radio_control_init(native_state_t *state) {
     if (!s_lock) s_lock = xSemaphoreCreateMutex();
     ESP_RETURN_ON_FALSE(s_lock, ESP_ERR_NO_MEM, TAG, "control mutex allocation");
     s_state = state;
+    uint16_t saved_item = 0;
+    if (load_last_station(&saved_item)) {
+        s_current_item = saved_item;
+        ESP_LOGI(TAG, "Restoring last station: %u", s_current_item);
+    }
     if (playlist_station(s_current_item, s_candidate_name,
                          sizeof(s_candidate_name), s_candidate_url,
                          sizeof(s_candidate_url))) {
@@ -90,8 +145,16 @@ esp_err_t radio_control_init(native_state_t *state) {
         strlcpy(s_current_url, s_candidate_url, sizeof(s_current_url));
         native_state_set_station(s_state, s_current_name);
     } else {
-        ESP_LOGW(TAG, "Initial station %u is absent from playlist",
+        ESP_LOGW(TAG, "Saved station %u is absent from playlist; using 1",
                  s_current_item);
+        s_current_item = 1;
+        if (playlist_station(s_current_item, s_candidate_name,
+                             sizeof(s_candidate_name), s_candidate_url,
+                             sizeof(s_candidate_url))) {
+            strlcpy(s_current_name, s_candidate_name, sizeof(s_current_name));
+            strlcpy(s_current_url, s_candidate_url, sizeof(s_current_url));
+            native_state_set_station(s_state, s_current_name);
+        }
     }
     return ESP_OK;
 }
