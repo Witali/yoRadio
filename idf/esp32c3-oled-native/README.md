@@ -127,12 +127,18 @@ an HLS manifest into a supported stream.
 
 ## Storage compatibility
 
-The partition table matches Arduino-ESP32's 4 MiB `min_spiffs` layout:
+The native 4 MiB partition table keeps dual OTA while reserving 256 KiB for
+SPIFFS:
 
 - NVS at `0x9000`;
-- OTA application slots at `0x10000` and `0x1f0000`;
-- SPIFFS at `0x3d0000`, size 128 KiB;
+- 1856 KiB OTA application slots at `0x10000` and `0x1e0000`;
+- SPIFFS at `0x3b0000`, size 256 KiB;
 - coredump partition at `0x3f0000`.
+
+Changing from the former 128 KiB layout moves SPIFFS from `0x3d0000` to
+`0x3b0000`. Back up `/data/wifi.csv` and `/data/playlist.csv` before the first
+serial reflash, then write the new partition table and SPIFFS image together;
+flashing the application alone cannot migrate the existing filesystem.
 
 Flashing only `app-flash` preserves Wi-Fi settings, playlists and WebUI. Use
 `spiffs-flash` only when the filesystem should be replaced explicitly.

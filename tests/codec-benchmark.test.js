@@ -32,7 +32,7 @@ test('codec benchmark flashes and runs the same checked fixture matrix', () => {
     assert.match(runner, new RegExp(fixture.replace('.', '\\.')));
   }
   assert.match(runner, /0x190000/);
-  assert.match(runner, /0x240000/);
+  assert.match(runner, /0x220000/);
   assert.match(runner, /0x59434658/);
   assert.match(runner, /IO\.BinaryWriter/);
   assert.match(runner, /System\.IO\.Ports\.SerialPort/);
@@ -46,8 +46,8 @@ test('codec benchmark firmware uses all non-SPIFFS flash without OTA', () => {
   const builder = read('tools', 'codec_benchmark', 'build.ps1');
 
   assert.match(partitions, /factory,\s+app,\s+factory,\s+0x10000,\s+0x180000/);
-  assert.match(partitions, /codec_test,\s+data,\s+0x40,\s+0x190000,\s+0x240000/);
-  assert.match(partitions, /spiffs,\s+data,\s+spiffs,\s+0x3D0000/);
+  assert.match(partitions, /codec_test,\s+data,\s+0x40,\s+0x190000,\s+0x220000/);
+  assert.match(partitions, /spiffs,\s+data,\s+spiffs,\s+0x3B0000,\s+0x40000/);
   assert.doesNotMatch(partitions, /ota_[01]|otadata/);
   assert.match(builder, /YORADIO_CODEC_BENCHMARK=ON/);
   assert.match(builder, /sdkconfig\.codec-benchmark\.defaults/);
@@ -91,7 +91,7 @@ test('MP3 backend benchmark selects all decoders and saves reproducible results'
   assert.match(runner, /finally/);
   assert.match(runner, /sdkconfig\.mp3-espressif\.defaults/);
   assert.match(runner, /"0x10000", \$normalApp/);
-  assert.match(runner, /"0x1f0000", \$normalApp/);
-  assert.doesNotMatch(runner, /"0x3d0000"/);
+  assert.match(runner, /"0x1e0000", \$normalApp/);
+  assert.doesNotMatch(runner, /"0x3b0000"/);
   assert.match(runner, /SPIFFS and NVS were preserved/);
 });

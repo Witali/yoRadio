@@ -663,12 +663,12 @@ test("native benchmark build reads codec fixtures only from dedicated flash", ()
   assert.match(app, /Codec benchmark mode: network, WebUI and display disabled/);
 });
 
-test("native partition table stays compatible with min_spiffs", () => {
+test("native partition table reserves 256 KiB for SPIFFS with dual OTA", () => {
   const partitions = read("partitions.csv");
 
-  assert.match(partitions, /app0,\s+app,\s+ota_0,\s+0x10000,\s+0x1E0000/);
-  assert.match(partitions, /app1,\s+app,\s+ota_1,\s+0x1F0000,\s+0x1E0000/);
-  assert.match(partitions, /spiffs,\s+data,\s+spiffs,\s+0x3D0000,\s+0x20000/);
+  assert.match(partitions, /app0,\s+app,\s+ota_0,\s+0x10000,\s+0x1D0000/);
+  assert.match(partitions, /app1,\s+app,\s+ota_1,\s+0x1E0000,\s+0x1D0000/);
+  assert.match(partitions, /spiffs,\s+data,\s+spiffs,\s+0x3B0000,\s+0x40000/);
 });
 
 test("native C3 uses wifi.csv as its only persistent credential source", () => {

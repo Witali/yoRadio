@@ -32,7 +32,7 @@ if (-not (Test-Path -LiteralPath $fixture -PathType Leaf)) {
     if ($LASTEXITCODE -ne 0) { throw "Fixture generation failed" }
 }
 $fixtureSize = (Get-Item -LiteralPath $fixture).Length
-if ($fixtureSize + 16 -gt 0x240000) {
+if ($fixtureSize + 16 -gt 0x220000) {
     throw "MP3 fixture exceeds the codec_test partition"
 }
 
@@ -204,7 +204,7 @@ if (-not $SkipRestore) {
         "0x8000", (Join-Path $normal "partition_table\partition-table.bin"),
         "0xe000", (Join-Path $normal "ota_data_initial.bin"),
         "0x10000", $normalApp,
-        "0x1f0000", $normalApp
+        "0x1e0000", $normalApp
     )
     Invoke-Esptool $restoreFlash
     Write-Host "Normal firmware restored; SPIFFS and NVS were preserved."

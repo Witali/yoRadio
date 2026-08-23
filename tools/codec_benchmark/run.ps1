@@ -33,8 +33,8 @@ foreach ($fixture in $fixtures) {
         throw "Missing fixture: $file"
     }
     $size = (Get-Item -LiteralPath $file).Length
-    if ($size + 16 -gt 0x240000) {
-        throw "$($fixture.File) exceeds the 0x240000-byte codec_test partition"
+    if ($size + 16 -gt 0x220000) {
+        throw "$($fixture.File) exceeds the 0x220000-byte codec_test partition"
     }
 
     $staged = Join-Path $FixtureDirectory "fixture.bin"
