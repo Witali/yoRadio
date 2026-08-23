@@ -575,7 +575,11 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
     assert.match(kconfig, new RegExp(symbol));
   }
   assert.match(kconfig, /default YORADIO_MP3_DECODER_MINIMP3/);
-  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/);
+  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_HELIX=y/);
+  assert.doesNotMatch(
+    defaults,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/m,
+  );
   assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y/);
   assert.match(component, /aac_decoder\/aac_decoder\.cpp/);
   assert.match(component, /mp3_decoder\/mp3_decoder\.cpp/);
@@ -586,7 +590,7 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
   assert.match(audio, /custom_legacy_decoder_feed/);
 });
 
-test("minimp3 is the default for every Arduino and native board path", () => {
+test("C3 defaults to real-time Helix while Arduino and CYD keep minimp3", () => {
   const selector = fs.readFileSync(
     path.join(
       root,
@@ -620,7 +624,11 @@ test("minimp3 is the default for every Arduino and native board path", () => {
 
   assert.match(selector, /selectedBackend = MP3_DECODER_MINIMP3/);
   assert.match(config, /store\.mp3Decoder = 1; \/\/ minimp3/);
-  assert.match(c3Defaults, /CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/);
+  assert.match(c3Defaults, /CONFIG_YORADIO_MP3_DECODER_HELIX=y/);
+  assert.doesNotMatch(
+    c3Defaults,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/m,
+  );
   assert.match(cydDefaults, /CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/);
   assert.match(cydAudio, /custom_legacy_decoder_feed/);
   assert.doesNotMatch(

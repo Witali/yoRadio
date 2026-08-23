@@ -90,7 +90,7 @@ alternative implementation in this repository:
 
 | Codec | Implementations | Default |
 |---|---|---|
-| MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | minimp3 |
+| MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | Helix |
 | AAC | Espressif, yoRadio Helix AAC-LC | Espressif |
 | FLAC | optimized yoRadio FLAC, Espressif | yoRadio |
 
@@ -101,6 +101,12 @@ and Opus keep their single Espressif implementation because the repository has
 no independent alternative for them. The yoRadio backends compile directly
 from the shared sources through a small ESP-IDF compatibility layer; Arduino
 Core is not linked.
+
+The single-core ESP32-C3 profile intentionally overrides the repository-wide
+minimp3 preference. On this 160 MHz RISC-V target, a 128 kbit/s stereo stream
+measured about 29-30% decoder time with Helix (roughly 3.4x real-time headroom),
+while scalar minimp3 required about 3.8x the available real-time CPU budget and
+starved the audio, BOOT-button and WebSocket tasks.
 
 ### Network stream transports
 
