@@ -241,6 +241,13 @@ extern "C" void custom_flac_decoder_destroy(custom_flac_decoder_t *decoder) {
     delete decoder;
 }
 
+extern "C" size_t custom_flac_decoder_memory_used(
+    const custom_flac_decoder_t *decoder) {
+    if (!decoder) return 0;
+    return sizeof(*decoder) + decoder->input_capacity +
+           FLACDecoder_GetAllocatedBytes();
+}
+
 extern "C" int custom_flac_decoder_feed(
     custom_flac_decoder_t *decoder, const uint8_t *data, size_t size, bool eos,
     custom_flac_pcm_callback_t callback, void *user,

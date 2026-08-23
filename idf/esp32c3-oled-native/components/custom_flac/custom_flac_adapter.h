@@ -30,6 +30,7 @@ typedef bool (*custom_flac_pcm_callback_t)(
 
 custom_flac_decoder_t *custom_flac_decoder_create(void);
 void custom_flac_decoder_destroy(custom_flac_decoder_t *decoder);
+size_t custom_flac_decoder_memory_used(const custom_flac_decoder_t *decoder);
 
 // Returns 0 when the data was accepted, 1 when the stream needs more data,
 // and a negative value for an invalid or unsupported FLAC stream.

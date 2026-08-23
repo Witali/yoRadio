@@ -836,6 +836,13 @@ static void decoder_task(void *argument) {
                     state_set_audio(false, "decoder allocation failed");
                     failed_generation = generation;
                 }
+#ifdef YORADIO_CODEC_BENCHMARK
+                if (flac_decoder) {
+                    benchmark_log_memory(
+                        "open", codec, decoder_heap_before,
+                        custom_flac_decoder_memory_used(flac_decoder));
+                }
+#endif
             } else
 #endif
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
@@ -922,6 +929,14 @@ static void decoder_task(void *argument) {
                     stats.max_call_us = feed_stats.max_call_us;
                 }
                 stats.input_bytes += feed_stats.input_bytes;
+#ifdef YORADIO_CODEC_BENCHMARK
+                if (!first_frame_memory_reported && stream_info_ready) {
+                    benchmark_log_memory(
+                        "first-frame", codec, decoder_heap_before,
+                        custom_flac_decoder_memory_used(flac_decoder));
+                    first_frame_memory_reported = true;
+                }
+#endif
                 decode_stats_report(&stats, esp_timer_get_time());
                 if (result < 0 && generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom FLAC decode error: %d", result);

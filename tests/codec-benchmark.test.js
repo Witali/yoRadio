@@ -58,6 +58,10 @@ test('codec benchmark reports comparable decoder heap and payload memory', () =>
                        'custom_legacy_adapter.cpp');
   const header = read('idf', 'components', 'custom_legacy_codecs',
                       'custom_legacy_adapter.h');
+  const flacAdapter = read('idf', 'esp32c3-oled-native', 'components',
+                           'custom_flac', 'custom_flac_adapter.cpp');
+  const flacHeader = read('idf', 'esp32c3-oled-native', 'components',
+                          'custom_flac', 'custom_flac_adapter.h');
 
   assert.match(audio, /MEM %s %s: heap_before/);
   assert.match(audio, /heap_caps_get_largest_free_block/);
@@ -65,6 +69,10 @@ test('codec benchmark reports comparable decoder heap and payload memory', () =>
   assert.match(audio, /"first-frame"/);
   assert.match(adapter, /CodecArenaUsed()/);
   assert.match(header, /custom_legacy_decoder_memory_used/);
+  assert.match(flacAdapter, /FLACDecoder_GetAllocatedBytes\(\)/);
+  assert.match(flacHeader, /custom_flac_decoder_memory_used/);
+  assert.equal((audio.match(/custom_flac_decoder_memory_used/g) || []).length,
+               2);
 });
 
 test('MP3 backend benchmark selects all decoders and saves reproducible results', () => {
