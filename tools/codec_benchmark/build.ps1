@@ -3,7 +3,7 @@ param(
     [string]$BuildDirectory = "build-codec-benchmark",
     [string]$DependencyRoot = "",
     [ValidateSet("espressif", "helix", "minimp3")]
-    [string]$Mp3Decoder = "helix",
+    [string]$Mp3Decoder = "espressif",
     [switch]$Setup,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")

@@ -90,7 +90,7 @@ alternative implementation in this repository:
 
 | Codec | Implementations | Default |
 |---|---|---|
-| MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | Helix |
+| MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | Espressif |
 | AAC | Espressif, yoRadio Helix AAC-LC | Espressif |
 | FLAC | optimized yoRadio FLAC, Espressif | yoRadio |
 
@@ -100,13 +100,14 @@ SDK defaults file. Only the chosen backend is registered and linked. Vorbis
 and Opus keep their single Espressif implementation because the repository has
 no independent alternative for them. The yoRadio backends compile directly
 from the shared sources through a small ESP-IDF compatibility layer; Arduino
-Core is not linked.
+Core is not linked. Backend alternatives are compile-time diagnostics and are
+not exposed as a WebUI setting.
 
-The single-core ESP32-C3 profile intentionally overrides the repository-wide
-minimp3 preference. On this 160 MHz RISC-V target, a 128 kbit/s stereo stream
-measured about 29-30% decoder time with Helix (roughly 3.4x real-time headroom),
-while scalar minimp3 required about 3.8x the available real-time CPU budget and
-starved the audio, BOOT-button and WebSocket tasks.
+Both native ESP-IDF profiles default to Espressif MP3. With the deterministic
+320 kbit/s fixture, the 160 MHz C3 measured 27.9% decoder time for Espressif
+(3.57x real-time headroom) and 30.2% for Helix, while scalar minimp3 required
+407.9% of the available real-time CPU budget and starved the audio, BOOT-button
+and WebSocket tasks.
 
 ### Network stream transports
 

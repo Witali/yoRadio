@@ -2,19 +2,19 @@ menu "yoRadio codec backends"
 
 choice YORADIO_MP3_DECODER
     prompt "MP3 decoder implementation"
-    default YORADIO_MP3_DECODER_MINIMP3
+    default YORADIO_MP3_DECODER_ESPRESSIF
     help
         Select one MP3 decoder at build time. Helix and minimp3 reuse the
         codec sources shipped with yoRadio; Espressif uses esp_audio_codec.
 
     config YORADIO_MP3_DECODER_ESPRESSIF
-        bool "Espressif esp_audio_codec MP3"
+        bool "Espressif esp_audio_codec MP3 (recommended)"
 
     config YORADIO_MP3_DECODER_HELIX
         bool "yoRadio Helix MP3"
 
     config YORADIO_MP3_DECODER_MINIMP3
-        bool "yoRadio minimp3 (recommended)"
+        bool "yoRadio minimp3"
 endchoice
 
 choice YORADIO_AAC_DECODER

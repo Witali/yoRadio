@@ -187,7 +187,7 @@ stereoOutput
 Обе native-прошивки должны получить:
 
 - одинаковое определение MP3, AAC, FLAC, Vorbis и Opus;
-- minimp3 по умолчанию;
+- Espressif `esp_audio_codec` MP3 по умолчанию; Helix и minimp3 доступны только как варианты сборки;
 - альтернативные декодеры через Kconfig;
 - общий ICY parser;
 - HTTPS и проверку сертификатов;

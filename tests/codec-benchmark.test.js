@@ -81,7 +81,7 @@ test('MP3 backend benchmark selects all decoders and saves reproducible results'
   assert.match(runner, /0x190000/);
   assert.match(runner, /summary\.csv/);
   assert.match(runner, /finally/);
-  assert.match(runner, /sdkconfig\.mp3-helix\.defaults/);
+  assert.match(runner, /sdkconfig\.mp3-espressif\.defaults/);
   assert.match(runner, /"0x10000", \$normalApp/);
   assert.match(runner, /"0x1f0000", \$normalApp/);
   assert.doesNotMatch(runner, /"0x3d0000"/);

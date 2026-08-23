@@ -62,8 +62,9 @@ Arduino WebSocket protocol:
 
 Supported decoder selections are `auto`, `mp3`, `aac`, `flac`, `ogg`,
 `vorbis`, and `opus` (Vorbis and Opus are detected inside the OGG container).
-MP3 uses yoRadio minimp3 by default. Espressif MP3 and yoRadio Helix MP3 remain
-available as compile-time alternatives in `menuconfig`.
+MP3 uses Espressif `esp_audio_codec` by default. yoRadio Helix MP3 and
+minimp3 remain compile-time alternatives in `menuconfig` for diagnostics and
+are not exposed as a WebUI setting.
 The optional ordinary PWM audio-level LED is disabled for CYD by default. It
 can be configured under `menuconfig -> yoRadio audio level LED` after choosing
 a GPIO verified to be free on the exact board revision.

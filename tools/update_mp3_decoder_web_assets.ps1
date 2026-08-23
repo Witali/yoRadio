@@ -44,6 +44,7 @@ function Replace-Once {
     param(
         [Parameter(Mandatory)][string]$Text,
         [Parameter(Mandatory)][string]$Old,
+        [AllowEmptyString()]
         [Parameter(Mandatory)][string]$New,
         [Parameter(Mandatory)][string]$Description
     )
@@ -57,13 +58,7 @@ function Replace-Once {
 
 $optionsPath = Join-Path $www "options.html.gz"
 $options = Read-GzipText $optionsPath
-$optionsAnchor = @'
-          </div>
-          <div class="hr">&nbsp;</div>
-          <div class="flex-row" id="mdnsnamerow">
-'@
-$optionsReplacement = @'
-          </div>
+$optionsBlock = @'
           <div class="flex-row">
             <div class="inputwrap">
               <span class="inputtitle">MP3 decoder</span>
@@ -73,42 +68,12 @@ $optionsReplacement = @'
               </select>
             </div>
           </div>
-          <div class="hr">&nbsp;</div>
-          <div class="flex-row" id="mdnsnamerow">
 '@
-$options = if($options.Contains('id="mp3decoder"')) {
-    $options
+$optionsBlock = $optionsBlock -replace "`r`n", "`n"
+if($options.Contains('id="mp3decoder"')) {
+    $options = Replace-Once $options $optionsBlock "" "MP3 decoder setting"
+    Write-GzipText $optionsPath $options
+    Write-Host "Removed MP3 decoder setting from $optionsPath"
 } else {
-    Replace-Once $options $optionsAnchor $optionsReplacement "system settings insertion point"
+    Write-Host "MP3 decoder setting is already absent from $optionsPath"
 }
-Write-GzipText $optionsPath $options
-
-$scriptPath = Join-Path $www "script.js.gz"
-$script = Read-GzipText $scriptPath
-$script = if($script.Contains("element.tagName==='SELECT'")) {
-    $script
-} else {
-    Replace-Once $script `
-        "if(element.type==='text' || element.type==='number' || element.type==='password'){" `
-        "if(element.type==='text' || element.type==='number' || element.type==='password' || element.tagName==='SELECT'){" `
-        "settings value assignment"
-}
-Write-GzipText $scriptPath $script
-
-$stylePath = Join-Path $www "style.css.gz"
-$style = Read-GzipText $stylePath
-if(!$style.Contains('input[type=number], select {')) {
-    $style = Replace-Once $style `
-        "input[type=text], input[type=password], input[type=number] {" `
-        "input[type=text], input[type=password], input[type=number], select {" `
-        "settings input style"
-}
-if(!$style.Contains('input[type=number]:focus, select:focus')) {
-    $style = Replace-Once $style `
-        "input[type=text]:focus, input[type=password]:focus, input[type=number]:focus { outline: none; }" `
-        "input[type=text]:focus, input[type=password]:focus, input[type=number]:focus, select:focus { outline: none; }" `
-        "settings focus style"
-}
-Write-GzipText $stylePath $style
-
-Write-Host "Updated MP3 decoder settings assets in $www"

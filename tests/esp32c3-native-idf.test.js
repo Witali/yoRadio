@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
+const zlib = require("node:zlib");
 
 const root = path.resolve(__dirname, "..");
 const nativeRoot = path.join(root, "idf", "esp32c3-oled-native");
@@ -574,11 +575,11 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
   ]) {
     assert.match(kconfig, new RegExp(symbol));
   }
-  assert.match(kconfig, /default YORADIO_MP3_DECODER_MINIMP3/);
-  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_HELIX=y/);
+  assert.match(kconfig, /default YORADIO_MP3_DECODER_ESPRESSIF/);
+  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
   assert.doesNotMatch(
     defaults,
-    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/m,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:HELIX|MINIMP3)=y/m,
   );
   assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y/);
   assert.match(component, /aac_decoder\/aac_decoder\.cpp/);
@@ -590,7 +591,7 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
   assert.match(audio, /custom_legacy_decoder_feed/);
 });
 
-test("C3 defaults to real-time Helix while Arduino and CYD keep minimp3", () => {
+test("native ESP-IDF boards default to Espressif MP3", () => {
   const selector = fs.readFileSync(
     path.join(
       root,
@@ -624,19 +625,31 @@ test("C3 defaults to real-time Helix while Arduino and CYD keep minimp3", () => 
 
   assert.match(selector, /selectedBackend = MP3_DECODER_MINIMP3/);
   assert.match(config, /store\.mp3Decoder = 1; \/\/ minimp3/);
-  assert.match(c3Defaults, /CONFIG_YORADIO_MP3_DECODER_HELIX=y/);
+  assert.match(c3Defaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
   assert.doesNotMatch(
     c3Defaults,
-    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/m,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:HELIX|MINIMP3)=y/m,
   );
-  assert.match(cydDefaults, /CONFIG_YORADIO_MP3_DECODER_MINIMP3=y/);
+  assert.match(cydDefaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
   assert.match(cydAudio, /custom_legacy_decoder_feed/);
   assert.doesNotMatch(
     c3Defaults + cydDefaults,
-    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/m,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:HELIX|MINIMP3)=y/m,
   );
 });
 
+
+test("shared WebUI does not expose MP3 backend selection", () => {
+  const options = zlib.gunzipSync(
+    fs.readFileSync(
+      path.join(root, "yoRadio", "data", "www", "options.html.gz"),
+    ),
+  ).toString("utf8");
+
+  assert.doesNotMatch(options, /id="mp3decoder"/i);
+  assert.doesNotMatch(options, /Helix \(legacy\)/i);
+  assert.doesNotMatch(options, /minimp3 \(new\)/i);
+});
 test("native benchmark build reads codec fixtures only from dedicated flash", () => {
   const audio = read("main", "audio_service.c");
   const app = read("main", "app_main.c");

@@ -183,13 +183,13 @@ Write-Host "Results saved to $csv"
 } finally {
 if (-not $SkipRestore) {
     Write-Host ""
-    Write-Host "=== Restoring normal Helix firmware ==="
+    Write-Host "=== Restoring normal Espressif firmware ==="
     $normalBuilder = Join-Path $project "build.ps1"
     $normalBuildDirectory = "build-normal-after-codec-benchmark"
     $normalSdkconfig = Join-Path $normalBuildDirectory "sdkconfig"
     $normalDefaults = @(
         "sdkconfig.defaults",
-        (Join-Path $PSScriptRoot "sdkconfig.mp3-helix.defaults")
+        (Join-Path $PSScriptRoot "sdkconfig.mp3-espressif.defaults")
     )
     & $normalBuilder -BuildDirectory $normalBuildDirectory -DependencyRoot $DependencyRoot -Sdkconfig $normalSdkconfig -SdkconfigDefaults $normalDefaults
     if ($LASTEXITCODE -ne 0) { throw "Normal firmware restore build failed" }

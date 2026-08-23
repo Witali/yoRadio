@@ -28,7 +28,7 @@ Run all three selectable MP3 backends against the same 320 kbit/s fixture:
 
 This three-way runner saves one serial log per backend plus a `summary.csv`
 under `.build\codec-benchmark\results\mp3-backends`. After the measurements
-it restores the normal Helix application to both OTA slots while preserving
+it restores the normal Espressif application to both OTA slots while preserving
 the existing SPIFFS files and NVS.
 
 The benchmark layout has one `0x180000` factory application and uses every byte
@@ -70,11 +70,11 @@ fixture at 320 kbit/s:
 frame. `Codec payload` is the exact custom decoder object, input buffer and
 arena use; the prebuilt Espressif library does not expose its internal split.
 
-Espressif is the fastest and uses the least heap in this isolated test. Helix
-remains safely real-time and is the default on ESP32-C3 because its source is
-integrated and controllable, at a cost of 10080 bytes of first-frame heap over
-Espressif. minimp3 has the smallest application image, but cannot run in
-real-time on the single-core soft-float C3 and must not be selected there.
+Espressif is the fastest, uses the least heap and is the native firmware
+default. Helix remains safely real-time as a compile-time comparison backend,
+at a cost of 10080 bytes of first-frame heap over Espressif. minimp3 has the
+smallest application image, but cannot run in real-time on the single-core
+soft-float C3 and must not be selected there.
 
 The measured ratio covers the prebuilt Espressif decoder call itself. The
 library's C3 archive is already compiled, so common pipeline changes are not
