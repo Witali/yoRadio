@@ -2,6 +2,8 @@
 param(
     [string]$BuildDirectory = "build-codec-benchmark",
     [string]$DependencyRoot = "",
+    [ValidateSet("espressif", "helix", "minimp3")]
+    [string]$Mp3Decoder = "helix",
     [switch]$Setup,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")
@@ -15,12 +17,14 @@ $defaults = @(
     "sdkconfig.defaults",
     "sdkconfig.codec-benchmark.defaults"
 )
+$defaults += Join-Path $PSScriptRoot "sdkconfig.mp3-$Mp3Decoder.defaults"
 $arguments = @("-D", "YORADIO_CODEC_BENCHMARK=ON") + $IdfArguments
+$sdkconfig = Join-Path $BuildDirectory "sdkconfig"
 
 & $builder `
     -BuildDirectory $BuildDirectory `
     -DependencyRoot $DependencyRoot `
-    -Sdkconfig "sdkconfig.codec-benchmark" `
+    -Sdkconfig $sdkconfig `
     -SdkconfigDefaults $defaults `
     -Setup:$Setup `
     -IdfArguments $arguments

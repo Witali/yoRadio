@@ -176,6 +176,22 @@ static const char *codec_name(native_codec_t codec) {
     }
 }
 
+#ifdef YORADIO_CODEC_BENCHMARK
+static void benchmark_log_memory(const char *stage, native_codec_t codec,
+                                 size_t heap_before, size_t codec_payload) {
+    size_t heap_now = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+    size_t heap_delta = heap_before > heap_now ? heap_before - heap_now : 0;
+    ESP_LOGI(TAG,
+             "MEM %s %s: heap_before %u, heap_now %u, heap_delta %u, "
+             "largest %u, minimum %u, codec_payload %u",
+             codec_name(codec), stage, (unsigned)heap_before,
+             (unsigned)heap_now, (unsigned)heap_delta,
+             (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_8BIT),
+             (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT),
+             (unsigned)codec_payload);
+}
+#endif
+
 static void decode_stats_reset(decode_stats_t *stats, uint32_t generation,
                                native_codec_t codec, int64_t now_us) {
     *stats = (decode_stats_t){
@@ -747,6 +763,10 @@ static void decoder_task(void *argument) {
     decode_stats_t stats = {0};
     esp_audio_simple_dec_info_t stream_info = {0};
     bool stream_info_ready = false;
+#ifdef YORADIO_CODEC_BENCHMARK
+    size_t decoder_heap_before = 0;
+    bool first_frame_memory_reported = false;
+#endif
 
     while (true) {
         uint32_t current_generation = atomic_load(&s_generation);
@@ -800,6 +820,11 @@ static void decoder_task(void *argument) {
             stream_info_ready = false;
             reset_decoder_bitrate_tracking();
             decode_stats_reset(&stats, generation, codec, esp_timer_get_time());
+#ifdef YORADIO_CODEC_BENCHMARK
+            decoder_heap_before =
+                heap_caps_get_free_size(MALLOC_CAP_8BIT);
+            first_frame_memory_reported = false;
+#endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (codec == NATIVE_CODEC_FLAC) {
                 free(output);
@@ -834,6 +859,13 @@ static void decoder_task(void *argument) {
                     state_set_audio(false, "decoder allocation failed");
                     failed_generation = generation;
                 }
+#ifdef YORADIO_CODEC_BENCHMARK
+                if (legacy_decoder) {
+                    benchmark_log_memory(
+                        "open", codec, decoder_heap_before,
+                        custom_legacy_decoder_memory_used(legacy_decoder));
+                }
+#endif
             } else
 #endif
             {
@@ -862,6 +894,12 @@ static void decoder_task(void *argument) {
                     state_set_audio(false, "decoder allocation failed");
                     failed_generation = generation;
                 }
+#ifdef YORADIO_CODEC_BENCHMARK
+                if (open_result == ESP_AUDIO_ERR_OK) {
+                    benchmark_log_memory("open", codec, decoder_heap_before,
+                                         0);
+                }
+#endif
             }
         }
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
@@ -922,6 +960,14 @@ static void decoder_task(void *argument) {
                     stats.max_call_us = feed_stats.max_call_us;
                 }
                 stats.input_bytes += feed_stats.input_bytes;
+#ifdef YORADIO_CODEC_BENCHMARK
+                if (!first_frame_memory_reported && stream_info_ready) {
+                    benchmark_log_memory(
+                        "first-frame", codec, decoder_heap_before,
+                        custom_legacy_decoder_memory_used(legacy_decoder));
+                    first_frame_memory_reported = true;
+                }
+#endif
                 decode_stats_report(&stats, esp_timer_get_time());
                 if (result < 0 && generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom %s decode error: %d",
@@ -1014,6 +1060,13 @@ static void decoder_task(void *argument) {
                     state_set_decoder_bitrate(latest_info.bitrate);
                 }
                 if (stream_info_ready) {
+#ifdef YORADIO_CODEC_BENCHMARK
+                    if (!first_frame_memory_reported) {
+                        benchmark_log_memory("first-frame", codec,
+                                             decoder_heap_before, 0);
+                        first_frame_memory_reported = true;
+                    }
+#endif
                     decode_stats_add_audio(&stats, &stream_info,
                                            frame.decoded_size);
                     if (!send_pcm(generation, &stream_info, output,

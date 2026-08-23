@@ -36,6 +36,8 @@ typedef bool (*custom_legacy_pcm_callback_t)(
 custom_legacy_decoder_t *custom_legacy_decoder_create(
     custom_legacy_kind_t kind);
 void custom_legacy_decoder_destroy(custom_legacy_decoder_t *decoder);
+size_t custom_legacy_decoder_memory_used(
+    const custom_legacy_decoder_t *decoder);
 
 int custom_legacy_decoder_feed(custom_legacy_decoder_t *decoder,
                                const uint8_t *data, size_t size, bool eos,

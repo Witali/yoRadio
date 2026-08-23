@@ -20,6 +20,17 @@ Run the automated flash and serial-log sequence:
 .\tools\codec_benchmark\run.ps1 -Port COM9
 ```
 
+Run all three selectable MP3 backends against the same 320 kbit/s fixture:
+
+```powershell
+.\tools\codec_benchmark\run-mp3-backends.ps1 -Port COM9
+```
+
+This three-way runner saves one serial log per backend plus a `summary.csv`
+under `.build\codec-benchmark\results\mp3-backends`. After the measurements
+it restores the normal Helix application to both OTA slots while preserving
+the existing SPIFFS files and NVS.
+
 The benchmark layout has one `0x180000` factory application and uses every byte
 between it and the unchanged SPIFFS partition as a `0x240000` `codec_test`
 partition. The runner writes one fixture at a time at `0x190000`, resets the
@@ -42,6 +53,28 @@ single call and uninterrupted playback must also pass.
 | FLAC | level 8, noise-heavy source | 13.5-13.7%, x7.28-7.39 | 13.4-13.7%, x7.28-7.45 | [x] |
 | Ogg Vorbis | quality 10 | 36.4-36.9%, x2.70-2.74 | 36.3-36.8%, x2.71-2.74 | [x] |
 | Ogg Opus | CBR 510 kbit/s, 20 ms frames | 42.2%, x2.36 | 42.1-42.2%, x2.36-2.37 | [x] |
+
+## MP3 backend comparison
+
+Measured on 2026-08-23 with the deterministic 11-second, 48 kHz stereo MP3
+fixture at 320 kbit/s:
+
+| Backend | App bytes | Heap open delta | Heap first-frame delta | Codec payload | Minimum free heap | CPU | Speed | Max call |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Espressif | 954656 | 12564 | 40948 | opaque | 225088 | 27.9% | x3.57 | 7643 us |
+| Helix | 956032 | 33548 | 51028 | 31980 | 214224 | 30.2% | x3.30 | 9008 us |
+| minimp3 | 931600 | 40460 | 57940 | 31624 | 208096 | 407.9% | x0.24 | 108009 us |
+
+`Heap open delta` is the total heap lost while opening the selected decoder.
+`Heap first-frame delta` also includes buffers allocated on the first decoded
+frame. `Codec payload` is the exact custom decoder object, input buffer and
+arena use; the prebuilt Espressif library does not expose its internal split.
+
+Espressif is the fastest and uses the least heap in this isolated test. Helix
+remains safely real-time and is the default on ESP32-C3 because its source is
+integrated and controllable, at a cost of 10080 bytes of first-frame heap over
+Espressif. minimp3 has the smallest application image, but cannot run in
+real-time on the single-core soft-float C3 and must not be selected there.
 
 The measured ratio covers the prebuilt Espressif decoder call itself. The
 library's C3 archive is already compiled, so common pipeline changes are not

@@ -7,6 +7,7 @@
 
 #include "esp_log.h"
 #include "esp_timer.h"
+#include "CodecMemoryArena.h"
 #include "sdkconfig.h"
 
 #ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
@@ -16,7 +17,6 @@
 #include "mp3_decoder.h"
 #endif
 #ifdef CONFIG_YORADIO_MP3_DECODER_MINIMP3
-#include "CodecMemoryArena.h"
 #define MINIMP3_ONLY_MP3
 #define MINIMP3_NO_SIMD
 #define MINIMP3_EXTERNAL_SCRATCH
@@ -304,6 +304,12 @@ extern "C" void custom_legacy_decoder_destroy(custom_legacy_decoder_t *decoder) 
     }
     std::free(decoder->input);
     delete decoder;
+}
+
+extern "C" size_t custom_legacy_decoder_memory_used(
+    const custom_legacy_decoder_t *decoder) {
+    if (!decoder) return 0;
+    return sizeof(*decoder) + decoder->input_capacity + CodecArenaUsed();
 }
 
 extern "C" int custom_legacy_decoder_feed(

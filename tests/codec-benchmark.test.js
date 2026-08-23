@@ -52,3 +52,38 @@ test('codec benchmark firmware uses all non-SPIFFS flash without OTA', () => {
   assert.match(builder, /YORADIO_CODEC_BENCHMARK=ON/);
   assert.match(builder, /sdkconfig\.codec-benchmark\.defaults/);
 });
+test('codec benchmark reports comparable decoder heap and payload memory', () => {
+  const audio = read('idf', 'esp32c3-oled-native', 'main', 'audio_service.c');
+  const adapter = read('idf', 'components', 'custom_legacy_codecs',
+                       'custom_legacy_adapter.cpp');
+  const header = read('idf', 'components', 'custom_legacy_codecs',
+                      'custom_legacy_adapter.h');
+
+  assert.match(audio, /MEM %s %s: heap_before/);
+  assert.match(audio, /heap_caps_get_largest_free_block/);
+  assert.match(audio, /heap_caps_get_minimum_free_size/);
+  assert.match(audio, /"first-frame"/);
+  assert.match(adapter, /CodecArenaUsed()/);
+  assert.match(header, /custom_legacy_decoder_memory_used/);
+});
+
+test('MP3 backend benchmark selects all decoders and saves reproducible results', () => {
+  const builder = read('tools', 'codec_benchmark', 'build.ps1');
+  const runner = read('tools', 'codec_benchmark', 'run-mp3-backends.ps1');
+
+  assert.match(builder, /ValidateSet\("espressif", "helix", "minimp3"\)/);
+  assert.match(builder, /sdkconfig\.mp3-\$Mp3Decoder\.defaults/);
+  for (const backend of ['espressif', 'helix', 'minimp3']) {
+    assert.match(runner, new RegExp(`"${backend}"`));
+    assert.match(runner, new RegExp(`\\$backend\\.log`));
+  }
+  assert.match(runner, /mp3-320\.mp3/);
+  assert.match(runner, /0x190000/);
+  assert.match(runner, /summary\.csv/);
+  assert.match(runner, /finally/);
+  assert.match(runner, /sdkconfig\.mp3-helix\.defaults/);
+  assert.match(runner, /"0x10000", \$normalApp/);
+  assert.match(runner, /"0x1f0000", \$normalApp/);
+  assert.doesNotMatch(runner, /"0x3d0000"/);
+  assert.match(runner, /SPIFFS and NVS were preserved/);
+});
