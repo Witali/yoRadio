@@ -260,8 +260,13 @@ def site_display_name(site: str) -> str:
         if spec.title.casefold().startswith("radio "):
             return spec.title[6:]
         return spec.title
-    if value.casefold() == "curated":
-        return "Прочие"
+    aliases = {
+        "curated": "Прочие",
+        "ogg opus": "OGG Opus",
+        "ogg vorbis": "OGG Vorbis",
+    }
+    if value.casefold() in aliases:
+        return aliases[value.casefold()]
     return value or "Прочие"
 
 
@@ -2042,6 +2047,8 @@ def run_self_test() -> None:
     assert site_display_name("101") == "101.ru"
     assert site_display_name("caprice") == "Caprice"
     assert site_display_name("record") == "Record"
+    assert site_display_name("ogg opus") == "OGG Opus"
+    assert site_display_name("curated") == "Прочие"
     assert sorted(
         [("record", "Beta"), ("caprice", "Alpha"), ("record", "Alpha"), ("101", "Zulu")],
         key=lambda item: site_station_sort_key(*item),
