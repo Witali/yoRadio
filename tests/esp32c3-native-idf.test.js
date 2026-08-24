@@ -501,8 +501,8 @@ test("native audio pipeline batches PCM and caches stable stream layout", () => 
   assert.match(audio, /runtime_settings_get_audio_buffer_blocks\(\) \* 1600U/);
   assert.match(audio,
                /xRingbufferCreate\(encoded_ring_size, RINGBUF_TYPE_NOSPLIT\)/);
-  assert.match(audio, /#define PCM_RING_SIZE \(16 \* 1024\)/);
-  assert.match(audio, /#define PCM_PACKET_DATA_SIZE 7168/);
+  assert.match(audio, /#define PCM_RING_SIZE \(8 \* 1024\)/);
+  assert.match(audio, /#define PCM_PACKET_DATA_SIZE 3584/);
   assert.match(audio, /bool stream_info_ready = false/);
   assert.match(
     audio,
@@ -511,6 +511,16 @@ test("native audio pipeline batches PCM and caches stable stream layout", () => 
   assert.match(output, /scale_sample_q15/);
   assert.match(output, /channel_gain_q15/);
   assert.doesNotMatch(output, /scale_sample\([^_]/);
+  assert.match(
+    audio,
+    /native_audio_output_init\(\)[\s\S]*xRingbufferCreate\(encoded_ring_size/,
+  );
+  assert.match(
+    output,
+    /native_audio_output_init\(void\)[\s\S]*pdm_begin\(\)/,
+  );
+  assert.match(output, /#define PDM_DMA_DESCRIPTORS 4U/);
+  assert.match(output, /if \(s_pdm\) return ESP_OK/);
 });
 
 test("native FLAC reuses the optimized yoRadio decoder without Arduino Core", () => {

@@ -23,7 +23,7 @@
 
 #define PDM_OUTPUT_SAMPLE_RATE 48000U
 #define PDM_DMA_FRAMES 512U
-#define PDM_DMA_DESCRIPTORS 8U
+#define PDM_DMA_DESCRIPTORS 4U
 #define PDM_BIAS_RAMP_MS 100U
 #define PDM_BIAS_SETTLE_MS 2U
 #define RESAMPLER_SCALE 32768U
@@ -254,6 +254,11 @@ static esp_err_t pdm_write_resampled(int16_t left, int16_t right) {
 
 esp_err_t native_audio_output_init(void) {
     hold_pdm_low();
+    // Reserve the I2S channel and its DMA descriptors before the compressed
+    // stream ring, decoder workspace, and TLS record buffers fragment the
+    // small internal heap. The 48 kHz PDM resource remains allocated across
+    // station changes; configure() only updates the source-rate resampler.
+    ESP_RETURN_ON_ERROR(pdm_begin(), TAG, "reserve fixed-rate stereo PDM");
     return ESP_OK;
 }
 
