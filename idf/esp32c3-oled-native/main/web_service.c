@@ -290,15 +290,7 @@ static esp_err_t save_playlist(const uint8_t *data, size_t size) {
 }
 
 static esp_err_t save_wifi(const uint8_t *data, size_t size) {
-    char line[160];
-    if (size >= sizeof(line)) return ESP_ERR_INVALID_SIZE;
-    memcpy(line, data, size);
-    line[size] = '\0';
-    line[strcspn(line, "\r\n")] = '\0';
-    char *tab = strchr(line, '\t');
-    if (!tab) return ESP_ERR_INVALID_ARG;
-    *tab++ = '\0';
-    return network_service_save_credentials(line, tab);
+    return network_service_save_credentials_file(data, size);
 }
 
 static bool safe_upload_name(const char *filename, char *name,
