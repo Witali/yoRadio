@@ -758,7 +758,7 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
   assert.match(websocket, /static webui_status_key_t s_previous_status_key/);
   assert.match(
     websocket,
-    /station_changed[\s\S]*\\"current\\":%u[\s\S]*broadcast_text\(s_broadcast_current\)/,
+    /station_changed[\s\S]*\\"current\\":%u[\s\S]*broadcast_text\([\s\S]*s_broadcast_current, &s_current_send_pending\)/,
   );
   assert.match(websocket, /audio_service_buffer_fill_percent\(\)/);
   assert.match(
@@ -822,7 +822,10 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   assert.match(websocket, /\.is_websocket = true/);
   assert.match(websocket, /httpd_ws_recv_frame/);
   assert.match(websocket, /httpd_ws_send_frame/);
-  assert.match(websocket, /httpd_ws_send_data/);
+  assert.match(websocket, /httpd_ws_send_data_async/);
+  assert.doesNotMatch(websocket, /httpd_ws_send_data\(/);
+  assert.match(websocket, /atomic_load\(&s_status_send_pending\) == 0U/);
+  assert.match(websocket, /ws_send_complete[\s\S]*httpd_sess_trigger_close/);
   assert.match(websocket, /strcmp\(command, "next"\)/);
   assert.match(websocket, /strcmp\(command, "prev"\)/);
   assert.doesNotMatch(web + websocket, /AsyncWebServer|AsyncWebSocket|Arduino/);

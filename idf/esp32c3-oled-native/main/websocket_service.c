@@ -50,6 +50,8 @@ static char s_broadcast_current[48];
 static webui_status_key_t s_previous_status_key;
 static webui_status_key_t s_current_status_key;
 static atomic_bool s_playlist_changed_pending;
+static atomic_uint s_status_send_pending;
+static atomic_uint s_current_send_pending;
 static size_t s_last_ws_clients;
 
 static void json_escape(const char *source, char *target, size_t target_size) {
@@ -77,7 +79,16 @@ static esp_err_t ws_send_request(httpd_req_t *request, const char *text) {
     return httpd_ws_send_frame(request, &frame);
 }
 
-static esp_err_t ws_send_async(int socket, const char *text) {
+static void ws_send_complete(esp_err_t result, int socket, void *argument) {
+    atomic_uint *pending = argument;
+    atomic_fetch_sub(pending, 1U);
+    if (result != ESP_OK && s_server) {
+        httpd_sess_trigger_close(s_server, socket);
+    }
+}
+
+static esp_err_t ws_send_async(int socket, const char *text,
+                               atomic_uint *pending) {
     httpd_ws_frame_t frame = {
         .final = true,
         .fragmented = false,
@@ -85,11 +96,15 @@ static esp_err_t ws_send_async(int socket, const char *text) {
         .payload = (uint8_t *)text,
         .len = strlen(text),
     };
-    return httpd_ws_send_data(s_server, socket, &frame);
+    atomic_fetch_add(pending, 1U);
+    esp_err_t result = httpd_ws_send_data_async(
+        s_server, socket, &frame, ws_send_complete, pending);
+    if (result != ESP_OK) atomic_fetch_sub(pending, 1U);
+    return result;
 }
 
-static size_t broadcast_text(const char *text) {
-    if (!s_server || !text) return 0;
+static size_t broadcast_text(const char *text, atomic_uint *pending) {
+    if (!s_server || !text || !pending) return 0;
     size_t count = CONFIG_LWIP_MAX_SOCKETS;
     int sockets[CONFIG_LWIP_MAX_SOCKETS];
     if (httpd_get_client_list(s_server, &count, sockets) != ESP_OK) return 0;
@@ -99,7 +114,9 @@ static size_t broadcast_text(const char *text) {
         if (httpd_ws_get_fd_info(s_server, sockets[index]) ==
             HTTPD_WS_CLIENT_WEBSOCKET) {
             ++clients;
-            if (ws_send_async(sockets[index], text) == ESP_OK) ++delivered;
+            if (ws_send_async(sockets[index], text, pending) == ESP_OK) {
+                ++delivered;
+            }
         }
     }
     s_last_ws_clients = clients;
@@ -603,24 +620,30 @@ static void status_task(void *argument) {
                              pdMS_TO_TICKS(WS_STATUS_HEARTBEAT_MS);
         if (atomic_exchange(&s_playlist_changed_pending, false)) {
             ESP_LOGI(TAG, "Broadcasting playlist changed event");
-            deliveries +=
-                (uint32_t)broadcast_text("{\"file\":\"/data/playlist.csv\"}");
+            deliveries += (uint32_t)broadcast_text(
+                "{\"file\":\"/data/playlist.csv\"}",
+                &s_status_send_pending);
             ++publications;
         }
-        if (changed || heartbeat) {
+        if ((changed || heartbeat) &&
+            atomic_load(&s_status_send_pending) == 0U) {
             bool station_changed = !have_previous ||
                                    s_current_status_key.current_item !=
                                        s_previous_status_key.current_item;
             format_status(s_broadcast_status, sizeof(s_broadcast_status));
-            if (station_changed) {
+            bool publish_current = station_changed &&
+                atomic_load(&s_current_send_pending) == 0U;
+            if (publish_current) {
                 snprintf(s_broadcast_current, sizeof(s_broadcast_current),
                          "{\"current\":%u}",
                          s_current_status_key.current_item);
             }
-            deliveries += (uint32_t)broadcast_text(s_broadcast_status);
+            deliveries += (uint32_t)broadcast_text(
+                s_broadcast_status, &s_status_send_pending);
             ++publications;
-            if (station_changed) {
-                deliveries += (uint32_t)broadcast_text(s_broadcast_current);
+            if (publish_current) {
+                deliveries += (uint32_t)broadcast_text(
+                    s_broadcast_current, &s_current_send_pending);
                 ++publications;
             }
             s_previous_status_key = s_current_status_key;
