@@ -88,3 +88,22 @@ test("normalizer hot path avoids 64-bit sample arithmetic", () => {
   assert.doesNotMatch(limiterBody, /int64_t/);
   assert.match(source, /soft limiter numerator must fit in int32_t/);
 });
+
+test("settings page requests and applies current normalization values", () => {
+  const scriptPath = path.join(
+    __dirname,
+    "..",
+    "yoRadio",
+    "data",
+    "www",
+    "script.js.gz"
+  );
+  const script = zlib.gunzipSync(fs.readFileSync(scriptPath)).toString("utf8");
+  const optionsLoaded = script.indexOf("getId('content').innerHTML = options");
+  const request = script.indexOf("websocket.send('getsystem=1')", optionsLoaded);
+
+  assert.ok(optionsLoaded >= 0 && request > optionsLoaded);
+  assert.match(script, /Object\.keys\(data\)\.forEach\(key=>\{/);
+  assert.match(script, /setupElement\(key, data\[key\]\)/);
+  assert.match(script, /classList\.contains\("checkbox"\)/);
+});

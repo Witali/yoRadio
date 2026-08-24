@@ -13,6 +13,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_audio_output.h"
+#include "native_audio_settings.h"
 #include "radio_control.h"
 
 #define WS_STATUS_POLL_MS 100
@@ -175,11 +176,14 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
     snprintf(settings, sizeof(settings),
              "{\"sst\":%u,\"aif\":1,\"vu\":0,\"softr\":0,\"vut\":0,"
              "\"mdns\":\"yoradio\",\"ipaddr\":\"%s\",\"abuff\":16,"
-             "\"mp3decoder\":0,\"normalize\":0,\"normgain\":20,"
-             "\"normtarget\":-3,\"normtime\":2000,\"telnet\":0,"
+             "\"mp3decoder\":0,\"normalize\":%u,\"normgain\":%u,"
+             "\"normtarget\":%d,\"normtime\":%u,\"telnet\":0,"
              "\"watchdog\":1}",
              radio_control_smartstart_enabled() ? 1U : 0U,
-             address);
+             address, native_audio_settings_get_normalization() ? 1U : 0U,
+             native_audio_settings_get_normalization_gain_db(),
+             native_audio_settings_get_normalization_target_dbfs(),
+             native_audio_settings_get_normalization_time_ms());
     return ws_send_request(request, settings);
 }
 
@@ -283,6 +287,47 @@ static void handle_command(httpd_req_t *request, char *command) {
         }
         send_system_settings(request);
 
+    } else if (strcmp(command, "normalization") == 0) {
+        esp_err_t result = native_audio_settings_set_normalization(
+            strtoul(value, NULL, 10) != 0U);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Normalization update failed: %s",
+                     esp_err_to_name(result));
+        }
+        send_system_settings(request);
+    } else if (strcmp(command, "normgain") == 0) {
+        unsigned gain_db = strtoul(value, NULL, 10);
+        if (gain_db > 20U) gain_db = 20U;
+        esp_err_t result = native_audio_settings_set_normalization_gain_db(
+            (uint8_t)gain_db);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Normalization gain update failed: %s",
+                     esp_err_to_name(result));
+        }
+        send_system_settings(request);
+    } else if (strcmp(command, "normtarget") == 0) {
+        long target_dbfs = strtol(value, NULL, 10);
+        if (target_dbfs < -20) target_dbfs = -20;
+        if (target_dbfs > 0) target_dbfs = 0;
+        esp_err_t result =
+            native_audio_settings_set_normalization_target_dbfs(
+                (int8_t)target_dbfs);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Normalization target update failed: %s",
+                     esp_err_to_name(result));
+        }
+        send_system_settings(request);
+    } else if (strcmp(command, "normtime") == 0) {
+        unsigned long time_ms = strtoul(value, NULL, 10);
+        if (time_ms < 100U) time_ms = 100U;
+        if (time_ms > 10000U) time_ms = 10000U;
+        esp_err_t result = native_audio_settings_set_normalization_time_ms(
+            (uint16_t)time_ms);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Normalization time update failed: %s",
+                     esp_err_to_name(result));
+        }
+        send_system_settings(request);
     } else if (strcmp(command, "brightness") == 0 ||
                strcmp(command, "dim") == 0) {
         unsigned brightness = strtoul(value, NULL, 10);

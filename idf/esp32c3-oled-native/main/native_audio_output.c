@@ -13,6 +13,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "native_audio_normalizer.h"
 #include "native_audio_settings.h"
 #include "soc/soc_caps.h"
 
@@ -265,6 +266,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
         s_input_sample_rate = input_sample_rate;
         s_buffered_frames = 0;
         reset_resampler();
+        native_audio_normalizer_set_sample_rate(input_sample_rate);
         ESP_LOGI(TAG, "Stereo PDM resampler input changed to %lu Hz",
                  (unsigned long)input_sample_rate);
     }
@@ -277,6 +279,12 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     if (!data || bits_per_sample != 16 || channels == 0) {
         return ESP_ERR_NOT_SUPPORTED;
     }
+    native_audio_normalizer_configure(
+        native_audio_settings_get_normalization(),
+        native_audio_settings_get_normalization_gain_db(),
+        native_audio_settings_get_normalization_target_dbfs(),
+        native_audio_settings_get_normalization_time_ms(),
+        s_input_sample_rate);
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
     uint16_t peak = 0;
@@ -294,6 +302,10 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
         int16_t left;
         int16_t right;
         decode_pcm_frame(data + frame * frame_bytes, channels, &left, &right);
+        int16_t normalized[2] = {left, right};
+        native_audio_normalizer_process(normalized);
+        left = normalized[0];
+        right = normalized[1];
         left = scale_sample_q15(left, left_gain_q15);
         right = scale_sample_q15(right, right_gain_q15);
         uint16_t left_peak = left == INT16_MIN ? 32768U

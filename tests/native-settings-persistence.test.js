@@ -105,3 +105,56 @@ test("classic ESP32 native HTTP API reports and changes persisted gain", () => {
   assert.match(output, /channel_gain_q15/);
   assert.match(output, /pcm_mono_sample[\s\S]*volume, balance/);
 });
+
+test("C3 persists, reports, and applies WebUI normalization settings", () => {
+  const header = read(
+    "idf",
+    "components",
+    "native_audio_settings",
+    "native_audio_settings.h",
+  );
+  const settings = read(
+    "idf",
+    "components",
+    "native_audio_settings",
+    "native_audio_settings.c",
+  );
+  const websocket = read(
+    "idf",
+    "esp32c3-oled-native",
+    "main",
+    "websocket_service.c",
+  );
+  const output = read(
+    "idf",
+    "esp32c3-oled-native",
+    "main",
+    "native_audio_output.c",
+  );
+  const cmake = read("idf", "esp32c3-oled-native", "main", "CMakeLists.txt");
+
+  assert.match(header, /NATIVE_AUDIO_DEFAULT_NORMALIZATION false/);
+  for (const key of ["normalize", "normgain", "normtarget", "normtime"]) {
+    assert.match(settings, new RegExp(`AUDIO_NVS_[A-Z_]+ "${key}"`));
+  }
+  assert.match(settings, /nvs_get_u16\(\s*handle, AUDIO_NVS_NORMALIZATION_TIME/);
+  assert.match(settings, /nvs_set_u16\(handle, key, value\)/);
+  assert.match(settings, /native_audio_settings_set_normalization\(bool enabled\)/);
+  assert.match(settings, /native_audio_settings_set_normalization_gain_db/);
+  assert.match(settings, /native_audio_settings_set_normalization_target_dbfs/);
+  assert.match(settings, /native_audio_settings_set_normalization_time_ms/);
+
+  for (const command of ["normalization", "normgain", "normtarget", "normtime"]) {
+    assert.match(websocket, new RegExp(`strcmp\\(command, "${command}"\\)`));
+  }
+  assert.match(websocket, /native_audio_settings_get_normalization\(\)/);
+  assert.match(websocket, /native_audio_settings_get_normalization_gain_db\(\)/);
+  assert.match(websocket, /native_audio_settings_get_normalization_target_dbfs\(\)/);
+  assert.match(websocket, /native_audio_settings_get_normalization_time_ms\(\)/);
+  assert.doesNotMatch(websocket, /\\"normalize\\":0,\\"normgain\\":20/);
+
+  const normalize = output.indexOf("native_audio_normalizer_process(normalized)");
+  const volume = output.indexOf("scale_sample_q15(left, left_gain_q15)");
+  assert.ok(normalize >= 0 && normalize < volume);
+  assert.match(cmake, /AudioNormalizer\.cpp/);
+});

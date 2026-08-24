@@ -5,6 +5,7 @@ set(NATIVE_SRCS
   "app_main.c"
   "audio_service.c"
   "display_settings.c"
+  "native_audio_normalizer.cpp"
   "native_audio_output.c"
   "native_state.c"
   "network_service.c"
@@ -41,6 +42,11 @@ idf_component_register(
     custom_flac
     custom_legacy_codecs
     esp_audio_codec)
+
+target_sources(${COMPONENT_LIB} PRIVATE
+  "${YORADIO_ROOT}/src/audioI2S/AudioNormalizer.cpp")
+target_include_directories(${COMPONENT_LIB} PRIVATE
+  "${YORADIO_ROOT}/src/audioI2S")
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)
 if(YORADIO_CODEC_BENCHMARK)
