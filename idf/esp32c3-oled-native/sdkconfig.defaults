@@ -106,9 +106,9 @@ CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=y
 # request side needs only small GET headers.
 CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384
 CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN=4096
-# Allocate TLS record buffers only while mbedTLS is actively using them. This
-# leaves enough contiguous RAM to switch HTTPS stations after PDM DMA starts.
-CONFIG_MBEDTLS_DYNAMIC_BUFFER=y
+# Keep one RX/TX allocation for the lifetime of a TLS connection. Reallocating
+# record buffers while Wi-Fi and a decoder are active fragments the C3 heap.
+# CONFIG_MBEDTLS_DYNAMIC_BUFFER is not set
 
 CONFIG_SPIFFS_USE_MAGIC=y
 CONFIG_SPIFFS_USE_MAGIC_LENGTH=y
