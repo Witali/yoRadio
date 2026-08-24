@@ -28,6 +28,7 @@
 #define PDM_BIAS_RAMP_MS 100U
 #define PDM_BIAS_SETTLE_MS 2U
 #define RESAMPLER_SCALE 32768U
+#define RESAMPLER_FRACTION_MULTIPLIER_Q16 44739U
 #define SAMPLE_GAIN_SCALE 32768U
 #define VOLUME_DENOMINATOR 254U
 #define BALANCE_DENOMINATOR 16U
@@ -242,9 +243,10 @@ static esp_err_t pdm_write_resampled(int16_t left, int16_t right) {
 
     uint32_t phase = s_resampler_next_phase;
     while (phase <= PDM_OUTPUT_SAMPLE_RATE) {
+        // round(phase * 32768 / 48000), using a Q16 reciprocal. This hot path
+        // runs once per 48 kHz output frame, so avoid a hardware division.
         uint32_t fraction =
-            (phase * RESAMPLER_SCALE + PDM_OUTPUT_SAMPLE_RATE / 2U) /
-            PDM_OUTPUT_SAMPLE_RATE;
+            (phase * RESAMPLER_FRACTION_MULTIPLIER_Q16 + 32768U) >> 16;
         ESP_RETURN_ON_ERROR(
             pdm_queue_frame(interpolate_sample(s_previous_left, left, fraction),
                             interpolate_sample(s_previous_right, right,
