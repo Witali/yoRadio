@@ -2,13 +2,14 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include <utility>
 
 namespace {
 constexpr uint16_t kUnityGainQ12 = 4096U;
 constexpr uint16_t kMinimumGainQ12 = 410U;   // -20 dB.
 constexpr uint16_t kNoiseFloor = 128U;       // Do not amplify silence or decoder noise.
-constexpr int32_t kSoftKnee = 28672;
-constexpr int32_t kSampleMaximum = 32767;
+constexpr uint32_t kSoftKnee = 28672U;
+constexpr uint32_t kSampleMaximum = 32767U;
 constexpr int32_t kMaximumAmplifiedSample = 327680; // Full scale at +20 dB.
 
 // 10^(dB/20), Q12, for 0..20 dB. Q12 keeps a full-scale sample multiplied
@@ -32,11 +33,6 @@ constexpr uint16_t kPeakByAttenuationDb[] = {
     6538U, 5827U, 5193U, 4628U, 4125U, 3676U, 3277U,
 };
 
-uint32_t absoluteSample(int16_t value) {
-    return value == INT16_MIN ? 32768U
-                              : static_cast<uint32_t>(value < 0 ? -value : value);
-}
-
 uint32_t moveTowards(uint32_t current, uint32_t target, uint32_t divisor) {
     if(current == target) return current;
     const uint32_t difference = current > target ? current - target : target - current;
@@ -45,6 +41,27 @@ uint32_t moveTowards(uint32_t current, uint32_t target, uint32_t divisor) {
 }
 } // namespace
 
+namespace audio_normalizer_detail {
+namespace {
+constexpr uint16_t softLimitLutValue(size_t index) {
+    const uint32_t over = static_cast<uint32_t>(
+        index << kSoftLimitLutStepShift);
+    const uint32_t remaining = kSampleMaximum - kSoftKnee;
+    return static_cast<uint16_t>(
+        kSoftKnee + (over * remaining) / (over + remaining));
+}
+
+template<size_t... Index>
+constexpr std::array<uint16_t, sizeof...(Index)> makeSoftLimitLut(
+    std::index_sequence<Index...>) {
+    return {{softLimitLutValue(Index)...}};
+}
+} // namespace
+
+const std::array<uint16_t, kSoftLimitLutEntries> kSoftLimitLut =
+    makeSoftLimitLut(std::make_index_sequence<kSoftLimitLutEntries>{});
+} // namespace audio_normalizer_detail
+
 void AudioNormalizer::configure(bool enabled, uint8_t maxBoostDb, int8_t targetDbfs,
                                 uint16_t timeConstantMs, uint32_t sampleRate) {
     if(maxBoostDb > 20U) maxBoostDb = 20U;
@@ -52,6 +69,13 @@ void AudioNormalizer::configure(bool enabled, uint8_t maxBoostDb, int8_t targetD
     if(targetDbfs > 0) targetDbfs = 0;
     if(timeConstantMs < 100U) timeConstantMs = 100U;
     if(timeConstantMs > 10000U) timeConstantMs = 10000U;
+    if(sampleRate < 8000U) sampleRate = 8000U;
+    if(sampleRate > 96000U) sampleRate = 96000U;
+    if(enabled == m_enabled && maxBoostDb == m_maxBoostDb &&
+       targetDbfs == m_targetDbfs &&
+       timeConstantMs == m_timeConstantMs && sampleRate == m_sampleRate) {
+        return;
+    }
     const bool restart = enabled != m_enabled;
     m_enabled = enabled;
     m_maxBoostDb = maxBoostDb;
@@ -69,17 +93,18 @@ void AudioNormalizer::setSampleRate(uint32_t sampleRate) {
     if(sampleRate > 96000U) sampleRate = 96000U;
     m_sampleRate = sampleRate;
     m_blockFrames = static_cast<uint16_t>((sampleRate + 50U) / 100U); // 10 ms
+    const uint32_t blockDuration = static_cast<uint32_t>(m_blockFrames) * 1000U;
+    const uint32_t smoothingNumerator =
+        static_cast<uint32_t>(m_timeConstantMs) * m_sampleRate;
+    m_smoothingBlocks = static_cast<uint16_t>(
+        (smoothingNumerator + blockDuration - 1U) / blockDuration);
+    if(m_smoothingBlocks == 0U) m_smoothingBlocks = 1U;
 }
 
 void AudioNormalizer::reset() {
     m_blockPeak = 0;
     m_blockCount = 0;
     m_gainQ12 = kUnityGainQ12;
-}
-
-void AudioNormalizer::process(int16_t sample[2]) {
-    if(!m_enabled) return;
-    processEnabled(sample);
 }
 
 void AudioNormalizer::processBlock(int16_t *samples, size_t frames,
@@ -94,52 +119,19 @@ void AudioNormalizer::processBlock(int16_t *samples, size_t frames,
     }
 }
 
-void AudioNormalizer::processEnabled(int16_t sample[2]) {
-    const uint32_t left = absoluteSample(sample[0]);
-    const uint32_t right = absoluteSample(sample[1]);
-    const uint32_t peak = left > right ? left : right;
-    if(peak > m_blockPeak) m_blockPeak = static_cast<uint16_t>(peak);
-    ++m_blockCount;
-
-    const int32_t amplifiedLeft =
-        (static_cast<int32_t>(sample[0]) * m_gainQ12) >> 12;
-    const int32_t amplifiedRight =
-        (static_cast<int32_t>(sample[1]) * m_gainQ12) >> 12;
-    sample[0] = softLimit(amplifiedLeft);
-    sample[1] = softLimit(amplifiedRight);
-
-    if(m_blockCount >= m_blockFrames) updateGainTarget();
-}
-
 void AudioNormalizer::updateGainTarget() {
     uint32_t targetGain = kUnityGainQ12;
     if(m_blockPeak >= kNoiseFloor) {
-        targetGain = static_cast<uint32_t>(
-            (static_cast<uint64_t>(m_targetPeak) * kUnityGainQ12) / m_blockPeak);
+        targetGain =
+            (static_cast<uint32_t>(m_targetPeak) * kUnityGainQ12) / m_blockPeak;
         if(targetGain < kMinimumGainQ12) targetGain = kMinimumGainQ12;
         if(targetGain > m_maxGainQ12) targetGain = m_maxGainQ12;
     }
 
     // Use the same time constant in both directions. Transient overshoots are
     // handled by the soft limiter without abruptly changing the stream gain.
-    const uint32_t blockDuration = static_cast<uint32_t>(m_blockFrames) * 1000U;
-    uint32_t smoothingBlocks =
-        (static_cast<uint32_t>(m_timeConstantMs) * m_sampleRate + blockDuration - 1U) /
-        blockDuration;
-    if(smoothingBlocks == 0U) smoothingBlocks = 1U;
-    m_gainQ12 = static_cast<uint16_t>(moveTowards(m_gainQ12, targetGain, smoothingBlocks));
+    m_gainQ12 = static_cast<uint16_t>(
+        moveTowards(m_gainQ12, targetGain, m_smoothingBlocks));
     m_blockPeak = 0;
     m_blockCount = 0;
-}
-
-int16_t AudioNormalizer::softLimit(int32_t value) {
-    const bool negative = value < 0;
-    int32_t magnitude = negative ? -value : value;
-    if(magnitude > kSoftKnee) {
-        const int32_t over = magnitude - kSoftKnee;
-        const int32_t remaining = kSampleMaximum - kSoftKnee;
-        magnitude = kSoftKnee + (over * remaining) / (over + remaining);
-    }
-    if(magnitude > kSampleMaximum) magnitude = kSampleMaximum;
-    return static_cast<int16_t>(negative ? -magnitude : magnitude);
 }

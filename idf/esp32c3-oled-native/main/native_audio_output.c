@@ -49,6 +49,17 @@ static uint64_t s_stats_audio_us;
 static uint64_t s_stats_normalize_us;
 static uint32_t s_stats_packets;
 
+typedef struct {
+    bool valid;
+    bool enabled;
+    uint8_t max_gain_db;
+    int8_t target_dbfs;
+    uint16_t time_ms;
+    uint32_t sample_rate;
+} normalizer_config_cache_t;
+
+static normalizer_config_cache_t s_normalizer_config;
+
 static int16_t scale_sample_q15(int16_t sample, uint32_t gain_q15) {
     int32_t scaled = (int32_t)sample * (int32_t)gain_q15;
     if (scaled >= 0) {
@@ -286,18 +297,37 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
     return ESP_OK;
 }
 
+static void sync_normalizer_configuration(void) {
+    normalizer_config_cache_t next = {
+        .valid = true,
+        .enabled = native_audio_settings_get_normalization(),
+        .max_gain_db = native_audio_settings_get_normalization_gain_db(),
+        .target_dbfs = native_audio_settings_get_normalization_target_dbfs(),
+        .time_ms = native_audio_settings_get_normalization_time_ms(),
+        .sample_rate = s_input_sample_rate,
+    };
+    if (s_normalizer_config.valid &&
+        next.enabled == s_normalizer_config.enabled &&
+        next.max_gain_db == s_normalizer_config.max_gain_db &&
+        next.target_dbfs == s_normalizer_config.target_dbfs &&
+        next.time_ms == s_normalizer_config.time_ms &&
+        next.sample_rate == s_normalizer_config.sample_rate) {
+        return;
+    }
+    native_audio_normalizer_configure(
+        next.enabled, next.max_gain_db, next.target_dbfs, next.time_ms,
+        next.sample_rate);
+    s_normalizer_config = next;
+}
+
 esp_err_t native_audio_output_write_pcm(uint8_t *data, size_t size,
                                         uint8_t bits_per_sample,
                                         uint8_t channels) {
     if (!data || bits_per_sample != 16 || channels == 0) {
         return ESP_ERR_NOT_SUPPORTED;
     }
-    native_audio_normalizer_configure(
-        native_audio_settings_get_normalization(),
-        native_audio_settings_get_normalization_gain_db(),
-        native_audio_settings_get_normalization_target_dbfs(),
-        native_audio_settings_get_normalization_time_ms(),
-        s_input_sample_rate);
+    sync_normalizer_configuration();
+
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
     int64_t normalize_started_us = esp_timer_get_time();

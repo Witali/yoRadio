@@ -522,6 +522,15 @@ test("native audio pipeline batches PCM and caches stable stream layout", () => 
   assert.match(output, /#define PDM_DMA_DESCRIPTORS 4U/);
   assert.match(output, /if \(s_pdm\) return ESP_OK/);
   assert.match(output, /native_audio_normalizer_process_block/);
+  assert.match(output, /normalizer_config_cache_t/);
+  assert.match(
+    output,
+    /sync_normalizer_configuration[\s\S]*s_normalizer_config\.valid[\s\S]*return;/,
+  );
+  assert.match(
+    output,
+    /native_audio_output_write_pcm[\s\S]*sync_normalizer_configuration\(\)/,
+  );
   assert.match(output, /PERF PCM:/);
 });
 
