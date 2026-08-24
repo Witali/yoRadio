@@ -16,6 +16,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "network_service.h"
+#include "radio_control.h"
 #include "web_pages_bridge.h"
 #include "websocket_service.h"
 
@@ -283,6 +284,8 @@ static esp_err_t save_playlist(const uint8_t *data, size_t size) {
         remove(temporary);
         return ESP_FAIL;
     }
+    ESP_RETURN_ON_ERROR(radio_control_reindex_playlist(), TAG,
+                        "rebuild playlist index");
     return ESP_OK;
 }
 

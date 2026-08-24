@@ -8,6 +8,7 @@
 #include "native_state.h"
 
 esp_err_t radio_control_init(native_state_t *state);
+esp_err_t radio_control_reindex_playlist(void);
 esp_err_t radio_control_play(uint16_t item);
 esp_err_t radio_control_stop(void);
 esp_err_t radio_control_toggle(void);

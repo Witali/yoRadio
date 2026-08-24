@@ -6,11 +6,14 @@
 #include "audio_service.h"
 #include "esp_check.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "nvs.h"
 
 #define PLAYLIST_PATH "/spiffs/data/playlist.csv"
+#define PLAYLIST_INDEX_PATH "/spiffs/data/index.dat"
+#define PLAYLIST_INDEX_TEMP_PATH "/spiffs/data/index.dat.tmp"
 #define RADIO_NVS_NAMESPACE "radio"
 #define RADIO_NVS_LAST_STATION "last_station"
 #define RADIO_NVS_SMARTSTART "smartstart"
@@ -23,6 +26,7 @@ static SemaphoreHandle_t s_lock;
 static native_state_t *s_state;
 static uint16_t s_current_item = 1;
 static uint8_t s_smartstart = SMARTSTART_DISABLED;
+static uint16_t s_playlist_count;
 static char s_current_name[144] = "yoRadio native";
 static char s_current_url[512];
 // Playlist access is serialized by s_lock. Keep the parsing and candidate
@@ -117,40 +121,132 @@ static void update_smartstart_play_state(bool playing) {
     }
 }
 
+static bool parse_playlist_line(char *line, char **name, char **url) {
+    char *first_tab = strchr(line, '\t');
+    if (!first_tab) return false;
+    char *second_tab = strchr(first_tab + 1, '\t');
+    if (!second_tab) return false;
+    *first_tab = '\0';
+    *second_tab = '\0';
+    if (!line[0] || !first_tab[1]) return false;
+    *name = line;
+    *url = first_tab + 1;
+    return true;
+}
+
+static esp_err_t load_playlist_index_locked(void) {
+    FILE *playlist = fopen(PLAYLIST_PATH, "rb");
+    if (!playlist) return ESP_ERR_NOT_FOUND;
+    fclose(playlist);
+    FILE *index = fopen(PLAYLIST_INDEX_PATH, "rb");
+    if (!index) return ESP_ERR_NOT_FOUND;
+    esp_err_t result = ESP_OK;
+    if (fseek(index, 0, SEEK_END) != 0) {
+        result = ESP_FAIL;
+    } else {
+        long size = ftell(index);
+        if (size < 0 || size % (long)sizeof(uint32_t) != 0 ||
+            (unsigned long)size / sizeof(uint32_t) > UINT16_MAX) {
+            result = ESP_ERR_INVALID_SIZE;
+        } else {
+            s_playlist_count = (uint16_t)((unsigned long)size /
+                                          sizeof(uint32_t));
+        }
+    }
+    fclose(index);
+    if (result == ESP_OK) {
+        ESP_LOGI(TAG, "Loaded playlist index: %u stations",
+                 s_playlist_count);
+    }
+    return result;
+}
+
+static esp_err_t build_playlist_index_locked(void) {
+    int64_t started_us = esp_timer_get_time();
+    FILE *playlist = fopen(PLAYLIST_PATH, "rb");
+    if (!playlist) {
+        remove(PLAYLIST_INDEX_PATH);
+        s_playlist_count = 0;
+        return ESP_ERR_NOT_FOUND;
+    }
+    FILE *index = fopen(PLAYLIST_INDEX_TEMP_PATH, "wb");
+    if (!index) {
+        fclose(playlist);
+        return ESP_FAIL;
+    }
+    esp_err_t result = ESP_OK;
+    uint16_t count = 0;
+    while (true) {
+        long position = ftell(playlist);
+        if (position < 0 || (unsigned long)position > UINT32_MAX) {
+            result = ESP_ERR_INVALID_SIZE;
+            break;
+        }
+        if (!fgets(s_playlist_line, sizeof(s_playlist_line), playlist)) break;
+        char *name;
+        char *url;
+        if (!parse_playlist_line(s_playlist_line, &name, &url)) continue;
+        if (count == UINT16_MAX) {
+            result = ESP_ERR_INVALID_SIZE;
+            break;
+        }
+        uint32_t offset = (uint32_t)position;
+        if (fwrite(&offset, sizeof(offset), 1, index) != 1) {
+            result = ESP_FAIL;
+            break;
+        }
+        ++count;
+    }
+    if (ferror(playlist) && result == ESP_OK) result = ESP_FAIL;
+    if (fflush(index) != 0 && result == ESP_OK) result = ESP_FAIL;
+    if (fclose(index) != 0 && result == ESP_OK) result = ESP_FAIL;
+    fclose(playlist);
+    if (result != ESP_OK) {
+        remove(PLAYLIST_INDEX_TEMP_PATH);
+        return result;
+    }
+    remove(PLAYLIST_INDEX_PATH);
+    if (rename(PLAYLIST_INDEX_TEMP_PATH, PLAYLIST_INDEX_PATH) != 0) {
+        remove(PLAYLIST_INDEX_TEMP_PATH);
+        return ESP_FAIL;
+    }
+    s_playlist_count = count;
+    uint64_t elapsed_ms =
+        (uint64_t)(esp_timer_get_time() - started_us + 999) / 1000U;
+    ESP_LOGI(TAG, "Built playlist index: %u stations in %llu ms",
+             s_playlist_count, (unsigned long long)elapsed_ms);
+    return ESP_OK;
+}
+
 static bool playlist_station(uint16_t requested, char *name,
                              size_t name_size, char *url, size_t url_size) {
-    FILE *file = fopen(PLAYLIST_PATH, "r");
-    if (!file) return false;
-    uint16_t item = 0;
-    bool found = false;
-    while (fgets(s_playlist_line, sizeof(s_playlist_line), file)) {
-        char *first_tab = strchr(s_playlist_line, '\t');
-        if (!first_tab) continue;
-        char *second_tab = strchr(first_tab + 1, '\t');
-        if (!second_tab) continue;
-        ++item;
-        if (item != requested) continue;
-        *first_tab = '\0';
-        *second_tab = '\0';
-        strlcpy(name, s_playlist_line, name_size);
-        strlcpy(url, first_tab + 1, url_size);
-        found = name[0] && url[0];
-        break;
+    if (!requested || requested > s_playlist_count) return false;
+    FILE *index = fopen(PLAYLIST_INDEX_PATH, "rb");
+    if (!index) return false;
+    long index_position = (long)(requested - 1U) * sizeof(uint32_t);
+    uint32_t offset = 0;
+    bool indexed = fseek(index, index_position, SEEK_SET) == 0 &&
+                   fread(&offset, sizeof(offset), 1, index) == 1;
+    fclose(index);
+    if (!indexed) return false;
+    FILE *playlist = fopen(PLAYLIST_PATH, "rb");
+    if (!playlist) return false;
+    bool found = fseek(playlist, (long)offset, SEEK_SET) == 0 &&
+                 fgets(s_playlist_line, sizeof(s_playlist_line), playlist);
+    fclose(playlist);
+    if (!found) return false;
+    char *indexed_name;
+    char *indexed_url;
+    if (!parse_playlist_line(s_playlist_line, &indexed_name, &indexed_url)) {
+        return false;
     }
-    fclose(file);
-    return found;
+    strlcpy(name, indexed_name, name_size);
+    strlcpy(url, indexed_url, url_size);
+    return name[0] && url[0];
 }
 
 static uint16_t playlist_count(void) {
-    FILE *file = fopen(PLAYLIST_PATH, "r");
-    if (!file) return 0;
-    uint16_t count = 0;
-    while (fgets(s_playlist_line, sizeof(s_playlist_line), file)) {
-        char *first_tab = strchr(s_playlist_line, '\t');
-        if (first_tab && strchr(first_tab + 1, '\t')) ++count;
-    }
-    fclose(file);
-    return count;
+    return s_playlist_count;
 }
 
 static esp_err_t play_locked(uint16_t item) {
@@ -184,6 +280,14 @@ esp_err_t radio_control_init(native_state_t *state) {
     if (!s_lock) s_lock = xSemaphoreCreateMutex();
     ESP_RETURN_ON_FALSE(s_lock, ESP_ERR_NO_MEM, TAG, "control mutex allocation");
     s_state = state;
+    esp_err_t index_result = load_playlist_index_locked();
+    if (index_result != ESP_OK) {
+        index_result = build_playlist_index_locked();
+    }
+    if (index_result != ESP_OK) {
+        ESP_LOGW(TAG, "Playlist index unavailable: %s",
+                 esp_err_to_name(index_result));
+    }
     load_smartstart();
     ESP_LOGI(TAG, "Smart Start state: %u", s_smartstart);
     uint16_t saved_item = 0;
@@ -217,6 +321,25 @@ esp_err_t radio_control_init(native_state_t *state) {
         }
     }
     return ESP_OK;
+}
+
+esp_err_t radio_control_reindex_playlist(void) {
+    ESP_RETURN_ON_FALSE(s_state && s_lock, ESP_ERR_INVALID_STATE, TAG,
+                        "radio is not ready");
+    ESP_RETURN_ON_FALSE(xSemaphoreTake(s_lock, pdMS_TO_TICKS(1000)) == pdTRUE,
+                        ESP_ERR_TIMEOUT, TAG, "radio control lock");
+    esp_err_t result = build_playlist_index_locked();
+    if (result == ESP_OK && s_playlist_count &&
+        s_current_item > s_playlist_count) {
+        s_current_item = 1;
+        esp_err_t save_result = save_last_station(s_current_item);
+        if (save_result != ESP_OK) {
+            ESP_LOGW(TAG, "Could not clamp saved station: %s",
+                     esp_err_to_name(save_result));
+        }
+    }
+    xSemaphoreGive(s_lock);
+    return result;
 }
 
 esp_err_t radio_control_play(uint16_t item) {
