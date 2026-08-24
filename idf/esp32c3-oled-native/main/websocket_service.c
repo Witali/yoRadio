@@ -10,10 +10,14 @@
 #include "esp_check.h"
 #include "esp_log.h"
 #include "esp_netif.h"
+#include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_audio_output.h"
 #include "native_audio_settings.h"
+#include "network_service.h"
+#include "runtime_settings.h"
+#include "time_service.h"
 #include "radio_control.h"
 
 #define WS_STATUS_POLL_MS 100
@@ -165,6 +169,8 @@ static esp_err_t send_initial_state(httpd_req_t *request) {
 }
 
 static esp_err_t send_system_settings(httpd_req_t *request) {
+    char mdns[24];
+    runtime_settings_get_mdns_name(mdns, sizeof(mdns));
     native_state_t state;
     native_state_snapshot(s_state, &state);
     char address[20] = "192.168.4.1";
@@ -174,16 +180,20 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
     }
     char settings[512];
     snprintf(settings, sizeof(settings),
-             "{\"sst\":%u,\"aif\":1,\"vu\":0,\"softr\":0,\"vut\":0,"
-             "\"mdns\":\"yoradio\",\"ipaddr\":\"%s\",\"abuff\":16,"
+             "{\"sst\":%u,\"aif\":%u,\"vu\":0,\"softr\":%u,\"vut\":0,"
+             "\"mdns\":\"%s\",\"ipaddr\":\"%s\",\"abuff\":%u,"
              "\"mp3decoder\":0,\"normalize\":%u,\"normgain\":%u,"
              "\"normtarget\":%d,\"normtime\":%u,\"telnet\":0,"
-             "\"watchdog\":1}",
+             "\"watchdog\":%u}",
              radio_control_smartstart_enabled() ? 1U : 0U,
-             address, native_audio_settings_get_normalization() ? 1U : 0U,
+             runtime_settings_get_audio_info() ? 1U : 0U,
+             runtime_settings_get_softap_delay_min(), mdns, address,
+             runtime_settings_get_audio_buffer_blocks(),
+             native_audio_settings_get_normalization() ? 1U : 0U,
              native_audio_settings_get_normalization_gain_db(),
              native_audio_settings_get_normalization_target_dbfs(),
-             native_audio_settings_get_normalization_time_ms());
+             native_audio_settings_get_normalization_time_ms(),
+             runtime_settings_get_watchdog() ? 1U : 0U);
     return ws_send_request(request, settings);
 }
 
@@ -191,21 +201,35 @@ static esp_err_t send_screen_settings(httpd_req_t *request) {
     char settings[256];
     unsigned brightness = display_settings_get_brightness();
     snprintf(settings, sizeof(settings),
-             "{\"flip\":0,\"inv\":0,\"nump\":0,\"tsf\":0,"
-             "\"tsd\":0,\"upst\":%u,\"dspon\":1,\"br\":%u,\"con\":55,"
-             "\"scre\":0,\"scrt\":30,\"scrb\":0,\"scrpe\":0,"
-             "\"scrpt\":5,\"scrpb\":0}",
+             "{\"flip\":0,\"inv\":0,\"nump\":%u,\"tsf\":0,"
+             "\"tsd\":0,\"upst\":%u,\"dspon\":%u,\"br\":%u,\"con\":55,"
+             "\"scre\":%u,\"scrt\":%u,\"scrb\":%u,\"scrpe\":%u,"
+             "\"scrpt\":%u,\"scrpb\":%u}",
+             display_settings_get_numbered_playlist() ? 1U : 0U,
              display_settings_get_station_uppercase() ? 1U : 0U,
-             brightness);
+             display_settings_get_screen_on() ? 1U : 0U, brightness,
+             display_settings_get_screensaver_enabled() ? 1U : 0U,
+             display_settings_get_screensaver_timeout(),
+             display_settings_get_screensaver_blank() ? 1U : 0U,
+             display_settings_get_screensaver_playing_enabled() ? 1U : 0U,
+             display_settings_get_screensaver_playing_timeout(),
+             display_settings_get_screensaver_playing_blank() ? 1U : 0U);
     return ws_send_request(request, settings);
 }
 
 static esp_err_t send_timezone_settings(httpd_req_t *request) {
-    return ws_send_request(
-        request,
-        "{\"tzh\":0,\"tzm\":0,\"sntp1\":\"pool.ntp.org\","
-        "\"sntp2\":\"time.nist.gov\",\"timeint\":60,"
-        "\"timeintrtc\":24}");
+    char sntp1[35];
+    char sntp2[35];
+    char settings[256];
+    runtime_settings_get_sntp1(sntp1, sizeof(sntp1));
+    runtime_settings_get_sntp2(sntp2, sizeof(sntp2));
+    snprintf(settings, sizeof(settings),
+             "{\"tzh\":%d,\"tzm\":%u,\"sntp1\":\"%s\","
+             "\"sntp2\":\"%s\",\"timeint\":%u,\"timeintrtc\":24}",
+             runtime_settings_get_timezone_hour(),
+             runtime_settings_get_timezone_minute(), sntp1, sntp2,
+             runtime_settings_get_time_sync_interval_min());
+    return ws_send_request(request, settings);
 }
 
 static esp_err_t send_weather_settings(httpd_req_t *request) {
@@ -215,8 +239,11 @@ static esp_err_t send_weather_settings(httpd_req_t *request) {
 }
 
 static esp_err_t send_control_settings(httpd_req_t *request) {
-    return ws_send_request(
-        request, "{\"vols\":8,\"enca\":0,\"irtl\":10,\"skipup\":1}");
+    char settings[96];
+    snprintf(settings, sizeof(settings),
+             "{\"vols\":%u,\"enca\":0,\"irtl\":10,\"skipup\":1}",
+             runtime_settings_get_volume_steps());
+    return ws_send_request(request, settings);
 }
 
 static esp_err_t send_active_settings(httpd_req_t *request, bool client_mode) {
@@ -224,11 +251,37 @@ static esp_err_t send_active_settings(httpd_req_t *request, bool client_mode) {
         return ws_send_request(request, "{\"act\":[\"group_wifi\"]}");
     }
     // Weather is intentionally excluded by the ESP32-C3 OLED build profile.
-    return ws_send_request(
+    ESP_RETURN_ON_ERROR(ws_send_request(
         request,
         "{\"act\":[\"group_wifi\",\"group_system\",\"group_display\","
         "\"group_oled\",\"group_timezone\",\"group_controls\","
-        "\"group_buffer\",\"group_wortc\"]}");
+        "\"group_buffer\",\"group_wortc\"]}"), TAG,
+        "Send active WebUI groups");
+    // C3 has neither a telnet console, an on-device station-list cursor, nor
+    // the optional ESP-IDF mDNS responder component. Keep the DHCP hostname,
+    // but do not expose no-op controls or a misleading .local link.
+    return ws_send_request(request,
+        "{\"hide\":[\"telnet\",\"skipup\",\"mdnsnamerow\","
+        "\"radiolink\"]}");
+}
+
+static void reboot_task(void *argument) {
+    (void)argument;
+    vTaskDelay(pdMS_TO_TICKS(300));
+    esp_restart();
+}
+
+static void schedule_reboot(void) {
+    if (xTaskCreate(reboot_task, "web_reboot", BOARD_TASK_STACK_WIFI_REBOOT,
+                    NULL, 3, NULL) != pdPASS) {
+        ESP_LOGE(TAG, "Could not schedule WebUI reboot");
+    }
+}
+
+static void log_setting_error(const char *name, esp_err_t result) {
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "%s update failed: %s", name, esp_err_to_name(result));
+    }
 }
 
 static void handle_command(httpd_req_t *request, char *command) {
@@ -261,20 +314,25 @@ static void handle_command(httpd_req_t *request, char *command) {
     } else if (strcmp(command, "submitplaylistdone") == 0) {
         // The shared WebUI acknowledges that it has reloaded playlist.csv.
     } else if (strcmp(command, "play") == 0) {
+        display_settings_note_activity();
         radio_control_play((uint16_t)strtoul(value, NULL, 10));
         send_initial_state(request);
     } else if (strcmp(command, "stop") == 0) {
+        display_settings_note_activity();
         radio_control_stop();
         send_initial_state(request);
     } else if (strcmp(command, "toggle") == 0) {
+        display_settings_note_activity();
         radio_control_toggle();
         send_initial_state(request);
     } else if (strcmp(command, "prev") == 0 ||
                strcmp(command, "next") == 0) {
+        display_settings_note_activity();
         if (strcmp(command, "prev") == 0) radio_control_previous();
         else radio_control_next();
         send_initial_state(request);
     } else if (strcmp(command, "volume") == 0) {
+        display_settings_note_activity();
         unsigned volume = strtoul(value, NULL, 10);
         native_audio_output_set_volume(volume > 254 ? 254 : (uint8_t)volume);
         send_initial_state(request);
@@ -287,6 +345,75 @@ static void handle_command(httpd_req_t *request, char *command) {
         }
         send_system_settings(request);
 
+    } else if (strcmp(command, "audioinfo") == 0) {
+        log_setting_error("Audio info", runtime_settings_set_audio_info(
+                                            strtoul(value, NULL, 10) != 0U));
+        send_system_settings(request);
+    } else if (strcmp(command, "softap") == 0) {
+        unsigned minutes = strtoul(value, NULL, 10);
+        if (minutes > 30U) minutes = 30U;
+        log_setting_error("SoftAP delay",
+                          runtime_settings_set_softap_delay_min(minutes));
+        send_system_settings(request);
+    } else if (strcmp(command, "abuff") == 0) {
+        unsigned blocks = strtoul(value, NULL, 10);
+        if (blocks < 5U) blocks = 5U;
+        if (blocks > 14U) blocks = 14U;
+        log_setting_error("Audio buffer",
+                          runtime_settings_set_audio_buffer_blocks(blocks));
+        send_system_settings(request);
+    } else if (strcmp(command, "watchdog") == 0) {
+        log_setting_error("Watchdog", runtime_settings_set_watchdog(
+                                          strtoul(value, NULL, 10) != 0U));
+        send_system_settings(request);
+    } else if (strcmp(command, "mdnsname") == 0) {
+        log_setting_error("mDNS", runtime_settings_set_mdns_name(value));
+        send_system_settings(request);
+    } else if (strcmp(command, "reboot") == 0 ||
+               strcmp(command, "rebootmdns") == 0) {
+        ws_send_request(request, "{\"rebooting\":1}");
+        schedule_reboot();
+    } else if (strcmp(command, "tzh") == 0) {
+        long hour = strtol(value, NULL, 10);
+        if (hour < -12) hour = -12;
+        if (hour > 14) hour = 14;
+        esp_err_t result = runtime_settings_set_timezone_hour((int8_t)hour);
+        if (result == ESP_OK) result = time_service_apply();
+        log_setting_error("Timezone hour", result);
+        send_timezone_settings(request);
+    } else if (strcmp(command, "tzm") == 0) {
+        unsigned minute = strtoul(value, NULL, 10);
+        if (minute > 45U) minute = 45U;
+        minute = (minute / 15U) * 15U;
+        esp_err_t result =
+            runtime_settings_set_timezone_minute((uint8_t)minute);
+        if (result == ESP_OK) result = time_service_apply();
+        log_setting_error("Timezone minute", result);
+        send_timezone_settings(request);
+    } else if (strcmp(command, "sntp1") == 0 ||
+               strcmp(command, "sntp2") == 0) {
+        esp_err_t result = strcmp(command, "sntp1") == 0
+                               ? runtime_settings_set_sntp1(value)
+                               : runtime_settings_set_sntp2(value);
+        if (result == ESP_OK) result = time_service_apply();
+        log_setting_error("SNTP server", result);
+        send_timezone_settings(request);
+    } else if (strcmp(command, "timeint") == 0) {
+        unsigned interval = strtoul(value, NULL, 10);
+        if (interval < 15U) interval = 15U;
+        if (interval > 1440U) interval = 1440U;
+        esp_err_t result = runtime_settings_set_time_sync_interval_min(
+            (uint16_t)interval);
+        if (result == ESP_OK) result = time_service_apply();
+        log_setting_error("SNTP interval", result);
+        send_timezone_settings(request);
+    } else if (strcmp(command, "volsteps") == 0) {
+        unsigned steps = strtoul(value, NULL, 10);
+        if (steps < 1U) steps = 1U;
+        if (steps > 10U) steps = 10U;
+        log_setting_error("Volume steps",
+                          runtime_settings_set_volume_steps((uint8_t)steps));
+        send_control_settings(request);
     } else if (strcmp(command, "normalization") == 0) {
         esp_err_t result = native_audio_settings_set_normalization(
             strtoul(value, NULL, 10) != 0U);
@@ -328,6 +455,51 @@ static void handle_command(httpd_req_t *request, char *command) {
                      esp_err_to_name(result));
         }
         send_system_settings(request);
+    } else if (strcmp(command, "screenon") == 0) {
+        log_setting_error("Screen power", display_settings_set_screen_on(
+                                              strtoul(value, NULL, 10) != 0U,
+                                              true));
+        send_screen_settings(request);
+    } else if (strcmp(command, "numplaylist") == 0) {
+        log_setting_error("Numbered playlist",
+                          display_settings_set_numbered_playlist(
+                              strtoul(value, NULL, 10) != 0U, true));
+        send_screen_settings(request);
+    } else if (strcmp(command, "screensaverenabled") == 0) {
+        log_setting_error("Stopped screensaver",
+                          display_settings_set_screensaver_enabled(
+                              strtoul(value, NULL, 10) != 0U));
+        send_screen_settings(request);
+    } else if (strcmp(command, "screensavertimeout") == 0) {
+        unsigned timeout = strtoul(value, NULL, 10);
+        if (timeout < 5U) timeout = 5U;
+        if (timeout > 65520U) timeout = 65520U;
+        log_setting_error("Stopped screensaver timeout",
+                          display_settings_set_screensaver_timeout(timeout));
+        send_screen_settings(request);
+    } else if (strcmp(command, "screensaverblank") == 0) {
+        log_setting_error("Stopped screensaver blank",
+                          display_settings_set_screensaver_blank(
+                              strtoul(value, NULL, 10) != 0U));
+        send_screen_settings(request);
+    } else if (strcmp(command, "screensaverplayingenabled") == 0) {
+        log_setting_error("Playing screensaver",
+                          display_settings_set_screensaver_playing_enabled(
+                              strtoul(value, NULL, 10) != 0U));
+        send_screen_settings(request);
+    } else if (strcmp(command, "screensaverplayingtimeout") == 0) {
+        unsigned timeout = strtoul(value, NULL, 10);
+        if (timeout < 1U) timeout = 1U;
+        if (timeout > 1080U) timeout = 1080U;
+        log_setting_error(
+            "Playing screensaver timeout",
+            display_settings_set_screensaver_playing_timeout(timeout));
+        send_screen_settings(request);
+    } else if (strcmp(command, "screensaverplayingblank") == 0) {
+        log_setting_error("Playing screensaver blank",
+                          display_settings_set_screensaver_playing_blank(
+                              strtoul(value, NULL, 10) != 0U));
+        send_screen_settings(request);
     } else if (strcmp(command, "brightness") == 0 ||
                strcmp(command, "dim") == 0) {
         unsigned brightness = strtoul(value, NULL, 10);
@@ -349,13 +521,16 @@ static void handle_command(httpd_req_t *request, char *command) {
         send_screen_settings(request);
     } else if (strcmp(command, "volp") == 0 ||
                strcmp(command, "volm") == 0) {
+        display_settings_note_activity();
         int volume = native_audio_output_get_volume();
-        volume += strcmp(command, "volp") == 0 ? 8 : -8;
+        int steps = runtime_settings_get_volume_steps();
+        volume += strcmp(command, "volp") == 0 ? steps : -steps;
         if (volume < 0) volume = 0;
         if (volume > 254) volume = 254;
         native_audio_output_set_volume((uint8_t)volume);
         send_initial_state(request);
     } else if (strcmp(command, "balance") == 0) {
+        display_settings_note_activity();
         int balance = strtol(value, NULL, 10);
         if (balance < -16) balance = -16;
         if (balance > 16) balance = 16;

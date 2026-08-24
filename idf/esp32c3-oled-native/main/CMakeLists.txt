@@ -11,6 +11,8 @@ set(NATIVE_SRCS
   "network_service.c"
   "oled_display.c"
   "radio_control.c"
+  "runtime_settings.c"
+  "time_service.c"
   "web_pages_bridge.cpp"
   "web_service.c"
   "websocket_service.c")
@@ -34,6 +36,7 @@ idf_component_register(
     esp_timer
     esp_wifi
     esp_ringbuf
+    lwip
     mbedtls
     nvs_flash
     spiffs

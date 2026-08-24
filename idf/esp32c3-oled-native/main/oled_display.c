@@ -115,6 +115,13 @@ esp_err_t oled_display_set_brightness(oled_display_t *display,
     return send_commands(display, commands, sizeof(commands));
 }
 
+esp_err_t oled_display_set_power(oled_display_t *display, bool on) {
+    ESP_RETURN_ON_FALSE(display && display->device, ESP_ERR_INVALID_STATE, TAG,
+                        "OLED is not initialized");
+    const uint8_t command = on ? 0xaf : 0xae;
+    return send_commands(display, &command, 1);
+}
+
 void oled_display_clear(oled_display_t *display) {
     if (display) memset(display->framebuffer, 0, sizeof(display->framebuffer));
 }

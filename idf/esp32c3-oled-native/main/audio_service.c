@@ -33,10 +33,10 @@
 #endif
 #include "native_audio_output.h"
 
+#include "runtime_settings.h"
 #define STREAM_CHUNK_SIZE 2048
 #define STREAM_READ_TIMEOUT_MS 250
 #define DECODE_BUFFER_INITIAL 12288
-#define ENCODED_RING_SIZE (16 * 1024)
 #define PCM_RING_SIZE (16 * 1024)
 #define PCM_PACKET_DATA_SIZE 7168
 #define MAX_HTTP_REDIRECTS 5
@@ -44,6 +44,7 @@
 #define DECODE_STATS_INTERVAL_US 5000000LL
 #define BITRATE_UPDATE_INTERVAL_US 1000000LL
 #define STREAM_BITRATE_INTERVAL_US 5000000LL
+#define STREAM_STALL_TIMEOUT_US 10000000LL
 #ifdef YORADIO_CODEC_BENCHMARK
 #define CODEC_FIXTURE_MAGIC 0x59434658UL
 #endif
@@ -543,6 +544,7 @@ static void stream_task(void *argument) {
         bool first_chunk = true;
         bool stream_stalled = false;
         bool stream_read_failed = false;
+        int64_t last_stream_data_us = esp_timer_get_time();
         stream_bitrate_meter_t bitrate_meter = {
             .started_us = esp_timer_get_time(),
         };
@@ -552,7 +554,15 @@ static void stream_task(void *argument) {
             // Stop/station change may happen while the socket read is blocked.
             // Never pass data returned by that obsolete read to ICY or audio.
             if (atomic_load(&s_generation) != command.generation) break;
-            if (received == -ESP_ERR_HTTP_EAGAIN) continue;
+            if (received == -ESP_ERR_HTTP_EAGAIN) {
+                if (runtime_settings_get_watchdog() &&
+                    esp_timer_get_time() - last_stream_data_us >=
+                        STREAM_STALL_TIMEOUT_US) {
+                    stream_read_failed = true;
+                    break;
+                }
+                continue;
+            }
             if (received < 0) {
                 ESP_LOGW(TAG, "Stream read failed");
                 stream_read_failed = true;
@@ -560,10 +570,18 @@ static void stream_task(void *argument) {
             }
             if (received == 0) {
                 if (esp_http_client_is_complete_data_received(client)) break;
+                if (runtime_settings_get_watchdog() &&
+                    esp_timer_get_time() - last_stream_data_us >=
+                        STREAM_STALL_TIMEOUT_US) {
+                    ESP_LOGW(TAG, "Stream watchdog timeout");
+                    stream_read_failed = true;
+                    break;
+                }
                 vTaskDelay(pdMS_TO_TICKS(10));
                 continue;
             }
             size_t offset = 0;
+            last_stream_data_us = esp_timer_get_time();
             while (offset < (size_t)received) {
                 if (!metadata_interval) {
                     if (!send_stream_audio(command.generation, &codec,
@@ -1155,8 +1173,10 @@ esp_err_t audio_service_start(native_state_t *state) {
     atomic_init(&s_measured_bitrate_ready, false);
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;
+    size_t encoded_ring_size =
+        (size_t)runtime_settings_get_audio_buffer_blocks() * 1600U;
     s_commands = xQueueCreate(1, sizeof(play_command_t));
-    s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
+    s_encoded = xRingbufferCreate(encoded_ring_size, RINGBUF_TYPE_NOSPLIT);
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     if (!s_commands || !s_encoded || !s_pcm) {
         return ESP_ERR_NO_MEM;
@@ -1178,8 +1198,9 @@ esp_err_t audio_service_start(native_state_t *state) {
         return ESP_ERR_NO_MEM;
     }
     ESP_LOGI(TAG,
-             "Pipeline ready: %s, 16 KiB compressed + 16 KiB PCM, free heap %u",
+             "Pipeline ready: %s, %u-byte compressed + 16 KiB PCM, free heap %u",
              native_audio_output_name(),
+             (unsigned)encoded_ring_size,
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
 #ifdef YORADIO_CODEC_BENCHMARK
     ESP_RETURN_ON_ERROR(benchmark_autostart(), TAG,

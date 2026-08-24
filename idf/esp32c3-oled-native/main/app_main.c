@@ -19,6 +19,8 @@
 #include "nvs_flash.h"
 #include "oled_display.h"
 #include "radio_control.h"
+#include "runtime_settings.h"
+#include "time_service.h"
 #include "web_service.h"
 
 #define BUTTON_DEBOUNCE_MS 35
@@ -228,6 +230,7 @@ static void format_stream_details(const native_state_t *state, char *output,
 }
 
 static void draw_status(const native_state_t *state,
+                        const char *station_text,
                         const char *secondary_text,
                         const display_scroll_t *station_scroll,
                         const display_scroll_t *title_scroll,
@@ -235,7 +238,7 @@ static void draw_status(const native_state_t *state,
     char line[24] = {0};
     oled_display_clear(&s_display);
     oled_display_draw_large_text(
-        &s_display, 0, 0, state->station,
+        &s_display, 0, 0, station_text,
         station_scroll->pixel_offset, station_scroll->enabled, true,
         station_uppercase);
     oled_display_draw_large_text(
@@ -282,6 +285,11 @@ static void display_task(void *argument) {
     bool secondary_initialized = false;
     bool previous_station_uppercase =
         display_settings_get_station_uppercase();
+    bool previous_numbered = display_settings_get_numbered_playlist();
+    bool previous_audio_info = runtime_settings_get_audio_info();
+    uint16_t previous_item = 0;
+    bool screensaver_was_active = false;
+    char station_text[176] = "";
     uint32_t button_status_revision =
         (uint32_t)atomic_load(&s_button_status_revision);
     uint32_t button_status_until_ms = 0;
@@ -293,6 +301,33 @@ static void display_task(void *argument) {
         native_state_snapshot(&s_state, &state);
         uint32_t now_ms = (uint32_t)(esp_timer_get_time() / 1000U);
         bool redraw = display_state_changed(&state, &previous);
+        bool screensaver_power_off = false;
+        bool screensaver_active = display_settings_screensaver_active(
+            state.audio_running, now_ms, &screensaver_power_off);
+        if (screensaver_active) {
+            if (!screensaver_was_active) {
+                ESP_ERROR_CHECK_WITHOUT_ABORT(
+                    oled_display_stop_scroll(&s_display));
+                oled_display_clear(&s_display);
+                ESP_ERROR_CHECK_WITHOUT_ABORT(
+                    oled_display_present(&s_display));
+                if (screensaver_power_off) {
+                    ESP_ERROR_CHECK_WITHOUT_ABORT(
+                        oled_display_set_power(&s_display, false));
+                }
+                screensaver_was_active = true;
+            }
+            previous = state;
+            vTaskDelay(pdMS_TO_TICKS(50));
+            continue;
+        }
+        if (screensaver_was_active) {
+            ESP_ERROR_CHECK_WITHOUT_ABORT(
+                oled_display_set_power(&s_display, true));
+            screensaver_was_active = false;
+            previous.network_mode = (native_network_mode_t)-1;
+            redraw = true;
+        }
         uint32_t current_button_status_revision =
             (uint32_t)atomic_load(&s_button_status_revision);
         if (current_button_status_revision != button_status_revision) {
@@ -307,17 +342,32 @@ static void display_task(void *argument) {
         if (button_status_visible != button_status_was_visible) redraw = true;
         bool station_uppercase = display_settings_get_station_uppercase();
         if (station_uppercase != previous_station_uppercase) redraw = true;
+        bool numbered = display_settings_get_numbered_playlist();
+        bool audio_info = runtime_settings_get_audio_info();
+        uint16_t current_item = radio_control_current_item();
+        if (numbered) {
+            snprintf(station_text, sizeof(station_text), "%u %s", current_item,
+                     state.station);
+        } else {
+            strlcpy(station_text, state.station, sizeof(station_text));
+        }
+        bool station_changed = strcmp(state.station, previous.station) != 0 ||
+                               numbered != previous_numbered ||
+                               current_item != previous_item;
+        bool audio_info_changed = audio_info != previous_audio_info;
+        if (station_changed || audio_info_changed) redraw = true;
         char stream_details[96];
         format_stream_details(&state, stream_details, sizeof(stream_details));
-        if (strcmp(state.station, previous.station) != 0) {
-            reset_scroll(&station_scroll, state.station, now_ms);
+        if (station_changed) {
+            reset_scroll(&station_scroll, station_text, now_ms);
             if (scroll_owner == DISPLAY_SCROLL_STATION) {
                 scroll_owner = DISPLAY_SCROLL_NONE;
             }
         }
-        bool title_changed = strcmp(state.title, previous.title) != 0;
+        bool title_changed = strcmp(state.title, previous.title) != 0 ||
+                             audio_info_changed;
         if (title_changed) {
-            show_stream_info = !state.title[0];
+            show_stream_info = audio_info && !state.title[0];
             secondary_started_ms = now_ms;
             if (scroll_owner == DISPLAY_SCROLL_TITLE) {
                 scroll_owner = DISPLAY_SCROLL_NONE;
@@ -389,7 +439,7 @@ static void display_task(void *argument) {
                            now_ms, &completed)) {
             redraw = true;
         }
-        if (state.title[0] &&
+        if (audio_info && state.title[0] &&
             (completed == DISPLAY_SCROLL_TITLE ||
              (!title_scroll.enabled &&
               now_ms - secondary_started_ms >= DISPLAY_SECONDARY_PAGE_MS))) {
@@ -403,7 +453,7 @@ static void display_task(void *argument) {
                 scroll_owner = DISPLAY_SCROLL_NONE;
             }
             redraw = true;
-        } else if (!state.title[0] &&
+        } else if (audio_info && !state.title[0] &&
                    (completed == DISPLAY_SCROLL_TITLE ||
                     (!title_scroll.enabled &&
                      now_ms - secondary_started_ms >=
@@ -420,12 +470,15 @@ static void display_task(void *argument) {
                 button_status_visible
                     ? (button_status_playing ? "playing" : "stopped")
                     : (state.audio_running ? secondary_text : "");
-            draw_status(&state, display_secondary, &station_scroll,
+            draw_status(&state, station_text, display_secondary, &station_scroll,
                         button_status_visible ? &button_status_scroll
                                               : &title_scroll,
                         station_uppercase);
             previous = state;
             previous_station_uppercase = station_uppercase;
+            previous_numbered = numbered;
+            previous_audio_info = audio_info;
+            previous_item = current_item;
             button_status_was_visible = button_status_visible;
         }
 #if CONFIG_YORADIO_OLED_HW_SCROLL
@@ -434,7 +487,7 @@ static void display_task(void *argument) {
                 scroll_owner == DISPLAY_SCROLL_STATION;
             esp_err_t result = oled_display_start_text_scroll(
                 &s_display, station ? 0 : 2,
-                station ? state.station : secondary_text, station,
+                station ? station_text : secondary_text, station,
                 station && station_uppercase);
             if (result == ESP_OK) {
                 hardware_scroll.active = true;
@@ -494,6 +547,7 @@ static void button_task(void *argument) {
             now - raw_changed_at >= pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS)) {
             stable_pressed = raw_pressed;
             if (stable_pressed) {
+                display_settings_note_activity();
                 pressed_at = now;
                 hold_handled = false;
             } else if (!hold_handled) {
@@ -564,6 +618,10 @@ static void services_task(void *argument) {
         ESP_LOGE(TAG, "Network failed: %s", esp_err_to_name(result));
         native_state_set_network(&s_state, NATIVE_NETWORK_ERROR, 0);
     }
+    result = time_service_apply();
+    if (result != ESP_OK) {
+        ESP_LOGE(TAG, "Time service failed: %s", esp_err_to_name(result));
+    }
     result = audio_service_start(&s_state);
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Audio service failed: %s", esp_err_to_name(result));
@@ -595,6 +653,7 @@ void app_main(void) {
                  esp_err_to_name(result));
     }
     ESP_ERROR_CHECK(native_audio_settings_init());
+    ESP_ERROR_CHECK(runtime_settings_init());
     result = mount_spiffs();
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "SPIFFS mount failed without format: %s",
