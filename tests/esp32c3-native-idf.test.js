@@ -182,8 +182,8 @@ test("native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll",
   assert.match(font, /Spleen 8x16/);
   assert.match(font, /Fixed 8x15 cells/);
   assert.match(font, /font8x15\[3840\]/);
-  assert.match(app, /state->station[\s\S]*secondary_text/);
-  assert.match(app, /state->station[\s\S]*station_scroll->enabled, true/);
+  assert.match(app, /station_text[\s\S]*secondary_text/);
+  assert.match(app, /station_text[\s\S]*station_scroll->enabled, true/);
   assert.match(app, /secondary_text[\s\S]*title_scroll->enabled, false/);
   assert.match(app, /DISPLAY_SCROLL_HOLD_MS 3500U/);
   assert.match(app, /DISPLAY_SCROLL_STEP_MS 35U/);
@@ -244,10 +244,10 @@ test("native OLED alternates ICY title with live stream parameters", () => {
   assert.match(app, /state->sample_rate_hz[\s\S]*"%lu\.%lu kHz"/);
   assert.match(app, /state->channels == 1[\s\S]*"mono"/);
   assert.match(app, /state->channels == 2[\s\S]*"stereo"/);
-  assert.match(app, /show_stream_info = !state\.title\[0\]/);
+  assert.match(app, /show_stream_info = audio_info && !state\.title\[0\]/);
   assert.match(app, /completed == DISPLAY_SCROLL_TITLE[\s\S]*show_stream_info = !show_stream_info/);
   assert.match(app, /DISPLAY_SECONDARY_PAGE_MS 5000U/);
-  assert.match(app, /strlcpy\(secondary_text, stream_details[\s\S]*reset_scroll/);
+  assert.match(app, /strlcpy\(secondary_text, wanted_secondary[\s\S]*reset_scroll/);
   assert.doesNotMatch(app, /update_scroll_dimensions/);
   assert.doesNotMatch(app, /stream info\.\.\./i);
   assert.match(app, /bool secondary_initialized = false/);
@@ -494,7 +494,9 @@ test("native audio pipeline batches PCM and caches stable stream layout", () => 
   const audio = read("main", "audio_service.c");
   const output = read("main", "native_audio_output.c");
 
-  assert.match(audio, /#define ENCODED_RING_SIZE \(16 \* 1024\)/);
+  assert.match(audio, /runtime_settings_get_audio_buffer_blocks\(\) \* 1600U/);
+  assert.match(audio,
+               /xRingbufferCreate\(encoded_ring_size, RINGBUF_TYPE_NOSPLIT\)/);
   assert.match(audio, /#define PCM_RING_SIZE \(16 \* 1024\)/);
   assert.match(audio, /#define PCM_PACKET_DATA_SIZE 7168/);
   assert.match(audio, /bool stream_info_ready = false/);
