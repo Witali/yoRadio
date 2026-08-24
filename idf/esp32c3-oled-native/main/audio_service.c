@@ -32,6 +32,7 @@
 #include "custom_legacy_adapter.h"
 #endif
 #include "native_audio_output.h"
+#include "network_service.h"
 
 #include "runtime_settings.h"
 #define STREAM_CHUNK_SIZE 2048
@@ -487,7 +488,10 @@ static void stream_task(void *argument) {
         };
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (!client) {
-            state_set_audio(false, "HTTP allocation failed");
+            if (atomic_load(&s_generation) == command.generation) {
+                state_set_audio(false, "HTTP allocation failed");
+                network_service_set_streaming(false);
+            }
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
@@ -495,7 +499,10 @@ static void stream_task(void *argument) {
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Stream connection failed for %s: %s", command.url,
                      esp_err_to_name(result));
-            state_set_audio(false, "connection failed");
+            if (atomic_load(&s_generation) == command.generation) {
+                state_set_audio(false, "connection failed");
+                network_service_set_streaming(false);
+            }
             dispose_http_client(client);
             continue;
         }
@@ -655,6 +662,7 @@ static void stream_task(void *argument) {
                                        : (stream_read_failed
                                               ? "stream read failed"
                                               : "stream ended"));
+            network_service_set_streaming(false);
         }
     }
 }
@@ -1216,15 +1224,16 @@ esp_err_t audio_service_start(native_state_t *state) {
         return ESP_ERR_NO_MEM;
     }
     s_encoded_usable_size = xRingbufferGetCurFreeSize(s_encoded);
-    // ESP32-C3 has one core. Give networking and decoding equal time slices;
-    // unlike the dual-core CYD, a lower-priority stream task can otherwise be
-    // starved before it reaches an ICY metadata boundary. Output stays one
-    // priority higher to keep the PDM DMA fed.
+    // ESP32-C3 has one core. Decode a complete compressed frame above the
+    // output task: equal-priority time slicing makes the wall-time measurement
+    // include output work and can stretch a 14 ms MP3 call past 60 ms. The
+    // small PCM ring bounds this burst; once full, backpressure yields to
+    // output. Wi-Fi/TCP driver tasks already use higher system priorities.
     if (xTaskCreate(stream_task, "radio_stream",
                     BOARD_TASK_STACK_RADIO_STREAM, NULL, 5, NULL) !=
             pdPASS ||
         xTaskCreate(decoder_task, "audio_decode",
-                    BOARD_TASK_STACK_AUDIO_DECODER, NULL, 5, NULL) !=
+                    BOARD_TASK_STACK_AUDIO_DECODER, NULL, 7, NULL) !=
             pdPASS ||
         xTaskCreate(output_task, "audio_output",
                     BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6, NULL) !=
@@ -1247,6 +1256,9 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     if (!url || !url[0] || strlen(url) >= sizeof(((play_command_t *)0)->url)) {
         return ESP_ERR_INVALID_ARG;
     }
+    // Power-save changes are best effort: a transient Wi-Fi driver error must
+    // not reject an otherwise valid Play command.
+    network_service_set_streaming(true);
     play_command_t command = {
         .generation = atomic_fetch_add(&s_generation, 1) + 1,
         .requested_codec = codec,
@@ -1261,8 +1273,11 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     // Clear a previous station's playing state before the command is queued.
     // The stream task switches it back after open_stream() succeeds.
     state_set_audio(false, "connecting");
-    return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
-                                                            : ESP_FAIL;
+    if (xQueueOverwrite(s_commands, &command) == pdTRUE) return ESP_OK;
+    if (atomic_load(&s_generation) == command.generation) {
+        network_service_set_streaming(false);
+    }
+    return ESP_FAIL;
 }
 
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -1328,6 +1343,7 @@ esp_err_t audio_service_resume(void) {
 
 void audio_service_stop(void) {
     atomic_fetch_add(&s_generation, 1);
+    network_service_set_streaming(false);
     native_state_set_title(s_state, "");
     native_state_set_bitrate(s_state, 0);
     native_state_set_stream_info(s_state, "", 0, 0);

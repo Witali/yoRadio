@@ -604,10 +604,10 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
     assert.match(kconfig, new RegExp(symbol));
   }
   assert.match(kconfig, /default YORADIO_MP3_DECODER_ESPRESSIF/);
-  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
+  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_HELIX=y/);
   assert.doesNotMatch(
     defaults,
-    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:HELIX|MINIMP3)=y/m,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:ESPRESSIF|MINIMP3)=y/m,
   );
   assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y/);
   assert.match(component, /aac_decoder\/aac_decoder\.cpp/);
@@ -619,7 +619,7 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
   assert.match(audio, /custom_legacy_decoder_feed/);
 });
 
-test("native ESP-IDF boards default to Espressif MP3", () => {
+test("native ESP-IDF boards use board-specific MP3 defaults", () => {
   const selector = fs.readFileSync(
     path.join(
       root,
@@ -653,15 +653,15 @@ test("native ESP-IDF boards default to Espressif MP3", () => {
 
   assert.match(selector, /selectedBackend = MP3_DECODER_MINIMP3/);
   assert.match(config, /store\.mp3Decoder = 1; \/\/ minimp3/);
-  assert.match(c3Defaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
+  assert.match(c3Defaults, /CONFIG_YORADIO_MP3_DECODER_HELIX=y/);
   assert.doesNotMatch(
     c3Defaults,
-    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:HELIX|MINIMP3)=y/m,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:ESPRESSIF|MINIMP3)=y/m,
   );
   assert.match(cydDefaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
   assert.match(cydAudio, /custom_legacy_decoder_feed/);
   assert.doesNotMatch(
-    c3Defaults + cydDefaults,
+    cydDefaults,
     /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:HELIX|MINIMP3)=y/m,
   );
 });
@@ -704,6 +704,45 @@ test("native C3 uses wifi.csv as its only persistent credential source", () => {
   assert.match(network, /read_credentials\(&s_station_config\)/);
   assert.match(network, /esp_wifi_set_storage\(WIFI_STORAGE_RAM\)/);
   assert.doesNotMatch(network, /esp_wifi_get_config/);
+});
+
+test("native C3 disables modem sleep only while audio is active", () => {
+  const network = read("main", "network_service.c");
+  const audio = read("main", "audio_service.c");
+
+  assert.match(network, /active \? WIFI_PS_NONE : WIFI_PS_MIN_MODEM/);
+  assert.match(audio, /audio_service_play[\s\S]*network_service_set_streaming\(true\)/);
+  assert.match(audio, /audio_service_stop[\s\S]*network_service_set_streaming\(false\)/);
+  assert.match(
+    audio,
+    /atomic_load\(&s_generation\) == command\.generation[\s\S]*network_service_set_streaming\(false\)/,
+  );
+  assert.doesNotMatch(
+    audio,
+    /ESP_RETURN_ON_ERROR\(network_service_set_streaming\(true\)/,
+  );
+});
+
+test("native audio buffers cover high-bitrate remote streams", () => {
+  const c3Defaults = read("sdkconfig.defaults");
+  const c3Audio = read("main", "audio_service.c");
+  const cydDefaults = fs.readFileSync(
+    path.join(root, "idf", "esp32-cyd2usb-native", "sdkconfig.defaults"),
+    "utf8",
+  );
+  const cydAudio = fs.readFileSync(
+    path.join(root, "idf", "esp32-cyd2usb-native", "main", "audio_service.c"),
+    "utf8",
+  );
+
+  for (const defaults of [c3Defaults, cydDefaults]) {
+    assert.match(defaults, /CONFIG_LWIP_TCP_WND_DEFAULT=11520/);
+    assert.match(defaults, /CONFIG_LWIP_TCP_RECVMBOX_SIZE=10/);
+  }
+  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_DECODER, NULL, 7, NULL/);
+  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6, NULL/);
+  assert.match(cydAudio, /#define ENCODED_RING_SIZE \(16 \* 1024\)/);
+  assert.match(cydAudio, /16 KiB compressed \+ 8 KiB PCM/);
 });
 
 test("native C3 refreshes Wi-Fi signal strength for WebSocket status", () => {
