@@ -121,6 +121,7 @@ static atomic_bool s_measured_bitrate_ready;
 // One stream task owns this workspace; keeping it in BSS avoids a 4 KiB
 // allocation/free cycle whenever a station starts or stops.
 static char s_icy_metadata[ICY_METADATA_MAX + 1];
+static void log_runtime_memory(const char *stage);
 
 static void dispose_http_client(esp_http_client_handle_t client) {
     if (!client) return;
@@ -498,6 +499,9 @@ static void stream_task(void *argument) {
             dispose_http_client(client);
             continue;
         }
+        if (strncmp(command.url, "https://", 8) == 0) {
+            log_runtime_memory("after TLS handshake");
+        }
         // Keep the long timeout for TCP/TLS setup, then poll the stream often
         // enough that Stop can be handled without closing an HTTP client from
         // a different task (esp_http_client handles are not thread-safe).
@@ -564,6 +568,7 @@ static void stream_task(void *argument) {
                 continue;
             }
             if (received < 0) {
+                log_runtime_memory("at stream read failure");
                 ESP_LOGW(TAG, "Stream read failed");
                 stream_read_failed = true;
                 break;
@@ -652,6 +657,16 @@ static void stream_task(void *argument) {
                                               : "stream ended"));
         }
     }
+}
+
+static void log_runtime_memory(const char *stage) {
+    ESP_LOGI(TAG,
+             "Memory %s: free=%u largest=%u minimum=%u task_stack_hwm=%u",
+             stage,
+             (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT),
+             (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_8BIT),
+             (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT),
+             (unsigned)uxTaskGetStackHighWaterMark(NULL));
 }
 
 static bool send_pcm(uint32_t generation,
@@ -780,6 +795,7 @@ static void decoder_task(void *argument) {
     decode_stats_t stats = {0};
     esp_audio_simple_dec_info_t stream_info = {0};
     bool stream_info_ready = false;
+    bool first_frame_memory_logged = false;
 #ifdef YORADIO_CODEC_BENCHMARK
     size_t decoder_heap_before = 0;
     bool first_frame_memory_reported = false;
@@ -806,6 +822,7 @@ static void decoder_task(void *argument) {
             codec = NATIVE_CODEC_AUTO;
             memset(&stream_info, 0, sizeof(stream_info));
             stream_info_ready = false;
+            first_frame_memory_logged = false;
             atomic_store(&s_decoder_released_generation,
                          current_generation);
         }
@@ -835,6 +852,7 @@ static void decoder_task(void *argument) {
             generation = packet->generation;
             codec = packet->codec;
             stream_info_ready = false;
+            first_frame_memory_logged = false;
             reset_decoder_bitrate_tracking();
             decode_stats_reset(&stats, generation, codec, esp_timer_get_time());
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -959,6 +977,10 @@ static void decoder_task(void *argument) {
                     first_frame_memory_reported = true;
                 }
 #endif
+                if (!first_frame_memory_logged && stream_info_ready) {
+                    log_runtime_memory("after first FLAC frame");
+                    first_frame_memory_logged = true;
+                }
                 decode_stats_report(&stats, esp_timer_get_time());
                 if (result < 0 && generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom FLAC decode error: %d", result);
@@ -1005,6 +1027,10 @@ static void decoder_task(void *argument) {
                     first_frame_memory_reported = true;
                 }
 #endif
+                if (!first_frame_memory_logged && stream_info_ready) {
+                    log_runtime_memory("after first legacy frame");
+                    first_frame_memory_logged = true;
+                }
                 decode_stats_report(&stats, esp_timer_get_time());
                 if (result < 0 && generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom %s decode error: %d",
@@ -1104,6 +1130,10 @@ static void decoder_task(void *argument) {
                         first_frame_memory_reported = true;
                     }
 #endif
+                    if (!first_frame_memory_logged) {
+                        log_runtime_memory("after first decoded frame");
+                        first_frame_memory_logged = true;
+                    }
                     decode_stats_add_audio(&stats, &stream_info,
                                            frame.decoded_size);
                     if (!send_pcm(generation, &stream_info, output,
