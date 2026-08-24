@@ -120,3 +120,25 @@ test("shared WebUI hides native controls that cannot be applied", () => {
     assert.ok(ws.includes(`\\"${id}\\"`), `native hide list is missing ${id}`);
   }
 });
+
+test("native settings changes do not overwrite the active form", () => {
+  const source = read(
+    "idf", "esp32c3-oled-native", "main", "websocket_service.c"
+  );
+
+  // Arduino sends each settings group only for its explicit GET request.
+  // Echoing a whole group after every input makes setupElement() rewrite
+  // text fields while the user is editing them.
+  for (const sender of [
+    "send_system_settings",
+    "send_screen_settings",
+    "send_timezone_settings",
+    "send_control_settings",
+  ]) {
+    const calls =
+      source.match(new RegExp(`${sender}\\(request\\);`, "g")) || [];
+    assert.equal(
+      calls.length, 1, `${sender} must only answer its GET request`
+    );
+  }
+});

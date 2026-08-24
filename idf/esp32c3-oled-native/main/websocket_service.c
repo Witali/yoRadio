@@ -343,32 +343,26 @@ static void handle_command(httpd_req_t *request, char *command) {
             ESP_LOGW(TAG, "Smart Start update failed: %s",
                      esp_err_to_name(result));
         }
-        send_system_settings(request);
 
     } else if (strcmp(command, "audioinfo") == 0) {
         log_setting_error("Audio info", runtime_settings_set_audio_info(
                                             strtoul(value, NULL, 10) != 0U));
-        send_system_settings(request);
     } else if (strcmp(command, "softap") == 0) {
         unsigned minutes = strtoul(value, NULL, 10);
         if (minutes > 30U) minutes = 30U;
         log_setting_error("SoftAP delay",
                           runtime_settings_set_softap_delay_min(minutes));
-        send_system_settings(request);
     } else if (strcmp(command, "abuff") == 0) {
         unsigned blocks = strtoul(value, NULL, 10);
         if (blocks < 5U) blocks = 5U;
         if (blocks > 14U) blocks = 14U;
         log_setting_error("Audio buffer",
                           runtime_settings_set_audio_buffer_blocks(blocks));
-        send_system_settings(request);
     } else if (strcmp(command, "watchdog") == 0) {
         log_setting_error("Watchdog", runtime_settings_set_watchdog(
                                           strtoul(value, NULL, 10) != 0U));
-        send_system_settings(request);
     } else if (strcmp(command, "mdnsname") == 0) {
         log_setting_error("mDNS", runtime_settings_set_mdns_name(value));
-        send_system_settings(request);
     } else if (strcmp(command, "reboot") == 0 ||
                strcmp(command, "rebootmdns") == 0) {
         ws_send_request(request, "{\"rebooting\":1}");
@@ -380,7 +374,6 @@ static void handle_command(httpd_req_t *request, char *command) {
         esp_err_t result = runtime_settings_set_timezone_hour((int8_t)hour);
         if (result == ESP_OK) result = time_service_apply();
         log_setting_error("Timezone hour", result);
-        send_timezone_settings(request);
     } else if (strcmp(command, "tzm") == 0) {
         unsigned minute = strtoul(value, NULL, 10);
         if (minute > 45U) minute = 45U;
@@ -389,7 +382,6 @@ static void handle_command(httpd_req_t *request, char *command) {
             runtime_settings_set_timezone_minute((uint8_t)minute);
         if (result == ESP_OK) result = time_service_apply();
         log_setting_error("Timezone minute", result);
-        send_timezone_settings(request);
     } else if (strcmp(command, "sntp1") == 0 ||
                strcmp(command, "sntp2") == 0) {
         esp_err_t result = strcmp(command, "sntp1") == 0
@@ -397,7 +389,6 @@ static void handle_command(httpd_req_t *request, char *command) {
                                : runtime_settings_set_sntp2(value);
         if (result == ESP_OK) result = time_service_apply();
         log_setting_error("SNTP server", result);
-        send_timezone_settings(request);
     } else if (strcmp(command, "timeint") == 0) {
         unsigned interval = strtoul(value, NULL, 10);
         if (interval < 15U) interval = 15U;
@@ -406,14 +397,12 @@ static void handle_command(httpd_req_t *request, char *command) {
             (uint16_t)interval);
         if (result == ESP_OK) result = time_service_apply();
         log_setting_error("SNTP interval", result);
-        send_timezone_settings(request);
     } else if (strcmp(command, "volsteps") == 0) {
         unsigned steps = strtoul(value, NULL, 10);
         if (steps < 1U) steps = 1U;
         if (steps > 10U) steps = 10U;
         log_setting_error("Volume steps",
                           runtime_settings_set_volume_steps((uint8_t)steps));
-        send_control_settings(request);
     } else if (strcmp(command, "normalization") == 0) {
         esp_err_t result = native_audio_settings_set_normalization(
             strtoul(value, NULL, 10) != 0U);
@@ -421,7 +410,6 @@ static void handle_command(httpd_req_t *request, char *command) {
             ESP_LOGW(TAG, "Normalization update failed: %s",
                      esp_err_to_name(result));
         }
-        send_system_settings(request);
     } else if (strcmp(command, "normgain") == 0) {
         unsigned gain_db = strtoul(value, NULL, 10);
         if (gain_db > 20U) gain_db = 20U;
@@ -431,7 +419,6 @@ static void handle_command(httpd_req_t *request, char *command) {
             ESP_LOGW(TAG, "Normalization gain update failed: %s",
                      esp_err_to_name(result));
         }
-        send_system_settings(request);
     } else if (strcmp(command, "normtarget") == 0) {
         long target_dbfs = strtol(value, NULL, 10);
         if (target_dbfs < -20) target_dbfs = -20;
@@ -443,7 +430,6 @@ static void handle_command(httpd_req_t *request, char *command) {
             ESP_LOGW(TAG, "Normalization target update failed: %s",
                      esp_err_to_name(result));
         }
-        send_system_settings(request);
     } else if (strcmp(command, "normtime") == 0) {
         unsigned long time_ms = strtoul(value, NULL, 10);
         if (time_ms < 100U) time_ms = 100U;
@@ -454,39 +440,32 @@ static void handle_command(httpd_req_t *request, char *command) {
             ESP_LOGW(TAG, "Normalization time update failed: %s",
                      esp_err_to_name(result));
         }
-        send_system_settings(request);
     } else if (strcmp(command, "screenon") == 0) {
         log_setting_error("Screen power", display_settings_set_screen_on(
                                               strtoul(value, NULL, 10) != 0U,
                                               true));
-        send_screen_settings(request);
     } else if (strcmp(command, "numplaylist") == 0) {
         log_setting_error("Numbered playlist",
                           display_settings_set_numbered_playlist(
                               strtoul(value, NULL, 10) != 0U, true));
-        send_screen_settings(request);
     } else if (strcmp(command, "screensaverenabled") == 0) {
         log_setting_error("Stopped screensaver",
                           display_settings_set_screensaver_enabled(
                               strtoul(value, NULL, 10) != 0U));
-        send_screen_settings(request);
     } else if (strcmp(command, "screensavertimeout") == 0) {
         unsigned timeout = strtoul(value, NULL, 10);
         if (timeout < 5U) timeout = 5U;
         if (timeout > 65520U) timeout = 65520U;
         log_setting_error("Stopped screensaver timeout",
                           display_settings_set_screensaver_timeout(timeout));
-        send_screen_settings(request);
     } else if (strcmp(command, "screensaverblank") == 0) {
         log_setting_error("Stopped screensaver blank",
                           display_settings_set_screensaver_blank(
                               strtoul(value, NULL, 10) != 0U));
-        send_screen_settings(request);
     } else if (strcmp(command, "screensaverplayingenabled") == 0) {
         log_setting_error("Playing screensaver",
                           display_settings_set_screensaver_playing_enabled(
                               strtoul(value, NULL, 10) != 0U));
-        send_screen_settings(request);
     } else if (strcmp(command, "screensaverplayingtimeout") == 0) {
         unsigned timeout = strtoul(value, NULL, 10);
         if (timeout < 1U) timeout = 1U;
@@ -494,12 +473,10 @@ static void handle_command(httpd_req_t *request, char *command) {
         log_setting_error(
             "Playing screensaver timeout",
             display_settings_set_screensaver_playing_timeout(timeout));
-        send_screen_settings(request);
     } else if (strcmp(command, "screensaverplayingblank") == 0) {
         log_setting_error("Playing screensaver blank",
                           display_settings_set_screensaver_playing_blank(
                               strtoul(value, NULL, 10) != 0U));
-        send_screen_settings(request);
     } else if (strcmp(command, "brightness") == 0 ||
                strcmp(command, "dim") == 0) {
         unsigned brightness = strtoul(value, NULL, 10);
@@ -510,7 +487,6 @@ static void handle_command(httpd_req_t *request, char *command) {
             ESP_LOGW(TAG, "Brightness update failed: %s",
                      esp_err_to_name(result));
         }
-        send_screen_settings(request);
     } else if (strcmp(command, "stationuppercase") == 0) {
         esp_err_t result = display_settings_set_station_uppercase(
             strtoul(value, NULL, 10) != 0, true);
@@ -518,7 +494,6 @@ static void handle_command(httpd_req_t *request, char *command) {
             ESP_LOGW(TAG, "Station uppercase update failed: %s",
                      esp_err_to_name(result));
         }
-        send_screen_settings(request);
     } else if (strcmp(command, "volp") == 0 ||
                strcmp(command, "volm") == 0) {
         display_settings_note_activity();
