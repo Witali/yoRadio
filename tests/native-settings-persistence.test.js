@@ -134,6 +134,9 @@ test("C3 persists, reports, and applies WebUI normalization settings", () => {
   const cmake = read("idf", "esp32c3-oled-native", "main", "CMakeLists.txt");
 
   assert.match(header, /NATIVE_AUDIO_DEFAULT_NORMALIZATION false/);
+  assert.match(
+    header, /NATIVE_AUDIO_DEFAULT_NORMALIZATION_TIME_MS 5000U/,
+  );
   for (const key of ["normalize", "normgain", "normtarget", "normtime"]) {
     assert.match(settings, new RegExp(`AUDIO_NVS_[A-Z_]+ "${key}"`));
   }

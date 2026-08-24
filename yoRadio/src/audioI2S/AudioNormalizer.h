@@ -18,7 +18,7 @@ private:
     uint16_t m_maxGainQ12 = 4096;
     uint32_t m_sampleRate = 16000;
     uint16_t m_targetPeak = 23198;
-    uint16_t m_timeConstantMs = 2000;
+    uint16_t m_timeConstantMs = 5000;
     uint16_t m_blockFrames = 160;
     uint16_t m_blockPeak = 0;
     uint16_t m_blockCount = 0;

@@ -78,7 +78,7 @@ if(-not $options.Contains('id="normtarget"')) {
             </div>
             <div class="inputwrap">
               <span class="inputtitle">time constant (ms)</span>
-              <input type="number" id="normtime" data-command="normtime" value="2000" min="100" max="10000" step="100" />
+              <input type="number" id="normtime" data-command="normtime" value="5000" min="100" max="10000" step="100" />
             </div>
           </div>
           <div class="hr">&nbsp;</div>
@@ -88,6 +88,10 @@ if(-not $options.Contains('id="normtarget"')) {
     $options = $options.Substring(0, $index) + $replacement +
         $options.Substring($index + $anchor.Length)
 }
+
+$options = $options.Replace(
+    'id="normtime" data-command="normtime" value="2000"',
+    'id="normtime" data-command="normtime" value="5000"')
 
 Write-GzipText $optionsPath $options
 Write-Host "Updated audio normalization controls in $optionsPath"

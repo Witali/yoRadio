@@ -51,7 +51,7 @@ test("settings expose target peak level and symmetric time constant", () => {
 
   assert.ok(timeInput, "normalization time input is missing");
   assert.match(timeInput, /data-command="normtime"/);
-  assert.match(timeInput, /value="2000"/);
+  assert.match(timeInput, /value="5000"/);
   assert.match(timeInput, /min="100"/);
   assert.match(timeInput, /max="10000"/);
 });

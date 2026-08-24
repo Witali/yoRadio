@@ -145,7 +145,7 @@ void Config::_setupVersion(){
       break;
     case 8:
       saveValue(&store.normalizationTargetDbfs, (int8_t)-3, false);
-      saveValue(&store.normalizationTimeMs, (uint16_t)2000);
+      saveValue(&store.normalizationTimeMs, (uint16_t)5000);
       break;
     case 9:
       if(VS1053_CS==255 && store.abuff < DEFAULT_AUDIO_BUFFER_BLOCKS) {
@@ -523,7 +523,7 @@ void Config::resetSystem(const char *val, uint8_t clientId){
     saveValue(&store.audioNormalization, true, false);
     saveValue(&store.normalizationMaxGainDb, (uint8_t)20, false);
     saveValue(&store.normalizationTargetDbfs, (int8_t)-3, false);
-    saveValue(&store.normalizationTimeMs, (uint16_t)2000);
+    saveValue(&store.normalizationTimeMs, (uint16_t)5000);
     #if I2S_DOUT!=255 || I2S_INTERNAL
       player.setNormalization(store.audioNormalization, store.normalizationMaxGainDb,
                               store.normalizationTargetDbfs, store.normalizationTimeMs);
@@ -666,7 +666,7 @@ void Config::setDefaults() {
   store.audioNormalization = true;
   store.normalizationMaxGainDb = 20;
   store.normalizationTargetDbfs = -3;
-  store.normalizationTimeMs = 2000;
+  store.normalizationTimeMs = 5000;
   store.stationUppercase = false;
   eepromWrite(EEPROM_START, store);
 }
