@@ -521,6 +521,8 @@ test("native audio pipeline batches PCM and caches stable stream layout", () => 
   );
   assert.match(output, /#define PDM_DMA_DESCRIPTORS 4U/);
   assert.match(output, /if \(s_pdm\) return ESP_OK/);
+  assert.match(output, /native_audio_normalizer_process_block/);
+  assert.match(output, /PERF PCM:/);
 });
 
 test("native FLAC reuses the optimized yoRadio decoder without Arduino Core", () => {
@@ -704,6 +706,7 @@ test("native C3 refreshes Wi-Fi signal strength for WebSocket status", () => {
   assert.match(network, /native_state_set_wifi_rssi\(s_state, access_point\.rssi\)/);
   assert.match(network, /xTaskCreate\(rssi_task, "wifi_rssi"/);
   assert.match(websocket, /WS_STATUS_HEARTBEAT_MS 2000/);
+  assert.match(websocket, /PERF WS:/);
   assert.match(websocket, /\{\\"id\\":\\"rssi\\",\\"value\\":%d\}/);
 });
 
@@ -734,6 +737,7 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
   );
   assert.match(websocket, /WS_STATUS_POLL_MS 100/);
   assert.match(websocket, /WS_STATUS_HEARTBEAT_MS 2000/);
+  assert.match(websocket, /PERF WS:/);
   assert.match(websocket, /BOARD_TASK_STACK_WEBSOCKET_STATUS/);
   assert.match(websocket, /capture_status_key/);
   assert.match(

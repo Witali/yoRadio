@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
 
 class AudioNormalizer {
@@ -9,9 +10,11 @@ public:
     void setSampleRate(uint32_t sampleRate);
     void reset();
     void process(int16_t sample[2]);
+    void processBlock(int16_t *samples, size_t frames, uint8_t channels);
 
 private:
     static int16_t softLimit(int32_t value);
+    void processEnabled(int16_t sample[2]);
     void updateGainTarget();
 
     uint16_t m_gainQ12 = 4096;

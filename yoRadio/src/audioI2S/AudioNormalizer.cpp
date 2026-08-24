@@ -79,7 +79,22 @@ void AudioNormalizer::reset() {
 
 void AudioNormalizer::process(int16_t sample[2]) {
     if(!m_enabled) return;
+    processEnabled(sample);
+}
 
+void AudioNormalizer::processBlock(int16_t *samples, size_t frames,
+                                   uint8_t channels) {
+    if(!m_enabled || !samples || !frames || !channels) return;
+    for(size_t frame = 0; frame < frames; ++frame) {
+        int16_t *input = samples + frame * channels;
+        int16_t stereo[2] = {input[0], channels > 1 ? input[1] : input[0]};
+        processEnabled(stereo);
+        input[0] = stereo[0];
+        if(channels > 1) input[1] = stereo[1];
+    }
+}
+
+void AudioNormalizer::processEnabled(int16_t sample[2]) {
     const uint32_t left = absoluteSample(sample[0]);
     const uint32_t right = absoluteSample(sample[1]);
     const uint32_t peak = left > right ? left : right;

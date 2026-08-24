@@ -11,6 +11,7 @@
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_system.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_audio_output.h"
@@ -49,6 +50,7 @@ static char s_broadcast_current[48];
 static webui_status_key_t s_previous_status_key;
 static webui_status_key_t s_current_status_key;
 static atomic_bool s_playlist_changed_pending;
+static size_t s_last_ws_clients;
 
 static void json_escape(const char *source, char *target, size_t target_size) {
     size_t written = 0;
@@ -86,17 +88,22 @@ static esp_err_t ws_send_async(int socket, const char *text) {
     return httpd_ws_send_data(s_server, socket, &frame);
 }
 
-static void broadcast_text(const char *text) {
-    if (!s_server || !text) return;
+static size_t broadcast_text(const char *text) {
+    if (!s_server || !text) return 0;
     size_t count = CONFIG_LWIP_MAX_SOCKETS;
     int sockets[CONFIG_LWIP_MAX_SOCKETS];
-    if (httpd_get_client_list(s_server, &count, sockets) != ESP_OK) return;
+    if (httpd_get_client_list(s_server, &count, sockets) != ESP_OK) return 0;
+    size_t delivered = 0;
+    size_t clients = 0;
     for (size_t index = 0; index < count; ++index) {
         if (httpd_ws_get_fd_info(s_server, sockets[index]) ==
             HTTPD_WS_CLIENT_WEBSOCKET) {
-            ws_send_async(sockets[index], text);
+            ++clients;
+            if (ws_send_async(sockets[index], text) == ESP_OK) ++delivered;
         }
     }
+    s_last_ws_clients = clients;
+    return delivered;
 }
 
 static void format_status(char *output, size_t output_size) {
@@ -542,12 +549,50 @@ static esp_err_t websocket_handler(httpd_req_t *request) {
     return ESP_OK;
 }
 
+typedef struct {
+    int64_t started_us;
+    uint64_t active_us;
+    uint32_t polls;
+    uint32_t publications;
+    uint32_t deliveries;
+} ws_profile_t;
+
+static void profile_status_cycle(ws_profile_t *profile, int64_t cycle_started_us,
+                                 uint32_t publications,
+                                 uint32_t deliveries) {
+    int64_t now_us = esp_timer_get_time();
+    if (!profile->started_us) profile->started_us = cycle_started_us;
+    profile->active_us += (uint64_t)(now_us - cycle_started_us);
+    ++profile->polls;
+    profile->publications += publications;
+    profile->deliveries += deliveries;
+    uint64_t window_us = (uint64_t)(now_us - profile->started_us);
+    if (window_us < 5000000ULL) return;
+    uint64_t tenths = profile->active_us * 1000ULL / window_us;
+    ESP_LOGI(TAG,
+             "PERF WS: active %llu us (%llu.%llu%%), polls %lu, "
+             "publications %lu, deliveries %lu, clients %u",
+             (unsigned long long)profile->active_us,
+             (unsigned long long)(tenths / 10ULL),
+             (unsigned long long)(tenths % 10ULL),
+             (unsigned long)profile->polls,
+             (unsigned long)profile->publications,
+             (unsigned long)profile->deliveries,
+             (unsigned)s_last_ws_clients);
+    memset(profile, 0, sizeof(*profile));
+    profile->started_us = now_us;
+}
+
 static void status_task(void *argument) {
     (void)argument;
     bool have_previous = false;
     TickType_t last_sent = 0;
+    ws_profile_t profile = {0};
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(WS_STATUS_POLL_MS));
+        int64_t cycle_started_us = esp_timer_get_time();
+        uint32_t publications = 0;
+        uint32_t deliveries = 0;
         capture_status_key(&s_current_status_key);
         TickType_t now = xTaskGetTickCount();
         bool changed = !have_previous ||
@@ -558,22 +603,32 @@ static void status_task(void *argument) {
                              pdMS_TO_TICKS(WS_STATUS_HEARTBEAT_MS);
         if (atomic_exchange(&s_playlist_changed_pending, false)) {
             ESP_LOGI(TAG, "Broadcasting playlist changed event");
-            broadcast_text("{\"file\":\"/data/playlist.csv\"}");
+            deliveries +=
+                (uint32_t)broadcast_text("{\"file\":\"/data/playlist.csv\"}");
+            ++publications;
         }
-        if (!changed && !heartbeat) continue;
-        bool station_changed = !have_previous ||
-                               s_current_status_key.current_item !=
-                                   s_previous_status_key.current_item;
-        format_status(s_broadcast_status, sizeof(s_broadcast_status));
-        if (station_changed) {
-            snprintf(s_broadcast_current, sizeof(s_broadcast_current),
-                     "{\"current\":%u}", s_current_status_key.current_item);
+        if (changed || heartbeat) {
+            bool station_changed = !have_previous ||
+                                   s_current_status_key.current_item !=
+                                       s_previous_status_key.current_item;
+            format_status(s_broadcast_status, sizeof(s_broadcast_status));
+            if (station_changed) {
+                snprintf(s_broadcast_current, sizeof(s_broadcast_current),
+                         "{\"current\":%u}",
+                         s_current_status_key.current_item);
+            }
+            deliveries += (uint32_t)broadcast_text(s_broadcast_status);
+            ++publications;
+            if (station_changed) {
+                deliveries += (uint32_t)broadcast_text(s_broadcast_current);
+                ++publications;
+            }
+            s_previous_status_key = s_current_status_key;
+            have_previous = true;
+            last_sent = now;
         }
-        broadcast_text(s_broadcast_status);
-        if (station_changed) broadcast_text(s_broadcast_current);
-        s_previous_status_key = s_current_status_key;
-        have_previous = true;
-        last_sent = now;
+        profile_status_cycle(&profile, cycle_started_us, publications,
+                             deliveries);
     }
 }
 

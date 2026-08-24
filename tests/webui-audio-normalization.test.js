@@ -75,7 +75,7 @@ test("normalizer hot path avoids 64-bit sample arithmetic", () => {
     "utf8"
   );
   const processBody = source.match(
-    /void AudioNormalizer::process\(int16_t sample\[2\]\) \{([\s\S]*?)\n\}/
+    /void AudioNormalizer::processEnabled\(int16_t sample\[2\]\) \{([\s\S]*?)\n\}/
   )?.[1];
   const limiterBody = source.match(
     /int16_t AudioNormalizer::softLimit\(int32_t value\) \{([\s\S]*?)\n\}/
@@ -87,6 +87,8 @@ test("normalizer hot path avoids 64-bit sample arithmetic", () => {
   assert.doesNotMatch(processBody, /int64_t/);
   assert.doesNotMatch(limiterBody, /int64_t/);
   assert.match(source, /soft limiter numerator must fit in int32_t/);
+  assert.match(source, /AudioNormalizer::processBlock/);
+  assert.match(source, /processEnabled\(stereo\)/);
 });
 
 test("settings page requests and applies current normalization values", () => {

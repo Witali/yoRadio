@@ -21,3 +21,8 @@ extern "C" void native_audio_normalizer_set_sample_rate(
 extern "C" void native_audio_normalizer_process(int16_t samples[2]) {
     normalizer.process(samples);
 }
+
+extern "C" void native_audio_normalizer_process_block(
+    int16_t *samples, size_t frames, uint8_t channels) {
+    normalizer.processBlock(samples, frames, channels);
+}

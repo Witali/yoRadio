@@ -11,6 +11,7 @@
 #include "driver/i2s_pdm.h"
 #include "esp_check.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_audio_normalizer.h"
@@ -30,6 +31,7 @@
 #define SAMPLE_GAIN_SCALE 32768U
 #define VOLUME_DENOMINATOR 254U
 #define BALANCE_DENOMINATOR 16U
+#define OUTPUT_STATS_INTERVAL_US 5000000LL
 
 static const char *const TAG = "audio_output";
 static i2s_chan_handle_t s_pdm;
@@ -41,6 +43,10 @@ static bool s_resampler_has_previous;
 static int16_t s_previous_left;
 static int16_t s_previous_right;
 static uint32_t s_resampler_next_phase;
+static int64_t s_stats_started_us;
+static uint64_t s_stats_audio_us;
+static uint64_t s_stats_normalize_us;
+static uint32_t s_stats_packets;
 
 static int16_t scale_sample_q15(int16_t sample, uint32_t gain_q15) {
     int32_t scaled = (int32_t)sample * (int32_t)gain_q15;
@@ -278,7 +284,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
     return ESP_OK;
 }
 
-esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
+esp_err_t native_audio_output_write_pcm(uint8_t *data, size_t size,
                                         uint8_t bits_per_sample,
                                         uint8_t channels) {
     if (!data || bits_per_sample != 16 || channels == 0) {
@@ -292,6 +298,10 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
         s_input_sample_rate);
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
+    int64_t normalize_started_us = esp_timer_get_time();
+    native_audio_normalizer_process_block((int16_t *)data, frames, channels);
+    uint64_t normalize_us =
+        (uint64_t)(esp_timer_get_time() - normalize_started_us);
     uint16_t peak = 0;
     uint8_t volume = native_audio_settings_get_volume();
     int8_t balance = native_audio_settings_get_balance();
@@ -307,10 +317,6 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
         int16_t left;
         int16_t right;
         decode_pcm_frame(data + frame * frame_bytes, channels, &left, &right);
-        int16_t normalized[2] = {left, right};
-        native_audio_normalizer_process(normalized);
-        left = normalized[0];
-        right = normalized[1];
         left = scale_sample_q15(left, left_gain_q15);
         right = scale_sample_q15(right, right_gain_q15);
         uint16_t left_peak = left == INT16_MIN ? 32768U
@@ -323,6 +329,29 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
                             "write stereo PDM PCM");
     }
     audio_level_led_update_peak(peak);
+    int64_t now_us = esp_timer_get_time();
+    if (!s_stats_started_us) s_stats_started_us = now_us;
+    s_stats_audio_us += frames * 1000000ULL / s_input_sample_rate;
+    s_stats_normalize_us += normalize_us;
+    ++s_stats_packets;
+    if (now_us - s_stats_started_us >= OUTPUT_STATS_INTERVAL_US) {
+        uint64_t tenths = s_stats_audio_us
+                              ? s_stats_normalize_us * 1000ULL /
+                                    s_stats_audio_us
+                              : 0;
+        ESP_LOGI(TAG,
+                 "PERF PCM: audio %llu ms, normalize %llu ms (%llu.%llu%%), "
+                 "packets %lu",
+                 (unsigned long long)(s_stats_audio_us / 1000ULL),
+                 (unsigned long long)(s_stats_normalize_us / 1000ULL),
+                 (unsigned long long)(tenths / 10ULL),
+                 (unsigned long long)(tenths % 10ULL),
+                 (unsigned long)s_stats_packets);
+        s_stats_started_us = now_us;
+        s_stats_audio_us = 0;
+        s_stats_normalize_us = 0;
+        s_stats_packets = 0;
+    }
     return ESP_OK;
 }
 
