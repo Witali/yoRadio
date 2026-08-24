@@ -919,6 +919,18 @@ static void decoder_task(void *argument) {
             } else
 #endif
             {
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+                // A same-family decoder reuses the released arena. An
+                // Espressif decoder cannot use it, so return the old custom
+                // arena to the heap only when crossing decoder families.
+                if (!custom_legacy_decoder_discard_arena()) {
+                    ESP_LOGE(TAG, "Old codec arena is still in use");
+                    state_set_audio(false, "decoder release failed");
+                    failed_generation = generation;
+                    vRingbufferReturnItem(s_encoded, packet);
+                    continue;
+                }
+#endif
                 if (output_size < DECODE_BUFFER_INITIAL) {
                     uint8_t *resized =
                         realloc(output, DECODE_BUFFER_INITIAL);

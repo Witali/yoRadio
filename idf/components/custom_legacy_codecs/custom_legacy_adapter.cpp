@@ -307,6 +307,10 @@ extern "C" void custom_legacy_decoder_destroy(custom_legacy_decoder_t *decoder) 
     delete decoder;
 }
 
+extern "C" bool custom_legacy_decoder_discard_arena(void) {
+    return CodecArenaDiscard();
+}
+
 extern "C" size_t custom_legacy_decoder_memory_used(
     const custom_legacy_decoder_t *decoder) {
     if (!decoder) return 0;

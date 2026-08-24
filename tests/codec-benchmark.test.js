@@ -75,6 +75,45 @@ test('codec benchmark reports comparable decoder heap and payload memory', () =>
                2);
 });
 
+test('codec switching releases only an incompatible legacy arena', () => {
+  const audio = read('idf', 'esp32c3-oled-native', 'main', 'audio_service.c');
+  const adapter = read('idf', 'components', 'custom_legacy_codecs',
+                       'custom_legacy_adapter.cpp');
+
+  const destroyStart = adapter.indexOf(
+    'extern "C" void custom_legacy_decoder_destroy(');
+  const destroyEnd = adapter.indexOf(
+    'extern "C" bool custom_legacy_decoder_discard_arena(', destroyStart);
+  const destroy = adapter.slice(destroyStart, destroyEnd);
+  assert.match(destroy, /MP3Decoder_FreeBuffers\(\)/);
+  assert.doesNotMatch(destroy, /CodecArenaDiscard\(\)/);
+  assert.match(adapter.slice(destroyEnd), /return CodecArenaDiscard\(\)/);
+
+  const releaseStart = audio.indexOf('if (generation != current_generation)');
+  const releaseEnd = audio.indexOf('size_t item_size', releaseStart);
+  const release = audio.slice(releaseStart, releaseEnd);
+  assert.match(release, /custom_legacy_decoder_destroy\(legacy_decoder\)/);
+  assert.match(release, /atomic_store\(&s_decoder_released_generation/);
+  assert.doesNotMatch(release, /custom_legacy_decoder_discard_arena\(\)/);
+  assert.ok(
+    release.indexOf('custom_legacy_decoder_destroy(legacy_decoder)') <
+      release.indexOf('atomic_store(&s_decoder_released_generation'),
+  );
+
+  const customStart = audio.indexOf('custom_legacy_decoder_create(');
+  const officialStart = audio.indexOf(
+    'custom_legacy_decoder_discard_arena()', customStart);
+  const officialOpen = audio.indexOf(
+    'esp_audio_simple_dec_open(&cfg, &decoder)', officialStart);
+  assert.ok(customStart >= 0);
+  assert.ok(officialStart > customStart);
+  assert.ok(officialOpen > officialStart);
+  assert.match(
+    audio.slice(officialStart, officialOpen),
+    /custom_legacy_decoder_discard_arena\(\)[\s\S]*realloc\(output/,
+  );
+});
+
 test('MP3 backend benchmark selects all decoders and saves reproducible results', () => {
   const builder = read('tools', 'codec_benchmark', 'build.ps1');
   const runner = read('tools', 'codec_benchmark', 'run-mp3-backends.ps1');
