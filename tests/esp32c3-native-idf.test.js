@@ -19,6 +19,35 @@ test("repository default setup and build select native ESP-IDF firmware", () => 
   assert.doesNotMatch(setup + build, /arduino-cli/);
 });
 
+test("debug and production profiles compile the same sources", () => {
+  const build = read("build.ps1");
+  const productionBuild = read("build-production.ps1");
+  const defaults = read("sdkconfig.defaults");
+  const productionDefaults = read("sdkconfig.production.defaults");
+
+  assert.match(productionBuild, /Join-Path \$PSScriptRoot "build\.ps1"/);
+  assert.match(
+    productionBuild,
+    /SdkconfigDefaults = @\([\s\S]*"sdkconfig\.defaults"[\s\S]*"sdkconfig\.production\.defaults"/,
+  );
+  assert.doesNotMatch(productionBuild, /main\/|main\\|src\/|src\\/);
+  assert.match(build, /SdkconfigDefaults/);
+
+  assert.match(defaults, /CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y/);
+  assert.match(defaults, /CONFIG_LOG_DEFAULT_LEVEL_INFO=y/);
+  assert.match(defaults, /CONFIG_LOG_MAXIMUM_LEVEL=3/);
+  assert.match(defaults, /CONFIG_ESP_SYSTEM_PANIC_PRINT_REBOOT=y/);
+
+  const productionSettings = productionDefaults
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#"));
+  assert.ok(productionSettings.length > 0);
+  assert.ok(productionSettings.every((line) => /^CONFIG_[A-Z0-9_]+=/.test(line)));
+  assert.match(productionDefaults, /CONFIG_LOG_MAXIMUM_LEVEL=0/);
+  assert.match(productionDefaults, /CONFIG_ESP_CONSOLE_NONE=y/);
+});
+
 test("ESP32-C3 native target is Arduino-free and selects the RISC-V chip", () => {
   const project = read("CMakeLists.txt");
   const component = read("main", "CMakeLists.txt");
