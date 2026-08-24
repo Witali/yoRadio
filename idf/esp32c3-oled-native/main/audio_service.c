@@ -118,6 +118,9 @@ static native_codec_t s_last_codec;
 static uint32_t s_published_bitrate_bps;
 static int64_t s_bitrate_updated_us;
 static atomic_bool s_measured_bitrate_ready;
+// One stream task owns this workspace; keeping it in BSS avoids a 4 KiB
+// allocation/free cycle whenever a station starts or stops.
+static char s_icy_metadata[ICY_METADATA_MAX + 1];
 
 static void dispose_http_client(esp_http_client_handle_t client) {
     if (!client) return;
@@ -534,10 +537,7 @@ static void stream_task(void *argument) {
                 ESP_LOGI(TAG, "ICY bitrate: %lu kbit/s", icy_bitrate);
             }
         }
-        char *metadata = metadata_interval ? malloc(ICY_METADATA_MAX + 1) : NULL;
-        if (metadata_interval && !metadata) {
-            ESP_LOGW(TAG, "No memory for ICY metadata; titles disabled");
-        }
+        char *metadata = metadata_interval ? s_icy_metadata : NULL;
         size_t audio_until_metadata = metadata_interval;
         size_t metadata_remaining = 0;
         size_t metadata_written = 0;
@@ -642,7 +642,6 @@ static void stream_task(void *argument) {
                 break;
             }
         }
-        free(metadata);
         send_encoded(command.generation, codec, NULL, 0, true);
         dispose_http_client(client);
         if (atomic_load(&s_generation) == command.generation) {
@@ -799,9 +798,9 @@ static void decoder_task(void *argument) {
             if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
             legacy_decoder = NULL;
 #endif
-            free(output);
-            output = NULL;
-            output_size = 0;
+            // Preserve the Espressif PCM workspace between stations. It is
+            // released only when switching to a custom decoder that owns
+            // a separate output workspace.
             generation = current_generation;
             failed_generation = 0;
             codec = NATIVE_CODEC_AUTO;
@@ -894,17 +893,22 @@ static void decoder_task(void *argument) {
             } else
 #endif
             {
-                uint8_t *resized = realloc(output, DECODE_BUFFER_INITIAL);
-                if (!resized) {
-                    ESP_LOGE(TAG, "%s PCM buffer allocation failed: %lu",
-                             codec_name(codec), (unsigned long)DECODE_BUFFER_INITIAL);
-                    state_set_audio(false, "PCM allocation failed");
-                    failed_generation = generation;
-                    vRingbufferReturnItem(s_encoded, packet);
-                    continue;
+                if (output_size < DECODE_BUFFER_INITIAL) {
+                    uint8_t *resized =
+                        realloc(output, DECODE_BUFFER_INITIAL);
+                    if (!resized) {
+                        ESP_LOGE(TAG,
+                                 "%s PCM buffer allocation failed: %lu",
+                                 codec_name(codec),
+                                 (unsigned long)DECODE_BUFFER_INITIAL);
+                        state_set_audio(false, "PCM allocation failed");
+                        failed_generation = generation;
+                        vRingbufferReturnItem(s_encoded, packet);
+                        continue;
+                    }
+                    output = resized;
+                    output_size = DECODE_BUFFER_INITIAL;
                 }
-                output = resized;
-                output_size = DECODE_BUFFER_INITIAL;
                 esp_audio_simple_dec_cfg_t cfg = {
                     .dec_type = simple_decoder_type(codec),
                     .dec_cfg = NULL,
