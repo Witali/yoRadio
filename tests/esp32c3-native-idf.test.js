@@ -336,7 +336,7 @@ test("native radio requests and publishes ICY song metadata", () => {
   assert.match(controls, /native_state_set_station\(s_state, s_candidate_name\)/);
 });
 
-test("native HTTPS station switching releases decoder RAM before TLS", () => {
+test("native HTTPS station switching keeps TLS and PCM workspaces stable", () => {
   const audio = read("main", "audio_service.c");
   const sdkconfig = fs.readFileSync(
     path.join(nativeRoot, "sdkconfig.defaults"),
@@ -346,16 +346,20 @@ test("native HTTPS station switching releases decoder RAM before TLS", () => {
   assert.match(audio, /\.crt_bundle_attach = esp_crt_bundle_attach/);
   assert.match(sdkconfig, /CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=y/);
   assert.match(sdkconfig, /CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384/);
-  assert.match(sdkconfig, /CONFIG_MBEDTLS_DYNAMIC_BUFFER=y/);
+  assert.match(sdkconfig, /# CONFIG_MBEDTLS_DYNAMIC_BUFFER is not set/);
+  assert.doesNotMatch(sdkconfig, /^CONFIG_MBEDTLS_DYNAMIC_BUFFER=y$/m);
   assert.match(audio, /atomic_uint s_decoder_released_generation/);
   assert.match(
     audio,
     /atomic_load\(&s_decoder_released_generation\) !=[\s\S]*command\.generation[\s\S]*esp_http_client_config_t config/,
   );
-  assert.match(
-    audio,
-    /generation != current_generation[\s\S]*esp_audio_simple_dec_close\(decoder\)[\s\S]*free\(output\)[\s\S]*atomic_store\(&s_decoder_released_generation/,
-  );
+  const generationResetStart = audio.indexOf("if (generation != current_generation)");
+  const generationResetEnd = audio.indexOf("size_t item_size", generationResetStart);
+  const generationReset = audio.slice(generationResetStart, generationResetEnd);
+  assert.match(generationReset, /esp_audio_simple_dec_close\(decoder\)/);
+  assert.match(generationReset, /Preserve the Espressif PCM workspace/);
+  assert.doesNotMatch(generationReset, /free\(output\)/);
+  assert.match(generationReset, /atomic_store\(&s_decoder_released_generation/);
   assert.match(
     audio,
     /xRingbufferReceive\([\s\S]*pdMS_TO_TICKS\(20\)\)/,
