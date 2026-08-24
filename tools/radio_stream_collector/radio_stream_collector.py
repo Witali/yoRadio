@@ -252,6 +252,34 @@ class FinalStream:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
+def site_display_name(site: str) -> str:
+    """Return the human-readable source name used for grouping and sorting."""
+    value = site.strip()
+    spec = SITE_SPECS.get(value.casefold())
+    if spec is not None:
+        if spec.title.casefold().startswith("radio "):
+            return spec.title[6:]
+        return spec.title
+    if value.casefold() == "curated":
+        return "Прочие"
+    return value or "Прочие"
+
+
+def site_station_sort_key(
+    site: str,
+    name: str,
+    *,
+    ok: bool = True,
+    url: str = "",
+) -> tuple[str, str, bool, str]:
+    """Sort by source display name first and station name second."""
+    return (site_display_name(site).casefold(), name.casefold(), not ok, url.casefold())
+
+
+def final_stream_sort_key(stream: FinalStream) -> tuple[str, str, bool, str]:
+    return site_station_sort_key(stream.site, stream.name, ok=stream.ok, url=stream.url)
+
+
 @dataclass(slots=True)
 class CrawlResult:
     candidates: list[Candidate] = field(default_factory=list)
@@ -452,7 +480,7 @@ class StreamCollector:
 
         verified = choose_best_per_station(verified)
         verified = dedupe_final_streams_by_url(verified)
-        verified.sort(key=lambda x: (x.site.lower(), x.name.lower(), not x.ok, x.url))
+        verified.sort(key=final_stream_sort_key)
         return verified
 
     async def fetch_text(
@@ -1841,13 +1869,13 @@ def utc_now() -> str:
 
 def write_outputs(streams: list[FinalStream], out_dir: Path, include_unverified: bool) -> dict[str, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
+    ordered_streams = sorted(streams, key=final_stream_sort_key)
     selected = [
-        s for s in streams
+        s for s in ordered_streams
         if (s.ok or include_unverified)
         and is_sane_stream_url(s.url)
         and is_sane_station_name(s.name)
     ]
-    selected.sort(key=lambda s: (s.site.lower(), s.name.lower()))
 
     json_path = out_dir / "streams.json"
     report_path = out_dir / "streams_report.csv"
@@ -1855,7 +1883,7 @@ def write_outputs(streams: list[FinalStream], out_dir: Path, include_unverified:
     yoradio_path = out_dir / "playlist.csv"
 
     json_path.write_text(
-        json.dumps([asdict(s) for s in streams], ensure_ascii=False, indent=2) + "\n",
+        json.dumps([asdict(s) for s in ordered_streams], ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
 
@@ -1867,7 +1895,7 @@ def write_outputs(streams: list[FinalStream], out_dir: Path, include_unverified:
     with report_path.open("w", encoding="utf-8-sig", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fields)
         writer.writeheader()
-        for stream in streams:
+        for stream in ordered_streams:
             row = asdict(stream)
             row["metadata"] = json.dumps(row["metadata"], ensure_ascii=False, separators=(",", ":"))
             writer.writerow(row)
@@ -1876,7 +1904,7 @@ def write_outputs(streams: list[FinalStream], out_dir: Path, include_unverified:
     for stream in selected:
         attrs = []
         if stream.site:
-            attrs.append(f'group-title="{m3u_escape(stream.site)}"')
+            attrs.append(f'group-title="{m3u_escape(site_display_name(stream.site))}"')
         m3u_lines.append(f"#EXTINF:-1 {' '.join(attrs)},{m3u_escape(stream.name)}".rstrip())
         m3u_lines.append(stream.url)
     m3u_path.write_text("\n".join(m3u_lines) + "\n", encoding="utf-8")
@@ -2011,6 +2039,18 @@ def run_self_test() -> None:
     )
     assert [candidate.site for candidate in curated] == ["record", "curated"]
     assert all(candidate.metadata.get("curated") for candidate in curated)
+    assert site_display_name("101") == "101.ru"
+    assert site_display_name("caprice") == "Caprice"
+    assert site_display_name("record") == "Record"
+    assert sorted(
+        [("record", "Beta"), ("caprice", "Alpha"), ("record", "Alpha"), ("101", "Zulu")],
+        key=lambda item: site_station_sort_key(*item),
+    ) == [
+        ("101", "Zulu"),
+        ("caprice", "Alpha"),
+        ("record", "Alpha"),
+        ("record", "Beta"),
+    ]
     from_json = candidates_from_json_block(
         parser.json_blocks[0],
         base_url="https://example.org/",
