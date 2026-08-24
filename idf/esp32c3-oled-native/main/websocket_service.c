@@ -182,6 +182,7 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
     snprintf(settings, sizeof(settings),
              "{\"sst\":%u,\"aif\":%u,\"vu\":0,\"softr\":%u,\"vut\":0,"
              "\"mdns\":\"%s\",\"ipaddr\":\"%s\",\"abuff\":%u,"
+             "\"abuffmax\":%u,"
              "\"mp3decoder\":0,\"normalize\":%u,\"normgain\":%u,"
              "\"normtarget\":%d,\"normtime\":%u,\"telnet\":0,"
              "\"watchdog\":%u}",
@@ -189,6 +190,7 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
              runtime_settings_get_audio_info() ? 1U : 0U,
              runtime_settings_get_softap_delay_min(), mdns, address,
              runtime_settings_get_audio_buffer_blocks(),
+             RUNTIME_MAX_AUDIO_BUFFER_BLOCKS,
              native_audio_settings_get_normalization() ? 1U : 0U,
              native_audio_settings_get_normalization_gain_db(),
              native_audio_settings_get_normalization_target_dbfs(),
@@ -354,8 +356,12 @@ static void handle_command(httpd_req_t *request, char *command) {
                           runtime_settings_set_softap_delay_min(minutes));
     } else if (strcmp(command, "abuff") == 0) {
         unsigned blocks = strtoul(value, NULL, 10);
-        if (blocks < 5U) blocks = 5U;
-        if (blocks > 14U) blocks = 14U;
+        if (blocks < RUNTIME_MIN_AUDIO_BUFFER_BLOCKS) {
+            blocks = RUNTIME_MIN_AUDIO_BUFFER_BLOCKS;
+        }
+        if (blocks > RUNTIME_MAX_AUDIO_BUFFER_BLOCKS) {
+            blocks = RUNTIME_MAX_AUDIO_BUFFER_BLOCKS;
+        }
         log_setting_error("Audio buffer",
                           runtime_settings_set_audio_buffer_blocks(blocks));
     } else if (strcmp(command, "watchdog") == 0) {
