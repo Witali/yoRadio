@@ -56,7 +56,7 @@ python radio_stream_collector.py --sites relax,caprice --verify -v
 python radio_stream_collector.py --quality low --verify -v
 ```
 
-Для 101.ru сначала проверяется AAC 64 кбит/с; для Zaycev.FM и Radio Record варианты качества также перебираются от меньшего к большему.
+Для 101.ru режимы `auto` и `high` сначала проверяют MP3 128 кбит/с, а затем AAC 64 кбит/с на том же сервере. Режим `low` использует обратный порядок. Если нужный профиль отсутствует, проверка быстро переходит к рабочему резервному профилю и только затем к зеркалам. Для Zaycev.FM и Radio Record порядок вариантов также зависит от `--quality`.
 
 ## Только данные сайтов, без Radio Browser
 

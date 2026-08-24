@@ -1490,6 +1490,26 @@ def quality_101_profiles(quality: str) -> list[tuple[str, str, int]]:
     return [mp3_128, aac_64]
 
 
+def build_101_stream_urls(
+    channel_id: int,
+    quality: str,
+    bases: Sequence[str],
+) -> list[str]:
+    """Build per-server quality fallbacks for a 101.ru channel.
+
+    Mirrors generally expose the same channel catalogue. Trying every mirror at
+    the preferred profile before falling back made channels without MP3 support
+    wait through several 404s and connection timeouts. Keep quality preference,
+    but exhaust the useful profiles on one server before moving to its mirror.
+    """
+    profiles = quality_101_profiles(quality)
+    return [
+        f"{base}/stream/{tier}/{codec}/{bitrate}/{channel_id}"
+        for base in bases
+        for tier, codec, bitrate in profiles
+    ]
+
+
 def derive_101_candidates(crawl: CrawlResult, quality: str, max_channels: int) -> list[Candidate]:
     channels: dict[int, tuple[str, str]] = {}
     for link in sorted(crawl.links | set(crawl.pages)):
@@ -1504,26 +1524,14 @@ def derive_101_candidates(crawl: CrawlResult, quality: str, max_channels: int) -
         if len(channels) >= max_channels:
             break
 
-    profiles = quality_101_profiles(quality)
     bases = (
         "https://pub0101.101.ru:8443",
         "https://pub0201.101.ru:8443",
-        "https://pub0202.101.ru:8443",
-        "https://pub0301.101.ru:8443",
-        "https://pub0302.101.ru:8443",
-        "https://srv11.gpmradio.ru:8443",
-        "http://pub0101.101.ru:8000",
-        "http://pub0201.101.ru:8000",
-        "http://pub0202.101.ru:8000",
-        "http://pub0302.101.ru:8000",
     )
     output: list[Candidate] = []
     for channel_id, (title, page) in channels.items():
-        alternatives = [
-            f"{base}/stream/{tier}/{codec}/{bitrate}/{channel_id}"
-            for tier, codec, bitrate in profiles
-            for base in bases
-        ]
+        profiles = quality_101_profiles(quality)
+        alternatives = build_101_stream_urls(channel_id, quality, bases)
         output.append(
             Candidate(
                 site="101",
@@ -2023,6 +2031,11 @@ def run_self_test() -> None:
     assert quality_101_profiles("low")[0] == ("pro", "aac", 64)
     assert quality_101_profiles("auto")[0] == ("trust", "mp3", 128)
     assert quality_101_profiles("high")[0] == ("trust", "mp3", 128)
+    assert build_101_stream_urls(1, "high", ("https://one", "https://two"))[:3] == [
+        "https://one/stream/trust/mp3/128/1",
+        "https://one/stream/pro/aac/64/1",
+        "https://two/stream/trust/mp3/128/1",
+    ]
     assert looks_like_stream("http://79.120.39.202:8000/dubtechno", ("radcap.ru",))
     assert not looks_like_stream("https://example.net:new/stream", ("example.net",))
     assert not looks_like_stream("https://radcap.ru/meta/3/stream39063.js", ("radcap.ru",))
