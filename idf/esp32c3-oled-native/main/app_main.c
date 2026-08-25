@@ -46,9 +46,16 @@ static native_state_t s_state;
 #ifndef YORADIO_CODEC_BENCHMARK
 static oled_display_t s_display;
 static int64_t s_boot_logo_until_us;
+typedef enum {
+    BUTTON_STATUS_STOPPED,
+    BUTTON_STATUS_PLAYING,
+    BUTTON_STATUS_NEXT,
+    BUTTON_STATUS_PREVIOUS,
+} button_status_t;
+
 static atomic_uint_fast32_t s_button_status_revision;
 static atomic_uint_fast32_t s_button_status_until_ms;
-static atomic_bool s_button_status_playing;
+static atomic_uchar s_button_status;
 
 typedef enum {
     BUTTON_ACTION_NONE,
@@ -108,11 +115,29 @@ static esp_err_t execute_button_action(button_action_t action) {
     }
 }
 
-static void show_button_playback_status(bool playing, uint32_t now_ms) {
-    atomic_store(&s_button_status_playing, playing);
+static void show_button_status(button_status_t status, uint32_t now_ms) {
+    atomic_store(&s_button_status, (unsigned char)status);
     atomic_store(&s_button_status_until_ms,
                  now_ms + BUTTON_STATUS_DISPLAY_MS);
     atomic_fetch_add(&s_button_status_revision, 1U);
+}
+
+static void show_button_playback_status(bool playing, uint32_t now_ms) {
+    show_button_status(playing ? BUTTON_STATUS_PLAYING : BUTTON_STATUS_STOPPED,
+                       now_ms);
+}
+
+static const char *button_status_text(button_status_t status) {
+    switch (status) {
+        case BUTTON_STATUS_PLAYING:
+            return "playing";
+        case BUTTON_STATUS_NEXT:
+            return "next";
+        case BUTTON_STATUS_PREVIOUS:
+            return "prev";
+        default:
+            return "stopped";
+    }
 }
 
 #ifdef CONFIG_YORADIO_ROTARY_ENCODER
@@ -201,6 +226,14 @@ static void execute_pending_button_action(button_state_t *button) {
         if (executing_action == BUTTON_ACTION_TOGGLE) {
             show_button_playback_status(
                 !state_before_action.audio_running,
+                (uint32_t)(esp_timer_get_time() / 1000U));
+        } else if (executing_action == BUTTON_ACTION_NEXT) {
+            show_button_status(
+                BUTTON_STATUS_NEXT,
+                (uint32_t)(esp_timer_get_time() / 1000U));
+        } else if (executing_action == BUTTON_ACTION_PREVIOUS) {
+            show_button_status(
+                BUTTON_STATUS_PREVIOUS,
                 (uint32_t)(esp_timer_get_time() / 1000U));
         }
         if (button->action_deferred) {
@@ -478,7 +511,7 @@ static void display_task(void *argument) {
     uint32_t button_status_revision =
         (uint32_t)atomic_load(&s_button_status_revision);
     uint32_t button_status_until_ms = 0;
-    bool button_status_playing = false;
+    button_status_t button_status = BUTTON_STATUS_STOPPED;
     bool button_status_was_visible = false;
     const display_scroll_t button_status_scroll = {0};
     while (true) {
@@ -519,7 +552,8 @@ static void display_task(void *argument) {
             button_status_revision = current_button_status_revision;
             button_status_until_ms =
                 (uint32_t)atomic_load(&s_button_status_until_ms);
-            button_status_playing = atomic_load(&s_button_status_playing);
+            button_status =
+                (button_status_t)atomic_load(&s_button_status);
             redraw = true;
         }
         bool button_status_visible =
@@ -653,7 +687,7 @@ static void display_task(void *argument) {
         if (redraw) {
             const char *display_secondary =
                 button_status_visible
-                    ? (button_status_playing ? "playing" : "stopped")
+                    ? button_status_text(button_status)
                     : (state.audio_running ? secondary_text : "");
             draw_status(&state, station_text, display_secondary, &station_scroll,
                         button_status_visible ? &button_status_scroll

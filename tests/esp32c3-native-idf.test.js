@@ -479,10 +479,18 @@ test("native BOOT gestures match the documented one-button controls", () => {
   assert.match(app, /Deferred BOOT action executed/);
   assert.match(app, /BUTTON_STATUS_DISPLAY_MS 2000U/);
   assert.match(app, /executing_action == BUTTON_ACTION_TOGGLE/);
+  assert.match(
+    app,
+    /executing_action == BUTTON_ACTION_NEXT[\s\S]*show_button_status\([\s\S]*BUTTON_STATUS_NEXT/,
+  );
+  assert.match(
+    app,
+    /executing_action == BUTTON_ACTION_PREVIOUS[\s\S]*show_button_status\([\s\S]*BUTTON_STATUS_PREVIOUS/,
+  );
   assert.match(app, /state_before_action\.audio_running/);
   assert.match(
     app,
-    /button_status_playing \? "playing" : "stopped"/,
+    /BUTTON_STATUS_NEXT:[\s\S]*return "next"[\s\S]*BUTTON_STATUS_PREVIOUS:[\s\S]*return "prev"/,
   );
   assert.match(app, /state\.audio_running \? secondary_text : ""/);
   assert.match(app, /button_status_visible[\s\S]*button_status_scroll/);

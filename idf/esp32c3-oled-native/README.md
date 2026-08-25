@@ -35,7 +35,8 @@ stronger channel peak and is configurable or removable under
 `menuconfig -> yoRadio audio level LED`. One BOOT click pauses or resumes, two
 clicks select the next station, and a hold selects the previous station.
 After a single click, the OLED second row shows `playing` or `stopped` for two
-seconds to confirm the resulting playback state.
+seconds to confirm the resulting playback state. A successful double click
+shows `next`, and a successful long press shows `prev` for the same interval.
 Holding BOOT while resetting still enters the ROM downloader.
 
 Software text scrolling is enabled for this board by default so every station
