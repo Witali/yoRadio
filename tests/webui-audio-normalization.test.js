@@ -56,39 +56,87 @@ test("settings expose target peak level and symmetric time constant", () => {
   assert.match(timeInput, /max="10000"/);
 });
 
-test("normalizer uses one time constant for gain increase and decrease", () => {
+test("normalizer precomputes one smoothing interval for both directions", () => {
   const source = fs.readFileSync(
     path.join(__dirname, "..", "yoRadio", "src", "audioI2S", "AudioNormalizer.cpp"),
     "utf8"
   );
 
   assert.match(source, /m_targetPeak/);
-  assert.match(source, /m_timeConstantMs/);
-  assert.match(source, /moveTowards\(m_gainQ12, targetGain, smoothingBlocks\)/);
+  assert.match(source, /m_smoothingBlocks/);
+  assert.match(source, /moveTowards\(m_gainQ12, targetGain, m_smoothingBlocks\)/);
   assert.doesNotMatch(source, /targetGain < m_gainQ12 \?/);
   assert.doesNotMatch(source, /attackSamples/);
 });
 
-test("normalizer hot path avoids 64-bit sample arithmetic", () => {
+test("normalizer hot path uses a division-free inline fixed-point limiter", () => {
   const source = fs.readFileSync(
     path.join(__dirname, "..", "yoRadio", "src", "audioI2S", "AudioNormalizer.cpp"),
     "utf8"
   );
-  const processBody = source.match(
-    /void AudioNormalizer::process\(int16_t sample\[2\]\) \{([\s\S]*?)\n\}/
+  const header = fs.readFileSync(
+    path.join(__dirname, "..", "yoRadio", "src", "audioI2S", "AudioNormalizer.h"),
+    "utf8"
+  );
+  const processBody = header.match(
+    /void processEnabled\(int16_t sample\[2\]\) \{([\s\S]*?)\n    \}/
   )?.[1];
-  const limiterBody = source.match(
-    /int16_t AudioNormalizer::softLimit\(int32_t value\) \{([\s\S]*?)\n\}/
+  const limiterBody = header.match(
+    /static int16_t softLimit\(int32_t value\) \{([\s\S]*?)\n    \}/
+  )?.[1];
+  const targetBody = source.match(
+    /void AudioNormalizer::updateGainTarget\(\) \{([\s\S]*?)\n\}/
   )?.[1];
 
-  assert.ok(processBody, "normalizer process body is missing");
-  assert.ok(limiterBody, "soft limiter body is missing");
+  assert.ok(processBody, "normalizer inline process body is missing");
+  assert.ok(limiterBody, "inline soft limiter body is missing");
+  assert.ok(targetBody, "gain target body is missing");
   assert.match(processBody, /\* m_gainQ12\) >> 12/);
   assert.doesNotMatch(processBody, /int64_t/);
   assert.doesNotMatch(limiterBody, /int64_t/);
+  assert.doesNotMatch(limiterBody, /\//);
+  assert.match(limiterBody, /kSoftLimitLutStepShift/);
+  assert.match(limiterBody, /\* fraction \+ rounding\) >>/);
   assert.match(source, /soft limiter numerator must fit in int32_t/);
+  assert.match(source, /std::make_index_sequence<kSoftLimitLutEntries>/);
+  assert.doesNotMatch(targetBody, /uint64_t/);
+  assert.match(source, /enabled == m_enabled[\s\S]*return;/);
+  assert.match(source, /AudioNormalizer::processBlock/);
+  assert.match(source, /processEnabled\(stereo\)/);
 });
 
+test("soft limiter LUT interpolation stays within 13 PCM levels", () => {
+  const knee = 28672;
+  const remaining = 32767 - knee;
+  const maximum = 327680;
+  const step = 1 << 9;
+  const exact = magnitude => magnitude <= knee
+    ? magnitude
+    : knee + Math.floor(
+        (magnitude - knee) * remaining /
+        (magnitude - knee + remaining)
+      );
+  const lut = [];
+  for(let magnitude = knee; magnitude <= maximum; magnitude += step) {
+    lut.push(exact(magnitude));
+  }
+  assert.equal(lut.length, 585);
+  let maximumError = 0;
+  for(let magnitude = knee; magnitude <= maximum; ++magnitude) {
+    const over = magnitude - knee;
+    const index = over >> 9;
+    const fraction = over & (step - 1);
+    const approximated = index >= lut.length - 1
+      ? lut.at(-1)
+      : lut[index] +
+        (((lut[index + 1] - lut[index]) * fraction + step / 2) >> 9);
+    maximumError = Math.max(
+      maximumError,
+      Math.abs(approximated - exact(magnitude))
+    );
+  }
+  assert.equal(maximumError, 13);
+});
 test("settings page requests and applies current normalization values", () => {
   const scriptPath = path.join(
     __dirname,

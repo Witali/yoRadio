@@ -70,6 +70,7 @@ static int16_t pcm_mono_sample(const uint8_t *frame, uint8_t channels,
 #define PDM_BIAS_RAMP_MS 100U
 #define PDM_BIAS_SETTLE_MS 2U
 #define RESAMPLER_SCALE 32768U
+#define RESAMPLER_FRACTION_MULTIPLIER_Q16 44739U
 
 static i2s_chan_handle_t s_pdm;
 static bool s_pdm_running;
@@ -262,9 +263,10 @@ static esp_err_t pdm_write_resampled(int16_t sample) {
     uint32_t phase = s_resampler_next_phase;
     int32_t delta = (int32_t)sample - s_resampler_previous;
     while (phase <= PDM_OUTPUT_SAMPLE_RATE) {
+        // round(phase * 32768 / 48000), using a Q16 reciprocal. This hot path
+        // runs once per 48 kHz output sample, so avoid a hardware division.
         uint32_t fraction =
-            (phase * RESAMPLER_SCALE + PDM_OUTPUT_SAMPLE_RATE / 2U) /
-            PDM_OUTPUT_SAMPLE_RATE;
+            (phase * RESAMPLER_FRACTION_MULTIPLIER_Q16 + 32768U) >> 16;
         int32_t scaled = delta * (int32_t)fraction;
         scaled += scaled >= 0 ? RESAMPLER_SCALE / 2U
                               : -(int32_t)(RESAMPLER_SCALE / 2U);

@@ -118,7 +118,7 @@ esp_err_t runtime_settings_init(void) {
                         "Runtime settings mutex allocation");
     nvs_handle_t handle;
     esp_err_t result =
-        nvs_open(SETTINGS_NVS_NAMESPACE, NVS_READONLY, &handle);
+        nvs_open(SETTINGS_NVS_NAMESPACE, NVS_READWRITE, &handle);
     if (result == ESP_ERR_NVS_NOT_FOUND) return ESP_OK;
     ESP_RETURN_ON_ERROR(result, TAG, "Open saved runtime settings");
 
@@ -130,7 +130,25 @@ esp_err_t runtime_settings_init(void) {
     if (nvs_get_u8(handle, SETTINGS_NVS_SOFTAP_DELAY, &u8) == ESP_OK &&
         u8 <= 30U) atomic_store(&s_softap_delay_min, u8);
     if (nvs_get_u8(handle, SETTINGS_NVS_AUDIO_BUFFER, &u8) == ESP_OK &&
-        u8 >= 5U && u8 <= 14U) atomic_store(&s_audio_buffer_blocks, u8);
+        u8 >= RUNTIME_MIN_AUDIO_BUFFER_BLOCKS) {
+        uint8_t saved = u8;
+        if (u8 > RUNTIME_MAX_AUDIO_BUFFER_BLOCKS) {
+            u8 = RUNTIME_MAX_AUDIO_BUFFER_BLOCKS;
+        }
+        atomic_store(&s_audio_buffer_blocks, u8);
+        if (saved != u8) {
+            esp_err_t migration =
+                nvs_set_u8(handle, SETTINGS_NVS_AUDIO_BUFFER, u8);
+            if (migration == ESP_OK) migration = nvs_commit(handle);
+            if (migration == ESP_OK) {
+                ESP_LOGI(TAG, "Migrated audio buffer from %u to %u blocks",
+                         saved, u8);
+            } else {
+                ESP_LOGW(TAG, "Audio buffer migration failed: %s",
+                         esp_err_to_name(migration));
+            }
+        }
+    }
     if (nvs_get_u8(handle, SETTINGS_NVS_WATCHDOG, &u8) == ESP_OK &&
         u8 <= 1U) atomic_store(&s_watchdog, u8 != 0U);
     if (nvs_get_i8(handle, SETTINGS_NVS_TZ_HOUR, &i8) == ESP_OK &&
@@ -219,8 +237,9 @@ esp_err_t runtime_settings_set_softap_delay_min(uint8_t minutes) {
     return ESP_OK;
 }
 esp_err_t runtime_settings_set_audio_buffer_blocks(uint8_t blocks) {
-    ESP_RETURN_ON_FALSE(blocks >= 5U && blocks <= 14U, ESP_ERR_INVALID_ARG, TAG,
-                        "Audio buffer range");
+    ESP_RETURN_ON_FALSE(blocks >= RUNTIME_MIN_AUDIO_BUFFER_BLOCKS &&
+                            blocks <= RUNTIME_MAX_AUDIO_BUFFER_BLOCKS,
+                        ESP_ERR_INVALID_ARG, TAG, "Audio buffer range");
     ESP_RETURN_ON_ERROR(save_u8(SETTINGS_NVS_AUDIO_BUFFER, blocks), TAG,
                         "Save audio buffer");
     atomic_store(&s_audio_buffer_blocks, blocks);

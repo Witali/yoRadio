@@ -32,13 +32,14 @@
 #include "custom_legacy_adapter.h"
 #endif
 #include "native_audio_output.h"
+#include "network_service.h"
 
 #include "runtime_settings.h"
 #define STREAM_CHUNK_SIZE 2048
 #define STREAM_READ_TIMEOUT_MS 250
 #define DECODE_BUFFER_INITIAL 12288
-#define PCM_RING_SIZE (16 * 1024)
-#define PCM_PACKET_DATA_SIZE 7168
+#define PCM_RING_SIZE (8 * 1024)
+#define PCM_PACKET_DATA_SIZE 3584
 #define MAX_HTTP_REDIRECTS 5
 #define ICY_METADATA_MAX 4080
 #define DECODE_STATS_INTERVAL_US 5000000LL
@@ -110,7 +111,9 @@ static RingbufHandle_t s_encoded;
 static RingbufHandle_t s_pcm;
 static size_t s_encoded_usable_size;
 static atomic_uint s_generation;
+static atomic_uint s_decoder_target_codec;
 static atomic_uint s_decoder_released_generation;
+static portMUX_TYPE s_generation_lock = portMUX_INITIALIZER_UNLOCKED;
 static char s_last_url[sizeof(((play_command_t *)0)->url)];
 static native_codec_t s_last_codec;
 // Decoder callbacks run only in decoder_task. These fields rate-limit VBR
@@ -118,6 +121,10 @@ static native_codec_t s_last_codec;
 static uint32_t s_published_bitrate_bps;
 static int64_t s_bitrate_updated_us;
 static atomic_bool s_measured_bitrate_ready;
+// One stream task owns this workspace; keeping it in BSS avoids a 4 KiB
+// allocation/free cycle whenever a station starts or stops.
+static char s_icy_metadata[ICY_METADATA_MAX + 1];
+static void log_runtime_memory(const char *stage);
 
 static void dispose_http_client(esp_http_client_handle_t client) {
     if (!client) return;
@@ -138,6 +145,28 @@ static native_codec_t codec_from_content_type(const char *content_type) {
         return NATIVE_CODEC_OGG;
     }
     return NATIVE_CODEC_AUTO;
+}
+
+static bool codec_uses_custom_legacy(native_codec_t codec) {
+#ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
+    if (codec == NATIVE_CODEC_AAC) return true;
+#endif
+#if defined(CONFIG_YORADIO_MP3_DECODER_HELIX) || \
+    defined(CONFIG_YORADIO_MP3_DECODER_MINIMP3)
+    if (codec == NATIVE_CODEC_MP3) return true;
+#endif
+    return false;
+}
+
+static uint32_t advance_generation(native_codec_t target_codec) {
+    portENTER_CRITICAL(&s_generation_lock);
+    uint32_t generation = atomic_load(&s_generation) + 1U;
+    // Publish the target first. Once the decoder observes the new generation,
+    // it can release an incompatible arena before the stream allocates TLS.
+    atomic_store(&s_decoder_target_codec, (unsigned)target_codec);
+    atomic_store(&s_generation, generation);
+    portEXIT_CRITICAL(&s_generation_lock);
+    return generation;
 }
 
 static native_codec_t codec_from_signature(const uint8_t *data, size_t size) {
@@ -483,7 +512,10 @@ static void stream_task(void *argument) {
         };
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (!client) {
-            state_set_audio(false, "HTTP allocation failed");
+            if (atomic_load(&s_generation) == command.generation) {
+                state_set_audio(false, "HTTP allocation failed");
+                network_service_set_streaming(false);
+            }
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
@@ -491,9 +523,15 @@ static void stream_task(void *argument) {
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Stream connection failed for %s: %s", command.url,
                      esp_err_to_name(result));
-            state_set_audio(false, "connection failed");
+            if (atomic_load(&s_generation) == command.generation) {
+                state_set_audio(false, "connection failed");
+                network_service_set_streaming(false);
+            }
             dispose_http_client(client);
             continue;
+        }
+        if (strncmp(command.url, "https://", 8) == 0) {
+            log_runtime_memory("after TLS handshake");
         }
         // Keep the long timeout for TCP/TLS setup, then poll the stream often
         // enough that Stop can be handled without closing an HTTP client from
@@ -534,10 +572,7 @@ static void stream_task(void *argument) {
                 ESP_LOGI(TAG, "ICY bitrate: %lu kbit/s", icy_bitrate);
             }
         }
-        char *metadata = metadata_interval ? malloc(ICY_METADATA_MAX + 1) : NULL;
-        if (metadata_interval && !metadata) {
-            ESP_LOGW(TAG, "No memory for ICY metadata; titles disabled");
-        }
+        char *metadata = metadata_interval ? s_icy_metadata : NULL;
         size_t audio_until_metadata = metadata_interval;
         size_t metadata_remaining = 0;
         size_t metadata_written = 0;
@@ -564,6 +599,7 @@ static void stream_task(void *argument) {
                 continue;
             }
             if (received < 0) {
+                log_runtime_memory("at stream read failure");
                 ESP_LOGW(TAG, "Stream read failed");
                 stream_read_failed = true;
                 break;
@@ -642,7 +678,6 @@ static void stream_task(void *argument) {
                 break;
             }
         }
-        free(metadata);
         send_encoded(command.generation, codec, NULL, 0, true);
         dispose_http_client(client);
         if (atomic_load(&s_generation) == command.generation) {
@@ -651,8 +686,19 @@ static void stream_task(void *argument) {
                                        : (stream_read_failed
                                               ? "stream read failed"
                                               : "stream ended"));
+            network_service_set_streaming(false);
         }
     }
+}
+
+static void log_runtime_memory(const char *stage) {
+    ESP_LOGI(TAG,
+             "Memory %s: free=%u largest=%u minimum=%u task_stack_hwm=%u",
+             stage,
+             (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT),
+             (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_8BIT),
+             (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT),
+             (unsigned)uxTaskGetStackHighWaterMark(NULL));
 }
 
 static bool send_pcm(uint32_t generation,
@@ -781,6 +827,7 @@ static void decoder_task(void *argument) {
     decode_stats_t stats = {0};
     esp_audio_simple_dec_info_t stream_info = {0};
     bool stream_info_ready = false;
+    bool first_frame_memory_logged = false;
 #ifdef YORADIO_CODEC_BENCHMARK
     size_t decoder_heap_before = 0;
     bool first_frame_memory_reported = false;
@@ -789,6 +836,12 @@ static void decoder_task(void *argument) {
     while (true) {
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
+            bool had_simple_decoder = decoder != NULL;
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            bool had_legacy_decoder = legacy_decoder != NULL;
+#endif
+            native_codec_t target_codec = (native_codec_t)atomic_load(
+                &s_decoder_target_codec);
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
@@ -798,15 +851,35 @@ static void decoder_task(void *argument) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
             legacy_decoder = NULL;
+            // Keep the arena for another custom MP3/AAC decoder. Otherwise
+            // return it before acknowledging release, so HTTP/TLS and the
+            // official decoder never overlap the old custom workspace.
+            if (had_legacy_decoder &&
+                !codec_uses_custom_legacy(target_codec) &&
+                !custom_legacy_decoder_discard_arena()) {
+                ESP_LOGE(TAG, "Old codec arena is still in use");
+                state_set_audio(false, "DECODER BUSY");
+            }
 #endif
-            free(output);
-            output = NULL;
-            output_size = 0;
+            // The simple decoder is already closed. Its reusable PCM buffer
+            // is useful for another official decoder, but not for a custom
+            // one. An unknown target is released conservatively.
+            if (had_simple_decoder &&
+                (target_codec == NATIVE_CODEC_AUTO ||
+                 codec_uses_custom_legacy(target_codec))) {
+                free(output);
+                output = NULL;
+                output_size = 0;
+            }
+            // Preserve the Espressif PCM workspace only when the next decoder
+            // is explicitly known to be compatible. AUTO is released before
+            // TLS because its type can be learned only from the stream.
             generation = current_generation;
             failed_generation = 0;
             codec = NATIVE_CODEC_AUTO;
             memset(&stream_info, 0, sizeof(stream_info));
             stream_info_ready = false;
+            first_frame_memory_logged = false;
             atomic_store(&s_decoder_released_generation,
                          current_generation);
         }
@@ -836,6 +909,7 @@ static void decoder_task(void *argument) {
             generation = packet->generation;
             codec = packet->codec;
             stream_info_ready = false;
+            first_frame_memory_logged = false;
             reset_decoder_bitrate_tracking();
             decode_stats_reset(&stats, generation, codec, esp_timer_get_time());
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -851,7 +925,7 @@ static void decoder_task(void *argument) {
                 flac_decoder = custom_flac_decoder_create();
                 if (!flac_decoder) {
                     ESP_LOGE(TAG, "Custom FLAC decoder allocation failed");
-                    state_set_audio(false, "decoder allocation failed");
+                    state_set_audio(false, "NO MEMORY");
                     failed_generation = generation;
                 }
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -881,7 +955,7 @@ static void decoder_task(void *argument) {
                 if (!legacy_decoder) {
                     ESP_LOGE(TAG, "Custom %s decoder allocation failed",
                              codec_name(codec));
-                    state_set_audio(false, "decoder allocation failed");
+                    state_set_audio(false, "NO MEMORY");
                     failed_generation = generation;
                 }
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -906,17 +980,22 @@ static void decoder_task(void *argument) {
                     continue;
                 }
 #endif
-                uint8_t *resized = realloc(output, DECODE_BUFFER_INITIAL);
-                if (!resized) {
-                    ESP_LOGE(TAG, "%s PCM buffer allocation failed: %lu",
-                             codec_name(codec), (unsigned long)DECODE_BUFFER_INITIAL);
-                    state_set_audio(false, "PCM allocation failed");
-                    failed_generation = generation;
-                    vRingbufferReturnItem(s_encoded, packet);
-                    continue;
+                if (output_size < DECODE_BUFFER_INITIAL) {
+                    uint8_t *resized =
+                        realloc(output, DECODE_BUFFER_INITIAL);
+                    if (!resized) {
+                        ESP_LOGE(TAG,
+                                 "%s PCM buffer allocation failed: %lu",
+                                 codec_name(codec),
+                                 (unsigned long)DECODE_BUFFER_INITIAL);
+                        state_set_audio(false, "NO MEMORY");
+                        failed_generation = generation;
+                        vRingbufferReturnItem(s_encoded, packet);
+                        continue;
+                    }
+                    output = resized;
+                    output_size = DECODE_BUFFER_INITIAL;
                 }
-                output = resized;
-                output_size = DECODE_BUFFER_INITIAL;
                 esp_audio_simple_dec_cfg_t cfg = {
                     .dec_type = simple_decoder_type(codec),
                     .dec_cfg = NULL,
@@ -928,7 +1007,10 @@ static void decoder_task(void *argument) {
                 if (open_result != ESP_AUDIO_ERR_OK) {
                     ESP_LOGE(TAG, "%s decoder open failed: %d",
                              codec_name(codec), open_result);
-                    state_set_audio(false, "decoder allocation failed");
+                    state_set_audio(
+                        false,
+                        open_result == ESP_AUDIO_ERR_MEM_LACK
+                            ? "NO MEMORY" : "DECODER ERROR");
                     failed_generation = generation;
                 }
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -967,10 +1049,15 @@ static void decoder_task(void *argument) {
                     first_frame_memory_reported = true;
                 }
 #endif
+                if (!first_frame_memory_logged && stream_info_ready) {
+                    log_runtime_memory("after first FLAC frame");
+                    first_frame_memory_logged = true;
+                }
                 decode_stats_report(&stats, esp_timer_get_time());
                 if (result < 0 && generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom FLAC decode error: %d", result);
-                    state_set_audio(false, "decode failed");
+                    state_set_audio(false,
+                                    result == -5 || result == -6 ? "NO MEMORY" : "decode failed");
                     failed_generation = generation;
                 }
             }
@@ -1013,6 +1100,10 @@ static void decoder_task(void *argument) {
                     first_frame_memory_reported = true;
                 }
 #endif
+                if (!first_frame_memory_logged && stream_info_ready) {
+                    log_runtime_memory("after first legacy frame");
+                    first_frame_memory_logged = true;
+                }
                 decode_stats_report(&stats, esp_timer_get_time());
                 if (result < 0 && generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom %s decode error: %d",
@@ -1112,6 +1203,10 @@ static void decoder_task(void *argument) {
                         first_frame_memory_reported = true;
                     }
 #endif
+                    if (!first_frame_memory_logged) {
+                        log_runtime_memory("after first decoded frame");
+                        first_frame_memory_logged = true;
+                    }
                     decode_stats_add_audio(&stats, &stream_info,
                                            frame.decoded_size);
                     if (!send_pcm(generation, &stream_info, output,
@@ -1181,6 +1276,7 @@ esp_err_t audio_service_start(native_state_t *state) {
     ESP_RETURN_ON_ERROR(audio_level_led_init(), TAG,
                         "initialize audio level LED");
     atomic_init(&s_generation, 0);
+    atomic_init(&s_decoder_target_codec, NATIVE_CODEC_AUTO);
     atomic_init(&s_decoder_released_generation, 0);
     atomic_init(&s_measured_bitrate_ready, false);
     s_last_url[0] = '\0';
@@ -1194,15 +1290,16 @@ esp_err_t audio_service_start(native_state_t *state) {
         return ESP_ERR_NO_MEM;
     }
     s_encoded_usable_size = xRingbufferGetCurFreeSize(s_encoded);
-    // ESP32-C3 has one core. Give networking and decoding equal time slices;
-    // unlike the dual-core CYD, a lower-priority stream task can otherwise be
-    // starved before it reaches an ICY metadata boundary. Output stays one
-    // priority higher to keep the PDM DMA fed.
+    // ESP32-C3 has one core. Decode a complete compressed frame above the
+    // output task: equal-priority time slicing makes the wall-time measurement
+    // include output work and can stretch a 14 ms MP3 call past 60 ms. The
+    // small PCM ring bounds this burst; once full, backpressure yields to
+    // output. Wi-Fi/TCP driver tasks already use higher system priorities.
     if (xTaskCreate(stream_task, "radio_stream",
                     BOARD_TASK_STACK_RADIO_STREAM, NULL, 5, NULL) !=
             pdPASS ||
         xTaskCreate(decoder_task, "audio_decode",
-                    BOARD_TASK_STACK_AUDIO_DECODER, NULL, 5, NULL) !=
+                    BOARD_TASK_STACK_AUDIO_DECODER, NULL, 7, NULL) !=
             pdPASS ||
         xTaskCreate(output_task, "audio_output",
                     BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6, NULL) !=
@@ -1210,9 +1307,9 @@ esp_err_t audio_service_start(native_state_t *state) {
         return ESP_ERR_NO_MEM;
     }
     ESP_LOGI(TAG,
-             "Pipeline ready: %s, %u-byte compressed + 16 KiB PCM, free heap %u",
+             "Pipeline ready: %s, %u-byte compressed + %u-byte PCM, free heap %u",
              native_audio_output_name(),
-             (unsigned)encoded_ring_size,
+             (unsigned)encoded_ring_size, (unsigned)PCM_RING_SIZE,
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
 #ifdef YORADIO_CODEC_BENCHMARK
     ESP_RETURN_ON_ERROR(benchmark_autostart(), TAG,
@@ -1225,8 +1322,11 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     if (!url || !url[0] || strlen(url) >= sizeof(((play_command_t *)0)->url)) {
         return ESP_ERR_INVALID_ARG;
     }
+    // Power-save changes are best effort: a transient Wi-Fi driver error must
+    // not reject an otherwise valid Play command.
+    network_service_set_streaming(true);
     play_command_t command = {
-        .generation = atomic_fetch_add(&s_generation, 1) + 1,
+        .generation = advance_generation(codec),
         .requested_codec = codec,
     };
     strlcpy(command.url, url, sizeof(command.url));
@@ -1239,8 +1339,11 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     // Clear a previous station's playing state before the command is queued.
     // The stream task switches it back after open_stream() succeeds.
     state_set_audio(false, "connecting");
-    return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
-                                                            : ESP_FAIL;
+    if (xQueueOverwrite(s_commands, &command) == pdTRUE) return ESP_OK;
+    if (atomic_load(&s_generation) == command.generation) {
+        network_service_set_streaming(false);
+    }
+    return ESP_FAIL;
 }
 
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -1255,7 +1358,7 @@ static esp_err_t audio_service_play_fixture(size_t size,
         return ESP_ERR_INVALID_ARG;
     }
     play_command_t command = {
-        .generation = atomic_fetch_add(&s_generation, 1) + 1,
+        .generation = advance_generation(codec),
         .requested_codec = codec,
         .fixture_size = (uint32_t)size,
     };
@@ -1305,7 +1408,8 @@ esp_err_t audio_service_resume(void) {
 }
 
 void audio_service_stop(void) {
-    atomic_fetch_add(&s_generation, 1);
+    advance_generation(NATIVE_CODEC_AUTO);
+    network_service_set_streaming(false);
     native_state_set_title(s_state, "");
     native_state_set_bitrate(s_state, 0);
     native_state_set_stream_info(s_state, "", 0, 0);

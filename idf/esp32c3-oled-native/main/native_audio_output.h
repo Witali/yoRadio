@@ -7,7 +7,7 @@
 
 esp_err_t native_audio_output_init(void);
 esp_err_t native_audio_output_configure(uint32_t input_sample_rate);
-esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
+esp_err_t native_audio_output_write_pcm(uint8_t *data, size_t size,
                                         uint8_t bits_per_sample,
                                         uint8_t channels);
 void native_audio_output_set_volume(uint8_t volume);

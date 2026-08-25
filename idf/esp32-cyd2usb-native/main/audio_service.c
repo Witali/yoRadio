@@ -27,7 +27,7 @@
 
 #define STREAM_CHUNK_SIZE 2048
 #define DECODE_BUFFER_INITIAL 12288
-#define ENCODED_RING_SIZE (8 * 1024)
+#define ENCODED_RING_SIZE (16 * 1024)
 #define PCM_RING_SIZE (8 * 1024)
 #define PCM_PACKET_DATA_SIZE 3072
 
@@ -510,7 +510,7 @@ esp_err_t audio_service_start(native_state_t *state) {
         return ESP_ERR_NO_MEM;
     }
     ESP_LOGI(TAG,
-             "Pipeline ready: %s, 8 KiB compressed + 8 KiB PCM, free heap %u",
+             "Pipeline ready: %s, 16 KiB compressed + 8 KiB PCM, free heap %u",
              native_audio_output_name(),
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
     return ESP_OK;

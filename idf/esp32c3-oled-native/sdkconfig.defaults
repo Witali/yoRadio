@@ -9,6 +9,12 @@ CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
 CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_160=y
 CONFIG_FREERTOS_UNICORE=y
 CONFIG_FREERTOS_HZ=1000
+# Eight TCP segments cover the bandwidth-delay product of remote 320 kbit/s
+# radio servers without reserving the much larger 16-32 KiB windows.
+CONFIG_LWIP_TCP_WND_DEFAULT=11520
+# ESP-IDF recommends receive-window/MSS + 2 mailbox entries.
+CONFIG_LWIP_TCP_RECVMBOX_SIZE=10
+
 CONFIG_ESP_MAIN_TASK_STACK_SIZE=4096
 
 # The proven software scroll is the board default. Hardware scrolling remains
@@ -72,14 +78,15 @@ CONFIG_AUDIO_ENCODER_SBC_SUPPORT=n
 CONFIG_AUDIO_ENCODER_LC3_SUPPORT=n
 CONFIG_AUDIO_ENCODER_G722_SUPPORT=n
 
-# Select exactly one implementation for each codec. Espressif MP3 and custom
-# FLAC are the native C3 defaults; alternatives remain available for explicit
-# A/B builds.
-CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y
-# CONFIG_YORADIO_MP3_DECODER_HELIX is not set
+# Select exactly one implementation for each codec. Helix MP3 is the native
+# C3 default because it sustains complex 320 kbit/s streams on the single-core
+# RISC-V target. Helix AAC shares the same reusable arena and remains stable
+# across mixed-codec transitions; custom FLAC remains the default FLAC implementation.
+# CONFIG_YORADIO_MP3_DECODER_ESPRESSIF is not set
+CONFIG_YORADIO_MP3_DECODER_HELIX=y
 # CONFIG_YORADIO_MP3_DECODER_MINIMP3 is not set
-CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y
-# CONFIG_YORADIO_AAC_DECODER_HELIX is not set
+# CONFIG_YORADIO_AAC_DECODER_ESPRESSIF is not set
+CONFIG_YORADIO_AAC_DECODER_HELIX=y
 CONFIG_YORADIO_FLAC_DECODER_CUSTOM=y
 # CONFIG_YORADIO_FLAC_DECODER_ESPRESSIF is not set
 
@@ -106,9 +113,9 @@ CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=y
 # request side needs only small GET headers.
 CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384
 CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN=4096
-# Allocate TLS record buffers only while mbedTLS is actively using them. This
-# leaves enough contiguous RAM to switch HTTPS stations after PDM DMA starts.
-CONFIG_MBEDTLS_DYNAMIC_BUFFER=y
+# Keep one RX/TX allocation for the lifetime of a TLS connection. Reallocating
+# record buffers while Wi-Fi and a decoder are active fragments the C3 heap.
+# CONFIG_MBEDTLS_DYNAMIC_BUFFER is not set
 
 CONFIG_SPIFFS_USE_MAGIC=y
 CONFIG_SPIFFS_USE_MAGIC_LENGTH=y

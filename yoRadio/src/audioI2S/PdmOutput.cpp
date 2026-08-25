@@ -27,6 +27,7 @@ constexpr uint32_t kBiasSettleMs = 2;
 constexpr uint32_t kPdmOutputSampleRate = 48000;
 constexpr uint32_t kPdmCarrierRate = 6144000;
 constexpr uint32_t kInterpolationScale = 32768;
+constexpr uint32_t kInterpolationFractionMultiplierQ16 = 44739;
 
 i2s_chan_handle_t outputChannel = nullptr;
 uint8_t outputPort = I2S_NUM_0;
@@ -211,9 +212,14 @@ esp_err_t pdmOutputBegin(uint8_t port, uint8_t leftPin, uint8_t rightPin,
       // are linearly resampled below, keeping the high-SNR PDM carrier at
       // exactly 6.144 MHz for every supported source rate.
       .clk_cfg = I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG(kPdmOutputSampleRate),
+#if SOC_I2S_HW_VERSION_2
       .slot_cfg = I2S_PDM_TX_SLOT_DAC_DEFAULT_CONFIG(
           I2S_DATA_BIT_WIDTH_16BIT,
           stereoOutput() ? I2S_SLOT_MODE_STEREO : I2S_SLOT_MODE_MONO),
+#else
+      .slot_cfg = I2S_PDM_TX_SLOT_DEFAULT_CONFIG(
+          I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
+#endif
       .gpio_cfg = {
           .clk = I2S_GPIO_UNUSED,
           .dout = static_cast<gpio_num_t>(outputLeftPin),
@@ -357,8 +363,7 @@ esp_err_t pdmOutputWriteFrame(int16_t left, int16_t right) {
     // Q15 keeps this 48 kHz hot path entirely in 32-bit arithmetic. Even the
     // worst-case 16-bit delta times 32768 remains inside int32_t.
     const uint32_t fraction =
-        (phase * kInterpolationScale + kPdmOutputSampleRate / 2) /
-        kPdmOutputSampleRate;
+        (phase * kInterpolationFractionMultiplierQ16 + 32768U) >> 16;
     int32_t scaledLeft = deltaLeft * static_cast<int32_t>(fraction);
     scaledLeft += scaledLeft >= 0 ? kInterpolationScale / 2
                                   : -static_cast<int32_t>(kInterpolationScale / 2);

@@ -94,11 +94,20 @@ test('codec switching releases only an incompatible legacy arena', () => {
   const release = audio.slice(releaseStart, releaseEnd);
   assert.match(release, /custom_legacy_decoder_destroy\(legacy_decoder\)/);
   assert.match(release, /atomic_store\(&s_decoder_released_generation/);
-  assert.doesNotMatch(release, /custom_legacy_decoder_discard_arena\(\)/);
+  assert.match(
+    release,
+    /had_legacy_decoder[\s\S]*!codec_uses_custom_legacy\(target_codec\)[\s\S]*custom_legacy_decoder_discard_arena\(\)/,
+  );
   assert.ok(
     release.indexOf('custom_legacy_decoder_destroy(legacy_decoder)') <
+      release.indexOf('custom_legacy_decoder_discard_arena()'),
+  );
+  assert.ok(
+    release.indexOf('custom_legacy_decoder_discard_arena()') <
       release.indexOf('atomic_store(&s_decoder_released_generation'),
   );
+  assert.match(audio, /codec_from_signature[\s\S]*"fLaC"[\s\S]*"OggS"[\s\S]*"ID3"/);
+  assert.match(audio, /atomic_store\(&s_decoder_target_codec[\s\S]*atomic_store\(&s_generation/);
 
   const customStart = audio.indexOf('custom_legacy_decoder_create(');
   const officialStart = audio.indexOf(

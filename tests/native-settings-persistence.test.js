@@ -156,7 +156,7 @@ test("C3 persists, reports, and applies WebUI normalization settings", () => {
   assert.match(websocket, /native_audio_settings_get_normalization_time_ms\(\)/);
   assert.doesNotMatch(websocket, /\\"normalize\\":0,\\"normgain\\":20/);
 
-  const normalize = output.indexOf("native_audio_normalizer_process(normalized)");
+  const normalize = output.indexOf("native_audio_normalizer_process_block");
   const volume = output.indexOf("scale_sample_q15(left, left_gain_q15)");
   assert.ok(normalize >= 0 && normalize < volume);
   assert.match(cmake, /AudioNormalizer\.cpp/);

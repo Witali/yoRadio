@@ -20,6 +20,10 @@
 
 #define MAX_CHANNELS 2
 #define MAX_BLOCKSIZE 8192
+#ifndef FLAC_OUTPUT_FRAMES
+#define FLAC_OUTPUT_FRAMES 2048
+#endif
+
 #define APLL_DISABLE 0
 #define EXTERNAL_I2S  0
 

@@ -223,6 +223,12 @@ esp_err_t network_service_start(native_state_t *state) {
                             "Station mode failed");
     }
     ESP_RETURN_ON_ERROR(esp_wifi_start(), TAG, "Wi-Fi start failed");
+    // Match the original Arduino YoRadio WiFi.setSleep(false) behavior while
+    // audio is active. Stop mode switches back to modem power saving.
+    // Power saving is optional; do not take down networking if the driver
+    // transiently refuses the policy update during startup.
+    network_service_set_streaming(false);
+
     ESP_RETURN_ON_FALSE(xTaskCreate(rssi_task, "wifi_rssi",
                                     BOARD_TASK_STACK_WIFI_RSSI, NULL, 2,
                                     NULL) == pdPASS,
@@ -235,6 +241,19 @@ esp_err_t network_service_start(native_state_t *state) {
         if (bits & WIFI_CONNECTED_BIT) return ESP_OK;
     }
     return start_access_point();
+}
+
+esp_err_t network_service_set_streaming(bool active) {
+    const wifi_ps_type_t mode = active ? WIFI_PS_NONE : WIFI_PS_MIN_MODEM;
+    esp_err_t result = esp_wifi_set_ps(mode);
+    if (result == ESP_OK) {
+        ESP_LOGI(TAG, "Wi-Fi power save: %s",
+                 active ? "disabled for audio" : "modem sleep");
+    } else {
+        ESP_LOGW(TAG, "Wi-Fi power save update failed: %s",
+                 esp_err_to_name(result));
+    }
+    return result;
 }
 
 esp_err_t network_service_retry_client(void) {

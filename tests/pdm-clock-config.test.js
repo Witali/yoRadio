@@ -21,10 +21,30 @@ test("PDM hardware always runs at 48 kHz with a 6.144 MHz carrier", () => {
 test("PDM linearly upsamples source rates below 48 kHz", () => {
   assert.match(source, /inputSampleRate == kPdmOutputSampleRate/);
   assert.match(source, /while \(phase <= kPdmOutputSampleRate\)/);
-  assert.match(source, /phase \* kInterpolationScale/);
+  assert.match(source, /kInterpolationFractionMultiplierQ16\s*=\s*44739/);
+  assert.match(source, /phase \* kInterpolationFractionMultiplierQ16/);
+  assert.doesNotMatch(
+    source,
+    /\(phase \* kInterpolationScale[\s\S]*?\/\s*kPdmOutputSampleRate/,
+  );
   assert.doesNotMatch(source, /(?:^|\s)int64_t scaled/);
   assert.match(source, /resamplerNextPhase = phase - kPdmOutputSampleRate/);
   assert.match(source, /resetResampler\(\);[\s\S]*memset\(sampleBuffer/);
+});
+
+test("native PDM outputs use the same division-free resampler", () => {
+  for (const board of ["esp32c3-oled-native", "esp32-cyd2usb-native"]) {
+    const nativeSource = fs.readFileSync(
+      path.join(__dirname, "..", "idf", board, "main", "native_audio_output.c"),
+      "utf8",
+    );
+    assert.match(nativeSource, /RESAMPLER_FRACTION_MULTIPLIER_Q16\s+44739U/);
+    assert.match(nativeSource, /phase \* RESAMPLER_FRACTION_MULTIPLIER_Q16/);
+    assert.doesNotMatch(
+      nativeSource,
+      /\(phase \* RESAMPLER_SCALE[\s\S]*?\/\s*PDM_OUTPUT_SAMPLE_RATE/,
+    );
+  }
 });
 
 test("PDM channel configuration uses the typed I2S port required by IDF 5", () => {
@@ -35,6 +55,14 @@ test("PDM channel configuration uses the typed I2S port required by IDF 5", () =
 });
 
 test("PDM stereo uses two DAC lines and keeps channels interleaved", () => {
+  assert.match(
+    source,
+    /#if SOC_I2S_HW_VERSION_2[\s\S]*I2S_PDM_TX_SLOT_DAC_DEFAULT_CONFIG/,
+  );
+  assert.match(
+    source,
+    /#else[\s\S]*I2S_PDM_TX_SLOT_DEFAULT_CONFIG/,
+  );
   assert.match(source, /I2S_PDM_TX_SLOT_DAC_DEFAULT_CONFIG/);
   assert.match(source, /I2S_SLOT_MODE_STEREO/);
   assert.match(source, /\.dout2 = stereoOutput\(\)/);

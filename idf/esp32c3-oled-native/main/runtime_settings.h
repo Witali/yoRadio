@@ -8,7 +8,11 @@
 
 #define RUNTIME_DEFAULT_AUDIO_INFO false
 #define RUNTIME_DEFAULT_SOFTAP_DELAY_MIN 0U
-// Arduino's abuff unit is one 1600-byte block. Ten blocks are 16 kB.
+// Ten 1600-byte blocks give a conservative 16 KiB default. Users may raise
+// the compressed-stream reserve to 22.4 KiB when a high-bitrate station needs
+// more jitter tolerance and the memory diagnostics confirm enough headroom.
+#define RUNTIME_MIN_AUDIO_BUFFER_BLOCKS 5U
+#define RUNTIME_MAX_AUDIO_BUFFER_BLOCKS 14U
 #define RUNTIME_DEFAULT_AUDIO_BUFFER_BLOCKS 10U
 #define RUNTIME_DEFAULT_MDNS_NAME "yoradio"
 #define RUNTIME_DEFAULT_WATCHDOG true
