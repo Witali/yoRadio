@@ -340,11 +340,11 @@ test("native radio requests and publishes ICY song metadata", () => {
   );
   assert.match(
     audio,
-    /audio_service_stop[\s\S]*atomic_fetch_add\(&s_generation, 1\)[\s\S]*native_state_set_title\(s_state, ""\)/,
+    /audio_service_stop[\s\S]*advance_generation\(NATIVE_CODEC_AUTO\)[\s\S]*native_state_set_title\(s_state, ""\)/,
   );
   assert.match(
     audio,
-    /audio_service_stop[\s\S]*atomic_fetch_add\(&s_generation, 1\)[\s\S]*state_set_audio\(false, "stopped"\)/,
+    /audio_service_stop[\s\S]*advance_generation\(NATIVE_CODEC_AUTO\)[\s\S]*state_set_audio\(false, "stopped"\)/,
   );
   assert.doesNotMatch(audio, /close_active_http_stream/);
   assert.match(audio, /#define STREAM_READ_TIMEOUT_MS 250/);
@@ -365,7 +365,7 @@ test("native radio requests and publishes ICY song metadata", () => {
   assert.match(controls, /native_state_set_station\(s_state, s_candidate_name\)/);
 });
 
-test("native HTTPS station switching keeps TLS and PCM workspaces stable", () => {
+test("native HTTPS station switching releases incompatible codec memory before TLS", () => {
   const audio = read("main", "audio_service.c");
   const sdkconfig = fs.readFileSync(
     path.join(nativeRoot, "sdkconfig.defaults"),
@@ -386,9 +386,25 @@ test("native HTTPS station switching keeps TLS and PCM workspaces stable", () =>
   const generationResetEnd = audio.indexOf("size_t item_size", generationResetStart);
   const generationReset = audio.slice(generationResetStart, generationResetEnd);
   assert.match(generationReset, /esp_audio_simple_dec_close\(decoder\)/);
-  assert.match(generationReset, /Preserve the Espressif PCM workspace/);
-  assert.doesNotMatch(generationReset, /free\(output\)/);
+  assert.match(
+    generationReset,
+    /custom_legacy_decoder_destroy\(legacy_decoder\)[\s\S]*custom_legacy_decoder_discard_arena\(\)[\s\S]*atomic_store\(&s_decoder_released_generation/,
+  );
+  assert.match(
+    generationReset,
+    /had_simple_decoder[\s\S]*codec_uses_custom_legacy\(target_codec\)[\s\S]*free\(output\)/,
+  );
   assert.match(generationReset, /atomic_store\(&s_decoder_released_generation/);
+  assert.match(audio, /codec_from_signature[\s\S]*"fLaC"[\s\S]*"OggS"[\s\S]*"ID3"/);
+  assert.match(
+    audio,
+    /advance_generation\(codec\)[\s\S]*requested_codec = codec/,
+  );
+  assert.match(audio, /state_set_audio\(false, "NO MEMORY"\)/);
+  assert.match(
+    audio,
+    /open_result == ESP_AUDIO_ERR_MEM_LACK[\s\S]*"NO MEMORY"[\s\S]*"DECODER ERROR"/,
+  );
   assert.match(
     audio,
     /xRingbufferReceive\([\s\S]*pdMS_TO_TICKS\(20\)\)/,
@@ -567,11 +583,37 @@ test("native FLAC reuses the optimized yoRadio decoder without Arduino Core", ()
   const audio = read("main", "audio_service.c");
   const cmake = read("components", "custom_flac", "CMakeLists.txt");
   const adapter = read("components", "custom_flac", "custom_flac_adapter.cpp");
+  const decoder = fs.readFileSync(
+    path.join(root, "yoRadio", "src", "audioI2S", "flac_decoder", "flac_decoder.cpp"), "utf8");
 
   assert.match(cmake, /yoRadio\/src\/audioI2S\/flac_decoder/);
   assert.match(cmake, /flac_decoder\.cpp/);
+  assert.match(cmake, /FLAC_OUTPUT_FRAMES=512/);
   assert.match(adapter, /FLACDecoder_AllocateBuffers\(max_block_size/);
+  assert.match(
+    adapter,
+    /required \+ kInputAlignment - 1[\s\S]*~\(kInputAlignment - 1\)/,
+  );
+  assert.match(adapter, /kFeedChunkSize = 512/);
+  assert.match(adapter, /kInitialInputCapacity = 512/);
+  assert.match(adapter, /kInputSlack = kFeedChunkSize/);
+  assert.match(adapter, /std::min\(kFeedChunkSize, size - offset\)/);
+  assert.doesNotMatch(adapter, /capacity \*= 2/);
   assert.match(adapter, /FLACDecode\(decoder->input/);
+  assert.match(adapter, /kWorkspaceAttempts = 4/);
+  assert.match(adapter, /vTaskDelay\(pdMS_TO_TICKS\(5\)\)/);
+  assert.match(adapter, /int16_t pcm\[kPcmSamplesPerCall\]/);
+  assert.match(cmake, /FLAC_SEGMENTED_WORKSPACE=1/);
+  assert.match(decoder, /kWorkspaceSegmentSamples = 1024/);
+  assert.match(decoder, /struct SampleBuffer[\s\S]*operator\[\]/);
+  assert.match(decoder, /segments\[segment\] =\s*allocateSamples/);
+  assert.match(adapter, /FLACDecoder_FreeBuffers[\s\S]*reserve_input[\s\S]*reserve_workspace/);
+  assert.match(adapter, /reserve_workspace[\s\S]*FLACSetRawBlockParams/);
+  assert.doesNotMatch(decoder, /int16_t\* samplesBuffer/);
+  assert.match(adapter, /FLACDecoder_AllocateBuffers[\s\S]*reserve_input/);
+  assert.match(adapter, /reserve_input[\s\S]*FLACDecoder_FreeBuffers/);
+  assert.doesNotMatch(adapter, /decoder->pcm/);
+  assert.match(audio, /result == -5 \|\| result == -6 \? "NO MEMORY"/);
   assert.match(audio, /custom_flac_decoder_feed/);
   assert.doesNotMatch(adapter, /#include\s+[<"]Arduino\.h[>"]/);
 });
@@ -638,7 +680,11 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
     defaults,
     /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:ESPRESSIF|MINIMP3)=y/m,
   );
-  assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y/);
+  assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_HELIX=y/);
+  assert.doesNotMatch(
+    defaults,
+    /^(?!#).*CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y/m,
+  );
   assert.match(component, /aac_decoder\/aac_decoder\.cpp/);
   assert.match(component, /mp3_decoder\/mp3_decoder\.cpp/);
   assert.match(adapter, /MINIMP3_IMPLEMENTATION/);

@@ -14,4 +14,7 @@ idf_component_register(
     heap
     log)
 
+target_compile_definitions(${COMPONENT_LIB} PRIVATE
+  FLAC_OUTPUT_FRAMES=512
+  FLAC_SEGMENTED_WORKSPACE=1)
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)

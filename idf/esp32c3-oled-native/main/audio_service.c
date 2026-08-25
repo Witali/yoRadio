@@ -111,7 +111,9 @@ static RingbufHandle_t s_encoded;
 static RingbufHandle_t s_pcm;
 static size_t s_encoded_usable_size;
 static atomic_uint s_generation;
+static atomic_uint s_decoder_target_codec;
 static atomic_uint s_decoder_released_generation;
+static portMUX_TYPE s_generation_lock = portMUX_INITIALIZER_UNLOCKED;
 static char s_last_url[sizeof(((play_command_t *)0)->url)];
 static native_codec_t s_last_codec;
 // Decoder callbacks run only in decoder_task. These fields rate-limit VBR
@@ -143,6 +145,28 @@ static native_codec_t codec_from_content_type(const char *content_type) {
         return NATIVE_CODEC_OGG;
     }
     return NATIVE_CODEC_AUTO;
+}
+
+static bool codec_uses_custom_legacy(native_codec_t codec) {
+#ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
+    if (codec == NATIVE_CODEC_AAC) return true;
+#endif
+#if defined(CONFIG_YORADIO_MP3_DECODER_HELIX) || \
+    defined(CONFIG_YORADIO_MP3_DECODER_MINIMP3)
+    if (codec == NATIVE_CODEC_MP3) return true;
+#endif
+    return false;
+}
+
+static uint32_t advance_generation(native_codec_t target_codec) {
+    portENTER_CRITICAL(&s_generation_lock);
+    uint32_t generation = atomic_load(&s_generation) + 1U;
+    // Publish the target first. Once the decoder observes the new generation,
+    // it can release an incompatible arena before the stream allocates TLS.
+    atomic_store(&s_decoder_target_codec, (unsigned)target_codec);
+    atomic_store(&s_generation, generation);
+    portEXIT_CRITICAL(&s_generation_lock);
+    return generation;
 }
 
 static native_codec_t codec_from_signature(const uint8_t *data, size_t size) {
@@ -812,6 +836,12 @@ static void decoder_task(void *argument) {
     while (true) {
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
+            bool had_simple_decoder = decoder != NULL;
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            bool had_legacy_decoder = legacy_decoder != NULL;
+#endif
+            native_codec_t target_codec = (native_codec_t)atomic_load(
+                &s_decoder_target_codec);
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
@@ -821,10 +851,29 @@ static void decoder_task(void *argument) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
             legacy_decoder = NULL;
+            // Keep the arena for another custom MP3/AAC decoder. Otherwise
+            // return it before acknowledging release, so HTTP/TLS and the
+            // official decoder never overlap the old custom workspace.
+            if (had_legacy_decoder &&
+                !codec_uses_custom_legacy(target_codec) &&
+                !custom_legacy_decoder_discard_arena()) {
+                ESP_LOGE(TAG, "Old codec arena is still in use");
+                state_set_audio(false, "DECODER BUSY");
+            }
 #endif
-            // Preserve the Espressif PCM workspace between stations. It is
-            // released only when switching to a custom decoder that owns
-            // a separate output workspace.
+            // The simple decoder is already closed. Its reusable PCM buffer
+            // is useful for another official decoder, but not for a custom
+            // one. An unknown target is released conservatively.
+            if (had_simple_decoder &&
+                (target_codec == NATIVE_CODEC_AUTO ||
+                 codec_uses_custom_legacy(target_codec))) {
+                free(output);
+                output = NULL;
+                output_size = 0;
+            }
+            // Preserve the Espressif PCM workspace only when the next decoder
+            // is explicitly known to be compatible. AUTO is released before
+            // TLS because its type can be learned only from the stream.
             generation = current_generation;
             failed_generation = 0;
             codec = NATIVE_CODEC_AUTO;
@@ -876,7 +925,7 @@ static void decoder_task(void *argument) {
                 flac_decoder = custom_flac_decoder_create();
                 if (!flac_decoder) {
                     ESP_LOGE(TAG, "Custom FLAC decoder allocation failed");
-                    state_set_audio(false, "decoder allocation failed");
+                    state_set_audio(false, "NO MEMORY");
                     failed_generation = generation;
                 }
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -906,7 +955,7 @@ static void decoder_task(void *argument) {
                 if (!legacy_decoder) {
                     ESP_LOGE(TAG, "Custom %s decoder allocation failed",
                              codec_name(codec));
-                    state_set_audio(false, "decoder allocation failed");
+                    state_set_audio(false, "NO MEMORY");
                     failed_generation = generation;
                 }
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -939,7 +988,7 @@ static void decoder_task(void *argument) {
                                  "%s PCM buffer allocation failed: %lu",
                                  codec_name(codec),
                                  (unsigned long)DECODE_BUFFER_INITIAL);
-                        state_set_audio(false, "PCM allocation failed");
+                        state_set_audio(false, "NO MEMORY");
                         failed_generation = generation;
                         vRingbufferReturnItem(s_encoded, packet);
                         continue;
@@ -958,7 +1007,10 @@ static void decoder_task(void *argument) {
                 if (open_result != ESP_AUDIO_ERR_OK) {
                     ESP_LOGE(TAG, "%s decoder open failed: %d",
                              codec_name(codec), open_result);
-                    state_set_audio(false, "decoder allocation failed");
+                    state_set_audio(
+                        false,
+                        open_result == ESP_AUDIO_ERR_MEM_LACK
+                            ? "NO MEMORY" : "DECODER ERROR");
                     failed_generation = generation;
                 }
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -1004,7 +1056,8 @@ static void decoder_task(void *argument) {
                 decode_stats_report(&stats, esp_timer_get_time());
                 if (result < 0 && generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom FLAC decode error: %d", result);
-                    state_set_audio(false, "decode failed");
+                    state_set_audio(false,
+                                    result == -5 || result == -6 ? "NO MEMORY" : "decode failed");
                     failed_generation = generation;
                 }
             }
@@ -1223,6 +1276,7 @@ esp_err_t audio_service_start(native_state_t *state) {
     ESP_RETURN_ON_ERROR(audio_level_led_init(), TAG,
                         "initialize audio level LED");
     atomic_init(&s_generation, 0);
+    atomic_init(&s_decoder_target_codec, NATIVE_CODEC_AUTO);
     atomic_init(&s_decoder_released_generation, 0);
     atomic_init(&s_measured_bitrate_ready, false);
     s_last_url[0] = '\0';
@@ -1272,7 +1326,7 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     // not reject an otherwise valid Play command.
     network_service_set_streaming(true);
     play_command_t command = {
-        .generation = atomic_fetch_add(&s_generation, 1) + 1,
+        .generation = advance_generation(codec),
         .requested_codec = codec,
     };
     strlcpy(command.url, url, sizeof(command.url));
@@ -1304,7 +1358,7 @@ static esp_err_t audio_service_play_fixture(size_t size,
         return ESP_ERR_INVALID_ARG;
     }
     play_command_t command = {
-        .generation = atomic_fetch_add(&s_generation, 1) + 1,
+        .generation = advance_generation(codec),
         .requested_codec = codec,
         .fixture_size = (uint32_t)size,
     };
@@ -1354,7 +1408,7 @@ esp_err_t audio_service_resume(void) {
 }
 
 void audio_service_stop(void) {
-    atomic_fetch_add(&s_generation, 1);
+    advance_generation(NATIVE_CODEC_AUTO);
     network_service_set_streaming(false);
     native_state_set_title(s_state, "");
     native_state_set_bitrate(s_state, 0);

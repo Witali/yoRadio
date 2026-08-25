@@ -16,7 +16,23 @@ namespace {
 
 FLACFrameHeader_t frameHeaderStorage = {};
 FLACMetadataBlock_t metadataBlockStorage = {};
+#ifdef FLAC_SEGMENTED_WORKSPACE
+constexpr size_t kWorkspaceSegmentSamples = 1024;
+constexpr size_t kWorkspaceSegmentCount =
+    (MAX_BLOCKSIZE + kWorkspaceSegmentSamples - 1) /
+    kWorkspaceSegmentSamples;
+struct SampleBuffer {
+    int32_t* segments[kWorkspaceSegmentCount] = {};
+    int32_t& operator[](size_t index) {
+        return segments[index / kWorkspaceSegmentSamples]
+                       [index % kWorkspaceSegmentSamples];
+    }
+};
+SampleBuffer samplesBuffer[MAX_CHANNELS] = {};
+#else
+int32_t* samplesStorage = nullptr;
 int32_t* samplesBuffer[MAX_CHANNELS] = {};
+#endif
 int32_t coefs[32] = {};
 uint8_t coefficientCount = 0;
 uint16_t allocatedBlockSize = 0;
@@ -33,7 +49,7 @@ int32_t* allocateSamples(size_t bytes) {
 FLACFrameHeader_t* FLACFrameHeader = &frameHeaderStorage;
 FLACMetadataBlock_t* FLACMetadataBlock = &metadataBlockStorage;
 
-const uint16_t outBuffSize = 2048;
+const uint16_t outBuffSize = FLAC_OUTPUT_FRAMES;
 uint16_t m_blockSize=0;
 uint16_t m_blockSizeLeft = 0;
 uint16_t m_validSamples = 0;
@@ -58,16 +74,40 @@ bool FLACDecoder_AllocateBuffers(uint16_t maxBlockSize, uint8_t channels){
     }
 
     FLACDecoder_FreeBuffers();
-    const size_t channelBytes = static_cast<size_t>(maxBlockSize) * sizeof(int32_t);
+#ifdef FLAC_SEGMENTED_WORKSPACE
+    const size_t segmentCount =
+        (maxBlockSize + kWorkspaceSegmentSamples - 1) /
+        kWorkspaceSegmentSamples;
     for(uint8_t channel = 0; channel < channels; ++channel) {
-        samplesBuffer[channel] = allocateSamples(channelBytes);
-        if(!samplesBuffer[channel]) {
-            log_e("not enough memory for FLAC channel %u (%u bytes)",
-                  channel, static_cast<unsigned>(channelBytes));
-            FLACDecoder_FreeBuffers();
-            return false;
+        for(size_t segment = 0; segment < segmentCount; ++segment) {
+            const size_t firstSample = segment * kWorkspaceSegmentSamples;
+            const size_t sampleCount = std::min(
+                kWorkspaceSegmentSamples,
+                static_cast<size_t>(maxBlockSize) - firstSample);
+            samplesBuffer[channel].segments[segment] =
+                allocateSamples(sampleCount * sizeof(int32_t));
+            if(!samplesBuffer[channel].segments[segment]) {
+                log_e("not enough memory for FLAC workspace segment (%u bytes)",
+                      static_cast<unsigned>(sampleCount * sizeof(int32_t)));
+                FLACDecoder_FreeBuffers();
+                return false;
+            }
         }
     }
+#else
+    const size_t channelBytes = static_cast<size_t>(maxBlockSize) * sizeof(int32_t);
+    const size_t workspaceBytes = channelBytes * channels;
+    samplesStorage = allocateSamples(workspaceBytes);
+    if(!samplesStorage) {
+        log_e("not enough memory for FLAC workspace (%u bytes)",
+              static_cast<unsigned>(workspaceBytes));
+        return false;
+    }
+    for(uint8_t channel = 0; channel < channels; ++channel) {
+        samplesBuffer[channel] = samplesStorage +
+                                 static_cast<size_t>(channel) * maxBlockSize;
+    }
+#endif
     allocatedBlockSize = maxBlockSize;
     allocatedChannels = channels;
     FLACDecoder_ClearBuffer();
@@ -85,10 +125,20 @@ void FLACDecoder_ClearBuffer(){
 }
 //----------------------------------------------------------------------------------------------------------------------
 void FLACDecoder_FreeBuffers(){
+#ifdef FLAC_SEGMENTED_WORKSPACE
     for(uint8_t channel = 0; channel < MAX_CHANNELS; ++channel) {
-        free(samplesBuffer[channel]);
+        for(size_t segment = 0; segment < kWorkspaceSegmentCount; ++segment) {
+            free(samplesBuffer[channel].segments[segment]);
+            samplesBuffer[channel].segments[segment] = nullptr;
+        }
+    }
+#else
+    free(samplesStorage);
+    samplesStorage = nullptr;
+    for(uint8_t channel = 0; channel < MAX_CHANNELS; ++channel) {
         samplesBuffer[channel] = nullptr;
     }
+#endif
     allocatedBlockSize = 0;
     allocatedChannels = 0;
     coefficientCount = 0;

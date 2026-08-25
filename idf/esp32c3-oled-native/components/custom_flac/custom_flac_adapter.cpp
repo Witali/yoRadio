@@ -6,16 +6,20 @@
 #include <new>
 
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "esp_timer.h"
 #include "flac_decoder.h"
 
 namespace {
 
-constexpr size_t kInitialInputCapacity = 4096;
-constexpr size_t kInputSlack = 2048;
+constexpr size_t kInitialInputCapacity = 512;
+constexpr size_t kFeedChunkSize = 512;
+constexpr size_t kInputSlack = kFeedChunkSize;
+constexpr size_t kInputAlignment = 256;
 constexpr size_t kUnknownFrameWindow = 32 * 1024;
 constexpr size_t kMaximumFrameWindow = 64 * 1024;
-constexpr size_t kPcmSamplesPerCall = 2048 * MAX_CHANNELS;
+constexpr size_t kPcmSamplesPerCall = FLAC_OUTPUT_FRAMES * MAX_CHANNELS;
 constexpr char kTag[] = "custom_flac";
 
 uint32_t read_be24(const uint8_t *data) {
@@ -40,26 +44,39 @@ struct custom_flac_decoder {
     bool header_ready = false;
     bool at_frame_start = true;
     custom_flac_info_t info = {};
-    int16_t pcm[kPcmSamplesPerCall] = {};
 };
 
 static bool reserve_input(custom_flac_decoder *decoder, size_t required) {
     if (required <= decoder->input_capacity) return true;
-    size_t capacity = decoder->input_capacity
-                          ? decoder->input_capacity
-                          : kInitialInputCapacity;
-    while (capacity < required && capacity < kMaximumFrameWindow + kInputSlack) {
-        capacity *= 2;
-    }
-    if (capacity < required || capacity > kMaximumFrameWindow + kInputSlack) {
+    if (required > kMaximumFrameWindow + kInputSlack) {
         return false;
     }
+    // A power-of-two growth policy rounded a typical 17.5 KiB FLAC frame
+    // window up to 32 KiB.  That wasted block then prevented the two channel
+    // workspaces from being allocated on RAM-only ESP32-C3 boards.  Once the
+    // STREAMINFO header is known, one aligned allocation is sufficient: the
+    // input slack already absorbs the following encoded packet.
+    size_t capacity = std::max(kInitialInputCapacity,
+        (required + kInputAlignment - 1) & ~(kInputAlignment - 1));
     auto *resized = static_cast<uint8_t *>(
         std::realloc(decoder->input, capacity));
     if (!resized) return false;
     decoder->input = resized;
     decoder->input_capacity = capacity;
     return true;
+}
+
+static bool reserve_workspace(uint16_t max_block_size, uint8_t channels) {
+    constexpr unsigned kWorkspaceAttempts = 4;
+    unsigned attempt = 0;
+    while (!FLACDecoder_AllocateBuffers(max_block_size, channels)) {
+        if (++attempt == kWorkspaceAttempts) break;
+        // HTTP/WebSocket response buffers can be released just after the
+        // stream header arrives. Yield briefly and retry the contiguous FLAC
+        // workspace instead of aborting an otherwise valid stream.
+        vTaskDelay(pdMS_TO_TICKS(5));
+    }
+    return attempt != kWorkspaceAttempts;
 }
 
 static int parse_header(custom_flac_decoder *decoder) {
@@ -112,18 +129,24 @@ static int parse_header(custom_flac_decoder *decoder) {
     }
     decoder->frame_window = max_frame_size ? max_frame_size
                                            : kUnknownFrameWindow;
-    if (decoder->frame_window > kMaximumFrameWindow ||
-        !reserve_input(decoder, decoder->frame_window + kInputSlack)) {
-        return -5;
-    }
-    if (!FLACDecoder_AllocateBuffers(max_block_size, decoder->info.channels)) {
-        return -6;
+    if (decoder->frame_window > kMaximumFrameWindow) return -5;
+    if (!reserve_workspace(max_block_size, decoder->info.channels)) return -6;
+    std::memmove(decoder->input, decoder->input + offset,
+                 decoder->input_size - offset);
+    if (!reserve_input(decoder, decoder->frame_window + kInputSlack)) {
+        FLACDecoder_FreeBuffers();
+        // The heap can contain either one large workspace block followed by
+        // a small input block, or the opposite. Retry in the other order.
+        if (!reserve_input(decoder, decoder->frame_window + kInputSlack)) {
+            return -5;
+        }
+        if (!reserve_workspace(max_block_size, decoder->info.channels)) {
+            return -6;
+        }
     }
     FLACSetRawBlockParams(decoder->info.channels, decoder->info.sample_rate,
                           decoder->info.bits_per_sample,
                           static_cast<uint32_t>(total_samples), 0);
-    std::memmove(decoder->input, decoder->input + offset,
-                 decoder->input_size - offset);
     decoder->input_size -= offset;
     decoder->header_ready = true;
     ESP_LOGI(kTag,
@@ -138,6 +161,9 @@ static int parse_header(custom_flac_decoder *decoder) {
 static int decode_available(custom_flac_decoder *decoder, bool eos,
                             custom_flac_pcm_callback_t callback, void *user,
                             custom_flac_feed_stats_t *stats) {
+    // Use the decoder task's already reserved stack instead of permanently
+    // taking another contiguous block from the C3 heap.
+    int16_t pcm[kPcmSamplesPerCall];
     while (decoder->input_size &&
            (!decoder->at_frame_start || eos ||
             decoder->input_size >= decoder->frame_window)) {
@@ -165,7 +191,7 @@ static int decode_available(custom_flac_decoder *decoder, bool eos,
 
         int bytes_left = static_cast<int>(decoder->input_size);
         int64_t started = esp_timer_get_time();
-        int8_t result = FLACDecode(decoder->input, &bytes_left, decoder->pcm);
+        int8_t result = FLACDecode(decoder->input, &bytes_left, pcm);
         uint32_t elapsed = static_cast<uint32_t>(esp_timer_get_time() - started);
         stats->decode_us += elapsed;
         ++stats->decode_calls;
@@ -179,12 +205,12 @@ static int decode_available(custom_flac_decoder *decoder, bool eos,
             size_t frames = samples / decoder->info.channels;
             if (decoder->info.channels == 1) {
                 for (size_t i = 0; i < frames; ++i) {
-                    decoder->pcm[i] = decoder->pcm[i * 2];
+                    pcm[i] = pcm[i * 2];
                 }
             }
             size_t pcm_size = frames * decoder->info.channels * sizeof(int16_t);
             if (!callback(user, &decoder->info,
-                          reinterpret_cast<const uint8_t *>(decoder->pcm),
+                          reinterpret_cast<const uint8_t *>(pcm),
                           pcm_size)) {
                 return -8;
             }
@@ -254,14 +280,26 @@ extern "C" int custom_flac_decoder_feed(
     custom_flac_feed_stats_t *stats) {
     if (!decoder || (!data && size) || !callback || !stats) return -1;
     *stats = {};
-    if (size) {
-        if (!reserve_input(decoder, decoder->input_size + size)) return -2;
-        std::memcpy(decoder->input + decoder->input_size, data, size);
-        decoder->input_size += size;
-    }
-    if (!decoder->header_ready) {
-        int parsed = parse_header(decoder);
-        if (parsed != 0) return parsed;
-    }
-    return decode_available(decoder, eos, callback, user, stats);
+    size_t offset = 0;
+    int result = 0;
+    do {
+        const size_t chunk = std::min(kFeedChunkSize, size - offset);
+        if (chunk) {
+            if (!reserve_input(decoder, decoder->input_size + chunk)) return -2;
+            std::memcpy(decoder->input + decoder->input_size,
+                        data + offset, chunk);
+            decoder->input_size += chunk;
+            offset += chunk;
+        }
+        if (!decoder->header_ready) {
+            result = parse_header(decoder);
+            if (result < 0) return result;
+        }
+        if (decoder->header_ready) {
+            result = decode_available(decoder, eos && offset == size,
+                                      callback, user, stats);
+            if (result < 0) return result;
+        }
+    } while (offset < size);
+    return result;
 }

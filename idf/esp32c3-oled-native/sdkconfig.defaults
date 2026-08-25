@@ -80,12 +80,13 @@ CONFIG_AUDIO_ENCODER_G722_SUPPORT=n
 
 # Select exactly one implementation for each codec. Helix MP3 is the native
 # C3 default because it sustains complex 320 kbit/s streams on the single-core
-# RISC-V target; custom FLAC remains the default FLAC implementation.
+# RISC-V target. Helix AAC shares the same reusable arena and remains stable
+# across mixed-codec transitions; custom FLAC remains the default FLAC implementation.
 # CONFIG_YORADIO_MP3_DECODER_ESPRESSIF is not set
 CONFIG_YORADIO_MP3_DECODER_HELIX=y
 # CONFIG_YORADIO_MP3_DECODER_MINIMP3 is not set
-CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y
-# CONFIG_YORADIO_AAC_DECODER_HELIX is not set
+# CONFIG_YORADIO_AAC_DECODER_ESPRESSIF is not set
+CONFIG_YORADIO_AAC_DECODER_HELIX=y
 CONFIG_YORADIO_FLAC_DECODER_CUSTOM=y
 # CONFIG_YORADIO_FLAC_DECODER_ESPRESSIF is not set
 
