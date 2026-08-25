@@ -12,6 +12,7 @@
 #include "esp_spiffs.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
 #include "freertos/task.h"
 #include "native_state.h"
 #include "native_audio_settings.h"
@@ -29,6 +30,8 @@
 #define BUTTON_ACTION_RETRY_MS 100
 #define BUTTON_ACTION_TIMEOUT_MS 30000
 #define BUTTON_STATUS_DISPLAY_MS 2000U
+#define BUTTON_EDGE_QUEUE_LENGTH 32
+#define BUTTON_TASK_PRIORITY 8
 #define DISPLAY_SCROLL_HOLD_MS 3500U
 #define DISPLAY_SCROLL_STEP_MS 35U
 #define DISPLAY_SCROLL_SEPARATOR_GLYPHS 3U
@@ -52,6 +55,44 @@ typedef enum {
     BUTTON_ACTION_PREVIOUS,
 } button_action_t;
 
+typedef struct {
+    TickType_t tick;
+    bool pressed;
+} button_edge_event_t;
+
+typedef struct {
+    bool raw_pressed;
+    bool stable_pressed;
+    bool hold_handled;
+    uint8_t clicks;
+    TickType_t raw_changed_at;
+    TickType_t pressed_at;
+    TickType_t released_at;
+    button_action_t pending_action;
+    TickType_t action_queued_at;
+    TickType_t action_retry_at;
+    bool action_deferred;
+} button_state_t;
+
+static QueueHandle_t s_button_edge_queue;
+
+static bool button_tick_reached(TickType_t now, TickType_t deadline) {
+    return (int32_t)(now - deadline) >= 0;
+}
+
+static void button_gpio_isr(void *argument) {
+    (void)argument;
+    button_edge_event_t event = {
+        .tick = xTaskGetTickCountFromISR(),
+        .pressed = gpio_get_level(BOARD_BOOT_BUTTON) == 0,
+    };
+    BaseType_t higher_priority_task_woken = pdFALSE;
+    xQueueSendFromISR(s_button_edge_queue, &event, &higher_priority_task_woken);
+    if (higher_priority_task_woken) {
+        portYIELD_FROM_ISR();
+    }
+}
+
 static esp_err_t execute_button_action(button_action_t action) {
     switch (action) {
         case BUTTON_ACTION_TOGGLE:
@@ -70,6 +111,122 @@ static void show_button_playback_status(bool playing, uint32_t now_ms) {
     atomic_store(&s_button_status_until_ms,
                  now_ms + BUTTON_STATUS_DISPLAY_MS);
     atomic_fetch_add(&s_button_status_revision, 1U);
+}
+
+static void queue_button_action(button_state_t *button, button_action_t action) {
+    TickType_t now = xTaskGetTickCount();
+    button->pending_action = action;
+    button->action_queued_at = now;
+    button->action_retry_at = now;
+    button->action_deferred = false;
+}
+
+static void apply_stable_button_level(button_state_t *button, bool pressed,
+                                      TickType_t changed_at) {
+    button->stable_pressed = pressed;
+    if (pressed) {
+        display_settings_note_activity();
+        button->pressed_at = changed_at;
+        button->hold_handled = false;
+    } else if (!button->hold_handled) {
+        if (button->clicks < UINT8_MAX) ++button->clicks;
+        button->released_at = changed_at;
+    }
+}
+
+static void process_button_gestures_until(button_state_t *button,
+                                          TickType_t through) {
+    TickType_t hold_at =
+        button->pressed_at + pdMS_TO_TICKS(BUTTON_HOLD_MS);
+    if (button->stable_pressed && !button->hold_handled &&
+        button_tick_reached(through, hold_at)) {
+        ESP_LOGI(TAG, "BOOT long press: previous station");
+        queue_button_action(button, BUTTON_ACTION_PREVIOUS);
+        button->hold_handled = true;
+        button->clicks = 0;
+    }
+
+    TickType_t click_at =
+        button->released_at + pdMS_TO_TICKS(BUTTON_CLICK_WINDOW_MS);
+    if (!button->stable_pressed && button->clicks &&
+        button_tick_reached(through, click_at)) {
+        const bool next = button->clicks >= 2;
+        ESP_LOGI(TAG, "%s", next ? "BOOT two clicks: next station"
+                                  : "BOOT click: play/pause");
+        queue_button_action(button,
+                            next ? BUTTON_ACTION_NEXT : BUTTON_ACTION_TOGGLE);
+        button->clicks = 0;
+    }
+}
+
+static void execute_pending_button_action(button_state_t *button) {
+    if (button->pending_action == BUTTON_ACTION_NONE) return;
+
+    TickType_t now = xTaskGetTickCount();
+    if (!button_tick_reached(now, button->action_retry_at)) return;
+
+    native_state_t state_before_action;
+    native_state_snapshot(&s_state, &state_before_action);
+    button_action_t executing_action = button->pending_action;
+    esp_err_t result = execute_button_action(button->pending_action);
+    if (result == ESP_OK) {
+        if (executing_action == BUTTON_ACTION_TOGGLE) {
+            show_button_playback_status(
+                !state_before_action.audio_running,
+                (uint32_t)(esp_timer_get_time() / 1000U));
+        }
+        if (button->action_deferred) {
+            ESP_LOGI(TAG, "Deferred BOOT action executed");
+        }
+        button->pending_action = BUTTON_ACTION_NONE;
+    } else if (result == ESP_ERR_INVALID_STATE &&
+               now - button->action_queued_at <
+                   pdMS_TO_TICKS(BUTTON_ACTION_TIMEOUT_MS)) {
+        if (!button->action_deferred) {
+            ESP_LOGI(TAG, "Radio is starting; deferring BOOT action");
+            button->action_deferred = true;
+        }
+        button->action_retry_at =
+            now + pdMS_TO_TICKS(BUTTON_ACTION_RETRY_MS);
+    } else {
+        ESP_LOGW(TAG, "BOOT action failed: %s", esp_err_to_name(result));
+        button->pending_action = BUTTON_ACTION_NONE;
+    }
+}
+
+static TickType_t button_wait_ticks(const button_state_t *button,
+                                    TickType_t now) {
+    TickType_t deadline = 0;
+    bool has_deadline = false;
+#define KEEP_EARLIEST_BUTTON_DEADLINE(candidate)                         \
+    do {                                                                 \
+        TickType_t value = (candidate);                                  \
+        if (!has_deadline || (int32_t)(value - deadline) < 0) {         \
+            deadline = value;                                            \
+            has_deadline = true;                                         \
+        }                                                                \
+    } while (0)
+
+    if (button->raw_pressed != button->stable_pressed) {
+        KEEP_EARLIEST_BUTTON_DEADLINE(
+            button->raw_changed_at + pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS));
+    }
+    if (button->stable_pressed && !button->hold_handled) {
+        KEEP_EARLIEST_BUTTON_DEADLINE(
+            button->pressed_at + pdMS_TO_TICKS(BUTTON_HOLD_MS));
+    }
+    if (!button->stable_pressed && button->clicks) {
+        KEEP_EARLIEST_BUTTON_DEADLINE(
+            button->released_at + pdMS_TO_TICKS(BUTTON_CLICK_WINDOW_MS));
+    }
+    if (button->pending_action != BUTTON_ACTION_NONE) {
+        KEEP_EARLIEST_BUTTON_DEADLINE(button->action_retry_at);
+    }
+#undef KEEP_EARLIEST_BUTTON_DEADLINE
+
+    if (!has_deadline) return portMAX_DELAY;
+    if (button_tick_reached(now, deadline)) return 0;
+    return deadline - now;
 }
 
 typedef struct {
@@ -517,6 +674,10 @@ static void display_task(void *argument) {
 
 static void button_task(void *argument) {
     (void)argument;
+    s_button_edge_queue =
+        xQueueCreate(BUTTON_EDGE_QUEUE_LENGTH, sizeof(button_edge_event_t));
+    ESP_ERROR_CHECK(s_button_edge_queue != NULL ? ESP_OK : ESP_ERR_NO_MEM);
+
     gpio_config_t config = {
         .pin_bit_mask = 1ULL << BOARD_BOOT_BUTTON,
         .mode = GPIO_MODE_INPUT,
@@ -525,89 +686,55 @@ static void button_task(void *argument) {
         .intr_type = GPIO_INTR_DISABLE,
     };
     ESP_ERROR_CHECK(gpio_config(&config));
-    bool raw_pressed = gpio_get_level(BOARD_BOOT_BUTTON) == 0;
-    bool stable_pressed = raw_pressed;
-    TickType_t raw_changed_at = xTaskGetTickCount();
-    TickType_t pressed_at = 0;
-    TickType_t released_at = 0;
-    uint8_t clicks = 0;
-    bool hold_handled = false;
-    button_action_t pending_action = BUTTON_ACTION_NONE;
-    TickType_t action_queued_at = 0;
-    TickType_t action_retry_at = 0;
-    bool action_deferred = false;
+    esp_err_t isr_result = gpio_install_isr_service(0);
+    ESP_ERROR_CHECK(isr_result == ESP_OK || isr_result == ESP_ERR_INVALID_STATE
+                        ? ESP_OK
+                        : isr_result);
+    ESP_ERROR_CHECK(gpio_isr_handler_add(BOARD_BOOT_BUTTON, button_gpio_isr,
+                                         NULL));
+
+    TickType_t now = xTaskGetTickCount();
+    bool initially_pressed = gpio_get_level(BOARD_BOOT_BUTTON) == 0;
+    button_state_t button = {
+        .raw_pressed = initially_pressed,
+        .stable_pressed = initially_pressed,
+        .raw_changed_at = now,
+        .pending_action = BUTTON_ACTION_NONE,
+    };
+    ESP_ERROR_CHECK(gpio_set_intr_type(BOARD_BOOT_BUTTON, GPIO_INTR_ANYEDGE));
+    ESP_ERROR_CHECK(gpio_intr_enable(BOARD_BOOT_BUTTON));
+
     while (true) {
-        bool pressed = gpio_get_level(BOARD_BOOT_BUTTON) == 0;
-        TickType_t now = xTaskGetTickCount();
-        if (pressed != raw_pressed) {
-            raw_pressed = pressed;
-            raw_changed_at = now;
-        }
-        if (raw_pressed != stable_pressed &&
-            now - raw_changed_at >= pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS)) {
-            stable_pressed = raw_pressed;
-            if (stable_pressed) {
-                display_settings_note_activity();
-                pressed_at = now;
-                hold_handled = false;
-            } else if (!hold_handled) {
-                if (clicks < UINT8_MAX) ++clicks;
-                released_at = now;
+        now = xTaskGetTickCount();
+        button_edge_event_t event;
+        TickType_t wait = button_wait_ticks(&button, now);
+        if (xQueueReceive(s_button_edge_queue, &event, wait) == pdTRUE) {
+            if (event.pressed != button.raw_pressed) {
+                TickType_t debounce_at =
+                    button.raw_changed_at +
+                    pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS);
+                if (button.raw_pressed != button.stable_pressed &&
+                    button_tick_reached(event.tick, debounce_at)) {
+                    apply_stable_button_level(&button, button.raw_pressed,
+                                              debounce_at);
+                }
+                process_button_gestures_until(&button, event.tick);
+                button.raw_pressed = event.pressed;
+                button.raw_changed_at = event.tick;
             }
+            execute_pending_button_action(&button);
+            continue;
         }
-        if (stable_pressed && !hold_handled &&
-            now - pressed_at >= pdMS_TO_TICKS(BUTTON_HOLD_MS)) {
-            ESP_LOGI(TAG, "BOOT long press: previous station");
-            pending_action = BUTTON_ACTION_PREVIOUS;
-            action_queued_at = now;
-            action_retry_at = now;
-            action_deferred = false;
-            hold_handled = true;
-            clicks = 0;
+
+        now = xTaskGetTickCount();
+        TickType_t debounce_at =
+            button.raw_changed_at + pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS);
+        if (button.raw_pressed != button.stable_pressed &&
+            button_tick_reached(now, debounce_at)) {
+            apply_stable_button_level(&button, button.raw_pressed, debounce_at);
         }
-        if (!stable_pressed && clicks &&
-            now - released_at >= pdMS_TO_TICKS(BUTTON_CLICK_WINDOW_MS)) {
-            const bool next = clicks >= 2;
-            ESP_LOGI(TAG, "%s", next ? "BOOT two clicks: next station"
-                                      : "BOOT click: play/pause");
-            pending_action = next ? BUTTON_ACTION_NEXT : BUTTON_ACTION_TOGGLE;
-            action_queued_at = now;
-            action_retry_at = now;
-            action_deferred = false;
-            clicks = 0;
-        }
-        if (pending_action != BUTTON_ACTION_NONE && now >= action_retry_at) {
-            native_state_t state_before_action;
-            native_state_snapshot(&s_state, &state_before_action);
-            button_action_t executing_action = pending_action;
-            esp_err_t result = execute_button_action(pending_action);
-            if (result == ESP_OK) {
-                if (executing_action == BUTTON_ACTION_TOGGLE) {
-                    show_button_playback_status(!state_before_action.audio_running,
-                                                (uint32_t)(esp_timer_get_time() /
-                                                           1000U));
-                }
-                if (action_deferred) {
-                    ESP_LOGI(TAG, "Deferred BOOT action executed");
-                }
-                pending_action = BUTTON_ACTION_NONE;
-            } else if (result == ESP_ERR_INVALID_STATE &&
-                       now - action_queued_at <
-                           pdMS_TO_TICKS(BUTTON_ACTION_TIMEOUT_MS)) {
-                if (!action_deferred) {
-                    ESP_LOGI(TAG,
-                             "Radio is starting; deferring BOOT action");
-                    action_deferred = true;
-                }
-                action_retry_at =
-                    now + pdMS_TO_TICKS(BUTTON_ACTION_RETRY_MS);
-            } else {
-                ESP_LOGW(TAG, "BOOT action failed: %s",
-                         esp_err_to_name(result));
-                pending_action = BUTTON_ACTION_NONE;
-            }
-        }
-        vTaskDelay(pdMS_TO_TICKS(10));
+        process_button_gestures_until(&button, now);
+        execute_pending_button_action(&button);
     }
 }
 
@@ -671,7 +798,8 @@ void app_main(void) {
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);
     ESP_ERROR_CHECK(xTaskCreate(button_task, "boot_button",
-                                BOARD_TASK_STACK_BOOT_BUTTON, NULL, 2,
+                                BOARD_TASK_STACK_BOOT_BUTTON, NULL,
+                                BUTTON_TASK_PRIORITY,
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);
