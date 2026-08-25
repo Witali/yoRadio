@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "audio_service.h"
+#include "native_audio_output.h"
 #include "esp_check.h"
 #include "esp_log.h"
 #include "esp_timer.h"
@@ -256,9 +257,11 @@ static esp_err_t play_locked(uint16_t item) {
                                          sizeof(s_candidate_url)),
                         ESP_ERR_NOT_FOUND, TAG,
                         "Station %u is absent from playlist", item);
+    const bool station_changed = item != s_current_item;
     ESP_RETURN_ON_ERROR(
         audio_service_play(s_candidate_url, NATIVE_CODEC_AUTO), TAG,
         "start station %u", item);
+    if (station_changed) native_audio_output_request_normalizer_reset();
     native_state_set_station(s_state, s_candidate_name);
     update_smartstart_play_state(true);
     s_current_item = item;

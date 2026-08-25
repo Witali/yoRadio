@@ -18,6 +18,10 @@ extern "C" void native_audio_normalizer_set_sample_rate(
     normalizer.setSampleRate(sample_rate);
 }
 
+extern "C" void native_audio_normalizer_reset(void) {
+    normalizer.reset();
+}
+
 extern "C" void native_audio_normalizer_process(int16_t samples[2]) {
     normalizer.process(samples);
 }

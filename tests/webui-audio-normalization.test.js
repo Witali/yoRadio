@@ -155,3 +155,24 @@ test("settings page requests and applies current normalization values", () => {
   assert.match(script, /setupElement\(key, data\[key\]\)/);
   assert.match(script, /classList\.contains\("checkbox"\)/);
 });
+
+test("station changes restart automatic gain at unity", () => {
+  const root = path.join(__dirname, "..", "idf", "esp32c3-oled-native", "main");
+  const radio = fs.readFileSync(path.join(root, "radio_control.c"), "utf8");
+  const output = fs.readFileSync(path.join(root, "native_audio_output.c"), "utf8");
+  const bridge = fs.readFileSync(path.join(root, "native_audio_normalizer.cpp"), "utf8");
+  const arduino = fs.readFileSync(
+    path.join(__dirname, "..", "yoRadio", "src", "audioI2S", "Audio.cpp"),
+    "utf8",
+  );
+
+  assert.match(radio, /station_changed = item != s_current_item/);
+  assert.match(
+    radio,
+    /station_changed[\s\S]*native_audio_output_request_normalizer_reset/,
+  );
+  assert.match(output, /native_audio_settings_get_normalization\(\)/);
+  assert.match(output, /atomic_exchange\(&s_normalizer_reset_pending, false\)/);
+  assert.match(bridge, /native_audio_normalizer_reset[\s\S]*normalizer\.reset\(\)/);
+  assert.match(arduino, /m_normalizer\.reset\(\)/);
+});

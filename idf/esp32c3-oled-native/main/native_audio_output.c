@@ -2,6 +2,7 @@
 
 #include <limits.h>
 #include <stdbool.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -59,6 +60,7 @@ typedef struct {
 } normalizer_config_cache_t;
 
 static normalizer_config_cache_t s_normalizer_config;
+static atomic_bool s_normalizer_reset_pending = ATOMIC_VAR_INIT(false);
 
 static int16_t scale_sample_q15(int16_t sample, uint32_t gain_q15) {
     int32_t scaled = (int32_t)sample * (int32_t)gain_q15;
@@ -320,6 +322,12 @@ static void sync_normalizer_configuration(void) {
     s_normalizer_config = next;
 }
 
+void native_audio_output_request_normalizer_reset(void) {
+    if (native_audio_settings_get_normalization()) {
+        atomic_store(&s_normalizer_reset_pending, true);
+    }
+}
+
 esp_err_t native_audio_output_write_pcm(uint8_t *data, size_t size,
                                         uint8_t bits_per_sample,
                                         uint8_t channels) {
@@ -327,6 +335,9 @@ esp_err_t native_audio_output_write_pcm(uint8_t *data, size_t size,
         return ESP_ERR_NOT_SUPPORTED;
     }
     sync_normalizer_configuration();
+    if (atomic_exchange(&s_normalizer_reset_pending, false)) {
+        native_audio_normalizer_reset();
+    }
 
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
