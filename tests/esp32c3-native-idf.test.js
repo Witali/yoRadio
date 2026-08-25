@@ -175,6 +175,41 @@ test("native OLED presents a legible full-screen yoRadio boot logo first", () =>
   assert.match(app, /esp_timer_get_time\(\) < s_boot_logo_until_us/);
 });
 
+test("stopped-radio screensaver draws a full-screen clock and wakes on BOOT", () => {
+  const header = read("main", "oled_display.h");
+  const display = read("main", "oled_display.c");
+  const app = read("main", "app_main.c");
+  const settings = read("main", "display_settings.c");
+  const websocket = read("main", "websocket_service.c");
+  const options = zlib.gunzipSync(
+    fs.readFileSync(path.join(root, "yoRadio", "data", "www", "options.html.gz")),
+  ).toString("utf8");
+
+  assert.match(header, /oled_display_draw_clock/);
+  assert.match(display, /CLOCK_DIGIT_WIDTH 13/);
+  assert.match(display, /CLOCK_DIGIT_HEIGHT 30/);
+  assert.match(display, /static const uint8_t segments\[10\]/);
+  assert.match(display, /const int digit_x\[\] = \{3, 18, 39, 54\}/);
+  assert.match(app, /CLOCK_VALID_AFTER_EPOCH 1704067200LL/);
+  assert.match(app, /localtime_r\(&now, &local_time\)/);
+  assert.match(
+    app,
+    /screensaver_active[\s\S]*screensaver_power_off[\s\S]*draw_screensaver_clock\(clock_tick\)/,
+  );
+  assert.match(app, /time\(NULL\)/);
+  assert.match(
+    app,
+    /xQueueReceive\(s_button_edge_queue[\s\S]*if \(event\.pressed\) display_settings_note_activity\(\)/,
+  );
+  assert.match(settings, /display_settings_get_screensaver_timeout\(\)/);
+  assert.match(settings, /display_settings_get_screensaver_blank\(\)/);
+  assert.match(websocket, /strcmp\(command, "screensavertimeout"\)/);
+  assert.match(websocket, /strcmp\(command, "screensaverblank"\)/);
+  assert.match(options, /<select id="scrb" data-command="screensaverblank">/);
+  assert.match(options, /<option value="0">clock<\/option>/);
+  assert.match(options, /<option value="1">blank<\/option>/);
+});
+
 test("native OLED brightness uses the shared 0..100 setting and persists it", () => {
   const component = read("main", "CMakeLists.txt");
   const header = read("main", "oled_display.h");

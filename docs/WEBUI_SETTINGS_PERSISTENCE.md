@@ -50,10 +50,10 @@ Arduino-прошивке, показывается только настройк
 | `brightness` (`br`) | сохранять и применять яркость 0..100% | уже работает |
 | `screensaverenabled` (`scre`) | сохранять screensaver остановленного радио | [x] |
 | `screensavertimeout` (`scrt`) | сохранять таймаут 5..65520 секунд | [x] |
-| `screensaverblank` (`scrb`) | сохранять режим blank/power-off | [x] |
+| `screensaverblank` (`scrb`) | сохранять выбор Clock (0) / Blank power-off (1) | [x] |
 | `screensaverplayingenabled` (`scrpe`) | сохранять screensaver при воспроизведении | [x] |
 | `screensaverplayingtimeout` (`scrpt`) | сохранять таймаут 1..1080 минут | [x] |
-| `screensaverplayingblank` (`scrpb`) | сохранять режим blank/power-off при playback | [x] |
+| `screensaverplayingblank` (`scrpb`) | сохранять выбор Clock (0) / Blank power-off (1) при playback | [x] |
 
 ## Timezone / SNTP
 

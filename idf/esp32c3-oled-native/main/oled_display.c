@@ -17,6 +17,9 @@
 #define OLED_COLUMN_OFFSET 28
 #define OLED_TRANSFER_CHUNK 24
 #define OLED_SCROLL_INTERVAL_5_FRAMES 0x00
+#define CLOCK_DIGIT_WIDTH 13
+#define CLOCK_DIGIT_HEIGHT 30
+#define CLOCK_SEGMENT_THICKNESS 3
 
 static const char *const TAG = "oled";
 
@@ -302,6 +305,116 @@ void oled_display_draw_large_text(oled_display_t *display, int x, int y,
         x += OLED_LARGE_GLYPH_WIDTH;
         ++glyph_index;
         if (wrap && glyph_index == cycle_glyphs) glyph_index = 0;
+    }
+}
+
+static void draw_filled_rectangle(oled_display_t *display, int x, int y,
+                                  int width, int height) {
+    for (int row = 0; row < height; ++row) {
+        for (int column = 0; column < width; ++column) {
+            draw_pixel(display, x + column, y + row, true);
+        }
+    }
+}
+
+static void draw_clock_digit(oled_display_t *display, int x, int y,
+                             int digit) {
+    enum {
+        SEGMENT_TOP = 1U << 0,
+        SEGMENT_UPPER_RIGHT = 1U << 1,
+        SEGMENT_LOWER_RIGHT = 1U << 2,
+        SEGMENT_BOTTOM = 1U << 3,
+        SEGMENT_LOWER_LEFT = 1U << 4,
+        SEGMENT_UPPER_LEFT = 1U << 5,
+        SEGMENT_MIDDLE = 1U << 6,
+    };
+    static const uint8_t segments[10] = {
+        SEGMENT_TOP | SEGMENT_UPPER_RIGHT | SEGMENT_LOWER_RIGHT |
+            SEGMENT_BOTTOM | SEGMENT_LOWER_LEFT | SEGMENT_UPPER_LEFT,
+        SEGMENT_UPPER_RIGHT | SEGMENT_LOWER_RIGHT,
+        SEGMENT_TOP | SEGMENT_UPPER_RIGHT | SEGMENT_MIDDLE |
+            SEGMENT_LOWER_LEFT | SEGMENT_BOTTOM,
+        SEGMENT_TOP | SEGMENT_UPPER_RIGHT | SEGMENT_LOWER_RIGHT |
+            SEGMENT_BOTTOM | SEGMENT_MIDDLE,
+        SEGMENT_UPPER_LEFT | SEGMENT_MIDDLE | SEGMENT_UPPER_RIGHT |
+            SEGMENT_LOWER_RIGHT,
+        SEGMENT_TOP | SEGMENT_UPPER_LEFT | SEGMENT_MIDDLE |
+            SEGMENT_LOWER_RIGHT | SEGMENT_BOTTOM,
+        SEGMENT_TOP | SEGMENT_UPPER_LEFT | SEGMENT_MIDDLE |
+            SEGMENT_LOWER_LEFT | SEGMENT_LOWER_RIGHT | SEGMENT_BOTTOM,
+        SEGMENT_TOP | SEGMENT_UPPER_RIGHT | SEGMENT_LOWER_RIGHT,
+        SEGMENT_TOP | SEGMENT_UPPER_RIGHT | SEGMENT_LOWER_RIGHT |
+            SEGMENT_BOTTOM | SEGMENT_LOWER_LEFT | SEGMENT_UPPER_LEFT |
+            SEGMENT_MIDDLE,
+        SEGMENT_TOP | SEGMENT_UPPER_RIGHT | SEGMENT_LOWER_RIGHT |
+            SEGMENT_BOTTOM | SEGMENT_UPPER_LEFT | SEGMENT_MIDDLE,
+    };
+    uint8_t enabled = digit >= 0 && digit <= 9
+                          ? segments[digit]
+                          : SEGMENT_MIDDLE;
+    const int horizontal_width =
+        CLOCK_DIGIT_WIDTH - 2 * CLOCK_SEGMENT_THICKNESS;
+    const int vertical_height =
+        (CLOCK_DIGIT_HEIGHT - 3 * CLOCK_SEGMENT_THICKNESS) / 2;
+    if (enabled & SEGMENT_TOP) {
+        draw_filled_rectangle(display, x + CLOCK_SEGMENT_THICKNESS, y,
+                              horizontal_width, CLOCK_SEGMENT_THICKNESS);
+    }
+    if (enabled & SEGMENT_MIDDLE) {
+        draw_filled_rectangle(
+            display, x + CLOCK_SEGMENT_THICKNESS,
+            y + CLOCK_SEGMENT_THICKNESS + vertical_height, horizontal_width,
+            CLOCK_SEGMENT_THICKNESS);
+    }
+    if (enabled & SEGMENT_BOTTOM) {
+        draw_filled_rectangle(display, x + CLOCK_SEGMENT_THICKNESS,
+                              y + CLOCK_DIGIT_HEIGHT - CLOCK_SEGMENT_THICKNESS,
+                              horizontal_width, CLOCK_SEGMENT_THICKNESS);
+    }
+    if (enabled & SEGMENT_UPPER_LEFT) {
+        draw_filled_rectangle(display, x, y + CLOCK_SEGMENT_THICKNESS,
+                              CLOCK_SEGMENT_THICKNESS, vertical_height);
+    }
+    if (enabled & SEGMENT_UPPER_RIGHT) {
+        draw_filled_rectangle(
+            display, x + CLOCK_DIGIT_WIDTH - CLOCK_SEGMENT_THICKNESS,
+            y + CLOCK_SEGMENT_THICKNESS, CLOCK_SEGMENT_THICKNESS,
+            vertical_height);
+    }
+    if (enabled & SEGMENT_LOWER_LEFT) {
+        draw_filled_rectangle(
+            display, x,
+            y + 2 * CLOCK_SEGMENT_THICKNESS + vertical_height,
+            CLOCK_SEGMENT_THICKNESS, vertical_height);
+    }
+    if (enabled & SEGMENT_LOWER_RIGHT) {
+        draw_filled_rectangle(
+            display, x + CLOCK_DIGIT_WIDTH - CLOCK_SEGMENT_THICKNESS,
+            y + 2 * CLOCK_SEGMENT_THICKNESS + vertical_height,
+            CLOCK_SEGMENT_THICKNESS, vertical_height);
+    }
+}
+
+void oled_display_draw_clock(oled_display_t *display, uint8_t hour,
+                             uint8_t minute, bool colon_on, bool time_valid) {
+    if (!display) return;
+    oled_display_clear(display);
+    const int y = (OLED_DISPLAY_HEIGHT - CLOCK_DIGIT_HEIGHT) / 2;
+    const int digit_x[] = {3, 18, 39, 54};
+    int digits[] = {-1, -1, -1, -1};
+    if (time_valid) {
+        digits[0] = hour / 10U;
+        digits[1] = hour % 10U;
+        digits[2] = minute / 10U;
+        digits[3] = minute % 10U;
+    }
+    for (size_t index = 0; index < sizeof(digits) / sizeof(digits[0]);
+         ++index) {
+        draw_clock_digit(display, digit_x[index], y, digits[index]);
+    }
+    if (colon_on) {
+        draw_filled_rectangle(display, 34, y + 9, 3, 3);
+        draw_filled_rectangle(display, 34, y + 20, 3, 3);
     }
 }
 

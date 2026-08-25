@@ -33,6 +33,8 @@ size_t oled_display_large_text_length(const char *text);
 void oled_display_draw_large_text(oled_display_t *display, int x, int y,
                                   const char *text, size_t pixel_offset,
                                   bool wrap, bool inverted, bool uppercase);
+void oled_display_draw_clock(oled_display_t *display, uint8_t hour,
+                             uint8_t minute, bool colon_on, bool time_valid);
 esp_err_t oled_display_start_text_scroll(oled_display_t *display,
                                          uint8_t first_page,
                                          const char *text, bool inverted,

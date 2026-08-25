@@ -39,6 +39,12 @@ seconds to confirm the resulting playback state. A successful double click
 shows `next`, and a successful long press shows `prev` for the same interval.
 Holding BOOT while resetting still enters the ROM downloader.
 
+The shared WebUI screensaver controls also apply to this OLED. When the
+stopped-radio screensaver is enabled, its saved timeout switches the display
+to the selected `Clock` or `Blank` mode. Clock mode uses the full 72x40 screen
+and a blinking colon. Pressing BOOT wakes the station screen immediately; the
+configured single/double/long gesture is then handled normally.
+
 Software text scrolling is enabled for this board by default so every station
 and track name follows the same timing and separator rules. The optional
 `CONFIG_YORADIO_OLED_HW_SCROLL` experiment can be enabled in `menuconfig` for

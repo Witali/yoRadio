@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdatomic.h>
 #include <string.h>
+#include <time.h>
 
 #include "audio_service.h"
 #include "board_config.h"
@@ -40,6 +41,7 @@
 #define DISPLAY_SECONDARY_PAGE_MS 5000U
 #define DISPLAY_BOOT_LOGO_MS 1500U
 #define DISPLAY_HARDWARE_SCROLL_RUN_MS 4000U
+#define CLOCK_VALID_AFTER_EPOCH 1704067200LL
 
 static const char *const TAG = "yoradio_c3";
 static native_state_t s_state;
@@ -481,6 +483,18 @@ static void draw_status(const native_state_t *state,
     ESP_ERROR_CHECK_WITHOUT_ABORT(oled_display_present(&s_display));
 }
 
+static void draw_screensaver_clock(time_t now) {
+    struct tm local_time = {0};
+    bool time_valid =
+        (int64_t)now >= CLOCK_VALID_AFTER_EPOCH &&
+        localtime_r(&now, &local_time) != NULL;
+    oled_display_draw_clock(
+        &s_display, time_valid ? (uint8_t)local_time.tm_hour : 0U,
+        time_valid ? (uint8_t)local_time.tm_min : 0U,
+        !time_valid || (local_time.tm_sec & 1) == 0, time_valid);
+    ESP_ERROR_CHECK_WITHOUT_ABORT(oled_display_present(&s_display));
+}
+
 static void display_task(void *argument) {
     (void)argument;
     while (esp_timer_get_time() < s_boot_logo_until_us) {
@@ -507,6 +521,8 @@ static void display_task(void *argument) {
     bool previous_audio_info = runtime_settings_get_audio_info();
     uint16_t previous_item = 0;
     bool screensaver_was_active = false;
+    bool screensaver_was_power_off = false;
+    time_t previous_clock_tick = (time_t)-1;
     char station_text[176] = "";
     uint32_t button_status_revision =
         (uint32_t)atomic_load(&s_button_status_revision);
@@ -526,15 +542,29 @@ static void display_task(void *argument) {
             if (!screensaver_was_active) {
                 ESP_ERROR_CHECK_WITHOUT_ABORT(
                     oled_display_stop_scroll(&s_display));
-                oled_display_clear(&s_display);
-                ESP_ERROR_CHECK_WITHOUT_ABORT(
-                    oled_display_present(&s_display));
-                if (screensaver_power_off) {
+            }
+            if (screensaver_power_off) {
+                if (!screensaver_was_active || !screensaver_was_power_off) {
+                    oled_display_clear(&s_display);
+                    ESP_ERROR_CHECK_WITHOUT_ABORT(
+                        oled_display_present(&s_display));
                     ESP_ERROR_CHECK_WITHOUT_ABORT(
                         oled_display_set_power(&s_display, false));
                 }
-                screensaver_was_active = true;
+            } else {
+                if (!screensaver_was_active || screensaver_was_power_off) {
+                    ESP_ERROR_CHECK_WITHOUT_ABORT(
+                        oled_display_set_power(&s_display, true));
+                    previous_clock_tick = (time_t)-1;
+                }
+                time_t clock_tick = time(NULL);
+                if (clock_tick != previous_clock_tick) {
+                    draw_screensaver_clock(clock_tick);
+                    previous_clock_tick = clock_tick;
+                }
             }
+            screensaver_was_active = true;
+            screensaver_was_power_off = screensaver_power_off;
             previous = state;
             vTaskDelay(pdMS_TO_TICKS(50));
             continue;
@@ -543,6 +573,8 @@ static void display_task(void *argument) {
             ESP_ERROR_CHECK_WITHOUT_ABORT(
                 oled_display_set_power(&s_display, true));
             screensaver_was_active = false;
+            screensaver_was_power_off = false;
+            previous_clock_tick = (time_t)-1;
             previous.network_mode = (native_network_mode_t)-1;
             redraw = true;
         }
@@ -771,6 +803,7 @@ static void button_task(void *argument) {
         button_edge_event_t event;
         TickType_t wait = button_wait_ticks(&button, now);
         if (xQueueReceive(s_button_edge_queue, &event, wait) == pdTRUE) {
+            if (event.pressed) display_settings_note_activity();
             if (event.pressed != button.raw_pressed) {
                 TickType_t debounce_at =
                     button.raw_changed_at +
