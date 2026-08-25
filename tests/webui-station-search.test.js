@@ -101,7 +101,7 @@ test("current station stays selectable without unsolicited scrolling", () => {
   assert.equal(scrollOptions.behavior, "smooth");
 });
 
-test("playlist scroll is requested only by user navigation and Play", () => {
+test("playlist scroll is requested after initial load or by user navigation", () => {
   const script = readAsset("script.js.gz");
 
   assert.match(script, /function setCurrentItem\(item, shouldScroll=false\)/);
@@ -128,6 +128,7 @@ test("playlist scroll is requested only by user navigation and Play", () => {
     script,
     /const changed = currentItemSynchronized && Number\(item\) !== Number\(currentItem\)/,
   );
+  assert.match(script, /const initial = initialPlaylistScrollPending && playlistLoaded/);
   assert.match(script, /currentItemSynchronized = true/);
 });
 
@@ -154,7 +155,11 @@ test("playlist reload preserves the user's scroll position", async () => {
     {
       bigplaylist: true,
       currentItem: 1,
+      initialPlaylistScrollPending: false,
+      playlistLoaded: true,
+      playlistRequestSerial: 0,
       fetch: async () => ({
+        ok: true,
         text: async () => "Station\tstream\t0",
       }),
       filterPlaylist: () => {},
@@ -169,6 +174,108 @@ test("playlist reload preserves the user's scroll position", async () => {
   await new Promise((resolve) => setImmediate(resolve));
 
   assert.equal(playlist.scrollTop, 4321);
+});
+
+test("WebSocket reconnect resynchronizes without rebuilding the player page", () => {
+  const script = readAsset("script.js.gz");
+  const reconnectFunctions = script.slice(
+    script.indexOf("function resyncCurrentPage"),
+    script.indexOf("function onClose"),
+  );
+  const sent = [];
+  let pageLoads = 0;
+  const context = {
+    continueLoading: () => pageLoads++,
+    loaded: false,
+    pingUp: () => {},
+    playMode: "player",
+    websocket: { send: (message) => sent.push(message) },
+    window: { location: { pathname: "/" } },
+    wserrcnt: 4,
+    console: { log: () => {} },
+  };
+
+  vm.runInNewContext(`${reconnectFunctions}\nonOpen(); onOpen();`, context);
+
+  assert.equal(pageLoads, 1, "reconnect must not replace the page DOM");
+  assert.deepEqual(sent, ["getindex=1"]);
+  assert.equal(context.wserrcnt, 0);
+});
+
+test("playlist remains visible while transient HTTP failures are retried", async () => {
+  const script = readAsset("script.js.gz");
+  const playlistFunctions = script.slice(
+    script.indexOf("function handlePlaylistData"),
+    script.indexOf("function plAdd"),
+  );
+  let html = "existing playlist";
+  let attempts = 0;
+  const playlist = {
+    scrollTop: 77,
+    get innerHTML() { return html; },
+    set innerHTML(value) { html = value; },
+  };
+  const context = {
+    bigplaylist: false,
+    currentItem: 1,
+    initialPlaylistScrollPending: false,
+    playlistLoaded: true,
+    playlistRequestSerial: 0,
+    fetch: async () => {
+      attempts++;
+      if(attempts < 3) return { ok: false, status: 503, text: async () => "" };
+      return { ok: true, text: async () => "Recovered\tstream\t0" };
+    },
+    filterPlaylist: () => {},
+    getId: (id) => id === "playlist" ? playlist : { value: "" },
+    hostname: "device",
+    initPLEditor: () => {},
+    modesd: true,
+    setCurrentItem: () => {},
+    setTimeout: (callback) => callback(),
+    console: { log: () => {} },
+    result: null,
+  };
+
+  vm.runInNewContext(
+    `${playlistFunctions}\nresult = generatePlaylist("http://source/playlist.csv");`,
+    context,
+  );
+  assert.equal(html, "existing playlist", "loading must not erase existing rows");
+  assert.equal(await context.result, true);
+  assert.equal(attempts, 3);
+  assert.match(html, /Recovered/);
+  assert.equal(playlist.scrollTop, 77);
+  assert.equal(context.bigplaylist, false);
+});
+
+test("failed playlist refresh keeps the last successfully rendered list", async () => {
+  const script = readAsset("script.js.gz");
+  const playlistFunctions = script.slice(
+    script.indexOf("function handlePlaylistData"),
+    script.indexOf("function plAdd"),
+  );
+  const playlist = { innerHTML: "last good playlist", scrollTop: 91 };
+  const context = {
+    bigplaylist: false,
+    currentItem: 1,
+    playlistRequestSerial: 0,
+    fetch: async () => ({ ok: false, status: 500, text: async () => "" }),
+    getId: () => playlist,
+    hostname: "device",
+    setTimeout: (callback) => callback(),
+    console: { log: () => {} },
+    result: null,
+  };
+
+  vm.runInNewContext(
+    `${playlistFunctions}\nresult = generatePlaylist("http://source/playlist.csv");`,
+    context,
+  );
+  assert.equal(await context.result, false);
+  assert.equal(playlist.innerHTML, "last good playlist");
+  assert.equal(playlist.scrollTop, 91);
+  assert.equal(context.bigplaylist, false);
 });
 
 test("repeated player status does not rebuild the station list", () => {
@@ -201,6 +308,8 @@ test("a physical station change scrolls once after initial synchronization", () 
     currentItem: 11,
     currentItemSynchronized: false,
     stationChangeScrollFrom: null,
+    initialPlaylistScrollPending: false,
+    playlistLoaded: true,
   };
 
   vm.runInNewContext(helpers, context);
@@ -209,6 +318,46 @@ test("a physical station change scrolls once after initial synchronization", () 
   assert.equal(context.shouldScrollCurrentItem(12), true);
   context.currentItem = 12;
   assert.equal(context.shouldScrollCurrentItem(12), false);
+});
+
+test("initial playlist rendering scrolls to the current station once", async () => {
+  const script = readAsset("script.js.gz");
+  const playlistFunctions = script.slice(
+    script.indexOf("function handlePlaylistData"),
+    script.indexOf("function plAdd"),
+  );
+  let shouldScroll = null;
+  const playlist = { innerHTML: "", scrollTop: 0 };
+  const context = {
+    bigplaylist: false,
+    currentItem: 2,
+    initialPlaylistScrollPending: true,
+    playlistLoaded: false,
+    playlistRequestSerial: 0,
+    fetch: async () => ({
+      ok: true,
+      text: async () => "First\tstream-1\t0\nSecond\tstream-2\t0",
+    }),
+    filterPlaylist: () => {},
+    getId: (id) => id === "playlist" ? playlist : { value: "" },
+    hostname: "device",
+    modesd: true,
+    setCurrentItem: (item, scroll) => {
+      assert.equal(item, 2);
+      shouldScroll = scroll;
+    },
+    console: { log: () => {} },
+    result: null,
+  };
+
+  vm.runInNewContext(
+    `${playlistFunctions}\nresult = generatePlaylist("http://source/playlist.csv");`,
+    context,
+  );
+  assert.equal(await context.result, true);
+  assert.equal(shouldScroll, true);
+  assert.equal(context.initialPlaylistScrollPending, false);
+  assert.equal(context.playlistLoaded, true);
 });
 
 test("station search has compact responsive styling", () => {
