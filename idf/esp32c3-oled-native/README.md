@@ -44,6 +44,25 @@ and track name follows the same timing and separator rules. The optional
 A/B builds; eligible 10-to-15-glyph strings then use the SSD1306 scroll engine,
 while longer strings continue to use software scrolling without truncation.
 
+### Optional rotary encoder
+
+An EC11/KY-040 encoder can be enabled with the supplied
+`sdkconfig.encoder.defaults` overlay. Its default wiring is phase A/CLK to
+GPIO0, phase B/DT to GPIO1, push switch/SW to GPIO4 and common to GND. Internal
+pull-ups are enabled. Rotation changes volume with Arduino-compatible
+acceleration and a short push toggles Play/Pause; the acceleration value is
+stored in NVS and edited by the shared WebUI.
+
+```powershell
+.\build.ps1 -BuildDirectory build-encoder -Sdkconfig sdkconfig.encoder -SdkconfigDefaults @("sdkconfig.defaults","sdkconfig.encoder.defaults")
+```
+
+The standard `sdkconfig.defaults` keeps this optional hardware disabled.
+Pin assignments, direction, transitions per detent, pull-ups and the push
+switch can also be changed under **yoRadio ESP32-C3 OLED** in `menuconfig`.
+See the [board wiring notes](../../docs/ESP32-C3-0.42-OLED.md#optional-rotary-encoder)
+before connecting a module.
+
 ## Reproducible setup and build
 
 This is the repository's default firmware target. From the repository root,

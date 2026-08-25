@@ -28,6 +28,7 @@ test("native WebUI returns persisted values instead of settings constants", () =
     "runtime_settings_get_timezone_minute",
     "runtime_settings_get_time_sync_interval_min",
     "runtime_settings_get_volume_steps",
+    "runtime_settings_get_encoder_acceleration",
   ]) {
     assert.match(ws, new RegExp(`${getter}\\(`), `missing ${getter}`);
   }
@@ -50,6 +51,7 @@ test("every supported native settings command has a persistent setter", () => {
     sntp2: "runtime_settings_set_sntp2",
     timeint: "runtime_settings_set_time_sync_interval_min",
     volsteps: "runtime_settings_set_volume_steps",
+    encacc: "runtime_settings_set_encoder_acceleration",
     screenon: "display_settings_set_screen_on",
     numplaylist: "display_settings_set_numbered_playlist",
     screensaverenabled: "display_settings_set_screensaver_enabled",
@@ -71,7 +73,7 @@ test("runtime settings use NVS and affect audio pipeline behavior", () => {
   const audio = fs.readFileSync(path.join(nativeMain, "audio_service.c"), "utf8");
 
   assert.match(runtime, /#define SETTINGS_NVS_NAMESPACE "runtime"/);
-  for (const key of ["audioinfo", "softap", "abuff", "watchdog", "tzh", "tzm", "sntp1", "sntp2", "timeint", "volsteps"]) {
+  for (const key of ["audioinfo", "softap", "abuff", "watchdog", "tzh", "tzm", "sntp1", "sntp2", "timeint", "volsteps", "encacc"]) {
     assert.match(runtime, new RegExp(`"${key}"`), `missing NVS key ${key}`);
   }
   assert.match(audio, /runtime_settings_get_audio_buffer_blocks\(\) \* 1600U/);

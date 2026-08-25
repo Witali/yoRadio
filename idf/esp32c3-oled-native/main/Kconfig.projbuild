@@ -1,5 +1,51 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_ROTARY_ENCODER
+    bool "Enable external rotary encoder"
+    default n
+    help
+        Enable the Arduino-compatible primary encoder behavior: rotation
+        changes volume with optional acceleration and a short switch click
+        toggles play/pause. The native OLED UI has no station-list menu, so
+        the Arduino long-press menu gesture is intentionally not assigned.
+
+if YORADIO_ROTARY_ENCODER
+
+config YORADIO_ROTARY_ENCODER_GPIO_A
+    int "Encoder phase A GPIO"
+    range 0 21
+    default 0
+
+config YORADIO_ROTARY_ENCODER_GPIO_B
+    int "Encoder phase B GPIO"
+    range 0 21
+    default 1
+
+config YORADIO_ROTARY_ENCODER_STEPS
+    int "Quadrature transitions per detent"
+    range 1 4
+    default 4
+
+config YORADIO_ROTARY_ENCODER_PULLUP
+    bool "Enable internal pull-ups"
+    default y
+
+config YORADIO_ROTARY_ENCODER_REVERSE
+    bool "Reverse rotation direction"
+    default n
+
+config YORADIO_ROTARY_ENCODER_BUTTON
+    bool "Enable encoder push switch"
+    default y
+
+config YORADIO_ROTARY_ENCODER_BUTTON_GPIO
+    int "Encoder switch GPIO"
+    range 0 21
+    default 4
+    depends on YORADIO_ROTARY_ENCODER_BUTTON
+
+endif
+
 config YORADIO_OLED_HW_SCROLL
     bool "Use SSD1306 hardware text scrolling"
     default n

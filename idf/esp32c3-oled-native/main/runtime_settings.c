@@ -21,6 +21,7 @@
 #define SETTINGS_NVS_SNTP2 "sntp2"
 #define SETTINGS_NVS_TIME_INTERVAL "timeint"
 #define SETTINGS_NVS_VOLUME_STEPS "volsteps"
+#define SETTINGS_NVS_ENCODER_ACCELERATION "encacc"
 
 #define MDNS_NAME_CAPACITY 24
 #define SNTP_NAME_CAPACITY 35
@@ -36,6 +37,8 @@ static atomic_uchar s_timezone_minute = RUNTIME_DEFAULT_TZ_MINUTE;
 static atomic_uint_least16_t s_time_sync_interval_min =
     RUNTIME_DEFAULT_TIME_SYNC_INTERVAL_MIN;
 static atomic_uchar s_volume_steps = RUNTIME_DEFAULT_VOLUME_STEPS;
+static atomic_uint_least16_t s_encoder_acceleration =
+    RUNTIME_DEFAULT_ENCODER_ACCELERATION;
 static SemaphoreHandle_t s_string_lock;
 static char s_mdns_name[MDNS_NAME_CAPACITY] = RUNTIME_DEFAULT_MDNS_NAME;
 static char s_sntp1[SNTP_NAME_CAPACITY] = RUNTIME_DEFAULT_SNTP1;
@@ -161,6 +164,10 @@ esp_err_t runtime_settings_init(void) {
     }
     if (nvs_get_u8(handle, SETTINGS_NVS_VOLUME_STEPS, &u8) == ESP_OK &&
         u8 >= 1U && u8 <= 10U) atomic_store(&s_volume_steps, u8);
+    if (nvs_get_u16(handle, SETTINGS_NVS_ENCODER_ACCELERATION, &u16) == ESP_OK &&
+        u16 <= RUNTIME_MAX_ENCODER_ACCELERATION) {
+        atomic_store(&s_encoder_acceleration, u16);
+    }
     load_string(handle, SETTINGS_NVS_MDNS_NAME, s_mdns_name,
                 sizeof(s_mdns_name), true);
     load_string(handle, SETTINGS_NVS_SNTP1, s_sntp1, sizeof(s_sntp1), false);
@@ -168,7 +175,7 @@ esp_err_t runtime_settings_init(void) {
     nvs_close(handle);
     ESP_LOGI(TAG,
              "Restored aif=%u softap=%u abuff=%u watchdog=%u tz=%d:%02u "
-             "timeint=%u vols=%u",
+             "timeint=%u vols=%u enca=%u",
              runtime_settings_get_audio_info() ? 1U : 0U,
              runtime_settings_get_softap_delay_min(),
              runtime_settings_get_audio_buffer_blocks(),
@@ -176,7 +183,8 @@ esp_err_t runtime_settings_init(void) {
              runtime_settings_get_timezone_hour(),
              runtime_settings_get_timezone_minute(),
              runtime_settings_get_time_sync_interval_min(),
-             runtime_settings_get_volume_steps());
+             runtime_settings_get_volume_steps(),
+             runtime_settings_get_encoder_acceleration());
     return ESP_OK;
 }
 
@@ -199,6 +207,9 @@ uint16_t runtime_settings_get_time_sync_interval_min(void) {
 }
 uint8_t runtime_settings_get_volume_steps(void) {
     return atomic_load(&s_volume_steps);
+}
+uint16_t runtime_settings_get_encoder_acceleration(void) {
+    return atomic_load(&s_encoder_acceleration);
 }
 
 static void get_string(const char *source, char *output, size_t output_size) {
@@ -281,6 +292,17 @@ esp_err_t runtime_settings_set_volume_steps(uint8_t steps) {
     ESP_RETURN_ON_ERROR(save_u8(SETTINGS_NVS_VOLUME_STEPS, steps), TAG,
                         "Save volume steps");
     atomic_store(&s_volume_steps, steps);
+    return ESP_OK;
+}
+
+esp_err_t runtime_settings_set_encoder_acceleration(uint16_t acceleration) {
+    ESP_RETURN_ON_FALSE(acceleration <= RUNTIME_MAX_ENCODER_ACCELERATION,
+                        ESP_ERR_INVALID_ARG, TAG,
+                        "Encoder acceleration range");
+    ESP_RETURN_ON_ERROR(
+        save_u16(SETTINGS_NVS_ENCODER_ACCELERATION, acceleration), TAG,
+        "Save encoder acceleration");
+    atomic_store(&s_encoder_acceleration, acceleration);
     return ESP_OK;
 }
 

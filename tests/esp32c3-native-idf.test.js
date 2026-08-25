@@ -86,6 +86,7 @@ test("native task stacks are configured by each board profile", () => {
   const c3Board = read("main", "board_config.h");
   const c3Sources = [
     read("main", "app_main.c"),
+    read("main", "encoder_input.c"),
     read("main", "audio_service.c"),
     read("main", "network_service.c"),
     read("main", "web_service.c"),
@@ -108,6 +109,8 @@ test("native task stacks are configured by each board profile", () => {
     assert.match(c3Sources, new RegExp(symbol));
     assert.match(cydSources, new RegExp(symbol));
   }
+  assert.match(c3Board, /BOARD_TASK_STACK_ROTARY_ENCODER 4096/);
+  assert.match(c3Sources, /BOARD_TASK_STACK_ROTARY_ENCODER/);
   assert.match(c3Board, /BOARD_TASK_STACK_WEBSOCKET_STATUS 8192/);
   assert.match(c3Sources, /BOARD_TASK_STACK_WEBSOCKET_STATUS/);
 });

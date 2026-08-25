@@ -267,8 +267,9 @@ static esp_err_t send_weather_settings(httpd_req_t *request) {
 static esp_err_t send_control_settings(httpd_req_t *request) {
     char settings[96];
     snprintf(settings, sizeof(settings),
-             "{\"vols\":%u,\"enca\":0,\"irtl\":10,\"skipup\":1}",
-             runtime_settings_get_volume_steps());
+             "{\"vols\":%u,\"enca\":%u,\"irtl\":10,\"skipup\":1}",
+             runtime_settings_get_volume_steps(),
+             runtime_settings_get_encoder_acceleration());
     return ws_send_request(request, settings);
 }
 
@@ -281,6 +282,9 @@ static esp_err_t send_active_settings(httpd_req_t *request, bool client_mode) {
         request,
         "{\"act\":[\"group_wifi\",\"group_system\",\"group_display\","
         "\"group_oled\",\"group_timezone\",\"group_controls\","
+#ifdef CONFIG_YORADIO_ROTARY_ENCODER
+        "\"group_encoder\","
+#endif
         "\"group_buffer\",\"group_wortc\"]}"), TAG,
         "Send active WebUI groups");
     // C3 has neither a telnet console, an on-device station-list cursor, nor
@@ -433,6 +437,14 @@ static void handle_command(httpd_req_t *request, char *command) {
         if (steps > 10U) steps = 10U;
         log_setting_error("Volume steps",
                           runtime_settings_set_volume_steps((uint8_t)steps));
+    } else if (strcmp(command, "encacc") == 0) {
+        unsigned acceleration = strtoul(value, NULL, 10);
+        if (acceleration > RUNTIME_MAX_ENCODER_ACCELERATION) {
+            acceleration = RUNTIME_MAX_ENCODER_ACCELERATION;
+        }
+        log_setting_error(
+            "Encoder acceleration",
+            runtime_settings_set_encoder_acceleration((uint16_t)acceleration));
     } else if (strcmp(command, "normalization") == 0) {
         esp_err_t result = native_audio_settings_set_normalization(
             strtoul(value, NULL, 10) != 0U);

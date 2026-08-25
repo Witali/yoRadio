@@ -22,6 +22,9 @@
 #define RUNTIME_DEFAULT_SNTP2 "time.nist.gov"
 #define RUNTIME_DEFAULT_TIME_SYNC_INTERVAL_MIN 60U
 #define RUNTIME_DEFAULT_VOLUME_STEPS 1U
+#define RUNTIME_MIN_ENCODER_ACCELERATION 0U
+#define RUNTIME_MAX_ENCODER_ACCELERATION 1000U
+#define RUNTIME_DEFAULT_ENCODER_ACCELERATION 200U
 
 esp_err_t runtime_settings_init(void);
 
@@ -36,6 +39,7 @@ void runtime_settings_get_sntp1(char *output, size_t output_size);
 void runtime_settings_get_sntp2(char *output, size_t output_size);
 uint16_t runtime_settings_get_time_sync_interval_min(void);
 uint8_t runtime_settings_get_volume_steps(void);
+uint16_t runtime_settings_get_encoder_acceleration(void);
 
 esp_err_t runtime_settings_set_audio_info(bool enabled);
 esp_err_t runtime_settings_set_softap_delay_min(uint8_t minutes);
@@ -48,3 +52,4 @@ esp_err_t runtime_settings_set_sntp1(const char *server);
 esp_err_t runtime_settings_set_sntp2(const char *server);
 esp_err_t runtime_settings_set_time_sync_interval_min(uint16_t minutes);
 esp_err_t runtime_settings_set_volume_steps(uint8_t steps);
+esp_err_t runtime_settings_set_encoder_acceleration(uint16_t acceleration);

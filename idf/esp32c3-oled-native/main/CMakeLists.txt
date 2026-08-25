@@ -5,6 +5,7 @@ set(NATIVE_SRCS
   "app_main.c"
   "audio_service.c"
   "display_settings.c"
+  "encoder_input.c"
   "native_audio_normalizer.cpp"
   "native_audio_output.c"
   "native_state.c"

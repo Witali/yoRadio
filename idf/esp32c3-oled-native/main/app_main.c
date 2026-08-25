@@ -6,6 +6,7 @@
 #include "board_config.h"
 #include "display_settings.h"
 #include "driver/gpio.h"
+#include "encoder_input.h"
 #include "esp_check.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -16,6 +17,7 @@
 #include "freertos/task.h"
 #include "native_state.h"
 #include "native_audio_settings.h"
+#include "native_audio_output.h"
 #include "network_service.h"
 #include "nvs_flash.h"
 #include "oled_display.h"
@@ -112,6 +114,32 @@ static void show_button_playback_status(bool playing, uint32_t now_ms) {
                  now_ms + BUTTON_STATUS_DISPLAY_MS);
     atomic_fetch_add(&s_button_status_revision, 1U);
 }
+
+#ifdef CONFIG_YORADIO_ROTARY_ENCODER
+static esp_err_t encoder_rotate_volume(int32_t delta, void *context) {
+    (void)context;
+    display_settings_note_activity();
+    int32_t volume = (int32_t)native_audio_output_get_volume() + delta;
+    if (volume < 0) volume = 0;
+    if (volume > 254) volume = 254;
+    native_audio_output_set_volume((uint8_t)volume);
+    return ESP_OK;
+}
+
+static esp_err_t encoder_toggle_playback(void *context) {
+    (void)context;
+    display_settings_note_activity();
+    native_state_t before;
+    native_state_snapshot(&s_state, &before);
+    esp_err_t result = radio_control_toggle();
+    if (result == ESP_OK) {
+        show_button_playback_status(
+            !before.audio_running,
+            (uint32_t)(esp_timer_get_time() / 1000U));
+    }
+    return result;
+}
+#endif
 
 static void queue_button_action(button_state_t *button, button_action_t action) {
     TickType_t now = xTaskGetTickCount();
@@ -757,6 +785,18 @@ static void services_task(void *argument) {
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Radio control failed: %s", esp_err_to_name(result));
     }
+#ifdef CONFIG_YORADIO_ROTARY_ENCODER
+    if (result == ESP_OK) {
+        const encoder_input_callbacks_t encoder_callbacks = {
+            .rotate = encoder_rotate_volume,
+            .click = encoder_toggle_playback,
+        };
+        result = encoder_input_start(&encoder_callbacks);
+        if (result != ESP_OK) {
+            ESP_LOGE(TAG, "Encoder input failed: %s", esp_err_to_name(result));
+        }
+    }
+#endif
     result = web_service_start(&s_state);
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Web server failed: %s", esp_err_to_name(result));
