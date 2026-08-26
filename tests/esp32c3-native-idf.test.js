@@ -48,6 +48,27 @@ test("debug and production profiles compile the same sources", () => {
   assert.match(productionDefaults, /CONFIG_ESP_CONSOLE_NONE=y/);
 });
 
+test("production builds save the application under firmware", () => {
+  const productionBuild = read("build-production.ps1");
+  const agentRules = fs.readFileSync(path.join(root, "AGENTS.md"), "utf8");
+  const firmwareReadme = fs.readFileSync(
+    path.join(root, "firmware", "README.md"),
+    "utf8",
+  );
+
+  assert.match(
+    productionBuild,
+    /firmware\\development\\esp32c3-oled-native-production/,
+  );
+  assert.match(productionBuild, /Join-Path \$resolvedFirmwareOutput "app\.bin"/);
+  assert.match(
+    productionBuild,
+    /Copy-Item -LiteralPath \$applicationImage -Destination \$savedImage -Force/,
+  );
+  assert.match(agentRules, /Save every successful production firmware build/);
+  assert.match(firmwareReadme, /firmware\/development\/<variant>\/app\.bin/);
+});
+
 test("ESP32-C3 native target is Arduino-free and selects the RISC-V chip", () => {
   const project = read("CMakeLists.txt");
   const component = read("main", "CMakeLists.txt");

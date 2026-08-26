@@ -4,6 +4,12 @@ This directory contains immutable, versioned firmware builds for supported
 YoRadio boards. Never replace or remove an existing release; create a new
 `firmware/<version>/<variant>/` directory instead.
 
+Successful production builds intended for testing or hand-off must also be
+copied out of the ignored build directory. Unreleased, replaceable application
+images are stored as `firmware/development/<variant>/app.bin`; the production
+build scripts do this automatically. Promote a validated image into a new
+immutable version directory when preparing a release.
+
 Binary `*.bin` files in this directory are stored with Git LFS. Install Git
 LFS before cloning or pulling release artifacts:
 
