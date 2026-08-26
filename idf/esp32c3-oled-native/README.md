@@ -117,7 +117,7 @@ alternative implementation in this repository:
 | Codec | Implementations | Default |
 |---|---|---|
 | MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | Espressif |
-| AAC | Espressif, yoRadio Helix AAC-LC | Espressif |
+| AAC | Espressif, yoRadio Helix AAC-LC | Helix |
 | FLAC | optimized yoRadio FLAC, Espressif | yoRadio |
 
 The choices are under **yoRadio ESP32-C3 OLED** in `menuconfig`, and can also

@@ -731,10 +731,10 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
     assert.match(kconfig, new RegExp(symbol));
   }
   assert.match(kconfig, /default YORADIO_MP3_DECODER_ESPRESSIF/);
-  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_HELIX=y/);
+  assert.match(defaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
   assert.doesNotMatch(
     defaults,
-    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:ESPRESSIF|MINIMP3)=y/m,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:HELIX|MINIMP3)=y/m,
   );
   assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_HELIX=y/);
   assert.doesNotMatch(
@@ -750,7 +750,7 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
   assert.match(audio, /custom_legacy_decoder_feed/);
 });
 
-test("native ESP-IDF boards use board-specific MP3 defaults", () => {
+test("native ESP-IDF boards default to Espressif MP3", () => {
   const selector = fs.readFileSync(
     path.join(
       root,
@@ -784,10 +784,10 @@ test("native ESP-IDF boards use board-specific MP3 defaults", () => {
 
   assert.match(selector, /selectedBackend = MP3_DECODER_MINIMP3/);
   assert.match(config, /store\.mp3Decoder = 1; \/\/ minimp3/);
-  assert.match(c3Defaults, /CONFIG_YORADIO_MP3_DECODER_HELIX=y/);
+  assert.match(c3Defaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
   assert.doesNotMatch(
     c3Defaults,
-    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:ESPRESSIF|MINIMP3)=y/m,
+    /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:HELIX|MINIMP3)=y/m,
   );
   assert.match(cydDefaults, /CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y/);
   assert.match(cydAudio, /custom_legacy_decoder_feed/);
