@@ -1,6 +1,23 @@
 get_filename_component(YORADIO_ROOT
   "${CMAKE_CURRENT_LIST_DIR}/../../../yoRadio" ABSOLUTE)
 
+if(YORADIO_OVERCLOCK_EXPERIMENT)
+  idf_component_register(
+    SRCS "overclock_experiment.c"
+    INCLUDE_DIRS "."
+    REQUIRES
+      esp_driver_gpio esp_hal_clock esp_hal_wdt esp_hw_support esp_system hal
+      riscv soc)
+  target_include_directories(${COMPONENT_LIB} PRIVATE
+    "$ENV{IDF_PATH}/components/esp_hal_clock/esp32c3/include"
+    "$ENV{IDF_PATH}/components/esp_hal_wdt/include"
+    "$ENV{IDF_PATH}/components/esp_hal_wdt/esp32c3/include")
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_OVERCLOCK_EXPERIMENT=1)
+  target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+  return()
+endif()
+
 set(NATIVE_SRCS
   "app_main.c"
   "audio_service.c"
