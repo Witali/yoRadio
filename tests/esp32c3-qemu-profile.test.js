@@ -21,7 +21,7 @@ test("QEMU profile is isolated from hardware builds", () => {
   assert.doesNotMatch(production, /qemu/i);
 });
 
-test("QEMU smoke validates persistent storage and the scheduler", () => {
+test("QEMU smoke validates display, audio, storage and the scheduler", () => {
   const app = read("main", "app_main.c");
   const kconfig = read("main", "Kconfig.projbuild");
 
@@ -29,7 +29,9 @@ test("QEMU smoke validates persistent storage and the scheduler", () => {
   assert.match(app, /#ifdef CONFIG_YORADIO_QEMU/);
   assert.match(app, /fopen\("\/spiffs\/data\/playlist\.csv", "rb"\)/);
   assert.match(app, /xTaskCreate\(qemu_smoke_task/);
-  assert.match(app, /QEMU_SMOKE_PASS NVS, SPIFFS and FreeRTOS/);
+  assert.match(app, /QEMU_OLED_PASS/);
+  assert.match(app, /QEMU_AUDIO_PASS/);
+  assert.match(app, /QEMU_SMOKE_PASS OLED, audio, NVS, SPIFFS and FreeRTOS/);
   assert.match(app, /esp_restart\(\)/);
 });
 
@@ -39,8 +41,26 @@ test("QEMU runner merges flash and requires the firmware pass marker", () => {
 
   assert.match(runner, /qemu-system-riscv32\.exe/);
   assert.match(runner, /--chip esp32c3 merge-bin/);
-  assert.match(runner, /"-M", "esp32c3"/);
+  assert.match(runner, /"-M", "esp32c3,audiodev=audio0"/);
+  assert.match(runner, /wav,id=audio0[^\r\n]*out\.frequency=48000/);
+  assert.match(runner, /qemu-audio\.wav/);
+  assert.match(runner, /QEMU_OLED_PASS/);
+  assert.match(runner, /QEMU_AUDIO_PASS/);
   assert.match(runner, /QEMU_SMOKE_PASS/);
-  assert.match(documentation, /does not emulate the board's SSD1306/);
+  assert.match(documentation, /virtual OLED and PCM devices/);
   assert.match(documentation, /physical board/);
+});
+
+test("QEMU builds virtual OLED and PCM backends without changing production", () => {
+  const component = read("main", "CMakeLists.txt");
+  const oled = read("main", "oled_display.c");
+  const qemuAudio = read("main", "native_audio_output_qemu.c");
+
+  assert.match(component, /if\(CONFIG_YORADIO_QEMU\)/);
+  assert.match(component, /native_audio_output_qemu\.c/);
+  assert.match(component, /else\(\)[\s\S]*native_audio_output\.c/);
+  assert.match(oled, /QEMU_RGB_VRAM_BASE 0x20000000U/);
+  assert.match(oled, /QEMU_OLED_SCALE 4U/);
+  assert.match(qemuAudio, /QEMU_PCM_BASE 0x6002d000U/);
+  assert.match(qemuAudio, /QEMU 48 kHz stereo PCM/);
 });

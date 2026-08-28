@@ -2,6 +2,7 @@
 param(
     [string]$QemuExecutable = $env:YORADIO_QEMU_RISCV32,
     [string]$QemuBiosDirectory = $env:YORADIO_QEMU_BIOS,
+    [string]$AudioOutput = "",
     [string]$BuildDirectory = "build-qemu",
     [string]$DependencyRoot = "",
     [switch]$SkipBuild
@@ -15,6 +16,10 @@ if ([string]::IsNullOrWhiteSpace($DependencyRoot)) {
 }
 $DependencyRoot = [IO.Path]::GetFullPath($DependencyRoot)
 $buildPath = [IO.Path]::GetFullPath((Join-Path $project $BuildDirectory))
+if ([string]::IsNullOrWhiteSpace($AudioOutput)) {
+    $AudioOutput = Join-Path $buildPath "qemu-audio.wav"
+}
+$AudioOutput = [IO.Path]::GetFullPath($AudioOutput)
 
 if (-not $SkipBuild) {
     & (Join-Path $project "build-qemu.ps1") `
@@ -60,7 +65,14 @@ $flashImage = Join-Path $buildPath "qemu-flash.bin"
     --pad-to-size 4MB
 if ($LASTEXITCODE -ne 0) { throw "QEMU flash image merge failed" }
 
-$qemuArguments = @("-M", "esp32c3", "-nographic", "-no-reboot", "-snapshot")
+if (Test-Path -LiteralPath $AudioOutput -PathType Leaf) {
+    Remove-Item -LiteralPath $AudioOutput -Force
+}
+$qemuArguments = @(
+    "-M", "esp32c3,audiodev=audio0",
+    "-nographic", "-no-reboot", "-snapshot",
+    "-audiodev", "wav,id=audio0,path=$AudioOutput,out.frequency=48000"
+)
 if (-not [string]::IsNullOrWhiteSpace($QemuBiosDirectory)) {
     $qemuArguments += @("-L", [IO.Path]::GetFullPath($QemuBiosDirectory))
 }
@@ -76,5 +88,11 @@ $joinedOutput = $output -join "`n"
 if ($qemuExitCode -ne 0 -or $joinedOutput -notmatch "QEMU_SMOKE_PASS") {
     throw "QEMU smoke test failed (exit $qemuExitCode); see $log"
 }
+if ($joinedOutput -notmatch "QEMU_OLED_PASS" -or
+    $joinedOutput -notmatch "QEMU_AUDIO_PASS" -or
+    -not (Test-Path -LiteralPath $AudioOutput -PathType Leaf) -or
+    (Get-Item -LiteralPath $AudioOutput).Length -le 44) {
+    throw "QEMU OLED/audio validation failed; see $log"
+}
 
-Write-Host "QEMU smoke test passed; log: $log"
+Write-Host "QEMU smoke test passed; log: $log; audio: $AudioOutput"

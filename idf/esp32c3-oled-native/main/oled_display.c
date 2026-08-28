@@ -21,6 +21,25 @@
 #define CLOCK_DIGIT_HEIGHT 30
 #define CLOCK_SEGMENT_THICKNESS 3
 
+#ifdef CONFIG_YORADIO_QEMU
+#define QEMU_RGB_REG_BASE 0x21000000U
+#define QEMU_RGB_VRAM_BASE 0x20000000U
+#define QEMU_RGB_VERSION_REG (*(volatile uint32_t *)(QEMU_RGB_REG_BASE + 0x00U))
+#define QEMU_RGB_SIZE_REG (*(volatile uint32_t *)(QEMU_RGB_REG_BASE + 0x04U))
+#define QEMU_RGB_FROM_REG (*(volatile uint32_t *)(QEMU_RGB_REG_BASE + 0x08U))
+#define QEMU_RGB_TO_REG (*(volatile uint32_t *)(QEMU_RGB_REG_BASE + 0x0cU))
+#define QEMU_RGB_CONTENT_REG (*(volatile uint32_t *)(QEMU_RGB_REG_BASE + 0x10U))
+#define QEMU_RGB_UPDATE_REG (*(volatile uint32_t *)(QEMU_RGB_REG_BASE + 0x14U))
+#define QEMU_RGB_BPP_REG (*(volatile uint32_t *)(QEMU_RGB_REG_BASE + 0x18U))
+#define QEMU_RGB_VERSION 0x00000002U
+#define QEMU_OLED_SCALE 4U
+#define QEMU_OLED_WIDTH (OLED_DISPLAY_WIDTH * QEMU_OLED_SCALE)
+#define QEMU_OLED_HEIGHT (OLED_DISPLAY_HEIGHT * QEMU_OLED_SCALE)
+
+static bool s_qemu_oled_powered = true;
+static uint8_t s_qemu_oled_brightness = 100;
+#endif
+
 static const char *const TAG = "oled";
 
 static i2c_master_dev_handle_t display_device(oled_display_t *display) {
@@ -61,6 +80,20 @@ esp_err_t oled_display_init(oled_display_t *display) {
     ESP_RETURN_ON_FALSE(display, ESP_ERR_INVALID_ARG, TAG,
                         "Display object is required");
     memset(display, 0, sizeof(*display));
+
+#ifdef CONFIG_YORADIO_QEMU
+    ESP_RETURN_ON_FALSE(QEMU_RGB_VERSION_REG == QEMU_RGB_VERSION,
+                        ESP_ERR_NOT_SUPPORTED, TAG,
+                        "QEMU RGB display is unavailable");
+    QEMU_RGB_BPP_REG = 32;
+    QEMU_RGB_SIZE_REG = (QEMU_OLED_WIDTH << 16) | QEMU_OLED_HEIGHT;
+    display->device = (void *)1;
+    oled_display_clear(display);
+    ESP_RETURN_ON_ERROR(oled_display_present(display), TAG,
+                        "QEMU OLED clear failed");
+    ESP_LOGI(TAG, "QEMU OLED 72x40 ready at 4x scale");
+    return ESP_OK;
+#else
 
     i2c_master_bus_config_t bus_config = {
         .i2c_port = -1,
@@ -104,6 +137,7 @@ esp_err_t oled_display_init(oled_display_t *display) {
                         "OLED clear failed");
     ESP_LOGI(TAG, "SSD1306 72x40 ready at I2C 0x%02x", BOARD_OLED_ADDRESS);
     return ESP_OK;
+#endif
 }
 
 esp_err_t oled_display_set_brightness(oled_display_t *display,
@@ -112,17 +146,27 @@ esp_err_t oled_display_set_brightness(oled_display_t *display,
                         "OLED is not initialized");
     ESP_RETURN_ON_FALSE(brightness <= 100, ESP_ERR_INVALID_ARG, TAG,
                         "Brightness must be between 0 and 100");
+#ifdef CONFIG_YORADIO_QEMU
+    s_qemu_oled_brightness = brightness;
+    return oled_display_present(display);
+#else
     uint8_t controller_contrast =
         (uint8_t)(((unsigned)brightness * 255U + 50U) / 100U);
     const uint8_t commands[] = {0x81, controller_contrast};
     return send_commands(display, commands, sizeof(commands));
+#endif
 }
 
 esp_err_t oled_display_set_power(oled_display_t *display, bool on) {
     ESP_RETURN_ON_FALSE(display && display->device, ESP_ERR_INVALID_STATE, TAG,
                         "OLED is not initialized");
+#ifdef CONFIG_YORADIO_QEMU
+    s_qemu_oled_powered = on;
+    return oled_display_present(display);
+#else
     const uint8_t command = on ? 0xaf : 0xae;
     return send_commands(display, &command, 1);
+#endif
 }
 
 void oled_display_clear(oled_display_t *display) {
@@ -461,6 +505,9 @@ esp_err_t oled_display_start_text_scroll(oled_display_t *display,
     ESP_RETURN_ON_FALSE(display && display->device && text,
                         ESP_ERR_INVALID_ARG, TAG,
                         "Display and scroll text are required");
+#ifdef CONFIG_YORADIO_QEMU
+    return ESP_ERR_NOT_SUPPORTED;
+#endif
     ESP_RETURN_ON_FALSE(first_page + 1U < OLED_PAGES, ESP_ERR_INVALID_ARG,
                         TAG, "Scroll requires two display pages");
     size_t glyph_count = oled_display_large_text_length(text);
@@ -522,13 +569,48 @@ esp_err_t oled_display_start_text_scroll(oled_display_t *display,
 esp_err_t oled_display_stop_scroll(oled_display_t *display) {
     ESP_RETURN_ON_FALSE(display && display->device, ESP_ERR_INVALID_STATE, TAG,
                         "OLED is not initialized");
+#ifdef CONFIG_YORADIO_QEMU
+    return ESP_OK;
+#else
     const uint8_t command = 0x2e;
     return send_commands(display, &command, 1);
+#endif
 }
 
 esp_err_t oled_display_present(oled_display_t *display) {
     ESP_RETURN_ON_FALSE(display && display->device, ESP_ERR_INVALID_STATE, TAG,
                         "OLED is not initialized");
+#ifdef CONFIG_YORADIO_QEMU
+    volatile uint32_t *pixels =
+        (volatile uint32_t *)QEMU_RGB_VRAM_BASE;
+    uint32_t intensity =
+        ((uint32_t)s_qemu_oled_brightness * 255U + 50U) / 100U;
+    uint32_t color = (intensity << 8) | intensity;
+    for (unsigned y = 0; y < OLED_DISPLAY_HEIGHT; ++y) {
+        for (unsigned scale_y = 0; scale_y < QEMU_OLED_SCALE; ++scale_y) {
+            unsigned output_y = y * QEMU_OLED_SCALE + scale_y;
+            for (unsigned x = 0; x < OLED_DISPLAY_WIDTH; ++x) {
+                uint8_t value =
+                    display->framebuffer[x + (y / 8U) * OLED_DISPLAY_WIDTH];
+                uint32_t pixel = s_qemu_oled_powered &&
+                                         (value & (1U << (y & 7U)))
+                                     ? color
+                                     : 0;
+                unsigned output_x = x * QEMU_OLED_SCALE;
+                for (unsigned scale_x = 0; scale_x < QEMU_OLED_SCALE;
+                     ++scale_x) {
+                    pixels[output_y * QEMU_OLED_WIDTH + output_x + scale_x] =
+                        pixel;
+                }
+            }
+        }
+    }
+    QEMU_RGB_FROM_REG = 0;
+    QEMU_RGB_TO_REG = (QEMU_OLED_WIDTH << 16) | QEMU_OLED_HEIGHT;
+    QEMU_RGB_CONTENT_REG = 0;
+    QEMU_RGB_UPDATE_REG = 1;
+    return ESP_OK;
+#else
     for (uint8_t page = 0; page < OLED_PAGES; ++page) {
         const uint8_t *data =
             display->framebuffer + page * OLED_DISPLAY_WIDTH;
@@ -537,6 +619,7 @@ esp_err_t oled_display_present(oled_display_t *display) {
                             TAG, "OLED page transfer failed");
     }
     return ESP_OK;
+#endif
 }
 
 esp_err_t oled_display_show_boot_logo(oled_display_t *display) {

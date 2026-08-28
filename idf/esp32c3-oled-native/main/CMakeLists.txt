@@ -24,7 +24,6 @@ set(NATIVE_SRCS
   "display_settings.c"
   "encoder_input.c"
   "native_audio_normalizer.cpp"
-  "native_audio_output.c"
   "native_state.c"
   "network_service.c"
   "oled_display.c"
@@ -34,6 +33,12 @@ set(NATIVE_SRCS
   "web_pages_bridge.cpp"
   "web_service.c"
   "websocket_service.c")
+
+if(CONFIG_YORADIO_QEMU)
+  list(APPEND NATIVE_SRCS "native_audio_output_qemu.c")
+else()
+  list(APPEND NATIVE_SRCS "native_audio_output.c")
+endif()
 
 idf_component_register(
   SRCS ${NATIVE_SRCS}

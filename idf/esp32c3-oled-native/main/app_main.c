@@ -89,6 +89,21 @@ typedef struct {
 static QueueHandle_t s_button_edge_queue;
 
 #ifdef CONFIG_YORADIO_QEMU
+#define QEMU_TONE_RATE 48000U
+#define QEMU_TONE_FRAMES (QEMU_TONE_RATE / 2U)
+
+static int16_t qemu_tone_sample(uint32_t frame) {
+    const uint32_t period = 109U;
+    const uint32_t half = period / 2U;
+    uint32_t phase = frame % period;
+    if (phase < half) {
+        return (int16_t)(-6000 + (int32_t)(phase * 12000U / half));
+    }
+    return (int16_t)(6000 -
+                     (int32_t)((phase - half) * 12000U /
+                               (period - half)));
+}
+
 static void qemu_smoke_task(void *argument) {
     (void)argument;
     vTaskDelay(pdMS_TO_TICKS(100));
@@ -105,11 +120,34 @@ static void qemu_smoke_task(void *argument) {
         abort();
     }
 
+    ESP_ERROR_CHECK(native_audio_output_configure(QEMU_TONE_RATE));
+    int16_t samples[256 * 2];
+    for (uint32_t first = 0; first < QEMU_TONE_FRAMES; first += 256U) {
+        size_t frames = QEMU_TONE_FRAMES - first;
+        if (frames > 256U) frames = 256U;
+        for (size_t frame = 0; frame < frames; ++frame) {
+            int16_t sample = qemu_tone_sample(first + frame);
+            samples[frame * 2U] = sample;
+            samples[frame * 2U + 1U] = sample;
+        }
+        ESP_ERROR_CHECK(native_audio_output_write_pcm(
+            (uint8_t *)samples, frames * 2U * sizeof(int16_t), 16, 2));
+    }
+    ESP_LOGI(TAG, "QEMU_AUDIO_PASS %u stereo frames", QEMU_TONE_FRAMES);
+
+    oled_display_clear(&s_display);
+    oled_display_draw_large_text(&s_display, 8, 12, "QEMU OK", 0, false,
+                                 false, false);
+    ESP_ERROR_CHECK(oled_display_present(&s_display));
+    ESP_LOGI(TAG, "QEMU_OLED_PASS 72x40 framebuffer presented");
+
     ESP_LOGI(TAG,
-             "QEMU_SMOKE_PASS NVS, SPIFFS and FreeRTOS; free heap: %lu bytes",
+             "QEMU_SMOKE_PASS OLED, audio, NVS, SPIFFS and FreeRTOS; free "
+             "heap: %lu bytes",
              (unsigned long)esp_get_free_heap_size());
     fflush(stdout);
-    vTaskDelay(pdMS_TO_TICKS(50));
+    /* Leave the last framebuffer visible long enough for SDL/HMP inspection. */
+    vTaskDelay(pdMS_TO_TICKS(3000));
     esp_restart();
 }
 #endif
@@ -921,9 +959,12 @@ void app_main(void) {
                  esp_err_to_name(result));
     }
 #ifdef CONFIG_YORADIO_QEMU
-    ESP_LOGW(TAG,
-             "QEMU headless profile: OLED, GPIO, Wi-Fi and PDM audio disabled");
-    ESP_ERROR_CHECK(xTaskCreate(qemu_smoke_task, "qemu_smoke", 3072, NULL, 3,
+    ESP_LOGW(TAG, "QEMU profile: virtual OLED and PCM enabled; Wi-Fi and GPIO "
+                  "disabled");
+    ESP_ERROR_CHECK(oled_display_init(&s_display));
+    ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));
+    ESP_ERROR_CHECK(native_audio_output_init());
+    ESP_ERROR_CHECK(xTaskCreate(qemu_smoke_task, "qemu_smoke", 4096, NULL, 3,
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);
