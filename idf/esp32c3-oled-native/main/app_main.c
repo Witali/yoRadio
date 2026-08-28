@@ -12,6 +12,7 @@
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_spiffs.h"
+#include "esp_system.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
@@ -86,6 +87,32 @@ typedef struct {
 } button_state_t;
 
 static QueueHandle_t s_button_edge_queue;
+
+#ifdef CONFIG_YORADIO_QEMU
+static void qemu_smoke_task(void *argument) {
+    (void)argument;
+    vTaskDelay(pdMS_TO_TICKS(100));
+
+    FILE *playlist = fopen("/spiffs/data/playlist.csv", "rb");
+    if (!playlist) {
+        ESP_LOGE(TAG, "QEMU smoke: playlist fixture is unavailable");
+        abort();
+    }
+    int first_byte = fgetc(playlist);
+    fclose(playlist);
+    if (first_byte == EOF) {
+        ESP_LOGE(TAG, "QEMU smoke: playlist fixture is empty");
+        abort();
+    }
+
+    ESP_LOGI(TAG,
+             "QEMU_SMOKE_PASS NVS, SPIFFS and FreeRTOS; free heap: %lu bytes",
+             (unsigned long)esp_get_free_heap_size());
+    fflush(stdout);
+    vTaskDelay(pdMS_TO_TICKS(50));
+    esp_restart();
+}
+#endif
 
 static bool button_tick_reached(TickType_t now, TickType_t deadline) {
     return (int32_t)(now - deadline) >= 0;
@@ -893,6 +920,14 @@ void app_main(void) {
         ESP_LOGE(TAG, "SPIFFS mount failed without format: %s",
                  esp_err_to_name(result));
     }
+#ifdef CONFIG_YORADIO_QEMU
+    ESP_LOGW(TAG,
+             "QEMU headless profile: OLED, GPIO, Wi-Fi and PDM audio disabled");
+    ESP_ERROR_CHECK(xTaskCreate(qemu_smoke_task, "qemu_smoke", 3072, NULL, 3,
+                                NULL) == pdPASS
+                        ? ESP_OK
+                        : ESP_ERR_NO_MEM);
+#else
     ESP_ERROR_CHECK(oled_display_init(&s_display));
     ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));
     s_boot_logo_until_us =
@@ -915,5 +950,6 @@ void app_main(void) {
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);
+#endif
 #endif
 }
