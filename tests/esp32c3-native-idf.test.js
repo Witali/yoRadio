@@ -231,6 +231,54 @@ test("stopped-radio screensaver draws a full-screen clock and wakes on BOOT", ()
   assert.match(options, /<option value="1">blank<\/option>/);
 });
 
+test("native SNTP owns server names and retries at low priority after reconnect", () => {
+  const board = read("main", "board_config.h");
+  const timeService = read("main", "time_service.c");
+  const timeHeader = read("main", "time_service.h");
+  const network = read("main", "network_service.c");
+
+  assert.match(
+    timeService,
+    /static char s_sntp_server1\[SNTP_SERVER_NAME_CAPACITY\]/,
+  );
+  assert.match(
+    timeService,
+    /static char s_sntp_server2\[SNTP_SERVER_NAME_CAPACITY\]/,
+  );
+  assert.doesNotMatch(timeService, /char server[12]\[35\]/);
+  assert.match(
+    timeService,
+    /esp_sntp_stop\(\);[\s\S]*runtime_settings_get_sntp1\(s_sntp_server1/,
+  );
+  assert.match(
+    timeService,
+    /esp_sntp_setservername\(0, s_sntp_server1\)/,
+  );
+  assert.match(
+    timeService,
+    /esp_sntp_setservername\(1, s_sntp_server2\)/,
+  );
+  assert.match(board, /BOARD_TASK_STACK_TIME_SYNC 2048/);
+  assert.match(timeService, /TIME_SYNC_TASK_PRIORITY 1/);
+  assert.match(
+    timeService,
+    /xTaskCreate\(time_sync_task,[\s\S]*TIME_SYNC_TASK_PRIORITY/,
+  );
+  assert.match(
+    timeService,
+    /time_service_notify_network_ready\(void\)[\s\S]*xTaskNotifyGive\(s_time_sync_task\)/,
+  );
+  assert.doesNotMatch(
+    timeService,
+    /time_service_notify_network_ready\(void\)[\s\S]*esp_sntp_restart\(\)/,
+  );
+  assert.match(timeHeader, /time_service_notify_network_ready/);
+  assert.match(
+    network,
+    /IP_EVENT_STA_GOT_IP[\s\S]*time_service_notify_network_ready\(\)/,
+  );
+});
+
 test("native OLED brightness uses the shared 0..100 setting and persists it", () => {
   const component = read("main", "CMakeLists.txt");
   const header = read("main", "oled_display.h");

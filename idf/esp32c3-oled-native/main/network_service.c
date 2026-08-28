@@ -15,6 +15,7 @@
 #include "freertos/event_groups.h"
 #include "freertos/task.h"
 #include "runtime_settings.h"
+#include "time_service.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
@@ -131,6 +132,7 @@ static void event_handler(void *arg, esp_event_base_t base, int32_t id,
         if (esp_wifi_sta_get_ap_info(&access_point) == ESP_OK) {
             native_state_set_wifi_rssi(s_state, access_point.rssi);
         }
+        time_service_notify_network_ready();
         xEventGroupSetBits(s_wifi_events, WIFI_CONNECTED_BIT);
         ESP_LOGI(TAG, "Client address: " IPSTR, IP2STR(&event->ip_info.ip));
     }

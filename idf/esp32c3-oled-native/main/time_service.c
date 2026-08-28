@@ -4,13 +4,50 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "board_config.h"
 #include "esp_log.h"
 #include "esp_sntp.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "runtime_settings.h"
 
 static const char *const TAG = "time_service";
 
+#define SNTP_SERVER_NAME_CAPACITY 35
+#define TIME_SYNC_TASK_PRIORITY 1
+
+// lwIP stores the pointers passed to esp_sntp_setservername(); it does not
+// copy the strings. Keep the backing storage alive for the entire SNTP
+// service lifetime, including after the one-shot services task is deleted.
+static char s_sntp_server1[SNTP_SERVER_NAME_CAPACITY] =
+    RUNTIME_DEFAULT_SNTP1;
+static char s_sntp_server2[SNTP_SERVER_NAME_CAPACITY] =
+    RUNTIME_DEFAULT_SNTP2;
+static TaskHandle_t s_time_sync_task;
+
+static void time_sync_task(void *argument) {
+    (void)argument;
+    while (true) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        if (esp_sntp_enabled() && esp_sntp_restart()) {
+            ESP_LOGI(TAG,
+                     "Network ready; requested immediate SNTP synchronization");
+        }
+    }
+}
+
+static esp_err_t ensure_time_sync_task(void) {
+    if (s_time_sync_task) return ESP_OK;
+    return xTaskCreate(time_sync_task, "time_sync",
+                       BOARD_TASK_STACK_TIME_SYNC, NULL,
+                       TIME_SYNC_TASK_PRIORITY, &s_time_sync_task) == pdPASS
+               ? ESP_OK
+               : ESP_ERR_NO_MEM;
+}
+
 esp_err_t time_service_apply(void) {
+    esp_err_t task_result = ensure_time_sync_task();
+    if (task_result != ESP_OK) return task_result;
     int hour = runtime_settings_get_timezone_hour();
     unsigned minute = runtime_settings_get_timezone_minute();
     int offset_minutes = hour * 60;
@@ -24,19 +61,27 @@ esp_err_t time_service_apply(void) {
     if (setenv("TZ", timezone, 1) != 0) return ESP_FAIL;
     tzset();
 
-    char server1[35];
-    char server2[35];
-    runtime_settings_get_sntp1(server1, sizeof(server1));
-    runtime_settings_get_sntp2(server2, sizeof(server2));
     if (esp_sntp_enabled()) esp_sntp_stop();
+    // Stop first so the TCP/IP thread cannot resolve a name while its
+    // persistent backing buffer is being updated from saved settings.
+    runtime_settings_get_sntp1(s_sntp_server1, sizeof(s_sntp_server1));
+    runtime_settings_get_sntp2(s_sntp_server2, sizeof(s_sntp_server2));
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    esp_sntp_setservername(0, server1);
-    esp_sntp_setservername(1, server2);
+    esp_sntp_setservername(0, s_sntp_server1);
+    esp_sntp_setservername(1, s_sntp_server2);
     esp_sntp_set_sync_interval(
         (uint32_t)runtime_settings_get_time_sync_interval_min() * 60U * 1000U);
     esp_sntp_init();
     ESP_LOGI(TAG, "Timezone %s, SNTP %s / %s every %u min", timezone,
-             server1, server2,
+             s_sntp_server1, s_sntp_server2,
              runtime_settings_get_time_sync_interval_min());
     return ESP_OK;
+}
+
+void time_service_notify_network_ready(void) {
+    // Initial Wi-Fi connection completes before time_service_apply(), so
+    // there is no worker to notify on that first event. time_service_apply()
+    // starts the initial request. Subsequent reconnects wake this priority-1
+    // worker instead of doing SNTP control work in the Wi-Fi event callback.
+    if (s_time_sync_task) xTaskNotifyGive(s_time_sync_task);
 }
