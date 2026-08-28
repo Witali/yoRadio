@@ -959,7 +959,7 @@ void app_main(void) {
                  esp_err_to_name(result));
     }
 #ifdef CONFIG_YORADIO_QEMU
-    ESP_LOGW(TAG, "QEMU profile: virtual OLED and PCM enabled; Wi-Fi and GPIO "
+    ESP_LOGW(TAG, "QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO "
                   "disabled");
     ESP_ERROR_CHECK(oled_display_init(&s_display));
     ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));

@@ -47,11 +47,11 @@ test("QEMU runner merges flash and requires the firmware pass marker", () => {
   assert.match(runner, /QEMU_OLED_PASS/);
   assert.match(runner, /QEMU_AUDIO_PASS/);
   assert.match(runner, /QEMU_SMOKE_PASS/);
-  assert.match(documentation, /virtual OLED and PCM devices/);
+  assert.match(documentation, /SSD1306 and PCM devices/);
   assert.match(documentation, /physical board/);
 });
 
-test("QEMU builds virtual OLED and PCM backends without changing production", () => {
+test("QEMU uses native SSD1306 I2C and virtual PCM without changing production", () => {
   const component = read("main", "CMakeLists.txt");
   const oled = read("main", "oled_display.c");
   const qemuAudio = read("main", "native_audio_output_qemu.c");
@@ -59,8 +59,8 @@ test("QEMU builds virtual OLED and PCM backends without changing production", ()
   assert.match(component, /if\(CONFIG_YORADIO_QEMU\)/);
   assert.match(component, /native_audio_output_qemu\.c/);
   assert.match(component, /else\(\)[\s\S]*native_audio_output\.c/);
-  assert.match(oled, /QEMU_RGB_VRAM_BASE 0x20000000U/);
-  assert.match(oled, /QEMU_OLED_SCALE 4U/);
+  assert.match(oled, /i2c_master_transmit/);
+  assert.doesNotMatch(oled, /QEMU_RGB_/);
   assert.match(qemuAudio, /QEMU_PCM_BASE 0x6002d000U/);
   assert.match(qemuAudio, /QEMU 48 kHz stereo PCM/);
 });
