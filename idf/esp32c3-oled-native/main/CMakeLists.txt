@@ -21,6 +21,7 @@ endif()
 set(NATIVE_SRCS
   "app_main.c"
   "audio_service.c"
+  "cpu_profiler.c"
   "display_settings.c"
   "encoder_input.c"
   "native_audio_normalizer.cpp"
