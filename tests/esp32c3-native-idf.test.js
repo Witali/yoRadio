@@ -266,11 +266,19 @@ test("native SNTP owns server names and retries at low priority after reconnect"
   );
   assert.match(
     timeService,
-    /time_service_notify_network_ready\(void\)[\s\S]*xTaskNotifyGive\(s_time_sync_task\)/,
+    /time_service_notify_network_ready\(void\)[\s\S]*xTaskNotify\(s_time_sync_task, TIME_SYNC_EVENT_NETWORK_READY, eSetBits\)/,
   );
   assert.doesNotMatch(
     timeService,
     /time_service_notify_network_ready\(void\)[\s\S]*esp_sntp_restart\(\)/,
+  );
+  assert.match(
+    timeService,
+    /time_sync_notification\(struct timeval \*synced_time\)[\s\S]*xTaskNotify\(s_time_sync_task, TIME_SYNC_EVENT_COMPLETED, eSetBits\)/,
+  );
+  assert.match(
+    timeService,
+    /TIME_SYNC_EVENT_COMPLETED[\s\S]*ESP_LOGI\(TAG, "SNTP synchronized"\)/,
   );
   assert.match(timeHeader, /time_service_notify_network_ready/);
   assert.match(

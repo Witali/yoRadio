@@ -15,6 +15,8 @@ static const char *const TAG = "time_service";
 
 #define SNTP_SERVER_NAME_CAPACITY 35
 #define TIME_SYNC_TASK_PRIORITY 1
+#define TIME_SYNC_EVENT_NETWORK_READY (1U << 0)
+#define TIME_SYNC_EVENT_COMPLETED (1U << 1)
 
 // lwIP stores the pointers passed to esp_sntp_setservername(); it does not
 // copy the strings. Keep the backing storage alive for the entire SNTP
@@ -25,13 +27,27 @@ static char s_sntp_server2[SNTP_SERVER_NAME_CAPACITY] =
     RUNTIME_DEFAULT_SNTP2;
 static TaskHandle_t s_time_sync_task;
 
+static void time_sync_notification(struct timeval *synced_time) {
+    (void)synced_time;
+    // The callback runs in lwIP context. Only post a constant-time task
+    // notification here; logging and all SNTP control stay at priority 1.
+    if (s_time_sync_task) {
+        xTaskNotify(s_time_sync_task, TIME_SYNC_EVENT_COMPLETED, eSetBits);
+    }
+}
+
 static void time_sync_task(void *argument) {
     (void)argument;
     while (true) {
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        if (esp_sntp_enabled() && esp_sntp_restart()) {
+        uint32_t events = 0;
+        xTaskNotifyWait(0, UINT32_MAX, &events, portMAX_DELAY);
+        if ((events & TIME_SYNC_EVENT_NETWORK_READY) != 0U &&
+            esp_sntp_enabled() && esp_sntp_restart()) {
             ESP_LOGI(TAG,
                      "Network ready; requested immediate SNTP synchronization");
+        }
+        if ((events & TIME_SYNC_EVENT_COMPLETED) != 0U) {
+            ESP_LOGI(TAG, "SNTP synchronized");
         }
     }
 }
@@ -69,6 +85,7 @@ esp_err_t time_service_apply(void) {
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
     esp_sntp_setservername(0, s_sntp_server1);
     esp_sntp_setservername(1, s_sntp_server2);
+    esp_sntp_set_time_sync_notification_cb(time_sync_notification);
     esp_sntp_set_sync_interval(
         (uint32_t)runtime_settings_get_time_sync_interval_min() * 60U * 1000U);
     esp_sntp_init();
@@ -83,5 +100,7 @@ void time_service_notify_network_ready(void) {
     // there is no worker to notify on that first event. time_service_apply()
     // starts the initial request. Subsequent reconnects wake this priority-1
     // worker instead of doing SNTP control work in the Wi-Fi event callback.
-    if (s_time_sync_task) xTaskNotifyGive(s_time_sync_task);
+    if (s_time_sync_task) {
+        xTaskNotify(s_time_sync_task, TIME_SYNC_EVENT_NETWORK_READY, eSetBits);
+    }
 }
