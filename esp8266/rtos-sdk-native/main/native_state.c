@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include "freertos/task.h"
+
 static SemaphoreHandle_t s_lock;
 static native_state_t s_state;
 
@@ -84,6 +86,31 @@ void native_state_set_stream(codec_type_t codec, uint32_t bitrate_kbps,
     s_state.bitrate_kbps = bitrate_kbps;
     s_state.sample_rate_hz = sample_rate_hz;
     s_state.channels = channels;
+    xSemaphoreGive(s_lock);
+}
+
+void native_state_set_station(uint16_t index, const char *name) {
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    s_state.station_index = index;
+    strncpy(s_state.station, name ? name : "", sizeof(s_state.station) - 1);
+    s_state.station[sizeof(s_state.station) - 1] = '\0';
+    s_state.title[0] = '\0';
+    xSemaphoreGive(s_lock);
+}
+
+void native_state_set_volume(uint8_t volume) {
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    s_state.volume = volume;
+    xSemaphoreGive(s_lock);
+}
+
+void native_state_set_message(const char *message, uint32_t duration_ms) {
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    strncpy(s_state.message, message ? message : "",
+            sizeof(s_state.message) - 1);
+    s_state.message[sizeof(s_state.message) - 1] = '\0';
+    s_state.message_until_tick =
+        (uint32_t)(xTaskGetTickCount() + pdMS_TO_TICKS(duration_ms));
     xSemaphoreGive(s_lock);
 }
 

@@ -59,7 +59,14 @@ static uint8_t s_work[HTTP_HEADER_BYTES];
 static char s_host[HTTP_HOST_BYTES];
 
 static bool generation_current(uint32_t generation) {
-    return __atomic_load_n(&s_generation, __ATOMIC_ACQUIRE) == generation;
+    return s_generation == generation;
+}
+
+static uint32_t advance_generation(void) {
+    taskENTER_CRITICAL();
+    uint32_t generation = ++s_generation;
+    taskEXIT_CRITICAL();
+    return generation;
 }
 
 static bool parse_http_url(const char *url, uint16_t *port,
@@ -463,7 +470,7 @@ esp_err_t audio_service_play(const char *url) {
     }
     if (strncmp(url, "http://", 7) != 0) return ESP_ERR_NOT_SUPPORTED;
     audio_command_t command = {
-        .generation = __atomic_add_fetch(&s_generation, 1, __ATOMIC_ACQ_REL),
+        .generation = advance_generation(),
         .play = true,
     };
     strncpy(command.url, url, sizeof(command.url) - 1);
@@ -473,7 +480,7 @@ esp_err_t audio_service_play(const char *url) {
 
 esp_err_t audio_service_stop(void) {
     audio_command_t command = {
-        .generation = __atomic_add_fetch(&s_generation, 1, __ATOMIC_ACQ_REL),
+        .generation = advance_generation(),
         .play = false,
     };
     return xQueueOverwrite(s_commands, &command) == pdPASS ? ESP_OK : ESP_FAIL;

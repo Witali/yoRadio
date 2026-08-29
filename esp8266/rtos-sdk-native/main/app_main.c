@@ -6,12 +6,14 @@
 
 #include "board_config.h"
 #include "audio_service.h"
+#include "input_service.h"
 #include "native_audio_output.h"
 #include "native_state.h"
 #include "network_service.h"
 #include "nvs_flash.h"
 #include "persistent_settings.h"
 #include "playlist_service.h"
+#include "radio_control.h"
 #include "storage_service.h"
 #include "time_service.h"
 
@@ -44,10 +46,16 @@ void app_main(void) {
                      esp_err_to_name(result));
         native_state_set_station_count(playlist_service_count());
     }
+    esp_err_t radio_result = radio_control_init();
+    if (radio_result != ESP_OK && radio_result != ESP_ERR_NOT_FOUND)
+        ESP_LOGW(TAG, "Radio control initialization: %s",
+                 esp_err_to_name(radio_result));
+    ESP_ERROR_CHECK(input_service_start());
     ESP_ERROR_CHECK(time_service_start());
     ESP_ERROR_CHECK(network_service_start());
 
     for (;;) {
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        radio_control_flush_pending();
+        vTaskDelay(pdMS_TO_TICKS(250));
     }
 }

@@ -13,7 +13,9 @@
 
 namespace {
 constexpr size_t kArenaBytes = 24U * 1024U;
-constexpr size_t kInputBytes = 4096U;
+/* 2048 bytes covers a maximum-size 320-kbit/s MP3 frame and normal
+ * high-bitrate ADTS AAC frames while saving 2 KiB of scarce ESP8266 heap. */
+constexpr size_t kInputBytes = 2048U;
 constexpr size_t kPcmSamples = 1152U * 2U;
 constexpr char kTag[] = "helix_bridge";
 

@@ -178,6 +178,75 @@ bool playlist_service_get(uint16_t one_based_index, playlist_station_t *station)
     return found;
 }
 
+esp_err_t playlist_service_visit(uint16_t one_based_index,
+                                 playlist_station_visitor_t visitor,
+                                 void *context) {
+    if (!s_lock || !visitor || !one_based_index) return ESP_ERR_INVALID_ARG;
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    esp_err_t result = ESP_ERR_NOT_FOUND;
+    if (one_based_index <= s_count) {
+        FILE *index = fopen(PLAYLIST_INDEX_PATH, "rb");
+        uint32_t offset = 0;
+        long position = (long)sizeof(index_header_t) +
+                        (long)(one_based_index - 1U) * sizeof(offset);
+        if (index && fseek(index, position, SEEK_SET) == 0 &&
+            fread(&offset, sizeof(offset), 1, index) == 1) {
+            FILE *playlist = fopen(PLAYLIST_PATH, "rb");
+            if (playlist && fseek(playlist, (long)offset, SEEK_SET) == 0 &&
+                fgets(s_line, sizeof(s_line), playlist)) {
+                char *name = s_line;
+                char *url = strchr(name, '\t');
+                if (url) {
+                    *url++ = '\0';
+                    char *gain_text = strchr(url, '\t');
+                    if (gain_text) *gain_text++ = '\0';
+                    url[strcspn(url, "\r\n")] = '\0';
+                    int8_t gain = gain_text
+                        ? (int8_t)strtol(gain_text, NULL, 10) : 0;
+                    if (name[0] && url[0])
+                        result = visitor(one_based_index, name, url, gain,
+                                         context);
+                }
+            }
+            if (playlist) fclose(playlist);
+        }
+        if (index) fclose(index);
+    }
+    xSemaphoreGive(s_lock);
+    return result;
+}
+
+static esp_err_t inspect_http(uint16_t index, const char *name,
+                              const char *url, int8_t gain, void *context) {
+    (void)index;
+    (void)name;
+    (void)gain;
+    *(bool *)context = strncmp(url, "http://", 7) == 0;
+    return ESP_OK;
+}
+
+bool playlist_service_find_http_index(uint16_t start, int direction,
+                                      uint16_t *found_index) {
+    uint16_t count = playlist_service_count();
+    if (!count || !found_index) return false;
+    uint16_t candidate = start >= 1 && start <= count ? start : 1;
+    for (uint16_t checked = 0; checked < count; ++checked) {
+        if (checked) {
+            if (direction < 0)
+                candidate = candidate == 1 ? count : candidate - 1;
+            else
+                candidate = candidate == count ? 1 : candidate + 1;
+        }
+        bool is_http = false;
+        if (playlist_service_visit(candidate, inspect_http, &is_http) ==
+                ESP_OK && is_http) {
+            *found_index = candidate;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool playlist_service_find_http(uint16_t start, int direction,
                                 uint16_t *found_index,
                                 playlist_station_t *station) {

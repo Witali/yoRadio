@@ -1,12 +1,18 @@
+set(YORADIO_AUDIO_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../yoRadio/src/audioI2S")
+
 idf_component_register(
   SRCS
     "app_main.c"
     "audio_service.c"
+    "input_service.c"
     "native_state.c"
     "network_service.c"
     "native_audio_output.c"
+    "native_audio_normalizer.cpp"
+    "${YORADIO_AUDIO_DIR}/AudioNormalizer.cpp"
     "persistent_settings.c"
     "playlist_service.c"
+    "radio_control.c"
     "storage_service.c"
     "time_service.c"
   INCLUDE_DIRS "."
@@ -15,7 +21,8 @@ idf_component_register(
 
 # ESP8266_RTOS_SDK exposes only -Og/-Os in menuconfig. Audio code needs the
 # same explicit performance profile used by the ESP32-C3 native build.
-target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+target_compile_options(${COMPONENT_LIB} PRIVATE -O3
+  $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++14>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
   YORADIO_HTTP_ONLY=1

@@ -27,6 +27,7 @@ typedef struct {
     uint16_t station_index;
     uint16_t station_count;
     uint16_t buffer_percent;
+    uint8_t volume;
     uint32_t bitrate_kbps;
     uint32_t sample_rate_hz;
     uint8_t channels;
@@ -35,6 +36,8 @@ typedef struct {
     char station[128];
     char title[192];
     char error[96];
+    char message[16];
+    uint32_t message_until_tick;
 } native_state_t;
 
 void native_state_init(void);
@@ -48,4 +51,7 @@ void native_state_set_audio(bool playing, bool connecting, const char *error);
 void native_state_set_title(const char *title);
 void native_state_set_stream(codec_type_t codec, uint32_t bitrate_kbps,
                              uint32_t sample_rate_hz, uint8_t channels);
+void native_state_set_station(uint16_t index, const char *name);
+void native_state_set_volume(uint8_t volume);
+void native_state_set_message(const char *message, uint32_t duration_ms);
 const char *native_codec_name(codec_type_t codec);

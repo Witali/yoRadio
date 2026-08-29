@@ -55,6 +55,7 @@ static void load_defaults(persistent_settings_t *settings) {
 
 static bool settings_valid(const persistent_settings_t *settings) {
     return settings && settings->last_station > 0 &&
+           settings->balance >= -16 && settings->balance <= 16 &&
            settings->smart_start <= 2 && settings->brightness <= 100 &&
            settings->normalization_target_db >= -24 &&
            settings->normalization_target_db <= 0 &&
@@ -135,4 +136,31 @@ esp_err_t persistent_settings_save(const persistent_settings_t *settings) {
     s_settings = *settings;
     xSemaphoreGive(s_lock);
     return ESP_OK;
+}
+
+esp_err_t persistent_settings_commit(void) {
+    persistent_settings_t snapshot;
+    persistent_settings_get(&snapshot);
+    return persistent_settings_save(&snapshot);
+}
+
+void persistent_settings_set_volume_runtime(uint8_t volume) {
+    if (!s_lock) return;
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    s_settings.volume = volume > 254U ? 254U : volume;
+    xSemaphoreGive(s_lock);
+}
+
+void persistent_settings_set_last_station_runtime(uint16_t station) {
+    if (!s_lock || !station) return;
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    s_settings.last_station = station;
+    xSemaphoreGive(s_lock);
+}
+
+void persistent_settings_set_smart_start_runtime(uint8_t state) {
+    if (!s_lock || state > 2U) return;
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    s_settings.smart_start = state;
+    xSemaphoreGive(s_lock);
 }
