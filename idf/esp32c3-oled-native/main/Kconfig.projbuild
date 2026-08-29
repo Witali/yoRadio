@@ -1,5 +1,13 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_QEMU
+    bool "Build the headless QEMU smoke-test profile"
+    default n
+    help
+        Skip peripherals that the ESP32-C3 QEMU machine does not emulate and
+        run deterministic NVS, SPIFFS and FreeRTOS startup checks instead.
+        This option is intended only for sdkconfig.qemu.defaults.
+
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n
