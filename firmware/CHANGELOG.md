@@ -3,6 +3,29 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-08-29
+
+### Native ESP-IDF ESP32-C3 OLED production image
+
+- Saved the physically verified, log-free ESP-IDF production application as
+  [`development/esp32c3-oled-native-production/app.bin`](development/esp32c3-oled-native-production/app.bin).
+- Fixed SNTP server-name lifetime: lwIP now receives pointers backed by
+  persistent storage rather than a deleted startup task stack.
+- Moved reconnect-triggered SNTP control and synchronization reporting to a
+  FreeRTOS task at priority 1. The lwIP callback only posts a constant-time
+  task notification.
+- Confirmed an SNTP response on a physical ESP32-C3 at 8.237 seconds while a
+  320 kbit/s MP3 stream was already decoding, with no underrun, reconnect or
+  audio interruption.
+- Exercised MP3, AAC and Ogg streams near 320 kbit/s. Decoder load remained
+  about 25–28% for MP3, 21% for AAC and 33–34% for Ogg, leaving at least a
+  roughly 3x real-time decoding margin.
+- Verified Wi-Fi client mode, HTTPS certificate validation, WebUI status,
+  SSD1306 initialization, stereo PDM output, playlist restoration and 55 host
+  regression tests.
+- Recorded the exact build identity, flash offset, size and SHA-256 in the
+  accompanying [manifest](development/esp32c3-oled-native-production/manifest.md).
+
 ## 0.9.724 — 2026-08-16
 
 ### ESP32-C3 0.42-inch OLED target
