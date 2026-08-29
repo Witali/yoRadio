@@ -5,10 +5,19 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-08-29
 
-### Native ESP-IDF ESP32-C3 OLED production image
+### Native ESP-IDF ESP32-C3 OLED production and development images
 
-- Saved the physically verified, log-free ESP-IDF production application as
-  [`development/esp32c3-oled-native-production/app.bin`](development/esp32c3-oled-native-production/app.bin).
+- Merged `codex/esp32c3-overclock-profile` through source revision `eef49d1`.
+- Rebuilt and archived separate production and development artifact sets. Each
+  set includes an OTA/WebUI `app.bin`, a 4 MiB recovery `full.bin`, bootloader,
+  partition table, initial OTA selector and a SHA-256 manifest:
+  - [`development/esp32c3-oled-native-production/`](development/esp32c3-oled-native-production/)
+  - [`development/esp32c3-oled-native-development/`](development/esp32c3-oled-native-development/)
+- The production application leaves 31% of the smallest app partition free;
+  the development application with diagnostic logging leaves 24% free.
+- Recovery images deliberately exclude user SPIFFS content. Flashing
+  `full.bin` at `0x0` erases the complete flash; normal OTA updates use
+  `app.bin` and preserve settings.
 - Fixed SNTP server-name lifetime: lwIP now receives pointers backed by
   persistent storage rather than a deleted startup task stack.
 - Moved reconnect-triggered SNTP control and synchronization reporting to a
@@ -23,8 +32,8 @@ entries are retained; changes are published under a new firmware version.
 - Verified Wi-Fi client mode, HTTPS certificate validation, WebUI status,
   SSD1306 initialization, stereo PDM output, playlist restoration and 55 host
   regression tests.
-- Recorded the exact build identity, flash offset, size and SHA-256 in the
-  accompanying [manifest](development/esp32c3-oled-native-production/manifest.md).
+- Recorded the exact build identity, flash offsets, sizes and SHA-256 values in
+  the accompanying manifests for both profiles.
 
 ## 0.9.724 — 2026-08-16
 
