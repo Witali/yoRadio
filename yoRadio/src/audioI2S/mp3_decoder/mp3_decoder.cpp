@@ -3639,7 +3639,7 @@ short ClipToShort(int x, int fracBits){
     /* assumes you've already rounded (x += (1 << (fracBits-1))) */
     x >>= fracBits;
 
-#ifndef __XTENSA__
+#if !defined(__XTENSA__) || defined(YORADIO_ESP8266_NATIVE)
     /* Ken's trick: clips to [-32768, 32767] */
     //ok vor generic case (fb)
     int sign = x >> 31;

@@ -108,7 +108,7 @@ inline int CLZ(int x){
 #endif
 }
 inline int FASTABS(int x){
-#ifdef __XTENSA__ //fb
+#if defined(__XTENSA__) && !defined(YORADIO_ESP8266_NATIVE) // ESP32 clamps instruction
     return __builtin_abs(x);
 #else
     int sign;
@@ -121,7 +121,7 @@ inline int64_t MADD64(int64_t sum64, int x, int y){
     return sum64;
 }
 inline short CLIPTOSHORT(int x){
-#ifdef __XTENSA__ //fb
+#if defined(__XTENSA__) && !defined(YORADIO_ESP8266_NATIVE) // ESP32 clamps instruction
     asm ("clamps %0, %1, 15" : "=a" (x) : "a" (x) : );
     return x;
 #else
