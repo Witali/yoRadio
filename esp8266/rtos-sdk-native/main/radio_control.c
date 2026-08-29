@@ -189,3 +189,10 @@ void radio_control_flush_pending(void) {
     }
     xSemaphoreGive(s_lock);
 }
+
+void radio_control_settings_changed(void) {
+    if (!s_lock) return;
+    if (xSemaphoreTake(s_lock, pdMS_TO_TICKS(100)) != pdTRUE) return;
+    mark_settings_dirty();
+    xSemaphoreGive(s_lock);
+}

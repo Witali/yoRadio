@@ -12,3 +12,4 @@ esp_err_t radio_control_next(void);
 esp_err_t radio_control_previous(void);
 esp_err_t radio_control_adjust_volume(int delta);
 void radio_control_flush_pending(void);
+void radio_control_settings_changed(void);

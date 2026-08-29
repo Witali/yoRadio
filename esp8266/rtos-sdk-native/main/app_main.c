@@ -19,6 +19,7 @@
 #include "radio_control.h"
 #include "storage_service.h"
 #include "time_service.h"
+#include "web_service.h"
 
 static const char *TAG = "yoradio8266";
 
@@ -61,9 +62,11 @@ void app_main(void) {
     ESP_ERROR_CHECK(input_service_start());
     ESP_ERROR_CHECK(time_service_start());
     ESP_ERROR_CHECK(network_service_start());
+    ESP_ERROR_CHECK(web_service_start());
 
     for (;;) {
         radio_control_flush_pending();
+        web_service_poll();
         vTaskDelay(pdMS_TO_TICKS(250));
     }
 }

@@ -13,6 +13,9 @@ set(YORADIO_SOURCES
     "radio_control.c"
     "storage_service.c"
     "time_service.c")
+list(APPEND YORADIO_SOURCES
+    "web_pages_bridge.cpp"
+    "web_service.c")
 set(YORADIO_INCLUDE_DIRS ".")
 if(CONFIG_YORADIO_OLED)
   list(APPEND YORADIO_SOURCES "display_service.c")
@@ -23,8 +26,8 @@ endif()
 idf_component_register(
   SRCS ${YORADIO_SOURCES}
   INCLUDE_DIRS ${YORADIO_INCLUDE_DIRS}
-  REQUIRES esp8266 esp_event freertos heap helix_codecs log lwip nvs_flash pthread
-           spiffs tcpip_adapter)
+  REQUIRES esp8266 esp_event esp_http_server freertos heap helix_codecs log
+           lwip nvs_flash pthread spiffs tcpip_adapter)
 
 # ESP8266_RTOS_SDK exposes only -Og/-Os in menuconfig. Audio code needs the
 # same explicit performance profile used by the ESP32-C3 native build.

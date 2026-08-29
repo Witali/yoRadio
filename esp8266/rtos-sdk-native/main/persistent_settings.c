@@ -138,6 +138,15 @@ esp_err_t persistent_settings_save(const persistent_settings_t *settings) {
     return ESP_OK;
 }
 
+esp_err_t persistent_settings_update_runtime(
+    const persistent_settings_t *settings) {
+    if (!settings_valid(settings)) return ESP_ERR_INVALID_ARG;
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    s_settings = *settings;
+    xSemaphoreGive(s_lock);
+    return ESP_OK;
+}
+
 esp_err_t persistent_settings_commit(void) {
     persistent_settings_t snapshot;
     persistent_settings_get(&snapshot);

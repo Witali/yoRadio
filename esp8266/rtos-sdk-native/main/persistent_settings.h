@@ -36,6 +36,8 @@ typedef struct {
 esp_err_t persistent_settings_init(void);
 void persistent_settings_get(persistent_settings_t *output);
 esp_err_t persistent_settings_save(const persistent_settings_t *settings);
+esp_err_t persistent_settings_update_runtime(
+    const persistent_settings_t *settings);
 esp_err_t persistent_settings_commit(void);
 void persistent_settings_set_volume_runtime(uint8_t volume);
 void persistent_settings_set_last_station_runtime(uint16_t station);
