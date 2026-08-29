@@ -25,7 +25,7 @@ test("the ESP32-C3 development image is identified by its manifest", () => {
   assert.ok(manifest.includes(`| \`app.bin\` | ${formattedSize} |`));
   assert.match(manifest.toLowerCase(), new RegExp(hash));
   assert.match(manifest, /Flash offset[\s\S]*`0x10000`/);
-  assert.match(manifest, /Embedded source revision: `d595dac`/);
+  assert.match(manifest, /Embedded source revision: `0028b7e`/);
 });
 
 test("the ESP32-C3 development image is described in the changelog", () => {

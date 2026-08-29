@@ -3,7 +3,7 @@
 ## Build
 
 - Date: 2026-08-29
-- Embedded source revision: `d595dac`
+- Embedded source revision: `0028b7e`
 - ESP-IDF: 6.0.2
 - Target: ESP32-C3, RISC-V, single core at 160 MHz
 - Board: 01Space-style ESP32-C3 with onboard 0.42-inch SSD1306 OLED
@@ -17,7 +17,7 @@
 
 | File | Size | Flash offset | SHA-256 |
 |---|---:|---:|---|
-| `app.bin` | 1,303,824 | `0x10000` | `D3B519173DDEF7B24E1042D04DCB65B64AB4D8E9BA1E7F5990EA336A8B80A34D` |
+| `app.bin` | 1,303,824 | `0x10000` | `0C1343E6F14A36BA1E85418AE925696DE14B5609BE0E93DAD3E93452231FEABF` |
 
 This is an application-only update. Writing it at `0x10000`, or uploading it
 through WebUI OTA, preserves NVS, saved settings, Wi-Fi configuration,
