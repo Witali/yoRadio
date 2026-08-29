@@ -5,6 +5,7 @@
 
 #include "audio_service.h"
 #include "board_config.h"
+#include "cpu_profiler.h"
 #include "display_settings.h"
 #include "driver/gpio.h"
 #include "encoder_input.h"
@@ -940,6 +941,7 @@ static void services_task(void *argument) {
 void app_main(void) {
     ESP_LOGI(TAG, "Starting pure ESP-IDF ESP32-C3 OLED yoRadio");
     native_state_init(&s_state);
+    ESP_ERROR_CHECK(cpu_profiler_start());
 
 #ifdef YORADIO_CODEC_BENCHMARK
     ESP_LOGI(TAG, "Codec benchmark mode: network, WebUI and display disabled");
