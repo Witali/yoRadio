@@ -1,7 +1,5 @@
 set(YORADIO_AUDIO_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../yoRadio/src/audioI2S")
-
-idf_component_register(
-  SRCS
+set(YORADIO_SOURCES
     "app_main.c"
     "audio_service.c"
     "input_service.c"
@@ -14,8 +12,17 @@ idf_component_register(
     "playlist_service.c"
     "radio_control.c"
     "storage_service.c"
-    "time_service.c"
-  INCLUDE_DIRS "."
+    "time_service.c")
+set(YORADIO_INCLUDE_DIRS ".")
+if(CONFIG_YORADIO_OLED)
+  list(APPEND YORADIO_SOURCES "display_service.c")
+  list(APPEND YORADIO_INCLUDE_DIRS
+    "${CMAKE_CURRENT_LIST_DIR}/../../../idf/esp32c3-oled-native/main")
+endif()
+
+idf_component_register(
+  SRCS ${YORADIO_SOURCES}
+  INCLUDE_DIRS ${YORADIO_INCLUDE_DIRS}
   REQUIRES esp8266 esp_event freertos heap helix_codecs log lwip nvs_flash pthread
            spiffs tcpip_adapter)
 

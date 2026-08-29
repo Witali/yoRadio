@@ -6,6 +6,9 @@
 
 #include "board_config.h"
 #include "audio_service.h"
+#if CONFIG_YORADIO_OLED
+#include "display_service.h"
+#endif
 #include "input_service.h"
 #include "native_audio_output.h"
 #include "native_state.h"
@@ -36,6 +39,11 @@ void app_main(void) {
     }
     ESP_ERROR_CHECK(result);
     ESP_ERROR_CHECK(persistent_settings_init());
+#if CONFIG_YORADIO_OLED
+    ESP_ERROR_CHECK(display_service_start());
+#else
+    ESP_LOGI(TAG, "OLED disabled: WebUI-only low-memory profile");
+#endif
     ESP_ERROR_CHECK(native_audio_output_init());
     ESP_ERROR_CHECK(audio_service_init());
     result = storage_service_init();
