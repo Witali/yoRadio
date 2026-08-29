@@ -5,6 +5,8 @@
 #include "freertos/task.h"
 
 #include "board_config.h"
+#include "audio_service.h"
+#include "native_audio_output.h"
 #include "native_state.h"
 #include "network_service.h"
 #include "nvs_flash.h"
@@ -32,6 +34,8 @@ void app_main(void) {
     }
     ESP_ERROR_CHECK(result);
     ESP_ERROR_CHECK(persistent_settings_init());
+    ESP_ERROR_CHECK(native_audio_output_init());
+    ESP_ERROR_CHECK(audio_service_init());
     result = storage_service_init();
     if (result == ESP_OK) {
         result = playlist_service_init();

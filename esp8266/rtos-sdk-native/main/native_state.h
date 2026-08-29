@@ -44,4 +44,8 @@ void native_state_set_network(network_mode_t mode);
 void native_state_set_ip(const char *ip);
 void native_state_set_wifi_rssi(int8_t rssi);
 void native_state_set_station_count(uint16_t count);
+void native_state_set_audio(bool playing, bool connecting, const char *error);
+void native_state_set_title(const char *title);
+void native_state_set_stream(codec_type_t codec, uint32_t bitrate_kbps,
+                             uint32_t sample_rate_hz, uint8_t channels);
 const char *native_codec_name(codec_type_t codec);
