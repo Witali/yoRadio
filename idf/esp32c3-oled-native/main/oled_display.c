@@ -400,7 +400,7 @@ void oled_display_draw_clock(oled_display_t *display, uint8_t hour,
     if (!display) return;
     oled_display_clear(display);
     const int y = (OLED_DISPLAY_HEIGHT - CLOCK_DIGIT_HEIGHT) / 2;
-    const int digit_x[] = {3, 18, 39, 54};
+    const int digit_x[] = {2, 18, 40, 56};
     int digits[] = {-1, -1, -1, -1};
     if (time_valid) {
         digits[0] = hour / 10U;

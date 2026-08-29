@@ -210,7 +210,23 @@ test("stopped-radio screensaver draws a full-screen clock and wakes on BOOT", ()
   assert.match(display, /CLOCK_DIGIT_WIDTH 13/);
   assert.match(display, /CLOCK_DIGIT_HEIGHT 30/);
   assert.match(display, /static const uint8_t segments\[10\]/);
-  assert.match(display, /const int digit_x\[\] = \{3, 18, 39, 54\}/);
+  assert.match(display, /const int digit_x\[\] = \{2, 18, 40, 56\}/);
+  const displayWidth = Number(
+    header.match(/OLED_DISPLAY_WIDTH (\d+)/)[1],
+  );
+  const digitWidth = Number(
+    display.match(/CLOCK_DIGIT_WIDTH (\d+)/)[1],
+  );
+  const digitPositions = display
+    .match(/const int digit_x\[\] = \{([^}]+)\}/)[1]
+    .split(",")
+    .map(Number);
+  assert.ok(
+    digitPositions.every(
+      (position) => position >= 0 && position + digitWidth <= displayWidth,
+    ),
+    "all clock digits must fit within the OLED width",
+  );
   assert.match(app, /CLOCK_VALID_AFTER_EPOCH 1704067200LL/);
   assert.match(app, /localtime_r\(&now, &local_time\)/);
   assert.match(
