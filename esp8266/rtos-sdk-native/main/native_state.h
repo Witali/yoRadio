@@ -31,6 +31,7 @@ typedef struct {
     uint32_t sample_rate_hz;
     uint8_t channels;
     codec_type_t codec;
+    char ip[16];
     char station[128];
     char title[192];
     char error[96];
@@ -39,5 +40,8 @@ typedef struct {
 void native_state_init(void);
 void native_state_snapshot(native_state_t *output);
 void native_state_update(const native_state_t *input);
+void native_state_set_network(network_mode_t mode);
+void native_state_set_ip(const char *ip);
+void native_state_set_wifi_rssi(int8_t rssi);
+void native_state_set_station_count(uint16_t count);
 const char *native_codec_name(codec_type_t codec);
-
