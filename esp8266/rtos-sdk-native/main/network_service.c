@@ -5,6 +5,7 @@
 
 #include "esp_event.h"
 #include "esp_log.h"
+#include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
@@ -17,7 +18,7 @@
 #define WIFI_PATH "/spiffs/data/wifi.csv"
 #define WIFI_MAX_CREDENTIALS 5U
 #define WIFI_RETRIES_PER_CREDENTIAL 2U
-#define WIFI_CONNECT_TIMEOUT_MS 20000U
+#define WIFI_CONNECT_TIMEOUT_MS 30000U
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
 
@@ -129,17 +130,37 @@ static void event_handler(void *argument, esp_event_base_t base,
             else
                 xEventGroupSetBits(s_events, WIFI_FAILED_BIT);
         } else {
-            xEventGroupSetBits(s_events, WIFI_FAILED_BIT);
+            /* Keep cycling saved networks until the supervisor's overall
+             * deadline. A short association failure must not permanently
+             * strand the station side once recovery AP starts. */
+            s_retries = 0;
+            if (select_credential(0) == ESP_OK)
+                esp_wifi_connect();
+            else
+                xEventGroupSetBits(s_events, WIFI_FAILED_BIT);
         }
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)data;
         s_connected = true;
         s_retries = 0;
+        esp_wifi_set_ps(WIFI_PS_NONE);
+        if (s_access_point) {
+            esp_err_t mode_result = esp_wifi_set_mode(WIFI_MODE_STA);
+            if (mode_result == ESP_OK) {
+                s_access_point = false;
+                ESP_LOGI(TAG, "Recovery AP stopped after client connected");
+            } else {
+                ESP_LOGW(TAG, "Cannot stop recovery AP: %s",
+                         esp_err_to_name(mode_result));
+            }
+        }
         native_state_set_network(NETWORK_CLIENT);
         native_state_set_ip(ip4addr_ntoa(&event->ip_info.ip));
-        time_service_notify_connected();
         xEventGroupSetBits(s_events, WIFI_CONNECTED_BIT);
-        ESP_LOGI(TAG, "Client address: %s", ip4addr_ntoa(&event->ip_info.ip));
+        ESP_LOGI(TAG, "Client address: %s; free heap: %u",
+                 ip4addr_ntoa(&event->ip_info.ip),
+                 (unsigned)esp_get_free_heap_size());
+        time_service_notify_connected();
     }
 }
 
@@ -148,21 +169,35 @@ static void supervisor_task(void *argument) {
     EventBits_t bits = xEventGroupWaitBits(
         s_events, WIFI_CONNECTED_BIT | WIFI_FAILED_BIT, pdFALSE, pdFALSE,
         pdMS_TO_TICKS(WIFI_CONNECT_TIMEOUT_MS));
-    if (!(bits & WIFI_CONNECTED_BIT)) {
+    if (!(bits & WIFI_CONNECTED_BIT) && !s_connected) {
         esp_err_t result = start_access_point();
         if (result != ESP_OK) {
             native_state_set_network(NETWORK_ERROR);
             ESP_LOGE(TAG, "Recovery AP failed: %s", esp_err_to_name(result));
         }
     }
-    while (true) {
-        if (s_connected) {
-            wifi_ap_record_t access_point;
-            if (esp_wifi_sta_get_ap_info(&access_point) == ESP_OK)
-                native_state_set_wifi_rssi(access_point.rssi);
+    TickType_t next_ap_retry = xTaskGetTickCount();
+    while (!s_connected) {
+        if (s_access_point &&
+            (int32_t)(xTaskGetTickCount() - next_ap_retry) >= 0) {
+            esp_wifi_connect();
+            next_ap_retry =
+                xTaskGetTickCount() + pdMS_TO_TICKS(5000U);
         }
         vTaskDelay(pdMS_TO_TICKS(2000));
     }
+    ESP_LOGI(TAG, "Wi-Fi supervisor exiting after DHCP");
+    vTaskDelete(NULL);
+}
+
+void network_service_poll(void) {
+    static TickType_t next_update;
+    TickType_t now = xTaskGetTickCount();
+    if (!s_connected || (int32_t)(now - next_update) < 0) return;
+    wifi_ap_record_t access_point;
+    if (esp_wifi_sta_get_ap_info(&access_point) == ESP_OK)
+        native_state_set_wifi_rssi(access_point.rssi);
+    next_update = now + pdMS_TO_TICKS(2000U);
 }
 
 esp_err_t network_service_start(void) {
@@ -196,5 +231,6 @@ esp_err_t network_service_start(void) {
 bool network_service_connected(void) { return s_connected; }
 
 esp_err_t network_service_set_streaming(bool active) {
-    return esp_wifi_set_ps(active ? WIFI_PS_NONE : WIFI_PS_MIN_MODEM);
+    (void)active;
+    return esp_wifi_set_ps(WIFI_PS_NONE);
 }

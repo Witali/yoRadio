@@ -27,8 +27,10 @@
 #define HTTP_HOST_BYTES 96U
 #define HTTP_MAX_REDIRECTS 3U
 #define SOCKET_READ_TIMEOUT_MS 200U
-#define CODEC_HEAP_RESERVE_BYTES 12000U
-#define AUDIO_STACK_BYTES 6144U
+#define HTTP_HEADER_TIMEOUT_MS 10000U
+#define HTTP_OPEN_ATTEMPTS 2U
+#define CODEC_HEAP_RESERVE_BYTES 2048U
+#define AUDIO_STACK_BYTES 5120U
 
 typedef struct {
     uint32_t generation;
@@ -215,16 +217,28 @@ static int open_http_stream(char *url, http_stream_t *stream) {
         }
         size_t received_total = 0;
         size_t header_size = 0;
+        int64_t header_deadline =
+            esp_timer_get_time() + HTTP_HEADER_TIMEOUT_MS * 1000LL;
         while (received_total < sizeof(s_work) - 1U &&
                !find_header_end(s_work, received_total, &header_size)) {
             int received = recv(socket_fd, s_work + received_total,
                                 sizeof(s_work) - 1U - received_total, 0);
+            if (received > 0) {
+                received_total += (size_t)received;
+                continue;
+            }
+            if (received < 0 &&
+                (errno == EAGAIN || errno == EWOULDBLOCK) &&
+                esp_timer_get_time() < header_deadline) {
+                continue;
+            }
             if (received <= 0) {
                 close(socket_fd);
                 return -4;
             }
-            received_total += (size_t)received;
         }
+        if (!header_size)
+            find_header_end(s_work, received_total, &header_size);
         if (!header_size) {
             close(socket_fd);
             return -5;
@@ -287,7 +301,11 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
     if (!generation_current(context->generation)) return false;
     esp_err_t result = native_audio_output_write(
         pcm, samples, info->sample_rate, info->channels);
-    if (result != ESP_OK) return false;
+    if (result != ESP_OK) {
+        ESP_LOGE(TAG, "PCM output failed: %s",
+                 esp_err_to_name(result));
+        return false;
+    }
     context->decoder_bitrate = info->bitrate;
     native_state_set_stream(context->codec_kind == HELIX_CODEC_MP3
                                 ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
@@ -324,10 +342,10 @@ static void audio_task(void *argument) {
         audio_command_t command;
         xQueueReceive(s_commands, &command, portMAX_DELAY);
         if (!command.play) {
+            native_audio_output_silence();
             helix_codec_destroy(codec);
             codec = NULL;
             codec_kind = 0;
-            native_audio_output_silence();
             native_state_set_audio(false, false, NULL);
             network_service_set_streaming(false);
             continue;
@@ -337,10 +355,23 @@ static void audio_task(void *argument) {
         http_stream_t stream;
         memset(&stream, 0, sizeof(stream));
         stream.socket = -1;
-        int opened = open_http_stream(command.url, &stream);
+        int opened = -1;
+        for (unsigned attempt = 0;
+             attempt < HTTP_OPEN_ATTEMPTS &&
+             generation_current(command.generation); ++attempt) {
+            opened = open_http_stream(command.url, &stream);
+            if (opened == 0) break;
+            if (attempt + 1U < HTTP_OPEN_ATTEMPTS) {
+                ESP_LOGW(TAG, "Stream open attempt %u failed: %d",
+                         attempt + 1U, opened);
+                vTaskDelay(pdMS_TO_TICKS(250U));
+            }
+        }
         if (opened != 0 || !generation_current(command.generation)) {
             if (stream.socket >= 0) close(stream.socket);
             if (generation_current(command.generation)) {
+                ESP_LOGW(TAG, "Open stream failed: %d (errno %d)",
+                         opened, errno);
                 native_state_set_audio(false, false,
                     opened == -7 ? "HTTPS NOT SUPPORTED" : "CONNECTION ERROR");
                 network_service_set_streaming(false);
@@ -374,15 +405,16 @@ static void audio_task(void *argument) {
                 native_state_set_audio(false, false, "UNSUPPORTED STREAM");
             continue;
         }
+        bool decoder_ready = true;
         if (!codec) {
             codec = helix_codec_create(codec_kind, CODEC_HEAP_RESERVE_BYTES);
-        } else if (helix_codec_switch(codec, codec_kind) != 0) {
-            helix_codec_destroy(codec);
-            codec = NULL;
+            decoder_ready = codec != NULL;
+        } else {
+            decoder_ready = helix_codec_switch(codec, codec_kind) == 0;
         }
-        if (!codec) {
+        if (!decoder_ready) {
             close(stream.socket);
-            native_state_set_audio(false, false, "NOT ENOUGH MEMORY");
+            native_state_set_audio(false, false, "DECODER INIT ERROR");
             network_service_set_streaming(false);
             continue;
         }
@@ -439,10 +471,13 @@ static void audio_task(void *argument) {
         }
         close(stream.socket);
         if (generation_current(command.generation)) {
+            native_audio_output_silence();
+            if (feed < 0)
+                ESP_LOGE(TAG, "Decoder stopped: %d (errno %d)",
+                         feed, errno);
             helix_codec_destroy(codec);
             codec = NULL;
             codec_kind = 0;
-            native_audio_output_silence();
             native_state_set_audio(false, false,
                                    feed < 0 ? "AUDIO STREAM ERROR" : NULL);
             network_service_set_streaming(false);

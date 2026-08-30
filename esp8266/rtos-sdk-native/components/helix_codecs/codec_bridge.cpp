@@ -8,14 +8,15 @@
 #include "aac_decoder.h"
 #include "codec_arena_native.h"
 #include "esp_log.h"
+#include "esp_heap_caps.h"
 #include "esp_system.h"
 #include "mp3_decoder.h"
 
 namespace {
-constexpr size_t kArenaBytes = 24U * 1024U;
-/* 2048 bytes covers a maximum-size 320-kbit/s MP3 frame and normal
- * high-bitrate ADTS AAC frames while saving 2 KiB of scarce ESP8266 heap. */
-constexpr size_t kInputBytes = 2048U;
+constexpr size_t kArenaBytes = 23328U;
+/* 1536 bytes covers a maximum-size 320-kbit/s MP3 frame and normal
+ * high-bitrate ADTS AAC frames while conserving scarce ESP8266 DRAM. */
+constexpr size_t kInputBytes = 1536U;
 constexpr size_t kPcmSamples = 1152U * 2U;
 constexpr char kTag[] = "helix_bridge";
 
@@ -77,10 +78,13 @@ struct helix_codec {
     helix_codec_kind_t kind;
     size_t input_start;
     size_t input_size;
-    uint8_t arena[kArenaBytes];
-    uint8_t input[kInputBytes];
-    int16_t pcm[kPcmSamples];
+    uint8_t *arena;
+    uint8_t *input;
+    int16_t *pcm;
 };
+static constexpr size_t kWorkspaceBytes = sizeof(helix_codec) +
+    kArenaBytes + kInputBytes + sizeof(int16_t) * kPcmSamples;
+
 
 static void free_decoder(helix_codec *codec) {
     if (codec->kind == HELIX_CODEC_MP3) MP3Decoder_FreeBuffers();
@@ -184,16 +188,29 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
                                                size_t reserve_heap_bytes) {
     if (kind != HELIX_CODEC_MP3 && kind != HELIX_CODEC_AAC) return nullptr;
     size_t free_heap = esp_get_free_heap_size();
-    if (free_heap < sizeof(helix_codec) + reserve_heap_bytes) {
+    if (free_heap < kWorkspaceBytes + reserve_heap_bytes) {
         ESP_LOGE(kTag, "Need %u bytes, free heap %u, reserve %u",
-                 (unsigned)sizeof(helix_codec), (unsigned)free_heap,
+                 (unsigned)kWorkspaceBytes, (unsigned)free_heap,
                  (unsigned)reserve_heap_bytes);
         return nullptr;
     }
-    helix_codec *codec = static_cast<helix_codec *>(std::calloc(1,
-                                                               sizeof(*codec)));
-    if (!codec || !CodecArenaBind(codec->arena, sizeof(codec->arena))) {
+    helix_codec *codec = static_cast<helix_codec *>(std::calloc(1, sizeof(*codec)));
+    if (codec) {
+        codec->input = static_cast<uint8_t *>(
+            heap_caps_malloc(kInputBytes, MALLOC_CAP_8BIT));
+        codec->pcm = static_cast<int16_t *>(
+            heap_caps_malloc(sizeof(int16_t) * kPcmSamples, MALLOC_CAP_8BIT));
+    }
+    if (!codec || !codec->input || !codec->pcm ||
+        !CodecArenaBind(nullptr, kArenaBytes)) {
+        if (codec) {
+            heap_caps_free(codec->pcm);
+            heap_caps_free(codec->input);
+            heap_caps_free(codec->arena);
+        }
         std::free(codec);
+        ESP_LOGE(kTag, "Heap cannot allocate %u-byte workspace",
+                 (unsigned)kWorkspaceBytes);
         return nullptr;
     }
     bool allocated = allocate_decoder(codec, kind);
@@ -201,12 +218,15 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
         if (kind == HELIX_CODEC_MP3) MP3Decoder_FreeBuffers();
         else AACDecoder_FreeBuffers();
         CodecArenaUnbind();
+        heap_caps_free(codec->pcm);
+        heap_caps_free(codec->input);
+        heap_caps_free(codec->arena);
         std::free(codec);
         return nullptr;
     }
     ESP_LOGI(kTag, "%s workspace: %u bytes, arena used: %u",
              kind == HELIX_CODEC_MP3 ? "MP3" : "AAC",
-             (unsigned)sizeof(*codec), (unsigned)CodecArenaUsed());
+             (unsigned)kWorkspaceBytes, (unsigned)CodecArenaUsed());
     return codec;
 }
 
@@ -214,6 +234,9 @@ extern "C" void helix_codec_destroy(helix_codec_t *codec) {
     if (!codec) return;
     free_decoder(codec);
     if (!CodecArenaUnbind()) ESP_LOGE(kTag, "Codec arena is still owned");
+    heap_caps_free(codec->pcm);
+    heap_caps_free(codec->input);
+    heap_caps_free(codec->arena);
     std::free(codec);
 }
 
@@ -302,7 +325,7 @@ extern "C" int helix_codec_feed(helix_codec_t *codec, const uint8_t *data,
 }
 
 extern "C" size_t helix_codec_workspace_size(void) {
-    return sizeof(helix_codec);
+    return kWorkspaceBytes;
 }
 
 extern "C" size_t helix_codec_arena_used(const helix_codec_t *codec) {

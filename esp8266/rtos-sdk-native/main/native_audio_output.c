@@ -13,6 +13,7 @@
 
 static const char *TAG = "audio_output";
 static uint32_t s_sample_rate;
+static bool s_i2s_started;
 static uint8_t s_volume = 160;
 static int8_t s_balance;
 static bool s_normalization_enabled;
@@ -49,7 +50,7 @@ esp_err_t native_audio_output_init(void) {
         .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
         .communication_format = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB,
-        .dma_buf_count = 6,
+        .dma_buf_count = 4,
         .dma_buf_len = 128,
         .tx_desc_auto_clear = true,
     };
@@ -61,9 +62,15 @@ esp_err_t native_audio_output_init(void) {
     };
     esp_err_t result = i2s_driver_install(I2S_NUM_0, &config, 0, NULL);
     if (result == ESP_OK) result = i2s_set_pin(I2S_NUM_0, &pins);
-    if (result == ESP_OK) s_sample_rate = 44100;
+    if (result == ESP_OK)
+        result = i2s_set_clk(I2S_NUM_0, 44100, I2S_BITS_PER_SAMPLE_16BIT,
+                             I2S_CHANNEL_STEREO);
+    if (result == ESP_OK) {
+        s_sample_rate = 44100;
+        result = i2s_stop(I2S_NUM_0);
+    }
     native_audio_output_reload_settings();
-    ESP_LOGI(TAG, "I2S DMA: 6 x 128 stereo frames");
+    ESP_LOGI(TAG, "I2S DMA: 4 x 128 stereo frames");
     return result;
 }
 
@@ -106,15 +113,34 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         if (result != ESP_OK) return result;
         s_sample_rate = sample_rate;
     }
-    size_t bytes_written = 0;
     size_t bytes = sample_count * sizeof(*samples);
-    esp_err_t result = i2s_write(I2S_NUM_0, samples, bytes, &bytes_written,
-                                 pdMS_TO_TICKS(120));
-    return result == ESP_OK && bytes_written == bytes ? ESP_OK : ESP_FAIL;
+    if (!s_i2s_started) {
+        esp_err_t result = i2s_start(I2S_NUM_0);
+        if (result != ESP_OK) return result;
+        s_i2s_started = true;
+    }
+
+    size_t offset = 0;
+    while (offset < bytes) {
+        size_t bytes_written = 0;
+        esp_err_t result = i2s_write(
+            I2S_NUM_0, (uint8_t *)samples + offset, bytes - offset,
+            &bytes_written, pdMS_TO_TICKS(1000));
+        if (result != ESP_OK || !bytes_written) {
+            ESP_LOGE(TAG, "I2S write failed: %s, %u/%u bytes",
+                     esp_err_to_name(result), (unsigned)offset,
+                     (unsigned)bytes);
+            return result == ESP_OK ? ESP_FAIL : result;
+        }
+        offset += bytes_written;
+    }
+    return ESP_OK;
 }
 
 void native_audio_output_silence(void) {
-    i2s_zero_dma_buffer(I2S_NUM_0);
+    if (!s_i2s_started) return;
+    i2s_stop(I2S_NUM_0);
+    s_i2s_started = false;
 }
 
 void native_audio_output_reload_settings(void) {

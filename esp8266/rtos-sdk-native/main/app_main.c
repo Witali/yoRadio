@@ -45,7 +45,6 @@ void app_main(void) {
 #else
     ESP_LOGI(TAG, "OLED disabled: WebUI-only low-memory profile");
 #endif
-    ESP_ERROR_CHECK(native_audio_output_init());
     ESP_ERROR_CHECK(audio_service_init());
     result = storage_service_init();
     if (result == ESP_OK) {
@@ -64,8 +63,14 @@ void app_main(void) {
     ESP_ERROR_CHECK(network_service_start());
     ESP_ERROR_CHECK(web_service_start());
 
+    bool audio_output_ready = false;
     for (;;) {
         radio_control_flush_pending();
+        if (!audio_output_ready && network_service_connected()) {
+            ESP_ERROR_CHECK(native_audio_output_init());
+            audio_output_ready = true;
+        }
+        network_service_poll();
         web_service_poll();
         vTaskDelay(pdMS_TO_TICKS(250));
     }

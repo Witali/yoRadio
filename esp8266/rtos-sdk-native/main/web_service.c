@@ -420,22 +420,28 @@ static void handle_command(httpd_req_t *request, char *command) {
 }
 
 static esp_err_t websocket_handler(httpd_req_t *request) {
+    if (request->method == HTTP_GET) {
+        ESP_LOGI(TAG, "WebUI client connected on socket %d",
+                 httpd_req_to_sockfd(request));
+        return ESP_OK;
+    }
+
     int socket = httpd_req_to_sockfd(request);
     if (s_ws_fd >= 0 && s_ws_fd != socket) {
         httpd_sess_trigger_close(s_server, s_ws_fd);
     }
     s_ws_fd = socket;
-    httpd_ws_frame_t frame = {0};
-    esp_err_t result = httpd_ws_recv_frame(request, &frame, 0);
+    char payload[WS_COMMAND_MAX + 1U];
+    httpd_ws_frame_t frame = {
+        .payload = (uint8_t *)payload,
+    };
+    esp_err_t result =
+        httpd_ws_recv_frame(request, &frame, sizeof(payload) - 1U);
     if (result != ESP_OK) return result;
     if (frame.type != HTTPD_WS_TYPE_TEXT || frame.len == 0U ||
         frame.len > WS_COMMAND_MAX) {
         return ESP_OK;
     }
-    char payload[WS_COMMAND_MAX + 1U];
-    frame.payload = (uint8_t *)payload;
-    result = httpd_ws_recv_frame(request, &frame, sizeof(payload) - 1U);
-    if (result != ESP_OK) return result;
     payload[frame.len] = '\0';
     handle_command(request, payload);
     return ESP_OK;
@@ -607,7 +613,7 @@ static esp_err_t register_get(const char *uri, esp_err_t (*handler)(httpd_req_t 
 esp_err_t web_service_start(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = 80;
-    config.stack_size = 5120;
+    config.stack_size = 6144;
     config.max_open_sockets = 5;
     config.max_uri_handlers = 18;
     config.lru_purge_enable = true;

@@ -182,7 +182,7 @@ esp_err_t input_service_start(void) {
              BOARD_ENCODER_A_GPIO, BOARD_ENCODER_B_GPIO);
 #endif
 
-    if (xTaskCreate(input_task, "input", 2048, NULL, 8, NULL) != pdPASS)
+    if (xTaskCreate(input_task, "input", 1536, NULL, 8, NULL) != pdPASS)
         return ESP_ERR_NO_MEM;
     ESP_LOGI(TAG, "BOOT: click play/stop, double next, long previous");
     return ESP_OK;
