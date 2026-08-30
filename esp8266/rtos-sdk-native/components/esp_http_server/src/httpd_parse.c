@@ -678,7 +678,9 @@ bool httpd_validate_req_ptr(httpd_req_t *r)
         if (hd) {
             /* Check if this function is running in the context of
              * the correct httpd server thread */
-            if (httpd_os_thread_handle() == hd->hd_td.handle) {
+            struct httpd_req_aux *ra = r->aux;
+            if (httpd_os_thread_handle() == hd->hd_td.handle ||
+                (ra && ra->sd && ra->sd->for_async_req)) {
                 return true;
             }
         }

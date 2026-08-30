@@ -14,6 +14,8 @@
 
 
 #include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 #include <esp_log.h>
 #include <esp_err.h>
 
@@ -147,6 +149,73 @@ int httpd_recv_with_opt(httpd_req_t *r, char *buf, size_t buf_len, bool halt_aft
 int httpd_recv(httpd_req_t *r, char *buf, size_t buf_len)
 {
     return httpd_recv_with_opt(r, buf, buf_len, false);
+}
+
+static void httpd_async_wakeup(void *argument)
+{
+    (void)argument;
+}
+
+esp_err_t httpd_req_async_handler_begin(httpd_req_t *r, httpd_req_t **out)
+{
+    if (r == NULL || out == NULL || r->aux == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    struct httpd_req_aux *r_aux = r->aux;
+    if (r_aux->sd == NULL || r_aux->sd->for_async_req) {
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    httpd_req_t *async = malloc(sizeof(*async));
+    if (async == NULL) {
+        return ESP_ERR_NO_MEM;
+    }
+    memcpy(async, r, sizeof(*async));
+
+    struct httpd_req_aux *async_aux = malloc(sizeof(*async_aux));
+    if (async_aux == NULL) {
+        free(async);
+        return ESP_ERR_NO_MEM;
+    }
+    memcpy(async_aux, r_aux, sizeof(*async_aux));
+
+    struct httpd_data *hd = (struct httpd_data *)r->handle;
+    async_aux->resp_hdrs =
+        calloc(hd->config.max_resp_headers, sizeof(struct resp_hdr));
+    if (async_aux->resp_hdrs == NULL) {
+        free(async_aux);
+        free(async);
+        return ESP_ERR_NO_MEM;
+    }
+    memcpy(async_aux->resp_hdrs, r_aux->resp_hdrs,
+           hd->config.max_resp_headers * sizeof(struct resp_hdr));
+    async->aux = async_aux;
+
+    r_aux->remaining_len = 0;
+    r_aux->sd->for_async_req = true;
+    *out = async;
+    return ESP_OK;
+}
+
+esp_err_t httpd_req_async_handler_complete(httpd_req_t *r)
+{
+    if (r == NULL || r->handle == NULL || r->aux == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    httpd_handle_t handle = r->handle;
+    struct httpd_req_aux *ra = r->aux;
+    if (ra->sd == NULL || !ra->sd->for_async_req) {
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    ra->sd->for_async_req = false;
+    free(ra->resp_hdrs);
+    free(ra);
+    free(r);
+
+    return httpd_queue_work(handle, httpd_async_wakeup, NULL);
 }
 
 size_t httpd_unrecv(struct httpd_req *r, const char *buf, size_t buf_len)

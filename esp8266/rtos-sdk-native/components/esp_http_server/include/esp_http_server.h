@@ -635,6 +635,11 @@ int httpd_req_to_sockfd(httpd_req_t *r);
  */
 int httpd_req_recv(httpd_req_t *r, char *buf, size_t buf_len);
 
+/* Transfer a request to a worker task and return its socket to the server
+ * only after the worker completes it. These mirror the ESP-IDF APIs. */
+esp_err_t httpd_req_async_handler_begin(httpd_req_t *r, httpd_req_t **out);
+esp_err_t httpd_req_async_handler_complete(httpd_req_t *r);
+
 /**
  * @brief   Search for a field in request headers and
  *          return the string length of it's value

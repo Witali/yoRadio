@@ -181,7 +181,7 @@ void httpd_sess_set_descriptors(struct httpd_data *hd,
     int i;
     *maxfd = -1;
     for (i = 0; i < hd->config.max_open_sockets; i++) {
-        if (hd->hd_sd[i].fd != -1) {
+        if (hd->hd_sd[i].fd != -1 && !hd->hd_sd[i].for_async_req) {
             FD_SET(hd->hd_sd[i].fd, fdset);
             if (hd->hd_sd[i].fd > *maxfd) {
                 *maxfd = hd->hd_sd[i].fd;
@@ -275,6 +275,10 @@ bool httpd_sess_pending(struct httpd_data *hd, int fd)
         return ESP_FAIL;
     }
 
+    if (sd->for_async_req) {
+        return false;
+    }
+
     if (sd->pending_fn) {
         // test if there's any data to be read (besides read() function, which is handled by select() in the main httpd loop)
         // this should check e.g. for the SSL data buffer
@@ -339,13 +343,15 @@ esp_err_t httpd_sess_close_lru(struct httpd_data *hd)
         if (hd->hd_sd[i].fd == -1) {
             return ESP_OK;
         }
-        if (hd->hd_sd[i].lru_counter < lru_counter) {
+        if (!hd->hd_sd[i].for_async_req &&
+            hd->hd_sd[i].lru_counter < lru_counter) {
             lru_counter = hd->hd_sd[i].lru_counter;
             lru_fd = hd->hd_sd[i].fd;
         }
     }
     ESP_LOGD(TAG, LOG_FMT("fd = %d"), lru_fd);
-    return httpd_sess_trigger_close(hd, lru_fd);
+    return lru_fd >= 0 ? httpd_sess_trigger_close(hd, lru_fd)
+                       : ESP_ERR_NOT_FOUND;
 }
 
 int httpd_sess_iterate(struct httpd_data *hd, int start_fd)
