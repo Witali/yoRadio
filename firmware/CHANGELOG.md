@@ -3,6 +3,23 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-08-30
+
+### ESP8266 native asynchronous WebUI image
+
+- Backported the standard ESP HTTP Server asynchronous request API and moved
+  SPIFFS/static WebUI responses to one low-memory worker.
+- Kept the primary HTTP task available for WebSocket and status traffic while
+  static files are being read and transmitted.
+- Protected asynchronous sockets from receive polling and LRU eviction until
+  their worker completes the request.
+- Built source revision `eed1ac0` with `-O3` and archived the application at
+  [`development/esp8266-native/`](development/esp8266-native/).
+- Flashed a physical ESP8266EX and concurrently loaded the WebUI shell, six
+  compressed assets and the 53,808-byte playlist. Every request returned 200,
+  while the same WebSocket delivered 46 ping replies.
+- Confirmed 36,032 bytes of free heap after DHCP with no reset, stack fault or
+  allocation error; all 218 repository tests passed.
 ## Development — 2026-08-29
 
 ### Native ESP-IDF ESP32-C3 OLED production and development images
