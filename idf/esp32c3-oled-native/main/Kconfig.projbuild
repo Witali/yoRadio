@@ -1,5 +1,31 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_WEB_SEND_TIMEOUT_SECONDS
+    int "Web content send timeout (seconds)"
+    range 5 120
+    default 20
+    help
+        Maximum time a static-content worker waits for one socket send. A
+        longer timeout prevents slow or temporarily backgrounded mobile
+        browsers from receiving a truncated WebUI response.
+
+config YORADIO_WEB_STATIC_WORKERS
+    int "Parallel WebUI static-content workers"
+    range 1 4
+    default 2
+    help
+        Number of asynchronous workers that may read SPIFFS and send WebUI
+        files in parallel. The main HTTP task remains available for WebSocket
+        traffic while static responses are in progress.
+
+config YORADIO_QEMU
+    bool "Build the headless QEMU smoke-test profile"
+    default n
+    help
+        Skip peripherals that the ESP32-C3 QEMU machine does not emulate and
+        run deterministic NVS, SPIFFS and FreeRTOS startup checks instead.
+        This option is intended only for sdkconfig.qemu.defaults.
+
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n

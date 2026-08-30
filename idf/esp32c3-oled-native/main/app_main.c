@@ -5,6 +5,7 @@
 
 #include "audio_service.h"
 #include "board_config.h"
+#include "cpu_profiler.h"
 #include "display_settings.h"
 #include "driver/gpio.h"
 #include "encoder_input.h"
@@ -12,6 +13,7 @@
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_spiffs.h"
+#include "esp_system.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
@@ -86,6 +88,70 @@ typedef struct {
 } button_state_t;
 
 static QueueHandle_t s_button_edge_queue;
+
+#ifdef CONFIG_YORADIO_QEMU
+#define QEMU_TONE_RATE 48000U
+#define QEMU_TONE_FRAMES (QEMU_TONE_RATE / 2U)
+
+static int16_t qemu_tone_sample(uint32_t frame) {
+    const uint32_t period = 109U;
+    const uint32_t half = period / 2U;
+    uint32_t phase = frame % period;
+    if (phase < half) {
+        return (int16_t)(-6000 + (int32_t)(phase * 12000U / half));
+    }
+    return (int16_t)(6000 -
+                     (int32_t)((phase - half) * 12000U /
+                               (period - half)));
+}
+
+static void qemu_smoke_task(void *argument) {
+    (void)argument;
+    vTaskDelay(pdMS_TO_TICKS(100));
+
+    FILE *playlist = fopen("/spiffs/data/playlist.csv", "rb");
+    if (!playlist) {
+        ESP_LOGE(TAG, "QEMU smoke: playlist fixture is unavailable");
+        abort();
+    }
+    int first_byte = fgetc(playlist);
+    fclose(playlist);
+    if (first_byte == EOF) {
+        ESP_LOGE(TAG, "QEMU smoke: playlist fixture is empty");
+        abort();
+    }
+
+    ESP_ERROR_CHECK(native_audio_output_configure(QEMU_TONE_RATE));
+    int16_t samples[256 * 2];
+    for (uint32_t first = 0; first < QEMU_TONE_FRAMES; first += 256U) {
+        size_t frames = QEMU_TONE_FRAMES - first;
+        if (frames > 256U) frames = 256U;
+        for (size_t frame = 0; frame < frames; ++frame) {
+            int16_t sample = qemu_tone_sample(first + frame);
+            samples[frame * 2U] = sample;
+            samples[frame * 2U + 1U] = sample;
+        }
+        ESP_ERROR_CHECK(native_audio_output_write_pcm(
+            (uint8_t *)samples, frames * 2U * sizeof(int16_t), 16, 2));
+    }
+    ESP_LOGI(TAG, "QEMU_AUDIO_PASS %u stereo frames", QEMU_TONE_FRAMES);
+
+    oled_display_clear(&s_display);
+    oled_display_draw_large_text(&s_display, 8, 12, "QEMU OK", 0, false,
+                                 false, false);
+    ESP_ERROR_CHECK(oled_display_present(&s_display));
+    ESP_LOGI(TAG, "QEMU_OLED_PASS 72x40 framebuffer presented");
+
+    ESP_LOGI(TAG,
+             "QEMU_SMOKE_PASS OLED, audio, NVS, SPIFFS and FreeRTOS; free "
+             "heap: %lu bytes",
+             (unsigned long)esp_get_free_heap_size());
+    fflush(stdout);
+    /* Leave the last framebuffer visible long enough for SDL/HMP inspection. */
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    esp_restart();
+}
+#endif
 
 static bool button_tick_reached(TickType_t now, TickType_t deadline) {
     return (int32_t)(now - deadline) >= 0;
@@ -875,6 +941,7 @@ static void services_task(void *argument) {
 void app_main(void) {
     ESP_LOGI(TAG, "Starting pure ESP-IDF ESP32-C3 OLED yoRadio");
     native_state_init(&s_state);
+    ESP_ERROR_CHECK(cpu_profiler_start());
 
 #ifdef YORADIO_CODEC_BENCHMARK
     ESP_LOGI(TAG, "Codec benchmark mode: network, WebUI and display disabled");
@@ -893,6 +960,17 @@ void app_main(void) {
         ESP_LOGE(TAG, "SPIFFS mount failed without format: %s",
                  esp_err_to_name(result));
     }
+#ifdef CONFIG_YORADIO_QEMU
+    ESP_LOGW(TAG, "QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO "
+                  "disabled");
+    ESP_ERROR_CHECK(oled_display_init(&s_display));
+    ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));
+    ESP_ERROR_CHECK(native_audio_output_init());
+    ESP_ERROR_CHECK(xTaskCreate(qemu_smoke_task, "qemu_smoke", 4096, NULL, 3,
+                                NULL) == pdPASS
+                        ? ESP_OK
+                        : ESP_ERR_NO_MEM);
+#else
     ESP_ERROR_CHECK(oled_display_init(&s_display));
     ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));
     s_boot_logo_until_us =
@@ -915,5 +993,6 @@ void app_main(void) {
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);
+#endif
 #endif
 }

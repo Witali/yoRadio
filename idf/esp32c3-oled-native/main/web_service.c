@@ -14,6 +14,7 @@
 #include "esp_netif.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
 #include "freertos/task.h"
 #include "network_service.h"
 #include "radio_control.h"
@@ -22,9 +23,15 @@
 
 #define WEBBOARD_UPLOAD_MAX (96 * 1024)
 #define MULTIPART_HEADER_MAX 768
+#define WEB_MAX_OPEN_SOCKETS 7
+#define WEB_STATIC_QUEUE_DEPTH WEB_MAX_OPEN_SOCKETS
+#define WEB_STATIC_WORKER_PRIORITY 3
 
 static const char *const TAG = "web";
 static native_state_t *s_state;
+static QueueHandle_t s_static_request_queue;
+static TaskHandle_t
+    s_static_worker_tasks[CONFIG_YORADIO_WEB_STATIC_WORKERS];
 
 static void reboot_task(void *argument) {
     (void)argument;
@@ -588,7 +595,7 @@ static esp_err_t finish_static_response(httpd_req_t *request,
     return result;
 }
 
-static esp_err_t static_handler(httpd_req_t *request) {
+static esp_err_t serve_static_request(httpd_req_t *request) {
     char uri[160];
     const char *query = strchr(request->uri, '?');
     size_t uri_len = query ? (size_t)(query - request->uri)
@@ -670,16 +677,85 @@ static esp_err_t static_handler(httpd_req_t *request) {
         request, httpd_resp_send_chunk(request, NULL, 0));
 }
 
+static void static_worker_task(void *argument) {
+    (void)argument;
+    while (true) {
+        httpd_req_t *request = NULL;
+        if (xQueueReceive(s_static_request_queue, &request, portMAX_DELAY) !=
+            pdTRUE) {
+            continue;
+        }
+        esp_err_t result = serve_static_request(request);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Static response failed for %s: %s", request->uri,
+                     esp_err_to_name(result));
+        }
+        result = httpd_req_async_handler_complete(request);
+        if (result != ESP_OK) {
+            ESP_LOGE(TAG, "Static request completion failed: %s",
+                     esp_err_to_name(result));
+        }
+    }
+}
+
+static esp_err_t start_static_workers(void) {
+    s_static_request_queue =
+        xQueueCreate(WEB_STATIC_QUEUE_DEPTH, sizeof(httpd_req_t *));
+    ESP_RETURN_ON_FALSE(s_static_request_queue, ESP_ERR_NO_MEM, TAG,
+                        "create static request queue");
+    for (size_t index = 0; index < CONFIG_YORADIO_WEB_STATIC_WORKERS;
+         ++index) {
+        char name[configMAX_TASK_NAME_LEN];
+        snprintf(name, sizeof(name), "web_static_%u", (unsigned)index);
+        if (xTaskCreate(static_worker_task, name, BOARD_TASK_STACK_WEB_STATIC,
+                        NULL, WEB_STATIC_WORKER_PRIORITY,
+                        &s_static_worker_tasks[index]) != pdPASS) {
+            for (size_t created = 0; created < index; ++created) {
+                vTaskDelete(s_static_worker_tasks[created]);
+                s_static_worker_tasks[created] = NULL;
+            }
+            vQueueDelete(s_static_request_queue);
+            s_static_request_queue = NULL;
+            return ESP_ERR_NO_MEM;
+        }
+    }
+    ESP_LOGI(TAG, "Static content workers: %u, send timeout: %u seconds",
+             (unsigned)CONFIG_YORADIO_WEB_STATIC_WORKERS,
+             (unsigned)CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS);
+    return ESP_OK;
+}
+
+static esp_err_t static_handler(httpd_req_t *request) {
+    httpd_req_t *async_request = NULL;
+    esp_err_t result =
+        httpd_req_async_handler_begin(request, &async_request);
+    if (result != ESP_OK) {
+        httpd_resp_set_status(request, "503 Service Unavailable");
+        httpd_resp_set_hdr(request, "Connection", "close");
+        return httpd_resp_sendstr(request, "Static worker unavailable");
+    }
+    if (xQueueSend(s_static_request_queue, &async_request, 0) != pdTRUE) {
+        httpd_resp_set_status(async_request, "503 Service Unavailable");
+        httpd_resp_set_hdr(async_request, "Connection", "close");
+        httpd_resp_sendstr(async_request, "Static worker queue full");
+        httpd_req_async_handler_complete(async_request);
+    }
+    return ESP_OK;
+}
+
 esp_err_t web_service_start(native_state_t *state) {
     s_state = state;
+    ESP_RETURN_ON_ERROR(start_static_workers(), TAG,
+                        "start static content workers");
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.stack_size = 6144;
     // Browsers commonly fetch six assets in parallel. Keep those connections
     // plus the persistent WebSocket alive; with four sockets the LRU purge
     // closed /ws during page startup and the shared UI spinner never stopped.
-    config.max_open_sockets = 7;
+    config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
     config.max_uri_handlers = 14;
     config.lru_purge_enable = true;
+    config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
     config.uri_match_fn = httpd_uri_match_wildcard;
     httpd_handle_t server = NULL;
     ESP_RETURN_ON_ERROR(httpd_start(&server, &config), TAG,

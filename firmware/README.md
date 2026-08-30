@@ -10,6 +10,12 @@ images are stored as `firmware/development/<variant>/app.bin`; the production
 build scripts do this automatically. Promote a validated image into a new
 immutable version directory when preparing a release.
 
+Whenever a development `app.bin` is replaced, update its `manifest.md` and add
+or update the dated Development section in `CHANGELOG.md` in the same commit.
+The changelog entry must describe the functional changes and validation; the
+manifest must identify the source, build profile, flash offset, size and
+SHA-256 of the exact binary.
+
 Binary `*.bin` files in this directory are stored with Git LFS. Install Git
 LFS before cloning or pulling release artifacts:
 
