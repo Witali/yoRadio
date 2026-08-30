@@ -5,10 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "board_config.h"
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
 #include "freertos/task.h"
 #include "native_audio_output.h"
 #include "native_state.h"
@@ -19,9 +21,15 @@
 #define WS_HEARTBEAT_MS 2000U
 #define WS_COMMAND_MAX 255U
 #define WEB_STATUS_CAPACITY 1280U
+#define WEB_MAX_OPEN_SOCKETS 7U
+#define WEB_STATIC_QUEUE_DEPTH WEB_MAX_OPEN_SOCKETS
+#define WEB_STATIC_WORKER_PRIORITY 3U
 
 static const char *TAG = "web";
 static httpd_handle_t s_server;
+static QueueHandle_t s_static_request_queue;
+static TaskHandle_t
+    s_static_worker_tasks[CONFIG_YORADIO_WEB_STATIC_WORKERS];
 static volatile int s_ws_fd = -1;
 static volatile bool s_send_pending;
 static volatile bool s_playlist_changed;
@@ -601,6 +609,90 @@ static esp_err_t favicon_handler(httpd_req_t *request) {
     return finish_short_response(request, httpd_resp_send(request, NULL, 0));
 }
 
+static esp_err_t serve_static_request(httpd_req_t *request) {
+    if (strcmp(request->uri, "/") == 0 ||
+        strcmp(request->uri, "/index.html") == 0 ||
+        strcmp(request->uri, "/settings.html") == 0 ||
+        strcmp(request->uri, "/update.html") == 0) {
+        return page_handler(request);
+    }
+    if (strcmp(request->uri, "/variables.js") == 0)
+        return variables_handler(request);
+    if (strcmp(request->uri, "/data/playlist.csv") == 0)
+        return playlist_handler(request);
+    if (strcmp(request->uri, "/favicon.ico") == 0)
+        return favicon_handler(request);
+    return asset_handler(request);
+}
+
+static void static_worker_task(void *argument) {
+    (void)argument;
+    while (true) {
+        httpd_req_t *request = NULL;
+        if (xQueueReceive(s_static_request_queue, &request, portMAX_DELAY) !=
+            pdTRUE) {
+            continue;
+        }
+        esp_err_t result = serve_static_request(request);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Static response failed for %s: %s", request->uri,
+                     esp_err_to_name(result));
+        }
+        result = httpd_req_async_handler_complete(request);
+        if (result != ESP_OK) {
+            ESP_LOGE(TAG, "Static request completion failed: %s",
+                     esp_err_to_name(result));
+        }
+    }
+}
+
+static esp_err_t start_static_workers(void) {
+    s_static_request_queue =
+        xQueueCreate(WEB_STATIC_QUEUE_DEPTH, sizeof(httpd_req_t *));
+    if (!s_static_request_queue) return ESP_ERR_NO_MEM;
+
+    for (size_t index = 0; index < CONFIG_YORADIO_WEB_STATIC_WORKERS;
+         ++index) {
+        char name[16];
+        snprintf(name, sizeof(name), "web_static_%u", (unsigned)index);
+        if (xTaskCreate(static_worker_task, name, BOARD_TASK_STACK_WEB_STATIC,
+                        NULL, WEB_STATIC_WORKER_PRIORITY,
+                        &s_static_worker_tasks[index]) != pdPASS) {
+            for (size_t created = 0; created < index; ++created) {
+                vTaskDelete(s_static_worker_tasks[created]);
+                s_static_worker_tasks[created] = NULL;
+            }
+            vQueueDelete(s_static_request_queue);
+            s_static_request_queue = NULL;
+            return ESP_ERR_NO_MEM;
+        }
+    }
+    ESP_LOGI(TAG,
+             "Static content workers: %u, send timeout: %u s; free heap: %u",
+             (unsigned)CONFIG_YORADIO_WEB_STATIC_WORKERS,
+             (unsigned)CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS,
+             (unsigned)esp_get_free_heap_size());
+    return ESP_OK;
+}
+
+static esp_err_t static_handler(httpd_req_t *request) {
+    httpd_req_t *async_request = NULL;
+    esp_err_t result =
+        httpd_req_async_handler_begin(request, &async_request);
+    if (result != ESP_OK) {
+        httpd_resp_set_status(request, "503 Service Unavailable");
+        httpd_resp_set_hdr(request, "Connection", "close");
+        return send_string(request, "Static worker unavailable");
+    }
+    if (xQueueSend(s_static_request_queue, &async_request, 0) != pdTRUE) {
+        httpd_resp_set_status(async_request, "503 Service Unavailable");
+        httpd_resp_set_hdr(async_request, "Connection", "close");
+        send_string(async_request, "Static worker queue full");
+        httpd_req_async_handler_complete(async_request);
+    }
+    return ESP_OK;
+}
+
 static esp_err_t register_get(const char *uri, esp_err_t (*handler)(httpd_req_t *)) {
     httpd_uri_t route = {
         .uri = uri,
@@ -611,13 +703,17 @@ static esp_err_t register_get(const char *uri, esp_err_t (*handler)(httpd_req_t 
 }
 
 esp_err_t web_service_start(void) {
+    esp_err_t result = start_static_workers();
+    if (result != ESP_OK) return result;
+
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = 80;
     config.stack_size = 6144;
-    config.max_open_sockets = 5;
+    config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
     config.max_uri_handlers = 18;
     config.lru_purge_enable = true;
-    esp_err_t result = httpd_start(&s_server, &config);
+    config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
+    result = httpd_start(&s_server, &config);
     if (result != ESP_OK) return result;
 
     static const char *pages[] = {
@@ -628,20 +724,20 @@ esp_err_t web_service_start(void) {
         "/player.html", "/options.html", "/logo.svg",
     };
     for (unsigned index = 0; index < sizeof(pages) / sizeof(pages[0]); ++index) {
-        if ((result = register_get(pages[index], page_handler)) != ESP_OK)
+        if ((result = register_get(pages[index], static_handler)) != ESP_OK)
             return result;
     }
     for (unsigned index = 0; index < sizeof(assets) / sizeof(assets[0]); ++index) {
-        if ((result = register_get(assets[index], asset_handler)) != ESP_OK)
+        if ((result = register_get(assets[index], static_handler)) != ESP_OK)
             return result;
     }
-    if ((result = register_get("/variables.js", variables_handler)) != ESP_OK)
+    if ((result = register_get("/variables.js", static_handler)) != ESP_OK)
         return result;
-    if ((result = register_get("/data/playlist.csv", playlist_handler)) != ESP_OK)
+    if ((result = register_get("/data/playlist.csv", static_handler)) != ESP_OK)
         return result;
     if ((result = register_get("/api/native/status", status_handler)) != ESP_OK)
         return result;
-    if ((result = register_get("/favicon.ico", favicon_handler)) != ESP_OK)
+    if ((result = register_get("/favicon.ico", static_handler)) != ESP_OK)
         return result;
     httpd_uri_t websocket = {
         .uri = "/ws",
