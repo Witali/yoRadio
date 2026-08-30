@@ -1072,7 +1072,8 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   assert.match(component, /websocket_service\.c/);
   assert.match(config, /CONFIG_HTTPD_WS_SUPPORT=y/);
   assert.match(web, /websocket_service_register\(server, state\)/);
-  assert.match(web, /config\.max_open_sockets = 7/);
+  assert.match(web, /#define WEB_MAX_OPEN_SOCKETS 7/);
+  assert.match(web, /config\.max_open_sockets = WEB_MAX_OPEN_SOCKETS/);
   assert.match(web, /httpd_resp_set_hdr\(request, "Connection", "close"\)/);
   assert.match(web, /httpd_sess_trigger_close\(request->handle/);
   assert.match(web, /strcmp\(uri, "\/variables\.js"\)/);
