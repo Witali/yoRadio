@@ -17,7 +17,10 @@ constexpr size_t kArenaBytes = 23328U;
 /* 1536 bytes covers a maximum-size 320-kbit/s MP3 frame and normal
  * high-bitrate ADTS AAC frames while conserving scarce ESP8266 DRAM. */
 constexpr size_t kInputBytes = 1536U;
-constexpr size_t kPcmSamples = 1152U * 2U;
+/* Helix emits at most 576 stereo samples per MPEG granule. Streaming each
+ * granule immediately halves the persistent PCM workspace while preserving
+ * the conventional frame sample order. */
+constexpr size_t kPcmSamples = 576U * 2U;
 constexpr char kTag[] = "helix_bridge";
 
 struct Mp3Header {
@@ -113,6 +116,25 @@ static void compact(helix_codec *codec) {
     }
 }
 
+struct Mp3GranuleOutput {
+    helix_pcm_callback_t callback;
+    void *context;
+    helix_stream_info_t info;
+    bool failed;
+};
+
+static bool emit_mp3_granule(void *opaque, short *pcm, int samples) {
+    Mp3GranuleOutput *output = static_cast<Mp3GranuleOutput *>(opaque);
+    if (samples <= 0 || static_cast<size_t>(samples) > kPcmSamples) {
+        output->failed = true;
+        return false;
+    }
+    bool accepted = output->callback(output->context, &output->info, pcm,
+                                     static_cast<size_t>(samples));
+    output->failed = !accepted;
+    return accepted;
+}
+
 static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
                       void *context) {
     uint8_t *input = codec->input + codec->input_start;
@@ -129,23 +151,21 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
         }
         if (codec->input_size < parsed.frame_size) return 1;
         int left = static_cast<int>(parsed.frame_size);
-        int result = MP3Decode(input, &left, codec->pcm, 0);
+        Mp3GranuleOutput output = {
+            callback,
+            context,
+            {parsed.sample_rate, parsed.bitrate, parsed.channels, 16},
+            false,
+        };
+        int result = MP3DecodeGranules(input, &left, codec->pcm, 0,
+                                       emit_mp3_granule, &output);
         size_t used = parsed.frame_size - std::min(
             parsed.frame_size, static_cast<size_t>(std::max(left, 0)));
+        if (output.failed) return -5;
         if (result != ERR_MP3_NONE) {
             consume(codec, used ? used : 1);
             return 0;
         }
-        helix_stream_info_t info = {
-            static_cast<uint32_t>(MP3GetSampRate()),
-            static_cast<uint32_t>(MP3GetBitrate()),
-            static_cast<uint8_t>(MP3GetChannels()),
-            static_cast<uint8_t>(MP3GetBitsPerSample()),
-        };
-        size_t samples = static_cast<size_t>(MP3GetOutputSamps());
-        if (!samples || samples > kPcmSamples || !callback(context, &info,
-                                                           codec->pcm,
-                                                           samples)) return -5;
         consume(codec, used ? used : parsed.frame_size);
         return 0;
     }

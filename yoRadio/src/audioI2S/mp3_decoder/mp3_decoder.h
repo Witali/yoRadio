@@ -458,6 +458,12 @@ const uint32_t csa[8][2] PROGMEM = {
 bool MP3Decoder_AllocateBuffers(void);
 void MP3Decoder_FreeBuffers();
 int  MP3Decode( unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize);
+#if defined(YORADIO_ESP8266_NATIVE)
+typedef bool (*MP3GranuleCallback)(void *context, short *pcm, int samples);
+int MP3DecodeGranules(unsigned char *inbuf, int *bytesLeft, short *outbuf,
+                      int useSize, MP3GranuleCallback callback,
+                      void *context);
+#endif
 void MP3GetLastFrameInfo();
 int  MP3GetNextFrameInfo(unsigned char *buf);
 int  MP3FindSyncWord(unsigned char *buf, int nBytes);

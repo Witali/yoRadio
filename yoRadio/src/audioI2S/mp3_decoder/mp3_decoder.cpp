@@ -53,6 +53,9 @@ ScaleFactorInfoSub_t m_ScaleFactorInfoSub[m_MAX_NGRAN][m_MAX_NCHAN];
 ScaleFactorJS_t *m_ScaleFactorJS;
 SubbandInfo_t *m_SubbandInfo;
 MP3DecInfo_t *m_MP3DecInfo;
+#if defined(YORADIO_ESP8266_NATIVE)
+static int m_OutputBufferSamples;
+#endif
 
 const unsigned short huffTable[4242] PROGMEM = {
     /* huffTable01[9] */
@@ -1319,7 +1322,13 @@ int MP3GetNextFrameInfo(unsigned char *buf) {
  **********************************************************************************************************************/
 void MP3ClearBadFrame( short *outbuf) {
     int i;
-    for (i = 0; i < m_MP3DecInfo->nGrans * m_MP3DecInfo->nGranSamps * m_MP3DecInfo->nChans; i++)
+    int samples = m_MP3DecInfo->nGrans * m_MP3DecInfo->nGranSamps *
+                  m_MP3DecInfo->nChans;
+#if defined(YORADIO_ESP8266_NATIVE)
+    if (m_OutputBufferSamples > 0 && samples > m_OutputBufferSamples)
+        samples = m_OutputBufferSamples;
+#endif
+    for (i = 0; i < samples; i++)
         outbuf[i] = 0;
 }
 /***********************************************************************************************************************
@@ -1341,7 +1350,12 @@ void MP3ClearBadFrame( short *outbuf) {
  * Notes:       switching useSize on and off between frames in the same stream
  *                is not supported (bit reservoir is not maintained if useSize on)
  **********************************************************************************************************************/
-int MP3Decode( unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize){
+static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
+                             short *outbuf, int useSize
+#if defined(YORADIO_ESP8266_NATIVE)
+                             , MP3GranuleCallback callback, void *context
+#endif
+                             ) {
     int offset, bitOffset, mainBits, gr, ch, fhBytes, siBytes, freeFrameBytes;
     int prevBitOffset, sfBlockBits, huffBlockBits;
     unsigned char *mainPtr;
@@ -1469,16 +1483,50 @@ int MP3Decode( unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize)
             }
         }
         /* subband transform - if stereo, interleaves pcm LRLRLR */
-        if (Subband(
-                outbuf + gr * m_MP3DecInfo->nGranSamps * m_MP3DecInfo->nChans)
+        short *granuleOut = outbuf;
+#if defined(YORADIO_ESP8266_NATIVE)
+        if (!callback)
+#endif
+            granuleOut += gr * m_MP3DecInfo->nGranSamps *
+                          m_MP3DecInfo->nChans;
+        if (Subband(granuleOut)
                 < 0) {
             MP3ClearBadFrame(outbuf);
             return ERR_MP3_INVALID_SUBBAND;
         }
+#if defined(YORADIO_ESP8266_NATIVE)
+        if (callback && !callback(context, granuleOut,
+                                  m_MP3DecInfo->nGranSamps *
+                                  m_MP3DecInfo->nChans))
+            return ERR_UNKNOWN;
+#endif
     }
     MP3GetLastFrameInfo();
     return ERR_MP3_NONE;
 }
+
+int MP3Decode(unsigned char *inbuf, int *bytesLeft, short *outbuf,
+              int useSize) {
+#if defined(YORADIO_ESP8266_NATIVE)
+    m_OutputBufferSamples = 0;
+    return MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize, nullptr,
+                             nullptr);
+#else
+    return MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize);
+#endif
+}
+
+#if defined(YORADIO_ESP8266_NATIVE)
+int MP3DecodeGranules(unsigned char *inbuf, int *bytesLeft, short *outbuf,
+                      int useSize, MP3GranuleCallback callback,
+                      void *context) {
+    m_OutputBufferSamples = m_MAX_NCHAN * m_MAX_NSAMP;
+    int result = MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize,
+                                   callback, context);
+    m_OutputBufferSamples = 0;
+    return result;
+}
+#endif
 
 /***********************************************************************************************************************
  * Function:    MP3Decoder_ClearBuffer
