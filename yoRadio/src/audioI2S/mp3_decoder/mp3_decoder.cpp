@@ -1582,10 +1582,10 @@ bool MP3Decoder_AllocateBuffers(void) {
     if(!m_FrameHeader)      {m_FrameHeader = (FrameHeader_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(FrameHeader_t));}
     if(!m_SideInfo)         {m_SideInfo = (SideInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(SideInfo_t));}
     if(!m_ScaleFactorJS)    {m_ScaleFactorJS = (ScaleFactorJS_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(ScaleFactorJS_t));}
-    if(!m_HuffmanInfo)      {m_HuffmanInfo = (HuffmanInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(HuffmanInfo_t));}
-    if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
+    if(!m_HuffmanInfo)      {m_HuffmanInfo = (HuffmanInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(HuffmanInfo_t));}
+    if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
     if(!m_IMDCTInfo)        {m_IMDCTInfo = (IMDCTInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(IMDCTInfo_t));}
-    if(!m_SubbandInfo)      {m_SubbandInfo = (SubbandInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(SubbandInfo_t));}
+    if(!m_SubbandInfo)      {m_SubbandInfo = (SubbandInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(SubbandInfo_t));}
     if(!m_MP3FrameInfo)     {m_MP3FrameInfo = (MP3FrameInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(MP3FrameInfo_t));}
 
     if(!m_MP3DecInfo || !m_FrameHeader || !m_SideInfo || !m_ScaleFactorJS || !m_HuffmanInfo ||

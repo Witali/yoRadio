@@ -1694,6 +1694,19 @@ bool AACDecoder_AllocateBuffers(void){
     memset( m_PSInfoSBR,         0, sizeof(PSInfoSBR_t));               //Clear PSInfoSBR
     InitSBRState();
 #endif
+#ifdef YORADIO_ESP8266_NATIVE
+    m_PSInfoBase->coef = (int (*)[AAC_MAX_NSAMPS])
+        CodecArenaCalloc32(CODEC_ARENA_AAC, AAC_MAX_NCHANS,
+                           AAC_MAX_NSAMPS * sizeof(int));
+    m_PSInfoBase->overlap = (int (*)[AAC_MAX_NSAMPS])
+        CodecArenaCalloc32(CODEC_ARENA_AAC, AAC_MAX_NCHANS,
+                           AAC_MAX_NSAMPS * sizeof(int));
+    if(!m_PSInfoBase->coef || !m_PSInfoBase->overlap) {
+        log_e("not enough IRAM/DRAM for AAC 32-bit workspaces");
+        AACDecoder_FreeBuffers();
+        return false;
+    }
+#endif
 
     m_AACDecInfo->prevBlockID = AAC_ID_INVALID;
     m_AACDecInfo->currBlockID = AAC_ID_INVALID;
@@ -1761,7 +1774,14 @@ void AACDecoder_FreeBuffers(void) {
 //    uint32_t i = ESP.getFreeHeap();
 
     if(m_AACDecInfo)                         {CodecArenaFree(m_AACDecInfo); m_AACDecInfo=NULL;}
-    if(m_PSInfoBase)                         {CodecArenaFree(m_PSInfoBase); m_PSInfoBase=NULL;}
+    if(m_PSInfoBase) {
+#ifdef YORADIO_ESP8266_NATIVE
+        CodecArenaFree(m_PSInfoBase->coef);
+        CodecArenaFree(m_PSInfoBase->overlap);
+#endif
+        CodecArenaFree(m_PSInfoBase);
+        m_PSInfoBase=NULL;
+    }
     if(m_pce[0])                             {CodecArenaFree(m_pce[0]);     m_pce[0]=NULL;}
 
 #ifdef AAC_ENABLE_SBR
@@ -1787,6 +1807,9 @@ void AACDecoder_FreeBuffers(void) {
  **********************************************************************************************************************/
 bool AACDecoder_IsInit(void) {
     if(m_AACDecInfo && m_PSInfoBase && m_pce[0]){
+#ifdef YORADIO_ESP8266_NATIVE
+        if(!m_PSInfoBase->coef || !m_PSInfoBase->overlap) return false;
+#endif
         return true;
     }
     return false;

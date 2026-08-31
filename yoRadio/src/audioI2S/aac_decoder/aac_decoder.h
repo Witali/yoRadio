@@ -359,12 +359,20 @@ typedef struct _PSInfoBase_t {
     int      tnsWorkBuf[20]; //[MAX_TNS_ORDER]
     GainControlInfo_t     gainControlInfo[2]; // [MAX_NCHANS_ELEM]
     int      gbCurrent[2];  // [MAX_NCHANS_ELEM]
+#ifdef YORADIO_ESP8266_NATIVE
+    int      (*coef)[1024]; // 32-bit-only workspace allocated in IRAM
+#else
     int      coef[2][1024]; // [MAX_NCHANS_ELEM][AAC_MAX_NSAMPS]
+#endif
 #ifdef AAC_ENABLE_SBR
     int      sbrWorkBuf[2][1024]; // [MAX_NCHANS_ELEM][AAC_MAX_NSAMPS];
 #endif
     /* state information which must be saved for each element and used in next frame */
+#ifdef YORADIO_ESP8266_NATIVE
+    int      (*overlap)[1024]; // 32-bit-only persistent state in IRAM
+#else
     int      overlap[2][1024];  // [AAC_MAX_NCHANS][AAC_MAX_NSAMPS]
+#endif
     int      prevWinShape[2]; // [AAC_MAX_NCHANS]
 } PSInfoBase_t;
 
