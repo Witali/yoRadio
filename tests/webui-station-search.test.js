@@ -45,6 +45,37 @@ test("clicking either a playlist row or its child selects that station", () => {
   assert.match(script, /websocket\.send\(`play=\$\{item\}`\)/);
 });
 
+test("every firmware target packages the shared full-row click handler", () => {
+  const targetSources = [
+    ["Arduino", "yoRadio/src/core/config.cpp", /script\.js\.gz/],
+    [
+      "ESP32-C3 native",
+      "idf/esp32c3-oled-native/main/CMakeLists.txt",
+      /file\(COPY "\$\{YORADIO_ROOT\}\/data\/"/,
+    ],
+    [
+      "ESP32 CYD native",
+      "idf/esp32-cyd2usb-native/main/CMakeLists.txt",
+      /spiffs_create_partition_image\(spiffs "\$\{YORADIO_ROOT\}\/data"/,
+    ],
+    [
+      "ESP32 CYD minimal",
+      "idf/esp32-cyd2usb-minimal/main/CMakeLists.txt",
+      /spiffs_create_partition_image\(spiffs "\$\{YORADIO_ROOT\}\/data"/,
+    ],
+    [
+      "ESP8266 native",
+      "esp8266/rtos-sdk-native/main/CMakeLists.txt",
+      /EMBED_FILES "\.\.\/\.\.\/\.\.\/yoRadio\/data\/www\/script\.js\.gz"/,
+    ],
+  ];
+
+  for(const [target, relativePath, pattern] of targetSources) {
+    const source = fs.readFileSync(path.join(repository, relativePath), "utf8");
+    assert.match(source, pattern, `${target} must package the shared WebUI`);
+  }
+});
+
 test("current station stays selectable without unsolicited scrolling", () => {
   const script = readAsset("script.js.gz");
   const setCurrentItem = script.slice(
