@@ -148,6 +148,13 @@ async function testSettingsResponses() {
 
 async function testRemoteControls() {
   await ensureStopped();
+  const clickedStation = state.current === 1 ? 2 : 1;
+  await command(
+    `play=${clickedStation}`,
+    "playlist row click selects and starts that station",
+    value => value.current === clickedStation && value.playing,
+  );
+  await command("stop=1", "clicked station can be stopped", value => !value.playing);
   await command("toggle=1", "Play reaches actual playing state", value => value.playing);
   await command("stop=1", "Stop reaches stopped state", value => !value.playing);
   await command("toggle=1", "Play resumes after Stop", value => value.playing);

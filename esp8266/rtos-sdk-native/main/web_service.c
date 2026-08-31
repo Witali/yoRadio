@@ -14,6 +14,7 @@
 #include "native_audio_output.h"
 #include "native_state.h"
 #include "persistent_settings.h"
+#include "playlist_service.h"
 #include "radio_control.h"
 #include "web_pages_bridge.h"
 
@@ -21,6 +22,9 @@
 #define WS_COMMAND_MAX 255U
 #define WEB_STATUS_CAPACITY 1280U
 #define WEB_MAX_OPEN_SOCKETS 4U
+
+extern const unsigned char _binary_script_js_gz_start[];
+extern const unsigned char _binary_script_js_gz_end[];
 
 static const char *TAG = "web";
 static httpd_handle_t s_server;
@@ -558,6 +562,24 @@ static esp_err_t variables_handler(httpd_req_t *request) {
 
 static esp_err_t asset_handler(httpd_req_t *request) {
     prepare_short_response(request);
+    if (request_path_equals(request, "/script.js")) {
+        httpd_resp_set_type(request, "application/javascript; charset=utf-8");
+        httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
+        const unsigned char *cursor = _binary_script_js_gz_start;
+        esp_err_t result = ESP_OK;
+        while (cursor < _binary_script_js_gz_end) {
+            size_t remaining = (size_t)(_binary_script_js_gz_end - cursor);
+            size_t count = remaining > 512U ? 512U : remaining;
+            result = httpd_resp_send_chunk(
+                request, (const char *)cursor, count);
+            if (result != ESP_OK) break;
+            cursor += count;
+        }
+        if (result == ESP_OK)
+            result = httpd_resp_send_chunk(request, NULL, 0);
+        return finish_short_response(request, result);
+    }
     char path[96];
     size_t uri_length = request_path_length(request);
     static const char prefix[] = "/spiffs/www";
@@ -588,19 +610,21 @@ static esp_err_t asset_handler(httpd_req_t *request) {
 
 static esp_err_t playlist_handler(httpd_req_t *request) {
     prepare_short_response(request);
-    FILE *file = open_nonempty("/spiffs/data/playlist.csv");
-    if (!file) {
+    FILE *file = open_nonempty(PLAYLIST_PATH);
+    if (!file || !playlist_service_count()) {
+        if (file) fclose(file);
         return httpd_resp_send_404(request);
     }
     httpd_resp_set_type(request, "text/csv; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
-    char chunk[512];
-    size_t count;
+    char line[672];
     esp_err_t result = ESP_OK;
-    while ((count = fread(chunk, 1, sizeof(chunk), file)) != 0U) {
-        result = httpd_resp_send_chunk(request, chunk, count);
+    while (fgets(line, sizeof(line), file)) {
+        if (!playlist_service_entry_supported(line)) continue;
+        result = httpd_resp_send_chunk(request, line, strlen(line));
         if (result != ESP_OK) break;
     }
+    if (ferror(file) && result == ESP_OK) result = ESP_FAIL;
     fclose(file);
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
     return finish_short_response(request, result);

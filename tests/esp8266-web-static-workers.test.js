@@ -104,6 +104,14 @@ test("ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming", () => 
   assert.match(sdkDefaults, /CONFIG_LWIP_TCP_WND_DEFAULT=2440/);
 });
 
+test("ESP8266 application serves the current shared WebUI script from flash", () => {
+  const component = main("CMakeLists.txt");
+  assert.match(component, /EMBED_FILES "\.\.\/\.\.\/\.\.\/yoRadio\/data\/www\/script\.js\.gz"/);
+  assert.match(webSource, /request_path_equals\(request, "\/script\.js"\)/);
+  assert.match(webSource, /_binary_script_js_gz_start/);
+  assert.match(webSource, /_binary_script_js_gz_end/);
+});
+
 test("ESP8266 releases short HTTP connections after each response", () => {
   const prepare = bodyFrom(
     webSource,

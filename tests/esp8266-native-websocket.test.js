@@ -48,6 +48,11 @@ const radioSource = fs.readFileSync(
   "utf8",
 );
 
+const playlistSource = fs.readFileSync(
+  path.resolve(__dirname, "..", "esp8266", "rtos-sdk-native", "main", "playlist_service.c"),
+  "utf8",
+);
+
 test("ESP8266 WebSocket handler completes HTTP upgrade before reading frames", () => {
   const handler = source.slice(source.indexOf("static esp_err_t websocket_handler"));
   const handshake = handler.indexOf("request->method == HTTP_GET");
@@ -81,6 +86,19 @@ test("ESP8266 WebSocket handler reads a command in one bounded receive", () => {
 
 test("ESP8266 HTTP task has enough stack for playlist-backed commands", () => {
   assert.match(source, /config\.stack_size = BOARD_TASK_STACK_WEB/);
+});
+
+test("ESP8266 exposes only board-supported stations with matching indices", () => {
+  assert.match(playlistSource, /#define INDEX_VERSION 2U/);
+  assert.match(playlistSource, /strncmp\(url, "http:\/\/", 7U\) == 0/);
+  assert.match(playlistSource, /strncasecmp\(name, "Ogg ", 4U\) != 0/);
+  for(const extension of ["ogg", "opus", "flac", "m3u8", "wav"]) {
+    assert.match(playlistSource, new RegExp(`"\\.${extension}"`));
+  }
+  const handler = source.slice(source.indexOf("static esp_err_t playlist_handler"), source.indexOf("static esp_err_t status_handler"));
+  assert.match(handler, /playlist_service_count\(\)/);
+  assert.match(handler, /playlist_service_entry_supported\(line\)/);
+  assert.match(handler, /open_nonempty\(PLAYLIST_PATH\)/);
 });
 
 test("ESP8266 radio retries short socket timeouts until the HTTP header deadline", () => {

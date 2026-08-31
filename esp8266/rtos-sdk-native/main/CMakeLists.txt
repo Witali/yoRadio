@@ -41,7 +41,8 @@ idf_component_register(
   SRCS ${YORADIO_SOURCES}
   INCLUDE_DIRS ${YORADIO_INCLUDE_DIRS}
   REQUIRES esp8266 esp_event esp_http_server freertos heap helix_codecs log
-           lwip nvs_flash pthread spiffs tcpip_adapter)
+           lwip nvs_flash pthread spiffs tcpip_adapter
+  EMBED_FILES "../../../yoRadio/data/www/script.js.gz")
 
 # ESP8266_RTOS_SDK exposes only -Og/-Os in menuconfig. Audio code needs the
 # same explicit performance profile used by the ESP32-C3 native build.

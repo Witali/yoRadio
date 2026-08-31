@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/stat.h>
 
 #include "esp_log.h"
@@ -10,7 +11,7 @@
 #include "freertos/semphr.h"
 
 #define INDEX_MAGIC 0x58444959UL
-#define INDEX_VERSION 1U
+#define INDEX_VERSION 2U
 #define INDEX_TEMP_PATH PLAYLIST_INDEX_PATH ".tmp"
 
 typedef struct {
@@ -26,7 +27,52 @@ static uint16_t s_count;
 /* 144-byte name + tab + 512-byte URL + tab/gain/newline. */
 static char s_line[672];
 
+static bool has_unsupported_extension(const char *url) {
+    static const char *extensions[] = {
+        ".ogg", ".opus", ".flac", ".m3u", ".m3u8", ".pls", ".wav",
+    };
+    const char *suffix = strpbrk(url, "?#");
+    size_t length = suffix ? (size_t)(suffix - url) : strlen(url);
+    for (size_t index = 0;
+         index < sizeof(extensions) / sizeof(extensions[0]); ++index) {
+        size_t extension_length = strlen(extensions[index]);
+        if (length >= extension_length &&
+            strncasecmp(url + length - extension_length,
+                        extensions[index], extension_length) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool station_supported(const char *name, const char *url) {
+    /* The ESP8266 profile deliberately contains no TLS, Ogg, FLAC or WAV
+     * decoder. The shared repository playlist remains unchanged; this board's
+     * offset index contains only streams it can actually open and decode. */
+    return strncmp(url, "http://", 7U) == 0 &&
+           strncasecmp(name, "Ogg ", 4U) != 0 &&
+           !has_unsupported_extension(url);
+}
+
+bool playlist_service_entry_supported(char *line) {
+    if (!line) return false;
+    char *name_end = strchr(line, '\t');
+    if (!name_end) return false;
+    char *url = name_end + 1;
+    char *url_end = strchr(url, '\t');
+    if (!url_end) url_end = url + strcspn(url, "\r\n");
+    char saved_name_end = *name_end;
+    char saved_url_end = *url_end;
+    *name_end = '\0';
+    *url_end = '\0';
+    bool supported = line[0] && url[0] && station_supported(line, url);
+    *name_end = saved_name_end;
+    *url_end = saved_url_end;
+    return supported;
+}
+
 static bool parse_line(char *line, playlist_station_t *station) {
+    if (!playlist_service_entry_supported(line)) return false;
     char *name = line;
     char *url = strchr(name, '\t');
     if (!url) return false;

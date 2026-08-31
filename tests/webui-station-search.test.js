@@ -38,6 +38,13 @@ test("station search filters rendered rows by normalized name", () => {
   assert.match(script, /filterPlaylist\(filter \? filter\.value : ''\)/);
 });
 
+test("clicking either a playlist row or its child selects that station", () => {
+  const script = readAsset("script.js.gz");
+  assert.match(script, /if\(target\.classList\.contains\("play"\)\) \{ playItem\(target\); return; \}/);
+  assert.match(script, /if\(target\.parentElement && target\.parentElement\.classList\.contains\("play"\)\)\{ playItem\(target\.parentElement\); return; \}/);
+  assert.match(script, /websocket\.send\(`play=\$\{item\}`\)/);
+});
+
 test("current station stays selectable without unsolicited scrolling", () => {
   const script = readAsset("script.js.gz");
   const setCurrentItem = script.slice(
