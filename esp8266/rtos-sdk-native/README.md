@@ -5,8 +5,19 @@ the ESP-IDF-style component/CMake layout. It is deliberately HTTP-only and
 will contain only the Helix MP3 and AAC decoders.
 
 The default profile targets a 4 MiB ESP-12E/NodeMCU/Wemos-class module at
-160 MHz. Hardware I2S uses the ESP8266 fixed outputs: DATA GPIO3, BCLK GPIO15,
-LRCLK GPIO2. The default optional SSD1306 bus is SDA GPIO4/SCL GPIO5.
+160 MHz. Audio defaults to mono SPI-PDM on GPIO13/D7, leaving UART0 RX GPIO3
+available. HSPI clocks the PDM stream at 769.23 kHz, the closest hardware rate
+to 48 kHz x 16; GPIO14/D5 carries the unused SPI clock and should not be wired
+to the audio filter. The optional legacy I2S profile uses the ESP8266 fixed
+outputs: DATA GPIO3, BCLK GPIO15, LRCLK GPIO2. The default optional SSD1306 bus
+is SDA GPIO4/SCL GPIO5.
+
+For SPI-PDM, connect GPIO13/D7 through a low-pass/AC-coupling chain for a
+one-bit DAC, then feed a high-impedance amplifier input. The output is mono:
+stereo streams are scaled with their individual balance gains and then
+averaged. Do not connect GPIO14/D5 to the amplifier. Select
+`YORADIO_AUDIO_OUTPUT_I2S` only when fixed-pin I2S is explicitly required and
+the USB-UART adapter does not drive GPIO3.
 
 The network layout intentionally matches the ESP32-C3 OLED native target:
 WebUI HTTP resources use the standard port 80 and the persistent WebSocket is

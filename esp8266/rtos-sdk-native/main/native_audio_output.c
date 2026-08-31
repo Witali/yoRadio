@@ -3,18 +3,36 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include "board_config.h"
+#include "spi_pdm_config.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "sdkconfig.h"
+#if YORADIO_ESP8266_SPI_PDM
+#include "driver/gpio.h"
+#include "driver/spi.h"
+#include "esp8266/spi_struct.h"
+#else
 #include "driver/i2s.h"
+#endif
 #include "esp_log.h"
 #include "native_audio_normalizer.h"
 #include "persistent_settings.h"
 
 static const char *TAG = "audio_output";
+#if YORADIO_ESP8266_SPI_PDM
+static uint32_t s_input_sample_rate;
+static uint32_t s_resample_phase;
+static uint32_t s_pdm_integrator;
+static bool s_spi_initialized;
+static bool s_spi_pin_selected;
+#else
 static uint32_t s_sample_rate;
 static bool s_i2s_started;
 static bool s_clock_primed;
+#endif
 static uint8_t s_volume = 160;
 static int8_t s_balance;
 static bool s_normalization_enabled;
@@ -43,6 +61,167 @@ static int16_t scale_sample(int16_t sample, uint32_t gain_q15) {
     if (value < INT16_MIN) value = INT16_MIN;
     return (int16_t)value;
 }
+
+#if YORADIO_ESP8266_SPI_PDM
+
+#define SPI_PDM_CHUNK_BITS 512U
+#define SPI_PDM_CHUNK_WORDS (SPI_PDM_CHUNK_BITS / 32U)
+
+static const spi_interface_t s_spi_interface = {
+    .cpol = 0,
+    .cpha = 0,
+    .bit_tx_order = 0,
+    .bit_rx_order = 0,
+    .byte_tx_order = 0,
+    .byte_rx_order = 0,
+    .mosi_en = 1,
+    .miso_en = 0,
+    .cs_en = 0,
+};
+
+static esp_err_t spi_pdm_select_pin(void) {
+    if (s_spi_pin_selected) return ESP_OK;
+    spi_interface_t interface = s_spi_interface;
+    esp_err_t result = spi_set_interface(HSPI_HOST, &interface);
+    if (result == ESP_OK) s_spi_pin_selected = true;
+    return result;
+}
+
+static esp_err_t spi_pdm_send(const uint32_t *words, size_t bit_count) {
+    if (!bit_count || bit_count > SPI_PDM_CHUNK_BITS)
+        return ESP_ERR_INVALID_ARG;
+    esp_err_t result = spi_pdm_select_pin();
+    if (result != ESP_OK) return result;
+    spi_trans_t transaction = {
+        .mosi = (uint32_t *)words,
+    };
+    transaction.bits.mosi = bit_count;
+    return spi_trans(HSPI_HOST, &transaction);
+}
+
+static esp_err_t spi_pdm_emit_sample(int16_t sample, uint32_t *words,
+                                     size_t *bit_count) {
+    const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
+    for (unsigned bit = 0; bit < BOARD_SPI_PDM_OVERSAMPLE; ++bit) {
+        s_pdm_integrator += target;
+        bool high = s_pdm_integrator >= 65536U;
+        if (high) s_pdm_integrator -= 65536U;
+        if (high) {
+            size_t word = *bit_count / 32U;
+            unsigned shift = 31U - (unsigned)(*bit_count % 32U);
+            words[word] |= 1UL << shift;
+        }
+        ++*bit_count;
+        if (*bit_count == SPI_PDM_CHUNK_BITS) {
+            esp_err_t result = spi_pdm_send(words, *bit_count);
+            if (result != ESP_OK) return result;
+            memset(words, 0, sizeof(uint32_t) * SPI_PDM_CHUNK_WORDS);
+            *bit_count = 0;
+        }
+    }
+    return ESP_OK;
+}
+
+esp_err_t native_audio_output_init(void) {
+    spi_config_t config = {
+        .interface = s_spi_interface,
+        .intr_enable = {.val = 0},
+        .event_cb = NULL,
+        .mode = SPI_MASTER_MODE,
+        /* Initialize through the public API, then use the full hardware
+         * pre-divider because the public enum stops at 2 MHz. */
+        .clk_div = SPI_2MHz_DIV,
+    };
+    esp_err_t result = spi_init(HSPI_HOST, &config);
+    if (result == ESP_OK) {
+        /* APB is fixed at 80 MHz. 13 * 8 = 104 is the closest integral
+         * divider to 80 MHz / (48 kHz * 16): 769230.77 Hz (+0.16%). */
+        SPI1.clock.clk_equ_sysclk = false;
+        SPI1.clock.clkdiv_pre = 12;
+        SPI1.clock.clkcnt_n = 7;
+        SPI1.clock.clkcnt_h = 3;
+        SPI1.clock.clkcnt_l = 7;
+        s_spi_initialized = true;
+        s_spi_pin_selected = true;
+    }
+    native_audio_output_reload_settings();
+    if (result == ESP_OK) {
+        ESP_LOGI(TAG,
+                 "SPI-PDM: mono GPIO%d/D7, %u Hz, 16 bits/sample; "
+                 "GPIO%d/D5 clock unused",
+                 BOARD_SPI_PDM_DATA_GPIO, BOARD_SPI_PDM_BIT_RATE_HZ,
+                 BOARD_SPI_PDM_CLOCK_GPIO);
+    }
+    return result;
+}
+
+esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
+                                    uint32_t sample_rate, uint8_t channels) {
+    if (!samples || !sample_count || !sample_rate ||
+        (channels != 1 && channels != 2) || sample_count % channels)
+        return ESP_ERR_INVALID_ARG;
+    if (!s_spi_initialized) return ESP_ERR_INVALID_STATE;
+    size_t frames = sample_count / channels;
+    native_audio_normalizer_configure(
+        s_normalization_enabled, s_normalization_max_gain_db,
+        s_normalization_target_db, s_normalization_time_ms, sample_rate);
+    native_audio_normalizer_process(samples, frames, channels);
+    uint8_t left_balance = s_balance < 0
+        ? (uint8_t)(BALANCE_DENOMINATOR + s_balance) : BALANCE_DENOMINATOR;
+    uint8_t right_balance = s_balance > 0
+        ? (uint8_t)(BALANCE_DENOMINATOR - s_balance) : BALANCE_DENOMINATOR;
+    uint32_t left_gain = channel_gain_q15(s_volume, left_balance);
+    uint32_t right_gain = channel_gain_q15(s_volume, right_balance);
+    for (size_t frame = 0; frame < frames; ++frame) {
+        samples[frame * channels] =
+            scale_sample(samples[frame * channels], left_gain);
+        if (channels == 2) {
+            samples[frame * 2U + 1U] =
+                scale_sample(samples[frame * 2U + 1U], right_gain);
+        }
+    }
+
+    if (sample_rate != s_input_sample_rate) {
+        s_input_sample_rate = sample_rate;
+        s_resample_phase = 0;
+    }
+    uint32_t words[SPI_PDM_CHUNK_WORDS] = {0};
+    size_t bit_count = 0;
+    for (size_t frame = 0; frame < frames; ++frame) {
+        int32_t mono = samples[frame * channels];
+        if (channels == 2)
+            mono = (mono + samples[frame * 2U + 1U]) / 2;
+        s_resample_phase += BOARD_SPI_PDM_SAMPLE_RATE;
+        while (s_resample_phase >= sample_rate) {
+            esp_err_t result = spi_pdm_emit_sample(
+                (int16_t)mono, words, &bit_count);
+            if (result != ESP_OK) return result;
+            s_resample_phase -= sample_rate;
+        }
+    }
+    return bit_count ? spi_pdm_send(words, bit_count) : ESP_OK;
+}
+
+void native_audio_output_silence(void) {
+    if (!s_spi_initialized) return;
+    uint32_t silence[SPI_PDM_CHUNK_WORDS];
+    for (size_t index = 0; index < SPI_PDM_CHUNK_WORDS; ++index)
+        silence[index] = 0xaaaaaaaaU;
+    if (spi_pdm_send(silence, SPI_PDM_CHUNK_BITS) == ESP_OK) {
+        while (SPI1.cmd.usr) {
+            /* One block lasts 0.67 ms. Finish it before forcing a quiet,
+             * defined DC level on the disconnected/stopped output. */
+        }
+    }
+    gpio_set_direction(BOARD_SPI_PDM_DATA_GPIO, GPIO_MODE_OUTPUT);
+    gpio_set_level(BOARD_SPI_PDM_DATA_GPIO, 0);
+    s_spi_pin_selected = false;
+    s_input_sample_rate = 0;
+    s_resample_phase = 0;
+    s_pdm_integrator = 0;
+}
+
+#else
 
 esp_err_t native_audio_output_init(void) {
     const i2s_config_t config = {
@@ -152,6 +331,8 @@ void native_audio_output_silence(void) {
         ESP_LOGE(TAG, "I2S silence failed: %s", esp_err_to_name(result));
     s_clock_primed = false;
 }
+
+#endif
 
 void native_audio_output_reload_settings(void) {
     persistent_settings_t settings;

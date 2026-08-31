@@ -5,6 +5,7 @@
 #include "freertos/task.h"
 
 #include "board_config.h"
+#include "spi_pdm_config.h"
 #include "audio_service.h"
 #if CONFIG_YORADIO_OLED
 #include "display_service.h"
@@ -29,9 +30,15 @@ void app_main(void) {
     ESP_LOGI(TAG, "CPU: %u MHz; free heap: %u",
              CONFIG_ESP8266_DEFAULT_CPU_FREQ_MHZ,
              esp_get_free_heap_size());
+#if YORADIO_ESP8266_SPI_PDM
+    ESP_LOGI(TAG,
+             "profile: HTTP only, Helix MP3/AAC, SPI-PDM GPIO %d at %u Hz",
+             BOARD_SPI_PDM_DATA_GPIO, BOARD_SPI_PDM_BIT_RATE_HZ);
+#else
     ESP_LOGI(TAG, "profile: HTTP only, Helix MP3/AAC, I2S GPIO %d/%d/%d",
              BOARD_I2S_DATA_GPIO, BOARD_I2S_BCLK_GPIO,
              BOARD_I2S_LRCLK_GPIO);
+#endif
 
     esp_err_t result = nvs_flash_init();
     if (result == ESP_ERR_NVS_NO_FREE_PAGES) {

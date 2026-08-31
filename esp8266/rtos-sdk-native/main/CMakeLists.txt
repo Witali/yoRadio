@@ -37,6 +37,15 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
   YORADIO_HTTP_ONLY=1
   YORADIO_HELIX_MP3=1)
+option(YORADIO_ESP8266_FIXED_I2S
+  "Use fixed ESP8266 I2S GPIO3/15/2 instead of UART-safe SPI-PDM" OFF)
+if(YORADIO_ESP8266_FIXED_I2S)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_SPI_PDM=0)
+else()
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_SPI_PDM=1)
+endif()
 if(CONFIG_YORADIO_HELIX_AAC)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_HELIX_AAC=1)
 endif()
