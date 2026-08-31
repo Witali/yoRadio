@@ -512,13 +512,25 @@ static void audio_task(void *argument) {
                 break;
             }
         }
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        ESP_LOGI(TAG, "Profile detection: codec=%d bytes=%u free_heap=%u",
+                 (int)codec_kind, (unsigned)detect_size,
+                 (unsigned)esp_get_free_heap_size());
+#endif
         if (!codec_kind || !generation_current(command.generation)) {
             close(stream.socket);
             if (generation_current(command.generation))
                 native_state_set_audio(false, false, "UNSUPPORTED STREAM");
             continue;
         }
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        ESP_LOGI(TAG, "Profile decoder switch begin");
+#endif
         bool decoder_ready = helix_codec_switch(codec, codec_kind) == 0;
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        ESP_LOGI(TAG, "Profile decoder switch end: ready=%d free_heap=%u",
+                 decoder_ready, (unsigned)esp_get_free_heap_size());
+#endif
         if (!decoder_ready) {
             close(stream.socket);
             native_state_set_audio(false, false, "DECODER INIT ERROR");
@@ -533,8 +545,14 @@ static void audio_task(void *argument) {
         native_state_set_stream(codec_kind == HELIX_CODEC_MP3
                                     ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
                                 stream.advertised_bitrate, 0, 0);
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        ESP_LOGI(TAG, "Profile initial feed begin");
+#endif
         int feed = helix_codec_feed(codec, s_work, detect_size, false,
                                     pcm_output, &output);
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        ESP_LOGI(TAG, "Profile initial feed end: result=%d", feed);
+#endif
         native_state_set_audio(true, false, NULL);
         while (feed == 0 && generation_current(command.generation)) {
             if (stream.metadata_interval && !audio_until_metadata) {

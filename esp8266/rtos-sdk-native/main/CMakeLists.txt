@@ -19,6 +19,12 @@ list(APPEND YORADIO_SOURCES
     "web_service.c")
 option(YORADIO_ESP8266_AUDIO_PROFILE
   "Measure ESP8266 radio decode and output stages" OFF)
+option(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY
+  "Discard decoded PCM instead of converting and sending PDM" OFF)
+if(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY AND
+   NOT YORADIO_ESP8266_AUDIO_PROFILE)
+  message(FATAL_ERROR "Decode-only mode requires the ESP8266 audio profile")
+endif()
 set(YORADIO_ESP8266_AUDIO_PROFILE_URL "" CACHE STRING
   "Optional HTTP stream automatically started by the audio profile")
 set(YORADIO_ESP8266_AUDIO_PROFILE_STATIC_IP "" CACHE STRING
@@ -55,6 +61,10 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
 if(YORADIO_ESP8266_AUDIO_PROFILE)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_AUDIO_PROFILE=1)
+  if(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE
+      YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY=1)
+  endif()
   if(YORADIO_ESP8266_AUDIO_PROFILE_URL)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE
       YORADIO_ESP8266_AUDIO_PROFILE_URL=\"${YORADIO_ESP8266_AUDIO_PROFILE_URL}\")

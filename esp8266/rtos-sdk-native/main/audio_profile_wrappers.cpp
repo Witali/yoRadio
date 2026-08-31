@@ -4,7 +4,9 @@
 #include <cstring>
 
 #include "codec_bridge.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "esp_system.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -45,7 +47,13 @@ char s_codec[8] = "?";
 int64_t s_decode_started_us;
 uint64_t s_decode_pcm_before;
 int64_t s_spi_wait_started_us;
+uint32_t s_cpu_total;
+uint32_t s_cpu_idle;
+bool s_cpu_baseline_valid;
 const char *kTag = "audio_profile";
+
+extern "C" size_t g_heap_region_num;
+extern "C" heap_region_t g_heap_region[];
 
 bool in_audio_task() {
     return s_audio_task && xTaskGetCurrentTaskHandle() == s_audio_task;
@@ -73,6 +81,35 @@ unsigned percent_x10(uint64_t value, uint64_t denominator) {
     return denominator ? static_cast<unsigned>(value * 1000ULL / denominator)
                        : 0U;
 }
+
+size_t heap_total_size() {
+    size_t total = 0;
+    for (size_t i = 0; i < g_heap_region_num; ++i) {
+        if (g_heap_region[i].caps & MALLOC_CAP_32BIT)
+            total += g_heap_region[i].total_size;
+    }
+    return total;
+}
+
+#if configGENERATE_RUN_TIME_STATS == 1
+bool cpu_counters(uint32_t *total, uint32_t *idle) {
+    TaskStatus_t tasks[20];
+    uint32_t runtime = 0;
+    UBaseType_t count = uxTaskGetSystemState(
+        tasks, sizeof(tasks) / sizeof(tasks[0]), &runtime);
+    if (!count || !runtime) return false;
+    uint32_t idle_runtime = 0;
+    for (UBaseType_t i = 0; i < count; ++i) {
+        if (tasks[i].pcTaskName &&
+            std::strcmp(tasks[i].pcTaskName, "IDLE") == 0)
+            idle_runtime += tasks[i].ulRunTimeCounter;
+    }
+    *total = runtime;
+    *idle = idle_runtime;
+    return true;
+}
+#endif
+
 
 void log_stage(const char *name, Stage stage, uint64_t wall_us) {
     const StageStats &stats = s_stage[stage];
@@ -122,6 +159,35 @@ void maybe_report() {
              static_cast<unsigned>(output_compute / 1000ULL),
              static_cast<unsigned>(output_compute % 1000ULL),
              compute_load / 10U, compute_load % 10U);
+#if configGENERATE_RUN_TIME_STATS == 1
+    uint32_t cpu_total = 0;
+    uint32_t cpu_idle = 0;
+    if (cpu_counters(&cpu_total, &cpu_idle)) {
+        if (s_cpu_baseline_valid) {
+            uint32_t total_delta = cpu_total - s_cpu_total;
+            uint32_t idle_delta = cpu_idle - s_cpu_idle;
+            unsigned idle_load = percent_x10(idle_delta, total_delta);
+            if (idle_load > 1000U) idle_load = 1000U;
+            unsigned busy_load = 1000U - idle_load;
+            ESP_LOGI(kTag, "cpu busy=%u.%u%% idle=%u.%u%%", busy_load / 10U,
+                     busy_load % 10U, idle_load / 10U, idle_load % 10U);
+        } else {
+            ESP_LOGI(kTag, "cpu baseline captured");
+        }
+        s_cpu_total = cpu_total;
+        s_cpu_idle = cpu_idle;
+        s_cpu_baseline_valid = true;
+    }
+#endif
+    size_t heap_total = heap_total_size();
+    size_t heap_free = esp_get_free_heap_size();
+    size_t heap_min = esp_get_minimum_free_heap_size();
+    ESP_LOGI(kTag, "heap total=%u used=%u free=%u min_free=%u",
+             static_cast<unsigned>(heap_total),
+             static_cast<unsigned>(heap_total -
+                                   std::min(heap_total, heap_free)),
+             static_cast<unsigned>(heap_free),
+             static_cast<unsigned>(heap_min));
     reset_profile(std::strcmp(s_codec, "AAC") == 0 ? HELIX_CODEC_AAC
                                                      : HELIX_CODEC_MP3);
 }
@@ -132,7 +198,10 @@ extern "C" int __real_helix_codec_switch(helix_codec_t *,
 extern "C" int __wrap_helix_codec_switch(helix_codec_t *codec,
                                            helix_codec_kind_t kind) {
     int result = __real_helix_codec_switch(codec, kind);
-    if (result == 0) reset_profile(kind);
+    if (result == 0) {
+        s_cpu_baseline_valid = false;
+        reset_profile(kind);
+    }
     return result;
 }
 
@@ -182,8 +251,13 @@ extern "C" esp_err_t __wrap_native_audio_output_write(
     int16_t *samples, size_t sample_count, uint32_t sample_rate,
     uint8_t channels) {
     int64_t started = esp_timer_get_time();
+#if YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY
+    (void)samples;
+    esp_err_t result = ESP_OK;
+#else
     esp_err_t result = __real_native_audio_output_write(
         samples, sample_count, sample_rate, channels);
+#endif
     record(kPcmOutput, elapsed_since(started));
     if (sample_rate && channels)
         s_audio_us += static_cast<uint64_t>(sample_count / channels) *

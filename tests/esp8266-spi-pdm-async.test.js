@@ -57,3 +57,38 @@ test("ESP8266 audio profile can use an explicit static IPv4 test network", () =>
   assert.match(network, /tcpip_adapter_dhcpc_stop\(TCPIP_ADAPTER_IF_STA\)/);
   assert.match(network, /tcpip_adapter_set_ip_info/);
 });
+test("ESP8266 audio profile reports whole-CPU load and heap use", () => {
+  const profile = fs.readFileSync(
+    path.join(root, "audio_profile_wrappers.cpp"),
+    "utf8",
+  );
+  const defaults = fs.readFileSync(
+    path.join(root, "..", "sdkconfig.audio-profile.defaults"),
+    "utf8",
+  );
+
+  assert.match(defaults, /CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y/);
+  assert.match(profile, /uxTaskGetSystemState/);
+  assert.match(profile, /cpu busy=%u\.%u%% idle=%u\.%u%%/);
+  assert.match(profile, /esp_get_free_heap_size\(\)/);
+  assert.match(profile, /esp_get_minimum_free_heap_size\(\)/);
+  assert.match(profile, /heap total=%u used=%u free=%u min_free=%u/);
+});
+test("ESP8266 decode-only profile bypasses PDM while counting decoded PCM", () => {
+  const profile = fs.readFileSync(
+    path.join(root, "audio_profile_wrappers.cpp"),
+    "utf8",
+  );
+
+  assert.match(component, /YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY/);
+  assert.ok(
+    profile.includes("#if YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY"),
+  );
+  assert.ok(profile.includes("esp_err_t result = ESP_OK;"));
+  assert.ok(profile.includes("__real_native_audio_output_write("));
+  assert.ok(
+    profile.includes(
+      "s_audio_us += static_cast<uint64_t>(sample_count / channels)",
+    ),
+  );
+});
