@@ -5,7 +5,10 @@ the ESP-IDF-style component/CMake layout. It is deliberately HTTP-only and
 will contain only the Helix MP3 and AAC decoders.
 
 The default profile targets a 4 MiB ESP-12E/NodeMCU/Wemos-class module at
-160 MHz. Audio defaults to mono SPI-PDM on GPIO13/D7, leaving UART0 RX GPIO3
+160 MHz and uses the external flash in QIO mode at 40 MHz. The bootloader is
+initially written in DIO as required by ESP8266 RTOS SDK, then enables Quad I/O
+during startup. Use DIO for modules whose flash chip does not support QIO.
+Audio defaults to mono SPI-PDM on GPIO13/D7, leaving UART0 RX GPIO3
 available. HSPI clocks the PDM stream at 769.23 kHz, the closest hardware rate
 to 48 kHz x 16; GPIO14/D5 carries the unused SPI clock and should not be wired
 to the audio filter. The optional legacy I2S profile uses the ESP8266 fixed
