@@ -1,33 +1,35 @@
 # ESP8266 native development artifact
 
-- Source revision: `085f24d`
+- Source revision: `8d26dbd`
 - Target: ESP8266EX, 4 MiB flash
 - Framework: ESP8266 RTOS SDK v3.4
 - Profile: development, diagnostic logging enabled, `-O3`, audio profiler disabled
 - Features: HTTP radio streams, Helix MP3/AAC, WebUI-only display profile
 - Application flash offset: `0x10000`
 - File: `app.bin`
-- Size: 655808 bytes
-- SHA-256: `C1A7B52D3FBC3EA3697BA977D7F24DD7F67A54BA8C4CA39B9289C4E72E802F1C`
+- Size: 655776 bytes
+- SHA-256: `DC4FCE7E6B93928B7E2C7B6723222289977F48F1B94A9D1B4E8E33BC3FAE5163`
 
 ## Changes
 
-- Enabled the Helix AAC decoder by default.
-- Reserved a complete 2048-sample stereo PCM frame in AAC-enabled builds;
-  MP3-only builds retain the smaller 1152-sample granule buffer.
-- Added a one-tick scheduler pause after each successfully processed input
-  chunk so the idle task can feed the watchdog during continuous streams.
-- Retained the opt-in audio stage profiler outside this normal firmware image.
+- Replaced synchronous SPI-PDM transactions with a bounded 12-block queue
+  drained by the HSPI transfer-complete interrupt.
+- The audio task now sleeps on a FreeRTOS notification only while the queue is
+  full; it no longer spins while every 512-bit PDM block is transmitted.
+- Increased the board-specific input stack to 3072 bytes after physical BOOT
+  tests exposed stack overflows while reading the SPIFFS playlist.
+- Added reproducible MP3/AAC profiling URLs and optional static IPv4 settings
+  to the opt-in diagnostic profile; they are absent from this normal image.
 
 ## Validation
 
 - Clean normal firmware build completed successfully with AAC enabled and the
-  profiling option disabled.
-- All 225 repository regression tests passed.
-- AAC 60-77 kbit/s, 22 kHz mono decoded on the physical ESP8266 for four
-  consecutive five-second windows without a watchdog reset.
-- AAC 320 kbit/s, 44 kHz stereo decoded without the former PCM-buffer overflow;
-  measured throughput remained about 37% of real time, so high-rate AAC is not
-  yet suitable for uninterrupted playback with synchronous SPI-PDM output.
-- Switching from AAC 320 kbit/s to AAC 64 kbit/s completed without reallocating
-  the outer codec workspace or corrupting the PCM buffer.
+  profiling option disabled; all 231 repository regression tests passed.
+- The physical Wemos D1 mini joined Wi-Fi by DHCP at 192.168.100.6; WebUI
+  root and /api/native/status both returned HTTP 200.
+- A simulated short BOOT press selected station 1 and opened its ICY stream;
+  live status reported playback, AAC, 67 kbit/s and current RSSI.
+- Reproducible local AAC 320, AAC 64 and MP3 128 streams all exercised the
+  interrupt-driven output without watchdog resets or SPI queue timeouts.
+- On AAC 320, SPI queue wait averaged about 22% of wall time as blocked task
+  time, while gain/mix/PDM computation averaged about 13%.
