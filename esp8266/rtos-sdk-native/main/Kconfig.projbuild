@@ -15,15 +15,6 @@ config YORADIO_WEB_SEND_TIMEOUT_SECONDS
     help
         Maximum time a static-content worker waits for one socket send.
 
-config YORADIO_WEB_STATIC_WORKERS
-    int "Parallel WebUI static-content workers"
-    range 1 2
-    default 1
-    help
-        Number of asynchronous workers that read SPIFFS and send WebUI files.
-        One worker is the low-memory default for ESP8266 and leaves the main
-        HTTP task available for WebSocket traffic.
-
 config YORADIO_OLED
     bool "Enable SSD1306 OLED display"
     default n

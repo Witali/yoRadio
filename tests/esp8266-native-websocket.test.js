@@ -69,7 +69,7 @@ test("ESP8266 WebSocket handler reads a command in one bounded receive", () => {
 });
 
 test("ESP8266 HTTP task has enough stack for playlist-backed commands", () => {
-  assert.match(source, /config\.stack_size = 6144/);
+  assert.match(source, /config\.stack_size = BOARD_TASK_STACK_WEB/);
 });
 
 test("ESP8266 radio retries short socket timeouts until the HTTP header deadline", () => {

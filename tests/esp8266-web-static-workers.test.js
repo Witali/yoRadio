@@ -67,19 +67,21 @@ test("ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets", () =
   );
 });
 
-test("ESP8266 sends static WebUI resources from a bounded worker queue", () => {
+test("ESP8266 services static WebUI resources from a bounded main-loop queue", () => {
   assert.match(webSource, /xQueueCreate\(WEB_STATIC_QUEUE_DEPTH, sizeof\(httpd_req_t \*\)\)/);
   assert.match(
     webSource,
-    /xTaskCreate\(static_worker_task, name, BOARD_TASK_STACK_WEB_STATIC/,
+    /service_static_queue_once\(void\)[\s\S]*xQueueReceive\(s_static_request_queue, &request, 0\)/,
   );
   assert.match(
     webSource,
     /httpd_req_async_handler_begin\(request, &async_request\)[\s\S]*xQueueSend\(s_static_request_queue, &async_request, 0\)/,
   );
-  const worker = bodyFrom(webSource, "static void static_worker_task", "static esp_err_t start_static_workers");
-  assert.match(worker, /serve_static_request\(request\)/);
-  assert.match(worker, /httpd_req_async_handler_complete\(request\)/);
+  const service = bodyFrom(webSource, "static void service_static_queue_once", "static esp_err_t static_handler");
+  assert.match(service, /serve_static_request\(request\)/);
+  assert.match(service, /httpd_req_async_handler_complete\(request\)/);
+  assert.match(webSource, /void web_service_poll\(void\) \{\s*service_static_queue_once\(\)/);
+  assert.doesNotMatch(webSource, /xTaskCreate\(static_worker_task/);
 });
 
 test("ESP8266 keeps status and WebSocket on the HTTP task while static routes are asynchronous", () => {
@@ -97,10 +99,10 @@ test("ESP8266 keeps status and WebSocket on the HTTP task while static routes ar
   assert.doesNotMatch(webSource, /register_get\("\/api\/native\/status", static_handler\)/);
 });
 
-test("ESP8266 async WebUI defaults preserve RAM for streaming", () => {
-  assert.match(kconfig, /config YORADIO_WEB_STATIC_WORKERS[\s\S]*range 1 2[\s\S]*default 1/);
+test("ESP8266 async WebUI defaults avoid a dedicated static worker stack", () => {
+  assert.doesNotMatch(kconfig, /config YORADIO_WEB_STATIC_WORKERS/);
   assert.match(kconfig, /config YORADIO_WEB_SEND_TIMEOUT_SECONDS[\s\S]*default 20/);
-  assert.match(boardConfig, /#define BOARD_TASK_STACK_WEB_STATIC 3072/);
-  assert.match(sdkDefaults, /CONFIG_YORADIO_WEB_STATIC_WORKERS=1/);
+  assert.doesNotMatch(boardConfig, /BOARD_TASK_STACK_WEB_STATIC/);
+  assert.doesNotMatch(sdkDefaults, /CONFIG_YORADIO_WEB_STATIC_WORKERS/);
   assert.match(sdkDefaults, /CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS=20/);
 });

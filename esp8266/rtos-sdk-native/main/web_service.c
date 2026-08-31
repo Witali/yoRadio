@@ -23,13 +23,10 @@
 #define WEB_STATUS_CAPACITY 1280U
 #define WEB_MAX_OPEN_SOCKETS 7U
 #define WEB_STATIC_QUEUE_DEPTH WEB_MAX_OPEN_SOCKETS
-#define WEB_STATIC_WORKER_PRIORITY 3U
 
 static const char *TAG = "web";
 static httpd_handle_t s_server;
 static QueueHandle_t s_static_request_queue;
-static TaskHandle_t
-    s_static_worker_tasks[CONFIG_YORADIO_WEB_STATIC_WORKERS];
 static volatile int s_ws_fd = -1;
 static volatile bool s_send_pending;
 static volatile bool s_playlist_changed;
@@ -625,54 +622,31 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
     return asset_handler(request);
 }
 
-static void static_worker_task(void *argument) {
-    (void)argument;
-    while (true) {
-        httpd_req_t *request = NULL;
-        if (xQueueReceive(s_static_request_queue, &request, portMAX_DELAY) !=
-            pdTRUE) {
-            continue;
-        }
-        esp_err_t result = serve_static_request(request);
-        if (result != ESP_OK) {
-            ESP_LOGW(TAG, "Static response failed for %s: %s", request->uri,
-                     esp_err_to_name(result));
-        }
-        result = httpd_req_async_handler_complete(request);
-        if (result != ESP_OK) {
-            ESP_LOGE(TAG, "Static request completion failed: %s",
-                     esp_err_to_name(result));
-        }
-    }
-}
-
-static esp_err_t start_static_workers(void) {
+static esp_err_t start_static_queue(void) {
     s_static_request_queue =
         xQueueCreate(WEB_STATIC_QUEUE_DEPTH, sizeof(httpd_req_t *));
     if (!s_static_request_queue) return ESP_ERR_NO_MEM;
-
-    for (size_t index = 0; index < CONFIG_YORADIO_WEB_STATIC_WORKERS;
-         ++index) {
-        char name[16];
-        snprintf(name, sizeof(name), "web_static_%u", (unsigned)index);
-        if (xTaskCreate(static_worker_task, name, BOARD_TASK_STACK_WEB_STATIC,
-                        NULL, WEB_STATIC_WORKER_PRIORITY,
-                        &s_static_worker_tasks[index]) != pdPASS) {
-            for (size_t created = 0; created < index; ++created) {
-                vTaskDelete(s_static_worker_tasks[created]);
-                s_static_worker_tasks[created] = NULL;
-            }
-            vQueueDelete(s_static_request_queue);
-            s_static_request_queue = NULL;
-            return ESP_ERR_NO_MEM;
-        }
-    }
     ESP_LOGI(TAG,
-             "Static content workers: %u, send timeout: %u s; free heap: %u",
-             (unsigned)CONFIG_YORADIO_WEB_STATIC_WORKERS,
+             "Static content: async main-loop queue, send timeout: %u s; free heap: %u",
              (unsigned)CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS,
              (unsigned)esp_get_free_heap_size());
     return ESP_OK;
+}
+
+static void service_static_queue_once(void) {
+    if (!s_static_request_queue) return;
+    httpd_req_t *request = NULL;
+    if (xQueueReceive(s_static_request_queue, &request, 0) != pdTRUE) return;
+    esp_err_t result = serve_static_request(request);
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "Static response failed for %s: %s", request->uri,
+                 esp_err_to_name(result));
+    }
+    result = httpd_req_async_handler_complete(request);
+    if (result != ESP_OK) {
+        ESP_LOGE(TAG, "Static request completion failed: %s",
+                 esp_err_to_name(result));
+    }
 }
 
 static esp_err_t static_handler(httpd_req_t *request) {
@@ -703,12 +677,12 @@ static esp_err_t register_get(const char *uri, esp_err_t (*handler)(httpd_req_t 
 }
 
 esp_err_t web_service_start(void) {
-    esp_err_t result = start_static_workers();
+    esp_err_t result = start_static_queue();
     if (result != ESP_OK) return result;
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = 80;
-    config.stack_size = 6144;
+    config.stack_size = BOARD_TASK_STACK_WEB;
     config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
     config.max_uri_handlers = 18;
     config.lru_purge_enable = true;
@@ -757,6 +731,7 @@ void web_service_notify_playlist_changed(void) {
 }
 
 void web_service_poll(void) {
+    service_static_queue_once();
     if (!s_server || s_ws_fd < 0 || s_send_pending) return;
     if (s_current_pending) {
         char current[40];
