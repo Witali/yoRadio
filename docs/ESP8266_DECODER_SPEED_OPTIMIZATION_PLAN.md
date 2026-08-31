@@ -35,6 +35,17 @@ decoder correctness.
 - [ ] Add a one-channel decode or synthesis path when the physical output is
   mono. Avoid decoding stereo and then discarding or mixing one channel.
   Verify that mono streams and stereo-to-mono output remain correct.
+- [ ] Investigate an MP3 mid/side joint-stereo fast path for mono output. For
+  frames that use M/S stereo without intensity stereo, benchmark decoding and
+  synthesizing only the mid (sum) channel instead of reconstructing left and
+  right. Compare its PCM output against the rounded average of the reference
+  stereo decoder and account for the Helix dequantizer's existing 1/sqrt(2)
+  scaling.
+- [ ] Keep a full-decoder fallback for MP3 intensity stereo and ordinary
+  independent stereo; `joint stereo` does not always mean that the first
+  coded channel is a directly usable sum channel. Test streams containing
+  mode changes between consecutive frames so skipped side-channel IMDCT and
+  synthesis history cannot corrupt later output.
 - [ ] Continue optimizing asynchronous SPI-PDM output and avoid polling,
   unnecessary copies, and long critical sections. Treat this as a separate
   output-path optimization; it cannot by itself make MP3 320 kbit/s realtime.
@@ -49,7 +60,8 @@ decoder correctness.
 2. Stage-level profiling, to identify the actual hot path.
 3. Xtensa fixed-point primitives applied only to measured hotspots.
 4. One carefully selected IRAM function and small hot tables.
-5. Mono decode/synthesis path where the hardware output is mono.
+5. Mono decode/synthesis path, including the guarded MP3 M/S joint-stereo
+   experiment, where the hardware output is mono.
 6. Asynchronous SPI-PDM refinements and integration profiling.
 
 ## Current performance gap
@@ -71,4 +83,3 @@ combination of Xtensa-specific fixed-point operations, selective IRAM/RAM
 placement, and output-path optimization. MP3 320 kbit/s still needs a much
 larger improvement. It may require a decoder better optimized for LX106, a
 mono-only synthesis path, or explicit limits on channel count and sample rate.
-
