@@ -127,6 +127,28 @@ test("ESP8266 bounds simultaneous HTTP sessions without LRU eviction", () => {
   assert.match(webSource, /config\.lru_purge_enable = false/);
 });
 
+test("ESP8266 strips cache-busting query from static file lookup", () => {
+  const pathLength = bodyFrom(
+    webSource,
+    "static size_t request_path_length",
+    "static bool request_path_equals",
+  );
+  assert.match(pathLength, /strchr\(request->uri, '\?'\)/);
+  const asset = bodyFrom(
+    webSource,
+    "static esp_err_t asset_handler",
+    "static esp_err_t playlist_handler",
+  );
+  assert.match(asset, /uri_length = request_path_length\(request\)/);
+  const dispatch = bodyFrom(
+    webSource,
+    "static esp_err_t serve_static_request",
+    "static esp_err_t static_handler",
+  );
+  assert.match(dispatch, /request_path_equals\(request, "\/variables\.js"\)/);
+  assert.match(dispatch, /request_path_equals\(request, "\/settings\.html"\)/);
+});
+
 test("ESP8266 chunks embedded HTML below its TCP send window", () => {
   const chunked = bodyFrom(webSource, "static esp_err_t send_chunked_string", "static void json_escape");
   assert.match(chunked, /remaining > 512U \? 512U : remaining/);

@@ -471,6 +471,18 @@ static FILE *open_nonempty(const char *path) {
     return file;
 }
 
+static size_t request_path_length(const httpd_req_t *request) {
+    const char *query = strchr(request->uri, '?');
+    return query ? (size_t)(query - request->uri) : strlen(request->uri);
+}
+
+static bool request_path_equals(const httpd_req_t *request,
+                                const char *path) {
+    size_t length = request_path_length(request);
+    return strlen(path) == length &&
+           memcmp(request->uri, path, length) == 0;
+}
+
 static bool web_ui_available(void) {
     static const char *required[] = {
         "theme.css.gz", "style.css.gz", "script.js.gz", "dragpl.js.gz",
@@ -513,7 +525,7 @@ static const char *asset_type(const char *uri) {
 
 static esp_err_t page_handler(httpd_req_t *request) {
     prepare_short_response(request);
-    if (strcmp(request->uri, "/") == 0 && !web_ui_available()) {
+    if (request_path_equals(request, "/") && !web_ui_available()) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
         return finish_short_response(
@@ -547,7 +559,7 @@ static esp_err_t variables_handler(httpd_req_t *request) {
 static esp_err_t asset_handler(httpd_req_t *request) {
     prepare_short_response(request);
     char path[96];
-    size_t uri_length = strlen(request->uri);
+    size_t uri_length = request_path_length(request);
     static const char prefix[] = "/spiffs/www";
     if (uri_length + sizeof(prefix) + 3U > sizeof(path)) {
         return httpd_resp_send_404(request);
@@ -622,17 +634,17 @@ static esp_err_t favicon_handler(httpd_req_t *request) {
 }
 
 static esp_err_t serve_static_request(httpd_req_t *request) {
-    if (strcmp(request->uri, "/") == 0 ||
-        strcmp(request->uri, "/index.html") == 0 ||
-        strcmp(request->uri, "/settings.html") == 0 ||
-        strcmp(request->uri, "/update.html") == 0) {
+    if (request_path_equals(request, "/") ||
+        request_path_equals(request, "/index.html") ||
+        request_path_equals(request, "/settings.html") ||
+        request_path_equals(request, "/update.html")) {
         return page_handler(request);
     }
-    if (strcmp(request->uri, "/variables.js") == 0)
+    if (request_path_equals(request, "/variables.js"))
         return variables_handler(request);
-    if (strcmp(request->uri, "/data/playlist.csv") == 0)
+    if (request_path_equals(request, "/data/playlist.csv"))
         return playlist_handler(request);
-    if (strcmp(request->uri, "/favicon.ico") == 0)
+    if (request_path_equals(request, "/favicon.ico"))
         return favicon_handler(request);
     return asset_handler(request);
 }

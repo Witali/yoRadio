@@ -34,6 +34,7 @@ const state = {
   station: "",
 };
 const waiters = new Set();
+const messageWaiters = new Set();
 
 function describeState(value = state) {
   return `playing=${value.playing} current=${value.current} station="${value.station}"`;
@@ -51,6 +52,13 @@ function settleWaiters() {
 
 function applyMessage(raw) {
   const data = JSON.parse(raw);
+  for(const waiter of [...messageWaiters]) {
+    if(waiter.predicate(data)) {
+      clearTimeout(waiter.timer);
+      messageWaiters.delete(waiter);
+      waiter.resolve(data);
+    }
+  }
   if(Array.isArray(data.payload)) {
     for(const item of data.payload) {
       if(item.id === "playerwrap") state.playing = item.value === "playing";
@@ -74,6 +82,25 @@ function waitFor(description, predicate, afterRevision = state.revision) {
   });
 }
 
+function waitForJson(description, predicate) {
+  return new Promise((resolve, reject) => {
+    const waiter = {description, predicate, resolve, reject};
+    waiter.timer = setTimeout(() => {
+      messageWaiters.delete(waiter);
+      reject(new Error(`Timed out waiting for ${description}`));
+    }, timeoutMs);
+    messageWaiters.add(waiter);
+  });
+}
+
+async function query(commandText, description, predicate) {
+  const response = waitForJson(description, predicate);
+  socket.send(commandText);
+  const data = await response;
+  console.log(`PASS ${description}`);
+  return data;
+}
+
 async function command(command, description, predicate) {
   const afterRevision = state.revision;
   socket.send(command);
@@ -87,6 +114,10 @@ function delay(milliseconds) {
 }
 
 async function ensureStopped() {
+  if(!state.playing) {
+    console.log(`PASS WebUI is already stopped: ${describeState()}`);
+    return;
+  }
   await command("stop=1", "WebUI receives stopped state", value => !value.playing);
   await delay(1000);
   if(state.playing) {
@@ -98,9 +129,28 @@ async function ensureStopped() {
   }
 }
 
+async function testSettingsResponses() {
+  await query(
+    "getactive=1",
+    "client mode exposes the full settings groups",
+    data => Array.isArray(data.act) && data.act.includes("group_system") &&
+            data.act.includes("group_display"),
+  );
+  await query("getsystem=1", "system settings are returned",
+              data => "normalize" in data && "normtime" in data);
+  await query("getscreen=1", "display settings are returned",
+              data => "br" in data && "scrt" in data);
+  await query("gettimezone=1", "timezone settings are returned",
+              data => "sntp1" in data && "timeint" in data);
+  await query("getcontrols=1", "control settings are returned",
+              data => "vols" in data && "enca" in data);
+}
+
 async function testRemoteControls() {
   await ensureStopped();
   await command("toggle=1", "Play reaches actual playing state", value => value.playing);
+  await command("stop=1", "Stop reaches stopped state", value => !value.playing);
+  await command("toggle=1", "Play resumes after Stop", value => value.playing);
   await command("toggle=1", "Pause reaches stopped state", value => !value.playing);
 
   const beforeNext = state.current;
@@ -173,6 +223,7 @@ try {
   );
   console.log(`Connected to ${url}: ${describeState()}`);
 
+  await testSettingsResponses();
   await testRemoteControls();
   if(physical) {
     input = createInterface({input: process.stdin, output: process.stdout});
