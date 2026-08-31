@@ -2,11 +2,11 @@ menu "yoRadio ESP8266 options"
 
 config YORADIO_HELIX_AAC
     bool "Enable Helix AAC decoder"
-    default n
+    default y
     help
-        Build AAC support into the ESP8266 firmware. Keep this disabled in
-        the low-memory MP3 profile: the AAC decoder increases IRAM pressure
-        and makes the large MP3 synthesis allocation less reliable.
+        Build AAC support into the ESP8266 firmware. MP3 and AAC share the
+        preallocated codec arena; AAC-enabled builds reserve a complete
+        stereo AAC PCM frame.
 
 config YORADIO_WEB_SEND_TIMEOUT_SECONDS
     int "Web content send timeout (seconds)"

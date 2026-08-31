@@ -443,6 +443,9 @@ static void audio_task(void *argument) {
                     audio_until_metadata -= (uint32_t)received;
                 feed = helix_codec_commit(codec, (size_t)received,
                                           pcm_output, &output);
+                /* A continuously readable stream must still let the idle
+                 * task feed the watchdog and service deferred Wi-Fi work. */
+                if (feed == 0) vTaskDelay(pdMS_TO_TICKS(1));
                 int64_t now = esp_timer_get_time();
                 if (!output.decoder_bitrate &&
                     now - output.measured_started_us >= 3000000) {

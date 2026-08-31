@@ -15,6 +15,12 @@ const decoder = read(
 const decoderHeader = read(
   "yoRadio", "src", "audioI2S", "mp3_decoder", "mp3_decoder.h",
 );
+const audioService = read(
+  "esp8266", "rtos-sdk-native", "main", "audio_service.c",
+);
+const nativeOptions = read(
+  "esp8266", "rtos-sdk-native", "main", "Kconfig.projbuild",
+);
 
 test("ESP8266 MP3 streams one granule through a half-size PCM buffer", () => {
   assert.match(bridge, /constexpr size_t kPcmSamples = 576U \* 2U/);
@@ -26,6 +32,24 @@ test("ESP8266 MP3 streams one granule through a half-size PCM buffer", () => {
   assert.match(
     bridge,
     /samples <= 0 \|\| static_cast<size_t>\(samples\) > kPcmSamples/,
+  );
+});
+
+test("ESP8266 AAC reserves a complete stereo PCM frame before decoding", () => {
+  assert.match(
+    bridge,
+    /#if CONFIG_YORADIO_HELIX_AAC[\s\S]*kPcmSamples = 1024U \* 2U;[\s\S]*#else[\s\S]*kPcmSamples = 576U \* 2U;/,
+  );
+});
+
+test("ESP8266 enables AAC and yields between compressed input chunks", () => {
+  assert.match(
+    nativeOptions,
+    /config YORADIO_HELIX_AAC[\s\S]*default y/,
+  );
+  assert.match(
+    audioService,
+    /helix_codec_commit\([\s\S]*if \(feed == 0\) vTaskDelay\(pdMS_TO_TICKS\(1\)\)/,
   );
 });
 

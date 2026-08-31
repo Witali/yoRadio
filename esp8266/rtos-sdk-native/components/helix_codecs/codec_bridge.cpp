@@ -25,10 +25,14 @@ constexpr size_t kArenaBytes = 23328U;
 /* 1536 bytes covers a maximum-size 320-kbit/s MP3 frame and normal
  * high-bitrate ADTS AAC frames while conserving scarce ESP8266 DRAM. */
 constexpr size_t kInputBytes = 1536U;
-/* Helix emits at most 576 stereo samples per MPEG granule. Streaming each
- * granule immediately halves the persistent PCM workspace while preserving
- * the conventional frame sample order. */
+/* Helix MP3 emits at most 576 stereo samples per granule. AAC writes a
+ * complete 1024-sample stereo frame before its size can be inspected, so an
+ * AAC-enabled build must reserve the larger destination up front. */
+#if CONFIG_YORADIO_HELIX_AAC
+constexpr size_t kPcmSamples = 1024U * 2U;
+#else
 constexpr size_t kPcmSamples = 576U * 2U;
+#endif
 constexpr char kTag[] = "helix_bridge";
 
 struct Mp3Header {
