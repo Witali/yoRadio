@@ -11,11 +11,13 @@ entries are retained; changes are published under a new firmware version.
   low-memory radio client and added native protocol tests.
 - Made ESP HTTP Server writes bounded and nonblocking, explicitly closed short
   static/API sessions and capped TCP PCB allocation to prevent heap exhaustion.
+- Fixed mobile WebUI startup by excluding cache-busting query parameters from
+  static SPIFFS filenames; all versioned page resources now return HTTP 200.
 - Flashed and tested the physical Wemos D1 mini: 12 concurrent requests, three
   53,808-byte playlist transfers, follow-up HTTP and ping all succeeded.
 - Played a real HTTP AAC stream on a non-default port and verified WebSocket
   Play/Pause/Next/Previous/Stop synchronization.
-- Built source revision `9733938`; all 239 regression tests passed. The checked
+- Built source revision `ceb6440`; all 240 regression tests passed. The checked
   artifact and SHA-256 manifest are in
   [`development/esp8266-native/`](development/esp8266-native/).
 
