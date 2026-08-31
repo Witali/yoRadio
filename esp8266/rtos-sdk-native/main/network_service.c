@@ -204,6 +204,23 @@ esp_err_t network_service_start(void) {
     s_events = xEventGroupCreate();
     if (!s_events) return ESP_ERR_NO_MEM;
     tcpip_adapter_init();
+#ifdef YORADIO_ESP8266_AUDIO_PROFILE_STATIC_IP
+    tcpip_adapter_ip_info_t static_ip;
+    if (!ip4addr_aton(YORADIO_ESP8266_AUDIO_PROFILE_STATIC_IP,
+                      &static_ip.ip) ||
+        !ip4addr_aton(YORADIO_ESP8266_AUDIO_PROFILE_GATEWAY,
+                      &static_ip.gw) ||
+        !ip4addr_aton(YORADIO_ESP8266_AUDIO_PROFILE_NETMASK,
+                      &static_ip.netmask)) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);
+    esp_err_t static_result = tcpip_adapter_set_ip_info(
+        TCPIP_ADAPTER_IF_STA, &static_ip);
+    if (static_result != ESP_OK) return static_result;
+    ESP_LOGI(TAG, "Audio profile static address: %s",
+             YORADIO_ESP8266_AUDIO_PROFILE_STATIC_IP);
+#endif
     esp_err_t result = esp_event_loop_create_default();
     if (result != ESP_OK) return result;
     wifi_init_config_t init = WIFI_INIT_CONFIG_DEFAULT();

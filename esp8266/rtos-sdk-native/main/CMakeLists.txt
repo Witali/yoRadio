@@ -18,6 +18,14 @@ list(APPEND YORADIO_SOURCES
     "web_service.c")
 option(YORADIO_ESP8266_AUDIO_PROFILE
   "Measure ESP8266 radio decode and output stages" OFF)
+set(YORADIO_ESP8266_AUDIO_PROFILE_URL "" CACHE STRING
+  "Optional HTTP stream automatically started by the audio profile")
+set(YORADIO_ESP8266_AUDIO_PROFILE_STATIC_IP "" CACHE STRING
+  "Optional static IPv4 address for an isolated audio profile")
+set(YORADIO_ESP8266_AUDIO_PROFILE_GATEWAY "" CACHE STRING
+  "Gateway paired with the profile static IPv4 address")
+set(YORADIO_ESP8266_AUDIO_PROFILE_NETMASK "" CACHE STRING
+  "Netmask paired with the profile static IPv4 address")
 if(YORADIO_ESP8266_AUDIO_PROFILE)
   list(APPEND YORADIO_SOURCES "audio_profile_wrappers.cpp")
 endif()
@@ -43,13 +51,28 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_HTTP_ONLY=1
   YORADIO_HELIX_MP3=1)
 if(YORADIO_ESP8266_AUDIO_PROFILE)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_AUDIO_PROFILE=1)
+  if(YORADIO_ESP8266_AUDIO_PROFILE_URL)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE
+      YORADIO_ESP8266_AUDIO_PROFILE_URL=\"${YORADIO_ESP8266_AUDIO_PROFILE_URL}\")
+  endif()
+  if(YORADIO_ESP8266_AUDIO_PROFILE_STATIC_IP)
+    if(NOT YORADIO_ESP8266_AUDIO_PROFILE_GATEWAY OR
+       NOT YORADIO_ESP8266_AUDIO_PROFILE_NETMASK)
+      message(FATAL_ERROR "Profile static IPv4 requires gateway and netmask")
+    endif()
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE
+      YORADIO_ESP8266_AUDIO_PROFILE_STATIC_IP=\"${YORADIO_ESP8266_AUDIO_PROFILE_STATIC_IP}\"
+      YORADIO_ESP8266_AUDIO_PROFILE_GATEWAY=\"${YORADIO_ESP8266_AUDIO_PROFILE_GATEWAY}\"
+      YORADIO_ESP8266_AUDIO_PROFILE_NETMASK=\"${YORADIO_ESP8266_AUDIO_PROFILE_NETMASK}\")
+  endif()
   target_link_libraries(${COMPONENT_LIB} INTERFACE
     "-Wl,--wrap=lwip_recv"
     "-Wl,--wrap=helix_codec_switch"
     "-Wl,--wrap=helix_codec_commit"
     "-Wl,--wrap=native_audio_output_write"
-    "-Wl,--wrap=native_audio_normalizer_process"
-    "-Wl,--wrap=spi_trans")
+    "-Wl,--wrap=native_audio_normalizer_process")
 endif()
 option(YORADIO_ESP8266_FIXED_I2S
   "Use fixed ESP8266 I2S GPIO3/15/2 instead of UART-safe SPI-PDM" OFF)

@@ -224,6 +224,11 @@ static int open_http_stream(char *url, http_stream_t *stream) {
             int received = recv(socket_fd, s_work + received_total,
                                 sizeof(s_work) - 1U - received_total, 0);
             if (received > 0) {
+#if YORADIO_ESP8266_AUDIO_PROFILE
+                if (!received_total)
+                    ESP_LOGI(TAG, "Profile header RX started: %d bytes",
+                             received);
+#endif
                 received_total += (size_t)received;
                 continue;
             }
@@ -233,6 +238,12 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                 continue;
             }
             if (received <= 0) {
+#if YORADIO_ESP8266_AUDIO_PROFILE
+                ESP_LOGW(TAG,
+                         "Profile header RX failed: received=%d total=%u "
+                         "errno=%d",
+                         received, (unsigned)received_total, errno);
+#endif
                 close(socket_fd);
                 return -4;
             }

@@ -4,7 +4,6 @@
 #include <cstring>
 
 #include "codec_bridge.h"
-#include "driver/spi.h"
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
@@ -45,6 +44,7 @@ uint32_t s_frames;
 char s_codec[8] = "?";
 int64_t s_decode_started_us;
 uint64_t s_decode_pcm_before;
+int64_t s_spi_wait_started_us;
 const char *kTag = "audio_profile";
 
 bool in_audio_task() {
@@ -116,7 +116,7 @@ void maybe_report() {
     log_stage("decode_core", kDecodeCore, wall_us);
     log_stage("pcm_output", kPcmOutput, wall_us);
     log_stage("normalize", kNormalizer, wall_us);
-    log_stage("spi_wait", kSpiWait, wall_us);
+    log_stage("spi_queue_wait", kSpiWait, wall_us);
     unsigned compute_load = percent_x10(output_compute, wall_us);
     ESP_LOGI(kTag, "gain+mix+pdm=%u.%03u ms (%u.%u%%)",
              static_cast<unsigned>(output_compute / 1000ULL),
@@ -200,11 +200,10 @@ extern "C" void __wrap_native_audio_normalizer_process(
     record(kNormalizer, elapsed_since(started));
 }
 
-extern "C" esp_err_t __real_spi_trans(spi_host_t, spi_trans_t *);
-extern "C" esp_err_t __wrap_spi_trans(spi_host_t host,
-                                        spi_trans_t *transaction) {
-    int64_t started = esp_timer_get_time();
-    esp_err_t result = __real_spi_trans(host, transaction);
-    if (in_audio_task()) record(kSpiWait, elapsed_since(started));
-    return result;
+extern "C" void audio_profile_spi_wait_begin(void) {
+    s_spi_wait_started_us = esp_timer_get_time();
+}
+
+extern "C" void audio_profile_spi_wait_end(void) {
+    record(kSpiWait, elapsed_since(s_spi_wait_started_us));
 }

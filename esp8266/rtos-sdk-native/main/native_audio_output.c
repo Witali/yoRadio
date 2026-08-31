@@ -13,6 +13,7 @@
 #if YORADIO_ESP8266_SPI_PDM
 #include "driver/gpio.h"
 #include "driver/spi.h"
+#include "esp_attr.h"
 #include "esp8266/spi_struct.h"
 #else
 #include "driver/i2s.h"
@@ -66,6 +67,25 @@ static int16_t scale_sample(int16_t sample, uint32_t gain_q15) {
 
 #define SPI_PDM_CHUNK_BITS 512U
 #define SPI_PDM_CHUNK_WORDS (SPI_PDM_CHUNK_BITS / 32U)
+#define SPI_PDM_QUEUE_CHUNKS 12U
+#define SPI_PDM_WAIT_MS 100U
+
+typedef struct {
+    uint32_t words[SPI_PDM_CHUNK_WORDS];
+    uint16_t bit_count;
+} spi_pdm_chunk_t;
+
+static spi_pdm_chunk_t s_spi_queue[SPI_PDM_QUEUE_CHUNKS];
+static volatile uint8_t s_spi_queue_head;
+static volatile uint8_t s_spi_queue_tail;
+static volatile uint8_t s_spi_queue_count;
+static volatile bool s_spi_active;
+static volatile TaskHandle_t s_spi_waiter;
+
+#if YORADIO_ESP8266_AUDIO_PROFILE
+extern void audio_profile_spi_wait_begin(void);
+extern void audio_profile_spi_wait_end(void);
+#endif
 
 static const spi_interface_t s_spi_interface = {
     .cpol = 0,
@@ -78,6 +98,45 @@ static const spi_interface_t s_spi_interface = {
     .miso_en = 0,
     .cs_en = 0,
 };
+
+static void IRAM_ATTR spi_pdm_start_next_locked(void) {
+    if (!s_spi_queue_count) {
+        s_spi_active = false;
+        return;
+    }
+    const spi_pdm_chunk_t *chunk = &s_spi_queue[s_spi_queue_head];
+    SPI1.user.usr_mosi = 1;
+    SPI1.user1.usr_mosi_bitlen = chunk->bit_count - 1U;
+    for (size_t index = 0; index * 32U < chunk->bit_count; ++index)
+        SPI1.data_buf[index] = chunk->words[index];
+    ++s_spi_queue_head;
+    if (s_spi_queue_head == SPI_PDM_QUEUE_CHUNKS) s_spi_queue_head = 0;
+    --s_spi_queue_count;
+    s_spi_active = true;
+    SPI1.cmd.usr = 1;
+}
+
+static void IRAM_ATTR spi_pdm_event(int event, void *arg) {
+    (void)arg;
+    if (event != SPI_TRANS_DONE_EVENT) return;
+    BaseType_t higher_task_woken = pdFALSE;
+    spi_pdm_start_next_locked();
+    TaskHandle_t waiter = s_spi_waiter;
+    if (waiter) vTaskNotifyGiveFromISR(waiter, &higher_task_woken);
+    if (higher_task_woken) portYIELD_FROM_ISR();
+}
+
+static uint32_t spi_pdm_wait_notification(void) {
+#if YORADIO_ESP8266_AUDIO_PROFILE
+    audio_profile_spi_wait_begin();
+#endif
+    uint32_t notified = ulTaskNotifyTake(pdTRUE,
+                                         pdMS_TO_TICKS(SPI_PDM_WAIT_MS));
+#if YORADIO_ESP8266_AUDIO_PROFILE
+    audio_profile_spi_wait_end();
+#endif
+    return notified;
+}
 
 static esp_err_t spi_pdm_select_pin(void) {
     if (s_spi_pin_selected) return ESP_OK;
@@ -92,11 +151,36 @@ static esp_err_t spi_pdm_send(const uint32_t *words, size_t bit_count) {
         return ESP_ERR_INVALID_ARG;
     esp_err_t result = spi_pdm_select_pin();
     if (result != ESP_OK) return result;
-    spi_trans_t transaction = {
-        .mosi = (uint32_t *)words,
-    };
-    transaction.bits.mosi = bit_count;
-    return spi_trans(HSPI_HOST, &transaction);
+    s_spi_waiter = xTaskGetCurrentTaskHandle();
+    for (;;) {
+        taskENTER_CRITICAL();
+        if (s_spi_queue_count < SPI_PDM_QUEUE_CHUNKS) {
+            spi_pdm_chunk_t *chunk = &s_spi_queue[s_spi_queue_tail];
+            for (size_t index = 0; index < SPI_PDM_CHUNK_WORDS; ++index)
+                chunk->words[index] = words[index];
+            chunk->bit_count = (uint16_t)bit_count;
+            ++s_spi_queue_tail;
+            if (s_spi_queue_tail == SPI_PDM_QUEUE_CHUNKS)
+                s_spi_queue_tail = 0;
+            ++s_spi_queue_count;
+            if (!s_spi_active) spi_pdm_start_next_locked();
+            taskEXIT_CRITICAL();
+            return ESP_OK;
+        }
+        taskEXIT_CRITICAL();
+        if (!spi_pdm_wait_notification()) return ESP_ERR_TIMEOUT;
+    }
+}
+
+static esp_err_t spi_pdm_wait_idle(void) {
+    s_spi_waiter = xTaskGetCurrentTaskHandle();
+    for (;;) {
+        taskENTER_CRITICAL();
+        bool idle = !s_spi_active && !s_spi_queue_count;
+        taskEXIT_CRITICAL();
+        if (idle) return ESP_OK;
+        if (!spi_pdm_wait_notification()) return ESP_ERR_TIMEOUT;
+    }
 }
 
 static esp_err_t spi_pdm_emit_sample(int16_t sample, uint32_t *words,
@@ -125,8 +209,8 @@ static esp_err_t spi_pdm_emit_sample(int16_t sample, uint32_t *words,
 esp_err_t native_audio_output_init(void) {
     spi_config_t config = {
         .interface = s_spi_interface,
-        .intr_enable = {.val = 0},
-        .event_cb = NULL,
+        .intr_enable = {.trans_done = 1},
+        .event_cb = spi_pdm_event,
         .mode = SPI_MASTER_MODE,
         /* Initialize through the public API, then use the full hardware
          * pre-divider because the public enum stops at 2 MHz. */
@@ -141,6 +225,11 @@ esp_err_t native_audio_output_init(void) {
         SPI1.clock.clkcnt_n = 7;
         SPI1.clock.clkcnt_h = 3;
         SPI1.clock.clkcnt_l = 7;
+        s_spi_queue_head = 0;
+        s_spi_queue_tail = 0;
+        s_spi_queue_count = 0;
+        s_spi_active = false;
+        s_spi_waiter = NULL;
         s_spi_initialized = true;
         s_spi_pin_selected = true;
     }
@@ -204,15 +293,20 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
 
 void native_audio_output_silence(void) {
     if (!s_spi_initialized) return;
+    esp_err_t result = spi_pdm_wait_idle();
     uint32_t silence[SPI_PDM_CHUNK_WORDS];
     for (size_t index = 0; index < SPI_PDM_CHUNK_WORDS; ++index)
         silence[index] = 0xaaaaaaaaU;
-    if (spi_pdm_send(silence, SPI_PDM_CHUNK_BITS) == ESP_OK) {
-        while (SPI1.cmd.usr) {
-            /* One block lasts 0.67 ms. Finish it before forcing a quiet,
-             * defined DC level on the disconnected/stopped output. */
-        }
-    }
+    if (result == ESP_OK) result = spi_pdm_send(silence, SPI_PDM_CHUNK_BITS);
+    if (result == ESP_OK) result = spi_pdm_wait_idle();
+    if (result != ESP_OK)
+        ESP_LOGE(TAG, "SPI-PDM drain failed: %s", esp_err_to_name(result));
+    taskENTER_CRITICAL();
+    s_spi_queue_head = 0;
+    s_spi_queue_tail = 0;
+    s_spi_queue_count = 0;
+    s_spi_active = false;
+    taskEXIT_CRITICAL();
     gpio_set_direction(BOARD_SPI_PDM_DATA_GPIO, GPIO_MODE_OUTPUT);
     gpio_set_level(BOARD_SPI_PDM_DATA_GPIO, 0);
     s_spi_pin_selected = false;
@@ -220,7 +314,6 @@ void native_audio_output_silence(void) {
     s_resample_phase = 0;
     s_pdm_integrator = 0;
 }
-
 #else
 
 esp_err_t native_audio_output_init(void) {

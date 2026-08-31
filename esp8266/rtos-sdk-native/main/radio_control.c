@@ -102,6 +102,9 @@ esp_err_t radio_control_init(void) {
     /* Network startup is asynchronous. Defer smart-start until DHCP has
      * completed instead of blocking/failing before the interface has an IP. */
     s_resume_when_connected = settings.smart_start == 1U;
+#ifdef YORADIO_ESP8266_AUDIO_PROFILE_URL
+    s_resume_when_connected = true;
+#endif
     return ESP_OK;
 }
 
@@ -169,7 +172,15 @@ esp_err_t radio_control_adjust_volume(int delta) {
 void radio_control_flush_pending(void) {
     if (s_resume_when_connected && network_service_connected()) {
         s_resume_when_connected = false;
+#ifdef YORADIO_ESP8266_AUDIO_PROFILE_URL
+        esp_err_t result = audio_service_play(
+            YORADIO_ESP8266_AUDIO_PROFILE_URL);
+        if (result == ESP_OK) {
+            native_state_set_station(s_current_station, "PROFILE STREAM");
+        }
+#else
         esp_err_t result = radio_control_play(s_current_station);
+#endif
         if (result != ESP_OK) {
             ESP_LOGW(TAG, "Deferred smart start failed: %s",
                      esp_err_to_name(result));
