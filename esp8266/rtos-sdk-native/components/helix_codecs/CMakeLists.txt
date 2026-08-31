@@ -22,3 +22,7 @@ idf_component_register(
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3 -fno-exceptions -fno-rtti)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1)
+if(YORADIO_ESP8266_AUDIO_PROFILE)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_AUDIO_PROFILE=1)
+endif()

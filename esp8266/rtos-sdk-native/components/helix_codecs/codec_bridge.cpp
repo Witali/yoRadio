@@ -15,6 +15,11 @@
 #include "esp_system.h"
 #include "mp3_decoder.h"
 
+#if YORADIO_ESP8266_AUDIO_PROFILE
+extern "C" void audio_profile_decode_begin(void);
+extern "C" void audio_profile_decode_end(void);
+#endif
+
 namespace {
 constexpr size_t kArenaBytes = 23328U;
 /* 1536 bytes covers a maximum-size 320-kbit/s MP3 frame and normal
@@ -167,8 +172,14 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
             {parsed.sample_rate, parsed.bitrate, parsed.channels, 16},
             false,
         };
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        audio_profile_decode_begin();
+#endif
         int result = MP3DecodeGranules(input, &left, codec->pcm, 0,
                                        emit_mp3_granule, &output);
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        audio_profile_decode_end();
+#endif
         size_t used = parsed.frame_size - std::min(
             parsed.frame_size, static_cast<size_t>(std::max(left, 0)));
         if (output.failed) return -5;
@@ -195,7 +206,13 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
     if (!frame || frame > kInputBytes) return -6;
     if (codec->input_size < frame) return 1;
     int left = static_cast<int>(frame);
+#if YORADIO_ESP8266_AUDIO_PROFILE
+    audio_profile_decode_begin();
+#endif
     int result = AACDecode(input, &left, codec->pcm);
+#if YORADIO_ESP8266_AUDIO_PROFILE
+    audio_profile_decode_end();
+#endif
     size_t used = frame - std::min(frame,
         static_cast<size_t>(std::max(left, 0)));
     if (result != ERR_AAC_NONE) {

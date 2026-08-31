@@ -16,6 +16,11 @@ set(YORADIO_SOURCES
 list(APPEND YORADIO_SOURCES
     "web_pages_bridge.cpp"
     "web_service.c")
+option(YORADIO_ESP8266_AUDIO_PROFILE
+  "Measure ESP8266 radio decode and output stages" OFF)
+if(YORADIO_ESP8266_AUDIO_PROFILE)
+  list(APPEND YORADIO_SOURCES "audio_profile_wrappers.cpp")
+endif()
 set(YORADIO_INCLUDE_DIRS ".")
 if(CONFIG_YORADIO_OLED)
   list(APPEND YORADIO_SOURCES "display_service.c")
@@ -37,6 +42,15 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
   YORADIO_HTTP_ONLY=1
   YORADIO_HELIX_MP3=1)
+if(YORADIO_ESP8266_AUDIO_PROFILE)
+  target_link_libraries(${COMPONENT_LIB} INTERFACE
+    "-Wl,--wrap=lwip_recv"
+    "-Wl,--wrap=helix_codec_switch"
+    "-Wl,--wrap=helix_codec_commit"
+    "-Wl,--wrap=native_audio_output_write"
+    "-Wl,--wrap=native_audio_normalizer_process"
+    "-Wl,--wrap=spi_trans")
+endif()
 option(YORADIO_ESP8266_FIXED_I2S
   "Use fixed ESP8266 I2S GPIO3/15/2 instead of UART-safe SPI-PDM" OFF)
 if(YORADIO_ESP8266_FIXED_I2S)
