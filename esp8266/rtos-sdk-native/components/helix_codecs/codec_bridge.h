@@ -23,6 +23,7 @@ typedef bool (*helix_pcm_callback_t)(void *context,
                                      const helix_stream_info_t *info,
                                      int16_t *pcm, size_t samples);
 
+bool helix_codec_prepare(void);
 helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
                                   size_t reserve_heap_bytes);
 void helix_codec_destroy(helix_codec_t *codec);

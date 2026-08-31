@@ -5,7 +5,10 @@
 #include <cstring>
 
 #include "CodecMemoryArena.h"
+#include "sdkconfig.h"
+#if CONFIG_YORADIO_HELIX_AAC
 #include "aac_decoder.h"
+#endif
 #include "codec_arena_native.h"
 #include "esp_log.h"
 #include "esp_heap_caps.h"
@@ -63,6 +66,7 @@ int find_mp3(const uint8_t *data, size_t size, Mp3Header *header) {
     return -1;
 }
 
+#if CONFIG_YORADIO_HELIX_AAC
 int find_aac(const uint8_t *data, size_t size) {
     for (size_t offset = 0; offset + 1 < size; ++offset)
         if (data[offset] == 0xff && (data[offset + 1] & 0xf6) == 0xf0)
@@ -75,6 +79,7 @@ size_t aac_frame_size(const uint8_t *data, size_t size) {
     return (static_cast<size_t>(data[3] & 3U) << 11) |
            (static_cast<size_t>(data[4]) << 3) | (data[5] >> 5);
 }
+#endif
 }
 
 struct helix_codec {
@@ -91,14 +96,19 @@ static constexpr size_t kWorkspaceBytes = sizeof(helix_codec) +
 
 static void free_decoder(helix_codec *codec) {
     if (codec->kind == HELIX_CODEC_MP3) MP3Decoder_FreeBuffers();
+#if CONFIG_YORADIO_HELIX_AAC
     else if (codec->kind == HELIX_CODEC_AAC) AACDecoder_FreeBuffers();
+#endif
 }
 
 static bool allocate_decoder(helix_codec *codec, helix_codec_kind_t kind) {
     codec->kind = kind;
     codec->input_start = codec->input_size = 0;
-    return kind == HELIX_CODEC_MP3 ? MP3Decoder_AllocateBuffers()
-                                   : AACDecoder_AllocateBuffers();
+    if (kind == HELIX_CODEC_MP3) return MP3Decoder_AllocateBuffers();
+#if CONFIG_YORADIO_HELIX_AAC
+    if (kind == HELIX_CODEC_AAC) return AACDecoder_AllocateBuffers();
+#endif
+    return false;
 }
 
 static void consume(helix_codec *codec, size_t count) {
@@ -170,6 +180,7 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
         return 0;
     }
 
+#if CONFIG_YORADIO_HELIX_AAC
     int sync = find_aac(input, codec->input_size);
     if (sync < 0) {
         if (codec->input_size > 1) consume(codec, codec->input_size - 1);
@@ -202,15 +213,28 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
         !callback(context, &info, codec->pcm, samples)) return -7;
     consume(codec, used ? used : frame);
     return 0;
+#else
+    return -8;
+#endif
+}
+
+extern "C" bool helix_codec_prepare(void) {
+    return CodecArenaPreallocateMp3();
 }
 
 extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
                                                size_t reserve_heap_bytes) {
-    if (kind != HELIX_CODEC_MP3 && kind != HELIX_CODEC_AAC) return nullptr;
+    if (kind != HELIX_CODEC_MP3
+#if CONFIG_YORADIO_HELIX_AAC
+        && kind != HELIX_CODEC_AAC
+#endif
+    ) return nullptr;
     size_t free_heap = esp_get_free_heap_size();
-    if (free_heap < kWorkspaceBytes + reserve_heap_bytes) {
+    size_t runtime_workspace = kWorkspaceBytes -
+                               CodecArenaPreallocatedBytes();
+    if (free_heap < runtime_workspace + reserve_heap_bytes) {
         ESP_LOGE(kTag, "Need %u bytes, free heap %u, reserve %u",
-                 (unsigned)kWorkspaceBytes, (unsigned)free_heap,
+                 (unsigned)runtime_workspace, (unsigned)free_heap,
                  (unsigned)reserve_heap_bytes);
         return nullptr;
     }
@@ -229,14 +253,16 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
             heap_caps_free(codec->arena);
         }
         std::free(codec);
-        ESP_LOGE(kTag, "Heap cannot allocate %u-byte workspace",
-                 (unsigned)kWorkspaceBytes);
+        ESP_LOGE(kTag, "Heap cannot allocate %u-byte runtime workspace",
+                 (unsigned)runtime_workspace);
         return nullptr;
     }
     bool allocated = allocate_decoder(codec, kind);
     if (!allocated) {
         if (kind == HELIX_CODEC_MP3) MP3Decoder_FreeBuffers();
+#if CONFIG_YORADIO_HELIX_AAC
         else AACDecoder_FreeBuffers();
+#endif
         CodecArenaUnbind();
         heap_caps_free(codec->pcm);
         heap_caps_free(codec->input);
@@ -262,7 +288,11 @@ extern "C" void helix_codec_destroy(helix_codec_t *codec) {
 
 extern "C" int helix_codec_switch(helix_codec_t *codec,
                                    helix_codec_kind_t kind) {
-    if (!codec || (kind != HELIX_CODEC_MP3 && kind != HELIX_CODEC_AAC))
+    if (!codec || (kind != HELIX_CODEC_MP3
+#if CONFIG_YORADIO_HELIX_AAC
+                   && kind != HELIX_CODEC_AAC
+#endif
+                  ))
         return -1;
     if (codec->kind == kind) {
         codec->input_start = codec->input_size = 0;
@@ -270,11 +300,15 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
             MP3Decoder_ClearBuffer();
             return 0;
         }
+#if CONFIG_YORADIO_HELIX_AAC
         /* AAC has no public state-reset entry point. Release/rebuild its
          * objects inside the same bound arena; the outer heap block remains
          * allocated and cannot fragment. */
         free_decoder(codec);
         return allocate_decoder(codec, kind) ? 0 : -2;
+#else
+        return -1;
+#endif
     }
     free_decoder(codec);
     if (!allocate_decoder(codec, kind)) {
@@ -288,9 +322,13 @@ extern "C" helix_codec_kind_t helix_codec_detect(const uint8_t *data,
                                                    size_t size) {
     Mp3Header header = {};
     int mp3 = find_mp3(data, size, &header);
+#if CONFIG_YORADIO_HELIX_AAC
     int aac = find_aac(data, size);
     if (mp3 >= 0 && (aac < 0 || mp3 <= aac)) return HELIX_CODEC_MP3;
     if (aac >= 0) return HELIX_CODEC_AAC;
+#else
+    if (mp3 >= 0) return HELIX_CODEC_MP3;
+#endif
     return static_cast<helix_codec_kind_t>(0);
 }
 

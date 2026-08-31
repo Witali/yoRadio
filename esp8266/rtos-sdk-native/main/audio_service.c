@@ -335,16 +335,14 @@ static void read_icy_metadata(int socket_fd, uint32_t generation) {
 }
 
 static void audio_task(void *argument) {
-    (void)argument;
-    helix_codec_t *codec = NULL;
+    helix_codec_t *codec = (helix_codec_t *)argument;
     helix_codec_kind_t codec_kind = 0;
     while (true) {
         audio_command_t command;
         xQueueReceive(s_commands, &command, portMAX_DELAY);
         if (!command.play) {
             native_audio_output_silence();
-            helix_codec_destroy(codec);
-            codec = NULL;
+            if (codec_kind) helix_codec_switch(codec, codec_kind);
             codec_kind = 0;
             native_state_set_audio(false, false, NULL);
             network_service_set_streaming(false);
@@ -405,13 +403,7 @@ static void audio_task(void *argument) {
                 native_state_set_audio(false, false, "UNSUPPORTED STREAM");
             continue;
         }
-        bool decoder_ready = true;
-        if (!codec) {
-            codec = helix_codec_create(codec_kind, CODEC_HEAP_RESERVE_BYTES);
-            decoder_ready = codec != NULL;
-        } else {
-            decoder_ready = helix_codec_switch(codec, codec_kind) == 0;
-        }
+        bool decoder_ready = helix_codec_switch(codec, codec_kind) == 0;
         if (!decoder_ready) {
             close(stream.socket);
             native_state_set_audio(false, false, "DECODER INIT ERROR");
@@ -475,8 +467,7 @@ static void audio_task(void *argument) {
             if (feed < 0)
                 ESP_LOGE(TAG, "Decoder stopped: %d (errno %d)",
                          feed, errno);
-            helix_codec_destroy(codec);
-            codec = NULL;
+            if (codec_kind) helix_codec_switch(codec, codec_kind);
             codec_kind = 0;
             native_state_set_audio(false, false,
                                    feed < 0 ? "AUDIO STREAM ERROR" : NULL);
@@ -486,10 +477,23 @@ static void audio_task(void *argument) {
 }
 
 esp_err_t audio_service_init(void) {
+    if (!helix_codec_prepare()) return ESP_ERR_NO_MEM;
     s_commands = xQueueCreate(1, sizeof(audio_command_t));
     if (!s_commands) return ESP_ERR_NO_MEM;
-    if (xTaskCreate(audio_task, "audio", AUDIO_STACK_BYTES, NULL, 5, NULL) !=
-        pdPASS) return ESP_ERR_NO_MEM;
+    helix_codec_t *codec =
+        helix_codec_create(HELIX_CODEC_MP3, CODEC_HEAP_RESERVE_BYTES);
+    if (!codec) {
+        vQueueDelete(s_commands);
+        s_commands = NULL;
+        return ESP_ERR_NO_MEM;
+    }
+    if (xTaskCreate(audio_task, "audio", AUDIO_STACK_BYTES, codec, 5, NULL) !=
+        pdPASS) {
+        helix_codec_destroy(codec);
+        vQueueDelete(s_commands);
+        s_commands = NULL;
+        return ESP_ERR_NO_MEM;
+    }
     ESP_LOGI(TAG, "Workspace %u bytes; required heap reserve %u bytes",
              (unsigned)helix_codec_workspace_size(),
              (unsigned)CODEC_HEAP_RESERVE_BYTES);

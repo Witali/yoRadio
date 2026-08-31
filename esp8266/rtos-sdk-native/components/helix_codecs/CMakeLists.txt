@@ -1,12 +1,17 @@
 set(YORADIO_AUDIO_DIR
     "${CMAKE_CURRENT_LIST_DIR}/../../../../yoRadio/src/audioI2S")
 
-idf_component_register(
-  SRCS
+set(YORADIO_HELIX_SOURCES
     "codec_bridge.cpp"
     "CodecMemoryArena.cpp"
-    "${YORADIO_AUDIO_DIR}/mp3_decoder/mp3_decoder.cpp"
-    "${YORADIO_AUDIO_DIR}/aac_decoder/aac_decoder.cpp"
+    "${YORADIO_AUDIO_DIR}/mp3_decoder/mp3_decoder.cpp")
+if(CONFIG_YORADIO_HELIX_AAC)
+  list(APPEND YORADIO_HELIX_SOURCES
+      "${YORADIO_AUDIO_DIR}/aac_decoder/aac_decoder.cpp")
+endif()
+
+idf_component_register(
+  SRCS ${YORADIO_HELIX_SOURCES}
   INCLUDE_DIRS
     "."
     "${YORADIO_AUDIO_DIR}"
