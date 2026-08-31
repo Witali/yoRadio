@@ -5,6 +5,19 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-08-31
 
+### ESP8266 native WebUI station selection
+
+- Fixed clicks on the full station row and verified that the emitted `play=N`
+  command selects and starts the requested station on a physical Wemos D1 mini.
+- Kept the repository playlist shared, but made the ESP8266 index and WebUI list
+  contain only its supported plain-HTTP MP3/AAC streams: 511 entries, no HTTPS
+  and no Ogg/Opus/FLAC/HLS/WAV entries.
+- Embedded the current shared `script.js.gz` in application flash, so this WebUI
+  fix is delivered without overwriting SPIFFS, `wifi.csv` or the stored playlist.
+- Built and flashed source revision `3acd51d`; all 243 regression tests and the
+  live Play/Stop/Next/Previous/playlist-click scenarios passed. The checked
+  artifact and SHA-256 manifest are in
+  [`development/esp8266-native/`](development/esp8266-native/).
 ### ESP8266 native HTTP stack stabilization
 
 - Corrected HTTP authority, redirect and chunked-transfer parsing for the
