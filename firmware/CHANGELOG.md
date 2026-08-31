@@ -3,6 +3,19 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-09-01
+
+### ESP8266 native QIO 80 MHz experiment
+
+- Added a separate `sdkconfig.qio80.defaults` profile while retaining QIO
+  40 MHz as the normal default.
+- Identified the physical 4 MiB flash by JEDEC ID `5E:4016` as a Zbit
+  ZB25VQ32B, whose Quad I/O read specification covers 80 MHz at 3.3 V.
+- Flashed a physical Wemos D1 mini without erasing NVS or SPIFFS and verified
+  two starts, Wi-Fi, WebUI/API access and repeated playlist reads.
+- Archived the checked binaries and hashes in
+  [`development/esp8266-native-qio80/`](development/esp8266-native-qio80/).
+
 ## Development — 2026-08-31
 
 ### ESP8266 native WebUI station selection

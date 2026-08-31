@@ -8,6 +8,10 @@ The default profile targets a 4 MiB ESP-12E/NodeMCU/Wemos-class module at
 160 MHz and uses the external flash in QIO mode at 40 MHz. The bootloader is
 initially written in DIO as required by ESP8266 RTOS SDK, then enables Quad I/O
 during startup. Use DIO for modules whose flash chip does not support QIO.
+The optional `sdkconfig.qio80.defaults` profile selects QIO at 80 MHz for
+modules with a suitably rated flash chip. Use it instead of
+`sdkconfig.defaults`; it is kept separate from the default profile because
+signal integrity still depends on the particular module PCB.
 Audio defaults to mono SPI-PDM on GPIO13/D7, leaving UART0 RX GPIO3
 available. HSPI clocks the PDM stream at 769.23 kHz, the closest hardware rate
 to 48 kHz x 16; GPIO14/D5 carries the unused SPI clock and should not be wired
