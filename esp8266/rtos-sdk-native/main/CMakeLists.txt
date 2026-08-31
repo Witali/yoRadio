@@ -2,6 +2,7 @@ set(YORADIO_AUDIO_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../yoRadio/src/audioI2S")
 set(YORADIO_SOURCES
     "app_main.c"
     "audio_service.c"
+    "http_stream_protocol.c"
     "input_service.c"
     "native_state.c"
     "network_service.c"

@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "codec_bridge.h"
+#include "http_stream_protocol.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
@@ -27,6 +28,9 @@
 #define HTTP_HOST_BYTES 96U
 #define HTTP_MAX_REDIRECTS 3U
 #define SOCKET_READ_TIMEOUT_MS 200U
+#define SOCKET_CONNECT_TIMEOUT_MS 10000U
+#define SOCKET_WRITE_TIMEOUT_MS 2000U
+#define ICY_METADATA_TIMEOUT_MS 5000U
 #define HTTP_HEADER_TIMEOUT_MS 10000U
 #define HTTP_OPEN_ATTEMPTS 2U
 #define CODEC_HEAP_RESERVE_BYTES 2048U
@@ -43,6 +47,8 @@ typedef struct {
     size_t body_size;
     uint32_t metadata_interval;
     uint32_t advertised_bitrate;
+    bool chunked;
+    http_chunk_decoder_t chunk_decoder;
 } http_stream_t;
 
 typedef struct {
@@ -71,29 +77,16 @@ static uint32_t advance_generation(void) {
     return generation;
 }
 
-static bool parse_http_url(const char *url, uint16_t *port,
-                           const char **path) {
-    if (!url || strncmp(url, "http://", 7) != 0) return false;
-    const char *host = url + 7;
-    const char *slash = strchr(host, '/');
-    const char *end = slash ? slash : host + strlen(host);
-    const char *colon = NULL;
-    for (const char *cursor = host; cursor < end; ++cursor)
-        if (*cursor == ':') colon = cursor;
-    const char *host_end = colon ? colon : end;
-    size_t host_length = (size_t)(host_end - host);
-    if (!host_length || host_length >= sizeof(s_host)) return false;
-    memcpy(s_host, host, host_length);
-    s_host[host_length] = '\0';
-    unsigned long parsed_port = 80;
-    if (colon) {
-        char *tail = NULL;
-        parsed_port = strtoul(colon + 1, &tail, 10);
-        if (tail != end || !parsed_port || parsed_port > 65535) return false;
-    }
-    *port = (uint16_t)parsed_port;
-    *path = slash ? slash : "/";
-    return true;
+static bool parse_http_url(const char *url, http_stream_url_t *parts) {
+    return http_stream_parse_url(url, parts, s_host, sizeof(s_host));
+}
+
+static void set_socket_timeout(int socket_fd, int option, uint32_t timeout_ms) {
+    struct timeval timeout = {
+        .tv_sec = (time_t)(timeout_ms / 1000U),
+        .tv_usec = (suseconds_t)((timeout_ms % 1000U) * 1000U),
+    };
+    setsockopt(socket_fd, SOL_SOCKET, option, &timeout, sizeof(timeout));
 }
 
 static int connect_http(uint16_t port) {
@@ -110,14 +103,17 @@ static int connect_http(uint16_t port) {
         socket_fd = socket(address->ai_family, address->ai_socktype,
                            address->ai_protocol);
         if (socket_fd < 0) continue;
-        struct timeval timeout = {
-            .tv_sec = 0,
-            .tv_usec = SOCKET_READ_TIMEOUT_MS * 1000,
-        };
-        setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout,
-                   sizeof(timeout));
-        if (connect(socket_fd, address->ai_addr, address->ai_addrlen) == 0)
+        set_socket_timeout(socket_fd, SO_RCVTIMEO,
+                           SOCKET_CONNECT_TIMEOUT_MS);
+        set_socket_timeout(socket_fd, SO_SNDTIMEO,
+                           SOCKET_CONNECT_TIMEOUT_MS);
+        if (connect(socket_fd, address->ai_addr, address->ai_addrlen) == 0) {
+            set_socket_timeout(socket_fd, SO_RCVTIMEO,
+                               SOCKET_READ_TIMEOUT_MS);
+            set_socket_timeout(socket_fd, SO_SNDTIMEO,
+                               SOCKET_WRITE_TIMEOUT_MS);
             break;
+        }
         close(socket_fd);
         socket_fd = -1;
     }
@@ -125,17 +121,53 @@ static int connect_http(uint16_t port) {
     return socket_fd;
 }
 
-static bool send_all(int socket_fd, const char *text) {
-    size_t remaining = strlen(text);
-    while (remaining) {
-        int sent = send(socket_fd, text, remaining, 0);
-        if (sent <= 0) return false;
-        text += sent;
-        remaining -= (size_t)sent;
+static bool socket_wait_writable(int socket_fd, uint32_t timeout_ms) {
+    fd_set write_set;
+    fd_set error_set;
+    FD_ZERO(&write_set);
+    FD_ZERO(&error_set);
+    FD_SET(socket_fd, &write_set);
+    FD_SET(socket_fd, &error_set);
+    struct timeval timeout = {
+        .tv_sec = (time_t)(timeout_ms / 1000U),
+        .tv_usec = (suseconds_t)((timeout_ms % 1000U) * 1000U),
+    };
+    int ready = select(socket_fd + 1, NULL, &write_set, &error_set, &timeout);
+    if (ready <= 0 || FD_ISSET(socket_fd, &error_set)) return false;
+    int socket_error = 0;
+    socklen_t length = sizeof(socket_error);
+    return getsockopt(socket_fd, SOL_SOCKET, SO_ERROR, &socket_error,
+                      &length) == 0 && socket_error == 0;
+}
+
+static bool send_all_bytes(int socket_fd, const char *data, size_t length) {
+    int64_t deadline =
+        esp_timer_get_time() + SOCKET_WRITE_TIMEOUT_MS * 1000LL;
+    while (length) {
+        int64_t remaining_us = deadline - esp_timer_get_time();
+        if (remaining_us <= 0 ||
+            !socket_wait_writable(socket_fd,
+                                  (uint32_t)((remaining_us + 999LL) / 1000LL)))
+            return false;
+        int sent = send(socket_fd, data, length, 0);
+        if (sent > 0) {
+            data += sent;
+            length -= (size_t)sent;
+            continue;
+        }
+        if (sent < 0 && errno == EINTR) continue;
+        if (sent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+            vTaskDelay(pdMS_TO_TICKS(1));
+            continue;
+        }
+        return false;
     }
     return true;
 }
 
+static bool send_all(int socket_fd, const char *text) {
+    return send_all_bytes(socket_fd, text, strlen(text));
+}
 static uint8_t *find_header_end(uint8_t *data, size_t size,
                                 size_t *header_size) {
     for (size_t index = 0; index + 3 < size; ++index) {
@@ -156,7 +188,8 @@ static uint8_t *find_header_end(uint8_t *data, size_t size,
 
 static int parse_headers(size_t header_size, char *redirect,
                          size_t redirect_size, uint32_t *metadata_interval,
-                         uint32_t *bitrate) {
+                         uint32_t *bitrate, bool *chunked,
+                         bool *unsupported_transfer) {
     s_work[header_size - 1] = '\0';
     char *cursor = (char *)s_work;
     char *line_end = strchr(cursor, '\n');
@@ -175,16 +208,26 @@ static int parse_headers(size_t header_size, char *redirect,
         if (!line_end) break;
         *line_end = '\0';
         size_t length = strlen(cursor);
-        if (length && cursor[length - 1] == '\r') cursor[length - 1] = '\0';
+        if (length && cursor[length - 1] == '\r') cursor[--length] = '\0';
         char *colon = strchr(cursor, ':');
         if (colon) {
             *colon++ = '\0';
             while (*colon == ' ' || *colon == '\t') ++colon;
+            char *value_end = colon + strlen(colon);
+            while (value_end > colon &&
+                   (value_end[-1] == ' ' || value_end[-1] == '\t'))
+                *--value_end = '\0';
             if (strcasecmp(cursor, "icy-metaint") == 0)
                 *metadata_interval = strtoul(colon, NULL, 10);
             else if (strcasecmp(cursor, "icy-br") == 0)
                 *bitrate = strtoul(colon, NULL, 10);
-            else if (strcasecmp(cursor, "location") == 0) {
+            else if (strcasecmp(cursor, "transfer-encoding") == 0) {
+                if (http_stream_header_has_token(colon, "chunked") &&
+                    strcasecmp(colon, "chunked") == 0)
+                    *chunked = true;
+                else
+                    *unsupported_transfer = true;
+            } else if (strcasecmp(cursor, "location") == 0) {
                 strncpy(redirect, colon, redirect_size - 1);
                 redirect[redirect_size - 1] = '\0';
             }
@@ -194,20 +237,44 @@ static int parse_headers(size_t header_size, char *redirect,
     return status;
 }
 
+static int stream_receive(http_stream_t *stream, uint8_t *destination,
+                          size_t capacity) {
+    while (true) {
+        if (stream->chunked &&
+            http_chunk_decoder_finished(&stream->chunk_decoder))
+            return 0;
+        int received = recv(stream->socket, destination, capacity, 0);
+        if (received > 0 && stream->chunked) {
+            size_t decoded = 0;
+            if (!http_chunk_decode(&stream->chunk_decoder, destination,
+                                   (size_t)received, &decoded)) {
+                errno = EPROTO;
+                return -1;
+            }
+            if (decoded) return (int)decoded;
+            if (http_chunk_decoder_finished(&stream->chunk_decoder)) return 0;
+            continue;
+        }
+        if (received < 0 && errno == EINTR) continue;
+        return received;
+    }
+}
+
 static int open_http_stream(char *url, http_stream_t *stream) {
     for (unsigned redirect_count = 0;
          redirect_count <= HTTP_MAX_REDIRECTS; ++redirect_count) {
-        uint16_t port;
-        const char *path;
-        if (!parse_http_url(url, &port, &path)) return -1;
-        int socket_fd = connect_http(port);
+        http_stream_url_t parts;
+        if (!parse_http_url(url, &parts)) return -1;
+        int socket_fd = connect_http(parts.port);
         if (socket_fd < 0) return -2;
-        char host_header[112];
-        snprintf(host_header, sizeof(host_header), "Host: %s\r\n", s_host);
         bool sent = send_all(socket_fd, "GET ") &&
-                    send_all(socket_fd, path) &&
-                    send_all(socket_fd, " HTTP/1.1\r\n") &&
-                    send_all(socket_fd, host_header) &&
+                    (!parts.query_only || send_all(socket_fd, "/")) &&
+                    send_all_bytes(socket_fd, parts.target,
+                                   parts.target_length) &&
+                    send_all(socket_fd, " HTTP/1.1\r\nHost: ") &&
+                    send_all_bytes(socket_fd, parts.authority,
+                                   parts.authority_length) &&
+                    send_all(socket_fd, "\r\n") &&
                     send_all(socket_fd, "User-Agent: yoRadio-esp8266/1\r\n") &&
                     send_all(socket_fd, "Icy-MetaData: 1\r\n") &&
                     send_all(socket_fd, "Connection: close\r\n\r\n");
@@ -232,21 +299,20 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                 received_total += (size_t)received;
                 continue;
             }
+            if (received < 0 && errno == EINTR) continue;
             if (received < 0 &&
                 (errno == EAGAIN || errno == EWOULDBLOCK) &&
                 esp_timer_get_time() < header_deadline) {
+                vTaskDelay(pdMS_TO_TICKS(1));
                 continue;
             }
-            if (received <= 0) {
 #if YORADIO_ESP8266_AUDIO_PROFILE
-                ESP_LOGW(TAG,
-                         "Profile header RX failed: received=%d total=%u "
-                         "errno=%d",
-                         received, (unsigned)received_total, errno);
+            ESP_LOGW(TAG,
+                     "Profile header RX failed: received=%d total=%u errno=%d",
+                     received, (unsigned)received_total, errno);
 #endif
-                close(socket_fd);
-                return -4;
-            }
+            close(socket_fd);
+            return -4;
         }
         if (!header_size)
             find_header_end(s_work, received_total, &header_size);
@@ -258,42 +324,51 @@ static int open_http_stream(char *url, http_stream_t *stream) {
         redirect_url[0] = '\0';
         uint32_t metadata_interval = 0;
         uint32_t bitrate = 0;
+        bool chunked = false;
+        bool unsupported_transfer = false;
         int status = parse_headers(header_size, redirect_url,
                                    sizeof(redirect_url), &metadata_interval,
-                                   &bitrate);
+                                   &bitrate, &chunked,
+                                   &unsupported_transfer);
         size_t body_size = received_total - header_size;
         memmove(s_work, s_work + header_size, body_size);
         if (status >= 200 && status < 300) {
+            if (unsupported_transfer) {
+                close(socket_fd);
+                errno = EPROTO;
+                return -9;
+            }
             stream->socket = socket_fd;
-            stream->body_size = body_size;
             stream->metadata_interval = metadata_interval;
             stream->advertised_bitrate = bitrate;
-            ESP_LOGI(TAG, "Stream response %d, ICY interval %u", status,
-                     (unsigned)metadata_interval);
+            stream->chunked = chunked;
+            http_chunk_decoder_init(&stream->chunk_decoder);
+            if (chunked &&
+                !http_chunk_decode(&stream->chunk_decoder, s_work, body_size,
+                                   &body_size)) {
+                close(socket_fd);
+                errno = EPROTO;
+                return -9;
+            }
+            stream->body_size = body_size;
+            ESP_LOGI(TAG, "Stream response %d, ICY interval %u%s", status,
+                     (unsigned)metadata_interval,
+                     chunked ? ", chunked" : "");
             return 0;
         }
         close(socket_fd);
         if ((status != 301 && status != 302 && status != 303 &&
              status != 307 && status != 308) || !redirect_url[0] ||
-            redirect_count == HTTP_MAX_REDIRECTS) return -6;
-        if (redirect_url[0] == '/') {
-            char relative[AUDIO_URL_BYTES];
-            size_t needed = 7U + strlen(s_host) + strlen(redirect_url) + 1U;
-            if (needed > sizeof(relative)) return -7;
-            strcpy(relative, "http://");
-            strcat(relative, s_host);
-            strcat(relative, redirect_url);
-            memcpy(url, relative, needed);
-        } else {
-            size_t needed = strlen(redirect_url) + 1U;
-            if (needed > AUDIO_URL_BYTES) return -7;
-            memcpy(url, redirect_url, needed);
-        }
-        if (strncmp(url, "http://", 7) != 0) return -7;
+            redirect_count == HTTP_MAX_REDIRECTS)
+            return -6;
+        char resolved[AUDIO_URL_BYTES];
+        if (!http_stream_resolve_redirect(url, redirect_url, resolved,
+                                          sizeof(resolved)))
+            return -7;
+        memcpy(url, resolved, strlen(resolved) + 1U);
     }
     return -8;
 }
-
 static void parse_icy_title(size_t size) {
     if (size >= sizeof(s_work)) size = sizeof(s_work) - 1U;
     s_work[size] = '\0';
@@ -325,10 +400,33 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
     return true;
 }
 
-static void read_icy_metadata(int socket_fd, uint32_t generation) {
+static bool stream_read_exact(http_stream_t *stream, uint8_t *destination,
+                              size_t length, uint32_t generation,
+                              int64_t deadline) {
+    while (length && generation_current(generation)) {
+        int received = stream_receive(stream, destination, length);
+        if (received > 0) {
+            destination += received;
+            length -= (size_t)received;
+            continue;
+        }
+        if (received < 0 &&
+            (errno == EAGAIN || errno == EWOULDBLOCK) &&
+            esp_timer_get_time() < deadline) {
+            vTaskDelay(pdMS_TO_TICKS(1));
+            continue;
+        }
+        return false;
+    }
+    return length == 0;
+}
+
+static bool read_icy_metadata(http_stream_t *stream, uint32_t generation) {
+    int64_t deadline =
+        esp_timer_get_time() + ICY_METADATA_TIMEOUT_MS * 1000LL;
     uint8_t blocks = 0;
-    int result = recv(socket_fd, &blocks, 1, 0);
-    if (result != 1) return;
+    if (!stream_read_exact(stream, &blocks, 1U, generation, deadline))
+        return false;
     size_t remaining = (size_t)blocks * 16U;
     size_t retained = 0;
     uint8_t discard[64];
@@ -336,13 +434,15 @@ static void read_icy_metadata(int socket_fd, uint32_t generation) {
         size_t available = sizeof(s_work) - 1U - retained;
         uint8_t *destination = available ? s_work + retained : discard;
         size_t capacity = available ? available : sizeof(discard);
-        size_t chunk = remaining > capacity ? capacity : remaining;
-        int received = recv(socket_fd, destination, chunk, 0);
-        if (received <= 0) return;
-        if (available) retained += (size_t)received;
-        remaining -= (size_t)received;
+        size_t count = remaining > capacity ? capacity : remaining;
+        if (!stream_read_exact(stream, destination, count, generation,
+                               deadline))
+            return false;
+        if (available) retained += count;
+        remaining -= count;
     }
     if (retained) parse_icy_title(retained);
+    return remaining == 0;
 }
 
 static void audio_task(void *argument) {
@@ -399,12 +499,16 @@ static void audio_task(void *argument) {
             size_t wanted = sizeof(s_work) - detect_size;
             if (audio_until_metadata && wanted > audio_until_metadata)
                 wanted = audio_until_metadata;
-            int received = recv(stream.socket, s_work + detect_size, wanted, 0);
+            int received = stream_receive(&stream, s_work + detect_size, wanted);
             if (received > 0) {
                 detect_size += (size_t)received;
                 if (stream.metadata_interval)
                     audio_until_metadata -= (uint32_t)received;
-            } else if (errno != EAGAIN && errno != EWOULDBLOCK) {
+            } else if (received == 0) {
+                break;
+            } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                vTaskDelay(pdMS_TO_TICKS(1));
+            } else {
                 break;
             }
         }
@@ -434,7 +538,10 @@ static void audio_task(void *argument) {
         native_state_set_audio(true, false, NULL);
         while (feed == 0 && generation_current(command.generation)) {
             if (stream.metadata_interval && !audio_until_metadata) {
-                read_icy_metadata(stream.socket, command.generation);
+                if (!read_icy_metadata(&stream, command.generation)) {
+                    feed = -22;
+                    break;
+                }
                 audio_until_metadata = stream.metadata_interval;
                 continue;
             }
@@ -447,7 +554,7 @@ static void audio_task(void *argument) {
             size_t wanted = capacity > 1024U ? 1024U : capacity;
             if (stream.metadata_interval && wanted > audio_until_metadata)
                 wanted = audio_until_metadata;
-            int received = recv(stream.socket, destination, wanted, 0);
+            int received = stream_receive(&stream, destination, wanted);
             if (received > 0) {
                 output.measured_bytes += (uint32_t)received;
                 if (stream.metadata_interval)
@@ -470,7 +577,9 @@ static void audio_task(void *argument) {
                 }
             } else if (received == 0) {
                 break;
-            } else if (errno != EAGAIN && errno != EWOULDBLOCK) {
+            } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                vTaskDelay(pdMS_TO_TICKS(1));
+            } else {
                 feed = -21;
                 break;
             }
