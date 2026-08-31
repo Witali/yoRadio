@@ -36,6 +36,17 @@ const networkSource = fs.readFileSync(
   ),
   "utf8",
 );
+const radioSource = fs.readFileSync(
+  path.resolve(
+    __dirname,
+    "..",
+    "esp8266",
+    "rtos-sdk-native",
+    "main",
+    "radio_control.c",
+  ),
+  "utf8",
+);
 
 test("ESP8266 WebSocket handler completes HTTP upgrade before reading frames", () => {
   const handler = source.slice(source.indexOf("static esp_err_t websocket_handler"));
@@ -95,7 +106,7 @@ test("ESP8266 radio checks a header that exactly fills its receive buffer", () =
 });
 
 test("ESP8266 waits for DHCP and releases recovery AP memory in client mode", () => {
-  assert.match(networkSource, /#define WIFI_CONNECT_TIMEOUT_MS 30000U/);
+  assert.match(networkSource, /CONFIG_YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS \* 1000U/);
   assert.match(
     networkSource,
     /IP_EVENT_STA_GOT_IP[\s\S]*s_access_point[\s\S]*esp_wifi_set_mode\(WIFI_MODE_STA\)[\s\S]*s_access_point = false/,
@@ -113,4 +124,20 @@ test("ESP8266 waits for DHCP and releases recovery AP memory in client mode", ()
     /Wi-Fi supervisor exiting after DHCP[\s\S]*vTaskDelete\(NULL\)/,
   );
   assert.match(networkSource, /void network_service_poll\(void\)/);
+});
+
+test("ESP8266 recovery AP assigns clients an address for WebUI access", () => {
+  assert.match(networkSource, /ip4addr_aton\("192\.168\.4\.1", &info\.ip\)/);
+  assert.match(networkSource, /tcpip_adapter_dhcps_stop\(TCPIP_ADAPTER_IF_AP\)/);
+  assert.match(networkSource, /tcpip_adapter_set_ip_info\(TCPIP_ADAPTER_IF_AP, &info\)/);
+  assert.match(networkSource, /tcpip_adapter_dhcps_start\(TCPIP_ADAPTER_IF_AP\)/);
+});
+
+test("ESP8266 next/previous starts searching after the current station", () => {
+  const radio = radioSource;
+  assert.match(
+    radio,
+    /candidate = candidate >= count \? 1U : candidate \+ 1U;[\s\S]*playlist_service_find_http_index\([\s\S]*candidate, direction, &found\)/,
+  );
+  assert.match(radio, /candidate = candidate <= 1U \? count : candidate - 1U;/);
 });

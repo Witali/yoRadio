@@ -10,7 +10,6 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
 #include "freertos/task.h"
 #include "native_audio_output.h"
 #include "native_state.h"
@@ -21,12 +20,10 @@
 #define WS_HEARTBEAT_MS 2000U
 #define WS_COMMAND_MAX 255U
 #define WEB_STATUS_CAPACITY 1280U
-#define WEB_MAX_OPEN_SOCKETS 7U
-#define WEB_STATIC_QUEUE_DEPTH WEB_MAX_OPEN_SOCKETS
+#define WEB_MAX_OPEN_SOCKETS 4U
 
 static const char *TAG = "web";
 static httpd_handle_t s_server;
-static QueueHandle_t s_static_request_queue;
 static volatile int s_ws_fd = -1;
 static volatile bool s_send_pending;
 static volatile bool s_playlist_changed;
@@ -64,6 +61,18 @@ static void copy_text(char *target, size_t capacity, const char *source) {
 
 static esp_err_t send_string(httpd_req_t *request, const char *text) {
     return httpd_resp_send(request, text, (ssize_t)strlen(text));
+}
+
+static esp_err_t send_chunked_string(httpd_req_t *request, const char *text) {
+    size_t remaining = strlen(text);
+    while (remaining) {
+        size_t count = remaining > 512U ? 512U : remaining;
+        esp_err_t result = httpd_resp_send_chunk(request, text, count);
+        if (result != ESP_OK) return result;
+        text += count;
+        remaining -= count;
+    }
+    return httpd_resp_send_chunk(request, NULL, 0);
 }
 
 static void json_escape(const char *source, char *target, size_t capacity) {
@@ -478,12 +487,19 @@ static bool web_ui_available(void) {
     return true;
 }
 
+static void prepare_short_response(httpd_req_t *request) {
+    /* Static responses do not need to retain one of the ESP8266's scarce TCP
+     * sessions. Advertising the close is required by HTTP/1.1 before the
+     * response body is sent. */
+    httpd_resp_set_hdr(request, "Connection", "close");
+}
+
 static esp_err_t finish_short_response(httpd_req_t *request,
                                        esp_err_t result) {
-    if (result == ESP_OK) {
-        httpd_sess_trigger_close(request->handle,
-                                 httpd_req_to_sockfd(request));
-    }
+    /* Queue the close after send() has accepted the complete response. The
+     * HTTP server processes this control message after the handler returns. */
+    (void)httpd_sess_trigger_close(request->handle,
+                                  httpd_req_to_sockfd(request));
     return result;
 }
 
@@ -496,21 +512,21 @@ static const char *asset_type(const char *uri) {
 }
 
 static esp_err_t page_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     if (strcmp(request->uri, "/") == 0 && !web_ui_available()) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
-        httpd_resp_set_hdr(request, "Connection", "close");
         return finish_short_response(
-            request, send_string(request, yoradio_emptyfs_html()));
+            request, send_chunked_string(request, yoradio_emptyfs_html()));
     }
     httpd_resp_set_type(request, "text/html; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
-    httpd_resp_set_hdr(request, "Connection", "close");
     return finish_short_response(
-        request, send_string(request, yoradio_index_html()));
+        request, send_chunked_string(request, yoradio_index_html()));
 }
 
 static esp_err_t variables_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     native_state_t state;
     native_state_snapshot(&state);
     char body[240];
@@ -525,11 +541,11 @@ static esp_err_t variables_handler(httpd_req_t *request) {
              state.network_mode == NETWORK_CLIENT ? "player" : "ap");
     httpd_resp_set_type(request, "application/javascript; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
-    httpd_resp_set_hdr(request, "Connection", "close");
     return finish_short_response(request, send_string(request, body));
 }
 
 static esp_err_t asset_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     char path[96];
     size_t uri_length = strlen(request->uri);
     static const char prefix[] = "/spiffs/www";
@@ -546,7 +562,6 @@ static esp_err_t asset_handler(httpd_req_t *request) {
     httpd_resp_set_type(request, asset_type(request->uri));
     httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
-    httpd_resp_set_hdr(request, "Connection", "close");
     char chunk[512];
     size_t count;
     esp_err_t result = ESP_OK;
@@ -560,13 +575,13 @@ static esp_err_t asset_handler(httpd_req_t *request) {
 }
 
 static esp_err_t playlist_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     FILE *file = open_nonempty("/spiffs/data/playlist.csv");
     if (!file) {
         return httpd_resp_send_404(request);
     }
     httpd_resp_set_type(request, "text/csv; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
-    httpd_resp_set_hdr(request, "Connection", "close");
     char chunk[512];
     size_t count;
     esp_err_t result = ESP_OK;
@@ -580,6 +595,7 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
 }
 
 static esp_err_t status_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     native_state_t state;
     native_state_snapshot(&state);
     char station[260];
@@ -596,13 +612,12 @@ static esp_err_t status_handler(httpd_req_t *request) {
              (unsigned long)state.bitrate_kbps);
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
-    httpd_resp_set_hdr(request, "Connection", "close");
     return finish_short_response(request, send_string(request, body));
 }
 
 static esp_err_t favicon_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     httpd_resp_set_type(request, "image/x-icon");
-    httpd_resp_set_hdr(request, "Connection", "close");
     return finish_short_response(request, httpd_resp_send(request, NULL, 0));
 }
 
@@ -622,49 +637,8 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
     return asset_handler(request);
 }
 
-static esp_err_t start_static_queue(void) {
-    s_static_request_queue =
-        xQueueCreate(WEB_STATIC_QUEUE_DEPTH, sizeof(httpd_req_t *));
-    if (!s_static_request_queue) return ESP_ERR_NO_MEM;
-    ESP_LOGI(TAG,
-             "Static content: async main-loop queue, send timeout: %u s; free heap: %u",
-             (unsigned)CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS,
-             (unsigned)esp_get_free_heap_size());
-    return ESP_OK;
-}
-
-static void service_static_queue_once(void) {
-    if (!s_static_request_queue) return;
-    httpd_req_t *request = NULL;
-    if (xQueueReceive(s_static_request_queue, &request, 0) != pdTRUE) return;
-    esp_err_t result = serve_static_request(request);
-    if (result != ESP_OK) {
-        ESP_LOGW(TAG, "Static response failed for %s: %s", request->uri,
-                 esp_err_to_name(result));
-    }
-    result = httpd_req_async_handler_complete(request);
-    if (result != ESP_OK) {
-        ESP_LOGE(TAG, "Static request completion failed: %s",
-                 esp_err_to_name(result));
-    }
-}
-
 static esp_err_t static_handler(httpd_req_t *request) {
-    httpd_req_t *async_request = NULL;
-    esp_err_t result =
-        httpd_req_async_handler_begin(request, &async_request);
-    if (result != ESP_OK) {
-        httpd_resp_set_status(request, "503 Service Unavailable");
-        httpd_resp_set_hdr(request, "Connection", "close");
-        return send_string(request, "Static worker unavailable");
-    }
-    if (xQueueSend(s_static_request_queue, &async_request, 0) != pdTRUE) {
-        httpd_resp_set_status(async_request, "503 Service Unavailable");
-        httpd_resp_set_hdr(async_request, "Connection", "close");
-        send_string(async_request, "Static worker queue full");
-        httpd_req_async_handler_complete(async_request);
-    }
-    return ESP_OK;
+    return serve_static_request(request);
 }
 
 static esp_err_t register_get(const char *uri, esp_err_t (*handler)(httpd_req_t *)) {
@@ -677,17 +651,17 @@ static esp_err_t register_get(const char *uri, esp_err_t (*handler)(httpd_req_t 
 }
 
 esp_err_t web_service_start(void) {
-    esp_err_t result = start_static_queue();
-    if (result != ESP_OK) return result;
-
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = 80;
     config.stack_size = BOARD_TASK_STACK_WEB;
     config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
+    config.backlog_conn = 1;
     config.max_uri_handlers = 18;
-    config.lru_purge_enable = true;
+    /* Reject excess connections immediately instead of evicting an active
+     * transfer or the WebSocket. Static handlers close their own sessions. */
+    config.lru_purge_enable = false;
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
-    result = httpd_start(&s_server, &config);
+    esp_err_t result = httpd_start(&s_server, &config);
     if (result != ESP_OK) return result;
 
     static const char *pages[] = {
@@ -731,7 +705,6 @@ void web_service_notify_playlist_changed(void) {
 }
 
 void web_service_poll(void) {
-    service_static_queue_once();
     if (!s_server || s_ws_fd < 0 || s_send_pending) return;
     if (s_current_pending) {
         char current[40];

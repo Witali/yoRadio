@@ -16,6 +16,8 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include <esp_log.h>
 #include <esp_err.h>
 
@@ -23,6 +25,7 @@
 #include "esp_httpd_priv.h"
 
 static const char *TAG = "httpd_txrx";
+#define HTTPD_SEND_RETRY_TIMEOUT_MS 5000U
 
 esp_err_t httpd_sess_set_send_override(httpd_handle_t hd, int sockfd, httpd_send_func_t send_func)
 {
@@ -76,21 +79,33 @@ int httpd_send(httpd_req_t *r, const char *buf, size_t buf_len)
 static esp_err_t httpd_send_all(httpd_req_t *r, const char *buf, size_t buf_len)
 {
     struct httpd_req_aux *ra = r->aux;
-    int ret;
+    TickType_t deadline = xTaskGetTickCount() +
+                          pdMS_TO_TICKS(HTTPD_SEND_RETRY_TIMEOUT_MS);
 
     while (buf_len > 0) {
-        ret = ra->sd->send_fn(ra->sd->handle, ra->sd->fd, buf, buf_len, 0);
-        if (ret < 0) {
-            ESP_LOGD(TAG, LOG_FMT("error in send_fn"));
-            return ESP_FAIL;
+        int ret = ra->sd->send_fn(ra->sd->handle, ra->sd->fd, buf, buf_len,
+                                  MSG_DONTWAIT);
+        if (ret > 0) {
+            ESP_LOGD(TAG, LOG_FMT("sent = %d"), ret);
+            buf += ret;
+            buf_len -= (size_t)ret;
+            continue;
         }
-        ESP_LOGD(TAG, LOG_FMT("sent = %d"), ret);
-        buf     += ret;
-        buf_len -= ret;
+        bool retryable = ret == HTTPD_SOCK_ERR_TIMEOUT ||
+                         (ret < 0 && (errno == EAGAIN ||
+                                     errno == EWOULDBLOCK ||
+                                     errno == EINTR));
+        if (retryable &&
+            (int32_t)(deadline - xTaskGetTickCount()) > 0) {
+            vTaskDelay(pdMS_TO_TICKS(1));
+            continue;
+        }
+        ESP_LOGD(TAG, LOG_FMT("error in send_fn: ret=%d errno=%d"),
+                 ret, errno);
+        return ESP_FAIL;
     }
     return ESP_OK;
 }
-
 static size_t httpd_recv_pending(httpd_req_t *r, char *buf, size_t buf_len)
 {
     struct httpd_req_aux *ra = r->aux;
@@ -602,11 +617,13 @@ int httpd_default_send(httpd_handle_t hd, int sockfd, const char *buf, size_t bu
 
     int ret = send(sockfd, buf, buf_len, flags);
     if (ret < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+            return HTTPD_SOCK_ERR_TIMEOUT;
+        }
         return httpd_sock_err("send", sockfd);
     }
     return ret;
 }
-
 int httpd_default_recv(httpd_handle_t hd, int sockfd, char *buf, size_t buf_len, int flags)
 {
     (void)hd;

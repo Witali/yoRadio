@@ -18,7 +18,7 @@
 #define WIFI_PATH "/spiffs/data/wifi.csv"
 #define WIFI_MAX_CREDENTIALS 5U
 #define WIFI_RETRIES_PER_CREDENTIAL 2U
-#define WIFI_CONNECT_TIMEOUT_MS 30000U
+#define WIFI_CONNECT_TIMEOUT_MS ((uint32_t)CONFIG_YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS * 1000U)
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
 
@@ -103,12 +103,29 @@ static esp_err_t start_access_point(void) {
     if (result == ESP_OK)
         result = esp_wifi_set_config(ESP_IF_WIFI_AP, &config);
     if (result != ESP_OK) return result;
+
+    tcpip_adapter_ip_info_t info;
+    memset(&info, 0, sizeof(info));
+    if (!ip4addr_aton("192.168.4.1", &info.ip) ||
+        !ip4addr_aton("192.168.4.1", &info.gw) ||
+        !ip4addr_aton("255.255.255.0", &info.netmask)) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    result = tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_AP);
+    if (result != ESP_OK &&
+        result != ESP_ERR_TCPIP_ADAPTER_DHCP_ALREADY_STOPPED) {
+        return result;
+    }
+    result = tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_AP, &info);
+    if (result == ESP_OK)
+        result = tcpip_adapter_dhcps_start(TCPIP_ADAPTER_IF_AP);
+    if (result != ESP_OK &&
+        result != ESP_ERR_TCPIP_ADAPTER_DHCP_ALREADY_STARTED) {
+        return result;
+    }
     s_access_point = true;
     native_state_set_network(NETWORK_ACCESS_POINT);
-    tcpip_adapter_ip_info_t info;
-    if (tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &info) == ESP_OK) {
-        native_state_set_ip(ip4addr_ntoa(&info.ip));
-    }
+    native_state_set_ip(ip4addr_ntoa(&info.ip));
     ESP_LOGW(TAG, "Recovery AP enabled: %s", config.ap.ssid);
     return ESP_OK;
 }

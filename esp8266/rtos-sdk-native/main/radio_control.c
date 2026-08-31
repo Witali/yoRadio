@@ -142,9 +142,18 @@ static esp_err_t step_station(int direction) {
     if (!s_lock) return ESP_ERR_INVALID_STATE;
     if (xSemaphoreTake(s_lock, pdMS_TO_TICKS(500)) != pdTRUE)
         return ESP_ERR_TIMEOUT;
+    uint16_t count = playlist_service_count();
+    uint16_t candidate = s_current_station;
+    if (count != 0U) {
+        if (direction < 0)
+            candidate = candidate <= 1U ? count : candidate - 1U;
+        else
+            candidate = candidate >= count ? 1U : candidate + 1U;
+    }
     uint16_t found = 0;
-    esp_err_t result = playlist_service_find_http_index(
-                           s_current_station, direction, &found)
+    esp_err_t result = count != 0U &&
+                           playlist_service_find_http_index(
+                               candidate, direction, &found)
                            ? play_locked(found)
                            : ESP_ERR_NOT_FOUND;
     xSemaphoreGive(s_lock);
