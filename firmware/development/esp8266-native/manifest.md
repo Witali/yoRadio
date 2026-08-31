@@ -1,35 +1,34 @@
 # ESP8266 native development artifact
 
-- Source revision: `8d26dbd`
+- Source revision: `9733938`
 - Target: ESP8266EX, 4 MiB flash
 - Framework: ESP8266 RTOS SDK v3.4
 - Profile: development, diagnostic logging enabled, `-O3`, audio profiler disabled
-- Features: HTTP radio streams, Helix MP3/AAC, WebUI-only display profile
+- Features: HTTP/ICY radio streams, Helix MP3/AAC, WebUI-only display profile
 - Application flash offset: `0x10000`
 - File: `app.bin`
-- Size: 655776 bytes
-- SHA-256: `DC4FCE7E6B93928B7E2C7B6723222289977F48F1B94A9D1B4E8E33BC3FAE5163`
+- Size: 659584 bytes
+- SHA-256: `98B42438FD14A55FF94A33F260BBDC97A8D5533B8432BA8665A4B9530375B725`
 
 ## Changes
 
-- Replaced synchronous SPI-PDM transactions with a bounded 12-block queue
-  drained by the HSPI transfer-complete interrupt.
-- The audio task now sleeps on a FreeRTOS notification only while the queue is
-  full; it no longer spins while every 512-bit PDM block is transmitted.
-- Increased the board-specific input stack to 3072 bytes after physical BOOT
-  tests exposed stack overflows while reading the SPIFFS playlist.
-- Added reproducible MP3/AAC profiling URLs and optional static IPv4 settings
-  to the opt-in diagnostic profile; they are absent from this normal image.
+- Added an RFC 9112-compatible low-memory HTTP stream parser: correct authority/port
+  handling, relative redirects, chunked transfer decoding and bounded socket I/O.
+- Made HTTP Server sends nonblocking and deadline-bounded, with correct transient
+  errno handling matching the Espressif transport conventions.
+- Closed short static/API sessions explicitly, limited the accept backlog and
+  bounded active TCP PCBs so connection bursts cannot exhaust the ESP8266 heap.
+- Reduced TCP MSS/window memory while preserving enough throughput for radio.
+- Fixed Next/Previous so the search starts after, rather than at, the current
+  HTTP station.
 
 ## Validation
 
-- Clean normal firmware build completed successfully with AAC enabled and the
-  profiling option disabled; all 231 repository regression tests passed.
-- The physical Wemos D1 mini joined Wi-Fi by DHCP at 192.168.100.6; WebUI
-  root and /api/native/status both returned HTTP 200.
-- A simulated short BOOT press selected station 1 and opened its ICY stream;
-  live status reported playback, AAC, 67 kbit/s and current RSSI.
-- Reproducible local AAC 320, AAC 64 and MP3 128 streams all exercised the
-  interrupt-driven output without watchdog resets or SPI queue timeouts.
-- On AAC 320, SPI queue wait averaged about 22% of wall time as blocked task
-  time, while gain/mix/PDM computation averaged about 13%.
+- All 239 repository regression tests passed, including native C tests for URL,
+  redirect, header-token and fragmented chunked-body handling.
+- The physical Wemos D1 mini joined Wi-Fi at `192.168.100.6`. Root HTML, gzip
+  JavaScript, the 53,808-byte playlist and native status all returned HTTP 200.
+- Twelve concurrent HTTP requests completed successfully; afterwards ping was
+  3/3 with 0% loss and the full playlist was served again.
+- A real non-default-port HTTP stream with a query played as AAC at 61 kbit/s.
+- WebSocket Play, Pause, Next, Previous and Stop status scenarios all passed.

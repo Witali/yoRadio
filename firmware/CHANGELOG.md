@@ -3,6 +3,22 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-08-31
+
+### ESP8266 native HTTP stack stabilization
+
+- Corrected HTTP authority, redirect and chunked-transfer parsing for the
+  low-memory radio client and added native protocol tests.
+- Made ESP HTTP Server writes bounded and nonblocking, explicitly closed short
+  static/API sessions and capped TCP PCB allocation to prevent heap exhaustion.
+- Flashed and tested the physical Wemos D1 mini: 12 concurrent requests, three
+  53,808-byte playlist transfers, follow-up HTTP and ping all succeeded.
+- Played a real HTTP AAC stream on a non-default port and verified WebSocket
+  Play/Pause/Next/Previous/Stop synchronization.
+- Built source revision `9733938`; all 239 regression tests passed. The checked
+  artifact and SHA-256 manifest are in
+  [`development/esp8266-native/`](development/esp8266-native/).
+
 ## Development — 2026-08-30
 
 ### ESP8266 native asynchronous WebUI image
