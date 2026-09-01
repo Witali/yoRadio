@@ -85,6 +85,9 @@ static volatile TaskHandle_t s_spi_waiter;
 #if YORADIO_ESP8266_AUDIO_PROFILE
 extern void audio_profile_spi_wait_begin(void);
 extern void audio_profile_spi_wait_end(void);
+#elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+extern void audio_output_benchmark_spi_wait_begin(void);
+extern void audio_output_benchmark_spi_wait_end(void);
 #endif
 
 static const spi_interface_t s_spi_interface = {
@@ -129,11 +132,15 @@ static void IRAM_ATTR spi_pdm_event(int event, void *arg) {
 static uint32_t spi_pdm_wait_notification(void) {
 #if YORADIO_ESP8266_AUDIO_PROFILE
     audio_profile_spi_wait_begin();
+#elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+    audio_output_benchmark_spi_wait_begin();
 #endif
     uint32_t notified = ulTaskNotifyTake(pdTRUE,
                                          pdMS_TO_TICKS(SPI_PDM_WAIT_MS));
 #if YORADIO_ESP8266_AUDIO_PROFILE
     audio_profile_spi_wait_end();
+#elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+    audio_output_benchmark_spi_wait_end();
 #endif
     return notified;
 }
@@ -146,9 +153,8 @@ static esp_err_t spi_pdm_select_pin(void) {
     return result;
 }
 
-static esp_err_t spi_pdm_send(const uint32_t *words, size_t bit_count) {
-    if (!bit_count || bit_count > SPI_PDM_CHUNK_BITS)
-        return ESP_ERR_INVALID_ARG;
+static esp_err_t spi_pdm_acquire(spi_pdm_chunk_t **out) {
+    if (!out) return ESP_ERR_INVALID_ARG;
     esp_err_t result = spi_pdm_select_pin();
     if (result != ESP_OK) return result;
     s_spi_waiter = xTaskGetCurrentTaskHandle();
@@ -156,20 +162,33 @@ static esp_err_t spi_pdm_send(const uint32_t *words, size_t bit_count) {
         taskENTER_CRITICAL();
         if (s_spi_queue_count < SPI_PDM_QUEUE_CHUNKS) {
             spi_pdm_chunk_t *chunk = &s_spi_queue[s_spi_queue_tail];
-            for (size_t index = 0; index < SPI_PDM_CHUNK_WORDS; ++index)
-                chunk->words[index] = words[index];
-            chunk->bit_count = (uint16_t)bit_count;
-            ++s_spi_queue_tail;
-            if (s_spi_queue_tail == SPI_PDM_QUEUE_CHUNKS)
-                s_spi_queue_tail = 0;
-            ++s_spi_queue_count;
-            if (!s_spi_active) spi_pdm_start_next_locked();
             taskEXIT_CRITICAL();
+            memset(chunk->words, 0, sizeof(chunk->words));
+            chunk->bit_count = 0;
+            *out = chunk;
             return ESP_OK;
         }
         taskEXIT_CRITICAL();
         if (!spi_pdm_wait_notification()) return ESP_ERR_TIMEOUT;
     }
+}
+
+static esp_err_t spi_pdm_commit(spi_pdm_chunk_t *chunk, size_t bit_count) {
+    if (!chunk || !bit_count || bit_count > SPI_PDM_CHUNK_BITS)
+        return ESP_ERR_INVALID_ARG;
+    taskENTER_CRITICAL();
+    if (chunk != &s_spi_queue[s_spi_queue_tail] ||
+        s_spi_queue_count >= SPI_PDM_QUEUE_CHUNKS) {
+        taskEXIT_CRITICAL();
+        return ESP_ERR_INVALID_STATE;
+    }
+    chunk->bit_count = (uint16_t)bit_count;
+    ++s_spi_queue_tail;
+    if (s_spi_queue_tail == SPI_PDM_QUEUE_CHUNKS) s_spi_queue_tail = 0;
+    ++s_spi_queue_count;
+    if (!s_spi_active) spi_pdm_start_next_locked();
+    taskEXIT_CRITICAL();
+    return ESP_OK;
 }
 
 static esp_err_t spi_pdm_wait_idle(void) {
@@ -183,8 +202,12 @@ static esp_err_t spi_pdm_wait_idle(void) {
     }
 }
 
-static esp_err_t spi_pdm_emit_sample(int16_t sample, uint32_t *words,
+static esp_err_t spi_pdm_emit_sample(int16_t sample, spi_pdm_chunk_t **chunk,
                                      size_t *bit_count) {
+    if (!*chunk) {
+        esp_err_t result = spi_pdm_acquire(chunk);
+        if (result != ESP_OK) return result;
+    }
     const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
     for (unsigned bit = 0; bit < BOARD_SPI_PDM_OVERSAMPLE; ++bit) {
         s_pdm_integrator += target;
@@ -193,13 +216,13 @@ static esp_err_t spi_pdm_emit_sample(int16_t sample, uint32_t *words,
         if (high) {
             size_t word = *bit_count / 32U;
             unsigned shift = 31U - (unsigned)(*bit_count % 32U);
-            words[word] |= 1UL << shift;
+            (*chunk)->words[word] |= 1UL << shift;
         }
         ++*bit_count;
         if (*bit_count == SPI_PDM_CHUNK_BITS) {
-            esp_err_t result = spi_pdm_send(words, *bit_count);
+            esp_err_t result = spi_pdm_commit(*chunk, *bit_count);
             if (result != ESP_OK) return result;
-            memset(words, 0, sizeof(uint32_t) * SPI_PDM_CHUNK_WORDS);
+            *chunk = NULL;
             *bit_count = 0;
         }
     }
@@ -274,7 +297,7 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         s_input_sample_rate = sample_rate;
         s_resample_phase = 0;
     }
-    uint32_t words[SPI_PDM_CHUNK_WORDS] = {0};
+    spi_pdm_chunk_t *chunk = NULL;
     size_t bit_count = 0;
     for (size_t frame = 0; frame < frames; ++frame) {
         int32_t mono = samples[frame * channels];
@@ -283,21 +306,24 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         s_resample_phase += BOARD_SPI_PDM_SAMPLE_RATE;
         while (s_resample_phase >= sample_rate) {
             esp_err_t result = spi_pdm_emit_sample(
-                (int16_t)mono, words, &bit_count);
+                (int16_t)mono, &chunk, &bit_count);
             if (result != ESP_OK) return result;
             s_resample_phase -= sample_rate;
         }
     }
-    return bit_count ? spi_pdm_send(words, bit_count) : ESP_OK;
+    return bit_count ? spi_pdm_commit(chunk, bit_count) : ESP_OK;
 }
 
 void native_audio_output_silence(void) {
     if (!s_spi_initialized) return;
     esp_err_t result = spi_pdm_wait_idle();
-    uint32_t silence[SPI_PDM_CHUNK_WORDS];
-    for (size_t index = 0; index < SPI_PDM_CHUNK_WORDS; ++index)
-        silence[index] = 0xaaaaaaaaU;
-    if (result == ESP_OK) result = spi_pdm_send(silence, SPI_PDM_CHUNK_BITS);
+    spi_pdm_chunk_t *silence = NULL;
+    if (result == ESP_OK) result = spi_pdm_acquire(&silence);
+    if (result == ESP_OK) {
+        for (size_t index = 0; index < SPI_PDM_CHUNK_WORDS; ++index)
+            silence->words[index] = 0xaaaaaaaaU;
+        result = spi_pdm_commit(silence, SPI_PDM_CHUNK_BITS);
+    }
     if (result == ESP_OK) result = spi_pdm_wait_idle();
     if (result != ESP_OK)
         ESP_LOGE(TAG, "SPI-PDM drain failed: %s", esp_err_to_name(result));

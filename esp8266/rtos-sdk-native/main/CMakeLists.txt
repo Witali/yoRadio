@@ -23,6 +23,12 @@ option(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY
   "Discard decoded PCM instead of converting and sending PDM" OFF)
 option(YORADIO_ESP8266_CODEC_RAM_BENCHMARK
   "Run embedded MP3/AAC frames repeatedly from RAM without Wi-Fi" OFF)
+option(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+  "Generate PCM in RAM and benchmark physical audio output without codecs" OFF)
+if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK AND
+   YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
+  message(FATAL_ERROR "Select only one isolated ESP8266 benchmark")
+endif()
 if(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY AND
    NOT YORADIO_ESP8266_AUDIO_PROFILE)
   message(FATAL_ERROR "Decode-only mode requires the ESP8266 audio profile")
@@ -44,6 +50,9 @@ if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
   list(APPEND YORADIO_EMBED_FILES
     "../../../tests/fixtures/helix_golden/stereo-320.mp3"
     "../../../tests/fixtures/helix_golden/stereo-320.aac")
+endif()
+if(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
+  list(APPEND YORADIO_SOURCES "audio_output_benchmark.c")
 endif()
 set(YORADIO_INCLUDE_DIRS ".")
 if(CONFIG_YORADIO_OLED)
@@ -98,6 +107,10 @@ endif()
 if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_CODEC_RAM_BENCHMARK=1)
+endif()
+if(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=1)
 endif()
 if(YORADIO_ESP8266_HELIX_STAGE_PROFILE)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
