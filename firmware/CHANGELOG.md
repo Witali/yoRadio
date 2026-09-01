@@ -5,6 +5,18 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-01
 
+### ESP8266 experimental libmad MP3 backend
+
+- Added a pinned ESP8266Audio `libmad-8266` backend selected by
+  `CONFIG_YORADIO_MP3_DECODER_LIBMAD`; Helix remains the production default.
+- The deterministic 320-kbit/s fixture produced the same frame/sample count
+  as Helix, with 49.41 dB SNR and a maximum difference of 99 PCM levels.
+- Built both Helix and libmad QIO80 radio profiles and passed all 256 repository
+  tests. Physical speed/RAM validation is pending because the Wemos USB-UART
+  adapter was not enumerated by Windows during this run.
+- Archived the experimental application and recovery binaries under
+  [`development/esp8266-native-libmad/`](development/esp8266-native-libmad/).
+
 ### ESP8266 native persistent WebUI server
 
 - Changed static WebUI delivery to standard HTTP/1.1 persistence: every
