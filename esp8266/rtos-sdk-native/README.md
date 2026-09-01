@@ -1,8 +1,10 @@
 # yoRadio ESP8266 native
 
 This target uses the official Espressif `ESP8266_RTOS_SDK v3.4` and follows
-the ESP-IDF-style component/CMake layout. It is deliberately HTTP-only and
-will contain only the Helix MP3 and AAC decoders.
+the ESP-IDF-style component/CMake layout. It is deliberately HTTP-only. The
+normal profile uses the yoRadio Helix MP3 and AAC decoders; an experimental
+ESP8266Audio `libmad-8266` MP3 backend can be selected at compile time with
+`CONFIG_YORADIO_MP3_DECODER_LIBMAD` while AAC remains on Helix.
 
 The default profile targets a 4 MiB ESP-12E/NodeMCU/Wemos-class module at
 160 MHz and uses the external flash in QIO mode at 40 MHz. The bootloader is
@@ -12,6 +14,9 @@ The optional `sdkconfig.qio80.defaults` profile selects QIO at 80 MHz for
 modules with a suitably rated flash chip. Use it instead of
 `sdkconfig.defaults`; it is kept separate from the default profile because
 signal integrity still depends on the particular module PCB.
+For a reproducible Wemos QIO80 libmad experiment, use
+`sdkconfig.libmad-qio80.defaults`. The ordinary defaults continue to select
+`CONFIG_YORADIO_MP3_DECODER_HELIX`.
 Audio defaults to mono SPI-PDM on GPIO13/D7, leaving UART0 RX GPIO3
 available. HSPI clocks the PDM stream at 769.23 kHz, the closest hardware rate
 to 48 kHz x 16; GPIO14/D5 carries the unused SPI clock and should not be wired

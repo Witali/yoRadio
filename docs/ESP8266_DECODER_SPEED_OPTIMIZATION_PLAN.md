@@ -72,6 +72,12 @@ decoder correctness.
   MP3 32/128/320 kbit/s and AAC 48/128/320 kbit/s. Record realtime ratio,
   CPU busy/idle, decoder stage timings, worst decoder call, free heap, minimum
   free heap, and IRAM consumption.
+- [x] Add the ESP8266Audio `libmad-8266` core as an experimental MP3 backend,
+  pinned to upstream commit `10d929ac01436dfe8856e0a06fd9ec35a848c6e2`.
+  Keep Helix as the production default and retain the same native stream,
+  PCM callback, normalizer, and output path so the A/B benchmark changes only
+  the MP3 decoder. The physical RAM benchmark remains pending until the Wemos
+  USB-UART adapter is connected again.
 
 ## Priority
 
@@ -145,6 +151,23 @@ one-time free-format bitrate division in MP3. MP3 and AAC golden PCM hashes are
 unchanged. AAC-LC has no affected code path; its 15,872 versus 15,920 us A/B
 shift is caused by flash layout after the MP3 text-size change and is not an
 AAC algorithm change.
+
+## Experimental libmad-8266 baseline
+
+The imported fixed-point core decodes the checked-in 48-kHz stereo
+320-kbit/s fixture to the same 18 frames and 82,944 PCM bytes as the current
+yoRadio Helix decoder. The approximate `FPM_DEFAULT`/`OPT_SPEED` arithmetic is
+not bit-identical: measured directly against the Helix PCM, SNR is 49.41 dB
+and the maximum absolute difference is 99 signed 16-bit PCM levels. These
+small low-bit differences are accepted for the speed experiment.
+
+Both complete QIO80 radio images build with GCC 8.4 and `-O3`. Compared with
+Helix, the libmad image grows from 670,848 to 721,232 bytes (+50,384 bytes).
+Static DRAM falls from 16,752 to 15,984 bytes, while the decoder's reported
+dynamic workspace rises from 28,984 to 33,336 bytes (+4,352 bytes). The final
+decision depends on the physical RAM-only frame time, worst frame, free heap,
+and integrated Wi-Fi/audio result; host execution time is intentionally not
+used as an ESP8266 speed result.
 
 ## Expected outcome
 

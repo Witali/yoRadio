@@ -162,6 +162,7 @@ void run_codec(const char *name, helix_codec_kind_t kind,
     }
 
     OutputStats output = {};
+    const size_t arena_bytes = helix_codec_arena_used(codec);
     uint32_t elapsed = 0;
     for (unsigned index = 0; index < kWarmupFrames; ++index) {
         if (!submit_frame(codec, frame_ram, fixture.size, &output, &elapsed)) {
@@ -200,7 +201,8 @@ void run_codec(const char *name, helix_codec_kind_t kind,
     ESP_LOGI(kTag,
              "%s RAM frame=%u bytes iterations=%u callbacks=%u "
              "decode=%u us avg=%u us min=%u us max=%u us "
-             "audio=%u us realtime=%u.%u%% speed=%u.%03ux heap=%u",
+             "audio=%u us realtime=%u.%u%% speed=%u.%03ux heap=%u "
+             "workspace=%u arena=%u",
              name, static_cast<unsigned>(fixture.size), kMeasuredFrames,
              static_cast<unsigned>(output.callbacks),
              static_cast<unsigned>(total_us),
@@ -208,7 +210,9 @@ void run_codec(const char *name, helix_codec_kind_t kind,
              maximum_us, static_cast<unsigned>(audio_us),
              speed_x1000 / 10U, speed_x1000 % 10U,
              speed_x1000 / 1000U, speed_x1000 % 1000U,
-             static_cast<unsigned>(esp_get_free_heap_size()));
+             static_cast<unsigned>(esp_get_free_heap_size()),
+             static_cast<unsigned>(helix_codec_workspace_size()),
+             static_cast<unsigned>(arena_bytes));
     report_stage_profile(name, total_us);
     helix_codec_destroy(codec);
 }
@@ -248,7 +252,13 @@ extern "C" void codec_ram_benchmark_run(void) {
         ESP_LOGE(kTag, "cannot reserve codec word arena");
         return;
     }
-    run_codec("MP3", HELIX_CODEC_MP3,
+    run_codec(
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+              "MP3/libmad",
+#else
+              "MP3/Helix",
+#endif
+              HELIX_CODEC_MP3,
               first_mp3_frame(_binary_stereo_320_mp3_start,
                               _binary_stereo_320_mp3_end -
                               _binary_stereo_320_mp3_start));

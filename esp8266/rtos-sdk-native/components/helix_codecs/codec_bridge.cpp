@@ -13,7 +13,14 @@
 #include "esp_log.h"
 #include "esp_heap_caps.h"
 #include "esp_system.h"
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+extern "C" {
+#include "../libmad8266/upstream/libmad/config.h"
+#include "mad.h"
+}
+#else
 #include "mp3_decoder.h"
+#endif
 
 #if YORADIO_ESP8266_AUDIO_PROFILE
 extern "C" void audio_profile_decode_begin(void);
@@ -21,10 +28,20 @@ extern "C" void audio_profile_decode_end(void);
 #endif
 
 namespace {
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+constexpr size_t kArenaBytes = sizeof(mad_stream) + sizeof(mad_frame) +
+                               sizeof(mad_synth) + 3U * alignof(max_align_t);
+#else
 constexpr size_t kArenaBytes = 23328U;
+#endif
 /* 1536 bytes covers a maximum-size 320-kbit/s MP3 frame and normal
  * high-bitrate ADTS AAC frames while conserving scarce ESP8266 DRAM. */
 constexpr size_t kInputBytes = 1536U;
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+constexpr size_t kInputStorageBytes = kInputBytes + MAD_BUFFER_GUARD;
+#else
+constexpr size_t kInputStorageBytes = kInputBytes;
+#endif
 /* Helix MP3 emits at most 576 stereo samples per granule. AAC writes a
  * complete 1024-sample stereo frame before its size can be inspected, so an
  * AAC-enabled build must reserve the larger destination up front. */
@@ -100,11 +117,61 @@ struct helix_codec {
     int16_t *pcm;
 };
 static constexpr size_t kWorkspaceBytes = sizeof(helix_codec) +
-    kArenaBytes + kInputBytes + sizeof(int16_t) * kPcmSamples;
+    kArenaBytes + kInputStorageBytes + sizeof(int16_t) * kPcmSamples;
+
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+struct LibmadDecoder {
+    mad_stream *stream;
+    mad_frame *frame;
+    mad_synth *synth;
+};
+
+LibmadDecoder s_libmad = {};
+
+bool libmad_allocate() {
+    /* The synthesis state is 32-bit-only and fits in the preallocated IRAM
+     * word arena. The byte-addressed bit-reservoir and the larger frame state
+     * remain in DRAM. All allocations still share the codec arena lifetime. */
+    s_libmad.synth = static_cast<mad_synth *>(CodecArenaCalloc32(
+        CODEC_ARENA_MP3, 1, sizeof(mad_synth)));
+    s_libmad.stream = static_cast<mad_stream *>(CodecArenaCalloc(
+        CODEC_ARENA_MP3, 1, sizeof(mad_stream)));
+    s_libmad.frame = static_cast<mad_frame *>(CodecArenaCalloc(
+        CODEC_ARENA_MP3, 1, sizeof(mad_frame)));
+    if (!s_libmad.stream || !s_libmad.frame || !s_libmad.synth) {
+        CodecArenaRelease(CODEC_ARENA_MP3);
+        s_libmad = {};
+        return false;
+    }
+    mad_stream_init(s_libmad.stream);
+    mad_stream_options(s_libmad.stream, MAD_OPTION_IGNORECRC);
+    mad_frame_init(s_libmad.frame);
+    mad_synth_init(s_libmad.synth);
+    return true;
+}
+
+void libmad_free() {
+    if (s_libmad.stream) mad_stream_finish(s_libmad.stream);
+    if (s_libmad.frame) mad_frame_finish(s_libmad.frame);
+    CodecArenaRelease(CODEC_ARENA_MP3);
+    s_libmad = {};
+}
+
+bool libmad_reset() {
+    libmad_free();
+    return libmad_allocate();
+}
+#endif
 
 
 static void free_decoder(helix_codec *codec) {
-    if (codec->kind == HELIX_CODEC_MP3) MP3Decoder_FreeBuffers();
+    if (codec->kind == HELIX_CODEC_MP3) {
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+        libmad_free();
+#else
+        MP3Decoder_FreeBuffers();
+#endif
+    }
 #if CONFIG_YORADIO_HELIX_AAC
     else if (codec->kind == HELIX_CODEC_AAC) AACDecoder_FreeBuffers();
 #endif
@@ -113,7 +180,13 @@ static void free_decoder(helix_codec *codec) {
 static bool allocate_decoder(helix_codec *codec, helix_codec_kind_t kind) {
     codec->kind = kind;
     codec->input_start = codec->input_size = 0;
-    if (kind == HELIX_CODEC_MP3) return MP3Decoder_AllocateBuffers();
+    if (kind == HELIX_CODEC_MP3) {
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+        return libmad_allocate();
+#else
+        return MP3Decoder_AllocateBuffers();
+#endif
+    }
 #if CONFIG_YORADIO_HELIX_AAC
     if (kind == HELIX_CODEC_AAC) return AACDecoder_AllocateBuffers();
 #endif
@@ -135,6 +208,7 @@ static void compact(helix_codec *codec) {
     }
 }
 
+#if !CONFIG_YORADIO_MP3_DECODER_LIBMAD
 struct Mp3GranuleOutput {
     helix_pcm_callback_t callback;
     void *context;
@@ -153,6 +227,7 @@ static bool emit_mp3_granule(void *opaque, short *pcm, int samples) {
     output->failed = !accepted;
     return accepted;
 }
+#endif
 
 static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
                       void *context) {
@@ -169,6 +244,53 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
             input = codec->input + codec->input_start;
         }
         if (codec->input_size < parsed.frame_size) return 1;
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        audio_profile_decode_begin();
+#endif
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+        size_t supplied = codec->input_size;
+        if (supplied < parsed.frame_size + MAD_BUFFER_GUARD) {
+            std::memset(input + supplied, 0,
+                        parsed.frame_size + MAD_BUFFER_GUARD - supplied);
+            supplied = parsed.frame_size + MAD_BUFFER_GUARD;
+        }
+        mad_stream_buffer(s_libmad.stream, input,
+                          static_cast<unsigned long>(supplied));
+        int result = mad_frame_decode(s_libmad.frame, s_libmad.stream);
+        bool output_failed = false;
+        if (result == 0) {
+            const unsigned channels = MAD_NCHANNELS(&s_libmad.frame->header);
+            const unsigned subbands = MAD_NSBSAMPLES(&s_libmad.frame->header);
+            size_t pcm_samples = 0;
+            helix_stream_info_t info = {
+                s_libmad.frame->header.samplerate,
+                s_libmad.frame->header.bitrate,
+                static_cast<uint8_t>(channels), 16,
+            };
+            for (unsigned ns = 0; ns < subbands; ++ns) {
+                if (mad_synth_frame_onens(s_libmad.synth,
+                                           s_libmad.frame, ns) !=
+                    MAD_FLOW_CONTINUE) {
+                    output_failed = true;
+                    break;
+                }
+                const mad_pcm &block = s_libmad.synth->pcm;
+                for (unsigned sample = 0; sample < block.length; ++sample) {
+                    codec->pcm[pcm_samples++] = block.samples[0][sample];
+                    if (channels == 2)
+                        codec->pcm[pcm_samples++] = block.samples[1][sample];
+                }
+                if (pcm_samples &&
+                    (((ns + 1U) % 18U) == 0U || ns + 1U == subbands)) {
+                    if (!callback(context, &info, codec->pcm, pcm_samples)) {
+                        output_failed = true;
+                        break;
+                    }
+                    pcm_samples = 0;
+                }
+            }
+        }
+#else
         int left = static_cast<int>(parsed.frame_size);
         Mp3GranuleOutput output = {
             callback,
@@ -176,14 +298,22 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
             {parsed.sample_rate, parsed.bitrate, parsed.channels, 16},
             false,
         };
-#if YORADIO_ESP8266_AUDIO_PROFILE
-        audio_profile_decode_begin();
-#endif
         int result = MP3DecodeGranules(input, &left, codec->pcm, 0,
                                        emit_mp3_granule, &output);
+#endif
 #if YORADIO_ESP8266_AUDIO_PROFILE
         audio_profile_decode_end();
 #endif
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+        if (output_failed) return -5;
+        if (result != 0) {
+            ESP_LOGW(kTag, "libmad frame error 0x%x: %s",
+                     static_cast<unsigned>(s_libmad.stream->error),
+                     mad_stream_errorstr(s_libmad.stream));
+        }
+        consume(codec, parsed.frame_size);
+        return 0;
+#else
         size_t used = parsed.frame_size - std::min(
             parsed.frame_size, static_cast<size_t>(std::max(left, 0)));
         if (output.failed) return -5;
@@ -193,6 +323,7 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
         }
         consume(codec, used ? used : parsed.frame_size);
         return 0;
+#endif
     }
 
 #if CONFIG_YORADIO_HELIX_AAC
@@ -262,7 +393,7 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
     helix_codec *codec = static_cast<helix_codec *>(std::calloc(1, sizeof(*codec)));
     if (codec) {
         codec->input = static_cast<uint8_t *>(
-            heap_caps_malloc(kInputBytes, MALLOC_CAP_8BIT));
+            heap_caps_calloc(1, kInputStorageBytes, MALLOC_CAP_8BIT));
         codec->pcm = static_cast<int16_t *>(
             heap_caps_malloc(sizeof(int16_t) * kPcmSamples, MALLOC_CAP_8BIT));
     }
@@ -280,7 +411,13 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
     }
     bool allocated = allocate_decoder(codec, kind);
     if (!allocated) {
-        if (kind == HELIX_CODEC_MP3) MP3Decoder_FreeBuffers();
+        if (kind == HELIX_CODEC_MP3) {
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+            libmad_free();
+#else
+            MP3Decoder_FreeBuffers();
+#endif
+        }
 #if CONFIG_YORADIO_HELIX_AAC
         else AACDecoder_FreeBuffers();
 #endif
@@ -292,7 +429,13 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
         return nullptr;
     }
     ESP_LOGI(kTag, "%s workspace: %u bytes, arena used: %u",
-             kind == HELIX_CODEC_MP3 ? "MP3" : "AAC",
+             kind == HELIX_CODEC_MP3
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+                 ? "libmad MP3"
+#else
+                 ? "Helix MP3"
+#endif
+                 : "Helix AAC",
              (unsigned)kWorkspaceBytes, (unsigned)CodecArenaUsed());
     return codec;
 }
@@ -318,8 +461,12 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
     if (codec->kind == kind) {
         codec->input_start = codec->input_size = 0;
         if (kind == HELIX_CODEC_MP3) {
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+            return libmad_reset() ? 0 : -2;
+#else
             MP3Decoder_ClearBuffer();
             return 0;
+#endif
         }
 #if CONFIG_YORADIO_HELIX_AAC
         /* AAC has no public state-reset entry point. Release/rebuild its
