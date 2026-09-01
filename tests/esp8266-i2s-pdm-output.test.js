@@ -23,7 +23,10 @@ const i2sPdmStart = output.indexOf(
 );
 const i2sPdm = output.slice(
   i2sPdmStart,
-  output.indexOf("\n#else", i2sPdmStart),
+  output.indexOf(
+    "\n#else\n\nesp_err_t native_audio_output_init(void) {",
+    i2sPdmStart,
+  ),
 );
 
 test("ESP8266 production audio defaults to I2S DMA PDM", () => {
@@ -71,10 +74,15 @@ test("I2S PDM uses circular SLC DMA with a continuous neutral bitstream", () => 
   assert.match(nodac, /I2S0\.conf\.clkm_div_num = clkm_div/);
   assert.match(nodac, /finished->buf_ptr\[word\] = s_silence_word/);
   assert.match(nodac, /~\(3U << 12\).*\(1U << 12\)/);
-  assert.match(nodac, /return s_free_count \? ESP_OK : ESP_ERR_TIMEOUT/);
-  assert.match(nodac, /NODAC_QUEUE_RECHECK_TICKS pdMS_TO_TICKS\(2\)/);
-  assert.match(nodac, /ulTaskNotifyTake\([\s\S]*pdTRUE, NODAC_QUEUE_RECHECK_TICKS\)/);
-  assert.match(nodac, /xTaskGetTickCount\(\) - started >= ticks_to_wait/);
+  assert.match(nodac, /vTaskNotifyGiveFromISR/);
+  assert.match(
+    nodac,
+    /ulTaskNotifyTake\([\s\S]*pdTRUE, ticks_to_wait - elapsed\)/,
+  );
+  assert.doesNotMatch(
+    nodac,
+    /NODAC_QUEUE_RECHECK_TICKS|xQueueCreate|xQueueReceive/,
+  );
   assert.match(nodac, /s_current_buffer == next->buf_ptr[\s\S]*s_current_position < NODAC_DMA_BUFFER_WORDS/);
   assert.match(output, /esp8266_nodac_i2s_reset_underruns/);
   assert.match(output, /stats->queue_empty_events = esp8266_nodac_i2s_underruns\(\)/);
@@ -92,6 +100,35 @@ test("I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier", () => {
   assert.match(pdm, /160000000U \/ BOARD_I2S_PDM_BCK_DIV \/ BOARD_I2S_PDM_CLKM_DIV/);
   assert.match(i2sPdm, /bit < BOARD_I2S_PDM_OVERSAMPLE/);
   assert.match(i2sPdm, /repeat < BOARD_I2S_PDM_REPEAT/);
+  assert.match(i2sPdm, /i2s_pdm_pack32/);
+  assert.match(i2sPdm, /integrator = sum & 0xffffU/);
+  assert.match(i2sPdm, /word = \(word << 1\) \| \(sum >> 16\)/);
+  assert.match(i2sPdm, /PDM32_STEP\(\); PDM32_STEP\(\);/);
+});
+
+test("optimized branchless PDM32 packer is bit-exact", () => {
+  const samples = [-32768, -30000, -1, 0, 1, 1234, 30000, 32767];
+  let oldIntegrator = 0;
+  let newIntegrator = 0;
+  for (let pass = 0; pass < 32; ++pass) {
+    for (const sample of samples) {
+      const target = sample + 32768;
+      let oldWord = 0;
+      let newWord = 0;
+      for (let bit = 0; bit < 32; ++bit) {
+        oldIntegrator += target;
+        const high = oldIntegrator >= 65536 ? 1 : 0;
+        if (high) oldIntegrator -= 65536;
+        oldWord = ((oldWord << 1) | high) >>> 0;
+
+        const sum = newIntegrator + target;
+        newIntegrator = sum & 0xffff;
+        newWord = ((newWord << 1) | (sum >>> 16)) >>> 0;
+      }
+      assert.equal(newWord, oldWord);
+      assert.equal(newIntegrator, oldIntegrator);
+    }
+  }
 });
 
 test("I2S PDM drives its clocks like ESP8266Audio and ignores UART RX input", () => {

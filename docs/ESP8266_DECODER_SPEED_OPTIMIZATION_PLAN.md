@@ -71,9 +71,11 @@ decoder correctness.
   coded channel is a directly usable sum channel. Test streams containing
   mode changes between consecutive frames so skipped side-channel IMDCT and
   synthesis history cannot corrupt later output.
-- [ ] Continue optimizing asynchronous SPI-PDM output and avoid polling,
-  unnecessary copies, and long critical sections. Treat this as a separate
-  output-path optimization; it cannot by itself make MP3 320 kbit/s realtime.
+- [x] Optimize the default I2S-PDM output: use a 456-byte IRAM branchless,
+  fully unrolled PDM32 packer and replace 2-ms DMA polling with one direct
+  FreeRTOS task notification per 512-word buffer. On the physical board this
+  reduced the generated-PCM producer non-wait bound from 33.5% to 9.1%, with
+  100.2% realtime output and zero underruns.
 - [ ] Re-run the complete bitrate matrix after every accepted optimization:
   MP3 32/128/320 kbit/s and AAC 48/128/320 kbit/s. Record realtime ratio,
   CPU busy/idle, decoder stage timings, worst decoder call, free heap, minimum

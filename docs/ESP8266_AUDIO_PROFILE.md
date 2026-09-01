@@ -123,11 +123,25 @@ Production now computes 32 genuine PDM decisions and clocks one 32-bit word per
 48-kHz PCM sample. `BCK_DIV=8`, `CLKM_DIV=13` gives 1.538461 MHz (+0.16% from
 the nominal 1.536 MHz). Two static 512-word DMA buffers implement ping-pong
 buffering and occupy 4,096 bytes. Each buffer covers about 10.67 ms. A
-10-second generated-PCM run produced 10.032 seconds of audio in 10.002 seconds
-(100.2% realtime), with zero measured ping-pong underruns. DMA backpressure
-accounted for 6.651 seconds, leaving a 33.5% producer non-wait upper bound. FreeRTOS runtime
-statistics reported 77.0% whole-system busy and 23.0% idle, which also includes
-SLC ISR and scheduler overhead. Free/minimum heap was 107,064/104,284 bytes.
+branchless, fully unrolled PDM32 packer occupies 456 bytes of IRAM. The SLC ISR
+returns one whole DMA buffer through a direct FreeRTOS task notification; the
+producer blocks once per buffer and no longer polls every 2 ms.
+
+On the physical board, a 10-second generated-PCM run produced 10.037 seconds
+of audio in 10.008 seconds (100.2% realtime), with zero measured ping-pong
+underruns. Blocking DMA wait accounted for 9.043 seconds in 941 calls, leaving
+0.912 seconds, or a 9.1% producer non-wait upper bound. The previous generic
+packer and periodic wait used 3.337 seconds of non-wait time and made 3,810
+wait calls, so the active producer bound fell by 72.7% (3.66x).
+Free/minimum heap was 106,608/103,828 bytes; the 456-byte decrease matches the
+new IRAM packer.
+
+The FreeRTOS runtime-statistics counter reports only 4.5% idle with the direct
+ISR wakeup even though the independently timed task is blocked for 90.4% of
+the wall interval. On this ESP8266 SDK that counter does not account the
+direct ISR-to-task scheduling path consistently. It must not be used as the
+CPU-load result for this experiment; wall-clock non-wait time is the
+conservative measured bound.
 
 The codec modules were then measured on the same board from embedded RAM
 fixtures, with Wi-Fi and audio output disabled. This isolates decoder cost from
@@ -143,12 +157,11 @@ MP3 synthesis accounts for 88.1% of decoder time (40.9% synthesis DCT and
 remaining measured stages are stereo processing 6.4% and dequantization 4.6%.
 Fifty create/switch lifecycle cycles returned the heap to the starting value.
 
-Adding the independently measured decoder budget to the 33.5% producer
-non-wait bound gives about 61.6% for MP3 and 109.7% for AAC before Wi-Fi and
-control work. This is not a simultaneous streaming measurement: DMA ISR and
-scheduler time overlap differently in production, and the measured 77.0%
-whole-system busy figure shows that the lower carrier still has appreciable
-driver overhead. MP3 has a plausible margin; 320-kbit/s AAC still does not.
+Adding the independently measured decoder budget to the 9.1% producer
+non-wait bound gives about 37.2% for MP3 and 85.3% for AAC before Wi-Fi, SLC
+ISR, and control work. This is not a simultaneous streaming measurement:
+DMA ISR and scheduler time overlap differently in production. MP3 has a
+plausible margin; 320-kbit/s AAC remains too close to the limit.
 
 ## Conclusions
 

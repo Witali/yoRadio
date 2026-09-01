@@ -11,12 +11,13 @@ entries are retained; changes are published under a new firmware version.
   divider produces 1.538461 MHz (+0.16%) and production uses genuine PDM32 x1;
   genuine PDM128 at 6.144 MHz remains an experimental build option.
 - Two static 512-word DMA buffers implement true ping-pong buffering. They
-  occupy 4,096 bytes and each covers about 10.67 ms. A bounded periodic recheck
-  prevents a low-rate EOF/waiter race without dynamic allocation.
-- On the physical Wemos D1 mini, PDM32 generated 100.2% realtime PCM with zero
-  ping-pong underruns. DMA wait was 66.5% of wall time; whole-system FreeRTOS
-  counters reported 77.0% busy and 23.0% idle. Genuine PDM128 at 6.144 MHz
-  reached only 64.4% realtime at 100% CPU and was rejected as the default.
+  occupy 4,096 bytes and each covers about 10.67 ms. A direct FreeRTOS task
+  notification blocks once per returned buffer, replacing 2-ms polling
+  without dynamic allocation.
+- Added a 456-byte IRAM, branchless, fully unrolled PDM32 packer. On the
+  physical Wemos D1 mini it generated 100.2% realtime PCM with zero ping-pong
+  underruns and reduced producer non-wait time from 33.5% to 9.1% (3.66x).
+  Genuine PDM128 at 6.144 MHz reached only 64.4% realtime and remains rejected.
 - Isolated 320-kbit/s RAM fixtures measured Helix MP3 SSO at 28.12% CPU and
   Helix AAC-LC at 76.20% CPU. The production binary is archived under
   [`development/esp8266-native-qio80-sso-pdm1536/`](development/esp8266-native-qio80-sso-pdm1536/).

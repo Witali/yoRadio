@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "board_config.h"
+#include "esp_attr.h"
 #include "esp8266_nodac_i2s.h"
 #include "spi_pdm_config.h"
 #include "freertos/FreeRTOS.h"
@@ -14,7 +15,6 @@
 #if YORADIO_ESP8266_SPI_PDM
 #include "driver/gpio.h"
 #include "driver/spi.h"
-#include "esp_attr.h"
 #include "esp8266/eagle_soc.h"
 #include "esp8266/spi_struct.h"
 #include "rom/ets_sys.h"
@@ -524,6 +524,34 @@ static esp_err_t i2s_pdm_flush(i2s_pdm_writer_t *writer) {
     return result;
 }
 
+#if CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
+#if BOARD_I2S_PDM_OVERSAMPLE != 32U || BOARD_I2S_PDM_REPEAT != 1U
+#error "The optimized PDM32 packer requires 32 genuine bits per sample"
+#endif
+
+static uint32_t IRAM_ATTR __attribute__((noinline))
+i2s_pdm_pack32(int16_t sample) {
+    const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
+    uint32_t integrator = s_pdm_integrator;
+    uint32_t word = 0;
+#define PDM32_STEP() do { \
+        uint32_t sum = integrator + target; \
+        integrator = sum & 0xffffU; \
+        word = (word << 1) | (sum >> 16); \
+    } while (0)
+    PDM32_STEP(); PDM32_STEP(); PDM32_STEP(); PDM32_STEP();
+    PDM32_STEP(); PDM32_STEP(); PDM32_STEP(); PDM32_STEP();
+    PDM32_STEP(); PDM32_STEP(); PDM32_STEP(); PDM32_STEP();
+    PDM32_STEP(); PDM32_STEP(); PDM32_STEP(); PDM32_STEP();
+    PDM32_STEP(); PDM32_STEP(); PDM32_STEP(); PDM32_STEP();
+    PDM32_STEP(); PDM32_STEP(); PDM32_STEP(); PDM32_STEP();
+    PDM32_STEP(); PDM32_STEP(); PDM32_STEP(); PDM32_STEP();
+    PDM32_STEP(); PDM32_STEP(); PDM32_STEP(); PDM32_STEP();
+#undef PDM32_STEP
+    s_pdm_integrator = integrator;
+    return word;
+}
+#else
 static esp_err_t i2s_pdm_push_bit(i2s_pdm_writer_t *writer, bool high) {
     s_i2s_pdm_partial_word =
         (s_i2s_pdm_partial_word << 1) | (high ? 1U : 0U);
@@ -536,9 +564,15 @@ static esp_err_t i2s_pdm_push_bit(i2s_pdm_writer_t *writer, bool high) {
     return writer->word_count == I2S_PDM_BATCH_WORDS
         ? i2s_pdm_flush(writer) : ESP_OK;
 }
+#endif
 
 static esp_err_t i2s_pdm_emit_sample(int16_t sample,
                                      i2s_pdm_writer_t *writer) {
+#if CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
+    writer->words[writer->word_count++] = i2s_pdm_pack32(sample);
+    return writer->word_count == I2S_PDM_BATCH_WORDS
+        ? i2s_pdm_flush(writer) : ESP_OK;
+#else
     const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
     for (unsigned bit = 0; bit < BOARD_I2S_PDM_OVERSAMPLE; ++bit) {
         s_pdm_integrator += target;
@@ -550,13 +584,16 @@ static esp_err_t i2s_pdm_emit_sample(int16_t sample,
         }
     }
     return ESP_OK;
+#endif
 }
 
 static esp_err_t i2s_pdm_finish_partial_word(i2s_pdm_writer_t *writer) {
+#if !CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
     while (s_i2s_pdm_partial_bits) {
         esp_err_t result = i2s_pdm_emit_sample(0, writer);
         if (result != ESP_OK) return result;
     }
+#endif
     return i2s_pdm_flush(writer);
 }
 

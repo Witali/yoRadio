@@ -21,7 +21,6 @@
 #define NODAC_DMA_BUFFER_WORDS ESP8266_NODAC_DMA_BUFFER_WORDS
 #define NODAC_DMA_BUFFER_BYTES \
     (NODAC_DMA_BUFFER_WORDS * sizeof(uint32_t))
-#define NODAC_QUEUE_RECHECK_TICKS pdMS_TO_TICKS(2)
 #define NODAC_SLC_ADDRESS_MASK 0x000fffffU
 
 typedef struct nodac_dma_descriptor {
@@ -196,6 +195,7 @@ esp_err_t esp8266_nodac_i2s_init(uint32_t silence_word,
 
 static bool acquire_free_buffer(TickType_t ticks_to_wait) {
     const TickType_t started = xTaskGetTickCount();
+    TaskHandle_t current = xTaskGetCurrentTaskHandle();
     for (;;) {
         taskENTER_CRITICAL();
         if (s_free_count) {
@@ -205,7 +205,13 @@ static bool acquire_free_buffer(TickType_t ticks_to_wait) {
             taskEXIT_CRITICAL();
             return true;
         }
-        s_waiter = xTaskGetCurrentTaskHandle();
+        TickType_t elapsed = xTaskGetTickCount() - started;
+        if (elapsed >= ticks_to_wait) {
+            s_waiting = false;
+            taskEXIT_CRITICAL();
+            return false;
+        }
+        s_waiter = current;
         s_waiting = true;
         taskEXIT_CRITICAL();
 #if YORADIO_ESP8266_AUDIO_PROFILE
@@ -213,18 +219,14 @@ static bool acquire_free_buffer(TickType_t ticks_to_wait) {
 #elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
         audio_output_benchmark_spi_wait_begin();
 #endif
-        /* Periodically recheck even without a notification. A low-rate SLC
-         * EOF can race the waiter flag on this SDK; sleeping for the whole
-         * caller timeout would then miss an already returned buffer. Two
-         * milliseconds leaves margin inside one 512-word DMA block. */
         uint32_t notified = ulTaskNotifyTake(
-            pdTRUE, NODAC_QUEUE_RECHECK_TICKS);
+            pdTRUE, ticks_to_wait - elapsed);
 #if YORADIO_ESP8266_AUDIO_PROFILE
         audio_profile_spi_wait_end();
 #elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
         audio_output_benchmark_spi_wait_end();
 #endif
-        if (!notified && xTaskGetTickCount() - started >= ticks_to_wait) {
+        if (!notified) {
             taskENTER_CRITICAL();
             s_waiting = false;
             taskEXIT_CRITICAL();
