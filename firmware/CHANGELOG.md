@@ -5,6 +5,19 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-01
 
+### ESP8266 MP3 SSO with 384-kHz SPI-PDM
+
+- Added a separate MP3 SSO + SPI-PDM8 profile while retaining 16-bit,
+  769.231-kHz SPI-PDM as the normal default.
+- The new HSPI configuration outputs eight PDM bits per 48-kHz PCM sample at
+  384.615 kHz. It halves conversion work and transfer interrupts, doubles the
+  12-block queue coverage to about 16 ms, and trades this for higher one-bit
+  quantization noise.
+- Built the complete QIO80/160-MHz radio and WebUI image, verified the final
+  SDK configuration, and passed all 267 repository tests. The build is
+  archived for physical testing under
+  [`development/esp8266-native-qio80-sso-pdm8/`](development/esp8266-native-qio80-sso-pdm8/).
+
 ### ESP8266 isolated audio-output profiles
 
 - Added a deterministic generated-PCM benchmark that exercises the real audio
