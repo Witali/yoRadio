@@ -62,35 +62,71 @@ for AAC (-25.7%) when QIO increased from 40 to 80 MHz. Heap headroom was
 effectively unchanged, as expected: this profile removes work from the hot
 path but retains the production buffers and tasks.
 
+## MP3 SSO and 384 kHz SPI-PDM8 profile
+
+On 2026-09-01 the optimized Helix MP3 SSO backend and exact AAC backend were
+measured again at 320 kbit/s. This profile used QIO 80 MHz, CPU 160 MHz,
+`-O3`, and mono SPI-PDM on GPIO13 at 384.615 kHz (eight PDM bits per 48-kHz
+output sample). The full-output and decode-only builds consumed the same
+paced deterministic input files.
+
+| Mode | Codec | Windows | Realtime | CPU busy | Decoder | PCM output | PDM compute | Free heap | Min free |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Full output | MP3 320 kbit/s | 6 | 95.2% | 97.7% | 81.2% | 12.1% | 12.0% | 5,864 B | 5,416 B |
+| Full output | AAC 320 kbit/s | 8 | 77.0% | 91.0% | 77.0% | 17.1% | 9.4% | 11,066 B | 10,020 B |
+| Decode only | MP3 320 kbit/s | 6 | 99.0% | 97.8% | 92.6% | 0.0% | 0.0% | 5,856 B | 5,508 B |
+| Decode only | AAC 320 kbit/s | 7 | 96.7% | 97.8% | 92.0% | 0.0% | 0.0% | 11,084 B | 10,024 B |
+
+The internal stage hooks give the following steady-state medians in the
+full-output build. `Wall` is the share of the five-second window; `Decoder`
+is the share of measured decoder-core time. Nested MP3 synthesis rows are
+subsets of the synthesis total and must not be added to it.
+
+| Codec | Internal stage | Wall | Decoder |
+|---|---:|---:|---:|
+| MP3 | Huffman | 16.6% | 20.4% |
+| MP3 | Dequantization | 3.5% | 4.3% |
+| MP3 | IMDCT | 18.2% | 22.5% |
+| MP3 | Synthesis total | 39.9% | 49.2% |
+| MP3 | Synthesis DCT | 21.4% | 26.5% |
+| MP3 | Synthesis polyphase | 17.1% | 21.1% |
+| AAC | Huffman | 33.8% | 43.9% |
+| AAC | Dequantization | 2.9% | 3.8% |
+| AAC | Stereo filter | 2.0% | 2.6% |
+| AAC | IMDCT | 37.5% | 48.7% |
+
+For MP3 the decoder is slower than the physical output producer, so the
+12-block SPI queue does not fill in steady state: measured queue wait is
+0.0%, while gain, stereo-to-mono, resampling, and PDM generation consume
+12.0%. AAC produces PCM in larger bursts; its 17.1% output time splits into
+7.6% queue wait and 9.4% output computation. Normalization is below 0.1% for
+both fixtures.
+
+The profiler originally never opened a reporting window when the first codec
+was created rather than switched. The profile now wraps both
+`helix_codec_create()` and `helix_codec_switch()`. The SPI ISR also only sends
+a task notification while the producer is actually blocked, preventing stale
+notifications from accumulating. A decoder-free generated-PCM run after this
+change completed at 96.8% physical realtime with zero invalid queue events.
+
 ## Conclusions
 
-- Helix MP3 is CPU-bound on this ESP8266 build at every measured bitrate. It
-  consumes about 97.5% of the processor and produces only 32-44% of realtime
-  PCM.
-- AAC leaves more idle time with physical output enabled, but still produces
-  only 42-58% of realtime PCM.
-- Removing normalization, PDM conversion, SPI queueing, and physical output
-  improves MP3 320 throughput from 32.1% to 38.4% (about 20%) and AAC 320 from
-  41.5% to 58.0% (about 40%).
-- With output already bypassed, QIO 80 MHz adds about 40% decode throughput at
-  320 kbit/s for both codecs. This, together with the shorter maximum decoder
-  calls, indicates that the Helix decoder is strongly flash/cache-bound.
-- QIO 80 MHz plus output bypass raises MP3 320 from 32.1% to 53.8% and AAC 320
-  from 41.5% to 80.8% versus the original full-output QIO 40 profile. These
-  combined figures must not be attributed to output removal alone.
-- Decode-only CPU approaches 99% because the audio task no longer blocks on
-  the output queue and instead spends the released time decoding more frames.
-  The increased decoder percentage is therefore expected.
-- Output optimization is worthwhile, especially for AAC, but cannot by itself
-  make these Helix stereo streams realtime at 160 MHz. The decoder path still
-  needs a substantially faster backend, reduced decode work, or a lower
-  sample-rate/channel profile.
-- AAC 128 reaches 99.2% in this synthetic decode-only test, which is still not
-  sufficient production margin. No tested configuration reaches safe realtime
-  throughput once normalization and SPI-PDM output are restored.
-- MP3 has only about 6-7 kB free heap in steady state and reached 5,452 bytes
-  minimum. AAC keeps about 11-12 kB free because its active codec workspace is
-  smaller. MP3 memory headroom remains the higher stability risk.
+- The optimized MP3 path is close to realtime at 320 kbit/s, but 95.2% leaves
+  no safety margin and predicts periodic underruns. It also leaves only
+  5.4 kB minimum heap.
+- AAC 320 is not realtime with SPI-PDM8: it produces 77.0% of the required PCM.
+  Decode-only reaches 96.7%, so output optimization alone cannot provide a
+  safe production margin.
+- Both decode-only cases keep the CPU about 97.8% busy. CPU busy falls to 91%
+  for full-output AAC because queue backpressure limits how many frames can be
+  decoded; that lower number does not mean playback has spare capacity.
+- MP3 synthesis is the primary target, consuming about half of decoder time;
+  DCT and polyphase are nearly the entire synthesis cost. AAC work is split
+  mainly between Huffman (44%) and IMDCT (49%).
+- The older QIO40 and pre-SSO tables remain useful historical baselines, but
+  they no longer describe the current optimized decoder throughput.
+- A production-safe 320-kbit/s profile still requires faster hot kernels,
+  reduced channel/sample-rate work, or the hardware I2S/SLC output path.
 
 The production application was restored after the measurement. Its UART boot
 was verified through Wi-Fi association, DHCP, WebUI startup, and SPI-PDM
