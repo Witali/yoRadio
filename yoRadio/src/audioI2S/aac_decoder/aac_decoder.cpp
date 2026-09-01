@@ -8,6 +8,9 @@
 
 #include "aac_decoder.h"
 #include "../CodecMemoryArena.h"
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+#include "../helix_lx106_fixed.h"
+#endif
 
 const uint32_t SQRTHALF             = 0x5a82799a;    /* sqrt(0.5), format = Q31 */
 const uint32_t Q28_2                = 0x20000000;    /* Q28: 2.0 */
@@ -89,8 +92,12 @@ PSInfoSBR_t         *m_PSInfoSBR;
 
 //----------------------------------------------------------------------------------------------------------------------
 inline int MULSHIFT32(int x, int y){
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+    return helix_lx106_mulshift32(x, y);
+#else
     int z; z = (int64_t)x * (int64_t)y >> 32;
     return z;
+#endif
 }
 inline int CLZ(int x){
 #ifdef __XTENSA__
@@ -117,8 +124,12 @@ inline int FASTABS(int x){
 #endif
 }
 inline int64_t MADD64(int64_t sum64, int x, int y){
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+    return (int64_t)helix_lx106_madd64((uint64_t)sum64, x, y);
+#else
     sum64 += (int64_t)x * (int64_t)y;
     return sum64;
+#endif
 }
 inline short CLIPTOSHORT(int x){
 #if defined(__XTENSA__) && !defined(YORADIO_ESP8266_NATIVE) // ESP32 clamps instruction
@@ -1863,12 +1874,22 @@ uint8_t AACGetProfile() {return (uint8_t)m_AACDecInfo->profile;} // 0-Main, 1-LC
 uint8_t AACGetFormat() {return (uint8_t)m_AACDecInfo->format;}   // 0-unknown 1-ADTS 2-ADIF, 3-RAW
 int AACGetOutputSamps(){return m_AACDecInfo->nChans * AAC_MAX_NSAMPS  * (m_AACDecInfo->sbrEnabled ? 2 : 1);}
 int AACGetBitrate() {
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+    /* For 16-bit AAC PCM, channels cancel between PCM bitrate and output
+     * bytes, and the SBR factor cancels between sample rate and samples per
+     * frame.  The native bridge limits an encoded frame to 1536 bytes, so
+     * core sample rate * frame bytes is safely below UINT32_MAX. */
+    return static_cast<int>(
+        (static_cast<uint32_t>(m_AACDecInfo->sampRate) *
+         m_AACDecInfo->frameBytes) / 128U);
+#else
     const uint32_t outputBytes = AACGetOutputSamps() * 2U;
     if (!outputBytes) return 0;
     const uint64_t pcmBitrate = static_cast<uint64_t>(AACGetBitsPerSample()) *
                                 AACGetChannels() * AACGetSampRate();
     return static_cast<int>(pcmBitrate * m_AACDecInfo->frameBytes /
                             outputBytes);
+#endif
 }
 /**************************************************************************************
  * Function:    AACSetRawBlockParams
