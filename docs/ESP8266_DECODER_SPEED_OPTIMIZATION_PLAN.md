@@ -277,6 +277,39 @@ This result is substantially faster and smaller in RAM than the experimental
 libmad backend. SSO remains opt-in until live radio, WebUI, normalization, and
 SPI-PDM tests cover the full MP3 bitrate/channel/block-type matrix.
 
+## Experimental Helix AAC 32-bit transform products — 2026-09-01
+
+The same reduced-precision idea was tested independently in AAC-LC. The exact
+LX106 `MULSHIFT32` helper forms the signed high half of a 32x32 product from
+four partial products. `CONFIG_YORADIO_HELIX_AAC_SSO` omits only the low*low
+term and retains high*high plus both signed cross terms. TNS `MADD64` remains
+exact. The switch is disabled by default and the reproducible QIO80 profile is
+`sdkconfig.aac-sso-qio80.defaults`.
+
+The host regression decoded the same 19 retained 320-kbit/s stereo AAC-LC
+frames (38,912 samples). Against exact Helix PCM, the optimized output measures
+82.65 dB SNR with a maximum absolute error of one signed 16-bit PCM level. A
+more aggressive two-product experiment reached a 311-level maximum error and
+was rejected.
+
+The physical A/B used the same Wemos D1 mini, 160 MHz CPU, QIO flash at 80 MHz,
+GCC 8.4 `-O3`, a RAM-resident AAC frame, 8 warm-ups and 200 measured frames.
+Wi-Fi, normalization and SPI-PDM output were disabled.
+
+| Helix AAC-LC 320 kbit/s | Average frame | Maximum frame | Audio/CPU speed | Free heap | Codec DRAM | App binary |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Exact high-half product | 16,010 us | 16,990 us | 1.332x | 86,188 B | 9,872 B | 275,872 B |
+| Three-product SSO | 15,698 us | 16,660 us | 1.358x | 86,188 B | 9,872 B | 274,512 B |
+
+The optimized path reduces the measured average frame time by 1.95%, increases
+isolated throughput by 1.95%, and removes 1,360 bytes from the benchmark image.
+Free heap, codec DRAM and the 16-KiB reserved IRAM arena are unchanged. The
+generated hot transform functions become 65 to 224 bytes smaller each, but an
+unchanged MP3 control moved by about 4.7% between the two image layouts. The
+AAC timing gain is therefore too small to promote this approximation to the
+production default. It remains an opt-in experiment; the exact implementation
+is still selected unless `CONFIG_YORADIO_HELIX_AAC_SSO` is enabled.
+
 ## Expected outcome
 
 AAC is the more realistic candidate for realtime operation through a

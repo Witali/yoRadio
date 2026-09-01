@@ -93,7 +93,20 @@ PSInfoSBR_t         *m_PSInfoSBR;
 
 //----------------------------------------------------------------------------------------------------------------------
 inline int MULSHIFT32(int x, int y){
-#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+#if defined(YORADIO_ESP8266_NATIVE) && defined(YORADIO_HELIX_AAC_SSO) && \
+        !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+    /* AAC spends most of its time in Q31/Q30 transform products. LX106 has
+     * only a native low 32-bit multiply, while the exact high-half helper
+     * needs four partial products. Omit only low*low; it can change the
+     * returned high word by at most one PCM level. */
+    const int32_t xHi = x >> 16;
+    const int32_t yHi = y >> 16;
+    const uint32_t xLo = (uint16_t)x;
+    const uint32_t yLo = (uint16_t)y;
+    const int32_t cross0 = xHi * (int32_t)yLo;
+    const int32_t cross1 = yHi * (int32_t)xLo + (int32_t)(uint16_t)cross0;
+    return xHi * yHi + (cross0 >> 16) + (cross1 >> 16);
+#elif defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
     return helix_lx106_mulshift32(x, y);
 #else
     int z; z = (int64_t)x * (int64_t)y >> 32;

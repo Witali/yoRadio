@@ -34,6 +34,16 @@ config YORADIO_HELIX_AAC
         preallocated codec arena; AAC-enabled builds reserve a complete
         stereo AAC PCM frame.
 
+config YORADIO_HELIX_AAC_SSO
+    bool "Use reduced-precision 32-bit Helix AAC arithmetic (experimental)"
+    depends on YORADIO_HELIX_AAC
+    default n
+    help
+        Approximate AAC fixed-point high-half products with three native LX106
+        16 x 16 multiplies, omitting only the low x low partial product. This
+        shortens the transform hot path without allocating another buffer, at
+        the cost of a small PCM precision loss.
+
 config YORADIO_WEB_SEND_TIMEOUT_SECONDS
     int "Web content send timeout (seconds)"
     range 1 30

@@ -21,6 +21,9 @@ The `sdkconfig.helix-sso-qio80.defaults` profile keeps Helix but enables its
 experimental reduced-precision 32-bit polyphase synthesis. It allocates no
 additional decoder buffers and is intended for PCM-quality and physical speed
 comparison before the optimization is considered for production.
+The matching `sdkconfig.aac-sso-qio80.defaults` profile keeps exact MP3 and
+enables the experimental three-partial-product AAC fixed-point path for
+isolated PCM, disassembly, and physical timing comparison.
 The `sdkconfig.libmad-mp3-only-qio80.defaults` experiment also disables AAC;
 this reduces stereo PCM storage from 4096 to 2304 bytes and the fixed IRAM word
 arena from 16 KiB to 12 KiB. The arena stores the 4236-byte `mad_synth`, the

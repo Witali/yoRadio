@@ -29,7 +29,7 @@ function findVcVars() {
   return null;
 }
 
-function compile(outputDir, name, reference, sso = false) {
+function compile(outputDir, name, reference, mp3Sso = false, aacSso = false) {
   const executable = path.join(
     outputDir, process.platform === "win32" ? `${name}.exe` : name,
   );
@@ -41,7 +41,8 @@ function compile(outputDir, name, reference, sso = false) {
   ];
   const defines = ["YORADIO_ESP8266_NATIVE=1"];
   if(reference) defines.push("YORADIO_HELIX_REFERENCE_FIXED_POINT=1");
-  if(sso) defines.push("YORADIO_HELIX_MP3_SSO=1");
+  if(mp3Sso) defines.push("YORADIO_HELIX_MP3_SSO=1");
+  if(aacSso) defines.push("YORADIO_HELIX_AAC_SSO=1");
 
   let build;
   if(process.platform === "win32") {
@@ -187,5 +188,44 @@ test("ESP8266 Helix SSO preserves MP3 frame layout and useful PCM quality", t =>
   assert.ok(quality.maximumError <= 34,
     `unexpected SSO maximum error ${quality.maximumError}`);
   t.diagnostic(`SSO SNR=${quality.snrDb.toFixed(2)} dB, ` +
+    `maxError=${quality.maximumError} PCM levels`);
+});
+
+test("ESP8266 Helix AAC SSO preserves frame layout and useful PCM quality", t => {
+  const kconfig = fs.readFileSync(path.join(
+    root, "esp8266", "rtos-sdk-native", "main", "Kconfig.projbuild",
+  ), "utf8");
+  const cmake = fs.readFileSync(path.join(
+    root, "esp8266", "rtos-sdk-native", "components", "helix_codecs",
+    "CMakeLists.txt",
+  ), "utf8");
+  const profile = fs.readFileSync(path.join(
+    root, "esp8266", "rtos-sdk-native", "sdkconfig.aac-sso-qio80.defaults",
+  ), "utf8");
+  assert.match(kconfig, /config YORADIO_HELIX_AAC_SSO/);
+  assert.match(cmake, /CONFIG_YORADIO_HELIX_AAC_SSO/);
+  assert.match(profile, /CONFIG_YORADIO_HELIX_AAC_SSO=y/);
+
+  const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-aac-sso-"));
+  t.after(() => fs.rmSync(outputDir, {recursive: true, force: true}));
+  const reference = compile(outputDir, "helix-reference", true);
+  if(reference.skip) return t.skip(reference.skip);
+  const sso = compile(outputDir, "helix-aac-sso", false, false, true);
+  const fixture = path.join(fixtures, "stereo-320.aac");
+  const oldPcm = decode(
+    reference.executable, "aac", fixture,
+    path.join(outputDir, "aac-reference.pcm"),
+  );
+  const newPcm = decode(
+    sso.executable, "aac", fixture,
+    path.join(outputDir, "aac-sso.pcm"),
+  );
+  assert.equal(newPcm.summary, oldPcm.summary, "AAC sample count changed");
+  const quality = comparePcm(oldPcm.pcm, newPcm.pcm);
+  assert.ok(Number.isFinite(quality.snrDb) && quality.snrDb >= 80,
+    `unexpected AAC SSO SNR ${quality.snrDb}`);
+  assert.ok(quality.maximumError <= 1,
+    `unexpected AAC SSO maximum error ${quality.maximumError}`);
+  t.diagnostic(`AAC SSO SNR=${quality.snrDb.toFixed(2)} dB, ` +
     `maxError=${quality.maximumError} PCM levels`);
 });
