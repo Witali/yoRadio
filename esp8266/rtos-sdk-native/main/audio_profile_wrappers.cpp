@@ -197,7 +197,7 @@ void maybe_report() {
     log_codec_stages(wall_us);
     log_stage("pcm_output", kPcmOutput, wall_us);
     log_stage("normalize", kNormalizer, wall_us);
-    log_stage("spi_queue_wait", kSpiWait, wall_us);
+    log_stage("output_dma_wait", kSpiWait, wall_us);
     unsigned compute_load = percent_x10(output_compute, wall_us);
     ESP_LOGI(kTag, "gain+mix+pdm=%u.%03u ms (%u.%u%%)",
              static_cast<unsigned>(output_compute / 1000ULL),

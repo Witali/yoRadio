@@ -21,11 +21,10 @@ The `sdkconfig.helix-sso-qio80.defaults` profile keeps Helix but enables its
 experimental reduced-precision 32-bit polyphase synthesis. It allocates no
 additional decoder buffers and is intended for PCM-quality and physical speed
 comparison before the optimization is considered for production.
-The `sdkconfig.helix-sso-qio80-pdm8.defaults` profile selects the production
-8-bit PDM ratio for that MP3 SSO configuration. Its 384.615 kHz bit clock
-halves PDM conversion work relative to 16-bit output. The default backend is
-continuous I2S/SLC DMA on GPIO3; legacy HSPI output remains selectable with
-`CONFIG_YORADIO_AUDIO_OUTPUT_SPI_PDM`.
+The `sdkconfig.helix-sso-qio80-pdm8.defaults` profile retains the legacy
+8-bit SPI-PDM selection for comparative tests. The default backend is now
+continuous I2S/SLC DMA on GPIO3 with a nominal 1.536-MHz carrier; legacy HSPI
+output remains selectable with `CONFIG_YORADIO_AUDIO_OUTPUT_SPI_PDM`.
 The matching `sdkconfig.audio-profile-qio80-pdm8.defaults` profile also
 enables FreeRTOS runtime counters. Build it with
 `YORADIO_ESP8266_AUDIO_PROFILE` and
@@ -42,11 +41,13 @@ arena from 16 KiB to 12 KiB. The arena stores the 4236-byte `mad_synth`, the
 The Xtensa build uses 11152 bytes of that arena and reduces `mad_frame` in
 8-bit DRAM from 20784 to 13880 bytes. It is not a full-feature replacement
 profile.
-Audio defaults to mono I2S-PDM on fixed DATA GPIO3/RX. Four circular SLC-DMA
-buffers continuously clock one 32-bit word per 48-kHz PCM sample. The physical
-carrier is about 1.538 MHz; four identical physical bits represent each PDM8
-decision, retaining the effective 384.615-kHz transition rate without doing
-32 sigma-delta steps per sample. As in ESP8266Audio's NoDAC path, the I2S
+Audio defaults to mono I2S-PDM on fixed DATA GPIO3/RX. Two circular SLC-DMA
+buffers continuously clock one 32-bit word per 48-kHz PCM sample. Production
+computes 32 genuine delta-sigma decisions per sample, giving a nominal
+1.536-MHz carrier. The ESP8266 integer divider produces 1.538461 MHz (+0.16%).
+A genuine PDM128 mode at nominally 6.144 MHz
+is compile-time selectable but remains experimental because it cannot run in
+realtime on the physical Wemos D1 mini. As in ESP8266Audio's NoDAC path, the I2S
 engine also routes BCLK on GPIO15 and LRCLK on GPIO2 so its SLC-DMA clock is
 started reliably. Only DATA GPIO3 is connected to the audio filter. Connect GPIO3 through the
 documented low-pass/AC-coupling chain and then to a high-impedance amplifier
@@ -55,7 +56,7 @@ The PDM profile uses a small local output-only backend instead of the RTOS SDK
 I2S driver. It follows the ESP8266 Arduino core architecture used by
 ESP8266Audio: a circular SLC descriptor ring, an always-running companion link,
 the BBPLL audio-clock gate and task notification when DMA returns a buffer.
-All four 512-byte buffers and descriptors are static, so starting or stopping
+Both 2048-byte buffers and descriptors are static, so starting or stopping
 audio cannot fragment the heap. Initialization waits for the first completed
 descriptor and fails explicitly if the hardware ring does not start.
 The board default profile uses QIO at 80 MHz. ESP8266 RTOS SDK intentionally
@@ -63,7 +64,7 @@ stores DIO in the boot image header so the ROM can load it on every supported
 flash chip; `CONFIG_SPI_FLASH_MODE=0x0` makes early SDK initialization enable
 QIO before the application executes. Do not override the boot header to QIO.
 The same default profile selects the measured faster 32-bit Helix MP3 SSO
-synthesis path and the 8x I2S-PDM backend.
+synthesis path and the genuine PDM32 x1 I2S backend.
 
 GPIO3 is also UART0 RX. The application intentionally never reads UART input
 and routes the pin to I2S while running; UART0 TX logging on GPIO1 remains

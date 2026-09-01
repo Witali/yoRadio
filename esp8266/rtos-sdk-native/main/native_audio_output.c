@@ -497,8 +497,6 @@ void native_audio_output_silence(void) {
 }
 #elif YORADIO_ESP8266_I2S_PDM
 
-#define I2S_PDM_DMA_BUFFER_COUNT 4U
-#define I2S_PDM_DMA_BUFFER_WORDS 128U
 #define I2S_PDM_BATCH_WORDS 64U
 #define I2S_PDM_WRITE_TIMEOUT_MS 1000U
 #define I2S_PDM_SILENCE_WORD 0xaaaaaaaaU
@@ -542,12 +540,11 @@ static esp_err_t i2s_pdm_push_bit(i2s_pdm_writer_t *writer, bool high) {
 static esp_err_t i2s_pdm_emit_sample(int16_t sample,
                                      i2s_pdm_writer_t *writer) {
     const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
-    for (unsigned bit = 0; bit < BOARD_PDM_OVERSAMPLE; ++bit) {
+    for (unsigned bit = 0; bit < BOARD_I2S_PDM_OVERSAMPLE; ++bit) {
         s_pdm_integrator += target;
         bool high = s_pdm_integrator >= 65536U;
         if (high) s_pdm_integrator -= 65536U;
-        for (unsigned repeat = 0; repeat < BOARD_I2S_PDM_BIT_REPEAT;
-             ++repeat) {
+        for (unsigned repeat = 0; repeat < BOARD_I2S_PDM_REPEAT; ++repeat) {
             esp_err_t result = i2s_pdm_push_bit(writer, high);
             if (result != ESP_OK) return result;
         }
@@ -569,7 +566,9 @@ static esp_err_t i2s_pdm_fill_dma_silence(void) {
 }
 
 esp_err_t native_audio_output_init(void) {
-    esp_err_t result = esp8266_nodac_i2s_init(I2S_PDM_SILENCE_WORD);
+    esp_err_t result = esp8266_nodac_i2s_init(
+        I2S_PDM_SILENCE_WORD, BOARD_I2S_PDM_BCK_DIV,
+        BOARD_I2S_PDM_CLKM_DIV);
     if (result == ESP_OK) {
         s_i2s_started = true;
         s_input_sample_rate = 0;
@@ -582,11 +581,13 @@ esp_err_t native_audio_output_init(void) {
     if (result == ESP_OK) {
         ESP_LOGI(TAG,
                  "I2S-PDM DMA: mono GPIO%d/RX, carrier %u Hz, "
-                 "PDM%u effective %u Hz, %u x %u words; UART RX ignored",
+                 "PDM%u x%u effective %u Hz, nominal carrier %u Hz, "
+                 "%u x %u words; UART RX ignored",
                  BOARD_I2S_DATA_GPIO, BOARD_I2S_PDM_CARRIER_HZ,
-                 BOARD_PDM_OVERSAMPLE, BOARD_PDM_BIT_RATE_HZ,
-                 I2S_PDM_DMA_BUFFER_COUNT,
-                 I2S_PDM_DMA_BUFFER_WORDS);
+                 BOARD_I2S_PDM_OVERSAMPLE, BOARD_I2S_PDM_REPEAT,
+                 BOARD_I2S_PDM_EFFECTIVE_HZ, BOARD_I2S_PDM_NOMINAL_HZ,
+                 ESP8266_NODAC_DMA_BUFFER_COUNT,
+                 ESP8266_NODAC_DMA_BUFFER_WORDS);
     }
     return result;
 }
@@ -627,7 +628,7 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         int32_t mono = samples[frame * channels];
         if (channels == 2)
             mono = (mono + samples[frame * 2U + 1U]) / 2;
-        s_resample_phase += BOARD_PDM_SAMPLE_RATE;
+        s_resample_phase += BOARD_I2S_PDM_SAMPLE_RATE;
         while (s_resample_phase >= sample_rate) {
             esp_err_t result =
                 i2s_pdm_emit_sample((int16_t)mono, &writer);
@@ -774,6 +775,8 @@ void native_audio_output_reset_spi_stats(void) {
     s_spi_chained_transfers = 0;
     s_spi_queue_empty_events = 0;
     taskEXIT_CRITICAL();
+#elif YORADIO_ESP8266_I2S_PDM
+    esp8266_nodac_i2s_reset_underruns();
 #endif
 }
 
@@ -787,6 +790,8 @@ void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *stats) {
     stats->gap_cycles_max = s_spi_gap_cycles_max;
     stats->queue_empty_events = s_spi_queue_empty_events;
     taskEXIT_CRITICAL();
+#elif YORADIO_ESP8266_I2S_PDM
+    stats->queue_empty_events = esp8266_nodac_i2s_underruns();
 #endif
 }
 

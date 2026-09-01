@@ -26,6 +26,7 @@ static uint32_t s_spi_wait_max_us;
 static uint32_t s_spi_wait_calls;
 static uint32_t s_spi_wait_invalid;
 static int64_t s_spi_wait_started;
+static uint32_t s_write_invalid;
 
 void audio_output_benchmark_spi_wait_begin(void) {
     s_spi_wait_started = esp_timer_get_time();
@@ -81,7 +82,13 @@ static bool run_until(int64_t deadline, uint32_t *calls,
         esp_err_t result = native_audio_output_write(
             s_pcm, sizeof(s_pcm) / sizeof(s_pcm[0]),
             BENCHMARK_SAMPLE_RATE, BENCHMARK_CHANNELS);
-        uint32_t elapsed = (uint32_t)(esp_timer_get_time() - started);
+        int64_t elapsed64 = esp_timer_get_time() - started;
+        uint32_t elapsed = 0;
+        if (elapsed64 < 0 || elapsed64 > 200000) {
+            ++s_write_invalid;
+        } else {
+            elapsed = (uint32_t)elapsed64;
+        }
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "PCM write failed: %s", esp_err_to_name(result));
             return false;
@@ -127,6 +134,7 @@ void audio_output_benchmark_run(void) {
     s_spi_wait_max_us = 0;
     s_spi_wait_calls = 0;
     s_spi_wait_invalid = 0;
+    s_write_invalid = 0;
     uint32_t cpu_total_before = 0;
     uint32_t cpu_idle_before = 0;
     uint32_t cpu_total_after = 0;
@@ -143,6 +151,9 @@ void audio_output_benchmark_run(void) {
     if (!run_until(started + BENCHMARK_MEASURE_US,
                    &calls, &write_us, &maximum_us)) return;
     uint64_t wall_us = (uint64_t)(esp_timer_get_time() - started);
+    native_audio_output_spi_stats_t spi_stats;
+    native_audio_output_get_spi_stats(&spi_stats);
+    native_audio_output_silence();
 #if configGENERATE_RUN_TIME_STATS == 1
     have_cpu = have_cpu && cpu_snapshot(&cpu_total_after, &cpu_idle_after);
 #endif
@@ -152,19 +163,17 @@ void audio_output_benchmark_run(void) {
         ? (uint32_t)(audio_us * 1000ULL / wall_us) : 0;
     ESP_LOGI(TAG,
              "result calls=%u wall=%u us audio=%u us realtime=%u.%u%% "
-             "write=%u us avg=%u us max=%u us",
+             "write=%u us avg=%u us max=%u us invalid=%u",
              calls, (unsigned)wall_us, (unsigned)audio_us,
              realtime_x10 / 10U, realtime_x10 % 10U,
              (unsigned)write_us, calls ? (unsigned)(write_us / calls) : 0U,
-             maximum_us);
+             maximum_us, s_write_invalid);
     ESP_LOGI(TAG,
              "spi_wait=%u us calls=%u avg=%u us max=%u us invalid=%u",
              (unsigned)s_spi_wait_us, s_spi_wait_calls,
              s_spi_wait_calls
                  ? (unsigned)(s_spi_wait_us / s_spi_wait_calls) : 0U,
              s_spi_wait_max_us, s_spi_wait_invalid);
-    native_audio_output_spi_stats_t spi_stats;
-    native_audio_output_get_spi_stats(&spi_stats);
     ESP_LOGI(TAG,
              "spi_gap cycles=%u calls=%u avg=%u max=%u empty=%u",
              spi_stats.gap_cycles_total, spi_stats.chained_transfers,
@@ -183,6 +192,5 @@ void audio_output_benchmark_run(void) {
     ESP_LOGI(TAG, "heap free=%u min_free=%u",
              (unsigned)esp_get_free_heap_size(),
              (unsigned)esp_get_minimum_free_heap_size());
-    native_audio_output_silence();
     ESP_LOGI(TAG, "complete");
 }

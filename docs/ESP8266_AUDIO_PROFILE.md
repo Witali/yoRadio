@@ -109,6 +109,47 @@ a task notification while the producer is actually blocked, preventing stale
 notifications from accumulating. A decoder-free generated-PCM run after this
 change completed at 96.8% physical realtime with zero invalid queue events.
 
+## I2S-PDM 1.536-MHz production mode and isolated codec load
+
+On 2026-09-01 the physical Wemos D1 mini was first measured with the output
+clock raised to nominally 6.144 MHz. The ESP8266 160-MHz integer divider used
+`BCK_DIV=2` and `CLKM_DIV=13`, producing 6.153846 MHz (+0.16%).
+
+The genuine PDM128 experiment was too expensive: it generated only 64.4% of
+realtime audio while keeping the CPU 100% busy. A PDM32 x4 comparison did reach
+100.2% realtime, but the carrier was subsequently divided by four as requested.
+
+Production now computes 32 genuine PDM decisions and clocks one 32-bit word per
+48-kHz PCM sample. `BCK_DIV=8`, `CLKM_DIV=13` gives 1.538461 MHz (+0.16% from
+the nominal 1.536 MHz). Two static 512-word DMA buffers implement ping-pong
+buffering and occupy 4,096 bytes. Each buffer covers about 10.67 ms. A
+10-second generated-PCM run produced 10.032 seconds of audio in 10.002 seconds
+(100.2% realtime), with zero measured ping-pong underruns. DMA backpressure
+accounted for 6.651 seconds, leaving a 33.5% producer non-wait upper bound. FreeRTOS runtime
+statistics reported 77.0% whole-system busy and 23.0% idle, which also includes
+SLC ISR and scheduler overhead. Free/minimum heap was 107,064/104,284 bytes.
+
+The codec modules were then measured on the same board from embedded RAM
+fixtures, with Wi-Fi and audio output disabled. This isolates decoder cost from
+network jitter and from the PDM output path.
+
+| Codec module | Fixture | CPU budget | Speed | Average / maximum frame | Free heap | Workspace / arena |
+|---|---:|---:|---:|---:|---:|---:|
+| Helix MP3 SSO | 320 kbit/s, 960 B | 28.12% | 3.556x | 6,748 / 6,768 us | 80,852 B | 28,992 / 23,228 B |
+| Helix AAC-LC | 320 kbit/s, 810 B | 76.20% | 1.312x | 16,255 / 16,267 us | 85,760 B | 28,992 / 20,600 B |
+
+MP3 synthesis accounts for 88.1% of decoder time (40.9% synthesis DCT and
+45.0% polyphase). AAC is dominated by IMDCT at 52.2% and Huffman at 35.4%; its
+remaining measured stages are stereo processing 6.4% and dequantization 4.6%.
+Fifty create/switch lifecycle cycles returned the heap to the starting value.
+
+Adding the independently measured decoder budget to the 33.5% producer
+non-wait bound gives about 61.6% for MP3 and 109.7% for AAC before Wi-Fi and
+control work. This is not a simultaneous streaming measurement: DMA ISR and
+scheduler time overlap differently in production, and the measured 77.0%
+whole-system busy figure shows that the lower carrier still has appreciable
+driver overhead. MP3 has a plausible margin; 320-kbit/s AAC still does not.
+
 ## Conclusions
 
 - The optimized MP3 path is close to realtime at 320 kbit/s, but 95.2% leaves

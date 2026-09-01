@@ -54,9 +54,9 @@ void app_main(void) {
 #elif YORADIO_ESP8266_I2S_PDM
     ESP_LOGI(TAG,
              "profile: HTTP only, Helix MP3/AAC, I2S-PDM DMA GPIO %d, "
-             "carrier %u Hz, PDM%u; UART RX ignored",
+             "carrier %u Hz, PDM%u x%u; UART RX ignored",
              BOARD_I2S_DATA_GPIO, BOARD_I2S_PDM_CARRIER_HZ,
-             BOARD_PDM_OVERSAMPLE);
+             BOARD_I2S_PDM_OVERSAMPLE, BOARD_I2S_PDM_REPEAT);
 #else
     ESP_LOGI(TAG, "profile: HTTP only, Helix MP3/AAC, I2S GPIO %d/%d/%d",
              BOARD_I2S_DATA_GPIO, BOARD_I2S_BCLK_GPIO,

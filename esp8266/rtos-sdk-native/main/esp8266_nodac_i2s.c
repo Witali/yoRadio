@@ -17,10 +17,11 @@
 #include "freertos/task.h"
 #include "rom/ets_sys.h"
 
-#define NODAC_DMA_BUFFER_COUNT 4U
-#define NODAC_DMA_BUFFER_WORDS 128U
+#define NODAC_DMA_BUFFER_COUNT ESP8266_NODAC_DMA_BUFFER_COUNT
+#define NODAC_DMA_BUFFER_WORDS ESP8266_NODAC_DMA_BUFFER_WORDS
 #define NODAC_DMA_BUFFER_BYTES \
     (NODAC_DMA_BUFFER_WORDS * sizeof(uint32_t))
+#define NODAC_QUEUE_RECHECK_TICKS pdMS_TO_TICKS(2)
 #define NODAC_SLC_ADDRESS_MASK 0x000fffffU
 
 typedef struct nodac_dma_descriptor {
@@ -38,11 +39,20 @@ static uint32_t s_buffers[NODAC_DMA_BUFFER_COUNT][NODAC_DMA_BUFFER_WORDS];
 static nodac_dma_descriptor_t s_descriptors[NODAC_DMA_BUFFER_COUNT];
 static uint32_t *s_free_buffers[NODAC_DMA_BUFFER_COUNT];
 static volatile uint8_t s_free_count;
-static uint32_t *s_current_buffer;
-static size_t s_current_position;
+static uint32_t *volatile s_current_buffer;
+static volatile size_t s_current_position;
 static volatile TaskHandle_t s_waiter;
 static volatile bool s_waiting;
 static uint32_t s_silence_word;
+static volatile uint32_t s_underruns;
+
+#if YORADIO_ESP8266_AUDIO_PROFILE
+extern void audio_profile_spi_wait_begin(void);
+extern void audio_profile_spi_wait_end(void);
+#elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+extern void audio_output_benchmark_spi_wait_begin(void);
+extern void audio_output_benchmark_spi_wait_end(void);
+#endif
 
 extern void rom_i2c_writeReg_Mask(int block, int host_id, int reg_add,
                                   int msb, int lsb, int value);
@@ -64,6 +74,11 @@ static void IRAM_ATTR nodac_slc_isr(void *arg) {
     if (status & (1U << 17)) {
         nodac_dma_descriptor_t *finished =
             (nodac_dma_descriptor_t *)SLC0.rx_eof_des_addr;
+        nodac_dma_descriptor_t *next = finished->next_link_ptr;
+        if (s_free_count >= NODAC_DMA_BUFFER_COUNT - 1U ||
+            (s_current_buffer == next->buf_ptr &&
+             s_current_position < NODAC_DMA_BUFFER_WORDS))
+            ++s_underruns;
         for (unsigned word = 0; word < NODAC_DMA_BUFFER_WORDS; ++word)
             finished->buf_ptr[word] = s_silence_word;
         if (s_free_count >= NODAC_DMA_BUFFER_COUNT - 1U)
@@ -89,6 +104,7 @@ static void configure_descriptors(uint32_t silence_word) {
     s_current_position = 0;
     s_waiter = NULL;
     s_waiting = false;
+    s_underruns = 0;
     for (unsigned index = 0; index < NODAC_DMA_BUFFER_COUNT; ++index) {
         for (unsigned word = 0; word < NODAC_DMA_BUFFER_WORDS; ++word)
             s_buffers[index][word] = silence_word;
@@ -126,13 +142,16 @@ static void configure_slc(void) {
         (uint32_t)&s_descriptors[0] & NODAC_SLC_ADDRESS_MASK;
     _xt_isr_attach(ETS_SLC_INUM, nodac_slc_isr, NULL);
     SLC0.int_ena.rx_eof = 1;
-    SLC0.int_ena.rx_dscr_err = 1;
+    /* The companion TX link intentionally has no payload owner. Enabling its
+     * descriptor-error source can create an ISR storm at low I2S rates; EOF
+     * is the only event needed to recycle the output ring. */
+    SLC0.int_ena.rx_dscr_err = 0;
     _xt_isr_unmask(1U << ETS_SLC_INUM);
     SLC0.tx_link.start = 1;
     SLC0.rx_link.start = 1;
 }
 
-static void configure_i2s(void) {
+static void configure_i2s(uint8_t bck_div, uint8_t clkm_div) {
     rom_i2c_writeReg_Mask(0x67, 4, 4, 7, 7, 1);
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_I2SO_DATA);
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDO_U, FUNC_I2SO_BCK);
@@ -156,16 +175,18 @@ static void configure_i2s(void) {
     I2S0.conf.tx_msb_shift = 1;
     I2S0.conf.rx_msb_shift = 1;
     I2S0.conf.bits_mod = 0;
-    /* 160 MHz / 32 / (2 * 52) = 48076.9 32-bit words/s. */
-    I2S0.conf.bck_div_num = 2;
-    I2S0.conf.clkm_div_num = 52;
+    I2S0.conf.bck_div_num = bck_div;
+    I2S0.conf.clkm_div_num = clkm_div;
     I2S0.conf.tx_start = 1;
 }
 
-esp_err_t esp8266_nodac_i2s_init(uint32_t silence_word) {
+esp_err_t esp8266_nodac_i2s_init(uint32_t silence_word,
+                                 uint8_t bck_div, uint8_t clkm_div) {
+    if (!bck_div || bck_div > 63U || !clkm_div || clkm_div > 63U)
+        return ESP_ERR_INVALID_ARG;
     configure_descriptors(silence_word);
     configure_slc();
-    configure_i2s();
+    configure_i2s(bck_div, clkm_div);
     const TickType_t timeout = pdMS_TO_TICKS(100);
     const TickType_t started = xTaskGetTickCount();
     while (!s_free_count && xTaskGetTickCount() - started < timeout)
@@ -174,6 +195,7 @@ esp_err_t esp8266_nodac_i2s_init(uint32_t silence_word) {
 }
 
 static bool acquire_free_buffer(TickType_t ticks_to_wait) {
+    const TickType_t started = xTaskGetTickCount();
     for (;;) {
         taskENTER_CRITICAL();
         if (s_free_count) {
@@ -186,7 +208,23 @@ static bool acquire_free_buffer(TickType_t ticks_to_wait) {
         s_waiter = xTaskGetCurrentTaskHandle();
         s_waiting = true;
         taskEXIT_CRITICAL();
-        if (!ulTaskNotifyTake(pdTRUE, ticks_to_wait)) {
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        audio_profile_spi_wait_begin();
+#elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+        audio_output_benchmark_spi_wait_begin();
+#endif
+        /* Periodically recheck even without a notification. A low-rate SLC
+         * EOF can race the waiter flag on this SDK; sleeping for the whole
+         * caller timeout would then miss an already returned buffer. Two
+         * milliseconds leaves margin inside one 512-word DMA block. */
+        uint32_t notified = ulTaskNotifyTake(
+            pdTRUE, NODAC_QUEUE_RECHECK_TICKS);
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        audio_profile_spi_wait_end();
+#elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+        audio_output_benchmark_spi_wait_end();
+#endif
+        if (!notified && xTaskGetTickCount() - started >= ticks_to_wait) {
             taskENTER_CRITICAL();
             s_waiting = false;
             taskEXIT_CRITICAL();
@@ -223,4 +261,17 @@ void esp8266_nodac_i2s_silence(uint32_t silence_word) {
     s_current_buffer = NULL;
     s_current_position = 0;
     taskEXIT_CRITICAL();
+}
+
+void esp8266_nodac_i2s_reset_underruns(void) {
+    taskENTER_CRITICAL();
+    s_underruns = 0;
+    taskEXIT_CRITICAL();
+}
+
+uint32_t esp8266_nodac_i2s_underruns(void) {
+    taskENTER_CRITICAL();
+    uint32_t underruns = s_underruns;
+    taskEXIT_CRITICAL();
+    return underruns;
 }

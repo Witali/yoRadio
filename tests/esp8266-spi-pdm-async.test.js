@@ -17,12 +17,12 @@ const pdm8Profile = fs.readFileSync(
   "utf8",
 );
 
-test("ESP8266 defaults to 384 kHz PDM8 and preserves its explicit profile", () => {
+test("ESP8266 legacy SPI keeps its explicit 384 kHz PDM8 profile", () => {
   assert.match(kconfig, /default YORADIO_SPI_PDM_OVERSAMPLE_8/);
   assert.match(pdm8Profile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
   assert.match(pdm8Profile, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
-  assert.match(pdmConfig, /BOARD_PDM_OVERSAMPLE 8U/);
-  assert.match(pdmConfig, /BOARD_PDM_BIT_RATE_HZ 384615U/);
+  assert.match(pdmConfig, /BOARD_SPI_PDM_OVERSAMPLE 8U/);
+  assert.match(pdmConfig, /BOARD_SPI_PDM_BIT_RATE_HZ 384615U/);
   assert.match(pdmConfig, /BOARD_SPI_PDM_CLOCK_PREDIV 25U/);
   assert.match(output, /SPI1\.clock\.clkdiv_pre = BOARD_SPI_PDM_CLOCK_PREDIV/);
 });
@@ -162,6 +162,7 @@ test("ESP8266 streaming profile reports internal MP3 and AAC decoder stages", ()
   assert.match(defaults, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
   assert.match(defaults, /CONFIG_YORADIO_HELIX_AAC=y/);
   assert.match(defaults, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
+  assert.match(defaults, /CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y/);
   assert.match(defaults, /CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y/);
   assert.match(summary, /CODEC_STAGE = re\.compile/);
   assert.match(summary, /Decoder core/);

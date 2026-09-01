@@ -65,19 +65,35 @@ config YORADIO_AUDIO_OUTPUT_I2S_PCM
 endchoice
 
 choice YORADIO_SPI_PDM_OVERSAMPLE
-    prompt "PDM bits per PCM sample"
+    prompt "Legacy SPI-PDM bits per PCM sample"
     default YORADIO_SPI_PDM_OVERSAMPLE_8
     help
-        Select the one-bit PDM oversampling ratio used by both I2S-DMA and
-        legacy SPI output. Eight bits matches the current 384.615 kHz
-        production profile; sixteen bits lowers quantization noise at twice
-        the conversion and output bandwidth.
+        Select the one-bit PDM oversampling ratio used by the legacy SPI
+        output. Eight bits gives 384.615 kHz; sixteen bits lowers quantization
+        noise at twice the conversion and output bandwidth.
 
 config YORADIO_SPI_PDM_OVERSAMPLE_8
     bool "8 bits/sample (384.615 kHz at 48 kHz)"
 
 config YORADIO_SPI_PDM_OVERSAMPLE_16
     bool "16 bits/sample (769.231 kHz at 48 kHz)"
+
+endchoice
+
+choice YORADIO_I2S_PDM_OVERSAMPLE
+    prompt "I2S-PDM carrier and delta-sigma mode"
+    depends on YORADIO_AUDIO_OUTPUT_I2S_PDM
+    default YORADIO_I2S_PDM_OVERSAMPLE_32
+    help
+        Production computes 32 delta-sigma bits per 48-kHz PCM sample at a
+        nominal 1.536-MHz carrier. PDM128 raises the carrier to 6.144 MHz and
+        remains experimental. ESP8266 integer dividers are +0.16% high.
+
+config YORADIO_I2S_PDM_OVERSAMPLE_32
+    bool "PDM32 genuine (1.536 MHz carrier, production)"
+
+config YORADIO_I2S_PDM_OVERSAMPLE_128
+    bool "PDM128 genuine (6.144 MHz carrier, experimental)"
 
 endchoice
 

@@ -7,6 +7,7 @@ const root = path.resolve(__dirname, "..", "esp8266", "rtos-sdk-native", "main")
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
 const output = read("native_audio_output.c");
 const nodac = read("esp8266_nodac_i2s.c");
+const nodacHeader = read("esp8266_nodac_i2s.h");
 const kconfig = read("Kconfig.projbuild");
 const component = read("CMakeLists.txt");
 const board = read("board_config.h");
@@ -17,7 +18,9 @@ const defaultProfile = fs.readFileSync(
   "utf8",
 );
 
-const i2sPdmStart = output.lastIndexOf("#elif YORADIO_ESP8266_I2S_PDM");
+const i2sPdmStart = output.indexOf(
+  "#elif YORADIO_ESP8266_I2S_PDM\n\n#define I2S_PDM_BATCH_WORDS",
+);
 const i2sPdm = output.slice(
   i2sPdmStart,
   output.indexOf("\n#else", i2sPdmStart),
@@ -43,33 +46,52 @@ test("ESP8266 production audio defaults to I2S DMA PDM", () => {
   assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
   assert.match(defaultProfile, /CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y/);
   assert.match(defaultProfile, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
+  assert.match(defaultProfile, /CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y/);
 });
 
 test("I2S PDM uses circular SLC DMA with a continuous neutral bitstream", () => {
-  assert.match(i2sPdm, /#define I2S_PDM_DMA_BUFFER_COUNT 4U/);
-  assert.match(i2sPdm, /#define I2S_PDM_DMA_BUFFER_WORDS 128U/);
   assert.match(i2sPdm, /I2S_PDM_SILENCE_WORD 0xaaaaaaaaU/);
-  assert.match(i2sPdm, /esp8266_nodac_i2s_init\(I2S_PDM_SILENCE_WORD\)/);
+  assert.match(
+    i2sPdm,
+    /esp8266_nodac_i2s_init\([\s\S]*I2S_PDM_SILENCE_WORD,[\s\S]*BOARD_I2S_PDM_BCK_DIV,[\s\S]*BOARD_I2S_PDM_CLKM_DIV/,
+  );
   assert.match(i2sPdm, /esp8266_nodac_i2s_write/);
   assert.doesNotMatch(i2sPdm, /i2s_driver_install|\bi2s_write\(/);
-  assert.match(nodac, /#define NODAC_DMA_BUFFER_COUNT 4U/);
-  assert.match(nodac, /#define NODAC_DMA_BUFFER_WORDS 128U/);
+  assert.match(nodacHeader, /ESP8266_NODAC_DMA_BUFFER_COUNT 2U/);
+  assert.match(nodacHeader, /ESP8266_NODAC_DMA_BUFFER_WORDS 512U/);
+  assert.match(nodacHeader, /true ping-pong DMA/);
+  assert.match(nodac, /NODAC_DMA_BUFFER_COUNT ESP8266_NODAC_DMA_BUFFER_COUNT/);
+  assert.match(nodac, /NODAC_DMA_BUFFER_WORDS ESP8266_NODAC_DMA_BUFFER_WORDS/);
   assert.match(nodac, /SLC0\.rx_link\.start = 1/);
   assert.match(nodac, /SLC0\.tx_link\.start = 1/);
+  assert.match(nodac, /SLC0\.int_ena\.rx_eof = 1/);
+  assert.match(nodac, /SLC0\.int_ena\.rx_dscr_err = 0/);
   assert.match(nodac, /rom_i2c_writeReg_Mask\(0x67, 4, 4, 7, 7, 1\)/);
+  assert.match(nodac, /I2S0\.conf\.bck_div_num = bck_div/);
+  assert.match(nodac, /I2S0\.conf\.clkm_div_num = clkm_div/);
   assert.match(nodac, /finished->buf_ptr\[word\] = s_silence_word/);
   assert.match(nodac, /~\(3U << 12\).*\(1U << 12\)/);
   assert.match(nodac, /return s_free_count \? ESP_OK : ESP_ERR_TIMEOUT/);
+  assert.match(nodac, /NODAC_QUEUE_RECHECK_TICKS pdMS_TO_TICKS\(2\)/);
+  assert.match(nodac, /ulTaskNotifyTake\([\s\S]*pdTRUE, NODAC_QUEUE_RECHECK_TICKS\)/);
+  assert.match(nodac, /xTaskGetTickCount\(\) - started >= ticks_to_wait/);
+  assert.match(nodac, /s_current_buffer == next->buf_ptr[\s\S]*s_current_position < NODAC_DMA_BUFFER_WORDS/);
+  assert.match(output, /esp8266_nodac_i2s_reset_underruns/);
+  assert.match(output, /stats->queue_empty_events = esp8266_nodac_i2s_underruns\(\)/);
 });
 
-test("I2S PDM packs across decoder calls instead of padding every block", () => {
+test("I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier", () => {
   assert.match(output, /static uint32_t s_i2s_pdm_partial_word/);
   assert.match(i2sPdm, /s_i2s_pdm_partial_bits != 32U/);
   assert.match(i2sPdm, /return i2s_pdm_flush\(&writer\);/);
-  assert.match(pdm, /BOARD_I2S_PDM_FRAME_RATE BOARD_PDM_SAMPLE_RATE/);
-  assert.match(pdm, /BOARD_I2S_PDM_BIT_REPEAT \(32U \/ BOARD_PDM_OVERSAMPLE\)/);
-  assert.match(i2sPdm, /repeat < BOARD_I2S_PDM_BIT_REPEAT/);
-  assert.match(pdm, /BOARD_PDM_BIT_RATE_HZ 384615U/);
+  assert.match(pdm, /CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32[\s\S]*BOARD_I2S_PDM_OVERSAMPLE 32U[\s\S]*BOARD_I2S_PDM_CARRIER_BITS_PER_SAMPLE 32U/);
+  assert.match(pdm, /BOARD_I2S_PDM_REPEAT/);
+  assert.match(pdm, /BOARD_I2S_PDM_BCK_DIV 8U/);
+  assert.match(pdm, /BOARD_I2S_PDM_CLKM_DIV 13U/);
+  assert.match(pdm, /BOARD_I2S_PDM_NOMINAL_HZ/);
+  assert.match(pdm, /160000000U \/ BOARD_I2S_PDM_BCK_DIV \/ BOARD_I2S_PDM_CLKM_DIV/);
+  assert.match(i2sPdm, /bit < BOARD_I2S_PDM_OVERSAMPLE/);
+  assert.match(i2sPdm, /repeat < BOARD_I2S_PDM_REPEAT/);
 });
 
 test("I2S PDM drives its clocks like ESP8266Audio and ignores UART RX input", () => {
