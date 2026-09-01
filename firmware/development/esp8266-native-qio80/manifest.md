@@ -18,7 +18,7 @@ the application. Flash all three images without erasing NVS or SPIFFS:
 
 SHA-256:
 
-- `app.bin`: `40B27B9BCE004890F14755706F297AD7709BF13BF3E013C0C8EF6CBB3C54031D`
+- `app.bin`: `6621B5690DB472E69AD9CD7F4B60E183BE028F91B0807C900063E851F55BE608`
 - `bootloader.bin`: `34A628DA55749D0C72ED3BC78EDA60B29DE6D341A8E54E70AE05CFF772219A85`
 - `partition-table.bin`: `C3AEC2B0CC450D37286B5D832556268970CF0F63AA31250C94A21116D22A22DF`
 
@@ -28,11 +28,18 @@ Physical validation on COM10:
   `__muldi3` helper in the decode hot path;
 - the optimized decoders produced PCM identical to the retained 64-bit
   reference for the checked-in 320-kbit/s MP3 and AAC golden fixtures;
+- safe MP3 divisions by 3, 5, 6, 18, and 36 use an exact Q32 reciprocal
+  multiply with quotient correction; reciprocal OFF/ON averaged 14,653/14,284
+  us per RAM-resident 320-kbit/s frame, a 2.52% speedup;
+- disassembly confirmed that the ordinary MP3 frame path no longer calls the
+  ROM integer divide helper; only one-time free-format bitrate detection keeps
+  a variable division;
 - decode-only MP3 320 kbit/s reached 74.1% realtime with a 32.9 ms worst
   decoder call, versus 53.8% before the fixed-point optimization;
 - decode-only AAC 320 kbit/s reached 99.2% realtime with a 21.4 ms worst
   decoder call, versus 80.8% before the fixed-point optimization;
 - application completed two independent RTS cold-start sequences;
+- the reciprocal-enabled production image booted after flashing on COM10;
 - CPU reported 160 MHz and the 511-station index loaded from SPIFFS;
 - Wi-Fi connected and received `192.168.100.6`;
 - WebUI root, status API and playlist returned HTTP 200;
