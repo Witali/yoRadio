@@ -22,6 +22,12 @@ decoder correctness.
   IMDCT, synthesis/subband, and PCM assembly. Measure total time, call count,
   average time, and maximum time for every stage before selecting code to
   optimize.
+- [ ] Unroll only the measured hottest fixed-trip loops. Benchmark unroll
+  factors 2 and 4 for MP3 dequant/IMDCT/polyphase synthesis and AAC IMDCT/QMF;
+  also compare manual unrolling with GCC `-funroll-loops`. Flash capacity is
+  not the limiting resource, but record text growth and reject variants that
+  lose speed through instruction-cache pressure or exceed the safe IRAM
+  budget.
 - [ ] Implement and benchmark Xtensa LX106 fixed-point primitives for
   32x32-to-high-32 multiplication, multiply-accumulate, count-leading-zeros,
   and saturation. Generic 64-bit operations are the main candidate for
@@ -59,10 +65,11 @@ decoder correctness.
 1. RAM-only microbenchmark, to separate decoder cost from Wi-Fi and flash.
 2. Stage-level profiling, to identify the actual hot path.
 3. Xtensa fixed-point primitives applied only to measured hotspots.
-4. One carefully selected IRAM function and small hot tables.
-5. Mono decode/synthesis path, including the guarded MP3 M/S joint-stereo
+4. Measured loop unrolling in the hottest fixed-trip kernels.
+5. One carefully selected IRAM function and small hot tables.
+6. Mono decode/synthesis path, including the guarded MP3 M/S joint-stereo
    experiment, where the hardware output is mono.
-6. Asynchronous SPI-PDM refinements and integration profiling.
+7. Asynchronous SPI-PDM refinements and integration profiling.
 
 ## Current performance gap
 
