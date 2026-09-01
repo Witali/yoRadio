@@ -107,6 +107,25 @@ test("ESP8266 audio profile reports whole-CPU load and heap use", () => {
   assert.match(profile, /esp_get_minimum_free_heap_size\(\)/);
   assert.match(profile, /heap total=%u used=%u free=%u min_free=%u/);
 });
+test("ESP8266 streaming profile reports internal MP3 and AAC decoder stages", () => {
+  const profile = fs.readFileSync(
+    path.join(root, "audio_profile_wrappers.cpp"),
+    "utf8",
+  );
+  const defaults = fs.readFileSync(
+    path.join(root, "..", "sdkconfig.audio-profile-qio80-pdm8.defaults"),
+    "utf8",
+  );
+
+  assert.match(profile, /codec_stage=%s time=%u\.%03u ms/);
+  assert.match(profile, /helix_stage_profile_begin/);
+  assert.match(profile, /helix_stage_profile_end/);
+  assert.match(profile, /"huffman", "dequant", "stereo_filter", "imdct"/);
+  assert.match(defaults, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
+  assert.match(defaults, /CONFIG_YORADIO_HELIX_AAC=y/);
+  assert.match(defaults, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
+  assert.match(defaults, /CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y/);
+});
 test("ESP8266 decode-only profile bypasses PDM while counting decoded PCM", () => {
   const profile = fs.readFileSync(
     path.join(root, "audio_profile_wrappers.cpp"),

@@ -10,6 +10,7 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "helix_stage_profile.h"
 #include "lwip/sockets.h"
 #include "mp3_decoder.h"
 #include "native_audio_normalizer.h"
@@ -38,6 +39,15 @@ struct StageStats {
 };
 
 StageStats s_stage[kStageCount];
+#if defined(YORADIO_ESP8266_HELIX_STAGE_PROFILE)
+StageStats s_codec_stage[HELIX_STAGE_COUNT];
+int64_t s_codec_stage_started[HELIX_STAGE_COUNT];
+const char *const kCodecStageNames[HELIX_STAGE_COUNT] = {
+    "huffman", "dequant", "stereo_filter", "imdct", "synthesis",
+    "synthesis_dct", "synthesis_polyphase", "sbr",
+};
+uint32_t s_codec_stage_rejected[HELIX_STAGE_COUNT];
+#endif
 TaskHandle_t s_audio_task;
 int64_t s_started_us;
 uint64_t s_audio_us;
@@ -121,8 +131,41 @@ void log_stage(const char *name, Stage stage, uint64_t wall_us) {
              static_cast<unsigned>(stats.max_us));
 }
 
+#if defined(YORADIO_ESP8266_HELIX_STAGE_PROFILE)
+void reset_codec_stages() {
+    std::memset(s_codec_stage, 0, sizeof(s_codec_stage));
+    std::memset(s_codec_stage_started, 0, sizeof(s_codec_stage_started));
+    std::memset(s_codec_stage_rejected, 0, sizeof(s_codec_stage_rejected));
+}
+
+void log_codec_stages(uint64_t wall_us) {
+    const uint64_t decode_us = total(kDecodeCore);
+    for (int stage = 0; stage < HELIX_STAGE_COUNT; ++stage) {
+        const StageStats &stats = s_codec_stage[stage];
+        if (!stats.calls) continue;
+        const unsigned wall_load = percent_x10(stats.total_us, wall_us);
+        const unsigned core_load = percent_x10(stats.total_us, decode_us);
+        ESP_LOGI(kTag,
+                 "codec_stage=%s time=%u.%03u ms wall=%u.%u%% "
+                 "core=%u.%u%% calls=%u max=%u us rejected=%u",
+                 kCodecStageNames[stage],
+                 static_cast<unsigned>(stats.total_us / 1000ULL),
+                 static_cast<unsigned>(stats.total_us % 1000ULL),
+                 wall_load / 10U, wall_load % 10U,
+                 core_load / 10U, core_load % 10U,
+                 static_cast<unsigned>(stats.calls),
+                 static_cast<unsigned>(stats.max_us),
+                 static_cast<unsigned>(s_codec_stage_rejected[stage]));
+    }
+}
+#else
+void reset_codec_stages() {}
+void log_codec_stages(uint64_t) {}
+#endif
+
 void reset_profile(helix_codec_kind_t kind) {
     std::memset(s_stage, 0, sizeof(s_stage));
+    reset_codec_stages();
     s_audio_task = xTaskGetCurrentTaskHandle();
     s_started_us = esp_timer_get_time();
     s_audio_us = 0;
@@ -151,6 +194,7 @@ void maybe_report() {
     log_stage("tcp_wait", kRecvWait, wall_us);
     log_stage("frame_scan", kFrameScan, wall_us);
     log_stage("decode_core", kDecodeCore, wall_us);
+    log_codec_stages(wall_us);
     log_stage("pcm_output", kPcmOutput, wall_us);
     log_stage("normalize", kNormalizer, wall_us);
     log_stage("spi_queue_wait", kSpiWait, wall_us);
@@ -281,3 +325,25 @@ extern "C" void audio_profile_spi_wait_begin(void) {
 extern "C" void audio_profile_spi_wait_end(void) {
     record(kSpiWait, elapsed_since(s_spi_wait_started_us));
 }
+
+#if defined(YORADIO_ESP8266_HELIX_STAGE_PROFILE)
+extern "C" void helix_stage_profile_begin(int stage) {
+    if (stage >= 0 && stage < HELIX_STAGE_COUNT)
+        s_codec_stage_started[stage] = esp_timer_get_time();
+}
+
+extern "C" void helix_stage_profile_end(int stage) {
+    if (stage < 0 || stage >= HELIX_STAGE_COUNT) return;
+    const int64_t elapsed_signed =
+        esp_timer_get_time() - s_codec_stage_started[stage];
+    if (elapsed_signed < 0 || elapsed_signed > 1000000) {
+        ++s_codec_stage_rejected[stage];
+        return;
+    }
+    StageStats &stats = s_codec_stage[stage];
+    const uint32_t elapsed = static_cast<uint32_t>(elapsed_signed);
+    stats.total_us += elapsed;
+    stats.max_us = std::max(stats.max_us, elapsed);
+    ++stats.calls;
+}
+#endif

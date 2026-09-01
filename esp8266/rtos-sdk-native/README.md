@@ -26,6 +26,12 @@ The `sdkconfig.helix-sso-qio80-pdm8.defaults` profile adds an experimental
 halves PDM conversion work and transfer interrupts relative to the default
 16-bit output, while increasing one-bit quantization noise and doubling each
 512-bit queue block from about 0.67 ms to 1.33 ms.
+The matching `sdkconfig.audio-profile-qio80-pdm8.defaults` profile also
+enables FreeRTOS runtime counters. Build it with
+`YORADIO_ESP8266_AUDIO_PROFILE` and
+`YORADIO_ESP8266_HELIX_STAGE_PROFILE` to measure network, frame scan,
+decoder internals, normalization, PDM conversion, SPI wait, CPU idle, and heap
+on a physical board.
 The matching `sdkconfig.aac-sso-qio80.defaults` profile keeps exact MP3 and
 enables the experimental three-partial-product AAC fixed-point path for
 isolated PCM, disassembly, and physical timing comparison.
