@@ -112,9 +112,11 @@ struct helix_codec {
     helix_codec_kind_t kind;
     size_t input_start;
     size_t input_size;
-    uint8_t *arena;
     uint8_t *input;
     int16_t *pcm;
+    size_t dram_used;
+    size_t iram_used;
+    size_t reserve_heap_bytes;
 };
 static constexpr size_t kWorkspaceBytes = sizeof(helix_codec) +
     kArenaBytes + kInputStorageBytes + sizeof(int16_t) * kPcmSamples;
@@ -128,6 +130,8 @@ struct LibmadDecoder {
 
 LibmadDecoder s_libmad = {};
 
+void libmad_free();
+
 bool libmad_allocate() {
     /* The synthesis state is 32-bit-only and fits in the preallocated IRAM
      * word arena. The byte-addressed bit-reservoir and the larger frame state
@@ -139,8 +143,7 @@ bool libmad_allocate() {
     s_libmad.frame = static_cast<mad_frame *>(CodecArenaCalloc(
         CODEC_ARENA_MP3, 1, sizeof(mad_frame)));
     if (!s_libmad.stream || !s_libmad.frame || !s_libmad.synth) {
-        CodecArenaRelease(CODEC_ARENA_MP3);
-        s_libmad = {};
+        libmad_free();
         return false;
     }
     mad_stream_init(s_libmad.stream);
@@ -153,6 +156,9 @@ bool libmad_allocate() {
 void libmad_free() {
     if (s_libmad.stream) mad_stream_finish(s_libmad.stream);
     if (s_libmad.frame) mad_frame_finish(s_libmad.frame);
+    CodecArenaFree(s_libmad.synth);
+    CodecArenaFree(s_libmad.stream);
+    CodecArenaFree(s_libmad.frame);
     CodecArenaRelease(CODEC_ARENA_MP3);
     s_libmad = {};
 }
@@ -165,7 +171,9 @@ bool libmad_reset() {
 
 
 static void free_decoder(helix_codec *codec) {
-    if (codec->kind == HELIX_CODEC_MP3) {
+    helix_codec_kind_t kind = codec->kind;
+    codec->kind = static_cast<helix_codec_kind_t>(0);
+    if (kind == HELIX_CODEC_MP3) {
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
         libmad_free();
 #else
@@ -173,7 +181,7 @@ static void free_decoder(helix_codec *codec) {
 #endif
     }
 #if CONFIG_YORADIO_HELIX_AAC
-    else if (codec->kind == HELIX_CODEC_AAC) AACDecoder_FreeBuffers();
+    else if (kind == HELIX_CODEC_AAC) AACDecoder_FreeBuffers();
 #endif
 }
 
@@ -190,6 +198,20 @@ static bool allocate_decoder(helix_codec *codec, helix_codec_kind_t kind) {
 #if CONFIG_YORADIO_HELIX_AAC
     if (kind == HELIX_CODEC_AAC) return AACDecoder_AllocateBuffers();
 #endif
+    return false;
+}
+
+static bool update_codec_memory(helix_codec *codec) {
+    size_t word_capacity = CodecArenaPreallocatedBytes();
+    bool word_in_iram = CodecArenaPreallocatedInIram();
+    codec->dram_used = sizeof(*codec) + kInputStorageBytes +
+                       sizeof(int16_t) * kPcmSamples + CodecArenaHeapUsed() +
+                       (word_in_iram ? 0U : word_capacity);
+    codec->iram_used = word_in_iram ? word_capacity : 0U;
+    size_t free_heap = esp_get_free_heap_size();
+    if (free_heap >= codec->reserve_heap_bytes) return true;
+    ESP_LOGE(kTag, "Codec leaves %u heap bytes, reserve requires %u",
+             (unsigned)free_heap, (unsigned)codec->reserve_heap_bytes);
     return false;
 }
 
@@ -381,16 +403,9 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
         && kind != HELIX_CODEC_AAC
 #endif
     ) return nullptr;
-    size_t free_heap = esp_get_free_heap_size();
-    size_t runtime_workspace = kWorkspaceBytes -
-                               CodecArenaPreallocatedBytes();
-    if (free_heap < runtime_workspace + reserve_heap_bytes) {
-        ESP_LOGE(kTag, "Need %u bytes, free heap %u, reserve %u",
-                 (unsigned)runtime_workspace, (unsigned)free_heap,
-                 (unsigned)reserve_heap_bytes);
-        return nullptr;
-    }
-    helix_codec *codec = static_cast<helix_codec *>(std::calloc(1, sizeof(*codec)));
+    if (!helix_codec_prepare()) return nullptr;
+    helix_codec *codec = static_cast<helix_codec *>(
+        heap_caps_calloc(1, sizeof(*codec), MALLOC_CAP_8BIT));
     if (codec) {
         codec->input = static_cast<uint8_t *>(
             heap_caps_calloc(1, kInputStorageBytes, MALLOC_CAP_8BIT));
@@ -402,13 +417,12 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
         if (codec) {
             heap_caps_free(codec->pcm);
             heap_caps_free(codec->input);
-            heap_caps_free(codec->arena);
         }
-        std::free(codec);
-        ESP_LOGE(kTag, "Heap cannot allocate %u-byte runtime workspace",
-                 (unsigned)runtime_workspace);
+        heap_caps_free(codec);
+        ESP_LOGE(kTag, "Heap cannot allocate codec input/PCM workspace");
         return nullptr;
     }
+    codec->reserve_heap_bytes = reserve_heap_bytes;
     bool allocated = allocate_decoder(codec, kind);
     if (!allocated) {
         if (kind == HELIX_CODEC_MP3) {
@@ -424,11 +438,14 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
         CodecArenaUnbind();
         heap_caps_free(codec->pcm);
         heap_caps_free(codec->input);
-        heap_caps_free(codec->arena);
-        std::free(codec);
+        heap_caps_free(codec);
         return nullptr;
     }
-    ESP_LOGI(kTag, "%s workspace: %u bytes, arena used: %u",
+    if (!update_codec_memory(codec)) {
+        helix_codec_destroy(codec);
+        return nullptr;
+    }
+    ESP_LOGI(kTag, "%s workspace: DRAM %u, IRAM %u, arena used %u",
              kind == HELIX_CODEC_MP3
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
                  ? "libmad MP3"
@@ -436,7 +453,8 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
                  ? "Helix MP3"
 #endif
                  : "Helix AAC",
-             (unsigned)kWorkspaceBytes, (unsigned)CodecArenaUsed());
+             (unsigned)codec->dram_used, (unsigned)codec->iram_used,
+             (unsigned)CodecArenaUsed());
     return codec;
 }
 
@@ -446,8 +464,7 @@ extern "C" void helix_codec_destroy(helix_codec_t *codec) {
     if (!CodecArenaUnbind()) ESP_LOGE(kTag, "Codec arena is still owned");
     heap_caps_free(codec->pcm);
     heap_caps_free(codec->input);
-    heap_caps_free(codec->arena);
-    std::free(codec);
+    heap_caps_free(codec);
 }
 
 extern "C" int helix_codec_switch(helix_codec_t *codec,
@@ -462,7 +479,12 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
         codec->input_start = codec->input_size = 0;
         if (kind == HELIX_CODEC_MP3) {
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
-            return libmad_reset() ? 0 : -2;
+            if (!libmad_reset()) return -2;
+            if (!update_codec_memory(codec)) {
+                free_decoder(codec);
+                return -3;
+            }
+            return 0;
 #else
             MP3Decoder_ClearBuffer();
             return 0;
@@ -473,7 +495,12 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
          * objects inside the same bound arena; the outer heap block remains
          * allocated and cannot fragment. */
         free_decoder(codec);
-        return allocate_decoder(codec, kind) ? 0 : -2;
+        if (!allocate_decoder(codec, kind)) return -2;
+        if (!update_codec_memory(codec)) {
+            free_decoder(codec);
+            return -3;
+        }
+        return 0;
 #else
         return -1;
 #endif
@@ -482,6 +509,10 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
     if (!allocate_decoder(codec, kind)) {
         free_decoder(codec);
         return -2;
+    }
+    if (!update_codec_memory(codec)) {
+        free_decoder(codec);
+        return -3;
     }
     return 0;
 }
@@ -556,4 +587,12 @@ extern "C" size_t helix_codec_workspace_size(void) {
 
 extern "C" size_t helix_codec_arena_used(const helix_codec_t *codec) {
     return codec ? CodecArenaUsed() : 0;
+}
+
+extern "C" size_t helix_codec_dram_used(const helix_codec_t *codec) {
+    return codec ? codec->dram_used : 0;
+}
+
+extern "C" size_t helix_codec_iram_used(const helix_codec_t *codec) {
+    return codec ? codec->iram_used : 0;
 }

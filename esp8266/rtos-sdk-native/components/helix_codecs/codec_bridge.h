@@ -37,6 +37,8 @@ int helix_codec_feed(helix_codec_t *codec, const uint8_t *data, size_t size,
                      void *context);
 size_t helix_codec_workspace_size(void);
 size_t helix_codec_arena_used(const helix_codec_t *codec);
+size_t helix_codec_dram_used(const helix_codec_t *codec);
+size_t helix_codec_iram_used(const helix_codec_t *codec);
 
 #ifdef __cplusplus
 }

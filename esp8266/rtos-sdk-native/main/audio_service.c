@@ -66,6 +66,35 @@ static volatile uint32_t s_generation;
 static uint8_t s_work[HTTP_HEADER_BYTES];
 static char s_host[HTTP_HOST_BYTES];
 
+static void log_audio_stack(const char *event) {
+#if YORADIO_ESP8266_AUDIO_PROFILE
+    ESP_LOGI(TAG, "Profile stack %s: high_water=%u bytes", event,
+             (unsigned)uxTaskGetStackHighWaterMark(NULL));
+#else
+    (void)event;
+#endif
+}
+
+static void release_codec(helix_codec_t **codec,
+                          helix_codec_kind_t *codec_kind,
+                          const char *reason) {
+    if (!*codec) {
+        *codec_kind = 0;
+        return;
+    }
+#if YORADIO_ESP8266_AUDIO_PROFILE
+    ESP_LOGI(TAG, "Profile codec release %s: DRAM=%u IRAM=%u heap=%u",
+             reason, (unsigned)helix_codec_dram_used(*codec),
+             (unsigned)helix_codec_iram_used(*codec),
+             (unsigned)esp_get_free_heap_size());
+#else
+    (void)reason;
+#endif
+    helix_codec_destroy(*codec);
+    *codec = NULL;
+    *codec_kind = 0;
+}
+
 static bool generation_current(uint32_t generation) {
     return s_generation == generation;
 }
@@ -446,15 +475,16 @@ static bool read_icy_metadata(http_stream_t *stream, uint32_t generation) {
 }
 
 static void audio_task(void *argument) {
-    helix_codec_t *codec = (helix_codec_t *)argument;
+    (void)argument;
+    helix_codec_t *codec = NULL;
     helix_codec_kind_t codec_kind = 0;
+    log_audio_stack("start");
     while (true) {
         audio_command_t command;
         xQueueReceive(s_commands, &command, portMAX_DELAY);
         if (!command.play) {
             native_audio_output_silence();
-            if (codec_kind) helix_codec_switch(codec, codec_kind);
-            codec_kind = 0;
+            release_codec(&codec, &codec_kind, "stop");
             native_state_set_audio(false, false, NULL);
             network_service_set_streaming(false);
             continue;
@@ -484,6 +514,7 @@ static void audio_task(void *argument) {
                 native_state_set_audio(false, false,
                     opened == -7 ? "HTTPS NOT SUPPORTED" : "CONNECTION ERROR");
                 network_service_set_streaming(false);
+                release_codec(&codec, &codec_kind, "open error");
             }
             continue;
         }
@@ -519,14 +550,20 @@ static void audio_task(void *argument) {
 #endif
         if (!codec_kind || !generation_current(command.generation)) {
             close(stream.socket);
-            if (generation_current(command.generation))
+            if (generation_current(command.generation)) {
                 native_state_set_audio(false, false, "UNSUPPORTED STREAM");
+                network_service_set_streaming(false);
+                release_codec(&codec, &codec_kind, "unsupported stream");
+            }
             continue;
         }
 #if YORADIO_ESP8266_AUDIO_PROFILE
         ESP_LOGI(TAG, "Profile decoder switch begin");
 #endif
-        bool decoder_ready = helix_codec_switch(codec, codec_kind) == 0;
+        bool decoder_ready = codec
+            ? helix_codec_switch(codec, codec_kind) == 0
+            : (codec = helix_codec_create(codec_kind,
+                                          CODEC_HEAP_RESERVE_BYTES)) != NULL;
 #if YORADIO_ESP8266_AUDIO_PROFILE
         ESP_LOGI(TAG, "Profile decoder switch end: ready=%d free_heap=%u",
                  decoder_ready, (unsigned)esp_get_free_heap_size());
@@ -535,8 +572,10 @@ static void audio_task(void *argument) {
             close(stream.socket);
             native_state_set_audio(false, false, "DECODER INIT ERROR");
             network_service_set_streaming(false);
+            release_codec(&codec, &codec_kind, "decoder init error");
             continue;
         }
+        log_audio_stack("decoder ready");
         output_context_t output = {
             .generation = command.generation,
             .codec_kind = codec_kind,
@@ -608,34 +647,30 @@ static void audio_task(void *argument) {
             if (feed < 0)
                 ESP_LOGE(TAG, "Decoder stopped: %d (errno %d)",
                          feed, errno);
-            if (codec_kind) helix_codec_switch(codec, codec_kind);
-            codec_kind = 0;
+            release_codec(&codec, &codec_kind,
+                          feed < 0 ? "stream error" : "stream end");
             native_state_set_audio(false, false,
                                    feed < 0 ? "AUDIO STREAM ERROR" : NULL);
             network_service_set_streaming(false);
+            log_audio_stack("stream complete");
         }
     }
 }
 
 esp_err_t audio_service_init(void) {
+    /* Reserve only the shared 32-bit arena while executable-capable IRAM is
+     * still available. Input, PCM and decoder state remain lazy and are not
+     * allocated until the stream signature has identified its codec. */
     if (!helix_codec_prepare()) return ESP_ERR_NO_MEM;
     s_commands = xQueueCreate(1, sizeof(audio_command_t));
     if (!s_commands) return ESP_ERR_NO_MEM;
-    helix_codec_t *codec =
-        helix_codec_create(HELIX_CODEC_MP3, CODEC_HEAP_RESERVE_BYTES);
-    if (!codec) {
-        vQueueDelete(s_commands);
-        s_commands = NULL;
-        return ESP_ERR_NO_MEM;
-    }
-    if (xTaskCreate(audio_task, "audio", AUDIO_STACK_BYTES, codec, 5, NULL) !=
+    if (xTaskCreate(audio_task, "audio", AUDIO_STACK_BYTES, NULL, 5, NULL) !=
         pdPASS) {
-        helix_codec_destroy(codec);
         vQueueDelete(s_commands);
         s_commands = NULL;
         return ESP_ERR_NO_MEM;
     }
-    ESP_LOGI(TAG, "Workspace %u bytes; required heap reserve %u bytes",
+    ESP_LOGI(TAG, "Codec state is lazy; maximum %u bytes, reserve %u",
              (unsigned)helix_codec_workspace_size(),
              (unsigned)CODEC_HEAP_RESERVE_BYTES);
     return ESP_OK;

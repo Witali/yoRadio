@@ -13,6 +13,7 @@
 namespace {
 constexpr unsigned kWarmupFrames = 8;
 constexpr unsigned kMeasuredFrames = 200;
+constexpr unsigned kLifecycleCycles = 50;
 constexpr size_t kMaxFrameBytes = 1536;
 constexpr char kTag[] = "codec_ram";
 
@@ -163,6 +164,8 @@ void run_codec(const char *name, helix_codec_kind_t kind,
 
     OutputStats output = {};
     const size_t arena_bytes = helix_codec_arena_used(codec);
+    const size_t dram_bytes = helix_codec_dram_used(codec);
+    const size_t iram_bytes = helix_codec_iram_used(codec);
     uint32_t elapsed = 0;
     for (unsigned index = 0; index < kWarmupFrames; ++index) {
         if (!submit_frame(codec, frame_ram, fixture.size, &output, &elapsed)) {
@@ -202,7 +205,7 @@ void run_codec(const char *name, helix_codec_kind_t kind,
              "%s RAM frame=%u bytes iterations=%u callbacks=%u "
              "decode=%u us avg=%u us min=%u us max=%u us "
              "audio=%u us realtime=%u.%u%% speed=%u.%03ux heap=%u "
-             "workspace=%u arena=%u",
+             "workspace=%u arena=%u dram=%u iram=%u",
              name, static_cast<unsigned>(fixture.size), kMeasuredFrames,
              static_cast<unsigned>(output.callbacks),
              static_cast<unsigned>(total_us),
@@ -212,9 +215,65 @@ void run_codec(const char *name, helix_codec_kind_t kind,
              speed_x1000 / 1000U, speed_x1000 % 1000U,
              static_cast<unsigned>(esp_get_free_heap_size()),
              static_cast<unsigned>(helix_codec_workspace_size()),
-             static_cast<unsigned>(arena_bytes));
+             static_cast<unsigned>(arena_bytes),
+             static_cast<unsigned>(dram_bytes),
+             static_cast<unsigned>(iram_bytes));
     report_stage_profile(name, total_us);
     helix_codec_destroy(codec);
+}
+
+void update_minimum_heap(uint32_t *minimum) {
+    *minimum = std::min(*minimum,
+                        static_cast<uint32_t>(esp_get_free_heap_size()));
+}
+
+void run_lifecycle_stress() {
+    const uint32_t initial_heap = esp_get_free_heap_size();
+    uint32_t minimum_heap = initial_heap;
+    unsigned completed_creates = 0;
+    for (unsigned cycle = 0; cycle < kLifecycleCycles; ++cycle) {
+        helix_codec_t *codec = helix_codec_create(HELIX_CODEC_MP3, 0);
+        if (!codec) {
+            ESP_LOGE(kTag, "lifecycle create failed at %u", cycle);
+            break;
+        }
+        update_minimum_heap(&minimum_heap);
+        helix_codec_destroy(codec);
+        update_minimum_heap(&minimum_heap);
+        ++completed_creates;
+    }
+
+    unsigned completed_switches = 0;
+    helix_codec_t *codec = helix_codec_create(HELIX_CODEC_MP3, 0);
+    if (codec) {
+        update_minimum_heap(&minimum_heap);
+        for (unsigned cycle = 0; cycle < kLifecycleCycles; ++cycle) {
+#if CONFIG_YORADIO_HELIX_AAC
+            helix_codec_kind_t kind = (cycle & 1U)
+                ? HELIX_CODEC_MP3 : HELIX_CODEC_AAC;
+#else
+            helix_codec_kind_t kind = HELIX_CODEC_MP3;
+#endif
+            if (helix_codec_switch(codec, kind) != 0) {
+                ESP_LOGE(kTag, "lifecycle switch failed at %u", cycle);
+                break;
+            }
+            update_minimum_heap(&minimum_heap);
+            ++completed_switches;
+        }
+        helix_codec_destroy(codec);
+    }
+    const uint32_t final_heap = esp_get_free_heap_size();
+    const int32_t delta = static_cast<int32_t>(final_heap) -
+                          static_cast<int32_t>(initial_heap);
+    ESP_LOGI(kTag,
+             "lifecycle creates=%u switches=%u initial=%u minimum=%u "
+             "final=%u delta=%d",
+             completed_creates, completed_switches, initial_heap,
+             minimum_heap, final_heap, delta);
+    if (completed_creates != kLifecycleCycles ||
+        completed_switches != kLifecycleCycles || delta != 0)
+        ESP_LOGE(kTag, "lifecycle memory regression detected");
 }
 
 } // namespace
@@ -268,5 +327,6 @@ extern "C" void codec_ram_benchmark_run(void) {
                               _binary_stereo_320_aac_end -
                               _binary_stereo_320_aac_start));
 #endif
+    run_lifecycle_stress();
     ESP_LOGI(kTag, "complete");
 }

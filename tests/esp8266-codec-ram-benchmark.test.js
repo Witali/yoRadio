@@ -22,6 +22,9 @@ test("ESP8266 RAM codec benchmark embeds golden fixtures and bypasses services",
   );
   assert.match(benchmark, /memcpy\(frame_ram, fixture\.data, fixture\.size\)/);
   assert.match(benchmark, /kMeasuredFrames\s*=\s*200/);
+  assert.match(benchmark, /kLifecycleCycles\s*=\s*50/);
+  assert.match(benchmark, /lifecycle creates=%u switches=%u/);
+  assert.match(benchmark, /delta != 0/);
   assert.match(benchmark, /esp_timer_get_time\(\)[\s\S]*helix_codec_commit/);
   assert.match(benchmark, /s_stage_started\[stage\] = esp_timer_get_time\(\)/);
   assert.match(benchmark, /stage=%s time=%u us avg=%u us max=%u us/);
