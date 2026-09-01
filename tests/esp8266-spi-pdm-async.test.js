@@ -24,18 +24,35 @@ test("ESP8266 SPI-PDM drains a bounded queue from the transfer-done interrupt", 
 test("ESP8266 SPI-PDM producer sleeps only when its bounded queue is full", () => {
   assert.match(
     output,
-    /s_spi_queue_count < SPI_PDM_QUEUE_CHUNKS[\s\S]*spi_pdm_start_next_locked\(\)/,
+    /spi_pdm_acquire[\s\S]*s_spi_queue_count < SPI_PDM_QUEUE_CHUNKS/,
   );
+  assert.match(output, /spi_pdm_commit[\s\S]*spi_pdm_start_next_locked\(\)/);
   assert.match(output, /ulTaskNotifyTake\(pdTRUE,/);
   assert.doesNotMatch(output, /while \(SPI1\.cmd\.usr\)/);
   assert.doesNotMatch(output, /spi_trans\(HSPI_HOST/);
   assert.doesNotMatch(component, /--wrap=spi_trans/);
 });
 
+test("ESP8266 PDM producer fills a reserved queue slot without an intermediate copy", () => {
+  const write = output.slice(
+    output.indexOf("esp_err_t native_audio_output_write"),
+    output.indexOf("void native_audio_output_silence"),
+  );
+  assert.match(
+    output,
+    /spi_pdm_acquire\(&?chunk\)[\s\S]*\(\*chunk\)->words\[word\][\s\S]*spi_pdm_commit\(\*chunk,/,
+  );
+  assert.doesNotMatch(write, /uint32_t words\[SPI_PDM_CHUNK_WORDS\]/);
+  assert.doesNotMatch(
+    output,
+    /chunk->words\[index\]\s*=\s*words\[index\]/,
+  );
+});
+
 test("ESP8266 SPI-PDM drains queued sound before forcing silence", () => {
   assert.match(
     output,
-    /void native_audio_output_silence\(void\)[\s\S]*spi_pdm_wait_idle\(\)[\s\S]*spi_pdm_send\(silence, SPI_PDM_CHUNK_BITS\)[\s\S]*spi_pdm_wait_idle\(\)/,
+    /void native_audio_output_silence\(void\)[\s\S]*spi_pdm_wait_idle\(\)[\s\S]*spi_pdm_acquire\(&silence\)[\s\S]*spi_pdm_commit\(silence, SPI_PDM_CHUNK_BITS\)[\s\S]*spi_pdm_wait_idle\(\)/,
   );
 });
 

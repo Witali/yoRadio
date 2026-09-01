@@ -13,8 +13,10 @@ Configure the native ESP8266 firmware with:
     -DYORADIO_ESP8266_AUDIO_PROFILE=ON
     -DYORADIO_ESP8266_AUDIO_PROFILE_URL=http://<PC-IP>:8765/stream.bin
 
-Use esp8266/rtos-sdk-native/sdkconfig.audio-profile.defaults so FreeRTOS
-runtime counters are enabled. To discard PCM after decode and bypass
+Use `esp8266/rtos-sdk-native/sdkconfig.audio-profile-qio80.defaults` for the
+reproducible 160 MHz/QIO80 profile with FreeRTOS runtime counters. The older
+`sdkconfig.audio-profile.defaults` fragment only enables those counters and is
+kept for custom configurations. To discard PCM after decode and bypass
 normalization, PDM conversion, queueing, and physical output, also set:
 
     -DYORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY=ON
@@ -33,3 +35,29 @@ Summarize one or more logs:
 
 The summary uses the median of complete windows that include a CPU sample.
 The first window is a runtime-counter baseline and is intentionally excluded.
+
+## Generated-PCM physical-output profile
+
+For a decoder- and network-independent SPI-PDM measurement, configure the same
+QIO80 sdkconfig with:
+
+    -DYORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=ON
+
+This profile never starts Wi-Fi and never creates an MP3/AAC decoder. It
+generates a deterministic 48-kHz stereo block in static RAM, submits the same
+128 frames/512 bytes to `native_audio_output_write()`, and reports write time,
+SPI queue wait, whole-CPU busy/idle, and free/minimum heap after a two-second
+warm-up and ten-second measurement. The saved Kconfig baseline is:
+
+    esp8266/rtos-sdk-native/sdkconfig.audio-profile-qio80.defaults
+
+SPI-PDM on GPIO13/D7 is the default. To run the identical generator through
+the ESP8266 fixed I2S DMA pins instead, add:
+
+    -DYORADIO_ESP8266_FIXED_I2S=ON
+
+The I2S mapping is DATA GPIO3/RX, BCLK GPIO15/D8, LRCLK GPIO2/D4. GPIO3
+conflicts with UART RX, so use this variant only with the documented wiring;
+UART TX logging on GPIO1 remains available. The benchmark is deliberately a
+build profile rather than production behavior and must be followed by
+restoring the normal application image.

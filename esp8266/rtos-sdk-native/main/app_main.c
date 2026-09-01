@@ -27,9 +27,17 @@ static const char *TAG = "yoradio8266";
 #if YORADIO_ESP8266_CODEC_RAM_BENCHMARK
 void codec_ram_benchmark_run(void);
 #endif
+#if YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+void audio_output_benchmark_run(void);
+#endif
 
 void app_main(void) {
-#if YORADIO_ESP8266_CODEC_RAM_BENCHMARK
+#if YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+    ESP_LOGI(TAG, "isolated generated-PCM audio output benchmark; "
+                  "Wi-Fi and codecs disabled");
+    audio_output_benchmark_run();
+    for (;;) vTaskDelay(portMAX_DELAY);
+#elif YORADIO_ESP8266_CODEC_RAM_BENCHMARK
     ESP_LOGI(TAG, "isolated codec RAM benchmark; Wi-Fi and audio output disabled");
     codec_ram_benchmark_run();
     for (;;) vTaskDelay(portMAX_DELAY);
