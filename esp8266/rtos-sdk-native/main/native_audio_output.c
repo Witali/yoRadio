@@ -81,6 +81,7 @@ static volatile uint8_t s_spi_queue_tail;
 static volatile uint8_t s_spi_queue_count;
 static volatile bool s_spi_active;
 static volatile TaskHandle_t s_spi_waiter;
+static volatile bool s_spi_waiting;
 
 #if YORADIO_ESP8266_AUDIO_PROFILE
 extern void audio_profile_spi_wait_begin(void);
@@ -124,7 +125,11 @@ static void IRAM_ATTR spi_pdm_event(int event, void *arg) {
     if (event != SPI_TRANS_DONE_EVENT) return;
     BaseType_t higher_task_woken = pdFALSE;
     spi_pdm_start_next_locked();
-    TaskHandle_t waiter = s_spi_waiter;
+    TaskHandle_t waiter = NULL;
+    if (s_spi_waiting) {
+        s_spi_waiting = false;
+        waiter = s_spi_waiter;
+    }
     if (waiter) vTaskNotifyGiveFromISR(waiter, &higher_task_woken);
     if (higher_task_woken) portYIELD_FROM_ISR();
 }
@@ -157,10 +162,10 @@ static esp_err_t spi_pdm_acquire(spi_pdm_chunk_t **out) {
     if (!out) return ESP_ERR_INVALID_ARG;
     esp_err_t result = spi_pdm_select_pin();
     if (result != ESP_OK) return result;
-    s_spi_waiter = xTaskGetCurrentTaskHandle();
     for (;;) {
         taskENTER_CRITICAL();
         if (s_spi_queue_count < SPI_PDM_QUEUE_CHUNKS) {
+            s_spi_waiting = false;
             spi_pdm_chunk_t *chunk = &s_spi_queue[s_spi_queue_tail];
             taskEXIT_CRITICAL();
             memset(chunk->words, 0, sizeof(chunk->words));
@@ -168,8 +173,15 @@ static esp_err_t spi_pdm_acquire(spi_pdm_chunk_t **out) {
             *out = chunk;
             return ESP_OK;
         }
+        s_spi_waiter = xTaskGetCurrentTaskHandle();
+        s_spi_waiting = true;
         taskEXIT_CRITICAL();
-        if (!spi_pdm_wait_notification()) return ESP_ERR_TIMEOUT;
+        if (!spi_pdm_wait_notification()) {
+            taskENTER_CRITICAL();
+            s_spi_waiting = false;
+            taskEXIT_CRITICAL();
+            return ESP_ERR_TIMEOUT;
+        }
     }
 }
 
@@ -192,13 +204,23 @@ static esp_err_t spi_pdm_commit(spi_pdm_chunk_t *chunk, size_t bit_count) {
 }
 
 static esp_err_t spi_pdm_wait_idle(void) {
-    s_spi_waiter = xTaskGetCurrentTaskHandle();
     for (;;) {
         taskENTER_CRITICAL();
         bool idle = !s_spi_active && !s_spi_queue_count;
+        if (idle) {
+            s_spi_waiting = false;
+        } else {
+            s_spi_waiter = xTaskGetCurrentTaskHandle();
+            s_spi_waiting = true;
+        }
         taskEXIT_CRITICAL();
         if (idle) return ESP_OK;
-        if (!spi_pdm_wait_notification()) return ESP_ERR_TIMEOUT;
+        if (!spi_pdm_wait_notification()) {
+            taskENTER_CRITICAL();
+            s_spi_waiting = false;
+            taskEXIT_CRITICAL();
+            return ESP_ERR_TIMEOUT;
+        }
     }
 }
 
@@ -253,6 +275,7 @@ esp_err_t native_audio_output_init(void) {
         s_spi_queue_count = 0;
         s_spi_active = false;
         s_spi_waiter = NULL;
+        s_spi_waiting = false;
         s_spi_initialized = true;
         s_spi_pin_selected = true;
     }
@@ -333,6 +356,7 @@ void native_audio_output_silence(void) {
     s_spi_queue_tail = 0;
     s_spi_queue_count = 0;
     s_spi_active = false;
+    s_spi_waiting = false;
     taskEXIT_CRITICAL();
     gpio_set_direction(BOARD_SPI_PDM_DATA_GPIO, GPIO_MODE_OUTPUT);
     gpio_set_level(BOARD_SPI_PDM_DATA_GPIO, 0);

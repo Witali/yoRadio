@@ -49,6 +49,18 @@ test("ESP8266 SPI-PDM producer sleeps only when its bounded queue is full", () =
   assert.doesNotMatch(component, /--wrap=spi_trans/);
 });
 
+test("ESP8266 SPI-PDM interrupt only wakes a producer that is actually blocked", () => {
+  assert.match(output, /static volatile bool s_spi_waiting/);
+  assert.match(
+    output,
+    /spi_pdm_event[\s\S]*if \(s_spi_waiting\)[\s\S]*s_spi_waiting = false[\s\S]*vTaskNotifyGiveFromISR/,
+  );
+  assert.match(
+    output,
+    /s_spi_queue_count < SPI_PDM_QUEUE_CHUNKS[\s\S]*s_spi_waiting = false[\s\S]*s_spi_waiter = xTaskGetCurrentTaskHandle\(\)[\s\S]*s_spi_waiting = true/,
+  );
+});
+
 test("ESP8266 PDM producer fills a reserved queue slot without an intermediate copy", () => {
   const write = output.slice(
     output.indexOf("esp_err_t native_audio_output_write"),
