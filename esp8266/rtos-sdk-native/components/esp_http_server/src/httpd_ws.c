@@ -320,6 +320,9 @@ esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t 
     if (!sess) {
         return ESP_ERR_INVALID_ARG;
     }
+    if (!sess->ws_handshake_done || sess->ws_close) {
+        return ESP_ERR_INVALID_STATE;
+    }
 
     /* Send off header */
     if (sess->send_fn(hd, fd, (const char *)header_buf, tx_len, 0) < 0) {
@@ -336,6 +339,17 @@ esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t 
     }
 
     return ESP_OK;
+}
+
+httpd_ws_client_info_t httpd_ws_get_fd_info(httpd_handle_t hd, int fd)
+{
+    struct sock_db *sess = httpd_sess_get(hd, fd);
+    if (sess == NULL) {
+        return HTTPD_WS_CLIENT_INVALID;
+    }
+    bool is_active_ws = sess->ws_handshake_done && !sess->ws_close;
+    return is_active_ws ? HTTPD_WS_CLIENT_WEBSOCKET
+                        : HTTPD_WS_CLIENT_HTTP;
 }
 
 esp_err_t httpd_ws_get_frame_type(httpd_req_t *req)

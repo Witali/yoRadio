@@ -25,7 +25,12 @@
 #include "esp_httpd_priv.h"
 
 static const char *TAG = "httpd_txrx";
+#ifdef CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS
+#define HTTPD_SEND_RETRY_TIMEOUT_MS \
+    (CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS * 1000U)
+#else
 #define HTTPD_SEND_RETRY_TIMEOUT_MS 5000U
+#endif
 
 esp_err_t httpd_sess_set_send_override(httpd_handle_t hd, int sockfd, httpd_send_func_t send_func)
 {

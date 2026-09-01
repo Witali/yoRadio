@@ -52,6 +52,18 @@ const playlistSource = fs.readFileSync(
   path.resolve(__dirname, "..", "esp8266", "rtos-sdk-native", "main", "playlist_service.c"),
   "utf8",
 );
+const httpServerHeader = fs.readFileSync(
+  path.resolve(__dirname, "..", "esp8266", "rtos-sdk-native", "components", "esp_http_server", "include", "esp_http_server.h"),
+  "utf8",
+);
+const httpWebSocketSource = fs.readFileSync(
+  path.resolve(__dirname, "..", "esp8266", "rtos-sdk-native", "components", "esp_http_server", "src", "httpd_ws.c"),
+  "utf8",
+);
+const httpParserSource = fs.readFileSync(
+  path.resolve(__dirname, "..", "esp8266", "rtos-sdk-native", "components", "esp_http_server", "src", "httpd_parse.c"),
+  "utf8",
+);
 
 test("ESP8266 WebSocket handler completes HTTP upgrade before reading frames", () => {
   const handler = source.slice(source.indexOf("static esp_err_t websocket_handler"));
@@ -81,6 +93,29 @@ test("ESP8266 WebSocket handler reads a command in one bounded receive", () => {
   assert.doesNotMatch(
     handler,
     /httpd_ws_recv_frame\(request, &frame, 0\)/,
+  );
+});
+
+test("ESP8266 validates a saved fd before treating it as a WebSocket", () => {
+  assert.match(httpServerHeader, /httpd_ws_client_info_t httpd_ws_get_fd_info/);
+  assert.match(
+    httpWebSocketSource,
+    /sess->ws_handshake_done && !sess->ws_close/,
+  );
+  assert.match(
+    source,
+    /websocket_socket_active\(s_ws_fd\)[\s\S]*httpd_sess_trigger_close\(s_server, s_ws_fd\)/,
+  );
+  assert.match(
+    source,
+    /static void async_send_work[\s\S]*websocket_socket_active\(socket\)/,
+  );
+});
+
+test("ESP8266 parser accepts exactly HTTP 1.1", () => {
+  assert.match(
+    httpParserSource,
+    /parser->http_major != 1\) \|\| \(parser->http_minor != 1/,
   );
 });
 

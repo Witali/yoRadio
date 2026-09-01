@@ -233,7 +233,8 @@ esp_err_t httpd_uri(struct httpd_data *hd)
     /* Invoke handler */
     if (uri->handler(req) != ESP_OK) {
         /* Handler returns error, this socket should be closed */
-        ESP_LOGW(TAG, LOG_FMT("uri handler execution failed"));
+        ESP_LOGW(TAG, LOG_FMT("uri handler execution failed for %s"),
+                 req->uri);
         return ESP_FAIL;
     }
     return ESP_OK;

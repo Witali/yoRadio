@@ -10,10 +10,12 @@ config YORADIO_HELIX_AAC
 
 config YORADIO_WEB_SEND_TIMEOUT_SECONDS
     int "Web content send timeout (seconds)"
-    range 5 120
-    default 20
+    range 1 30
+    default 2
     help
-        Maximum time a static-content worker waits for one socket send.
+        Maximum time the shared HTTP task waits for one stalled socket send.
+        Keep this short because one blocked client otherwise stops WebSocket
+        and static-file service for every browser.
 
 config YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS
     int "Recovery access point delay (seconds)"

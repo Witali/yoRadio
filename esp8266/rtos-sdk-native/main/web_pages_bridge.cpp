@@ -1,4 +1,5 @@
 #define YORADIO_WEB_PAGES_ONLY
+#define YORADIO_WEB_SEQUENTIAL_LOAD
 #define PROGMEM
 #include "../../../yoRadio/src/core/netserver.h"
 

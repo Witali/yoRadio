@@ -1211,9 +1211,17 @@ typedef struct httpd_ws_frame {
     size_t len;
 } httpd_ws_frame_t;
 
+/** Classification of a socket currently owned by the HTTP server. */
+typedef enum {
+    HTTPD_WS_CLIENT_INVALID = 0,
+    HTTPD_WS_CLIENT_HTTP,
+    HTTPD_WS_CLIENT_WEBSOCKET,
+} httpd_ws_client_info_t;
+
 esp_err_t httpd_ws_recv_frame(httpd_req_t *req, httpd_ws_frame_t *pkt, size_t max_len);
 esp_err_t httpd_ws_send_frame(httpd_req_t *req, httpd_ws_frame_t *pkt);
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t *frame);
+httpd_ws_client_info_t httpd_ws_get_fd_info(httpd_handle_t hd, int fd);
 #endif
 
 #ifdef __cplusplus

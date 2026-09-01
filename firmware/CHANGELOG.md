@@ -5,6 +5,24 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-01
 
+### ESP8266 native persistent WebUI server
+
+- Changed static WebUI delivery to standard HTTP/1.1 persistence: every
+  response is explicitly framed and the browser reuses one keep-alive
+  connection instead of reopening TCP for each asset.
+- Serialized the ESP8266-only asset loader while retaining the common YoRadio
+  HTML, JavaScript and CSS sources used by the other firmware targets.
+- Increased the bounded server capacity to four active Web sessions and a
+  three-connection listen backlog, with short idle expiry and LRU recovery.
+- Backported the standard WebSocket connection-state query and stopped stale,
+  reused file descriptors from closing an unrelated HTTP request.
+- Flashed the QIO 80 MHz image on the physical Wemos D1 mini. With WebSocket
+  open, nine page resources reused one HTTP socket; live playlist-row Play,
+  Stop, Toggle, Next and Previous scenarios passed, along with 42 focused
+  regressions.
+- Replaced the checked development application and recorded its exact hash in
+  [`development/esp8266-native-qio80/`](development/esp8266-native-qio80/).
+
 ### ESP8266 native QIO 80 MHz experiment
 
 - Added a separate `sdkconfig.qio80.defaults` profile while retaining QIO

@@ -22,6 +22,8 @@
 #define WS_COMMAND_MAX 255U
 #define WEB_STATUS_CAPACITY 1280U
 #define WEB_MAX_OPEN_SOCKETS 4U
+#define WEB_CONNECTION_BACKLOG 3U
+#define WEB_IDLE_TIMEOUT_SECONDS 2U
 
 extern const unsigned char _binary_script_js_gz_start[];
 extern const unsigned char _binary_script_js_gz_end[];
@@ -167,10 +169,16 @@ static esp_err_t ws_send(httpd_req_t *request, const char *text) {
     return httpd_ws_send_frame(request, &frame);
 }
 
+static bool websocket_socket_active(int socket) {
+    return s_server && socket >= 0 &&
+           httpd_ws_get_fd_info(s_server, socket) ==
+               HTTPD_WS_CLIENT_WEBSOCKET;
+}
+
 static void async_send_work(void *argument) {
     (void)argument;
     int socket = s_ws_fd;
-    if (socket >= 0) {
+    if (websocket_socket_active(socket)) {
         httpd_ws_frame_t frame = {
             .final = true,
             .fragmented = false,
@@ -180,13 +188,21 @@ static void async_send_work(void *argument) {
         };
         if (httpd_ws_send_frame_async(s_server, socket, &frame) != ESP_OK) {
             s_ws_fd = -1;
+        } else {
+            httpd_sess_update_lru_counter(s_server, socket);
         }
+    } else {
+        s_ws_fd = -1;
     }
     s_send_pending = false;
 }
 
 static bool queue_message(const char *message) {
     if (!s_server || s_ws_fd < 0 || s_send_pending) return false;
+    if (!websocket_socket_active(s_ws_fd)) {
+        s_ws_fd = -1;
+        return false;
+    }
     copy_text(s_async_message, sizeof(s_async_message), message);
     s_send_pending = true;
     if (httpd_queue_work(s_server, async_send_work, NULL) != ESP_OK) {
@@ -445,7 +461,8 @@ static esp_err_t websocket_handler(httpd_req_t *request) {
     }
 
     int socket = httpd_req_to_sockfd(request);
-    if (s_ws_fd >= 0 && s_ws_fd != socket) {
+    if (s_ws_fd >= 0 && s_ws_fd != socket &&
+        websocket_socket_active(s_ws_fd)) {
         httpd_sess_trigger_close(s_server, s_ws_fd);
     }
     s_ws_fd = socket;
@@ -503,19 +520,14 @@ static bool web_ui_available(void) {
     return true;
 }
 
-static void prepare_short_response(httpd_req_t *request) {
-    /* Static responses do not need to retain one of the ESP8266's scarce TCP
-     * sessions. Advertising the close is required by HTTP/1.1 before the
-     * response body is sent. */
-    httpd_resp_set_hdr(request, "Connection", "close");
-}
-
 static esp_err_t finish_short_response(httpd_req_t *request,
                                        esp_err_t result) {
-    /* Queue the close after send() has accepted the complete response. The
-     * HTTP server processes this control message after the handler returns. */
-    (void)httpd_sess_trigger_close(request->handle,
-                                  httpd_req_to_sockfd(request));
+    /* HTTP/1.1 is persistent by default. Every response emitted here has
+     * self-defined framing (Content-Length or a terminating zero chunk), so
+     * the connection can safely carry the next request. Do not emit the
+     * obsolete HTTP/1.0 Keep-Alive header and do not force a close. The HTTP
+     * server reclaims an idle session after WEB_IDLE_TIMEOUT_SECONDS. */
+    (void)request;
     return result;
 }
 
@@ -528,7 +540,6 @@ static const char *asset_type(const char *uri) {
 }
 
 static esp_err_t page_handler(httpd_req_t *request) {
-    prepare_short_response(request);
     if (request_path_equals(request, "/") && !web_ui_available()) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
@@ -542,7 +553,6 @@ static esp_err_t page_handler(httpd_req_t *request) {
 }
 
 static esp_err_t variables_handler(httpd_req_t *request) {
-    prepare_short_response(request);
     native_state_t state;
     native_state_snapshot(&state);
     char body[240];
@@ -561,7 +571,6 @@ static esp_err_t variables_handler(httpd_req_t *request) {
 }
 
 static esp_err_t asset_handler(httpd_req_t *request) {
-    prepare_short_response(request);
     if (request_path_equals(request, "/script.js")) {
         httpd_resp_set_type(request, "application/javascript; charset=utf-8");
         httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
@@ -609,7 +618,6 @@ static esp_err_t asset_handler(httpd_req_t *request) {
 }
 
 static esp_err_t playlist_handler(httpd_req_t *request) {
-    prepare_short_response(request);
     FILE *file = open_nonempty(PLAYLIST_PATH);
     if (!file || !playlist_service_count()) {
         if (file) fclose(file);
@@ -631,7 +639,6 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
 }
 
 static esp_err_t status_handler(httpd_req_t *request) {
-    prepare_short_response(request);
     native_state_t state;
     native_state_snapshot(&state);
     char station[260];
@@ -652,7 +659,6 @@ static esp_err_t status_handler(httpd_req_t *request) {
 }
 
 static esp_err_t favicon_handler(httpd_req_t *request) {
-    prepare_short_response(request);
     httpd_resp_set_type(request, "image/x-icon");
     return finish_short_response(request, httpd_resp_send(request, NULL, 0));
 }
@@ -691,11 +697,15 @@ esp_err_t web_service_start(void) {
     config.server_port = 80;
     config.stack_size = BOARD_TASK_STACK_WEB;
     config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
-    config.backlog_conn = 1;
+    config.backlog_conn = WEB_CONNECTION_BACKLOG;
+    config.recv_wait_timeout = WEB_IDLE_TIMEOUT_SECONDS;
     config.max_uri_handlers = 18;
-    /* Reject excess connections immediately instead of evicting an active
-     * transfer or the WebSocket. Static handlers close their own sessions. */
-    config.lru_purge_enable = false;
+    /* The ESP8266 page loader serializes static requests so one persistent
+     * HTTP/1.1 session normally serves the whole page beside the WebSocket.
+     * Four sessions allow one complete UI (WebSocket + HTTP keep-alive) and
+     * one reconnecting or diagnostic client. Queue a small connection burst
+     * and evict the oldest idle session before exhausting heap. */
+    config.lru_purge_enable = true;
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
     esp_err_t result = httpd_start(&s_server, &config);
     if (result != ESP_OK) return result;
@@ -742,6 +752,10 @@ void web_service_notify_playlist_changed(void) {
 
 void web_service_poll(void) {
     if (!s_server || s_ws_fd < 0 || s_send_pending) return;
+    if (!websocket_socket_active(s_ws_fd)) {
+        s_ws_fd = -1;
+        return;
+    }
     if (s_current_pending) {
         char current[40];
         snprintf(current, sizeof(current), "{\"current\":%u}",

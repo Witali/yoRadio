@@ -7,6 +7,8 @@
 - JEDEC ID: `5E:4016`
 - Audio: mono SPI-PDM on GPIO13/D7
 - SDK: ESP8266 RTOS SDK v3.4
+- Source: `esp8266/rtos-sdk-native` from the source tree committed with this manifest
+- Profile: development, `-O3`, Helix MP3/AAC, shared ESP HTTP Server task
 
 The ESP8266 ROM loads the bootloader through its DIO-compatible image header.
 The QIO-configured bootloader then enables Quad I/O at 80 MHz before loading
@@ -18,7 +20,7 @@ the application. Flash all three images without erasing NVS or SPIFFS:
 
 SHA-256:
 
-- `app.bin`: `10C6420BD67DDBBF173A3A3977172F52C71A57B59627B9994747BBBF6FC1A074`
+- `app.bin` (670,848 bytes): `1CF122A5266A871707FE8A48A5C44262732065E983EEB569345324C1EBA937E8`
 - `bootloader.bin`: `34A628DA55749D0C72ED3BC78EDA60B29DE6D341A8E54E70AE05CFF772219A85`
 - `partition-table.bin`: `C3AEC2B0CC450D37286B5D832556268970CF0F63AA31250C94A21116D22A22DF`
 
@@ -49,4 +51,10 @@ Physical validation on COM10:
 - WebUI root, `/api/native/status`, and `/data/playlist.csv` returned HTTP 200;
 - 20 consecutive status requests succeeded;
 - eight consecutive 36,086-byte playlist reads from SPIFFS succeeded;
+- with WebSocket `/ws` open, the HTML shell, variables, four shared assets,
+  player fragment, logo and 36,086-byte playlist all returned HTTP 200 over
+  one reused HTTP/1.1 connection, with valid Content-Length or chunked framing;
+- live WebUI commands verified the full settings response, playlist-row Play,
+  Stop, Toggle, Next and Previous state updates on the physical board;
+- 42 focused HTTP, WebSocket and shared-WebUI regression tests passed;
 - the board was intentionally left running with QIO at 80 MHz.

@@ -76,6 +76,43 @@ const char index_html[] PROGMEM = R"(
     const bootToken = Date.now().toString(36);
     document.write(`<script type="text/javascript" src="variables.js?boot=${bootToken}"><\/script>`);
   </script>
+)"
+#ifdef YORADIO_WEB_SEQUENTIAL_LOAD
+R"(
+  <script>
+    const uiSuffix = `?ui=${encodeURIComponent(webUiRevision)}`;
+    const requestedUi = new URLSearchParams(window.location.search).get('ui');
+    if(requestedUi !== webUiRevision) {
+      window.history.replaceState(null, '', `${window.location.pathname}${uiSuffix}`);
+    }
+    const loadUiElement = (tag, configure) => new Promise((resolve, reject) => {
+      const element = document.createElement(tag);
+      configure(element);
+      element.onload = resolve;
+      element.onerror = () => reject(new Error(`Unable to load ${element.href || element.src}`));
+      document.head.appendChild(element);
+    });
+    (async () => {
+      await loadUiElement('link', element => {
+        element.rel = 'stylesheet'; element.href = `theme.css${uiSuffix}`;
+      });
+      await loadUiElement('link', element => {
+        element.rel = 'stylesheet'; element.href = `style.css${uiSuffix}`;
+      });
+      await loadUiElement('script', element => {
+        element.src = `script.js${uiSuffix}`;
+      });
+      window.removeEventListener('load', onLoad);
+      await loadUiElement('script', element => {
+        element.src = `dragpl.js${uiSuffix}`;
+      });
+      if(document.readyState === 'complete') onLoad();
+      else window.addEventListener('load', onLoad, {once: true});
+    })().catch(error => console.log('WebUI loading failed:', error.message));
+  </script>
+)"
+#else
+R"(
   <script>
     const uiSuffix = `?ui=${encodeURIComponent(webUiRevision)}`;
     const requestedUi = new URLSearchParams(window.location.search).get('ui');
@@ -87,6 +124,9 @@ const char index_html[] PROGMEM = R"(
     document.write(`<script type="text/javascript" src="script.js${uiSuffix}"><\/script>`);
     document.write(`<script type="text/javascript" src="dragpl.js${uiSuffix}"><\/script>`);
   </script>
+)"
+#endif
+R"(
   </head>
 <body>
 <div id="content" class="hidden progmem">
