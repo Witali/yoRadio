@@ -239,6 +239,18 @@ void maybe_report() {
 
 extern "C" int __real_helix_codec_switch(helix_codec_t *,
                                            helix_codec_kind_t);
+extern "C" helix_codec_t *__real_helix_codec_create(helix_codec_kind_t,
+                                                       size_t);
+extern "C" helix_codec_t *__wrap_helix_codec_create(helix_codec_kind_t kind,
+                                                       size_t reserve_bytes) {
+    helix_codec_t *codec = __real_helix_codec_create(kind, reserve_bytes);
+    if (codec) {
+        s_cpu_baseline_valid = false;
+        reset_profile(kind);
+    }
+    return codec;
+}
+
 extern "C" int __wrap_helix_codec_switch(helix_codec_t *codec,
                                            helix_codec_kind_t kind) {
     int result = __real_helix_codec_switch(codec, kind);

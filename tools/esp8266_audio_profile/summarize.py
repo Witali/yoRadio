@@ -18,6 +18,11 @@ STAGE = re.compile(
     r"(?P<name>tcp_wait|frame_scan|decode_core|pcm_output|normalize|"
     r"spi_queue_wait)=(?P<ms>\d+\.\d+) ms \((?P<load>\d+\.\d+)%\)"
 )
+CODEC_STAGE = re.compile(
+    r"codec_stage=(?P<name>[a-z_]+) time=(?P<ms>\d+\.\d+) ms "
+    r"wall=(?P<wall>\d+\.\d+)% core=(?P<core>\d+\.\d+)% "
+    r"calls=(?P<calls>\d+) max=(?P<max>\d+) us rejected=(?P<rejected>\d+)"
+)
 PDM = re.compile(r"gain\+mix\+pdm=(?P<ms>\d+\.\d+) ms \((?P<load>\d+\.\d+)%\)")
 CPU = re.compile(r"cpu busy=(?P<busy>\d+\.\d+)% idle=(?P<idle>\d+\.\d+)%")
 HEAP = re.compile(
@@ -47,6 +52,14 @@ def parse_log(path: pathlib.Path) -> list[dict[str, float]]:
         if match:
             current[f"{match.group('name')}_ms"] = float(match.group("ms"))
             current[f"{match.group('name')}_load"] = float(match.group("load"))
+            continue
+        match = CODEC_STAGE.search(line)
+        if match:
+            name = match.group("name")
+            for key in ("ms", "wall", "core"):
+                current[f"codec_{name}_{key}"] = float(match.group(key))
+            for key in ("calls", "max", "rejected"):
+                current[f"codec_{name}_{key}"] = int(match.group(key))
             continue
         match = PDM.search(line)
         if match:
@@ -81,7 +94,7 @@ def main() -> None:
         if not windows:
             raise SystemExit(f"{path}: no complete CPU profile windows")
         print(
-            f"| {path.parent.parent.name}/{path.stem} | {windows[0]['codec']} | {len(windows)} | "
+            f"| {path.parent.name}/{path.stem} | {windows[0]['codec']} | {len(windows)} | "
             f"{central(windows, 'realtime'):.1f}% | "
             f"{central(windows, 'cpu_busy'):.1f}% | "
             f"{central(windows, 'cpu_idle'):.1f}% | "
@@ -92,6 +105,27 @@ def main() -> None:
             f"{central(windows, 'used'):.0f} B | "
             f"{min(int(window['min_free']) for window in windows)} B |"
         )
+
+    print()
+    print("| Run | Stage | Wall | Decoder core | Calls/window | Max call | Rejected/window |")
+    print("|---|---:|---:|---:|---:|---:|---:|")
+    for path in args.logs:
+        windows = [window for window in parse_log(path) if "cpu_busy" in window]
+        names = sorted({
+            key[len("codec_"):-len("_wall")]
+            for window in windows
+            for key in window
+            if key.startswith("codec_") and key.endswith("_wall")
+        })
+        for name in names:
+            print(
+                f"| {path.parent.name}/{path.stem} | {name} | "
+                f"{central(windows, f'codec_{name}_wall'):.1f}% | "
+                f"{central(windows, f'codec_{name}_core'):.1f}% | "
+                f"{central(windows, f'codec_{name}_calls'):.0f} | "
+                f"{central(windows, f'codec_{name}_max'):.0f} us | "
+                f"{central(windows, f'codec_{name}_rejected'):.0f} |"
+            )
 
 
 if __name__ == "__main__":

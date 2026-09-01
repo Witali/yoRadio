@@ -99,6 +99,7 @@ if(YORADIO_ESP8266_AUDIO_PROFILE)
   endif()
   target_link_libraries(${COMPONENT_LIB} INTERFACE
     "-Wl,--wrap=lwip_recv"
+    "-Wl,--wrap=helix_codec_create"
     "-Wl,--wrap=helix_codec_switch"
     "-Wl,--wrap=helix_codec_commit"
     "-Wl,--wrap=native_audio_output_write"

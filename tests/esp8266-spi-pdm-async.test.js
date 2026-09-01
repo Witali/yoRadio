@@ -116,15 +116,23 @@ test("ESP8266 streaming profile reports internal MP3 and AAC decoder stages", ()
     path.join(root, "..", "sdkconfig.audio-profile-qio80-pdm8.defaults"),
     "utf8",
   );
+  const summary = fs.readFileSync(
+    path.resolve(__dirname, "..", "tools", "esp8266_audio_profile", "summarize.py"),
+    "utf8",
+  );
 
   assert.match(profile, /codec_stage=%s time=%u\.%03u ms/);
   assert.match(profile, /helix_stage_profile_begin/);
   assert.match(profile, /helix_stage_profile_end/);
+  assert.match(component, /--wrap=helix_codec_create/);
+  assert.match(profile, /__wrap_helix_codec_create[\s\S]*reset_profile\(kind\)/);
   assert.match(profile, /"huffman", "dequant", "stereo_filter", "imdct"/);
   assert.match(defaults, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
   assert.match(defaults, /CONFIG_YORADIO_HELIX_AAC=y/);
   assert.match(defaults, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
   assert.match(defaults, /CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y/);
+  assert.match(summary, /CODEC_STAGE = re\.compile/);
+  assert.match(summary, /Decoder core/);
 });
 test("ESP8266 decode-only profile bypasses PDM while counting decoded PCM", () => {
   const profile = fs.readFileSync(
