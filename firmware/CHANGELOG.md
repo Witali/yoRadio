@@ -5,6 +5,24 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-01
 
+### ESP8266 Helix 32-bit SSO MP3 synthesis
+
+- Added an optional reduced-precision Helix polyphase path that maps the hot
+  synthesis loop to native LX106 32-bit multiply/accumulate operations without
+  adding decoder buffers. The exact 64-bit path remains available at build
+  time.
+- The retained 320-kbit/s stereo fixture kept all frames and samples, measured
+  48.50 dB PCM SNR against exact Helix, and had a maximum error of 34 signed
+  16-bit PCM levels.
+- On the physical 160-MHz Wemos D1 mini, average MP3 frame time fell from
+  13,705 to 6,414 us (53.20%); isolated throughput rose from 1.751x to 3.741x
+  realtime with unchanged codec DRAM and free heap.
+- Built and flashed the complete radio/WebUI QIO80 image. It connected at
+  `192.168.100.6`, served WebUI/status/playlist over HTTP 200, and started an
+  MP3 128-kbit/s stereo station through WebSocket control.
+- Archived the development image and exact hashes under
+  [`development/esp8266-native-qio80-sso/`](development/esp8266-native-qio80-sso/).
+
 ### ESP8266 experimental libmad IRAM frame workspace
 
 - Moved the 4,608-byte Layer III spectral workspace and 2,304-byte reorder

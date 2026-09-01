@@ -3743,6 +3743,58 @@ short ClipToShort(int x, int fracBits){
     return x;
 #endif
 }
+
+/* libmad's OPT_SSO synthesis avoids a 64-bit multiply/accumulate for every
+ * window tap by distributing the fixed-point shift between the DCT samples,
+ * the window coefficients, and the final PCM conversion. LX106 has a fast
+ * 32-bit low multiply but no 32-bit high multiply, so this is substantially
+ * cheaper than reconstructing an exact 32 x 32 -> 64 product.
+ *
+ * Helix stores vbuf as Q23 and polyCoef as Q18. The reference path therefore
+ * accumulates Q41 products and shifts the result by 26 bits. The SSO path
+ * removes 12 bits from vbuf and 4 bits from the coefficients before the
+ * multiply, leaving a Q25 accumulator and a 10-bit final shift. It uses the
+ * existing buffers and coefficient table; no persistent RAM is added.
+ */
+#if defined(YORADIO_HELIX_MP3_SSO)
+using PolyphaseAccum_t = int32_t;
+static constexpr int m_POLY_SSO_VSHIFT = 12;
+static constexpr int m_POLY_SSO_CSHIFT = 4;
+static constexpr int m_POLY_OUT_FRACBITS = 10;
+static constexpr int m_POLY_ROUND_SHIFT = m_POLY_OUT_FRACBITS - 1;
+
+static inline __attribute__((always_inline)) PolyphaseAccum_t
+PolyphaseMadd(PolyphaseAccum_t sum, int value, int coefficient) {
+    return sum + (value >> m_POLY_SSO_VSHIFT) *
+                 (coefficient >> m_POLY_SSO_CSHIFT);
+}
+
+static inline __attribute__((always_inline)) int
+PolyphaseScale(PolyphaseAccum_t sum) {
+    return sum;
+}
+#else
+using PolyphaseAccum_t = uint64_t;
+static constexpr int m_POLY_OUT_FRACBITS =
+        m_DQ_FRACBITS_OUT - 2 - 2 - 15;
+static constexpr int m_POLY_ROUND_SHIFT =
+        m_POLY_OUT_FRACBITS - 1 + (32 - m_CSHIFT);
+
+static inline __attribute__((always_inline)) PolyphaseAccum_t
+PolyphaseMadd(PolyphaseAccum_t sum, int value, int coefficient) {
+    return MADD64(sum, value, coefficient);
+}
+
+static inline __attribute__((always_inline)) int
+PolyphaseScale(PolyphaseAccum_t sum) {
+    return (int)SAR64(sum, 32 - m_CSHIFT);
+}
+#endif
+
+static inline __attribute__((always_inline)) PolyphaseAccum_t
+PolyphaseRoundValue() {
+    return (PolyphaseAccum_t)1 << m_POLY_ROUND_SHIFT;
+}
 /***********************************************************************************************************************
  * Function:    PolyphaseMono
  *
@@ -3764,9 +3816,9 @@ void PolyphaseMono(short *pcm, int *vbuf, const uint32_t *coefBase){
     const uint32_t *coef;
     int *vb1;
     int vLo, vHi, c1, c2;
-    uint64_t sum1L, sum2L, rndVal;
+    PolyphaseAccum_t sum1L, sum2L, rndVal;
 
-    rndVal = (uint64_t)( 1ULL << ((m_DQ_FRACBITS_OUT - 2 - 2 - 15) - 1 + (32 - m_CSHIFT)) );
+    rndVal = PolyphaseRoundValue();
 
     /* special case, output sample 0 */
     coef = coefBase;
@@ -3774,18 +3826,18 @@ void PolyphaseMono(short *pcm, int *vbuf, const uint32_t *coefBase){
     sum1L = rndVal;
     for(int j=0; j<8; j++){
         c1=*coef; coef++; c2=*coef; coef++; vLo=*(vb1+(j)); vHi=*(vb1+(23-(j))); // 0...7
-        sum1L=MADD64(sum1L, vLo, c1); sum1L=MADD64(sum1L, vHi, -c2);
+        sum1L=PolyphaseMadd(sum1L, vLo, c1); sum1L=PolyphaseMadd(sum1L, vHi, -c2);
     }
-    *(pcm + 0) = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+    *(pcm + 0) = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
 
     /* special case, output sample 16 */
     coef = coefBase + 256;
     vb1 = vbuf + 64*16;
     sum1L = rndVal;
     for(int j=0; j<8; j++){
-        c1=*coef; coef++; vLo=*(vb1+(j)); sum1L = MADD64(sum1L, vLo,  c1); // 0...7
+        c1=*coef; coef++; vLo=*(vb1+(j)); sum1L = PolyphaseMadd(sum1L, vLo,  c1); // 0...7
     }
-    *(pcm + 16) = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+    *(pcm + 16) = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
 
     /* main convolution loop: sum1L = samples 1, 2, 3, ... 15   sum2L = samples 31, 30, ... 17 */
     coef = coefBase + 16;
@@ -3797,12 +3849,12 @@ void PolyphaseMono(short *pcm, int *vbuf, const uint32_t *coefBase){
         sum1L = sum2L = rndVal;
         for(int j=0; j<8; j++){
             c1=*coef; coef++; c2=*coef; coef++; vLo=*(vb1+(j)); vHi = *(vb1+(23-(j)));
-            sum1L=MADD64(sum1L, vLo,  c1); sum2L = MADD64(sum2L, vLo,  c2);
-            sum1L=MADD64(sum1L, vHi, -c2); sum2L = MADD64(sum2L, vHi,  c1);
+            sum1L=PolyphaseMadd(sum1L, vLo,  c1); sum2L = PolyphaseMadd(sum2L, vLo,  c2);
+            sum1L=PolyphaseMadd(sum1L, vHi, -c2); sum2L = PolyphaseMadd(sum2L, vHi,  c1);
         }
         vb1 += 64;
-        *(pcm)       = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-        *(pcm + 2*i) = ClipToShort((int)SAR64(sum2L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+        *(pcm)       = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
+        *(pcm + 2*i) = ClipToShort(PolyphaseScale(sum2L), m_POLY_OUT_FRACBITS);
         pcm++;
     }
 }
@@ -3829,9 +3881,9 @@ void PolyphaseStereo(short *pcm, int *vbuf, const uint32_t *coefBase){
     const uint32_t *coef;
     int *vb1;
     int vLo, vHi, c1, c2;
-    uint64_t sum1L, sum2L, sum1R, sum2R, rndVal;
+    PolyphaseAccum_t sum1L, sum2L, sum1R, sum2R, rndVal;
 
-    rndVal = (uint64_t)( 1 << ((m_DQ_FRACBITS_OUT - 2 - 2 - 15) - 1 + (32 - m_CSHIFT)) );
+    rndVal = PolyphaseRoundValue();
 
     /* special case, output sample 0 */
     coef = coefBase;
@@ -3840,12 +3892,12 @@ void PolyphaseStereo(short *pcm, int *vbuf, const uint32_t *coefBase){
 
     for(int j=0; j<8; j++){
         c1=*coef; coef++; c2=*coef; coef++; vLo=*(vb1+(j)); vHi = *(vb1+(23-(j)));
-        sum1L=MADD64(sum1L, vLo,  c1); sum1L=MADD64(sum1L, vHi, -c2);
+        sum1L=PolyphaseMadd(sum1L, vLo,  c1); sum1L=PolyphaseMadd(sum1L, vHi, -c2);
         vLo=*(vb1+32+(j)); vHi=*(vb1+32+(23-(j)));
-        sum1R=MADD64(sum1R, vLo,  c1); sum1R=MADD64(sum1R, vHi, -c2); \
+        sum1R=PolyphaseMadd(sum1R, vLo,  c1); sum1R=PolyphaseMadd(sum1R, vHi, -c2); \
     }
-    *(pcm + 0) = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-    *(pcm + 1) = ClipToShort((int)SAR64(sum1R, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+    *(pcm + 0) = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
+    *(pcm + 1) = ClipToShort(PolyphaseScale(sum1R), m_POLY_OUT_FRACBITS);
 
     /* special case, output sample 16 */
     coef = coefBase + 256;
@@ -3853,11 +3905,11 @@ void PolyphaseStereo(short *pcm, int *vbuf, const uint32_t *coefBase){
     sum1L = sum1R = rndVal;
 
     for(int j=0; j<8; j++){
-        c1=*coef; coef++; vLo = *(vb1+(j)); sum1L = MADD64(sum1L, vLo,  c1);
-        vLo = *(vb1+32+(j)); sum1R = MADD64(sum1R, vLo,  c1);
+        c1=*coef; coef++; vLo = *(vb1+(j)); sum1L = PolyphaseMadd(sum1L, vLo,  c1);
+        vLo = *(vb1+32+(j)); sum1R = PolyphaseMadd(sum1R, vLo,  c1);
     }
-    *(pcm + 2*16 + 0) = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-    *(pcm + 2*16 + 1) = ClipToShort((int)SAR64(sum1R, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+    *(pcm + 2*16 + 0) = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
+    *(pcm + 2*16 + 1) = ClipToShort(PolyphaseScale(sum1R), m_POLY_OUT_FRACBITS);
 
     /* main convolution loop: sum1L = samples 1, 2, 3, ... 15   sum2L = samples 31, 30, ... 17 */
     coef = coefBase + 16;
@@ -3871,17 +3923,17 @@ void PolyphaseStereo(short *pcm, int *vbuf, const uint32_t *coefBase){
 
         for(int j=0; j<8; j++){
             c1=*coef; coef++; c2=*coef; coef++; vLo=*(vb1+(j)); vHi = *(vb1+(23-(j)));
-            sum1L=MADD64(sum1L, vLo,  c1); sum2L=MADD64(sum2L, vLo,  c2);
-            sum1L=MADD64(sum1L, vHi, -c2); sum2L=MADD64(sum2L, vHi,  c1);
+            sum1L=PolyphaseMadd(sum1L, vLo,  c1); sum2L=PolyphaseMadd(sum2L, vLo,  c2);
+            sum1L=PolyphaseMadd(sum1L, vHi, -c2); sum2L=PolyphaseMadd(sum2L, vHi,  c1);
             vLo=*(vb1+32+(j));  vHi=*(vb1+32+(23-(j)));
-            sum1R=MADD64(sum1R, vLo,  c1); sum2R=MADD64(sum2R, vLo,  c2);
-            sum1R=MADD64(sum1R, vHi, -c2); sum2R=MADD64(sum2R, vHi,  c1);
+            sum1R=PolyphaseMadd(sum1R, vLo,  c1); sum2R=PolyphaseMadd(sum2R, vLo,  c2);
+            sum1R=PolyphaseMadd(sum1R, vHi, -c2); sum2R=PolyphaseMadd(sum2R, vHi,  c1);
         }
         vb1 += 64;
-        *(pcm + 0)         = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-        *(pcm + 1)         = ClipToShort((int)SAR64(sum1R, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-        *(pcm + 2*2*i + 0) = ClipToShort((int)SAR64(sum2L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-        *(pcm + 2*2*i + 1) = ClipToShort((int)SAR64(sum2R, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+        *(pcm + 0)         = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
+        *(pcm + 1)         = ClipToShort(PolyphaseScale(sum1R), m_POLY_OUT_FRACBITS);
+        *(pcm + 2*2*i + 0) = ClipToShort(PolyphaseScale(sum2L), m_POLY_OUT_FRACBITS);
+        *(pcm + 2*2*i + 1) = ClipToShort(PolyphaseScale(sum2R), m_POLY_OUT_FRACBITS);
         pcm += 2;
     }
 }

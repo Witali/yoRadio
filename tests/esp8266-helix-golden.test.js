@@ -29,7 +29,7 @@ function findVcVars() {
   return null;
 }
 
-function compile(outputDir, name, reference) {
+function compile(outputDir, name, reference, sso = false) {
   const executable = path.join(
     outputDir, process.platform === "win32" ? `${name}.exe` : name,
   );
@@ -41,6 +41,7 @@ function compile(outputDir, name, reference) {
   ];
   const defines = ["YORADIO_ESP8266_NATIVE=1"];
   if(reference) defines.push("YORADIO_HELIX_REFERENCE_FIXED_POINT=1");
+  if(sso) defines.push("YORADIO_HELIX_MP3_SSO=1");
 
   let build;
   if(process.platform === "win32") {
@@ -83,6 +84,25 @@ function compile(outputDir, name, reference) {
   }
   assert.equal(build.status, 0, `${build.stdout}\n${build.stderr}`);
   return {executable};
+}
+
+function comparePcm(reference, candidate) {
+  assert.equal(candidate.length, reference.length, "PCM length differs");
+  let signal = 0;
+  let noise = 0;
+  let maximumError = 0;
+  for(let offset = 0; offset < reference.length; offset += 2) {
+    const expected = reference.readInt16LE(offset);
+    const actual = candidate.readInt16LE(offset);
+    const error = actual - expected;
+    signal += expected * expected;
+    noise += error * error;
+    maximumError = Math.max(maximumError, Math.abs(error));
+  }
+  return {
+    snrDb: noise === 0 ? Infinity : 10 * Math.log10(signal / noise),
+    maximumError,
+  };
 }
 
 function decode(executable, codec, fixture, output) {
@@ -128,4 +148,44 @@ test("ESP8266 optimized Helix MP3/AAC PCM matches the 64-bit reference", t => {
     assert.deepEqual(newPcm.pcm, oldPcm.pcm, `${codec} PCM bytes changed`);
     t.diagnostic(`${codec}: ${newPcm.summary}, sha256=${newPcm.sha256}`);
   }
+});
+
+test("ESP8266 Helix SSO preserves MP3 frame layout and useful PCM quality", t => {
+  const kconfig = fs.readFileSync(path.join(
+    root, "esp8266", "rtos-sdk-native", "main", "Kconfig.projbuild",
+  ), "utf8");
+  const cmake = fs.readFileSync(path.join(
+    root, "esp8266", "rtos-sdk-native", "components", "helix_codecs",
+    "CMakeLists.txt",
+  ), "utf8");
+  const profile = fs.readFileSync(path.join(
+    root, "esp8266", "rtos-sdk-native",
+    "sdkconfig.helix-sso-qio80.defaults",
+  ), "utf8");
+  assert.match(kconfig, /config YORADIO_HELIX_MP3_SSO/);
+  assert.match(cmake, /CONFIG_YORADIO_HELIX_MP3_SSO/);
+  assert.match(profile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
+
+  const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-sso-"));
+  t.after(() => fs.rmSync(outputDir, {recursive: true, force: true}));
+  const reference = compile(outputDir, "helix-reference", true);
+  if(reference.skip) return t.skip(reference.skip);
+  const sso = compile(outputDir, "helix-sso", false, true);
+  const fixture = path.join(fixtures, "stereo-320.mp3");
+  const oldPcm = decode(
+    reference.executable, "mp3", fixture,
+    path.join(outputDir, "mp3-reference.pcm"),
+  );
+  const newPcm = decode(
+    sso.executable, "mp3", fixture,
+    path.join(outputDir, "mp3-sso.pcm"),
+  );
+  assert.equal(newPcm.summary, oldPcm.summary, "MP3 sample count changed");
+  const quality = comparePcm(oldPcm.pcm, newPcm.pcm);
+  assert.ok(Number.isFinite(quality.snrDb) && quality.snrDb >= 48,
+    `unexpected SSO SNR ${quality.snrDb}`);
+  assert.ok(quality.maximumError <= 34,
+    `unexpected SSO maximum error ${quality.maximumError}`);
+  t.diagnostic(`SSO SNR=${quality.snrDb.toFixed(2)} dB, ` +
+    `maxError=${quality.maximumError} PCM levels`);
 });

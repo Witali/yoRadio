@@ -16,6 +16,16 @@ config YORADIO_MP3_DECODER_LIBMAD
 
 endchoice
 
+config YORADIO_HELIX_MP3_SSO
+    bool "Use reduced-precision 32-bit Helix MP3 synthesis (experimental)"
+    depends on YORADIO_MP3_DECODER_HELIX
+    default n
+    help
+        Distribute the polyphase fixed-point shifts across the input samples,
+        coefficients, and PCM conversion so the ESP8266 LX106 can use native
+        32-bit multiply/accumulate operations. This adds no decoder buffers
+        but trades a small amount of PCM precision for synthesis speed.
+
 config YORADIO_HELIX_AAC
     bool "Enable Helix AAC decoder"
     default y

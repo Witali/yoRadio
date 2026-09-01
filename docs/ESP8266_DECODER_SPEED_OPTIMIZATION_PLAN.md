@@ -33,6 +33,12 @@ decoder correctness.
   32x32-to-high-32 multiplication, multiply-accumulate, count-leading-zeros,
   and saturation. Generic 64-bit operations are the main candidate for
   replacement. Keep a portable reference path for correctness comparison.
+- [x] Adapt libmad `OPT_SSO` scaling to the Helix polyphase synthesis. Split
+  the fixed-point shift between Q23 `vbuf`, Q18 coefficients, and final PCM
+  conversion so the LX106 uses native 32-bit multiply/accumulate operations.
+  Keep the exact 64-bit path as the default and select SSO at build time.
+  The implementation adds no buffer and passes host PCM/SNR plus physical
+  QIO80 RAM benchmarks.
 - [x] Audit integer division in the measured hot paths. Replace the ESP8266
   MP3 parser and IMDCT block-count divisions by 3, 5, 6, 18, and 36 with an
   exact Q32 reciprocal multiply-and-shift. Derive a remainder from the one
@@ -232,6 +238,44 @@ The reset-loop paragraph above records the older eager-allocation image. The
 current source allocates codec state lazily and the new full benchmark creates
 libmad successfully, but the complete libmad+AAC radio/WebUI image still needs
 an integrated physical run before replacing Helix as the production default.
+
+## Experimental Helix 32-bit SSO synthesis — 2026-09-01
+
+The libmad `OPT_SSO` idea was adapted to the existing Helix data layout rather
+than copying libmad's larger decoder state. Helix stores synthesis history as
+Q23 and its window table as Q18. The experimental path removes 12 bits from
+the history value and 4 bits from the coefficient before multiplication, then
+uses a Q25 signed 32-bit accumulator and a 10-bit rounded PCM conversion. It
+reuses the existing `vbuf` and `polyCoef` table and is selected with
+`CONFIG_YORADIO_HELIX_MP3_SSO` or the reproducible
+`sdkconfig.helix-sso-qio80.defaults` profile.
+
+The host golden test decoded all 18 retained 320-kbit/s stereo MP3 frames and
+kept the same frame/sample count. Against exact Helix PCM, SSO measures 48.50
+dB SNR with a maximum absolute error of 34 signed 16-bit PCM levels. The exact
+non-SSO build remains byte-identical to the existing golden hash.
+
+The physical A/B used the same Wemos D1 mini, 160 MHz CPU, QIO flash at 80
+MHz, GCC 8.4 `-O3`, RAM-resident first MP3 frame, 8 warm-ups and 200 measured
+frames. Wi-Fi, normalization, and SPI-PDM output were disabled.
+
+| Helix MP3 320 kbit/s | Average frame | Maximum frame | Audio/CPU speed | Free heap | Codec DRAM | App binary |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Exact 64-bit polyphase | 13,705 us | 13,722 us | 1.751x | 81,280 B | 14,756 B | 275,872 B |
+| 32-bit SSO polyphase | 6,414 us | 6,432 us | 3.741x | 81,280 B | 14,756 B | 275,472 B |
+
+SSO reduces frame time by 53.20% and raises isolated decode throughput by
+113.69%. Dynamic DRAM, arena use, and free heap are unchanged; 50
+create/destroy and MP3/AAC switches return heap from 96,108 to 96,108 bytes in
+both builds. The generated `PolyphaseStereo()` stack frame falls from 144 to
+128 bytes. The complete benchmark image is 400 bytes smaller, although the
+stereo function itself grows because GCC keeps more 32-bit operations inline.
+AAC is unchanged and measured 15,860 us in the SSO image versus 16,010 us in
+the exact image, a 0.94% build-layout variation.
+
+This result is substantially faster and smaller in RAM than the experimental
+libmad backend. SSO remains opt-in until live radio, WebUI, normalization, and
+SPI-PDM tests cover the full MP3 bitrate/channel/block-type matrix.
 
 ## Expected outcome
 

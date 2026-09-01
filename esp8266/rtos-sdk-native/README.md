@@ -17,6 +17,10 @@ signal integrity still depends on the particular module PCB.
 For a reproducible Wemos QIO80 libmad experiment, use
 `sdkconfig.libmad-qio80.defaults`. The ordinary defaults continue to select
 `CONFIG_YORADIO_MP3_DECODER_HELIX`.
+The `sdkconfig.helix-sso-qio80.defaults` profile keeps Helix but enables its
+experimental reduced-precision 32-bit polyphase synthesis. It allocates no
+additional decoder buffers and is intended for PCM-quality and physical speed
+comparison before the optimization is considered for production.
 The `sdkconfig.libmad-mp3-only-qio80.defaults` experiment also disables AAC;
 this reduces stereo PCM storage from 4096 to 2304 bytes and the fixed IRAM word
 arena from 16 KiB to 12 KiB. The arena stores the 4236-byte `mad_synth`, the

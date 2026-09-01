@@ -43,6 +43,10 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1)
+if(CONFIG_YORADIO_HELIX_MP3_SSO)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_HELIX_MP3_SSO=1)
+endif()
 if(CONFIG_YORADIO_MP3_DECODER_LIBMAD)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_LIBMAD_EXTERNAL_FRAME_WORKSPACE=1)
