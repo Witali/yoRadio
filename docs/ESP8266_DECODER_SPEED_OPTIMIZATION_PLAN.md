@@ -76,8 +76,8 @@ decoder correctness.
   pinned to upstream commit `10d929ac01436dfe8856e0a06fd9ec35a848c6e2`.
   Keep Helix as the production default and retain the same native stream,
   PCM callback, normalizer, and output path so the A/B benchmark changes only
-  the MP3 decoder. The physical RAM benchmark remains pending until the Wemos
-  USB-UART adapter is connected again.
+  the MP3 decoder. The physical RAM benchmark is complete; the integrated
+  radio image is currently blocked by its Wi-Fi startup memory failure.
 
 ## Priority
 
@@ -164,10 +164,42 @@ small low-bit differences are accepted for the speed experiment.
 Both complete QIO80 radio images build with GCC 8.4 and `-O3`. Compared with
 Helix, the libmad image grows from 670,848 to 721,232 bytes (+50,384 bytes).
 Static DRAM falls from 16,752 to 15,984 bytes, while the decoder's reported
-dynamic workspace rises from 28,984 to 33,336 bytes (+4,352 bytes). The final
-decision depends on the physical RAM-only frame time, worst frame, free heap,
-and integrated Wi-Fi/audio result; host execution time is intentionally not
-used as an ESP8266 speed result.
+dynamic workspace rises from 28,984 to 33,336 bytes (+4,352 bytes).
+
+### Physical Wemos D1 mini result — 2026-09-01
+
+The A/B run used the same ESP8266EX at 160 MHz, QIO flash at 80 MHz, GCC 8.4
+`-O3`, the same first frame copied to RAM, 8 warm-up frames and 200 measured
+frames. Wi-Fi, normalization and SPI-PDM output were disabled. The PCM callback
+only consumed two samples, so the result measures decoder throughput rather
+than the complete radio pipeline.
+
+| Fixture/backend | Average frame | Maximum frame | Audio/CPU speed | Free heap | Workspace | Arena |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| MP3 320 kbit/s, Helix | 14,289 us | 14,313 us | 1.679x | 81,416 B | 28,984 B | 23,228 B |
+| MP3 320 kbit/s, libmad | 12,904 us | 12,925 us | 1.859x | 67,888 B | 33,336 B | 27,656 B |
+| AAC 320 kbit/s, Helix image | 15,890 us | 15,900 us | 1.342x | 86,324 B | 28,984 B | 20,600 B |
+| AAC 320 kbit/s, libmad image | 16,082 us | 16,103 us | 1.326x | 63,656 B | 33,336 B | 20,600 B |
+
+For MP3, libmad reduces average frame time by 9.69% and raises throughput by
+10.72%. Its maximum frame remains below the 24 ms represented by one MPEG-1
+Layer III frame at 48 kHz, so the isolated decoder has 46.2% timing headroom.
+The AAC implementation is identical in both images; its 1.2% shift is a build
+layout effect, not a libmad AAC result. Free-heap values are end-to-end values
+of different firmware images and therefore include code/layout effects in
+addition to the reported codec workspace.
+
+The complete libmad radio image is not usable yet. It starts with 92,996 bytes
+free, allocates the 33,336-byte codec workspace before Wi-Fi, mounts SPIFFS and
+loads the 511-station index, then `network_service_start()` returns an error
+after indexing the Wi-Fi credential. `ESP_ERROR_CHECK` aborts and the board
+enters a repeatable reset loop. The matching Helix image starts normally,
+obtains `192.168.100.6`, and has 7,436 bytes free after DHCP. This strongly
+indicates that the extra pre-Wi-Fi decoder allocation/heap layout leaves no
+safe memory margin for the Wi-Fi startup path. Helix therefore remains the
+production default. Before another integrated libmad test, allocate the MP3
+decoder lazily after Wi-Fi initialization or reduce its workspace, then repeat
+the full live-stream, WebUI and codec-switch matrix.
 
 ## Expected outcome
 

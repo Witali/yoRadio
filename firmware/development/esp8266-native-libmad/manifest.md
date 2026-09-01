@@ -34,9 +34,18 @@ Validation completed:
 - PCM versus current Helix: 49.41 dB SNR, maximum absolute error 99 levels;
 - all 256 repository tests passed;
 - static DRAM: 15,984 bytes; reported decoder workspace: 33,336 bytes;
-- application size is 50,384 bytes larger than the matching Helix image.
+- application size is 50,384 bytes larger than the matching Helix image;
+- physical 160-MHz/QIO80 MP3 RAM benchmark: 12,904 us average, 12,925 us
+  maximum, 1.859x realtime and 67,888 bytes free heap;
+- matching Helix benchmark: 14,289 us average, 14,313 us maximum, 1.679x
+  realtime and 81,416 bytes free heap;
+- libmad improves isolated MP3 throughput by 10.72%, with 9.69% lower average
+  frame time.
 
-Physical validation is not claimed for this artifact: no serial port was
-enumerated when the benchmark was ready. Flash it only as an experimental
-image and record RAM-frame realtime ratio, maximum frame time, free heap, and
-live radio stability before considering a default change.
+Warning: this archived full radio image is not usable as normal firmware. On
+the physical Wemos D1 mini it allocates the codec before Wi-Fi, reaches
+`network_service_start()` with insufficient safe heap margin, aborts after the
+credential index is read, and repeats the reset. The production Helix image
+was restored and verified to obtain `192.168.100.6`. Keep libmad experimental
+until its workspace is allocated lazily after Wi-Fi startup or reduced, and
+the complete live-stream/WebUI test passes.

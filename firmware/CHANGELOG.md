@@ -12,8 +12,13 @@ entries are retained; changes are published under a new firmware version.
 - The deterministic 320-kbit/s fixture produced the same frame/sample count
   as Helix, with 49.41 dB SNR and a maximum difference of 99 PCM levels.
 - Built both Helix and libmad QIO80 radio profiles and passed all 256 repository
-  tests. Physical speed/RAM validation is pending because the Wemos USB-UART
-  adapter was not enumerated by Windows during this run.
+  tests. On the physical 160-MHz Wemos D1 mini, libmad decoded the 320-kbit/s
+  MP3 RAM fixture at 1.859x realtime versus 1.679x for Helix: 10.72% higher
+  throughput and 9.69% lower average frame time.
+- The full libmad radio image is not usable yet: allocating its 33,336-byte
+  workspace before Wi-Fi makes `network_service_start()` fail and causes a
+  repeatable reset loop. Helix remains the production default; the working
+  QIO80 Helix image was restored after the test.
 - Archived the experimental application and recovery binaries under
   [`development/esp8266-native-libmad/`](development/esp8266-native-libmad/).
 
