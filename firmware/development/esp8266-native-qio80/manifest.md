@@ -18,12 +18,20 @@ the application. Flash all three images without erasing NVS or SPIFFS:
 
 SHA-256:
 
-- `app.bin`: `0B354F2640D9B3D20767844D2A5AA94CDEE347661F2F6883019809A5BBA52007`
+- `app.bin`: `40B27B9BCE004890F14755706F297AD7709BF13BF3E013C0C8EF6CBB3C54031D`
 - `bootloader.bin`: `34A628DA55749D0C72ED3BC78EDA60B29DE6D341A8E54E70AE05CFF772219A85`
 - `partition-table.bin`: `C3AEC2B0CC450D37286B5D832556268970CF0F63AA31250C94A21116D22A22DF`
 
 Physical validation on COM10:
 
+- Helix MP3/AAC fixed-point multiplication no longer calls the ROM
+  `__muldi3` helper in the decode hot path;
+- the optimized decoders produced PCM identical to the retained 64-bit
+  reference for the checked-in 320-kbit/s MP3 and AAC golden fixtures;
+- decode-only MP3 320 kbit/s reached 74.1% realtime with a 32.9 ms worst
+  decoder call, versus 53.8% before the fixed-point optimization;
+- decode-only AAC 320 kbit/s reached 99.2% realtime with a 21.4 ms worst
+  decoder call, versus 80.8% before the fixed-point optimization;
 - application completed two independent RTS cold-start sequences;
 - CPU reported 160 MHz and the 511-station index loaded from SPIFFS;
 - Wi-Fi connected and received `192.168.100.6`;
