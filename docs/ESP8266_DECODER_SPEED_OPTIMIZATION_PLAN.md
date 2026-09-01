@@ -22,12 +22,13 @@ decoder correctness.
   IMDCT, synthesis/subband, and PCM assembly. Measure total time, call count,
   average time, and maximum time for every stage before selecting code to
   optimize.
-- [ ] Unroll only the measured hottest fixed-trip loops. Benchmark unroll
+- [x] Unroll only the measured hottest fixed-trip loops. Benchmark unroll
   factors 2 and 4 for MP3 dequant/IMDCT/polyphase synthesis and AAC IMDCT/QMF;
   also compare manual unrolling with GCC `-funroll-loops`. Flash capacity is
   not the limiting resource, but record text growth and reject variants that
   lose speed through instruction-cache pressure or exceed the safe IRAM
-  budget.
+  budget. The tested global, pragma-directed, and manual variants were all
+  rejected; the production source keeps the original compact loop.
 - [ ] Implement and benchmark Xtensa LX106 fixed-point primitives for
   32x32-to-high-32 multiplication, multiply-accumulate, count-leading-zeros,
   and saturation. Generic 64-bit operations are the main candidate for
@@ -112,6 +113,28 @@ dequantization 4.5%. These figures make MP3 synthesis and AAC IMDCT/Huffman
 the first loop-unrolling candidates. The instrumentation changes flash layout
 and adds timer calls, so its absolute frame time is not used as the
 unprofiled performance baseline.
+
+The refined MP3 stage profile splits synthesis into FDCT32 and polyphase
+convolution. Synthesis consumes 93.8% of measured decode time: FDCT32 accounts
+for 19.7% and polyphase convolution for 73.8%. This makes
+`PolyphaseStereo()` the dominant kernel, but loop unrolling is counterproductive
+on the LX106. GCC 8.4 disassembly of the original, manually unrolled x2, and
+manually unrolled x4 functions gives the following results:
+
+| variant | function bytes | instructions | stack frame | `l32i` | `s32i` | stack operands | MP3 us/frame |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| original | 1,730 | 680 | 144 B | 154 | 99 | 240 | 14,284 |
+| manual x2 | 2,763 | 1,049 | 288 B | 305 | 146 | 432 | 15,092 |
+| manual x4 | 4,699 | 1,754 | 560 B | 567 | 257 | 793 | 15,669 |
+
+The x2 and x4 versions are 5.7% and 9.7% slower on the physical board. The
+large increase in loads, stores, and stack references shows register pressure
+forcing GCC to spill intermediate accumulators to RAM. Global
+`-funroll-loops` is also slower (14,759 us/frame, with binary growth from
+273,664 to 285,472 bytes). Targeted `#pragma GCC unroll 2/4` produces
+14,336/14,338 us per frame, also slightly slower than the 14,284-us baseline.
+All variants preserve the golden PCM output, but none earns its code and stack
+cost, so no unrolling switch or duplicated loop remains in production.
 
 The reciprocal-division change was also measured as a clean compile-time A/B
 test with all stage hooks disabled. With reciprocal division disabled, MP3

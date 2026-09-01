@@ -3515,24 +3515,32 @@ int Subband( short *pcmBuf) {
     if (m_MP3DecInfo->nChans == 2) {
         /* stereo */
         for (b = 0; b < m_BLOCK_SIZE; b++) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_DCT);
             FDCT32(m_IMDCTInfo->outBuf[0][b], m_SubbandInfo->vbuf + 0 * 32, m_SubbandInfo->vindex,
                     (b & 0x01), m_IMDCTInfo->gb[0]);
             FDCT32(m_IMDCTInfo->outBuf[1][b], m_SubbandInfo->vbuf + 1 * 32, m_SubbandInfo->vindex,
                     (b & 0x01), m_IMDCTInfo->gb[1]);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_DCT);
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             PolyphaseStereo(pcmBuf,
                     m_SubbandInfo->vbuf + m_SubbandInfo->vindex + m_VBUF_LENGTH * (b & 0x01),
                     polyCoef);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             m_SubbandInfo->vindex = (m_SubbandInfo->vindex - (b & 0x01)) & 7;
             pcmBuf += (2 * m_NBANDS);
         }
     } else {
         /* mono */
         for (b = 0; b < m_BLOCK_SIZE; b++) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_DCT);
             FDCT32(m_IMDCTInfo->outBuf[0][b], m_SubbandInfo->vbuf + 0 * 32, m_SubbandInfo->vindex,
                     (b & 0x01), m_IMDCTInfo->gb[0]);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_DCT);
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             PolyphaseMono(pcmBuf,
                     m_SubbandInfo->vbuf + m_SubbandInfo->vindex + m_VBUF_LENGTH * (b & 0x01),
                     polyCoef);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             m_SubbandInfo->vindex = (m_SubbandInfo->vindex - (b & 0x01)) & 7;
             pcmBuf += m_NBANDS;
         }

@@ -44,4 +44,9 @@ test("ESP8266 Helix stage hooks cover both MP3 and AAC hot paths", () => {
     assert.match(source, /HELIX_PROFILE_BEGIN\(HELIX_STAGE_IMDCT\)/);
   }
   assert.match(mp3, /HELIX_PROFILE_BEGIN\(HELIX_STAGE_SYNTHESIS\)/);
+  assert.match(mp3, /HELIX_PROFILE_BEGIN\(HELIX_STAGE_SYNTHESIS_DCT\)/);
+  assert.match(
+    mp3,
+    /HELIX_PROFILE_BEGIN\(HELIX_STAGE_SYNTHESIS_POLYPHASE\)/,
+  );
 });

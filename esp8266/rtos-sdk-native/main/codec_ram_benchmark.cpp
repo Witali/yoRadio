@@ -45,7 +45,8 @@ struct StageStats {
 StageStats s_stage[HELIX_STAGE_COUNT];
 int64_t s_stage_started[HELIX_STAGE_COUNT];
 const char *const kStageNames[HELIX_STAGE_COUNT] = {
-    "huffman", "dequant", "stereo_filter", "imdct", "synthesis", "sbr",
+    "huffman", "dequant", "stereo_filter", "imdct", "synthesis",
+    "synthesis_dct", "synthesis_polyphase", "sbr",
 };
 
 void reset_stage_profile() {
