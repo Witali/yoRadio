@@ -30,10 +30,15 @@ test("ESP8266 keeps 16x PDM by default and offers an explicit 384 kHz PDM8 profi
 test("ESP8266 SPI-PDM drains a bounded queue from the transfer-done interrupt", () => {
   assert.match(output, /#define SPI_PDM_QUEUE_CHUNKS 12U/);
   assert.match(output, /\.intr_enable = \{\.trans_done = 1\}/);
-  assert.match(output, /\.event_cb = spi_pdm_event/);
+  assert.match(component, /option\(YORADIO_ESP8266_SPI_PDM_FAST_ISR/);
+  assert.match(output, /_xt_isr_attach\(ETS_SPI_INUM, spi_pdm_isr, NULL\)/);
   assert.match(
     output,
-    /IRAM_ATTR spi_pdm_event[\s\S]*SPI_TRANS_DONE_EVENT[\s\S]*spi_pdm_start_next_locked\(\)[\s\S]*vTaskNotifyGiveFromISR/,
+    /noinline\)\) spi_pdm_start_next_locked/,
+  );
+  assert.match(
+    output,
+    /IRAM_ATTR spi_pdm_isr[\s\S]*SPI1\.slave\.val[\s\S]*spi_pdm_complete\(\)/,
   );
 });
 
@@ -53,12 +58,27 @@ test("ESP8266 SPI-PDM interrupt only wakes a producer that is actually blocked",
   assert.match(output, /static volatile bool s_spi_waiting/);
   assert.match(
     output,
-    /spi_pdm_event[\s\S]*if \(s_spi_waiting\)[\s\S]*s_spi_waiting = false[\s\S]*vTaskNotifyGiveFromISR/,
+    /spi_pdm_complete[\s\S]*if \(s_spi_waiting\) spi_pdm_wake_waiter\(\)/,
+  );
+  assert.match(
+    output,
+    /noinline\)\) spi_pdm_wake_waiter[\s\S]*s_spi_waiting = false[\s\S]*vTaskNotifyGiveFromISR/,
   );
   assert.match(
     output,
     /s_spi_queue_count < SPI_PDM_QUEUE_CHUNKS[\s\S]*s_spi_waiting = false[\s\S]*s_spi_waiter = xTaskGetCurrentTaskHandle\(\)[\s\S]*s_spi_waiting = true/,
   );
+});
+
+test("ESP8266 fast ISR has a fixed full-chunk path and measures block gaps", () => {
+  assert.match(
+    output,
+    /spi_pdm_load_fifo[\s\S]*bit_count == SPI_PDM_CHUNK_BITS/,
+  );
+  assert.match(output, /rsr %0, ccount/);
+  assert.match(output, /g_esp_os_cpu_clk \+ cycles/);
+  assert.match(output, /s_spi_gap_cycles_total \+= gap/);
+  assert.match(output, /s_spi_queue_empty_events/);
 });
 
 test("ESP8266 PDM producer fills a reserved queue slot without an intermediate copy", () => {

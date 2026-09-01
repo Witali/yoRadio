@@ -31,7 +31,7 @@ Flash all three images without erasing NVS or SPIFFS:
 
 SHA-256:
 
-- `app.bin` (673,520 bytes): `C29229D0E06B3FE3E089BDEAAD2D3353C1E6162D9CCB1D62B79781F520430EFF`
+- `app.bin` (672,480 bytes): `B55B7CACAE18F2C369053274F4B083C5BB8D9C35ED700B52D1B87972DC956157`
 - `bootloader.bin` (7,808 bytes): `34A628DA55749D0C72ED3BC78EDA60B29DE6D341A8E54E70AE05CFF772219A85`
 - `partition-table.bin` (3,072 bytes): `C3AEC2B0CC450D37286B5D832556268970CF0F63AA31250C94A21116D22A22DF`
 
@@ -44,12 +44,19 @@ Validation:
   16-bit PCM levels.
 - The SPI transfer ISR now notifies the producer only while it is blocked,
   preventing stale task notifications from accumulating.
+- The production PDM path uses a direct 95-byte IRAM HSPI ISR instead of the
+  generic SDK SPI dispatcher. Its common C prologue has a 16-byte frame and
+  saves only `a0`; the rare producer wake/yield is a separate noinline path.
+- Physical SDK-dispatcher versus direct-ISR A/B retained 96.8% realtime and
+  reduced the average 512-bit inter-block gap from 7,423 to 7,393 CPU cycles
+  (46.39 to 46.21 us). A high/low FIFO ping-pong experiment was rejected
+  because it doubled the interrupt rate and reduced realtime to 93.7%.
 - A generated-PCM physical run completed at 96.8% realtime with zero invalid
   queue events. Full 320-kbit/s profiles reached 95.2% realtime for MP3 and
   77.0% for AAC; see `docs/ESP8266_AUDIO_PROFILE.md` for stage timings.
 - The profile and decode-only binaries were flashed and exercised on the
   Wemos D1 mini. This archived image is the rebuilt production profile without
   runtime statistics or decoder-stage logging.
-- All 269 repository tests passed. The archived production image associated
+- All 270 repository tests passed. The archived production image associated
   with Wi-Fi `DYACHENKO`, obtained `192.168.100.6`, initialized SPI-PDM8, and
   returned HTTP 200 for the WebUI root page.

@@ -14,7 +14,9 @@
 #include "driver/gpio.h"
 #include "driver/spi.h"
 #include "esp_attr.h"
+#include "esp8266/eagle_soc.h"
 #include "esp8266/spi_struct.h"
+#include "rom/ets_sys.h"
 #else
 #include "driver/i2s.h"
 #endif
@@ -69,9 +71,15 @@ static int16_t scale_sample(int16_t sample, uint32_t gain_q15) {
 #define SPI_PDM_CHUNK_WORDS (SPI_PDM_CHUNK_BITS / 32U)
 #define SPI_PDM_QUEUE_CHUNKS 12U
 #define SPI_PDM_WAIT_MS 100U
+#define SPI_PDM_GAP_STATS \
+    (YORADIO_ESP8266_AUDIO_PROFILE || \
+     YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
 
 typedef struct {
     uint32_t words[SPI_PDM_CHUNK_WORDS];
+#if SPI_PDM_GAP_STATS
+    uint32_t wire_cycles;
+#endif
     uint16_t bit_count;
 } spi_pdm_chunk_t;
 
@@ -82,6 +90,18 @@ static volatile uint8_t s_spi_queue_count;
 static volatile bool s_spi_active;
 static volatile TaskHandle_t s_spi_waiter;
 static volatile bool s_spi_waiting;
+#if SPI_PDM_GAP_STATS
+static volatile uint32_t s_spi_last_start_cycle;
+static volatile uint32_t s_spi_last_wire_cycles;
+static volatile uint32_t s_spi_gap_cycles_total;
+static volatile uint32_t s_spi_gap_cycles_max;
+static volatile uint32_t s_spi_chained_transfers;
+static volatile uint32_t s_spi_queue_empty_events;
+#endif
+
+#define DPORT_SPI_INT_STATUS_REG 0x3ff00020U
+#define DPORT_SPI_INT_STATUS_SPI0 BIT4
+#define DPORT_SPI_INT_STATUS_SPI1 BIT7
 
 #if YORADIO_ESP8266_AUDIO_PROFILE
 extern void audio_profile_spi_wait_begin(void);
@@ -103,36 +123,106 @@ static const spi_interface_t s_spi_interface = {
     .cs_en = 0,
 };
 
-static void IRAM_ATTR spi_pdm_start_next_locked(void) {
-    if (!s_spi_queue_count) {
-        s_spi_active = false;
+#if SPI_PDM_GAP_STATS
+extern uint64_t g_esp_os_cpu_clk;
+
+static inline uint32_t IRAM_ATTR spi_pdm_cycle_clock(void) {
+    uint32_t cycles;
+    __asm__ __volatile__("rsr %0, ccount" : "=a"(cycles));
+    /* ESP8266 RTOS SDK resets CCOUNT on every system tick. The accumulated
+     * low word plus the live counter remains monotonic while this level-1 ISR
+     * runs (and while the task-side caller holds its critical section). */
+    return (uint32_t)g_esp_os_cpu_clk + cycles;
+}
+#endif
+
+static inline void IRAM_ATTR spi_pdm_load_fifo(
+    const spi_pdm_chunk_t *chunk) {
+    if (chunk->bit_count == SPI_PDM_CHUNK_BITS) {
+        for (unsigned index = 0; index < SPI_PDM_CHUNK_WORDS; ++index)
+            SPI1.data_buf[index] = chunk->words[index];
         return;
     }
+    unsigned words = (chunk->bit_count + 31U) / 32U;
+    for (unsigned index = 0; index < words; ++index)
+        SPI1.data_buf[index] = chunk->words[index];
+}
+
+static void IRAM_ATTR __attribute__((noinline)) spi_pdm_start_next_locked(void) {
+    if (!s_spi_queue_count) {
+#if SPI_PDM_GAP_STATS
+        if (s_spi_active) ++s_spi_queue_empty_events;
+#endif
+        s_spi_active = false;
+#if SPI_PDM_GAP_STATS
+        s_spi_last_start_cycle = 0;
+#endif
+        return;
+    }
+#if SPI_PDM_GAP_STATS
+    bool chained = s_spi_active && s_spi_last_start_cycle;
+#endif
     const spi_pdm_chunk_t *chunk = &s_spi_queue[s_spi_queue_head];
     SPI1.user.usr_mosi = 1;
+    SPI1.user.usr_mosi_highpart = 0;
     SPI1.user1.usr_mosi_bitlen = chunk->bit_count - 1U;
-    for (size_t index = 0; index * 32U < chunk->bit_count; ++index)
-        SPI1.data_buf[index] = chunk->words[index];
+    spi_pdm_load_fifo(chunk);
     ++s_spi_queue_head;
     if (s_spi_queue_head == SPI_PDM_QUEUE_CHUNKS) s_spi_queue_head = 0;
     --s_spi_queue_count;
     s_spi_active = true;
+#if SPI_PDM_GAP_STATS
+    uint32_t now = spi_pdm_cycle_clock();
+    if (chained) {
+        uint32_t elapsed = now - s_spi_last_start_cycle;
+        uint32_t gap = elapsed > s_spi_last_wire_cycles
+            ? elapsed - s_spi_last_wire_cycles : 0;
+        s_spi_gap_cycles_total += gap;
+        if (gap > s_spi_gap_cycles_max) s_spi_gap_cycles_max = gap;
+        ++s_spi_chained_transfers;
+    }
+    s_spi_last_start_cycle = now;
+    s_spi_last_wire_cycles = chunk->wire_cycles;
+#endif
     SPI1.cmd.usr = 1;
 }
 
-static void IRAM_ATTR spi_pdm_event(int event, void *arg) {
-    (void)arg;
-    if (event != SPI_TRANS_DONE_EVENT) return;
+static void IRAM_ATTR __attribute__((noinline)) spi_pdm_wake_waiter(void) {
     BaseType_t higher_task_woken = pdFALSE;
-    spi_pdm_start_next_locked();
-    TaskHandle_t waiter = NULL;
-    if (s_spi_waiting) {
-        s_spi_waiting = false;
-        waiter = s_spi_waiter;
-    }
+    s_spi_waiting = false;
+    TaskHandle_t waiter = s_spi_waiter;
     if (waiter) vTaskNotifyGiveFromISR(waiter, &higher_task_woken);
     if (higher_task_woken) portYIELD_FROM_ISR();
 }
+
+static void IRAM_ATTR spi_pdm_complete(void) {
+    spi_pdm_start_next_locked();
+    if (s_spi_waiting) spi_pdm_wake_waiter();
+}
+
+#if YORADIO_ESP8266_SPI_PDM_FAST_ISR
+static void IRAM_ATTR spi_pdm_isr(void *arg) {
+    (void)arg;
+    uint32_t status = READ_PERI_REG(DPORT_SPI_INT_STATUS_REG);
+    if (!(status & DPORT_SPI_INT_STATUS_SPI1)) {
+        /* The vector is shared. Preserve the SDK driver's SPI0 acknowledgement
+         * in the exceptional case that its transfer-done interrupt is enabled. */
+        if (status & DPORT_SPI_INT_STATUS_SPI0) SPI0.slave.val &= ~0x1fU;
+        return;
+    }
+    /* The SDK repeats this write because early silicon can leave a transfer
+     * flag asserted for one APB cycle. This loop normally runs once. */
+    do {
+        SPI1.slave.val &= ~0x1fU;
+    } while (SPI1.slave.val & 0x1fU);
+    spi_pdm_complete();
+}
+#else
+static void IRAM_ATTR spi_pdm_event(int event, void *arg) {
+    (void)arg;
+    if (event == SPI_TRANS_DONE_EVENT) spi_pdm_complete();
+}
+#endif
 
 static uint32_t spi_pdm_wait_notification(void) {
 #if YORADIO_ESP8266_AUDIO_PROFILE
@@ -195,6 +285,12 @@ static esp_err_t spi_pdm_commit(spi_pdm_chunk_t *chunk, size_t bit_count) {
         return ESP_ERR_INVALID_STATE;
     }
     chunk->bit_count = (uint16_t)bit_count;
+#if SPI_PDM_GAP_STATS
+    chunk->wire_cycles = (uint32_t)(
+        ((uint64_t)CONFIG_ESP8266_DEFAULT_CPU_FREQ_MHZ * 1000000ULL *
+         bit_count + BOARD_SPI_PDM_BIT_RATE_HZ / 2U) /
+        BOARD_SPI_PDM_BIT_RATE_HZ);
+#endif
     ++s_spi_queue_tail;
     if (s_spi_queue_tail == SPI_PDM_QUEUE_CHUNKS) s_spi_queue_tail = 0;
     ++s_spi_queue_count;
@@ -255,7 +351,11 @@ esp_err_t native_audio_output_init(void) {
     spi_config_t config = {
         .interface = s_spi_interface,
         .intr_enable = {.trans_done = 1},
+#if YORADIO_ESP8266_SPI_PDM_FAST_ISR
+        .event_cb = NULL,
+#else
         .event_cb = spi_pdm_event,
+#endif
         .mode = SPI_MASTER_MODE,
         /* Initialize through the public API, then use the full hardware
          * pre-divider because the public enum stops at 2 MHz. */
@@ -276,6 +376,15 @@ esp_err_t native_audio_output_init(void) {
         s_spi_active = false;
         s_spi_waiter = NULL;
         s_spi_waiting = false;
+#if SPI_PDM_GAP_STATS
+        s_spi_last_start_cycle = 0;
+#endif
+        native_audio_output_reset_spi_stats();
+#if YORADIO_ESP8266_SPI_PDM_FAST_ISR
+        _xt_isr_mask(1U << ETS_SPI_INUM);
+        _xt_isr_attach(ETS_SPI_INUM, spi_pdm_isr, NULL);
+        _xt_isr_unmask(1U << ETS_SPI_INUM);
+#endif
         s_spi_initialized = true;
         s_spi_pin_selected = true;
     }
@@ -283,10 +392,11 @@ esp_err_t native_audio_output_init(void) {
     if (result == ESP_OK) {
         ESP_LOGI(TAG,
                  "SPI-PDM: mono GPIO%d/D7, %u Hz, %u bits/sample; "
-                 "GPIO%d/D5 clock unused",
+                 "GPIO%d/D5 clock unused; fast_isr=%u",
                  BOARD_SPI_PDM_DATA_GPIO, BOARD_SPI_PDM_BIT_RATE_HZ,
                  BOARD_SPI_PDM_OVERSAMPLE,
-                 BOARD_SPI_PDM_CLOCK_GPIO);
+                 BOARD_SPI_PDM_CLOCK_GPIO,
+                 (unsigned)YORADIO_ESP8266_SPI_PDM_FAST_ISR);
     }
     return result;
 }
@@ -477,6 +587,30 @@ void native_audio_output_silence(void) {
 }
 
 #endif
+
+void native_audio_output_reset_spi_stats(void) {
+#if YORADIO_ESP8266_SPI_PDM && SPI_PDM_GAP_STATS
+    taskENTER_CRITICAL();
+    s_spi_gap_cycles_total = 0;
+    s_spi_gap_cycles_max = 0;
+    s_spi_chained_transfers = 0;
+    s_spi_queue_empty_events = 0;
+    taskEXIT_CRITICAL();
+#endif
+}
+
+void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *stats) {
+    if (!stats) return;
+    memset(stats, 0, sizeof(*stats));
+#if YORADIO_ESP8266_SPI_PDM && SPI_PDM_GAP_STATS
+    taskENTER_CRITICAL();
+    stats->chained_transfers = s_spi_chained_transfers;
+    stats->gap_cycles_total = s_spi_gap_cycles_total;
+    stats->gap_cycles_max = s_spi_gap_cycles_max;
+    stats->queue_empty_events = s_spi_queue_empty_events;
+    taskEXIT_CRITICAL();
+#endif
+}
 
 void native_audio_output_reload_settings(void) {
     persistent_settings_t settings;

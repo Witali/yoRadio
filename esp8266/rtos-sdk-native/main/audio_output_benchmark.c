@@ -122,6 +122,7 @@ void audio_output_benchmark_run(void) {
 
     if (!run_until(esp_timer_get_time() + BENCHMARK_WARMUP_US,
                    NULL, NULL, NULL)) return;
+    native_audio_output_reset_spi_stats();
     s_spi_wait_us = 0;
     s_spi_wait_max_us = 0;
     s_spi_wait_calls = 0;
@@ -162,6 +163,14 @@ void audio_output_benchmark_run(void) {
              s_spi_wait_calls
                  ? (unsigned)(s_spi_wait_us / s_spi_wait_calls) : 0U,
              s_spi_wait_max_us, s_spi_wait_invalid);
+    native_audio_output_spi_stats_t spi_stats;
+    native_audio_output_get_spi_stats(&spi_stats);
+    ESP_LOGI(TAG,
+             "spi_gap cycles=%u calls=%u avg=%u max=%u empty=%u",
+             spi_stats.gap_cycles_total, spi_stats.chained_transfers,
+             spi_stats.chained_transfers
+                 ? spi_stats.gap_cycles_total / spi_stats.chained_transfers : 0U,
+             spi_stats.gap_cycles_max, spi_stats.queue_empty_events);
     if (have_cpu) {
         uint32_t total = cpu_total_after - cpu_total_before;
         uint32_t idle = cpu_idle_after - cpu_idle_before;
