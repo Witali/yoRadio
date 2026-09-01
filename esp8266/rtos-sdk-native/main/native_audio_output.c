@@ -241,10 +241,10 @@ esp_err_t native_audio_output_init(void) {
     };
     esp_err_t result = spi_init(HSPI_HOST, &config);
     if (result == ESP_OK) {
-        /* APB is fixed at 80 MHz. 13 * 8 = 104 is the closest integral
-         * divider to 80 MHz / (48 kHz * 16): 769230.77 Hz (+0.16%). */
+        /* APB is fixed at 80 MHz. The selected integral divider produces
+         * 48.077 kHz times either 8 or 16 PDM bits/sample (+0.16%). */
         SPI1.clock.clk_equ_sysclk = false;
-        SPI1.clock.clkdiv_pre = 12;
+        SPI1.clock.clkdiv_pre = BOARD_SPI_PDM_CLOCK_PREDIV;
         SPI1.clock.clkcnt_n = 7;
         SPI1.clock.clkcnt_h = 3;
         SPI1.clock.clkcnt_l = 7;
@@ -259,9 +259,10 @@ esp_err_t native_audio_output_init(void) {
     native_audio_output_reload_settings();
     if (result == ESP_OK) {
         ESP_LOGI(TAG,
-                 "SPI-PDM: mono GPIO%d/D7, %u Hz, 16 bits/sample; "
+                 "SPI-PDM: mono GPIO%d/D7, %u Hz, %u bits/sample; "
                  "GPIO%d/D5 clock unused",
                  BOARD_SPI_PDM_DATA_GPIO, BOARD_SPI_PDM_BIT_RATE_HZ,
+                 BOARD_SPI_PDM_OVERSAMPLE,
                  BOARD_SPI_PDM_CLOCK_GPIO);
     }
     return result;

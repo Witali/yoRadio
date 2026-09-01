@@ -44,6 +44,21 @@ config YORADIO_HELIX_AAC_SSO
         shortens the transform hot path without allocating another buffer, at
         the cost of a small PCM precision loss.
 
+choice YORADIO_SPI_PDM_OVERSAMPLE
+    prompt "SPI-PDM bits per PCM sample"
+    default YORADIO_SPI_PDM_OVERSAMPLE_16
+    help
+        Select the one-bit SPI-PDM oversampling ratio. Eight bits halves the
+        PDM conversion and interrupt rate but raises quantization noise.
+
+config YORADIO_SPI_PDM_OVERSAMPLE_8
+    bool "8 bits/sample (384.615 kHz at 48 kHz)"
+
+config YORADIO_SPI_PDM_OVERSAMPLE_16
+    bool "16 bits/sample (769.231 kHz at 48 kHz)"
+
+endchoice
+
 config YORADIO_WEB_SEND_TIMEOUT_SECONDS
     int "Web content send timeout (seconds)"
     range 1 30

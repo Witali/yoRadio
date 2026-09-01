@@ -10,6 +10,22 @@ const board = fs.readFileSync(path.join(root, "board_config.h"), "utf8");
 const input = fs.readFileSync(path.join(root, "input_service.c"), "utf8");
 const radio = fs.readFileSync(path.join(root, "radio_control.c"), "utf8");
 const network = fs.readFileSync(path.join(root, "network_service.c"), "utf8");
+const pdmConfig = fs.readFileSync(path.join(root, "spi_pdm_config.h"), "utf8");
+const kconfig = fs.readFileSync(path.join(root, "Kconfig.projbuild"), "utf8");
+const pdm8Profile = fs.readFileSync(
+  path.join(root, "..", "sdkconfig.helix-sso-qio80-pdm8.defaults"),
+  "utf8",
+);
+
+test("ESP8266 keeps 16x PDM by default and offers an explicit 384 kHz PDM8 profile", () => {
+  assert.match(kconfig, /default YORADIO_SPI_PDM_OVERSAMPLE_16/);
+  assert.match(pdm8Profile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
+  assert.match(pdm8Profile, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
+  assert.match(pdmConfig, /BOARD_SPI_PDM_OVERSAMPLE 8U/);
+  assert.match(pdmConfig, /BOARD_SPI_PDM_BIT_RATE_HZ 384615U/);
+  assert.match(pdmConfig, /BOARD_SPI_PDM_CLOCK_PREDIV 25U/);
+  assert.match(output, /SPI1\.clock\.clkdiv_pre = BOARD_SPI_PDM_CLOCK_PREDIV/);
+});
 
 test("ESP8266 SPI-PDM drains a bounded queue from the transfer-done interrupt", () => {
   assert.match(output, /#define SPI_PDM_QUEUE_CHUNKS 12U/);
