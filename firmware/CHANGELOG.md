@@ -7,6 +7,20 @@ entries are retained; changes are published under a new firmware version.
 
 ### ESP8266 experimental libmad MP3 backend
 
+- Follow-up: made libmad follow the common codec-arena lifetime. `mad_stream`,
+  `mad_frame` and `mad_synth` now have symmetric allocation/free paths; input,
+  PCM and decoder state are created only after stream detection and released
+  on Stop/error.
+- Added exact DRAM/IRAM accounting, post-allocation reserve checks and a
+  50-create/50-switch physical stress test; heap returned from 96,868 to 96,868
+  bytes with no leak.
+- Added the tested MP3-only QIO80 profile. Its 5-KB IRAM arena covers the
+  measured 4,236-byte `mad_synth`, and its 2,304-byte PCM buffer lets real
+  128-kbit/s MP3, ICY metadata, WebUI HTTP 200 and Stop coexist on the Wemos.
+- Replaced the previous reset-loop development `app.bin` with the working
+  MP3-only image. The combined libmad+AAC profile remains build-only because
+  AAC's 16-KB word arena leaves insufficient contiguous heap for libmad.
+
 - Added a pinned ESP8266Audio `libmad-8266` backend selected by
   `CONFIG_YORADIO_MP3_DECODER_LIBMAD`; Helix remains the production default.
 - The deterministic 320-kbit/s fixture produced the same frame/sample count
