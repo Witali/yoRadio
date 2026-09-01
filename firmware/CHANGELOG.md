@@ -5,6 +5,23 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-01
 
+### ESP8266 experimental libmad IRAM frame workspace
+
+- Moved the 4,608-byte Layer III spectral workspace and 2,304-byte reorder
+  workspace from `mad_frame` DRAM into the shared aligned 32-bit IRAM arena.
+  The byte-addressed stream reservoir, frame header, subband samples, and
+  overlap state remain in DRAM.
+- Reduced the Xtensa `mad_frame` layout from 20,784 to 13,880 bytes, freeing
+  6,904 bytes of 8-bit DRAM. The MP3-only profile now reserves 12 KiB IRAM,
+  of which the decoder uses 11,152 bytes.
+- Verified byte-identical PCM between the original and external-workspace
+  layouts, passed all 261 repository tests, and built both MP3-only and full
+  libmad+AAC QIO80 images. Physical validation remains pending because no
+  serial adapter was connected.
+- Archived the test image under
+  [`development/esp8266-native-libmad-iram/`](development/esp8266-native-libmad-iram/)
+  without replacing the previously hardware-validated libmad image.
+
 ### ESP8266 experimental libmad MP3 backend
 
 - Follow-up: made libmad follow the common codec-arena lifetime. `mad_stream`,
