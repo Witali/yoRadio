@@ -21,11 +21,11 @@ The `sdkconfig.helix-sso-qio80.defaults` profile keeps Helix but enables its
 experimental reduced-precision 32-bit polyphase synthesis. It allocates no
 additional decoder buffers and is intended for PCM-quality and physical speed
 comparison before the optimization is considered for production.
-The `sdkconfig.helix-sso-qio80-pdm8.defaults` profile adds an experimental
-8-bit SPI-PDM output to that MP3 SSO configuration. Its 384.615 kHz bit clock
-halves PDM conversion work and transfer interrupts relative to the default
-16-bit output, while increasing one-bit quantization noise and doubling each
-512-bit queue block from about 0.67 ms to 1.33 ms.
+The `sdkconfig.helix-sso-qio80-pdm8.defaults` profile selects the production
+8-bit PDM ratio for that MP3 SSO configuration. Its 384.615 kHz bit clock
+halves PDM conversion work relative to 16-bit output. The default backend is
+continuous I2S/SLC DMA on GPIO3; legacy HSPI output remains selectable with
+`CONFIG_YORADIO_AUDIO_OUTPUT_SPI_PDM`.
 The matching `sdkconfig.audio-profile-qio80-pdm8.defaults` profile also
 enables FreeRTOS runtime counters. Build it with
 `YORADIO_ESP8266_AUDIO_PROFILE` and
@@ -42,20 +42,22 @@ arena from 16 KiB to 12 KiB. The arena stores the 4236-byte `mad_synth`, the
 The Xtensa build uses 11152 bytes of that arena and reduces `mad_frame` in
 8-bit DRAM from 20784 to 13880 bytes. It is not a full-feature replacement
 profile.
-Audio defaults to mono SPI-PDM on GPIO13/D7, leaving UART0 RX GPIO3
-available. HSPI clocks the PDM stream at 769.23 kHz, the closest hardware rate
-to 48 kHz x 16. The PDM8 experiment uses 384.615 kHz (48 kHz x 8).
-GPIO14/D5 carries the unused SPI clock and should not be wired to the audio
-filter. The optional legacy I2S profile uses the ESP8266 fixed
-outputs: DATA GPIO3, BCLK GPIO15, LRCLK GPIO2. The default optional SSD1306 bus
-is SDA GPIO4/SCL GPIO5.
+Audio defaults to mono I2S-PDM on fixed DATA GPIO3/RX. Four circular SLC-DMA
+buffers continuously clock the 384.615 kHz one-bit stream; BCLK GPIO15 and
+LRCLK GPIO2 are not routed to pins in this mode. Connect GPIO3 through the
+documented low-pass/AC-coupling chain and then to a high-impedance amplifier
+input. Stereo streams are gain/balance adjusted and averaged before PDM.
 
-For SPI-PDM, connect GPIO13/D7 through a low-pass/AC-coupling chain for a
-one-bit DAC, then feed a high-impedance amplifier input. The output is mono:
-stereo streams are scaled with their individual balance gains and then
-averaged. Do not connect GPIO14/D5 to the amplifier. Select
-`YORADIO_AUDIO_OUTPUT_I2S` only when fixed-pin I2S is explicitly required and
-the USB-UART adapter does not drive GPIO3.
+GPIO3 is also UART0 RX. The application intentionally never reads UART input
+and routes the pin to I2S while running; UART0 TX logging on GPIO1 remains
+available. The onboard 470-ohm series resistor limits contention with CH340
+TXD; do not send UART data from the host while audio is playing.
+
+Legacy mono HSPI-PDM on GPIO13/D7 can be selected with
+`CONFIG_YORADIO_AUDIO_OUTPUT_SPI_PDM`; GPIO14/D5 is then an unused SPI clock.
+Standard stereo PCM for an external I2S DAC remains available through
+`CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PCM` and uses DATA GPIO3, BCLK GPIO15 and
+LRCLK GPIO2. The optional SSD1306 bus is SDA GPIO4/SCL GPIO5.
 
 The network layout intentionally matches the ESP32-C3 OLED native target:
 WebUI HTTP resources use the standard port 80 and the persistent WebSocket is

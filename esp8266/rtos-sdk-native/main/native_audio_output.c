@@ -31,6 +31,13 @@ static uint32_t s_resample_phase;
 static uint32_t s_pdm_integrator;
 static bool s_spi_initialized;
 static bool s_spi_pin_selected;
+#elif YORADIO_ESP8266_I2S_PDM
+static uint32_t s_input_sample_rate;
+static uint32_t s_resample_phase;
+static uint32_t s_pdm_integrator;
+static uint32_t s_i2s_pdm_partial_word;
+static uint8_t s_i2s_pdm_partial_bits;
+static bool s_i2s_started;
 #else
 static uint32_t s_sample_rate;
 static bool s_i2s_started;
@@ -475,6 +482,202 @@ void native_audio_output_silence(void) {
     s_resample_phase = 0;
     s_pdm_integrator = 0;
 }
+#elif YORADIO_ESP8266_I2S_PDM
+
+#define I2S_PDM_DMA_BUFFER_COUNT 4U
+#define I2S_PDM_DMA_BUFFER_WORDS 128U
+#define I2S_PDM_BATCH_WORDS 64U
+#define I2S_PDM_WRITE_TIMEOUT_MS 1000U
+#define I2S_PDM_SILENCE_WORD 0xaaaaaaaaU
+
+typedef struct {
+    uint32_t words[I2S_PDM_BATCH_WORDS];
+    size_t word_count;
+} i2s_pdm_writer_t;
+
+static esp_err_t i2s_pdm_write_words(const uint32_t *words,
+                                     size_t word_count) {
+    size_t offset = 0;
+    size_t bytes = word_count * sizeof(*words);
+    while (offset < bytes) {
+        size_t bytes_written = 0;
+        esp_err_t result = i2s_write(
+            I2S_NUM_0, (const uint8_t *)words + offset, bytes - offset,
+            &bytes_written, pdMS_TO_TICKS(I2S_PDM_WRITE_TIMEOUT_MS));
+        if (result != ESP_OK || !bytes_written) {
+            ESP_LOGE(TAG, "I2S-PDM write failed: %s, %u/%u bytes",
+                     esp_err_to_name(result), (unsigned)offset,
+                     (unsigned)bytes);
+            return result == ESP_OK ? ESP_FAIL : result;
+        }
+        offset += bytes_written;
+    }
+    return ESP_OK;
+}
+
+static esp_err_t i2s_pdm_flush(i2s_pdm_writer_t *writer) {
+    if (!writer->word_count) return ESP_OK;
+    esp_err_t result =
+        i2s_pdm_write_words(writer->words, writer->word_count);
+    if (result == ESP_OK) writer->word_count = 0;
+    return result;
+}
+
+static esp_err_t i2s_pdm_push_bit(i2s_pdm_writer_t *writer, bool high) {
+    s_i2s_pdm_partial_word =
+        (s_i2s_pdm_partial_word << 1) | (high ? 1U : 0U);
+    ++s_i2s_pdm_partial_bits;
+    if (s_i2s_pdm_partial_bits != 32U) return ESP_OK;
+
+    writer->words[writer->word_count++] = s_i2s_pdm_partial_word;
+    s_i2s_pdm_partial_word = 0;
+    s_i2s_pdm_partial_bits = 0;
+    return writer->word_count == I2S_PDM_BATCH_WORDS
+        ? i2s_pdm_flush(writer) : ESP_OK;
+}
+
+static esp_err_t i2s_pdm_emit_sample(int16_t sample,
+                                     i2s_pdm_writer_t *writer) {
+    const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
+    for (unsigned bit = 0; bit < BOARD_PDM_OVERSAMPLE; ++bit) {
+        s_pdm_integrator += target;
+        bool high = s_pdm_integrator >= 65536U;
+        if (high) s_pdm_integrator -= 65536U;
+        esp_err_t result = i2s_pdm_push_bit(writer, high);
+        if (result != ESP_OK) return result;
+    }
+    return ESP_OK;
+}
+
+static esp_err_t i2s_pdm_finish_partial_word(i2s_pdm_writer_t *writer) {
+    while (s_i2s_pdm_partial_bits) {
+        esp_err_t result = i2s_pdm_emit_sample(0, writer);
+        if (result != ESP_OK) return result;
+    }
+    return i2s_pdm_flush(writer);
+}
+
+static esp_err_t i2s_pdm_fill_dma_silence(void) {
+    uint32_t words[I2S_PDM_BATCH_WORDS];
+    for (size_t index = 0; index < I2S_PDM_BATCH_WORDS; ++index)
+        words[index] = I2S_PDM_SILENCE_WORD;
+    const size_t batches =
+        I2S_PDM_DMA_BUFFER_COUNT * I2S_PDM_DMA_BUFFER_WORDS /
+        I2S_PDM_BATCH_WORDS;
+    for (size_t batch = 0; batch < batches; ++batch) {
+        esp_err_t result =
+            i2s_pdm_write_words(words, I2S_PDM_BATCH_WORDS);
+        if (result != ESP_OK) return result;
+    }
+    return ESP_OK;
+}
+
+esp_err_t native_audio_output_init(void) {
+    const i2s_config_t config = {
+        .mode = I2S_MODE_MASTER | I2S_MODE_TX,
+        .sample_rate = BOARD_I2S_PDM_FRAME_RATE,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+        .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
+        .communication_format = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB,
+        .dma_buf_count = I2S_PDM_DMA_BUFFER_COUNT,
+        .dma_buf_len = I2S_PDM_DMA_BUFFER_WORDS,
+        /* Repeating the last PDM buffer is safer than replacing it with all
+         * zeroes, which is full-scale negative DC after the RC filter. */
+        .tx_desc_auto_clear = false,
+    };
+    const i2s_pin_config_t pins = {
+        .bck_o_en = 0,
+        .ws_o_en = 0,
+        .data_out_en = 1,
+        .data_in_en = 0,
+    };
+
+    esp_err_t result = i2s_driver_install(I2S_NUM_0, &config, 0, NULL);
+    if (result == ESP_OK) {
+        s_i2s_started = true;
+        s_input_sample_rate = 0;
+        s_resample_phase = 0;
+        s_pdm_integrator = 0;
+        s_i2s_pdm_partial_word = 0;
+        s_i2s_pdm_partial_bits = 0;
+        /* Prime every circular descriptor while DATA is still disconnected,
+         * then route only the continuous one-bit stream to GPIO3. */
+        result = i2s_pdm_fill_dma_silence();
+    }
+    if (result == ESP_OK) result = i2s_set_pin(I2S_NUM_0, &pins);
+    native_audio_output_reload_settings();
+    if (result == ESP_OK) {
+        ESP_LOGI(TAG,
+                 "I2S-PDM DMA: mono GPIO%d/RX, %u Hz, %u bits/sample, "
+                 "%u x %u words; UART RX ignored",
+                 BOARD_I2S_DATA_GPIO, BOARD_PDM_BIT_RATE_HZ,
+                 BOARD_PDM_OVERSAMPLE, I2S_PDM_DMA_BUFFER_COUNT,
+                 I2S_PDM_DMA_BUFFER_WORDS);
+    }
+    return result;
+}
+
+esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
+                                    uint32_t sample_rate, uint8_t channels) {
+    if (!samples || !sample_count || !sample_rate ||
+        (channels != 1 && channels != 2) || sample_count % channels)
+        return ESP_ERR_INVALID_ARG;
+    if (!s_i2s_started) return ESP_ERR_INVALID_STATE;
+
+    size_t frames = sample_count / channels;
+    native_audio_normalizer_configure(
+        s_normalization_enabled, s_normalization_max_gain_db,
+        s_normalization_target_db, s_normalization_time_ms, sample_rate);
+    native_audio_normalizer_process(samples, frames, channels);
+    uint8_t left_balance = s_balance < 0
+        ? (uint8_t)(BALANCE_DENOMINATOR + s_balance) : BALANCE_DENOMINATOR;
+    uint8_t right_balance = s_balance > 0
+        ? (uint8_t)(BALANCE_DENOMINATOR - s_balance) : BALANCE_DENOMINATOR;
+    uint32_t left_gain = channel_gain_q15(s_volume, left_balance);
+    uint32_t right_gain = channel_gain_q15(s_volume, right_balance);
+    for (size_t frame = 0; frame < frames; ++frame) {
+        samples[frame * channels] =
+            scale_sample(samples[frame * channels], left_gain);
+        if (channels == 2) {
+            samples[frame * 2U + 1U] =
+                scale_sample(samples[frame * 2U + 1U], right_gain);
+        }
+    }
+
+    if (sample_rate != s_input_sample_rate) {
+        s_input_sample_rate = sample_rate;
+        s_resample_phase = 0;
+    }
+    i2s_pdm_writer_t writer = {0};
+    for (size_t frame = 0; frame < frames; ++frame) {
+        int32_t mono = samples[frame * channels];
+        if (channels == 2)
+            mono = (mono + samples[frame * 2U + 1U]) / 2;
+        s_resample_phase += BOARD_PDM_SAMPLE_RATE;
+        while (s_resample_phase >= sample_rate) {
+            esp_err_t result =
+                i2s_pdm_emit_sample((int16_t)mono, &writer);
+            if (result != ESP_OK) return result;
+            s_resample_phase -= sample_rate;
+        }
+    }
+    return i2s_pdm_flush(&writer);
+}
+
+void native_audio_output_silence(void) {
+    if (!s_i2s_started) return;
+    i2s_pdm_writer_t writer = {0};
+    esp_err_t result = i2s_pdm_finish_partial_word(&writer);
+    if (result == ESP_OK) result = i2s_pdm_fill_dma_silence();
+    if (result != ESP_OK)
+        ESP_LOGE(TAG, "I2S-PDM silence failed: %s", esp_err_to_name(result));
+    s_input_sample_rate = 0;
+    s_resample_phase = 0;
+    s_pdm_integrator = 0;
+    s_i2s_pdm_partial_word = 0;
+    s_i2s_pdm_partial_bits = 0;
+}
+
 #else
 
 esp_err_t native_audio_output_init(void) {

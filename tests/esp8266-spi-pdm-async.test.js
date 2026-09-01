@@ -17,12 +17,12 @@ const pdm8Profile = fs.readFileSync(
   "utf8",
 );
 
-test("ESP8266 keeps 16x PDM by default and offers an explicit 384 kHz PDM8 profile", () => {
-  assert.match(kconfig, /default YORADIO_SPI_PDM_OVERSAMPLE_16/);
+test("ESP8266 defaults to 384 kHz PDM8 and preserves its explicit profile", () => {
+  assert.match(kconfig, /default YORADIO_SPI_PDM_OVERSAMPLE_8/);
   assert.match(pdm8Profile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
   assert.match(pdm8Profile, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
-  assert.match(pdmConfig, /BOARD_SPI_PDM_OVERSAMPLE 8U/);
-  assert.match(pdmConfig, /BOARD_SPI_PDM_BIT_RATE_HZ 384615U/);
+  assert.match(pdmConfig, /BOARD_PDM_OVERSAMPLE 8U/);
+  assert.match(pdmConfig, /BOARD_PDM_BIT_RATE_HZ 384615U/);
   assert.match(pdmConfig, /BOARD_SPI_PDM_CLOCK_PREDIV 25U/);
   assert.match(output, /SPI1\.clock\.clkdiv_pre = BOARD_SPI_PDM_CLOCK_PREDIV/);
 });

@@ -44,12 +44,34 @@ config YORADIO_HELIX_AAC_SSO
         shortens the transform hot path without allocating another buffer, at
         the cost of a small PCM precision loss.
 
-choice YORADIO_SPI_PDM_OVERSAMPLE
-    prompt "SPI-PDM bits per PCM sample"
-    default YORADIO_SPI_PDM_OVERSAMPLE_16
+choice YORADIO_AUDIO_OUTPUT
+    prompt "Audio output backend"
+    default YORADIO_AUDIO_OUTPUT_I2S_PDM
     help
-        Select the one-bit SPI-PDM oversampling ratio. Eight bits halves the
-        PDM conversion and interrupt rate but raises quantization noise.
+        I2S-PDM is the production default. SLC DMA continuously clocks a
+        one-bit delta-sigma stream on fixed GPIO3 without the inter-block gap
+        of the single-buffer HSPI peripheral. GPIO3 is UART0 RX, so the
+        application intentionally ignores UART input while audio is active.
+
+config YORADIO_AUDIO_OUTPUT_I2S_PDM
+    bool "I2S DMA PDM on GPIO3 (production)"
+
+config YORADIO_AUDIO_OUTPUT_SPI_PDM
+    bool "HSPI PDM on GPIO13 (legacy UART-safe)"
+
+config YORADIO_AUDIO_OUTPUT_I2S_PCM
+    bool "Standard I2S PCM for an external DAC"
+
+endchoice
+
+choice YORADIO_SPI_PDM_OVERSAMPLE
+    prompt "PDM bits per PCM sample"
+    default YORADIO_SPI_PDM_OVERSAMPLE_8
+    help
+        Select the one-bit PDM oversampling ratio used by both I2S-DMA and
+        legacy SPI output. Eight bits matches the current 384.615 kHz
+        production profile; sixteen bits lowers quantization noise at twice
+        the conversion and output bandwidth.
 
 config YORADIO_SPI_PDM_OVERSAMPLE_8
     bool "8 bits/sample (384.615 kHz at 48 kHz)"

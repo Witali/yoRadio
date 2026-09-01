@@ -38,7 +38,7 @@ The first window is a runtime-counter baseline and is intentionally excluded.
 
 ## Generated-PCM physical-output profile
 
-For a decoder- and network-independent SPI-PDM measurement, configure the same
+For a decoder- and network-independent physical-output measurement, configure the same
 QIO80 sdkconfig with:
 
     -DYORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=ON
@@ -51,13 +51,14 @@ warm-up and ten-second measurement. The saved Kconfig baseline is:
 
     esp8266/rtos-sdk-native/sdkconfig.audio-profile-qio80.defaults
 
-SPI-PDM on GPIO13/D7 is the default. To run the identical generator through
-the ESP8266 fixed I2S DMA pins instead, add:
+I2S-PDM SLC DMA on GPIO3/RX is the default and clocks only the DATA pin;
+BCLK/LRCLK remain ordinary GPIOs. UART input is intentionally ignored, while
+UART TX logging on GPIO1 remains available. The onboard 470-ohm resistor is
+the only electrical current limiter; do not transmit from the host during
+audio output.
 
-    -DYORADIO_ESP8266_FIXED_I2S=ON
-
-The I2S mapping is DATA GPIO3/RX, BCLK GPIO15/D8, LRCLK GPIO2/D4. GPIO3
-conflicts with UART RX, so use this variant only with the documented wiring;
-UART TX logging on GPIO1 remains available. The benchmark is deliberately a
-build profile rather than production behavior and must be followed by
+Select `CONFIG_YORADIO_AUDIO_OUTPUT_SPI_PDM` for the legacy GPIO13/D7
+SPI-PDM comparison. The deprecated CMake option
+`YORADIO_ESP8266_FIXED_I2S=ON` now selects standard PCM for an external I2S
+DAC rather than the no-DAC PDM path. The benchmark must be followed by
 restoring the normal application image.
