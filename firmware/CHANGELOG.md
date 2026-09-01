@@ -5,6 +5,20 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-01
 
+### ESP8266 isolated audio-output profiles
+
+- Added a deterministic generated-PCM benchmark that exercises the real audio
+  driver without Wi-Fi, HTTP, flash reads, or a decoder.
+- Removed the producer-side 64-byte SPI-PDM copy by filling a reserved static
+  queue slot directly. On the physical Wemos D1 mini this reduced output
+  compute by 6.07% and total CPU busy time by 1.2 percentage points with no
+  heap cost.
+- Saved one QIO80 configuration for both stream profiling and generated-PCM
+  output testing. SPI-PDM remains the default; the same benchmark compiles
+  with fixed I2S/SLC DMA for a future GPIO3/15/2 hardware comparison.
+- Refreshed and flashed the ordinary QIO80 radio/WebUI image after testing;
+  WebUI returned HTTP 200 at `192.168.100.6`.
+
 ### ESP8266 Helix 32-bit SSO MP3 synthesis
 
 - Added an optional reduced-precision Helix polyphase path that maps the hot
