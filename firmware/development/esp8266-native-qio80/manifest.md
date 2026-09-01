@@ -18,7 +18,7 @@ the application. Flash all three images without erasing NVS or SPIFFS:
 
 SHA-256:
 
-- `app.bin`: `6621B5690DB472E69AD9CD7F4B60E183BE028F91B0807C900063E851F55BE608`
+- `app.bin`: `10C6420BD67DDBBF173A3A3977172F52C71A57B59627B9994747BBBF6FC1A074`
 - `bootloader.bin`: `34A628DA55749D0C72ED3BC78EDA60B29DE6D341A8E54E70AE05CFF772219A85`
 - `partition-table.bin`: `C3AEC2B0CC450D37286B5D832556268970CF0F63AA31250C94A21116D22A22DF`
 
@@ -34,6 +34,10 @@ Physical validation on COM10:
 - disassembly confirmed that the ordinary MP3 frame path no longer calls the
   ROM integer divide helper; only one-time free-format bitrate detection keeps
   a variable division;
+- GCC 8.4 disassembly and physical RAM benchmarks rejected loop unrolling in
+  the MP3 polyphase kernel: the original, manual x2, and manual x4 functions
+  use 1,730/2,763/4,699 bytes and average 14,284/15,092/15,669 us per frame;
+  the production source therefore keeps the compact original loop;
 - decode-only MP3 320 kbit/s reached 74.1% realtime with a 32.9 ms worst
   decoder call, versus 53.8% before the fixed-point optimization;
 - decode-only AAC 320 kbit/s reached 99.2% realtime with a 21.4 ms worst
@@ -42,7 +46,7 @@ Physical validation on COM10:
 - the reciprocal-enabled production image booted after flashing on COM10;
 - CPU reported 160 MHz and the 511-station index loaded from SPIFFS;
 - Wi-Fi connected and received `192.168.100.6`;
-- WebUI root, status API and playlist returned HTTP 200;
+- WebUI root, `/api/native/status`, and `/data/playlist.csv` returned HTTP 200;
 - 20 consecutive status requests succeeded;
 - eight consecutive 36,086-byte playlist reads from SPIFFS succeeded;
 - the board was intentionally left running with QIO at 80 MHz.
