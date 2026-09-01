@@ -24,6 +24,7 @@ static int16_t s_pcm[BENCHMARK_FRAMES * BENCHMARK_CHANNELS];
 static uint64_t s_spi_wait_us;
 static uint32_t s_spi_wait_max_us;
 static uint32_t s_spi_wait_calls;
+static uint32_t s_spi_wait_invalid;
 static int64_t s_spi_wait_started;
 
 void audio_output_benchmark_spi_wait_begin(void) {
@@ -31,7 +32,12 @@ void audio_output_benchmark_spi_wait_begin(void) {
 }
 
 void audio_output_benchmark_spi_wait_end(void) {
-    uint32_t elapsed = (uint32_t)(esp_timer_get_time() - s_spi_wait_started);
+    int64_t elapsed64 = esp_timer_get_time() - s_spi_wait_started;
+    if (elapsed64 < 0 || elapsed64 > 200000) {
+        ++s_spi_wait_invalid;
+        return;
+    }
+    uint32_t elapsed = (uint32_t)elapsed64;
     s_spi_wait_us += elapsed;
     if (elapsed > s_spi_wait_max_us) s_spi_wait_max_us = elapsed;
     ++s_spi_wait_calls;
@@ -119,6 +125,7 @@ void audio_output_benchmark_run(void) {
     s_spi_wait_us = 0;
     s_spi_wait_max_us = 0;
     s_spi_wait_calls = 0;
+    s_spi_wait_invalid = 0;
     uint32_t cpu_total_before = 0;
     uint32_t cpu_idle_before = 0;
     uint32_t cpu_total_after = 0;
@@ -149,11 +156,12 @@ void audio_output_benchmark_run(void) {
              realtime_x10 / 10U, realtime_x10 % 10U,
              (unsigned)write_us, calls ? (unsigned)(write_us / calls) : 0U,
              maximum_us);
-    ESP_LOGI(TAG, "spi_wait=%u us calls=%u avg=%u us max=%u us",
+    ESP_LOGI(TAG,
+             "spi_wait=%u us calls=%u avg=%u us max=%u us invalid=%u",
              (unsigned)s_spi_wait_us, s_spi_wait_calls,
              s_spi_wait_calls
                  ? (unsigned)(s_spi_wait_us / s_spi_wait_calls) : 0U,
-             s_spi_wait_max_us);
+             s_spi_wait_max_us, s_spi_wait_invalid);
     if (have_cpu) {
         uint32_t total = cpu_total_after - cpu_total_before;
         uint32_t idle = cpu_idle_after - cpu_idle_before;

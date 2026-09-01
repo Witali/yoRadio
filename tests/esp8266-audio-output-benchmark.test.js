@@ -23,7 +23,8 @@ test("ESP8266 output benchmark generates deterministic PCM without Wi-Fi or code
 
 test("ESP8266 output benchmark reports queue wait, CPU idle, and heap", () => {
   assert.match(bench, /audio_output_benchmark_spi_wait_begin/);
-  assert.match(bench, /spi_wait=.*calls=.*avg=.*max=/);
+  assert.match(bench, /spi_wait=.*calls=.*avg=.*max=.*invalid=/);
+  assert.match(bench, /elapsed64 < 0 \|\| elapsed64 > 200000/);
   assert.match(bench, /uxTaskGetSystemState/);
   assert.match(bench, /cpu busy=.*idle=/);
   assert.match(bench, /esp_get_free_heap_size/);
