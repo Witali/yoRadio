@@ -44,14 +44,25 @@ default until every integrated libmad criterion below passes.
   arena for its two 8-KB 32-bit workspaces.
 - [x] Add an MP3-only build profile. When AAC is disabled, size PCM for one
   576-sample stereo granule (2304 bytes instead of 4096) and use a backend-
-  appropriate IRAM arena (5 KB for libmad: 4236 bytes measured plus 884 bytes
-  headroom; measured Helix requirement must remain covered).
+  appropriate IRAM arena. libmad now reserves 12 KiB: 4236 bytes for
+  `mad_synth`, 4608 bytes for `xr_raw`, 2304 bytes for the reorder workspace,
+  and 1136 bytes of alignment/version headroom.
+- [x] Move only libmad's aligned 32-bit Layer III `xr_raw` and reorder
+  workspaces to IRAM. The Xtensa DWARF layout confirms that `mad_frame` falls
+  from 20784 to 13880 bytes, freeing 6904 bytes of byte-addressable DRAM while
+  keeping `mad_stream`, the frame header, subband samples, and overlap in DRAM.
+- [x] Keep the normal upstream array layout unless the ESP8266 component
+  explicitly enables `YORADIO_LIBMAD_EXTERNAL_FRAME_WORKSPACE`. The external-
+  workspace host fixture decodes all 18 retained 320-kbit/s MP3 frames to PCM
+  byte-for-byte identical to the original libmad layout.
 - [x] Do not reduce the 1536-byte compressed-input buffer until fixtures prove
   that the maximum supported MP3/AAC frame still fits.
 
 ## Acceptance
 
 - [x] Build Helix and libmad full/QIO80/MP3-only profiles with GCC 8.4 `-O3`.
+- [x] Rebuild both libmad MP3-only/QIO80 and full libmad+AAC/QIO80 after the
+  IRAM frame split; both link successfully with GCC 8.4 `-O3`.
 - [x] Pass native HTTP, WebUI, codec-switch, PCM golden/SNR and repository
   regression tests.
 - [x] On the physical board, boot without a reset loop, obtain DHCP, return
@@ -59,8 +70,13 @@ default until every integrated libmad criterion below passes.
 - [x] Play low- and high-bitrate MP3 and AAC streams, including a 320-kbit/s
   fixture/stream, without decoder starvation or heap-reserve violations.
   Verified live MP3 at 128 kbit/s, live AAC near 320 kbit/s and the deterministic
-  MP3/AAC 320-kbit/s RAM fixtures. The full libmad+AAC profile still cannot
-  create libmad after reserving AAC's 16-KB arena; use the tested MP3-only
-  libmad profile or the normal Helix profile.
+  MP3/AAC 320-kbit/s RAM fixtures. Before the IRAM frame split, the full
+  libmad+AAC profile could not create libmad after reserving AAC's 16-KB
+  arena. The reduced-DRAM full image now builds, but keep using the tested
+  MP3-only libmad or normal Helix profile until it is rechecked on hardware.
+- [ ] Repeat the physical MP3-only RAM benchmark after the IRAM frame split.
+  Expected active workspace accounting is 20388 bytes DRAM and 12288 bytes
+  reserved IRAM; confirm boot, WebUI, BOOT control, lifecycle delta zero, and
+  continuous 320-kbit/s playback before replacing the archived image.
 - [x] Archive a successful development firmware and update the firmware
   changelog only after the integrated test passes.

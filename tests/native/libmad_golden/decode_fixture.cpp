@@ -27,6 +27,12 @@ int main(int argc, char **argv) {
     mad_stream stream;
     mad_frame frame;
     mad_synth synth;
+#if defined(YORADIO_LIBMAD_EXTERNAL_FRAME_WORKSPACE)
+    mad_fixed_t xr_raw[576 * 2] = {};
+    mad_fixed_t reorder_tmp[576] = {};
+    frame.xr_raw = xr_raw;
+    frame.tmp = reorder_tmp;
+#endif
     mad_stream_init(&stream);
     mad_stream_options(&stream, MAD_OPTION_IGNORECRC);
     mad_frame_init(&frame);

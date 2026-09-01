@@ -12,10 +12,10 @@
 
 namespace {
 #if !CONFIG_YORADIO_HELIX_AAC && CONFIG_YORADIO_MP3_DECODER_LIBMAD
-/* The hardware RAM benchmark measures a 4,236-byte mad_synth allocation.
- * Keep almost 900 bytes of alignment/version headroom without reserving the
- * unused 4 KiB that the first experimental profile carried. */
-constexpr size_t kWordArenaBytes = 5U * 1024U;
+/* libmad keeps mad_synth (4,236 bytes), xr_raw (4,608 bytes), and the Layer
+ * III reorder scratch buffer (2,304 bytes) in aligned 32-bit IRAM. The 12-KiB
+ * arena leaves more than 1 KiB for alignment and version headroom. */
+constexpr size_t kWordArenaBytes = 12U * 1024U;
 #elif !CONFIG_YORADIO_HELIX_AAC
 /* Helix MP3 uses about 14.2 KiB across Huffman/dequant/subband state. */
 constexpr size_t kWordArenaBytes = 15U * 1024U;

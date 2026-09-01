@@ -72,8 +72,15 @@ struct mad_frame {
     mad_fixed_t sbsample[2][36][32];	/* synthesis subband filter samples */
     mad_fixed_t overlap[2][32][18];	/* Layer III block overlap data */
 
+# if defined(YORADIO_LIBMAD_EXTERNAL_FRAME_WORKSPACE)
+    /* ESP8266 may place these aligned 32-bit-only Layer III workspaces in
+     * IRAM while keeping the byte/halfword-addressed frame state in DRAM. */
+    mad_fixed_t *xr_raw;
+    mad_fixed_t *tmp;
+# else
     mad_fixed_t xr_raw[576 * 2];
     mad_fixed_t tmp[576];
+# endif
 };
 
 # define MAD_NCHANNELS(header)		((header)->mode ? 2 : 1)

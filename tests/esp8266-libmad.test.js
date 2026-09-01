@@ -22,13 +22,16 @@ function wslPath(file) {
   return result.stdout.trim();
 }
 
-function compile(outputDir) {
+function compile(outputDir, externalWorkspace = false) {
   if(process.platform !== "win32") {
     return {skip: "This ESP8266 libmad host test currently uses WSL GCC"};
   }
   const linuxOutput = wslPath(outputDir);
   if(!linuxOutput) return {skip: "WSL GCC is not available"};
-  const executable = `${linuxOutput}/libmad-golden`;
+  const suffix = externalWorkspace ? "-external-workspace" : "";
+  const executable = `${linuxOutput}/libmad-golden${suffix}`;
+  const definitions = externalWorkspace
+    ? ["-DYORADIO_LIBMAD_EXTERNAL_FRAME_WORKSPACE=1"] : [];
   const sourceNames = [
     "bit.c", "fixed.c", "frame.c", "huffman.c", "layer3.c", "stream.c",
     "synth.c", "timer.c", "version.c",
@@ -37,14 +40,15 @@ function compile(outputDir) {
   const objects = [];
   for(const name of sourceNames) {
     const object = `${linuxOutput}/${name}.o`;
-    const build = spawnSync("wsl.exe", ["-e", "gcc", "-O2", ...includeArgs,
+    const build = spawnSync("wsl.exe", ["-e", "gcc", "-O2", ...definitions,
+      ...includeArgs,
       "-c", wslPath(path.join(libmad, name)), "-o", object], {encoding: "utf8"});
     assert.equal(build.status, 0, `${build.stdout}\n${build.stderr}`);
     objects.push(object);
   }
   const mainObject = `${linuxOutput}/decode_fixture.o`;
   const mainBuild = spawnSync("wsl.exe", ["-e", "g++", "-std=c++17", "-O2",
-    ...includeArgs, "-c", wslPath(path.join(
+    ...definitions, ...includeArgs, "-c", wslPath(path.join(
       root, "tests", "native", "libmad_golden", "decode_fixture.cpp",
     )), "-o", mainObject], {encoding: "utf8"});
   assert.equal(mainBuild.status, 0, `${mainBuild.stdout}\n${mainBuild.stderr}`);
@@ -137,6 +141,14 @@ test("ESP8266 libmad backend is pinned, selectable, and decodes golden MP3", t =
   const pcm = fs.readFileSync(pcmPath);
   assert.ok(pcm.length >= 80000, "libmad produced too little PCM");
   assert.match(decoded.stdout, /rate=48000 channels=2/);
+  const externalBuild = compile(outputDir, true);
+  const externalPcmPath = path.join(outputDir, "libmad-external.pcm");
+  const externalDecoded = spawnSync("wsl.exe", ["-e", externalBuild.executable,
+    wslPath(fixture), wslPath(externalPcmPath)], {encoding: "utf8"});
+  assert.equal(externalDecoded.status, 0,
+    `${externalDecoded.stdout}\n${externalDecoded.stderr}`);
+  assert.deepEqual(fs.readFileSync(externalPcmPath), pcm,
+    "external libmad frame workspace changed PCM output");
   const helixExecutable = compileHelix(outputDir);
   const helixPcmPath = path.join(outputDir, "helix.pcm");
   const helixDecoded = spawnSync("wsl.exe", ["-e", helixExecutable, "mp3",

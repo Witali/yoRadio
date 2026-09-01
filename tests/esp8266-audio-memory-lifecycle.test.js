@@ -20,12 +20,22 @@ const mp3Only = read(
   "esp8266", "rtos-sdk-native",
   "sdkconfig.libmad-mp3-only-qio80.defaults",
 );
+const libmadFrame = read(
+  "esp8266", "rtos-sdk-native", "components", "libmad8266", "upstream",
+  "libmad", "frame.h",
+);
+const codecCmake = read(
+  "esp8266", "rtos-sdk-native", "components", "helix_codecs",
+  "CMakeLists.txt",
+);
 
 test("libmad follows the same symmetric CodecArena ownership as Helix", () => {
   const free = bridge.match(/void libmad_free\(\) \{[\s\S]*?\n\}/);
   assert.ok(free);
   assert.match(free[0], /mad_stream_finish/);
   assert.match(free[0], /mad_frame_finish/);
+  assert.match(free[0], /CodecArenaFree\(s_libmad\.frame->tmp\)/);
+  assert.match(free[0], /CodecArenaFree\(s_libmad\.frame->xr_raw\)/);
   assert.match(free[0], /CodecArenaFree\(s_libmad\.synth\)/);
   assert.match(free[0], /CodecArenaFree\(s_libmad\.stream\)/);
   assert.match(free[0], /CodecArenaFree\(s_libmad\.frame\)/);
@@ -65,7 +75,28 @@ test("audio workspace is lazy, reusable for station changes, and released on sto
 test("MP3-only libmad profile reduces PCM and IRAM without changing AAC profile", () => {
   assert.match(mp3Only, /CONFIG_YORADIO_MP3_DECODER_LIBMAD=y/);
   assert.match(mp3Only, /# CONFIG_YORADIO_HELIX_AAC is not set/);
-  assert.match(arena, /!CONFIG_YORADIO_HELIX_AAC && CONFIG_YORADIO_MP3_DECODER_LIBMAD[\s\S]*5U \* 1024U/);
+  assert.match(arena, /!CONFIG_YORADIO_HELIX_AAC && CONFIG_YORADIO_MP3_DECODER_LIBMAD[\s\S]*12U \* 1024U/);
   assert.match(arena, /#else[\s\S]*16U \* 1024U/);
   assert.match(bridge, /#if CONFIG_YORADIO_HELIX_AAC[\s\S]*1024U \* 2U[\s\S]*576U \* 2U/);
+});
+
+test("libmad places only aligned Layer III word workspaces in ESP8266 IRAM", () => {
+  assert.match(
+    codecCmake,
+    /CONFIG_YORADIO_MP3_DECODER_LIBMAD[\s\S]*YORADIO_LIBMAD_EXTERNAL_FRAME_WORKSPACE=1/,
+  );
+  assert.match(
+    libmadFrame,
+    /YORADIO_LIBMAD_EXTERNAL_FRAME_WORKSPACE[\s\S]*mad_fixed_t \*xr_raw;[\s\S]*mad_fixed_t \*tmp;/,
+  );
+  assert.match(
+    bridge,
+    /frame->xr_raw = static_cast<mad_fixed_t \*>\([\s\S]*CodecArenaCalloc32/,
+  );
+  assert.match(
+    bridge,
+    /frame->tmp = static_cast<mad_fixed_t \*>\([\s\S]*CodecArenaCalloc32/,
+  );
+  assert.match(bridge, /kLibmadXrSamples = 576U \* 2U/);
+  assert.match(bridge, /kLibmadReorderSamples = 576U/);
 });

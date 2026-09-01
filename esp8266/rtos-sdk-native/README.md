@@ -19,9 +19,11 @@ For a reproducible Wemos QIO80 libmad experiment, use
 `CONFIG_YORADIO_MP3_DECODER_HELIX`.
 The `sdkconfig.libmad-mp3-only-qio80.defaults` experiment also disables AAC;
 this reduces stereo PCM storage from 4096 to 2304 bytes and the fixed IRAM word
-arena from 16 KiB to 5 KiB. The physical RAM benchmark measures 4236 bytes
-used by `mad_synth`, leaving 884 bytes of headroom. It is not a full-feature
-replacement profile.
+arena from 16 KiB to 12 KiB. The arena stores the 4236-byte `mad_synth`, the
+4608-byte Layer III spectral workspace, and the 2304-byte reorder workspace.
+The Xtensa build uses 11152 bytes of that arena and reduces `mad_frame` in
+8-bit DRAM from 20784 to 13880 bytes. It is not a full-feature replacement
+profile.
 Audio defaults to mono SPI-PDM on GPIO13/D7, leaving UART0 RX GPIO3
 available. HSPI clocks the PDM stream at 769.23 kHz, the closest hardware rate
 to 48 kHz x 16; GPIO14/D5 carries the unused SPI clock and should not be wired

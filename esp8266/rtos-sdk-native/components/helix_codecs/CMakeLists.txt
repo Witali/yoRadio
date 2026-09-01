@@ -43,6 +43,10 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1)
+if(CONFIG_YORADIO_MP3_DECODER_LIBMAD)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_LIBMAD_EXTERNAL_FRAME_WORKSPACE=1)
+endif()
 option(YORADIO_ESP8266_HELIX_STAGE_PROFILE
   "Measure Helix stages with the ESP microsecond timer" OFF)
 if(YORADIO_ESP8266_HELIX_STAGE_PROFILE)

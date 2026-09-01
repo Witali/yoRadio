@@ -29,8 +29,14 @@ extern "C" void audio_profile_decode_end(void);
 
 namespace {
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
+constexpr size_t kLibmadXrSamples = 576U * 2U;
+constexpr size_t kLibmadReorderSamples = 576U;
 constexpr size_t kArenaBytes = sizeof(mad_stream) + sizeof(mad_frame) +
-                               sizeof(mad_synth) + 3U * alignof(max_align_t);
+                               sizeof(mad_synth) +
+                               sizeof(mad_fixed_t) *
+                                   (kLibmadXrSamples +
+                                    kLibmadReorderSamples) +
+                               5U * alignof(max_align_t);
 #else
 constexpr size_t kArenaBytes = 23328U;
 #endif
@@ -133,16 +139,26 @@ LibmadDecoder s_libmad = {};
 void libmad_free();
 
 bool libmad_allocate() {
-    /* The synthesis state is 32-bit-only and fits in the preallocated IRAM
-     * word arena. The byte-addressed bit-reservoir and the larger frame state
-     * remain in DRAM. All allocations still share the codec arena lifetime. */
+    /* Keep only aligned mad_fixed_t workspaces in the preallocated IRAM word
+     * arena. The byte-addressed bit reservoir, frame header, overlap, and
+     * synthesis samples remain in DRAM. Every allocation shares one owner and
+     * is released as a unit when the decoder stops or changes backend. */
     s_libmad.synth = static_cast<mad_synth *>(CodecArenaCalloc32(
         CODEC_ARENA_MP3, 1, sizeof(mad_synth)));
     s_libmad.stream = static_cast<mad_stream *>(CodecArenaCalloc(
         CODEC_ARENA_MP3, 1, sizeof(mad_stream)));
     s_libmad.frame = static_cast<mad_frame *>(CodecArenaCalloc(
         CODEC_ARENA_MP3, 1, sizeof(mad_frame)));
-    if (!s_libmad.stream || !s_libmad.frame || !s_libmad.synth) {
+    if (s_libmad.frame) {
+        s_libmad.frame->xr_raw = static_cast<mad_fixed_t *>(
+            CodecArenaCalloc32(CODEC_ARENA_MP3, kLibmadXrSamples,
+                               sizeof(mad_fixed_t)));
+        s_libmad.frame->tmp = static_cast<mad_fixed_t *>(
+            CodecArenaCalloc32(CODEC_ARENA_MP3, kLibmadReorderSamples,
+                               sizeof(mad_fixed_t)));
+    }
+    if (!s_libmad.stream || !s_libmad.frame || !s_libmad.synth ||
+        !s_libmad.frame->xr_raw || !s_libmad.frame->tmp) {
         libmad_free();
         return false;
     }
@@ -156,6 +172,8 @@ bool libmad_allocate() {
 void libmad_free() {
     if (s_libmad.stream) mad_stream_finish(s_libmad.stream);
     if (s_libmad.frame) mad_frame_finish(s_libmad.frame);
+    if (s_libmad.frame) CodecArenaFree(s_libmad.frame->tmp);
+    if (s_libmad.frame) CodecArenaFree(s_libmad.frame->xr_raw);
     CodecArenaFree(s_libmad.synth);
     CodecArenaFree(s_libmad.stream);
     CodecArenaFree(s_libmad.frame);
