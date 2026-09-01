@@ -16,8 +16,12 @@ entries are retained; changes are published under a new firmware version.
   of which the decoder uses 11,152 bytes.
 - Verified byte-identical PCM between the original and external-workspace
   layouts, passed all 261 repository tests, and built both MP3-only and full
-  libmad+AAC QIO80 images. Physical validation remains pending because no
-  serial adapter was connected.
+  libmad+AAC QIO80 images.
+- On the physical 160-MHz Wemos D1 mini, the new libmad decoded the retained
+  320-kbit/s RAM frame in 11,965 us average (2.005x realtime), versus Helix at
+  13,786 us (1.740x). libmad is 13.21% faster by frame time, but uses 7,424
+  bytes more DRAM and adds 50,384 bytes of flash. The ordinary validated Helix
+  radio image was restored after the benchmark and obtained `192.168.100.6`.
 - Archived the test image under
   [`development/esp8266-native-libmad-iram/`](development/esp8266-native-libmad-iram/)
   without replacing the previously hardware-validated libmad image.

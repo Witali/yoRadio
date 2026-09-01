@@ -10,8 +10,8 @@
 - Profile: `sdkconfig.libmad-mp3-only-qio80.defaults`
 - MP3: ESP8266Audio libmad, external Layer III IRAM workspace
 - AAC: disabled
-- Physical validation: pending; no serial adapter was connected during this
-  build
+- Physical validation: decoder RAM benchmark passed on the Wemos D1 mini;
+  integrated radio/WebUI validation of this archived application is pending
 
 Flash without erasing NVS or SPIFFS:
 
@@ -30,4 +30,9 @@ Validation completed:
 - Xtensa DWARF reports `mad_frame` reduced from 20,784 to 13,880 bytes;
 - active MP3 workspace is expected to reserve 12,288 bytes IRAM and use
   20,388 bytes DRAM, freeing 6,904 bytes of byte-addressable DRAM compared
-  with the previous image.
+  with the previous MP3-only image;
+- the fair full MP3+AAC hardware benchmark reserved 16,384 bytes IRAM and used
+  22,180 bytes DRAM for libmad versus 14,756 bytes for Helix;
+- libmad decoded 200 RAM-resident 320-kbit/s frames in 11,965 us average
+  (2.005x realtime) versus Helix at 13,786 us (1.740x), while 50 lifecycle
+  cycles returned heap from 96,868 to 96,868 bytes.

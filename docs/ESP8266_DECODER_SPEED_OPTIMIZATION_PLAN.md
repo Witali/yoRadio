@@ -201,6 +201,38 @@ production default. Before another integrated libmad test, allocate the MP3
 decoder lazily after Wi-Fi initialization or reduce its workspace, then repeat
 the full live-stream, WebUI and codec-switch matrix.
 
+### Physical result after the libmad IRAM frame split — 2026-09-01
+
+The comparison was repeated on the same Wemos D1 mini after moving libmad's
+4608-byte `xr_raw` and 2304-byte reorder workspace from DRAM into the existing
+16-KiB word arena. Both images used 160 MHz CPU, QIO flash at 80 MHz, GCC 8.4
+`-O3`, the same RAM-resident 320-kbit/s frame, 8 warm-up frames and 200 measured
+frames. Wi-Fi and audio output remained disabled.
+
+| Backend/fixture | Average frame | Maximum frame | Audio/CPU speed | Free heap | Codec DRAM | Reserved IRAM | App binary |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Helix MP3 320 kbit/s | 13,786 us | 13,806 us | 1.740x | 81,272 B | 14,756 B | 16,384 B | 275,744 B |
+| libmad MP3 320 kbit/s | 11,965 us | 11,969 us | 2.005x | 74,648 B | 22,180 B | 16,384 B | 326,128 B |
+| Helix AAC control, Helix image | 16,127 us | 16,140 us | 1.322x | 86,180 B | 9,872 B | 16,384 B | 275,744 B |
+| Helix AAC control, libmad image | 15,981 us | 15,990 us | 1.334x | 86,940 B | 9,880 B | 16,384 B | 326,128 B |
+
+Against the current Helix build, libmad reduces average MP3 frame time by
+13.21% and increases throughput by 15.23%. It uses 7424 bytes more dynamic
+DRAM, leaves 6624 bytes less free heap, and adds 50384 bytes of application
+flash. Both reserve the same 16-KiB IRAM arena in this fair MP3+AAC profile.
+
+Against the previous libmad baseline, the IRAM split reduces average frame
+time from 12904 to 11965 us (7.28%), raises throughput from 1.859x to 2.005x
+(7.85%), and increases free heap from 67888 to 74648 bytes (+6760). The
+unchanged Helix AAC control differs by less than 1%, which bounds build-layout
+and measurement noise well below the MP3 result. Fifty create/destroy cycles
+and fifty MP3/AAC switches returned heap from 96868 to 96868 bytes (delta 0).
+
+The reset-loop paragraph above records the older eager-allocation image. The
+current source allocates codec state lazily and the new full benchmark creates
+libmad successfully, but the complete libmad+AAC radio/WebUI image still needs
+an integrated physical run before replacing Helix as the production default.
+
 ## Expected outcome
 
 AAC is the more realistic candidate for realtime operation through a
