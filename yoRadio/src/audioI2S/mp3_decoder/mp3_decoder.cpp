@@ -7,6 +7,23 @@
  */
 #include "mp3_decoder.h"
 #include "../CodecMemoryArena.h"
+#include "../helix_stage_profile.h"
+
+#if defined(YORADIO_ESP8266_NATIVE) && \
+    defined(YORADIO_ESP8266_HELIX_RECIPROCAL_DIVIDE) && \
+    !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+#define HELIX_UDIV3(value)  ((int)helix_lx106_udiv_recip((uint32_t)(value), 3U, 0x55555556U))
+#define HELIX_UDIV5(value)  ((int)helix_lx106_udiv_recip((uint32_t)(value), 5U, 0x33333334U))
+#define HELIX_UDIV6(value)  ((int)helix_lx106_udiv_recip((uint32_t)(value), 6U, 0x2aaaaaabU))
+#define HELIX_UDIV18(value) ((int)helix_lx106_udiv_recip((uint32_t)(value), 18U, 0x0e38e38fU))
+#define HELIX_UDIV36(value) ((int)helix_lx106_udiv_recip((uint32_t)(value), 36U, 0x071c71c8U))
+#else
+#define HELIX_UDIV3(value)  ((value) / 3)
+#define HELIX_UDIV5(value)  ((value) / 5)
+#define HELIX_UDIV6(value)  ((value) / 6)
+#define HELIX_UDIV18(value) ((value) / 18)
+#define HELIX_UDIV36(value) ((value) / 36)
+#endif
 /* clip to range [-2^n, 2^n - 1] */
 #if 0 //Fast on ARM:
 #define CLIP_2N(y, n) { \
@@ -784,7 +801,10 @@ int UnpackFrameHeader(unsigned char *buf){
     m_MP3DecInfo->nChans = (m_sMode == Mono ? 1 : 2);
     m_MP3DecInfo->samprate = samplerateTab[m_MPEGVersion][m_FrameHeader->srIdx];
     m_MP3DecInfo->nGrans = (m_MPEGVersion == MPEG1 ? m_NGRANS_MPEG1 : m_NGRANS_MPEG2);
-    m_MP3DecInfo->nGranSamps = ((int) samplesPerFrameTab[m_MPEGVersion][m_FrameHeader->layer - 1])/m_MP3DecInfo->nGrans;
+    int samplesPerFrame =
+        (int)samplesPerFrameTab[m_MPEGVersion][m_FrameHeader->layer - 1];
+    m_MP3DecInfo->nGranSamps =
+        (m_MP3DecInfo->nGrans == 2 ? samplesPerFrame >> 1 : samplesPerFrame);
     m_MP3DecInfo->layer = m_FrameHeader->layer;
 
     /* get bitrate and nSlots from table, unless brIdx == 0 (free mode) in which case caller must figure it out himself
@@ -1003,8 +1023,9 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         /* in other words: if ((modeExt & 0x01) == 0 || ch == 0) */
         if (sfCompress < 400) {
             /* max slen = floor[(399/16) / 5] = 4 */
-            slen[0] = (sfCompress >> 4) / 5;
-            slen[1]= (sfCompress >> 4) % 5;
+            int packed = sfCompress >> 4;
+            slen[0] = HELIX_UDIV5(packed);
+            slen[1] = packed - slen[0] * 5;
             slen[2]= (sfCompress & 0x0f) >> 2;
             slen[3]= (sfCompress & 0x03);
             sfcIdx = 0;
@@ -1012,8 +1033,9 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         else if(sfCompress < 500){
             /* max slen = floor[(99/4) / 5] = 4 */
             sfCompress -= 400;
-            slen[0] = (sfCompress >> 2) / 5;
-            slen[1]= (sfCompress >> 2) % 5;
+            int packed = sfCompress >> 2;
+            slen[0] = HELIX_UDIV5(packed);
+            slen[1] = packed - slen[0] * 5;
             slen[2]= (sfCompress & 0x03);
             slen[3]= 0;
             sfcIdx = 1;
@@ -1021,8 +1043,8 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         else{
             /* max slen = floor[11/3] = 3 (sfCompress = 9 bits in MPEG2) */
             sfCompress -= 500;
-            slen[0] = sfCompress / 3;
-            slen[1] = sfCompress % 3;
+            slen[0] = HELIX_UDIV3(sfCompress);
+            slen[1] = sfCompress - slen[0] * 3;
             slen[2] = slen[3] = 0;
             if (sis->mixedBlock) {
                 /* adjust for long/short mix logic (see comment above in NRTab[] definition) */
@@ -1039,9 +1061,10 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         sfCompress >>= 1;
         if (sfCompress < 180) {
             /* max slen = floor[35/6] = 5 (from mod 36) */
-            slen[0] = (sfCompress / 36);
-            slen[1] = (sfCompress % 36) / 6;
-            slen[2] = (sfCompress % 36) % 6;
+            slen[0] = HELIX_UDIV36(sfCompress);
+            int remainder = sfCompress - slen[0] * 36;
+            slen[1] = HELIX_UDIV6(remainder);
+            slen[2] = remainder - slen[1] * 6;
             slen[3] = 0;
             sfcIdx = 3;
         }
@@ -1057,8 +1080,8 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         else{
             /* max slen = floor[11/3] = 3 (max sfCompress >> 1 = 511/2 = 255) */
             sfCompress -= 244;
-            slen[0] = (sfCompress / 3);
-            slen[1] = (sfCompress % 3);
+            slen[0] = HELIX_UDIV3(sfCompress);
+            slen[1] = sfCompress - slen[0] * 3;
             slen[2] = slen[3] = 0;
             sfcIdx = 5;
         }
@@ -1461,7 +1484,9 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
             }
             /* decode Huffman code words */
             prevBitOffset = bitOffset;
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_HUFFMAN);
             offset = DecodeHuffman( mainPtr, &bitOffset, huffBlockBits, gr, ch);
+            HELIX_PROFILE_END(HELIX_STAGE_HUFFMAN);
             if (offset < 0) {
                 MP3ClearBadFrame( outbuf);
                 return ERR_MP3_INVALID_HUFFCODES;
@@ -1470,14 +1495,20 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
             mainBits -= (8 * offset - prevBitOffset + bitOffset);
         }
         /* dequantize coefficients, decode stereo, reorder short blocks */
-        if (MP3Dequantize( gr) < 0) {
+        HELIX_PROFILE_BEGIN(HELIX_STAGE_DEQUANT);
+        int dequantResult = MP3Dequantize(gr);
+        HELIX_PROFILE_END(HELIX_STAGE_DEQUANT);
+        if (dequantResult < 0) {
             MP3ClearBadFrame(outbuf);
             return ERR_MP3_INVALID_DEQUANTIZE;
         }
 
         /* alias reduction, inverse MDCT, overlap-add, frequency inversion */
         for (ch = 0; ch < m_MP3DecInfo->nChans; ch++) {
-            if (IMDCT( gr, ch) < 0) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_IMDCT);
+            int imdctResult = IMDCT(gr, ch);
+            HELIX_PROFILE_END(HELIX_STAGE_IMDCT);
+            if (imdctResult < 0) {
                 MP3ClearBadFrame(outbuf);
                 return ERR_MP3_INVALID_IMDCT;
             }
@@ -1489,8 +1520,10 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
 #endif
             granuleOut += gr * m_MP3DecInfo->nGranSamps *
                           m_MP3DecInfo->nChans;
-        if (Subband(granuleOut)
-                < 0) {
+        HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS);
+        int subbandResult = Subband(granuleOut);
+        HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS);
+        if (subbandResult < 0) {
             MP3ClearBadFrame(outbuf);
             return ERR_MP3_INVALID_SUBBAND;
         }
@@ -2020,7 +2053,7 @@ int DecodeHuffman(unsigned char *buf, int *bitOffset, int huffBlockBits, int gr,
     /* figure out region boundaries (the first 2*bigVals coefficients divided into 3 regions) */
     if (sis->winSwitchFlag && sis->blockType == 2) {
         if (sis->mixedBlock == 0) {
-            r1Start = m_SFBandTable.s[(sis->region0Count + 1) / 3] * 3;
+            r1Start = m_SFBandTable.s[HELIX_UDIV3(sis->region0Count + 1)] * 3;
         } else {
             if (m_MPEGVersion == MPEG1) {
                 r1Start = m_SFBandTable.l[sis->region0Count + 1];
@@ -3415,10 +3448,11 @@ int IMDCT( int gr, int ch) {
      *   nLongBlocks = number of blocks with (possibly) non-zero power
      *   nBfly = number of butterflies to do (nLongBlocks - 1, unless no long blocks)
      */
-    blockCutoff = m_SFBandTable.l[(m_MPEGVersion == MPEG1 ? 8 : 6)] / 18; /* same as 3* num short sfb's in spec */
+    blockCutoff = HELIX_UDIV18(
+        m_SFBandTable.l[(m_MPEGVersion == MPEG1 ? 8 : 6)]); /* same as 3* num short sfb's in spec */
     if (m_SideInfoSub[gr][ch].blockType != 2) {
         /* all long transforms */
-        int x=(m_HuffmanInfo->nonZeroBound[ch] + 7) / 18 + 1;
+        int x = HELIX_UDIV18(m_HuffmanInfo->nonZeroBound[ch] + 7) + 1;
         bc.nBlocksLong=(x<32 ? x : 32);
         //bc.nBlocksLong = min((hi->nonZeroBound[ch] + 7) / 18 + 1, 32);
         nBfly = bc.nBlocksLong - 1;
@@ -3440,7 +3474,7 @@ int IMDCT( int gr, int ch) {
     assert(m_HuffmanInfo->nonZeroBound[ch] <= m_MAX_NSAMP);
 
     /* for readability, use a struct instead of passing a million parameters to HybridTransform() */
-    bc.nBlocksTotal = (m_HuffmanInfo->nonZeroBound[ch] + 17) / 18;
+    bc.nBlocksTotal = HELIX_UDIV18(m_HuffmanInfo->nonZeroBound[ch] + 17);
     bc.nBlocksPrev = m_IMDCTInfo->numPrevIMDCT[ch];
     bc.prevType = m_IMDCTInfo->prevType[ch];
     bc.prevWinSwitch = m_IMDCTInfo->prevWinSwitch[ch];

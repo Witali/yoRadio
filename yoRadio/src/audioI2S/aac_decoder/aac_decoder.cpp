@@ -8,6 +8,7 @@
 
 #include "aac_decoder.h"
 #include "../CodecMemoryArena.h"
+#include "../helix_stage_profile.h"
 #if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
 #include "../helix_lx106_fixed.h"
 #endif
@@ -2029,25 +2030,36 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
 
         /* noiseless decoder and dequantizer */
         for (ch = 0; ch < elementChans; ch++) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_HUFFMAN);
             err = DecodeNoiselessData(&inptr, &bitOffset, &bitsAvail, ch);
+            HELIX_PROFILE_END(HELIX_STAGE_HUFFMAN);
 
             if (err)
                 return err;
 
-            if (AACDequantize(ch))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_DEQUANT);
+            int dequantResult = AACDequantize(ch);
+            HELIX_PROFILE_END(HELIX_STAGE_DEQUANT);
+            if (dequantResult)
                 return ERR_AAC_DEQUANT;
         }
 
         /* mid-side and intensity stereo */
         if (m_AACDecInfo->currBlockID == AAC_ID_CPE) {
-            if (StereoProcess())
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_STEREO_FILTER);
+            int stereoResult = StereoProcess();
+            HELIX_PROFILE_END(HELIX_STAGE_STEREO_FILTER);
+            if (stereoResult)
                 return ERR_AAC_STEREO_PROCESS;
         }
 
         /* PNS, TNS, inverse transform */
         for (ch = 0; ch < elementChans; ch++) {
 
-            if (PNS(ch))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_STEREO_FILTER);
+            int pnsResult = PNS(ch);
+            HELIX_PROFILE_END(HELIX_STAGE_STEREO_FILTER);
+            if (pnsResult)
                 return ERR_AAC_PNS;
 
             if (m_AACDecInfo->sbDeinterleaveReqd[ch]) {
@@ -2057,10 +2069,16 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
                 m_AACDecInfo->sbDeinterleaveReqd[ch] = 0;
             }
 
-            if (TNSFilter(ch))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_STEREO_FILTER);
+            int tnsResult = TNSFilter(ch);
+            HELIX_PROFILE_END(HELIX_STAGE_STEREO_FILTER);
+            if (tnsResult)
                 return ERR_AAC_TNS;
 
-            if (IMDCT(ch, baseChan + ch, outbuf))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_IMDCT);
+            int imdctResult = IMDCT(ch, baseChan + ch, outbuf);
+            HELIX_PROFILE_END(HELIX_STAGE_IMDCT);
+            if (imdctResult)
                 return ERR_AAC_IMDCT;
         }
 
@@ -2083,7 +2101,10 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
                 return ERR_AAC_SBR_BITSTREAM;
 
             /* apply SBR */
-            if (DecodeSBRData(baseChanSBR, outbuf))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SBR);
+            int sbrResult = DecodeSBRData(baseChanSBR, outbuf);
+            HELIX_PROFILE_END(HELIX_STAGE_SBR);
+            if (sbrResult)
                 return ERR_AAC_SBR_DATA;
 
             baseChanSBR += elementChansSBR;

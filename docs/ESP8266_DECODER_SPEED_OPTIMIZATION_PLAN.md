@@ -13,12 +13,12 @@ decoder correctness.
 
 ## Work plan
 
-- [ ] Create a pure RAM microbenchmark. Load one or more complete encoded
+- [x] Create a pure RAM microbenchmark. Load one or more complete encoded
   frames into RAM and decode them repeatedly without Wi-Fi, flash reads,
   normalization, PDM conversion, SPI, or physical audio output. Compare this
   result with the existing decode-only network profile; that profile still
   includes Wi-Fi interrupts.
-- [ ] Add stage-level Helix profiling for Huffman decoding, dequantization,
+- [x] Add stage-level Helix profiling for Huffman decoding, dequantization,
   IMDCT, synthesis/subband, and PCM assembly. Measure total time, call count,
   average time, and maximum time for every stage before selecting code to
   optimize.
@@ -32,6 +32,18 @@ decoder correctness.
   32x32-to-high-32 multiplication, multiply-accumulate, count-leading-zeros,
   and saturation. Generic 64-bit operations are the main candidate for
   replacement. Keep a portable reference path for correctness comparison.
+- [x] Audit integer division in the measured hot paths. Replace the ESP8266
+  MP3 parser and IMDCT block-count divisions by 3, 5, 6, 18, and 36 with an
+  exact Q32 reciprocal multiply-and-shift. Derive a remainder from the one
+  quotient instead of invoking both divide and modulo helpers. The reciprocal
+  estimate has a one-step correction, preserving C integer truncation for the
+  complete unsigned 32-bit range. Verify the generated code and golden PCM.
+- [ ] For a divisor reused across samples or bands, calculate its fixed-point
+  reciprocal once and replace repeated variable division with
+  multiply-and-shift. The MP3 and AAC-LC sample loops contain no such variable
+  division. AAC has candidates in SBR setup and gain limiting; add an
+  HE-AAC/SBR golden fixture before changing them because the existing AAC
+  fixture exercises LC only.
 - [ ] Move only the hottest function to IRAM and measure the effect. Do not
   move all of Helix: after reserving the 16 KiB codec arena, only about 5 KiB
   of IRAM is considered safe for additional hot code.
@@ -65,11 +77,12 @@ decoder correctness.
 1. RAM-only microbenchmark, to separate decoder cost from Wi-Fi and flash.
 2. Stage-level profiling, to identify the actual hot path.
 3. Xtensa fixed-point primitives applied only to measured hotspots.
-4. Measured loop unrolling in the hottest fixed-trip kernels.
-5. One carefully selected IRAM function and small hot tables.
-6. Mono decode/synthesis path, including the guarded MP3 M/S joint-stereo
+4. Reciprocal multiply-and-shift for measured repeated variable divisors.
+5. Measured loop unrolling in the hottest fixed-trip kernels.
+6. One carefully selected IRAM function and small hot tables.
+7. Mono decode/synthesis path, including the guarded MP3 M/S joint-stereo
    experiment, where the hardware output is mono.
-7. Asynchronous SPI-PDM refinements and integration profiling.
+8. Asynchronous SPI-PDM refinements and integration profiling.
 
 ## Current performance gap
 
@@ -82,6 +95,33 @@ operation needs additional margin above 100%.
 The earlier QIO 40 MHz decode-only MP3 result was 38.4%, corresponding to the
 previously quoted 2.6x gap. QIO 80 MHz reduced that gap but did not make MP3
 realtime.
+
+The isolated QIO 80 MHz RAM benchmark, with Wi-Fi and audio output never
+started, repeats one complete 48-kHz/320-kbit/s encoded frame 200 times. MP3
+averages 16,189 us per frame (148.2% realtime, 1.482x), while AAC-LC averages
+15,950 us (133.7% realtime, 1.337x). The 28-us MP3 and 23-us AAC min-to-max
+spreads show that network interrupts and stream pacing account for most of the
+long-tail latency in the integrated profile; the remaining CPU margin is still
+insufficient once Wi-Fi and SPI-PDM are restored.
+
+The physical stage profile (same RAM fixture, 200 iterations) identifies the
+actual hot kernels. MP3 synthesis/subband consumes 93.2% of decode time;
+Huffman consumes 2.3%, IMDCT 1.5%, and dequantization 0.5%. AAC-LC IMDCT
+consumes 52.9%, Huffman 34.5%, stereo/PNS/TNS processing 6.7%, and
+dequantization 4.5%. These figures make MP3 synthesis and AAC IMDCT/Huffman
+the first loop-unrolling candidates. The instrumentation changes flash layout
+and adds timer calls, so its absolute frame time is not used as the
+unprofiled performance baseline.
+
+The reciprocal-division change was also measured as a clean compile-time A/B
+test with all stage hooks disabled. With reciprocal division disabled, MP3
+averages 14,653 us per frame (1.637x realtime); with it enabled, the same frame
+averages 14,284 us (1.680x), a 2.52% decoder speedup. The benchmark binary grows
+from 273,040 to 273,664 bytes (+624 bytes). Disassembly leaves only the rare,
+one-time free-format bitrate division in MP3. MP3 and AAC golden PCM hashes are
+unchanged. AAC-LC has no affected code path; its 15,872 versus 15,920 us A/B
+shift is caused by flash layout after the MP3 text-size change and is not an
+AAC algorithm change.
 
 ## Expected outcome
 

@@ -21,6 +21,8 @@ option(YORADIO_ESP8266_AUDIO_PROFILE
   "Measure ESP8266 radio decode and output stages" OFF)
 option(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY
   "Discard decoded PCM instead of converting and sending PDM" OFF)
+option(YORADIO_ESP8266_CODEC_RAM_BENCHMARK
+  "Run embedded MP3/AAC frames repeatedly from RAM without Wi-Fi" OFF)
 if(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY AND
    NOT YORADIO_ESP8266_AUDIO_PROFILE)
   message(FATAL_ERROR "Decode-only mode requires the ESP8266 audio profile")
@@ -36,6 +38,13 @@ set(YORADIO_ESP8266_AUDIO_PROFILE_NETMASK "" CACHE STRING
 if(YORADIO_ESP8266_AUDIO_PROFILE)
   list(APPEND YORADIO_SOURCES "audio_profile_wrappers.cpp")
 endif()
+set(YORADIO_EMBED_FILES "../../../yoRadio/data/www/script.js.gz")
+if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
+  list(APPEND YORADIO_SOURCES "codec_ram_benchmark.cpp")
+  list(APPEND YORADIO_EMBED_FILES
+    "../../../tests/fixtures/helix_golden/stereo-320.mp3"
+    "../../../tests/fixtures/helix_golden/stereo-320.aac")
+endif()
 set(YORADIO_INCLUDE_DIRS ".")
 if(CONFIG_YORADIO_OLED)
   list(APPEND YORADIO_SOURCES "display_service.c")
@@ -48,7 +57,7 @@ idf_component_register(
   INCLUDE_DIRS ${YORADIO_INCLUDE_DIRS}
   REQUIRES esp8266 esp_event esp_http_server freertos heap helix_codecs log
            lwip nvs_flash pthread spiffs tcpip_adapter
-  EMBED_FILES "../../../yoRadio/data/www/script.js.gz")
+  EMBED_FILES ${YORADIO_EMBED_FILES})
 
 # ESP8266_RTOS_SDK exposes only -Og/-Os in menuconfig. Audio code needs the
 # same explicit performance profile used by the ESP32-C3 native build.
@@ -85,6 +94,14 @@ if(YORADIO_ESP8266_AUDIO_PROFILE)
     "-Wl,--wrap=helix_codec_commit"
     "-Wl,--wrap=native_audio_output_write"
     "-Wl,--wrap=native_audio_normalizer_process")
+endif()
+if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_CODEC_RAM_BENCHMARK=1)
+endif()
+if(YORADIO_ESP8266_HELIX_STAGE_PROFILE)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_HELIX_STAGE_PROFILE=1)
 endif()
 option(YORADIO_ESP8266_FIXED_I2S
   "Use fixed ESP8266 I2S GPIO3/15/2 instead of UART-safe SPI-PDM" OFF)

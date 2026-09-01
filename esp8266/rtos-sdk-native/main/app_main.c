@@ -24,7 +24,16 @@
 
 static const char *TAG = "yoradio8266";
 
+#if YORADIO_ESP8266_CODEC_RAM_BENCHMARK
+void codec_ram_benchmark_run(void);
+#endif
+
 void app_main(void) {
+#if YORADIO_ESP8266_CODEC_RAM_BENCHMARK
+    ESP_LOGI(TAG, "isolated codec RAM benchmark; Wi-Fi and audio output disabled");
+    codec_ram_benchmark_run();
+    for (;;) vTaskDelay(portMAX_DELAY);
+#else
     native_state_init();
     ESP_LOGI(TAG, "yoRadio ESP8266 RTOS SDK native starting");
     ESP_LOGI(TAG, "CPU: %u MHz; free heap: %u",
@@ -81,4 +90,5 @@ void app_main(void) {
         web_service_poll();
         vTaskDelay(pdMS_TO_TICKS(250));
     }
+#endif
 }
