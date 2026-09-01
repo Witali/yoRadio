@@ -53,9 +53,10 @@ void app_main(void) {
              BOARD_SPI_PDM_DATA_GPIO, BOARD_SPI_PDM_BIT_RATE_HZ);
 #elif YORADIO_ESP8266_I2S_PDM
     ESP_LOGI(TAG,
-             "profile: HTTP only, Helix MP3/AAC, I2S-PDM DMA GPIO %d at %u Hz; "
-             "UART RX ignored",
-             BOARD_I2S_DATA_GPIO, BOARD_PDM_BIT_RATE_HZ);
+             "profile: HTTP only, Helix MP3/AAC, I2S-PDM DMA GPIO %d, "
+             "carrier %u Hz, PDM%u; UART RX ignored",
+             BOARD_I2S_DATA_GPIO, BOARD_I2S_PDM_CARRIER_HZ,
+             BOARD_PDM_OVERSAMPLE);
 #else
     ESP_LOGI(TAG, "profile: HTTP only, Helix MP3/AAC, I2S GPIO %d/%d/%d",
              BOARD_I2S_DATA_GPIO, BOARD_I2S_BCLK_GPIO,
@@ -75,6 +76,10 @@ void app_main(void) {
     ESP_LOGI(TAG, "OLED disabled: WebUI-only low-memory profile");
 #endif
     ESP_ERROR_CHECK(audio_service_init());
+    /* Install the I2S/SLC ISR and allocate its fixed DMA ring before Wi-Fi
+     * starts consuming and fragmenting the small ESP8266 heap. The ring emits
+     * neutral PDM until decoded PCM becomes available. */
+    ESP_ERROR_CHECK(native_audio_output_init());
     result = storage_service_init();
     if (result == ESP_OK) {
         result = playlist_service_init();
@@ -92,13 +97,8 @@ void app_main(void) {
     ESP_ERROR_CHECK(network_service_start());
     ESP_ERROR_CHECK(web_service_start());
 
-    bool audio_output_ready = false;
     for (;;) {
         radio_control_flush_pending();
-        if (!audio_output_ready && network_service_connected()) {
-            ESP_ERROR_CHECK(native_audio_output_init());
-            audio_output_ready = true;
-        }
         network_service_poll();
         web_service_poll();
         vTaskDelay(pdMS_TO_TICKS(250));

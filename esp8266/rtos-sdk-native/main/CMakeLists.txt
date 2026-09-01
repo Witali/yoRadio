@@ -6,6 +6,7 @@ set(YORADIO_SOURCES
     "input_service.c"
     "native_state.c"
     "network_service.c"
+    "esp8266_nodac_i2s.c"
     "native_audio_output.c"
     "native_audio_normalizer.cpp"
     "${YORADIO_AUDIO_DIR}/AudioNormalizer.cpp"

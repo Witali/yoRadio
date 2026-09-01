@@ -43,10 +43,27 @@ The Xtensa build uses 11152 bytes of that arena and reduces `mad_frame` in
 8-bit DRAM from 20784 to 13880 bytes. It is not a full-feature replacement
 profile.
 Audio defaults to mono I2S-PDM on fixed DATA GPIO3/RX. Four circular SLC-DMA
-buffers continuously clock the 384.615 kHz one-bit stream; BCLK GPIO15 and
-LRCLK GPIO2 are not routed to pins in this mode. Connect GPIO3 through the
+buffers continuously clock one 32-bit word per 48-kHz PCM sample. The physical
+carrier is about 1.538 MHz; four identical physical bits represent each PDM8
+decision, retaining the effective 384.615-kHz transition rate without doing
+32 sigma-delta steps per sample. As in ESP8266Audio's NoDAC path, the I2S
+engine also routes BCLK on GPIO15 and LRCLK on GPIO2 so its SLC-DMA clock is
+started reliably. Only DATA GPIO3 is connected to the audio filter. Connect GPIO3 through the
 documented low-pass/AC-coupling chain and then to a high-impedance amplifier
 input. Stereo streams are gain/balance adjusted and averaged before PDM.
+The PDM profile uses a small local output-only backend instead of the RTOS SDK
+I2S driver. It follows the ESP8266 Arduino core architecture used by
+ESP8266Audio: a circular SLC descriptor ring, an always-running companion link,
+the BBPLL audio-clock gate and task notification when DMA returns a buffer.
+All four 512-byte buffers and descriptors are static, so starting or stopping
+audio cannot fragment the heap. Initialization waits for the first completed
+descriptor and fails explicitly if the hardware ring does not start.
+The board default profile uses QIO at 80 MHz. ESP8266 RTOS SDK intentionally
+stores DIO in the boot image header so the ROM can load it on every supported
+flash chip; `CONFIG_SPI_FLASH_MODE=0x0` makes early SDK initialization enable
+QIO before the application executes. Do not override the boot header to QIO.
+The same default profile selects the measured faster 32-bit Helix MP3 SSO
+synthesis path and the 8x I2S-PDM backend.
 
 GPIO3 is also UART0 RX. The application intentionally never reads UART input
 and routes the pin to I2S while running; UART0 TX logging on GPIO1 remains

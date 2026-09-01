@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "board_config.h"
+#include "esp8266_nodac_i2s.h"
 #include "spi_pdm_config.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -53,6 +54,18 @@ static uint16_t s_normalization_time_ms;
 #define VOLUME_DENOMINATOR 254U
 #define BALANCE_DENOMINATOR 16U
 #define GAIN_Q15_ONE 32768U
+
+#if !YORADIO_ESP8266_SPI_PDM && !YORADIO_ESP8266_I2S_PDM
+/* The release/v3.4 RTOS I2S driver configures I2S and SLC but omits the
+ * BBPLL audio-clock gate. ESP8266Audio enables this gate before touching the
+ * peripheral; without it no DMA descriptor can ever complete. */
+extern void rom_i2c_writeReg_Mask(int block, int host_id, int reg_add,
+                                  int msb, int lsb, int value);
+
+static void i2s_enable_bbpll_audio_clock(void) {
+    rom_i2c_writeReg_Mask(0x67, 4, 4, 7, 7, 1);
+}
+#endif
 
 static uint32_t channel_gain_q15(uint8_t volume, uint8_t balance_gain) {
     uint32_t denominator = VOLUME_DENOMINATOR * BALANCE_DENOMINATOR;
@@ -497,22 +510,12 @@ typedef struct {
 
 static esp_err_t i2s_pdm_write_words(const uint32_t *words,
                                      size_t word_count) {
-    size_t offset = 0;
-    size_t bytes = word_count * sizeof(*words);
-    while (offset < bytes) {
-        size_t bytes_written = 0;
-        esp_err_t result = i2s_write(
-            I2S_NUM_0, (const uint8_t *)words + offset, bytes - offset,
-            &bytes_written, pdMS_TO_TICKS(I2S_PDM_WRITE_TIMEOUT_MS));
-        if (result != ESP_OK || !bytes_written) {
-            ESP_LOGE(TAG, "I2S-PDM write failed: %s, %u/%u bytes",
-                     esp_err_to_name(result), (unsigned)offset,
-                     (unsigned)bytes);
-            return result == ESP_OK ? ESP_FAIL : result;
-        }
-        offset += bytes_written;
-    }
-    return ESP_OK;
+    esp_err_t result = esp8266_nodac_i2s_write(
+        words, word_count, pdMS_TO_TICKS(I2S_PDM_WRITE_TIMEOUT_MS));
+    if (result != ESP_OK)
+        ESP_LOGE(TAG, "I2S-PDM DMA write failed: %s",
+                 esp_err_to_name(result));
+    return result;
 }
 
 static esp_err_t i2s_pdm_flush(i2s_pdm_writer_t *writer) {
@@ -543,8 +546,11 @@ static esp_err_t i2s_pdm_emit_sample(int16_t sample,
         s_pdm_integrator += target;
         bool high = s_pdm_integrator >= 65536U;
         if (high) s_pdm_integrator -= 65536U;
-        esp_err_t result = i2s_pdm_push_bit(writer, high);
-        if (result != ESP_OK) return result;
+        for (unsigned repeat = 0; repeat < BOARD_I2S_PDM_BIT_REPEAT;
+             ++repeat) {
+            esp_err_t result = i2s_pdm_push_bit(writer, high);
+            if (result != ESP_OK) return result;
+        }
     }
     return ESP_OK;
 }
@@ -558,41 +564,12 @@ static esp_err_t i2s_pdm_finish_partial_word(i2s_pdm_writer_t *writer) {
 }
 
 static esp_err_t i2s_pdm_fill_dma_silence(void) {
-    uint32_t words[I2S_PDM_BATCH_WORDS];
-    for (size_t index = 0; index < I2S_PDM_BATCH_WORDS; ++index)
-        words[index] = I2S_PDM_SILENCE_WORD;
-    const size_t batches =
-        I2S_PDM_DMA_BUFFER_COUNT * I2S_PDM_DMA_BUFFER_WORDS /
-        I2S_PDM_BATCH_WORDS;
-    for (size_t batch = 0; batch < batches; ++batch) {
-        esp_err_t result =
-            i2s_pdm_write_words(words, I2S_PDM_BATCH_WORDS);
-        if (result != ESP_OK) return result;
-    }
+    esp8266_nodac_i2s_silence(I2S_PDM_SILENCE_WORD);
     return ESP_OK;
 }
 
 esp_err_t native_audio_output_init(void) {
-    const i2s_config_t config = {
-        .mode = I2S_MODE_MASTER | I2S_MODE_TX,
-        .sample_rate = BOARD_I2S_PDM_FRAME_RATE,
-        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-        .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
-        .communication_format = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB,
-        .dma_buf_count = I2S_PDM_DMA_BUFFER_COUNT,
-        .dma_buf_len = I2S_PDM_DMA_BUFFER_WORDS,
-        /* Repeating the last PDM buffer is safer than replacing it with all
-         * zeroes, which is full-scale negative DC after the RC filter. */
-        .tx_desc_auto_clear = false,
-    };
-    const i2s_pin_config_t pins = {
-        .bck_o_en = 0,
-        .ws_o_en = 0,
-        .data_out_en = 1,
-        .data_in_en = 0,
-    };
-
-    esp_err_t result = i2s_driver_install(I2S_NUM_0, &config, 0, NULL);
+    esp_err_t result = esp8266_nodac_i2s_init(I2S_PDM_SILENCE_WORD);
     if (result == ESP_OK) {
         s_i2s_started = true;
         s_input_sample_rate = 0;
@@ -600,18 +577,15 @@ esp_err_t native_audio_output_init(void) {
         s_pdm_integrator = 0;
         s_i2s_pdm_partial_word = 0;
         s_i2s_pdm_partial_bits = 0;
-        /* Prime every circular descriptor while DATA is still disconnected,
-         * then route only the continuous one-bit stream to GPIO3. */
-        result = i2s_pdm_fill_dma_silence();
     }
-    if (result == ESP_OK) result = i2s_set_pin(I2S_NUM_0, &pins);
     native_audio_output_reload_settings();
     if (result == ESP_OK) {
         ESP_LOGI(TAG,
-                 "I2S-PDM DMA: mono GPIO%d/RX, %u Hz, %u bits/sample, "
-                 "%u x %u words; UART RX ignored",
-                 BOARD_I2S_DATA_GPIO, BOARD_PDM_BIT_RATE_HZ,
-                 BOARD_PDM_OVERSAMPLE, I2S_PDM_DMA_BUFFER_COUNT,
+                 "I2S-PDM DMA: mono GPIO%d/RX, carrier %u Hz, "
+                 "PDM%u effective %u Hz, %u x %u words; UART RX ignored",
+                 BOARD_I2S_DATA_GPIO, BOARD_I2S_PDM_CARRIER_HZ,
+                 BOARD_PDM_OVERSAMPLE, BOARD_PDM_BIT_RATE_HZ,
+                 I2S_PDM_DMA_BUFFER_COUNT,
                  I2S_PDM_DMA_BUFFER_WORDS);
     }
     return result;
@@ -697,6 +671,7 @@ esp_err_t native_audio_output_init(void) {
         .data_out_en = 1,
         .data_in_en = 0,
     };
+    i2s_enable_bbpll_audio_clock();
     esp_err_t result = i2s_driver_install(I2S_NUM_0, &config, 0, NULL);
     if (result == ESP_OK) result = i2s_set_pin(I2S_NUM_0, &pins);
     if (result == ESP_OK)

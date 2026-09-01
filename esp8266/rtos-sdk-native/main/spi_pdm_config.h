@@ -20,10 +20,16 @@
 #error "Select an ESP8266 PDM oversampling ratio"
 #endif
 
-// The ESP8266 I2S clock API treats one 32-bit stereo frame as one sample.
-// Packing consecutive PDM bits into each frame therefore produces the same
-// wire rates as the legacy HSPI profiles without software transaction gaps.
-#define BOARD_I2S_PDM_FRAME_RATE (BOARD_PDM_BIT_RATE_HZ / 32U)
+// The stable ESP8266 I2S/SLC path consumes one 32-bit DMA word per PCM sample.
+// Preserve the low-cost 8x/16x sigma-delta kernel by stretching each logical
+// PDM bit to fill that word. The physical carrier is therefore ~1.538 MHz,
+// while the effective PDM transition rate remains 384.615/769.231 kHz.
+#if (32U % BOARD_PDM_OVERSAMPLE) != 0
+#error "ESP8266 I2S-PDM oversampling must divide one 32-bit DMA word"
+#endif
+#define BOARD_I2S_PDM_FRAME_RATE BOARD_PDM_SAMPLE_RATE
+#define BOARD_I2S_PDM_BIT_REPEAT (32U / BOARD_PDM_OVERSAMPLE)
+#define BOARD_I2S_PDM_CARRIER_HZ (BOARD_I2S_PDM_FRAME_RATE * 32U)
 
 // Backward-compatible names used by the legacy SPI backend.
 #define BOARD_SPI_PDM_SAMPLE_RATE BOARD_PDM_SAMPLE_RATE

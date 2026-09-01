@@ -6,16 +6,20 @@
 - Flash: 4 MiB, QIO at 80 MHz
 - SDK: ESP8266 RTOS SDK v3.4, GCC 8.4, release optimization
 - Source: `esp8266/rtos-sdk-native`
-- Profile: `sdkconfig.helix-sso-qio80-pdm8.defaults`
+- Profile: board default `sdkconfig.defaults`
 - Decoder: Helix MP3/AAC with `CONFIG_YORADIO_HELIX_MP3_SSO=y`
-- Audio: mono I2S-PDM DATA on GPIO3/RX, 8 bits/sample
-- PDM bit clock: 384,615 Hz (48,076.9 PCM samples/s)
+- Audio: mono I2S-PDM DATA on GPIO3/RX, PDM8
+- I2S carrier: 1,538,461 Hz (48,076.9 32-bit words/s)
+- Effective PDM transition rate: 384,615 Hz
 
 This production-profile build makes continuous I2S/SLC-DMA PDM the default
-audio backend. Four circular buffers of 128 32-bit words are primed with the
-neutral `0xAAAAAAAA` bit pattern. An incomplete 32-bit PDM word is retained
-across decoder callbacks, so PCM block boundaries do not add padding gaps.
-Only the DATA signal is routed: GPIO15/BCLK and GPIO2/LRCLK remain GPIOs.
+audio backend. Its local output-only backend follows the architecture used by
+ESP8266Audio/ESP8266 Arduino core: four static circular buffers of 128 32-bit
+words, a companion SLC link, DMA mode 1, BBPLL audio clock and EOF task
+notification. Buffers are primed with neutral `0xAAAAAAAA`; initialization
+fails if DMA does not return its first descriptor within 100 ms. GPIO15/BCLK
+and GPIO2/LRCLK are routed to make the hardware clocks run; only GPIO3/DATA is
+connected to the RC audio filter.
 
 GPIO3 is also UART0 RX. Firmware does not read UART input in this mode and does
 not control GPIO16. The installed 470-ohm series resistor is the only current
@@ -34,7 +38,7 @@ Flash all three images without erasing NVS or SPIFFS:
 
 SHA-256:
 
-- `app.bin` (673,616 bytes): `0C67351D5446EBCB8A2C89B7811200D8D94370B7B0033F4D57CBDCB3BD5CD8D4`
+- `app.bin` (668,992 bytes): `78B2E1FCCE4490345E185F2C81EEE0952258F013F8D06D12FB850C2B6DBA4E31`
 - `bootloader.bin` (7,808 bytes): `34A628DA55749D0C72ED3BC78EDA60B29DE6D341A8E54E70AE05CFF772219A85`
 - `partition-table.bin` (3,072 bytes): `C3AEC2B0CC450D37286B5D832556268970CF0F63AA31250C94A21116D22A22DF`
 
@@ -43,8 +47,12 @@ Validation:
 - The generated `sdkconfig` selects QIO 80 MHz, CPU 160 MHz,
   `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y` and
   `CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y`; legacy SPI-PDM is disabled.
-- The release build completed successfully after removing all GPIO16 control.
-- The focused I2S/SPI-PDM tests passed: 19/19.
-- All 274 repository tests passed.
-- This exact I2S-PDM image has not yet been flashed or audio-tested on the
-  physical Wemos D1 mini.
+- The release build completed successfully with no GPIO16 control.
+- The focused I2S-DMA tests passed: 5/5.
+- All repository tests passed: 275/275.
+- This exact image was flashed and hash-verified on Wemos D1 mini
+  `48:3f:da:18:f0:35`. The 100-ms hardware DMA self-test passed, Wi-Fi obtained
+  `192.168.100.6`, HTTP status and WebSocket responded, station 502 returned
+  HTTP 200/ICY metadata and initialized the Helix MP3 workspace. No I2S DMA
+  write timeout or reset loop occurred during the short test.
+- Long-duration listening and the complete MP3/AAC bitrate matrix remain open.

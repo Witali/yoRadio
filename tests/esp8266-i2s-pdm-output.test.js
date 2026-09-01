@@ -6,11 +6,16 @@ const test = require("node:test");
 const root = path.resolve(__dirname, "..", "esp8266", "rtos-sdk-native", "main");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
 const output = read("native_audio_output.c");
+const nodac = read("esp8266_nodac_i2s.c");
 const kconfig = read("Kconfig.projbuild");
 const component = read("CMakeLists.txt");
 const board = read("board_config.h");
 const pdm = read("spi_pdm_config.h");
 const app = read("app_main.c");
+const defaultProfile = fs.readFileSync(
+  path.resolve(root, "..", "sdkconfig.defaults"),
+  "utf8",
+);
 
 const i2sPdmStart = output.lastIndexOf("#elif YORADIO_ESP8266_I2S_PDM");
 const i2sPdm = output.slice(
@@ -33,31 +38,45 @@ test("ESP8266 production audio defaults to I2S DMA PDM", () => {
     component,
     /else\(\)[\s\S]*YORADIO_ESP8266_I2S_PDM=1/,
   );
+  assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHMODE_QIO=y/);
+  assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHFREQ_80M=y/);
+  assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
+  assert.match(defaultProfile, /CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y/);
+  assert.match(defaultProfile, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
 });
 
 test("I2S PDM uses circular SLC DMA with a continuous neutral bitstream", () => {
   assert.match(i2sPdm, /#define I2S_PDM_DMA_BUFFER_COUNT 4U/);
   assert.match(i2sPdm, /#define I2S_PDM_DMA_BUFFER_WORDS 128U/);
   assert.match(i2sPdm, /I2S_PDM_SILENCE_WORD 0xaaaaaaaaU/);
-  assert.match(i2sPdm, /\.tx_desc_auto_clear = false/);
-  assert.match(i2sPdm, /\.sample_rate = BOARD_I2S_PDM_FRAME_RATE/);
-  assert.match(i2sPdm, /i2s_pdm_fill_dma_silence\(\)[\s\S]*i2s_set_pin/);
-  assert.doesNotMatch(i2sPdm, /i2s_zero_dma_buffer/);
+  assert.match(i2sPdm, /esp8266_nodac_i2s_init\(I2S_PDM_SILENCE_WORD\)/);
+  assert.match(i2sPdm, /esp8266_nodac_i2s_write/);
+  assert.doesNotMatch(i2sPdm, /i2s_driver_install|\bi2s_write\(/);
+  assert.match(nodac, /#define NODAC_DMA_BUFFER_COUNT 4U/);
+  assert.match(nodac, /#define NODAC_DMA_BUFFER_WORDS 128U/);
+  assert.match(nodac, /SLC0\.rx_link\.start = 1/);
+  assert.match(nodac, /SLC0\.tx_link\.start = 1/);
+  assert.match(nodac, /rom_i2c_writeReg_Mask\(0x67, 4, 4, 7, 7, 1\)/);
+  assert.match(nodac, /finished->buf_ptr\[word\] = s_silence_word/);
+  assert.match(nodac, /~\(3U << 12\).*\(1U << 12\)/);
+  assert.match(nodac, /return s_free_count \? ESP_OK : ESP_ERR_TIMEOUT/);
 });
 
 test("I2S PDM packs across decoder calls instead of padding every block", () => {
   assert.match(output, /static uint32_t s_i2s_pdm_partial_word/);
   assert.match(i2sPdm, /s_i2s_pdm_partial_bits != 32U/);
   assert.match(i2sPdm, /return i2s_pdm_flush\(&writer\);/);
-  assert.match(pdm, /BOARD_I2S_PDM_FRAME_RATE \(BOARD_PDM_BIT_RATE_HZ \/ 32U\)/);
+  assert.match(pdm, /BOARD_I2S_PDM_FRAME_RATE BOARD_PDM_SAMPLE_RATE/);
+  assert.match(pdm, /BOARD_I2S_PDM_BIT_REPEAT \(32U \/ BOARD_PDM_OVERSAMPLE\)/);
+  assert.match(i2sPdm, /repeat < BOARD_I2S_PDM_BIT_REPEAT/);
   assert.match(pdm, /BOARD_PDM_BIT_RATE_HZ 384615U/);
 });
 
-test("I2S PDM routes only DATA and ignores UART RX input", () => {
+test("I2S PDM drives its clocks like ESP8266Audio and ignores UART RX input", () => {
   assert.doesNotMatch(board, /UART_RX_ISOLATE_GPIO/);
   assert.match(
-    i2sPdm,
-    /\.bck_o_en = 0,[\s\S]*\.ws_o_en = 0,[\s\S]*\.data_out_en = 1/,
+    nodac,
+    /FUNC_I2SO_DATA[\s\S]*FUNC_I2SO_BCK[\s\S]*FUNC_I2SO_WS/,
   );
   assert.doesNotMatch(i2sPdm, /gpio_set_level|gpio_set_direction/);
   assert.match(app, /I2S-PDM DMA GPIO[\s\S]*UART RX ignored/);
@@ -68,4 +87,12 @@ test("I2S PDM routes only DATA and ignores UART RX input", () => {
     .map(read)
     .join("\n");
   assert.doesNotMatch(sources, /uart_read_bytes|uart_driver_install/);
+});
+
+test("I2S DMA is installed before Wi-Fi starts and then emits neutral PDM", () => {
+  assert.match(
+    app,
+    /audio_service_init\(\)[\s\S]*native_audio_output_init\(\)[\s\S]*network_service_start\(\)/,
+  );
+  assert.doesNotMatch(app, /network_service_connected\(\)[\s\S]*native_audio_output_init/);
 });
