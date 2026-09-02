@@ -5,19 +5,29 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-02
 
-### ESP8266 production firmware and WebUI refresh
+### ESP8266 playback and WebUI hang fixes
 
 - Rebuilt and flashed the QIO80/160-MHz Helix SSO production profile with
   1.536-MHz I2S/SLC DMA PDM output.
-- Updated the physical board to the current shared compressed WebUI while
-  preserving `wifi.csv`, `playlist.csv`, and `playlist.idx`; all 11 HTTP
-  resources returned `200`, including the 511-station filtered playlist.
+- Removed unbounded waits from the radio socket and I2S-PDM callback. The
+  stream socket is nonblocking and each PCM callback now has one cumulative
+  100-ms DMA deadline rather than a fresh one-second wait for every batch.
+- Allocated the exact 2304-byte MP3 PCM buffer instead of the 4096-byte AAC
+  maximum, leaving 1792 more heap bytes for lwIP while MP3 is active. Codec
+  switches still release the old decoder before allocating an incompatible
+  replacement.
+- Fixed incomplete WebUI downloads on the ESP8266 SDK: short HTTP responses
+  use standard `Connection: close`, `TCP_NODELAY`, and deferred session close
+  so the terminating chunk is flushed and the scarce socket is released.
+- Kept the HTTP/WebSocket task stack at 5120 bytes. A physical 4096-byte test
+  reproduced a FreeRTOS stack-canary reset during `getindex`; the 5-KiB minimum
+  is now documented in the target README.
 - Added Web API regression coverage for Play, Stop, Toggle, Next, Previous,
-  current-station publication, player state, bitrate, and RSSI. All 278
+  current-station publication, player state, bitrate, and RSSI. All 280
   repository tests pass.
-- The live API run also exposed a separate audio issue: the selected stream
-  can remain stopped and eventually make the board unreachable. The archived
-  image records the exact firmware used to reproduce that problem.
+- On the physical Wemos D1 mini, WebSocket initialization and all settings
+  requests passed. MP3 playback reported 128 kbit/s, 44.1 kHz stereo and sent
+  live player/RSSI updates for about 50 seconds despite -74 to -86 dBm RSSI.
 
 ## Development — 2026-09-01
 
