@@ -4,7 +4,8 @@ const path = require("node:path");
 const test = require("node:test");
 
 const root = path.resolve(__dirname, "..", "esp8266", "rtos-sdk-native", "main");
-const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
+const read = (name) =>
+  fs.readFileSync(path.join(root, name), "utf8").replace(/\r\n/g, "\n");
 const output = read("native_audio_output.c");
 const nodac = read("esp8266_nodac_i2s.c");
 const nodacHeader = read("esp8266_nodac_i2s.h");
