@@ -48,10 +48,14 @@ computes 32 genuine delta-sigma decisions per sample, giving a nominal
 A genuine PDM128 mode at nominally 6.144 MHz
 is compile-time selectable but remains experimental because it cannot run in
 realtime on the physical Wemos D1 mini. As in ESP8266Audio's NoDAC path, the I2S
-engine also routes BCLK on GPIO15 and LRCLK on GPIO2 so its SLC-DMA clock is
-started reliably. Only DATA GPIO3 is connected to the audio filter. Connect GPIO3 through the
+engine initially routes BCLK on GPIO15 and LRCLK on GPIO2 so its SLC-DMA clock
+starts reliably. The default Wemos profile then returns GPIO2 to the onboard
+active-low status LED, matching ESP8266Audio's NoDAC handling of the unused
+clock pin. Only DATA GPIO3 is connected to the audio filter. Connect GPIO3 through the
 documented low-pass/AC-coupling chain and then to a high-impedance amplifier
 input. Stereo streams are gain/balance adjusted and averaged before PDM.
+The status LED is off until client Wi-Fi has an address, stays on while the
+radio is stopped, and alternates 500 ms off / 500 ms on while audio is playing.
 The PDM profile uses a small local output-only backend instead of the RTOS SDK
 I2S driver. It follows the ESP8266 Arduino core architecture used by
 ESP8266Audio: a circular SLC descriptor ring, an always-running companion link,

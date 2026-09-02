@@ -13,6 +13,7 @@ set(YORADIO_SOURCES
     "persistent_settings.c"
     "playlist_service.c"
     "radio_control.c"
+    "status_led.c"
     "storage_service.c"
     "time_service.c")
 list(APPEND YORADIO_SOURCES

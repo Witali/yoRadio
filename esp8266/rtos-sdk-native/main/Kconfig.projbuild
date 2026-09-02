@@ -121,4 +121,14 @@ config YORADIO_OLED
         Build the optional SSD1306 display task. Keep this disabled for the
         lowest-RAM WebUI-only firmware profile.
 
+config YORADIO_STATUS_LED
+    bool "Enable Wi-Fi/player status LED"
+    default y
+    depends on !YORADIO_AUDIO_OUTPUT_I2S_PCM
+    help
+        Use the active-low onboard LED on Wemos D1 mini GPIO2. It is off
+        without a client Wi-Fi connection, steady while connected and idle,
+        and blinks in 500-ms phases while audio is playing. I2S-PDM uses GPIO2
+        only while starting its DMA engine, then releases it for the LED.
+
 endmenu

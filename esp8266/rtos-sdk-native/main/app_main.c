@@ -19,6 +19,9 @@
 #include "playlist_service.h"
 #include "radio_control.h"
 #include "storage_service.h"
+#if CONFIG_YORADIO_STATUS_LED
+#include "status_led.h"
+#endif
 #include "time_service.h"
 #include "web_service.h"
 
@@ -80,6 +83,9 @@ void app_main(void) {
      * starts consuming and fragmenting the small ESP8266 heap. The ring emits
      * neutral PDM until decoded PCM becomes available. */
     ESP_ERROR_CHECK(native_audio_output_init());
+#if CONFIG_YORADIO_STATUS_LED
+    ESP_ERROR_CHECK(status_led_init());
+#endif
     result = storage_service_init();
     if (result == ESP_OK) {
         result = playlist_service_init();
@@ -101,6 +107,9 @@ void app_main(void) {
         radio_control_flush_pending();
         network_service_poll();
         web_service_poll();
+#if CONFIG_YORADIO_STATUS_LED
+        status_led_poll();
+#endif
         vTaskDelay(pdMS_TO_TICKS(250));
     }
 #endif
