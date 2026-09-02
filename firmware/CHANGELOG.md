@@ -5,20 +5,20 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-02
 
-### ESP8266 Wi-Fi and playback status LED
+### ESP8266 GPIO2/I2S status LED constraint
 
-- Enabled the Wemos D1 mini onboard active-low LED on GPIO2: off before client
-  Wi-Fi connects, steady while connected and stopped/connecting, and alternating
-  500 ms off / 500 ms on after audio playback actually starts.
-- GPIO2 is used as I2S WS only while the NoDAC SLC-DMA ring starts, then returned
-  to GPIO output as supported by ESP8266Audio's NoDAC implementation. Standard
-  external-DAC I2S PCM keeps the LED option disabled because it needs WS.
-- Reused the existing 250-ms application poll, adding no task, timer, stack, or
-  heap allocation. All 282 repository tests pass.
-- Flashed the QIO40/160-MHz production image; the physical Wemos configured
-  GPIO2 as output, connected to Wi-Fi, and started Retro FM by a double BOOT
-  click. The status API reported live MP3 playback at 128 kbit/s.
-
+- Verified against the ESP8266EX pin table that I2S output uses fixed GPIO3
+  DATA, GPIO15 BCLK and GPIO2 WS signals.
+- A physical experiment reclaimed GPIO2 after the first DMA completion: the
+  onboard LED then followed the requested 500-ms playback blink, but PDM audio
+  stopped. Keeping GPIO2/GPIO15 assigned restored the GPIO3 audio output.
+- The production I2S-PDM profile now leaves both hardware clock pins active and
+  disables software ownership of the onboard LED. Its apparently steady light
+  is the visual average of the 48-kHz WS waveform, not the player status.
+- GPIO2 Wi-Fi/playback indication remains available only with the legacy
+  SPI-PDM backend, which outputs audio on GPIO13 and does not claim GPIO2.
+- Rebuilt and flashed the QIO40/160-MHz image, connected to Wi-Fi, started Retro
+  FM as MP3 128 kbit/s, and passed all 282 repository tests.
 ### ESP8266 WebUI physical reliability
 
 - Changed the Wemos default from QIO 80 MHz to QIO 40 MHz after verified QIO80
