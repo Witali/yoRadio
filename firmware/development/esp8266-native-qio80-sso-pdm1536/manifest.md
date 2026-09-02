@@ -2,10 +2,10 @@
 
 Development production-profile image for a 4 MiB Wemos D1 mini / ESP-12E.
 
-- Built: 2026-09-01
+- Built: 2026-09-02
 - Application offset: `0x10000`
 - Application: `app.bin` (668,592 bytes)
-- SHA-256: `30C8666F5F22B844C4EB01B30347DC278DB719D0ED52A3A3FE2E9095099A2975`
+- SHA-256: `4C451F7C9005EC9F9D4D9451B51A6E18E9580E98BB7C865D66F3F8CD93C6E17C`
 - CPU: 160 MHz; compiler release optimization
 - Flash runtime: QIO 80 MHz (the SDK-compatible image header remains DIO)
 - MP3: Helix 32-bit SSO

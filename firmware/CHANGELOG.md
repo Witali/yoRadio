@@ -3,6 +3,22 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-09-02
+
+### ESP8266 production firmware and WebUI refresh
+
+- Rebuilt and flashed the QIO80/160-MHz Helix SSO production profile with
+  1.536-MHz I2S/SLC DMA PDM output.
+- Updated the physical board to the current shared compressed WebUI while
+  preserving `wifi.csv`, `playlist.csv`, and `playlist.idx`; all 11 HTTP
+  resources returned `200`, including the 511-station filtered playlist.
+- Added Web API regression coverage for Play, Stop, Toggle, Next, Previous,
+  current-station publication, player state, bitrate, and RSSI. All 278
+  repository tests pass.
+- The live API run also exposed a separate audio issue: the selected stream
+  can remain stopped and eventually make the board unreachable. The archived
+  image records the exact firmware used to reproduce that problem.
+
 ## Development — 2026-09-01
 
 ### ESP8266 I2S-PDM 1.536-MHz carrier
