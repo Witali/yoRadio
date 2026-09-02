@@ -27,11 +27,17 @@ option(YORADIO_ESP8266_CODEC_RAM_BENCHMARK
   "Run embedded MP3/AAC frames repeatedly from RAM without Wi-Fi" OFF)
 option(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
   "Generate PCM in RAM and benchmark physical audio output without codecs" OFF)
+option(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+  "Generate a gated full-scale 1 kHz tone in the isolated output firmware" OFF)
 option(YORADIO_ESP8266_SPI_PDM_FAST_ISR
   "Bypass the generic SDK SPI dispatcher for continuous PDM output" ON)
 if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK AND
    YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
   message(FATAL_ERROR "Select only one isolated ESP8266 benchmark")
+endif()
+if(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST AND
+   NOT YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
+  message(FATAL_ERROR "The tone test requires the audio output benchmark")
 endif()
 if(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY AND
    NOT YORADIO_ESP8266_AUDIO_PROFILE)
@@ -116,6 +122,10 @@ endif()
 if(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=1)
+endif()
+if(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST=1)
 endif()
 if(YORADIO_ESP8266_SPI_PDM_FAST_ISR)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE

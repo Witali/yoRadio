@@ -32,3 +32,24 @@ test("ESP8266 output benchmark reports queue wait, CPU idle, and heap", () => {
   assert.match(bench, /esp_get_free_heap_size/);
   assert.match(bench, /esp_get_minimum_free_heap_size/);
 });
+test("ESP8266 gated tone profile emits an exact full-scale 1 kHz sine", () => {
+  assert.match(cmake, /option\(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST/);
+  assert.match(
+    cmake,
+    /YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST AND[\s\S]*NOT YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK/,
+  );
+  const table = bench.match(
+    /s_sine_1khz\[TONE_PERIOD_FRAMES\] = \{([\s\S]*?)\};/,
+  );
+  assert.ok(table);
+  const actual = table[1].match(/-?\d+/g).map(Number);
+  const expected = Array.from({ length: 48 }, (_, index) =>
+    Math.round(32767 * Math.sin((2 * Math.PI * index) / 48)),
+  );
+  assert.deepEqual(actual, expected);
+  assert.match(bench, /TONE_HALF_CYCLE_FRAMES \(BENCHMARK_SAMPLE_RATE \/ 2U\)/);
+  assert.match(bench, /TONE_GATE_CYCLE_FRAMES BENCHMARK_SAMPLE_RATE/);
+  assert.match(bench, /settings\.normalization_enabled = false/);
+  assert.match(bench, /settings\.volume = 254/);
+  assert.match(bench, /500 ms on \/ 500 ms silence/);
+});

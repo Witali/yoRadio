@@ -18,9 +18,30 @@
 #define BENCHMARK_WARMUP_US 2000000LL
 #define BENCHMARK_MEASURE_US 10000000LL
 
+#ifndef YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+#define YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST 0
+#endif
+
+#define TONE_PERIOD_FRAMES 48U
+#define TONE_HALF_CYCLE_FRAMES (BENCHMARK_SAMPLE_RATE / 2U)
+#define TONE_GATE_CYCLE_FRAMES BENCHMARK_SAMPLE_RATE
+
 static const char *TAG = "audio_output_bench";
+#if !YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
 static int16_t s_template[BENCHMARK_FRAMES * BENCHMARK_CHANNELS];
+#endif
 static int16_t s_pcm[BENCHMARK_FRAMES * BENCHMARK_CHANNELS];
+#if YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+static const int16_t s_sine_1khz[TONE_PERIOD_FRAMES] = {
+         0,   4277,   8481,  12539,  16383,  19947,  23170,  25996,
+     28377,  30273,  31650,  32487,  32767,  32487,  31650,  30273,
+     28377,  25996,  23170,  19947,  16383,  12539,   8481,   4277,
+         0,  -4277,  -8481, -12539, -16383, -19947, -23170, -25996,
+    -28377, -30273, -31650, -32487, -32767, -32487, -31650, -30273,
+    -28377, -25996, -23170, -19947, -16384, -12539,  -8481,  -4277,
+};
+static uint32_t s_tone_frame;
+#endif
 static uint64_t s_spi_wait_us;
 static uint32_t s_spi_wait_max_us;
 static uint32_t s_spi_wait_calls;
@@ -44,6 +65,7 @@ void audio_output_benchmark_spi_wait_end(void) {
     ++s_spi_wait_calls;
 }
 
+#if !YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
 static void generate_pcm(void) {
     uint32_t left = 0x82661234U;
     uint32_t right = 0x32082667U;
@@ -55,6 +77,19 @@ static void generate_pcm(void) {
     }
 }
 
+#endif
+
+#if YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+static void generate_tone_pcm(void) {
+    for (size_t frame = 0; frame < BENCHMARK_FRAMES; ++frame) {
+        int16_t sample = s_tone_frame < TONE_HALF_CYCLE_FRAMES
+            ? s_sine_1khz[s_tone_frame % TONE_PERIOD_FRAMES] : 0;
+        s_pcm[frame * 2U] = sample;
+        s_pcm[frame * 2U + 1U] = sample;
+        if (++s_tone_frame == TONE_GATE_CYCLE_FRAMES) s_tone_frame = 0;
+    }
+}
+#endif
 #if configGENERATE_RUN_TIME_STATS == 1
 static bool cpu_snapshot(uint32_t *total, uint32_t *idle) {
     static TaskStatus_t tasks[16];
@@ -77,7 +112,11 @@ static bool cpu_snapshot(uint32_t *total, uint32_t *idle) {
 static bool run_until(int64_t deadline, uint32_t *calls,
                       uint64_t *write_us, uint32_t *maximum_us) {
     while (esp_timer_get_time() < deadline) {
+#if YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+        generate_tone_pcm();
+#else
         memcpy(s_pcm, s_template, sizeof(s_pcm));
+#endif
         int64_t started = esp_timer_get_time();
         esp_err_t result = native_audio_output_write(
             s_pcm, sizeof(s_pcm) / sizeof(s_pcm[0]),
@@ -113,6 +152,16 @@ void audio_output_benchmark_run(void) {
     }
     persistent_settings_t settings;
     persistent_settings_get(&settings);
+#if YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+    settings.volume = 254;
+    settings.balance = 0;
+    settings.normalization_enabled = false;
+    result = persistent_settings_update_runtime(&settings);
+    if (result != ESP_OK) {
+        ESP_LOGE(TAG, "Tone settings failed: %s", esp_err_to_name(result));
+        return;
+    }
+#endif
     result = native_audio_output_init();
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Output init failed: %s", esp_err_to_name(result));
@@ -121,6 +170,17 @@ void audio_output_benchmark_run(void) {
     native_audio_output_set_volume_runtime(254);
     native_audio_output_set_balance_runtime(0);
     native_audio_output_reset_normalizer();
+#if YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+    s_tone_frame = 0;
+    ESP_LOGI(TAG,
+             "tone test: 1000 Hz full-scale stereo PCM at 48 kHz, "
+             "500 ms on / 500 ms silence; normalization=off, "
+             "Wi-Fi=off, codec=off");
+    for (;;) {
+        if (!run_until(esp_timer_get_time() + 1000000LL,
+                       NULL, NULL, NULL)) return;
+    }
+#else
     generate_pcm();
     ESP_LOGI(TAG,
              "generated PCM: stereo 48 kHz, 128 frames/512 bytes; "
@@ -193,4 +253,5 @@ void audio_output_benchmark_run(void) {
              (unsigned)esp_get_free_heap_size(),
              (unsigned)esp_get_minimum_free_heap_size());
     ESP_LOGI(TAG, "complete");
+#endif
 }

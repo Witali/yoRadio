@@ -51,14 +51,28 @@ warm-up and ten-second measurement. The saved Kconfig baseline is:
 
     esp8266/rtos-sdk-native/sdkconfig.audio-profile-qio80.defaults
 
-I2S-PDM SLC DMA on GPIO3/RX is the default and clocks only the DATA pin;
-BCLK/LRCLK remain ordinary GPIOs. UART input is intentionally ignored, while
-UART TX logging on GPIO1 remains available. The onboard 470-ohm resistor is
-the only electrical current limiter; do not transmit from the host during
-audio output.
+I2S-PDM SLC DMA uses the ESP8266 fixed I2S pins: GPIO3/RX for DATA, GPIO15
+for BCLK, and GPIO2 for WS. UART input is intentionally ignored, while UART
+TX logging on GPIO1 remains available. GPIO2 cannot drive the onboard status
+LED in this mode because reclaiming WS stops DMA audio. The onboard 470-ohm
+resistor is only a current limiter; do not transmit from the host during audio
+output.
 
 Select `CONFIG_YORADIO_AUDIO_OUTPUT_SPI_PDM` for the legacy GPIO13/D7
 SPI-PDM comparison. The deprecated CMake option
 `YORADIO_ESP8266_FIXED_I2S=ON` now selects standard PCM for an external I2S
 DAC rather than the no-DAC PDM path. The benchmark must be followed by
 restoring the normal application image.
+
+## Gated 1 kHz physical-output test
+
+Add both CMake options to the generated-PCM profile:
+
+    -DYORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=ON
+    -DYORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST=ON
+
+The resulting isolated firmware continuously produces identical left/right
+full-scale 16-bit PCM at 48 kHz: an exact 48-sample 1 kHz sine for 500 ms,
+then zero PCM for 500 ms. Normalization, Wi-Fi, WebUI, and codecs remain off.
+The GPIO3 PDM bitstream must pass through the documented RC low-pass filter
+before an amplifier input. Restore the normal application after the test.
