@@ -44,8 +44,6 @@ static volatile TaskHandle_t s_waiter;
 static volatile bool s_waiting;
 static uint32_t s_silence_word;
 static volatile uint32_t s_underruns;
-static uint32_t s_bck_mux_before;
-static uint32_t s_ws_mux_before;
 
 #if YORADIO_ESP8266_AUDIO_PROFILE
 extern void audio_profile_spi_wait_begin(void);
@@ -154,12 +152,6 @@ static void configure_slc(void) {
 
 static void configure_i2s(uint8_t bck_div, uint8_t clkm_div) {
     rom_i2c_writeReg_Mask(0x67, 4, 4, 7, 7, 1);
-    /* The ESP8266 I2S signals have fixed pads. NoDAC only needs DATA on
-     * GPIO3, but the peripheral setup temporarily enables BCLK and WS too.
-     * Save their mux state so GPIO15 and the GPIO2 board LED can be returned
-     * to the application after the DMA engine has started. */
-    s_bck_mux_before = READ_PERI_REG(PERIPHS_IO_MUX_MTDO_U);
-    s_ws_mux_before = READ_PERI_REG(PERIPHS_IO_MUX_GPIO2_U);
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_I2SO_DATA);
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDO_U, FUNC_I2SO_BCK);
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_I2SO_WS);
@@ -198,10 +190,6 @@ esp_err_t esp8266_nodac_i2s_init(uint32_t silence_word,
     const TickType_t started = xTaskGetTickCount();
     while (!s_free_count && xTaskGetTickCount() - started < timeout)
         vTaskDelay(1);
-    /* I2S/SLC keeps running internally after its unused clock pads are
-     * detached. This is the same NoDAC technique used by ESP8266Audio. */
-    WRITE_PERI_REG(PERIPHS_IO_MUX_MTDO_U, s_bck_mux_before);
-    WRITE_PERI_REG(PERIPHS_IO_MUX_GPIO2_U, s_ws_mux_before);
     return s_free_count ? ESP_OK : ESP_ERR_TIMEOUT;
 }
 

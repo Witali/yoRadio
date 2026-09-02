@@ -124,11 +124,12 @@ config YORADIO_OLED
 config YORADIO_STATUS_LED
     bool "Enable Wi-Fi/player status LED"
     default y
-    depends on !YORADIO_AUDIO_OUTPUT_I2S_PCM
+    depends on YORADIO_AUDIO_OUTPUT_SPI_PDM
     help
         Use the active-low onboard LED on Wemos D1 mini GPIO2. It is off
         without a client Wi-Fi connection, steady while connected and idle,
-        and blinks in 500-ms phases while audio is playing. I2S-PDM uses GPIO2
-        only while starting its DMA engine, then releases it for the LED.
+        and blinks in 500-ms phases while audio is playing. ESP8266 I2S output
+        has fixed clock pins and owns GPIO2 as WS for the entire transfer, so
+        the onboard LED is available only with the legacy SPI-PDM backend.
 
 endmenu

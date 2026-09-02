@@ -33,9 +33,6 @@ esp_err_t status_led_init(void) {
     };
     esp_err_t result = gpio_config(&led);
     if (result != ESP_OK) return result;
-    /* GPIO2 was used as I2S WS while the NoDAC DMA ring started. Switching it
-     * back to GPIO here is safe once native_audio_output_init() has returned,
-     * and matches ESP8266Audio's NoDAC handling of the unused clock pin. */
     s_output_on = true;
     set_output(false);
     s_was_playing = false;
