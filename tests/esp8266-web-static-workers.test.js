@@ -130,7 +130,7 @@ test("ESP8266 application serves the current shared WebUI script from flash", ()
   assert.match(webSource, /_binary_script_js_gz_start/);
   assert.match(webSource, /_binary_script_js_gz_end/);
   assert.match(webSource, /static char s_static_scratch\[WEB_STATIC_SCRATCH_SIZE\]/);
-  assert.match(webSource, /#define WEB_STATIC_SCRATCH_SIZE WEB_STATUS_CAPACITY/);
+  assert.match(webSource, /#define WEB_STATIC_SCRATCH_SIZE 672U/);
   assert.doesNotMatch(webSource, /char chunk\[512\]|char line\[672\]/);
   assert.match(webSource, /memcpy\(s_static_scratch, cursor, count\)/);
   assert.match(webSource, /httpd_resp_send_chunk\(request, s_static_scratch, count\)/);

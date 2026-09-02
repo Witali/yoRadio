@@ -20,12 +20,12 @@
 
 #define WS_HEARTBEAT_MS 2000U
 #define WS_COMMAND_MAX 255U
-#define WEB_STATUS_CAPACITY 1280U
+#define WEB_STATUS_CAPACITY 1152U
 #define WEB_MAX_OPEN_SOCKETS 4U
 #define WEB_CONNECTION_BACKLOG 3U
 #define WEB_IDLE_TIMEOUT_SECONDS 2U
 #define WEB_SEND_CHUNK_SIZE 512U
-#define WEB_STATIC_SCRATCH_SIZE WEB_STATUS_CAPACITY
+#define WEB_STATIC_SCRATCH_SIZE 672U
 
 extern const unsigned char _binary_script_js_gz_start[];
 extern const unsigned char _binary_script_js_gz_end[];
@@ -129,6 +129,20 @@ static void capture_status(web_status_key_t *key) {
     key->codec = state.codec;
     copy_text(key->station, sizeof(key->station), state.station);
     copy_text(key->title, sizeof(key->title), state.title);
+}
+
+static bool status_requires_immediate_send(const web_status_key_t *current,
+                                           const web_status_key_t *previous) {
+    return current->playing != previous->playing ||
+           current->connecting != previous->connecting ||
+           current->station_index != previous->station_index ||
+           current->volume != previous->volume ||
+           current->bitrate_kbps != previous->bitrate_kbps ||
+           current->sample_rate_hz != previous->sample_rate_hz ||
+           current->channels != previous->channels ||
+           current->codec != previous->codec ||
+           strcmp(current->station, previous->station) != 0 ||
+           strcmp(current->title, previous->title) != 0;
 }
 
 static void format_stream(const web_status_key_t *status, char *output,
@@ -811,11 +825,17 @@ void web_service_poll(void) {
     web_status_key_t current;
     capture_status(&current);
     TickType_t now = xTaskGetTickCount();
-    bool changed = !s_have_previous_status ||
-                   memcmp(&current, &s_previous_status, sizeof(current)) != 0;
+    bool immediate = !s_have_previous_status ||
+                     status_requires_immediate_send(&current,
+                                                    &s_previous_status);
     bool heartbeat = !s_last_status_tick ||
                      now - s_last_status_tick >= pdMS_TO_TICKS(WS_HEARTBEAT_MS);
-    if (!changed && !heartbeat) return;
+    /* RSSI and buffer fill can fluctuate on every application poll. Sending
+     * a full status frame for each fluctuation exhausts the ESP8266's small
+     * lwIP pbuf pool while an audio TCP stream is active. Control, station,
+     * codec and metadata changes remain immediate; telemetry is sampled by
+     * the two-second heartbeat. */
+    if (!immediate && !heartbeat) return;
     format_status(&current, s_async_message, sizeof(s_async_message));
     bool station_changed = !s_have_previous_status ||
                            current.station_index !=

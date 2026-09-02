@@ -136,6 +136,21 @@ test("ESP8266 Web API publishes player, station and stream state after commands"
   assert.match(source, /\{\\"id\\":\\"rssi\\",\\"value\\":%d\}/);
 });
 
+test("ESP8266 throttles volatile telemetry without delaying player state", () => {
+  assert.match(source, /status_requires_immediate_send/);
+  assert.match(source, /current->playing != previous->playing/);
+  assert.match(source, /current->station_index != previous->station_index/);
+  assert.match(source, /current->codec != previous->codec/);
+  assert.match(source, /strcmp\(current->title, previous->title\) != 0/);
+  const immediate = source.slice(
+    source.indexOf("static bool status_requires_immediate_send"),
+    source.indexOf("static void format_stream"),
+  );
+  assert.doesNotMatch(immediate, /rssi|buffer_percent/);
+  assert.match(source, /WS_HEARTBEAT_MS 2000U/);
+  assert.match(source, /if \(!immediate && !heartbeat\) return/);
+  assert.doesNotMatch(source, /memcmp\(&current, &s_previous_status/);
+});
 test("ESP8266 WebUI keeps the profiled stack needed by getindex", () => {
   const board = fs.readFileSync(
     path.resolve(
