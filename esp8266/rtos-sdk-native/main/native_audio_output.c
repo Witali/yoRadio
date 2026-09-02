@@ -498,18 +498,22 @@ void native_audio_output_silence(void) {
 #elif YORADIO_ESP8266_I2S_PDM
 
 #define I2S_PDM_BATCH_WORDS 64U
-#define I2S_PDM_WRITE_TIMEOUT_MS 1000U
+#define I2S_PDM_WRITE_TIMEOUT_MS 100U
 #define I2S_PDM_SILENCE_WORD 0xaaaaaaaaU
 
 typedef struct {
     uint32_t words[I2S_PDM_BATCH_WORDS];
     size_t word_count;
+    TickType_t deadline;
 } i2s_pdm_writer_t;
 
-static esp_err_t i2s_pdm_write_words(const uint32_t *words,
+static esp_err_t i2s_pdm_write_words(i2s_pdm_writer_t *writer,
+                                     const uint32_t *words,
                                      size_t word_count) {
+    TickType_t now = xTaskGetTickCount();
+    if ((int32_t)(writer->deadline - now) <= 0) return ESP_ERR_TIMEOUT;
     esp_err_t result = esp8266_nodac_i2s_write(
-        words, word_count, pdMS_TO_TICKS(I2S_PDM_WRITE_TIMEOUT_MS));
+        words, word_count, writer->deadline - now);
     if (result != ESP_OK)
         ESP_LOGE(TAG, "I2S-PDM DMA write failed: %s",
                  esp_err_to_name(result));
@@ -519,7 +523,7 @@ static esp_err_t i2s_pdm_write_words(const uint32_t *words,
 static esp_err_t i2s_pdm_flush(i2s_pdm_writer_t *writer) {
     if (!writer->word_count) return ESP_OK;
     esp_err_t result =
-        i2s_pdm_write_words(writer->words, writer->word_count);
+        i2s_pdm_write_words(writer, writer->words, writer->word_count);
     if (result == ESP_OK) writer->word_count = 0;
     return result;
 }
@@ -660,7 +664,10 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         s_input_sample_rate = sample_rate;
         s_resample_phase = 0;
     }
-    i2s_pdm_writer_t writer = {0};
+    i2s_pdm_writer_t writer = {
+        .deadline = xTaskGetTickCount() +
+                    pdMS_TO_TICKS(I2S_PDM_WRITE_TIMEOUT_MS),
+    };
     for (size_t frame = 0; frame < frames; ++frame) {
         int32_t mono = samples[frame * channels];
         if (channels == 2)
@@ -678,7 +685,10 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
 
 void native_audio_output_silence(void) {
     if (!s_i2s_started) return;
-    i2s_pdm_writer_t writer = {0};
+    i2s_pdm_writer_t writer = {
+        .deadline = xTaskGetTickCount() +
+                    pdMS_TO_TICKS(I2S_PDM_WRITE_TIMEOUT_MS),
+    };
     esp_err_t result = i2s_pdm_finish_partial_word(&writer);
     if (result == ESP_OK) result = i2s_pdm_fill_dma_silence();
     if (result != ESP_OK)

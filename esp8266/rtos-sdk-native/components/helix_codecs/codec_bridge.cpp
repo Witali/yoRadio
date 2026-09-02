@@ -48,15 +48,25 @@ constexpr size_t kInputStorageBytes = kInputBytes + MAD_BUFFER_GUARD;
 #else
 constexpr size_t kInputStorageBytes = kInputBytes;
 #endif
-/* Helix MP3 emits at most 576 stereo samples per granule. AAC writes a
- * complete 1024-sample stereo frame before its size can be inspected, so an
- * AAC-enabled build must reserve the larger destination up front. */
+/* Helix MP3 emits at most one 576-sample stereo granule per callback. AAC
+ * writes a complete 1024-sample stereo frame. Allocate the active codec's
+ * exact PCM size: reserving AAC's larger buffer while playing MP3 starved
+ * lwIP on the ESP8266. */
+constexpr size_t kMp3PcmSamples = 576U * 2U;
 #if CONFIG_YORADIO_HELIX_AAC
-constexpr size_t kPcmSamples = 1024U * 2U;
+constexpr size_t kAacPcmSamples = 1024U * 2U;
+constexpr size_t kMaxPcmSamples = kAacPcmSamples;
 #else
-constexpr size_t kPcmSamples = 576U * 2U;
+constexpr size_t kMaxPcmSamples = kMp3PcmSamples;
 #endif
 constexpr char kTag[] = "helix_bridge";
+
+size_t pcm_samples_for_kind(helix_codec_kind_t kind) {
+#if CONFIG_YORADIO_HELIX_AAC
+    if (kind == HELIX_CODEC_AAC) return kAacPcmSamples;
+#endif
+    return kMp3PcmSamples;
+}
 
 struct Mp3Header {
     size_t frame_size;
@@ -119,13 +129,14 @@ struct helix_codec {
     size_t input_start;
     size_t input_size;
     uint8_t *input;
+    size_t pcm_samples;
     int16_t *pcm;
     size_t dram_used;
     size_t iram_used;
     size_t reserve_heap_bytes;
 };
 static constexpr size_t kWorkspaceBytes = sizeof(helix_codec) +
-    kArenaBytes + kInputStorageBytes + sizeof(int16_t) * kPcmSamples;
+    kArenaBytes + kInputStorageBytes + sizeof(int16_t) * kMaxPcmSamples;
 
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
 struct LibmadDecoder {
@@ -223,7 +234,8 @@ static bool update_codec_memory(helix_codec *codec) {
     size_t word_capacity = CodecArenaPreallocatedBytes();
     bool word_in_iram = CodecArenaPreallocatedInIram();
     codec->dram_used = sizeof(*codec) + kInputStorageBytes +
-                       sizeof(int16_t) * kPcmSamples + CodecArenaHeapUsed() +
+                       sizeof(int16_t) * codec->pcm_samples +
+                       CodecArenaHeapUsed() +
                        (word_in_iram ? 0U : word_capacity);
     codec->iram_used = word_in_iram ? word_capacity : 0U;
     size_t free_heap = esp_get_free_heap_size();
@@ -258,7 +270,8 @@ struct Mp3GranuleOutput {
 
 static bool emit_mp3_granule(void *opaque, short *pcm, int samples) {
     Mp3GranuleOutput *output = static_cast<Mp3GranuleOutput *>(opaque);
-    if (samples <= 0 || static_cast<size_t>(samples) > kPcmSamples) {
+    if (samples <= 0 ||
+        static_cast<size_t>(samples) > kMp3PcmSamples) {
         output->failed = true;
         return false;
     }
@@ -401,7 +414,7 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
         static_cast<uint8_t>(AACGetBitsPerSample()),
     };
     size_t samples = static_cast<size_t>(AACGetOutputSamps());
-    if (!samples || samples > kPcmSamples ||
+    if (!samples || samples > codec->pcm_samples ||
         !callback(context, &info, codec->pcm, samples)) return -7;
     consume(codec, used ? used : frame);
     return 0;
@@ -425,10 +438,12 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
     helix_codec *codec = static_cast<helix_codec *>(
         heap_caps_calloc(1, sizeof(*codec), MALLOC_CAP_8BIT));
     if (codec) {
+        codec->pcm_samples = pcm_samples_for_kind(kind);
         codec->input = static_cast<uint8_t *>(
             heap_caps_calloc(1, kInputStorageBytes, MALLOC_CAP_8BIT));
         codec->pcm = static_cast<int16_t *>(
-            heap_caps_malloc(sizeof(int16_t) * kPcmSamples, MALLOC_CAP_8BIT));
+            heap_caps_malloc(sizeof(int16_t) * codec->pcm_samples,
+                             MALLOC_CAP_8BIT));
     }
     if (!codec || !codec->input || !codec->pcm ||
         !CodecArenaBind(nullptr, kArenaBytes)) {
@@ -524,6 +539,14 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
 #endif
     }
     free_decoder(codec);
+    size_t pcm_samples = pcm_samples_for_kind(kind);
+    if (pcm_samples != codec->pcm_samples) {
+        int16_t *resized = static_cast<int16_t *>(heap_caps_realloc(
+            codec->pcm, sizeof(int16_t) * pcm_samples, MALLOC_CAP_8BIT));
+        if (!resized) return -2;
+        codec->pcm = resized;
+        codec->pcm_samples = pcm_samples;
+    }
     if (!allocate_decoder(codec, kind)) {
         free_decoder(codec);
         return -2;

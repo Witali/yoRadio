@@ -54,6 +54,7 @@ const command = `@call "${vcvars}" >nul`+"\r\n"+`@if errorlevel 1 exit /b %error
 test("ESP8266 audio client uses bounded, chunk-aware socket I/O", () => {
   const audio = fs.readFileSync(path.join(sourceDir, "audio_service.c"), "utf8");
   assert.match(audio, /SO_RCVTIMEO[\s\S]*SO_SNDTIMEO/);
+  assert.match(audio, /fcntl\(socket_fd, F_SETFL, flags \| O_NONBLOCK\)/);
   assert.match(audio, /socket_wait_writable[\s\S]*select\(/);
   assert.match(audio, /parts\.authority[\s\S]*parts\.authority_length/);
   assert.match(audio, /http_stream_resolve_redirect/);

@@ -1,6 +1,7 @@
 #include "audio_service.h"
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -34,7 +35,7 @@
 #define HTTP_HEADER_TIMEOUT_MS 10000U
 #define HTTP_OPEN_ATTEMPTS 2U
 #define CODEC_HEAP_RESERVE_BYTES 2048U
-#define AUDIO_STACK_BYTES 5120U
+#define AUDIO_STACK_BYTES 4096U
 
 typedef struct {
     uint32_t generation;
@@ -141,7 +142,10 @@ static int connect_http(uint16_t port) {
                                SOCKET_READ_TIMEOUT_MS);
             set_socket_timeout(socket_fd, SO_SNDTIMEO,
                                SOCKET_WRITE_TIMEOUT_MS);
-            break;
+            int flags = fcntl(socket_fd, F_GETFL, 0);
+            if (flags >= 0 &&
+                fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK) == 0)
+                break;
         }
         close(socket_fd);
         socket_fd = -1;

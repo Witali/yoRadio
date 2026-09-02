@@ -11,6 +11,7 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "lwip/sockets.h"
 #include "native_audio_output.h"
 #include "native_state.h"
 #include "persistent_settings.h"
@@ -520,14 +521,24 @@ static bool web_ui_available(void) {
     return true;
 }
 
+static void prepare_short_response(httpd_req_t *request) {
+    /* ESP8266's old esp_http_server can leave the final five-byte chunk in
+     * lwIP indefinitely on a persistent connection.  Connection: close is
+     * standard HTTP/1.1 framing and also keeps static downloads from holding
+     * one of the four scarce TCP sessions. */
+    httpd_resp_set_hdr(request, "Connection", "close");
+    int no_delay = 1;
+    (void)setsockopt(httpd_req_to_sockfd(request), IPPROTO_TCP,
+                     TCP_NODELAY, &no_delay, sizeof(no_delay));
+}
+
 static esp_err_t finish_short_response(httpd_req_t *request,
                                        esp_err_t result) {
-    /* HTTP/1.1 is persistent by default. Every response emitted here has
-     * self-defined framing (Content-Length or a terminating zero chunk), so
-     * the connection can safely carry the next request. Do not emit the
-     * obsolete HTTP/1.0 Keep-Alive header and do not force a close. The HTTP
-     * server reclaims an idle session after WEB_IDLE_TIMEOUT_SECONDS. */
-    (void)request;
+    /* The ESP8266 SDK does not act on a response Connection header itself.
+     * Queue the close after send() accepted the complete response so lwIP
+     * flushes the terminating chunk before releasing the session. */
+    (void)httpd_sess_trigger_close(request->handle,
+                                  httpd_req_to_sockfd(request));
     return result;
 }
 
@@ -540,6 +551,7 @@ static const char *asset_type(const char *uri) {
 }
 
 static esp_err_t page_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     if (request_path_equals(request, "/") && !web_ui_available()) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
@@ -553,6 +565,7 @@ static esp_err_t page_handler(httpd_req_t *request) {
 }
 
 static esp_err_t variables_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     native_state_t state;
     native_state_snapshot(&state);
     char body[240];
@@ -571,6 +584,7 @@ static esp_err_t variables_handler(httpd_req_t *request) {
 }
 
 static esp_err_t asset_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     if (request_path_equals(request, "/script.js")) {
         httpd_resp_set_type(request, "application/javascript; charset=utf-8");
         httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
@@ -618,6 +632,7 @@ static esp_err_t asset_handler(httpd_req_t *request) {
 }
 
 static esp_err_t playlist_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     FILE *file = open_nonempty(PLAYLIST_PATH);
     if (!file || !playlist_service_count()) {
         if (file) fclose(file);
@@ -639,6 +654,7 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
 }
 
 static esp_err_t status_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     native_state_t state;
     native_state_snapshot(&state);
     char station[260];
@@ -659,6 +675,7 @@ static esp_err_t status_handler(httpd_req_t *request) {
 }
 
 static esp_err_t favicon_handler(httpd_req_t *request) {
+    prepare_short_response(request);
     httpd_resp_set_type(request, "image/x-icon");
     return finish_short_response(request, httpd_resp_send(request, NULL, 0));
 }

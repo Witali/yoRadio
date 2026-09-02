@@ -136,6 +136,21 @@ test("ESP8266 Web API publishes player, station and stream state after commands"
   assert.match(source, /\{\\"id\\":\\"rssi\\",\\"value\\":%d\}/);
 });
 
+test("ESP8266 WebUI keeps the profiled stack needed by getindex", () => {
+  const board = fs.readFileSync(
+    path.resolve(
+      __dirname,
+      "..",
+      "esp8266",
+      "rtos-sdk-native",
+      "main",
+      "board_config.h",
+    ),
+    "utf8",
+  );
+  assert.match(board, /BOARD_TASK_STACK_WEB 5120/);
+});
+
 test("ESP8266 validates a saved fd before treating it as a WebSocket", () => {
   assert.match(httpServerHeader, /httpd_ws_client_info_t httpd_ws_get_fd_info/);
   assert.match(

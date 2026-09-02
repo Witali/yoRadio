@@ -119,7 +119,7 @@ test("ESP8266 application serves the current shared WebUI script from flash", ()
   assert.match(webSource, /_binary_script_js_gz_end/);
 });
 
-test("ESP8266 loads shared WebUI assets sequentially over one keep-alive connection", () => {
+test("ESP8266 loads shared WebUI assets sequentially to bound connections", () => {
   assert.match(webPagesBridge, /#define YORADIO_WEB_SEQUENTIAL_LOAD/);
   assert.match(
     sharedPages,
@@ -129,18 +129,24 @@ test("ESP8266 loads shared WebUI assets sequentially over one keep-alive connect
   assert.match(sharedPages, /window\.addEventListener\('load', onLoad, \{once: true\}\)/);
 });
 
-test("ESP8266 uses standard HTTP/1.1 persistence during page assembly", () => {
+test("ESP8266 closes completed static responses to flush the final chunk", () => {
+  const prepare = bodyFrom(
+    webSource,
+    "static void prepare_short_response",
+    "static esp_err_t finish_short_response",
+  );
   const finish = bodyFrom(
     webSource,
     "static esp_err_t finish_short_response",
     "static const char *asset_type",
   );
   const staticResponses = bodyFrom(webSource, "static esp_err_t page_handler", "static esp_err_t serve_static_request");
-  assert.doesNotMatch(staticResponses, /"Connection"/);
   assert.doesNotMatch(staticResponses, /"Keep-Alive"/);
-  assert.doesNotMatch(finish, /httpd_sess_trigger_close/);
-  assert.match(finish, /HTTP\/1\.1 is persistent by default/);
-  assert.match(finish, /Content-Length or a terminating zero chunk/);
+  assert.match(prepare, /httpd_resp_set_hdr\(request, "Connection", "close"\)/);
+  assert.match(prepare, /setsockopt[\s\S]*IPPROTO_TCP[\s\S]*TCP_NODELAY/);
+  assert.match(staticResponses, /prepare_short_response\(request\)/);
+  assert.match(finish, /httpd_sess_trigger_close/);
+  assert.match(finish, /httpd_req_to_sockfd\(request\)/);
 });
 
 test("ESP8266 bounds browser connections and recovers with LRU eviction", () => {

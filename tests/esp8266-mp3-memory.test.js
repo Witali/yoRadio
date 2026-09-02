@@ -23,23 +23,22 @@ const nativeOptions = read(
 );
 
 test("ESP8266 MP3 streams one granule through a half-size PCM buffer", () => {
-  assert.match(bridge, /constexpr size_t kPcmSamples = 576U \* 2U/);
-  assert.doesNotMatch(bridge, /kPcmSamples = 1152U \* 2U/);
+  assert.match(bridge, /constexpr size_t kMp3PcmSamples = 576U \* 2U/);
+  assert.doesNotMatch(bridge, /kMp3PcmSamples = 1152U \* 2U/);
   assert.match(
     bridge,
     /MP3DecodeGranules\(input, &left, codec->pcm, 0,[\s\S]*emit_mp3_granule/,
   );
   assert.match(
     bridge,
-    /samples <= 0 \|\| static_cast<size_t>\(samples\) > kPcmSamples/,
+    /samples <= 0 \|\|[\s\S]*static_cast<size_t>\(samples\) > kMp3PcmSamples/,
   );
 });
 
 test("ESP8266 AAC reserves a complete stereo PCM frame before decoding", () => {
-  assert.match(
-    bridge,
-    /#if CONFIG_YORADIO_HELIX_AAC[\s\S]*kPcmSamples = 1024U \* 2U;[\s\S]*#else[\s\S]*kPcmSamples = 576U \* 2U;/,
-  );
+  assert.match(bridge, /constexpr size_t kAacPcmSamples = 1024U \* 2U/);
+  assert.match(bridge, /pcm_samples_for_kind[\s\S]*HELIX_CODEC_AAC[\s\S]*kAacPcmSamples/);
+  assert.match(bridge, /heap_caps_realloc\([\s\S]*sizeof\(int16_t\) \* pcm_samples/);
 });
 
 test("ESP8266 enables AAC and yields between compressed input chunks", () => {

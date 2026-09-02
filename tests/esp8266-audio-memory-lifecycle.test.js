@@ -77,7 +77,15 @@ test("MP3-only libmad profile reduces PCM and IRAM without changing AAC profile"
   assert.match(mp3Only, /# CONFIG_YORADIO_HELIX_AAC is not set/);
   assert.match(arena, /!CONFIG_YORADIO_HELIX_AAC && CONFIG_YORADIO_MP3_DECODER_LIBMAD[\s\S]*12U \* 1024U/);
   assert.match(arena, /#else[\s\S]*16U \* 1024U/);
-  assert.match(bridge, /#if CONFIG_YORADIO_HELIX_AAC[\s\S]*1024U \* 2U[\s\S]*576U \* 2U/);
+  assert.match(bridge, /kAacPcmSamples = 1024U \* 2U/);
+  assert.match(bridge, /kMp3PcmSamples = 576U \* 2U/);
+  assert.match(bridge, /codec->pcm_samples = pcm_samples_for_kind\(kind\)/);
+  assert.match(bridge, /sizeof\(int16_t\) \* codec->pcm_samples/);
+});
+
+test("ESP8266 preserves heap for lwIP after starting the MP3 decoder", () => {
+  assert.match(audio, /#define AUDIO_STACK_BYTES 4096U/);
+  assert.match(bridge, /heap_caps_realloc\([\s\S]*MALLOC_CAP_8BIT/);
 });
 
 test("libmad places only aligned Layer III word workspaces in ESP8266 IRAM", () => {

@@ -82,5 +82,12 @@ WebUI HTTP resources use the standard port 80 and the persistent WebSocket is
 the `/ws` route on that same server and port. Static gzip responses close their
 short-lived sockets after transfer; there is no second WebUI or WebSocket port.
 
+The HTTP/WebSocket task requires a **minimum 5120-byte stack** in this
+firmware. The shared YoRadio WebUI formats playlist-backed state for
+`getindex`; a physical Wemos D1 mini test with a 4096-byte stack triggered the
+FreeRTOS stack canary in the `httpd` task. Do not reduce
+`BOARD_TASK_STACK_WEB` below 5120 bytes without a new on-device high-water and
+full Web API test.
+
 The project is under active implementation; use the repository setup/build
 scripts once they are added rather than invoking a globally installed SDK.

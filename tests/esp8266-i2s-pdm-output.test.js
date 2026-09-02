@@ -59,6 +59,10 @@ test("I2S PDM uses circular SLC DMA with a continuous neutral bitstream", () => 
     /esp8266_nodac_i2s_init\([\s\S]*I2S_PDM_SILENCE_WORD,[\s\S]*BOARD_I2S_PDM_BCK_DIV,[\s\S]*BOARD_I2S_PDM_CLKM_DIV/,
   );
   assert.match(i2sPdm, /esp8266_nodac_i2s_write/);
+  assert.match(i2sPdm, /I2S_PDM_WRITE_TIMEOUT_MS 100U/);
+  assert.match(i2sPdm, /TickType_t deadline/);
+  assert.match(i2sPdm, /writer->deadline - now/);
+  assert.doesNotMatch(i2sPdm, /pdMS_TO_TICKS\(I2S_PDM_WRITE_TIMEOUT_MS\)\);[\s\S]*esp8266_nodac_i2s_write/);
   assert.doesNotMatch(i2sPdm, /i2s_driver_install|\bi2s_write\(/);
   assert.match(nodacHeader, /ESP8266_NODAC_DMA_BUFFER_COUNT 2U/);
   assert.match(nodacHeader, /ESP8266_NODAC_DMA_BUFFER_WORDS 512U/);
