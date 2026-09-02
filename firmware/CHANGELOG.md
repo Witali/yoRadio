@@ -5,6 +5,27 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-02
 
+### ESP8266 WebUI physical reliability
+
+- Changed the Wemos default from QIO 80 MHz to QIO 40 MHz after verified QIO80
+  images intermittently stopped immediately after the ROM loader on the physical
+  module. Named QIO80 profiles remain available for explicit experiments.
+- Fixed truncated HTML and JavaScript by copying memory-mapped IROM data through
+  a DRAM scratch buffer, pacing 512-byte chunk writes, retrying transient lwIP
+  `ENOMEM`/`ENOBUFS`, and allowing up to 15 seconds for a congested send.
+- Removed `TCP_NODELAY` and the eager server-side close that could split chunk
+  framing into tiny packets or discard the final queued bytes on a weak link.
+- Reused one static scratch buffer for static files, playlist lines, and initial
+  WebSocket state, avoiding the HTTP-task stack-canary reset seen with nested
+  local buffers while retaining the documented 5120-byte minimum stack.
+- Added regression checks for DRAM-backed IROM sends, bounded retry behavior,
+  stack usage, QIO40 defaults, and all saved build profiles. All 280 tests pass.
+- Flashed the physical Wemos and verified HTTP 200 for every page asset, the
+  complete 36,086-byte playlist, and status. The isolated WebSocket scenario
+  covered settings, station selection, Play, Stop, Pause, Next, and Previous.
+- Archived the validated image under
+  [`development/esp8266-native-qio40-sso-pdm1536/`](development/esp8266-native-qio40-sso-pdm1536/).
+
 ### ESP8266 playback and WebUI hang fixes
 
 - Rebuilt and flashed the QIO80/160-MHz Helix SSO production profile with
