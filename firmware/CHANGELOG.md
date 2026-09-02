@@ -5,6 +5,20 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-02
 
+### ESP8266 verified default memory and streaming profile
+
+- Locked the default to QIO40/160 MHz, Helix MP3 SSO + AAC, and GPIO3
+  I2S-PDM32 with the static 2 x 512-word DMA ring.
+- Kept the physically reliable 16-KiB IRAM codec arena and split MP3 IMDCT
+  output by channel; the measured active workspace is 11,472 bytes DRAM and
+  16,384 bytes IRAM.
+- Bounded WebSocket sends, kept radio HTTP connections alive, reconnected clean
+  stream EOF, and reduced persistent WebUI buffers without changing pages.
+- Flashed the Wemos D1 mini and verified MP3 128 kbit/s playback, 32 WebSocket
+  status frames over 60 seconds, and subsequent HTTP 200 status recovery.
+- All 290 repository tests pass; the replaceable development binary and
+  manifest were updated.
+
 ### ESP8266 canonical audio profile and end-to-end trace
 
 - Made the tracked `sdkconfig.defaults` authoritative and explicit: QIO 40 MHz,
