@@ -17,6 +17,8 @@ const boardConfig = main("board_config.h");
 const kconfig = main("Kconfig.projbuild");
 const sdkDefaults = read("esp8266", "rtos-sdk-native", "sdkconfig.defaults");
 const qioDefaults = read("esp8266", "rtos-sdk-native", "sdkconfig.qio80.defaults");
+const sdkProfiles = fs.readdirSync(path.join(root, "esp8266", "rtos-sdk-native"))
+  .filter((name) => /^sdkconfig(?:\..+)?\.defaults$/.test(name));
 const publicHeader = httpd("include", "esp_http_server.h");
 const privateHeader = httpd("src", "esp_httpd_priv.h");
 const sessionSource = httpd("src", "httpd_sess.c");
@@ -95,11 +97,21 @@ test("ESP8266 keeps status, WebSocket and static routes on the shared HTTP task"
 
 test("ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming", () => {
   assert.doesNotMatch(kconfig, /config YORADIO_WEB_STATIC_WORKERS/);
-  assert.match(kconfig, /config YORADIO_WEB_SEND_TIMEOUT_SECONDS[\s\S]*range 1 30[\s\S]*default 2/);
+  assert.match(kconfig, /config YORADIO_WEB_SEND_TIMEOUT_SECONDS[\s\S]*range 1 30[\s\S]*default 15/);
   assert.doesNotMatch(boardConfig, /BOARD_TASK_STACK_WEB_STATIC/);
   assert.doesNotMatch(sdkDefaults, /CONFIG_YORADIO_WEB_STATIC_WORKERS/);
-  assert.match(sdkDefaults, /CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS=2/);
-  assert.match(qioDefaults, /CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS=2/);
+  assert.match(sdkDefaults, /CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS=15/);
+  assert.match(qioDefaults, /CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS=15/);
+  for (const profile of sdkProfiles) {
+    const profileText = read("esp8266", "rtos-sdk-native", profile);
+    if (/CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS=/.test(profileText)) {
+      assert.match(
+        profileText,
+        /CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS=15/,
+        `${profile} must tolerate a normal TCP retransmission window`,
+      );
+    }
+  }
   assert.match(kconfig, /config YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS[\s\S]*default 30/);
   assert.match(sdkDefaults, /CONFIG_YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS=30/);
   assert.match(sdkDefaults, /CONFIG_LWIP_MAX_ACTIVE_TCP=6/);
@@ -117,6 +129,12 @@ test("ESP8266 application serves the current shared WebUI script from flash", ()
   assert.match(webSource, /request_path_equals\(request, "\/script\.js"\)/);
   assert.match(webSource, /_binary_script_js_gz_start/);
   assert.match(webSource, /_binary_script_js_gz_end/);
+  assert.match(webSource, /static char s_static_scratch\[WEB_STATIC_SCRATCH_SIZE\]/);
+  assert.match(webSource, /#define WEB_STATIC_SCRATCH_SIZE WEB_STATUS_CAPACITY/);
+  assert.doesNotMatch(webSource, /char chunk\[512\]|char line\[672\]/);
+  assert.match(webSource, /memcpy\(s_static_scratch, cursor, count\)/);
+  assert.match(webSource, /httpd_resp_send_chunk\(request, s_static_scratch, count\)/);
+  assert.doesNotMatch(webSource, /httpd_resp_send_chunk\(\s*request, \(const char \*\)cursor/);
 });
 
 test("ESP8266 loads shared WebUI assets sequentially to bound connections", () => {
@@ -129,7 +147,7 @@ test("ESP8266 loads shared WebUI assets sequentially to bound connections", () =
   assert.match(sharedPages, /window\.addEventListener\('load', onLoad, \{once: true\}\)/);
 });
 
-test("ESP8266 closes completed static responses to flush the final chunk", () => {
+test("ESP8266 lets successful close-framed responses drain before cleanup", () => {
   const prepare = bodyFrom(
     webSource,
     "static void prepare_short_response",
@@ -143,9 +161,9 @@ test("ESP8266 closes completed static responses to flush the final chunk", () =>
   const staticResponses = bodyFrom(webSource, "static esp_err_t page_handler", "static esp_err_t serve_static_request");
   assert.doesNotMatch(staticResponses, /"Keep-Alive"/);
   assert.match(prepare, /httpd_resp_set_hdr\(request, "Connection", "close"\)/);
-  assert.match(prepare, /setsockopt[\s\S]*IPPROTO_TCP[\s\S]*TCP_NODELAY/);
+  assert.doesNotMatch(prepare, /TCP_NODELAY|setsockopt/);
   assert.match(staticResponses, /prepare_short_response\(request\)/);
-  assert.match(finish, /httpd_sess_trigger_close/);
+  assert.match(finish, /if \(result != ESP_OK\)[\s\S]*httpd_sess_trigger_close/);
   assert.match(finish, /httpd_req_to_sockfd\(request\)/);
 });
 
@@ -186,8 +204,12 @@ test("ESP8266 strips cache-busting query from static file lookup", () => {
 
 test("ESP8266 chunks embedded HTML below its TCP send window", () => {
   const chunked = bodyFrom(webSource, "static esp_err_t send_chunked_string", "static void json_escape");
-  assert.match(chunked, /remaining > 512U \? 512U : remaining/);
-  assert.match(chunked, /httpd_resp_send_chunk\(request, text, count\)/);
+  assert.match(chunked, /remaining > WEB_SEND_CHUNK_SIZE/);
+  assert.match(chunked, /memcpy\(s_static_scratch, text, count\)/);
+  assert.match(chunked, /httpd_resp_send_chunk\(request,[\s\S]*s_static_scratch, count\)/);
+  assert.match(chunked, /pace_static_send\(\)/);
+  assert.match(webSource, /static void pace_static_send[\s\S]*vTaskDelay\(1\)/);
+  assert.ok((webSource.match(/pace_static_send\(\);/g) || []).length >= 4);
   assert.match(chunked, /httpd_resp_send_chunk\(request, NULL, 0\)/);
   const page = bodyFrom(webSource, "static esp_err_t page_handler", "static esp_err_t variables_handler");
   assert.match(page, /send_chunked_string\(request, yoradio_index_html\(\)\)/);
@@ -206,6 +228,7 @@ test("ESP8266 HTTP send loop is nonblocking, bounded and retryable", () => {
     /HTTPD_SEND_RETRY_TIMEOUT_MS[\s\S]*CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS \* 1000U/,
   );
   assert.match(sendAll, /HTTPD_SOCK_ERR_TIMEOUT[\s\S]*EAGAIN[\s\S]*EWOULDBLOCK[\s\S]*EINTR/);
+  assert.match(sendAll, /ENOMEM[\s\S]*ENOBUFS/);
   assert.match(sendAll, /vTaskDelay\(pdMS_TO_TICKS\(1\)\)/);
   assert.match(sendAll, /return ESP_FAIL/);
 
@@ -215,5 +238,6 @@ test("ESP8266 HTTP send loop is nonblocking, bounded and retryable", () => {
     "int httpd_default_recv",
   );
   assert.match(defaultSend, /errno == EAGAIN[\s\S]*errno == EWOULDBLOCK[\s\S]*errno == EINTR/);
+  assert.match(defaultSend, /ENOMEM[\s\S]*ENOBUFS/);
   assert.match(defaultSend, /return HTTPD_SOCK_ERR_TIMEOUT/);
 });

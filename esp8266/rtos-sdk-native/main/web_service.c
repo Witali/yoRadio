@@ -11,7 +11,6 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "lwip/sockets.h"
 #include "native_audio_output.h"
 #include "native_state.h"
 #include "persistent_settings.h"
@@ -25,6 +24,8 @@
 #define WEB_MAX_OPEN_SOCKETS 4U
 #define WEB_CONNECTION_BACKLOG 3U
 #define WEB_IDLE_TIMEOUT_SECONDS 2U
+#define WEB_SEND_CHUNK_SIZE 512U
+#define WEB_STATIC_SCRATCH_SIZE WEB_STATUS_CAPACITY
 
 extern const unsigned char _binary_script_js_gz_start[];
 extern const unsigned char _binary_script_js_gz_end[];
@@ -37,6 +38,9 @@ static volatile bool s_playlist_changed;
 static volatile bool s_current_pending;
 static uint16_t s_pending_current;
 static char s_async_message[WEB_STATUS_CAPACITY];
+/* All static routes run serially on the HTTP task, so one DRAM buffer can
+ * replace the former 512/672-byte per-handler stack arrays. */
+static char s_static_scratch[WEB_STATIC_SCRATCH_SIZE];
 
 typedef struct {
     bool playing;
@@ -70,12 +74,24 @@ static esp_err_t send_string(httpd_req_t *request, const char *text) {
     return httpd_resp_send(request, text, (ssize_t)strlen(text));
 }
 
+static void pace_static_send(void) {
+    /* The ESP8266 TCP window is deliberately small; let lwIP/Wi-Fi drain
+     * it between chunks instead of filling all pbufs in one HTTP burst. */
+    vTaskDelay(1);
+}
+
 static esp_err_t send_chunked_string(httpd_req_t *request, const char *text) {
     size_t remaining = strlen(text);
     while (remaining) {
-        size_t count = remaining > 512U ? 512U : remaining;
-        esp_err_t result = httpd_resp_send_chunk(request, text, count);
+        size_t count = remaining > WEB_SEND_CHUNK_SIZE
+                           ? WEB_SEND_CHUNK_SIZE : remaining;
+        /* Generated pages are stored in memory-mapped IROM. lwIP on the
+         * ESP8266 needs a DRAM-backed source while it queues socket data. */
+        memcpy(s_static_scratch, text, count);
+        esp_err_t result = httpd_resp_send_chunk(request,
+                                                 s_static_scratch, count);
         if (result != ESP_OK) return result;
+        pace_static_send();
         text += count;
         remaining -= count;
     }
@@ -204,7 +220,8 @@ static bool queue_message(const char *message) {
         s_ws_fd = -1;
         return false;
     }
-    copy_text(s_async_message, sizeof(s_async_message), message);
+    if (message != s_async_message)
+        copy_text(s_async_message, sizeof(s_async_message), message);
     s_send_pending = true;
     if (httpd_queue_work(s_server, async_send_work, NULL) != ESP_OK) {
         s_send_pending = false;
@@ -215,11 +232,10 @@ static bool queue_message(const char *message) {
 
 static esp_err_t send_initial_state(httpd_req_t *request) {
     web_status_key_t status;
-    char body[WEB_STATUS_CAPACITY];
     char current[40];
     capture_status(&status);
-    format_status(&status, body, sizeof(body));
-    esp_err_t result = ws_send(request, body);
+    format_status(&status, s_static_scratch, sizeof(s_static_scratch));
+    esp_err_t result = ws_send(request, s_static_scratch);
     if (result != ESP_OK) return result;
     snprintf(current, sizeof(current), "{\"current\":%u}",
              status.station_index);
@@ -527,18 +543,19 @@ static void prepare_short_response(httpd_req_t *request) {
      * standard HTTP/1.1 framing and also keeps static downloads from holding
      * one of the four scarce TCP sessions. */
     httpd_resp_set_hdr(request, "Connection", "close");
-    int no_delay = 1;
-    (void)setsockopt(httpd_req_to_sockfd(request), IPPROTO_TCP,
-                     TCP_NODELAY, &no_delay, sizeof(no_delay));
 }
 
 static esp_err_t finish_short_response(httpd_req_t *request,
                                        esp_err_t result) {
-    /* The ESP8266 SDK does not act on a response Connection header itself.
-     * Queue the close after send() accepted the complete response so lwIP
-     * flushes the terminating chunk before releasing the session. */
-    (void)httpd_sess_trigger_close(request->handle,
-                                  httpd_req_to_sockfd(request));
+    /* A conforming client closes after receiving the complete response
+     * because prepare_short_response() emitted Connection: close. Queuing a
+     * server-side close after a successful send can run before lwIP drains
+     * its TCP queue and truncate the final chunk on a lossy link. Only force
+     * cleanup when the response already failed. */
+    if (result != ESP_OK) {
+        (void)httpd_sess_trigger_close(request->handle,
+                                      httpd_req_to_sockfd(request));
+    }
     return result;
 }
 
@@ -593,10 +610,14 @@ static esp_err_t asset_handler(httpd_req_t *request) {
         esp_err_t result = ESP_OK;
         while (cursor < _binary_script_js_gz_end) {
             size_t remaining = (size_t)(_binary_script_js_gz_end - cursor);
-            size_t count = remaining > 512U ? 512U : remaining;
-            result = httpd_resp_send_chunk(
-                request, (const char *)cursor, count);
+            size_t count = remaining > WEB_SEND_CHUNK_SIZE
+                               ? WEB_SEND_CHUNK_SIZE : remaining;
+            /* ESP8266 socket writes need a DRAM-backed source; the embedded
+             * asset lives in memory-mapped IROM. */
+            memcpy(s_static_scratch, cursor, count);
+            result = httpd_resp_send_chunk(request, s_static_scratch, count);
             if (result != ESP_OK) break;
+            pace_static_send();
             cursor += count;
         }
         if (result == ESP_OK)
@@ -619,12 +640,12 @@ static esp_err_t asset_handler(httpd_req_t *request) {
     httpd_resp_set_type(request, asset_type(request->uri));
     httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
-    char chunk[512];
     size_t count;
     esp_err_t result = ESP_OK;
-    while ((count = fread(chunk, 1, sizeof(chunk), file)) != 0U) {
-        result = httpd_resp_send_chunk(request, chunk, count);
+    while ((count = fread(s_static_scratch, 1, WEB_SEND_CHUNK_SIZE, file)) != 0U) {
+        result = httpd_resp_send_chunk(request, s_static_scratch, count);
         if (result != ESP_OK) break;
+        pace_static_send();
     }
     fclose(file);
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
@@ -640,12 +661,13 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
     }
     httpd_resp_set_type(request, "text/csv; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
-    char line[672];
     esp_err_t result = ESP_OK;
-    while (fgets(line, sizeof(line), file)) {
-        if (!playlist_service_entry_supported(line)) continue;
-        result = httpd_resp_send_chunk(request, line, strlen(line));
+    while (fgets(s_static_scratch, sizeof(s_static_scratch), file)) {
+        if (!playlist_service_entry_supported(s_static_scratch)) continue;
+        result = httpd_resp_send_chunk(request, s_static_scratch,
+                                       strlen(s_static_scratch));
         if (result != ESP_OK) break;
+        pace_static_send();
     }
     if (ferror(file) && result == ESP_OK) result = ESP_FAIL;
     fclose(file);
@@ -794,12 +816,11 @@ void web_service_poll(void) {
     bool heartbeat = !s_last_status_tick ||
                      now - s_last_status_tick >= pdMS_TO_TICKS(WS_HEARTBEAT_MS);
     if (!changed && !heartbeat) return;
-    char body[WEB_STATUS_CAPACITY];
-    format_status(&current, body, sizeof(body));
+    format_status(&current, s_async_message, sizeof(s_async_message));
     bool station_changed = !s_have_previous_status ||
                            current.station_index !=
                                s_previous_status.station_index;
-    if (!queue_message(body)) return;
+    if (!queue_message(s_async_message)) return;
     if (station_changed) {
         /* The status is sent first. The current index follows on the next
          * poll so one static asynchronous send buffer is sufficient. */

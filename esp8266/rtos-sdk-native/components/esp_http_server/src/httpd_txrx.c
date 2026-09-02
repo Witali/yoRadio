@@ -29,7 +29,7 @@ static const char *TAG = "httpd_txrx";
 #define HTTPD_SEND_RETRY_TIMEOUT_MS \
     (CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS * 1000U)
 #else
-#define HTTPD_SEND_RETRY_TIMEOUT_MS 5000U
+#define HTTPD_SEND_RETRY_TIMEOUT_MS 15000U
 #endif
 
 esp_err_t httpd_sess_set_send_override(httpd_handle_t hd, int sockfd, httpd_send_func_t send_func)
@@ -99,7 +99,9 @@ static esp_err_t httpd_send_all(httpd_req_t *r, const char *buf, size_t buf_len)
         bool retryable = ret == HTTPD_SOCK_ERR_TIMEOUT ||
                          (ret < 0 && (errno == EAGAIN ||
                                      errno == EWOULDBLOCK ||
-                                     errno == EINTR));
+                                     errno == EINTR ||
+                                     errno == ENOMEM ||
+                                     errno == ENOBUFS));
         if (retryable &&
             (int32_t)(deadline - xTaskGetTickCount()) > 0) {
             vTaskDelay(pdMS_TO_TICKS(1));
@@ -622,7 +624,8 @@ int httpd_default_send(httpd_handle_t hd, int sockfd, const char *buf, size_t bu
 
     int ret = send(sockfd, buf, buf_len, flags);
     if (ret < 0) {
-        if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR ||
+            errno == ENOMEM || errno == ENOBUFS) {
             return HTTPD_SOCK_ERR_TIMEOUT;
         }
         return httpd_sock_err("send", sockfd);

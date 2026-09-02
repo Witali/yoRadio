@@ -42,7 +42,7 @@ initializer that should be kept in sync
         .backlog_conn       = 5,                        \
         .lru_purge_enable   = false,                    \
         .recv_wait_timeout  = 5,                        \
-        .send_wait_timeout  = 5,                        \
+        .send_wait_timeout  = 15,                        \
         .global_user_ctx = NULL,                        \
         .global_user_ctx_free_fn = NULL,                \
         .global_transport_ctx = NULL,                   \

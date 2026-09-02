@@ -45,7 +45,7 @@ test("ESP8266 production audio defaults to I2S DMA PDM", () => {
     /else\(\)[\s\S]*YORADIO_ESP8266_I2S_PDM=1/,
   );
   assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHMODE_QIO=y/);
-  assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHFREQ_80M=y/);
+  assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHFREQ_40M=y/);
   assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
   assert.match(defaultProfile, /CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y/);
   assert.match(defaultProfile, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);

@@ -126,8 +126,8 @@ test("ESP8266 Web API publishes player, station and stream state after commands"
     source.indexOf("static esp_err_t send_initial_state"),
     source.indexOf("static esp_err_t send_active_settings"),
   );
-  assert.match(initial, /format_status\(&status, body, sizeof\(body\)\)/);
-  assert.match(initial, /ws_send\(request, body\)/);
+  assert.match(initial, /format_status\(&status, s_static_scratch, sizeof\(s_static_scratch\)\)/);
+  assert.match(initial, /ws_send\(request, s_static_scratch\)/);
   assert.match(initial, /\{\\"current\\":%u\}/);
   assert.match(initial, /\{\\"playermode\\":\\"modeweb\\"\}/);
   assert.match(source, /\{\\"id\\":\\"playerwrap\\",\\"value\\":\\"%s\\"\}/);
@@ -149,6 +149,9 @@ test("ESP8266 WebUI keeps the profiled stack needed by getindex", () => {
     "utf8",
   );
   assert.match(board, /BOARD_TASK_STACK_WEB 5120/);
+  const initial = source.slice(source.indexOf("static esp_err_t send_initial_state"), source.indexOf("static esp_err_t send_active_settings"));
+  assert.doesNotMatch(initial, /char body\[WEB_STATUS_CAPACITY\]/);
+  assert.match(initial, /s_static_scratch/);
 });
 
 test("ESP8266 validates a saved fd before treating it as a WebSocket", () => {
@@ -187,7 +190,7 @@ test("ESP8266 exposes only board-supported stations with matching indices", () =
   }
   const handler = source.slice(source.indexOf("static esp_err_t playlist_handler"), source.indexOf("static esp_err_t status_handler"));
   assert.match(handler, /playlist_service_count\(\)/);
-  assert.match(handler, /playlist_service_entry_supported\(line\)/);
+  assert.match(handler, /playlist_service_entry_supported\(s_static_scratch\)/);
   assert.match(handler, /open_nonempty\(PLAYLIST_PATH\)/);
 });
 

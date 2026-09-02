@@ -59,7 +59,12 @@ the BBPLL audio-clock gate and task notification when DMA returns a buffer.
 Both 2048-byte buffers and descriptors are static, so starting or stopping
 audio cannot fragment the heap. Initialization waits for the first completed
 descriptor and fails explicitly if the hardware ring does not start.
-The board default profile uses QIO at 80 MHz. ESP8266 RTOS SDK intentionally
+The board default profile uses QIO at 40 MHz. A physical Wemos D1 mini with
+verified bootloader, partition table, and application bytes intermittently
+stopped immediately after the ROM loader at QIO80; the same code boots and
+serves the WebUI at QIO40. The named `qio80` profiles remain available for
+explicit experiments on modules whose flash and PCB are stable at 80 MHz.
+ESP8266 RTOS SDK intentionally
 stores DIO in the boot image header so the ROM can load it on every supported
 flash chip; `CONFIG_SPI_FLASH_MODE=0x0` makes early SDK initialization enable
 QIO before the application executes. Do not override the boot header to QIO.
