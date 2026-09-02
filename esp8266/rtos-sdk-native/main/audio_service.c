@@ -416,6 +416,7 @@ static void parse_icy_title(size_t size) {
 
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
 static unsigned s_pcm_trace_count;
+static unsigned s_stream_trace_count;
 
 static void trace_pcm_samples(const helix_stream_info_t *info,
                               const int16_t *pcm, size_t samples) {
@@ -616,6 +617,7 @@ static void audio_task(void *argument) {
         };
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
         s_pcm_trace_count = 0;
+        s_stream_trace_count = 0;
 #endif
         native_state_set_stream(codec_kind == HELIX_CODEC_MP3
                                     ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
@@ -631,11 +633,19 @@ static void audio_task(void *argument) {
         native_state_set_audio(true, false, NULL);
         while (feed == 0 && generation_current(command.generation)) {
             if (stream.metadata_interval && !audio_until_metadata) {
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+                ESP_LOGI(TAG, "AUDIO_TRACE ICY begin commit=%u",
+                         s_stream_trace_count);
+#endif
                 if (!read_icy_metadata(&stream, command.generation)) {
                     feed = -22;
                     break;
                 }
                 audio_until_metadata = stream.metadata_interval;
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+                ESP_LOGI(TAG, "AUDIO_TRACE ICY end commit=%u",
+                         s_stream_trace_count);
+#endif
                 continue;
             }
             size_t capacity = 0;
@@ -652,8 +662,21 @@ static void audio_task(void *argument) {
                 output.measured_bytes += (uint32_t)received;
                 if (stream.metadata_interval)
                     audio_until_metadata -= (uint32_t)received;
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+                if (s_stream_trace_count < 24U)
+                    ESP_LOGI(TAG,
+                             "AUDIO_TRACE COMMIT begin=%u bytes=%d until=%u",
+                             s_stream_trace_count, received,
+                             (unsigned)audio_until_metadata);
+#endif
                 feed = helix_codec_commit(codec, (size_t)received,
                                           pcm_output, &output);
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+                if (s_stream_trace_count < 24U)
+                    ESP_LOGI(TAG, "AUDIO_TRACE COMMIT end=%u result=%d",
+                             s_stream_trace_count, feed);
+                ++s_stream_trace_count;
+#endif
                 /* A continuously readable stream must still let the idle
                  * task feed the watchdog and service deferred Wi-Fi work. */
                 if (feed == 0) vTaskDelay(pdMS_TO_TICKS(1));

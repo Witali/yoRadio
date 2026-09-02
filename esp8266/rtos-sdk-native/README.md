@@ -65,6 +65,11 @@ cmake -S esp8266/rtos-sdk-native -B .build/esp8266-production \
 ninja -C .build/esp8266-production
 ```
 
+The project forces the generated `sdkconfig` into that build directory. An
+ignored `esp8266/rtos-sdk-native/sdkconfig` left by an experiment is therefore
+never an input to a new build and cannot replace Helix with libmad. Explicit
+`-DSDKCONFIG=...` is still supported for controlled experiments.
+
 Use a fresh build directory when changing profiles. A diagnostic audio trace
 may add `-DYORADIO_ESP8266_AUDIO_TRACE=ON`, but must keep the same
 `SDKCONFIG_DEFAULTS`; that option only adds bounded logging and must not change
@@ -112,6 +117,12 @@ Legacy mono HSPI-PDM on GPIO13/D7 can be selected with
 Standard stereo PCM for an external I2S DAC remains available through
 `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PCM` and uses DATA GPIO3, BCLK GPIO15 and
 LRCLK GPIO2. The optional SSD1306 bus is SDA GPIO4/SCL GPIO5.
+
+ESP8266 RTOS SDK enforces 2440 bytes as the minimum TCP send buffer, so the
+canonical profile keeps both send buffer and receive window at 2440 bytes for
+high-bitrate radio. RAM is bounded in the WebUI itself: static responses use one
+672-byte scratch buffer, and volatile RSSI/buffer telemetry is sampled every two
+seconds instead of enqueueing a full status frame on every fluctuation.
 
 The network layout intentionally matches the ESP32-C3 OLED native target:
 WebUI HTTP resources use the standard port 80 and the persistent WebSocket is

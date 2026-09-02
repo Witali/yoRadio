@@ -19,6 +19,11 @@ const defaultProfile = fs.readFileSync(
   "utf8",
 );
 
+const projectCmake = fs.readFileSync(
+  path.resolve(root, "..", "CMakeLists.txt"),
+  "utf8",
+);
+
 const i2sPdmStart = output.indexOf(
   "#elif YORADIO_ESP8266_I2S_PDM\n\n#define I2S_PDM_BATCH_WORDS",
 );
@@ -56,6 +61,15 @@ test("ESP8266 production audio defaults to I2S DMA PDM", () => {
   assert.match(defaultProfile, /CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PCM=n/);
   assert.match(defaultProfile, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
   assert.match(defaultProfile, /CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y/);
+});
+
+test("ESP8266 keeps mutable sdkconfig inside each build directory", () => {
+  assert.match(projectCmake, /if\(NOT DEFINED SDKCONFIG\)/);
+  assert.match(
+    projectCmake,
+    /set\(SDKCONFIG "\$\{CMAKE_BINARY_DIR\}\/sdkconfig" CACHE FILEPATH/,
+  );
+  assert.match(projectCmake, /file\(WRITE "\$\{SDKCONFIG\}" ""\)/);
 });
 
 test("I2S PDM uses circular SLC DMA with a continuous neutral bitstream", () => {

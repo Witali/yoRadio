@@ -31,8 +31,9 @@ boundary without changing the selected codec or audio backend:
   including their bit population, FNV checksum and first four words.
 
 The option is OFF by default and compiles out of production builds.
-Always combine it with the canonical `sdkconfig.defaults`; do not copy a stale
-experimental `sdkconfig` into the diagnostic build directory.
+Always combine it with the canonical `sdkconfig.defaults`. The build entrypoint
+stores the generated `sdkconfig` inside its build directory, isolating it from
+any stale ignored experimental config in the source tree.
 
 ## Physical verification (2026-09-02)
 
@@ -47,6 +48,6 @@ reported `MP3 128 kbps 44 kHz stereo`.
 
 A failed earlier trace that requested a 13880-byte allocation was not the
 production decoder: its generated `sdkconfig.h` had silently selected the
-experimental libmad backend despite a copied text `sdkconfig`. Reconfiguring
-from the tracked production defaults restored Helix SSO and removed the false
-out-of-memory failure.
+experimental libmad backend. The project now keeps mutable Kconfig output in
+each build directory; configuring a fresh directory from the tracked defaults
+restores Helix SSO and prevents this false out-of-memory failure.
