@@ -13,6 +13,7 @@ const component = read("CMakeLists.txt");
 const board = read("board_config.h");
 const pdm = read("spi_pdm_config.h");
 const app = read("app_main.c");
+const audio = read("audio_service.c");
 const defaultProfile = fs.readFileSync(
   path.resolve(root, "..", "sdkconfig.defaults"),
   "utf8",
@@ -46,8 +47,13 @@ test("ESP8266 production audio defaults to I2S DMA PDM", () => {
   );
   assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHMODE_QIO=y/);
   assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHFREQ_40M=y/);
+  assert.match(defaultProfile, /CONFIG_YORADIO_MP3_DECODER_LIBMAD=n/);
   assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
+  assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_AAC=y/);
+  assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_AAC_SSO=n/);
   assert.match(defaultProfile, /CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y/);
+  assert.match(defaultProfile, /CONFIG_YORADIO_AUDIO_OUTPUT_SPI_PDM=n/);
+  assert.match(defaultProfile, /CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PCM=n/);
   assert.match(defaultProfile, /CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y/);
   assert.match(defaultProfile, /CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y/);
 });
@@ -158,4 +164,16 @@ test("I2S DMA is installed before Wi-Fi starts and then emits neutral PDM", () =
     /audio_service_init\(\)[\s\S]*native_audio_output_init\(\)[\s\S]*network_service_start\(\)/,
   );
   assert.doesNotMatch(app, /network_service_connected\(\)[\s\S]*native_audio_output_init/);
+});
+
+test("ESP8266 audio trace follows decoder PCM into the physical PDM DMA buffer", () => {
+  assert.match(component, /option\(YORADIO_ESP8266_AUDIO_TRACE[\s\S]*OFF\)/);
+  assert.doesNotMatch(defaultProfile, /YORADIO_ESP8266_AUDIO_TRACE/);
+  assert.match(audio, /AUDIO_TRACE PCM cb=%u rate=%u ch=%u samples=%u/);
+  assert.match(audio, /min=%d max=%d fnv=%08x first=/);
+  assert.match(output, /AUDIO_TRACE OUTPUT-PCM cb=%u frames=%u/);
+  assert.match(output, /trace_output_pcm\(samples, frames, channels\)/);
+  assert.match(nodac, /memcpy\(s_current_buffer \+ s_current_position, words,[\s\S]*AUDIO_TRACE DMA-PDM/);
+  assert.match(nodac, /ones=%u\/%u/);
+  assert.match(nodac, /s_dma_trace_count < 4U/);
 });

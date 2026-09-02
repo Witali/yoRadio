@@ -45,6 +45,33 @@ Audio defaults to mono I2S-PDM on fixed DATA GPIO3/RX. Two circular SLC-DMA
 buffers continuously clock one 32-bit word per 48-kHz PCM sample. Production
 computes 32 genuine delta-sigma decisions per sample, giving a nominal
 1.536-MHz carrier. The ESP8266 integer divider produces 1.538461 MHz (+0.16%).
+
+## Canonical production configuration
+
+The tracked `sdkconfig.defaults` is the authoritative default for this board.
+It explicitly selects QIO 40 MHz flash, a 160 MHz CPU, Helix MP3 SSO, Helix
+AAC, I2S-PDM on GPIO3, genuine PDM32 at nominal 1.536 MHz, and the static
+2 x 512-word SLC-DMA ring. libmad, AAC SSO, legacy SPI-PDM, standard I2S PCM,
+and PDM128 are explicitly disabled. This explicit selection prevents a stale
+experimental choice from being inherited by a fresh build.
+
+Configure every ordinary or diagnostic build with the tracked defaults path,
+for example:
+
+```sh
+cmake -S esp8266/rtos-sdk-native -B .build/esp8266-production \
+  -G Ninja \
+  -DSDKCONFIG_DEFAULTS="$PWD/esp8266/rtos-sdk-native/sdkconfig.defaults"
+ninja -C .build/esp8266-production
+```
+
+Use a fresh build directory when changing profiles. A diagnostic audio trace
+may add `-DYORADIO_ESP8266_AUDIO_TRACE=ON`, but must keep the same
+`SDKCONFIG_DEFAULTS`; that option only adds bounded logging and must not change
+the codec, flash, clock, or output selections. See
+[`docs/ESP8266_AUDIO_PATH.md`](../../docs/ESP8266_AUDIO_PATH.md) for the traced
+signal path and physical verification.
+
 A genuine PDM128 mode at nominally 6.144 MHz
 is compile-time selectable but remains experimental because it cannot run in
 realtime on the physical Wemos D1 mini. As in ESP8266Audio's NoDAC path, the I2S

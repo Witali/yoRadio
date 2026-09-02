@@ -414,9 +414,38 @@ static void parse_icy_title(size_t size) {
     native_state_set_title(start);
 }
 
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+static unsigned s_pcm_trace_count;
+
+static void trace_pcm_samples(const helix_stream_info_t *info,
+                              const int16_t *pcm, size_t samples) {
+    if (s_pcm_trace_count >= 4U || !info || !pcm || !samples) return;
+    int16_t minimum = INT16_MAX;
+    int16_t maximum = INT16_MIN;
+    uint32_t hash = 2166136261U;
+    for (size_t index = 0; index < samples; ++index) {
+        if (pcm[index] < minimum) minimum = pcm[index];
+        if (pcm[index] > maximum) maximum = pcm[index];
+        hash = (hash ^ (uint16_t)pcm[index]) * 16777619U;
+    }
+    ESP_LOGI(TAG,
+             "AUDIO_TRACE PCM cb=%u rate=%u ch=%u samples=%u "
+             "min=%d max=%d fnv=%08x first=%d,%d,%d,%d,%d,%d,%d,%d",
+             s_pcm_trace_count++, (unsigned)info->sample_rate,
+             (unsigned)info->channels, (unsigned)samples, minimum, maximum,
+             (unsigned)hash, pcm[0], samples > 1U ? pcm[1] : 0,
+             samples > 2U ? pcm[2] : 0, samples > 3U ? pcm[3] : 0,
+             samples > 4U ? pcm[4] : 0, samples > 5U ? pcm[5] : 0,
+             samples > 6U ? pcm[6] : 0, samples > 7U ? pcm[7] : 0);
+}
+#endif
+
 static bool pcm_output(void *opaque, const helix_stream_info_t *info,
                        int16_t *pcm, size_t samples) {
     output_context_t *context = (output_context_t *)opaque;
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+    trace_pcm_samples(info, pcm, samples);
+#endif
     if (!generation_current(context->generation)) return false;
     esp_err_t result = native_audio_output_write(
         pcm, samples, info->sample_rate, info->channels);
@@ -585,6 +614,9 @@ static void audio_task(void *argument) {
             .codec_kind = codec_kind,
             .measured_started_us = esp_timer_get_time(),
         };
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+        s_pcm_trace_count = 0;
+#endif
         native_state_set_stream(codec_kind == HELIX_CODEC_MP3
                                     ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
                                 stream.advertised_bitrate, 0, 0);

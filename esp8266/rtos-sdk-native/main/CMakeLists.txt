@@ -29,6 +29,8 @@ option(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
   "Generate PCM in RAM and benchmark physical audio output without codecs" OFF)
 option(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
   "Generate a gated full-scale 1 kHz tone in the isolated output firmware" OFF)
+option(YORADIO_ESP8266_AUDIO_TRACE
+  "Log bounded PCM and final DMA PDM samples for physical audio diagnosis" OFF)
 option(YORADIO_ESP8266_SPI_PDM_FAST_ISR
   "Bypass the generic SDK SPI dispatcher for continuous PDM output" ON)
 if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK AND
@@ -126,6 +128,10 @@ endif()
 if(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST=1)
+endif()
+if(YORADIO_ESP8266_AUDIO_TRACE)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_AUDIO_TRACE=1)
 endif()
 if(YORADIO_ESP8266_SPI_PDM_FAST_ISR)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE

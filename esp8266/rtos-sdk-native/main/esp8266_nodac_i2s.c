@@ -9,6 +9,9 @@
 #include <stdbool.h>
 #include <string.h>
 
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+#include "esp_log.h"
+#endif
 #include "esp_attr.h"
 #include "esp8266/eagle_soc.h"
 #include "esp8266/i2s_struct.h"
@@ -44,6 +47,19 @@ static volatile TaskHandle_t s_waiter;
 static volatile bool s_waiting;
 static uint32_t s_silence_word;
 static volatile uint32_t s_underruns;
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+static const char *TAG = "nodac_i2s";
+static unsigned s_dma_trace_count;
+
+static unsigned trace_popcount32(uint32_t word) {
+    unsigned count = 0;
+    while (word) {
+        word &= word - 1U;
+        ++count;
+    }
+    return count;
+}
+#endif
 
 #if YORADIO_ESP8266_AUDIO_PROFILE
 extern void audio_profile_spi_wait_begin(void);
@@ -104,6 +120,9 @@ static void configure_descriptors(uint32_t silence_word) {
     s_waiter = NULL;
     s_waiting = false;
     s_underruns = 0;
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+    s_dma_trace_count = 0;
+#endif
     for (unsigned index = 0; index < NODAC_DMA_BUFFER_COUNT; ++index) {
         for (unsigned word = 0; word < NODAC_DMA_BUFFER_WORDS; ++word)
             s_buffers[index][word] = silence_word;
@@ -247,6 +266,26 @@ esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
         size_t count = word_count < available ? word_count : available;
         memcpy(s_current_buffer + s_current_position, words,
                count * sizeof(*words));
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+        if (s_dma_trace_count < 4U && count) {
+            const uint32_t *copied =
+                s_current_buffer + s_current_position;
+            unsigned ones = 0;
+            uint32_t hash = 2166136261U;
+            for (size_t index = 0; index < count; ++index) {
+                ones += trace_popcount32(copied[index]);
+                hash = (hash ^ copied[index]) * 16777619U;
+            }
+            ESP_LOGI(TAG,
+                     "AUDIO_TRACE DMA-PDM copy=%u words=%u ones=%u/%u "
+                     "fnv=%08x first=%08x,%08x,%08x,%08x",
+                     s_dma_trace_count++, (unsigned)count, ones,
+                     (unsigned)(count * 32U), (unsigned)hash, copied[0],
+                     count > 1U ? copied[1] : 0U,
+                     count > 2U ? copied[2] : 0U,
+                     count > 3U ? copied[3] : 0U);
+        }
+#endif
         s_current_position += count;
         words += count;
         word_count -= count;

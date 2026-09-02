@@ -26,6 +26,35 @@
 #include "persistent_settings.h"
 
 static const char *TAG = "audio_output";
+
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+static unsigned s_output_pcm_trace_count;
+
+static void trace_output_pcm(const int16_t *samples, size_t frames,
+                             uint8_t channels) {
+    if (s_output_pcm_trace_count >= 4U || !frames) return;
+    int16_t minimum = INT16_MAX;
+    int16_t maximum = INT16_MIN;
+    uint32_t hash = 2166136261U;
+    int16_t first[8] = {0};
+    for (size_t frame = 0; frame < frames; ++frame) {
+        int32_t mono = samples[frame * channels];
+        if (channels == 2)
+            mono = (mono + samples[frame * 2U + 1U]) / 2;
+        int16_t value = (int16_t)mono;
+        if (value < minimum) minimum = value;
+        if (value > maximum) maximum = value;
+        hash = (hash ^ (uint16_t)value) * 16777619U;
+        if (frame < sizeof(first) / sizeof(first[0])) first[frame] = value;
+    }
+    ESP_LOGI(TAG,
+             "AUDIO_TRACE OUTPUT-PCM cb=%u frames=%u min=%d max=%d "
+             "fnv=%08x first=%d,%d,%d,%d,%d,%d,%d,%d",
+             s_output_pcm_trace_count++, (unsigned)frames, minimum, maximum,
+             (unsigned)hash, first[0], first[1], first[2], first[3],
+             first[4], first[5], first[6], first[7]);
+}
+#endif
 #if YORADIO_ESP8266_SPI_PDM
 static uint32_t s_input_sample_rate;
 static uint32_t s_resample_phase;
@@ -446,6 +475,9 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
                 scale_sample(samples[frame * 2U + 1U], right_gain);
         }
     }
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+    trace_output_pcm(samples, frames, channels);
+#endif
 
     if (sample_rate != s_input_sample_rate) {
         s_input_sample_rate = sample_rate;
@@ -659,6 +691,9 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
                 scale_sample(samples[frame * 2U + 1U], right_gain);
         }
     }
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+    trace_output_pcm(samples, frames, channels);
+#endif
 
     if (sample_rate != s_input_sample_rate) {
         s_input_sample_rate = sample_rate;
