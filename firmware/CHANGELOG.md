@@ -5,6 +5,20 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-02
 
+### ESP8266 Wi-Fi and playback status LED
+
+- Enabled the Wemos D1 mini onboard active-low LED on GPIO2: off before client
+  Wi-Fi connects, steady while connected and stopped/connecting, and alternating
+  500 ms off / 500 ms on after audio playback actually starts.
+- GPIO2 is used as I2S WS only while the NoDAC SLC-DMA ring starts, then returned
+  to GPIO output as supported by ESP8266Audio's NoDAC implementation. Standard
+  external-DAC I2S PCM keeps the LED option disabled because it needs WS.
+- Reused the existing 250-ms application poll, adding no task, timer, stack, or
+  heap allocation. All 282 repository tests pass.
+- Flashed the QIO40/160-MHz production image; the physical Wemos configured
+  GPIO2 as output, connected to Wi-Fi, and started Retro FM by a double BOOT
+  click. The status API reported live MP3 playback at 128 kbit/s.
+
 ### ESP8266 WebUI physical reliability
 
 - Changed the Wemos default from QIO 80 MHz to QIO 40 MHz after verified QIO80
