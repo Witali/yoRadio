@@ -130,7 +130,7 @@ test("ESP8266 application serves the current shared WebUI script from flash", ()
   assert.match(webSource, /_binary_script_js_gz_start/);
   assert.match(webSource, /_binary_script_js_gz_end/);
   assert.match(webSource, /static char s_static_scratch\[WEB_STATIC_SCRATCH_SIZE\]/);
-  assert.match(webSource, /#define WEB_STATIC_SCRATCH_SIZE 672U/);
+  assert.match(webSource, /#define WEB_STATIC_SCRATCH_SIZE 512U/);
   assert.doesNotMatch(webSource, /char chunk\[512\]|char line\[672\]/);
   assert.match(webSource, /memcpy\(s_static_scratch, cursor, count\)/);
   assert.match(webSource, /httpd_resp_send_chunk\(request, s_static_scratch, count\)/);
@@ -177,6 +177,32 @@ test("ESP8266 bounds browser connections and recovers with LRU eviction", () => 
   assert.match(
     webSource,
     /httpd_ws_send_frame_async[\s\S]*httpd_sess_update_lru_counter\(s_server, socket\)/,
+  );
+});
+
+test("ESP8266 WebSocket status cannot block the sole HTTP worker", () => {
+  const websocket = read(
+    "esp8266",
+    "rtos-sdk-native",
+    "components",
+    "esp_http_server",
+    "src",
+    "httpd_ws.c",
+  );
+  const asyncSend = bodyFrom(
+    websocket,
+    "esp_err_t httpd_ws_send_frame_async",
+    "httpd_ws_client_info_t httpd_ws_get_fd_info",
+  );
+  assert.match(websocket, /#define HTTPD_WS_ASYNC_SEND_TIMEOUT_MS 1000U/);
+  assert.match(websocket, /httpd_ws_send_all_async[\s\S]*MSG_DONTWAIT/);
+  assert.match(websocket, /data \+= sent[\s\S]*length -= \(size_t\)sent/);
+  assert.match(websocket, /errno == ENOMEM[\s\S]*errno == ENOBUFS/);
+  assert.match(asyncSend, /httpd_ws_send_all_async/);
+  assert.match(asyncSend, /sess->ws_close = true/);
+  assert.match(
+    webSource,
+    /httpd_ws_send_frame_async[\s\S]*httpd_sess_trigger_close\(s_server, socket\)/,
   );
 });
 

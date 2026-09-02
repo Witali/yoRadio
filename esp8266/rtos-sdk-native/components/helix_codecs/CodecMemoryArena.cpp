@@ -16,12 +16,17 @@ namespace {
  * III reorder scratch buffer (2,304 bytes) in aligned 32-bit IRAM. The 12-KiB
  * arena leaves more than 1 KiB for alignment and version headroom. */
 constexpr size_t kWordArenaBytes = 12U * 1024U;
+constexpr size_t kWordSpillBytes = 0U;
 #elif !CONFIG_YORADIO_HELIX_AAC
 /* Helix MP3 uses about 14.2 KiB across Huffman/dequant/subband state. */
 constexpr size_t kWordArenaBytes = 15U * 1024U;
+constexpr size_t kWordSpillBytes = 0U;
 #else
-/* AAC coef+overlap are two 8-KiB word-only workspaces. */
+/* The full MP3/AAC profile has a physically verified contiguous 16-KiB
+ * IRAM arena. Larger and secondary allocations are not reliable with the
+ * ESP8266 RTOS SDK heap regions, so the remaining MP3 state uses DRAM. */
 constexpr size_t kWordArenaBytes = 16U * 1024U;
+constexpr size_t kWordSpillBytes = 0U;
 #endif
 constexpr size_t kMaxHeapAllocations = 16U;
 constexpr uint32_t kIramDataCaps = MALLOC_CAP_32BIT | MALLOC_CAP_EXEC;
@@ -31,11 +36,14 @@ struct HeapAllocation {
 };
 uint8_t *s_arena;
 uint8_t *s_word_arena;
+uint8_t *s_word_spill;
 bool s_fragmented;
 bool s_word_arena_in_iram;
+bool s_word_spill_in_iram;
 size_t s_capacity;
 size_t s_used;
 size_t s_word_used;
+size_t s_word_spill_used;
 size_t s_heap_used;
 HeapAllocation s_heap_allocations[kMaxHeapAllocations];
 CodecArenaOwner s_owner = CODEC_ARENA_NONE;
@@ -49,8 +57,11 @@ bool contains(const void *pointer) {
 bool contains_word(const void *pointer) {
     uintptr_t value = reinterpret_cast<uintptr_t>(pointer);
     uintptr_t first = reinterpret_cast<uintptr_t>(s_word_arena);
-    return s_word_arena && value >= first &&
-           value < first + kWordArenaBytes;
+    if (s_word_arena && value >= first &&
+        value < first + kWordArenaBytes) return true;
+    first = reinterpret_cast<uintptr_t>(s_word_spill);
+    return s_word_spill && value >= first &&
+           value < first + kWordSpillBytes;
 }
 
 bool track_heap_allocation(void *pointer, size_t bytes) {
@@ -96,18 +107,34 @@ bool CodecArenaPreallocateMp3(void) {
         return false;
     }
     s_word_used = 0;
-    ESP_LOGI("codec_arena", "Reserved %u-byte codec word arena at %p (%s)",
-             (unsigned)kWordArenaBytes, s_word_arena,
+    if (kWordSpillBytes && s_word_arena_in_iram) {
+        s_word_spill = static_cast<uint8_t *>(
+            heap_caps_calloc(1, kWordSpillBytes, kIramDataCaps));
+        s_word_spill_in_iram = s_word_spill != nullptr;
+        if (!s_word_spill) {
+            ESP_LOGW("codec_arena",
+                     "IRAM cannot reserve %u-byte codec spill arena",
+                     (unsigned)kWordSpillBytes);
+        }
+    }
+    s_word_spill_used = 0;
+    ESP_LOGI("codec_arena",
+             "Reserved %u+%u-byte codec word arena (%s)",
+             (unsigned)kWordArenaBytes,
+             (unsigned)(s_word_spill ? kWordSpillBytes : 0U),
              s_word_arena_in_iram ? "IRAM" : "DRAM");
     return true;
 }
 
 size_t CodecArenaPreallocatedBytes(void) {
-    return s_word_arena ? kWordArenaBytes : 0U;
+    return s_word_arena
+        ? kWordArenaBytes + (s_word_spill ? kWordSpillBytes : 0U)
+        : 0U;
 }
 
 bool CodecArenaPreallocatedInIram(void) {
-    return s_word_arena && s_word_arena_in_iram;
+    return s_word_arena && s_word_arena_in_iram &&
+           (!s_word_spill || s_word_spill_in_iram);
 }
 
 bool CodecArenaBind(uint8_t *memory, size_t capacity) {
@@ -154,16 +181,22 @@ static void *arena_calloc(CodecArenaOwner owner, size_t count, size_t size,
         if (!s_word_arena && !CodecArenaPreallocateMp3()) return nullptr;
         const size_t word_offset =
             (s_word_used + alignment - 1U) & ~(alignment - 1U);
+        const size_t spill_offset =
+            (s_word_spill_used + alignment - 1U) & ~(alignment - 1U);
         if (word_offset <= kWordArenaBytes &&
             bytes <= kWordArenaBytes - word_offset) {
             result = s_word_arena + word_offset;
             s_word_used = word_offset + bytes;
             memset(result, 0, bytes);
+        } else if (s_word_spill && spill_offset <= kWordSpillBytes &&
+                   bytes <= kWordSpillBytes - spill_offset) {
+            result = s_word_spill + spill_offset;
+            s_word_spill_used = spill_offset + bytes;
+            memset(result, 0, bytes);
         } else {
             ESP_LOGW("codec_arena",
-                     "Word arena exhausted: %u + %u > %u; using DRAM",
-                     (unsigned)word_offset, (unsigned)bytes,
-                     (unsigned)kWordArenaBytes);
+                     "Word arenas exhausted for %u bytes; using DRAM",
+                     (unsigned)bytes);
             result = heap_caps_calloc(count, size, caps);
             heap_backed = true;
         }
@@ -214,10 +247,13 @@ void CodecArenaRelease(CodecArenaOwner owner) {
         s_owner = CODEC_ARENA_NONE;
         s_used = 0;
         s_word_used = 0;
+        s_word_spill_used = 0;
     }
 }
 
 size_t CodecArenaCapacity() { return s_capacity; }
 size_t CodecArenaUsed() { return s_used; }
 size_t CodecArenaHeapUsed() { return s_heap_used; }
-size_t CodecArenaWordUsed() { return s_word_used; }
+size_t CodecArenaWordUsed() {
+    return s_word_used + s_word_spill_used;
+}

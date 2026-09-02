@@ -51,7 +51,9 @@ computes 32 genuine delta-sigma decisions per sample, giving a nominal
 The tracked `sdkconfig.defaults` is the authoritative default for this board.
 It explicitly selects QIO 40 MHz flash, a 160 MHz CPU, Helix MP3 SSO, Helix
 AAC, I2S-PDM on GPIO3, genuine PDM32 at nominal 1.536 MHz, and the static
-2 x 512-word SLC-DMA ring. libmad, AAC SSO, legacy SPI-PDM, standard I2S PCM,
+2 x 512-word SLC-DMA ring. The main task stack is 3072 bytes, the input
+task stack is 2048 bytes, and the HTTP/WebSocket task remains at its measured
+minimum of 5120 bytes. libmad, AAC SSO, legacy SPI-PDM, standard I2S PCM,
 and PDM128 are explicitly disabled. This explicit selection prevents a stale
 experimental choice from being inherited by a fresh build.
 
@@ -107,6 +109,13 @@ QIO before the application executes. Do not override the boot header to QIO.
 The same default profile selects the measured faster 32-bit Helix MP3 SSO
 synthesis path and the genuine PDM32 x1 I2S backend.
 
+The production codec layout reserves one physically verified contiguous
+16384-byte IRAM arena. Helix MP3 splits IMDCT output by channel: one channel
+fits the arena and the remaining word workspaces use DRAM. On the physical
+board the active MP3 workspace reports 11472 bytes DRAM and 16384 bytes IRAM.
+Larger single or secondary IRAM allocations are not a default: the SDK heap
+regions rejected them even when the ELF map showed enough aggregate bytes.
+
 GPIO3 is also UART0 RX. The application intentionally never reads UART input
 and routes the pin to I2S while running; UART0 TX logging on GPIO1 remains
 available. The onboard 470-ohm series resistor limits contention with CH340
@@ -121,7 +130,8 @@ LRCLK GPIO2. The optional SSD1306 bus is SDA GPIO4/SCL GPIO5.
 ESP8266 RTOS SDK enforces 2440 bytes as the minimum TCP send buffer, so the
 canonical profile keeps both send buffer and receive window at 2440 bytes for
 high-bitrate radio. RAM is bounded in the WebUI itself: static responses use one
-672-byte scratch buffer, and volatile RSSI/buffer telemetry is sampled every two
+512-byte scratch buffer, the persistent status buffer is 1088 bytes, and
+volatile RSSI/buffer telemetry is sampled every two
 seconds instead of enqueueing a full status frame on every fluctuation.
 
 The network layout intentionally matches the ESP32-C3 OLED native target:

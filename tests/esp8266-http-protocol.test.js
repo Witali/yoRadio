@@ -57,6 +57,8 @@ test("ESP8266 audio client uses bounded, chunk-aware socket I/O", () => {
   assert.match(audio, /fcntl\(socket_fd, F_SETFL, flags \| O_NONBLOCK\)/);
   assert.match(audio, /socket_wait_writable[\s\S]*select\(/);
   assert.match(audio, /parts\.authority[\s\S]*parts\.authority_length/);
+  assert.match(audio, /Connection: keep-alive/);
+  assert.doesNotMatch(audio, /Connection: close/);
   assert.match(audio, /http_stream_resolve_redirect/);
   assert.match(audio, /http_chunk_decode/);
   assert.match(audio, /stream_read_exact[\s\S]*read_icy_metadata/);

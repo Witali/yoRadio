@@ -15,6 +15,9 @@
 
 
 #include <stdlib.h>
+#include <errno.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include <sys/random.h>
 #include <esp_log.h>
 #include <esp_err.h>
@@ -280,6 +283,36 @@ esp_err_t httpd_ws_send_frame(httpd_req_t *req, httpd_ws_frame_t *frame)
     return httpd_ws_send_frame_async(req->handle, httpd_req_to_sockfd(req), frame);
 }
 
+#define HTTPD_WS_ASYNC_SEND_TIMEOUT_MS 1000U
+
+static esp_err_t httpd_ws_send_all_async(httpd_handle_t hd, int fd,
+                                          struct sock_db *sess,
+                                          const uint8_t *data,
+                                          size_t length)
+{
+    TickType_t deadline = xTaskGetTickCount() +
+                          pdMS_TO_TICKS(HTTPD_WS_ASYNC_SEND_TIMEOUT_MS);
+    while (length > 0U) {
+        int sent = sess->send_fn(hd, fd, (const char *)data, length,
+                                 MSG_DONTWAIT);
+        if (sent > 0) {
+            data += sent;
+            length -= (size_t)sent;
+            continue;
+        }
+        bool retryable = sent < 0 &&
+                         (errno == EAGAIN || errno == EWOULDBLOCK ||
+                          errno == EINTR || errno == ENOMEM ||
+                          errno == ENOBUFS);
+        if (retryable &&
+            (int32_t)(deadline - xTaskGetTickCount()) > 0) {
+            vTaskDelay(1);
+            continue;
+        }
+        return ESP_FAIL;
+    }
+    return ESP_OK;
+}
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t *frame)
 {
     if (!frame) {
@@ -324,16 +357,21 @@ esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t 
         return ESP_ERR_INVALID_STATE;
     }
 
-    /* Send off header */
-    if (sess->send_fn(hd, fd, (const char *)header_buf, tx_len, 0) < 0) {
+    /* Queued WebSocket work must not monopolize the only HTTP task when a
+     * browser tab stops reading. Retry transient pbuf pressure only briefly,
+     * while preserving partial progress so RFC 6455 framing stays intact. */
+    if (httpd_ws_send_all_async(hd, fd, sess, header_buf, tx_len) != ESP_OK) {
         ESP_LOGW(TAG, LOG_FMT("Failed to send WS header"));
+        sess->ws_close = true;
         return ESP_FAIL;
     }
 
     /* Send off payload */
     if(frame->len > 0 && frame->payload != NULL) {
-        if (sess->send_fn(hd, fd, (const char *)frame->payload, frame->len, 0) < 0) {
+        if (httpd_ws_send_all_async(hd, fd, sess, frame->payload,
+                                    frame->len) != ESP_OK) {
             ESP_LOGW(TAG, LOG_FMT("Failed to send WS payload"));
+            sess->ws_close = true;
             return ESP_FAIL;
         }
     }

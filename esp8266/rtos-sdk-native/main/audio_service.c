@@ -34,7 +34,7 @@
 #define ICY_METADATA_TIMEOUT_MS 5000U
 #define HTTP_HEADER_TIMEOUT_MS 10000U
 #define HTTP_OPEN_ATTEMPTS 2U
-#define CODEC_HEAP_RESERVE_BYTES 2048U
+#define CODEC_HEAP_RESERVE_BYTES 1152U
 #define AUDIO_STACK_BYTES 4096U
 
 typedef struct {
@@ -310,7 +310,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                     send_all(socket_fd, "\r\n") &&
                     send_all(socket_fd, "User-Agent: yoRadio-esp8266/1\r\n") &&
                     send_all(socket_fd, "Icy-MetaData: 1\r\n") &&
-                    send_all(socket_fd, "Connection: close\r\n\r\n");
+                    send_all(socket_fd, "Connection: keep-alive\r\n\r\n");
         if (!sent) {
             close(socket_fd);
             return -3;
@@ -701,6 +701,17 @@ static void audio_task(void *argument) {
             }
         }
         close(stream.socket);
+        if (feed == 0 && generation_current(command.generation)) {
+            ESP_LOGW(TAG,
+                     "Radio stream ended cleanly; reconnecting (heap %u)",
+                     (unsigned)esp_get_free_heap_size());
+            native_audio_output_silence();
+            native_state_set_audio(false, true, "RECONNECTING");
+            vTaskDelay(pdMS_TO_TICKS(250U));
+            if (generation_current(command.generation))
+                xQueueOverwrite(s_commands, &command);
+            continue;
+        }
         if (generation_current(command.generation)) {
             native_audio_output_silence();
             if (feed < 0)

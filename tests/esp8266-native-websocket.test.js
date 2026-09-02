@@ -96,31 +96,27 @@ test("ESP8266 WebSocket handler reads a command in one bounded receive", () => {
   );
 });
 
-test("ESP8266 Web API dispatches every player command and returns fresh state", () => {
+test("ESP8266 Web API dispatches player commands without synchronous status sends", () => {
   const commands = source.slice(
     source.indexOf("static void handle_command"),
     source.indexOf("static esp_err_t websocket_handler"),
   );
 
-  assert.match(
-    commands,
-    /strcmp\(command, "play"\) == 0[\s\S]*radio_control_play\(\(uint16_t\)strtoul\(value, NULL, 10\)\)[\s\S]*send_initial_state\(request\)/,
+  const playerCommands = commands.slice(
+    commands.indexOf('strcmp(command, "play")'),
+    commands.indexOf('strcmp(command, "volume")'),
   );
-  for(const [wireCommand, controlCall] of [
-    ["stop", "radio_control_stop"],
-    ["toggle", "radio_control_toggle"],
-    ["next", "radio_control_next"],
-    ["prev", "radio_control_previous"],
+  for(const controlCall of [
+    "radio_control_play",
+    "radio_control_stop",
+    "radio_control_toggle",
+    "radio_control_next",
+    "radio_control_previous",
   ]) {
-    assert.match(
-      commands,
-      new RegExp(
-        `strcmp\\(command, "${wireCommand}"\\) == 0[\\s\\S]*${controlCall}\\(\\)[\\s\\S]*send_initial_state\\(request\\)`,
-      ),
-    );
+    assert.ok(playerCommands.includes(controlCall));
   }
+  assert.doesNotMatch(playerCommands, /send_initial_state/);
 });
-
 test("ESP8266 Web API publishes player, station and stream state after commands", () => {
   const initial = source.slice(
     source.indexOf("static esp_err_t send_initial_state"),
@@ -134,6 +130,10 @@ test("ESP8266 Web API publishes player, station and stream state after commands"
   assert.match(source, /status->playing \? "playing" : "stopped"/);
   assert.match(source, /\{\\"id\\":\\"bitrate\\",\\"value\\":%lu\}/);
   assert.match(source, /\{\\"id\\":\\"rssi\\",\\"value\\":%d\}/);
+});
+
+test("ESP8266 bounds the persistent status buffer for audio heap", () => {
+  assert.match(source, /#define WEB_STATUS_CAPACITY 1088U/);
 });
 
 test("ESP8266 throttles volatile telemetry without delaying player state", () => {
@@ -224,6 +224,11 @@ test("ESP8266 radio retries short socket timeouts until the HTTP header deadline
   );
 });
 
+test("ESP8266 reconnects a clean radio EOF unless control changed", () => {
+  assert.ok(audioSource.includes("feed == 0 && generation_current(command.generation)"));
+  assert.ok(audioSource.includes('native_state_set_audio(false, true, "RECONNECTING")'));
+  assert.ok(audioSource.includes("xQueueOverwrite(s_commands, &command)"));
+});
 test("ESP8266 radio checks a header that exactly fills its receive buffer", () => {
   assert.match(
     audioSource,

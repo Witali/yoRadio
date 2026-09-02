@@ -24,7 +24,7 @@
 #define BOARD_TASK_STACK_AUDIO 6144
 /* getindex formats playlist-backed state on this stack; 4 KiB overflows. */
 #define BOARD_TASK_STACK_WEB 5120
-#define BOARD_TASK_STACK_INPUT 3072
+#define BOARD_TASK_STACK_INPUT 2048
 #define BOARD_TASK_STACK_DISPLAY 3072
 
 #define BOARD_AUDIO_INPUT_BYTES 12288

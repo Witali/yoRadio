@@ -20,12 +20,12 @@
 
 #define WS_HEARTBEAT_MS 2000U
 #define WS_COMMAND_MAX 255U
-#define WEB_STATUS_CAPACITY 1152U
+#define WEB_STATUS_CAPACITY 1088U
 #define WEB_MAX_OPEN_SOCKETS 4U
 #define WEB_CONNECTION_BACKLOG 3U
 #define WEB_IDLE_TIMEOUT_SECONDS 2U
 #define WEB_SEND_CHUNK_SIZE 512U
-#define WEB_STATIC_SCRATCH_SIZE 672U
+#define WEB_STATIC_SCRATCH_SIZE 512U
 
 extern const unsigned char _binary_script_js_gz_start[];
 extern const unsigned char _binary_script_js_gz_end[];
@@ -218,6 +218,7 @@ static void async_send_work(void *argument) {
             .len = strlen(s_async_message),
         };
         if (httpd_ws_send_frame_async(s_server, socket, &frame) != ESP_OK) {
+            httpd_sess_trigger_close(s_server, socket);
             s_ws_fd = -1;
         } else {
             httpd_sess_update_lru_counter(s_server, socket);
@@ -383,19 +384,14 @@ static void handle_command(httpd_req_t *request, char *command) {
         send_control_settings(request);
     } else if (strcmp(command, "play") == 0) {
         radio_control_play((uint16_t)strtoul(value, NULL, 10));
-        send_initial_state(request);
     } else if (strcmp(command, "stop") == 0) {
         radio_control_stop();
-        send_initial_state(request);
     } else if (strcmp(command, "toggle") == 0) {
         radio_control_toggle();
-        send_initial_state(request);
     } else if (strcmp(command, "next") == 0) {
         radio_control_next();
-        send_initial_state(request);
     } else if (strcmp(command, "prev") == 0) {
         radio_control_previous();
-        send_initial_state(request);
     } else if (strcmp(command, "volume") == 0) {
         int target = (int)parse_unsigned(value, 254U);
         radio_control_adjust_volume(target - (int)native_audio_output_volume());

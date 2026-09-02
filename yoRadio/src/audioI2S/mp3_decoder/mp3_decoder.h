@@ -138,8 +138,16 @@ typedef struct HuffTabLookup {
 } HuffTabLookup_t;
 
 typedef struct IMDCTInfo {
+#if defined(YORADIO_ESP8266_NATIVE)
+    /* The ESP8266 native build keeps the large word-addressed transform
+     * output in the preallocated IRAM arena. The overlap history remains
+     * in byte-addressable DRAM. */
+    int (*outBuf[m_MAX_NCHAN])[m_NBANDS];
+    int *overBuf[m_MAX_NCHAN];
+#else
     int outBuf[m_MAX_NCHAN][m_BLOCK_SIZE][m_NBANDS];  /* output of IMDCT */
     int overBuf[m_MAX_NCHAN][m_MAX_NSAMP / 2];      /* overlap-add buffer (by symmetry, only need 1/2 size) */
+#endif
     int numPrevIMDCT[m_MAX_NCHAN];                /* how many IMDCT's calculated in this channel on prev. granule */
     int prevType[m_MAX_NCHAN];
     int prevWinSwitch[m_MAX_NCHAN];

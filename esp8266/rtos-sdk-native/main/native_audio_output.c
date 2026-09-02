@@ -565,7 +565,9 @@ static esp_err_t i2s_pdm_flush(i2s_pdm_writer_t *writer) {
 #error "The optimized PDM32 packer requires 32 genuine bits per sample"
 #endif
 
-static uint32_t IRAM_ATTR __attribute__((noinline))
+/* This packer runs in the audio task, not in the DMA ISR. Keep scarce IRAM
+ * for decoder word workspaces; flash execution remains cache-backed. */
+static uint32_t __attribute__((noinline))
 i2s_pdm_pack32(int16_t sample) {
     const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
     uint32_t integrator = s_pdm_integrator;

@@ -42,6 +42,10 @@ default until every integrated libmad criterion below passes.
   bytes until a lower-overhead diagnostic build can finish the full scenario.
 - [x] Keep the full MP3+AAC profile's 16-KB word arena: AAC can use the whole
   arena for its two 8-KB 32-bit workspaces.
+  Physical testing established this as the largest reliable contiguous
+  allocation. MP3 splits IMDCT output per channel and uses 11472 bytes DRAM
+  plus the 16384-byte IRAM arena; larger/spill arenas were rejected by the
+  SDK heap regions and are not part of the default profile.
 - [x] Add an MP3-only build profile. When AAC is disabled, size PCM for one
   576-sample stereo granule (2304 bytes instead of 4096) and use a backend-
   appropriate IRAM arena. libmad now reserves 12 KiB: 4236 bytes for

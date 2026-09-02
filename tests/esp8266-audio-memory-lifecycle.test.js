@@ -28,6 +28,12 @@ const codecCmake = read(
   "esp8266", "rtos-sdk-native", "components", "helix_codecs",
   "CMakeLists.txt",
 );
+const mp3Header = read(
+  "yoRadio", "src", "audioI2S", "mp3_decoder", "mp3_decoder.h",
+);
+const mp3Decoder = read(
+  "yoRadio", "src", "audioI2S", "mp3_decoder", "mp3_decoder.cpp",
+);
 
 test("libmad follows the same symmetric CodecArena ownership as Helix", () => {
   const free = bridge.match(/void libmad_free\(\) \{[\s\S]*?\n\}/);
@@ -72,19 +78,32 @@ test("audio workspace is lazy, reusable for station changes, and released on sto
   assert.match(audio, /uxTaskGetStackHighWaterMark\(NULL\)/);
 });
 
-test("MP3-only libmad profile reduces PCM and IRAM without changing AAC profile", () => {
+test("full codec profile reserves IRAM for AAC and MP3 while libmad-only stays smaller", () => {
   assert.match(mp3Only, /CONFIG_YORADIO_MP3_DECODER_LIBMAD=y/);
   assert.match(mp3Only, /# CONFIG_YORADIO_HELIX_AAC is not set/);
   assert.match(arena, /!CONFIG_YORADIO_HELIX_AAC && CONFIG_YORADIO_MP3_DECODER_LIBMAD[\s\S]*12U \* 1024U/);
-  assert.match(arena, /#else[\s\S]*16U \* 1024U/);
+  assert.match(arena, /#else[\s\S]*16U \* 1024U[\s\S]*kWordSpillBytes = 0U/);
   assert.match(bridge, /kAacPcmSamples = 1024U \* 2U/);
   assert.match(bridge, /kMp3PcmSamples = 576U \* 2U/);
   assert.match(bridge, /codec->pcm_samples = pcm_samples_for_kind\(kind\)/);
   assert.match(bridge, /sizeof\(int16_t\) \* codec->pcm_samples/);
 });
 
+test("ESP8266 splits the word-only IMDCT output into the IRAM arena", () => {
+  assert.match(mp3Header, /YORADIO_ESP8266_NATIVE[\s\S]*int \(\*outBuf\[m_MAX_NCHAN\]\)\[m_NBANDS\]/);
+  assert.match(mp3Header, /int \*overBuf\[m_MAX_NCHAN\]/);
+  assert.match(mp3Decoder, /m_SubbandInfo[\s\S]*CodecArenaCalloc32/);
+  assert.match(mp3Decoder, /m_IMDCTInfo->outBuf\[0\][\s\S]*CodecArenaCalloc32/);
+  assert.match(mp3Decoder, /m_IMDCTInfo->outBuf\[1\][\s\S]*CodecArenaCalloc\(/);
+  assert.match(mp3Decoder, /m_IMDCTInfo->overBuf\[0\][\s\S]*CodecArenaCalloc\(/);
+  assert.match(mp3Decoder, /m_IMDCTInfo->overBuf\[1\][\s\S]*CodecArenaCalloc\(/);
+  assert.match(mp3Decoder, /CodecArenaFree\(m_IMDCTInfo->outBuf\[0\]\)[\s\S]*CodecArenaFree\(m_IMDCTInfo->outBuf\[1\]\)/);
+  assert.match(mp3Decoder, /CodecArenaFree\(m_IMDCTInfo->overBuf\[0\]\)[\s\S]*CodecArenaFree\(m_IMDCTInfo->overBuf\[1\]\)/);
+});
+
 test("ESP8266 preserves heap for lwIP after starting the MP3 decoder", () => {
   assert.match(audio, /#define AUDIO_STACK_BYTES 4096U/);
+  assert.match(audio, /#define CODEC_HEAP_RESERVE_BYTES 1152U/);
   assert.match(bridge, /heap_caps_realloc\([\s\S]*MALLOC_CAP_8BIT/);
 });
 

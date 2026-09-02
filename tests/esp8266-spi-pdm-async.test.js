@@ -105,7 +105,7 @@ test("ESP8266 SPI-PDM drains queued sound before forcing silence", () => {
 });
 
 test("ESP8266 input task has enough board-specific stack to open SPIFFS playlist", () => {
-  assert.match(board, /#define BOARD_TASK_STACK_INPUT 3072/);
+  assert.match(board, /#define BOARD_TASK_STACK_INPUT 2048/);
   assert.match(input, /xTaskCreate\(input_task, "input", BOARD_TASK_STACK_INPUT,/);
 });
 test("ESP8266 audio profile can auto-start a reproducible HTTP stream", () => {

@@ -52,6 +52,8 @@ test("ESP8266 production audio defaults to I2S DMA PDM", () => {
   );
   assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHMODE_QIO=y/);
   assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHFREQ_40M=y/);
+  assert.match(defaultProfile, /CONFIG_ESP_MAIN_TASK_STACK_SIZE=3072/);
+  assert.match(board, /#define BOARD_TASK_STACK_INPUT 2048/);
   assert.match(defaultProfile, /CONFIG_YORADIO_MP3_DECODER_LIBMAD=n/);
   assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
   assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_AAC=y/);
@@ -125,6 +127,7 @@ test("I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier", () => {
   assert.match(i2sPdm, /bit < BOARD_I2S_PDM_OVERSAMPLE/);
   assert.match(i2sPdm, /repeat < BOARD_I2S_PDM_REPEAT/);
   assert.match(i2sPdm, /i2s_pdm_pack32/);
+  assert.doesNotMatch(i2sPdm, /IRAM_ATTR[^\n]*[\r\n]+i2s_pdm_pack32/);
   assert.match(i2sPdm, /integrator = sum & 0xffffU/);
   assert.match(i2sPdm, /word = \(word << 1\) \| \(sum >> 16\)/);
   assert.match(i2sPdm, /PDM32_STEP\(\); PDM32_STEP\(\);/);

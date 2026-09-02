@@ -1582,7 +1582,29 @@ void MP3Decoder_ClearBuffer(void) {
     memset( m_FrameHeader,        0, sizeof(FrameHeader_t));                                   //Clear FrameHeader
     memset( m_HuffmanInfo,        0, sizeof(HuffmanInfo_t));                                   //Clear HuffmanInfo
     memset( m_DequantInfo,        0, sizeof(DequantInfo_t));                                   //Clear DequantInfo
+#if defined(YORADIO_ESP8266_NATIVE)
+    {
+        int (*outBuf0)[m_NBANDS] = m_IMDCTInfo->outBuf[0];
+        int (*outBuf1)[m_NBANDS] = m_IMDCTInfo->outBuf[1];
+        int *overBuf0 = m_IMDCTInfo->overBuf[0];
+        int *overBuf1 = m_IMDCTInfo->overBuf[1];
+        memset(m_IMDCTInfo, 0, sizeof(IMDCTInfo_t));
+        m_IMDCTInfo->outBuf[0] = outBuf0;
+        m_IMDCTInfo->outBuf[1] = outBuf1;
+        m_IMDCTInfo->overBuf[0] = overBuf0;
+        m_IMDCTInfo->overBuf[1] = overBuf1;
+        memset(m_IMDCTInfo->outBuf[0], 0,
+               sizeof(int) * m_BLOCK_SIZE * m_NBANDS);
+        memset(m_IMDCTInfo->outBuf[1], 0,
+               sizeof(int) * m_BLOCK_SIZE * m_NBANDS);
+        memset(m_IMDCTInfo->overBuf[0], 0,
+               sizeof(int) * (m_MAX_NSAMP / 2));
+        memset(m_IMDCTInfo->overBuf[1], 0,
+               sizeof(int) * (m_MAX_NSAMP / 2));
+    }
+#else
     memset( m_IMDCTInfo,          0, sizeof(IMDCTInfo_t));                                     //Clear IMDCTInfo
+#endif
     memset( m_SubbandInfo,        0, sizeof(SubbandInfo_t));                                   //Clear SubbandInfo
     memset(&m_CriticalBandInfo,   0, sizeof(CriticalBandInfo_t)*m_MAX_NCHAN);                  //Clear CriticalBandInfo
     memset( m_ScaleFactorJS,      0, sizeof(ScaleFactorJS_t));                                 //Clear ScaleFactorJS
@@ -1616,13 +1638,42 @@ bool MP3Decoder_AllocateBuffers(void) {
     if(!m_SideInfo)         {m_SideInfo = (SideInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(SideInfo_t));}
     if(!m_ScaleFactorJS)    {m_ScaleFactorJS = (ScaleFactorJS_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(ScaleFactorJS_t));}
     if(!m_HuffmanInfo)      {m_HuffmanInfo = (HuffmanInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(HuffmanInfo_t));}
+#if !defined(YORADIO_ESP8266_NATIVE)
     if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
+#endif
+#if defined(YORADIO_ESP8266_NATIVE)
+    if(!m_SubbandInfo)      {m_SubbandInfo = (SubbandInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(SubbandInfo_t));}
+    if(!m_IMDCTInfo)        {m_IMDCTInfo = (IMDCTInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(IMDCTInfo_t));}
+    if(m_IMDCTInfo && !m_IMDCTInfo->outBuf[0]) {
+        m_IMDCTInfo->outBuf[0] = (int (*)[m_NBANDS])CodecArenaCalloc32(
+            CODEC_ARENA_MP3, m_BLOCK_SIZE * m_NBANDS, sizeof(int));
+    }
+    if(m_IMDCTInfo && !m_IMDCTInfo->outBuf[1]) {
+        m_IMDCTInfo->outBuf[1] = (int (*)[m_NBANDS])CodecArenaCalloc(
+            CODEC_ARENA_MP3, m_BLOCK_SIZE * m_NBANDS, sizeof(int));
+    }
+    if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
+    if(m_IMDCTInfo && !m_IMDCTInfo->overBuf[0]) {
+        m_IMDCTInfo->overBuf[0] = (int*)CodecArenaCalloc(
+            CODEC_ARENA_MP3, m_MAX_NSAMP / 2, sizeof(int));
+    }
+    if(m_IMDCTInfo && !m_IMDCTInfo->overBuf[1]) {
+        m_IMDCTInfo->overBuf[1] = (int*)CodecArenaCalloc(
+            CODEC_ARENA_MP3, m_MAX_NSAMP / 2, sizeof(int));
+    }
+#else
     if(!m_IMDCTInfo)        {m_IMDCTInfo = (IMDCTInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(IMDCTInfo_t));}
     if(!m_SubbandInfo)      {m_SubbandInfo = (SubbandInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(SubbandInfo_t));}
+#endif
     if(!m_MP3FrameInfo)     {m_MP3FrameInfo = (MP3FrameInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(MP3FrameInfo_t));}
 
     if(!m_MP3DecInfo || !m_FrameHeader || !m_SideInfo || !m_ScaleFactorJS || !m_HuffmanInfo ||
-       !m_DequantInfo || !m_IMDCTInfo || !m_SubbandInfo || !m_MP3FrameInfo) {
+       !m_DequantInfo || !m_IMDCTInfo || !m_SubbandInfo || !m_MP3FrameInfo
+#if defined(YORADIO_ESP8266_NATIVE)
+       || !m_IMDCTInfo->outBuf[0] || !m_IMDCTInfo->outBuf[1] ||
+          !m_IMDCTInfo->overBuf[0] || !m_IMDCTInfo->overBuf[1]
+#endif
+       ) {
         MP3Decoder_FreeBuffers();
         log_e("not enough memory to allocate mp3decoder buffers");
         return false;
@@ -1653,7 +1704,18 @@ void MP3Decoder_FreeBuffers()
     if(m_ScaleFactorJS )    {CodecArenaFree(m_ScaleFactorJS); m_ScaleFactorJS=NULL;}
     if(m_HuffmanInfo)       {CodecArenaFree(m_HuffmanInfo);   m_HuffmanInfo=NULL;}
     if(m_DequantInfo)       {CodecArenaFree(m_DequantInfo);   m_DequantInfo=0;}
+#if defined(YORADIO_ESP8266_NATIVE)
+    if(m_IMDCTInfo) {
+        CodecArenaFree(m_IMDCTInfo->outBuf[0]);
+        CodecArenaFree(m_IMDCTInfo->outBuf[1]);
+        CodecArenaFree(m_IMDCTInfo->overBuf[0]);
+        CodecArenaFree(m_IMDCTInfo->overBuf[1]);
+        CodecArenaFree(m_IMDCTInfo);
+        m_IMDCTInfo=0;
+    }
+#else
     if(m_IMDCTInfo)         {CodecArenaFree(m_IMDCTInfo);     m_IMDCTInfo=0;}
+#endif
     if(m_SubbandInfo)       {CodecArenaFree(m_SubbandInfo);   m_SubbandInfo=0;}
     if(m_MP3FrameInfo)      {CodecArenaFree(m_MP3FrameInfo);  m_MP3FrameInfo=0;}
 

@@ -39,12 +39,15 @@ any stale ignored experimental config in the source tree.
 
 On the Wemos D1 mini, station 510 (`Ретро FM`) returned HTTP 200 with an ICY
 interval of 16000 bytes. Stream inspection selected MP3. Helix SSO allocated
-12968 bytes of DRAM and used the preallocated 16384-byte IRAM arena. The first
+11472 bytes of DRAM and used the preallocated 16384-byte IRAM arena. The first
 four decoded blocks were stereo, 44.1 kHz and non-silent; observed PCM extrema
 reached -19847 and 18834. The DMA snapshots had different checksums and roughly
 half of their 2048 bits set, proving that changing audio data reached the PDM
 DMA ring. During the same run WebUI advanced from `stopped` to `playing` and
 reported `MP3 128 kbps 44 kHz stereo`.
+A 60-second integrated rerun kept playback active while 32 WebSocket status
+frames were received; after the socket timeout drained, `/api/native/status`
+again returned HTTP 200 with `playing=true`, `codec=MP3`, and `bitrate=128`.
 
 A failed earlier trace that requested a 13880-byte allocation was not the
 production decoder: its generated `sdkconfig.h` had silently selected the
