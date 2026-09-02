@@ -5,6 +5,19 @@ entries are retained; changes are published under a new firmware version.
 
 ## Development — 2026-09-02
 
+### ESP8266 canonical audio profile and end-to-end trace
+
+- Made the tracked `sdkconfig.defaults` authoritative and explicit: QIO 40 MHz,
+  160 MHz CPU, Helix MP3 SSO, Helix AAC, GPIO3 I2S-PDM32 at 1.536 MHz and a
+  static 2 x 512-word DMA ring; experimental alternatives are disabled.
+- Added an opt-in bounded diagnostic mode that fingerprints raw decoder PCM,
+  processed mono PCM and the actual PDM words copied into the SLC-DMA ring.
+  It is compiled out of the production image.
+- Physically verified HTTP/ICY -> MP3 detection -> Helix decode -> fixed-point
+  normalization/volume -> stereo-to-mono -> PDM32 -> DMA, while WebUI remained
+  connected and changed from stopped to playing.
+- Rebuilt the ordinary no-trace image, passed all 284 tests and archived it in
+  [`development/esp8266-native-qio40-sso-pdm1536/`](development/esp8266-native-qio40-sso-pdm1536/).
 ### ESP8266 GPIO2/I2S status LED constraint
 
 - Verified against the ESP8266EX pin table that I2S output uses fixed GPIO3
