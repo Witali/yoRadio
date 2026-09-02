@@ -9,14 +9,21 @@ const hostIndex = args.indexOf("--host");
 const host = hostIndex >= 0 ? args[hostIndex + 1] : "192.168.100.4";
 const timeoutIndex = args.indexOf("--timeout");
 const timeoutMs = timeoutIndex >= 0 ? Number(args[timeoutIndex + 1]) : 20000;
+const stationIndex = args.indexOf("--station");
+const selectedStation = stationIndex >= 0 ? Number(args[stationIndex + 1]) : null;
 
-if(args.includes("--help") || !host || !Number.isFinite(timeoutMs)) {
+if(args.includes("--help") || !host || !Number.isFinite(timeoutMs) ||
+   (selectedStation !== null &&
+    (!Number.isInteger(selectedStation) || selectedStation < 1 ||
+     selectedStation > 65535))) {
   console.log(`Usage: node tools/test_webui_controls.mjs [options]
 
 Options:
   --host ADDRESS     Board address (default: 192.168.100.4)
   --timeout MS       Per-step timeout (default: 20000)
   --physical         Also verify short, double and long BOOT gestures
+  --station INDEX    Known working station used for the playlist-row Play test;
+                     defaults to station 1 or 2, whichever is not current
   --help             Show this help
 
 The default run verifies the same WebSocket status flow used by WebUI for
@@ -148,7 +155,7 @@ async function testSettingsResponses() {
 
 async function testRemoteControls() {
   await ensureStopped();
-  const clickedStation = state.current === 1 ? 2 : 1;
+  const clickedStation = selectedStation ?? (state.current === 1 ? 2 : 1);
   await command(
     `play=${clickedStation}`,
     "playlist row click selects and starts that station",

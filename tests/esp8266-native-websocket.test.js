@@ -96,6 +96,46 @@ test("ESP8266 WebSocket handler reads a command in one bounded receive", () => {
   );
 });
 
+test("ESP8266 Web API dispatches every player command and returns fresh state", () => {
+  const commands = source.slice(
+    source.indexOf("static void handle_command"),
+    source.indexOf("static esp_err_t websocket_handler"),
+  );
+
+  assert.match(
+    commands,
+    /strcmp\(command, "play"\) == 0[\s\S]*radio_control_play\(\(uint16_t\)strtoul\(value, NULL, 10\)\)[\s\S]*send_initial_state\(request\)/,
+  );
+  for(const [wireCommand, controlCall] of [
+    ["stop", "radio_control_stop"],
+    ["toggle", "radio_control_toggle"],
+    ["next", "radio_control_next"],
+    ["prev", "radio_control_previous"],
+  ]) {
+    assert.match(
+      commands,
+      new RegExp(
+        `strcmp\\(command, "${wireCommand}"\\) == 0[\\s\\S]*${controlCall}\\(\\)[\\s\\S]*send_initial_state\\(request\\)`,
+      ),
+    );
+  }
+});
+
+test("ESP8266 Web API publishes player, station and stream state after commands", () => {
+  const initial = source.slice(
+    source.indexOf("static esp_err_t send_initial_state"),
+    source.indexOf("static esp_err_t send_active_settings"),
+  );
+  assert.match(initial, /format_status\(&status, body, sizeof\(body\)\)/);
+  assert.match(initial, /ws_send\(request, body\)/);
+  assert.match(initial, /\{\\"current\\":%u\}/);
+  assert.match(initial, /\{\\"playermode\\":\\"modeweb\\"\}/);
+  assert.match(source, /\{\\"id\\":\\"playerwrap\\",\\"value\\":\\"%s\\"\}/);
+  assert.match(source, /status->playing \? "playing" : "stopped"/);
+  assert.match(source, /\{\\"id\\":\\"bitrate\\",\\"value\\":%lu\}/);
+  assert.match(source, /\{\\"id\\":\\"rssi\\",\\"value\\":%d\}/);
+});
+
 test("ESP8266 validates a saved fd before treating it as a WebSocket", () => {
   assert.match(httpServerHeader, /httpd_ws_client_info_t httpd_ws_get_fd_info/);
   assert.match(
