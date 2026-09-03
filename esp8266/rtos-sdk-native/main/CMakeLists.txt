@@ -33,6 +33,9 @@ option(YORADIO_ESP8266_AUDIO_TRACE
   "Log bounded PCM and final DMA PDM samples for physical audio diagnosis" OFF)
 option(YORADIO_ESP8266_SPI_PDM_FAST_ISR
   "Bypass the generic SDK SPI dispatcher for continuous PDM output" ON)
+option(YORADIO_ESP8266_KARADIO_PIPELINE
+  "Use KaRadio-style network producer and compressed-stream ring" OFF)
+
 if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK AND
    YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
   message(FATAL_ERROR "Select only one isolated ESP8266 benchmark")
@@ -88,6 +91,11 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
   YORADIO_HTTP_ONLY=1
   YORADIO_HELIX_MP3=1)
+if(YORADIO_ESP8266_KARADIO_PIPELINE)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_KARADIO_PIPELINE=1)
+endif()
+
 if(YORADIO_ESP8266_AUDIO_PROFILE)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_AUDIO_PROFILE=1)

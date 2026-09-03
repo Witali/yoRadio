@@ -37,6 +37,23 @@
 #define CODEC_HEAP_RESERVE_BYTES 1152U
 #define AUDIO_STACK_BYTES 4096U
 
+#ifndef YORADIO_ESP8266_KARADIO_PIPELINE
+#define YORADIO_ESP8266_KARADIO_PIPELINE 0
+#endif
+
+#if YORADIO_ESP8266_KARADIO_PIPELINE
+/* KaRadio's most useful property on the ESP8266 is not the VS1053 driver but
+ * its producer/consumer split. Keep the compressed stream in a bounded,
+ * statically allocated ring so Wi-Fi can run ahead of Helix without allocating
+ * or freeing memory while a station is playing. */
+#define KARADIO_RING_BYTES 4096U
+#define KARADIO_PREBUFFER_BYTES (KARADIO_RING_BYTES * 3U / 4U)
+#define KARADIO_NETWORK_STACK_BYTES 2560U
+#define KARADIO_NETWORK_PRIORITY 6U
+#define KARADIO_AUDIO_PRIORITY 5U
+#define KARADIO_READ_BYTES 1460U
+#endif
+
 typedef struct {
     uint32_t generation;
     bool play;
@@ -66,6 +83,125 @@ static volatile uint32_t s_generation;
 /* Reused for HTTP headers, initial codec detection and ICY metadata. */
 static uint8_t s_work[HTTP_HEADER_BYTES];
 static char s_host[HTTP_HOST_BYTES];
+
+#if YORADIO_ESP8266_KARADIO_PIPELINE
+typedef enum {
+    KARADIO_PIPELINE_IDLE,
+    KARADIO_PIPELINE_OPENING,
+    KARADIO_PIPELINE_STREAMING,
+    KARADIO_PIPELINE_EOF,
+    KARADIO_PIPELINE_ERROR,
+} karadio_pipeline_state_t;
+
+static uint8_t s_karadio_ring[KARADIO_RING_BYTES];
+static uint8_t s_karadio_probe[HTTP_HEADER_BYTES];
+static volatile size_t s_karadio_head;
+static volatile size_t s_karadio_tail;
+static volatile size_t s_karadio_count;
+static volatile bool s_karadio_abort;
+static volatile karadio_pipeline_state_t s_karadio_state;
+static volatile int s_karadio_error;
+static uint32_t s_karadio_generation;
+static char s_karadio_url[AUDIO_URL_BYTES];
+static TaskHandle_t s_karadio_network_task;
+static TaskHandle_t s_karadio_audio_task;
+
+static void karadio_wake(TaskHandle_t task) {
+    if (task) xTaskNotifyGive(task);
+}
+
+static size_t karadio_ring_count(void) {
+    taskENTER_CRITICAL();
+    size_t count = s_karadio_count;
+    taskEXIT_CRITICAL();
+    return count;
+}
+
+static void karadio_ring_reset(void) {
+    taskENTER_CRITICAL();
+    s_karadio_head = 0;
+    s_karadio_tail = 0;
+    s_karadio_count = 0;
+    taskEXIT_CRITICAL();
+}
+
+static size_t karadio_ring_peek(uint8_t *destination, size_t capacity) {
+    taskENTER_CRITICAL();
+    size_t count = s_karadio_count < capacity ? s_karadio_count : capacity;
+    size_t head = s_karadio_head;
+    taskEXIT_CRITICAL();
+    size_t first = KARADIO_RING_BYTES - head;
+    if (first > count) first = count;
+    memcpy(destination, s_karadio_ring + head, first);
+    if (count > first)
+        memcpy(destination + first, s_karadio_ring, count - first);
+    return count;
+}
+
+static size_t karadio_ring_read(uint8_t *destination, size_t capacity) {
+    taskENTER_CRITICAL();
+    size_t count = s_karadio_count < capacity ? s_karadio_count : capacity;
+    size_t head = s_karadio_head;
+    taskEXIT_CRITICAL();
+    size_t first = KARADIO_RING_BYTES - head;
+    if (first > count) first = count;
+    memcpy(destination, s_karadio_ring + head, first);
+    if (count > first)
+        memcpy(destination + first, s_karadio_ring, count - first);
+    taskENTER_CRITICAL();
+    s_karadio_head = (head + count) % KARADIO_RING_BYTES;
+    s_karadio_count -= count;
+    taskEXIT_CRITICAL();
+    if (count) karadio_wake(s_karadio_network_task);
+    return count;
+}
+
+static size_t karadio_ring_write(const uint8_t *source, size_t length) {
+    size_t written = 0;
+    while (written < length) {
+        taskENTER_CRITICAL();
+        size_t free_bytes = KARADIO_RING_BYTES - s_karadio_count;
+        size_t count = length - written;
+        if (count > free_bytes) count = free_bytes;
+        size_t tail = s_karadio_tail;
+        taskEXIT_CRITICAL();
+        if (!count) break;
+        size_t first = KARADIO_RING_BYTES - tail;
+        if (first > count) first = count;
+        memcpy(s_karadio_ring + tail, source + written, first);
+        if (count > first)
+            memcpy(s_karadio_ring, source + written + first, count - first);
+        taskENTER_CRITICAL();
+        s_karadio_tail = (tail + count) % KARADIO_RING_BYTES;
+        s_karadio_count += count;
+        taskEXIT_CRITICAL();
+        written += count;
+    }
+    if (written) karadio_wake(s_karadio_audio_task);
+    return written;
+}
+
+/* The producer owns tail and the consumer owns head. A consumer can only
+ * increase the returned free region, so receiving directly into it is safe
+ * and avoids a TCP-to-ring staging copy. */
+static size_t karadio_ring_write_window(uint8_t **destination) {
+    taskENTER_CRITICAL();
+    size_t free_bytes = KARADIO_RING_BYTES - s_karadio_count;
+    size_t contiguous = KARADIO_RING_BYTES - s_karadio_tail;
+    if (contiguous > free_bytes) contiguous = free_bytes;
+    *destination = s_karadio_ring + s_karadio_tail;
+    taskEXIT_CRITICAL();
+    return contiguous;
+}
+
+static void karadio_ring_commit(size_t count) {
+    taskENTER_CRITICAL();
+    s_karadio_tail = (s_karadio_tail + count) % KARADIO_RING_BYTES;
+    s_karadio_count += count;
+    taskEXIT_CRITICAL();
+    karadio_wake(s_karadio_audio_task);
+}
+#endif
 
 static void log_audio_stack(const char *event) {
 #if YORADIO_ESP8266_AUDIO_PROFILE
@@ -508,6 +644,279 @@ static bool read_icy_metadata(http_stream_t *stream, uint32_t generation) {
     return remaining == 0;
 }
 
+#if YORADIO_ESP8266_KARADIO_PIPELINE
+static bool karadio_pipeline_active(void) {
+    return s_karadio_state == KARADIO_PIPELINE_OPENING ||
+           s_karadio_state == KARADIO_PIPELINE_STREAMING;
+}
+
+static void karadio_pipeline_publish(karadio_pipeline_state_t state,
+                                     int error) {
+    s_karadio_error = error;
+    s_karadio_state = state;
+    karadio_wake(s_karadio_audio_task);
+}
+
+static void karadio_network_worker(void *argument) {
+    (void)argument;
+    s_karadio_network_task = xTaskGetCurrentTaskHandle();
+    for (;;) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        if (s_karadio_state != KARADIO_PIPELINE_OPENING) continue;
+
+        const uint32_t generation = s_karadio_generation;
+        http_stream_t stream;
+        memset(&stream, 0, sizeof(stream));
+        stream.socket = -1;
+        int opened = -1;
+        for (unsigned attempt = 0;
+             attempt < HTTP_OPEN_ATTEMPTS &&
+             generation_current(generation) && !s_karadio_abort; ++attempt) {
+            opened = open_http_stream(s_karadio_url, &stream);
+            if (opened == 0) break;
+            if (attempt + 1U < HTTP_OPEN_ATTEMPTS)
+                vTaskDelay(pdMS_TO_TICKS(250U));
+        }
+        if (opened != 0 || !generation_current(generation) ||
+            s_karadio_abort) {
+            if (stream.socket >= 0) close(stream.socket);
+            if (!generation_current(generation) || s_karadio_abort)
+                karadio_pipeline_publish(KARADIO_PIPELINE_IDLE, 0);
+            else
+                karadio_pipeline_publish(KARADIO_PIPELINE_ERROR, opened);
+            continue;
+        }
+
+        uint32_t audio_until_metadata = stream.metadata_interval;
+        if (audio_until_metadata && stream.body_size <= audio_until_metadata)
+            audio_until_metadata -= (uint32_t)stream.body_size;
+        if (stream.body_size &&
+            karadio_ring_write(s_work, stream.body_size) != stream.body_size) {
+            close(stream.socket);
+            karadio_pipeline_publish(KARADIO_PIPELINE_ERROR, -30);
+            continue;
+        }
+        karadio_pipeline_publish(KARADIO_PIPELINE_STREAMING, 0);
+
+        int stream_result = 0;
+        while (generation_current(generation) && !s_karadio_abort) {
+            if (stream.metadata_interval && !audio_until_metadata) {
+                if (!read_icy_metadata(&stream, generation)) {
+                    stream_result = -31;
+                    break;
+                }
+                audio_until_metadata = stream.metadata_interval;
+                continue;
+            }
+
+            uint8_t *destination = NULL;
+            size_t capacity = karadio_ring_write_window(&destination);
+            if (!capacity) {
+                ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10));
+                continue;
+            }
+            if (capacity > KARADIO_READ_BYTES) capacity = KARADIO_READ_BYTES;
+            if (audio_until_metadata && capacity > audio_until_metadata)
+                capacity = audio_until_metadata;
+            int received = stream_receive(&stream, destination, capacity);
+            if (received > 0) {
+                karadio_ring_commit((size_t)received);
+                if (stream.metadata_interval)
+                    audio_until_metadata -= (uint32_t)received;
+                continue;
+            }
+            if (received == 0) {
+                stream_result = 1;
+                break;
+            }
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                vTaskDelay(pdMS_TO_TICKS(1));
+                continue;
+            }
+            stream_result = -32;
+            break;
+        }
+        close(stream.socket);
+        if (!generation_current(generation) || s_karadio_abort)
+            karadio_pipeline_publish(KARADIO_PIPELINE_IDLE, 0);
+        else if (stream_result > 0)
+            karadio_pipeline_publish(KARADIO_PIPELINE_EOF, 0);
+        else
+            karadio_pipeline_publish(KARADIO_PIPELINE_ERROR, stream_result);
+    }
+}
+
+static bool karadio_pipeline_start(const audio_command_t *command) {
+    int64_t deadline = esp_timer_get_time() + 11000000LL;
+    while (s_karadio_state != KARADIO_PIPELINE_IDLE &&
+           esp_timer_get_time() < deadline) {
+        karadio_wake(s_karadio_network_task);
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
+    if (s_karadio_state != KARADIO_PIPELINE_IDLE) return false;
+    karadio_ring_reset();
+    s_karadio_abort = false;
+    s_karadio_error = 0;
+    s_karadio_generation = command->generation;
+    strncpy(s_karadio_url, command->url, sizeof(s_karadio_url) - 1U);
+    s_karadio_url[sizeof(s_karadio_url) - 1U] = '\0';
+    s_karadio_state = KARADIO_PIPELINE_OPENING;
+    karadio_wake(s_karadio_network_task);
+    return true;
+}
+
+static void karadio_pipeline_abort(void) {
+    if (karadio_pipeline_active()) {
+        s_karadio_abort = true;
+        karadio_wake(s_karadio_network_task);
+        int64_t deadline = esp_timer_get_time() + 11000000LL;
+        while (karadio_pipeline_active() && esp_timer_get_time() < deadline)
+            vTaskDelay(pdMS_TO_TICKS(1));
+    }
+    s_karadio_state = KARADIO_PIPELINE_IDLE;
+    s_karadio_abort = false;
+    karadio_ring_reset();
+}
+
+static void audio_task(void *argument) {
+    (void)argument;
+    s_karadio_audio_task = xTaskGetCurrentTaskHandle();
+    helix_codec_t *codec = NULL;
+    helix_codec_kind_t codec_kind = 0;
+    log_audio_stack("start");
+    while (true) {
+        audio_command_t command;
+        xQueueReceive(s_commands, &command, portMAX_DELAY);
+        if (!command.play) {
+            karadio_pipeline_abort();
+            native_audio_output_silence();
+            release_codec(&codec, &codec_kind, "stop");
+            native_state_set_audio(false, false, NULL);
+            network_service_set_streaming(false);
+            continue;
+        }
+
+        native_state_set_audio(false, true, "BUFFERING");
+        network_service_set_streaming(true);
+        if (!karadio_pipeline_start(&command)) {
+            native_state_set_audio(false, false, "NETWORK TASK BUSY");
+            network_service_set_streaming(false);
+            continue;
+        }
+        while (generation_current(command.generation) &&
+               karadio_pipeline_active() &&
+               karadio_ring_count() < KARADIO_PREBUFFER_BYTES)
+            ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10));
+
+        helix_codec_kind_t detected = 0;
+        while (generation_current(command.generation)) {
+            size_t probe_size = karadio_ring_peek(
+                s_karadio_probe, sizeof(s_karadio_probe));
+            detected = helix_codec_detect(s_karadio_probe, probe_size);
+            if (detected || probe_size == sizeof(s_karadio_probe) ||
+                !karadio_pipeline_active())
+                break;
+            ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10));
+        }
+        if (!detected || !generation_current(command.generation)) {
+            bool current = generation_current(command.generation);
+            int error = s_karadio_error;
+            karadio_pipeline_abort();
+            if (current) {
+                native_state_set_audio(false, false,
+                    error == -7 ? "HTTPS NOT SUPPORTED" :
+                    error ? "CONNECTION ERROR" : "UNSUPPORTED STREAM");
+                network_service_set_streaming(false);
+                release_codec(&codec, &codec_kind, "stream detection error");
+            }
+            continue;
+        }
+        codec_kind = detected;
+        bool decoder_ready = codec
+            ? helix_codec_switch(codec, codec_kind) == 0
+            : (codec = helix_codec_create(codec_kind,
+                                          CODEC_HEAP_RESERVE_BYTES)) != NULL;
+        if (!decoder_ready) {
+            karadio_pipeline_abort();
+            native_state_set_audio(false, false, "DECODER INIT ERROR");
+            network_service_set_streaming(false);
+            release_codec(&codec, &codec_kind, "decoder init error");
+            continue;
+        }
+
+        output_context_t output = {
+            .generation = command.generation,
+            .codec_kind = codec_kind,
+            .measured_started_us = esp_timer_get_time(),
+        };
+        native_state_set_stream(codec_kind == HELIX_CODEC_MP3
+                                    ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
+                                0, 0, 0);
+        native_state_set_audio(true, false, NULL);
+        int feed = 0;
+        while (feed == 0 && generation_current(command.generation)) {
+            size_t capacity = 0;
+            uint8_t *destination = helix_codec_write_pointer(codec, &capacity);
+            if (!destination || !capacity) {
+                feed = -20;
+                break;
+            }
+            if (capacity > 1024U) capacity = 1024U;
+            size_t received = karadio_ring_read(destination, capacity);
+            if (received) {
+                output.measured_bytes += received;
+                feed = helix_codec_commit(codec, received,
+                                          pcm_output, &output);
+                int64_t now = esp_timer_get_time();
+                if (!output.decoder_bitrate &&
+                    now - output.measured_started_us >= 3000000) {
+                    uint32_t kbps = (uint32_t)(
+                        output.measured_bytes * 8000ULL /
+                        (uint64_t)(now - output.measured_started_us));
+                    native_state_set_stream(codec_kind == HELIX_CODEC_MP3
+                                                ? CODEC_HELIX_MP3
+                                                : CODEC_HELIX_AAC,
+                                            kbps, 0, 0);
+                    output.measured_bytes = 0;
+                    output.measured_started_us = now;
+                }
+                continue;
+            }
+            if (s_karadio_state == KARADIO_PIPELINE_EOF) {
+                feed = helix_codec_feed(codec, NULL, 0, true,
+                                        pcm_output, &output);
+                break;
+            }
+            if (s_karadio_state == KARADIO_PIPELINE_ERROR) {
+                feed = s_karadio_error ? s_karadio_error : -21;
+                break;
+            }
+            ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(5));
+        }
+
+        bool current = generation_current(command.generation);
+        bool clean_end = current &&
+                         s_karadio_state == KARADIO_PIPELINE_EOF && feed == 0;
+        karadio_pipeline_abort();
+        if (clean_end) {
+            native_audio_output_silence();
+            native_state_set_audio(false, true, "RECONNECTING");
+            vTaskDelay(pdMS_TO_TICKS(250U));
+            if (generation_current(command.generation))
+                xQueueOverwrite(s_commands, &command);
+        } else if (current) {
+            native_audio_output_silence();
+            if (feed < 0)
+                ESP_LOGE(TAG, "KaRadio pipeline stopped: %d", feed);
+            release_codec(&codec, &codec_kind,
+                          feed < 0 ? "stream error" : "stream end");
+            native_state_set_audio(false, false,
+                                   feed < 0 ? "AUDIO STREAM ERROR" : NULL);
+            network_service_set_streaming(false);
+        }
+    }
+}
+#else
 static void audio_task(void *argument) {
     (void)argument;
     helix_codec_t *codec = NULL;
@@ -726,6 +1135,7 @@ static void audio_task(void *argument) {
         }
     }
 }
+#endif
 
 esp_err_t audio_service_init(void) {
     /* Reserve only the shared 32-bit arena while executable-capable IRAM is
@@ -734,15 +1144,41 @@ esp_err_t audio_service_init(void) {
     if (!helix_codec_prepare()) return ESP_ERR_NO_MEM;
     s_commands = xQueueCreate(1, sizeof(audio_command_t));
     if (!s_commands) return ESP_ERR_NO_MEM;
-    if (xTaskCreate(audio_task, "audio", AUDIO_STACK_BYTES, NULL, 5, NULL) !=
+#if YORADIO_ESP8266_KARADIO_PIPELINE
+    s_karadio_state = KARADIO_PIPELINE_IDLE;
+    if (xTaskCreate(karadio_network_worker, "karadio-net",
+                    KARADIO_NETWORK_STACK_BYTES, NULL,
+                    KARADIO_NETWORK_PRIORITY, &s_karadio_network_task) !=
         pdPASS) {
         vQueueDelete(s_commands);
         s_commands = NULL;
         return ESP_ERR_NO_MEM;
     }
+#define AUDIO_TASK_PRIORITY KARADIO_AUDIO_PRIORITY
+#else
+#define AUDIO_TASK_PRIORITY 5U
+#endif
+    if (xTaskCreate(audio_task, "audio", AUDIO_STACK_BYTES, NULL,
+                    AUDIO_TASK_PRIORITY, NULL) !=
+        pdPASS) {
+#if YORADIO_ESP8266_KARADIO_PIPELINE
+        vTaskDelete(s_karadio_network_task);
+        s_karadio_network_task = NULL;
+#endif
+        vQueueDelete(s_commands);
+        s_commands = NULL;
+        return ESP_ERR_NO_MEM;
+    }
+#undef AUDIO_TASK_PRIORITY
     ESP_LOGI(TAG, "Codec state is lazy; maximum %u bytes, reserve %u",
              (unsigned)helix_codec_workspace_size(),
              (unsigned)CODEC_HEAP_RESERVE_BYTES);
+#if YORADIO_ESP8266_KARADIO_PIPELINE
+    ESP_LOGI(TAG, "KaRadio pipeline: network priority %u, audio priority %u, "
+                  "ring %u bytes, prebuffer %u bytes",
+             KARADIO_NETWORK_PRIORITY, KARADIO_AUDIO_PRIORITY,
+             KARADIO_RING_BYTES, KARADIO_PREBUFFER_BYTES);
+#endif
     return ESP_OK;
 }
 
