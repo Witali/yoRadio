@@ -18,8 +18,11 @@ namespace {
 constexpr size_t kWordArenaBytes = 12U * 1024U;
 constexpr size_t kWordSpillBytes = 0U;
 #elif !CONFIG_YORADIO_HELIX_AAC
-/* Helix MP3 uses about 14.2 KiB across Huffman/dequant/subband state. */
-constexpr size_t kWordArenaBytes = 15U * 1024U;
+/* A 16-KiB arena is the largest contiguous word workspace verified on the
+ * physical Wemos D1 mini. It also changes the Helix allocation packing so
+ * the 2304-byte synthesis block remains in IRAM instead of spilling to DRAM.
+ * Requests above 16 KiB are not reliable on the real ESP8266 heap. */
+constexpr size_t kWordArenaBytes = 16U * 1024U;
 constexpr size_t kWordSpillBytes = 0U;
 #else
 /* The full MP3/AAC profile has a physically verified contiguous 16-KiB

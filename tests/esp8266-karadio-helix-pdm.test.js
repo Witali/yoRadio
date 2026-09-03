@@ -10,6 +10,9 @@ const audio = fs.readFileSync(path.join(
 const cmake = fs.readFileSync(path.join(target, 'main', 'CMakeLists.txt'), 'utf8');
 const defaults = fs.readFileSync(path.join(target, 'sdkconfig.defaults'), 'utf8');
 const readme = fs.readFileSync(path.join(target, 'README.md'), 'utf8');
+const arena = fs.readFileSync(path.join(
+  root, 'esp8266', 'rtos-sdk-native', 'components', 'helix_codecs',
+  'CodecMemoryArena.cpp'), 'utf8');
 
 test('KaRadio target uses Helix MP3 and DMA I2S PDM without VS1053', () => {
   assert.match(cmake, /YORADIO_ESP8266_KARADIO_PIPELINE=1/);
@@ -37,6 +40,11 @@ test('network producer receives directly into the bounded ring', () => {
   assert.match(audio, /karadio_ring_commit\(\(size_t\)received\)/);
   assert.match(audio, /karadio_ring_read\(destination, capacity\)/);
   assert.doesNotMatch(audio, /malloc\([^\n]*KARADIO_RING_BYTES/);
+});
+
+test('MP3 word workspace uses the physically verified 16-KiB IRAM arena', () => {
+  assert.match(arena, /kWordArenaBytes = 16U \* 1024U/);
+  assert.doesNotMatch(audio, /s_karadio_prepared_codec/);
 });
 
 test('documentation states the physical output and compatibility limits', () => {
