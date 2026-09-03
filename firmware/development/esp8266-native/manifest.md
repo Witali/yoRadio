@@ -1,18 +1,23 @@
 # ESP8266 native development artifact
 
 - Built: 2026-09-03
-- Source revision: `70c7e43`
+- Source revision: `101ac56`
 - Target: ESP8266EX, 4 MiB flash
 - Framework: ESP8266 RTOS SDK v3.4
 - Profile: development, diagnostic logging enabled, `-O3`, audio profiler disabled
 - Features: HTTP/ICY radio streams, Helix MP3/AAC, WebUI-only display profile
 - Application flash offset: `0x10000`
 - File: `app.bin`
-- Size: 670192 bytes
-- SHA-256: `E1EA68CB33A5B39315F9B14285E0CD6446C679977C36BE89B65B9C7B08125F24`
+- Size: 670448 bytes
+- SHA-256: `E15E6D24003ED14BEAAD5CC14FCF1F1D43F12F176708862186C1FDBB1AFEBEBC`
 
 ## Changes
 
+- Removed the dedicated 2048-byte input task. BOOT and encoder ISRs now queue
+  compact events and wake the existing 3072-byte application task with a task
+  notification; debounce and click recognition run when that task wakes.
+- Added a compact locked playback-state accessor so button toggling no longer
+  places a complete 484-byte station-state snapshot on the application stack.
 - Replaced the 320-byte station/title status copies with compact hashes while
   retaining every WebUI field and immediate metadata-change notification.
 - Formats escaped WebSocket JSON directly into its bounded output buffer and
@@ -36,6 +41,15 @@
 
 ## Validation
 
+- On the physical board, free heap after DHCP increased from 21,160 to 23,300
+  bytes (+2,140), accounting for the removed stack and task control block.
+  The firmware booted at 160 MHz, rejoined Wi-Fi and logged that BOOT input is
+  owned by the application task. DTR on this USB-UART adapter does not drive
+  GPIO0 independently, so the three physical button gestures still require a
+  manual press test.
+- The complete repository suite passed: 301 tests, including assertions that
+  no input task or input-stack allocation remains and that both button and
+  encoder ISRs notify the application task.
 - Static DRAM fell from 20,536 to 20,216 bytes; together with the 1,024-byte
   stack reduction this releases 1,344 bytes of runtime RAM. The physical board
   reported 21,160 bytes free after DHCP versus 19,816 before this change.
