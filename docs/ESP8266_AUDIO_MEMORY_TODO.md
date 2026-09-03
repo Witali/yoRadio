@@ -37,9 +37,9 @@ default until every integrated libmad criterion below passes.
 - [x] Add audio-task stack high-water instrumentation to the diagnostic
   profile.
 - [ ] Measure connection, MP3 320 kbit/s, switching, ICY metadata and WebUI
-  activity before changing the 5120-byte stack. The diagnostic wrappers
-  currently fragment the last free block before libmad allocation; keep 5120
-  bytes until a lower-overhead diagnostic build can finish the full scenario.
+  activity before reducing the HTTP stack below 4096 bytes. Direct bounded
+  status formatting and a physical Web API test made 4096 bytes reliable, but
+  a smaller stack still needs a lower-overhead high-water measurement.
 - [x] Keep the full MP3+AAC profile's 16-KB word arena: AAC can use the whole
   arena for its two 8-KB 32-bit workspaces.
   Physical testing established this as the largest reliable contiguous

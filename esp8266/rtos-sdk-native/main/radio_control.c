@@ -131,9 +131,7 @@ esp_err_t radio_control_stop(void) {
 }
 
 esp_err_t radio_control_toggle(void) {
-    native_state_t state;
-    native_state_snapshot(&state);
-    return state.playing || state.connecting
+    return native_state_audio_active()
                ? radio_control_stop()
                : radio_control_play(s_current_station);
 }

@@ -42,6 +42,7 @@ typedef struct {
 
 void native_state_init(void);
 void native_state_snapshot(native_state_t *output);
+bool native_state_audio_active(void);
 void native_state_update(const native_state_t *input);
 void native_state_set_network(network_mode_t mode);
 void native_state_set_ip(const char *ip);

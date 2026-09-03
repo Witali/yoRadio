@@ -8,6 +8,7 @@ const output = fs.readFileSync(path.join(root, "native_audio_output.c"), "utf8")
 const component = fs.readFileSync(path.join(root, "CMakeLists.txt"), "utf8");
 const board = fs.readFileSync(path.join(root, "board_config.h"), "utf8");
 const input = fs.readFileSync(path.join(root, "input_service.c"), "utf8");
+const app = fs.readFileSync(path.join(root, "app_main.c"), "utf8");
 const radio = fs.readFileSync(path.join(root, "radio_control.c"), "utf8");
 const network = fs.readFileSync(path.join(root, "network_service.c"), "utf8");
 const pdmConfig = fs.readFileSync(path.join(root, "spi_pdm_config.h"), "utf8");
@@ -104,9 +105,12 @@ test("ESP8266 SPI-PDM drains queued sound before forcing silence", () => {
   );
 });
 
-test("ESP8266 input task has enough board-specific stack to open SPIFFS playlist", () => {
-  assert.match(board, /#define BOARD_TASK_STACK_INPUT 2048/);
-  assert.match(input, /xTaskCreate\(input_task, "input", BOARD_TASK_STACK_INPUT,/);
+test("ESP8266 input gestures reuse the notified main task stack", () => {
+  assert.doesNotMatch(board, /BOARD_TASK_STACK_INPUT/);
+  assert.doesNotMatch(input, /xTaskCreate\(input_task/);
+  assert.match(input, /vTaskNotifyGiveFromISR\(consumer, wake\)/);
+  assert.match(input, /void input_service_poll\(void\)/);
+  assert.match(app, /input_service_poll\(\)[\s\S]*ulTaskNotifyTake\(pdTRUE, wait\)/);
 });
 test("ESP8266 audio profile can auto-start a reproducible HTTP stream", () => {
   assert.match(component, /YORADIO_ESP8266_AUDIO_PROFILE=1/);

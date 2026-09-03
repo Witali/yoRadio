@@ -22,6 +22,13 @@ void native_state_snapshot(native_state_t *output) {
     xSemaphoreGive(s_lock);
 }
 
+bool native_state_audio_active(void) {
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    bool active = s_state.playing || s_state.connecting;
+    xSemaphoreGive(s_lock);
+    return active;
+}
+
 void native_state_update(const native_state_t *input) {
     if (!input) return;
     xSemaphoreTake(s_lock, portMAX_DELAY);

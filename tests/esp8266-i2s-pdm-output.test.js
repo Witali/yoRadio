@@ -54,7 +54,8 @@ test("ESP8266 production audio defaults to I2S DMA PDM", () => {
   assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHMODE_QIO=y/);
   assert.match(defaultProfile, /CONFIG_ESPTOOLPY_FLASHFREQ_40M=y/);
   assert.match(defaultProfile, /CONFIG_ESP_MAIN_TASK_STACK_SIZE=3072/);
-  assert.match(board, /#define BOARD_TASK_STACK_INPUT 2048/);
+  assert.doesNotMatch(board, /BOARD_TASK_STACK_INPUT/);
+  assert.match(app, /input_service_poll\(\)[\s\S]*ulTaskNotifyTake\(pdTRUE, wait\)/);
   assert.match(defaultProfile, /CONFIG_YORADIO_MP3_DECODER_LIBMAD=n/);
   assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_MP3_SSO=y/);
   assert.match(defaultProfile, /CONFIG_YORADIO_HELIX_AAC=y/);

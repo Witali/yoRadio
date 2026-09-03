@@ -24,7 +24,6 @@
 #define BOARD_TASK_STACK_AUDIO 6144
 /* Status formatting is bounded; playlist responses reuse the shared buffer. */
 #define BOARD_TASK_STACK_WEB 4096
-#define BOARD_TASK_STACK_INPUT 2048
 #define BOARD_TASK_STACK_DISPLAY 3072
 
 #define BOARD_AUDIO_INPUT_BYTES 12288

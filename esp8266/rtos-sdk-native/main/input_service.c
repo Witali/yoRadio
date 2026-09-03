@@ -28,6 +28,18 @@ typedef struct {
 
 static const char *TAG = "input";
 static QueueHandle_t s_events;
+static TaskHandle_t s_consumer_task;
+static bool s_raw_pressed;
+static bool s_stable_pressed;
+static TickType_t s_raw_changed;
+static TickType_t s_pressed_at;
+static bool s_click_pending;
+static TickType_t s_click_deadline;
+
+static void IRAM_ATTR wake_consumer_from_isr(BaseType_t *wake) {
+    TaskHandle_t consumer = s_consumer_task;
+    if (consumer) vTaskNotifyGiveFromISR(consumer, wake);
+}
 
 #if BOARD_ENCODER_A_GPIO >= 0 && BOARD_ENCODER_B_GPIO >= 0
 static volatile uint8_t s_encoder_phase;
@@ -45,6 +57,7 @@ static void IRAM_ATTR button_isr(void *argument) {
     };
     BaseType_t wake = pdFALSE;
     xQueueSendFromISR(s_events, &event, &wake);
+    wake_consumer_from_isr(&wake);
     if (wake) portYIELD_FROM_ISR();
 }
 
@@ -70,6 +83,7 @@ static void IRAM_ATTR encoder_isr(void *argument) {
     };
     BaseType_t wake = pdFALSE;
     xQueueSendFromISR(s_events, &event, &wake);
+    wake_consumer_from_isr(&wake);
     if (wake) portYIELD_FROM_ISR();
 }
 #endif
@@ -79,74 +93,82 @@ static bool tick_due(TickType_t now, TickType_t deadline) {
 }
 
 static void show_play_state(void) {
-    native_state_t state;
-    native_state_snapshot(&state);
-    native_state_set_message(state.playing || state.connecting
-                                 ? "playing" : "stopped",
+    native_state_set_message(native_state_audio_active() ? "playing" : "stopped",
                              INPUT_MESSAGE_MS);
 }
 
-static void input_task(void *argument) {
-    (void)argument;
-    bool raw_pressed = gpio_get_level(BOARD_BOOT_BUTTON_GPIO) == 0;
-    bool stable_pressed = raw_pressed;
-    TickType_t raw_changed = xTaskGetTickCount();
-    TickType_t pressed_at = raw_changed;
-    bool click_pending = false;
-    TickType_t click_deadline = 0;
-
-    while (true) {
-        TickType_t now = xTaskGetTickCount();
-        TickType_t wait = pdMS_TO_TICKS(20);
-        if (click_pending && tick_due(now, click_deadline)) wait = 0;
-        input_event_t event;
-        if (xQueueReceive(s_events, &event, wait) == pdTRUE) {
-            if (event.type == INPUT_ENCODER_STEP) {
-                persistent_settings_t settings;
-                persistent_settings_get(&settings);
-                radio_control_adjust_volume(event.delta * settings.volume_steps);
-                continue;
-            }
-            bool pressed = gpio_get_level(BOARD_BOOT_BUTTON_GPIO) == 0;
-            if (pressed != raw_pressed) {
-                raw_pressed = pressed;
-                raw_changed = event.tick;
-            }
+void input_service_poll(void) {
+    if (!s_events) return;
+    input_event_t event;
+    while (xQueueReceive(s_events, &event, 0) == pdTRUE) {
+        if (event.type == INPUT_ENCODER_STEP) {
+            persistent_settings_t settings;
+            persistent_settings_get(&settings);
+            radio_control_adjust_volume(event.delta * settings.volume_steps);
+            continue;
         }
-        now = xTaskGetTickCount();
-        if (raw_pressed != stable_pressed &&
-            tick_due(now, raw_changed + pdMS_TO_TICKS(INPUT_DEBOUNCE_MS))) {
-            stable_pressed = raw_pressed;
-            if (stable_pressed) {
-                pressed_at = now;
-            } else {
-                uint32_t held_ms =
-                    (uint32_t)((now - pressed_at) * portTICK_PERIOD_MS);
-                if (held_ms >= INPUT_LONG_MS) {
-                    click_pending = false;
-                    radio_control_previous();
-                    native_state_set_message("prev", INPUT_MESSAGE_MS);
-                } else if (click_pending && !tick_due(now, click_deadline)) {
-                    click_pending = false;
-                    radio_control_next();
-                    native_state_set_message("next", INPUT_MESSAGE_MS);
-                } else {
-                    click_pending = true;
-                    click_deadline = now + pdMS_TO_TICKS(INPUT_DOUBLE_MS);
-                }
-            }
-        }
-        if (click_pending && tick_due(now, click_deadline)) {
-            click_pending = false;
-            radio_control_toggle();
-            show_play_state();
+        bool pressed = gpio_get_level(BOARD_BOOT_BUTTON_GPIO) == 0;
+        if (pressed != s_raw_pressed) {
+            s_raw_pressed = pressed;
+            s_raw_changed = event.tick;
         }
     }
+
+    TickType_t now = xTaskGetTickCount();
+    if (s_raw_pressed != s_stable_pressed &&
+        tick_due(now, s_raw_changed + pdMS_TO_TICKS(INPUT_DEBOUNCE_MS))) {
+        s_stable_pressed = s_raw_pressed;
+        if (s_stable_pressed) {
+            s_pressed_at = now;
+        } else {
+            uint32_t held_ms =
+                (uint32_t)((now - s_pressed_at) * portTICK_PERIOD_MS);
+            if (held_ms >= INPUT_LONG_MS) {
+                s_click_pending = false;
+                radio_control_previous();
+                native_state_set_message("prev", INPUT_MESSAGE_MS);
+            } else if (s_click_pending &&
+                       !tick_due(now, s_click_deadline)) {
+                s_click_pending = false;
+                radio_control_next();
+                native_state_set_message("next", INPUT_MESSAGE_MS);
+            } else {
+                s_click_pending = true;
+                s_click_deadline = now + pdMS_TO_TICKS(INPUT_DOUBLE_MS);
+            }
+        }
+    }
+    if (s_click_pending && tick_due(now, s_click_deadline)) {
+        s_click_pending = false;
+        radio_control_toggle();
+        show_play_state();
+    }
+}
+
+static TickType_t deadline_wait(TickType_t now, TickType_t deadline) {
+    return tick_due(now, deadline) ? 0 : deadline - now;
+}
+
+TickType_t input_service_wait_ticks(TickType_t maximum_wait) {
+    if (!s_events || uxQueueMessagesWaiting(s_events)) return 0;
+    TickType_t now = xTaskGetTickCount();
+    TickType_t wait = maximum_wait;
+    if (s_raw_pressed != s_stable_pressed) {
+        TickType_t debounce = deadline_wait(
+            now, s_raw_changed + pdMS_TO_TICKS(INPUT_DEBOUNCE_MS));
+        if (debounce < wait) wait = debounce;
+    }
+    if (s_click_pending) {
+        TickType_t click = deadline_wait(now, s_click_deadline);
+        if (click < wait) wait = click;
+    }
+    return wait;
 }
 
 esp_err_t input_service_start(void) {
     s_events = xQueueCreate(12, sizeof(input_event_t));
     if (!s_events) return ESP_ERR_NO_MEM;
+    s_consumer_task = xTaskGetCurrentTaskHandle();
     gpio_config_t button = {
         .pin_bit_mask = 1ULL << BOARD_BOOT_BUTTON_GPIO,
         .mode = GPIO_MODE_INPUT,
@@ -156,6 +178,12 @@ esp_err_t input_service_start(void) {
     };
     esp_err_t result = gpio_config(&button);
     if (result != ESP_OK) return result;
+    s_raw_pressed = gpio_get_level(BOARD_BOOT_BUTTON_GPIO) == 0;
+    s_stable_pressed = s_raw_pressed;
+    s_raw_changed = xTaskGetTickCount();
+    s_pressed_at = s_raw_changed;
+    s_click_pending = false;
+    s_click_deadline = 0;
     result = gpio_install_isr_service(0);
     if (result != ESP_OK && result != ESP_ERR_INVALID_STATE) return result;
     result = gpio_isr_handler_add(BOARD_BOOT_BUTTON_GPIO, button_isr, NULL);
@@ -182,9 +210,6 @@ esp_err_t input_service_start(void) {
              BOARD_ENCODER_A_GPIO, BOARD_ENCODER_B_GPIO);
 #endif
 
-    if (xTaskCreate(input_task, "input", BOARD_TASK_STACK_INPUT,
-                    NULL, 8, NULL) != pdPASS)
-        return ESP_ERR_NO_MEM;
-    ESP_LOGI(TAG, "BOOT: click play/stop, double next, long previous");
+    ESP_LOGI(TAG, "BOOT on app task: click play/stop, double next, long previous");
     return ESP_OK;
 }

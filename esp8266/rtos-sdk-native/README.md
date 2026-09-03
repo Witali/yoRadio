@@ -51,9 +51,10 @@ computes 32 genuine delta-sigma decisions per sample, giving a nominal
 The tracked `sdkconfig.defaults` is the authoritative default for this board.
 It explicitly selects QIO 40 MHz flash, a 160 MHz CPU, Helix MP3 SSO, Helix
 AAC, I2S-PDM on GPIO3, genuine PDM32 at nominal 1.536 MHz, and the static
-2 x 512-word SLC-DMA ring. The main task stack is 3072 bytes, the input
-task stack is 2048 bytes, and the HTTP/WebSocket task remains at its measured
-minimum of 5120 bytes. libmad, AAC SSO, legacy SPI-PDM, standard I2S PCM,
+2 x 512-word SLC-DMA ring. The 3072-byte main task also owns the button and
+encoder gesture state machine, awakened directly by their ISRs, so there is no
+separate input-task stack. The HTTP/WebSocket task uses 4096 bytes. libmad,
+AAC SSO, legacy SPI-PDM, standard I2S PCM,
 and PDM128 are explicitly disabled. This explicit selection prevents a stale
 experimental choice from being inherited by a fresh build.
 
@@ -139,12 +140,12 @@ WebUI HTTP resources use the standard port 80 and the persistent WebSocket is
 the `/ws` route on that same server and port. Static gzip responses close their
 short-lived sockets after transfer; there is no second WebUI or WebSocket port.
 
-The HTTP/WebSocket task requires a **minimum 5120-byte stack** in this
-firmware. The shared YoRadio WebUI formats playlist-backed state for
-`getindex`; a physical Wemos D1 mini test with a 4096-byte stack triggered the
-FreeRTOS stack canary in the `httpd` task. Do not reduce
-`BOARD_TASK_STACK_WEB` below 5120 bytes without a new on-device high-water and
-full Web API test.
+The HTTP/WebSocket task currently requires a **4096-byte stack**. The older
+status formatter overflowed that size because it held multiple escaped copies
+of station and ICY strings. The bounded direct JSON writer removed those
+temporaries; a physical Wemos D1 mini then completed the full WebSocket status
+exchange and playlist-backed WebUI requests with 4096 bytes. Do not reduce it
+further without a new on-device high-water and full Web API test.
 
 The project is under active implementation; use the repository setup/build
 scripts once they are added rather than invoking a globally installed SDK.

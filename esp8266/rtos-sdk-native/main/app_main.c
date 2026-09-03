@@ -104,13 +104,15 @@ void app_main(void) {
     ESP_ERROR_CHECK(web_service_start());
 
     for (;;) {
+        input_service_poll();
         radio_control_flush_pending();
         network_service_poll();
         web_service_poll();
 #if CONFIG_YORADIO_STATUS_LED
         status_led_poll();
 #endif
-        vTaskDelay(pdMS_TO_TICKS(250));
+        TickType_t wait = input_service_wait_ticks(pdMS_TO_TICKS(250));
+        ulTaskNotifyTake(pdTRUE, wait);
     }
 #endif
 }
