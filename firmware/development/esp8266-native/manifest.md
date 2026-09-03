@@ -1,18 +1,22 @@
 # ESP8266 native development artifact
 
 - Built: 2026-09-03
-- Source revision: `8e829e0` (native inputs clean; unrelated WebRadio files were dirty)
+- Source revision: `70c7e43`
 - Target: ESP8266EX, 4 MiB flash
 - Framework: ESP8266 RTOS SDK v3.4
 - Profile: development, diagnostic logging enabled, `-O3`, audio profiler disabled
 - Features: HTTP/ICY radio streams, Helix MP3/AAC, WebUI-only display profile
 - Application flash offset: `0x10000`
 - File: `app.bin`
-- Size: 669616 bytes
-- SHA-256: `BCF11C05B4738D367A7907730D067D2D322211E5DE28C55AA3F32EE02B583C05`
+- Size: 670192 bytes
+- SHA-256: `E1EA68CB33A5B39315F9B14285E0CD6446C679977C36BE89B65B9C7B08125F24`
 
 ## Changes
 
+- Replaced the 320-byte station/title status copies with compact hashes while
+  retaining every WebUI field and immediate metadata-change notification.
+- Formats escaped WebSocket JSON directly into its bounded output buffer and
+  reduced the HTTP server task stack from 5120 to 4096 bytes.
 - Added an RFC 9112-compatible low-memory HTTP stream parser: correct authority/port
   handling, relative redirects, chunked transfer decoding and bounded socket I/O.
 - Made HTTP Server sends nonblocking and deadline-bounded, with correct transient
@@ -32,6 +36,12 @@
 
 ## Validation
 
+- Static DRAM fell from 20,536 to 20,216 bytes; together with the 1,024-byte
+  stack reduction this releases 1,344 bytes of runtime RAM. The physical board
+  reported 21,160 bytes free after DHCP versus 19,816 before this change.
+- All 301 repository tests passed. A physical `getindex` WebSocket exchange
+  returned valid station, metadata, volume, RSSI, buffer, bitrate, format,
+  uppercase and playback fields followed by the current station index.
 - Rebuilt from the tracked canonical `sdkconfig.defaults`, flashed to COM8 and
   verified by the flash tool without erasing NVS or SPIFFS.
 - UART startup showed 160 MHz, 89,852 bytes of free heap early in boot and
@@ -39,7 +49,7 @@
   and SPIFFS usage of 92,368 / 2,884,241 bytes were reported correctly.
 - The board rejoined the configured router at `192.168.100.6`; `/` and
   `/api/native/status` returned HTTP 200, with station, RSSI and `/ws` status.
-- All 243 repository regression tests passed, including native C tests for URL,
+- All repository regression tests passed, including native C tests for URL,
   redirect, header-token and fragmented chunked-body handling.
 - The physical Wemos D1 mini joined Wi-Fi at `192.168.100.6`. Root HTML, gzip
   JavaScript, the 53,808-byte playlist and native status all returned HTTP 200.
@@ -54,4 +64,4 @@
   explicitly unsupported codec/container entries.
 - Direct `play=2` (the exact command sent by a row click) selected Radio Caprice —
   Opera and reached actual playback; all Play/Stop/Next/Previous checks passed.
-- All 243 repository regression tests passed.
+- All repository regression tests passed.
