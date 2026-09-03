@@ -1,4 +1,4 @@
-# ESP8266Audio WebRadio reference firmware
+# WebRadio
 
 This is a separate Arduino-core firmware for a Wemos D1 mini. It is intended
 as a direct, reproducible comparison with the native ESP8266 RTOS-SDK target;
@@ -19,7 +19,7 @@ The target uses the standard `ESP8266WebServer` on port 80. In client mode it
 provides a compact page and JSON API for URL selection, MP3/AAC selection,
 volume, play and stop. A short BOOT/GPIO0 press toggles play/stop. If Wi-Fi
 cannot connect within 15 seconds, the board starts the open
-`YoRadio-ESP8266Audio` setup access point; in AP mode only Wi-Fi setup is
+`WebRadio` setup access point; in AP mode only Wi-Fi setup is
 available. Credentials, stream URL, codec and volume are stored in emulated
 EEPROM. Only unencrypted HTTP/ICY streams are supported by this target.
 
@@ -38,7 +38,7 @@ a Windows path-length bug in the ESP8266 GCC 10 toolchain:
 The build pins ESP8266 Arduino core 3.1.2 and ESP8266Audio 2.4.1 and selects
 Wemos D1 mini, 160 MHz CPU, QIO flash at 40 MHz, 4 MiB flash and lwIP v2
 high-bandwidth settings supplied by the board profile. A successful build is
-copied to `firmware/development/esp8266-esp8266audio-webradio/app.bin`.
+copied to `firmware/development/web-radio/app.bin`.
 
 ## Upstream basis
 

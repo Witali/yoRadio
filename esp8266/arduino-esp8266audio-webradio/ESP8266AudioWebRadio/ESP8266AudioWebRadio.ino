@@ -1,5 +1,5 @@
 /*
-  YoRadio ESP8266Audio reference WebRadio firmware.
+  WebRadio firmware for ESP8266.
 
   The streaming lifecycle and fixed preallocation model are derived from the
   ESP8266Audio WebRadio and StreamMP3FromHTTP examples by Earle F. Philhower,
@@ -28,7 +28,7 @@ constexpr uint32_t kButtonDebounceMs = 35;
 constexpr size_t kStreamBufferBytes = 5 * 1024;
 constexpr size_t kCodecWorkspaceBytes = 29192;
 constexpr uint8_t kBootButtonPin = 0;
-constexpr char kAccessPointName[] = "YoRadio-ESP8266Audio";
+constexpr char kAccessPointName[] = "WebRadio";
 
 enum class Codec : uint8_t { Mp3 = 0, Aac = 1 };
 
@@ -63,9 +63,9 @@ uint32_t restartAt = 0;
 
 const char kPlayerPage[] PROGMEM = R"HTML(<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>YoRadio ESP8266Audio</title><style>
+<title>WebRadio</title><style>
 body{font:16px system-ui;background:#111;color:#f0c83c;max-width:720px;margin:auto;padding:24px}input,select,button{font:inherit;padding:10px;margin:5px 0;background:#242424;color:#f0c83c;border:1px solid #f0c83c;border-radius:6px}input[type=url]{box-sizing:border-box;width:100%}button:disabled{opacity:.45}small{color:#bbb}#title{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-</style></head><body><h1>YoRadio ESP8266Audio</h1><h2 id="title">Stopped</h2><p id="state">Loading...</p>
+</style></head><body><h1>WebRadio</h1><h2 id="title">Stopped</h2><p id="state">Loading...</p>
 <form id="play"><label>HTTP stream URL</label><input id="url" name="url" type="url" maxlength="191" required>
 <select id="codec" name="codec"><option value="mp3">MP3</option><option value="aac">AAC</option></select>
 <button id="playButton">Play</button> <button id="stopButton" type="button">Stop</button></form>
@@ -82,8 +82,8 @@ q('#volume').onchange=async e=>{await call('/api/volume',{value:e.target.value})
 
 const char kWifiPage[] PROGMEM = R"HTML(<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>YoRadio Wi-Fi setup</title><style>body{font:16px system-ui;background:#111;color:#f0c83c;max-width:560px;margin:auto;padding:24px}input,button{box-sizing:border-box;width:100%;font:inherit;padding:12px;margin:6px 0;background:#242424;color:#f0c83c;border:1px solid #f0c83c;border-radius:6px}</style></head>
-<body><h1>YoRadio Wi-Fi setup</h1><p>Connect this board to a 2.4 GHz access point.</p><form action="/api/wifi" method="get">
+<title>WebRadio</title><style>body{font:16px system-ui;background:#111;color:#f0c83c;max-width:560px;margin:auto;padding:24px}input,button{box-sizing:border-box;width:100%;font:inherit;padding:12px;margin:6px 0;background:#242424;color:#f0c83c;border:1px solid #f0c83c;border-radius:6px}</style></head>
+<body><h1>WebRadio</h1><p>Connect this board to a 2.4 GHz access point.</p><form action="/api/wifi" method="get">
 <label>SSID</label><input name="ssid" maxlength="32" required><label>Password</label><input name="password" type="password" maxlength="64"><button>Save and restart</button></form></body></html>)HTML";
 
 uint32_t checksum(const Settings &value) {
@@ -315,7 +315,7 @@ void connectWifi() {
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
   WiFi.setAutoReconnect(true);
-  WiFi.hostname("yoradio-esp8266audio");
+  WiFi.hostname("webradio");
   if (settings.ssid[0])
     WiFi.begin(settings.ssid, settings.password);
   else
@@ -369,7 +369,7 @@ void setup() {
   pinMode(kBootButtonPin, INPUT_PULLUP);
   Serial.begin(115200);
   delay(200);
-  Serial.println(F("\nYoRadio ESP8266Audio reference firmware"));
+  Serial.println(F("\nWebRadio"));
 
   streamStorage = malloc(kStreamBufferBytes);
   codecStorage = malloc(kCodecWorkspaceBytes);

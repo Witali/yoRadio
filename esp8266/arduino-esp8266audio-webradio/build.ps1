@@ -51,11 +51,11 @@ $sketch = Join-Path $targetRoot "ESP8266AudioWebRadio"
     --build-property "build.flash_flags=-DFLASHMODE_QIO" `
     --build-property "build.flash_freq=40" `
     --output-dir $BuildDirectory $sketch
-if ($LASTEXITCODE -ne 0) { throw "ESP8266Audio WebRadio build failed" }
+if ($LASTEXITCODE -ne 0) { throw "WebRadio build failed" }
 
 $app = Get-ChildItem -LiteralPath $BuildDirectory -Filter "*.ino.bin" | Select-Object -First 1
 if (-not $app) { throw "Arduino CLI did not produce an application binary" }
-$firmwareDirectory = Join-Path $repositoryRoot "firmware\development\esp8266-esp8266audio-webradio"
+$firmwareDirectory = Join-Path $repositoryRoot "firmware\development\web-radio"
 New-Item -ItemType Directory -Force -Path $firmwareDirectory | Out-Null
 Copy-Item -LiteralPath $app.FullName -Destination (Join-Path $firmwareDirectory "app.bin") -Force
 

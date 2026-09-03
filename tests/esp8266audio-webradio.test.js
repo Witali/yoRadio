@@ -34,5 +34,7 @@ test('ESP8266Audio build selects the Wemos clock and flash profile', () => {
   assert.match(build, /xtal=160/);
   assert.match(build, /build\.flash_mode=qio/);
   assert.match(build, /build\.flash_freq=40/);
-  assert.match(build, /firmware\\development\\esp8266-esp8266audio-webradio/);
+  assert.match(build, /firmware\\development\\web-radio/);
+  assert.match(sketch, /kAccessPointName\[\] = "WebRadio"/);
+  assert.doesNotMatch(sketch, /<title>YoRadio/);
 });
