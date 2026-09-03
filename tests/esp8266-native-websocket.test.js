@@ -122,8 +122,9 @@ test("ESP8266 Web API publishes player, station and stream state after commands"
     source.indexOf("static esp_err_t send_initial_state"),
     source.indexOf("static esp_err_t send_active_settings"),
   );
-  assert.match(initial, /format_status\(&status, s_static_scratch, sizeof\(s_static_scratch\)\)/);
-  assert.match(initial, /ws_send\(request, s_static_scratch\)/);
+  assert.match(initial, /format_status\(&state, s_async_message, sizeof\(s_async_message\)\)/);
+  assert.match(initial, /ws_send\(request, s_async_message\)/);
+  assert.match(initial, /s_send_pending = true[\s\S]*ws_send\(request, s_async_message\)[\s\S]*s_send_pending = false/);
   assert.match(initial, /\{\\"current\\":%u\}/);
   assert.match(initial, /\{\\"playermode\\":\\"modeweb\\"\}/);
   assert.match(source, /\{\\"id\\":\\"playerwrap\\",\\"value\\":\\"%s\\"\}/);
@@ -141,7 +142,8 @@ test("ESP8266 throttles volatile telemetry without delaying player state", () =>
   assert.match(source, /current->playing != previous->playing/);
   assert.match(source, /current->station_index != previous->station_index/);
   assert.match(source, /current->codec != previous->codec/);
-  assert.match(source, /strcmp\(current->title, previous->title\) != 0/);
+  assert.match(source, /current->title_hash != previous->title_hash/);
+  assert.match(source, /current->station_hash != previous->station_hash/);
   const immediate = source.slice(
     source.indexOf("static bool status_requires_immediate_send"),
     source.indexOf("static void format_stream"),
@@ -151,7 +153,25 @@ test("ESP8266 throttles volatile telemetry without delaying player state", () =>
   assert.match(source, /if \(!immediate && !heartbeat\) return/);
   assert.doesNotMatch(source, /memcmp\(&current, &s_previous_status/);
 });
-test("ESP8266 WebUI keeps the profiled stack needed by getindex", () => {
+test("ESP8266 WebUI status uses a compact change key and bounded writer", () => {
+  const key = source.slice(
+    source.indexOf("typedef struct {", source.indexOf("WEB_STATIC_SCRATCH_SIZE")),
+    source.indexOf("} web_status_key_t;") + "} web_status_key_t;".length,
+  );
+  assert.doesNotMatch(key, /char station|char title/);
+  assert.match(key, /uint32_t station_hash/);
+  assert.match(key, /uint32_t title_hash/);
+  assert.match(source, /sizeof\(web_status_key_t\) <= 32U/);
+  const formatter = source.slice(
+    source.indexOf("static bool format_status"),
+    source.indexOf("static esp_err_t ws_send"),
+  );
+  assert.doesNotMatch(formatter, /char station\[|char title\[|char escaped_stream\[/);
+  assert.match(formatter, /json_writer_escaped\(&writer, status->station\)/);
+  assert.match(formatter, /json_writer_escaped\(&writer, status->title\)/);
+});
+
+test("ESP8266 WebUI uses the reduced stack after removing status temporaries", () => {
   const board = fs.readFileSync(
     path.resolve(
       __dirname,
@@ -163,10 +183,10 @@ test("ESP8266 WebUI keeps the profiled stack needed by getindex", () => {
     ),
     "utf8",
   );
-  assert.match(board, /BOARD_TASK_STACK_WEB 5120/);
+  assert.match(board, /BOARD_TASK_STACK_WEB 4096/);
   const initial = source.slice(source.indexOf("static esp_err_t send_initial_state"), source.indexOf("static esp_err_t send_active_settings"));
   assert.doesNotMatch(initial, /char body\[WEB_STATUS_CAPACITY\]/);
-  assert.match(initial, /s_static_scratch/);
+  assert.match(initial, /format_status\(&state, s_async_message, sizeof\(s_async_message\)\)/);
 });
 
 test("ESP8266 validates a saved fd before treating it as a WebSocket", () => {

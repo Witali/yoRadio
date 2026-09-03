@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -44,18 +45,25 @@ static char s_static_scratch[WEB_STATIC_SCRATCH_SIZE];
 
 typedef struct {
     bool playing;
-    bool connecting;
-    int8_t rssi;
     uint16_t station_index;
-    uint16_t buffer_percent;
     uint8_t volume;
     uint32_t bitrate_kbps;
     uint32_t sample_rate_hz;
     uint8_t channels;
     codec_type_t codec;
-    char station[128];
-    char title[192];
+    uint32_t station_hash;
+    uint32_t title_hash;
 } web_status_key_t;
+
+_Static_assert(sizeof(web_status_key_t) <= 32U,
+               "Web status change key must stay compact");
+
+typedef struct {
+    char *output;
+    size_t capacity;
+    size_t length;
+    bool valid;
+} json_writer_t;
 
 static web_status_key_t s_previous_status;
 static bool s_have_previous_status;
@@ -113,39 +121,91 @@ static void json_escape(const char *source, char *target, size_t capacity) {
     target[written] = '\0';
 }
 
-static void capture_status(web_status_key_t *key) {
-    native_state_t state;
-    native_state_snapshot(&state);
+static uint32_t text_hash(const char *text) {
+    uint32_t hash = 2166136261UL;
+    while (text && *text) {
+        hash ^= (uint8_t)*text++;
+        hash *= 16777619UL;
+    }
+    return hash;
+}
+
+static void json_writer_init(json_writer_t *writer, char *output,
+                             size_t capacity) {
+    writer->output = output;
+    writer->capacity = capacity;
+    writer->length = 0;
+    writer->valid = capacity != 0U;
+    if (capacity) output[0] = '\0';
+}
+
+static void json_writer_raw(json_writer_t *writer, const char *text) {
+    if (!writer->valid) return;
+    size_t length = strlen(text);
+    if (length >= writer->capacity - writer->length) {
+        writer->valid = false;
+        return;
+    }
+    memcpy(writer->output + writer->length, text, length + 1U);
+    writer->length += length;
+}
+
+static void json_writer_format(json_writer_t *writer, const char *format, ...) {
+    if (!writer->valid) return;
+    va_list arguments;
+    va_start(arguments, format);
+    int length = vsnprintf(writer->output + writer->length,
+                           writer->capacity - writer->length,
+                           format, arguments);
+    va_end(arguments);
+    if (length < 0 || (size_t)length >= writer->capacity - writer->length) {
+        writer->valid = false;
+        return;
+    }
+    writer->length += (size_t)length;
+}
+
+static void json_writer_escaped(json_writer_t *writer, const char *text) {
+    while (writer->valid && text && *text) {
+        unsigned char value = (unsigned char)*text++;
+        if (value < 0x20U) continue;
+        char encoded[3] = {(char)value, '\0', '\0'};
+        if (value == '"' || value == '\\') {
+            encoded[0] = '\\';
+            encoded[1] = (char)value;
+        }
+        json_writer_raw(writer, encoded);
+    }
+}
+
+static void capture_status(web_status_key_t *key, native_state_t *state) {
+    native_state_snapshot(state);
     memset(key, 0, sizeof(*key));
-    key->playing = state.playing;
-    key->connecting = state.connecting;
-    key->rssi = state.wifi_rssi;
-    key->station_index = state.station_index;
-    key->buffer_percent = state.buffer_percent;
-    key->volume = state.volume;
-    key->bitrate_kbps = state.bitrate_kbps;
-    key->sample_rate_hz = state.sample_rate_hz;
-    key->channels = state.channels;
-    key->codec = state.codec;
-    copy_text(key->station, sizeof(key->station), state.station);
-    copy_text(key->title, sizeof(key->title), state.title);
+    key->playing = state->playing;
+    key->station_index = state->station_index;
+    key->volume = state->volume;
+    key->bitrate_kbps = state->bitrate_kbps;
+    key->sample_rate_hz = state->sample_rate_hz;
+    key->channels = state->channels;
+    key->codec = state->codec;
+    key->station_hash = text_hash(state->station);
+    key->title_hash = text_hash(state->title);
 }
 
 static bool status_requires_immediate_send(const web_status_key_t *current,
                                            const web_status_key_t *previous) {
     return current->playing != previous->playing ||
-           current->connecting != previous->connecting ||
            current->station_index != previous->station_index ||
            current->volume != previous->volume ||
            current->bitrate_kbps != previous->bitrate_kbps ||
            current->sample_rate_hz != previous->sample_rate_hz ||
            current->channels != previous->channels ||
            current->codec != previous->codec ||
-           strcmp(current->station, previous->station) != 0 ||
-           strcmp(current->title, previous->title) != 0;
+           current->station_hash != previous->station_hash ||
+           current->title_hash != previous->title_hash;
 }
 
-static void format_stream(const web_status_key_t *status, char *output,
+static void format_stream(const native_state_t *status, char *output,
                           size_t capacity) {
     const char *codec = native_codec_name(status->codec);
     const char *channels = status->channels == 1U ? "mono" :
@@ -159,34 +219,40 @@ static void format_stream(const web_status_key_t *status, char *output,
     }
 }
 
-static void format_status(const web_status_key_t *status, char *output,
+static bool format_status(const native_state_t *status, char *output,
                           size_t capacity) {
-    char station[260];
-    char title[390];
     char stream[64];
-    char escaped_stream[130];
-    json_escape(status->station, station, sizeof(station));
-    json_escape(status->title, title, sizeof(title));
     format_stream(status, stream, sizeof(stream));
-    json_escape(stream, escaped_stream, sizeof(escaped_stream));
     persistent_settings_t settings;
     persistent_settings_get(&settings);
-    snprintf(output, capacity,
-             "{\"payload\":[{\"id\":\"nameset\",\"value\":\"%s\"},"
-             "{\"id\":\"meta\",\"value\":\"%s\"},"
-             "{\"id\":\"volume\",\"value\":%u},"
-             "{\"id\":\"balance\",\"value\":%d},"
-             "{\"id\":\"rssi\",\"value\":%d},"
-             "{\"id\":\"heap\",\"value\":%u},"
-             "{\"id\":\"bitrate\",\"value\":%lu},"
-             "{\"id\":\"fmt\",\"value\":\"%s\"},"
-             "{\"id\":\"upst\",\"value\":%u},"
-             "{\"id\":\"playerwrap\",\"value\":\"%s\"}]}",
-             station, title, status->volume, settings.balance, status->rssi,
-             status->playing ? status->buffer_percent : 0U,
-             (unsigned long)status->bitrate_kbps, escaped_stream,
-             settings.station_uppercase ? 1U : 0U,
-             status->playing ? "playing" : "stopped");
+    json_writer_t writer;
+    json_writer_init(&writer, output, capacity);
+    json_writer_raw(&writer,
+                    "{\"payload\":[{\"id\":\"nameset\",\"value\":\"");
+    json_writer_escaped(&writer, status->station);
+    json_writer_raw(&writer, "\"},{\"id\":\"meta\",\"value\":\"");
+    json_writer_escaped(&writer, status->title);
+    json_writer_format(
+        &writer,
+        "\"},{\"id\":\"volume\",\"value\":%u},"
+        "{\"id\":\"balance\",\"value\":%d},"
+        "{\"id\":\"rssi\",\"value\":%d},"
+        "{\"id\":\"heap\",\"value\":%u},"
+        "{\"id\":\"bitrate\",\"value\":%lu},"
+        "{\"id\":\"fmt\",\"value\":\"",
+        status->volume, settings.balance, status->wifi_rssi,
+        status->playing ? status->buffer_percent : 0U,
+        (unsigned long)status->bitrate_kbps);
+    json_writer_escaped(&writer, stream);
+    json_writer_format(
+        &writer,
+        "\"},{\"id\":\"upst\",\"value\":%u},"
+        "{\"id\":\"playerwrap\",\"value\":\"%s\"}]}",
+        settings.station_uppercase ? 1U : 0U,
+        status->playing ? "playing" : "stopped");
+    if (writer.valid) return true;
+    copy_text(output, capacity, "{\"error\":\"status overflow\"}");
+    return false;
 }
 
 static esp_err_t ws_send(httpd_req_t *request, const char *text) {
@@ -246,11 +312,20 @@ static bool queue_message(const char *message) {
 }
 
 static esp_err_t send_initial_state(httpd_req_t *request) {
+    native_state_t state;
     web_status_key_t status;
     char current[40];
-    capture_status(&status);
-    format_status(&status, s_static_scratch, sizeof(s_static_scratch));
-    esp_err_t result = ws_send(request, s_static_scratch);
+    /* The application task uses the same bounded status buffer for queued
+     * broadcasts. Mark this synchronous send busy before formatting so it
+     * cannot be overwritten between capture and ws_send(). */
+    s_send_pending = true;
+    capture_status(&status, &state);
+    if (!format_status(&state, s_async_message, sizeof(s_async_message))) {
+        s_send_pending = false;
+        return ESP_ERR_INVALID_SIZE;
+    }
+    esp_err_t result = ws_send(request, s_async_message);
+    s_send_pending = false;
     if (result != ESP_OK) return result;
     snprintf(current, sizeof(current), "{\"current\":%u}",
              status.station_index);
@@ -818,8 +893,9 @@ void web_service_poll(void) {
         }
         return;
     }
+    native_state_t state;
     web_status_key_t current;
-    capture_status(&current);
+    capture_status(&current, &state);
     TickType_t now = xTaskGetTickCount();
     bool immediate = !s_have_previous_status ||
                      status_requires_immediate_send(&current,
@@ -832,7 +908,7 @@ void web_service_poll(void) {
      * codec and metadata changes remain immediate; telemetry is sampled by
      * the two-second heartbeat. */
     if (!immediate && !heartbeat) return;
-    format_status(&current, s_async_message, sizeof(s_async_message));
+    if (!format_status(&state, s_async_message, sizeof(s_async_message))) return;
     bool station_changed = !s_have_previous_status ||
                            current.station_index !=
                                s_previous_status.station_index;
