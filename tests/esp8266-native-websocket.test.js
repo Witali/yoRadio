@@ -124,7 +124,7 @@ test("ESP8266 Web API publishes player, station and stream state after commands"
   );
   assert.match(initial, /format_status\(&state, s_async_message, sizeof\(s_async_message\)\)/);
   assert.match(initial, /ws_send\(request, s_async_message\)/);
-  assert.match(initial, /s_send_pending = true[\s\S]*ws_send\(request, s_async_message\)[\s\S]*s_send_pending = false/);
+  assert.doesNotMatch(initial, /s_send_pending/);
   assert.match(initial, /\{\\"current\\":%u\}/);
   assert.match(initial, /\{\\"playermode\\":\\"modeweb\\"\}/);
   assert.match(source, /\{\\"id\\":\\"playerwrap\\",\\"value\\":\\"%s\\"\}/);
@@ -198,11 +198,11 @@ test("ESP8266 validates a saved fd before treating it as a WebSocket", () => {
   );
   assert.match(
     source,
-    /websocket_socket_active\(s_ws_fd\)[\s\S]*httpd_sess_trigger_close\(s_server, s_ws_fd\)/,
+    /websocket_socket_active\(socket\)/,
   );
   assert.match(
     source,
-    /static void async_send_work[\s\S]*websocket_socket_active\(socket\)/,
+    /static bool broadcast_message[\s\S]*websocket_socket_active\(socket\)/,
   );
 });
 

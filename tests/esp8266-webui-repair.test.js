@@ -8,6 +8,21 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('two bounded WebSocket subscribers share a single HTTP-owned status buffer', () => {
+  const source = read(main+'web_service.c');
+  assert.match(source, /#define WEB_WS_CLIENTS 2U/);
+  assert.match(source, /s_ws_fds\[WEB_WS_CLIENTS\]/);
+  const subscribe = source.slice(source.indexOf('static bool subscribe_socket'),
+    source.indexOf('static void session_closed'));
+  assert.doesNotMatch(subscribe, /trigger_close/);
+  assert.match(subscribe, /if \(available < 0\) return false/);
+  const poll = source.slice(source.indexOf('void web_service_poll(void)'));
+  assert.doesNotMatch(poll, /format_status|native_state_snapshot|s_async_message/);
+  assert.match(poll, /httpd_queue_work\(s_server, poll_work, NULL\)/);
+  const sessions = read('esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_sess.c');
+  assert.match(sessions, /!hd->hd_sd\[i\].ws_handshake_done/);
+});
+
 test('VBR waits for heartbeat but state, format and metadata remain immediate', () => {
   const source = read(main+'web_service.c');
   const body = source.slice(source.indexOf('static bool status_requires_immediate_send'),

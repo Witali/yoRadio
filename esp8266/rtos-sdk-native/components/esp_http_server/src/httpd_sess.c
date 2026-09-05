@@ -344,6 +344,9 @@ esp_err_t httpd_sess_close_lru(struct httpd_data *hd)
             return ESP_OK;
         }
         if (!hd->hd_sd[i].for_async_req &&
+#ifdef CONFIG_HTTPD_WS_SUPPORT
+            !hd->hd_sd[i].ws_handshake_done &&
+#endif
             hd->hd_sd[i].lru_counter < lru_counter) {
             lru_counter = hd->hd_sd[i].lru_counter;
             lru_fd = hd->hd_sd[i].fd;

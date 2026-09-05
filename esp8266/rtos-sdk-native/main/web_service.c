@@ -27,14 +27,17 @@
 #define WEB_IDLE_TIMEOUT_SECONDS 2U
 #define WEB_SEND_CHUNK_SIZE 512U
 #define WEB_STATIC_SCRATCH_SIZE 512U
+#define WEB_WS_CLIENTS 2U
 
 extern const unsigned char _binary_script_js_gz_start[];
 extern const unsigned char _binary_script_js_gz_end[];
 
 static const char *TAG = "web";
 static httpd_handle_t s_server;
-static volatile int s_ws_fd = -1;
-static volatile bool s_send_pending;
+/* Only the HTTP task owns subscribers and formats/sends this shared buffer.
+ * The app task queues a poll, never writes a buffer being transmitted. */
+static int s_ws_fds[WEB_WS_CLIENTS] = {-1, -1};
+static volatile bool s_poll_queued;
 static volatile bool s_playlist_changed;
 static volatile bool s_current_pending;
 static uint16_t s_pending_current;
@@ -277,60 +280,60 @@ static bool websocket_socket_active(int socket) {
                HTTPD_WS_CLIENT_WEBSOCKET;
 }
 
-static void async_send_work(void *argument) {
-    (void)argument;
-    int socket = s_ws_fd;
-    if (websocket_socket_active(socket)) {
+static bool broadcast_message(const char *message) {
+    bool sent = false;
+    for (unsigned i = 0; i < WEB_WS_CLIENTS; ++i) {
+        int socket = s_ws_fds[i];
+        if (!websocket_socket_active(socket)) {
+            s_ws_fds[i] = -1;
+            continue;
+        }
         httpd_ws_frame_t frame = {
             .final = true,
             .fragmented = false,
             .type = HTTPD_WS_TYPE_TEXT,
-            .payload = (uint8_t *)s_async_message,
-            .len = strlen(s_async_message),
+            .payload = (uint8_t *)message,
+            .len = strlen(message),
         };
         if (httpd_ws_send_frame_async(s_server, socket, &frame) != ESP_OK) {
             httpd_sess_trigger_close(s_server, socket);
-            s_ws_fd = -1;
+            s_ws_fds[i] = -1;
         } else {
             httpd_sess_update_lru_counter(s_server, socket);
+            sent = true;
         }
-    } else {
-        s_ws_fd = -1;
     }
-    s_send_pending = false;
+    return sent;
 }
 
-static bool queue_message(const char *message) {
-    if (!s_server || s_ws_fd < 0 || s_send_pending) return false;
-    if (!websocket_socket_active(s_ws_fd)) {
-        s_ws_fd = -1;
-        return false;
+static bool subscribe_socket(int socket) {
+    int available = -1;
+    for (unsigned i = 0; i < WEB_WS_CLIENTS; ++i) {
+        if (s_ws_fds[i] == socket) return true;
+        if (!websocket_socket_active(s_ws_fds[i])) available = (int)i;
     }
-    if (message != s_async_message)
-        copy_text(s_async_message, sizeof(s_async_message), message);
-    s_send_pending = true;
-    if (httpd_queue_work(s_server, async_send_work, NULL) != ESP_OK) {
-        s_send_pending = false;
-        return false;
-    }
+    if (available < 0) return false;
+    s_ws_fds[available] = socket;
     return true;
+}
+
+static void session_closed(httpd_handle_t server, int socket) {
+    (void)server;
+    for (unsigned i = 0; i < WEB_WS_CLIENTS; ++i)
+        if (s_ws_fds[i] == socket) s_ws_fds[i] = -1;
+    /* This SDK closes the descriptor after calling close_fn. */
 }
 
 static esp_err_t send_initial_state(httpd_req_t *request) {
     native_state_t state;
     web_status_key_t status;
     char current[40];
-    /* The application task uses the same bounded status buffer for queued
-     * broadcasts. Mark this synchronous send busy before formatting so it
-     * cannot be overwritten between capture and ws_send(). */
-    s_send_pending = true;
+    /* Initial replies and broadcasts execute on the same HTTP task. */
     capture_status(&status, &state);
     if (!format_status(&state, s_async_message, sizeof(s_async_message))) {
-        s_send_pending = false;
         return ESP_ERR_INVALID_SIZE;
     }
     esp_err_t result = ws_send(request, s_async_message);
-    s_send_pending = false;
     if (result != ESP_OK) return result;
     snprintf(current, sizeof(current), "{\"current\":%u}",
              status.station_index);
@@ -568,11 +571,7 @@ static esp_err_t websocket_handler(httpd_req_t *request) {
     }
 
     int socket = httpd_req_to_sockfd(request);
-    if (s_ws_fd >= 0 && s_ws_fd != socket &&
-        websocket_socket_active(s_ws_fd)) {
-        httpd_sess_trigger_close(s_server, s_ws_fd);
-    }
-    s_ws_fd = socket;
+    if (!subscribe_socket(socket)) return ESP_FAIL;
     char payload[WS_COMMAND_MAX + 1U];
     httpd_ws_frame_t frame = {
         .payload = (uint8_t *)payload,
@@ -828,15 +827,13 @@ esp_err_t web_service_start(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = 80;
     config.stack_size = BOARD_TASK_STACK_WEB;
+    config.close_fn = session_closed;
     config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
     config.backlog_conn = WEB_CONNECTION_BACKLOG;
     config.recv_wait_timeout = WEB_IDLE_TIMEOUT_SECONDS;
     config.max_uri_handlers = 18;
-    /* The ESP8266 page loader serializes static requests so one persistent
-     * HTTP/1.1 session normally serves the whole page beside the WebSocket.
-     * Four sessions allow one complete UI (WebSocket + HTTP keep-alive) and
-     * one reconnecting or diagnostic client. Queue a small connection burst
-     * and evict the oldest idle session before exhausting heap. */
+    /* Two WebSockets plus two short HTTP connections. The shared ESP8266
+     * loader serializes each tab's static requests. */
     config.lru_purge_enable = true;
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
     esp_err_t result = httpd_start(&s_server, &config);
@@ -882,21 +879,20 @@ void web_service_notify_playlist_changed(void) {
     s_playlist_changed = true;
 }
 
-void web_service_poll(void) {
-    if (!s_server || s_ws_fd < 0 || s_send_pending) return;
-    if (!websocket_socket_active(s_ws_fd)) {
-        s_ws_fd = -1;
-        return;
-    }
+static void poll_on_http_task(void) {
+    bool have_client = false;
+    for (unsigned i = 0; i < WEB_WS_CLIENTS; ++i)
+        have_client |= websocket_socket_active(s_ws_fds[i]);
+    if (!have_client) return;
     if (s_current_pending) {
         char current[40];
         snprintf(current, sizeof(current), "{\"current\":%u}",
                  s_pending_current);
-        if (queue_message(current)) s_current_pending = false;
+        if (broadcast_message(current)) s_current_pending = false;
         return;
     }
     if (s_playlist_changed) {
-        if (queue_message("{\"file\":\"/data/playlist.csv\"}")) {
+        if (broadcast_message("{\"file\":\"/data/playlist.csv\"}")) {
             s_playlist_changed = false;
         }
         return;
@@ -920,7 +916,7 @@ void web_service_poll(void) {
     bool station_changed = !s_have_previous_status ||
                            current.station_index !=
                                s_previous_status.station_index;
-    if (!queue_message(s_async_message)) return;
+    if (!broadcast_message(s_async_message)) return;
     if (station_changed) {
         /* The status is sent first. The current index follows on the next
          * poll so one static asynchronous send buffer is sufficient. */
@@ -930,4 +926,17 @@ void web_service_poll(void) {
     s_previous_status = current;
     s_have_previous_status = true;
     s_last_status_tick = now;
+}
+
+static void poll_work(void *argument) {
+    (void)argument;
+    poll_on_http_task();
+    s_poll_queued = false;
+}
+
+void web_service_poll(void) {
+    if (!s_server || s_poll_queued) return;
+    s_poll_queued = true;
+    if (httpd_queue_work(s_server, poll_work, NULL) != ESP_OK)
+        s_poll_queued = false;
 }
