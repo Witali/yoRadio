@@ -3,6 +3,16 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-09-05: ESP8266 memory-only diagnostic
+
+- Saved `development/esp8266-native-memory-profile/app.bin` and its manifest.
+- Added opt-in allocation-free DRAM fragmentation/low-water and task-stack
+  measurements, with normal MP3/AAC, Wi-Fi, WebUI and I2S PDM configuration.
+- Saved a repeatable physical workload including codec switches and two real
+  browser pages. See `docs/ESP8266_MEMORY_HEADROOM_2026-09-05.md` for results
+  and failures; this is not a claim that the two-tab acceptance test passed.
+- The ordinary native profile and its buffer/stack defaults are unchanged.
+
 ## Development — 2026-09-02
 
 ### ESP8266 verified default memory and streaming profile

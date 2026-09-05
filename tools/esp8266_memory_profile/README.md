@@ -27,7 +27,7 @@ GPIO3 is the audio output.
    test stations 498/502/2/510 refer to the filtered 511-entry ESP8266 list.
    Use `--aac-station N` for another verified AAC entry. `--aac-followup`
    replaces the initial MP3 cases with AAC station 1 (nominal 64 kbit/s),
-   while retaining switching and the two-tab workload.
+   while retaining switching and running AAC first in the two-tab workload.
    `--reload-during-audio` also reloads a tab during each codec's playback,
    measuring static-resource/bootstrap allocation peaks.
    Labels are nominal rates, NOT proof of the received codec or bitrate.

@@ -25,6 +25,25 @@ stack based on the older 4096-byte experiments recorded below.
 - [ ] Measure production heap low-water, largest allocation and stack margins
   with MP3/AAC, station switches and multiple WebUI tabs before choosing the
   larger default. Do not subtract all reserved IRAM as freed DRAM.
+  Measurement work is recorded in `ESP8266_MEMORY_HEADROOM_2026-09-05.md`;
+  do not approve a larger buffer yet. The two-tab MP3 stress reached only
+  1160 bytes free DRAM (lifetime minimum), with a sampled largest block of
+  548 bytes and loss of WebUI control. Full acceptance remains open.
+  - [x] Add allocation-free DRAM/largest-block and app/audio/WebUI stack
+    instrumentation; save the physical workload and diagnostic image.
+  - [x] Measure MP3 128 and decoded AAC about 320 kbit/s on the physical board,
+    and exercise AAC -> MP3 -> AAC with Wi-Fi and ordinary I2S PDM enabled.
+  - [x] Load two actual WebUI pages and capture the MP3 low-memory failure.
+  - [x] Repeat after reset with AAC 320, page reload during playback and MP3:
+    AAC reload reached 5136 bytes minimum, and MP3 again lost WebUI with
+    1472 bytes minimum / 548-byte largest sampled block. Restore and verify
+    the exact ordinary firmware and the original station/volume/stop state.
+  - [ ] Resolve slow/disconnected WebSocket/TCP resource pressure, then repeat
+    the full two-tab/reload stress before reserving more compressed data.
+  - [ ] Repeat with a controlled MP3 320-kbit/s fixture; the nominal 256 preset
+    tested here actually supplied MP3 128.
+  - [ ] Investigate the separate low-bitrate AAC PCM-output timeout observed
+    with about 10 KiB minimum free heap; it is not proven to be an OOM failure.
 - [ ] Replace the producer's EAGAIN 1-ms polling with readiness waiting and
   keep immediate cancellation/BOOT control responsive.
 

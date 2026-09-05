@@ -127,10 +127,13 @@ async function reloadTab(index, label) {
     await phase('one-tab-stopped', null, 20);
     await openTab('second');
     await phase('two-tabs-stopped', null, 20);
-    await phase('two-tabs-MP3', 'play=498', 45);
-    if (args.includes('--reload-during-audio')) await reloadTab(0, 'reload-during-MP3');
-    await phase('two-tabs-AAC', `play=${aacStation}`, 45);
-    if (args.includes('--reload-during-audio')) await reloadTab(1, 'reload-during-AAC');
+    const tabCases = args.includes('--aac-followup')
+      ? [['AAC', `play=${aacStation}`], ['MP3', 'play=498']]
+      : [['MP3', 'play=498'], ['AAC', `play=${aacStation}`]];
+    for (const [codec, cmd] of tabCases) {
+      await phase(`two-tabs-${codec}`, cmd, 45);
+      if (args.includes('--reload-during-audio')) await reloadTab(0, `reload-during-${codec}`);
+    }
     await phase('two-tabs-stopped-after', 'stop=1', 20);
   } finally {
     if (browser) await browser.close().catch(error => log('close_error', {error: error.message}));
