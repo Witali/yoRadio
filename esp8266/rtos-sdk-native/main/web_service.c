@@ -200,7 +200,6 @@ static bool status_requires_immediate_send(const web_status_key_t *current,
            current->connecting != previous->connecting ||
            current->station_index != previous->station_index ||
            current->volume != previous->volume ||
-           current->bitrate_kbps != previous->bitrate_kbps ||
            current->sample_rate_hz != previous->sample_rate_hz ||
            current->channels != previous->channels ||
            current->codec != previous->codec ||

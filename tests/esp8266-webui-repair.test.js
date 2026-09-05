@@ -8,6 +8,23 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('VBR waits for heartbeat but state, format and metadata remain immediate', () => {
+  const source = read(main+'web_service.c');
+  const body = source.slice(source.indexOf('static bool status_requires_immediate_send'),
+    source.indexOf('static void format_stream'));
+  const expression = body.match(/return ([\s\S]*?);/)[1].replace(/->/g, '.');
+  const compare = new Function('current', 'previous', 'return '+expression);
+  const baseline = {playing:true, connecting:false, station_index:2, volume:160,
+    bitrate_kbps:320, sample_rate_hz:44100, channels:2, codec:1,
+    station_hash:1, title_hash:2};
+  assert.equal(compare({...baseline, bitrate_kbps:299}, baseline), false);
+  for(const field of ['playing','connecting','station_index','volume',
+    'sample_rate_hz','channels','codec','station_hash','title_hash']) {
+    assert.equal(compare({...baseline, [field]:Number(baseline[field])+1}, baseline),
+      true, field);
+  }
+});
+
 test('native stream identity is invalidated when changing the station', () => {
   const source = read(main+'native_state.c');
   const change = source.slice(source.indexOf('void native_state_set_station(uint16_t'),
