@@ -24,7 +24,10 @@
 // experimental PDM128 mode raises the carrier to 6.144 MHz. Integer divider
 // values produce 1.538462/6.153846 MHz, both +0.16% from nominal.
 #define BOARD_I2S_PDM_SAMPLE_RATE 48000U
-#if CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
+#if CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32 || CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM || !CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM
+// I2S RCPDM always uses 32 bits, independently of the delta-sigma choice.
+// SPI/standard PCM do not expose the PDM choice; these unused defaults keep
+// their builds independent of hidden Kconfig values.
 #define BOARD_I2S_PDM_OVERSAMPLE 32U
 #define BOARD_I2S_PDM_CARRIER_BITS_PER_SAMPLE 32U
 #define BOARD_I2S_PDM_BCK_DIV 8U

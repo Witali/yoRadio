@@ -24,6 +24,11 @@
 #include "esp_log.h"
 #include "native_audio_normalizer.h"
 #include "persistent_settings.h"
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+#include "rc_pdm.h"
+_Static_assert(BOARD_I2S_PDM_OVERSAMPLE == RC_PDM_BITS_PER_SAMPLE,
+               "I2S RCPDM requires exactly 32 bits per output PCM sample");
+#endif
 
 static const char *TAG = "audio_output";
 
@@ -64,7 +69,11 @@ static bool s_spi_pin_selected;
 #elif YORADIO_ESP8266_I2S_PDM
 static uint32_t s_input_sample_rate;
 static uint32_t s_resample_phase;
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+static rc_pdm_t s_rcpdm;
+#else
 static uint32_t s_pdm_integrator;
+#endif
 static uint32_t s_i2s_pdm_partial_word;
 static uint8_t s_i2s_pdm_partial_bits;
 static bool s_i2s_started;
@@ -532,6 +541,11 @@ void native_audio_output_silence(void) {
 #define I2S_PDM_BATCH_WORDS 64U
 #define I2S_PDM_WRITE_TIMEOUT_MS 100U
 #define I2S_PDM_SILENCE_WORD 0xaaaaaaaaU
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+#define I2S_PDM_LOG_NAME "I2S RCPDM"
+#else
+#define I2S_PDM_LOG_NAME "I2S-PDM"
+#endif
 
 typedef struct {
     uint32_t words[I2S_PDM_BATCH_WORDS];
@@ -547,7 +561,7 @@ static esp_err_t i2s_pdm_write_words(i2s_pdm_writer_t *writer,
     esp_err_t result = esp8266_nodac_i2s_write(
         words, word_count, writer->deadline - now);
     if (result != ESP_OK)
-        ESP_LOGE(TAG, "I2S-PDM DMA write failed: %s",
+        ESP_LOGE(TAG, I2S_PDM_LOG_NAME " DMA write failed: %s",
                  esp_err_to_name(result));
     return result;
 }
@@ -560,7 +574,7 @@ static esp_err_t i2s_pdm_flush(i2s_pdm_writer_t *writer) {
     return result;
 }
 
-#if CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM || CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
 #if BOARD_I2S_PDM_OVERSAMPLE != 32U || BOARD_I2S_PDM_REPEAT != 1U
 #error "The optimized PDM32 packer requires 32 genuine bits per sample"
 #endif
@@ -569,6 +583,9 @@ static esp_err_t i2s_pdm_flush(i2s_pdm_writer_t *writer) {
  * for decoder word workspaces; flash execution remains cache-backed. */
 static uint32_t __attribute__((noinline))
 i2s_pdm_pack32(int16_t sample) {
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+    return rc_pdm_sample(&s_rcpdm, sample);
+#else
     const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
     uint32_t integrator = s_pdm_integrator;
     uint32_t word = 0;
@@ -588,6 +605,7 @@ i2s_pdm_pack32(int16_t sample) {
 #undef PDM32_STEP
     s_pdm_integrator = integrator;
     return word;
+#endif
 }
 #else
 static esp_err_t i2s_pdm_push_bit(i2s_pdm_writer_t *writer, bool high) {
@@ -606,7 +624,7 @@ static esp_err_t i2s_pdm_push_bit(i2s_pdm_writer_t *writer, bool high) {
 
 static esp_err_t i2s_pdm_emit_sample(int16_t sample,
                                      i2s_pdm_writer_t *writer) {
-#if CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM || CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
     writer->words[writer->word_count++] = i2s_pdm_pack32(sample);
     return writer->word_count == I2S_PDM_BATCH_WORDS
         ? i2s_pdm_flush(writer) : ESP_OK;
@@ -626,7 +644,7 @@ static esp_err_t i2s_pdm_emit_sample(int16_t sample,
 }
 
 static esp_err_t i2s_pdm_finish_partial_word(i2s_pdm_writer_t *writer) {
-#if !CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
+#if !CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM && !CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
     while (s_i2s_pdm_partial_bits) {
         esp_err_t result = i2s_pdm_emit_sample(0, writer);
         if (result != ESP_OK) return result;
@@ -648,12 +666,24 @@ esp_err_t native_audio_output_init(void) {
         s_i2s_started = true;
         s_input_sample_rate = 0;
         s_resample_phase = 0;
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+        rc_pdm_init(&s_rcpdm);
+#else
         s_pdm_integrator = 0;
+#endif
         s_i2s_pdm_partial_word = 0;
         s_i2s_pdm_partial_bits = 0;
     }
     native_audio_output_reload_settings();
     if (result == ESP_OK) {
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+        ESP_LOGI(TAG,
+                 "I2S RCPDM DMA: mono GPIO%d/RX, carrier %u Hz, alpha=1/16; "
+                 "%u x %u words; UART RX ignored",
+                 BOARD_I2S_DATA_GPIO, BOARD_I2S_PDM_CARRIER_HZ,
+                 ESP8266_NODAC_DMA_BUFFER_COUNT,
+                 ESP8266_NODAC_DMA_BUFFER_WORDS);
+#else
         ESP_LOGI(TAG,
                  "I2S-PDM DMA: mono GPIO%d/RX, carrier %u Hz, "
                  "PDM%u x%u effective %u Hz, nominal carrier %u Hz, "
@@ -663,6 +693,7 @@ esp_err_t native_audio_output_init(void) {
                  BOARD_I2S_PDM_EFFECTIVE_HZ, BOARD_I2S_PDM_NOMINAL_HZ,
                  ESP8266_NODAC_DMA_BUFFER_COUNT,
                  ESP8266_NODAC_DMA_BUFFER_WORDS);
+#endif
     }
     return result;
 }
@@ -729,10 +760,14 @@ void native_audio_output_silence(void) {
     esp_err_t result = i2s_pdm_finish_partial_word(&writer);
     if (result == ESP_OK) result = i2s_pdm_fill_dma_silence();
     if (result != ESP_OK)
-        ESP_LOGE(TAG, "I2S-PDM silence failed: %s", esp_err_to_name(result));
+        ESP_LOGE(TAG, I2S_PDM_LOG_NAME " silence failed: %s", esp_err_to_name(result));
     s_input_sample_rate = 0;
     s_resample_phase = 0;
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+    rc_pdm_init(&s_rcpdm);
+#else
     s_pdm_integrator = 0;
+#endif
     s_i2s_pdm_partial_word = 0;
     s_i2s_pdm_partial_bits = 0;
 }

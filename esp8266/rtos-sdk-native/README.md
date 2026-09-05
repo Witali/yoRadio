@@ -48,6 +48,12 @@ computes 32 genuine delta-sigma decisions per sample, giving a nominal
 
 ## Canonical production configuration
 
+An independent experimental **I2S RCPDM** output is available with
+`sdkconfig.i2s-rcpdm.defaults` / `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM`.
+It predicts an RC filter with alpha=1/16 and emits exactly 32 bits per 48-kHz
+output PCM sample through the existing GPIO3 DMA ring. It does not replace
+the default delta-sigma I2S PDM. See [RCPDM configuration and filter](../../docs/ESP8266_I2S_RCPDM.md).
+
 The tracked `sdkconfig.defaults` is the authoritative default for this board.
 It explicitly selects QIO 40 MHz flash, a 160 MHz CPU, Helix MP3 SSO, Helix
 AAC, I2S-PDM on GPIO3, genuine PDM32 at nominal 1.536 MHz, and the static

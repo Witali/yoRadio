@@ -172,6 +172,7 @@ elseif(CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PCM)
 else()
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_SPI_PDM=0
+    # I2S RCPDM shares the same transport; Kconfig selects its modulator.
     YORADIO_ESP8266_I2S_PDM=1
     YORADIO_ESP8266_I2S_PCM=0)
 endif()

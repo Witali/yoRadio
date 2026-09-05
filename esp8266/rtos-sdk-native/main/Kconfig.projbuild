@@ -56,6 +56,16 @@ choice YORADIO_AUDIO_OUTPUT
 config YORADIO_AUDIO_OUTPUT_I2S_PDM
     bool "I2S DMA PDM on GPIO3 (production)"
 
+config YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+    bool "I2S RCPDM on GPIO3 (experimental)"
+    help
+        Predict the output RC voltage with an unsigned 32-bit model and
+        alpha=1/16. Continuous I2S/SLC DMA transports exactly 32 bits per
+        48-kHz output PCM sample (nominal 1.536 MHz, actual 1.538462 MHz).
+        Use a matched RC filter (1 kohm, approximately 10 nF) and a
+        high-impedance, AC-coupled amplifier input. GPIO3 is still UART RX.
+        This is a separate modulator, not the production delta-sigma PDM.
+
 config YORADIO_AUDIO_OUTPUT_SPI_PDM
     bool "HSPI PDM on GPIO13 (legacy UART-safe)"
 
