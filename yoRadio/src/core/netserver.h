@@ -85,11 +85,18 @@ R"(
     if(requestedUi !== webUiRevision) {
       window.history.replaceState(null, '', `${window.location.pathname}${uiSuffix}`);
     }
-    const loadUiElement = (tag, configure) => new Promise((resolve, reject) => {
+    const loadUiElement = (tag, configure, attempts = 3) => new Promise((resolve, reject) => {
       const element = document.createElement(tag);
       configure(element);
       element.onload = resolve;
-      element.onerror = () => reject(new Error(`Unable to load ${element.href || element.src}`));
+      element.onerror = () => {
+        const error = new Error('Unable to load ' + (element.href || element.src));
+        element.remove();
+        if(attempts <= 1) { reject(error); return; }
+        console.log('Retrying WebUI resource:', element.href || element.src);
+        setTimeout(() => loadUiElement(tag, configure, attempts-1).then(resolve, reject),
+                   (4-attempts)*250);
+      };
       document.head.appendChild(element);
     });
     (async () => {
@@ -108,7 +115,16 @@ R"(
       });
       if(document.readyState === 'complete') onLoad();
       else window.addEventListener('load', onLoad, {once: true});
-    })().catch(error => console.log('WebUI loading failed:', error.message));
+    })().catch(error => {
+      console.log('WebUI loading failed:', error.message);
+      const showFailure = () => {
+        const progress = document.getElementById('progress');
+        if(progress) progress.textContent = 'WebUI loading failed. Please reload the page.';
+      };
+      if(document.readyState === 'loading')
+        document.addEventListener('DOMContentLoaded', showFailure, {once: true});
+      else showFailure();
+    });
   </script>
 )"
 #else
