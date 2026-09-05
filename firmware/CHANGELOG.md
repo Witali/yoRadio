@@ -3,6 +3,16 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-09-05: ESP8266 shared MP3 reorder workspace
+
+- Saved `development/esp8266-native-mono-reorder/app.bin`, source `f3138f2`,
+  686848 bytes; previous firmware artifacts remain unchanged.
+- Reuse idle IMDCT output for reorder, removing one 792-byte DRAM allocation.
+- Separate/shared PCM matches byte-for-byte in Mono and Stereo. Allocation
+  failures, reset and AAC/MP3 lifecycle tests pass; all 331 host tests pass.
+- GCC O3 firmware builds; static DRAM/IRAM size unchanged, image 96 bytes smaller.
+- No flashing performed; on-board performance/headroom still needs testing.
+
 ## Development — 2026-09-05: ESP8266 mono MP3 M/S fast path
 
 - Saved `development/esp8266-native-mono/app.bin` separately from the
