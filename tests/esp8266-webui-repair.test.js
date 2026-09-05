@@ -8,6 +8,15 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('HTTP send deadline belongs to the entire response, not each chunk', () => {
+  const source = read('esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_txrx.c');
+  assert.match(source, /if \(!ra->send_started\) \{[\s\S]*?ra->send_deadline =/);
+  assert.match(source, /TickType_t deadline = ra->send_deadline/);
+  assert.match(source, /while \(buf_len > 0\) \{\s*if \(\(int32_t\)\(deadline - xTaskGetTickCount\(\)\) <= 0\)/);
+  assert.match(read('esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_parse.c'),
+    /ra->send_started = false/);
+});
+
 test('OTA accepts the original shared form target and embeds emergency recovery', () => {
   const form = zlib.gunzipSync(fs.readFileSync(path.join(root, 'yoRadio/data/www/updform.html.gz'))).toString();
   assert.match(form, /name="updatetarget" value="fw" checked/);

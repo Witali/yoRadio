@@ -84,10 +84,18 @@ int httpd_send(httpd_req_t *r, const char *buf, size_t buf_len)
 static esp_err_t httpd_send_all(httpd_req_t *r, const char *buf, size_t buf_len)
 {
     struct httpd_req_aux *ra = r->aux;
-    TickType_t deadline = xTaskGetTickCount() +
-                          pdMS_TO_TICKS(HTTPD_SEND_RETRY_TIMEOUT_MS);
+    if (!ra->send_started) {
+        ra->send_started = true;
+        ra->send_deadline = xTaskGetTickCount() +
+                            pdMS_TO_TICKS(HTTPD_SEND_RETRY_TIMEOUT_MS);
+    }
+    TickType_t deadline = ra->send_deadline;
 
     while (buf_len > 0) {
+        if ((int32_t)(deadline - xTaskGetTickCount()) <= 0) {
+            ESP_LOGW(TAG, LOG_FMT("response send deadline, fd=%d"), ra->sd->fd);
+            return ESP_FAIL;
+        }
         int ret = ra->sd->send_fn(ra->sd->handle, ra->sd->fd, buf, buf_len,
                                   MSG_DONTWAIT);
         if (ret > 0) {

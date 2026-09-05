@@ -148,6 +148,8 @@ struct httpd_req_aux {
     char           *status;                         /*!< HTTP response's status code */
     char           *content_type;                   /*!< HTTP response's content type */
     bool            first_chunk_sent;               /*!< Used to indicate if first chunk sent */
+    bool            send_started;
+    uint32_t        send_deadline;                  /*!< One tick deadline for the entire response */
     unsigned        req_hdrs_count;                 /*!< Count of total headers in request packet */
     unsigned        resp_hdrs_count;                /*!< Count of additional headers in response packet */
     struct resp_hdr {

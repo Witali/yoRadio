@@ -558,6 +558,8 @@ static void init_req_aux(struct httpd_req_aux *ra, httpd_config_t *config)
     ra->status = 0;
     ra->content_type = 0;
     ra->first_chunk_sent = 0;
+    ra->send_started = false;
+    ra->send_deadline = 0;
     ra->req_hdrs_count = 0;
     ra->resp_hdrs_count = 0;
 #ifdef CONFIG_HTTPD_WS_SUPPORT
