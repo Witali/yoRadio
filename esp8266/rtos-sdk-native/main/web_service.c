@@ -45,6 +45,7 @@ static char s_static_scratch[WEB_STATIC_SCRATCH_SIZE];
 
 typedef struct {
     bool playing;
+    bool connecting;
     uint16_t station_index;
     uint8_t volume;
     uint32_t bitrate_kbps;
@@ -182,6 +183,7 @@ static void capture_status(web_status_key_t *key, native_state_t *state) {
     native_state_snapshot(state);
     memset(key, 0, sizeof(*key));
     key->playing = state->playing;
+    key->connecting = state->connecting;
     key->station_index = state->station_index;
     key->volume = state->volume;
     key->bitrate_kbps = state->bitrate_kbps;
@@ -189,12 +191,13 @@ static void capture_status(web_status_key_t *key, native_state_t *state) {
     key->channels = state->channels;
     key->codec = state->codec;
     key->station_hash = text_hash(state->station);
-    key->title_hash = text_hash(state->title);
+    key->title_hash = text_hash(state->title) ^ text_hash(state->error);
 }
 
 static bool status_requires_immediate_send(const web_status_key_t *current,
                                            const web_status_key_t *previous) {
     return current->playing != previous->playing ||
+           current->connecting != previous->connecting ||
            current->station_index != previous->station_index ||
            current->volume != previous->volume ||
            current->bitrate_kbps != previous->bitrate_kbps ||
@@ -231,7 +234,8 @@ static bool format_status(const native_state_t *status, char *output,
                     "{\"payload\":[{\"id\":\"nameset\",\"value\":\"");
     json_writer_escaped(&writer, status->station);
     json_writer_raw(&writer, "\"},{\"id\":\"meta\",\"value\":\"");
-    json_writer_escaped(&writer, status->title);
+    json_writer_escaped(&writer, status->error[0] && !status->playing
+                                    ? status->error : status->title);
     json_writer_format(
         &writer,
         "\"},{\"id\":\"volume\",\"value\":%u},"
@@ -247,9 +251,11 @@ static bool format_status(const native_state_t *status, char *output,
     json_writer_format(
         &writer,
         "\"},{\"id\":\"upst\",\"value\":%u},"
-        "{\"id\":\"playerwrap\",\"value\":\"%s\"}]}",
+        "{\"id\":\"playerwrap\",\"value\":\"%s\"},"
+        "{\"id\":\"connecting\",\"value\":%s}]}",
         settings.station_uppercase ? 1U : 0U,
-        status->playing ? "playing" : "stopped");
+        status->playing ? "playing" : "stopped",
+        status->connecting ? "true" : "false");
     if (writer.valid) return true;
     copy_text(output, capacity, "{\"error\":\"status overflow\"}");
     return false;
@@ -766,16 +772,19 @@ static esp_err_t status_handler(httpd_req_t *request) {
     native_state_snapshot(&state);
     char station[260];
     json_escape(state.station, station, sizeof(station));
-    char body[420];
+    char body[640];
+    char error[192];
+    json_escape(state.error, error, sizeof(error));
     snprintf(body, sizeof(body),
              "{\"firmware\":\"esp8266-native\",\"port\":80,"
              "\"websocket\":\"/ws\",\"network\":%d,\"rssi\":%d,"
              "\"playing\":%s,\"station\":\"%s\",\"codec\":\"%s\","
-             "\"bitrate\":%lu}",
+             "\"bitrate\":%lu,\"connecting\":%s,\"error\":\"%s\"}",
              state.network_mode, state.wifi_rssi,
              state.playing ? "true" : "false", station,
              native_codec_name(state.codec),
-             (unsigned long)state.bitrate_kbps);
+             (unsigned long)state.bitrate_kbps,
+             state.connecting ? "true" : "false", error);
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return finish_short_response(request, send_string(request, body));

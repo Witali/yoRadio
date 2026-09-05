@@ -102,6 +102,12 @@ void native_state_set_station(uint16_t index, const char *name) {
     strncpy(s_state.station, name ? name : "", sizeof(s_state.station) - 1);
     s_state.station[sizeof(s_state.station) - 1] = '\0';
     s_state.title[0] = '\0';
+    s_state.error[0] = '\0';
+    s_state.codec = CODEC_NONE;
+    s_state.bitrate_kbps = 0;
+    s_state.sample_rate_hz = 0;
+    s_state.channels = 0;
+    s_state.buffer_percent = 0;
     xSemaphoreGive(s_lock);
 }
 

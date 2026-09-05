@@ -168,7 +168,8 @@ test("ESP8266 WebUI status uses a compact change key and bounded writer", () => 
   );
   assert.doesNotMatch(formatter, /char station\[|char title\[|char escaped_stream\[/);
   assert.match(formatter, /json_writer_escaped\(&writer, status->station\)/);
-  assert.match(formatter, /json_writer_escaped\(&writer, status->title\)/);
+  assert.match(formatter, /status->error\[0\] && !status->playing/);
+  assert.match(formatter, /\? status->error : status->title/);
 });
 
 test("ESP8266 WebUI uses the reduced stack after removing status temporaries", () => {
