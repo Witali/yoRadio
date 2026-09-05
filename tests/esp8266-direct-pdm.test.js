@@ -18,6 +18,13 @@ test('production direct DMA writer preserves PCM/PDM across chunk boundaries and
   fs.writeFileSync(path.join(dir, 'gain_config.inc'), ['VOLUME_DENOMINATOR', 'BALANCE_DENOMINATOR', 'GAIN_Q15_ONE']
     .map(name => output.match(new RegExp(`^#define ${name} .+$`, 'm'))[0]).join('\n'));
   fs.writeFileSync(path.join(dir, 'settings.inc'), output.slice(output.indexOf('void native_audio_output_reload_settings(void)')));
+  const prefix = driver.slice(driver.indexOf('static inline __attribute__((always_inline)) bool publish_committed_prefix('),
+    driver.indexOf('static void IRAM_ATTR submit_buffer('));
+  assert.ok(prefix.includes('s_reserved_words'));
+  fs.writeFileSync(path.join(dir, 'prefix.inc'), prefix);
+  fs.writeFileSync(path.join(dir, 'descriptor.inc'), driver.slice(
+    driver.indexOf('typedef struct nodac_dma_descriptor {'),
+    driver.indexOf('static uint32_t s_buffers[')));
   // Compile the actual production producer and PDM routines. Only replace
   // Xtensa MEMW with a host fence; MMIO/RTOS events are simulated in the harness.
   const producer = driver.slice(driver.indexOf('static bool acquire_free_buffer('),

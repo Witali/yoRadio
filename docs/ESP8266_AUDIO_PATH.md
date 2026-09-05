@@ -17,9 +17,11 @@ The Wemos D1 mini production firmware passes audio through these stages:
 5. The branchless first-order delta-sigma packer converts each mono sample to
    one 32-bit PDM word (PDM32), nominally 1.536 MHz.
 6. The packer writes directly into the producer-owned span reserved from
-   `esp8266_nodac_i2s.c`. Only complete 512-word buffers are published to SLC
-   DMA; the two buffers use finite descriptors, not an unguarded circular
-   ring. I2S transmits DATA on GPIO3/RX; underrun produces neutral PDM.
+   `esp8266_nodac_i2s.c`. Full buffers or safely committed prefixes are
+   published to SLC DMA; no outstanding producer loan may transfer. The
+   two 512-word-capacity buffers use finite descriptors, not an unguarded
+   circular ring. Underrun retries with 64 neutral words while playing;
+   stop retains 512-word neutral blocks. See [recovery measurements](ESP8266_DMA_STARVATION_RECOVERY.md).
 7. GPIO3 feeds the external passive RC low-pass and AC-coupling network, then a
    high-impedance amplifier input.
 

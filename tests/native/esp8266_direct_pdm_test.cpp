@@ -22,25 +22,35 @@ enum { ESP_OK = 0, ESP_ERR_INVALID_ARG = 1, ESP_ERR_INVALID_STATE = 2, ESP_ERR_T
 #define ESP_LOGE(...) ((void)0)
 #define ESP_LOGI(...) ((void)0)
 #define NODAC_DMA_BUFFER_WORDS 512U
+#define NODAC_DMA_BUFFER_BYTES (NODAC_DMA_BUFFER_WORDS * sizeof(uint32_t))
 #define ESP8266_NODAC_DMA_BUFFER_WORDS 512U
 #define ESP8266_NODAC_DMA_BUFFER_COUNT 2U
 static uint32_t s_buffers[2][512];
+#include "descriptor.inc"
+static nodac_dma_descriptor_t s_descriptors[2];
 static nodac_buffer_state_t s_state;
 static uint32_t *s_current_buffer;
 static size_t s_current_position, s_reserved_words;
 static TaskHandle_t s_waiter;
 static bool s_waiting;
+static bool s_running;
 static uint32_t s_silence_word = 0xaaaaaaaaU;
 static unsigned critical, waits;
 static TickType_t ticks;
 static bool autoEof = true;
 static std::vector<uint32_t> committed;
+static std::vector<uint32_t> transmitted;
+#include "prefix.inc"
 
 static void eof() {
     assert(critical == 0);
     const unsigned old = s_state.active;
+    if (!s_state.silent) transmitted.insert(transmitted.end(), s_buffers[old],
+        s_buffers[old] + s_descriptors[old].datalen / sizeof(uint32_t));
+    publish_committed_prefix();
     if(nodac_state_eof(&s_state))
         std::fill(s_buffers[old], s_buffers[old] + 512, s_silence_word);
+    if(s_state.silent) s_descriptors[s_state.active].control = s_running ? 0xc0100100U : 0xc0800800U;
     assert(s_state.state[s_state.active] == NODAC_DMA);
 }
 #define taskENTER_CRITICAL() (++critical)
@@ -69,12 +79,15 @@ static esp_err_t esp8266_nodac_i2s_init(uint32_t silence, uint8_t, uint8_t) {
     s_current_buffer = nullptr;
     s_current_position = s_reserved_words = 0;
     s_waiting = false;
+    s_running = false;
     ticks = waits = critical = 0;
     autoEof = true;
     s_silence_word = silence;
     std::fill(&s_buffers[0][0], &s_buffers[0][0] + 512, silence);
     std::fill(&s_buffers[1][0], &s_buffers[1][0] + 512, silence);
     committed.clear();
+    transmitted.clear();
+    s_descriptors[0].control = s_descriptors[1].control = 0xc0800800U;
     return ESP_OK;
 }
 
@@ -180,6 +193,58 @@ static void ownership() {
 }
 
 struct Render { std::vector<int16_t> pcm; std::vector<uint32_t> pdm; };
+static void prefix_handoff() {
+    esp8266_nodac_i2s_init(0xaaaaaaaaU, 8, 13);
+    uint32_t *loan;
+    size_t capacity;
+    assert(esp8266_nodac_i2s_reserve(&loan, &capacity, 10) == ESP_OK);
+    for(unsigned i = 0; i < 32; ++i) {
+        loan[i] = 1000 + i;
+        eof(); // A loan must NEVER be consumed while the CPU holds it.
+        assert(s_state.active == 0 && s_current_buffer == loan);
+    }
+    assert(driver_commit(32) == ESP_OK);
+    eof();
+    assert(s_state.active == 1 && !s_state.silent && s_current_buffer == nullptr);
+    assert(s_descriptors[1].datalen == 128);
+    assert(esp8266_nodac_i2s_reserve(&loan, &capacity, 10) == ESP_OK);
+    assert(capacity == 512 && loan == s_buffers[0]);
+    for(unsigned i = 0; i < 512; ++i) loan[i] = 2000 + i;
+    assert(driver_commit(512) == ESP_OK);
+    eof();
+    assert(transmitted.size() == 32 && s_state.active == 0);
+    for(unsigned i = 0; i < 32; ++i) assert(transmitted[i] == 1000 + i);
+    assert(s_descriptors[0].datalen == 2048);
+    eof();
+    assert(transmitted.size() == 544 && s_state.silent);
+    for(unsigned i = 0; i < 512; ++i) assert(transmitted[32 + i] == 2000 + i);
+    assert(s_descriptors[0].datalen == 256); // short neutral retry while playing
+    esp8266_nodac_i2s_silence(0xaaaaaaaaU);
+    eof();
+    assert(s_descriptors[s_state.active].datalen == 2048); // idle cadence
+
+    // Random EOFs before/inside/after loans: compare actual DMA sequence,
+    // excluding deliberate neutral underrun intervals, with input words.
+    esp8266_nodac_i2s_init(0xaaaaaaaaU, 8, 13);
+    std::vector<uint32_t> expected;
+    uint32_t random = 0x8266;
+    for(unsigned block = 0; block < 1000; ++block) {
+        assert(esp8266_nodac_i2s_reserve(&loan, &capacity, 100) == ESP_OK);
+        random = random * 1664525U + 1013904223U;
+        const size_t count = std::min(capacity, size_t(1 + random % 280));
+        for(size_t i = 0; i < count; ++i) {
+            const uint32_t word = uint32_t(expected.size() + 1);
+            loan[i] = word;
+            expected.push_back(word);
+            if(i % 23 == 0) eof();
+        }
+        assert(driver_commit(count) == ESP_OK);
+        if(block % 3) eof();
+    }
+    eof(); eof(); eof(); // drain final committed prefix and active payload
+    assert(transmitted == expected);
+}
+
 static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned chunk) {
     normalizer = AudioNormalizer();
     storedSettings.volume = 193;
@@ -210,6 +275,7 @@ static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned c
 
 int main() {
     balance_regression();
+    prefix_handoff();
     std::vector<uint32_t> monoReference;
     for(int balance : {0, -16, 16}) {
         storedSettings = {};

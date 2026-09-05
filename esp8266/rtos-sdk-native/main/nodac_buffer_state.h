@@ -11,7 +11,7 @@
 
 /* Single producer; calls are serialized with the EOF ISR. DMA descriptors
  * MUST terminate (next == NULL), otherwise software ownership is meaningless.
- * The ISR submits the selected COMPLETE buffer after the previous DMA read.
+ * The ISR submits the selected committed buffer after the previous DMA read.
  * No payload is copied here. This same state machine is exercised on the host. */
 enum { NODAC_FREE, NODAC_FILLING, NODAC_READY, NODAC_DMA };
 typedef struct {

@@ -262,8 +262,9 @@ void audio_output_benchmark_run(void) {
              (unsigned)esp_get_free_heap_size(),
              (unsigned)esp_get_minimum_free_heap_size());
 #if YORADIO_ESP8266_I2S_PDM
-    ESP_LOGI(TAG, "dma eof=%u blocked_partial=%u fifo_empty=%u",
+    ESP_LOGI(TAG, "dma eof=%u partial_start=%u blocked_partial=%u fifo_empty=%u",
              (unsigned)(dma_after.eof_count - dma_before.eof_count),
+             (unsigned)(dma_after.partial_starts - dma_before.partial_starts),
              (unsigned)(dma_after.blocked_partial - dma_before.blocked_partial),
              (unsigned)(dma_after.fifo_empty - dma_before.fifo_empty));
     ESP_LOGI(TAG, "stalled producer (65 ms): %s",

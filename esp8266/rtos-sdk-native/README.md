@@ -49,8 +49,10 @@ computes 32 genuine delta-sigma decisions per sample, giving a nominal
 ## Canonical production configuration
 
 The audio producer converts PCM directly into a reserved, producer-owned
-DMA span; only a full buffer becomes playable. The two 512-word buffers and
-neutral underrun output remain unchanged. Balance is ignored for mono PCM,
+DMA span; EOF may take a committed prefix only after all producer loans are
+released. The two 512-word-capacity buffers remain; playing underruns retry
+with 64 neutral words and stop uses 512. See [DMA recovery](../../docs/ESP8266_DMA_STARVATION_RECOVERY.md).
+Balance is ignored for mono PCM,
 including restored settings and runtime updates; volume/normalization still
 apply. See [PCM32, direct DMA and physical trace](../../docs/ESP8266_PCM32_DIRECT_DMA.md).
 

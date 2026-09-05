@@ -28,12 +28,17 @@
 #define NODAC_SLC_ADDRESS_MASK 0x000fffffU
 
 typedef struct nodac_dma_descriptor {
-    uint32_t blocksize : 12;
-    uint32_t datalen : 12;
-    uint32_t unused : 5;
-    uint32_t sub_sof : 1;
-    uint32_t eof : 1;
-    volatile uint32_t owner : 1;
+    union {
+        struct {
+            uint32_t blocksize : 12;
+            uint32_t datalen : 12;
+            uint32_t unused : 5;
+            uint32_t sub_sof : 1;
+            uint32_t eof : 1;
+            volatile uint32_t owner : 1;
+        };
+        uint32_t control;
+    };
     uint32_t *buf_ptr;
     struct nodac_dma_descriptor *next_link_ptr;
 } nodac_dma_descriptor_t;
@@ -47,14 +52,15 @@ _Static_assert(NODAC_DMA_BUFFER_BYTES <= 4095U, "12-bit DMA descriptor length");
  * enough to displace the 16-KiB codec arena from IRAM. The task critical
  * section calls and explicit publication barrier provide synchronization. */
 static nodac_buffer_state_t s_state;
-static uint32_t *volatile s_current_buffer;
-static volatile size_t s_current_position;
-static size_t s_reserved_words; /* producer-only; no ISR accesses */
-static volatile TaskHandle_t s_waiter;
-static volatile bool s_waiting;
+static uint32_t *s_current_buffer;
+static size_t s_current_position;
+static size_t s_reserved_words; /* protected with current pointer against EOF */
+static TaskHandle_t s_waiter;
+static bool s_waiting;
+static bool s_running;
 static uint32_t s_silence_word;
 static volatile uint32_t s_underruns;
-#if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+#if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK || YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
 static esp8266_nodac_profile_t s_profile;
 #endif
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
@@ -82,6 +88,19 @@ extern void audio_output_benchmark_spi_wait_end(void);
 extern void rom_i2c_writeReg_Mask(int block, int host_id, int reg_add,
                                   int msb, int lsb, int value);
 
+/* EOF may hand off a committed prefix while decoding is between callbacks.
+ * A live reserve loan forbids this: the producer may still be storing words.
+ * Taking the prefix releases the ENTIRE buffer, never a writable suffix. */
+static inline __attribute__((always_inline)) bool publish_committed_prefix(void) {
+    if (s_state.mute || !s_current_buffer || s_reserved_words ||
+        !s_current_position) return false;
+    /* A current pointer always owns FILLING on the non-DMA side. Commit
+     * already recorded its exact length, keeping this ISR path short. */
+    s_state.state[s_state.active ^ 1U] = NODAC_READY;
+    s_current_buffer = NULL;
+    return true;
+}
+
 static void IRAM_ATTR submit_buffer(unsigned index) {
     /* A finite descriptor prevents DMA from prefetching a producer-owned
      * buffer. Restart only SLC, not I2S or its FIFO: the final FIFO words
@@ -93,7 +112,9 @@ static void IRAM_ATTR submit_buffer(unsigned index) {
     SLC0.rx_link.start = 1;
 }
 
-static void IRAM_ATTR nodac_slc_isr(void *arg) {
+/* Keep the finite-descriptor handoff compact enough for the 16-KiB codec
+ * IRAM allocation. GCC emits a 32-byte ISR frame, no added helper calls. */
+static void IRAM_ATTR __attribute__((optimize("Os"))) nodac_slc_isr(void *arg) {
     (void)arg;
     /* Like the SDK I2S ISR, rely on interrupt entry masking this level.
      * No redundant _xt_isr_mask/unmask calls inside the handler. */
@@ -104,9 +125,15 @@ static void IRAM_ATTR nodac_slc_isr(void *arg) {
         nodac_dma_descriptor_t *finished =
             (nodac_dma_descriptor_t *)SLC0.rx_eof_des_addr;
         if (finished != &s_descriptors[s_state.active]) return;
+#if YORADIO_ESP8266_DMA_COMMITTED_PREFIX
+        bool partial = publish_committed_prefix();
+#else
+        bool partial = false;
+#endif
         bool missing = s_state.state[s_state.active ^ 1U] != NODAC_READY;
-#if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+#if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK || YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
         ++s_profile.eof_count;
+        if (partial) ++s_profile.partial_starts;
         if (I2S0.int_raw.tx_rempty) ++s_profile.fifo_empty;
         I2S0.int_clr.tx_rempty = 1;
         if (missing) ++s_profile.empty_starts;
@@ -118,10 +145,25 @@ static void IRAM_ATTR nodac_slc_isr(void *arg) {
                 NODAC_DMA_BUFFER_WORDS - s_current_position;
         }
 #endif
+        (void)partial;
         if (missing && !s_state.mute) ++s_underruns;
         if (nodac_state_eof(&s_state)) {
             for (unsigned word = 0; word < NODAC_DMA_BUFFER_WORDS; ++word)
                 finished->buf_ptr[word] = s_silence_word;
+        }
+        if (s_state.silent) {
+#if YORADIO_ESP8266_DMA_COMMITTED_PREFIX
+            /* Retry quickly while playing: a missed deadline must not force
+             * another 10.7 ms neutral block. Stop retains the quiet 512-word
+             * cadence. Capacity remains 512 words in both buffers. */
+            const uint32_t bytes = s_running ? 64U * sizeof(uint32_t)
+                                            : NODAC_DMA_BUFFER_BYTES;
+            s_descriptors[s_state.active].control =
+                0xc0000000U | (bytes << 12) | bytes;
+#else
+            s_descriptors[s_state.active].control = 0xc0000000U |
+                (NODAC_DMA_BUFFER_BYTES << 12) | NODAC_DMA_BUFFER_BYTES;
+#endif
         }
         submit_buffer(s_state.active);
 
@@ -145,6 +187,7 @@ static void configure_descriptors(uint32_t silence_word) {
     s_reserved_words = 0;
     s_waiter = NULL;
     s_waiting = false;
+    s_running = false;
     s_underruns = 0;
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
     s_dma_trace_count = 0;
@@ -286,13 +329,28 @@ esp_err_t esp8266_nodac_i2s_reserve(uint32_t **words, size_t *capacity,
     if (!words || !capacity) return ESP_ERR_INVALID_ARG;
     *words = NULL;
     *capacity = 0;
-    if (s_reserved_words) return ESP_ERR_INVALID_STATE;
-    if (!s_current_buffer && !acquire_free_buffer(ticks_to_wait))
-        return ESP_ERR_TIMEOUT;
-    s_reserved_words = NODAC_DMA_BUFFER_WORDS - s_current_position;
-    *words = s_current_buffer + s_current_position;
-    *capacity = s_reserved_words;
-    return ESP_OK;
+    const TickType_t started = xTaskGetTickCount();
+    for (;;) {
+        taskENTER_CRITICAL();
+        if (s_reserved_words) {
+            taskEXIT_CRITICAL();
+            return ESP_ERR_INVALID_STATE;
+        }
+        if (s_current_buffer) {
+            s_running = true;
+            s_reserved_words = NODAC_DMA_BUFFER_WORDS - s_current_position;
+            *words = s_current_buffer + s_current_position;
+            *capacity = s_reserved_words;
+            taskEXIT_CRITICAL();
+            return ESP_OK;
+        }
+        taskEXIT_CRITICAL();
+        TickType_t elapsed = xTaskGetTickCount() - started;
+        TickType_t remaining = elapsed < ticks_to_wait
+            ? ticks_to_wait - elapsed : 0;
+        if (!acquire_free_buffer(remaining)) return ESP_ERR_TIMEOUT;
+        /* The newly acquired empty buffer cannot be submitted by EOF. */
+    }
 }
 
 esp_err_t esp8266_nodac_i2s_commit(size_t count) {
@@ -326,8 +384,12 @@ esp_err_t esp8266_nodac_i2s_commit(size_t count) {
     taskENTER_CRITICAL();
     s_reserved_words = 0;
     s_current_position += count;
+    unsigned index = s_current_buffer == s_buffers[0] ? 0U : 1U;
+    const uint32_t bytes = s_current_position * sizeof(uint32_t);
+    /* Owner + EOF + both lengths, only in producer-owned memory. EOF may
+     * submit exactly this committed prefix after the loan is released. */
+    s_descriptors[index].control = 0xc0000000U | (bytes << 12) | bytes;
     if (s_current_position == NODAC_DMA_BUFFER_WORDS) {
-        unsigned index = s_current_buffer == s_buffers[0] ? 0U : 1U;
         __asm__ __volatile__("memw" ::: "memory");
         (void)nodac_state_publish(&s_state, index);
         s_current_buffer = NULL;
@@ -364,6 +426,7 @@ void esp8266_nodac_i2s_silence(uint32_t silence_word) {
     taskENTER_CRITICAL();
     s_silence_word = silence_word;
     nodac_state_silence(&s_state);
+    s_running = false;
     s_current_buffer = NULL;
     s_current_position = 0;
     s_reserved_words = 0;
@@ -383,10 +446,11 @@ uint32_t esp8266_nodac_i2s_underruns(void) {
     return underruns;
 }
 
-#if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+#if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK || YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
 void esp8266_nodac_i2s_profile(esp8266_nodac_profile_t *stats) {
     taskENTER_CRITICAL();
     stats->eof_count = s_profile.eof_count;
+    stats->partial_starts = s_profile.partial_starts;
     stats->empty_starts = s_profile.empty_starts;
     stats->blocked_partial = s_profile.blocked_partial;
     stats->missing_words = s_profile.missing_words;
@@ -403,16 +467,20 @@ bool esp8266_nodac_i2s_test_stalled_producer(void) {
     for (unsigned i = 0; i < 32; ++i) words[i] = 0x55550000U + i;
     esp8266_nodac_i2s_silence(0xaaaaaaaaU);
     vTaskDelay(pdMS_TO_TICKS(30));
-    if (esp8266_nodac_i2s_write(words, 32, pdMS_TO_TICKS(100)) != ESP_OK)
+    uint32_t *loan;
+    size_t capacity;
+    if (esp8266_nodac_i2s_reserve(&loan, &capacity, pdMS_TO_TICKS(100)) != ESP_OK)
         return false;
+    memcpy(loan, words, sizeof(words));
     uint32_t *partial = s_current_buffer;
     uint32_t before = s_profile.blocked_partial;
     vTaskDelay(pdMS_TO_TICKS(65));
     bool valid = partial && s_current_buffer == partial &&
-        s_current_position == 32 && s_state.silent &&
+        s_current_position == 0 && s_reserved_words == capacity && s_state.silent &&
         s_profile.blocked_partial - before >= 2U &&
         memcmp(partial, words, sizeof(words)) == 0;
     if (valid) {
+        valid = esp8266_nodac_i2s_commit(32) == ESP_OK;
         for (unsigned block = 1; block < NODAC_DMA_BUFFER_WORDS / 32; ++block)
             if (esp8266_nodac_i2s_write(words, 32, pdMS_TO_TICKS(100)) != ESP_OK)
                 valid = false;

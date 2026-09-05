@@ -9,6 +9,14 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "helix_stage_profile.h"
+#if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
+extern "C" {
+#include "native_audio_output.h"
+#include "esp8266_nodac_i2s.h"
+#include "persistent_settings.h"
+#include "nvs_flash.h"
+}
+#endif
 
 namespace {
 constexpr unsigned kWarmupFrames = 8;
@@ -33,6 +41,7 @@ struct OutputStats {
     uint8_t channels;
     uint32_t callbacks;
     volatile int16_t sink;
+    bool physical_output;
 };
 
 #if defined(YORADIO_ESP8266_HELIX_STAGE_PROFILE)
@@ -84,6 +93,11 @@ bool accept_pcm(void *context, const helix_stream_info_t *info,
     OutputStats *output = static_cast<OutputStats *>(context);
     if (!info || !pcm || !samples || !info->sample_rate || !info->channels)
         return false;
+#if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
+    if (output->physical_output && native_audio_output_write(
+            pcm, samples, info->sample_rate, info->channels) != ESP_OK)
+        return false;
+#endif
     output->samples += samples;
     output->sample_rate = info->sample_rate;
     output->channels = info->channels;
@@ -150,7 +164,9 @@ bool submit_frame(helix_codec_t *codec, const uint8_t *frame,
 
 void run_codec(const char *name, helix_codec_kind_t kind,
                const FrameView &fixture) {
-    uint8_t frame_ram[kMaxFrameBytes];
+    /* The single benchmark runner owns this buffer. Keep the RAM fixture
+     * off the 3-KiB app stack when physical output adds nested calls. */
+    static uint8_t frame_ram[kMaxFrameBytes];
     if (!fixture.data || !fixture.size) {
         ESP_LOGE(kTag, "%s fixture has no complete frame", name);
         return;
@@ -163,6 +179,11 @@ void run_codec(const char *name, helix_codec_kind_t kind,
     }
 
     OutputStats output = {};
+#if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
+    output.physical_output = true;
+    native_audio_output_silence();
+    native_audio_output_reset_normalizer();
+#endif
     const size_t arena_bytes = helix_codec_arena_used(codec);
     const size_t dram_bytes = helix_codec_dram_used(codec);
     const size_t iram_bytes = helix_codec_iram_used(codec);
@@ -178,6 +199,12 @@ void run_codec(const char *name, helix_codec_kind_t kind,
 
     output.samples = 0;
     output.callbacks = 0;
+#if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
+    native_audio_output_reset_spi_stats();
+    esp8266_nodac_profile_t dma_before = {};
+    esp8266_nodac_i2s_profile(&dma_before);
+    const int64_t wall_started = esp_timer_get_time();
+#endif
     reset_stage_profile();
     uint64_t total_us = 0;
     uint32_t minimum_us = UINT32_MAX;
@@ -201,6 +228,22 @@ void run_codec(const char *name, helix_codec_kind_t kind,
     uint32_t speed_x1000 = total_us
         ? static_cast<uint32_t>(audio_us * 1000ULL / total_us)
         : 0;
+#if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
+    const int64_t wall_us = esp_timer_get_time() - wall_started;
+    esp8266_nodac_profile_t dma_after = {};
+    esp8266_nodac_i2s_profile(&dma_after);
+    native_audio_output_spi_stats_t output_stats = {};
+    native_audio_output_get_spi_stats(&output_stats);
+    native_audio_output_silence();
+    ESP_LOGI(kTag,
+        "%s physical wall=%u us audio=%u us eof=%u underrun=%u partial=%u fifo_empty=%u prefix=%u",
+        name, unsigned(wall_us), unsigned(audio_us),
+        unsigned(dma_after.eof_count - dma_before.eof_count),
+        unsigned(output_stats.queue_empty_events),
+        unsigned(dma_after.partial_starts - dma_before.partial_starts),
+        unsigned(dma_after.fifo_empty - dma_before.fifo_empty),
+        unsigned(YORADIO_ESP8266_DMA_COMMITTED_PREFIX));
+#endif
     ESP_LOGI(kTag,
              "%s RAM frame=%u bytes iterations=%u callbacks=%u "
              "decode=%u us avg=%u us min=%u us max=%u us "
@@ -219,6 +262,8 @@ void run_codec(const char *name, helix_codec_kind_t kind,
              static_cast<unsigned>(dram_bytes),
              static_cast<unsigned>(iram_bytes));
     report_stage_profile(name, total_us);
+    ESP_LOGI(kTag, "%s task stack free=%u", name,
+             unsigned(uxTaskGetStackHighWaterMark(NULL)));
     helix_codec_destroy(codec);
 }
 
@@ -306,7 +351,25 @@ extern "C" void helix_stage_profile_end(int stage) {
 #endif
 
 extern "C" void codec_ram_benchmark_run(void) {
+#if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
+    ESP_LOGI(kTag, "begin: RAM decode -> PCM -> PDM -> DMA, Wi-Fi off");
+    if (nvs_flash_init() != ESP_OK || persistent_settings_init() != ESP_OK) {
+        ESP_LOGE(kTag, "test settings init failed");
+        return;
+    }
+    persistent_settings_t settings;
+    persistent_settings_get(&settings);
+    settings.normalization_enabled = false;
+    settings.volume = 128;
+    settings.balance = 0;
+    if (persistent_settings_update_runtime(&settings) != ESP_OK ||
+        native_audio_output_init() != ESP_OK) {
+        ESP_LOGE(kTag, "test output init failed");
+        return;
+    }
+#else
     ESP_LOGI(kTag, "begin: CPU-only decode, fixture copied to RAM, Wi-Fi off");
+#endif
     if (!helix_codec_prepare()) {
         ESP_LOGE(kTag, "cannot reserve codec word arena");
         return;

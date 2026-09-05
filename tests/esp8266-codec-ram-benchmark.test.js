@@ -31,7 +31,19 @@ test("ESP8266 RAM codec benchmark embeds golden fixtures and bypasses services",
   assert.match(benchmark, /elapsed_signed < 0[\s\S]*rejected_samples/);
   assert.doesNotMatch(benchmark, /soc_get_ccount\(\)/);
   assert.match(cmake, /YORADIO_ESP8266_HELIX_STAGE_PROFILE/);
-  assert.doesNotMatch(benchmark, /network_service|native_audio_output|lwip_/);
+  assert.doesNotMatch(benchmark, /network_service|lwip_/);
+});
+
+test("RAM decoder-to-DMA comparison is opt-in and never persists test settings", () => {
+  const cmake = read("esp8266", "rtos-sdk-native", "main", "CMakeLists.txt");
+  const source = read("esp8266", "rtos-sdk-native", "main", "codec_ram_benchmark.cpp");
+  assert.match(cmake, /option\(YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT[\s\S]*?OFF\)/);
+  assert.match(cmake, /RAM audio output requires CODEC_RAM_BENCHMARK/);
+  assert.match(cmake, /option\(YORADIO_ESP8266_DMA_COMMITTED_PREFIX[\s\S]*?ON\)/);
+  assert.match(source, /#if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT\s+if \(output->physical_output && native_audio_output_write/);
+  assert.match(source, /persistent_settings_update_runtime\(&settings\)/);
+  assert.doesNotMatch(source, /persistent_settings_(save|commit)|nvs_set|nvs_commit|nvs_flash_erase/);
+  assert.match(source, /physical wall=%u us audio=%u us eof=%u underrun=%u partial=%u fifo_empty=%u prefix=%u/);
 });
 
 test("ESP8266 Helix stage hooks cover both MP3 and AAC hot paths", () => {

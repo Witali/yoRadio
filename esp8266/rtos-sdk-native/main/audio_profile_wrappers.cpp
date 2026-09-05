@@ -219,10 +219,11 @@ void maybe_report() {
     log_stage("output_dma_wait", kSpiWait, wall_us);
     log_stage("pcm_gap", kPcmGap, wall_us);
     ESP_LOGI(kTag,
-             "dma eof=%u underrun=%u empty_start=%u blocked_partial=%u "
+             "dma eof=%u underrun=%u partial_start=%u empty_start=%u blocked_partial=%u "
              "missing_words=%u fifo_empty=%u",
              unsigned(dma.eof_count - s_dma_before.eof_count),
              unsigned(output_stats.queue_empty_events - s_underruns_before),
+             unsigned(dma.partial_starts - s_dma_before.partial_starts),
              unsigned(dma.empty_starts - s_dma_before.empty_starts),
              unsigned(dma.blocked_partial - s_dma_before.blocked_partial),
              unsigned(dma.missing_words - s_dma_before.missing_words),

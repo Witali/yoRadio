@@ -43,7 +43,8 @@ void app_main(void) {
     audio_output_benchmark_run();
     for (;;) vTaskDelay(portMAX_DELAY);
 #elif YORADIO_ESP8266_CODEC_RAM_BENCHMARK
-    ESP_LOGI(TAG, "isolated codec RAM benchmark; Wi-Fi and audio output disabled");
+    ESP_LOGI(TAG, "isolated codec RAM benchmark; Wi-Fi disabled, audio output=%u",
+             (unsigned)YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT);
     codec_ram_benchmark_run();
     for (;;) vTaskDelay(portMAX_DELAY);
 #else

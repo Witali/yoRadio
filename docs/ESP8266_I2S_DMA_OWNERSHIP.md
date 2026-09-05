@@ -1,5 +1,10 @@
 # ESP8266 I2S PDM: explicit buffer ownership
 
+The later [starvation recovery](ESP8266_DMA_STARVATION_RECOVERY.md) retains
+this ownership protection but allows a committed prefix to transfer whole
+buffer ownership, and uses short neutral retries while playing. The original
+full-buffer-only implementation and measurements below are historical.
+
 Date: 2026-09-05. Wemos D1 mini, CPU 160 MHz, QIO 40 MHz, ordinary
 first-order software delta-sigma PDM32 (not RCPDM), output GPIO3.
 Nominal carrier 1.536 MHz; divider 8/13 gives 1,538,461 Hz.

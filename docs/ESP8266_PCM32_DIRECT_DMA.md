@@ -1,5 +1,10 @@
 # ESP8266: 32-frame PCM and direct PDM-to-DMA
 
+Follow-up: the user confirmed sound but reported distortion. The later
+[DMA starvation recovery](ESP8266_DMA_STARVATION_RECOVERY.md) supersedes the
+full-buffer-only handoff below with committed prefixes and short neutral
+retries. The original measurements in this document remain historical.
+
 ## Data path
 
 Helix MP3 now calls a synchronous sink after each 32-frame synthesis step,
