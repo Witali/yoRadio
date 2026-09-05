@@ -4,6 +4,30 @@ This checklist follows the 2026-09-01 physical Wemos D1 mini comparison of
 the Helix and experimental libmad MP3 backends. Keep Helix as the production
 default until every integrated libmad criterion below passes.
 
+## Compressed-stream buffering follow-up (2026-09-05)
+
+The live starvation measurements and reader-task RAM budget are in
+`ESP8266_AUDIO_GAPS_2026-09-05.md`. Do not lower production WebUI's 5120-byte
+stack based on the older 4096-byte experiments recorded below.
+
+- [x] Remove the KaRadio producer's redundant 1024-byte detection probe.
+  Before the consumer's first read the published ring prefix starts at zero,
+  is contiguous and cannot be overwritten by the producer. Inspect it directly
+  outside the critical section, keeping the existing 1024-byte probe limit.
+  The 4096-byte input ring and 2560-byte network stack remain unchanged.
+  This saves exactly 1024 bytes of static DRAM when the producer is enabled;
+  native's default single-task profile already excludes that probe entirely.
+- [ ] Reduce/reuse the remaining extra URL/protocol workspace with explicit
+  lifetime ownership and cancellation acknowledgement before enabling the
+  producer in the memory-constrained full MP3/AAC native build.
+- [ ] Make the compressed ring configurable and assign verified savings to
+  larger prebuffering, keeping headroom for WebUI, the TCP stack and AAC.
+- [ ] Measure production heap low-water, largest allocation and stack margins
+  with MP3/AAC, station switches and multiple WebUI tabs before choosing the
+  larger default. Do not subtract all reserved IRAM as freed DRAM.
+- [ ] Replace the producer's EAGAIN 1-ms polling with readiness waiting and
+  keep immediate cancellation/BOOT control responsive.
+
 ## Correctness before reduction
 
 - [x] Fix the libmad DRAM leak: `mad_stream` and `mad_frame` must be released

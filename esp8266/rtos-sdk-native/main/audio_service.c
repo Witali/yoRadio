@@ -94,7 +94,6 @@ typedef enum {
 } karadio_pipeline_state_t;
 
 static uint8_t s_karadio_ring[KARADIO_RING_BYTES];
-static uint8_t s_karadio_probe[HTTP_HEADER_BYTES];
 static volatile size_t s_karadio_head;
 static volatile size_t s_karadio_tail;
 static volatile size_t s_karadio_count;
@@ -125,16 +124,16 @@ static void karadio_ring_reset(void) {
     taskEXIT_CRITICAL();
 }
 
-static size_t karadio_ring_peek(uint8_t *destination, size_t capacity) {
+static size_t karadio_probe_stream_start(helix_codec_kind_t *detected) {
     taskENTER_CRITICAL();
-    size_t count = s_karadio_count < capacity ? s_karadio_count : capacity;
-    size_t head = s_karadio_head;
+    size_t count = s_karadio_count < HTTP_HEADER_BYTES
+        ? s_karadio_count : HTTP_HEADER_BYTES;
+    /* This is only called before the first decoder read after ring_reset.
+     * No consumed bytes can be reused by the producer yet, so the published
+     * prefix stays contiguous and immutable while detection inspects it. */
+    configASSERT(s_karadio_head == 0);
     taskEXIT_CRITICAL();
-    size_t first = KARADIO_RING_BYTES - head;
-    if (first > count) first = count;
-    memcpy(destination, s_karadio_ring + head, first);
-    if (count > first)
-        memcpy(destination + first, s_karadio_ring, count - first);
+    *detected = helix_codec_detect(s_karadio_ring, count);
     return count;
 }
 
@@ -810,10 +809,8 @@ static void audio_task(void *argument) {
 
         helix_codec_kind_t detected = 0;
         while (generation_current(command.generation)) {
-            size_t probe_size = karadio_ring_peek(
-                s_karadio_probe, sizeof(s_karadio_probe));
-            detected = helix_codec_detect(s_karadio_probe, probe_size);
-            if (detected || probe_size == sizeof(s_karadio_probe) ||
+            size_t probe_size = karadio_probe_stream_start(&detected);
+            if (detected || probe_size == HTTP_HEADER_BYTES ||
                 !karadio_pipeline_active())
                 break;
             ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10));

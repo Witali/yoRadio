@@ -42,6 +42,22 @@ test('network producer receives directly into the bounded ring', () => {
   assert.doesNotMatch(audio, /malloc\([^\n]*KARADIO_RING_BYTES/);
 });
 
+test('stream detection borrows the immutable ring prefix instead of allocating a probe', () => {
+  assert.doesNotMatch(audio, /s_karadio_probe|karadio_ring_peek/);
+  const begin = audio.indexOf('static size_t karadio_probe_stream_start(');
+  const end = audio.indexOf('static size_t karadio_ring_read(', begin);
+  const probe = audio.slice(begin, end);
+  assert.ok(begin >= 0 && end > begin);
+  assert.match(probe, /configASSERT\(s_karadio_head == 0\)/);
+  assert.match(probe, /s_karadio_count < HTTP_HEADER_BYTES/);
+  assert.match(probe, /helix_codec_detect\(s_karadio_ring, count\)/);
+  assert.doesNotMatch(probe, /memcpy|malloc/);
+  // Parsing does not hold the critical section or expose uncommitted data.
+  assert.ok(probe.indexOf('taskEXIT_CRITICAL()') < probe.indexOf('helix_codec_detect('));
+  assert.ok(audio.indexOf('karadio_probe_stream_start(&detected)') <
+            audio.indexOf('size_t received = karadio_ring_read('));
+});
+
 test('MP3 word workspace uses the physically verified 16-KiB IRAM arena', () => {
   assert.match(arena, /kWordArenaBytes = 16U \* 1024U/);
   assert.doesNotMatch(audio, /s_karadio_prepared_codec/);
