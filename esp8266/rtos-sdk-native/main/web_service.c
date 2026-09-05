@@ -728,6 +728,12 @@ static const char *asset_type(const char *uri) {
 
 static esp_err_t page_handler(httpd_req_t *request) {
     prepare_short_response(request);
+    if (request_path_equals(request, "/emergency")) {
+        httpd_resp_set_type(request, "text/html; charset=utf-8");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        return finish_short_response(
+            request, send_chunked_string(request, yoradio_emergency_form()));
+    }
     if (request_path_equals(request, "/webboard") ||
         (request_path_equals(request, "/") && !web_ui_available())) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
@@ -970,6 +976,7 @@ esp_err_t web_service_start(void) {
             return result;
     }
     if ((result = register_get("/webboard", page_handler)) != ESP_OK) return result;
+    if ((result = register_get("/emergency", page_handler)) != ESP_OK) return result;
     if ((result = register_get("/updform.html", asset_handler)) != ESP_OK) return result;
     if ((result = register_get("/data/wifi.csv", wifi_file_handler)) != ESP_OK) return result;
     static const char *posts[] = {"/upload", "/webboard", "/"};

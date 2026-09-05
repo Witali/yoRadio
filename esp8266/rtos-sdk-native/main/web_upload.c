@@ -250,7 +250,9 @@ static bool ota_part(mp_event_t event, const uint8_t *data, size_t length, void 
             u->target_seen = true;
             return true;
         }
-        if (!u->image_part || u->image_seen || strcmp(u->target, "firmware") != 0)
+        /* The original shared YoRadio form and emergency page send "fw". */
+        if (!u->image_part || u->image_seen ||
+            (strcmp(u->target, "fw") != 0 && strcmp(u->target, "firmware") != 0))
             return false;
         u->image_seen = true;
         return true;

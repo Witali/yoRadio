@@ -8,6 +8,14 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('OTA accepts the original shared form target and embeds emergency recovery', () => {
+  const form = zlib.gunzipSync(fs.readFileSync(path.join(root, 'yoRadio/data/www/updform.html.gz'))).toString();
+  assert.match(form, /name="updatetarget" value="fw" checked/);
+  assert.match(read(main+'web_upload.c'), /strcmp\(u->target, "fw"\) != 0/);
+  assert.match(read(main+'web_service.c'), /register_get\("\/emergency", page_handler\)/);
+  assert.match(read(main+'web_service.c'), /send_chunked_string\(request, yoradio_emergency_form\(\)\)/);
+});
+
 test('OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS', () => {
   const rows = read('esp8266/rtos-sdk-native/partitions.csv').split(/\r?\n/)
     .filter(line => line && !line.startsWith('#')).map(line=>line.split(',').map(x=>x.trim()));
