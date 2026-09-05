@@ -33,6 +33,14 @@ typedef struct {
     char sntp2[SETTINGS_SNTP_CAPACITY];
 } persistent_settings_t;
 
+/* Extra keys keep the original version-1 blob ABI readable by older builds. */
+typedef struct {
+    bool audio_info;
+    uint8_t softap_delay_min;
+} persistent_web_settings_t;
+void persistent_settings_get_web(persistent_web_settings_t *output);
+esp_err_t persistent_settings_update_web(const persistent_web_settings_t *settings);
+
 esp_err_t persistent_settings_init(void);
 void persistent_settings_get(persistent_settings_t *output);
 esp_err_t persistent_settings_save(const persistent_settings_t *settings);

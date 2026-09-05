@@ -8,6 +8,19 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('Audio Info and AP reboot delay persist without changing the legacy blob', () => {
+  const source = read(main+'persistent_settings.c');
+  assert.match(source, /SETTINGS_VERSION 1U/);
+  for(const key of ['audioinfo', 'apdelay']) {
+    assert.ok(source.includes('nvs_get_u8(handle, "'+key+'"'));
+    assert.ok(source.includes('nvs_set_u8(handle, "'+key+'"'));
+  }
+  const save = source.slice(source.indexOf('esp_err_t persistent_settings_save'),
+    source.indexOf('esp_err_t persistent_settings_update_runtime'));
+  assert.doesNotMatch(save, /s_settings = \*settings/);
+  assert.match(read(main+'network_service.c'), /web.softap_delay_min \* 60000U/);
+});
+
 test('short HTTP responses use TCP_NODELAY and graceful write-half shutdown', () => {
   const source = read(main+'web_service.c');
   assert.match(source, /config.open_fn = session_opened/);

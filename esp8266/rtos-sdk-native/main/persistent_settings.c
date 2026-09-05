@@ -24,6 +24,22 @@ typedef struct {
 static const char *TAG = "settings";
 static SemaphoreHandle_t s_lock;
 static persistent_settings_t s_settings;
+static persistent_web_settings_t s_web = {.audio_info = true};
+
+void persistent_settings_get_web(persistent_web_settings_t *output) {
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    *output = s_web;
+    xSemaphoreGive(s_lock);
+}
+
+esp_err_t persistent_settings_update_web(const persistent_web_settings_t *settings) {
+    if (!settings || settings->softap_delay_min > 30U)
+        return ESP_ERR_INVALID_ARG;
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    s_web = *settings;
+    xSemaphoreGive(s_lock);
+    return ESP_OK;
+}
 
 static uint32_t checksum_bytes(const void *data, size_t length) {
     const uint8_t *bytes = (const uint8_t *)data;
@@ -86,6 +102,11 @@ esp_err_t persistent_settings_init(void) {
     if (result != ESP_OK) return result;
     settings_blob_t blob;
     size_t size = sizeof(blob);
+    uint8_t audio_info = 1, ap_delay = 0;
+    (void)nvs_get_u8(handle, "audioinfo", &audio_info);
+    (void)nvs_get_u8(handle, "apdelay", &ap_delay);
+    s_web.audio_info = audio_info != 0;
+    s_web.softap_delay_min = ap_delay <= 30U ? ap_delay : 0U;
     result = nvs_get_blob(handle, SETTINGS_KEY, &blob, &size);
     nvs_close(handle);
     if (result == ESP_ERR_NVS_NOT_FOUND) {
@@ -129,12 +150,14 @@ esp_err_t persistent_settings_save(const persistent_settings_t *settings) {
     esp_err_t result = nvs_open(SETTINGS_NAMESPACE, NVS_READWRITE, &handle);
     if (result != ESP_OK) return result;
     result = nvs_set_blob(handle, SETTINGS_KEY, &blob, sizeof(blob));
+    persistent_web_settings_t web;
+    persistent_settings_get_web(&web);
+    if (result == ESP_OK) result = nvs_set_u8(handle, "audioinfo", web.audio_info);
+    if (result == ESP_OK) result = nvs_set_u8(handle, "apdelay", web.softap_delay_min);
     if (result == ESP_OK) result = nvs_commit(handle);
     nvs_close(handle);
     if (result != ESP_OK) return result;
-    xSemaphoreTake(s_lock, portMAX_DELAY);
-    s_settings = *settings;
-    xSemaphoreGive(s_lock);
+    /* Never overwrite newer runtime values with the older flash snapshot. */
     return ESP_OK;
 }
 

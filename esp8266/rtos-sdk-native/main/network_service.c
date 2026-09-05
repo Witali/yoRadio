@@ -12,6 +12,7 @@
 #include "freertos/task.h"
 #include "lwip/inet.h"
 #include "native_state.h"
+#include "persistent_settings.h"
 #include "tcpip_adapter.h"
 #include "time_service.h"
 
@@ -209,7 +210,20 @@ static void supervisor_task(void *argument) {
 
 void network_service_poll(void) {
     static TickType_t next_update;
+    static TickType_t ap_since;
     TickType_t now = xTaskGetTickCount();
+    if (s_access_point && !s_connected) {
+        if (!ap_since) ap_since = now;
+        persistent_web_settings_t web;
+        persistent_settings_get_web(&web);
+        if (web.softap_delay_min && now - ap_since >=
+                pdMS_TO_TICKS((uint32_t)web.softap_delay_min * 60000U)) {
+            ESP_LOGW(TAG, "Reboot after configured recovery AP delay");
+            esp_restart();
+        }
+    } else {
+        ap_since = 0;
+    }
     if (!s_connected || (int32_t)(now - next_update) < 0) return;
     wifi_ap_record_t access_point;
     if (esp_wifi_sta_get_ap_info(&access_point) == ESP_OK)

@@ -163,7 +163,7 @@ test("ESP8266 lets successful close-framed responses drain before cleanup", () =
   assert.match(prepare, /httpd_resp_set_hdr\(request, "Connection", "close"\)/);
   assert.doesNotMatch(prepare, /TCP_NODELAY|setsockopt/);
   assert.match(staticResponses, /prepare_short_response\(request\)/);
-  assert.match(finish, /if \(result != ESP_OK\)[\s\S]*httpd_sess_trigger_close/);
+  assert.match(finish, /if \(result == ESP_OK\)[\s\S]*SHUT_WR[\s\S]*else[\s\S]*httpd_sess_trigger_close/);
   assert.match(finish, /httpd_req_to_sockfd\(request\)/);
 });
 

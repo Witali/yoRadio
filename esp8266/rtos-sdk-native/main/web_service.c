@@ -232,6 +232,8 @@ static bool format_status(const native_state_t *status, char *output,
     format_stream(status, stream, sizeof(stream));
     persistent_settings_t settings;
     persistent_settings_get(&settings);
+    persistent_web_settings_t web;
+    persistent_settings_get_web(&web);
     json_writer_t writer;
     json_writer_init(&writer, output, capacity);
     json_writer_raw(&writer,
@@ -249,7 +251,7 @@ static bool format_status(const native_state_t *status, char *output,
         "{\"id\":\"bitrate\",\"value\":%lu},"
         "{\"id\":\"fmt\",\"value\":\"",
         status->volume, settings.balance, status->wifi_rssi,
-        status->playing ? status->buffer_percent : 0U,
+        status->playing && web.audio_info ? status->buffer_percent : 0U,
         (unsigned long)status->bitrate_kbps);
     json_writer_escaped(&writer, stream);
     json_writer_format(
@@ -362,28 +364,41 @@ static esp_err_t send_active_settings(httpd_req_t *request) {
     }
     esp_err_t result = ws_send(
         request,
-        "{\"act\":[\"group_wifi\",\"group_system\",\"group_display\","
-        "\"group_oled\",\"group_timezone\",\"group_controls\","
-        "\"group_encoder\",\"group_wortc\"]}");
+        "{\"act\":[\"group_wifi\",\"group_system\","
+#if CONFIG_YORADIO_OLED
+        "\"group_display\",\"group_oled\","
+#endif
+#if BOARD_ENCODER_A_GPIO >= 0 && BOARD_ENCODER_B_GPIO >= 0
+        "\"group_encoder\","
+#endif
+        "\"group_timezone\",\"group_controls\",\"group_wortc\"]}");
     if (result != ESP_OK) return result;
+#if !CONFIG_YORADIO_OLED
+    if ((result = ws_send(request, "{\"nativeAppearance\":true}")) != ESP_OK)
+        return result;
+#endif
     return ws_send(request,
                    "{\"hide\":[\"telnet\",\"skipup\",\"mdnsnamerow\","
-                   "\"radiolink\",\"group_weather\",\"group_buffer\"]}");
+                   "\"radiolink\",\"group_weather\",\"group_buffer\","
+                   "\"watchdog\",\"dspon\",\"con\",\"scrpe\",\"scrpt\",\"scrpb\"]}");
 }
 
 static esp_err_t send_system_settings(httpd_req_t *request) {
     persistent_settings_t settings;
     persistent_settings_get(&settings);
+    persistent_web_settings_t web;
+    persistent_settings_get_web(&web);
     native_state_t state;
     native_state_snapshot(&state);
     char body[420];
     snprintf(body, sizeof(body),
-             "{\"sst\":%u,\"aif\":1,\"vu\":0,\"softr\":0,\"vut\":0,"
+             "{\"sst\":%u,\"aif\":%u,\"vu\":0,\"softr\":%u,\"vut\":0,"
              "\"mdns\":\"%s\",\"ipaddr\":\"%s\",\"abuff\":0,"
              "\"abuffmax\":0,\"mp3decoder\":0,\"normalize\":%u,"
              "\"normgain\":%u,\"normtarget\":%d,\"normtime\":%u,"
              "\"telnet\":0,\"watchdog\":0}",
-             settings.smart_start, settings.mdns_name,
+             settings.smart_start, web.audio_info ? 1U : 0U,
+             web.softap_delay_min, settings.mdns_name,
              state.ip[0] ? state.ip : "0.0.0.0",
              settings.normalization_enabled ? 1U : 0U,
              settings.normalization_max_gain_db,
@@ -476,6 +491,17 @@ static void handle_command(httpd_req_t *request, char *command) {
                 "\"wkey\":\"\",\"wint\":60}");
     } else if (strcmp(command, "getcontrols") == 0) {
         send_control_settings(request);
+    } else if (strcmp(command, "audioinfo") == 0 ||
+               strcmp(command, "softap") == 0) {
+        persistent_web_settings_t web;
+        persistent_settings_get_web(&web);
+        if (strcmp(command, "audioinfo") == 0)
+            web.audio_info = parse_unsigned(value, 1U) != 0;
+        else web.softap_delay_min = (uint8_t)parse_unsigned(value, 30U);
+        if (persistent_settings_update_web(&web) == ESP_OK) {
+            radio_control_settings_changed();
+            ws_send(request, "{\"accepted\":true}");
+        } else ws_send(request, "{\"commandError\":\"Invalid settings\"}");
     } else if (strcmp(command, "play") == 0) {
         radio_control_play((uint16_t)strtoul(value, NULL, 10));
     } else if (strcmp(command, "stop") == 0) {
@@ -570,7 +596,14 @@ static void handle_command(httpd_req_t *request, char *command) {
         } else {
             changed = false;
         }
-        if (changed) update_settings(&settings, reload_audio);
+        if (changed) {
+            ws_send(request, update_settings(&settings, reload_audio)
+                ? "{\"accepted\":true}"
+                : "{\"commandError\":\"Settings rejected\"}");
+        } else if (strcmp(command, "submitplaylist") != 0 &&
+                   strcmp(command, "submitplaylistdone") != 0) {
+            ws_send(request, "{\"commandError\":\"Unsupported command in this build\"}");
+        }
     }
 }
 
