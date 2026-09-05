@@ -8,6 +8,29 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('Wi-Fi readback preserves edge spaces and ignores excess credential rows', () => {
+  const source = zlib.gunzipSync(fs.readFileSync(path.join(root, 'yoRadio/data/www/script.js.gz'))).toString();
+  const fn = source.slice(source.indexOf('function handleWiFiData'), source.indexOf('function getWiFi'));
+  const elements = {ssid0:{value:''}, pass0:{attr:(key, value)=>elements.password=value}};
+  const context = {getId:id=>elements[id]};
+  vm.runInNewContext(fn, context);
+  context.handleWiFiData(' SSID \t password \r\nextra\tunused\n');
+  assert.equal(elements.ssid0.value, ' SSID ');
+  assert.equal(elements.password, ' password ');
+});
+
+test('uploads stream to a temporary file, whitelist destinations and reject disconnected bodies', () => {
+  const source = read(main+'web_upload.c');
+  assert.doesNotMatch(source, /\bmalloc\b|\bcalloc\b/);
+  assert.match(source, /mp_feed\(&parser, s_receive/);
+  assert.match(source, /playlist_service_validate\(UPLOAD_TEMP\)/);
+  assert.match(source, /file_replace\(UPLOAD_TEMP, u->destination\)/);
+  assert.match(source, /if \(!found\) return false/);
+  assert.match(source, /mp_complete\(&parser\)/);
+  const parser = read('esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_parse.c');
+  assert.match(parser, /while \(ra->remaining_len\)[\s\S]*if \(ret <= 0\)/);
+});
+
 test('SNTP reconfiguration uses its lwIP task and a reusable nonblocking message', () => {
   const source = read(main+'time_service.c');
   assert.match(source, /if \(sntp_enabled\(\)\) sntp_stop\(\)/);

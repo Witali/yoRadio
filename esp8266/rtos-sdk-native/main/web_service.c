@@ -21,6 +21,8 @@
 #include "radio_control.h"
 #include "time_service.h"
 #include "web_pages_bridge.h"
+#include "web_upload.h"
+#include "file_replace.h"
 
 #define WS_HEARTBEAT_MS 2000U
 #define WS_COMMAND_MAX 255U
@@ -707,7 +709,8 @@ static const char *asset_type(const char *uri) {
 
 static esp_err_t page_handler(httpd_req_t *request) {
     prepare_short_response(request);
-    if (request_path_equals(request, "/") && !web_ui_available()) {
+    if (request_path_equals(request, "/webboard") ||
+        (request_path_equals(request, "/") && !web_ui_available())) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
         return finish_short_response(
@@ -730,8 +733,7 @@ static esp_err_t variables_handler(httpd_req_t *request) {
              "var formAction='%s';\n"
              "var playMode='%s';\n"
              "var equalizerEnabled=false;\n",
-             state.network_mode == NETWORK_CLIENT && web_ui_available()
-                 ? "webboard" : "",
+             "",
              state.network_mode == NETWORK_CLIENT ? "player" : "ap");
     httpd_resp_set_type(request, "application/javascript; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
@@ -740,7 +742,8 @@ static esp_err_t variables_handler(httpd_req_t *request) {
 
 static esp_err_t asset_handler(httpd_req_t *request) {
     prepare_short_response(request);
-    if (request_path_equals(request, "/script.js")) {
+    if (request_path_equals(request, "/script.js") &&
+        !file_exists("/spiffs/www/script.js.gz")) {
         httpd_resp_set_type(request, "application/javascript; charset=utf-8");
         httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
         httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
@@ -843,6 +846,25 @@ static esp_err_t favicon_handler(httpd_req_t *request) {
     return finish_short_response(request, httpd_resp_send(request, NULL, 0));
 }
 
+static esp_err_t wifi_file_handler(httpd_req_t *request) {
+    prepare_short_response(request);
+    httpd_resp_set_type(request, "text/csv; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    FILE *file = fopen("/spiffs/data/wifi.csv", "rb");
+    esp_err_t result = ESP_OK;
+    if (file) {
+        size_t n;
+        while ((n = fread(s_static_scratch, 1, sizeof(s_static_scratch), file))) {
+            result = httpd_resp_send_chunk(request, s_static_scratch, n);
+            if (result != ESP_OK) break;
+        }
+        if (ferror(file)) result = ESP_FAIL;
+        fclose(file);
+    }
+    if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
+    return finish_short_response(request, result);
+}
+
 static esp_err_t serve_static_request(httpd_req_t *request) {
     if (request_path_equals(request, "/") ||
         request_path_equals(request, "/index.html") ||
@@ -881,7 +903,7 @@ esp_err_t web_service_start(void) {
     config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
     config.backlog_conn = WEB_CONNECTION_BACKLOG;
     config.recv_wait_timeout = WEB_IDLE_TIMEOUT_SECONDS;
-    config.max_uri_handlers = 18;
+    config.max_uri_handlers = 26;
     /* Two WebSockets plus two short HTTP connections. The shared ESP8266
      * loader serializes each tab's static requests. */
     config.lru_purge_enable = true;
@@ -903,6 +925,15 @@ esp_err_t web_service_start(void) {
     for (unsigned index = 0; index < sizeof(assets) / sizeof(assets[0]); ++index) {
         if ((result = register_get(assets[index], static_handler)) != ESP_OK)
             return result;
+    }
+    if ((result = register_get("/webboard", page_handler)) != ESP_OK) return result;
+    if ((result = register_get("/updform.html", asset_handler)) != ESP_OK) return result;
+    if ((result = register_get("/data/wifi.csv", wifi_file_handler)) != ESP_OK) return result;
+    static const char *posts[] = {"/upload", "/webboard", "/"};
+    for (unsigned i = 0; i < sizeof(posts)/sizeof(posts[0]); ++i) {
+        httpd_uri_t post = {.uri = posts[i], .method = HTTP_POST,
+                            .handler = web_upload_handler};
+        if ((result = httpd_register_uri_handler(s_server, &post)) != ESP_OK) return result;
     }
     if ((result = register_get("/variables.js", static_handler)) != ESP_OK)
         return result;
@@ -985,6 +1016,7 @@ static void poll_work(void *argument) {
 }
 
 void web_service_poll(void) {
+    web_upload_poll();
     if (!s_server || s_poll_queued) return;
     s_poll_queued = true;
     if (httpd_queue_work(s_server, poll_work, NULL) != ESP_OK)

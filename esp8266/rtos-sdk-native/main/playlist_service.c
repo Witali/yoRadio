@@ -9,6 +9,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
+#include "file_replace.h"
 
 #define INDEX_MAGIC 0x58444959UL
 #define INDEX_VERSION 2U
@@ -26,6 +27,31 @@ static SemaphoreHandle_t s_lock;
 static uint16_t s_count;
 /* 144-byte name + tab + 512-byte URL + tab/gain/newline. */
 static char s_line[672];
+
+bool playlist_service_validate(const char *path) {
+    if (!s_lock) return false;
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    FILE *file = fopen(path, "rb");
+    bool valid = file != NULL;
+    unsigned supported = 0;
+    while (file && fgets(s_line, sizeof(s_line), file)) {
+        size_t n = strlen(s_line);
+        if (!n || (s_line[n-1] != '\n' && !feof(file))) { valid = false; break; }
+        if (playlist_service_entry_supported(s_line)) ++supported;
+    }
+    if (file) { valid = valid && !ferror(file); fclose(file); }
+    xSemaphoreGive(s_lock);
+    return valid && supported > 0;
+}
+
+static esp_err_t rebuild_locked(void);
+esp_err_t playlist_service_install(const char *temporary) {
+    if (!s_lock) return ESP_ERR_INVALID_STATE;
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    esp_err_t result = file_replace(temporary, PLAYLIST_PATH) ? rebuild_locked() : ESP_FAIL;
+    xSemaphoreGive(s_lock);
+    return result;
+}
 
 static bool has_unsupported_extension(const char *url) {
     static const char *extensions[] = {

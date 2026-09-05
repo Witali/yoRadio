@@ -23,6 +23,8 @@ typedef esp_err_t (*playlist_station_visitor_t)(uint16_t one_based_index,
 
 esp_err_t playlist_service_init(void);
 esp_err_t playlist_service_rebuild(void);
+bool playlist_service_validate(const char *path);
+esp_err_t playlist_service_install(const char *temporary);
 bool playlist_service_entry_supported(char *line);
 uint16_t playlist_service_count(void);
 bool playlist_service_get(uint16_t one_based_index, playlist_station_t *station);

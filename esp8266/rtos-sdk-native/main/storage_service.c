@@ -2,6 +2,8 @@
 
 #include "esp_log.h"
 #include "esp_spiffs.h"
+#include <stdbool.h>
+#include "file_replace.h"
 
 static const char *TAG = "storage";
 
@@ -17,6 +19,17 @@ esp_err_t storage_service_init(void) {
         ESP_LOGE(TAG, "SPIFFS mount failed: %s", esp_err_to_name(result));
         return result;
     }
+    static const char *paths[] = {
+        "/spiffs/data/wifi.csv", "/spiffs/data/playlist.csv",
+        "/spiffs/www/theme.css.gz", "/spiffs/www/style.css.gz",
+        "/spiffs/www/script.js.gz", "/spiffs/www/dragpl.js.gz",
+        "/spiffs/www/player.html.gz", "/spiffs/www/options.html.gz",
+        "/spiffs/www/logo.svg.gz", "/spiffs/www/updform.html.gz",
+        "/spiffs/www/ir.css.gz", "/spiffs/www/ir.js.gz",
+        "/spiffs/www/irrecord.html.gz",
+    };
+    for (unsigned i = 0; i < sizeof(paths)/sizeof(paths[0]); ++i)
+        if (!file_recover(paths[i])) return ESP_FAIL;
     size_t total = 0;
     size_t used = 0;
     result = esp_spiffs_info("spiffs", &total, &used);

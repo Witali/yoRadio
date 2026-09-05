@@ -655,7 +655,7 @@ esp_err_t httpd_req_delete(struct httpd_data *hd)
         char dummy[32];
         int recv_len = MIN(sizeof(dummy) - 1, ra->remaining_len);
         int ret = httpd_req_recv(r, dummy, recv_len);
-        if (ret <  0) {
+        if (ret <= 0) {
             httpd_req_cleanup(r);
             return ESP_FAIL;
         }

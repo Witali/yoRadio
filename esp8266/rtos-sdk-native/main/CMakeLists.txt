@@ -19,6 +19,7 @@ set(YORADIO_SOURCES
 list(APPEND YORADIO_SOURCES
     "web_pages_bridge.cpp"
     "web_service.c")
+list(APPEND YORADIO_SOURCES "web_upload.c")
 option(YORADIO_ESP8266_AUDIO_PROFILE
   "Measure ESP8266 radio decode and output stages" OFF)
 option(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY

@@ -52,7 +52,7 @@ static bool index_credentials(void) {
         if (!tab) continue;
         *tab++ = '\0';
         tab[strcspn(tab, "\r\n")] = '\0';
-        if (!s_wifi_line[0] || strlen(s_wifi_line) >= 32 ||
+        if (!s_wifi_line[0] || strlen(s_wifi_line) > 32 ||
             strlen(tab) >= 64) {
             continue;
         }
@@ -81,7 +81,7 @@ static esp_err_t select_credential(uint8_t index) {
     password[strcspn(password, "\r\n")] = '\0';
     wifi_config_t config;
     memset(&config, 0, sizeof(config));
-    memcpy(config.sta.ssid, s_wifi_line, strlen(s_wifi_line) + 1U);
+    memcpy(config.sta.ssid, s_wifi_line, strlen(s_wifi_line));
     memcpy(config.sta.password, password, strlen(password) + 1U);
     config.sta.threshold.authmode = WIFI_AUTH_OPEN;
     s_credential_index = index;
