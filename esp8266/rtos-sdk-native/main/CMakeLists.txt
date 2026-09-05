@@ -22,6 +22,11 @@ list(APPEND YORADIO_SOURCES
 list(APPEND YORADIO_SOURCES "web_upload.c")
 option(YORADIO_ESP8266_AUDIO_PROFILE
   "Measure ESP8266 radio decode and output stages" OFF)
+set(YORADIO_ESP8266_AUDIO_PROFILE_WINDOW_MS "5000" CACHE STRING
+  "Audio profile report interval; use 30000 to reduce UART interference")
+if(NOT YORADIO_ESP8266_AUDIO_PROFILE_WINDOW_MS MATCHES "^[1-9][0-9]*$")
+  message(FATAL_ERROR "Audio profile window must be a positive integer")
+endif()
 option(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY
   "Discard decoded PCM instead of converting and sending PDM" OFF)
 option(YORADIO_ESP8266_CODEC_RAM_BENCHMARK
@@ -100,6 +105,8 @@ endif()
 if(YORADIO_ESP8266_AUDIO_PROFILE)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_AUDIO_PROFILE=1)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_AUDIO_PROFILE_WINDOW_MS=${YORADIO_ESP8266_AUDIO_PROFILE_WINDOW_MS})
   if(YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE
       YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY=1)

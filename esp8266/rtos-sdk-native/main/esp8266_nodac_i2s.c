@@ -47,6 +47,9 @@ static volatile TaskHandle_t s_waiter;
 static volatile bool s_waiting;
 static uint32_t s_silence_word;
 static volatile uint32_t s_underruns;
+#if YORADIO_ESP8266_AUDIO_PROFILE
+static volatile esp8266_nodac_profile_t s_profile;
+#endif
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
 static const char *TAG = "nodac_i2s";
 static unsigned s_dma_trace_count;
@@ -90,6 +93,20 @@ static void IRAM_ATTR nodac_slc_isr(void *arg) {
         nodac_dma_descriptor_t *finished =
             (nodac_dma_descriptor_t *)SLC0.rx_eof_des_addr;
         nodac_dma_descriptor_t *next = finished->next_link_ptr;
+#if YORADIO_ESP8266_AUDIO_PROFILE
+        ++s_profile.eof_count;
+        if (s_free_count >= NODAC_DMA_BUFFER_COUNT - 1U)
+            ++s_profile.empty_starts;
+        /* Unlike the start-of-buffer warning, this observes a producer
+         * still unfinished when DMA has already completed that buffer.
+         * It is a software lateness measurement, not a GPIO waveform trace. */
+        if (s_current_buffer == finished->buf_ptr &&
+            s_current_position < NODAC_DMA_BUFFER_WORDS) {
+            ++s_profile.incomplete_eof;
+            s_profile.incomplete_words +=
+                NODAC_DMA_BUFFER_WORDS - s_current_position;
+        }
+#endif
         if (s_free_count >= NODAC_DMA_BUFFER_COUNT - 1U ||
             (s_current_buffer == next->buf_ptr &&
              s_current_position < NODAC_DMA_BUFFER_WORDS))
@@ -316,3 +333,14 @@ uint32_t esp8266_nodac_i2s_underruns(void) {
     taskEXIT_CRITICAL();
     return underruns;
 }
+
+#if YORADIO_ESP8266_AUDIO_PROFILE
+void esp8266_nodac_i2s_profile(esp8266_nodac_profile_t *stats) {
+    taskENTER_CRITICAL();
+    stats->eof_count = s_profile.eof_count;
+    stats->empty_starts = s_profile.empty_starts;
+    stats->incomplete_eof = s_profile.incomplete_eof;
+    stats->incomplete_words = s_profile.incomplete_words;
+    taskEXIT_CRITICAL();
+}
+#endif

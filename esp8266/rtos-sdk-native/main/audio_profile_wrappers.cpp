@@ -14,13 +14,17 @@
 #include "lwip/sockets.h"
 #include "mp3_decoder.h"
 #include "native_audio_normalizer.h"
+extern "C" {
 #include "native_audio_output.h"
+#include "esp8266_nodac_i2s.h"
+}
 #if CONFIG_YORADIO_HELIX_AAC
 #include "aac_decoder.h"
 #endif
 
 namespace {
-constexpr int64_t kWindowUs = 5000000;
+constexpr int64_t kWindowUs =
+    int64_t(YORADIO_ESP8266_AUDIO_PROFILE_WINDOW_MS) * 1000;
 
 enum Stage {
     kRecvWait,
@@ -29,6 +33,7 @@ enum Stage {
     kPcmOutput,
     kNormalizer,
     kSpiWait,
+    kPcmGap,
     kStageCount,
 };
 
@@ -60,6 +65,9 @@ int64_t s_spi_wait_started_us;
 uint32_t s_cpu_total;
 uint32_t s_cpu_idle;
 bool s_cpu_baseline_valid;
+int64_t s_previous_pcm_end;
+uint32_t s_underruns_before;
+esp8266_nodac_profile_t s_dma_before;
 const char *kTag = "audio_profile";
 
 extern "C" size_t g_heap_region_num;
@@ -171,6 +179,11 @@ void reset_profile(helix_codec_kind_t kind) {
     s_audio_us = 0;
     s_network_bytes = 0;
     s_frames = 0;
+    s_previous_pcm_end = 0;
+    native_audio_output_spi_stats_t output_stats = {};
+    native_audio_output_get_spi_stats(&output_stats);
+    s_underruns_before = output_stats.queue_empty_events;
+    esp8266_nodac_i2s_profile(&s_dma_before);
     std::snprintf(s_codec, sizeof(s_codec), "%s",
                   kind == HELIX_CODEC_MP3 ? "MP3" : "AAC");
 }
@@ -179,6 +192,12 @@ void maybe_report() {
     int64_t now = esp_timer_get_time();
     if (!s_started_us || now - s_started_us < kWindowUs) return;
     uint64_t wall_us = static_cast<uint64_t>(now - s_started_us);
+    /* Snapshot before logging, and establish the next baseline only after
+     * logging. UART output must not inflate these window counters/gaps. */
+    native_audio_output_spi_stats_t output_stats = {};
+    native_audio_output_get_spi_stats(&output_stats);
+    esp8266_nodac_profile_t dma = {};
+    esp8266_nodac_i2s_profile(&dma);
     uint64_t output_compute = total(kPcmOutput);
     output_compute -= std::min(output_compute, total(kNormalizer));
     output_compute -= std::min(output_compute, total(kSpiWait));
@@ -198,6 +217,15 @@ void maybe_report() {
     log_stage("pcm_output", kPcmOutput, wall_us);
     log_stage("normalize", kNormalizer, wall_us);
     log_stage("output_dma_wait", kSpiWait, wall_us);
+    log_stage("pcm_gap", kPcmGap, wall_us);
+    ESP_LOGI(kTag,
+             "dma eof=%u late_start=%u empty_start=%u incomplete_eof=%u "
+             "incomplete_words=%u",
+             unsigned(dma.eof_count - s_dma_before.eof_count),
+             unsigned(output_stats.queue_empty_events - s_underruns_before),
+             unsigned(dma.empty_starts - s_dma_before.empty_starts),
+             unsigned(dma.incomplete_eof - s_dma_before.incomplete_eof),
+             unsigned(dma.incomplete_words - s_dma_before.incomplete_words));
     unsigned compute_load = percent_x10(output_compute, wall_us);
     ESP_LOGI(kTag, "gain+mix+pdm=%u.%03u ms (%u.%u%%)",
              static_cast<unsigned>(output_compute / 1000ULL),
@@ -307,6 +335,9 @@ extern "C" esp_err_t __wrap_native_audio_output_write(
     int16_t *samples, size_t sample_count, uint32_t sample_rate,
     uint8_t channels) {
     int64_t started = esp_timer_get_time();
+    if (s_previous_pcm_end)
+        record(kPcmGap, static_cast<uint64_t>(
+            std::max<int64_t>(started - s_previous_pcm_end, 0)));
 #if YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY
     (void)samples;
     esp_err_t result = ESP_OK;
@@ -315,6 +346,7 @@ extern "C" esp_err_t __wrap_native_audio_output_write(
         samples, sample_count, sample_rate, channels);
 #endif
     record(kPcmOutput, elapsed_since(started));
+    s_previous_pcm_end = esp_timer_get_time();
     if (sample_rate && channels)
         s_audio_us += static_cast<uint64_t>(sample_count / channels) *
                       1000000ULL / sample_rate;

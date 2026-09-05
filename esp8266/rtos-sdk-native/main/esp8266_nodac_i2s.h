@@ -18,3 +18,13 @@ esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
 void esp8266_nodac_i2s_silence(uint32_t silence_word);
 void esp8266_nodac_i2s_reset_underruns(void);
 uint32_t esp8266_nodac_i2s_underruns(void);
+
+#if YORADIO_ESP8266_AUDIO_PROFILE
+typedef struct {
+    uint32_t eof_count;
+    uint32_t empty_starts;
+    uint32_t incomplete_eof;
+    uint32_t incomplete_words;
+} esp8266_nodac_profile_t;
+void esp8266_nodac_i2s_profile(esp8266_nodac_profile_t *stats);
+#endif

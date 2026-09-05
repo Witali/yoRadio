@@ -1,5 +1,40 @@
 # ESP8266 audio profile tools
 
+## Live-radio DMA starvation diagnosis
+
+Keep the production sdkconfig (including its flash frequency, decoder and
+output mode), and enable only these CMake options:
+
+    -DYORADIO_ESP8266_AUDIO_PROFILE=ON
+    -DYORADIO_ESP8266_AUDIO_PROFILE_WINDOW_MS=30000
+
+Leave the profile URL empty to select the ordinary saved station through
+WebUI. Do not enable decode-only mode. Capture UART TX without sending UART
+commands; GPIO3 remains the audio output. Restore the saved production app
+after the experiment, flashing only the currently running application slot.
+
+The report includes `pcm_gap`: time from the previous PCM output return to
+the next PCM call. This overlaps decoding/network work; do not add it to
+those stages as extra CPU load. All timings are wall time and include task
+preemption. Runtime-counter CPU percentages are not reliable for the SDK's
+direct ISR task-notification path (see `docs/ESP8266_AUDIO_PROFILE.md`).
+
+DMA counters are sampled before reporting and rebased after reporting, so
+UART logging itself is excluded from the counter window. Discard the first
+window after connection when evaluating steady state. Long reporting periods
+reduce, but cannot completely eliminate, profiler interference.
+
+- `late_start`: existing warning that the next buffer is not ready at EOF.
+  It does not prove audible silence if the producer catches up with DMA.
+- `empty_start`: the next free buffer has not been claimed by the producer.
+- `incomplete_eof`: the current producer buffer is still partial when DMA
+  finishes transmitting it; stronger evidence of missed output deadlines.
+- `incomplete_words`: sum of the unwritten tails at those EOFs, not an exact
+  analog silence duration. These are software observations, not a GPIO trace.
+
+The extra ISR counters exist only with the audio profile enabled. Production
+buffer ownership, DMA operation, PDM conversion and decode behavior are unchanged.
+
 These tools generate deterministic MP3/AAC fixtures, serve one fixture at its
 encoded bitrate, capture five-second CPU/heap profile windows from a physical
 ESP8266, and summarize the UART log.
