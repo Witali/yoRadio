@@ -90,7 +90,8 @@ static int8_t s_normalization_target_db;
 static uint16_t s_normalization_time_ms;
 
 #define VOLUME_DENOMINATOR 254U
-#define BALANCE_DENOMINATOR 16U
+/* Signed: negating 16U wraps and clamps neutral balance to -16 (mute). */
+#define BALANCE_DENOMINATOR 16
 #define GAIN_Q15_ONE 32768U
 
 #if !YORADIO_ESP8266_SPI_PDM && !YORADIO_ESP8266_I2S_PDM
@@ -470,9 +471,10 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         s_normalization_enabled, s_normalization_max_gain_db,
         s_normalization_target_db, s_normalization_time_ms, sample_rate);
     native_audio_normalizer_process(samples, frames, channels);
-    uint8_t left_balance = s_balance < 0
+    /* Mono PDM has no independent L/R channels to balance. */
+    uint8_t left_balance = channels == 2 && s_balance < 0
         ? (uint8_t)(BALANCE_DENOMINATOR + s_balance) : BALANCE_DENOMINATOR;
-    uint8_t right_balance = s_balance > 0
+    uint8_t right_balance = channels == 2 && s_balance > 0
         ? (uint8_t)(BALANCE_DENOMINATOR - s_balance) : BALANCE_DENOMINATOR;
     uint32_t left_gain = channel_gain_q15(s_volume, left_balance);
     uint32_t right_gain = channel_gain_q15(s_volume, right_balance);
@@ -710,9 +712,10 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         s_normalization_enabled, s_normalization_max_gain_db,
         s_normalization_target_db, s_normalization_time_ms, sample_rate);
     native_audio_normalizer_process(samples, frames, channels);
-    uint8_t left_balance = s_balance < 0
+    /* Mono PDM has no independent L/R channels to balance. */
+    uint8_t left_balance = channels == 2 && s_balance < 0
         ? (uint8_t)(BALANCE_DENOMINATOR + s_balance) : BALANCE_DENOMINATOR;
-    uint8_t right_balance = s_balance > 0
+    uint8_t right_balance = channels == 2 && s_balance > 0
         ? (uint8_t)(BALANCE_DENOMINATOR - s_balance) : BALANCE_DENOMINATOR;
     uint32_t left_gain = channel_gain_q15(s_volume, left_balance);
     uint32_t right_gain = channel_gain_q15(s_volume, right_balance);
@@ -821,9 +824,10 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         s_normalization_enabled, s_normalization_max_gain_db,
         s_normalization_target_db, s_normalization_time_ms, sample_rate);
     native_audio_normalizer_process(samples, frames, channels);
-    uint8_t left_balance = s_balance < 0
+    /* Balance only applies when the decoder supplies independent L/R. */
+    uint8_t left_balance = channels == 2 && s_balance < 0
         ? (uint8_t)(BALANCE_DENOMINATOR + s_balance) : BALANCE_DENOMINATOR;
-    uint8_t right_balance = s_balance > 0
+    uint8_t right_balance = channels == 2 && s_balance > 0
         ? (uint8_t)(BALANCE_DENOMINATOR - s_balance) : BALANCE_DENOMINATOR;
     uint32_t left_gain = channel_gain_q15(s_volume, left_balance);
     uint32_t right_gain = channel_gain_q15(s_volume, right_balance);
