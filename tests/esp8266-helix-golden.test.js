@@ -47,6 +47,10 @@ function compile(outputDir, name, reference, mp3Sso = false, aacSso = false, opt
     sources[0] = path.join(native, "mp3_reorder_state_test.cpp");
     sources.splice(2, 2); // this harness supplies its own checked allocator
   }
+  if(options.blockUnit) {
+    sources[0] = path.join(native, "mp3_block_state_test.cpp");
+    sources.pop();
+  }
   const defines = ["YORADIO_ESP8266_NATIVE=1"];
   if(reference) defines.push("YORADIO_HELIX_REFERENCE_FIXED_POINT=1");
   if(mp3Sso) defines.push("YORADIO_HELIX_MP3_SSO=1");
@@ -162,6 +166,45 @@ function downmix(stereo) {
     mono.writeInt16LE((stereo.readInt16LE(offset) + stereo.readInt16LE(offset + 2)) >> 1, offset / 2);
   return mono;
 }
+
+test("32-frame MP3 output matches granules and full frames byte for byte", t => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-blocks-"));
+  t.after(() => fs.rmSync(dir, {recursive:true, force:true}));
+  const original = fs.readFileSync(path.join(fixtures, "stereo-320.mp3"));
+  const inputs = [
+    ["noise-320", original],
+    ["modes", mp3Modes(original, i => [0x60,0x00,0x50,0x70,0x80][i % 5])],
+    ...["mpeg1", "mpeg2", "mpeg25", "mono"].map(name => [name,
+      fs.readFileSync(path.join(__dirname, "fixtures", "helix_mono", `${name}.mp3`))]),
+  ];
+  for(const mono of [false, true]) for(const sso of [false, true]) {
+    const binary = compile(dir, `blocks-${mono}-${sso}`, false, sso, false, {mono});
+    if(binary.skip) return t.skip(binary.skip);
+    for(const [name, data] of inputs) {
+      const input = path.join(dir, `${name}.mp3`);
+      fs.writeFileSync(input, data);
+      const reference = decode(binary.executable, "mp3", input, path.join(dir, "frame.pcm"));
+      for(const api of ["mp3-granules", "mp3-blocks"]) {
+        const actual = decode(binary.executable, api, input, path.join(dir, "out.pcm"));
+        assert.equal(actual.summary, reference.summary);
+        assert.deepEqual(actual.pcm, reference.pcm, `${name}, mono=${mono}, SSO=${sso}, ${api}`);
+      }
+    }
+  }
+  t.diagnostic("6 vectors x mono/stereo x exact/SSO: frame, granule and 32-frame PCM identical; canaries intact");
+});
+
+test("32-frame MP3 output handles cancellation, reset and bounded error concealment", t => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-block-state-"));
+  t.after(() => fs.rmSync(dir, {recursive:true, force:true}));
+  for(const mono of [false, true]) {
+    const binary = compile(dir, `state-${mono}`, false, true, false, {mono, blockUnit:true});
+    if(binary.skip) return t.skip(binary.skip);
+    const run = spawnSync(binary.executable, [], {encoding:"utf8"});
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+    t.diagnostic(run.stdout.trim());
+  }
+});
 
 test("shared MP3 reorder scratch is bit-exact against the separate allocation", t => {
   const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-reorder-pcm-"));

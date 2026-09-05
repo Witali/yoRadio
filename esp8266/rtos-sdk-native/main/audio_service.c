@@ -74,6 +74,8 @@ typedef struct {
     uint32_t generation;
     helix_codec_kind_t codec_kind;
     uint32_t decoder_bitrate;
+    uint32_t decoder_sample_rate;
+    uint8_t decoder_channels;
     uint64_t measured_bytes;
     int64_t measured_started_us;
 } output_context_t;
@@ -591,11 +593,19 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
                  esp_err_to_name(result));
         return false;
     }
-    context->decoder_bitrate = info->bitrate;
-    native_state_set_stream(context->codec_kind == HELIX_CODEC_MP3
+    /* A synthesis callback is now only 32 frames. Publish the first format
+     * and actual changes, not the same state/lock work 18 times per granule. */
+    if (context->decoder_bitrate != info->bitrate ||
+        context->decoder_sample_rate != info->sample_rate ||
+        context->decoder_channels != info->channels) {
+        context->decoder_bitrate = info->bitrate;
+        context->decoder_sample_rate = info->sample_rate;
+        context->decoder_channels = info->channels;
+        native_state_set_stream(context->codec_kind == HELIX_CODEC_MP3
                                 ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
                             (info->bitrate + 500U) / 1000U,
                             info->sample_rate, info->channels);
+    }
     return true;
 }
 

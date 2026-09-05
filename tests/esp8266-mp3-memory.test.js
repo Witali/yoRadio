@@ -35,12 +35,13 @@ test("ESP8266 channel choice defaults to mono and retains an explicit stereo pro
   assert.match(decoderHeader, /#ifndef YORADIO_HELIX_MP3_MONO\s+#define YORADIO_HELIX_MP3_MONO 0/);
 });
 
-test("ESP8266 MP3 streams one granule through a half-size PCM buffer", () => {
+test("ESP8266 Helix MP3 streams 32 frames while libmad retains granule PCM", () => {
   assert.match(bridge, /constexpr size_t kMp3PcmSamples = 576U \* \(CONFIG_YORADIO_AUDIO_MONO \? 1U : 2U\)/);
+  assert.match(bridge, /kMp3PcmSamples = MP3_PCM_BLOCK_FRAMES \*/);
   assert.doesNotMatch(bridge, /kMp3PcmSamples = 1152U \* 2U/);
   assert.match(
     bridge,
-    /MP3DecodeGranules\(input, &left, codec->pcm, 0,[\s\S]*emit_mp3_granule/,
+    /MP3DecodeBlocks\(input, &left, codec->pcm,[\s\S]*emit_mp3_block/,
   );
   assert.match(
     bridge,
@@ -76,12 +77,17 @@ test("ESP8266 granule API preserves the conventional full-frame API", () => {
   );
   assert.match(
     decoder,
-    /Subband\(granuleOut\)[\s\S]*callback\(context, granuleOut,[\s\S]*m_MP3DecInfo->nGranSamps/,
+    /Subband\(granuleOut\)[\s\S]*!streamBlocks && !callback\(context, granuleOut,[\s\S]*m_MP3DecInfo->nGranSamps/,
   );
   assert.match(
     decoder,
     /int MP3Decode\([\s\S]*MP3DecodeInternal\(inbuf, bytesLeft, outbuf, useSize/,
   );
+});
+
+test("32-frame callbacks publish stream format only on change", () => {
+  assert.match(audioService, /context->decoder_bitrate != info->bitrate \|\|[\s\S]*context->decoder_sample_rate != info->sample_rate \|\|[\s\S]*context->decoder_channels != info->channels[\s\S]*native_state_set_stream/);
+  assert.match(decoder, /m_OutputBufferSamples = required;[\s\S]*context, true\);[\s\S]*m_OutputBufferSamples = 0/);
 });
 
 test("ESP8266 error concealment cannot overrun the granule PCM buffer", () => {

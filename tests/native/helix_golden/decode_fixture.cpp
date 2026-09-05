@@ -26,18 +26,30 @@ bool write_pcm(std::ofstream &output, const short *pcm, int samples) {
 struct GranuleOutput {
     std::ofstream *output;
     int samples;
+    bool blocks;
+    int calls;
 };
 
 bool emit_granule(void *context, short *pcm, int samples) {
     GranuleOutput *sink = static_cast<GranuleOutput *>(context);
     if (samples <= 0 || samples > (YORADIO_HELIX_MP3_MONO ? 576 : 1152)) return false;
+    if (sink->blocks && samples != 32 && samples != 64) return false;
     sink->samples += samples;
-    return write_pcm(*sink->output, pcm, samples);
+    ++sink->calls;
+    const bool result = write_pcm(*sink->output, pcm, samples);
+    /* The real sink changes PCM in place. The next synthesis block must
+     * neither reuse these values nor depend on a previous output block. */
+    if (sink->blocks) for (int i = 0; i < samples; ++i) pcm[i] = -12345;
+    return result;
 }
 
-int decode_mp3(std::vector<unsigned char> &input, std::ofstream &output, bool granules = false) {
+int decode_mp3(std::vector<unsigned char> &input, std::ofstream &output,
+               bool granules = false, bool blocks = false) {
     if (!MP3Decoder_AllocateBuffers()) return 10;
-    short pcm[4096] = {};
+    const int capacity = blocks ? 32 * (YORADIO_HELIX_MP3_MONO ? 1 : 2)
+        : granules ? (YORADIO_HELIX_MP3_MONO ? 576 : 1152) : 4096;
+    std::vector<short> guarded(static_cast<size_t>(capacity) + 2U, 12345);
+    short *pcm = guarded.data() + 1;
     size_t cursor = 0;
     size_t frames = 0;
     size_t samples = 0;
@@ -49,13 +61,13 @@ int decode_mp3(std::vector<unsigned char> &input, std::ofstream &output, bool gr
         cursor += static_cast<size_t>(sync);
         available = static_cast<int>(input.size() - cursor);
         int left = available;
-        GranuleOutput sink = {&output, 0};
-        const int capacity = YORADIO_HELIX_MP3_MONO ? 576 : 1152;
-        pcm[capacity] = 12345;
-        int result = granules
+        GranuleOutput sink = {&output, 0, blocks, 0};
+        int result = blocks
+            ? MP3DecodeBlocks(input.data() + cursor, &left, pcm, capacity, 0, emit_granule, &sink)
+            : granules
             ? MP3DecodeGranules(input.data() + cursor, &left, pcm, 0, emit_granule, &sink)
             : MP3Decode(input.data() + cursor, &left, pcm, 0);
-        if (granules && pcm[capacity] != 12345) return 14;
+        if (guarded.front() != 12345 || guarded.back() != 12345) return 14;
         int consumed = available - left;
         if (consumed <= 0) {
             ++cursor;
@@ -70,8 +82,9 @@ int decode_mp3(std::vector<unsigned char> &input, std::ofstream &output, bool gr
             return 11;
         }
         int frame_samples = MP3GetOutputSamps();
-        if ((granules && sink.samples != frame_samples) ||
-            (!granules && !write_pcm(output, pcm, frame_samples))) {
+        if (((granules || blocks) && sink.samples != frame_samples) ||
+            (blocks && sink.calls != (MP3GetSampRate() >= 32000 ? 36 : 18)) ||
+            (!granules && !blocks && !write_pcm(output, pcm, frame_samples))) {
             MP3Decoder_FreeBuffers();
             return 12;
         }
@@ -149,6 +162,7 @@ int main(int argc, char **argv) {
     const std::string codec = argv[1];
     if (codec == "mp3") return decode_mp3(input, output);
     if (codec == "mp3-granules") return decode_mp3(input, output, true);
+    if (codec == "mp3-blocks") return decode_mp3(input, output, false, true);
     if (codec == "aac") return decode_aac(input, output);
     return 6;
 }

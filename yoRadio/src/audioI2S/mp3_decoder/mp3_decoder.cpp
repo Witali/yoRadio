@@ -76,6 +76,12 @@ MP3DecInfo_t *m_MP3DecInfo;
 static int m_OutputBufferSamples;
 #endif
 
+static int SubbandInternal(short *pcmBuf
+#if defined(YORADIO_ESP8266_NATIVE)
+                           , MP3GranuleCallback callback, void *context
+#endif
+                           );
+
 static int MP3OutputChannels() {
     return YORADIO_HELIX_MP3_MONO ? 1 : m_MP3DecInfo->nChans;
 }
@@ -1399,7 +1405,8 @@ void MP3ClearBadFrame( short *outbuf) {
 static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
                              short *outbuf, int useSize
 #if defined(YORADIO_ESP8266_NATIVE)
-                             , MP3GranuleCallback callback, void *context
+                             , MP3GranuleCallback callback, void *context,
+                             bool streamBlocks
 #endif
                              ) {
     int offset, bitOffset, mainBits, gr, ch, fhBytes, siBytes, freeFrameBytes;
@@ -1579,15 +1586,19 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
 #endif
             granuleOut += gr * m_MP3DecInfo->nGranSamps *
                           MP3OutputChannels();
-        HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS);
-        int subbandResult = Subband(granuleOut);
-        HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS);
+        int subbandResult;
+#if defined(YORADIO_ESP8266_NATIVE)
+        if (streamBlocks)
+            subbandResult = SubbandInternal(granuleOut, callback, context);
+        else
+#endif
+            subbandResult = Subband(granuleOut);
         if (subbandResult < 0) {
             MP3ClearBadFrame(outbuf);
             return ERR_MP3_INVALID_SUBBAND;
         }
 #if defined(YORADIO_ESP8266_NATIVE)
-        if (callback && !callback(context, granuleOut,
+        if (callback && !streamBlocks && !callback(context, granuleOut,
                                   m_MP3DecInfo->nGranSamps *
                                   MP3OutputChannels()))
             return ERR_UNKNOWN;
@@ -1602,7 +1613,7 @@ int MP3Decode(unsigned char *inbuf, int *bytesLeft, short *outbuf,
 #if defined(YORADIO_ESP8266_NATIVE)
     m_OutputBufferSamples = 0;
     return MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize, nullptr,
-                             nullptr);
+                             nullptr, false);
 #else
     return MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize);
 #endif
@@ -1614,7 +1625,22 @@ int MP3DecodeGranules(unsigned char *inbuf, int *bytesLeft, short *outbuf,
                       void *context) {
     m_OutputBufferSamples = (YORADIO_HELIX_MP3_MONO ? 1 : m_MAX_NCHAN) * m_MAX_NSAMP;
     int result = MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize,
-                                   callback, context);
+                                   callback, context, false);
+    m_OutputBufferSamples = 0;
+    return result;
+}
+
+int MP3DecodeBlocks(unsigned char *inbuf, int *bytesLeft, short *outbuf,
+                    int outCapacity, int useSize, MP3GranuleCallback callback,
+                    void *context) {
+    const int required = MP3_PCM_BLOCK_FRAMES *
+                         (YORADIO_HELIX_MP3_MONO ? 1 : m_MAX_NCHAN);
+    if (!inbuf || !bytesLeft || !outbuf || !callback || outCapacity < required)
+        return ERR_UNKNOWN;
+    /* Bound every error-concealment path, including reservoir underflow. */
+    m_OutputBufferSamples = required;
+    int result = MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize,
+                                   callback, context, true);
     m_OutputBufferSamples = 0;
     return result;
 }
@@ -3643,11 +3669,16 @@ int IMDCT( int gr, int ch) {
  *
  * Return:      0 on success,  -1 if null input pointers
  **********************************************************************************************************************/
-int Subband( short *pcmBuf) {
+static int SubbandInternal(short *pcmBuf
+#if defined(YORADIO_ESP8266_NATIVE)
+                           , MP3GranuleCallback callback, void *context
+#endif
+                           ) {
     int b;
     if (MP3OutputChannels() == 2) {
         /* stereo */
         for (b = 0; b < m_BLOCK_SIZE; b++) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS);
             HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_DCT);
             FDCT32(m_IMDCTInfo->outBuf[0][b], m_SubbandInfo->vbuf + 0 * 32, m_SubbandInfo->vindex,
                     (b & 0x01), m_IMDCTInfo->gb[0]);
@@ -3660,11 +3691,18 @@ int Subband( short *pcmBuf) {
                     polyCoef);
             HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             m_SubbandInfo->vindex = (m_SubbandInfo->vindex - (b & 0x01)) & 7;
-            pcmBuf += (2 * m_NBANDS);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS);
+#if defined(YORADIO_ESP8266_NATIVE)
+            if (callback) {
+                if (!callback(context, pcmBuf, 2 * m_NBANDS)) return -1;
+            } else
+#endif
+                pcmBuf += (2 * m_NBANDS);
         }
     } else {
         /* mono */
         for (b = 0; b < m_BLOCK_SIZE; b++) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS);
             HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_DCT);
             FDCT32(m_IMDCTInfo->outBuf[0][b], m_SubbandInfo->vbuf + 0 * 32, m_SubbandInfo->vindex,
                     (b & 0x01), m_IMDCTInfo->gb[0]);
@@ -3675,7 +3713,13 @@ int Subband( short *pcmBuf) {
                     polyCoef);
             HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             m_SubbandInfo->vindex = (m_SubbandInfo->vindex - (b & 0x01)) & 7;
-            pcmBuf += m_NBANDS;
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS);
+#if defined(YORADIO_ESP8266_NATIVE)
+            if (callback) {
+                if (!callback(context, pcmBuf, m_NBANDS)) return -1;
+            } else
+#endif
+                pcmBuf += m_NBANDS;
         }
     }
 
@@ -3685,6 +3729,14 @@ int Subband( short *pcmBuf) {
 /***********************************************************************************************************************
  * D C T 3 2
  **********************************************************************************************************************/
+
+int Subband(short *pcmBuf) {
+    return SubbandInternal(pcmBuf
+#if defined(YORADIO_ESP8266_NATIVE)
+                            , nullptr, nullptr
+#endif
+                            );
+}
 
 /***********************************************************************************************************************
  * Function:    FDCT32

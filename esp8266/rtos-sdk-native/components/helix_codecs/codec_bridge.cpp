@@ -51,11 +51,16 @@ constexpr size_t kInputStorageBytes = kInputBytes + MAD_BUFFER_GUARD;
 #else
 constexpr size_t kInputStorageBytes = kInputBytes;
 #endif
-/* Helix MP3 emits at most one 576-sample stereo granule per callback. AAC
+/* Helix MP3 reuses one 32-frame synthesis block per callback. AAC
  * writes a complete 1024-sample stereo frame. Allocate the active codec's
  * exact PCM size: reserving AAC's larger buffer while playing MP3 starved
  * lwIP on the ESP8266. */
+#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
 constexpr size_t kMp3PcmSamples = 576U * (CONFIG_YORADIO_AUDIO_MONO ? 1U : 2U);
+#else
+constexpr size_t kMp3PcmSamples = MP3_PCM_BLOCK_FRAMES *
+                                (CONFIG_YORADIO_AUDIO_MONO ? 1U : 2U);
+#endif
 #if CONFIG_YORADIO_HELIX_AAC
 constexpr size_t kAacPcmSamples = 1024U * 2U;
 constexpr size_t kMaxPcmSamples = kAacPcmSamples;
@@ -264,15 +269,15 @@ static void compact(helix_codec *codec) {
 }
 
 #if !CONFIG_YORADIO_MP3_DECODER_LIBMAD
-struct Mp3GranuleOutput {
+struct Mp3BlockOutput {
     helix_pcm_callback_t callback;
     void *context;
     helix_stream_info_t info;
     bool failed;
 };
 
-static bool emit_mp3_granule(void *opaque, short *pcm, int samples) {
-    Mp3GranuleOutput *output = static_cast<Mp3GranuleOutput *>(opaque);
+static bool emit_mp3_block(void *opaque, short *pcm, int samples) {
+    Mp3BlockOutput *output = static_cast<Mp3BlockOutput *>(opaque);
     if (samples <= 0 ||
         static_cast<size_t>(samples) > kMp3PcmSamples) {
         output->failed = true;
@@ -354,15 +359,16 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
         }
 #else
         int left = static_cast<int>(parsed.frame_size);
-        Mp3GranuleOutput output = {
+        Mp3BlockOutput output = {
             callback,
             context,
             {parsed.sample_rate, parsed.bitrate,
              static_cast<uint8_t>(CONFIG_YORADIO_AUDIO_MONO ? 1 : parsed.channels), 16},
             false,
         };
-        int result = MP3DecodeGranules(input, &left, codec->pcm, 0,
-                                       emit_mp3_granule, &output);
+        int result = MP3DecodeBlocks(input, &left, codec->pcm,
+                                     static_cast<int>(codec->pcm_samples), 0,
+                                     emit_mp3_block, &output);
 #endif
 #if YORADIO_ESP8266_AUDIO_PROFILE
         audio_profile_decode_end();
