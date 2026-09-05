@@ -49,6 +49,7 @@ _Static_assert(NODAC_DMA_BUFFER_BYTES <= 4095U, "12-bit DMA descriptor length");
 static nodac_buffer_state_t s_state;
 static uint32_t *volatile s_current_buffer;
 static volatile size_t s_current_position;
+static size_t s_reserved_words; /* producer-only; no ISR accesses */
 static volatile TaskHandle_t s_waiter;
 static volatile bool s_waiting;
 static uint32_t s_silence_word;
@@ -141,6 +142,7 @@ static void configure_descriptors(uint32_t silence_word) {
     nodac_state_init(&s_state);
     s_current_buffer = NULL;
     s_current_position = 0;
+    s_reserved_words = 0;
     s_waiter = NULL;
     s_waiting = false;
     s_underruns = 0;
@@ -279,33 +281,37 @@ static bool acquire_free_buffer(TickType_t ticks_to_wait) {
     }
 }
 
-esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
-                                  TickType_t ticks_to_wait) {
-    if (!words && word_count) return ESP_ERR_INVALID_ARG;
-    const TickType_t started = xTaskGetTickCount();
-    while (word_count) {
-        if (!s_current_buffer) {
-            TickType_t elapsed = xTaskGetTickCount() - started;
-            TickType_t remaining = elapsed < ticks_to_wait
-                ? ticks_to_wait - elapsed : 0;
-            if (!acquire_free_buffer(remaining)) return ESP_ERR_TIMEOUT;
-        }
-        size_t available = NODAC_DMA_BUFFER_WORDS - s_current_position;
-        size_t count = word_count < available ? word_count : available;
-        memcpy(s_current_buffer + s_current_position, words,
-               count * sizeof(*words));
+esp_err_t esp8266_nodac_i2s_reserve(uint32_t **words, size_t *capacity,
+                                    TickType_t ticks_to_wait) {
+    if (!words || !capacity) return ESP_ERR_INVALID_ARG;
+    *words = NULL;
+    *capacity = 0;
+    if (s_reserved_words) return ESP_ERR_INVALID_STATE;
+    if (!s_current_buffer && !acquire_free_buffer(ticks_to_wait))
+        return ESP_ERR_TIMEOUT;
+    s_reserved_words = NODAC_DMA_BUFFER_WORDS - s_current_position;
+    *words = s_current_buffer + s_current_position;
+    *capacity = s_reserved_words;
+    return ESP_OK;
+}
+
+esp_err_t esp8266_nodac_i2s_commit(size_t count) {
+    if (!s_current_buffer || !s_reserved_words) return ESP_ERR_INVALID_STATE;
+    if (count > s_reserved_words) return ESP_ERR_INVALID_ARG;
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
-        if (s_dma_trace_count < 4U && count) {
-            const uint32_t *copied =
-                s_current_buffer + s_current_position;
-            unsigned ones = 0;
-            uint32_t hash = 2166136261U;
-            for (size_t index = 0; index < count; ++index) {
-                ones += trace_popcount32(copied[index]);
-                hash = (hash ^ copied[index]) * 16777619U;
-            }
+    if (s_dma_trace_count < 4U && count) {
+        const uint32_t *copied = s_current_buffer + s_current_position;
+        unsigned ones = 0;
+        uint32_t hash = 2166136261U;
+        bool non_neutral = false;
+        for (size_t index = 0; index < count; ++index) {
+            ones += trace_popcount32(copied[index]);
+            hash = (hash ^ copied[index]) * 16777619U;
+            non_neutral |= copied[index] != 0xaaaaaaaaU && copied[index] != 0x55555555U;
+        }
+        if (!s_dma_trace_count || non_neutral) {
             ESP_LOGI(TAG,
-                     "AUDIO_TRACE DMA-PDM copy=%u words=%u ones=%u/%u "
+                     "AUDIO_TRACE DMA-PDM commit=%u words=%u ones=%u/%u "
                      "fnv=%08x first=%08x,%08x,%08x,%08x",
                      s_dma_trace_count++, (unsigned)count, ones,
                      (unsigned)(count * 32U), (unsigned)hash, copied[0],
@@ -313,16 +319,41 @@ esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
                      count > 2U ? copied[2] : 0U,
                      count > 3U ? copied[3] : 0U);
         }
+    }
 #endif
-        taskENTER_CRITICAL();
-        s_current_position += count;
-        if (s_current_position == NODAC_DMA_BUFFER_WORDS) {
-            unsigned index = s_current_buffer == s_buffers[0] ? 0U : 1U;
-            __asm__ __volatile__("memw" ::: "memory");
-            (void)nodac_state_publish(&s_state, index);
-            s_current_buffer = NULL;
-        }
-        taskEXIT_CRITICAL();
+    /* Conversion/copy and tracing are OUTSIDE the critical section.
+     * EOF cannot acquire this FILLING buffer before publication. */
+    taskENTER_CRITICAL();
+    s_reserved_words = 0;
+    s_current_position += count;
+    if (s_current_position == NODAC_DMA_BUFFER_WORDS) {
+        unsigned index = s_current_buffer == s_buffers[0] ? 0U : 1U;
+        __asm__ __volatile__("memw" ::: "memory");
+        (void)nodac_state_publish(&s_state, index);
+        s_current_buffer = NULL;
+    }
+    taskEXIT_CRITICAL();
+    return ESP_OK;
+}
+
+esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
+                                  TickType_t ticks_to_wait) {
+    if (!words && word_count) return ESP_ERR_INVALID_ARG;
+    if (s_reserved_words) return ESP_ERR_INVALID_STATE;
+    const TickType_t started = xTaskGetTickCount();
+    while (word_count) {
+        TickType_t elapsed = xTaskGetTickCount() - started;
+        TickType_t remaining = elapsed < ticks_to_wait
+            ? ticks_to_wait - elapsed : 0;
+        uint32_t *destination;
+        size_t available;
+        esp_err_t result = esp8266_nodac_i2s_reserve(
+            &destination, &available, remaining);
+        if (result != ESP_OK) return result;
+        size_t count = word_count < available ? word_count : available;
+        memcpy(destination, words, count * sizeof(*words));
+        result = esp8266_nodac_i2s_commit(count);
+        if (result != ESP_OK) return result;
         words += count;
         word_count -= count;
     }
@@ -335,6 +366,7 @@ void esp8266_nodac_i2s_silence(uint32_t silence_word) {
     nodac_state_silence(&s_state);
     s_current_buffer = NULL;
     s_current_position = 0;
+    s_reserved_words = 0;
     taskEXIT_CRITICAL();
 }
 

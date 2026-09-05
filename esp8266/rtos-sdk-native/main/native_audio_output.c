@@ -52,6 +52,7 @@ static void trace_output_pcm(const int16_t *samples, size_t frames,
         hash = (hash ^ (uint16_t)value) * 16777619U;
         if (frame < sizeof(first) / sizeof(first[0])) first[frame] = value;
     }
+    if (s_output_pcm_trace_count && minimum == 0 && maximum == 0) return;
     ESP_LOGI(TAG,
              "AUDIO_TRACE OUTPUT-PCM cb=%u frames=%u min=%d max=%d "
              "fnv=%08x first=%d,%d,%d,%d,%d,%d,%d,%d",
@@ -540,7 +541,6 @@ void native_audio_output_silence(void) {
 }
 #elif YORADIO_ESP8266_I2S_PDM
 
-#define I2S_PDM_BATCH_WORDS 64U
 #define I2S_PDM_WRITE_TIMEOUT_MS 100U
 #define I2S_PDM_SILENCE_WORD 0xaaaaaaaaU
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
@@ -550,30 +550,45 @@ void native_audio_output_silence(void) {
 #endif
 
 typedef struct {
-    uint32_t words[I2S_PDM_BATCH_WORDS];
+    uint32_t *words;
     size_t word_count;
+    size_t capacity;
     TickType_t deadline;
 } i2s_pdm_writer_t;
 
-static esp_err_t i2s_pdm_write_words(i2s_pdm_writer_t *writer,
-                                     const uint32_t *words,
-                                     size_t word_count) {
+static esp_err_t i2s_pdm_reserve(i2s_pdm_writer_t *writer) {
     TickType_t now = xTaskGetTickCount();
     if ((int32_t)(writer->deadline - now) <= 0) return ESP_ERR_TIMEOUT;
-    esp_err_t result = esp8266_nodac_i2s_write(
-        words, word_count, writer->deadline - now);
+    esp_err_t result = esp8266_nodac_i2s_reserve(
+        &writer->words, &writer->capacity, writer->deadline - now);
     if (result != ESP_OK)
-        ESP_LOGE(TAG, I2S_PDM_LOG_NAME " DMA write failed: %s",
+        ESP_LOGE(TAG, I2S_PDM_LOG_NAME " DMA reserve failed: %s",
                  esp_err_to_name(result));
     return result;
 }
 
 static esp_err_t i2s_pdm_flush(i2s_pdm_writer_t *writer) {
-    if (!writer->word_count) return ESP_OK;
-    esp_err_t result =
-        i2s_pdm_write_words(writer, writer->words, writer->word_count);
-    if (result == ESP_OK) writer->word_count = 0;
+    if (!writer->words) return ESP_OK;
+    esp_err_t result = esp8266_nodac_i2s_commit(writer->word_count);
+    if (result != ESP_OK) {
+        /* Do not leave a loan outstanding on an error return. */
+        (void)esp8266_nodac_i2s_commit(0);
+        ESP_LOGE(TAG, I2S_PDM_LOG_NAME " DMA commit failed: %s",
+                 esp_err_to_name(result));
+    }
+    writer->words = NULL;
+    writer->word_count = writer->capacity = 0;
     return result;
+}
+
+static esp_err_t i2s_pdm_push_word(i2s_pdm_writer_t *writer, uint32_t word) {
+    if (!writer->words) {
+        esp_err_t result = i2s_pdm_reserve(writer);
+        if (result != ESP_OK) return result;
+    }
+    writer->words[writer->word_count++] = word;
+    return writer->word_count == writer->capacity
+        ? i2s_pdm_flush(writer) : ESP_OK;
 }
 
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM || CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
@@ -616,20 +631,17 @@ static esp_err_t i2s_pdm_push_bit(i2s_pdm_writer_t *writer, bool high) {
     ++s_i2s_pdm_partial_bits;
     if (s_i2s_pdm_partial_bits != 32U) return ESP_OK;
 
-    writer->words[writer->word_count++] = s_i2s_pdm_partial_word;
+    uint32_t word = s_i2s_pdm_partial_word;
     s_i2s_pdm_partial_word = 0;
     s_i2s_pdm_partial_bits = 0;
-    return writer->word_count == I2S_PDM_BATCH_WORDS
-        ? i2s_pdm_flush(writer) : ESP_OK;
+    return i2s_pdm_push_word(writer, word);
 }
 #endif
 
 static esp_err_t i2s_pdm_emit_sample(int16_t sample,
                                      i2s_pdm_writer_t *writer) {
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM || CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
-    writer->words[writer->word_count++] = i2s_pdm_pack32(sample);
-    return writer->word_count == I2S_PDM_BATCH_WORDS
-        ? i2s_pdm_flush(writer) : ESP_OK;
+    return i2s_pdm_push_word(writer, i2s_pdm_pack32(sample));
 #else
     const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
     for (unsigned bit = 0; bit < BOARD_I2S_PDM_OVERSAMPLE; ++bit) {

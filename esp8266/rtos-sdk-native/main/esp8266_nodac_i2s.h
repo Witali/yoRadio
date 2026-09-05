@@ -16,6 +16,14 @@ esp_err_t esp8266_nodac_i2s_init(uint32_t silence_word,
                                  uint8_t bck_div, uint8_t clkm_div);
 esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
                                   TickType_t ticks_to_wait);
+/* Single producer, one outstanding writable span. The span is never DMA-
+ * owned, and remains private across EOF interrupts. Commit at most capacity
+ * words; commit(0) cancels the span. Partial commits accumulate until all
+ * 512 words are ready. Do not retain the pointer after commit or silence,
+ * nest reservations, or call write/silence concurrently with a reservation. */
+esp_err_t esp8266_nodac_i2s_reserve(uint32_t **words, size_t *capacity,
+                                    TickType_t ticks_to_wait);
+esp_err_t esp8266_nodac_i2s_commit(size_t word_count);
 /* Single-producer API: call silence between writes, never concurrently.
  * Mute is applied at the next EOF, without modifying active DMA memory. */
 void esp8266_nodac_i2s_silence(uint32_t silence_word);

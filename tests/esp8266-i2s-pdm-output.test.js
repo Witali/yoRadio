@@ -26,7 +26,7 @@ const projectCmake = fs.readFileSync(
 );
 
 const i2sPdmStart = output.indexOf(
-  "#elif YORADIO_ESP8266_I2S_PDM\n\n#define I2S_PDM_BATCH_WORDS",
+  "#elif YORADIO_ESP8266_I2S_PDM\n\n#define I2S_PDM_WRITE_TIMEOUT_MS",
 );
 const i2sPdm = output.slice(
   i2sPdmStart,
@@ -82,7 +82,9 @@ test("I2S PDM submits only complete finite DMA buffers with neutral underrun fal
     i2sPdm,
     /esp8266_nodac_i2s_init\([\s\S]*I2S_PDM_SILENCE_WORD,[\s\S]*BOARD_I2S_PDM_BCK_DIV,[\s\S]*BOARD_I2S_PDM_CLKM_DIV/,
   );
-  assert.match(i2sPdm, /esp8266_nodac_i2s_write/);
+  assert.match(i2sPdm, /esp8266_nodac_i2s_reserve/);
+  assert.match(i2sPdm, /esp8266_nodac_i2s_commit/);
+  assert.doesNotMatch(i2sPdm, /uint32_t words\[|memcpy|esp8266_nodac_i2s_write\(/);
   assert.match(i2sPdm, /I2S_PDM_WRITE_TIMEOUT_MS 100U/);
   assert.match(i2sPdm, /TickType_t deadline/);
   assert.match(i2sPdm, /writer->deadline - now/);
@@ -114,6 +116,7 @@ test("I2S PDM submits only complete finite DMA buffers with neutral underrun fal
   assert.match(nodac, /descriptor->next_link_ptr = NULL/);
   assert.match(nodac, /if \(nodac_state_eof\(&s_state\)\)[\s\S]*finished->buf_ptr\[word\] = s_silence_word/);
   assert.match(nodac, /s_current_position == NODAC_DMA_BUFFER_WORDS[\s\S]*nodac_state_publish/);
+  assert.match(nodac, /configure_descriptors\([\s\S]*s_current_position = 0;\s+s_reserved_words = 0;/);
   assert.doesNotMatch(nodac, /s_free_buffers|pop_free_buffer/);
   const silence = nodac.slice(nodac.indexOf('void esp8266_nodac_i2s_silence('), nodac.indexOf('void esp8266_nodac_i2s_reset_underruns('));
   assert.match(silence, /nodac_state_silence/);
@@ -198,7 +201,7 @@ test("ESP8266 audio trace follows decoder PCM into the physical PDM DMA buffer",
   assert.match(audio, /min=%d max=%d fnv=%08x first=/);
   assert.match(output, /AUDIO_TRACE OUTPUT-PCM cb=%u frames=%u/);
   assert.match(output, /trace_output_pcm\(samples, frames, channels\)/);
-  assert.match(nodac, /memcpy\(s_current_buffer \+ s_current_position, words,[\s\S]*AUDIO_TRACE DMA-PDM/);
+  assert.match(nodac, /esp8266_nodac_i2s_commit\([\s\S]*AUDIO_TRACE DMA-PDM commit=/);
   assert.match(nodac, /ones=%u\/%u/);
   assert.match(nodac, /s_dma_trace_count < 4U/);
 });

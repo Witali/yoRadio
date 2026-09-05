@@ -567,6 +567,8 @@ static void trace_pcm_samples(const helix_stream_info_t *info,
         if (pcm[index] > maximum) maximum = pcm[index];
         hash = (hash ^ (uint16_t)pcm[index]) * 16777619U;
     }
+    /* Keep one startup-zero snapshot, then wait for actual decoded audio. */
+    if (s_pcm_trace_count && minimum == 0 && maximum == 0) return;
     ESP_LOGI(TAG,
              "AUDIO_TRACE PCM cb=%u rate=%u ch=%u samples=%u "
              "min=%d max=%d fnv=%08x first=%d,%d,%d,%d,%d,%d,%d,%d",

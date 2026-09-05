@@ -34,7 +34,7 @@ test('RCPDM32 reuses the production carrier, sample pacing and DMA ring', () => 
   assert.match(read('esp8266_nodac_i2s.h'), /DMA_BUFFER_WORDS 512U/);
   const output = read('native_audio_output.c');
   assert.match(output, /return rc_pdm_sample\(&s_rcpdm, sample\)/);
-  assert.match(output, /words\[writer->word_count\+\+\] = i2s_pdm_pack32\(sample\)/);
+  assert.match(output, /i2s_pdm_push_word\(writer, i2s_pdm_pack32\(sample\)\)/);
   assert.match(output, /s_resample_phase \+= BOARD_I2S_PDM_SAMPLE_RATE/);
   assert.equal((output.match(/rc_pdm_init\(&s_rcpdm\)/g) || []).length, 2);
   assert.doesNotMatch(read('rc_pdm.h'), /\b(float|double|uint64_t|int64_t|malloc|calloc)\b/);
