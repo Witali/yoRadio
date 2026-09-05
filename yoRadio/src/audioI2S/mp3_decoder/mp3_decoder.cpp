@@ -63,7 +63,9 @@ FrameHeader_t *m_FrameHeader;
 SideInfoSub_t m_SideInfoSub[m_MAX_NGRAN][m_MAX_NCHAN];
 SideInfo_t *m_SideInfo;
 CriticalBandInfo_t m_CriticalBandInfo[m_MAX_NCHAN];  /* filled in dequantizer, used in joint stereo reconstruction */
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
 DequantInfo_t *m_DequantInfo;
+#endif
 HuffmanInfo_t *m_HuffmanInfo;
 IMDCTInfo_t *m_IMDCTInfo;
 ScaleFactorInfoSub_t m_ScaleFactorInfoSub[m_MAX_NGRAN][m_MAX_NCHAN];
@@ -76,6 +78,21 @@ static int m_OutputBufferSamples;
 
 static int MP3OutputChannels() {
     return YORADIO_HELIX_MP3_MONO ? 1 : m_MP3DecInfo->nChans;
+}
+
+static int *MP3ReorderBuffer() {
+#if YORADIO_HELIX_MP3_SHARED_REORDER
+    static_assert(m_MAX_REORDER_SAMPS <= m_BLOCK_SIZE * m_NBANDS,
+                  "Reorder scratch must fit one IMDCT output channel");
+    /* Same aligned int storage, not an aliased DequantInfo_t object. All
+     * channels finish dequantization BEFORE any IMDCT writes outBuf; the
+     * previous granule's synthesis/callback has already returned. Never
+     * pipeline these stages concurrently while this workspace is shared.
+     * IMDCT remains the sole owner, including on allocation failure. */
+    return reinterpret_cast<int *>(m_IMDCTInfo->outBuf[0]);
+#else
+    return m_DequantInfo->workBuf;
+#endif
 }
 #include "mp3_mono.h"
 
@@ -1522,7 +1539,7 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
             /* DequantChannel already applies 1/sqrt(2) for M/S, yielding
              * the desired (L+R)/2 domain without reconstructing L and R. */
             m_HuffmanInfo->gb[0] = DequantChannel(
-                m_HuffmanInfo->huffDecBuf[0], m_DequantInfo->workBuf,
+                m_HuffmanInfo->huffDecBuf[0], MP3ReorderBuffer(),
                 &m_HuffmanInfo->nonZeroBound[0], &m_SideInfoSub[gr][0],
                 &m_ScaleFactorInfoSub[gr][0], &m_CriticalBandInfo[0]);
             dequantResult = 0;
@@ -1626,7 +1643,9 @@ void MP3Decoder_ClearBuffer(void) {
     memset( m_SideInfo,           0, sizeof(SideInfo_t));                                      //Clear SideInfo
     memset( m_FrameHeader,        0, sizeof(FrameHeader_t));                                   //Clear FrameHeader
     memset( m_HuffmanInfo,        0, sizeof(HuffmanInfo_t));                                   //Clear HuffmanInfo
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
     memset( m_DequantInfo,        0, sizeof(DequantInfo_t));                                   //Clear DequantInfo
+#endif
 #if defined(YORADIO_ESP8266_NATIVE)
     {
         int (*outBuf0)[m_NBANDS] = m_IMDCTInfo->outBuf[0];
@@ -1683,7 +1702,7 @@ bool MP3Decoder_AllocateBuffers(void) {
     if(!m_SideInfo)         {m_SideInfo = (SideInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(SideInfo_t));}
     if(!m_ScaleFactorJS)    {m_ScaleFactorJS = (ScaleFactorJS_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(ScaleFactorJS_t));}
     if(!m_HuffmanInfo)      {m_HuffmanInfo = (HuffmanInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(HuffmanInfo_t));}
-#if !defined(YORADIO_ESP8266_NATIVE)
+#if !defined(YORADIO_ESP8266_NATIVE) && !YORADIO_HELIX_MP3_SHARED_REORDER
     if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
 #endif
 #if defined(YORADIO_ESP8266_NATIVE)
@@ -1697,7 +1716,9 @@ bool MP3Decoder_AllocateBuffers(void) {
         m_IMDCTInfo->outBuf[1] = (int (*)[m_NBANDS])CodecArenaCalloc(
             CODEC_ARENA_MP3, m_BLOCK_SIZE * m_NBANDS, sizeof(int));
     }
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
     if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
+#endif
     if(m_IMDCTInfo && !m_IMDCTInfo->overBuf[0]) {
         m_IMDCTInfo->overBuf[0] = (int*)CodecArenaCalloc(
             CODEC_ARENA_MP3, m_MAX_NSAMP / 2, sizeof(int));
@@ -1713,7 +1734,10 @@ bool MP3Decoder_AllocateBuffers(void) {
     if(!m_MP3FrameInfo)     {m_MP3FrameInfo = (MP3FrameInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(MP3FrameInfo_t));}
 
     if(!m_MP3DecInfo || !m_FrameHeader || !m_SideInfo || !m_ScaleFactorJS || !m_HuffmanInfo ||
-       !m_DequantInfo || !m_IMDCTInfo || !m_SubbandInfo || !m_MP3FrameInfo
+       !m_IMDCTInfo || !m_SubbandInfo || !m_MP3FrameInfo
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
+       || !m_DequantInfo
+#endif
 #if defined(YORADIO_ESP8266_NATIVE)
        || !m_IMDCTInfo->outBuf[0] || !m_IMDCTInfo->outBuf[1] ||
           !m_IMDCTInfo->overBuf[0] || !m_IMDCTInfo->overBuf[1]
@@ -1748,7 +1772,9 @@ void MP3Decoder_FreeBuffers()
     if(m_SideInfo)          {CodecArenaFree(m_SideInfo);      m_SideInfo=NULL;}
     if(m_ScaleFactorJS )    {CodecArenaFree(m_ScaleFactorJS); m_ScaleFactorJS=NULL;}
     if(m_HuffmanInfo)       {CodecArenaFree(m_HuffmanInfo);   m_HuffmanInfo=NULL;}
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
     if(m_DequantInfo)       {CodecArenaFree(m_DequantInfo);   m_DequantInfo=0;}
+#endif
 #if defined(YORADIO_ESP8266_NATIVE)
     if(m_IMDCTInfo) {
         CodecArenaFree(m_IMDCTInfo->outBuf[0]);
@@ -2253,7 +2279,7 @@ int MP3Dequantize(int gr){
 
     /* dequantize all the samples in each channel */
     for (ch = 0; ch < m_MP3DecInfo->nChans; ch++) {
-        m_HuffmanInfo->gb[ch] = DequantChannel(m_HuffmanInfo->huffDecBuf[ch], m_DequantInfo->workBuf,
+        m_HuffmanInfo->gb[ch] = DequantChannel(m_HuffmanInfo->huffDecBuf[ch], MP3ReorderBuffer(),
                 &m_HuffmanInfo->nonZeroBound[ch], &m_SideInfoSub[gr][ch], &m_ScaleFactorInfoSub[gr][ch], &cbi[ch]);
     }
 

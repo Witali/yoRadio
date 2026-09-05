@@ -49,6 +49,20 @@ stack based on the older 4096-byte experiments recorded below.
 
 ## Correctness before reduction
 
+### MP3 scratch reuse (2026-09-05)
+
+- [x] Reuse the dead IMDCT output for the 792-byte short-block reorder
+  scratch, retaining IMDCT as the sole allocation owner.
+- [x] Prove separate/shared PCM is byte-identical for Mono/Stereo and both
+  output APIs; test allocation failures, reset, canaries and MP3/AAC cycles.
+- [x] Build the optimized native profile; keep an explicit A/B switch.
+- [ ] Measure the additional device heap headroom and CPU behavior under
+  real playback/WebUI load. Host results are not on-board speed measurements.
+
+See [lifetime contract and results](ESP8266_MP3_REORDER_REUSE.md).
+
+### Existing lifecycle checks
+
 - [x] Fix the libmad DRAM leak: `mad_stream` and `mad_frame` must be released
   with `CodecArenaFree()` before resetting their pointers/arena owner.
 - [x] Add a regression that repeatedly resets MP3 and switches MP3/AAC in

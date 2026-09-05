@@ -9,6 +9,16 @@
 #define YORADIO_HELIX_MP3_MONO 0
 #endif
 
+/* Reuse IMDCT output during sequential ESP8266 dequantization. Set to 0
+ * for the separate-buffer reference. Other targets keep their layout. */
+#ifndef YORADIO_HELIX_MP3_SHARED_REORDER
+#if defined(YORADIO_ESP8266_NATIVE)
+#define YORADIO_HELIX_MP3_SHARED_REORDER 1
+#else
+#define YORADIO_HELIX_MP3_SHARED_REORDER 0
+#endif
+#endif
+
 static const uint8_t  m_HUFF_PAIRTABS          =32;
 static const uint8_t  m_BLOCK_SIZE             =18;
 static const uint8_t  m_NBANDS                 =32;

@@ -40,6 +40,8 @@ freed between granules. Decoder reset also resets this domain state.
 MP3 callback PCM storage drops from 2304 to **1152 bytes** (576 mono samples),
 saving 1152 bytes DRAM. Spectrum, fallback overlap and the 16-KiB IRAM arena
 remain allocated. This is not a claim of halving total decoder RAM.
+The subsequent [shared reorder workspace](ESP8266_MP3_REORDER_REUSE.md)
+removes another 792-byte DRAM allocation without changing mono PCM.
 PCM channel metadata reflects the decoded output. Independent left/right
 balance cannot be recovered after early mono downmix.
 

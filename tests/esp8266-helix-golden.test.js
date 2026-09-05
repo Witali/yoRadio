@@ -43,12 +43,18 @@ function compile(outputDir, name, reference, mp3Sso = false, aacSso = false, opt
     sources[0] = path.join(native, "mp3_mono_state_test.cpp");
     sources.pop();
   }
+  if(options.reorderUnit) {
+    sources[0] = path.join(native, "mp3_reorder_state_test.cpp");
+    sources.splice(2, 2); // this harness supplies its own checked allocator
+  }
   const defines = ["YORADIO_ESP8266_NATIVE=1"];
   if(reference) defines.push("YORADIO_HELIX_REFERENCE_FIXED_POINT=1");
   if(mp3Sso) defines.push("YORADIO_HELIX_MP3_SSO=1");
   if(aacSso) defines.push("YORADIO_HELIX_AAC_SSO=1");
   if(options.mono) defines.push("YORADIO_HELIX_MP3_MONO=1");
   if(options.profile) defines.push("YORADIO_ESP8266_HELIX_STAGE_PROFILE=1");
+  if(options.sharedReorder !== undefined)
+    defines.push(`YORADIO_HELIX_MP3_SHARED_REORDER=${options.sharedReorder ? 1 : 0}`);
 
   let build;
   if(process.platform === "win32") {
@@ -156,6 +162,54 @@ function downmix(stereo) {
     mono.writeInt16LE((stereo.readInt16LE(offset) + stereo.readInt16LE(offset + 2)) >> 1, offset / 2);
   return mono;
 }
+
+test("shared MP3 reorder scratch is bit-exact against the separate allocation", t => {
+  const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-reorder-pcm-"));
+  t.after(() => fs.rmSync(outputDir, {recursive:true, force:true}));
+  const original = fs.readFileSync(path.join(fixtures, "stereo-320.mp3"));
+  const inputs = [
+    ["noise-320", original],
+    ["mode-switches", mp3Modes(original, i => [0x60,0x00,0x50,0x70,0x80][i % 5])],
+    ...["mpeg1", "mpeg2", "mpeg25", "mono"].map(name => [name,
+      fs.readFileSync(path.join(__dirname, "fixtures", "helix_mono", `${name}.mp3`))]),
+  ];
+  for(const mono of [false, true]) {
+    const before = compile(outputDir, `before-${mono}`, false, true, false, {mono, sharedReorder:false});
+    if(before.skip) return t.skip(before.skip);
+    const after = compile(outputDir, `after-${mono}`, false, true, false, {mono, sharedReorder:true});
+    for(const [name, data] of inputs) {
+      const fixture = path.join(outputDir, `${name}.mp3`);
+      fs.writeFileSync(fixture, data);
+      for(const api of ["mp3", "mp3-granules"]) {
+        const oldPcm = decode(before.executable, api, fixture, path.join(outputDir, "before.pcm"));
+        const newPcm = decode(after.executable, api, fixture, path.join(outputDir, "after.pcm"));
+        assert.equal(newPcm.summary, oldPcm.summary);
+        assert.deepEqual(newPcm.pcm, oldPcm.pcm, `${name} mono=${mono} ${api}: shared scratch changed PCM`);
+      }
+    }
+  }
+  t.diagnostic("6 MP3 vectors x mono/stereo x frame/granule API: identical PCM bytes");
+});
+
+test("shared MP3 reorder has one owner, saves 792 heap bytes and survives allocation failures", t => {
+  const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-reorder-state-"));
+  t.after(() => fs.rmSync(outputDir, {recursive:true, force:true}));
+  const reports = [];
+  for(const sharedReorder of [false, true]) {
+    const binary = compile(outputDir, `state-${sharedReorder}`, false, true, false,
+      {mono:true, sharedReorder, reorderUnit:true});
+    if(binary.skip) return t.skip(binary.skip);
+    const result = spawnSync(binary.executable, [], {encoding:"utf8"});
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    const values = /heap=(\d+) word=(\d+) allocations=(\d+)/.exec(result.stdout);
+    assert.ok(values, result.stdout);
+    reports.push(values.slice(1).map(Number));
+    t.diagnostic(`${sharedReorder ? "shared" : "separate"}: ${result.stdout.trim()}`);
+  }
+  assert.equal(reports[0][0] - reports[1][0], 792);
+  assert.equal(reports[0][1], reports[1][1], "word arena grew");
+  assert.equal(reports[0][2] - reports[1][2], 1);
+});
 
 test("MP3 build-time mono skips M/S side and preserves fallback/mode transitions", t => {
   const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-mono-"));

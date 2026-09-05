@@ -43,6 +43,13 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1)
+option(YORADIO_ESP8266_MP3_SHARED_REORDER
+  "Reuse IMDCT output as MP3 reorder scratch (OFF for A/B comparison)" ON)
+if(YORADIO_ESP8266_MP3_SHARED_REORDER)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_HELIX_MP3_SHARED_REORDER=1)
+else()
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_HELIX_MP3_SHARED_REORDER=0)
+endif()
 if(CONFIG_YORADIO_AUDIO_MONO)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_HELIX_MP3_MONO=1)

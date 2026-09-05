@@ -130,6 +130,10 @@ fits the arena and the remaining word workspaces use DRAM. On the physical
 board the previous stereo MP3 workspace reported 11472 bytes DRAM and 16384
 bytes IRAM. Build-time mono reduces its PCM allocation by 1152 DRAM bytes;
 the fallback transform storage and 16-KiB IRAM reservation remain unchanged.
+Helix now also reuses the idle IMDCT output for short-block reorder scratch,
+removing another 792-byte DRAM allocation. The CMake option
+`YORADIO_ESP8266_MP3_SHARED_REORDER` defaults to `ON`; `OFF` restores separate
+storage for A/B measurement. See [lifetime contract and tests](../../docs/ESP8266_MP3_REORDER_REUSE.md).
 Larger single or secondary IRAM allocations are not a default: the SDK heap
 regions rejected them even when the ELF map showed enough aggregate bytes.
 
