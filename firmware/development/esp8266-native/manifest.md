@@ -1,7 +1,7 @@
 # ESP8266 native development artifact
 
-- Built: 2026-09-03
-- Source revision: `101ac56`
+- Built: 2026-09-05
+- Source revision: `a08cf8b` (native sources unchanged; unrelated Arduino changes excluded)
 - Target: ESP8266EX, 4 MiB flash
 - Framework: ESP8266 RTOS SDK v3.4
 - Profile: development, diagnostic logging enabled, `-O3`, audio profiler disabled
@@ -9,10 +9,14 @@
 - Application flash offset: `0x10000`
 - File: `app.bin`
 - Size: 670448 bytes
-- SHA-256: `E15E6D24003ED14BEAAD5CC14FCF1F1D43F12F176708862186C1FDBB1AFEBEBC`
+- SHA-256: `F1D1B954843295A4D9433133EEE7F601B6172EA9F5ABEA253BDB93345FA93E3A`
 
 ## Changes
 
+- Rebuilt the current native firmware and flashed the physical Wemos D1 mini.
+  Refreshed stale shared WebUI assets in SPIFFS at 0x100000 after a full backup,
+  preserving Wi-Fi, playlist and index. The private SPIFFS image is not tracked.
+  Application behaviour is unchanged; the build identity reflects the revision.
 - Removed the dedicated 2048-byte input task. BOOT and encoder ISRs now queue
   compact events and wake the existing 3072-byte application task with a task
   notification; debounce and click recognition run when that task wakes.
@@ -40,6 +44,17 @@
   HTTP MP3/AAC-compatible entries; HTTPS, Ogg, Opus, FLAC, HLS and WAV are hidden.
 
 ## Validation
+
+- Current physical/browser audit: [2026-09-05 report](../../../docs/ESP8266_WEBUI_AUDIT_2026-09-05.md).
+  Main player, MP3/AAC, live status and supported settings work, but the full
+  shared WebUI is NOT yet implemented. Missing Wi-Fi/upload/update handlers,
+  ignored settings, initial playlist scrolling and multi-tab problems remain.
+- One-client page load 2.45-3.49 s; volume 53-108 ms; pause/resume/selection
+  typically 0.3-0.9 s. Concurrent clients can cause large delays and reconnects.
+- Repository regression suite: 301/301 passed. This does not supersede the
+  failing live-browser capability checks documented in the audit.
+
+## Historical validation (earlier builds; not a full-WebUI claim)
 
 - On the physical board, free heap after DHCP increased from 21,160 to 23,300
   bytes (+2,140), accounting for the removed stack and task control block.
