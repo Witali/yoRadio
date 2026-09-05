@@ -1,14 +1,30 @@
 # ESP8266 native development artifact
 
 - Built: 2026-09-05
-- Native source revision: b02617f (unrelated Arduino working-tree changes excluded)
+- Native source: includes DMA fix 4ad22fb (built before commit; embedded version tag 795000a-dirty). Unrelated Arduino working-tree changes excluded.
 - Target: Wemos D1 mini / ESP8266EX, 4 MiB flash, CPU 160 MHz
 - SDK: ESP8266 RTOS SDK v3.4, GCC 8.4, -O3
 - Profile: diagnostic logging enabled; Helix MP3 SSO + AAC; display disabled
 - Output: I2S PDM on GPIO3, nominal 1.536 MHz, two DMA buffers of 512 words
 - Flash: QIO 40 MHz (the SDK's boot image header is DIO; SDK enables QIO)
-- app.bin: 688640 bytes
-- SHA-256: 76E47B98D18CCC7C259FCFDDE7A627D1266C6A6D17A408E103F4C9BD3BABAE59
+- app.bin: 688656 bytes
+- SHA-256: BD2AE0F650AF5B041001B68DEB5EC6E5A3B1028CE87D27B3E10AF1AF5F40CC9A
+
+## Changelog: 2026-09-05 I2S DMA ownership
+
+- Submit only fully filled buffers; finite descriptors prevent DMA from
+  revisiting producer-owned storage. Keep two 512-word payload buffers.
+- Replace missing audio with 0xAAAAAAAA (50% density PDM audio zero), never
+  repeat stale audio or clear a partially filled producer buffer.
+- Stop switches to neutral PDM at EOF without modifying active DMA memory.
+- Preserve the 16-KiB codec IRAM arena; static DRAM is 8 bytes smaller.
+- 331 regression tests passed; isolated physical test: 941 EOFs, zero
+  underruns/FIFO-empty observations, 65-ms partial-buffer delay PASS.
+- Flashed app0 at 0x10000 and verified the write hash. Normal radio restored,
+  Wi-Fi connected; MP3 128 starts. AAC 320 still ended/reconnected during the
+  final test, so uninterrupted AAC playback is not claimed. Settings/SPIFFS
+  unchanged; restored station 498, volume 254, playback stopped.
+- See [DMA fix and limitations](../../../docs/ESP8266_I2S_DMA_OWNERSHIP.md).
 
 ## Flash layout — changed; read before using USB flashing
 
