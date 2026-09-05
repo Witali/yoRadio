@@ -19,6 +19,7 @@
 #include "persistent_settings.h"
 #include "playlist_service.h"
 #include "radio_control.h"
+#include "time_service.h"
 #include "web_pages_bridge.h"
 
 #define WS_HEARTBEAT_MS 2000U
@@ -597,7 +598,12 @@ static void handle_command(httpd_req_t *request, char *command) {
             changed = false;
         }
         if (changed) {
-            ws_send(request, update_settings(&settings, reload_audio)
+            bool accepted = update_settings(&settings, reload_audio);
+            if (accepted && (strcmp(command, "tzh") == 0 ||
+                strcmp(command, "tzm") == 0 || strcmp(command, "timeint") == 0 ||
+                strcmp(command, "sntp1") == 0 || strcmp(command, "sntp2") == 0))
+                time_service_settings_changed();
+            ws_send(request, accepted
                 ? "{\"accepted\":true}"
                 : "{\"commandError\":\"Settings rejected\"}");
         } else if (strcmp(command, "submitplaylist") != 0 &&

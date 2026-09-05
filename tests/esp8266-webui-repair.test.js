@@ -8,6 +8,16 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('SNTP reconfiguration uses its lwIP task and a reusable nonblocking message', () => {
+  const source = read(main+'time_service.c');
+  assert.match(source, /if \(sntp_enabled\(\)\) sntp_stop\(\)/);
+  assert.match(source, /tcpip_callbackmsg_new\(configure_sntp, NULL\)/);
+  assert.match(source, /tcpip_callbackmsg_trycallback\(s_callback\)/);
+  assert.doesNotMatch(source, /xTaskCreate|xEventGroupWaitBits|vTaskDelay/);
+  assert.match(read(main+'app_main.c'), /time_service_poll\(\)/);
+  assert.match(read(main+'web_service.c'), /time_service_settings_changed\(\)/);
+});
+
 test('Audio Info and AP reboot delay persist without changing the legacy blob', () => {
   const source = read(main+'persistent_settings.c');
   assert.match(source, /SETTINGS_VERSION 1U/);
