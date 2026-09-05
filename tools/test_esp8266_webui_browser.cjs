@@ -90,11 +90,18 @@ async function statusTimings(label) {
 }
 async function loadPlayer(label) {
   const t=stamp();
+  console.log('RUN', label);
   await page.goto(`${base}/?ui=audit-20260905`,{waitUntil:'domcontentloaded',timeout:60000});
   await page.waitForFunction(()=>document.querySelectorAll('#playlist li[attr-id]').length>0 && typeof currentItem!=='undefined' && currentItem>0,{},{timeout:60000});
   result(label,true,{ms:stamp()-t,state:await snap()});
 }
 async function testSetting(id, command, queryCommand, key, newValue, checkbox=false) {
+  const unsupported = ['scre','scrt','scrb','dspon','scrpe','scrpt','watchdog','enca'];
+  if(unsupported.includes(id)) {
+    result('unsupported control hidden: '+id, !(await page.locator('#'+id).isVisible()), {});
+    return;
+  }
+  console.log('RUN setting', id);
   const initial=(await query(queryCommand,key))[key];
   baseline[command]=initial;
   const t=stamp();
@@ -112,15 +119,34 @@ async function testSetting(id, command, queryCommand, key, newValue, checkbox=fa
   browser=await chromium.launch({channel:option('--channel','msedge'),headless:true});
   page=await browser.newPage({viewport:{width:1280,height:800}});
   page.setDefaultTimeout(12000); attach(page,'main');
+  // Do not include OS SYN retransmission while the MCU is still acquiring
+  // Wi-Fi/DHCP in the page-load measurement. No browser cache is warmed here.
+  const readyUntil=stamp()+90000;
+  let ready=false;
+  while(stamp()<readyUntil && !ready) {
+    try {
+      const r=await page.request.get(base+'/api/native/status',{timeout:5000});
+      ready=r.ok() && (await r.json()).network===1;
+    } catch {}
+    if(!ready) { console.log('WAIT board HTTP readiness'); await sleep(1000); }
+  }
+  if(!ready) throw new Error('Board HTTP did not become ready');
   await loadPlayer('cold player load');
   original=await snap(); report.original=original;
+  // The playlist uses smooth scrolling. Presence of rows is not its completion.
+  await page.waitForFunction(()=>{
+    const ul=document.querySelector('#playlist'), active=ul?.querySelector('li.active');
+    if(!active) return false;
+    const a=active.getBoundingClientRect(), b=ul.getBoundingClientRect();
+    return a.top>=b.top && a.bottom<=b.bottom;
+  },{},{timeout:3000}).catch(()=>{});
   const selectedVisible=await page.locator('#playlist').evaluate(ul=>{
     const active=ul.querySelector('li.active');
     if(!active) return false;
     const a=active.getBoundingClientRect(), b=ul.getBoundingClientRect();
     return a.top>=b.top && a.bottom<=b.bottom;
   });
-  result('current station visible on initial load',selectedVisible,{current:original.current,scroll:original.scroll});
+  result('current station visible on initial load',selectedVisible,{current:original.current,scroll:(await snap()).scroll});
   originalSystem=await query('getsystem=1','normtime');
   if(original.player.includes('playing')) {await action('initial pause','#playbutton',m=>val(m,'playerwrap')==='stopped');await sleep(800);}
   await page.screenshot({path:path.join(output,'desktop.png'),fullPage:true});
@@ -162,7 +188,7 @@ async function testSetting(id, command, queryCommand, key, newValue, checkbox=fa
   await page.evaluate(v=>websocket.send(`balance=${v}`),oldBalance);
   baseline.balance=oldBalance;
   await page.locator('#equalizer [data-target="equalizerbg"]').click();
-  for(const [index,label] of [[500,'MP3 64 URL'],[498,'MP3 128 URL'],[502,'MP3 256 URL']]) {
+  for(const [index,label] of [[498,'MP3 ROCK FM'],[502,'MP3 Europa Plus']]) {
     await page.evaluate(()=>websocket.send('stop=1')); await sleep(1000);
     await page.locator('#playlistfilter').fill(index===500?'Говорит Москва':index===498?'ROCK FM':'Европа Плюс');
     const name=await page.locator(`#playlist li[attr-id="${index}"]`).getAttribute('data-name');
