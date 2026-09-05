@@ -3,6 +3,18 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-09-05: ESP8266 mono MP3 M/S fast path
+
+- Saved `development/esp8266-native-mono/app.bin` separately from the
+  physically verified preceding build; source `236d4ad`, 686944 bytes.
+- Added build-time Mono/Stereo; default Mono skips the difference channel
+  for compatible M/S MP3 and retains safe fallback for other stereo modes.
+- MP3 PCM storage is 1152 bytes smaller; unchanged two-buffer DMA output.
+- Fixed pre-existing MPEG2.5 sync detection, now covered by own fixtures.
+- 329 host tests pass; Mono firmware and Stereo/libmad decoder component
+  builds pass. CPU timing and listening on the board remain untested.
+- No flashing, settings changes or WebUI asset update performed.
+
 ## Development — 2026-09-05: ESP8266 memory-only diagnostic
 
 - Saved `development/esp8266-native-memory-profile/app.bin` and its manifest.

@@ -80,3 +80,10 @@ now uses the correct 11-bit sync and rejects the reserved MPEG version.
 These are correctness and invocation-count tests, **not ESP8266 CPU timing**.
 Physical speed, RF-load stability and listening checks remain to be measured.
 The board is not flashed by this change.
+
+Final verification: **329 host tests passed** (33.79 seconds), recorded in
+`docs/benchmarks/esp8266-mono-2026-09-05/regression.log`. Native Mono firmware
+and the Helix/AAC Stereo and libmad/AAC Mono components compiled with Xtensa
+GCC 8.4. The application and manifest are saved under
+`firmware/development/esp8266-native-mono/`; the previous board-tested binary
+is preserved separately.
