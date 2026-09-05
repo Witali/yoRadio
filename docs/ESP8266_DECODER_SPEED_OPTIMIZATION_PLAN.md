@@ -57,20 +57,24 @@ decoder correctness.
 - [ ] Identify small, frequently accessed lookup tables and selectively copy
   only those tables to RAM. Do not move all Huffman or IMDCT tables. Measure
   speed and heap/IRAM cost for every table moved.
-- [ ] Add a one-channel decode or synthesis path when the physical output is
-  mono. Avoid decoding stereo and then discarding or mixing one channel.
-  Verify that mono streams and stereo-to-mono output remain correct.
-- [ ] Investigate an MP3 mid/side joint-stereo fast path for mono output. For
+- [x] Add a build-time one-channel MP3 decode/synthesis path for mono output.
+  Original mono is bit-exact; fallback stereo is mixed before synthesis.
+  AAC and libmad currently downmix after decoding, without side skipping.
+- [x] Implement an MP3 mid/side joint-stereo fast path for mono output. For
   frames that use M/S stereo without intensity stereo, benchmark decoding and
   synthesizing only the mid (sum) channel instead of reconstructing left and
   right. Compare its PCM output against the rounded average of the reference
   stereo decoder and account for the Helix dequantizer's existing 1/sqrt(2)
   scaling.
-- [ ] Keep a full-decoder fallback for MP3 intensity stereo and ordinary
+- [x] Keep a full-decoder fallback for MP3 intensity stereo and ordinary
   independent stereo; `joint stereo` does not always mean that the first
   coded channel is a directly usable sum channel. Test streams containing
   mode changes between consecutive frames so skipped side-channel IMDCT and
   synthesis history cannot corrupt later output.
+- [ ] Measure the new mono path's CPU, RAM headroom and playback stability
+  on the physical ESP8266. Host regression and exact Huffman invocation
+  counts pass; they are not on-board speed measurements. See
+  [implementation and results](ESP8266_MP3_MONO.md).
 - [x] Optimize the default I2S-PDM output: use a 456-byte IRAM branchless,
   fully unrolled PDM32 packer and replace 2-ms DMA polling with one direct
   FreeRTOS task notification per 512-word buffer. On the physical board this

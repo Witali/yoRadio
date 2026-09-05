@@ -74,6 +74,11 @@ MP3DecInfo_t *m_MP3DecInfo;
 static int m_OutputBufferSamples;
 #endif
 
+static int MP3OutputChannels() {
+    return YORADIO_HELIX_MP3_MONO ? 1 : m_MP3DecInfo->nChans;
+}
+#include "mp3_mono.h"
+
 const unsigned short huffTable[4242] PROGMEM = {
     /* huffTable01[9] */
     0xf003, 0x3112, 0x3101, 0x2011, 0x2011, 0x1000, 0x1000, 0x1000, 0x1000,
@@ -1297,10 +1302,10 @@ void MP3GetLastFrameInfo() {
     }
     else{
         m_MP3FrameInfo->bitrate=m_MP3DecInfo->bitrate;
-        m_MP3FrameInfo->nChans=m_MP3DecInfo->nChans;
+        m_MP3FrameInfo->nChans=MP3OutputChannels();
         m_MP3FrameInfo->samprate=m_MP3DecInfo->samprate;
         m_MP3FrameInfo->bitsPerSample=16;
-        m_MP3FrameInfo->outputSamps=m_MP3DecInfo->nChans
+        m_MP3FrameInfo->outputSamps=MP3OutputChannels()
                 * (int) samplesPerFrameTab[m_MPEGVersion][m_MP3DecInfo->layer-1];
         m_MP3FrameInfo->layer=m_MP3DecInfo->layer;
         m_MP3FrameInfo->version=m_MPEGVersion;
@@ -1347,7 +1352,7 @@ int MP3GetNextFrameInfo(unsigned char *buf) {
 void MP3ClearBadFrame( short *outbuf) {
     int i;
     int samples = m_MP3DecInfo->nGrans * m_MP3DecInfo->nGranSamps *
-                  m_MP3DecInfo->nChans;
+                  MP3OutputChannels();
 #if defined(YORADIO_ESP8266_NATIVE)
     if (m_OutputBufferSamples > 0 && samples > m_OutputBufferSamples)
         samples = m_OutputBufferSamples;
@@ -1469,6 +1474,9 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
 
     /* decode one complete frame */
     for (gr = 0; gr < m_MP3DecInfo->nGrans; gr++) {
+#if YORADIO_HELIX_MP3_MONO
+        const bool monoMidSide = MonoMidSide(gr);
+#endif
         for (ch = 0; ch < m_MP3DecInfo->nChans; ch++) {
             /* unpack scale factors and compute size of scale factor block */
             prevBitOffset = bitOffset;
@@ -1479,11 +1487,22 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
             mainPtr += offset;
             mainBits -= sfBlockBits;
 
-            if (offset < 0 || mainBits < huffBlockBits) {
+            if (offset < 0 || huffBlockBits < 0 || mainBits < huffBlockBits) {
                 MP3ClearBadFrame(outbuf);
                 return ERR_MP3_INVALID_SCALEFACT;
             }
             /* decode Huffman code words */
+#if YORADIO_HELIX_MP3_MONO
+            if (monoMidSide && ch == 1) {
+                /* Preserve MPEG1 SCFSI scalefactors and reservoir alignment,
+                 * but skip the side's Huffman payload without decoding it. */
+                const int bits = bitOffset + huffBlockBits;
+                mainPtr += bits >> 3;
+                bitOffset = bits & 7;
+                mainBits -= huffBlockBits;
+                continue;
+            }
+#endif
             prevBitOffset = bitOffset;
             HELIX_PROFILE_BEGIN(HELIX_STAGE_HUFFMAN);
             offset = DecodeHuffman( mainPtr, &bitOffset, huffBlockBits, gr, ch);
@@ -1497,7 +1516,19 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
         }
         /* dequantize coefficients, decode stereo, reorder short blocks */
         HELIX_PROFILE_BEGIN(HELIX_STAGE_DEQUANT);
-        int dequantResult = MP3Dequantize(gr);
+        int dequantResult;
+#if YORADIO_HELIX_MP3_MONO
+        if (monoMidSide) {
+            /* DequantChannel already applies 1/sqrt(2) for M/S, yielding
+             * the desired (L+R)/2 domain without reconstructing L and R. */
+            m_HuffmanInfo->gb[0] = DequantChannel(
+                m_HuffmanInfo->huffDecBuf[0], m_DequantInfo->workBuf,
+                &m_HuffmanInfo->nonZeroBound[0], &m_SideInfoSub[gr][0],
+                &m_ScaleFactorInfoSub[gr][0], &m_CriticalBandInfo[0]);
+            dequantResult = 0;
+        } else
+#endif
+            dequantResult = MP3Dequantize(gr);
         HELIX_PROFILE_END(HELIX_STAGE_DEQUANT);
         if (dequantResult < 0) {
             MP3ClearBadFrame(outbuf);
@@ -1505,6 +1536,15 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
         }
 
         /* alias reduction, inverse MDCT, overlap-add, frequency inversion */
+#if YORADIO_HELIX_MP3_MONO
+        HELIX_PROFILE_BEGIN(HELIX_STAGE_IMDCT);
+        int imdctResult = MonoIMDCT(gr, monoMidSide);
+        HELIX_PROFILE_END(HELIX_STAGE_IMDCT);
+        if (imdctResult < 0) {
+            MP3ClearBadFrame(outbuf);
+            return ERR_MP3_INVALID_IMDCT;
+        }
+#else
         for (ch = 0; ch < m_MP3DecInfo->nChans; ch++) {
             HELIX_PROFILE_BEGIN(HELIX_STAGE_IMDCT);
             int imdctResult = IMDCT(gr, ch);
@@ -1514,13 +1554,14 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
                 return ERR_MP3_INVALID_IMDCT;
             }
         }
-        /* subband transform - if stereo, interleaves pcm LRLRLR */
+#endif
+        /* Subband synthesis: mono or interleaved stereo PCM. */
         short *granuleOut = outbuf;
 #if defined(YORADIO_ESP8266_NATIVE)
         if (!callback)
 #endif
             granuleOut += gr * m_MP3DecInfo->nGranSamps *
-                          m_MP3DecInfo->nChans;
+                          MP3OutputChannels();
         HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS);
         int subbandResult = Subband(granuleOut);
         HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS);
@@ -1531,7 +1572,7 @@ static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
 #if defined(YORADIO_ESP8266_NATIVE)
         if (callback && !callback(context, granuleOut,
                                   m_MP3DecInfo->nGranSamps *
-                                  m_MP3DecInfo->nChans))
+                                  MP3OutputChannels()))
             return ERR_UNKNOWN;
 #endif
     }
@@ -1554,7 +1595,7 @@ int MP3Decode(unsigned char *inbuf, int *bytesLeft, short *outbuf,
 int MP3DecodeGranules(unsigned char *inbuf, int *bytesLeft, short *outbuf,
                       int useSize, MP3GranuleCallback callback,
                       void *context) {
-    m_OutputBufferSamples = m_MAX_NCHAN * m_MAX_NSAMP;
+    m_OutputBufferSamples = (YORADIO_HELIX_MP3_MONO ? 1 : m_MAX_NCHAN) * m_MAX_NSAMP;
     int result = MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize,
                                    callback, context);
     m_OutputBufferSamples = 0;
@@ -1575,6 +1616,9 @@ int MP3DecodeGranules(unsigned char *inbuf, int *bytesLeft, short *outbuf,
  *
  **********************************************************************************************************************/
 void MP3Decoder_ClearBuffer(void) {
+#if YORADIO_HELIX_MP3_MONO
+    m_MonoOverlap = false;
+#endif
 
     /* important to do this - DSP primitives assume a bunch of state variables are 0 on first use */
     memset( m_MP3DecInfo,         0, sizeof(MP3DecInfo_t));                                    //Clear MP3DecInfo
@@ -3575,7 +3619,7 @@ int IMDCT( int gr, int ch) {
  **********************************************************************************************************************/
 int Subband( short *pcmBuf) {
     int b;
-    if (m_MP3DecInfo->nChans == 2) {
+    if (MP3OutputChannels() == 2) {
         /* stereo */
         for (b = 0; b < m_BLOCK_SIZE; b++) {
             HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_DCT);

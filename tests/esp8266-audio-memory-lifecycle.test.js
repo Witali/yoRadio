@@ -84,7 +84,7 @@ test("full codec profile reserves IRAM for AAC and MP3 while libmad-only stays s
   assert.match(arena, /!CONFIG_YORADIO_HELIX_AAC && CONFIG_YORADIO_MP3_DECODER_LIBMAD[\s\S]*12U \* 1024U/);
   assert.match(arena, /#else[\s\S]*16U \* 1024U[\s\S]*kWordSpillBytes = 0U/);
   assert.match(bridge, /kAacPcmSamples = 1024U \* 2U/);
-  assert.match(bridge, /kMp3PcmSamples = 576U \* 2U/);
+  assert.match(bridge, /kMp3PcmSamples = 576U \* \(CONFIG_YORADIO_AUDIO_MONO \? 1U : 2U\)/);
   assert.match(bridge, /codec->pcm_samples = pcm_samples_for_kind\(kind\)/);
   assert.match(bridge, /sizeof\(int16_t\) \* codec->pcm_samples/);
 });

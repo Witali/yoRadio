@@ -1,5 +1,24 @@
 menu "yoRadio ESP8266 options"
 
+choice YORADIO_AUDIO_CHANNELS
+    prompt "Decoded audio channels"
+    default YORADIO_AUDIO_STEREO if YORADIO_AUDIO_OUTPUT_I2S_PCM
+    default YORADIO_AUDIO_MONO
+    help
+        Mono produces (L+R)/2. Helix MP3 skips the side channel in compatible
+        M/S frames without intensity stereo, with one IMDCT and one synthesis.
+        Other MP3 modes retain a safe downmix path. AAC and libmad downmix
+        after decoding. Stereo preserves both channels; a stereo DAC requires
+        the I2S PCM backend (the one-pin PDM outputs are physically mono).
+
+config YORADIO_AUDIO_MONO
+    bool "Mono"
+
+config YORADIO_AUDIO_STEREO
+    bool "Stereo"
+
+endchoice
+
 choice YORADIO_MP3_DECODER
     prompt "MP3 decoder backend"
     default YORADIO_MP3_DECODER_HELIX

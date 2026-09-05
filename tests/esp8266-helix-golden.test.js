@@ -29,7 +29,7 @@ function findVcVars() {
   return null;
 }
 
-function compile(outputDir, name, reference, mp3Sso = false, aacSso = false) {
+function compile(outputDir, name, reference, mp3Sso = false, aacSso = false, options = {}) {
   const executable = path.join(
     outputDir, process.platform === "win32" ? `${name}.exe` : name,
   );
@@ -39,10 +39,16 @@ function compile(outputDir, name, reference, mp3Sso = false, aacSso = false) {
     path.join(native, "codec_arena_host.cpp"),
     path.join(native, "decode_fixture.cpp"),
   ];
+  if(options.unit) {
+    sources[0] = path.join(native, "mp3_mono_state_test.cpp");
+    sources.pop();
+  }
   const defines = ["YORADIO_ESP8266_NATIVE=1"];
   if(reference) defines.push("YORADIO_HELIX_REFERENCE_FIXED_POINT=1");
   if(mp3Sso) defines.push("YORADIO_HELIX_MP3_SSO=1");
   if(aacSso) defines.push("YORADIO_HELIX_AAC_SSO=1");
+  if(options.mono) defines.push("YORADIO_HELIX_MP3_MONO=1");
+  if(options.profile) defines.push("YORADIO_ESP8266_HELIX_STAGE_PROFILE=1");
 
   let build;
   if(process.platform === "win32") {
@@ -116,9 +122,87 @@ function decode(executable, codec, fixture, output) {
   return {
     pcm,
     summary: result.stdout.trim(),
+    profile: result.stderr.trim(),
     sha256: crypto.createHash("sha256").update(pcm).digest("hex"),
   };
 }
+
+function mp3Modes(source, selectMode) {
+  const data = Buffer.from(source);
+  const rates = [0,32,40,48,56,64,80,96,112,128,160,192,224,256,320];
+  const samples = [44100,48000,32000];
+  let frames = 0;
+  let start = 0;
+  if(data.subarray(0,3).toString() === "ID3") {
+    start = 10;
+    start += (data[6] << 21) | (data[7] << 14) | (data[8] << 7) | data[9];
+  }
+  for(let offset = start; offset + 4 <= data.length;) {
+    assert.equal(data[offset], 0xff);
+    assert.equal(data[offset + 1] & 0xfe, 0xfa, "fixture must be MPEG1 Layer III");
+    const size = Math.floor(144000 * rates[data[offset + 2] >> 4] /
+      samples[(data[offset + 2] >> 2) & 3]) + ((data[offset + 2] >> 1) & 1);
+    if(offset + size > data.length) break;
+    data[offset + 3] = (data[offset + 3] & 15) | selectMode(frames++);
+    offset += size;
+  }
+  assert.ok(frames > 4);
+  return data;
+}
+
+function downmix(stereo) {
+  const mono = Buffer.alloc(stereo.length / 2);
+  for(let offset = 0; offset < stereo.length; offset += 4)
+    mono.writeInt16LE((stereo.readInt16LE(offset) + stereo.readInt16LE(offset + 2)) >> 1, offset / 2);
+  return mono;
+}
+
+test("MP3 build-time mono skips M/S side and preserves fallback/mode transitions", t => {
+  const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-mono-"));
+  t.after(() => fs.rmSync(outputDir, {recursive: true, force: true}));
+  const stereo = compile(outputDir, "stereo", false, true, false, {profile:true});
+  if(stereo.skip) return t.skip(stereo.skip);
+  const mono = compile(outputDir, "mono", false, true, false, {mono:true, profile:true});
+  const original = fs.readFileSync(path.join(fixtures, "stereo-320.mp3"));
+  for(const [name, data] of [
+    ["original", original],
+    ["mid-side", mp3Modes(original, () => 0x60)],
+    ["left-right", mp3Modes(original, () => 0x00)],
+    ["dual-channel", mp3Modes(original, () => 0x80)],
+    ["intensity", mp3Modes(original, () => 0x50)],
+    ["mid-side-intensity", mp3Modes(original, () => 0x70)],
+    ["transitions", mp3Modes(original, i => [0x60,0x00,0x50,0x70,0x60][i % 5])],
+    ...["mpeg1", "mpeg2", "mpeg25", "mono"].map(name => [name,
+      fs.readFileSync(path.join(__dirname, "fixtures", "helix_mono", `${name}.mp3`))]),
+  ]) {
+    const fixture = path.join(outputDir, `${name}.mp3`);
+    fs.writeFileSync(fixture, data);
+    const ref = decode(stereo.executable, "mp3", fixture, path.join(outputDir, `${name}-stereo.pcm`));
+    const actual = decode(mono.executable, "mp3", fixture, path.join(outputDir, `${name}-mono.pcm`));
+    const granules = decode(mono.executable, "mp3-granules", fixture, path.join(outputDir, `${name}-granules.pcm`));
+    assert.deepEqual(actual.pcm, granules.pcm, `${name}: frame/granule API differs`);
+    const quality = comparePcm(name === "mono" ? ref.pcm : downmix(ref.pcm), actual.pcm);
+    assert.ok(quality.snrDb >= 48, `${name}: SNR=${quality.snrDb}`);
+    assert.ok(quality.maximumError <= 64, `${name}: error=${quality.maximumError}`);
+    const calls = value => Number(/huffman=(\d+)/.exec(value.profile)[1]);
+    if(["mid-side", "mpeg1", "mpeg2", "mpeg25"].includes(name))
+      assert.ok(calls(actual) < calls(ref), `${name}: side Huffman was not skipped`);
+    if(name === "mono") assert.deepEqual(actual.pcm, ref.pcm, "native mono must remain bit-exact");
+    if(["left-right", "dual-channel", "intensity", "mid-side-intensity"].includes(name))
+      assert.equal(calls(actual), calls(ref), `${name}: unsafe side skip`);
+    t.diagnostic(`${name}: SNR=${quality.snrDb.toFixed(2)} dB maxError=${quality.maximumError}, Huffman ${calls(ref)} -> ${calls(actual)}`);
+  }
+});
+
+test("MP3 mono overlap state is safe across windows, channel modes and reset", t => {
+  const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-mono-state-"));
+  t.after(() => fs.rmSync(outputDir, {recursive:true, force:true}));
+  const binary = compile(outputDir, "mono-state", false, false, false, {mono:true, unit:true});
+  if(binary.skip) return t.skip(binary.skip);
+  const result = spawnSync(binary.executable, [], {encoding:"utf8"});
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  t.diagnostic(result.stdout.trim());
+});
 
 test("ESP8266 optimized Helix MP3/AAC PCM matches the 64-bit reference", t => {
   const outputDir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-golden-"));

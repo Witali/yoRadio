@@ -56,7 +56,7 @@ the default delta-sigma I2S PDM. See [RCPDM configuration and filter](../../docs
 
 The tracked `sdkconfig.defaults` is the authoritative default for this board.
 It explicitly selects QIO 40 MHz flash, a 160 MHz CPU, Helix MP3 SSO, Helix
-AAC, I2S-PDM on GPIO3, genuine PDM32 at nominal 1.536 MHz, and the static
+AAC, mono decoded PCM, I2S-PDM on GPIO3, genuine PDM32 at nominal 1.536 MHz, and the static
 2 x 512-word SLC-DMA ping-pong buffers. The 3072-byte main task also owns the button and
 encoder gesture state machine, awakened directly by their ISRs, so there is no
 separate input-task stack. The HTTP/WebSocket task uses 4096 bytes. libmad,
@@ -94,7 +94,12 @@ starts reliably. The default Wemos profile then returns GPIO2 to the onboard
 active-low status LED, matching ESP8266Audio's NoDAC handling of the unused
 clock pin. Only DATA GPIO3 is connected to the audio filter. Connect GPIO3 through the
 documented low-pass/AC-coupling chain and then to a high-impedance amplifier
-input. Stereo streams are gain/balance adjusted and averaged before PDM.
+input. The default now selects build-time `CONFIG_YORADIO_AUDIO_MONO`:
+compatible Helix MP3 M/S frames skip the side channel and use one
+IMDCT/synthesis. Select `CONFIG_YORADIO_AUDIO_STEREO` or the complete
+`sdkconfig.stereo.defaults` profile to retain stereo decoding and independent
+L/R balance. The one-pin PDM backend itself remains mono in either case.
+See [mono/stereo behavior and tests](../../docs/ESP8266_MP3_MONO.md).
 The status LED is off until client Wi-Fi has an address, stays on while the
 radio is stopped, and alternates 500 ms off / 500 ms on while audio is playing.
 The PDM profile uses a small local output-only backend instead of the RTOS SDK
@@ -122,7 +127,9 @@ synthesis path and the genuine PDM32 x1 I2S backend.
 The production codec layout reserves one physically verified contiguous
 16384-byte IRAM arena. Helix MP3 splits IMDCT output by channel: one channel
 fits the arena and the remaining word workspaces use DRAM. On the physical
-board the active MP3 workspace reports 11472 bytes DRAM and 16384 bytes IRAM.
+board the previous stereo MP3 workspace reported 11472 bytes DRAM and 16384
+bytes IRAM. Build-time mono reduces its PCM allocation by 1152 DRAM bytes;
+the fallback transform storage and 16-KiB IRAM reservation remain unchanged.
 Larger single or secondary IRAM allocations are not a default: the SDK heap
 regions rejected them even when the ELF map showed enough aggregate bytes.
 

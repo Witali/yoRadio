@@ -6,6 +6,9 @@
 
 #include "CodecMemoryArena.h"
 #include "sdkconfig.h"
+#ifndef CONFIG_YORADIO_AUDIO_MONO
+#define CONFIG_YORADIO_AUDIO_MONO 0
+#endif
 #if CONFIG_YORADIO_HELIX_AAC
 #include "aac_decoder.h"
 #endif
@@ -52,7 +55,7 @@ constexpr size_t kInputStorageBytes = kInputBytes;
  * writes a complete 1024-sample stereo frame. Allocate the active codec's
  * exact PCM size: reserving AAC's larger buffer while playing MP3 starved
  * lwIP on the ESP8266. */
-constexpr size_t kMp3PcmSamples = 576U * 2U;
+constexpr size_t kMp3PcmSamples = 576U * (CONFIG_YORADIO_AUDIO_MONO ? 1U : 2U);
 #if CONFIG_YORADIO_HELIX_AAC
 constexpr size_t kAacPcmSamples = 1024U * 2U;
 constexpr size_t kMaxPcmSamples = kAacPcmSamples;
@@ -318,7 +321,7 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
             helix_stream_info_t info = {
                 s_libmad.frame->header.samplerate,
                 s_libmad.frame->header.bitrate,
-                static_cast<uint8_t>(channels), 16,
+                static_cast<uint8_t>(CONFIG_YORADIO_AUDIO_MONO ? 1 : channels), 16,
             };
             for (unsigned ns = 0; ns < subbands; ++ns) {
                 if (mad_synth_frame_onens(s_libmad.synth,
@@ -329,9 +332,15 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
                 }
                 const mad_pcm &block = s_libmad.synth->pcm;
                 for (unsigned sample = 0; sample < block.length; ++sample) {
+#if CONFIG_YORADIO_AUDIO_MONO
+                    int32_t value = block.samples[0][sample];
+                    if (channels == 2) value = (value + block.samples[1][sample]) >> 1;
+                    codec->pcm[pcm_samples++] = static_cast<int16_t>(value);
+#else
                     codec->pcm[pcm_samples++] = block.samples[0][sample];
                     if (channels == 2)
                         codec->pcm[pcm_samples++] = block.samples[1][sample];
+#endif
                 }
                 if (pcm_samples &&
                     (((ns + 1U) % 18U) == 0U || ns + 1U == subbands)) {
@@ -348,7 +357,8 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
         Mp3GranuleOutput output = {
             callback,
             context,
-            {parsed.sample_rate, parsed.bitrate, parsed.channels, 16},
+            {parsed.sample_rate, parsed.bitrate,
+             static_cast<uint8_t>(CONFIG_YORADIO_AUDIO_MONO ? 1 : parsed.channels), 16},
             false,
         };
         int result = MP3DecodeGranules(input, &left, codec->pcm, 0,
@@ -414,8 +424,18 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
         static_cast<uint8_t>(AACGetBitsPerSample()),
     };
     size_t samples = static_cast<size_t>(AACGetOutputSamps());
-    if (!samples || samples > codec->pcm_samples ||
-        !callback(context, &info, codec->pcm, samples)) return -7;
+    if (!samples || samples > codec->pcm_samples) return -7;
+#if CONFIG_YORADIO_AUDIO_MONO
+    if (info.channels == 2) {
+        if (samples & 1U) return -7;
+        samples /= 2U;
+        for (size_t i = 0; i < samples; ++i)
+            codec->pcm[i] = static_cast<int16_t>(
+                (static_cast<int32_t>(codec->pcm[2U * i]) + codec->pcm[2U * i + 1U]) >> 1);
+        info.channels = 1;
+    }
+#endif
+    if (!callback(context, &info, codec->pcm, samples)) return -7;
     consume(codec, used ? used : frame);
     return 0;
 #else

@@ -4,6 +4,11 @@
 #include "Arduino.h"
 #include "assert.h"
 
+/* Existing Arduino/ESP32 callers retain stereo unless explicitly opted in. */
+#ifndef YORADIO_HELIX_MP3_MONO
+#define YORADIO_HELIX_MP3_MONO 0
+#endif
+
 static const uint8_t  m_HUFF_PAIRTABS          =32;
 static const uint8_t  m_BLOCK_SIZE             =18;
 static const uint8_t  m_NBANDS                 =32;

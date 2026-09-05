@@ -1,11 +1,18 @@
 #include "aac_decoder.h"
 #include "mp3_decoder.h"
+#include "helix_stage_profile.h"
 
 #include <fstream>
 #include <iostream>
 #include <iterator>
 #include <string>
 #include <vector>
+
+#if defined(YORADIO_ESP8266_HELIX_STAGE_PROFILE)
+static unsigned stage_calls[HELIX_STAGE_COUNT];
+extern "C" void helix_stage_profile_begin(int stage) { ++stage_calls[stage]; }
+extern "C" void helix_stage_profile_end(int) {}
+#endif
 
 namespace {
 
@@ -16,7 +23,19 @@ bool write_pcm(std::ofstream &output, const short *pcm, int samples) {
     return output.good();
 }
 
-int decode_mp3(std::vector<unsigned char> &input, std::ofstream &output) {
+struct GranuleOutput {
+    std::ofstream *output;
+    int samples;
+};
+
+bool emit_granule(void *context, short *pcm, int samples) {
+    GranuleOutput *sink = static_cast<GranuleOutput *>(context);
+    if (samples <= 0 || samples > (YORADIO_HELIX_MP3_MONO ? 576 : 1152)) return false;
+    sink->samples += samples;
+    return write_pcm(*sink->output, pcm, samples);
+}
+
+int decode_mp3(std::vector<unsigned char> &input, std::ofstream &output, bool granules = false) {
     if (!MP3Decoder_AllocateBuffers()) return 10;
     short pcm[4096] = {};
     size_t cursor = 0;
@@ -30,7 +49,13 @@ int decode_mp3(std::vector<unsigned char> &input, std::ofstream &output) {
         cursor += static_cast<size_t>(sync);
         available = static_cast<int>(input.size() - cursor);
         int left = available;
-        int result = MP3Decode(input.data() + cursor, &left, pcm, 0);
+        GranuleOutput sink = {&output, 0};
+        const int capacity = YORADIO_HELIX_MP3_MONO ? 576 : 1152;
+        pcm[capacity] = 12345;
+        int result = granules
+            ? MP3DecodeGranules(input.data() + cursor, &left, pcm, 0, emit_granule, &sink)
+            : MP3Decode(input.data() + cursor, &left, pcm, 0);
+        if (granules && pcm[capacity] != 12345) return 14;
         int consumed = available - left;
         if (consumed <= 0) {
             ++cursor;
@@ -45,7 +70,8 @@ int decode_mp3(std::vector<unsigned char> &input, std::ofstream &output) {
             return 11;
         }
         int frame_samples = MP3GetOutputSamps();
-        if (!write_pcm(output, pcm, frame_samples)) {
+        if ((granules && sink.samples != frame_samples) ||
+            (!granules && !write_pcm(output, pcm, frame_samples))) {
             MP3Decoder_FreeBuffers();
             return 12;
         }
@@ -53,6 +79,10 @@ int decode_mp3(std::vector<unsigned char> &input, std::ofstream &output) {
         ++frames;
     }
     MP3Decoder_FreeBuffers();
+#if defined(YORADIO_ESP8266_HELIX_STAGE_PROFILE)
+    std::cerr << "huffman=" << stage_calls[HELIX_STAGE_HUFFMAN]
+              << " synthesis=" << stage_calls[HELIX_STAGE_SYNTHESIS] << "\n";
+#endif
     if (!frames) return 13;
     std::cout << "codec=mp3 frames=" << frames << " samples=" << samples
               << " bytes=" << samples * sizeof(short) << "\n";
@@ -118,6 +148,7 @@ int main(int argc, char **argv) {
     if (!output) return 5;
     const std::string codec = argv[1];
     if (codec == "mp3") return decode_mp3(input, output);
+    if (codec == "mp3-granules") return decode_mp3(input, output, true);
     if (codec == "aac") return decode_aac(input, output);
     return 6;
 }
