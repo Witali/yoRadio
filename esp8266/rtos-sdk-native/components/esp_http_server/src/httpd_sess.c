@@ -383,8 +383,13 @@ int httpd_sess_iterate(struct httpd_data *hd, int start_fd)
 static void httpd_sess_close(void *arg)
 {
     struct sock_db *sock_db = (struct sock_db *)arg;
-    if (sock_db) {
+    /* A queued callback can outlive this slot's original connection. New
+     * sessions zero close_pending; never close a reused slot unless its new
+     * owner has independently requested closure too. Duplicate callbacks
+     * coalesce and cannot close an unrelated later connection. */
+    if (sock_db && sock_db->fd >= 0 && sock_db->close_pending) {
         int fd = sock_db->fd;
+        sock_db->close_pending = false;
         struct httpd_data *hd = (struct httpd_data *) sock_db->handle;
         httpd_sess_delete(hd, fd);
         close(fd);
@@ -395,7 +400,11 @@ esp_err_t httpd_sess_trigger_close(httpd_handle_t handle, int sockfd)
 {
     struct sock_db *sock_db = httpd_sess_get(handle, sockfd);
     if (sock_db) {
-        return httpd_queue_work(handle, httpd_sess_close, sock_db);
+        if (sock_db->close_pending) return ESP_OK;
+        sock_db->close_pending = true;
+        esp_err_t result = httpd_queue_work(handle, httpd_sess_close, sock_db);
+        if (result != ESP_OK) sock_db->close_pending = false;
+        return result;
     }
 
     return ESP_ERR_NOT_FOUND;

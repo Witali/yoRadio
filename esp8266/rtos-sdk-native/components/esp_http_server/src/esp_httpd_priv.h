@@ -129,6 +129,7 @@ struct sock_db {
     char pending_data[PARSER_BLOCK_SIZE];   /*!< Buffer for pending data to be received */
     size_t pending_len;                     /*!< Length of pending data to be received */
     bool for_async_req;                     /*!< Socket is owned by an async handler */
+    bool close_pending;                     /*!< Coalesced close request for this lifetime */
 #ifdef CONFIG_HTTPD_WS_SUPPORT
     bool ws_handshake_done;
     bool ws_close;

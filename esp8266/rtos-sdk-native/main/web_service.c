@@ -12,6 +12,8 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "lwip/sockets.h"
+#include "lwip/tcp.h"
 #include "native_audio_output.h"
 #include "native_state.h"
 #include "persistent_settings.h"
@@ -322,6 +324,15 @@ static void session_closed(httpd_handle_t server, int socket) {
     for (unsigned i = 0; i < WEB_WS_CLIENTS; ++i)
         if (s_ws_fds[i] == socket) s_ws_fds[i] = -1;
     /* This SDK closes the descriptor after calling close_fn. */
+}
+
+static esp_err_t session_opened(httpd_handle_t server, int socket) {
+    (void)server;
+    int enabled = 1;
+    /* HTTP headers/chunk delimiters and WS headers are short writes. Do not
+     * make each one wait for a delayed TCP ACK before sending its payload. */
+    return setsockopt(socket, IPPROTO_TCP, TCP_NODELAY,
+                      &enabled, sizeof(enabled)) == 0 ? ESP_OK : ESP_FAIL;
 }
 
 static esp_err_t send_initial_state(httpd_req_t *request) {
@@ -636,12 +647,11 @@ static void prepare_short_response(httpd_req_t *request) {
 
 static esp_err_t finish_short_response(httpd_req_t *request,
                                        esp_err_t result) {
-    /* A conforming client closes after receiving the complete response
-     * because prepare_short_response() emitted Connection: close. Queuing a
-     * server-side close after a successful send can run before lwIP drains
-     * its TCP queue and truncate the final chunk on a lossy link. Only force
-     * cleanup when the response already failed. */
-    if (result != ESP_OK) {
+    /* RFC 9112 section 9.6: send FIN after queued response bytes, retain the
+     * read half until the client closes. Do not abort a successful response. */
+    if (result == ESP_OK) {
+        shutdown(httpd_req_to_sockfd(request), SHUT_WR);
+    } else {
         (void)httpd_sess_trigger_close(request->handle,
                                       httpd_req_to_sockfd(request));
     }
@@ -828,6 +838,7 @@ esp_err_t web_service_start(void) {
     config.server_port = 80;
     config.stack_size = BOARD_TASK_STACK_WEB;
     config.close_fn = session_closed;
+    config.open_fn = session_opened;
     config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
     config.backlog_conn = WEB_CONNECTION_BACKLOG;
     config.recv_wait_timeout = WEB_IDLE_TIMEOUT_SECONDS;

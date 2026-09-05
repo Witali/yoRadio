@@ -8,6 +8,17 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('short HTTP responses use TCP_NODELAY and graceful write-half shutdown', () => {
+  const source = read(main+'web_service.c');
+  assert.match(source, /config.open_fn = session_opened/);
+  assert.match(source, /setsockopt\(socket, IPPROTO_TCP, TCP_NODELAY/);
+  assert.match(source, /if \(result == ESP_OK\) \{\s*shutdown\(httpd_req_to_sockfd\(request\), SHUT_WR\)/);
+  const sessions = read('esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_sess.c');
+  assert.match(sessions, /sock_db && sock_db->fd >= 0 && sock_db->close_pending/);
+  assert.match(sessions, /if \(sock_db->close_pending\) return ESP_OK/);
+  assert.match(sessions, /sock_db->close_pending = false;\s*struct httpd_data/);
+});
+
 test('two bounded WebSocket subscribers share a single HTTP-owned status buffer', () => {
   const source = read(main+'web_service.c');
   assert.match(source, /#define WEB_WS_CLIENTS 2U/);
