@@ -89,6 +89,44 @@ static bool settings_valid(const persistent_settings_t *settings) {
            settings->sntp2[sizeof(settings->sntp2) - 1] == '\0';
 }
 
+esp_err_t persistent_settings_reset_group(const char *group) {
+    persistent_settings_t defaults, settings;
+    load_defaults(&defaults);
+    persistent_settings_get(&settings);
+    persistent_web_settings_t web;
+    persistent_settings_get_web(&web);
+    if (strcmp(group, "1") == 0) {
+        settings = defaults;
+        web.audio_info = true; web.softap_delay_min = 0;
+    } else if (strcmp(group, "system") == 0) {
+        settings.smart_start = defaults.smart_start;
+        settings.normalization_enabled = defaults.normalization_enabled;
+        settings.normalization_max_gain_db = defaults.normalization_max_gain_db;
+        settings.normalization_target_db = defaults.normalization_target_db;
+        settings.normalization_time_ms = defaults.normalization_time_ms;
+        web.audio_info = true; web.softap_delay_min = 0;
+    } else if (strcmp(group, "screen") == 0) {
+        settings.brightness = defaults.brightness;
+        settings.station_uppercase = defaults.station_uppercase;
+        settings.numbered_playlist = defaults.numbered_playlist;
+        settings.screensaver_enabled = defaults.screensaver_enabled;
+        settings.screensaver_blank = defaults.screensaver_blank;
+        settings.screensaver_timeout_s = defaults.screensaver_timeout_s;
+    } else if (strcmp(group, "timezone") == 0) {
+        settings.timezone_hour = defaults.timezone_hour;
+        settings.timezone_minute = defaults.timezone_minute;
+        settings.time_sync_interval_min = defaults.time_sync_interval_min;
+        memcpy(settings.sntp1, defaults.sntp1, sizeof(settings.sntp1));
+        memcpy(settings.sntp2, defaults.sntp2, sizeof(settings.sntp2));
+    } else if (strcmp(group, "controls") == 0) {
+        settings.volume_steps = defaults.volume_steps;
+        settings.encoder_acceleration = defaults.encoder_acceleration;
+    } else return ESP_ERR_NOT_SUPPORTED;
+    esp_err_t result = persistent_settings_update_runtime(&settings);
+    if (result == ESP_OK) result = persistent_settings_update_web(&web);
+    return result;
+}
+
 esp_err_t persistent_settings_init(void) {
     s_lock = xSemaphoreCreateMutex();
     if (!s_lock) return ESP_ERR_NO_MEM;

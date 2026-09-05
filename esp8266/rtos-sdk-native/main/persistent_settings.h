@@ -47,6 +47,7 @@ esp_err_t persistent_settings_save(const persistent_settings_t *settings);
 esp_err_t persistent_settings_update_runtime(
     const persistent_settings_t *settings);
 esp_err_t persistent_settings_commit(void);
+esp_err_t persistent_settings_reset_group(const char *group);
 void persistent_settings_set_volume_runtime(uint8_t volume);
 void persistent_settings_set_last_station_runtime(uint16_t station);
 void persistent_settings_set_smart_start_runtime(uint8_t state);

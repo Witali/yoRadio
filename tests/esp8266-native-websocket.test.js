@@ -184,7 +184,7 @@ test("ESP8266 WebUI uses the reduced stack after removing status temporaries", (
     ),
     "utf8",
   );
-  assert.match(board, /BOARD_TASK_STACK_WEB 4096/);
+  assert.match(board, /BOARD_TASK_STACK_WEB 5120/);
   const initial = source.slice(source.indexOf("static esp_err_t send_initial_state"), source.indexOf("static esp_err_t send_active_settings"));
   assert.doesNotMatch(initial, /char body\[WEB_STATUS_CAPACITY\]/);
   assert.match(initial, /format_status\(&state, s_async_message, sizeof\(s_async_message\)\)/);

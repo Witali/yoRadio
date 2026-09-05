@@ -5,6 +5,7 @@
 #include <string.h>
 #include "esp_log.h"
 #include "esp_system.h"
+#include "esp_ota_ops.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "lwip/sockets.h"
@@ -158,9 +159,10 @@ static bool upload_part(mp_event_t event, const uint8_t *data, size_t length,
     return ok;
 }
 
-static bool receive_form(httpd_req_t *request, mp_handler_t handler, void *context) {
+static bool receive_form(httpd_req_t *request, size_t maximum,
+                          mp_handler_t handler, void *context) {
     char type[160];
-    if (!request->content_len || request->content_len > UPLOAD_MAX ||
+    if (!request->content_len || request->content_len > maximum ||
         httpd_req_get_hdr_value_str(request, "Content-Type", type, sizeof(type)) != ESP_OK)
         return false;
     if (strncmp(type, "multipart/form-data;", 20) != 0) return false;
@@ -174,7 +176,7 @@ static bool receive_form(httpd_req_t *request, mp_handler_t handler, void *conte
     size_t left = request->content_len;
     TickType_t start = xTaskGetTickCount();
     while (left) {
-        if (xTaskGetTickCount() - start > pdMS_TO_TICKS(60000)) return false;
+        if (xTaskGetTickCount() - start > pdMS_TO_TICKS(120000)) return false;
         size_t n = left > sizeof(s_receive) ? sizeof(s_receive) : left;
         int received = httpd_req_recv(request, (char *)s_receive, n);
         if (received <= 0) return false;
@@ -190,7 +192,7 @@ esp_err_t web_upload_handler(httpd_req_t *request) {
     /* File maintenance pauses radio explicitly; no decoder competes for RAM
      * with flash writes. Commands arriving over WS resume after this request. */
     (void)radio_control_stop();
-    bool ok = receive_form(request, upload_part, &upload);
+    bool ok = receive_form(request, UPLOAD_MAX, upload_part, &upload);
     if (upload.file) fclose(upload.file);
     if (ok && upload.credentials) {
         ok = upload.fields == 3U && upload.ssid[0];
@@ -224,5 +226,83 @@ esp_err_t web_upload_handler(httpd_req_t *request) {
     if (ok && upload.wifi_saved) web_upload_request_reboot();
     if (result == ESP_OK) shutdown(httpd_req_to_sockfd(request), SHUT_WR);
     /* Do not ask the SDK to drain an untrusted unbounded rejected body. */
+    return ok ? result : ESP_FAIL;
+}
+
+typedef struct {
+    const esp_partition_t *partition;
+    esp_ota_handle_t handle;
+    bool started, verified, image_part, target_part, target_seen, image_seen;
+    size_t written, target_length;
+    char target[16];
+} ota_upload_t;
+
+static bool ota_part(mp_event_t event, const uint8_t *data, size_t length, void *context) {
+    ota_upload_t *u = context;
+    if (event == MP_BEGIN) {
+        char field[24];
+        if (!mp_parameter((const char *)data, "name", field, sizeof(field))) return false;
+        u->target_part = strcmp(field, "updatetarget") == 0;
+        u->image_part = strcmp(field, "update") == 0;
+        if (u->target_part) {
+            if (u->target_seen || u->image_seen) return false;
+            u->target_seen = true;
+            return true;
+        }
+        if (!u->image_part || u->image_seen || strcmp(u->target, "firmware") != 0)
+            return false;
+        u->image_seen = true;
+        return true;
+    }
+    if (u->target_part) {
+        if (event == MP_DATA) {
+            if (u->target_length + length >= sizeof(u->target) ||
+                memchr(data, 0, length)) return false;
+            memcpy(u->target + u->target_length, data, length);
+            u->target_length += length;
+            u->target[u->target_length] = 0;
+        }
+        return true;
+    }
+    if (!u->image_part) return false;
+    if (event == MP_DATA) {
+        if (u->written + length > u->partition->size) return false;
+        if (!u->started) {
+            if (!length || data[0] != 0xe9) return false;
+            if (esp_ota_begin(u->partition, OTA_SIZE_UNKNOWN, &u->handle) != ESP_OK)
+                return false;
+            u->started = true;
+        }
+        if (esp_ota_write(u->handle, data, length) != ESP_OK) return false;
+        u->written += length;
+        return true;
+    }
+    if (!u->started || !u->written) return false;
+    u->verified = esp_ota_end(u->handle) == ESP_OK;
+    u->started = false; /* SDK frees the handle even on validation failure. */
+    return u->verified;
+}
+
+esp_err_t web_ota_handler(httpd_req_t *request) {
+    ota_upload_t upload = {.partition = esp_ota_get_next_update_partition(NULL)};
+    bool ok = upload.partition &&
+              upload.partition != esp_ota_get_running_partition();
+    if (ok) {
+        (void)radio_control_stop();
+        ok = receive_form(request, upload.partition->size + 4096U, ota_part, &upload);
+    }
+    if (upload.started) (void)esp_ota_end(upload.handle);
+    /* Select boot slot only after complete reception AND image validation. */
+    ok = ok && upload.verified &&
+         esp_ota_set_boot_partition(upload.partition) == ESP_OK;
+    httpd_resp_set_hdr(request, "Connection", "close");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    httpd_resp_set_type(request, "text/plain; charset=utf-8");
+    if (!ok) httpd_resp_set_status(request, "400 Bad Request");
+    const char *body = ok ? "OK" :
+        "OTA rejected: use an ESP8266 native app.bin. SPIFFS images are not supported; use Board file upload.";
+    esp_err_t result = httpd_resp_send(request, body, strlen(body));
+    if (result == ESP_OK) shutdown(httpd_req_to_sockfd(request), SHUT_WR);
+    if (ok) web_upload_request_reboot();
     return ok ? result : ESP_FAIL;
 }

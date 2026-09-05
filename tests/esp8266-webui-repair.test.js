@@ -8,6 +8,20 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS', () => {
+  const rows = read('esp8266/rtos-sdk-native/partitions.csv').split(/\r?\n/)
+    .filter(line => line && !line.startsWith('#')).map(line=>line.split(',').map(x=>x.trim()));
+  const find = name => rows.find(row=>row[0] === name);
+  assert.equal(Number(find('spiffs')[4]), 256*1024);
+  assert.equal(Number(find('app1')[3])-Number(find('app0')[3]), 0x100000);
+  assert.equal(Number(find('nvs')[3]), 0x9000);
+  assert.equal(Number(find('nvs')[4]), 0x6000);
+  const source = read(main+'web_upload.c');
+  assert.match(source, /upload.partition != esp_ota_get_running_partition\(\)/);
+  assert.match(source, /ok = ok && upload.verified &&\s*esp_ota_set_boot_partition/);
+  assert.match(source, /esp_ota_end\(u->handle\) == ESP_OK/);
+});
+
 test('Wi-Fi readback preserves edge spaces and ignores excess credential rows', () => {
   const source = zlib.gunzipSync(fs.readFileSync(path.join(root, 'yoRadio/data/www/script.js.gz'))).toString();
   const fn = source.slice(source.indexOf('function handleWiFiData'), source.indexOf('function getWiFi'));

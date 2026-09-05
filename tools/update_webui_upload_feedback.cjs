@@ -17,4 +17,14 @@ if(!source.includes('function reportUploadFailure')) {
     feedback + "\n    };\n    xhr.onerror = () => reportUploadFailure(xhr);\n    xhr.send(formData);\n    fileuploadinput.value = '';");
 }
 source = source.replaceAll('getId("status").innerHTML =', 'getId("uploadstatus").innerHTML =');
+if(!source.includes("nativeFirmwareOnly === true")) {
+  source = source.replace("getId('content').innerHTML = updform;",
+    "getId('content').innerHTML = updform;\n" +
+    "        if(typeof nativeFirmwareOnly !== 'undefined' && nativeFirmwareOnly === true){\n" +
+    "          getId('uploadtype2').closest('label').classList.add('hidden');\n" +
+    "          getId('uploadstatus').innerText='Choose ESP8266 native app.bin. For WebUI files use Board.';\n" +
+    "        }");
+  source = source.replace('system.appendChild(row);',
+    "system.appendChild(row);\n      document.querySelector('[data-command=\"format\"]')?.classList.add('hidden');");
+}
 fs.writeFileSync(file, zlib.gzipSync(source, {level:9}));

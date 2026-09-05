@@ -10,6 +10,7 @@
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "esp_system.h"
+#include "esp_ota_ops.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "lwip/sockets.h"
@@ -494,6 +495,24 @@ static void handle_command(httpd_req_t *request, char *command) {
                 "\"wkey\":\"\",\"wint\":60}");
     } else if (strcmp(command, "getcontrols") == 0) {
         send_control_settings(request);
+    } else if (strcmp(command, "reboot") == 0) {
+        ws_send(request, "{\"accepted\":true}");
+        web_upload_request_reboot();
+    } else if (strcmp(command, "reset") == 0) {
+        if (persistent_settings_reset_group(value) != ESP_OK) {
+            ws_send(request, "{\"commandError\":\"Unknown settings group\"}");
+        } else {
+            radio_control_settings_changed();
+            native_audio_output_reload_settings();
+            time_service_settings_changed();
+            if (strcmp(value, "1") == 0) web_upload_request_reboot();
+            else {
+                send_system_settings(request);
+                send_screen_settings(request);
+                send_timezone_settings(request);
+                send_control_settings(request);
+            }
+        }
     } else if (strcmp(command, "audioinfo") == 0 ||
                strcmp(command, "softap") == 0) {
         persistent_web_settings_t web;
@@ -732,7 +751,8 @@ static esp_err_t variables_handler(httpd_req_t *request) {
              "var webUiRevision='8266n01';\n"
              "var formAction='%s';\n"
              "var playMode='%s';\n"
-             "var equalizerEnabled=false;\n",
+             "var equalizerEnabled=false;\n"
+             "var nativeFirmwareOnly=true;\n",
              "",
              state.network_mode == NETWORK_CLIENT ? "player" : "ap");
     httpd_resp_set_type(request, "application/javascript; charset=utf-8");
@@ -822,19 +842,24 @@ static esp_err_t status_handler(httpd_req_t *request) {
     native_state_snapshot(&state);
     char station[260];
     json_escape(state.station, station, sizeof(station));
-    char body[640];
+    char body[768];
     char error[192];
     json_escape(state.error, error, sizeof(error));
     snprintf(body, sizeof(body),
              "{\"firmware\":\"esp8266-native\",\"port\":80,"
              "\"websocket\":\"/ws\",\"network\":%d,\"rssi\":%d,"
              "\"playing\":%s,\"station\":\"%s\",\"codec\":\"%s\","
-             "\"bitrate\":%lu,\"connecting\":%s,\"error\":\"%s\"}",
+             "\"bitrate\":%lu,\"connecting\":%s,\"error\":\"%s\","
+             "\"free_heap\":%u,\"min_heap\":%u,\"web_stack_free\":%u,"
+             "\"app_address\":%u}",
              state.network_mode, state.wifi_rssi,
              state.playing ? "true" : "false", station,
              native_codec_name(state.codec),
              (unsigned long)state.bitrate_kbps,
-             state.connecting ? "true" : "false", error);
+             state.connecting ? "true" : "false", error,
+             esp_get_free_heap_size(), esp_get_minimum_free_heap_size(),
+             (unsigned)uxTaskGetStackHighWaterMark(NULL),
+             (unsigned)esp_ota_get_running_partition()->address);
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return finish_short_response(request, send_string(request, body));
@@ -943,6 +968,9 @@ esp_err_t web_service_start(void) {
         return result;
     if ((result = register_get("/favicon.ico", static_handler)) != ESP_OK)
         return result;
+    httpd_uri_t ota = {.uri = "/update", .method = HTTP_POST,
+                       .handler = web_ota_handler};
+    if ((result = httpd_register_uri_handler(s_server, &ota)) != ESP_OK) return result;
     httpd_uri_t websocket = {
         .uri = "/ws",
         .method = HTTP_GET,

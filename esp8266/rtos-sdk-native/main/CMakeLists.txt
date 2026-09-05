@@ -80,7 +80,7 @@ endif()
 idf_component_register(
   SRCS ${YORADIO_SOURCES}
   INCLUDE_DIRS ${YORADIO_INCLUDE_DIRS}
-  REQUIRES esp8266 esp_event esp_http_server freertos heap helix_codecs log
+  REQUIRES app_update esp8266 esp_event esp_http_server freertos heap helix_codecs log
            lwip nvs_flash pthread spiffs tcpip_adapter
   EMBED_FILES ${YORADIO_EMBED_FILES})
 
