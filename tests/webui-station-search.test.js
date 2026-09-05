@@ -383,6 +383,7 @@ test("initial playlist rendering scrolls to the current station once", async () 
     setCurrentItem: (item, scroll) => {
       assert.equal(item, 2);
       shouldScroll = scroll;
+      if(scroll) playlist.scrollTop = 420;
     },
     console: { log: () => {} },
     result: null,
@@ -394,8 +395,22 @@ test("initial playlist rendering scrolls to the current station once", async () 
   );
   assert.equal(await context.result, true);
   assert.equal(shouldScroll, true);
+  assert.equal(playlist.scrollTop, 420, "initial scroll must not be overwritten");
   assert.equal(context.initialPlaylistScrollPending, false);
   assert.equal(context.playlistLoaded, true);
+});
+
+test("current arriving after playlist requests initial scroll only once", () => {
+  const script = readAsset("script.js.gz");
+  const helpers = script.slice(script.indexOf("function requestStationChangeScroll"),
+    script.indexOf("function setupElement"));
+  const context = { currentItem: 0, currentItemSynchronized: false,
+    stationChangeScrollFrom: null, initialPlaylistScrollPending: true,
+    playlistLoaded: true };
+  vm.runInNewContext(helpers, context);
+  assert.equal(context.shouldScrollCurrentItem(500), true);
+  context.currentItem = 500;
+  assert.equal(context.shouldScrollCurrentItem(500), false);
 });
 
 test("station search has compact responsive styling", () => {
