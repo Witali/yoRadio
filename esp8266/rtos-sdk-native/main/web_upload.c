@@ -70,12 +70,13 @@ static bool valid_wifi(const char *path) {
 
 static bool publish_file(upload_t *u) {
     if (!u->ready) return true;
-    bool ok = u->playlist ? playlist_service_install(UPLOAD_TEMP) == ESP_OK
+    bool changed = false;
+    bool ok = u->playlist ? playlist_service_install(UPLOAD_TEMP, &changed) == ESP_OK
                          : file_replace(UPLOAD_TEMP, u->destination);
     if (!ok) return false;
     ++u->saved;
     u->wifi_saved |= u->wifi;
-    u->playlist_saved |= u->playlist;
+    u->playlist_saved |= u->playlist && changed;
     u->ready = false;
     return true;
 }

@@ -45,10 +45,55 @@ bool playlist_service_validate(const char *path) {
 }
 
 static esp_err_t rebuild_locked(void);
-esp_err_t playlist_service_install(const char *temporary) {
+static bool same_playlist_locked(const char *temporary) {
+    struct stat a, b;
+    if (stat(temporary, &a) || stat(PLAYLIST_PATH, &b) ||
+        a.st_size != b.st_size) return false;
+    FILE *left = fopen(temporary, "rb"), *right = fopen(PLAYLIST_PATH, "rb");
+    bool same = left && right;
+    /* Reuse the indexed-reader line buffer while holding its mutex. */
+    const size_t half = sizeof(s_line) / 2U;
+    while (same) {
+        size_t n = fread(s_line, 1, half, left);
+        size_t m = fread(s_line + half, 1, half, right);
+        same = n == m && !memcmp(s_line, s_line + half, n);
+        if (!n || !m) break;
+    }
+    if (left) { same = same && !ferror(left); fclose(left); }
+    if (right) { same = same && !ferror(right); fclose(right); }
+    return same;
+}
+
+esp_err_t playlist_service_install(const char *temporary, bool *changed) {
+    if (changed) *changed = false;
     if (!s_lock) return ESP_ERR_INVALID_STATE;
     xSemaphoreTake(s_lock, portMAX_DELAY);
-    esp_err_t result = file_replace(temporary, PLAYLIST_PATH) ? rebuild_locked() : ESP_FAIL;
+    esp_err_t result = ESP_FAIL;
+    if (same_playlist_locked(temporary)) {
+        result = remove(temporary) == 0 ? ESP_OK : ESP_FAIL;
+    } else if (file_recover(PLAYLIST_PATH)) {
+        bool previous = file_exists(PLAYLIST_PATH);
+        /* Invalidate even an equal-size old index before publishing new CSV.
+         * Keep old CSV until the replacement's index has been built. */
+        bool invalidated = !file_exists(PLAYLIST_INDEX_PATH) ||
+                           remove(PLAYLIST_INDEX_PATH) == 0;
+        if (invalidated && (!previous ||
+            rename(PLAYLIST_PATH, PLAYLIST_PATH ".bak") == 0)) {
+            result = rename(temporary, PLAYLIST_PATH) == 0
+                         ? rebuild_locked() : ESP_FAIL;
+            if (result == ESP_OK) {
+                if (previous) (void)remove(PLAYLIST_PATH ".bak");
+                if (changed) *changed = true;
+            } else {
+                (void)remove(PLAYLIST_PATH);
+                if (previous) (void)rename(PLAYLIST_PATH ".bak", PLAYLIST_PATH);
+                s_count = 0;
+                (void)rebuild_locked();
+            }
+        } else if (invalidated) {
+            (void)rebuild_locked(); /* Failed to rename old CSV: restore its index. */
+        }
+    }
     xSemaphoreGive(s_lock);
     return result;
 }
