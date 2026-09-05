@@ -48,6 +48,12 @@ computes 32 genuine delta-sigma decisions per sample, giving a nominal
 
 ## Canonical production configuration
 
+The audio producer converts PCM directly into a reserved, producer-owned
+DMA span; only a full buffer becomes playable. The two 512-word buffers and
+neutral underrun output remain unchanged. Balance is ignored for mono PCM,
+including restored settings and runtime updates; volume/normalization still
+apply. See [PCM32, direct DMA and physical trace](../../docs/ESP8266_PCM32_DIRECT_DMA.md).
+
 An independent experimental **I2S RCPDM** output is available with
 `sdkconfig.i2s-rcpdm.defaults` / `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM`.
 It predicts an RC filter with alpha=1/16 and emits exactly 32 bits per 48-kHz
@@ -128,8 +134,11 @@ The production codec layout reserves one physically verified contiguous
 16384-byte IRAM arena. Helix MP3 splits IMDCT output by channel: one channel
 fits the arena and the remaining word workspaces use DRAM. On the physical
 board the previous stereo MP3 workspace reported 11472 bytes DRAM and 16384
-bytes IRAM. Build-time mono reduces its PCM allocation by 1152 DRAM bytes;
-the fallback transform storage and 16-KiB IRAM reservation remain unchanged.
+bytes IRAM. Helix now emits 32 frames per synchronous callback, requiring
+only 64 bytes of mono PCM (128 stereo), instead of a 576-frame granule.
+The current mono/shared-reorder workspace measures 8440 bytes DRAM and
+16384 bytes IRAM. Fallback transform storage and the IRAM reservation remain
+unchanged; AAC and libmad keep their own existing PCM layouts.
 Helix now also reuses the idle IMDCT output for short-block reorder scratch,
 removing another 792-byte DRAM allocation. The CMake option
 `YORADIO_ESP8266_MP3_SHARED_REORDER` defaults to `ON`; `OFF` restores separate

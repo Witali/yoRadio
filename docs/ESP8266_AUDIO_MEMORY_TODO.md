@@ -61,6 +61,21 @@ stack based on the older 4096-byte experiments recorded below.
 
 See [lifetime contract and results](ESP8266_MP3_REORDER_REUSE.md).
 
+### PCM32 and direct DMA (2026-09-05)
+
+- [x] Emit Helix MP3 in 32-frame blocks: 64-byte mono PCM, 1088 bytes saved.
+- [x] Write PDM into a reserved producer-owned DMA span, without the 256-byte
+  temporary array/copy; keep two 512-word buffers and all task stack sizes.
+- [x] Test bit-exact PCM/PDM, normalization continuity, EOF interleavings,
+  partial commits, cancellation, timeout and reset.
+- [x] Fix unsigned balance clamping and ignore balance completely for mono.
+- [x] On-board trace: physical MP3 workspace 8440 DRAM / 16384 IRAM, nonzero
+  decoded/processed PCM and changing DMA-PDM. All 337 host tests pass.
+- [ ] Measure matched CPU timing and long-run audio/WebUI stability before
+  assigning these savings to a larger compressed input buffer.
+
+See [implementation and physical evidence](ESP8266_PCM32_DIRECT_DMA.md).
+
 ### Existing lifecycle checks
 
 - [x] Fix the libmad DRAM leak: `mad_stream` and `mad_frame` must be released

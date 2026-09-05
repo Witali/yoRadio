@@ -1,0 +1,67 @@
+TAP version 13
+# Subtest: production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+ok 1 - production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+  ---
+  duration_ms: 8528.7952
+  type: 'test'
+  ...
+# PDM32: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM128: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/576 frames; ownership, EOF, timeout, cancel and stop passed
+# Subtest: ESP8266 production audio defaults to I2S DMA PDM
+ok 2 - ESP8266 production audio defaults to I2S DMA PDM
+  ---
+  duration_ms: 1.0989
+  type: 'test'
+  ...
+# Subtest: ESP8266 keeps mutable sdkconfig inside each build directory
+ok 3 - ESP8266 keeps mutable sdkconfig inside each build directory
+  ---
+  duration_ms: 0.1099
+  type: 'test'
+  ...
+# Subtest: I2S PDM submits only complete finite DMA buffers with neutral underrun fallback
+ok 4 - I2S PDM submits only complete finite DMA buffers with neutral underrun fallback
+  ---
+  duration_ms: 1.044
+  type: 'test'
+  ...
+# Subtest: I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier
+ok 5 - I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier
+  ---
+  duration_ms: 0.2144
+  type: 'test'
+  ...
+# Subtest: optimized branchless PDM32 packer is bit-exact
+ok 6 - optimized branchless PDM32 packer is bit-exact
+  ---
+  duration_ms: 0.4815
+  type: 'test'
+  ...
+# Subtest: I2S PDM drives its clocks like ESP8266Audio and ignores UART RX input
+ok 7 - I2S PDM drives its clocks like ESP8266Audio and ignores UART RX input
+  ---
+  duration_ms: 4.2055
+  type: 'test'
+  ...
+# Subtest: I2S DMA is installed before Wi-Fi starts and then emits neutral PDM
+ok 8 - I2S DMA is installed before Wi-Fi starts and then emits neutral PDM
+  ---
+  duration_ms: 0.1977
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio trace follows decoder PCM into the physical PDM DMA buffer
+ok 9 - ESP8266 audio trace follows decoder PCM into the physical PDM DMA buffer
+  ---
+  duration_ms: 0.2193
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8596.7801

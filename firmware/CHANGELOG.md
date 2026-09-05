@@ -3,6 +3,28 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-09-05: ESP8266 PCM32, direct DMA and mono mute fix
+
+- Source `6bd547b`; ordinary image saved as
+  `development/esp8266-native-pcm32/app.bin` (687232 bytes). Optional bounded
+  diagnostic image is `development/esp8266-native-pcm32-trace/app.bin`
+  (689792 bytes). Older artifacts are retained.
+- Helix MP3 emits 32-frame blocks; mono PCM storage falls from 1152 to 64
+  bytes. Actual MP3 DRAM workspace is 8440 bytes, with 16384 bytes in IRAM.
+- PDM is generated directly in a reserved producer-owned DMA span. Two
+  512-word buffers, neutral underrun output and task stack sizes are retained.
+- Fixed unsigned balance clamping that turned neutral balance into -16 and
+  muted mono. Balance is ignored for mono input, including all codecs in
+  build-time Mono mode; volume and normalization still apply.
+- 337 host tests pass; PCM/PDM equivalence, settings, ownership, EOF races,
+  cancellation and timeout are covered. GCC output-write frame is 80 bytes
+  versus 352 previously; no matched hardware CPU timing was performed.
+- Physical trace confirms nonzero decoded/processed PCM and changing DMA
+  words. Restored/flashed the ordinary image, preserving NVS/SPIFFS/OTA
+  selection; MP3/WebSocket status and WebUI HTTP 200 verified. Stream
+  reconnects remain; long-run continuity and listening are not yet confirmed.
+- See `docs/ESP8266_PCM32_DIRECT_DMA.md` and per-image manifests.
+
 ## Development — 2026-09-05: ESP8266 shared MP3 reorder workspace
 
 - Saved `development/esp8266-native-mono-reorder/app.bin`, source `f3138f2`,

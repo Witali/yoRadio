@@ -9,14 +9,17 @@ The Wemos D1 mini production firmware passes audio through these stages:
 2. The first valid frame signature selects MP3 or AAC from the stream content,
    not from the URL suffix or HTTP `Content-Type`.
 3. `codec_bridge.cpp` feeds the compressed frame to the production Helix MP3
-   SSO or Helix AAC decoder. The decoder callback receives interleaved signed
-   16-bit PCM.
-4. `native_audio_output.c` applies fixed-point normalization, volume and
-   balance, averages stereo to mono, and resamples the input cadence to 48 kHz.
+   SSO or Helix AAC decoder. Helix MP3 emits 32 signed 16-bit PCM frames per
+   callback (mono by default); AAC retains its full-frame output buffer.
+4. `native_audio_output.c` applies fixed-point normalization and volume;
+   balance applies only to stereo PCM. Stereo is averaged to mono and the
+   input cadence resampled to 48 kHz, preserving state across callbacks.
 5. The branchless first-order delta-sigma packer converts each mono sample to
    one 32-bit PDM word (PDM32), nominally 1.536 MHz.
-6. `esp8266_nodac_i2s.c` copies those words into the 2 x 512-word circular SLC
-   DMA ring. The I2S peripheral continuously transmits DATA on GPIO3/RX.
+6. The packer writes directly into the producer-owned span reserved from
+   `esp8266_nodac_i2s.c`. Only complete 512-word buffers are published to SLC
+   DMA; the two buffers use finite descriptors, not an unguarded circular
+   ring. I2S transmits DATA on GPIO3/RX; underrun produces neutral PDM.
 7. GPIO3 feeds the external passive RC low-pass and AC-coupling network, then a
    high-impedance amplifier input.
 
@@ -27,10 +30,14 @@ boundary without changing the selected codec or audio backend:
 
 - `AUDIO_TRACE PCM`: raw PCM returned by the decoder;
 - `AUDIO_TRACE OUTPUT-PCM`: normalized, volume-scaled and mono-mixed PCM;
-- `AUDIO_TRACE DMA-PDM`: the words already copied into the physical DMA ring,
+- `AUDIO_TRACE DMA-PDM`: the words committed into the physical DMA buffer,
   including their bit population, FNV checksum and first four words.
 
 The option is OFF by default and compiles out of production builds.
+One startup-zero snapshot is retained, then the bounded trace waits for
+nonzero PCM/non-neutral PDM so the 32-frame API's startup silence cannot
+consume all diagnostic snapshots. The signed-balance mute fix and current
+physical trace are recorded in [PCM32/direct DMA](ESP8266_PCM32_DIRECT_DMA.md).
 Always combine it with the canonical `sdkconfig.defaults`. The build entrypoint
 stores the generated `sdkconfig` inside its build directory, isolating it from
 any stale ignored experimental config in the source tree.

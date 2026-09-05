@@ -63,4 +63,61 @@ retained for stereo. Fixed-point normalization and volume still apply.
   known nonzero mono PCM stays nonzero at balance 0/-16/+16. The test failed
   before the signed-clamp fix and passes afterward.
 
-Hardware trace and ordinary-build results will be recorded after installation.
+## Build and physical trace, 2026-09-05
+
+All 337 root tests pass (95.46 s). The focused direct-PDM/ownership suite was
+rerun after the final reservation-reset check: all 9 tests pass. Ordinary
+and trace builds use Xtensa GCC 8.4/O3 and source `6bd547b`.
+
+| Item | Previous mono/reorder | PCM32/direct DMA |
+| --- | ---: | ---: |
+| Mono MP3 PCM allocation | 1152 B | 64 B |
+| Physical MP3 DRAM workspace | 9528 B | 8440 B |
+| Reserved codec IRAM | 16384 B | 16384 B |
+| ELF static DRAM data+bss | 20840 B | 20848 B |
+| `native_audio_output_write` GCC stack frame | 352 B | 80 B |
+| Ordinary app image | 686848 B | 687232 B |
+
+Stack figures are function-local prologues, not total task high-water marks.
+The 8-byte static DRAM increase includes linker alignment; no larger input
+buffer or reduced task stack is selected as part of this change.
+
+The Wemos D1 mini received an app-only diagnostic image at `0x10000` with
+hash verification. It restored station 510 / volume 254 and 511 playlist
+entries. Wi-Fi needed retries (DHCP at 19 s); initial HTTP/WebSocket attempts
+timed out. After connection, Retro FM supplied MP3 128 kbit/s at 44.1 kHz.
+
+Actual trace, after the expected startup zeros:
+
+- Decoder PCM: 32 mono frames, min=-3/max=17, FNV `e24d7993`.
+- Processed PCM: min=-3/max=17, the same FNV `e24d7993`; no mute at balance 0.
+- Committed DMA-PDM: changing FNV `b2dc5eec`, `ecc79395`, `5e94c2f8`,
+  including word `5555555a`, rather than only neutral `55555555`/`aaaaaaaa`.
+- Decoder allocation: DRAM 8440, IRAM 16384, codec-arena used 22452 bytes.
+- At the final trace status check: playing=true, free heap 15504, minimum
+  heap 10988, web stack headroom 2328 bytes. ICY and stream feed continued.
+
+This verifies nonzero PCM through processing into the DMA buffer. It is not
+an electrical GPIO measurement or a listening test, nor a matched CPU-speed
+benchmark. The preceding image also showed reconnects/AUDIO STREAM ERROR
+and a 776-byte lifetime heap minimum; those broader network/memory issues
+are not declared resolved by the balance fix.
+
+Artifacts: `firmware/development/esp8266-native-pcm32/` (ordinary) and
+`firmware/development/esp8266-native-pcm32-trace/` (diagnostic). Both retain
+QIO40, CPU 160 MHz, Helix MP3 SSO/AAC, GPIO3 I2S PDM32 and 2 x 512 DMA words.
+No bootloader, partition-table, NVS, SPIFFS or OTA-selection writes are needed.
+
+The ordinary image was subsequently flashed to app0 with hash verification
+and restarted. DHCP completed at 8.9 s; WebSocket `play=510` changed the
+player to MP3 128 kbit/s, and `/` returned HTTP 200 in 0.192 s. One playing
+snapshot showed free heap 14040, minimum heap 7192 and web stack headroom
+2328 bytes. Clean stream EOF/reconnects and one failed stream-open attempt
+were observed; there was also a WebSocket send warning after client closure.
+The board was left playing for the user's listening check. No listening
+confirmation has yet been received. Trace/profiling are off in this image.
+
+Retained test output: [337-test regression](benchmarks/esp8266-pcm32-2026-09-05/regression.log),
+[focused rerun](benchmarks/esp8266-pcm32-2026-09-05/direct-final.log),
+[filtered diagnostic trace](benchmarks/esp8266-pcm32-2026-09-05/audio-path.log)
+and [filtered ordinary boot/audio log](benchmarks/esp8266-pcm32-2026-09-05/ordinary-audio.log).
