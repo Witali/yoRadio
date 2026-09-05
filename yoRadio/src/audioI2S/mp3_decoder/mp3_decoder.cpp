@@ -42,7 +42,7 @@
 #endif
 
 const uint8_t  m_SYNCWORDH              =0xff;
-const uint8_t  m_SYNCWORDL              =0xf0;
+const uint8_t  m_SYNCWORDL              =0xe0; // 11 sync bits; MPEG2.5 has version bits 00
 const uint8_t  m_DQ_FRACBITS_OUT        =25;  // number of fraction bits in output of dequant
 const uint8_t  m_CSHIFT                 =12;  // coefficients have 12 leading sign bits for early-terminating mulitplies
 const uint8_t  m_SIBYTES_MPEG1_MONO     =17;
@@ -779,6 +779,7 @@ int UnpackFrameHeader(unsigned char *buf){
     if ((buf[0] & m_SYNCWORDH) != m_SYNCWORDH || (buf[1] & m_SYNCWORDL) != m_SYNCWORDL)  return -1;
     /* read header fields - use bitmasks instead of GetBits() for speed, since format never varies */
     verIdx = (buf[1] >> 3) & 0x03;
+    if (verIdx == 1) return -1; // reserved MPEG version, not MPEG1
     m_MPEGVersion = (MPEGVersion_t) (verIdx == 0 ? MPEG25 : ((verIdx & 0x01) ? MPEG1 : MPEG2));
     m_FrameHeader->layer = 4 - ((buf[1] >> 1) & 0x03); /* easy mapping of index to layer number, 4 = error */
     m_FrameHeader->crc = 1 - ((buf[1] >> 0) & 0x01);
