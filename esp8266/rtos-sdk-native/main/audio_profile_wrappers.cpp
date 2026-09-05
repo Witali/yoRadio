@@ -219,13 +219,14 @@ void maybe_report() {
     log_stage("output_dma_wait", kSpiWait, wall_us);
     log_stage("pcm_gap", kPcmGap, wall_us);
     ESP_LOGI(kTag,
-             "dma eof=%u late_start=%u empty_start=%u incomplete_eof=%u "
-             "incomplete_words=%u",
+             "dma eof=%u underrun=%u empty_start=%u blocked_partial=%u "
+             "missing_words=%u fifo_empty=%u",
              unsigned(dma.eof_count - s_dma_before.eof_count),
              unsigned(output_stats.queue_empty_events - s_underruns_before),
              unsigned(dma.empty_starts - s_dma_before.empty_starts),
-             unsigned(dma.incomplete_eof - s_dma_before.incomplete_eof),
-             unsigned(dma.incomplete_words - s_dma_before.incomplete_words));
+             unsigned(dma.blocked_partial - s_dma_before.blocked_partial),
+             unsigned(dma.missing_words - s_dma_before.missing_words),
+             unsigned(dma.fifo_empty - s_dma_before.fifo_empty));
     unsigned compute_load = percent_x10(output_compute, wall_us);
     ESP_LOGI(kTag, "gain+mix+pdm=%u.%03u ms (%u.%u%%)",
              static_cast<unsigned>(output_compute / 1000ULL),

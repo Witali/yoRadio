@@ -1,10 +1,11 @@
-/* Minimal ESP8266 output-only I2S/SLC ring for a software NoDAC stream.
+/* Minimal ESP8266 output-only I2S/SLC ping-pong for a software NoDAC stream.
  *
- * The ring and companion-link arrangement follows the LGPL-2.1 ESP8266
+ * The peripheral and companion-link setup follows the LGPL-2.1 ESP8266
  * Arduino core I2S implementation used by ESP8266Audio. It is kept local so
  * the RTOS SDK application does not depend on Arduino. */
 
 #include "esp8266_nodac_i2s.h"
+#include "nodac_buffer_state.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -39,16 +40,21 @@ typedef struct nodac_dma_descriptor {
 
 static uint32_t s_buffers[NODAC_DMA_BUFFER_COUNT][NODAC_DMA_BUFFER_WORDS];
 static nodac_dma_descriptor_t s_descriptors[NODAC_DMA_BUFFER_COUNT];
-static uint32_t *s_free_buffers[NODAC_DMA_BUFFER_COUNT];
-static volatile uint8_t s_free_count;
+_Static_assert(NODAC_DMA_BUFFER_COUNT == 2U, "ping-pong requires two buffers");
+_Static_assert(NODAC_DMA_BUFFER_BYTES <= 4095U, "12-bit DMA descriptor length");
+/* Access only in the ISR or task critical sections. Avoid volatile byte
+ * accesses here: LX106 GCC emits MEMW + EXTUI for each one, bloating the ISR
+ * enough to displace the 16-KiB codec arena from IRAM. The task critical
+ * section calls and explicit publication barrier provide synchronization. */
+static nodac_buffer_state_t s_state;
 static uint32_t *volatile s_current_buffer;
 static volatile size_t s_current_position;
 static volatile TaskHandle_t s_waiter;
 static volatile bool s_waiting;
 static uint32_t s_silence_word;
 static volatile uint32_t s_underruns;
-#if YORADIO_ESP8266_AUDIO_PROFILE
-static volatile esp8266_nodac_profile_t s_profile;
+#if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+static esp8266_nodac_profile_t s_profile;
 #endif
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
 static const char *TAG = "nodac_i2s";
@@ -75,49 +81,51 @@ extern void audio_output_benchmark_spi_wait_end(void);
 extern void rom_i2c_writeReg_Mask(int block, int host_id, int reg_add,
                                   int msb, int lsb, int value);
 
-static uint32_t *IRAM_ATTR pop_free_buffer(void) {
-    uint32_t *buffer = s_free_buffers[0];
-    --s_free_count;
-    for (uint8_t index = 0; index < s_free_count; ++index)
-        s_free_buffers[index] = s_free_buffers[index + 1U];
-    return buffer;
+static void IRAM_ATTR submit_buffer(unsigned index) {
+    /* A finite descriptor prevents DMA from prefetching a producer-owned
+     * buffer. Restart only SLC, not I2S or its FIFO: the final FIFO words
+     * continue shifting while the next complete block is submitted. */
+    s_descriptors[index].owner = 1;
+    __asm__ __volatile__("memw" ::: "memory");
+    SLC0.rx_link.val =
+        (uint32_t)&s_descriptors[index] & NODAC_SLC_ADDRESS_MASK;
+    SLC0.rx_link.start = 1;
 }
 
 static void IRAM_ATTR nodac_slc_isr(void *arg) {
     (void)arg;
-    _xt_isr_mask(1U << ETS_SLC_INUM);
+    /* Like the SDK I2S ISR, rely on interrupt entry masking this level.
+     * No redundant _xt_isr_mask/unmask calls inside the handler. */
     uint32_t status = SLC0.int_st.val;
     SLC0.int_clr.val = 0xffffffffU;
 
     if (status & (1U << 17)) {
         nodac_dma_descriptor_t *finished =
             (nodac_dma_descriptor_t *)SLC0.rx_eof_des_addr;
-        nodac_dma_descriptor_t *next = finished->next_link_ptr;
-#if YORADIO_ESP8266_AUDIO_PROFILE
+        if (finished != &s_descriptors[s_state.active]) return;
+        bool missing = s_state.state[s_state.active ^ 1U] != NODAC_READY;
+#if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
         ++s_profile.eof_count;
-        if (s_free_count >= NODAC_DMA_BUFFER_COUNT - 1U)
-            ++s_profile.empty_starts;
-        /* Unlike the start-of-buffer warning, this observes a producer
-         * still unfinished when DMA has already completed that buffer.
-         * It is a software lateness measurement, not a GPIO waveform trace. */
-        if (s_current_buffer == finished->buf_ptr &&
+        if (I2S0.int_raw.tx_rempty) ++s_profile.fifo_empty;
+        I2S0.int_clr.tx_rempty = 1;
+        if (missing) ++s_profile.empty_starts;
+        /* Partial data is now BLOCKED, never read by DMA. */
+        if (s_state.state[s_state.active ^ 1U] == NODAC_FILLING &&
             s_current_position < NODAC_DMA_BUFFER_WORDS) {
-            ++s_profile.incomplete_eof;
-            s_profile.incomplete_words +=
+            ++s_profile.blocked_partial;
+            s_profile.missing_words +=
                 NODAC_DMA_BUFFER_WORDS - s_current_position;
         }
 #endif
-        if (s_free_count >= NODAC_DMA_BUFFER_COUNT - 1U ||
-            (s_current_buffer == next->buf_ptr &&
-             s_current_position < NODAC_DMA_BUFFER_WORDS))
-            ++s_underruns;
-        for (unsigned word = 0; word < NODAC_DMA_BUFFER_WORDS; ++word)
-            finished->buf_ptr[word] = s_silence_word;
-        if (s_free_count >= NODAC_DMA_BUFFER_COUNT - 1U)
-            (void)pop_free_buffer();
-        s_free_buffers[s_free_count++] = finished->buf_ptr;
+        if (missing && !s_state.mute) ++s_underruns;
+        if (nodac_state_eof(&s_state)) {
+            for (unsigned word = 0; word < NODAC_DMA_BUFFER_WORDS; ++word)
+                finished->buf_ptr[word] = s_silence_word;
+        }
+        submit_buffer(s_state.active);
 
-        if (s_waiting && s_waiter) {
+        if (s_state.state[s_state.active ^ 1U] == NODAC_FREE &&
+            s_waiting && s_waiter) {
             BaseType_t higher_task_woken = pdFALSE;
             s_waiting = false;
             vTaskNotifyGiveFromISR((TaskHandle_t)s_waiter,
@@ -126,12 +134,11 @@ static void IRAM_ATTR nodac_slc_isr(void *arg) {
         }
     }
 
-    _xt_isr_unmask(1U << ETS_SLC_INUM);
 }
 
 static void configure_descriptors(uint32_t silence_word) {
     s_silence_word = silence_word;
-    s_free_count = 0;
+    nodac_state_init(&s_state);
     s_current_buffer = NULL;
     s_current_position = 0;
     s_waiter = NULL;
@@ -150,8 +157,7 @@ static void configure_descriptors(uint32_t silence_word) {
         descriptor->datalen = NODAC_DMA_BUFFER_BYTES;
         descriptor->blocksize = NODAC_DMA_BUFFER_BYTES;
         descriptor->buf_ptr = s_buffers[index];
-        descriptor->next_link_ptr =
-            &s_descriptors[(index + 1U) % NODAC_DMA_BUFFER_COUNT];
+        descriptor->next_link_ptr = NULL;
     }
 }
 
@@ -179,7 +185,7 @@ static void configure_slc(void) {
     SLC0.int_ena.rx_eof = 1;
     /* The companion TX link intentionally has no payload owner. Enabling its
      * descriptor-error source can create an ISR storm at low I2S rates; EOF
-     * is the only event needed to recycle the output ring. */
+     * is the only event needed to submit the next complete output block. */
     SLC0.int_ena.rx_dscr_err = 0;
     _xt_isr_unmask(1U << ETS_SLC_INUM);
     SLC0.tx_link.start = 1;
@@ -224,9 +230,10 @@ esp_err_t esp8266_nodac_i2s_init(uint32_t silence_word,
     configure_i2s(bck_div, clkm_div);
     const TickType_t timeout = pdMS_TO_TICKS(100);
     const TickType_t started = xTaskGetTickCount();
-    while (!s_free_count && xTaskGetTickCount() - started < timeout)
+    /* Before any producer starts, the first EOF necessarily emits silence. */
+    while (!s_underruns && xTaskGetTickCount() - started < timeout)
         vTaskDelay(1);
-    return s_free_count ? ESP_OK : ESP_ERR_TIMEOUT;
+    return s_underruns ? ESP_OK : ESP_ERR_TIMEOUT;
 }
 
 static bool acquire_free_buffer(TickType_t ticks_to_wait) {
@@ -234,9 +241,10 @@ static bool acquire_free_buffer(TickType_t ticks_to_wait) {
     TaskHandle_t current = xTaskGetCurrentTaskHandle();
     for (;;) {
         taskENTER_CRITICAL();
-        if (s_free_count) {
+        int index = nodac_state_acquire(&s_state);
+        if (index >= 0) {
             s_waiting = false;
-            s_current_buffer = pop_free_buffer();
+            s_current_buffer = s_buffers[index];
             s_current_position = 0;
             taskEXIT_CRITICAL();
             return true;
@@ -274,10 +282,13 @@ static bool acquire_free_buffer(TickType_t ticks_to_wait) {
 esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
                                   TickType_t ticks_to_wait) {
     if (!words && word_count) return ESP_ERR_INVALID_ARG;
+    const TickType_t started = xTaskGetTickCount();
     while (word_count) {
-        if (!s_current_buffer ||
-            s_current_position == NODAC_DMA_BUFFER_WORDS) {
-            if (!acquire_free_buffer(ticks_to_wait)) return ESP_ERR_TIMEOUT;
+        if (!s_current_buffer) {
+            TickType_t elapsed = xTaskGetTickCount() - started;
+            TickType_t remaining = elapsed < ticks_to_wait
+                ? ticks_to_wait - elapsed : 0;
+            if (!acquire_free_buffer(remaining)) return ESP_ERR_TIMEOUT;
         }
         size_t available = NODAC_DMA_BUFFER_WORDS - s_current_position;
         size_t count = word_count < available ? word_count : available;
@@ -303,7 +314,15 @@ esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
                      count > 3U ? copied[3] : 0U);
         }
 #endif
+        taskENTER_CRITICAL();
         s_current_position += count;
+        if (s_current_position == NODAC_DMA_BUFFER_WORDS) {
+            unsigned index = s_current_buffer == s_buffers[0] ? 0U : 1U;
+            __asm__ __volatile__("memw" ::: "memory");
+            (void)nodac_state_publish(&s_state, index);
+            s_current_buffer = NULL;
+        }
+        taskEXIT_CRITICAL();
         words += count;
         word_count -= count;
     }
@@ -313,9 +332,7 @@ esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
 void esp8266_nodac_i2s_silence(uint32_t silence_word) {
     taskENTER_CRITICAL();
     s_silence_word = silence_word;
-    for (unsigned index = 0; index < NODAC_DMA_BUFFER_COUNT; ++index)
-        for (unsigned word = 0; word < NODAC_DMA_BUFFER_WORDS; ++word)
-            s_buffers[index][word] = silence_word;
+    nodac_state_silence(&s_state);
     s_current_buffer = NULL;
     s_current_position = 0;
     taskEXIT_CRITICAL();
@@ -334,13 +351,43 @@ uint32_t esp8266_nodac_i2s_underruns(void) {
     return underruns;
 }
 
-#if YORADIO_ESP8266_AUDIO_PROFILE
+#if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
 void esp8266_nodac_i2s_profile(esp8266_nodac_profile_t *stats) {
     taskENTER_CRITICAL();
     stats->eof_count = s_profile.eof_count;
     stats->empty_starts = s_profile.empty_starts;
-    stats->incomplete_eof = s_profile.incomplete_eof;
-    stats->incomplete_words = s_profile.incomplete_words;
+    stats->blocked_partial = s_profile.blocked_partial;
+    stats->missing_words = s_profile.missing_words;
+    stats->fifo_empty = s_profile.fifo_empty;
     taskEXIT_CRITICAL();
+}
+#endif
+
+#if YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
+bool esp8266_nodac_i2s_test_stalled_producer(void) {
+    /* Physical regression: keep a partial buffer across multiple DMA EOFs.
+     * Old circular driver erased/recycled it. No test task or heap allocation. */
+    uint32_t words[32];
+    for (unsigned i = 0; i < 32; ++i) words[i] = 0x55550000U + i;
+    esp8266_nodac_i2s_silence(0xaaaaaaaaU);
+    vTaskDelay(pdMS_TO_TICKS(30));
+    if (esp8266_nodac_i2s_write(words, 32, pdMS_TO_TICKS(100)) != ESP_OK)
+        return false;
+    uint32_t *partial = s_current_buffer;
+    uint32_t before = s_profile.blocked_partial;
+    vTaskDelay(pdMS_TO_TICKS(65));
+    bool valid = partial && s_current_buffer == partial &&
+        s_current_position == 32 && s_state.silent &&
+        s_profile.blocked_partial - before >= 2U &&
+        memcmp(partial, words, sizeof(words)) == 0;
+    if (valid) {
+        for (unsigned block = 1; block < NODAC_DMA_BUFFER_WORDS / 32; ++block)
+            if (esp8266_nodac_i2s_write(words, 32, pdMS_TO_TICKS(100)) != ESP_OK)
+                valid = false;
+        vTaskDelay(pdMS_TO_TICKS(30));
+        valid = valid && s_current_buffer == NULL && s_state.silent;
+    }
+    esp8266_nodac_i2s_silence(0xaaaaaaaaU);
+    return valid;
 }
 #endif

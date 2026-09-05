@@ -41,8 +41,8 @@ arena from 16 KiB to 12 KiB. The arena stores the 4236-byte `mad_synth`, the
 The Xtensa build uses 11152 bytes of that arena and reduces `mad_frame` in
 8-bit DRAM from 20784 to 13880 bytes. It is not a full-feature replacement
 profile.
-Audio defaults to mono I2S-PDM on fixed DATA GPIO3/RX. Two circular SLC-DMA
-buffers continuously clock one 32-bit word per 48-kHz PCM sample. Production
+Audio defaults to mono I2S-PDM on fixed DATA GPIO3/RX. Two explicitly owned
+SLC-DMA buffers clock one 32-bit word per 48-kHz PCM sample. Production
 computes 32 genuine delta-sigma decisions per sample, giving a nominal
 1.536-MHz carrier. The ESP8266 integer divider produces 1.538461 MHz (+0.16%).
 
@@ -51,13 +51,13 @@ computes 32 genuine delta-sigma decisions per sample, giving a nominal
 An independent experimental **I2S RCPDM** output is available with
 `sdkconfig.i2s-rcpdm.defaults` / `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM`.
 It predicts an RC filter with alpha=1/16 and emits exactly 32 bits per 48-kHz
-output PCM sample through the existing GPIO3 DMA ring. It does not replace
+output PCM sample through the existing GPIO3 DMA backend. It does not replace
 the default delta-sigma I2S PDM. See [RCPDM configuration and filter](../../docs/ESP8266_I2S_RCPDM.md).
 
 The tracked `sdkconfig.defaults` is the authoritative default for this board.
 It explicitly selects QIO 40 MHz flash, a 160 MHz CPU, Helix MP3 SSO, Helix
 AAC, I2S-PDM on GPIO3, genuine PDM32 at nominal 1.536 MHz, and the static
-2 x 512-word SLC-DMA ring. The 3072-byte main task also owns the button and
+2 x 512-word SLC-DMA ping-pong buffers. The 3072-byte main task also owns the button and
 encoder gesture state machine, awakened directly by their ISRs, so there is no
 separate input-task stack. The HTTP/WebSocket task uses 4096 bytes. libmad,
 AAC SSO, legacy SPI-PDM, standard I2S PCM,
@@ -98,12 +98,15 @@ input. Stereo streams are gain/balance adjusted and averaged before PDM.
 The status LED is off until client Wi-Fi has an address, stays on while the
 radio is stopped, and alternates 500 ms off / 500 ms on while audio is playing.
 The PDM profile uses a small local output-only backend instead of the RTOS SDK
-I2S driver. It follows the ESP8266 Arduino core architecture used by
-ESP8266Audio: a circular SLC descriptor ring, an always-running companion link,
-the BBPLL audio-clock gate and task notification when DMA returns a buffer.
-Both 2048-byte buffers and descriptors are static, so starting or stopping
-audio cannot fragment the heap. Initialization waits for the first completed
-descriptor and fails explicitly if the hardware ring does not start.
+I2S driver. Peripheral/companion-link setup follows ESP8266Audio's Arduino
+backend, but output descriptors now terminate rather than forming an unguarded
+ring. The producer owns one buffer until all 512 words are ready; EOF submits
+the next complete buffer and wakes the producer. I2S/FIFO are not reset between
+blocks. On underrun, only the completed DMA buffer is replaced by audio zero
+(`0xAAAAAAAA`, alternating 1/0), never a partial producer block or stale audio.
+Both 2048-byte buffers and descriptors remain static. Initialization waits
+for the first EOF and fails explicitly if DMA does not start. See
+[DMA ownership fix and physical tests](../../docs/ESP8266_I2S_DMA_OWNERSHIP.md).
 The board default profile uses QIO at 40 MHz. A physical Wemos D1 mini with
 verified bootloader, partition table, and application bytes intermittently
 stopped immediately after the ROM loader at QIO80; the same code boots and

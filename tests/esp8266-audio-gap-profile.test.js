@@ -12,11 +12,12 @@ test('audio gap instrumentation is opt-in and its report window is configurable'
   assert.match(read('esp8266_nodac_i2s.h'), /#if YORADIO_ESP8266_AUDIO_PROFILE[\s\S]*esp8266_nodac_profile_t/);
 });
 
-test('DMA profiler distinguishes incomplete buffer starts from incomplete EOFs', () => {
+test('DMA profiler distinguishes prevented partial reads from FIFO starvation', () => {
   const source = read('esp8266_nodac_i2s.c');
-  assert.match(source, /s_current_buffer == next->buf_ptr[\s\S]*?\+\+s_underruns/);
-  assert.match(source, /#if YORADIO_ESP8266_AUDIO_PROFILE[\s\S]*?s_current_buffer == finished->buf_ptr[\s\S]*?\+\+s_profile.incomplete_eof/);
-  assert.match(source, /s_profile.incomplete_words \+=[\s\S]*?NODAC_DMA_BUFFER_WORDS - s_current_position/);
+  assert.match(source, /missing && !s_state.mute[\s\S]*?\+\+s_underruns/);
+  assert.match(source, /NODAC_FILLING[\s\S]*?\+\+s_profile.blocked_partial/);
+  assert.match(source, /s_profile.missing_words \+=[\s\S]*?NODAC_DMA_BUFFER_WORDS - s_current_position/);
+  assert.match(source, /I2S0.int_raw.tx_rempty[\s\S]*?\+\+s_profile.fifo_empty/);
 });
 
 test('profile snapshots DMA before UART logging and resets baseline afterwards', () => {

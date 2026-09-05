@@ -9,6 +9,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_audio_output.h"
+#include "esp8266_nodac_i2s.h"
 #include "nvs_flash.h"
 #include "persistent_settings.h"
 
@@ -205,6 +206,10 @@ void audio_output_benchmark_run(void) {
     bool have_cpu = false;
 #endif
     uint32_t calls = 0;
+#if YORADIO_ESP8266_I2S_PDM
+    esp8266_nodac_profile_t dma_before;
+    esp8266_nodac_i2s_profile(&dma_before);
+#endif
     uint64_t write_us = 0;
     uint32_t maximum_us = 0;
     int64_t started = esp_timer_get_time();
@@ -213,6 +218,10 @@ void audio_output_benchmark_run(void) {
     uint64_t wall_us = (uint64_t)(esp_timer_get_time() - started);
     native_audio_output_spi_stats_t spi_stats;
     native_audio_output_get_spi_stats(&spi_stats);
+#if YORADIO_ESP8266_I2S_PDM
+    esp8266_nodac_profile_t dma_after;
+    esp8266_nodac_i2s_profile(&dma_after);
+#endif
     native_audio_output_silence();
 #if configGENERATE_RUN_TIME_STATS == 1
     have_cpu = have_cpu && cpu_snapshot(&cpu_total_after, &cpu_idle_after);
@@ -252,6 +261,14 @@ void audio_output_benchmark_run(void) {
     ESP_LOGI(TAG, "heap free=%u min_free=%u",
              (unsigned)esp_get_free_heap_size(),
              (unsigned)esp_get_minimum_free_heap_size());
+#if YORADIO_ESP8266_I2S_PDM
+    ESP_LOGI(TAG, "dma eof=%u blocked_partial=%u fifo_empty=%u",
+             (unsigned)(dma_after.eof_count - dma_before.eof_count),
+             (unsigned)(dma_after.blocked_partial - dma_before.blocked_partial),
+             (unsigned)(dma_after.fifo_empty - dma_before.fifo_empty));
+    ESP_LOGI(TAG, "stalled producer (65 ms): %s",
+             esp8266_nodac_i2s_test_stalled_producer() ? "PASS" : "FAIL");
+#endif
     ESP_LOGI(TAG, "complete");
 #endif
 }

@@ -76,7 +76,7 @@ test("ESP8266 keeps mutable sdkconfig inside each build directory", () => {
   assert.match(projectCmake, /file\(WRITE "\$\{SDKCONFIG\}" ""\)/);
 });
 
-test("I2S PDM uses circular SLC DMA with a continuous neutral bitstream", () => {
+test("I2S PDM submits only complete finite DMA buffers with neutral underrun fallback", () => {
   assert.match(i2sPdm, /I2S_PDM_SILENCE_WORD 0xaaaaaaaaU/);
   assert.match(
     i2sPdm,
@@ -90,7 +90,7 @@ test("I2S PDM uses circular SLC DMA with a continuous neutral bitstream", () => 
   assert.doesNotMatch(i2sPdm, /i2s_driver_install|\bi2s_write\(/);
   assert.match(nodacHeader, /ESP8266_NODAC_DMA_BUFFER_COUNT 2U/);
   assert.match(nodacHeader, /ESP8266_NODAC_DMA_BUFFER_WORDS 512U/);
-  assert.match(nodacHeader, /true ping-pong DMA/);
+  assert.match(nodacHeader, /producer\/DMA ping-pong/);
   assert.match(nodac, /NODAC_DMA_BUFFER_COUNT ESP8266_NODAC_DMA_BUFFER_COUNT/);
   assert.match(nodac, /NODAC_DMA_BUFFER_WORDS ESP8266_NODAC_DMA_BUFFER_WORDS/);
   assert.match(nodac, /SLC0\.rx_link\.start = 1/);
@@ -111,7 +111,13 @@ test("I2S PDM uses circular SLC DMA with a continuous neutral bitstream", () => 
     nodac,
     /NODAC_QUEUE_RECHECK_TICKS|xQueueCreate|xQueueReceive/,
   );
-  assert.match(nodac, /s_current_buffer == next->buf_ptr[\s\S]*s_current_position < NODAC_DMA_BUFFER_WORDS/);
+  assert.match(nodac, /descriptor->next_link_ptr = NULL/);
+  assert.match(nodac, /if \(nodac_state_eof\(&s_state\)\)[\s\S]*finished->buf_ptr\[word\] = s_silence_word/);
+  assert.match(nodac, /s_current_position == NODAC_DMA_BUFFER_WORDS[\s\S]*nodac_state_publish/);
+  assert.doesNotMatch(nodac, /s_free_buffers|pop_free_buffer/);
+  const silence = nodac.slice(nodac.indexOf('void esp8266_nodac_i2s_silence('), nodac.indexOf('void esp8266_nodac_i2s_reset_underruns('));
+  assert.match(silence, /nodac_state_silence/);
+  assert.doesNotMatch(silence, /s_buffers\[|memcpy|memset/);
   assert.match(output, /esp8266_nodac_i2s_reset_underruns/);
   assert.match(output, /stats->queue_empty_events = esp8266_nodac_i2s_underruns\(\)/);
 });
