@@ -104,3 +104,31 @@ static RAM fixed the test without changing any production task stack.
   stopped playback retains the original low-frequency neutral cadence.
 
 Build artifacts and filtered captures are saved with the firmware changelog.
+
+## Ordinary installation
+
+Source `aab3600` built with profiling, trace and benchmarks OFF; the recovery
+switch is ON. Image 687312 bytes was flashed to app0 at `0x10000` and hash
+verified. Boot confirms 16384 bytes of codec IRAM, restored station 510,
+volume 254 and the existing filesystem. Static DRAM remains 20848 bytes;
+IRAM vectors/text/bss is 27464 bytes, 80 bytes more than the prior ordinary
+PCM32 image. No extra production payload buffer or task was allocated.
+
+All 338 host tests pass (79.05 s). Retro FM starts as MP3 128 kbit/s and
+WebSocket sends playing/reconnecting states. Initial HTTP/WS attempts still
+timed out and the station reconnects. One reconnecting snapshot showed
+13924 bytes free heap, 7672 minimum and 2340 web stack headroom. This is not
+an uninterrupted-playback acceptance result. User listening feedback on
+this new version is still required.
+
+A later read-only check timed out on both `/api/native/status` (8 seconds)
+and `/` (connection timeout, 3 seconds). WebUI availability is therefore
+also an unresolved live-network issue; the successful earlier WebSocket
+exchange is not evidence of stable web access.
+
+Retained filtered logs: [original live-radio profile](benchmarks/esp8266-dma-recovery-2026-09-05/live-before.log),
+[limited LAN test](benchmarks/esp8266-dma-recovery-2026-09-05/lan-prefix.log),
+[RAM whole-buffer baseline](benchmarks/esp8266-dma-recovery-2026-09-05/ram-whole.log),
+[rejected prefix-only run](benchmarks/esp8266-dma-recovery-2026-09-05/ram-prefix-only.log),
+[short-neutral run](benchmarks/esp8266-dma-recovery-2026-09-05/ram-short.log),
+[338-test regression](benchmarks/esp8266-dma-recovery-2026-09-05/regression.log).

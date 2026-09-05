@@ -1,5 +1,32 @@
 # ESP8266 audio profile tools
 
+## RAM decoder with physical DMA output
+
+To remove network delivery from the timing comparison while exercising the
+actual decoder, PCM processing, PDM packing and GPIO3 DMA, configure:
+
+```text
+-DYORADIO_ESP8266_CODEC_RAM_BENCHMARK=ON
+-DYORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT=ON
+-DYORADIO_ESP8266_AUDIO_PROFILE=OFF
+-DYORADIO_ESP8266_AUDIO_TRACE=OFF
+```
+
+This copies retained MP3/AAC fixture frames into test-only static RAM, runs
+eight warm-up and 200 measured frames, and does not start Wi-Fi/WebUI.
+Volume 128, neutral balance and disabled normalization are applied in RAM
+only; saved settings are not overwritten. Reported wall time includes output
+backpressure: it is not decoder-only CPU cost. Restore ordinary firmware
+after this isolated benchmark.
+
+`YORADIO_ESP8266_DMA_COMMITTED_PREFIX=OFF` restores the original full-buffer
+handoff and long neutral retry for an A/B control. Its default ON enables
+both safe committed-prefix handoff and short underrun retries. Compare
+duration and FIFO-empty flags, not just underrun counts: an active neutral
+retry is now 64 words instead of 512 words.
+
+See [physical results and limitations](../../docs/ESP8266_DMA_STARVATION_RECOVERY.md).
+
 ## Live-radio DMA starvation diagnosis
 
 Keep the production sdkconfig (including its flash frequency, decoder and

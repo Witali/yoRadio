@@ -3,6 +3,25 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-09-05: ESP8266 DMA starvation recovery
+
+- Ordinary image: `development/esp8266-native-dma-recovery/app.bin`, source
+  `aab3600`, 687312 bytes. App0 flashed and hash verified; NVS, SPIFFS and OTA
+  selection retained. The 16-KiB IRAM decoder arena still fits.
+- Hand off committed prefixes only when no producer loan is outstanding;
+  use 64-word neutral retries while playing and 512-word neutral blocks
+  when stopped. Buffer capacity remains 2 x 512 words. Mono ignores balance.
+- Added an opt-in RAM decoder-to-PDM/DMA benchmark and A/B build switch.
+  In isolated physical tests MP3 had zero underruns; AAC produced 4.267 s
+  in 4.259 s with four short neutral retries and zero FIFO-empty flags.
+- 338 host tests pass. Preserve the rejected prefix-only experiment and
+  whole-buffer baseline separately, explicitly labelled diagnostic.
+- The prior image's sound was confirmed but distorted. The new ordinary
+  image started Retro FM and publishes WebSocket playing/reconnecting state;
+  live-stream reconnects and initial HTTP timeouts remain. Listening
+  acceptance and long-run network stability are not claimed.
+- See `docs/ESP8266_DMA_STARVATION_RECOVERY.md` for measurements and limits.
+
 ## Development — 2026-09-05: ESP8266 PCM32, direct DMA and mono mute fix
 
 - Source `6bd547b`; ordinary image saved as
