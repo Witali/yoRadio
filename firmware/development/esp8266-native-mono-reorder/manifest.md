@@ -27,8 +27,16 @@
 
 ## Hardware / installation status
 
-**Not flashed or physically tested.** Heap headroom and CPU timings on the
-board remain unmeasured. Previous development binaries and board settings
-are preserved. Application-only update for the existing dual-960-KiB OTA
-slots / 256-KiB SPIFFS layout; do not erase NVS, SPIFFS or OTA selection as
-part of an ordinary update. No credentials or private filesystem included.
+Flashed on 2026-09-05 to the physical Wemos D1 mini (COM8), application only
+at `0x10000`, with esptool hash verification. The preceding app0 was backed
+up locally. Bootloader, partition table, NVS, SPIFFS and OTA selection were
+not written. Wi-Fi, station 498, volume 254 and the 511-station index restored.
+
+WebUI `/` returned HTTP 200. A short WebSocket play/stop smoke test started
+ROCK FM MP3 128 kbit/s, received 11 frames, and restored the stopped state.
+The first stream-open attempt failed with -4; the retry returned HTTP 200.
+MP3 workspace reported DRAM 9528 bytes, IRAM 16384 bytes. One playing
+snapshot showed free heap 12532 bytes and minimum heap 10572 bytes; these
+are short-run observations, not a worst-case memory/performance guarantee.
+CPU timing, prolonged RF-load stability, AAC playback and listening remain
+untested for this build. No credentials or private filesystem included.

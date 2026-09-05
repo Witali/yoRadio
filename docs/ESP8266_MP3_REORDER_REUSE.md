@@ -69,6 +69,34 @@ for the focused A/B tests. Full output is saved in
 `docs/benchmarks/esp8266-reorder-2026-09-05/regression.log`.
 
 The application and manifest are under
-`firmware/development/esp8266-native-mono-reorder/`. **Not flashed**: on-board
-heap/CPU timing, RF-load stability and listening checks remain unmeasured.
-Previous development binaries and the physical board are unchanged.
+`firmware/development/esp8266-native-mono-reorder/`.
+
+## Physical installation and smoke test, 2026-09-05
+
+The archived 686848-byte image was flashed to app0 at `0x10000` on the Wemos
+D1 mini, with esptool hash verification and a local backup of the preceding
+application. Bootloader, partition table, NVS, SPIFFS and OTA selection were
+not written. Boot confirmed CPU 160 MHz, GPIO3 I2S-PDM32, two 512-word DMA
+buffers, restored station 498 / volume 254, and a 511-station playlist index.
+The board obtained `192.168.100.6`; `/` returned HTTP 200.
+
+A short WebSocket toggle/stop test received 11 frames and confirmed ROCK FM
+MP3 128 kbit/s playback, then restored the original stopped state. The first
+stream-open attempt failed with -4; the next attempt returned HTTP 200.
+The stream was still connecting at the 7-second observation and playing at
+17 seconds. No OOM, panic or reset appeared in the captured application log.
+
+The physical decoder reported **9528 bytes DRAM and 16384 bytes IRAM**,
+versus the previously measured stereo/separate-reorder DRAM value 11472:
+1944 bytes less, matching 1152 bytes of mono PCM plus 792 bytes of reorder
+scratch. This comparison is decoder workspace, not a matched RF-load heap
+benchmark. One playing snapshot reported free heap 12532 bytes, minimum heap
+10572 bytes and web stack headroom 2336 bytes; after stopping, free heap was
+24024 bytes. The three post-command status requests took 34-36 ms; this
+short sample is not a comprehensive WebUI responsiveness test.
+
+Raw results: `docs/benchmarks/esp8266-reorder-2026-09-05/hardware-smoke.log`
+and `hardware-playback.log`. Long-run stability, AAC playback, CPU timing
+and listening remain untested for this image. Previous firmware artifacts
+remain available. PCM output still uses 576 samples/channel per callback;
+the discussed 64/128-sample chunking has not been implemented.

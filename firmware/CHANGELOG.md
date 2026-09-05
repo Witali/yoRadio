@@ -11,7 +11,11 @@ entries are retained; changes are published under a new firmware version.
 - Separate/shared PCM matches byte-for-byte in Mono and Stereo. Allocation
   failures, reset and AAC/MP3 lifecycle tests pass; all 331 host tests pass.
 - GCC O3 firmware builds; static DRAM/IRAM size unchanged, image 96 bytes smaller.
-- No flashing performed; on-board performance/headroom still needs testing.
+- Subsequently flashed app0 on the Wemos D1 mini with hash verification;
+  NVS/SPIFFS/OTA selection preserved. Wi-Fi, HTTP and a short WebSocket MP3
+  128-kbit/s play/stop test passed, with one stream-open retry. Physical MP3
+  workspace is 9528 bytes DRAM / 16384 bytes IRAM. Long-run performance and
+  listening remain untested; see the shared-reorder document for raw results.
 
 ## Development — 2026-09-05: ESP8266 mono MP3 M/S fast path
 
