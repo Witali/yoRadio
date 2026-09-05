@@ -147,6 +147,11 @@ async function testSetting(id, command, queryCommand, key, newValue, checkbox=fa
     return a.top>=b.top && a.bottom<=b.bottom;
   });
   result('current station visible on initial load',selectedVisible,{current:original.current,scroll:(await snap()).scroll});
+  if(args.includes('--bootstrap-only')) {
+    await statusTimings('bootstrap');
+    await page.screenshot({path:path.join(output,'desktop.png'),fullPage:true});
+    return;
+  }
   originalSystem=await query('getsystem=1','normtime');
   if(original.player.includes('playing')) {await action('initial pause','#playbutton',m=>val(m,'playerwrap')==='stopped');await sleep(800);}
   await page.screenshot({path:path.join(output,'desktop.png'),fullPage:true});
@@ -288,6 +293,18 @@ async function testSetting(id, command, queryCommand, key, newValue, checkbox=fa
   await second.waitForSelector('#playbutton',{timeout:60000});
   await sleep(10000);
   result('two concurrent tabs',report.sockets.filter(s=>s.closedAt && s.openedAt>report.sockets[beforeTabs-1]?.openedAt).length===0,{newSockets:socketCount-beforeTabs,sockets:report.sockets.slice(beforeTabs-1)});
+  const tabVolume=Number((await snap()).volume);
+  let changeAt=stamp();
+  await page.locator('#volmbutton').click();
+  await waitMessage(changeAt,m=>val(m,'volume')<tabVolume,12000,'main');
+  await waitMessage(changeAt,m=>val(m,'volume')<tabVolume,12000,'second');
+  result('main tab command updates both subscribers',true,{ms:stamp()-changeAt});
+  changeAt=stamp();
+  await second.evaluate(v=>websocket.send('volume='+v),tabVolume);
+  await waitMessage(changeAt,m=>val(m,'volume')===tabVolume,12000,'main');
+  await waitMessage(changeAt,m=>val(m,'volume')===tabVolume,12000,'second');
+  result('second tab command updates both subscribers',true,{ms:stamp()-changeAt});
+  await statusTimings('two tabs stopped');
   await second.close(); await sleep(2300);
 })().catch(e=>{report.fatal=e.stack;console.error('FATAL',e.message);process.exitCode=1;}).finally(async()=>{
   if(page && original) {
