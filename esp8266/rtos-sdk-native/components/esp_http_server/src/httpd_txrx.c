@@ -322,147 +322,76 @@ esp_err_t httpd_resp_set_type(httpd_req_t *r, const char *type)
     return ESP_OK;
 }
 
+/* Coalesce headers and small chunks in the existing request scratch buffer.
+ * With TCP_NODELAY, separate 2-byte writes exhaust lwIP's segment queue and
+ * spend more airtime on framing than on the actual payload. No new buffer. */
+static esp_err_t httpd_send_headers(httpd_req_t *r, bool chunked, ssize_t length)
+{
+    struct httpd_req_aux *ra = r->aux;
+    ra->req_hdrs_count = 0;
+    int n = snprintf(ra->scratch, sizeof(ra->scratch),
+                     "HTTP/1.1 %s\r\nContent-Type: %s\r\n",
+                     ra->status, ra->content_type);
+    if (n < 0 || (size_t)n >= sizeof(ra->scratch)) return ESP_ERR_HTTPD_RESP_HDR;
+    size_t used = (size_t)n;
+    n = chunked
+        ? snprintf(ra->scratch + used, sizeof(ra->scratch) - used,
+                   "Transfer-Encoding: chunked\r\n")
+        : snprintf(ra->scratch + used, sizeof(ra->scratch) - used,
+                   "Content-Length: %d\r\n", (int)length);
+    if (n < 0 || (size_t)n >= sizeof(ra->scratch) - used) return ESP_ERR_HTTPD_RESP_HDR;
+    used += (size_t)n;
+    for (unsigned i = 0; i < ra->resp_hdrs_count; ++i) {
+        n = snprintf(ra->scratch + used, sizeof(ra->scratch) - used,
+                     "%s: %s\r\n", ra->resp_hdrs[i].field, ra->resp_hdrs[i].value);
+        if (n < 0 || (size_t)n >= sizeof(ra->scratch) - used) return ESP_ERR_HTTPD_RESP_HDR;
+        used += (size_t)n;
+    }
+    if (sizeof(ra->scratch) - used < 2U) return ESP_ERR_HTTPD_RESP_HDR;
+    memcpy(ra->scratch + used, "\r\n", 2);
+    return httpd_send_all(r, ra->scratch, used + 2U) == ESP_OK
+               ? ESP_OK : ESP_ERR_HTTPD_RESP_SEND;
+}
+
 esp_err_t httpd_resp_send(httpd_req_t *r, const char *buf, ssize_t buf_len)
 {
-    if (r == NULL) {
-        return ESP_ERR_INVALID_ARG;
-    }
-
-    if (!httpd_valid_req(r)) {
-        return ESP_ERR_HTTPD_INVALID_REQ;
-    }
-
-    struct httpd_req_aux *ra = r->aux;
-    const char *httpd_hdr_str = "HTTP/1.1 %s\r\nContent-Type: %s\r\nContent-Length: %d\r\n";
-    const char *colon_separator = ": ";
-    const char *cr_lf_seperator = "\r\n";
-
-    if (buf_len == -1) buf_len = strlen(buf);
-
-    /* Request headers are no longer available */
-    ra->req_hdrs_count = 0;
-
-    /* Size of essential headers is limited by scratch buffer size */
-    if (snprintf(ra->scratch, sizeof(ra->scratch), httpd_hdr_str,
-                 ra->status, ra->content_type, buf_len) >= sizeof(ra->scratch)) {
-        return ESP_ERR_HTTPD_RESP_HDR;
-    }
-
-    /* Sending essential headers */
-    if (httpd_send_all(r, ra->scratch, strlen(ra->scratch)) != ESP_OK) {
-        return ESP_ERR_HTTPD_RESP_SEND;
-    }
-
-    /* Sending additional headers based on set_header */
-    for (unsigned i = 0; i < ra->resp_hdrs_count; i++) {
-        /* Send header field */
-        if (httpd_send_all(r, ra->resp_hdrs[i].field, strlen(ra->resp_hdrs[i].field)) != ESP_OK) {
-            return ESP_ERR_HTTPD_RESP_SEND;
-        }
-        /* Send ': ' */
-        if (httpd_send_all(r, colon_separator, strlen(colon_separator)) != ESP_OK) {
-            return ESP_ERR_HTTPD_RESP_SEND;
-        }
-        /* Send header value */
-        if (httpd_send_all(r, ra->resp_hdrs[i].value, strlen(ra->resp_hdrs[i].value)) != ESP_OK) {
-            return ESP_ERR_HTTPD_RESP_SEND;
-        }
-        /* Send CR + LF */
-        if (httpd_send_all(r, cr_lf_seperator, strlen(cr_lf_seperator)) != ESP_OK) {
-            return ESP_ERR_HTTPD_RESP_SEND;
-        }
-    }
-
-    /* End header section */
-    if (httpd_send_all(r, cr_lf_seperator, strlen(cr_lf_seperator)) != ESP_OK) {
-        return ESP_ERR_HTTPD_RESP_SEND;
-    }
-
-    /* Sending content */
-    if (buf && buf_len) {
-        if (httpd_send_all(r, buf, buf_len) != ESP_OK) {
-            return ESP_ERR_HTTPD_RESP_SEND;
-        }
-    }
-    return ESP_OK;
+    if (!r) return ESP_ERR_INVALID_ARG;
+    if (!httpd_valid_req(r)) return ESP_ERR_HTTPD_INVALID_REQ;
+    if (buf_len == -1 && buf) buf_len = strlen(buf);
+    if (buf_len < 0 || (!buf && buf_len)) return ESP_ERR_INVALID_ARG;
+    esp_err_t result = httpd_send_headers(r, false, buf_len);
+    if (result != ESP_OK) return result;
+    return buf_len && httpd_send_all(r, buf, buf_len) != ESP_OK
+               ? ESP_ERR_HTTPD_RESP_SEND : ESP_OK;
 }
 
 esp_err_t httpd_resp_send_chunk(httpd_req_t *r, const char *buf, ssize_t buf_len)
 {
-    if (r == NULL) {
-        return ESP_ERR_INVALID_ARG;
-    }
-
-    if (!httpd_valid_req(r)) {
-        return ESP_ERR_HTTPD_INVALID_REQ;
-    }
-
-    if (buf_len == -1) buf_len = strlen(buf);
-
+    if (!r) return ESP_ERR_INVALID_ARG;
+    if (!httpd_valid_req(r)) return ESP_ERR_HTTPD_INVALID_REQ;
+    if (buf_len == -1 && buf) buf_len = strlen(buf);
+    if (buf_len < 0 || (!buf && buf_len)) return ESP_ERR_INVALID_ARG;
     struct httpd_req_aux *ra = r->aux;
-    const char *httpd_chunked_hdr_str = "HTTP/1.1 %s\r\nContent-Type: %s\r\nTransfer-Encoding: chunked\r\n";
-    const char *colon_separator = ": ";
-    const char *cr_lf_seperator = "\r\n";
-
-    /* Request headers are no longer available */
-    ra->req_hdrs_count = 0;
-
     if (!ra->first_chunk_sent) {
-        /* Size of essential headers is limited by scratch buffer size */
-        if (snprintf(ra->scratch, sizeof(ra->scratch), httpd_chunked_hdr_str,
-                     ra->status, ra->content_type) >= sizeof(ra->scratch)) {
-            return ESP_ERR_HTTPD_RESP_HDR;
-        }
-
-        /* Sending essential headers */
-        if (httpd_send_all(r, ra->scratch, strlen(ra->scratch)) != ESP_OK) {
-            return ESP_ERR_HTTPD_RESP_SEND;
-        }
-
-        /* Sending additional headers based on set_header */
-        for (unsigned i = 0; i < ra->resp_hdrs_count; i++) {
-            /* Send header field */
-            if (httpd_send_all(r, ra->resp_hdrs[i].field, strlen(ra->resp_hdrs[i].field)) != ESP_OK) {
-                return ESP_ERR_HTTPD_RESP_SEND;
-            }
-            /* Send ': ' */
-            if (httpd_send_all(r, colon_separator, strlen(colon_separator)) != ESP_OK) {
-                return ESP_ERR_HTTPD_RESP_SEND;
-            }
-            /* Send header value */
-            if (httpd_send_all(r, ra->resp_hdrs[i].value, strlen(ra->resp_hdrs[i].value)) != ESP_OK) {
-                return ESP_ERR_HTTPD_RESP_SEND;
-            }
-            /* Send CR + LF */
-            if (httpd_send_all(r, cr_lf_seperator, strlen(cr_lf_seperator)) != ESP_OK) {
-                return ESP_ERR_HTTPD_RESP_SEND;
-            }
-        }
-
-        /* End header section */
-        if (httpd_send_all(r, cr_lf_seperator, strlen(cr_lf_seperator)) != ESP_OK) {
-            return ESP_ERR_HTTPD_RESP_SEND;
-        }
+        esp_err_t result = httpd_send_headers(r, true, 0);
+        if (result != ESP_OK) return result;
         ra->first_chunk_sent = true;
     }
-
-    /* Sending chunked content */
-    char len_str[10];
-    snprintf(len_str, sizeof(len_str), "%x\r\n", buf_len);
-    if (httpd_send_all(r, len_str, strlen(len_str)) != ESP_OK) {
+    char len_str[2 * sizeof(size_t) + 4];
+    int n = snprintf(len_str, sizeof(len_str), "%x\r\n", (unsigned)buf_len);
+    size_t header = (size_t)n;
+    if ((size_t)buf_len <= sizeof(ra->scratch) - header - 2U) {
+        if (buf_len) memmove(ra->scratch + header, buf, (size_t)buf_len);
+        memcpy(ra->scratch, len_str, header);
+        memcpy(ra->scratch + header + buf_len, "\r\n", 2);
+        return httpd_send_all(r, ra->scratch, header + buf_len + 2U) == ESP_OK
+                   ? ESP_OK : ESP_ERR_HTTPD_RESP_SEND;
+    }
+    /* Preserve support for larger application chunks without allocating. */
+    if (httpd_send_all(r, len_str, header) != ESP_OK ||
+        httpd_send_all(r, buf, (size_t)buf_len) != ESP_OK ||
+        httpd_send_all(r, "\r\n", 2) != ESP_OK)
         return ESP_ERR_HTTPD_RESP_SEND;
-    }
-
-    if (buf) {
-        if (httpd_send_all(r, buf, (size_t) buf_len) != ESP_OK) {
-            return ESP_ERR_HTTPD_RESP_SEND;
-        }
-    }
-
-    /* Indicate end of chunk */
-    if (httpd_send_all(r, "\r\n", strlen("\r\n")) != ESP_OK) {
-        return ESP_ERR_HTTPD_RESP_SEND;
-    }
     return ESP_OK;
 }
 

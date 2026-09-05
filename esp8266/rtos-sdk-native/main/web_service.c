@@ -823,13 +823,31 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
     httpd_resp_set_type(request, "text/csv; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
     esp_err_t result = ESP_OK;
-    while (fgets(s_static_scratch, sizeof(s_static_scratch), file)) {
-        if (!playlist_service_entry_supported(s_static_scratch)) continue;
-        result = httpd_resp_send_chunk(request, s_static_scratch,
-                                       strlen(s_static_scratch));
+    /* Status formatting cannot run concurrently on this HTTP task. Reuse its
+     * buffer for one complete CSV row; never allocate the whole playlist. */
+    size_t used = 0;
+    while (fgets(s_async_message, sizeof(s_async_message), file)) {
+        if (!playlist_service_entry_supported(s_async_message)) continue;
+        const char *line = s_async_message;
+        size_t remaining = strlen(line);
+        while (remaining) {
+            size_t n = sizeof(s_static_scratch) - used;
+            if (n > remaining) n = remaining;
+            memcpy(s_static_scratch + used, line, n);
+            used += n;
+            line += n;
+            remaining -= n;
+            if (used == sizeof(s_static_scratch)) {
+                result = httpd_resp_send_chunk(request, s_static_scratch, used);
+                if (result != ESP_OK) break;
+                used = 0;
+                pace_static_send();
+            }
+        }
         if (result != ESP_OK) break;
-        pace_static_send();
     }
+    if (result == ESP_OK && used)
+        result = httpd_resp_send_chunk(request, s_static_scratch, used);
     if (ferror(file) && result == ESP_OK) result = ESP_FAIL;
     fclose(file);
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
