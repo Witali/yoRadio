@@ -22,6 +22,11 @@ list(APPEND YORADIO_SOURCES
 list(APPEND YORADIO_SOURCES "web_upload.c")
 option(YORADIO_ESP8266_AUDIO_PROFILE
   "Measure ESP8266 radio decode and output stages" OFF)
+option(YORADIO_ESP8266_MEMORY_PROFILE
+  "Sample DRAM fragmentation and application stack margins over UART" OFF)
+if(YORADIO_ESP8266_MEMORY_PROFILE)
+  list(APPEND YORADIO_SOURCES "memory_profile.c")
+endif()
 set(YORADIO_ESP8266_AUDIO_PROFILE_WINDOW_MS "5000" CACHE STRING
   "Audio profile report interval; use 30000 to reduce UART interference")
 if(NOT YORADIO_ESP8266_AUDIO_PROFILE_WINDOW_MS MATCHES "^[1-9][0-9]*$")
@@ -97,6 +102,10 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
   YORADIO_HTTP_ONLY=1
   YORADIO_HELIX_MP3=1)
+if(YORADIO_ESP8266_MEMORY_PROFILE)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_MEMORY_PROFILE=1)
+endif()
 if(YORADIO_ESP8266_KARADIO_PIPELINE)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_KARADIO_PIPELINE=1)

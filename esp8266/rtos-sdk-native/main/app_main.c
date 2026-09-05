@@ -24,6 +24,7 @@
 #endif
 #include "time_service.h"
 #include "web_service.h"
+#include "memory_profile.h"
 
 static const char *TAG = "yoradio8266";
 
@@ -35,6 +36,7 @@ void audio_output_benchmark_run(void);
 #endif
 
 void app_main(void) {
+    memory_profile_register(MEMORY_APP);
 #if YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
     ESP_LOGI(TAG, "isolated generated-PCM audio output benchmark; "
                   "Wi-Fi and codecs disabled");
@@ -114,6 +116,7 @@ void app_main(void) {
         network_service_poll();
         time_service_poll();
         web_service_poll();
+        memory_profile_poll();
 #if CONFIG_YORADIO_STATUS_LED
         status_led_poll();
 #endif

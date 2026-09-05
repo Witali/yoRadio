@@ -1,4 +1,5 @@
 #include "audio_service.h"
+#include "memory_profile.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -778,6 +779,7 @@ static void karadio_pipeline_abort(void) {
 }
 
 static void audio_task(void *argument) {
+    memory_profile_register(MEMORY_AUDIO);
     (void)argument;
     s_karadio_audio_task = xTaskGetCurrentTaskHandle();
     helix_codec_t *codec = NULL;
@@ -915,6 +917,7 @@ static void audio_task(void *argument) {
 }
 #else
 static void audio_task(void *argument) {
+    memory_profile_register(MEMORY_AUDIO);
     (void)argument;
     helix_codec_t *codec = NULL;
     helix_codec_kind_t codec_kind = 0;

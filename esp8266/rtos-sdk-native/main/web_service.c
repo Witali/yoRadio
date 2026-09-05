@@ -1,4 +1,5 @@
 #include "web_service.h"
+#include "memory_profile.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -1070,6 +1071,7 @@ static void poll_on_http_task(void) {
 
 static void poll_work(void *argument) {
     (void)argument;
+    memory_profile_register(MEMORY_WEB);
     poll_on_http_task();
     s_poll_queued = false;
 }
