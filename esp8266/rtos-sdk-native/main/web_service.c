@@ -35,6 +35,12 @@
 #define WEB_STATIC_SCRATCH_SIZE 512U
 #define WEB_WS_CLIENTS 2U
 
+/* This SDK counts the TCP listener and pending accepts in its PCB limit.
+ * Exhausting it can silently abandon FIN_WAIT_1 with response data pending. */
+_Static_assert(CONFIG_LWIP_MAX_ACTIVE_TCP >=
+                   WEB_MAX_OPEN_SOCKETS + WEB_CONNECTION_BACKLOG + 2U,
+               "TCP budget must include HTTP sessions, backlog, listener and radio");
+
 extern const unsigned char _binary_script_js_gz_start[];
 extern const unsigned char _binary_script_js_gz_end[];
 

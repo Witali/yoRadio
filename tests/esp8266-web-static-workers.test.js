@@ -114,8 +114,14 @@ test("ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming", () => 
   }
   assert.match(kconfig, /config YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS[\s\S]*default 30/);
   assert.match(sdkDefaults, /CONFIG_YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS=30/);
-  assert.match(sdkDefaults, /CONFIG_LWIP_MAX_ACTIVE_TCP=6/);
-  assert.match(qioDefaults, /CONFIG_LWIP_MAX_ACTIVE_TCP=6/);
+  assert.match(sdkDefaults, /CONFIG_LWIP_MAX_ACTIVE_TCP=10/);
+  assert.match(qioDefaults, /CONFIG_LWIP_MAX_ACTIVE_TCP=10/);
+  assert.match(webSource, /WEB_MAX_OPEN_SOCKETS \+ WEB_CONNECTION_BACKLOG \+ 2U/);
+  for(const profile of sdkProfiles) {
+    const config = read("esp8266", "rtos-sdk-native", profile);
+    const limit = config.match(/^CONFIG_LWIP_MAX_ACTIVE_TCP=(\d+)$/m);
+    if(limit) assert.ok(Number(limit[1]) >= 9, profile+" TCP PCB budget");
+  }
   assert.match(sdkDefaults, /CONFIG_LWIP_TCP_MSL=5000/);
   assert.match(qioDefaults, /CONFIG_LWIP_TCP_MSL=5000/);
   assert.match(sdkDefaults, /CONFIG_LWIP_TCP_MSS=536/);
