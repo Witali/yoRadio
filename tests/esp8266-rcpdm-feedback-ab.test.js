@@ -11,6 +11,8 @@ test('feedback ablation changes only error feedback; enabled model is production
   assert.equal(result.simple_reference_frames,141312);assert.equal(result.simple_tie_checks,2);
   assert.ok(result.simple_different_words>1000);
   assert.equal(result.no_dither_frames_per_method,141312);assert.equal(result.disabled_prng_unchanged,true);
+  assert.equal(result.attenuation_reference_frames,141312*2*2*9);
+  assert.equal(result.attenuation_max_shift,8);
   assert.equal(result.prng_and_interpolation_identical,true);assert.equal(result.off_error_ignored,true);
   assert.ok(result.different_words>1000);t.diagnostic(JSON.stringify(result));
   const pcm=path.join(dir,'pcm.s16le');fs.writeFileSync(pcm,Buffer.from([0,0,1,0,255,255,255,127,0,128]));
@@ -21,6 +23,16 @@ test('feedback ablation changes only error feedback; enabled model is production
   assert.equal(simple.method,'simple');assert.equal(simple.on_reference_frames,5);
   for(const mode of ['on','off'])assert.equal(fs.statSync(prefix+'-simple.'+mode+'.bin').size,20);
   for(const method of ['predictive','simple']){
+    const flags=method==='simple'?['simple']:[];
+    const full=prefix+'-'+method+'-full';
+    execute(exe,[pcm,full,'8266',...flags,'dither-shift=0']);
+    for(const mode of ['on','off'])assert.deepEqual(fs.readFileSync(full+'.'+mode+'.bin'),
+      fs.readFileSync(prefix+(method==='simple'?'-simple':'')+'.'+mode+'.bin'));
+    for(let shift=1;shift<=8;++shift){
+      const scaled=JSON.parse(execute(exe,[pcm,prefix+'-scaled','8266',...flags,`dither-shift=${shift}`]).stdout);
+      assert.equal(scaled.dither,2);assert.equal(scaled.dither_shift,shift);
+      assert.equal(scaled.on_reference_frames,5);assert.equal(scaled.method,method);
+    }
     const paths=[];
     for(const seed of ['1','8266']){
       const output=prefix+'-'+method+'-nodither-'+seed;
@@ -28,6 +40,10 @@ test('feedback ablation changes only error feedback; enabled model is production
       assert.equal(proof.method,method);assert.equal(proof.dither,0);assert.equal(proof.on_reference_frames,5);paths.push(output);
     }
     for(const mode of ['on','off'])assert.deepEqual(fs.readFileSync(paths[0]+'.'+mode+'.bin'),fs.readFileSync(paths[1]+'.'+mode+'.bin'));
+  }
+  for(const options of [['dither-shift=9'],['dither-shift=-1'],['dither-shift=01'],
+    ['no-dither','dither-shift=1'],['dither-shift=1','no-dither'],['dither-shift=1','dither-shift=1']]){
+    assert.throws(()=>execute(exe,[pcm,prefix+'-invalid','8266',...options]));
   }
 });
 

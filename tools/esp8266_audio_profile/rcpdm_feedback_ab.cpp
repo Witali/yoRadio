@@ -15,7 +15,7 @@ static void check(bool ok,const char *why) {if(!ok)throw std::runtime_error(why)
 static bool same(const rc_pdm_feedback_t &a,const rc_pdm_feedback_t &b) {
     return a.rc==b.rc&&a.error==b.error&&a.previous==b.previous&&a.random==b.random;
 }
-static uint32_t literal(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool simple=false,bool dither=true) {
+static uint32_t literal(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool simple=false,bool dither=true,unsigned attenuation=0) {
     const int64_t full=INT64_C(1)<<29,limit=INT64_C(1)<<30,step=full/16;
     const int64_t previous=s.previous,target=(int64_t(pcm)+32768)*8192;
     int64_t voltage=s.rc,error=enabled?s.error:0;
@@ -27,7 +27,7 @@ static uint32_t literal(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool simpl
             uint64_t r=s.random;
             r=(r^(r<<13))&UINT32_MAX;r^=r>>17;r=(r^(r<<5))&UINT32_MAX;
             s.random=uint32_t(r);
-            noise=(int64_t(r%65536)+int64_t(r/65536)-65535)*256;
+            noise=(int64_t(r%65536)+int64_t(r/65536)-65535)*(256/(1U<<attenuation));
         }
         const int64_t down=voltage-voltage/16;
         const bool high=desired+(enabled?error:0)+noise>(simple?voltage:down+step/2);
@@ -41,10 +41,13 @@ static uint32_t literal(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool simpl
 // Same scale/interpolation/dither/RC recurrence as Feedback32, but compare
 // the CURRENT voltage, not the midpoint of the predicted next voltages.
 // This is a new offline Simple ablation, NOT the old no-dither ASM backend.
-static uint32_t simple32(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool dither=true) {
+static uint32_t simple32(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool dither=true,unsigned attenuation=0,bool simple=true) {
     const int32_t target=(int32_t(pcm)+32768)*8192;
     const int32_t increment=(target-s.previous)/32;
     int32_t desired=s.previous;
+    // Scale the positive coefficient, not a signed random value: no rounding
+    // bias, and exactly the same PRNG sequence at every nonzero amplitude.
+    const int32_t noiseScale=256>>attenuation;
     if(!enabled)s.error=0;
     uint32_t word=0;
     for(unsigned bit=0;bit<32;++bit) {
@@ -52,9 +55,10 @@ static uint32_t simple32(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool dith
         int32_t noise=0;
         if(dither) {
             const uint32_t r=rc_fb_random(&s);
-            noise=(int32_t(r&65535U)+int32_t(r>>16)-65535)*256;
+            noise=(int32_t(r&65535U)+int32_t(r>>16)-65535)*noiseScale;
         }
-        const bool high=desired+s.error+noise>s.rc; // Decide before decay.
+        const int32_t threshold=simple?s.rc:s.rc-(s.rc>>4)+RC_FB_FULL/32;
+        const bool high=desired+s.error+noise>threshold; // Decide before decay.
         s.rc-=s.rc>>4;
         if(high)s.rc+=RC_FB_FULL/16;
         if(enabled) {
@@ -66,11 +70,38 @@ static uint32_t simple32(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool dith
     s.previous=target;
     return word;
 }
-static uint32_t predictive32(rc_pdm_feedback_t &s,int16_t pcm,bool dither) {
+static uint32_t predictive32(rc_pdm_feedback_t &s,int16_t pcm,bool dither,unsigned attenuation=0) {
+    if(dither&&attenuation)return simple32(s,pcm,true,true,attenuation,false);
     if(dither)return rc_pdm_feedback_sample(&s,pcm);
     uint32_t word;
     rc_pdm_feedback_frame(&s,pcm,&word,32,4,0,0,1);
     return word;
+}
+static unsigned attenuation_test() {
+    rc_pdm_feedback_t fast[2][2][9],reference[2][2][9];
+    for(unsigned method=0;method<2;++method)for(unsigned enabled=0;enabled<2;++enabled)
+        for(unsigned shift=0;shift<=8;++shift) {
+            rc_pdm_feedback_init(&fast[method][enabled][shift],8266);
+            reference[method][enabled][shift]=fast[method][enabled][shift];
+        }
+    unsigned comparisons=0;uint32_t random=8266;
+    auto one=[&](int16_t pcm) {
+        for(unsigned method=0;method<2;++method)for(unsigned enabled=0;enabled<2;++enabled)
+            for(unsigned shift=0;shift<=8;++shift) {
+                auto &s=fast[method][enabled][shift],&r=reference[method][enabled][shift];
+                auto production=s;
+                const auto word=simple32(s,pcm,enabled!=0,true,shift,method!=0);
+                check(word==literal(r,pcm,enabled!=0,method!=0,true,shift)&&same(s,r),"attenuation reference mismatch");
+                if(method==0&&enabled&&shift==0)
+                    check(word==rc_pdm_feedback_sample(&production,pcm)&&same(s,production),"full amplitude differs from production");
+                check(s.random==fast[0][0][0].random&&s.previous==fast[0][0][0].previous,"attenuation changes PRNG/interpolation");
+                ++comparisons;
+            }
+    };
+    for(int pcm=-32768;pcm<=32767;++pcm)one(int16_t(pcm));
+    for(unsigned i=0;i<65536;++i){random=random*1664525U+1013904223U;one(int16_t(random>>16));}
+    for(int level:{-32768,32767,0,1,-1})for(unsigned i=0;i<2048;++i)one(int16_t(level));
+    return comparisons;
 }
 static void self_test() {
     rc_pdm_feedback_t prod,model,frozen,off;
@@ -126,19 +157,26 @@ static void self_test() {
         check((word&0x80000000U)==0,"Simple equality must choose zero");
         check(word==literal(expected,0,enabled,true)&&same(tie,expected),"Simple tie reference");
     }
+    const unsigned attenuationComparisons=attenuation_test();
     std::cout<<"{\"pass\":true,\"frames\":"<<count<<",\"different_words\":"<<changed
              <<",\"simple_reference_frames\":"<<count<<",\"simple_different_words\":"<<simpleChanged
              <<",\"no_dither_frames_per_method\":"<<count<<",\"disabled_prng_unchanged\":true"
+             <<",\"attenuation_reference_frames\":"<<attenuationComparisons<<",\"attenuation_max_shift\":8"
              <<",\"simple_tie_checks\":2,\"prng_and_interpolation_identical\":true,\"off_error_ignored\":true}\n";
 }
 int main(int argc,char **argv) {
     try {
         if(argc==2&&std::string(argv[1])=="--self-test"){self_test();return 0;}
-        check(argc>=4&&argc<=6,"usage: rcpdm-feedback-ab PCM output-prefix seed [simple] [no-dither]; or --self-test");
+        check(argc>=4&&argc<=6,"usage: rcpdm-feedback-ab PCM output-prefix seed [simple] [no-dither|dither-shift=0..8]; or --self-test");
         bool simple=false,dither=true;
+        unsigned attenuation=0;bool amplitudeSet=false;
         for(int i=4;i<argc;++i) {
             if(std::string(argv[i])=="simple"&&!simple)simple=true;
-            else if(std::string(argv[i])=="no-dither"&&dither)dither=false;
+            else if(std::string(argv[i])=="no-dither"&&dither&&!amplitudeSet)dither=false;
+            else if(std::string(argv[i]).size()==14&&std::string(argv[i]).substr(0,13)=="dither-shift="&&dither&&!amplitudeSet) {
+                check(argv[i][13]>='0'&&argv[i][13]<='8',"dither shift must be 0..8");
+                attenuation=unsigned(argv[i][13]-'0');amplitudeSet=true;
+            }
             else throw std::runtime_error("unknown or repeated option");
         }
         const uint16_t endian=1;check(*reinterpret_cast<const uint8_t*>(&endian)==1,"LE host required");
@@ -152,10 +190,10 @@ int main(int argc,char **argv) {
         const uint32_t initialRandom=on.random;
         std::vector<uint32_t> with(pcm.size()),without(pcm.size());unsigned different=0;
         for(size_t i=0;i<pcm.size();++i) {
-            with[i]=simple?simple32(on,pcm[i],true,dither):predictive32(on,pcm[i],dither);
-            check(with[i]==literal(reference,pcm[i],true,simple,dither)&&same(on,reference),"enabled reference mismatch");
-            without[i]=literal(off,pcm[i],false,simple,dither);
-            if(simple)check(without[i]==simple32(off32,pcm[i],false,dither)&&same(off,off32),"Simple disabled reference mismatch");
+            with[i]=simple?simple32(on,pcm[i],true,dither,attenuation):predictive32(on,pcm[i],dither,attenuation);
+            check(with[i]==literal(reference,pcm[i],true,simple,dither,attenuation)&&same(on,reference),"enabled reference mismatch");
+            without[i]=literal(off,pcm[i],false,simple,dither,attenuation);
+            check(without[i]==simple32(off32,pcm[i],false,dither,attenuation,simple)&&same(off,off32),"disabled reference mismatch");
             check(off.random==on.random&&off.previous==on.previous&&off.error==0,"ablation invariants");
             check(dither||on.random==initialRandom,"disabled dither advances PRNG");
             different+=with[i]!=without[i];
@@ -167,6 +205,7 @@ int main(int argc,char **argv) {
         write(".on.bin",with);write(".off.bin",without);
         std::cout<<"{\"frames\":"<<pcm.size()<<",\"different_words\":"<<different
                  <<",\"on_reference_frames\":"<<pcm.size()<<",\"method\":\""<<(simple?"simple":"predictive")
-                 <<"\",\"dither\":"<<(dither?2:0)<<",\"prng_and_interpolation_identical\":true}"<<'\n';
+                 <<"\",\"dither\":"<<(dither?2:0)<<",\"dither_shift\":"<<attenuation
+                 <<",\"prng_and_interpolation_identical\":true}"<<'\n';
     } catch(const std::exception &e){std::cerr<<e.what()<<'\n';return 1;}
 }
