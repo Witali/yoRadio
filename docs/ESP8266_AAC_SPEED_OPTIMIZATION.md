@@ -30,7 +30,7 @@ Then test real I2S-PDM output for underruns and restore ordinary radio firmware.
   decoder as fallback. Exhaustively compare symbols and consumed bit counts.
 - [x] 3. Try a fused bit-reader fast path to avoid repeated peek/refill work,
   retaining the existing state size and bounds behavior.
-- [ ] Run the complete regression suite and physical output checks for the
+- [x] Run the complete regression suite and physical output checks for the
   accepted combination; archive measurements and an ordinary firmware build.
 
 For each experiment append the implementation, correctness/SNR, memory,
@@ -144,3 +144,28 @@ were removed. An independent bit-by-bit oracle regression remains to cover
 lookahead, consumption, alignment and end-of-buffer zero padding.
 
 No lossy arithmetic or larger buffers were accepted.
+
+## Final verification and hand-off
+
+All **344** host tests passed (102.26 s), including the final independent bit
+oracle's 3874304 comparisons. Original/final saved binaries were alternated
+twice for isolated decode and twice for physical output; the above timings
+and zero final underruns reproduced. See the [filtered captures, image hashes,
+ELF section sizes and full test log](benchmarks/esp8266-aac-speed-2026-09-06/README.md).
+
+Ordinary firmware from `851c7d2` is saved in
+`firmware/development/esp8266-native-aac-speed/app.bin`, with manifest and
+CHANGELOG. Size 698336 bytes; SHA256
+`E10B739E9BDDEA684E657DAA77274C397FAE323FD908A6D78CAB07E07C0AB874`.
+All diagnostic profiles are OFF, exact AAC remains selected. Static DRAM
+20848 B / IRAM 27464 B are unchanged; image growth is 8304 B.
+
+Flashed app0 only at 0x10000 on COM8; esptool verified the hash. RTS reboot
+confirms ordinary CPU160 / I2S-PDM32 startup, 511 retained indexed stations,
+SPIFFS 93623/233681 B used, initial free heap 89236 B. STA obtained
+192.168.100.6 after about 36.6 s. NVS, partitions and SPIFFS were not flashed;
+no PC Wi-Fi changes or application UART bytes were sent.
+
+Limits: timing is from the isolated diagnostic image, not a sustained live
+network player run. SNR compares digital PCM against the exact old decoder;
+it does not measure analog RC-filter/amplifier distortion or AAC encoding loss.
