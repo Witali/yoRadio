@@ -1,0 +1,736 @@
+{
+  "note": "Offline RC10us, same saved bits. Peak bins exclude the intended fundamental; no perceptual claim.",
+  "source_sha256": {
+    "tools\\esp8266_audio_profile\\inspect_rcpdm_no_dither.py": "b1a442a7fe85b8c7df0fc89402ffbdabe28225d218adb6d11aca6767a6773d0d",
+    "tools\\esp8266_audio_profile\\measure_pdm_matrix.py": "90a730f283159f82c383c54a983ea8ec7025cbfad9a76e55f6bcf467d815d2df",
+    "tools\\esp8266_audio_profile\\measure_rcpdm8_quality.py": "6ef78d259c2526cef3fc69cdc62e1fd815f5a83c637bd18c4216b31072d7fec9"
+  },
+  "variants": {
+    "predictive-dither": {
+      "report_sha256": "d2f7ed3334574f604ca8bb68b29a606c6861a1ddae64d64fdf4adab1932179c4",
+      "models": {
+        "on": {
+          "spectra": {
+            "zero": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 19151,
+                  "rms_dbfs": -94.89730623749716
+                },
+                {
+                  "hz": 19293,
+                  "rms_dbfs": -95.91249731486582
+                },
+                {
+                  "hz": 18365,
+                  "rms_dbfs": -95.54941437122366
+                }
+              ]
+            },
+            "tone-1000hz-40db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 16000,
+                  "rms_dbfs": -90.01155821284729
+                },
+                {
+                  "hz": 13000,
+                  "rms_dbfs": -91.11153291263442
+                },
+                {
+                  "hz": 15000,
+                  "rms_dbfs": -91.79755517535602
+                }
+              ]
+            },
+            "tone-1000hz-80db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 19628,
+                  "rms_dbfs": -94.67503648041719
+                },
+                {
+                  "hz": 19220,
+                  "rms_dbfs": -95.06961081526154
+                },
+                {
+                  "hz": 19162,
+                  "rms_dbfs": -95.23241858527516
+                }
+              ]
+            }
+          },
+          "lsb": {
+            "seed": 2654435769,
+            "start_seconds": 0.25,
+            "window_seconds": 1,
+            "gains": [
+              {
+                "magnitude": 0.9765896628463817,
+                "phase_degrees": -3.606688355906813
+              },
+              {
+                "magnitude": 0.9853457943637964,
+                "phase_degrees": -3.5245838433692143
+              },
+              {
+                "magnitude": 0.9979161832390759,
+                "phase_degrees": -3.991402599392702
+              },
+              {
+                "magnitude": 1.0057099486758954,
+                "phase_degrees": -3.7248881801517686
+              },
+              {
+                "magnitude": 1.0066866955364426,
+                "phase_degrees": -3.7255970853194547
+              },
+              {
+                "magnitude": 1.0214138369983905,
+                "phase_degrees": -3.6337591883674243
+              },
+              {
+                "magnitude": 1.0159004608381257,
+                "phase_degrees": -4.432872650508988
+              },
+              {
+                "magnitude": 1.0074384172099755,
+                "phase_degrees": -3.772366968417385
+              }
+            ],
+            "coherent_mean_magnitude": 1.0021137998730667
+          }
+        },
+        "off": {
+          "spectra": {
+            "zero": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 2519,
+                  "rms_dbfs": -74.58986610765811
+                },
+                {
+                  "hz": 10542,
+                  "rms_dbfs": -75.95978779944579
+                },
+                {
+                  "hz": 7811,
+                  "rms_dbfs": -74.95983795348681
+                }
+              ]
+            },
+            "tone-1000hz-40db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 19726,
+                  "rms_dbfs": -75.43519932383984
+                },
+                {
+                  "hz": 1480,
+                  "rms_dbfs": -75.27706482742809
+                },
+                {
+                  "hz": 18904,
+                  "rms_dbfs": -76.04375391411854
+                }
+              ]
+            },
+            "tone-1000hz-80db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 12368,
+                  "rms_dbfs": -75.49587042977282
+                },
+                {
+                  "hz": 10542,
+                  "rms_dbfs": -75.86016474903428
+                },
+                {
+                  "hz": 6754,
+                  "rms_dbfs": -75.87425739521707
+                }
+              ]
+            }
+          },
+          "lsb": {
+            "seed": 2654435769,
+            "start_seconds": 0.25,
+            "window_seconds": 1,
+            "gains": [
+              {
+                "magnitude": 0.954833686455922,
+                "phase_degrees": 10.169252795593392
+              },
+              {
+                "magnitude": 0.7503354962163574,
+                "phase_degrees": -5.034822528021354
+              },
+              {
+                "magnitude": 1.152522646314049,
+                "phase_degrees": -1.1158758018869726
+              },
+              {
+                "magnitude": 1.0360129962264457,
+                "phase_degrees": 6.2096404241503915
+              },
+              {
+                "magnitude": 0.8100079987103757,
+                "phase_degrees": -4.6800017474462985
+              },
+              {
+                "magnitude": 0.9526000684215676,
+                "phase_degrees": 15.863817203700819
+              },
+              {
+                "magnitude": 0.9749645454224957,
+                "phase_degrees": -7.01067818229786
+              },
+              {
+                "magnitude": 0.8900026187300615,
+                "phase_degrees": -16.05158850734906
+              }
+            ],
+            "coherent_mean_magnitude": 0.927018772293168
+          }
+        }
+      }
+    },
+    "simple-dither": {
+      "report_sha256": "6db9ae51259aac6b1f2332f1f1a4dcba9e32efc41daaff0eedcc3c2bc3071a43",
+      "models": {
+        "on": {
+          "spectra": {
+            "zero": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 19596,
+                  "rms_dbfs": -95.48185389748481
+                },
+                {
+                  "hz": 16964,
+                  "rms_dbfs": -96.08677459948
+                },
+                {
+                  "hz": 18669,
+                  "rms_dbfs": -96.3659222771507
+                }
+              ]
+            },
+            "tone-1000hz-40db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 13000,
+                  "rms_dbfs": -89.42745512678096
+                },
+                {
+                  "hz": 15000,
+                  "rms_dbfs": -89.99923756047627
+                },
+                {
+                  "hz": 16000,
+                  "rms_dbfs": -90.729556436525
+                }
+              ]
+            },
+            "tone-1000hz-80db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 19006,
+                  "rms_dbfs": -96.41352199991917
+                },
+                {
+                  "hz": 19520,
+                  "rms_dbfs": -96.77113918145278
+                },
+                {
+                  "hz": 19628,
+                  "rms_dbfs": -95.83301479183783
+                }
+              ]
+            }
+          },
+          "lsb": {
+            "seed": 2654435769,
+            "start_seconds": 0.25,
+            "window_seconds": 1,
+            "gains": [
+              {
+                "magnitude": 0.9750017562780608,
+                "phase_degrees": -3.733310512245791
+              },
+              {
+                "magnitude": 0.9838307530696843,
+                "phase_degrees": -3.9126393205373935
+              },
+              {
+                "magnitude": 0.9948394463507245,
+                "phase_degrees": -3.695450342449226
+              },
+              {
+                "magnitude": 1.002355942468099,
+                "phase_degrees": -3.938057636090899
+              },
+              {
+                "magnitude": 0.9996258469366931,
+                "phase_degrees": -3.424424931642852
+              },
+              {
+                "magnitude": 1.0154306840315002,
+                "phase_degrees": -3.965315942322515
+              },
+              {
+                "magnitude": 1.014019911371248,
+                "phase_degrees": -3.7646497592467836
+              },
+              {
+                "magnitude": 1.0071822313695242,
+                "phase_degrees": -3.9091219055570554
+              }
+            ],
+            "coherent_mean_magnitude": 0.999031471994777
+          }
+        },
+        "off": {
+          "spectra": {
+            "zero": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 14030,
+                  "rms_dbfs": -75.6077733937512
+                },
+                {
+                  "hz": 7186,
+                  "rms_dbfs": -75.17308149042192
+                },
+                {
+                  "hz": 5091,
+                  "rms_dbfs": -75.4521139463196
+                }
+              ]
+            },
+            "tone-1000hz-40db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 5239,
+                  "rms_dbfs": -75.10808152817356
+                },
+                {
+                  "hz": 1469,
+                  "rms_dbfs": -75.99652419678651
+                },
+                {
+                  "hz": 8225,
+                  "rms_dbfs": -75.77431824712643
+                }
+              ]
+            },
+            "tone-1000hz-80db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 14030,
+                  "rms_dbfs": -75.44217414763315
+                },
+                {
+                  "hz": 7186,
+                  "rms_dbfs": -74.8397522776358
+                },
+                {
+                  "hz": 19725,
+                  "rms_dbfs": -75.15369038579787
+                }
+              ]
+            }
+          },
+          "lsb": {
+            "seed": 2654435769,
+            "start_seconds": 0.25,
+            "window_seconds": 1,
+            "gains": [
+              {
+                "magnitude": 0.7989961958156973,
+                "phase_degrees": 8.343401650712556
+              },
+              {
+                "magnitude": 0.941014289842808,
+                "phase_degrees": 8.233151415892516
+              },
+              {
+                "magnitude": 1.051557746684731,
+                "phase_degrees": 11.121513428975737
+              },
+              {
+                "magnitude": 0.7594750354994899,
+                "phase_degrees": 3.631952732562681
+              },
+              {
+                "magnitude": 0.8876369822827533,
+                "phase_degrees": 1.1804950421845155
+              },
+              {
+                "magnitude": 1.108858731605573,
+                "phase_degrees": 2.9544113633715163
+              },
+              {
+                "magnitude": 0.9533224355738166,
+                "phase_degrees": -14.57324419367843
+              },
+              {
+                "magnitude": 1.1891510512665917,
+                "phase_degrees": -2.1727474318660427
+              }
+            ],
+            "coherent_mean_magnitude": 0.9528743619907244
+          }
+        }
+      }
+    },
+    "predictive-none": {
+      "report_sha256": "a63912f47f19bb0fc5f7934bee513b3986230b08f8a1ea5058a071fc7652244a",
+      "models": {
+        "on": {
+          "spectra": {
+            "zero": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 18622,
+                  "rms_dbfs": -116.95964445403618
+                },
+                {
+                  "hz": 18713,
+                  "rms_dbfs": -116.63152986785589
+                },
+                {
+                  "hz": 18677,
+                  "rms_dbfs": -117.27811204575467
+                }
+              ]
+            },
+            "tone-1000hz-40db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 13000,
+                  "rms_dbfs": -80.88813928618087
+                },
+                {
+                  "hz": 15000,
+                  "rms_dbfs": -81.20413598150128
+                },
+                {
+                  "hz": 20000,
+                  "rms_dbfs": -83.51936226840813
+                }
+              ]
+            },
+            "tone-1000hz-80db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 2000,
+                  "rms_dbfs": -91.91302785284122
+                },
+                {
+                  "hz": 3000,
+                  "rms_dbfs": -93.57851804508081
+                },
+                {
+                  "hz": 19995,
+                  "rms_dbfs": -94.53395967202545
+                }
+              ]
+            }
+          },
+          "lsb": {
+            "seed": 2654435769,
+            "start_seconds": 0.25,
+            "window_seconds": 1,
+            "gains": [
+              {
+                "magnitude": 1.3061118480976466,
+                "phase_degrees": -1.3262585316788142
+              },
+              {
+                "magnitude": 0.9433030261914501,
+                "phase_degrees": -1.6070275495887079
+              },
+              {
+                "magnitude": 1.178858609396103,
+                "phase_degrees": -1.7286659709492638
+              },
+              {
+                "magnitude": 0.47044317468348185,
+                "phase_degrees": -0.9132913554659272
+              },
+              {
+                "magnitude": 1.1805824499564967,
+                "phase_degrees": -1.2458449869045585
+              },
+              {
+                "magnitude": 0.9084340105223163,
+                "phase_degrees": -1.366982511779968
+              },
+              {
+                "magnitude": 1.0201510898136688,
+                "phase_degrees": -1.6833593846537191
+              },
+              {
+                "magnitude": 1.0779163945823003,
+                "phase_degrees": -1.242035212981574
+              }
+            ],
+            "coherent_mean_magnitude": 1.0107170633903768
+          }
+        },
+        "off": {
+          "spectra": {
+            "zero": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": []
+            },
+            "tone-1000hz-40db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": []
+            },
+            "tone-1000hz-80db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": []
+            }
+          },
+          "lsb": {
+            "seed": 2654435769,
+            "start_seconds": 0.25,
+            "window_seconds": 1,
+            "gains": [
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              }
+            ],
+            "coherent_mean_magnitude": 0.0
+          }
+        }
+      }
+    },
+    "simple-none": {
+      "report_sha256": "31b65169f73a1619969d1db5d7f2182fe7ae6a5c05490ae4d679ff03d973c0ff",
+      "models": {
+        "on": {
+          "spectra": {
+            "zero": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 18661,
+                  "rms_dbfs": -116.85257607296565
+                },
+                {
+                  "hz": 18736,
+                  "rms_dbfs": -117.98123496823266
+                },
+                {
+                  "hz": 18746,
+                  "rms_dbfs": -117.43828686043118
+                }
+              ]
+            },
+            "tone-1000hz-40db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 20000,
+                  "rms_dbfs": -81.1690343332242
+                },
+                {
+                  "hz": 13000,
+                  "rms_dbfs": -81.11763959079803
+                },
+                {
+                  "hz": 15000,
+                  "rms_dbfs": -82.50413986957027
+                }
+              ]
+            },
+            "tone-1000hz-80db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": [
+                {
+                  "hz": 2000,
+                  "rms_dbfs": -91.47608870069172
+                },
+                {
+                  "hz": 3000,
+                  "rms_dbfs": -93.40351580617667
+                },
+                {
+                  "hz": 19995,
+                  "rms_dbfs": -94.39757316567733
+                }
+              ]
+            }
+          },
+          "lsb": {
+            "seed": 2654435769,
+            "start_seconds": 0.25,
+            "window_seconds": 1,
+            "gains": [
+              {
+                "magnitude": 1.3107112688048037,
+                "phase_degrees": -1.3403659065203837
+              },
+              {
+                "magnitude": 0.9424216199137107,
+                "phase_degrees": -1.6584402313701947
+              },
+              {
+                "magnitude": 1.196775793812266,
+                "phase_degrees": -1.7724711182365345
+              },
+              {
+                "magnitude": 0.4670402786545126,
+                "phase_degrees": -0.8947519311193044
+              },
+              {
+                "magnitude": 1.1878842579461812,
+                "phase_degrees": -1.2795729128749516
+              },
+              {
+                "magnitude": 0.9183438230793582,
+                "phase_degrees": -1.421753201419932
+              },
+              {
+                "magnitude": 1.0220124540170419,
+                "phase_degrees": -1.6376285124564982
+              },
+              {
+                "magnitude": 1.0751955459089382,
+                "phase_degrees": -1.3083031426402825
+              }
+            ],
+            "coherent_mean_magnitude": 1.0150401735076133
+          }
+        },
+        "off": {
+          "spectra": {
+            "zero": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": []
+            },
+            "tone-1000hz-40db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": []
+            },
+            "tone-1000hz-80db": {
+              "window_seconds": 1,
+              "windows": 2,
+              "strongest_nonfundamental_bins": []
+            }
+          },
+          "lsb": {
+            "seed": 2654435769,
+            "start_seconds": 0.25,
+            "window_seconds": 1,
+            "gains": [
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              },
+              {
+                "magnitude": 0.0,
+                "phase_degrees": 180.0
+              }
+            ],
+            "coherent_mean_magnitude": 0.0
+          }
+        }
+      }
+    }
+  }
+}

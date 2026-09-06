@@ -10,6 +10,7 @@ test('feedback ablation changes only error feedback; enabled model is production
   assert.equal(result.pass,true);assert.equal(result.frames,141312);
   assert.equal(result.simple_reference_frames,141312);assert.equal(result.simple_tie_checks,2);
   assert.ok(result.simple_different_words>1000);
+  assert.equal(result.no_dither_frames_per_method,141312);assert.equal(result.disabled_prng_unchanged,true);
   assert.equal(result.prng_and_interpolation_identical,true);assert.equal(result.off_error_ignored,true);
   assert.ok(result.different_words>1000);t.diagnostic(JSON.stringify(result));
   const pcm=path.join(dir,'pcm.s16le');fs.writeFileSync(pcm,Buffer.from([0,0,1,0,255,255,255,127,0,128]));
@@ -19,6 +20,15 @@ test('feedback ablation changes only error feedback; enabled model is production
   const simple=JSON.parse(execute(exe,[pcm,prefix+'-simple','8266','simple']).stdout);
   assert.equal(simple.method,'simple');assert.equal(simple.on_reference_frames,5);
   for(const mode of ['on','off'])assert.equal(fs.statSync(prefix+'-simple.'+mode+'.bin').size,20);
+  for(const method of ['predictive','simple']){
+    const paths=[];
+    for(const seed of ['1','8266']){
+      const output=prefix+'-'+method+'-nodither-'+seed;
+      const proof=JSON.parse(execute(exe,[pcm,output,seed,...(method==='simple'?['simple']:[]),'no-dither']).stdout);
+      assert.equal(proof.method,method);assert.equal(proof.dither,0);assert.equal(proof.on_reference_frames,5);paths.push(output);
+    }
+    for(const mode of ['on','off'])assert.deepEqual(fs.readFileSync(paths[0]+'.'+mode+'.bin'),fs.readFileSync(paths[1]+'.'+mode+'.bin'));
+  }
 });
 
 test('archived feedback ablation has matched controls and reproduces enabled baseline',()=>{

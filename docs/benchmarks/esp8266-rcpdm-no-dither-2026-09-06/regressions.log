@@ -1,0 +1,47 @@
+TAP version 13
+# Subtest: production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+ok 1 - production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+  ---
+  duration_ms: 18375.4934
+  type: 'test'
+  ...
+# PDM32: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_SIMPLE: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_FEEDBACK: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM128: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# Subtest: feedback ablation changes only error feedback; enabled model is production-bit-exact
+ok 2 - feedback ablation changes only error feedback; enabled model is production-bit-exact
+  ---
+  duration_ms: 4386.9203
+  type: 'test'
+  ...
+# {"pass":true,"frames":141312,"different_words":135068,"simple_reference_frames":141312,"simple_different_words":141014,"no_dither_frames_per_method":141312,"disabled_prng_unchanged":true,"simple_tie_checks":2,"prng_and_interpolation_identical":true,"off_error_ignored":true}
+# Subtest: archived feedback ablation has matched controls and reproduces enabled baseline
+ok 3 - archived feedback ablation has matched controls and reproduces enabled baseline
+  ---
+  duration_ms: 2.9957
+  type: 'test'
+  ...
+# Subtest: Simple on/off archive matches the predictive experiment except for decision rule
+ok 4 - Simple on/off archive matches the predictive experiment except for decision rule
+  ---
+  duration_ms: 1.7879
+  type: 'test'
+  ...
+# Subtest: RCPDM feedback preserves fractional PCM, state bounds and chunk continuity
+ok 5 - RCPDM feedback preserves fractional PCM, state bounds and chunk continuity
+  ---
+  duration_ms: 4870.3793
+  type: 'test'
+  ...
+# {"pass":true,"word_state_frames":1654296,"batch_cases":16,"selected_frames":116795,"state_bytes":16}
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18464.6762
