@@ -49,8 +49,10 @@ test("ESP8266 Helix MP3 streams 32 frames while libmad retains granule PCM", () 
   );
 });
 
-test("ESP8266 AAC reserves a complete stereo PCM frame before decoding", () => {
-  assert.match(bridge, /constexpr size_t kAacPcmSamples = 1024U \* 2U/);
+test("ESP8266 AAC reserves only its active bounded PCM block", () => {
+  assert.match(bridge, /#if YORADIO_ESP8266_AAC_BLOCK_OUTPUT\s+constexpr size_t kAacPcmSamples = YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES \*\s+\(CONFIG_YORADIO_AUDIO_MONO \? 1U : 2U\)/);
+  assert.match(bridge, /AACDecodeBlocks\(input, &left, codec->pcm/);
+  assert.match(bridge, /kAacPcmSamples > kMp3PcmSamples \? kAacPcmSamples : kMp3PcmSamples/);
   assert.match(bridge, /pcm_samples_for_kind[\s\S]*HELIX_CODEC_AAC[\s\S]*kAacPcmSamples/);
   assert.match(bridge, /heap_caps_realloc\([\s\S]*sizeof\(int16_t\) \* pcm_samples/);
 });

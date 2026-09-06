@@ -51,6 +51,10 @@ function compile(outputDir, name, reference, mp3Sso = false, aacSso = false, opt
     sources[0] = path.join(native, "mp3_block_state_test.cpp");
     sources.pop();
   }
+  if(options.aacBlockUnit) {
+    sources.splice(0, 2, path.join(native, "aac_block_state_test.cpp"));
+    sources.pop();
+  }
   const defines = ["YORADIO_ESP8266_NATIVE=1"];
   if(reference) defines.push("YORADIO_HELIX_REFERENCE_FIXED_POINT=1");
   if(mp3Sso) defines.push("YORADIO_HELIX_MP3_SSO=1");
@@ -166,6 +170,40 @@ function downmix(stereo) {
     mono.writeInt16LE((stereo.readInt16LE(offset) + stereo.readInt16LE(offset + 2)) >> 1, offset / 2);
   return mono;
 }
+
+test("AAC sequential block windows preserve exact PCM and overlap state", t => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "aac-window-blocks-"));
+  t.after(() => fs.rmSync(dir, {recursive:true, force:true}));
+  for(const sso of [false, true]) {
+    const binary = compile(dir, `aac-state-${sso}`, false, false, sso, {aacBlockUnit:true});
+    if(binary.skip) return t.skip(binary.skip);
+    const run = spawnSync(binary.executable, [], {encoding:"utf8"});
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+    t.diagnostic(run.stdout.trim());
+  }
+});
+
+test("AAC 32/64/128/256/512-frame callbacks match full-frame decode and mono downmix", t => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "aac-pcm-blocks-"));
+  t.after(() => fs.rmSync(dir, {recursive:true, force:true}));
+  const inputs = [
+    [path.join(fixtures, "stereo-320.aac"), 2],
+    [path.join(__dirname, "fixtures", "helix_aac_blocks", "mono-22050.aac"), 1],
+    [path.join(__dirname, "fixtures", "helix_aac_blocks", "stereo-44100.aac"), 2],
+  ];
+  for(const sso of [false, true]) {
+    const binary = compile(dir, `aac-blocks-${sso}`, false, false, sso);
+    if(binary.skip) return t.skip(binary.skip);
+    for(const [fixture, channels] of inputs) {
+      const reference = decode(binary.executable, "aac", fixture, path.join(dir, "reference.pcm"));
+      for(const frames of [32, 64, 128, 256, 512]) for(const mono of [false, true]) {
+        const actual = decode(binary.executable, `aac-blocks-${frames}${mono ? "-mono" : ""}`, fixture, path.join(dir, "blocks.pcm"));
+        assert.deepEqual(actual.pcm, mono && channels === 2 ? downmix(reference.pcm) : reference.pcm,
+          `AAC ${frames} frames, mono=${mono}, SSO=${sso}, ${fixture}`);
+      }
+    }
+  }
+});
 
 test("32-frame MP3 output matches granules and full frames byte for byte", t => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "helix-blocks-"));

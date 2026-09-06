@@ -6,6 +6,12 @@ normal profile uses the yoRadio Helix MP3 and AAC decoders; an experimental
 ESP8266Audio `libmad-8266` MP3 backend can be selected at compile time with
 `CONFIG_YORADIO_MP3_DECODER_LIBMAD` while AAC remains on Helix.
 
+AAC-LC defaults to 512-frame PCM callbacks: 1024 bytes of mono PCM instead
+of a 4096-byte stereo frame. Set `YORADIO_ESP8266_AAC_BLOCK_OUTPUT=OFF` for
+the retained full-frame A/B path. `YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES`
+accepts 32/64/128/256/512; the physical PDM32 test selected 512 for continuity.
+See [AAC memory and timing results](../../docs/ESP8266_AAC_PCM_BLOCKS.md).
+
 The default profile targets a 4 MiB ESP-12E/NodeMCU/Wemos-class module at
 160 MHz and uses the external flash in QIO mode at 40 MHz. The bootloader is
 initially written in DIO as required by ESP8266 RTOS SDK, then enables Quad I/O

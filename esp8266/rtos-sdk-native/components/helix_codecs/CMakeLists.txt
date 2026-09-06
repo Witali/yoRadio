@@ -45,6 +45,16 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1)
 option(YORADIO_ESP8266_MP3_SHARED_REORDER
   "Reuse IMDCT output as MP3 reorder scratch (OFF for A/B comparison)" ON)
+option(YORADIO_ESP8266_AAC_BLOCK_OUTPUT "Stream AAC PCM in bounded blocks" ON)
+# 512 mono PCM samples fill one 512-word PDM32 DMA payload. Smaller blocks
+# allowed premature partial handoff and underruns in physical AAC tests.
+set(YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES "512" CACHE STRING "AAC frames per PCM block (32/64/128/256/512)")
+if(NOT YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES MATCHES "^(32|64|128|256|512)$")
+  message(FATAL_ERROR "AAC PCM block must be 32, 64, 128, 256 or 512 frames")
+endif()
+target_compile_definitions(${COMPONENT_LIB} PRIVATE
+  YORADIO_ESP8266_AAC_BLOCK_OUTPUT=$<BOOL:${YORADIO_ESP8266_AAC_BLOCK_OUTPUT}>
+  YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES=${YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES})
 if(YORADIO_ESP8266_MP3_SHARED_REORDER)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_HELIX_MP3_SHARED_REORDER=1)
 else()

@@ -297,7 +297,7 @@ int main() {
     for(unsigned rate : {8000U, 16000U, 22050U, 32000U, 44100U, 48000U})
         for(uint8_t channels : {1, 2}) for(bool normalize : {false, true}) {
             const Render baseline = render(rate, channels, normalize, 576);
-            for(unsigned chunk : {1U, 32U, 64U, 128U}) {
+            for(unsigned chunk : {1U, 32U, 64U, 128U, 256U, 512U}) {
                 const Render actual = render(rate, channels, normalize, chunk);
                 assert(actual.pcm == baseline.pcm);
                 assert(actual.pdm == baseline.pdm);
@@ -308,5 +308,5 @@ int main() {
     std::vector<int16_t> tooMuch(1100);
     assert(native_audio_output_write(tooMuch.data(), tooMuch.size(), 48000, 1) == ESP_ERR_TIMEOUT);
     assert(s_reserved_words == 0 && critical == 0); // no leaked writable span
-    puts("PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/576 frames; ownership, EOF, timeout, cancel and stop passed");
+    puts("PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed");
 }

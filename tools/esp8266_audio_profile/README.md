@@ -1,5 +1,14 @@
 # ESP8266 audio profile tools
 
+## AAC PCM block-size matrix
+
+`run_aac_block_matrix.ps1` compares the retained full-frame bridge and
+32/64/128/256/512-frame AAC output on the connected board, first decode-only
+or with `-PhysicalOutput` through real I2S-PDM DMA. It writes app0 only and
+leaves a diagnostic app installed; restore ordinary firmware afterwards.
+The selected default is 512 frames / 1024 bytes mono PCM. See
+[measurements and safety invariants](../../docs/ESP8266_AAC_PCM_BLOCKS.md).
+
 ## RAM decoder with physical DMA output
 
 To remove network delivery from the timing comparison while exercising the

@@ -51,8 +51,8 @@ constexpr size_t kInputStorageBytes = kInputBytes + MAD_BUFFER_GUARD;
 #else
 constexpr size_t kInputStorageBytes = kInputBytes;
 #endif
-/* Helix MP3 reuses one 32-frame synthesis block per callback. AAC
- * writes a complete 1024-sample stereo frame. Allocate the active codec's
+/* Helix MP3 reuses one 32-frame synthesis block per callback. Native AAC
+ * uses a bounded PCM block, with full-frame output retained for A/B. Allocate the active codec's
  * exact PCM size: reserving AAC's larger buffer while playing MP3 starved
  * lwIP on the ESP8266. */
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
@@ -62,8 +62,13 @@ constexpr size_t kMp3PcmSamples = MP3_PCM_BLOCK_FRAMES *
                                 (CONFIG_YORADIO_AUDIO_MONO ? 1U : 2U);
 #endif
 #if CONFIG_YORADIO_HELIX_AAC
+#if YORADIO_ESP8266_AAC_BLOCK_OUTPUT
+constexpr size_t kAacPcmSamples = YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES *
+                                (CONFIG_YORADIO_AUDIO_MONO ? 1U : 2U);
+#else
 constexpr size_t kAacPcmSamples = 1024U * 2U;
-constexpr size_t kMaxPcmSamples = kAacPcmSamples;
+#endif
+constexpr size_t kMaxPcmSamples = kAacPcmSamples > kMp3PcmSamples ? kAacPcmSamples : kMp3PcmSamples;
 #else
 constexpr size_t kMaxPcmSamples = kMp3PcmSamples;
 #endif
@@ -290,6 +295,23 @@ static bool emit_mp3_block(void *opaque, short *pcm, int samples) {
 }
 #endif
 
+#if CONFIG_YORADIO_HELIX_AAC && YORADIO_ESP8266_AAC_BLOCK_OUTPUT
+struct AacBlockOutput {
+    helix_pcm_callback_t callback;
+    void *context;
+};
+static bool emit_aac_block(void *opaque, short *pcm, int samples) {
+    AacBlockOutput &output = *static_cast<AacBlockOutput *>(opaque);
+    if (samples <= 0 || static_cast<size_t>(samples) > kAacPcmSamples) return false;
+    helix_stream_info_t info = {
+        static_cast<uint32_t>(AACGetSampRate()),
+        static_cast<uint32_t>(AACGetBitrate()),
+        static_cast<uint8_t>(CONFIG_YORADIO_AUDIO_MONO ? 1 : AACGetChannels()), 16,
+    };
+    return output.callback(output.context, &info, pcm, static_cast<size_t>(samples));
+}
+#endif
+
 static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
                       void *context) {
     uint8_t *input = codec->input + codec->input_start;
@@ -413,16 +435,27 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
 #if YORADIO_ESP8266_AUDIO_PROFILE
     audio_profile_decode_begin();
 #endif
+#if YORADIO_ESP8266_AAC_BLOCK_OUTPUT
+    AacBlockOutput output = {callback, context};
+    int result = AACDecodeBlocks(input, &left, codec->pcm,
+        static_cast<int>(codec->pcm_samples), YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES,
+        CONFIG_YORADIO_AUDIO_MONO, emit_aac_block, &output);
+#else
     int result = AACDecode(input, &left, codec->pcm);
+#endif
 #if YORADIO_ESP8266_AUDIO_PROFILE
     audio_profile_decode_end();
 #endif
     size_t used = frame - std::min(frame,
         static_cast<size_t>(std::max(left, 0)));
+#if YORADIO_ESP8266_AAC_BLOCK_OUTPUT
+    if (result == ERR_AAC_OUTPUT_CANCELLED) return -7;
+#endif
     if (result != ERR_AAC_NONE) {
         consume(codec, used ? used : 1);
         return 0;
     }
+#if !YORADIO_ESP8266_AAC_BLOCK_OUTPUT
     helix_stream_info_t info = {
         static_cast<uint32_t>(AACGetSampRate()),
         static_cast<uint32_t>(AACGetBitrate()),
@@ -442,6 +475,7 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
     }
 #endif
     if (!callback(context, &info, codec->pcm, samples)) return -7;
+#endif
     consume(codec, used ? used : frame);
     return 0;
 #else

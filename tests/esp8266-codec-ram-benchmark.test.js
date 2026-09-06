@@ -6,6 +6,17 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8");
 
+test("native AAC block default matches a PDM32 DMA payload and retains A/B control", () => {
+  const cmake = read("esp8266", "rtos-sdk-native", "components", "helix_codecs", "CMakeLists.txt");
+  assert.match(cmake, /option\(YORADIO_ESP8266_AAC_BLOCK_OUTPUT[^\n]+ON\)/);
+  assert.match(cmake, /set\(YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES "512" CACHE/);
+  assert.match(cmake, /32\|64\|128\|256\|512/);
+  const runner = read("tools", "esp8266_audio_profile", "run_aac_block_matrix.ps1");
+  assert.match(runner, /--flash_mode keep --flash_size 4MB --flash_freq keep 0x10000/);
+  assert.match(runner, /monitor_esp8266.py --port \$Port --reset/);
+  assert.match(runner, /restore the ordinary app/);
+});
+
 test("ESP8266 RAM codec benchmark embeds golden fixtures and bypasses services", () => {
   const cmake = read("esp8266", "rtos-sdk-native", "main", "CMakeLists.txt");
   const app = read("esp8266", "rtos-sdk-native", "main", "app_main.c");

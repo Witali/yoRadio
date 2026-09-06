@@ -67,6 +67,7 @@ enum {
     ERR_AAC_SBR_NCHANS_TOO_HIGH           = -20,
     ERR_AAC_SBR_SINGLERATE_UNSUPPORTED    = -21,
     ERR_AAC_RAWBLOCK_PARAMS               = -22,
+    ERR_AAC_OUTPUT_CANCELLED              = -23,
     ERR_AAC_UNKNOWN                       = -9999
 };
 
@@ -447,6 +448,18 @@ bool AACDecoder_IsInit(void);
 int AACFindSyncWord(uint8_t *buf, int nBytes);
 int AACSetRawBlockParams(int copyLast, int nChans, int sampRateCore, int profile);
 int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf);
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(AAC_ENABLE_SBR)
+#define YORADIO_AAC_BLOCK_OUTPUT 1
+/* Capacity is in int16 samples, blockFrames in frames/channel (32..512,
+ * powers of two). The sink may modify PCM, but must not reenter the decoder.
+ * Mono averages the separately clipped L/R values, just like the old bridge.
+ * GetChannels/GetOutputSamps still describe the encoded stream. */
+typedef bool (*AACPCMCallback)(void *context, short *pcm, int samples);
+int AACDecodeBlocks(uint8_t *inbuf, int *bytesLeft, short *pcm, int capacity,
+                    int blockFrames, bool mono, AACPCMCallback sink, void *context);
+#else
+#define YORADIO_AAC_BLOCK_OUTPUT 0
+#endif
 int AACGetSampRate();
 int AACGetStreamSampRate();
 int AACGetChannels();

@@ -1957,7 +1957,15 @@ int AACSetRawBlockParams(int copyLast, int nChans, int sampRateCore, int profile
  *                successfully decoded, so if ERR_AAC_INDATA_UNDERFLOW is returned
  *                just call AACDecode again with more data in inbuf
  **********************************************************************************************************************/
-int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
+#if YORADIO_AAC_BLOCK_OUTPUT
+#include "aac_pcm_blocks.inc"
+#endif
+
+static int AACDecodeInternal(uint8_t *inbuf, int *bytesLeft, short *outbuf
+#if YORADIO_AAC_BLOCK_OUTPUT
+                             , AACBlockOutput *blocks
+#endif
+                             )
 {
     int err, offset, bitOffset, bitsAvail;
     int ch, baseChan, elementChans;
@@ -2041,6 +2049,10 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
         if (baseChan + elementChans > AAC_MAX_NCHANS)
             return ERR_AAC_NCHANS_TOO_HIGH;
 
+#if YORADIO_AAC_BLOCK_OUTPUT
+        AACCoefOffset coefOffset(blocks ? baseChan : 0);
+#endif
+
         /* noiseless decoder and dequantizer */
         for (ch = 0; ch < elementChans; ch++) {
             HELIX_PROFILE_BEGIN(HELIX_STAGE_HUFFMAN);
@@ -2089,7 +2101,23 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
                 return ERR_AAC_TNS;
 
             HELIX_PROFILE_BEGIN(HELIX_STAGE_IMDCT);
-            int imdctResult = IMDCT(ch, baseChan + ch, outbuf);
+            int imdctResult;
+#if YORADIO_AAC_BLOCK_OUTPUT
+            if (blocks) {
+                const ICSInfo_t &ics = m_PSInfoBase->icsInfo[
+                    ch == 1 && m_PSInfoBase->commonWin ? 0 : ch];
+                blocks->window[baseChan + ch] = aac_window_state(ch, baseChan + ch);
+                if (ics.winSequence == 2) {
+                    for (int i = 0; i < 8; ++i)
+                        DCT4(0, m_PSInfoBase->coef[ch] + i * 128, m_PSInfoBase->gbCurrent[ch]);
+                } else {
+                    DCT4(1, m_PSInfoBase->coef[ch], m_PSInfoBase->gbCurrent[ch]);
+                }
+                m_PSInfoBase->prevWinShape[baseChan + ch] = ics.winShape;
+                imdctResult = 0;
+            } else
+#endif
+                imdctResult = IMDCT(ch, baseChan + ch, outbuf);
             HELIX_PROFILE_END(HELIX_STAGE_IMDCT);
             if (imdctResult)
                 return ERR_AAC_IMDCT;
@@ -2143,8 +2171,52 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
     *bytesLeft -= (inptr - inbuf);
     inbuf = inptr;
 
+#if YORADIO_AAC_BLOCK_OUTPUT
+    if (blocks) {
+        if (baseChan != m_AACDecInfo->nChans) return ERR_AAC_CHANNEL_MAP;
+        return aac_emit_blocks(outbuf, *blocks);
+    }
+#endif
     return ERR_AAC_NONE;
 }
+
+int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf) {
+    return AACDecodeInternal(inbuf, bytesLeft, outbuf
+#if YORADIO_AAC_BLOCK_OUTPUT
+                             , nullptr
+#endif
+                             );
+}
+
+#if YORADIO_AAC_BLOCK_OUTPUT
+int AACDecodeBlocks(uint8_t *inbuf, int *bytesLeft, short *pcm, int capacity,
+                    int blockFrames, bool mono, AACPCMCallback sink, void *context) {
+    if (!inbuf || !bytesLeft || !pcm || !sink || !m_AACDecInfo || !m_PSInfoBase)
+        return ERR_AAC_NULL_POINTER;
+    /* Validate the stereo worst case before parsing, since channel count can
+     * change in an ADTS header. No allocation or output on invalid capacity. */
+    if (*bytesLeft < 0 || blockFrames < 32 || blockFrames > 512 ||
+        (blockFrames & (blockFrames - 1)) || capacity < blockFrames * (mono ? 1 : 2))
+        return ERR_AAC_INVALID_FRAME;
+    /* The bit decoder expects an entire ADTS frame, not a network fragment.
+     * Reject truncation before entering it (including after a prior frame).
+     * Keep RAW/ADIF and the remaining raw blocks of a multi-block ADTS frame. */
+    if (m_AACDecInfo->format != AAC_FF_RAW && m_AACDecInfo->format != AAC_FF_ADIF &&
+        m_AACDecInfo->adtsBlocksLeft == 0 &&
+        !(*bytesLeft >= 4 && inbuf[0] == 'A' && inbuf[1] == 'D' && inbuf[2] == 'I' && inbuf[3] == 'F')) {
+        const int sync = AACFindSyncWord(inbuf, *bytesLeft);
+        if (sync < 0 || *bytesLeft - sync < 7) return ERR_AAC_INDATA_UNDERFLOW;
+        const uint8_t *header = inbuf + sync;
+        const int length = ((header[3] & 3) << 11) | (header[4] << 3) | (header[5] >> 5);
+        if (length < ((header[1] & 1) ? 7 : 9)) return ERR_AAC_INVALID_ADTS_HEADER;
+        if (length > *bytesLeft - sync) return ERR_AAC_INDATA_UNDERFLOW;
+    }
+    AACBlockOutput output = {blockFrames, mono, sink, context, {}};
+    const int result = AACDecodeInternal(inbuf, bytesLeft, pcm, &output);
+    if (result != ERR_AAC_NONE) AACFlushCodec();
+    return result;
+}
+#endif
 /***********************************************************************************************************************
  * Function:    DecodeLPCCoefs
  *
