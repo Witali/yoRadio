@@ -235,6 +235,10 @@ powershell -ExecutionPolicy Bypass -File tools/esp8266_audio_profile/build_rcpdm
 [firmware/development/esp8266-rcpdm-feedback](../firmware/development/esp8266-rcpdm-feedback/).
 Приложение не является полным дампом flash. Не стирать NVS/SPIFFS ради проверки.
 
+Дополнительный [sweep 20 Гц–20 кГц на 6,144 МГц](benchmarks/esp8266-rcpdm-6144-response-2026-09-06/README.md)
+включает тоны 10/20 кГц, АЧХ/ФЧХ и групповую задержку Predictive/Simple/PDM.
+Это численная модель основной гармоники при −3 dBFS, не измерение платы.
+
 ## Перед сменой профиля по умолчанию
 
 - [x] Проверить арифметику и побитное соответствие независимой новой модели.

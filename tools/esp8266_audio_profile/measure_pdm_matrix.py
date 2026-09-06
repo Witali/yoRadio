@@ -69,20 +69,24 @@ def bits_to_grid(words, bits, grid_bits=GRID_BITS):
     return np.repeat(bit_values.astype(np.float64) * 2 - 1, grid_bits // bits)
 
 
-def analyze(pcm, paths, configs, tone=None, progress=None):
+def analyze(pcm, paths, configs, tone=None, progress=None, band_high_hz=20000):
+    if not isinstance(band_high_hz, int) or not 20 <= band_high_hz < GRID_RATE // 2:
+        raise ValueError("Invalid analysis band")
     frames, n = PCM_RATE, PCM_RATE * GRID_BITS
     window = .5 - .5 * np.cos(2 * np.pi * np.arange(n) / n)
     # One-second FFT bins are integer Hz. Retain only audible bins to avoid
     # allocating three full-grid filter spectra for every path.
-    frequency = np.arange(20, 20001, dtype=np.float64)
-    band = slice(20, 20001)
+    # An explicit 20001-Hz guard includes the upper Hann bin of a 20-kHz
+    # tone. Default remains bit-for-bit compatible with previous reports.
+    frequency = np.arange(20, band_high_hz + 1, dtype=np.float64)
+    band = slice(20, band_high_hz + 1)
     aperture = np.sinc(frequency / GRID_RATE) * np.exp(-1j * np.pi * frequency / GRID_RATE)
     models = original.filters(frequency)
     scale = 2 / (n * np.sum(window * window))
     fundamental = abs(frequency - tone) < 1.01 if tone else None
     harmonics = np.zeros(len(frequency), dtype=bool)
     if tone:
-        for k in range(2, int(20000 // tone) + 1):
+        for k in range(2, int(band_high_hz // tone) + 1):
             harmonics |= abs(frequency - k * tone) < 1.01
     words = {name: np.fromfile(path, dtype=dtype(configs[name]["bits"])) for name, path in paths.items()}
     for name, data in words.items():
