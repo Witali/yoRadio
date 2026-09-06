@@ -3435,7 +3435,7 @@ void UnpackZeros(int nVals, int *coef)
 
 static inline int aac_huffman_decode(int book, uint32_t bitBuf, int32_t *val) {
 #if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_AAC_REFERENCE_HUFFMAN)
-    const uint32_t entry = aacHuffmanPrefix[book][bitBuf >> 24];
+    const uint32_t entry = aacHuffmanPrefix[book][bitBuf >> (32 - AAC_HUFFMAN_PREFIX_BITS)];
     if (entry) {
         *val = static_cast<int16_t>(entry);
         return entry >> 16;

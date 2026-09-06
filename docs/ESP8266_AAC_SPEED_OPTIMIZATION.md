@@ -90,9 +90,9 @@ Reproduce alternating saved binaries with
 `tools/esp8266_audio_profile/run_saved_images.ps1`; it writes only app0 and
 uses RTS reset/TX capture without sending UART application bytes.
 
-### 2 — Flash Huffman prefix lookup: KEEP
+### 2 — Flash Huffman prefix lookup: KEEP with 6-bit table
 
-An offline generator derives 8-bit prefix entries from the existing Helix
+The first experiment derived 8-bit prefix entries from the existing Helix
 canonical tables. Each aligned uint32 entry packs symbol and consumed length;
 zero selects the unchanged canonical fallback. Spectrum and scale factors
 use 12 rows, no runtime-generated tables or pointer arrays.
@@ -108,6 +108,23 @@ for both symbols and consumed bit counts. Whole-stream comparison against
 the canonical/64-bit reference: 38912 samples at 48 kHz stereo, 23552 at
 22.05 kHz mono, and 92160 at 44.1 kHz stereo all have maxError=0 and SNR=Infinity.
 Window/overlap and cancellation regression suites also pass.
+
+**Full-output correction:** The 8-bit/12-KiB table is NOT the final version.
+Despite its isolated speed, physical I2S-PDM produced 114 neutral underruns
+in 200 AAC frames (4.405387 s wall for 4.266666 s audio). Alternating with the
+original binary reproduced 0 versus 114 underruns. Flash/cache contention and
+image layout are the working explanation, not a measured hardware counter.
+
+Reducing the prefix to **6 bits / 3072 flash bytes** restored **zero underruns,
+zero partial handoffs and zero FIFO-empty events** for MP3 and AAC. No output
+buffer/ISR/clock changes were made. Isolated AAC improves further to
+**15140 us average / 15161 us maximum**; unchanged MP3 is 4756 us.
+Versus the original 18945 us, AAC time falls **20.09%** (throughput +25.13%).
+The 48-kHz frame's CPU budget falls **88.80% -> 70.97%** before Wi-Fi/output.
+Physical AAC wall is 4.253941 s for 4.266666 s audio; queued DMA data explains
+the slightly shorter wall measurement. This is not an audio-speed change.
+
+All 1305600 Huffman cases and 154624 retained PCM samples still match exactly.
 
 ### 3 — Bit-reader fast paths: REJECT
 
