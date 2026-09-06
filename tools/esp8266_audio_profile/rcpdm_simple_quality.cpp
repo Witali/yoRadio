@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include "rcpdm8.h"
 #include "rcpdm_simple.h"
+#include "rcpdm_simple_reference.h"
 #include "pdm32_original.inc"
 
 static void check(bool value,const char *message) {
@@ -69,8 +70,25 @@ static void self_test() {
             ++continuity;
         }
     }
+    unsigned batchWords=0;
+    for(unsigned channels:{1U,2U}) {
+        rc_pdm_t a,b; rc_pdm_init(&a); rc_pdm_init(&b);
+        for(unsigned block=0;block<128;++block) {
+            int16_t pcm[34]; uint32_t words[17];
+            for(auto &value:pcm) { random=random*1664525U+1013904223U; value=int16_t(random>>16); }
+            const unsigned count=block%18U;
+            rcpdm_simple_fill(&a,words,pcm,count,channels);
+            for(unsigned i=0;i<count;++i) {
+                int32_t mono=pcm[i*channels];
+                if(channels==2) mono=(mono+pcm[i*channels+1])/2;
+                check(words[i]==rcpdm_simple_reference(&b,int16_t(mono)),"batch reference mismatch");
+                ++batchWords;
+            }
+            check(a.rc==b.rc,"batch state mismatch");
+        }
+    }
     std::cout<<"{\"pass\":true,\"word_state_comparisons\":"<<comparisons
-             <<",\"continuity_checks\":"<<continuity<<",\"tie_checks\":5}\n";
+             <<",\"continuity_checks\":"<<continuity<<",\"tie_checks\":5,\"batch_word_checks\":"<<batchWords<<"}\n";
 }
 template<class T> static void save(const std::string &file,const std::vector<T> &data) {
     std::ofstream out(file,std::ios::binary);

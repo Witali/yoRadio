@@ -9,6 +9,16 @@
 #include "AudioNormalizer.h"
 #include "rc_pdm.h"
 #include "rcpdm_variants.h"
+#include "rcpdm_simple.h"
+#include "rcpdm_simple_reference.h"
+#if TEST_RCPDM_SIMPLE
+#define TEST_RCPDM 1
+#define RCPDM_TEST_SIMPLE 1
+#define RCPDM_TEST_SAMPLE rcpdm_simple_sample
+#define TEST_RC_REFERENCE rcpdm_simple_reference
+#else
+#define TEST_RC_REFERENCE rc_candidate_original
+#endif
 #include "persistent_settings.h"
 #if defined(_MSC_VER)
 #define __attribute__(x)
@@ -280,7 +290,7 @@ static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned c
         phase += 48000U;
         while (phase >= rate) {
             assert(position < out.pdm.size());
-            assert(out.pdm[position++] == rc_candidate_original(&reference, static_cast<int16_t>(mono)));
+            assert(out.pdm[position++] == TEST_RC_REFERENCE(&reference, static_cast<int16_t>(mono)));
             phase -= rate;
         }
     }
@@ -329,7 +339,7 @@ int main() {
     assert(s_reserved_words == 0 && critical == 0); // no leaked writable span
 #if TEST_RCPDM
     rc_pdm_t stopped = {0x80000000U};
-    for (size_t i = 0; i <= committed.size(); ++i) rc_candidate_original(&stopped, 0);
+    for (size_t i = 0; i <= committed.size(); ++i) TEST_RC_REFERENCE(&stopped, 0);
     assert(s_rcpdm.rc == stopped.rc && s_resample_phase == 48000U);
 #endif
     puts("PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed");

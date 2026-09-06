@@ -28,6 +28,15 @@
 #include "rc_pdm.h"
 #if YORADIO_ESP8266_OUTPUT_COMPARE
 #include "rcpdm_variants.h"
+#if RCPDM_TEST_SIMPLE
+#include "rcpdm_simple.h"
+#include "rcpdm_simple_reference.h"
+#define RCPDM_VERIFY_SAMPLE rcpdm_simple_reference
+#define RCPDM_VERIFY_NAME "RCPDM-Simple"
+#else
+#define RCPDM_VERIFY_SAMPLE rc_candidate_original
+#define RCPDM_VERIFY_NAME "RCPDM"
+#endif
 #endif
 _Static_assert(BOARD_I2S_PDM_OVERSAMPLE == RC_PDM_BITS_PER_SAMPLE,
                "I2S RCPDM requires exactly 32 bits per output PCM sample");
@@ -604,7 +613,11 @@ static esp_err_t i2s_pdm_push_word(i2s_pdm_writer_t *writer, uint32_t word) {
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM && !RCPDM_DISABLE_BATCH
 static void __attribute__((noinline)) i2s_rcpdm_fill(
     uint32_t *words, const int16_t *pcm, size_t frames, unsigned channels) {
+#if RCPDM_TEST_SIMPLE
+    rcpdm_simple_fill(&s_rcpdm, words, pcm, frames, channels);
+#else
     rc_pdm_fill(&s_rcpdm, words, pcm, frames, channels);
+#endif
 }
 #endif
 static uint32_t __attribute__((noinline))
@@ -647,7 +660,7 @@ bool native_audio_output_benchmark_verify(void) {
     for (unsigned s = 0; s < sizeof(seeds) / sizeof(seeds[0]); ++s) {
         for (int32_t pcm = INT16_MIN; pcm <= INT16_MAX; ++pcm) {
             s_rcpdm.rc = expected.rc = seeds[s];
-            uint32_t want = rc_candidate_original(&expected, (int16_t)pcm);
+            uint32_t want = RCPDM_VERIFY_SAMPLE(&expected, (int16_t)pcm);
             uint32_t got = i2s_pdm_pack32((int16_t)pcm);
             if (want != got || expected.rc != s_rcpdm.rc) goto mismatch;
             if (!(++cases & 1023U)) vTaskDelay(1);
@@ -658,13 +671,13 @@ bool native_audio_output_benchmark_verify(void) {
     for (unsigned i = 0; i < 100000; ++i) {
         random = random * 1664525U + 1013904223U;
         int16_t pcm = (int16_t)((int32_t)(random & 65535U) - 32768);
-        uint32_t want = rc_candidate_original(&expected, pcm);
+        uint32_t want = RCPDM_VERIFY_SAMPLE(&expected, pcm);
         uint32_t got = i2s_pdm_pack32(pcm);
         if (want != got || expected.rc != s_rcpdm.rc) goto mismatch;
         if (!(++cases & 1023U)) vTaskDelay(1);
     }
     s_rcpdm.rc = saved;
-    ESP_LOGI(TAG, "RCPDM bit-exact PASS: %u words and states", cases);
+    ESP_LOGI(TAG, "%s bit-exact PASS: %u words and states", RCPDM_VERIFY_NAME, cases);
 #if !RCPDM_DISABLE_BATCH
     // Exercise the actual machine-code batch writer before DMA/timing starts.
     int16_t pcm_batch[34];
@@ -682,18 +695,18 @@ bool native_audio_output_benchmark_verify(void) {
             for (size_t i = 0; i < count; ++i) {
                 int32_t mono = pcm_batch[i * channels];
                 if (channels == 2) mono = (mono + pcm_batch[i * channels + 1]) / 2;
-                if (words[i] != rc_candidate_original(&expected, (int16_t)mono)) goto mismatch;
+                if (words[i] != RCPDM_VERIFY_SAMPLE(&expected, (int16_t)mono)) goto mismatch;
                 ++batch_words;
             }
             if (s_rcpdm.rc != expected.rc) goto mismatch;
         }
     }
     s_rcpdm.rc = saved;
-    ESP_LOGI(TAG, "RCPDM batch bit-exact PASS: %u words, mono/stereo", batch_words);
+    ESP_LOGI(TAG, "%s batch bit-exact PASS: %u words, mono/stereo", RCPDM_VERIFY_NAME, batch_words);
 #endif
     return true;
 mismatch:
-    ESP_LOGE(TAG, "RCPDM bit-exact FAIL after %u words", cases);
+    ESP_LOGE(TAG, "%s bit-exact FAIL after %u words", RCPDM_VERIFY_NAME, cases);
     s_rcpdm.rc = saved;
     return false;
 #else

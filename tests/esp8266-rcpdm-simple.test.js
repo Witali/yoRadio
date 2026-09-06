@@ -9,6 +9,7 @@ test('RCPDM simple compares current state before update and preserves block cont
   const checks=JSON.parse(execute(exe,['--self-test']).stdout);
   assert.equal(checks.pass,true); assert.equal(checks.word_state_comparisons,1972864);
   assert.equal(checks.continuity_checks,20000); assert.equal(checks.tie_checks,5);
+  assert.equal(checks.batch_word_checks,2144);
   const pcm=Buffer.alloc(257*2);
   for(let i=0;i<257;++i) pcm.writeInt16LE((i*997)%65536-32768,i*2);
   const file=path.join(dir,'input.pcm'); fs.writeFileSync(file,pcm);
@@ -20,4 +21,16 @@ test('RCPDM simple compares current state before update and preserves block cont
     assert.deepEqual(base,fs.readFileSync(path.join(dir,`reference.${name}.bin`)));
     if(name.startsWith('rc')) assert.equal(fs.statSync(path.join(dir,`out.${name}-simple.bin`)).size,257*width);
   }
+});
+
+test('Simple remains restricted to the isolated benchmark and uses its own reference',()=>{
+  const root=path.resolve(__dirname,'..');
+  const read=file=>fs.readFileSync(path.join(root,file),'utf8');
+  const cmake=read('esp8266/rtos-sdk-native/main/CMakeLists.txt');
+  assert.match(cmake,/RCPDM candidates require the isolated RCPDM output comparison/);
+  assert.match(cmake,/RCPDM_TEST_SIMPLE=1 RCPDM_TEST_SAMPLE=rcpdm_simple_sample/);
+  assert.match(cmake,/NOT YORADIO_ESP8266_RCPDM_VARIANT MATCHES "\^\(production\|simple\)\$"/);
+  const output=read('esp8266/rtos-sdk-native/main/native_audio_output.c');
+  assert.match(output,/#define RCPDM_VERIFY_SAMPLE rcpdm_simple_reference/);
+  assert.match(output,/rcpdm_simple_fill\(&s_rcpdm, words, pcm, frames, channels\)/);
 });

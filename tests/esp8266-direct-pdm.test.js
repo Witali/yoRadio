@@ -42,7 +42,7 @@ test('production direct DMA writer preserves PCM/PDM across chunk boundaries and
     output.indexOf('\n#if YORADIO_ESP8266_SPI_PDM\n\n#define SPI_PDM_CHUNK_BITS'));
   fs.writeFileSync(path.join(dir, 'output.inc'), helpers + output.slice(
     output.indexOf('\n', start) + 1, end));
-  for(const mode of ['PDM32', 'RCPDM', 'PDM128']) {
+  for(const mode of ['PDM32', 'RCPDM', 'RCPDM_SIMPLE', 'PDM128']) {
     const exe = path.join(dir, mode + (process.platform === 'win32' ? '.exe' : ''));
     const files = [path.join(__dirname, 'native/esp8266_direct_pdm_test.cpp'), path.join(audio, 'AudioNormalizer.cpp')];
     let build;

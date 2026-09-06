@@ -21,7 +21,7 @@ try {
         Copy-Item docs/benchmarks/esp8266-output-compare-2026-09-06/sdkconfig-rcpdm "$build/sdkconfig"
     }
     foreach ($variant in $Variants) {
-        if ($variant -notmatch '^(production|original|limit|unroll4|unroll8|unroll32|mask8|branchless8)$') { throw 'Unknown variant' }
+        if ($variant -notmatch '^(production|simple|original|limit|unroll4|unroll8|unroll32|mask8|branchless8)$') { throw 'Unknown variant' }
         $label = if ($DisableBatch) { "$variant-no-batch" } else { $variant }
         if ($ArtifactSuffix) {
             if ($ArtifactSuffix -notmatch '^[a-z0-9-]+$') { throw 'Invalid artifact suffix' }
