@@ -8,25 +8,24 @@
 static inline uint32_t rcpdm_simple_bits(rc_pdm_t *p, int16_t pcm,
                                         unsigned count, unsigned shift) {
     const uint32_t target = rc_pdm_target(pcm);
-    const uint32_t step = UINT32_MAX >> shift;
     uint32_t state = p->rc, word = 0;
     for (unsigned i = 0; i < count; ++i) {
         /* Decide BEFORE updating the RC state. Equal target selects zero. */
-        uint32_t next = state - (state >> shift);
         word <<= 1;
         if (state < target) {
-            next += step;
+            state += (UINT32_MAX - state) >> shift;
             word |= 1U;
+        } else {
+            state -= state >> shift;
         }
-        state = next;
     }
     p->rc = state;
     return word;
 }
 
-/* up == down + step for the UINT32_MAX rail. This uses one shift regardless
- * of the selected bit, and equals s + ((UINT32_MAX-s) >> shift) for bit 1.
- * The state is bounded by the rails; no saturation or wide multiply needed. */
+/* Charge towards the upper rail for bit 1, discharge towards zero for bit 0.
+ * Each selected update uses only unsigned 32-bit arithmetic and a shift.
+ * The state stays bounded by the rails; no saturation or wide multiply. */
 static inline uint32_t rcpdm_simple_sample(rc_pdm_t *p, int16_t pcm) {
     return rcpdm_simple_bits(p, pcm, RC_PDM_BITS_PER_SAMPLE, RC_PDM_SHIFT);
 }
