@@ -1,0 +1,100 @@
+TAP version 13
+# Subtest: production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+ok 1 - production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+  ---
+  duration_ms: 17563.2625
+  type: 'test'
+  ...
+# PDM32: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_SIMPLE: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_FEEDBACK: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM128: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# Subtest: saved tables use identical frequencies and rate-appropriate RC shifts
+ok 2 - saved tables use identical frequencies and rate-appropriate RC shifts
+  ---
+  duration_ms: 10.6669
+  type: 'test'
+  ...
+# Subtest: same-rate PDM matrix preserves decisions and packs all 8..128 new bits
+ok 3 - same-rate PDM matrix preserves decisions and packs all 8..128 new bits
+  ---
+  duration_ms: 5218.6455
+  type: 'test'
+  ...
+# Subtest: feedback report compares equal rates and preserves coherent LSB evidence
+ok 4 - feedback report compares equal rates and preserves coherent LSB evidence
+  ---
+  duration_ms: 16.6805
+  type: 'test'
+  ...
+# Subtest: new feedback backend stays opt-in and mutually exclusive with old experiments
+ok 5 - new feedback backend stays opt-in and mutually exclusive with old experiments
+  ---
+  duration_ms: 1.6496
+  type: 'test'
+  ...
+# Subtest: RCPDM feedback preserves fractional PCM, state bounds and chunk continuity
+ok 6 - RCPDM feedback preserves fractional PCM, state bounds and chunk continuity
+  ---
+  duration_ms: 4744.6259
+  type: 'test'
+  ...
+# {"pass":true,"word_state_frames":423416,"batch_cases":16,"state_bytes":16}
+# Subtest: RCPDM higher precision preserves RC decisions and does not cure quiet-tone deadband
+ok 7 - RCPDM higher precision preserves RC decisions and does not cure quiet-tone deadband
+  ---
+  duration_ms: 7696.0944
+  type: 'test'
+  ...
+# Subtest: LX106 Simple assembly builds with safe architecture gating and forced-C fallback
+ok 8 - LX106 Simple assembly builds with safe architecture gating and forced-C fallback
+  ---
+  duration_ms: 6224.6226
+  type: 'test'
+  ...
+# Subtest: RCPDM simple compares current state before update and preserves block continuity
+ok 9 - RCPDM simple compares current state before update and preserves block continuity
+  ---
+  duration_ms: 7614.2225
+  type: 'test'
+  ...
+# Subtest: Simple remains restricted to the isolated benchmark and uses its own reference
+ok 10 - Simple remains restricted to the isolated benchmark and uses its own reference
+  ---
+  duration_ms: 0.5597
+  type: 'test'
+  ...
+# Subtest: I2S RCPDM is a separate opt-in profile, not a new board default
+ok 11 - I2S RCPDM is a separate opt-in profile, not a new board default
+  ---
+  duration_ms: 3.0444
+  type: 'test'
+  ...
+# Subtest: RCPDM32 reuses the production carrier, sample pacing and DMA ring
+ok 12 - RCPDM32 reuses the production carrier, sample pacing and DMA ring
+  ---
+  duration_ms: 2.2775
+  type: 'test'
+  ...
+# Subtest: RCPDM32 C implementation matches the independent full-range RC reference
+ok 13 - RCPDM32 C implementation matches the independent full-range RC reference
+  ---
+  duration_ms: 3507.8044
+  type: 'test'
+  ...
+# Subtest: RCPDM8 preserves reference decisions, exposes idle lock, and groups into RCPDM32
+ok 14 - RCPDM8 preserves reference decisions, exposes idle lock, and groups into RCPDM32
+  ---
+  duration_ms: 4783.9304
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 17642.6333

@@ -54,6 +54,10 @@ computes 32 genuine delta-sigma decisions per sample, giving a nominal
 
 ## Canonical production configuration
 
+Experimental low-level RC-PDM feedback, interpolation and dither are documented
+in [RC-PDM Feedback](../../docs/ESP8266_RCPDM_FEEDBACK.md). This is opt-in via
+`CONFIG_YORADIO_RCPDM_FEEDBACK`; the production PDM32 default is unchanged.
+
 The audio producer converts PCM directly into a reserved, producer-owned
 DMA span; EOF may take a committed prefix only after all producer loans are
 released. The two 512-word-capacity buffers remain; playing underruns retry
