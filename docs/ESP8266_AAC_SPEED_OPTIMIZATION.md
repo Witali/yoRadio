@@ -26,7 +26,7 @@ Then test real I2S-PDM output for underruns and restore ordinary radio firmware.
 - [x] 1. Specialize window/overlap output into block loops: select window
   sequence outside the sample loop, walk pointers and remove per-sample calls.
   Preserve clipping/downmix order and update overlap only after consuming it.
-- [ ] 2. Try a flash-only Huffman prefix lookup with the exact canonical
+- [x] 2. Try a flash-only Huffman prefix lookup with the exact canonical
   decoder as fallback. Exhaustively compare symbols and consumed bit counts.
 - [ ] 3. Try a fused bit-reader fast path to avoid repeated peek/refill work,
   retaining the existing state size and bounds behavior.
@@ -79,7 +79,7 @@ Unchanged MP3 moves **4632 -> 4754 us**, demonstrating code-layout sensitivity:
 these are complete-image timings, not a claim that every improvement is due
 only to instruction count. AAC DRAM/IRAM and free heap are unchanged; benchmark
 task minimum free stack improves **1712 -> 1792 bytes**. Lifecycle heap delta=0.
-Diagnostic image size increases 3904 bytes (277856 -> 281760).
+Diagnostic image size increases 5136 bytes (276624 -> 281760).
 
 Both exact and experimental SSO window tests pass 1280 state vectors each,
 all block sizes, cancellation boundaries, coefficient immutability and canaries.
@@ -89,3 +89,22 @@ maximum PCM error=0, SNR=Infinity dB. SSO is still disabled in firmware.
 Reproduce alternating saved binaries with
 `tools/esp8266_audio_profile/run_saved_images.ps1`; it writes only app0 and
 uses RTS reset/TX capture without sending UART application bytes.
+
+### 2 — Flash Huffman prefix lookup: KEEP
+
+An offline generator derives 8-bit prefix entries from the existing Helix
+canonical tables. Each aligned uint32 entry packs symbol and consumed length;
+zero selects the unchanged canonical fallback. Spectrum and scale factors
+use 12 rows, no runtime-generated tables or pointer arrays.
+
+Physical A/B: AAC average **17951 -> 16015 us (-10.79%)**, maximum
+**17960 -> 16033 us**. MP3 control is **4754 -> 4756 us** (+0.04%).
+DRAM/IRAM, heap and free stack (1792 bytes) remain unchanged. Lifecycle delta=0.
+ELF `.flash.rodata` grows exactly **12288 bytes**, `.flash.text` by 44 bytes;
+all `.dram0` and `.iram0` section sizes match. Image: 294080 bytes.
+
+**1305600** exhaustive prefix/suffix combinations match the canonical decoder
+for both symbols and consumed bit counts. Whole-stream comparison against
+the canonical/64-bit reference: 38912 samples at 48 kHz stereo, 23552 at
+22.05 kHz mono, and 92160 at 44.1 kHz stereo all have maxError=0 and SNR=Infinity.
+Window/overlap and cancellation regression suites also pass.

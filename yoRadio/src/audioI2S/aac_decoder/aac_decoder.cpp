@@ -3429,6 +3429,23 @@ void UnpackZeros(int nVals, int *coef)
  * Notes:       assumes nVals is always a multiple of 4 because all scalefactor bands
  *                are a multiple of 4 coefficients long
  **********************************************************************************************************************/
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_AAC_REFERENCE_HUFFMAN)
+#include "aac_huffman_prefix.inc"
+#endif
+
+static inline int aac_huffman_decode(int book, uint32_t bitBuf, int32_t *val) {
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_AAC_REFERENCE_HUFFMAN)
+    const uint32_t entry = aacHuffmanPrefix[book][bitBuf >> 24];
+    if (entry) {
+        *val = static_cast<int16_t>(entry);
+        return entry >> 16;
+    }
+#endif
+    return book == 11
+        ? DecodeHuffmanScalar(huffTabScaleFact, &huffTabScaleFactInfo, bitBuf, val)
+        : DecodeHuffmanScalar(huffTabSpec, &huffTabSpecInfo[book], bitBuf, val);
+}
+
 void UnpackQuads(int cb, int nVals, int *coef)
 {
     int w, x, y, z, maxBits, nCodeBits, nSignBits;
@@ -3439,7 +3456,7 @@ void UnpackQuads(int cb, int nVals, int *coef)
     while (nVals > 0) {
         /* decode quad */
         bitBuf = GetBitsNoAdvance(maxBits) << (32 - maxBits);
-        nCodeBits = DecodeHuffmanScalar(huffTabSpec, &huffTabSpecInfo[cb - HUFFTAB_SPEC_OFFSET], bitBuf, &val);
+        nCodeBits = aac_huffman_decode(cb - HUFFTAB_SPEC_OFFSET, bitBuf, &val);
 
         w = (((int32_t)(val) << 20) >>   29);    /* bits 11-9, sign-extend */
         x = (((int32_t)(val) << 23) >>   29);    /* bits  8-6, sign-extend */
@@ -3486,7 +3503,7 @@ void UnpackPairsNoEsc(int cb, int nVals, int *coef)
     while (nVals > 0) {
         /* decode pair */
         bitBuf = GetBitsNoAdvance(maxBits) << (32 - maxBits);
-        nCodeBits = DecodeHuffmanScalar(huffTabSpec, &huffTabSpecInfo[cb-HUFFTAB_SPEC_OFFSET], bitBuf, &val);
+        nCodeBits = aac_huffman_decode(cb - HUFFTAB_SPEC_OFFSET, bitBuf, &val);
 
         y = (((int32_t)(val) << 22) >>   27);    /* bits  9-5, sign-extend */
         z = (((int32_t)(val) << 27) >>   27);    /* bits  4-0, sign-extend */
@@ -3528,7 +3545,7 @@ void UnpackPairsEsc(int cb, int nVals, int *coef)
     while (nVals > 0) {
         /* decode pair with escape value */
         bitBuf = GetBitsNoAdvance(maxBits) << (32 - maxBits);
-        nCodeBits = DecodeHuffmanScalar(huffTabSpec, &huffTabSpecInfo[cb-HUFFTAB_SPEC_OFFSET], bitBuf, &val);
+        nCodeBits = aac_huffman_decode(cb - HUFFTAB_SPEC_OFFSET, bitBuf, &val);
 
         y = (((int32_t)(val) << 20) >>   26);    /* bits 11-6, sign-extend */
         z = (((int32_t)(val) << 26) >>   26);    /* bits  5-0, sign-extend */
@@ -4329,7 +4346,7 @@ int DecodeOneScaleFactor()
     int32_t val;
     /* decode next scalefactor from bitstream */
     bitBuf = GetBitsNoAdvance(huffTabScaleFactInfo.maxBits) << (32 - huffTabScaleFactInfo.maxBits);
-    nBits = DecodeHuffmanScalar(huffTabScaleFact, &huffTabScaleFactInfo, bitBuf, &val);
+    nBits = aac_huffman_decode(11, bitBuf, &val);
     AdvanceBitstream(nBits);
     return val;
 }

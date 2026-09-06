@@ -56,7 +56,12 @@ function compile(outputDir, name, reference, mp3Sso = false, aacSso = false, opt
     sources.pop();
   }
   const defines = ["YORADIO_ESP8266_NATIVE=1"];
+  if(options.aacHuffmanUnit) {
+    sources.splice(0, 2, path.join(native, "aac_huffman_state_test.cpp"));
+    sources.pop();
+  }
   if(reference) defines.push("YORADIO_HELIX_REFERENCE_FIXED_POINT=1");
+  if(reference) defines.push("YORADIO_HELIX_AAC_REFERENCE_HUFFMAN=1");
   if(mp3Sso) defines.push("YORADIO_HELIX_MP3_SSO=1");
   if(aacSso) defines.push("YORADIO_HELIX_AAC_SSO=1");
   if(options.mono) defines.push("YORADIO_HELIX_MP3_MONO=1");
@@ -170,6 +175,36 @@ function downmix(stereo) {
     mono.writeInt16LE((stereo.readInt16LE(offset) + stereo.readInt16LE(offset + 2)) >> 1, offset / 2);
   return mono;
 }
+
+test("AAC flash Huffman lookup matches every canonical code and suffix", t => {
+  const generated = spawnSync(process.execPath, [path.join(root, 'tools/esp8266_audio_profile/generate_aac_prefix.js'), '--check'], {encoding:'utf8'});
+  assert.equal(generated.status, 0, generated.stdout + generated.stderr);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'aac-huffman-'));
+  t.after(() => fs.rmSync(dir, {recursive:true, force:true}));
+  const binary = compile(dir, 'aac-huffman', false, false, false, {aacHuffmanUnit:true});
+  if(binary.skip) return t.skip(binary.skip);
+  const run = spawnSync(binary.executable, [], {encoding:'utf8'});
+  assert.equal(run.status, 0, run.stdout + run.stderr);
+  t.diagnostic(run.stdout.trim());
+});
+
+test("AAC exact optimizations preserve PCM on all retained rates and channels", t => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'aac-exact-speed-'));
+  t.after(() => fs.rmSync(dir, {recursive:true, force:true}));
+  const ref = compile(dir, 'aac-reference', true);
+  const fast = compile(dir, 'aac-fast', false);
+  if(ref.skip || fast.skip) return t.skip(ref.skip || fast.skip);
+  for(const fixture of [path.join(fixtures, 'stereo-320.aac'),
+    path.join(__dirname, 'fixtures/helix_aac_blocks/mono-22050.aac'),
+    path.join(__dirname, 'fixtures/helix_aac_blocks/stereo-44100.aac')]) {
+    const a = decode(ref.executable, 'aac', fixture, path.join(dir, 'a.pcm'));
+    const b = decode(fast.executable, 'aac-blocks-512', fixture, path.join(dir, 'b.pcm'));
+    const quality = comparePcm(a.pcm, b.pcm);
+    assert.deepEqual(a.pcm, b.pcm);
+    assert.equal(quality.maximumError, 0);
+    t.diagnostic(`${path.basename(fixture)}: samples=${a.pcm.length / 2}, maxError=${quality.maximumError}, SNR=${quality.snrDb} dB`);
+  }
+});
 
 test("AAC sequential block windows preserve exact PCM and overlap state", t => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "aac-window-blocks-"));
