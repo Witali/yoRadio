@@ -1,0 +1,126 @@
+TAP version 13
+# Subtest: production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+ok 1 - production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+  ---
+  duration_ms: 15506.5107
+  type: 'test'
+  ...
+# PDM32: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_SIMPLE: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_FEEDBACK: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM128: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# Subtest: same-rate PDM matrix preserves decisions and packs all 8..128 new bits
+ok 2 - same-rate PDM matrix preserves decisions and packs all 8..128 new bits
+  ---
+  duration_ms: 4055.778
+  type: 'test'
+  ...
+# Subtest: legacy comparison holds rates fixed and exactly preserves all archived controls
+ok 3 - legacy comparison holds rates fixed and exactly preserves all archived controls
+  ---
+  duration_ms: 28.1837
+  type: 'test'
+  ...
+# Subtest: legacy LSB probe uses identical inputs, verifies PDM and does not invent seed variation
+ok 4 - legacy LSB probe uses identical inputs, verifies PDM and does not invent seed variation
+  ---
+  duration_ms: 8.2458
+  type: 'test'
+  ...
+# Subtest: legacy quiet-signal dead zone is confirmed by output words and DC/LSB probes
+ok 5 - legacy quiet-signal dead zone is confirmed by output words and DC/LSB probes
+  ---
+  duration_ms: 6.4388
+  type: 'test'
+  ...
+# Subtest: response sweep uses equal rates, guarded band and exact historical tone controls
+ok 6 - response sweep uses equal rates, guarded band and exact historical tone controls
+  ---
+  duration_ms: 7.5175
+  type: 'test'
+  ...
+# Subtest: phase curves retain raw delay and separately compensate only the known interpolation
+ok 7 - phase curves retain raw delay and separately compensate only the known interpolation
+  ---
+  duration_ms: 2.1103
+  type: 'test'
+  ...
+# Subtest: native 6.144 MHz paths emit 128 fresh bits and match independent references
+ok 8 - native 6.144 MHz paths emit 128 fresh bits and match independent references
+  ---
+  duration_ms: 4003.7186
+  type: 'test'
+  ...
+# {"pass":true,"frames_per_variant":141312,"word_state_checks":2826240,"bits_per_sample":128,"rc_shift":6,"rc_state_bytes":16,"pdm_state_bytes":4,"same_prng":true}
+# Subtest: 6.144 MHz quality report has matched rates/inputs and unchanged archived controls
+ok 9 - 6.144 MHz quality report has matched rates/inputs and unchanged archived controls
+  ---
+  duration_ms: 8.2275
+  type: 'test'
+  ...
+# Subtest: ordinary PDM weak-tone loss is verified from bits, not called infinite SINAD
+ok 10 - ordinary PDM weak-tone loss is verified from bits, not called infinite SINAD
+  ---
+  duration_ms: 2.7897
+  type: 'test'
+  ...
+# Subtest: dither amplitude sweep holds all other parameters fixed and reproduces controls
+ok 11 - dither amplitude sweep holds all other parameters fixed and reproduces controls
+  ---
+  duration_ms: 16.1053
+  type: 'test'
+  ...
+# Subtest: weak-signal results contain three seeds and eight windows, not only a long average
+ok 12 - weak-signal results contain three seeds and eight windows, not only a long average
+  ---
+  duration_ms: 4.3745
+  type: 'test'
+  ...
+# Subtest: feedback ablation changes only error feedback; enabled model is production-bit-exact
+ok 13 - feedback ablation changes only error feedback; enabled model is production-bit-exact
+  ---
+  duration_ms: 5921.7693
+  type: 'test'
+  ...
+# {"pass":true,"frames":141312,"different_words":135068,"simple_reference_frames":141312,"simple_different_words":141014,"no_dither_frames_per_method":141312,"disabled_prng_unchanged":true,"attenuation_reference_frames":5087232,"attenuation_max_shift":8,"simple_tie_checks":2,"prng_and_interpolation_identical":true,"off_error_ignored":true}
+# Subtest: archived feedback ablation has matched controls and reproduces enabled baseline
+ok 14 - archived feedback ablation has matched controls and reproduces enabled baseline
+  ---
+  duration_ms: 2.3015
+  type: 'test'
+  ...
+# Subtest: Simple on/off archive matches the predictive experiment except for decision rule
+ok 15 - Simple on/off archive matches the predictive experiment except for decision rule
+  ---
+  duration_ms: 1.1869
+  type: 'test'
+  ...
+# Subtest: RCPDM feedback preserves fractional PCM, state bounds and chunk continuity
+ok 16 - RCPDM feedback preserves fractional PCM, state bounds and chunk continuity
+  ---
+  duration_ms: 4739.1349
+  type: 'test'
+  ...
+# {"pass":true,"word_state_frames":2038946,"batch_cases":16,"selected_frames":116795,"state_bytes":16}
+# Subtest: dither removal preserves matched controls, verifies PRNG bypass and reports lost tones honestly
+ok 17 - dither removal preserves matched controls, verifies PRNG bypass and reports lost tones honestly
+  ---
+  duration_ms: 6.3744
+  type: 'test'
+  ...
+# Subtest: temporal LSB results reproduce archived coherent means instead of hiding their spread
+ok 18 - temporal LSB results reproduce archived coherent means instead of hiding their spread
+  ---
+  duration_ms: 4.2145
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15586.6962

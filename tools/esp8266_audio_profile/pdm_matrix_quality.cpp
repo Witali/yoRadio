@@ -109,7 +109,9 @@ static void self_test() {
 int main(int argc,char **argv) {
     try {
         if(argc==2 && std::string(argv[1])=="--self-test") { self_test(); return 0; }
-        check(argc==3,"usage: pdm-matrix-quality mono48.s16le output-prefix");
+        check(argc==3 || (argc==4 && std::string(argv[3])=="--matched-6144"),
+              "usage: pdm-matrix-quality mono48.s16le output-prefix [--matched-6144]");
+        const bool matched6144=argc==4;
         const uint16_t endian=1;
         check(*reinterpret_cast<const uint8_t*>(&endian)==1,"little-endian PCM host required");
         std::ifstream in(argv[1],std::ios::binary|std::ios::ate);
@@ -117,18 +119,29 @@ int main(int argc,char **argv) {
         check(size>0 && uint64_t(size)%2==0,"invalid PCM size");
         std::vector<int16_t> pcm(size_t(size)/2); in.seekg(0);
         check(bool(in.read(reinterpret_cast<char*>(pcm.data()),size)),"cannot read PCM");
+        unsigned generated=0; uint64_t referenceChecks=0;
         for(const auto &v:variants()) {
+            if(matched6144 && (v.bits!=128 || (v.method && v.shift!=6)))continue;
+            ++generated;
             uint32_t state=v.method?0x80000000U:0;
+            uint32_t referenceState=state;
             std::vector<uint8_t> data; data.reserve(pcm.size()*(v.bits/8));
             for(int16_t sample:pcm) for(unsigned offset=0;offset<v.bits;offset+=32) {
                 const unsigned count=std::min(32U,v.bits-offset);
                 const uint32_t word=chunk(state,sample,count,v.shift,v.method);
+                if(matched6144) {
+                    check(word==reference(referenceState,sample,count,v.shift,v.method)
+                          && state==referenceState,"6144 capture reference mismatch");
+                    ++referenceChecks;
+                }
                 // Little-endian words, chronological bits MSB first within word.
                 for(unsigned byte=0;byte<count/8;++byte) data.push_back(uint8_t(word>>(8*byte)));
             }
             std::ofstream out(std::string(argv[2])+"."+v.name+".bin",std::ios::binary);
             check(bool(out.write(reinterpret_cast<const char*>(data.data()),std::streamsize(data.size()))),"write failed");
         }
-        std::cout<<"{\"samples\":"<<pcm.size()<<",\"variants\":"<<variants().size()<<"}\n";
+        std::cout<<"{\"samples\":"<<pcm.size()<<",\"variants\":"<<generated;
+        if(matched6144)std::cout<<",\"bits_per_sample\":128,\"rc_shift\":6,\"reference_word_state_checks\":"<<referenceChecks;
+        std::cout<<"}\n";
     } catch(const std::exception &error) { std::cerr<<error.what()<<'\n'; return 1; }
 }

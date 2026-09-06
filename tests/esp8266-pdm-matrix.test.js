@@ -52,4 +52,11 @@ test('same-rate PDM matrix preserves decisions and packs all 8..128 new bits', t
     }
   });
   assert.equal(variants,23);
+  const selected=path.join(dir,'selected');
+  const proof=JSON.parse(execute(exe,[input,selected,'--matched-6144']).stdout);
+  assert.deepEqual(proof,{samples:samples.length,variants:3,bits_per_sample:128,rc_shift:6,
+    reference_word_state_checks:samples.length*12});
+  assert.equal(fs.readdirSync(dir).filter(name=>name.startsWith('selected.')).length,3);
+  for(const name of ['pdm128','rc128-a64','simple128-a64'])
+    assert.deepEqual(fs.readFileSync(`${selected}.${name}.bin`),fs.readFileSync(`${prefix}.${name}.bin`));
 });
