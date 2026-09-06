@@ -28,7 +28,7 @@ Then test real I2S-PDM output for underruns and restore ordinary radio firmware.
   Preserve clipping/downmix order and update overlap only after consuming it.
 - [x] 2. Try a flash-only Huffman prefix lookup with the exact canonical
   decoder as fallback. Exhaustively compare symbols and consumed bit counts.
-- [ ] 3. Try a fused bit-reader fast path to avoid repeated peek/refill work,
+- [x] 3. Try a fused bit-reader fast path to avoid repeated peek/refill work,
   retaining the existing state size and bounds behavior.
 - [ ] Run the complete regression suite and physical output checks for the
   accepted combination; archive measurements and an ordinary firmware build.
@@ -108,3 +108,22 @@ for both symbols and consumed bit counts. Whole-stream comparison against
 the canonical/64-bit reference: 38912 samples at 48 kHz stereo, 23552 at
 22.05 kHz mono, and 92160 at 44.1 kHz stereo all have maxError=0 and SNR=Infinity.
 Window/overlap and cancellation regression suites also pass.
+
+### 3 — Bit-reader fast paths: REJECT
+
+Two zero-allocation variants were tested after steps 1+2:
+
+| Variant | AAC avg/max us | MP3 avg us | Task free stack |
+| --- | ---: | ---: | ---: |
+| Accepted window + Huffman | 16015 / 16033 | 4756 | 1792 B |
+| Top up existing cache before Huffman | 15870 / 15892 | 6148 | 1712 B |
+| Reuse sufficient cache, otherwise old peek | 15867 / 15891 | 5429 | 1712 B |
+
+Both pass all fixture PCM comparisons with zero error/infinite SNR and
+1700960 peek/consume comparisons. However, AAC improves less than 1%, peak
+stack increases 80 bytes, and the unchanged MP3 suffers large image-layout
+regressions. Neither meets the acceptance criteria. Both production changes
+were removed. An independent bit-by-bit oracle regression remains to cover
+lookahead, consumption, alignment and end-of-buffer zero padding.
+
+No lossy arithmetic or larger buffers were accepted.

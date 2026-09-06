@@ -60,6 +60,10 @@ function compile(outputDir, name, reference, mp3Sso = false, aacSso = false, opt
     sources.splice(0, 2, path.join(native, "aac_huffman_state_test.cpp"));
     sources.pop();
   }
+  if(options.aacBitsUnit) {
+    sources.splice(0, 2, path.join(native, "aac_bit_reader_test.cpp"));
+    sources.pop();
+  }
   if(reference) defines.push("YORADIO_HELIX_REFERENCE_FIXED_POINT=1");
   if(reference) defines.push("YORADIO_HELIX_AAC_REFERENCE_HUFFMAN=1");
   if(mp3Sso) defines.push("YORADIO_HELIX_MP3_SSO=1");
@@ -175,6 +179,16 @@ function downmix(stereo) {
     mono.writeInt16LE((stereo.readInt16LE(offset) + stereo.readInt16LE(offset + 2)) >> 1, offset / 2);
   return mono;
 }
+
+test("AAC bit reader matches an independent bit oracle at buffer tails", t => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'aac-bits-'));
+  t.after(() => fs.rmSync(dir, {recursive:true, force:true}));
+  const binary = compile(dir, 'aac-bits', false, false, false, {aacBitsUnit:true});
+  if(binary.skip) return t.skip(binary.skip);
+  const run = spawnSync(binary.executable, [], {encoding:'utf8'});
+  assert.equal(run.status, 0, run.stdout + run.stderr);
+  t.diagnostic(run.stdout.trim());
+});
 
 test("AAC flash Huffman lookup matches every canonical code and suffix", t => {
   const generated = spawnSync(process.execPath, [path.join(root, 'tools/esp8266_audio_profile/generate_aac_prefix.js'), '--check'], {encoding:'utf8'});
