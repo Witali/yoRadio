@@ -2,7 +2,7 @@ const fs=require('node:fs'),path=require('node:path');
 const {execute}=require('./run_rcpdm_radio');
 const root=path.resolve(__dirname,'../..');
 function build(directory,stem='rcpdm8_quality') {
-  if(!['rcpdm8_quality','rcpdm_precision','rcpdm_simple_quality','pdm_matrix_quality','rcpdm_feedback_quality'].includes(stem)) throw Error('Unknown benchmark source');
+  if(!['rcpdm8_quality','rcpdm_precision','rcpdm_simple_quality','pdm_matrix_quality','rcpdm_feedback_quality','rcpdm_feedback_ab'].includes(stem)) throw Error('Unknown benchmark source');
   fs.mkdirSync(directory,{recursive:true});
   const source=fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/main/native_audio_output.c'),'utf8');
   const pack=source.slice(source.indexOf('i2s_pdm_pack32(int16_t sample)'));

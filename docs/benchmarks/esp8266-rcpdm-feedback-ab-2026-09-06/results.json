@@ -1,0 +1,1342 @@
+{
+  "measured_utc": "2026-09-06T18:38:13.412567+00:00",
+  "source_sha256": {
+    "esp8266/rtos-sdk-native/main/rc_pdm_feedback.h": "f61e7eb30e85dec6d767653ee576141663dba3296b878dd93151477b250890d3",
+    "tests/native/rcpdm_feedback_reference.h": "aad95f775503b2e2a7a200895ff4491e4f82eae0ed1d404760219a7542aeb103",
+    "tools/esp8266_audio_profile/rcpdm_feedback_ab.cpp": "dac0e512fab869f40dd73b213152b3498098b92295c104350b5422ea1a58e087",
+    "tools/esp8266_audio_profile/measure_rcpdm_feedback_ab.py": "0f45587e88b21380de1b06080c26622c5419b934f84984a4f5c333eceea95998",
+    "tools/esp8266_audio_profile/measure_pdm_matrix.py": "90a730f283159f82c383c54a983ea8ec7025cbfad9a76e55f6bcf467d815d2df",
+    "tools/esp8266_audio_profile/measure_rcpdm8_quality.py": "6ef78d259c2526cef3fc69cdc62e1fd815f5a83c637bd18c4216b31072d7fec9",
+    "tools/esp8266_audio_profile/build_rcpdm8_quality.js": "ad125e7c4a3201e8611e5352aae3ddf5d79b0820f1092df2c390bf54686478e6"
+  },
+  "baseline_sha256": "91542679712a84ebb3ce70ca37a5bda7e8487ed9adc23bc2d27d14619c4e2174",
+  "self_test": {
+    "pass": true,
+    "frames": 141312,
+    "different_words": 135068,
+    "prng_and_interpolation_identical": true,
+    "off_error_ignored": true
+  },
+  "configs": {
+    "on": {
+      "bits": 32,
+      "bit_rate_hz": 1536000,
+      "shift": 4,
+      "alpha": 0.0625,
+      "dither": 2,
+      "interpolate": true,
+      "feedback_enabled": true
+    },
+    "off": {
+      "bits": 32,
+      "bit_rate_hz": 1536000,
+      "shift": 4,
+      "alpha": 0.0625,
+      "dither": 2,
+      "interpolate": true,
+      "feedback_enabled": false
+    }
+  },
+  "pcm_rate": 48000,
+  "common_grid_rate": 6144000,
+  "band_hz": [
+    20,
+    20000
+  ],
+  "seed": 2654435769,
+  "firmware_flashed": false,
+  "note": "Offline numerical model only; no hardware timing or analog measurement. Only accumulated-error feedback is ablated.",
+  "cases": [
+    {
+      "id": "mayak",
+      "type": "radio",
+      "pcm": "radio_output/rcpdm-real-radio-20260906/benchmark-repeat/mayak-v254.mono48.s16le",
+      "pcm_sha256": "ae5dc7edd48cc2c0d9c7ff9584c351e7a9bbf1ebca817552babf4f4ee6251514",
+      "quality": {
+        "segments": 11,
+        "frames": 575471,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 15.633342748219583,
+              "snr_to_ideal_rc_db": 31.218575889583416,
+              "output_rms_dbfs": -25.466621275120644,
+              "error_to_ideal_rc_rms_dbfs": -56.742320569888506
+            },
+            "rc40us": {
+              "snr_to_input_db": 8.799140412899972,
+              "snr_to_ideal_rc_db": 37.113606133087934,
+              "output_rms_dbfs": -25.99055152823668,
+              "error_to_ideal_rc_rms_dbfs": -63.12835922341284
+            },
+            "ladder10us": {
+              "snr_to_input_db": 9.347992790566904,
+              "snr_to_ideal_rc_db": 34.96950669539825,
+              "output_rms_dbfs": -25.778455061459415,
+              "error_to_ideal_rc_rms_dbfs": -60.78208933260882
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": 13.534710863541546,
+              "snr_to_ideal_rc_db": 17.40320091192431,
+              "output_rms_dbfs": -25.424383211168657,
+              "error_to_ideal_rc_rms_dbfs": -42.92694559222941
+            },
+            "rc40us": {
+              "snr_to_input_db": 8.625207923158385,
+              "snr_to_ideal_rc_db": 21.930233461641087,
+              "output_rms_dbfs": -25.996829495345985,
+              "error_to_ideal_rc_rms_dbfs": -47.94498655196599
+            },
+            "ladder10us": {
+              "snr_to_input_db": 9.071486655609602,
+              "snr_to_ideal_rc_db": 20.53956983668383,
+              "output_rms_dbfs": -25.77455035579169,
+              "error_to_ideal_rc_rms_dbfs": -46.3521524738944
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "e076bbefe5df12627c03264a3c25c7e6eec9f160e6f07ac9cbe8d418649f4b7c",
+        "off": "beabb312d7e14995d02dd559336a1120bd0e4373e04be83556eabd0e665e333d"
+      },
+      "proof": {
+        "frames": 575471,
+        "different_words": 575335,
+        "on_reference_frames": 575471,
+        "prng_and_interpolation_identical": true
+      },
+      "delay": {
+        "fixed_delay_seconds": 1.0091145833333333e-05,
+        "models": {
+          "on": {
+            "raw_snr_db": 15.633342748219583,
+            "aligned_snr_db": 35.20916745618194
+          },
+          "off": {
+            "raw_snr_db": 13.534710863541548,
+            "aligned_snr_db": 17.58772691683578
+          }
+        }
+      }
+    },
+    {
+      "id": "record",
+      "type": "radio",
+      "pcm": "radio_output/rcpdm-real-radio-20260906/benchmark-repeat/record-v254.mono48.s16le",
+      "pcm_sha256": "f8d2e4bd94f3a7ffff42d20b0412b9d4a7fdac7bcb6725f8f343602e719aab4f",
+      "quality": {
+        "segments": 11,
+        "frames": 576226,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 16.403100744534648,
+              "snr_to_ideal_rc_db": 30.51471356747866,
+              "output_rms_dbfs": -8.459191754942525,
+              "error_to_ideal_rc_rms_dbfs": -39.01425028883273
+            },
+            "rc40us": {
+              "snr_to_input_db": 10.422495063771109,
+              "snr_to_ideal_rc_db": 37.83037995298208,
+              "output_rms_dbfs": -8.80227623918572,
+              "error_to_ideal_rc_rms_dbfs": -46.648177634218385
+            },
+            "ladder10us": {
+              "snr_to_input_db": 10.970542290762841,
+              "snr_to_ideal_rc_db": 35.45761012635903,
+              "output_rms_dbfs": -8.661915763367922,
+              "error_to_ideal_rc_rms_dbfs": -44.141125523895596
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": 16.34925426179406,
+              "snr_to_ideal_rc_db": 29.08868970411802,
+              "output_rms_dbfs": -8.527176312775318,
+              "error_to_ideal_rc_rms_dbfs": -37.588226425472094
+            },
+            "rc40us": {
+              "snr_to_input_db": 10.416647464637617,
+              "snr_to_ideal_rc_db": 34.78695670258358,
+              "output_rms_dbfs": -8.870713756522438,
+              "error_to_ideal_rc_rms_dbfs": -43.604754383819895
+            },
+            "ladder10us": {
+              "snr_to_input_db": 10.971071439136836,
+              "snr_to_ideal_rc_db": 33.11680847186258,
+              "output_rms_dbfs": -8.730242337276493,
+              "error_to_ideal_rc_rms_dbfs": -41.80032386939915
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "ea5fa08e444a352130ce2e1882b3c4342d6e7e506923604f078f48ffe7c07043",
+        "off": "e17cf35b668263b7a54627364ee867d5786d835be13ef1df84abfc3506a53a7e"
+      },
+      "proof": {
+        "frames": 576226,
+        "different_words": 574960,
+        "on_reference_frames": 576226,
+        "prng_and_interpolation_identical": true
+      },
+      "delay": {
+        "fixed_delay_seconds": 1.0091145833333333e-05,
+        "models": {
+          "on": {
+            "raw_snr_db": 16.403100744534648,
+            "aligned_snr_db": 34.33888121168845
+          },
+          "off": {
+            "raw_snr_db": 16.34925426179406,
+            "aligned_snr_db": 30.535127772551576
+          }
+        }
+      }
+    },
+    {
+      "id": "retro",
+      "type": "radio",
+      "pcm": "radio_output/rcpdm-real-radio-20260906/benchmark-repeat/retro-v254.mono48.s16le",
+      "pcm_sha256": "489a470d51e4b8db045f8c61933e6480f117b3ffc7eda468c6ce08bab9a74798",
+      "quality": {
+        "segments": 11,
+        "frames": 576207,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 16.179452609728003,
+              "snr_to_ideal_rc_db": 31.14523728886006,
+              "output_rms_dbfs": -15.095488197793554,
+              "error_to_ideal_rc_rms_dbfs": -46.28674095833128
+            },
+            "rc40us": {
+              "snr_to_input_db": 9.767515421912076,
+              "snr_to_ideal_rc_db": 37.83886210837113,
+              "output_rms_dbfs": -15.503416932769706,
+              "error_to_ideal_rc_rms_dbfs": -53.36079533629351
+            },
+            "ladder10us": {
+              "snr_to_input_db": 10.341016409088153,
+              "snr_to_ideal_rc_db": 35.542029582407416,
+              "output_rms_dbfs": -15.336006437393202,
+              "error_to_ideal_rc_rms_dbfs": -50.903835159649404
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": 15.913474205841634,
+              "snr_to_ideal_rc_db": 26.273641840809066,
+              "output_rms_dbfs": -15.127227990171228,
+              "error_to_ideal_rc_rms_dbfs": -41.41514551028028
+            },
+            "rc40us": {
+              "snr_to_input_db": 9.747660055534533,
+              "snr_to_ideal_rc_db": 31.36943129628206,
+              "output_rms_dbfs": -15.539168423884288,
+              "error_to_ideal_rc_rms_dbfs": -46.891364524204434
+            },
+            "ladder10us": {
+              "snr_to_input_db": 10.314005622830775,
+              "snr_to_ideal_rc_db": 29.779545331296895,
+              "output_rms_dbfs": -15.370969192421708,
+              "error_to_ideal_rc_rms_dbfs": -45.141350908538875
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "b7a1caa787f6701dc7d1d14a0e92682cb67c76dad20cc23ff857544a87b9d42c",
+        "off": "288bfade8c4cc2a171b1228ce6897560937d35efc9fec47bb0ad6e5980a0268a"
+      },
+      "proof": {
+        "frames": 576207,
+        "different_words": 576055,
+        "on_reference_frames": 576207,
+        "prng_and_interpolation_identical": true
+      },
+      "delay": {
+        "fixed_delay_seconds": 1.0091145833333333e-05,
+        "models": {
+          "on": {
+            "raw_snr_db": 16.179452609728003,
+            "aligned_snr_db": 35.27560291334465
+          },
+          "off": {
+            "raw_snr_db": 15.913474205841634,
+            "aligned_snr_db": 27.052807621062787
+          }
+        }
+      }
+    },
+    {
+      "id": "symphony",
+      "type": "radio",
+      "pcm": "radio_output/rcpdm-real-radio-20260906/benchmark-repeat/symphony-v254.mono48.s16le",
+      "pcm_sha256": "14455023a6b15029dac06c3bb8e07fc906e93a573c8ed7fd7645e63b36cecad8",
+      "quality": {
+        "segments": 11,
+        "frames": 576226,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 28.423671532713293,
+              "snr_to_ideal_rc_db": 35.97798113631604,
+              "output_rms_dbfs": -30.805163912431965,
+              "error_to_ideal_rc_rms_dbfs": -66.78728810105872
+            },
+            "rc40us": {
+              "snr_to_input_db": 18.00416275449428,
+              "snr_to_ideal_rc_db": 44.16083645241522,
+              "output_rms_dbfs": -30.86943686038062,
+              "error_to_ideal_rc_rms_dbfs": -75.03323982439835
+            },
+            "ladder10us": {
+              "snr_to_input_db": 20.23864262965192,
+              "snr_to_ideal_rc_db": 41.694148753166324,
+              "output_rms_dbfs": -30.832410170370892,
+              "error_to_ideal_rc_rms_dbfs": -72.5297523914954
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": 12.177017551635982,
+              "snr_to_ideal_rc_db": 12.262156332958313,
+              "output_rms_dbfs": -30.587076446202875,
+              "error_to_ideal_rc_rms_dbfs": -43.071463297701
+            },
+            "rc40us": {
+              "snr_to_input_db": 14.582131731462571,
+              "snr_to_ideal_rc_db": 17.172713057249748,
+              "output_rms_dbfs": -30.81991257880096,
+              "error_to_ideal_rc_rms_dbfs": -48.04511642923288
+            },
+            "ladder10us": {
+              "snr_to_input_db": 14.363668127212463,
+              "snr_to_ideal_rc_db": 15.640164661428189,
+              "output_rms_dbfs": -30.748204635545395,
+              "error_to_ideal_rc_rms_dbfs": -46.47576829975726
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "666820469f06e48f037538bc84e5c1f645c4accede7aac807fc37368a5033580",
+        "off": "aadc14ea8a0c6972b04664c12ddb70c202230b8c3e79d37ae912eaa5bb93c557"
+      },
+      "proof": {
+        "frames": 576226,
+        "different_words": 576065,
+        "on_reference_frames": 576226,
+        "prng_and_interpolation_identical": true
+      },
+      "delay": {
+        "fixed_delay_seconds": 1.0091145833333333e-05,
+        "models": {
+          "on": {
+            "raw_snr_db": 28.423671532713293,
+            "aligned_snr_db": 36.039149811889736
+          },
+          "off": {
+            "raw_snr_db": 12.177017551635982,
+            "aligned_snr_db": 12.26715064425407
+          }
+        }
+      }
+    },
+    {
+      "id": "vesti",
+      "type": "radio",
+      "pcm": "radio_output/rcpdm-real-radio-20260906/benchmark-repeat/vesti-v254.mono48.s16le",
+      "pcm_sha256": "33d3804b3a9d882d110e6c5edf83bc587112bb1593958874808642d1a29455b3",
+      "quality": {
+        "segments": 11,
+        "frames": 575471,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 18.092399275024952,
+              "snr_to_ideal_rc_db": 33.64547346632744,
+              "output_rms_dbfs": -26.987985519841477,
+              "error_to_ideal_rc_rms_dbfs": -60.66721591487928
+            },
+            "rc40us": {
+              "snr_to_input_db": 10.982485017894831,
+              "snr_to_ideal_rc_db": 39.550854449694015,
+              "output_rms_dbfs": -27.298694750519733,
+              "error_to_ideal_rc_rms_dbfs": -66.86360243358185
+            },
+            "ladder10us": {
+              "snr_to_input_db": 11.583615048914153,
+              "snr_to_ideal_rc_db": 37.354699162264886,
+              "output_rms_dbfs": -27.17298079723037,
+              "error_to_ideal_rc_rms_dbfs": -64.54776730090629
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": 13.991487378112526,
+              "snr_to_ideal_rc_db": 16.000357060120226,
+              "output_rms_dbfs": -26.917099754794936,
+              "error_to_ideal_rc_rms_dbfs": -43.02209950867208
+            },
+            "rc40us": {
+              "snr_to_input_db": 10.579300305636556,
+              "snr_to_ideal_rc_db": 20.696060725265617,
+              "output_rms_dbfs": -27.297393832974592,
+              "error_to_ideal_rc_rms_dbfs": -48.008808709153456
+            },
+            "ladder10us": {
+              "snr_to_input_db": 10.940429386685889,
+              "snr_to_ideal_rc_db": 19.238688373707493,
+              "output_rms_dbfs": -27.15729757634909,
+              "error_to_ideal_rc_rms_dbfs": -46.4317565123489
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "03ec3531ad8f223e9216f91982b206873c3cc3ef18aecde98d15115c8a8340a3",
+        "off": "df638d3c4adc5a3a38bc52298a5c02f2ac9bff5465678681b129cf87d24ff879"
+      },
+      "proof": {
+        "frames": 575471,
+        "different_words": 575318,
+        "on_reference_frames": 575471,
+        "prng_and_interpolation_identical": true
+      },
+      "delay": {
+        "fixed_delay_seconds": 1.0091145833333333e-05,
+        "models": {
+          "on": {
+            "raw_snr_db": 18.092399275024952,
+            "aligned_snr_db": 36.92543266807722
+          },
+          "off": {
+            "raw_snr_db": 13.991487378112526,
+            "aligned_snr_db": 16.08474794434487
+          }
+        }
+      }
+    },
+    {
+      "id": "tone-1000hz-3db",
+      "type": "tone",
+      "hz": 1000,
+      "level_dbfs": -3,
+      "pcm": "radio_output/rcpdm8-quality/tone-1000hz-3db.s16le",
+      "pcm_sha256": "d6c3c2f65c5fbc5ef47fed8e2bddf5d96cb8df978abc46be08bfa15c9deb5d59",
+      "quality": {
+        "segments": 2,
+        "frames": 144000,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 23.71791350815205,
+              "snr_to_ideal_rc_db": 49.905631584590644,
+              "output_rms_dbfs": -6.022495033641109,
+              "error_to_ideal_rc_rms_dbfs": -55.93949967862553,
+              "tone_detected": true,
+              "sinad_db": 55.94922466387352,
+              "thd_db": -76.68739848767478,
+              "fundamental_gain_db": -0.0057494860470510235
+            },
+            "rc40us": {
+              "snr_to_input_db": 12.177060384524097,
+              "snr_to_ideal_rc_db": 50.933591446811384,
+              "output_rms_dbfs": -6.271401542439278,
+              "error_to_ideal_rc_rms_dbfs": -57.216356718879524,
+              "tone_detected": true,
+              "sinad_db": 64.0581686447618,
+              "thd_db": -80.05278532832688,
+              "fundamental_gain_db": -0.2546466635388925
+            },
+            "ladder10us": {
+              "snr_to_input_db": 14.497230333538516,
+              "snr_to_ideal_rc_db": 50.778868386230485,
+              "output_rms_dbfs": -6.123845907411565,
+              "error_to_ideal_rc_rms_dbfs": -56.91407929046078,
+              "tone_detected": true,
+              "sinad_db": 61.64548544416025,
+              "thd_db": -78.93268283498882,
+              "fundamental_gain_db": -0.10709229583569202
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": 23.430573494452585,
+              "snr_to_ideal_rc_db": 35.55365522065811,
+              "output_rms_dbfs": -6.088344997244176,
+              "error_to_ideal_rc_rms_dbfs": -41.58752331469299,
+              "tone_detected": true,
+              "sinad_db": 36.311010194796374,
+              "thd_db": -55.33062543084874,
+              "fundamental_gain_db": -0.07260380154653251
+            },
+            "rc40us": {
+              "snr_to_input_db": 12.162775061777072,
+              "snr_to_ideal_rc_db": 38.99715519009925,
+              "output_rms_dbfs": -6.337912500406942,
+              "error_to_ideal_rc_rms_dbfs": -45.27992046216739,
+              "tone_detected": true,
+              "sinad_db": 40.99842762944693,
+              "thd_db": -57.28215055851236,
+              "fundamental_gain_db": -0.32150099913172137
+            },
+            "ladder10us": {
+              "snr_to_input_db": 14.478479610430792,
+              "snr_to_ideal_rc_db": 38.0648217390574,
+              "output_rms_dbfs": -6.190225426169355,
+              "error_to_ideal_rc_rms_dbfs": -44.2000326432877,
+              "tone_detected": true,
+              "sinad_db": 39.58533959771506,
+              "thd_db": -56.38674146586759,
+              "fundamental_gain_db": -0.17394661966051053
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "6de7b80579961f9aa5ed56d363cb897b92c297fb26d3204a07116de546d07946",
+        "off": "1a549259ae19f7ee714405372763978fa1a3ad84ca19038edff2615318330f58"
+      },
+      "proof": {
+        "frames": 144000,
+        "different_words": 143794,
+        "on_reference_frames": 144000,
+        "prng_and_interpolation_identical": true
+      }
+    },
+    {
+      "id": "tone-1000hz-20db",
+      "type": "tone",
+      "hz": 1000,
+      "level_dbfs": -20,
+      "pcm": "radio_output/rcpdm8-quality/tone-1000hz-20db.s16le",
+      "pcm_sha256": "4d11805e743019a56bb4c0f24141c0cfc231ae93af791cc1da4ff79390f4c5a2",
+      "quality": {
+        "segments": 2,
+        "frames": 144000,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 23.692632475923233,
+              "snr_to_ideal_rc_db": 43.15838736255614,
+              "output_rms_dbfs": -23.022004139324558,
+              "error_to_ideal_rc_rms_dbfs": -66.19190554884293,
+              "tone_detected": true,
+              "sinad_db": 43.86562047210652,
+              "thd_db": -65.38404269975922,
+              "fundamental_gain_db": -0.005775768276151529
+            },
+            "rc40us": {
+              "snr_to_input_db": 12.180264730968977,
+              "snr_to_ideal_rc_db": 48.73270268590926,
+              "output_rms_dbfs": -23.27105266442222,
+              "error_to_ideal_rc_rms_dbfs": -72.01511806542389,
+              "tone_detected": true,
+              "sinad_db": 52.067970094498655,
+              "thd_db": -73.93536229111106,
+              "fundamental_gain_db": -0.2546729444377197
+            },
+            "ladder10us": {
+              "snr_to_input_db": 14.50079180496804,
+              "snr_to_ideal_rc_db": 47.42639295572931,
+              "output_rms_dbfs": -23.12347794085367,
+              "error_to_ideal_rc_rms_dbfs": -70.56125396421106,
+              "tone_detected": true,
+              "sinad_db": 49.62616388684732,
+              "thd_db": -71.44894296377905,
+              "fundamental_gain_db": -0.10711857751357476
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": 18.54148002243805,
+              "snr_to_ideal_rc_db": 20.046500346777112,
+              "output_rms_dbfs": -23.01392300587945,
+              "error_to_ideal_rc_rms_dbfs": -43.08001853306389,
+              "tone_detected": true,
+              "sinad_db": 20.027917549090905,
+              "thd_db": -46.25006403769238,
+              "fundamental_gain_db": -0.040454513602732695
+            },
+            "rc40us": {
+              "snr_to_input_db": 11.987648444831764,
+              "snr_to_ideal_rc_db": 24.832407312079848,
+              "output_rms_dbfs": -23.291478133921846,
+              "error_to_ideal_rc_rms_dbfs": -48.114822691594476,
+              "tone_detected": true,
+              "sinad_db": 24.82336574764001,
+              "thd_db": -52.11606154632199,
+              "fundamental_gain_db": -0.289351612497523
+            },
+            "ladder10us": {
+              "snr_to_input_db": 14.020323991792228,
+              "snr_to_ideal_rc_db": 23.39089711012822,
+              "output_rms_dbfs": -23.138296940823643,
+              "error_to_ideal_rc_rms_dbfs": -46.52575811860997,
+              "tone_detected": true,
+              "sinad_db": 23.377817477495974,
+              "thd_db": -50.21750941696454,
+              "fundamental_gain_db": -0.14179729082283177
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "0aa75839fe2783e05b755e147579d81dc3897e6feab0c5b22fe97108a1f42e21",
+        "off": "b1d91fdae136a207edfef7db2f750d18e7524bc8e1ed0a435e0d6b12e24db0cc"
+      },
+      "proof": {
+        "frames": 144000,
+        "different_words": 143970,
+        "on_reference_frames": 144000,
+        "prng_and_interpolation_identical": true
+      }
+    },
+    {
+      "id": "tone-1000hz-40db",
+      "type": "tone",
+      "hz": 1000,
+      "level_dbfs": -40,
+      "pcm": "radio_output/rcpdm8-quality/tone-1000hz-40db.s16le",
+      "pcm_sha256": "433cd3dda689bce144db8670f4c09ae8789be2ac2d122e0db5fc2d9b30fbf351",
+      "quality": {
+        "segments": 2,
+        "frames": 144000,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 20.78803979850027,
+              "snr_to_ideal_rc_db": 23.84014211641215,
+              "output_rms_dbfs": -42.997825351167684,
+              "error_to_ideal_rc_rms_dbfs": -66.8687338016807,
+              "tone_detected": true,
+              "sinad_db": 23.862607381896368,
+              "thd_db": -40.39078681104405,
+              "fundamental_gain_db": -0.004151959747295617
+            },
+            "rc40us": {
+              "snr_to_input_db": 12.138553953460342,
+              "snr_to_ideal_rc_db": 32.00626885118298,
+              "output_rms_dbfs": -43.2618393812694,
+              "error_to_ideal_rc_rms_dbfs": -75.28375877644102,
+              "tone_detected": true,
+              "sinad_db": 32.075972155795355,
+              "thd_db": -48.352100582358055,
+              "fundamental_gain_db": -0.25304912481235836
+            },
+            "ladder10us": {
+              "snr_to_input_db": 14.373129527492098,
+              "snr_to_ideal_rc_db": 29.583730447588575,
+              "output_rms_dbfs": -43.112250288931094,
+              "error_to_ideal_rc_rms_dbfs": -72.7136656996465,
+              "tone_detected": true,
+              "sinad_db": 29.62999837531861,
+              "thd_db": -45.87926251023405,
+              "fundamental_gain_db": -0.10549476438656821
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": 0.08032697788197737,
+              "snr_to_ideal_rc_db": 0.08265093596413042,
+              "output_rms_dbfs": -40.09351567755772,
+              "error_to_ideal_rc_rms_dbfs": -43.111242621232684,
+              "tone_detected": true,
+              "sinad_db": 0.01766767995061,
+              "thd_db": -25.843001437301915,
+              "fundamental_gain_db": -0.08350866190395809
+            },
+            "rc40us": {
+              "snr_to_input_db": 4.2751759926402855,
+              "snr_to_ideal_rc_db": 4.784717968347866,
+              "output_rms_dbfs": -42.08228120734954,
+              "error_to_ideal_rc_rms_dbfs": -48.0622078936059,
+              "tone_detected": true,
+              "sinad_db": 4.7225332158403175,
+              "thd_db": -31.430872398641473,
+              "fundamental_gain_db": -0.3324075387399545
+            },
+            "ladder10us": {
+              "snr_to_input_db": 3.1586130894875906,
+              "snr_to_ideal_rc_db": 3.3749300086630796,
+              "output_rms_dbfs": -41.533539711289066,
+              "error_to_ideal_rc_rms_dbfs": -46.504865260721004,
+              "tone_detected": true,
+              "sinad_db": 3.311565543169379,
+              "thd_db": -29.611326278521783,
+              "fundamental_gain_db": -0.1848521758124676
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "9360ef60be3ad4f5c71a084a442b10d00d9bbf30fe42a77692dcfe488e1bad3b",
+        "off": "904b3448e08a3808922bc0b12da6018e2239e88cb6855fd5a7bb05190ef5ca36"
+      },
+      "proof": {
+        "frames": 144000,
+        "different_words": 143963,
+        "on_reference_frames": 144000,
+        "prng_and_interpolation_identical": true
+      }
+    },
+    {
+      "id": "tone-7000hz-3db",
+      "type": "tone",
+      "hz": 7000,
+      "level_dbfs": -3,
+      "pcm": "radio_output/rcpdm8-quality/tone-7000hz-3db.s16le",
+      "pcm_sha256": "c80662569634e35c13bef034b742d8058754ad89968b939b395016de342c0cab",
+      "quality": {
+        "segments": 2,
+        "frames": 144000,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 6.993813652977502,
+              "snr_to_ideal_rc_db": 22.83431470571034,
+              "output_rms_dbfs": -6.601954284745517,
+              "error_to_ideal_rc_rms_dbfs": -29.91890731392234,
+              "tone_detected": true,
+              "sinad_db": 54.91924056651678,
+              "thd_db": -90.12363610069733,
+              "fundamental_gain_db": -0.2853970188383643
+            },
+            "rc40us": {
+              "snr_to_input_db": 0.9910633577704617,
+              "snr_to_ideal_rc_db": 22.83584203444142,
+              "output_rms_dbfs": -11.956593538348558,
+              "error_to_ideal_rc_rms_dbfs": -35.27506678003666,
+              "tone_detected": true,
+              "sinad_db": 58.00208064629246,
+              "thd_db": -93.54464192304597,
+              "fundamental_gain_db": -5.64002916089494
+            },
+            "ladder10us": {
+              "snr_to_input_db": 0.9429253247290871,
+              "snr_to_ideal_rc_db": 22.835753014234154,
+              "output_rms_dbfs": -9.620698669376754,
+              "error_to_ideal_rc_rms_dbfs": -32.93908330590912,
+              "tone_detected": true,
+              "sinad_db": 57.74859177474697,
+              "thd_db": -93.07621430737599,
+              "fundamental_gain_db": -3.3041347054333254
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": 6.995906061876108,
+              "snr_to_ideal_rc_db": 23.394201921835972,
+              "output_rms_dbfs": -6.678632013167112,
+              "error_to_ideal_rc_rms_dbfs": -30.47879453004797,
+              "tone_detected": true,
+              "sinad_db": 35.720686711532686,
+              "thd_db": -71.38442295624506,
+              "fundamental_gain_db": -0.3632239641746564
+            },
+            "rc40us": {
+              "snr_to_input_db": 0.9891241416087837,
+              "snr_to_ideal_rc_db": 23.371422602997384,
+              "output_rms_dbfs": -12.033168981927378,
+              "error_to_ideal_rc_rms_dbfs": -35.810647348592624,
+              "tone_detected": true,
+              "sinad_db": 35.37888388701241,
+              "thd_db": -74.80560618150658,
+              "fundamental_gain_db": -5.717856166077588
+            },
+            "ladder10us": {
+              "snr_to_input_db": 0.9491831120194179,
+              "snr_to_ideal_rc_db": 23.41954074837006,
+              "output_rms_dbfs": -9.697475048749496,
+              "error_to_ideal_rc_rms_dbfs": -33.52287104004503,
+              "tone_detected": true,
+              "sinad_db": 36.13285498407208,
+              "thd_db": -74.33718494577633,
+              "fundamental_gain_db": -3.3819616946599966
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "061a5dc515d490b22aaef1e010ca80210fd0ee342fe9b04303f9524f9d9bb1be",
+        "off": "f839b8963ae5effe8b74b37bdf74b3f42223bfdc4f7b251d9d83dc99babe0cbf"
+      },
+      "proof": {
+        "frames": 144000,
+        "different_words": 143821,
+        "on_reference_frames": 144000,
+        "prng_and_interpolation_identical": true
+      }
+    },
+    {
+      "id": "tone-1000hz-60db",
+      "type": "tone",
+      "hz": 1000,
+      "level_dbfs": -60,
+      "pcm": "C:\\Work\\yoRadio\\radio_output\\rcpdm-feedback-ab-20260906\\tone-1000hz-60db.s16le",
+      "pcm_sha256": "13e74a575be3c5ec383e2932090f35d93dbd89624d38ab7b3e795316d827837a",
+      "quality": {
+        "segments": 2,
+        "frames": 144000,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": 3.8635450820405404,
+              "snr_to_ideal_rc_db": 3.891735378503824,
+              "output_rms_dbfs": -61.58980012918752,
+              "error_to_ideal_rc_rms_dbfs": -66.96387995291309,
+              "tone_detected": true,
+              "sinad_db": 3.8852374076867213,
+              "thd_db": -28.042078176225964,
+              "fundamental_gain_db": -0.02300921985382407
+            },
+            "rc40us": {
+              "snr_to_input_db": 9.254881352970694,
+              "snr_to_ideal_rc_db": 12.084212641625111,
+              "output_rms_dbfs": -63.06593611747473,
+              "error_to_ideal_rc_rms_dbfs": -75.40537135350685,
+              "tone_detected": true,
+              "sinad_db": 12.077643199387584,
+              "thd_db": -34.46723342989089,
+              "fundamental_gain_db": -0.27190636146056435
+            },
+            "ladder10us": {
+              "snr_to_input_db": 8.506361608836606,
+              "snr_to_ideal_rc_db": 9.645788867611385,
+              "output_rms_dbfs": -62.731539148745426,
+              "error_to_ideal_rc_rms_dbfs": -72.81937060682344,
+              "tone_detected": true,
+              "sinad_db": 9.639170972826598,
+              "thd_db": -32.7602880703951,
+              "fundamental_gain_db": -0.12435201477252426
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": -19.91831796601405,
+              "snr_to_ideal_rc_db": -19.935331397313668,
+              "output_rms_dbfs": -43.096169315770766,
+              "error_to_ideal_rc_rms_dbfs": -43.1368131770956,
+              "tone_detected": true,
+              "sinad_db": -20.18814187627601,
+              "thd_db": -6.740366091905924,
+              "fundamental_gain_db": -0.27051766920374815
+            },
+            "rc40us": {
+              "snr_to_input_db": -14.902785728282552,
+              "snr_to_ideal_rc_db": -15.160606010733169,
+              "output_rms_dbfs": -48.03958150919299,
+              "error_to_ideal_rc_rms_dbfs": -48.160552701148575,
+              "tone_detected": true,
+              "sinad_db": -15.411872121418927,
+              "thd_db": -12.248834878948912,
+              "fundamental_gain_db": -0.519417151818241
+            },
+            "ladder10us": {
+              "snr_to_input_db": -16.48408740909336,
+              "snr_to_ideal_rc_db": -16.599356377706908,
+              "output_rms_dbfs": -46.48704012309379,
+              "error_to_ideal_rc_rms_dbfs": -46.57422536150514,
+              "tone_detected": true,
+              "sinad_db": -16.85124580210456,
+              "thd_db": -10.415165901525771,
+              "fundamental_gain_db": -0.3718614338967624
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "f2bc50faaba31e38d8e8b39e9674df6f8ccdb9d5b82298aa2522afbcc8f47533",
+        "off": "7937efe51374db9535fd6bf33308a71c05ee8eb8dcb1dc4b2d28aa7cc08fb7eb"
+      },
+      "proof": {
+        "frames": 144000,
+        "different_words": 143974,
+        "on_reference_frames": 144000,
+        "prng_and_interpolation_identical": true
+      }
+    },
+    {
+      "id": "tone-1000hz-80db",
+      "type": "tone",
+      "hz": 1000,
+      "level_dbfs": -80,
+      "pcm": "C:\\Work\\yoRadio\\radio_output\\rcpdm-feedback-ab-20260906\\tone-1000hz-80db.s16le",
+      "pcm_sha256": "38b80d1f48bc4722204fe2e92d5bbdcc9335274441336e20f840fb33135b320c",
+      "quality": {
+        "segments": 2,
+        "frames": 144000,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": -16.01600055338874,
+              "snr_to_ideal_rc_db": -16.04556511908276,
+              "output_rms_dbfs": -66.97934741653388,
+              "error_to_ideal_rc_rms_dbfs": -67.08061298978735,
+              "tone_detected": true,
+              "sinad_db": -16.283324359858028,
+              "thd_db": -8.771447838322436,
+              "fundamental_gain_db": -0.22901423147245722
+            },
+            "rc40us": {
+              "snr_to_input_db": -7.637026890694906,
+              "snr_to_ideal_rc_db": -7.882415843517402,
+              "output_rms_dbfs": -74.8850904979849,
+              "error_to_ideal_rc_rms_dbfs": -75.51059184092978,
+              "tone_detected": true,
+              "sinad_db": -8.102445216196221,
+              "thd_db": -17.044158479571735,
+              "fundamental_gain_db": -0.4779089165707245
+            },
+            "ladder10us": {
+              "snr_to_input_db": -10.193350056151463,
+              "snr_to_ideal_rc_db": -10.32084941957465,
+              "output_rms_dbfs": -72.55313261503557,
+              "error_to_ideal_rc_rms_dbfs": -72.92071539442017,
+              "tone_detected": true,
+              "sinad_db": -10.544765509158847,
+              "thd_db": -14.628154373240045,
+              "fundamental_gain_db": -0.33035600847933455
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": -39.99704385212111,
+              "snr_to_ideal_rc_db": -40.02792414661468,
+              "output_rms_dbfs": -43.09812181924207,
+              "error_to_ideal_rc_rms_dbfs": -43.09825396225543,
+              "tone_detected": true,
+              "sinad_db": -36.16823134388188,
+              "thd_db": 9.912714682067007,
+              "fundamental_gain_db": 3.867271316971042
+            },
+            "rc40us": {
+              "snr_to_input_db": -34.998012986074635,
+              "snr_to_ideal_rc_db": -35.295918207541554,
+              "output_rms_dbfs": -48.09667064526999,
+              "error_to_ideal_rc_rms_dbfs": -48.09708947690562,
+              "tone_detected": true,
+              "sinad_db": -31.416593029940127,
+              "thd_db": 5.118665065820932,
+              "fundamental_gain_db": 3.618277069359137
+            },
+            "ladder10us": {
+              "snr_to_input_db": -36.57419846669646,
+              "snr_to_ideal_rc_db": -36.720583274736285,
+              "output_rms_dbfs": -46.52069131664491,
+              "error_to_ideal_rc_rms_dbfs": -46.52098153925852,
+              "tone_detected": true,
+              "sinad_db": -32.84583951045859,
+              "thd_db": 6.682365279677831,
+              "fundamental_gain_db": 3.765888280765851
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "7498a1d9c50de47f10e6de0664275677944a03e2034d4ec698531434c917643e",
+        "off": "05158b6ddc7da8ba1f94f6943d95312ff1dddfd2bad3b4ff3f5ae1ddc9696d7d"
+      },
+      "proof": {
+        "frames": 144000,
+        "different_words": 143982,
+        "on_reference_frames": 144000,
+        "prng_and_interpolation_identical": true
+      }
+    },
+    {
+      "id": "zero",
+      "type": "silence",
+      "pcm": "C:\\Work\\yoRadio\\radio_output\\rcpdm-feedback-ab-20260906\\zero.s16le",
+      "pcm_sha256": "0e89e5d755de20a0a96681c385ffcd1c64e8ae3b7d56d1c7c0c351a81cc46513",
+      "quality": {
+        "segments": 2,
+        "frames": 144000,
+        "models": {
+          "on": {
+            "rc10us": {
+              "snr_to_input_db": null,
+              "snr_to_ideal_rc_db": null,
+              "output_rms_dbfs": -66.94093872112518,
+              "error_to_ideal_rc_rms_dbfs": -66.94093872112518
+            },
+            "rc40us": {
+              "snr_to_input_db": null,
+              "snr_to_ideal_rc_db": null,
+              "output_rms_dbfs": -75.391111979311,
+              "error_to_ideal_rc_rms_dbfs": -75.391111979311
+            },
+            "ladder10us": {
+              "snr_to_input_db": null,
+              "snr_to_ideal_rc_db": null,
+              "output_rms_dbfs": -72.79870234024551,
+              "error_to_ideal_rc_rms_dbfs": -72.79870234024551
+            }
+          },
+          "off": {
+            "rc10us": {
+              "snr_to_input_db": null,
+              "snr_to_ideal_rc_db": null,
+              "output_rms_dbfs": -43.08041418830073,
+              "error_to_ideal_rc_rms_dbfs": -43.08041418830073
+            },
+            "rc40us": {
+              "snr_to_input_db": null,
+              "snr_to_ideal_rc_db": null,
+              "output_rms_dbfs": -48.0767706195152,
+              "error_to_ideal_rc_rms_dbfs": -48.0767706195152
+            },
+            "ladder10us": {
+              "snr_to_input_db": null,
+              "snr_to_ideal_rc_db": null,
+              "output_rms_dbfs": -46.502208170970015,
+              "error_to_ideal_rc_rms_dbfs": -46.502208170970015
+            }
+          }
+        }
+      },
+      "bitstream_sha256": {
+        "on": "50b74bb2b16d5fb33321811baa241aa1bd5cc7b5348e2da3967a1b9b58550800",
+        "off": "b96d38cf57e5eae1454251dfffb107f5a9e297b6bfc2d5da7f91041f92296ed5"
+      },
+      "proof": {
+        "frames": 144000,
+        "different_words": 143987,
+        "on_reference_frames": 144000,
+        "prng_and_interpolation_identical": true
+      }
+    }
+  ],
+  "lsb": {
+    "window_seconds": 8,
+    "total_seconds": 10,
+    "trim_start_seconds": 0.25,
+    "reference": {
+      "real": 1.0164395367051604e-20,
+      "imag": -3.365044527720898e-05
+    },
+    "seeds": [
+      {
+        "seed": 1,
+        "models": {
+          "on": {
+            "zero": {
+              "coherent": {
+                "real": -3.3739417342074745e-07,
+                "imag": -1.7914778727957403e-07
+              },
+              "mean_pcm_lsb": -0.005333333334419876,
+              "bitstream_sha256": "12964930d14b0f79e21ee09fb29f47d76b3545af1d69aaf9c89e16d5d42956c1"
+            },
+            "dc-plus": {
+              "coherent": {
+                "real": -1.4550910754843141e-07,
+                "imag": -4.739259301235771e-08
+              },
+              "mean_pcm_lsb": 0.9973333333327901,
+              "bitstream_sha256": "59b318bb415737ed7cce497965f7cb011be8dd0d208e29844b5b5add25a963cc"
+            },
+            "dc-minus": {
+              "coherent": {
+                "real": -1.745027112972422e-07,
+                "imag": -1.2185923418521813e-07
+              },
+              "mean_pcm_lsb": -1.00266666666721,
+              "bitstream_sha256": "fa7fe8e07568e5477268cca590de75db0916c4d42a47d103a8d15638e6b3dd00"
+            },
+            "tone-plus": {
+              "coherent": {
+                "real": -2.3955937031873384e-06,
+                "imag": -3.360215831015009e-05
+              },
+              "mean_pcm_lsb": -0.005333333334419876,
+              "bitstream_sha256": "1b494aa1b1ee62caf110a955d6d68b9c8962feadb74161d8ed2c9c501d700c6b"
+            },
+            "tone-minus": {
+              "coherent": {
+                "real": 1.934679492123249e-06,
+                "imag": 3.3527298757079764e-05
+              },
+              "mean_pcm_lsb": -0.005333333334419876,
+              "bitstream_sha256": "f33c464f5eb3da217775ef466cb2f4b8a4a6d30b5ec24ada7bc9772570ba859f"
+            },
+            "differential_gain": {
+              "real": 0.9974527307770245,
+              "imag": -0.0643419895284929
+            }
+          },
+          "off": {
+            "zero": {
+              "coherent": {
+                "real": -2.716655526799227e-05,
+                "imag": -8.171651796702842e-06
+              },
+              "mean_pcm_lsb": -0.0639999999984866,
+              "bitstream_sha256": "ab7b91586662d2cb105def60e3045414f7b236739a49c8b1e5e17726624e6162"
+            },
+            "dc-plus": {
+              "coherent": {
+                "real": -2.5594103204092512e-05,
+                "imag": -1.0091991826373009e-05
+              },
+              "mean_pcm_lsb": 0.8799999999973807,
+              "bitstream_sha256": "f1c84b2f4888a654adb3348013f432f6b3c38f70b0c47d30a78b0d08f1e105b5"
+            },
+            "dc-minus": {
+              "coherent": {
+                "real": -2.5973684367863334e-05,
+                "imag": -4.10499039683697e-06
+              },
+              "mean_pcm_lsb": -0.9599999999991269,
+              "bitstream_sha256": "5381af52ed43cf6c6d3191eed25ef1797fa5afe2e9f950d00272813609be052e"
+            },
+            "tone-plus": {
+              "coherent": {
+                "real": -2.6585913871815103e-05,
+                "imag": -3.8177089982317466e-05
+              },
+              "mean_pcm_lsb": -0.03733333333366318,
+              "bitstream_sha256": "71cf186450d25f005b508dfd42142600aa72f5f78c6fa70576731744705ec5f6"
+            },
+            "tone-minus": {
+              "coherent": {
+                "real": -2.70815080644776e-05,
+                "imag": 2.3794179981826375e-05
+              },
+              "mean_pcm_lsb": -0.08533333333252813,
+              "bitstream_sha256": "2298e342ead961fab8cb6d45653949972a94bf65e2bd9c190bcaddb7a1043777"
+            },
+            "differential_gain": {
+              "real": 0.9208090629058656,
+              "imag": 0.00736385787141633
+            }
+          }
+        }
+      },
+      {
+        "seed": 8266,
+        "models": {
+          "on": {
+            "zero": {
+              "coherent": {
+                "real": 5.408794804537382e-08,
+                "imag": -1.3850691513818765e-07
+              },
+              "mean_pcm_lsb": 0.0,
+              "bitstream_sha256": "53ea3c7bf6e1c6228350a5df8bcfcca50eacefaa2b92ea495ace5364ac52f8df"
+            },
+            "dc-plus": {
+              "coherent": {
+                "real": 7.544972352510899e-08,
+                "imag": -1.293828139962696e-07
+              },
+              "mean_pcm_lsb": 1.00266666666721,
+              "bitstream_sha256": "0ab0c04c76334c5c71e1d7ec18f9a7e3d58e1e6428c108cc622ab0edbc6ee2e7"
+            },
+            "dc-minus": {
+              "coherent": {
+                "real": -2.591699299142508e-07,
+                "imag": -6.254969633759746e-08
+              },
+              "mean_pcm_lsb": -1.00266666666721,
+              "bitstream_sha256": "836f0702083bd9594a90d2f115bddaea7a1c3ef1fe2745cb45df0d5cf977a56f"
+            },
+            "tone-plus": {
+              "coherent": {
+                "real": -2.128696600014211e-06,
+                "imag": -3.3573017233523634e-05
+              },
+              "mean_pcm_lsb": 0.0,
+              "bitstream_sha256": "b2a330f6512d1e72eefddd757c0f5d15fd3479e5372d56158edda90bbeb7ee3f"
+            },
+            "tone-minus": {
+              "coherent": {
+                "real": 2.282222895252997e-06,
+                "imag": 3.350079226370482e-05
+              },
+              "mean_pcm_lsb": 0.0,
+              "bitstream_sha256": "e3363d62cb39e53d7c734aa90267d50a957b1e274de1a2820bcf88658371c422"
+            },
+            "differential_gain": {
+              "real": 0.9966258833231055,
+              "imag": -0.06554028422106331
+            }
+          },
+          "off": {
+            "zero": {
+              "coherent": {
+                "real": -1.686700342957e-05,
+                "imag": 3.6969990119704633e-07
+              },
+              "mean_pcm_lsb": -0.19733333333351766,
+              "bitstream_sha256": "5ed9355b8d86e58baa8ba2162d5cd9737ecd4e03c881c7d60a278b87228b8919"
+            },
+            "dc-plus": {
+              "coherent": {
+                "real": -1.3866652830155876e-05,
+                "imag": 3.339715751189355e-06
+              },
+              "mean_pcm_lsb": 0.7359999999971478,
+              "bitstream_sha256": "d0e3c0d8b6876fb87f8e54643ac395172785630ac82e8516def2eb8554022a49"
+            },
+            "dc-minus": {
+              "coherent": {
+                "real": -1.701305869571664e-05,
+                "imag": 6.162590160394171e-07
+              },
+              "mean_pcm_lsb": -1.0506666666660749,
+              "bitstream_sha256": "37ba55d82354e00d99edd11d2a38fae0e9ef80fea9fe703e8cc465eb0827019c"
+            },
+            "tone-plus": {
+              "coherent": {
+                "real": -1.6099020520026775e-05,
+                "imag": -3.0124233612350677e-05
+              },
+              "mean_pcm_lsb": -0.26666666666642413,
+              "bitstream_sha256": "9d74c4d7b6a7a4d899107918d1623f9043c29383961df07408e2ae92d2c3db5f"
+            },
+            "tone-minus": {
+              "coherent": {
+                "real": -1.3979089114187608e-05,
+                "imag": 3.6174792689282164e-05
+              },
+              "mean_pcm_lsb": -0.16533333333427436,
+              "bitstream_sha256": "e549990488c5e7c1bd6085d1f37ad53884632eab7d957ecd66ea1971c78fb44a"
+            },
+            "differential_gain": {
+              "real": 0.9851136553390026,
+              "imag": -0.031499306894387354
+            }
+          }
+        }
+      },
+      {
+        "seed": 2654435769,
+        "models": {
+          "on": {
+            "zero": {
+              "coherent": {
+                "real": 7.173782840181859e-08,
+                "imag": 1.521537422633452e-07
+              },
+              "mean_pcm_lsb": 0.0,
+              "bitstream_sha256": "c8951a604870f61e749b6a5722888d3d03e794dbddf43e68e863c8e96423a0cb"
+            },
+            "dc-plus": {
+              "coherent": {
+                "real": -1.527439809280489e-07,
+                "imag": 1.762057790025924e-07
+              },
+              "mean_pcm_lsb": 0.9973333333327901,
+              "bitstream_sha256": "98f110d29c6a28b576b0facc5356b7073191ee907cb7976b1bf72469a006a475"
+            },
+            "dc-minus": {
+              "coherent": {
+                "real": -1.6754690851674557e-07,
+                "imag": 1.5965742254845725e-07
+              },
+              "mean_pcm_lsb": -1.00266666666721,
+              "bitstream_sha256": "88c8603ae82c7f6625011e339bc5ebef2e943b100165771be466cd0f0c4c25f8"
+            },
+            "tone-plus": {
+              "coherent": {
+                "real": -2.201622912823208e-06,
+                "imag": -3.3463400384550365e-05
+              },
+              "mean_pcm_lsb": 0.0,
+              "bitstream_sha256": "0ac829aea40467139363a7b8a2874fbc0f43b389a18b0a93eb199b6c2e5b342f"
+            },
+            "tone-minus": {
+              "coherent": {
+                "real": 2.2718601497483214e-06,
+                "imag": 3.3831224874843236e-05
+              },
+              "mean_pcm_lsb": 0.0,
+              "bitstream_sha256": "29388b540317d08d7935523af603a91e2c04477cc400ae9f6f484199d9e56e01"
+            },
+            "differential_gain": {
+              "real": 0.9999069062092232,
+              "imag": -0.06646989401952108
+            }
+          },
+          "off": {
+            "zero": {
+              "coherent": {
+                "real": 5.4940093107823534e-05,
+                "imag": -1.3691085348044712e-05
+              },
+              "mean_pcm_lsb": 0.11200000000098953,
+              "bitstream_sha256": "9799e9e71d11178db33a443edc483a71cc621ace68b35687b2d86220f8a48bd1"
+            },
+            "dc-plus": {
+              "coherent": {
+                "real": 5.582808439196054e-05,
+                "imag": -1.464841803099309e-05
+              },
+              "mean_pcm_lsb": 0.9973333333327901,
+              "bitstream_sha256": "78b53a3e9991a095a3ce0cb25e13eae58d893f704a231783cfc7a4824e6d5acc"
+            },
+            "dc-minus": {
+              "coherent": {
+                "real": 5.4485610573400945e-05,
+                "imag": -1.432199340119359e-05
+              },
+              "mean_pcm_lsb": -0.8266666666677338,
+              "bitstream_sha256": "d46f69ddcb5a6aa811cbdc89ef2bc146e2ae49dc77a79f721f0c6fb9696b541b"
+            },
+            "tone-plus": {
+              "coherent": {
+                "real": 5.44988117468291e-05,
+                "imag": -4.5018244603163294e-05
+              },
+              "mean_pcm_lsb": 0.1279999999969732,
+              "bitstream_sha256": "04606b5305d72367fad41253eb0476cb8cf8c134fb5a27a1bec7a1956bb80b08"
+            },
+            "tone-minus": {
+              "coherent": {
+                "real": 5.43173672854742e-05,
+                "imag": 1.737068048774231e-05
+              },
+              "mean_pcm_lsb": 0.1279999999969732,
+              "bitstream_sha256": "a1e41f557b365126dc1d19c4c600623845f0f939b78dd156a3a3f82a8f8cbe82"
+            },
+            "differential_gain": {
+              "real": 0.9270148519128337,
+              "imag": 0.002696018728135157
+            }
+          }
+        }
+      }
+    ],
+    "summaries": {
+      "on": {
+        "gain_magnitude": 1.0001390719744754,
+        "gain_phase_degrees": -3.7522101792251026,
+        "zero_coherent_noise_relative_tone": 0.0026607947669892314,
+        "dc_plus_lsb": 1.00088888888907,
+        "dc_minus_lsb": -1.00088888888907
+      },
+      "off": {
+        "gain_magnitude": 0.9443395649625187,
+        "gain_phase_degrees": -0.4336013025826505,
+        "zero_coherent_noise_relative_tone": 0.23874802791971578,
+        "dc_plus_lsb": 0.9208888888861111,
+        "dc_minus_lsb": -0.8960000000006403
+      }
+    },
+    "pcm_sha256": {
+      "zero": "b9163d03c43083a18e6101539b555cb5e363eed61fa4b3a3b54f50ae60eb5b52",
+      "dc-plus": "438c958566fc45d9779485005dc42300a58858680819dd947dde412f9557e405",
+      "dc-minus": "41dd379966e7d1bd11145160760f3ab137aaa4b3517d23c6b8758364660c4b62",
+      "tone-plus": "b6e165669d884b9721e5df09ecc37ed248f0c95b5b8de65ec86f84171cc7a0aa",
+      "tone-minus": "251ded076a1b2a645455acf8ddb54a1a1175333eb46ee341bd20c08496fba3b6"
+    }
+  },
+  "complete": true
+}
