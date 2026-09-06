@@ -82,6 +82,11 @@ streaming or resolve the separate Wi-Fi/WebUI instability.
 
 ## Regression coverage
 
+All **341 host tests passed** (91.64 seconds, no skips).
+Filtered [UART measurements and regression output](benchmarks/esp8266-aac-blocks-2026-09-06/README.md)
+and diagnostic images are retained; their manifests identify unreleased
+development snapshots leading to source commit `9f991d6`.
+
 - Exact versus SSO arithmetic: 1280 synthetic vectors each, all four window
   sequences and both shapes, distinct L/R windows, mono/stereo, every size.
   PCM **and next overlap** match the previous functions; coefficients and
@@ -110,3 +115,21 @@ It sends no application UART bytes and changes no computer Wi-Fi settings.
 Its default build directory reuses the documented production sdkconfig;
 inspect that configuration before interpreting timings from a different
 machine. **Restore the ordinary firmware after the matrix.**
+
+## Ordinary artifact
+
+`firmware/development/esp8266-native-aac-blocks/app.bin`, source `9f991d6`,
+690032 bytes, AAC blocks ON/512, all benchmark/trace/profile options OFF.
+Static DRAM remains 20848 bytes; IRAM vectors/text/bss remains 27464 bytes.
+The application image grows 2720 bytes versus the previous DMA-recovery
+ordinary image. Runtime AAC allocation, not static DRAM, provides the 3-KiB
+saving. Existing versioned releases are unchanged.
+
+The ordinary image was flashed to app0 over COM8, hash verified, and booted
+by RTS reset. Boot confirms CPU160, PDM32, the 16-KiB IRAM arena, 511 indexed
+stations and the retained filesystem (93623/233681 bytes). No NVS or SPIFFS
+was written. Startup enabled the recovery AP after 30 seconds and Wi-Fi
+association occurred around 44 seconds, but checks of the previous
+`192.168.100.6` address timed out. Live streaming and WebUI availability
+were therefore **not** accepted in this run. The separate network issue is
+not solved by this AAC memory change. See [ordinary boot log](benchmarks/esp8266-aac-blocks-2026-09-06/ordinary.log).

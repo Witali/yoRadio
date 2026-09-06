@@ -3,6 +3,29 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-09-06: bounded AAC PCM output
+
+- Ordinary image: `development/esp8266-native-aac-blocks/app.bin`, source
+  `9f991d6`, 690032 bytes. CPU160/QIO40, mono Helix MP3 SSO/AAC-LC,
+  GPIO3 I2S-PDM32, profiling/trace/benchmarks OFF.
+- AAC defaults to 512-frame callbacks / 1024 bytes mono PCM rather than a
+  complete 4096-byte stereo frame. Actual AAC DRAM falls 9876 -> 6804 bytes;
+  16384-byte IRAM arena and 2 x 512-word DMA payloads are unchanged.
+- 341 host tests passed. PCM and next-frame overlap match the previous
+  implementation, including mono clipping/rounding and all window sequences.
+- On the physical board, the selected 512-frame path produced 4.266666 s of
+  320-kbit/s AAC audio in 4.254014 s wall time with zero measured underruns.
+  Smaller sizes were tested and had more underruns. Decode-only cost rose
+  about 6.1%; this is a RAM optimization, not a decoder speed improvement.
+- The twelve isolated A/B images (`esp8266-native-aac-decode-*` and
+  `esp8266-native-aac-output-*`) are diagnostic, Wi-Fi disabled, and must not
+  be used as normal radio firmware. Each includes a manifest and hash.
+- See `docs/ESP8266_AAC_PCM_BLOCKS.md` and its retained measurement logs.
+- Ordinary app0 flash/hash/startup verified, 511-station index retained.
+  Wi-Fi association was delayed and HTTP at the prior IP timed out; live
+  streaming/WebUI are not certified by this AAC change.
+
+
 ## Development — 2026-09-05: ESP8266 DMA starvation recovery
 
 - Ordinary image: `development/esp8266-native-dma-recovery/app.bin`, source
