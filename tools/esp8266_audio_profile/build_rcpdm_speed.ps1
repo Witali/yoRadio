@@ -1,6 +1,9 @@
 param(
     [string[]]$Variants = @('original', 'limit', 'unroll4', 'unroll8', 'unroll32', 'mask8', 'branchless8'),
-    [string]$SdkPath = '.worktree/esp8266-native-port/.build/esp8266-rtos-sdk'
+    [string]$SdkPath = '.worktree/esp8266-native-port/.build/esp8266-rtos-sdk',
+    [switch]$DisableBatch,
+    [string]$ArtifactSuffix = '',
+    [switch]$Radio
 )
 $ErrorActionPreference = 'Stop'
 $radioRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
@@ -19,13 +22,25 @@ try {
     }
     foreach ($variant in $Variants) {
         if ($variant -notmatch '^(production|original|limit|unroll4|unroll8|unroll32|mask8|branchless8)$') { throw 'Unknown variant' }
-        $artifact = "firmware/development/esp8266-rcpdm-speed/$variant"
-        $logs = ".build/rcpdm-speed-results/$variant"
+        $label = if ($DisableBatch) { "$variant-no-batch" } else { $variant }
+        if ($ArtifactSuffix) {
+            if ($ArtifactSuffix -notmatch '^[a-z0-9-]+$') { throw 'Invalid artifact suffix' }
+            $label += "-$ArtifactSuffix"
+        }
+        if ($Radio) {
+            if ($variant -ne 'production') { throw 'Radio only permits the production implementation' }
+            $label += '-radio'
+        }
+        $isolated = if ($Radio) { 'OFF' } else { 'ON' }
+        $batch = if ($DisableBatch) { 'OFF' } else { 'ON' }
+        $artifact = "firmware/development/esp8266-rcpdm-speed/$label"
+        $logs = ".build/rcpdm-speed-results/$label"
         New-Item -ItemType Directory -Path $artifact, $logs -Force | Out-Null
         Write-Output "Building RCPDM $variant"
         & $cmake -S esp8266/rtos-sdk-native -B $build -G Ninja "-DSDKCONFIG=$radioRoot/$build/sdkconfig" `
-            -DYORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=ON -DYORADIO_ESP8266_OUTPUT_COMPARE=ON `
+            "-DYORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=$isolated" "-DYORADIO_ESP8266_OUTPUT_COMPARE=$isolated" `
             "-DYORADIO_ESP8266_RCPDM_VARIANT=$variant" -DYORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST=OFF `
+            "-DYORADIO_ESP8266_RCPDM_BATCH=$batch" `
             -DYORADIO_ESP8266_CODEC_RAM_BENCHMARK=OFF -DYORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT=OFF `
             -DYORADIO_ESP8266_AUDIO_PROFILE=OFF -DYORADIO_ESP8266_AUDIO_TRACE=OFF `
             -DYORADIO_ESP8266_MEMORY_PROFILE=OFF -DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF *> "$logs/configure.log"
@@ -37,7 +52,8 @@ try {
         & xtensa-lx106-elf-size.exe -A "$logs/app.elf" > "$logs/sections.txt"
         & xtensa-lx106-elf-nm.exe -S --size-sort "$logs/app.elf" > "$logs/symbols.txt"
         & xtensa-lx106-elf-objdump.exe -d "$logs/app.elf" > "$logs/disassembly.txt"
-        $manifest = [ordered]@{ variant=$variant; purpose='Diagnostic RCPDM exactness and speed, not ordinary radio'; source=(git rev-parse HEAD); cpu_mhz=160; flash='QIO40'; app_address='0x10000'; bytes=(Get-Item "$artifact/app.bin").Length; sha256=(Get-FileHash "$artifact/app.bin").Hash }
+        $purpose = if ($Radio) { 'Ordinary native radio with optimized RCPDM32; alternate output, not board default' } else { 'Diagnostic RCPDM exactness and speed, not ordinary radio' }
+        $manifest = [ordered]@{ variant=$label; purpose=$purpose; source=(git rev-parse HEAD); compiled_working_tree=$true; batch=(-not $DisableBatch); cpu_mhz=160; flash='QIO40'; app_address='0x10000'; bytes=(Get-Item "$artifact/app.bin").Length; sha256=(Get-FileHash "$artifact/app.bin").Hash }
         $manifest | ConvertTo-Json | Out-File "$artifact/manifest.json" -Encoding utf8
         Write-Output "$variant SHA256=$($manifest.sha256)"
     }

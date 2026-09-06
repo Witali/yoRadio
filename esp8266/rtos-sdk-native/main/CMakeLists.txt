@@ -48,6 +48,7 @@ option(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
 option(YORADIO_ESP8266_OUTPUT_COMPARE
   "Compare PDM packers before DMA and force reproducible benchmark settings" OFF)
 set(YORADIO_ESP8266_RCPDM_VARIANT "production" CACHE STRING "Diagnostic-only RCPDM candidate")
+option(YORADIO_ESP8266_RCPDM_BATCH "Fill RCPDM DMA spans directly at 48 kHz (OFF for A/B)" ON)
 if(NOT YORADIO_ESP8266_RCPDM_VARIANT MATCHES "^(production|original|limit|unroll4|unroll8|unroll32|mask8|branchless8)$")
   message(FATAL_ERROR "Unknown RCPDM candidate")
 endif()
@@ -188,6 +189,9 @@ if(YORADIO_ESP8266_OUTPUT_COMPARE)
   if(NOT YORADIO_ESP8266_RCPDM_VARIANT STREQUAL "production")
     target_compile_definitions(${COMPONENT_LIB} PRIVATE RCPDM_TEST_SAMPLE=rc_candidate_${YORADIO_ESP8266_RCPDM_VARIANT})
   endif()
+endif()
+if(NOT YORADIO_ESP8266_RCPDM_BATCH OR NOT YORADIO_ESP8266_RCPDM_VARIANT STREQUAL "production")
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE RCPDM_DISABLE_BATCH=1)
 endif()
 if(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE

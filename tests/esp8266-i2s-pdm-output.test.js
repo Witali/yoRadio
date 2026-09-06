@@ -84,7 +84,9 @@ test("I2S PDM submits only complete finite DMA buffers with neutral underrun fal
   );
   assert.match(i2sPdm, /esp8266_nodac_i2s_reserve/);
   assert.match(i2sPdm, /esp8266_nodac_i2s_commit/);
-  assert.doesNotMatch(i2sPdm, /uint32_t words\[|memcpy|esp8266_nodac_i2s_write\(/);
+  // The boot-only bit comparator has a tiny scratch array, not an audio buffer.
+  const productionPdm = i2sPdm.replace(/bool native_audio_output_benchmark_verify\(void\)[\s\S]*?(?=\/\* Diagnostic only: actual production packer)/, '');
+  assert.doesNotMatch(productionPdm, /uint32_t words\[|memcpy|esp8266_nodac_i2s_write\(/);
   assert.match(i2sPdm, /I2S_PDM_WRITE_TIMEOUT_MS 100U/);
   assert.match(i2sPdm, /TickType_t deadline/);
   assert.match(i2sPdm, /writer->deadline - now/);

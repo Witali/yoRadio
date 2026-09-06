@@ -601,6 +601,12 @@ static esp_err_t i2s_pdm_push_word(i2s_pdm_writer_t *writer, uint32_t word) {
 
 /* This packer runs in the audio task, not in the DMA ISR. Keep scarce IRAM
  * for decoder word workspaces; flash execution remains cache-backed. */
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM && !RCPDM_DISABLE_BATCH
+static void __attribute__((noinline)) i2s_rcpdm_fill(
+    uint32_t *words, const int16_t *pcm, size_t frames, unsigned channels) {
+    rc_pdm_fill(&s_rcpdm, words, pcm, frames, channels);
+}
+#endif
 static uint32_t __attribute__((noinline))
 i2s_pdm_pack32(int16_t sample) {
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
@@ -659,6 +665,32 @@ bool native_audio_output_benchmark_verify(void) {
     }
     s_rcpdm.rc = saved;
     ESP_LOGI(TAG, "RCPDM bit-exact PASS: %u words and states", cases);
+#if !RCPDM_DISABLE_BATCH
+    // Exercise the actual machine-code batch writer before DMA/timing starts.
+    int16_t pcm_batch[34];
+    uint32_t words[17];
+    unsigned batch_words = 0;
+    for (unsigned channels = 1; channels <= 2; ++channels) {
+        s_rcpdm.rc = expected.rc = 0x80000000U;
+        for (unsigned block = 0; block < 128; ++block) {
+            for (unsigned i = 0; i < 34; ++i) {
+                random = random * 1664525U + 1013904223U;
+                pcm_batch[i] = (int16_t)(random >> 16);
+            }
+            size_t count = block % 18U; // includes empty and partial spans
+            i2s_rcpdm_fill(words, pcm_batch, count, channels);
+            for (size_t i = 0; i < count; ++i) {
+                int32_t mono = pcm_batch[i * channels];
+                if (channels == 2) mono = (mono + pcm_batch[i * channels + 1]) / 2;
+                if (words[i] != rc_candidate_original(&expected, (int16_t)mono)) goto mismatch;
+                ++batch_words;
+            }
+            if (s_rcpdm.rc != expected.rc) goto mismatch;
+        }
+    }
+    s_rcpdm.rc = saved;
+    ESP_LOGI(TAG, "RCPDM batch bit-exact PASS: %u words, mono/stereo", batch_words);
+#endif
     return true;
 mismatch:
     ESP_LOGE(TAG, "RCPDM bit-exact FAIL after %u words", cases);
@@ -812,6 +844,35 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         .deadline = xTaskGetTickCount() +
                     pdMS_TO_TICKS(I2S_PDM_WRITE_TIMEOUT_MS),
     };
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM && !RCPDM_DISABLE_BATCH
+    if (sample_rate == BOARD_I2S_PDM_SAMPLE_RATE && s_resample_phase == 0) {
+        size_t frame = 0;
+        while (frame < frames) {
+            esp_err_t result = i2s_pdm_reserve(&writer);
+            if (result != ESP_OK) {
+                // Match the scalar path: it advances one sample before a
+                // failed reserve and leaves the resampler subtraction pending.
+                int32_t mono = samples[frame * channels];
+                if (channels == 2) mono = (mono + samples[frame * 2U + 1U]) / 2;
+                (void)i2s_pdm_pack32((int16_t)mono);
+                s_resample_phase = BOARD_I2S_PDM_SAMPLE_RATE;
+                return result;
+            }
+            size_t count = frames - frame;
+            if (count > writer.capacity) count = writer.capacity;
+            i2s_rcpdm_fill(writer.words, samples + frame * channels, count, channels);
+            writer.word_count = count;
+            frame += count;
+            bool full = count == writer.capacity;
+            result = i2s_pdm_flush(&writer);
+            if (result != ESP_OK) {
+                if (full) s_resample_phase = BOARD_I2S_PDM_SAMPLE_RATE;
+                return result;
+            }
+        }
+        return ESP_OK;
+    }
+#endif
     for (size_t frame = 0; frame < frames; ++frame) {
         int32_t mono = samples[frame * channels];
         if (channels == 2)

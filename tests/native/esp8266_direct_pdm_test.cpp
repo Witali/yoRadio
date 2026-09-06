@@ -327,5 +327,10 @@ int main() {
     std::vector<int16_t> tooMuch(1100);
     assert(native_audio_output_write(tooMuch.data(), tooMuch.size(), 48000, 1) == ESP_ERR_TIMEOUT);
     assert(s_reserved_words == 0 && critical == 0); // no leaked writable span
+#if TEST_RCPDM
+    rc_pdm_t stopped = {0x80000000U};
+    for (size_t i = 0; i <= committed.size(); ++i) rc_candidate_original(&stopped, 0);
+    assert(s_rcpdm.rc == stopped.rc && s_resample_phase == 48000U);
+#endif
     puts("PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed");
 }

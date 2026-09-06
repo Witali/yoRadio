@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 
 /* Predictive, unsigned full-scale RC model, alpha = 1/16. The peripheral
  * only transports these bits; this is not a hardware PDM modulator. */
@@ -44,4 +45,22 @@ static inline uint32_t rc_pdm_sample(rc_pdm_t *p, int16_t pcm) {
     }
     p->rc = state;
     return word;
+}
+
+/* Fill a caller-owned span, retaining the RC state in a local object for
+ * the whole batch. No temporary PCM/PDM buffer; stereo rounding is unchanged. */
+static inline void rc_pdm_fill(rc_pdm_t *p, uint32_t *words,
+                               const int16_t *pcm, size_t frames,
+                               unsigned channels) {
+    rc_pdm_t current = *p;
+    if (channels == 2) {
+        for (size_t i = 0; i < frames; ++i) {
+            int32_t mono = ((int32_t)pcm[i * 2] + pcm[i * 2 + 1]) / 2;
+            words[i] = rc_pdm_sample(&current, (int16_t)mono);
+        }
+    } else {
+        for (size_t i = 0; i < frames; ++i)
+            words[i] = rc_pdm_sample(&current, pcm[i]);
+    }
+    *p = current;
 }
