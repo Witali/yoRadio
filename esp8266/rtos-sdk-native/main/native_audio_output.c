@@ -621,7 +621,7 @@ static esp_err_t i2s_pdm_push_word(i2s_pdm_writer_t *writer, uint32_t word) {
 /* This packer runs in the audio task, not in the DMA ISR. Keep scarce IRAM
  * for decoder word workspaces; flash execution remains cache-backed. */
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM && !RCPDM_DISABLE_BATCH
-static void __attribute__((noinline)) i2s_rcpdm_fill(
+static inline __attribute__((always_inline)) void i2s_rcpdm_fill_channels(
     uint32_t *words, const int16_t *pcm, size_t frames, unsigned channels) {
 #if CONFIG_YORADIO_RCPDM_FEEDBACK
     rc_pdm_feedback_fill(&s_rcpdm, words, pcm, frames, channels);
@@ -630,6 +630,19 @@ static void __attribute__((noinline)) i2s_rcpdm_fill(
 #else
     rc_pdm_fill(&s_rcpdm, words, pcm, frames, channels);
 #endif
+}
+static void __attribute__((noinline)) i2s_rcpdm_fill_mono(
+    uint32_t *words, const int16_t *pcm, size_t frames) {
+    i2s_rcpdm_fill_channels(words, pcm, frames, 1);
+}
+static void __attribute__((noinline)) i2s_rcpdm_fill_stereo(
+    uint32_t *words, const int16_t *pcm, size_t frames) {
+    i2s_rcpdm_fill_channels(words, pcm, frames, 2);
+}
+static inline __attribute__((always_inline)) void i2s_rcpdm_fill(
+    uint32_t *words, const int16_t *pcm, size_t frames, unsigned channels) {
+    if (channels == 2) i2s_rcpdm_fill_stereo(words, pcm, frames);
+    else i2s_rcpdm_fill_mono(words, pcm, frames);
 }
 #endif
 static uint32_t __attribute__((noinline))
@@ -910,13 +923,12 @@ esp_err_t native_audio_output_init(void) {
     return result;
 }
 
-esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
-                                    uint32_t sample_rate, uint8_t channels) {
-    if (!samples || !sample_count || !sample_rate ||
-        (channels != 1 && channels != 2) || sample_count % channels)
-        return ESP_ERR_INVALID_ARG;
-    if (!s_i2s_started) return ESP_ERR_INVALID_STATE;
-
+/* Instantiate this single implementation with constant channel counts below.
+ * always_inline is intentional: optimized builds must not dispatch mono/stereo
+ * inside the gain, downmix, resampler or modulator loops. */
+static inline __attribute__((always_inline)) esp_err_t i2s_pdm_write_channels(
+    int16_t *samples, size_t sample_count, uint32_t sample_rate,
+    const uint8_t channels) {
     size_t frames = sample_count / channels;
     native_audio_normalizer_configure(
         s_normalization_enabled, s_normalization_max_gain_db,
@@ -991,6 +1003,38 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         }
     }
     return i2s_pdm_flush(&writer);
+}
+
+static esp_err_t i2s_pdm_write_mono(int16_t *samples, size_t sample_count,
+                                    uint32_t sample_rate) {
+    return i2s_pdm_write_channels(samples, sample_count, sample_rate, 1);
+}
+
+static esp_err_t i2s_pdm_write_stereo(int16_t *samples, size_t sample_count,
+                                      uint32_t sample_rate) {
+    return i2s_pdm_write_channels(samples, sample_count, sample_rate, 2);
+}
+
+typedef esp_err_t (*i2s_pdm_write_fn)(int16_t *, size_t, uint32_t);
+static i2s_pdm_write_fn s_i2s_pdm_write;
+static uint8_t s_i2s_pdm_channels;
+
+esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
+                                    uint32_t sample_rate, uint8_t channels) {
+    if (!samples || !sample_count || !sample_rate ||
+        (channels != 1 && channels != 2) ||
+        (channels == 2 && (sample_count & 1U)))
+        return ESP_ERR_INVALID_ARG;
+    if (!s_i2s_started) return ESP_ERR_INVALID_STATE;
+
+    /* Only the audio producer owns this dispatch state. Preserve RC/PDM and
+     * resampler history across channel-only changes; silence resets them. */
+    if (channels != s_i2s_pdm_channels) {
+        s_i2s_pdm_write = channels == 2
+            ? i2s_pdm_write_stereo : i2s_pdm_write_mono;
+        s_i2s_pdm_channels = channels;
+    }
+    return s_i2s_pdm_write(samples, sample_count, sample_rate);
 }
 
 void native_audio_output_silence(void) {

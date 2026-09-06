@@ -108,13 +108,27 @@ static inline uint32_t rc_pdm_feedback_sample(rc_pdm_feedback_t *p, int16_t pcm)
     rc_pdm_feedback_frame(p, pcm, &word, 32, 4, 0, RC_FB_SELECTED_DITHER, 1);
     return word;
 }
-static inline void rc_pdm_feedback_fill(rc_pdm_feedback_t *p, uint32_t *out,
-        const int16_t *pcm, size_t frames, unsigned channels) {
+static inline void rc_pdm_feedback_fill_mono(rc_pdm_feedback_t *p, uint32_t *out,
+        const int16_t *pcm, size_t frames) {
     rc_pdm_feedback_t current = *p;
     for (size_t i = 0; i < frames; ++i) {
-        int32_t mono = pcm[i * channels];
-        if (channels == 2) mono = (mono + pcm[i * channels + 1]) / 2;
+        out[i] = rc_pdm_feedback_sample(&current, pcm[i]);
+    }
+    *p = current;
+}
+static inline void rc_pdm_feedback_fill_stereo(rc_pdm_feedback_t *p, uint32_t *out,
+        const int16_t *pcm, size_t frames) {
+    rc_pdm_feedback_t current = *p;
+    for (size_t i = 0; i < frames; ++i) {
+        int32_t mono = ((int32_t)pcm[2 * i] + pcm[2 * i + 1]) / 2;
         out[i] = rc_pdm_feedback_sample(&current, (int16_t)mono);
     }
     *p = current;
+}
+/* Generic host/benchmark entry point. The radio selects a fixed-channel
+ * writer when the input format changes, not for each PCM sample. */
+static inline void rc_pdm_feedback_fill(rc_pdm_feedback_t *p, uint32_t *out,
+        const int16_t *pcm, size_t frames, unsigned channels) {
+    if (channels == 2) rc_pdm_feedback_fill_stereo(p, out, pcm, frames);
+    else rc_pdm_feedback_fill_mono(p, out, pcm, frames);
 }
