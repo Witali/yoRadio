@@ -656,26 +656,27 @@ bool native_audio_output_benchmark_verify(void) {
 #if RCPDM_TEST_SIMPLE
     ESP_LOGI(TAG, "RCPDM-Simple backend: %s",
              RCPDM_SIMPLE_LX106_ASM ? "Xtensa LX106 asm" : "portable C");
+    ESP_LOGI(TAG, "RCPDM-Simple asm group bits: %u",
+             RCPDM_SIMPLE_LX106_ASM ? (RCPDM_SIMPLE_UNROLL4 ? 4U : 1U) : 0U);
 #endif
     const uint32_t seeds[] = {0, 1, 15, 0x80000000U, UINT32_MAX - 15U, UINT32_MAX};
     uint32_t saved = s_rcpdm.rc;
     unsigned cases = 0;
     rc_pdm_t expected;
 #if RCPDM_TEST_SIMPLE
-    /* Exercise runtime dispatch too: empty, single-bit, Simple8/32, and the
-     * non-asm alpha=1/4 fallback. The main sweep below uses a wide reference. */
+    /* Exercise every supported count, including unroll4 group boundaries,
+     * empty input and the non-asm alpha=1/4 fallback. */
     {
         const int16_t samples[] = {INT16_MIN, -1, 0, 1, INT16_MAX};
-        const unsigned counts[] = {0, 1, 8, 32};
         const unsigned shifts[] = {2, 4};
         unsigned dispatch_cases = 0;
         for (unsigned s = 0; s < sizeof(seeds) / sizeof(seeds[0]); ++s)
             for (unsigned j = 0; j < sizeof(samples) / sizeof(samples[0]); ++j)
-                for (unsigned n = 0; n < sizeof(counts) / sizeof(counts[0]); ++n)
+                for (unsigned n = 0; n <= 32; ++n)
                     for (unsigned k = 0; k < sizeof(shifts) / sizeof(shifts[0]); ++k) {
                         rc_pdm_t actual = {seeds[s]}, fallback = {seeds[s]};
-                        uint32_t got = rcpdm_simple_bits(&actual, samples[j], counts[n], shifts[k]);
-                        uint32_t want = rcpdm_simple_bits_c(&fallback, samples[j], counts[n], shifts[k]);
+                        uint32_t got = rcpdm_simple_bits(&actual, samples[j], n, shifts[k]);
+                        uint32_t want = rcpdm_simple_bits_c(&fallback, samples[j], n, shifts[k]);
                         if (got != want || actual.rc != fallback.rc) {
                             ESP_LOGE(TAG, "RCPDM-Simple dispatch FAIL after %u cases", dispatch_cases);
                             goto mismatch;

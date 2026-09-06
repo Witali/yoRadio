@@ -16,8 +16,12 @@ test('LX106 Simple assembly builds with safe architecture gating and forced-C fa
   const modes = [
     ['native', 1, '-DYORADIO_ESP8266_NATIVE=1'],
     ['arduino', 1, '-DESP8266=1'],
+    ['native-unroll4', 1, '-DYORADIO_ESP8266_NATIVE=1', '-DRCPDM_SIMPLE_UNROLL4=1'],
+    ['arduino-unroll4', 1, '-DESP8266=1', '-DRCPDM_SIMPLE_UNROLL4=1'],
     ['forced-c', 0, '-DYORADIO_ESP8266_NATIVE=1', '-DRCPDM_SIMPLE_FORCE_C=1'],
+    ['forced-c-unroll4', 0, '-DYORADIO_ESP8266_NATIVE=1', '-DRCPDM_SIMPLE_FORCE_C=1', '-DRCPDM_SIMPLE_UNROLL4=1'],
     ['other-xtensa', 0, '-DESP32=1'],
+    ['other-xtensa-unroll4', 0, '-DESP32=1', '-DRCPDM_SIMPLE_UNROLL4=1'],
     ['disabled-native', 0, '-DYORADIO_ESP8266_NATIVE=0'],
   ];
   for (const [name, expected, ...defines] of modes) for (const optimization of ['-O0', '-Os', '-O3']) {
@@ -29,6 +33,8 @@ test('LX106 Simple assembly builds with safe architecture gating and forced-C fa
     execute(compiler, [...args, '-c', '-o', prefix + '.o']);
     const assembly = fs.readFileSync(prefix + '.s', 'utf8');
     assert.equal(/#APP/.test(assembly), !!expected, `${name} ${optimization}`);
+    assert.equal(/\.rept 4/.test(assembly), !!expected && name.endsWith('-unroll4'),
+      `Only the selected LX106 unroll4 path repeats four steps: ${name} ${optimization}`);
     assert.doesNotMatch(assembly, /\b(?:rsil|wsr|callx0)\b/,
       'No interrupt masking, special-register writes, or indirect calls');
   }

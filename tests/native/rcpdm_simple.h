@@ -6,6 +6,10 @@
 #ifndef RCPDM_SIMPLE_FORCE_C
 #define RCPDM_SIMPLE_FORCE_C 0
 #endif
+/* Opt-in four-bit groups for the isolated LX106 speed comparison. */
+#ifndef RCPDM_SIMPLE_UNROLL4
+#define RCPDM_SIMPLE_UNROLL4 0
+#endif
 #if defined(__GNUC__) && defined(__XTENSA__) && !RCPDM_SIMPLE_FORCE_C && \
     (defined(ESP8266) || (defined(YORADIO_ESP8266_NATIVE) && YORADIO_ESP8266_NATIVE))
 #define RCPDM_SIMPLE_LX106_ASM 1
@@ -52,21 +56,46 @@ static inline uint32_t rcpdm_simple_bits(rc_pdm_t *p, int16_t pcm,
          * Early-clobbers keep loop-carried outputs distinct from invariant
          * inputs for ALL iterations, not merely the first. No memory/SAR/IRQ
          * changes: GCC handles register allocation and the normal ABI. */
+#define RCPDM_SIMPLE_ASM_BIT \
+            "srli %[decay], %[state], 4\n\t" \
+            "slli %[word], %[word], 1\n\t" \
+            "bgeu %[state], %[target], 2f\n\t" \
+            "add %[state], %[state], %[step]\n\t" \
+            "addi %[word], %[word], 1\n\t" \
+            "2:\n\t" \
+            "sub %[state], %[state], %[decay]\n\t"
+#if RCPDM_SIMPLE_UNROLL4
+        if ((count & 3U) == 0U) {
+            /* Sequential dependent steps, not four independent samples.
+             * .rept bounds expansion to four; GCC cannot unroll this asm.
+             * 2f binds the next local label inside EACH repeated step. */
+            unsigned groups = count >> 2;
+            __asm__ volatile (
+                "1:\n\t"
+                ".rept 4\n\t"
+                RCPDM_SIMPLE_ASM_BIT
+                ".endr\n\t"
+                "addi %[groups], %[groups], -1\n\t"
+                "bnez %[groups], 1b\n\t"
+                : [state] "+&r" (state), [word] "+&r" (word),
+                  [groups] "+&r" (groups), [decay] "=&r" (decay)
+                : [target] "r" (target), [step] "r" (step)
+            );
+            p->rc = state;
+            return word;
+        }
+#endif
+        /* Non-multiples of four retain the one-bit loop (no padding bits). */
         __asm__ volatile (
             "1:\n\t"
-            "srli %[decay], %[state], 4\n\t"
-            "slli %[word], %[word], 1\n\t"
-            "bgeu %[state], %[target], 2f\n\t"
-            "add %[state], %[state], %[step]\n\t"
-            "addi %[word], %[word], 1\n\t"
-            "2:\n\t"
-            "sub %[state], %[state], %[decay]\n\t"
+            RCPDM_SIMPLE_ASM_BIT
             "addi %[count], %[count], -1\n\t"
             "bnez %[count], 1b\n\t"
             : [state] "+&r" (state), [word] "+&r" (word),
               [count] "+&r" (count), [decay] "=&r" (decay)
             : [target] "r" (target), [step] "r" (step)
         );
+#undef RCPDM_SIMPLE_ASM_BIT
         p->rc = state;
         return word;
     }

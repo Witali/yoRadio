@@ -7,8 +7,9 @@ const target=path.resolve(process.argv[3]||path.join(root,'docs/benchmarks/esp82
 const sha=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const record=JSON.parse(fs.readFileSync(path.join(source,'run-manifest.json'),'utf8'));
 assert.equal(record.restored,true); assert.equal(record.restore_boot_verified,true);
-assert.deepEqual(record.rounds.map(r=>r.mode),['production','simple','simple','production']);
-const results=summarize(source);
+const modes=record.modes||['production','simple'];
+assert.deepEqual(record.rounds.map(r=>r.mode),[modes[0],modes[1],modes[1],modes[0]]);
+const results=summarize(source,modes);
 fs.mkdirSync(target,{recursive:true});
 results.measured_utc=record.finished_utc;
 results.port=record.port;
@@ -18,7 +19,7 @@ for(const file of ['esp8266/rtos-sdk-native/main/native_audio_output.c',
   'esp8266/rtos-sdk-native/main/audio_output_benchmark.c','esp8266/rtos-sdk-native/main/esp8266_nodac_i2s.c',
   'esp8266/rtos-sdk-native/main/rc_pdm.h','esp8266/rtos-sdk-native/main/CMakeLists.txt',
   'tests/native/rcpdm_simple.h','tests/native/rcpdm_simple_reference.h']) results.source_sha256[file]=sha(path.join(root,file));
-for(const mode of ['production','simple']) {
+for(const mode of modes) {
   const image=record.images[mode]; assert.equal(sha(image.binary),image.sha256);
   results.images[mode]={file:path.relative(root,image.binary).replaceAll('\\','/'),bytes:image.bytes,sha256:image.sha256};
   const build=path.join(root,'.build/rcpdm-speed-results',path.basename(path.dirname(image.binary)));

@@ -2,6 +2,7 @@
 // No application UART TX, OTA selection, NVS, bootloader or SPIFFS writes.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict');
 const {execute}=require('./run_rcpdm_radio');
+const {parseRun}=require('./summarize_rcpdm_simple_board');
 const root=path.resolve(__dirname,'../..');
 const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
 function otaCrc(bytes) {
@@ -35,7 +36,10 @@ function main() {
   const data=fs.readFileSync(backup),info=inspectBackup(data);
   if(process.argv.includes('--preflight')) { console.log(JSON.stringify(info,null,2)); return; }
   const suffix=process.argv[5]||'simple-board'; assert.match(suffix,/^[a-z0-9-]+$/);
+  const unrollComparison=process.argv.includes('--simple-unroll4');
+  const modes=unrollComparison?['simple-u1','simple-u4']:['production','simple'];
   fs.mkdirSync(directory,{recursive:true});
+  assert.ok(!fs.existsSync(path.join(directory,'run-manifest.json')),'Do not overwrite a recorded run');
   const restore=path.join(path.dirname(backup),'app0-restore.bin');
   if(fs.existsSync(restore)) assert.equal(sha(fs.readFileSync(restore)),info.app0_sha256);
   else fs.writeFileSync(restore,data.subarray(0x10000,0x100000),{flag:'wx'});
@@ -43,15 +47,17 @@ function main() {
   const esptool=path.join(root,'.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esptool_py/esptool/esptool.py');
   const env={...process.env,PYTHONIOENCODING:'utf-8'};
   const images={};
-  for(const mode of ['production','simple']) {
-    const folder=path.join(root,`firmware/development/esp8266-rcpdm-speed/${mode}-${suffix}`);
+  for(const mode of modes) {
+    const label=unrollComparison?`simple-${suffix}-${mode.slice(-2)}`:`${mode}-${suffix}`;
+    const folder=path.join(root,`firmware/development/esp8266-rcpdm-speed/${label}`);
     const manifest=JSON.parse(fs.readFileSync(path.join(folder,'manifest.json'),'utf8').replace(/^\uFEFF/,''));
     const binary=path.join(folder,'app.bin'),bytes=fs.readFileSync(binary);
     assert.equal(sha(bytes),manifest.sha256.toLowerCase()); assert.equal(bytes.length,manifest.bytes);
     assert.ok(bytes.length<=0xf0000); assert.equal(manifest.batch,true);
+    if(unrollComparison) assert.equal(manifest.simple_unroll4,mode==='simple-u4');
     images[mode]={binary,sha256:sha(bytes),bytes:bytes.length};
   }
-  const record={started_utc:new Date().toISOString(),port,backup:info,images,rounds:[],restored:false};
+  const record={started_utc:new Date().toISOString(),port,backup:info,modes,images,rounds:[],restored:false};
   const save=()=>fs.writeFileSync(path.join(directory,'run-manifest.json'),JSON.stringify(record,null,2)+'\n');
   const run=(args,log)=>{const r=execute(python,args,{cwd:root,env}); fs.writeFileSync(log,r.stdout+r.stderr); return r.stdout+r.stderr;};
   const install=(file,log)=>run([esptool,'--chip','esp8266','--port',port,'--baud','460800',
@@ -60,7 +66,7 @@ function main() {
   save();
   try {
     // Symmetric ABBA ordering reduces bias from a monotonic environmental drift.
-    for(const [round,mode] of [[1,'production'],[1,'simple'],[2,'simple'],[2,'production']]) {
+    for(const [round,mode] of [[1,modes[0]],[1,modes[1]],[2,modes[1]],[2,modes[0]]]) {
       const prefix=path.join(directory,`round-${round}-${mode}`);
       assert.ok(!fs.existsSync(prefix+'-uart.log'),'Do not overwrite a recorded run');
       console.log(`Flashing ${mode}, round ${round} (app0 only)`);
@@ -70,17 +76,18 @@ function main() {
       assert.match(log,/audio_output_bench: complete/);
       assert.match(log,/stalled producer.*PASS/);
       assert.doesNotMatch(log,/invalid=[1-9]|PCM write failed|bit-exact FAIL|stalled producer.*FAIL/);
-      const label=mode==='simple'?'RCPDM-Simple':'RCPDM';
+      const label=mode==='production'?'RCPDM':'RCPDM-Simple';
       assert.ok(log.includes(`${label} bit-exact PASS: 493216 words and states`));
       assert.ok(log.includes(`${label} batch bit-exact PASS: 2144 words`));
       if(mode==='simple' && process.argv.includes('--expect-simple-asm')) {
         assert.ok(log.includes('RCPDM-Simple backend: Xtensa LX106 asm'));
-        assert.ok(log.includes('RCPDM-Simple dispatch PASS: 240 cases'));
+        assert.match(log,/RCPDM-Simple dispatch PASS: (240|1980) cases/);
       }
+      parseRun(log,mode); // includes unroll backend/group identity and DMA checks
       const samples=[...log.matchAll(/pack_only round=(\d+) samples=48000 elapsed=(\d+) us checksum=([0-9a-f]+)/g)];
       assert.equal(samples.length,3); assert.equal(new Set(samples.map(m=>m[3])).size,1);
       record.rounds.push({round,mode,pack_us:samples.map(m=>Number(m[2])),checksum:samples[0][3]}); save();
-      console.log(log.split(/\r?\n/).filter(s=>/bit-exact|RCPDM-Simple (backend|dispatch)|audio_output_bench: (pack_only|producer_nonwait|dma |heap |complete)/.test(s)).join('\n'));
+      console.log(log.split(/\r?\n/).filter(s=>/bit-exact|RCPDM-Simple (backend|dispatch|asm group)|audio_output_bench: (pack_only|producer_nonwait|dma |heap |complete)/.test(s)).join('\n'));
     }
   } finally {
     console.log('Restoring exact app0 from private backup');
