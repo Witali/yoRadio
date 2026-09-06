@@ -12,10 +12,13 @@ static inline uint32_t rcpdm_simple_bits(rc_pdm_t *p, int16_t pcm,
     uint32_t state = p->rc, word = 0;
     for (unsigned i = 0; i < count; ++i) {
         /* Decide BEFORE updating the RC state. Equal target selects zero. */
-        const unsigned high = target > state;
-        state -= state >> shift;
-        if (high) state += step;
-        word = (word << 1) | high;
+        uint32_t next = state - (state >> shift);
+        word <<= 1;
+        if (state < target) {
+            next += step;
+            word |= 1U;
+        }
+        state = next;
     }
     p->rc = state;
     return word;

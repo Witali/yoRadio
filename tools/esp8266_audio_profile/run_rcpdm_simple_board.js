@@ -34,6 +34,7 @@ function main() {
   const port=process.argv[4]||'COM8'; assert.match(port,/^COM\d+$/i);
   const data=fs.readFileSync(backup),info=inspectBackup(data);
   if(process.argv.includes('--preflight')) { console.log(JSON.stringify(info,null,2)); return; }
+  const suffix=process.argv[5]||'simple-board'; assert.match(suffix,/^[a-z0-9-]+$/);
   fs.mkdirSync(directory,{recursive:true});
   const restore=path.join(path.dirname(backup),'app0-restore.bin');
   if(fs.existsSync(restore)) assert.equal(sha(fs.readFileSync(restore)),info.app0_sha256);
@@ -43,7 +44,7 @@ function main() {
   const env={...process.env,PYTHONIOENCODING:'utf-8'};
   const images={};
   for(const mode of ['production','simple']) {
-    const folder=path.join(root,`firmware/development/esp8266-rcpdm-speed/${mode}-simple-board`);
+    const folder=path.join(root,`firmware/development/esp8266-rcpdm-speed/${mode}-${suffix}`);
     const manifest=JSON.parse(fs.readFileSync(path.join(folder,'manifest.json'),'utf8').replace(/^\uFEFF/,''));
     const binary=path.join(folder,'app.bin'),bytes=fs.readFileSync(binary);
     assert.equal(sha(bytes),manifest.sha256.toLowerCase()); assert.equal(bytes.length,manifest.bytes);
