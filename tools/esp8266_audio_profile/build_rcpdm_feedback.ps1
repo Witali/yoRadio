@@ -6,6 +6,15 @@ $taskArtifact = "$taskRoot/firmware/development/esp8266-rcpdm-feedback"
 $taskSavedPath = $env:PATH
 $taskSavedIdf = $env:IDF_PATH
 $taskSavedTools = $env:IDF_TOOLS_PATH
+function Invoke-TaskBuildTool([string]$Executable, [string[]]$Arguments, [string]$Log) {
+    if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) { throw "Missing tool: $Executable" }
+    # Windows PowerShell 5.1 wraps native stderr in ErrorRecord, even for a
+    # successful SDK command printing a deprecation warning. Capture it, but
+    # use the process exit code rather than stderr presence to decide failure.
+    $ErrorActionPreference = 'Continue'
+    & $Executable @Arguments *> $Log
+    if ($LASTEXITCODE -ne 0) { throw "Build command failed ($LASTEXITCODE): $Executable; see $Log" }
+}
 Push-Location $taskRoot
 try {
     $env:IDF_PATH = (Resolve-Path $SdkPath).Path
@@ -19,28 +28,26 @@ try {
     [IO.File]::WriteAllText("$taskBuild/feedback.defaults", $taskDefaults, (New-Object Text.UTF8Encoding($false)))
     $taskCmake = "$taskRoot/.build/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe"
     Write-Output 'Configuring experimental RC-PDM feedback radio (no flashing)'
-    & $taskCmake -S esp8266/rtos-sdk-native -B $taskBuild -G Ninja `
-        "-DSDKCONFIG=$taskBuild/sdkconfig" "-DSDKCONFIG_DEFAULTS=$taskBuild/feedback.defaults" `
-        -DYORADIO_ESP8266_RCPDM_VARIANT=production -DYORADIO_ESP8266_RCPDM_BATCH=ON `
-        -DYORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=OFF -DYORADIO_ESP8266_OUTPUT_COMPARE=OFF `
-        -DYORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST=OFF -DYORADIO_ESP8266_CODEC_RAM_BENCHMARK=OFF `
-        -DYORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT=OFF -DYORADIO_ESP8266_AUDIO_PROFILE=OFF `
-        -DYORADIO_ESP8266_AUDIO_TRACE=OFF -DYORADIO_ESP8266_MEMORY_PROFILE=OFF `
-        -DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF *> "$taskBuild/configure.log"
-    if ($LASTEXITCODE) { throw "Configure failed: $taskBuild/configure.log" }
+    Invoke-TaskBuildTool $taskCmake @('-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
+        "-DSDKCONFIG=$taskBuild/sdkconfig", "-DSDKCONFIG_DEFAULTS=$taskBuild/feedback.defaults",
+        '-DYORADIO_ESP8266_RCPDM_VARIANT=production', '-DYORADIO_ESP8266_RCPDM_BATCH=ON',
+        '-DYORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=OFF', '-DYORADIO_ESP8266_OUTPUT_COMPARE=OFF',
+        '-DYORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST=OFF', '-DYORADIO_ESP8266_CODEC_RAM_BENCHMARK=OFF',
+        '-DYORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT=OFF', '-DYORADIO_ESP8266_AUDIO_PROFILE=OFF',
+        '-DYORADIO_ESP8266_AUDIO_TRACE=OFF', '-DYORADIO_ESP8266_MEMORY_PROFILE=OFF',
+        '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
     $taskConfig = Get-Content "$taskBuild/sdkconfig" -Raw
     foreach ($taskRequired in @('CONFIG_YORADIO_RCPDM_FEEDBACK=y', 'CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM=y')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Unexpected cached configuration: $taskRequired" }
     }
     Write-Output 'Building normal radio application with the experimental modulator'
-    & "$taskRoot/.build/esp8266-tools/tools/ninja/1.9.0/ninja.exe" -C $taskBuild *> "$taskBuild/build.log"
-    if ($LASTEXITCODE) { throw "Build failed: $taskBuild/build.log" }
-    & "$taskCompiler/xtensa-lx106-elf-gcc.exe" -std=c11 -O3 -Wall -Wextra -Werror -fstack-usage `
-        -Iesp8266/rtos-sdk-native/main -c tests/native/rcpdm_feedback_codegen.c -o "$taskBuild/feedback-codegen.o"
-    if ($LASTEXITCODE) { throw 'Feedback codegen compile failed' }
-    & "$taskCompiler/xtensa-lx106-elf-nm.exe" -u "$taskBuild/feedback-codegen.o" > "$taskBuild/codegen-undefined.txt"
-    & "$taskCompiler/xtensa-lx106-elf-objdump.exe" -d "$taskBuild/feedback-codegen.o" > "$taskBuild/feedback-disassembly.txt"
-    & "$taskCompiler/xtensa-lx106-elf-size.exe" -A "$taskBuild/yoradio_esp8266_helix_native.elf" > "$taskBuild/sections.txt"
+    Invoke-TaskBuildTool "$taskRoot/.build/esp8266-tools/tools/ninja/1.9.0/ninja.exe" @('-C', $taskBuild) "$taskBuild/build.log"
+    Invoke-TaskBuildTool "$taskCompiler/xtensa-lx106-elf-gcc.exe" @('-std=c11', '-O3', '-Wall', '-Wextra', '-Werror',
+        '-fstack-usage', '-Iesp8266/rtos-sdk-native/main', '-c', 'tests/native/rcpdm_feedback_codegen.c',
+        '-o', "$taskBuild/feedback-codegen.o") "$taskBuild/codegen-build.log"
+    Invoke-TaskBuildTool "$taskCompiler/xtensa-lx106-elf-nm.exe" @('-u', "$taskBuild/feedback-codegen.o") "$taskBuild/codegen-undefined.txt"
+    Invoke-TaskBuildTool "$taskCompiler/xtensa-lx106-elf-objdump.exe" @('-d', "$taskBuild/feedback-codegen.o") "$taskBuild/feedback-disassembly.txt"
+    Invoke-TaskBuildTool "$taskCompiler/xtensa-lx106-elf-size.exe" @('-A', "$taskBuild/yoradio_esp8266_helix_native.elf") "$taskBuild/sections.txt"
     New-Item -ItemType Directory -Path $taskArtifact -Force | Out-Null
     Copy-Item "$taskBuild/yoradio_esp8266_helix_native.bin" "$taskArtifact/app.bin"
     $taskManifest = [ordered]@{
