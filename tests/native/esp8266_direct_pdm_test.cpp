@@ -8,6 +8,7 @@
 #include "nodac_buffer_state.h"
 #include "AudioNormalizer.h"
 #include "rc_pdm.h"
+#include "rcpdm_variants.h"
 #include "persistent_settings.h"
 #if defined(_MSC_VER)
 #define __attribute__(x)
@@ -267,6 +268,24 @@ static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned c
         if(start % 3 == 0) eof(); // independent interrupt schedule
     }
     out.pdm = committed;
+#if TEST_RCPDM
+    // Independent frozen modulator checks every actual DMA word, not just
+    // one optimized rendering against another chunk size of the same code.
+    rc_pdm_t reference = {0x80000000U};
+    uint32_t phase = 0;
+    size_t position = 0;
+    for (unsigned frame = 0; frame < frames; ++frame) {
+        int32_t mono = out.pcm[frame * channels];
+        if (channels == 2) mono = (mono + out.pcm[frame * 2 + 1]) / 2;
+        phase += 48000U;
+        while (phase >= rate) {
+            assert(position < out.pdm.size());
+            assert(out.pdm[position++] == rc_candidate_original(&reference, static_cast<int16_t>(mono)));
+            phase -= rate;
+        }
+    }
+    assert(position == out.pdm.size() && s_rcpdm.rc == reference.rc);
+#endif
     assert(out.pdm.size() == static_cast<size_t>(frames) * 48000U / rate * (BOARD_I2S_PDM_OVERSAMPLE / 32U));
     native_audio_output_silence();
     assert(s_reserved_words == 0 && s_current_buffer == nullptr);

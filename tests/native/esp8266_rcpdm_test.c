@@ -4,6 +4,20 @@
 #include <stdio.h>
 
 #include "rc_pdm.h"
+#include "rcpdm_variants.h"
+
+static void check_candidates(uint32_t seed, int16_t pcm, uint32_t word, uint32_t state) {
+    uint32_t (*const candidates[])(rc_pdm_t *, int16_t) = {
+        rc_candidate_original, rc_candidate_limit, rc_candidate_unroll4,
+        rc_candidate_unroll8, rc_candidate_unroll32, rc_candidate_mask8,
+        rc_candidate_branchless8
+    };
+    for (unsigned i = 0; i < sizeof(candidates) / sizeof(candidates[0]); ++i) {
+        rc_pdm_t actual = {seed};
+        assert(candidates[i](&actual, pcm) == word);
+        assert(actual.rc == state);
+    }
+}
 
 /* Deliberately independent, wider reference: calculate both candidates as
  * in the supplied RC description, not the production constant-step shortcut. */
@@ -45,6 +59,7 @@ int main(void) {
             uint32_t expected = reference_sample(&reference, (int16_t)pcm);
             assert(rc_pdm_sample(&actual, (int16_t)pcm) == expected);
             assert(actual.rc == reference);
+            check_candidates(seeds[i], (int16_t)pcm, expected, reference);
         }
     }
 
@@ -54,9 +69,11 @@ int main(void) {
     uint32_t rng = 1;
     for (unsigned i = 0; i < 100000; ++i) {
         int16_t pcm = (int16_t)((int32_t)(random_word(&rng) & 65535U) - 32768);
+        uint32_t before = reference;
         uint32_t expected = reference_sample(&reference, pcm);
         assert(rc_pdm_sample(&actual, pcm) == expected);
         assert(actual.rc == reference);
+        check_candidates(before, pcm, expected, reference);
     }
 
     /* Continuous zero must match the neutral DMA word, including across

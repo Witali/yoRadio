@@ -52,6 +52,7 @@ static uint32_t s_write_invalid;
 
 #if YORADIO_ESP8266_OUTPUT_COMPARE
 extern uint32_t native_audio_output_benchmark_pack32(const int16_t *, size_t, unsigned);
+extern bool native_audio_output_benchmark_verify(void);
 #endif
 
 static int64_t benchmark_time_us(void) {
@@ -184,6 +185,7 @@ void audio_output_benchmark_run(void) {
     }
 #endif
 #if YORADIO_ESP8266_OUTPUT_COMPARE && !YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+    if (!native_audio_output_benchmark_verify()) return;
     generate_pcm();
     for (unsigned round = 0; round < 3; ++round) {
         int64_t started = benchmark_time_us();

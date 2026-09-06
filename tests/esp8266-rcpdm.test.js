@@ -22,6 +22,9 @@ test('I2S RCPDM is a separate opt-in profile, not a new board default', () => {
   assert.match(profile, /CONFIG_ESPTOOLPY_FLASHFREQ_40M=y/);
   assert.match(read('Kconfig.projbuild'), /config YORADIO_AUDIO_OUTPUT_I2S_RCPDM\s+bool "I2S RCPDM/);
   assert.match(read('app_main.c'), /I2S RCPDM DMA GPIO/);
+  assert.match(read('CMakeLists.txt'), /RCPDM_VARIANT "production" CACHE STRING/);
+  assert.match(read('CMakeLists.txt'), /RCPDM candidates require the isolated RCPDM output comparison/);
+  assert.match(read('native_audio_output.c'), /want != got \|\| expected\.rc != s_rcpdm\.rc/);
 });
 
 test('RCPDM32 reuses the production carrier, sample pacing and DMA ring', () => {

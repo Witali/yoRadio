@@ -26,6 +26,9 @@
 #include "persistent_settings.h"
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
 #include "rc_pdm.h"
+#if YORADIO_ESP8266_OUTPUT_COMPARE
+#include "rcpdm_variants.h"
+#endif
 _Static_assert(BOARD_I2S_PDM_OVERSAMPLE == RC_PDM_BITS_PER_SAMPLE,
                "I2S RCPDM requires exactly 32 bits per output PCM sample");
 #endif
@@ -601,7 +604,11 @@ static esp_err_t i2s_pdm_push_word(i2s_pdm_writer_t *writer, uint32_t word) {
 static uint32_t __attribute__((noinline))
 i2s_pdm_pack32(int16_t sample) {
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+#ifdef RCPDM_TEST_SAMPLE
+    return RCPDM_TEST_SAMPLE(&s_rcpdm, sample);
+#else
     return rc_pdm_sample(&s_rcpdm, sample);
+#endif
 #else
     const uint32_t target = (uint32_t)((int32_t)sample - INT16_MIN);
     uint32_t integrator = s_pdm_integrator;
@@ -625,6 +632,43 @@ i2s_pdm_pack32(int16_t sample) {
 #endif
 }
 #if YORADIO_ESP8266_OUTPUT_COMPARE
+bool native_audio_output_benchmark_verify(void) {
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+    const uint32_t seeds[] = {0, 1, 15, 0x80000000U, UINT32_MAX - 15U, UINT32_MAX};
+    uint32_t saved = s_rcpdm.rc;
+    unsigned cases = 0;
+    rc_pdm_t expected;
+    for (unsigned s = 0; s < sizeof(seeds) / sizeof(seeds[0]); ++s) {
+        for (int32_t pcm = INT16_MIN; pcm <= INT16_MAX; ++pcm) {
+            s_rcpdm.rc = expected.rc = seeds[s];
+            uint32_t want = rc_candidate_original(&expected, (int16_t)pcm);
+            uint32_t got = i2s_pdm_pack32((int16_t)pcm);
+            if (want != got || expected.rc != s_rcpdm.rc) goto mismatch;
+            if (!(++cases & 1023U)) vTaskDelay(1);
+        }
+    }
+    s_rcpdm.rc = expected.rc = 0x80000000U;
+    uint32_t random = 1;
+    for (unsigned i = 0; i < 100000; ++i) {
+        random = random * 1664525U + 1013904223U;
+        int16_t pcm = (int16_t)((int32_t)(random & 65535U) - 32768);
+        uint32_t want = rc_candidate_original(&expected, pcm);
+        uint32_t got = i2s_pdm_pack32(pcm);
+        if (want != got || expected.rc != s_rcpdm.rc) goto mismatch;
+        if (!(++cases & 1023U)) vTaskDelay(1);
+    }
+    s_rcpdm.rc = saved;
+    ESP_LOGI(TAG, "RCPDM bit-exact PASS: %u words and states", cases);
+    return true;
+mismatch:
+    ESP_LOGE(TAG, "RCPDM bit-exact FAIL after %u words", cases);
+    s_rcpdm.rc = saved;
+    return false;
+#else
+    return true;
+#endif
+}
+
 /* Diagnostic only: actual production packer, before I2S/DMA is initialized.
  * Count includes the common loop/checksum overhead; no writes or allocation. */
 uint32_t native_audio_output_benchmark_pack32(const int16_t *pcm,
