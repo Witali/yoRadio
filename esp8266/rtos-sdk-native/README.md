@@ -67,6 +67,8 @@ An independent experimental **I2S RCPDM** output is available with
 It predicts an RC filter with alpha=1/16 and emits exactly 32 bits per 48-kHz
 output PCM sample through the existing GPIO3 DMA backend. It does not replace
 the default delta-sigma I2S PDM. See [RCPDM configuration and filter](../../docs/ESP8266_I2S_RCPDM.md).
+For the algorithms, Simple variants, output bitrates, quality trade-offs and
+measured CPU cost, see the [RC-PDM versus PDM overview](../../docs/RC_PDM_OVERVIEW.md).
 
 The tracked `sdkconfig.defaults` is the authoritative default for this board.
 It explicitly selects QIO 40 MHz flash, a 160 MHz CPU, Helix MP3 SSO, Helix
