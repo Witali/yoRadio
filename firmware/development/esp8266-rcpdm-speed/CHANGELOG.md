@@ -1,5 +1,27 @@
 # 2026-09-06 — Bit-exact RCPDM speed experiments
 
+## Simple32 LX106 assembly, four bits per iteration
+
+`simple-simple-unroll4-u1` and `simple-simple-unroll4-u4`: isolated output
+diagnostics, CPU160/QIO40, 48-kHz PCM, alpha=1/16, 32 bits/sample, GPIO3,
+2x512 DMA words. No Wi-Fi, WebUI or codecs; not ordinary radio.
+
+- u1: 129360 bytes, SHA256
+  `3E7C7B40642FEF1C966C19825578E32AC18F946E92187745C1DD26A1FDB4134F`.
+- u4: 129632 bytes, SHA256
+  `1FEF79B7F59C64FFC1629D5581969183687313B7EDA5B09506D13CE3FF6422DB`.
+- Physical ABBA: pack 48000 samples 107175 -> 78283 us (-26.96%).
+- Producer excluding DMA wait 119845 -> 90957 us/audio-second (-24.10%);
+  this is not total CPU utilization. No change in bitstream, RAM or stack.
+- Scalar/batch flash sizes 45/175 -> 93/271 bytes; total image +272 bytes.
+- Per boot: 493216 scalar, 2144 batch, 1980 dispatch checks PASS; DMA errors
+  zero. All 23 host tests passed, all 72 archived C bitstreams unchanged.
+
+Implementation `9b654eb`, built as a working change over `8c2d325`.
+`-SimpleUnroll4` selects the candidate; u1 and portable C remain available.
+Exact original native PDM32 app0 restored; DHCP and HTTP 200 verified.
+[Report](../../../docs/benchmarks/esp8266-rcpdm-simple-unroll4-2026-09-06/README.md).
+
 ## Simple32 Xtensa LX106 assembly with portable C fallback
 
 `production-simple-lx106-asm` and `simple-simple-lx106-asm`: CPU160/QIO40,
