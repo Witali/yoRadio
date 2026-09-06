@@ -2,8 +2,8 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const {execute}=require('./run_rcpdm_radio');
 const {summarize}=require('./summarize_rcpdm_simple_board');
 const root=path.resolve(__dirname,'../..');
-const source=path.join(root,'.build/rcpdm-simple-board/runs');
-const target=path.join(root,'docs/benchmarks/esp8266-rcpdm-simple-board-2026-09-06');
+const source=path.resolve(process.argv[2]||path.join(root,'.build/rcpdm-simple-board/runs'));
+const target=path.resolve(process.argv[3]||path.join(root,'docs/benchmarks/esp8266-rcpdm-simple-board-2026-09-06'));
 const sha=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const record=JSON.parse(fs.readFileSync(path.join(source,'run-manifest.json'),'utf8'));
 assert.equal(record.restored,true); assert.equal(record.restore_boot_verified,true);
@@ -21,7 +21,7 @@ for(const file of ['esp8266/rtos-sdk-native/main/native_audio_output.c',
 for(const mode of ['production','simple']) {
   const image=record.images[mode]; assert.equal(sha(image.binary),image.sha256);
   results.images[mode]={file:path.relative(root,image.binary).replaceAll('\\','/'),bytes:image.bytes,sha256:image.sha256};
-  const build=path.join(root,`.build/rcpdm-speed-results/${mode}-simple-board`);
+  const build=path.join(root,'.build/rcpdm-speed-results',path.basename(path.dirname(image.binary)));
   const sections=fs.readFileSync(path.join(build,'sections.txt'),'utf8');
   results.static_memory[mode]=Object.fromEntries([...sections.matchAll(/^(\.(?:iram0|dram0|flash)\.\w+)\s+(\d+)\s+\d+/gm)].map(m=>[m[1],Number(m[2])]));
   fs.copyFileSync(path.join(build,'build.log'),path.join(target,`${mode}-build.log`));
@@ -32,7 +32,7 @@ for(const mode of ['production','simple']) {
     const fragment=asm.match(new RegExp(`^[0-9a-f]+ <${symbol}>:[\\s\\S]*?(?=^[0-9a-f]+ <|$(?![\\s\\S]))`,'m'));
     assert.ok(fragment,`Missing ${symbol}`); relevant.push(fragment[0]);
   }
-  fs.writeFileSync(path.join(target,`${mode}-packers.asm`),relevant.join('\n'));
+  fs.writeFileSync(path.join(target,`${mode}-packers.asm`),relevant.join('\n').trimEnd()+'\n');
   fs.copyFileSync(path.join(path.dirname(image.binary),'manifest.json'),path.join(target,`${mode}-image.json`));
 }
 fs.copyFileSync(path.join(root,'.build/rcpdm-speed/sdkconfig'),path.join(target,'sdkconfig'));

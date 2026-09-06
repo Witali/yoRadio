@@ -1,5 +1,29 @@
 # 2026-09-06 — Bit-exact RCPDM speed experiments
 
+## Additional Simple32 board experiment
+
+`production-simple-board` and `simple-simple-board` are isolated diagnostic
+images (no Wi-Fi, WebUI or codecs), not ordinary radio. CPU160/QIO40,
+alpha=1/16, 32 bits/sample, GPIO3, 2x512 DMA words, batch output enabled.
+Both were flashed twice in ABBA order. Each boot passed 493216 scalar
+word/state checks and 2144 mono/stereo batch words, with no DMA underruns.
+
+- Predictive: 128592 bytes; SHA256
+  `56E5400944BF13BDBEB706C8CAAFB55344115B1194314B2AEC3D101F0562BDDC`.
+- Simple: 128864 bytes; SHA256
+  `D119E53B96017DE969DBE587B4E0B27DF3C7526C52A7EF418ECF6349EA3BE34C`.
+- Pack 48000 words: 112275 vs 170046 us (Simple +51.45%).
+- Output excluding DMA wait: 122843 vs 182385 us/audio-second (+48.47%).
+- Identical free/min heap 108532/105752 B in the isolated images.
+
+Simple changes the algorithm: its independent direct-comparator reference
+is used instead of the predictive reference. No quality/SNR claim is made
+from digital timing. Default firmware unchanged; exact previous app0 was
+restored from a private backup and its native-radio boot/DHCP verified.
+See [physical results](../../../docs/benchmarks/esp8266-rcpdm-simple-board-2026-09-06/README.md).
+
+## Previous predictive optimizations
+
 CPU160/QIO40, GPIO3, alpha=1/16, nominal 1.536 MHz, 32 bits/sample,
 two 512-word DMA buffers. Board default remains ordinary I2S PDM32.
 
