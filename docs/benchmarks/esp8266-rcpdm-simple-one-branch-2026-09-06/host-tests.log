@@ -1,0 +1,134 @@
+TAP version 13
+# Subtest: ESP8266 output benchmark generates deterministic PCM without Wi-Fi or codecs
+ok 1 - ESP8266 output benchmark generates deterministic PCM without Wi-Fi or codecs
+  ---
+  duration_ms: 1.2971
+  type: 'test'
+  ...
+# Subtest: ESP8266 output benchmark reports queue wait, CPU idle, and heap
+ok 2 - ESP8266 output benchmark reports queue wait, CPU idle, and heap
+  ---
+  duration_ms: 0.3741
+  type: 'test'
+  ...
+# Subtest: ESP8266 gated tone profile emits an exact full-scale 1 kHz sine
+ok 3 - ESP8266 gated tone profile emits an exact full-scale 1 kHz sine
+  ---
+  duration_ms: 1.3582
+  type: 'test'
+  ...
+# Subtest: PDM comparison measures the actual packer before DMA without persisting test settings
+ok 4 - PDM comparison measures the actual packer before DMA without persisting test settings
+  ---
+  duration_ms: 0.6904
+  type: 'test'
+  ...
+# Subtest: production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+ok 5 - production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+  ---
+  duration_ms: 11786.8833
+  type: 'test'
+  ...
+# PDM32: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_SIMPLE: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM128: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# Subtest: ESP8266 production audio defaults to I2S DMA PDM
+ok 6 - ESP8266 production audio defaults to I2S DMA PDM
+  ---
+  duration_ms: 1.6625
+  type: 'test'
+  ...
+# Subtest: ESP8266 keeps mutable sdkconfig inside each build directory
+ok 7 - ESP8266 keeps mutable sdkconfig inside each build directory
+  ---
+  duration_ms: 0.1846
+  type: 'test'
+  ...
+# Subtest: I2S PDM submits only complete finite DMA buffers with neutral underrun fallback
+ok 8 - I2S PDM submits only complete finite DMA buffers with neutral underrun fallback
+  ---
+  duration_ms: 1.0595
+  type: 'test'
+  ...
+# Subtest: I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier
+ok 9 - I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier
+  ---
+  duration_ms: 0.344
+  type: 'test'
+  ...
+# Subtest: optimized branchless PDM32 packer is bit-exact
+ok 10 - optimized branchless PDM32 packer is bit-exact
+  ---
+  duration_ms: 0.621
+  type: 'test'
+  ...
+# Subtest: I2S PDM drives its clocks like ESP8266Audio and ignores UART RX input
+ok 11 - I2S PDM drives its clocks like ESP8266Audio and ignores UART RX input
+  ---
+  duration_ms: 5.1366
+  type: 'test'
+  ...
+# Subtest: I2S DMA is installed before Wi-Fi starts and then emits neutral PDM
+ok 12 - I2S DMA is installed before Wi-Fi starts and then emits neutral PDM
+  ---
+  duration_ms: 0.266
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio trace follows decoder PCM into the physical PDM DMA buffer
+ok 13 - ESP8266 audio trace follows decoder PCM into the physical PDM DMA buffer
+  ---
+  duration_ms: 0.3555
+  type: 'test'
+  ...
+# Subtest: board runner validates SDK OTA CRC and refuses to overwrite an inactive app0
+ok 14 - board runner validates SDK OTA CRC and refuses to overwrite an inactive app0
+  ---
+  duration_ms: 9.3569
+  type: 'test'
+  ...
+# Subtest: board result parser rejects missing proof, incomplete tests and DMA underruns
+ok 15 - board result parser rejects missing proof, incomplete tests and DMA underruns
+  ---
+  duration_ms: 6.7836
+  type: 'test'
+  ...
+# Subtest: RCPDM simple compares current state before update and preserves block continuity
+ok 16 - RCPDM simple compares current state before update and preserves block continuity
+  ---
+  duration_ms: 5699.3142
+  type: 'test'
+  ...
+# Subtest: Simple remains restricted to the isolated benchmark and uses its own reference
+ok 17 - Simple remains restricted to the isolated benchmark and uses its own reference
+  ---
+  duration_ms: 0.5113
+  type: 'test'
+  ...
+# Subtest: I2S RCPDM is a separate opt-in profile, not a new board default
+ok 18 - I2S RCPDM is a separate opt-in profile, not a new board default
+  ---
+  duration_ms: 2.0224
+  type: 'test'
+  ...
+# Subtest: RCPDM32 reuses the production carrier, sample pacing and DMA ring
+ok 19 - RCPDM32 reuses the production carrier, sample pacing and DMA ring
+  ---
+  duration_ms: 1.9117
+  type: 'test'
+  ...
+# Subtest: RCPDM32 C implementation matches the independent full-range RC reference
+ok 20 - RCPDM32 C implementation matches the independent full-range RC reference
+  ---
+  duration_ms: 2282.4978
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11865.1414

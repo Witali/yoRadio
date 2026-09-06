@@ -1,5 +1,27 @@
 # 2026-09-06 — Bit-exact RCPDM speed experiments
 
+## Simple32 rewritten with one bit-selection branch
+
+`production-simple-one-branch` and `simple-simple-one-branch` repeat the ABBA
+diagnostic comparison after removing Simple's intermediate `high` and its
+extra GCC branch. No predictive threshold is added back. Same CPU160/QIO40,
+32 bits/sample, alpha=1/16, GPIO3, 2x512 DMA words and batch path.
+
+- Predictive: 128592 bytes, SHA256
+  `D5E4B9180F4763C31D9A81EAE2C819E095B389C2CB73F666822536DF1709C0E9`.
+- Simple: 128832 bytes, SHA256
+  `D695322CC81AC1277F9EB1766461F70FF5A7A6DB00A9DD3899B771724F9322A8`.
+- Pack 48000 words: Simple 170046 -> 126617 us (-25.54%); predictive 112275 us.
+- Producer excluding DMA wait: Simple 182385 -> 130634 us/audio-second;
+  predictive 122843 us/audio-second. These are not total CPU utilization.
+- All 72 archived bitstreams unchanged; 20 host tests and physical scalar,
+  batch, stall and DMA checks passed. No extra RAM.
+
+Source change `67f3ec2`, built as a working change over `c950d19`.
+These images are diagnostics without Wi-Fi/WebUI/codecs. The exact original
+native PDM32 radio was restored; boot, DHCP and HTTP 200 verified. No default
+profile change. [Report](../../../docs/benchmarks/esp8266-rcpdm-simple-one-branch-2026-09-06/README.md).
+
 ## Additional Simple32 board experiment
 
 `production-simple-board` and `simple-simple-board` are isolated diagnostic
