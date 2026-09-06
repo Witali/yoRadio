@@ -1,12 +1,22 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const median=values=>{const a=[...values].sort((x,y)=>x-y),i=Math.floor(a.length/2);return a.length%2?a[i]:(a[i-1]+a[i])/2;};
 function parseRun(text,mode) {
-  assert.ok(['production','simple','simple-u1','simple-u4'].includes(mode));
+  assert.ok(['pdm','feedback','production','simple','simple-u1','simple-u4'].includes(mode));
   assert.match(text,/audio_output_bench: complete/); assert.match(text,/stalled producer.*PASS/);
   assert.doesNotMatch(text,/invalid=[1-9]|PCM write failed|bit-exact FAIL|stalled producer.*FAIL/);
   const label=mode==='production'?'RCPDM':'RCPDM-Simple';
-  assert.ok(text.includes(`${label} bit-exact PASS: 493216 words and states`));
-  assert.ok(text.includes(`${label} batch bit-exact PASS: 2144 words`));
+  if(mode==='feedback') {
+    assert.ok(text.includes('RCPDM feedback bit/state PASS: 65536 frames'));
+    assert.ok(text.includes('RCPDM feedback batch PASS: 2144 words'));
+    assert.ok(text.includes('RC-PDM feedback: unity error, interpolation, TPDF dither; state=16 bytes'));
+    assert.doesNotMatch(text,/RCPDM feedback.*FAIL/);
+  } else if(mode==='pdm') {
+    assert.match(text,/I2S-PDM DMA: mono GPIO3\/RX, carrier 1538461 Hz, PDM32 x1 effective 1536000 Hz, nominal carrier 1536000 Hz/);
+    assert.doesNotMatch(text,/RCPDM|RC-PDM feedback/);
+  } else {
+    assert.ok(text.includes(`${label} bit-exact PASS: 493216 words and states`));
+    assert.ok(text.includes(`${label} batch bit-exact PASS: 2144 words`));
+  }
   if(mode==='simple-u1' || mode==='simple-u4') {
     assert.ok(text.includes('RCPDM-Simple backend: Xtensa LX106 asm'));
     assert.ok(text.includes(`RCPDM-Simple asm group bits: ${mode==='simple-u4'?4:1}`));

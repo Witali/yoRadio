@@ -41,6 +41,45 @@ test('board result parser rejects missing proof, incomplete tests and DMA underr
     log.replace('audio_output_bench: complete',''),log.replace('493216','493215')]) assert.throws(()=>parseRun(bad,'simple'));
 });
 
+test('feedback comparison requires the new scalar and batch proofs and exact PDM32 identity',()=>{
+  const base=simpleLog().split('\n').filter(line=>!line.startsWith('RCPDM-Simple')).join('\n');
+  const feedback='RCPDM feedback bit/state PASS: 65536 frames\nRCPDM feedback batch PASS: 2144 words\n'+
+    'RC-PDM feedback: unity error, interpolation, TPDF dither; state=16 bytes\n'+base;
+  const pdm='I2S-PDM DMA: mono GPIO3/RX, carrier 1538461 Hz, PDM32 x1 effective 1536000 Hz, nominal carrier 1536000 Hz\n'+base;
+  assert.equal(parseRun(feedback,'feedback').underruns,0);
+  assert.equal(parseRun(pdm,'pdm').underruns,0);
+  assert.throws(()=>parseRun(feedback,'pdm'));
+  assert.throws(()=>parseRun(pdm,'feedback'));
+  assert.throws(()=>parseRun(pdm.replace('PDM32','PDM128'),'pdm'));
+  assert.throws(()=>parseRun(pdm.replace('carrier 1538461','carrier 1536000'),'pdm'));
+  for(const broken of [feedback.replace('65536','65535'),feedback.replace('2144','2143'),
+    feedback.replace('fifo_empty=0','fifo_empty=1'),feedback+'\nRCPDM feedback batch FAIL'])
+    assert.throws(()=>parseRun(broken,'feedback'));
+});
+
+test('four-way summary requires two runs per mode and compares speed, not different algorithms checksums',t=>{
+  const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+  const {MODES,summarize:summary4}=require('../tools/esp8266_audio_profile/summarize_rcpdm_feedback_board');
+  const parent=path.resolve(os.tmpdir()),dir=fs.mkdtempSync(path.join(parent,'feedback-speed-summary-'));
+  t.after(()=>{assert.equal(path.dirname(path.resolve(dir)),parent);fs.rmSync(dir,{recursive:true,force:true});});
+  const base=simpleLog().split('\n').filter(line=>!line.startsWith('RCPDM-Simple')).join('\n');
+  const proofs={pdm:'I2S-PDM DMA: mono GPIO3/RX, carrier 1538461 Hz, PDM32 x1 effective 1536000 Hz, nominal carrier 1536000 Hz\n',
+    production:'RCPDM bit-exact PASS: 493216 words and states\nRCPDM batch bit-exact PASS: 2144 words\n',
+    'simple-u4':'RCPDM-Simple bit-exact PASS: 493216 words and states\nRCPDM-Simple batch bit-exact PASS: 2144 words\n'+
+      'RCPDM-Simple backend: Xtensa LX106 asm\nRCPDM-Simple asm group bits: 4\nRCPDM-Simple dispatch PASS: 1980 cases\n',
+    feedback:'RCPDM feedback bit/state PASS: 65536 frames\nRCPDM feedback batch PASS: 2144 words\n'+
+      'RC-PDM feedback: unity error, interpolation, TPDF dither; state=16 bytes\n'};
+  for(const mode of MODES) for(const round of [1,2]) {
+    const log=proofs[mode]+base.replaceAll('elapsed=100000',`elapsed=${mode==='feedback'?300000:100000}`)
+      .replaceAll('checksum=12345678',`checksum=${mode==='feedback'?'abcdef12':'12345678'}`);
+    fs.writeFileSync(path.join(dir,`round-${round}-${mode}-uart.log`),log);
+  }
+  assert.equal(summary4(dir).summary.feedback.pack_change_vs_production_percent,200);
+  const file=path.join(dir,'round-2-feedback-uart.log');
+  fs.writeFileSync(file,fs.readFileSync(file,'utf8').replaceAll('abcdef12','ffffffff'));
+  assert.throws(()=>summary4(dir),/Checksum changed/);
+});
+
 test('unroll comparison requires actual LX106 backend, group width and expanded dispatch proof',()=>{
   for(const bits of [1,4]) {
     const mode=`simple-u${bits}`,other=`simple-u${bits===1?4:1}`;

@@ -29,7 +29,8 @@ static inline void rc_feedback_reference_frame(rc_pdm_feedback_t *p, int16_t pcm
         const bool high=desired+feedback+noise>down+(up-down)/2;
         state=high?up:down;
         error+=desired-state;
-        if(error>bound)error=bound;if(error< -bound)error= -bound;
+        if(error>bound)error=bound;
+        if(error< -bound)error= -bound;
         word=(word<<1)|(unsigned)high;
         if((bit+1)%32==0||bit+1==bits){out[pos++]=word;word=0;}
     }

@@ -677,8 +677,35 @@ bool native_audio_output_benchmark_verify(void) {
             memcmp(&expected, &s_rcpdm, sizeof(expected))) { ok = false; break; }
         if (!((uint32_t)pcm & 1023U)) vTaskDelay(1);
     }
+    unsigned batch_words = 0;
+#if !RCPDM_DISABLE_BATCH
+    int16_t pcm_batch[34];
+    uint32_t words[17], random = 1;
+    for (unsigned channels = 1; ok && channels <= 2; ++channels) {
+        rc_pdm_feedback_init(&s_rcpdm, RC_FB_DEFAULT_SEED);
+        expected = s_rcpdm;
+        for (unsigned block = 0; ok && block < 128; ++block) {
+            for (unsigned i = 0; i < 34; ++i) {
+                random = random * 1664525U + 1013904223U;
+                pcm_batch[i] = (int16_t)(random >> 16);
+            }
+            size_t count = block % 18U;
+            i2s_rcpdm_fill(words, pcm_batch, count, channels);
+            for (size_t i = 0; i < count; ++i) {
+                int32_t mono = pcm_batch[i * channels];
+                if (channels == 2) mono = (mono + pcm_batch[i * channels + 1]) / 2;
+                if (words[i] != rc_feedback_reference_sample(&expected, (int16_t)mono)) ok = false;
+                ++batch_words;
+            }
+            if (memcmp(&expected, &s_rcpdm, sizeof(expected))) ok = false;
+        }
+    }
+#endif
     s_rcpdm = saved;
-    if (ok) ESP_LOGI(TAG, "RCPDM feedback bit/state PASS: 65536 frames");
+    if (ok) {
+        ESP_LOGI(TAG, "RCPDM feedback bit/state PASS: 65536 frames");
+        ESP_LOGI(TAG, "RCPDM feedback batch PASS: %u words", batch_words);
+    }
     else ESP_LOGE(TAG, "RCPDM feedback bit/state FAIL");
     return ok;
 #elif CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
