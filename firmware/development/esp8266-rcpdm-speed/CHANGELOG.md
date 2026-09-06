@@ -1,5 +1,29 @@
 # 2026-09-06 — Bit-exact RCPDM speed experiments
 
+## Literal Simple32 charge/discharge loop
+
+`production-simple-literal` and `simple-simple-literal` are isolated images
+built from the Simple change `7dfc1af`. The readable `UINT32_MAX - state`
+expression is retained; GCC already compiles it as bitwise inversion.
+Same CPU160/QIO40, 48-kHz PCM, alpha=1/16, 32 bits/sample, GPIO3 and 2x512
+DMA words. No Wi-Fi, WebUI or codecs in these diagnostic binaries.
+
+- Predictive: 128592 bytes, SHA256
+  `3F6FC789721E1EE7EA8E1A83ADCCD59198F514C248410FF9EA450C7997B550C3`.
+- Literal Simple: 128816 bytes, SHA256
+  `E8BBBE57E4C92894BC7C9BE3099452EDFF70769B477EC5C4CF7246412950791C`.
+- Physical ABBA: pack 48000 words 112275 vs 139047 us (+23.85% for Simple).
+- Producer excluding DMA wait: 122843 vs 155637 us/audio-second (+26.70%).
+  This is not total CPU utilization. Previous one-branch Simple: 126617 /
+  130634 us respectively; the literal source loop does not improve speed.
+- Scalar/batch exactness, stalled-producer and DMA checks passed at each
+  boot. All 72 archived bitstreams unchanged and 20 host tests passed.
+- Free/min heap identical at 108532/105752 B in these isolated images.
+
+The exact original native I2S-PDM32 app0 was restored from a fresh private
+backup. Boot, DHCP and HTTP 200 verified. No default-profile or algorithm
+change during testing. [Report](../../../docs/benchmarks/esp8266-rcpdm-simple-literal-2026-09-06/README.md).
+
 ## Simple32 rewritten with one bit-selection branch
 
 `production-simple-one-branch` and `simple-simple-one-branch` repeat the ABBA
