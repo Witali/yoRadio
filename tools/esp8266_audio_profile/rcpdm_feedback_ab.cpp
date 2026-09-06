@@ -15,7 +15,7 @@ static void check(bool ok,const char *why) {if(!ok)throw std::runtime_error(why)
 static bool same(const rc_pdm_feedback_t &a,const rc_pdm_feedback_t &b) {
     return a.rc==b.rc&&a.error==b.error&&a.previous==b.previous&&a.random==b.random;
 }
-static uint32_t literal(rc_pdm_feedback_t &s,int16_t pcm,bool enabled) {
+static uint32_t literal(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool simple=false) {
     const int64_t full=INT64_C(1)<<29,limit=INT64_C(1)<<30,step=full/16;
     const int64_t previous=s.previous,target=(int64_t(pcm)+32768)*8192;
     int64_t voltage=s.rc,error=enabled?s.error:0;
@@ -27,7 +27,7 @@ static uint32_t literal(rc_pdm_feedback_t &s,int16_t pcm,bool enabled) {
         s.random=uint32_t(r);
         const int64_t noise=(int64_t(r%65536)+int64_t(r/65536)-65535)*256;
         const int64_t down=voltage-voltage/16;
-        const bool high=desired+(enabled?error:0)+noise>down+step/2;
+        const bool high=desired+(enabled?error:0)+noise>(simple?voltage:down+step/2);
         voltage=down+(high?step:0);
         if(enabled)error=std::max(-limit,std::min(limit,error+desired-voltage));
         word=(word<<1)|unsigned(high);
@@ -35,9 +35,36 @@ static uint32_t literal(rc_pdm_feedback_t &s,int16_t pcm,bool enabled) {
     s.rc=int32_t(voltage);s.previous=int32_t(target);s.error=int32_t(error);
     return word;
 }
+// Same scale/interpolation/dither/RC recurrence as Feedback32, but compare
+// the CURRENT voltage, not the midpoint of the predicted next voltages.
+// This is a new offline Simple ablation, NOT the old no-dither ASM backend.
+static uint32_t simple32(rc_pdm_feedback_t &s,int16_t pcm,bool enabled) {
+    const int32_t target=(int32_t(pcm)+32768)*8192;
+    const int32_t increment=(target-s.previous)/32;
+    int32_t desired=s.previous;
+    if(!enabled)s.error=0;
+    uint32_t word=0;
+    for(unsigned bit=0;bit<32;++bit) {
+        desired+=increment;
+        const uint32_t r=rc_fb_random(&s);
+        const int32_t noise=(int32_t(r&65535U)+int32_t(r>>16)-65535)*256;
+        const bool high=desired+s.error+noise>s.rc; // Decide before decay.
+        s.rc-=s.rc>>4;
+        if(high)s.rc+=RC_FB_FULL/16;
+        if(enabled) {
+            const int32_t error=s.error+desired-s.rc;
+            s.error=std::max(-RC_FB_ERROR_LIMIT,std::min(RC_FB_ERROR_LIMIT,error));
+        }
+        word=(word<<1)|unsigned(high);
+    }
+    s.previous=target;
+    return word;
+}
 static void self_test() {
     rc_pdm_feedback_t prod,model,frozen,off;
     rc_pdm_feedback_init(&prod,0);model=frozen=off=prod;
+    auto simpleOn=prod,simpleOff=prod,simpleModelOn=prod,simpleModelOff=prod;
+    unsigned simpleChanged=0;
     uint32_t random=8266;unsigned count=0,changed=0;
     auto one=[&](int16_t pcm) {
         const uint32_t got=rc_pdm_feedback_sample(&prod,pcm);
@@ -47,19 +74,38 @@ static void self_test() {
         const uint32_t without=literal(off,pcm,false);
         check(without==literal(ignored,pcm,false)&&same(off,ignored),"off depends on feedback state");
         check(off.error==0&&off.random==prod.random&&off.previous==prod.previous,"off changes more than feedback");
+        const uint32_t son=simple32(simpleOn,pcm,true),soff=simple32(simpleOff,pcm,false);
+        check(son==literal(simpleModelOn,pcm,true,true)&&same(simpleOn,simpleModelOn),"Simple on reference");
+        auto ignoredSimple=simpleModelOff;ignoredSimple.error=RC_FB_ERROR_LIMIT;
+        check(soff==literal(simpleModelOff,pcm,false,true)&&same(simpleOff,simpleModelOff),"Simple off reference");
+        check(soff==literal(ignoredSimple,pcm,false,true)&&same(simpleOff,ignoredSimple),"Simple off depends on error");
+        check(simpleOn.random==prod.random&&simpleOff.random==prod.random&&simpleOn.previous==prod.previous&&simpleOff.previous==prod.previous,"Simple changes PRNG/interpolation");
+        simpleChanged+=son!=soff;
         changed+=got!=without;++count;
     };
     for(int pcm=-32768;pcm<=32767;++pcm)one(int16_t(pcm));
     for(unsigned i=0;i<65536;++i){random=random*1664525U+1013904223U;one(int16_t(random>>16));}
     for(int level:{-32768,32767,0,1,-1})for(unsigned i=0;i<2048;++i)one(int16_t(level));
     check(changed>0,"feedback ablation has no effect");
+    check(simpleChanged>0,"Simple feedback ablation has no effect");
+    for(bool enabled:{false,true}) {
+        rc_pdm_feedback_t tie;rc_pdm_feedback_init(&tie,1);
+        auto rng=tie;const uint32_t r=rc_fb_random(&rng);
+        tie.rc+=((int32_t(r&65535U)+int32_t(r>>16))-65535)*256;
+        auto expected=tie;const auto word=simple32(tie,0,enabled);
+        check((word&0x80000000U)==0,"Simple equality must choose zero");
+        check(word==literal(expected,0,enabled,true)&&same(tie,expected),"Simple tie reference");
+    }
     std::cout<<"{\"pass\":true,\"frames\":"<<count<<",\"different_words\":"<<changed
-             <<",\"prng_and_interpolation_identical\":true,\"off_error_ignored\":true}\n";
+             <<",\"simple_reference_frames\":"<<count<<",\"simple_different_words\":"<<simpleChanged
+             <<",\"simple_tie_checks\":2,\"prng_and_interpolation_identical\":true,\"off_error_ignored\":true}\n";
 }
 int main(int argc,char **argv) {
     try {
         if(argc==2&&std::string(argv[1])=="--self-test"){self_test();return 0;}
-        check(argc==4,"usage: rcpdm-feedback-ab PCM output-prefix seed; or --self-test");
+        check(argc==4||argc==5,"usage: rcpdm-feedback-ab PCM output-prefix seed [simple]; or --self-test");
+        const bool simple=argc==5;
+        check(!simple||std::string(argv[4])=="simple","unknown method");
         const uint16_t endian=1;check(*reinterpret_cast<const uint8_t*>(&endian)==1,"LE host required");
         std::ifstream input(argv[1],std::ios::binary|std::ios::ate);check(bool(input),"PCM open failed");
         const auto bytes=input.tellg();check(bytes>0&&uint64_t(bytes)%2==0,"invalid PCM length");
@@ -67,11 +113,13 @@ int main(int argc,char **argv) {
         check(bool(input.read(reinterpret_cast<char*>(pcm.data()),bytes)),"PCM read failed");
         const auto seed=uint32_t(std::stoul(argv[3]));
         rc_pdm_feedback_t on,reference,off;rc_pdm_feedback_init(&on,seed);reference=off=on;
+        auto off32=off;
         std::vector<uint32_t> with(pcm.size()),without(pcm.size());unsigned different=0;
         for(size_t i=0;i<pcm.size();++i) {
-            with[i]=rc_pdm_feedback_sample(&on,pcm[i]);
-            check(with[i]==literal(reference,pcm[i],true)&&same(on,reference),"enabled model/production mismatch");
-            without[i]=literal(off,pcm[i],false);
+            with[i]=simple?simple32(on,pcm[i],true):rc_pdm_feedback_sample(&on,pcm[i]);
+            check(with[i]==literal(reference,pcm[i],true,simple)&&same(on,reference),"enabled reference mismatch");
+            without[i]=literal(off,pcm[i],false,simple);
+            if(simple)check(without[i]==simple32(off32,pcm[i],false)&&same(off,off32),"Simple disabled reference mismatch");
             check(off.random==on.random&&off.previous==on.previous&&off.error==0,"ablation invariants");
             different+=with[i]!=without[i];
         }
@@ -81,6 +129,7 @@ int main(int argc,char **argv) {
         };
         write(".on.bin",with);write(".off.bin",without);
         std::cout<<"{\"frames\":"<<pcm.size()<<",\"different_words\":"<<different
-                 <<",\"on_reference_frames\":"<<pcm.size()<<",\"prng_and_interpolation_identical\":true}\n";
+                 <<",\"on_reference_frames\":"<<pcm.size()<<",\"method\":\""<<(simple?"simple":"predictive")
+                 <<"\",\"prng_and_interpolation_identical\":true}\n";
     } catch(const std::exception &e){std::cerr<<e.what()<<'\n';return 1;}
 }
