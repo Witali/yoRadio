@@ -73,10 +73,14 @@ function main() {
       const label=mode==='simple'?'RCPDM-Simple':'RCPDM';
       assert.ok(log.includes(`${label} bit-exact PASS: 493216 words and states`));
       assert.ok(log.includes(`${label} batch bit-exact PASS: 2144 words`));
+      if(mode==='simple' && process.argv.includes('--expect-simple-asm')) {
+        assert.ok(log.includes('RCPDM-Simple backend: Xtensa LX106 asm'));
+        assert.ok(log.includes('RCPDM-Simple dispatch PASS: 240 cases'));
+      }
       const samples=[...log.matchAll(/pack_only round=(\d+) samples=48000 elapsed=(\d+) us checksum=([0-9a-f]+)/g)];
       assert.equal(samples.length,3); assert.equal(new Set(samples.map(m=>m[3])).size,1);
       record.rounds.push({round,mode,pack_us:samples.map(m=>Number(m[2])),checksum:samples[0][3]}); save();
-      console.log(log.split(/\r?\n/).filter(s=>/bit-exact|audio_output_bench: (pack_only|producer_nonwait|dma |heap |complete)/.test(s)).join('\n'));
+      console.log(log.split(/\r?\n/).filter(s=>/bit-exact|RCPDM-Simple (backend|dispatch)|audio_output_bench: (pack_only|producer_nonwait|dma |heap |complete)/.test(s)).join('\n'));
     }
   } finally {
     console.log('Restoring exact app0 from private backup');

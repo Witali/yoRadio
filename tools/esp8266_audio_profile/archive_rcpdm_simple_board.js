@@ -43,6 +43,7 @@ const flashed=fs.readFileSync(path.join(source,'restore-flash.log'),'utf8');
 assert.match(flashed,/Hash of data verified/);
 fs.writeFileSync(path.join(target,'restore-verified.log'),flashed.split(/\r?\n/).filter(s=>/Wrote |Hash of data verified/.test(s)).join('\n')+'\n');
 const tests=execute(process.execPath,['--test','tests/esp8266-rcpdm-board-runner.test.js',
+  'tests/esp8266-rcpdm-simple-asm.test.js',
   'tests/esp8266-rcpdm-simple.test.js','tests/esp8266-direct-pdm.test.js','tests/esp8266-rcpdm.test.js',
   'tests/esp8266-audio-output-benchmark.test.js','tests/esp8266-i2s-pdm-output.test.js'],{cwd:root});
 fs.writeFileSync(path.join(target,'host-tests.log'),tests.stdout+tests.stderr);
