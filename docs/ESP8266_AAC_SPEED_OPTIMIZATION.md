@@ -22,8 +22,8 @@ Then test real I2S-PDM output for underruns and restore ordinary radio firmware.
 
 ## Checklist
 
-- [ ] Record fresh reference timing, memory and correctness results.
-- [ ] 1. Specialize window/overlap output into block loops: select window
+- [x] Record fresh reference timing, memory and correctness results.
+- [x] 1. Specialize window/overlap output into block loops: select window
   sequence outside the sample loop, walk pointers and remove per-sample calls.
   Preserve clipping/downmix order and update overlap only after consuming it.
 - [ ] 2. Try a flash-only Huffman prefix lookup with the exact canonical
@@ -67,4 +67,25 @@ No blanket loop unrolling, added RAM tables or additional IRAM code is planned.
 
 ## Experiment log
 
-Pending. No acceleration is claimed before measurement.
+### 1 — Window blocks: KEEP
+
+Sequence-specialized channel loops replace per-sample calls. Mono writes the
+clipped left channel then averages the separately clipped right channel into
+the same buffer. This also supports distinct L/R window sequences.
+
+200-frame physical RAM tests, repeated alternating original/candidate images:
+AAC average **18945 -> 17951 us (-5.25%)**, maximum **18970 -> 17960 us**.
+Unchanged MP3 moves **4632 -> 4754 us**, demonstrating code-layout sensitivity:
+these are complete-image timings, not a claim that every improvement is due
+only to instruction count. AAC DRAM/IRAM and free heap are unchanged; benchmark
+task minimum free stack improves **1712 -> 1792 bytes**. Lifecycle heap delta=0.
+Diagnostic image size increases 3904 bytes (277856 -> 281760).
+
+Both exact and experimental SSO window tests pass 1280 state vectors each,
+all block sizes, cancellation boundaries, coefficient immutability and canaries.
+All retained mono/stereo AAC fixtures match the old full-frame window path:
+maximum PCM error=0, SNR=Infinity dB. SSO is still disabled in firmware.
+
+Reproduce alternating saved binaries with
+`tools/esp8266_audio_profile/run_saved_images.ps1`; it writes only app0 and
+uses RTS reset/TX capture without sending UART application bytes.

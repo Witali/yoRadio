@@ -32,10 +32,11 @@ static inline int aac_short_second(const int *coef, const int *window, int n) {
     return MULSHIFT32(window[aac_window_index(127 - n, 128)], coef[63 - i]);
 }
 
-static inline short aac_window_sample(const AACWindowState &w,
+template<int Sequence>
+static inline __attribute__((always_inline)) short aac_window_sample(const AACWindowState &w,
                                       const int *coef, int *overlap, int n) {
     int current = 0, next = 0;
-    if (w.sequence == 2) {
+    if (Sequence == 2) {
         /* Eight 256-sample short windows, stride 128, start offset 448.
          * Current PCM and next overlap each need at most two contributions.
          * Only the first short window uses the previous window shape. */
@@ -57,7 +58,7 @@ static inline short aac_window_sample(const AACWindowState &w,
     } else {
         const int i = n < 512 ? n : 1023 - n;
         const int input = coef[512 + i];
-        if (w.sequence != 3) {
+        if (Sequence != 3) {
             const int value = MULSHIFT32(w.previous[aac_window_index(n, 1024)], input);
             current = n < 512 ? -value : value;
         } else if (n >= 576) {
@@ -66,7 +67,7 @@ static inline short aac_window_sample(const AACWindowState &w,
             const int value = MULSHIFT32(w.previous[aac_window_index(n - 448, 128)], input);
             current = n < 512 ? -value : value;
         }
-        if (w.sequence != 1) {
+        if (Sequence != 1) {
             next = MULSHIFT32(w.current[aac_window_index(1023 - n, 1024)], coef[511 - i]);
         } else if (n < 448) {
             next = coef[511 - i] >> 1;
@@ -77,6 +78,31 @@ static inline short aac_window_sample(const AACWindowState &w,
     const int value = overlap[n] + current;
     overlap[n] = next;
     return CLIPTOSHORT((value + (1 << (FBITS_OUT_IMDCT - 1))) >> FBITS_OUT_IMDCT);
+}
+
+/* Emit into the existing PCM block, averaging separately clipped channels
+ * in place for mono. No scratch PCM or changed overlap ownership. */
+template<int Sequence, bool Mix>
+static void aac_window_block(const AACWindowState &w, const int *coef,
+                             int *overlap, int start, int frames,
+                             short *pcm, int stride) {
+    for (int n = start; n < start + frames; ++n, pcm += stride) {
+        const short sample = aac_window_sample<Sequence>(w, coef, overlap, n);
+        if (Mix) *pcm = static_cast<short>((static_cast<int>(*pcm) + sample) >> 1);
+        else *pcm = sample;
+    }
+}
+
+template<bool Mix>
+static void aac_window_channel(const AACWindowState &w, const int *coef,
+                               int *overlap, int start, int frames,
+                               short *pcm, int stride) {
+    switch (w.sequence) {
+        case 0: aac_window_block<0, Mix>(w, coef, overlap, start, frames, pcm, stride); break;
+        case 1: aac_window_block<1, Mix>(w, coef, overlap, start, frames, pcm, stride); break;
+        case 2: aac_window_block<2, Mix>(w, coef, overlap, start, frames, pcm, stride); break;
+        case 3: aac_window_block<3, Mix>(w, coef, overlap, start, frames, pcm, stride); break;
+    }
 }
 
 static AACWindowState aac_window_state(int ch, int chOut) {
@@ -96,18 +122,16 @@ static int aac_emit_blocks(short *pcm, AACBlockOutput &output) {
     const int channels = m_AACDecInfo->nChans;
     for (int start = 0; start < 1024; start += output.frames) {
         HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS);
-        for (int i = 0; i < output.frames; ++i) {
-            const int n = start + i;
-            const short left = aac_window_sample(output.window[0],
-                m_PSInfoBase->coef[0], m_PSInfoBase->overlap[0], n);
-            if (channels == 1) {
-                pcm[i] = left;
-            } else {
-                const short right = aac_window_sample(output.window[1],
-                    m_PSInfoBase->coef[1], m_PSInfoBase->overlap[1], n);
-                if (output.mono) pcm[i] = static_cast<short>((static_cast<int>(left) + right) >> 1);
-                else { pcm[2 * i] = left; pcm[2 * i + 1] = right; }
-            }
+        const int stride = output.mono ? 1 : channels;
+        aac_window_channel<false>(output.window[0], m_PSInfoBase->coef[0],
+            m_PSInfoBase->overlap[0], start, output.frames, pcm, stride);
+        if (channels == 2) {
+            if (output.mono)
+                aac_window_channel<true>(output.window[1], m_PSInfoBase->coef[1],
+                    m_PSInfoBase->overlap[1], start, output.frames, pcm, 1);
+            else
+                aac_window_channel<false>(output.window[1], m_PSInfoBase->coef[1],
+                    m_PSInfoBase->overlap[1], start, output.frames, pcm + 1, 2);
         }
         HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS);
         if (!output.sink(output.context, pcm, output.frames * (output.mono ? 1 : channels))) {

@@ -198,11 +198,16 @@ test("AAC 32/64/128/256/512-frame callbacks match full-frame decode and mono dow
       const reference = decode(binary.executable, "aac", fixture, path.join(dir, "reference.pcm"));
       for(const frames of [32, 64, 128, 256, 512]) for(const mono of [false, true]) {
         const actual = decode(binary.executable, `aac-blocks-${frames}${mono ? "-mono" : ""}`, fixture, path.join(dir, "blocks.pcm"));
-        assert.deepEqual(actual.pcm, mono && channels === 2 ? downmix(reference.pcm) : reference.pcm,
+        const expectedPcm = mono && channels === 2 ? downmix(reference.pcm) : reference.pcm;
+        const quality = comparePcm(expectedPcm, actual.pcm);
+        assert.equal(quality.maximumError, 0);
+        assert.equal(quality.snrDb, Infinity);
+        assert.deepEqual(actual.pcm, expectedPcm,
           `AAC ${frames} frames, mono=${mono}, SSO=${sso}, ${fixture}`);
       }
     }
   }
+  t.diagnostic('AAC block matrix: all PCM samples bit-identical; maximum error=0, SNR=Infinity dB versus exact matching full-frame arithmetic');
 });
 
 test("32-frame MP3 output matches granules and full frames byte for byte", t => {
