@@ -1,5 +1,29 @@
 # 2026-09-06 — Bit-exact RCPDM speed experiments
 
+## Simple32 Xtensa LX106 assembly with portable C fallback
+
+`production-simple-lx106-asm` and `simple-simple-lx106-asm`: CPU160/QIO40,
+alpha=1/16, 48-kHz PCM, GPIO3, 32 bits/sample, 2x512 DMA words, batch output.
+Diagnostic images without Wi-Fi, WebUI or codecs; not ordinary radio.
+
+- Predictive: 128592 bytes, SHA256
+  `58F6F8D7519CA9A53DFE4A8B7E174771D339A6FFB5EEECF523620CCC938FFB7C`.
+- Simple asm: 129424 bytes, SHA256
+  `EEE154709076F5A17AE69CE4D178EAAF4875BFC75171D19126EDD4420E28239C`.
+- Pack 48000 words: 112275 vs 107177 us; previous literal Simple C 139047 us.
+- Producer excluding DMA wait: 122843 vs 120053 us/audio-second; previous
+  literal Simple C 155637 us. These are not total CPU utilization figures.
+- ASM backend confirmed in UART; scalar 493216, batch 2144 and dispatch
+  240 comparisons passed per Simple boot. No DMA errors or additional RAM.
+- Portable C retained; only ESP8266/Xtensa alpha=1/16 selects ASM. Other
+  targets/coefficients and `RCPDM_SIMPLE_FORCE_C=1` select C.
+
+Implementation `7f62157`, built as a working change over `c62decd`.
+The diagnostic image includes new dispatch checks/logs; scalar/batch packers
+shrank to 45/175 bytes. All 21 host tests passed. Exact original native PDM32
+app0 restored from a fresh private backup; boot, DHCP and HTTP 200 verified.
+[Report](../../../docs/benchmarks/esp8266-rcpdm-simple-lx106-asm-2026-09-06/README.md).
+
 ## Literal Simple32 charge/discharge loop
 
 `production-simple-literal` and `simple-simple-literal` are isolated images
