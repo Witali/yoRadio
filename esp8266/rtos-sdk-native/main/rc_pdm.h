@@ -27,13 +27,17 @@ static inline uint32_t rc_pdm_target(int16_t pcm) {
  * down + STEP and the midpoint cannot exceed UINT32_MAX. */
 static inline uint32_t rc_pdm_sample(rc_pdm_t *p, int16_t pcm) {
     const uint32_t target = rc_pdm_target(pcm);
+    /* down + HALF never overflows. Clamp before unsigned subtraction:
+     * target <= HALF cannot select the upper candidate for any state. */
+    const uint32_t half = RC_PDM_STEP >> 1;
+    const uint32_t limit = target > half ? target - half : 0;
     uint32_t word = 0;
     uint32_t state = p->rc;
     for (unsigned bit = 0; bit < RC_PDM_BITS_PER_SAMPLE; ++bit) {
         uint32_t down = state - (state >> RC_PDM_SHIFT);
         state = down;
         word <<= 1;
-        if (target > down + (RC_PDM_STEP >> 1)) {
+        if (down < limit) {
             state += RC_PDM_STEP;
             word |= 1U;
         }
