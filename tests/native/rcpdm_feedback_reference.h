@@ -22,7 +22,7 @@ static inline void rc_feedback_reference_frame(rc_pdm_feedback_t *p, int16_t pcm
             p->random=(uint32_t)r;
             if(dither==1) noise=(int64_t)(r/(UINT64_C(1)<<(shift+3)))-step/2;
             else noise=((int64_t)(r%65536)+(int64_t)(r/65536)-65535)*
-                       (INT64_C(1)<<(dither==3?13-shift:12-shift));
+                       (INT64_C(1)<<(dither==3?13-shift:dither==4?11-shift:12-shift));
         }
         const int64_t down=state-state/divisor,up=down+step;
         const int64_t feedback=error/gain_divisor-((error<0&&error%gain_divisor)?1:0);
@@ -37,5 +37,5 @@ static inline void rc_feedback_reference_frame(rc_pdm_feedback_t *p, int16_t pcm
     p->rc=(int32_t)state;p->error=(int32_t)error;p->previous=(int32_t)current;
 }
 static inline uint32_t rc_feedback_reference_sample(rc_pdm_feedback_t *p,int16_t pcm) {
-    uint32_t word;rc_feedback_reference_frame(p,pcm,&word,32,4,0,2,1);return word;
+    uint32_t word;rc_feedback_reference_frame(p,pcm,&word,32,4,0,4,1);return word;
 }

@@ -57,7 +57,7 @@ try {
         app_sha256=(Get-FileHash "$taskArtifact/app.bin").Hash
         app_address='0x10000'; bytes=(Get-Item "$taskArtifact/app.bin").Length
         cpu_mhz=160; flash='QIO40'; pcm_rate=48000; nominal_bit_rate=1536000
-        rc_shift=4; feedback_shift=0; dither='TPDF half-step'; interpolation='linear'
+        rc_shift=4; feedback_shift=0; dither='TPDF quarter-step (half original amplitude)'; interpolation='linear'
         modulator_state_bytes=16; dma_buffers='2 x 512 words'
     }
     $taskManifest | ConvertTo-Json | Out-File "$taskArtifact/manifest.json" -Encoding utf8

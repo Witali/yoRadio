@@ -13,7 +13,7 @@ int main(int argc,char **argv) {
         const unsigned bits=unsigned(std::stoul(argv[3])),shift=unsigned(std::stoul(argv[4]));
         const unsigned feedback=unsigned(std::stoul(argv[5])),dither=unsigned(std::stoul(argv[6]));
         const int interpolate=std::stoi(argv[7]); const auto seed=uint32_t(std::stoul(argv[8]));
-        check((bits==8||bits==16||bits==32||bits==64||bits==128)&&shift>=2&&shift<=6&&feedback<=6&&dither<=3,"invalid configuration");
+        check((bits==8||bits==16||bits==32||bits==64||bits==128)&&shift>=2&&shift<=6&&feedback<=6&&dither<=4,"invalid configuration");
         const uint16_t endian=1;check(*reinterpret_cast<const uint8_t*>(&endian)==1,"LE host required");
         std::ifstream in(argv[1],std::ios::binary|std::ios::ate);check(bool(in),"cannot open PCM");
         const auto size=in.tellg();check(size>0&&uint64_t(size)%2==0,"invalid PCM length");

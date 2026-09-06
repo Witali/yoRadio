@@ -21,7 +21,7 @@ int main() {
             rc_pdm_feedback_frame(&a,sample,got+1,bits,shift,gain,dither,interp);
             rc_feedback_reference_frame(&b,sample,want+1,bits,shift,gain,dither,interp);
             check(std::equal(got,got+6,want)&&same(a,b),"word/state/canary reference mismatch");
-            if(bits==32&&shift==4&&gain==0&&dither==2&&interp) {
+            if(bits==32&&shift==4&&gain==0&&dither==4&&interp) {
                 check(rc_pdm_feedback_sample(&fast,sample)==want[1]&&same(fast,b),"constant profile mismatch");
                 ++selected;
             }
@@ -31,11 +31,12 @@ int main() {
         rc_pdm_feedback_t a,b;
         rc_pdm_feedback_init(&a,0);rc_pdm_feedback_init(&b,RC_FB_DEFAULT_SEED);
         check(same(a,b),"zero seed fallback");
-        for(int pcm=-32768;pcm<=32767;++pcm)one(a,b,int16_t(pcm),32,4,0,2,1);
+        check(RC_FB_SELECTED_DITHER==4,"selected profile must use half the original TPDF amplitude");
+        for(int pcm=-32768;pcm<=32767;++pcm)one(a,b,int16_t(pcm),32,4,0,4,1);
         // Include worst-case positive raw noise (shift=2, TPDF full-step)
         // and both error limits, not only the frequency-matched diagonal.
         for(unsigned bits:{8U,16U,32U,64U,128U})for(unsigned shift=2;shift<=6;++shift) {
-            for(unsigned gain=0;gain<=6;++gain)for(unsigned dither=0;dither<=3;++dither)for(int interp:{0,1}) {
+            for(unsigned gain=0;gain<=6;++gain)for(unsigned dither=0;dither<=4;++dither)for(int interp:{0,1}) {
                 rc_pdm_feedback_init(&a,random);b=a;
                 for(unsigned i=0;i<1024;++i) {
                     random=random*1664525U+1013904223U;
@@ -74,11 +75,11 @@ int main() {
         // Full-scale, DC and recovery from a deliberately wound-up state.
         for(int16_t level:{int16_t(-32768),int16_t(32767),int16_t(0),int16_t(1),int16_t(-1)}) {
             a={RC_FB_FULL,RC_FB_ERROR_LIMIT,RC_FB_FULL,1};b=a;
-            for(unsigned i=0;i<10000;++i)one(a,b,level,32,4,0,2,1);
+            for(unsigned i=0;i<10000;++i)one(a,b,level,32,4,0,4,1);
             // Exact lower rail may clamp: integer exponential decay retains
             // sub-PCM-LSB residue. It must recover promptly when PCM returns
             // to audio zero, not remain stuck after leaving the rail.
-            for(unsigned i=0;i<32;++i)one(a,b,0,32,4,0,2,1);
+            for(unsigned i=0;i<32;++i)one(a,b,0,32,4,0,4,1);
             check(a.error!=RC_FB_ERROR_LIMIT&&a.error!=-RC_FB_ERROR_LIMIT,"persistent windup after rail release");
         }
         std::cout<<"{\"pass\":true,\"word_state_frames\":"<<count<<",\"batch_cases\":"<<batches

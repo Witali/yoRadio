@@ -9,6 +9,7 @@
 #define RC_FB_FULL INT32_C(536870912)
 #define RC_FB_ERROR_LIMIT INT32_C(1073741824)
 #define RC_FB_DEFAULT_SEED UINT32_C(0x9e3779b9)
+#define RC_FB_SELECTED_DITHER 4 /* TPDF +/-quarter RC decision step. */
 typedef struct {
     int32_t rc;
     int32_t error;
@@ -40,7 +41,8 @@ static inline uint32_t rc_fb_random(rc_pdm_feedback_t *p) {
 
 /* bits=8,16,32,64,128; RC shift=2..6; feedback shift=0..6.
  * dither=0:none, 1:uniform +/-half a decision step, 2:TPDF +/-half,
- * 3:TPDF +/-one step. Dither only perturbs the decision, never the desired PCM
+ * 3:TPDF +/-one step, 4:TPDF +/-quarter (half the original mode 2 amplitude).
+ * Dither only perturbs the decision, never the desired PCM
  * in the accumulated error. These selectors are compile-time constants in a
  * hardware wrapper and runtime parameters only in the quality sweep.
  * out contains chronological MSB-first words; 8/16-bit frames use low bits.
@@ -56,7 +58,7 @@ static inline void rc_pdm_feedback_frame(rc_pdm_feedback_t *p, int16_t pcm,
      * selected hardware wrapper, without adding fields to the stream state. */
     const int32_t step = RC_FB_FULL >> shift;
     const unsigned uniform_shift = shift + 3;
-    const int32_t noise_scale = INT32_C(1) << (dither == 3 ? 13 - shift : 12 - shift);
+    const int32_t noise_scale = INT32_C(1) << (dither == 3 ? 13 - shift : dither == 4 ? 11 - shift : 12 - shift);
     /* Move the constant noise bias to the other side of the comparison once,
      * not once per bit: adjusted + (raw_noise - bias) > down + step/2.
      * Even at shift=2/dither=3, adjusted + raw_noise stays below INT32_MAX. */
@@ -98,11 +100,12 @@ static inline void rc_pdm_feedback_frame(rc_pdm_feedback_t *p, int16_t pcm,
 }
 
 /* Selected 48-kHz/32-bit profile: unity accumulated-error feedback, TPDF
- * decision dither and causal linear interpolation. The dither generator is
+ * decision dither at half the original amplitude and causal interpolation.
+ * The dither generator is
  * deliberately deterministic across resets for regression reproducibility. */
 static inline uint32_t rc_pdm_feedback_sample(rc_pdm_feedback_t *p, int16_t pcm) {
     uint32_t word;
-    rc_pdm_feedback_frame(p, pcm, &word, 32, 4, 0, 2, 1);
+    rc_pdm_feedback_frame(p, pcm, &word, 32, 4, 0, RC_FB_SELECTED_DITHER, 1);
     return word;
 }
 static inline void rc_pdm_feedback_fill(rc_pdm_feedback_t *p, uint32_t *out,

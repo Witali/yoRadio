@@ -15,6 +15,11 @@ static void check(bool ok,const char *why) {if(!ok)throw std::runtime_error(why)
 static bool same(const rc_pdm_feedback_t &a,const rc_pdm_feedback_t &b) {
     return a.rc==b.rc&&a.error==b.error&&a.previous==b.previous&&a.random==b.random;
 }
+// Historical full-amplitude control remains explicit when the selected
+// firmware wrapper changes to the recommended half-amplitude dither.
+static uint32_t full_control(rc_pdm_feedback_t &s,int16_t pcm) {
+    uint32_t word;rc_pdm_feedback_frame(&s,pcm,&word,32,4,0,2,1);return word;
+}
 static uint32_t literal(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool simple=false,bool dither=true,unsigned attenuation=0) {
     const int64_t full=INT64_C(1)<<29,limit=INT64_C(1)<<30,step=full/16;
     const int64_t previous=s.previous,target=(int64_t(pcm)+32768)*8192;
@@ -72,7 +77,7 @@ static uint32_t simple32(rc_pdm_feedback_t &s,int16_t pcm,bool enabled,bool dith
 }
 static uint32_t predictive32(rc_pdm_feedback_t &s,int16_t pcm,bool dither,unsigned attenuation=0) {
     if(dither&&attenuation)return simple32(s,pcm,true,true,attenuation,false);
-    if(dither)return rc_pdm_feedback_sample(&s,pcm);
+    if(dither)return full_control(s,pcm);
     uint32_t word;
     rc_pdm_feedback_frame(&s,pcm,&word,32,4,0,0,1);
     return word;
@@ -93,7 +98,9 @@ static unsigned attenuation_test() {
                 const auto word=simple32(s,pcm,enabled!=0,true,shift,method!=0);
                 check(word==literal(r,pcm,enabled!=0,method!=0,true,shift)&&same(s,r),"attenuation reference mismatch");
                 if(method==0&&enabled&&shift==0)
-                    check(word==rc_pdm_feedback_sample(&production,pcm)&&same(s,production),"full amplitude differs from production");
+                    check(word==full_control(production,pcm)&&same(s,production),"full amplitude differs from production");
+                if(method==0&&enabled&&shift==1)
+                    check(word==rc_pdm_feedback_sample(&production,pcm)&&same(s,production),"selected half amplitude differs from production");
                 check(s.random==fast[0][0][0].random&&s.previous==fast[0][0][0].previous,"attenuation changes PRNG/interpolation");
                 ++comparisons;
             }
@@ -112,9 +119,10 @@ static void self_test() {
     unsigned simpleChanged=0;
     uint32_t random=8266;unsigned count=0,changed=0;
     auto one=[&](int16_t pcm) {
-        const uint32_t got=rc_pdm_feedback_sample(&prod,pcm);
+        const uint32_t got=full_control(prod,pcm);
         check(got==literal(model,pcm,true)&&same(prod,model),"enabled differs from production");
-        check(got==rc_feedback_reference_sample(&frozen,pcm)&&same(prod,frozen),"frozen reference differs");
+        uint32_t frozenWord;rc_feedback_reference_frame(&frozen,pcm,&frozenWord,32,4,0,2,1);
+        check(got==frozenWord&&same(prod,frozen),"frozen reference differs");
         auto ignored=off;ignored.error=(count&1)?RC_FB_ERROR_LIMIT:-RC_FB_ERROR_LIMIT;
         const uint32_t without=literal(off,pcm,false);
         check(without==literal(ignored,pcm,false)&&same(off,ignored),"off depends on feedback state");
