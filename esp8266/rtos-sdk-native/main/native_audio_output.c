@@ -624,6 +624,23 @@ i2s_pdm_pack32(int16_t sample) {
     return word;
 #endif
 }
+#if YORADIO_ESP8266_OUTPUT_COMPARE
+/* Diagnostic only: actual production packer, before I2S/DMA is initialized.
+ * Count includes the common loop/checksum overhead; no writes or allocation. */
+uint32_t native_audio_output_benchmark_pack32(const int16_t *pcm,
+                                             size_t samples, unsigned repeats) {
+#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+    rc_pdm_init(&s_rcpdm);
+#else
+    s_pdm_integrator = 0;
+#endif
+    uint32_t checksum = 0;
+    for (unsigned repeat = 0; repeat < repeats; ++repeat)
+        for (size_t i = 0; i < samples; ++i)
+            checksum ^= i2s_pdm_pack32(pcm[i]);
+    return checksum;
+}
+#endif
 #else
 static esp_err_t i2s_pdm_push_bit(i2s_pdm_writer_t *writer, bool high) {
     s_i2s_pdm_partial_word =

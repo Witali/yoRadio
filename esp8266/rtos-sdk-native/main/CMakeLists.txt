@@ -45,8 +45,22 @@ option(YORADIO_ESP8266_DMA_COMMITTED_PREFIX
   "Submit safely committed DMA prefixes at EOF (OFF for A/B testing only)" ON)
 option(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
   "Generate PCM in RAM and benchmark physical audio output without codecs" OFF)
+option(YORADIO_ESP8266_OUTPUT_COMPARE
+  "Compare PDM packers before DMA and force reproducible benchmark settings" OFF)
+if(YORADIO_ESP8266_OUTPUT_COMPARE)
+  if(NOT YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
+    message(FATAL_ERROR "OUTPUT_COMPARE requires AUDIO_OUTPUT_BENCHMARK")
+  endif()
+endif()
 option(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
   "Generate a gated full-scale 1 kHz tone in the isolated output firmware" OFF)
+if(YORADIO_ESP8266_OUTPUT_COMPARE)
+  if(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST OR
+     NOT (CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM OR
+          (CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM AND CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32)))
+    message(FATAL_ERROR "OUTPUT_COMPARE requires finite generated PCM and I2S PDM32 or RCPDM32")
+  endif()
+endif()
 option(YORADIO_ESP8266_AUDIO_TRACE
   "Log bounded PCM and final DMA PDM samples for physical audio diagnosis" OFF)
 option(YORADIO_ESP8266_SPI_PDM_FAST_ISR
@@ -159,6 +173,9 @@ endif()
 if(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=1)
+endif()
+if(YORADIO_ESP8266_OUTPUT_COMPARE)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP8266_OUTPUT_COMPARE=1)
 endif()
 if(YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE

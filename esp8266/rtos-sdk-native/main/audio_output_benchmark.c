@@ -50,12 +50,25 @@ static uint32_t s_spi_wait_invalid;
 static int64_t s_spi_wait_started;
 static uint32_t s_write_invalid;
 
+#if YORADIO_ESP8266_OUTPUT_COMPARE
+extern uint32_t native_audio_output_benchmark_pack32(const int16_t *, size_t, unsigned);
+#endif
+
+static int64_t benchmark_time_us(void) {
+    /* SysTick resets CCOUNT while adding it to g_esp_os_us in this SDK.
+     * Protect only the timestamp read, never packing or DMA waiting. */
+    taskENTER_CRITICAL();
+    int64_t stamp = esp_timer_get_time();
+    taskEXIT_CRITICAL();
+    return stamp;
+}
+
 void audio_output_benchmark_spi_wait_begin(void) {
-    s_spi_wait_started = esp_timer_get_time();
+    s_spi_wait_started = benchmark_time_us();
 }
 
 void audio_output_benchmark_spi_wait_end(void) {
-    int64_t elapsed64 = esp_timer_get_time() - s_spi_wait_started;
+    int64_t elapsed64 = benchmark_time_us() - s_spi_wait_started;
     if (elapsed64 < 0 || elapsed64 > 200000) {
         ++s_spi_wait_invalid;
         return;
@@ -75,6 +88,10 @@ static void generate_pcm(void) {
         right = right * 22695477U + 1U;
         s_template[frame * 2U] = (int16_t)(left >> 18);
         s_template[frame * 2U + 1U] = (int16_t)(right >> 18);
+#if YORADIO_ESP8266_OUTPUT_COMPARE
+        s_template[frame * 2U] = (int16_t)(left >> 16);
+        s_template[frame * 2U + 1U] = (int16_t)(right >> 16);
+#endif
     }
 }
 
@@ -112,17 +129,17 @@ static bool cpu_snapshot(uint32_t *total, uint32_t *idle) {
 
 static bool run_until(int64_t deadline, uint32_t *calls,
                       uint64_t *write_us, uint32_t *maximum_us) {
-    while (esp_timer_get_time() < deadline) {
+    while (benchmark_time_us() < deadline) {
 #if YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
         generate_tone_pcm();
 #else
         memcpy(s_pcm, s_template, sizeof(s_pcm));
 #endif
-        int64_t started = esp_timer_get_time();
+        int64_t started = benchmark_time_us();
         esp_err_t result = native_audio_output_write(
             s_pcm, sizeof(s_pcm) / sizeof(s_pcm[0]),
             BENCHMARK_SAMPLE_RATE, BENCHMARK_CHANNELS);
-        int64_t elapsed64 = esp_timer_get_time() - started;
+        int64_t elapsed64 = benchmark_time_us() - started;
         uint32_t elapsed = 0;
         if (elapsed64 < 0 || elapsed64 > 200000) {
             ++s_write_invalid;
@@ -153,14 +170,27 @@ void audio_output_benchmark_run(void) {
     }
     persistent_settings_t settings;
     persistent_settings_get(&settings);
-#if YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+#if YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST || YORADIO_ESP8266_OUTPUT_COMPARE
     settings.volume = 254;
     settings.balance = 0;
     settings.normalization_enabled = false;
+#if YORADIO_ESP8266_OUTPUT_COMPARE
+    settings.volume = 64; // keep physical generated noise below full amplitude
+#endif
     result = persistent_settings_update_runtime(&settings);
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Tone settings failed: %s", esp_err_to_name(result));
         return;
+    }
+#endif
+#if YORADIO_ESP8266_OUTPUT_COMPARE && !YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
+    generate_pcm();
+    for (unsigned round = 0; round < 3; ++round) {
+        int64_t started = benchmark_time_us();
+        uint32_t checksum = native_audio_output_benchmark_pack32(s_template, 128, 375);
+        uint32_t elapsed = (uint32_t)(benchmark_time_us() - started);
+        ESP_LOGI(TAG, "pack_only round=%u samples=48000 elapsed=%u us checksum=%08x DMA=off", round, elapsed, checksum);
+        vTaskDelay(1);
     }
 #endif
     result = native_audio_output_init();
@@ -169,6 +199,9 @@ void audio_output_benchmark_run(void) {
         return;
     }
     native_audio_output_set_volume_runtime(254);
+#if YORADIO_ESP8266_OUTPUT_COMPARE
+    native_audio_output_set_volume_runtime(64);
+#endif
     native_audio_output_set_balance_runtime(0);
     native_audio_output_reset_normalizer();
 #if YORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST
@@ -178,7 +211,7 @@ void audio_output_benchmark_run(void) {
              "500 ms on / 500 ms silence; normalization=off, "
              "Wi-Fi=off, codec=off");
     for (;;) {
-        if (!run_until(esp_timer_get_time() + 1000000LL,
+        if (!run_until(benchmark_time_us() + 1000000LL,
                        NULL, NULL, NULL)) return;
     }
 #else
@@ -188,7 +221,7 @@ void audio_output_benchmark_run(void) {
              "normalization=%u, Wi-Fi=off, codec=off",
              settings.normalization_enabled ? 1U : 0U);
 
-    if (!run_until(esp_timer_get_time() + BENCHMARK_WARMUP_US,
+    if (!run_until(benchmark_time_us() + BENCHMARK_WARMUP_US,
                    NULL, NULL, NULL)) return;
     native_audio_output_reset_spi_stats();
     s_spi_wait_us = 0;
@@ -212,10 +245,10 @@ void audio_output_benchmark_run(void) {
 #endif
     uint64_t write_us = 0;
     uint32_t maximum_us = 0;
-    int64_t started = esp_timer_get_time();
+    int64_t started = benchmark_time_us();
     if (!run_until(started + BENCHMARK_MEASURE_US,
                    &calls, &write_us, &maximum_us)) return;
-    uint64_t wall_us = (uint64_t)(esp_timer_get_time() - started);
+    uint64_t wall_us = (uint64_t)(benchmark_time_us() - started);
     native_audio_output_spi_stats_t spi_stats;
     native_audio_output_get_spi_stats(&spi_stats);
 #if YORADIO_ESP8266_I2S_PDM
@@ -243,6 +276,12 @@ void audio_output_benchmark_run(void) {
              s_spi_wait_calls
                  ? (unsigned)(s_spi_wait_us / s_spi_wait_calls) : 0U,
              s_spi_wait_max_us, s_spi_wait_invalid);
+    if (write_us >= s_spi_wait_us) {
+        uint64_t active = write_us - s_spi_wait_us;
+        ESP_LOGI(TAG, "producer_nonwait=%u us avg=%u us per_audio_second=%u us; wall-time estimate, not total CPU load",
+                 (unsigned)active, calls ? (unsigned)(active / calls) : 0U,
+                 audio_us ? (unsigned)(active * 1000000ULL / audio_us) : 0U);
+    }
     ESP_LOGI(TAG,
              "spi_gap cycles=%u calls=%u avg=%u max=%u empty=%u",
              spi_stats.gap_cycles_total, spi_stats.chained_transfers,

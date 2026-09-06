@@ -36,7 +36,8 @@ test('RCPDM32 reuses the production carrier, sample pacing and DMA ring', () => 
   assert.match(output, /return rc_pdm_sample\(&s_rcpdm, sample\)/);
   assert.match(output, /i2s_pdm_push_word\(writer, i2s_pdm_pack32\(sample\)\)/);
   assert.match(output, /s_resample_phase \+= BOARD_I2S_PDM_SAMPLE_RATE/);
-  assert.equal((output.match(/rc_pdm_init\(&s_rcpdm\)/g) || []).length, 2);
+  const diagnostic = output.match(/uint32_t native_audio_output_benchmark_pack32[\s\S]*?return checksum;\s*}/)?.[0] || '';
+  assert.equal((output.replace(diagnostic, '').match(/rc_pdm_init\(&s_rcpdm\)/g) || []).length, 2);
   assert.doesNotMatch(read('rc_pdm.h'), /\b(float|double|uint64_t|int64_t|malloc|calloc)\b/);
 });
 
