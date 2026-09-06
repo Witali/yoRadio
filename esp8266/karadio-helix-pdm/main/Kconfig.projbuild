@@ -1,0 +1,75 @@
+menu "KaRadio Helix ESP8266 options"
+
+choice YORADIO_MP3_DECODER
+    prompt "MP3 decoder backend"
+    default YORADIO_MP3_DECODER_HELIX
+config YORADIO_MP3_DECODER_HELIX
+    bool "yoRadio Helix MP3"
+config YORADIO_MP3_DECODER_LIBMAD
+    bool "libmad-8266 (experimental)"
+endchoice
+
+config YORADIO_HELIX_MP3_SSO
+    bool "Use fast 32-bit Helix MP3 synthesis"
+    depends on YORADIO_MP3_DECODER_HELIX
+    default y
+
+config YORADIO_HELIX_AAC
+    bool "Enable Helix AAC decoder"
+    default n
+
+config YORADIO_HELIX_AAC_SSO
+    bool "Use reduced-precision Helix AAC arithmetic"
+    depends on YORADIO_HELIX_AAC
+    default n
+
+choice YORADIO_AUDIO_OUTPUT
+    prompt "Audio output backend"
+    default YORADIO_AUDIO_OUTPUT_I2S_PDM
+config YORADIO_AUDIO_OUTPUT_I2S_PDM
+    bool "I2S DMA PDM on GPIO3"
+config YORADIO_AUDIO_OUTPUT_SPI_PDM
+    bool "HSPI PDM on GPIO13"
+config YORADIO_AUDIO_OUTPUT_I2S_PCM
+    bool "Standard I2S PCM"
+endchoice
+
+choice YORADIO_SPI_PDM_OVERSAMPLE
+    prompt "Legacy SPI-PDM bits per PCM sample"
+    default YORADIO_SPI_PDM_OVERSAMPLE_8
+config YORADIO_SPI_PDM_OVERSAMPLE_8
+    bool "8 bits/sample"
+config YORADIO_SPI_PDM_OVERSAMPLE_16
+    bool "16 bits/sample"
+endchoice
+
+choice YORADIO_I2S_PDM_OVERSAMPLE
+    prompt "I2S-PDM carrier"
+    depends on YORADIO_AUDIO_OUTPUT_I2S_PDM
+    default YORADIO_I2S_PDM_OVERSAMPLE_32
+config YORADIO_I2S_PDM_OVERSAMPLE_32
+    bool "PDM32 at nominal 1.536 MHz"
+config YORADIO_I2S_PDM_OVERSAMPLE_128
+    bool "PDM128 at nominal 6.144 MHz"
+endchoice
+
+config YORADIO_WEB_SEND_TIMEOUT_SECONDS
+    int "Web send timeout"
+    range 1 30
+    default 15
+
+config YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS
+    int "Recovery AP delay"
+    range 5 300
+    default 30
+
+config YORADIO_OLED
+    bool "Enable SSD1306 OLED"
+    default n
+
+config YORADIO_STATUS_LED
+    bool "Enable status LED"
+    default n
+    depends on YORADIO_AUDIO_OUTPUT_SPI_PDM
+
+endmenu

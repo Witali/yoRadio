@@ -67,6 +67,7 @@ enum {
     ERR_AAC_SBR_NCHANS_TOO_HIGH           = -20,
     ERR_AAC_SBR_SINGLERATE_UNSUPPORTED    = -21,
     ERR_AAC_RAWBLOCK_PARAMS               = -22,
+    ERR_AAC_OUTPUT_CANCELLED              = -23,
     ERR_AAC_UNKNOWN                       = -9999
 };
 
@@ -359,12 +360,20 @@ typedef struct _PSInfoBase_t {
     int      tnsWorkBuf[20]; //[MAX_TNS_ORDER]
     GainControlInfo_t     gainControlInfo[2]; // [MAX_NCHANS_ELEM]
     int      gbCurrent[2];  // [MAX_NCHANS_ELEM]
+#ifdef YORADIO_ESP8266_NATIVE
+    int      (*coef)[1024]; // 32-bit-only workspace allocated in IRAM
+#else
     int      coef[2][1024]; // [MAX_NCHANS_ELEM][AAC_MAX_NSAMPS]
+#endif
 #ifdef AAC_ENABLE_SBR
     int      sbrWorkBuf[2][1024]; // [MAX_NCHANS_ELEM][AAC_MAX_NSAMPS];
 #endif
     /* state information which must be saved for each element and used in next frame */
+#ifdef YORADIO_ESP8266_NATIVE
+    int      (*overlap)[1024]; // 32-bit-only persistent state in IRAM
+#else
     int      overlap[2][1024];  // [AAC_MAX_NCHANS][AAC_MAX_NSAMPS]
+#endif
     int      prevWinShape[2]; // [AAC_MAX_NCHANS]
 } PSInfoBase_t;
 
@@ -439,6 +448,18 @@ bool AACDecoder_IsInit(void);
 int AACFindSyncWord(uint8_t *buf, int nBytes);
 int AACSetRawBlockParams(int copyLast, int nChans, int sampRateCore, int profile);
 int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf);
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(AAC_ENABLE_SBR)
+#define YORADIO_AAC_BLOCK_OUTPUT 1
+/* Capacity is in int16 samples, blockFrames in frames/channel (32..512,
+ * powers of two). The sink may modify PCM, but must not reenter the decoder.
+ * Mono averages the separately clipped L/R values, just like the old bridge.
+ * GetChannels/GetOutputSamps still describe the encoded stream. */
+typedef bool (*AACPCMCallback)(void *context, short *pcm, int samples);
+int AACDecodeBlocks(uint8_t *inbuf, int *bytesLeft, short *pcm, int capacity,
+                    int blockFrames, bool mono, AACPCMCallback sink, void *context);
+#else
+#define YORADIO_AAC_BLOCK_OUTPUT 0
+#endif
 int AACGetSampRate();
 int AACGetStreamSampRate();
 int AACGetChannels();

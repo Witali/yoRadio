@@ -1,0 +1,63 @@
+TAP version 13
+# Subtest: AAC Huffman prefetch preserves bit positions and buffer tails
+ok 1 - AAC Huffman prefetch preserves bit positions and buffer tails
+  ---
+  duration_ms: 2570.3867
+  type: 'test'
+  ...
+# AAC bit reader: 1700960 peek/consume comparisons, exact bits and logical positions
+# Subtest: AAC flash Huffman lookup matches every canonical code and suffix
+ok 2 - AAC flash Huffman lookup matches every canonical code and suffix
+  ---
+  duration_ms: 2552.6055
+  type: 'test'
+  ...
+# AAC Huffman: 1305600 exhaustive prefixes/suffixes, exact symbols and bit counts
+# Subtest: AAC exact optimizations preserve PCM on all retained rates and channels
+ok 3 - AAC exact optimizations preserve PCM on all retained rates and channels
+  ---
+  duration_ms: 6970.4903
+  type: 'test'
+  ...
+# stereo-320.aac: samples=38912, maxError=0, SNR=Infinity dB
+# mono-22050.aac: samples=23552, maxError=0, SNR=Infinity dB
+# stereo-44100.aac: samples=92160, maxError=0, SNR=Infinity dB
+# Subtest: AAC sequential block windows preserve exact PCM and overlap state
+ok 4 - AAC sequential block windows preserve exact PCM and overlap state
+  ---
+  duration_ms: 6221.6891
+  type: 'test'
+  ...
+# AAC sequential windows: 1280 vectors, exact PCM/overlap, immutable coefficients, all block cancellations and canaries passed
+# AAC sequential windows: 1280 vectors, exact PCM/overlap, immutable coefficients, all block cancellations and canaries passed
+# Subtest: AAC 32/64/128/256/512-frame callbacks match full-frame decode and mono downmix
+ok 5 - AAC 32/64/128/256/512-frame callbacks match full-frame decode and mono downmix
+  ---
+  duration_ms: 8256.9193
+  type: 'test'
+  ...
+# AAC block matrix: all PCM samples bit-identical; maximum error=0, SNR=Infinity dB versus exact matching full-frame arithmetic
+# Subtest: ESP8266 optimized Helix MP3/AAC PCM matches the 64-bit reference
+ok 6 - ESP8266 optimized Helix MP3/AAC PCM matches the 64-bit reference
+  ---
+  duration_ms: 6778.6376
+  type: 'test'
+  ...
+# mp3: codec=mp3 frames=18 samples=41472 bytes=82944, sha256=bccd41c32d39c55f571bfc205f53817871715be78090ba519ded6749fd004c6a
+# aac: codec=aac frames=19 samples=38912 bytes=77824, sha256=13afe42da43d6c9387001cf91cdf9f95177dea9c51820f951c459812b58f3a43
+# Subtest: ESP8266 Helix AAC SSO preserves frame layout and useful PCM quality
+ok 7 - ESP8266 Helix AAC SSO preserves frame layout and useful PCM quality
+  ---
+  duration_ms: 6730.4061
+  type: 'test'
+  ...
+# AAC SSO SNR=82.65 dB, maxError=1 PCM levels
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 40164.4593

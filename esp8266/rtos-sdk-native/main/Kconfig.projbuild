@@ -1,0 +1,164 @@
+menu "yoRadio ESP8266 options"
+
+choice YORADIO_AUDIO_CHANNELS
+    prompt "Decoded audio channels"
+    default YORADIO_AUDIO_STEREO if YORADIO_AUDIO_OUTPUT_I2S_PCM
+    default YORADIO_AUDIO_MONO
+    help
+        Mono produces (L+R)/2. Helix MP3 skips the side channel in compatible
+        M/S frames without intensity stereo, with one IMDCT and one synthesis.
+        Other MP3 modes retain a safe downmix path. AAC and libmad downmix
+        after decoding. Stereo preserves both channels; a stereo DAC requires
+        the I2S PCM backend (the one-pin PDM outputs are physically mono).
+
+config YORADIO_AUDIO_MONO
+    bool "Mono"
+
+config YORADIO_AUDIO_STEREO
+    bool "Stereo"
+
+endchoice
+
+choice YORADIO_MP3_DECODER
+    prompt "MP3 decoder backend"
+    default YORADIO_MP3_DECODER_HELIX
+    help
+        Select the native MP3 decoder. Helix remains the production default;
+        libmad-8266 is an experimental fixed-point backend used for speed,
+        memory, and PCM-quality comparisons on the physical ESP8266.
+
+config YORADIO_MP3_DECODER_HELIX
+    bool "yoRadio Helix MP3 (production)"
+
+config YORADIO_MP3_DECODER_LIBMAD
+    bool "libmad-8266 from ESP8266Audio (experimental)"
+
+endchoice
+
+config YORADIO_HELIX_MP3_SSO
+    bool "Use reduced-precision 32-bit Helix MP3 synthesis (experimental)"
+    depends on YORADIO_MP3_DECODER_HELIX
+    default n
+    help
+        Distribute the polyphase fixed-point shifts across the input samples,
+        coefficients, and PCM conversion so the ESP8266 LX106 can use native
+        32-bit multiply/accumulate operations. This adds no decoder buffers
+        but trades a small amount of PCM precision for synthesis speed.
+
+config YORADIO_HELIX_AAC
+    bool "Enable Helix AAC decoder"
+    default y
+    help
+        Build AAC support into the ESP8266 firmware. MP3 and AAC share the
+        preallocated codec arena; AAC-enabled builds reserve a complete
+        stereo AAC PCM frame.
+
+config YORADIO_HELIX_AAC_SSO
+    bool "Use reduced-precision 32-bit Helix AAC arithmetic (experimental)"
+    depends on YORADIO_HELIX_AAC
+    default n
+    help
+        Approximate AAC fixed-point high-half products with three native LX106
+        16 x 16 multiplies, omitting only the low x low partial product. This
+        shortens the transform hot path without allocating another buffer, at
+        the cost of a small PCM precision loss.
+
+choice YORADIO_AUDIO_OUTPUT
+    prompt "Audio output backend"
+    default YORADIO_AUDIO_OUTPUT_I2S_PDM
+    help
+        I2S-PDM is the production default. SLC DMA continuously clocks a
+        one-bit delta-sigma stream on fixed GPIO3 without the inter-block gap
+        of the single-buffer HSPI peripheral. GPIO3 is UART0 RX, so the
+        application intentionally ignores UART input while audio is active.
+
+config YORADIO_AUDIO_OUTPUT_I2S_PDM
+    bool "I2S DMA PDM on GPIO3 (production)"
+
+config YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+    bool "I2S RCPDM on GPIO3 (experimental)"
+    help
+        Predict the output RC voltage with an unsigned 32-bit model and
+        alpha=1/16. Continuous I2S/SLC DMA transports exactly 32 bits per
+        48-kHz output PCM sample (nominal 1.536 MHz, actual 1.538462 MHz).
+        Use a matched RC filter (1 kohm, approximately 10 nF) and a
+        high-impedance, AC-coupled amplifier input. GPIO3 is still UART RX.
+        This is a separate modulator, not the production delta-sigma PDM.
+
+config YORADIO_AUDIO_OUTPUT_SPI_PDM
+    bool "HSPI PDM on GPIO13 (legacy UART-safe)"
+
+config YORADIO_AUDIO_OUTPUT_I2S_PCM
+    bool "Standard I2S PCM for an external DAC"
+
+endchoice
+
+choice YORADIO_SPI_PDM_OVERSAMPLE
+    prompt "Legacy SPI-PDM bits per PCM sample"
+    default YORADIO_SPI_PDM_OVERSAMPLE_8
+    help
+        Select the one-bit PDM oversampling ratio used by the legacy SPI
+        output. Eight bits gives 384.615 kHz; sixteen bits lowers quantization
+        noise at twice the conversion and output bandwidth.
+
+config YORADIO_SPI_PDM_OVERSAMPLE_8
+    bool "8 bits/sample (384.615 kHz at 48 kHz)"
+
+config YORADIO_SPI_PDM_OVERSAMPLE_16
+    bool "16 bits/sample (769.231 kHz at 48 kHz)"
+
+endchoice
+
+choice YORADIO_I2S_PDM_OVERSAMPLE
+    prompt "I2S-PDM carrier and delta-sigma mode"
+    depends on YORADIO_AUDIO_OUTPUT_I2S_PDM
+    default YORADIO_I2S_PDM_OVERSAMPLE_32
+    help
+        Production computes 32 delta-sigma bits per 48-kHz PCM sample at a
+        nominal 1.536-MHz carrier. PDM128 raises the carrier to 6.144 MHz and
+        remains experimental. ESP8266 integer dividers are +0.16% high.
+
+config YORADIO_I2S_PDM_OVERSAMPLE_32
+    bool "PDM32 genuine (1.536 MHz carrier, production)"
+
+config YORADIO_I2S_PDM_OVERSAMPLE_128
+    bool "PDM128 genuine (6.144 MHz carrier, experimental)"
+
+endchoice
+
+config YORADIO_WEB_SEND_TIMEOUT_SECONDS
+    int "Web content send timeout (seconds)"
+    range 1 30
+    default 15
+    help
+        Maximum time the shared HTTP task waits for one stalled socket send.
+        Keep this short because one blocked client otherwise stops WebSocket
+        and static-file service for every browser.
+
+config YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS
+    int "Recovery access point delay (seconds)"
+    range 5 300
+    default 30
+    help
+        Start the recovery access point after this many seconds without a
+        successful client-mode Wi-Fi connection.
+
+config YORADIO_OLED
+    bool "Enable SSD1306 OLED display"
+    default n
+    help
+        Build the optional SSD1306 display task. Keep this disabled for the
+        lowest-RAM WebUI-only firmware profile.
+
+config YORADIO_STATUS_LED
+    bool "Enable Wi-Fi/player status LED"
+    default y
+    depends on YORADIO_AUDIO_OUTPUT_SPI_PDM
+    help
+        Use the active-low onboard LED on Wemos D1 mini GPIO2. It is off
+        without a client Wi-Fi connection, steady while connected and idle,
+        and blinks in 500-ms phases while audio is playing. ESP8266 I2S output
+        has fixed clock pins and owns GPIO2 as WS for the entire transfer, so
+        the onboard LED is available only with the legacy SPI-PDM backend.
+
+endmenu

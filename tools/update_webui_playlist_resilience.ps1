@@ -243,5 +243,16 @@ function shouldScrollCurrentItem(item){
 '@ "scroll after initial playlist rendering"
 }
 
+if(-not $script.Contains("if(!initialScroll) ul.scrollTop = previousScrollTop;")) {
+    $script = Replace-Once $script @'
+  ul.scrollTop = previousScrollTop;
+  if(!modesd) initPLEditor();
+'@ @'
+  // Do not cancel the initial smooth scroll with an immediate restoration.
+  if(!initialScroll) ul.scrollTop = previousScrollTop;
+  if(!modesd) initPLEditor();
+'@ "preserve initial scroll"
+}
+
 Write-GzipText $scriptPath $script
 Write-Host "Updated WebUI playlist reconnect and loading resilience"

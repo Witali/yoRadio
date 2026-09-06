@@ -65,8 +65,15 @@ test("live WebUI test covers remote and physical control status", () => {
 
   assert.match(integration, /Play reaches actual playing state/);
   assert.match(integration, /Pause reaches stopped state/);
+  assert.match(integration, /Stop reaches stopped state/);
+  assert.match(integration, /Play resumes after Stop/);
   assert.match(integration, /Next publishes a different current station/);
   assert.match(integration, /Previous publishes a different current station/);
+  assert.match(integration, /client mode exposes the full settings groups/);
+  assert.match(integration, /system settings are returned/);
+  assert.match(integration, /display settings are returned/);
+  assert.match(integration, /timezone settings are returned/);
+  assert.match(integration, /control settings are returned/);
   assert.match(integration, /physical Play reaches WebUI/);
   assert.match(integration, /physical Stop reaches WebUI/);
   assert.match(integration, /physical Next changes the WebUI station/);

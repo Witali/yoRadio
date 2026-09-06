@@ -100,6 +100,12 @@ void* CodecArenaCalloc(CodecArenaOwner owner, size_t count, size_t size) {
     return result;
 }
 
+void* CodecArenaCalloc32(CodecArenaOwner owner, size_t count, size_t size) {
+    // The regular ESP32 arena is byte-addressable internal RAM (or PSRAM).
+    // Only the ESP8266 implementation needs a distinct IRAM-backed path.
+    return CodecArenaCalloc(owner, count, size);
+}
+
 void CodecArenaFree(void* pointer) {
     if(pointer && !contains(pointer)) free(pointer);
 }

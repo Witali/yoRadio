@@ -38,6 +38,44 @@ test("station search filters rendered rows by normalized name", () => {
   assert.match(script, /filterPlaylist\(filter \? filter\.value : ''\)/);
 });
 
+test("clicking either a playlist row or its child selects that station", () => {
+  const script = readAsset("script.js.gz");
+  assert.match(script, /if\(target\.classList\.contains\("play"\)\) \{ playItem\(target\); return; \}/);
+  assert.match(script, /if\(target\.parentElement && target\.parentElement\.classList\.contains\("play"\)\)\{ playItem\(target\.parentElement\); return; \}/);
+  assert.match(script, /websocket\.send\(`play=\$\{item\}`\)/);
+});
+
+test("every firmware target packages the shared full-row click handler", () => {
+  const targetSources = [
+    ["Arduino", "yoRadio/src/core/config.cpp", /script\.js\.gz/],
+    [
+      "ESP32-C3 native",
+      "idf/esp32c3-oled-native/main/CMakeLists.txt",
+      /file\(COPY "\$\{YORADIO_ROOT\}\/data\/"/,
+    ],
+    [
+      "ESP32 CYD native",
+      "idf/esp32-cyd2usb-native/main/CMakeLists.txt",
+      /spiffs_create_partition_image\(spiffs "\$\{YORADIO_ROOT\}\/data"/,
+    ],
+    [
+      "ESP32 CYD minimal",
+      "idf/esp32-cyd2usb-minimal/main/CMakeLists.txt",
+      /spiffs_create_partition_image\(spiffs "\$\{YORADIO_ROOT\}\/data"/,
+    ],
+    [
+      "ESP8266 native",
+      "esp8266/rtos-sdk-native/main/CMakeLists.txt",
+      /EMBED_FILES "\.\.\/\.\.\/\.\.\/yoRadio\/data\/www\/script\.js\.gz"/,
+    ],
+  ];
+
+  for(const [target, relativePath, pattern] of targetSources) {
+    const source = fs.readFileSync(path.join(repository, relativePath), "utf8");
+    assert.match(source, pattern, `${target} must package the shared WebUI`);
+  }
+});
+
 test("current station stays selectable without unsolicited scrolling", () => {
   const script = readAsset("script.js.gz");
   const setCurrentItem = script.slice(
@@ -345,6 +383,7 @@ test("initial playlist rendering scrolls to the current station once", async () 
     setCurrentItem: (item, scroll) => {
       assert.equal(item, 2);
       shouldScroll = scroll;
+      if(scroll) playlist.scrollTop = 420;
     },
     console: { log: () => {} },
     result: null,
@@ -356,8 +395,22 @@ test("initial playlist rendering scrolls to the current station once", async () 
   );
   assert.equal(await context.result, true);
   assert.equal(shouldScroll, true);
+  assert.equal(playlist.scrollTop, 420, "initial scroll must not be overwritten");
   assert.equal(context.initialPlaylistScrollPending, false);
   assert.equal(context.playlistLoaded, true);
+});
+
+test("current arriving after playlist requests initial scroll only once", () => {
+  const script = readAsset("script.js.gz");
+  const helpers = script.slice(script.indexOf("function requestStationChangeScroll"),
+    script.indexOf("function setupElement"));
+  const context = { currentItem: 0, currentItemSynchronized: false,
+    stationChangeScrollFrom: null, initialPlaylistScrollPending: true,
+    playlistLoaded: true };
+  vm.runInNewContext(helpers, context);
+  assert.equal(context.shouldScrollCurrentItem(500), true);
+  context.currentItem = 500;
+  assert.equal(context.shouldScrollCurrentItem(500), false);
 });
 
 test("station search has compact responsive styling", () => {

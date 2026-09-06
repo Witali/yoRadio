@@ -1,0 +1,49 @@
+TAP version 13
+# Subtest: production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+ok 1 - production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+  ---
+  duration_ms: 9196.723
+  type: 'test'
+  ...
+# PDM32: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM128: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# Subtest: desktop fixed/state-aware/entry-only RCPDM runs preserve every bit and RC state
+ok 2 - desktop fixed/state-aware/entry-only RCPDM runs preserve every bit and RC state
+  ---
+  duration_ms: 4076.2373
+  type: 'test'
+  ...
+# Subtest: sufficient bounds for 2/4/8 constant bits preserve every word and RC state
+ok 3 - sufficient bounds for 2/4/8 constant bits preserve every word and RC state
+  ---
+  duration_ms: 497.3147
+  type: 'test'
+  ...
+# Subtest: I2S RCPDM is a separate opt-in profile, not a new board default
+ok 4 - I2S RCPDM is a separate opt-in profile, not a new board default
+  ---
+  duration_ms: 2.5922
+  type: 'test'
+  ...
+# Subtest: RCPDM32 reuses the production carrier, sample pacing and DMA ring
+ok 5 - RCPDM32 reuses the production carrier, sample pacing and DMA ring
+  ---
+  duration_ms: 2.0841
+  type: 'test'
+  ...
+# Subtest: RCPDM32 C implementation matches the independent full-range RC reference
+ok 6 - RCPDM32 C implementation matches the independent full-range RC reference
+  ---
+  duration_ms: 2348.056
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9266.2142

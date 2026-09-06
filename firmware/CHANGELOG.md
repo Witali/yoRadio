@@ -3,6 +3,387 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development — 2026-09-06: bounded AAC PCM output
+
+- Ordinary image: `development/esp8266-native-aac-blocks/app.bin`, source
+  `9f991d6`, 690032 bytes. CPU160/QIO40, mono Helix MP3 SSO/AAC-LC,
+  GPIO3 I2S-PDM32, profiling/trace/benchmarks OFF.
+- AAC defaults to 512-frame callbacks / 1024 bytes mono PCM rather than a
+  complete 4096-byte stereo frame. Actual AAC DRAM falls 9876 -> 6804 bytes;
+  16384-byte IRAM arena and 2 x 512-word DMA payloads are unchanged.
+- 341 host tests passed. PCM and next-frame overlap match the previous
+  implementation, including mono clipping/rounding and all window sequences.
+- On the physical board, the selected 512-frame path produced 4.266666 s of
+  320-kbit/s AAC audio in 4.254014 s wall time with zero measured underruns.
+  Smaller sizes were tested and had more underruns. Decode-only cost rose
+  about 6.1%; this is a RAM optimization, not a decoder speed improvement.
+- The twelve isolated A/B images (`esp8266-native-aac-decode-*` and
+  `esp8266-native-aac-output-*`) are diagnostic, Wi-Fi disabled, and must not
+  be used as normal radio firmware. Each includes a manifest and hash.
+- See `docs/ESP8266_AAC_PCM_BLOCKS.md` and its retained measurement logs.
+- Ordinary app0 flash/hash/startup verified, 511-station index retained.
+  Wi-Fi association was delayed and HTTP at the prior IP timed out; live
+  streaming/WebUI are not certified by this AAC change.
+
+
+## Development — 2026-09-05: ESP8266 DMA starvation recovery
+
+- Ordinary image: `development/esp8266-native-dma-recovery/app.bin`, source
+  `aab3600`, 687312 bytes. App0 flashed and hash verified; NVS, SPIFFS and OTA
+  selection retained. The 16-KiB IRAM decoder arena still fits.
+- Hand off committed prefixes only when no producer loan is outstanding;
+  use 64-word neutral retries while playing and 512-word neutral blocks
+  when stopped. Buffer capacity remains 2 x 512 words. Mono ignores balance.
+- Added an opt-in RAM decoder-to-PDM/DMA benchmark and A/B build switch.
+  In isolated physical tests MP3 had zero underruns; AAC produced 4.267 s
+  in 4.259 s with four short neutral retries and zero FIFO-empty flags.
+- 338 host tests pass. Preserve the rejected prefix-only experiment and
+  whole-buffer baseline separately, explicitly labelled diagnostic.
+- The prior image's sound was confirmed but distorted. The new ordinary
+  image started Retro FM and publishes WebSocket playing/reconnecting state;
+  live-stream reconnects and initial HTTP timeouts remain. Listening
+  acceptance and long-run network stability are not claimed.
+- See `docs/ESP8266_DMA_STARVATION_RECOVERY.md` for measurements and limits.
+
+## Development — 2026-09-05: ESP8266 PCM32, direct DMA and mono mute fix
+
+- Source `6bd547b`; ordinary image saved as
+  `development/esp8266-native-pcm32/app.bin` (687232 bytes). Optional bounded
+  diagnostic image is `development/esp8266-native-pcm32-trace/app.bin`
+  (689792 bytes). Older artifacts are retained.
+- Helix MP3 emits 32-frame blocks; mono PCM storage falls from 1152 to 64
+  bytes. Actual MP3 DRAM workspace is 8440 bytes, with 16384 bytes in IRAM.
+- PDM is generated directly in a reserved producer-owned DMA span. Two
+  512-word buffers, neutral underrun output and task stack sizes are retained.
+- Fixed unsigned balance clamping that turned neutral balance into -16 and
+  muted mono. Balance is ignored for mono input, including all codecs in
+  build-time Mono mode; volume and normalization still apply.
+- 337 host tests pass; PCM/PDM equivalence, settings, ownership, EOF races,
+  cancellation and timeout are covered. GCC output-write frame is 80 bytes
+  versus 352 previously; no matched hardware CPU timing was performed.
+- Physical trace confirms nonzero decoded/processed PCM and changing DMA
+  words. Restored/flashed the ordinary image, preserving NVS/SPIFFS/OTA
+  selection; MP3/WebSocket status and WebUI HTTP 200 verified. Stream
+  reconnects remain; long-run continuity and listening are not yet confirmed.
+- See `docs/ESP8266_PCM32_DIRECT_DMA.md` and per-image manifests.
+
+## Development — 2026-09-05: ESP8266 shared MP3 reorder workspace
+
+- Saved `development/esp8266-native-mono-reorder/app.bin`, source `f3138f2`,
+  686848 bytes; previous firmware artifacts remain unchanged.
+- Reuse idle IMDCT output for reorder, removing one 792-byte DRAM allocation.
+- Separate/shared PCM matches byte-for-byte in Mono and Stereo. Allocation
+  failures, reset and AAC/MP3 lifecycle tests pass; all 331 host tests pass.
+- GCC O3 firmware builds; static DRAM/IRAM size unchanged, image 96 bytes smaller.
+- Subsequently flashed app0 on the Wemos D1 mini with hash verification;
+  NVS/SPIFFS/OTA selection preserved. Wi-Fi, HTTP and a short WebSocket MP3
+  128-kbit/s play/stop test passed, with one stream-open retry. Physical MP3
+  workspace is 9528 bytes DRAM / 16384 bytes IRAM. Long-run performance and
+  listening remain untested; see the shared-reorder document for raw results.
+
+## Development — 2026-09-05: ESP8266 mono MP3 M/S fast path
+
+- Saved `development/esp8266-native-mono/app.bin` separately from the
+  physically verified preceding build; source `236d4ad`, 686944 bytes.
+- Added build-time Mono/Stereo; default Mono skips the difference channel
+  for compatible M/S MP3 and retains safe fallback for other stereo modes.
+- MP3 PCM storage is 1152 bytes smaller; unchanged two-buffer DMA output.
+- Fixed pre-existing MPEG2.5 sync detection, now covered by own fixtures.
+- 329 host tests pass; Mono firmware and Stereo/libmad decoder component
+  builds pass. CPU timing and listening on the board remain untested.
+- No flashing, settings changes or WebUI asset update performed.
+
+## Development — 2026-09-05: ESP8266 memory-only diagnostic
+
+- Saved `development/esp8266-native-memory-profile/app.bin` and its manifest.
+- Added opt-in allocation-free DRAM fragmentation/low-water and task-stack
+  measurements, with normal MP3/AAC, Wi-Fi, WebUI and I2S PDM configuration.
+- Saved a repeatable physical workload including codec switches and two real
+  browser pages. See `docs/ESP8266_MEMORY_HEADROOM_2026-09-05.md` for results
+  and failures; this is not a claim that the two-tab acceptance test passed.
+- The ordinary native profile and its buffer/stack defaults are unchanged.
+
+## Development — 2026-09-02
+
+### ESP8266 verified default memory and streaming profile
+
+- Locked the default to QIO40/160 MHz, Helix MP3 SSO + AAC, and GPIO3
+  I2S-PDM32 with the static 2 x 512-word DMA ring.
+- Kept the physically reliable 16-KiB IRAM codec arena and split MP3 IMDCT
+  output by channel; the measured active workspace is 11,472 bytes DRAM and
+  16,384 bytes IRAM.
+- Bounded WebSocket sends, kept radio HTTP connections alive, reconnected clean
+  stream EOF, and reduced persistent WebUI buffers without changing pages.
+- Flashed the Wemos D1 mini and verified MP3 128 kbit/s playback, 32 WebSocket
+  status frames over 60 seconds, and subsequent HTTP 200 status recovery.
+- All 290 repository tests pass; the replaceable development binary and
+  manifest were updated.
+
+### ESP8266 canonical audio profile and end-to-end trace
+
+- Made the tracked `sdkconfig.defaults` authoritative and explicit: QIO 40 MHz,
+  160 MHz CPU, Helix MP3 SSO, Helix AAC, GPIO3 I2S-PDM32 at 1.536 MHz and a
+  static 2 x 512-word DMA ring; experimental alternatives are disabled.
+- Added an opt-in bounded diagnostic mode that fingerprints raw decoder PCM,
+  processed mono PCM and the actual PDM words copied into the SLC-DMA ring.
+  It is compiled out of the production image.
+- Physically verified HTTP/ICY -> MP3 detection -> Helix decode -> fixed-point
+  normalization/volume -> stereo-to-mono -> PDM32 -> DMA, while WebUI remained
+  connected and changed from stopped to playing.
+- Rebuilt the ordinary no-trace image, passed all 284 tests and archived it in
+  [`development/esp8266-native-qio40-sso-pdm1536/`](development/esp8266-native-qio40-sso-pdm1536/).
+### ESP8266 GPIO2/I2S status LED constraint
+
+- Verified against the ESP8266EX pin table that I2S output uses fixed GPIO3
+  DATA, GPIO15 BCLK and GPIO2 WS signals.
+- A physical experiment reclaimed GPIO2 after the first DMA completion: the
+  onboard LED then followed the requested 500-ms playback blink, but PDM audio
+  stopped. Keeping GPIO2/GPIO15 assigned restored the GPIO3 audio output.
+- The production I2S-PDM profile now leaves both hardware clock pins active and
+  disables software ownership of the onboard LED. Its apparently steady light
+  is the visual average of the 48-kHz WS waveform, not the player status.
+- GPIO2 Wi-Fi/playback indication remains available only with the legacy
+  SPI-PDM backend, which outputs audio on GPIO13 and does not claim GPIO2.
+- Rebuilt and flashed the QIO40/160-MHz image, connected to Wi-Fi, started Retro
+  FM as MP3 128 kbit/s, and passed all 282 repository tests.
+### ESP8266 WebUI physical reliability
+
+- Changed the Wemos default from QIO 80 MHz to QIO 40 MHz after verified QIO80
+  images intermittently stopped immediately after the ROM loader on the physical
+  module. Named QIO80 profiles remain available for explicit experiments.
+- Fixed truncated HTML and JavaScript by copying memory-mapped IROM data through
+  a DRAM scratch buffer, pacing 512-byte chunk writes, retrying transient lwIP
+  `ENOMEM`/`ENOBUFS`, and allowing up to 15 seconds for a congested send.
+- Removed `TCP_NODELAY` and the eager server-side close that could split chunk
+  framing into tiny packets or discard the final queued bytes on a weak link.
+- Reused one static scratch buffer for static files, playlist lines, and initial
+  WebSocket state, avoiding the HTTP-task stack-canary reset seen with nested
+  local buffers while retaining the documented 5120-byte minimum stack.
+- Added regression checks for DRAM-backed IROM sends, bounded retry behavior,
+  stack usage, QIO40 defaults, and all saved build profiles. All 280 tests pass.
+- Flashed the physical Wemos and verified HTTP 200 for every page asset, the
+  complete 36,086-byte playlist, and status. The isolated WebSocket scenario
+  covered settings, station selection, Play, Stop, Pause, Next, and Previous.
+- Archived the validated image under
+  [`development/esp8266-native-qio40-sso-pdm1536/`](development/esp8266-native-qio40-sso-pdm1536/).
+
+### ESP8266 playback and WebUI hang fixes
+
+- Rebuilt and flashed the QIO80/160-MHz Helix SSO production profile with
+  1.536-MHz I2S/SLC DMA PDM output.
+- Removed unbounded waits from the radio socket and I2S-PDM callback. The
+  stream socket is nonblocking and each PCM callback now has one cumulative
+  100-ms DMA deadline rather than a fresh one-second wait for every batch.
+- Allocated the exact 2304-byte MP3 PCM buffer instead of the 4096-byte AAC
+  maximum, leaving 1792 more heap bytes for lwIP while MP3 is active. Codec
+  switches still release the old decoder before allocating an incompatible
+  replacement.
+- Fixed incomplete WebUI downloads on the ESP8266 SDK: short HTTP responses
+  use standard `Connection: close`, `TCP_NODELAY`, and deferred session close
+  so the terminating chunk is flushed and the scarce socket is released.
+- Kept the HTTP/WebSocket task stack at 5120 bytes. A physical 4096-byte test
+  reproduced a FreeRTOS stack-canary reset during `getindex`; the 5-KiB minimum
+  is now documented in the target README.
+- Added Web API regression coverage for Play, Stop, Toggle, Next, Previous,
+  current-station publication, player state, bitrate, and RSSI. All 280
+  repository tests pass.
+- On the physical Wemos D1 mini, WebSocket initialization and all settings
+  requests passed. MP3 playback reported 128 kbit/s, 44.1 kHz stereo and sent
+  live player/RSSI updates for about 50 seconds despite -74 to -86 dBm RSSI.
+
+## Development — 2026-09-01
+
+### ESP8266 I2S-PDM 1.536-MHz carrier
+
+- Set the default I2S/SLC PDM carrier to nominally 1.536 MHz. The ESP8266
+  divider produces 1.538461 MHz (+0.16%) and production uses genuine PDM32 x1;
+  genuine PDM128 at 6.144 MHz remains an experimental build option.
+- Two static 512-word DMA buffers implement true ping-pong buffering. They
+  occupy 4,096 bytes and each covers about 10.67 ms. A direct FreeRTOS task
+  notification blocks once per returned buffer, replacing 2-ms polling
+  without dynamic allocation.
+- Added a 456-byte IRAM, branchless, fully unrolled PDM32 packer. On the
+  physical Wemos D1 mini it generated 100.2% realtime PCM with zero ping-pong
+  underruns and reduced producer non-wait time from 33.5% to 9.1% (3.66x).
+  Genuine PDM128 at 6.144 MHz reached only 64.4% realtime and remains rejected.
+- Isolated 320-kbit/s RAM fixtures measured Helix MP3 SSO at 28.12% CPU and
+  Helix AAC-LC at 76.20% CPU. The production binary is archived under
+  [`development/esp8266-native-qio80-sso-pdm1536/`](development/esp8266-native-qio80-sso-pdm1536/).
+
+### ESP8266 MP3 SSO with 384-kHz SPI-PDM
+
+- Added a separate MP3 SSO + SPI-PDM8 profile while retaining 16-bit,
+  769.231-kHz SPI-PDM as the normal default.
+- The new HSPI configuration outputs eight PDM bits per 48-kHz PCM sample at
+  384.615 kHz. It halves conversion work and transfer interrupts, doubles the
+  12-block queue coverage to about 16 ms, and trades this for higher one-bit
+  quantization noise.
+- Built the complete QIO80/160-MHz radio and WebUI image, verified the final
+  SDK configuration, and passed all 267 repository tests. The build is
+  archived for physical testing under
+  [`development/esp8266-native-qio80-sso-pdm8/`](development/esp8266-native-qio80-sso-pdm8/).
+
+### ESP8266 isolated audio-output profiles
+
+- Added a deterministic generated-PCM benchmark that exercises the real audio
+  driver without Wi-Fi, HTTP, flash reads, or a decoder.
+- Removed the producer-side 64-byte SPI-PDM copy by filling a reserved static
+  queue slot directly. On the physical Wemos D1 mini this reduced output
+  compute by 6.07% and total CPU busy time by 1.2 percentage points with no
+  heap cost.
+- Saved one QIO80 configuration for both stream profiling and generated-PCM
+  output testing. SPI-PDM remains the default; the same benchmark compiles
+  with fixed I2S/SLC DMA for a future GPIO3/15/2 hardware comparison.
+- Refreshed and flashed the ordinary QIO80 radio/WebUI image after testing;
+  WebUI returned HTTP 200 at `192.168.100.6`.
+
+### ESP8266 Helix 32-bit SSO MP3 synthesis
+
+- Added an optional reduced-precision Helix polyphase path that maps the hot
+  synthesis loop to native LX106 32-bit multiply/accumulate operations without
+  adding decoder buffers. The exact 64-bit path remains available at build
+  time.
+- The retained 320-kbit/s stereo fixture kept all frames and samples, measured
+  48.50 dB PCM SNR against exact Helix, and had a maximum error of 34 signed
+  16-bit PCM levels.
+- On the physical 160-MHz Wemos D1 mini, average MP3 frame time fell from
+  13,705 to 6,414 us (53.20%); isolated throughput rose from 1.751x to 3.741x
+  realtime with unchanged codec DRAM and free heap.
+- Built and flashed the complete radio/WebUI QIO80 image. It connected at
+  `192.168.100.6`, served WebUI/status/playlist over HTTP 200, and started an
+  MP3 128-kbit/s stereo station through WebSocket control.
+- Archived the development image and exact hashes under
+  [`development/esp8266-native-qio80-sso/`](development/esp8266-native-qio80-sso/).
+
+### ESP8266 experimental libmad IRAM frame workspace
+
+- Moved the 4,608-byte Layer III spectral workspace and 2,304-byte reorder
+  workspace from `mad_frame` DRAM into the shared aligned 32-bit IRAM arena.
+  The byte-addressed stream reservoir, frame header, subband samples, and
+  overlap state remain in DRAM.
+- Reduced the Xtensa `mad_frame` layout from 20,784 to 13,880 bytes, freeing
+  6,904 bytes of 8-bit DRAM. The MP3-only profile now reserves 12 KiB IRAM,
+  of which the decoder uses 11,152 bytes.
+- Verified byte-identical PCM between the original and external-workspace
+  layouts, passed all 261 repository tests, and built both MP3-only and full
+  libmad+AAC QIO80 images.
+- On the physical 160-MHz Wemos D1 mini, the new libmad decoded the retained
+  320-kbit/s RAM frame in 11,965 us average (2.005x realtime), versus Helix at
+  13,786 us (1.740x). libmad is 13.21% faster by frame time, but uses 7,424
+  bytes more DRAM and adds 50,384 bytes of flash. The ordinary validated Helix
+  radio image was restored after the benchmark and obtained `192.168.100.6`.
+- Archived the test image under
+  [`development/esp8266-native-libmad-iram/`](development/esp8266-native-libmad-iram/)
+  without replacing the previously hardware-validated libmad image.
+
+### ESP8266 experimental libmad MP3 backend
+
+- Follow-up: made libmad follow the common codec-arena lifetime. `mad_stream`,
+  `mad_frame` and `mad_synth` now have symmetric allocation/free paths; input,
+  PCM and decoder state are created only after stream detection and released
+  on Stop/error.
+- Added exact DRAM/IRAM accounting, post-allocation reserve checks and a
+  50-create/50-switch physical stress test; heap returned from 96,868 to 96,868
+  bytes with no leak.
+- Added the tested MP3-only QIO80 profile. Its 5-KB IRAM arena covers the
+  measured 4,236-byte `mad_synth`, and its 2,304-byte PCM buffer lets real
+  128-kbit/s MP3, ICY metadata, WebUI HTTP 200 and Stop coexist on the Wemos.
+- Replaced the previous reset-loop development `app.bin` with the working
+  MP3-only image. The combined libmad+AAC profile remains build-only because
+  AAC's 16-KB word arena leaves insufficient contiguous heap for libmad.
+
+- Added a pinned ESP8266Audio `libmad-8266` backend selected by
+  `CONFIG_YORADIO_MP3_DECODER_LIBMAD`; Helix remains the production default.
+- The deterministic 320-kbit/s fixture produced the same frame/sample count
+  as Helix, with 49.41 dB SNR and a maximum difference of 99 PCM levels.
+- Built both Helix and libmad QIO80 radio profiles and passed all 256 repository
+  tests. On the physical 160-MHz Wemos D1 mini, libmad decoded the 320-kbit/s
+  MP3 RAM fixture at 1.859x realtime versus 1.679x for Helix: 10.72% higher
+  throughput and 9.69% lower average frame time.
+- The full libmad radio image is not usable yet: allocating its 33,336-byte
+  workspace before Wi-Fi makes `network_service_start()` fail and causes a
+  repeatable reset loop. Helix remains the production default; the working
+  QIO80 Helix image was restored after the test.
+- Archived the experimental application and recovery binaries under
+  [`development/esp8266-native-libmad/`](development/esp8266-native-libmad/).
+
+### ESP8266 native persistent WebUI server
+
+- Changed static WebUI delivery to standard HTTP/1.1 persistence: every
+  response is explicitly framed and the browser reuses one keep-alive
+  connection instead of reopening TCP for each asset.
+- Serialized the ESP8266-only asset loader while retaining the common YoRadio
+  HTML, JavaScript and CSS sources used by the other firmware targets.
+- Increased the bounded server capacity to four active Web sessions and a
+  three-connection listen backlog, with short idle expiry and LRU recovery.
+- Backported the standard WebSocket connection-state query and stopped stale,
+  reused file descriptors from closing an unrelated HTTP request.
+- Flashed the QIO 80 MHz image on the physical Wemos D1 mini. With WebSocket
+  open, nine page resources reused one HTTP socket; live playlist-row Play,
+  Stop, Toggle, Next and Previous scenarios passed, along with 42 focused
+  regressions.
+- Replaced the checked development application and recorded its exact hash in
+  [`development/esp8266-native-qio80/`](development/esp8266-native-qio80/).
+
+### ESP8266 native QIO 80 MHz experiment
+
+- Added a separate `sdkconfig.qio80.defaults` profile while retaining QIO
+  40 MHz as the normal default.
+- Identified the physical 4 MiB flash by JEDEC ID `5E:4016` as a Zbit
+  ZB25VQ32B, whose Quad I/O read specification covers 80 MHz at 3.3 V.
+- Flashed a physical Wemos D1 mini without erasing NVS or SPIFFS and verified
+  two starts, Wi-Fi, WebUI/API access and repeated playlist reads.
+- Archived the checked binaries and hashes in
+  [`development/esp8266-native-qio80/`](development/esp8266-native-qio80/).
+
+## Development — 2026-08-31
+
+### ESP8266 native WebUI station selection
+
+- Fixed clicks on the full station row and verified that the emitted `play=N`
+  command selects and starts the requested station on a physical Wemos D1 mini.
+- Kept the repository playlist shared, but made the ESP8266 index and WebUI list
+  contain only its supported plain-HTTP MP3/AAC streams: 511 entries, no HTTPS
+  and no Ogg/Opus/FLAC/HLS/WAV entries.
+- Embedded the current shared `script.js.gz` in application flash, so this WebUI
+  fix is delivered without overwriting SPIFFS, `wifi.csv` or the stored playlist.
+- Built and flashed source revision `3acd51d`; all 243 regression tests and the
+  live Play/Stop/Next/Previous/playlist-click scenarios passed. The checked
+  artifact and SHA-256 manifest are in
+  [`development/esp8266-native/`](development/esp8266-native/).
+### ESP8266 native HTTP stack stabilization
+
+- Corrected HTTP authority, redirect and chunked-transfer parsing for the
+  low-memory radio client and added native protocol tests.
+- Made ESP HTTP Server writes bounded and nonblocking, explicitly closed short
+  static/API sessions and capped TCP PCB allocation to prevent heap exhaustion.
+- Fixed mobile WebUI startup by excluding cache-busting query parameters from
+  static SPIFFS filenames; all versioned page resources now return HTTP 200.
+- Flashed and tested the physical Wemos D1 mini: 12 concurrent requests, three
+  53,808-byte playlist transfers, follow-up HTTP and ping all succeeded.
+- Played a real HTTP AAC stream on a non-default port and verified WebSocket
+  Play/Pause/Next/Previous/Stop synchronization.
+- Built source revision `ceb6440`; all 240 regression tests passed. The checked
+  artifact and SHA-256 manifest are in
+  [`development/esp8266-native/`](development/esp8266-native/).
+
+## Development — 2026-08-30
+
+### ESP8266 native asynchronous WebUI image
+
+- Backported the standard ESP HTTP Server asynchronous request API and moved
+  SPIFFS/static WebUI responses to one low-memory worker.
+- Kept the primary HTTP task available for WebSocket and status traffic while
+  static files are being read and transmitted.
+- Protected asynchronous sockets from receive polling and LRU eviction until
+  their worker completes the request.
+- Built source revision `eed1ac0` with `-O3` and archived the application at
+  [`development/esp8266-native/`](development/esp8266-native/).
+- Flashed a physical ESP8266EX and concurrently loaded the WebUI shell, six
+  compressed assets and the 53,808-byte playlist. Every request returned 200,
+  while the same WebSocket delivered 46 ping replies.
+- Confirmed 36,032 bytes of free heap after DHCP with no reset, stack fault or
+  allocation error; all 218 repository tests passed.
 ## Development — 2026-08-29
 
 ### Native ESP-IDF ESP32-C3 OLED production and development images

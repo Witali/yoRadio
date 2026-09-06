@@ -76,6 +76,59 @@ const char index_html[] PROGMEM = R"(
     const bootToken = Date.now().toString(36);
     document.write(`<script type="text/javascript" src="variables.js?boot=${bootToken}"><\/script>`);
   </script>
+)"
+#ifdef YORADIO_WEB_SEQUENTIAL_LOAD
+R"(
+  <script>
+    const uiSuffix = `?ui=${encodeURIComponent(webUiRevision)}`;
+    const requestedUi = new URLSearchParams(window.location.search).get('ui');
+    if(requestedUi !== webUiRevision) {
+      window.history.replaceState(null, '', `${window.location.pathname}${uiSuffix}`);
+    }
+    const loadUiElement = (tag, configure, attempts = 3) => new Promise((resolve, reject) => {
+      const element = document.createElement(tag);
+      configure(element);
+      element.onload = resolve;
+      element.onerror = () => {
+        const error = new Error('Unable to load ' + (element.href || element.src));
+        element.remove();
+        if(attempts <= 1) { reject(error); return; }
+        console.log('Retrying WebUI resource:', element.href || element.src);
+        setTimeout(() => loadUiElement(tag, configure, attempts-1).then(resolve, reject),
+                   (4-attempts)*250);
+      };
+      document.head.appendChild(element);
+    });
+    (async () => {
+      await loadUiElement('link', element => {
+        element.rel = 'stylesheet'; element.href = `theme.css${uiSuffix}`;
+      });
+      await loadUiElement('link', element => {
+        element.rel = 'stylesheet'; element.href = `style.css${uiSuffix}`;
+      });
+      await loadUiElement('script', element => {
+        element.src = `script.js${uiSuffix}`;
+      });
+      window.removeEventListener('load', onLoad);
+      await loadUiElement('script', element => {
+        element.src = `dragpl.js${uiSuffix}`;
+      });
+      if(document.readyState === 'complete') onLoad();
+      else window.addEventListener('load', onLoad, {once: true});
+    })().catch(error => {
+      console.log('WebUI loading failed:', error.message);
+      const showFailure = () => {
+        const progress = document.getElementById('progress');
+        if(progress) progress.textContent = 'WebUI loading failed. Please reload the page.';
+      };
+      if(document.readyState === 'loading')
+        document.addEventListener('DOMContentLoaded', showFailure, {once: true});
+      else showFailure();
+    });
+  </script>
+)"
+#else
+R"(
   <script>
     const uiSuffix = `?ui=${encodeURIComponent(webUiRevision)}`;
     const requestedUi = new URLSearchParams(window.location.search).get('ui');
@@ -87,6 +140,9 @@ const char index_html[] PROGMEM = R"(
     document.write(`<script type="text/javascript" src="script.js${uiSuffix}"><\/script>`);
     document.write(`<script type="text/javascript" src="dragpl.js${uiSuffix}"><\/script>`);
   </script>
+)"
+#endif
+R"(
   </head>
 <body>
 <div id="content" class="hidden progmem">

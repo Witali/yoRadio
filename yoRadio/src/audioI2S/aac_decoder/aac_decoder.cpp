@@ -8,6 +8,10 @@
 
 #include "aac_decoder.h"
 #include "../CodecMemoryArena.h"
+#include "../helix_stage_profile.h"
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+#include "../helix_lx106_fixed.h"
+#endif
 
 const uint32_t SQRTHALF             = 0x5a82799a;    /* sqrt(0.5), format = Q31 */
 const uint32_t Q28_2                = 0x20000000;    /* Q28: 2.0 */
@@ -89,8 +93,25 @@ PSInfoSBR_t         *m_PSInfoSBR;
 
 //----------------------------------------------------------------------------------------------------------------------
 inline int MULSHIFT32(int x, int y){
+#if defined(YORADIO_ESP8266_NATIVE) && defined(YORADIO_HELIX_AAC_SSO) && \
+        !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+    /* AAC spends most of its time in Q31/Q30 transform products. LX106 has
+     * only a native low 32-bit multiply, while the exact high-half helper
+     * needs four partial products. Omit only low*low; it can change the
+     * returned high word by at most one PCM level. */
+    const int32_t xHi = x >> 16;
+    const int32_t yHi = y >> 16;
+    const uint32_t xLo = (uint16_t)x;
+    const uint32_t yLo = (uint16_t)y;
+    const int32_t cross0 = xHi * (int32_t)yLo;
+    const int32_t cross1 = yHi * (int32_t)xLo + (int32_t)(uint16_t)cross0;
+    return xHi * yHi + (cross0 >> 16) + (cross1 >> 16);
+#elif defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+    return helix_lx106_mulshift32(x, y);
+#else
     int z; z = (int64_t)x * (int64_t)y >> 32;
     return z;
+#endif
 }
 inline int CLZ(int x){
 #ifdef __XTENSA__
@@ -108,7 +129,7 @@ inline int CLZ(int x){
 #endif
 }
 inline int FASTABS(int x){
-#ifdef __XTENSA__ //fb
+#if defined(__XTENSA__) && !defined(YORADIO_ESP8266_NATIVE) // ESP32 clamps instruction
     return __builtin_abs(x);
 #else
     int sign;
@@ -117,11 +138,15 @@ inline int FASTABS(int x){
 #endif
 }
 inline int64_t MADD64(int64_t sum64, int x, int y){
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+    return (int64_t)helix_lx106_madd64((uint64_t)sum64, x, y);
+#else
     sum64 += (int64_t)x * (int64_t)y;
     return sum64;
+#endif
 }
 inline short CLIPTOSHORT(int x){
-#ifdef __XTENSA__ //fb
+#if defined(__XTENSA__) && !defined(YORADIO_ESP8266_NATIVE) // ESP32 clamps instruction
     asm ("clamps %0, %1, 15" : "=a" (x) : "a" (x) : );
     return x;
 #else
@@ -1694,6 +1719,19 @@ bool AACDecoder_AllocateBuffers(void){
     memset( m_PSInfoSBR,         0, sizeof(PSInfoSBR_t));               //Clear PSInfoSBR
     InitSBRState();
 #endif
+#ifdef YORADIO_ESP8266_NATIVE
+    m_PSInfoBase->coef = (int (*)[AAC_MAX_NSAMPS])
+        CodecArenaCalloc32(CODEC_ARENA_AAC, AAC_MAX_NCHANS,
+                           AAC_MAX_NSAMPS * sizeof(int));
+    m_PSInfoBase->overlap = (int (*)[AAC_MAX_NSAMPS])
+        CodecArenaCalloc32(CODEC_ARENA_AAC, AAC_MAX_NCHANS,
+                           AAC_MAX_NSAMPS * sizeof(int));
+    if(!m_PSInfoBase->coef || !m_PSInfoBase->overlap) {
+        log_e("not enough IRAM/DRAM for AAC 32-bit workspaces");
+        AACDecoder_FreeBuffers();
+        return false;
+    }
+#endif
 
     m_AACDecInfo->prevBlockID = AAC_ID_INVALID;
     m_AACDecInfo->currBlockID = AAC_ID_INVALID;
@@ -1761,7 +1799,14 @@ void AACDecoder_FreeBuffers(void) {
 //    uint32_t i = ESP.getFreeHeap();
 
     if(m_AACDecInfo)                         {CodecArenaFree(m_AACDecInfo); m_AACDecInfo=NULL;}
-    if(m_PSInfoBase)                         {CodecArenaFree(m_PSInfoBase); m_PSInfoBase=NULL;}
+    if(m_PSInfoBase) {
+#ifdef YORADIO_ESP8266_NATIVE
+        CodecArenaFree(m_PSInfoBase->coef);
+        CodecArenaFree(m_PSInfoBase->overlap);
+#endif
+        CodecArenaFree(m_PSInfoBase);
+        m_PSInfoBase=NULL;
+    }
     if(m_pce[0])                             {CodecArenaFree(m_pce[0]);     m_pce[0]=NULL;}
 
 #ifdef AAC_ENABLE_SBR
@@ -1787,6 +1832,9 @@ void AACDecoder_FreeBuffers(void) {
  **********************************************************************************************************************/
 bool AACDecoder_IsInit(void) {
     if(m_AACDecInfo && m_PSInfoBase && m_pce[0]){
+#ifdef YORADIO_ESP8266_NATIVE
+        if(!m_PSInfoBase->coef || !m_PSInfoBase->overlap) return false;
+#endif
         return true;
     }
     return false;
@@ -1840,12 +1888,22 @@ uint8_t AACGetProfile() {return (uint8_t)m_AACDecInfo->profile;} // 0-Main, 1-LC
 uint8_t AACGetFormat() {return (uint8_t)m_AACDecInfo->format;}   // 0-unknown 1-ADTS 2-ADIF, 3-RAW
 int AACGetOutputSamps(){return m_AACDecInfo->nChans * AAC_MAX_NSAMPS  * (m_AACDecInfo->sbrEnabled ? 2 : 1);}
 int AACGetBitrate() {
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+    /* For 16-bit AAC PCM, channels cancel between PCM bitrate and output
+     * bytes, and the SBR factor cancels between sample rate and samples per
+     * frame.  The native bridge limits an encoded frame to 1536 bytes, so
+     * core sample rate * frame bytes is safely below UINT32_MAX. */
+    return static_cast<int>(
+        (static_cast<uint32_t>(m_AACDecInfo->sampRate) *
+         m_AACDecInfo->frameBytes) / 128U);
+#else
     const uint32_t outputBytes = AACGetOutputSamps() * 2U;
     if (!outputBytes) return 0;
     const uint64_t pcmBitrate = static_cast<uint64_t>(AACGetBitsPerSample()) *
                                 AACGetChannels() * AACGetSampRate();
     return static_cast<int>(pcmBitrate * m_AACDecInfo->frameBytes /
                             outputBytes);
+#endif
 }
 /**************************************************************************************
  * Function:    AACSetRawBlockParams
@@ -1899,7 +1957,15 @@ int AACSetRawBlockParams(int copyLast, int nChans, int sampRateCore, int profile
  *                successfully decoded, so if ERR_AAC_INDATA_UNDERFLOW is returned
  *                just call AACDecode again with more data in inbuf
  **********************************************************************************************************************/
-int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
+#if YORADIO_AAC_BLOCK_OUTPUT
+#include "aac_pcm_blocks.inc"
+#endif
+
+static int AACDecodeInternal(uint8_t *inbuf, int *bytesLeft, short *outbuf
+#if YORADIO_AAC_BLOCK_OUTPUT
+                             , AACBlockOutput *blocks
+#endif
+                             )
 {
     int err, offset, bitOffset, bitsAvail;
     int ch, baseChan, elementChans;
@@ -1983,27 +2049,42 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
         if (baseChan + elementChans > AAC_MAX_NCHANS)
             return ERR_AAC_NCHANS_TOO_HIGH;
 
+#if YORADIO_AAC_BLOCK_OUTPUT
+        AACCoefOffset coefOffset(blocks ? baseChan : 0);
+#endif
+
         /* noiseless decoder and dequantizer */
         for (ch = 0; ch < elementChans; ch++) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_HUFFMAN);
             err = DecodeNoiselessData(&inptr, &bitOffset, &bitsAvail, ch);
+            HELIX_PROFILE_END(HELIX_STAGE_HUFFMAN);
 
             if (err)
                 return err;
 
-            if (AACDequantize(ch))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_DEQUANT);
+            int dequantResult = AACDequantize(ch);
+            HELIX_PROFILE_END(HELIX_STAGE_DEQUANT);
+            if (dequantResult)
                 return ERR_AAC_DEQUANT;
         }
 
         /* mid-side and intensity stereo */
         if (m_AACDecInfo->currBlockID == AAC_ID_CPE) {
-            if (StereoProcess())
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_STEREO_FILTER);
+            int stereoResult = StereoProcess();
+            HELIX_PROFILE_END(HELIX_STAGE_STEREO_FILTER);
+            if (stereoResult)
                 return ERR_AAC_STEREO_PROCESS;
         }
 
         /* PNS, TNS, inverse transform */
         for (ch = 0; ch < elementChans; ch++) {
 
-            if (PNS(ch))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_STEREO_FILTER);
+            int pnsResult = PNS(ch);
+            HELIX_PROFILE_END(HELIX_STAGE_STEREO_FILTER);
+            if (pnsResult)
                 return ERR_AAC_PNS;
 
             if (m_AACDecInfo->sbDeinterleaveReqd[ch]) {
@@ -2013,10 +2094,32 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
                 m_AACDecInfo->sbDeinterleaveReqd[ch] = 0;
             }
 
-            if (TNSFilter(ch))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_STEREO_FILTER);
+            int tnsResult = TNSFilter(ch);
+            HELIX_PROFILE_END(HELIX_STAGE_STEREO_FILTER);
+            if (tnsResult)
                 return ERR_AAC_TNS;
 
-            if (IMDCT(ch, baseChan + ch, outbuf))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_IMDCT);
+            int imdctResult;
+#if YORADIO_AAC_BLOCK_OUTPUT
+            if (blocks) {
+                const ICSInfo_t &ics = m_PSInfoBase->icsInfo[
+                    ch == 1 && m_PSInfoBase->commonWin ? 0 : ch];
+                blocks->window[baseChan + ch] = aac_window_state(ch, baseChan + ch);
+                if (ics.winSequence == 2) {
+                    for (int i = 0; i < 8; ++i)
+                        DCT4(0, m_PSInfoBase->coef[ch] + i * 128, m_PSInfoBase->gbCurrent[ch]);
+                } else {
+                    DCT4(1, m_PSInfoBase->coef[ch], m_PSInfoBase->gbCurrent[ch]);
+                }
+                m_PSInfoBase->prevWinShape[baseChan + ch] = ics.winShape;
+                imdctResult = 0;
+            } else
+#endif
+                imdctResult = IMDCT(ch, baseChan + ch, outbuf);
+            HELIX_PROFILE_END(HELIX_STAGE_IMDCT);
+            if (imdctResult)
                 return ERR_AAC_IMDCT;
         }
 
@@ -2039,7 +2142,10 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
                 return ERR_AAC_SBR_BITSTREAM;
 
             /* apply SBR */
-            if (DecodeSBRData(baseChanSBR, outbuf))
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SBR);
+            int sbrResult = DecodeSBRData(baseChanSBR, outbuf);
+            HELIX_PROFILE_END(HELIX_STAGE_SBR);
+            if (sbrResult)
                 return ERR_AAC_SBR_DATA;
 
             baseChanSBR += elementChansSBR;
@@ -2065,8 +2171,52 @@ int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf)
     *bytesLeft -= (inptr - inbuf);
     inbuf = inptr;
 
+#if YORADIO_AAC_BLOCK_OUTPUT
+    if (blocks) {
+        if (baseChan != m_AACDecInfo->nChans) return ERR_AAC_CHANNEL_MAP;
+        return aac_emit_blocks(outbuf, *blocks);
+    }
+#endif
     return ERR_AAC_NONE;
 }
+
+int AACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf) {
+    return AACDecodeInternal(inbuf, bytesLeft, outbuf
+#if YORADIO_AAC_BLOCK_OUTPUT
+                             , nullptr
+#endif
+                             );
+}
+
+#if YORADIO_AAC_BLOCK_OUTPUT
+int AACDecodeBlocks(uint8_t *inbuf, int *bytesLeft, short *pcm, int capacity,
+                    int blockFrames, bool mono, AACPCMCallback sink, void *context) {
+    if (!inbuf || !bytesLeft || !pcm || !sink || !m_AACDecInfo || !m_PSInfoBase)
+        return ERR_AAC_NULL_POINTER;
+    /* Validate the stereo worst case before parsing, since channel count can
+     * change in an ADTS header. No allocation or output on invalid capacity. */
+    if (*bytesLeft < 0 || blockFrames < 32 || blockFrames > 512 ||
+        (blockFrames & (blockFrames - 1)) || capacity < blockFrames * (mono ? 1 : 2))
+        return ERR_AAC_INVALID_FRAME;
+    /* The bit decoder expects an entire ADTS frame, not a network fragment.
+     * Reject truncation before entering it (including after a prior frame).
+     * Keep RAW/ADIF and the remaining raw blocks of a multi-block ADTS frame. */
+    if (m_AACDecInfo->format != AAC_FF_RAW && m_AACDecInfo->format != AAC_FF_ADIF &&
+        m_AACDecInfo->adtsBlocksLeft == 0 &&
+        !(*bytesLeft >= 4 && inbuf[0] == 'A' && inbuf[1] == 'D' && inbuf[2] == 'I' && inbuf[3] == 'F')) {
+        const int sync = AACFindSyncWord(inbuf, *bytesLeft);
+        if (sync < 0 || *bytesLeft - sync < 7) return ERR_AAC_INDATA_UNDERFLOW;
+        const uint8_t *header = inbuf + sync;
+        const int length = ((header[3] & 3) << 11) | (header[4] << 3) | (header[5] >> 5);
+        if (length < ((header[1] & 1) ? 7 : 9)) return ERR_AAC_INVALID_ADTS_HEADER;
+        if (length > *bytesLeft - sync) return ERR_AAC_INDATA_UNDERFLOW;
+    }
+    AACBlockOutput output = {blockFrames, mono, sink, context, {}};
+    const int result = AACDecodeInternal(inbuf, bytesLeft, pcm, &output);
+    if (result != ERR_AAC_NONE) AACFlushCodec();
+    return result;
+}
+#endif
 /***********************************************************************************************************************
  * Function:    DecodeLPCCoefs
  *
@@ -3279,6 +3429,23 @@ void UnpackZeros(int nVals, int *coef)
  * Notes:       assumes nVals is always a multiple of 4 because all scalefactor bands
  *                are a multiple of 4 coefficients long
  **********************************************************************************************************************/
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_AAC_REFERENCE_HUFFMAN)
+#include "aac_huffman_prefix.inc"
+#endif
+
+static inline int aac_huffman_decode(int book, uint32_t bitBuf, int32_t *val) {
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_AAC_REFERENCE_HUFFMAN)
+    const uint32_t entry = aacHuffmanPrefix[book][bitBuf >> (32 - AAC_HUFFMAN_PREFIX_BITS)];
+    if (entry) {
+        *val = static_cast<int16_t>(entry);
+        return entry >> 16;
+    }
+#endif
+    return book == 11
+        ? DecodeHuffmanScalar(huffTabScaleFact, &huffTabScaleFactInfo, bitBuf, val)
+        : DecodeHuffmanScalar(huffTabSpec, &huffTabSpecInfo[book], bitBuf, val);
+}
+
 void UnpackQuads(int cb, int nVals, int *coef)
 {
     int w, x, y, z, maxBits, nCodeBits, nSignBits;
@@ -3289,7 +3456,7 @@ void UnpackQuads(int cb, int nVals, int *coef)
     while (nVals > 0) {
         /* decode quad */
         bitBuf = GetBitsNoAdvance(maxBits) << (32 - maxBits);
-        nCodeBits = DecodeHuffmanScalar(huffTabSpec, &huffTabSpecInfo[cb - HUFFTAB_SPEC_OFFSET], bitBuf, &val);
+        nCodeBits = aac_huffman_decode(cb - HUFFTAB_SPEC_OFFSET, bitBuf, &val);
 
         w = (((int32_t)(val) << 20) >>   29);    /* bits 11-9, sign-extend */
         x = (((int32_t)(val) << 23) >>   29);    /* bits  8-6, sign-extend */
@@ -3336,7 +3503,7 @@ void UnpackPairsNoEsc(int cb, int nVals, int *coef)
     while (nVals > 0) {
         /* decode pair */
         bitBuf = GetBitsNoAdvance(maxBits) << (32 - maxBits);
-        nCodeBits = DecodeHuffmanScalar(huffTabSpec, &huffTabSpecInfo[cb-HUFFTAB_SPEC_OFFSET], bitBuf, &val);
+        nCodeBits = aac_huffman_decode(cb - HUFFTAB_SPEC_OFFSET, bitBuf, &val);
 
         y = (((int32_t)(val) << 22) >>   27);    /* bits  9-5, sign-extend */
         z = (((int32_t)(val) << 27) >>   27);    /* bits  4-0, sign-extend */
@@ -3378,7 +3545,7 @@ void UnpackPairsEsc(int cb, int nVals, int *coef)
     while (nVals > 0) {
         /* decode pair with escape value */
         bitBuf = GetBitsNoAdvance(maxBits) << (32 - maxBits);
-        nCodeBits = DecodeHuffmanScalar(huffTabSpec, &huffTabSpecInfo[cb-HUFFTAB_SPEC_OFFSET], bitBuf, &val);
+        nCodeBits = aac_huffman_decode(cb - HUFFTAB_SPEC_OFFSET, bitBuf, &val);
 
         y = (((int32_t)(val) << 20) >>   26);    /* bits 11-6, sign-extend */
         z = (((int32_t)(val) << 26) >>   26);    /* bits  5-0, sign-extend */
@@ -4179,7 +4346,7 @@ int DecodeOneScaleFactor()
     int32_t val;
     /* decode next scalefactor from bitstream */
     bitBuf = GetBitsNoAdvance(huffTabScaleFactInfo.maxBits) << (32 - huffTabScaleFactInfo.maxBits);
-    nBits = DecodeHuffmanScalar(huffTabScaleFact, &huffTabScaleFactInfo, bitBuf, &val);
+    nBits = aac_huffman_decode(11, bitBuf, &val);
     AdvanceBitstream(nBits);
     return val;
 }

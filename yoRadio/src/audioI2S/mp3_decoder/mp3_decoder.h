@@ -4,6 +4,21 @@
 #include "Arduino.h"
 #include "assert.h"
 
+/* Existing Arduino/ESP32 callers retain stereo unless explicitly opted in. */
+#ifndef YORADIO_HELIX_MP3_MONO
+#define YORADIO_HELIX_MP3_MONO 0
+#endif
+
+/* Reuse IMDCT output during sequential ESP8266 dequantization. Set to 0
+ * for the separate-buffer reference. Other targets keep their layout. */
+#ifndef YORADIO_HELIX_MP3_SHARED_REORDER
+#if defined(YORADIO_ESP8266_NATIVE)
+#define YORADIO_HELIX_MP3_SHARED_REORDER 1
+#else
+#define YORADIO_HELIX_MP3_SHARED_REORDER 0
+#endif
+#endif
+
 static const uint8_t  m_HUFF_PAIRTABS          =32;
 static const uint8_t  m_BLOCK_SIZE             =18;
 static const uint8_t  m_NBANDS                 =32;
@@ -138,8 +153,16 @@ typedef struct HuffTabLookup {
 } HuffTabLookup_t;
 
 typedef struct IMDCTInfo {
+#if defined(YORADIO_ESP8266_NATIVE)
+    /* The ESP8266 native build keeps the large word-addressed transform
+     * output in the preallocated IRAM arena. The overlap history remains
+     * in byte-addressable DRAM. */
+    int (*outBuf[m_MAX_NCHAN])[m_NBANDS];
+    int *overBuf[m_MAX_NCHAN];
+#else
     int outBuf[m_MAX_NCHAN][m_BLOCK_SIZE][m_NBANDS];  /* output of IMDCT */
     int overBuf[m_MAX_NCHAN][m_MAX_NSAMP / 2];      /* overlap-add buffer (by symmetry, only need 1/2 size) */
+#endif
     int numPrevIMDCT[m_MAX_NCHAN];                /* how many IMDCT's calculated in this channel on prev. granule */
     int prevType[m_MAX_NCHAN];
     int prevWinSwitch[m_MAX_NCHAN];
@@ -458,6 +481,20 @@ const uint32_t csa[8][2] PROGMEM = {
 bool MP3Decoder_AllocateBuffers(void);
 void MP3Decoder_FreeBuffers();
 int  MP3Decode( unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize);
+#if defined(YORADIO_ESP8266_NATIVE)
+typedef bool (*MP3GranuleCallback)(void *context, short *pcm, int samples);
+enum { MP3_PCM_BLOCK_FRAMES = 32 };
+int MP3DecodeGranules(unsigned char *inbuf, int *bytesLeft, short *outbuf,
+                      int useSize, MP3GranuleCallback callback,
+                      void *context);
+/* Synchronous sink: consume/copy each 32-frame block before returning.
+ * outCapacity is in int16 samples, not bytes; mono needs 32, stereo 64.
+ * Cancellation stops synthesis immediately; clear/reset before resuming.
+ * Like the granule API, already-delivered PCM cannot be retracted on error. */
+int MP3DecodeBlocks(unsigned char *inbuf, int *bytesLeft, short *outbuf,
+                    int outCapacity, int useSize, MP3GranuleCallback callback,
+                    void *context);
+#endif
 void MP3GetLastFrameInfo();
 int  MP3GetNextFrameInfo(unsigned char *buf);
 int  MP3FindSyncWord(unsigned char *buf, int nBytes);
@@ -506,8 +543,18 @@ void imdct12(int *x, int *out);
 int IMDCT12x3(int *xCurr, int *xPrev, int *y, int btPrev, int blockIdx, int gb);
 int HybridTransform(int *xCurr, int *xPrev, int y[m_BLOCK_SIZE][m_NBANDS], SideInfoSub_t *sis, BlockCount_t *bc);
 inline uint64_t SAR64(uint64_t x, int n) {return x >> n;}
+#if defined(YORADIO_ESP8266_NATIVE) && !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+#include "../helix_lx106_fixed.h"
+inline int MULSHIFT32(int x, int y) {
+    return helix_lx106_mulshift32(x, y);
+}
+inline uint64_t MADD64(uint64_t sum64, int x, int y) {
+    return helix_lx106_madd64(sum64, x, y);
+}
+#else
 inline int MULSHIFT32(int x, int y) { int z; z = (uint64_t) x * (uint64_t) y >> 32; return z;}
 inline uint64_t MADD64(uint64_t sum64, int x, int y) {sum64 += (uint64_t) x * (uint64_t) y; return sum64;}/* returns 64-bit value in [edx:eax] */
+#endif
 inline uint64_t xSAR64(uint64_t x, int n){return x >> n;}
 inline int FASTABS(int x){ return __builtin_abs(x);} //xtensa has a fast abs instruction //fb
 #define CLZ(x) __builtin_clz(x) //fb

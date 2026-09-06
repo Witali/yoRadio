@@ -7,6 +7,23 @@
  */
 #include "mp3_decoder.h"
 #include "../CodecMemoryArena.h"
+#include "../helix_stage_profile.h"
+
+#if defined(YORADIO_ESP8266_NATIVE) && \
+    defined(YORADIO_ESP8266_HELIX_RECIPROCAL_DIVIDE) && \
+    !defined(YORADIO_HELIX_REFERENCE_FIXED_POINT)
+#define HELIX_UDIV3(value)  ((int)helix_lx106_udiv_recip((uint32_t)(value), 3U, 0x55555556U))
+#define HELIX_UDIV5(value)  ((int)helix_lx106_udiv_recip((uint32_t)(value), 5U, 0x33333334U))
+#define HELIX_UDIV6(value)  ((int)helix_lx106_udiv_recip((uint32_t)(value), 6U, 0x2aaaaaabU))
+#define HELIX_UDIV18(value) ((int)helix_lx106_udiv_recip((uint32_t)(value), 18U, 0x0e38e38fU))
+#define HELIX_UDIV36(value) ((int)helix_lx106_udiv_recip((uint32_t)(value), 36U, 0x071c71c8U))
+#else
+#define HELIX_UDIV3(value)  ((value) / 3)
+#define HELIX_UDIV5(value)  ((value) / 5)
+#define HELIX_UDIV6(value)  ((value) / 6)
+#define HELIX_UDIV18(value) ((value) / 18)
+#define HELIX_UDIV36(value) ((value) / 36)
+#endif
 /* clip to range [-2^n, 2^n - 1] */
 #if 0 //Fast on ARM:
 #define CLIP_2N(y, n) { \
@@ -25,7 +42,7 @@
 #endif
 
 const uint8_t  m_SYNCWORDH              =0xff;
-const uint8_t  m_SYNCWORDL              =0xf0;
+const uint8_t  m_SYNCWORDL              =0xe0; // 11 sync bits; MPEG2.5 has version bits 00
 const uint8_t  m_DQ_FRACBITS_OUT        =25;  // number of fraction bits in output of dequant
 const uint8_t  m_CSHIFT                 =12;  // coefficients have 12 leading sign bits for early-terminating mulitplies
 const uint8_t  m_SIBYTES_MPEG1_MONO     =17;
@@ -46,13 +63,44 @@ FrameHeader_t *m_FrameHeader;
 SideInfoSub_t m_SideInfoSub[m_MAX_NGRAN][m_MAX_NCHAN];
 SideInfo_t *m_SideInfo;
 CriticalBandInfo_t m_CriticalBandInfo[m_MAX_NCHAN];  /* filled in dequantizer, used in joint stereo reconstruction */
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
 DequantInfo_t *m_DequantInfo;
+#endif
 HuffmanInfo_t *m_HuffmanInfo;
 IMDCTInfo_t *m_IMDCTInfo;
 ScaleFactorInfoSub_t m_ScaleFactorInfoSub[m_MAX_NGRAN][m_MAX_NCHAN];
 ScaleFactorJS_t *m_ScaleFactorJS;
 SubbandInfo_t *m_SubbandInfo;
 MP3DecInfo_t *m_MP3DecInfo;
+#if defined(YORADIO_ESP8266_NATIVE)
+static int m_OutputBufferSamples;
+#endif
+
+static int SubbandInternal(short *pcmBuf
+#if defined(YORADIO_ESP8266_NATIVE)
+                           , MP3GranuleCallback callback, void *context
+#endif
+                           );
+
+static int MP3OutputChannels() {
+    return YORADIO_HELIX_MP3_MONO ? 1 : m_MP3DecInfo->nChans;
+}
+
+static int *MP3ReorderBuffer() {
+#if YORADIO_HELIX_MP3_SHARED_REORDER
+    static_assert(m_MAX_REORDER_SAMPS <= m_BLOCK_SIZE * m_NBANDS,
+                  "Reorder scratch must fit one IMDCT output channel");
+    /* Same aligned int storage, not an aliased DequantInfo_t object. All
+     * channels finish dequantization BEFORE any IMDCT writes outBuf; the
+     * previous granule's synthesis/callback has already returned. Never
+     * pipeline these stages concurrently while this workspace is shared.
+     * IMDCT remains the sole owner, including on allocation failure. */
+    return reinterpret_cast<int *>(m_IMDCTInfo->outBuf[0]);
+#else
+    return m_DequantInfo->workBuf;
+#endif
+}
+#include "mp3_mono.h"
 
 const unsigned short huffTable[4242] PROGMEM = {
     /* huffTable01[9] */
@@ -759,6 +807,7 @@ int UnpackFrameHeader(unsigned char *buf){
     if ((buf[0] & m_SYNCWORDH) != m_SYNCWORDH || (buf[1] & m_SYNCWORDL) != m_SYNCWORDL)  return -1;
     /* read header fields - use bitmasks instead of GetBits() for speed, since format never varies */
     verIdx = (buf[1] >> 3) & 0x03;
+    if (verIdx == 1) return -1; // reserved MPEG version, not MPEG1
     m_MPEGVersion = (MPEGVersion_t) (verIdx == 0 ? MPEG25 : ((verIdx & 0x01) ? MPEG1 : MPEG2));
     m_FrameHeader->layer = 4 - ((buf[1] >> 1) & 0x03); /* easy mapping of index to layer number, 4 = error */
     m_FrameHeader->crc = 1 - ((buf[1] >> 0) & 0x01);
@@ -781,7 +830,10 @@ int UnpackFrameHeader(unsigned char *buf){
     m_MP3DecInfo->nChans = (m_sMode == Mono ? 1 : 2);
     m_MP3DecInfo->samprate = samplerateTab[m_MPEGVersion][m_FrameHeader->srIdx];
     m_MP3DecInfo->nGrans = (m_MPEGVersion == MPEG1 ? m_NGRANS_MPEG1 : m_NGRANS_MPEG2);
-    m_MP3DecInfo->nGranSamps = ((int) samplesPerFrameTab[m_MPEGVersion][m_FrameHeader->layer - 1])/m_MP3DecInfo->nGrans;
+    int samplesPerFrame =
+        (int)samplesPerFrameTab[m_MPEGVersion][m_FrameHeader->layer - 1];
+    m_MP3DecInfo->nGranSamps =
+        (m_MP3DecInfo->nGrans == 2 ? samplesPerFrame >> 1 : samplesPerFrame);
     m_MP3DecInfo->layer = m_FrameHeader->layer;
 
     /* get bitrate and nSlots from table, unless brIdx == 0 (free mode) in which case caller must figure it out himself
@@ -1000,8 +1052,9 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         /* in other words: if ((modeExt & 0x01) == 0 || ch == 0) */
         if (sfCompress < 400) {
             /* max slen = floor[(399/16) / 5] = 4 */
-            slen[0] = (sfCompress >> 4) / 5;
-            slen[1]= (sfCompress >> 4) % 5;
+            int packed = sfCompress >> 4;
+            slen[0] = HELIX_UDIV5(packed);
+            slen[1] = packed - slen[0] * 5;
             slen[2]= (sfCompress & 0x0f) >> 2;
             slen[3]= (sfCompress & 0x03);
             sfcIdx = 0;
@@ -1009,8 +1062,9 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         else if(sfCompress < 500){
             /* max slen = floor[(99/4) / 5] = 4 */
             sfCompress -= 400;
-            slen[0] = (sfCompress >> 2) / 5;
-            slen[1]= (sfCompress >> 2) % 5;
+            int packed = sfCompress >> 2;
+            slen[0] = HELIX_UDIV5(packed);
+            slen[1] = packed - slen[0] * 5;
             slen[2]= (sfCompress & 0x03);
             slen[3]= 0;
             sfcIdx = 1;
@@ -1018,8 +1072,8 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         else{
             /* max slen = floor[11/3] = 3 (sfCompress = 9 bits in MPEG2) */
             sfCompress -= 500;
-            slen[0] = sfCompress / 3;
-            slen[1] = sfCompress % 3;
+            slen[0] = HELIX_UDIV3(sfCompress);
+            slen[1] = sfCompress - slen[0] * 3;
             slen[2] = slen[3] = 0;
             if (sis->mixedBlock) {
                 /* adjust for long/short mix logic (see comment above in NRTab[] definition) */
@@ -1036,9 +1090,10 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         sfCompress >>= 1;
         if (sfCompress < 180) {
             /* max slen = floor[35/6] = 5 (from mod 36) */
-            slen[0] = (sfCompress / 36);
-            slen[1] = (sfCompress % 36) / 6;
-            slen[2] = (sfCompress % 36) % 6;
+            slen[0] = HELIX_UDIV36(sfCompress);
+            int remainder = sfCompress - slen[0] * 36;
+            slen[1] = HELIX_UDIV6(remainder);
+            slen[2] = remainder - slen[1] * 6;
             slen[3] = 0;
             sfcIdx = 3;
         }
@@ -1054,8 +1109,8 @@ void UnpackSFMPEG2(BitStreamInfo_t *bsi, SideInfoSub_t *sis,
         else{
             /* max slen = floor[11/3] = 3 (max sfCompress >> 1 = 511/2 = 255) */
             sfCompress -= 244;
-            slen[0] = (sfCompress / 3);
-            slen[1] = (sfCompress % 3);
+            slen[0] = HELIX_UDIV3(sfCompress);
+            slen[1] = sfCompress - slen[0] * 3;
             slen[2] = slen[3] = 0;
             sfcIdx = 5;
         }
@@ -1270,10 +1325,10 @@ void MP3GetLastFrameInfo() {
     }
     else{
         m_MP3FrameInfo->bitrate=m_MP3DecInfo->bitrate;
-        m_MP3FrameInfo->nChans=m_MP3DecInfo->nChans;
+        m_MP3FrameInfo->nChans=MP3OutputChannels();
         m_MP3FrameInfo->samprate=m_MP3DecInfo->samprate;
         m_MP3FrameInfo->bitsPerSample=16;
-        m_MP3FrameInfo->outputSamps=m_MP3DecInfo->nChans
+        m_MP3FrameInfo->outputSamps=MP3OutputChannels()
                 * (int) samplesPerFrameTab[m_MPEGVersion][m_MP3DecInfo->layer-1];
         m_MP3FrameInfo->layer=m_MP3DecInfo->layer;
         m_MP3FrameInfo->version=m_MPEGVersion;
@@ -1319,7 +1374,13 @@ int MP3GetNextFrameInfo(unsigned char *buf) {
  **********************************************************************************************************************/
 void MP3ClearBadFrame( short *outbuf) {
     int i;
-    for (i = 0; i < m_MP3DecInfo->nGrans * m_MP3DecInfo->nGranSamps * m_MP3DecInfo->nChans; i++)
+    int samples = m_MP3DecInfo->nGrans * m_MP3DecInfo->nGranSamps *
+                  MP3OutputChannels();
+#if defined(YORADIO_ESP8266_NATIVE)
+    if (m_OutputBufferSamples > 0 && samples > m_OutputBufferSamples)
+        samples = m_OutputBufferSamples;
+#endif
+    for (i = 0; i < samples; i++)
         outbuf[i] = 0;
 }
 /***********************************************************************************************************************
@@ -1341,7 +1402,13 @@ void MP3ClearBadFrame( short *outbuf) {
  * Notes:       switching useSize on and off between frames in the same stream
  *                is not supported (bit reservoir is not maintained if useSize on)
  **********************************************************************************************************************/
-int MP3Decode( unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize){
+static int MP3DecodeInternal(unsigned char *inbuf, int *bytesLeft,
+                             short *outbuf, int useSize
+#if defined(YORADIO_ESP8266_NATIVE)
+                             , MP3GranuleCallback callback, void *context,
+                             bool streamBlocks
+#endif
+                             ) {
     int offset, bitOffset, mainBits, gr, ch, fhBytes, siBytes, freeFrameBytes;
     int prevBitOffset, sfBlockBits, huffBlockBits;
     unsigned char *mainPtr;
@@ -1431,6 +1498,9 @@ int MP3Decode( unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize)
 
     /* decode one complete frame */
     for (gr = 0; gr < m_MP3DecInfo->nGrans; gr++) {
+#if YORADIO_HELIX_MP3_MONO
+        const bool monoMidSide = MonoMidSide(gr);
+#endif
         for (ch = 0; ch < m_MP3DecInfo->nChans; ch++) {
             /* unpack scale factors and compute size of scale factor block */
             prevBitOffset = bitOffset;
@@ -1441,13 +1511,26 @@ int MP3Decode( unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize)
             mainPtr += offset;
             mainBits -= sfBlockBits;
 
-            if (offset < 0 || mainBits < huffBlockBits) {
+            if (offset < 0 || huffBlockBits < 0 || mainBits < huffBlockBits) {
                 MP3ClearBadFrame(outbuf);
                 return ERR_MP3_INVALID_SCALEFACT;
             }
             /* decode Huffman code words */
+#if YORADIO_HELIX_MP3_MONO
+            if (monoMidSide && ch == 1) {
+                /* Preserve MPEG1 SCFSI scalefactors and reservoir alignment,
+                 * but skip the side's Huffman payload without decoding it. */
+                const int bits = bitOffset + huffBlockBits;
+                mainPtr += bits >> 3;
+                bitOffset = bits & 7;
+                mainBits -= huffBlockBits;
+                continue;
+            }
+#endif
             prevBitOffset = bitOffset;
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_HUFFMAN);
             offset = DecodeHuffman( mainPtr, &bitOffset, huffBlockBits, gr, ch);
+            HELIX_PROFILE_END(HELIX_STAGE_HUFFMAN);
             if (offset < 0) {
                 MP3ClearBadFrame( outbuf);
                 return ERR_MP3_INVALID_HUFFCODES;
@@ -1456,29 +1539,112 @@ int MP3Decode( unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize)
             mainBits -= (8 * offset - prevBitOffset + bitOffset);
         }
         /* dequantize coefficients, decode stereo, reorder short blocks */
-        if (MP3Dequantize( gr) < 0) {
+        HELIX_PROFILE_BEGIN(HELIX_STAGE_DEQUANT);
+        int dequantResult;
+#if YORADIO_HELIX_MP3_MONO
+        if (monoMidSide) {
+            /* DequantChannel already applies 1/sqrt(2) for M/S, yielding
+             * the desired (L+R)/2 domain without reconstructing L and R. */
+            m_HuffmanInfo->gb[0] = DequantChannel(
+                m_HuffmanInfo->huffDecBuf[0], MP3ReorderBuffer(),
+                &m_HuffmanInfo->nonZeroBound[0], &m_SideInfoSub[gr][0],
+                &m_ScaleFactorInfoSub[gr][0], &m_CriticalBandInfo[0]);
+            dequantResult = 0;
+        } else
+#endif
+            dequantResult = MP3Dequantize(gr);
+        HELIX_PROFILE_END(HELIX_STAGE_DEQUANT);
+        if (dequantResult < 0) {
             MP3ClearBadFrame(outbuf);
             return ERR_MP3_INVALID_DEQUANTIZE;
         }
 
         /* alias reduction, inverse MDCT, overlap-add, frequency inversion */
+#if YORADIO_HELIX_MP3_MONO
+        HELIX_PROFILE_BEGIN(HELIX_STAGE_IMDCT);
+        int imdctResult = MonoIMDCT(gr, monoMidSide);
+        HELIX_PROFILE_END(HELIX_STAGE_IMDCT);
+        if (imdctResult < 0) {
+            MP3ClearBadFrame(outbuf);
+            return ERR_MP3_INVALID_IMDCT;
+        }
+#else
         for (ch = 0; ch < m_MP3DecInfo->nChans; ch++) {
-            if (IMDCT( gr, ch) < 0) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_IMDCT);
+            int imdctResult = IMDCT(gr, ch);
+            HELIX_PROFILE_END(HELIX_STAGE_IMDCT);
+            if (imdctResult < 0) {
                 MP3ClearBadFrame(outbuf);
                 return ERR_MP3_INVALID_IMDCT;
             }
         }
-        /* subband transform - if stereo, interleaves pcm LRLRLR */
-        if (Subband(
-                outbuf + gr * m_MP3DecInfo->nGranSamps * m_MP3DecInfo->nChans)
-                < 0) {
+#endif
+        /* Subband synthesis: mono or interleaved stereo PCM. */
+        short *granuleOut = outbuf;
+#if defined(YORADIO_ESP8266_NATIVE)
+        if (!callback)
+#endif
+            granuleOut += gr * m_MP3DecInfo->nGranSamps *
+                          MP3OutputChannels();
+        int subbandResult;
+#if defined(YORADIO_ESP8266_NATIVE)
+        if (streamBlocks)
+            subbandResult = SubbandInternal(granuleOut, callback, context);
+        else
+#endif
+            subbandResult = Subband(granuleOut);
+        if (subbandResult < 0) {
             MP3ClearBadFrame(outbuf);
             return ERR_MP3_INVALID_SUBBAND;
         }
+#if defined(YORADIO_ESP8266_NATIVE)
+        if (callback && !streamBlocks && !callback(context, granuleOut,
+                                  m_MP3DecInfo->nGranSamps *
+                                  MP3OutputChannels()))
+            return ERR_UNKNOWN;
+#endif
     }
     MP3GetLastFrameInfo();
     return ERR_MP3_NONE;
 }
+
+int MP3Decode(unsigned char *inbuf, int *bytesLeft, short *outbuf,
+              int useSize) {
+#if defined(YORADIO_ESP8266_NATIVE)
+    m_OutputBufferSamples = 0;
+    return MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize, nullptr,
+                             nullptr, false);
+#else
+    return MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize);
+#endif
+}
+
+#if defined(YORADIO_ESP8266_NATIVE)
+int MP3DecodeGranules(unsigned char *inbuf, int *bytesLeft, short *outbuf,
+                      int useSize, MP3GranuleCallback callback,
+                      void *context) {
+    m_OutputBufferSamples = (YORADIO_HELIX_MP3_MONO ? 1 : m_MAX_NCHAN) * m_MAX_NSAMP;
+    int result = MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize,
+                                   callback, context, false);
+    m_OutputBufferSamples = 0;
+    return result;
+}
+
+int MP3DecodeBlocks(unsigned char *inbuf, int *bytesLeft, short *outbuf,
+                    int outCapacity, int useSize, MP3GranuleCallback callback,
+                    void *context) {
+    const int required = MP3_PCM_BLOCK_FRAMES *
+                         (YORADIO_HELIX_MP3_MONO ? 1 : m_MAX_NCHAN);
+    if (!inbuf || !bytesLeft || !outbuf || !callback || outCapacity < required)
+        return ERR_UNKNOWN;
+    /* Bound every error-concealment path, including reservoir underflow. */
+    m_OutputBufferSamples = required;
+    int result = MP3DecodeInternal(inbuf, bytesLeft, outbuf, useSize,
+                                   callback, context, true);
+    m_OutputBufferSamples = 0;
+    return result;
+}
+#endif
 
 /***********************************************************************************************************************
  * Function:    MP3Decoder_ClearBuffer
@@ -1493,6 +1659,9 @@ int MP3Decode( unsigned char *inbuf, int *bytesLeft, short *outbuf, int useSize)
  *
  **********************************************************************************************************************/
 void MP3Decoder_ClearBuffer(void) {
+#if YORADIO_HELIX_MP3_MONO
+    m_MonoOverlap = false;
+#endif
 
     /* important to do this - DSP primitives assume a bunch of state variables are 0 on first use */
     memset( m_MP3DecInfo,         0, sizeof(MP3DecInfo_t));                                    //Clear MP3DecInfo
@@ -1500,8 +1669,32 @@ void MP3Decoder_ClearBuffer(void) {
     memset( m_SideInfo,           0, sizeof(SideInfo_t));                                      //Clear SideInfo
     memset( m_FrameHeader,        0, sizeof(FrameHeader_t));                                   //Clear FrameHeader
     memset( m_HuffmanInfo,        0, sizeof(HuffmanInfo_t));                                   //Clear HuffmanInfo
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
     memset( m_DequantInfo,        0, sizeof(DequantInfo_t));                                   //Clear DequantInfo
+#endif
+#if defined(YORADIO_ESP8266_NATIVE)
+    {
+        int (*outBuf0)[m_NBANDS] = m_IMDCTInfo->outBuf[0];
+        int (*outBuf1)[m_NBANDS] = m_IMDCTInfo->outBuf[1];
+        int *overBuf0 = m_IMDCTInfo->overBuf[0];
+        int *overBuf1 = m_IMDCTInfo->overBuf[1];
+        memset(m_IMDCTInfo, 0, sizeof(IMDCTInfo_t));
+        m_IMDCTInfo->outBuf[0] = outBuf0;
+        m_IMDCTInfo->outBuf[1] = outBuf1;
+        m_IMDCTInfo->overBuf[0] = overBuf0;
+        m_IMDCTInfo->overBuf[1] = overBuf1;
+        memset(m_IMDCTInfo->outBuf[0], 0,
+               sizeof(int) * m_BLOCK_SIZE * m_NBANDS);
+        memset(m_IMDCTInfo->outBuf[1], 0,
+               sizeof(int) * m_BLOCK_SIZE * m_NBANDS);
+        memset(m_IMDCTInfo->overBuf[0], 0,
+               sizeof(int) * (m_MAX_NSAMP / 2));
+        memset(m_IMDCTInfo->overBuf[1], 0,
+               sizeof(int) * (m_MAX_NSAMP / 2));
+    }
+#else
     memset( m_IMDCTInfo,          0, sizeof(IMDCTInfo_t));                                     //Clear IMDCTInfo
+#endif
     memset( m_SubbandInfo,        0, sizeof(SubbandInfo_t));                                   //Clear SubbandInfo
     memset(&m_CriticalBandInfo,   0, sizeof(CriticalBandInfo_t)*m_MAX_NCHAN);                  //Clear CriticalBandInfo
     memset( m_ScaleFactorJS,      0, sizeof(ScaleFactorJS_t));                                 //Clear ScaleFactorJS
@@ -1534,14 +1727,48 @@ bool MP3Decoder_AllocateBuffers(void) {
     if(!m_FrameHeader)      {m_FrameHeader = (FrameHeader_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(FrameHeader_t));}
     if(!m_SideInfo)         {m_SideInfo = (SideInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(SideInfo_t));}
     if(!m_ScaleFactorJS)    {m_ScaleFactorJS = (ScaleFactorJS_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(ScaleFactorJS_t));}
-    if(!m_HuffmanInfo)      {m_HuffmanInfo = (HuffmanInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(HuffmanInfo_t));}
-    if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
+    if(!m_HuffmanInfo)      {m_HuffmanInfo = (HuffmanInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(HuffmanInfo_t));}
+#if !defined(YORADIO_ESP8266_NATIVE) && !YORADIO_HELIX_MP3_SHARED_REORDER
+    if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
+#endif
+#if defined(YORADIO_ESP8266_NATIVE)
+    if(!m_SubbandInfo)      {m_SubbandInfo = (SubbandInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(SubbandInfo_t));}
     if(!m_IMDCTInfo)        {m_IMDCTInfo = (IMDCTInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(IMDCTInfo_t));}
-    if(!m_SubbandInfo)      {m_SubbandInfo = (SubbandInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(SubbandInfo_t));}
+    if(m_IMDCTInfo && !m_IMDCTInfo->outBuf[0]) {
+        m_IMDCTInfo->outBuf[0] = (int (*)[m_NBANDS])CodecArenaCalloc32(
+            CODEC_ARENA_MP3, m_BLOCK_SIZE * m_NBANDS, sizeof(int));
+    }
+    if(m_IMDCTInfo && !m_IMDCTInfo->outBuf[1]) {
+        m_IMDCTInfo->outBuf[1] = (int (*)[m_NBANDS])CodecArenaCalloc(
+            CODEC_ARENA_MP3, m_BLOCK_SIZE * m_NBANDS, sizeof(int));
+    }
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
+    if(!m_DequantInfo)      {m_DequantInfo = (DequantInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(DequantInfo_t));}
+#endif
+    if(m_IMDCTInfo && !m_IMDCTInfo->overBuf[0]) {
+        m_IMDCTInfo->overBuf[0] = (int*)CodecArenaCalloc(
+            CODEC_ARENA_MP3, m_MAX_NSAMP / 2, sizeof(int));
+    }
+    if(m_IMDCTInfo && !m_IMDCTInfo->overBuf[1]) {
+        m_IMDCTInfo->overBuf[1] = (int*)CodecArenaCalloc(
+            CODEC_ARENA_MP3, m_MAX_NSAMP / 2, sizeof(int));
+    }
+#else
+    if(!m_IMDCTInfo)        {m_IMDCTInfo = (IMDCTInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(IMDCTInfo_t));}
+    if(!m_SubbandInfo)      {m_SubbandInfo = (SubbandInfo_t*)CodecArenaCalloc32(CODEC_ARENA_MP3, 1, sizeof(SubbandInfo_t));}
+#endif
     if(!m_MP3FrameInfo)     {m_MP3FrameInfo = (MP3FrameInfo_t*)CodecArenaCalloc(CODEC_ARENA_MP3, 1, sizeof(MP3FrameInfo_t));}
 
     if(!m_MP3DecInfo || !m_FrameHeader || !m_SideInfo || !m_ScaleFactorJS || !m_HuffmanInfo ||
-       !m_DequantInfo || !m_IMDCTInfo || !m_SubbandInfo || !m_MP3FrameInfo) {
+       !m_IMDCTInfo || !m_SubbandInfo || !m_MP3FrameInfo
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
+       || !m_DequantInfo
+#endif
+#if defined(YORADIO_ESP8266_NATIVE)
+       || !m_IMDCTInfo->outBuf[0] || !m_IMDCTInfo->outBuf[1] ||
+          !m_IMDCTInfo->overBuf[0] || !m_IMDCTInfo->overBuf[1]
+#endif
+       ) {
         MP3Decoder_FreeBuffers();
         log_e("not enough memory to allocate mp3decoder buffers");
         return false;
@@ -1571,8 +1798,21 @@ void MP3Decoder_FreeBuffers()
     if(m_SideInfo)          {CodecArenaFree(m_SideInfo);      m_SideInfo=NULL;}
     if(m_ScaleFactorJS )    {CodecArenaFree(m_ScaleFactorJS); m_ScaleFactorJS=NULL;}
     if(m_HuffmanInfo)       {CodecArenaFree(m_HuffmanInfo);   m_HuffmanInfo=NULL;}
+#if !YORADIO_HELIX_MP3_SHARED_REORDER
     if(m_DequantInfo)       {CodecArenaFree(m_DequantInfo);   m_DequantInfo=0;}
+#endif
+#if defined(YORADIO_ESP8266_NATIVE)
+    if(m_IMDCTInfo) {
+        CodecArenaFree(m_IMDCTInfo->outBuf[0]);
+        CodecArenaFree(m_IMDCTInfo->outBuf[1]);
+        CodecArenaFree(m_IMDCTInfo->overBuf[0]);
+        CodecArenaFree(m_IMDCTInfo->overBuf[1]);
+        CodecArenaFree(m_IMDCTInfo);
+        m_IMDCTInfo=0;
+    }
+#else
     if(m_IMDCTInfo)         {CodecArenaFree(m_IMDCTInfo);     m_IMDCTInfo=0;}
+#endif
     if(m_SubbandInfo)       {CodecArenaFree(m_SubbandInfo);   m_SubbandInfo=0;}
     if(m_MP3FrameInfo)      {CodecArenaFree(m_MP3FrameInfo);  m_MP3FrameInfo=0;}
 
@@ -1972,7 +2212,7 @@ int DecodeHuffman(unsigned char *buf, int *bitOffset, int huffBlockBits, int gr,
     /* figure out region boundaries (the first 2*bigVals coefficients divided into 3 regions) */
     if (sis->winSwitchFlag && sis->blockType == 2) {
         if (sis->mixedBlock == 0) {
-            r1Start = m_SFBandTable.s[(sis->region0Count + 1) / 3] * 3;
+            r1Start = m_SFBandTable.s[HELIX_UDIV3(sis->region0Count + 1)] * 3;
         } else {
             if (m_MPEGVersion == MPEG1) {
                 r1Start = m_SFBandTable.l[sis->region0Count + 1];
@@ -2065,7 +2305,7 @@ int MP3Dequantize(int gr){
 
     /* dequantize all the samples in each channel */
     for (ch = 0; ch < m_MP3DecInfo->nChans; ch++) {
-        m_HuffmanInfo->gb[ch] = DequantChannel(m_HuffmanInfo->huffDecBuf[ch], m_DequantInfo->workBuf,
+        m_HuffmanInfo->gb[ch] = DequantChannel(m_HuffmanInfo->huffDecBuf[ch], MP3ReorderBuffer(),
                 &m_HuffmanInfo->nonZeroBound[ch], &m_SideInfoSub[gr][ch], &m_ScaleFactorInfoSub[gr][ch], &cbi[ch]);
     }
 
@@ -3367,10 +3607,11 @@ int IMDCT( int gr, int ch) {
      *   nLongBlocks = number of blocks with (possibly) non-zero power
      *   nBfly = number of butterflies to do (nLongBlocks - 1, unless no long blocks)
      */
-    blockCutoff = m_SFBandTable.l[(m_MPEGVersion == MPEG1 ? 8 : 6)] / 18; /* same as 3* num short sfb's in spec */
+    blockCutoff = HELIX_UDIV18(
+        m_SFBandTable.l[(m_MPEGVersion == MPEG1 ? 8 : 6)]); /* same as 3* num short sfb's in spec */
     if (m_SideInfoSub[gr][ch].blockType != 2) {
         /* all long transforms */
-        int x=(m_HuffmanInfo->nonZeroBound[ch] + 7) / 18 + 1;
+        int x = HELIX_UDIV18(m_HuffmanInfo->nonZeroBound[ch] + 7) + 1;
         bc.nBlocksLong=(x<32 ? x : 32);
         //bc.nBlocksLong = min((hi->nonZeroBound[ch] + 7) / 18 + 1, 32);
         nBfly = bc.nBlocksLong - 1;
@@ -3392,7 +3633,7 @@ int IMDCT( int gr, int ch) {
     assert(m_HuffmanInfo->nonZeroBound[ch] <= m_MAX_NSAMP);
 
     /* for readability, use a struct instead of passing a million parameters to HybridTransform() */
-    bc.nBlocksTotal = (m_HuffmanInfo->nonZeroBound[ch] + 17) / 18;
+    bc.nBlocksTotal = HELIX_UDIV18(m_HuffmanInfo->nonZeroBound[ch] + 17);
     bc.nBlocksPrev = m_IMDCTInfo->numPrevIMDCT[ch];
     bc.prevType = m_IMDCTInfo->prevType[ch];
     bc.prevWinSwitch = m_IMDCTInfo->prevWinSwitch[ch];
@@ -3428,31 +3669,57 @@ int IMDCT( int gr, int ch) {
  *
  * Return:      0 on success,  -1 if null input pointers
  **********************************************************************************************************************/
-int Subband( short *pcmBuf) {
+static int SubbandInternal(short *pcmBuf
+#if defined(YORADIO_ESP8266_NATIVE)
+                           , MP3GranuleCallback callback, void *context
+#endif
+                           ) {
     int b;
-    if (m_MP3DecInfo->nChans == 2) {
+    if (MP3OutputChannels() == 2) {
         /* stereo */
         for (b = 0; b < m_BLOCK_SIZE; b++) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS);
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_DCT);
             FDCT32(m_IMDCTInfo->outBuf[0][b], m_SubbandInfo->vbuf + 0 * 32, m_SubbandInfo->vindex,
                     (b & 0x01), m_IMDCTInfo->gb[0]);
             FDCT32(m_IMDCTInfo->outBuf[1][b], m_SubbandInfo->vbuf + 1 * 32, m_SubbandInfo->vindex,
                     (b & 0x01), m_IMDCTInfo->gb[1]);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_DCT);
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             PolyphaseStereo(pcmBuf,
                     m_SubbandInfo->vbuf + m_SubbandInfo->vindex + m_VBUF_LENGTH * (b & 0x01),
                     polyCoef);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             m_SubbandInfo->vindex = (m_SubbandInfo->vindex - (b & 0x01)) & 7;
-            pcmBuf += (2 * m_NBANDS);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS);
+#if defined(YORADIO_ESP8266_NATIVE)
+            if (callback) {
+                if (!callback(context, pcmBuf, 2 * m_NBANDS)) return -1;
+            } else
+#endif
+                pcmBuf += (2 * m_NBANDS);
         }
     } else {
         /* mono */
         for (b = 0; b < m_BLOCK_SIZE; b++) {
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS);
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_DCT);
             FDCT32(m_IMDCTInfo->outBuf[0][b], m_SubbandInfo->vbuf + 0 * 32, m_SubbandInfo->vindex,
                     (b & 0x01), m_IMDCTInfo->gb[0]);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_DCT);
+            HELIX_PROFILE_BEGIN(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             PolyphaseMono(pcmBuf,
                     m_SubbandInfo->vbuf + m_SubbandInfo->vindex + m_VBUF_LENGTH * (b & 0x01),
                     polyCoef);
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS_POLYPHASE);
             m_SubbandInfo->vindex = (m_SubbandInfo->vindex - (b & 0x01)) & 7;
-            pcmBuf += m_NBANDS;
+            HELIX_PROFILE_END(HELIX_STAGE_SYNTHESIS);
+#if defined(YORADIO_ESP8266_NATIVE)
+            if (callback) {
+                if (!callback(context, pcmBuf, m_NBANDS)) return -1;
+            } else
+#endif
+                pcmBuf += m_NBANDS;
         }
     }
 
@@ -3462,6 +3729,14 @@ int Subband( short *pcmBuf) {
 /***********************************************************************************************************************
  * D C T 3 2
  **********************************************************************************************************************/
+
+int Subband(short *pcmBuf) {
+    return SubbandInternal(pcmBuf
+#if defined(YORADIO_ESP8266_NATIVE)
+                            , nullptr, nullptr
+#endif
+                            );
+}
 
 /***********************************************************************************************************************
  * Function:    FDCT32
@@ -3639,7 +3914,7 @@ short ClipToShort(int x, int fracBits){
     /* assumes you've already rounded (x += (1 << (fracBits-1))) */
     x >>= fracBits;
 
-#ifndef __XTENSA__
+#if !defined(__XTENSA__) || defined(YORADIO_ESP8266_NATIVE)
     /* Ken's trick: clips to [-32768, 32767] */
     //ok vor generic case (fb)
     int sign = x >> 31;
@@ -3652,6 +3927,58 @@ short ClipToShort(int x, int fracBits){
     asm ("clamps %0, %1, 15" : "=a" (x) : "a" (x) : );
     return x;
 #endif
+}
+
+/* libmad's OPT_SSO synthesis avoids a 64-bit multiply/accumulate for every
+ * window tap by distributing the fixed-point shift between the DCT samples,
+ * the window coefficients, and the final PCM conversion. LX106 has a fast
+ * 32-bit low multiply but no 32-bit high multiply, so this is substantially
+ * cheaper than reconstructing an exact 32 x 32 -> 64 product.
+ *
+ * Helix stores vbuf as Q23 and polyCoef as Q18. The reference path therefore
+ * accumulates Q41 products and shifts the result by 26 bits. The SSO path
+ * removes 12 bits from vbuf and 4 bits from the coefficients before the
+ * multiply, leaving a Q25 accumulator and a 10-bit final shift. It uses the
+ * existing buffers and coefficient table; no persistent RAM is added.
+ */
+#if defined(YORADIO_HELIX_MP3_SSO)
+using PolyphaseAccum_t = int32_t;
+static constexpr int m_POLY_SSO_VSHIFT = 12;
+static constexpr int m_POLY_SSO_CSHIFT = 4;
+static constexpr int m_POLY_OUT_FRACBITS = 10;
+static constexpr int m_POLY_ROUND_SHIFT = m_POLY_OUT_FRACBITS - 1;
+
+static inline __attribute__((always_inline)) PolyphaseAccum_t
+PolyphaseMadd(PolyphaseAccum_t sum, int value, int coefficient) {
+    return sum + (value >> m_POLY_SSO_VSHIFT) *
+                 (coefficient >> m_POLY_SSO_CSHIFT);
+}
+
+static inline __attribute__((always_inline)) int
+PolyphaseScale(PolyphaseAccum_t sum) {
+    return sum;
+}
+#else
+using PolyphaseAccum_t = uint64_t;
+static constexpr int m_POLY_OUT_FRACBITS =
+        m_DQ_FRACBITS_OUT - 2 - 2 - 15;
+static constexpr int m_POLY_ROUND_SHIFT =
+        m_POLY_OUT_FRACBITS - 1 + (32 - m_CSHIFT);
+
+static inline __attribute__((always_inline)) PolyphaseAccum_t
+PolyphaseMadd(PolyphaseAccum_t sum, int value, int coefficient) {
+    return MADD64(sum, value, coefficient);
+}
+
+static inline __attribute__((always_inline)) int
+PolyphaseScale(PolyphaseAccum_t sum) {
+    return (int)SAR64(sum, 32 - m_CSHIFT);
+}
+#endif
+
+static inline __attribute__((always_inline)) PolyphaseAccum_t
+PolyphaseRoundValue() {
+    return (PolyphaseAccum_t)1 << m_POLY_ROUND_SHIFT;
 }
 /***********************************************************************************************************************
  * Function:    PolyphaseMono
@@ -3674,9 +4001,9 @@ void PolyphaseMono(short *pcm, int *vbuf, const uint32_t *coefBase){
     const uint32_t *coef;
     int *vb1;
     int vLo, vHi, c1, c2;
-    uint64_t sum1L, sum2L, rndVal;
+    PolyphaseAccum_t sum1L, sum2L, rndVal;
 
-    rndVal = (uint64_t)( 1ULL << ((m_DQ_FRACBITS_OUT - 2 - 2 - 15) - 1 + (32 - m_CSHIFT)) );
+    rndVal = PolyphaseRoundValue();
 
     /* special case, output sample 0 */
     coef = coefBase;
@@ -3684,18 +4011,18 @@ void PolyphaseMono(short *pcm, int *vbuf, const uint32_t *coefBase){
     sum1L = rndVal;
     for(int j=0; j<8; j++){
         c1=*coef; coef++; c2=*coef; coef++; vLo=*(vb1+(j)); vHi=*(vb1+(23-(j))); // 0...7
-        sum1L=MADD64(sum1L, vLo, c1); sum1L=MADD64(sum1L, vHi, -c2);
+        sum1L=PolyphaseMadd(sum1L, vLo, c1); sum1L=PolyphaseMadd(sum1L, vHi, -c2);
     }
-    *(pcm + 0) = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+    *(pcm + 0) = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
 
     /* special case, output sample 16 */
     coef = coefBase + 256;
     vb1 = vbuf + 64*16;
     sum1L = rndVal;
     for(int j=0; j<8; j++){
-        c1=*coef; coef++; vLo=*(vb1+(j)); sum1L = MADD64(sum1L, vLo,  c1); // 0...7
+        c1=*coef; coef++; vLo=*(vb1+(j)); sum1L = PolyphaseMadd(sum1L, vLo,  c1); // 0...7
     }
-    *(pcm + 16) = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+    *(pcm + 16) = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
 
     /* main convolution loop: sum1L = samples 1, 2, 3, ... 15   sum2L = samples 31, 30, ... 17 */
     coef = coefBase + 16;
@@ -3707,12 +4034,12 @@ void PolyphaseMono(short *pcm, int *vbuf, const uint32_t *coefBase){
         sum1L = sum2L = rndVal;
         for(int j=0; j<8; j++){
             c1=*coef; coef++; c2=*coef; coef++; vLo=*(vb1+(j)); vHi = *(vb1+(23-(j)));
-            sum1L=MADD64(sum1L, vLo,  c1); sum2L = MADD64(sum2L, vLo,  c2);
-            sum1L=MADD64(sum1L, vHi, -c2); sum2L = MADD64(sum2L, vHi,  c1);
+            sum1L=PolyphaseMadd(sum1L, vLo,  c1); sum2L = PolyphaseMadd(sum2L, vLo,  c2);
+            sum1L=PolyphaseMadd(sum1L, vHi, -c2); sum2L = PolyphaseMadd(sum2L, vHi,  c1);
         }
         vb1 += 64;
-        *(pcm)       = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-        *(pcm + 2*i) = ClipToShort((int)SAR64(sum2L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+        *(pcm)       = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
+        *(pcm + 2*i) = ClipToShort(PolyphaseScale(sum2L), m_POLY_OUT_FRACBITS);
         pcm++;
     }
 }
@@ -3739,9 +4066,9 @@ void PolyphaseStereo(short *pcm, int *vbuf, const uint32_t *coefBase){
     const uint32_t *coef;
     int *vb1;
     int vLo, vHi, c1, c2;
-    uint64_t sum1L, sum2L, sum1R, sum2R, rndVal;
+    PolyphaseAccum_t sum1L, sum2L, sum1R, sum2R, rndVal;
 
-    rndVal = (uint64_t)( 1 << ((m_DQ_FRACBITS_OUT - 2 - 2 - 15) - 1 + (32 - m_CSHIFT)) );
+    rndVal = PolyphaseRoundValue();
 
     /* special case, output sample 0 */
     coef = coefBase;
@@ -3750,12 +4077,12 @@ void PolyphaseStereo(short *pcm, int *vbuf, const uint32_t *coefBase){
 
     for(int j=0; j<8; j++){
         c1=*coef; coef++; c2=*coef; coef++; vLo=*(vb1+(j)); vHi = *(vb1+(23-(j)));
-        sum1L=MADD64(sum1L, vLo,  c1); sum1L=MADD64(sum1L, vHi, -c2);
+        sum1L=PolyphaseMadd(sum1L, vLo,  c1); sum1L=PolyphaseMadd(sum1L, vHi, -c2);
         vLo=*(vb1+32+(j)); vHi=*(vb1+32+(23-(j)));
-        sum1R=MADD64(sum1R, vLo,  c1); sum1R=MADD64(sum1R, vHi, -c2); \
+        sum1R=PolyphaseMadd(sum1R, vLo,  c1); sum1R=PolyphaseMadd(sum1R, vHi, -c2); \
     }
-    *(pcm + 0) = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-    *(pcm + 1) = ClipToShort((int)SAR64(sum1R, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+    *(pcm + 0) = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
+    *(pcm + 1) = ClipToShort(PolyphaseScale(sum1R), m_POLY_OUT_FRACBITS);
 
     /* special case, output sample 16 */
     coef = coefBase + 256;
@@ -3763,11 +4090,11 @@ void PolyphaseStereo(short *pcm, int *vbuf, const uint32_t *coefBase){
     sum1L = sum1R = rndVal;
 
     for(int j=0; j<8; j++){
-        c1=*coef; coef++; vLo = *(vb1+(j)); sum1L = MADD64(sum1L, vLo,  c1);
-        vLo = *(vb1+32+(j)); sum1R = MADD64(sum1R, vLo,  c1);
+        c1=*coef; coef++; vLo = *(vb1+(j)); sum1L = PolyphaseMadd(sum1L, vLo,  c1);
+        vLo = *(vb1+32+(j)); sum1R = PolyphaseMadd(sum1R, vLo,  c1);
     }
-    *(pcm + 2*16 + 0) = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-    *(pcm + 2*16 + 1) = ClipToShort((int)SAR64(sum1R, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+    *(pcm + 2*16 + 0) = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
+    *(pcm + 2*16 + 1) = ClipToShort(PolyphaseScale(sum1R), m_POLY_OUT_FRACBITS);
 
     /* main convolution loop: sum1L = samples 1, 2, 3, ... 15   sum2L = samples 31, 30, ... 17 */
     coef = coefBase + 16;
@@ -3781,17 +4108,17 @@ void PolyphaseStereo(short *pcm, int *vbuf, const uint32_t *coefBase){
 
         for(int j=0; j<8; j++){
             c1=*coef; coef++; c2=*coef; coef++; vLo=*(vb1+(j)); vHi = *(vb1+(23-(j)));
-            sum1L=MADD64(sum1L, vLo,  c1); sum2L=MADD64(sum2L, vLo,  c2);
-            sum1L=MADD64(sum1L, vHi, -c2); sum2L=MADD64(sum2L, vHi,  c1);
+            sum1L=PolyphaseMadd(sum1L, vLo,  c1); sum2L=PolyphaseMadd(sum2L, vLo,  c2);
+            sum1L=PolyphaseMadd(sum1L, vHi, -c2); sum2L=PolyphaseMadd(sum2L, vHi,  c1);
             vLo=*(vb1+32+(j));  vHi=*(vb1+32+(23-(j)));
-            sum1R=MADD64(sum1R, vLo,  c1); sum2R=MADD64(sum2R, vLo,  c2);
-            sum1R=MADD64(sum1R, vHi, -c2); sum2R=MADD64(sum2R, vHi,  c1);
+            sum1R=PolyphaseMadd(sum1R, vLo,  c1); sum2R=PolyphaseMadd(sum2R, vLo,  c2);
+            sum1R=PolyphaseMadd(sum1R, vHi, -c2); sum2R=PolyphaseMadd(sum2R, vHi,  c1);
         }
         vb1 += 64;
-        *(pcm + 0)         = ClipToShort((int)SAR64(sum1L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-        *(pcm + 1)         = ClipToShort((int)SAR64(sum1R, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-        *(pcm + 2*2*i + 0) = ClipToShort((int)SAR64(sum2L, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
-        *(pcm + 2*2*i + 1) = ClipToShort((int)SAR64(sum2R, (32-m_CSHIFT)), m_DQ_FRACBITS_OUT - 2 - 2 - 15);
+        *(pcm + 0)         = ClipToShort(PolyphaseScale(sum1L), m_POLY_OUT_FRACBITS);
+        *(pcm + 1)         = ClipToShort(PolyphaseScale(sum1R), m_POLY_OUT_FRACBITS);
+        *(pcm + 2*2*i + 0) = ClipToShort(PolyphaseScale(sum2L), m_POLY_OUT_FRACBITS);
+        *(pcm + 2*2*i + 1) = ClipToShort(PolyphaseScale(sum2R), m_POLY_OUT_FRACBITS);
         pcm += 2;
     }
 }

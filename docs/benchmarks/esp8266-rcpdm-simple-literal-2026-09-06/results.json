@@ -1,0 +1,253 @@
+{
+  "note": "48k PCM; no Wi-Fi or codecs. Nonwait is write minus DMA wait, not total CPU utilization.",
+  "summary": {
+    "production": {
+      "runs": 2,
+      "pack_us_median": 112275,
+      "pack_us_range": [
+        112275,
+        112276
+      ],
+      "microseconds_per_sample": 2.3390625,
+      "nonwait_us_per_audio_second": 122842.59175221148,
+      "heap_free": [
+        108532,
+        108532
+      ],
+      "heap_min": [
+        105752,
+        105752
+      ],
+      "underruns": 0,
+      "fifo_empty": 0
+    },
+    "simple": {
+      "runs": 2,
+      "pack_us_median": 139047,
+      "pack_us_range": [
+        139047,
+        139048
+      ],
+      "microseconds_per_sample": 2.8968125,
+      "nonwait_us_per_audio_second": 155637.45867552666,
+      "heap_free": [
+        108532,
+        108532
+      ],
+      "heap_min": [
+        105752,
+        105752
+      ],
+      "underruns": 0,
+      "fifo_empty": 0
+    },
+    "simple_pack_change_percent": 23.84502338009351,
+    "simple_nonwait_change_percent": 26.696658264477556
+  },
+  "runs": [
+    {
+      "file": "round-1-production-uart.log",
+      "round": 1,
+      "mode": "production",
+      "pack_us": [
+        112276,
+        112275,
+        112275
+      ],
+      "checksum": "e3126451",
+      "result": {
+        "calls": 3764,
+        "wall": 10007942,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9973301,
+        "avg": 2649,
+        "max": 9635,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 8740289,
+        "calls": 941,
+        "avg": 9288,
+        "max": 9292,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 122842.59175221148,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    },
+    {
+      "file": "round-1-simple-uart.log",
+      "round": 1,
+      "mode": "simple",
+      "pack_us": [
+        139048,
+        139047,
+        139047
+      ],
+      "checksum": "8ebd3ff0",
+      "result": {
+        "calls": 3764,
+        "wall": 10007944,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9983663,
+        "avg": 2652,
+        "max": 9385,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 8421478,
+        "calls": 941,
+        "avg": 8949,
+        "max": 8954,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 155637.45867552666,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    },
+    {
+      "file": "round-2-production-uart.log",
+      "round": 2,
+      "mode": "production",
+      "pack_us": [
+        112276,
+        112275,
+        112275
+      ],
+      "checksum": "e3126451",
+      "result": {
+        "calls": 3764,
+        "wall": 10007942,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9973301,
+        "avg": 2649,
+        "max": 9635,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 8740289,
+        "calls": 941,
+        "avg": 9288,
+        "max": 9292,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 122842.59175221148,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    },
+    {
+      "file": "round-2-simple-uart.log",
+      "round": 2,
+      "mode": "simple",
+      "pack_us": [
+        139048,
+        139047,
+        139047
+      ],
+      "checksum": "8ebd3ff0",
+      "result": {
+        "calls": 3764,
+        "wall": 10007944,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9983663,
+        "avg": 2652,
+        "max": 9385,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 8421478,
+        "calls": 941,
+        "avg": 8949,
+        "max": 8954,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 155637.45867552666,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    }
+  ],
+  "measured_utc": "2026-09-06T15:44:02.769Z",
+  "port": "COM8",
+  "restore_app0_sha256": "d3365325c09b05a446ce280248c163fddba406b81d03ec2a5f3e295cdca94580",
+  "images": {
+    "production": {
+      "file": "firmware/development/esp8266-rcpdm-speed/production-simple-literal/app.bin",
+      "bytes": 128592,
+      "sha256": "3f6fc789721e1ee7ea8e1a83adccd59198f514c248410ff9ea450c7997b550c3"
+    },
+    "simple": {
+      "file": "firmware/development/esp8266-rcpdm-speed/simple-simple-literal/app.bin",
+      "bytes": 128816,
+      "sha256": "e8bbbe57e4c92894bc7c9be3099452edff70769b477ec5c4cf7246412950791c"
+    }
+  },
+  "static_memory": {
+    "production": {
+      ".iram0.vectors": 128,
+      ".iram0.text": 18020,
+      ".iram0.bss": 524,
+      ".dram0.data": 1012,
+      ".dram0.bss": 9320,
+      ".flash.text": 86454,
+      ".flash.rodata": 22892
+    },
+    "simple": {
+      ".iram0.vectors": 128,
+      ".iram0.text": 18020,
+      ".iram0.bss": 524,
+      ".dram0.data": 1012,
+      ".dram0.bss": 9320,
+      ".flash.text": 86678,
+      ".flash.rodata": 22900
+    }
+  },
+  "source_sha256": {
+    "esp8266/rtos-sdk-native/main/native_audio_output.c": "7ba0ea92bcf0e2301619b207368e20d3fd144ddbb2c9272c6b49846b47f9b6c0",
+    "esp8266/rtos-sdk-native/main/audio_output_benchmark.c": "6daee56e6fef62cbcd7cc01174e2a2161a4634e79015cab626ccdfa95b9908b4",
+    "esp8266/rtos-sdk-native/main/esp8266_nodac_i2s.c": "49178f1454cd626075e3f56b25016b63dfcd27230ba93e36525269e2f64359e3",
+    "esp8266/rtos-sdk-native/main/rc_pdm.h": "b2ee82f9f6a77036b8e0cc73d4ec0385fdbed752565099adeb4de1486b6f7228",
+    "esp8266/rtos-sdk-native/main/CMakeLists.txt": "f842e5073b9b9f9ff03bbfbf4e9ad137db1984ea27c635c0132ef3b893765216",
+    "tests/native/rcpdm_simple.h": "4308d4bad963f53ff6986bd4f4e60243715fcd4ac1987a13cc7d21c8284d0b03",
+    "tests/native/rcpdm_simple_reference.h": "562031b0198c8aebe6ed2caacf9f21d1b1ef045a6bc3e5fdce3df618ddf7409a"
+  }
+}
