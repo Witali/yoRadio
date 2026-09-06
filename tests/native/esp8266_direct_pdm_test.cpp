@@ -11,7 +11,13 @@
 #include "rcpdm_variants.h"
 #include "rcpdm_simple.h"
 #include "rcpdm_simple_reference.h"
-#if TEST_RCPDM_SIMPLE
+#if TEST_RCPDM_FEEDBACK
+#include "rc_pdm_feedback.h"
+#include "rcpdm_feedback_reference.h"
+#define TEST_RCPDM 1
+#define CONFIG_YORADIO_RCPDM_FEEDBACK 1
+#define TEST_RC_REFERENCE rc_feedback_reference_sample
+#elif TEST_RCPDM_SIMPLE
 #define TEST_RCPDM 1
 #define RCPDM_TEST_SIMPLE 1
 #define RCPDM_TEST_SAMPLE rcpdm_simple_sample
@@ -118,7 +124,11 @@ static esp_err_t esp8266_nodac_i2s_init(uint32_t silence, uint8_t, uint8_t) {
 #define BOARD_I2S_DATA_GPIO 3
 #include "gain_config.inc"
 static uint32_t s_input_sample_rate, s_resample_phase, s_pdm_integrator;
+#if TEST_RCPDM_FEEDBACK
+static rc_pdm_feedback_t s_rcpdm;
+#else
 static rc_pdm_t s_rcpdm;
+#endif
 static uint32_t s_i2s_pdm_partial_word;
 static uint8_t s_i2s_pdm_partial_bits;
 static bool s_i2s_started;
@@ -281,7 +291,12 @@ static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned c
 #if TEST_RCPDM
     // Independent frozen modulator checks every actual DMA word, not just
     // one optimized rendering against another chunk size of the same code.
+#if TEST_RCPDM_FEEDBACK
+    rc_pdm_feedback_t reference;
+    rc_pdm_feedback_init(&reference, RC_FB_DEFAULT_SEED);
+#else
     rc_pdm_t reference = {0x80000000U};
+#endif
     uint32_t phase = 0;
     size_t position = 0;
     for (unsigned frame = 0; frame < frames; ++frame) {
@@ -295,6 +310,9 @@ static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned c
         }
     }
     assert(position == out.pdm.size() && s_rcpdm.rc == reference.rc);
+#if TEST_RCPDM_FEEDBACK
+    assert(s_rcpdm.error == reference.error && s_rcpdm.random == reference.random && s_rcpdm.previous == reference.previous);
+#endif
 #endif
     assert(out.pdm.size() == static_cast<size_t>(frames) * 48000U / rate * (BOARD_I2S_PDM_OVERSAMPLE / 32U));
     native_audio_output_silence();
@@ -338,9 +356,17 @@ int main() {
     assert(native_audio_output_write(tooMuch.data(), tooMuch.size(), 48000, 1) == ESP_ERR_TIMEOUT);
     assert(s_reserved_words == 0 && critical == 0); // no leaked writable span
 #if TEST_RCPDM
+#if TEST_RCPDM_FEEDBACK
+    rc_pdm_feedback_t stopped;
+    rc_pdm_feedback_init(&stopped, RC_FB_DEFAULT_SEED);
+#else
     rc_pdm_t stopped = {0x80000000U};
+#endif
     for (size_t i = 0; i <= committed.size(); ++i) TEST_RC_REFERENCE(&stopped, 0);
     assert(s_rcpdm.rc == stopped.rc && s_resample_phase == 48000U);
+#if TEST_RCPDM_FEEDBACK
+    assert(s_rcpdm.error == stopped.error && s_rcpdm.random == stopped.random && s_rcpdm.previous == stopped.previous);
+#endif
 #endif
     puts("PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed");
 }

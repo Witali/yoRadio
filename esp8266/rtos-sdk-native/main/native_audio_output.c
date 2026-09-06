@@ -26,8 +26,14 @@
 #include "persistent_settings.h"
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
 #include "rc_pdm.h"
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+#include "rc_pdm_feedback.h"
+#endif
 #if YORADIO_ESP8266_OUTPUT_COMPARE
 #include "rcpdm_variants.h"
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+#include "rcpdm_feedback_reference.h"
+#endif
 #if RCPDM_TEST_SIMPLE
 #include "rcpdm_simple.h"
 #include "rcpdm_simple_reference.h"
@@ -83,7 +89,11 @@ static bool s_spi_pin_selected;
 static uint32_t s_input_sample_rate;
 static uint32_t s_resample_phase;
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+static rc_pdm_feedback_t s_rcpdm;
+#else
 static rc_pdm_t s_rcpdm;
+#endif
 #else
 static uint32_t s_pdm_integrator;
 #endif
@@ -613,7 +623,9 @@ static esp_err_t i2s_pdm_push_word(i2s_pdm_writer_t *writer, uint32_t word) {
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM && !RCPDM_DISABLE_BATCH
 static void __attribute__((noinline)) i2s_rcpdm_fill(
     uint32_t *words, const int16_t *pcm, size_t frames, unsigned channels) {
-#if RCPDM_TEST_SIMPLE
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+    rc_pdm_feedback_fill(&s_rcpdm, words, pcm, frames, channels);
+#elif RCPDM_TEST_SIMPLE
     rcpdm_simple_fill(&s_rcpdm, words, pcm, frames, channels);
 #else
     rc_pdm_fill(&s_rcpdm, words, pcm, frames, channels);
@@ -623,7 +635,9 @@ static void __attribute__((noinline)) i2s_rcpdm_fill(
 static uint32_t __attribute__((noinline))
 i2s_pdm_pack32(int16_t sample) {
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
-#ifdef RCPDM_TEST_SAMPLE
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+    return rc_pdm_feedback_sample(&s_rcpdm, sample);
+#elif defined(RCPDM_TEST_SAMPLE)
     return RCPDM_TEST_SAMPLE(&s_rcpdm, sample);
 #else
     return rc_pdm_sample(&s_rcpdm, sample);
@@ -652,7 +666,22 @@ i2s_pdm_pack32(int16_t sample) {
 }
 #if YORADIO_ESP8266_OUTPUT_COMPARE
 bool native_audio_output_benchmark_verify(void) {
-#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+    rc_pdm_feedback_t saved = s_rcpdm, expected;
+    rc_pdm_feedback_init(&s_rcpdm, RC_FB_DEFAULT_SEED);
+    expected = s_rcpdm;
+    bool ok = true;
+    for (int32_t pcm = INT16_MIN; pcm <= INT16_MAX; ++pcm) {
+        uint32_t want = rc_feedback_reference_sample(&expected, (int16_t)pcm);
+        if (want != i2s_pdm_pack32((int16_t)pcm) ||
+            memcmp(&expected, &s_rcpdm, sizeof(expected))) { ok = false; break; }
+        if (!((uint32_t)pcm & 1023U)) vTaskDelay(1);
+    }
+    s_rcpdm = saved;
+    if (ok) ESP_LOGI(TAG, "RCPDM feedback bit/state PASS: 65536 frames");
+    else ESP_LOGE(TAG, "RCPDM feedback bit/state FAIL");
+    return ok;
+#elif CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
 #if RCPDM_TEST_SIMPLE
     ESP_LOGI(TAG, "RCPDM-Simple backend: %s",
              RCPDM_SIMPLE_LX106_ASM ? "Xtensa LX106 asm" : "portable C");
@@ -747,7 +776,9 @@ mismatch:
  * Count includes the common loop/checksum overhead; no writes or allocation. */
 uint32_t native_audio_output_benchmark_pack32(const int16_t *pcm,
                                              size_t samples, unsigned repeats) {
-#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+    rc_pdm_feedback_init(&s_rcpdm, RC_FB_DEFAULT_SEED);
+#elif CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
     rc_pdm_init(&s_rcpdm);
 #else
     s_pdm_integrator = 0;
@@ -815,7 +846,9 @@ esp_err_t native_audio_output_init(void) {
         s_i2s_started = true;
         s_input_sample_rate = 0;
         s_resample_phase = 0;
-#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+        rc_pdm_feedback_init(&s_rcpdm, RC_FB_DEFAULT_SEED);
+#elif CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
         rc_pdm_init(&s_rcpdm);
 #else
         s_pdm_integrator = 0;
@@ -826,6 +859,9 @@ esp_err_t native_audio_output_init(void) {
     native_audio_output_reload_settings();
     if (result == ESP_OK) {
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+        ESP_LOGI(TAG, "RC-PDM feedback: unity error, interpolation, TPDF dither; state=16 bytes");
+#endif
         ESP_LOGI(TAG,
                  "I2S RCPDM DMA: mono GPIO%d/RX, carrier %u Hz, alpha=1/16; "
                  "%u x %u words; UART RX ignored",
@@ -942,7 +978,9 @@ void native_audio_output_silence(void) {
         ESP_LOGE(TAG, I2S_PDM_LOG_NAME " silence failed: %s", esp_err_to_name(result));
     s_input_sample_rate = 0;
     s_resample_phase = 0;
-#if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+#if CONFIG_YORADIO_RCPDM_FEEDBACK
+    rc_pdm_feedback_init(&s_rcpdm, RC_FB_DEFAULT_SEED);
+#elif CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
     rc_pdm_init(&s_rcpdm);
 #else
     s_pdm_integrator = 0;

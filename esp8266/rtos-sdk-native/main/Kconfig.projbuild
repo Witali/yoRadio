@@ -93,6 +93,17 @@ config YORADIO_AUDIO_OUTPUT_I2S_PCM
 
 endchoice
 
+config YORADIO_RCPDM_FEEDBACK
+    bool "RC-PDM with error feedback, interpolation and dither (experimental)"
+    depends on YORADIO_AUDIO_OUTPUT_I2S_RCPDM
+    default n
+    help
+        Preserve low-level PCM by accumulating tracking error. Uses causal
+        linear interpolation and deterministic TPDF decision dither. The RC
+        shift remains 4 at the fixed 1.536-MHz/32-bit carrier. Modulator state
+        grows from 4 to 16 bytes; DMA buffers are unchanged. This changes the
+        bitstream and is not a bit-exact optimization of the original RC-PDM.
+
 choice YORADIO_SPI_PDM_OVERSAMPLE
     prompt "Legacy SPI-PDM bits per PCM sample"
     default YORADIO_SPI_PDM_OVERSAMPLE_8
