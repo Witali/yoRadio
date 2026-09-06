@@ -39,7 +39,7 @@ function main() {
     const functions=[...disassembly.matchAll(/^([\da-f]+) <([^>]+)>:[\s\S]*?(?=^[\da-f]+ <|$(?![\s\S]))/gm)]
       .filter(m=>['i2s_pdm_pack32','i2s_rcpdm_fill'].includes(m[2])).map(m=>m[0]);
     assert.ok(functions.length>0,'Missing actual firmware packer disassembly');
-    fs.writeFileSync(path.join(dest,`${mode}-packers.asm.txt`),functions.join('\n'));
+    fs.writeFileSync(path.join(dest,`${mode}-packers.asm.txt`),functions.join('\n').trimEnd()+'\n');
   }
   for(const run of result.runs) {
     const raw=fs.readFileSync(path.join(source,run.file),'utf8');

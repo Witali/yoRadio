@@ -1,0 +1,975 @@
+{
+  "note": "Physical CPU160/QIO40, 48k PCM/32-bit output. No Wi-Fi/codec/normalization. Nonwait excludes DMA wait, not total CPU utilization.",
+  "summary": {
+    "pdm": {
+      "pack_us_median": 56337,
+      "pack_us_range": [
+        56337,
+        56352
+      ],
+      "pack_us_per_sample": 1.1736875,
+      "nonwait_us_per_audio_second": 96430.39640111571,
+      "nonwait_us_per_audio_second_range": [
+        96430.39640111571,
+        96430.39640111571
+      ],
+      "heap_free": [
+        108532,
+        108532
+      ],
+      "heap_min": [
+        105752,
+        105752
+      ],
+      "underruns": 0,
+      "fifo_empty": 0
+    },
+    "production": {
+      "pack_us_median": 112275,
+      "pack_us_range": [
+        112275,
+        112276
+      ],
+      "pack_us_per_sample": 2.3390625,
+      "nonwait_us_per_audio_second": 122842.59175221148,
+      "nonwait_us_per_audio_second_range": [
+        122842.59175221148,
+        122842.59175221148
+      ],
+      "heap_free": [
+        108532,
+        108532
+      ],
+      "heap_min": [
+        105752,
+        105752
+      ],
+      "underruns": 0,
+      "fifo_empty": 0
+    },
+    "simple-u4": {
+      "pack_us_median": 78283,
+      "pack_us_range": [
+        78283,
+        78289
+      ],
+      "pack_us_per_sample": 1.6308958333333334,
+      "nonwait_us_per_audio_second": 90957.42863168931,
+      "nonwait_us_per_audio_second_range": [
+        90957.42863168931,
+        90957.42863168931
+      ],
+      "heap_free": [
+        108532,
+        108532
+      ],
+      "heap_min": [
+        105752,
+        105752
+      ],
+      "underruns": 0,
+      "fifo_empty": 0
+    },
+    "feedback": {
+      "pack_us_median": 748277,
+      "pack_us_range": [
+        748277,
+        748278
+      ],
+      "pack_us_per_sample": 15.589104166666667,
+      "nonwait_us_per_audio_second": 790223.1858054226,
+      "nonwait_us_per_audio_second_range": [
+        790223.1858054226,
+        790223.1858054226
+      ],
+      "heap_free": [
+        108516,
+        108516
+      ],
+      "heap_min": [
+        105736,
+        105736
+      ],
+      "underruns": 0,
+      "fifo_empty": 0,
+      "pack_change_vs_pdm_percent": 1228.2159149404476,
+      "nonwait_change_vs_pdm_percent": 719.4752021119759,
+      "pack_change_vs_production_percent": 566.4680472055221,
+      "nonwait_change_vs_production_percent": 543.2811083955306,
+      "pack_change_vs_simple-u4_percent": 855.8614258523562,
+      "nonwait_change_vs_simple-u4_percent": 768.783559180466
+    }
+  },
+  "runs": [
+    {
+      "file": "round-1-pdm-uart.log",
+      "round": 1,
+      "mode": "pdm",
+      "pack_us": [
+        56352,
+        56337,
+        56337
+      ],
+      "checksum": "9bfa8dfa",
+      "result": {
+        "calls": 3764,
+        "wall": 10007934,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9977303,
+        "avg": 2650,
+        "max": 9849,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 9009399,
+        "calls": 941,
+        "avg": 9574,
+        "max": 9578,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 96430.39640111571,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    },
+    {
+      "file": "round-2-pdm-uart.log",
+      "round": 2,
+      "mode": "pdm",
+      "pack_us": [
+        56352,
+        56337,
+        56337
+      ],
+      "checksum": "9bfa8dfa",
+      "result": {
+        "calls": 3764,
+        "wall": 10007934,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9977303,
+        "avg": 2650,
+        "max": 9849,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 9009399,
+        "calls": 941,
+        "avg": 9574,
+        "max": 9578,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 96430.39640111571,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    },
+    {
+      "file": "round-1-production-uart.log",
+      "round": 1,
+      "mode": "production",
+      "pack_us": [
+        112276,
+        112275,
+        112275
+      ],
+      "checksum": "e3126451",
+      "result": {
+        "calls": 3764,
+        "wall": 10007942,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9973301,
+        "avg": 2649,
+        "max": 9635,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 8740289,
+        "calls": 941,
+        "avg": 9288,
+        "max": 9292,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 122842.59175221148,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    },
+    {
+      "file": "round-2-production-uart.log",
+      "round": 2,
+      "mode": "production",
+      "pack_us": [
+        112276,
+        112275,
+        112275
+      ],
+      "checksum": "e3126451",
+      "result": {
+        "calls": 3764,
+        "wall": 10007942,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9973301,
+        "avg": 2649,
+        "max": 9635,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 8740289,
+        "calls": 941,
+        "avg": 9288,
+        "max": 9292,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 122842.59175221148,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    },
+    {
+      "file": "round-1-simple-u4-uart.log",
+      "round": 1,
+      "mode": "simple-u4",
+      "pack_us": [
+        78289,
+        78283,
+        78283
+      ],
+      "checksum": "8ebd3ff0",
+      "result": {
+        "calls": 3764,
+        "wall": 10007942,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9983663,
+        "avg": 2652,
+        "max": 9898,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 9070693,
+        "calls": 941,
+        "avg": 9639,
+        "max": 9643,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 90957.42863168931,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    },
+    {
+      "file": "round-2-simple-u4-uart.log",
+      "round": 2,
+      "mode": "simple-u4",
+      "pack_us": [
+        78289,
+        78283,
+        78283
+      ],
+      "checksum": "8ebd3ff0",
+      "result": {
+        "calls": 3764,
+        "wall": 10007942,
+        "audio": 10037333,
+        "realtime": 100.2,
+        "write": 9983663,
+        "avg": 2652,
+        "max": 9898,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 9070693,
+        "calls": 941,
+        "avg": 9639,
+        "max": 9643,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 941,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 90957.42863168931,
+      "heap": {
+        "free": 108532,
+        "min_free": 105752
+      }
+    },
+    {
+      "file": "round-1-feedback-uart.log",
+      "round": 1,
+      "mode": "feedback",
+      "pack_us": [
+        748278,
+        748277,
+        748277
+      ],
+      "checksum": "e465b3fa",
+      "result": {
+        "calls": 3762,
+        "wall": 10001567,
+        "audio": 10032000,
+        "realtime": 100.3,
+        "write": 9977312,
+        "avg": 2652,
+        "max": 4299,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 2049793,
+        "calls": 940,
+        "avg": 2180,
+        "max": 2185,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 940,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 790223.1858054226,
+      "heap": {
+        "free": 108516,
+        "min_free": 105736
+      }
+    },
+    {
+      "file": "round-2-feedback-uart.log",
+      "round": 2,
+      "mode": "feedback",
+      "pack_us": [
+        748278,
+        748277,
+        748277
+      ],
+      "checksum": "e465b3fa",
+      "result": {
+        "calls": 3762,
+        "wall": 10001567,
+        "audio": 10032000,
+        "realtime": 100.3,
+        "write": 9977312,
+        "avg": 2652,
+        "max": 4299,
+        "invalid": 0
+      },
+      "wait": {
+        "spi_wait": 2049793,
+        "calls": 940,
+        "avg": 2180,
+        "max": 2185,
+        "invalid": 0
+      },
+      "dma": {
+        "eof": 940,
+        "partial_start": 0,
+        "blocked_partial": 0,
+        "fifo_empty": 0
+      },
+      "underruns": 0,
+      "nonwait_us_per_audio_second": 790223.1858054226,
+      "heap": {
+        "free": 108516,
+        "min_free": 105736
+      }
+    }
+  ],
+  "started_utc": "2026-09-06T18:04:13.663Z",
+  "finished_utc": "2026-09-06T18:11:53.944Z",
+  "order": [
+    "1:pdm",
+    "1:production",
+    "1:simple-u4",
+    "1:feedback",
+    "2:feedback",
+    "2:simple-u4",
+    "2:production",
+    "2:pdm"
+  ],
+  "restore": {
+    "app0_sha256": "d3365325c09b05a446ce280248c163fddba406b81d03ec2a5f3e295cdca94580",
+    "flash_sha256": "02834c5f63c5fe4b5b104141c7f4aa8c8f00fa2b32e19a3941cf082fb6d4cbd5",
+    "full_flash_verified": true,
+    "boot_verified": true
+  },
+  "builds": {
+    "pdm": {
+      "manifest": {
+        "mode": "pdm",
+        "purpose": "Isolated PCM packer and I2S DMA speed benchmark, not radio",
+        "source": "b14b1fb32a43e1c28465fd2167b66cde3e068306",
+        "compiled_working_tree": true,
+        "batch": true,
+        "simple_unroll4": false,
+        "cpu_mhz": 160,
+        "flash": "QIO40",
+        "pcm_rate": 48000,
+        "bits": 32,
+        "bit_rate_hz": 1536000,
+        "app_address": "0x10000",
+        "bytes": 127568,
+        "sha256": "7596637AD4D1CC5B686A6613ECE12E8412DFFDCD35EE4BCEC7C29B9AB208ECFA",
+        "config_sha256": "4FE8DA2AFBD5E5D58EF2662A1B37AFEC13951D30C03D10063304940AB74B6F19",
+        "feedback_source_sha256": "9AFF2491DF393E34F8D8FB9043CE37E95E51C0E87EDE92D4E0A2FCD7B7D5586A",
+        "output_source_sha256": "0488946194AB68CD3E1FF38B887187E32E74103D72C1DB167F31D6B071D97864",
+        "benchmark_source_sha256": "6DAEE56E6FEF62CBCD7CC01174E2A2161A4634E79015CAB626CCDFA95B9908B4"
+      },
+      "static_dram": 10332,
+      "static_iram": 18672,
+      "sections": {
+        ".rtc_noinit": 0,
+        ".iram0.vectors": 128,
+        ".iram0.text": 18020,
+        ".iram0.bss": 524,
+        ".dram0.data": 1012,
+        ".noinit": 0,
+        ".dram0.bss": 9320,
+        ".flash.text": 85562,
+        ".flash.rodata": 22768,
+        ".xtensa.info": 56,
+        ".comment": 199,
+        ".xt.lit._ZN3nvs4Lock4initEv": 0,
+        ".xt.prop._ZN3nvs4Lock4initEv": 72,
+        ".xt.prop._ZN14intrusive_listI11HandleEntryE5eraseENS1_8iteratorE": 84,
+        ".xt.lit._ZN19CompressedEnumTableIbLj1ELj256EE3setEjb": 8,
+        ".xt.prop._ZN19CompressedEnumTableIbLj1ELj256EE3setEjb": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs7Storage14NamespaceEntryEE9push_backEPS2_": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs8HashList13HashListBlockEE5eraseENS3_8iteratorE": 84,
+        ".xt.lit._ZN3nvs4ItemC5EhNS_8ItemTypeEhPKc": 0,
+        ".xt.lit._ZNK19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3getEj": 8,
+        ".xt.lit._ZN19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3setEjS2_": 8,
+        ".xt.prop._ZN3nvs4ItemC5EhNS_8ItemTypeEhPKc": 0,
+        ".xt.prop._ZNK19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3getEj": 60,
+        ".xt.prop._ZN19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3setEjS2_": 60,
+        ".xt.prop._ZN3nvs4ItemC2EhNS_8ItemTypeEhPKc": 60,
+        ".xt.lit._ZN14intrusive_listIN3nvs4PageEE5clearEv": 0,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE5clearEv": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE9push_backEPS1_": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE5eraseENS2_8iteratorE": 84,
+        ".xt.lit._ZNK9__gnu_cxx24__concurrence_lock_error4whatEv": 8,
+        ".xt.lit._ZNK9__gnu_cxx26__concurrence_unlock_error4whatEv": 8,
+        ".xt.lit._ZN9__gnu_cxx24__concurrence_lock_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx26__concurrence_unlock_errorD5Ev": 8,
+        ".xt.prop._ZNK9__gnu_cxx24__concurrence_lock_error4whatEv": 48,
+        ".xt.prop._ZNK9__gnu_cxx26__concurrence_unlock_error4whatEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD0Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD0Ev": 36,
+        ".xt.prop._ZTIN9__gnu_cxx24__concurrence_lock_errorE": 12,
+        ".xt.prop._ZTIN9__gnu_cxx26__concurrence_unlock_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx24__concurrence_lock_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx26__concurrence_unlock_errorE": 12,
+        ".xt.prop._ZTISt9bad_alloc": 12,
+        ".xt.prop._ZTVSt9bad_alloc": 12,
+        ".xt.prop._ZTISt9exception": 12,
+        ".xt.prop._ZTISt13bad_exception": 12,
+        ".xt.prop._ZTIN10__cxxabiv115__forced_unwindE": 12,
+        ".xt.prop._ZTIN10__cxxabiv119__foreign_exceptionE": 12,
+        ".xt.prop._ZTVSt13bad_exception": 12,
+        ".xt.lit._ZN9__gnu_cxx7__mutex4lockEv": 0,
+        ".xt.lit._ZN9__gnu_cxx13__scoped_lockD5Ev": 0,
+        ".xt.prop._ZN9__gnu_cxx7__mutex4lockEv": 36,
+        ".xt.prop._ZN9__gnu_cxx13__scoped_lockD5Ev": 0,
+        ".xt.prop._ZN9__gnu_cxx13__scoped_lockD2Ev": 72,
+        ".xt.lit._ZNK9__gnu_cxx29__concurrence_broadcast_error4whatEv": 8,
+        ".xt.lit._ZNK9__gnu_cxx24__concurrence_wait_error4whatEv": 8,
+        ".xt.lit._ZN9__gnu_cxx24__concurrence_wait_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx29__concurrence_broadcast_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx6__cond9broadcastEv": 8,
+        ".xt.prop._ZNK9__gnu_cxx29__concurrence_broadcast_error4whatEv": 48,
+        ".xt.prop._ZNK9__gnu_cxx24__concurrence_wait_error4whatEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx6__cond9broadcastEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD0Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD0Ev": 36,
+        ".xt.prop._ZTIN9__gnu_cxx29__concurrence_broadcast_errorE": 12,
+        ".xt.prop._ZTIN9__gnu_cxx24__concurrence_wait_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx29__concurrence_broadcast_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx24__concurrence_wait_errorE": 12,
+        ".xt.prop._ZTIN10__cxxabiv117__class_type_infoE": 12,
+        ".xt.prop._ZTVN10__cxxabiv117__class_type_infoE": 12,
+        ".xt.prop._ZTISt9type_info": 12,
+        ".xt.prop._ZTIN10__cxxabiv120__si_class_type_infoE": 12,
+        ".xt.prop._ZTVN10__cxxabiv120__si_class_type_infoE": 12,
+        ".debug_frame": 34312,
+        ".debug_info": 783965,
+        ".debug_abbrev": 116236,
+        ".debug_loc": 209978,
+        ".debug_aranges": 10376,
+        ".debug_ranges": 25808,
+        ".debug_line": 417037,
+        ".debug_str": 115333
+      },
+      "symbols": [
+        {
+          "name": "s_pdm_integrator",
+          "address": "3ffe9ef4",
+          "bytes": 4,
+          "type": "b"
+        },
+        {
+          "name": "i2s_pdm_pack32",
+          "address": "40214f28",
+          "bytes": 456,
+          "type": "t"
+        }
+      ]
+    },
+    "production": {
+      "manifest": {
+        "mode": "production",
+        "purpose": "Isolated PCM packer and I2S DMA speed benchmark, not radio",
+        "source": "b14b1fb32a43e1c28465fd2167b66cde3e068306",
+        "compiled_working_tree": true,
+        "batch": true,
+        "simple_unroll4": false,
+        "cpu_mhz": 160,
+        "flash": "QIO40",
+        "pcm_rate": 48000,
+        "bits": 32,
+        "bit_rate_hz": 1536000,
+        "app_address": "0x10000",
+        "bytes": 128592,
+        "sha256": "7AE622C2E5E1A0EFDE360D96289C57BA73E85EBBD4A9EB1789445BAC2D0FB30C",
+        "config_sha256": "3B27940C5FDE45FE88E9C64423C73710B58CC2B32E7CB33684CC648BBF841464",
+        "feedback_source_sha256": "9AFF2491DF393E34F8D8FB9043CE37E95E51C0E87EDE92D4E0A2FCD7B7D5586A",
+        "output_source_sha256": "0488946194AB68CD3E1FF38B887187E32E74103D72C1DB167F31D6B071D97864",
+        "benchmark_source_sha256": "6DAEE56E6FEF62CBCD7CC01174E2A2161A4634E79015CAB626CCDFA95B9908B4"
+      },
+      "static_dram": 10332,
+      "static_iram": 18672,
+      "sections": {
+        ".rtc_noinit": 0,
+        ".iram0.vectors": 128,
+        ".iram0.text": 18020,
+        ".iram0.bss": 524,
+        ".dram0.data": 1012,
+        ".noinit": 0,
+        ".dram0.bss": 9320,
+        ".flash.text": 86454,
+        ".flash.rodata": 22892,
+        ".xtensa.info": 56,
+        ".comment": 199,
+        ".xt.lit._ZN3nvs4Lock4initEv": 0,
+        ".xt.prop._ZN3nvs4Lock4initEv": 72,
+        ".xt.prop._ZN14intrusive_listI11HandleEntryE5eraseENS1_8iteratorE": 84,
+        ".xt.lit._ZN19CompressedEnumTableIbLj1ELj256EE3setEjb": 8,
+        ".xt.prop._ZN19CompressedEnumTableIbLj1ELj256EE3setEjb": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs7Storage14NamespaceEntryEE9push_backEPS2_": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs8HashList13HashListBlockEE5eraseENS3_8iteratorE": 84,
+        ".xt.lit._ZN3nvs4ItemC5EhNS_8ItemTypeEhPKc": 0,
+        ".xt.lit._ZNK19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3getEj": 8,
+        ".xt.lit._ZN19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3setEjS2_": 8,
+        ".xt.prop._ZN3nvs4ItemC5EhNS_8ItemTypeEhPKc": 0,
+        ".xt.prop._ZNK19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3getEj": 60,
+        ".xt.prop._ZN19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3setEjS2_": 60,
+        ".xt.prop._ZN3nvs4ItemC2EhNS_8ItemTypeEhPKc": 60,
+        ".xt.lit._ZN14intrusive_listIN3nvs4PageEE5clearEv": 0,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE5clearEv": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE9push_backEPS1_": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE5eraseENS2_8iteratorE": 84,
+        ".xt.lit._ZNK9__gnu_cxx24__concurrence_lock_error4whatEv": 8,
+        ".xt.lit._ZNK9__gnu_cxx26__concurrence_unlock_error4whatEv": 8,
+        ".xt.lit._ZN9__gnu_cxx24__concurrence_lock_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx26__concurrence_unlock_errorD5Ev": 8,
+        ".xt.prop._ZNK9__gnu_cxx24__concurrence_lock_error4whatEv": 48,
+        ".xt.prop._ZNK9__gnu_cxx26__concurrence_unlock_error4whatEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD0Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD0Ev": 36,
+        ".xt.prop._ZTIN9__gnu_cxx24__concurrence_lock_errorE": 12,
+        ".xt.prop._ZTIN9__gnu_cxx26__concurrence_unlock_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx24__concurrence_lock_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx26__concurrence_unlock_errorE": 12,
+        ".xt.prop._ZTISt9bad_alloc": 12,
+        ".xt.prop._ZTVSt9bad_alloc": 12,
+        ".xt.prop._ZTISt9exception": 12,
+        ".xt.prop._ZTISt13bad_exception": 12,
+        ".xt.prop._ZTIN10__cxxabiv115__forced_unwindE": 12,
+        ".xt.prop._ZTIN10__cxxabiv119__foreign_exceptionE": 12,
+        ".xt.prop._ZTVSt13bad_exception": 12,
+        ".xt.lit._ZN9__gnu_cxx7__mutex4lockEv": 0,
+        ".xt.lit._ZN9__gnu_cxx13__scoped_lockD5Ev": 0,
+        ".xt.prop._ZN9__gnu_cxx7__mutex4lockEv": 36,
+        ".xt.prop._ZN9__gnu_cxx13__scoped_lockD5Ev": 0,
+        ".xt.prop._ZN9__gnu_cxx13__scoped_lockD2Ev": 72,
+        ".xt.lit._ZNK9__gnu_cxx29__concurrence_broadcast_error4whatEv": 8,
+        ".xt.lit._ZNK9__gnu_cxx24__concurrence_wait_error4whatEv": 8,
+        ".xt.lit._ZN9__gnu_cxx24__concurrence_wait_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx29__concurrence_broadcast_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx6__cond9broadcastEv": 8,
+        ".xt.prop._ZNK9__gnu_cxx29__concurrence_broadcast_error4whatEv": 48,
+        ".xt.prop._ZNK9__gnu_cxx24__concurrence_wait_error4whatEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx6__cond9broadcastEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD0Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD0Ev": 36,
+        ".xt.prop._ZTIN9__gnu_cxx29__concurrence_broadcast_errorE": 12,
+        ".xt.prop._ZTIN9__gnu_cxx24__concurrence_wait_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx29__concurrence_broadcast_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx24__concurrence_wait_errorE": 12,
+        ".xt.prop._ZTIN10__cxxabiv117__class_type_infoE": 12,
+        ".xt.prop._ZTVN10__cxxabiv117__class_type_infoE": 12,
+        ".xt.prop._ZTISt9type_info": 12,
+        ".xt.prop._ZTIN10__cxxabiv120__si_class_type_infoE": 12,
+        ".xt.prop._ZTVN10__cxxabiv120__si_class_type_infoE": 12,
+        ".debug_frame": 34372,
+        ".debug_info": 786120,
+        ".debug_abbrev": 116409,
+        ".debug_loc": 210132,
+        ".debug_aranges": 10384,
+        ".debug_ranges": 25744,
+        ".debug_line": 419179,
+        ".debug_str": 115495
+      },
+      "symbols": [
+        {
+          "name": "s_rcpdm",
+          "address": "3ffe9ef4",
+          "bytes": 4,
+          "type": "b"
+        },
+        {
+          "name": "i2s_pdm_pack32",
+          "address": "40214f48",
+          "bytes": 63,
+          "type": "t"
+        },
+        {
+          "name": "i2s_rcpdm_fill",
+          "address": "40214f88",
+          "bytes": 203,
+          "type": "t"
+        }
+      ]
+    },
+    "simple-u4": {
+      "manifest": {
+        "mode": "simple-u4",
+        "purpose": "Isolated PCM packer and I2S DMA speed benchmark, not radio",
+        "source": "b14b1fb32a43e1c28465fd2167b66cde3e068306",
+        "compiled_working_tree": true,
+        "batch": true,
+        "simple_unroll4": true,
+        "cpu_mhz": 160,
+        "flash": "QIO40",
+        "pcm_rate": 48000,
+        "bits": 32,
+        "bit_rate_hz": 1536000,
+        "app_address": "0x10000",
+        "bytes": 129632,
+        "sha256": "3A829D76F975243FC875468834D10FE94AA169178B734F8A4F3EA545D2566352",
+        "config_sha256": "3B27940C5FDE45FE88E9C64423C73710B58CC2B32E7CB33684CC648BBF841464",
+        "feedback_source_sha256": "9AFF2491DF393E34F8D8FB9043CE37E95E51C0E87EDE92D4E0A2FCD7B7D5586A",
+        "output_source_sha256": "0488946194AB68CD3E1FF38B887187E32E74103D72C1DB167F31D6B071D97864",
+        "benchmark_source_sha256": "6DAEE56E6FEF62CBCD7CC01174E2A2161A4634E79015CAB626CCDFA95B9908B4"
+      },
+      "static_dram": 10332,
+      "static_iram": 18672,
+      "sections": {
+        ".rtc_noinit": 0,
+        ".iram0.vectors": 128,
+        ".iram0.text": 18020,
+        ".iram0.bss": 524,
+        ".dram0.data": 1012,
+        ".noinit": 0,
+        ".dram0.bss": 9320,
+        ".flash.text": 87310,
+        ".flash.rodata": 23076,
+        ".xtensa.info": 56,
+        ".comment": 199,
+        ".xt.lit._ZN3nvs4Lock4initEv": 0,
+        ".xt.prop._ZN3nvs4Lock4initEv": 72,
+        ".xt.prop._ZN14intrusive_listI11HandleEntryE5eraseENS1_8iteratorE": 84,
+        ".xt.lit._ZN19CompressedEnumTableIbLj1ELj256EE3setEjb": 8,
+        ".xt.prop._ZN19CompressedEnumTableIbLj1ELj256EE3setEjb": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs7Storage14NamespaceEntryEE9push_backEPS2_": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs8HashList13HashListBlockEE5eraseENS3_8iteratorE": 84,
+        ".xt.lit._ZN3nvs4ItemC5EhNS_8ItemTypeEhPKc": 0,
+        ".xt.lit._ZNK19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3getEj": 8,
+        ".xt.lit._ZN19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3setEjS2_": 8,
+        ".xt.prop._ZN3nvs4ItemC5EhNS_8ItemTypeEhPKc": 0,
+        ".xt.prop._ZNK19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3getEj": 60,
+        ".xt.prop._ZN19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3setEjS2_": 60,
+        ".xt.prop._ZN3nvs4ItemC2EhNS_8ItemTypeEhPKc": 60,
+        ".xt.lit._ZN14intrusive_listIN3nvs4PageEE5clearEv": 0,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE5clearEv": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE9push_backEPS1_": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE5eraseENS2_8iteratorE": 84,
+        ".xt.lit._ZNK9__gnu_cxx24__concurrence_lock_error4whatEv": 8,
+        ".xt.lit._ZNK9__gnu_cxx26__concurrence_unlock_error4whatEv": 8,
+        ".xt.lit._ZN9__gnu_cxx24__concurrence_lock_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx26__concurrence_unlock_errorD5Ev": 8,
+        ".xt.prop._ZNK9__gnu_cxx24__concurrence_lock_error4whatEv": 48,
+        ".xt.prop._ZNK9__gnu_cxx26__concurrence_unlock_error4whatEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD0Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD0Ev": 36,
+        ".xt.prop._ZTIN9__gnu_cxx24__concurrence_lock_errorE": 12,
+        ".xt.prop._ZTIN9__gnu_cxx26__concurrence_unlock_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx24__concurrence_lock_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx26__concurrence_unlock_errorE": 12,
+        ".xt.prop._ZTISt9bad_alloc": 12,
+        ".xt.prop._ZTVSt9bad_alloc": 12,
+        ".xt.prop._ZTISt9exception": 12,
+        ".xt.prop._ZTISt13bad_exception": 12,
+        ".xt.prop._ZTIN10__cxxabiv115__forced_unwindE": 12,
+        ".xt.prop._ZTIN10__cxxabiv119__foreign_exceptionE": 12,
+        ".xt.prop._ZTVSt13bad_exception": 12,
+        ".xt.lit._ZN9__gnu_cxx7__mutex4lockEv": 0,
+        ".xt.lit._ZN9__gnu_cxx13__scoped_lockD5Ev": 0,
+        ".xt.prop._ZN9__gnu_cxx7__mutex4lockEv": 36,
+        ".xt.prop._ZN9__gnu_cxx13__scoped_lockD5Ev": 0,
+        ".xt.prop._ZN9__gnu_cxx13__scoped_lockD2Ev": 72,
+        ".xt.lit._ZNK9__gnu_cxx29__concurrence_broadcast_error4whatEv": 8,
+        ".xt.lit._ZNK9__gnu_cxx24__concurrence_wait_error4whatEv": 8,
+        ".xt.lit._ZN9__gnu_cxx24__concurrence_wait_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx29__concurrence_broadcast_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx6__cond9broadcastEv": 8,
+        ".xt.prop._ZNK9__gnu_cxx29__concurrence_broadcast_error4whatEv": 48,
+        ".xt.prop._ZNK9__gnu_cxx24__concurrence_wait_error4whatEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx6__cond9broadcastEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD0Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD0Ev": 36,
+        ".xt.prop._ZTIN9__gnu_cxx29__concurrence_broadcast_errorE": 12,
+        ".xt.prop._ZTIN9__gnu_cxx24__concurrence_wait_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx29__concurrence_broadcast_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx24__concurrence_wait_errorE": 12,
+        ".xt.prop._ZTIN10__cxxabiv117__class_type_infoE": 12,
+        ".xt.prop._ZTVN10__cxxabiv117__class_type_infoE": 12,
+        ".xt.prop._ZTISt9type_info": 12,
+        ".xt.prop._ZTIN10__cxxabiv120__si_class_type_infoE": 12,
+        ".xt.prop._ZTVN10__cxxabiv120__si_class_type_infoE": 12,
+        ".debug_frame": 34372,
+        ".debug_info": 787516,
+        ".debug_abbrev": 116439,
+        ".debug_loc": 211887,
+        ".debug_aranges": 10384,
+        ".debug_ranges": 26488,
+        ".debug_line": 420712,
+        ".debug_str": 115574
+      },
+      "symbols": [
+        {
+          "name": "s_rcpdm",
+          "address": "3ffe9ef4",
+          "bytes": 4,
+          "type": "b"
+        },
+        {
+          "name": "i2s_pdm_pack32",
+          "address": "40215068",
+          "bytes": 93,
+          "type": "t"
+        },
+        {
+          "name": "i2s_rcpdm_fill",
+          "address": "40214f58",
+          "bytes": 271,
+          "type": "t"
+        }
+      ]
+    },
+    "feedback": {
+      "manifest": {
+        "mode": "feedback",
+        "purpose": "Isolated PCM packer and I2S DMA speed benchmark, not radio",
+        "source": "b14b1fb32a43e1c28465fd2167b66cde3e068306",
+        "compiled_working_tree": true,
+        "batch": true,
+        "simple_unroll4": false,
+        "cpu_mhz": 160,
+        "flash": "QIO40",
+        "pcm_rate": 48000,
+        "bits": 32,
+        "bit_rate_hz": 1536000,
+        "app_address": "0x10000",
+        "bytes": 130000,
+        "sha256": "E4908C9B5183222354045CFDCBD3377738DEE5932E94C4001A43DD5779A9F154",
+        "config_sha256": "3887100F8A22DD7ACF185570CA8EF50EFB1400E19E8999DF56FE1DF756C6CF1B",
+        "feedback_source_sha256": "9AFF2491DF393E34F8D8FB9043CE37E95E51C0E87EDE92D4E0A2FCD7B7D5586A",
+        "output_source_sha256": "0488946194AB68CD3E1FF38B887187E32E74103D72C1DB167F31D6B071D97864",
+        "benchmark_source_sha256": "6DAEE56E6FEF62CBCD7CC01174E2A2161A4634E79015CAB626CCDFA95B9908B4"
+      },
+      "static_dram": 10348,
+      "static_iram": 18672,
+      "sections": {
+        ".rtc_noinit": 0,
+        ".iram0.vectors": 128,
+        ".iram0.text": 18020,
+        ".iram0.bss": 524,
+        ".dram0.data": 1012,
+        ".noinit": 0,
+        ".dram0.bss": 9336,
+        ".flash.text": 87834,
+        ".flash.rodata": 22924,
+        ".xtensa.info": 56,
+        ".comment": 199,
+        ".xt.lit._ZN3nvs4Lock4initEv": 0,
+        ".xt.prop._ZN3nvs4Lock4initEv": 72,
+        ".xt.prop._ZN14intrusive_listI11HandleEntryE5eraseENS1_8iteratorE": 84,
+        ".xt.lit._ZN19CompressedEnumTableIbLj1ELj256EE3setEjb": 8,
+        ".xt.prop._ZN19CompressedEnumTableIbLj1ELj256EE3setEjb": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs7Storage14NamespaceEntryEE9push_backEPS2_": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs8HashList13HashListBlockEE5eraseENS3_8iteratorE": 84,
+        ".xt.lit._ZN3nvs4ItemC5EhNS_8ItemTypeEhPKc": 0,
+        ".xt.lit._ZNK19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3getEj": 8,
+        ".xt.lit._ZN19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3setEjS2_": 8,
+        ".xt.prop._ZN3nvs4ItemC5EhNS_8ItemTypeEhPKc": 0,
+        ".xt.prop._ZNK19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3getEj": 60,
+        ".xt.prop._ZN19CompressedEnumTableIN3nvs4Page10EntryStateELj2ELj126EE3setEjS2_": 60,
+        ".xt.prop._ZN3nvs4ItemC2EhNS_8ItemTypeEhPKc": 60,
+        ".xt.lit._ZN14intrusive_listIN3nvs4PageEE5clearEv": 0,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE5clearEv": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE9push_backEPS1_": 60,
+        ".xt.prop._ZN14intrusive_listIN3nvs4PageEE5eraseENS2_8iteratorE": 84,
+        ".xt.lit._ZNK9__gnu_cxx24__concurrence_lock_error4whatEv": 8,
+        ".xt.lit._ZNK9__gnu_cxx26__concurrence_unlock_error4whatEv": 8,
+        ".xt.lit._ZN9__gnu_cxx24__concurrence_lock_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx26__concurrence_unlock_errorD5Ev": 8,
+        ".xt.prop._ZNK9__gnu_cxx24__concurrence_lock_error4whatEv": 48,
+        ".xt.prop._ZNK9__gnu_cxx26__concurrence_unlock_error4whatEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_lock_errorD0Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx26__concurrence_unlock_errorD0Ev": 36,
+        ".xt.prop._ZTIN9__gnu_cxx24__concurrence_lock_errorE": 12,
+        ".xt.prop._ZTIN9__gnu_cxx26__concurrence_unlock_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx24__concurrence_lock_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx26__concurrence_unlock_errorE": 12,
+        ".xt.prop._ZTISt9bad_alloc": 12,
+        ".xt.prop._ZTVSt9bad_alloc": 12,
+        ".xt.prop._ZTISt9exception": 12,
+        ".xt.prop._ZTISt13bad_exception": 12,
+        ".xt.prop._ZTIN10__cxxabiv115__forced_unwindE": 12,
+        ".xt.prop._ZTIN10__cxxabiv119__foreign_exceptionE": 12,
+        ".xt.prop._ZTVSt13bad_exception": 12,
+        ".xt.lit._ZN9__gnu_cxx7__mutex4lockEv": 0,
+        ".xt.lit._ZN9__gnu_cxx13__scoped_lockD5Ev": 0,
+        ".xt.prop._ZN9__gnu_cxx7__mutex4lockEv": 36,
+        ".xt.prop._ZN9__gnu_cxx13__scoped_lockD5Ev": 0,
+        ".xt.prop._ZN9__gnu_cxx13__scoped_lockD2Ev": 72,
+        ".xt.lit._ZNK9__gnu_cxx29__concurrence_broadcast_error4whatEv": 8,
+        ".xt.lit._ZNK9__gnu_cxx24__concurrence_wait_error4whatEv": 8,
+        ".xt.lit._ZN9__gnu_cxx24__concurrence_wait_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx29__concurrence_broadcast_errorD5Ev": 8,
+        ".xt.lit._ZN9__gnu_cxx6__cond9broadcastEv": 8,
+        ".xt.prop._ZNK9__gnu_cxx29__concurrence_broadcast_error4whatEv": 48,
+        ".xt.prop._ZNK9__gnu_cxx24__concurrence_wait_error4whatEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD5Ev": 12,
+        ".xt.prop._ZN9__gnu_cxx6__cond9broadcastEv": 48,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD2Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx24__concurrence_wait_errorD0Ev": 36,
+        ".xt.prop._ZN9__gnu_cxx29__concurrence_broadcast_errorD0Ev": 36,
+        ".xt.prop._ZTIN9__gnu_cxx29__concurrence_broadcast_errorE": 12,
+        ".xt.prop._ZTIN9__gnu_cxx24__concurrence_wait_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx29__concurrence_broadcast_errorE": 12,
+        ".xt.prop._ZTVN9__gnu_cxx24__concurrence_wait_errorE": 12,
+        ".xt.prop._ZTIN10__cxxabiv117__class_type_infoE": 12,
+        ".xt.prop._ZTVN10__cxxabiv117__class_type_infoE": 12,
+        ".xt.prop._ZTISt9type_info": 12,
+        ".xt.prop._ZTIN10__cxxabiv120__si_class_type_infoE": 12,
+        ".xt.prop._ZTVN10__cxxabiv120__si_class_type_infoE": 12,
+        ".debug_frame": 34400,
+        ".debug_info": 787440,
+        ".debug_abbrev": 116387,
+        ".debug_loc": 212294,
+        ".debug_aranges": 10384,
+        ".debug_ranges": 25776,
+        ".debug_line": 421537,
+        ".debug_str": 115662
+      },
+      "symbols": [
+        {
+          "name": "s_rcpdm",
+          "address": "3ffe9ef4",
+          "bytes": 16,
+          "type": "b"
+        },
+        {
+          "name": "i2s_pdm_pack32",
+          "address": "40214f48",
+          "bytes": 216,
+          "type": "t"
+        },
+        {
+          "name": "i2s_rcpdm_fill",
+          "address": "40215020",
+          "bytes": 291,
+          "type": "t"
+        }
+      ]
+    }
+  }
+}

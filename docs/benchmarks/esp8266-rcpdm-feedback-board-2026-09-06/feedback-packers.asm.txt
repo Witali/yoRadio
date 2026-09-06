@@ -1,0 +1,208 @@
+40214f48 <i2s_pdm_pack32>:
+40214f48:	ed5441        	l32r	a4, 40210498 <_stext+0x488>
+40214f4b:	ed5231        	l32r	a3, 40210494 <_stext+0x484>
+40214f4e:	d0c112        	addi	a1, a1, -48
+40214f51:	223a      	add.n	a2, a2, a3
+40214f53:	b1c9      	s32i.n	a12, a1, 44
+40214f55:	24c8      	l32i.n	a12, a4, 8
+40214f57:	112230        	slli	a2, a2, 13
+40214f5a:	c032c0        	sub	a3, a2, a12
+40214f5d:	1fc372        	addi	a7, a3, 31
+40214f60:	b37330        	movgez	a7, a3, a3
+40214f63:	090c      	movi.n	a9, 0
+40214f65:	217570        	srai	a7, a7, 5
+40214f68:	3438      	l32i.n	a3, a4, 12
+40214f6a:	0468      	l32i.n	a6, a4, 0
+40214f6c:	1458      	l32i.n	a5, a4, 4
+40214f6e:	a1d9      	s32i.n	a13, a1, 40
+40214f70:	91e9      	s32i.n	a14, a1, 36
+40214f72:	81f9      	s32i.n	a15, a1, 32
+40214f74:	4179      	s32i.n	a7, a1, 16
+40214f76:	09bd      	mov.n	a11, a9
+40214f78:	20a990        	or	a10, a9, a9
+40214f7b:	1e0c      	movi.n	a14, 1
+40214f7d:	20d990        	or	a13, a9, a9
+40214f80:	117330        	slli	a7, a3, 13
+40214f83:	303730        	xor	a3, a7, a3
+40214f86:	e57130        	extui	a7, a3, 17, 15
+40214f89:	303370        	xor	a3, a3, a7
+40214f8c:	1173b0        	slli	a7, a3, 5
+40214f8f:	303370        	xor	a3, a3, a7
+40214f92:	f57030        	extui	a7, a3, 16, 16
+40214f95:	f48030        	extui	a8, a3, 0, 16
+40214f98:	887a      	add.n	a8, a8, a7
+40214f9a:	4178      	l32i.n	a7, a1, 16
+40214f9c:	21f460        	srai	a15, a6, 4
+40214f9f:	cc7a      	add.n	a12, a12, a7
+40214fa1:	ed3e71        	l32r	a7, 4021049c <_stext+0x48c>
+40214fa4:	c066f0        	sub	a6, a6, a15
+40214fa7:	887a      	add.n	a8, a8, a7
+40214fa9:	118880        	slli	a8, a8, 8
+40214fac:	7c5a      	add.n	a7, a12, a5
+40214fae:	778a      	add.n	a7, a7, a8
+40214fb0:	ed3c81        	l32r	a8, 402104a0 <_stext+0x490>
+40214fb3:	f68a      	add.n	a15, a6, a8
+40214fb5:	0e8d      	mov.n	a8, a14
+40214fb7:	012f77        	blt	a15, a7, 40214fbc <i2s_pdm_pack32+0x74>
+40214fba:	0d8d      	mov.n	a8, a13
+40214fbc:	04af77        	bge	a15, a7, 40214fc4 <i2s_pdm_pack32+0x7c>
+40214fbf:	ed3971        	l32r	a7, 402104a4 <_stext+0x494>
+40214fc2:	667a      	add.n	a6, a6, a7
+40214fc4:	c07c60        	sub	a7, a12, a6
+40214fc7:	557a      	add.n	a5, a5, a7
+40214fc9:	ed1171        	l32r	a7, 40210410 <_stext+0x400>
+40214fcc:	01a577        	bge	a5, a7, 40214fd1 <i2s_pdm_pack32+0x89>
+40214fcf:	075d      	mov.n	a5, a7
+40214fd1:	ec7671        	l32r	a7, 402101ac <_stext+0x19c>
+40214fd4:	02a757        	bge	a7, a5, 40214fda <i2s_pdm_pack32+0x92>
+40214fd7:	205770        	or	a5, a7, a7
+40214fda:	bb1b      	addi.n	a11, a11, 1
+40214fdc:	44f0b0        	extui	a15, a11, 0, 5
+40214fdf:	0d7d      	mov.n	a7, a13
+40214fe1:	837ef0        	moveqz	a7, a14, a15
+40214fe4:	11aaf0        	slli	a10, a10, 1
+40214fe7:	747070        	extui	a7, a7, 0, 8
+40214fea:	20a8a0        	or	a10, a8, a10
+40214fed:	77cc      	bnez.n	a7, 40214ff8 <i2s_pdm_pack32+0xb0>
+40214fef:	e0cb82        	addi	a8, a11, -32
+40214ff2:	837e80        	moveqz	a7, a14, a8
+40214ff5:	f87716        	beqz	a7, 40214f80 <i2s_pdm_pack32+0x38>
+40214ff8:	1179e0        	slli	a7, a9, 2
+40214ffb:	717a      	add.n	a7, a1, a7
+40214ffd:	07a9      	s32i.n	a10, a7, 0
+40214fff:	06cb26        	beqi	a11, 32, 40215009 <i2s_pdm_pack32+0xc1>
+40215002:	991b      	addi.n	a9, a9, 1
+40215004:	0dad      	mov.n	a10, a13
+40215006:	ffdd86        	j	40214f80 <i2s_pdm_pack32+0x38>
+40215009:	2429      	s32i.n	a2, a4, 8
+4021500b:	b1c8      	l32i.n	a12, a1, 44
+4021500d:	0128      	l32i.n	a2, a1, 0
+4021500f:	a1d8      	l32i.n	a13, a1, 40
+40215011:	91e8      	l32i.n	a14, a1, 36
+40215013:	81f8      	l32i.n	a15, a1, 32
+40215015:	3439      	s32i.n	a3, a4, 12
+40215017:	0469      	s32i.n	a6, a4, 0
+40215019:	1459      	s32i.n	a5, a4, 4
+4021501b:	30c112        	addi	a1, a1, 48
+4021501e:	f00d      	ret.n
+
+
+40215020 <i2s_rcpdm_fill>:
+40215020:	c0c112        	addi	a1, a1, -64
+40215023:	ed1d61        	l32r	a6, 40210498 <_stext+0x488>
+40215026:	5159      	s32i.n	a5, a1, 20
+40215028:	f1c9      	s32i.n	a12, a1, 60
+4021502a:	e1d9      	s32i.n	a13, a1, 56
+4021502c:	d1e9      	s32i.n	a14, a1, 52
+4021502e:	c1f9      	s32i.n	a15, a1, 48
+40215030:	0688      	l32i.n	a8, a6, 0
+40215032:	1678      	l32i.n	a7, a6, 4
+40215034:	26b8      	l32i.n	a11, a6, 8
+40215036:	3658      	l32i.n	a5, a6, 12
+40215038:	0f0416        	beqz	a4, 4021512c <i2s_rcpdm_fill+0x10c>
+4021503b:	5198      	l32i.n	a9, a1, 20
+4021503d:	1144e0        	slli	a4, a4, 2
+40215040:	1199f0        	slli	a9, a9, 1
+40215043:	424a      	add.n	a4, a2, a4
+40215045:	7199      	s32i.n	a9, a1, 28
+40215047:	046132        	s32i	a3, a1, 16
+4021504a:	066142        	s32i	a4, a1, 24
+4021504d:	41a8      	l32i.n	a10, a1, 16
+4021504f:	5148      	l32i.n	a4, a1, 20
+40215051:	009a32        	l16si	a3, a10, 0
+40215054:	0c2466        	bnei	a4, 2, 40215064 <i2s_rcpdm_fill+0x44>
+40215057:	019a42        	l16si	a4, a10, 2
+4021505a:	443a      	add.n	a4, a4, a3
+4021505c:	053f40        	extui	a3, a4, 31, 1
+4021505f:	334a      	add.n	a3, a3, a4
+40215061:	213130        	srai	a3, a3, 1
+40215064:	ed0c91        	l32r	a9, 40210494 <_stext+0x484>
+40215067:	0d0c      	movi.n	a13, 0
+40215069:	339a      	add.n	a3, a3, a9
+4021506b:	113330        	slli	a3, a3, 13
+4021506e:	c093b0        	sub	a9, a3, a11
+40215071:	1fc942        	addi	a4, a9, 31
+40215074:	a39490        	movltz	a9, a4, a9
+40215077:	219590        	srai	a9, a9, 5
+4021507a:	0ded      	mov.n	a14, a13
+4021507c:	0dcd      	mov.n	a12, a13
+4021507e:	8199      	s32i.n	a9, a1, 32
+40215080:	114530        	slli	a4, a5, 13
+40215083:	305450        	xor	a5, a4, a5
+40215086:	e54150        	extui	a4, a5, 17, 15
+40215089:	305540        	xor	a5, a5, a4
+4021508c:	1145b0        	slli	a4, a5, 5
+4021508f:	305540        	xor	a5, a5, a4
+40215092:	f54050        	extui	a4, a5, 16, 16
+40215095:	f4a050        	extui	a10, a5, 0, 16
+40215098:	aa4a      	add.n	a10, a10, a4
+4021509a:	ed0091        	l32r	a9, 4021049c <_stext+0x48c>
+4021509d:	8148      	l32i.n	a4, a1, 32
+4021509f:	aa9a      	add.n	a10, a10, a9
+402150a1:	bb4a      	add.n	a11, a11, a4
+402150a3:	11aa80        	slli	a10, a10, 8
+402150a6:	4b7a      	add.n	a4, a11, a7
+402150a8:	21f480        	srai	a15, a8, 4
+402150ab:	44aa      	add.n	a4, a4, a10
+402150ad:	ecfca1        	l32r	a10, 402104a0 <_stext+0x490>
+402150b0:	c088f0        	sub	a8, a8, a15
+402150b3:	f8aa      	add.n	a15, a8, a10
+402150b5:	1a0c      	movi.n	a10, 1
+402150b7:	012f47        	blt	a15, a4, 402150bc <i2s_rcpdm_fill+0x9c>
+402150ba:	0a0c      	movi.n	a10, 0
+402150bc:	04af47        	bge	a15, a4, 402150c4 <i2s_rcpdm_fill+0xa4>
+402150bf:	ecf941        	l32r	a4, 402104a4 <_stext+0x494>
+402150c2:	884a      	add.n	a8, a8, a4
+402150c4:	c04b80        	sub	a4, a11, a8
+402150c7:	ecd291        	l32r	a9, 40210410 <_stext+0x400>
+402150ca:	774a      	add.n	a7, a7, a4
+402150cc:	01a797        	bge	a7, a9, 402150d1 <i2s_rcpdm_fill+0xb1>
+402150cf:	097d      	mov.n	a7, a9
+402150d1:	ec3641        	l32r	a4, 402101ac <_stext+0x19c>
+402150d4:	01a477        	bge	a4, a7, 402150d9 <i2s_rcpdm_fill+0xb9>
+402150d7:	047d      	mov.n	a7, a4
+402150d9:	ee1b      	addi.n	a14, a14, 1
+402150db:	140c      	movi.n	a4, 1
+402150dd:	44f0e0        	extui	a15, a14, 0, 5
+402150e0:	090c      	movi.n	a9, 0
+402150e2:	8394f0        	moveqz	a9, a4, a15
+402150e5:	401400        	ssl	a4
+402150e8:	a1cc00        	sll	a12, a12
+402150eb:	744090        	extui	a4, a9, 0, 8
+402150ee:	20cac0        	or	a12, a10, a12
+402150f1:	00b456        	bnez	a4, 40215100 <i2s_rcpdm_fill+0xe0>
+402150f4:	e0cea2        	addi	a10, a14, -32
+402150f7:	01a092        	movi	a9, 1
+402150fa:	8349a0        	moveqz	a4, a9, a10
+402150fd:	f7f416        	beqz	a4, 40215080 <i2s_rcpdm_fill+0x60>
+40215100:	114de0        	slli	a4, a13, 2
+40215103:	414a      	add.n	a4, a1, a4
+40215105:	04c9      	s32i.n	a12, a4, 0
+40215107:	06ce26        	beqi	a14, 32, 40215111 <i2s_rcpdm_fill+0xf1>
+4021510a:	dd1b      	addi.n	a13, a13, 1
+4021510c:	0c0c      	movi.n	a12, 0
+4021510e:	ffdb86        	j	40215080 <i2s_rcpdm_fill+0x60>
+40215111:	41a8      	l32i.n	a10, a1, 16
+40215113:	7148      	l32i.n	a4, a1, 28
+40215115:	6198      	l32i.n	a9, a1, 24
+40215117:	aa4a      	add.n	a10, a10, a4
+40215119:	0148      	l32i.n	a4, a1, 0
+4021511b:	41a9      	s32i.n	a10, a1, 16
+4021511d:	0249      	s32i.n	a4, a2, 0
+4021511f:	224b      	addi.n	a2, a2, 4
+40215121:	03bd      	mov.n	a11, a3
+40215123:	021927        	beq	a9, a2, 40215129 <i2s_rcpdm_fill+0x109>
+40215126:	ffc8c6        	j	4021504d <i2s_rcpdm_fill+0x2d>
+40215129:	000046        	j	4021512e <i2s_rcpdm_fill+0x10e>
+4021512c:	0b3d      	mov.n	a3, a11
+4021512e:	f1c8      	l32i.n	a12, a1, 60
+40215130:	e1d8      	l32i.n	a13, a1, 56
+40215132:	d1e8      	l32i.n	a14, a1, 52
+40215134:	c1f8      	l32i.n	a15, a1, 48
+40215136:	0689      	s32i.n	a8, a6, 0
+40215138:	1679      	s32i.n	a7, a6, 4
+4021513a:	2639      	s32i.n	a3, a6, 8
+4021513c:	3659      	s32i.n	a5, a6, 12
+4021513e:	40c112        	addi	a1, a1, 64
+40215141:	f00d      	ret.n
+	...
