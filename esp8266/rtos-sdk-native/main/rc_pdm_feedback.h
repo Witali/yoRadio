@@ -26,6 +26,8 @@ static inline void rc_pdm_feedback_init(rc_pdm_feedback_t *p, uint32_t seed) {
 /* Defined floor division, including negative values; no signed-left-shift UB
  * and no dependency on implementation-defined signed right shift. */
 static inline int32_t rc_fb_shift(int32_t value, unsigned shift) {
+    /* GCC 8.4 otherwise retains a sign branch even for unity feedback. */
+    if (shift == 0) return value;
     return value >= 0 ? value >> shift : -1 - (int32_t)((uint32_t)(-(value + 1)) >> shift);
 }
 
@@ -50,33 +52,47 @@ static inline void rc_pdm_feedback_frame(rc_pdm_feedback_t *p, int16_t pcm,
     const int32_t target = ((int32_t)pcm + 32768) * 8192;
     const int32_t increment = interpolate ? (target - p->previous) / (int32_t)bits : 0;
     int32_t desired = interpolate ? p->previous : target;
+    /* Profile preparation: all of these become build-time constants in the
+     * selected hardware wrapper, without adding fields to the stream state. */
     const int32_t step = RC_FB_FULL >> shift;
-    uint32_t word = 0;
-    unsigned output = 0;
-    for (unsigned bit = 0; bit < bits; ++bit) {
-        desired += increment;
-        int32_t noise = 0;
-        if (dither) {
-            const uint32_t r = rc_fb_random(p);
-            const int32_t triangle = (int32_t)(r & 65535U) + (int32_t)(r >> 16) - 65535;
-            noise = dither == 1 ? (int32_t)(r >> (shift + 3)) - step / 2
-                  : triangle * (INT32_C(1) << (dither == 3 ? 13 - shift : 12 - shift));
+    const unsigned uniform_shift = shift + 3;
+    const int32_t noise_scale = INT32_C(1) << (dither == 3 ? 13 - shift : 12 - shift);
+    /* Move the constant noise bias to the other side of the comparison once,
+     * not once per bit: adjusted + (raw_noise - bias) > down + step/2.
+     * Even at shift=2/dither=3, adjusted + raw_noise stays below INT32_MAX. */
+    const int32_t noise_bias = dither == 1 ? step / 2 : dither ? 65535 * noise_scale : 0;
+    const int32_t decision_offset = step / 2 + noise_bias;
+    /* Supported frames are either a partial word (8/16) or whole words.
+     * Decide this before the hot loop; the selected 32-bit profile has no
+     * per-bit modulo, last-bit test, output index or temporary word array. */
+    const unsigned word_bits = bits < 32 ? bits : 32;
+    for (unsigned first = 0; first < bits; first += 32) {
+        uint32_t word = 0;
+        for (unsigned bit = 0; bit < word_bits; ++bit) {
+            desired += increment;
+            int32_t noise = 0;
+            if (dither) {
+                const uint32_t r = rc_fb_random(p);
+                noise = dither == 1 ? (int32_t)(r >> uniform_shift)
+                      : ((int32_t)(r & 65535U) + (int32_t)(r >> 16)) * noise_scale;
+            }
+            const int32_t down = p->rc - (p->rc >> shift);
+            const int32_t accumulated = p->error + desired;
+            const int32_t adjusted = desired + rc_fb_shift(p->error, feedback_shift) + noise;
+            word <<= 1;
+            p->rc = down;
+            if (adjusted > down + decision_offset) {
+                p->rc += step;
+                word |= 1U;
+            }
+            /* |error| <= 2^30, |desired-rc| <= 2^29, so this addition and the
+             * comparison path stay strictly inside signed 32-bit range. Clamp
+             * prevents windup for unattainable targets at full-scale transitions. */
+            const int32_t error = accumulated - p->rc;
+            p->error = error > RC_FB_ERROR_LIMIT ? RC_FB_ERROR_LIMIT
+                     : error < -RC_FB_ERROR_LIMIT ? -RC_FB_ERROR_LIMIT : error;
         }
-        const int32_t down = p->rc - (p->rc >> shift);
-        const int32_t adjusted = desired + rc_fb_shift(p->error, feedback_shift) + noise;
-        const uint32_t high = adjusted > down + step / 2;
-        p->rc = down + (high ? step : 0);
-        /* |error| <= 2^30, |desired-rc| <= 2^29, so this addition and the
-         * comparison path stay strictly inside signed 32-bit range. Clamp
-         * prevents windup for unattainable targets at full-scale transitions. */
-        const int32_t error = p->error + (desired - p->rc);
-        p->error = error > RC_FB_ERROR_LIMIT ? RC_FB_ERROR_LIMIT
-                 : error < -RC_FB_ERROR_LIMIT ? -RC_FB_ERROR_LIMIT : error;
-        word = (word << 1) | high;
-        if ((bit + 1) % 32 == 0 || bit + 1 == bits) {
-            out[output++] = word;
-            word = 0;
-        }
+        *out++ = word;
     }
     p->previous = target;
 }

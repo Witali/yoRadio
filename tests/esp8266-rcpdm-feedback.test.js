@@ -20,5 +20,6 @@ test('RCPDM feedback preserves fractional PCM, state bounds and chunk continuity
   }else execute('c++',['-std=c++17','-O2','-fsanitize=undefined',...includes.map(p=>`-I${p}`),source,'-o',exe],{cwd:dir});
   const result=JSON.parse(execute(exe,[]).stdout);
   assert.equal(result.pass,true);assert.equal(result.state_bytes,16);assert.equal(result.batch_cases,16);
-  assert.ok(result.word_state_frames>300000);t.diagnostic(JSON.stringify(result));
+  assert.ok(result.word_state_frames>1500000);assert.ok(result.selected_frames>100000);
+  t.diagnostic(JSON.stringify(result));
 });

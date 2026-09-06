@@ -1,0 +1,260 @@
+
+codegen.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .literal:
+
+00000000 <.literal>:
+   0:	00 80 00 00
+   4:	01 00 ff ff
+   8:	00 00 00 01
+   c:	00 00 00 02
+  10:	00 00 00 c0
+  14:	00 00 00 40
+  18:	00 80 00 00
+  1c:	01 00 ff ff
+  20:	00 00 00 01
+  24:	00 00 00 02
+  28:	00 00 00 c0
+  2c:	00 00 00 40
+
+Disassembly of section .text:
+
+00000000 <rc_feedback_codegen_sample>:
+   0:	113300        	slli	a3, a3, 16
+   3:	314030        	srai	a4, a3, 16
+   6:	000031        	l32r	a3, fffc0008 <rc_feedback_codegen_fill+0xfffbff2c>
+			6: R_XTENSA_SLOT0_OP	.literal
+   9:	d0c112        	addi	a1, a1, -48
+   c:	443a      	add.n	a4, a4, a3
+   e:	b1c9      	s32i.n	a12, a1, 44
+  10:	22c8      	l32i.n	a12, a2, 8
+  12:	114430        	slli	a4, a4, 13
+  15:	c034c0        	sub	a3, a4, a12
+  18:	1fc372        	addi	a7, a3, 31
+  1b:	b37330        	movgez	a7, a3, a3
+  1e:	090c      	movi.n	a9, 0
+  20:	217570        	srai	a7, a7, 5
+  23:	3238      	l32i.n	a3, a2, 12
+  25:	0268      	l32i.n	a6, a2, 0
+  27:	1258      	l32i.n	a5, a2, 4
+  29:	a1d9      	s32i.n	a13, a1, 40
+  2b:	91e9      	s32i.n	a14, a1, 36
+  2d:	81f9      	s32i.n	a15, a1, 32
+  2f:	4179      	s32i.n	a7, a1, 16
+  31:	09bd      	mov.n	a11, a9
+  33:	09ad      	mov.n	a10, a9
+  35:	1e0c      	movi.n	a14, 1
+  37:	09dd      	mov.n	a13, a9
+  39:	117330        	slli	a7, a3, 13
+  3c:	303730        	xor	a3, a7, a3
+  3f:	e57130        	extui	a7, a3, 17, 15
+  42:	303370        	xor	a3, a3, a7
+  45:	1173b0        	slli	a7, a3, 5
+  48:	303370        	xor	a3, a3, a7
+  4b:	f57030        	extui	a7, a3, 16, 16
+  4e:	f48030        	extui	a8, a3, 0, 16
+  51:	887a      	add.n	a8, a8, a7
+  53:	4178      	l32i.n	a7, a1, 16
+  55:	21f460        	srai	a15, a6, 4
+  58:	cc7a      	add.n	a12, a12, a7
+  5a:	000071        	l32r	a7, fffc005c <rc_feedback_codegen_fill+0xfffbff80>
+			5a: R_XTENSA_SLOT0_OP	.literal+0x4
+  5d:	c066f0        	sub	a6, a6, a15
+  60:	887a      	add.n	a8, a8, a7
+  62:	118880        	slli	a8, a8, 8
+  65:	7c5a      	add.n	a7, a12, a5
+  67:	778a      	add.n	a7, a7, a8
+  69:	000081        	l32r	a8, fffc006c <rc_feedback_codegen_fill+0xfffbff90>
+			69: R_XTENSA_SLOT0_OP	.literal+0x8
+  6c:	f68a      	add.n	a15, a6, a8
+  6e:	0e8d      	mov.n	a8, a14
+  70:	012f77        	blt	a15, a7, 75 <rc_feedback_codegen_sample+0x75>
+			70: R_XTENSA_SLOT0_OP	.text+0x75
+  73:	0d8d      	mov.n	a8, a13
+  75:	04af77        	bge	a15, a7, 7d <rc_feedback_codegen_sample+0x7d>
+			75: R_XTENSA_SLOT0_OP	.text+0x7d
+  78:	000071        	l32r	a7, fffc0078 <rc_feedback_codegen_fill+0xfffbff9c>
+			78: R_XTENSA_SLOT0_OP	.literal+0xc
+  7b:	667a      	add.n	a6, a6, a7
+  7d:	c07c60        	sub	a7, a12, a6
+  80:	805570        	add	a5, a5, a7
+  83:	000071        	l32r	a7, fffc0084 <rc_feedback_codegen_fill+0xfffbffa8>
+			83: R_XTENSA_SLOT0_OP	.literal+0x10
+  86:	02a577        	bge	a5, a7, 8c <rc_feedback_codegen_sample+0x8c>
+			86: R_XTENSA_SLOT0_OP	.text+0x8c
+  89:	205770        	or	a5, a7, a7
+  8c:	000071        	l32r	a7, fffc008c <rc_feedback_codegen_fill+0xfffbffb0>
+			8c: R_XTENSA_SLOT0_OP	.literal+0x14
+  8f:	01a757        	bge	a7, a5, 94 <rc_feedback_codegen_sample+0x94>
+			8f: R_XTENSA_SLOT0_OP	.text+0x94
+  92:	075d      	mov.n	a5, a7
+  94:	bb1b      	addi.n	a11, a11, 1
+  96:	44f0b0        	extui	a15, a11, 0, 5
+  99:	207dd0        	or	a7, a13, a13
+  9c:	837ef0        	moveqz	a7, a14, a15
+  9f:	11aaf0        	slli	a10, a10, 1
+  a2:	747070        	extui	a7, a7, 0, 8
+  a5:	20a8a0        	or	a10, a8, a10
+  a8:	008756        	bnez	a7, b4 <rc_feedback_codegen_sample+0xb4>
+			a8: R_XTENSA_SLOT0_OP	.text+0xb4
+  ab:	e0cb82        	addi	a8, a11, -32
+  ae:	837e80        	moveqz	a7, a14, a8
+  b1:	f84716        	beqz	a7, 39 <rc_feedback_codegen_sample+0x39>
+			b1: R_XTENSA_SLOT0_OP	.text+0x39
+  b4:	1179e0        	slli	a7, a9, 2
+  b7:	717a      	add.n	a7, a1, a7
+  b9:	07a9      	s32i.n	a10, a7, 0
+  bb:	06cb26        	beqi	a11, 32, c5 <rc_feedback_codegen_sample+0xc5>
+			bb: R_XTENSA_SLOT0_OP	.text+0xc5
+  be:	991b      	addi.n	a9, a9, 1
+  c0:	0dad      	mov.n	a10, a13
+  c2:	ffdcc6        	j	39 <rc_feedback_codegen_sample+0x39>
+			c2: R_XTENSA_SLOT0_OP	.text+0x39
+  c5:	3239      	s32i.n	a3, a2, 12
+  c7:	0269      	s32i.n	a6, a2, 0
+  c9:	1259      	s32i.n	a5, a2, 4
+  cb:	2249      	s32i.n	a4, a2, 8
+  cd:	b1c8      	l32i.n	a12, a1, 44
+  cf:	0128      	l32i.n	a2, a1, 0
+  d1:	a1d8      	l32i.n	a13, a1, 40
+  d3:	91e8      	l32i.n	a14, a1, 36
+  d5:	81f8      	l32i.n	a15, a1, 32
+  d7:	30c112        	addi	a1, a1, 48
+  da:	f00d      	ret.n
+
+000000dc <rc_feedback_codegen_fill>:
+  dc:	c0c112        	addi	a1, a1, -64
+  df:	4169      	s32i.n	a6, a1, 16
+  e1:	f1c9      	s32i.n	a12, a1, 60
+  e3:	e1d9      	s32i.n	a13, a1, 56
+  e5:	d1e9      	s32i.n	a14, a1, 52
+  e7:	c1f9      	s32i.n	a15, a1, 48
+  e9:	0288      	l32i.n	a8, a2, 0
+  eb:	1278      	l32i.n	a7, a2, 4
+  ed:	22b8      	l32i.n	a11, a2, 8
+  ef:	3268      	l32i.n	a6, a2, 12
+  f1:	0ed516        	beqz	a5, 1e2 <rc_feedback_codegen_fill+0x106>
+			f1: R_XTENSA_SLOT0_OP	.text+0x1e2
+  f4:	4198      	l32i.n	a9, a1, 16
+  f6:	1155e0        	slli	a5, a5, 2
+  f9:	1199f0        	slli	a9, a9, 1
+  fc:	535a      	add.n	a5, a3, a5
+  fe:	7129      	s32i.n	a2, a1, 28
+ 100:	6199      	s32i.n	a9, a1, 24
+ 102:	5159      	s32i.n	a5, a1, 20
+ 104:	042d      	mov.n	a2, a4
+ 106:	41a8      	l32i.n	a10, a1, 16
+ 108:	009242        	l16si	a4, a2, 0
+ 10b:	0d2a66        	bnei	a10, 2, 11c <rc_feedback_codegen_fill+0x40>
+			10b: R_XTENSA_SLOT0_OP	.text+0x11c
+ 10e:	019252        	l16si	a5, a2, 2
+ 111:	554a      	add.n	a5, a5, a4
+ 113:	054f50        	extui	a4, a5, 31, 1
+ 116:	804450        	add	a4, a4, a5
+ 119:	214140        	srai	a4, a4, 1
+ 11c:	000051        	l32r	a5, fffc011c <rc_feedback_codegen_fill+0xfffc0040>
+			11c: R_XTENSA_SLOT0_OP	.literal+0x18
+ 11f:	0d0c      	movi.n	a13, 0
+ 121:	445a      	add.n	a4, a4, a5
+ 123:	114430        	slli	a4, a4, 13
+ 126:	c094b0        	sub	a9, a4, a11
+ 129:	1fc952        	addi	a5, a9, 31
+ 12c:	a39590        	movltz	a9, a5, a9
+ 12f:	219590        	srai	a9, a9, 5
+ 132:	0ded      	mov.n	a14, a13
+ 134:	0dcd      	mov.n	a12, a13
+ 136:	8199      	s32i.n	a9, a1, 32
+ 138:	115630        	slli	a5, a6, 13
+ 13b:	306560        	xor	a6, a5, a6
+ 13e:	e55160        	extui	a5, a6, 17, 15
+ 141:	306650        	xor	a6, a6, a5
+ 144:	1156b0        	slli	a5, a6, 5
+ 147:	306650        	xor	a6, a6, a5
+ 14a:	f55060        	extui	a5, a6, 16, 16
+ 14d:	f4a060        	extui	a10, a6, 0, 16
+ 150:	aa5a      	add.n	a10, a10, a5
+ 152:	8198      	l32i.n	a9, a1, 32
+ 154:	000051        	l32r	a5, fffc0154 <rc_feedback_codegen_fill+0xfffc0078>
+			154: R_XTENSA_SLOT0_OP	.literal+0x1c
+ 157:	bb9a      	add.n	a11, a11, a9
+ 159:	aa5a      	add.n	a10, a10, a5
+ 15b:	21f480        	srai	a15, a8, 4
+ 15e:	000091        	l32r	a9, fffc0160 <rc_feedback_codegen_fill+0xfffc0084>
+			15e: R_XTENSA_SLOT0_OP	.literal+0x20
+ 161:	11aa80        	slli	a10, a10, 8
+ 164:	c088f0        	sub	a8, a8, a15
+ 167:	5b7a      	add.n	a5, a11, a7
+ 169:	55aa      	add.n	a5, a5, a10
+ 16b:	f89a      	add.n	a15, a8, a9
+ 16d:	1a0c      	movi.n	a10, 1
+ 16f:	012f57        	blt	a15, a5, 174 <rc_feedback_codegen_fill+0x98>
+			16f: R_XTENSA_SLOT0_OP	.text+0x174
+ 172:	0a0c      	movi.n	a10, 0
+ 174:	04af57        	bge	a15, a5, 17c <rc_feedback_codegen_fill+0xa0>
+			174: R_XTENSA_SLOT0_OP	.text+0x17c
+ 177:	000051        	l32r	a5, fffc0178 <rc_feedback_codegen_fill+0xfffc009c>
+			177: R_XTENSA_SLOT0_OP	.literal+0x24
+ 17a:	885a      	add.n	a8, a8, a5
+ 17c:	c05b80        	sub	a5, a11, a8
+ 17f:	000091        	l32r	a9, fffc0180 <rc_feedback_codegen_fill+0xfffc00a4>
+			17f: R_XTENSA_SLOT0_OP	.literal+0x28
+ 182:	775a      	add.n	a7, a7, a5
+ 184:	01a797        	bge	a7, a9, 189 <rc_feedback_codegen_fill+0xad>
+			184: R_XTENSA_SLOT0_OP	.text+0x189
+ 187:	097d      	mov.n	a7, a9
+ 189:	000051        	l32r	a5, fffc018c <rc_feedback_codegen_fill+0xfffc00b0>
+			189: R_XTENSA_SLOT0_OP	.literal+0x2c
+ 18c:	01a577        	bge	a5, a7, 191 <rc_feedback_codegen_fill+0xb5>
+			18c: R_XTENSA_SLOT0_OP	.text+0x191
+ 18f:	057d      	mov.n	a7, a5
+ 191:	ee1b      	addi.n	a14, a14, 1
+ 193:	150c      	movi.n	a5, 1
+ 195:	44f0e0        	extui	a15, a14, 0, 5
+ 198:	090c      	movi.n	a9, 0
+ 19a:	8395f0        	moveqz	a9, a5, a15
+ 19d:	401500        	ssl	a5
+ 1a0:	a1cc00        	sll	a12, a12
+ 1a3:	745090        	extui	a5, a9, 0, 8
+ 1a6:	20cac0        	or	a12, a10, a12
+ 1a9:	00b556        	bnez	a5, 1b8 <rc_feedback_codegen_fill+0xdc>
+			1a9: R_XTENSA_SLOT0_OP	.text+0x1b8
+ 1ac:	e0cea2        	addi	a10, a14, -32
+ 1af:	01a092        	movi	a9, 1
+ 1b2:	8359a0        	moveqz	a5, a9, a10
+ 1b5:	f7f516        	beqz	a5, 138 <rc_feedback_codegen_fill+0x5c>
+			1b5: R_XTENSA_SLOT0_OP	.text+0x138
+ 1b8:	115de0        	slli	a5, a13, 2
+ 1bb:	515a      	add.n	a5, a1, a5
+ 1bd:	05c9      	s32i.n	a12, a5, 0
+ 1bf:	06ce26        	beqi	a14, 32, 1c9 <rc_feedback_codegen_fill+0xed>
+			1bf: R_XTENSA_SLOT0_OP	.text+0x1c9
+ 1c2:	dd1b      	addi.n	a13, a13, 1
+ 1c4:	0c0c      	movi.n	a12, 0
+ 1c6:	ffdb86        	j	138 <rc_feedback_codegen_fill+0x5c>
+			1c6: R_XTENSA_SLOT0_OP	.text+0x138
+ 1c9:	0158      	l32i.n	a5, a1, 0
+ 1cb:	61a8      	l32i.n	a10, a1, 24
+ 1cd:	0359      	s32i.n	a5, a3, 0
+ 1cf:	5158      	l32i.n	a5, a1, 20
+ 1d1:	334b      	addi.n	a3, a3, 4
+ 1d3:	22aa      	add.n	a2, a2, a10
+ 1d5:	04bd      	mov.n	a11, a4
+ 1d7:	021537        	beq	a5, a3, 1dd <rc_feedback_codegen_fill+0x101>
+			1d7: R_XTENSA_SLOT0_OP	.text+0x1dd
+ 1da:	ffca06        	j	106 <rc_feedback_codegen_fill+0x2a>
+			1da: R_XTENSA_SLOT0_OP	.text+0x106
+ 1dd:	7128      	l32i.n	a2, a1, 28
+ 1df:	000046        	j	1e4 <rc_feedback_codegen_fill+0x108>
+			1df: R_XTENSA_SLOT0_OP	.text+0x1e4
+ 1e2:	0b4d      	mov.n	a4, a11
+ 1e4:	f1c8      	l32i.n	a12, a1, 60
+ 1e6:	e1d8      	l32i.n	a13, a1, 56
+ 1e8:	d1e8      	l32i.n	a14, a1, 52
+ 1ea:	c1f8      	l32i.n	a15, a1, 48
+ 1ec:	0289      	s32i.n	a8, a2, 0
+ 1ee:	1279      	s32i.n	a7, a2, 4
+ 1f0:	2249      	s32i.n	a4, a2, 8
+ 1f2:	3269      	s32i.n	a6, a2, 12
+ 1f4:	40c112        	addi	a1, a1, 64
+ 1f7:	f00d      	ret.n

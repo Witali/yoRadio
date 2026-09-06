@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "measurement": "code generation only; not board timing",
+  "baseline_revision": "8047b476f47f081590c46806f2284cc57a67cf11",
+  "compiler": "xtensa-lx106-elf-gcc.exe (crosstool-NG esp-2020r3-49-gd5524c1) 8.4.0",
+  "flags": [
+    "-std=c11",
+    "-O3",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fstack-usage"
+  ],
+  "wrapper_sha256": "ec656c45e1cf259d7f356e28f66147806dbcb03741769ad15af06925e285074a",
+  "variants": {
+    "before": {
+      "algorithm_sha256": "9aff2491df393e34f8d8fb9043ce37e95e51c0e87ede92d4e0a2fcd7b7d5586a",
+      "functions": {
+        "rc_feedback_codegen_sample": {
+          "code_bytes": 220,
+          "stack_bytes": 48
+        },
+        "rc_feedback_codegen_fill": {
+          "code_bytes": 285,
+          "stack_bytes": 64
+        }
+      },
+      "undefined_symbols": []
+    },
+    "after": {
+      "algorithm_sha256": "f61e7eb30e85dec6d767653ee576141663dba3296b878dd93151477b250890d3",
+      "functions": {
+        "rc_feedback_codegen_sample": {
+          "code_bytes": 173,
+          "stack_bytes": 32
+        },
+        "rc_feedback_codegen_fill": {
+          "code_bytes": 239,
+          "stack_bytes": 32
+        }
+      },
+      "undefined_symbols": []
+    }
+  }
+}
