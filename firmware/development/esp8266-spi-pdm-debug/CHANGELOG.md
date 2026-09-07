@@ -1,5 +1,23 @@
 # ESP8266 temporary SPI-PDM debugging profile
 
+## 2026-09-08 (build 2026-09-07 UTC)
+
+- Restored and tested ordinary SPI radio after the isolated 1 kHz test.
+- Source `cae6aaf`: bounded playlist read-ahead, faster ASCII URL filter,
+  no unconditional sleeps between static HTTP chunks, initial Wi-Fi RSSI and
+  disconnect-reason logging. Optional WebProfile is **off** in this image.
+- `app.bin`: 702832 bytes; SHA-256
+  `682DC689A9C127C3664EA13A2ADB620906AF4CCA77F91E158E2B8150544E6E57`.
+- Application-only app0 update; existing SPIFFS/Wi-Fi, station 1 and volume
+  254 preserved. GPIO13/D7 remains the physical audio output.
+- Complete player measured about 0.89..0.92 s in the profiled comparison;
+  volume-button confirmations 8..15 ms; all 511 stations present. The 500 ms
+  target is not yet met. Other controls and two-tab/playing tests remain open.
+- After flashing this exact non-profiled image: cold 1.149 s (one slow script
+  request), warm 0.843 s; volume acknowledgements 7.9..13.5 ms; no JS errors.
+- See `docs/ESP8266_WEBUI_LATENCY_RESULTS_2026-09-07.md` for raw reports,
+  network outliers and the 31 passing regression checks.
+
 ## 2026-09-07
 
 - Wemos D1 mini: move the **audio filter input** from RX/GPIO3 to D7/GPIO13.
@@ -41,7 +59,7 @@ they do not prove a hardware cause. UART passive capture was silent.
 Full logs/screenshots and the credential-bearing flash backup are private,
 under ignored `.build/webui-diagnostic-20260907/`, never included in Git.
 
-This ordinary SPI radio image was built but **not flashed**: the user next
+At this earlier point the ordinary SPI radio image was built but **not flashed**: the user next
 requested an isolated 1 kHz output test. The installed test is documented in
 `../esp8266-spi-pdm-tone/CHANGELOG.md`. WebUI comparison after the output change
 must wait until normal radio firmware is restored.

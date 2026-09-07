@@ -20,6 +20,11 @@ The preceding I2S session had TCP connect timeouts and lost pings even with
 RSSI -67..-70. This is not a controlled I2S/SPI comparison: firmware and board
 reset also changed. Do not attribute it conclusively to the GPIO3 connection.
 
+User reports approximately 6 m to the router, with one wall and a wooden
+door. Distance/material alone cannot prove the root cause. The last ordinary
+build's browser samples reported -62 and -78 dBm; a closer-location control
+measurement would help separate RF effects from software timing.
+
 ## Browser measurements (radio stopped, one tab)
 
 Headless Edge/Playwright; completion requires populated playlist, selected
@@ -41,6 +46,11 @@ an optimistic slider change.
 
 Raw reports: `tests/results/esp8266-webui-latency-20260907/`.
 Threshold failures intentionally produce a nonzero benchmark exit status.
+
+Final ordinary build, WebProfile disabled, source `cae6aaf`: cold 1149.4 ms
+(dragpl.js had a 284 ms outlier), warm 842.8 ms; ten volume confirmations
+7.9..13.5 ms. No JS/resource errors, 511 stations. See `retained-radio.json`.
+This confirms functionality but **not** consistent sub-second load latency.
 
 ## Changes retained
 
