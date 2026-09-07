@@ -6,6 +6,13 @@
 
 static SemaphoreHandle_t s_lock;
 static native_state_t s_state;
+static TaskHandle_t s_consumer_task;
+
+static void notify_consumer(void) {
+    /* app_main already waits on a notification for BOOT edges. Reuse that
+     * wakeup, after unlocking state; never run HTTP on the audio task. */
+    if (s_consumer_task) xTaskNotifyGive(s_consumer_task);
+}
 
 void native_state_init(void) {
     s_lock = xSemaphoreCreateMutex();
@@ -13,6 +20,7 @@ void native_state_init(void) {
     s_state.network_mode = NETWORK_STARTING;
     s_state.station_index = 1;
     strcpy(s_state.station, "yoRadio ESP8266");
+    s_consumer_task = xTaskGetCurrentTaskHandle();
 }
 
 void native_state_snapshot(native_state_t *output) {
@@ -67,6 +75,8 @@ void native_state_set_station_count(uint16_t count) {
 
 void native_state_set_audio(bool playing, bool connecting, const char *error) {
     xSemaphoreTake(s_lock, portMAX_DELAY);
+    bool changed = s_state.playing != playing || s_state.connecting != connecting ||
+                   strcmp(s_state.error, error ? error : "") != 0;
     s_state.playing = playing;
     s_state.connecting = connecting;
     if (error) {
@@ -77,23 +87,30 @@ void native_state_set_audio(bool playing, bool connecting, const char *error) {
     }
     if (!playing && !connecting) s_state.title[0] = '\0';
     xSemaphoreGive(s_lock);
+    if (changed) notify_consumer();
 }
 
 void native_state_set_title(const char *title) {
     xSemaphoreTake(s_lock, portMAX_DELAY);
+    bool changed = strcmp(s_state.title, title ? title : "") != 0;
     strncpy(s_state.title, title ? title : "", sizeof(s_state.title) - 1);
     s_state.title[sizeof(s_state.title) - 1] = '\0';
     xSemaphoreGive(s_lock);
+    if (changed) notify_consumer();
 }
 
 void native_state_set_stream(codec_type_t codec, uint32_t bitrate_kbps,
                              uint32_t sample_rate_hz, uint8_t channels) {
     xSemaphoreTake(s_lock, portMAX_DELAY);
+    bool changed = s_state.codec != codec || s_state.sample_rate_hz != sample_rate_hz ||
+                   s_state.channels != channels;
     s_state.codec = codec;
     s_state.bitrate_kbps = bitrate_kbps;
     s_state.sample_rate_hz = sample_rate_hz;
     s_state.channels = channels;
     xSemaphoreGive(s_lock);
+    /* VBR bitrate changes use the existing slow telemetry heartbeat. */
+    if (changed) notify_consumer();
 }
 
 void native_state_set_station(uint16_t index, const char *name) {
@@ -109,12 +126,15 @@ void native_state_set_station(uint16_t index, const char *name) {
     s_state.channels = 0;
     s_state.buffer_percent = 0;
     xSemaphoreGive(s_lock);
+    notify_consumer();
 }
 
 void native_state_set_volume(uint8_t volume) {
     xSemaphoreTake(s_lock, portMAX_DELAY);
+    bool changed = s_state.volume != volume;
     s_state.volume = volume;
     xSemaphoreGive(s_lock);
+    if (changed) notify_consumer();
 }
 
 void native_state_set_message(const char *message, uint32_t duration_ms) {

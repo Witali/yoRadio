@@ -49,3 +49,22 @@ with all 511 rows preserved. Full readiness remained 524–600 ms: still above
 target. Play/Stop tests additionally exposed 248–291 ms stop status and
 515–566 ms station-index updates, consistent with successive 250 ms polls.
 Raw results: `tests/results/esp8266-webui-latency-20260907/posix-read-radio.json`.
+
+## State-change notifications
+
+State changes now notify the existing app task after releasing the state mutex;
+audio never performs HTTP transmission. Bitrate/RSSI-only changes retain the
+two-second heartbeat. The HTTP task sends station status and index in order
+within the same poll. This SDK copies a WebSocket payload before returning
+from `httpd_ws_send_frame_async`, so no second persistent buffer is necessary.
+The compiled host test verifies unlocked notifications and no per-frame wakeup.
+
+The first physical run had 50% ping loss (3/6) and severe outliers, despite RSSI
+sometimes reaching -61 dBm. After a reset **without any firmware change**, the
+repeat measured RSSI -55..-57, volume 8.4–11.5 ms, Play confirmation 45.2 ms,
+Stop 27.1–45.0 ms, station confirmation/selection 32.5–50.0 ms. Four stream
+starts reached the playing state 290–326 ms after confirmation; this is separate
+from command acceptance. Cold/warm page readiness 546.4/531.8 ms still fails
+the page goal. Keep both runs, not only the successful one:
+`event-state-radio.json` and `event-state-repeat.json` in the results directory.
+The network-delay cause is not conclusively isolated by these measurements.

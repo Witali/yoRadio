@@ -219,18 +219,17 @@ test("ESP8266 HTTP task has enough stack for playlist-backed commands", () => {
 
 test("ESP8266 exposes only board-supported stations with matching indices", () => {
   assert.match(playlistSource, /#define INDEX_VERSION 2U/);
-  assert.match(playlistSource, /strncmp\(url, "http:\/\/", 7U\) == 0/);
-  assert.match(playlistSource, /strncasecmp\(name, "Ogg ", 4U\) != 0/);
-  for(const extension of ["ogg", "opus", "flac", "m3u8", "wav"]) {
-    assert.match(playlistSource, new RegExp(`"\\.${extension}"`));
-  }
+  // Actual filter equivalence, including extension case/query boundaries,
+  // is compiled and executed in esp8266-playlist-streaming.test.js.
+  assert.match(playlistSource, /return http && !ogg &&/);
+  assert.match(playlistSource, /!has_unsupported_extension\(url\)/);
   const handler = source.slice(source.indexOf("static esp_err_t playlist_handler"), source.indexOf("static esp_err_t status_handler"));
   assert.match(handler, /playlist_service_count\(\)/);
-  assert.match(handler, /fgets\(s_async_message, sizeof\(s_async_message\), file\)/);
-  assert.match(handler, /playlist_service_entry_supported\(s_async_message\)/);
+  assert.match(handler, /read\(file, s_async_message/);
+  assert.match(handler, /playlist_service_entry_supported\(line\)/);
   assert.match(handler, /if \(used == sizeof\(s_static_scratch\)\)/);
   assert.doesNotMatch(handler, /\bmalloc\b|\bcalloc\b/);
-  assert.match(handler, /open_nonempty\(PLAYLIST_PATH\)/);
+  assert.match(handler, /open\(PLAYLIST_PATH, O_RDONLY\)/);
 });
 
 test("ESP8266 radio retries short socket timeouts until the HTTP header deadline", () => {

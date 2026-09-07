@@ -57,8 +57,6 @@ static httpd_handle_t s_server;
 static int s_ws_fds[WEB_WS_CLIENTS] = {-1, -1};
 static volatile bool s_poll_queued;
 static volatile bool s_playlist_changed;
-static volatile bool s_current_pending;
-static uint16_t s_pending_current;
 static char s_async_message[WEB_STATUS_CAPACITY];
 /* All static routes run serially on the HTTP task, so one DRAM buffer can
  * replace the former 512/672-byte per-handler stack arrays. */
@@ -1133,13 +1131,6 @@ static void poll_on_http_task(void) {
     for (unsigned i = 0; i < WEB_WS_CLIENTS; ++i)
         have_client |= websocket_socket_active(s_ws_fds[i]);
     if (!have_client) return;
-    if (s_current_pending) {
-        char current[40];
-        snprintf(current, sizeof(current), "{\"current\":%u}",
-                 s_pending_current);
-        if (broadcast_message(current)) s_current_pending = false;
-        return;
-    }
     if (s_playlist_changed) {
         if (broadcast_message("{\"file\":\"/data/playlist.csv\"}")) {
             s_playlist_changed = false;
@@ -1167,10 +1158,13 @@ static void poll_on_http_task(void) {
                                s_previous_status.station_index;
     if (!broadcast_message(s_async_message)) return;
     if (station_changed) {
-        /* The status is sent first. The current index follows on the next
-         * poll so one static asynchronous send buffer is sufficient. */
-        s_pending_current = current.station_index;
-        s_current_pending = true;
+        /* In this SDK send_frame_async finishes copying to the socket before
+         * returning; it does not retain the caller's payload. Keep status and
+         * selection in order on this same HTTP task, without another 250 ms
+         * application poll or an additional permanent buffer. */
+        char selection[40];
+        snprintf(selection, sizeof(selection), "{\"current\":%u}", current.station_index);
+        if (!broadcast_message(selection)) return;
     }
     s_previous_status = current;
     s_have_previous_status = true;
