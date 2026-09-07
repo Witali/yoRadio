@@ -137,6 +137,9 @@ static void event_handler(void *argument, esp_event_base_t base,
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
         if (s_credential_count) esp_wifi_connect();
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
+        const wifi_event_sta_disconnected_t *event = data;
+        ESP_LOGW(TAG, "Wi-Fi disconnected: reason=%u",
+                 event ? (unsigned)event->reason : 0U);
         s_connected = false;
         if (s_access_point || !s_credential_count) return;
         if (++s_retries <= WIFI_RETRIES_PER_CREDENTIAL) {
@@ -174,6 +177,12 @@ static void event_handler(void *argument, esp_event_base_t base,
         }
         native_state_set_network(NETWORK_CLIENT);
         native_state_set_ip(ip4addr_ntoa(&event->ip_info.ip));
+        wifi_ap_record_t access_point;
+        if (esp_wifi_sta_get_ap_info(&access_point) == ESP_OK) {
+            native_state_set_wifi_rssi(access_point.rssi);
+            ESP_LOGI(TAG, "Wi-Fi link: RSSI=%d dBm, channel=%u",
+                     access_point.rssi, (unsigned)access_point.primary);
+        }
         xEventGroupSetBits(s_events, WIFI_CONNECTED_BIT);
         ESP_LOGI(TAG, "Client address: %s; free heap: %u",
                  ip4addr_ntoa(&event->ip_info.ip),

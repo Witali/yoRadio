@@ -10,6 +10,11 @@ confirmation, or a connecting indicator with decoded audio starting.
   requests 16-236 ms, TCP connect 3-9 ms. The earlier I2S session had lost
   pings and TCP connection timeouts even at -67 to -70 dBm. Signal strength
   alone does not establish the cause; the firmware and reset also changed.
+  Subsequent resets: SDK reasons 4 (ASSOC_EXPIRE), 6 (NOT_AUTHED),
+  204 (HANDSHAKE_TIMEOUT), 205 (CONNECTION_FAIL), then DHCP around 20 s.
+  RSSI at successful connections -68, -72 and -75 dBm, channel 10.
+  The firmware now records initial RSSI/channel and numeric disconnect reason.
+  These codes do not establish weak signal as the sole cause.
 - [x] Add repeatable cold/warm browser timings and actual volume-button tests.
   `tools/test_esp8266_webui_latency.cjs --controls`; requires Playwright and
   installed Edge. JSON and screenshots go to the chosen `--output` directory.
