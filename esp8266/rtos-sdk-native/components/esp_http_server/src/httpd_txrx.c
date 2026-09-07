@@ -369,8 +369,22 @@ esp_err_t httpd_resp_send(httpd_req_t *r, const char *buf, ssize_t buf_len)
     if (buf_len < 0 || (!buf && buf_len)) return ESP_ERR_INVALID_ARG;
     esp_err_t result = httpd_send_headers(r, false, buf_len);
     if (result != ESP_OK) return result;
-    return buf_len && httpd_send_all(r, buf, buf_len) != ESP_OK
-               ? ESP_ERR_HTTPD_RESP_SEND : ESP_OK;
+    /* Stage fixed-length bodies through the existing aligned HTTP workspace.
+     * In particular, ESP8266 XIP assets must not be passed straight into lwIP
+     * byte copies. Bound each send without allocating the complete body. */
+    struct httpd_req_aux *ra = r->aux;
+    char *stage = (char *)(((uintptr_t)ra->scratch + 3U) & ~(uintptr_t)3U);
+    size_t capacity = (sizeof(ra->scratch) - (size_t)(stage - ra->scratch)) & ~(size_t)3U;
+    if (capacity > 1024U) capacity = 1024U;
+    while (buf_len > 0) {
+        size_t n = (size_t)buf_len < capacity ? (size_t)buf_len : capacity;
+        memcpy(stage, buf, n);
+        if (httpd_send_all(r, stage, n) != ESP_OK)
+            return ESP_ERR_HTTPD_RESP_SEND;
+        buf += n;
+        buf_len -= (ssize_t)n;
+    }
+    return ESP_OK;
 }
 
 esp_err_t httpd_resp_send_chunk(httpd_req_t *r, const char *buf, ssize_t buf_len)

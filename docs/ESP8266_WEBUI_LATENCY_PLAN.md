@@ -19,8 +19,19 @@ confirmation, or a connecting indicator with decoded audio starting.
   `tools/test_esp8266_webui_latency.cjs --controls`; requires Playwright and
   installed Edge. JSON and screenshots go to the chosen `--output` directory.
 - [ ] Record repeated baseline with stopped/playing radio and one/two tabs.
-- [ ] Remove measured HTTP transport and bootstrap bottlenecks, preserving
+- [x] Remove measured HTTP transport and player bootstrap bottlenecks, preserving
   standard framing, common UI assets and bounded RAM (no whole-playlist buffer).
+- [x] Replace two successive 250 ms player/status polls with state notifications
+  and ordered station selection in the same HTTP poll; retain telemetry rate.
+- [x] Test Play/Stop/Next/Prev/row clicks, AAC/MP3, mobile layout, settings readback
+  and two concurrent subscribers. See `ESP8266_WEBUI_BUNDLE.md` and raw results.
+- [ ] Apply equivalent shared-asset bootstrap acceleration to settings. Main
+  player reaches 444–452 ms on a healthy run; settings still take 1.7–2.2 s.
+- [ ] Extend page timing tests to reload while decoding and control updates
+  during a concurrent load. Fix the audit's caught getsystem/radiolink exception.
+- [ ] Isolate intermittent network stalls: one run had 50% ping loss even with
+  RSSI near -61 dBm. A reset of the same image restored fast controls. A closer,
+  unobstructed board placement was requested as an optional control experiment.
 - [ ] Verify playback, settings, playlist updates and memory; retain regression
   tests and commit each independently validated change.
 - [ ] Repeatedly meet 500/200 ms targets. Record failures, RSSI and maximum as

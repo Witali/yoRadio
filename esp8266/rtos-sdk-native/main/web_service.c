@@ -776,16 +776,10 @@ static esp_err_t page_handler(httpd_req_t *request) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
         httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
-        esp_err_t result = ESP_OK;
-        for (size_t offset = 0; offset < sizeof(web_bundle_gzip);) {
-            size_t n = sizeof(web_bundle_gzip) - offset;
-            if (n > sizeof(s_static_scratch)) n = sizeof(s_static_scratch);
-            memcpy(s_static_scratch, web_bundle_gzip + offset, n);
-            result = httpd_resp_send_chunk(request, s_static_scratch, n);
-            if (result != ESP_OK) break;
-            offset += n;
-        }
-        if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
+        /* Its length is known; the HTTP server stages flash data in bounded
+         * pieces while preserving a single Content-Length response. */
+        esp_err_t result = httpd_resp_send(request, (const char *)web_bundle_gzip,
+                                          sizeof(web_bundle_gzip));
         return finish_short_response(request, result);
     }
     if (!identity_quality) {

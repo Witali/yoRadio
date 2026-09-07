@@ -3,11 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
+#include <stdint.h>
 typedef int esp_err_t;
 enum { ESP_OK, ESP_ERR_INVALID_ARG, ESP_ERR_HTTPD_INVALID_REQ,
        ESP_ERR_HTTPD_RESP_HDR, ESP_ERR_HTTPD_RESP_SEND };
 struct resp_hdr { const char *field, *value; };
 struct httpd_req_aux {
+    char alignment_skew;
     char scratch[1513];
     unsigned req_hdrs_count, resp_hdrs_count;
     const char *status, *content_type;
@@ -19,9 +21,11 @@ static bool httpd_valid_req(httpd_req_t *r) { return r->aux != NULL; }
 static char output[16384];
 static size_t size;
 static int calls, fail_call;
+static bool check_body;
 static esp_err_t httpd_send_all(httpd_req_t *r, const char *b, size_t n) {
     (void)r;
     if (++calls == fail_call) return -1;
+    if (check_body && calls > 1) assert(n <= 1024 && ((uintptr_t)b & 3U) == 0);
     assert(size + n < sizeof(output));
     memcpy(output + size, b, n);
     size += n;
@@ -54,5 +58,17 @@ int main(void) {
     char huge[2000]; memset(huge, 'a', sizeof(huge)-1); huge[1999]=0;
     aux.resp_hdrs[0].value = huge;
     assert(httpd_resp_send(&r, "x", 1) == ESP_ERR_HTTPD_RESP_HDR);
+    aux.resp_hdrs[0].value = "close";
+    static char binary[8193];
+    for (unsigned i=0;i<sizeof(binary);++i) binary[i]=(char)(i*131U);
+    size = calls = fail_call = 0; check_body = true;
+    assert(httpd_resp_send(&r, binary, sizeof(binary)) == ESP_OK);
+    const char *body = strstr(output,"\r\n\r\n"); assert(body); body+=4;
+    assert(strstr(output,"Content-Length: 8193\r\n"));
+    assert(size-(size_t)(body-output)==sizeof(binary));
+    assert(!memcmp(body,binary,sizeof(binary)) && calls==10);
+    size = calls = 0; fail_call = 4;
+    assert(httpd_resp_send(&r,binary,sizeof(binary))==ESP_ERR_HTTPD_RESP_SEND);
+    assert(calls==4);
     puts("HTTP response framing passed");
 }

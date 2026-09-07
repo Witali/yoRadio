@@ -77,7 +77,11 @@ async function playbackButtons(page) {
   const waitPlaying = async () => {
     const start=Date.now();
     try {
-      await page.waitForFunction(()=>document.querySelector('#playerwrap').classList.contains('playing'),null,{timeout:20000});
+      // A station-selection packet can briefly carry the previous playing
+      // flag. set_station clears stream identity: require its new format too.
+      await page.waitForFunction(()=>document.querySelector('#playerwrap').classList.contains('playing') &&
+        /MP3|AAC/.test(document.querySelector('#fmt')?.textContent||'') &&
+        !document.querySelector('#playbutton').classList.contains('connecting'),null,{timeout:20000});
       report.controls.push({kind:'decoded-audio-start',elapsedMs:Date.now()-start,pass:true});
     } catch {report.controls.push({kind:'decoded-audio-start',error:'No playing state within 20 s',pass:false});}
     save();
