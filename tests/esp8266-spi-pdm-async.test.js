@@ -112,6 +112,18 @@ test("ESP8266 input gestures reuse the notified main task stack", () => {
   assert.match(input, /void input_service_poll\(void\)/);
   assert.match(app, /input_service_poll\(\)[\s\S]*ulTaskNotifyTake\(pdTRUE, wait\)/);
 });
+
+test("temporary SPI debug overlay leaves the canonical I2S default unchanged", () => {
+  const defaults = fs.readFileSync(path.join(root, '..', 'sdkconfig.defaults'), 'utf8');
+  const overlay = fs.readFileSync(path.join(root, '..', 'sdkconfig.spi-pdm-debug.defaults'), 'utf8');
+  assert.match(defaults, /^CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y$/m);
+  assert.match(defaults, /^CONFIG_YORADIO_AUDIO_OUTPUT_SPI_PDM=n$/m);
+  assert.match(overlay, /^CONFIG_YORADIO_AUDIO_OUTPUT_SPI_PDM=y$/m);
+  assert.match(overlay, /^CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=n$/m);
+  assert.match(overlay, /^CONFIG_YORADIO_SPI_PDM_OVERSAMPLE_8=y$/m);
+  assert.doesNotMatch(overlay, /^CONFIG_(ESPTOOLPY|LWIP|PARTITION|YORADIO_(MP3|HELIX|AUDIO_MONO))/m);
+  assert.match(pdmConfig, /BOARD_SPI_PDM_DATA_GPIO 13/);
+});
 test("ESP8266 audio profile can auto-start a reproducible HTTP stream", () => {
   assert.match(component, /YORADIO_ESP8266_AUDIO_PROFILE=1/);
   assert.match(component, /YORADIO_ESP8266_AUDIO_PROFILE_URL/);
