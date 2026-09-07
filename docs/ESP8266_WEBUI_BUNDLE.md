@@ -33,3 +33,19 @@ RSSI during these loads: -63 to -74 dBm; startup -73 dBm after association
 retries. User reports six metres, one wall and a wooden door. These observations
 do not identify RF signal as the sole reason for latency outliers.
 Raw results: `tests/results/esp8266-webui-latency-20260907/bundle-radio.json`.
+
+## Bounded playlist reads
+
+The follow-up uses direct POSIX reads of at most 1087 bytes into the existing
+HTTP buffer, retaining only an incomplete row. Filtering and row fragmentation
+remain identical to the index's 672-byte fgets buffer. Output chunks are still
+512 bytes; no whole-playlist allocation and no extra DRAM. Actual-handler host
+tests compare against fgets at ordinary, oversized and read-boundary records.
+
+Do not use unbuffered `fread` here: this SDK's FILE path made the otherwise
+correct experiment take 13.9–14.2 seconds per playlist. It was rejected.
+Direct `read` reduced healthy transfers from 324–373 to 284–288 ms (one 322 ms),
+with all 511 rows preserved. Full readiness remained 524–600 ms: still above
+target. Play/Stop tests additionally exposed 248–291 ms stop status and
+515–566 ms station-index updates, consistent with successive 250 ms polls.
+Raw results: `tests/results/esp8266-webui-latency-20260907/posix-read-radio.json`.

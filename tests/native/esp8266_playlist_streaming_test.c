@@ -5,6 +5,8 @@
 #include <string.h>
 #include <strings.h>
 #include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
 typedef int esp_err_t;
 typedef struct { int unused; } httpd_req_t;
 enum { ESP_OK = 0, ESP_FAIL = -1 };
@@ -82,6 +84,26 @@ int main(int argc, char **argv) {
     fail_call = 0; size = calls = 0;
     count = 0; assert(playlist_handler(&req) == 404); count = 1;
     f = fopen(PLAYLIST_PATH, "wb"); assert(f); fclose(f);
+    assert(playlist_handler(&req) == 404);
+    /* Compare with the original fgets boundaries, including split UTF-8,
+     * empty/overlong lines and lengths on both sides of the 1087-byte read. */
+    f = fopen(PLAYLIST_PATH, "wb"); assert(f);
+    for (unsigned n = 1; n < 2400; n += 37) {
+        fputs("Boundary\thttp://host/", f);
+        for (unsigned j = 0; j < n; ++j) fputc('a' + j % 26, f);
+        fputs("\t0\r\n\n", f);
+    }
+    fclose(f);
+    expected[0] = 0;
+    f = fopen(PLAYLIST_PATH, "rb"); assert(f);
+    char row[672];
+    while (fgets(row, sizeof(row), f))
+        if (playlist_service_entry_supported(row)) strcat(expected, row);
+    fclose(f);
+    size = calls = 0;
+    assert(playlist_handler(&req) == ESP_OK);
+    assert(size == strlen(expected) && !strcmp(received, expected));
+    assert(remove(PLAYLIST_PATH) == 0);
     assert(playlist_handler(&req) == 404);
     puts("streaming playlist passed");
 }

@@ -6,6 +6,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "board_config.h"
 #include "esp_http_server.h"
@@ -886,40 +888,54 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
     TickType_t profile_start = xTaskGetTickCount(), read_ticks = 0, send_ticks = 0;
 #endif
     prepare_short_response(request);
-    /* The HTTP task owns this buffer. Reserve one maximum playlist-service
-     * row and give stdio the remainder as explicit read-ahead storage instead
-     * of allocating a separate FILE buffer. Output stays in the 512-byte
-     * scratch buffer; neither the playlist nor its index is loaded into RAM. */
+    /* Read blocks into the existing HTTP-task buffer, not one FILE operation
+     * per row. Retain only an incomplete tail between reads. Row boundaries
+     * match playlist_service's fgets(..., 672), including overlong records.
+     * Output still uses the independent 512-byte scratch; no new RAM. */
     enum { ROW_BYTES = 672 };
-    FILE *file = fopen(PLAYLIST_PATH, "rb");
-    /* setvbuf must precede the first stream operation, including the empty
-     * file check; open_nonempty() has already read and is not suitable here. */
-    if (file && setvbuf(file, s_async_message + ROW_BYTES, _IOFBF,
-                       sizeof(s_async_message) - ROW_BYTES) != 0) {
-        fclose(file);
-        file = NULL;
-    }
-    if (!file || !playlist_service_count() || fgetc(file) == EOF ||
-        fseek(file, 0, SEEK_SET) != 0) {
-        if (file) fclose(file);
+    int file = open(PLAYLIST_PATH, O_RDONLY);
+    ssize_t first = file >= 0 ? read(file, s_async_message,
+                                   sizeof(s_async_message) - 1) : -1;
+    if (first <= 0 || !playlist_service_count()) {
+        if (file >= 0) close(file);
         return httpd_resp_send_404(request);
     }
     httpd_resp_set_type(request, "text/csv; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
     esp_err_t result = ESP_OK;
-    size_t used = 0;
+    size_t used = 0, offset = 0, buffered = (size_t)first;
+    bool eof = false, read_failed = false;
+    s_async_message[buffered] = '\0';
     for (;;) {
+        size_t available = buffered - offset;
+        size_t length = available < ROW_BYTES - 1 ? available : ROW_BYTES - 1;
+        char *line = s_async_message + offset;
+        char *newline = memchr(line, '\n', length);
+        if (!newline && available < ROW_BYTES - 1 && !eof) {
+            memmove(s_async_message, line, available);
 #if YORADIO_ESP8266_WEB_PROFILE
-        TickType_t read_start = xTaskGetTickCount();
+            TickType_t read_start = xTaskGetTickCount();
 #endif
-        char *row = fgets(s_async_message, ROW_BYTES, file);
+            ssize_t count = read(file, s_async_message + available,
+                                 sizeof(s_async_message) - 1 - available);
+            read_failed = count < 0;
+            eof = count <= 0;
+            buffered = available + (count > 0 ? (size_t)count : 0);
 #if YORADIO_ESP8266_WEB_PROFILE
-        read_ticks += xTaskGetTickCount() - read_start;
+            read_ticks += xTaskGetTickCount() - read_start;
 #endif
-        if (!row) break;
-        if (!playlist_service_entry_supported(s_async_message)) continue;
-        const char *line = s_async_message;
-        size_t remaining = strlen(line);
+            offset = 0;
+            s_async_message[buffered] = '\0';
+            continue;
+        }
+        if (!available) break;
+        if (newline) length = (size_t)(newline - line) + 1;
+        offset += length;
+        char saved = line[length];
+        line[length] = '\0';
+        bool supported = playlist_service_entry_supported(line);
+        size_t remaining = supported ? strlen(line) : 0;
+        line[length] = saved;
         while (remaining) {
             size_t n = sizeof(s_static_scratch) - used;
             if (n > remaining) n = remaining;
@@ -943,8 +959,8 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
     }
     if (result == ESP_OK && used)
         result = httpd_resp_send_chunk(request, s_static_scratch, used);
-    if (ferror(file) && result == ESP_OK) result = ESP_FAIL;
-    fclose(file);
+    if (read_failed && result == ESP_OK) result = ESP_FAIL;
+    close(file);
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
 #if YORADIO_ESP8266_WEB_PROFILE
     ESP_LOGI(TAG, "playlist profile: total=%u read=%u send=%u ms",

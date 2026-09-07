@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Opt-in physical-board benchmark. No Wi-Fi changes, uploads or resets.
 // --controls temporarily changes volume via the actual page buttons, restores it.
+// --playback exercises real Play/Stop/Next/Prev/row clicks, restores station/state.
 const fs = require('node:fs');
 const path = require('node:path');
 const {chromium} = require('playwright');
@@ -70,6 +71,62 @@ async function buttons(page) {
     await page.waitForFunction(value=>document.querySelector('#volume').value===value,original,{timeout:5000});
   }
 }
+async function playbackButtons(page) {
+  const original = await page.evaluate(()=>({station:Number(currentItem),
+    playing:document.querySelector('#playerwrap').classList.contains('playing')}));
+  const waitPlaying = async () => {
+    const start=Date.now();
+    try {
+      await page.waitForFunction(()=>document.querySelector('#playerwrap').classList.contains('playing'),null,{timeout:20000});
+      report.controls.push({kind:'decoded-audio-start',elapsedMs:Date.now()-start,pass:true});
+    } catch {report.controls.push({kind:'decoded-audio-start',error:'No playing state within 20 s',pass:false});}
+    save();
+  };
+  const action = async (selector,kind,target) => {
+    const result=await page.evaluate(({selector,kind,target})=>new Promise(resolve=>{
+      const started=performance.now(); let timer;
+      const finish=data=>{clearTimeout(timer);websocket.removeEventListener('message',message);resolve(data);};
+      const message=event=>{
+        let data;try{data=JSON.parse(event.data);}catch{return;}
+        const fields=Object.fromEntries((data.payload||[]).map(x=>[x.id,x.value]));
+        const confirmed=kind==='station'?Number(data.current)===target:
+          kind==='play'?(fields.connecting===true||fields.playerwrap==='playing'):
+          fields.playerwrap==='stopped'&&fields.connecting===false;
+        if(!confirmed)return;
+        finish({kind,selector,target,elapsedMs:performance.now()-started,
+          current:Number(currentItem),active:Number(document.querySelector('#playlist li.active')?.getAttribute('attr-id')),
+          player:document.querySelector('#playerwrap').className,
+          connecting:document.querySelector('#playbutton').classList.contains('connecting')});
+      };
+      websocket.addEventListener('message',message);
+      timer=setTimeout(()=>finish({kind,selector,target,error:'No device confirmation in 5000 ms'}),5000);
+      document.querySelector(selector).click();
+    }),{selector,kind,target});
+    result.pass=!result.error&&result.elapsedMs<=200&&
+      (kind!=='station'||(result.current===target&&result.active===target));
+    report.controls.push(result);save();console.log(JSON.stringify(result));
+    return !result.error;
+  };
+  try {
+    if(original.playing) await action('#playbutton','stop');
+    await action('#playbutton','play');await waitPlaying();
+    await action('#playbutton','stop');
+    const next=await page.evaluate(()=>Number(currentItem)===document.querySelectorAll('#playlist li[attr-id]').length?1:Number(currentItem)+1);
+    await action('#nextbutton','station',next);await waitPlaying();
+    await action('#prevbutton','station',original.station);await waitPlaying();
+    const row=original.station===3?4:3;
+    await action(`#playlist li[attr-id="${row}"]`,'station',row);await waitPlaying();
+    await action('#playbutton','stop');
+  } finally {
+    await page.evaluate(station=>websocket.send('play='+station),original.station);
+    await page.waitForFunction(station=>Number(currentItem)===station,original.station,{timeout:10000});
+    if(!original.playing) {
+      await page.evaluate(()=>websocket.send('stop=1'));
+      await page.waitForFunction(()=>document.querySelector('#playerwrap').classList.contains('stopped')&&
+        !document.querySelector('#playbutton').classList.contains('connecting'),null,{timeout:10000});
+    }
+  }
+}
 (async()=>{
   browser=await chromium.launch({channel:option('--channel','msedge'),headless:true});
   for(let round=0;round<rounds;round++) {
@@ -91,6 +148,7 @@ async function buttons(page) {
     if(cold) {
       await page.screenshot({path:path.join(output,`cold-${round}.png`)});
       if(args.includes('--controls')) await buttons(page);
+      if(args.includes('--playback')) await playbackButtons(page);
       await load(page,'warm',round);
     }
     await context.close();
