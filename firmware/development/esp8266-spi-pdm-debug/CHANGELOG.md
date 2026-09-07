@@ -1,5 +1,35 @@
 # ESP8266 temporary SPI-PDM debugging profile
 
+## 2026-09-08 — shared bootstrap and event-driven player status
+
+- Source `9b9b5c6`; ordinary radio, SPI GPIO13/D7, CPU160/QIO40; WebProfile
+  and isolated tone/codec benchmarks disabled. Board-default I2S is unchanged.
+- Shared gzip player bootstrap (26847 bytes), runtime SPIFFS fingerprint and
+  upload invalidation; no parallel HTML/JS implementation. Only script.js.gz
+  was updated on SPIFFS; credentials and playlist were preserved.
+- Fixed-length flash response with bounded aligned 1024-byte staging in the
+  existing HTTP workspace; bounded 1087-byte playlist reads; state-change
+  notifications and station-index update in the same HTTP poll. No new task
+  or full-playlist RAM allocation.
+- `app.bin`: 732896 bytes, SHA-256
+  `18F3FC816DFD96135484C861350B0AC2CAAAE3C6BB055642B84CA7419ED1D65A`.
+  Flashed app0 at 0x10000 only. No NVS/OTA/partition erase.
+- Measured equivalent-source build: five player loads 444–452 ms, first-load
+  outlier 1097 ms; all 48 player-button confirmations <=51.5 ms. Two-tab
+  volume updates 46–59 ms. AAC320/MP3 and settings readback work; minimum
+  measured heap 11272 bytes, HTTP stack headroom 2212 bytes.
+- 49 host regression tests pass. Browser audit: 54 functional checks pass,
+  plus one caught getsystem/radiolink exception (not yet resolved). Settings
+  page still 1.7–2.2 seconds; network stalls remain under investigation.
+  These limits mean the complete 500/200 ms goal is **not yet achieved**.
+- Full results and remaining work: `docs/ESP8266_WEBUI_BUNDLE.md` and
+  `docs/ESP8266_WEBUI_LATENCY_PLAN.md`. Original station 1, volume 254 and
+  stopped state restored after tests.
+- After flashing this exact saved image: cold 479.0 ms, warm 446.5 ms,
+  all 16 button confirmations 8.0–53.9 ms; no browser errors, all 511 rows.
+  RSSI -65/-69 dBm. Raw report: `retained-bundle-radio.json` under
+  `tests/results/esp8266-webui-latency-20260907/`.
+
 ## 2026-09-08 (build 2026-09-07 UTC)
 
 - Restored and tested ordinary SPI radio after the isolated 1 kHz test.

@@ -39,8 +39,12 @@ confirmation, or a connecting indicator with decoded audio starting.
 
 First retained improvements and raw measurements:
 [2026-09-07 results](ESP8266_WEBUI_LATENCY_RESULTS_2026-09-07.md).
-Full player is now about 0.89..0.92 s in the last four healthy-link samples;
-volume confirmations 8..15 ms. Other controls and stressed cases remain open.
+That earlier stage reached 0.89..0.92 s. The subsequent shared bundle,
+bounded direct reads and fixed-length HTTP response reached 444..452 ms in
+five healthy-link loads, but the first attempt took 1097 ms. All 48 player
+button confirmations in that batch were <=51.5 ms; two-tab volume updates
+46..59 ms. See `ESP8266_WEBUI_BUNDLE.md`. Settings-page acceleration and
+concurrent loading/decoding stress still remain open; do not declare completion.
 
 External radio DNS/connection/buffering time is a separate measurement, not a
 guarantee of playback starting within 200 ms. Cold and warm results are separate.
