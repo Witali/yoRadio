@@ -99,12 +99,6 @@ static esp_err_t send_string(httpd_req_t *request, const char *text) {
     return httpd_resp_send(request, text, (ssize_t)strlen(text));
 }
 
-static void pace_static_send(void) {
-    /* The ESP8266 TCP window is deliberately small; let lwIP/Wi-Fi drain
-     * it between chunks instead of filling all pbufs in one HTTP burst. */
-    vTaskDelay(1);
-}
-
 static esp_err_t send_chunked_string(httpd_req_t *request, const char *text) {
     size_t remaining = strlen(text);
     while (remaining) {
@@ -116,7 +110,6 @@ static esp_err_t send_chunked_string(httpd_req_t *request, const char *text) {
         esp_err_t result = httpd_resp_send_chunk(request,
                                                  s_static_scratch, count);
         if (result != ESP_OK) return result;
-        pace_static_send();
         text += count;
         remaining -= count;
     }
@@ -791,7 +784,6 @@ static esp_err_t asset_handler(httpd_req_t *request) {
             memcpy(s_static_scratch, cursor, count);
             result = httpd_resp_send_chunk(request, s_static_scratch, count);
             if (result != ESP_OK) break;
-            pace_static_send();
             cursor += count;
         }
         if (result == ESP_OK)
@@ -819,7 +811,6 @@ static esp_err_t asset_handler(httpd_req_t *request) {
     while ((count = fread(s_static_scratch, 1, WEB_SEND_CHUNK_SIZE, file)) != 0U) {
         result = httpd_resp_send_chunk(request, s_static_scratch, count);
         if (result != ESP_OK) break;
-        pace_static_send();
     }
     fclose(file);
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
@@ -827,19 +818,41 @@ static esp_err_t asset_handler(httpd_req_t *request) {
 }
 
 static esp_err_t playlist_handler(httpd_req_t *request) {
+#if YORADIO_ESP8266_WEB_PROFILE
+    TickType_t profile_start = xTaskGetTickCount(), read_ticks = 0, send_ticks = 0;
+#endif
     prepare_short_response(request);
-    FILE *file = open_nonempty(PLAYLIST_PATH);
-    if (!file || !playlist_service_count()) {
+    /* The HTTP task owns this buffer. Reserve one maximum playlist-service
+     * row and give stdio the remainder as explicit read-ahead storage instead
+     * of allocating a separate FILE buffer. Output stays in the 512-byte
+     * scratch buffer; neither the playlist nor its index is loaded into RAM. */
+    enum { ROW_BYTES = 672 };
+    FILE *file = fopen(PLAYLIST_PATH, "rb");
+    /* setvbuf must precede the first stream operation, including the empty
+     * file check; open_nonempty() has already read and is not suitable here. */
+    if (file && setvbuf(file, s_async_message + ROW_BYTES, _IOFBF,
+                       sizeof(s_async_message) - ROW_BYTES) != 0) {
+        fclose(file);
+        file = NULL;
+    }
+    if (!file || !playlist_service_count() || fgetc(file) == EOF ||
+        fseek(file, 0, SEEK_SET) != 0) {
         if (file) fclose(file);
         return httpd_resp_send_404(request);
     }
     httpd_resp_set_type(request, "text/csv; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
     esp_err_t result = ESP_OK;
-    /* Status formatting cannot run concurrently on this HTTP task. Reuse its
-     * buffer for one complete CSV row; never allocate the whole playlist. */
     size_t used = 0;
-    while (fgets(s_async_message, sizeof(s_async_message), file)) {
+    for (;;) {
+#if YORADIO_ESP8266_WEB_PROFILE
+        TickType_t read_start = xTaskGetTickCount();
+#endif
+        char *row = fgets(s_async_message, ROW_BYTES, file);
+#if YORADIO_ESP8266_WEB_PROFILE
+        read_ticks += xTaskGetTickCount() - read_start;
+#endif
+        if (!row) break;
         if (!playlist_service_entry_supported(s_async_message)) continue;
         const char *line = s_async_message;
         size_t remaining = strlen(line);
@@ -851,10 +864,15 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
             line += n;
             remaining -= n;
             if (used == sizeof(s_static_scratch)) {
+#if YORADIO_ESP8266_WEB_PROFILE
+                TickType_t send_start = xTaskGetTickCount();
+#endif
                 result = httpd_resp_send_chunk(request, s_static_scratch, used);
+#if YORADIO_ESP8266_WEB_PROFILE
+                send_ticks += xTaskGetTickCount() - send_start;
+#endif
                 if (result != ESP_OK) break;
                 used = 0;
-                pace_static_send();
             }
         }
         if (result != ESP_OK) break;
@@ -864,6 +882,12 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
     if (ferror(file) && result == ESP_OK) result = ESP_FAIL;
     fclose(file);
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
+#if YORADIO_ESP8266_WEB_PROFILE
+    ESP_LOGI(TAG, "playlist profile: total=%u read=%u send=%u ms",
+             (unsigned)((xTaskGetTickCount() - profile_start) * portTICK_PERIOD_MS),
+             (unsigned)(read_ticks * portTICK_PERIOD_MS),
+             (unsigned)(send_ticks * portTICK_PERIOD_MS));
+#endif
     return finish_short_response(request, result);
 }
 

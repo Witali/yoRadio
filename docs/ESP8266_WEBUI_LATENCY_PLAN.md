@@ -26,6 +26,11 @@ confirmation, or a connecting indicator with decoded audio starting.
 - [ ] Repeatedly meet 500/200 ms targets. Record failures, RSSI and maximum as
   well as median/p95; do not discard slow attempts or count only cached shells.
 
+First retained improvements and raw measurements:
+[2026-09-07 results](ESP8266_WEBUI_LATENCY_RESULTS_2026-09-07.md).
+Full player is now about 0.89..0.92 s in the last four healthy-link samples;
+volume confirmations 8..15 ms. Other controls and stressed cases remain open.
+
 External radio DNS/connection/buffering time is a separate measurement, not a
 guarantee of playback starting within 200 ms. Cold and warm results are separate.
 Wi-Fi has no hard real-time bound; these targets require measured network health.

@@ -1,11 +1,13 @@
 param(
     [string]$SdkPath = '.worktree/esp8266-native-port/.build/esp8266-rtos-sdk',
-    [switch]$ToneTest
+    [switch]$ToneTest,
+    [switch]$WebProfile
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
 $taskVariant = if ($ToneTest) { 'esp8266-spi-pdm-tone' } else { 'esp8266-spi-pdm-debug' }
 $taskToneFlag = if ($ToneTest) { 'ON' } else { 'OFF' }
+$taskWebFlag = if ($WebProfile) { 'ON' } else { 'OFF' }
 $taskBuild = "$taskRoot/.build/$taskVariant"
 $taskArtifact = "$taskRoot/firmware/development/$taskVariant"
 $taskSavedPath = $env:PATH
@@ -39,6 +41,7 @@ try {
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
         "-DSDKCONFIG=$taskBuild/sdkconfig", "-DSDKCONFIG_DEFAULTS=$taskBuild/spi.defaults",
         '-DYORADIO_ESP8266_FIXED_I2S=OFF', '-DYORADIO_ESP8266_SPI_PDM_FAST_ISR=ON',
+        "-DYORADIO_ESP8266_WEB_PROFILE=$taskWebFlag",
         "-DYORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=$taskToneFlag", '-DYORADIO_ESP8266_OUTPUT_COMPARE=OFF',
         "-DYORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST=$taskToneFlag", '-DYORADIO_ESP8266_CODEC_RAM_BENCHMARK=OFF',
         '-DYORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT=OFF', '-DYORADIO_ESP8266_AUDIO_PROFILE=OFF',
@@ -57,11 +60,14 @@ try {
     $taskManifest = [ordered]@{
         purpose=if ($ToneTest) { '1 kHz sine, 500 ms on/off, no Wi-Fi or decoder; build does not flash' } else { 'Temporary normal radio SPI-PDM debug profile; build does not flash' }
         tone_test=[bool]$ToneTest
+        web_profile=[bool]$WebProfile
         built_utc=[DateTime]::UtcNow.ToString('o'); source_revision=(git rev-parse HEAD)
         app_sha256=(Get-FileHash "$taskArtifact/app.bin").Hash
         bytes=(Get-Item "$taskArtifact/app.bin").Length; app_address='0x10000'
         config_sha256=(Get-FileHash "$taskArtifact/sdkconfig").Hash
         output_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/native_audio_output.c).Hash
+        web_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/web_service.c).Hash
+        playlist_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/playlist_service.c).Hash
         cpu_mhz=160; flash='QIO40'; output='HSPI PDM8'; data_gpio=13; clock_gpio=14
         pcm_rate=48000; bit_rate_hz=384615; i2s=$false
         partition_layout='app0/app1 960 KiB, SPIFFS 256 KiB; flash app only'

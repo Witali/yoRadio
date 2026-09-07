@@ -24,6 +24,8 @@ option(YORADIO_ESP8266_AUDIO_PROFILE
   "Measure ESP8266 radio decode and output stages" OFF)
 option(YORADIO_ESP8266_MEMORY_PROFILE
   "Sample DRAM fragmentation and application stack margins over UART" OFF)
+option(YORADIO_ESP8266_WEB_PROFILE
+  "Log static HTTP handler read/send timings (no URLs or credentials)" OFF)
 if(YORADIO_ESP8266_MEMORY_PROFILE)
   list(APPEND YORADIO_SOURCES "memory_profile.c")
 endif()
@@ -134,6 +136,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++14>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
+  YORADIO_ESP8266_WEB_PROFILE=$<BOOL:${YORADIO_ESP8266_WEB_PROFILE}>
   YORADIO_HTTP_ONLY=1
   YORADIO_HELIX_MP3=1)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE

@@ -8,6 +8,14 @@ const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const main = 'esp8266/rtos-sdk-native/main/';
 
+test('static writes yield only on actual socket backpressure', () => {
+  const source = read(main+'web_service.c');
+  assert.doesNotMatch(source, /pace_static_send|vTaskDelay/);
+  const transport = read('esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_txrx.c');
+  assert.match(transport, /MSG_DONTWAIT/);
+  assert.match(transport, /if \(retryable &&[\s\S]*?vTaskDelay\(pdMS_TO_TICKS\(1\)\)/);
+});
+
 test('HTTP send deadline belongs to the entire response, not each chunk', () => {
   const source = read('esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_txrx.c');
   assert.match(source, /if \(!ra->send_started\) \{[\s\S]*?ra->send_deadline =/);

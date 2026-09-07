@@ -99,29 +99,44 @@ esp_err_t playlist_service_install(const char *temporary, bool *changed) {
 }
 
 static bool has_unsupported_extension(const char *url) {
-    static const char *extensions[] = {
-        ".ogg", ".opus", ".flac", ".m3u", ".m3u8", ".pls", ".wav",
-    };
-    const char *suffix = strpbrk(url, "?#");
-    size_t length = suffix ? (size_t)(suffix - url) : strlen(url);
-    for (size_t index = 0;
-         index < sizeof(extensions) / sizeof(extensions[0]); ++index) {
-        size_t extension_length = strlen(extensions[index]);
-        if (length >= extension_length &&
-            strncasecmp(url + length - extension_length,
-                        extensions[index], extension_length) == 0) {
-            return true;
-        }
+    /* strpbrk/strncasecmp repeatedly byte-read flash literals (and libc's
+     * ctype table) through LX106 LoadStoreError emulation. Scan the DRAM URL
+     * once and compare immediate ASCII codes, with no new RAM table. */
+    const char *end = url, *dot = NULL;
+    while (*end && *end != '?' && *end != '#') {
+        if (*end == '.') dot = end;
+        ++end;
     }
-    return false;
+    if (!dot || end - dot < 4 || end - dot > 5) return false;
+    unsigned code = 0;
+    for (const char *p = dot + 1; p < end; ++p) {
+        unsigned c = (unsigned char)*p;
+        if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
+        code = (code << 8) | c;
+    }
+    switch (code) {
+        case 0x6f6767U:   /* ogg */
+        case 0x6f707573U: /* opus */
+        case 0x666c6163U: /* flac */
+        case 0x6d3375U:   /* m3u */
+        case 0x6d337538U: /* m3u8 */
+        case 0x706c73U:   /* pls */
+        case 0x776176U:   /* wav */
+            return true;
+        default: return false;
+    }
 }
 
 static bool station_supported(const char *name, const char *url) {
     /* The ESP8266 profile deliberately contains no TLS, Ogg, FLAC or WAV
      * decoder. The shared repository playlist remains unchanged; this board's
      * offset index contains only streams it can actually open and decode. */
-    return strncmp(url, "http://", 7U) == 0 &&
-           strncasecmp(name, "Ogg ", 4U) != 0 &&
+    bool http = url[0] == 'h' && url[1] == 't' && url[2] == 't' &&
+                url[3] == 'p' && url[4] == ':' && url[5] == '/' && url[6] == '/';
+    bool ogg = (name[0] == 'O' || name[0] == 'o') &&
+               (name[1] == 'G' || name[1] == 'g') &&
+               (name[2] == 'G' || name[2] == 'g') && name[3] == ' ';
+    return http && !ogg &&
            !has_unsupported_extension(url);
 }
 
