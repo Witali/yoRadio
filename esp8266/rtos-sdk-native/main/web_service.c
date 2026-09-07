@@ -24,6 +24,9 @@
 #include "time_service.h"
 #include "web_pages_bridge.h"
 #include "web_upload.h"
+#include "web_encoding.h"
+#include "web_bundle_generated.h"
+#include "network_service.h"
 #include "file_replace.h"
 
 #define WS_HEARTBEAT_MS 2000U
@@ -58,6 +61,7 @@ static char s_async_message[WEB_STATUS_CAPACITY];
 /* All static routes run serially on the HTTP task, so one DRAM buffer can
  * replace the former 512/672-byte per-handler stack arrays. */
 static char s_static_scratch[WEB_STATIC_SCRATCH_SIZE];
+static bool s_bundle_current;
 
 typedef struct {
     bool playing;
@@ -669,6 +673,32 @@ static FILE *open_nonempty(const char *path) {
     return file;
 }
 
+/* Run before HTTP starts: compare actual SPIFFS assets to the build inputs.
+ * Only one existing scratch buffer is used. Never serve stale bundled UI
+ * after a custom file upload or in place of the empty-filesystem uploader. */
+static bool bundle_matches_spiffs(void) {
+    for (unsigned i = 0; i < sizeof(web_bundle_files)/sizeof(web_bundle_files[0]); ++i) {
+        FILE *file = fopen(web_bundle_files[i].path, "rb");
+        if (!file) return false;
+        uint32_t hash = 2166136261U;
+        size_t n;
+        while ((n = fread(s_static_scratch, 1, sizeof(s_static_scratch), file))) {
+            for (size_t j = 0; j < n; ++j)
+                hash = (hash ^ (uint8_t)s_static_scratch[j]) * 16777619U;
+        }
+        bool matches = !ferror(file) && hash == web_bundle_files[i].hash;
+        fclose(file);
+        if (!matches) return false;
+    }
+    return true;
+}
+
+void web_service_notify_assets_changed(void) {
+    /* Upload runs on the HTTP task, as do readers of this flag. Revalidate
+     * once at next boot; meanwhile use the freshly uploaded original assets. */
+    s_bundle_current = false;
+}
+
 static size_t request_path_length(const httpd_req_t *request) {
     const char *query = strchr(request->uri, '?');
     return query ? (size_t)(query - request->uri) : strlen(request->uri);
@@ -728,6 +758,40 @@ static const char *asset_type(const char *uri) {
 
 static esp_err_t page_handler(httpd_req_t *request) {
     prepare_short_response(request);
+    httpd_resp_set_hdr(request, "Vary", "Accept-Encoding");
+    char encoding[128];
+    const char *accept_encoding = NULL;
+    esp_err_t header_result = httpd_req_get_hdr_value_str(
+        request, "Accept-Encoding", encoding, sizeof(encoding));
+    if (header_result == ESP_OK) accept_encoding = encoding;
+    else if (httpd_req_get_hdr_value_len(request, "Accept-Encoding") >= sizeof(encoding)) {
+        httpd_resp_set_status(request, "431 Request Header Fields Too Large");
+        return finish_short_response(request, send_string(request, "Accept-Encoding too long"));
+    }
+    int gzip_quality = web_encoding_quality(accept_encoding, "gzip");
+    int identity_quality = web_encoding_quality(accept_encoding, "identity");
+    if (s_bundle_current && network_service_connected() && gzip_quality > 0 &&
+        gzip_quality >= identity_quality &&
+        (request_path_equals(request, "/") || request_path_equals(request, "/index.html"))) {
+        httpd_resp_set_type(request, "text/html; charset=utf-8");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+        esp_err_t result = ESP_OK;
+        for (size_t offset = 0; offset < sizeof(web_bundle_gzip);) {
+            size_t n = sizeof(web_bundle_gzip) - offset;
+            if (n > sizeof(s_static_scratch)) n = sizeof(s_static_scratch);
+            memcpy(s_static_scratch, web_bundle_gzip + offset, n);
+            result = httpd_resp_send_chunk(request, s_static_scratch, n);
+            if (result != ESP_OK) break;
+            offset += n;
+        }
+        if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
+        return finish_short_response(request, result);
+    }
+    if (!identity_quality) {
+        httpd_resp_set_status(request, "406 Not Acceptable");
+        return finish_short_response(request, send_string(request, "No acceptable page encoding"));
+    }
     if (request_path_equals(request, "/emergency")) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
@@ -975,6 +1039,10 @@ static esp_err_t register_get(const char *uri, esp_err_t (*handler)(httpd_req_t 
 }
 
 esp_err_t web_service_start(void) {
+    s_bundle_current = bundle_matches_spiffs();
+    ESP_LOGI(TAG, "Shared player bundle %s (%u bytes)",
+             s_bundle_current ? "ready" : "disabled: SPIFFS assets differ",
+             (unsigned)sizeof(web_bundle_gzip));
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = 80;
     config.stack_size = BOARD_TASK_STACK_WEB;

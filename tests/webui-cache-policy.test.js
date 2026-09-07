@@ -36,8 +36,9 @@ test("UI revision propagates to dynamically loaded settings", () => {
   const script = zlib.gunzipSync(compressed).toString("utf8");
 
   assert.match(script, /typeof webUiRevision === 'undefined'/);
-  assert.match(script, /fetch\(uiResource\('options\.html'\), \{cache: 'no-store'\}\)/);
-  assert.match(script, /fetch\(uiResource\('player\.html'\), \{cache: 'no-store'\}\)/);
+  assert.match(script, /fetchUiResource\('options\.html'\)/);
+  assert.match(script, /fetchUiResource\('player\.html'\)/);
+  assert.match(script, /return fetch\(uiResource\(path\), \{cache: 'no-store'\}\)/);
 });
 
 test("all SPIFFS WebUI assets are stored compressed", () => {

@@ -74,6 +74,7 @@ static bool publish_file(upload_t *u) {
     bool ok = u->playlist ? playlist_service_install(UPLOAD_TEMP, &changed) == ESP_OK
                          : file_replace(UPLOAD_TEMP, u->destination);
     if (!ok) return false;
+    if (!u->wifi && !u->playlist) web_service_notify_assets_changed();
     ++u->saved;
     u->wifi_saved |= u->wifi;
     u->playlist_saved |= u->playlist && changed;

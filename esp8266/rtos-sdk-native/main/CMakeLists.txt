@@ -130,6 +130,19 @@ idf_component_register(
            lwip nvs_flash pthread spiffs tcpip_adapter
   EMBED_FILES ${YORADIO_EMBED_FILES})
 
+set(WEB_BUNDLE_HEADER "${CMAKE_CURRENT_BINARY_DIR}/web_bundle_generated.h")
+set(WEB_BUNDLE_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../..")
+file(GLOB WEB_BUNDLE_INPUTS "${WEB_BUNDLE_ROOT}/yoRadio/data/www/*.gz")
+add_custom_command(OUTPUT "${WEB_BUNDLE_HEADER}"
+  COMMAND ${PYTHON} "${WEB_BUNDLE_ROOT}/tools/build_esp8266_web_bundle.py"
+          --root "${WEB_BUNDLE_ROOT}" --output "${WEB_BUNDLE_HEADER}"
+  DEPENDS "${WEB_BUNDLE_ROOT}/tools/build_esp8266_web_bundle.py"
+          "${WEB_BUNDLE_ROOT}/yoRadio/src/core/netserver.h" ${WEB_BUNDLE_INPUTS}
+  VERBATIM)
+add_custom_target(yoradio_web_bundle DEPENDS "${WEB_BUNDLE_HEADER}")
+add_dependencies(${COMPONENT_LIB} yoradio_web_bundle)
+target_include_directories(${COMPONENT_LIB} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
 # ESP8266_RTOS_SDK exposes only -Og/-Os in menuconfig. Audio code needs the
 # same explicit performance profile used by the ESP32-C3 native build.
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3
