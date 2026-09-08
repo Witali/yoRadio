@@ -3,6 +3,24 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-08: MP3 flash-source benchmark and recovery diagnostics
+
+- Ordinary I2S PDM32 image: development/esp8266-i2s-pdm-production/app.bin,
+  source d8d0219, 760032 bytes, SHA-256
+  670D808E07B91BA0ABE575A00DF5FA71544F7C83C1D4B3AB49A75B88F0813AF7.
+  CPU160/QIO40, Helix SSO mono, 2 x 512 DMA words, ERROR logs only.
+  No benchmarks/test files included; native radio/WebUI remain enabled.
+- Stream inactivity timeout is build-configurable, default 1000 ms.
+  Reconnect retries cannot overwrite newer user commands. Audio health
+  exposes physical DMA progress; NoDAC does not mux unused external clocks.
+- Separate MP3 flash-output and flash-decode images retain deterministic
+  tone/noise fixtures at 64/128/320 kbit/s without whole-file RAM copies.
+  64/128 pass 26.12 seconds of digital continuity; 320 has 286 underruns.
+  Old repeated-Info MP3 results are invalid as music-decoding measurements.
+- Measurements, exact configurations, hashes and limitations:
+  docs/ESP8266_MP3_FLASH_BENCHMARK_2026-09-08.md.
+  Live radio/WebUI acceptance is still unresolved; no analog capture.
+
 ## Development — 2026-09-06: bounded AAC PCM output
 
 - Ordinary image: `development/esp8266-native-aac-blocks/app.bin`, source
