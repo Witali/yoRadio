@@ -1,7 +1,12 @@
 """Bounded UART TX log capture; never send application commands on GPIO3."""
 import argparse
+import sys
 import time
 import serial
+
+# The boot ROM uses a different baud rate; malformed bytes must not crash a
+# Windows console configured with a legacy code page during log capture.
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 p = argparse.ArgumentParser()
 p.add_argument('--port', default='COM8')
