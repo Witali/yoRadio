@@ -19,6 +19,7 @@
 
 #include <esp_http_server.h>
 #include "esp_httpd_priv.h"
+#include "httpd_trace.h"
 #include <sys/fcntl.h>
 
 static const char *TAG = "httpd_sess";
@@ -300,7 +301,14 @@ esp_err_t httpd_sess_process(struct httpd_data *hd, int newfd)
     }
 
     ESP_LOGD(TAG, LOG_FMT("httpd_req_new"));
-    if (httpd_req_new(hd, sd) != ESP_OK) {
+    /* WS frame processing is deliberately not logged at audio/heartbeat rate. */
+#ifdef CONFIG_HTTPD_WS_SUPPORT
+    if (!sd->ws_handshake_done)
+#endif
+        httpd_trace_begin();
+    esp_err_t request_result = httpd_req_new(hd, sd);
+    httpd_trace_end(request_result);
+    if (request_result != ESP_OK) {
         return ESP_FAIL;
     }
     ESP_LOGD(TAG, LOG_FMT("httpd_req_delete"));

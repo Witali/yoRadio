@@ -11,6 +11,7 @@
 
 #include "board_config.h"
 #include "esp_http_server.h"
+#include "httpd_trace.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_ota_ops.h"
@@ -901,7 +902,9 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
             esp_err_t result = ESP_OK;
             while (left && result == ESP_OK) {
                 size_t n = left < sizeof(s_static_scratch) ? left : sizeof(s_static_scratch);
+                uint32_t trace_start = httpd_trace_clock();
                 ssize_t count = read(file, s_static_scratch, n);
+                httpd_trace_read(trace_start);
                 if (count <= 0) { result = ESP_FAIL; break; }
                 left -= (size_t)count;
                 result = httpd_resp_send_chunk(request, s_static_scratch, (size_t)count);
@@ -925,8 +928,10 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
      * Output uses a bounded independent 1-KiB scratch, never the full list. */
     enum { ROW_BYTES = 672 };
     int file = open(PLAYLIST_PATH, O_RDONLY);
+    uint32_t trace_start = httpd_trace_clock();
     ssize_t first = file >= 0 ? read(file, s_async_message,
                                    sizeof(s_async_message) - 1) : -1;
+    httpd_trace_read(trace_start);
     if (first <= 0 || !playlist_service_count()) {
         if (file >= 0) close(file);
         return httpd_resp_send_404(request);
@@ -947,8 +952,10 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
 #if YORADIO_ESP8266_WEB_PROFILE
             TickType_t read_start = xTaskGetTickCount();
 #endif
+            trace_start = httpd_trace_clock();
             ssize_t count = read(file, s_async_message + available,
                                  sizeof(s_async_message) - 1 - available);
+            httpd_trace_read(trace_start);
             read_failed = count < 0;
             eof = count <= 0;
             buffered = available + (count > 0 ? (size_t)count : 0);

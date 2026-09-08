@@ -11,4 +11,9 @@ set(COMPONENT_SRCS "src/httpd_main.c"
 set(COMPONENT_PRIV_REQUIRES freertos lwip)
 set(COMPONENT_REQUIRES http_parser mbedtls)
 
+if(YORADIO_ESP8266_WEB_PROFILE)
+  list(APPEND COMPONENT_SRCS "src/httpd_trace.c")
+endif()
 register_component()
+target_compile_definitions(${COMPONENT_LIB} PRIVATE
+  YORADIO_ESP8266_WEB_PROFILE=$<BOOL:${YORADIO_ESP8266_WEB_PROFILE}>)

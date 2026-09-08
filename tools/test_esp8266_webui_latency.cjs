@@ -16,9 +16,31 @@ const save = () => fs.writeFileSync(path.join(output,'results.json'), JSON.strin
 let browser;
 async function load(page, kind, round) {
   const sample = {kind, round, resources:[], errors:[]};
+  let cdp;
+  if(args.includes('--trace')) {
+    sample.network=[];
+    cdp=await page.context().newCDPSession(page);await cdp.send('Network.enable');
+    const pending=new Map();
+    cdp.on('Network.requestWillBeSent',e=>{
+      const item={requestId:e.requestId,path:new URL(e.request.url).pathname,
+        wallTime:e.wallTime,started:e.timestamp,chunks:[]};
+      pending.set(e.requestId,item);sample.network.push(item);
+    });
+    cdp.on('Network.responseReceived',e=>{
+      const item=pending.get(e.requestId);if(!item)return;
+      item.headersAt=e.timestamp;item.timing=e.response.timing;
+      item.traceId=Object.entries(e.response.headers).find(([k])=>k.toLowerCase()==='x-yoradio-trace')?.[1] || null;
+    });
+    cdp.on('Network.dataReceived',e=>{const item=pending.get(e.requestId);if(item)item.chunks.push({at:e.timestamp,bytes:e.encodedDataLength,decodedBytes:e.dataLength});});
+    cdp.on('Network.loadingFinished',e=>{const item=pending.get(e.requestId);if(item){item.finished=e.timestamp;item.encodedBytes=e.encodedDataLength;}});
+    cdp.on('Network.loadingFailed',e=>{const item=pending.get(e.requestId);if(item)item.error=e.errorText;});
+  }
   const finished = async req => {
     const res = await req.response(), t = req.timing();
     sample.resources.push({path:new URL(req.url()).pathname, status:res.status(),
+      traceId:res.headers()['x-yoradio-trace'] || null,
+      startTime:t.startTime, dnsStart:t.domainLookupStart, dnsEnd:t.domainLookupEnd,
+      connectStart:t.connectStart, connectEnd:t.connectEnd, requestStart:t.requestStart,
       ttfbMs:t.responseStart, totalMs:t.responseEnd});
   };
   const failed = req => sample.errors.push({url:req.url(), error:req.failure()?.errorText});
@@ -34,6 +56,7 @@ async function load(page, kind, round) {
     sample.pass = sample.readyMs <= 500;
   } catch(e) {sample.error=e.message; sample.pass=false;}
   page.off('requestfinished', finished); page.off('requestfailed', failed);
+  if(cdp)await cdp.detach();
   report.loads.push(sample); save();
   console.log(JSON.stringify(sample));
   return !sample.error;

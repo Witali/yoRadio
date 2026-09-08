@@ -8,6 +8,7 @@ $ErrorActionPreference = 'Stop'
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
 if ($ToneTest -and $NoPlaylistGzip) { throw 'Use NoPlaylistGzip with the normal-radio profile' }
 $taskVariant = if ($ToneTest) { 'esp8266-spi-pdm-tone' } elseif ($NoPlaylistGzip) { 'esp8266-spi-pdm-raw-playlist' } else { 'esp8266-spi-pdm-debug' }
+if ($WebProfile) { $taskVariant += '-web-trace' }
 $taskToneFlag = if ($ToneTest) { 'ON' } else { 'OFF' }
 $taskWebFlag = if ($WebProfile) { 'ON' } else { 'OFF' }
 $taskBuild = "$taskRoot/.build/$taskVariant"

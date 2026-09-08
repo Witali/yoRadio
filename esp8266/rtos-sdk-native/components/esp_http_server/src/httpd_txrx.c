@@ -23,6 +23,7 @@
 
 #include <esp_http_server.h>
 #include "esp_httpd_priv.h"
+#include "httpd_trace.h"
 
 static const char *TAG = "httpd_txrx";
 #ifdef CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS
@@ -96,8 +97,11 @@ static esp_err_t httpd_send_all(httpd_req_t *r, const char *buf, size_t buf_len)
             ESP_LOGW(TAG, LOG_FMT("response send deadline, fd=%d"), ra->sd->fd);
             return ESP_FAIL;
         }
+        uint32_t trace_start = httpd_trace_clock();
         int ret = ra->sd->send_fn(ra->sd->handle, ra->sd->fd, buf, buf_len,
                                   MSG_DONTWAIT);
+        int send_errno = ret < 0 ? errno : 0;
+        httpd_trace_send(trace_start, ret, send_errno);
         if (ret > 0) {
             ESP_LOGD(TAG, LOG_FMT("sent = %d"), ret);
             buf += ret;
@@ -105,14 +109,17 @@ static esp_err_t httpd_send_all(httpd_req_t *r, const char *buf, size_t buf_len)
             continue;
         }
         bool retryable = ret == HTTPD_SOCK_ERR_TIMEOUT ||
-                         (ret < 0 && (errno == EAGAIN ||
-                                     errno == EWOULDBLOCK ||
-                                     errno == EINTR ||
-                                     errno == ENOMEM ||
-                                     errno == ENOBUFS));
+                         (ret < 0 && (send_errno == EAGAIN ||
+                                     send_errno == EWOULDBLOCK ||
+                                     send_errno == EINTR ||
+                                     send_errno == ENOMEM ||
+                                     send_errno == ENOBUFS));
         if (retryable &&
             (int32_t)(deadline - xTaskGetTickCount()) > 0) {
+            trace_start = httpd_trace_clock();
             vTaskDelay(pdMS_TO_TICKS(1));
+            httpd_trace_wait(trace_start, send_errno,
+                pdMS_TO_TICKS(1) * portTICK_PERIOD_MS * 1000U);
             continue;
         }
         ESP_LOGD(TAG, LOG_FMT("error in send_fn: ret=%d errno=%d"),
@@ -157,7 +164,9 @@ int httpd_recv_with_opt(httpd_req_t *r, char *buf, size_t buf_len, bool halt_aft
     }
 
     /* Receive data of remaining length */
+    uint32_t trace_start = httpd_trace_clock();
     int ret = ra->sd->recv_fn(ra->sd->handle, ra->sd->fd, buf, buf_len, 0);
+    httpd_trace_recv(trace_start);
     if (ret < 0) {
         ESP_LOGD(TAG, LOG_FMT("error in recv_fn"));
         if ((ret == HTTPD_SOCK_ERR_TIMEOUT) && (pending_len != 0)) {

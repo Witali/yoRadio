@@ -20,6 +20,7 @@
 
 #include <esp_http_server.h>
 #include "esp_httpd_priv.h"
+#include "httpd_trace.h"
 
 static const char *TAG = "httpd_uri";
 
@@ -186,6 +187,7 @@ esp_err_t httpd_uri(struct httpd_data *hd)
 {
     httpd_uri_t            *uri = NULL;
     httpd_req_t            *req = &hd->hd_req;
+    httpd_trace_route(req);
     struct http_parser_url *res = &hd->hd_req_aux.url_parse_res;
 
     /* For conveying URI not found/method not allowed */

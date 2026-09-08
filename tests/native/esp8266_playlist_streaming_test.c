@@ -7,6 +7,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdint.h>
+static uint32_t httpd_trace_clock(void) { return 0; }
+static void httpd_trace_read(uint32_t start) { (void)start; }
 typedef int esp_err_t;
 typedef struct { int unused; } httpd_req_t;
 enum { ESP_OK = 0, ESP_FAIL = -1 };
