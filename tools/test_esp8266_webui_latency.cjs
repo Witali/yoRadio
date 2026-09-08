@@ -2,6 +2,8 @@
 // Opt-in physical-board benchmark. No Wi-Fi changes, uploads or resets.
 // --controls temporarily changes volume via the actual page buttons, restores it.
 // --playback exercises real Play/Stop/Next/Prev/row clicks, restores station/state.
+// --compare-bootstrap alternates the native snapshot and legacy getindex on
+// the same firmware, without changing board/network configuration.
 const fs = require('node:fs');
 const path = require('node:path');
 const {chromium} = require('playwright');
@@ -63,6 +65,7 @@ async function load(page, kind, round) {
       rows:document.querySelectorAll('#playlist li[attr-id]').length,
       current:currentItem, rssi:document.querySelector('#rssi')?.textContent,
       player:document.querySelector('#playerwrap')?.className,
+      bootstrap:typeof websocketBootstrapEnabled==='function'&&websocketBootstrapEnabled(),
       pageTrace:window.__pageTrace})));
     sample.pass = sample.readyMs <= 500;
   } catch(e) {sample.error=e.message; sample.pass=false;}
@@ -217,7 +220,9 @@ async function stress(page, context, round) {
     args:args.includes('--netlog')?['--log-net-log='+path.resolve(output,'netlog.json'),'--net-log-capture-mode=Default']:[]});
   for(let round=0;round<rounds;round++) {
     const context=await browser.newContext({viewport:{width:1200,height:850}});
-    await context.addInitScript(({trace})=>{
+    await context.addInitScript(({trace,legacyIndex})=>{
+      if(legacyIndex)Object.defineProperty(window,'webSocketInitialState',{
+        get:()=>false,set:()=>{},configurable:true});
       if(trace){
         const timeline=window.__pageTrace={timeOrigin:performance.timeOrigin,sockets:[],longTasks:[],visibility:document.visibilityState};
         addEventListener('DOMContentLoaded',()=>timeline.domContentLoaded=performance.now());
@@ -247,7 +252,8 @@ async function stress(page, context, round) {
           typeof currentItem!=='undefined' && Number(currentItem)>0;
         if(ready) window.__readyMs=performance.now(); else requestAnimationFrame(check);
       }; requestAnimationFrame(check);
-    },{trace:args.includes('--trace')});
+    },{trace:args.includes('--trace'),legacyIndex:args.includes('--legacy-index') ||
+      (args.includes('--compare-bootstrap') && round%2===1)});
     const page=await context.newPage();
     page.on('pageerror',e=>report.errors.push(e.message));
     const cold=await load(page,'cold',round);
