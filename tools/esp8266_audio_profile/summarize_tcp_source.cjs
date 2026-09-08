@@ -3,6 +3,26 @@ const fs=require('node:fs');
 const {readLog}=require('./summarize_mp3_matrix.cjs');
 const {stats}=require('./summarize_network_sweep.cjs');
 
+function summarizeSnapshots(samples,sampleMs) {
+  const first=samples[0],last=samples.at(-1);
+  const delta=key=>first&&last&&last[key]>=first[key]?last[key]-first[key]:null;
+  let zeroStart=null,previous=null,longest=0,zeroCount=0;
+  for(const s of samples) {
+    if(s.snd_wnd===0) {
+      ++zeroCount;
+      if(zeroStart===null||s.ms-previous>2*sampleMs)zeroStart=s.ms;
+      longest=Math.max(longest,s.ms-zeroStart);
+    } else zeroStart=null;
+    previous=s.ms;
+  }
+  return {sample_count:samples.length,first_sample_ms:first?.ms??null,last_sample_ms:last?.ms??null,
+    zero_window_samples:samples.length?zeroCount:null,longest_zero_window_sample_span_ms:samples.length?longest:null,
+    rtt_us:stats(samples.map(s=>s.rtt_us)),send_window:stats(samples.map(s=>s.snd_wnd)),
+    retransmitted_bytes_sample_delta:delta('bytes_retrans'),rto_episodes_sample_delta:delta('rto_episodes'),
+    fast_retrans_sample_delta:delta('fast_retrans'),dup_acks_sample_delta:delta('dup_acks'),
+    sample_call_ms:stats(samples.map(s=>s.sample_call_ms))};
+}
+
 function analyzeTcp(log,board=null) {
   const connections=new Map();let malformed=0,starts=0;
   for(const line of log.split(/\r?\n/)) {
@@ -21,33 +41,25 @@ function analyzeTcp(log,board=null) {
   const cases=board?.samples||board?.cases||[];
   const rows=[...connections.values()].map(c=>{
     const samples=c.samples.sort((a,b)=>a.ms-b.ms);
-    const first=samples[0],last=samples.at(-1);
-    // Counter deltas cover the sampled interval only, excluding both tails.
-    const delta=key=>first&&last&&last[key]>=first[key]?last[key]-first[key]:null;
-    let zeroStart=null,previous=null,longest=0,zeroCount=0;
-    for(const s of samples) {
-      if(s.snd_wnd===0) {
-        ++zeroCount;
-        if(zeroStart===null||s.ms-previous>2*(c.begin?.sample_ms||100))zeroStart=s.ms;
-        longest=Math.max(longest,s.ms-zeroStart);
-      } else zeroStart=null;
-      previous=s.ms;
-    }
+    const sampleMs=c.begin?.sample_ms||100;
     const matches=cases.filter(row=>c.begin?.case>=0&&row.case===c.begin.case&&row.variant===c.begin.variant);
     const match=matches.length===1?matches[0]:null;
+    let interior=null;
+    if(match&&Number.isFinite(match.open_us)&&Number.isFinite(match.wall_us)) {
+      // The server sees GET after the board starts opening, and before its
+      // body measurement. The exact clock offset is unknown but bounded by
+      // open_us. Take a conservative interior, adding one sample of margin.
+      // Keep whole-connection data separately, including close/RST tails.
+      const from=match.open_us/1000+sampleMs,to=match.wall_us/1000-sampleMs;
+      interior={from_ms:from,to_ms:to,...summarizeSnapshots(samples.filter(s=>s.ms>=from&&s.ms<=to),sampleMs)};
+    }
     return {id:c.id,case:c.begin?.case,variant:c.begin?.variant,path:c.begin?.path,
-      rate_kbps:c.begin?.rate_kbps,closed:Boolean(c.end),sample_count:samples.length,
-      first_sample_ms:first?.ms??null,last_sample_ms:last?.ms??null,
-      zero_window_samples:samples.length?zeroCount:null,longest_zero_window_sample_span_ms:samples.length?longest:null,
-      rtt_us:stats(samples.map(s=>s.rtt_us)),send_window:stats(samples.map(s=>s.snd_wnd)),
-      retransmitted_bytes_sample_delta:delta('bytes_retrans'),
-      rto_episodes_sample_delta:delta('rto_episodes'),
-      fast_retrans_sample_delta:delta('fast_retrans'),dup_acks_sample_delta:delta('dup_acks'),
+      rate_kbps:c.begin?.rate_kbps,closed:Boolean(c.end),...summarizeSnapshots(samples,sampleMs),interior,
       accepted_body:c.end?.accepted_body??null,max_send_us:c.end?.max_send_us??null,
       accepted_wire_bytes:c.end?.accepted_wire_bytes??null,
-      sample_call_ms:stats(samples.map(s=>s.sample_call_ms)),
       end_error:c.end?.error??null,telemetry_errors:c.errors,
-      board_match:match?{completed:match.completed,kept_up:match.kept_up,error:match.error,
+      board_match:match?{finished:match.finished??(match.error!==undefined||match.open!==undefined),
+        completed:match.completed,kept_up:match.kept_up,error:match.error,
         rx_kbps:match.rx_kbps,output:match.output,underruns:match.underrun,
         rssi_before:match.rssi_before,rssi:match.rssi}:null};
   });
@@ -63,6 +75,6 @@ if(require.main===module) {
   console.table(report.connections.map(c=>({case:c.case,variant:c.variant,samples:c.sample_count,
     zero:c.zero_window_samples,zeroSpan:c.longest_zero_window_sample_span_ms,
     retrans:c.retransmitted_bytes_sample_delta,rto:c.rto_episodes_sample_delta,
-    rtt:c.rtt_us.median,boardOK:c.board_match?.completed})));
+    rtt:c.rtt_us.median,boardOK:c.board_match?.finished?c.board_match.completed:undefined})));
   if(!report.valid)process.exitCode=1;
 }

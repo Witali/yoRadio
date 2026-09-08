@@ -28,3 +28,13 @@ test('ambiguous or wrong-variant board matches are not silently joined',()=>{
   assert.equal(analyzeTcp(source,{samples:[{case:4,variant:0}]}).connections[0].board_match,null);
   assert.equal(analyzeTcp(source,{samples:[{case:4,variant:1},{case:4,variant:1}]}).connections[0].board_match,null);
 });
+
+test('conservative measurement interior excludes connection setup and close tails',()=>{
+  const source=log([{event:'listen'},{event:'begin',id:1,case:0,variant:0,sample_ms:100},
+    sample(50,0,10,1),sample(300,2000,20,2),sample(19000,2000,20,2),sample(21000,0,500,9)]);
+  const c=analyzeTcp(source,{samples:[{case:0,variant:0,open_us:100000,wall_us:20000000,error:0}]}).connections[0];
+  assert.equal(c.rto_episodes_sample_delta,8);
+  assert.equal(c.interior.from_ms,200);assert.equal(c.interior.to_ms,19900);
+  assert.equal(c.interior.sample_count,2);assert.equal(c.interior.zero_window_samples,0);
+  assert.equal(c.interior.rto_episodes_sample_delta,0);assert.equal(c.interior.retransmitted_bytes_sample_delta,0);
+});
