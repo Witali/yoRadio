@@ -166,6 +166,16 @@ config YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS
         Start the recovery access point after this many seconds without a
         successful client-mode Wi-Fi connection.
 
+config YORADIO_STREAM_IDLE_TIMEOUT_MS
+    int "Radio stream receive inactivity timeout (milliseconds)"
+    range 250 60000
+    default 1000
+    help
+        Reopen the radio TCP/HTTP stream after this interval without received
+        data. Reads remain nonblocking before the deadline. A short timeout
+        restores a stalled stream sooner but reconnects more often when Wi-Fi
+        packets are delayed. This is not the HTTP connection/header timeout.
+
 config YORADIO_OLED
     bool "Enable SSD1306 OLED display"
     default n
