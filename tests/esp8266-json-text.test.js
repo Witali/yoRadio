@@ -3,6 +3,31 @@ const fs=require('node:fs'),path=require('node:path'),{spawnSync}=require('node:
 const root=path.resolve(__dirname,'..'),main=path.join(root,'esp8266/rtos-sdk-native/main');
 const wsl=process.platform==='win32',p=f=>wsl?'/mnt/'+f[0].toLowerCase()+f.slice(2).replace(/\\/g,'/'):f;
 
+test('actual volume reply uses one bounded Arduino-compatible frame and actual device value',()=>{
+  const dir=fs.mkdtempSync(path.join(root,'.build/volume-json-'));
+  const source=fs.readFileSync(path.join(main,'web_service.c'),'utf8');
+  const fn=source.slice(source.indexOf('static esp_err_t send_current_volume'),source.indexOf('static esp_err_t send_active_settings'));
+  const commands=source.slice(source.indexOf('strcmp(command, "volume")'),source.indexOf('strcmp(command, "balance")'));
+  assert.doesNotMatch(commands,/send_initial_state/);
+  assert.equal((commands.match(/send_current_volume\(request\)/g)||[]).length,2);
+  fs.writeFileSync(path.join(dir,'test.c'),`#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+typedef int esp_err_t; typedef int httpd_req_t;
+static unsigned volume,calls;
+static unsigned native_audio_output_volume(void){return volume;}
+static int ws_send(httpd_req_t *r,const char *text){(void)r;++calls;assert(strlen(text)<48);puts(text);return -7;}
+${fn}
+int main(void){for(volume=0;volume<=254;++volume){assert(send_current_volume(NULL)==-7);}assert(calls==255);return 0;}
+`);
+  const bin=path.join(dir,'test'),args=['-std=c11','-Wall','-Wextra','-Werror','-fsanitize=undefined',p(path.join(dir,'test.c')),'-o',p(bin)];
+  let r=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...args]:args,{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
+  r=spawnSync(wsl?'wsl.exe':bin,wsl?['--exec',p(bin)]:[],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
+  const rows=r.stdout.trim().split('\n').map(x=>JSON.parse(x));
+  assert.equal(rows.length,255);
+  rows.forEach((row,volume)=>assert.deepEqual(row,{payload:[{id:'volume',value:volume}]}));
+});
+
 test('actual WebUI writers keep UTF-8 frames valid with malformed ICY and bounded buffers',()=>{
   const dir=fs.mkdtempSync(path.join(root,'.build/json-text-'));
   const source=fs.readFileSync(path.join(main,'web_service.c'),'utf8');

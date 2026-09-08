@@ -360,6 +360,16 @@ static esp_err_t send_initial_state(httpd_req_t *request) {
     return ws_send(request, "{\"playermode\":\"modeweb\"}");
 }
 
+static esp_err_t send_current_volume(httpd_req_t *request) {
+    /* Match Arduino's VOLUME response. Station/SD/mode did not change;
+     * notifying other subscribers remains the normal state-change path. */
+    char body[48];
+    snprintf(body, sizeof(body),
+             "{\"payload\":[{\"id\":\"volume\",\"value\":%u}]}",
+             (unsigned)native_audio_output_volume());
+    return ws_send(request, body);
+}
+
 static esp_err_t send_active_settings(httpd_req_t *request) {
     native_state_t state;
     native_state_snapshot(&state);
@@ -540,7 +550,7 @@ static void handle_command(httpd_req_t *request, char *command) {
         httpd_trace_volume_begin();
         int target = (int)parse_unsigned(value, 254U);
         radio_control_adjust_volume(target - (int)native_audio_output_volume());
-        send_initial_state(request);
+        send_current_volume(request);
     } else if (strcmp(command, "volp") == 0 ||
                strcmp(command, "volm") == 0) {
         httpd_trace_volume_begin();
@@ -549,7 +559,7 @@ static void handle_command(httpd_req_t *request, char *command) {
         int delta = settings.volume_steps;
         radio_control_adjust_volume(strcmp(command, "volp") == 0 ? delta
                                                                   : -delta);
-        send_initial_state(request);
+        send_current_volume(request);
     } else {
         persistent_settings_t settings;
         persistent_settings_get(&settings);

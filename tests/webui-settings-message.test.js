@@ -14,6 +14,19 @@ test('station broadcasts update current state without requiring the player DOM',
   assert.deepEqual(errors, []);
   assert.equal(context.currentItem, 176);
 });
+test('Arduino-compatible volume-only acknowledgement leaves station and playlist alone', () => {
+  const seen={},errors=[];
+  const context={JSON,Object,currentItem:176,escapeData:s=>s,
+    setupElement:(id,value)=>{seen[id]=value;},
+    console:{log:(...args)=>errors.push(args)}};
+  vm.runInNewContext(handler,context);
+  context.onMessage({data:'{"payload":[{"id":"volume","value":252}]}'});
+  assert.deepEqual(errors,[]);
+  assert.equal(seen.volume,252);
+  assert.equal(context.currentItem,176);
+  assert.deepEqual(Object.keys(seen),['volume']);
+});
+
 for (const hasLink of [false, true]) {
   test(`system snapshot is processed on ${hasLink ? 'settings' : 'player'} page`, () => {
     const seen = {}, errors = [], link = {innerHTML: ''};
