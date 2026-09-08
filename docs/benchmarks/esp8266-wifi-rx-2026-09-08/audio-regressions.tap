@@ -1,0 +1,171 @@
+TAP version 13
+# Subtest: AAC matrix contains complete sequential AAC-LC frames from the same MP3 source
+ok 1 - AAC matrix contains complete sequential AAC-LC frames from the same MP3 source
+  ---
+  duration_ms: 4.0258
+  type: 'test'
+  ...
+# Subtest: composite source is deterministic stereo tone/noise with headroom
+ok 2 - composite source is deterministic stereo tone/noise with headroom
+  ---
+  duration_ms: 41.7666
+  type: 'test'
+  ...
+# Subtest: stored MP3s use real sequential frames and match fixture hashes
+ok 3 - stored MP3s use real sequential frames and match fixture hashes
+  ---
+  duration_ms: 2.3676
+  type: 'test'
+  ...
+# Subtest: production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+ok 4 - production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+  ---
+  duration_ms: 14720.8604
+  type: 'test'
+  ...
+# PDM32: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_SIMPLE: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_FEEDBACK: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM128: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# Subtest: AAC bit reader matches an independent bit oracle at buffer tails
+ok 5 - AAC bit reader matches an independent bit oracle at buffer tails
+  ---
+  duration_ms: 2586.1545
+  type: 'test'
+  ...
+# AAC bit reader: 3874304 peek/consume comparisons, exact bits and logical positions
+# Subtest: AAC flash Huffman lookup matches every canonical code and suffix
+ok 6 - AAC flash Huffman lookup matches every canonical code and suffix
+  ---
+  duration_ms: 2447.3395
+  type: 'test'
+  ...
+# AAC Huffman: 1305600 exhaustive prefixes/suffixes, exact symbols and bit counts
+# Subtest: AAC exact optimizations preserve PCM on all retained rates and channels
+ok 7 - AAC exact optimizations preserve PCM on all retained rates and channels
+  ---
+  duration_ms: 6595.7455
+  type: 'test'
+  ...
+# stereo-320.aac: samples=38912, maxError=0, SNR=Infinity dB
+# mono-22050.aac: samples=23552, maxError=0, SNR=Infinity dB
+# stereo-44100.aac: samples=92160, maxError=0, SNR=Infinity dB
+# Subtest: AAC sequential block windows preserve exact PCM and overlap state
+ok 8 - AAC sequential block windows preserve exact PCM and overlap state
+  ---
+  duration_ms: 5228.0252
+  type: 'test'
+  ...
+# AAC sequential windows: 1280 vectors, exact PCM/overlap, immutable coefficients, all block cancellations and canaries passed
+# AAC sequential windows: 1280 vectors, exact PCM/overlap, immutable coefficients, all block cancellations and canaries passed
+# Subtest: AAC 32/64/128/256/512-frame callbacks match full-frame decode and mono downmix
+ok 9 - AAC 32/64/128/256/512-frame callbacks match full-frame decode and mono downmix
+  ---
+  duration_ms: 7069.9396
+  type: 'test'
+  ...
+# AAC block matrix: all PCM samples bit-identical; maximum error=0, SNR=Infinity dB versus exact matching full-frame arithmetic
+# Subtest: 32-frame MP3 output matches granules and full frames byte for byte
+ok 10 - 32-frame MP3 output matches granules and full frames byte for byte
+  ---
+  duration_ms: 13849.6349
+  type: 'test'
+  ...
+# 6 vectors x mono/stereo x exact/SSO: frame, granule and 32-frame PCM identical; canaries intact
+# Subtest: 32-frame MP3 output handles cancellation, reset and bounded error concealment
+ok 11 - 32-frame MP3 output handles cancellation, reset and bounded error concealment
+  ---
+  duration_ms: 5463.8406
+  type: 'test'
+  ...
+# 32-frame MP3: cancellation at all synthesis boundaries, reset, capacity, underflow and canaries passed
+# 32-frame MP3: cancellation at all synthesis boundaries, reset, capacity, underflow and canaries passed
+# Subtest: shared MP3 reorder scratch is bit-exact against the separate allocation
+ok 12 - shared MP3 reorder scratch is bit-exact against the separate allocation
+  ---
+  duration_ms: 13161.8558
+  type: 'test'
+  ...
+# 6 MP3 vectors x mono/stereo x frame/granule API: identical PCM bytes
+# Subtest: shared MP3 reorder has one owner, saves 792 heap bytes and survives allocation failures
+ok 13 - shared MP3 reorder has one owner, saves 792 heap bytes and survives allocation failures
+  ---
+  duration_ms: 5295.8939
+  type: 'test'
+  ...
+# separate: heap=7612 word=15636 allocations=13; short/mixed 9 rates, failure cleanup, 50 AAC/MP3 cycles PASS
+# shared: heap=6820 word=15636 allocations=12; short/mixed 9 rates, failure cleanup, 50 AAC/MP3 cycles PASS
+# Subtest: MP3 build-time mono skips M/S side and preserves fallback/mode transitions
+ok 14 - MP3 build-time mono skips M/S side and preserves fallback/mode transitions
+  ---
+  duration_ms: 6691.6841
+  type: 'test'
+  ...
+# original: SNR=49.69 dB maxError=21, Huffman 72 -> 72
+# mid-side: SNR=49.79 dB maxError=21, Huffman 72 -> 36
+# left-right: SNR=49.69 dB maxError=21, Huffman 72 -> 72
+# dual-channel: SNR=49.69 dB maxError=21, Huffman 72 -> 72
+# intensity: SNR=49.69 dB maxError=21, Huffman 72 -> 72
+# mid-side-intensity: SNR=49.79 dB maxError=21, Huffman 72 -> 72
+# transitions: SNR=49.78 dB maxError=21, Huffman 72 -> 58
+# mpeg1: SNR=49.65 dB maxError=22, Huffman 72 -> 50
+# mpeg2: SNR=49.07 dB maxError=21, Huffman 36 -> 26
+# mpeg25: SNR=48.84 dB maxError=21, Huffman 20 -> 12
+# mono: SNR=Infinity dB maxError=0, Huffman 19 -> 19
+# Subtest: MP3 mono overlap state is safe across windows, channel modes and reset
+ok 15 - MP3 mono overlap state is safe across windows, channel modes and reset
+  ---
+  duration_ms: 2707.3634
+  type: 'test'
+  ...
+# mono overlap/window/reset/canary PASS, max PCM error=1
+# Subtest: ESP8266 optimized Helix MP3/AAC PCM matches the 64-bit reference
+ok 16 - ESP8266 optimized Helix MP3/AAC PCM matches the 64-bit reference
+  ---
+  duration_ms: 6372.4112
+  type: 'test'
+  ...
+# mp3: codec=mp3 frames=18 samples=41472 bytes=82944, sha256=bccd41c32d39c55f571bfc205f53817871715be78090ba519ded6749fd004c6a
+# aac: codec=aac frames=19 samples=38912 bytes=77824, sha256=13afe42da43d6c9387001cf91cdf9f95177dea9c51820f951c459812b58f3a43
+# Subtest: ESP8266 Helix SSO preserves MP3 frame layout and useful PCM quality
+ok 17 - ESP8266 Helix SSO preserves MP3 frame layout and useful PCM quality
+  ---
+  duration_ms: 6133.2283
+  type: 'test'
+  ...
+# SSO SNR=48.50 dB, maxError=34 PCM levels
+# Subtest: ESP8266 Helix AAC SSO preserves frame layout and useful PCM quality
+ok 18 - ESP8266 Helix AAC SSO preserves frame layout and useful PCM quality
+  ---
+  duration_ms: 6333.2465
+  type: 'test'
+  ...
+# AAC SSO SNR=82.65 dB, maxError=1 PCM levels
+# Subtest: all ESP8266 native output backends ignore balance for mono PCM
+ok 19 - all ESP8266 native output backends ignore balance for mono PCM
+  ---
+  duration_ms: 1.0772
+  type: 'test'
+  ...
+# Subtest: runtime and restored balance use a signed lower bound
+ok 20 - runtime and restored balance use a signed lower bound
+  ---
+  duration_ms: 0.3348
+  type: 'test'
+  ...
+# Subtest: production NoDAC ownership state machine survives delayed producer/EOF interleavings
+ok 21 - production NoDAC ownership state machine survives delayed producer/EOF interleavings
+  ---
+  duration_ms: 1928.6724
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 90044.8527

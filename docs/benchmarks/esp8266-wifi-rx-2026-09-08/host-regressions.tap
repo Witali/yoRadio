@@ -1,0 +1,527 @@
+TAP version 13
+# Subtest: requires at least 20 seconds of real PCM progress and no DMA gap
+ok 1 - requires at least 20 seconds of real PCM progress and no DMA gap
+  ---
+  duration_ms: 1.4011
+  type: 'test'
+  ...
+# Subtest: failed requests, counter resets, rate/station changes are not discarded
+ok 2 - failed requests, counter resets, rate/station changes are not discarded
+  ---
+  duration_ms: 0.3883
+  type: 'test'
+  ...
+# Subtest: health uses tick time and records PCM only after successful output
+ok 3 - health uses tick time and records PCM only after successful output
+  ---
+  duration_ms: 1.6652
+  type: 'test'
+  ...
+# Subtest: libmad follows the same symmetric CodecArena ownership as Helix
+ok 4 - libmad follows the same symmetric CodecArena ownership as Helix
+  ---
+  duration_ms: 2.065
+  type: 'test'
+  ...
+# Subtest: ESP8266 reports DRAM and IRAM separately and enforces reserve after allocation
+ok 5 - ESP8266 reports DRAM and IRAM separately and enforces reserve after allocation
+  ---
+  duration_ms: 0.41
+  type: 'test'
+  ...
+# Subtest: audio workspace is lazy, reusable for station changes, and released on stop
+ok 6 - audio workspace is lazy, reusable for station changes, and released on stop
+  ---
+  duration_ms: 0.6848
+  type: 'test'
+  ...
+# Subtest: full codec profile reserves IRAM for AAC and MP3 while libmad-only stays smaller
+ok 7 - full codec profile reserves IRAM for AAC and MP3 while libmad-only stays smaller
+  ---
+  duration_ms: 0.715
+  type: 'test'
+  ...
+# Subtest: ESP8266 splits the word-only IMDCT output into the IRAM arena
+ok 8 - ESP8266 splits the word-only IMDCT output into the IRAM arena
+  ---
+  duration_ms: 2.7207
+  type: 'test'
+  ...
+# Subtest: ESP8266 preserves heap for lwIP after starting the MP3 decoder
+ok 9 - ESP8266 preserves heap for lwIP after starting the MP3 decoder
+  ---
+  duration_ms: 0.3234
+  type: 'test'
+  ...
+# Subtest: libmad places only aligned Layer III word workspaces in ESP8266 IRAM
+ok 10 - libmad places only aligned Layer III word workspaces in ESP8266 IRAM
+  ---
+  duration_ms: 0.5195
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP URL, redirect and chunk parser passes native tests
+ok 11 - ESP8266 HTTP URL, redirect and chunk parser passes native tests
+  ---
+  duration_ms: 2201.7226
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio client uses bounded, chunk-aware socket I/O
+ok 12 - ESP8266 audio client uses bounded, chunk-aware socket I/O
+  ---
+  duration_ms: 1.3653
+  type: 'test'
+  ...
+# Subtest: ESP8266 stream inactivity deadline is configurable with a one-second default
+ok 13 - ESP8266 stream inactivity deadline is configurable with a one-second default
+  ---
+  duration_ms: 0.5811
+  type: 'test'
+  ...
+# Subtest: actual HTTP receiver and upload loop preserve errno, partial reads and deadlines
+ok 14 - actual HTTP receiver and upload loop preserve errno, partial reads and deadlines
+  ---
+  duration_ms: 2160.1042
+  type: 'test'
+  ...
+# Subtest: actual HTTP response encoder coalesces chunks and keeps valid framing
+ok 15 - actual HTTP response encoder coalesces chunks and keeps valid framing
+  ---
+  duration_ms: 4344.9601
+  type: 'test'
+  ...
+# Subtest: physical volume benchmark starts inward at either limit and never awaits a clamped no-op
+ok 16 - physical volume benchmark starts inward at either limit and never awaits a clamped no-op
+  ---
+  duration_ms: 2.754
+  type: 'test'
+  ...
+# Subtest: latency analysis excludes only proven TX wait; RAM, unknown and raw outliers remain
+ok 17 - latency analysis excludes only proven TX wait; RAM, unknown and raw outliers remain
+  ---
+  duration_ms: 2.4282
+  type: 'test'
+  ...
+# Subtest: actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-safe wall time
+ok 18 - actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-safe wall time
+  ---
+  duration_ms: 4662.2088
+  type: 'test'
+  ...
+# Subtest: control correlation retains pre-input delay and rejects ambiguous commands
+ok 19 - control correlation retains pre-input delay and rejects ambiguous commands
+  ---
+  duration_ms: 1.2621
+  type: 'test'
+  ...
+# Subtest: startup correlation bounds delay before WS dispatch without calling it network wait
+ok 20 - startup correlation bounds delay before WS dispatch without calling it network wait
+  ---
+  duration_ms: 0.9685
+  type: 'test'
+  ...
+# Subtest: ESP8266 keeps SLC DMA active while the radio is silent
+ok 21 - ESP8266 keeps SLC DMA active while the radio is silent
+  ---
+  duration_ms: 1.9444
+  type: 'test'
+  ...
+# Subtest: ESP8266 re-primes the I2S clock before PCM after silence
+ok 22 - ESP8266 re-primes the I2S clock before PCM after silence
+  ---
+  duration_ms: 0.3741
+  type: 'test'
+  ...
+# Subtest: streaming multipart handles every split and rejects truncated uploads
+ok 23 - streaming multipart handles every split and rejects truncated uploads
+  ---
+  duration_ms: 4430.9193
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket handler completes HTTP upgrade before reading frames
+ok 24 - ESP8266 WebSocket handler completes HTTP upgrade before reading frames
+  ---
+  duration_ms: 1.7527
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket handler reads a command in one bounded receive
+ok 25 - ESP8266 WebSocket handler reads a command in one bounded receive
+  ---
+  duration_ms: 0.3456
+  type: 'test'
+  ...
+# Subtest: ESP8266 Web API dispatches player commands without synchronous status sends
+ok 26 - ESP8266 Web API dispatches player commands without synchronous status sends
+  ---
+  duration_ms: 0.2093
+  type: 'test'
+  ...
+# Subtest: ESP8266 Web API publishes player, station and stream state after commands
+ok 27 - ESP8266 Web API publishes player, station and stream state after commands
+  ---
+  duration_ms: 0.3317
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounds the persistent status buffer for audio heap
+ok 28 - ESP8266 bounds the persistent status buffer for audio heap
+  ---
+  duration_ms: 0.1712
+  type: 'test'
+  ...
+# Subtest: ESP8266 throttles volatile telemetry without delaying player state
+ok 29 - ESP8266 throttles volatile telemetry without delaying player state
+  ---
+  duration_ms: 0.2859
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI status uses a compact change key and bounded writer
+ok 30 - ESP8266 WebUI status uses a compact change key and bounded writer
+  ---
+  duration_ms: 0.4179
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI uses the reduced stack after removing status temporaries
+ok 31 - ESP8266 WebUI uses the reduced stack after removing status temporaries
+  ---
+  duration_ms: 0.4022
+  type: 'test'
+  ...
+# Subtest: ESP8266 validates a saved fd before treating it as a WebSocket
+ok 32 - ESP8266 validates a saved fd before treating it as a WebSocket
+  ---
+  duration_ms: 0.659
+  type: 'test'
+  ...
+# Subtest: ESP8266 parser accepts exactly HTTP 1.1
+ok 33 - ESP8266 parser accepts exactly HTTP 1.1
+  ---
+  duration_ms: 0.473
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP task has enough stack for playlist-backed commands
+ok 34 - ESP8266 HTTP task has enough stack for playlist-backed commands
+  ---
+  duration_ms: 0.2159
+  type: 'test'
+  ...
+# Subtest: ESP8266 exposes only board-supported stations with matching indices
+ok 35 - ESP8266 exposes only board-supported stations with matching indices
+  ---
+  duration_ms: 0.3141
+  type: 'test'
+  ...
+# Subtest: ESP8266 radio retries short socket timeouts until the HTTP header deadline
+ok 36 - ESP8266 radio retries short socket timeouts until the HTTP header deadline
+  ---
+  duration_ms: 1.2814
+  type: 'test'
+  ...
+# Subtest: ESP8266 reconnects a clean radio EOF unless control changed
+ok 37 - ESP8266 reconnects a clean radio EOF unless control changed
+  ---
+  duration_ms: 0.3161
+  type: 'test'
+  ...
+# Subtest: ESP8266 radio checks a header that exactly fills its receive buffer
+ok 38 - ESP8266 radio checks a header that exactly fills its receive buffer
+  ---
+  duration_ms: 0.3641
+  type: 'test'
+  ...
+# Subtest: ESP8266 waits for DHCP and releases recovery AP memory in client mode
+ok 39 - ESP8266 waits for DHCP and releases recovery AP memory in client mode
+  ---
+  duration_ms: 0.4672
+  type: 'test'
+  ...
+# Subtest: ESP8266 recovery AP assigns clients an address for WebUI access
+ok 40 - ESP8266 recovery AP assigns clients an address for WebUI access
+  ---
+  duration_ms: 0.2298
+  type: 'test'
+  ...
+# Subtest: ESP8266 next/previous starts searching after the current station
+ok 41 - ESP8266 next/previous starts searching after the current station
+  ---
+  duration_ms: 0.2273
+  type: 'test'
+  ...
+# Subtest: LAN source preserves HTTP framing, exact encoded prefix, and pacing
+ok 42 - LAN source preserves HTTP framing, exact encoded prefix, and pacing
+  ---
+  duration_ms: 249.0128
+  type: 'test'
+  ...
+# Subtest: network diagnostic retains decoder memory and distinguishes app gaps from socket emptiness
+ok 43 - network diagnostic retains decoder memory and distinguishes app gaps from socket emptiness
+  ---
+  duration_ms: 0.7111
+  type: 'test'
+  ...
+# Subtest: network report does not discard failed or partial measurements
+ok 44 - network report does not discard failed or partial measurements
+  ---
+  duration_ms: 2.8264
+  type: 'test'
+  ...
+# Subtest: runtime report separates task residency and baseline from receive elapsed time
+ok 45 - runtime report separates task residency and baseline from receive elapsed time
+  ---
+  duration_ms: 0.8003
+  type: 'test'
+  ...
+# {"path":"/mp3-128","rate_kbps":128,"bytes_written":4096,"elapsed_ms":268,"peer_closed":true}
+# Subtest: sweep requires ten attempts, retains failed samples, and compares matching rounds
+ok 46 - sweep requires ten attempts, retains failed samples, and compares matching rounds
+  ---
+  duration_ms: 18.6893
+  type: 'test'
+  ...
+# Subtest: missing/open-failed cases are not mistaken for successful throughput
+ok 47 - missing/open-failed cases are not mistaken for successful throughput
+  ---
+  duration_ms: 1.0283
+  type: 'test'
+  ...
+# Subtest: Wi-Fi recovery is retained and separates paired samples
+ok 48 - Wi-Fi recovery is retained and separates paired samples
+  ---
+  duration_ms: 0.669
+  type: 'test'
+  ...
+# Subtest: explicit campaign combination retains partial runs and requires a finished final run
+ok 49 - explicit campaign combination retains partial runs and requires a finished final run
+  ---
+  duration_ms: 6.4305
+  type: 'test'
+  ...
+# Subtest: cancelled short windows are not reported as error zero or a continuous success
+ok 50 - cancelled short windows are not reported as error zero or a continuous success
+  ---
+  duration_ms: 0.442
+  type: 'test'
+  ...
+# Subtest: playback task residency is not mislabelled as receive-only CPU
+ok 51 - playback task residency is not mislabelled as receive-only CPU
+  ---
+  duration_ms: 0.5996
+  type: 'test'
+  ...
+# Subtest: Windows TCP source preserves ten encoded prefixes and returns socket telemetry
+ok 52 - Windows TCP source preserves ten encoded prefixes and returns socket telemetry
+  ---
+  duration_ms: 3004.2486
+  type: 'test'
+  ...
+# Subtest: actual native state wakes its consumer after unlocking, not for every bitrate sample
+ok 53 - actual native state wakes its consumer after unlocking, not for every bitrate sample
+  ---
+  duration_ms: 4247.8463
+  type: 'test'
+  ...
+# Subtest: station status and index are sent in one HTTP poll without a second timer tick
+ok 54 - station status and index are sent in one HTTP poll without a second timer tick
+  ---
+  duration_ms: 1.6957
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounded readiness wait preserves cancellation and inactivity deadlines
+ok 55 - ESP8266 bounded readiness wait preserves cancellation and inactivity deadlines
+  ---
+  duration_ms: 2198.154
+  type: 'test'
+  ...
+# Subtest: ready-wait SDK uses persistent per-thread semaphores
+ok 56 - ready-wait SDK uses persistent per-thread semaphores
+  ---
+  duration_ms: 0.7937
+  type: 'test'
+  ...
+# Subtest: TCP summary joins case/variant, retaining loss and zero-window observations
+ok 57 - TCP summary joins case/variant, retaining loss and zero-window observations
+  ---
+  duration_ms: 2.4531
+  type: 'test'
+  ...
+# Subtest: missing telemetry is not reported as a zero retransmit count
+ok 58 - missing telemetry is not reported as a zero retransmit count
+  ---
+  duration_ms: 0.2939
+  type: 'test'
+  ...
+# Subtest: multiple server starts and malformed lines invalidate a combined capture
+ok 59 - multiple server starts and malformed lines invalidate a combined capture
+  ---
+  duration_ms: 0.2392
+  type: 'test'
+  ...
+# Subtest: ambiguous or wrong-variant board matches are not silently joined
+ok 60 - ambiguous or wrong-variant board matches are not silently joined
+  ---
+  duration_ms: 0.1773
+  type: 'test'
+  ...
+# Subtest: ESP8266 backports the standard asynchronous HTTP request API
+ok 61 - ESP8266 backports the standard asynchronous HTTP request API
+  ---
+  duration_ms: 1.7537
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets
+ok 62 - ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets
+  ---
+  duration_ms: 0.3527
+  type: 'test'
+  ...
+# Subtest: ESP8266 serves static WebUI resources on the shared HTTP task stack
+ok 63 - ESP8266 serves static WebUI resources on the shared HTTP task stack
+  ---
+  duration_ms: 0.2791
+  type: 'test'
+  ...
+# Subtest: ESP8266 keeps status, WebSocket and static routes on the shared HTTP task
+ok 64 - ESP8266 keeps status, WebSocket and static routes on the shared HTTP task
+  ---
+  duration_ms: 0.3307
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming
+ok 65 - ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming
+  ---
+  duration_ms: 18.09
+  type: 'test'
+  ...
+# Subtest: ESP8266 application serves the current shared WebUI script from flash
+ok 66 - ESP8266 application serves the current shared WebUI script from flash
+  ---
+  duration_ms: 0.7975
+  type: 'test'
+  ...
+# Subtest: ESP8266 loads shared WebUI assets sequentially to bound connections
+ok 67 - ESP8266 loads shared WebUI assets sequentially to bound connections
+  ---
+  duration_ms: 0.3955
+  type: 'test'
+  ...
+# Subtest: ESP8266 lets successful close-framed responses drain before cleanup
+ok 68 - ESP8266 lets successful close-framed responses drain before cleanup
+  ---
+  duration_ms: 0.3338
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounds browser connections and recovers with LRU eviction
+ok 69 - ESP8266 bounds browser connections and recovers with LRU eviction
+  ---
+  duration_ms: 0.5434
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket status cannot block the sole HTTP worker
+ok 70 - ESP8266 WebSocket status cannot block the sole HTTP worker
+  ---
+  duration_ms: 0.9585
+  type: 'test'
+  ...
+# Subtest: ESP8266 strips cache-busting query from static file lookup
+ok 71 - ESP8266 strips cache-busting query from static file lookup
+  ---
+  duration_ms: 0.3104
+  type: 'test'
+  ...
+# Subtest: ESP8266 chunks embedded HTML below its TCP send window
+ok 72 - ESP8266 chunks embedded HTML below its TCP send window
+  ---
+  duration_ms: 0.3756
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP send loop is nonblocking, bounded and retryable
+ok 73 - ESP8266 HTTP send loop is nonblocking, bounded and retryable
+  ---
+  duration_ms: 0.4213
+  type: 'test'
+  ...
+# Subtest: static writes yield only on actual socket backpressure
+ok 74 - static writes yield only on actual socket backpressure
+  ---
+  duration_ms: 3.626
+  type: 'test'
+  ...
+# Subtest: HTTP send deadline belongs to the entire response, not each chunk
+ok 75 - HTTP send deadline belongs to the entire response, not each chunk
+  ---
+  duration_ms: 0.6902
+  type: 'test'
+  ...
+# Subtest: OTA accepts the original shared form target and embeds emergency recovery
+ok 76 - OTA accepts the original shared form target and embeds emergency recovery
+  ---
+  duration_ms: 2.6883
+  type: 'test'
+  ...
+# Subtest: OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS
+ok 77 - OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS
+  ---
+  duration_ms: 0.793
+  type: 'test'
+  ...
+# Subtest: Wi-Fi readback preserves edge spaces and ignores excess credential rows
+ok 78 - Wi-Fi readback preserves edge spaces and ignores excess credential rows
+  ---
+  duration_ms: 2.1581
+  type: 'test'
+  ...
+# Subtest: uploads stream to a temporary file, whitelist destinations and reject disconnected bodies
+ok 79 - uploads stream to a temporary file, whitelist destinations and reject disconnected bodies
+  ---
+  duration_ms: 0.597
+  type: 'test'
+  ...
+# Subtest: SNTP reconfiguration uses its lwIP task and a reusable nonblocking message
+ok 80 - SNTP reconfiguration uses its lwIP task and a reusable nonblocking message
+  ---
+  duration_ms: 0.7598
+  type: 'test'
+  ...
+# Subtest: Audio Info and AP reboot delay persist without changing the legacy blob
+ok 81 - Audio Info and AP reboot delay persist without changing the legacy blob
+  ---
+  duration_ms: 0.5278
+  type: 'test'
+  ...
+# Subtest: short HTTP responses use TCP_NODELAY and graceful write-half shutdown
+ok 82 - short HTTP responses use TCP_NODELAY and graceful write-half shutdown
+  ---
+  duration_ms: 0.8021
+  type: 'test'
+  ...
+# Subtest: two bounded WebSocket subscribers share a single HTTP-owned status buffer
+ok 83 - two bounded WebSocket subscribers share a single HTTP-owned status buffer
+  ---
+  duration_ms: 0.8711
+  type: 'test'
+  ...
+# Subtest: VBR waits for heartbeat but state, format and metadata remain immediate
+ok 84 - VBR waits for heartbeat but state, format and metadata remain immediate
+  ---
+  duration_ms: 0.5895
+  type: 'test'
+  ...
+# Subtest: native stream identity is invalidated when changing the station
+ok 85 - native stream identity is invalidated when changing the station
+  ---
+  duration_ms: 0.4249
+  type: 'test'
+  ...
+# Subtest: native connecting telemetry locks and unlocks Play without affecting Arduino states
+ok 86 - native connecting telemetry locks and unlocks Play without affecting Arduino states
+  ---
+  duration_ms: 2.1476
+  type: 'test'
+  ...
+1..86
+# tests 86
+# suites 0
+# pass 86
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4795.8497
