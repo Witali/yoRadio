@@ -102,6 +102,9 @@ esp_err_t radio_control_init(void) {
     /* Network startup is asynchronous. Defer smart-start until DHCP has
      * completed instead of blocking/failing before the interface has an IP. */
     s_resume_when_connected = settings.smart_start == 1U;
+#if YORADIO_ESP8266_NETWORK_BENCHMARK
+    s_resume_when_connected = false; /* The diagnostic owns the audio task. */
+#endif
 #ifdef YORADIO_ESP8266_AUDIO_PROFILE_URL
     s_resume_when_connected = true;
 #endif

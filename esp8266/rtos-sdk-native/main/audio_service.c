@@ -973,9 +973,15 @@ static void audio_task(void *argument) {
     }
 }
 #else
+#if YORADIO_ESP8266_NETWORK_BENCHMARK
+#include "network_benchmark.inc"
+#endif
 static void audio_task(void *argument) {
     memory_profile_register(MEMORY_AUDIO);
     (void)argument;
+#if YORADIO_ESP8266_NETWORK_BENCHMARK
+    network_benchmark_run();
+#endif
     helix_codec_t *codec = NULL;
     helix_codec_kind_t codec_kind = 0;
     log_audio_stack("start");
