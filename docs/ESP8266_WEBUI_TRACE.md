@@ -48,6 +48,7 @@ path, counters, times and result are printed.
 | `select_wait_us` | Previous `select()` wall time; can include ordinary idle before a request existed, never automatically excluded |
 | `dispatch_us` | Time from `select()` return to this session's processing start; includes earlier handlers, control work and preemption |
 | `dispatch_flags` | 1: socket reported readable by `select`; 2: only HTTP's buffered data; 0: no session-dispatch context |
+| `tcp_rx_us`, `tcp_rx_len`, `tcp_seq_gap` | Most recent payload seen by lwIP for this remote port: uptime, bytes, sequence minus expected; zero length means unavailable |
 | `recv_us` | Wall time inside socket receives; overlaps parsing and possibly body handling |
 | `read_us` | Wall time reading playlist payload blocks from SPIFFS, cached or identity |
 | `send_us`, `max_send_us` | Sum and maximum of nonblocking socket-send calls |
@@ -88,11 +89,12 @@ Compact UART format is a JSON array after `WEBTRACE`, with this field order:
 ```text
 id,path,start_us,total_us,parse_us,read_us,recv_us,send_us,max_send_us,
 tx_wait_us,tx_sleep_budget_us,mem_wait_us,other_wait_us,mem_errors,
-retries,bytes,calls,result,last_errno,select_wait_us,dispatch_us,dispatch_flags
+retries,bytes,calls,result,last_errno,select_wait_us,dispatch_us,dispatch_flags,
+tcp_rx_us,tcp_rx_len,tcp_seq_gap
 ```
 
 The analyzer expands it to named fields and retains all request records.
-It also accepts the earlier 18/19-field arrays and verbose JSON-object format. The compact
+It also accepts the earlier 18/19/22-field arrays and verbose JSON-object format. The compact
 format lives in DRAM to avoid repeated LX106 flash byte-load emulation while
 formatting. No added task, stack or per-request heap allocation is used.
 
@@ -104,6 +106,22 @@ symmetric network delay. They handle 32-bit uptime wrap; ambiguous concurrent
 operations or missing data are not guessed. The bound, dispatch time and frame
 receive time distinguish delays before service, earlier server work, and reads.
 They do not by themselves prove packet loss or authorize sample exclusion.
+
+An optional `LWIP_HOOK_TCP_INPACKET_PCB` timestamps port-80 TCP payloads
+before TCP input processing. It returns success unconditionally, does not
+change packets, and records no payload bytes. A fixed 128-byte/eight-port
+table is shared under short critical sections, with no log output from the
+TCP task. `tcpInputToSessionMs` separates lwIP arrival from HTTP service.
+The most recent payload is not necessarily the command: inspect length,
+sequence gap and browser timeline, especially with pipelined/segmented data.
+This hook is wired through CMake only for WebProfile; no downloaded SDK is
+modified. Ordinary builds have neither the hook nor its table.
+
+A large command-to-session delay with small TCP-input-to-session delay means
+the delay preceded this lwIP input hook. That still includes Wi-Fi/driver
+delivery and TCP-task scheduling, not only RF transit. A large post-input
+delay instead points inside TCP/readiness/server scheduling. Neither case
+automatically counts as an excluded network sample.
 
 ## Excluding network waits without hiding regressions
 

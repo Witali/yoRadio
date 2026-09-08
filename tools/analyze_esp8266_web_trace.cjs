@@ -4,8 +4,9 @@ const fs=require('node:fs');
 function decodeTrace(value){
   const fields=['id','path','start_us','total_us','parse_us','read_us','recv_us','send_us','max_send_us','tx_wait_us','tx_sleep_budget_us','mem_wait_us','other_wait_us','mem_errors','retries','bytes','calls','result'];
   if(!Array.isArray(value))return value;
-  if(value.length===19||value.length===22)fields.push('last_errno');
-  if(value.length===22)fields.push('select_wait_us','dispatch_us','dispatch_flags');
+  if([19,22,25].includes(value.length))fields.push('last_errno');
+  if(value.length===22||value.length===25)fields.push('select_wait_us','dispatch_us','dispatch_flags');
+  if(value.length===25)fields.push('tcp_rx_us','tcp_rx_len','tcp_seq_gap');
   if(value.length!==fields.length)throw new Error('Unknown WEBTRACE record format');
   return Object.fromEntries(fields.map((key,i)=>[key,value[i]]));
 }
@@ -44,6 +45,8 @@ function startupTiming(load, resources, records) {
     selectWaitMs:Number.isFinite(t.select_wait_us)?t.select_wait_us/1000:null,
     readyToSessionMs:Number.isFinite(t.dispatch_us)?t.dispatch_us/1000:null,
     dispatchFlags:t.dispatch_flags??null,
+    tcpPayloadBytes:t.tcp_rx_len||null,tcpSequenceGap:t.tcp_rx_len?t.tcp_seq_gap:null,
+    tcpInputToSessionMs:t.tcp_rx_len?((t.start_us-t.tcp_rx_us)|0)/1000:null,
     sessionToCommandParsedMs:t.parse_us/1000,receiveWallMs:t.recv_us/1000,
     sessionWallMs:t.total_us/1000,sendWallMs:t.send_us/1000,
     note:'Bounds, not a one-way network measurement. Dispatch includes earlier handlers and preemption; select may include normal idle.'};

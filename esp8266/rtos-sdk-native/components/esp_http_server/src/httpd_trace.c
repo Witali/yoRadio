@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 /* One synchronous request at a time. No ring allocation or packet logging. */
 static struct {
@@ -16,6 +18,8 @@ static struct {
     unsigned mem_errors;
     int last_errno;
     uint32_t select_wait_us, dispatch_us, dispatch_flags;
+    uint32_t tcp_rx_us, tcp_rx_len;
+    int32_t tcp_seq_gap;
     char id[24], path[64];
     bool active, slow_only;
 } trace;
@@ -24,10 +28,17 @@ static struct {
     bool pending;
 } dispatch;
 static uint32_t boot_id, sequence;
+/* Eight recent WebUI connections, fixed 128-byte table. The TCP task writes,
+ * HTTP task snapshots under a short critical section. No UART in TCP context. */
+static struct {
+    uint16_t port, length;
+    uint32_t at, sequence, expected;
+} tcp_rx[8];
+static unsigned tcp_rx_next;
 /* Compact format in DRAM avoids LX106 byte-load emulation for every format
  * character and reduces UART occupancy. Field order is decoded by the tool. */
 static char trace_format[] =
-    "WEBTRACE [\"%s\",\"%s\",%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%d,%d,%u,%u,%u]\n";
+    "WEBTRACE [\"%s\",\"%s\",%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%d,%d,%u,%u,%u,%u,%u,%d]\n";
 
 uint32_t httpd_trace_clock(void) {
     int saved_errno = errno;
@@ -41,6 +52,29 @@ void httpd_trace_begin(void) {
     snprintf(trace.id, sizeof(trace.id), "%08x-%u", (unsigned)boot_id, (unsigned)++sequence);
     trace.active = true;
     trace.start = httpd_trace_clock();
+}
+void httpd_trace_tcp_packet(uint16_t port, uint16_t length,
+                            uint32_t seq, uint32_t expected) {
+    if (!port || !length) return;
+    uint32_t at = httpd_trace_clock();
+    taskENTER_CRITICAL();
+    unsigned i;
+    for (i = 0; i < 8; ++i) if (tcp_rx[i].port == port) break;
+    if (i == 8) { i = tcp_rx_next; tcp_rx_next = (tcp_rx_next + 1U) % 8U; }
+    tcp_rx[i].port = port; tcp_rx[i].length = length; tcp_rx[i].at = at;
+    tcp_rx[i].sequence = seq; tcp_rx[i].expected = expected;
+    taskEXIT_CRITICAL();
+}
+void httpd_trace_tcp_snapshot(uint16_t port) {
+    if (!trace.active || !port) return;
+    taskENTER_CRITICAL();
+    for (unsigned i = 0; i < 8; ++i) if (tcp_rx[i].port == port) {
+        trace.tcp_rx_us = tcp_rx[i].at;
+        trace.tcp_rx_len = tcp_rx[i].length;
+        trace.tcp_seq_gap = (int32_t)(tcp_rx[i].sequence - tcp_rx[i].expected);
+        break;
+    }
+    taskEXIT_CRITICAL();
 }
 void httpd_trace_dispatch(uint32_t select_start, uint32_t select_end, bool readable) {
     dispatch.start = select_start;
@@ -135,6 +169,7 @@ void httpd_trace_end(int result) {
         (unsigned)trace.tx_sleep_budget_us, (unsigned)trace.mem_wait_us, (unsigned)trace.other_wait_us, trace.mem_errors,
         (unsigned)trace.retries, (unsigned)trace.bytes, (unsigned)trace.calls, result,
         trace.last_errno, (unsigned)trace.select_wait_us,
-        (unsigned)trace.dispatch_us, (unsigned)trace.dispatch_flags);
+        (unsigned)trace.dispatch_us, (unsigned)trace.dispatch_flags,
+        (unsigned)trace.tcp_rx_us, (unsigned)trace.tcp_rx_len, (int)trace.tcp_seq_gap);
     }
 }

@@ -21,6 +21,9 @@
 #include "esp_httpd_priv.h"
 #include "httpd_trace.h"
 #include <sys/fcntl.h>
+#if YORADIO_ESP8266_WEB_PROFILE
+#include "lwip/sockets.h"
+#endif
 
 static const char *TAG = "httpd_sess";
 
@@ -306,6 +309,12 @@ esp_err_t httpd_sess_process(struct httpd_data *hd, int newfd)
     httpd_trace_request_begin(sd->ws_handshake_done);
 #else
     httpd_trace_request_begin(false);
+#endif
+#if YORADIO_ESP8266_WEB_PROFILE
+    struct sockaddr_in peer;
+    socklen_t peer_size = sizeof(peer);
+    if (getpeername(newfd, (struct sockaddr *)&peer, &peer_size) == 0)
+        httpd_trace_tcp_snapshot(ntohs(peer.sin_port));
 #endif
     esp_err_t request_result = httpd_req_new(hd, sd);
     httpd_trace_end(request_result);

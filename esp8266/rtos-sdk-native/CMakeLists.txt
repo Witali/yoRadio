@@ -14,3 +14,11 @@ endif()
 set(EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/components")
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yoradio_esp8266_helix_native)
+
+# Instrument the configured SDK through its supported hook, not by modifying
+# the downloaded SDK. Nothing is injected into ordinary non-profiled builds.
+if(YORADIO_ESP8266_WEB_PROFILE)
+  idf_component_get_property(web_trace_lwip lwip COMPONENT_LIB)
+  target_compile_definitions(${web_trace_lwip} PRIVATE
+    LWIP_HOOK_FILENAME="${CMAKE_CURRENT_LIST_DIR}/components/esp_http_server/include/web_trace_lwip_hook.h")
+endif()

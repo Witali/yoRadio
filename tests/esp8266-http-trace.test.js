@@ -40,11 +40,15 @@ test('actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-saf
   fs.writeFileSync(path.join(dir,'esp_timer.h'),'#include <stdint.h>\nint64_t esp_timer_get_time(void);\n');
   fs.writeFileSync(path.join(dir,'esp_system.h'),'#include <stdint.h>\nuint32_t esp_random(void);\n');
   fs.writeFileSync(path.join(dir,'esp_log.h'),'#define ESP_LOG_INFO 3\n#define esp_log_write(level,tag,...) do {(void)(level);(void)(tag);printf(__VA_ARGS__);}while(0)\n');
+  fs.mkdirSync(path.join(dir,'freertos'));
+  fs.writeFileSync(path.join(dir,'freertos/FreeRTOS.h'),'#pragma once\n');
+  fs.writeFileSync(path.join(dir,'freertos/task.h'),'#define taskENTER_CRITICAL() ((void)0)\n#define taskEXIT_CRITICAL() ((void)0)\n');
   fs.writeFileSync(path.join(dir,'test.c'),`#include "httpd_trace.h"
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
+#include "web_trace_lwip_hook.h"
 static uint32_t now=0xfffffff0U;
 int64_t esp_timer_get_time(void){errno=EDOM;return now;}
 uint32_t esp_random(void){return 0xabcdef01;}
@@ -66,7 +70,17 @@ int main(void){
   assert(httpd_trace_ws_begin());now+=100;httpd_trace_ws_end(-1);
   uint32_t selected=now;now+=250000;
   httpd_trace_dispatch(selected,now,true);now+=32000;
-  httpd_trace_request_begin(true);s=now;now+=700;httpd_trace_recv(s);
+  enum { LISTEN=1 };
+  struct {int state;uint16_t local_port,remote_port;uint32_t rcv_nxt;} pcb={2,80,123,0xfffffff0U};
+  struct {uint32_t seqno;} hdr={3};struct {uint16_t tot_len;} payload={16};
+  assert(LWIP_HOOK_TCP_INPACKET_PCB(&pcb,&hdr,0,0,0,&payload)==0);
+  pcb.state=LISTEN;payload.tot_len=99;
+  assert(LWIP_HOOK_TCP_INPACKET_PCB(&pcb,&hdr,0,0,0,&payload)==0);
+  pcb.state=2;pcb.local_port=81;
+  assert(LWIP_HOOK_TCP_INPACKET_PCB(&pcb,&hdr,0,0,0,&payload)==0);
+  now+=300;
+  httpd_trace_request_begin(true);httpd_trace_tcp_snapshot(123);
+  s=now;now+=700;httpd_trace_recv(s);
   httpd_trace_index_begin();now+=20;httpd_trace_end(0);httpd_trace_end(0);
   return 0;}
 `);
@@ -86,9 +100,11 @@ int main(void){
   assert.equal(decodeTrace(JSON.parse(lines[2].slice('WEBTRACE '.length))).result,-1);
   const dispatch=decodeTrace(JSON.parse(lines[3].slice('WEBTRACE '.length)));
   assert.equal(dispatch.path,'/ws:getindex');assert.equal(dispatch.select_wait_us,250000);
-  assert.equal(dispatch.dispatch_us,32000);assert.equal(dispatch.dispatch_flags,1);
+  assert.equal(dispatch.dispatch_us,32300);assert.equal(dispatch.dispatch_flags,1);
   assert.equal(dispatch.recv_us,700);assert.equal(dispatch.parse_us,700);
   assert.equal(dispatch.total_us,720);assert.equal(dispatch.tx_wait_us,0);
+  assert.equal((dispatch.start_us-dispatch.tcp_rx_us)>>>0,300);
+  assert.equal(dispatch.tcp_rx_len,16);assert.equal(dispatch.tcp_seq_gap,19);
 });
 
 test('startup correlation bounds delay before WS dispatch without calling it network wait',()=>{
@@ -109,6 +125,6 @@ test('startup correlation bounds delay before WS dispatch without calling it net
   assert.equal(r.excluded,0);assert.equal(r.processingFailures,1);
   assert.equal(analyze({loads},serial+'\nWEBTRACE '+JSON.stringify(index)).samples[0].startup,null);
   assert.equal(analyze({loads:[{...loads[0],pageTrace:{indexSentMs:100}}]},serial).samples[0].startup,null);
-  for(const n of [18,19,22])assert.ok(decodeTrace(Array(n).fill(0)));
+  for(const n of [18,19,22,25])assert.ok(decodeTrace(Array(n).fill(0)));
   assert.throws(()=>decodeTrace(Array(20).fill(0)),/Unknown/);
 });
