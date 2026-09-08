@@ -250,7 +250,10 @@ test("ESP8266 radio retries short socket timeouts until the HTTP header deadline
 test("ESP8266 reconnects a clean radio EOF unless control changed", () => {
   assert.ok(audioSource.includes("feed == 0 && generation_current(command.generation)"));
   assert.ok(audioSource.includes('native_state_set_audio(false, true, "RECONNECTING")'));
-  assert.ok(audioSource.includes("xQueueOverwrite(s_commands, &command)"));
+  assert.equal((audioSource.match(/requeue_if_current\(&command\)/g) || []).length, 2);
+  const retry = audioSource.slice(audioSource.indexOf("static void requeue_if_current"),
+    audioSource.indexOf("static uint32_t advance_generation"));
+  assert.match(retry, /taskENTER_CRITICAL\(\);\s+if \(generation_current\(command->generation\)\)\s+xQueueOverwrite\(s_commands, command\);\s+taskEXIT_CRITICAL\(\);/);
 });
 test("ESP8266 radio checks a header that exactly fills its receive buffer", () => {
   assert.match(

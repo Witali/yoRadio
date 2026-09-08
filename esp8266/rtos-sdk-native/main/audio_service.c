@@ -256,6 +256,15 @@ static bool generation_current(uint32_t generation) {
     return s_generation == generation;
 }
 
+static void requeue_if_current(const audio_command_t *command) {
+    /* Do not let an old retry overwrite Stop or a newer station between the
+     * generation check and the nonblocking, single-slot queue update. */
+    taskENTER_CRITICAL();
+    if (generation_current(command->generation))
+        xQueueOverwrite(s_commands, command);
+    taskEXIT_CRITICAL();
+}
+
 static uint32_t advance_generation(void) {
     taskENTER_CRITICAL();
     uint32_t generation = ++s_generation;
@@ -950,8 +959,7 @@ static void audio_task(void *argument) {
             native_audio_output_silence();
             native_state_set_audio(false, true, "RECONNECTING");
             vTaskDelay(pdMS_TO_TICKS(250U));
-            if (generation_current(command.generation))
-                xQueueOverwrite(s_commands, &command);
+            requeue_if_current(&command);
         } else if (current) {
             native_audio_output_silence();
             if (feed < 0)
@@ -1166,8 +1174,7 @@ static void audio_task(void *argument) {
             native_audio_output_silence();
             native_state_set_audio(false, true, "RECONNECTING");
             vTaskDelay(pdMS_TO_TICKS(250U));
-            if (generation_current(command.generation))
-                xQueueOverwrite(s_commands, &command);
+            requeue_if_current(&command);
             continue;
         }
         if (generation_current(command.generation)) {
