@@ -135,6 +135,10 @@ retained, not memory consumed by the benchmark or whole-system idle time.
 
 ## Implications and next work
 
+The prioritized implementation checklist is saved separately in
+[the Wi-Fi/HTTP receive optimization plan](ESP8266_WIFI_RX_OPTIMIZATION_PLAN.md).
+Saving the plan does not enable its production changes.
+
 1. Current HTTP reception has average headroom over 320 kbit/s, but no
    tested bitrate is certified continuously reliable in these conditions.
 2. At 320 kbit/s, bridging the observed 947-ms receive-only gap would need
