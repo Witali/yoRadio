@@ -10,11 +10,54 @@ typedef struct {
     uint32_t bytes, calls, empty_calls, max_rx_gap, max_app_gap;
     uint32_t max_empty_wait, max_recv_us, max_commit_us, ready_max, ready_probes;
     uint32_t minimum_heap, pcm_frames, pcm_rate;
+    uint32_t recv_total_us, recv_positive_us, recv_empty_us;
     uint32_t bins[NET_BENCH_SECONDS];
     int64_t started, last_positive, last_recv_end, empty_since;
     bool output;
 } network_bench_stats_t;
 static network_bench_stats_t s_net_bench;
+
+#if YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
+/* Diagnostic-only static snapshots; no extra stack or heap allocation.
+ * Task accounting includes interrupts in whichever task was interrupted. */
+#define NET_CPU_TASKS 24
+static TaskStatus_t s_net_tasks[NET_CPU_TASKS];
+static char s_net_task_names[NET_CPU_TASKS][configMAX_TASK_NAME_LEN];
+static struct { UBaseType_t id; uint32_t runtime; } s_net_cpu_before[NET_CPU_TASKS];
+static UBaseType_t s_net_cpu_count;
+static uint32_t s_net_cpu_total;
+static void net_cpu_begin(void) {
+    s_net_cpu_count = uxTaskGetSystemState(s_net_tasks, NET_CPU_TASKS, &s_net_cpu_total);
+    for (UBaseType_t n = 0; n < s_net_cpu_count; ++n) {
+        s_net_cpu_before[n].id = s_net_tasks[n].xTaskNumber;
+        s_net_cpu_before[n].runtime = s_net_tasks[n].ulRunTimeCounter;
+    }
+}
+static void net_cpu_end(int measurement) {
+    uint32_t total = 0;
+    /* Copy task names while deletion is suspended, before UART logging. */
+    vTaskSuspendAll();
+    UBaseType_t count = uxTaskGetSystemState(s_net_tasks, NET_CPU_TASKS, &total);
+    for (UBaseType_t n = 0; n < count; ++n)
+        snprintf(s_net_task_names[n], sizeof(s_net_task_names[n]), "%s", s_net_tasks[n].pcTaskName);
+    xTaskResumeAll();
+    ESP_LOGI("net_cpu", "case=%d valid=%u total_us=%u tasks_before=%u tasks_after=%u snapshot_bytes=%u",
+             measurement, s_net_cpu_count > 0 && count > 0, total-s_net_cpu_total,
+             (unsigned)s_net_cpu_count, (unsigned)count,
+             (unsigned)(sizeof(s_net_tasks)+sizeof(s_net_task_names)+sizeof(s_net_cpu_before)));
+    for (UBaseType_t n = 0; n < count; ++n) {
+        uint32_t before = 0;
+        bool found = false;
+        for (UBaseType_t k = 0; k < s_net_cpu_count; ++k)
+            if (s_net_tasks[n].xTaskNumber == s_net_cpu_before[k].id) {
+                before = s_net_cpu_before[k].runtime; found = true; break;
+            }
+        ESP_LOGI("net_cpu", "case=%d task=%s id=%u runtime_us=%u existed=%u",
+                 measurement, s_net_task_names[n], (unsigned)s_net_tasks[n].xTaskNumber,
+                 s_net_tasks[n].ulRunTimeCounter-before, found);
+    }
+}
+#endif
 
 static uint32_t net_bench_elapsed(int64_t start) {
     int64_t dt = esp_timer_get_time() - start;
@@ -48,9 +91,11 @@ static void network_benchmark_run(void) {
         {"/mp3-128?rate=128", HELIX_CODEC_MP3, false},
         {"/mp3-320?rate=320", HELIX_CODEC_MP3, false},
         {"/aac-64?rate=64", HELIX_CODEC_AAC, false},
+#if !YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
         {"/mp3-128?rate=128", HELIX_CODEC_MP3, true},
         {"/mp3-320?rate=320", HELIX_CODEC_MP3, true},
         {"/aac-64?rate=64", HELIX_CODEC_AAC, true},
+#endif
 #endif
     };
     ESP_LOGI(tag, "begin cases=%u", (unsigned)(sizeof(cases)/sizeof(cases[0])));
@@ -68,6 +113,15 @@ static void network_benchmark_run(void) {
     settings.balance = 0;
     persistent_settings_update_runtime(&settings);
     network_service_set_streaming(true);
+#if YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
+    helix_codec_t *baseline_codec = helix_codec_create(HELIX_CODEC_MP3, CODEC_HEAP_RESERVE_BYTES);
+    if (!baseline_codec) { network_service_set_streaming(false); return; }
+    ESP_LOGI(tag, "connected baseline: 20 seconds, decoder retained, no stream");
+    net_cpu_begin();
+    vTaskDelay(pdMS_TO_TICKS(NET_BENCH_SECONDS * 1000U));
+    net_cpu_end(-1);
+    helix_codec_destroy(baseline_codec);
+#endif
     for (unsigned n = 0; n < sizeof(cases)/sizeof(cases[0]) &&
                          generation_current(generation); ++n) {
         char url[AUDIO_URL_BYTES];
@@ -96,6 +150,9 @@ static void network_benchmark_run(void) {
         native_audio_output_reset_normalizer();
         native_audio_output_reset_spi_stats();
         uint32_t eof_before = esp8266_nodac_i2s_eofs();
+#if YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
+        net_cpu_begin();
+#endif
         s_net_bench.started = esp_timer_get_time();
         s_net_bench.last_positive = s_net_bench.started;
         s_net_bench.last_recv_end = s_net_bench.started;
@@ -119,6 +176,11 @@ static void network_benchmark_run(void) {
                           net_bench_elapsed(s_net_bench.last_recv_end));
             int received = stream_receive(&stream, destination, capacity);
             int receive_errno = errno;
+            uint32_t recv_us = net_bench_elapsed(before);
+            s_net_bench.recv_total_us += recv_us;
+            if (received > 0) s_net_bench.recv_positive_us += recv_us;
+            else if (received < 0 && (receive_errno == EAGAIN || receive_errno == EWOULDBLOCK))
+                s_net_bench.recv_empty_us += recv_us;
             ++s_net_bench.calls;
             net_bench_max(&s_net_bench.max_recv_us, net_bench_elapsed(before));
             s_net_bench.last_recv_end = esp_timer_get_time();
@@ -154,11 +216,16 @@ static void network_benchmark_run(void) {
         uint32_t eof_after = esp8266_nodac_i2s_eofs();
         native_audio_output_spi_stats_t dma;
         native_audio_output_get_spi_stats(&dma);
+#if YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
+        net_cpu_end((int)n);
+#endif
         close(stream.socket);
         native_audio_output_silence();
         ESP_LOGI(tag, "case=%u output=%u wall_us=%u bytes=%u open_us=%u error=%d rssi=%d heap_min=%u",
                  n, cases[n].output, wall_us, s_net_bench.bytes, open_us, error,
                  net_bench_rssi(), s_net_bench.minimum_heap);
+        ESP_LOGI(tag, "case=%u recv_total_us=%u recv_positive_us=%u recv_empty_us=%u",
+                 n, s_net_bench.recv_total_us, s_net_bench.recv_positive_us, s_net_bench.recv_empty_us);
         ESP_LOGI(tag, "case=%u calls=%u empty=%u rx_gap_us=%u app_gap_us=%u empty_wait_us=%u recv_max_us=%u commit_max_us=%u ready_max=%u ready_probes=%u",
                  n, s_net_bench.calls, s_net_bench.empty_calls, s_net_bench.max_rx_gap,
                  s_net_bench.max_app_gap, s_net_bench.max_empty_wait, s_net_bench.max_recv_us,

@@ -54,3 +54,21 @@ test('network report does not discard failed or partial measurements',()=>{
   assert.equal(result.complete,false);
   assert.equal(summarize(log.replace('error=0','error=-116')).cases[0].completed,false);
 });
+
+test('runtime report separates task residency and baseline from receive elapsed time',()=>{
+  const {summarize}=require('../tools/esp8266_audio_profile/summarize_network.cjs');
+  const report=summarize('net_bench: begin cases=4\n'+
+    'net_cpu: case=-1 valid=1 total_us=20000000 tasks_before=2 tasks_after=2\n'+
+    'net_cpu: case=-1 task=IDLE id=1 runtime_us=19000000 existed=1\n'+
+    'net_cpu: case=-1 task=tiT id=2 runtime_us=1000000 existed=1\n');
+  assert.equal(report.cases.length,4);
+  assert.equal(report.cpu[0].case,-1);
+  assert.equal(report.cpu[0].idle_percent,95);
+  assert.equal(report.cpu[0].non_idle_percent,5);
+  assert.equal(report.cpu[0].accounted_percent,100);
+  assert.equal(summarize('net_cpu: case=0 valid=0 total_us=0').cpu[0].idle_percent,null);
+  const source=fs.readFileSync('esp8266/rtos-sdk-native/main/network_benchmark.inc','utf8');
+  assert.match(source,/uxTaskGetSystemState/);
+  assert.match(source,/recv_total_us/);
+  assert.match(source,/net_cpu_end\(-1\)/);
+});

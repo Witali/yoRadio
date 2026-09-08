@@ -4,7 +4,17 @@ const {readLog}=require('./summarize_mp3_matrix.cjs');
 function summarize(log) {
   const count=Number(/net_bench: begin cases=(\d+)/.exec(log)?.[1]||7);
   const cases=Array.from({length:count},(_,id)=>({case:id,seconds:[]}));
+  const cpu=new Map();
   for(const line of log.split(/\r?\n/)) {
+    if(line.includes('net_cpu: case=')) {
+      const fields=Object.fromEntries([...line.matchAll(/(\w+)=(-?\d+)/g)]
+        .map(m=>[m[1],Number(m[2])]));
+      const row=cpu.get(fields.case)||{case:fields.case,tasks:[]};
+      const task=/task=(\S+)/.exec(line)?.[1];
+      if(task)row.tasks.push({name:task,id:fields.id,runtime_us:fields.runtime_us,existed:fields.existed===1});
+      else Object.assign(row,fields);
+      cpu.set(fields.case,row);continue;
+    }
     if(!line.includes('net_bench: case='))continue;
     const fields=Object.fromEntries([...line.matchAll(/(\w+)=(-?\d+)/g)]
       .map(m=>[m[1],Number(m[2])]));
@@ -27,7 +37,13 @@ function summarize(log) {
     if(!c.ready_probe_supported)c.ready_max=null;
     c.kept_up=c.completed && (!c.target_kbps || c.rate_ratio>=0.98);
   }
-  return {complete:log.includes('net_bench: complete'),cases};
+  for(const row of cpu.values()) {
+    for(const task of row.tasks)task.percent=row.total_us ? task.runtime_us*100/row.total_us : null;
+    row.accounted_percent=row.tasks.reduce((sum,t)=>sum+(t.percent||0),0);
+    row.idle_percent=row.tasks.find(t=>t.name==='IDLE')?.percent ?? null;
+    row.non_idle_percent=row.idle_percent===null ? null : 100-row.idle_percent;
+  }
+  return {complete:log.includes('net_bench: complete'),cases,cpu:[...cpu.values()]};
 }
 module.exports={summarize};
 if(require.main===module) {
@@ -38,7 +54,7 @@ if(require.main===module) {
     fs.writeFileSync(save,json);
     // Keep all benchmark records, without SSID/BSSID or unrelated startup messages.
     fs.writeFileSync(save.replace(/\.json$/,'')+'.log',
-      log.split(/\r?\n/).filter(s=>s.includes('net_bench:')).join('\n')+'\n');
+      log.split(/\r?\n/).filter(s=>s.includes('net_bench:')||s.includes('net_cpu:')).join('\n')+'\n');
   }
   console.log(json);
   if(!report.complete || report.cases.some(c=>!c.completed))process.exitCode=1;
