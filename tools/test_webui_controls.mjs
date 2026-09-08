@@ -5,6 +5,7 @@ import { createInterface } from "node:readline/promises";
 
 const args = process.argv.slice(2);
 const physical = args.includes("--physical");
+const noDisplay = args.includes("--no-display");
 const hostIndex = args.indexOf("--host");
 const host = hostIndex >= 0 ? args[hostIndex + 1] : "192.168.100.4";
 const timeoutIndex = args.indexOf("--timeout");
@@ -22,6 +23,7 @@ Options:
   --host ADDRESS     Board address (default: 192.168.100.4)
   --timeout MS       Per-step timeout (default: 20000)
   --physical         Also verify short, double and long BOOT gestures
+  --no-display       Do not require a display settings group on headless builds
   --station INDEX    Known working station used for the playlist-row Play test;
                      defaults to station 1 or 2, whichever is not current
   --help             Show this help
@@ -141,12 +143,13 @@ async function testSettingsResponses() {
     "getactive=1",
     "client mode exposes the full settings groups",
     data => Array.isArray(data.act) && data.act.includes("group_system") &&
-            data.act.includes("group_display"),
+            data.act.includes("group_timezone") && data.act.includes("group_controls") &&
+            (noDisplay || data.act.includes("group_display")),
   );
   await query("getsystem=1", "system settings are returned",
               data => "normalize" in data && "normtime" in data);
-  await query("getscreen=1", "display settings are returned",
-              data => "br" in data && "scrt" in data);
+  if(!noDisplay) await query("getscreen=1", "display settings are returned",
+                            data => "br" in data && "scrt" in data);
   await query("gettimezone=1", "timezone settings are returned",
               data => "sntp1" in data && "timeint" in data);
   await query("getcontrols=1", "control settings are returned",
