@@ -8,6 +8,7 @@ test('physical volume benchmark starts inward at either limit and never awaits a
   const source=fs.readFileSync(path.join(root,'tools/test_esp8266_webui_latency.cjs'),'utf8');
   const fn=source.slice(source.indexOf('function volumeButtonSelector'),source.indexOf('async function buttons'));
   const selector=require('node:vm').runInNewContext(fn+';volumeButtonSelector');
+  assert.match(source,/if\(!await load\(page,'playing-'\+codec,round\)\)[\s\S]*?throw new Error/);
   for(const original of [0,1,2,128,253,254]) {
     let current=original;
     for(let i=0;i<10;++i){const next=Math.min(254,Math.max(0,current+(selector(original,i)==='#volpbutton'?2:-2)));

@@ -189,14 +189,16 @@ async function stress(page, context, round) {
         if(!state.playing||state.codec!==codec) throw new Error('Audio stopped during '+phase);
       };
       await status('before-'+codec);
-      await load(page,'playing-'+codec,round);
+      if(!await load(page,'playing-'+codec,round))
+        throw new Error('Player page not ready during '+codec+'; controls were not exercised');
       await buttons(page);
       const second=await context.newPage();
       second.on('pageerror',e=>report.errors.push(e.message));
       try {
         // Keep issuing real volume clicks while the other tab loads its shell
         // and entire playlist. No artificial idle gap before each command.
-        await Promise.all([load(second,'concurrent-'+codec,round),buttons(page)]);
+        const [secondReady]=await Promise.all([load(second,'concurrent-'+codec,round),buttons(page)]);
+        if(!secondReady) throw new Error('Second player page not ready during '+codec);
         await status('two-tabs-'+codec);
       }finally{await second.close();}
     }
