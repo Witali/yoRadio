@@ -228,7 +228,9 @@ esp_err_t httpd_uri(struct httpd_data *hd)
         }
         aux->sd->ws_handshake_done = true;
         aux->sd->ws_handler = uri->handler;
-        return ESP_OK;
+        /* Notify the application only after a successful upgrade. It can
+         * send an opted-in initial snapshot without an extra client frame. */
+        return uri->handler(req);
     }
 #endif
 

@@ -638,8 +638,14 @@ static void handle_command(httpd_req_t *request, char *command) {
 
 static esp_err_t websocket_handler(httpd_req_t *request) {
     if (request->method == HTTP_GET) {
-        ESP_LOGI(TAG, "WebUI client connected on socket %d",
-                 httpd_req_to_sockfd(request));
+        char query[32], initial[4];
+        if (httpd_req_get_url_query_str(request, query, sizeof(query)) == ESP_OK &&
+            httpd_query_key_value(query, "initial", initial, sizeof(initial)) == ESP_OK &&
+            strcmp(initial, "1") == 0) {
+            if (!subscribe_socket(httpd_req_to_sockfd(request))) return ESP_FAIL;
+            return send_initial_state(request);
+        }
+        /* Legacy clients still explicitly send getindex after installing DOM. */
         return ESP_OK;
     }
 

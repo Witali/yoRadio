@@ -48,6 +48,8 @@ def build(root, page='player'):
     preloaded = json.dumps({name: assets[name] for name in (fragment, 'logo.svg')},
                           ensure_ascii=True, separators=(',', ':')).replace('<', r'\u003c')
     variables += 'window.yoUiAssets=' + preloaded + ';'
+    if page == 'player':
+        variables += 'var webSocketInitialState=true;'
     variables += ("history.replaceState(null,'',location.pathname+'?ui='+webUiRevision);")
     def script(text):
         return '<script>' + re.sub(r'</script', r'<\\/script', text, flags=re.I) + '</script>'
