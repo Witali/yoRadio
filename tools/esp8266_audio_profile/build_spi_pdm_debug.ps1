@@ -1,11 +1,13 @@
 param(
     [string]$SdkPath = '.worktree/esp8266-native-port/.build/esp8266-rtos-sdk',
     [switch]$ToneTest,
-    [switch]$WebProfile
+    [switch]$WebProfile,
+    [switch]$NoPlaylistGzip
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
-$taskVariant = if ($ToneTest) { 'esp8266-spi-pdm-tone' } else { 'esp8266-spi-pdm-debug' }
+if ($ToneTest -and $NoPlaylistGzip) { throw 'Use NoPlaylistGzip with the normal-radio profile' }
+$taskVariant = if ($ToneTest) { 'esp8266-spi-pdm-tone' } elseif ($NoPlaylistGzip) { 'esp8266-spi-pdm-raw-playlist' } else { 'esp8266-spi-pdm-debug' }
 $taskToneFlag = if ($ToneTest) { 'ON' } else { 'OFF' }
 $taskWebFlag = if ($WebProfile) { 'ON' } else { 'OFF' }
 $taskBuild = "$taskRoot/.build/$taskVariant"
@@ -28,6 +30,9 @@ try {
     # Mechanically overlay only these audio choices; inherit current RAM,
     # codecs, HTTP, partition table, clocks and logging from board defaults.
     $taskDefaults = Get-Content esp8266/rtos-sdk-native/sdkconfig.defaults -Raw
+    if ($NoPlaylistGzip) {
+        $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y', 'CONFIG_YORADIO_PLAYLIST_WEB_GZIP=n')
+    }
     foreach ($taskLine in Get-Content esp8266/rtos-sdk-native/sdkconfig.spi-pdm-debug.defaults) {
         if ($taskLine -match '^(CONFIG_[A-Z0-9_]+)=') {
             $taskPattern = '(?m)^' + $Matches[1] + '=.*$'
@@ -52,6 +57,8 @@ try {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
     if ($taskConfig -match '(?m)^CONFIG_YORADIO_AUDIO_OUTPUT_I2S_(PDM|RCPDM|PCM)=y') { throw 'I2S must be disabled' }
+    $taskGzipEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y\r?$'
+    if ($taskGzipEnabled -eq [bool]$NoPlaylistGzip) { throw 'Wrong cached playlist compression choice' }
     Write-Output "Building $taskVariant, CPU160, QIO40"
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/ninja/1.9.0/ninja.exe" @('-C', $taskBuild) "$taskBuild/build.log"
     New-Item -ItemType Directory -Path $taskArtifact -Force | Out-Null
@@ -61,6 +68,7 @@ try {
         purpose=if ($ToneTest) { '1 kHz sine, 500 ms on/off, no Wi-Fi or decoder; build does not flash' } else { 'Temporary normal radio SPI-PDM debug profile; build does not flash' }
         tone_test=[bool]$ToneTest
         web_profile=[bool]$WebProfile
+        playlist_web_gzip=[bool]$taskGzipEnabled
         built_utc=[DateTime]::UtcNow.ToString('o'); source_revision=(git rev-parse HEAD)
         app_sha256=(Get-FileHash "$taskArtifact/app.bin").Hash
         bytes=(Get-Item "$taskArtifact/app.bin").Length; app_address='0x10000'

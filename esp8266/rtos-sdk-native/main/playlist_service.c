@@ -1,4 +1,5 @@
 #include "playlist_service.h"
+#include "playlist_web_cache.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,6 +73,7 @@ esp_err_t playlist_service_install(const char *temporary, bool *changed) {
     if (same_playlist_locked(temporary)) {
         result = remove(temporary) == 0 ? ESP_OK : ESP_FAIL;
     } else if (file_recover(PLAYLIST_PATH)) {
+        playlist_web_cache_invalidate();
         bool previous = file_exists(PLAYLIST_PATH);
         /* Invalidate even an equal-size old index before publishing new CSV.
          * Keep old CSV until the replacement's index has been built. */
@@ -94,6 +96,7 @@ esp_err_t playlist_service_install(const char *temporary, bool *changed) {
             (void)rebuild_locked(); /* Failed to rename old CSV: restore its index. */
         }
     }
+    if (result == ESP_OK) playlist_web_cache_refresh();
     xSemaphoreGive(s_lock);
     return result;
 }
@@ -203,6 +206,7 @@ static bool load_index_locked(void) {
 }
 
 static esp_err_t rebuild_locked(void) {
+    playlist_web_cache_invalidate();
     struct stat playlist_stat;
     FILE *playlist = fopen(PLAYLIST_PATH, "rb");
     if (!playlist || stat(PLAYLIST_PATH, &playlist_stat) != 0 ||
@@ -272,6 +276,7 @@ esp_err_t playlist_service_init(void) {
     if (!s_lock) return ESP_ERR_NO_MEM;
     xSemaphoreTake(s_lock, portMAX_DELAY);
     esp_err_t result = load_index_locked() ? ESP_OK : rebuild_locked();
+    if (result == ESP_OK) playlist_web_cache_refresh();
     xSemaphoreGive(s_lock);
     return result;
 }
@@ -280,6 +285,7 @@ esp_err_t playlist_service_rebuild(void) {
     if (!s_lock) return ESP_ERR_INVALID_STATE;
     xSemaphoreTake(s_lock, portMAX_DELAY);
     esp_err_t result = rebuild_locked();
+    if (result == ESP_OK) playlist_web_cache_refresh();
     xSemaphoreGive(s_lock);
     return result;
 }

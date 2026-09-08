@@ -137,6 +137,18 @@ config YORADIO_I2S_PDM_OVERSAMPLE_128
 
 endchoice
 
+config YORADIO_PLAYLIST_WEB_GZIP
+    bool "Cache a compressed WebUI playlist in SPIFFS"
+    default y
+    help
+        Build a bounded-memory gzip representation after a playlist upload.
+        Reuse it on boot after source/body CRC validation and stream it to
+        browsers without recompressing per request. Requires about 4.3 KiB
+        temporary RAM during generation, and compressed-list space in SPIFFS.
+        The original CSV and station index remain authoritative. If disabled,
+        the encoder and cache implementation are excluded and the WebUI uses
+        ordinary bounded CSV streaming. Existing cache files are left intact.
+
 config YORADIO_WEB_SEND_TIMEOUT_SECONDS
     int "Web content send timeout (seconds)"
     range 1 30

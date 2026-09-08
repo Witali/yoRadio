@@ -16,6 +16,9 @@ set(YORADIO_SOURCES
     "status_led.c"
     "storage_service.c"
     "time_service.c")
+if(CONFIG_YORADIO_PLAYLIST_WEB_GZIP)
+    list(APPEND YORADIO_SOURCES "playlist_web_cache.c" "small_gzip.c")
+endif()
 list(APPEND YORADIO_SOURCES
     "web_pages_bridge.cpp"
     "web_service.c")

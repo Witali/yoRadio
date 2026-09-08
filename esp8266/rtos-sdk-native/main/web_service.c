@@ -22,6 +22,7 @@
 #include "native_state.h"
 #include "persistent_settings.h"
 #include "playlist_service.h"
+#include "playlist_web_cache.h"
 #include "radio_control.h"
 #include "time_service.h"
 #include "web_pages_bridge.h"
@@ -878,6 +879,42 @@ static esp_err_t asset_handler(httpd_req_t *request) {
 }
 
 static esp_err_t playlist_handler(httpd_req_t *request) {
+    prepare_short_response(request);
+    httpd_resp_set_hdr(request, "Vary", "Accept-Encoding");
+    char encoding[128];
+    const char *accept_encoding = NULL;
+    if (httpd_req_get_hdr_value_str(request, "Accept-Encoding", encoding, sizeof(encoding)) == ESP_OK)
+        accept_encoding = encoding;
+    else if (httpd_req_get_hdr_value_len(request, "Accept-Encoding") >= sizeof(encoding)) {
+        httpd_resp_set_status(request, "431 Request Header Fields Too Large");
+        return finish_short_response(request, send_string(request, "Accept-Encoding too long"));
+    }
+    int gzip_quality = web_encoding_quality(accept_encoding, "gzip");
+    int identity_quality = web_encoding_quality(accept_encoding, "identity");
+    if (gzip_quality > 0 && gzip_quality >= identity_quality) {
+        size_t left;
+        int file = playlist_web_cache_open(&left);
+        if (file >= 0) {
+            httpd_resp_set_type(request, "text/csv; charset=utf-8");
+            httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
+            httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+            esp_err_t result = ESP_OK;
+            while (left && result == ESP_OK) {
+                size_t n = left < sizeof(s_static_scratch) ? left : sizeof(s_static_scratch);
+                ssize_t count = read(file, s_static_scratch, n);
+                if (count <= 0) { result = ESP_FAIL; break; }
+                left -= (size_t)count;
+                result = httpd_resp_send_chunk(request, s_static_scratch, (size_t)count);
+            }
+            close(file);
+            if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
+            return finish_short_response(request, result);
+        }
+    }
+    if (!identity_quality) {
+        httpd_resp_set_status(request, "406 Not Acceptable");
+        return finish_short_response(request, send_string(request, "No acceptable playlist encoding"));
+    }
 #if YORADIO_ESP8266_WEB_PROFILE
     TickType_t profile_start = xTaskGetTickCount(), read_ticks = 0, send_ticks = 0;
 #endif

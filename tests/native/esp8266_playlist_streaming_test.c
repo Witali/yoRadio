@@ -15,6 +15,27 @@ static char s_static_scratch[512], s_async_message[1088];
 static char received[65536], expected[65536];
 static size_t size, largest, calls, fail_call;
 static unsigned count = 1;
+static const char *accept_encoding = "identity";
+static const char *cache_path;
+static char status_text[80];
+static int httpd_req_get_hdr_value_str(httpd_req_t *r, const char *key, char *buffer, size_t capacity) {
+    (void)r; (void)key;
+    if (!accept_encoding || strlen(accept_encoding) >= capacity) return ESP_FAIL;
+    strcpy(buffer, accept_encoding); return ESP_OK;
+}
+static size_t httpd_req_get_hdr_value_len(httpd_req_t *r, const char *key) {
+    (void)r; (void)key; return accept_encoding ? strlen(accept_encoding) : 0;
+}
+static void httpd_resp_set_status(httpd_req_t *r, const char *value) {
+    (void)r; strcpy(status_text, value);
+}
+static int send_string(httpd_req_t *r, const char *value) { (void)r; (void)value; return ESP_OK; }
+static int playlist_web_cache_open(size_t *length) {
+    if (!cache_path) return -1;
+    int fd = open(cache_path, O_RDONLY);
+    if (fd >= 0) { *length = (size_t)lseek(fd, 0, SEEK_END); lseek(fd, 0, SEEK_SET); }
+    return fd;
+}
 static void prepare_short_response(httpd_req_t *r) { (void)r; }
 static int finish_short_response(httpd_req_t *r, int result) { (void)r; return result; }
 static int httpd_resp_send_404(httpd_req_t *r) { (void)r; return 404; }
@@ -105,5 +126,20 @@ int main(int argc, char **argv) {
     assert(size == strlen(expected) && !strcmp(received, expected));
     assert(remove(PLAYLIST_PATH) == 0);
     assert(playlist_handler(&req) == 404);
+    /* Encoded bodies are opaque binary data (including NUL), streamed only
+     * when gzip is acceptable; cached data does not bypass negotiation. */
+    unsigned char compressed[2051];
+    for (unsigned i=0;i<sizeof(compressed);++i) compressed[i]=(unsigned char)i;
+    f=fopen(PLAYLIST_PATH,"wb");assert(f);
+    assert(fwrite(compressed,1,sizeof(compressed),f)==sizeof(compressed));fclose(f);
+    cache_path=PLAYLIST_PATH;accept_encoding="gzip, identity;q=0";size=calls=0;
+    assert(playlist_handler(&req)==ESP_OK);
+    assert(size==sizeof(compressed)&&!memcmp(received,compressed,size));
+    size=calls=0;fail_call=2;assert(playlist_handler(&req)==ESP_FAIL);fail_call=0;
+    accept_encoding="gzip;q=0, identity;q=0";size=calls=0;
+    assert(playlist_handler(&req)==ESP_OK);assert(!strncmp(status_text,"406 ",4)&&size==0);
+    char large[140];memset(large,'x',sizeof(large)-1);large[sizeof(large)-1]=0;
+    accept_encoding=large;assert(playlist_handler(&req)==ESP_OK);assert(!strncmp(status_text,"431 ",4));
+    assert(remove(PLAYLIST_PATH)==0);
     puts("streaming playlist passed");
 }

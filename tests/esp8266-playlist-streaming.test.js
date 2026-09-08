@@ -14,7 +14,8 @@ test('actual buffered playlist handler preserves filtered rows across buffer bou
   const source = path.join(dir,'test.c'), binary=path.join(dir,'test');
   const scratch=Number(web.match(/#define WEB_STATIC_SCRATCH_SIZE (\d+)U/)[1]);
   assert.ok(scratch<=1024,'Keep the output workspace bounded to 1 KiB');
-  fs.writeFileSync(source,fixture.replace(/s_static_scratch\[512\]/g,`s_static_scratch[${scratch}]`).replace('/* IMPLEMENTATION */',filter+'\n'+handler));
+  const encoding=fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/main/web_encoding.h'),'utf8').replace('#pragma once','');
+  fs.writeFileSync(source,fixture.replace(/s_static_scratch\[512\]/g,`s_static_scratch[${scratch}]`).replace('/* IMPLEMENTATION */',encoding+'\n'+filter+'\n'+handler));
   const wsl=process.platform==='win32';
   const platformPath=p=>wsl?'/mnt/'+p[0].toLowerCase()+p.slice(2).replace(/\\/g,'/'):p;
   const options={encoding:'utf8'};
