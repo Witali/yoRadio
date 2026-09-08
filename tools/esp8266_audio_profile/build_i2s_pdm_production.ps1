@@ -46,7 +46,7 @@ try {
         '-DYORADIO_ESP8266_AUDIO_TRACE=OFF', '-DYORADIO_ESP8266_MEMORY_PROFILE=OFF',
         '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
     $taskConfig = Get-Content "$taskBuild/sdkconfig" -Raw
-    foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y')) {
+    foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHMODE_QIO=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y', 'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0', 'CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS=1000')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
     if ($taskConfig -match '(?m)^CONFIG_YORADIO_AUDIO_OUTPUT_(SPI_PDM|I2S_RCPDM|I2S_PCM)=y') { throw 'Only standard I2S PDM is allowed' }
@@ -69,6 +69,11 @@ try {
         output_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/native_audio_output.c).Hash
         web_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/web_service.c).Hash
         playlist_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/playlist_service.c).Hash
+        audio_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/audio_service.c).Hash
+        stream_wait_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_read_wait.h).Hash
+        http_receive_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_txrx.c).Hash
+        stream_read_wait_ms=0; stream_idle_timeout_ms=1000
+        network_benchmark=$false
         cpu_mhz=160; flash='QIO40'; output='I2S PDM32 SLC-DMA'; data_gpio=3; dma_buffers=2; dma_words_per_buffer=512
         pcm_rate=48000; nominal_bit_rate_hz=1536000; bit_rate_hz=1538461; i2s=$true
         partition_layout='app0/app1 960 KiB, SPIFFS 256 KiB; flash app only'
