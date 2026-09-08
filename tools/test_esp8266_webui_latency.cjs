@@ -131,6 +131,45 @@ async function playbackButtons(page) {
     }
   }
 }
+async function stress(page, context, round) {
+  const original=await page.evaluate(()=>({station:Number(currentItem),
+    playing:document.querySelector('#playerwrap').classList.contains('playing')}));
+  report.playingStates ||= [];
+  try {
+    // The board's supported playlist used by the full functional audit.
+    for(const [station,codec] of [[2,'AAC'],[498,'MP3']]) {
+      await page.evaluate(station=>websocket.send('play='+station),station);
+      await page.waitForFunction(({station,codec})=>Number(currentItem)===station &&
+        document.querySelector('#playerwrap').classList.contains('playing') &&
+        document.querySelector('#fmt').textContent.includes(codec),{station,codec},{timeout:20000});
+      await page.waitForTimeout(2000);
+      const status=async phase=>{
+        const state=await page.evaluate(async()=>await (await fetch('/api/native/status',{cache:'no-store'})).json());
+        report.playingStates.push({phase,expectedCodec:codec,...state});save();
+        if(!state.playing||state.codec!==codec) throw new Error('Audio stopped during '+phase);
+      };
+      await status('before-'+codec);
+      await load(page,'playing-'+codec,round);
+      await buttons(page);
+      const second=await context.newPage();
+      second.on('pageerror',e=>report.errors.push(e.message));
+      try {
+        // Keep issuing real volume clicks while the other tab loads its shell
+        // and entire playlist. No artificial idle gap before each command.
+        await Promise.all([load(second,'concurrent-'+codec,round),buttons(page)]);
+        await status('two-tabs-'+codec);
+      }finally{await second.close();}
+    }
+  } finally {
+    await page.evaluate(station=>websocket.send('play='+station),original.station);
+    await page.waitForFunction(station=>Number(currentItem)===station,original.station,{timeout:10000});
+    if(!original.playing) {
+      await page.evaluate(()=>websocket.send('stop=1'));
+      await page.waitForFunction(()=>document.querySelector('#playerwrap').classList.contains('stopped') &&
+        !document.querySelector('#playbutton').classList.contains('connecting'),null,{timeout:10000});
+    }
+  }
+}
 (async()=>{
   browser=await chromium.launch({channel:option('--channel','msedge'),headless:true});
   for(let round=0;round<rounds;round++) {
@@ -153,6 +192,7 @@ async function playbackButtons(page) {
       await page.screenshot({path:path.join(output,`cold-${round}.png`)});
       if(args.includes('--controls')) await buttons(page);
       if(args.includes('--playback')) await playbackButtons(page);
+      if(args.includes('--stress')) await stress(page,context,round);
       await load(page,'warm',round);
     }
     await context.close();
