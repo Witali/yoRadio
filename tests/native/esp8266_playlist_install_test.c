@@ -10,9 +10,12 @@ enum { ESP_OK=0, ESP_FAIL=-1, ESP_ERR_INVALID_STATE=-2 };
 #define PLAYLIST_INDEX_PATH "playlist.idx"
 #define portMAX_DELAY 0
 static int s_lock=1, s_count, builds, fail_once;
+static unsigned invalidations, refreshes;
 static char s_line[672];
 static void xSemaphoreTake(int lock, int timeout) { (void)lock; (void)timeout; }
 static void xSemaphoreGive(int lock) { (void)lock; }
+static void playlist_web_cache_invalidate(void) { ++invalidations; }
+static void playlist_web_cache_refresh(void) { ++refreshes; }
 /* INSTALLER */
 static void put(const char *path, const char *text) {
     FILE *f=fopen(path,"wb"); assert(f);
@@ -33,14 +36,18 @@ int main(void) {
     put(PLAYLIST_PATH,"old row\n"); put("upload.tmp","old row\n");
     assert(playlist_service_install("upload.tmp",&changed)==ESP_OK);
     assert(!changed && !builds && !file_exists("upload.tmp")); expect("old row\n");
+    assert(invalidations==0 && refreshes==1);
     put("upload.tmp","new row\n");
     assert(playlist_service_install("upload.tmp",&changed)==ESP_OK);
     assert(changed && builds==1 && !file_exists(PLAYLIST_PATH ".bak")); expect("new row\n");
+    assert(invalidations==1 && refreshes==2);
     put("upload.tmp","bad row\n"); fail_once=1;
     assert(playlist_service_install("upload.tmp",&changed)==ESP_FAIL);
     assert(!changed && builds==3 && s_count==1); expect("new row\n");
+    assert(invalidations==2 && refreshes==2);
     assert(file_exists(PLAYLIST_INDEX_PATH) && !file_exists(PLAYLIST_PATH ".bak"));
     s_lock=0; changed=true;
     assert(playlist_service_install("missing",&changed)==ESP_ERR_INVALID_STATE && !changed);
+    assert(invalidations==2 && refreshes==2);
     puts("Playlist install tests passed");
 }
