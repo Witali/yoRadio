@@ -325,6 +325,6 @@ async function testSetting(id, command, queryCommand, key, newValue, checkbox=fa
   report.finished=new Date().toISOString();
   fs.writeFileSync(path.join(output,'results.json'),JSON.stringify(report,null,2));
   await browser?.close();
-  if(report.checks.some(c=>!c.pass)) process.exitCode=1;
+  if(report.checks.some(c=>!c.pass) || report.errors.length) process.exitCode=1;
   console.log('REPORT',path.join(output,'results.json'));
 });
