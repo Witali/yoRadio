@@ -12,6 +12,9 @@ DMA progress with generated silence, not music decoding capacity. Do not use
 this MP3 row or older repeated-Info results as an MP3 speed/continuity claim.
 The replacement sequential tone/noise benchmark skips metadata, checks
 nonzero PCM, and reads complete files in order from internal flash.
+See [the replacement report](ESP8266_MP3_FLASH_BENCHMARK_2026-09-08.md):
+64/128 kbit/s pass 26.12 seconds, but 320 kbit/s has 286 underruns even
+without Wi-Fi. Average decoder speed alone does not guarantee continuous DMA.
 
 Wemos D1 mini, CPU160/QIO40, Helix mono MP3 SSO/AAC, I2S PDM32 GPIO3,
 two 512-word DMA buffers. Wi-Fi off, 1500 repetitions of an embedded frame
