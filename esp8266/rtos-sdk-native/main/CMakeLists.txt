@@ -117,6 +117,13 @@ if(YORADIO_ESP8266_AUDIO_PROFILE)
 endif()
 option(YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
   "Benchmark sequential MP3 64/128/320 from internal flash, without AAC" OFF)
+option(YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX
+  "Benchmark sequential AAC-LC 48/64/96 from internal flash" OFF)
+if(YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX AND
+   (NOT YORADIO_ESP8266_CODEC_RAM_BENCHMARK OR
+    YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX OR NOT CONFIG_YORADIO_HELIX_AAC))
+  message(FATAL_ERROR "AAC matrix requires benchmark, AAC enabled, and MP3 matrix OFF")
+endif()
 if(YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX AND NOT YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
   message(FATAL_ERROR "MP3 matrix requires CODEC_RAM_BENCHMARK")
 endif()
@@ -128,6 +135,11 @@ if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
       "../../../tests/fixtures/mp3_composite/mix-064.mp3"
       "../../../tests/fixtures/mp3_composite/mix-128.mp3"
       "../../../tests/fixtures/mp3_composite/mix-320.mp3")
+  elseif(YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX)
+    list(APPEND YORADIO_EMBED_FILES
+      "../../../tests/fixtures/aac_composite/mix-048.aac"
+      "../../../tests/fixtures/aac_composite/mix-064.aac"
+      "../../../tests/fixtures/aac_composite/mix-096.aac")
   else()
     list(APPEND YORADIO_EMBED_FILES
       "../../../tests/fixtures/helix_golden/stereo-320.mp3"
@@ -219,6 +231,10 @@ endif()
 if(YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX=1)
+endif()
+if(YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX=1)
 endif()
 if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE

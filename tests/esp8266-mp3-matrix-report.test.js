@@ -23,3 +23,11 @@ test('decode-only results never certify physical continuity', () => {
   assert.equal(summarize(log(), false).continuous, null);
   assert.equal(summarize(log()+'\nINVALID benchmark', false).valid, false);
 });
+test('AAC report requires all low-rate cases and cannot pass with missing PCM', () => {
+  const names={64:48,128:64,320:96};
+  const aac=log().replace(/MP3\/mix\/(64|128|320)/g,(_,rate)=>'AAC/mix/'+names[rate]);
+  assert.equal(summarize(aac,true,'AAC').continuous,true);
+  assert.equal(summarize(aac.replaceAll('nonzero=1','nonzero=0'),true,'AAC').valid,false);
+  assert.equal(summarize(aac,false,'AAC').continuous,null);
+  assert.throws(()=>summarize(aac,true,'MP3'),/Missing result/);
+});

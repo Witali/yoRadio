@@ -24,6 +24,11 @@ constexpr unsigned kMeasuredFrames = YORADIO_ESP8266_CODEC_RAM_FRAMES;
 constexpr unsigned kLifecycleCycles = 50;
 constexpr size_t kMaxFrameBytes = 1536;
 constexpr char kTag[] = "codec_ram";
+#if YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX
+extern "C" const uint8_t _binary_mix_048_aac_start[], _binary_mix_048_aac_end[];
+extern "C" const uint8_t _binary_mix_064_aac_start[], _binary_mix_064_aac_end[];
+extern "C" const uint8_t _binary_mix_096_aac_start[], _binary_mix_096_aac_end[];
+#endif
 
 extern "C" const uint8_t _binary_stereo_320_mp3_start[];
 extern "C" const uint8_t _binary_stereo_320_mp3_end[];
@@ -115,6 +120,7 @@ bool accept_pcm(void *context, const helix_stream_info_t *info,
     return true;
 }
 
+#if !YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX
 FrameView first_mp3_frame(const uint8_t *data, size_t size, bool independent_only=true) {
     static const uint16_t rate1[] =
         {0,32,40,48,56,64,80,96,112,128,160,192,224,256,320};
@@ -159,6 +165,7 @@ FrameView first_mp3_frame(const uint8_t *data, size_t size, bool independent_onl
     return {nullptr, 0};
 }
 
+#endif
 #if !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
 FrameView first_aac_frame(const uint8_t *data, size_t size) {
     for (size_t offset = 0; offset + 7 <= size; ++offset) {
@@ -200,7 +207,7 @@ void run_codec(const char *name, helix_codec_kind_t kind,
         ESP_LOGE(kTag, "%s decoder allocation failed", name);
         return;
     }
-#if !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
+#if !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX && !YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX
     /* Legacy single-frame CPU benchmark: cache just one frame in RAM. */
     static uint8_t frame_ram[kMaxFrameBytes];
     std::memcpy(frame_ram, fixture.data, fixture.size);
@@ -208,7 +215,7 @@ void run_codec(const char *name, helix_codec_kind_t kind,
     size_t cursor = 0;
     unsigned clip_loops = 0;
     auto next_input = [&]() -> FrameView {
-#if !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
+#if !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX && !YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX
         if (!sequential) return {frame_ram, fixture.size};
 #endif
         /* Files remain in mapped flash. Reuse the decoder's input buffer,
@@ -220,7 +227,11 @@ void run_codec(const char *name, helix_codec_kind_t kind,
         const size_t bytes = std::min(kMaxFrameBytes, fixture.size - cursor);
         if (!input || capacity < bytes) return {nullptr, 0};
         std::memcpy(input, fixture.data + cursor, bytes);
+#if YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX
+        FrameView frame = first_aac_frame(input, bytes);
+#else
         FrameView frame = first_mp3_frame(input, bytes, false);
+#endif
         if (frame.data) cursor += size_t(frame.data - input) + frame.size;
         return frame;
     };
@@ -328,11 +339,16 @@ void update_minimum_heap(uint32_t *minimum) {
 }
 
 void run_lifecycle_stress() {
+#if YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX
+    const helix_codec_kind_t initial_kind = HELIX_CODEC_AAC;
+#else
+    const helix_codec_kind_t initial_kind = HELIX_CODEC_MP3;
+#endif
     const uint32_t initial_heap = esp_get_free_heap_size();
     uint32_t minimum_heap = initial_heap;
     unsigned completed_creates = 0;
     for (unsigned cycle = 0; cycle < kLifecycleCycles; ++cycle) {
-        helix_codec_t *codec = helix_codec_create(HELIX_CODEC_MP3, 0);
+        helix_codec_t *codec = helix_codec_create(initial_kind, 0);
         if (!codec) {
             ESP_LOGE(kTag, "lifecycle create failed at %u", cycle);
             break;
@@ -344,15 +360,15 @@ void run_lifecycle_stress() {
     }
 
     unsigned completed_switches = 0;
-    helix_codec_t *codec = helix_codec_create(HELIX_CODEC_MP3, 0);
+    helix_codec_t *codec = helix_codec_create(initial_kind, 0);
     if (codec) {
         update_minimum_heap(&minimum_heap);
         for (unsigned cycle = 0; cycle < kLifecycleCycles; ++cycle) {
-#if CONFIG_YORADIO_HELIX_AAC && !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
+#if CONFIG_YORADIO_HELIX_AAC && !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX && !YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX
             helix_codec_kind_t kind = (cycle & 1U)
                 ? HELIX_CODEC_MP3 : HELIX_CODEC_AAC;
 #else
-            helix_codec_kind_t kind = HELIX_CODEC_MP3;
+            helix_codec_kind_t kind = initial_kind;
 #endif
             if (helix_codec_switch(codec, kind) != 0) {
                 ESP_LOGE(kTag, "lifecycle switch failed at %u", cycle);
@@ -439,6 +455,16 @@ extern "C" void codec_ram_benchmark_run(void) {
     run_codec("MP3/mix/320", HELIX_CODEC_MP3,
               {_binary_mix_320_mp3_start,
                size_t(_binary_mix_320_mp3_end - _binary_mix_320_mp3_start)}, true);
+#elif YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX
+    run_codec("AAC/mix/48", HELIX_CODEC_AAC,
+              {_binary_mix_048_aac_start,
+               size_t(_binary_mix_048_aac_end - _binary_mix_048_aac_start)}, true);
+    run_codec("AAC/mix/64", HELIX_CODEC_AAC,
+              {_binary_mix_064_aac_start,
+               size_t(_binary_mix_064_aac_end - _binary_mix_064_aac_start)}, true);
+    run_codec("AAC/mix/96", HELIX_CODEC_AAC,
+              {_binary_mix_096_aac_start,
+               size_t(_binary_mix_096_aac_end - _binary_mix_096_aac_start)}, true);
 #else
     run_codec(
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD

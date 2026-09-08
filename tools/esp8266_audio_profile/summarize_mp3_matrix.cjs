@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 const fs = require('node:fs');
 
-function summarize(log, physical) {
-  const cases = [64, 128, 320].map(bitrate => {
-    const prefix = 'MP3/mix/' + bitrate;
+function summarize(log, physical, codec = 'MP3') {
+  if (!['MP3', 'AAC'].includes(codec)) throw new Error('Unknown codec');
+  const cases = (codec === 'AAC' ? [48, 64, 96] : [64, 128, 320]).map(bitrate => {
+    const prefix = codec + '/mix/' + bitrate;
     const line = log.split(/\r?\n/).find(s => s.includes(prefix + ' FLASH frame='));
     if (!line) throw new Error('Missing result: ' + prefix);
     const fields = s => Object.fromEntries(
@@ -29,7 +30,7 @@ function summarize(log, physical) {
   });
   const complete = /codec_ram: complete/.test(log);
   const errors = /INVALID benchmark|failed at|allocation failed|memory regression|Guru Meditation/.test(log);
-  return {mode: physical ? 'physical-output' : 'decode-only',
+  return {codec, mode: physical ? 'physical-output' : 'decode-only',
     valid: complete && !errors && cases.every(c => c.valid),
     continuous: physical ? complete && !errors && cases.every(c => c.continuous) : null,
     cases};
@@ -43,7 +44,7 @@ if (require.main === module) {
   if (!file || !['physical', 'decode'].includes(mode))
     throw new Error('Usage: node summarize_mp3_matrix.cjs capture.log [physical|decode] [report.json]');
   const log = readLog(file);
-  const result = summarize(log, mode === 'physical');
+  const result = summarize(log, mode === 'physical', log.includes('AAC/mix/') ? 'AAC' : 'MP3');
   const json = JSON.stringify(result, null, 2) + '\n';
   if (save) {
     fs.writeFileSync(save, json);

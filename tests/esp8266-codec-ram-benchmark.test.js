@@ -80,6 +80,19 @@ test("MP3 matrix runs stored 64/128/320 inputs and excludes AAC", () => {
   assert.match(production, /-DYORADIO_ESP8266_CODEC_RAM_MP3_MATRIX=OFF/);
 });
 
+test("AAC flash matrix is isolated and normal production clears it", () => {
+  const cmake = read("esp8266", "rtos-sdk-native", "main", "CMakeLists.txt");
+  const source = read("esp8266", "rtos-sdk-native", "main", "codec_ram_benchmark.cpp");
+  assert.match(cmake, /option\(YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX[\s\S]*?OFF\)/);
+  assert.match(cmake, /AAC matrix requires benchmark, AAC enabled, and MP3 matrix OFF/);
+  for (const rate of [48, 64, 96])
+    assert.ok(source.includes('run_codec("AAC/mix/'+rate+'"'));
+  assert.match(source, /FrameView frame = first_aac_frame\(input, bytes\)/);
+  assert.match(source, /#if YORADIO_ESP8266_CODEC_RAM_AAC_MATRIX\s+const helix_codec_kind_t initial_kind = HELIX_CODEC_AAC/);
+  assert.match(read("tools", "esp8266_audio_profile", "build_i2s_pdm_production.ps1"),
+    /-DYORADIO_ESP8266_CODEC_RAM_AAC_MATRIX=OFF/);
+});
+
 test("ESP8266 Helix stage hooks cover both MP3 and AAC hot paths", () => {
   const mp3 = read(
     "yoRadio", "src", "audioI2S", "mp3_decoder", "mp3_decoder.cpp",
