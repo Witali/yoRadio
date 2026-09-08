@@ -51,6 +51,38 @@ function startupTiming(load, resources, records) {
     sessionWallMs:t.total_us/1000,sendWallMs:t.send_us/1000,
     note:'Bounds, not a one-way network measurement. Dispatch includes earlier handlers and preemption; select may include normal idle.'};
 }
+function controlTiming(control, resources, records) {
+  if(![control.timeOrigin,control.startedMs,control.elapsedMs].every(Number.isFinite))return null;
+  const anchors=resources.filter(r=>r.trace && [r.startTime,r.requestStart,r.ttfbMs].every(Number.isFinite));
+  if(!anchors.length)return null;
+  const root=anchors[0], boot=root.trace.id.split('-')[0];
+  const relative=t=>((t-root.trace.start_us)>>>0)/1000;
+  let low=-Infinity,high=Infinity;
+  for(const r of anchors) {
+    if(r.trace.id.split('-')[0]!==boot || relative(r.trace.start_us)>120000)return null;
+    low=Math.max(low,r.startTime+r.requestStart-relative(r.trace.start_us));
+    high=Math.min(high,r.startTime+r.ttfbMs-relative(r.trace.start_us));
+  }
+  if(low>high)return null;
+  // Bounded short-run clock-drift allowance, not assumed clock synchronization.
+  low-=5;high+=5;
+  const command=control.timeOrigin+control.startedMs, reply=command+control.elapsedMs;
+  if(command-root.startTime>120000 || command<root.startTime)return null;
+  const candidates=[...records.values()].flat().filter(t=>t.path==='/ws:volume' &&
+    t.id.split('-')[0]===boot && relative(t.start_us)<120000 &&
+    relative(t.start_us)+high>=command && relative(t.start_us)+low<=reply);
+  if(candidates.length!==1)return null; // Never guess across restore/retry/other tabs.
+  const t=candidates[0],at=relative(t.start_us);
+  return {traceId:t.id,clockOffsetUncertaintyMs:high-low,clockDriftAllowanceMs:5,
+    commandToSessionStartMs:{min:at+low-command,max:at+high-command},
+    selectWaitMs:t.select_wait_us/1000,readyToSessionMs:t.dispatch_us/1000,
+    tcpInputToSessionMs:t.tcp_rx_len?((t.start_us-t.tcp_rx_us)|0)/1000:null,
+    tcpPayloadBytes:t.tcp_rx_len||null,tcpSequenceGap:t.tcp_rx_len?t.tcp_seq_gap:null,
+    sessionToCommandParsedMs:t.parse_us/1000,receiveWallMs:t.recv_us/1000,
+    sessionWallMs:t.total_us/1000,sendWallMs:t.send_us/1000,
+    txSleepBudgetMs:t.tx_sleep_budget_us/1000,memoryErrors:t.mem_errors,
+    note:'Unique bounded association, not packet capture or CPU time. No control exclusion.'};
+}
 function analyze(report,serial,ping=null){
   const records=new Map();
   for(const line of serial.split(/\r?\n/)) {
@@ -97,7 +129,10 @@ function analyze(report,serial,ping=null){
   });
   const admitted=samples.filter(s=>!s.excludedFromProcessingSample);
   const requestTraces=[...records.values()].flat();
-  return {traceRecords:requestTraces.length,requestTraces,samples,
+  const controls=(report.controls||[]).map(c=>({...c,
+    timing:Number.isInteger(c.loadIndex)&&samples[c.loadIndex]?
+      controlTiming(c,samples[c.loadIndex].resources,records):null}));
+  return {traceRecords:requestTraces.length,requestTraces,samples,controls,
     raw:stats(samples.map(s=>s.readyMs)),processingSample:stats(admitted.map(s=>s.readyMs)),
     excluded:samples.filter(s=>s.excludedFromProcessingSample).length,
     rawFailures:samples.filter(s=>s.rawPass===false).length,

@@ -112,6 +112,22 @@ int main(void){
   assert.equal(volume.total_us,3900);
 });
 
+test('control correlation retains pre-input delay and rejects ambiguous commands',()=>{
+  const root={id:'b-1',path:'/',start_us:1000000,total_us:5000,result:0};
+  const volume={id:'b-2',path:'/ws:volume',start_us:1700000,total_us:5000,
+    parse_us:1000,recv_us:500,send_us:3500,select_wait_us:202000,dispatch_us:300,
+    tcp_rx_us:1699000,tcp_rx_len:12,tcp_seq_gap:0,tx_sleep_budget_us:0,mem_errors:0};
+  const resources=[{path:'/',traceId:'b-1',startTime:1000,requestStart:0,ttfbMs:10,totalMs:20}];
+  const report={loads:[{resources}],controls:[{loadIndex:0,timeOrigin:1000,startedMs:500,elapsedMs:225,pass:false}]};
+  const serial=[root,volume].map(r=>'WEBTRACE '+JSON.stringify(r)).join('\n');
+  const r=analyze(report,serial),t=r.controls[0].timing;
+  assert.deepEqual(t.commandToSessionStartMs,{min:195,max:215});
+  assert.equal(t.tcpInputToSessionMs,1);assert.equal(t.sessionWallMs,5);
+  assert.equal(r.controls[0].pass,false);assert.equal(r.excluded,0);
+  assert.equal(analyze(report,serial+'\nWEBTRACE '+JSON.stringify(volume)).controls[0].timing,null);
+  assert.equal(analyze({...report,controls:[{...report.controls[0],loadIndex:8}]},serial).controls[0].timing,null);
+});
+
 test('startup correlation bounds delay before WS dispatch without calling it network wait',()=>{
   const base={total_us:10000,parse_us:1000,recv_us:500,send_us:8000,result:0,
     tx_wait_us:0,tx_sleep_budget_us:0,mem_wait_us:0,other_wait_us:0,mem_errors:0};

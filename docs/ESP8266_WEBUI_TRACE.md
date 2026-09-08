@@ -143,10 +143,17 @@ nonblocking send calls, ICMP loss alone and late task rescheduling are not
 automatically excluded. Subtracting the bounded sleep budget from handler
 wall time is labeled accordingly, never called CPU time.
 
-Controls keep their raw server-confirmed timings; there is no evidence-based
-per-command wait attribution yet. Do not discard slow controls by analogy
-with a different HTTP request. The 500/200 ms end-to-end goal remains distinct
-from the filtered processing sample.
+Controls keep their raw server-confirmed timings. `/ws:volume` traces retain
+session start, parse, TCP input and response timing for each volume command,
+without logging its payload. The browser records a monotonic click timestamp,
+time origin and the page-load anchor. The analyzer associates a command only
+when one trace fits the HTTP-bounded clock interval; duplicates, concurrent
+ambiguity, missing anchors and intervals over two minutes remain unmatched.
+It adds an explicit five-millisecond drift allowance, not an assumed precise
+clock synchronization. No controls are excluded by this association or by
+analogy with a different HTTP request. The 500/200 ms end-to-end goal remains
+distinct from the filtered processing sample. Per-command UART logging can
+perturb the next command: verify improvements with profiling disabled too.
 
 ## Observer overhead and validation
 
