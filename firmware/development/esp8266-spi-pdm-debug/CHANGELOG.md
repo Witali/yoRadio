@@ -1,5 +1,22 @@
 # ESP8266 temporary SPI-PDM debugging profile
 
+## 2026-09-08 â€” optional compressed playlist, ordinary radio
+
+- Source `b74e21b`; `CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y`, WebProfile OFF.
+  GPIO13/D7, CPU160/QIO40, no tone generator. App0-only flash verified;
+  NVS, partitions and full original playlist preserved.
+- Cache built on upload, validated/reused on boot; no full-playlist RAM
+  allocation. HTTP identity remains available. Wire CSV 36086 -> 12637 bytes.
+- `app.bin`: 768112 bytes, SHA-256
+  `EA7C6F830A944DB0BCDC0830F4A376E36E5A3C29F94D8FBC3A1EDF43430DA0BE`.
+- Exact image: 54 functional browser checks pass; settings 200-220 ms;
+  all 168 player confirmations <=158.9 ms. 17/18 player loads <=416.3 ms;
+  one 3440.5 ms outlier remains unexplained. Goal is not complete.
+- Three physical upload checks pass, full original restored. 57 host checks
+  pass (59 after optional tracing tests). Separate OFF build is compiled,
+  not flashed; separate WebProfile images are for causal diagnostics.
+- Details: `docs/ESP8266_PLAYLIST_WEB_GZIP.md` and the 2026-09-08 latency report.
+
 ## 2026-09-08 — settings bundle and playback-load regression tests
 
 - Source `32d8978`; normal radio, SPI-PDM GPIO13/D7, CPU160/QIO40. Tone,

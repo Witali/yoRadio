@@ -35,14 +35,15 @@ confirmation, or a connecting indicator with decoded audio starting.
 - [x] Extend page timing tests to reload while decoding and control updates
   during a concurrent load. Fix caught settings-link and station-selection
   messages when their target DOM is absent on the other page.
-- [ ] Remove the remaining long playlist request from the HTTP critical path.
-  At AAC/MP3 playback, reading/filtering/sending the entire CSV in one handler
-  blocks commands for hundreds of milliseconds. 1-KiB writes help but do not
-  meet 500/200 ms. Evaluate a validated compressed representation built only
-  when the playlist changes, and/or bounded resumable response work on the
-  HTTP task (without reentrant reuse of its status buffer or a whole-list RAM
-  allocation). Preserve filtering, station indices, upload invalidation and
-  standards-compliant fallback; benchmark before choosing an implementation.
+- [x] Remove repeated raw playlist parsing/transmission from the normal gzip
+  request path. Optional `CONFIG_YORADIO_PLAYLIST_WEB_GZIP` defaults ON;
+  build after upload, validate/reuse at boot, bounded identity fallback.
+  36086 -> 12637 wire bytes; no whole-playlist RAM buffer. OFF excludes the
+  encoder/cache objects. See `ESP8266_PLAYLIST_WEB_GZIP.md`.
+- [x] Trace socket/flash/receive wall times, explicit TX waits, RAM errors,
+  browser receive/handshake/initialization and independent ICMP latency.
+  Keep raw statistics plus a separately explained processing sample; unknown
+  causes must not be discarded. See `ESP8266_WEBUI_TRACE.md`.
 - [ ] Isolate intermittent network stalls: one run had 50% ping loss even with
   RSSI near -61 dBm. A reset of the same image restored fast controls. A closer,
   unobstructed board placement was requested as an optional control experiment.
@@ -58,7 +59,10 @@ bounded direct reads and fixed-length HTTP response reached 444..452 ms in
 five healthy-link loads, but the first attempt took 1097 ms. All 48 player
 button confirmations in that batch were <=51.5 ms; two-tab volume updates
 46..59 ms. See `ESP8266_WEBUI_BUNDLE.md`. Settings are now accelerated, but
-concurrent loading/decoding latency still fails; do not declare completion.
+the optional playlist cache improves normal loads to 249-416 ms in 17/18
+exact-image attempts, but one takes 3440.5 ms. All 168 control confirmations
+in that batch are <=158.9 ms. Later diagnostic runs still reproduce slower
+loads and controls; do not declare completion or discard unknown causes.
 Latest measurements: `ESP8266_WEBUI_LATENCY_RESULTS_2026-09-08.md`.
 
 External radio DNS/connection/buffering time is a separate measurement, not a

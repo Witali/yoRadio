@@ -113,3 +113,67 @@ Repeat stopped/playing, one/two tabs, settings and all real player controls.
 
 Raw JSON is in `tests/results/esp8266-webui-latency-20260908/`; private serial
 logs and screenshots remain in `.build/webui-diagnostic-20260908/`.
+
+## Optional upload-time playlist gzip (later, source b74e21b)
+
+The earlier images above have been superseded in the replaceable development
+directory; their hashes and source revisions still identify those results.
+Current non-profiled gzip image: 768112 bytes, SHA-256
+`EA7C6F830A944DB0BCDC0830F4A376E36E5A3C29F94D8FBC3A1EDF43430DA0BE`.
+Matched OFF build: 761328 bytes; configs differ only in the gzip option.
+OFF was compiled and symbol-checked, not flashed. Implementation/configuration
+and memory/flash costs: `ESP8266_PLAYLIST_WEB_GZIP.md`.
+
+- Full original CSV 53808 bytes; supported HTTP CSV 36086 bytes, gzip 12637.
+  The full source and station index remain authoritative. Cache workspace
+  4320 bytes is transient, not an allocation per page or per station change.
+- A real same-size name edit, identical upload, and full original restoration
+  passed. HTTP 303 is the expected upload success response. Gzip and identity
+  decode to the same filtered content. Retained-image reboot reused the cache.
+- Exact non-profiled image: 18 page loads, 17 within 500 ms (249.5-416.3 ms),
+  one AAC-playing load **3440.5 ms**. That request's playlist transfer took
+  2780.9 ms; it predates causal tracing and is not classified/excluded.
+- All 168 player control confirmations passed, maximum 158.9 ms; 12 separately
+  measured decoded-audio starts passed. Six settings loads 200.3-220.4 ms,
+  18 acceptance/readback checks <=30.7 ms. Full browser audit: 54/54, no JS
+  errors. 57 host checks passed before adding the tracing tests; 59 afterward.
+- Minimum free heap after the full physical audit was 7928 bytes; HTTP stack
+  headroom 2212 bytes. These are observed minima, not guaranteed reserves.
+  Station 176 / volume 254 / stopped restored. PC Wi-Fi unchanged.
+
+Reports: `playlist-gzip-{player,settings,browser,upload}.json`.
+
+## Causal tracing and retained failures
+
+Per user request, `YORADIO_ESP8266_WEB_PROFILE` creates a separate diagnostic
+image and correlates browser resources with board records. It distinguishes
+file reads, receives, nonblocking send calls, EAGAIN sleep, RAM retries and
+late rescheduling. A separate processing sample may exclude only explicitly
+confirmed dominant TX waits; raw end-to-end results are always retained.
+No recorded batch below qualifies for automatic exclusions.
+
+| Diagnostic batch | Loads | Page max / failures >500 ms | Controls | Control max / failures >200 ms |
+|---|---:|---:|---:|---:|
+| Verbose trace, aa748bf | 18 | 546.6 ms / 4 | 168 | see raw JSON |
+| Compact trace, 514ece0 | 36 | 1690.2 ms / 17 | 336 | 298.1 ms / 7 |
+| Added browser handshake timeline, same image | 7 before interruption | 697.7 ms / 5 | 72 | 827.7 ms / 2 |
+
+The last batch failed an HTTP status fetch and ended early; this is retained
+as an error, not a passing shorter run. A later UART warning reported failed
+WebSocket header sending. The captured script restored station 176/stopped.
+Optional `--netlog` remains private under `.build`, not committed.
+
+In the compact 1.3-1.7 s samples, HTML and playlist bodies had no comparable
+pause: largest receive gaps were roughly 6-19 ms. Much of the time was
+between HTML completion and the subsequent playlist request. The added
+timeline found both a slow WebSocket opening and a roughly 250 ms delay
+between opening and the first status message, with no browser long task in
+those samples. This does not establish a weak Wi-Fi signal as the sole cause.
+Independent ICMP: 350 samples, 2 failures, successful RTT maximum 24 ms.
+
+Detailed UART logging itself perturbs timings after each handler. Compact
+records reduce wire output and flash-format overhead, but diagnostic runs
+are not interchangeable with a non-profiled performance run. Firmware
+`fa842ef` further traces `getindex` processing and slow/failed asynchronous
+WebSocket sends, including errno, to localize the remaining gap. See
+`ESP8266_WEBUI_TRACE.md`; keep the 500/200 ms goal open.
