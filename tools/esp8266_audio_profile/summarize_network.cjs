@@ -38,7 +38,13 @@ function summarize(log) {
     if(c.gap_metrics_valid===0) {
       c.rx_gap_us=null; c.app_gap_us=null; c.empty_wait_us=null;
     }
-    if(c.heap_is_final===1) { c.heap_final=c.heap_min; c.heap_min=null; }
+    if(c.heap_is_final===1) {
+      // Lean receive returns early on transport failure, before its final
+      // heap sample. In that case the retained value is the initial sample.
+      if(c.error===0)c.heap_final=c.heap_min;
+      else c.heap_initial=c.heap_min;
+      c.heap_min=null;
+    }
     c.kept_up=c.completed && (!c.target_kbps || c.rate_ratio>=0.98);
   }
   for(const row of cpu.values()) {
