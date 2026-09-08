@@ -130,9 +130,9 @@ endif()
 option(YORADIO_ESP8266_NETWORK_BENCHMARK "Run controlled HTTP download/playback matrix" OFF)
 option(YORADIO_ESP8266_NETWORK_BENCHMARK_BULK_ONLY "Repeat three unpaced receive-only runs" OFF)
 option(YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY "Measure connected baseline and receive-only task runtime" OFF)
-set(YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP "0" CACHE STRING "0=single, 1=wait A/B, 2=read sizes, 3=bounded batching, 4=playback A/B")
+set(YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP "0" CACHE STRING "0=single, 1=wait A/B, 2=read sizes, 3=bounded batching, 4=playback wait, 5=playback read-size")
 set(YORADIO_ESP8266_NETWORK_BENCHMARK_ROUNDS "10" CACHE STRING "Repeated attempts per fixture and variant")
-if(NOT YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP MATCHES "^[0-4]$" OR
+if(NOT YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP MATCHES "^[0-5]$" OR
    NOT YORADIO_ESP8266_NETWORK_BENCHMARK_ROUNDS MATCHES "^[1-9][0-9]*$")
   message(FATAL_ERROR "Invalid network sweep/round count")
 endif()

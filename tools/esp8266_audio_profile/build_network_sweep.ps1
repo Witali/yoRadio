@@ -1,5 +1,5 @@
 param(
-    [ValidateSet(1, 2, 3, 4)][int]$Sweep = 1,
+    [ValidateSet(1, 2, 3, 4, 5)][int]$Sweep = 1,
     [ValidateRange(1, 100)][int]$Rounds = 10,
     [string]$SourceUrl = 'http://192.168.100.253:8765',
     [string]$SdkPath = '.worktree/esp8266-native-port/.build/esp8266-rtos-sdk'
@@ -70,7 +70,7 @@ try {
         app_sha256=(Get-FileHash "$taskArtifact/app.bin").Hash
         bytes=(Get-Item "$taskArtifact/app.bin").Length
         config_sha256=(Get-FileHash "$taskArtifact/sdkconfig").Hash
-        cpu_mhz=160; flash='QIO40'; playback_cases=($Sweep -eq 4)
+        cpu_mhz=160; flash='QIO40'; playback_cases=($Sweep -ge 4)
         serial_rx_commands=$false; auto_flash=$false
     }
     if ($taskManifest.bytes -gt 0xf0000) { throw 'App exceeds OTA slot' }

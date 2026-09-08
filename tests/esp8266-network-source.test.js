@@ -43,6 +43,15 @@ test('network diagnostic retains decoder memory and distinguishes app gaps from 
   const build=fs.readFileSync('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1','utf8');
   assert.match(build,/-DYORADIO_ESP8266_NETWORK_BENCHMARK=OFF/);
 });
+
+test('full read-size comparison holds readiness and output constant',()=>{
+  const source=fs.readFileSync('esp8266/rtos-sdk-native/main/network_benchmark.inc','utf8');
+  const branch=source.split('#elif YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP == 5')[1].split('#elif')[0];
+  assert.match(branch,/s_net_wait_ms = 25U/);
+  assert.match(branch,/s_net_read_limit = variant \? 1536U : 1024U/);
+  assert.match(source,/HELIX_CODEC_AAC, YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP >= 4/);
+  assert.match(source,/if \(capacity > s_net_read_limit\) capacity = s_net_read_limit/);
+});
 test('network report does not discard failed or partial measurements',()=>{
   const {summarize}=require('../tools/esp8266_audio_profile/summarize_network.cjs');
   let log='net_bench: case=0 path=/mp3-320?rate=0 output=0 begin rssi=-80\n'+

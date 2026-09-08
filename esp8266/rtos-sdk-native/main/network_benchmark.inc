@@ -179,9 +179,9 @@ static void network_benchmark_run(void) {
         {"/mp3-320?rate=0", HELIX_CODEC_MP3, false},
         {"/mp3-320?rate=0", HELIX_CODEC_MP3, false},
 #else
-        {"/mp3-128?rate=128", HELIX_CODEC_MP3, YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP == 4},
-        {"/mp3-320?rate=320", HELIX_CODEC_MP3, YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP == 4},
-        {"/aac-64?rate=64", HELIX_CODEC_AAC, YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP == 4},
+        {"/mp3-128?rate=128", HELIX_CODEC_MP3, YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP >= 4},
+        {"/mp3-320?rate=320", HELIX_CODEC_MP3, YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP >= 4},
+        {"/aac-64?rate=64", HELIX_CODEC_AAC, YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP >= 4},
 #if !YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
         {"/mp3-128?rate=128", HELIX_CODEC_MP3, true},
         {"/mp3-320?rate=320", HELIX_CODEC_MP3, true},
@@ -230,6 +230,9 @@ static void network_benchmark_run(void) {
         unsigned variant = (n % variants + round) % variants;
 #if YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP == 1 || YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP == 4
         s_net_wait_ms = variant ? 25U : 0U;
+#elif YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP == 5
+        s_net_wait_ms = 25U;
+        s_net_read_limit = variant ? 1536U : 1024U;
 #elif YORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP == 2
         static const size_t read_limits[] = {1024U, 512U, 1536U, 1024U};
         s_net_wait_ms = 25U;
