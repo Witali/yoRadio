@@ -2,7 +2,19 @@
 
 ## 2026-09-08
 
-### Initial snapshot (`91889f4`, currently flashed)
+### Volume trace (`5c121bb`, retained diagnostic)
+
+- 772128 bytes, SHA-256
+  `DD16D9E55D20873908BB5D4E9739199A6E48CA41A549A2733099448E4C902BAF`.
+- App0/hash verified. Adds fixed-category volume timing; no payload logging.
+- Degraded-link run: 24 loads, 17 over500 ms, max21.232 s; 138 of224
+  confirmations fail the200 ms/ack requirement. All16 audio starts pass.
+- Stopped commands wait~0.9-1.8 s before TCP input; handlers~12-16 ms,
+  input-to-handler~1 ms. Initial page shows6.381 s socket wait; no RAM errors.
+- Later ICMP has29/33 timeouts. No automatic exclusions or network changes.
+- Replaced on the board by the non-profiled build for further testing.
+
+### Initial snapshot (`91889f4`)
 
 - 772064 bytes, SHA-256
   `C3EEAD9E4AA8D46E125A9FA66BBF3277129E7CCF9A23866E7D5E79343C2A4241`.

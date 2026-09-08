@@ -349,3 +349,48 @@ including two tabs. Settings: 18/18 acknowledged/read-back changes, five loads
 ms goal. Reports are `initial-{idle,compare,stress,functional,settings}-browser.json`
 plus idle/compare analyses. Next trace individual controls before optimizing
 their processing; do not infer their cause from the separate idle experiment.
+
+## Per-command trace during a degraded connection
+
+Source `5c121bb`, 772128 bytes, SHA-256
+`DD16D9E55D20873908BB5D4E9739199A6E48CA41A549A2733099448E4C902BAF`,
+app0 flashed/hash verified. Diagnostic-only volume labels and browser
+monotonic click timestamps allow bounded associations (including explicit
+5 ms drift allowance); no request values or private payloads are logged.
+
+The link degraded during this run. All raw failures are retained:
+24 loads, median1870.4/max21232.1 ms, 17 over500 ms; 224 controls,
+138 failed the200 ms/confirmation requirement, maximum finite3383.7 ms.
+All16 separate decoded-audio starts passed; two browser send attempts
+encountered a reconnecting socket. UART covers the first160 seconds only.
+Later read-only ICMP sampling: 29 of33 replies timed out; four returned in
+3/12/90/153 ms. The neighbor MAC matches the board. No PC network changes.
+RSSI alone (-61 to -73 dBm) did not predict this failure.
+
+Specific stopped-player commands:
+
+- 1855 ms confirmation: command-to-handler1788.4-1813.0 ms,
+  TCP-input-to-handler1.045 ms, handler12.707 ms, send7.148 ms.
+- 983.8 ms confirmation: command-to-handler918.9-943.4 ms,
+  TCP-input-to-handler1.023 ms, handler12.514 ms.
+- Repeated ~1850 ms confirmations similarly precede TCP input; handler
+  remains11.4-15.6 ms. No memory errors or TX retry sleeps in these commands.
+
+This excludes audio decoding and handler computation as the source of those
+long waits, not every possible stall. It does not distinguish radio loss,
+driver/client buffering or scheduling before TCP input.
+
+The initial root response also records real socket backpressure: 8.762 s
+handler wall time, including6.381 s explicit EAGAIN sleep budget, 8605 retries,
+no memory errors. The playlist records3.024 s sleep budget. The full page
+takes19.016 s, leaving substantial other delays; the analyzer correctly
+excludes **zero** whole samples instead of hiding the failure.
+Reports: `volume-stress-{browser,analysis}.json`, `volume-link.json`.
+
+One independent reduction is now implemented in source `1d36682`: reply to
+volume changes with only Arduino's volume payload, not status/current/SD/mode
+four-frame startup traffic. Actual device readback and other-tab updates are
+preserved. The C regression covers every volume0-254, one send and return
+errors; the shared frontend regression proves no station/playlist mutation.
+All69 host checks pass. Hardware measurements without detailed profiling
+follow separately; compilation alone is not a latency improvement claim.
