@@ -3,6 +3,28 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-08: HTTP receive throughput and CPU accounting
+
+- Added opt-in native network benchmarks with the same decoder allocations,
+  HTTP client and DMA configuration. Deterministic local MP3/AAC sources
+  support unlimited and paced 64/128/320-kbit/s delivery. No new stream
+  buffer or production decoder/output algorithm change.
+- Original 20-second unlimited runs: 460.5..569.9 kbit/s, plus an aborted
+  attempt. A runtime-instrumented run reached 816.5 kbit/s; none of these
+  results guarantees continuous playback. Receive-only 320 had a 947-ms gap.
+- Reduced-probe runtime measurement: non-idle 22.27/25.39/42.55% at actual
+  64.23/128.14/518.77 kbit/s, without decoding. Connected background 2.17%.
+  The reading task uses about 16%; 1-ms empty socket polling is a candidate
+  for future optimization. The 320-kbit/s CPU case ended on timeout.
+- Four diagnostic images, configurations and raw measurement reports are
+  retained in development/esp8266-network-{profile,bulk,cpu,cpu-lean}/ and
+  docs/benchmarks/esp8266-network-2026-09-08/. Exact hashes and caveats:
+  docs/ESP8266_NETWORK_BENCHMARK_2026-09-08.md.
+- Ordinary I2S PDM production image: source 4cea0d9, 760032 bytes, SHA-256
+  E79263CC1B8F0E245D3D0F52E7CF6941671FCB3CAB76BF01C10CEAA3E15957BC.
+  CPU160/QIO40, GPIO3, two 512-word DMA buffers, ERROR logs; network and
+  codec benchmarks/runtime tracing are OFF. SPIFFS/NVS are not reflashed.
+
 ## Development - 2026-09-08: AAC-LC flash-source benchmark
 
 - Added isolated flash-output (288224 bytes) and flash-decode (278672 bytes)

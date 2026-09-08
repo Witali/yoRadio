@@ -1,0 +1,61 @@
+{
+  "date": "2026-09-08",
+  "purpose": "Actual HTTP/TCP receive throughput and receive-only CPU residency",
+  "cpu_mhz": 160,
+  "flash": "QIO40",
+  "wifi_enabled": true,
+  "server": "http://192.168.100.253:8765",
+  "output": "I2S PDM32 GPIO3, 2 x 512 DMA words, neutral in receive-only cases",
+  "source": "tools/esp8266_audio_profile/network_source.cjs",
+  "cases_seconds": 20,
+  "tcp_mss": 536,
+  "tcp_window": 2440,
+  "tcp_receive_mailbox": 6,
+  "read_limit_bytes": 1024,
+  "codec_input_bytes": 1536,
+  "inactivity_timeout_ms": 1000,
+  "matrix": {
+    "artifact": "firmware/development/esp8266-network-profile/app.bin",
+    "bytes": 770304,
+    "sha256": "072105638AA519C07CFEDB57C31D736F426706C9833B221DF3DC64EEC83A1765",
+    "source_note": "Built on bd869e0 while developing 4cea0d9, before bulk selector and successful FIONREAD-probe counter were added. Retained exact measured binary.",
+    "sdkconfig_sha256": "DA18E5DF79DCE5F60A248F5883854DC5BE2736A95CFF826A56BBD42934B198AF",
+    "runtime_stats": false
+  },
+  "bulk": {
+    "artifact": "firmware/development/esp8266-network-bulk/app.bin",
+    "bytes": 770256,
+    "sha256": "F484EBBE124926498348A4553167666795F0FBB8BBD06304596F9D904088A26D",
+    "runtime_source": "4cea0d951a42bf476672a3fdd0250d53b56cd411",
+    "source_note": "Built before committing; includes bulk selector and ready_probes counter.",
+    "sdkconfig_sha256": "DA18E5DF79DCE5F60A248F5883854DC5BE2736A95CFF826A56BBD42934B198AF",
+    "runtime_stats": false
+  },
+  "cpu": {
+    "artifact": "firmware/development/esp8266-network-cpu/app.bin",
+    "bytes": 771904,
+    "sha256": "39D962202E6F1743A76CD8ED9DBA9782E2B1E0038AC9D5FE432A344025725013",
+    "runtime_source": "37d5930ed9885a955377a34db03bb02d97bd978d",
+    "source_note": "Built before committing. Includes detailed per-poll instrumentation; not a production CPU overhead estimate.",
+    "sdkconfig_sha256": "A749DBD1B8B68921BCAEA5FF9754F42539754276CE0F2B07600B1490ACDE9831",
+    "runtime_stats": true
+  },
+  "cpu_lean": {
+    "artifact": "firmware/development/esp8266-network-cpu-lean/app.bin",
+    "bytes": 771280,
+    "sha256": "A9A37AD830E0D59EA80A3E82B3ADC9552CCA1B3EAA567A3AC52C9428464212FE",
+    "runtime_source": "85d5c115c1a6c9c77c324f8414d380c68223b1f1",
+    "source_note": "Built before committing. Omits unsupported ioctl, repeated gap probes and per-poll heap scans.",
+    "sdkconfig_sha256": "A749DBD1B8B68921BCAEA5FF9754F42539754276CE0F2B07600B1490ACDE9831",
+    "runtime_stats": true
+  },
+  "production": {
+    "artifact": "firmware/development/esp8266-i2s-pdm-production/app.bin",
+    "bytes": 760032,
+    "sha256": "E79263CC1B8F0E245D3D0F52E7CF6941671FCB3CAB76BF01C10CEAA3E15957BC",
+    "source_revision": "4cea0d951a42bf476672a3fdd0250d53b56cd411",
+    "sdkconfig_sha256": "66D313B17BB3096DB467DDA6E1A57C0642334C2E3A7F306748F4B85D80D6E58C",
+    "runtime_stats": false,
+    "network_benchmark": false
+  }
+}
