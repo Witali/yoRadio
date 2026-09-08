@@ -2,7 +2,7 @@
 
 ## 2026-09-08 - initial snapshot and compact volume replies, physically tested
 
-- Currently flashed source `1d36682`; normal radio, no tone/WebProfile.
+- Previously flashed source `1d36682`; normal radio, no tone/WebProfile.
   CPU160/QIO40, SPI-PDM GPIO13/D7; board's canonical I2S default unchanged.
 - 769840 bytes, SHA-256
   `4F7CD62D83F85304EA9C8B36FE0F7CFBA36E852A6719B9154F1F05B1340A96B8`.
@@ -17,6 +17,8 @@
   Not a hard500 ms guarantee. Keep failed samples; see the latency report.
 - Final readback: station176/stopped, volume254; free heap25960/min7684,
   web stack headroom2164 bytes. RSSI had deteriorated to-86 dBm.
+- Superseded on the board at the user's request by
+  `esp8266-i2s-pdm-production`; the latency investigation was stopped.
 
 ## 2026-09-08 - safe UTF-8 JSON, compile-verified
 

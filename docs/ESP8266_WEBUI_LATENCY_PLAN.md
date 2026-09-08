@@ -1,5 +1,10 @@
 # ESP8266 WebUI latency goal
 
+Status: paused at the user's request on 2026-09-08. The board was restored to
+the error-log-only `esp8266-i2s-pdm-production` image on GPIO3/RX.
+Do not resume latency optimization or extended tests without a new request.
+The 500/200 ms goal has not been declared achieved.
+
 Target: complete usable player within 500 ms of navigation; server-confirmed
 button response within 200 ms. Do not confuse an optimistic DOM update with
 confirmation, or a connecting indicator with decoded audio starting.

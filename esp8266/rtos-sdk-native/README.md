@@ -54,6 +54,19 @@ computes 32 genuine delta-sigma decisions per sample, giving a nominal
 
 ## Canonical production configuration
 
+For an error-log-only production build on Windows, with all tone, decoder,
+memory and WebUI profiling modes disabled, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/esp8266_audio_profile/build_i2s_pdm_production.ps1
+```
+
+This uses a separate build directory, validates I2S PDM32/mono/Helix/QIO40
+selections, and saves the app, configuration and manifest under
+`firmware/development/esp8266-i2s-pdm-production/`. It does not flash.
+DATA is GPIO3/RX (not the temporary SPI debug output GPIO13/D7); do not send
+UART application commands while I2S owns RX.
+
 Experimental low-level RC-PDM feedback, interpolation and dither are documented
 in [RC-PDM Feedback](../../docs/ESP8266_RCPDM_FEEDBACK.md). This is opt-in via
 `CONFIG_YORADIO_RCPDM_FEEDBACK`; the production PDM32 default is unchanged.
