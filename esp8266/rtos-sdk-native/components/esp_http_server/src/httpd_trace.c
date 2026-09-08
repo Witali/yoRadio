@@ -18,6 +18,10 @@ static struct {
     bool active;
 } trace;
 static uint32_t boot_id, sequence;
+/* Compact format in DRAM avoids LX106 byte-load emulation for every format
+ * character and reduces UART occupancy. Field order is decoded by the tool. */
+static char trace_format[] =
+    "WEBTRACE [\"%s\",\"%s\",%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%d]\n";
 
 uint32_t httpd_trace_clock(void) {
     int saved_errno = errno;
@@ -75,14 +79,14 @@ void httpd_trace_end(int result) {
     trace.active = false;
     /* Logging happens after the handler. Its UART cost is outside total_us
      * but can delay the next request: compare a non-profiled image as well. */
-    if (trace.path[0]) ESP_LOGI("http_trace",
-        "WEBTRACE {\"id\":\"%s\",\"path\":\"%s\",\"start_us\":%u,\"total_us\":%u,"
-        "\"parse_us\":%u,\"read_us\":%u,\"recv_us\":%u,\"send_us\":%u,\"max_send_us\":%u,"
-        "\"tx_wait_us\":%u,\"tx_sleep_budget_us\":%u,\"mem_wait_us\":%u,\"other_wait_us\":%u,"
-        "\"mem_errors\":%u,\"retries\":%u,\"bytes\":%u,\"calls\":%u,\"result\":%d}",
+    /* esp_log_write accepts a DRAM format; ESP_LOGI requires a literal for
+     * its prefix concatenation. The record already includes uptime and ID. */
+    if (trace.path[0]) {
+        esp_log_write(ESP_LOG_INFO, "http_trace", trace_format,
         trace.id, trace.path, (unsigned)trace.start, (unsigned)total,
         (unsigned)trace.parse_us, (unsigned)trace.read_us, (unsigned)trace.recv_us,
         (unsigned)trace.send_us, (unsigned)trace.max_send_us, (unsigned)trace.tx_wait_us,
         (unsigned)trace.tx_sleep_budget_us, (unsigned)trace.mem_wait_us, (unsigned)trace.other_wait_us, trace.mem_errors,
         (unsigned)trace.retries, (unsigned)trace.bytes, (unsigned)trace.calls, result);
+    }
 }

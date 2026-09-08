@@ -1,6 +1,12 @@
 // Keep every raw measurement. Filter only separately reported, explicitly
 // instrumented socket-backpressure samples, never merely the slow tail.
 const fs=require('node:fs');
+function decodeTrace(value){
+  const fields=['id','path','start_us','total_us','parse_us','read_us','recv_us','send_us','max_send_us','tx_wait_us','tx_sleep_budget_us','mem_wait_us','other_wait_us','mem_errors','retries','bytes','calls','result'];
+  if(!Array.isArray(value))return value;
+  if(value.length!==fields.length)throw new Error('Unknown WEBTRACE record format');
+  return Object.fromEntries(fields.map((key,i)=>[key,value[i]]));
+}
 function stats(values){
   const a=values.filter(Number.isFinite).sort((x,y)=>x-y);
   return {count:a.length,min:a[0]??null,median:a.length?a[Math.floor(a.length/2)]:null,
@@ -9,8 +15,8 @@ function stats(values){
 function analyze(report,serial){
   const records=new Map();
   for(const line of serial.split(/\r?\n/)) {
-    const match=line.match(/WEBTRACE (\{.*\})/);if(!match)continue;
-    const r=JSON.parse(match[1]);if(!records.has(r.id))records.set(r.id,[]);records.get(r.id).push(r);
+    const match=line.match(/WEBTRACE (\{.*\}|\[.*\])/);if(!match)continue;
+    const r=decodeTrace(JSON.parse(match[1]));if(!records.has(r.id))records.set(r.id,[]);records.get(r.id).push(r);
   }
   const samples=(report.loads||[]).map(load=>{
     const resources=(load.resources||[]).map(resource=>{
@@ -30,7 +36,10 @@ function analyze(report,serial){
           trace.mem_errors||trace.mem_wait_us?'memory-pressure':
           resource.totalMs-total>200?'outside-measured-handler-unresolved':'no-dominant-network-wait'};
     });
-    const exclude=resources.some(r=>r.classification==='confirmed-tx-backpressure');
+    const exclude=!load.error && !(load.errors||[]).length && resources.every(r=>r.trace) &&
+      resources.some(r=>r.classification==='confirmed-tx-backpressure') &&
+      !resources.some(r=>r.classification!=='confirmed-tx-backpressure' &&
+        (r.totalMs>500 || r.serverWallMs>500 || r.trace.result!==0 || r.trace.mem_errors>0));
     return {kind:load.kind,round:load.round,readyMs:load.readyMs,rawPass:load.pass,
       excludedFromProcessingSample:exclude,
       exclusionReason:exclude?'Successful response dominated by explicitly measured EAGAIN wait; not proof of RF cause':null,
@@ -44,7 +53,7 @@ function analyze(report,serial){
     processingFailures:admitted.filter(s=>s.rawPass===false).length,
     note:'Filtered sample is not an end-to-end guarantee. Unknown causes and memory waits remain included. Subtracted handler wall time is not CPU time.'};
 }
-module.exports={analyze};
+module.exports={analyze,decodeTrace};
 if(require.main===module){
   const args=process.argv.slice(2),opt=k=>args[args.indexOf(k)+1];
   if(!['--report','--serial','--output'].every(k=>args.includes(k)))throw new Error('Use --report <browser.json> --serial <uart.log> --output <analysis.json>');

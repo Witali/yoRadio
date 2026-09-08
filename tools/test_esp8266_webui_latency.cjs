@@ -58,7 +58,7 @@ async function load(page, kind, round) {
   page.off('requestfinished', finished); page.off('requestfailed', failed);
   if(cdp)await cdp.detach();
   report.loads.push(sample); save();
-  console.log(JSON.stringify(sample));
+  console.log(JSON.stringify({...sample,network:sample.network?.map(({chunks,...rest})=>({...rest,chunkCount:chunks.length}))}));
   return !sample.error;
 }
 async function buttons(page) {

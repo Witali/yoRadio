@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {spawnSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..'),component=path.join(root,'esp8266/rtos-sdk-native/components/esp_http_server');
 const wsl=process.platform==='win32',p=f=>wsl?'/mnt/'+f[0].toLowerCase()+f.slice(2).replace(/\\/g,'/'):f;
-const {analyze}=require('../tools/analyze_esp8266_web_trace.cjs');
+const {analyze,decodeTrace}=require('../tools/analyze_esp8266_web_trace.cjs');
 test('latency analysis excludes only proven TX wait; RAM, unknown and raw outliers remain',()=>{
   const good={id:'a-1',path:'/',total_us:1000000,tx_wait_us:900000,tx_sleep_budget_us:900000,mem_wait_us:0,other_wait_us:0,mem_errors:0,result:0};
   const records=[good,{...good,id:'a-2',mem_errors:1},{...good,id:'a-3',tx_sleep_budget_us:1000},{...good,id:'a-4',result:-1}];
@@ -12,6 +12,8 @@ test('latency analysis excludes only proven TX wait; RAM, unknown and raw outlie
   assert.equal(r.rawFailures,5);assert.equal(r.processingFailures,4);assert.equal(loads.length,5);
   assert.equal(analyze({loads},'').excluded,0);
   assert.equal(analyze({loads},[good,good].map(r=>'WEBTRACE '+JSON.stringify(r)).join('\n')).excluded,0);
+  const mixed={...loads[0],resources:[...loads[0].resources,{path:'/',traceId:'a-2',totalMs:1100}]};
+  assert.equal(analyze({loads:[mixed]},records.map(r=>'WEBTRACE '+JSON.stringify(r)).join('\n')).excluded,0);
 });
 test('actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-safe wall time',()=>{
   const dir=fs.mkdtempSync(path.join(root,'.build/http-trace-'));
@@ -19,7 +21,7 @@ test('actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-saf
   fs.writeFileSync(path.join(dir,'esp_http_server.h'),'#pragma once\n#include <stddef.h>\ntypedef struct {const char *uri;} httpd_req_t;\nint httpd_resp_set_hdr(httpd_req_t *,const char *,const char *);\n');
   fs.writeFileSync(path.join(dir,'esp_timer.h'),'#include <stdint.h>\nint64_t esp_timer_get_time(void);\n');
   fs.writeFileSync(path.join(dir,'esp_system.h'),'#include <stdint.h>\nuint32_t esp_random(void);\n');
-  fs.writeFileSync(path.join(dir,'esp_log.h'),'#define ESP_LOGI(tag,...) do {(void)(tag);printf(__VA_ARGS__);putchar(10);}while(0)\n');
+  fs.writeFileSync(path.join(dir,'esp_log.h'),'#define ESP_LOG_INFO 3\n#define esp_log_write(level,tag,...) do {(void)(level);(void)(tag);printf(__VA_ARGS__);}while(0)\n');
   fs.writeFileSync(path.join(dir,'test.c'),`#include "httpd_trace.h"
 #include <stdint.h>
 #include <string.h>
@@ -46,7 +48,7 @@ int main(void){
   let r=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...args]:args,{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
   r=spawnSync(wsl?'wsl.exe':bin,wsl?['--exec',p(bin)]:[],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
   const lines=r.stdout.trim().split('\n');assert.equal(lines.length,1);
-  const record=JSON.parse(lines[0].slice('WEBTRACE '.length));
+  const record=decodeTrace(JSON.parse(lines[0].slice('WEBTRACE '.length)));
   assert.equal(record.total_us,391155);assert.equal(record.tx_wait_us,300000);
   assert.equal(record.tx_sleep_budget_us,1000);
   assert.equal(record.mem_wait_us,90000);assert.equal(record.other_wait_us,1000);
