@@ -10,7 +10,7 @@ function summarize(log) {
       const fields=Object.fromEntries([...line.matchAll(/(\w+)=(-?\d+)/g)]
         .map(m=>[m[1],Number(m[2])]));
       const row=cpu.get(fields.case)||{case:fields.case,tasks:[]};
-      const task=/task=(\S+)/.exec(line)?.[1];
+      const task=/task=(.*?) id=/.exec(line)?.[1];
       if(task)row.tasks.push({name:task,id:fields.id,runtime_us:fields.runtime_us,existed:fields.existed===1});
       else Object.assign(row,fields);
       cpu.set(fields.case,row);continue;
@@ -35,6 +35,10 @@ function summarize(log) {
     c.pcm_seconds=c.rate ? c.pcm_frames/c.rate : 0;
     c.ready_probe_supported=(c.ready_probes||0)>0;
     if(!c.ready_probe_supported)c.ready_max=null;
+    if(c.gap_metrics_valid===0) {
+      c.rx_gap_us=null; c.app_gap_us=null; c.empty_wait_us=null;
+    }
+    if(c.heap_is_final===1) { c.heap_final=c.heap_min; c.heap_min=null; }
     c.kept_up=c.completed && (!c.target_kbps || c.rate_ratio>=0.98);
   }
   for(const row of cpu.values()) {

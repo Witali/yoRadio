@@ -67,6 +67,14 @@ test('runtime report separates task residency and baseline from receive elapsed 
   assert.equal(report.cpu[0].non_idle_percent,5);
   assert.equal(report.cpu[0].accounted_percent,100);
   assert.equal(summarize('net_cpu: case=0 valid=0 total_us=0').cpu[0].idle_percent,null);
+  const lean=summarize('net_bench: case=0 cpu_lean=1 gap_metrics_valid=0 heap_is_final=1\n'+
+    'net_bench: case=0 heap_min=10000 rx_gap_us=0\n'+
+    'net_cpu: case=0 valid=1 total_us=1000\n'+
+    'net_cpu: case=0 task=Tmr Svc id=3 runtime_us=10 existed=1');
+  assert.equal(lean.cpu[0].tasks[0].name,'Tmr Svc');
+  assert.equal(lean.cases[0].heap_min,null);
+  assert.equal(lean.cases[0].heap_final,10000);
+  assert.equal(lean.cases[0].rx_gap_us,null);
   const source=fs.readFileSync('esp8266/rtos-sdk-native/main/network_benchmark.inc','utf8');
   assert.match(source,/uxTaskGetSystemState/);
   assert.match(source,/recv_total_us/);

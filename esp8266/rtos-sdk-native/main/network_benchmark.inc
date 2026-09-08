@@ -70,6 +70,41 @@ static int net_bench_rssi(void) {
     wifi_ap_record_t ap;
     return esp_wifi_sta_get_ap_info(&ap) == ESP_OK ? ap.rssi : -127;
 }
+#if YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
+/* CPU measurement: omit unsupported FIONREAD, repeated gap timestamps and
+ * per-poll heap scans. Preserve production read capacity and 1 ms yields. */
+static int net_cpu_receive(http_stream_t *stream, helix_codec_t *codec,
+                           uint32_t generation) {
+    const TickType_t start = xTaskGetTickCount();
+    while (generation_current(generation) &&
+           xTaskGetTickCount()-start < pdMS_TO_TICKS(NET_BENCH_SECONDS * 1000U)) {
+        size_t capacity = 0;
+        uint8_t *destination = helix_codec_write_pointer(codec, &capacity);
+        if (!destination || !capacity) return -200;
+        if (capacity > 1024U) capacity = 1024U;
+        int64_t before = esp_timer_get_time();
+        int received = stream_receive(stream, destination, capacity);
+        int receive_errno = errno;
+        uint32_t elapsed = net_bench_elapsed(before);
+        s_net_bench.recv_total_us += elapsed;
+        net_bench_max(&s_net_bench.max_recv_us, elapsed);
+        ++s_net_bench.calls;
+        if (received > 0) {
+            s_net_bench.recv_positive_us += elapsed;
+            s_net_bench.bytes += received;
+            unsigned bin = (xTaskGetTickCount()-start)/pdMS_TO_TICKS(1000U);
+            if (bin < NET_BENCH_SECONDS) s_net_bench.bins[bin] += received;
+        } else if (received < 0 && (receive_errno == EAGAIN || receive_errno == EWOULDBLOCK)) {
+            s_net_bench.recv_empty_us += elapsed;
+            ++s_net_bench.empty_calls;
+        } else return received == 0 ? -201 : -receive_errno;
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
+    /* A final sample is not the minimum over the measured interval. */
+    s_net_bench.minimum_heap = esp_get_free_heap_size();
+    return 0;
+}
+#endif
 static bool net_bench_pcm(void *opaque, const helix_stream_info_t *info,
                            int16_t *pcm, size_t samples) {
     (void)opaque;
@@ -160,6 +195,9 @@ static void network_benchmark_run(void) {
         s_net_bench.bins[0] = stream.body_size;
         if (cases[n].output && stream.body_size)
             error = helix_codec_feed(codec, s_work, stream.body_size, false, net_bench_pcm, NULL);
+#if YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
+        error = net_cpu_receive(&stream, codec, generation);
+#else
         while (!error && generation_current(generation) &&
                net_bench_elapsed(s_net_bench.started) < NET_BENCH_SECONDS * 1000000U) {
             size_t capacity = 0;
@@ -209,10 +247,13 @@ static void network_benchmark_run(void) {
             uint32_t heap = esp_get_free_heap_size();
             if (heap < s_net_bench.minimum_heap) s_net_bench.minimum_heap = heap;
         }
+#endif
         uint32_t wall_us = net_bench_elapsed(s_net_bench.started);
         if (s_net_bench.empty_since)
             net_bench_max(&s_net_bench.max_empty_wait, net_bench_elapsed(s_net_bench.empty_since));
+#if !YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
         net_bench_max(&s_net_bench.max_rx_gap, net_bench_elapsed(s_net_bench.last_positive));
+#endif
         uint32_t eof_after = esp8266_nodac_i2s_eofs();
         native_audio_output_spi_stats_t dma;
         native_audio_output_get_spi_stats(&dma);
@@ -226,6 +267,9 @@ static void network_benchmark_run(void) {
                  net_bench_rssi(), s_net_bench.minimum_heap);
         ESP_LOGI(tag, "case=%u recv_total_us=%u recv_positive_us=%u recv_empty_us=%u",
                  n, s_net_bench.recv_total_us, s_net_bench.recv_positive_us, s_net_bench.recv_empty_us);
+#if YORADIO_ESP8266_NETWORK_BENCHMARK_CPU_ONLY
+        ESP_LOGI(tag, "case=%u cpu_lean=1 gap_metrics_valid=0 heap_is_final=1", n);
+#endif
         ESP_LOGI(tag, "case=%u calls=%u empty=%u rx_gap_us=%u app_gap_us=%u empty_wait_us=%u recv_max_us=%u commit_max_us=%u ready_max=%u ready_probes=%u",
                  n, s_net_bench.calls, s_net_bench.empty_calls, s_net_bench.max_rx_gap,
                  s_net_bench.max_app_gap, s_net_bench.max_empty_wait, s_net_bench.max_recv_us,
