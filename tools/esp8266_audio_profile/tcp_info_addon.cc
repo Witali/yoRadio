@@ -55,8 +55,19 @@ static napi_value read(napi_env env,napi_callback_info cb) {
     if(napi_create_array(env,&walk.rows)!=napi_ok||napi_get_uv_event_loop(env,&loop)!=napi_ok)return nullptr;
     uv_walk(loop,sample,&walk);return walk.rows;
 }
+static napi_value keep_awake(napi_env env,napi_callback_info cb) {
+    size_t count=1;napi_value arg;bool enable=false;
+    if(napi_get_cb_info(env,cb,&count,&arg,nullptr,nullptr)!=napi_ok||count!=1||
+       napi_get_value_bool(env,arg,&enable)!=napi_ok) {
+        napi_throw_type_error(env,nullptr,"Expected keep-awake boolean");return nullptr;
+    }
+    EXECUTION_STATE previous=SetThreadExecutionState(ES_CONTINUOUS|(enable?ES_SYSTEM_REQUIRED:0));
+    napi_value result;napi_get_boolean(env,previous!=0,&result);return result;
+}
 static napi_value init(napi_env env,napi_value exports) {
     napi_value fn;napi_create_function(env,"sample",NAPI_AUTO_LENGTH,read,nullptr,&fn);
-    napi_set_named_property(env,exports,"sample",fn);return exports;
+    napi_set_named_property(env,exports,"sample",fn);
+    napi_create_function(env,"keepAwake",NAPI_AUTO_LENGTH,keep_awake,nullptr,&fn);
+    napi_set_named_property(env,exports,"keepAwake",fn);return exports;
 }
 NAPI_MODULE(NODE_GYP_MODULE_NAME,init)

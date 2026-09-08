@@ -31,6 +31,9 @@ module.exports={attachTelemetry};
 if(require.main===module) {
   const addon=require(path.resolve(__dirname,'../../.build/node-tcp-info',process.version,'tcp_info.node'));
   const log=data=>console.log(JSON.stringify({utc:new Date().toISOString(),...data}));
+  if(!addon.keepAwake(true))throw Error('Cannot inhibit automatic sleep for this benchmark');
+  process.once('exit',()=>addon.keepAwake(false));
   const server=createServer();attachTelemetry(server,addon,log);
+  server.once('close',()=>addon.keepAwake(false));
   server.listen(8765,'192.168.100.253',()=>log({event:'listen',address:'192.168.100.253',port:8765,host:'node'}));
 }
