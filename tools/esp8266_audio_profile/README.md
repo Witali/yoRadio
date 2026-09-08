@@ -23,6 +23,11 @@ actual decoder, PCM processing, PDM packing and GPIO3 DMA, configure:
 
 This copies retained MP3/AAC fixture frames into test-only static RAM, runs
 eight warm-up and 200 measured frames, and does not start Wi-Fi/WebUI.
+For a continuity test use `-DYORADIO_ESP8266_CODEC_RAM_FRAMES=1500`:
+the retained 48-kHz fixtures provide 36 seconds of MP3 and 32 seconds of AAC.
+Require zero DMA underruns, zero FIFO-empty events and no output/decode error
+throughout the measured interval. This isolates decode/output only; separately
+verify live network playback and WebUI on the ordinary radio firmware.
 Volume 128, neutral balance and disabled normalization are applied in RAM
 only; saved settings are not overwritten. Reported wall time includes output
 backpressure: it is not decoder-only CPU cost. Restore ordinary firmware

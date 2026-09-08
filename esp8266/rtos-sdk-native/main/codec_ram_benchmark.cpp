@@ -20,7 +20,7 @@ extern "C" {
 
 namespace {
 constexpr unsigned kWarmupFrames = 8;
-constexpr unsigned kMeasuredFrames = 200;
+constexpr unsigned kMeasuredFrames = YORADIO_ESP8266_CODEC_RAM_FRAMES;
 constexpr unsigned kLifecycleCycles = 50;
 constexpr size_t kMaxFrameBytes = 1536;
 constexpr char kTag[] = "codec_ram";

@@ -32,7 +32,9 @@ test("ESP8266 RAM codec benchmark embeds golden fixtures and bypasses services",
     /YORADIO_ESP8266_CODEC_RAM_BENCHMARK[\s\S]*codec_ram_benchmark_run\(\)[\s\S]*#else/,
   );
   assert.match(benchmark, /memcpy\(frame_ram, fixture\.data, fixture\.size\)/);
-  assert.match(benchmark, /kMeasuredFrames\s*=\s*200/);
+  assert.match(benchmark, /kMeasuredFrames\s*=\s*YORADIO_ESP8266_CODEC_RAM_FRAMES/);
+  assert.match(cmake, /set\(YORADIO_ESP8266_CODEC_RAM_FRAMES "200" CACHE/);
+  assert.match(cmake, /YORADIO_ESP8266_CODEC_RAM_FRAMES GREATER 10000/);
   assert.match(benchmark, /kLifecycleCycles\s*=\s*50/);
   assert.match(benchmark, /lifecycle creates=%u switches=%u/);
   assert.match(benchmark, /delta != 0/);
