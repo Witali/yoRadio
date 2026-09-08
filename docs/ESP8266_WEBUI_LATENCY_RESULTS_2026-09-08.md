@@ -157,6 +157,7 @@ No recorded batch below qualifies for automatic exclusions.
 | Verbose trace, aa748bf | 18 | 546.6 ms / 4 | 168 | see raw JSON |
 | Compact trace, 514ece0 | 36 | 1690.2 ms / 17 | 336 | 298.1 ms / 7 |
 | Added browser handshake timeline, same image | 7 before interruption | 697.7 ms / 5 | 72 | 827.7 ms / 2 |
+| getindex/slow-WS trace, fa842ef | 12 | 1348.1 ms / 7 | 112 | 256.0 ms / 1 |
 
 The last batch failed an HTTP status fetch and ended early; this is retained
 as an error, not a passing shorter run. A later UART warning reported failed
@@ -177,3 +178,20 @@ are not interchangeable with a non-profiled performance run. Firmware
 `fa842ef` further traces `getindex` processing and slow/failed asynchronous
 WebSocket sends, including errno, to localize the remaining gap. See
 `ESP8266_WEBUI_TRACE.md`; keep the 500/200 ms goal open.
+
+Exact `fa842ef` image: 769504 bytes, SHA-256
+`514E0D61CE3A67353C9B3B7DE5F019F66A98C92743537EAA329A3DA7EE437F03`,
+saved in the separate `esp8266-spi-pdm-debug-web-trace` variant and flashed.
+Twelve `getindex` operations took 14.4-26.6 ms each, without EAGAIN sleep or
+memory errors; no slow async-send record appeared in this particular run.
+Browser command-to-first-message latency could still reach about 250 ms.
+Those observations narrow the interval but do not distinguish delayed TCP
+delivery from request dispatch waiting; they are not a reason to exclude
+these samples. No JS/test exception in this last run. Final station 176,
+volume 254, stopped, no error; free heap 25996, observed minimum 7532 bytes,
+HTTP stack headroom 2228 bytes. All 59 host regressions pass.
+
+Next: correlate the receipt/dispatch of the first WebSocket command with
+browser frame-send and frame-receive times; inspect TCP delivery/ACK behavior
+and queued work. Do not call the remaining delay pure network waiting until
+that interval is identified. The old uninstrumented 3.44 s case remains open.
