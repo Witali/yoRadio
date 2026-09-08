@@ -177,11 +177,27 @@ static bool receive_form(httpd_req_t *request, size_t maximum,
     if (!mp_init(&parser, boundary, handler, context)) return false;
     size_t left = request->content_len;
     TickType_t start = xTaskGetTickCount();
+    TickType_t last_received = start;
     while (left) {
         if (xTaskGetTickCount() - start > pdMS_TO_TICKS(120000)) return false;
         size_t n = left > sizeof(s_receive) ? sizeof(s_receive) : left;
         int received = httpd_req_recv(request, (char *)s_receive, n);
-        if (received <= 0) return false;
+        if (received == HTTPD_SOCK_ERR_TIMEOUT) {
+            /* Ordinary idle sessions keep their short socket timeout.
+             * Maintenance uploads may retry a temporary network gap, but
+             * neither this wakeup nor EINTR renews either deadline. */
+            if (xTaskGetTickCount()-last_received >= pdMS_TO_TICKS(10000)) {
+                ESP_LOGW(TAG, "Upload inactivity timeout: %u bytes remaining", (unsigned)left);
+                return false;
+            }
+            vTaskDelay(1);
+            continue;
+        }
+        if (received <= 0) {
+            ESP_LOGW(TAG, "Upload receive failed: result=%d remaining=%u", received, (unsigned)left);
+            return false;
+        }
+        last_received = xTaskGetTickCount();
         if (!mp_feed(&parser, s_receive, (size_t)received)) return false;
         left -= (size_t)received;
         vTaskDelay(1);
@@ -304,7 +320,7 @@ esp_err_t web_ota_handler(httpd_req_t *request) {
     httpd_resp_set_type(request, "text/plain; charset=utf-8");
     if (!ok) httpd_resp_set_status(request, "400 Bad Request");
     const char *body = ok ? "OK" :
-        "OTA rejected: use an ESP8266 native app.bin. SPIFFS images are not supported; use Board file upload.";
+        "OTA rejected: incomplete or invalid ESP8266 native app.bin; active boot slot unchanged. SPIFFS images are not supported; use Board file upload.";
     esp_err_t result = httpd_resp_send(request, body, strlen(body));
     if (result == ESP_OK) shutdown(httpd_req_to_sockfd(request), SHUT_WR);
     if (ok) web_upload_request_reboot();
