@@ -205,3 +205,36 @@ further without a new on-device high-water and full Web API test.
 
 The project is under active implementation; use the repository setup/build
 scripts once they are added rather than invoking a globally installed SDK.
+
+## OTA-first updates with audio connected to RX
+
+For the connected Wemos D1 mini, use OTA for subsequent application updates:
+the audio circuit is connected to UART RX/GPIO3. Do not automatically fall
+back to serial flashing/reset if Wi-Fi or HTTP is unavailable. Serial recovery
+requires a separate user decision. Passive GPIO1/TX log capture must not send
+UART bytes or assert the reset/boot control lines.
+
+The native firmware already provides `POST /update` on HTTP port 80. Its
+multipart fields, in order, are `updatetarget=fw` and `update=<app.bin>`.
+Upload only an ESP8266 RTOS SDK native application image, not an Arduino
+image, merged flash image, bootloader, partition table or SPIFFS image.
+The two app slots are 960 KiB each at `0x10000` and `0x110000`; the production
+artifact is `firmware/development/esp8266-i2s-pdm-production/app.bin`.
+
+Before an update, verify stable HTTP access and read `/api/native/status`,
+including `app_address`. Retain the application binary and its manifest under
+`firmware/`. The OTA handler stops playback, writes the inactive slot, and
+selects it only after complete reception and successful SDK image validation.
+A successful request returns HTTP 200 with `OK`, then schedules a restart.
+This updates neither the partition table nor NVS/SPIFFS contents; stopping
+playback can, however, persist the normal stopped/smart-start setting.
+
+After restart, verify HTTP access, the expected new `app_address`, settings,
+playlist, WebUI and playback. A lost upload response is ambiguous: first
+inspect the running slot instead of blindly retrying the POST. Do not claim
+an OTA update succeeded from the upload request alone, and do not assume
+automatic rollback if a validated image fails during application startup.
+
+The existing `tools/test_esp8266_maintenance.py` exercises both OTA slots but
+also uploads Wi-Fi, playlist and WebUI files; it is a separately authorized
+maintenance test, not the routine app-only updater.
