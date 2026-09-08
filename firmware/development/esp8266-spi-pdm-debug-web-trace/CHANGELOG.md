@@ -2,7 +2,19 @@
 
 ## 2026-09-08
 
-### TCP input trace (`14e1526`, currently flashed)
+### Initial snapshot (`91889f4`, currently flashed)
+
+- 772064 bytes, SHA-256
+  `C3EEAD9E4AA8D46E125A9FA66BBF3277129E7CCF9A23866E7D5E79343C2A4241`.
+- Matching shared script uploaded/hash verified. Opt-in snapshot after WS
+  upgrade removes a client request; legacy/settings behavior unchanged.
+- 66 host tests; 54 functional browser checks pass. Interleaved A/B: new
+  p95 300.7/max384.6 ms; old p95 482.8/max508 ms, 30 loads each.
+- Separate first run still has 556.5/1269.6 ms outliers. Stress 18 loads
+  <=486.5 ms, but two of 168 confirmations take248.1/255.5 ms. Settings
+  has one2605.4 ms outlier. No exclusions; latency goal remains open.
+
+### TCP input trace (`14e1526`)
 
 - 770688 bytes, SHA-256
   `B4F040752763A8DF6839943250795B9A9E33A184CFBEE85B44AA3408E996157A`.

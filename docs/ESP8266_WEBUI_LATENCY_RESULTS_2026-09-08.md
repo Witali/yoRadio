@@ -307,3 +307,45 @@ Zero automatic exclusions. Reports `trace-tcp-idle-{browser,analysis}.json`.
 Final station 176/stopped, free heap 26096/min18804, HTTP stack free2272,
 RSSI -60 dBm. Next reduce the unnecessary client `getindex` round trip while
 retaining an actual server snapshot and legacy WebUI behavior.
+
+## Opt-in initial snapshot: one fewer network round trip
+
+Source `91889f4`, 772064 bytes, SHA-256
+`C3EEAD9E4AA8D46E125A9FA66BBF3277129E7CCF9A23866E7D5E79343C2A4241`.
+Flashed app0 and verified. The matching shared `script.js.gz` was uploaded
+and its downloaded bytes verified (SHA-256
+`31511ED52482AAF84ED412A505F5CFAFA67271C61FBA2A130A1BAA7448EDCF29`).
+No partition, Wi-Fi, playlist or audio-output change.
+
+The native player bundle opts into `/ws?initial=1`: the server sends its real
+snapshot immediately after the upgrade. Other clients and settings retain
+explicit requests. A bounded 16-message frontend queue handles the snapshot
+arriving before the player fragment is installed; overflow requests a fresh
+snapshot. Reconnection does not reuse an old pending snapshot. All 66 host
+checks pass, including early/late arrival and legacy behavior.
+
+Physical headless Edge results (raw samples, no exclusions):
+
+| Run | Loads | Median | p95 | Maximum | Over 500 ms |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| First snapshot-only idle | 40 | 282.9 ms | 368.2 ms | 1269.6 ms | 2 |
+| Interleaved snapshot | 30 | 276.9 ms | 300.7 ms | 384.6 ms | 0 |
+| Interleaved legacy, same image | 30 | 286.2 ms | 482.8 ms | 508.0 ms | 1 |
+| MP3/AAC/two-tab stress | 18 | 412.4 ms | 486.5 ms | 486.5 ms | 0 |
+
+The first 556.5 ms sample includes about 257 ms before playlist connection
+setup. The 1269.6 ms sample delays the WebSocket handshake request by about
+one second; the handshake itself takes about 14 ms. These remain unresolved,
+not relabeled as network exclusions. Private Chromium NetLogs from an earlier
+run also contain board TCP connect attempts lasting 1012 and 1019 ms; that
+does not establish why those connections took so long.
+
+Stress: 168 changed-state confirmations, two failures at 248.1/255.5 ms;
+12 separate decoded-audio starts pass. AAC ~320 kbps and MP3 128 kbps were
+confirmed by the device. Minimum heap 7664 bytes, HTTP stack headroom2228.
+No JS or malformed WS text errors. Functional browser audit: 54/54 checks,
+including two tabs. Settings: 18/18 acknowledged/read-back changes, five loads
+230.7-263 ms and one 2605.4 ms outlier. This is not completion of the 500/200
+ms goal. Reports are `initial-{idle,compare,stress,functional,settings}-browser.json`
+plus idle/compare analyses. Next trace individual controls before optimizing
+their processing; do not infer their cause from the separate idle experiment.

@@ -52,6 +52,11 @@ confirmation, or a connecting indicator with decoded audio starting.
   Actual C writer regression covers malformed/truncated UTF-8 and capacities.
 - [x] Fix benchmark boundary cases: a minus click at zero is not an expected
   changed-value acknowledgement. Do not exercise controls on a failed page.
+- [x] Remove the redundant initial getindex round trip for the opt-in native
+  player. Preserve legacy/settings behavior and queue early snapshots safely.
+  Same-image interleaved physical A/B and MP3/AAC/two-tab tests retained.
+- [ ] Trace individual slow controls: two volume confirmations still took
+  248-256 ms after the initial-snapshot improvement.
 - [ ] Isolate intermittent network stalls: one run had 50% ping loss even with
   RSSI near -61 dBm. A reset of the same image restored fast controls. A closer,
   unobstructed board placement was requested as an optional control experiment.
