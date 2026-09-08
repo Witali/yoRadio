@@ -276,3 +276,34 @@ The non-profiled variant also builds with the UTF-8 fix: 768352 bytes,
 SHA-256 `66FC91DACD703B768228D427616CD6106964B0BF370F1D1DF8BFCCB7118C86BF`,
 source `a639709`. This new non-profiled binary is compile-verified only;
 the board retains the `fa1abc1` diagnostic image for the 200 ms investigation.
+
+## TCP-input trace excludes audio decoding in the reproduced idle stalls
+
+Diagnostic source `14e1526`, 770688 bytes, SHA-256
+`B4F040752763A8DF6839943250795B9A9E33A184CFBEE85B44AA3408E996157A`,
+flashed app0/hash verified. A supported lwIP input hook timestamps only port-80
+TCP payload metadata; no SDK source patch, packet changes or new task. Windows
+PktMon denied driver access without administrator rights; no packet capture or
+PC network configuration was changed.
+
+After reset, the test never started playback: 40/40 page states were stopped,
+zero control commands, no codec/bitrate in status before or after. The audio
+task blocks in `xQueueReceive(..., portMAX_DELAY)` until a command. Wi-Fi modem
+sleep is already disabled both while stopped and playing.
+
+- Cold round 10: page 513.4 ms; command-to-session 220.4-232.6 ms; select
+  222.255 ms; TCP-input-to-session **1.162 ms**; frame input 16 bytes, in-order
+  (`tcp_seq_gap=0`); command parsing 1.572 ms; complete reply 17.798 ms.
+- Cold round 13: page 492.1 ms; command-to-session 210.3-221.2 ms; select
+  209.096 ms; TCP-input-to-session **1.172 ms**, also an in-order 16-byte frame.
+
+The delay precedes lwIP's input hook, not the web handler or audio decoding.
+The hook does not expose physical RF arrival: client TCP buffering/retransmit,
+Wi-Fi/driver delivery and TCP-task scheduling still require distinction.
+Do not assert packet loss solely from the roughly 200 ms duration.
+
+All 40 loads: 268.1-513.4 ms, p95 373.4 ms, one >500 ms; no JS/WS errors.
+Zero automatic exclusions. Reports `trace-tcp-idle-{browser,analysis}.json`.
+Final station 176/stopped, free heap 26096/min18804, HTTP stack free2272,
+RSSI -60 dBm. Next reduce the unnecessary client `getindex` round trip while
+retaining an actual server snapshot and legacy WebUI behavior.

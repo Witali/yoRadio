@@ -2,7 +2,20 @@
 
 ## 2026-09-08
 
-### UTF-8 repaired diagnostic (`fa1abc1`, currently flashed)
+### TCP input trace (`14e1526`, currently flashed)
+
+- 770688 bytes, SHA-256
+  `B4F040752763A8DF6839943250795B9A9E33A184CFBEE85B44AA3408E996157A`.
+- App0/hash verified. Read-only port-80 lwIP input hook in diagnostic builds;
+  128-byte recent-connection table, no payload logging, no modified SDK.
+- Fresh-boot/no-audio control: 40 loads, all stopped, 268.1-513.4 ms;
+  one >500 ms, no JS or WS errors. Two ~210-230 ms command delays occurred
+  before lwIP input; input-to-session was only 1.16-1.17 ms.
+- This excludes audio decoding for those specific stalls. It does not alone
+  distinguish RF loss from client/driver/TCP scheduling. No exclusions.
+- Station 176/stopped, free heap 26096/min18804, stack headroom2272.
+
+### UTF-8 repaired diagnostic (`fa1abc1`)
 
 - 769952 bytes, SHA-256
   `3427ACBFAEC7732FC5DE3EF7DF86D7602BEFC4136D715B79BC09B118289F7DF8`.
