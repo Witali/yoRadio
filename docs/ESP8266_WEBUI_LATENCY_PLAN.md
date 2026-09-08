@@ -18,17 +18,31 @@ confirmation, or a connecting indicator with decoded audio starting.
 - [x] Add repeatable cold/warm browser timings and actual volume-button tests.
   `tools/test_esp8266_webui_latency.cjs --controls`; requires Playwright and
   installed Edge. JSON and screenshots go to the chosen `--output` directory.
-- [ ] Record repeated baseline with stopped/playing radio and one/two tabs.
+- [x] Record baseline with stopped/playing radio and one/two tabs; continue
+  repetitions after each change. `--stress` now reloads during AAC320/MP3
+  decoding and clicks real controls while the second tab is loading.
 - [x] Remove measured HTTP transport and player bootstrap bottlenecks, preserving
   standard framing, common UI assets and bounded RAM (no whole-playlist buffer).
 - [x] Replace two successive 250 ms player/status polls with state notifications
   and ordered station selection in the same HTTP poll; retain telemetry rate.
 - [x] Test Play/Stop/Next/Prev/row clicks, AAC/MP3, mobile layout, settings readback
   and two concurrent subscribers. See `ESP8266_WEBUI_BUNDLE.md` and raw results.
-- [ ] Apply equivalent shared-asset bootstrap acceleration to settings. Main
-  player reaches 444–452 ms on a healthy run; settings still take 1.7–2.2 s.
-- [ ] Extend page timing tests to reload while decoding and control updates
-  during a concurrent load. Fix the audit's caught getsystem/radiolink exception.
+- [x] Apply equivalent shared-asset bootstrap acceleration to settings.
+  Correction: the old 1.7–2.2 s audit result included its deliberate 1.5 s
+  sleep and was not a page-load measurement. The new observer requires live
+  settings snapshots, DOM readback, capabilities, logo and Wi-Fi HTTP success.
+  Actual baseline 531–534 ms; accelerated page 217–291 ms in these runs.
+- [x] Extend page timing tests to reload while decoding and control updates
+  during a concurrent load. Fix caught settings-link and station-selection
+  messages when their target DOM is absent on the other page.
+- [ ] Remove the remaining long playlist request from the HTTP critical path.
+  At AAC/MP3 playback, reading/filtering/sending the entire CSV in one handler
+  blocks commands for hundreds of milliseconds. 1-KiB writes help but do not
+  meet 500/200 ms. Evaluate a validated compressed representation built only
+  when the playlist changes, and/or bounded resumable response work on the
+  HTTP task (without reentrant reuse of its status buffer or a whole-list RAM
+  allocation). Preserve filtering, station indices, upload invalidation and
+  standards-compliant fallback; benchmark before choosing an implementation.
 - [ ] Isolate intermittent network stalls: one run had 50% ping loss even with
   RSSI near -61 dBm. A reset of the same image restored fast controls. A closer,
   unobstructed board placement was requested as an optional control experiment.
@@ -43,8 +57,9 @@ That earlier stage reached 0.89..0.92 s. The subsequent shared bundle,
 bounded direct reads and fixed-length HTTP response reached 444..452 ms in
 five healthy-link loads, but the first attempt took 1097 ms. All 48 player
 button confirmations in that batch were <=51.5 ms; two-tab volume updates
-46..59 ms. See `ESP8266_WEBUI_BUNDLE.md`. Settings-page acceleration and
-concurrent loading/decoding stress still remain open; do not declare completion.
+46..59 ms. See `ESP8266_WEBUI_BUNDLE.md`. Settings are now accelerated, but
+concurrent loading/decoding latency still fails; do not declare completion.
+Latest measurements: `ESP8266_WEBUI_LATENCY_RESULTS_2026-09-08.md`.
 
 External radio DNS/connection/buffering time is a separate measurement, not a
 guarantee of playback starting within 200 ms. Cold and warm results are separate.

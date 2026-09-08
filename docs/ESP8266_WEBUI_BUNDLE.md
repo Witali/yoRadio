@@ -1,13 +1,13 @@
 # Shared WebUI bootstrap bundle (ESP8266 native)
 
-The build generates one gzip HTML response from the existing shared index,
-theme, stylesheet, scripts, player fragment and logo. No playlist, credentials
-or settings are compiled into it. The ordinary shared JavaScript can consume
+The build generates gzip player and settings HTML responses from the existing
+shared index, theme, stylesheet, scripts, page fragments and logo. No playlist,
+credentials or saved setting values are compiled into them. Shared JavaScript can consume
 explicitly preloaded fragments; other firmware keeps its existing fetch path.
 
-The bundle is served only for the station-mode player and only after checking
+The bundles serve only station-mode player/settings pages after checking
 the compressed SPIFFS assets against the build fingerprints. Uploading any
-WebUI asset invalidates it immediately. Missing or modified files, settings,
+WebUI asset invalidates them immediately. Missing or modified files,
 AP configuration and maintenance pages retain their existing routes. Reboot
 revalidates files. HTTP encoding negotiation supports qvalues and exclusions,
 with `Vary: Accept-Encoding`; the response closes after transmission.
@@ -100,3 +100,13 @@ exception because its initial getsystem request reached the player page before
 the settings-only radiolink element existed. This remains to be addressed;
 54 passing assertions do **not** mean a completely error-free UI.
 Raw result: `fixed-full-audit.json`.
+
+## Follow-up, 2026-09-08
+
+Settings now also use the shared bundle. Null-DOM exceptions in system and
+station messages are fixed. The old settings audit's 1.7–2.2 s included an
+intentional 1.5 s pause; a dedicated readiness observer now measures actual
+saved values/capabilities/Wi-Fi loading. Exact retained image: 242–276 ms.
+Playback/concurrent-load stress exposes a remaining long playlist handler;
+the complete 500/200 ms goal is still open. See
+[updated results](ESP8266_WEBUI_LATENCY_RESULTS_2026-09-08.md).

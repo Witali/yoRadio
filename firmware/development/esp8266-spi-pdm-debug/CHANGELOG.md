@@ -1,5 +1,31 @@
 # ESP8266 temporary SPI-PDM debugging profile
 
+## 2026-09-08 — settings bundle and playback-load regression tests
+
+- Source `32d8978`; normal radio, SPI-PDM GPIO13/D7, CPU160/QIO40. Tone,
+  codec benchmark and WebProfile are disabled. Shared script.js.gz updated;
+  Wi-Fi, playlist, NVS and OTA layout preserved; app0 flashed at 0x10000.
+- Shared settings bundle, null-DOM guards for system/selection messages,
+  and bounded 1024-byte static-response scratch (+512 bytes RAM). No new
+  worker stack or whole-playlist allocation; common Arduino/C3 assets remain
+  the source for HTML/CSS/JS.
+- `app.bin`: 759520 bytes, SHA-256
+  `9ED938C2AD147FABBE4C341ED265D9C5C4765C8B218B73D13F00758D978CE3A8`.
+- Exact image: all 54 functional browser checks and 52 host regressions pass;
+  no JavaScript errors. Initial scroll to station 176 confirmed. Settings
+  242–276 ms, acceptance plus readback 14.9–22.6 ms; stopped player 430–450 ms.
+- Stress still fails the requested latency limits: AAC/MP3 page loads
+  649–755 ms; three of 56 control confirmations exceed 200 ms (211, 230,
+  291 ms). Four separately counted decoder starts succeed. Minimum heap
+  after the full run 8804 bytes; HTTP stack headroom 2212 bytes. No claim of
+  completing the 500/200 ms goal. Station 176 / volume 254 / stopped restored.
+- Corrected earlier settings audit timings: its 1.7–2.2 s included an
+  intentional 1.5 s test pause; the new dedicated test excludes that pause
+  and waits for real saved settings in the DOM.
+- Reports and remaining bottleneck:
+  `docs/ESP8266_WEBUI_LATENCY_RESULTS_2026-09-08.md` and
+  `tests/results/esp8266-webui-latency-20260908/`.
+
 ## 2026-09-08 — shared bootstrap and event-driven player status
 
 - Source `9b9b5c6`; ordinary radio, SPI GPIO13/D7, CPU160/QIO40; WebProfile

@@ -1,0 +1,322 @@
+TAP version 13
+# Subtest: ESP8266 HTTP URL, redirect and chunk parser passes native tests
+ok 1 - ESP8266 HTTP URL, redirect and chunk parser passes native tests
+  ---
+  duration_ms: 2254.8299
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio client uses bounded, chunk-aware socket I/O
+ok 2 - ESP8266 audio client uses bounded, chunk-aware socket I/O
+  ---
+  duration_ms: 1.3944
+  type: 'test'
+  ...
+# Subtest: actual HTTP response encoder coalesces chunks and keeps valid framing
+ok 3 - actual HTTP response encoder coalesces chunks and keeps valid framing
+  ---
+  duration_ms: 4097.062
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket handler completes HTTP upgrade before reading frames
+ok 4 - ESP8266 WebSocket handler completes HTTP upgrade before reading frames
+  ---
+  duration_ms: 2.4918
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket handler reads a command in one bounded receive
+ok 5 - ESP8266 WebSocket handler reads a command in one bounded receive
+  ---
+  duration_ms: 1.0306
+  type: 'test'
+  ...
+# Subtest: ESP8266 Web API dispatches player commands without synchronous status sends
+ok 6 - ESP8266 Web API dispatches player commands without synchronous status sends
+  ---
+  duration_ms: 0.2097
+  type: 'test'
+  ...
+# Subtest: ESP8266 Web API publishes player, station and stream state after commands
+ok 7 - ESP8266 Web API publishes player, station and stream state after commands
+  ---
+  duration_ms: 0.3145
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounds the persistent status buffer for audio heap
+ok 8 - ESP8266 bounds the persistent status buffer for audio heap
+  ---
+  duration_ms: 0.1742
+  type: 'test'
+  ...
+# Subtest: ESP8266 throttles volatile telemetry without delaying player state
+ok 9 - ESP8266 throttles volatile telemetry without delaying player state
+  ---
+  duration_ms: 0.2751
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI status uses a compact change key and bounded writer
+ok 10 - ESP8266 WebUI status uses a compact change key and bounded writer
+  ---
+  duration_ms: 1.0234
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI uses the reduced stack after removing status temporaries
+ok 11 - ESP8266 WebUI uses the reduced stack after removing status temporaries
+  ---
+  duration_ms: 0.3735
+  type: 'test'
+  ...
+# Subtest: ESP8266 validates a saved fd before treating it as a WebSocket
+ok 12 - ESP8266 validates a saved fd before treating it as a WebSocket
+  ---
+  duration_ms: 0.8574
+  type: 'test'
+  ...
+# Subtest: ESP8266 parser accepts exactly HTTP 1.1
+ok 13 - ESP8266 parser accepts exactly HTTP 1.1
+  ---
+  duration_ms: 0.6669
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP task has enough stack for playlist-backed commands
+ok 14 - ESP8266 HTTP task has enough stack for playlist-backed commands
+  ---
+  duration_ms: 0.2916
+  type: 'test'
+  ...
+# Subtest: ESP8266 exposes only board-supported stations with matching indices
+ok 15 - ESP8266 exposes only board-supported stations with matching indices
+  ---
+  duration_ms: 0.2592
+  type: 'test'
+  ...
+# Subtest: ESP8266 radio retries short socket timeouts until the HTTP header deadline
+ok 16 - ESP8266 radio retries short socket timeouts until the HTTP header deadline
+  ---
+  duration_ms: 1.2577
+  type: 'test'
+  ...
+# Subtest: ESP8266 reconnects a clean radio EOF unless control changed
+ok 17 - ESP8266 reconnects a clean radio EOF unless control changed
+  ---
+  duration_ms: 0.1305
+  type: 'test'
+  ...
+# Subtest: ESP8266 radio checks a header that exactly fills its receive buffer
+ok 18 - ESP8266 radio checks a header that exactly fills its receive buffer
+  ---
+  duration_ms: 0.3707
+  type: 'test'
+  ...
+# Subtest: ESP8266 waits for DHCP and releases recovery AP memory in client mode
+ok 19 - ESP8266 waits for DHCP and releases recovery AP memory in client mode
+  ---
+  duration_ms: 0.3963
+  type: 'test'
+  ...
+# Subtest: ESP8266 recovery AP assigns clients an address for WebUI access
+ok 20 - ESP8266 recovery AP assigns clients an address for WebUI access
+  ---
+  duration_ms: 0.1097
+  type: 'test'
+  ...
+# Subtest: ESP8266 next/previous starts searching after the current station
+ok 21 - ESP8266 next/previous starts searching after the current station
+  ---
+  duration_ms: 0.199
+  type: 'test'
+  ...
+# Subtest: actual buffered playlist handler preserves filtered rows across buffer boundaries
+ok 22 - actual buffered playlist handler preserves filtered rows across buffer boundaries
+  ---
+  duration_ms: 4159.857
+  type: 'test'
+  ...
+# Subtest: actual native state wakes its consumer after unlocking, not for every bitrate sample
+ok 23 - actual native state wakes its consumer after unlocking, not for every bitrate sample
+  ---
+  duration_ms: 4075.0461
+  type: 'test'
+  ...
+# Subtest: station status and index are sent in one HTTP poll without a second timer tick
+ok 24 - station status and index are sent in one HTTP poll without a second timer tick
+  ---
+  duration_ms: 2.0628
+  type: 'test'
+  ...
+# Subtest: shared fragment loader uses preloaded content only when explicitly supplied
+ok 25 - shared fragment loader uses preloaded content only when explicitly supplied
+  ---
+  duration_ms: 31.5047
+  type: 'test'
+  ...
+# Subtest: generated gzip contains the exact common fragments and parseable common scripts
+ok 26 - generated gzip contains the exact common fragments and parseable common scripts
+  ---
+  duration_ms: 132.5187
+  type: 'test'
+  ...
+# Subtest: HTTP encoding selection respects integer qvalues, exclusions and wildcard
+ok 27 - HTTP encoding selection respects integer qvalues, exclusions and wildcard
+  ---
+  duration_ms: 3897.8208
+  type: 'test'
+  ...
+# Subtest: bundle is validated before serving and invalidated by uploads, never used in AP mode
+ok 28 - bundle is validated before serving and invalidated by uploads, never used in AP mode
+  ---
+  duration_ms: 1.0047
+  type: 'test'
+  ...
+# Subtest: static writes yield only on actual socket backpressure
+ok 29 - static writes yield only on actual socket backpressure
+  ---
+  duration_ms: 3.0651
+  type: 'test'
+  ...
+# Subtest: HTTP send deadline belongs to the entire response, not each chunk
+ok 30 - HTTP send deadline belongs to the entire response, not each chunk
+  ---
+  duration_ms: 0.6367
+  type: 'test'
+  ...
+# Subtest: OTA accepts the original shared form target and embeds emergency recovery
+ok 31 - OTA accepts the original shared form target and embeds emergency recovery
+  ---
+  duration_ms: 2.6754
+  type: 'test'
+  ...
+# Subtest: OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS
+ok 32 - OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS
+  ---
+  duration_ms: 0.8326
+  type: 'test'
+  ...
+# Subtest: Wi-Fi readback preserves edge spaces and ignores excess credential rows
+ok 33 - Wi-Fi readback preserves edge spaces and ignores excess credential rows
+  ---
+  duration_ms: 2.3274
+  type: 'test'
+  ...
+# Subtest: uploads stream to a temporary file, whitelist destinations and reject disconnected bodies
+ok 34 - uploads stream to a temporary file, whitelist destinations and reject disconnected bodies
+  ---
+  duration_ms: 0.6576
+  type: 'test'
+  ...
+# Subtest: SNTP reconfiguration uses its lwIP task and a reusable nonblocking message
+ok 35 - SNTP reconfiguration uses its lwIP task and a reusable nonblocking message
+  ---
+  duration_ms: 0.8218
+  type: 'test'
+  ...
+# Subtest: Audio Info and AP reboot delay persist without changing the legacy blob
+ok 36 - Audio Info and AP reboot delay persist without changing the legacy blob
+  ---
+  duration_ms: 0.6815
+  type: 'test'
+  ...
+# Subtest: short HTTP responses use TCP_NODELAY and graceful write-half shutdown
+ok 37 - short HTTP responses use TCP_NODELAY and graceful write-half shutdown
+  ---
+  duration_ms: 1.0403
+  type: 'test'
+  ...
+# Subtest: two bounded WebSocket subscribers share a single HTTP-owned status buffer
+ok 38 - two bounded WebSocket subscribers share a single HTTP-owned status buffer
+  ---
+  duration_ms: 0.8662
+  type: 'test'
+  ...
+# Subtest: VBR waits for heartbeat but state, format and metadata remain immediate
+ok 39 - VBR waits for heartbeat but state, format and metadata remain immediate
+  ---
+  duration_ms: 0.6019
+  type: 'test'
+  ...
+# Subtest: native stream identity is invalidated when changing the station
+ok 40 - native stream identity is invalidated when changing the station
+  ---
+  duration_ms: 0.3668
+  type: 'test'
+  ...
+# Subtest: native connecting telemetry locks and unlocks Play without affecting Arduino states
+ok 41 - native connecting telemetry locks and unlocks Play without affecting Arduino states
+  ---
+  duration_ms: 2.5566
+  type: 'test'
+  ...
+# Subtest: WebUI responses are not cached for a year
+ok 42 - WebUI responses are not cached for a year
+  ---
+  duration_ms: 2.7667
+  type: 'test'
+  ...
+# Subtest: content-derived UI revision propagates to shell assets
+ok 43 - content-derived UI revision propagates to shell assets
+  ---
+  duration_ms: 0.4447
+  type: 'test'
+  ...
+# Subtest: UI revision propagates to dynamically loaded settings
+ok 44 - UI revision propagates to dynamically loaded settings
+  ---
+  duration_ms: 1.4063
+  type: 'test'
+  ...
+# Subtest: all SPIFFS WebUI assets are stored compressed
+ok 45 - all SPIFFS WebUI assets are stored compressed
+  ---
+  duration_ms: 6.0338
+  type: 'test'
+  ...
+# Subtest: startup spinner cannot be confused with the playlist spinner
+ok 46 - startup spinner cannot be confused with the playlist spinner
+  ---
+  duration_ms: 0.6275
+  type: 'test'
+  ...
+# Subtest: UI revision survives navigation between player and settings
+ok 47 - UI revision survives navigation between player and settings
+  ---
+  duration_ms: 0.4824
+  type: 'test'
+  ...
+# Subtest: firmware serves the index shell for a versioned root URL
+ok 48 - firmware serves the index shell for a versioned root URL
+  ---
+  duration_ms: 1.3798
+  type: 'test'
+  ...
+# Subtest: firmware computes the UI revision from SPIFFS file contents
+ok 49 - firmware computes the UI revision from SPIFFS file contents
+  ---
+  duration_ms: 0.6907
+  type: 'test'
+  ...
+# Subtest: station broadcasts update current state without requiring the player DOM
+ok 50 - station broadcasts update current state without requiring the player DOM
+  ---
+  duration_ms: 2.7563
+  type: 'test'
+  ...
+# Subtest: system snapshot is processed on player page
+ok 51 - system snapshot is processed on player page
+  ---
+  duration_ms: 1.0927
+  type: 'test'
+  ...
+# Subtest: system snapshot is processed on settings page
+ok 52 - system snapshot is processed on settings page
+  ---
+  duration_ms: 0.6157
+  type: 'test'
+  ...
+1..52
+# tests 52
+# suites 0
+# pass 52
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4259.4106
