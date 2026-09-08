@@ -29,8 +29,13 @@ static uint32_t s_credential_offsets[WIFI_MAX_CREDENTIALS];
 static uint8_t s_credential_count;
 static uint8_t s_credential_index;
 static uint8_t s_retries;
-static bool s_connected;
+static volatile bool s_connected;
 static bool s_access_point;
+/* The startup supervisor frees its stack after DHCP. The existing app poll
+ * handles later outages without allocating another task or extending the
+ * recovery deadline on every unsuccessful association. */
+static volatile bool s_recovery_after_dhcp;
+static volatile TickType_t s_disconnected_since;
 /* Shared by indexing and credential loading; no array of wifi_config_t is
  * retained in RAM. */
 static char s_wifi_line[128];
@@ -135,12 +140,27 @@ static void event_handler(void *argument, esp_event_base_t base,
                           int32_t id, void *data) {
     (void)argument;
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
+        uint8_t protocol = 0;
+        int8_t power = 0;
+        if (esp_wifi_get_protocol(ESP_IF_WIFI_STA, &protocol) == ESP_OK &&
+            esp_wifi_get_max_tx_power(&power) == ESP_OK)
+            ESP_LOGI(TAG, "Wi-Fi protocol bitmap=%u TX power cap=%d (SDK units)",
+                     (unsigned)protocol, (int)power);
         if (s_credential_count) esp_wifi_connect();
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
         const wifi_event_sta_disconnected_t *event = data;
         ESP_LOGW(TAG, "Wi-Fi disconnected: reason=%u",
                  event ? (unsigned)event->reason : 0U);
+        if (s_connected) {
+            s_disconnected_since = xTaskGetTickCount();
+            s_recovery_after_dhcp = true;
+        }
         s_connected = false;
+        xEventGroupClearBits(s_events, WIFI_CONNECTED_BIT);
+        if (!s_access_point) {
+            native_state_set_network(NETWORK_STARTING);
+            native_state_set_ip("0.0.0.0");
+        }
         if (s_access_point || !s_credential_count) return;
         if (++s_retries <= WIFI_RETRIES_PER_CREDENTIAL) {
             esp_wifi_connect();
@@ -163,6 +183,7 @@ static void event_handler(void *argument, esp_event_base_t base,
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)data;
         s_connected = true;
+        s_recovery_after_dhcp = false;
         s_retries = 0;
         esp_wifi_set_ps(WIFI_PS_NONE);
         if (s_access_point) {
@@ -220,7 +241,33 @@ static void supervisor_task(void *argument) {
 void network_service_poll(void) {
     static TickType_t next_update;
     static TickType_t ap_since;
+    static TickType_t next_recovery_retry;
     TickType_t now = xTaskGetTickCount();
+    /* DHCP may arrive while the app is enabling AP mode. Reconcile that
+     * race on the next poll, including the address shown by WebUI. */
+    if (s_connected && s_access_point &&
+        esp_wifi_set_mode(WIFI_MODE_STA) == ESP_OK) {
+        s_access_point = false;
+        tcpip_adapter_ip_info_t info;
+        if (s_connected &&
+            tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &info) == ESP_OK) {
+            native_state_set_network(NETWORK_CLIENT);
+            native_state_set_ip(ip4addr_ntoa(&info.ip));
+        }
+    }
+    if (s_recovery_after_dhcp && !s_connected &&
+        now - s_disconnected_since >= pdMS_TO_TICKS(WIFI_CONNECT_TIMEOUT_MS) &&
+        (int32_t)(now - next_recovery_retry) >= 0) {
+        if (!s_access_point) {
+            esp_err_t result = start_access_point();
+            if (result != ESP_OK)
+                ESP_LOGE(TAG, "Recovery AP after link loss failed: %s",
+                         esp_err_to_name(result));
+        }
+        if (!s_connected) esp_wifi_connect();
+        next_recovery_retry = now + pdMS_TO_TICKS(5000U);
+    }
+    if (!s_recovery_after_dhcp) next_recovery_retry = now;
     if (s_access_point && !s_connected) {
         if (!ap_since) ap_since = now;
         persistent_web_settings_t web;
