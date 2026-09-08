@@ -37,8 +37,8 @@
 #define WEB_MAX_OPEN_SOCKETS 4U
 #define WEB_CONNECTION_BACKLOG 3U
 #define WEB_IDLE_TIMEOUT_SECONDS 2U
-#define WEB_SEND_CHUNK_SIZE 512U
-#define WEB_STATIC_SCRATCH_SIZE 512U
+#define WEB_SEND_CHUNK_SIZE 1024U
+#define WEB_STATIC_SCRATCH_SIZE 1024U
 #define WEB_WS_CLIENTS 2U
 
 /* This SDK counts the TCP listener and pending accepts in its PCB limit.
@@ -885,7 +885,7 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
     /* Read blocks into the existing HTTP-task buffer, not one FILE operation
      * per row. Retain only an incomplete tail between reads. Row boundaries
      * match playlist_service's fgets(..., 672), including overlong records.
-     * Output still uses the independent 512-byte scratch; no new RAM. */
+     * Output uses a bounded independent 1-KiB scratch, never the full list. */
     enum { ROW_BYTES = 672 };
     int file = open(PLAYLIST_PATH, O_RDONLY);
     ssize_t first = file >= 0 ? read(file, s_async_message,

@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
     fputs(last,f); strcat(expected,last); fclose(f);
     httpd_req_t req = {0};
     assert(playlist_handler(&req) == ESP_OK);
-    assert(largest == 512 && size == strlen(expected));
+    assert(largest == sizeof(s_static_scratch) && size == strlen(expected));
     assert(!strcmp(received, expected));
     size = calls = 0; fail_call = 3;
     assert(playlist_handler(&req) == ESP_FAIL);
