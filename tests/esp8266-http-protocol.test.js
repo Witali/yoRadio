@@ -62,4 +62,7 @@ test("ESP8266 audio client uses bounded, chunk-aware socket I/O", () => {
   assert.match(audio, /http_stream_resolve_redirect/);
   assert.match(audio, /http_chunk_decode/);
   assert.match(audio, /stream_read_exact[\s\S]*read_icy_metadata/);
+  assert.match(audio, /STREAM_IDLE_TIMEOUT_MS 10000U/);
+  assert.match(audio, /http_stream_idle_expired\(xTaskGetTickCount\(\)/);
+  assert.match(audio, /feed = errno == ETIMEDOUT \? 0 : -21/);
 });

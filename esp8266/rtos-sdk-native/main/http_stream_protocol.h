@@ -42,3 +42,7 @@ void http_chunk_decoder_init(http_chunk_decoder_t *decoder);
 bool http_chunk_decode(http_chunk_decoder_t *decoder, uint8_t *buffer,
                        size_t input_size, size_t *output_size);
 bool http_chunk_decoder_finished(const http_chunk_decoder_t *decoder);
+
+/* Monotonic 32-bit ticks, including a single counter wrap. All arguments
+ * use the same tick unit; callers convert milliseconds with their OS. */
+bool http_stream_idle_expired(uint32_t now, uint32_t last, uint32_t timeout);

@@ -3,6 +3,11 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
+bool http_stream_idle_expired(uint32_t now, uint32_t last, uint32_t timeout) {
+    return (uint32_t)(now - last) >= timeout;
+}
+
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp

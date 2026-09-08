@@ -82,6 +82,11 @@ static void test_fragmented_chunked_body(void) {
 }
 
 int main(void) {
+    assert(!http_stream_idle_expired(100, 100, 10000));
+    assert(!http_stream_idle_expired(10099, 100, 10000));
+    assert(http_stream_idle_expired(10100, 100, 10000));
+    assert(!http_stream_idle_expired(3, UINT32_MAX - 5U, 10));
+    assert(http_stream_idle_expired(4, UINT32_MAX - 5U, 10));
     test_url_and_redirects();
     test_header_tokens();
     test_fragmented_chunked_body();

@@ -30,6 +30,7 @@
 #define HTTP_HOST_BYTES 96U
 #define HTTP_MAX_REDIRECTS 3U
 #define SOCKET_READ_TIMEOUT_MS 200U
+#define STREAM_IDLE_TIMEOUT_MS 10000U
 #define SOCKET_CONNECT_TIMEOUT_MS 10000U
 #define SOCKET_WRITE_TIMEOUT_MS 2000U
 #define ICY_METADATA_TIMEOUT_MS 5000U
@@ -66,6 +67,7 @@ typedef struct {
     size_t body_size;
     uint32_t metadata_interval;
     uint32_t advertised_bitrate;
+    TickType_t last_receive_tick;
     bool chunked;
     http_chunk_decoder_t chunk_decoder;
 } http_stream_t;
@@ -432,6 +434,7 @@ static int stream_receive(http_stream_t *stream, uint8_t *destination,
             return 0;
         int received = recv(stream->socket, destination, capacity, 0);
         if (received > 0) {
+            stream->last_receive_tick = xTaskGetTickCount();
             taskENTER_CRITICAL();
             s_rx_bytes += (uint32_t)received;
             s_rx_tick = xTaskGetTickCount();
@@ -449,6 +452,12 @@ static int stream_receive(http_stream_t *stream, uint8_t *destination,
             continue;
         }
         if (received < 0 && errno == EINTR) continue;
+        if (received < 0 && (errno == EAGAIN || errno == EWOULDBLOCK) &&
+            http_stream_idle_expired(xTaskGetTickCount(),
+                stream->last_receive_tick, pdMS_TO_TICKS(STREAM_IDLE_TIMEOUT_MS))) {
+            ESP_LOGW(TAG, "No stream data for %u ms", STREAM_IDLE_TIMEOUT_MS);
+            errno = ETIMEDOUT;
+        }
         return received;
     }
 }
@@ -532,6 +541,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                 return -9;
             }
             stream->socket = socket_fd;
+            stream->last_receive_tick = xTaskGetTickCount();
             stream->metadata_interval = metadata_interval;
             stream->advertised_bitrate = bitrate;
             stream->chunked = chunked;
@@ -1086,7 +1096,7 @@ static void audio_task(void *argument) {
                          s_stream_trace_count);
 #endif
                 if (!read_icy_metadata(&stream, command.generation)) {
-                    feed = -22;
+                    feed = errno == ETIMEDOUT ? 0 : -22;
                     break;
                 }
                 audio_until_metadata = stream.metadata_interval;
@@ -1144,14 +1154,14 @@ static void audio_task(void *argument) {
             } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 vTaskDelay(pdMS_TO_TICKS(1));
             } else {
-                feed = -21;
+                feed = errno == ETIMEDOUT ? 0 : -21;
                 break;
             }
         }
         close(stream.socket);
         if (feed == 0 && generation_current(command.generation)) {
             ESP_LOGW(TAG,
-                     "Radio stream ended cleanly; reconnecting (heap %u)",
+                     "Radio stream ended or timed out; reconnecting (heap %u)",
                      (unsigned)esp_get_free_heap_size());
             native_audio_output_silence();
             native_state_set_audio(false, true, "RECONNECTING");
