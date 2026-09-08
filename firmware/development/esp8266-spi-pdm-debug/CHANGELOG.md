@@ -1,5 +1,23 @@
 # ESP8266 temporary SPI-PDM debugging profile
 
+## 2026-09-08 - initial snapshot and compact volume replies, physically tested
+
+- Currently flashed source `1d36682`; normal radio, no tone/WebProfile.
+  CPU160/QIO40, SPI-PDM GPIO13/D7; board's canonical I2S default unchanged.
+- 769840 bytes, SHA-256
+  `4F7CD62D83F85304EA9C8B36FE0F7CFBA36E852A6719B9154F1F05B1340A96B8`.
+- App0/hash verified; Wi-Fi, full playlist, partition layout preserved.
+  Matching shared script was already installed and verified.
+- Opt-in initial snapshot avoids getindex; a volume reply now sends one
+  Arduino-compatible payload rather than four startup frames.
+- All69 host tests, 54 functional browser checks and18 settings changes pass.
+  MP3/AAC/two-tab batch:112 confirmations6.2-157.5 ms, median11.8/p9531.5;
+  12 page loads299.9-513.2 ms, one above500; all8 audio starts pass.
+- Separate60-load repeat: median433.3 ms, max3930.9 ms, 22 above500.
+  Not a hard500 ms guarantee. Keep failed samples; see the latency report.
+- Final readback: station176/stopped, volume254; free heap25960/min7684,
+  web stack headroom2164 bytes. RSSI had deteriorated to-86 dBm.
+
 ## 2026-09-08 - safe UTF-8 JSON, compile-verified
 
 - Source `a639709`; no WebProfile, no tone. Same CPU160/QIO40/SPI GPIO13.

@@ -55,13 +55,22 @@ confirmation, or a connecting indicator with decoded audio starting.
 - [x] Remove the redundant initial getindex round trip for the opt-in native
   player. Preserve legacy/settings behavior and queue early snapshots safely.
   Same-image interleaved physical A/B and MP3/AAC/two-tab tests retained.
-- [ ] Trace individual slow controls: two volume confirmations still took
-  248-256 ms after the initial-snapshot improvement.
+- [x] Trace individual slow controls. In a degraded stopped-player run,
+  ~0.9-1.8 s occurs before TCP input; processing stays~12-16 ms.
+  Keep conservative per-command associations and all unfiltered failures.
+- [x] Replace volume's four-frame startup reply with Arduino-compatible
+  volume-only readback.69 host checks;112 physical confirmations<=157.5 ms.
+- [ ] Investigate remaining pre-TCP/connection stalls separately from decoder
+  work: use closer placement as a control and inspect connection/ACK evidence.
+  Do not change CPU quantum or label all waits as RF loss without evidence.
+- [ ] Evaluate bounded interleaving of static responses if socket backpressure
+  blocks other clients; preserve small RAM usage and correct partial writes.
 - [ ] Isolate intermittent network stalls: one run had 50% ping loss even with
   RSSI near -61 dBm. A reset of the same image restored fast controls. A closer,
   unobstructed board placement was requested as an optional control experiment.
-- [ ] Verify playback, settings, playlist updates and memory; retain regression
-  tests and commit each independently validated change.
+- [x] Verify playback, settings, playlist updates and memory; retain regression
+  tests and commit each independently validated change. Latest normal image:
+  54 functional checks,18 settings changes,8 decoded-audio starts pass.
 - [ ] Repeatedly meet 500/200 ms targets. Record failures, RSSI and maximum as
   well as median/p95; do not discard slow attempts or count only cached shells.
 

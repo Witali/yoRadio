@@ -394,3 +394,40 @@ preserved. The C regression covers every volume0-254, one send and return
 errors; the shared frontend regression proves no station/playlist mutation.
 All69 host checks pass. Hardware measurements without detailed profiling
 follow separately; compilation alone is not a latency improvement claim.
+
+## Current non-profiled image and repeated verification
+
+Source `1d36682`, 769840 bytes, SHA-256
+`4F7CD62D83F85304EA9C8B36FE0F7CFBA36E852A6719B9154F1F05B1340A96B8`,
+app0 flashed/hash verified. Ordinary SPI radio, no tone or WebProfile. This
+is retained in `firmware/development/esp8266-spi-pdm-debug/app.bin`.
+The direct volume reply is one41-byte JSON payload at volume254; the normal
+state notification still updates other subscribers. Do not count that direct
+reply reduction as the same reduction in all broadcast traffic.
+
+Headless Edge MP3/AAC/two-tab run:
+
+- 112/112 server-confirmed controls pass:6.2-157.5 ms,
+  median11.8 ms, p9531.5 ms; all8 separate audio starts pass.
+- 12/12 player pages load correctly,299.9-513.2 ms; one exceeds500 ms.
+  That513.2 ms case includes251.3 ms playlist transfer; no handler trace in
+  this image, so it is not automatically classified or excluded.
+- Concurrent read-only ICMP:118 replies, zero timeouts, maximum11 ms.
+- Functional audit54/54; settings18/18 accepted/read-back changes and six
+  loads259.2-314.5 ms; no JS or WebSocket text errors.
+
+This is not a controlled A/B against the preceding severely degraded link:
+the board was also reset and connection health changed. The traffic reduction
+is verified; the entire latency recovery cannot be attributed to that change.
+
+A subsequent independent60-load repeat, still with profiling OFF, has
+median433.3/p951696.9/max3930.9 ms and22 above500 ms, no JS errors. Retain all
+of these failures; no filtering. The500/200 ms goal remains open. A physical
+closer-to-router comparison was requested; no changed placement has been
+confirmed, and no PC Wi-Fi settings have been modified.
+
+Final HTTP/WS readback after all tests: station176, stopped, volume254;
+no device error, free heap25960/min7684 bytes, web stack headroom2164 bytes,
+RSSI-86 dBm. This last RSSI is not assumed to describe every earlier sample.
+Reports: `compact-{volume,functional,settings,soak}-browser.json` and
+`compact-volume-link.json`.
