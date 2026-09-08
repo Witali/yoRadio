@@ -136,7 +136,9 @@ test("ESP8266 application serves the current shared WebUI script from flash", ()
   assert.match(webSource, /_binary_script_js_gz_start/);
   assert.match(webSource, /_binary_script_js_gz_end/);
   assert.match(webSource, /static char s_static_scratch\[WEB_STATIC_SCRATCH_SIZE\]/);
-  assert.match(webSource, /#define WEB_STATIC_SCRATCH_SIZE 512U/);
+  const scratch = Number(/#define WEB_STATIC_SCRATCH_SIZE (\d+)U/.exec(webSource)?.[1]);
+  const chunk = Number(/#define WEB_SEND_CHUNK_SIZE (\d+)U/.exec(webSource)?.[1]);
+  assert.ok(chunk > 0 && scratch >= chunk && scratch <= 1024);
   assert.doesNotMatch(webSource, /char chunk\[512\]|char line\[672\]/);
   assert.match(webSource, /memcpy\(s_static_scratch, cursor, count\)/);
   assert.match(webSource, /httpd_resp_send_chunk\(request, s_static_scratch, count\)/);
@@ -239,9 +241,12 @@ test("ESP8266 chunks embedded HTML below its TCP send window", () => {
   assert.match(chunked, /remaining > WEB_SEND_CHUNK_SIZE/);
   assert.match(chunked, /memcpy\(s_static_scratch, text, count\)/);
   assert.match(chunked, /httpd_resp_send_chunk\(request,[\s\S]*s_static_scratch, count\)/);
-  assert.match(chunked, /pace_static_send\(\)/);
-  assert.match(webSource, /static void pace_static_send[\s\S]*vTaskDelay\(1\)/);
-  assert.ok((webSource.match(/pace_static_send\(\);/g) || []).length >= 4);
+  const chunk = Number(/#define WEB_SEND_CHUNK_SIZE (\d+)U/.exec(webSource)?.[1]);
+  const sendBuffer = Number(/CONFIG_LWIP_TCP_SND_BUF_DEFAULT=(\d+)/.exec(sdkDefaults)?.[1]);
+  assert.ok(chunk > 0 && chunk + 128 < sendBuffer, 'chunk and HTTP framing fit the TCP send buffer');
+  // Pacing belongs to the bounded send/retry loop, not a delay after every
+  // successful flash read. The production code already removed that delay.
+  assert.doesNotMatch(chunked, /vTaskDelay|pace_static_send/);
   assert.match(chunked, /httpd_resp_send_chunk\(request, NULL, 0\)/);
   const page = bodyFrom(webSource, "static esp_err_t page_handler", "static esp_err_t variables_handler");
   assert.match(page, /send_chunked_string\(request, yoradio_index_html\(\)\)/);
