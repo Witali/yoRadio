@@ -14,6 +14,7 @@ test('latency analysis excludes only proven TX wait; RAM, unknown and raw outlie
   assert.equal(analyze({loads},[good,good].map(r=>'WEBTRACE '+JSON.stringify(r)).join('\n')).excluded,0);
   const mixed={...loads[0],resources:[...loads[0].resources,{path:'/',traceId:'a-2',totalMs:1100}]};
   assert.equal(analyze({loads:[mixed]},records.map(r=>'WEBTRACE '+JSON.stringify(r)).join('\n')).excluded,0);
+  assert.equal(analyze({loads:[{...loads[0],readyMs:3000}]},'WEBTRACE '+JSON.stringify(good)).excluded,0);
   const withTime={...loads[4],resources:[{...loads[4].resources[0],startTime:1000}]};
   const ping={samples:[{startTime:1000,elapsedMs:750,rttMs:null,status:'TimedOut'}]};
   const linked=analyze({loads:[withTime]},'',ping);
@@ -49,12 +50,17 @@ int main(void){
   httpd_trace_end(0);httpd_trace_end(0);
   httpd_trace_index_begin();assert(!httpd_trace_ws_begin());now+=100;httpd_trace_end(0);
   assert(httpd_trace_ws_begin());now+=1;httpd_trace_ws_end(0);
-  assert(httpd_trace_ws_begin());now+=100;httpd_trace_ws_end(-1);return 0;}
+  assert(httpd_trace_ws_begin());now+=100;httpd_trace_ws_end(-1);
+  uint32_t selected=now;now+=250000;
+  httpd_trace_dispatch(selected,now,true);now+=32000;
+  httpd_trace_request_begin(true);s=now;now+=700;httpd_trace_recv(s);
+  httpd_trace_index_begin();now+=20;httpd_trace_end(0);httpd_trace_end(0);
+  return 0;}
 `);
   const bin=path.join(dir,'test'),args=['-std=c11','-Wall','-Wextra','-Werror','-fsanitize=undefined','-DYORADIO_ESP8266_WEB_PROFILE=1','-I'+p(dir),'-I'+p(path.join(component,'include')),p(path.join(dir,'test.c')),p(path.join(component,'src/httpd_trace.c')),'-o',p(bin)];
   let r=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...args]:args,{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
   r=spawnSync(wsl?'wsl.exe':bin,wsl?['--exec',p(bin)]:[],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
-  const lines=r.stdout.trim().split('\n');assert.equal(lines.length,3);
+  const lines=r.stdout.trim().split('\n');assert.equal(lines.length,4);
   const record=decodeTrace(JSON.parse(lines[0].slice('WEBTRACE '.length)));
   assert.equal(record.total_us,391155);assert.equal(record.tx_wait_us,300000);
   assert.equal(record.tx_sleep_budget_us,1000);
@@ -65,4 +71,31 @@ int main(void){
   assert.equal(record.last_errno,12); // ENOMEM on the POSIX test host.
   assert.equal(decodeTrace(JSON.parse(lines[1].slice('WEBTRACE '.length))).path,'/ws:getindex');
   assert.equal(decodeTrace(JSON.parse(lines[2].slice('WEBTRACE '.length))).result,-1);
+  const dispatch=decodeTrace(JSON.parse(lines[3].slice('WEBTRACE '.length)));
+  assert.equal(dispatch.path,'/ws:getindex');assert.equal(dispatch.select_wait_us,250000);
+  assert.equal(dispatch.dispatch_us,32000);assert.equal(dispatch.dispatch_flags,1);
+  assert.equal(dispatch.recv_us,700);assert.equal(dispatch.parse_us,700);
+  assert.equal(dispatch.total_us,720);assert.equal(dispatch.tx_wait_us,0);
+});
+
+test('startup correlation bounds delay before WS dispatch without calling it network wait',()=>{
+  const base={total_us:10000,parse_us:1000,recv_us:500,send_us:8000,result:0,
+    tx_wait_us:0,tx_sleep_budget_us:0,mem_wait_us:0,other_wait_us:0,mem_errors:0};
+  const root={...base,id:'a-1',path:'/',start_us:0xffff0000};
+  const index={...base,id:'a-2',path:'/ws:getindex',start_us:(root.start_us+300000)>>>0,
+    select_wait_us:250000,dispatch_us:1000,dispatch_flags:1};
+  const playlist={...base,id:'a-3',path:'/data/playlist.csv',start_us:(root.start_us+350000)>>>0};
+  const resources=[{path:'/',traceId:'a-1',startTime:1000,requestStart:0,ttfbMs:10,totalMs:20},
+    {path:'/data/playlist.csv',traceId:'a-3',startTime:1350,requestStart:0,ttfbMs:10,totalMs:20}];
+  const loads=[{kind:'cold',readyMs:600,pass:false,resources,pageTrace:{timeOrigin:1000,indexSentMs:100}}];
+  const serial=[root,index,playlist].map(r=>'WEBTRACE '+JSON.stringify(r)).join('\n');
+  const r=analyze({loads},serial),s=r.samples[0].startup;
+  assert.deepEqual(s.commandToSessionStartMs,{min:200,max:210});
+  assert.equal(s.clockOffsetUncertaintyMs,10);assert.equal(s.readyToSessionMs,1);
+  assert.equal(s.sessionToCommandParsedMs,1);assert.equal(s.selectWaitMs,250);
+  assert.equal(r.excluded,0);assert.equal(r.processingFailures,1);
+  assert.equal(analyze({loads},serial+'\nWEBTRACE '+JSON.stringify(index)).samples[0].startup,null);
+  assert.equal(analyze({loads:[{...loads[0],pageTrace:{indexSentMs:100}}]},serial).samples[0].startup,null);
+  for(const n of [18,19,22])assert.ok(decodeTrace(Array(n).fill(0)));
+  assert.throws(()=>decodeTrace(Array(20).fill(0)),/Unknown/);
 });

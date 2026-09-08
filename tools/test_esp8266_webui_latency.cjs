@@ -211,7 +211,7 @@ async function stress(page, context, round) {
     const context=await browser.newContext({viewport:{width:1200,height:850}});
     await context.addInitScript(({trace})=>{
       if(trace){
-        const timeline=window.__pageTrace={sockets:[],longTasks:[],visibility:document.visibilityState};
+        const timeline=window.__pageTrace={timeOrigin:performance.timeOrigin,sockets:[],longTasks:[],visibility:document.visibilityState};
         addEventListener('DOMContentLoaded',()=>timeline.domContentLoaded=performance.now());
         addEventListener('load',()=>timeline.windowLoad=performance.now());
         const OriginalSocket=WebSocket;

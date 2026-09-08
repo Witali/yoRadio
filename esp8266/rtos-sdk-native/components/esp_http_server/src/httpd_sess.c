@@ -301,11 +301,12 @@ esp_err_t httpd_sess_process(struct httpd_data *hd, int newfd)
     }
 
     ESP_LOGD(TAG, LOG_FMT("httpd_req_new"));
-    /* WS processing opts in separately for getindex and slow/failed sends. */
+    /* Start before any WS frame byte is read, not only after getindex. */
 #ifdef CONFIG_HTTPD_WS_SUPPORT
-    if (!sd->ws_handshake_done)
+    httpd_trace_request_begin(sd->ws_handshake_done);
+#else
+    httpd_trace_request_begin(false);
 #endif
-        httpd_trace_begin();
     esp_err_t request_result = httpd_req_new(hd, sd);
     httpd_trace_end(request_result);
     if (request_result != ESP_OK) {

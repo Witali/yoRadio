@@ -15,14 +15,19 @@ static struct {
     uint32_t max_send_us;
     unsigned mem_errors;
     int last_errno;
+    uint32_t select_wait_us, dispatch_us, dispatch_flags;
     char id[24], path[64];
-    bool active;
+    bool active, slow_only;
 } trace;
+static struct {
+    uint32_t start, end, flags;
+    bool pending;
+} dispatch;
 static uint32_t boot_id, sequence;
 /* Compact format in DRAM avoids LX106 byte-load emulation for every format
  * character and reduces UART occupancy. Field order is decoded by the tool. */
 static char trace_format[] =
-    "WEBTRACE [\"%s\",\"%s\",%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%d,%d]\n";
+    "WEBTRACE [\"%s\",\"%s\",%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%d,%d,%u,%u,%u]\n";
 
 uint32_t httpd_trace_clock(void) {
     int saved_errno = errno;
@@ -37,8 +42,31 @@ void httpd_trace_begin(void) {
     trace.active = true;
     trace.start = httpd_trace_clock();
 }
-void httpd_trace_index_begin(void) {
+void httpd_trace_dispatch(uint32_t select_start, uint32_t select_end, bool readable) {
+    dispatch.start = select_start;
+    dispatch.end = select_end;
+    /* 1: select reported socket ready; 2: only HTTP's pending buffer. */
+    dispatch.flags = readable ? 1U : 2U;
+    dispatch.pending = true;
+}
+void httpd_trace_request_begin(bool websocket) {
     httpd_trace_begin();
+    if (dispatch.pending) {
+        trace.select_wait_us = dispatch.end - dispatch.start;
+        trace.dispatch_us = trace.start - dispatch.end;
+        trace.dispatch_flags = dispatch.flags;
+        dispatch.pending = false;
+    }
+    if (websocket) {
+        strcpy(trace.path, "/ws:recv");
+        trace.slow_only = true;
+    }
+}
+void httpd_trace_index_begin(void) {
+    /* Preserve socket reads and time since session dispatch. */
+    if (!trace.active) httpd_trace_begin();
+    trace.parse_us = httpd_trace_clock() - trace.start;
+    trace.slow_only = false;
     /* A fixed operation label, never the received command or its value. */
     strcpy(trace.path, "/ws:getindex");
 }
@@ -46,12 +74,11 @@ bool httpd_trace_ws_begin(void) {
     if (trace.active) return false; /* Keep an enclosing request's counters. */
     httpd_trace_begin();
     strcpy(trace.path, "/ws:send");
+    trace.slow_only = true;
     return true;
 }
 void httpd_trace_ws_end(int result) {
-    if (result || httpd_trace_clock() - trace.start >= 50000U)
-        httpd_trace_end(result);
-    else trace.active = false; /* Ordinary fast heartbeats are not logged. */
+    httpd_trace_end(result);
 }
 void httpd_trace_route(httpd_req_t *request) {
     if (!trace.active) return;
@@ -95,6 +122,7 @@ void httpd_trace_end(int result) {
     if (!trace.active) return;
     uint32_t total = httpd_trace_clock() - trace.start;
     trace.active = false;
+    if (trace.slow_only && !result && total < 50000U) return;
     /* Logging happens after the handler. Its UART cost is outside total_us
      * but can delay the next request: compare a non-profiled image as well. */
     /* esp_log_write accepts a DRAM format; ESP_LOGI requires a literal for
@@ -106,6 +134,7 @@ void httpd_trace_end(int result) {
         (unsigned)trace.send_us, (unsigned)trace.max_send_us, (unsigned)trace.tx_wait_us,
         (unsigned)trace.tx_sleep_budget_us, (unsigned)trace.mem_wait_us, (unsigned)trace.other_wait_us, trace.mem_errors,
         (unsigned)trace.retries, (unsigned)trace.bytes, (unsigned)trace.calls, result,
-        trace.last_errno);
+        trace.last_errno, (unsigned)trace.select_wait_us,
+        (unsigned)trace.dispatch_us, (unsigned)trace.dispatch_flags);
     }
 }

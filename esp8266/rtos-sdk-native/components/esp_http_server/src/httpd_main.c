@@ -23,6 +23,7 @@
 #include <esp_http_server.h>
 #include "esp_httpd_priv.h"
 #include "ctrl_sock.h"
+#include "httpd_trace.h"
 
 static const char *TAG = "httpd";
 
@@ -166,7 +167,9 @@ static esp_err_t httpd_server(struct httpd_data *hd)
     maxfd = MAX(hd->ctrl_fd, tmp_max_fd);
 
     ESP_LOGD(TAG, LOG_FMT("doing select maxfd+1 = %d"), maxfd + 1);
+    uint32_t select_start = httpd_trace_clock();
     int active_cnt = select(maxfd + 1, &read_set, NULL, NULL, NULL);
+    uint32_t select_end = httpd_trace_clock();
     if (active_cnt < 0) {
         ESP_LOGE(TAG, LOG_FMT("error in select (%d)"), errno);
         httpd_sess_delete_invalid(hd);
@@ -188,6 +191,7 @@ static esp_err_t httpd_server(struct httpd_data *hd)
     int fd = -1;
     while ((fd = httpd_sess_iterate(hd, fd)) != -1) {
         if (FD_ISSET(fd, &read_set) || (httpd_sess_pending(hd, fd))) {
+            httpd_trace_dispatch(select_start, select_end, FD_ISSET(fd, &read_set));
             ESP_LOGD(TAG, LOG_FMT("processing socket %d"), fd);
             if (httpd_sess_process(hd, fd) != ESP_OK) {
                 ESP_LOGD(TAG, LOG_FMT("closing socket %d"), fd);

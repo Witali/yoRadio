@@ -45,6 +45,9 @@ path, counters, times and result are printed.
 |---|---|
 | `start_us`, `total_us` | Board uptime and wall time from HTTP processing start to handler completion |
 | `parse_us` | Time until URI dispatch (not time waiting in the server's accept queue) |
+| `select_wait_us` | Previous `select()` wall time; can include ordinary idle before a request existed, never automatically excluded |
+| `dispatch_us` | Time from `select()` return to this session's processing start; includes earlier handlers, control work and preemption |
+| `dispatch_flags` | 1: socket reported readable by `select`; 2: only HTTP's buffered data; 0: no session-dispatch context |
 | `recv_us` | Wall time inside socket receives; overlaps parsing and possibly body handling |
 | `read_us` | Wall time reading playlist payload blocks from SPIFFS, cached or identity |
 | `send_us`, `max_send_us` | Sum and maximum of nonblocking socket-send calls |
@@ -68,8 +71,12 @@ handshake and first-message times, and the `getindex` send timestamp.
 Optional `--netlog` saves Chromium network diagnostics privately in the output
 directory; do not commit that file without a separate privacy review.
 
-Board operation `/ws:getindex` measures initial-state generation and sending
-after receiving that command. Slow (>=50 ms) or failed asynchronous WebSocket
+Board operation `/ws:getindex` now begins before reading the first frame byte.
+Its `parse_us` marks the received/parsed command; `recv_us` includes frame reads.
+Subtract `parse_us` from `total_us` to obtain the reply-generation/sending wall
+time. Earlier captures began only after receiving the command and have no
+dispatch fields. Slow (>=50 ms) or failed incoming frames use the fixed label
+`/ws:recv`; no command values are logged. Slow or failed asynchronous WebSocket
 sends are recorded as `/ws:send`; fast heartbeats are not logged individually.
 An enclosing HTTP/getindex trace retains ownership of its counters. The
 `last_errno` field distinguishes a closed socket, RAM errors and backpressure.
@@ -81,13 +88,22 @@ Compact UART format is a JSON array after `WEBTRACE`, with this field order:
 ```text
 id,path,start_us,total_us,parse_us,read_us,recv_us,send_us,max_send_us,
 tx_wait_us,tx_sleep_budget_us,mem_wait_us,other_wait_us,mem_errors,
-retries,bytes,calls,result,last_errno
+retries,bytes,calls,result,last_errno,select_wait_us,dispatch_us,dispatch_flags
 ```
 
 The analyzer expands it to named fields and retains all request records.
-It also accepts the earlier 18-field array and verbose JSON-object format. The compact
+It also accepts the earlier 18/19-field arrays and verbose JSON-object format. The compact
 format lives in DRAM to avoid repeated LX106 flash byte-load emulation while
 formatting. No added task, stack or per-request heap allocation is used.
+
+The browser records `performance.timeOrigin`. For a unique initial-state
+operation between matched HTML and playlist requests, `startup` bounds the
+time from the browser's command to server session entry. Bounds use HTTP
+request-send/first-response timestamps, not assumed clock synchronization or
+symmetric network delay. They handle 32-bit uptime wrap; ambiguous concurrent
+operations or missing data are not guessed. The bound, dispatch time and frame
+receive time distinguish delays before service, earlier server work, and reads.
+They do not by themselves prove packet loss or authorize sample exclusion.
 
 ## Excluding network waits without hiding regressions
 
@@ -98,6 +114,9 @@ measured socket-backpressure sleep budget: at least 200 ms and at least half
 the server wall time. Memory-pressure/other retries invalidate that decision.
 All resources must have unique matching traces; another slow/unresolved
 resource, request failure or memory error keeps the entire attempt included.
+Removing the largest proven wait budget must also leave at most 500 ms;
+several potentially overlapping resource waits are not summed to hide a
+separate browser or dispatch stall.
 
 Every exclusion has an explicit reason and count. EAGAIN means the socket
 could not enqueue bytes; it does **not** prove RF loss. Receiver behavior,
