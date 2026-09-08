@@ -2,7 +2,8 @@ const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), zlib = require('node:zlib'), vm = require('node:vm');
 const source = zlib.gunzipSync(fs.readFileSync(require('node:path').join(__dirname,
   '../yoRadio/data/www/script.js.gz'))).toString();
-const handler = source.slice(source.indexOf('function onMessage('), source.indexOf('function escapeData('));
+const bootstrap = source.slice(source.indexOf('function websocketBootstrapEnabled('), source.indexOf('function initialPlayerStateReady('));
+const handler = bootstrap+'\n'+source.slice(source.indexOf('function onMessage('), source.indexOf('function escapeData('));
 test('station broadcasts update current state without requiring the player DOM', () => {
   const select = source.slice(source.indexOf('function setCurrentItem('), source.indexOf('function normalizeStationName('));
   const errors = [];
