@@ -45,6 +45,10 @@ test("ESP8266 RAM codec benchmark embeds golden fixtures and bypasses services",
   assert.doesNotMatch(benchmark, /soc_get_ccount\(\)/);
   assert.match(cmake, /YORADIO_ESP8266_HELIX_STAGE_PROFILE/);
   assert.doesNotMatch(benchmark, /network_service|lwip_/);
+  assert.match(benchmark, /"Info"[\s\S]*"Xing"[\s\S]*"VBRI"/);
+  assert.match(benchmark, /!index_frame && \(!independent_only \|\| reservoir == 0U\)/);
+  assert.match(benchmark, /output\.pcm_or = 0/);
+  assert.match(benchmark, /INVALID benchmark: PCM is all zero/);
 });
 
 test("RAM decoder-to-DMA comparison is opt-in and never persists test settings", () => {
@@ -57,6 +61,23 @@ test("RAM decoder-to-DMA comparison is opt-in and never persists test settings",
   assert.match(source, /persistent_settings_update_runtime\(&settings\)/);
   assert.doesNotMatch(source, /persistent_settings_(save|commit)|nvs_set|nvs_commit|nvs_flash_erase/);
   assert.match(source, /physical wall=%u us audio=%u us eof=%u underrun=%u partial=%u fifo_empty=%u prefix=%u/);
+});
+
+test("MP3 matrix runs stored 64/128/320 inputs and excludes AAC", () => {
+  const cmake = read("esp8266", "rtos-sdk-native", "main", "CMakeLists.txt");
+  const source = read("esp8266", "rtos-sdk-native", "main", "codec_ram_benchmark.cpp");
+  assert.match(cmake, /option\(YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX[\s\S]*?OFF\)/);
+  assert.match(cmake, /mp3_composite\/mix-064.mp3[\s\S]*mp3_composite\/mix-320.mp3/);
+  for(const rate of [64,128,320]) assert.ok(source.includes('run_codec("MP3/mix/'+rate+'"'));
+  assert.match(source, /#if CONFIG_YORADIO_HELIX_AAC && !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX/);
+  assert.match(source, /#if CONFIG_YORADIO_HELIX_AAC\s+run_codec\("AAC"/);
+  assert.match(source, /first_mp3_frame\(input, bytes, false\)/);
+  assert.match(source, /cursor \+= size_t\(frame\.data - input\) \+ frame\.size/);
+  assert.match(source, /memcpy\(input, fixture\.data \+ cursor, bytes\)/);
+  assert.match(source, /helix_codec_write_pointer\(codec, &capacity\)/);
+  assert.doesNotMatch(source, /kMaxFixtureBytes|48U \* 1024U/);
+  const production = read("tools", "esp8266_audio_profile", "build_i2s_pdm_production.ps1");
+  assert.match(production, /-DYORADIO_ESP8266_CODEC_RAM_MP3_MATRIX=OFF/);
 });
 
 test("ESP8266 Helix stage hooks cover both MP3 and AAC hot paths", () => {

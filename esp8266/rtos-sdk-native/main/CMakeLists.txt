@@ -115,12 +115,24 @@ set(YORADIO_ESP8266_AUDIO_PROFILE_NETMASK "" CACHE STRING
 if(YORADIO_ESP8266_AUDIO_PROFILE)
   list(APPEND YORADIO_SOURCES "audio_profile_wrappers.cpp")
 endif()
+option(YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
+  "Benchmark sequential MP3 64/128/320 from internal flash, without AAC" OFF)
+if(YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX AND NOT YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
+  message(FATAL_ERROR "MP3 matrix requires CODEC_RAM_BENCHMARK")
+endif()
 set(YORADIO_EMBED_FILES "../../../yoRadio/data/www/script.js.gz")
 if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
   list(APPEND YORADIO_SOURCES "codec_ram_benchmark.cpp")
-  list(APPEND YORADIO_EMBED_FILES
-    "../../../tests/fixtures/helix_golden/stereo-320.mp3"
-    "../../../tests/fixtures/helix_golden/stereo-320.aac")
+  if(YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX)
+    list(APPEND YORADIO_EMBED_FILES
+      "../../../tests/fixtures/mp3_composite/mix-064.mp3"
+      "../../../tests/fixtures/mp3_composite/mix-128.mp3"
+      "../../../tests/fixtures/mp3_composite/mix-320.mp3")
+  else()
+    list(APPEND YORADIO_EMBED_FILES
+      "../../../tests/fixtures/helix_golden/stereo-320.mp3"
+      "../../../tests/fixtures/helix_golden/stereo-320.aac")
+  endif()
 endif()
 if(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK)
   list(APPEND YORADIO_SOURCES "audio_output_benchmark.c")
@@ -203,6 +215,10 @@ if(YORADIO_ESP8266_AUDIO_PROFILE)
     "-Wl,--wrap=helix_codec_commit"
     "-Wl,--wrap=native_audio_output_write"
     "-Wl,--wrap=native_audio_normalizer_process")
+endif()
+if(YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX=1)
 endif()
 if(YORADIO_ESP8266_CODEC_RAM_BENCHMARK)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE

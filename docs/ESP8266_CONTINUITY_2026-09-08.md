@@ -1,9 +1,17 @@
 # ESP8266 playback continuity investigation, 2026-09-08
 
-Status: standalone physical DMA passes; continuous live radio and responsive
+Status: standalone physical DMA progresses; continuous live radio and responsive
 WebUI together have NOT passed acceptance. No analog recording was obtained.
 
-## Reproducible RAM-source physical output
+## Historical RAM-source physical output (MP3 workload invalid)
+
+Correction: inspection found that the old MP3 selector repeatedly decoded
+the initial silent Info seek-table frame, not representative MP3 audio.
+Retain its counters below as historical observations ONLY: they establish
+DMA progress with generated silence, not music decoding capacity. Do not use
+this MP3 row or older repeated-Info results as an MP3 speed/continuity claim.
+The replacement sequential tone/noise benchmark skips metadata, checks
+nonzero PCM, and reads complete files in order from internal flash.
 
 Wemos D1 mini, CPU160/QIO40, Helix mono MP3 SSO/AAC, I2S PDM32 GPIO3,
 two 512-word DMA buffers. Wi-Fi off, 1500 repetitions of an embedded frame
@@ -12,7 +20,7 @@ its elapsed time is NOT decoder CPU consumption.
 
 | Codec | PCM duration | Measured wall | DMA EOF | Underruns | FIFO empty | Free heap |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| MP3, 320 kbit/s fixture | 36.000 s | 35.893457 s | 3375 | 0 | 0 | 81972 B |
+| MP3 Info frame, INVALID audio workload | 36.000 s | 35.893457 s | 3375 | 0 | 0 | 81972 B |
 | AAC, 320 kbit/s fixture | 32.000 s | 31.905115 s | 3000 | 0 | 0 | 83656 B |
 
 Task stack margin was 1504 bytes. Fifty decoder lifecycle iterations returned

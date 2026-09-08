@@ -29,6 +29,11 @@ extern "C" const uint8_t _binary_stereo_320_mp3_start[];
 extern "C" const uint8_t _binary_stereo_320_mp3_end[];
 extern "C" const uint8_t _binary_stereo_320_aac_start[];
 extern "C" const uint8_t _binary_stereo_320_aac_end[];
+#if YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
+extern "C" const uint8_t _binary_mix_064_mp3_start[], _binary_mix_064_mp3_end[];
+extern "C" const uint8_t _binary_mix_128_mp3_start[], _binary_mix_128_mp3_end[];
+extern "C" const uint8_t _binary_mix_320_mp3_start[], _binary_mix_320_mp3_end[];
+#endif
 
 struct FrameView {
     const uint8_t *data;
@@ -41,6 +46,7 @@ struct OutputStats {
     uint8_t channels;
     uint32_t callbacks;
     volatile int16_t sink;
+    uint16_t pcm_or;
     bool physical_output;
 };
 
@@ -93,6 +99,8 @@ bool accept_pcm(void *context, const helix_stream_info_t *info,
     OutputStats *output = static_cast<OutputStats *>(context);
     if (!info || !pcm || !samples || !info->sample_rate || !info->channels)
         return false;
+    for (size_t index = 0; index < samples; ++index)
+        output->pcm_or |= static_cast<uint16_t>(pcm[index]);
 #if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
     if (output->physical_output && native_audio_output_write(
             pcm, samples, info->sample_rate, info->channels) != ESP_OK)
@@ -107,7 +115,7 @@ bool accept_pcm(void *context, const helix_stream_info_t *info,
     return true;
 }
 
-FrameView first_mp3_frame(const uint8_t *data, size_t size) {
+FrameView first_mp3_frame(const uint8_t *data, size_t size, bool independent_only=true) {
     static const uint16_t rate1[] =
         {0,32,40,48,56,64,80,96,112,128,160,192,224,256,320};
     static const uint16_t rate2[] =
@@ -129,12 +137,29 @@ FrameView first_mp3_frame(const uint8_t *data, size_t size) {
         uint32_t bitrate = mpeg1 ? rate1[bitrate_index] : rate2[bitrate_index];
         size_t frame_size = ((mpeg1 ? 144000U : 72000U) * bitrate) /
                             sample_rate + ((frame[2] >> 1) & 1U);
-        if (frame_size <= kMaxFrameBytes && offset + frame_size <= size)
-            return {frame, frame_size};
+        if (frame_size <= kMaxFrameBytes && offset + frame_size <= size) {
+            const size_t side = 4U + ((frame[1] & 1U) ? 0U : 2U);
+            const bool mono = (frame[3] >> 6) == 3U;
+            const size_t tag = side + (mpeg1 ? (mono ? 17U : 32U)
+                                                       : (mono ? 9U : 17U));
+            if (tag + 4U > frame_size) continue;
+            const bool index_frame = !std::memcmp(frame + tag, "Info", 4) ||
+                !std::memcmp(frame + tag, "Xing", 4) ||
+                (frame_size >= 40U && !std::memcmp(frame + 36U, "VBRI", 4));
+            const unsigned reservoir = mpeg1
+                ? (unsigned(frame[side]) << 1) | (frame[side + 1U] >> 7)
+                : frame[side];
+            /* Repeating a seek-table/silent Info frame is not an audio
+             * benchmark. A repeated frame must not depend on previous data. */
+            if (!index_frame && (!independent_only || reservoir == 0U))
+                return {frame, frame_size};
+            offset += frame_size - 1U;
+        }
     }
     return {nullptr, 0};
 }
 
+#if !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
 FrameView first_aac_frame(const uint8_t *data, size_t size) {
     for (size_t offset = 0; offset + 7 <= size; ++offset) {
         const uint8_t *frame = data + offset;
@@ -148,6 +173,7 @@ FrameView first_aac_frame(const uint8_t *data, size_t size) {
     }
     return {nullptr, 0};
 }
+#endif
 
 bool submit_frame(helix_codec_t *codec, const uint8_t *frame,
                   size_t frame_size, OutputStats *output,
@@ -155,7 +181,7 @@ bool submit_frame(helix_codec_t *codec, const uint8_t *frame,
     size_t capacity = 0;
     uint8_t *destination = helix_codec_write_pointer(codec, &capacity);
     if (!destination || capacity < frame_size) return false;
-    std::memcpy(destination, frame, frame_size);
+    if (destination != frame) std::memmove(destination, frame, frame_size);
     int64_t started = esp_timer_get_time();
     int result = helix_codec_commit(codec, frame_size, accept_pcm, output);
     *elapsed_us = static_cast<uint32_t>(esp_timer_get_time() - started);
@@ -163,20 +189,41 @@ bool submit_frame(helix_codec_t *codec, const uint8_t *frame,
 }
 
 void run_codec(const char *name, helix_codec_kind_t kind,
-               const FrameView &fixture) {
-    /* The single benchmark runner owns this buffer. Keep the RAM fixture
-     * off the 3-KiB app stack when physical output adds nested calls. */
-    static uint8_t frame_ram[kMaxFrameBytes];
-    if (!fixture.data || !fixture.size) {
+               const FrameView &fixture, bool sequential=false) {
+    if (!fixture.data || !fixture.size ||
+        (!sequential && fixture.size > kMaxFrameBytes)) {
         ESP_LOGE(kTag, "%s fixture has no complete frame", name);
         return;
     }
-    std::memcpy(frame_ram, fixture.data, fixture.size);
     helix_codec_t *codec = helix_codec_create(kind, 0);
     if (!codec) {
         ESP_LOGE(kTag, "%s decoder allocation failed", name);
         return;
     }
+#if !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
+    /* Legacy single-frame CPU benchmark: cache just one frame in RAM. */
+    static uint8_t frame_ram[kMaxFrameBytes];
+    std::memcpy(frame_ram, fixture.data, fixture.size);
+#endif
+    size_t cursor = 0;
+    unsigned clip_loops = 0;
+    auto next_input = [&]() -> FrameView {
+#if !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
+        if (!sequential) return {frame_ram, fixture.size};
+#endif
+        /* Files remain in mapped flash. Reuse the decoder's input buffer,
+         * never allocate a clip-sized RAM copy or a second staging buffer.
+         * Parse only RAM bytes (byte reads from ESP8266 flash are costly). */
+        if (cursor == fixture.size) { cursor = 0; ++clip_loops; }
+        size_t capacity = 0;
+        uint8_t *input = helix_codec_write_pointer(codec, &capacity);
+        const size_t bytes = std::min(kMaxFrameBytes, fixture.size - cursor);
+        if (!input || capacity < bytes) return {nullptr, 0};
+        std::memcpy(input, fixture.data + cursor, bytes);
+        FrameView frame = first_mp3_frame(input, bytes, false);
+        if (frame.data) cursor += size_t(frame.data - input) + frame.size;
+        return frame;
+    };
 
     OutputStats output = {};
 #if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
@@ -189,7 +236,8 @@ void run_codec(const char *name, helix_codec_kind_t kind,
     const size_t iram_bytes = helix_codec_iram_used(codec);
     uint32_t elapsed = 0;
     for (unsigned index = 0; index < kWarmupFrames; ++index) {
-        if (!submit_frame(codec, frame_ram, fixture.size, &output, &elapsed)) {
+        const FrameView input = next_input();
+        if (!input.data || !submit_frame(codec, input.data, input.size, &output, &elapsed)) {
             ESP_LOGE(kTag, "%s warmup failed at %u", name, index);
             helix_codec_destroy(codec);
             return;
@@ -199,6 +247,7 @@ void run_codec(const char *name, helix_codec_kind_t kind,
 
     output.samples = 0;
     output.callbacks = 0;
+    output.pcm_or = 0;
 #if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
     native_audio_output_reset_spi_stats();
     esp8266_nodac_profile_t dma_before = {};
@@ -210,7 +259,8 @@ void run_codec(const char *name, helix_codec_kind_t kind,
     uint32_t minimum_us = UINT32_MAX;
     uint32_t maximum_us = 0;
     for (unsigned index = 0; index < kMeasuredFrames; ++index) {
-        if (!submit_frame(codec, frame_ram, fixture.size, &output, &elapsed)) {
+        const FrameView input = next_input();
+        if (!input.data || !submit_frame(codec, input.data, input.size, &output, &elapsed)) {
             ESP_LOGE(kTag, "%s measured decode failed at %u", name, index);
             helix_codec_destroy(codec);
             return;
@@ -245,11 +295,12 @@ void run_codec(const char *name, helix_codec_kind_t kind,
         unsigned(YORADIO_ESP8266_DMA_COMMITTED_PREFIX));
 #endif
     ESP_LOGI(kTag,
-             "%s RAM frame=%u bytes iterations=%u callbacks=%u "
+             "%s %s frame=%u bytes iterations=%u callbacks=%u "
              "decode=%u us avg=%u us min=%u us max=%u us "
              "audio=%u us realtime=%u.%u%% speed=%u.%03ux heap=%u "
              "workspace=%u arena=%u dram=%u iram=%u",
-             name, static_cast<unsigned>(fixture.size), kMeasuredFrames,
+             name, sequential ? "FLASH" : "RAM",
+             static_cast<unsigned>(fixture.size), kMeasuredFrames,
              static_cast<unsigned>(output.callbacks),
              static_cast<unsigned>(total_us),
              static_cast<unsigned>(total_us / kMeasuredFrames), minimum_us,
@@ -261,6 +312,10 @@ void run_codec(const char *name, helix_codec_kind_t kind,
              static_cast<unsigned>(arena_bytes),
              static_cast<unsigned>(dram_bytes),
              static_cast<unsigned>(iram_bytes));
+    ESP_LOGI(kTag, "%s PCM nonzero=%u rate=%u channels=%u", name,
+             output.pcm_or != 0, unsigned(output.sample_rate), unsigned(output.channels));
+    if (sequential) ESP_LOGI(kTag, "%s sequential clip loops=%u", name, clip_loops);
+    if (!output.pcm_or) ESP_LOGE(kTag, "%s INVALID benchmark: PCM is all zero", name);
     report_stage_profile(name, total_us);
     ESP_LOGI(kTag, "%s task stack free=%u", name,
              unsigned(uxTaskGetStackHighWaterMark(NULL)));
@@ -293,7 +348,7 @@ void run_lifecycle_stress() {
     if (codec) {
         update_minimum_heap(&minimum_heap);
         for (unsigned cycle = 0; cycle < kLifecycleCycles; ++cycle) {
-#if CONFIG_YORADIO_HELIX_AAC
+#if CONFIG_YORADIO_HELIX_AAC && !YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
             helix_codec_kind_t kind = (cycle & 1U)
                 ? HELIX_CODEC_MP3 : HELIX_CODEC_AAC;
 #else
@@ -352,7 +407,7 @@ extern "C" void helix_stage_profile_end(int stage) {
 
 extern "C" void codec_ram_benchmark_run(void) {
 #if YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
-    ESP_LOGI(kTag, "begin: RAM decode -> PCM -> PDM -> DMA, Wi-Fi off");
+    ESP_LOGI(kTag, "begin: fixture -> decode -> PCM -> PDM -> DMA, Wi-Fi off");
     if (nvs_flash_init() != ESP_OK || persistent_settings_init() != ESP_OK) {
         ESP_LOGE(kTag, "test settings init failed");
         return;
@@ -368,12 +423,23 @@ extern "C" void codec_ram_benchmark_run(void) {
         return;
     }
 #else
-    ESP_LOGI(kTag, "begin: CPU-only decode, fixture copied to RAM, Wi-Fi off");
+    ESP_LOGI(kTag, "begin: CPU-only decode, Wi-Fi off");
 #endif
     if (!helix_codec_prepare()) {
         ESP_LOGE(kTag, "cannot reserve codec word arena");
         return;
     }
+#if YORADIO_ESP8266_CODEC_RAM_MP3_MATRIX
+    run_codec("MP3/mix/64", HELIX_CODEC_MP3,
+              {_binary_mix_064_mp3_start,
+               size_t(_binary_mix_064_mp3_end - _binary_mix_064_mp3_start)}, true);
+    run_codec("MP3/mix/128", HELIX_CODEC_MP3,
+              {_binary_mix_128_mp3_start,
+               size_t(_binary_mix_128_mp3_end - _binary_mix_128_mp3_start)}, true);
+    run_codec("MP3/mix/320", HELIX_CODEC_MP3,
+              {_binary_mix_320_mp3_start,
+               size_t(_binary_mix_320_mp3_end - _binary_mix_320_mp3_start)}, true);
+#else
     run_codec(
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
               "MP3/libmad",
@@ -389,6 +455,7 @@ extern "C" void codec_ram_benchmark_run(void) {
               first_aac_frame(_binary_stereo_320_aac_start,
                               _binary_stereo_320_aac_end -
                               _binary_stereo_320_aac_start));
+#endif
 #endif
     run_lifecycle_stress();
     ESP_LOGI(kTag, "complete");
