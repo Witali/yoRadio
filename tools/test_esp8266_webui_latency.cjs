@@ -72,11 +72,17 @@ async function load(page, kind, round) {
   console.log(JSON.stringify({...sample,network:sample.network?.map(({chunks,...rest})=>({...rest,chunkCount:chunks.length}))}));
   return !sample.error;
 }
+function volumeButtonSelector(original, iteration) {
+  // At zero, a minus click cannot produce a changed-value acknowledgement.
+  // Alternate inward first at either boundary, then restore the exact value.
+  const increase = (iteration % 2 === 1) !== (Number(original) < 2);
+  return increase ? '#volpbutton' : '#volmbutton';
+}
 async function buttons(page) {
   const original = await page.locator('#volume').inputValue();
   try {
     for(let i=0;i<10;i++) {
-      const selector = i%2 ? '#volpbutton' : '#volmbutton';
+      const selector = volumeButtonSelector(original,i);
       const result = await page.evaluate(({selector})=>new Promise(resolve=>{
         const before = Number(document.querySelector('#volume').value);
         const started = performance.now();

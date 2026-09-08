@@ -3,6 +3,18 @@ const {spawnSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..'),component=path.join(root,'esp8266/rtos-sdk-native/components/esp_http_server');
 const wsl=process.platform==='win32',p=f=>wsl?'/mnt/'+f[0].toLowerCase()+f.slice(2).replace(/\\/g,'/'):f;
 const {analyze,decodeTrace}=require('../tools/analyze_esp8266_web_trace.cjs');
+
+test('physical volume benchmark starts inward at either limit and never awaits a clamped no-op',()=>{
+  const source=fs.readFileSync(path.join(root,'tools/test_esp8266_webui_latency.cjs'),'utf8');
+  const fn=source.slice(source.indexOf('function volumeButtonSelector'),source.indexOf('async function buttons'));
+  const selector=require('node:vm').runInNewContext(fn+';volumeButtonSelector');
+  for(const original of [0,1,2,128,253,254]) {
+    let current=original;
+    for(let i=0;i<10;++i){const next=Math.min(254,Math.max(0,current+(selector(original,i)==='#volpbutton'?2:-2)));
+      assert.notEqual(next,current);current=next;}
+    assert.equal(current,original);
+  }
+});
 test('latency analysis excludes only proven TX wait; RAM, unknown and raw outliers remain',()=>{
   const good={id:'a-1',path:'/',total_us:1000000,tx_wait_us:900000,tx_sleep_budget_us:900000,mem_wait_us:0,other_wait_us:0,mem_errors:0,result:0};
   const records=[good,{...good,id:'a-2',mem_errors:1},{...good,id:'a-3',tx_sleep_budget_us:1000},{...good,id:'a-4',result:-1}];
