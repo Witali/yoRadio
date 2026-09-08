@@ -30,6 +30,7 @@ esp_err_t esp8266_nodac_i2s_commit(size_t word_count);
 void esp8266_nodac_i2s_silence(uint32_t silence_word);
 void esp8266_nodac_i2s_reset_underruns(void);
 uint32_t esp8266_nodac_i2s_underruns(void);
+uint32_t esp8266_nodac_i2s_eofs(void);
 
 #if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK || YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
 typedef struct {

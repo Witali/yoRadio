@@ -1084,16 +1084,25 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
     native_audio_output_spi_stats_t output;
     audio_service_health(&health);
     native_audio_output_get_spi_stats(&output);
+    /* A decode-only build also produces PCM callbacks; it is not physical
+     * playback and must never satisfy the continuity acceptance test. */
+#if YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY
+    const char *output_enabled = "false";
+#else
+    const char *output_enabled = "true";
+#endif
     char body[384];
     snprintf(body, sizeof(body),
         "{\"generation\":%u,\"uptime_ms\":%u,\"rx_bytes\":%u,"
         "\"pcm_frames\":%u,\"sample_rate\":%u,\"rx_age_ms\":%u,"
-        "\"pcm_age_ms\":%u,\"underruns\":%u,\"free_heap\":%u}",
+        "\"pcm_age_ms\":%u,\"underruns\":%u,\"free_heap\":%u,"
+        "\"dma_eofs\":%u,\"output_enabled\":%s}",
         (unsigned)health.generation, (unsigned)health.uptime_ms,
         (unsigned)health.rx_bytes, (unsigned)health.pcm_frames,
         (unsigned)health.sample_rate, (unsigned)health.rx_age_ms,
         (unsigned)health.pcm_age_ms, (unsigned)output.queue_empty_events,
-        (unsigned)esp_get_free_heap_size());
+        (unsigned)esp_get_free_heap_size(),
+        (unsigned)output.chained_transfers, output_enabled);
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return finish_short_response(request, send_string(request, body));

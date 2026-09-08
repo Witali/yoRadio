@@ -60,6 +60,7 @@ static bool s_waiting;
 static bool s_running;
 static uint32_t s_silence_word;
 static volatile uint32_t s_underruns;
+static volatile uint32_t s_eofs;
 #if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK || YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
 static esp8266_nodac_profile_t s_profile;
 #endif
@@ -131,8 +132,8 @@ static void IRAM_ATTR __attribute__((optimize("Os"))) nodac_slc_isr(void *arg) {
         bool partial = false;
 #endif
         bool missing = s_state.state[s_state.active ^ 1U] != NODAC_READY;
+        ++s_eofs;
 #if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK || YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
-        ++s_profile.eof_count;
         if (partial) ++s_profile.partial_starts;
         if (I2S0.int_raw.tx_rempty) ++s_profile.fifo_empty;
         I2S0.int_clr.tx_rempty = 1;
@@ -189,6 +190,7 @@ static void configure_descriptors(uint32_t silence_word) {
     s_waiting = false;
     s_running = false;
     s_underruns = 0;
+    s_eofs = 0;
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
     s_dma_trace_count = 0;
 #endif
@@ -446,10 +448,17 @@ uint32_t esp8266_nodac_i2s_underruns(void) {
     return underruns;
 }
 
+uint32_t esp8266_nodac_i2s_eofs(void) {
+    taskENTER_CRITICAL();
+    uint32_t eofs = s_eofs;
+    taskEXIT_CRITICAL();
+    return eofs;
+}
+
 #if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK || YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
 void esp8266_nodac_i2s_profile(esp8266_nodac_profile_t *stats) {
     taskENTER_CRITICAL();
-    stats->eof_count = s_profile.eof_count;
+    stats->eof_count = s_eofs;
     stats->partial_starts = s_profile.partial_starts;
     stats->empty_starts = s_profile.empty_starts;
     stats->blocked_partial = s_profile.blocked_partial;

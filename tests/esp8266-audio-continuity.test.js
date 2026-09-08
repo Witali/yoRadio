@@ -4,13 +4,16 @@ const fs=require('node:fs');
 const {analyze}=require('../tools/test_esp8266_audio_continuity.cjs');
 function sample(t) { return {host_ms:t,uptime_ms:1000+t,generation:1,
   sample_rate:48000,pcm_frames:48000+t*48,underruns:3,
-  rx_bytes:3000+t*6,pcm_age_ms:10,free_heap:12000}; }
+  rx_bytes:3000+t*6,pcm_age_ms:10,free_heap:12000,
+  output_enabled:true,dma_eofs:3+Math.floor(t/10)}; }
 test('requires at least 20 seconds of real PCM progress and no DMA gap',()=>{
   assert.equal(analyze([sample(0),sample(20000)]).pass,true);
   assert.equal(analyze([sample(0),sample(19000)]).pass,false);
   assert.equal(analyze([sample(0),{...sample(20000),underruns:4}]).pass,false);
   assert.equal(analyze([sample(0),{...sample(20000),pcm_frames:48000}]).pass,false);
   assert.equal(analyze([sample(0),{...sample(20000),pcm_age_ms:900}]).pass,false);
+  assert.equal(analyze([sample(0),{...sample(20000),output_enabled:false}]).pass,false);
+  assert.equal(analyze([sample(0),{...sample(20000),dma_eofs:3}]).pass,false);
 });
 test('failed requests, counter resets, rate/station changes are not discarded',()=>{
   assert.equal(analyze([sample(0),{...sample(22000),underruns:undefined}]).pass,false);

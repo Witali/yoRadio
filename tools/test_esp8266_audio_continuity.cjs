@@ -7,7 +7,7 @@ const delta = (a,b) => (a-b) >>> 0;
 function analyze(samples, seconds=20) {
   const errors=[];
   const fields=['host_ms','uptime_ms','generation','rx_bytes','pcm_frames',
-    'sample_rate','pcm_age_ms','underruns','free_heap'];
+    'sample_rate','pcm_age_ms','underruns','free_heap','dma_eofs'];
   if(seconds<20) errors.push('minimum window is 20 seconds');
   if(samples.length<2 || samples.some(s=>s.error)) return {pass:false,errors:[...errors,'missing health samples']};
   if(samples.some(s=>fields.some(k=>!Number.isFinite(s[k]) || s[k]<0)))
@@ -16,6 +16,8 @@ function analyze(samples, seconds=20) {
   const wallMs=b.host_ms-a.host_ms, boardMs=delta(b.uptime_ms,a.uptime_ms);
   const frames=delta(b.pcm_frames,a.pcm_frames);
   const underruns=delta(b.underruns,a.underruns);
+  if(samples.some(s=>s.output_enabled!==true) || !delta(b.dma_eofs,a.dma_eofs))
+    errors.push('physical DMA output is not progressing');
   if(wallMs<seconds*1000 || boardMs<seconds*1000) errors.push('window too short');
   if(samples.some(s=>s.generation!==a.generation || s.sample_rate!==a.sample_rate))
     errors.push('station or format changed');

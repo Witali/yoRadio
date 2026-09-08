@@ -1199,6 +1199,7 @@ void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *stats) {
     stats->queue_empty_events = s_spi_queue_empty_events;
     taskEXIT_CRITICAL();
 #elif YORADIO_ESP8266_I2S_PDM
+    stats->chained_transfers = esp8266_nodac_i2s_eofs();
     stats->queue_empty_events = esp8266_nodac_i2s_underruns();
 #endif
 }
