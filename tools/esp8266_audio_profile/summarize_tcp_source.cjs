@@ -44,6 +44,8 @@ function analyzeTcp(log,board=null) {
       rto_episodes_sample_delta:delta('rto_episodes'),
       fast_retrans_sample_delta:delta('fast_retrans'),dup_acks_sample_delta:delta('dup_acks'),
       accepted_body:c.end?.accepted_body??null,max_send_us:c.end?.max_send_us??null,
+      accepted_wire_bytes:c.end?.accepted_wire_bytes??null,
+      sample_call_ms:stats(samples.map(s=>s.sample_call_ms)),
       end_error:c.end?.error??null,telemetry_errors:c.errors,
       board_match:match?{completed:match.completed,kept_up:match.kept_up,error:match.error,
         rx_kbps:match.rx_kbps,output:match.output,underruns:match.underrun,

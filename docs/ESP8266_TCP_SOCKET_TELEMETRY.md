@@ -55,6 +55,39 @@ Host-проверка: `node --test tests/esp8266-network-tcp-source.test.js`.
 пейсинг и наличие валидной статистики сокета. Пройдено на Windows.
 Измерения физической платы с этим сервером — отдельный следующий этап.
 
+## Вариант внутри существующего Node-сервера
+
+На физической плате .NET-host не принял ни одного из четырёх соединений,
+хотя слушал правильный адрес/порт. После возврата Node-хоста соединение
+прошло. Точная причина недоступности .NET не установлена; правила firewall
+не изменялись. Для этого ПК использовать адаптер существующего сервера:
+
+```powershell
+node tools/esp8266_audio_profile/build_tcp_info.cjs
+node tools/esp8266_audio_profile/network_node_tcp_source.cjs
+```
+
+Это тот же `network_source.cjs`, без замены HTTP/pacing. Небольшой addon
+на ПК использует [napi_get_uv_event_loop](https://nodejs.org/api/n-api.html#napi_get_uv_event_loop),
+`uv_walk` и [uv_fileno](https://docs.libuv.org/en/v1.x/handle.html#c.uv_fileno)
+для собственных TCP-сокетов Node, после чего читает SIO_TCP_INFO.
+Дескрипторы не закрываются/не изменяются, приватные указатели Node/V8
+и доступ к чужим процессам не используются. Новых задач/RAM на ESP нет.
+
+Сборщик скачивает официальные headers и `node.lib` строго для текущего
+`process.version`, проверяет SHA-256 по официальному SHASUMS256 и собирает
+в `.build/node-tcp-info/<version>/`. Нужны установленные MSVC x64 tools.
+Node не переустанавливается. После обновления Node addon нужно пересобрать:
+использование libuv требует соответствующих заголовков/библиотеки.
+
+`accepted_wire_bytes` у Node включает HTTP-заголовки, это не body-only
+и не подтверждённые платой байты. `sample_call_ms` показывает накладные
+расходы выборки на ПК. Самплер выполняется между событиями Node, в том
+числе пока HTTP-отправка ждёт drain; он не добавляет задержек в firmware.
+Десять loopback MP3/AAC-запросов прошли с неизменными encoded bytes и
+валидными TCP-снимками: `node --test tests/esp8266-node-tcp-info.test.js`.
+Физическая серия будет отдельной; нельзя заменить сервер посреди A/B.
+
 Отчёт со связью по case/variant:
 
 ```powershell
