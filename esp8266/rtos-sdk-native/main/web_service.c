@@ -770,16 +770,18 @@ static esp_err_t page_handler(httpd_req_t *request) {
     }
     int gzip_quality = web_encoding_quality(accept_encoding, "gzip");
     int identity_quality = web_encoding_quality(accept_encoding, "identity");
+    bool settings_page = request_path_equals(request, "/settings.html");
     if (s_bundle_current && network_service_connected() && gzip_quality > 0 &&
         gzip_quality >= identity_quality &&
-        (request_path_equals(request, "/") || request_path_equals(request, "/index.html"))) {
+        (settings_page || request_path_equals(request, "/") || request_path_equals(request, "/index.html"))) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
         httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
         /* Its length is known; the HTTP server stages flash data in bounded
          * pieces while preserving a single Content-Length response. */
-        esp_err_t result = httpd_resp_send(request, (const char *)web_bundle_gzip,
-                                          sizeof(web_bundle_gzip));
+        const unsigned char *bundle = settings_page ? web_settings_bundle_gzip : web_bundle_gzip;
+        size_t bundle_size = settings_page ? sizeof(web_settings_bundle_gzip) : sizeof(web_bundle_gzip);
+        esp_err_t result = httpd_resp_send(request, (const char *)bundle, bundle_size);
         return finish_short_response(request, result);
     }
     if (!identity_quality) {

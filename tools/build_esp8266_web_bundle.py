@@ -1,4 +1,4 @@
-"""Build a compressed native-player bootstrap from the shared WebUI sources.
+"""Build compressed native-player/settings shells from shared WebUI sources.
 
 No playlist/settings/credentials are embedded. A runtime content fingerprint
 must match SPIFFS before firmware may serve this acceleration. Default source
@@ -21,7 +21,9 @@ def fnv(data):
     return result
 
 
-def build(root):
+def build(root, page='player'):
+    if page not in ('player', 'settings'):
+        raise ValueError('Unsupported bundle page')
     web = root / 'yoRadio/data/www'
     compressed = {name: (web / (name + '.gz')).read_bytes() for name in FILES}
     assets = {name: gzip.decompress(data).decode('utf-8')
@@ -42,7 +44,8 @@ def build(root):
     variables = ("var yoVersion='esp8266-native',webUiRevision='%s',"
                  "formAction='',playMode='player',equalizerEnabled=false,"
                  "nativeFirmwareOnly=true;" % revision)
-    preloaded = json.dumps({name: assets[name] for name in ('player.html','logo.svg')},
+    fragment = 'player.html' if page == 'player' else 'options.html'
+    preloaded = json.dumps({name: assets[name] for name in (fragment, 'logo.svg')},
                           ensure_ascii=True, separators=(',', ':')).replace('<', r'\u003c')
     variables += 'window.yoUiAssets=' + preloaded + ';'
     variables += ("history.replaceState(null,'',location.pathname+'?ui='+webUiRevision);")
@@ -61,14 +64,18 @@ def main():
     parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--html-gzip', type=Path)
+    parser.add_argument('--settings-gzip', type=Path)
     args = parser.parse_args()
     data, originals, revision = build(args.root)
+    settings, _, _ = build(args.root, 'settings')
     lines = ['/* Generated from shared WebUI; do not edit. */', '#pragma once',
-             '#include <stdint.h>',
-             'static const unsigned char web_bundle_gzip[] __attribute__((aligned(4))) = {']
-    for offset in range(0, len(data), 24):
-        lines.append('  ' + ','.join('0x%02x' % value for value in data[offset:offset+24]) + ',')
-    lines += ['};', 'static const struct { const char *path; uint32_t hash; } web_bundle_files[] = {']
+             '#include <stdint.h>']
+    for symbol, content in (('web_bundle_gzip', data), ('web_settings_bundle_gzip', settings)):
+        lines.append('static const unsigned char %s[] __attribute__((aligned(4))) = {' % symbol)
+        for offset in range(0, len(content), 24):
+            lines.append('  ' + ','.join('0x%02x' % value for value in content[offset:offset+24]) + ',')
+        lines.append('};')
+    lines += ['static const struct { const char *path; uint32_t hash; } web_bundle_files[] = {']
     for name, original in originals.items():
         lines.append('  {"/spiffs/www/%s.gz", 0x%08xU},' % (name, fnv(original)))
     lines += ['};', '#define WEB_BUNDLE_REVISION "%s"' % revision]
@@ -76,7 +83,10 @@ def main():
     args.output.write_text('\n'.join(lines)+'\n', encoding='utf-8')
     if args.html_gzip:
         args.html_gzip.write_bytes(data)
-    print('Shared player bundle: %d gzip bytes, revision %s' % (len(data), revision))
+    if args.settings_gzip:
+        args.settings_gzip.write_bytes(settings)
+    print('Shared bundles: player %d, settings %d gzip bytes, revision %s' %
+          (len(data), len(settings), revision))
 
 
 if __name__ == '__main__':

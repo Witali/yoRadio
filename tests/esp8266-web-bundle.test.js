@@ -19,8 +19,8 @@ test('shared fragment loader uses preloaded content only when explicitly supplie
 test('generated gzip contains the exact common fragments and parseable common scripts',()=>{
   const dir=fs.mkdtempSync(path.join(root,'.build/web-bundle-'));
   const python=process.platform==='win32'?path.join(root,'.build/esp8266-python/Scripts/python.exe'):'python3';
-  const header=path.join(dir,'generated.h'),gzip=path.join(dir,'player.html.gz');
-  const build=spawnSync(python,[path.join(root,'tools/build_esp8266_web_bundle.py'),'--output',header,'--html-gzip',gzip],{encoding:'utf8'});
+  const header=path.join(dir,'generated.h'),gzip=path.join(dir,'player.html.gz'),settings=path.join(dir,'settings.html.gz');
+  const build=spawnSync(python,[path.join(root,'tools/build_esp8266_web_bundle.py'),'--output',header,'--html-gzip',gzip,'--settings-gzip',settings],{encoding:'utf8'});
   assert.equal(build.status,0,build.stdout+build.stderr);
   const html=zlib.gunzipSync(fs.readFileSync(gzip)).toString();
   const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
@@ -40,6 +40,18 @@ test('generated gzip contains the exact common fragments and parseable common sc
   }
   assert.doesNotMatch(html, /src="(?:variables|script|dragpl)\.js/);
   assert.ok(html.includes('id="content"') && html.includes('id="progress"'));
+  const settingsHtml=zlib.gunzipSync(fs.readFileSync(settings)).toString();
+  const settingsScripts=[...settingsHtml.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
+  assert.equal(settingsScripts.length,3);
+  for(const code of settingsScripts) new vm.Script(code);
+  assert.equal(settingsScripts[1],script);
+  const settingsContext={window:{},history:{replaceState(){}},location:{pathname:'/settings.html'}};
+  vm.runInNewContext(settingsScripts[0],settingsContext);
+  assert.equal(settingsContext.playMode,'player'); // STA, not the Wi-Fi-only AP page.
+  for(const name of ['options.html','logo.svg']) assert.equal(settingsContext.window.yoUiAssets[name],
+    zlib.gunzipSync(fs.readFileSync(path.join(root,'yoRadio/data/www',name+'.gz'))).toString());
+  assert.equal(settingsContext.window.yoUiAssets['player.html'],undefined);
+  assert.match(generated,/web_settings_bundle_gzip\[\] __attribute__\(\(aligned\(4\)\)\)/);
 });
 test('HTTP encoding selection respects integer qvalues, exclusions and wildcard',()=>{
   const dir=fs.mkdtempSync(path.join(root,'.build/web-encoding-'));
@@ -76,6 +88,8 @@ test('bundle is validated before serving and invalidated by uploads, never used 
   const web=fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/main/web_service.c'),'utf8');
   assert.match(web,/s_bundle_current = bundle_matches_spiffs\(\)/);
   assert.match(web,/if \(s_bundle_current && network_service_connected\(\)/);
+  assert.match(web,/bool settings_page = request_path_equals\(request, "\/settings.html"\)/);
+  assert.match(web,/settings_page \? web_settings_bundle_gzip : web_bundle_gzip/);
   assert.match(web,/web_service_notify_assets_changed\(void\)[\s\S]*?s_bundle_current = false/);
   const upload=fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/main/web_upload.c'),'utf8');
   assert.match(upload,/if \(!u->wifi && !u->playlist\) web_service_notify_assets_changed\(\)/);
