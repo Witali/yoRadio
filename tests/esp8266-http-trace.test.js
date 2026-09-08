@@ -14,6 +14,10 @@ test('latency analysis excludes only proven TX wait; RAM, unknown and raw outlie
   assert.equal(analyze({loads},[good,good].map(r=>'WEBTRACE '+JSON.stringify(r)).join('\n')).excluded,0);
   const mixed={...loads[0],resources:[...loads[0].resources,{path:'/',traceId:'a-2',totalMs:1100}]};
   assert.equal(analyze({loads:[mixed]},records.map(r=>'WEBTRACE '+JSON.stringify(r)).join('\n')).excluded,0);
+  const withTime={...loads[4],resources:[{...loads[4].resources[0],startTime:1000}]};
+  const ping={samples:[{startTime:1000,elapsedMs:750,rttMs:null,status:'TimedOut'}]};
+  const linked=analyze({loads:[withTime]},'',ping);
+  assert.equal(linked.samples[0].pingDuringLoad.failures,1);assert.equal(linked.excluded,0);
 });
 test('actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-safe wall time',()=>{
   const dir=fs.mkdtempSync(path.join(root,'.build/http-trace-'));
@@ -42,12 +46,15 @@ int main(void){
   s=now;now+=5;httpd_trace_send(s,-1,ENOMEM);
   s=now;now+=90000;httpd_trace_wait(s,ENOMEM,1000);
   s=now;now+=1000;httpd_trace_wait(s,EINTR,1000);
-  httpd_trace_end(0);httpd_trace_end(0);return 0;}
+  httpd_trace_end(0);httpd_trace_end(0);
+  httpd_trace_index_begin();assert(!httpd_trace_ws_begin());now+=100;httpd_trace_end(0);
+  assert(httpd_trace_ws_begin());now+=1;httpd_trace_ws_end(0);
+  assert(httpd_trace_ws_begin());now+=100;httpd_trace_ws_end(-1);return 0;}
 `);
   const bin=path.join(dir,'test'),args=['-std=c11','-Wall','-Wextra','-Werror','-fsanitize=undefined','-DYORADIO_ESP8266_WEB_PROFILE=1','-I'+p(dir),'-I'+p(path.join(component,'include')),p(path.join(dir,'test.c')),p(path.join(component,'src/httpd_trace.c')),'-o',p(bin)];
   let r=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...args]:args,{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
   r=spawnSync(wsl?'wsl.exe':bin,wsl?['--exec',p(bin)]:[],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
-  const lines=r.stdout.trim().split('\n');assert.equal(lines.length,1);
+  const lines=r.stdout.trim().split('\n');assert.equal(lines.length,3);
   const record=decodeTrace(JSON.parse(lines[0].slice('WEBTRACE '.length)));
   assert.equal(record.total_us,391155);assert.equal(record.tx_wait_us,300000);
   assert.equal(record.tx_sleep_budget_us,1000);
@@ -55,4 +62,7 @@ int main(void){
   assert.equal(record.mem_errors,1);assert.equal(record.read_us,40);assert.equal(record.recv_us,30);
   assert.equal(record.send_us,65);assert.equal(record.max_send_us,50);assert.equal(record.bytes,100);
   assert.equal(record.path,'/data/playlist.csv');assert.ok(!r.stdout.includes('private'));
+  assert.equal(record.last_errno,12); // ENOMEM on the POSIX test host.
+  assert.equal(decodeTrace(JSON.parse(lines[1].slice('WEBTRACE '.length))).path,'/ws:getindex');
+  assert.equal(decodeTrace(JSON.parse(lines[2].slice('WEBTRACE '.length))).result,-1);
 });

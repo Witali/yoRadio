@@ -486,7 +486,9 @@ static void handle_command(httpd_req_t *request, char *command) {
     if (strcmp(command, "ping") == 0) {
         ws_send(request, "{\"pong\":1}");
     } else if (strcmp(command, "getindex") == 0) {
-        send_initial_state(request);
+        httpd_trace_index_begin();
+        esp_err_t index_result = send_initial_state(request);
+        httpd_trace_end(index_result);
     } else if (strcmp(command, "getactive") == 0) {
         send_active_settings(request);
     } else if (strcmp(command, "getsystem") == 0) {

@@ -301,7 +301,7 @@ esp_err_t httpd_sess_process(struct httpd_data *hd, int newfd)
     }
 
     ESP_LOGD(TAG, LOG_FMT("httpd_req_new"));
-    /* WS frame processing is deliberately not logged at audio/heartbeat rate. */
+    /* WS processing opts in separately for getindex and slow/failed sends. */
 #ifdef CONFIG_HTTPD_WS_SUPPORT
     if (!sd->ws_handshake_done)
 #endif

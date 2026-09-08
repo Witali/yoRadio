@@ -26,6 +26,7 @@
 
 #include <esp_http_server.h>
 #include "esp_httpd_priv.h"
+#include "httpd_trace.h"
 
 #ifdef CONFIG_HTTPD_WS_SUPPORT
 
@@ -293,20 +294,25 @@ static esp_err_t httpd_ws_send_all_async(httpd_handle_t hd, int fd,
     TickType_t deadline = xTaskGetTickCount() +
                           pdMS_TO_TICKS(HTTPD_WS_ASYNC_SEND_TIMEOUT_MS);
     while (length > 0U) {
+        uint32_t trace_start = httpd_trace_clock();
         int sent = sess->send_fn(hd, fd, (const char *)data, length,
                                  MSG_DONTWAIT);
+        int send_errno = sent < 0 ? errno : 0;
+        httpd_trace_send(trace_start, sent, send_errno);
         if (sent > 0) {
             data += sent;
             length -= (size_t)sent;
             continue;
         }
         bool retryable = sent < 0 &&
-                         (errno == EAGAIN || errno == EWOULDBLOCK ||
-                          errno == EINTR || errno == ENOMEM ||
-                          errno == ENOBUFS);
+                         (send_errno == EAGAIN || send_errno == EWOULDBLOCK ||
+                          send_errno == EINTR || send_errno == ENOMEM ||
+                          send_errno == ENOBUFS);
         if (retryable &&
             (int32_t)(deadline - xTaskGetTickCount()) > 0) {
+            trace_start = httpd_trace_clock();
             vTaskDelay(1);
+            httpd_trace_wait(trace_start, send_errno, portTICK_PERIOD_MS * 1000U);
             continue;
         }
         return ESP_FAIL;
@@ -360,9 +366,11 @@ esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t 
     /* Queued WebSocket work must not monopolize the only HTTP task when a
      * browser tab stops reading. Retry transient pbuf pressure only briefly,
      * while preserving partial progress so RFC 6455 framing stays intact. */
+    bool trace_owner = httpd_trace_ws_begin();
     if (httpd_ws_send_all_async(hd, fd, sess, header_buf, tx_len) != ESP_OK) {
         ESP_LOGW(TAG, LOG_FMT("Failed to send WS header"));
         sess->ws_close = true;
+        if (trace_owner) httpd_trace_ws_end(ESP_FAIL);
         return ESP_FAIL;
     }
 
@@ -372,10 +380,12 @@ esp_err_t httpd_ws_send_frame_async(httpd_handle_t hd, int fd, httpd_ws_frame_t 
                                     frame->len) != ESP_OK) {
             ESP_LOGW(TAG, LOG_FMT("Failed to send WS payload"));
             sess->ws_close = true;
+            if (trace_owner) httpd_trace_ws_end(ESP_FAIL);
             return ESP_FAIL;
         }
     }
 
+    if (trace_owner) httpd_trace_ws_end(ESP_OK);
     return ESP_OK;
 }
 

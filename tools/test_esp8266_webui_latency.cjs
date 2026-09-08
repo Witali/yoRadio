@@ -22,6 +22,7 @@ async function load(page, kind, round) {
     cdp=await page.context().newCDPSession(page);await cdp.send('Network.enable');
     const pending=new Map();
     cdp.on('Network.requestWillBeSent',e=>{
+      if(!/^https?:/.test(e.request.url))return;
       const item={requestId:e.requestId,path:new URL(e.request.url).pathname,
         wallTime:e.wallTime,started:e.timestamp,chunks:[]};
       pending.set(e.requestId,item);sample.network.push(item);
@@ -34,6 +35,15 @@ async function load(page, kind, round) {
     cdp.on('Network.dataReceived',e=>{const item=pending.get(e.requestId);if(item)item.chunks.push({at:e.timestamp,bytes:e.encodedDataLength,decodedBytes:e.dataLength});});
     cdp.on('Network.loadingFinished',e=>{const item=pending.get(e.requestId);if(item){item.finished=e.timestamp;item.encodedBytes=e.encodedDataLength;}});
     cdp.on('Network.loadingFailed',e=>{const item=pending.get(e.requestId);if(item)item.error=e.errorText;});
+    sample.sockets=[];const sockets=new Map();
+    cdp.on('Network.webSocketCreated',e=>{
+      const item={requestId:e.requestId,path:new URL(e.url).pathname};
+      sockets.set(e.requestId,item);sample.sockets.push(item);
+    });
+    cdp.on('Network.webSocketWillSendHandshakeRequest',e=>{const item=sockets.get(e.requestId);if(item){item.handshakeStart=e.timestamp;item.wallTime=e.wallTime;}});
+    cdp.on('Network.webSocketHandshakeResponseReceived',e=>{const item=sockets.get(e.requestId);if(item){item.handshakeEnd=e.timestamp;item.status=e.response.status;}});
+    cdp.on('Network.webSocketClosed',e=>{const item=sockets.get(e.requestId);if(item)item.closedAt=e.timestamp;});
+    cdp.on('Network.webSocketFrameError',e=>{const item=sockets.get(e.requestId);if(item)item.error=e.errorMessage;});
   }
   const finished = async req => {
     const res = await req.response(), t = req.timing();
@@ -52,7 +62,8 @@ async function load(page, kind, round) {
     Object.assign(sample, await page.evaluate(()=>({readyMs:window.__readyMs,
       rows:document.querySelectorAll('#playlist li[attr-id]').length,
       current:currentItem, rssi:document.querySelector('#rssi')?.textContent,
-      player:document.querySelector('#playerwrap')?.className})));
+      player:document.querySelector('#playerwrap')?.className,
+      pageTrace:window.__pageTrace})));
     sample.pass = sample.readyMs <= 500;
   } catch(e) {sample.error=e.message; sample.pass=false;}
   page.off('requestfinished', finished); page.off('requestfailed', failed);
@@ -194,10 +205,31 @@ async function stress(page, context, round) {
   }
 }
 (async()=>{
-  browser=await chromium.launch({channel:option('--channel','msedge'),headless:true});
+  browser=await chromium.launch({channel:option('--channel','msedge'),headless:true,
+    args:args.includes('--netlog')?['--log-net-log='+path.resolve(output,'netlog.json'),'--net-log-capture-mode=Default']:[]});
   for(let round=0;round<rounds;round++) {
     const context=await browser.newContext({viewport:{width:1200,height:850}});
-    await context.addInitScript(()=>{
+    await context.addInitScript(({trace})=>{
+      if(trace){
+        const timeline=window.__pageTrace={sockets:[],longTasks:[],visibility:document.visibilityState};
+        addEventListener('DOMContentLoaded',()=>timeline.domContentLoaded=performance.now());
+        addEventListener('load',()=>timeline.windowLoad=performance.now());
+        const OriginalSocket=WebSocket;
+        window.WebSocket=class extends OriginalSocket{
+          constructor(...args){
+            const item={createdMs:performance.now()};super(...args);timeline.sockets.push(item);
+            this.addEventListener('open',()=>item.openedMs=performance.now());
+            this.addEventListener('message',()=>{item.firstMessageMs??=performance.now();});
+            this.addEventListener('error',()=>item.errorMs=performance.now());
+            this.addEventListener('close',e=>{item.closedMs=performance.now();item.closeCode=e.code;});
+          }
+          send(data){
+            if(data==='getindex=1')timeline.indexSentMs=performance.now();
+            return super.send(data);
+          }
+        };
+        new PerformanceObserver(list=>{for(const e of list.getEntries())timeline.longTasks.push({startMs:e.startTime,durationMs:e.duration});}).observe({type:'longtask',buffered:true});
+      }
       // Measure from navigationStart until the complete player, populated
       // playlist, current selection, live socket and logo are all available.
       const check=()=>{
@@ -207,7 +239,7 @@ async function stress(page, context, round) {
           typeof currentItem!=='undefined' && Number(currentItem)>0;
         if(ready) window.__readyMs=performance.now(); else requestAnimationFrame(check);
       }; requestAnimationFrame(check);
-    });
+    },{trace:args.includes('--trace')});
     const page=await context.newPage();
     page.on('pageerror',e=>report.errors.push(e.message));
     const cold=await load(page,'cold',round);

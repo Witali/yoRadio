@@ -14,6 +14,7 @@ static struct {
     uint32_t tx_sleep_budget_us;
     uint32_t max_send_us;
     unsigned mem_errors;
+    int last_errno;
     char id[24], path[64];
     bool active;
 } trace;
@@ -21,7 +22,7 @@ static uint32_t boot_id, sequence;
 /* Compact format in DRAM avoids LX106 byte-load emulation for every format
  * character and reduces UART occupancy. Field order is decoded by the tool. */
 static char trace_format[] =
-    "WEBTRACE [\"%s\",\"%s\",%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%d]\n";
+    "WEBTRACE [\"%s\",\"%s\",%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%d,%d]\n";
 
 uint32_t httpd_trace_clock(void) {
     int saved_errno = errno;
@@ -35,6 +36,22 @@ void httpd_trace_begin(void) {
     snprintf(trace.id, sizeof(trace.id), "%08x-%u", (unsigned)boot_id, (unsigned)++sequence);
     trace.active = true;
     trace.start = httpd_trace_clock();
+}
+void httpd_trace_index_begin(void) {
+    httpd_trace_begin();
+    /* A fixed operation label, never the received command or its value. */
+    strcpy(trace.path, "/ws:getindex");
+}
+bool httpd_trace_ws_begin(void) {
+    if (trace.active) return false; /* Keep an enclosing request's counters. */
+    httpd_trace_begin();
+    strcpy(trace.path, "/ws:send");
+    return true;
+}
+void httpd_trace_ws_end(int result) {
+    if (result || httpd_trace_clock() - trace.start >= 50000U)
+        httpd_trace_end(result);
+    else trace.active = false; /* Ordinary fast heartbeats are not logged. */
 }
 void httpd_trace_route(httpd_req_t *request) {
     if (!trace.active) return;
@@ -51,6 +68,7 @@ void httpd_trace_send(uint32_t start, int result, int error) {
     if (!trace.active) return;
     uint32_t elapsed = httpd_trace_clock() - start;
     trace.send_us += elapsed; ++trace.calls;
+    if (result < 0) trace.last_errno = error;
     if (elapsed > trace.max_send_us) trace.max_send_us = elapsed;
     if (result > 0) trace.bytes += (uint32_t)result;
     else if (error == ENOMEM || error == ENOBUFS) ++trace.mem_errors;
@@ -87,6 +105,7 @@ void httpd_trace_end(int result) {
         (unsigned)trace.parse_us, (unsigned)trace.read_us, (unsigned)trace.recv_us,
         (unsigned)trace.send_us, (unsigned)trace.max_send_us, (unsigned)trace.tx_wait_us,
         (unsigned)trace.tx_sleep_budget_us, (unsigned)trace.mem_wait_us, (unsigned)trace.other_wait_us, trace.mem_errors,
-        (unsigned)trace.retries, (unsigned)trace.bytes, (unsigned)trace.calls, result);
+        (unsigned)trace.retries, (unsigned)trace.bytes, (unsigned)trace.calls, result,
+        trace.last_errno);
     }
 }
