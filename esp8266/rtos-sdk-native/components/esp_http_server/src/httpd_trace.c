@@ -104,6 +104,13 @@ void httpd_trace_index_begin(void) {
     /* A fixed operation label, never the received command or its value. */
     strcpy(trace.path, "/ws:getindex");
 }
+void httpd_trace_volume_begin(void) {
+    if (!trace.active) httpd_trace_begin();
+    trace.parse_us = httpd_trace_clock() - trace.start;
+    trace.slow_only = false;
+    /* Fixed category, never a received value or arbitrary command text. */
+    strcpy(trace.path, "/ws:volume");
+}
 bool httpd_trace_ws_begin(void) {
     if (trace.active) return false; /* Keep an enclosing request's counters. */
     httpd_trace_begin();

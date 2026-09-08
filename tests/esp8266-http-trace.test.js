@@ -82,12 +82,14 @@ int main(void){
   httpd_trace_request_begin(true);httpd_trace_tcp_snapshot(123);
   s=now;now+=700;httpd_trace_recv(s);
   httpd_trace_index_begin();now+=20;httpd_trace_end(0);httpd_trace_end(0);
+  httpd_trace_request_begin(true);now+=900;httpd_trace_volume_begin();
+  now+=3000;httpd_trace_end(0);
   return 0;}
 `);
   const bin=path.join(dir,'test'),args=['-std=c11','-Wall','-Wextra','-Werror','-fsanitize=undefined','-DYORADIO_ESP8266_WEB_PROFILE=1','-I'+p(dir),'-I'+p(path.join(component,'include')),p(path.join(dir,'test.c')),p(path.join(component,'src/httpd_trace.c')),'-o',p(bin)];
   let r=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...args]:args,{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
   r=spawnSync(wsl?'wsl.exe':bin,wsl?['--exec',p(bin)]:[],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
-  const lines=r.stdout.trim().split('\n');assert.equal(lines.length,4);
+  const lines=r.stdout.trim().split('\n');assert.equal(lines.length,5);
   const record=decodeTrace(JSON.parse(lines[0].slice('WEBTRACE '.length)));
   assert.equal(record.total_us,391155);assert.equal(record.tx_wait_us,300000);
   assert.equal(record.tx_sleep_budget_us,1000);
@@ -105,6 +107,9 @@ int main(void){
   assert.equal(dispatch.total_us,720);assert.equal(dispatch.tx_wait_us,0);
   assert.equal((dispatch.start_us-dispatch.tcp_rx_us)>>>0,300);
   assert.equal(dispatch.tcp_rx_len,16);assert.equal(dispatch.tcp_seq_gap,19);
+  const volume=decodeTrace(JSON.parse(lines[4].slice('WEBTRACE '.length)));
+  assert.equal(volume.path,'/ws:volume');assert.equal(volume.parse_us,900);
+  assert.equal(volume.total_us,3900);
 });
 
 test('startup correlation bounds delay before WS dispatch without calling it network wait',()=>{

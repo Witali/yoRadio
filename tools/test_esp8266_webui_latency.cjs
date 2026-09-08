@@ -71,6 +71,7 @@ async function load(page, kind, round) {
   } catch(e) {sample.error=e.message; sample.pass=false;}
   page.off('requestfinished', finished); page.off('requestfailed', failed);
   if(cdp)await cdp.detach();
+  page.__latencyLoadIndex = report.loads.length;
   report.loads.push(sample); save();
   console.log(JSON.stringify({...sample,network:sample.network?.map(({chunks,...rest})=>({...rest,chunkCount:chunks.length}))}));
   return !sample.error;
@@ -97,7 +98,8 @@ async function buttons(page) {
           if(value==null || Number(value)===before) return;
           // This listener runs after the real onMessage handler. Check readback,
           // not the optimistic slider update made when the user clicks.
-          finish({selector, before, serverValue:Number(value),
+          finish({selector, before, timeOrigin:performance.timeOrigin,
+            startedMs:started, serverValue:Number(value),
             displayedValue:Number(document.querySelector('#volume').value),
             elapsedMs:performance.now()-started});
         };
@@ -105,6 +107,7 @@ async function buttons(page) {
         timer=setTimeout(()=>finish({selector,error:'No changed server volume in 5000 ms'}),5000);
         document.querySelector(selector).click();
       }),{selector});
+      result.loadIndex=page.__latencyLoadIndex;
       result.pass=!result.error && result.elapsedMs<=200 && result.serverValue===result.displayedValue;
       report.controls.push(result); save(); console.log(JSON.stringify(result));
       await page.waitForTimeout(200);

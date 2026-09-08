@@ -537,11 +537,13 @@ static void handle_command(httpd_req_t *request, char *command) {
     } else if (strcmp(command, "prev") == 0) {
         radio_control_previous();
     } else if (strcmp(command, "volume") == 0) {
+        httpd_trace_volume_begin();
         int target = (int)parse_unsigned(value, 254U);
         radio_control_adjust_volume(target - (int)native_audio_output_volume());
         send_initial_state(request);
     } else if (strcmp(command, "volp") == 0 ||
                strcmp(command, "volm") == 0) {
+        httpd_trace_volume_begin();
         persistent_settings_t settings;
         persistent_settings_get(&settings);
         int delta = settings.volume_steps;
