@@ -159,7 +159,7 @@ No recorded batch below qualifies for automatic exclusions.
 | Added browser handshake timeline, same image | 7 before interruption | 697.7 ms / 5 | 72 | 827.7 ms / 2 |
 | getindex/slow-WS trace, fa842ef | 12 | 1348.1 ms / 7 | 112 | 256.0 ms / 1 |
 
-The last batch failed an HTTP status fetch and ended early; this is retained
+The handshake-timeline batch failed an HTTP status fetch and ended early; this is retained
 as an error, not a passing shorter run. A later UART warning reported failed
 WebSocket header sending. The captured script restored station 176/stopped.
 Optional `--netlog` remains private under `.build`, not committed.
@@ -195,3 +195,36 @@ Next: correlate the receipt/dispatch of the first WebSocket command with
 browser frame-send and frame-receive times; inspect TCP delivery/ACK behavior
 and queued work. Do not call the remaining delay pure network waiting until
 that interval is identified. The old uninstrumented 3.44 s case remains open.
+
+## Dispatch/input trace: an actual protocol failure, not network waiting
+
+Source `bf530f3`, 769696-byte diagnostic application, SHA-256
+`4258A7118F9731CFA4D80E5FD7FBA0EE86E22AD78FB9291CA3192628282D3C89`,
+flashed app0 and verified. Initial connection retried, DHCP at about 20 s,
+RSSI -72 dBm. No PC Wi-Fi changes.
+
+The first cold page was ready in 368.5 ms. Its command reached session
+processing within the bounded interval 0.8-13.6 ms; select-to-session delay
+0.281 ms, frame parsing 1.317 ms, complete operation 16.289 ms.
+Later, both AAC page attempts timed out: Chromium repeatedly reported
+`Could not decode a text frame as UTF-8.` and reconnected every two seconds.
+The run ended with an error; do not interpret its one finite page timing as
+a successful one-sample benchmark. All failed button/page attempts remain.
+
+A separate bounded raw WebSocket capture reproduced invalid byte `F1` in
+the ICY performer's name (`50 6c f1 63 69 64 6f`). The station name in the
+same frame had valid UTF-8. The JSON encoder passed this byte through as a
+text frame. The browser then reset the connection; UART recorded errno 104,
+not EAGAIN or a memory retry. This is a concrete newly observed failure,
+not proof of the cause of the older 3.44 s sample.
+
+RFC 6455 section 8.1 requires failing an invalid-UTF-8 connection; RFC 8259
+section 8.1 requires UTF-8 for interoperable JSON. Sources:
+[WebSocket](https://www.rfc-editor.org/rfc/rfc6455.html#section-8.1),
+[JSON](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1).
+
+Reports `trace-dispatch-{browser,analysis}.json` retain the failure. Zero
+network exclusions. The original private byte capture stays under `.build`;
+the host regression uses only the minimal malformed-name byte sequence.
+The benchmark and a subsequent diagnostic restore left station 176, volume
+254 and stopped. The remaining first-command delay still needs investigation.

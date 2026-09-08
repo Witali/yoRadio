@@ -2,6 +2,20 @@
 
 ## 2026-09-08
 
+### Dispatch/input trace (`bf530f3`)
+
+- 769696 bytes, SHA-256
+  `4258A7118F9731CFA4D80E5FD7FBA0EE86E22AD78FB9291CA3192628282D3C89`.
+- Flashed/verified app0, unchanged SPI radio wiring and saved files.
+- Trace now starts before WS frame reads; records select wait, readiness-to-
+  dispatch and parsed-command timestamps. Browser/board clock bounds, not
+  assumed synchronized clocks. Conservative filtering retains other delays.
+- 60 host checks passed. Physical trace uncovered invalid upstream ICY text
+  passed into WS, causing browser UTF-8 errors and reconnects. Raw failed
+  attempts retained; no network-wait exclusion. See `trace-dispatch-*`.
+
+### Earlier getindex/send trace (`fa842ef`)
+
 - Source `fa842ef`, 769504 bytes, SHA-256
   `514E0D61CE3A67353C9B3B7DE5F019F66A98C92743537EAA329A3DA7EE437F03`.
 - Flashed app0 at 0x10000, hash verified. Radio, not a tone generator.
