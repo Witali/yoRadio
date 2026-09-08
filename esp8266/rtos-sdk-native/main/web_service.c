@@ -21,6 +21,7 @@
 #include "lwip/sockets.h"
 #include "lwip/tcp.h"
 #include "native_audio_output.h"
+#include "audio_service.h"
 #include "native_state.h"
 #include "persistent_settings.h"
 #include "playlist_service.h"
@@ -1077,6 +1078,27 @@ static esp_err_t wifi_file_handler(httpd_req_t *request) {
     return finish_short_response(request, result);
 }
 
+static esp_err_t audio_health_handler(httpd_req_t *request) {
+    prepare_short_response(request);
+    audio_service_health_t health;
+    native_audio_output_spi_stats_t output;
+    audio_service_health(&health);
+    native_audio_output_get_spi_stats(&output);
+    char body[384];
+    snprintf(body, sizeof(body),
+        "{\"generation\":%u,\"uptime_ms\":%u,\"rx_bytes\":%u,"
+        "\"pcm_frames\":%u,\"sample_rate\":%u,\"rx_age_ms\":%u,"
+        "\"pcm_age_ms\":%u,\"underruns\":%u,\"free_heap\":%u}",
+        (unsigned)health.generation, (unsigned)health.uptime_ms,
+        (unsigned)health.rx_bytes, (unsigned)health.pcm_frames,
+        (unsigned)health.sample_rate, (unsigned)health.rx_age_ms,
+        (unsigned)health.pcm_age_ms, (unsigned)output.queue_empty_events,
+        (unsigned)esp_get_free_heap_size());
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return finish_short_response(request, send_string(request, body));
+}
+
 static esp_err_t serve_static_request(httpd_req_t *request) {
     if (request_path_equals(request, "/") ||
         request_path_equals(request, "/index.html") ||
@@ -1157,6 +1179,8 @@ esp_err_t web_service_start(void) {
     if ((result = register_get("/data/playlist.csv", static_handler)) != ESP_OK)
         return result;
     if ((result = register_get("/api/native/status", status_handler)) != ESP_OK)
+        return result;
+    if ((result = register_get("/api/native/audio", audio_health_handler)) != ESP_OK)
         return result;
     if ((result = register_get("/favicon.ico", static_handler)) != ESP_OK)
         return result;

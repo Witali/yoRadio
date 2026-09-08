@@ -83,6 +83,22 @@ typedef struct {
 static const char *TAG = "audio";
 static QueueHandle_t s_commands;
 static volatile uint32_t s_generation;
+static uint32_t s_rx_bytes, s_pcm_frames, s_pcm_rate;
+static TickType_t s_rx_tick, s_pcm_tick;
+
+void audio_service_health(audio_service_health_t *health) {
+    if (!health) return;
+    taskENTER_CRITICAL();
+    TickType_t now = xTaskGetTickCount();
+    *health = (audio_service_health_t){
+        .generation = s_generation, .uptime_ms = now * portTICK_PERIOD_MS,
+        .rx_bytes = s_rx_bytes, .pcm_frames = s_pcm_frames,
+        .sample_rate = s_pcm_rate,
+        .rx_age_ms = (now - s_rx_tick) * portTICK_PERIOD_MS,
+        .pcm_age_ms = (now - s_pcm_tick) * portTICK_PERIOD_MS,
+    };
+    taskEXIT_CRITICAL();
+}
 /* Reused for HTTP headers, initial codec detection and ICY metadata. */
 static uint8_t s_work[HTTP_HEADER_BYTES];
 static char s_host[HTTP_HOST_BYTES];
@@ -415,6 +431,12 @@ static int stream_receive(http_stream_t *stream, uint8_t *destination,
             http_chunk_decoder_finished(&stream->chunk_decoder))
             return 0;
         int received = recv(stream->socket, destination, capacity, 0);
+        if (received > 0) {
+            taskENTER_CRITICAL();
+            s_rx_bytes += (uint32_t)received;
+            s_rx_tick = xTaskGetTickCount();
+            taskEXIT_CRITICAL();
+        }
         if (received > 0 && stream->chunked) {
             size_t decoded = 0;
             if (!http_chunk_decode(&stream->chunk_decoder, destination,
@@ -595,6 +617,11 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
                  esp_err_to_name(result));
         return false;
     }
+    taskENTER_CRITICAL();
+    s_pcm_frames += samples / info->channels;
+    s_pcm_rate = info->sample_rate;
+    s_pcm_tick = xTaskGetTickCount();
+    taskEXIT_CRITICAL();
     /* A synthesis callback is now only 32 frames. Publish the first format
      * and actual changes, not the same state/lock work 18 times per granule. */
     if (context->decoder_bitrate != info->bitrate ||
