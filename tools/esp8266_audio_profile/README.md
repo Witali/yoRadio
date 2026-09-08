@@ -127,10 +127,10 @@ warm-up and ten-second measurement. The saved Kconfig baseline is:
 
     esp8266/rtos-sdk-native/sdkconfig.audio-profile-qio80.defaults
 
-I2S-PDM SLC DMA uses the ESP8266 fixed I2S pins: GPIO3/RX for DATA, GPIO15
-for BCLK, and GPIO2 for WS. UART input is intentionally ignored, while UART
-TX logging on GPIO1 remains available. GPIO2 cannot drive the onboard status
-LED in this mode because reclaiming WS stops DMA audio. The onboard 470-ohm
+I2S-PDM SLC DMA routes DATA on GPIO3/RX. Unused BCLK/WS signals stay internal;
+GPIO15/GPIO2 are not switched to I2S functions in the NoDAC backend. UART
+input is intentionally ignored, while TX logging on GPIO1 remains available.
+The SPI-only status-LED build option is unchanged. The onboard 470-ohm
 resistor is only a current limiter; do not transmit from the host during audio
 output.
 

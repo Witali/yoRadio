@@ -171,12 +171,10 @@ test("optimized branchless PDM32 packer is bit-exact", () => {
   }
 });
 
-test("I2S PDM drives its clocks like ESP8266Audio and ignores UART RX input", () => {
+test("I2S NoDAC routes DATA only and ignores UART RX input", () => {
   assert.doesNotMatch(board, /UART_RX_ISOLATE_GPIO/);
-  assert.match(
-    nodac,
-    /FUNC_I2SO_DATA[\s\S]*FUNC_I2SO_BCK[\s\S]*FUNC_I2SO_WS/,
-  );
+  assert.match(nodac, /FUNC_I2SO_DATA/);
+  assert.doesNotMatch(nodac, /FUNC_I2SO_BCK|FUNC_I2SO_WS/);
   assert.doesNotMatch(i2sPdm, /gpio_set_level|gpio_set_direction/);
   assert.match(app, /I2S-PDM DMA GPIO[\s\S]*UART RX ignored/);
 

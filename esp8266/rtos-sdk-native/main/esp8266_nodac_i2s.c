@@ -242,8 +242,8 @@ static void configure_slc(void) {
 static void configure_i2s(uint8_t bck_div, uint8_t clkm_div) {
     rom_i2c_writeReg_Mask(0x67, 4, 4, 7, 7, 1);
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_I2SO_DATA);
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDO_U, FUNC_I2SO_BCK);
-    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_I2SO_WS);
+    /* The NoDAC filter consumes DATA only. Keep the peripheral's internal
+     * clocks running without routing unused BCK/WS onto external pins. */
 
     I2S0.int_clr.val = 0x3fU;
     I2S0.int_ena.val = 0;

@@ -121,11 +121,10 @@ signal path and physical verification.
 
 A genuine PDM128 mode at nominally 6.144 MHz
 is compile-time selectable but remains experimental because it cannot run in
-realtime on the physical Wemos D1 mini. As in ESP8266Audio's NoDAC path, the I2S
-engine initially routes BCLK on GPIO15 and LRCLK on GPIO2 so its SLC-DMA clock
-starts reliably. The default Wemos profile then returns GPIO2 to the onboard
-active-low status LED, matching ESP8266Audio's NoDAC handling of the unused
-clock pin. Only DATA GPIO3 is connected to the audio filter. Connect GPIO3 through the
+realtime on the physical Wemos D1 mini. The NoDAC path keeps I2S clocks internal:
+it routes only DATA GPIO3 to the audio filter, not BCLK GPIO15 or WS GPIO2.
+The SPI-only status-LED build option is unchanged. Standard external-DAC I2S
+still uses its clock pins. Connect GPIO3 through the
 documented low-pass/AC-coupling chain and then to a high-impedance amplifier
 input. The default now selects build-time `CONFIG_YORADIO_AUDIO_MONO`:
 compatible Helix MP3 M/S frames skip the side channel and use one

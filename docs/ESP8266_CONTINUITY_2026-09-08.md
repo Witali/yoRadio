@@ -27,7 +27,9 @@ heap from 90508 to 90508 bytes. UART source: local diagnostic build
   proof against RAM pressure or DMA interaction.
 - A subsequent control retained DMA and its memory, toggling only the GPIO3
   mux every 30 seconds. AAC reception continued in both mux states. This did
-  not establish GPIO contention as the cause. All mux experiments were reverted.
+  not establish GPIO3 contention as the cause. The timed GPIO3 experiment was
+  reverted. NoDAC now leaves unused BCK/WS pins alone; this change alone has
+  NOT been demonstrated to cure Wi-Fi failures.
 - With 22.05-kHz AAC and the 512-word output, typical five-second diagnostic
   windows delivered 95-96% of wall time as audio. Decode-core wall time was
   about 30-31%; gain/mix/PDM about 8%; waiting for DMA about 59%. These are
