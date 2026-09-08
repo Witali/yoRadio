@@ -1,5 +1,6 @@
 #include "web_service.h"
 #include "memory_profile.h"
+#include "json_text.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -126,13 +127,11 @@ static void json_escape(const char *source, char *target, size_t capacity) {
     size_t written = 0;
     if (!capacity) return;
     while (source && *source && written + 1U < capacity) {
-        unsigned char value = (unsigned char)*source++;
-        if ((value == '"' || value == '\\') && written + 2U < capacity) {
-            target[written++] = '\\';
-            target[written++] = (char)value;
-        } else if (value >= 0x20U) {
-            target[written++] = (char)value;
-        }
+        char encoded[5];
+        size_t count = json_text_unit(&source, encoded);
+        if (count >= capacity - written) break;
+        memcpy(target + written, encoded, count);
+        written += count;
     }
     target[written] = '\0';
 }
@@ -183,13 +182,8 @@ static void json_writer_format(json_writer_t *writer, const char *format, ...) {
 
 static void json_writer_escaped(json_writer_t *writer, const char *text) {
     while (writer->valid && text && *text) {
-        unsigned char value = (unsigned char)*text++;
-        if (value < 0x20U) continue;
-        char encoded[3] = {(char)value, '\0', '\0'};
-        if (value == '"' || value == '\\') {
-            encoded[0] = '\\';
-            encoded[1] = (char)value;
-        }
+        char encoded[5];
+        if (!json_text_unit(&text, encoded)) continue;
         json_writer_raw(writer, encoded);
     }
 }
