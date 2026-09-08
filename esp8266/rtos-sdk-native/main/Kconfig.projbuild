@@ -176,6 +176,15 @@ config YORADIO_STREAM_IDLE_TIMEOUT_MS
         restores a stalled stream sooner but reconnects more often when Wi-Fi
         packets are delayed. This is not the HTTP connection/header timeout.
 
+config YORADIO_STREAM_READ_WAIT_MS
+    int "Maximum socket readiness wait after EAGAIN (0 = legacy polling)"
+    range 0 50
+    default 0
+    help
+        Wait for a readable socket instead of polling it every millisecond.
+        Cancellation is checked before and after each bounded wait. This
+        does not change the stream inactivity timeout or add an input buffer.
+
 config YORADIO_OLED
     bool "Enable SSD1306 OLED display"
     default n

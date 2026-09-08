@@ -4,8 +4,13 @@ const {readLog}=require('./summarize_mp3_matrix.cjs');
 function summarize(log) {
   const count=Number(/net_bench: begin cases=(\d+)/.exec(log)?.[1]||7);
   const cases=Array.from({length:count},(_,id)=>({case:id,seconds:[]}));
-  const cpu=new Map();
+  const cpu=new Map(),recoveries=[];
+  let recoveryEpoch=0;
   for(const line of log.split(/\r?\n/)) {
+    if(line.includes('net_bench: recovery ')) {
+      recoveries.push(line);
+      if(line.includes('recovery begin '))++recoveryEpoch;
+    }
     if(line.includes('net_cpu: case=')) {
       const fields=Object.fromEntries([...line.matchAll(/(\w+)=(-?\d+)/g)]
         .map(m=>[m[1],Number(m[2])]));
@@ -20,11 +25,18 @@ function summarize(log) {
       .map(m=>[m[1],Number(m[2])]));
     const row=cases[fields.case];
     if(!row)continue;
+    if(line.includes('allocation failed'))row.allocation_failed=true;
     if(line.includes(' begin ')) {
+      Object.assign(row,fields);
+      row.recovery_epoch=recoveryEpoch;
       row.path=/path=(\S+)/.exec(line)?.[1];row.rssi_before=fields.rssi;
       row.output=fields.output===1;
     } else if(fields.second!==undefined) {
       row.seconds[fields.second]=fields.bytes;
+      if(fields.rssi!==undefined) {
+        row.rssi_seconds ||= [];
+        row.rssi_seconds[fields.second]=fields.rssi;
+      }
     } else Object.assign(row,fields);
   }
   for(const c of cases) {
@@ -53,7 +65,8 @@ function summarize(log) {
     row.idle_percent=row.tasks.find(t=>t.name==='IDLE')?.percent ?? null;
     row.non_idle_percent=row.idle_percent===null ? null : 100-row.idle_percent;
   }
-  return {complete:log.includes('net_bench: complete'),cases,cpu:[...cpu.values()]};
+  const starts=[...log.matchAll(/net_bench: begin cases=/g)].length;
+  return {complete:starts<=1 && log.includes('net_bench: complete'),starts,recoveries,cases,cpu:[...cpu.values()]};
 }
 module.exports={summarize};
 if(require.main===module) {

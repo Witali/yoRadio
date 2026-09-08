@@ -32,13 +32,14 @@ test('LAN source preserves HTTP framing, exact encoded prefix, and pacing',async
 });
 test('network diagnostic retains decoder memory and distinguishes app gaps from socket emptiness',()=>{
   const source=fs.readFileSync('esp8266/rtos-sdk-native/main/network_benchmark.inc','utf8');
-  assert.match(source,/helix_codec_create\(cases\[n\]\.codec, CODEC_HEAP_RESERVE_BYTES\)/);
+  assert.match(source,/helix_codec_create\(cases\[case_index\]\.codec, CODEC_HEAP_RESERVE_BYTES\)/);
   assert.match(source,/open_http_stream\(url, &stream\)/);
   assert.match(source,/stream_receive\(&stream, destination, capacity\)/);
   assert.match(source,/max_app_gap/); assert.match(source,/max_empty_wait/);
   assert.match(source,/FIONREAD/); assert.match(source,/generation_current\(generation\)/);
   assert.match(source,/vTaskDelay\(pdMS_TO_TICKS\(1\)\)/);
   assert.doesNotMatch(source,/nvs_set|nvs_commit|nvs_flash_erase/);
+  assert.doesNotMatch(source,/persistent_settings_update_runtime|persistent_settings_set_/);
   const build=fs.readFileSync('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1','utf8');
   assert.match(build,/-DYORADIO_ESP8266_NETWORK_BENCHMARK=OFF/);
 });

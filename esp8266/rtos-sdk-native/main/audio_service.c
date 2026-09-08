@@ -38,6 +38,7 @@
 #define HTTP_OPEN_ATTEMPTS 2U
 #define CODEC_HEAP_RESERVE_BYTES 1152U
 #define AUDIO_STACK_BYTES 4096U
+#define STREAM_READ_WAIT_MS ((uint32_t)CONFIG_YORADIO_STREAM_READ_WAIT_MS)
 
 #ifndef YORADIO_ESP8266_KARADIO_PIPELINE
 #define YORADIO_ESP8266_KARADIO_PIPELINE 0
@@ -255,6 +256,8 @@ static void release_codec(helix_codec_t **codec,
 static bool generation_current(uint32_t generation) {
     return s_generation == generation;
 }
+
+#include "stream_read_wait.h"
 
 static void requeue_if_current(const audio_command_t *command) {
     /* Do not let an old retry overwrite Stop or a newer station between the
@@ -670,12 +673,12 @@ static bool stream_read_exact(http_stream_t *stream, uint8_t *destination,
         if (received < 0 &&
             (errno == EAGAIN || errno == EWOULDBLOCK) &&
             esp_timer_get_time() < deadline) {
-            vTaskDelay(pdMS_TO_TICKS(1));
+            if (!stream_wait_after_empty(stream, generation, STREAM_READ_WAIT_MS)) return false;
             continue;
         }
         return false;
     }
-    return length == 0;
+    return length == 0 && generation_current(generation);
 }
 
 static bool read_icy_metadata(http_stream_t *stream, uint32_t generation) {
@@ -698,7 +701,7 @@ static bool read_icy_metadata(http_stream_t *stream, uint32_t generation) {
         if (available) retained += count;
         remaining -= count;
     }
-    if (retained) parse_icy_title(retained);
+    if (retained && generation_current(generation)) parse_icy_title(retained);
     return remaining == 0;
 }
 
@@ -778,6 +781,7 @@ static void karadio_network_worker(void *argument) {
                 capacity = audio_until_metadata;
             int received = stream_receive(&stream, destination, capacity);
             if (received > 0) {
+                if (!generation_current(generation) || s_karadio_abort) break;
                 karadio_ring_commit((size_t)received);
                 if (stream.metadata_interval)
                     audio_until_metadata -= (uint32_t)received;
@@ -788,7 +792,9 @@ static void karadio_network_worker(void *argument) {
                 break;
             }
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                vTaskDelay(pdMS_TO_TICKS(1));
+                if (!stream_wait_after_empty(&stream, generation, STREAM_READ_WAIT_MS)) {
+                    stream_result = -32; break;
+                }
                 continue;
             }
             stream_result = -32;
@@ -1044,7 +1050,7 @@ static void audio_task(void *argument) {
             } else if (received == 0) {
                 break;
             } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                vTaskDelay(pdMS_TO_TICKS(1));
+                if (!stream_wait_after_empty(&stream, command.generation, STREAM_READ_WAIT_MS)) break;
             } else {
                 break;
             }
@@ -1131,6 +1137,7 @@ static void audio_task(void *argument) {
                 wanted = audio_until_metadata;
             int received = stream_receive(&stream, destination, wanted);
             if (received > 0) {
+                if (!generation_current(command.generation)) break;
                 output.measured_bytes += (uint32_t)received;
                 if (stream.metadata_interval)
                     audio_until_metadata -= (uint32_t)received;
@@ -1166,7 +1173,9 @@ static void audio_task(void *argument) {
             } else if (received == 0) {
                 break;
             } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                vTaskDelay(pdMS_TO_TICKS(1));
+                if (!stream_wait_after_empty(&stream, command.generation, STREAM_READ_WAIT_MS)) {
+                    feed = errno == ETIMEDOUT ? 0 : -21; break;
+                }
             } else {
                 feed = errno == ETIMEDOUT ? 0 : -21;
                 break;
