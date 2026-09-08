@@ -3,6 +3,19 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-08: AAC-LC flash-source benchmark
+
+- Added isolated flash-output (288224 bytes) and flash-decode (278672 bytes)
+  AAC-LC images, source 75b6104. Same tone/noise source as MP3, target
+  48/64/96 kbit/s, 44.1 kHz stereo encoded / mono PCM, 1000 measured frames.
+- Decoder-only uses 64.77/67.25/69.50% of PCM time budget. The complete
+  PDM/DMA path fails continuity in all three cases, Wi-Fi OFF:
+  2098/2841/2916 neutral underruns per 23.219954 s PCM.
+- Production decoder/output code and defaults are unchanged.
+  Restore the ordinary I2S PDM production image after benchmarking.
+- Saved fixtures, logs, JSON reports, exact configurations and binary
+  hashes: docs/ESP8266_AAC_FLASH_BENCHMARK_2026-09-08.md.
+
 ## Development - 2026-09-08: MP3 flash-source benchmark and recovery diagnostics
 
 - Ordinary I2S PDM32 image: development/esp8266-i2s-pdm-production/app.bin,

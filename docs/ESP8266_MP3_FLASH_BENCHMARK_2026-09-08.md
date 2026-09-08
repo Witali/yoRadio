@@ -32,6 +32,8 @@ analog sound quality.
 [Source, encoded files and generator](../tests/fixtures/mp3_composite/README.md),
 [fixture hashes and encoder version](../tests/fixtures/mp3_composite/manifest.json).
 Ordinary firmware does not include these test files.
+The same WAV was subsequently tested as AAC-LC at 48/64/96 kbit/s:
+[AAC results](ESP8266_AAC_FLASH_BENCHMARK_2026-09-08.md).
 
 ## Decode-only: no PDM or DMA
 
