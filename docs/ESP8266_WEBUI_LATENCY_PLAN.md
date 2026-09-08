@@ -44,6 +44,14 @@ confirmation, or a connecting indicator with decoded audio starting.
   browser receive/handshake/initialization and independent ICMP latency.
   Keep raw statistics plus a separately explained processing sample; unknown
   causes must not be discarded. See `ESP8266_WEBUI_TRACE.md`.
+- [x] Extend tracing before WS frame reads: separate select wait, readiness-to-
+  dispatch, receive/parsing and response time; bound browser/board clocks.
+- [x] Reproduce and fix malformed ICY bytes in WebSocket JSON. A raw F1 byte
+  caused browser UTF-8 failures and repeated two-second reconnects. Preserve
+  valid text, show '?' for invalid bytes; do not discard the status message.
+  Actual C writer regression covers malformed/truncated UTF-8 and capacities.
+- [x] Fix benchmark boundary cases: a minus click at zero is not an expected
+  changed-value acknowledgement. Do not exercise controls on a failed page.
 - [ ] Isolate intermittent network stalls: one run had 50% ping loss even with
   RSSI near -61 dBm. A reset of the same image restored fast controls. A closer,
   unobstructed board placement was requested as an optional control experiment.

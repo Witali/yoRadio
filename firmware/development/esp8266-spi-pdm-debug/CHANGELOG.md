@@ -1,5 +1,16 @@
 # ESP8266 temporary SPI-PDM debugging profile
 
+## 2026-09-08 - safe UTF-8 JSON, compile-verified
+
+- Source `a639709`; no WebProfile, no tone. Same CPU160/QIO40/SPI GPIO13.
+- Invalid ICY bytes are represented by `?` without discarding the message;
+  valid UTF-8 and bounded JSON escapes are preserved. No new message buffer.
+- 768352 bytes, SHA-256
+  `66FC91DACD703B768228D427616CD6106964B0BF370F1D1DF8BFCCB7118C86BF`.
+- This binary was built, not flashed/tested on hardware. Physical verification
+  used the separate diagnostic `fa1abc1` image: see its changelog and the
+  2026-09-08 latency report. All 62 host regressions pass.
+
 ## 2026-09-08 â€” optional compressed playlist, ordinary radio
 
 - Source `b74e21b`; `CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y`, WebProfile OFF.

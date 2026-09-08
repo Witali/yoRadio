@@ -2,6 +2,18 @@
 
 ## 2026-09-08
 
+### UTF-8 repaired diagnostic (`fa1abc1`, currently flashed)
+
+- 769952 bytes, SHA-256
+  `3427ACBFAEC7732FC5DE3EF7DF86D7602BEFC4136D715B79BC09B118289F7DF8`.
+- Same trace/wiring/profile; no partition or SPIFFS changes. Malformed ICY
+  bytes no longer invalidate the whole WS text message; valid UTF-8 unchanged.
+- 62 host checks pass. Corrected physical benchmark: 18 loads, maximum
+  503.2 ms (3 exceed 500); all 168 confirmations <=77 ms; 12 audio starts
+  pass. No JS or UTF-8 frame errors. Zero network exclusions.
+- Station 176, volume 254, stopped. Free heap 25684/min8044, HTTP stack
+  headroom 2268. The rare ~211 ms select wait is still being investigated.
+
 ### Dispatch/input trace (`bf530f3`)
 
 - 769696 bytes, SHA-256

@@ -226,5 +226,53 @@ section 8.1 requires UTF-8 for interoperable JSON. Sources:
 Reports `trace-dispatch-{browser,analysis}.json` retain the failure. Zero
 network exclusions. The original private byte capture stays under `.build`;
 the host regression uses only the minimal malformed-name byte sequence.
-The benchmark and a subsequent diagnostic restore left station 176, volume
-254 and stopped. The remaining first-command delay still needs investigation.
+Station 176 and stopped were restored. A later readback found volume zero:
+the failed-page benchmark had read the uninitialized slider and restored its
+default rather than the original value. The later one-shot diagnostic also
+used an unsupported `vol` command, so its claimed volume restore was not
+verified. Volume was subsequently restored using `volume=254` and confirmed
+in a server reply. The benchmark now stops controls after failed readiness.
+The remaining first-command delay still needs investigation.
+
+## UTF-8 repair and more precise wait evidence
+
+Source `fa1abc1`, application 769952 bytes, SHA-256
+`3427ACBFAEC7732FC5DE3EF7DF86D7602BEFC4136D715B79BC09B118289F7DF8`,
+flashed and hash-verified. The byte-wise JSON writer is now code-point-aware:
+valid UTF-8 is unchanged; invalid bytes become ASCII `?`, without guessing a
+legacy charset. The title and full status are still sent, including messages
+that happen to contain JSON-looking text. Quotes/backslashes are escaped
+atomically, and bounded buffers never end halfway through a valid UTF-8
+sequence. The existing omission of ASCII controls is unchanged. No extra
+heap/message buffer; the worst-case 2x escaping bound is retained.
+
+Initial repaired-image run: 18/18 pages became ready, no WebSocket UTF-8 errors
+or JavaScript exceptions. Page times 304.4-527.5 ms, 3 above 500 ms. There were
+15 false control timeouts from asking minus-at-zero to change the value;
+the old raw report is retained, not relabeled as passing or network waiting.
+The test now alternates inward first at either volume boundary and has a
+regression for 0/1/2/128/253/254. Subsequent tests start at the confirmed 254.
+
+The 527.5 ms cold load has a command-to-session interval bounded at
+209.6-222.8 ms. The server spent 211.436 ms in select; readiness-to-session
+was 0.304 ms, frame parsing 1.296 ms, complete initial reply 17.144 ms. This
+rules out a 200 ms delay in this handler, but does not separate TCP delivery
+from a delayed readiness notification/rescheduling. It is not automatically
+excluded. Next investigate the TCP/readiness interval using targeted packet
+evidence; do not optimize reply construction as the cause of this sample.
+
+Reports: `trace-utf8-{browser,analysis}.json`. The image passed all 61 host
+checks before the added benchmark boundary regression (62 checks afterward).
+
+Repeat with corrected test at volume 254: 18 page loads, 285.3-503.2 ms;
+three above 500 ms. All 168 server-confirmed controls passed, maximum 77 ms;
+all 12 separate audio starts passed. No JS exceptions or WS frame errors,
+no automatic network exclusions. Reports `trace-utf8-repeat-{browser,analysis}.json`.
+Final station 176/stopped, volume 254 (confirmed WS readback before the run,
+restored by each completed button cycle). Free heap 25684, minimum 8044,
+HTTP stack headroom 2268 bytes, RSSI -74 dBm.
+
+The non-profiled variant also builds with the UTF-8 fix: 768352 bytes,
+SHA-256 `66FC91DACD703B768228D427616CD6106964B0BF370F1D1DF8BFCCB7118C86BF`,
+source `a639709`. This new non-profiled binary is compile-verified only;
+the board retains the `fa1abc1` diagnostic image for the 200 ms investigation.
