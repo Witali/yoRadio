@@ -64,7 +64,11 @@ test("ESP8266 audio client uses bounded, chunk-aware socket I/O", () => {
   assert.match(audio, /stream_read_exact[\s\S]*read_icy_metadata/);
   assert.match(audio, /STREAM_IDLE_TIMEOUT_MS \(\(uint32_t\)CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS\)/);
   assert.match(audio, /http_stream_idle_expired\(xTaskGetTickCount\(\)/);
-  assert.match(audio, /feed = errno == ETIMEDOUT \? 0 : -21/);
+  assert.match(audio, /end_error = errno == ETIMEDOUT \? 0 : -21/);
+  assert.match(audio, /else if \(ended\)[\s\S]*feed = end_error/);
+  const refill = fs.readFileSync(path.join(sourceDir, "stream_input_refill.inc"), "utf8");
+  assert.match(refill, /errno == ETIMEDOUT \? STREAM_FILL_TIMEOUT : STREAM_FILL_ERROR/);
+  assert.match(refill, /stream_receive[\s\S]*stream_icy_audio[\s\S]*helix_codec_buffer_commit/);
 });
 
 test("ESP8266 stream inactivity deadline is configurable with a one-second default", () => {

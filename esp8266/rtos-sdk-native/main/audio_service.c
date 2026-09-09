@@ -14,6 +14,7 @@
 
 #include "codec_bridge.h"
 #include "http_stream_protocol.h"
+#include "stream_input_buffer.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
@@ -39,6 +40,7 @@
 #define CODEC_HEAP_RESERVE_BYTES 1152U
 #define AUDIO_STACK_BYTES 4096U
 #define STREAM_READ_WAIT_MS ((uint32_t)CONFIG_YORADIO_STREAM_READ_WAIT_MS)
+#define STREAM_PREFILL_MS ((uint32_t)CONFIG_YORADIO_STREAM_PREFILL_MS)
 
 #ifndef YORADIO_ESP8266_KARADIO_PIPELINE
 #define YORADIO_ESP8266_KARADIO_PIPELINE 0
@@ -660,6 +662,7 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
     return true;
 }
 
+#if YORADIO_ESP8266_KARADIO_PIPELINE
 static bool stream_read_exact(http_stream_t *stream, uint8_t *destination,
                               size_t length, uint32_t generation,
                               int64_t deadline) {
@@ -705,7 +708,6 @@ static bool read_icy_metadata(http_stream_t *stream, uint32_t generation) {
     return remaining == 0;
 }
 
-#if YORADIO_ESP8266_KARADIO_PIPELINE
 static bool karadio_pipeline_active(void) {
     return s_karadio_state == KARADIO_PIPELINE_OPENING ||
            s_karadio_state == KARADIO_PIPELINE_STREAMING;
@@ -982,6 +984,7 @@ static void audio_task(void *argument) {
 #if YORADIO_ESP8266_NETWORK_BENCHMARK
 #include "network_benchmark.inc"
 #endif
+#include "stream_input_refill.inc"
 static void audio_task(void *argument) {
     memory_profile_register(MEMORY_AUDIO);
     (void)argument;
@@ -1100,85 +1103,112 @@ static void audio_task(void *argument) {
         native_state_set_stream(codec_kind == HELIX_CODEC_MP3
                                     ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
                                 stream.advertised_bitrate, 0, 0);
-#if YORADIO_ESP8266_AUDIO_PROFILE
-        ESP_LOGI(TAG, "Profile initial feed begin");
-#endif
-        int feed = helix_codec_feed(codec, s_work, detect_size, false,
-                                    pcm_output, &output);
-#if YORADIO_ESP8266_AUDIO_PROFILE
-        ESP_LOGI(TAG, "Profile initial feed end: result=%d", feed);
-#endif
-        native_state_set_audio(true, false, NULL);
+        /* The HTTP prefix aliases the metadata scratch area. Move it to the
+         * input queue before stripping ICY, so metadata cannot overwrite audio. */
+        stream_icy_t icy = {
+            .interval = stream.metadata_interval,
+            .audio_left = stream.metadata_interval,
+        };
+        size_t capacity = 0;
+        uint8_t *destination = helix_codec_write_pointer(codec, &capacity);
+        int feed = 0;
+        if (!destination || detect_size > capacity) {
+            feed = -20;
+        } else {
+            memcpy(destination, s_work, detect_size);
+            size_t initial_audio = stream_icy_audio(&icy, destination, detect_size,
+                s_work, sizeof(s_work) - 1U, stream_buffer_metadata, &output);
+            feed = helix_codec_buffer_commit(codec, initial_audio);
+            output.measured_bytes = initial_audio;
+        }
+        int64_t prefill_started = esp_timer_get_time();
+        bool prefill = true, ended = false, playing = false;
+        int end_error = 0;
+        /* Keep command latency bounded even when a profile uses a longer
+         * select() wait. Normal playback never waits just to fill the queue. */
+        const uint32_t wait_ms = STREAM_READ_WAIT_MS > 10U ? 10U : STREAM_READ_WAIT_MS;
         while (feed == 0 && generation_current(command.generation)) {
-            if (stream.metadata_interval && !audio_until_metadata) {
-#if defined(YORADIO_ESP8266_AUDIO_TRACE)
-                ESP_LOGI(TAG, "AUDIO_TRACE ICY begin commit=%u",
-                         s_stream_trace_count);
-#endif
-                if (!read_icy_metadata(&stream, command.generation)) {
-                    feed = errno == ETIMEDOUT ? 0 : -22;
-                    break;
-                }
-                audio_until_metadata = stream.metadata_interval;
-#if defined(YORADIO_ESP8266_AUDIO_TRACE)
-                ESP_LOGI(TAG, "AUDIO_TRACE ICY end commit=%u",
-                         s_stream_trace_count);
-#endif
-                continue;
+            int filled = ended ? STREAM_FILL_EOF :
+                stream_input_refill(&stream, codec, &icy, &output);
+            if (filled == STREAM_FILL_CANCELLED) break;
+            if (filled == STREAM_FILL_EOF || filled == STREAM_FILL_TIMEOUT ||
+                filled == STREAM_FILL_ERROR) {
+                ended = true;
+                if (filled == STREAM_FILL_ERROR) end_error = -21;
             }
-            size_t capacity = 0;
-            uint8_t *destination = helix_codec_write_pointer(codec, &capacity);
-            if (!destination || !capacity) {
-                feed = -20;
+            if (prefill) {
+                if (!stream_prefill_ready(helix_codec_buffered(codec),
+                        helix_codec_input_capacity(), ended,
+                        esp_timer_get_time() - prefill_started, STREAM_PREFILL_MS)) {
+                    if (filled == STREAM_FILL_AGAIN) {
+                        if (!stream_wait_after_empty(&stream, command.generation, wait_ms)) {
+                            ended = true;
+                            end_error = errno == ETIMEDOUT ? 0 : -21;
+                        }
+                    } else {
+                        vTaskDelay(pdMS_TO_TICKS(1));
+                    }
+                    continue;
+                }
+                prefill = false;
+                ESP_LOGI(TAG, "Input prefill %u/%u bytes in %u ms",
+                         (unsigned)helix_codec_buffered(codec),
+                         (unsigned)helix_codec_input_capacity(),
+                         (unsigned)((esp_timer_get_time() - prefill_started) / 1000));
+            }
+
+            /* Exactly one compressed frame, then service TCP again. Draining
+             * the entire enlarged queue here would defeat read-ahead. */
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+            if (s_stream_trace_count < 24U)
+                ESP_LOGI(TAG, "AUDIO_TRACE FRAME begin=%u queued=%u fill=%d",
+                         s_stream_trace_count,
+                         (unsigned)helix_codec_buffered(codec), filled);
+#endif
+            int decoded = helix_codec_process_one(codec, pcm_output, &output);
+#if defined(YORADIO_ESP8266_AUDIO_TRACE)
+            if (s_stream_trace_count < 24U)
+                ESP_LOGI(TAG, "AUDIO_TRACE FRAME end=%u queued=%u result=%d",
+                         s_stream_trace_count,
+                         (unsigned)helix_codec_buffered(codec), decoded);
+            ++s_stream_trace_count;
+#endif
+            if (decoded < 0) {
+                feed = decoded;
                 break;
             }
-            size_t wanted = capacity > 1024U ? 1024U : capacity;
-            if (stream.metadata_interval && wanted > audio_until_metadata)
-                wanted = audio_until_metadata;
-            int received = stream_receive(&stream, destination, wanted);
-            if (received > 0) {
-                if (!generation_current(command.generation)) break;
-                output.measured_bytes += (uint32_t)received;
-                if (stream.metadata_interval)
-                    audio_until_metadata -= (uint32_t)received;
-#if defined(YORADIO_ESP8266_AUDIO_TRACE)
-                if (s_stream_trace_count < 24U)
-                    ESP_LOGI(TAG,
-                             "AUDIO_TRACE COMMIT begin=%u bytes=%d until=%u",
-                             s_stream_trace_count, received,
-                             (unsigned)audio_until_metadata);
-#endif
-                feed = helix_codec_commit(codec, (size_t)received,
-                                          pcm_output, &output);
-#if defined(YORADIO_ESP8266_AUDIO_TRACE)
-                if (s_stream_trace_count < 24U)
-                    ESP_LOGI(TAG, "AUDIO_TRACE COMMIT end=%u result=%d",
-                             s_stream_trace_count, feed);
-                ++s_stream_trace_count;
-#endif
-                /* A continuously readable stream must still let the idle
-                 * task feed the watchdog and service deferred Wi-Fi work. */
-                if (feed == 0) vTaskDelay(pdMS_TO_TICKS(1));
-                int64_t now = esp_timer_get_time();
-                if (!output.decoder_bitrate &&
-                    now - output.measured_started_us >= 3000000) {
-                    uint32_t kbps = (uint32_t)(output.measured_bytes * 8000ULL /
-                                              (uint64_t)(now - output.measured_started_us));
-                    native_state_set_stream(codec_kind == HELIX_CODEC_MP3
-                                                ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
-                                            kbps, 0, 0);
-                    output.measured_bytes = 0;
-                    output.measured_started_us = now;
-                }
-            } else if (received == 0) {
+            if (!playing && output.decoder_sample_rate &&
+                generation_current(command.generation)) {
+                playing = true;
+                native_state_set_audio(true, false, NULL);
+            }
+            if (decoded == 0) {
+                /* Give idle/watchdog and deferred Wi-Fi work a turn even on
+                 * continuously readable streams or malformed input. */
+                vTaskDelay(pdMS_TO_TICKS(1));
+            } else if (ended) {
+                /* Drain all complete queued frames before reconnecting.
+                 * Only the final incomplete frame is discarded. */
+                feed = end_error;
                 break;
-            } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                if (!stream_wait_after_empty(&stream, command.generation, STREAM_READ_WAIT_MS)) {
-                    feed = errno == ETIMEDOUT ? 0 : -21; break;
-                }
-            } else {
-                feed = errno == ETIMEDOUT ? 0 : -21;
+            } else if (helix_codec_buffered(codec) == helix_codec_input_capacity()) {
+                feed = -20; /* No progress is possible in a full input queue. */
                 break;
+            } else if (!stream_wait_after_empty(&stream, command.generation, wait_ms)) {
+                ended = true;
+                end_error = errno == ETIMEDOUT ? 0 : -21;
+            }
+            int64_t now = esp_timer_get_time();
+            if (!output.decoder_bitrate &&
+                now - output.measured_started_us >= 3000000) {
+                uint32_t kbps = (uint32_t)(output.measured_bytes * 8000ULL /
+                                          (uint64_t)(now - output.measured_started_us));
+                native_state_set_stream(codec_kind == HELIX_CODEC_MP3
+                                            ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
+                                        kbps, output.decoder_sample_rate,
+                                        output.decoder_channels);
+                output.measured_bytes = 0;
+                output.measured_started_us = now;
             }
         }
         close(stream.socket);

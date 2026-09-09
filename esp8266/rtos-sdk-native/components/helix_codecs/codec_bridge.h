@@ -30,6 +30,16 @@ void helix_codec_destroy(helix_codec_t *codec);
 int helix_codec_switch(helix_codec_t *codec, helix_codec_kind_t kind);
 helix_codec_kind_t helix_codec_detect(const uint8_t *data, size_t size);
 uint8_t *helix_codec_write_pointer(helix_codec_t *codec, size_t *capacity);
+/* Queue compressed bytes without decoding; no second FIFO is allocated.
+ * After every process/commit, reacquire the write pointer before writing. */
+int helix_codec_buffer_commit(helix_codec_t *codec, size_t size);
+size_t helix_codec_buffered(const helix_codec_t *codec);
+size_t helix_codec_input_capacity(void);
+/* 0 = progress, 1 = incomplete frame (needs input), negative = error.
+ * Decodes at most one compressed frame; PCM callbacks may run in blocks. */
+int helix_codec_process_one(helix_codec_t *codec,
+                            helix_pcm_callback_t callback, void *context);
+/* Compatibility API: append and drain all complete frames. */
 int helix_codec_commit(helix_codec_t *codec, size_t size,
                        helix_pcm_callback_t callback, void *context);
 int helix_codec_feed(helix_codec_t *codec, const uint8_t *data, size_t size,

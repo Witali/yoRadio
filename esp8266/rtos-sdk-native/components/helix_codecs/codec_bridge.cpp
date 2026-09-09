@@ -43,9 +43,14 @@ constexpr size_t kArenaBytes = sizeof(mad_stream) + sizeof(mad_frame) +
 #else
 constexpr size_t kArenaBytes = 23328U;
 #endif
-/* 1536 bytes covers a maximum-size 320-kbit/s MP3 frame and normal
- * high-bitrate ADTS AAC frames while conserving scarce ESP8266 DRAM. */
-constexpr size_t kInputBytes = 1536U;
+/* Reuse the decoder input as read-ahead storage. Older host/experimental
+ * configs without this option keep the original single-frame buffer. */
+#ifndef CONFIG_YORADIO_STREAM_INPUT_BYTES
+#define CONFIG_YORADIO_STREAM_INPUT_BYTES 1536
+#endif
+constexpr size_t kInputBytes = CONFIG_YORADIO_STREAM_INPUT_BYTES;
+static_assert(kInputBytes >= 1536U && kInputBytes <= 8192U,
+              "Compressed input must fit the ESP8266 memory budget");
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
 constexpr size_t kInputStorageBytes = kInputBytes + MAD_BUFFER_GUARD;
 #else
@@ -640,14 +645,36 @@ extern "C" uint8_t *helix_codec_write_pointer(helix_codec_t *codec,
     return codec->input + codec->input_start + codec->input_size;
 }
 
-extern "C" int helix_codec_commit(helix_codec_t *codec, size_t size,
-                                   helix_pcm_callback_t callback,
-                                   void *context) {
-    if (!codec || !callback) return -1;
+extern "C" size_t helix_codec_buffered(const helix_codec_t *codec) {
+    return codec ? codec->input_size : 0;
+}
+
+extern "C" size_t helix_codec_input_capacity(void) {
+    return kInputBytes;
+}
+
+extern "C" int helix_codec_buffer_commit(helix_codec_t *codec, size_t size) {
+    if (!codec) return -1;
     size_t capacity = 0;
     helix_codec_write_pointer(codec, &capacity);
     if (size > capacity) return -2;
     codec->input_size += size;
+    return 0;
+}
+
+extern "C" int helix_codec_process_one(helix_codec_t *codec,
+                                        helix_pcm_callback_t callback,
+                                        void *context) {
+    if (!codec || !callback) return -1;
+    return decode_one(codec, callback, context);
+}
+
+extern "C" int helix_codec_commit(helix_codec_t *codec, size_t size,
+                                   helix_pcm_callback_t callback,
+                                   void *context) {
+    if (!callback) return -1;
+    int committed = helix_codec_buffer_commit(codec, size);
+    if (committed < 0) return committed;
     while (codec->input_size) {
         size_t before = codec->input_size;
         int result = decode_one(codec, callback, context);

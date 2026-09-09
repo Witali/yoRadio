@@ -92,10 +92,18 @@ It explicitly selects QIO 40 MHz flash, a 160 MHz CPU, Helix MP3 SSO, Helix
 AAC, mono decoded PCM, I2S-PDM on GPIO3, genuine PDM32 at nominal 1.536 MHz, and the static
 2 x 512-word SLC-DMA ping-pong buffers. The 3072-byte main task also owns the button and
 encoder gesture state machine, awakened directly by their ISRs, so there is no
-separate input-task stack. The HTTP/WebSocket task uses 4096 bytes. libmad,
+separate input-task stack. The HTTP/WebSocket task uses 5120 bytes. libmad,
 AAC SSO, legacy SPI-PDM, standard I2S PCM,
 and PDM128 are explicitly disabled. This explicit selection prevents a stale
 experimental choice from being inherited by a fresh build.
+
+The compressed decoder input now defaults to 6144 bytes
+(`CONFIG_YORADIO_STREAM_INPUT_BYTES`). Startup tries to fill the whole buffer
+for up to 1000 ms (`CONFIG_YORADIO_STREAM_PREFILL_MS`); playback refills from
+nonblocking TCP before each compressed frame. No second FIFO or task is added.
+This costs 4608 extra DRAM bytes versus the previous 1536-byte input.
+See [prefill behavior, RAM budget and test limits](../../docs/ESP8266_INPUT_PREFILL_2026-09-09.md).
+Use 4096 for a smaller build; a safe runtime maximum still needs hardware stress testing.
 
 Configure every ordinary or diagnostic build with the tracked defaults path,
 for example:

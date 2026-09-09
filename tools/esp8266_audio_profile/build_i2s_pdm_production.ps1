@@ -1,9 +1,11 @@
 param(
-    [string]$SdkPath = '.worktree/esp8266-native-port/.build/esp8266-rtos-sdk'
+    [string]$SdkPath = '.worktree/esp8266-native-port/.build/esp8266-rtos-sdk',
+    [ValidatePattern('^[a-zA-Z0-9_-]+$')]
+    [string]$Variant = 'esp8266-i2s-pdm-production'
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
-$taskVariant = 'esp8266-i2s-pdm-production'
+$taskVariant = $Variant
 $taskBuild = "$taskRoot/.build/$taskVariant"
 $taskArtifact = "$taskRoot/firmware/development/$taskVariant"
 $taskSavedPath = $env:PATH
@@ -50,6 +52,9 @@ try {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
     if ($taskConfig -match '(?m)^CONFIG_YORADIO_AUDIO_OUTPUT_(SPI_PDM|I2S_RCPDM|I2S_PCM)=y') { throw 'Only standard I2S PDM is allowed' }
+    foreach ($taskRequired in @('CONFIG_YORADIO_STREAM_INPUT_BYTES=6144', 'CONFIG_YORADIO_STREAM_PREFILL_MS=1000')) {
+        if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired; use a fresh -Variant build directory" }
+    }
     $taskGzipEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y\r?$'
     Write-Output "Building $taskVariant, CPU160, QIO40"
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/ninja/1.9.0/ninja.exe" @('-C', $taskBuild) "$taskBuild/build.log"
@@ -73,6 +78,10 @@ try {
         stream_wait_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_read_wait.h).Hash
         http_receive_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_txrx.c).Hash
         stream_read_wait_ms=0; stream_idle_timeout_ms=1000
+        stream_input_bytes=6144; stream_prefill_ms=1000
+        codec_bridge_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/helix_codecs/codec_bridge.cpp).Hash
+        stream_input_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_input_buffer.h).Hash
+        stream_refill_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_input_refill.inc).Hash
         network_benchmark=$false
         cpu_mhz=160; flash='QIO40'; output='I2S PDM32 SLC-DMA'; data_gpio=3; dma_buffers=2; dma_words_per_buffer=512
         pcm_rate=48000; nominal_bit_rate_hz=1536000; bit_rate_hz=1538461; i2s=$true

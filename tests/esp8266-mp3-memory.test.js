@@ -57,14 +57,14 @@ test("ESP8266 AAC reserves only its active bounded PCM block", () => {
   assert.match(bridge, /heap_caps_realloc\([\s\S]*sizeof\(int16_t\) \* pcm_samples/);
 });
 
-test("ESP8266 enables AAC and yields between compressed input chunks", () => {
+test("ESP8266 enables AAC and refills/yields between compressed frames", () => {
   assert.match(
     nativeOptions,
     /config YORADIO_HELIX_AAC[\s\S]*default y/,
   );
   assert.match(
     audioService,
-    /helix_codec_commit\([\s\S]*if \(feed == 0\) vTaskDelay\(pdMS_TO_TICKS\(1\)\)/,
+    /stream_input_refill\([\s\S]*helix_codec_process_one\([\s\S]*if \(decoded == 0\)[\s\S]*vTaskDelay\(pdMS_TO_TICKS\(1\)\)/,
   );
 });
 

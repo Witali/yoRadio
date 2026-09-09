@@ -1,0 +1,45 @@
+{
+  "date": "2026-09-09",
+  "platform": "Windows host, MSVC C/C++",
+  "suite": {
+    "selection": "rg --files tests -g esp8266*.test.js",
+    "command": "node --test --test-concurrency=2 <selected files>",
+    "tests": 236,
+    "pass": 236,
+    "fail": 0,
+    "skipped": 0,
+    "duration_ms": 120675.3192
+  },
+  "input_regression": {
+    "command": "node --test tests/esp8266-stream-input.test.js",
+    "tests": 5,
+    "pass": 5,
+    "input_bytes": [1536, 4096, 6144],
+    "read_chunk_bytes": [1, 73, 1024],
+    "mp3_kbps": [64, 128, 320],
+    "aac_kbps": [48, 96, 320],
+    "reference": "legacy helix_codec_feed draining all complete frames after each 1024-byte chunk",
+    "candidate": "fill all free input space, then helix_codec_process_one",
+    "pcm_bit_exact": true,
+    "frame_format_sequence_identical": true,
+    "maximum_pcm_difference": 0,
+    "native_icy_and_refill_harness": "tests/native/esp8266_stream_input_test.c"
+  },
+  "target_build": {
+    "variant": "esp8266-i2s-pdm-prefill6k",
+    "toolchain": "xtensa-lx106-elf GCC 8.4.0",
+    "input_bytes": 6144,
+    "prefill_timeout_ms": 1000,
+    "extra_input_dram_bytes": 4608,
+    "static_dram_bytes": 21432,
+    "static_iram_bytes": 27484,
+    "pcm_dma_configuration_changed": false,
+    "manifest": "../../../firmware/development/esp8266-i2s-pdm-prefill6k/manifest.json"
+  },
+  "hardware": {
+    "flashed": false,
+    "tested": false,
+    "runtime_free_heap_measured": false,
+    "continuous_audio_confirmed": false
+  }
+}

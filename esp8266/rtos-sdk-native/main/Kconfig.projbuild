@@ -166,6 +166,26 @@ config YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS
         Start the recovery access point after this many seconds without a
         successful client-mode Wi-Fi connection.
 
+config YORADIO_STREAM_INPUT_BYTES
+    int "Compressed audio input buffer (bytes)"
+    range 1536 8192
+    default 6144
+    help
+        Reuse the decoder input as a queue, without a separate FIFO/task.
+        6144 bytes adds 4608 bytes of DRAM compared with the old 1536-byte
+        buffer. Use 4096 on memory-constrained profiles. Larger values need
+        on-board heap/stack and WebUI stress testing for both MP3 and AAC.
+
+config YORADIO_STREAM_PREFILL_MS
+    int "Maximum initial input prefill time (milliseconds, 0 = disabled)"
+    range 0 5000
+    default 1000
+    help
+        Before decoding, try to fill the entire compressed input buffer.
+        Start sooner if it fills, or with the available bytes at the deadline.
+        Stop/station changes cancel the wait. During playback, top up with
+        immediately available data before each frame without waiting to fill.
+
 config YORADIO_STREAM_IDLE_TIMEOUT_MS
     int "Radio stream receive inactivity timeout (milliseconds)"
     range 250 60000
