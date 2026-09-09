@@ -31,13 +31,21 @@ option(YORADIO_ESP8266_SPIFFS_LOG
   "Mirror SDK logs to bounded SPIFFS files (diagnostic flash writes)" OFF)
 option(YORADIO_ESP8266_DIAGNOSTIC
   "Enable explicitly requested diagnostic facilities, never for production" OFF)
+option(YORADIO_ESP8266_OPUS_STREAM_TEST
+  "Allow diagnostic live Opus URL requests and init-failure snapshots" OFF)
 option(YORADIO_ESP8266_OPUS_BENCHMARK
   "Run raw flash-fixture Opus benchmark on request while preserving WebUI/OTA" OFF)
 set(YORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES "" CACHE PATH "Generated Opus board fixture directory")
 if(YORADIO_ESP8266_OPUS_BENCHMARK)
+  # Preserve the existing benchmark profile without making the cache sticky.
+  set(YORADIO_ESP8266_OPUS_STREAM_TEST ON)
+endif()
+if(YORADIO_ESP8266_OPUS_STREAM_TEST)
   if(NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT CONFIG_YORADIO_OGG_OPUS)
-    message(FATAL_ERROR "Opus benchmark requires diagnostic Opus profile")
+    message(FATAL_ERROR "Opus stream test/benchmark requires diagnostic Opus profile")
   endif()
+endif()
+if(YORADIO_ESP8266_OPUS_BENCHMARK)
   if(NOT EXISTS "${YORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES}/opus_board_fixtures.h")
     message(FATAL_ERROR "Generate raw Opus fixtures with build_board_fixtures.cjs first")
   endif()
@@ -238,6 +246,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++14>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
+  YORADIO_ESP8266_OPUS_STREAM_TEST=$<BOOL:${YORADIO_ESP8266_OPUS_STREAM_TEST}>
   YORADIO_ESP8266_OPUS_BENCHMARK=$<BOOL:${YORADIO_ESP8266_OPUS_BENCHMARK}>
   YORADIO_ESP8266_WEB_AUDIO_PAUSE=${WEB_AUDIO_PAUSE_MODE}
   YORADIO_ESP8266_WEB_PROFILE=$<BOOL:${YORADIO_ESP8266_WEB_PROFILE}>

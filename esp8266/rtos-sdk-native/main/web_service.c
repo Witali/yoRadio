@@ -26,8 +26,10 @@
 #include "lwip/tcp.h"
 #include "native_audio_output.h"
 #include "audio_service.h"
-#include "opus_benchmark.h"
 #if YORADIO_ESP8266_OPUS_BENCHMARK
+#include "opus_benchmark.h"
+#endif
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
 #include "codec_bridge.h"
 #endif
 #include "native_state.h"
@@ -1177,7 +1179,7 @@ static esp_err_t static_handler(httpd_req_t *request) {
     return result;
 }
 
-#if YORADIO_ESP8266_OPUS_BENCHMARK
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
 /* Diagnostic-only live stream probe. It does not rewrite the user's playlist,
  * Wi-Fi credentials or saved station. Body is one bounded HTTP URL. */
 static esp_err_t opus_test_stream_handler(httpd_req_t *request) {
@@ -1229,6 +1231,9 @@ static esp_err_t opus_test_stream_status_handler(httpd_req_t *request) {
     return finish_short_response(request, send_string(request, body));
 }
 
+#endif
+
+#if YORADIO_ESP8266_OPUS_BENCHMARK
 static esp_err_t opus_benchmark_start_handler(httpd_req_t *request) {
     prepare_short_response(request);
     httpd_resp_set_type(request, "application/json");
@@ -1310,8 +1315,11 @@ esp_err_t web_service_start(void) {
     config.backlog_conn = WEB_CONNECTION_BACKLOG;
     config.recv_wait_timeout = WEB_IDLE_TIMEOUT_SECONDS;
     config.max_uri_handlers = 26;
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
+    config.max_uri_handlers += 2;
+#endif
 #if YORADIO_ESP8266_OPUS_BENCHMARK
-    config.max_uri_handlers += 4;
+    config.max_uri_handlers += 2;
 #endif
 #if YORADIO_ESP8266_SPIFFS_LOG_HTTP
     config.max_uri_handlers += 2;
@@ -1356,17 +1364,19 @@ esp_err_t web_service_start(void) {
         return result;
     if ((result = register_get("/api/native/audio", audio_health_handler)) != ESP_OK)
         return result;
-#if YORADIO_ESP8266_OPUS_BENCHMARK
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
     if ((result = register_get("/api/native/opus-stream", opus_test_stream_status_handler)) != ESP_OK)
         return result;
+    httpd_uri_t opus_stream = {.uri = "/api/native/opus-stream", .method = HTTP_POST,
+                               .handler = opus_test_stream_handler};
+    if ((result = httpd_register_uri_handler(s_server, &opus_stream)) != ESP_OK) return result;
+#endif
+#if YORADIO_ESP8266_OPUS_BENCHMARK
     if ((result = register_get("/api/native/opus-benchmark", opus_benchmark_status_handler)) != ESP_OK)
         return result;
     httpd_uri_t opus_bench = {.uri = "/api/native/opus-benchmark", .method = HTTP_POST,
                               .handler = opus_benchmark_start_handler};
     if ((result = httpd_register_uri_handler(s_server, &opus_bench)) != ESP_OK) return result;
-    httpd_uri_t opus_stream = {.uri = "/api/native/opus-stream", .method = HTTP_POST,
-                               .handler = opus_test_stream_handler};
-    if ((result = httpd_register_uri_handler(s_server, &opus_stream)) != ESP_OK) return result;
 #endif
 #if YORADIO_ESP8266_SPIFFS_LOG_HTTP
     if ((result = register_get("/api/native/log", spiffs_log_handler)) != ESP_OK)

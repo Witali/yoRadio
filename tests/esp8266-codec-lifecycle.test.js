@@ -33,7 +33,8 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
   const defines=['YORADIO_ESP8266_NATIVE=1','YORADIO_HELIX_MP3_MONO=1','YORADIO_HELIX_MP3_SSO=1',
     'YORADIO_ESP8266_AAC_BLOCK_OUTPUT=1','YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES=512','CONFIG_YORADIO_STREAM_INPUT_BYTES=4096',
     'CONFIG_YORADIO_OGG_OPUS=' + Number(opusEnabled), 'CONFIG_YORADIO_OPUS_INPUT_BYTES=' + (opusInput || 1024),
-    'CONFIG_YORADIO_OPUS_SCRATCH_BYTES=' + opusScratch, 'YORADIO_ESP8266_OPUS_BENCHMARK=' + diagnostics, 'PROGMEM='];
+    'CONFIG_YORADIO_OPUS_SCRATCH_BYTES=' + opusScratch, 'YORADIO_ESP8266_OPUS_STREAM_TEST=' + diagnostics,
+    'YORADIO_ESP8266_OPUS_BENCHMARK=0', 'PROGMEM='];
   const exe=path.join(dir,process.platform==='win32'?'test.exe':'test');
   let build;
   if(process.platform==='win32') {

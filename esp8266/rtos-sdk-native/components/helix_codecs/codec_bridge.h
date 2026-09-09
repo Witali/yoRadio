@@ -55,7 +55,7 @@ size_t helix_codec_arena_used(const helix_codec_t *codec);
 size_t helix_codec_dram_used(const helix_codec_t *codec);
 size_t helix_codec_iram_used(const helix_codec_t *codec);
 
-#if YORADIO_ESP8266_OPUS_BENCHMARK
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
 typedef enum {
     HELIX_OPUS_INIT_NONE = 0,
     HELIX_OPUS_INIT_CODEC = 1,

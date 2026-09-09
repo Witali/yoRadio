@@ -14,6 +14,7 @@ param(
     [switch]$EnableOpus,
     [switch]$NoSpiffsCache,
     [switch]$OpusWordAsm,
+    [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
     [string]$OpusBenchmarkFixtures = '.build/esp8266-opus-board-fixtures'
 )
@@ -23,8 +24,10 @@ if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
 }
 if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -SpiffsLog' }
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
+if ($OpusStreamTest -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusStreamTest requires -Diagnostic and -EnableOpus' }
 if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOpus' }
 if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
+$taskOpusStreamTestEnabled = [bool]($OpusStreamTest -or $OpusBenchmark)
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
 $taskVariant = $Variant
 $taskBuild = "$taskRoot/.build/$taskVariant"
@@ -51,6 +54,28 @@ function Get-TaskSpiffsCacheProfile([string]$Config, [bool]$Disabled) {
     }
     return [pscustomobject]@{ enabled = $taskReadCache; write_enabled = $taskWriteCache }
 }
+function Set-TaskOpusRuntimeDefaults([string]$Defaults, [bool]$Benchmark) {
+    # Runtime stats select trace/formatting and enlarge every task/queue. A live
+    # URL probe does not need them; explicitly disable stale benchmark defaults.
+    $taskStats = 'CONFIG_FREERTOS_(?:GENERATE_RUN_TIME_STATS|USE_TRACE_FACILITY|USE_STATS_FORMATTING_FUNCTIONS|RUN_TIME_STATS_USING_ESP_TIMER|RUN_TIME_STATS_USING_CPU_CLK)'
+    $taskText = $Defaults -replace "(?m)^(?:$taskStats=[^\r\n]*|# $taskStats is not set)\r?\n?", ''
+    foreach ($taskOption in @('GENERATE_RUN_TIME_STATS', 'USE_TRACE_FACILITY', 'USE_STATS_FORMATTING_FUNCTIONS', 'RUN_TIME_STATS_USING_ESP_TIMER')) {
+        $taskText += $(if ($Benchmark) { "`nCONFIG_FREERTOS_$taskOption=y" } else { "`n# CONFIG_FREERTOS_$taskOption is not set" })
+    }
+    return $taskText + "`n# CONFIG_FREERTOS_RUN_TIME_STATS_USING_CPU_CLK is not set`n"
+}
+function Get-TaskOpusRuntimeProfile([string]$Config, [bool]$Benchmark) {
+    foreach ($taskOption in @('GENERATE_RUN_TIME_STATS', 'USE_TRACE_FACILITY', 'USE_STATS_FORMATTING_FUNCTIONS', 'RUN_TIME_STATS_USING_ESP_TIMER')) {
+        $taskEnabled = $Config -match "(?m)^CONFIG_FREERTOS_$taskOption=y`r?$"
+        if ($taskEnabled -ne $Benchmark) {
+            throw "Wrong cached FreeRTOS runtime profile: $taskOption; use a fresh -Variant build directory"
+        }
+    }
+    if ($Config -match '(?m)^CONFIG_FREERTOS_RUN_TIME_STATS_USING_CPU_CLK=y\r?$') {
+        throw 'Wrong cached FreeRTOS runtime clock; use a fresh -Variant build directory'
+    }
+    return [pscustomobject]@{ enabled = $Benchmark }
+}
 Push-Location $taskRoot
 try {
     $env:IDF_PATH = (Resolve-Path $SdkPath).Path
@@ -66,8 +91,8 @@ try {
     if ($NoAudioLevelLed) { $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED=y', '# CONFIG_YORADIO_STATUS_LED is not set') }
     if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=1024`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144`n" }
     $taskDefaults = Set-TaskSpiffsCacheDefaults $taskDefaults ([bool]$NoSpiffsCache)
+    $taskDefaults = Set-TaskOpusRuntimeDefaults $taskDefaults ([bool]$OpusBenchmark)
     if ($OpusBenchmark) {
-        $taskDefaults += "`nCONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y`nCONFIG_FREERTOS_RUN_TIME_STATS_USING_ESP_TIMER=y`n"
         $OpusBenchmarkFixtures = (Resolve-Path $OpusBenchmarkFixtures).Path.Replace('\', '/')
     }
     [IO.File]::WriteAllText("$taskBuild/production.defaults", $taskDefaults, (New-Object Text.UTF8Encoding($false)))
@@ -77,6 +102,7 @@ try {
     $taskSpiffsLogHttp = if ($SpiffsLogHttp) { 'ON' } else { 'OFF' }
     $taskDiagnostic = if ($Diagnostic) { 'ON' } else { 'OFF' }
     $taskOpusBenchmark = if ($OpusBenchmark) { 'ON' } else { 'OFF' }
+    $taskOpusStreamTest = if ($taskOpusStreamTestEnabled) { 'ON' } else { 'OFF' }
     $taskOpusWordAsm = if ($OpusWordAsm) { 'ON' } else { 'OFF' }
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
@@ -100,11 +126,13 @@ try {
         "-DYORADIO_ESP8266_SPIFFS_LOG_HTTP=$taskSpiffsLogHttp",
         "-DYORADIO_ESP8266_DIAGNOSTIC=$taskDiagnostic",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK=$taskOpusBenchmark",
+        "-DYORADIO_ESP8266_OPUS_STREAM_TEST=$taskOpusStreamTest",
         "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES=$OpusBenchmarkFixtures",
         '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
     $taskConfig = Get-Content "$taskBuild/sdkconfig" -Raw
     $taskSpiffsCache = Get-TaskSpiffsCacheProfile $taskConfig ([bool]$NoSpiffsCache)
+    $taskOpusRuntime = Get-TaskOpusRuntimeProfile $taskConfig ([bool]$OpusBenchmark)
     foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHMODE_QIO=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y', 'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0', 'CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS=1000')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
@@ -132,6 +160,8 @@ try {
         opus_input_bytes=$(if ($taskOpusEnabled) { 1024 } else { 0 })
         opus_scratch_bytes=$(if ($taskOpusEnabled) { 6144 } else { 0 })
         opus_benchmark=[bool]$OpusBenchmark
+        opus_stream_test=[bool]$taskOpusStreamTestEnabled
+        freertos_runtime_stats=[bool]$taskOpusRuntime.enabled
         opus_word_asm=[bool]$OpusWordAsm
         opus_max_packet_ms=$(if ($taskOpusEnabled) { 20 } else { 0 })
         tone_test=$false

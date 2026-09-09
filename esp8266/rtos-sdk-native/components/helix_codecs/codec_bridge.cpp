@@ -16,7 +16,7 @@
 #include "esp_log.h"
 #include "esp_heap_caps.h"
 #include "esp_system.h"
-#if YORADIO_ESP8266_OPUS_BENCHMARK
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #endif
@@ -39,7 +39,7 @@ extern "C" void audio_profile_decode_end(void);
 #endif
 
 namespace {
-#if YORADIO_ESP8266_OPUS_BENCHMARK
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
 static helix_opus_init_failure_t s_opus_init_failure;
 static_assert(sizeof(s_opus_init_failure) == 20, "Keep init diagnostics bounded");
 static void opus_init_diagnostic_reset() {
@@ -655,7 +655,7 @@ extern "C" bool helix_codec_prepare(void) {
     return CodecArenaPreallocateMp3();
 }
 
-#if YORADIO_ESP8266_OPUS_BENCHMARK
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
 extern "C" void helix_codec_opus_init_failure_snapshot(helix_opus_init_failure_t *out) {
     if (!out) return;
     taskENTER_CRITICAL();

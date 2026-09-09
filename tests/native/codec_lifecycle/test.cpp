@@ -361,7 +361,7 @@ static void opus_bridge_delivery(const std::map<void *, size_t> &baseline) {
     puts("Opus adapter routing, bounded PCM callbacks and finish/cancellation PASS");
 }
 
-#if YORADIO_ESP8266_OPUS_BENCHMARK
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
 static helix_opus_init_failure_t init_failure(unsigned stage) {
     helix_opus_init_failure_t failure;
     const unsigned before=attempts;
@@ -410,7 +410,7 @@ static void opus_diagnostics(const std::map<void *, size_t> &baseline) {
 static void dram_fallback(const std::map<void *, size_t> &baseline) {
     assert(!CodecArenaPreallocatedInIram());
     assert(!helix_codec_create(HELIX_CODEC_OPUS, 1152)); clean(baseline);
-#if YORADIO_ESP8266_OPUS_BENCHMARK
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
     assert(init_failure(HELIX_OPUS_INIT_IRAM).requested_bytes==16384);
 #endif
     for (auto first : {HELIX_CODEC_MP3, HELIX_CODEC_AAC}) {
@@ -428,7 +428,7 @@ int main(int argc, char **argv) {
     fail_after = 0;
     assert(!helix_codec_prepare());
     assert(live.empty());
-#if CONFIG_YORADIO_OGG_OPUS && YORADIO_ESP8266_OPUS_BENCHMARK
+#if CONFIG_YORADIO_OGG_OPUS && YORADIO_ESP8266_OPUS_STREAM_TEST
     assert(!helix_codec_create(HELIX_CODEC_OPUS,1152));
     assert(init_failure(HELIX_OPUS_INIT_IRAM).requested_bytes==16384 && live.empty());
 #endif
@@ -446,7 +446,7 @@ int main(int argc, char **argv) {
 #if CONFIG_YORADIO_OGG_OPUS
     opus_reserve_and_init_failures(baseline);
     opus_bridge_delivery(baseline);
-#if YORADIO_ESP8266_OPUS_BENCHMARK
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
     opus_diagnostics(baseline);
 #endif
     assert(opus_inits && opus_resets);
