@@ -1,0 +1,27 @@
+#pragma once
+#include <stddef.h>
+#include <stdint.h>
+#include <setjmp.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct { size_t bytes, words; } opus_scratch_mark;
+/* One active decoder. Binding/unbinding occurs outside decode calls. */
+void yoradio_opus_memory_bind(void *bytes, size_t byte_capacity,
+                              void *words, size_t word_capacity);
+opus_scratch_mark yoradio_opus_scratch_mark(void);
+void yoradio_opus_scratch_restore(opus_scratch_mark mark);
+void *yoradio_opus_scratch_alloc(size_t count, size_t size, int word_safe);
+void *yoradio_opus_history(size_t bytes);
+void yoradio_opus_copy(void *to, const void *from, size_t count, size_t size);
+void yoradio_opus_clear(void *to, size_t count, size_t size);
+size_t yoradio_opus_scratch_peak_bytes(void);
+size_t yoradio_opus_scratch_peak_words(void);
+/* Kept inside the C decoder wrapper; no C++ destructors are crossed. */
+extern jmp_buf yoradio_opus_oom;
+int yoradio_opus_decode_bounded(void *decoder, const unsigned char *packet,
+                               int length, int16_t *pcm, int frame_size);
+#ifdef __cplusplus
+}
+#endif
