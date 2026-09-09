@@ -3,7 +3,8 @@ param(
     [ValidatePattern('^[a-zA-Z0-9_-]+$')]
     [string]$Variant = 'esp8266-i2s-pdm-production',
     [ValidateSet('off', 'short', 'long')]
-    [string]$WebAudioPause = 'off'
+    [string]$WebAudioPause = 'off',
+    [switch]$MemoryProfile
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
@@ -31,6 +32,7 @@ try {
     $taskDefaults = $taskDefaults.Replace('CONFIG_LOG_BOOTLOADER_LEVEL_WARN=y', 'CONFIG_LOG_BOOTLOADER_LEVEL_ERROR=y')
     [IO.File]::WriteAllText("$taskBuild/production.defaults", $taskDefaults, (New-Object Text.UTF8Encoding($false)))
     Write-Output "Configuring $taskVariant on GPIO3/RX (no flashing)"
+    $taskMemoryProfile = if ($MemoryProfile) { 'ON' } else { 'OFF' }
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
         "-DSDKCONFIG=$taskBuild/sdkconfig", "-DSDKCONFIG_DEFAULTS=$taskBuild/production.defaults",
@@ -48,7 +50,7 @@ try {
         '-DYORADIO_ESP8266_NETWORK_BENCHMARK_SWEEP=0',
         '-DYORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY=OFF',
         '-DYORADIO_ESP8266_KARADIO_PIPELINE=OFF', '-DYORADIO_ESP8266_AUDIO_PROFILE_URL=',
-        '-DYORADIO_ESP8266_AUDIO_TRACE=OFF', '-DYORADIO_ESP8266_MEMORY_PROFILE=OFF',
+        '-DYORADIO_ESP8266_AUDIO_TRACE=OFF', "-DYORADIO_ESP8266_MEMORY_PROFILE=$taskMemoryProfile",
         '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
     $taskConfig = Get-Content "$taskBuild/sdkconfig" -Raw
     foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHMODE_QIO=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y', 'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0', 'CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS=1000')) {
@@ -68,6 +70,7 @@ try {
         purpose='Production native radio, I2S PDM32 DMA, error logs only; build does not flash'
         tone_test=$false
         web_profile=$false
+        memory_profile=[bool]$MemoryProfile
         web_audio_pause=$WebAudioPause
         log_level='error'
         playlist_web_gzip=[bool]$taskGzipEnabled

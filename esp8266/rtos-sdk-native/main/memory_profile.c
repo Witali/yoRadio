@@ -11,6 +11,28 @@
 #include "freertos/task.h"
 #include "native_state.h"
 #include <limits.h>
+#include "lwip/tcpip.h"
+#include "lwip/priv/tcp_priv.h"
+
+static volatile bool s_tcp_pending;
+static void tcp_memory_sample(void *context) {
+    (void)context;
+    unsigned active = 0, timewait = 0;
+    for (struct tcp_pcb *p = tcp_active_pcbs; p; p = p->next) {
+        unsigned queued = 0;
+#if TCP_QUEUE_OOSEQ
+        for (struct tcp_seg *s = p->ooseq; s; s = s->next)
+            if (s->p) queued += s->p->tot_len;
+#endif
+        ESP_LOGE("memory", "tcp local=%u remote=%u state=%u ooseq=%u refused=%u wnd=%u",
+                 p->local_port, p->remote_port, p->state, queued,
+                 p->refused_data ? p->refused_data->tot_len : 0, (unsigned)p->rcv_wnd);
+        ++active;
+    }
+    for (struct tcp_pcb *p = tcp_tw_pcbs; p; p = p->next) ++timewait;
+    ESP_LOGE("memory", "tcp active=%u timewait=%u", active, timewait);
+    s_tcp_pending = false;
+}
 
 #ifdef CONFIG_HEAP_TRACING
 #error "Memory profile expects the production untraced allocator layout"
@@ -102,7 +124,7 @@ void memory_profile_poll(void) {
     unsigned idle = uxTaskGetStackHighWaterMark(xTaskGetIdleTaskHandle());
     /* StackType_t is uint8_t in this port: these high-water values are bytes.
      * Avoid all-task trace arrays, which would alter the RAM under test. */
-    ESP_LOGI("memory", "station=%u codec=%s play=%u conn=%u kbps=%u "
+    ESP_LOGE("memory", "station=%u codec=%s play=%u conn=%u kbps=%u "
              "dram_total=%u free=%u low=%u largest=%u window_free=%u "
              "window_largest=%u iram_free=%u blocks=%u valid=%u "
              "stack_app=%u stack_audio=%u stack_web=%u stack_idle=%u",
@@ -112,4 +134,11 @@ void memory_profile_poll(void) {
              s_low_free, s_low_largest, sample.iram_free, sample.blocks,
              sample.valid, app, audio, web, idle);
     s_low_free = s_low_largest = UINT_MAX;
+    /* Inspect PCBs only on the TCP/IP owner task; no unsafe cross-task walk.
+     * This entire module is compiled out of ordinary production builds. */
+    if (!s_tcp_pending) {
+        s_tcp_pending = true;
+        if (tcpip_try_callback(tcp_memory_sample, NULL) != ERR_OK)
+            s_tcp_pending = false;
+    }
 }
