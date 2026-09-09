@@ -41,9 +41,10 @@
 #define HTTP_OPEN_ATTEMPTS 2U
 #define CODEC_HEAP_RESERVE_BYTES 1152U
 #if CONFIG_YORADIO_OGG_OPUS
-/* Fixed scratch is separate, but SILK/CELT still have nested scalar frames.
- * Retain additional stack headroom until measured on the physical LX106. */
-#define AUDIO_STACK_BYTES 6144U
+/* Raw SILK/Hybrid/CELT board test used at most 3356 of 6144 bytes.
+ * Keep 1764 bytes above that measured depth for the native stream adapter;
+ * HTTP opening has its own non-inlined frame outside decode. */
+#define AUDIO_STACK_BYTES 5120U
 #else
 #define AUDIO_STACK_BYTES 4096U
 #endif

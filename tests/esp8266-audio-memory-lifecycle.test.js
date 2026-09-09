@@ -103,6 +103,7 @@ test("ESP8266 splits the word-only IMDCT output into the IRAM arena", () => {
 });
 
 test("ESP8266 preserves heap for lwIP after starting the MP3 decoder", () => {
+  assert.match(audio, /#if CONFIG_YORADIO_OGG_OPUS[\s\S]*#define AUDIO_STACK_BYTES 5120U[\s\S]*#else\s*#define AUDIO_STACK_BYTES 4096U/);
   assert.match(audio, /#define AUDIO_STACK_BYTES 4096U/);
   assert.match(audio, /#define CODEC_HEAP_RESERVE_BYTES 1152U/);
   assert.match(bridge, /heap_caps_realloc\([\s\S]*MALLOC_CAP_8BIT/);
