@@ -343,7 +343,7 @@ static bool opus_allocate(helix_codec *codec) {
     config.pcm_samples = codec->pcm_samples;
     config.output = emit_opus;
     config.output_ctx = s_opus;
-    const int result = native_opus_init(&s_opus->stream, &config);
+    const int result = native_opus_init_ex(&s_opus->stream, &config, true);
     if (result != 0)
         opus_init_failed(codec->kind, HELIX_OPUS_INIT_NATIVE, native_opus_decoder_size(), codec->reserve_heap_bytes, result);
     return result == 0;

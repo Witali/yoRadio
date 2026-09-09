@@ -51,6 +51,11 @@ static bool valid_memory(native_opus_t *s, const native_opus_config_t *c) {
 }
 
 int native_opus_init(native_opus_t *s, const native_opus_config_t *config) {
+    return native_opus_init_ex(s, config, false);
+}
+
+int native_opus_init_ex(native_opus_t *s, const native_opus_config_t *config,
+                        bool allow_live_join) {
     if (!s || !config) return NATIVE_OPUS_ERR_ARGUMENT;
     const native_opus_config_t copy = *config;
     /* Validate before clearing: an accidentally overlapping object must not
@@ -58,7 +63,7 @@ int native_opus_init(native_opus_t *s, const native_opus_config_t *config) {
     if (!valid_memory(s, &copy)) return NATIVE_OPUS_ERR_MEMORY;
     memset(s, 0, sizeof(*s));
     s->config = copy;
-    ogg_opus_demux_init(&s->demux);
+    ogg_opus_demux_init_ex(&s->demux, allow_live_join);
     yoradio_opus_memory_bind(copy.scratch, copy.scratch_bytes,
                              copy.iram, NATIVE_OPUS_IRAM_BYTES);
     s->libopus_error = opus_decoder_init((OpusDecoder *)copy.decoder_state,
@@ -70,7 +75,7 @@ int native_opus_init(native_opus_t *s, const native_opus_config_t *config) {
 
 int native_opus_reset(native_opus_t *s) {
     if (!s || !s->decoder_ready) return NATIVE_OPUS_ERR_ARGUMENT;
-    return native_opus_init(s, &s->config);
+    return native_opus_init_ex(s, &s->config, s->demux.allow_live_join);
 }
 
 static int read_head(native_opus_t *s, const ogg_opus_packet_t *p) {

@@ -47,10 +47,13 @@ test("bounded Ogg Opus demux handles split input, corruption and chains under sa
     "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
     "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
     executable, ...fixtures,
+    ...(process.env.YORADIO_OPUS_LIVE_CAPTURE ?
+      ["--live-capture", hostPath(path.resolve(process.env.YORADIO_OPUS_LIVE_CAPTURE))] : []),
   ]);
   assert.equal(result.status, 0, result.stdout + "\n" + result.stderr);
   assert.match(result.stdout, /Ogg Opus demux tests passed/);
   assert.match(result.stdout, /state bytes: 18\d\d/);
+  assert.match(result.stdout, /live join opt-in, strict rejection, 1024-byte input and later holes passed/);
   assert.equal((result.stdout.match(/fixture packets identical/g) || []).length,
     fixtures.length);
   t.diagnostic(result.stdout.trim());

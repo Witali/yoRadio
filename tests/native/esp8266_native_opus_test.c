@@ -210,8 +210,90 @@ static void test_chains(void) {
     opus_int32 gain=0;assert(opus_decoder_ctl((OpusDecoder*)state.bytes,OPUS_GET_GAIN(&gain))==0);
     assert(gain==512 && decoder.input_channels==2 && decoder.pre_skip==240);
 }
-int main(void) {
+
+static void test_live_join(void) {
+    const uint8_t *packets[]={silence,silence,silence,silence,silence};
+    const size_t lengths[]={3,3,3,3,3};
+    init();stream_size=0;headers(91,1,2,356,0,0,19);
+    page(91,2534,0,UINT64_C(10522378560),packets,lengths,5);
+    page(91,2535,4,UINT64_C(10522383360),packets,lengths,5);
+    assert(!decoder.demux.allow_live_join);
+    assert(feed_all(1024)==NATIVE_OPUS_ERR_DEMUX && !calls);
+    assert(decoder.demux_error==OGG_OPUS_DEMUX_ERR_SEQUENCE);
+    assert(native_opus_reset(&decoder)==0 && !decoder.demux.allow_live_join);
+    assert(feed_all(1024)==NATIVE_OPUS_ERR_DEMUX && !calls);
+    native_opus_config_t c=config();
+    assert(native_opus_init_ex(&decoder,&c,true)==0);
+    assert(feed_all(1024)==0 && received==9600-356 && calls==10);
+    assert(decoder.granule_offset==UINT64_C(10522373760));
+    assert(native_opus_reset(&decoder)==0 && decoder.demux.allow_live_join);
+    calls=received=0;
+    assert(feed_all(7)==0 && received==9600-356 && calls==10);
+    puts("Native live join: strict default, pre-skip, 64-bit granules and reset PASS");
+}
+
+typedef struct { FILE *golden; bool positioned; size_t samples; } capture_output_t;
+static bool capture_output(void *ctx,const int16_t *data,size_t samples,uint32_t bitrate) {
+    capture_output_t *capture=ctx;
+    assert(bitrate==56000);
+    if(!capture->positioned) {
+        assert(fseek(capture->golden,(long)decoder.pre_skip*2,SEEK_SET)==0);
+        capture->positioned=true;
+    }
+    for(size_t i=0;i<samples;++i) {
+        const int lo=fgetc(capture->golden),hi=fgetc(capture->golden);
+        assert(lo!=EOF && hi!=EOF);
+        assert((uint16_t)data[i]==(uint16_t)((unsigned)lo|((unsigned)hi<<8)));
+    }
+    capture->samples+=samples;
+    return true;
+}
+static int feed_capture(FILE *file) {
+    uint8_t input[1024];
+    size_t size;
+    while((size=fread(input,1,sizeof(input),file))!=0) {
+        size_t pos=0;
+        for(;;) {
+            size_t used=SIZE_MAX;
+            const int result=native_opus_feed(&decoder,input+pos,size-pos,&used);
+            assert(used<=size-pos);pos+=used;
+            if(result<0)return result;
+            if(result==NATIVE_OPUS_PACKET)continue;
+            assert(pos==size);break;
+        }
+    }
+    assert(!ferror(file));
+    return 0;
+}
+static void test_live_capture(const char *filename,const char *golden_path) {
+    FILE *file=fopen(filename,"rb"),*golden=fopen(golden_path,"rb");
+    assert(file && golden);
+    capture_output_t capture={golden,false,0};
+    native_opus_config_t c=config();c.output=capture_output;c.output_ctx=&capture;
+    c.scratch_bytes=6144;
+    assert(native_opus_init(&decoder,&c)==0);
+    assert(feed_capture(file)==NATIVE_OPUS_ERR_DEMUX);
+    assert(decoder.demux_error==OGG_OPUS_DEMUX_ERR_SEQUENCE && !capture.samples);
+    assert(native_opus_init_ex(&decoder,&c,true)==0);
+    for(unsigned repeat=0;repeat<2;++repeat) {
+        assert(fseek(file,0,SEEK_SET)==0);
+        capture.positioned=false;capture.samples=0;
+        assert(feed_capture(file)==0);
+        assert(decoder.audio_packets==675 && decoder.decoded_samples==648000);
+        assert(decoder.output_samples==647644 && capture.samples==647644);
+        assert(fgetc(golden)==EOF && !ferror(golden));
+        assert(native_opus_finish(&decoder)==NATIVE_OPUS_ERR_TRUNCATED);
+        assert(native_opus_reset(&decoder)==0 && decoder.demux.allow_live_join);
+    }
+    assert(fclose(file)==0 && fclose(golden)==0);
+    puts("Intense live capture: input1024 scratch6144, 675 packets, 647644 PCM samples exact twice PASS");
+}
+
+int main(int argc,char **argv) {
     test_memory();test_alignment();test_flash_table_reads();test_headers();test_granules();test_failures();test_chains();
+    test_live_join();
+    assert(argc==1 || argc==3);
+    if(argc==3)test_live_capture(argv[1],argv[2]);
     assert(allocation_count==0);
     printf("Native Opus PASS: state=%zu adapter=%zu PCM=%zu no allocations\n",native_opus_decoder_size(),sizeof(decoder),sizeof(pcm));
     return 0;

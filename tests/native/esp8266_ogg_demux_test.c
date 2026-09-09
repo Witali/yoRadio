@@ -201,16 +201,23 @@ static void compare(void) {
                   actual.count * sizeof(record_t)) == 0);
 }
 
-static void valid_chunks(const uint8_t *bytes, size_t size, size_t chunk) {
+static void valid_chunks_mode(const uint8_t *bytes, size_t size, size_t chunk,
+                              bool live_join, bool finite) {
     ogg_opus_demux_t d;
     reset(&d);
+    ogg_opus_demux_init_ex(&d, live_join);
     for (size_t at = 0; at < size;) {
         const size_t take = size - at < chunk ? size - at : chunk;
         assert(feed_block(&d, bytes + at, take) == OGG_OPUS_DEMUX_NEED_INPUT);
         at += take;
     }
-    assert(ogg_opus_demux_finish(&d) == 0);
+    assert(ogg_opus_demux_finish(&d) ==
+           (finite ? 0 : OGG_OPUS_DEMUX_ERR_TRUNCATED));
     compare();
+}
+
+static void valid_chunks(const uint8_t *bytes, size_t size, size_t chunk) {
+    valid_chunks_mode(bytes, size, chunk, false, true);
 }
 
 static void expect_error(int error) {
@@ -582,6 +589,100 @@ static void test_generated_page_boundaries(void) {
     puts("generated page boundaries and 2000 malformed streams passed");
 }
 
+static size_t build_live_join(void) {
+    /* Reproduce IntenseRadio's cached header pages and live sequence jump:
+     * 47-byte Head, 105-byte Tags, then seq2534 with five 140-byte packets.
+     * These are synthetic packet bytes; the optional capture test below
+     * also verifies every packet in the unmodified recorded radio stream. */
+    uint8_t metadata[77] = {0}, audio[700];
+    const uint8_t laces[] = {140, 140, 140, 140, 140};
+    memcpy(metadata, tags, sizeof(tags));
+    memset(audio, 0xfc, sizeof(audio));
+    wire_size = 0;
+    one_packet(2, 0x800004aau, 0, 0, head, sizeof(head));
+    one_packet(0, 0x800004aau, 1, 0, metadata, sizeof(metadata));
+    const size_t at = page(0, 0x800004aau, 2534, UINT64_C(10522378560),
+                           laces, sizeof(laces), audio);
+    page(4, 0x800004aau, 2535, UINT64_C(10522383360),
+         laces, sizeof(laces), audio);
+    return at;
+}
+
+static void live_error(int error) {
+    ogg_opus_demux_t d;
+    reset(&d);
+    ogg_opus_demux_init_ex(&d, true);
+    assert(feed_block(&d, wire, wire_size) == error);
+    assert(ogg_opus_demux_finish(&d) == error);
+}
+
+static void test_live_join(void) {
+    const size_t first = build_live_join();
+    assert(first == 152);
+    expect_error(OGG_OPUS_DEMUX_ERR_SEQUENCE);
+    assert(actual.count == 2); /* Old failure: headers delivered, no audio. */
+    reference(wire, wire_size);
+    const size_t chunks[] = {1, 2, 7, 27, 140, 255, 1024, 1536, WIRE_CAPACITY};
+    for (size_t i = 0; i < sizeof(chunks) / sizeof(chunks[0]); ++i)
+        valid_chunks_mode(wire, wire_size, chunks[i], true, true);
+    assert(actual.count == 12 && actual.records[6].last);
+    assert(actual.records[6].granule == UINT64_C(10522378560));
+    const size_t next = first + page_length(first);
+    put32(wire + next + 18, 2537); refresh_crc(next);
+    live_error(OGG_OPUS_DEMUX_ERR_SEQUENCE); /* No holes after baseline. */
+    assert(actual.count == 7);
+    build_live_join(); wire[first + 5] = 1; refresh_crc(first);
+    live_error(OGG_OPUS_DEMUX_ERR_SEQUENCE); /* No partial first packet. */
+    build_live_join(); wire[first + 14] ^= 1; refresh_crc(first);
+    live_error(OGG_OPUS_DEMUX_ERR_SERIAL);
+    build_live_join(); wire[first + 22] ^= 1;
+    live_error(OGG_OPUS_DEMUX_ERR_CRC);
+    assert(actual.count == 6); /* Last packet still waits for CRC. */
+    build_live_join(); put32(wire + first + 18, 1); refresh_crc(first);
+    live_error(OGG_OPUS_DEMUX_ERR_SEQUENCE);
+    build_live_join(); put32(wire + 47 + 18, 5); refresh_crc(47);
+    live_error(OGG_OPUS_DEMUX_ERR_SEQUENCE); /* Headers remain strict. */
+    uint8_t body[256] = {0};
+    const uint8_t tail[] = {1, 255};
+    wire_size = 0; headers(1);
+    page(0, 1, 2534, 960, tail, 2, body);
+    live_error(OGG_OPUS_DEMUX_ERR_SEQUENCE); /* Unsupported partial tail. */
+    assert(actual.count == 2);
+    wire_size = 0; headers(1);
+    page(0, 1, 2, UINT64_MAX, NULL, 0, NULL);
+    one_packet(4, 1, 2534, 960, body, 1);
+    live_error(OGG_OPUS_DEMUX_ERR_SEQUENCE); /* Empty page used the chance. */
+    wire_size = 0; headers(1);
+    page(0, 1, 2, 960, tail, 2, body);
+    const uint8_t final_laces[] = {1};
+    page(5, 1, 2534, 1920, final_laces, 1, body);
+    live_error(OGG_OPUS_DEMUX_ERR_SEQUENCE); /* No resync inside a packet. */
+    wire_size = 0; headers(1);
+    one_packet(4, 1, UINT32_MAX, 960, body, 1);
+    headers(2);
+    one_packet(0, 2, UINT32_MAX, 960, body, 1);
+    one_packet(4, 2, 0, 1920, body, 1);
+    reference(wire, wire_size);
+    valid_chunks_mode(wire, wire_size, 1024, true, true); /* Chain and wrap. */
+    puts("live join opt-in, strict rejection, 1024-byte input and later holes passed");
+}
+
+static void test_live_capture(const char *filename) {
+    FILE *file = fopen(filename, "rb");
+    assert(file);
+    wire_size = fread(wire, 1, sizeof(wire), file);
+    assert(!ferror(file) && wire_size < sizeof(wire));
+    assert(fclose(file) == 0);
+    reference(wire, wire_size);
+    expect_error(OGG_OPUS_DEMUX_ERR_SEQUENCE);
+    assert(actual.count == 2);
+    const size_t chunks[] = {1, 7, 255, 1024, 1536, WIRE_CAPACITY};
+    for (size_t i = 0; i < sizeof(chunks) / sizeof(chunks[0]); ++i)
+        valid_chunks_mode(wire, wire_size, chunks[i], true, false);
+    printf("live capture packets identical: %s (%zu bytes, %zu packets)\n",
+           filename, wire_size, actual.count);
+}
+
 static void test_fixture(const char *filename) {
     FILE *file = fopen(filename, "rb");
     assert(file);
@@ -590,7 +691,7 @@ static void test_fixture(const char *filename) {
     assert(fclose(file) == 0);
     reference(wire, wire_size);
     assert(expected.count > 2);
-    const size_t chunks[] = {1, 2, 7, 27, 255, 1536, 4096, WIRE_CAPACITY};
+    const size_t chunks[] = {1, 2, 7, 27, 255, 1024, 1536, 4096, WIRE_CAPACITY};
     for (size_t i = 0; i < sizeof(chunks) / sizeof(chunks[0]); ++i)
         valid_chunks(wire, wire_size, chunks[i]);
     printf("fixture packets identical: %s (%zu packets)\n", filename, actual.count);
@@ -605,7 +706,13 @@ int main(int argc, char **argv) {
     test_invalid_framing();
     test_header_bounds_and_cancellation();
     test_generated_page_boundaries();
-    for (int i = 1; i < argc; ++i) test_fixture(argv[i]);
+    test_live_join();
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "--live-capture") == 0) {
+            assert(i + 1 < argc);
+            test_live_capture(argv[++i]);
+        } else test_fixture(argv[i]);
+    }
     printf("Ogg Opus demux tests passed; state bytes: %zu\n", sizeof(ogg_opus_demux_t));
     return 0;
 }

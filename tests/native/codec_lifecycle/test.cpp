@@ -88,7 +88,9 @@ extern "C" void yoradio_opus_memory_bind(void *bytes, size_t byte_capacity,
 }
 extern "C" size_t yoradio_opus_scratch_peak_bytes(void) { return 0; }
 extern "C" size_t yoradio_opus_scratch_peak_words(void) { return 0; }
-extern "C" int native_opus_init(native_opus_t *d, const native_opus_config_t *config) {
+extern "C" int native_opus_init_ex(native_opus_t *d, const native_opus_config_t *config,
+                                     bool allow_live_join) {
+    assert(allow_live_join); // The radio bridge opts in; finite adapters do not.
     assert(d && config && config->output && config->output_ctx);
     assert(config->decoder_state_bytes == native_opus_decoder_size());
     assert(config->scratch_bytes == CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
@@ -103,6 +105,7 @@ extern "C" int native_opus_init(native_opus_t *d, const native_opus_config_t *co
     assert(CodecArenaWordUsed() == 16384);
     memset(d, 0, sizeof(*d));
     d->config = *config;
+    d->demux.allow_live_join = allow_live_join;
     ++opus_inits;
     yoradio_opus_memory_bind(config->scratch, config->scratch_bytes,
                             config->iram, config->iram_bytes);
@@ -110,8 +113,10 @@ extern "C" int native_opus_init(native_opus_t *d, const native_opus_config_t *co
 }
 extern "C" int native_opus_reset(native_opus_t *d) {
     assert(d && d->config.scratch == opus_bound_bytes);
+    assert(d->demux.allow_live_join);
     const native_opus_config_t config = d->config;
     memset(d, 0, sizeof(*d)); d->config = config;
+    d->demux.allow_live_join = true;
     ++opus_resets;
     return opus_reset_fail ? NATIVE_OPUS_ERR_MEMORY : 0;
 }

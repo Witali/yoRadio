@@ -36,7 +36,14 @@ static int fail(ogg_opus_demux_t *d, int error) {
 }
 
 void ogg_opus_demux_init(ogg_opus_demux_t *d) {
-    if (d) memset(d, 0, sizeof(*d));
+    ogg_opus_demux_init_ex(d, false);
+}
+
+void ogg_opus_demux_init_ex(ogg_opus_demux_t *d, bool allow_live_join) {
+    if (d) {
+        memset(d, 0, sizeof(*d));
+        d->allow_live_join = allow_live_join;
+    }
 }
 
 static int begin_page(ogg_opus_demux_t *d) {
@@ -59,16 +66,19 @@ static int begin_page(ogg_opus_demux_t *d) {
         d->stream_ended = false;
         d->serial = serial;
         d->packet_index = 0;
+        d->live_join_pending = false;
     } else {
         if (serial != d->serial) return fail(d, OGG_OPUS_DEMUX_ERR_SERIAL);
         if (h[5] & FLAG_BOS) return fail(d, OGG_OPUS_DEMUX_ERR_FORMAT);
-        if (sequence != d->next_sequence)
+        if (sequence != d->next_sequence &&
+            !(d->live_join_pending && d->packet_index == 2 &&
+              !d->packet_open && d->segment_count &&
+              !(h[5] & FLAG_CONTINUED) && sequence >= 2))
             return fail(d, OGG_OPUS_DEMUX_ERR_SEQUENCE);
     }
     /* Empty pages carry no first packet and do not change continuation. */
     if (d->segment_count && !!(h[5] & FLAG_CONTINUED) != d->packet_open)
         return fail(d, OGG_OPUS_DEMUX_ERR_CONTINUATION);
-    d->next_sequence = sequence + 1u; /* Ogg sequence wraps modulo 2^32. */
     d->expected_crc = read32(h + 22);
     d->crc = 0;
     for (size_t i = 0; i < sizeof(d->header); ++i)
@@ -89,6 +99,13 @@ static int begin_body(ogg_opus_demux_t *d) {
     }
     const bool complete_end = d->segment_count &&
         d->last_complete_segment == (uint16_t)(d->segment_count - 1u);
+    const uint32_t sequence = read32(d->header + 18);
+    if (d->live_join_pending && sequence != d->next_sequence && !complete_end)
+        return fail(d, OGG_OPUS_DEMUX_ERR_SEQUENCE);
+    /* Consume this opportunity even on an ordinary/empty first audio page.
+     * A later packet continuation or sequence hole is never a fresh join. */
+    d->live_join_pending = false;
+    d->next_sequence = sequence + 1u; /* Ogg sequence wraps modulo 2^32. */
     /* RFC 7845 section 3: Head is alone on BOS; Tags finish their page. */
     if (d->packet_index == 0 && (completed != 1 || !complete_end))
         return fail(d, OGG_OPUS_DEMUX_ERR_FORMAT);
@@ -140,6 +157,7 @@ static int deliver_packet(ogg_opus_demux_t *d, uint16_t segment,
         .page_eos = !!(d->page_flags & FLAG_EOS),
         .stream_start = d->packet_index == 0
     };
+    if (d->packet_index == 1) d->live_join_pending = d->allow_live_join;
     ++d->packet_index;
     d->packet_size = 0;
     d->packet_open = false;

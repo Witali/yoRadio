@@ -82,6 +82,10 @@ size_t native_opus_decoder_size(void);
  * capacity; extra supplied bytes are not used. Insufficient scratch during
  * decoding returns ERR_MEMORY, resets codec state and latches the error. */
 int native_opus_init(native_opus_t *decoder, const native_opus_config_t *config);
+/* Opt in for radio servers replaying cached headers at a live page boundary.
+ * The ordinary init remains strict; reset preserves this option. */
+int native_opus_init_ex(native_opus_t *decoder, const native_opus_config_t *config,
+                        bool allow_live_join);
 int native_opus_reset(native_opus_t *decoder);
 /* Exact byte consumption, at most one Ogg packet (including headers) per
  * call. A PACKET result may consume zero bytes. Drain such results before

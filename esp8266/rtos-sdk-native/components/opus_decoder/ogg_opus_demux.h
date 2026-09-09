@@ -65,12 +65,21 @@ typedef struct {
     bool stream_seen;
     bool stream_ended;
     bool packet_open;
+    bool allow_live_join;
+    bool live_join_pending;
     uint8_t header[27];
     uint8_t lacing[255];
     uint8_t packet[OGG_OPUS_PACKET_BYTES];
 } ogg_opus_demux_t;
 
 void ogg_opus_demux_init(ogg_opus_demux_t *demux);
+/* Strict by default. The opt-in live mode supports cached Head/Tags followed
+ * by a later complete audio page (RFC 7845 section 3). Only that first page
+ * may establish a new sequence baseline, with sequence >= 2, the same serial,
+ * no continued packet and no unfinished tail. Later holes remain errors.
+ * A live join whose first audio page starts with a continued packet remains
+ * unsupported: never join an incomplete audio packet onto OpusTags. */
+void ogg_opus_demux_init_ex(ogg_opus_demux_t *demux, bool allow_live_join);
 
 /* Consume arbitrary input fragments and deliver at most one packet per call.
  * Return PACKET after delivery, NEED_INPUT when all supplied bytes are used,

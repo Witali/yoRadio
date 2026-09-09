@@ -13,7 +13,10 @@ test('native Opus streaming adapter validates headers, sample trimming, chains, 
         return t.skip('GCC (WSL on Windows) unavailable');
       throw error;
     }
-    const build = await buildHost({bounded: true, noBuild: process.env.YORADIO_OPUS_NO_BUILD === '1'});
+    const fastInt64 = process.env.YORADIO_OPUS_FAST_INT64 === undefined ? undefined :
+      Number(process.env.YORADIO_OPUS_FAST_INT64);
+    const build = await buildHost({bounded: true, fastInt64,
+      noBuild: process.env.YORADIO_OPUS_NO_BUILD === '1'});
     const directory = fs.mkdtempSync(path.join(build.out, 'adapter-test-'));
     t.after(() => fs.rmSync(directory, {recursive: true, force: true}));
     const objects = build.objects.filter(file => !file.endsWith('probe.c.o'));
@@ -26,8 +29,13 @@ test('native Opus streaming adapter validates headers, sample trimming, chains, 
     const binary = path.join(directory, 'test');
     execute('gcc', [...objects.map(hostPath), '-Wl,--gc-sections', '-Wl,--wrap=malloc',
       '-Wl,--wrap=calloc', '-Wl,--wrap=realloc', '-lm', '-o', hostPath(binary)]);
-    const result = execute(hostPath(binary), []);
+    const capture = process.env.YORADIO_OPUS_LIVE_CAPTURE;
+    const golden = process.env.YORADIO_OPUS_LIVE_GOLDEN;
+    assert.equal(Boolean(capture), Boolean(golden), 'live capture and raw golden PCM paths must be supplied together');
+    const result = execute(hostPath(binary), capture ?
+      [hostPath(path.resolve(capture)), hostPath(path.resolve(golden))] : []);
     assert.match(result, /Native Opus PASS/);
     assert.match(result, /no allocations/);
+    assert.match(result, /Native live join: strict default, pre-skip, 64-bit granules and reset PASS/);
     t.diagnostic(result.trim());
   });
