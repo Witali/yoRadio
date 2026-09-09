@@ -4,6 +4,19 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { fixtureDirectory, sha256, inspectPackets } = require('../tools/esp8266_opus_profile/fixtures.cjs');
 const { runRegressions } = require('../tools/esp8266_opus_profile/run_regressions.cjs');
+const { checkPitchInterpolation, checkWordOnlyZeroFills, defaultObject, defaultObjdump } = require('../tools/esp8266_opus_profile/check_xtensa_iram.cjs');
+
+test('Xtensa pitch interpolation keeps IRAM correlation loads at 32 bits', {
+  skip: (!fs.existsSync(defaultObject) || !fs.existsSync(defaultObjdump)) && 'Build the ESP8266 Opus component to inspect target instructions.',
+}, () => {
+  assert.equal(checkPitchInterpolation().passed, true);
+});
+
+test('Xtensa CELT IRAM zero fills cannot become raw libc memset', {
+  skip: (!fs.existsSync(defaultObject) || !fs.existsSync(defaultObjdump)) && 'Build the ESP8266 Opus component to inspect target instructions.',
+}, () => {
+  assert.equal(checkWordOnlyZeroFills().every(result => result.passed), true);
+});
 
 test('Opus corpus pins CBR 12..510 kbps packets and covers SILK, hybrid and CELT', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(fixtureDirectory, 'manifest.json'), 'utf8'));
@@ -42,11 +55,25 @@ test('saved Opus host evidence has exact pristine/baseline/bounded PCM and bound
     assert.equal(result.bounded.reset_exact, true);
     assert.equal(result.bounded.oom_reinitialized_exact, true);
     assert.equal(result.bounded.arena_guards_ok, true);
-    assert.equal(result.bounded.scratch_byte_capacity_bytes, 7168);
+    assert.equal(result.bounded.scratch_byte_capacity_bytes, 7680);
     assert.equal(result.bounded.scratch_word_capacity_bytes, 16384);
-    assert.ok(result.bounded.scratch_byte_peak_bytes <= 7168);
+    assert.ok(result.bounded.scratch_byte_peak_bytes <= 7680);
     assert.ok(result.bounded.scratch_word_peak_bytes <= 16384);
   }
+  const mixed = report.mixed_sequence;
+  assert.ok(mixed, 'mixed SILK mono/stereo + mode transition + PLC evidence is missing');
+  assert.equal(mixed.bounded.sequence_packets, 286);
+  assert.equal(mixed.bounded.plc_frames, 35);
+  assert.equal(mixed.bounded.samples, 308160);
+  assert.equal(mixed.bounded.reset_exact, true);
+  assert.equal(mixed.baseline.reset_exact, true);
+  assert.equal(mixed.bounded.persistent_bytes, 11232);
+  assert.equal(mixed.bounded.scratch_byte_capacity_bytes, 7680);
+  assert.ok(mixed.bounded.scratch_byte_peak_bytes <= 7680);
+  assert.ok(mixed.bounded.scratch_word_peak_bytes <= 16384);
+  assert.equal(mixed.pcm.exact, true);
+  assert.equal(mixed.pcm.mismatched_samples, 0);
+  assert.equal(mixed.pristine.pcm_vs_baseline.exact, true);
 });
 
 test('real host decoders reproduce all Opus fixtures, reset and OOM recovery', {

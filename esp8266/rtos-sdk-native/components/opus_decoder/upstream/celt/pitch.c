@@ -393,9 +393,17 @@ void pitch_search(const opus_val16 * OPUS_RESTRICT x_lp, opus_val16 * OPUS_RESTR
    if (best_pitch[0]>0 && best_pitch[0]<(max_pitch>>1)-1)
    {
       opus_val32 a, b, c;
+#ifdef YORADIO_OPUS_BOUNDED
+      /* xcorr may live in word-only IRAM. GCC can otherwise reload the low
+         half of b for MULT16_32_Q15 even after loading the whole value. */
+      a = yoradio_opus_load32(&xcorr[best_pitch[0]-1]);
+      b = yoradio_opus_load32(&xcorr[best_pitch[0]]);
+      c = yoradio_opus_load32(&xcorr[best_pitch[0]+1]);
+#else
       a = xcorr[best_pitch[0]-1];
       b = xcorr[best_pitch[0]];
       c = xcorr[best_pitch[0]+1];
+#endif
       if ((c-a) > MULT16_32_Q15(QCONST16(.7f,15),b-a))
          offset = 1;
       else if ((a-c) > MULT16_32_Q15(QCONST16(.7f,15),b-c))

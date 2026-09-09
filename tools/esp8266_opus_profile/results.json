@@ -3,7 +3,7 @@
   "passed": true,
   "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
   "comparison": "Vendored libopus with YORADIO_OPUS_BOUNDED undefined versus enabled; mono output at 48000 Hz.",
-  "memory_scope": "Host decoder state sizes and arena high-water marks only. Word arena includes persistent CELT history. Excludes PCM, packets, bridge state, stack and SDK/Wi-Fi memory. Host sizeof pointers differs from ESP8266.",
+  "memory_scope": "Host decoder state sizes and arena high-water marks only. Word arena includes persistent CELT history and both SILK excitation buffers. Excludes PCM, packets, bridge state, stack and SDK/Wi-Fi memory. Host sizeof pointers differs from ESP8266.",
   "timing_scope": "No physical ESP8266 throughput, deadline or audio-output claim.",
   "pristine_source": ".build/upstream-radio-review-2026-09-09/esp8266audio/src/libopus",
   "fixtures": [
@@ -27,8 +27,8 @@
       },
       "bounded": {
         "libopus": "libopus 1.5.2-fixed",
-        "mono_state_bytes": 9198,
-        "stereo_state_bytes": 9246,
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
         "output_channels": 1,
         "sample_rate": 48000,
         "packets": 61,
@@ -40,8 +40,8 @@
         },
         "reset_exact": true,
         "scratch_byte_peak_bytes": 1808,
-        "scratch_word_peak_bytes": 11552,
-        "scratch_byte_capacity_bytes": 7168,
+        "scratch_word_peak_bytes": 14112,
+        "scratch_byte_capacity_bytes": 7680,
         "scratch_word_capacity_bytes": 16384,
         "arena_guards_ok": true,
         "oom_reinitialized_exact": true
@@ -102,8 +102,8 @@
       },
       "bounded": {
         "libopus": "libopus 1.5.2-fixed",
-        "mono_state_bytes": 9198,
-        "stereo_state_bytes": 9246,
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
         "output_channels": 1,
         "sample_rate": 48000,
         "packets": 61,
@@ -115,8 +115,8 @@
         },
         "reset_exact": true,
         "scratch_byte_peak_bytes": 2904,
-        "scratch_word_peak_bytes": 13040,
-        "scratch_byte_capacity_bytes": 7168,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
         "scratch_word_capacity_bytes": 16384,
         "arena_guards_ok": true,
         "oom_reinitialized_exact": true
@@ -177,8 +177,8 @@
       },
       "bounded": {
         "libopus": "libopus 1.5.2-fixed",
-        "mono_state_bytes": 9198,
-        "stereo_state_bytes": 9246,
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
         "output_channels": 1,
         "sample_rate": 48000,
         "packets": 61,
@@ -190,8 +190,8 @@
         },
         "reset_exact": true,
         "scratch_byte_peak_bytes": 6736,
-        "scratch_word_peak_bytes": 13040,
-        "scratch_byte_capacity_bytes": 7168,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
         "scratch_word_capacity_bytes": 16384,
         "arena_guards_ok": true,
         "oom_reinitialized_exact": true
@@ -252,8 +252,8 @@
       },
       "bounded": {
         "libopus": "libopus 1.5.2-fixed",
-        "mono_state_bytes": 9198,
-        "stereo_state_bytes": 9246,
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
         "output_channels": 1,
         "sample_rate": 48000,
         "packets": 61,
@@ -265,8 +265,8 @@
         },
         "reset_exact": true,
         "scratch_byte_peak_bytes": 6736,
-        "scratch_word_peak_bytes": 13040,
-        "scratch_byte_capacity_bytes": 7168,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
         "scratch_word_capacity_bytes": 16384,
         "arena_guards_ok": true,
         "oom_reinitialized_exact": true
@@ -327,8 +327,8 @@
       },
       "bounded": {
         "libopus": "libopus 1.5.2-fixed",
-        "mono_state_bytes": 9198,
-        "stereo_state_bytes": 9246,
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
         "output_channels": 1,
         "sample_rate": 48000,
         "packets": 61,
@@ -340,8 +340,8 @@
         },
         "reset_exact": true,
         "scratch_byte_peak_bytes": 6736,
-        "scratch_word_peak_bytes": 13040,
-        "scratch_byte_capacity_bytes": 7168,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
         "scratch_word_capacity_bytes": 16384,
         "arena_guards_ok": true,
         "oom_reinitialized_exact": true
@@ -382,5 +382,59 @@
         }
       }
     }
-  ]
+  ],
+  "mixed_sequence": {
+    "route": [
+      "mono-12.opuspkt",
+      "mixed-silk-stereo.opuspkt",
+      "mono-12.opuspkt",
+      "mono-24.opuspkt",
+      "stereo-128.opuspkt",
+      "mixed-silk-stereo.opuspkt"
+    ],
+    "plc_every_packets": 8,
+    "silk_stereo_packet_sha256": "380c00449fb9e52919b0e372172e334125cdcdbf07d34a124a442a5cded4648c",
+    "baseline": {
+      "sequence_packets": 286,
+      "plc_frames": 35,
+      "samples": 308160,
+      "reset_exact": true
+    },
+    "bounded": {
+      "sequence_packets": 286,
+      "plc_frames": 35,
+      "samples": 308160,
+      "reset_exact": true,
+      "persistent_bytes": 11232,
+      "scratch_byte_peak_bytes": 7216,
+      "scratch_word_peak_bytes": 15600,
+      "scratch_byte_capacity_bytes": 7680
+    },
+    "pcm": {
+      "exact": true,
+      "compared_samples": 308160,
+      "mismatched_samples": 0,
+      "max_absolute_error": 0,
+      "snr_db": "Infinity",
+      "reference_pcm_sha256": "70f2199474d92e7cf7f603d9c1cf4d8ec117a91385dd538bd726d2d7f38d1951",
+      "actual_pcm_sha256": "70f2199474d92e7cf7f603d9c1cf4d8ec117a91385dd538bd726d2d7f38d1951"
+    },
+    "pristine": {
+      "decoder": {
+        "sequence_packets": 286,
+        "plc_frames": 35,
+        "samples": 308160,
+        "reset_exact": true
+      },
+      "pcm_vs_baseline": {
+        "exact": true,
+        "compared_samples": 308160,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "70f2199474d92e7cf7f603d9c1cf4d8ec117a91385dd538bd726d2d7f38d1951",
+        "actual_pcm_sha256": "70f2199474d92e7cf7f603d9c1cf4d8ec117a91385dd538bd726d2d7f38d1951"
+      }
+    }
+  }
 }

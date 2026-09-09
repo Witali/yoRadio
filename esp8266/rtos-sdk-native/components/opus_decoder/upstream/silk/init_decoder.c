@@ -36,6 +36,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "structs.h"
+#ifdef YORADIO_OPUS_BOUNDED
+#include "opus_memory.h"
+#endif
 
 /************************/
 /* Reset Decoder State  */
@@ -46,6 +49,9 @@ opus_int silk_reset_decoder(
 {
     /* Clear the entire encoder state, except anything copied */
     silk_memset( &psDec->SILK_DECODER_STATE_RESET_START, 0, sizeof( silk_decoder_state ) - ((char*) &psDec->SILK_DECODER_STATE_RESET_START - (char*)psDec) );
+#ifdef YORADIO_OPUS_BOUNDED
+    yoradio_opus_clear(psDec->exc_Q14, MAX_FRAME_LENGTH, sizeof(opus_int32));
+#endif
 
     /* Used to deactivate LSF interpolation */
     psDec->first_frame_after_reset = 1;
@@ -74,8 +80,16 @@ opus_int silk_init_decoder(
     silk_decoder_state          *psDec                          /* I/O  Decoder state pointer                       */
 )
 {
+#ifdef YORADIO_OPUS_BOUNDED
+    /* silk_InitDecoder prebinds this pointer; channel reinitialization during
+       mono-to-stereo decoding must not allocate or lose the existing region. */
+    opus_int32 *exc = psDec->exc_Q14;
+#endif
     /* Clear the entire encoder state, except anything copied */
     silk_memset( psDec, 0, sizeof( silk_decoder_state ) );
+#ifdef YORADIO_OPUS_BOUNDED
+    psDec->exc_Q14 = exc;
+#endif
 
     silk_reset_decoder( psDec );
 

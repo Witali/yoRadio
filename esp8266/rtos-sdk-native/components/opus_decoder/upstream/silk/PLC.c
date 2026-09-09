@@ -202,8 +202,13 @@ static OPUS_INLINE void silk_PLC_energy(opus_int32 *energy1, opus_int *shift1, o
     exc_buf_ptr = exc_buf;
     for( k = 0; k < 2; k++ ) {
         for( i = 0; i < subfr_length; i++ ) {
+#ifdef YORADIO_OPUS_BOUNDED
+            const opus_int32 excitation = yoradio_opus_load32(&exc_Q14[i + (k + nb_subfr - 2) * subfr_length]);
+            exc_buf_ptr[i] = (opus_int16)silk_SAT16(silk_RSHIFT(silk_SMULWW(excitation, prevGain_Q10[k]), 8));
+#else
             exc_buf_ptr[ i ] = (opus_int16)silk_SAT16( silk_RSHIFT(
                 silk_SMULWW( exc_Q14[ i + ( k + nb_subfr - 2 ) * subfr_length ], prevGain_Q10[ k ] ), 8 ) );
+#endif
         }
         exc_buf_ptr += subfr_length;
     }
@@ -345,7 +350,12 @@ static OPUS_INLINE void silk_PLC_conceal(
             /* Generate LPC excitation */
             rand_seed = silk_RAND( rand_seed );
             idx = silk_RSHIFT( rand_seed, 25 ) & RAND_BUF_MASK;
+#ifdef YORADIO_OPUS_BOUNDED
+            const opus_int32 excitation = yoradio_opus_load32(&rand_ptr[idx]);
+            sLTP_Q14[sLTP_buf_idx] = silk_LSHIFT32(silk_SMLAWB(LTP_pred_Q12, excitation, rand_scale_Q14), 2);
+#else
             sLTP_Q14[ sLTP_buf_idx ] = silk_LSHIFT32( silk_SMLAWB( LTP_pred_Q12, rand_ptr[ idx ], rand_scale_Q14 ), 2 );
+#endif
             sLTP_buf_idx++;
         }
 

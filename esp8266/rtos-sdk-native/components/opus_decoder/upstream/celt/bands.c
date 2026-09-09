@@ -213,8 +213,14 @@ void denormalise_bands(const CELTMode *m, const celt_norm * OPUS_RESTRICT X,
    }
    f = freq;
    x = X+M*eBands[start];
+#ifdef YORADIO_OPUS_BOUNDED
+   /* A plain zero-fill loop can become byte-oriented ROM memset on Xtensa. */
+   OPUS_CLEAR(f, M*eBands[start]);
+   f += M*eBands[start];
+#else
    for (i=0;i<M*eBands[start];i++)
       *f++ = 0;
+#endif
    for (i=start;i<end;i++)
    {
       int j, band_end;

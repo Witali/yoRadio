@@ -32,6 +32,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "main.h"
 #include "stack_alloc.h"
 #include "os_support.h"
+#ifdef YORADIO_OPUS_BOUNDED
+#include "opus_defines.h"
+#endif
 
 #ifdef ENABLE_OSCE
 #include "osce.h"
@@ -110,6 +113,14 @@ opus_int silk_InitDecoder(                              /* O    Returns error co
 {
     opus_int n, ret = SILK_NO_ERROR;
     silk_decoder_state *channel_state = ((silk_decoder *)decState)->channel_state;
+#ifdef YORADIO_OPUS_BOUNDED
+    /* Allocate every channel before decode: mono-to-stereo calls the channel
+       initializer inside a packet, where persistent allocation is forbidden. */
+    opus_int32 *exc = yoradio_opus_history(DECODER_NUM_CHANNELS * MAX_FRAME_LENGTH * sizeof(opus_int32));
+    if (!exc) return OPUS_ALLOC_FAIL;
+    for (n = 0; n < DECODER_NUM_CHANNELS; n++)
+        channel_state[n].exc_Q14 = exc + n * MAX_FRAME_LENGTH;
+#endif
 #ifdef ENABLE_OSCE
     ((silk_decoder *)decState)->osce_model.loaded = 0;
 #endif

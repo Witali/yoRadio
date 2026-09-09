@@ -286,9 +286,15 @@ typedef struct {
 #ifdef ENABLE_OSCE
     silk_OSCE_struct            osce;
 #endif
+#ifdef YORADIO_OPUS_BOUNDED
+    /* Prebound for both channels; preserved across resets and channel changes. */
+    opus_int32                  *exc_Q14;
+#endif
 #define SILK_DECODER_STATE_RESET_START prev_gain_Q16
     opus_int32                  prev_gain_Q16;
+#ifndef YORADIO_OPUS_BOUNDED
     opus_int32                  exc_Q14[ MAX_FRAME_LENGTH ];
+#endif
     opus_int32                  sLPC_Q14_buf[ MAX_LPC_ORDER ];
     opus_int16                  outBuf[ MAX_FRAME_LENGTH + 2 * MAX_SUB_FRAME_LENGTH ];  /* Buffer for output signal                     */
     opus_int                    lagPrev;                            /* Previous Lag                                                     */

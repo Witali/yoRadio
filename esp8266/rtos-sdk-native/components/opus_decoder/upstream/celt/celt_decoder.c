@@ -907,8 +907,13 @@ static void celt_decode_lost(CELTDecoder * OPUS_RESTRICT st, int N, int LM
             if (!(S1 > 0.2f*S2))
 #endif
             {
+#ifdef YORADIO_OPUS_BOUNDED
+               /* Keep persistent IRAM history off the ROM memset path. */
+               OPUS_CLEAR(buf+DECODE_BUFFER_SIZE-N, extrapolation_len);
+#else
                for (i=0;i<extrapolation_len;i++)
                   buf[DECODE_BUFFER_SIZE-N+i] = 0;
+#endif
             } else if (S1 < S2)
             {
                opus_val16 ratio = celt_sqrt(frac_div32(SHR32(S1,1)+1,S2+1));

@@ -13,7 +13,17 @@ void yoradio_opus_memory_bind(void *bytes, size_t byte_capacity,
 opus_scratch_mark yoradio_opus_scratch_mark(void);
 void yoradio_opus_scratch_restore(opus_scratch_mark mark);
 void *yoradio_opus_scratch_alloc(size_t count, size_t size, int word_safe);
+/* Begin one decoder's persistent allocations, only outside a packet decode.
+ * Each history call reserves a distinct aligned region until the next begin. */
+int yoradio_opus_history_begin(void);
 void *yoradio_opus_history(size_t bytes);
+/* Force full-width IRAM accesses even when only half of a value is consumed. */
+static inline int32_t yoradio_opus_load32(const int32_t *p) {
+    return *(const volatile int32_t *)p;
+}
+static inline void yoradio_opus_store32(int32_t *p, int32_t value) {
+    *(volatile int32_t *)p = value;
+}
 void yoradio_opus_copy(void *to, const void *from, size_t count, size_t size);
 void yoradio_opus_clear(void *to, size_t count, size_t size);
 size_t yoradio_opus_scratch_peak_bytes(void);

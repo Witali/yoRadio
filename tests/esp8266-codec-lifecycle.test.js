@@ -29,7 +29,7 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
   const defines=['YORADIO_ESP8266_NATIVE=1','YORADIO_HELIX_MP3_MONO=1','YORADIO_HELIX_MP3_SSO=1',
     'YORADIO_ESP8266_AAC_BLOCK_OUTPUT=1','YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES=512','CONFIG_YORADIO_STREAM_INPUT_BYTES=4096',
     'CONFIG_YORADIO_OGG_OPUS=' + Number(opusEnabled), 'CONFIG_YORADIO_OPUS_INPUT_BYTES=1536',
-    'CONFIG_YORADIO_OPUS_SCRATCH_BYTES=7168', 'PROGMEM='];
+    'CONFIG_YORADIO_OPUS_SCRATCH_BYTES=7680', 'PROGMEM='];
   const exe=path.join(dir,process.platform==='win32'?'test.exe':'test');
   let build;
   if(process.platform==='win32') {
@@ -52,7 +52,7 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
   assert.match(run.stdout,/Codec lifecycle PASS/);
   t.diagnostic(run.stdout.trim());
   if (opusEnabled) {
-    assert.match(run.stdout,/Opus input 1536, scratch 7168, reserve and allocation-free reset PASS/);
+    assert.match(run.stdout,/Opus input 1536, scratch 7680, reserve and allocation-free reset PASS/);
     const fallback=spawnSync(exe,['--dram-arena'],{encoding:'utf8',timeout:60000});
     assert.equal(fallback.status,0,fallback.stdout+'\n'+fallback.stderr);
     assert.match(fallback.stdout,/Opus refuses DRAM fallback arena without leaking/);

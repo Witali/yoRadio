@@ -4,10 +4,16 @@
 #include <string.h>
 #include "opus.h"
 #ifdef YORADIO_OPUS_BOUNDED
+#include "config.h"
+#include "structs.h"
 #include "opus_memory.h"
+extern int silk_init_decoder(silk_decoder_state *state);
 #define GUARD 0x5a39ce71U
+#ifndef OPUS_PROBE_BYTE_CAPACITY
+#define OPUS_PROBE_BYTE_CAPACITY 7680
+#endif
 static struct { uint32_t before[2], data[4096], after[2]; } words;
-static struct { uint32_t before[2], data[1792], after[2]; } bytes;
+static struct { uint32_t before[2], data[OPUS_PROBE_BYTE_CAPACITY / 4], after[2]; } bytes;
 static void bind_arenas(size_t byte_capacity) {
     words.before[0] = words.before[1] = words.after[0] = words.after[1] = GUARD;
     bytes.before[0] = bytes.before[1] = bytes.after[0] = bytes.after[1] = GUARD;
@@ -38,6 +44,47 @@ static void initialize(OpusDecoder *decoder) {
 #endif
     check(opus_decoder_init(decoder, 48000, 1) == OPUS_OK, "decoder initialization failed");
 }
+#ifdef YORADIO_OPUS_BOUNDED
+static void persistent_test(OpusDecoder *decoder) {
+    /* Inspect the private SILK prefix through OpusDecoder's two offsets. This
+       deliberately tracks the vendored ABI, not a public libopus API. */
+    int offsets[2];
+    bind_arenas(sizeof(bytes.data));
+    check(yoradio_opus_history_begin(), "persistent begin failed");
+    check(yoradio_opus_history(SIZE_MAX) == NULL && yoradio_opus_scratch_mark().words == 0,
+          "overflowing persistent allocation changed the arena");
+    check(yoradio_opus_history(1) == words.data &&
+          yoradio_opus_history(1) == (unsigned char *)words.data + 8 &&
+          yoradio_opus_scratch_mark().words == 16, "persistent allocations do not accumulate with alignment");
+    yoradio_opus_memory_bind(bytes.data, sizeof(bytes.data), words.data, 11231);
+    check(opus_decoder_init(decoder, 48000, 1) == OPUS_ALLOC_FAIL, "undersized persistent arena was accepted");
+    initialize(decoder);
+    memcpy(offsets, decoder, sizeof(offsets));
+    silk_decoder_state *channels = (silk_decoder_state *)((char *)decoder + offsets[1]);
+    opus_int32 *first = channels[0].exc_Q14, *second = channels[1].exc_Q14;
+    check(first == (opus_int32 *)words.data && second == first + MAX_FRAME_LENGTH,
+          "SILK persistent regions overlap or were not prebound");
+    check(yoradio_opus_scratch_mark().words == 11232, "incorrect cumulative persistent size");
+    for (int iteration = 0; iteration < 3; iteration++) {
+        first[0] = 123; second[MAX_FRAME_LENGTH - 1] = -456;
+        check(opus_decoder_ctl(decoder, OPUS_RESET_STATE) == OPUS_OK, "persistent reset failed");
+        check(channels[0].exc_Q14 == first && channels[1].exc_Q14 == second,
+              "whole SILK reset lost persistent pointers");
+        check(first[0] == 0 && second[MAX_FRAME_LENGTH - 1] == 0, "persistent reset did not clear excitation");
+        /* Same initializer used by the in-packet mono-to-stereo transition. */
+        first[0] = 123; second[0] = -456;
+        check(silk_init_decoder(&channels[1]) == 0, "channel reinitialization failed");
+        check(channels[1].exc_Q14 == second && second[0] == 0 && first[0] == 123,
+              "channel initialization lost or overlapped excitation");
+        check(yoradio_opus_scratch_mark().words == 11232, "channel initialization allocated history");
+        check(opus_decoder_init(decoder, 48000, 1) == OPUS_OK, "reinitialization without rebind failed");
+        check(yoradio_opus_scratch_mark().words == 11232, "reinitialization leaked persistent memory");
+        check(channels[0].exc_Q14 == first && channels[1].exc_Q14 == second,
+              "reinitialization changed persistent layout");
+    }
+    check(guards_ok(), "persistent tests corrupted guards");
+}
+#endif
 static void self_test(OpusDecoder *decoder, const unsigned char *packet, int length) {
     int16_t reference[5760], actual[5760];
     initialize(decoder);
@@ -49,6 +96,7 @@ static void self_test(OpusDecoder *decoder, const unsigned char *packet, int len
     check(count == expected && !memcmp(reference, actual, count * sizeof(*actual)), "reset PCM differs from fresh decoder");
     check(guards_ok(), "reset corrupted arena guards");
 #ifdef YORADIO_OPUS_BOUNDED
+    persistent_test(decoder);
     // Zero DRAM scratch forces the bounded wrapper's OOM path on every fixture.
     bind_arenas(0);
     check(opus_decoder_init(decoder, 48000, 1) == OPUS_OK, "small-arena initialization failed");
@@ -62,7 +110,76 @@ static void self_test(OpusDecoder *decoder, const unsigned char *packet, int len
 #endif
 }
 
+/* Continuous mixed-mode/channel corpus, with PLC after every eighth packet.
+ * Write round one for byte-exact baseline/bounded comparison; round two starts
+ * from OPUS_RESET_STATE and compares every sample against the saved sequence. */
+static int sequence_test(int argc, char **argv) {
+    check(argc >= 5, "usage: probe --sequence output.pcm input1.opuspkt input2.opuspkt ...");
+    OpusDecoder *decoder = malloc(opus_decoder_get_size(1));
+    check(decoder != NULL, "sequence decoder allocation failed");
+    initialize(decoder);
+    FILE *out = fopen(argv[2], "w+b");
+    check(out != NULL, "cannot open sequence output");
+    unsigned expected_samples = 0, packets = 0, losses = 0;
+    for (int round = 0; round < 2; round++) {
+        unsigned samples = 0;
+        packets = losses = 0;
+        if (round) {
+            check(fflush(out) == 0 && fseek(out, 0, SEEK_SET) == 0, "sequence rewind failed");
+            check(opus_decoder_ctl(decoder, OPUS_RESET_STATE) == OPUS_OK, "sequence reset failed");
+        }
+        for (int fixture = 3; fixture < argc; fixture++) {
+            FILE *in = fopen(argv[fixture], "rb");
+            check(in != NULL, "cannot open sequence input");
+            for (;;) {
+                unsigned char length[2], packet[4096];
+                int16_t pcm[5760];
+                size_t read = fread(length, 1, 2, in);
+                if (!read) break;
+                check(read == 2, "truncated sequence packet length");
+                unsigned size = length[0] | ((unsigned)length[1] << 8);
+                check(size && size <= sizeof(packet), "invalid sequence packet length");
+                check(fread(packet, 1, size, in) == size, "truncated sequence packet");
+                for (int plc = 0; plc < 1 + ((packets & 7U) == 7U); plc++) {
+                    int count;
+#ifdef YORADIO_OPUS_BOUNDED
+                    count = yoradio_opus_decode_bounded(decoder, plc ? NULL : packet, plc ? 0 : (int)size, pcm, 960);
+                    check(yoradio_opus_scratch_mark().words == 11232, "packet changed persistent reservation");
+#else
+                    count = opus_decode(decoder, plc ? NULL : packet, plc ? 0 : (int)size, pcm, 960, 0);
+#endif
+                    if (count <= 0) fprintf(stderr, "sequence decode failed fixture %d packet %u PLC %d error %d\n", fixture, packets, plc, count);
+                    check(count > 0, "sequence decode failed");
+                    check(guards_ok(), "sequence corrupted arena guards");
+                    if (!round) check(fwrite(pcm, sizeof(*pcm), count, out) == (size_t)count, "sequence PCM write failed");
+                    if (round) {
+                        int16_t reference[5760];
+                        check(fread(reference, sizeof(*reference), count, out) == (size_t)count &&
+                              !memcmp(pcm, reference, count * sizeof(*pcm)), "mixed-mode/channel PLC reset PCM differs");
+                    }
+                    samples += count;
+                    losses += plc;
+                }
+                packets++;
+            }
+            check(!ferror(in) && fclose(in) == 0, "sequence input failed");
+        }
+        if (!round) expected_samples = samples;
+        else check(samples == expected_samples, "mixed-mode/channel PLC reset sample count differs");
+    }
+    check(fclose(out) == 0, "sequence output close failed");
+    printf("{\"sequence_packets\":%u,\"plc_frames\":%u,\"samples\":%u,\"reset_exact\":true", packets, losses, expected_samples);
+#ifdef YORADIO_OPUS_BOUNDED
+    printf(",\"persistent_bytes\":%zu,\"scratch_byte_peak_bytes\":%zu,\"scratch_word_peak_bytes\":%zu,\"scratch_byte_capacity_bytes\":%zu",
+           yoradio_opus_scratch_mark().words, yoradio_opus_scratch_peak_bytes(), yoradio_opus_scratch_peak_words(), sizeof(bytes.data));
+#endif
+    puts("}");
+    free(decoder);
+    return 0;
+}
+
 int main(int argc, char **argv) {
+    if (argc > 1 && !strcmp(argv[1], "--sequence")) return sequence_test(argc, argv);
     if (argc == 1) {
         printf("{\"libopus\":\"%s\",\"mono_state_bytes\":%d,\"stereo_state_bytes\":%d}\n",
             opus_get_version_string(), opus_decoder_get_size(1), opus_decoder_get_size(2));

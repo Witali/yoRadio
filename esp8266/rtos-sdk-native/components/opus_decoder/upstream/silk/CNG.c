@@ -113,7 +113,11 @@ void silk_CNG(
         }
         /* Update CNG excitation buffer with excitation from this subframe */
         silk_memmove( &psCNG->CNG_exc_buf_Q14[ psDec->subfr_length ], psCNG->CNG_exc_buf_Q14, ( psDec->nb_subfr - 1 ) * psDec->subfr_length * sizeof( opus_int32 ) );
+#ifdef YORADIO_OPUS_BOUNDED
+        yoradio_opus_copy(psCNG->CNG_exc_buf_Q14, &psDec->exc_Q14[subfr * psDec->subfr_length], psDec->subfr_length, sizeof(opus_int32));
+#else
         silk_memcpy(   psCNG->CNG_exc_buf_Q14, &psDec->exc_Q14[ subfr * psDec->subfr_length ], psDec->subfr_length * sizeof( opus_int32 ) );
+#endif
 
         /* Smooth gains */
         for( i = 0; i < psDec->nb_subfr; i++ ) {

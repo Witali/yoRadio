@@ -55,10 +55,10 @@ OOM возвращается через C-only boundary, сбрасывает de
 
 | Область | Размер / смысл |
 |---|---:|
-| Opus state, host x64 | 9198 Б вместо исходных 17860 Б |
-| Opus state, Xtensa GCC 8.4 | 9134 Б, рассчитано по сгенерированному коду |
+| Opus state, host x64 | 6654 Б вместо исходных 17860 Б |
+| Opus state, Xtensa GCC 8.4 | 6582 Б, рассчитано по сгенерированному коду |
 | IRAM reservation | 16384 Б, уже общая с MP3/AAC |
-| DRAM scratch reservation | 7168 Б |
+| DRAM scratch reservation | 7680 Б |
 | Ogg + adapter, host x64 | 2040 Б, включая packet buffer |
 | PCM | 1920 Б, один mono frame до 20 мс |
 | Opus read-ahead | 1536 Б, отдельная настройка; MP3/AAC по-прежнему 4096 Б |
@@ -69,12 +69,15 @@ bridge, TCP/Wi-Fi, WebUI и остальные стеки учитываются
 Opus контролируется остаток heap не менее 4096 байт либо больший резерв caller;
 это аварийный порог, **не** прохождение production-гейта 8/6 КиБ free/min heap.
 
-По Xtensa disassembly `audio_task` сам резервирует 1792 байта, а суммарный
-консервативный путь с рекурсией CELT и сменой режима может достигать примерно
-4.7 КиБ до остаточных runtime/leaf расходов. Поэтому 4096 байт не оставлены
-для Opus; даже 5120 дают слишком малый запас. Это статическая оценка возможного
-пути, не фактический high-water. Word-path copy/clear проверен в ассемблере:
-`l32i/s32i`, без byte/halfword обращений к IRAM.
+HTTP handshake выделен границей `noinline`: target frame `audio_task`
+уменьшился с 1792 до 784 байт, а отдельный HTTP frame 1152 байта отсутствует
+на глубоком пути декодера. Размер task stack пока оставлен 6144 байта до
+физического замера high-water. Это не освобождает heap само по себе.
+SILK excitation двух каналов перенесён в persistent IRAM: target state
+уменьшился ещё на 2552 байта, persistent reservation составляет 11232 байта
+вместе с CELT history. Указатели сохраняются при reset и mono/stereo переходах.
+Word-path и найденные compiler narrowing проверяются target asm-тестом;
+см. [аудит IRAM](ESP8266_IRAM_ACCESS_AUDIT.md).
 
 Почему нельзя просто выдавать PCM по 32 отсчёта, как MP3: CELT entropy/folding
 и синтез используют спектр полного кадра и предыдущее состояние. Полный PCM
@@ -93,11 +96,17 @@ SNR между вариантами бесконечный. Это отсутс�
 
 | Fixture | Режим | Пик DRAM scratch | Пик word arena, включая history |
 |---|---|---:|---:|
-| mono 12 кбит/с | SILK | 1808 Б | 11552 Б |
-| mono 24 кбит/с | Hybrid | 2904 Б | 13040 Б |
-| stereo 64 кбит/с | CELT | 6736 Б | 13040 Б |
-| stereo 128 кбит/с | CELT | 6736 Б | 13040 Б |
-| stereo 510 кбит/с | CELT | 6736 Б | 13040 Б |
+| mono 12 кбит/с | SILK | 1808 Б | 14112 Б |
+| mono 24 кбит/с | Hybrid | 2904 Б | 15600 Б |
+| stereo 64 кбит/с | CELT | 6736 Б | 15600 Б |
+| stereo 128 кбит/с | CELT | 6736 Б | 15600 Б |
+| stereo 510 кбит/с | CELT | 6736 Б | 15600 Б |
+| смешанный поток + PLC | SILK/Hybrid/CELT | 7216 Б | 15600 Б |
+
+Дополнительно 286 смешанных пакетов и 35 PLC-кадров дали 308160 одинаковых
+отсчётов pristine/baseline/bounded, включая полный reset и mono/stereo.
+Именно переход Hybrid→CELT обнаружил нехватку 48 байт при прежнем лимите
+7168; резерв поднят до 7680, без изменения алгоритма декодирования.
 
 Проверены reset, искусственный OOM/reinitialize, защитные границы arena,
 2.5/10/20-мс пакеты, отказ 40/60 мс, gain, pre-skip, EOS, chains, отмена callback.

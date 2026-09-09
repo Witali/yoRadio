@@ -25,7 +25,7 @@ static bool output(void *ctx, const int16_t *data, size_t samples, uint32_t bitr
     return !cancel;
 }
 static native_opus_config_t config(void) {
-    native_opus_config_t c = {state.bytes,sizeof(state.bytes),scratch.bytes,sizeof(scratch.bytes),
+    native_opus_config_t c = {state.bytes,sizeof(state.bytes),scratch.bytes,7680,
         iram.bytes,NATIVE_OPUS_IRAM_BYTES,pcm,960,output,&calls};
     return c;
 }

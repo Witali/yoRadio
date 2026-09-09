@@ -5,6 +5,7 @@
 static unsigned char *byte_base, *word_base;
 static size_t byte_capacity, word_capacity, byte_used, word_used;
 static size_t history_bytes, peak_bytes, peak_words;
+static int decode_active;
 jmp_buf yoradio_opus_oom;
 
 void yoradio_opus_memory_bind(void *bytes, size_t bytes_size,
@@ -12,14 +13,27 @@ void yoradio_opus_memory_bind(void *bytes, size_t bytes_size,
     byte_base = bytes; word_base = words;
     byte_capacity = bytes_size; word_capacity = words_size;
     byte_used = word_used = history_bytes = peak_bytes = peak_words = 0;
+    decode_active = 0;
+}
+
+int yoradio_opus_history_begin(void) {
+    if (decode_active || !word_base) return 0;
+    history_bytes = word_used = 0;
+    return 1;
 }
 
 void *yoradio_opus_history(size_t bytes) {
-    if (!word_base || bytes > word_capacity) return NULL;
-    history_bytes = (bytes + 7U) & ~(size_t)7U;
-    if (history_bytes > word_capacity) return NULL;
+    size_t aligned;
+    void *result;
+    if (decode_active || !word_base || bytes > SIZE_MAX - 7U) return NULL;
+    aligned = (bytes + 7U) & ~(size_t)7U;
+    if (history_bytes > word_capacity || aligned > word_capacity - history_bytes)
+        return NULL;
+    result = word_base + history_bytes;
+    history_bytes += aligned;
     word_used = history_bytes;
-    return word_base;
+    if (word_used > peak_words) peak_words = word_used;
+    return result;
 }
 
 opus_scratch_mark yoradio_opus_scratch_mark(void) {
@@ -75,11 +89,14 @@ void yoradio_opus_clear(void *to, size_t count, size_t size) {
 int yoradio_opus_decode_bounded(void *decoder, const unsigned char *packet,
                                int length, int16_t *pcm, int frame_size) {
     byte_used = 0; word_used = history_bytes;
+    decode_active = 1;
     if (setjmp(yoradio_opus_oom)) {
         byte_used = 0; word_used = history_bytes;
+        decode_active = 0;
         return OPUS_ALLOC_FAIL;
     }
     int result = opus_decode(decoder, packet, length, pcm, frame_size, 0);
     byte_used = 0; word_used = history_bytes;
+    decode_active = 0;
     return result;
 }

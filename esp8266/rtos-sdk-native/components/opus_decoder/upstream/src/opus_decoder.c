@@ -136,6 +136,9 @@ int opus_decoder_init(OpusDecoder *st, opus_int32 Fs, int channels)
     || (channels!=1&&channels!=2))
       return OPUS_BAD_ARG;
 
+#ifdef YORADIO_OPUS_BOUNDED
+   if (!yoradio_opus_history_begin()) return OPUS_ALLOC_FAIL;
+#endif
    OPUS_CLEAR((char*)st, opus_decoder_get_size(channels));
    /* Initialize SILK decoder */
    ret = silk_Get_Decoder_Size(&silkDecSizeBytes);
@@ -156,11 +159,19 @@ int opus_decoder_init(OpusDecoder *st, opus_int32 Fs, int channels)
 
    /* Reset decoder */
    ret = silk_InitDecoder( silk_dec );
+#ifdef YORADIO_OPUS_BOUNDED
+   if(ret)return ret;
+#else
    if(ret)return OPUS_INTERNAL_ERROR;
+#endif
 
    /* Initialize CELT decoder */
    ret = celt_decoder_init(celt_dec, Fs, channels);
+#ifdef YORADIO_OPUS_BOUNDED
+   if(ret!=OPUS_OK)return ret;
+#else
    if(ret!=OPUS_OK)return OPUS_INTERNAL_ERROR;
+#endif
 
    celt_decoder_ctl(celt_dec, CELT_SET_SIGNALLING(0));
 

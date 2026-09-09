@@ -41,12 +41,21 @@ successful reinitialization after OOM. The wrapper may partially update decoder
 state before OOM; callers must reset/reinitialize it before reusing it. The probe
 rebinds the arenas and calls `opus_decoder_init` before recovery decoding.
 
-The bounded probe uses 7,168 bytes of byte-addressed scratch and a 16,384-byte
+The bounded probe uses 7,680 bytes of byte-addressed scratch and a 16,384-byte
 word arena, matching the experimental profile limits. Word-arena high-water marks include
-persistent CELT history. Host state sizes depend on host pointer/alignment rules.
+persistent CELT history and SILK excitation. Host state sizes depend on host pointer/alignment rules.
 These measurements exclude packet and PCM buffers, native bridge allocations,
 call-stack usage, and SDK/Wi-Fi memory. They establish PCM equivalence and arena
 usage for this corpus, not physical ESP8266 speed or deadline compliance.
+
+After building the ESP8266 Opus component, run
+`node tools/esp8266_opus_profile/check_xtensa_iram.cjs` to inspect the actual
+Xtensa object code. It checks that pitch interpolation never narrows reads of
+its IRAM correlation array and that band denormalization/PLC history zero fills
+call the word-safe helper instead of compiler-generated ROM `memset`. The same
+checks run in the Node tests when target objects and the SDK disassembler exist.
+They reject stale target objects and accept explicit `--object`/`--objdump`
+paths. These guards cover the identified regressions, not every IRAM access.
 
 Run the checked-in evidence/corpus tests with `node --test
 tests/esp8266-opus-memory.test.js`. To additionally execute GCC and the actual

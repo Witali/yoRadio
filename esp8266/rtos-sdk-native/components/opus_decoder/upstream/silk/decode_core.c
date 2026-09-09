@@ -79,6 +79,15 @@ void silk_decode_core(
     rand_seed = psDec->indices.Seed;
     for( i = 0; i < psDec->frame_length; i++ ) {
         rand_seed = silk_RAND( rand_seed );
+#ifdef YORADIO_OPUS_BOUNDED
+        /* Compute in registers, then make one explicitly full-width IRAM store. */
+        opus_int32 excitation = silk_LSHIFT((opus_int32)pulses[i], 14);
+        if (excitation > 0) excitation -= QUANT_LEVEL_ADJUST_Q10 << 4;
+        else if (excitation < 0) excitation += QUANT_LEVEL_ADJUST_Q10 << 4;
+        excitation += offset_Q10 << 4;
+        if (rand_seed < 0) excitation = -excitation;
+        yoradio_opus_store32(&psDec->exc_Q14[i], excitation);
+#else
         psDec->exc_Q14[ i ] = silk_LSHIFT( (opus_int32)pulses[ i ], 14 );
         if( psDec->exc_Q14[ i ] > 0 ) {
             psDec->exc_Q14[ i ] -= QUANT_LEVEL_ADJUST_Q10 << 4;
@@ -90,6 +99,7 @@ void silk_decode_core(
         if( rand_seed < 0 ) {
            psDec->exc_Q14[ i ] = -psDec->exc_Q14[ i ];
         }
+#endif
 
         rand_seed = silk_ADD32_ovflw( rand_seed, pulses[ i ] );
     }
@@ -199,7 +209,11 @@ void silk_decode_core(
                 pred_lag_ptr++;
 
                 /* Generate LPC excitation */
+#ifdef YORADIO_OPUS_BOUNDED
+                pres_Q14[i] = silk_ADD_LSHIFT32(yoradio_opus_load32(&pexc_Q14[i]), LTP_pred_Q13, 1);
+#else
                 pres_Q14[ i ] = silk_ADD_LSHIFT32( pexc_Q14[ i ], LTP_pred_Q13, 1 );
+#endif
 
                 /* Update states */
                 sLTP_Q15[ sLTP_buf_idx ] = silk_LSHIFT( pres_Q14[ i ], 1 );
@@ -234,7 +248,13 @@ void silk_decode_core(
             }
 
             /* Add prediction to LPC excitation */
+#ifdef YORADIO_OPUS_BOUNDED
+            /* pres_Q14 aliases the persistent excitation for unvoiced frames. */
+            const opus_int32 excitation = yoradio_opus_load32(&pres_Q14[i]);
+            sLPC_Q14[MAX_LPC_ORDER + i] = silk_ADD_SAT32(excitation, silk_LSHIFT_SAT32(LPC_pred_Q10, 4));
+#else
             sLPC_Q14[ MAX_LPC_ORDER + i ] = silk_ADD_SAT32( pres_Q14[ i ], silk_LSHIFT_SAT32( LPC_pred_Q10, 4 ) );
+#endif
 
             /* Scale with gain */
             pxq[ i ] = (opus_int16)silk_SAT16( silk_RSHIFT_ROUND( silk_SMULWW( sLPC_Q14[ MAX_LPC_ORDER + i ], Gain_Q10 ), 8 ) );
