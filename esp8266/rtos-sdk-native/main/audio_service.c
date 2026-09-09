@@ -554,7 +554,6 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                 errno = EPROTO;
                 return -9;
             }
-            stream->socket = socket_fd;
             stream->last_receive_tick = xTaskGetTickCount();
             stream->metadata_interval = metadata_interval;
             stream->advertised_bitrate = bitrate;
@@ -568,6 +567,9 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                 return -9;
             }
             stream->body_size = body_size;
+            /* Transfer ownership only after validating the initial body.
+             * On failure the caller must not retain a closed/reused fd. */
+            stream->socket = socket_fd;
             ESP_LOGI(TAG, "Stream response %d, ICY interval %u%s", status,
                      (unsigned)metadata_interval,
                      chunked ? ", chunked" : "");
