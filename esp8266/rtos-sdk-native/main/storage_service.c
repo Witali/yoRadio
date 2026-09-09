@@ -11,7 +11,9 @@ esp_err_t storage_service_init(void) {
     const esp_vfs_spiffs_conf_t config = {
         .base_path = STORAGE_ROOT,
         .partition_label = "spiffs",
-        .max_files = 10,
+        /* Four simultaneous handles at most, plus one spare; each slot also
+         * reserves a 256-byte SPIFFS cache page. See docs/ESP8266_SPIFFS_RAM.md. */
+        .max_files = 5,
         .format_if_mount_failed = false,
     };
     esp_err_t result = esp_vfs_spiffs_register(&config);
