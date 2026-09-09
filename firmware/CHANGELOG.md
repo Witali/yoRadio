@@ -3,6 +3,26 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-09: ESP8266 volume 0..100
+
+- `development/esp8266-volume100-production/app.bin`, source `be0207e`,
+  763952 B (+704 versus LED production), SHA-256
+  `fdb5565b24e72a7badadca7bac90ebf7a0dc1f04d5ad8ae11374cafee4aa0214`.
+- Slider, WebSocket volume command/status, +/- buttons and encoder use
+  inclusive 0..100; legacy NVS/gain remain 0..254 to preserve saved loudness.
+  No PCM-loop change, new task, heap buffer or static DRAM/IRAM increase.
+- Matching `script.js.gz` is included. Deploy it to `/www/script.js.gz`
+  before application OTA; then reload all tabs. Other chips retain 0..254
+  unless their firmware advertises the new `volumeMax=100` capability.
+- 324/324 ESP8266 + shared WebUI host tests passed; build emitted no compiler
+  warnings. No physical deployment, listening or browser-on-board test in
+  this change. The previously documented audio/WebUI performance issues
+  are not claimed fixed by the volume-scale change.
+- I2S PDM32/GPIO3, QIO40/160 MHz, input 4096 B, short HTTP-priority profile,
+  LED 10 Hz/max 32 and diagnostic logging disabled remain unchanged.
+- [Deployment/verification details](development/esp8266-volume100-production/verification.md),
+  [remaining-target plan](../docs/VOLUME_0_100_SYNC_PLAN.md).
+
 ## Development - 2026-09-09: ESP8266 LED regression correction
 
 - `development/esp8266-led-production/app.bin`, source `82edaf2`, 763248 B,
