@@ -25,6 +25,7 @@
 #include "lwip/tcp.h"
 #include "native_audio_output.h"
 #include "audio_service.h"
+#include "opus_benchmark.h"
 #include "native_state.h"
 #include "persistent_settings.h"
 #include "playlist_service.h"
@@ -1160,6 +1161,60 @@ static esp_err_t static_handler(httpd_req_t *request) {
     return result;
 }
 
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+static esp_err_t opus_benchmark_start_handler(httpd_req_t *request) {
+    prepare_short_response(request);
+    httpd_resp_set_type(request, "application/json");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    if (request->content_len) {
+        httpd_resp_set_status(request, "400 Bad Request");
+        return finish_short_response(request, send_string(request, "{\"error\":\"empty POST required\"}"));
+    }
+    if (!opus_benchmark_request()) {
+        httpd_resp_set_status(request, "409 Conflict");
+        return finish_short_response(request, send_string(request, "{\"error\":\"benchmark busy\"}"));
+    }
+    if (audio_service_stop() != ESP_OK) {
+        opus_benchmark_cancel_pending();
+        httpd_resp_set_status(request, "503 Service Unavailable");
+        return finish_short_response(request, send_string(request, "{\"error\":\"stop queue failed\"}"));
+    }
+    httpd_resp_set_status(request, "202 Accepted");
+    return finish_short_response(request, send_string(request, "{\"queued\":true}"));
+}
+static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
+    prepare_short_response(request);
+    httpd_resp_set_type(request, "application/json");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    opus_benchmark_status_t status;
+    opus_benchmark_snapshot(&status);
+    char row[384];
+    int n = snprintf(row, sizeof(row),
+        "{\"run\":%u,\"state\":%u,\"case\":%u,\"round\":%u,\"rounds\":%u,"
+        "\"dram_before\":%u,\"dram_after\":%u,\"state_bytes\":%u,\"empty_task_us\":%u,"
+        "\"error\":%d,\"results\":[",
+        status.run, status.state, status.current_case, status.round, status.rounds,
+        status.dram_before, status.dram_after, status.state_bytes, status.empty_task_us, status.error);
+    esp_err_t result = httpd_resp_send_chunk(request, row, n);
+    for (unsigned i = 0; result == ESP_OK && i < status.cases; ++i) {
+        opus_benchmark_case_t item;
+        opus_benchmark_case_snapshot(i, &item);
+        n = snprintf(row, sizeof(row),
+            "%s{\"id\":%u,\"packets\":%u,\"samples\":%u,\"wall_us\":%u,\"task_us\":%u,"
+            "\"max_wall_us\":%u,\"pcm_hash\":%u,\"scratch_bytes\":%u,\"scratch_words\":%u,"
+            "\"min_dram\":%u,\"stack_free_lifetime\":%u,\"error\":%d}",
+            i ? "," : "", i, item.packets, item.samples, item.wall_us, item.task_us,
+            item.max_wall_us, item.pcm_hash, item.scratch_bytes, item.scratch_words,
+            item.min_dram, item.stack_free, item.error);
+        if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
+        else result = httpd_resp_send_chunk(request, row, n);
+    }
+    if (result == ESP_OK) result = httpd_resp_send_chunk(request, "]}", 2);
+    if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
+    return finish_short_response(request, result);
+}
+#endif
+
 static esp_err_t register_get(const char *uri, esp_err_t (*handler)(httpd_req_t *)) {
     httpd_uri_t route = {
         .uri = uri,
@@ -1188,6 +1243,9 @@ esp_err_t web_service_start(void) {
     config.backlog_conn = WEB_CONNECTION_BACKLOG;
     config.recv_wait_timeout = WEB_IDLE_TIMEOUT_SECONDS;
     config.max_uri_handlers = 26;
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+    config.max_uri_handlers += 2;
+#endif
 #if YORADIO_ESP8266_SPIFFS_LOG_HTTP
     config.max_uri_handlers += 2;
 #endif
@@ -1231,6 +1289,13 @@ esp_err_t web_service_start(void) {
         return result;
     if ((result = register_get("/api/native/audio", audio_health_handler)) != ESP_OK)
         return result;
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+    if ((result = register_get("/api/native/opus-benchmark", opus_benchmark_status_handler)) != ESP_OK)
+        return result;
+    httpd_uri_t opus_bench = {.uri = "/api/native/opus-benchmark", .method = HTTP_POST,
+                              .handler = opus_benchmark_start_handler};
+    if ((result = httpd_register_uri_handler(s_server, &opus_bench)) != ESP_OK) return result;
+#endif
 #if YORADIO_ESP8266_SPIFFS_LOG_HTTP
     if ((result = register_get("/api/native/log", spiffs_log_handler)) != ESP_OK)
         return result;

@@ -1,6 +1,7 @@
 #include "audio_service.h"
 #include "web_audio_pause_config.h"
 #include "memory_profile.h"
+#include "opus_benchmark.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -500,6 +501,9 @@ static int stream_receive(http_stream_t *stream, uint8_t *destination,
     }
 }
 
+/* Keep the two redirect URL buffers off audio_task's persistent frame:
+ * HTTP setup finishes before the nested codec decode path needs its stack. */
+__attribute__((noinline))
 static int open_http_stream(char *url, http_stream_t *stream) {
     for (unsigned redirect_count = 0;
          redirect_count <= HTTP_MAX_REDIRECTS; ++redirect_count) {
@@ -1032,8 +1036,10 @@ static void audio_task(void *argument) {
             release_codec(&codec, &codec_kind, "stop");
             native_state_set_audio(false, false, NULL);
             network_service_set_streaming(false);
+            opus_benchmark_run_pending(command.generation, generation_current);
             continue;
         }
+        opus_benchmark_cancel_pending();
         native_state_set_audio(false, true, NULL);
         network_service_set_streaming(true);
         http_stream_t stream;

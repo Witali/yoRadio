@@ -31,6 +31,18 @@ option(YORADIO_ESP8266_SPIFFS_LOG
   "Mirror SDK logs to bounded SPIFFS files (diagnostic flash writes)" OFF)
 option(YORADIO_ESP8266_DIAGNOSTIC
   "Enable explicitly requested diagnostic facilities, never for production" OFF)
+option(YORADIO_ESP8266_OPUS_BENCHMARK
+  "Run raw flash-fixture Opus benchmark on request while preserving WebUI/OTA" OFF)
+set(YORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES "" CACHE PATH "Generated Opus board fixture directory")
+if(YORADIO_ESP8266_OPUS_BENCHMARK)
+  if(NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT CONFIG_YORADIO_OGG_OPUS)
+    message(FATAL_ERROR "Opus benchmark requires diagnostic Opus profile")
+  endif()
+  if(NOT EXISTS "${YORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES}/opus_board_fixtures.h")
+    message(FATAL_ERROR "Generate raw Opus fixtures with build_board_fixtures.cjs first")
+  endif()
+  list(APPEND YORADIO_SOURCES "opus_benchmark.cpp")
+endif()
 option(YORADIO_ESP8266_SPIFFS_LOG_HTTP
   "Allow read-only LAN download of SPIFFS logs in diagnostic builds" OFF)
 if(YORADIO_ESP8266_SPIFFS_LOG AND NOT YORADIO_ESP8266_DIAGNOSTIC)
@@ -216,6 +228,9 @@ add_custom_command(OUTPUT "${WEB_BUNDLE_HEADER}"
 add_custom_target(yoradio_web_bundle DEPENDS "${WEB_BUNDLE_HEADER}")
 add_dependencies(${COMPONENT_LIB} yoradio_web_bundle)
 target_include_directories(${COMPONENT_LIB} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+if(YORADIO_ESP8266_OPUS_BENCHMARK)
+  target_include_directories(${COMPONENT_LIB} PRIVATE "${YORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES}")
+endif()
 
 # ESP8266_RTOS_SDK exposes only -Og/-Os in menuconfig. Audio code needs the
 # same explicit performance profile used by the ESP32-C3 native build.
@@ -223,6 +238,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++14>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
+  YORADIO_ESP8266_OPUS_BENCHMARK=$<BOOL:${YORADIO_ESP8266_OPUS_BENCHMARK}>
   YORADIO_ESP8266_WEB_AUDIO_PAUSE=${WEB_AUDIO_PAUSE_MODE}
   YORADIO_ESP8266_WEB_PROFILE=$<BOOL:${YORADIO_ESP8266_WEB_PROFILE}>
   YORADIO_ESP8266_SPIFFS_LOG=$<BOOL:${YORADIO_ESP8266_SPIFFS_LOG}>
