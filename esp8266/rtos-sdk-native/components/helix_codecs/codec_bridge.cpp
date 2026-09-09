@@ -589,9 +589,9 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
 #endif
         }
 #if CONFIG_YORADIO_HELIX_AAC
-        /* AAC has no public state-reset entry point. Release/rebuild its
-         * objects inside the same bound arena; the outer heap block remains
-         * allocated and cannot fragment. */
+        /* A new station may change AAC configuration. Release/rebuild the
+         * state; the input/PCM and permanent IRAM arena are retained, but
+         * byte-oriented decoder objects are real DRAM heap allocations. */
         free_decoder(codec);
         if (!allocate_decoder(codec, kind)) return -2;
         if (!update_codec_memory(codec)) {
