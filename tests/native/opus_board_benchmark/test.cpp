@@ -176,7 +176,7 @@ extern "C" size_t heap_caps_get_free_size(unsigned caps) {
     return free_bytes;
 }
 bool CodecArenaPreallocatedInIram(void) { return arena_iram; }
-bool CodecArenaBind(void *memory, size_t capacity) {
+bool CodecArenaBind(uint8_t *memory, size_t capacity) {
     assert(!arena_bound && !memory && capacity == 16384);
     if (reject_bind) return false;
     arena_bound = true; return true;
@@ -187,9 +187,9 @@ void *CodecArenaCalloc32(CodecArenaOwner owner, size_t count, size_t bytes) {
     if (arena_words) memset(arena_words, 0, count * bytes);
     return arena_words;
 }
-bool CodecArenaFree(void *memory) {
+void CodecArenaFree(void *memory) {
     assert(memory == arena_words);
-    deallocate(memory); arena_words = nullptr; return true;
+    deallocate(memory); arena_words = nullptr;
 }
 void CodecArenaRelease(CodecArenaOwner owner) {
     assert(arena_bound && !arena_words && owner == CODEC_ARENA_OPUS); ++releases;
