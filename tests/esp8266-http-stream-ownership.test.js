@@ -16,7 +16,7 @@ test('actual HTTP opener never publishes a closed socket after a chunk error', t
   }
   const streamType = audio.match(/typedef struct \{\s+int socket;[\s\S]*?\} http_stream_t;/);
   assert.ok(streamType);
-  const cleanup = audio.match(/if \(opened != 0 \|\| !generation_current\(command\.generation\)\) \{\s*([^\n]+)/);
+  const cleanup = audio.match(/if \(opened != 0 \|\| !generation_current\(command\.generation\)\) \{\s*(?:audio_transport_phase\([^;]+;\s*)?(if \(stream.socket >= 0\) close\(stream.socket\);)/);
   assert.ok(cleanup, 'Use production caller cleanup, not a test substitute');
   const fixture = fs.readFileSync(path.join(__dirname, 'native/esp8266_http_stream_ownership_test.c'), 'utf8');
   const code = fixture.replace('/* STREAM_TYPE */', streamType[0])

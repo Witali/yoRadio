@@ -109,6 +109,36 @@ static volatile uint32_t s_generation;
 static uint32_t s_rx_bytes, s_pcm_frames, s_pcm_rate;
 static TickType_t s_rx_tick, s_pcm_tick;
 
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
+static volatile uint32_t s_transport_phase;
+static int32_t s_transport_result = INT32_MIN, s_transport_errno;
+static uint32_t s_transport_input_bytes;
+static void audio_transport_phase(audio_transport_phase_t phase) {
+    s_transport_phase = (uint32_t)phase;
+}
+/* Caller holds the generation critical section. Do not reset phase here: a
+ * queued Stop must still show the operation that the audio owner is awaiting. */
+static void audio_transport_new_generation(void) {
+    s_transport_result = INT32_MIN;
+    s_transport_errno = 0;
+    s_transport_input_bytes = 0;
+}
+static void audio_transport_latch(uint32_t generation, int result, int error,
+                                 size_t buffered) {
+    taskENTER_CRITICAL();
+    if (generation == s_generation) {
+        s_transport_result = result;
+        s_transport_errno = error;
+        s_transport_input_bytes = (uint32_t)buffered;
+    }
+    taskEXIT_CRITICAL();
+}
+#else
+#define audio_transport_phase(phase) ((void)0)
+#define audio_transport_new_generation() ((void)0)
+#define audio_transport_latch(generation, result, error, buffered) ((void)0)
+#endif
+
 void audio_service_health(audio_service_health_t *health) {
     if (!health) return;
     taskENTER_CRITICAL();
@@ -119,6 +149,12 @@ void audio_service_health(audio_service_health_t *health) {
         .sample_rate = s_pcm_rate,
         .rx_age_ms = (now - s_rx_tick) * portTICK_PERIOD_MS,
         .pcm_age_ms = (now - s_pcm_tick) * portTICK_PERIOD_MS,
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
+        .transport_phase = s_transport_phase,
+        .transport_result = s_transport_result,
+        .transport_errno = s_transport_errno,
+        .input_bytes = s_transport_input_bytes,
+#endif
     };
     taskEXIT_CRITICAL();
     /* Scan the watermark only for a health request, never per audio sample.
@@ -294,6 +330,7 @@ static void requeue_if_current(const audio_command_t *command) {
 static uint32_t advance_generation(void) {
     taskENTER_CRITICAL();
     uint32_t generation = ++s_generation;
+    audio_transport_new_generation();
     taskEXIT_CRITICAL();
     return generation;
 }
@@ -367,6 +404,7 @@ static int connect_http(uint16_t port, uint32_t generation) {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     struct addrinfo *addresses = NULL;
+    audio_transport_phase(AUDIO_TRANSPORT_DNS);
     int dns_error = getaddrinfo(s_host, port_text, &hints, &addresses);
     if (dns_error != 0) {
         ESP_LOGE(TAG, "Stream DNS failed: %d, heap %u", dns_error,
@@ -379,6 +417,7 @@ static int connect_http(uint16_t port, uint32_t generation) {
     int64_t deadline = esp_timer_get_time() + SOCKET_CONNECT_TIMEOUT_MS * 1000LL;
     int socket_fd = -1;
     int saved_error = EHOSTUNREACH;
+    audio_transport_phase(AUDIO_TRANSPORT_CONNECT);
     for (struct addrinfo *address = addresses; address; address = address->ai_next) {
         if (!socket_connect_allowed(generation)) {
             saved_error = errno;
@@ -411,7 +450,9 @@ static int connect_http(uint16_t port, uint32_t generation) {
             }
         }
         saved_error = errno;
+        audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
         close(socket_fd);
+        audio_transport_phase(AUDIO_TRANSPORT_CONNECT);
         socket_fd = -1;
     }
     freeaddrinfo(addresses);
@@ -515,6 +556,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
         if (!parse_http_url(url, &parts)) return -1;
         int socket_fd = connect_http(parts.port, generation);
         if (socket_fd < 0) return -2;
+        audio_transport_phase(AUDIO_TRANSPORT_SEND);
         bool sent = send_all(socket_fd, "GET ") &&
                     (!parts.query_only || send_all(socket_fd, "/")) &&
                     send_all_bytes(socket_fd, parts.target,
@@ -528,6 +570,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                     send_all(socket_fd, "Connection: keep-alive\r\n\r\n");
         if (!sent) {
             int saved_error = errno;
+            audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
             close(socket_fd);
             errno = saved_error;
             return -3;
@@ -539,10 +582,12 @@ static int open_http_stream(char *url, http_stream_t *stream) {
         size_t body_size = 0;
         int64_t header_deadline =
             esp_timer_get_time() + HTTP_HEADER_TIMEOUT_MS * 1000LL;
+        audio_transport_phase(AUDIO_TRANSPORT_HEADER);
         while (!http_response_header_finished(&headers)) {
             /* The deadline also bounds continuously readable trickle headers,
              * not only EAGAIN. No allocation or second receive buffer. */
             if (esp_timer_get_time() >= header_deadline) {
+                audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
                 close(socket_fd);
                 errno = ETIMEDOUT;
                 return -4;
@@ -561,6 +606,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                     s_work, sizeof(s_work), s_work + input_start,
                     (size_t)received, &consumed, redirect_url, sizeof(redirect_url));
                 if (parsed == HTTP_RESPONSE_HEADER_ERROR) {
+                    audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
                     close(socket_fd);
                     errno = EPROTO;
                     return -5;
@@ -586,6 +632,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
             int saved_error = received == 0 ? ECONNRESET : errno;
             if (saved_error == EAGAIN || saved_error == EWOULDBLOCK)
                 saved_error = ETIMEDOUT;
+            audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
             close(socket_fd);
             errno = saved_error;
             return -4;
@@ -594,6 +641,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
         bool chunked = http_response_header_chunked(&headers);
         if (status >= 200 && status < 300) {
             if (http_response_header_unsupported_transfer(&headers)) {
+                audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
                 close(socket_fd);
                 errno = EPROTO;
                 return -9;
@@ -606,6 +654,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
             if (chunked &&
                 !http_chunk_decode(&stream->chunk_decoder, s_work, body_size,
                                    &body_size)) {
+                audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
                 close(socket_fd);
                 errno = EPROTO;
                 return -9;
@@ -619,6 +668,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                      chunked ? ", chunked" : "");
             return 0;
         }
+        audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
         close(socket_fd);
         if ((status != 301 && status != 302 && status != 303 &&
              status != 307 && status != 308) || !redirect_url[0] ||
@@ -1045,6 +1095,7 @@ static void audio_task(void *argument) {
         if (!command.play) {
             native_audio_output_silence();
             release_codec(&codec, &codec_kind, "stop");
+            audio_transport_phase(AUDIO_TRANSPORT_IDLE);
             native_state_set_audio(false, false, NULL);
             network_service_set_streaming(false);
             opus_benchmark_run_pending(command.generation, generation_current);
@@ -1076,6 +1127,7 @@ static void audio_task(void *argument) {
         }
         if (audio_web_pause_checkpoint(&stream, &command)) continue;
         if (opened != 0 || !generation_current(command.generation)) {
+            audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
             if (stream.socket >= 0) close(stream.socket);
             if (generation_current(command.generation)) {
                 ESP_LOGE(TAG, "Open stream failed: stage %d errno %d heap %u",
@@ -1085,6 +1137,7 @@ static void audio_task(void *argument) {
                 network_service_set_streaming(false);
                 release_codec(&codec, &codec_kind, "open error");
             }
+            audio_transport_phase(AUDIO_TRANSPORT_IDLE);
             continue;
         }
 
@@ -1092,6 +1145,7 @@ static void audio_task(void *argument) {
         uint32_t audio_until_metadata = stream.metadata_interval;
         if (audio_until_metadata && detect_size <= audio_until_metadata)
             audio_until_metadata -= (uint32_t)detect_size;
+        audio_transport_phase(AUDIO_TRANSPORT_REFILL);
         while (generation_current(command.generation) &&
                !audio_web_pause_requested() &&
                !(codec_kind = helix_codec_detect(s_work, detect_size))) {
@@ -1120,12 +1174,14 @@ static void audio_task(void *argument) {
 #endif
         if (audio_web_pause_checkpoint(&stream, &command)) continue;
         if (!codec_kind || !generation_current(command.generation)) {
+            audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
             close(stream.socket);
             if (generation_current(command.generation)) {
                 native_state_set_audio(false, false, "UNSUPPORTED STREAM");
                 network_service_set_streaming(false);
                 release_codec(&codec, &codec_kind, "unsupported stream");
             }
+            audio_transport_phase(AUDIO_TRANSPORT_IDLE);
             continue;
         }
 #if YORADIO_ESP8266_AUDIO_PROFILE
@@ -1140,10 +1196,12 @@ static void audio_task(void *argument) {
                  decoder_ready, (unsigned)esp_get_free_heap_size());
 #endif
         if (!decoder_ready) {
+            audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
             close(stream.socket);
             native_state_set_audio(false, false, "DECODER INIT ERROR");
             network_service_set_streaming(false);
             release_codec(&codec, &codec_kind, "decoder init error");
+            audio_transport_phase(AUDIO_TRANSPORT_IDLE);
             continue;
         }
         log_audio_stack("decoder ready");
@@ -1184,11 +1242,16 @@ static void audio_task(void *argument) {
         const uint32_t wait_ms = STREAM_READ_WAIT_MS > 10U ? 10U : STREAM_READ_WAIT_MS;
         while (feed == 0 && generation_current(command.generation) &&
                !audio_web_pause_requested()) {
+            audio_transport_phase(AUDIO_TRANSPORT_REFILL);
             int filled = ended ? STREAM_FILL_EOF :
                 stream_input_refill(&stream, codec, &icy, &output);
             if (filled == STREAM_FILL_CANCELLED) break;
             if (filled == STREAM_FILL_EOF || filled == STREAM_FILL_TIMEOUT ||
                 filled == STREAM_FILL_ERROR) {
+                if (!ended)
+                    audio_transport_latch(command.generation, filled,
+                        filled == STREAM_FILL_EOF ? 0 : errno,
+                        helix_codec_buffered(codec));
                 ended = true;
                 if (filled == STREAM_FILL_ERROR) end_error = -21;
             }
@@ -1198,6 +1261,9 @@ static void audio_task(void *argument) {
                         esp_timer_get_time() - prefill_started, STREAM_PREFILL_MS)) {
                     if (filled == STREAM_FILL_AGAIN) {
                         if (!stream_wait_after_empty(&stream, command.generation, wait_ms)) {
+                            audio_transport_latch(command.generation,
+                                errno == ETIMEDOUT ? STREAM_FILL_TIMEOUT : STREAM_FILL_ERROR,
+                                errno, helix_codec_buffered(codec));
                             ended = true;
                             end_error = errno == ETIMEDOUT ? 0 : -21;
                         }
@@ -1221,7 +1287,9 @@ static void audio_task(void *argument) {
                          s_stream_trace_count,
                          (unsigned)helix_codec_buffered(codec), filled);
 #endif
+            audio_transport_phase(AUDIO_TRANSPORT_DECODE);
             int decoded = helix_codec_process_one(codec, pcm_output, &output);
+            audio_transport_phase(AUDIO_TRANSPORT_REFILL);
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
             if (s_stream_trace_count < 24U)
                 ESP_LOGI(TAG, "AUDIO_TRACE FRAME end=%u queued=%u result=%d",
@@ -1255,6 +1323,9 @@ static void audio_task(void *argument) {
                 feed = -20; /* No progress is possible in a full input queue. */
                 break;
             } else if (!stream_wait_after_empty(&stream, command.generation, wait_ms)) {
+                audio_transport_latch(command.generation,
+                    errno == ETIMEDOUT ? STREAM_FILL_TIMEOUT : STREAM_FILL_ERROR,
+                    errno, helix_codec_buffered(codec));
                 ended = true;
                 end_error = errno == ETIMEDOUT ? 0 : -21;
             }
@@ -1271,8 +1342,10 @@ static void audio_task(void *argument) {
             }
         }
         if (audio_web_pause_checkpoint(&stream, &command)) continue;
+        audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
         int stream_closed = close(stream.socket);
         (void)stream_closed;
+        audio_transport_phase(AUDIO_TRANSPORT_IDLE);
         if (feed == 0 && generation_current(command.generation)) {
             ESP_LOGW(TAG,
                      "Radio stream ended or timed out; reconnecting (heap %u)",

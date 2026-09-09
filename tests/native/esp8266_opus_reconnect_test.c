@@ -12,6 +12,7 @@
 #define ESP_LOGI(...) ((void)0)
 #define ESP_LOGW(...) ((void)0)
 #define ESP_LOGE(...) ((void)0)
+#define audio_transport_phase(phase) ((void)0)
 #define pdMS_TO_TICKS(ms) (ms)
 #define taskENTER_CRITICAL() ((void)0)
 #define taskEXIT_CRITICAL() ((void)0)

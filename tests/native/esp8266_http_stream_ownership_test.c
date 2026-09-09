@@ -20,6 +20,7 @@
 #define HTTP_HEADER_TIMEOUT_MS 10000U
 #define YORADIO_ESP8266_AUDIO_PROFILE 0
 #define ESP_LOGI(...) ((void)0)
+#define audio_transport_phase(phase) ((void)0)
 #define pdMS_TO_TICKS(value) (value)
 typedef uint32_t TickType_t;
 /* STREAM_TYPE */

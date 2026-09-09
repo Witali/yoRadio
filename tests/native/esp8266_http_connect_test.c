@@ -17,6 +17,7 @@
     fprintf(stderr, "line %d: %s\n", __LINE__, #expr); exit(1); \
 } } while (0)
 #define ESP_LOGE(...) ((void)0)
+#define audio_transport_phase(phase) ((void)0)
 /* DEFINES */
 typedef struct {
     int socket_error, get_flags_error, set_flags_error, connect_error;
