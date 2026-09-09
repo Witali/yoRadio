@@ -114,22 +114,35 @@ void app_main(void) {
     ESP_ERROR_CHECK(network_service_start());
     ESP_ERROR_CHECK(web_service_start());
 
+    /* Background poll scheduling: LED-only wakeups must not enqueue HTTP
+     * work (a control-socket/lwIP operation) or run the other services. Real
+     * BOOT/state notifications still service controls and WebUI immediately. */
+    const TickType_t service_period = pdMS_TO_TICKS(250);
+    TickType_t service_tick = xTaskGetTickCount();
+    uint32_t notifications = 1;
     for (;;) {
         input_service_poll();
-        radio_control_flush_pending();
-        network_service_poll();
-        time_service_poll();
-        web_service_poll();
-        memory_profile_poll();
-        spiffs_log_poll();
+        TickType_t now = xTaskGetTickCount();
+        if (notifications || (TickType_t)(now - service_tick) >= service_period) {
+            service_tick = now;
+            radio_control_flush_pending();
+            network_service_poll();
+            time_service_poll();
+            web_service_poll();
+            memory_profile_poll();
+            spiffs_log_poll();
+        }
 #if CONFIG_YORADIO_STATUS_LED
         status_led_poll();
 #endif
-        TickType_t wait = input_service_wait_ticks(pdMS_TO_TICKS(250));
+        TickType_t elapsed = xTaskGetTickCount() - service_tick;
+        TickType_t wait = elapsed >= service_period ? 0 : service_period - elapsed;
+        wait = input_service_wait_ticks(wait);
 #if CONFIG_YORADIO_STATUS_LED
         wait = status_led_wait_ticks(wait);
 #endif
-        ulTaskNotifyTake(pdTRUE, wait);
+        notifications = ulTaskNotifyTake(pdTRUE, wait);
     }
+    /* End background poll scheduling. */
 #endif
 }

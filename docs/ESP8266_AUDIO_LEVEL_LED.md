@@ -112,3 +112,19 @@ served HTML/status plus WebSocket state messages. Playback was already stopped
 and was left stopped for the user's listening/LED test. See the
 [deployment record](../firmware/development/esp8266-audio-level-led/manifest.md).
 No LED brightness observation or audio CPU measurement is claimed.
+
+### Background scheduling correction, 2026-09-09
+
+The initial LED integration shortened the whole app loop from 250 to 50 ms.
+Consequently it could queue HTTP server work five times as often, even with
+no WebSocket clients. The hardware LED pulse generator itself has no ISR;
+this extra background scheduling is a separate software regression.
+
+The corrected loop keeps periodic services at 250 ms independently of the
+10/20-Hz LED timer. Real state/input notifications still wake those services
+immediately. No extra task, heap buffer or software pulse timer was added.
+`tests/esp8266-app-poll.test.js` executes the actual C loop with virtual time:
+LED disabled/10/20 Hz, immediate state events, BOOT debounce, tick wrap and
+a service taking longer than its period. All 18 targeted scheduling, LED,
+state-notification and I2S tests passed. Live audio/RAM verification remains
+separate: this correction alone does not establish the cause of decoder OOM.
