@@ -649,6 +649,12 @@ static inline __attribute__((always_inline)) void i2s_rcpdm_fill(
 #ifndef YORADIO_ESP8266_PDM32_IRAM
 #define YORADIO_ESP8266_PDM32_IRAM 0
 #endif
+#ifndef YORADIO_ESP8266_PDM32_BATCH
+#define YORADIO_ESP8266_PDM32_BATCH 0
+#endif
+#if YORADIO_ESP8266_PDM32_BATCH != 0 && YORADIO_ESP8266_PDM32_BATCH != 1
+#error "YORADIO_ESP8266_PDM32_BATCH must be 0 or 1"
+#endif
 #if YORADIO_ESP8266_PDM32_IRAM != 0 && YORADIO_ESP8266_PDM32_IRAM != 1
 #error "YORADIO_ESP8266_PDM32_IRAM must be 0 or 1"
 #endif
@@ -985,6 +991,43 @@ static inline __attribute__((always_inline)) esp_err_t i2s_pdm_write_channels(
             size_t count = frames - frame;
             if (count > writer.capacity) count = writer.capacity;
             i2s_rcpdm_fill(writer.words, samples + frame * channels, count, channels);
+            writer.word_count = count;
+            frame += count;
+            bool full = count == writer.capacity;
+            result = i2s_pdm_flush(&writer);
+            if (result != ESP_OK) {
+                if (full) s_resample_phase = BOARD_I2S_PDM_SAMPLE_RATE;
+                return result;
+            }
+        }
+        return ESP_OK;
+    }
+#endif
+#if YORADIO_ESP8266_PDM32_BATCH && CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM && CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32
+    /* At 48 kHz one PCM frame produces exactly one DMA word. Fill the
+     * existing loan directly; keep gain/LED/normalization above and the
+     * scalar resampler below unchanged. No additional PCM or word buffer. */
+    if (sample_rate == BOARD_I2S_PDM_SAMPLE_RATE && s_resample_phase == 0) {
+        size_t frame = 0;
+        while (frame < frames) {
+            esp_err_t result = i2s_pdm_reserve(&writer);
+            if (result != ESP_OK) {
+                /* Scalar emit packs before reserving: preserve its one
+                 * advanced sample and unconsumed resampler phase on error. */
+                int32_t mono = samples[frame * channels];
+                if (channels == 2) mono = (mono + samples[frame * 2U + 1U]) / 2;
+                (void)i2s_pdm_pack32((int16_t)mono);
+                s_resample_phase = BOARD_I2S_PDM_SAMPLE_RATE;
+                return result;
+            }
+            size_t count = frames - frame;
+            if (count > writer.capacity) count = writer.capacity;
+            for (size_t i = 0; i < count; ++i) {
+                int32_t mono = samples[(frame + i) * channels];
+                if (channels == 2)
+                    mono = (mono + samples[(frame + i) * 2U + 1U]) / 2;
+                writer.words[i] = i2s_pdm_pack32((int16_t)mono);
+            }
             writer.word_count = count;
             frame += count;
             bool full = count == writer.capacity;

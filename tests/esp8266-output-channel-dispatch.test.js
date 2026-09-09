@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const {execute} = require('../tools/esp8266_audio_profile/run_rcpdm_radio');
+const {execute: executeHost, hostPath} = require('../tools/esp8266_opus_profile/build_host.cjs');
 const root = path.resolve(__dirname, '..');
 const main = path.join(root, 'esp8266/rtos-sdk-native/main');
 
@@ -16,7 +17,8 @@ function section(source, start, end) {
 }
 
 for (const led of [0, 1]) for (const backend of ['pdm', 'rcpdm', 'feedback', 'simple']) {
-  test(`I2S ${backend} LED=${led}: format dispatch preserves PCM, bits, state and DMA boundaries`, t => {
+ for (const batch of backend === 'pdm' ? [0, 1] : [0]) {
+  test(`I2S ${backend} LED=${led} PDM32_BATCH=${batch}: preserves PCM, bits, state and DMA boundaries`, t => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'yoradio-channel-dispatch-'));
     t.after(() => fs.rmSync(dir, {recursive: true, force: true}));
     const source = fs.readFileSync(path.join(main, 'native_audio_output.c'), 'utf8').replace(/\r\n/g, '\n');
@@ -27,14 +29,24 @@ for (const led of [0, 1]) for (const backend of ['pdm', 'rcpdm', 'feedback', 'si
     fs.writeFileSync(path.join(dir, 'output_under_test.inc'), common + i2s);
     const flags = [
       `CONFIG_YORADIO_STATUS_LED=${led}`,
+      `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=${backend === 'pdm' ? 1 : 0}`,
       `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM=${backend !== 'pdm' ? 1 : 0}`,
+      `YORADIO_ESP8266_PDM32_BATCH=${batch}`,
       `CONFIG_YORADIO_RCPDM_FEEDBACK=${backend === 'feedback' ? 1 : 0}`,
       `RCPDM_TEST_SIMPLE=${backend === 'simple' ? 1 : 0}`,
     ];
     const exe = path.join(dir, 'test' + (process.platform === 'win32' ? '.exe' : ''));
     const harness = path.join(root, 'tests/native/esp8266_output_channel_dispatch.cpp');
     const includes = [dir, main, path.join(root, 'tests/native')];
-    if (process.platform === 'win32') {
+    let output;
+    if (backend === 'pdm') {
+      // Both PDM32 paths run with actual source under ASan/UBSan, including on
+      // Windows via the existing WSL host compiler; no firmware build/cache.
+      executeHost('g++', ['-std=c++20', '-O2', '-fsanitize=address,undefined',
+        '-fno-sanitize-recover=all', '-fno-pie', '-no-pie', ...flags.map(f => '-D' + f),
+        ...includes.map(p => '-I' + hostPath(p)), hostPath(harness), '-o', hostPath(exe)]);
+      output = executeHost(hostPath(exe), []);
+    } else if (process.platform === 'win32') {
       let vc;
       const base = 'C:/Program Files/Microsoft Visual Studio';
       for (const v of fs.readdirSync(base)) for (const e of fs.readdirSync(path.join(base, v))) {
@@ -49,10 +61,12 @@ for (const led of [0, 1]) for (const backend of ['pdm', 'rcpdm', 'feedback', 'si
       execute('c++', ['-std=c++20', '-O2', '-fsanitize=undefined', ...flags.map(f => '-D' + f),
         ...includes.map(p => '-I' + p), harness, '-o', exe], {cwd: dir});
     }
-    const result = JSON.parse(execute(exe, []).stdout);
+    const result = JSON.parse(output ?? execute(exe, []).stdout);
     assert.equal(result.pass, true);
     assert.ok(result.blocks >= 1000);
     assert.ok(result.words > 100000);
+    assert.equal(result.failure_cases, 5670);
     t.diagnostic(JSON.stringify(result));
   });
+ }
 }

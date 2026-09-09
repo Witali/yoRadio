@@ -49,22 +49,38 @@ static rc_pdm_t s_rcpdm;
 #else
 static uint32_t s_pdm_integrator;
 #endif
-static uint32_t dma_words[512];
+static uint32_t dma_words[514]; /* Prefix/suffix canaries surround every loan. */
 static size_t dma_capacity = 512;
 static bool fail_reserve, fail_commit;
+static unsigned fail_reserve_at, fail_commit_at;
+static unsigned reserve_calls, commit_calls, cancel_calls;
+static bool dma_loan;
 static std::vector<uint32_t> emitted;
+static std::vector<size_t> committed_sizes;
 static unsigned normalized_channels;
 static esp_err_t esp8266_nodac_i2s_init(uint32_t, unsigned, unsigned) { return ESP_OK; }
-static void esp8266_nodac_i2s_silence(uint32_t) {}
+static void esp8266_nodac_i2s_silence(uint32_t) { dma_loan = false; }
 static esp_err_t esp8266_nodac_i2s_reserve(uint32_t **words, size_t *capacity, TickType_t) {
-    if (fail_reserve) return ESP_ERR_TIMEOUT;
-    *words = dma_words; *capacity = dma_capacity;
+    check(!dma_loan, "nested DMA loan");
+    if (++reserve_calls == fail_reserve_at || fail_reserve) return ESP_ERR_TIMEOUT;
+    std::fill(std::begin(dma_words), std::end(dma_words), 0xdecafbadU);
+    dma_loan = true;
+    *words = dma_words + 1; *capacity = dma_capacity;
     return ESP_OK;
 }
 static esp_err_t esp8266_nodac_i2s_commit(size_t words) {
+    check(dma_loan, "commit without DMA loan");
     check(words <= dma_capacity, "DMA write outside span");
-    if (fail_commit && words) return ESP_ERR_TIMEOUT;
-    emitted.insert(emitted.end(), dma_words, dma_words + words);
+    check(dma_words[0] == 0xdecafbadU, "DMA prefix canary");
+    for (size_t i = dma_capacity + 1; i < std::size(dma_words); ++i)
+        check(dma_words[i] == 0xdecafbadU, "DMA suffix canary");
+    if (!words) { ++cancel_calls; dma_loan = false; return ESP_OK; }
+    for (size_t i = words + 1; i <= dma_capacity; ++i)
+        check(dma_words[i] == 0xdecafbadU, "write beyond committed prefix");
+    if (++commit_calls == fail_commit_at || fail_commit) return ESP_ERR_TIMEOUT;
+    emitted.insert(emitted.end(), dma_words + 1, dma_words + 1 + words);
+    committed_sizes.push_back(words);
+    dma_loan = false;
     return ESP_OK;
 }
 static void native_audio_normalizer_configure(bool, uint8_t, int8_t, uint16_t, uint32_t) {}
@@ -127,6 +143,96 @@ static int16_t reference_scale(int16_t pcm, unsigned gain) {
     return int16_t(std::clamp<int64_t>(product < 0 ? -rounded : rounded, -32768, 32767));
 }
 
+/* Independent scalar writer, including pack-before-reserve, phase subtraction
+ * AFTER a full commit, and final partial flush AFTER the last subtraction. */
+struct ReferenceWrite {
+    esp_err_t result = ESP_OK;
+    std::vector<uint32_t> words;
+    std::vector<size_t> sizes;
+    unsigned reserves = 0, commits = 0, cancels = 0;
+};
+static ReferenceWrite reference_write(Reference &state,
+    const std::vector<int16_t> &pcm, unsigned channels, unsigned rate,
+    unsigned reserve_failure, unsigned commit_failure) {
+    ReferenceWrite run;
+    if (state.rate != rate) { state.rate = rate; state.phase = 0; }
+    std::vector<uint32_t> pending;
+    bool loan = false;
+    auto flush = [&]() {
+        if (++run.commits == commit_failure) {
+            ++run.cancels;
+            run.result = ESP_ERR_TIMEOUT;
+            return false;
+        }
+        run.words.insert(run.words.end(), pending.begin(), pending.end());
+        run.sizes.push_back(pending.size());
+        pending.clear(); loan = false;
+        return true;
+    };
+    for (size_t frame = 0; frame < pcm.size() / channels; ++frame) {
+        int32_t mono = pcm[frame * channels];
+        if (channels == 2) mono = (mono + pcm[frame * 2 + 1]) / 2;
+        state.phase += 48000;
+        while (state.phase >= rate) {
+            uint32_t word = state.pack(int16_t(mono));
+            if (!loan) {
+                if (++run.reserves == reserve_failure) {
+                    run.result = ESP_ERR_TIMEOUT;
+                    return run;
+                }
+                loan = true;
+            }
+            pending.push_back(word);
+            if (pending.size() == dma_capacity && !flush()) return run;
+            state.phase -= rate;
+        }
+    }
+    if (loan) (void)flush();
+    return run;
+}
+static void reset_dma_observation(unsigned reserve_failure = 0, unsigned commit_failure = 0) {
+    emitted.clear(); committed_sizes.clear();
+    reserve_calls = commit_calls = cancel_calls = 0;
+    fail_reserve_at = reserve_failure; fail_commit_at = commit_failure;
+}
+static size_t verify_failure_matrix() {
+    size_t cases = 0;
+    s_volume = 254; s_balance = 0; /* Unity gain keeps the reference independent. */
+    for (unsigned capacity : {1U, 31U, 64U, 448U, 512U})
+        for (unsigned rate : {8000U, 12000U, 16000U, 22050U, 24000U, 32000U, 44100U, 48000U, 96000U})
+            for (unsigned channels : {1U, 2U}) for (unsigned phase : {0U, rate - 1U, rate})
+                for (unsigned frames : {1U, capacity, capacity + 1U})
+                    for (unsigned failure = 0; failure <= 6; ++failure) {
+                        native_audio_output_silence();
+                        Reference reference;
+                        reference.rate = s_input_sample_rate = rate;
+                        reference.phase = s_resample_phase = phase;
+                        dma_capacity = capacity;
+                        unsigned reserve_failure = failure <= 3 ? failure : 0;
+                        unsigned commit_failure = failure > 3 ? failure - 3 : 0;
+                        std::vector<int16_t> pcm(frames * channels);
+                        for (size_t i = 0; i < pcm.size(); ++i)
+                            pcm[i] = int16_t((i * 7919U + 12345U) & 0xffffU);
+                        auto expected = reference_write(reference, pcm, channels, rate, reserve_failure, commit_failure);
+                        reset_dma_observation(reserve_failure, commit_failure);
+                        auto result = native_audio_output_write(pcm.data(), pcm.size(), rate, uint8_t(channels));
+                        check(result == expected.result, "failure matrix return code");
+                        check(emitted == expected.words && committed_sizes == expected.sizes, "failure matrix output/boundaries");
+                        check(reference.same() && s_resample_phase == reference.phase, "failure matrix integrator/phase");
+                        check(reserve_calls == expected.reserves && commit_calls == expected.commits &&
+                              cancel_calls == expected.cancels && !dma_loan, "failure matrix DMA ownership");
+                        // The next call must use scalar fallback if an error left
+                        // phase pending, not silently reset or discard that phase.
+                        expected = reference_write(reference, pcm, channels, rate, 0, 0);
+                        reset_dma_observation();
+                        check(native_audio_output_write(pcm.data(), pcm.size(), rate, uint8_t(channels)) == ESP_OK, "post-failure write");
+                        check(emitted == expected.words && committed_sizes == expected.sizes, "post-failure output/boundaries");
+                        check(reference.same() && s_resample_phase == reference.phase && !dma_loan, "post-failure state");
+                        ++cases;
+                    }
+    return cases;
+}
+
 int main() {
     try {
         check(native_audio_output_init() == ESP_OK, "init");
@@ -138,7 +244,7 @@ int main() {
             for (unsigned rate : {48000U, 44100U, 22050U, 96000U})
                 for (int balance : {-16, 0, 16}) for (unsigned volume : {0U, 160U, 254U})
                     for (unsigned channels : {1U, 1U, 2U, 2U, 1U})
-                        for (unsigned frames : {1U, 3U, 4U, 5U, 32U, 127U, 128U, 129U, 513U}) {
+                        for (unsigned frames : {1U, 3U, 4U, 5U, 32U, 127U, 128U, 129U, 448U, 512U, 513U, 960U}) {
                             s_balance = int8_t(balance); s_volume = uint8_t(volume);
                             std::vector<int16_t> pcm(frames * channels), scaled;
                             for (auto &sample : pcm) {
@@ -226,6 +332,8 @@ int main() {
 #if CONFIG_YORADIO_STATUS_LED
         check(led_blocks >= blocks / 2 && led_clears > 0, "LED hooks not exercised");
 #endif
-        std::cout << "{\"pass\":true,\"blocks\":" << blocks << ",\"words\":" << words << "}\n";
+        size_t failure_cases = verify_failure_matrix();
+        std::cout << "{\"pass\":true,\"blocks\":" << blocks << ",\"words\":" << words
+                  << ",\"failure_cases\":" << failure_cases << "}\n";
     } catch (const std::exception &error) { std::cerr << error.what() << '\n'; return 1; }
 }
