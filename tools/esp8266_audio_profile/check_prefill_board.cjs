@@ -10,6 +10,10 @@ const base = opt('--base', 'http://192.168.100.6');
 const file = opt('--output', '.build/esp8266-prefill-board/result.json');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const report = {date:new Date().toISOString(), mode, base};
+function readManifest(file) {
+  // Windows PowerShell 5.1 Out-File -Encoding utf8 writes a UTF-8 BOM.
+  return JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, ''));
+}
 const save = () => {
   fs.mkdirSync(path.dirname(file), {recursive:true});
   fs.writeFileSync(file, JSON.stringify(report,null,2)+'\n');
@@ -73,7 +77,7 @@ async function main() {
     const firmware=opt('--firmware','');
     if(!firmware)throw Error('--firmware is required; no implicit update');
     const app=fs.readFileSync(firmware);
-    const manifest=JSON.parse(fs.readFileSync(path.join(path.dirname(firmware),'manifest.json')));
+    const manifest=readManifest(path.join(path.dirname(firmware),'manifest.json'));
     report.sha256=crypto.createHash('sha256').update(app).digest('hex');
     if(report.sha256.toUpperCase()!==manifest.app_sha256.toUpperCase() ||
         app.length!==manifest.bytes || app.length>0xf0000 || app[0]!==0xe9)
@@ -139,6 +143,7 @@ async function main() {
     continuity:report.continuity,status:report.status,output:file}));
   if(report.pass===false)process.exitCode=1;
 }
+module.exports = {readManifest};
 if(require.main===module)main().catch(error=>{
   report.error=error.stack;save();console.error(error.message);process.exitCode=1;
 });

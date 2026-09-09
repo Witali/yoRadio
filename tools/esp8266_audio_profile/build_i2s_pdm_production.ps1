@@ -93,7 +93,7 @@ try {
         partition_layout='app0/app1 960 KiB, SPIFFS 256 KiB; flash app only'
     }
     if ($taskManifest.bytes -gt 0xf0000) { throw 'App exceeds OTA slot' }
-    $taskManifest | ConvertTo-Json | Out-File "$taskArtifact/manifest.json" -Encoding utf8
+    [IO.File]::WriteAllText("$taskArtifact/manifest.json", ($taskManifest | ConvertTo-Json), (New-Object Text.UTF8Encoding($false)))
     Write-Output "Saved $taskArtifact/app.bin ($($taskManifest.bytes) bytes); board default unchanged"
 } finally {
     $env:PATH=$taskSavedPath; $env:IDF_PATH=$taskSavedIdf; $env:IDF_TOOLS_PATH=$taskSavedTools
