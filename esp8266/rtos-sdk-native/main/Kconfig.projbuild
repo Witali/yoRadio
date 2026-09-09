@@ -76,9 +76,11 @@ config YORADIO_OPUS_SCRATCH_BYTES
     int "Opus byte-addressable scratch limit"
     depends on YORADIO_OGG_OPUS
     range 4096 16384
-    default 7680
+    default 6144
     help
         Fixed workspace, reused between SILK/CELT stages; not task-stack VLAs.
+        The 6144-byte profile passes the phase/PLC regression corpus with a
+        measured peak of 5968 bytes; this is not a universal stream bound.
         Exceeding this bound stops playback with an explicit decoder error.
 
 config YORADIO_HELIX_AAC_SSO

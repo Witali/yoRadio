@@ -24,7 +24,7 @@ test('real board benchmark control cleans up OOM/cancel/error and supports repea
   const executable = path.join(directory, 'test');
   const build = execute('g++', ['-std=c++17', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
     '-fsanitize=address,undefined', '-fno-sanitize-recover=all', '-fno-omit-frame-pointer', '-fno-pie', '-no-pie',
-    '-DYORADIO_ESP8266_OPUS_BENCHMARK=1', '-DCONFIG_YORADIO_OPUS_SCRATCH_BYTES=7680',
+    '-DYORADIO_ESP8266_OPUS_BENCHMARK=1', '-DCONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144',
     '-I' + hostPath(stubs), '-I' + hostPath(main), hostPath(path.join(main, 'opus_benchmark.cpp')),
     hostPath(path.join(stubs, 'test.cpp')), '-o', hostPath(executable)]);
   assert.equal(build.status, 0, build.stdout + '\n' + build.stderr);
