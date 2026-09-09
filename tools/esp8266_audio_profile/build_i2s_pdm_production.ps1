@@ -97,6 +97,8 @@ try {
         spiffs_log_http=[bool]$SpiffsLogHttp
         audio_level_led=[bool]$taskLedEnabled
         audio_level_led_update_hz=$(if ($taskLedEnabled) { $LedUpdateHz } else { 0 })
+        audio_level_led_max_brightness=$(if ($taskLedEnabled -and $taskConfig -match '(?m)^CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS=(\d+)') { [int]$Matches[1] } else { 0 })
+        audio_gain_led_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/audio_gain_led.inc).Hash
         audio_level_led_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/status_led.c).Hash
         spiffs_log_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/spiffs_log.c).Hash
         web_audio_pause=$WebAudioPause

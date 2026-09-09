@@ -236,7 +236,12 @@ config YORADIO_STATUS_LED_MAX_BRIGHTNESS
     int "Audio-level LED maximum brightness (0-255)"
     depends on YORADIO_STATUS_LED
     range 0 255
-    default 255
+    default 32
+    help
+        Limit GPIO2 modulation/current on the ESP-12F module. On the test
+        board 255 caused repeatable receive/audio stalls; 32 and 1 did not.
+        The physical coupling mechanism is not yet established. Use 0 to
+        keep the LED dark, or disable YORADIO_STATUS_LED to remove its code.
 
 config YORADIO_STATUS_LED_DECAY_STEP
     int "Audio-level LED decay per 50 ms (1-255)"

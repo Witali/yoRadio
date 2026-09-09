@@ -11,6 +11,12 @@ test('GPIO2 hardware level LED supports NoDAC and SPI, excludes external-DAC WS'
   assert.match(read('board_config.h'), /BOARD_STATUS_LED_ACTIVE_LOW 1/);
   assert.match(read('Kconfig.projbuild'), /config YORADIO_STATUS_LED\s+bool[^]*?default y\s+depends on YORADIO_AUDIO_OUTPUT_SPI_PDM \|\| YORADIO_AUDIO_OUTPUT_I2S_PDM \|\| YORADIO_AUDIO_OUTPUT_I2S_RCPDM/);
   assert.match(read('Kconfig.projbuild'), /config YORADIO_STATUS_LED_UPDATE_HZ[^]*?range 10 20\s+default 10/);
+  assert.match(read('Kconfig.projbuild'), /config YORADIO_STATUS_LED_MAX_BRIGHTNESS[^]*?range 0 255\s+default 32/);
+  for (const name of ['sdkconfig.defaults', 'sdkconfig.stereo.defaults']) {
+    const defaults = fs.readFileSync(path.join(main, '..', name), 'utf8');
+    assert.match(defaults, /CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=10/);
+    assert.match(defaults, /CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS=32/);
+  }
   assert.match(read('app_main.c'), /native_audio_output_init\(\)[^]*?status_led_init\(\)[^]*?network_service_start\(\)/);
   assert.match(read('app_main.c'), /wait = status_led_wait_ticks\(wait\)/);
   assert.doesNotMatch(led, /\b(xTaskCreate|xTimerCreate|malloc|calloc|realloc|pwm_init|native_state_snapshot|vTaskDelay)\s*\(/);

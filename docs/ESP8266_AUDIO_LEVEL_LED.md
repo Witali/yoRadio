@@ -11,7 +11,9 @@ External-DAC I2S needs WS and therefore excludes the LED at build time.
   I2S-RCPDM. Set `n` to remove the LED implementation and PCM taps entirely.
 - `CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=10`: default 100-ms envelope refresh;
   `20` selects 50 ms. This is not the frequency of electrical brightness pulses.
-- `CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS=255`: cap brightness (0..255).
+- `CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS=32`: cap brightness (0..255).
+  The test ESP-12F had reproducible stream stalls at 255; use the tested
+  lower default. Full scale is experimental until the coupling is understood.
 - `CONFIG_YORADIO_STATUS_LED_DECAY_STEP=8`: release by 8 levels per 50 ms;
   doubled at 10 Hz. Attack is immediate at the next refresh, like C3.
 
@@ -38,7 +40,7 @@ and it must not be used as a sample-accurate VU/clipping meter. No new task,
 timer, ISR, allocation or native-state snapshot is required. App sleep is
 bounded by the next LED update, but higher-priority work and synchronous
 services can delay a refresh: this is not a hard realtime refresh guarantee.
-Default maximum brightness needs no multiply/divide; other caps use an exact
+Unity (255) maximum brightness needs no multiply/divide; other caps use an exact
 shift/add replacement for rounded division by 255 (all 65536 input pairs tested).
 No extra persistent state was added by the integrated gain-loop implementation.
 
