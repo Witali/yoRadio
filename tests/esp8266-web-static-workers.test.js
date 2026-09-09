@@ -171,8 +171,12 @@ test("ESP8266 lets successful close-framed responses drain before cleanup", () =
   assert.match(prepare, /httpd_resp_set_hdr\(request, "Connection", "close"\)/);
   assert.doesNotMatch(prepare, /TCP_NODELAY|setsockopt/);
   assert.match(staticResponses, /prepare_short_response\(request\)/);
-  assert.match(finish, /if \(result == ESP_OK\)[\s\S]*SHUT_WR[\s\S]*else[\s\S]*httpd_sess_trigger_close/);
-  assert.match(finish, /httpd_req_to_sockfd\(request\)/);
+  assert.match(finish, /web_service_finish_response\(request, result\)/);
+  const close = read("esp8266", "rtos-sdk-native", "main", "web_connection_close.inc");
+  assert.match(close, /shutdown\(fd, SHUT_WR\)/);
+  assert.match(close, /WEB_CLOSE_GRACE_MS 5000U/);
+  assert.match(close, /httpd_sess_trigger_close/);
+  assert.match(close, /httpd_req_to_sockfd\(request\)/);
 });
 
 test("ESP8266 bounds browser connections and recovers with LRU eviction", () => {

@@ -97,7 +97,8 @@ test('short HTTP responses use TCP_NODELAY and graceful write-half shutdown', ()
   const source = read(main+'web_service.c');
   assert.match(source, /config.open_fn = session_opened/);
   assert.match(source, /setsockopt\(socket, IPPROTO_TCP, TCP_NODELAY/);
-  assert.match(source, /if \(result == ESP_OK\) \{\s*shutdown\(httpd_req_to_sockfd\(request\), SHUT_WR\)/);
+  assert.match(source, /web_service_finish_response\(request, result\)/);
+  assert.match(read(main+'web_connection_close.inc'), /shutdown\(fd, SHUT_WR\)/);
   const sessions = read('esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_sess.c');
   assert.match(sessions, /sock_db && sock_db->fd >= 0 && sock_db->close_pending/);
   assert.match(sessions, /if \(sock_db->close_pending\) return ESP_OK/);
