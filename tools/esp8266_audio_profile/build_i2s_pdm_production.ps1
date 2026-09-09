@@ -7,7 +7,7 @@ param(
     [switch]$MemoryProfile,
     [switch]$SpiffsLog,
     [ValidateSet(10, 20)]
-    [int]$LedUpdateHz = 20,
+    [int]$LedUpdateHz = 10,
     [switch]$NoAudioLevelLed
 )
 $ErrorActionPreference = 'Stop'
@@ -34,7 +34,7 @@ try {
     $taskDefaults = Get-Content esp8266/rtos-sdk-native/sdkconfig.defaults -Raw
     $taskDefaults = $taskDefaults.Replace('CONFIG_LOG_DEFAULT_LEVEL_INFO=y', 'CONFIG_LOG_DEFAULT_LEVEL_ERROR=y')
     $taskDefaults = $taskDefaults.Replace('CONFIG_LOG_BOOTLOADER_LEVEL_WARN=y', 'CONFIG_LOG_BOOTLOADER_LEVEL_ERROR=y')
-    $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=20', "CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz")
+    $taskDefaults = $taskDefaults -replace 'CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=\d+', "CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz"
     if ($NoAudioLevelLed) { $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED=y', '# CONFIG_YORADIO_STATUS_LED is not set') }
     [IO.File]::WriteAllText("$taskBuild/production.defaults", $taskDefaults, (New-Object Text.UTF8Encoding($false)))
     Write-Output "Configuring $taskVariant on GPIO3/RX (no flashing)"

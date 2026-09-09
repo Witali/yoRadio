@@ -148,8 +148,10 @@ L/R balance. The one-pin PDM backend itself remains mono in either case.
 See [mono/stereo behavior and tests](../../docs/ESP8266_MP3_MONO.md).
 The ESP-12F/Wemos GPIO2 LED follows the post-volume mono PCM peak, with fast
 attack and slow release; stopped audio is dark. `CONFIG_YORADIO_STATUS_LED`
-enables it by default. `CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=20` updates every
-50 ms; select `10` for 100 ms. Hardware GPIO sigma-delta supplies the pulses,
+enables it by default; set `n` (or build with `-NoAudioLevelLed`) to compile
+out its state and peak processing. `CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=10`
+updates every 100 ms; select `20` for 50 ms. Every fourth frame in a bounded
+snapshot is measured inside the gain loop. Hardware sigma-delta supplies pulses,
 without software PWM interrupts. See [LED details and tests](../../docs/ESP8266_AUDIO_LEVEL_LED.md).
 The PDM profile uses a small local output-only backend instead of the RTOS SDK
 I2S driver. Peripheral/companion-link setup follows ESP8266Audio's Arduino

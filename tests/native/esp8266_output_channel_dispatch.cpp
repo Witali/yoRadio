@@ -76,10 +76,9 @@ static void native_audio_output_reload_settings() {}
 #if CONFIG_YORADIO_STATUS_LED
 static volatile bool status_led_capture_requested = true;
 static unsigned led_blocks, led_clears;
-static std::vector<int16_t> led_pcm;
-static void status_led_capture_pcm(const int16_t *samples, size_t count, uint8_t channels) {
-    check(channels == normalized_channels, "LED wrong channel count");
-    led_pcm.assign(samples, samples + count);
+static uint16_t led_peak;
+static void status_led_publish_peak(uint16_t peak) {
+    led_peak = peak;
     ++led_blocks;
 }
 static void status_led_clear() { ++led_clears; }
@@ -139,7 +138,7 @@ int main() {
             for (unsigned rate : {48000U, 44100U, 22050U, 96000U})
                 for (int balance : {-16, 0, 16}) for (unsigned volume : {0U, 160U, 254U})
                     for (unsigned channels : {1U, 1U, 2U, 2U, 1U})
-                        for (unsigned frames : {1U, 32U, 513U}) {
+                        for (unsigned frames : {1U, 3U, 4U, 5U, 32U, 127U, 128U, 129U, 513U}) {
                             s_balance = int8_t(balance); s_volume = uint8_t(volume);
                             std::vector<int16_t> pcm(frames * channels), scaled;
                             for (auto &sample : pcm) {
@@ -168,10 +167,23 @@ int main() {
                                 }
                             }
                             emitted.clear();
+#if CONFIG_YORADIO_STATUS_LED
+                            status_led_capture_requested = (blocks % 2) == 0;
+                            const unsigned previous_led_blocks = led_blocks;
+#endif
                             check(native_audio_output_write(pcm.data(), pcm.size(), rate, uint8_t(channels)) == ESP_OK, "write");
                             check(pcm == scaled, "gain/mono balance changed");
 #if CONFIG_YORADIO_STATUS_LED
-                            check(led_pcm == scaled, "LED did not see post-volume PCM");
+                            unsigned expected_peak = 0;
+                            for (unsigned frame = 0; frame < std::min(frames, 128U); frame += 4) {
+                                int value = scaled[frame * channels];
+                                if (channels == 2) value = (value + scaled[frame * channels + 1]) / 2;
+                                expected_peak = std::max(expected_peak, unsigned(std::abs(value)));
+                            }
+                            if (status_led_capture_requested) {
+                                check(led_peak == expected_peak, "LED must use every fourth post-gain mono frame");
+                                check(led_blocks == previous_led_blocks + 1, "one peak publication per selected block");
+                            } else check(led_blocks == previous_led_blocks, "inactive LED snapshot must do no publication");
 #endif
                             check(emitted == expected, "PDM sequence or DMA boundary changed");
                             check(reference.same() && s_resample_phase == reference.phase, "state discontinuity");
@@ -212,7 +224,7 @@ int main() {
             fail_commit = false;
         }
 #if CONFIG_YORADIO_STATUS_LED
-        check(led_blocks >= blocks && led_clears > 0, "LED hooks not exercised");
+        check(led_blocks >= blocks / 2 && led_clears > 0, "LED hooks not exercised");
 #endif
         std::cout << "{\"pass\":true,\"blocks\":" << blocks << ",\"words\":" << words << "}\n";
     } catch (const std::exception &error) { std::cerr << error.what() << '\n'; return 1; }

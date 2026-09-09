@@ -150,6 +150,8 @@ static int16_t scale_sample(int16_t sample, uint32_t gain_q15) {
     return (int16_t)value;
 }
 
+#include "audio_gain_led.inc"
+
 #if YORADIO_ESP8266_SPI_PDM
 
 #define SPI_PDM_CHUNK_BITS 512U
@@ -504,18 +506,7 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
         ? (uint8_t)(BALANCE_DENOMINATOR - s_balance) : BALANCE_DENOMINATOR;
     uint32_t left_gain = channel_gain_q15(s_volume, left_balance);
     uint32_t right_gain = channel_gain_q15(s_volume, right_balance);
-    for (size_t frame = 0; frame < frames; ++frame) {
-        samples[frame * channels] =
-            scale_sample(samples[frame * channels], left_gain);
-        if (channels == 2) {
-            samples[frame * 2U + 1U] =
-                scale_sample(samples[frame * 2U + 1U], right_gain);
-        }
-    }
-#if CONFIG_YORADIO_STATUS_LED
-    if (status_led_capture_requested)
-        status_led_capture_pcm(samples, frames * channels, channels);
-#endif
+    output_gain_with_led(samples, frames, channels, left_gain, right_gain);
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
     trace_output_pcm(samples, frames, channels);
 #endif
@@ -951,18 +942,7 @@ static inline __attribute__((always_inline)) esp_err_t i2s_pdm_write_channels(
         ? (uint8_t)(BALANCE_DENOMINATOR - s_balance) : BALANCE_DENOMINATOR;
     uint32_t left_gain = channel_gain_q15(s_volume, left_balance);
     uint32_t right_gain = channel_gain_q15(s_volume, right_balance);
-    for (size_t frame = 0; frame < frames; ++frame) {
-        samples[frame * channels] =
-            scale_sample(samples[frame * channels], left_gain);
-        if (channels == 2) {
-            samples[frame * 2U + 1U] =
-                scale_sample(samples[frame * 2U + 1U], right_gain);
-        }
-    }
-#if CONFIG_YORADIO_STATUS_LED
-    if (status_led_capture_requested)
-        status_led_capture_pcm(samples, frames * channels, channels);
-#endif
+    output_gain_with_led(samples, frames, channels, left_gain, right_gain);
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
     trace_output_pcm(samples, frames, channels);
 #endif

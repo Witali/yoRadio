@@ -36,6 +36,21 @@ static esp_err_t gpio_config(const gpio_config_t *config) {
 
 /* LED_IMPLEMENTATION */
 
+/* Feed synthetic peaks to test the envelope independently. Actual gain-loop
+ * decimation and unchanged PCM/bits are covered by the output-dispatch test. */
+static void status_led_capture_pcm(const int16_t *pcm, size_t count, uint8_t channels) {
+    if (!pcm || (channels != 1 && channels != 2) || count < channels) return;
+    uint32_t peak = 0;
+    size_t limit = count < 64U * channels ? count : 64U * channels;
+    for (size_t i = 0; i + channels <= limit; i += channels) {
+        int32_t value = pcm[i];
+        if (channels == 2) value = (value + pcm[i + 1]) / 2;
+        uint32_t magnitude = (uint32_t)(value < 0 ? -value : value);
+        if (magnitude > peak) peak = magnitude;
+    }
+    status_led_publish_peak((uint16_t)peak);
+}
+
 static void next_update(void) { clock_tick += STATUS_LED_UPDATE_MS; status_led_poll(); }
 int main(void) {
     int16_t pcm[] = {0, -32768, 32767, -12, 3276};

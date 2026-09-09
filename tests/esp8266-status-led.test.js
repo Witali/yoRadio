@@ -10,16 +10,23 @@ test('GPIO2 hardware level LED supports NoDAC and SPI, excludes external-DAC WS'
   assert.match(read('board_config.h'), /BOARD_STATUS_LED_GPIO 2/);
   assert.match(read('board_config.h'), /BOARD_STATUS_LED_ACTIVE_LOW 1/);
   assert.match(read('Kconfig.projbuild'), /config YORADIO_STATUS_LED\s+bool[^]*?default y\s+depends on YORADIO_AUDIO_OUTPUT_SPI_PDM \|\| YORADIO_AUDIO_OUTPUT_I2S_PDM \|\| YORADIO_AUDIO_OUTPUT_I2S_RCPDM/);
-  assert.match(read('Kconfig.projbuild'), /config YORADIO_STATUS_LED_UPDATE_HZ[^]*?range 10 20\s+default 20/);
+  assert.match(read('Kconfig.projbuild'), /config YORADIO_STATUS_LED_UPDATE_HZ[^]*?range 10 20\s+default 10/);
   assert.match(read('app_main.c'), /native_audio_output_init\(\)[^]*?status_led_init\(\)[^]*?network_service_start\(\)/);
   assert.match(read('app_main.c'), /wait = status_led_wait_ticks\(wait\)/);
   assert.doesNotMatch(led, /\b(xTaskCreate|xTimerCreate|malloc|calloc|realloc|pwm_init|native_state_snapshot|vTaskDelay)\s*\(/);
   assert.match(led, /GPIO\.sigma_delta = SIGMA_DELTA_ENABLE/);
   const output = read('native_audio_output.c');
-  assert.equal((output.match(/status_led_capture_pcm\(samples, frames \* channels, channels\)/g) || []).length, 2);
+  assert.equal((output.match(/output_gain_with_led\(samples, frames, channels, left_gain, right_gain\)/g) || []).length, 2);
   assert.equal((output.match(/status_led_clear\(\)/g) || []).length, 2);
-  assert.match(output, /#if CONFIG_YORADIO_STATUS_LED\s+if \(status_led_capture_requested\)\s+status_led_capture_pcm/);
-  assert.match(led, /STATUS_LED_CAPTURE_FRAMES 64U/);
+  assert.match(read('audio_gain_led.inc'), /#if CONFIG_YORADIO_STATUS_LED\s+if \(status_led_capture_requested\)/);
+  assert.doesNotMatch(led, /const int16_t \*|status_led_capture_pcm/);
+});
+
+test('LED brightness scaling is exact without integer division for all caps/levels', () => {
+  for (let cap = 0; cap <= 255; ++cap) for (let level = 0; level <= 255; ++level) {
+    const product = level * cap + 127;
+    assert.equal((product + 1 + (product >>> 8)) >>> 8, Math.floor(product / 255));
+  }
 });
 
 for (const hz of [10, 20]) for (const activeLow of [0, 1]) {

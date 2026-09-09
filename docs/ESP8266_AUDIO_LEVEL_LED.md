@@ -9,32 +9,38 @@ External-DAC I2S needs WS and therefore excludes the LED at build time.
 
 - `CONFIG_YORADIO_STATUS_LED=y`: enabled by default for SPI-PDM, I2S-PDM and
   I2S-RCPDM. Set `n` to remove the LED implementation and PCM taps entirely.
-- `CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=20`: 50-ms envelope refresh; `10` means
-  100 ms. This is not the frequency of the electrical brightness pulses.
+- `CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=10`: default 100-ms envelope refresh;
+  `20` selects 50 ms. This is not the frequency of electrical brightness pulses.
 - `CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS=255`: cap brightness (0..255).
 - `CONFIG_YORADIO_STATUS_LED_DECAY_STEP=8`: release by 8 levels per 50 ms;
   doubled at 10 Hz. Attack is immediate at the next refresh, like C3.
 
-The production build script also accepts `-LedUpdateHz 10` (default 20) and
+The production build script also accepts `-LedUpdateHz 20` (default 10) and
 `-NoAudioLevelLed`. Use a fresh `-Variant` when changing cached SDK settings.
 
-The read-only tap runs after normalization/volume/balance. It measures the
-actual one-pin mono signal (L/R average for stereo input), retaining only
-a 16-bit peak from a snapshot of at most 64 frames once per refresh. It handles -32768 safely,
+The tap is integrated into the existing post-normalization volume/balance
+loop. Once per refresh it measures every fourth of the first 128 frames of
+one PCM block: at most 32 peak comparisons. It uses the scaled values already
+in CPU registers and the L/R average for stereo, retaining only a 16-bit peak.
+There is no second pass over PCM. It handles -32768 safely,
 does not change PCM, and stores no PCM buffer. Silent windows decay to dark;
 explicit output silence requests clear the envelope at the next refresh.
 This replaces the old Wi-Fi-connected/500-ms-blink indicator.
 
 The existing app loop updates registers; the audio task checks one volatile
-flag per PCM block. Only when requested does it scan up to 64 frames and
-publish the peak inside a short critical section. At 20 Hz this is at most
-1280 frames/second (640 at 10 Hz), rather than scanning all 48000. No clock
+flag per PCM block. Only when requested does it collect and
+publish the peak inside a short critical section. At the default 10 Hz this
+is at most 320 peak comparisons/second (640 at 20 Hz), versus up to 1280 in
+the initial LED version. All audio samples are still played. No clock
 query, critical section or register update is done on skipped PCM blocks.
 This is a cosmetic indicator: transients between snapshots can be missed,
 and it must not be used as a sample-accurate VU/clipping meter. No new task,
 timer, ISR, allocation or native-state snapshot is required. App sleep is
 bounded by the next LED update, but higher-priority work and synchronous
-services can delay a refresh: this is not a hard realtime 20-Hz guarantee.
+services can delay a refresh: this is not a hard realtime refresh guarantee.
+Default maximum brightness needs no multiply/divide; other caps use an exact
+shift/add replacement for rounded division by 255 (all 65536 input pairs tested).
+No extra persistent state was added by the integrated gain-loop implementation.
 
 ## Hardware modulation
 

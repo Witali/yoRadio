@@ -13,7 +13,6 @@
 #define STATUS_LED_DECAY ((CONFIG_YORADIO_STATUS_LED_DECAY_STEP * 20U) / \
                          CONFIG_YORADIO_STATUS_LED_UPDATE_HZ)
 #define STATUS_LED_SD_PRESCALE 255U
-#define STATUS_LED_CAPTURE_FRAMES 64U
 
 _Static_assert(BOARD_STATUS_LED_GPIO >= 0 && BOARD_STATUS_LED_GPIO < 16,
                "GPIO sigma-delta is not available on GPIO16");
@@ -71,31 +70,10 @@ esp_err_t status_led_init(void) {
     return ESP_OK;
 }
 
-void status_led_capture_pcm(const int16_t *samples, size_t count, uint8_t channels) {
-    if (!status_led_capture_requested || !samples ||
-        (channels != 1 && channels != 2) || count < channels) return;
-    /* Cosmetic level snapshot, not a sample-accurate VU meter. At 20 Hz this
-     * scans at most 1280 mono frames/second instead of the entire stream. */
-    size_t limit = STATUS_LED_CAPTURE_FRAMES * channels;
-    if (count > limit) count = limit;
-    uint32_t peak = 0;
-    if (channels == 1) {
-        for (size_t i = 0; i < count; ++i) {
-            int32_t sample = samples[i];
-            uint32_t magnitude = (uint32_t)(sample < 0 ? -sample : sample);
-            if (magnitude > peak) peak = magnitude;
-        }
-    } else {
-        /* Both one-pin backends actually play the L/R average, not max(L,R).
-         * Select the format once per block; INT16_MIN and L+R fit int32_t. */
-        for (size_t i = 0; i + 1 < count; i += 2) {
-            int32_t sample = ((int32_t)samples[i] + samples[i + 1]) / 2;
-            uint32_t magnitude = (uint32_t)(sample < 0 ? -sample : sample);
-            if (magnitude > peak) peak = magnitude;
-        }
-    }
+void status_led_publish_peak(uint16_t peak) {
+    if (!status_led_capture_requested) return;
     taskENTER_CRITICAL();
-    if (peak > s_pending_peak) s_pending_peak = (uint16_t)peak;
+    if (peak > s_pending_peak) s_pending_peak = peak;
     status_led_capture_requested = false;
     taskEXIT_CRITICAL();
 }
@@ -137,7 +115,12 @@ void status_led_poll(void) {
             ? s_envelope - STATUS_LED_DECAY : 0;
         s_envelope = (uint8_t)(released > target ? released : target);
     }
-    set_brightness((uint8_t)(((uint32_t)s_envelope *
-        CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS + 127U) / 255U));
+#if CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS == 255
+    set_brightness(s_envelope); /* No multiply/divide in the default profile. */
+#else
+    uint32_t product = (uint32_t)s_envelope * CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS + 127U;
+    /* Exact rounded /255 for the entire 0..65152 product range. */
+    set_brightness((uint8_t)((product + 1U + (product >> 8)) >> 8));
+#endif
 }
 #endif
