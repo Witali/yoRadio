@@ -1,4 +1,5 @@
 #include "audio_service.h"
+#include "web_audio_pause_config.h"
 #include "memory_profile.h"
 
 #include <errno.h>
@@ -276,6 +277,8 @@ static uint32_t advance_generation(void) {
     taskEXIT_CRITICAL();
     return generation;
 }
+
+#include "audio_web_pause.inc"
 
 static bool parse_http_url(const char *url, http_stream_url_t *parts) {
     return http_stream_parse_url(url, parts, s_host, sizeof(s_host));
@@ -998,7 +1001,9 @@ static void audio_task(void *argument) {
     log_audio_stack("start");
     while (true) {
         audio_command_t command;
-        xQueueReceive(s_commands, &command, portMAX_DELAY);
+        audio_web_pause_gate(&codec, &codec_kind);
+        if (xQueueReceive(s_commands, &command, AUDIO_WEB_QUEUE_WAIT) != pdPASS)
+            continue;
         if (!command.play) {
             native_audio_output_silence();
             release_codec(&codec, &codec_kind, "stop");
@@ -1011,10 +1016,12 @@ static void audio_task(void *argument) {
         http_stream_t stream;
         memset(&stream, 0, sizeof(stream));
         stream.socket = -1;
+        if (audio_web_pause_checkpoint(&stream, &command)) continue;
         int opened = -1;
         for (unsigned attempt = 0;
              attempt < HTTP_OPEN_ATTEMPTS &&
-             generation_current(command.generation); ++attempt) {
+             generation_current(command.generation) &&
+             !audio_web_pause_requested(); ++attempt) {
             opened = open_http_stream(command.url, &stream);
             if (opened == 0) break;
             if (attempt + 1U < HTTP_OPEN_ATTEMPTS) {
@@ -1023,6 +1030,7 @@ static void audio_task(void *argument) {
                 vTaskDelay(pdMS_TO_TICKS(250U));
             }
         }
+        if (audio_web_pause_checkpoint(&stream, &command)) continue;
         if (opened != 0 || !generation_current(command.generation)) {
             if (stream.socket >= 0) close(stream.socket);
             if (generation_current(command.generation)) {
@@ -1041,6 +1049,7 @@ static void audio_task(void *argument) {
         if (audio_until_metadata && detect_size <= audio_until_metadata)
             audio_until_metadata -= (uint32_t)detect_size;
         while (generation_current(command.generation) &&
+               !audio_web_pause_requested() &&
                !(codec_kind = helix_codec_detect(s_work, detect_size))) {
             if (detect_size == sizeof(s_work)) break;
             if (stream.metadata_interval && !audio_until_metadata) break;
@@ -1065,6 +1074,7 @@ static void audio_task(void *argument) {
                  (int)codec_kind, (unsigned)detect_size,
                  (unsigned)esp_get_free_heap_size());
 #endif
+        if (audio_web_pause_checkpoint(&stream, &command)) continue;
         if (!codec_kind || !generation_current(command.generation)) {
             close(stream.socket);
             if (generation_current(command.generation)) {
@@ -1129,7 +1139,8 @@ static void audio_task(void *argument) {
         /* Keep command latency bounded even when a profile uses a longer
          * select() wait. Normal playback never waits just to fill the queue. */
         const uint32_t wait_ms = STREAM_READ_WAIT_MS > 10U ? 10U : STREAM_READ_WAIT_MS;
-        while (feed == 0 && generation_current(command.generation)) {
+        while (feed == 0 && generation_current(command.generation) &&
+               !audio_web_pause_requested()) {
             int filled = ended ? STREAM_FILL_EOF :
                 stream_input_refill(&stream, codec, &icy, &output);
             if (filled == STREAM_FILL_CANCELLED) break;
@@ -1213,6 +1224,7 @@ static void audio_task(void *argument) {
                 output.measured_started_us = now;
             }
         }
+        if (audio_web_pause_checkpoint(&stream, &command)) continue;
         close(stream.socket);
         if (feed == 0 && generation_current(command.generation)) {
             ESP_LOGW(TAG,

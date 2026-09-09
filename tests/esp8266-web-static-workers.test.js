@@ -74,7 +74,7 @@ test("ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets", () =
 
 test("ESP8266 serves static WebUI resources on the shared HTTP task stack", () => {
   const handler = bodyFrom(webSource, "static esp_err_t static_handler", "static esp_err_t register_get");
-  assert.match(handler, /return serve_static_request\(request\)/);
+  assert.match(handler, /result = serve_static_request\(request\);[\s\S]*return result;/);
   assert.doesNotMatch(webSource, /httpd_req_async_handler_begin\(request/);
   assert.doesNotMatch(webSource, /xTaskCreate\(static_worker_task/);
   assert.doesNotMatch(webSource, /xQueueCreate\(WEB_STATIC_QUEUE_DEPTH/);

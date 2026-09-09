@@ -1,4 +1,5 @@
 #include "web_service.h"
+#include "web_audio_pause_config.h"
 #include "memory_profile.h"
 #include "json_text.h"
 
@@ -1125,7 +1126,16 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
 }
 
 static esp_err_t static_handler(httpd_req_t *request) {
-    return serve_static_request(request);
+    if (audio_service_web_pause_begin() != ESP_OK) {
+        prepare_short_response(request);
+        httpd_resp_set_status(request, "503 Service Unavailable");
+        httpd_resp_set_hdr(request, "Retry-After", "1");
+        return finish_short_response(request,
+            httpd_resp_send(request, "Audio pause timed out", HTTPD_RESP_USE_STRLEN));
+    }
+    esp_err_t result = serve_static_request(request);
+    audio_service_web_pause_end(); /* Includes failed/disconnected sends. */
+    return result;
 }
 
 static esp_err_t register_get(const char *uri, esp_err_t (*handler)(httpd_req_t *)) {
@@ -1144,6 +1154,11 @@ esp_err_t web_service_start(void) {
              (unsigned)sizeof(web_bundle_gzip));
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = 80;
+#if YORADIO_ESP8266_WEB_AUDIO_PAUSE != 0
+    /* Audio runs at 5. Preempt only while HTTP is runnable; a blocking send
+     * or delay lets audio run. Never suspend a task holding an audio lock. */
+    config.task_priority = tskIDLE_PRIORITY + 6;
+#endif
     config.stack_size = BOARD_TASK_STACK_WEB;
     config.close_fn = session_closed;
     config.open_fn = session_opened;

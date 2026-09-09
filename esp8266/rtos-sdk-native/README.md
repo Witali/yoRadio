@@ -67,6 +67,12 @@ selections, and saves the app, configuration and manifest under
 DATA is GPIO3/RX (not the temporary SPI debug output GPIO13/D7); do not send
 UART application commands while I2S owns RX.
 
+Optional HTTP/audio arbitration: `-WebAudioPause short` prioritizes the HTTP
+task without releasing the decoder; `-WebAudioPause long` cooperatively
+releases the decoder/stream during static-page loading and reconnects after
+the last request. Default: `off`. This is a build-time policy, independent of
+debug logging; see [pause modes and limitations](../../docs/ESP8266_WEB_AUDIO_PAUSE.md).
+
 Experimental low-level RC-PDM feedback, interpolation and dither are documented
 in [RC-PDM Feedback](../../docs/ESP8266_RCPDM_FEEDBACK.md). This is opt-in via
 `CONFIG_YORADIO_RCPDM_FEEDBACK`; the production PDM32 default is unchanged.

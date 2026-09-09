@@ -1,7 +1,9 @@
 param(
     [string]$SdkPath = '.worktree/esp8266-native-port/.build/esp8266-rtos-sdk',
     [ValidatePattern('^[a-zA-Z0-9_-]+$')]
-    [string]$Variant = 'esp8266-i2s-pdm-production'
+    [string]$Variant = 'esp8266-i2s-pdm-production',
+    [ValidateSet('off', 'short', 'long')]
+    [string]$WebAudioPause = 'off'
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
@@ -34,6 +36,7 @@ try {
         "-DSDKCONFIG=$taskBuild/sdkconfig", "-DSDKCONFIG_DEFAULTS=$taskBuild/production.defaults",
         '-DYORADIO_ESP8266_FIXED_I2S=OFF', '-DYORADIO_ESP8266_SPI_PDM_FAST_ISR=ON',
         '-DYORADIO_ESP8266_WEB_PROFILE=OFF',
+        "-DYORADIO_ESP8266_WEB_AUDIO_PAUSE=$WebAudioPause",
         '-DYORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK=OFF', '-DYORADIO_ESP8266_OUTPUT_COMPARE=OFF',
         '-DYORADIO_ESP8266_AUDIO_OUTPUT_TONE_TEST=OFF', '-DYORADIO_ESP8266_CODEC_RAM_BENCHMARK=OFF',
         '-DYORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT=OFF', '-DYORADIO_ESP8266_AUDIO_PROFILE=OFF',
@@ -65,6 +68,7 @@ try {
         purpose='Production native radio, I2S PDM32 DMA, error logs only; build does not flash'
         tone_test=$false
         web_profile=$false
+        web_audio_pause=$WebAudioPause
         log_level='error'
         playlist_web_gzip=[bool]$taskGzipEnabled
         built_utc=[DateTime]::UtcNow.ToString('o'); source_revision=(git rev-parse HEAD)
@@ -75,6 +79,7 @@ try {
         web_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/web_service.c).Hash
         playlist_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/playlist_service.c).Hash
         audio_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/audio_service.c).Hash
+        web_audio_pause_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/audio_web_pause.inc).Hash
         stream_wait_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_read_wait.h).Hash
         http_receive_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_txrx.c).Hash
         stream_read_wait_ms=0; stream_idle_timeout_ms=1000
