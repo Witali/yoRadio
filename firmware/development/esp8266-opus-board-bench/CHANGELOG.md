@@ -1,5 +1,34 @@
 # Experimental Opus board benchmark
 
+## 2026-09-09 — word-only MDCT/FFT flash reads
+
+OTA to app0 verified. Current artifact: 908768 bytes; see manifest for SHA.
+All five PCM fingerprints still match. No scratch borrowing in this build.
+
+| Input fixture | Before CPU | After CPU | Maximum call after |
+| --- | ---: | ---: | ---: |
+| SILK mono12 | 58.88% | 58.62% | 14.046 ms |
+| Hybrid mono24 | 115.62% | 92.98% | 20.319 ms |
+| CELT stereo64 | 99.11% | 75.85% | 17.011 ms |
+| CELT stereo128 | 120.55% | 94.73% | 21.620 ms |
+| CELT stereo510 | 198.72% | 175.44% | 38.037 ms |
+
+Audio stack now 5120 B, minimum free 1772 B. Read-ahead in THIS binary is
+still 1536 B: the existing SDK configuration retained its previous value.
+Manifest corrected to the actual sdkconfig; the builder now rejects this
+stale configuration instead of silently claiming 1024 B. The next variant
+must be configured freshly. This does not affect raw benchmark input (1536 B).
+Scratch reservation 7680 B; normal streaming still fails decoder initialization.
+Wi-Fi RSSI around -48 dBm, stopped free IRAM 28 B.
+
+Actual Intense Radio response has 1049 header bytes, exceeding the old whole-
+header limit 1023: it fails before decoder initialization. A local fixture with
+short headers reaches decoder initialization but does not yet start playback.
+Neither error is discarded from the acceptance results.
+
+`board-results.json` / `ota-results.json` describe this artifact;
+`baseline-results.json` retains the previous CPU run. No production qualification.
+
 ## 2026-09-09 — generic32 reference, first complete physical run
 
 OTA-only application update verified on Wemos D1 mini at 192.168.100.6.
