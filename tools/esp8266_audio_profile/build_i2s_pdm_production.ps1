@@ -5,7 +5,10 @@ param(
     [ValidateSet('off', 'short', 'long')]
     [string]$WebAudioPause = 'off',
     [switch]$MemoryProfile,
-    [switch]$SpiffsLog
+    [switch]$SpiffsLog,
+    [ValidateSet(10, 20)]
+    [int]$LedUpdateHz = 20,
+    [switch]$NoAudioLevelLed
 )
 $ErrorActionPreference = 'Stop'
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
@@ -31,6 +34,8 @@ try {
     $taskDefaults = Get-Content esp8266/rtos-sdk-native/sdkconfig.defaults -Raw
     $taskDefaults = $taskDefaults.Replace('CONFIG_LOG_DEFAULT_LEVEL_INFO=y', 'CONFIG_LOG_DEFAULT_LEVEL_ERROR=y')
     $taskDefaults = $taskDefaults.Replace('CONFIG_LOG_BOOTLOADER_LEVEL_WARN=y', 'CONFIG_LOG_BOOTLOADER_LEVEL_ERROR=y')
+    $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=20', "CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz")
+    if ($NoAudioLevelLed) { $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED=y', '# CONFIG_YORADIO_STATUS_LED is not set') }
     [IO.File]::WriteAllText("$taskBuild/production.defaults", $taskDefaults, (New-Object Text.UTF8Encoding($false)))
     Write-Output "Configuring $taskVariant on GPIO3/RX (no flashing)"
     $taskMemoryProfile = if ($MemoryProfile) { 'ON' } else { 'OFF' }
@@ -64,6 +69,9 @@ try {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired; use a fresh -Variant build directory" }
     }
     $taskGzipEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y\r?$'
+    $taskLedEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_STATUS_LED=y\r?$'
+    if ($taskLedEnabled -eq [bool]$NoAudioLevelLed) { throw 'Wrong cached LED profile; use a fresh -Variant build directory' }
+    if ($taskLedEnabled -and $taskConfig -notmatch "(?m)^CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz`r?$") { throw 'Wrong cached LED refresh rate; use a fresh -Variant build directory' }
     Write-Output "Building $taskVariant, CPU160, QIO40"
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/ninja/1.9.0/ninja.exe" @('-C', $taskBuild) "$taskBuild/build.log"
     New-Item -ItemType Directory -Path $taskArtifact -Force | Out-Null
@@ -75,6 +83,9 @@ try {
         web_profile=$false
         memory_profile=[bool]$MemoryProfile
         spiffs_log=[bool]$SpiffsLog
+        audio_level_led=[bool]$taskLedEnabled
+        audio_level_led_update_hz=$(if ($taskLedEnabled) { $LedUpdateHz } else { 0 })
+        audio_level_led_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/status_led.c).Hash
         spiffs_log_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/spiffs_log.c).Hash
         web_audio_pause=$WebAudioPause
         log_level='error'

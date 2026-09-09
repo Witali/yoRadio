@@ -137,8 +137,8 @@ A genuine PDM128 mode at nominally 6.144 MHz
 is compile-time selectable but remains experimental because it cannot run in
 realtime on the physical Wemos D1 mini. The NoDAC path keeps I2S clocks internal:
 it routes only DATA GPIO3 to the audio filter, not BCLK GPIO15 or WS GPIO2.
-The SPI-only status-LED build option is unchanged. Standard external-DAC I2S
-still uses its clock pins. Connect GPIO3 through the
+The GPIO2 audio-level LED is available with NoDAC I2S and SPI-PDM; standard
+external-DAC I2S still owns GPIO2 as WS and disables the LED. Connect GPIO3 through the
 documented low-pass/AC-coupling chain and then to a high-impedance amplifier
 input. The default now selects build-time `CONFIG_YORADIO_AUDIO_MONO`:
 compatible Helix MP3 M/S frames skip the side channel and use one
@@ -146,8 +146,11 @@ IMDCT/synthesis. Select `CONFIG_YORADIO_AUDIO_STEREO` or the complete
 `sdkconfig.stereo.defaults` profile to retain stereo decoding and independent
 L/R balance. The one-pin PDM backend itself remains mono in either case.
 See [mono/stereo behavior and tests](../../docs/ESP8266_MP3_MONO.md).
-The status LED is off until client Wi-Fi has an address, stays on while the
-radio is stopped, and alternates 500 ms off / 500 ms on while audio is playing.
+The ESP-12F/Wemos GPIO2 LED follows the post-volume mono PCM peak, with fast
+attack and slow release; stopped audio is dark. `CONFIG_YORADIO_STATUS_LED`
+enables it by default. `CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=20` updates every
+50 ms; select `10` for 100 ms. Hardware GPIO sigma-delta supplies the pulses,
+without software PWM interrupts. See [LED details and tests](../../docs/ESP8266_AUDIO_LEVEL_LED.md).
 The PDM profile uses a small local output-only backend instead of the RTOS SDK
 I2S driver. Peripheral/companion-link setup follows ESP8266Audio's Arduino
 backend, but output descriptors now terminate rather than forming an unguarded

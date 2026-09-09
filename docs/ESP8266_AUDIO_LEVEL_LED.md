@@ -1,0 +1,70 @@
+# ESP8266 audio-level LED
+
+GPIO2 / D4 drives the active-low blue LED on the ESP-12F module. GPIO3 / RX
+is our I2S-PDM data output; GPIO1 / TX carries the UART0 console. GPIO2 can
+alternatively be UART1 TX or I2S WS, but our NoDAC driver routes only GPIO3.
+External-DAC I2S needs WS and therefore excludes the LED at build time.
+
+## Configuration
+
+- `CONFIG_YORADIO_STATUS_LED=y`: enabled by default for SPI-PDM, I2S-PDM and
+  I2S-RCPDM. Set `n` to remove the LED implementation and PCM taps entirely.
+- `CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=20`: 50-ms envelope refresh; `10` means
+  100 ms. This is not the frequency of the electrical brightness pulses.
+- `CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS=255`: cap brightness (0..255).
+- `CONFIG_YORADIO_STATUS_LED_DECAY_STEP=8`: release by 8 levels per 50 ms;
+  doubled at 10 Hz. Attack is immediate at the next refresh, like C3.
+
+The production build script also accepts `-LedUpdateHz 10` (default 20) and
+`-NoAudioLevelLed`. Use a fresh `-Variant` when changing cached SDK settings.
+
+The read-only tap runs after normalization/volume/balance. It measures the
+actual one-pin mono signal (L/R average for stereo input), retaining only
+a 16-bit peak from a snapshot of at most 64 frames once per refresh. It handles -32768 safely,
+does not change PCM, and stores no PCM buffer. Silent windows decay to dark;
+explicit output silence requests clear the envelope at the next refresh.
+This replaces the old Wi-Fi-connected/500-ms-blink indicator.
+
+The existing app loop updates registers; the audio task checks one volatile
+flag per PCM block. Only when requested does it scan up to 64 frames and
+publish the peak inside a short critical section. At 20 Hz this is at most
+1280 frames/second (640 at 10 Hz), rather than scanning all 48000. No clock
+query, critical section or register update is done on skipped PCM blocks.
+This is a cosmetic indicator: transients between snapshots can be missed,
+and it must not be used as a sample-accurate VU/clipping meter. No new task,
+timer, ISR, allocation or native-state snapshot is required. App sleep is
+bounded by the next LED update, but higher-priority work and synchronous
+services can delay a refresh: this is not a hard realtime 20-Hz guarantee.
+
+## Hardware modulation
+
+ESP8266's SDK PWM is interrupt-driven. Instead this implementation reserves
+the single GPIO sigma-delta generator, selects it as GPIO2's source and uses
+the SDK register definitions. It does not change I2S, SLC-DMA, UART or their
+interrupts. No other component may use this global sigma-delta generator.
+
+The raw target is a high-level density out of 256, inverted for this LED.
+Prescaler 255 gives a 312.5-kHz bit clock from 80 MHz; pulse repetition varies
+with density (minimum about 1.22 kHz), rather than classic constant-period
+PWM. Exact off/full brightness bypass modulation and use normal GPIO levels.
+Software does not service individual pulses.
+
+References: [Espressif TRM, GPIO/I2S/UART and register appendix](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf),
+[SDK PWM interrupt implementation](https://docs.espressif.com/projects/esp8266-rtos-sdk/en/latest/api-guides/pwm-and-sniffer-coexists.html),
+[NodeMCU sigma-delta target/timing documentation](https://nodemcu.readthedocs.io/en/release/modules/sigma-delta/).
+The raw unsigned target convention follows the working NodeMCU interface;
+the TRM's description calls the target byte signed.
+
+## Verification
+
+`node --test tests/esp8266-status-led.test.js` compiles the real C module with
+mock GPIO/ticks at 10/20 Hz and both LED polarities. Cases cover all brightness
+levels, bounded snapshots, skipped blocks, release, exact endpoints, stereo cancellation,
+INT16_MIN, stop/restart, initialization failure, tick wrap, preserved other
+GPIOs and unchanged input PCM. It does not emulate the electrical peripheral.
+
+`node --test tests/esp8266-output-channel-dispatch.test.js` checks real output
+code with LED hooks enabled/disabled across PDM, RCPDM, feedback and simple
+variants. PCM, output bits, resampler state and DMA boundaries must match
+the existing reference. Physical brightness, RF coupling and CPU cost must
+still be checked on the board; host correctness tests cannot establish them.

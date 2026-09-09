@@ -73,6 +73,18 @@ static void native_audio_normalizer_process(int16_t *, size_t, uint8_t channels)
 }
 static void native_audio_output_reload_settings() {}
 
+#if CONFIG_YORADIO_STATUS_LED
+static volatile bool status_led_capture_requested = true;
+static unsigned led_blocks, led_clears;
+static std::vector<int16_t> led_pcm;
+static void status_led_capture_pcm(const int16_t *samples, size_t count, uint8_t channels) {
+    check(channels == normalized_channels, "LED wrong channel count");
+    led_pcm.assign(samples, samples + count);
+    ++led_blocks;
+}
+static void status_led_clear() { ++led_clears; }
+#endif
+
 #include "output_under_test.inc"
 
 struct Reference {
@@ -158,6 +170,9 @@ int main() {
                             emitted.clear();
                             check(native_audio_output_write(pcm.data(), pcm.size(), rate, uint8_t(channels)) == ESP_OK, "write");
                             check(pcm == scaled, "gain/mono balance changed");
+#if CONFIG_YORADIO_STATUS_LED
+                            check(led_pcm == scaled, "LED did not see post-volume PCM");
+#endif
                             check(emitted == expected, "PDM sequence or DMA boundary changed");
                             check(reference.same() && s_resample_phase == reference.phase, "state discontinuity");
                             check(normalized_channels == channels, "normalizer format");
@@ -196,6 +211,9 @@ int main() {
             check(reference.same() && s_resample_phase == 48000, "commit error state");
             fail_commit = false;
         }
+#if CONFIG_YORADIO_STATUS_LED
+        check(led_blocks >= blocks && led_clears > 0, "LED hooks not exercised");
+#endif
         std::cout << "{\"pass\":true,\"blocks\":" << blocks << ",\"words\":" << words << "}\n";
     } catch (const std::exception &error) { std::cerr << error.what() << '\n'; return 1; }
 }

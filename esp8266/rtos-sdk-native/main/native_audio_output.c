@@ -12,6 +12,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "sdkconfig.h"
+#if CONFIG_YORADIO_STATUS_LED
+#include "status_led.h"
+#endif
 #if YORADIO_ESP8266_SPI_PDM
 #include "driver/gpio.h"
 #include "driver/spi.h"
@@ -509,6 +512,10 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
                 scale_sample(samples[frame * 2U + 1U], right_gain);
         }
     }
+#if CONFIG_YORADIO_STATUS_LED
+    if (status_led_capture_requested)
+        status_led_capture_pcm(samples, frames * channels, channels);
+#endif
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
     trace_output_pcm(samples, frames, channels);
 #endif
@@ -535,6 +542,9 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
 }
 
 void native_audio_output_silence(void) {
+#if CONFIG_YORADIO_STATUS_LED
+    status_led_clear();
+#endif
     if (!s_spi_initialized) return;
     esp_err_t result = spi_pdm_wait_idle();
     spi_pdm_chunk_t *silence = NULL;
@@ -949,6 +959,10 @@ static inline __attribute__((always_inline)) esp_err_t i2s_pdm_write_channels(
                 scale_sample(samples[frame * 2U + 1U], right_gain);
         }
     }
+#if CONFIG_YORADIO_STATUS_LED
+    if (status_led_capture_requested)
+        status_led_capture_pcm(samples, frames * channels, channels);
+#endif
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
     trace_output_pcm(samples, frames, channels);
 #endif
@@ -1038,6 +1052,9 @@ esp_err_t native_audio_output_write(int16_t *samples, size_t sample_count,
 }
 
 void native_audio_output_silence(void) {
+#if CONFIG_YORADIO_STATUS_LED
+    status_led_clear();
+#endif
     if (!s_i2s_started) return;
     i2s_pdm_writer_t writer = {
         .deadline = xTaskGetTickCount() +

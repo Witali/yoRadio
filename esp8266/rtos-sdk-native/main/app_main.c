@@ -126,6 +126,9 @@ void app_main(void) {
         status_led_poll();
 #endif
         TickType_t wait = input_service_wait_ticks(pdMS_TO_TICKS(250));
+#if CONFIG_YORADIO_STATUS_LED
+        wait = status_led_wait_ticks(wait);
+#endif
         ulTaskNotifyTake(pdTRUE, wait);
     }
 #endif

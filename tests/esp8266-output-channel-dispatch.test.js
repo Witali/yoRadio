@@ -15,8 +15,8 @@ function section(source, start, end) {
   return source.slice(a, b);
 }
 
-for (const backend of ['pdm', 'rcpdm', 'feedback', 'simple']) {
-  test(`I2S ${backend}: format dispatch preserves PCM, bits, state and DMA boundaries`, t => {
+for (const led of [0, 1]) for (const backend of ['pdm', 'rcpdm', 'feedback', 'simple']) {
+  test(`I2S ${backend} LED=${led}: format dispatch preserves PCM, bits, state and DMA boundaries`, t => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'yoradio-channel-dispatch-'));
     t.after(() => fs.rmSync(dir, {recursive: true, force: true}));
     const source = fs.readFileSync(path.join(main, 'native_audio_output.c'), 'utf8').replace(/\r\n/g, '\n');
@@ -26,6 +26,7 @@ for (const backend of ['pdm', 'rcpdm', 'feedback', 'simple']) {
     assert.match(i2s, /return s_i2s_pdm_write\(samples, sample_count, sample_rate\)/);
     fs.writeFileSync(path.join(dir, 'output_under_test.inc'), common + i2s);
     const flags = [
+      `CONFIG_YORADIO_STATUS_LED=${led}`,
       `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM=${backend !== 'pdm' ? 1 : 0}`,
       `CONFIG_YORADIO_RCPDM_FEEDBACK=${backend === 'feedback' ? 1 : 0}`,
       `RCPDM_TEST_SIMPLE=${backend === 'simple' ? 1 : 0}`,
