@@ -13,9 +13,10 @@ test('native defaults and production manifest use a 4 KiB compressed input', () 
   assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /stream_input_bytes=4096/);
 });
 
-for (const opusEnabled of [false, true]) {
+for (const opusInput of [0, 1024, 1536]) {
+const opusEnabled = opusInput !== 0;
 test('real codec bridge and arena pair every allocation/free through OOM and switches' +
-  (opusEnabled ? ' with Opus enabled' : ' with Opus disabled'), t => {
+  (opusEnabled ? ' with Opus input ' + opusInput : ' with Opus disabled'), t => {
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'yoradio-lifecycle-'));
   t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
   const audio=path.join(root,'yoRadio/src/audioI2S');
@@ -28,7 +29,7 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
     path.join(root,'esp8266/rtos-sdk-native/components/opus_decoder')];
   const defines=['YORADIO_ESP8266_NATIVE=1','YORADIO_HELIX_MP3_MONO=1','YORADIO_HELIX_MP3_SSO=1',
     'YORADIO_ESP8266_AAC_BLOCK_OUTPUT=1','YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES=512','CONFIG_YORADIO_STREAM_INPUT_BYTES=4096',
-    'CONFIG_YORADIO_OGG_OPUS=' + Number(opusEnabled), 'CONFIG_YORADIO_OPUS_INPUT_BYTES=1536',
+    'CONFIG_YORADIO_OGG_OPUS=' + Number(opusEnabled), 'CONFIG_YORADIO_OPUS_INPUT_BYTES=' + (opusInput || 1024),
     'CONFIG_YORADIO_OPUS_SCRATCH_BYTES=7680', 'PROGMEM='];
   const exe=path.join(dir,process.platform==='win32'?'test.exe':'test');
   let build;
@@ -52,7 +53,7 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
   assert.match(run.stdout,/Codec lifecycle PASS/);
   t.diagnostic(run.stdout.trim());
   if (opusEnabled) {
-    assert.match(run.stdout,/Opus input 1536, scratch 7680, reserve and allocation-free reset PASS/);
+    assert.ok(run.stdout.includes('Opus input ' + opusInput + ', scratch 7680, reserve and allocation-free reset PASS'));
     const fallback=spawnSync(exe,['--dram-arena'],{encoding:'utf8',timeout:60000});
     assert.equal(fallback.status,0,fallback.stdout+'\n'+fallback.stderr);
     assert.match(fallback.stdout,/Opus refuses DRAM fallback arena without leaking/);

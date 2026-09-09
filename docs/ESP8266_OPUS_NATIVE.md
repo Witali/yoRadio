@@ -62,7 +62,7 @@ OOM возвращается через C-only boundary, сбрасывает de
 | DRAM scratch reservation | 7680 Б |
 | Ogg + adapter, host x64 | 2040 Б, включая packet buffer |
 | PCM | 1920 Б, один mono frame до 20 мс |
-| Opus read-ahead | 1536 Б, отдельная настройка; MP3/AAC по-прежнему 4096 Б |
+| Opus read-ahead | 1024 Б, отдельная настройка; MP3/AAC по-прежнему 4096 Б |
 | Audio task stack при включённом Opus | 5120 Б вместо 4096 Б |
 
 Это не размер всей прошивки и не свободная память платы. Heap allocator,

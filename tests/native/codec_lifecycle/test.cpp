@@ -128,7 +128,7 @@ static const helix_codec_kind_t kinds[] = {
 };
 
 static void capacity_and_owner(helix_codec_t *c, helix_codec_kind_t kind) {
-    const size_t expected = kind == HELIX_CODEC_OPUS ? 1536 : 4096;
+    const size_t expected = kind == HELIX_CODEC_OPUS ? CONFIG_YORADIO_OPUS_INPUT_BYTES : 4096;
     assert(helix_codec_input_capacity() == 4096);
     assert(helix_codec_active_input_capacity(c) == expected);
     assert(helix_codec_buffered(c) == 0);
@@ -289,8 +289,8 @@ static void opus_reserve_and_init_failures(const std::map<void *, size_t> &basel
         helix_codec_destroy(c); clean(baseline);
         reported_free_heap = 65536;
     }
-    printf("Opus input 1536, scratch %u, reserve and allocation-free reset PASS\n",
-           unsigned(CONFIG_YORADIO_OPUS_SCRATCH_BYTES));
+    printf("Opus input %u, scratch %u, reserve and allocation-free reset PASS\n",
+           unsigned(CONFIG_YORADIO_OPUS_INPUT_BYTES), unsigned(CONFIG_YORADIO_OPUS_SCRATCH_BYTES));
 }
 
 struct PcmOutput { unsigned blocks; size_t samples; bool cancel; };

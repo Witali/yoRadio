@@ -46,7 +46,7 @@ try {
     $taskDefaults = $taskDefaults.Replace('CONFIG_LOG_BOOTLOADER_LEVEL_WARN=y', 'CONFIG_LOG_BOOTLOADER_LEVEL_ERROR=y')
     $taskDefaults = $taskDefaults -replace 'CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=\d+', "CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz"
     if ($NoAudioLevelLed) { $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED=y', '# CONFIG_YORADIO_STATUS_LED is not set') }
-    if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=1536`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=7680`n" }
+    if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=1024`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=7680`n" }
     if ($OpusBenchmark) {
         $taskDefaults += "`nCONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y`nCONFIG_FREERTOS_RUN_TIME_STATS_USING_ESP_TIMER=y`n"
         $OpusBenchmarkFixtures = (Resolve-Path $OpusBenchmarkFixtures).Path.Replace('\', '/')
@@ -106,7 +106,7 @@ try {
         purpose=$(if ($EnableOpus) { 'Experimental Opus native radio, I2S PDM32 DMA; not device-qualified; build does not flash' } elseif ($Diagnostic) { 'Diagnostic native radio, I2S PDM32 DMA, error logs only; build does not flash' } else { 'Production native radio, I2S PDM32 DMA, UART error logs only; build does not flash' })
         diagnostic=[bool]$Diagnostic
         experimental_opus=[bool]$taskOpusEnabled
-        opus_input_bytes=$(if ($taskOpusEnabled) { 1536 } else { 0 })
+        opus_input_bytes=$(if ($taskOpusEnabled) { 1024 } else { 0 })
         opus_scratch_bytes=$(if ($taskOpusEnabled) { 7680 } else { 0 })
         opus_benchmark=[bool]$OpusBenchmark
         opus_max_packet_ms=$(if ($taskOpusEnabled) { 20 } else { 0 })

@@ -67,7 +67,7 @@ config YORADIO_OPUS_INPUT_BYTES
     int "Opus compressed read-ahead bytes"
     depends on YORADIO_OGG_OPUS
     range 1024 4096
-    default 1536
+    default 1024
     help
         Separate from the unchanged MP3/AAC read-ahead size. The Ogg parser
         consumes partial packets incrementally into its bounded packet buffer.
