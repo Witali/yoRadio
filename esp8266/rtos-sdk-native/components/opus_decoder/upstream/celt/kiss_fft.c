@@ -41,6 +41,19 @@
 #include "mathops.h"
 #include "stack_alloc.h"
 
+#if defined(YORADIO_OPUS_BOUNDED) && defined(FIXED_POINT)
+#define FFT_TABLE16(value) yoradio_opus_table_read16(&(value))
+/* Read each packed r/i pair once, before the multiply macro reuses it. */
+#define C_MUL_TABLE(m,a,b) do { \
+    const yoradio_opus_table_pair packed = yoradio_opus_table_load_pair(&(b)); \
+    const kiss_twiddle_cpx twiddle = {packed.half[0], packed.half[1]}; \
+    C_MUL(m,a,twiddle); \
+} while (0)
+#else
+#define FFT_TABLE16(value) (value)
+#define C_MUL_TABLE(m,a,b) C_MUL(m,a,b)
+#endif
+
 /* The guts header contains all the multiplication and addition macros that are defined for
    complex numbers.  It also delares the kf_ internal functions.
 */
@@ -146,9 +159,9 @@ static void kf_bfly4(
          /* m is guaranteed to be a multiple of 4. */
          for (j=0;j<m;j++)
          {
-            C_MUL(scratch[0],Fout[m] , *tw1 );
-            C_MUL(scratch[1],Fout[m2] , *tw2 );
-            C_MUL(scratch[2],Fout[m3] , *tw3 );
+            C_MUL_TABLE(scratch[0],Fout[m] , *tw1 );
+            C_MUL_TABLE(scratch[1],Fout[m2] , *tw2 );
+            C_MUL_TABLE(scratch[2],Fout[m3] , *tw3 );
 
             C_SUB( scratch[5] , *Fout, scratch[1] );
             C_ADDTO(*Fout, scratch[1]);
@@ -204,8 +217,8 @@ static void kf_bfly3(
       k=m;
       do {
 
-         C_MUL(scratch[1],Fout[m] , *tw1);
-         C_MUL(scratch[2],Fout[m2] , *tw2);
+         C_MUL_TABLE(scratch[1],Fout[m] , *tw1);
+         C_MUL_TABLE(scratch[2],Fout[m2] , *tw2);
 
          C_ADD(scratch[3],scratch[1],scratch[2]);
          C_SUB(scratch[0],scratch[1],scratch[2]);
@@ -272,10 +285,10 @@ static void kf_bfly5(
       for ( u=0; u<m; ++u ) {
          scratch[0] = *Fout0;
 
-         C_MUL(scratch[1] ,*Fout1, tw[u*fstride]);
-         C_MUL(scratch[2] ,*Fout2, tw[2*u*fstride]);
-         C_MUL(scratch[3] ,*Fout3, tw[3*u*fstride]);
-         C_MUL(scratch[4] ,*Fout4, tw[4*u*fstride]);
+         C_MUL_TABLE(scratch[1] ,*Fout1, tw[u*fstride]);
+         C_MUL_TABLE(scratch[2] ,*Fout2, tw[2*u*fstride]);
+         C_MUL_TABLE(scratch[3] ,*Fout3, tw[3*u*fstride]);
+         C_MUL_TABLE(scratch[4] ,*Fout4, tw[4*u*fstride]);
 
          C_ADD( scratch[7],scratch[1],scratch[4]);
          C_SUB( scratch[10],scratch[1],scratch[4]);
@@ -533,19 +546,19 @@ void opus_fft_impl(const kiss_fft_state *st,kiss_fft_cpx *fout)
     fstride[0] = 1;
     L=0;
     do {
-       p = st->factors[2*L];
-       m = st->factors[2*L+1];
+       p = FFT_TABLE16(st->factors[2*L]);
+       m = FFT_TABLE16(st->factors[2*L+1]);
        fstride[L+1] = fstride[L]*p;
        L++;
     } while(m!=1);
-    m = st->factors[2*L-1];
+    m = FFT_TABLE16(st->factors[2*L-1]);
     for (i=L-1;i>=0;i--)
     {
        if (i!=0)
-          m2 = st->factors[2*i-1];
+          m2 = FFT_TABLE16(st->factors[2*i-1]);
        else
           m2 = 1;
-       switch (st->factors[2*i])
+       switch (FFT_TABLE16(st->factors[2*i]))
        {
        case 2:
           kf_bfly2(fout, m, fstride[i]);

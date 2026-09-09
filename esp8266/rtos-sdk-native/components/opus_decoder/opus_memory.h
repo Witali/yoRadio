@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <setjmp.h>
+#include <string.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,6 +24,28 @@ static inline int32_t yoradio_opus_load32(const int32_t *p) {
 }
 static inline void yoradio_opus_store32(int32_t *p, int32_t value) {
     *(volatile int32_t *)p = value;
+}
+/* Audited static flash tables only: every addressed halfword must belong to
+ * a complete, readable, four-byte-aligned word. Native MDCT/FFT tables meet
+ * this condition. Union halves preserve host byte order for PCM regressions. */
+typedef union { uint32_t word; int16_t half[2]; } yoradio_opus_table_pair;
+static inline yoradio_opus_table_pair yoradio_opus_table_load_pair(const void *p) {
+    yoradio_opus_table_pair value;
+#if defined(__XTENSA__)
+    /* Do not let the compiler narrow this flash load to exception-emulated
+     * l16si/l16ui instructions when it consumes the individual halves. */
+    value.word = *(const volatile uint32_t *)p;
+#else
+    /* Avoid effective-type/alignment assumptions in portable host builds. */
+    memcpy(&value.word, p, sizeof(value.word));
+#endif
+    return value;
+}
+static inline int16_t yoradio_opus_table_read16(const int16_t *p) {
+    uintptr_t address = (uintptr_t)p;
+    yoradio_opus_table_pair value =
+        yoradio_opus_table_load_pair((const void *)(address & ~(uintptr_t)3U));
+    return address & 2U ? value.half[1] : value.half[0];
 }
 void yoradio_opus_copy(void *to, const void *from, size_t count, size_t size);
 void yoradio_opus_clear(void *to, size_t count, size_t size);

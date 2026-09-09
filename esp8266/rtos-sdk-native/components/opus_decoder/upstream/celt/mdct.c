@@ -269,9 +269,17 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
       {
          int rev;
          kiss_fft_scalar yr, yi;
+#if defined(YORADIO_OPUS_BOUNDED) && defined(FIXED_POINT)
+         const kiss_twiddle_scalar t0 = yoradio_opus_table_read16(&t[i]);
+         const kiss_twiddle_scalar t1 = yoradio_opus_table_read16(&t[N4+i]);
+         rev = yoradio_opus_table_read16(bitrev++);
+         yr = ADD32_ovflw(S_MUL(*xp2, t0), S_MUL(*xp1, t1));
+         yi = SUB32_ovflw(S_MUL(*xp1, t0), S_MUL(*xp2, t1));
+#else
          rev = *bitrev++;
          yr = ADD32_ovflw(S_MUL(*xp2, t[i]), S_MUL(*xp1, t[N4+i]));
          yi = SUB32_ovflw(S_MUL(*xp1, t[i]), S_MUL(*xp2, t[N4+i]));
+#endif
          /* We swap real and imag because we use an FFT instead of an IFFT. */
          yp[2*rev+1] = yr;
          yp[2*rev] = yi;
@@ -298,8 +306,13 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
          /* We swap real and imag because we're using an FFT instead of an IFFT. */
          re = yp0[1];
          im = yp0[0];
+#if defined(YORADIO_OPUS_BOUNDED) && defined(FIXED_POINT)
+         t0 = yoradio_opus_table_read16(&t[i]);
+         t1 = yoradio_opus_table_read16(&t[N4+i]);
+#else
          t0 = t[i];
          t1 = t[N4+i];
+#endif
          /* We'd scale up by 2 here, but instead it's done when mixing the windows */
          yr = ADD32_ovflw(S_MUL(re,t0), S_MUL(im,t1));
          yi = SUB32_ovflw(S_MUL(re,t1), S_MUL(im,t0));
@@ -309,8 +322,13 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
          yp0[0] = yr;
          yp1[1] = yi;
 
+#if defined(YORADIO_OPUS_BOUNDED) && defined(FIXED_POINT)
+         t0 = yoradio_opus_table_read16(&t[(N4-i-1)]);
+         t1 = yoradio_opus_table_read16(&t[(N2-i-1)]);
+#else
          t0 = t[(N4-i-1)];
          t1 = t[(N2-i-1)];
+#endif
          /* We'd scale up by 2 here, but instead it's done when mixing the windows */
          yr = ADD32_ovflw(S_MUL(re,t0), S_MUL(im,t1));
          yi = SUB32_ovflw(S_MUL(re,t1), S_MUL(im,t0));
@@ -333,8 +351,15 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
          kiss_fft_scalar x1, x2;
          x1 = *xp1;
          x2 = *yp1;
+#if defined(YORADIO_OPUS_BOUNDED) && defined(FIXED_POINT)
+         const opus_val16 w1 = yoradio_opus_table_read16(wp1);
+         const opus_val16 w2 = yoradio_opus_table_read16(wp2);
+         *yp1++ = SUB32_ovflw(MULT16_32_Q15(w2, x2), MULT16_32_Q15(w1, x1));
+         *xp1-- = ADD32_ovflw(MULT16_32_Q15(w1, x2), MULT16_32_Q15(w2, x1));
+#else
          *yp1++ = SUB32_ovflw(MULT16_32_Q15(*wp2, x2), MULT16_32_Q15(*wp1, x1));
          *xp1-- = ADD32_ovflw(MULT16_32_Q15(*wp1, x2), MULT16_32_Q15(*wp2, x1));
+#endif
          wp1++;
          wp2--;
       }

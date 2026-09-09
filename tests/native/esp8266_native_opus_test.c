@@ -1,5 +1,6 @@
 #include "native_opus.h"
 #include "opus.h"
+#include "opus_memory.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -125,6 +126,19 @@ static void test_alignment(void) {
         assert(iram.bytes[i]==0xa5 && iram.bytes[4+c.iram_bytes+i]==0xa5);
     }
 }
+static void test_flash_table_reads(void) {
+    /* Both halfword positions, every signed16 value, including the extrema.
+     * Use full uint32 storage so the aligned read never crosses an object. */
+    for(unsigned value=0;value<65536;++value) {
+        yoradio_opus_table_pair table;
+        table.half[0]=(int16_t)((int)value-32768);
+        table.half[1]=(int16_t)(32767-(int)value);
+        yoradio_opus_table_pair pair=yoradio_opus_table_load_pair(&table);
+        assert(pair.half[0]==table.half[0] && pair.half[1]==table.half[1]);
+        assert(yoradio_opus_table_read16(&table.half[0])==table.half[0]);
+        assert(yoradio_opus_table_read16(&table.half[1])==table.half[1]);
+    }
+}
 static void test_headers(void) {
     const unsigned ch[]={0,3,1,1,1},version[]={1,1,16,1,1},mapping[]={0,0,0,1,0};
     const size_t sizes[]={19,19,19,19,20};
@@ -197,7 +211,7 @@ static void test_chains(void) {
     assert(gain==512 && decoder.input_channels==2 && decoder.pre_skip==240);
 }
 int main(void) {
-    test_memory();test_alignment();test_headers();test_granules();test_failures();test_chains();
+    test_memory();test_alignment();test_flash_table_reads();test_headers();test_granules();test_failures();test_chains();
     assert(allocation_count==0);
     printf("Native Opus PASS: state=%zu adapter=%zu PCM=%zu no allocations\n",native_opus_decoder_size(),sizeof(decoder),sizeof(pcm));
     return 0;
