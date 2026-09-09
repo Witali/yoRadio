@@ -3,6 +3,23 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Maintenance - 2026-09-09: remove obsolete test images
+
+- Removed 54 test/experimental directories from `development/`: isolated
+  MP3/AAC and DMA benchmarks, audio/memory/TCP profiles, network sweeps,
+  libmad and network-reader experiments, RC-PDM comparison builds, temporary
+  SPI debug/tone images and alternate WebUI-pause A/B builds.
+- Moved all 195 files (31,322,401 bytes, 29.87 MiB) into the ignored local
+  safety archive `.build/firmware-test-archive-2026-09-09/`, including eight
+  untracked files. This cleans `firmware/`, not the total disk or Git/LFS
+  history. Previously tracked artifacts remain recoverable at `904394b`.
+- Verified SHA-256 for every archived file and all 117 retained firmware
+  files. Releases `0.9.721` through `0.9.724`, current logging-enabled radio,
+  logging-disabled radio, ordinary variants and the modified WebRadio binary
+  were preserved byte-for-byte. No firmware was rebuilt or flashed.
+- Source code, test scripts, benchmark reports and unrelated working-tree
+  changes are unchanged. Earlier entries below remain historical records.
+
 ## Development - 2026-09-08: HTTP receive throughput and CPU accounting
 
 - Added opt-in native network benchmarks with the same decoder allocations,

@@ -24,6 +24,27 @@ git lfs install
 git lfs pull
 ```
 
+## Test-image cleanup (2026-09-09)
+
+Obsolete benchmark, tone-generator, profiling and experimental A/B image
+directories were removed from `development/`. Their previously tracked
+images, manifests and configurations remain in Git history at `904394b`
+(binary recovery requires the corresponding Git LFS objects). Historical
+changelog paths may therefore refer to files no longer in the current tree.
+Test sources, build profiles and measurement reports under `docs/` were not
+removed.
+
+The local safety archive is `.build/firmware-test-archive-2026-09-09/` at the
+repository root. It also contains eight previously untracked files which
+cannot be recovered from Git. This archive is ignored and is not uploaded.
+
+Versioned releases, ordinary radio images and the current ESP8266
+`esp8266-spiffs-log` / `esp8266-spiffs-log-off` profiles remain available.
+Retained historical radio images are not necessarily the latest firmware;
+check their manifests and changelogs before flashing.
+
+## Artifact contents
+
 Each variant directory contains:
 
 - `app.bin` — application image for OTA/WebUI updates;
