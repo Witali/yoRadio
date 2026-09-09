@@ -36,3 +36,8 @@ copied SDK overlay manifest in the firmware artifact. `/api/native/audio` adds
 the eight named counters only with this flag, using the existing serialized
 1088-byte HTTP scratch. The health JSON host test covers both flags and maximum
 32-bit values with ASan/UBSan; no additional response heap allocation is needed.
+
+The same diagnostic JSON includes `reset_reason` from the SDK's boot-latched
+`esp_reset_reason()`: 1 power-on, 3 software restart, 4 panic, 5 interrupt WDT,
+6 task WDT, 7 other WDT, 9 brownout. This adds no application counter state.
+A reason sampled after OTA describes that OTA reboot, not an earlier failure.

@@ -1146,6 +1146,7 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
         ",\"rx_custom_fail\":%u,\"rx_enqueue_nomem\":%u,\"rx_enqueue_full\":%u"
         ",\"tx_transform_fail\":%u,\"tx_driver_fail\":%u"
         ",\"rx_custom_live\":%u,\"rx_custom_peak\":%u,\"rx_custom_total\":%u"
+        ",\"reset_reason\":%u"
 #endif
         "}",
         (unsigned)health.generation, (unsigned)health.uptime_ms,
@@ -1165,6 +1166,7 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
         (unsigned)rx_diag.rx_enqueue_full, (unsigned)rx_diag.tx_transform_fail,
         (unsigned)rx_diag.tx_driver_fail, (unsigned)rx_diag.rx_custom_live,
         (unsigned)rx_diag.rx_custom_peak, (unsigned)rx_diag.rx_custom_total
+        , (unsigned)esp_reset_reason()
 #endif
     );
     httpd_resp_set_type(request, "application/json; charset=utf-8");

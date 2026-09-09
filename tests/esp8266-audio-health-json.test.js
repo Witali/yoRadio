@@ -29,7 +29,7 @@ test('health JSON preserves counters and gates transport fields without a stack 
     assert.equal(result.generation, 0xffffffff);
     assert.equal(result.free_iram, 0xffffffff);
     for (const field of ['rx_custom_fail', 'rx_enqueue_nomem', 'rx_enqueue_full',
-      'tx_transform_fail', 'tx_driver_fail', 'rx_custom_live', 'rx_custom_peak', 'rx_custom_total']) {
+      'tx_transform_fail', 'tx_driver_fail', 'rx_custom_live', 'rx_custom_peak', 'rx_custom_total', 'reset_reason']) {
       assert.equal(field in result, !!rxDiag);
       if (rxDiag) assert.equal(result[field], 0xffffffff);
     }
