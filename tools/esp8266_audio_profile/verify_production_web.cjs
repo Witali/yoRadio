@@ -5,6 +5,8 @@ const fs=require('node:fs'),path=require('node:path');
 const {chromium}=require('playwright');
 const args=process.argv.slice(2),opt=(k,d)=>args.includes(k)?args[args.indexOf(k)+1]:d;
 const base=opt('--base','http://192.168.100.6');
+const tabs=Number(opt('--tabs','2'));
+if(![1,2].includes(tabs))throw Error('--tabs must be 1 or 2');
 const output=opt('--output','.build/esp8266-network-cpu/production-web.json');
 const report={started:new Date().toISOString(),base,loads:[],actions:[],errors:[],sockets:[],health:[]};
 const pages=[],messages=[];let browser,originalVolume;
@@ -24,7 +26,7 @@ async function health(label) {
 async function waitVolume(after,expected) {
   const end=Date.now()+12000;
   while(Date.now()<end) {
-    const found=[0,1].map(tab=>messages.find(m=>m.tab===tab&&m.at>=after&&Number(value(m.data,'volume'))===expected));
+    const found=pages.map((_,tab)=>messages.find(m=>m.tab===tab&&m.at>=after&&Number(value(m.data,'volume'))===expected));
     if(found.every(Boolean))return found.map(m=>m.at-after);
     await sleep(25);
   }
@@ -32,7 +34,7 @@ async function waitVolume(after,expected) {
 }
 async function main() {
   browser=await chromium.launch({channel:opt('--channel','msedge'),headless:true});
-  for(let tab=0;tab<2;tab++) {
+  for(let tab=0;tab<tabs;tab++) {
     const page=await browser.newPage({viewport:{width:tab?390:1200,height:800}});pages.push(page);
     page.on('pageerror',e=>report.errors.push({tab,error:e.message}));
     page.on('requestfailed',r=>report.errors.push({tab,path:new URL(r.url()).pathname,error:r.failure()?.errorText}));
@@ -58,7 +60,7 @@ async function main() {
   }
   await health('two-tabs-before');
   for(let trial=0;trial<10;trial++) {
-    const tab=trial%2,current=await state(pages[tab]);
+    const tab=trial%tabs,current=await state(pages[tab]);
     const selector=current.volume>=254?'#volmbutton':current.volume<=0?'#volpbutton':trial%2?'#volpbutton':'#volmbutton';
     const start=Date.now();await pages[tab].locator(selector).click();
     const end=Date.now()+12000;let own;
@@ -77,7 +79,7 @@ async function main() {
   report.beforeClose=await Promise.all(pages.map(state));
   fs.mkdirSync(path.dirname(output),{recursive:true});
   for(let tab=0;tab<pages.length;tab++)await pages[tab].screenshot({path:output.replace(/\.json$/,`-tab${tab}.png`),fullPage:true});
-  report.pass=report.actions.length===10&&report.sockets.length===2&&report.sockets.every(s=>!s.closed&&s.frames>0)&&!report.errors.length;
+  report.pass=report.actions.length===10&&report.sockets.length===tabs&&report.sockets.every(s=>!s.closed&&s.frames>0)&&!report.errors.length;
 }
 main().catch(e=>{report.fatal=e.stack;report.pass=false;}).finally(async()=>{
   if(pages[0]&&Number.isFinite(originalVolume)) {
