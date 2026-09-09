@@ -14,7 +14,9 @@ param(
     [switch]$EnableOpus,
     [switch]$NoSpiffsCache,
     [switch]$OpusWordAsm,
+    [switch]$OpusIcdfFlashWord,
     [switch]$Pdm32Iram,
+    [switch]$Pdm32Batch,
     [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
     [string]$OpusBenchmarkFixtures = '.build/esp8266-opus-board-fixtures'
@@ -27,7 +29,9 @@ if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -Spiff
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
 if ($OpusStreamTest -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusStreamTest requires -Diagnostic and -EnableOpus' }
 if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOpus' }
+if ($OpusIcdfFlashWord -and -not $EnableOpus) { throw '-OpusIcdfFlashWord requires -EnableOpus' }
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
+if ($Pdm32Batch -and -not $Diagnostic) { throw '-Pdm32Batch requires -Diagnostic until board qualification' }
 if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
 $taskOpusStreamTestEnabled = [bool]($OpusStreamTest -or $OpusBenchmark)
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
@@ -106,7 +110,9 @@ try {
     $taskOpusBenchmark = if ($OpusBenchmark) { 'ON' } else { 'OFF' }
     $taskOpusStreamTest = if ($taskOpusStreamTestEnabled) { 'ON' } else { 'OFF' }
     $taskOpusWordAsm = if ($OpusWordAsm) { 'ON' } else { 'OFF' }
+    $taskOpusIcdfFlashWord = if ($OpusIcdfFlashWord) { 'ON' } else { 'OFF' }
     $taskPdm32Iram = if ($Pdm32Iram) { 'ON' } else { 'OFF' }
+    $taskPdm32Batch = if ($Pdm32Batch) { 'ON' } else { 'OFF' }
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
         "-DSDKCONFIG=$taskBuild/sdkconfig", "-DSDKCONFIG_DEFAULTS=$taskBuild/production.defaults",
@@ -131,7 +137,9 @@ try {
         "-DYORADIO_ESP8266_OPUS_BENCHMARK=$taskOpusBenchmark",
         "-DYORADIO_ESP8266_OPUS_STREAM_TEST=$taskOpusStreamTest",
         "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
         "-DYORADIO_ESP8266_PDM32_IRAM=$taskPdm32Iram",
+        "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES=$OpusBenchmarkFixtures",
         '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
     $taskConfig = Get-Content "$taskBuild/sdkconfig" -Raw
@@ -167,7 +175,9 @@ try {
         opus_stream_test=[bool]$taskOpusStreamTestEnabled
         freertos_runtime_stats=[bool]$taskOpusRuntime.enabled
         opus_word_asm=[bool]$OpusWordAsm
+        opus_icdf_flash_word=[bool]$OpusIcdfFlashWord
         pdm32_iram=[bool]$Pdm32Iram
+        pdm32_batch=[bool]$Pdm32Batch
         opus_max_packet_ms=$(if ($taskOpusEnabled) { 20 } else { 0 })
         tone_test=$false
         web_profile=$false

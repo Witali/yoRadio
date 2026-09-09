@@ -175,6 +175,21 @@ decoding loop. Constant CDFs in the ESP8266 mapped flash window
 DRAM CDFs, packet-byte reads and `ec_dec_icdf16` retain their original accesses.
 No table is copied to DRAM in production and no persistent RAM is added.
 
+The production builder exposes this as `-OpusIcdfFlashWord`, requiring
+`-EnableOpus`. It is independent of `-OpusWordAsm` and `-Pdm32Iram`.
+Every builder invocation explicitly passes the CMake option ON or OFF, so
+omitting the switch clears a previous ON selection. The artifact manifest
+records the boolean `opus_icdf_flash_word` field. For a controlled raw A/B,
+use fresh variant names and otherwise identical switches/fixtures; for example:
+
+```powershell
+./tools/esp8266_audio_profile/build_i2s_pdm_production.ps1 -Variant esp8266-opus-icdf-on -Diagnostic -EnableOpus -OpusBenchmark -OpusWordAsm -OpusIcdfFlashWord
+```
+
+The matching OFF build omits only `-OpusIcdfFlashWord` and uses a different
+variant name. The builder does not deploy either image; physical timing and
+PCM hashes must be compared separately before claiming a speed improvement.
+
 This relies on the existing internal API contract: valid monotonically
 non-increasing CDFs ending in zero. Each accessed byte selects only its own
 aligned word; there is no next-word prefetch. Both mapped-region boundaries

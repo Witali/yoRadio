@@ -70,3 +70,14 @@ this is not merely a copied JavaScript model.
 No physical speed improvement is claimed by these checks. Keep the option
 OFF until a controlled output/stream A/B establishes CPU, underrun, heap and
 reconnect behavior for the intended firmware.
+
+## Independent builder switches
+
+`build_i2s_pdm_production.ps1 -Diagnostic -Pdm32Iram` selects this placement.
+The separate `-Pdm32Batch` switch selects
+`YORADIO_ESP8266_PDM32_BATCH=ON` for the DMA-span batching experiment. It also
+requires `-Diagnostic` and does not imply `-Pdm32Iram` or `-EnableOpus`.
+Both switches default OFF and the builder explicitly passes their ON/OFF
+values on every invocation, including after an earlier ON build. Manifests
+record independent boolean `pdm32_iram` and `pdm32_batch` fields. Keep other
+switches identical and vary only one experiment at a time for physical A/B.
