@@ -53,6 +53,34 @@ config YORADIO_HELIX_AAC
         preallocated codec arena; AAC-enabled builds reserve a complete
         stereo AAC PCM frame.
 
+config YORADIO_OGG_OPUS
+    bool "Ogg Opus fixed-point decoder (experimental)"
+    depends on YORADIO_AUDIO_MONO
+    default n
+    help
+        Local libopus decoder, without Arduino. Mapping family 0, mono/stereo
+        streams mixed to mono at 48 kHz; packets up to 20 ms / 1536 bytes.
+        Reuses the 16-KiB codec IRAM arena and bounded DRAM scratch. No TLS.
+        Not yet qualified for real-time playback on the physical ESP8266.
+
+config YORADIO_OPUS_INPUT_BYTES
+    int "Opus compressed read-ahead bytes"
+    depends on YORADIO_OGG_OPUS
+    range 1024 4096
+    default 1536
+    help
+        Separate from the unchanged MP3/AAC read-ahead size. The Ogg parser
+        consumes partial packets incrementally into its bounded packet buffer.
+
+config YORADIO_OPUS_SCRATCH_BYTES
+    int "Opus byte-addressable scratch limit"
+    depends on YORADIO_OGG_OPUS
+    range 4096 16384
+    default 7168
+    help
+        Fixed workspace, reused between SILK/CELT stages; not task-stack VLAs.
+        Exceeding this bound stops playback with an explicit decoder error.
+
 config YORADIO_HELIX_AAC_SSO
     bool "Use reduced-precision 32-bit Helix AAC arithmetic (experimental)"
     depends on YORADIO_HELIX_AAC

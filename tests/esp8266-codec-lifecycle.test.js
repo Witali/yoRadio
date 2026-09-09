@@ -13,7 +13,9 @@ test('native defaults and production manifest use a 4 KiB compressed input', () 
   assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /stream_input_bytes=4096/);
 });
 
-test('real codec bridge and arena pair every allocation/free through OOM and switches', t => {
+for (const opusEnabled of [false, true]) {
+test('real codec bridge and arena pair every allocation/free through OOM and switches' +
+  (opusEnabled ? ' with Opus enabled' : ' with Opus disabled'), t => {
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'yoradio-lifecycle-'));
   t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
   const audio=path.join(root,'yoRadio/src/audioI2S');
@@ -22,9 +24,12 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
     path.join(bridge,'codec_bridge.cpp'),path.join(bridge,'CodecMemoryArena.cpp'),
     path.join(__dirname,'native/codec_lifecycle/test.cpp')];
   const includes=[path.join(__dirname,'native/codec_lifecycle'),path.join(__dirname,'native/esp8266_input/stubs'),
-    path.join(__dirname,'native/helix_golden'),audio,path.join(audio,'mp3_decoder'),path.join(audio,'aac_decoder'),bridge];
+    path.join(__dirname,'native/helix_golden'),audio,path.join(audio,'mp3_decoder'),path.join(audio,'aac_decoder'),bridge,
+    path.join(root,'esp8266/rtos-sdk-native/components/opus_decoder')];
   const defines=['YORADIO_ESP8266_NATIVE=1','YORADIO_HELIX_MP3_MONO=1','YORADIO_HELIX_MP3_SSO=1',
-    'YORADIO_ESP8266_AAC_BLOCK_OUTPUT=1','YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES=512','CONFIG_YORADIO_STREAM_INPUT_BYTES=4096','PROGMEM='];
+    'YORADIO_ESP8266_AAC_BLOCK_OUTPUT=1','YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES=512','CONFIG_YORADIO_STREAM_INPUT_BYTES=4096',
+    'CONFIG_YORADIO_OGG_OPUS=' + Number(opusEnabled), 'CONFIG_YORADIO_OPUS_INPUT_BYTES=1536',
+    'CONFIG_YORADIO_OPUS_SCRATCH_BYTES=7168', 'PROGMEM='];
   const exe=path.join(dir,process.platform==='win32'?'test.exe':'test');
   let build;
   if(process.platform==='win32') {
@@ -46,7 +51,15 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
   assert.equal(run.status,0,run.stdout+'\n'+run.stderr);
   assert.match(run.stdout,/Codec lifecycle PASS/);
   t.diagnostic(run.stdout.trim());
+  if (opusEnabled) {
+    assert.match(run.stdout,/Opus input 1536, scratch 7168, reserve and allocation-free reset PASS/);
+    const fallback=spawnSync(exe,['--dram-arena'],{encoding:'utf8',timeout:60000});
+    assert.equal(fallback.status,0,fallback.stdout+'\n'+fallback.stderr);
+    assert.match(fallback.stdout,/Opus refuses DRAM fallback arena without leaking/);
+    t.diagnostic(fallback.stdout.trim());
+  }
 });
+}
 test('network reconnect releases cached decoder before another handshake', () => {
   const audio=fs.readFileSync(path.resolve(__dirname,'../esp8266/rtos-sdk-native/main/audio_service.c'),'utf8');
   const start=audio.indexOf('if (feed == 0 && generation_current(command.generation))');

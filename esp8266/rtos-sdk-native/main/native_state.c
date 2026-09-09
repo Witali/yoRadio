@@ -150,5 +150,6 @@ void native_state_set_message(const char *message, uint32_t duration_ms) {
 const char *native_codec_name(codec_type_t codec) {
     if (codec == CODEC_HELIX_MP3) return "MP3";
     if (codec == CODEC_HELIX_AAC) return "AAC";
+    if (codec == CODEC_OPUS) return "OPUS";
     return "";
 }

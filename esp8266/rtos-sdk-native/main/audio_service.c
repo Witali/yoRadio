@@ -39,9 +39,22 @@
 #define HTTP_HEADER_TIMEOUT_MS 10000U
 #define HTTP_OPEN_ATTEMPTS 2U
 #define CODEC_HEAP_RESERVE_BYTES 1152U
+#if CONFIG_YORADIO_OGG_OPUS
+/* Fixed scratch is separate, but SILK/CELT still have nested scalar frames.
+ * Retain additional stack headroom until measured on the physical LX106. */
+#define AUDIO_STACK_BYTES 6144U
+#else
 #define AUDIO_STACK_BYTES 4096U
+#endif
 #define STREAM_READ_WAIT_MS ((uint32_t)CONFIG_YORADIO_STREAM_READ_WAIT_MS)
 #define STREAM_PREFILL_MS ((uint32_t)CONFIG_YORADIO_STREAM_PREFILL_MS)
+
+static codec_type_t state_codec(helix_codec_kind_t kind) {
+    if (kind == HELIX_CODEC_MP3) return CODEC_HELIX_MP3;
+    if (kind == HELIX_CODEC_AAC) return CODEC_HELIX_AAC;
+    if (kind == HELIX_CODEC_OPUS) return CODEC_OPUS;
+    return CODEC_NONE;
+}
 
 #ifndef YORADIO_ESP8266_KARADIO_PIPELINE
 #define YORADIO_ESP8266_KARADIO_PIPELINE 0
@@ -673,8 +686,7 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
         context->decoder_bitrate = info->bitrate;
         context->decoder_sample_rate = info->sample_rate;
         context->decoder_channels = info->channels;
-        native_state_set_stream(context->codec_kind == HELIX_CODEC_MP3
-                                ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
+        native_state_set_stream(state_codec(context->codec_kind),
                             (info->bitrate + 500U) / 1000U,
                             info->sample_rate, info->channels);
     }
@@ -933,8 +945,7 @@ static void audio_task(void *argument) {
             .codec_kind = codec_kind,
             .measured_started_us = esp_timer_get_time(),
         };
-        native_state_set_stream(codec_kind == HELIX_CODEC_MP3
-                                    ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
+        native_state_set_stream(state_codec(codec_kind),
                                 0, 0, 0);
         native_state_set_audio(true, false, NULL);
         int feed = 0;
@@ -957,9 +968,7 @@ static void audio_task(void *argument) {
                     uint32_t kbps = (uint32_t)(
                         output.measured_bytes * 8000ULL /
                         (uint64_t)(now - output.measured_started_us));
-                    native_state_set_stream(codec_kind == HELIX_CODEC_MP3
-                                                ? CODEC_HELIX_MP3
-                                                : CODEC_HELIX_AAC,
+                    native_state_set_stream(state_codec(codec_kind),
                                             kbps, 0, 0);
                     output.measured_bytes = 0;
                     output.measured_started_us = now;
@@ -1130,8 +1139,7 @@ static void audio_task(void *argument) {
         s_pcm_trace_count = 0;
         s_stream_trace_count = 0;
 #endif
-        native_state_set_stream(codec_kind == HELIX_CODEC_MP3
-                                    ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
+        native_state_set_stream(state_codec(codec_kind),
                                 stream.advertised_bitrate, 0, 0);
         /* The HTTP prefix aliases the metadata scratch area. Move it to the
          * input queue before stripping ICY, so metadata cannot overwrite audio. */
@@ -1169,7 +1177,7 @@ static void audio_task(void *argument) {
             }
             if (prefill) {
                 if (!stream_prefill_ready(helix_codec_buffered(codec),
-                        helix_codec_input_capacity(), ended,
+                        helix_codec_active_input_capacity(codec), ended,
                         esp_timer_get_time() - prefill_started, STREAM_PREFILL_MS)) {
                     if (filled == STREAM_FILL_AGAIN) {
                         if (!stream_wait_after_empty(&stream, command.generation, wait_ms)) {
@@ -1184,7 +1192,7 @@ static void audio_task(void *argument) {
                 prefill = false;
                 ESP_LOGI(TAG, "Input prefill %u/%u bytes in %u ms",
                          (unsigned)helix_codec_buffered(codec),
-                         (unsigned)helix_codec_input_capacity(),
+                         (unsigned)helix_codec_active_input_capacity(codec),
                          (unsigned)((esp_timer_get_time() - prefill_started) / 1000));
             }
 
@@ -1221,8 +1229,12 @@ static void audio_task(void *argument) {
                 /* Drain all complete queued frames before reconnecting.
                  * Only the final incomplete frame is discarded. */
                 feed = end_error;
+                /* A transport timeout/EOF is recoverable for live Ogg too.
+                 * Reconnect with a reset decoder; do not turn a missing EOS
+                 * from a broken TCP connection into a permanent codec error.
+                 * Finite-file callers use helix_codec_finish for strict EOS. */
                 break;
-            } else if (helix_codec_buffered(codec) == helix_codec_input_capacity()) {
+            } else if (helix_codec_buffered(codec) == helix_codec_active_input_capacity(codec)) {
                 feed = -20; /* No progress is possible in a full input queue. */
                 break;
             } else if (!stream_wait_after_empty(&stream, command.generation, wait_ms)) {
@@ -1234,8 +1246,7 @@ static void audio_task(void *argument) {
                 now - output.measured_started_us >= 3000000) {
                 uint32_t kbps = (uint32_t)(output.measured_bytes * 8000ULL /
                                           (uint64_t)(now - output.measured_started_us));
-                native_state_set_stream(codec_kind == HELIX_CODEC_MP3
-                                            ? CODEC_HELIX_MP3 : CODEC_HELIX_AAC,
+                native_state_set_stream(state_codec(codec_kind),
                                         kbps, output.decoder_sample_rate,
                                         output.decoder_channels);
                 output.measured_bytes = 0;
@@ -1263,10 +1274,11 @@ static void audio_task(void *argument) {
             if (feed < 0)
                 ESP_LOGE(TAG, "Decoder stopped: %d (errno %d)",
                          feed, errno);
+            const char *decode_error = helix_codec_error_message(codec_kind, feed);
             release_codec(&codec, &codec_kind,
                           feed < 0 ? "stream error" : "stream end");
             native_state_set_audio(false, false,
-                                   feed < 0 ? "AUDIO STREAM ERROR" : NULL);
+                                   decode_error);
             network_service_set_streaming(false);
             log_audio_stack("stream complete");
         }

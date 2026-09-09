@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
         const char *suffix=strpbrk(url,"?#");
         size_t length=suffix?(size_t)(suffix-url):strlen(url);
         bool old=false;
-        for(unsigned i=0;i<7;++i) {
+        for(unsigned i=CONFIG_YORADIO_OGG_OPUS ? 2 : 0;i<7;++i) {
             size_t l=strlen(extensions[i]);
             if(length>=l && !strncasecmp(url+length-l,extensions[i],l)) old=true;
         }
@@ -82,7 +82,9 @@ int main(int argc, char **argv) {
     assert(!has_unsupported_extension(""));
     assert(!has_unsupported_extension("http://h/?x=.ogg"));
     assert(station_supported("Radio", "http://host/mp3"));
-    assert(!station_supported("oGg radio", "http://host/mp3"));
+    assert(station_supported("oGg radio", "http://host/mp3") == !!CONFIG_YORADIO_OGG_OPUS);
+    assert(station_supported("Opus", "http://host/radio.opus") == !!CONFIG_YORADIO_OGG_OPUS);
+    assert(!station_supported("Opus", "https://host/radio.opus"));
     assert(!station_supported("Radio", "HTTP://host/mp3"));
     assert(!station_supported("", "h"));
     assert(argc == 2); PLAYLIST_PATH = argv[1];
@@ -94,7 +96,13 @@ int main(int argc, char **argv) {
         fputs(row, f); strcat(expected, row);
         fputs("Unsupported\thttps://host/stream.mp3\t0\n", f);
         fputs("Ogg radio\thttp://host/stream\t0\n", f);
+#if CONFIG_YORADIO_OGG_OPUS
+        strcat(expected, "Ogg radio\thttp://host/stream\t0\n");
+#endif
         fputs("Unsupported\thttp://host/stream.opus?x=1\t0\n", f);
+#if CONFIG_YORADIO_OGG_OPUS
+        strcat(expected, "Unsupported\thttp://host/stream.opus?x=1\t0\n");
+#endif
     }
     const char *last = "Last UTF-8: \xd1\x91\thttp://host/live.aac\t0";
     fputs(last,f); strcat(expected,last); fclose(f);

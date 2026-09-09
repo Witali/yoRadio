@@ -16,6 +16,10 @@
 #include "esp_log.h"
 #include "esp_heap_caps.h"
 #include "esp_system.h"
+#if CONFIG_YORADIO_OGG_OPUS
+#include "native_opus.h"
+#include "opus_memory.h"
+#endif
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
 extern "C" {
 #include "../libmad8266/upstream/libmad/config.h"
@@ -34,14 +38,20 @@ namespace {
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
 constexpr size_t kLibmadXrSamples = 576U * 2U;
 constexpr size_t kLibmadReorderSamples = 576U;
-constexpr size_t kArenaBytes = sizeof(mad_stream) + sizeof(mad_frame) +
+constexpr size_t kLegacyArenaBytes = sizeof(mad_stream) + sizeof(mad_frame) +
                                sizeof(mad_synth) +
                                sizeof(mad_fixed_t) *
                                    (kLibmadXrSamples +
                                     kLibmadReorderSamples) +
                                5U * alignof(max_align_t);
 #else
-constexpr size_t kArenaBytes = 23328U;
+constexpr size_t kLegacyArenaBytes = 23328U;
+#endif
+#if CONFIG_YORADIO_OGG_OPUS
+/* Logical allocation accounting, not an additional physical reservation. */
+constexpr size_t kArenaBytes = 32768U + CONFIG_YORADIO_OPUS_SCRATCH_BYTES;
+#else
+constexpr size_t kArenaBytes = kLegacyArenaBytes;
 #endif
 /* Reuse the decoder input as read-ahead storage. Older host/experimental
  * configs without this option keep the original single-frame buffer. */
@@ -73,13 +83,31 @@ constexpr size_t kAacPcmSamples = YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES *
 #else
 constexpr size_t kAacPcmSamples = 1024U * 2U;
 #endif
-constexpr size_t kMaxPcmSamples = kAacPcmSamples > kMp3PcmSamples ? kAacPcmSamples : kMp3PcmSamples;
+constexpr size_t kLegacyMaxPcmSamples = kAacPcmSamples > kMp3PcmSamples ? kAacPcmSamples : kMp3PcmSamples;
 #else
-constexpr size_t kMaxPcmSamples = kMp3PcmSamples;
+constexpr size_t kLegacyMaxPcmSamples = kMp3PcmSamples;
+#endif
+#if CONFIG_YORADIO_OGG_OPUS
+constexpr size_t kMaxPcmSamples = kLegacyMaxPcmSamples > 960U ? kLegacyMaxPcmSamples : 960U;
+#else
+constexpr size_t kMaxPcmSamples = kLegacyMaxPcmSamples;
 #endif
 constexpr char kTag[] = "helix_bridge";
 
+size_t input_bytes_for_kind(helix_codec_kind_t kind) {
+#if CONFIG_YORADIO_OGG_OPUS
+    if (kind == HELIX_CODEC_OPUS) return CONFIG_YORADIO_OPUS_INPUT_BYTES;
+#endif
+    return kInputBytes;
+}
+size_t input_storage_bytes(size_t capacity) {
+    return capacity + (kInputStorageBytes - kInputBytes);
+}
+
 size_t pcm_samples_for_kind(helix_codec_kind_t kind) {
+#if CONFIG_YORADIO_OGG_OPUS
+    if (kind == HELIX_CODEC_OPUS) return 960U;
+#endif
 #if CONFIG_YORADIO_HELIX_AAC
     if (kind == HELIX_CODEC_AAC) return kAacPcmSamples;
 #endif
@@ -146,6 +174,7 @@ struct helix_codec {
     helix_codec_kind_t kind;
     size_t input_start;
     size_t input_size;
+    size_t input_capacity;
     uint8_t *input;
     size_t pcm_samples;
     int16_t *pcm;
@@ -217,6 +246,69 @@ bool libmad_reset() {
 #endif
 
 
+#if CONFIG_YORADIO_OGG_OPUS
+struct OpusWorkspace {
+    native_opus_t stream;
+    void *state;
+    void *scratch;
+    void *words;
+    helix_pcm_callback_t callback;
+    void *context;
+};
+static OpusWorkspace *s_opus;
+
+static bool emit_opus(void *opaque, const int16_t *pcm, size_t samples,
+                      uint32_t bitrate) {
+    OpusWorkspace *output = static_cast<OpusWorkspace *>(opaque);
+    helix_stream_info_t info = {48000U, bitrate, 1, 16};
+    /* libopus has finished this frame. The output pipeline may apply gain in
+     * place, just as it does for MP3/AAC, without touching decoder history. */
+    for (size_t offset = 0; offset < samples; offset += 512U) {
+        size_t count = std::min(samples - offset, size_t(512));
+        if (!output->callback(output->context, &info,
+                              const_cast<int16_t *>(pcm + offset), count)) return false;
+    }
+    return true;
+}
+
+static void opus_free() {
+    yoradio_opus_memory_bind(nullptr, 0, nullptr, 0);
+    if (s_opus) {
+        CodecArenaFree(s_opus->state);
+        CodecArenaFree(s_opus->scratch);
+        CodecArenaFree(s_opus->words);
+        CodecArenaFree(s_opus);
+        s_opus = nullptr;
+    }
+    CodecArenaRelease(CODEC_ARENA_OPUS);
+}
+
+static bool opus_allocate(helix_codec *codec) {
+    if (!CodecArenaPreallocatedInIram() || CodecArenaPreallocatedBytes() < 16384U) {
+        ESP_LOGE(kTag, "Opus requires the 16-KiB IRAM codec arena");
+        return false;
+    }
+    s_opus = static_cast<OpusWorkspace *>(CodecArenaCalloc(CODEC_ARENA_OPUS, 1, sizeof(OpusWorkspace)));
+    if (!s_opus) return false;
+    s_opus->words = CodecArenaCalloc32(CODEC_ARENA_OPUS, 1, 16384U);
+    s_opus->state = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, native_opus_decoder_size());
+    s_opus->scratch = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
+    if (!s_opus->words || !s_opus->state || !s_opus->scratch) return false;
+    native_opus_config_t config = {};
+    config.decoder_state = s_opus->state;
+    config.decoder_state_bytes = native_opus_decoder_size();
+    config.scratch = s_opus->scratch;
+    config.scratch_bytes = CONFIG_YORADIO_OPUS_SCRATCH_BYTES;
+    config.iram = s_opus->words;
+    config.iram_bytes = 16384U;
+    config.pcm = codec->pcm;
+    config.pcm_samples = codec->pcm_samples;
+    config.output = emit_opus;
+    config.output_ctx = s_opus;
+    return native_opus_init(&s_opus->stream, &config) == 0;
+}
+#endif
+
 static void free_decoder(helix_codec *codec) {
     helix_codec_kind_t kind = codec->kind;
     codec->kind = static_cast<helix_codec_kind_t>(0);
@@ -229,6 +321,9 @@ static void free_decoder(helix_codec *codec) {
     }
 #if CONFIG_YORADIO_HELIX_AAC
     else if (kind == HELIX_CODEC_AAC) AACDecoder_FreeBuffers();
+#endif
+#if CONFIG_YORADIO_OGG_OPUS
+    else if (kind == HELIX_CODEC_OPUS) opus_free();
 #endif
 }
 
@@ -245,21 +340,28 @@ static bool allocate_decoder(helix_codec *codec, helix_codec_kind_t kind) {
 #if CONFIG_YORADIO_HELIX_AAC
     if (kind == HELIX_CODEC_AAC) return AACDecoder_AllocateBuffers();
 #endif
+#if CONFIG_YORADIO_OGG_OPUS
+    if (kind == HELIX_CODEC_OPUS) return opus_allocate(codec);
+#endif
     return false;
 }
 
 static bool update_codec_memory(helix_codec *codec) {
     size_t word_capacity = CodecArenaPreallocatedBytes();
     bool word_in_iram = CodecArenaPreallocatedInIram();
-    codec->dram_used = sizeof(*codec) + kInputStorageBytes +
+    codec->dram_used = sizeof(*codec) + input_storage_bytes(codec->input_capacity) +
                        sizeof(int16_t) * codec->pcm_samples +
                        CodecArenaHeapUsed() +
                        (word_in_iram ? 0U : word_capacity);
     codec->iram_used = word_in_iram ? word_capacity : 0U;
     size_t free_heap = esp_get_free_heap_size();
-    if (free_heap >= codec->reserve_heap_bytes) return true;
+    size_t reserve = codec->reserve_heap_bytes;
+#if CONFIG_YORADIO_OGG_OPUS
+    if (codec->kind == HELIX_CODEC_OPUS) reserve = std::max(reserve, size_t(4096));
+#endif
+    if (free_heap >= reserve) return true;
     ESP_LOGE(kTag, "Codec leaves %u heap bytes, reserve requires %u",
-             (unsigned)free_heap, (unsigned)codec->reserve_heap_bytes);
+             (unsigned)free_heap, (unsigned)reserve);
     return false;
 }
 
@@ -320,6 +422,25 @@ static bool emit_aac_block(void *opaque, short *pcm, int samples) {
 static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
                       void *context) {
     uint8_t *input = codec->input + codec->input_start;
+#if CONFIG_YORADIO_OGG_OPUS
+    if (codec->kind == HELIX_CODEC_OPUS) {
+        if (!s_opus) return -8;
+        s_opus->callback = callback;
+        s_opus->context = context;
+        size_t consumed = 0;
+        int result = native_opus_feed(&s_opus->stream, input, codec->input_size, &consumed);
+        consume(codec, consumed);
+        if (result < 0) {
+            ESP_LOGE(kTag, "Opus stream error %d (libopus %d), scratch %u/%u, words %u/16384",
+                     result, s_opus->stream.libopus_error,
+                     (unsigned)yoradio_opus_scratch_peak_bytes(),
+                     (unsigned)CONFIG_YORADIO_OPUS_SCRATCH_BYTES,
+                     (unsigned)yoradio_opus_scratch_peak_words());
+            return result;
+        }
+        return result == 1 ? 0 : 1;
+    }
+#endif
     if (codec->kind == HELIX_CODEC_MP3) {
         Mp3Header parsed = {};
         int sync = find_mp3(input, codec->input_size, &parsed);
@@ -495,6 +616,9 @@ extern "C" bool helix_codec_prepare(void) {
 extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
                                                size_t reserve_heap_bytes) {
     if (kind != HELIX_CODEC_MP3
+#if CONFIG_YORADIO_OGG_OPUS
+        && kind != HELIX_CODEC_OPUS
+#endif
 #if CONFIG_YORADIO_HELIX_AAC
         && kind != HELIX_CODEC_AAC
 #endif
@@ -504,8 +628,9 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
         heap_caps_calloc(1, sizeof(*codec), MALLOC_CAP_8BIT));
     if (codec) {
         codec->pcm_samples = pcm_samples_for_kind(kind);
+        codec->input_capacity = input_bytes_for_kind(kind);
         codec->input = static_cast<uint8_t *>(
-            heap_caps_calloc(1, kInputStorageBytes, MALLOC_CAP_8BIT));
+            heap_caps_calloc(1, input_storage_bytes(codec->input_capacity), MALLOC_CAP_8BIT));
         codec->pcm = static_cast<int16_t *>(
             heap_caps_malloc(sizeof(int16_t) * codec->pcm_samples,
                              MALLOC_CAP_8BIT));
@@ -523,16 +648,7 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
     codec->reserve_heap_bytes = reserve_heap_bytes;
     bool allocated = allocate_decoder(codec, kind);
     if (!allocated) {
-        if (kind == HELIX_CODEC_MP3) {
-#if CONFIG_YORADIO_MP3_DECODER_LIBMAD
-            libmad_free();
-#else
-            MP3Decoder_FreeBuffers();
-#endif
-        }
-#if CONFIG_YORADIO_HELIX_AAC
-        else AACDecoder_FreeBuffers();
-#endif
+        free_decoder(codec);
         CodecArenaUnbind();
         heap_caps_free(codec->pcm);
         heap_caps_free(codec->input);
@@ -550,7 +666,7 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
 #else
                  ? "Helix MP3"
 #endif
-                 : "Helix AAC",
+                 : (kind == HELIX_CODEC_OPUS ? "Opus" : "Helix AAC"),
              (unsigned)codec->dram_used, (unsigned)codec->iram_used,
              (unsigned)CodecArenaUsed());
     return codec;
@@ -568,6 +684,9 @@ extern "C" void helix_codec_destroy(helix_codec_t *codec) {
 extern "C" int helix_codec_switch(helix_codec_t *codec,
                                    helix_codec_kind_t kind) {
     if (!codec || (kind != HELIX_CODEC_MP3
+#if CONFIG_YORADIO_OGG_OPUS
+                   && kind != HELIX_CODEC_OPUS
+#endif
 #if CONFIG_YORADIO_HELIX_AAC
                    && kind != HELIX_CODEC_AAC
 #endif
@@ -575,6 +694,10 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
         return -1;
     if (codec->kind == kind) {
         codec->input_start = codec->input_size = 0;
+#if CONFIG_YORADIO_OGG_OPUS
+        if (kind == HELIX_CODEC_OPUS)
+            return s_opus ? native_opus_reset(&s_opus->stream) : -2;
+#endif
         if (kind == HELIX_CODEC_MP3) {
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
             if (!libmad_reset()) return -2;
@@ -604,6 +727,15 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
 #endif
     }
     free_decoder(codec);
+    size_t input_capacity = input_bytes_for_kind(kind);
+    if (input_capacity != codec->input_capacity) {
+        uint8_t *resized = static_cast<uint8_t *>(heap_caps_realloc(
+            codec->input, input_storage_bytes(input_capacity), MALLOC_CAP_8BIT));
+        if (!resized) return -2;
+        codec->input = resized;
+        codec->input_capacity = input_capacity;
+        codec->input_start = codec->input_size = 0;
+    }
     size_t pcm_samples = pcm_samples_for_kind(kind);
     if (pcm_samples != codec->pcm_samples) {
         int16_t *resized = static_cast<int16_t *>(heap_caps_realloc(
@@ -625,6 +757,17 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
 
 extern "C" helix_codec_kind_t helix_codec_detect(const uint8_t *data,
                                                    size_t size) {
+    /* Never search Ogg packet payload for accidental MP3/AAC sync words. */
+    if (size >= 4 && std::memcmp(data, "OggS", 4) == 0) {
+#if CONFIG_YORADIO_OGG_OPUS
+        if (size >= 27U && data[4] == 0 && data[26]) {
+            size_t body = 27U + data[26];
+            if (size >= body + 8U && std::memcmp(data + body, "OpusHead", 8) == 0)
+                return HELIX_CODEC_OPUS;
+        }
+#endif
+        return static_cast<helix_codec_kind_t>(0);
+    }
     Mp3Header header = {};
     int mp3 = find_mp3(data, size, &header);
 #if CONFIG_YORADIO_HELIX_AAC
@@ -640,8 +783,8 @@ extern "C" helix_codec_kind_t helix_codec_detect(const uint8_t *data,
 extern "C" uint8_t *helix_codec_write_pointer(helix_codec_t *codec,
                                                 size_t *capacity) {
     if (!codec || !capacity) return nullptr;
-    if (codec->input_start + codec->input_size == kInputBytes) compact(codec);
-    *capacity = kInputBytes - codec->input_start - codec->input_size;
+    if (codec->input_start + codec->input_size == codec->input_capacity) compact(codec);
+    *capacity = codec->input_capacity - codec->input_start - codec->input_size;
     return codec->input + codec->input_start + codec->input_size;
 }
 
@@ -651,6 +794,9 @@ extern "C" size_t helix_codec_buffered(const helix_codec_t *codec) {
 
 extern "C" size_t helix_codec_input_capacity(void) {
     return kInputBytes;
+}
+extern "C" size_t helix_codec_active_input_capacity(const helix_codec_t *codec) {
+    return codec ? codec->input_capacity : kInputBytes;
 }
 
 extern "C" int helix_codec_buffer_commit(helix_codec_t *codec, size_t size) {
@@ -684,14 +830,33 @@ extern "C" int helix_codec_commit(helix_codec_t *codec, size_t size,
     return 0;
 }
 
+extern "C" int helix_codec_finish(helix_codec_t *codec) {
+    if (!codec) return -1;
+#if CONFIG_YORADIO_OGG_OPUS
+    if (codec->kind == HELIX_CODEC_OPUS && s_opus)
+        return native_opus_finish(&s_opus->stream);
+#endif
+    codec->input_size = codec->input_start = 0;
+    return 0;
+}
+
+extern "C" const char *helix_codec_error_message(helix_codec_kind_t kind, int result) {
+    if (result >= 0) return nullptr;
+#if CONFIG_YORADIO_OGG_OPUS
+    if (kind == HELIX_CODEC_OPUS && result <= NATIVE_OPUS_ERR_ARGUMENT)
+        return native_opus_error_string(result);
+#endif
+    return "AUDIO STREAM ERROR";
+}
+
 extern "C" int helix_codec_feed(helix_codec_t *codec, const uint8_t *data,
                                  size_t size, bool eos,
                                  helix_pcm_callback_t callback,
                                  void *context) {
     if (!codec || (!data && size) || !callback) return -1;
     while (size) {
-        if (codec->input_start + codec->input_size == kInputBytes) compact(codec);
-        size_t free_space = kInputBytes - codec->input_start - codec->input_size;
+        if (codec->input_start + codec->input_size == codec->input_capacity) compact(codec);
+        size_t free_space = codec->input_capacity - codec->input_start - codec->input_size;
         if (!free_space) {
             int result = decode_one(codec, callback, context);
             if (result != 0) return result == 1 ? -2 : result;
@@ -705,7 +870,7 @@ extern "C" int helix_codec_feed(helix_codec_t *codec, const uint8_t *data,
         int result = helix_codec_commit(codec, copied, callback, context);
         if (result < 0) return result;
     }
-    if (eos) codec->input_size = codec->input_start = 0;
+    if (eos) return helix_codec_finish(codec);
     return 0;
 }
 

@@ -6,7 +6,8 @@
 enum CodecArenaOwner : uint8_t {
     CODEC_ARENA_NONE = 0,
     CODEC_ARENA_MP3,
-    CODEC_ARENA_AAC
+    CODEC_ARENA_AAC,
+    CODEC_ARENA_OPUS
 };
 
 // Reserve one contiguous block before a network connection can fragment the

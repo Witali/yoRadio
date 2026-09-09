@@ -11,7 +11,7 @@
 #include "sdkconfig.h"
 
 namespace {
-#if !CONFIG_YORADIO_HELIX_AAC && CONFIG_YORADIO_MP3_DECODER_LIBMAD
+#if !CONFIG_YORADIO_OGG_OPUS && !CONFIG_YORADIO_HELIX_AAC && CONFIG_YORADIO_MP3_DECODER_LIBMAD
 /* libmad keeps mad_synth (4,236 bytes), xr_raw (4,608 bytes), and the Layer
  * III reorder scratch buffer (2,304 bytes) in aligned 32-bit IRAM. The 12-KiB
  * arena leaves more than 1 KiB for alignment and version headroom. */

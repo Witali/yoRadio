@@ -59,8 +59,9 @@ test("ESP8266 reports DRAM and IRAM separately and enforces reserve after alloca
   assert.match(bridge, /codec->iram_used = word_in_iram \? word_capacity : 0U/);
   assert.match(
     bridge,
-    /size_t free_heap = esp_get_free_heap_size\(\);[\s\S]*free_heap >= codec->reserve_heap_bytes/,
+    /size_t free_heap = esp_get_free_heap_size\(\);[\s\S]*size_t reserve = codec->reserve_heap_bytes;[\s\S]*free_heap >= reserve/,
   );
+  assert.match(bridge, /#if CONFIG_YORADIO_OGG_OPUS\s+if \(codec->kind == HELIX_CODEC_OPUS\) reserve = std::max\(reserve, size_t\(4096\)\);\s+#endif/);
   assert.match(bridge, /helix_codec_switch[\s\S]*update_codec_memory\(codec\)/);
 });
 

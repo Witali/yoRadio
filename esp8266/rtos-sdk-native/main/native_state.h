@@ -17,6 +17,7 @@ typedef enum {
     CODEC_NONE,
     CODEC_HELIX_MP3,
     CODEC_HELIX_AAC,
+    CODEC_OPUS,
 } codec_type_t;
 
 typedef struct {

@@ -249,6 +249,16 @@ further without a new on-device high-water and full Web API test.
 The project is under active implementation; use the repository setup/build
 scripts once they are added rather than invoking a globally installed SDK.
 
+## Experimental Ogg Opus
+
+`CONFIG_YORADIO_OGG_OPUS` (default OFF, mono output only) adds vendored
+fixed-point libopus without Arduino. The build helper accepts `-EnableOpus`
+with a fresh `-Variant`; this is not a device-qualified production profile.
+It supports mono/stereo mapping-0 streams at 48-kHz mono output, packets up to
+20 ms / 1536 bytes, bounded shared IRAM/scratch and incremental Ogg parsing.
+MP3/AAC retain their existing settings. See [limits, memory reuse, tests and
+remaining qualification](../../docs/ESP8266_OPUS_NATIVE.md).
+
 ## Optional local SPIFFS logging
 
 Optional local diagnostic logging: build with `-Diagnostic -SpiffsLog` using

@@ -11,9 +11,14 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "file_replace.h"
+#include "sdkconfig.h"
 
 #define INDEX_MAGIC 0x58444959UL
+#if CONFIG_YORADIO_OGG_OPUS
+#define INDEX_VERSION 3U /* Codec capabilities change the filtered index. */
+#else
 #define INDEX_VERSION 2U
+#endif
 #define INDEX_TEMP_PATH PLAYLIST_INDEX_PATH ".tmp"
 
 typedef struct {
@@ -118,8 +123,10 @@ static bool has_unsupported_extension(const char *url) {
         code = (code << 8) | c;
     }
     switch (code) {
+#if !CONFIG_YORADIO_OGG_OPUS
         case 0x6f6767U:   /* ogg */
         case 0x6f707573U: /* opus */
+#endif
         case 0x666c6163U: /* flac */
         case 0x6d3375U:   /* m3u */
         case 0x6d337538U: /* m3u8 */
@@ -131,15 +138,21 @@ static bool has_unsupported_extension(const char *url) {
 }
 
 static bool station_supported(const char *name, const char *url) {
-    /* The ESP8266 profile deliberately contains no TLS, Ogg, FLAC or WAV
-     * decoder. The shared repository playlist remains unchanged; this board's
+    /* The ESP8266 profile has no TLS, Vorbis, FLAC or WAV decoder.
+     * Experimental .ogg URLs need an OpusHead check at runtime; .ogg alone
+     * cannot distinguish Opus from Vorbis. The shared playlist is unchanged; this board's
      * offset index contains only streams it can actually open and decode. */
     bool http = url[0] == 'h' && url[1] == 't' && url[2] == 't' &&
                 url[3] == 'p' && url[4] == ':' && url[5] == '/' && url[6] == '/';
     bool ogg = (name[0] == 'O' || name[0] == 'o') &&
                (name[1] == 'G' || name[1] == 'g') &&
                (name[2] == 'G' || name[2] == 'g') && name[3] == ' ';
+#if CONFIG_YORADIO_OGG_OPUS
+    (void)ogg;
+    return http &&
+#else
     return http && !ogg &&
+#endif
            !has_unsupported_extension(url);
 }
 

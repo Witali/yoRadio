@@ -10,7 +10,8 @@ param(
     [switch]$Diagnostic,
     [ValidateSet(10, 20)]
     [int]$LedUpdateHz = 10,
-    [switch]$NoAudioLevelLed
+    [switch]$NoAudioLevelLed,
+    [switch]$EnableOpus
 )
 $ErrorActionPreference = 'Stop'
 if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
@@ -42,6 +43,7 @@ try {
     $taskDefaults = $taskDefaults.Replace('CONFIG_LOG_BOOTLOADER_LEVEL_WARN=y', 'CONFIG_LOG_BOOTLOADER_LEVEL_ERROR=y')
     $taskDefaults = $taskDefaults -replace 'CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=\d+', "CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz"
     if ($NoAudioLevelLed) { $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED=y', '# CONFIG_YORADIO_STATUS_LED is not set') }
+    if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=1536`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=7168`n" }
     [IO.File]::WriteAllText("$taskBuild/production.defaults", $taskDefaults, (New-Object Text.UTF8Encoding($false)))
     Write-Output "Configuring $taskVariant on GPIO3/RX (no flashing)"
     $taskMemoryProfile = if ($MemoryProfile) { 'ON' } else { 'OFF' }
@@ -79,6 +81,8 @@ try {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired; use a fresh -Variant build directory" }
     }
     $taskGzipEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y\r?$'
+    $taskOpusEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_OGG_OPUS=y\r?$'
+    if ($taskOpusEnabled -ne [bool]$EnableOpus) { throw 'Wrong cached Opus profile; use a fresh -Variant build directory' }
     $taskLedEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_STATUS_LED=y\r?$'
     if ($taskLedEnabled -eq [bool]$NoAudioLevelLed) { throw 'Wrong cached LED profile; use a fresh -Variant build directory' }
     if ($taskLedEnabled -and $taskConfig -notmatch "(?m)^CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz`r?$") { throw 'Wrong cached LED refresh rate; use a fresh -Variant build directory' }
@@ -88,8 +92,12 @@ try {
     Copy-Item "$taskBuild/yoradio_esp8266_helix_native.bin" "$taskArtifact/app.bin"
     Copy-Item "$taskBuild/sdkconfig" "$taskArtifact/sdkconfig"
     $taskManifest = [ordered]@{
-        purpose=$(if ($Diagnostic) { 'Diagnostic native radio, I2S PDM32 DMA, error logs only; build does not flash' } else { 'Production native radio, I2S PDM32 DMA, UART error logs only; build does not flash' })
+        purpose=$(if ($EnableOpus) { 'Experimental Opus native radio, I2S PDM32 DMA; not device-qualified; build does not flash' } elseif ($Diagnostic) { 'Diagnostic native radio, I2S PDM32 DMA, error logs only; build does not flash' } else { 'Production native radio, I2S PDM32 DMA, UART error logs only; build does not flash' })
         diagnostic=[bool]$Diagnostic
+        experimental_opus=[bool]$taskOpusEnabled
+        opus_input_bytes=$(if ($taskOpusEnabled) { 1536 } else { 0 })
+        opus_scratch_bytes=$(if ($taskOpusEnabled) { 7168 } else { 0 })
+        opus_max_packet_ms=$(if ($taskOpusEnabled) { 20 } else { 0 })
         tone_test=$false
         web_profile=$false
         memory_profile=[bool]$MemoryProfile

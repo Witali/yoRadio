@@ -33,10 +33,13 @@ if(CONFIG_YORADIO_HELIX_AAC)
       "${YORADIO_AUDIO_DIR}/aac_decoder/aac_decoder.cpp")
 endif()
 
+# Dependencies are scanned before Kconfig values are available. The Opus
+# component itself has no sources when its experimental option is disabled.
+set(YORADIO_CODEC_REQUIRES esp8266 log opus_decoder)
 idf_component_register(
   SRCS ${YORADIO_HELIX_SOURCES}
   INCLUDE_DIRS ${YORADIO_CODEC_INCLUDES}
-  REQUIRES esp8266 log)
+  REQUIRES ${YORADIO_CODEC_REQUIRES})
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>

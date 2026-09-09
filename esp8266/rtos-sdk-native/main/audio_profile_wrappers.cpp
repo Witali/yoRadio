@@ -185,7 +185,7 @@ void reset_profile(helix_codec_kind_t kind) {
     s_underruns_before = output_stats.queue_empty_events;
     esp8266_nodac_i2s_profile(&s_dma_before);
     std::snprintf(s_codec, sizeof(s_codec), "%s",
-                  kind == HELIX_CODEC_MP3 ? "MP3" : "AAC");
+                  kind == HELIX_CODEC_MP3 ? "MP3" : (kind == HELIX_CODEC_OPUS ? "OPUS" : "AAC"));
 }
 
 void maybe_report() {

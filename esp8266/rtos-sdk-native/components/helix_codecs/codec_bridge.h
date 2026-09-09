@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-typedef enum { HELIX_CODEC_MP3 = 1, HELIX_CODEC_AAC = 2 } helix_codec_kind_t;
+typedef enum { HELIX_CODEC_MP3 = 1, HELIX_CODEC_AAC = 2, HELIX_CODEC_OPUS = 3 } helix_codec_kind_t;
 
 typedef struct helix_codec helix_codec_t;
 
@@ -35,10 +35,15 @@ uint8_t *helix_codec_write_pointer(helix_codec_t *codec, size_t *capacity);
 int helix_codec_buffer_commit(helix_codec_t *codec, size_t size);
 size_t helix_codec_buffered(const helix_codec_t *codec);
 size_t helix_codec_input_capacity(void);
+/* Actual read-ahead capacity, which can be smaller for experimental Opus. */
+size_t helix_codec_active_input_capacity(const helix_codec_t *codec);
 /* 0 = progress, 1 = incomplete frame (needs input), negative = error.
  * Decodes at most one compressed frame; PCM callbacks may run in blocks. */
 int helix_codec_process_one(helix_codec_t *codec,
                             helix_pcm_callback_t callback, void *context);
+/* Validate end-of-stream after process_one has drained available packets. */
+int helix_codec_finish(helix_codec_t *codec);
+const char *helix_codec_error_message(helix_codec_kind_t kind, int result);
 /* Compatibility API: append and drain all complete frames. */
 int helix_codec_commit(helix_codec_t *codec, size_t size,
                        helix_pcm_callback_t callback, void *context);
