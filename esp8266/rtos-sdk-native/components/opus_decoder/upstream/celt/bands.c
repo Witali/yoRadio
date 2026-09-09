@@ -1406,7 +1406,11 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
       const celt_ener *bandE, int *pulses, int shortBlocks, int spread,
       int dual_stereo, int intensity, int *tf_res, opus_int32 total_bits,
       opus_int32 balance, ec_ctx *ec, int LM, int codedBands,
-      opus_uint32 *seed, int complexity, int arch, int disable_inv)
+      opus_uint32 *seed, int complexity, int arch, int disable_inv
+#ifdef YORADIO_OPUS_BOUNDED
+      , celt_norm *norm2_scratch, int norm2_scratch_size
+#endif
+      )
 {
    int i;
    opus_int32 remaining_bits;
@@ -1441,9 +1445,22 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
    norm_offset = M*eBands[start];
    /* No need to allocate norm for the last band because we don't need an
       output in that band. */
+#ifdef YORADIO_OPUS_BOUNDED
+   {
+      int norm_size = M*eBands[m->nbEBands-1]-norm_offset;
+      int borrow_norm2 = !encode && C==2 && norm2_scratch != NULL &&
+                         norm_size > 0 && norm2_scratch_size >= norm_size;
+      /* The caller may lend an idle output frame. Folding is finished before
+         synthesis/deemphasis writes that frame; X/Y remain separate arrays. */
+      ALLOC(_norm, (borrow_norm2 ? 1 : C)*norm_size, celt_norm);
+      norm = _norm;
+      norm2 = borrow_norm2 ? norm2_scratch : norm + norm_size;
+   }
+#else
    ALLOC(_norm, C*(M*eBands[m->nbEBands-1]-norm_offset), celt_norm);
    norm = _norm;
    norm2 = norm + M*eBands[m->nbEBands-1]-norm_offset;
+#endif
 
    /* For decoding, we can use the last band as scratch space because we don't need that
       scratch space for the last band and we don't care about the data there until we're

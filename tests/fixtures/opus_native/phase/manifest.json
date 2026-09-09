@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "generator": "tools/esp8266_opus_profile/generate_phase_fixtures.cjs",
+  "encoder": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "pcm_sha256": "d10a61a4b225ed7dfe04b47f9baff03e994349c83a0eeb40e93dc8b858ae8cea",
+  "signal": "Own deterministic stereo xorshift32 noise (seed 7349), 997/1703-Hz tones and abrupt 40-ms envelope steps; 15360 frames, f32le 48 kHz.",
+  "fixtures": [
+    {
+      "name": "stereo-2_5ms",
+      "source": {
+        "application": "lowdelay",
+        "frame_ms": 2.5,
+        "channels": 2,
+        "bitrate": 128000,
+        "vbr": false
+      },
+      "opuspkt_sha256": "e8edba9c4b4543db8cbd0ddc8d96a3c7a2ec215f142f2264e18bf46812b351a1",
+      "bytes": 5418,
+      "packets": 129,
+      "samples": 15480,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 129
+      },
+      "packet_durations_ms": {
+        "2.5": 129
+      },
+      "packet_channels": {
+        "2": 129
+      },
+      "max_packet_bytes": 40
+    },
+    {
+      "name": "stereo-2_5ms-packed20",
+      "source": {
+        "parent": "stereo-2_5ms",
+        "packing": "CBR",
+        "frames": 8
+      },
+      "opuspkt_sha256": "3136b5863c895ea05796ad002aeca2037f2c6d3fbed55dc15be72fb1c4889324",
+      "bytes": 5056,
+      "packets": 16,
+      "samples": 15360,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 16
+      },
+      "packet_durations_ms": {
+        "20": 16
+      },
+      "packet_channels": {
+        "2": 16
+      },
+      "max_packet_bytes": 314
+    },
+    {
+      "name": "stereo-5ms",
+      "source": {
+        "application": "lowdelay",
+        "frame_ms": 5,
+        "channels": 2,
+        "bitrate": 128000,
+        "vbr": false
+      },
+      "opuspkt_sha256": "461364e76a20c49b4307844cffe630e556de88891d5125f57818ab74368eee00",
+      "bytes": 5330,
+      "packets": 65,
+      "samples": 15600,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 65
+      },
+      "packet_durations_ms": {
+        "5": 65
+      },
+      "packet_channels": {
+        "2": 65
+      },
+      "max_packet_bytes": 80
+    },
+    {
+      "name": "stereo-5ms-packed20",
+      "source": {
+        "parent": "stereo-5ms",
+        "packing": "CBR",
+        "frames": 4
+      },
+      "opuspkt_sha256": "4610fc31766bcc409af108de4444b6760eba1ca027ee8694b49917aef4cb7849",
+      "bytes": 5120,
+      "packets": 16,
+      "samples": 15360,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 16
+      },
+      "packet_durations_ms": {
+        "20": 16
+      },
+      "packet_channels": {
+        "2": 16
+      },
+      "max_packet_bytes": 318
+    },
+    {
+      "name": "stereo-10ms",
+      "source": {
+        "application": "lowdelay",
+        "frame_ms": 10,
+        "channels": 2,
+        "bitrate": 128000,
+        "vbr": false
+      },
+      "opuspkt_sha256": "bcb44a05e3123435b54d1ba959b08a7532973e643d80e57d2c59e9926b37aa02",
+      "bytes": 5346,
+      "packets": 33,
+      "samples": 15840,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 33
+      },
+      "packet_durations_ms": {
+        "10": 33
+      },
+      "packet_channels": {
+        "2": 33
+      },
+      "max_packet_bytes": 160
+    },
+    {
+      "name": "stereo-10ms-packed20",
+      "source": {
+        "parent": "stereo-10ms",
+        "packing": "CBR",
+        "frames": 2
+      },
+      "opuspkt_sha256": "1c5350bc9c4b2cfd3e3bed37dd8e80ea7b40219b5d5009e09cd90c407396055b",
+      "bytes": 5136,
+      "packets": 16,
+      "samples": 15360,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 16
+      },
+      "packet_durations_ms": {
+        "20": 16
+      },
+      "packet_channels": {
+        "2": 16
+      },
+      "max_packet_bytes": 319
+    },
+    {
+      "name": "stereo-20ms",
+      "source": {
+        "application": "lowdelay",
+        "frame_ms": 20,
+        "channels": 2,
+        "bitrate": 128000,
+        "vbr": false
+      },
+      "opuspkt_sha256": "3ace4c3db8a1b39c6a7558274dd71fc31fc6753ad825f46cc1b3ee51ee5bebfa",
+      "bytes": 5474,
+      "packets": 17,
+      "samples": 16320,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 17
+      },
+      "packet_durations_ms": {
+        "20": 17
+      },
+      "packet_channels": {
+        "2": 17
+      },
+      "max_packet_bytes": 320
+    },
+    {
+      "name": "mono-20ms",
+      "source": {
+        "application": "lowdelay",
+        "frame_ms": 20,
+        "channels": 1,
+        "bitrate": 128000,
+        "vbr": false
+      },
+      "opuspkt_sha256": "aa316afd1415f9b597afbf5e6d49da2f1459639afe34d6179afc759d3bfa69bf",
+      "bytes": 5474,
+      "packets": 17,
+      "samples": 16320,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 17
+      },
+      "packet_durations_ms": {
+        "20": 17
+      },
+      "packet_channels": {
+        "1": 17
+      },
+      "max_packet_bytes": 320
+    },
+    {
+      "name": "stereo-10ms-vbr",
+      "source": {
+        "application": "lowdelay",
+        "frame_ms": 10,
+        "channels": 2,
+        "bitrate": 128000,
+        "vbr": true
+      },
+      "opuspkt_sha256": "3589bf6006336e2fb72e97221ce0d0b33c7c07ab9c1ebc5aa9c33788c8e97ccb",
+      "bytes": 5347,
+      "packets": 33,
+      "samples": 15840,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 33
+      },
+      "packet_durations_ms": {
+        "10": 33
+      },
+      "packet_channels": {
+        "2": 33
+      },
+      "max_packet_bytes": 307
+    },
+    {
+      "name": "stereo-10ms-vbr-packed20",
+      "source": {
+        "parent": "stereo-10ms-vbr",
+        "packing": "VBR",
+        "frames": 2
+      },
+      "opuspkt_sha256": "501ade152d7c66df7718e7e359c4f9965fe3fcde917c72dd209cadb0fd635cb9",
+      "bytes": 5050,
+      "packets": 16,
+      "samples": 15360,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 16
+      },
+      "packet_durations_ms": {
+        "20": 16
+      },
+      "packet_channels": {
+        "2": 16
+      },
+      "max_packet_bytes": 452
+    }
+  ]
+}

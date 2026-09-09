@@ -750,7 +750,9 @@ static void celt_decode_lost(CELTDecoder * OPUS_RESTRICT st, int N, int LM
       exc_length = IMIN(2*pitch_index, MAX_PERIOD);
 
       ALLOC(_exc, MAX_PERIOD+CELT_LPC_ORDER, opus_val16);
+#ifndef YORADIO_OPUS_BOUNDED
       ALLOC(fir_tmp, exc_length, opus_val16);
+#endif
       exc = _exc+CELT_LPC_ORDER;
       window = mode->window;
       c=0; do {
@@ -811,11 +813,20 @@ static void celt_decode_lost(CELTDecoder * OPUS_RESTRICT st, int N, int LM
          /* Initialize the LPC history with the samples just before the start
             of the region for which we're computing the excitation. */
          {
+#ifdef YORADIO_OPUS_BOUNDED
+            /* Only the FIR phase needs this copy. Release it before the IIR
+               phase; _exc and the outer channel loop remain live. */
+            SAVE_STACK;
+            ALLOC(fir_tmp, exc_length, opus_val16);
+#endif
             /* Compute the excitation for exc_length samples before the loss. We need the copy
                because celt_fir() cannot filter in-place. */
             celt_fir(exc+MAX_PERIOD-exc_length, lpc+c*CELT_LPC_ORDER,
                   fir_tmp, exc_length, CELT_LPC_ORDER, st->arch);
             OPUS_COPY(exc+MAX_PERIOD-exc_length, fir_tmp, exc_length);
+#ifdef YORADIO_OPUS_BOUNDED
+            RESTORE_STACK;
+#endif
          }
 
          /* Check if the waveform is decaying, and if so how fast.
@@ -1310,7 +1321,15 @@ int celt_decode_with_ec_dred(CELTDecoder * OPUS_RESTRICT st, const unsigned char
    quant_all_bands(0, mode, start, end, X, C==2 ? X+N : NULL, collapse_masks,
          NULL, pulses, shortBlocks, spread_decision, dual_stereo, intensity, tf_res,
          len*(8<<BITRES)-anti_collapse_rsv, balance, dec, LM, codedBands, &st->rng, 0,
-         st->arch, st->disable_inv);
+         st->arch, st->disable_inv
+#ifdef YORADIO_OPUS_BOUNDED
+         /* Only the current mono output frame is lent. Hybrid accumulation
+            already holds SILK PCM, and downsampled output may be too short.
+            Earlier frames of a multi-frame packet are outside this range.
+            quant_all_bands checks the folding length before borrowing it. */
+         , CC==1 && C==2 && !accum && st->downsample==1 ? pcm : NULL, N
+#endif
+         );
 
    if (anti_collapse_rsv > 0)
    {

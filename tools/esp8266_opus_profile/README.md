@@ -109,3 +109,58 @@ node --test tests/esp8266-opus-memory.test.js
 `OPUS_HOST_NO_BUILD=1` reuses existing binaries; `OPUS_HOST_UPSTREAM` optionally
 adds a pristine tree. Packet duration admission (2.5/10/20 ms, rejection above
 20 ms) belongs to the native adapter tests, not this raw libopus probe.
+
+## CELT phase-buffer reuse
+
+`YORADIO_OPUS_BOUNDED` can lend the current idle PCM output frame to the
+second-channel folding buffer (`norm2`). This does not change packet channels,
+sample rate, frame size or decoding arithmetic. It is allowed only for mono API
+output, stereo-coded CELT, no SILK accumulation, and no downsampling. The callee
+also checks the exact folding length. The first folding buffer and X/Y remain
+separate. Folding finishes before synthesis/deemphasis writes PCM; earlier
+frames of a multi-frame packet are outside the borrowed current-frame range.
+For the fixed 48-kHz mode, `N=120*M` and the largest lent region is `78*M`
+16-bit samples (1,248 bytes at 20 ms), within the current output frame.
+
+Pitch-based PLC now allocates `fir_tmp` only inside the FIR/copy block. Its scoped
+allocator mark preserves `_exc` and the outer channel-loop state, and releases
+the copy before IIR. Neither `_celt_autocorr` nor IIR accesses `fir_tmp`. Both
+changes leave the ordinary, non-bounded allocation path unchanged.
+
+```powershell
+node tools/esp8266_opus_profile/run_phase_regressions.cjs
+node --test tests/esp8266-opus-phase-memory.test.js
+```
+
+The runner requires the independent reference preparation described above. It
+reuses the incremental generic32 objects, then links a host-only wrapper around
+`quant_all_bands` to count actual borrowed transient/dual-stereo paths and around
+the allocator to permit peak-call tracing. Production objects contain no trace
+hooks. Set `OPUS_PHASE_TEST=1` to rerun it from the Node test as well.
+
+Saved `pcm-scratch-results.json` covers the original five fixtures, ten new
+deterministic short/multiframe CELT fixtures, mixed modes/PLC, six-loss PLC bursts,
+and 8/12/16/24-kHz no-borrow guard cases. Every sample matches independent
+pristine generic32 PCM, including a second pass after reset. The focused probe
+uses a real 6,144-byte logical scratch limit with a canary immediately after it,
+and checks the PCM boundaries and untouched tail after short packets. The
+original runner separately retains its forced-OOM/reinitialization checks.
+
+| Host DRAM scratch peak | Before phase reuse | After both changes |
+| --- | ---: | ---: |
+| Normal 20-ms stereo-coded CELT, mono output | 6,736 | 5,488 |
+| Mixed modes/channels plus PLC | 7,216 | 5,968 |
+
+Norm borrowing alone reduced the mixed peak to 6,400; its remaining high-water
+allocation was `celt_iir`'s 1,104-sample 16-bit temporary while the obsolete FIR
+copy was still live. The word-arena peak remains 15,600 bytes. A 6,144-byte DRAM
+arena leaves 176 bytes above this tested corpus peak; this is not a universal
+upper-bound proof for every valid Opus stream. Production defaults are a
+separate decision. No board throughput or whole-device heap claim is made here.
+
+For a reproducible allocator trace, run the bounded `phase_probe` from its WSL
+environment with `OPUS_TRACE_ALLOC=1`; it prints each new peak, request size and
+caller address. The probe is linked without PIE, so `addr2line -f -e phase_probe`
+can resolve those addresses. `OPUS_PHASE_CAPACITY` selects a diagnostic limit,
+`OPUS_PHASE_RATE` selects the test API rate, and `OPUS_PHASE_PLC_BURST` selects
+one through eight losses after every eighth packet when `--plc` is supplied.

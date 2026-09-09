@@ -108,7 +108,11 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
       const celt_ener *bandE, int *pulses, int shortBlocks, int spread,
       int dual_stereo, int intensity, int *tf_res, opus_int32 total_bits,
       opus_int32 balance, ec_ctx *ec, int M, int codedBands, opus_uint32 *seed,
-      int complexity, int arch, int disable_inv);
+      int complexity, int arch, int disable_inv
+#ifdef YORADIO_OPUS_BOUNDED
+      , celt_norm *norm2_scratch, int norm2_scratch_size
+#endif
+      );
 
 void anti_collapse(const CELTMode *m, celt_norm *X_,
       unsigned char *collapse_masks, int LM, int C, int size, int start,
