@@ -19,8 +19,23 @@
 - Targeted LED and audio-path tests: 13/13 passed (four host hardware mocks
   plus eight bit-exact I2S output combinations and one configuration check).
 - Final complete ESP8266 host regression: 257/257 passed, no skips, 113.16 s.
-- Not flashed in this task. Physical brightness and CPU overhead still need
-  on-board verification. Deployment must follow the repository OTA/RX rules.
+- Deployed by application-only OTA on 2026-09-09; see validation below.
+  Physical brightness and CPU overhead still need user/on-board verification.
+
+## OTA deployment, 2026-09-09
+
+- Uploaded the exact image above to `http://192.168.100.6/update`; HTTP 200
+  `OK` in 18.1 s. Confirmed reboot from app0 `0x10000` into app1 `0x110000`.
+- Client Wi-Fi reconnected; final RSSI -68 dBm. Main HTML returned HTTP 200
+  in 163 ms; status returned HTTP 200 in 21 ms. These are single requests,
+  not a browser render benchmark or sustained latency guarantee.
+- WebSocket `getindex=1` received state/current-station messages. No commands
+  to change station, volume or settings were sent. ROCK FM remained stopped,
+  as before OTA, for the user's sound/LED test.
+- Idle free heap: 23260 bytes during WebSocket check, 22908 on the final
+  HTTP sample; boot minimum 17420; WebUI stack watermark 2312 bytes.
+- No serial transmission/reset and no SPIFFS/NVS/partition image upload.
+  Raw local checks: `.build/esp8266-led-ota-2026-09-09/`.
 
 Build command:
 

@@ -102,5 +102,13 @@ node --test @taskTests
 ```
 
 The four modulator variants each compared 1620 blocks / 351246 output words
-with the reference, both with LED hooks disabled and enabled. The artifact
-has not been installed on the board during this task.
+with the reference, both with LED hooks disabled and enabled.
+
+### OTA deployment, 2026-09-09
+
+The user subsequently requested installation. Application-only OTA returned
+HTTP 200/OK; the board booted into slot `0x110000`, rejoined client Wi-Fi and
+served HTML/status plus WebSocket state messages. Playback was already stopped
+and was left stopped for the user's listening/LED test. See the
+[deployment record](../firmware/development/esp8266-audio-level-led/manifest.md).
+No LED brightness observation or audio CPU measurement is claimed.

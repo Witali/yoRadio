@@ -17,10 +17,14 @@ entries are retained; changes are published under a new firmware version.
   external-DAC I2S disables it because GPIO2 is WS. Stereo profile synchronized.
 - +16 bytes static DRAM, no extra IRAM, +944 bytes application image versus
   the previous SPIFFS-logging production image. Short WebUI audio pause and
-  local SPIFFS error logging retained. Built and host-tested, not flashed;
+  local SPIFFS error logging retained. Built, host-tested and OTA-installed;
   physical LED brightness and CPU time are not yet measured.
 - Final ESP8266 host regression: 257/257 passed, no skips. Includes LED tests
   at 10/20 Hz and bit-exact PCM/PDM comparisons with LED hooks on/off.
+- Installed by OTA on 2026-09-09: HTTP 200/OK, confirmed new slot `0x110000`,
+  Wi-Fi and HTTP/WebSocket status available. Main HTML fetched in 163 ms
+  (single request, not a render benchmark). ROCK FM was stopped before and
+  after update; the sound/LED test is left to the user.
 
 ## Maintenance - 2026-09-09: remove obsolete test images
 
