@@ -27,6 +27,11 @@ option(YORADIO_ESP8266_AUDIO_PROFILE
   "Measure ESP8266 radio decode and output stages" OFF)
 option(YORADIO_ESP8266_MEMORY_PROFILE
   "Sample DRAM fragmentation and application stack margins over UART" OFF)
+option(YORADIO_ESP8266_SPIFFS_LOG
+  "Mirror SDK logs to bounded SPIFFS files (diagnostic flash writes)" OFF)
+if(YORADIO_ESP8266_SPIFFS_LOG)
+  list(APPEND YORADIO_SOURCES "spiffs_log.c")
+endif()
 option(YORADIO_ESP8266_WEB_PROFILE
   "Log static HTTP handler read/send timings (no URLs or credentials)" OFF)
 if(YORADIO_ESP8266_MEMORY_PROFILE)
@@ -210,6 +215,7 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
   YORADIO_ESP8266_WEB_AUDIO_PAUSE=${WEB_AUDIO_PAUSE_MODE}
   YORADIO_ESP8266_WEB_PROFILE=$<BOOL:${YORADIO_ESP8266_WEB_PROFILE}>
+  YORADIO_ESP8266_SPIFFS_LOG=$<BOOL:${YORADIO_ESP8266_SPIFFS_LOG}>
   YORADIO_HTTP_ONLY=1
   YORADIO_HELIX_MP3=1)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE

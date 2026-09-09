@@ -219,6 +219,16 @@ further without a new on-device high-water and full Web API test.
 The project is under active implementation; use the repository setup/build
 scripts once they are added rather than invoking a globally installed SDK.
 
+## Optional local SPIFFS logging
+
+Optional local diagnostic logging: build with `-SpiffsLog` using
+`tools/esp8266_audio_profile/build_i2s_pdm_production.ps1`, or configure
+`-DYORADIO_ESP8266_SPIFFS_LOG=ON`. Default OFF; two bounded 8 KiB SPIFFS
+files, a 512-byte RAM queue, deferred app-task writes, no new task/stack.
+UART output is preserved. No HTTP log access; retrieve later from a USB flash
+backup with the correct native SPIFFS format. Flash writes can disturb audio.
+See [configuration, limits and USB extraction](../../docs/ESP8266_SPIFFS_LOGGING.md).
+
 ## OTA-first updates with audio connected to RX
 
 For the connected Wemos D1 mini, use OTA for subsequent application updates:

@@ -25,6 +25,7 @@
 #include "time_service.h"
 #include "web_service.h"
 #include "memory_profile.h"
+#include "spiffs_log.h"
 
 static const char *TAG = "yoradio8266";
 
@@ -48,6 +49,7 @@ void app_main(void) {
     codec_ram_benchmark_run();
     for (;;) vTaskDelay(portMAX_DELAY);
 #else
+    spiffs_log_init();
     native_state_init();
     ESP_LOGI(TAG, "yoRadio ESP8266 RTOS SDK native starting");
     ESP_LOGI(TAG, "CPU: %u MHz; free heap: %u",
@@ -96,6 +98,7 @@ void app_main(void) {
 #endif
     result = storage_service_init();
     if (result == ESP_OK) {
+        spiffs_log_mount_ready();
         result = playlist_service_init();
         if (result != ESP_OK && result != ESP_ERR_NOT_FOUND)
             ESP_LOGE(TAG, "Playlist initialization failed: %s",
@@ -118,6 +121,7 @@ void app_main(void) {
         time_service_poll();
         web_service_poll();
         memory_profile_poll();
+        spiffs_log_poll();
 #if CONFIG_YORADIO_STATUS_LED
         status_led_poll();
 #endif
