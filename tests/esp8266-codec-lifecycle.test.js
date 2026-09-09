@@ -11,6 +11,7 @@ test('native defaults and production manifest use a 4 KiB compressed input', () 
   assert.match(read('esp8266/rtos-sdk-native/sdkconfig.defaults'), /^CONFIG_YORADIO_STREAM_INPUT_BYTES=4096$/m);
   assert.match(read('esp8266/rtos-sdk-native/main/Kconfig.projbuild'), /config YORADIO_STREAM_INPUT_BYTES[\s\S]*?default 4096/);
   assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /stream_input_bytes=4096/);
+  assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /Wrong cached Opus input size/);
 });
 
 for (const opusInput of [0, 1024, 1536]) {

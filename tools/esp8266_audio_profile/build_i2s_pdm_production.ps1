@@ -93,6 +93,7 @@ try {
     $taskGzipEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y\r?$'
     $taskOpusEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_OGG_OPUS=y\r?$'
     if ($taskOpusEnabled -ne [bool]$EnableOpus) { throw 'Wrong cached Opus profile; use a fresh -Variant build directory' }
+    if ($taskOpusEnabled -and $taskConfig -notmatch '(?m)^CONFIG_YORADIO_OPUS_INPUT_BYTES=1024\r?$') { throw 'Wrong cached Opus input size; use a fresh -Variant build directory' }
     if ($taskOpusEnabled -and $taskConfig -notmatch '(?m)^CONFIG_YORADIO_OPUS_SCRATCH_BYTES=7680\r?$') { throw 'Wrong cached Opus scratch size; use a fresh -Variant build directory' }
     $taskLedEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_STATUS_LED=y\r?$'
     if ($taskLedEnabled -eq [bool]$NoAudioLevelLed) { throw 'Wrong cached LED profile; use a fresh -Variant build directory' }
