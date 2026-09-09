@@ -1163,6 +1163,40 @@ static esp_err_t static_handler(httpd_req_t *request) {
 }
 
 #if YORADIO_ESP8266_OPUS_BENCHMARK
+/* Diagnostic-only live stream probe. It does not rewrite the user's playlist,
+ * Wi-Fi credentials or saved station. Body is one bounded HTTP URL. */
+static esp_err_t opus_test_stream_handler(httpd_req_t *request) {
+    prepare_short_response(request);
+    httpd_resp_set_type(request, "application/json");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    char url[512];
+    if (request->content_len < 8 || request->content_len >= sizeof(url)) {
+        httpd_resp_set_status(request, "400 Bad Request");
+        return finish_short_response(request, send_string(request, "{\"error\":\"HTTP URL required, maximum 511 bytes\"}"));
+    }
+    size_t used = 0;
+    while (used < request->content_len) {
+        int n = httpd_req_recv(request, url + used, request->content_len - used);
+        if (n <= 0) return ESP_FAIL;
+        used += (size_t)n;
+    }
+    url[used] = '\0';
+    bool valid = strncmp(url, "http://", 7) == 0;
+    for (size_t i = 0; i < used; ++i)
+        if ((unsigned char)url[i] <= 32U || (unsigned char)url[i] == 127U) valid = false;
+    if (!valid) {
+        httpd_resp_set_status(request, "400 Bad Request");
+        return finish_short_response(request, send_string(request, "{\"error\":\"Invalid HTTP URL\"}"));
+    }
+    if (audio_service_play(url) != ESP_OK) {
+        httpd_resp_set_status(request, "503 Service Unavailable");
+        return finish_short_response(request, send_string(request, "{\"error\":\"play queue failed\"}"));
+    }
+    native_state_set_station(0, "OPUS TEST");
+    httpd_resp_set_status(request, "202 Accepted");
+    return finish_short_response(request, send_string(request, "{\"queued\":true}"));
+}
+
 static esp_err_t opus_benchmark_start_handler(httpd_req_t *request) {
     prepare_short_response(request);
     httpd_resp_set_type(request, "application/json");
@@ -1245,7 +1279,7 @@ esp_err_t web_service_start(void) {
     config.recv_wait_timeout = WEB_IDLE_TIMEOUT_SECONDS;
     config.max_uri_handlers = 26;
 #if YORADIO_ESP8266_OPUS_BENCHMARK
-    config.max_uri_handlers += 2;
+    config.max_uri_handlers += 3;
 #endif
 #if YORADIO_ESP8266_SPIFFS_LOG_HTTP
     config.max_uri_handlers += 2;
@@ -1296,6 +1330,9 @@ esp_err_t web_service_start(void) {
     httpd_uri_t opus_bench = {.uri = "/api/native/opus-benchmark", .method = HTTP_POST,
                               .handler = opus_benchmark_start_handler};
     if ((result = httpd_register_uri_handler(s_server, &opus_bench)) != ESP_OK) return result;
+    httpd_uri_t opus_stream = {.uri = "/api/native/opus-stream", .method = HTTP_POST,
+                               .handler = opus_test_stream_handler};
+    if ((result = httpd_register_uri_handler(s_server, &opus_stream)) != ESP_OK) return result;
 #endif
 #if YORADIO_ESP8266_SPIFFS_LOG_HTTP
     if ((result = register_get("/api/native/log", spiffs_log_handler)) != ESP_OK)

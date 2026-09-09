@@ -28,6 +28,21 @@ node tools/esp8266_opus_profile/run_board.cjs --base http://192.168.100.6 --outp
 
 ## Что измеряется
 
+В этой же диагностической сборке можно запустить реальный URL, не заменяя
+плейлист: `POST /api/native/opus-stream`, тело — HTTP URL текстом (8–511 байт,
+без переводов строк). Например:
+
+```powershell
+curl.exe --max-time 10 -H "Content-Type: text/plain" --data-raw "http://secure.live-streams.nl/opus.opus" http://192.168.100.6/api/native/opus-stream
+node tools/test_esp8266_audio_continuity.cjs --base http://192.168.100.6 --seconds 25 --output .build/opus-live-continuity.json
+```
+
+Запуск проходит через обычную audio-task и HTTP/Ogg/PCM/I2S цепочку; метка
+станции временно `OPUS TEST`, сохранённая станция и плейлист не меняются.
+Для остановки используется обычный WebUI/`stop=1`. Этот маршрут отсутствует
+в production так же, как raw benchmark. `/api/native/audio` дополнительно
+возвращает `audio_stack_free` — lifetime watermark в байтах.
+
 - Пять собственных фрагментов: SILK mono12, Hybrid mono24, CELT stereo64,
   stereo128, stereo510 кбит/с. Выход декодера mono 48 кГц, 20 мс на пакет.
 - Первые 12 пакетов каждого фрагмента хранятся во flash (22756 байт вместе
