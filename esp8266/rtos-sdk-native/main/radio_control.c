@@ -164,17 +164,36 @@ static esp_err_t step_station(int direction) {
 esp_err_t radio_control_next(void) { return step_station(1); }
 esp_err_t radio_control_previous(void) { return step_station(-1); }
 
+uint8_t radio_control_volume(void) {
+    return volume_to_percent(native_audio_output_volume());
+}
+
+static void set_volume_locked(int percent) {
+    uint8_t raw = volume_from_percent(percent);
+    if (native_audio_output_volume() == raw) return;
+    native_audio_output_set_volume_runtime(raw);
+    native_state_set_volume(raw);
+    persistent_settings_set_volume_runtime(raw);
+    mark_settings_dirty();
+}
+
+esp_err_t radio_control_set_volume(int percent) {
+    if (!s_lock) return ESP_ERR_INVALID_STATE;
+    if (xSemaphoreTake(s_lock, pdMS_TO_TICKS(100)) != pdTRUE)
+        return ESP_ERR_TIMEOUT;
+    set_volume_locked(percent);
+    xSemaphoreGive(s_lock);
+    return ESP_OK;
+}
+
 esp_err_t radio_control_adjust_volume(int delta) {
     if (!s_lock) return ESP_ERR_INVALID_STATE;
     if (xSemaphoreTake(s_lock, pdMS_TO_TICKS(100)) != pdTRUE)
         return ESP_ERR_TIMEOUT;
-    int volume = (int)native_audio_output_volume() + delta;
-    if (volume < 0) volume = 0;
-    if (volume > 254) volume = 254;
-    native_audio_output_set_volume_runtime((uint8_t)volume);
-    native_state_set_volume((uint8_t)volume);
-    persistent_settings_set_volume_runtime((uint8_t)volume);
-    mark_settings_dirty();
+    /* Clamp before adding to avoid overflow even for an invalid caller. */
+    if (delta > (int)RADIO_VOLUME_MAX) delta = RADIO_VOLUME_MAX;
+    if (delta < -(int)RADIO_VOLUME_MAX) delta = -(int)RADIO_VOLUME_MAX;
+    set_volume_locked((int)radio_control_volume() + delta);
     xSemaphoreGive(s_lock);
     return ESP_OK;
 }

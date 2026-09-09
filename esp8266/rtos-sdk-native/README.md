@@ -1,5 +1,30 @@
 # yoRadio ESP8266 native
 
+## Volume control
+
+The player slider and WebSocket `volume=N` use **0..100 inclusive** (step 1).
+`volp`, `volm` and encoder steps use percentage points; the configured step
+remains 1..10 (default 2). Zero is mute; 100 is the former full-scale 254.
+The initial/default volume 160 is displayed as 63. Percent refers to the
+linear gain control, not a calibrated acoustic loudness percentage.
+
+PCM gain and the version-1 NVS blob retain 0..254 units. Existing settings
+are not rewritten during boot, and all 101 new values round-trip exactly.
+There are no new audio buffers, tasks or per-sample conversions.
+
+Deploy the updated shared `yoRadio/data/www/script.js.gz` **before** the new
+app (or update both together). The new script works with old firmware too;
+it opts into percent only when `volumeMax=100` is advertised. An old script
+with a new app can send legacy 0..254 commands, which the new API clamps to
+100; do not operate that mismatched combination. Reload all open WebUI tabs.
+For application-only OTA, the old SPIFFS asset does not update automatically.
+The compressed built-in player/settings bundles include the capability too.
+
+Other chips and Arduino WebRadio are unchanged. KaRadio ESP8266 reuses this
+controller/WebUI and inherits the scale when rebuilt (not separately tested).
+See the
+[synchronization plan](../../docs/VOLUME_0_100_SYNC_PLAN.md).
+
 This target uses the official Espressif `ESP8266_RTOS_SDK v3.4` and follows
 the ESP-IDF-style component/CMake layout. It is deliberately HTTP-only. The
 normal profile uses the yoRadio Helix MP3 and AAC decoders; an experimental

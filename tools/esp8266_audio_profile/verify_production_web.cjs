@@ -14,6 +14,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const value=(data,id)=>data.payload?.find(p=>p.id===id)?.value;
 async function state(page) {
   return page.evaluate(()=>({current:currentItem,volume:Number(document.querySelector('#volume').value),
+    volumeMax:Number(document.querySelector('#volume').max),
     player:document.querySelector('#playerwrap').className,rows:document.querySelectorAll('#playlist li[attr-id]').length,
     active:document.querySelector('#playlist li.active')?.getAttribute('attr-id'),
     socket:websocket.readyState,scroll:document.querySelector('#playlist').scrollTop}));
@@ -61,7 +62,7 @@ async function main() {
   await health('two-tabs-before');
   for(let trial=0;trial<10;trial++) {
     const tab=trial%tabs,current=await state(pages[tab]);
-    const selector=current.volume>=254?'#volmbutton':current.volume<=0?'#volpbutton':trial%2?'#volpbutton':'#volmbutton';
+    const selector=current.volume>=current.volumeMax?'#volmbutton':current.volume<=0?'#volpbutton':trial%2?'#volpbutton':'#volmbutton';
     const start=Date.now();await pages[tab].locator(selector).click();
     const end=Date.now()+12000;let own;
     while(Date.now()<end&&!own) {

@@ -43,7 +43,7 @@ def build(root, page='player'):
     revision = '%08x' % fnv(b''.join(compressed.values()))
     variables = ("var yoVersion='esp8266-native',webUiRevision='%s',"
                  "formAction='',playMode='player',equalizerEnabled=false,"
-                 "nativeFirmwareOnly=true;" % revision)
+                 "nativeFirmwareOnly=true,volumeMax=100;" % revision)
     fragment = 'player.html' if page == 'player' else 'options.html'
     preloaded = json.dumps({name: assets[name] for name in (fragment, 'logo.svg')},
                           ensure_ascii=True, separators=(',', ':')).replace('<', r'\u003c')

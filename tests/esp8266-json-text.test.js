@@ -15,16 +15,16 @@ test('actual volume reply uses one bounded Arduino-compatible frame and actual d
 #include <assert.h>
 typedef int esp_err_t; typedef int httpd_req_t;
 static unsigned volume,calls;
-static unsigned native_audio_output_volume(void){return volume;}
+static unsigned radio_control_volume(void){return volume;}
 static int ws_send(httpd_req_t *r,const char *text){(void)r;++calls;assert(strlen(text)<48);puts(text);return -7;}
 ${fn}
-int main(void){for(volume=0;volume<=254;++volume){assert(send_current_volume(NULL)==-7);}assert(calls==255);return 0;}
+int main(void){for(volume=0;volume<=100;++volume){assert(send_current_volume(NULL)==-7);}assert(calls==101);return 0;}
 `);
   const bin=path.join(dir,'test'),args=['-std=c11','-Wall','-Wextra','-Werror','-fsanitize=undefined',p(path.join(dir,'test.c')),'-o',p(bin)];
   let r=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...args]:args,{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
   r=spawnSync(wsl?'wsl.exe':bin,wsl?['--exec',p(bin)]:[],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
   const rows=r.stdout.trim().split('\n').map(x=>JSON.parse(x));
-  assert.equal(rows.length,255);
+  assert.equal(rows.length,101);
   rows.forEach((row,volume)=>assert.deepEqual(row,{payload:[{id:'volume',value:volume}]}));
 });
 

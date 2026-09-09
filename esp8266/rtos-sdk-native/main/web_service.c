@@ -262,7 +262,7 @@ static bool format_status(const native_state_t *status, char *output,
         "{\"id\":\"heap\",\"value\":%u},"
         "{\"id\":\"bitrate\",\"value\":%lu},"
         "{\"id\":\"fmt\",\"value\":\"",
-        status->volume, settings.balance, status->wifi_rssi,
+        volume_to_percent(status->volume), settings.balance, status->wifi_rssi,
         status->playing && web.audio_info ? status->buffer_percent : 0U,
         (unsigned long)status->bitrate_kbps);
     json_writer_escaped(&writer, stream);
@@ -382,7 +382,7 @@ static esp_err_t send_current_volume(httpd_req_t *request) {
     char body[48];
     snprintf(body, sizeof(body),
              "{\"payload\":[{\"id\":\"volume\",\"value\":%u}]}",
-             (unsigned)native_audio_output_volume());
+             (unsigned)radio_control_volume());
     return ws_send(request, body);
 }
 
@@ -564,8 +564,18 @@ static void handle_command(httpd_req_t *request, char *command) {
         radio_control_previous();
     } else if (strcmp(command, "volume") == 0) {
         httpd_trace_volume_begin();
-        int target = (int)parse_unsigned(value, 254U);
-        radio_control_adjust_volume(target - (int)native_audio_output_volume());
+        char *end;
+        long target = strtol(value, &end, 10);
+        if (end == value || *end != '\0') {
+            ws_send(request, "{\"commandError\":\"Invalid volume\"}");
+            return;
+        }
+        if (target < 0) target = 0;
+        if (target > RADIO_VOLUME_MAX) target = RADIO_VOLUME_MAX;
+        if (radio_control_set_volume((int)target) != ESP_OK) {
+            ws_send(request, "{\"commandError\":\"Volume busy\"}");
+            return;
+        }
         send_current_volume(request);
     } else if (strcmp(command, "volp") == 0 ||
                strcmp(command, "volm") == 0) {
@@ -838,11 +848,12 @@ static esp_err_t variables_handler(httpd_req_t *request) {
     char body[240];
     snprintf(body, sizeof(body),
              "var yoVersion='esp8266-native';\n"
-             "var webUiRevision='8266n01';\n"
+             "var webUiRevision='8266vol100';\n"
              "var formAction='%s';\n"
              "var playMode='%s';\n"
              "var equalizerEnabled=false;\n"
-             "var nativeFirmwareOnly=true;\n",
+             "var nativeFirmwareOnly=true;\n"
+             "var volumeMax=100;\n",
              "",
              state.network_mode == NETWORK_CLIENT ? "player" : "ap");
     httpd_resp_set_type(request, "application/javascript; charset=utf-8");

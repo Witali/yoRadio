@@ -9,7 +9,7 @@
 #define SETTINGS_SNTP_CAPACITY 36
 
 typedef struct {
-    uint8_t volume;
+    uint8_t volume; /* Legacy 0..254 gain units, NOT user-facing percent. */
     int8_t balance;
     uint16_t last_station;
     uint8_t smart_start;
@@ -26,7 +26,7 @@ typedef struct {
     int8_t timezone_hour;
     uint8_t timezone_minute;
     uint16_t time_sync_interval_min;
-    uint8_t volume_steps;
+    uint8_t volume_steps; /* User control step in percentage points (1..10). */
     uint16_t encoder_acceleration;
     char mdns_name[SETTINGS_HOST_CAPACITY];
     char sntp1[SETTINGS_SNTP_CAPACITY];

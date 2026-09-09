@@ -27,7 +27,7 @@ typedef struct {
     uint16_t station_index;
     uint16_t station_count;
     uint16_t buffer_percent;
-    uint8_t volume;
+    uint8_t volume; /* Legacy gain units; WebUI serializes 0..100 percent. */
     uint32_t bitrate_kbps;
     uint32_t sample_rate_hz;
     uint8_t channels;
