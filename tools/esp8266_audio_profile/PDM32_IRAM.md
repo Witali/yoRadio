@@ -71,6 +71,15 @@ No physical speed improvement is claimed by these checks. Keep the option
 OFF until a controlled output/stream A/B establishes CPU, underrun, heap and
 reconnect behavior for the intended firmware.
 
+## Whole-firmware trial
+
+`firmware/development/esp8266-opus-pdm-iram/` contains the first target ELF
+placement report and OTA/local/real stream results. Full link recovered504B
+IRAM; the packer remained456B/164instructions. Both local64 and real56
+streams still stalled, and SILK12 reproduced a transport stall too. The
+trial therefore does not justify enabling this option by default or claim
+uninterrupted Opus playback. Use `-Diagnostic -Pdm32Iram` for reproduction.
+
 ## Independent builder switches
 
 `build_i2s_pdm_production.ps1 -Diagnostic -Pdm32Iram` selects this placement.
