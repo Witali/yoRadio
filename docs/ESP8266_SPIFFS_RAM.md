@@ -37,3 +37,29 @@ none consumes a SPIFFS handle. Startup playlist work precedes Wi-Fi/HTTP.
 This is a bound for successful close/normal error cleanup, not a claim that a
 corrupt filesystem leaking SDK handles remains usable. Keep the spare slot;
 re-audit before adding independent file workers or nested file operations.
+
+## Optional Opus cache-off experiment
+
+`tools/esp8266_audio_profile/build_i2s_pdm_production.ps1 -EnableOpus
+-NoSpiffsCache -Variant <fresh-name>` selects the SDK's standard uncached
+SPIFFS implementation. The switch is opt-in and rejected without `-EnableOpus`;
+all ordinary/default builds keep both read and write caches enabled. It changes
+only `CONFIG_SPIFFS_CACHE` and its dependent `CONFIG_SPIFFS_CACHE_WR`, not the
+five file slots, page size, filesystem layout, audio/DMA, stacks, or heap reserve.
+
+With five slots, disabling the cache removes its 1400-byte allocation and the
+five four-byte cached-write pointers in `spiffs_fd`: at least **1420 additional
+DRAM bytes** before the removed allocation header/other SDK fields. This is a
+source/target-layout calculation, not yet a device qualification result.
+Uncached reads call the flash HAL directly; uncached writes use
+`spiffs_hydro_write`. Neither path requires a cache page; caching is not part
+of the on-flash format.
+The cost is more flash I/O, especially with page checks enabled; WebUI file
+latency and upload/recovery still need measurement. NVS and raw-partition OTA
+do not use this cache. Test before selecting this option for production.
+
+The builder checks the effective cached `sdkconfig` in both directions and
+rejects a stale variant rather than silently building a different experiment.
+The firmware manifest records `spiffs_cache` and `spiffs_write_cache` from
+that verified configuration. To return to caching, omit `-NoSpiffsCache` and
+choose a fresh variant directory. The opt-in does not rewrite SPIFFS or NVS.

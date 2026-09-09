@@ -12,6 +12,7 @@ param(
     [int]$LedUpdateHz = 10,
     [switch]$NoAudioLevelLed,
     [switch]$EnableOpus,
+    [switch]$NoSpiffsCache,
     [switch]$OpusWordAsm,
     [switch]$OpusBenchmark,
     [string]$OpusBenchmarkFixtures = '.build/esp8266-opus-board-fixtures'
@@ -23,6 +24,7 @@ if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
 if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -SpiffsLog' }
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
 if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOpus' }
+if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
 $taskVariant = $Variant
 $taskBuild = "$taskRoot/.build/$taskVariant"
@@ -34,6 +36,20 @@ function Invoke-TaskTool([string]$Executable, [string[]]$Arguments, [string]$Log
     $ErrorActionPreference = 'Continue'
     & $Executable @Arguments *> $Log
     if ($LASTEXITCODE -ne 0) { throw "Command failed ($LASTEXITCODE): $Executable; see $Log" }
+}
+function Set-TaskSpiffsCacheDefaults([string]$Defaults, [bool]$Disabled) {
+    if (-not $Disabled) { return $Defaults }
+    # Replace only cache options, never filesystem geometry or file limits.
+    $taskText = $Defaults -replace '(?m)^(?:CONFIG_SPIFFS_CACHE(?:_WR)?=[^\r\n]*|# CONFIG_SPIFFS_CACHE(?:_WR)? is not set)\r?\n?', ''
+    return $taskText + "`n# CONFIG_SPIFFS_CACHE is not set`n# CONFIG_SPIFFS_CACHE_WR is not set`n"
+}
+function Get-TaskSpiffsCacheProfile([string]$Config, [bool]$Disabled) {
+    $taskReadCache = $Config -match '(?m)^CONFIG_SPIFFS_CACHE=y\r?$'
+    $taskWriteCache = $Config -match '(?m)^CONFIG_SPIFFS_CACHE_WR=y\r?$'
+    if ($taskReadCache -eq $Disabled -or $taskWriteCache -ne $taskReadCache) {
+        throw 'Wrong cached SPIFFS cache profile; use a fresh -Variant build directory'
+    }
+    return [pscustomobject]@{ enabled = $taskReadCache; write_enabled = $taskWriteCache }
 }
 Push-Location $taskRoot
 try {
@@ -49,6 +65,7 @@ try {
     $taskDefaults = $taskDefaults -replace 'CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=\d+', "CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz"
     if ($NoAudioLevelLed) { $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED=y', '# CONFIG_YORADIO_STATUS_LED is not set') }
     if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=1024`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144`n" }
+    $taskDefaults = Set-TaskSpiffsCacheDefaults $taskDefaults ([bool]$NoSpiffsCache)
     if ($OpusBenchmark) {
         $taskDefaults += "`nCONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y`nCONFIG_FREERTOS_RUN_TIME_STATS_USING_ESP_TIMER=y`n"
         $OpusBenchmarkFixtures = (Resolve-Path $OpusBenchmarkFixtures).Path.Replace('\', '/')
@@ -87,6 +104,7 @@ try {
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES=$OpusBenchmarkFixtures",
         '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
     $taskConfig = Get-Content "$taskBuild/sdkconfig" -Raw
+    $taskSpiffsCache = Get-TaskSpiffsCacheProfile $taskConfig ([bool]$NoSpiffsCache)
     foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHMODE_QIO=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y', 'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0', 'CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS=1000')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
@@ -121,6 +139,8 @@ try {
         memory_profile=[bool]$MemoryProfile
         spiffs_log=[bool]$SpiffsLog
         spiffs_log_http=[bool]$SpiffsLogHttp
+        spiffs_cache=[bool]$taskSpiffsCache.enabled
+        spiffs_write_cache=[bool]$taskSpiffsCache.write_enabled
         audio_level_led=[bool]$taskLedEnabled
         audio_level_led_update_hz=$(if ($taskLedEnabled) { $LedUpdateHz } else { 0 })
         audio_level_led_max_brightness=$(if ($taskLedEnabled -and $taskConfig -match '(?m)^CONFIG_YORADIO_STATUS_LED_MAX_BRIGHTNESS=(\d+)') { [int]$Matches[1] } else { 0 })
