@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
+option(YORADIO_ESP8266_SDK_RX_DIAG
+  "Diagnostic-only SDK RX/TX allocation and queue counters (32 bytes RAM)" OFF)
+
 # Keep the mutable Kconfig output local to each build directory. Otherwise
 # ESP8266_RTOS_SDK defaults to a source-tree sdkconfig, so an ignored file left
 # by a libmad experiment can silently override the tracked production defaults.
@@ -14,6 +17,8 @@ endif()
 set(EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/components")
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yoradio_esp8266_helix_native)
+
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/sdk_rx_diag.cmake")
 
 # Instrument the configured SDK through its supported hook, not by modifying
 # the downloaded SDK. Nothing is injected into ordinary non-profiled builds.

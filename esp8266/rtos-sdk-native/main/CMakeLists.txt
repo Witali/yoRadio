@@ -31,6 +31,12 @@ option(YORADIO_ESP8266_SPIFFS_LOG
   "Mirror SDK logs to bounded SPIFFS files (diagnostic flash writes)" OFF)
 option(YORADIO_ESP8266_DIAGNOSTIC
   "Enable explicitly requested diagnostic facilities, never for production" OFF)
+if(YORADIO_ESP8266_SDK_RX_DIAG)
+  if(NOT YORADIO_ESP8266_DIAGNOSTIC)
+    message(FATAL_ERROR "SDK RX diagnostics require YORADIO_ESP8266_DIAGNOSTIC=ON")
+  endif()
+  list(APPEND YORADIO_SOURCES "sdk_rx_diag.c")
+endif()
 option(YORADIO_ESP8266_OPUS_STREAM_TEST
   "Allow diagnostic live Opus URL requests and init-failure snapshots" OFF)
 option(YORADIO_ESP8266_OPUS_BENCHMARK
@@ -264,6 +270,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++14>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
+  YORADIO_ESP8266_SDK_RX_DIAG=$<BOOL:${YORADIO_ESP8266_SDK_RX_DIAG}>
   YORADIO_ESP8266_PDM32_IRAM=$<BOOL:${YORADIO_ESP8266_PDM32_IRAM}>
   YORADIO_ESP8266_PDM32_BATCH=$<BOOL:${YORADIO_ESP8266_PDM32_BATCH}>
   YORADIO_ESP8266_OPUS_STREAM_TEST=$<BOOL:${YORADIO_ESP8266_OPUS_STREAM_TEST}>
