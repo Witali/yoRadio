@@ -1038,6 +1038,9 @@ static void audio_task(void *argument) {
              !audio_web_pause_requested(); ++attempt) {
             opened = open_http_stream(command.url, &stream);
             if (opened == 0) break;
+            /* Reuse a decoder on successful switches, but do not reserve
+             * its DRAM throughout repeated failed TCP/DNS handshakes. */
+            release_codec(&codec, &codec_kind, "connection retry");
             if (attempt + 1U < HTTP_OPEN_ATTEMPTS) {
                 ESP_LOGE(TAG, "Stream open attempt %u failed: stage %d errno %d heap %u",
                          attempt + 1U, opened, errno,
