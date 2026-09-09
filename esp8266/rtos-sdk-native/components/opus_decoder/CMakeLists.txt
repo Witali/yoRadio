@@ -1,5 +1,6 @@
 if(CONFIG_YORADIO_OGG_OPUS)
   option(YORADIO_OPUS_WORD_ASM "A/B: private Opus LX106 word accesses without volatile-C MEMW" OFF)
+  option(YORADIO_OPUS_ICDF_FLASH_WORD "A/B: decode static flash ICDF tables with word loads" OFF)
   file(GLOB OPUS_SOURCES upstream/src/*.c upstream/celt/*.c
        upstream/silk/*.c upstream/silk/fixed/*.c)
   idf_component_register(SRCS ${OPUS_SOURCES}
@@ -9,6 +10,9 @@ if(CONFIG_YORADIO_OGG_OPUS)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_BOUNDED=1)
   if(YORADIO_OPUS_WORD_ASM)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_WORD_ASM=1)
+  endif()
+  if(YORADIO_OPUS_ICDF_FLASH_WORD)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_ICDF_FLASH_WORD=1)
   endif()
   target_compile_options(${COMPONENT_LIB} PRIVATE -O3 -fwrapv -fstack-usage)
 else()

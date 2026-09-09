@@ -9,6 +9,12 @@
 #if YORADIO_OPUS_WORD_ASM != 0 && YORADIO_OPUS_WORD_ASM != 1
 #error "YORADIO_OPUS_WORD_ASM must be 0 or 1"
 #endif
+#ifndef YORADIO_OPUS_ICDF_FLASH_WORD
+#define YORADIO_OPUS_ICDF_FLASH_WORD 0
+#endif
+#if YORADIO_OPUS_ICDF_FLASH_WORD != 0 && YORADIO_OPUS_ICDF_FLASH_WORD != 1
+#error "YORADIO_OPUS_ICDF_FLASH_WORD must be 0 or 1"
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -76,6 +82,37 @@ static inline int16_t yoradio_opus_table_read16(const int16_t *p) {
     yoradio_opus_table_pair value =
         yoradio_opus_table_load_pair((const void *)(address & ~(uintptr_t)3U));
     return address & 2U ? value.half[1] : value.half[0];
+}
+/* The ESP8266 mapped flash window has word-aligned boundaries. Call only
+ * after selecting this region once, with a valid zero-terminated static CDF.
+ * No next-word prefetch: the last valid byte uses the last mapped word.
+ * Host diagnostics map this same range and execute the same word/extract
+ * algorithm with memcpy, not a byte-read fallback. No MMIO or local CDFs. */
+#define YORADIO_OPUS_FLASH_BEGIN ((uintptr_t)0x40200000U)
+#define YORADIO_OPUS_FLASH_END   ((uintptr_t)0x40300000U)
+#if defined(YORADIO_OPUS_ICDF_TEST_HOOKS)
+void yoradio_opus_icdf_test_path(const unsigned char *cdf, int flash);
+void yoradio_opus_icdf_test_word(const void *word);
+#endif
+static inline unsigned char yoradio_opus_icdf_flash_read8(const unsigned char *p) {
+    uintptr_t address = (uintptr_t)p;
+    const void *aligned = (const void *)(address & ~(uintptr_t)3U);
+    uint32_t value;
+#if defined(YORADIO_OPUS_ICDF_TEST_HOOKS)
+    yoradio_opus_icdf_test_word(aligned);
+#endif
+#if defined(__XTENSA__)
+    value = yoradio_opus_private_load_word(aligned);
+#else
+    memcpy(&value, aligned, sizeof(value));
+#endif
+    /* Explicit shifts avoid GCC 8 spilling a byte-view union to the stack.
+     * LX106 and the diagnostic x86 hosts are little-endian. */
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    return (unsigned char)(value >> ((3U - (address & 3U)) * 8U));
+#else
+    return (unsigned char)(value >> ((address & 3U) * 8U));
+#endif
 }
 void yoradio_opus_copy(void *to, const void *from, size_t count, size_t size);
 void yoradio_opus_clear(void *to, size_t count, size_t size);

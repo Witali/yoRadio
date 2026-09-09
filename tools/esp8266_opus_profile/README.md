@@ -164,3 +164,53 @@ caller address. The probe is linked without PIE, so `addr2line -f -e phase_probe
 can resolve those addresses. `OPUS_PHASE_CAPACITY` selects a diagnostic limit,
 `OPUS_PHASE_RATE` selects the test API rate, and `OPUS_PHASE_PLC_BURST` selects
 one through eight losses after every eighth packet when `--plc` is supplied.
+
+## ICDF flash-word A/B (default OFF)
+
+The separate CMake option `-DYORADIO_OPUS_ICDF_FLASH_WORD=ON` enables a bounded
+decoder experiment in `ec_dec_icdf`. It is independent of
+`YORADIO_OPUS_WORD_ASM`. The table address is classified once before either
+decoding loop. Constant CDFs in the ESP8266 mapped flash window
+`[0x40200000, 0x40300000)` use an aligned word load and byte extraction; ordinary
+DRAM CDFs, packet-byte reads and `ec_dec_icdf16` retain their original accesses.
+No table is copied to DRAM in production and no persistent RAM is added.
+
+This relies on the existing internal API contract: valid monotonically
+non-increasing CDFs ending in zero. Each accessed byte selects only its own
+aligned word; there is no next-word prefetch. Both mapped-region boundaries
+are word-aligned, so a valid CDF ending at the final flash byte does not cause
+a read beyond the region. This is not an API accepting untrusted CDF pointers.
+
+```powershell
+node tools/esp8266_opus_profile/run_icdf_regressions.cjs
+node --test tests/esp8266-opus-icdf-word.test.js
+node tools/esp8266_opus_profile/check_xtensa_icdf.cjs
+```
+
+The host tests execute the real word/extract branch, not the normal host byte
+fallback. A Linux/WSL `MAP_FIXED_NOREPLACE` mapping occupies the actual flash
+address range, with `PROT_NONE` guard pages outside. A test-only linker wrapper
+copies only the executable's readonly CDF tables into this mock region,
+preserving bytes through the first zero. Stack/heap CDFs are passed unchanged.
+Actual path/load hooks count execution and check each word against the active
+table's enclosing words. The mapping is read-only while decoding. Failure to
+reserve it is explicit; the test never silently reports byte-fallback coverage.
+The wrapper, hooks, mappings and their memory costs do not exist in firmware.
+
+Unit tests compare every entropy context field and bit count against the legacy
+implementation for 137,728 symbols. They exercise byte offsets 0 through 3,
+CDFs ending at the flash boundary, a final two-byte flash table, exact two-byte
+heap/guard-page DRAM tables, and addresses immediately outside both flash
+boundaries. The same test passes AddressSanitizer and UndefinedBehaviorSanitizer.
+The full 22-scenario corpus requires pristine generic32 PCM equality, actual
+word-branch coverage, untouched output guards, repeat/reset equality, and
+unchanged scratch peaks. Evidence is saved in `icdf-word-results.json`.
+
+The isolated GCC 8.4 target-object check verifies one address-dispatch branch
+outside both loops, `l32i` plus shifts in the flash loop, and the two retained
+`l8ui` sites for DRAM CDF and packet data. It also checks unchanged machine code
+for `ec_dec_init`, `ec_dec_icdf16` and `ec_dec_bits`. With word assembly enabled
+the flash loop has no `memw`; otherwise the existing volatile-word fence is
+retained. The `ec_dec_icdf` stack frame is 32 bytes versus 16 bytes before this
+experiment (+16 bytes); static RAM remains unchanged. No physical speedup is
+claimed until a separate board A/B holds the firmware and packet corpus fixed.

@@ -34,6 +34,9 @@
 #include "arch.h"
 #include "entdec.h"
 #include "mfrngcod.h"
+#ifdef YORADIO_OPUS_BOUNDED
+#include "opus_memory.h"
+#endif
 
 /*A range decoder.
   This is an entropy decoder based upon \cite{Mar79}, which is itself a
@@ -184,11 +187,32 @@ int ec_dec_icdf(ec_dec *_this,const unsigned char *_icdf,unsigned _ftb){
   d=_this->val;
   r=s>>_ftb;
   ret=-1;
-  do{
-    t=s;
-    s=IMUL32(r,_icdf[++ret]);
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_ICDF_FLASH_WORD
+  /* Classify the table once. Packet-byte normalization and dynamically
+     constructed DRAM CDFs retain their original byte accesses. */
+  if((uintptr_t)_icdf>=YORADIO_OPUS_FLASH_BEGIN &&
+     (uintptr_t)_icdf<YORADIO_OPUS_FLASH_END){
+#if defined(YORADIO_OPUS_ICDF_TEST_HOOKS)
+    yoradio_opus_icdf_test_path(_icdf,1);
+#endif
+    do{
+      t=s;
+      s=IMUL32(r,yoradio_opus_icdf_flash_read8(_icdf+(++ret)));
+    }
+    while(d<s);
   }
-  while(d<s);
+  else
+#endif
+  {
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_ICDF_FLASH_WORD && defined(YORADIO_OPUS_ICDF_TEST_HOOKS)
+    yoradio_opus_icdf_test_path(_icdf,0);
+#endif
+    do{
+      t=s;
+      s=IMUL32(r,_icdf[++ret]);
+    }
+    while(d<s);
+  }
   _this->val=d-s;
   _this->rng=t-s;
   ec_dec_normalize(_this);
