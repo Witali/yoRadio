@@ -7,6 +7,13 @@
 
 ## Подготовка и запуск
 
+Эталон обязан использовать `OPUS_FAST_INT64=0`, как Xtensa. Обычный x86-64
+libopus выбирает другую fixed-point ветку: отдельные младшие биты PCM
+различаются даже без изменений алгоритма. Генератор отклоняет эталон без
+явного `-DOPUS_FAST_INT64=0`; default probe находится в
+`.build/esp8266-opus-host-pristine-int64-0/probe`. Подготовка независимого
+эталона описана в `tools/esp8266_opus_profile/README.md`.
+
 ```powershell
 node tools/esp8266_opus_profile/build_board_fixtures.cjs
 tools/esp8266_audio_profile/build_i2s_pdm_production.ps1 -Variant esp8266-opus-board-bench -EnableOpus -Diagnostic -OpusBenchmark -WebAudioPause short
