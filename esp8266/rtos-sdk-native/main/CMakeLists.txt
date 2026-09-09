@@ -93,6 +93,16 @@ option(YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
   "Generate PCM in RAM and benchmark physical audio output without codecs" OFF)
 option(YORADIO_ESP8266_OUTPUT_COMPARE
   "Compare PDM packers before DMA and force reproducible benchmark settings" OFF)
+option(YORADIO_ESP8266_PDM32_IRAM
+  "A/B: put PDM32 packer in IRAM and cold signed modulo in flash" OFF)
+set(YORADIO_AUDIO_LDFRAGMENTS "")
+if(YORADIO_ESP8266_PDM32_IRAM)
+  if(NOT CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM OR
+     NOT CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32)
+    message(FATAL_ERROR "PDM32 IRAM experiment requires standard I2S PDM32 output")
+  endif()
+  list(APPEND YORADIO_AUDIO_LDFRAGMENTS "pdm32_iram.lf")
+endif()
 set(YORADIO_ESP8266_RCPDM_VARIANT "production" CACHE STRING "Diagnostic-only RCPDM candidate")
 option(YORADIO_ESP8266_RCPDM_BATCH "Fill RCPDM DMA spans directly at 48 kHz (OFF for A/B)" ON)
 option(YORADIO_ESP8266_RCPDM_SIMPLE_UNROLL4 "Use four-bit LX106 assembly groups in the Simple experiment" OFF)
@@ -222,6 +232,7 @@ idf_component_register(
   INCLUDE_DIRS ${YORADIO_INCLUDE_DIRS}
   REQUIRES app_update esp8266 esp_event esp_http_server freertos heap helix_codecs log
            lwip nvs_flash pthread spiffs tcpip_adapter
+  LDFRAGMENTS ${YORADIO_AUDIO_LDFRAGMENTS}
   EMBED_FILES ${YORADIO_EMBED_FILES})
 
 set(WEB_BUNDLE_HEADER "${CMAKE_CURRENT_BINARY_DIR}/web_bundle_generated.h")
@@ -246,6 +257,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++14>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
+  YORADIO_ESP8266_PDM32_IRAM=$<BOOL:${YORADIO_ESP8266_PDM32_IRAM}>
   YORADIO_ESP8266_OPUS_STREAM_TEST=$<BOOL:${YORADIO_ESP8266_OPUS_STREAM_TEST}>
   YORADIO_ESP8266_OPUS_BENCHMARK=$<BOOL:${YORADIO_ESP8266_OPUS_BENCHMARK}>
   YORADIO_ESP8266_WEB_AUDIO_PAUSE=${WEB_AUDIO_PAUSE_MODE}

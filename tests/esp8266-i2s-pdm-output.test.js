@@ -140,7 +140,8 @@ test("I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier", () => {
   assert.match(i2sPdm, /bit < BOARD_I2S_PDM_OVERSAMPLE/);
   assert.match(i2sPdm, /repeat < BOARD_I2S_PDM_REPEAT/);
   assert.match(i2sPdm, /i2s_pdm_pack32/);
-  assert.doesNotMatch(i2sPdm, /IRAM_ATTR[^\n]*[\r\n]+i2s_pdm_pack32/);
+  assert.match(i2sPdm, /#ifndef YORADIO_ESP8266_PDM32_IRAM\n#define YORADIO_ESP8266_PDM32_IRAM 0/);
+  assert.match(i2sPdm, /static uint32_t PDM32_CODE_ATTR __attribute__\(\(noinline\)\)/);
   assert.match(i2sPdm, /integrator = sum & 0xffffU/);
   assert.match(i2sPdm, /word = \(word << 1\) \| \(sum >> 16\)/);
   assert.match(i2sPdm, /PDM32_STEP\(\); PDM32_STEP\(\);/);

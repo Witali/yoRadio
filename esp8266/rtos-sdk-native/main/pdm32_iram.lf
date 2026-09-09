@@ -1,0 +1,8 @@
+# Opt-in only, registered with YORADIO_ESP8266_PDM32_IRAM.
+# The pinned firmware references __moddi3 only from adjtime and
+# sntp_sync_time. Both callers already execute from flash; neither disables
+# its cache. Do not move the rest of libgcc: PHY/cache-off code uses it.
+[mapping:yoradio_pdm32_cold_modulo]
+archive: libgcc.a
+entries:
+    _moddi3 (inflash_text)

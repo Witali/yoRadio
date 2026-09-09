@@ -646,7 +646,20 @@ static inline __attribute__((always_inline)) void i2s_rcpdm_fill(
     else i2s_rcpdm_fill_mono(words, pcm, frames);
 }
 #endif
-static uint32_t __attribute__((noinline))
+#ifndef YORADIO_ESP8266_PDM32_IRAM
+#define YORADIO_ESP8266_PDM32_IRAM 0
+#endif
+#if YORADIO_ESP8266_PDM32_IRAM != 0 && YORADIO_ESP8266_PDM32_IRAM != 1
+#error "YORADIO_ESP8266_PDM32_IRAM must be 0 or 1"
+#endif
+#if YORADIO_ESP8266_PDM32_IRAM
+/* Experimental placement only; pdm32_iram.lf recovers space from a cold
+ * task-only libgcc helper. The shared codec arena remains 16384 bytes. */
+#define PDM32_CODE_ATTR IRAM_ATTR
+#else
+#define PDM32_CODE_ATTR
+#endif
+static uint32_t PDM32_CODE_ATTR __attribute__((noinline))
 i2s_pdm_pack32(int16_t sample) {
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
 #if CONFIG_YORADIO_RCPDM_FEEDBACK
