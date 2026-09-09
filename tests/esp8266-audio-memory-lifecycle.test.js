@@ -109,6 +109,12 @@ test("ESP8266 preserves heap for lwIP after starting the MP3 decoder", () => {
   assert.match(bridge, /heap_caps_realloc\([\s\S]*MALLOC_CAP_8BIT/);
 });
 
+test("audio stack watermark is sampled on demand outside the critical section", () => {
+  const health = audio.slice(audio.indexOf('void audio_service_health('), audio.indexOf('/* Reused for HTTP headers'));
+  assert.match(health, /taskEXIT_CRITICAL\(\);[\s\S]*health->stack_free = s_audio_task \? uxTaskGetStackHighWaterMark\(s_audio_task\)/);
+  assert.match(audio, /xTaskCreate\(audio_task,[\s\S]*AUDIO_TASK_PRIORITY, &s_audio_task\)/);
+});
+
 test("libmad places only aligned Layer III word workspaces in ESP8266 IRAM", () => {
   assert.match(
     codecCmake,

@@ -103,6 +103,7 @@ typedef struct {
 
 static const char *TAG = "audio";
 static QueueHandle_t s_commands;
+static TaskHandle_t s_audio_task;
 static volatile uint32_t s_generation;
 static uint32_t s_rx_bytes, s_pcm_frames, s_pcm_rate;
 static TickType_t s_rx_tick, s_pcm_tick;
@@ -119,6 +120,9 @@ void audio_service_health(audio_service_health_t *health) {
         .pcm_age_ms = (now - s_pcm_tick) * portTICK_PERIOD_MS,
     };
     taskEXIT_CRITICAL();
+    /* Scan the watermark only for a health request, never per audio sample.
+     * StackType_t is uint8_t in this ESP8266 SDK: the result is bytes. */
+    health->stack_free = s_audio_task ? uxTaskGetStackHighWaterMark(s_audio_task) : 0U;
 }
 /* Reused for HTTP headers, initial codec detection and ICY metadata. */
 static uint8_t s_work[HTTP_HEADER_BYTES];
@@ -1315,7 +1319,7 @@ esp_err_t audio_service_init(void) {
 #define AUDIO_TASK_PRIORITY 5U
 #endif
     if (xTaskCreate(audio_task, "audio", AUDIO_STACK_BYTES, NULL,
-                    AUDIO_TASK_PRIORITY, NULL) !=
+                    AUDIO_TASK_PRIORITY, &s_audio_task) !=
         pdPASS) {
 #if YORADIO_ESP8266_KARADIO_PIPELINE
         vTaskDelete(s_karadio_network_task);
