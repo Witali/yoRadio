@@ -28,6 +28,18 @@ node tools/esp8266_opus_profile/run_board.cjs --base http://192.168.100.6 --outp
 
 ## Что измеряется
 
+Для проверки реального потока без RAM/CPU-накладных расходов raw benchmark
+используйте отдельный профиль. В нём остаётся диагностический URL и причина
+ошибки init, но отсутствуют fixtures, таблицы результатов и runtime stats:
+
+```powershell
+tools/esp8266_audio_profile/build_i2s_pdm_production.ps1 -Variant esp8266-opus-stream-only -EnableOpus -Diagnostic -OpusStreamTest -OpusWordAsm -WebAudioPause short -NoSpiffsCache
+```
+
+`-OpusBenchmark` по-прежнему включает URL-пробу неявно; `-OpusStreamTest`
+сам по себе не включает микробенчмарк. Для смены SDK-профиля выбирайте новый
+каталог сборки. Обе диагностические возможности отсутствуют в production.
+
 В этой же диагностической сборке можно запустить реальный URL, не заменяя
 плейлист: `POST /api/native/opus-stream`, тело — HTTP URL текстом (8–511 байт,
 без переводов строк). Например:
