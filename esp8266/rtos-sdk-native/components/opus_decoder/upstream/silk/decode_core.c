@@ -169,7 +169,15 @@ void silk_decode_core(
                 /* Update LTP state when Gain changes */
                 if( gain_adj_Q16 != (opus_int32)1 << 16 ) {
                     for( i = 0; i < lag + LTP_ORDER/2; i++ ) {
+#ifdef YORADIO_OPUS_BOUNDED
+                        /* GCC 8.4 narrows part of SMULWW's second operand to
+                           l16si even though its source type is int32. IRAM
+                           permits only l32i/s32i: force a full-width read. */
+                        const opus_int32 previous = *(const volatile opus_int32 *)&sLTP_Q15[sLTP_buf_idx - i - 1];
+                        sLTP_Q15[sLTP_buf_idx - i - 1] = silk_SMULWW(gain_adj_Q16, previous);
+#else
                         sLTP_Q15[ sLTP_buf_idx - i - 1 ] = silk_SMULWW( gain_adj_Q16, sLTP_Q15[ sLTP_buf_idx - i - 1 ] );
+#endif
                     }
                 }
             }

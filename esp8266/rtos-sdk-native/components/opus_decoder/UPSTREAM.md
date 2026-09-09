@@ -23,6 +23,8 @@ YoRadio adaptation (compile-time `YORADIO_OPUS_BOUNDED`):
   remain in DRAM. SILK/CELT stage lifetimes reuse the same scratch storage.
 - Skip unused 48-kHz deemphasis scratch, scope prefilter scratch, and remove
   decoder-unreachable encoder RDO stack storage in bounded builds.
+- Force a full-width volatile read of SILK sLTP_Q15 during gain rescaling:
+  Xtensa GCC 8.4 otherwise emits l16si for part of an int32 SMULWW operand.
 
 The adapter is single-decoder/single-audio-task, like the existing MP3/AAC
 arena. It must be opened only after the preceding codec has been released.
