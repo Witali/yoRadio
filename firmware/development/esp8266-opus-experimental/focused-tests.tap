@@ -1,0 +1,95 @@
+TAP version 13
+# Subtest: native defaults and production manifest use a 4 KiB compressed input
+ok 1 - native defaults and production manifest use a 4 KiB compressed input
+  ---
+  duration_ms: 1.3638
+  type: 'test'
+  ...
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus disabled
+ok 2 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus disabled
+  ---
+  duration_ms: 3366.1361
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 35 allocation failure sites; 3376 allocations, 3375 frees, 1 permanent IRAM allocation
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus enabled
+ok 3 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus enabled
+  ---
+  duration_ms: 3390.6646
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nOpus input 1536, scratch 7168, reserve and allocation-free reset PASS\\r\\nOpus adapter routing, bounded PCM callbacks and finish/cancellation PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 67 allocation failure sites; 5061 allocations, 5060 frees, 1 permanent IRAM allocation
+# Opus refuses DRAM fallback arena without leaking
+# Subtest: network reconnect releases cached decoder before another handshake
+ok 4 - network reconnect releases cached decoder before another handshake
+  ---
+  duration_ms: 1.0093
+  type: 'test'
+  ...
+# bounded: compiled 0/112 objects; link reused
+# Subtest: native Opus streaming adapter validates headers, sample trimming, chains, cancellation and bounded memory
+ok 5 - native Opus streaming adapter validates headers, sample trimming, chains, cancellation and bounded memory
+  ---
+  duration_ms: 9683.1444
+  type: 'test'
+  ...
+# Native Opus PASS: state=9198 adapter=2040 PCM=1920 no allocations
+# Subtest: bounded Ogg Opus demux handles split input, corruption and chains under sanitizers
+ok 6 - bounded Ogg Opus demux handles split input, corruption and chains under sanitizers
+  ---
+  duration_ms: 1958.6535
+  type: 'test'
+  ...
+# fragmentation, continuation, zero laces and EOS metadata passed\\nchains, empty pages and sequence wrap passed\\npacket bounds, 1 MiB tags and 255 packet pages passed\\nCRC failure withholding and streaming delivery contract passed\\ninvalid capture, version, flags, sequence, serial and continuation passed\\nheader bounds, cancellation and argument contracts passed\\ngenerated page boundaries and 2000 malformed streams passed\\nfixture packets identical: /mnt/c/Work/yoRadio/tests/fixtures/opus_native/mono-12.opus (63 packets)\\nfixture packets identical: /mnt/c/Work/yoRadio/tests/fixtures/opus_native/mono-24.opus (63 packets)\\nfixture packets identical: /mnt/c/Work/yoRadio/tests/fixtures/opus_native/stereo-128.opus (63 packets)\\nfixture packets identical: /mnt/c/Work/yoRadio/tests/fixtures/opus_native/stereo-510.opus (63 packets)\\nfixture packets identical: /mnt/c/Work/yoRadio/tests/fixtures/opus_native/stereo-64.opus (63 packets)\\nOgg Opus demux tests passed; state bytes: 1872
+# baseline: compiled 0/111 objects; link reused
+# bounded: compiled 0/112 objects; link reused
+# mono-12: exact, scratch 1808B DRAM / 11552B word arena
+# mono-24: exact, scratch 2904B DRAM / 13040B word arena
+# stereo-64: exact, scratch 6736B DRAM / 13040B word arena
+# stereo-128: exact, scratch 6736B DRAM / 13040B word arena
+# stereo-510: exact, scratch 6736B DRAM / 13040B word arena
+# Subtest: Opus corpus pins CBR 12..510 kbps packets and covers SILK, hybrid and CELT
+ok 7 - Opus corpus pins CBR 12..510 kbps packets and covers SILK, hybrid and CELT
+  ---
+  duration_ms: 4.5805
+  type: 'test'
+  ...
+# Subtest: saved Opus host evidence has exact pristine/baseline/bounded PCM and bounded arena usage
+ok 8 - saved Opus host evidence has exact pristine/baseline/bounded PCM and bounded arena usage
+  ---
+  duration_ms: 1.1127
+  type: 'test'
+  ...
+# Subtest: real host decoders reproduce all Opus fixtures, reset and OOM recovery
+ok 9 - real host decoders reproduce all Opus fixtures, reset and OOM recovery
+  ---
+  duration_ms: 1856.1274
+  type: 'test'
+  ...
+# Subtest: actual buffered playlist handler preserves filtered rows across buffer boundaries, Opus=0
+ok 10 - actual buffered playlist handler preserves filtered rows across buffer boundaries, Opus=0
+  ---
+  duration_ms: 439.102
+  type: 'test'
+  ...
+# Subtest: actual buffered playlist handler preserves filtered rows across buffer boundaries, Opus=1
+ok 11 - actual buffered playlist handler preserves filtered rows across buffer boundaries, Opus=1
+  ---
+  duration_ms: 431.6831
+  type: 'test'
+  ...
+# Subtest: Opus capability changes invalidate the persistent filtered index in both directions
+ok 12 - Opus capability changes invalidate the persistent filtered index in both directions
+  ---
+  duration_ms: 0.4018
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21434.7168

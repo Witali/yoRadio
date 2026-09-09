@@ -3,6 +3,20 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-09: optional ESP8266 Ogg Opus
+
+- Source `6a9f8ea`. Experimental app 881536 B; Opus-disabled regression app 763936 B.
+  Both saved under `development/esp8266-opus-{experimental,disabled-regression}`
+  with manifests/checksums. No board deployment or physical speed claim.
+- Vendored fixed-point decoder, bounded scratch/shared IRAM, incremental Ogg,
+  mono output up to 20 ms packets, codec lifecycle and WebUI integration.
+  Experimental only; normal default remains MP3/AAC without Opus.
+- 334/334 host tests passed. Final IRAM width fix additionally passed 12 focused
+  tests and exact PCM against pristine upstream on 292800 samples.
+- Future deployment is OTA; USB/serial not used. Remaining target RAM/CPU/stack
+  qualification and a further memory-reuse candidate are recorded in
+  [ESP8266 Opus documentation](../docs/ESP8266_OPUS_NATIVE.md).
+
 ## Development - 2026-09-09: ESP8266 volume 0..100
 
 - `development/esp8266-volume100-production/app.bin`, source `be0207e`,

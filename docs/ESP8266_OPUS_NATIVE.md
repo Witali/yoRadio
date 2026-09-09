@@ -124,6 +124,11 @@ Host GCC используется через WSL на Windows. Первый за
 
 ## Осталось перед включением по умолчанию
 
+- [ ] Следующий кандидат уменьшения DRAM: вынести две SILK `exc_Q14[320]`
+  в постоянные IRAM-слоты (расчётная экономия 2552 Б с учётом указателей).
+  Нужны cumulative persistent allocator, сохранение привязки при reset и
+  mono→stereo, word-copy вместо `CNG.c` memcpy и повторный аудит Xtensa loads.
+  Пока **не реализовано**; source type int32 сам по себе не исключает l16 load.
 - [ ] Проверить target min/free/largest heap при Wi-Fi + WebUI + Opus.
 - [ ] Измерить high-water audio stack и реальный запас, а не отдельные `.su`.
 - [ ] Проверить IRAM accesses на устройстве, SILK/Hybrid/CELT и OOM/recovery.
