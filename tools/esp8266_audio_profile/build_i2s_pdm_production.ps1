@@ -12,6 +12,7 @@ param(
     [int]$LedUpdateHz = 10,
     [switch]$NoAudioLevelLed,
     [switch]$EnableOpus,
+    [switch]$OpusWordAsm,
     [switch]$OpusBenchmark,
     [string]$OpusBenchmarkFixtures = '.build/esp8266-opus-board-fixtures'
 )
@@ -21,6 +22,7 @@ if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
 }
 if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -SpiffsLog' }
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
+if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOpus' }
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
 $taskVariant = $Variant
 $taskBuild = "$taskRoot/.build/$taskVariant"
@@ -58,6 +60,7 @@ try {
     $taskSpiffsLogHttp = if ($SpiffsLogHttp) { 'ON' } else { 'OFF' }
     $taskDiagnostic = if ($Diagnostic) { 'ON' } else { 'OFF' }
     $taskOpusBenchmark = if ($OpusBenchmark) { 'ON' } else { 'OFF' }
+    $taskOpusWordAsm = if ($OpusWordAsm) { 'ON' } else { 'OFF' }
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
         "-DSDKCONFIG=$taskBuild/sdkconfig", "-DSDKCONFIG_DEFAULTS=$taskBuild/production.defaults",
@@ -80,6 +83,7 @@ try {
         "-DYORADIO_ESP8266_SPIFFS_LOG_HTTP=$taskSpiffsLogHttp",
         "-DYORADIO_ESP8266_DIAGNOSTIC=$taskDiagnostic",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK=$taskOpusBenchmark",
+        "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES=$OpusBenchmarkFixtures",
         '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
     $taskConfig = Get-Content "$taskBuild/sdkconfig" -Raw
@@ -110,6 +114,7 @@ try {
         opus_input_bytes=$(if ($taskOpusEnabled) { 1024 } else { 0 })
         opus_scratch_bytes=$(if ($taskOpusEnabled) { 6144 } else { 0 })
         opus_benchmark=[bool]$OpusBenchmark
+        opus_word_asm=[bool]$OpusWordAsm
         opus_max_packet_ms=$(if ($taskOpusEnabled) { 20 } else { 0 })
         tone_test=$false
         web_profile=$false
