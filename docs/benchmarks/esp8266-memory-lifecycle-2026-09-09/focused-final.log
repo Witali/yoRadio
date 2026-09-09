@@ -1,0 +1,191 @@
+TAP version 13
+# Subtest: native defaults and production manifest use a 4 KiB compressed input
+ok 1 - native defaults and production manifest use a 4 KiB compressed input
+  ---
+  duration_ms: 1.3873
+  type: 'test'
+  ...
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches
+ok 2 - real codec bridge and arena pair every allocation/free through OOM and switches
+  ---
+  duration_ms: 3374.1261
+  type: 'test'
+  ...
+# Codec lifecycle PASS: 100 mixed cycles, every allocation failure; 4453 allocations, 4452 frees, 1 permanent IRAM allocation
+# Subtest: network reconnect releases cached decoder before another handshake
+ok 3 - network reconnect releases cached decoder before another handshake
+  ---
+  duration_ms: 0.3933
+  type: 'test'
+  ...
+# Subtest: HTTP startup and URI allocation failures release every owned resource
+ok 4 - HTTP startup and URI allocation failures release every owned resource
+  ---
+  duration_ms: 1715.7528
+  type: 'test'
+  ...
+# Subtest: ESP8266 backports the standard asynchronous HTTP request API
+ok 5 - ESP8266 backports the standard asynchronous HTTP request API
+  ---
+  duration_ms: 1.4667
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets
+ok 6 - ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets
+  ---
+  duration_ms: 0.2346
+  type: 'test'
+  ...
+# Subtest: ESP8266 serves static WebUI resources on the shared HTTP task stack
+ok 7 - ESP8266 serves static WebUI resources on the shared HTTP task stack
+  ---
+  duration_ms: 0.2228
+  type: 'test'
+  ...
+# Subtest: ESP8266 keeps status, WebSocket and static routes on the shared HTTP task
+ok 8 - ESP8266 keeps status, WebSocket and static routes on the shared HTTP task
+  ---
+  duration_ms: 0.2069
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming
+ok 9 - ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming
+  ---
+  duration_ms: 13.6969
+  type: 'test'
+  ...
+# Subtest: ESP8266 application serves the current shared WebUI script from flash
+ok 10 - ESP8266 application serves the current shared WebUI script from flash
+  ---
+  duration_ms: 0.497
+  type: 'test'
+  ...
+# Subtest: ESP8266 loads shared WebUI assets sequentially to bound connections
+ok 11 - ESP8266 loads shared WebUI assets sequentially to bound connections
+  ---
+  duration_ms: 0.3254
+  type: 'test'
+  ...
+# Subtest: ESP8266 lets successful close-framed responses drain before cleanup
+ok 12 - ESP8266 lets successful close-framed responses drain before cleanup
+  ---
+  duration_ms: 0.3282
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounds browser connections and recovers with LRU eviction
+ok 13 - ESP8266 bounds browser connections and recovers with LRU eviction
+  ---
+  duration_ms: 0.4272
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket status cannot block the sole HTTP worker
+ok 14 - ESP8266 WebSocket status cannot block the sole HTTP worker
+  ---
+  duration_ms: 0.6691
+  type: 'test'
+  ...
+# Subtest: ESP8266 strips cache-busting query from static file lookup
+ok 15 - ESP8266 strips cache-busting query from static file lookup
+  ---
+  duration_ms: 0.2106
+  type: 'test'
+  ...
+# Subtest: ESP8266 chunks embedded HTML below its TCP send window
+ok 16 - ESP8266 chunks embedded HTML below its TCP send window
+  ---
+  duration_ms: 0.2623
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP send loop is nonblocking, bounded and retryable
+ok 17 - ESP8266 HTTP send loop is nonblocking, bounded and retryable
+  ---
+  duration_ms: 0.2405
+  type: 'test'
+  ...
+# Subtest: static writes yield only on actual socket backpressure
+ok 18 - static writes yield only on actual socket backpressure
+  ---
+  duration_ms: 2.0671
+  type: 'test'
+  ...
+# Subtest: HTTP send deadline belongs to the entire response, not each chunk
+ok 19 - HTTP send deadline belongs to the entire response, not each chunk
+  ---
+  duration_ms: 0.4982
+  type: 'test'
+  ...
+# Subtest: OTA accepts the original shared form target and embeds emergency recovery
+ok 20 - OTA accepts the original shared form target and embeds emergency recovery
+  ---
+  duration_ms: 1.7453
+  type: 'test'
+  ...
+# Subtest: OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS
+ok 21 - OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS
+  ---
+  duration_ms: 0.6147
+  type: 'test'
+  ...
+# Subtest: Wi-Fi readback preserves edge spaces and ignores excess credential rows
+ok 22 - Wi-Fi readback preserves edge spaces and ignores excess credential rows
+  ---
+  duration_ms: 1.6089
+  type: 'test'
+  ...
+# Subtest: uploads stream to a temporary file, whitelist destinations and reject disconnected bodies
+ok 23 - uploads stream to a temporary file, whitelist destinations and reject disconnected bodies
+  ---
+  duration_ms: 0.4582
+  type: 'test'
+  ...
+# Subtest: SNTP reconfiguration uses its lwIP task and a reusable nonblocking message
+ok 24 - SNTP reconfiguration uses its lwIP task and a reusable nonblocking message
+  ---
+  duration_ms: 0.6138
+  type: 'test'
+  ...
+# Subtest: Audio Info and AP reboot delay persist without changing the legacy blob
+ok 25 - Audio Info and AP reboot delay persist without changing the legacy blob
+  ---
+  duration_ms: 0.5069
+  type: 'test'
+  ...
+# Subtest: short HTTP responses use TCP_NODELAY and graceful write-half shutdown
+ok 26 - short HTTP responses use TCP_NODELAY and graceful write-half shutdown
+  ---
+  duration_ms: 0.8975
+  type: 'test'
+  ...
+# Subtest: two bounded WebSocket subscribers share a single HTTP-owned status buffer
+ok 27 - two bounded WebSocket subscribers share a single HTTP-owned status buffer
+  ---
+  duration_ms: 0.714
+  type: 'test'
+  ...
+# Subtest: VBR waits for heartbeat but state, format and metadata remain immediate
+ok 28 - VBR waits for heartbeat but state, format and metadata remain immediate
+  ---
+  duration_ms: 0.4789
+  type: 'test'
+  ...
+# Subtest: native stream identity is invalidated when changing the station
+ok 29 - native stream identity is invalidated when changing the station
+  ---
+  duration_ms: 0.3271
+  type: 'test'
+  ...
+# Subtest: native connecting telemetry locks and unlocks Play without affecting Arduino states
+ok 30 - native connecting telemetry locks and unlocks Play without affecting Arduino states
+  ---
+  duration_ms: 1.7586
+  type: 'test'
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3446.6394
