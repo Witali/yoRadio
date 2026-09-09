@@ -46,7 +46,6 @@ static void xQueueOverwrite(void *queue, const audio_command_t *command) {
 #include "audio_web_pause.inc"
 
 typedef int httpd_req_t;
-#define HTTPD_RESP_USE_STRLEN -1
 static int served, unavailable, finished, prepared, serve_result;
 static void prepare_short_response(httpd_req_t *request) { assert(request); ++prepared; }
 static int finish_short_response(httpd_req_t *request, int result) {
@@ -59,7 +58,8 @@ static void httpd_resp_set_hdr(httpd_req_t *request, const char *key, const char
     assert(request && key[0] == 'R' && value[0] == '1');
 }
 static int httpd_resp_send(httpd_req_t *request, const char *body, int length) {
-    assert(request && body && length == HTTPD_RESP_USE_STRLEN); return ESP_OK;
+    assert(request && body && length == sizeof("Audio pause timed out") - 1);
+    return ESP_OK;
 }
 static int serve_static_request(httpd_req_t *request) {
     assert(request); ++served; return serve_result;

@@ -1127,11 +1127,12 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
 
 static esp_err_t static_handler(httpd_req_t *request) {
     if (audio_service_web_pause_begin() != ESP_OK) {
+        static const char message[] = "Audio pause timed out";
         prepare_short_response(request);
         httpd_resp_set_status(request, "503 Service Unavailable");
         httpd_resp_set_hdr(request, "Retry-After", "1");
         return finish_short_response(request,
-            httpd_resp_send(request, "Audio pause timed out", HTTPD_RESP_USE_STRLEN));
+            httpd_resp_send(request, message, sizeof(message) - 1));
     }
     esp_err_t result = serve_static_request(request);
     audio_service_web_pause_end(); /* Includes failed/disconnected sends. */
