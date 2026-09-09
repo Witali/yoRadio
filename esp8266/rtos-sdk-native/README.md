@@ -103,13 +103,13 @@ AAC SSO, legacy SPI-PDM, standard I2S PCM,
 and PDM128 are explicitly disabled. This explicit selection prevents a stale
 experimental choice from being inherited by a fresh build.
 
-The compressed decoder input now defaults to 6144 bytes
+The compressed decoder input now defaults to 4096 bytes
 (`CONFIG_YORADIO_STREAM_INPUT_BYTES`). Startup tries to fill the whole buffer
 for up to 1000 ms (`CONFIG_YORADIO_STREAM_PREFILL_MS`); playback refills from
 nonblocking TCP before each compressed frame. No second FIFO or task is added.
-This costs 4608 extra DRAM bytes versus the previous 1536-byte input.
+This frees 2048 DRAM bytes compared with the previous 6144-byte default.
 See [prefill behavior, RAM budget and test limits](../../docs/ESP8266_INPUT_PREFILL_2026-09-09.md).
-Use 4096 for a smaller build; a safe runtime maximum still needs hardware stress testing.
+Larger values remain build-time options and need hardware stress testing.
 
 Configure every ordinary or diagnostic build with the tracked defaults path,
 for example:

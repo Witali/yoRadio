@@ -55,7 +55,7 @@ try {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
     if ($taskConfig -match '(?m)^CONFIG_YORADIO_AUDIO_OUTPUT_(SPI_PDM|I2S_RCPDM|I2S_PCM)=y') { throw 'Only standard I2S PDM is allowed' }
-    foreach ($taskRequired in @('CONFIG_YORADIO_STREAM_INPUT_BYTES=6144', 'CONFIG_YORADIO_STREAM_PREFILL_MS=1000')) {
+    foreach ($taskRequired in @('CONFIG_YORADIO_STREAM_INPUT_BYTES=4096', 'CONFIG_YORADIO_STREAM_PREFILL_MS=1000')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired; use a fresh -Variant build directory" }
     }
     $taskGzipEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y\r?$'
@@ -83,7 +83,7 @@ try {
         stream_wait_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_read_wait.h).Hash
         http_receive_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_txrx.c).Hash
         stream_read_wait_ms=0; stream_idle_timeout_ms=1000
-        stream_input_bytes=6144; stream_prefill_ms=1000
+        stream_input_bytes=4096; stream_prefill_ms=1000
         codec_bridge_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/helix_codecs/codec_bridge.cpp).Hash
         stream_input_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_input_buffer.h).Hash
         stream_refill_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_input_refill.inc).Hash

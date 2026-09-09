@@ -169,11 +169,11 @@ config YORADIO_WIFI_RECOVERY_AP_TIMEOUT_SECONDS
 config YORADIO_STREAM_INPUT_BYTES
     int "Compressed audio input buffer (bytes)"
     range 1536 8192
-    default 6144
+    default 4096
     help
         Reuse the decoder input as a queue, without a separate FIFO/task.
-        6144 bytes adds 4608 bytes of DRAM compared with the old 1536-byte
-        buffer. Use 4096 on memory-constrained profiles. Larger values need
+        4096 bytes leaves 2048 more DRAM bytes than the previous 6144-byte
+        default. Larger values remain selectable but need
         on-board heap/stack and WebUI stress testing for both MP3 and AAC.
 
 config YORADIO_STREAM_PREFILL_MS
