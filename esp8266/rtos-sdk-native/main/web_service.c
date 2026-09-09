@@ -1126,12 +1126,18 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
 #else
     const char *output_enabled = "true";
 #endif
-    char body[384];
-    snprintf(body, sizeof(body),
+    /* Serialized HTTP task: reuse its scratch instead of extending the stack
+     * buffer for diagnostic fields. send_string copies before returning. */
+    char *body = s_async_message;
+    snprintf(body, sizeof(s_async_message),
         "{\"generation\":%u,\"uptime_ms\":%u,\"rx_bytes\":%u,"
         "\"pcm_frames\":%u,\"sample_rate\":%u,\"rx_age_ms\":%u,"
         "\"pcm_age_ms\":%u,\"underruns\":%u,\"free_heap\":%u,"
-        "\"dma_eofs\":%u,\"output_enabled\":%s,\"audio_stack_free\":%u,\"free_iram\":%u}",
+        "\"dma_eofs\":%u,\"output_enabled\":%s,\"audio_stack_free\":%u,\"free_iram\":%u"
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
+        ",\"transport_phase\":%u,\"transport_result\":%d,\"transport_errno\":%d,\"input_bytes\":%u"
+#endif
+        "}",
         (unsigned)health.generation, (unsigned)health.uptime_ms,
         (unsigned)health.rx_bytes, (unsigned)health.pcm_frames,
         (unsigned)health.sample_rate, (unsigned)health.rx_age_ms,
@@ -1139,7 +1145,12 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
         (unsigned)esp_get_free_heap_size(),
         (unsigned)output.chained_transfers, output_enabled,
         (unsigned)health.stack_free,
-        (unsigned)heap_caps_get_free_size(MALLOC_CAP_EXEC));
+        (unsigned)heap_caps_get_free_size(MALLOC_CAP_EXEC)
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
+        , (unsigned)health.transport_phase, (int)health.transport_result,
+        (int)health.transport_errno, (unsigned)health.input_bytes
+#endif
+    );
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return finish_short_response(request, send_string(request, body));
