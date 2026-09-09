@@ -3,6 +3,28 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-09: ESP8266 LED regression correction
+
+- `development/esp8266-led-production/app.bin`, source `82edaf2`, 763248 B,
+  SHA-256 `3a06bb31ac4f31f311ffb57e825fe36956f23549037eac383697f54d9daf8235`.
+  Installed via OTA in app1. I2S PDM32 remains on GPIO3; radio left playing.
+- GPIO2 LED: 10 Hz, peak from every fourth of a bounded group of frames
+  inside the gain loop; no second PCM walk, extra task, ISR or heap buffer.
+  Background services retain 250-ms cadence independently of the LED.
+- Existing enable flag retained; tested brightness ceiling changed to 32.
+  Full scale 255 reproduced long stream/audio stalls, while OFF/1/32 did not
+  in these windows. The physical coupling mechanism remains unproven.
+- `development/esp8266-led-diagnostic/app.bin`, 765840 B, SHA-256
+  `e09ce877727f25e9dc389143a7725ba1bfe25fe42c4f14098daeac229a5c1b65`:
+  separate explicitly diagnostic SPIFFS/HTTP logging. Production excludes
+  both file logging and its routes (HTTP 404 checked on board).
+- 263/263 host regressions passed. Final audio sample 22.465 s: 98.91%
+  PCM/time, free RAM >=8432 B, no long PCM stall, **253 underrun events**.
+  This is not a zero-underrun pass. Occasional slow HTTP transfers remain.
+- A/B control builds (low-overhead, OFF, diagnostic, cap1, cap32) retained
+  with exact configs/manifests. See
+  [full results and remaining work](../docs/ESP8266_LED_REGRESSION_2026-09-09.md).
+
 ## Development - 2026-09-09: ESP8266 hardware audio-level LED
 
 - `development/esp8266-audio-level-led/app.bin`: ordinary native radio, source

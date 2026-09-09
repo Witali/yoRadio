@@ -136,3 +136,7 @@ LED disabled/10/20 Hz, immediate state events, BOOT debounce, tick wrap and
 a service taking longer than its period. All 18 targeted scheduling, LED,
 state-notification and I2S tests passed. Live audio/RAM verification remains
 separate: this correction alone does not establish the cause of decoder OOM.
+
+Full on-board A/B results, the 32/255 brightness limit, firmware hashes and
+remaining underrun/HTTP failures are recorded in
+[the regression report](ESP8266_LED_REGRESSION_2026-09-09.md).

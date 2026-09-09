@@ -1,0 +1,1657 @@
+TAP version 13
+# Subtest: app loop: LED 0 Hz does not accelerate services or delay controls
+ok 1 - app loop: LED 0 Hz does not accelerate services or delay controls
+  ---
+  duration_ms: 17229.4883
+  type: 'test'
+  ...
+# app poll PASS: 4-Hz services, independent LED rate, immediate events, wrap and delayed service
+# Subtest: app loop: LED 10 Hz does not accelerate services or delay controls
+ok 2 - app loop: LED 10 Hz does not accelerate services or delay controls
+  ---
+  duration_ms: 8496.6567
+  type: 'test'
+  ...
+# app poll PASS: 4-Hz services, independent LED rate, immediate events, wrap and delayed service
+# Subtest: app loop: LED 20 Hz does not accelerate services or delay controls
+ok 3 - app loop: LED 20 Hz does not accelerate services or delay controls
+  ---
+  duration_ms: 6211.1563
+  type: 'test'
+  ...
+# app poll PASS: 4-Hz services, independent LED rate, immediate events, wrap and delayed service
+# Subtest: requires at least 20 seconds of real PCM progress and no DMA gap
+ok 4 - requires at least 20 seconds of real PCM progress and no DMA gap
+  ---
+  duration_ms: 1.8488
+  type: 'test'
+  ...
+# Subtest: failed requests, counter resets, rate/station changes are not discarded
+ok 5 - failed requests, counter resets, rate/station changes are not discarded
+  ---
+  duration_ms: 0.4072
+  type: 'test'
+  ...
+# Subtest: health uses tick time and records PCM only after successful output
+ok 6 - health uses tick time and records PCM only after successful output
+  ---
+  duration_ms: 1.789
+  type: 'test'
+  ...
+# Subtest: audio gap instrumentation is opt-in and its report window is configurable
+ok 7 - audio gap instrumentation is opt-in and its report window is configurable
+  ---
+  duration_ms: 2.5077
+  type: 'test'
+  ...
+# Subtest: DMA profiler distinguishes prevented partial reads from FIFO starvation
+ok 8 - DMA profiler distinguishes prevented partial reads from FIFO starvation
+  ---
+  duration_ms: 0.6931
+  type: 'test'
+  ...
+# Subtest: profile snapshots DMA before UART logging and resets baseline afterwards
+ok 9 - profile snapshots DMA before UART logging and resets baseline afterwards
+  ---
+  duration_ms: 0.6534
+  type: 'test'
+  ...
+# Subtest: libmad follows the same symmetric CodecArena ownership as Helix
+ok 10 - libmad follows the same symmetric CodecArena ownership as Helix
+  ---
+  duration_ms: 3.2609
+  type: 'test'
+  ...
+# Subtest: ESP8266 reports DRAM and IRAM separately and enforces reserve after allocation
+ok 11 - ESP8266 reports DRAM and IRAM separately and enforces reserve after allocation
+  ---
+  duration_ms: 0.4782
+  type: 'test'
+  ...
+# Subtest: audio workspace is lazy, reusable for station changes, and released on stop
+ok 12 - audio workspace is lazy, reusable for station changes, and released on stop
+  ---
+  duration_ms: 0.5386
+  type: 'test'
+  ...
+# Subtest: full codec profile reserves IRAM for AAC and MP3 while libmad-only stays smaller
+ok 13 - full codec profile reserves IRAM for AAC and MP3 while libmad-only stays smaller
+  ---
+  duration_ms: 0.4114
+  type: 'test'
+  ...
+# Subtest: ESP8266 splits the word-only IMDCT output into the IRAM arena
+ok 14 - ESP8266 splits the word-only IMDCT output into the IRAM arena
+  ---
+  duration_ms: 2.4838
+  type: 'test'
+  ...
+# Subtest: ESP8266 preserves heap for lwIP after starting the MP3 decoder
+ok 15 - ESP8266 preserves heap for lwIP after starting the MP3 decoder
+  ---
+  duration_ms: 0.2513
+  type: 'test'
+  ...
+# Subtest: libmad places only aligned Layer III word workspaces in ESP8266 IRAM
+ok 16 - libmad places only aligned Layer III word workspaces in ESP8266 IRAM
+  ---
+  duration_ms: 0.5018
+  type: 'test'
+  ...
+# Subtest: ESP8266 output benchmark generates deterministic PCM without Wi-Fi or codecs
+ok 17 - ESP8266 output benchmark generates deterministic PCM without Wi-Fi or codecs
+  ---
+  duration_ms: 1.3412
+  type: 'test'
+  ...
+# Subtest: ESP8266 output benchmark reports queue wait, CPU idle, and heap
+ok 18 - ESP8266 output benchmark reports queue wait, CPU idle, and heap
+  ---
+  duration_ms: 0.3413
+  type: 'test'
+  ...
+# Subtest: ESP8266 gated tone profile emits an exact full-scale 1 kHz sine
+ok 19 - ESP8266 gated tone profile emits an exact full-scale 1 kHz sine
+  ---
+  duration_ms: 1.4591
+  type: 'test'
+  ...
+# Subtest: PDM comparison measures the actual packer before DMA without persisting test settings
+ok 20 - PDM comparison measures the actual packer before DMA without persisting test settings
+  ---
+  duration_ms: 1.6776
+  type: 'test'
+  ...
+# Subtest: native defaults and production manifest use a 4 KiB compressed input
+ok 21 - native defaults and production manifest use a 4 KiB compressed input
+  ---
+  duration_ms: 1.97
+  type: 'test'
+  ...
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches
+ok 22 - real codec bridge and arena pair every allocation/free through OOM and switches
+  ---
+  duration_ms: 21751.4996
+  type: 'test'
+  ...
+# Codec lifecycle PASS: 100 mixed cycles, every allocation failure; 4453 allocations, 4452 frees, 1 permanent IRAM allocation
+# Subtest: network reconnect releases cached decoder before another handshake
+ok 23 - network reconnect releases cached decoder before another handshake
+  ---
+  duration_ms: 0.7204
+  type: 'test'
+  ...
+# Subtest: native AAC block default matches a PDM32 DMA payload and retains A/B control
+ok 24 - native AAC block default matches a PDM32 DMA payload and retains A/B control
+  ---
+  duration_ms: 2.1808
+  type: 'test'
+  ...
+# Subtest: ESP8266 RAM codec benchmark embeds golden fixtures and bypasses services
+ok 25 - ESP8266 RAM codec benchmark embeds golden fixtures and bypasses services
+  ---
+  duration_ms: 1.7084
+  type: 'test'
+  ...
+# Subtest: RAM decoder-to-DMA comparison is opt-in and never persists test settings
+ok 26 - RAM decoder-to-DMA comparison is opt-in and never persists test settings
+  ---
+  duration_ms: 25.878
+  type: 'test'
+  ...
+# Subtest: MP3 matrix runs stored 64/128/320 inputs and excludes AAC
+ok 27 - MP3 matrix runs stored 64/128/320 inputs and excludes AAC
+  ---
+  duration_ms: 2.0372
+  type: 'test'
+  ...
+# Subtest: AAC flash matrix is isolated and normal production clears it
+ok 28 - AAC flash matrix is isolated and normal production clears it
+  ---
+  duration_ms: 0.9055
+  type: 'test'
+  ...
+# Subtest: ESP8266 Helix stage hooks cover both MP3 and AAC hot paths
+ok 29 - ESP8266 Helix stage hooks cover both MP3 and AAC hot paths
+  ---
+  duration_ms: 2.4902
+  type: 'test'
+  ...
+# Subtest: AAC matrix contains complete sequential AAC-LC frames from the same MP3 source
+ok 30 - AAC matrix contains complete sequential AAC-LC frames from the same MP3 source
+  ---
+  duration_ms: 48.4955
+  type: 'test'
+  ...
+# Subtest: composite source is deterministic stereo tone/noise with headroom
+ok 31 - composite source is deterministic stereo tone/noise with headroom
+  ---
+  duration_ms: 53.4284
+  type: 'test'
+  ...
+# Subtest: stored MP3s use real sequential frames and match fixture hashes
+ok 32 - stored MP3s use real sequential frames and match fixture hashes
+  ---
+  duration_ms: 25.7261
+  type: 'test'
+  ...
+# Subtest: production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+ok 33 - production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+  ---
+  duration_ms: 53044.8142
+  type: 'test'
+  ...
+# PDM32: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_SIMPLE: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_FEEDBACK: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM128: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# Subtest: LX106 high-half multiply is exact for edge and deterministic random inputs
+ok 34 - LX106 high-half multiply is exact for edge and deterministic random inputs
+  ---
+  duration_ms: 20.9529
+  type: 'test'
+  ...
+# Subtest: LX106 Q32 reciprocal division is exact for MP3 divisors
+ok 35 - LX106 Q32 reciprocal division is exact for MP3 divisors
+  ---
+  duration_ms: 149.3798
+  type: 'test'
+  ...
+# Subtest: ESP8266 Helix decoders use the shared non-64-bit multiply helper
+ok 36 - ESP8266 Helix decoders use the shared non-64-bit multiply helper
+  ---
+  duration_ms: 9.237
+  type: 'test'
+  ...
+# Subtest: AAC bit reader matches an independent bit oracle at buffer tails
+ok 37 - AAC bit reader matches an independent bit oracle at buffer tails
+  ---
+  duration_ms: 18871.3515
+  type: 'test'
+  ...
+# AAC bit reader: 3874304 peek/consume comparisons, exact bits and logical positions
+# Subtest: AAC flash Huffman lookup matches every canonical code and suffix
+ok 38 - AAC flash Huffman lookup matches every canonical code and suffix
+  ---
+  duration_ms: 9737.9392
+  type: 'test'
+  ...
+# AAC Huffman: 1305600 exhaustive prefixes/suffixes, exact symbols and bit counts
+# Subtest: AAC exact optimizations preserve PCM on all retained rates and channels
+ok 39 - AAC exact optimizations preserve PCM on all retained rates and channels
+  ---
+  duration_ms: 18981.2642
+  type: 'test'
+  ...
+# stereo-320.aac: samples=38912, maxError=0, SNR=Infinity dB
+# mono-22050.aac: samples=23552, maxError=0, SNR=Infinity dB
+# stereo-44100.aac: samples=92160, maxError=0, SNR=Infinity dB
+# Subtest: AAC sequential block windows preserve exact PCM and overlap state
+ok 40 - AAC sequential block windows preserve exact PCM and overlap state
+  ---
+  duration_ms: 9129.1948
+  type: 'test'
+  ...
+# AAC sequential windows: 1280 vectors, exact PCM/overlap, immutable coefficients, all block cancellations and canaries passed
+# AAC sequential windows: 1280 vectors, exact PCM/overlap, immutable coefficients, all block cancellations and canaries passed
+# Subtest: AAC 32/64/128/256/512-frame callbacks match full-frame decode and mono downmix
+ok 41 - AAC 32/64/128/256/512-frame callbacks match full-frame decode and mono downmix
+  ---
+  duration_ms: 8656.264
+  type: 'test'
+  ...
+# AAC block matrix: all PCM samples bit-identical; maximum error=0, SNR=Infinity dB versus exact matching full-frame arithmetic
+# Subtest: 32-frame MP3 output matches granules and full frames byte for byte
+ok 42 - 32-frame MP3 output matches granules and full frames byte for byte
+  ---
+  duration_ms: 13734.5426
+  type: 'test'
+  ...
+# 6 vectors x mono/stereo x exact/SSO: frame, granule and 32-frame PCM identical; canaries intact
+# Subtest: 32-frame MP3 output handles cancellation, reset and bounded error concealment
+ok 43 - 32-frame MP3 output handles cancellation, reset and bounded error concealment
+  ---
+  duration_ms: 5419.912
+  type: 'test'
+  ...
+# 32-frame MP3: cancellation at all synthesis boundaries, reset, capacity, underflow and canaries passed
+# 32-frame MP3: cancellation at all synthesis boundaries, reset, capacity, underflow and canaries passed
+# Subtest: shared MP3 reorder scratch is bit-exact against the separate allocation
+ok 44 - shared MP3 reorder scratch is bit-exact against the separate allocation
+  ---
+  duration_ms: 13183.9485
+  type: 'test'
+  ...
+# 6 MP3 vectors x mono/stereo x frame/granule API: identical PCM bytes
+# Subtest: shared MP3 reorder has one owner, saves 792 heap bytes and survives allocation failures
+ok 45 - shared MP3 reorder has one owner, saves 792 heap bytes and survives allocation failures
+  ---
+  duration_ms: 5411.813
+  type: 'test'
+  ...
+# separate: heap=7612 word=15636 allocations=13; short/mixed 9 rates, failure cleanup, 50 AAC/MP3 cycles PASS
+# shared: heap=6820 word=15636 allocations=12; short/mixed 9 rates, failure cleanup, 50 AAC/MP3 cycles PASS
+# Subtest: MP3 build-time mono skips M/S side and preserves fallback/mode transitions
+ok 46 - MP3 build-time mono skips M/S side and preserves fallback/mode transitions
+  ---
+  duration_ms: 6715.3322
+  type: 'test'
+  ...
+# original: SNR=49.69 dB maxError=21, Huffman 72 -> 72
+# mid-side: SNR=49.79 dB maxError=21, Huffman 72 -> 36
+# left-right: SNR=49.69 dB maxError=21, Huffman 72 -> 72
+# dual-channel: SNR=49.69 dB maxError=21, Huffman 72 -> 72
+# intensity: SNR=49.69 dB maxError=21, Huffman 72 -> 72
+# mid-side-intensity: SNR=49.79 dB maxError=21, Huffman 72 -> 72
+# transitions: SNR=49.78 dB maxError=21, Huffman 72 -> 58
+# mpeg1: SNR=49.65 dB maxError=22, Huffman 72 -> 50
+# mpeg2: SNR=49.07 dB maxError=21, Huffman 36 -> 26
+# mpeg25: SNR=48.84 dB maxError=21, Huffman 20 -> 12
+# mono: SNR=Infinity dB maxError=0, Huffman 19 -> 19
+# Subtest: MP3 mono overlap state is safe across windows, channel modes and reset
+ok 47 - MP3 mono overlap state is safe across windows, channel modes and reset
+  ---
+  duration_ms: 2761.5929
+  type: 'test'
+  ...
+# mono overlap/window/reset/canary PASS, max PCM error=1
+# Subtest: ESP8266 optimized Helix MP3/AAC PCM matches the 64-bit reference
+ok 48 - ESP8266 optimized Helix MP3/AAC PCM matches the 64-bit reference
+  ---
+  duration_ms: 6315.1299
+  type: 'test'
+  ...
+# mp3: codec=mp3 frames=18 samples=41472 bytes=82944, sha256=bccd41c32d39c55f571bfc205f53817871715be78090ba519ded6749fd004c6a
+# aac: codec=aac frames=19 samples=38912 bytes=77824, sha256=13afe42da43d6c9387001cf91cdf9f95177dea9c51820f951c459812b58f3a43
+# Subtest: ESP8266 Helix SSO preserves MP3 frame layout and useful PCM quality
+ok 49 - ESP8266 Helix SSO preserves MP3 frame layout and useful PCM quality
+  ---
+  duration_ms: 6263.6317
+  type: 'test'
+  ...
+# SSO SNR=48.50 dB, maxError=34 PCM levels
+# Subtest: ESP8266 Helix AAC SSO preserves frame layout and useful PCM quality
+ok 50 - ESP8266 Helix AAC SSO preserves frame layout and useful PCM quality
+  ---
+  duration_ms: 6260.9886
+  type: 'test'
+  ...
+# AAC SSO SNR=82.65 dB, maxError=1 PCM levels
+# Subtest: HTTP startup and URI allocation failures release every owned resource
+ok 51 - HTTP startup and URI allocation failures release every owned resource
+  ---
+  duration_ms: 18292.035
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP URL, redirect and chunk parser passes native tests
+ok 52 - ESP8266 HTTP URL, redirect and chunk parser passes native tests
+  ---
+  duration_ms: 17163.5628
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio client uses bounded, chunk-aware socket I/O
+ok 53 - ESP8266 audio client uses bounded, chunk-aware socket I/O
+  ---
+  duration_ms: 2.0445
+  type: 'test'
+  ...
+# Subtest: ESP8266 stream inactivity deadline is configurable with a one-second default
+ok 54 - ESP8266 stream inactivity deadline is configurable with a one-second default
+  ---
+  duration_ms: 0.7452
+  type: 'test'
+  ...
+# Subtest: actual HTTP receiver and upload loop preserve errno, partial reads and deadlines
+ok 55 - actual HTTP receiver and upload loop preserve errno, partial reads and deadlines
+  ---
+  duration_ms: 17870.4192
+  type: 'test'
+  ...
+# Subtest: actual HTTP response encoder coalesces chunks and keeps valid framing
+ok 56 - actual HTTP response encoder coalesces chunks and keeps valid framing
+  ---
+  duration_ms: 19955.8841
+  type: 'test'
+  ...
+# Subtest: actual HTTP opener never publishes a closed socket after a chunk error
+ok 57 - actual HTTP opener never publishes a closed socket after a chunk error
+  ---
+  duration_ms: 16986.2917
+  type: 'test'
+  ...
+# Subtest: physical volume benchmark starts inward at either limit and never awaits a clamped no-op
+ok 58 - physical volume benchmark starts inward at either limit and never awaits a clamped no-op
+  ---
+  duration_ms: 2.7685
+  type: 'test'
+  ...
+# Subtest: latency analysis excludes only proven TX wait; RAM, unknown and raw outliers remain
+ok 59 - latency analysis excludes only proven TX wait; RAM, unknown and raw outliers remain
+  ---
+  duration_ms: 2.9673
+  type: 'test'
+  ...
+# Subtest: actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-safe wall time
+ok 60 - actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-safe wall time
+  ---
+  duration_ms: 21112.9772
+  type: 'test'
+  ...
+# Subtest: control correlation retains pre-input delay and rejects ambiguous commands
+ok 61 - control correlation retains pre-input delay and rejects ambiguous commands
+  ---
+  duration_ms: 1.8906
+  type: 'test'
+  ...
+# Subtest: startup correlation bounds delay before WS dispatch without calling it network wait
+ok 62 - startup correlation bounds delay before WS dispatch without calling it network wait
+  ---
+  duration_ms: 1.4815
+  type: 'test'
+  ...
+# Subtest: ESP8266 keeps SLC DMA active while the radio is silent
+ok 63 - ESP8266 keeps SLC DMA active while the radio is silent
+  ---
+  duration_ms: 1.319
+  type: 'test'
+  ...
+# Subtest: ESP8266 re-primes the I2S clock before PCM after silence
+ok 64 - ESP8266 re-primes the I2S clock before PCM after silence
+  ---
+  duration_ms: 0.3654
+  type: 'test'
+  ...
+# Subtest: ESP8266 production audio defaults to I2S DMA PDM
+ok 65 - ESP8266 production audio defaults to I2S DMA PDM
+  ---
+  duration_ms: 3.1214
+  type: 'test'
+  ...
+# Subtest: ESP8266 keeps mutable sdkconfig inside each build directory
+ok 66 - ESP8266 keeps mutable sdkconfig inside each build directory
+  ---
+  duration_ms: 0.2181
+  type: 'test'
+  ...
+# Subtest: I2S PDM submits only complete finite DMA buffers with neutral underrun fallback
+ok 67 - I2S PDM submits only complete finite DMA buffers with neutral underrun fallback
+  ---
+  duration_ms: 1.1702
+  type: 'test'
+  ...
+# Subtest: I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier
+ok 68 - I2S PDM defaults to a genuine 1.536 MHz PDM32 carrier
+  ---
+  duration_ms: 0.3858
+  type: 'test'
+  ...
+# Subtest: optimized branchless PDM32 packer is bit-exact
+ok 69 - optimized branchless PDM32 packer is bit-exact
+  ---
+  duration_ms: 0.8666
+  type: 'test'
+  ...
+# Subtest: I2S NoDAC routes DATA only and ignores UART RX input
+ok 70 - I2S NoDAC routes DATA only and ignores UART RX input
+  ---
+  duration_ms: 6.2962
+  type: 'test'
+  ...
+# Subtest: I2S DMA is installed before Wi-Fi starts and then emits neutral PDM
+ok 71 - I2S DMA is installed before Wi-Fi starts and then emits neutral PDM
+  ---
+  duration_ms: 0.2779
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio trace follows decoder PCM into the physical PDM DMA buffer
+ok 72 - ESP8266 audio trace follows decoder PCM into the physical PDM DMA buffer
+  ---
+  duration_ms: 0.4274
+  type: 'test'
+  ...
+# Subtest: actual volume reply uses one bounded Arduino-compatible frame and actual device value
+ok 73 - actual volume reply uses one bounded Arduino-compatible frame and actual device value
+  ---
+  duration_ms: 19238.6519
+  type: 'test'
+  ...
+# Subtest: actual WebUI writers keep UTF-8 frames valid with malformed ICY and bounded buffers
+ok 74 - actual WebUI writers keep UTF-8 frames valid with malformed ICY and bounded buffers
+  ---
+  duration_ms: 1462.5584
+  type: 'test'
+  ...
+# Subtest: KaRadio target uses Helix MP3 and DMA I2S PDM without VS1053
+ok 75 - KaRadio target uses Helix MP3 and DMA I2S PDM without VS1053
+  ---
+  duration_ms: 2.0548
+  type: 'test'
+  ...
+# Subtest: KaRadio pipeline separates network producer from audio consumer
+ok 76 - KaRadio pipeline separates network producer from audio consumer
+  ---
+  duration_ms: 0.7409
+  type: 'test'
+  ...
+# Subtest: network producer receives directly into the bounded ring
+ok 77 - network producer receives directly into the bounded ring
+  ---
+  duration_ms: 0.3753
+  type: 'test'
+  ...
+# Subtest: stream detection borrows the immutable ring prefix instead of allocating a probe
+ok 78 - stream detection borrows the immutable ring prefix instead of allocating a probe
+  ---
+  duration_ms: 1.3027
+  type: 'test'
+  ...
+# Subtest: MP3 word workspace uses the physically verified 16-KiB IRAM arena
+ok 79 - MP3 word workspace uses the physically verified 16-KiB IRAM arena
+  ---
+  duration_ms: 0.2527
+  type: 'test'
+  ...
+# Subtest: documentation states the physical output and compatibility limits
+ok 80 - documentation states the physical output and compatibility limits
+  ---
+  duration_ms: 0.2163
+  type: 'test'
+  ...
+# Subtest: ESP8266 libmad backend is pinned, selectable, and decodes golden MP3
+ok 81 - ESP8266 libmad backend is pinned, selectable, and decodes golden MP3
+  ---
+  duration_ms: 45657.0877
+  type: 'test'
+  ...
+# codec=libmad frames=18 samples=41472 bytes=82944 rate=48000 channels=2 state=27708, SNR=49.41 dB, maxError=99 PCM levels
+# Subtest: memory diagnostics are compiled out of the ordinary firmware
+ok 82 - memory diagnostics are compiled out of the ordinary firmware
+  ---
+  duration_ms: 2.4066
+  type: 'test'
+  ...
+# Subtest: read-only heap walk uses the SDK lock, flags and allocation alignment
+ok 83 - read-only heap walk uses the SDK lock, flags and allocation alignment
+  ---
+  duration_ms: 0.7317
+  type: 'test'
+  ...
+# Subtest: reports separate byte-addressable DRAM, IRAM and sampled minima
+ok 84 - reports separate byte-addressable DRAM, IRAM and sampled minima
+  ---
+  duration_ms: 2.1977
+  type: 'test'
+  ...
+# Subtest: physical workload disconnect errors settle once without recursive close
+ok 85 - physical workload disconnect errors settle once without recursive close
+  ---
+  duration_ms: 3.8741
+  type: 'test'
+  ...
+# Subtest: all ESP8266 native output backends ignore balance for mono PCM
+ok 86 - all ESP8266 native output backends ignore balance for mono PCM
+  ---
+  duration_ms: 1.6789
+  type: 'test'
+  ...
+# Subtest: runtime and restored balance use a signed lower bound
+ok 87 - runtime and restored balance use a signed lower bound
+  ---
+  duration_ms: 0.7691
+  type: 'test'
+  ...
+# Subtest: MP3 matrix requires every codec case and actual nonzero PCM
+ok 88 - MP3 matrix requires every codec case and actual nonzero PCM
+  ---
+  duration_ms: 3.0417
+  type: 'test'
+  ...
+# Subtest: DMA starvation is not accepted even with advancing nonzero PCM
+ok 89 - DMA starvation is not accepted even with advancing nonzero PCM
+  ---
+  duration_ms: 1.4592
+  type: 'test'
+  ...
+# Subtest: decode-only results never certify physical continuity
+ok 90 - decode-only results never certify physical continuity
+  ---
+  duration_ms: 0.4348
+  type: 'test'
+  ...
+# Subtest: AAC report requires all low-rate cases and cannot pass with missing PCM
+ok 91 - AAC report requires all low-rate cases and cannot pass with missing PCM
+  ---
+  duration_ms: 0.9523
+  type: 'test'
+  ...
+# Subtest: ESP8266 channel choice defaults to mono and retains an explicit stereo profile
+ok 92 - ESP8266 channel choice defaults to mono and retains an explicit stereo profile
+  ---
+  duration_ms: 3.9528
+  type: 'test'
+  ...
+# Subtest: ESP8266 Helix MP3 streams 32 frames while libmad retains granule PCM
+ok 93 - ESP8266 Helix MP3 streams 32 frames while libmad retains granule PCM
+  ---
+  duration_ms: 0.621
+  type: 'test'
+  ...
+# Subtest: ESP8266 AAC reserves only its active bounded PCM block
+ok 94 - ESP8266 AAC reserves only its active bounded PCM block
+  ---
+  duration_ms: 0.6252
+  type: 'test'
+  ...
+# Subtest: ESP8266 enables AAC and refills/yields between compressed frames
+ok 95 - ESP8266 enables AAC and refills/yields between compressed frames
+  ---
+  duration_ms: 0.3139
+  type: 'test'
+  ...
+# Subtest: ESP8266 granule API preserves the conventional full-frame API
+ok 96 - ESP8266 granule API preserves the conventional full-frame API
+  ---
+  duration_ms: 1.5168
+  type: 'test'
+  ...
+# Subtest: 32-frame callbacks publish stream format only on change
+ok 97 - 32-frame callbacks publish stream format only on change
+  ---
+  duration_ms: 1.014
+  type: 'test'
+  ...
+# Subtest: ESP8266 error concealment cannot overrun the granule PCM buffer
+ok 98 - ESP8266 error concealment cannot overrun the granule PCM buffer
+  ---
+  duration_ms: 0.7555
+  type: 'test'
+  ...
+# Subtest: streaming multipart handles every split and rejects truncated uploads
+ok 99 - streaming multipart handles every split and rejects truncated uploads
+  ---
+  duration_ms: 1869.2677
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket handler completes HTTP upgrade before reading frames
+ok 100 - ESP8266 WebSocket handler completes HTTP upgrade before reading frames
+  ---
+  duration_ms: 1.9761
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket handler reads a command in one bounded receive
+ok 101 - ESP8266 WebSocket handler reads a command in one bounded receive
+  ---
+  duration_ms: 0.3872
+  type: 'test'
+  ...
+# Subtest: ESP8266 Web API dispatches player commands without synchronous status sends
+ok 102 - ESP8266 Web API dispatches player commands without synchronous status sends
+  ---
+  duration_ms: 0.2297
+  type: 'test'
+  ...
+# Subtest: ESP8266 Web API publishes player, station and stream state after commands
+ok 103 - ESP8266 Web API publishes player, station and stream state after commands
+  ---
+  duration_ms: 0.3807
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounds the persistent status buffer for audio heap
+ok 104 - ESP8266 bounds the persistent status buffer for audio heap
+  ---
+  duration_ms: 0.1692
+  type: 'test'
+  ...
+# Subtest: ESP8266 throttles volatile telemetry without delaying player state
+ok 105 - ESP8266 throttles volatile telemetry without delaying player state
+  ---
+  duration_ms: 1.1353
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI status uses a compact change key and bounded writer
+ok 106 - ESP8266 WebUI status uses a compact change key and bounded writer
+  ---
+  duration_ms: 0.5147
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI uses the reduced stack after removing status temporaries
+ok 107 - ESP8266 WebUI uses the reduced stack after removing status temporaries
+  ---
+  duration_ms: 0.4242
+  type: 'test'
+  ...
+# Subtest: ESP8266 validates a saved fd before treating it as a WebSocket
+ok 108 - ESP8266 validates a saved fd before treating it as a WebSocket
+  ---
+  duration_ms: 0.7636
+  type: 'test'
+  ...
+# Subtest: ESP8266 parser accepts exactly HTTP 1.1
+ok 109 - ESP8266 parser accepts exactly HTTP 1.1
+  ---
+  duration_ms: 0.5623
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP task has enough stack for playlist-backed commands
+ok 110 - ESP8266 HTTP task has enough stack for playlist-backed commands
+  ---
+  duration_ms: 0.2392
+  type: 'test'
+  ...
+# Subtest: ESP8266 exposes only board-supported stations with matching indices
+ok 111 - ESP8266 exposes only board-supported stations with matching indices
+  ---
+  duration_ms: 0.3268
+  type: 'test'
+  ...
+# Subtest: ESP8266 radio retries short socket timeouts until the HTTP header deadline
+ok 112 - ESP8266 radio retries short socket timeouts until the HTTP header deadline
+  ---
+  duration_ms: 1.4227
+  type: 'test'
+  ...
+# Subtest: ESP8266 reconnects a clean radio EOF unless control changed
+ok 113 - ESP8266 reconnects a clean radio EOF unless control changed
+  ---
+  duration_ms: 0.3676
+  type: 'test'
+  ...
+# Subtest: ESP8266 radio checks a header that exactly fills its receive buffer
+ok 114 - ESP8266 radio checks a header that exactly fills its receive buffer
+  ---
+  duration_ms: 0.4094
+  type: 'test'
+  ...
+# Subtest: ESP8266 waits for DHCP and releases recovery AP memory in client mode
+ok 115 - ESP8266 waits for DHCP and releases recovery AP memory in client mode
+  ---
+  duration_ms: 0.468
+  type: 'test'
+  ...
+# Subtest: ESP8266 recovery AP assigns clients an address for WebUI access
+ok 116 - ESP8266 recovery AP assigns clients an address for WebUI access
+  ---
+  duration_ms: 0.3046
+  type: 'test'
+  ...
+# Subtest: ESP8266 next/previous starts searching after the current station
+ok 117 - ESP8266 next/previous starts searching after the current station
+  ---
+  duration_ms: 0.22
+  type: 'test'
+  ...
+# Subtest: LAN source preserves HTTP framing, exact encoded prefix, and pacing
+ok 118 - LAN source preserves HTTP framing, exact encoded prefix, and pacing
+  ---
+  duration_ms: 253.1253
+  type: 'test'
+  ...
+# Subtest: network diagnostic retains decoder memory and distinguishes app gaps from socket emptiness
+ok 119 - network diagnostic retains decoder memory and distinguishes app gaps from socket emptiness
+  ---
+  duration_ms: 2.5594
+  type: 'test'
+  ...
+# Subtest: full read-size comparison holds readiness and output constant
+ok 120 - full read-size comparison holds readiness and output constant
+  ---
+  duration_ms: 0.5407
+  type: 'test'
+  ...
+# Subtest: network report does not discard failed or partial measurements
+ok 121 - network report does not discard failed or partial measurements
+  ---
+  duration_ms: 6.5042
+  type: 'test'
+  ...
+# Subtest: runtime report separates task residency and baseline from receive elapsed time
+ok 122 - runtime report separates task residency and baseline from receive elapsed time
+  ---
+  duration_ms: 0.87
+  type: 'test'
+  ...
+# {"path":"/mp3-128","rate_kbps":128,"bytes_written":4096,"elapsed_ms":264,"peer_closed":true}
+# Subtest: sweep requires ten attempts, retains failed samples, and compares matching rounds
+ok 123 - sweep requires ten attempts, retains failed samples, and compares matching rounds
+  ---
+  duration_ms: 16.972
+  type: 'test'
+  ...
+# Subtest: missing/open-failed cases are not mistaken for successful throughput
+ok 124 - missing/open-failed cases are not mistaken for successful throughput
+  ---
+  duration_ms: 1.1473
+  type: 'test'
+  ...
+# Subtest: Wi-Fi recovery is retained and separates paired samples
+ok 125 - Wi-Fi recovery is retained and separates paired samples
+  ---
+  duration_ms: 0.6693
+  type: 'test'
+  ...
+# Subtest: explicit campaign combination retains partial runs and requires a finished final run
+ok 126 - explicit campaign combination retains partial runs and requires a finished final run
+  ---
+  duration_ms: 7.4291
+  type: 'test'
+  ...
+# Subtest: cancelled short windows are not reported as error zero or a continuous success
+ok 127 - cancelled short windows are not reported as error zero or a continuous success
+  ---
+  duration_ms: 0.4967
+  type: 'test'
+  ...
+# Subtest: playback task residency is not mislabelled as receive-only CPU
+ok 128 - playback task residency is not mislabelled as receive-only CPU
+  ---
+  duration_ms: 0.6684
+  type: 'test'
+  ...
+# Subtest: Windows TCP source preserves ten encoded prefixes and returns socket telemetry
+ok 129 - Windows TCP source preserves ten encoded prefixes and returns socket telemetry
+  ---
+  duration_ms: 3552.3846
+  type: 'test'
+  ...
+# Subtest: production NoDAC ownership state machine survives delayed producer/EOF interleavings
+ok 130 - production NoDAC ownership state machine survives delayed producer/EOF interleavings
+  ---
+  duration_ms: 7582.1095
+  type: 'test'
+  ...
+# {"path":"/mp3-128","rate_kbps":128,"bytes_written":4096,"elapsed_ms":264,"peer_closed":true}
+# {"path":"/aac-64","rate_kbps":64,"bytes_written":4096,"elapsed_ms":542,"peer_closed":true}
+# {"path":"/mp3-128","rate_kbps":128,"bytes_written":4096,"elapsed_ms":270,"peer_closed":true}
+# {"path":"/aac-64","rate_kbps":64,"bytes_written":4096,"elapsed_ms":523,"peer_closed":true}
+# {"path":"/mp3-128","rate_kbps":128,"bytes_written":4096,"elapsed_ms":266,"peer_closed":true}
+# {"path":"/aac-64","rate_kbps":64,"bytes_written":4096,"elapsed_ms":529,"peer_closed":true}
+# {"path":"/mp3-128","rate_kbps":128,"bytes_written":4096,"elapsed_ms":262,"peer_closed":true}
+# {"path":"/aac-64","rate_kbps":64,"bytes_written":4096,"elapsed_ms":521,"peer_closed":true}
+# {"path":"/mp3-128","rate_kbps":128,"bytes_written":4096,"elapsed_ms":271,"peer_closed":true}
+# Subtest: native Node TCP_INFO samples ten real fixture connections without changing HTTP bytes
+ok 131 - native Node TCP_INFO samples ten real fixture connections without changing HTTP bytes
+  ---
+  duration_ms: 3411.8178
+  type: 'test'
+  ...
+# {"path":"/aac-64","rate_kbps":64,"bytes_written":4096,"elapsed_ms":546,"peer_closed":true}
+# Subtest: OTA accepts UTF-8 manifests with and without PowerShell BOM
+ok 132 - OTA accepts UTF-8 manifests with and without PowerShell BOM
+  ---
+  duration_ms: 14.4798
+  type: 'test'
+  ...
+# Subtest: I2S pdm LED=0: format dispatch preserves PCM, bits, state and DMA boundaries
+ok 133 - I2S pdm LED=0: format dispatch preserves PCM, bits, state and DMA boundaries
+  ---
+  duration_ms: 9455.0961
+  type: 'test'
+  ...
+# {"pass":true,"blocks":4860,"words":606000}
+# Subtest: I2S rcpdm LED=0: format dispatch preserves PCM, bits, state and DMA boundaries
+ok 134 - I2S rcpdm LED=0: format dispatch preserves PCM, bits, state and DMA boundaries
+  ---
+  duration_ms: 8094.7262
+  type: 'test'
+  ...
+# {"pass":true,"blocks":4860,"words":606000}
+# Subtest: I2S feedback LED=0: format dispatch preserves PCM, bits, state and DMA boundaries
+ok 135 - I2S feedback LED=0: format dispatch preserves PCM, bits, state and DMA boundaries
+  ---
+  duration_ms: 7018.2979
+  type: 'test'
+  ...
+# {"pass":true,"blocks":4860,"words":606000}
+# Subtest: I2S simple LED=0: format dispatch preserves PCM, bits, state and DMA boundaries
+ok 136 - I2S simple LED=0: format dispatch preserves PCM, bits, state and DMA boundaries
+  ---
+  duration_ms: 6591.2802
+  type: 'test'
+  ...
+# {"pass":true,"blocks":4860,"words":606000}
+# Subtest: I2S pdm LED=1: format dispatch preserves PCM, bits, state and DMA boundaries
+ok 137 - I2S pdm LED=1: format dispatch preserves PCM, bits, state and DMA boundaries
+  ---
+  duration_ms: 4559.7342
+  type: 'test'
+  ...
+# {"pass":true,"blocks":4860,"words":606000}
+# Subtest: I2S rcpdm LED=1: format dispatch preserves PCM, bits, state and DMA boundaries
+ok 138 - I2S rcpdm LED=1: format dispatch preserves PCM, bits, state and DMA boundaries
+  ---
+  duration_ms: 3253.9258
+  type: 'test'
+  ...
+# {"pass":true,"blocks":4860,"words":606000}
+# Subtest: I2S feedback LED=1: format dispatch preserves PCM, bits, state and DMA boundaries
+ok 139 - I2S feedback LED=1: format dispatch preserves PCM, bits, state and DMA boundaries
+  ---
+  duration_ms: 3533.5558
+  type: 'test'
+  ...
+# {"pass":true,"blocks":4860,"words":606000}
+# Subtest: I2S simple LED=1: format dispatch preserves PCM, bits, state and DMA boundaries
+ok 140 - I2S simple LED=1: format dispatch preserves PCM, bits, state and DMA boundaries
+  ---
+  duration_ms: 3013.2017
+  type: 'test'
+  ...
+# {"pass":true,"blocks":4860,"words":606000}
+# Subtest: saved tables use identical frequencies and rate-appropriate RC shifts
+ok 141 - saved tables use identical frequencies and rate-appropriate RC shifts
+  ---
+  duration_ms: 11.5735
+  type: 'test'
+  ...
+# Subtest: same-rate PDM matrix preserves decisions and packs all 8..128 new bits
+ok 142 - same-rate PDM matrix preserves decisions and packs all 8..128 new bits
+  ---
+  duration_ms: 10029.0863
+  type: 'test'
+  ...
+# Subtest: actual playlist installer skips identical files and rolls back index failure
+ok 143 - actual playlist installer skips identical files and rolls back index failure
+  ---
+  duration_ms: 797.5572
+  type: 'test'
+  ...
+# Subtest: actual buffered playlist handler preserves filtered rows across buffer boundaries
+ok 144 - actual buffered playlist handler preserves filtered rows across buffer boundaries
+  ---
+  duration_ms: 991.3528
+  type: 'test'
+  ...
+# Subtest: actual flash cache validates source and body, rebuilds stale data, reuses unchanged files
+ok 145 - actual flash cache validates source and body, rebuilds stale data, reuses unchanged files
+  ---
+  duration_ms: 4301.0927
+  type: 'test'
+  ...
+# Subtest: disabled cache needs no compressor or cache object code
+ok 146 - disabled cache needs no compressor or cache object code
+  ---
+  duration_ms: 931.3117
+  type: 'test'
+  ...
+# Subtest: playlist upload rebuilds cache under the same lock; requests never compress
+ok 147 - playlist upload rebuilds cache under the same lock; requests never compress
+  ---
+  duration_ms: 1.6801
+  type: 'test'
+  ...
+# Subtest: legacy comparison holds rates fixed and exactly preserves all archived controls
+ok 148 - legacy comparison holds rates fixed and exactly preserves all archived controls
+  ---
+  duration_ms: 68.7236
+  type: 'test'
+  ...
+# Subtest: legacy LSB probe uses identical inputs, verifies PDM and does not invent seed variation
+ok 149 - legacy LSB probe uses identical inputs, verifies PDM and does not invent seed variation
+  ---
+  duration_ms: 11.2338
+  type: 'test'
+  ...
+# Subtest: legacy quiet-signal dead zone is confirmed by output words and DC/LSB probes
+ok 150 - legacy quiet-signal dead zone is confirmed by output words and DC/LSB probes
+  ---
+  duration_ms: 8.0426
+  type: 'test'
+  ...
+# Subtest: response sweep uses equal rates, guarded band and exact historical tone controls
+ok 151 - response sweep uses equal rates, guarded band and exact historical tone controls
+  ---
+  duration_ms: 9.5586
+  type: 'test'
+  ...
+# Subtest: phase curves retain raw delay and separately compensate only the known interpolation
+ok 152 - phase curves retain raw delay and separately compensate only the known interpolation
+  ---
+  duration_ms: 2.4666
+  type: 'test'
+  ...
+# Subtest: native 6.144 MHz paths emit 128 fresh bits and match independent references
+ok 153 - native 6.144 MHz paths emit 128 fresh bits and match independent references
+  ---
+  duration_ms: 9340.7964
+  type: 'test'
+  ...
+# {"pass":true,"frames_per_variant":141312,"word_state_checks":2826240,"bits_per_sample":128,"rc_shift":6,"rc_state_bytes":16,"pdm_state_bytes":4,"same_prng":true}
+# Subtest: 6.144 MHz quality report has matched rates/inputs and unchanged archived controls
+ok 154 - 6.144 MHz quality report has matched rates/inputs and unchanged archived controls
+  ---
+  duration_ms: 24.7381
+  type: 'test'
+  ...
+# Subtest: ordinary PDM weak-tone loss is verified from bits, not called infinite SINAD
+ok 155 - ordinary PDM weak-tone loss is verified from bits, not called infinite SINAD
+  ---
+  duration_ms: 25.6687
+  type: 'test'
+  ...
+# Subtest: board runner validates SDK OTA CRC and refuses to overwrite an inactive app0
+ok 156 - board runner validates SDK OTA CRC and refuses to overwrite an inactive app0
+  ---
+  duration_ms: 12.1097
+  type: 'test'
+  ...
+# Subtest: board result parser rejects missing proof, incomplete tests and DMA underruns
+ok 157 - board result parser rejects missing proof, incomplete tests and DMA underruns
+  ---
+  duration_ms: 11.3081
+  type: 'test'
+  ...
+# Subtest: feedback comparison requires the new scalar and batch proofs and exact PDM32 identity
+ok 158 - feedback comparison requires the new scalar and batch proofs and exact PDM32 identity
+  ---
+  duration_ms: 2.784
+  type: 'test'
+  ...
+# Subtest: four-way summary requires two runs per mode and compares speed, not different algorithms checksums
+ok 159 - four-way summary requires two runs per mode and compares speed, not different algorithms checksums
+  ---
+  duration_ms: 29.9446
+  type: 'test'
+  ...
+# Subtest: unroll comparison requires actual LX106 backend, group width and expanded dispatch proof
+ok 160 - unroll comparison requires actual LX106 backend, group width and expanded dispatch proof
+  ---
+  duration_ms: 2.813
+  type: 'test'
+  ...
+# Subtest: unroll summary compares matching bitstreams and preserves legacy comparison
+ok 161 - unroll summary compares matching bitstreams and preserves legacy comparison
+  ---
+  duration_ms: 44.4561
+  type: 'test'
+  ...
+# Subtest: dither amplitude sweep holds all other parameters fixed and reproduces controls
+ok 162 - dither amplitude sweep holds all other parameters fixed and reproduces controls
+  ---
+  duration_ms: 129.4076
+  type: 'test'
+  ...
+# Subtest: weak-signal results contain three seeds and eight windows, not only a long average
+ok 163 - weak-signal results contain three seeds and eight windows, not only a long average
+  ---
+  duration_ms: 56.6312
+  type: 'test'
+  ...
+# Subtest: feedback ablation changes only error feedback; enabled model is production-bit-exact
+ok 164 - feedback ablation changes only error feedback; enabled model is production-bit-exact
+  ---
+  duration_ms: 11703.0223
+  type: 'test'
+  ...
+# {"pass":true,"frames":141312,"different_words":135068,"simple_reference_frames":141312,"simple_different_words":141014,"no_dither_frames_per_method":141312,"disabled_prng_unchanged":true,"attenuation_reference_frames":5087232,"attenuation_max_shift":8,"simple_tie_checks":2,"prng_and_interpolation_identical":true,"off_error_ignored":true}
+# Subtest: archived feedback ablation has matched controls and reproduces enabled baseline
+ok 165 - archived feedback ablation has matched controls and reproduces enabled baseline
+  ---
+  duration_ms: 4.9191
+  type: 'test'
+  ...
+# Subtest: Simple on/off archive matches the predictive experiment except for decision rule
+ok 166 - Simple on/off archive matches the predictive experiment except for decision rule
+  ---
+  duration_ms: 3.3361
+  type: 'test'
+  ...
+# Subtest: archived physical feedback measurements reproduce summaries and matching carrier conditions
+ok 167 - archived physical feedback measurements reproduce summaries and matching carrier conditions
+  ---
+  duration_ms: 300.9217
+  type: 'test'
+  ...
+# Subtest: feedback report compares equal rates and preserves coherent LSB evidence
+ok 168 - feedback report compares equal rates and preserves coherent LSB evidence
+  ---
+  duration_ms: 33.5109
+  type: 'test'
+  ...
+# Subtest: new feedback backend stays opt-in and mutually exclusive with old experiments
+ok 169 - new feedback backend stays opt-in and mutually exclusive with old experiments
+  ---
+  duration_ms: 1.2773
+  type: 'test'
+  ...
+# Subtest: RCPDM feedback preserves fractional PCM, state bounds and chunk continuity
+ok 170 - RCPDM feedback preserves fractional PCM, state bounds and chunk continuity
+  ---
+  duration_ms: 9110.0711
+  type: 'test'
+  ...
+# {"pass":true,"word_state_frames":2038946,"batch_cases":16,"selected_frames":116795,"state_bytes":16}
+# Subtest: dither removal preserves matched controls, verifies PRNG bypass and reports lost tones honestly
+ok 171 - dither removal preserves matched controls, verifies PRNG bypass and reports lost tones honestly
+  ---
+  duration_ms: 34.2414
+  type: 'test'
+  ...
+# Subtest: temporal LSB results reproduce archived coherent means instead of hiding their spread
+ok 172 - temporal LSB results reproduce archived coherent means instead of hiding their spread
+  ---
+  duration_ms: 10.5835
+  type: 'test'
+  ...
+# Subtest: RCPDM higher precision preserves RC decisions and does not cure quiet-tone deadband
+ok 173 - RCPDM higher precision preserves RC decisions and does not cure quiet-tone deadband
+  ---
+  duration_ms: 17225.4277
+  type: 'test'
+  ...
+# Subtest: desktop fixed/state-aware/entry-only RCPDM runs preserve every bit and RC state
+ok 174 - desktop fixed/state-aware/entry-only RCPDM runs preserve every bit and RC state
+  ---
+  duration_ms: 8795.2984
+  type: 'test'
+  ...
+# Subtest: sufficient bounds for 2/4/8 constant bits preserve every word and RC state
+ok 175 - sufficient bounds for 2/4/8 constant bits preserve every word and RC state
+  ---
+  duration_ms: 692.0408
+  type: 'test'
+  ...
+# Subtest: LX106 Simple assembly builds with safe architecture gating and forced-C fallback
+ok 176 - LX106 Simple assembly builds with safe architecture gating and forced-C fallback
+  ---
+  duration_ms: 9619.7559
+  type: 'test'
+  ...
+# Subtest: RCPDM simple compares current state before update and preserves block continuity
+ok 177 - RCPDM simple compares current state before update and preserves block continuity
+  ---
+  duration_ms: 13981.8388
+  type: 'test'
+  ...
+# Subtest: Simple remains restricted to the isolated benchmark and uses its own reference
+ok 178 - Simple remains restricted to the isolated benchmark and uses its own reference
+  ---
+  duration_ms: 0.8931
+  type: 'test'
+  ...
+# Subtest: I2S RCPDM is a separate opt-in profile, not a new board default
+ok 179 - I2S RCPDM is a separate opt-in profile, not a new board default
+  ---
+  duration_ms: 2.6634
+  type: 'test'
+  ...
+# Subtest: RCPDM32 reuses the production carrier, sample pacing and DMA ring
+ok 180 - RCPDM32 reuses the production carrier, sample pacing and DMA ring
+  ---
+  duration_ms: 1.8891
+  type: 'test'
+  ...
+# Subtest: RCPDM32 C implementation matches the independent full-range RC reference
+ok 181 - RCPDM32 C implementation matches the independent full-range RC reference
+  ---
+  duration_ms: 7004.2683
+  type: 'test'
+  ...
+# Subtest: RCPDM8 preserves reference decisions, exposes idle lock, and groups into RCPDM32
+ok 182 - RCPDM8 preserves reference decisions, exposes idle lock, and groups into RCPDM32
+  ---
+  duration_ms: 7676.3005
+  type: 'test'
+  ...
+# Subtest: bounded streaming gzip round-trips binary and playlist data with standard zlib
+ok 183 - bounded streaming gzip round-trips binary and playlist data with standard zlib
+  ---
+  duration_ms: 12197.4945
+  type: 'test'
+  ...
+# Subtest: gzip writer failure is propagated and cannot be finished as success
+ok 184 - gzip writer failure is propagated and cannot be finished as success
+  ---
+  duration_ms: 171.6791
+  type: 'test'
+  ...
+# Subtest: ESP8266 legacy SPI keeps its explicit 384 kHz PDM8 profile
+ok 185 - ESP8266 legacy SPI keeps its explicit 384 kHz PDM8 profile
+  ---
+  duration_ms: 2.4695
+  type: 'test'
+  ...
+# Subtest: ESP8266 SPI-PDM drains a bounded queue from the transfer-done interrupt
+ok 186 - ESP8266 SPI-PDM drains a bounded queue from the transfer-done interrupt
+  ---
+  duration_ms: 0.501
+  type: 'test'
+  ...
+# Subtest: ESP8266 SPI-PDM producer sleeps only when its bounded queue is full
+ok 187 - ESP8266 SPI-PDM producer sleeps only when its bounded queue is full
+  ---
+  duration_ms: 0.6314
+  type: 'test'
+  ...
+# Subtest: ESP8266 SPI-PDM interrupt only wakes a producer that is actually blocked
+ok 188 - ESP8266 SPI-PDM interrupt only wakes a producer that is actually blocked
+  ---
+  duration_ms: 1.5123
+  type: 'test'
+  ...
+# Subtest: ESP8266 fast ISR has a fixed full-chunk path and measures block gaps
+ok 189 - ESP8266 fast ISR has a fixed full-chunk path and measures block gaps
+  ---
+  duration_ms: 0.3643
+  type: 'test'
+  ...
+# Subtest: ESP8266 PDM producer fills a reserved queue slot without an intermediate copy
+ok 190 - ESP8266 PDM producer fills a reserved queue slot without an intermediate copy
+  ---
+  duration_ms: 0.4892
+  type: 'test'
+  ...
+# Subtest: ESP8266 SPI-PDM drains queued sound before forcing silence
+ok 191 - ESP8266 SPI-PDM drains queued sound before forcing silence
+  ---
+  duration_ms: 0.6282
+  type: 'test'
+  ...
+# Subtest: ESP8266 input gestures reuse the notified main task stack
+ok 192 - ESP8266 input gestures reuse the notified main task stack
+  ---
+  duration_ms: 0.2364
+  type: 'test'
+  ...
+# Subtest: temporary SPI debug overlay leaves the canonical I2S default unchanged
+ok 193 - temporary SPI debug overlay leaves the canonical I2S default unchanged
+  ---
+  duration_ms: 1.4218
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio profile can auto-start a reproducible HTTP stream
+ok 194 - ESP8266 audio profile can auto-start a reproducible HTTP stream
+  ---
+  duration_ms: 0.6054
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio profile can use an explicit static IPv4 test network
+ok 195 - ESP8266 audio profile can use an explicit static IPv4 test network
+  ---
+  duration_ms: 0.2676
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio profile reports whole-CPU load and heap use
+ok 196 - ESP8266 audio profile reports whole-CPU load and heap use
+  ---
+  duration_ms: 0.5901
+  type: 'test'
+  ...
+# Subtest: ESP8266 streaming profile reports internal MP3 and AAC decoder stages
+ok 197 - ESP8266 streaming profile reports internal MP3 and AAC decoder stages
+  ---
+  duration_ms: 0.8109
+  type: 'test'
+  ...
+# Subtest: ESP8266 decode-only profile bypasses PDM while counting decoded PCM
+ok 198 - ESP8266 decode-only profile bypasses PDM while counting decoded PCM
+  ---
+  duration_ms: 1.2971
+  type: 'test'
+  ...
+# Subtest: SPIFFS logging defaults off and never allocates/writes inside its hook
+ok 199 - SPIFFS logging defaults off and never allocates/writes inside its hook
+  ---
+  duration_ms: 3.2242
+  type: 'test'
+  ...
+# Subtest: SPIFFS logger HTTP=0: real C I/O and ownership failures
+ok 200 - SPIFFS logger HTTP=0: real C I/O and ownership failures
+  ---
+  duration_ms: 6416.7833
+  type: 'test'
+  ...
+# SPIFFS log PASS: deferred/bounded/rotation/low-space/I-O failures/recursion/concurrency/tick-wrap
+# Subtest: SPIFFS logger HTTP=1: real C I/O and ownership failures
+ok 201 - SPIFFS logger HTTP=1: real C I/O and ownership failures
+  ---
+  duration_ms: 5193.1998
+  type: 'test'
+  ...
+# SPIFFS log PASS: deferred/bounded/rotation/low-space/I-O failures/recursion/concurrency/tick-wrap
+# Subtest: SPIFFS HTTP handler: real C I/O and ownership failures
+ok 202 - SPIFFS HTTP handler: real C I/O and ownership failures
+  ---
+  duration_ms: 3550.1809
+  type: 'test'
+  ...
+# HTTP log PASS: bounded short reads, empty/missing/busy, query, read/send/close failures and fd cleanup
+# Subtest: actual native state wakes its consumer after unlocking, not for every bitrate sample
+ok 203 - actual native state wakes its consumer after unlocking, not for every bitrate sample
+  ---
+  duration_ms: 1133.4946
+  type: 'test'
+  ...
+# Subtest: station status and index are sent in one HTTP poll without a second timer tick
+ok 204 - station status and index are sent in one HTTP poll without a second timer tick
+  ---
+  duration_ms: 1.8073
+  type: 'test'
+  ...
+# Subtest: GPIO2 hardware level LED supports NoDAC and SPI, excludes external-DAC WS
+ok 205 - GPIO2 hardware level LED supports NoDAC and SPI, excludes external-DAC WS
+  ---
+  duration_ms: 4.4244
+  type: 'test'
+  ...
+# Subtest: LED brightness scaling is exact without integer division for all caps/levels
+ok 206 - LED brightness scaling is exact without integer division for all caps/levels
+  ---
+  duration_ms: 7.7031
+  type: 'test'
+  ...
+# Subtest: real LED C: 10 Hz, activeLow=0, peaks/decay/GPIO/stop/tick wrap
+ok 207 - real LED C: 10 Hz, activeLow=0, peaks/decay/GPIO/stop/tick wrap
+  ---
+  duration_ms: 5624.6798
+  type: 'test'
+  ...
+# LED PASS: peak/mono/stereo/clear/decay/rate/wrap/polarity/256 levels, no PCM changes
+# Subtest: real LED C: 10 Hz, activeLow=1, peaks/decay/GPIO/stop/tick wrap
+ok 208 - real LED C: 10 Hz, activeLow=1, peaks/decay/GPIO/stop/tick wrap
+  ---
+  duration_ms: 3704.2296
+  type: 'test'
+  ...
+# LED PASS: peak/mono/stereo/clear/decay/rate/wrap/polarity/256 levels, no PCM changes
+# Subtest: real LED C: 20 Hz, activeLow=0, peaks/decay/GPIO/stop/tick wrap
+ok 209 - real LED C: 20 Hz, activeLow=0, peaks/decay/GPIO/stop/tick wrap
+  ---
+  duration_ms: 3382.2684
+  type: 'test'
+  ...
+# LED PASS: peak/mono/stereo/clear/decay/rate/wrap/polarity/256 levels, no PCM changes
+# Subtest: real LED C: 20 Hz, activeLow=1, peaks/decay/GPIO/stop/tick wrap
+ok 210 - real LED C: 20 Hz, activeLow=1, peaks/decay/GPIO/stop/tick wrap
+  ---
+  duration_ms: 2599.9858
+  type: 'test'
+  ...
+# LED PASS: peak/mono/stereo/clear/decay/rate/wrap/polarity/256 levels, no PCM changes
+# Subtest: input queue prefills, tops up, cancels and strips arbitrarily split ICY without waits
+ok 211 - input queue prefills, tops up, cancels and strips arbitrarily split ICY without waits
+  ---
+  duration_ms: 5565.5025
+  type: 'test'
+  ...
+# Subtest: queued MP3/AAC PCM is bit-exact with legacy draining, input=1536
+ok 212 - queued MP3/AAC PCM is bit-exact with legacy draining, input=1536
+  ---
+  duration_ms: 6707.9661
+  type: 'test'
+  ...
+# Subtest: queued MP3/AAC PCM is bit-exact with legacy draining, input=4096
+ok 213 - queued MP3/AAC PCM is bit-exact with legacy draining, input=4096
+  ---
+  duration_ms: 4409.0767
+  type: 'test'
+  ...
+# Subtest: queued MP3/AAC PCM is bit-exact with legacy draining, input=6144
+ok 214 - queued MP3/AAC PCM is bit-exact with legacy draining, input=6144
+  ---
+  duration_ms: 4029.8086
+  type: 'test'
+  ...
+# Subtest: native startup buffers before decoding and does not announce Playing until PCM
+ok 215 - native startup buffers before decoding and does not announce Playing until PCM
+  ---
+  duration_ms: 0.9221
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounded readiness wait preserves cancellation and inactivity deadlines
+ok 216 - ESP8266 bounded readiness wait preserves cancellation and inactivity deadlines
+  ---
+  duration_ms: 5677.4804
+  type: 'test'
+  ...
+# Subtest: ready-wait SDK uses persistent per-thread semaphores
+ok 217 - ready-wait SDK uses persistent per-thread semaphores
+  ---
+  duration_ms: 0.8945
+  type: 'test'
+  ...
+# Subtest: TCP summary joins case/variant, retaining loss and zero-window observations
+ok 218 - TCP summary joins case/variant, retaining loss and zero-window observations
+  ---
+  duration_ms: 2.8671
+  type: 'test'
+  ...
+# Subtest: missing telemetry is not reported as a zero retransmit count
+ok 219 - missing telemetry is not reported as a zero retransmit count
+  ---
+  duration_ms: 0.3819
+  type: 'test'
+  ...
+# Subtest: multiple server starts and malformed lines invalidate a combined capture
+ok 220 - multiple server starts and malformed lines invalidate a combined capture
+  ---
+  duration_ms: 0.4542
+  type: 'test'
+  ...
+# Subtest: ambiguous or wrong-variant board matches are not silently joined
+ok 221 - ambiguous or wrong-variant board matches are not silently joined
+  ---
+  duration_ms: 0.3984
+  type: 'test'
+  ...
+# Subtest: conservative measurement interior excludes connection setup and close tails
+ok 222 - conservative measurement interior excludes connection setup and close tails
+  ---
+  duration_ms: 0.726
+  type: 'test'
+  ...
+# Subtest: delayed upload client preserves identical gzip bytes and multipart framing
+ok 223 - delayed upload client preserves identical gzip bytes and multipart framing
+  ---
+  duration_ms: 160.2704
+  type: 'test'
+  ...
+# Subtest: early rejection stops the delayed second half instead of reporting a full upload
+ok 224 - early rejection stops the delayed second half instead of reporting a full upload
+  ---
+  duration_ms: 7.8448
+  type: 'test'
+  ...
+# Subtest: Web audio pause off: execute production helpers
+ok 225 - Web audio pause off: execute production helpers
+  ---
+  duration_ms: 4743.2947
+  type: 'test'
+  ...
+# Subtest: Web audio pause short: execute production helpers
+ok 226 - Web audio pause short: execute production helpers
+  ---
+  duration_ms: 3150.3243
+  type: 'test'
+  ...
+# Subtest: Web audio pause long: execute production helpers
+ok 227 - Web audio pause long: execute production helpers
+  ---
+  duration_ms: 2848.3316
+  type: 'test'
+  ...
+# Subtest: pause checkpoints surround open/detect/decode and leave generation semantics intact
+ok 228 - pause checkpoints surround open/detect/decode and leave generation semantics intact
+  ---
+  duration_ms: 0.8067
+  type: 'test'
+  ...
+# Subtest: only static GETs request long pause; errors always release it
+ok 229 - only static GETs request long pause; errors always release it
+  ---
+  duration_ms: 0.4507
+  type: 'test'
+  ...
+# Subtest: build switch validates all values and rejects long pause for KaRadio
+ok 230 - build switch validates all values and rejects long pause for KaRadio
+  ---
+  duration_ms: 214.0375
+  type: 'test'
+  ...
+# Subtest: shared fragment loader uses preloaded content only when explicitly supplied
+ok 231 - shared fragment loader uses preloaded content only when explicitly supplied
+  ---
+  duration_ms: 43.9856
+  type: 'test'
+  ...
+# Subtest: generated gzip contains the exact common fragments and parseable common scripts
+ok 232 - generated gzip contains the exact common fragments and parseable common scripts
+  ---
+  duration_ms: 289.0893
+  type: 'test'
+  ...
+# Subtest: HTTP encoding selection respects integer qvalues, exclusions and wildcard
+ok 233 - HTTP encoding selection respects integer qvalues, exclusions and wildcard
+  ---
+  duration_ms: 734.1728
+  type: 'test'
+  ...
+# Subtest: bundle is validated before serving and invalidated by uploads, never used in AP mode
+ok 234 - bundle is validated before serving and invalidated by uploads, never used in AP mode
+  ---
+  duration_ms: 1.0586
+  type: 'test'
+  ...
+# Subtest: ESP8266 backports the standard asynchronous HTTP request API
+ok 235 - ESP8266 backports the standard asynchronous HTTP request API
+  ---
+  duration_ms: 1.8713
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets
+ok 236 - ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets
+  ---
+  duration_ms: 0.3376
+  type: 'test'
+  ...
+# Subtest: ESP8266 serves static WebUI resources on the shared HTTP task stack
+ok 237 - ESP8266 serves static WebUI resources on the shared HTTP task stack
+  ---
+  duration_ms: 0.3114
+  type: 'test'
+  ...
+# Subtest: ESP8266 keeps status, WebSocket and static routes on the shared HTTP task
+ok 238 - ESP8266 keeps status, WebSocket and static routes on the shared HTTP task
+  ---
+  duration_ms: 0.3253
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming
+ok 239 - ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming
+  ---
+  duration_ms: 6.6696
+  type: 'test'
+  ...
+# Subtest: ESP8266 application serves the current shared WebUI script from flash
+ok 240 - ESP8266 application serves the current shared WebUI script from flash
+  ---
+  duration_ms: 0.6554
+  type: 'test'
+  ...
+# Subtest: ESP8266 loads shared WebUI assets sequentially to bound connections
+ok 241 - ESP8266 loads shared WebUI assets sequentially to bound connections
+  ---
+  duration_ms: 0.504
+  type: 'test'
+  ...
+# Subtest: ESP8266 lets successful close-framed responses drain before cleanup
+ok 242 - ESP8266 lets successful close-framed responses drain before cleanup
+  ---
+  duration_ms: 0.4848
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounds browser connections and recovers with LRU eviction
+ok 243 - ESP8266 bounds browser connections and recovers with LRU eviction
+  ---
+  duration_ms: 0.8608
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket status cannot block the sole HTTP worker
+ok 244 - ESP8266 WebSocket status cannot block the sole HTTP worker
+  ---
+  duration_ms: 1.1812
+  type: 'test'
+  ...
+# Subtest: ESP8266 strips cache-busting query from static file lookup
+ok 245 - ESP8266 strips cache-busting query from static file lookup
+  ---
+  duration_ms: 0.3563
+  type: 'test'
+  ...
+# Subtest: ESP8266 chunks embedded HTML below its TCP send window
+ok 246 - ESP8266 chunks embedded HTML below its TCP send window
+  ---
+  duration_ms: 0.5289
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP send loop is nonblocking, bounded and retryable
+ok 247 - ESP8266 HTTP send loop is nonblocking, bounded and retryable
+  ---
+  duration_ms: 0.5286
+  type: 'test'
+  ...
+# Subtest: static writes yield only on actual socket backpressure
+ok 248 - static writes yield only on actual socket backpressure
+  ---
+  duration_ms: 3.6546
+  type: 'test'
+  ...
+# Subtest: HTTP send deadline belongs to the entire response, not each chunk
+ok 249 - HTTP send deadline belongs to the entire response, not each chunk
+  ---
+  duration_ms: 0.6489
+  type: 'test'
+  ...
+# Subtest: OTA accepts the original shared form target and embeds emergency recovery
+ok 250 - OTA accepts the original shared form target and embeds emergency recovery
+  ---
+  duration_ms: 7.7603
+  type: 'test'
+  ...
+# Subtest: OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS
+ok 251 - OTA slots share the ESP8266 mapping offset and preserve NVS with 256 KiB SPIFFS
+  ---
+  duration_ms: 1.4193
+  type: 'test'
+  ...
+# Subtest: Wi-Fi readback preserves edge spaces and ignores excess credential rows
+ok 252 - Wi-Fi readback preserves edge spaces and ignores excess credential rows
+  ---
+  duration_ms: 2.4798
+  type: 'test'
+  ...
+# Subtest: uploads stream to a temporary file, whitelist destinations and reject disconnected bodies
+ok 253 - uploads stream to a temporary file, whitelist destinations and reject disconnected bodies
+  ---
+  duration_ms: 0.6701
+  type: 'test'
+  ...
+# Subtest: SNTP reconfiguration uses its lwIP task and a reusable nonblocking message
+ok 254 - SNTP reconfiguration uses its lwIP task and a reusable nonblocking message
+  ---
+  duration_ms: 0.8298
+  type: 'test'
+  ...
+# Subtest: Audio Info and AP reboot delay persist without changing the legacy blob
+ok 255 - Audio Info and AP reboot delay persist without changing the legacy blob
+  ---
+  duration_ms: 0.6944
+  type: 'test'
+  ...
+# Subtest: short HTTP responses use TCP_NODELAY and graceful write-half shutdown
+ok 256 - short HTTP responses use TCP_NODELAY and graceful write-half shutdown
+  ---
+  duration_ms: 1.1775
+  type: 'test'
+  ...
+# Subtest: two bounded WebSocket subscribers share a single HTTP-owned status buffer
+ok 257 - two bounded WebSocket subscribers share a single HTTP-owned status buffer
+  ---
+  duration_ms: 1.0267
+  type: 'test'
+  ...
+# Subtest: VBR waits for heartbeat but state, format and metadata remain immediate
+ok 258 - VBR waits for heartbeat but state, format and metadata remain immediate
+  ---
+  duration_ms: 0.6366
+  type: 'test'
+  ...
+# Subtest: native stream identity is invalidated when changing the station
+ok 259 - native stream identity is invalidated when changing the station
+  ---
+  duration_ms: 0.3876
+  type: 'test'
+  ...
+# Subtest: native connecting telemetry locks and unlocks Play without affecting Arduino states
+ok 260 - native connecting telemetry locks and unlocks Play without affecting Arduino states
+  ---
+  duration_ms: 3.8898
+  type: 'test'
+  ...
+# Subtest: Wi-Fi connection captures initial RSSI and logs numeric disconnect reason
+ok 261 - Wi-Fi connection captures initial RSSI and logs numeric disconnect reason
+  ---
+  duration_ms: 1.8392
+  type: 'test'
+  ...
+# Subtest: a lost client link clears DHCP state and arms recovery only once
+ok 262 - a lost client link clears DHCP state and arms recovery only once
+  ---
+  duration_ms: 0.6818
+  type: 'test'
+  ...
+# Subtest: post-DHCP recovery uses the existing app poll and bounded retry cadence
+ok 263 - post-DHCP recovery uses the existing app poll and bounded retry cadence
+  ---
+  duration_ms: 0.5354
+  type: 'test'
+  ...
+1..263
+# tests 263
+# suites 0
+# pass 263
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 132079.1781
