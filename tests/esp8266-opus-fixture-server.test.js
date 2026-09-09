@@ -31,3 +31,22 @@ test('fixture server streams exact file with bounded HTTP lifecycle and no direc
   assert.ok(events.some(event => event.event === 'close' && event.complete));
   assert.ok(events.some(event => event.event === 'finish' && event.socket_bytes > get.body.length));
 });
+
+test('optional FIN hold preserves payload and can be cancelled by the client', async t => {
+  const file = path.resolve(__dirname, 'fixtures/opus_native/mono-12.opus'), events = [];
+  assert.throws(() => createFixtureServer(file, undefined, {holdOpenMs: -1}));
+  const server = createFixtureServer(file, event => events.push(event), {holdOpenMs: 200});
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const body = await new Promise((resolve, reject) => {
+    // Retain the client socket until the test explicitly closes it.
+    const req = http.get({host: '127.0.0.1', port: server.address().port, path: '/test.opus', agent: false}, res => {
+      const chunks = []; res.on('data', data => chunks.push(data)); res.on('error', reject);
+      res.on('end', () => { resolve(Buffer.concat(chunks)); req.destroy(); });
+    }); req.on('error', reject);
+  });
+  assert.deepEqual(body, fs.readFileSync(file));
+  await new Promise(resolve => setTimeout(resolve, 30));
+  assert.ok(events.some(event => event.event === 'close' && !event.complete));
+  assert.ok(!events.some(event => event.event === 'finish'));
+});
