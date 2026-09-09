@@ -108,6 +108,29 @@ info/stat/open/write/rename/unlink/close, рекурсивные сообщен�
 Проверка на ПК не измеряет задержки реальной flash. Перед длительным
 использованием профиля на плате нужны замеры audio underrun и RAM.
 
+### Проверено 2026-09-09
+
+Исходная ревизия `4005e04`; оба варианта успешно собраны, но на плату
+в рамках этой задачи **не прошивались**. Физическая плата остаётся на
+предыдущей обычной прошивке. Полный набор: 250 passed, 0 failed, 0 skipped.
+
+| Параметр | OFF | ON | Разница |
+|---|---:|---:|---:|
+| app.bin | 761824 | 763328 | +1504 байта |
+| .dram0.data | 1648 | 1656 | +8 байт |
+| .dram0.bss | 19832 | 20368 | +536 байт |
+| _bss_end | 0x3ffed3e8 | 0x3ffed610 | +552 байта с выравниванием |
+| IRAM text + bss + vectors | 27484 | 27484 | без изменений |
+
+В ELF варианта OFF символы logger отсутствуют. Граница _bss_end отражает
+изменение статического бюджета, а не замер свободной heap на работающей
+плате. Временные расходы SDK при flash I/O отдельно не измерялись.
+
+Артефакты и changelog:
+`firmware/development/esp8266-spiffs-log/` (ON),
+`firmware/development/esp8266-spiffs-log-off/` (OFF).
+Отчёт тестов: `docs/benchmarks/esp8266-spiffs-log-2026-09-09/all-tests.log`.
+
 API сверено с [официальной документацией Espressif](https://docs.espressif.com/projects/esp8266-rtos-sdk/en/latest/api-reference/system/log.html)
 и исходниками установленного ESP8266_RTOS_SDK: log.c, esp_spiffs.c,
 spiffs_hydrogen.c и vfs.c.
