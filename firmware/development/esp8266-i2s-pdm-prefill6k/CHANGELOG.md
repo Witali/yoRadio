@@ -30,3 +30,16 @@ Build:
 `tools/esp8266_audio_profile/build_i2s_pdm_production.ps1 -Variant esp8266-i2s-pdm-prefill6k`
 
 [Design and test results](../../../../docs/ESP8266_INPUT_PREFILL_2026-09-09.md).
+
+## 2026-09-09 — physical OTA validation (same binary)
+
+- Native `/update` accepted the app; active slot changed from 0x10000 to
+  0x110000. No SPIFFS/NVS/partition image uploaded, no serial reset/TX commands.
+- Free heap after boot: 23956 bytes. MP3 128 playback failed continuity and
+  stalled API requests; cumulative SDK minimum reached 4612 bytes, then 1024
+  after another station attempt. These are allocator minima, not largest blocks.
+- Stopped-player two-tab WebUI smoke passed: 263/273 ms initial readiness;
+  ten volume actions acknowledged in both tabs in 22–71 ms; volume restored.
+- This is **not a stability-qualified production image**. No successful
+  20-second continuous PCM run; AAC/high-bitrate hardware checks remain open.
+  See the linked document and saved board reports for evidence and caveats.

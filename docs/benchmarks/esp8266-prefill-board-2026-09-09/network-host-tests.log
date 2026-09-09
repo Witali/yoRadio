@@ -1,0 +1,328 @@
+TAP version 13
+# Subtest: libmad follows the same symmetric CodecArena ownership as Helix
+ok 1 - libmad follows the same symmetric CodecArena ownership as Helix
+  ---
+  duration_ms: 2.6806
+  type: 'test'
+  ...
+# Subtest: ESP8266 reports DRAM and IRAM separately and enforces reserve after allocation
+ok 2 - ESP8266 reports DRAM and IRAM separately and enforces reserve after allocation
+  ---
+  duration_ms: 0.2796
+  type: 'test'
+  ...
+# Subtest: audio workspace is lazy, reusable for station changes, and released on stop
+ok 3 - audio workspace is lazy, reusable for station changes, and released on stop
+  ---
+  duration_ms: 0.3281
+  type: 'test'
+  ...
+# Subtest: full codec profile reserves IRAM for AAC and MP3 while libmad-only stays smaller
+ok 4 - full codec profile reserves IRAM for AAC and MP3 while libmad-only stays smaller
+  ---
+  duration_ms: 0.2361
+  type: 'test'
+  ...
+# Subtest: ESP8266 splits the word-only IMDCT output into the IRAM arena
+ok 5 - ESP8266 splits the word-only IMDCT output into the IRAM arena
+  ---
+  duration_ms: 1.5248
+  type: 'test'
+  ...
+# Subtest: ESP8266 preserves heap for lwIP after starting the MP3 decoder
+ok 6 - ESP8266 preserves heap for lwIP after starting the MP3 decoder
+  ---
+  duration_ms: 0.1675
+  type: 'test'
+  ...
+# Subtest: libmad places only aligned Layer III word workspaces in ESP8266 IRAM
+ok 7 - libmad places only aligned Layer III word workspaces in ESP8266 IRAM
+  ---
+  duration_ms: 0.3268
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP URL, redirect and chunk parser passes native tests
+ok 8 - ESP8266 HTTP URL, redirect and chunk parser passes native tests
+  ---
+  duration_ms: 2650.9244
+  type: 'test'
+  ...
+# Subtest: ESP8266 audio client uses bounded, chunk-aware socket I/O
+ok 9 - ESP8266 audio client uses bounded, chunk-aware socket I/O
+  ---
+  duration_ms: 1.7005
+  type: 'test'
+  ...
+# Subtest: ESP8266 stream inactivity deadline is configurable with a one-second default
+ok 10 - ESP8266 stream inactivity deadline is configurable with a one-second default
+  ---
+  duration_ms: 0.7176
+  type: 'test'
+  ...
+# Subtest: actual HTTP receiver and upload loop preserve errno, partial reads and deadlines
+ok 11 - actual HTTP receiver and upload loop preserve errno, partial reads and deadlines
+  ---
+  duration_ms: 2643.1748
+  type: 'test'
+  ...
+# Subtest: actual HTTP response encoder coalesces chunks and keeps valid framing
+ok 12 - actual HTTP response encoder coalesces chunks and keeps valid framing
+  ---
+  duration_ms: 5406.5617
+  type: 'test'
+  ...
+# Subtest: physical volume benchmark starts inward at either limit and never awaits a clamped no-op
+ok 13 - physical volume benchmark starts inward at either limit and never awaits a clamped no-op
+  ---
+  duration_ms: 2.4486
+  type: 'test'
+  ...
+# Subtest: latency analysis excludes only proven TX wait; RAM, unknown and raw outliers remain
+ok 14 - latency analysis excludes only proven TX wait; RAM, unknown and raw outliers remain
+  ---
+  duration_ms: 2.3071
+  type: 'test'
+  ...
+# Subtest: actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-safe wall time
+ok 15 - actual HTTP trace separates TX backpressure, RAM retries, I/O and wrap-safe wall time
+  ---
+  duration_ms: 5656.4353
+  type: 'test'
+  ...
+# Subtest: control correlation retains pre-input delay and rejects ambiguous commands
+ok 16 - control correlation retains pre-input delay and rejects ambiguous commands
+  ---
+  duration_ms: 1.4882
+  type: 'test'
+  ...
+# Subtest: startup correlation bounds delay before WS dispatch without calling it network wait
+ok 17 - startup correlation bounds delay before WS dispatch without calling it network wait
+  ---
+  duration_ms: 1.126
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket handler completes HTTP upgrade before reading frames
+ok 18 - ESP8266 WebSocket handler completes HTTP upgrade before reading frames
+  ---
+  duration_ms: 1.8379
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket handler reads a command in one bounded receive
+ok 19 - ESP8266 WebSocket handler reads a command in one bounded receive
+  ---
+  duration_ms: 0.3599
+  type: 'test'
+  ...
+# Subtest: ESP8266 Web API dispatches player commands without synchronous status sends
+ok 20 - ESP8266 Web API dispatches player commands without synchronous status sends
+  ---
+  duration_ms: 0.2146
+  type: 'test'
+  ...
+# Subtest: ESP8266 Web API publishes player, station and stream state after commands
+ok 21 - ESP8266 Web API publishes player, station and stream state after commands
+  ---
+  duration_ms: 0.4062
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounds the persistent status buffer for audio heap
+ok 22 - ESP8266 bounds the persistent status buffer for audio heap
+  ---
+  duration_ms: 0.1975
+  type: 'test'
+  ...
+# Subtest: ESP8266 throttles volatile telemetry without delaying player state
+ok 23 - ESP8266 throttles volatile telemetry without delaying player state
+  ---
+  duration_ms: 1.0471
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI status uses a compact change key and bounded writer
+ok 24 - ESP8266 WebUI status uses a compact change key and bounded writer
+  ---
+  duration_ms: 0.4347
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI uses the reduced stack after removing status temporaries
+ok 25 - ESP8266 WebUI uses the reduced stack after removing status temporaries
+  ---
+  duration_ms: 0.4183
+  type: 'test'
+  ...
+# Subtest: ESP8266 validates a saved fd before treating it as a WebSocket
+ok 26 - ESP8266 validates a saved fd before treating it as a WebSocket
+  ---
+  duration_ms: 0.7079
+  type: 'test'
+  ...
+# Subtest: ESP8266 parser accepts exactly HTTP 1.1
+ok 27 - ESP8266 parser accepts exactly HTTP 1.1
+  ---
+  duration_ms: 0.5518
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP task has enough stack for playlist-backed commands
+ok 28 - ESP8266 HTTP task has enough stack for playlist-backed commands
+  ---
+  duration_ms: 0.2472
+  type: 'test'
+  ...
+# Subtest: ESP8266 exposes only board-supported stations with matching indices
+ok 29 - ESP8266 exposes only board-supported stations with matching indices
+  ---
+  duration_ms: 0.2765
+  type: 'test'
+  ...
+# Subtest: ESP8266 radio retries short socket timeouts until the HTTP header deadline
+ok 30 - ESP8266 radio retries short socket timeouts until the HTTP header deadline
+  ---
+  duration_ms: 1.3033
+  type: 'test'
+  ...
+# Subtest: ESP8266 reconnects a clean radio EOF unless control changed
+ok 31 - ESP8266 reconnects a clean radio EOF unless control changed
+  ---
+  duration_ms: 0.4276
+  type: 'test'
+  ...
+# Subtest: ESP8266 radio checks a header that exactly fills its receive buffer
+ok 32 - ESP8266 radio checks a header that exactly fills its receive buffer
+  ---
+  duration_ms: 0.4269
+  type: 'test'
+  ...
+# Subtest: ESP8266 waits for DHCP and releases recovery AP memory in client mode
+ok 33 - ESP8266 waits for DHCP and releases recovery AP memory in client mode
+  ---
+  duration_ms: 0.4118
+  type: 'test'
+  ...
+# Subtest: ESP8266 recovery AP assigns clients an address for WebUI access
+ok 34 - ESP8266 recovery AP assigns clients an address for WebUI access
+  ---
+  duration_ms: 0.1593
+  type: 'test'
+  ...
+# Subtest: ESP8266 next/previous starts searching after the current station
+ok 35 - ESP8266 next/previous starts searching after the current station
+  ---
+  duration_ms: 0.2139
+  type: 'test'
+  ...
+# Subtest: input queue prefills, tops up, cancels and strips arbitrarily split ICY without waits
+ok 36 - input queue prefills, tops up, cancels and strips arbitrarily split ICY without waits
+  ---
+  duration_ms: 2595.6182
+  type: 'test'
+  ...
+# Subtest: queued MP3/AAC PCM is bit-exact with legacy draining, input=1536
+ok 37 - queued MP3/AAC PCM is bit-exact with legacy draining, input=1536
+  ---
+  duration_ms: 4085.7666
+  type: 'test'
+  ...
+# Subtest: queued MP3/AAC PCM is bit-exact with legacy draining, input=4096
+ok 38 - queued MP3/AAC PCM is bit-exact with legacy draining, input=4096
+  ---
+  duration_ms: 3315.803
+  type: 'test'
+  ...
+# Subtest: queued MP3/AAC PCM is bit-exact with legacy draining, input=6144
+ok 39 - queued MP3/AAC PCM is bit-exact with legacy draining, input=6144
+  ---
+  duration_ms: 3243.8793
+  type: 'test'
+  ...
+# Subtest: native startup buffers before decoding and does not announce Playing until PCM
+ok 40 - native startup buffers before decoding and does not announce Playing until PCM
+  ---
+  duration_ms: 0.6847
+  type: 'test'
+  ...
+# Subtest: ESP8266 backports the standard asynchronous HTTP request API
+ok 41 - ESP8266 backports the standard asynchronous HTTP request API
+  ---
+  duration_ms: 1.6768
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets
+ok 42 - ESP8266 HTTP server does not poll or LRU-purge worker-owned sockets
+  ---
+  duration_ms: 0.3288
+  type: 'test'
+  ...
+# Subtest: ESP8266 serves static WebUI resources on the shared HTTP task stack
+ok 43 - ESP8266 serves static WebUI resources on the shared HTTP task stack
+  ---
+  duration_ms: 0.2408
+  type: 'test'
+  ...
+# Subtest: ESP8266 keeps status, WebSocket and static routes on the shared HTTP task
+ok 44 - ESP8266 keeps status, WebSocket and static routes on the shared HTTP task
+  ---
+  duration_ms: 0.2765
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming
+ok 45 - ESP8266 WebUI shares the HTTP stack to preserve RAM for streaming
+  ---
+  duration_ms: 19.2164
+  type: 'test'
+  ...
+# Subtest: ESP8266 application serves the current shared WebUI script from flash
+ok 46 - ESP8266 application serves the current shared WebUI script from flash
+  ---
+  duration_ms: 0.7642
+  type: 'test'
+  ...
+# Subtest: ESP8266 loads shared WebUI assets sequentially to bound connections
+ok 47 - ESP8266 loads shared WebUI assets sequentially to bound connections
+  ---
+  duration_ms: 0.5078
+  type: 'test'
+  ...
+# Subtest: ESP8266 lets successful close-framed responses drain before cleanup
+ok 48 - ESP8266 lets successful close-framed responses drain before cleanup
+  ---
+  duration_ms: 0.3559
+  type: 'test'
+  ...
+# Subtest: ESP8266 bounds browser connections and recovers with LRU eviction
+ok 49 - ESP8266 bounds browser connections and recovers with LRU eviction
+  ---
+  duration_ms: 0.7352
+  type: 'test'
+  ...
+# Subtest: ESP8266 WebSocket status cannot block the sole HTTP worker
+ok 50 - ESP8266 WebSocket status cannot block the sole HTTP worker
+  ---
+  duration_ms: 1.06
+  type: 'test'
+  ...
+# Subtest: ESP8266 strips cache-busting query from static file lookup
+ok 51 - ESP8266 strips cache-busting query from static file lookup
+  ---
+  duration_ms: 0.2985
+  type: 'test'
+  ...
+# Subtest: ESP8266 chunks embedded HTML below its TCP send window
+ok 52 - ESP8266 chunks embedded HTML below its TCP send window
+  ---
+  duration_ms: 0.2521
+  type: 'test'
+  ...
+# Subtest: ESP8266 HTTP send loop is nonblocking, bounded and retryable
+ok 53 - ESP8266 HTTP send loop is nonblocking, bounded and retryable
+  ---
+  duration_ms: 0.2386
+  type: 'test'
+  ...
+1..53
+# tests 53
+# suites 0
+# pass 53
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13387.6891
