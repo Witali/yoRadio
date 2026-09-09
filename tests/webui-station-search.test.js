@@ -216,6 +216,10 @@ test("playlist reload preserves the user's scroll position", async () => {
 
 test("WebSocket reconnect resynchronizes without rebuilding the player page", () => {
   const script = readAsset("script.js.gz");
+  const bootstrapFunction = script.slice(
+    script.indexOf("function websocketBootstrapEnabled"),
+    script.indexOf("function initialPlayerStateReady"),
+  );
   const reconnectFunctions = script.slice(
     script.indexOf("function resyncCurrentPage"),
     script.indexOf("function onClose"),
@@ -233,7 +237,7 @@ test("WebSocket reconnect resynchronizes without rebuilding the player page", ()
     console: { log: () => {} },
   };
 
-  vm.runInNewContext(`${reconnectFunctions}\nonOpen(); onOpen();`, context);
+  vm.runInNewContext(`${bootstrapFunction}\n${reconnectFunctions}\nonOpen(); onOpen();`, context);
 
   assert.equal(pageLoads, 1, "reconnect must not replace the page DOM");
   assert.deepEqual(sent, ["getindex=1"]);
