@@ -43,6 +43,24 @@ node tools/test_esp8266_audio_continuity.cjs --base http://192.168.100.6 --secon
 в production так же, как raw benchmark. `/api/native/audio` дополнительно
 возвращает `audio_stack_free` — lifetime watermark в байтах.
 
+`GET /api/native/opus-stream` читает последнюю причину отказа инициализации,
+снятую до освобождения выделенных буферов. `stage`: 0 — отказа нет, 1 —
+объект codec, 2 — входной буфер, 3 — PCM, 4 — привязка arena, 5 —
+Opus/Ogg workspace, 6 — IRAM, 7 — decoder state, 8 — scratch, 9 —
+native init/reset, 10 — недостаточный остаток после успешных выделений.
+`free_dram` — CAP8 в момент отказа; `current_dram` — CAP8 при GET;
+`requested_bytes` и `reserve_bytes` задают размер запроса и защитный резерв.
+`detail` для stage 9 — код native decoder, для stage 10 — CAP32 при
+проверке резерва. CAP32 включает свободную IRAM, поэтому не равен CAP8.
+Диагностика не уменьшает защитный резерв и отсутствует в production.
+
+После оптимизации сроков жизни scratch новый экспериментальный профиль
+использует 6144 байта scratch и 1024 байта read-ahead. Старый build directory
+с сохранёнными другими значениями будет отклонён: выбирайте новый `-Variant`.
+22 host-сценария с настоящим лимитом 6144 прошли точное сравнение PCM,
+максимум scratch — 5968 байт. Это проверенный корпус, не гарантия верхней
+границы для произвольного Opus-потока.
+
 - Пять собственных фрагментов: SILK mono12, Hybrid mono24, CELT stereo64,
   stereo128, stereo510 кбит/с. Выход декодера mono 48 кГц, 20 мс на пакет.
 - Первые 12 пакетов каждого фрагмента хранятся во flash (22756 байт вместе

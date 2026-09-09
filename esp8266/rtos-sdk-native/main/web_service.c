@@ -27,6 +27,9 @@
 #include "native_audio_output.h"
 #include "audio_service.h"
 #include "opus_benchmark.h"
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+#include "codec_bridge.h"
+#endif
 #include "native_state.h"
 #include "persistent_settings.h"
 #include "playlist_service.h"
@@ -1199,6 +1202,23 @@ static esp_err_t opus_test_stream_handler(httpd_req_t *request) {
     return finish_short_response(request, send_string(request, "{\"queued\":true}"));
 }
 
+static esp_err_t opus_test_stream_status_handler(httpd_req_t *request) {
+    prepare_short_response(request);
+    httpd_resp_set_type(request, "application/json");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    helix_opus_init_failure_t failure;
+    helix_codec_opus_init_failure_snapshot(&failure);
+    char body[256];
+    int n = snprintf(body, sizeof(body),
+        "{\"stage\":%u,\"free_dram\":%u,\"requested_bytes\":%u,"
+        "\"reserve_bytes\":%u,\"detail\":%d,\"current_dram\":%u}",
+        (unsigned)failure.stage, (unsigned)failure.free_dram,
+        (unsigned)failure.requested_bytes, (unsigned)failure.reserve_bytes,
+        (int)failure.detail, (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    if (n < 0 || (size_t)n >= sizeof(body)) return ESP_FAIL;
+    return finish_short_response(request, send_string(request, body));
+}
+
 static esp_err_t opus_benchmark_start_handler(httpd_req_t *request) {
     prepare_short_response(request);
     httpd_resp_set_type(request, "application/json");
@@ -1281,7 +1301,7 @@ esp_err_t web_service_start(void) {
     config.recv_wait_timeout = WEB_IDLE_TIMEOUT_SECONDS;
     config.max_uri_handlers = 26;
 #if YORADIO_ESP8266_OPUS_BENCHMARK
-    config.max_uri_handlers += 3;
+    config.max_uri_handlers += 4;
 #endif
 #if YORADIO_ESP8266_SPIFFS_LOG_HTTP
     config.max_uri_handlers += 2;
@@ -1327,6 +1347,8 @@ esp_err_t web_service_start(void) {
     if ((result = register_get("/api/native/audio", audio_health_handler)) != ESP_OK)
         return result;
 #if YORADIO_ESP8266_OPUS_BENCHMARK
+    if ((result = register_get("/api/native/opus-stream", opus_test_stream_status_handler)) != ESP_OK)
+        return result;
     if ((result = register_get("/api/native/opus-benchmark", opus_benchmark_status_handler)) != ESP_OK)
         return result;
     httpd_uri_t opus_bench = {.uri = "/api/native/opus-benchmark", .method = HTTP_POST,

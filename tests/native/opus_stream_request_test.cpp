@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <cstdio>
+#include <cstdint>
 using esp_err_t = int;
 static constexpr int ESP_OK = 0, ESP_FAIL = -1;
 struct httpd_req_t {
@@ -14,6 +15,11 @@ struct httpd_req_t {
 static unsigned queued, named;
 static int queue_result;
 static std::string queued_url;
+struct helix_opus_init_failure_t { uint32_t stage, free_dram, requested_bytes, reserve_bytes; int32_t detail; };
+static helix_opus_init_failure_t diagnostic;
+static void helix_codec_opus_init_failure_snapshot(helix_opus_init_failure_t *out) { *out = diagnostic; }
+static constexpr unsigned MALLOC_CAP_8BIT = 4;
+static size_t heap_caps_get_free_size(unsigned caps) { assert(caps == MALLOC_CAP_8BIT); return UINT32_MAX; }
 static void prepare_short_response(httpd_req_t *) {}
 static void httpd_resp_set_type(httpd_req_t *, const char *) {}
 static void httpd_resp_set_hdr(httpd_req_t *, const char *, const char *) {}
@@ -38,6 +44,11 @@ static httpd_req_t run(std::string input, bool error = false) {
     return r;
 }
 int main() {
+    httpd_req_t status{0, "", "", ""};
+    diagnostic = {UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, INT32_MIN};
+    assert(opus_test_stream_status_handler(&status) == ESP_OK);
+    assert(status.output == "{\"stage\":4294967295,\"free_dram\":4294967295,\"requested_bytes\":4294967295,\"reserve_bytes\":4294967295,\"detail\":-2147483648,\"current_dram\":4294967295}");
+    assert(!queued && !named);
     for (const std::string &input : {std::string(""), std::string("http://"),
             std::string("https://example.org/a"), std::string("http://a/\r\nX: a"),
             std::string("http://a/ "), std::string("http://a/\0x", 11),
