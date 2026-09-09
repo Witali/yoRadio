@@ -30,3 +30,15 @@ prepared upstream generic32 reference exactly: 648000 PCM samples, zero
 differences; scratch peak 5488/6144 bytes. See `real-capture-pcm-results.json`.
 The capture itself is not redistributed. The board's separate Ogg live-join
 failure at this revision is not a floating-point performance problem.
+
+## Later physical ICDF comparison
+
+The two-run comparison in
+`../firmware/development/esp8266-opus-icdf-on-bench/comparison-results.json`
+keeps the same fixed-point decoder and uses aligned32-bit loads for static
+ICDF flash tables. Compared with its paired OFF build, decode time fell
+1.09–4.54% depending on mode, with all PCM fingerprints unchanged. This is
+a memory-access optimization, not replacement of floating-point arithmetic.
+ON CPU budgets: SILK12 58.20%, Hybrid24 91.85%, CELT64 74.35%, CELT12890.03%,
+CELT510150.91%, excluding network audio and output. The same revisions still
+show real radio RX timeouts and DMA underruns; full playback is not qualified.
