@@ -25,9 +25,10 @@ typedef uint32_t TickType_t;
 /* STREAM_TYPE */
 static uint8_t s_work[1024];
 static char s_host[96];
+static uint32_t s_generation;
 enum { FREE_FD, AUDIO_FD, WEB_FD };
 static int owners[16], closes, connects, closed_web, last_fd;
-static bool reuse_closed, fail_send;
+static bool reuse_closed, fail_send, cancel_on_close;
 static unsigned fail_connect;
 static int64_t clock_us;
 static const char *replies[4];
@@ -40,8 +41,9 @@ static void vTaskDelay(unsigned ticks) { clock_us += (int64_t)ticks * 1000; }
 static bool parse_http_url(const char *url, http_stream_url_t *parts) {
     return http_stream_parse_url(url, parts, s_host, sizeof(s_host));
 }
-static int connect_http(uint16_t port) {
+static int connect_http(uint16_t port, uint32_t generation) {
     (void)port;
+    if (generation != s_generation) { errno = ECANCELED; return -1; }
     ++connects;
     if ((unsigned)connects == fail_connect) { errno = ECONNREFUSED; return -1; }
     reply = replies[(connects - 1) % 4]; read_offset = 0;
@@ -55,6 +57,7 @@ static int mock_close(int fd) {
     ++closes;
     if (owners[fd] == WEB_FD) ++closed_web;
     owners[fd] = reuse_closed ? WEB_FD : FREE_FD;
+    if (cancel_on_close) ++s_generation;
     /* close may alter errno; protocol errors must still return EPROTO. */
     errno = EIO; return 0;
 }
@@ -88,7 +91,8 @@ static void reset(void) {
     memset(owners, 0, sizeof(owners));
     for (size_t i = 0; i < sizeof(replies)/sizeof(replies[0]); ++i) replies[i] = NULL;
     closes = connects = closed_web = 0; last_fd = -1;
-    fail_connect = 0; fail_send = false; reuse_closed = true;
+    fail_connect = 0; fail_send = cancel_on_close = false; reuse_closed = true;
+    s_generation = 42;
     clock_us = 0; read_step = 0; read_cost_us = 0; errno = 0;
 }
 static http_stream_t empty_stream(void) {
@@ -187,7 +191,18 @@ static int wide_headers(void) {
     caller_cleanup(stream); CHECK(closes == 1 && !closed_web);
     return 0;
 }
+static int redirect_cancellation(void) {
+    reset(); cancel_on_close = true;
+    replies[0] = "HTTP/1.1 302 Found\r\nLocation: /next\r\n\r\n";
+    replies[1] = "HTTP/1.1 200 OK\r\n\r\nOggS";
+    char url[AUDIO_URL_BYTES] = "http://radio.invalid/live";
+    http_stream_t stream = empty_stream();
+    CHECK(open_http_stream(url, &stream) == -2 && errno == ECANCELED);
+    CHECK(connects == 1 && closes == 1 && stream.socket == -1);
+    caller_cleanup(stream); CHECK(closes == 1 && closed_web == 0);
+    return 0;
+}
 int main(void) {
-    if (invalid_chunk(true) || invalid_chunk(false) || successful_retry() || open_cases() || wide_headers()) return 1;
+    if (invalid_chunk(true) || invalid_chunk(false) || successful_retry() || open_cases() || wide_headers() || redirect_cancellation()) return 1;
     puts("HTTP stream ownership tests passed"); return 0;
 }

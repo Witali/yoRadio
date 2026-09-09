@@ -35,6 +35,7 @@
 #define SOCKET_READ_TIMEOUT_MS 200U
 #define STREAM_IDLE_TIMEOUT_MS ((uint32_t)CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS)
 #define SOCKET_CONNECT_TIMEOUT_MS 10000U
+#define SOCKET_CONNECT_POLL_MS 50U
 #define SOCKET_WRITE_TIMEOUT_MS 2000U
 #define ICY_METADATA_TIMEOUT_MS 5000U
 #define HTTP_HEADER_TIMEOUT_MS 10000U
@@ -311,7 +312,54 @@ static void set_socket_timeout(int socket_fd, int option, uint32_t timeout_ms) {
     setsockopt(socket_fd, SOL_SOCKET, option, &timeout, sizeof(timeout));
 }
 
-static int connect_http(uint16_t port) {
+static bool socket_connect_allowed(uint32_t generation) {
+    if (generation_current(generation) && !audio_web_pause_requested())
+        return true;
+    errno = ECANCELED;
+    return false;
+}
+
+static bool socket_wait_connected(int socket_fd, uint32_t generation,
+                                  int64_t deadline) {
+    for (;;) {
+        if (!socket_connect_allowed(generation)) return false;
+        int64_t remaining_us = deadline - esp_timer_get_time();
+        if (remaining_us <= 0) { errno = ETIMEDOUT; return false; }
+        if (remaining_us > SOCKET_CONNECT_POLL_MS * 1000LL)
+            remaining_us = SOCKET_CONNECT_POLL_MS * 1000LL;
+        fd_set write_set, error_set;
+        FD_ZERO(&write_set);
+        FD_ZERO(&error_set);
+        FD_SET(socket_fd, &write_set);
+        FD_SET(socket_fd, &error_set);
+        struct timeval timeout = {
+            .tv_sec = (time_t)(remaining_us / 1000000LL),
+            .tv_usec = (suseconds_t)(remaining_us % 1000000LL),
+        };
+        int ready = select(socket_fd + 1, NULL, &write_set, &error_set,
+                           &timeout);
+        if (!socket_connect_allowed(generation)) return false;
+        if (ready < 0) {
+            if (errno == EINTR) continue;
+            return false;
+        }
+        if (!ready) continue;
+        /* Readiness also signals refused/reset connections. lwIP's SO_ERROR
+         * reports the asynchronous connect result, not select's return value. */
+        int socket_error = 0;
+        socklen_t length = sizeof(socket_error);
+        if (getsockopt(socket_fd, SOL_SOCKET, SO_ERROR, &socket_error,
+                       &length) != 0)
+            return false;
+        if (socket_error) { errno = socket_error; return false; }
+        if (FD_ISSET(socket_fd, &write_set)) return true;
+        errno = ECONNABORTED;
+        return false;
+    }
+}
+
+static int connect_http(uint16_t port, uint32_t generation) {
+    if (!socket_connect_allowed(generation)) return -1;
     char port_text[6];
     snprintf(port_text, sizeof(port_text), "%u", port);
     struct addrinfo hints;
@@ -325,25 +373,42 @@ static int connect_http(uint16_t port) {
                  (unsigned)esp_get_free_heap_size());
         return -1;
     }
+    /* getaddrinfo is a separate blocking SDK operation. This deadline bounds
+     * TCP setup across all resolved addresses; SO_[RCV/SND]TIMEO do not bound
+     * lwIP's blocking connect. Check cancellation again when DNS returns. */
+    int64_t deadline = esp_timer_get_time() + SOCKET_CONNECT_TIMEOUT_MS * 1000LL;
     int socket_fd = -1;
-    int saved_error = 0;
+    int saved_error = EHOSTUNREACH;
     for (struct addrinfo *address = addresses; address; address = address->ai_next) {
+        if (!socket_connect_allowed(generation)) {
+            saved_error = errno;
+            break;
+        }
+        if (esp_timer_get_time() >= deadline) {
+            saved_error = ETIMEDOUT;
+            break;
+        }
         socket_fd = socket(address->ai_family, address->ai_socktype,
                            address->ai_protocol);
         if (socket_fd < 0) { saved_error = errno; continue; }
-        set_socket_timeout(socket_fd, SO_RCVTIMEO,
-                           SOCKET_CONNECT_TIMEOUT_MS);
-        set_socket_timeout(socket_fd, SO_SNDTIMEO,
-                           SOCKET_CONNECT_TIMEOUT_MS);
-        if (connect(socket_fd, address->ai_addr, address->ai_addrlen) == 0) {
-            set_socket_timeout(socket_fd, SO_RCVTIMEO,
-                               SOCKET_READ_TIMEOUT_MS);
-            set_socket_timeout(socket_fd, SO_SNDTIMEO,
-                               SOCKET_WRITE_TIMEOUT_MS);
-            int flags = fcntl(socket_fd, F_GETFL, 0);
-            if (flags >= 0 &&
-                fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK) == 0)
-                break;
+        int flags = fcntl(socket_fd, F_GETFL, 0);
+        if (flags >= 0 && fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK) == 0) {
+            int connected = connect(socket_fd, address->ai_addr,
+                                    address->ai_addrlen);
+            if (connected < 0 && (errno == EINPROGRESS || errno == EALREADY ||
+                                  errno == EWOULDBLOCK))
+                connected = socket_wait_connected(socket_fd, generation,
+                                                   deadline) ? 0 : -1;
+            if (connected == 0 && socket_connect_allowed(generation)) {
+                if (esp_timer_get_time() < deadline) {
+                    set_socket_timeout(socket_fd, SO_RCVTIMEO,
+                                       SOCKET_READ_TIMEOUT_MS);
+                    set_socket_timeout(socket_fd, SO_SNDTIMEO,
+                                       SOCKET_WRITE_TIMEOUT_MS);
+                    break;
+                }
+                errno = ETIMEDOUT;
+            }
         }
         saved_error = errno;
         close(socket_fd);
@@ -441,11 +506,14 @@ static int stream_receive(http_stream_t *stream, uint8_t *destination,
  * HTTP setup finishes before the nested codec decode path needs its stack. */
 __attribute__((noinline))
 static int open_http_stream(char *url, http_stream_t *stream) {
+    /* Keep the same cancellation token through redirects, rather than letting
+     * a newly queued Stop/Play become the token of an obsolete HTTP request. */
+    const uint32_t generation = s_generation;
     for (unsigned redirect_count = 0;
          redirect_count <= HTTP_MAX_REDIRECTS; ++redirect_count) {
         http_stream_url_t parts;
         if (!parse_http_url(url, &parts)) return -1;
-        int socket_fd = connect_http(parts.port);
+        int socket_fd = connect_http(parts.port, generation);
         if (socket_fd < 0) return -2;
         bool sent = send_all(socket_fd, "GET ") &&
                     (!parts.query_only || send_all(socket_fd, "/")) &&
