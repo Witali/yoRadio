@@ -1,7 +1,14 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
-const {analyze}=require('../tools/test_esp8266_audio_continuity.cjs');
+const {analyze,sampleInterval}=require('../tools/test_esp8266_audio_continuity.cjs');
+test('sparse health sampling is explicit and does not weaken cumulative DMA acceptance',()=>{
+  assert.equal(sampleInterval(),1000);
+  assert.equal(sampleInterval('27000'),27000);
+  for(const invalid of [0,-1,249,60001,'invalid',1.5]) assert.throws(()=>sampleInterval(invalid));
+  assert.equal(analyze([sample(0),sample(27000)],25).pass,true);
+  assert.equal(analyze([sample(0),{...sample(27000),underruns:4}],25).pass,false);
+});
 function sample(t) { return {host_ms:t,uptime_ms:1000+t,generation:1,
   sample_rate:48000,pcm_frames:48000+t*48,underruns:3,
   rx_bytes:3000+t*6,pcm_age_ms:10,free_heap:12000,

@@ -46,13 +46,20 @@ function readHealth(base) {
     req.on('error',reject);
   });
 }
+function sampleInterval(value = 1000) {
+  const interval = Number(value);
+  if (!Number.isInteger(interval) || interval < 250 || interval > 60000)
+    throw new Error('--interval-ms must be 250..60000');
+  return interval;
+}
 async function main() {
   const args=process.argv.slice(2), opt=(k,d)=>args.includes(k)?args[args.indexOf(k)+1]:d;
   const seconds=Number(opt('--seconds','25'));
   if(!Number.isFinite(seconds)||seconds<20||seconds>600) throw new Error('--seconds must be 20..600');
   const base=opt('--base','http://192.168.100.6');
+  const intervalMs=sampleInterval(opt('--interval-ms','1000'));
   const output=opt('--output','.build/esp8266-audio-continuity/results.json');
-  const report={date:new Date().toISOString(),base,seconds,samples:[]};
+  const report={date:new Date().toISOString(),base,seconds,interval_ms:intervalMs,samples:[]};
   const begin=performance.now();
   do {
     const start=performance.now();
@@ -63,7 +70,7 @@ async function main() {
     }catch(e){report.samples.push({host_ms:performance.now()-begin,error:e.message});console.log('FAIL',e.message);}
     const elapsed=performance.now()-begin;
     if(elapsed>=(seconds+2)*1000 && report.samples.length>=2) break;
-    await new Promise(r=>setTimeout(r,1000));
+    await new Promise(r=>setTimeout(r,intervalMs));
   }while(true);
   report.result=analyze(report.samples,seconds);
   fs.mkdirSync(path.dirname(output),{recursive:true});
@@ -71,5 +78,5 @@ async function main() {
   console.log(JSON.stringify(report.result));
   process.exitCode=report.result.pass?0:1;
 }
-module.exports={analyze};
+module.exports={analyze,sampleInterval};
 if(require.main===module) main().catch(e=>{console.error(e);process.exitCode=1;});
