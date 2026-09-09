@@ -47,3 +47,11 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
   assert.match(run.stdout,/Codec lifecycle PASS/);
   t.diagnostic(run.stdout.trim());
 });
+test('network reconnect releases cached decoder before another handshake', () => {
+  const audio=fs.readFileSync(path.resolve(__dirname,'../esp8266/rtos-sdk-native/main/audio_service.c'),'utf8');
+  const start=audio.indexOf('if (feed == 0 && generation_current(command.generation))');
+  assert.ok(start>=0);
+  const recovery=audio.slice(start,audio.indexOf('continue;',start));
+  assert.match(recovery,/release_codec\(&codec, &codec_kind, "stream reconnect"\)/);
+  assert.ok(recovery.indexOf('release_codec')<recovery.indexOf('requeue_if_current'));
+});

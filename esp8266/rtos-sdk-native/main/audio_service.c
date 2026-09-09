@@ -1249,6 +1249,10 @@ static void audio_task(void *argument) {
                      "Radio stream ended or timed out; reconnecting (heap %u)",
                      (unsigned)esp_get_free_heap_size());
             native_audio_output_silence();
+            /* This is network recovery, not a successful user station switch.
+             * The old TCP PCB may still retain receive data while closing.
+             * Release decoder DRAM before starting another TCP handshake. */
+            release_codec(&codec, &codec_kind, "stream reconnect");
             native_state_set_audio(false, true, "RECONNECTING");
             vTaskDelay(pdMS_TO_TICKS(250U));
             requeue_if_current(&command);
