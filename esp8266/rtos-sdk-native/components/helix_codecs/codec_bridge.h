@@ -55,6 +55,35 @@ size_t helix_codec_arena_used(const helix_codec_t *codec);
 size_t helix_codec_dram_used(const helix_codec_t *codec);
 size_t helix_codec_iram_used(const helix_codec_t *codec);
 
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+typedef enum {
+    HELIX_OPUS_INIT_NONE = 0,
+    HELIX_OPUS_INIT_CODEC = 1,
+    HELIX_OPUS_INIT_INPUT = 2,
+    HELIX_OPUS_INIT_PCM = 3,
+    HELIX_OPUS_INIT_ARENA_BIND = 4,
+    HELIX_OPUS_INIT_WORKSPACE = 5,
+    HELIX_OPUS_INIT_IRAM = 6,
+    HELIX_OPUS_INIT_STATE = 7,
+    HELIX_OPUS_INIT_SCRATCH = 8,
+    HELIX_OPUS_INIT_NATIVE = 9,
+    HELIX_OPUS_INIT_RESERVE = 10
+} helix_opus_init_stage_t;
+/* First failure of the latest create/switch attempt, captured before cleanup.
+ * free_dram is CAP8, not the SDK's combined CAP32 free-heap value. detail is
+ * the native error at NATIVE, combined CAP32 free bytes at RESERVE, else zero.
+ * requested_bytes is the failed allocation size (logical capacity at
+ * ARENA_BIND, state size at NATIVE, required reserve at RESERVE). */
+typedef struct {
+    uint32_t stage;
+    uint32_t free_dram;
+    uint32_t requested_bytes;
+    uint32_t reserve_bytes;
+    int32_t detail;
+} helix_opus_init_failure_t;
+void helix_codec_opus_init_failure_snapshot(helix_opus_init_failure_t *out);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

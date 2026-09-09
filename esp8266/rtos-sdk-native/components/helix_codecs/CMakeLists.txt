@@ -46,6 +46,10 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1)
+if(YORADIO_ESP8266_OPUS_BENCHMARK)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    YORADIO_ESP8266_OPUS_BENCHMARK=1)
+endif()
 option(YORADIO_ESP8266_MP3_SHARED_REORDER
   "Reuse IMDCT output as MP3 reorder scratch (OFF for A/B comparison)" ON)
 option(YORADIO_ESP8266_AAC_BLOCK_OUTPUT "Stream AAC PCM in bounded blocks" ON)

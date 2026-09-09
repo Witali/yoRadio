@@ -13,17 +13,30 @@
 #endif
 
 static std::map<void *, size_t> live;
+static std::map<void *, unsigned> live_caps;
 static int fail_after = -1;
 static size_t reported_free_heap = 65536;
+static size_t reported_dram_budget = 65536;
+static size_t first_failed_bytes, first_failed_dram;
+static unsigned critical_depth;
+void test_codec_enter_critical(void) { assert(!critical_depth); ++critical_depth; }
+void test_codec_exit_critical(void) { assert(critical_depth==1); --critical_depth; }
 static bool reject_iram;
 static unsigned allocations, frees, failures, attempts, tested_failure_sites;
 void *heap_caps_malloc(size_t size, unsigned caps) {
+    assert(!critical_depth);
     ++attempts;
     if (reject_iram && (caps & MALLOC_CAP_EXEC)) { ++failures; return nullptr; }
-    if (fail_after == 0) { ++failures; return nullptr; }
+    if (fail_after == 0) {
+        if (!first_failed_bytes) {
+            first_failed_bytes=size; first_failed_dram=heap_caps_get_free_size(MALLOC_CAP_8BIT);
+        }
+        ++failures; return nullptr;
+    }
     if (fail_after > 0) --fail_after;
     void *p = malloc(size); assert(p);
     assert(live.emplace(p, size).second); ++allocations;
+    assert(live_caps.emplace(p,caps).second);
     return p;
 }
 void *heap_caps_calloc(size_t count, size_t size, unsigned caps) {
@@ -32,8 +45,10 @@ void *heap_caps_calloc(size_t count, size_t size, unsigned caps) {
     return p;
 }
 void heap_caps_free(void *p) {
+    assert(!critical_depth);
     if (!p) return;
     assert(live.erase(p) == 1); // double free/unowned pointer fails immediately
+    assert(live_caps.erase(p) == 1);
     ++frees; free(p);
 }
 void *heap_caps_realloc(void *p, size_t size, unsigned caps) {
@@ -47,7 +62,14 @@ void *heap_caps_realloc(void *p, size_t size, unsigned caps) {
     return q;
 }
 size_t esp_get_free_heap_size() { return reported_free_heap; }
-size_t heap_caps_get_free_size(unsigned) { return esp_get_free_heap_size(); }
+size_t heap_caps_get_free_size(unsigned caps) {
+    assert(!critical_depth);
+    if (caps!=MALLOC_CAP_8BIT) return esp_get_free_heap_size();
+    size_t used=0;
+    for (const auto &allocation:live)
+        if (live_caps.at(allocation.first)&MALLOC_CAP_8BIT) used+=allocation.second;
+    return used<reported_dram_budget?reported_dram_budget-used:0;
+}
 
 #if CONFIG_YORADIO_OGG_OPUS
 /* Stub only the low-level adapter: the actual bridge, native_opus_t layout,
@@ -55,6 +77,7 @@ size_t heap_caps_get_free_size(unsigned) { return esp_get_free_heap_size(); }
  * the measured host mono decoder-state size; no libopus build is required. */
 static void *opus_bound_bytes, *opus_bound_words;
 static bool opus_init_fail;
+static bool opus_reset_fail;
 static int opus_finish_result;
 static unsigned opus_inits, opus_resets, opus_finishes;
 extern "C" size_t native_opus_decoder_size(void) { return 9198; }
@@ -90,7 +113,7 @@ extern "C" int native_opus_reset(native_opus_t *d) {
     const native_opus_config_t config = d->config;
     memset(d, 0, sizeof(*d)); d->config = config;
     ++opus_resets;
-    return 0;
+    return opus_reset_fail ? NATIVE_OPUS_ERR_MEMORY : 0;
 }
 extern "C" int native_opus_feed(native_opus_t *d, const uint8_t *data,
                                   size_t size, size_t *consumed) {
@@ -333,9 +356,58 @@ static void opus_bridge_delivery(const std::map<void *, size_t> &baseline) {
     puts("Opus adapter routing, bounded PCM callbacks and finish/cancellation PASS");
 }
 
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+static helix_opus_init_failure_t init_failure(unsigned stage) {
+    helix_opus_init_failure_t failure;
+    const unsigned before=attempts;
+    helix_codec_opus_init_failure_snapshot(&failure);
+    assert(attempts==before && !critical_depth && failure.stage==stage);
+    if (stage) assert(failure.reserve_bytes==4096 && failure.requested_bytes);
+    else assert(!failure.free_dram && !failure.requested_bytes && !failure.reserve_bytes && !failure.detail);
+    return failure;
+}
+static void opus_diagnostics(const std::map<void *, size_t> &baseline) {
+    const unsigned stages[]={HELIX_OPUS_INIT_CODEC,HELIX_OPUS_INIT_INPUT,HELIX_OPUS_INIT_PCM,
+        HELIX_OPUS_INIT_WORKSPACE,HELIX_OPUS_INIT_STATE,HELIX_OPUS_INIT_SCRATCH};
+    for(unsigned site=0;site<sizeof(stages)/sizeof(stages[0]);++site) {
+        first_failed_bytes=first_failed_dram=0;fail_after=static_cast<int>(site);
+        assert(!helix_codec_create(HELIX_CODEC_OPUS,1152));fail_after=-1;
+        const auto failure=init_failure(stages[site]);
+        assert(failure.requested_bytes==first_failed_bytes && failure.free_dram==first_failed_dram && !failure.detail);
+        if(site) assert(failure.free_dram<heap_caps_get_free_size(MALLOC_CAP_8BIT));
+        clean(baseline);
+        helix_codec_t *c=helix_codec_create(HELIX_CODEC_OPUS,1152);assert(c);init_failure(HELIX_OPUS_INIT_NONE);
+        helix_codec_destroy(c);clean(baseline);
+    }
+    assert(CodecArenaBind(nullptr,1234));
+    assert(!helix_codec_create(HELIX_CODEC_OPUS,1152));
+    assert(init_failure(HELIX_OPUS_INIT_ARENA_BIND).requested_bytes==32768+CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
+    assert(CodecArenaCapacity()==1234 && CodecArenaUnbind());clean(baseline);
+    opus_init_fail=true;assert(!helix_codec_create(HELIX_CODEC_OPUS,1152));opus_init_fail=false;
+    assert(init_failure(HELIX_OPUS_INIT_NATIVE).detail==NATIVE_OPUS_ERR_MEMORY);clean(baseline);
+    helix_codec_t *c=helix_codec_create(HELIX_CODEC_OPUS,1152);assert(c);
+    opus_reset_fail=true;assert(helix_codec_switch(c,HELIX_CODEC_OPUS)==NATIVE_OPUS_ERR_MEMORY);
+    assert(init_failure(HELIX_OPUS_INIT_NATIVE).detail==NATIVE_OPUS_ERR_MEMORY);
+    opus_reset_fail=false;assert(helix_codec_switch(c,HELIX_CODEC_OPUS)==0);init_failure(HELIX_OPUS_INIT_NONE);
+    helix_codec_destroy(c);clean(baseline);
+    reported_free_heap=4095;reported_dram_budget=24000;
+    assert(!helix_codec_create(HELIX_CODEC_OPUS,1152));
+    const auto failure=init_failure(HELIX_OPUS_INIT_RESERVE);
+    assert(failure.detail==4095 && failure.requested_bytes==4096 && failure.free_dram<4095);
+    assert(failure.free_dram<heap_caps_get_free_size(MALLOC_CAP_8BIT));clean(baseline);
+    reported_free_heap=reported_dram_budget=65536;
+    c=helix_codec_create(HELIX_CODEC_OPUS,1152);assert(c);init_failure(HELIX_OPUS_INIT_NONE);
+    helix_codec_destroy(c);clean(baseline);
+    puts("Opus init diagnostics: allocation stages, CAP8 before cleanup, native, reserve, retry PASS");
+}
+#endif
+
 static void dram_fallback(const std::map<void *, size_t> &baseline) {
     assert(!CodecArenaPreallocatedInIram());
     assert(!helix_codec_create(HELIX_CODEC_OPUS, 1152)); clean(baseline);
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+    assert(init_failure(HELIX_OPUS_INIT_IRAM).requested_bytes==16384);
+#endif
     for (auto first : {HELIX_CODEC_MP3, HELIX_CODEC_AAC}) {
         helix_codec_t *c = helix_codec_create(first, 1152); assert(c);
         assert(helix_codec_iram_used(c) == 0);
@@ -351,6 +423,10 @@ int main(int argc, char **argv) {
     fail_after = 0;
     assert(!helix_codec_prepare());
     assert(live.empty());
+#if CONFIG_YORADIO_OGG_OPUS && YORADIO_ESP8266_OPUS_BENCHMARK
+    assert(!helix_codec_create(HELIX_CODEC_OPUS,1152));
+    assert(init_failure(HELIX_OPUS_INIT_IRAM).requested_bytes==16384 && live.empty());
+#endif
     fail_after = -1;
     reject_iram = argc > 1 && strcmp(argv[1], "--dram-arena") == 0;
     assert(helix_codec_prepare());
@@ -365,6 +441,9 @@ int main(int argc, char **argv) {
 #if CONFIG_YORADIO_OGG_OPUS
     opus_reserve_and_init_failures(baseline);
     opus_bridge_delivery(baseline);
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+    opus_diagnostics(baseline);
+#endif
     assert(opus_inits && opus_resets);
 #endif
     clean(baseline);

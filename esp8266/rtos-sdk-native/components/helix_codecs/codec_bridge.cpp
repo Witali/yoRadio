@@ -16,6 +16,10 @@
 #include "esp_log.h"
 #include "esp_heap_caps.h"
 #include "esp_system.h"
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#endif
 #if CONFIG_YORADIO_OGG_OPUS
 #include "native_opus.h"
 #include "opus_memory.h"
@@ -35,6 +39,30 @@ extern "C" void audio_profile_decode_end(void);
 #endif
 
 namespace {
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+static helix_opus_init_failure_t s_opus_init_failure;
+static_assert(sizeof(s_opus_init_failure) == 20, "Keep init diagnostics bounded");
+static void opus_init_diagnostic_reset() {
+    taskENTER_CRITICAL();
+    s_opus_init_failure = {};
+    taskEXIT_CRITICAL();
+}
+static void opus_init_failed(helix_codec_kind_t kind, uint32_t stage,
+                             size_t requested, size_t reserve, int32_t detail) {
+    if (kind != HELIX_CODEC_OPUS) return;
+    const helix_opus_init_failure_t failure = {
+        stage, static_cast<uint32_t>(heap_caps_get_free_size(MALLOC_CAP_8BIT)),
+        static_cast<uint32_t>(requested),
+        static_cast<uint32_t>(std::max(reserve, size_t(4096))), detail};
+    taskENTER_CRITICAL();
+    if (!s_opus_init_failure.stage) s_opus_init_failure = failure;
+    taskEXIT_CRITICAL();
+}
+#else
+#define opus_init_diagnostic_reset() ((void)0)
+#define opus_init_failed(kind, stage, requested, reserve, detail) ((void)0)
+#endif
+
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
 constexpr size_t kLibmadXrSamples = 576U * 2U;
 constexpr size_t kLibmadReorderSamples = 576U;
@@ -285,14 +313,24 @@ static void opus_free() {
 
 static bool opus_allocate(helix_codec *codec) {
     if (!CodecArenaPreallocatedInIram() || CodecArenaPreallocatedBytes() < 16384U) {
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_IRAM, 16384U, codec->reserve_heap_bytes, 0);
         ESP_LOGE(kTag, "Opus requires the 16-KiB IRAM codec arena");
         return false;
     }
     s_opus = static_cast<OpusWorkspace *>(CodecArenaCalloc(CODEC_ARENA_OPUS, 1, sizeof(OpusWorkspace)));
-    if (!s_opus) return false;
+    if (!s_opus) {
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_WORKSPACE, sizeof(OpusWorkspace), codec->reserve_heap_bytes, 0);
+        return false;
+    }
     s_opus->words = CodecArenaCalloc32(CODEC_ARENA_OPUS, 1, 16384U);
+    if (!s_opus->words)
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_IRAM, 16384U, codec->reserve_heap_bytes, 0);
     s_opus->state = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, native_opus_decoder_size());
+    if (!s_opus->state)
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_STATE, native_opus_decoder_size(), codec->reserve_heap_bytes, 0);
     s_opus->scratch = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
+    if (!s_opus->scratch)
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_SCRATCH, CONFIG_YORADIO_OPUS_SCRATCH_BYTES, codec->reserve_heap_bytes, 0);
     if (!s_opus->words || !s_opus->state || !s_opus->scratch) return false;
     native_opus_config_t config = {};
     config.decoder_state = s_opus->state;
@@ -305,7 +343,10 @@ static bool opus_allocate(helix_codec *codec) {
     config.pcm_samples = codec->pcm_samples;
     config.output = emit_opus;
     config.output_ctx = s_opus;
-    return native_opus_init(&s_opus->stream, &config) == 0;
+    const int result = native_opus_init(&s_opus->stream, &config);
+    if (result != 0)
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_NATIVE, native_opus_decoder_size(), codec->reserve_heap_bytes, result);
+    return result == 0;
 }
 #endif
 
@@ -360,6 +401,7 @@ static bool update_codec_memory(helix_codec *codec) {
     if (codec->kind == HELIX_CODEC_OPUS) reserve = std::max(reserve, size_t(4096));
 #endif
     if (free_heap >= reserve) return true;
+    opus_init_failed(codec->kind, HELIX_OPUS_INIT_RESERVE, reserve, reserve, static_cast<int32_t>(free_heap));
     ESP_LOGE(kTag, "Codec leaves %u heap bytes, reserve requires %u",
              (unsigned)free_heap, (unsigned)reserve);
     return false;
@@ -613,8 +655,18 @@ extern "C" bool helix_codec_prepare(void) {
     return CodecArenaPreallocateMp3();
 }
 
+#if YORADIO_ESP8266_OPUS_BENCHMARK
+extern "C" void helix_codec_opus_init_failure_snapshot(helix_opus_init_failure_t *out) {
+    if (!out) return;
+    taskENTER_CRITICAL();
+    *out = s_opus_init_failure;
+    taskEXIT_CRITICAL();
+}
+#endif
+
 extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
                                                size_t reserve_heap_bytes) {
+    opus_init_diagnostic_reset();
     if (kind != HELIX_CODEC_MP3
 #if CONFIG_YORADIO_OGG_OPUS
         && kind != HELIX_CODEC_OPUS
@@ -623,20 +675,31 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
         && kind != HELIX_CODEC_AAC
 #endif
     ) return nullptr;
-    if (!helix_codec_prepare()) return nullptr;
+    if (!helix_codec_prepare()) {
+        opus_init_failed(kind, HELIX_OPUS_INIT_IRAM, 16384U, reserve_heap_bytes, 0);
+        return nullptr;
+    }
     helix_codec *codec = static_cast<helix_codec *>(
         heap_caps_calloc(1, sizeof(*codec), MALLOC_CAP_8BIT));
+    if (!codec)
+        opus_init_failed(kind, HELIX_OPUS_INIT_CODEC, sizeof(*codec), reserve_heap_bytes, 0);
     if (codec) {
         codec->pcm_samples = pcm_samples_for_kind(kind);
         codec->input_capacity = input_bytes_for_kind(kind);
         codec->input = static_cast<uint8_t *>(
             heap_caps_calloc(1, input_storage_bytes(codec->input_capacity), MALLOC_CAP_8BIT));
+        if (!codec->input)
+            opus_init_failed(kind, HELIX_OPUS_INIT_INPUT, input_storage_bytes(codec->input_capacity), reserve_heap_bytes, 0);
         codec->pcm = static_cast<int16_t *>(
             heap_caps_malloc(sizeof(int16_t) * codec->pcm_samples,
                              MALLOC_CAP_8BIT));
+        if (!codec->pcm)
+            opus_init_failed(kind, HELIX_OPUS_INIT_PCM, sizeof(int16_t) * codec->pcm_samples, reserve_heap_bytes, 0);
     }
     if (!codec || !codec->input || !codec->pcm ||
         !CodecArenaBind(nullptr, kArenaBytes)) {
+        if (codec && codec->input && codec->pcm)
+            opus_init_failed(kind, HELIX_OPUS_INIT_ARENA_BIND, kArenaBytes, reserve_heap_bytes, 0);
         if (codec) {
             heap_caps_free(codec->pcm);
             heap_caps_free(codec->input);
@@ -683,6 +746,7 @@ extern "C" void helix_codec_destroy(helix_codec_t *codec) {
 
 extern "C" int helix_codec_switch(helix_codec_t *codec,
                                    helix_codec_kind_t kind) {
+    opus_init_diagnostic_reset();
     if (!codec || (kind != HELIX_CODEC_MP3
 #if CONFIG_YORADIO_OGG_OPUS
                    && kind != HELIX_CODEC_OPUS
@@ -695,8 +759,12 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
     if (codec->kind == kind) {
         codec->input_start = codec->input_size = 0;
 #if CONFIG_YORADIO_OGG_OPUS
-        if (kind == HELIX_CODEC_OPUS)
-            return s_opus ? native_opus_reset(&s_opus->stream) : -2;
+        if (kind == HELIX_CODEC_OPUS) {
+            const int result = s_opus ? native_opus_reset(&s_opus->stream) : -2;
+            if (result != 0)
+                opus_init_failed(kind, HELIX_OPUS_INIT_NATIVE, native_opus_decoder_size(), codec->reserve_heap_bytes, result);
+            return result;
+        }
 #endif
         if (kind == HELIX_CODEC_MP3) {
 #if CONFIG_YORADIO_MP3_DECODER_LIBMAD
@@ -731,7 +799,10 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
     if (input_capacity != codec->input_capacity) {
         uint8_t *resized = static_cast<uint8_t *>(heap_caps_realloc(
             codec->input, input_storage_bytes(input_capacity), MALLOC_CAP_8BIT));
-        if (!resized) return -2;
+        if (!resized) {
+            opus_init_failed(kind, HELIX_OPUS_INIT_INPUT, input_storage_bytes(input_capacity), codec->reserve_heap_bytes, 0);
+            return -2;
+        }
         codec->input = resized;
         codec->input_capacity = input_capacity;
         codec->input_start = codec->input_size = 0;
@@ -740,7 +811,10 @@ extern "C" int helix_codec_switch(helix_codec_t *codec,
     if (pcm_samples != codec->pcm_samples) {
         int16_t *resized = static_cast<int16_t *>(heap_caps_realloc(
             codec->pcm, sizeof(int16_t) * pcm_samples, MALLOC_CAP_8BIT));
-        if (!resized) return -2;
+        if (!resized) {
+            opus_init_failed(kind, HELIX_OPUS_INIT_PCM, sizeof(int16_t) * pcm_samples, codec->reserve_heap_bytes, 0);
+            return -2;
+        }
         codec->pcm = resized;
         codec->pcm_samples = pcm_samples;
     }
