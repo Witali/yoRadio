@@ -229,10 +229,15 @@ LRCLK GPIO2. The optional SSD1306 bus is SDA GPIO4/SCL GPIO5.
 
 ESP8266 RTOS SDK enforces 2440 bytes as the minimum TCP send buffer, so the
 canonical profile keeps both send buffer and receive window at 2440 bytes for
-high-bitrate radio. RAM is bounded in the WebUI itself: static responses use one
-512-byte scratch buffer, the persistent status buffer is 1088 bytes, and
+high-bitrate radio. RAM is bounded in the WebUI itself: static responses,
+status/CSV formatting, and upload reception share one 1088-byte HTTP-task
+buffer (1024-byte static sends, 512-byte upload reads), and
 volatile RSSI/buffer telemetry is sampled every two
 seconds instead of enqueueing a full status frame on every fluctuation.
+CSV filtering compacts consumed rows in place and flushes before refilling.
+This saves 1536 bytes of BSS; the [five-slot SPIFFS mount](../../docs/ESP8266_SPIFFS_RAM.md)
+saves another 1620 bytes of permanent DRAM. Audio/DMA buffers, task stacks,
+codec formats, and the 4096-byte codec reserve are unchanged.
 
 The network layout intentionally matches the ESP32-C3 OLED native target:
 WebUI HTTP resources use the standard port 80 and the persistent WebSocket is

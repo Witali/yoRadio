@@ -18,7 +18,6 @@
 
 #define UPLOAD_MAX (96U * 1024U)
 #define UPLOAD_TEMP "/spiffs/upload.tmp"
-static uint8_t s_receive[512]; /* HTTP task only */
 static volatile TickType_t s_reboot_at;
 static const char *TAG = "upload";
 
@@ -175,12 +174,13 @@ static bool receive_form(httpd_req_t *request, size_t maximum,
     boundary[strcspn(boundary, "\";")] = 0;
     web_multipart_t parser;
     if (!mp_init(&parser, boundary, handler, context)) return false;
+    uint8_t *s_receive = web_service_upload_buffer();
     size_t left = request->content_len;
     TickType_t start = xTaskGetTickCount();
     TickType_t last_received = start;
     while (left) {
         if (xTaskGetTickCount() - start > pdMS_TO_TICKS(120000)) return false;
-        size_t n = left > sizeof(s_receive) ? sizeof(s_receive) : left;
+        size_t n = left > WEB_UPLOAD_RECEIVE_BYTES ? WEB_UPLOAD_RECEIVE_BYTES : left;
         int received = httpd_req_recv(request, (char *)s_receive, n);
         if (received == HTTPD_SOCK_ERR_TIMEOUT) {
             /* Ordinary idle sessions keep their short socket timeout.

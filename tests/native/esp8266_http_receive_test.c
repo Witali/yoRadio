@@ -31,12 +31,16 @@ static int httpd_req_get_hdr_value_str(httpd_req_t *r,const char *name,char *dst
 static bool mp_init(web_multipart_t *p,const char *b,mp_handler_t h,void *c) {
     (void)b; (void)h; (void)c; p->bytes=0; return true;
 }
+#define WEB_UPLOAD_RECEIVE_BYTES 512U
+static uint8_t shared_http_scratch[1088];
+static unsigned borrows, expected_fed = 6;
+static uint8_t *web_service_upload_buffer(void) { ++borrows; return shared_http_scratch; }
 static unsigned fed;
 static bool mp_feed(web_multipart_t *p,const uint8_t *s,size_t n) {
-    (void)s; p->bytes+=(unsigned)n; fed+=(unsigned)n; return true;
+    assert(s == shared_http_scratch && n <= WEB_UPLOAD_RECEIVE_BYTES);
+    p->bytes+=(unsigned)n; fed+=(unsigned)n; return true;
 }
-static bool mp_complete(web_multipart_t *p) { return p->bytes==6; }
-static uint8_t s_receive[512];
+static bool mp_complete(web_multipart_t *p) { return p->bytes==expected_fed; }
 typedef struct { int result,error; unsigned elapsed; } event_t;
 static event_t events[16];
 static unsigned event_count,event_index;
@@ -80,7 +84,10 @@ static size_t httpd_recv_pending(httpd_req_t *r,char *buf,size_t length) {
 #pragma warning(pop)
 #endif
 /* FORM_IMPLEMENTATION */
-static void reset(void) { now=0; fed=event_count=event_index=0; }
+static void reset(void) {
+    now=0; fed=event_count=event_index=borrows=0;
+    memset(shared_http_scratch, 0xa5, sizeof(shared_http_scratch));
+}
 static void add(int result,int error,unsigned elapsed) {
     assert(event_count<16); events[event_count++]=(event_t){result,error,elapsed};
 }
@@ -115,6 +122,13 @@ int main(void) {
     assert(!receive_form(&request,100,NULL,NULL)&&fed==2);
     reset();aux.remaining_len=6;add(2,0,0);add(0,0,0);
     assert(!receive_form(&request,100,NULL,NULL)&&fed==2);
+    /* Upload/OTA receive blocks borrow the same memory, never consume the
+     * remaining status-buffer tail, and retain no pointer after return. */
+    reset();expected_fed=1056;request.content_len=aux.remaining_len=1056;
+    add(512,0,0);add(512,0,0);add(32,0,0);
+    assert(receive_form(&request,2000,NULL,NULL) && fed==1056 && borrows==1);
+    for (unsigned i=WEB_UPLOAD_RECEIVE_BYTES; i<sizeof(shared_http_scratch); ++i)
+        assert(shared_http_scratch[i]==0xa5);
     puts("HTTP receive/upload tests passed");
     return 0;
 }

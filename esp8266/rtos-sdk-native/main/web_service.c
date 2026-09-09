@@ -73,10 +73,22 @@ static httpd_handle_t s_server;
 static int s_ws_fds[WEB_WS_CLIENTS] = {-1, -1};
 static volatile bool s_poll_queued;
 static volatile bool s_playlist_changed;
-static char s_async_message[WEB_STATUS_CAPACITY];
-/* All static routes run serially on the HTTP task, so one DRAM buffer can
- * replace the former 512/672-byte per-handler stack arrays. */
-static char s_static_scratch[WEB_STATIC_SCRATCH_SIZE];
+/* Status, static responses, CSV filtering and upload reception run serially
+ * on the HTTP task. Sends copy the payload before returning; queued poll work
+ * cannot run inside a handler. Startup bundle checking precedes HTTP start. */
+static union {
+    char message[WEB_STATUS_CAPACITY];
+    char transfer[WEB_STATIC_SCRATCH_SIZE];
+} s_http_scratch;
+#define s_async_message s_http_scratch.message
+#define s_static_scratch s_http_scratch.transfer
+
+uint8_t *web_service_upload_buffer(void) {
+    _Static_assert(WEB_UPLOAD_RECEIVE_BYTES <= WEB_STATIC_SCRATCH_SIZE,
+                   "Upload reception must fit the shared HTTP scratch");
+    return (uint8_t *)s_static_scratch;
+}
+
 static bool s_bundle_current;
 
 typedef struct {
@@ -963,7 +975,8 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
     /* Read blocks into the existing HTTP-task buffer, not one FILE operation
      * per row. Retain only an incomplete tail between reads. Row boundaries
      * match playlist_service's fgets(..., 672), including overlong records.
-     * Output uses a bounded independent 1-KiB scratch, never the full list. */
+     * Compact supported rows into the consumed prefix. Flush that prefix
+     * before moving/refilling the unread tail: no second output buffer. */
     enum { ROW_BYTES = 672 };
     int file = open(PLAYLIST_PATH, O_RDONLY);
     uint32_t trace_start = httpd_trace_clock();
@@ -986,6 +999,17 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
         char *line = s_async_message + offset;
         char *newline = memchr(line, '\n', length);
         if (!newline && available < ROW_BYTES - 1 && !eof) {
+            if (used) {
+#if YORADIO_ESP8266_WEB_PROFILE
+                TickType_t send_start = xTaskGetTickCount();
+#endif
+                result = httpd_resp_send_chunk(request, s_async_message, used);
+#if YORADIO_ESP8266_WEB_PROFILE
+                send_ticks += xTaskGetTickCount() - send_start;
+#endif
+                if (result != ESP_OK) break;
+                used = 0;
+            }
             memmove(s_async_message, line, available);
 #if YORADIO_ESP8266_WEB_PROFILE
             TickType_t read_start = xTaskGetTickCount();
@@ -1012,29 +1036,15 @@ static esp_err_t playlist_handler(httpd_req_t *request) {
         bool supported = playlist_service_entry_supported(line);
         size_t remaining = supported ? strlen(line) : 0;
         line[length] = saved;
-        while (remaining) {
-            size_t n = sizeof(s_static_scratch) - used;
-            if (n > remaining) n = remaining;
-            memcpy(s_static_scratch + used, line, n);
-            used += n;
-            line += n;
-            remaining -= n;
-            if (used == sizeof(s_static_scratch)) {
-#if YORADIO_ESP8266_WEB_PROFILE
-                TickType_t send_start = xTaskGetTickCount();
-#endif
-                result = httpd_resp_send_chunk(request, s_static_scratch, used);
-#if YORADIO_ESP8266_WEB_PROFILE
-                send_ticks += xTaskGetTickCount() - send_start;
-#endif
-                if (result != ESP_OK) break;
-                used = 0;
-            }
+        if (remaining) {
+            /* used <= the old offset, remaining <= length: destination ends
+             * no later than offset, so unread bytes are never overwritten. */
+            memmove(s_async_message + used, line, remaining);
+            used += remaining;
         }
-        if (result != ESP_OK) break;
     }
     if (result == ESP_OK && used)
-        result = httpd_resp_send_chunk(request, s_static_scratch, used);
+        result = httpd_resp_send_chunk(request, s_async_message, used);
     if (read_failed && result == ESP_OK) result = ESP_FAIL;
     close(file);
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);

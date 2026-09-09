@@ -135,7 +135,8 @@ test("ESP8266 application serves the current shared WebUI script from flash", ()
   assert.match(webSource, /request_path_equals\(request, "\/script\.js"\)/);
   assert.match(webSource, /_binary_script_js_gz_start/);
   assert.match(webSource, /_binary_script_js_gz_end/);
-  assert.match(webSource, /static char s_static_scratch\[WEB_STATIC_SCRATCH_SIZE\]/);
+  assert.match(webSource, /static union \{\s*char message\[WEB_STATUS_CAPACITY\];\s*char transfer\[WEB_STATIC_SCRATCH_SIZE\];\s*\} s_http_scratch;/);
+  assert.match(webSource, /#define s_static_scratch s_http_scratch.transfer/);
   const scratch = Number(/#define WEB_STATIC_SCRATCH_SIZE (\d+)U/.exec(webSource)?.[1]);
   const chunk = Number(/#define WEB_SEND_CHUNK_SIZE (\d+)U/.exec(webSource)?.[1]);
   assert.ok(chunk > 0 && scratch >= chunk && scratch <= 1024);
@@ -143,6 +144,22 @@ test("ESP8266 application serves the current shared WebUI script from flash", ()
   assert.match(webSource, /memcpy\(s_static_scratch, cursor, count\)/);
   assert.match(webSource, /httpd_resp_send_chunk\(request, s_static_scratch, count\)/);
   assert.doesNotMatch(webSource, /httpd_resp_send_chunk\(\s*request, \(const char \*\)cursor/);
+});
+
+test("HTTP upload, status and file scratch have one owner and no nested borrow", () => {
+  const upload = main("web_upload.c");
+  const header = main("web_service.h");
+  assert.match(header, /#define WEB_UPLOAD_RECEIVE_BYTES 512U/);
+  assert.match(upload, /uint8_t \*s_receive = web_service_upload_buffer\(\)/);
+  assert.doesNotMatch(upload, /static uint8_t s_receive\[/);
+  assert.match(upload, /left > WEB_UPLOAD_RECEIVE_BYTES \? WEB_UPLOAD_RECEIVE_BYTES : left/);
+  const notify = bodyFrom(webSource, "void web_service_notify_assets_changed", "static size_t request_path_length");
+  assert.doesNotMatch(notify, /s_http_scratch|s_static_scratch|s_async_message|bundle_matches_spiffs\(/);
+  assert.doesNotMatch(main("playlist_web_cache.c"), /web_service_upload_buffer|s_http_scratch/);
+  const poll = bodyFrom(webSource, "void web_service_poll(void)");
+  assert.doesNotMatch(poll, /s_http_scratch|s_static_scratch|s_async_message|format_status/);
+  assert.match(poll, /httpd_queue_work\(s_server, poll_work, NULL\)/);
+  assert.doesNotMatch(webSource, /httpd_req_async_handler_begin\(|xTaskCreate\(/);
 });
 
 test("ESP8266 loads shared WebUI assets sequentially to bound connections", () => {

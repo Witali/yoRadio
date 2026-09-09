@@ -227,7 +227,8 @@ test("ESP8266 exposes only board-supported stations with matching indices", () =
   assert.match(handler, /playlist_service_count\(\)/);
   assert.match(handler, /read\(file, s_async_message/);
   assert.match(handler, /playlist_service_entry_supported\(line\)/);
-  assert.match(handler, /if \(used == sizeof\(s_static_scratch\)\)/);
+  assert.match(handler, /memmove\(s_async_message \+ used, line, remaining\)/);
+  assert.match(handler, /httpd_resp_send_chunk\(request, s_async_message, used\)/);
   assert.doesNotMatch(handler, /\bmalloc\b|\bcalloc\b/);
   assert.match(handler, /open\(PLAYLIST_PATH, O_RDONLY\)/);
 });

@@ -14,9 +14,25 @@ typedef int esp_err_t;
 typedef struct { int unused; } httpd_req_t;
 enum { ESP_OK = 0, ESP_FAIL = -1 };
 static const char *PLAYLIST_PATH;
-static char s_static_scratch[512], s_async_message[1088];
+/* SCRATCH_IMPLEMENTATION */
 static char received[65536], expected[65536];
 static size_t size, largest, calls, fail_call;
+static size_t read_limit, reads, fail_read;
+static unsigned open_files;
+static int tracked_open(const char *path, int flags) {
+    int fd = open(path, flags); if (fd >= 0) ++open_files; return fd;
+}
+static int tracked_close(int fd) {
+    assert(open_files); --open_files; return close(fd);
+}
+static ssize_t tracked_read(int fd, void *data, size_t n) {
+    if (++reads == fail_read) return -1;
+    if (read_limit && n > read_limit) n = read_limit;
+    return read(fd, data, n);
+}
+#define open tracked_open
+#define close tracked_close
+#define read tracked_read
 static unsigned count = 1;
 static const char *accept_encoding = "identity";
 static const char *cache_path;
@@ -48,7 +64,7 @@ static unsigned playlist_service_count(void) { return count; }
 static int httpd_resp_send_chunk(httpd_req_t *r, const char *s, size_t n) {
     (void)r;
     if (++calls == fail_call) return ESP_FAIL;
-    assert(n <= sizeof(s_static_scratch));
+    assert(n <= sizeof(s_async_message));
     if (n > largest) largest = n;
     assert(size + n < sizeof(received));
     if (n) memcpy(received + size, s, n);
@@ -58,6 +74,10 @@ static int httpd_resp_send_chunk(httpd_req_t *r, const char *s, size_t n) {
 }
 /* IMPLEMENTATION */
 int main(int argc, char **argv) {
+    assert(sizeof(s_http_scratch) == 1088);
+    assert((void *)s_async_message == (void *)s_static_scratch);
+    assert(web_service_upload_buffer() == (uint8_t *)s_async_message);
+    memset(web_service_upload_buffer(), 0xa5, WEB_UPLOAD_RECEIVE_BYTES);
     static const char *extensions[] = {".ogg", ".opus", ".flac", ".m3u", ".m3u8", ".pls", ".wav"};
     static const char *tails[] = {"", "?mp3=yes", "#fragment", "x", "/audio.mp3"};
     /* Compare against the previous extension algorithm including case,
@@ -108,11 +128,23 @@ int main(int argc, char **argv) {
     fputs(last,f); strcat(expected,last); fclose(f);
     httpd_req_t req = {0};
     assert(playlist_handler(&req) == ESP_OK);
-    assert(largest == sizeof(s_static_scratch) && size == strlen(expected));
+    assert(largest > 512 && largest < sizeof(s_async_message) && size == strlen(expected));
     assert(!strcmp(received, expected));
+    assert(!open_files);
+    const size_t fragments[] = {1, 2, 7, 113, 671, 672, 1023, 1087};
+    for (unsigned i=0; i<sizeof(fragments)/sizeof(fragments[0]); ++i) {
+        read_limit=fragments[i]; size=calls=reads=0;
+        assert(playlist_handler(&req)==ESP_OK && !open_files);
+        assert(size==strlen(expected) && !strcmp(received,expected));
+    }
+    read_limit=0;
     size = calls = 0; fail_call = 3;
     assert(playlist_handler(&req) == ESP_FAIL);
     assert(calls == 3);
+    assert(!open_files);
+    fail_call=0; size=calls=reads=0; fail_read=3;
+    assert(playlist_handler(&req)==ESP_FAIL && !open_files);
+    fail_read=0;
     fail_call = 0; size = calls = 0;
     count = 0; assert(playlist_handler(&req) == 404); count = 1;
     f = fopen(PLAYLIST_PATH, "wb"); assert(f); fclose(f);
