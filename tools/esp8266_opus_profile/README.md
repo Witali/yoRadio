@@ -20,6 +20,46 @@ compiler/flags signature, recompiling changed objects and relinking only when
 needed. `--no-build` explicitly trusts the existing executables; use it only when
 sources have not changed. Builds and decoded PCM go under `.build/`.
 
+`build_host.cjs --fast-int64 0` selects the generic 32-bit arithmetic used by
+Xtensa, even on an x86-64 host; `--fast-int64 1` selects native 64-bit arithmetic.
+Each explicit selection has a separate `-int64-0`/`-int64-1` build cache.
+Without the option the upstream architecture default is unchanged. These Opus
+arithmetic branches are not always bit-exact with one another, so board golden
+PCM must use `--fast-int64 0`. This changes arithmetic selection, not the host ABI.
+A pristine source override must have the same opt-in `#ifndef OPUS_FAST_INT64`
+guard in `celt/arch.h`; preserve the original tree and document that sole change.
+
+Reproduce the target-matched reference and the saved generic32 report:
+
+```powershell
+node tools/esp8266_opus_profile/prepare_generic32_reference.cjs --source .build/upstream-radio-review-2026-09-09/esp8266audio/src/libopus
+node tools/esp8266_opus_profile/run_regressions.cjs --fast-int64 0 --compare-fast-int64 1 --upstream .build/esp8266-opus-pristine-generic32 --output tools/esp8266_opus_profile/generic32-results.json
+node --test tests/esp8266-opus-arithmetic.test.js
+```
+
+Preparation never changes the original tree. Its default diagnostic destination
+is `.build/esp8266-opus-pristine-generic32`; `--output` can select another new
+directory. Only the architecture-detection guard is added (line endings in that
+edited block become LF). Every source/copy file SHA-256 and sorted-tree digest
+is recorded in `opus-generic32-provenance.json`. Repeating preparation verifies
+the complete inventory and contents; unexpected changes are rejected, not
+overwritten. The source must be an independently obtained pinned upstream tree,
+not the adapted vendored component.
+
+The runner accepts `--fast-int64 0/1` and isolates PCM/report outputs under
+`.build/esp8266-opus-regression-int64-0` or `-int64-1`. Optional
+`--compare-fast-int64 1` also decodes the other upstream arithmetic branch and
+records full-corpus and first-12-packet quality, without requiring those two
+upstream branches to match each other. Baseline/bounded/pristine equivalence
+within the selected branch remains strict, including mixed modes and PLC.
+`generic32-results.json` preserves this report; the earlier `results.json`
+records the host's original architecture default. For the first 12 hybrid
+packets, generic32's FNV-1a32 is `0xbfb8d5fa` (matching the initial board run),
+versus native64 `0xcae9facc`: 1,024/11,520 samples differ by at most 1, SNR
+84.24 dB. Switching only `vq.c` to generic32 reproduced that difference: normal
+`alg_unquant -> exp_rotation -> celt_div -> MULT32_32_Q31` uses the split-product
+approximation. This is upstream arithmetic variation, not adaptation error.
+
 For an independent pristine copy of the pinned upstream sources:
 
 ```powershell

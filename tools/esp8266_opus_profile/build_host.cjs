@@ -39,10 +39,14 @@ function dependencies(depfile) {
   return text.slice(text.indexOf(':') + 1).trim().split(/\s+/).filter(Boolean).map(nativePath);
 }
 
-async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot } = {}) {
+async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64 } = {}) {
   if (bounded && upstreamRoot) throw Error('--upstream is for a pristine unbounded baseline only.');
+  if (fastInt64 !== undefined && fastInt64 !== 0 && fastInt64 !== 1) throw Error('fastInt64 must be 0 or 1.');
   const sourceRoot = upstreamRoot ? path.resolve(upstreamRoot) : upstream;
-  const out = path.join(root, '.build/esp8266-opus-host' + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : ''));
+  if (fastInt64 !== undefined && !fs.readFileSync(path.join(sourceRoot, 'celt/arch.h'), 'utf8').includes('#ifndef OPUS_FAST_INT64'))
+    throw Error('Selected upstream does not support an OPUS_FAST_INT64 override; use a documented diagnostic copy.');
+  const out = path.join(root, '.build/esp8266-opus-host' + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
+    (fastInt64 === undefined ? '' : '-int64-' + fastInt64));
   const binary = path.join(out, 'probe');
   const sources = ['src', 'celt', 'silk', 'silk/fixed'].flatMap(dir =>
     fs.readdirSync(path.join(sourceRoot, dir)).filter(file => file.endsWith('.c')).sort()
@@ -50,6 +54,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   if (bounded) sources.push(path.join(component, 'opus_memory.c'));
   sources.push(path.join(__dirname, 'probe.c'));
   const flags = ['-O2', '-std=c99', '-fwrapv', '-ffunction-sections', '-fdata-sections',
+    ...(fastInt64 === undefined ? [] : ['-DOPUS_FAST_INT64=' + fastInt64]),
     ...(bounded ? ['-DYORADIO_OPUS_BOUNDED=1', '-I' + hostPath(component)] : []),
     ...['include', 'celt', 'silk', 'silk/fixed', 'src'].map(dir => '-I' + hostPath(path.join(sourceRoot, dir)))];
   const objects = sources.map(source => path.join(out, 'objects',
@@ -59,6 +64,8 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   const previous = fs.existsSync(buildfile) ? JSON.parse(fs.readFileSync(buildfile, 'utf8')) : null;
   if (noBuild) {
     if (!fs.existsSync(binary) || !previous) throw Error(`No incremental host build in ${out}; omit --no-build once.`);
+    if (JSON.stringify(previous.flags) !== JSON.stringify(flags) || JSON.stringify(previous.sources) !== JSON.stringify(sources))
+      throw Error('Existing host cache uses different flags or sources; omit --no-build.');
     return { binary, out, objects, flags, compiler: previous.compiler, compiled: 0, linked: false, reused: true };
   }
   fs.mkdirSync(out, { recursive: true });
@@ -86,8 +93,9 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   return { binary, out, objects, flags, compiler, compiled: pending.length, linked, reused: false };
 }
 
-function runProbe({ bounded = false, fixture, output, selfTest = true, upstreamRoot }) {
-  const out = path.join(root, '.build/esp8266-opus-host' + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : ''));
+function runProbe({ bounded = false, fixture, output, selfTest = true, upstreamRoot, fastInt64 }) {
+  const out = path.join(root, '.build/esp8266-opus-host' + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
+    (fastInt64 === undefined ? '' : '-int64-' + fastInt64));
   const args = fixture ? [hostPath(path.resolve(fixture)), hostPath(path.resolve(output || path.join(out, 'decoded.pcm'))),
     ...(selfTest ? ['--self-test'] : [])] : [];
   return JSON.parse(execute(hostPath(path.join(out, 'probe')), args).trim());
@@ -98,9 +106,11 @@ if (require.main === module) {
   const bounded = process.argv.includes('--bounded');
   const upstreamIndex = process.argv.indexOf('--upstream');
   const upstreamRoot = upstreamIndex < 0 ? undefined : process.argv[upstreamIndex + 1];
-  buildHost({ bounded, noBuild: process.argv.includes('--no-build'), upstreamRoot }).then(() => {
+  const fastInt64Index = process.argv.indexOf('--fast-int64');
+  const fastInt64 = fastInt64Index < 0 ? undefined : Number(process.argv[fastInt64Index + 1]);
+  buildHost({ bounded, noBuild: process.argv.includes('--no-build'), upstreamRoot, fastInt64 }).then(() => {
     const fixture = process.argv.find(arg => arg.endsWith('.opuspkt'));
     const outputIndex = process.argv.indexOf('--output');
-    console.log(JSON.stringify(runProbe({ bounded, fixture, upstreamRoot, output: outputIndex < 0 ? undefined : process.argv[outputIndex + 1] }), null, 2));
+    console.log(JSON.stringify(runProbe({ bounded, fixture, upstreamRoot, fastInt64, output: outputIndex < 0 ? undefined : process.argv[outputIndex + 1] }), null, 2));
   }).catch(error => { console.error(error.message); process.exitCode = 1; });
 }

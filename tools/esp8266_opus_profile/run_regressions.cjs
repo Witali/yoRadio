@@ -3,6 +3,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const { buildHost, runProbe, root, execute, hostPath } = require('./build_host.cjs');
 const { fixtureDirectory, sha256, inspectPackets } = require('./fixtures.cjs');
+const { prepareReference, provenanceName } = require('./prepare_generic32_reference.cjs');
 
 function comparePcm(reference, actual) {
   assert.equal(actual.length, reference.length, 'PCM sample counts differ');
@@ -20,12 +21,41 @@ function comparePcm(reference, actual) {
     reference_pcm_sha256: sha256(reference), actual_pcm_sha256: sha256(actual) };
 }
 
-async function runRegressions({ noBuild = false, upstreamRoot, output } = {}) {
+function fnv1a32(data) {
+  let hash = 2166136261;
+  for (const byte of data) hash = Math.imul(hash ^ byte, 16777619) >>> 0;
+  return hash;
+}
+
+function prefixSamples(data, count) {
+  let offset = 0;
+  for (let index = 0; index < count; index++) {
+    assert.ok(offset + 2 <= data.length, 'Insufficient packets for quality prefix');
+    const length = data.readUInt16LE(offset);
+    offset += length + 2;
+    assert.ok(offset <= data.length, 'Truncated quality prefix packet');
+  }
+  return inspectPackets(data.subarray(0, offset)).samples;
+}
+
+async function runRegressions({ noBuild = false, upstreamRoot, output, fastInt64, compareFastInt64 } = {}) {
+  if (compareFastInt64 !== undefined) {
+    assert.ok((fastInt64 === 0 || fastInt64 === 1) && (compareFastInt64 === 0 || compareFastInt64 === 1), 'Arithmetic comparison requires explicit 0/1 selections');
+    assert.notEqual(compareFastInt64, fastInt64, 'Arithmetic comparison must select the other branch');
+  }
+  if (upstreamRoot) {
+    const provenance = path.join(path.resolve(upstreamRoot), provenanceName);
+    if (fs.existsSync(provenance)) {
+      const manifest = JSON.parse(fs.readFileSync(provenance, 'utf8'));
+      prepareReference({ source: path.resolve(root, manifest.source), output: upstreamRoot });
+    }
+  }
   const manifest = JSON.parse(fs.readFileSync(path.join(fixtureDirectory, 'manifest.json'), 'utf8'));
-  const baselineBuild = await buildHost({ noBuild });
-  const boundedBuild = await buildHost({ bounded: true, noBuild });
-  const pristineBuild = upstreamRoot ? await buildHost({ upstreamRoot, noBuild }) : null;
-  const resultDirectory = path.join(root, '.build/esp8266-opus-regression');
+  const baselineBuild = await buildHost({ noBuild, fastInt64 });
+  const boundedBuild = await buildHost({ bounded: true, noBuild, fastInt64 });
+  const pristineBuild = upstreamRoot ? await buildHost({ upstreamRoot, noBuild, fastInt64 }) : null;
+  const qualityBuild = compareFastInt64 === undefined ? null : await buildHost({ upstreamRoot, noBuild, fastInt64: compareFastInt64 });
+  const resultDirectory = path.join(root, '.build/esp8266-opus-regression' + (fastInt64 === undefined ? '' : '-int64-' + fastInt64));
   fs.mkdirSync(resultDirectory, { recursive: true });
   const results = [];
   for (const fixture of manifest.fixtures) {
@@ -36,8 +66,8 @@ async function runRegressions({ noBuild = false, upstreamRoot, output } = {}) {
     for (const key of Object.keys(observed)) assert.deepEqual(observed[key], fixture[key], fixture.name + ' ' + key);
     const baselinePcm = path.join(resultDirectory, fixture.name + '.baseline.pcm');
     const boundedPcm = path.join(resultDirectory, fixture.name + '.bounded.pcm');
-    const baseline = runProbe({ fixture: filename, output: baselinePcm });
-    const bounded = runProbe({ bounded: true, fixture: filename, output: boundedPcm });
+    const baseline = runProbe({ fixture: filename, output: baselinePcm, fastInt64 });
+    const bounded = runProbe({ bounded: true, fixture: filename, output: boundedPcm, fastInt64 });
     const baselineData = fs.readFileSync(baselinePcm);
     const pcm = comparePcm(baselineData, fs.readFileSync(boundedPcm));
     assert.equal(baseline.samples, fixture.samples);
@@ -53,10 +83,23 @@ async function runRegressions({ noBuild = false, upstreamRoot, output } = {}) {
     let pristine;
     if (upstreamRoot) {
       const pristinePcm = path.join(resultDirectory, fixture.name + '.pristine.pcm');
-      const metadata = runProbe({ upstreamRoot, fixture: filename, output: pristinePcm });
+      const metadata = runProbe({ upstreamRoot, fixture: filename, output: pristinePcm, fastInt64 });
       pristine = { decoder: metadata, pcm_vs_baseline: comparePcm(fs.readFileSync(pristinePcm), baselineData) };
     }
-    results.push({ name: fixture.name, opuspkt_sha256: fixture.opuspkt_sha256, baseline, bounded, pcm, ...(pristine ? { pristine } : {}) });
+    let arithmeticQuality;
+    if (qualityBuild) {
+      const qualityPcm = path.join(resultDirectory, fixture.name + '.int64-' + compareFastInt64 + '.pcm');
+      runProbe({ upstreamRoot, fastInt64: compareFastInt64, fixture: filename, output: qualityPcm });
+      const qualityData = fs.readFileSync(qualityPcm), bytes = prefixSamples(data, 12) * 2;
+      const referencePrefix = qualityData.subarray(0, bytes), actualPrefix = baselineData.subarray(0, bytes);
+      arithmeticQuality = { reference_fast_int64: compareFastInt64, actual_fast_int64: fastInt64,
+        pcm: comparePcm(qualityData, baselineData), first_12_packets: {
+          reference_fnv1a32: fnv1a32(referencePrefix), actual_fnv1a32: fnv1a32(actualPrefix),
+          pcm: comparePcm(referencePrefix, actualPrefix),
+        } };
+    }
+    results.push({ name: fixture.name, opuspkt_sha256: fixture.opuspkt_sha256, baseline, bounded, pcm,
+      ...(pristine ? { pristine } : {}), ...(arithmeticQuality ? { arithmetic_quality: arithmeticQuality } : {}) });
     process.stderr.write(`${fixture.name}: ${pcm.exact ? 'exact' : 'DIFF'}, scratch ${bounded.scratch_byte_peak_bytes}B DRAM / ${bounded.scratch_word_peak_bytes}B word arena\n`);
   }
   // Own synthesized 997/1703 Hz stereo tones, FFmpeg 8.1.1 libopus voip CBR
@@ -94,23 +137,44 @@ async function runRegressions({ noBuild = false, upstreamRoot, output } = {}) {
     const pristine = sequence(pristineBuild, 'pristine');
     mixed.pristine = { decoder: pristine.decoder, pcm_vs_baseline: comparePcm(pristine.data, mixedBaseline.data) };
   }
+  if (qualityBuild) {
+    const quality = sequence(qualityBuild, 'int64-' + compareFastInt64);
+    mixed.arithmetic_quality = { reference_fast_int64: compareFastInt64, actual_fast_int64: fastInt64,
+      pcm: comparePcm(quality.data, mixedBaseline.data) };
+  }
   process.stderr.write(`mixed SILK mono/stereo + hybrid/CELT + PLC: ${mixed.pcm.exact ? 'exact' : 'DIFF'}, scratch ${mixed.bounded.scratch_byte_peak_bytes}B DRAM / ${mixed.bounded.scratch_word_peak_bytes}B word arena\n`);
   const passed = mixed.pcm.exact && (!mixed.pristine || mixed.pristine.pcm_vs_baseline.exact) &&
     results.every(result => result.pcm.exact && (!result.pristine || result.pristine.pcm_vs_baseline.exact));
   const report = { schema_version: 1, passed, compiler: baselineBuild.compiler,
+    arithmetic: { fast_int64: fastInt64 === undefined ? 'upstream architecture default' : fastInt64,
+      baseline_flags: baselineBuild.flags, bounded_flags: boundedBuild.flags,
+      ...(pristineBuild ? { pristine_flags: pristineBuild.flags } : {}),
+      ...(qualityBuild ? { comparison_fast_int64: compareFastInt64, comparison_flags: qualityBuild.flags,
+        comparison_scope: 'Quality difference between upstream arithmetic branches, not bounded-adaptation error. A 64-bit host with generic32 arithmetic is not a 32-bit ABI.' } : {}) },
     comparison: 'Vendored libopus with YORADIO_OPUS_BOUNDED undefined versus enabled; mono output at 48000 Hz.',
     memory_scope: 'Host decoder state sizes and arena high-water marks only. Word arena includes persistent CELT history and both SILK excitation buffers. Excludes PCM, packets, bridge state, stack and SDK/Wi-Fi memory. Host sizeof pointers differs from ESP8266.',
     timing_scope: 'No physical ESP8266 throughput, deadline or audio-output claim.',
     ...(upstreamRoot ? { pristine_source: path.relative(root, path.resolve(upstreamRoot)).replace(/\\/g, '/') } : {}),
     fixtures: results, mixed_sequence: mixed };
+  if (upstreamRoot) {
+    const provenance = path.join(path.resolve(upstreamRoot), provenanceName);
+    if (fs.existsSync(provenance)) {
+      const contents = fs.readFileSync(provenance);
+      const { files, ...summary } = JSON.parse(contents);
+      report.pristine_provenance = { ...summary, manifest: path.relative(root, provenance).replaceAll('\\', '/'),
+        manifest_sha256: sha256(contents) };
+    }
+  }
   fs.writeFileSync(output || path.join(resultDirectory, 'results.json'), JSON.stringify(report, null, 2) + '\n');
   assert.equal(passed, true, 'PCM changed; inspect results.json');
   return report;
 }
-module.exports = { runRegressions, comparePcm };
+module.exports = { runRegressions, comparePcm, fnv1a32, prefixSamples };
 if (require.main === module) {
   const value = key => { const i = process.argv.indexOf(key); return i < 0 ? undefined : process.argv[i + 1]; };
-  runRegressions({ noBuild: process.argv.includes('--no-build'), upstreamRoot: value('--upstream'), output: value('--output') })
+  const numeric = key => process.argv.includes(key) ? Number(value(key)) : undefined;
+  runRegressions({ noBuild: process.argv.includes('--no-build'), upstreamRoot: value('--upstream'), output: value('--output'),
+    fastInt64: numeric('--fast-int64'), compareFastInt64: numeric('--compare-fast-int64') })
     .then(report => console.log(`PASS: ${report.fixtures.length} fixtures; exact PCM, reset and OOM recovery.`))
     .catch(error => { console.error(error.stack); process.exitCode = 1; });
 }
