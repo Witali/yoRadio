@@ -242,7 +242,7 @@ esp_err_t web_upload_handler(httpd_req_t *request) {
     const char *body = ok ? "OK" : "Upload failed: invalid, incomplete, oversized file or storage full";
     esp_err_t result = httpd_resp_send(request, body, strlen(body));
     if (ok && upload.wifi_saved) web_upload_request_reboot();
-    if (result == ESP_OK) shutdown(httpd_req_to_sockfd(request), SHUT_WR);
+    result = web_service_finish_response(request, result);
     /* Do not ask the SDK to drain an untrusted unbounded rejected body. */
     return ok ? result : ESP_FAIL;
 }
@@ -322,7 +322,7 @@ esp_err_t web_ota_handler(httpd_req_t *request) {
     const char *body = ok ? "OK" :
         "OTA rejected: incomplete or invalid ESP8266 native app.bin; active boot slot unchanged. SPIFFS images are not supported; use Board file upload.";
     esp_err_t result = httpd_resp_send(request, body, strlen(body));
-    if (result == ESP_OK) shutdown(httpd_req_to_sockfd(request), SHUT_WR);
+    result = web_service_finish_response(request, result);
     if (ok) web_upload_request_reboot();
     return ok ? result : ESP_FAIL;
 }

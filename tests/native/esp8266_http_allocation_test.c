@@ -70,6 +70,42 @@ static int httpd_os_thread_create(void **h,const char *n,int s,int p,void (*f)(v
 }
 /* START_IMPLEMENTATION */
 
+typedef uint32_t TickType_t;
+typedef struct {void *handle; int fd;} httpd_req_t;
+#define WEB_MAX_OPEN_SOCKETS 4
+#define SHUT_WR 1
+#define pdMS_TO_TICKS(n) (n)
+static TickType_t tick;
+static int queued, queued_fd;
+static bool queue_fail, shutdown_fail;
+static httpd_handle_t s_server=&server;
+static TickType_t xTaskGetTickCount(void) {return tick;}
+static int httpd_req_to_sockfd(httpd_req_t *r) {return r->fd;}
+static int shutdown(int fd,int how) {(void)fd;assert(how==SHUT_WR);return shutdown_fail?-1:0;}
+static int httpd_sess_trigger_close(void *h,int fd) {
+    assert(h==s_server);if(queue_fail)return ESP_FAIL;++queued;queued_fd=fd;return ESP_OK;
+}
+/* CLOSE_IMPLEMENTATION */
+
+static void test_bounded_close(void) {
+    httpd_req_t r={s_server,7};
+    assert(web_service_finish_response(&r,ESP_OK)==ESP_OK);
+    tick=4999;web_close_poll();assert(queued==0);
+    queue_fail=true;tick=5000;web_close_poll();assert(queued==0);
+    queue_fail=false;web_close_poll();assert(queued==1&&queued_fd==7);
+    web_close_poll();assert(queued==1);
+    assert(web_service_finish_response(&r,ESP_OK)==ESP_OK);
+    web_close_forget(7);tick+=5001;web_close_poll();assert(queued==1);
+    // A new connection with the same fd must not inherit a pending timeout.
+    tick=UINT32_MAX-100;
+    assert(web_service_finish_response(&r,ESP_OK)==ESP_OK);
+    tick+=5000;web_close_poll();assert(queued==2);
+    shutdown_fail=true;
+    assert(web_service_finish_response(&r,ESP_OK)==ESP_FAIL&&queued==3);
+    shutdown_fail=false;
+    assert(web_service_finish_response(&r,ESP_FAIL)==ESP_FAIL&&queued==4);
+}
+
 int main(void) {
     httpd_uri_t *slots[2]={0};
     struct httpd_data hd={0};hd.hd_calls=slots;hd.config.max_uri_handlers=2;
@@ -89,5 +125,6 @@ int main(void) {
     httpd_config_t config={0};httpd_handle_t handle=NULL;
     assert(httpd_start(&handle,&config)==ESP_ERR_HTTPD_TASK);
     assert(!handle&&!sockets[0]&&!sockets[1]&&!sockets[2]);
+    test_bounded_close();
     puts("HTTP allocation cleanup tests passed");
 }

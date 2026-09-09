@@ -57,7 +57,7 @@ try {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
     if ($taskConfig -match '(?m)^CONFIG_YORADIO_AUDIO_OUTPUT_(SPI_PDM|I2S_RCPDM|I2S_PCM)=y') { throw 'Only standard I2S PDM is allowed' }
-    foreach ($taskRequired in @('CONFIG_YORADIO_STREAM_INPUT_BYTES=4096', 'CONFIG_YORADIO_STREAM_PREFILL_MS=1000')) {
+    foreach ($taskRequired in @('CONFIG_YORADIO_STREAM_INPUT_BYTES=4096', 'CONFIG_YORADIO_STREAM_PREFILL_MS=1000', 'CONFIG_LWIP_SO_LINGER=y')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired; use a fresh -Variant build directory" }
     }
     $taskGzipEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y\r?$'

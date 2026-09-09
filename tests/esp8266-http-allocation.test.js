@@ -11,7 +11,8 @@ test('HTTP startup and URI allocation failures release every owned resource',t=>
     section('httpd_uri.c','void httpd_unregister_all_uri_handlers(', '/* Alternate implmentation');
   const start=section('httpd_main.c','esp_err_t httpd_start(', 'esp_err_t httpd_stop(');
   const code=fs.readFileSync(path.join(__dirname,'native/esp8266_http_allocation_test.c'),'utf8')
-    .replace('/* URI_IMPLEMENTATION */',uri).replace('/* START_IMPLEMENTATION */',start);
+    .replace('/* URI_IMPLEMENTATION */',uri).replace('/* START_IMPLEMENTATION */',start)
+    .replace('/* CLOSE_IMPLEMENTATION */',fs.readFileSync(path.resolve(__dirname,'../esp8266/rtos-sdk-native/main/web_connection_close.inc'),'utf8'));
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'yoradio-http-allocation-'));
   t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
   const source=path.join(dir,'test.c'),exe=path.join(dir,process.platform==='win32'?'test.exe':'test');

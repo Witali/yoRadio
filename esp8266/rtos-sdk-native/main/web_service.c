@@ -45,6 +45,9 @@
 #define WEB_SEND_CHUNK_SIZE 1024U
 #define WEB_STATIC_SCRATCH_SIZE 1024U
 #define WEB_WS_CLIENTS 2U
+#if !CONFIG_LWIP_SO_LINGER
+#error "Native WebUI requires CONFIG_LWIP_SO_LINGER=y for failed-connection cleanup"
+#endif
 
 /* This SDK counts the TCP listener and pending accepts in its PCB limit.
  * Exhausting it can silently abandon FIN_WAIT_1 with response data pending. */
@@ -57,6 +60,7 @@ extern const unsigned char _binary_script_js_gz_end[];
 
 static const char *TAG = "web";
 static httpd_handle_t s_server;
+#include "web_connection_close.inc"
 /* Only the HTTP task owns subscribers and formats/sends this shared buffer.
  * The app task queues a poll, never writes a buffer being transmitted. */
 static int s_ws_fds[WEB_WS_CLIENTS] = {-1, -1};
@@ -329,6 +333,7 @@ static bool subscribe_socket(int socket) {
 
 static void session_closed(httpd_handle_t server, int socket) {
     (void)server;
+    web_close_forget(socket);
     for (unsigned i = 0; i < WEB_WS_CLIENTS; ++i)
         if (s_ws_fds[i] == socket) s_ws_fds[i] = -1;
     /* This SDK closes the descriptor after calling close_fn. */
@@ -336,6 +341,13 @@ static void session_closed(httpd_handle_t server, int socket) {
 
 static esp_err_t session_opened(httpd_handle_t server, int socket) {
     (void)server;
+    web_close_forget(socket);
+    /* A failed WebSocket send must not leave retransmission buffers in
+     * FIN_WAIT_1 after the session is deleted. Successful HTTP responses
+     * still half-close first and receive the bounded grace period. */
+    struct linger abort_pending = {.l_onoff = 1, .l_linger = 0};
+    if (setsockopt(socket, SOL_SOCKET, SO_LINGER,
+                   &abort_pending, sizeof(abort_pending)) != 0) return ESP_FAIL;
     int enabled = 1;
     /* HTTP headers/chunk delimiters and WS headers are short writes. Do not
      * make each one wait for a delayed TCP ACK before sending its payload. */
@@ -755,15 +767,7 @@ static void prepare_short_response(httpd_req_t *request) {
 
 static esp_err_t finish_short_response(httpd_req_t *request,
                                        esp_err_t result) {
-    /* RFC 9112 section 9.6: send FIN after queued response bytes, retain the
-     * read half until the client closes. Do not abort a successful response. */
-    if (result == ESP_OK) {
-        shutdown(httpd_req_to_sockfd(request), SHUT_WR);
-    } else {
-        (void)httpd_sess_trigger_close(request->handle,
-                                      httpd_req_to_sockfd(request));
-    }
-    return result;
+    return web_service_finish_response(request, result);
 }
 
 static const char *asset_type(const char *uri) {
@@ -1230,6 +1234,7 @@ void web_service_notify_playlist_changed(void) {
 }
 
 static void poll_on_http_task(void) {
+    web_close_poll();
     bool have_client = false;
     for (unsigned i = 0; i < WEB_WS_CLIENTS; ++i)
         have_client |= websocket_socket_active(s_ws_fds[i]);
