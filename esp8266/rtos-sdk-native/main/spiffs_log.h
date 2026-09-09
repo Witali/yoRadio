@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #if YORADIO_ESP8266_SPIFFS_LOG
 #define SPIFFS_LOG_PATH "/spiffs/log/current.txt"
@@ -21,6 +22,11 @@ void spiffs_log_init(void);
 void spiffs_log_mount_ready(void);
 void spiffs_log_poll(void);
 void spiffs_log_get_status(spiffs_log_status_t *status);
+#if YORADIO_ESP8266_SPIFFS_LOG_HTTP
+/* HTTP-task only. Excludes writer/rotation until read_close; never waits. */
+int spiffs_log_read_open(bool previous, size_t *length);
+int spiffs_log_read_close(int fd);
+#endif
 #else
 static inline void spiffs_log_init(void) {}
 static inline void spiffs_log_mount_ready(void) {}

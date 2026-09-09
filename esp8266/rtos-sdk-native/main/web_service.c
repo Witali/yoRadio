@@ -1,6 +1,7 @@
 #include "web_service.h"
 #include "web_audio_pause_config.h"
 #include "memory_profile.h"
+#include "spiffs_log.h"
 #include "json_text.h"
 
 #include <stdbool.h>
@@ -9,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <unistd.h>
 
 #include "board_config.h"
@@ -1113,6 +1115,10 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
     return finish_short_response(request, send_string(request, body));
 }
 
+#if YORADIO_ESP8266_SPIFFS_LOG_HTTP
+#include "web_spiffs_log.inc"
+#endif
+
 static esp_err_t serve_static_request(httpd_req_t *request) {
     if (request_path_equals(request, "/") ||
         request_path_equals(request, "/index.html") ||
@@ -1171,6 +1177,9 @@ esp_err_t web_service_start(void) {
     config.backlog_conn = WEB_CONNECTION_BACKLOG;
     config.recv_wait_timeout = WEB_IDLE_TIMEOUT_SECONDS;
     config.max_uri_handlers = 26;
+#if YORADIO_ESP8266_SPIFFS_LOG_HTTP
+    config.max_uri_handlers += 2;
+#endif
     /* Two WebSockets plus two short HTTP connections. The shared ESP8266
      * loader serializes each tab's static requests. */
     config.lru_purge_enable = true;
@@ -1211,6 +1220,12 @@ esp_err_t web_service_start(void) {
         return result;
     if ((result = register_get("/api/native/audio", audio_health_handler)) != ESP_OK)
         return result;
+#if YORADIO_ESP8266_SPIFFS_LOG_HTTP
+    if ((result = register_get("/api/native/log", spiffs_log_handler)) != ESP_OK)
+        return result;
+    if ((result = register_get("/api/native/log/previous", spiffs_log_handler)) != ESP_OK)
+        return result;
+#endif
     if ((result = register_get("/favicon.ico", static_handler)) != ESP_OK)
         return result;
     httpd_uri_t ota = {.uri = "/update", .method = HTTP_POST,

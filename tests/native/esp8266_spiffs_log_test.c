@@ -11,6 +11,7 @@ typedef ptrdiff_t ssize_t;
 typedef int (*putchar_like_t)(int);
 #define ESP_OK 0
 #define O_WRONLY 1
+#define O_RDONLY 0
 #define O_CREAT 2
 #define O_APPEND 4
 #define pdMS_TO_TICKS(ms) (ms)
@@ -54,7 +55,17 @@ static int test_rename(const char *from,const char *to) {
     current_size=0;current_exists=false;return 0;
 }
 static int test_open(const char *path,int flags,int mode) {
-    filesystem();assert(!strcmp(path,SPIFFS_LOG_PATH));assert(flags==(O_WRONLY|O_CREAT|O_APPEND)&&mode==0600);
+    filesystem();
+#if YORADIO_ESP8266_SPIFFS_LOG_HTTP
+    if(flags==O_RDONLY) {
+        bool previous=!strcmp(path,SPIFFS_LOG_PREVIOUS_PATH);
+        assert(previous||!strcmp(path,SPIFFS_LOG_PATH));
+        if(fail_open){errno=EMFILE;return -1;}
+        if(previous?!previous_exists:!current_exists){errno=ENOENT;return -1;}
+        assert(!live_fd);live_fd=true;++opens;return previous?8:7;
+    }
+#endif
+    assert(!strcmp(path,SPIFFS_LOG_PATH));assert(flags==(O_WRONLY|O_CREAT|O_APPEND)&&mode==0600);
     if(fail_open){errno=EMFILE;return -1;}assert(!live_fd);live_fd=true;++opens;current_exists=true;return 7;
 }
 static ssize_t test_write(int fd,const void *data,size_t n) {
@@ -67,7 +78,7 @@ static ssize_t test_write(int fd,const void *data,size_t n) {
     memcpy(current_file+current_size,data,n);current_size+=n;return (ssize_t)n;
 }
 static int test_close(int fd) {
-    filesystem();assert(fd==7&&live_fd);live_fd=false;++closes;
+    filesystem();assert((fd==7||fd==8)&&live_fd);live_fd=false;++closes;
     if(fail_close){errno=EIO;return -1;}return 0;
 }
 #define stat test_stat
@@ -76,6 +87,14 @@ static int test_close(int fd) {
 #define open test_open
 #define write test_write
 #define close test_close
+#if YORADIO_ESP8266_SPIFFS_LOG_HTTP
+static int test_fstat(int fd,struct test_stat *st) {
+    filesystem();assert(live_fd&&(fd==7||fd==8));
+    if(fail_stat){errno=EIO;return -1;}
+    st->st_size=(int)(fd==7?current_size:previous_size);return 0;
+}
+#define fstat test_fstat
+#endif
 /* LOGGER_IMPLEMENTATION */
 #undef stat
 #undef unlink
@@ -140,6 +159,29 @@ int main(void) {
     before=opens;fail_close=false;emit("after fault\n");advance(60000);assert(opens==before);
 
     ready_empty();s_last_poll=UINT32_MAX-500;tick=499;emit("wrap\n");spiffs_log_poll();assert(!s_count);
+#if YORADIO_ESP8266_SPIFFS_LOG_HTTP
+    size_t length=99;
+    reset();assert(spiffs_log_read_open(false,&length)<0&&errno==EBUSY&&length==0&&!s_io_owner);
+    ready_empty();previous_exists=false;
+    assert(spiffs_log_read_open(true,&length)<0&&errno==ENOENT&&!s_io_owner);
+    current_size=9000;int fd=spiffs_log_read_open(false,&length);
+    assert(fd==7&&length==8192&&s_io_owner==current_task);
+    assert(spiffs_log_read_open(true,&length)<0&&errno==EBUSY&&s_io_owner==current_task);
+    current_task=(void *)2;emit("while reading\n");before=fs_calls;advance(1000);
+    assert(fs_calls==before&&s_count==14); // Writer must not rotate an open download.
+    current_task=(void *)1;assert(spiffs_log_read_close(fd)==0&&!s_io_owner&&opens==closes);
+    current_size=0;advance(1000);assert(s_count==0);
+    previous_exists=true;previous_size=321;
+    fd=spiffs_log_read_open(true,&length);assert(fd==8&&length==321);
+    assert(spiffs_log_read_close(fd)==0&&opens==closes);
+    for(unsigned i=0;i<2;++i) {
+        ready_empty();if(i)fail_stat=true;else fail_open=true;
+        assert(spiffs_log_read_open(false,&length)<0&&!s_io_owner&&opens==closes&&!live_fd);
+    }
+    ready_empty();fd=spiffs_log_read_open(false,&length);fail_close=true;
+    assert(spiffs_log_read_close(fd)<0&&s_storage_fault&&!s_io_owner&&opens==closes);
+    before=opens;assert(spiffs_log_read_open(false,&length)<0&&errno==EBUSY&&opens==before);
+#endif
     puts("SPIFFS log PASS: deferred/bounded/rotation/low-space/I-O failures/recursion/concurrency/tick-wrap");
     return 0;
 }

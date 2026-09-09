@@ -226,12 +226,16 @@ scripts once they are added rather than invoking a globally installed SDK.
 
 ## Optional local SPIFFS logging
 
-Optional local diagnostic logging: build with `-SpiffsLog` using
+Optional local diagnostic logging: build with `-Diagnostic -SpiffsLog` using
 `tools/esp8266_audio_profile/build_i2s_pdm_production.ps1`, or configure
-`-DYORADIO_ESP8266_SPIFFS_LOG=ON`. Default OFF; two bounded 8 KiB SPIFFS
+`-DYORADIO_ESP8266_DIAGNOSTIC=ON -DYORADIO_ESP8266_SPIFFS_LOG=ON`.
+Production has neither SPIFFS logging nor log HTTP routes. Diagnostic-only
+`-DYORADIO_ESP8266_SPIFFS_LOG_HTTP=ON` enables read-only `/api/native/log`
+and `/api/native/log/previous` downloads. Default OFF; two bounded 8 KiB SPIFFS
 files, a 512-byte RAM queue, deferred app-task writes, no new task/stack.
-UART output is preserved. No HTTP log access; retrieve later from a USB flash
-backup with the correct native SPIFFS format. Flash writes can disturb audio.
+UART output is preserved. HTTP reading additionally requires `-SpiffsLogHttp`;
+USB flash extraction with the native SPIFFS format remains available.
+Flash writes can disturb audio.
 See [configuration, limits and USB extraction](../../docs/ESP8266_SPIFFS_LOGGING.md).
 
 ## OTA-first updates with audio connected to RX

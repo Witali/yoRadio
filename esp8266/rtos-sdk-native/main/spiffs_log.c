@@ -65,6 +65,47 @@ void spiffs_log_get_status(spiffs_log_status_t *status) {
     taskEXIT_CRITICAL();
 }
 
+#if YORADIO_ESP8266_SPIFFS_LOG_HTTP
+int spiffs_log_read_close(int fd) {
+    int result = close(fd); /* Exactly once: VFS discards even a failed fd. */
+    taskENTER_CRITICAL();
+    if (result != 0) {
+        s_storage_fault = true;
+        if (s_io_errors != UINT32_MAX) ++s_io_errors;
+    }
+    s_io_owner = NULL;
+    taskEXIT_CRITICAL();
+    return result;
+}
+
+int spiffs_log_read_open(bool previous, size_t *length) {
+    *length = 0;
+    taskENTER_CRITICAL();
+    bool busy = !s_mounted || s_storage_fault || s_io_owner;
+    if (!busy) s_io_owner = xTaskGetCurrentTaskHandle();
+    taskEXIT_CRITICAL();
+    if (busy) { errno = EBUSY; return -1; }
+    /* Only two constant paths; no fopen/malloc or critical section over I/O. */
+    int fd = open(previous ? SPIFFS_LOG_PREVIOUS_PATH : SPIFFS_LOG_PATH, O_RDONLY, 0);
+    struct stat st;
+    if (fd >= 0 && fstat(fd, &st) == 0) {
+        if (st.st_size >= 0) {
+            *length = (size_t)st.st_size;
+            if (*length > SPIFFS_LOG_FILE_BYTES) *length = SPIFFS_LOG_FILE_BYTES;
+            return fd;
+        }
+        errno = EIO;
+    }
+    int saved_errno = errno;
+    if (fd >= 0) spiffs_log_read_close(fd);
+    else {
+        taskENTER_CRITICAL(); s_io_owner = NULL; taskEXIT_CRITICAL();
+    }
+    errno = saved_errno;
+    return -1;
+}
+#endif
+
 /* App-task only. Only the two named log files can be rotated/deleted. */
 static bool rotate_if_needed(size_t length) {
     struct stat st;
