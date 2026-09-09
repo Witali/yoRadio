@@ -3,6 +3,25 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-09: ESP8266 hardware audio-level LED
+
+- `development/esp8266-audio-level-led/app.bin`: ordinary native radio, source
+  `a98116e`, 764272 bytes; SHA-256
+  `562e1986f72097f33210fa85ce1e4a7350ef056522d24b051a43694915001517`.
+- GPIO2 module LED uses hardware sigma-delta at its minimum bit clock with
+  20-Hz envelope updates (10 Hz selectable at build time). No software PWM
+  ISR or new task. At most 64 post-gain mono frames are sampled per update;
+  this cosmetic indicator can miss transients between snapshots.
+- PDM32 audio remains on GPIO3, unchanged byte-for-byte in host reference
+  tests with LED hooks on/off. SPI and NoDAC I2S support the LED; conventional
+  external-DAC I2S disables it because GPIO2 is WS. Stereo profile synchronized.
+- +16 bytes static DRAM, no extra IRAM, +944 bytes application image versus
+  the previous SPIFFS-logging production image. Short WebUI audio pause and
+  local SPIFFS error logging retained. Built and host-tested, not flashed;
+  physical LED brightness and CPU time are not yet measured.
+- Final ESP8266 host regression: 257/257 passed, no skips. Includes LED tests
+  at 10/20 Hz and bit-exact PCM/PDM comparisons with LED hooks on/off.
+
 ## Maintenance - 2026-09-09: remove obsolete test images
 
 - Removed 54 test/experimental directories from `development/`: isolated

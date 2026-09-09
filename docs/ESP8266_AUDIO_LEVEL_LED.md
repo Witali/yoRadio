@@ -70,3 +70,37 @@ code with LED hooks enabled/disabled across PDM, RCPDM, feedback and simple
 variants. PCM, output bits, resampler state and DMA boundaries must match
 the existing reference. Physical brightness, RF coupling and CPU cost must
 still be checked on the board; host correctness tests cannot establish them.
+
+### Build measurements, 2026-09-09
+
+Production image `firmware/development/esp8266-audio-level-led/app.bin`, source
+`a98116e`, compared with the previous logging-enabled image (`4005e04`):
+
+| Section | Previous | LED enabled | Difference |
+| --- | ---: | ---: | ---: |
+| DRAM data | 1656 | 1656 | 0 |
+| DRAM BSS | 20368 | 20384 | +16 |
+| IRAM text + BSS + vectors | 27484 | 27484 | 0 |
+| Flash text | 533650 | 534566 | +916 |
+| Flash rodata | 204492 | 204520 | +28 |
+| Application binary | 763328 | 764272 | +944 |
+
+LX106 GCC disassembly confirms the usual PCM-block fast path contains only
+a flag load/barrier/test/branch, with no LED function call when capture is not
+requested. Pulse generation has no software handler. The LED object's state
+symbols total 11 bytes; linker alignment makes the DRAM delta 16 bytes.
+No board CPU percentage is claimed from these build/host results.
+
+The first full host run passed 256/257 cases and caught missing LED defaults
+in the explicit stereo profile. Those defaults were synchronized without
+changing codec/output algorithms; the seven profile/memory tests then passed.
+The final full run passed **257/257**, with no skips, in 113.16 seconds:
+
+```powershell
+$taskTests = @(rg --files tests -g 'esp8266*.test.js')
+node --test @taskTests
+```
+
+The four modulator variants each compared 1620 blocks / 351246 output words
+with the reference, both with LED hooks disabled and enabled. The artifact
+has not been installed on the board during this task.
