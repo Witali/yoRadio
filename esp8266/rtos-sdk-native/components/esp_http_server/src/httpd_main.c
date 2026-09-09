@@ -368,7 +368,10 @@ esp_err_t httpd_start(httpd_handle_t *handle, const httpd_config_t *config)
                                hd->config.stack_size,
                                hd->config.task_priority,
                                httpd_thread, hd) != ESP_OK) {
-        /* Failed to launch task */
+        /* No HTTP task exists to close the already-created sockets. */
+        close(hd->msg_fd);
+        cs_free_ctrl_sock(hd->ctrl_fd);
+        close(hd->listen_fd);
         httpd_delete(hd);
         return ESP_ERR_HTTPD_TASK;
     }

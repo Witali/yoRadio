@@ -72,6 +72,7 @@ esp_err_t httpd_register_uri_handler(httpd_handle_t handle,
             if (hd->hd_calls[i]->uri == NULL) {
                 /* Failed to allocate memory */
                 free(hd->hd_calls[i]);
+                hd->hd_calls[i] = NULL;
                 return ESP_ERR_HTTPD_ALLOC_MEM;
             }
 
@@ -147,6 +148,7 @@ void httpd_unregister_all_uri_handlers(struct httpd_data *hd)
 
             free((char*)hd->hd_calls[i]->uri);
             free(hd->hd_calls[i]);
+            hd->hd_calls[i] = NULL;
         }
     }
 }
