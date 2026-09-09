@@ -66,11 +66,13 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
   }
 });
 }
-test('network reconnect releases cached decoder before another handshake', () => {
+test('network reconnect keeps only Opus and still releases it for a cold open retry', () => {
   const audio=fs.readFileSync(path.resolve(__dirname,'../esp8266/rtos-sdk-native/main/audio_service.c'),'utf8');
   const start=audio.indexOf('if (feed == 0 && generation_current(command.generation))');
   assert.ok(start>=0);
   const recovery=audio.slice(start,audio.indexOf('continue;',start));
   assert.match(recovery,/release_codec\(&codec, &codec_kind, "stream reconnect"\)/);
+  assert.match(recovery,/#if CONFIG_YORADIO_OGG_OPUS\s+if \(codec_kind != HELIX_CODEC_OPUS \|\| stream_closed != 0\)\s+#endif\s+release_codec/);
   assert.ok(recovery.indexOf('release_codec')<recovery.indexOf('requeue_if_current'));
+  assert.match(audio,/opened = open_http_stream\(command.url, &stream\);\s+if \(opened == 0\) break;[\s\S]*release_codec\(&codec, &codec_kind, "connection retry"\)/);
 });

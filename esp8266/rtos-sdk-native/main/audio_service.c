@@ -1203,15 +1203,22 @@ static void audio_task(void *argument) {
             }
         }
         if (audio_web_pause_checkpoint(&stream, &command)) continue;
-        close(stream.socket);
+        int stream_closed = close(stream.socket);
+        (void)stream_closed;
         if (feed == 0 && generation_current(command.generation)) {
             ESP_LOGW(TAG,
                      "Radio stream ended or timed out; reconnecting (heap %u)",
                      (unsigned)esp_get_free_heap_size());
             native_audio_output_silence();
-            /* This is network recovery, not a successful user station switch.
-             * The old TCP PCB may still retain receive data while closing.
-             * Release decoder DRAM before starting another TCP handshake. */
+            /* Keep Opus's large DRAM blocks after a successful TCP close:
+             * rebuilding them after HTTP allocations can fail on fragmentation.
+             * The next failed open attempt releases the cached codec,
+             * so the existing second attempt still gets a cold handshake.
+             * Successful sniffing resets same-kind Opus without allocation;
+             * another codec kind still frees the old decoder before its init. */
+#if CONFIG_YORADIO_OGG_OPUS
+            if (codec_kind != HELIX_CODEC_OPUS || stream_closed != 0)
+#endif
             release_codec(&codec, &codec_kind, "stream reconnect");
             native_state_set_audio(false, true, "RECONNECTING");
             vTaskDelay(pdMS_TO_TICKS(250U));
