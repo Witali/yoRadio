@@ -29,3 +29,10 @@ buffer rejection. No observed errors does **not** prove there were no Wi-Fi drop
 drops before the SDK receive callback are outside this instrumentation. Counters
 wrap modulo 2^32 and are never reset on reconnect; compare beginning/end snapshots
 so outstanding old-stream pbufs do not cause false underflow or a misleading peak.
+
+The production builder exposes this diagnostic as `-Diagnostic -SdkRxDiag`.
+It explicitly selects OFF otherwise and records the boolean plus a hash of the
+copied SDK overlay manifest in the firmware artifact. `/api/native/audio` adds
+the eight named counters only with this flag, using the existing serialized
+1088-byte HTTP scratch. The health JSON host test covers both flags and maximum
+32-bit values with ASan/UBSan; no additional response heap allocation is needed.

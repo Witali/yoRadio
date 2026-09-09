@@ -15,17 +15,24 @@ test('health JSON preserves counters and gates transport fields without a stack 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opus-health-json-'));
   t.after(() => fs.rmSync(dir, {recursive: true, force: true}));
   fs.writeFileSync(path.join(dir, 'health_under_test.inc'), handler);
-  for (const stream of [0, 1]) for (const decodeOnly of [0, 1]) {
-    const binary = path.join(dir, `probe-${stream}-${decodeOnly}`);
+  for (const stream of [0, 1]) for (const decodeOnly of [0, 1]) for (const rxDiag of [0, 1]) {
+    const binary = path.join(dir, `probe-${stream}-${decodeOnly}-${rxDiag}`);
     execute('gcc', ['-O2', '-std=c11', '-Wall', '-Wextra', '-Werror', '-fsanitize=address,undefined',
       '-fno-sanitize-recover=all', '-fno-pie', '-no-pie',
       '-DYORADIO_ESP8266_OPUS_STREAM_TEST=' + stream,
       '-DYORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY=' + decodeOnly,
+      '-DYORADIO_ESP8266_SDK_RX_DIAG=' + rxDiag,
+      '-I' + hostPath(path.join(root, 'esp8266/rtos-sdk-native/main')),
       '-I' + hostPath(dir), hostPath(path.join(root, 'tests/native/esp8266_audio_health_json_test.c')), '-o', hostPath(binary)]);
     const result = JSON.parse(execute(hostPath(binary), []));
     assert.equal(result.output_enabled, !decodeOnly);
     assert.equal(result.generation, 0xffffffff);
     assert.equal(result.free_iram, 0xffffffff);
+    for (const field of ['rx_custom_fail', 'rx_enqueue_nomem', 'rx_enqueue_full',
+      'tx_transform_fail', 'tx_driver_fail', 'rx_custom_live', 'rx_custom_peak', 'rx_custom_total']) {
+      assert.equal(field in result, !!rxDiag);
+      if (rxDiag) assert.equal(result[field], 0xffffffff);
+    }
     for (const field of ['transport_phase', 'transport_result', 'transport_errno', 'input_bytes'])
       assert.equal(field in result, !!stream);
     if (stream) {

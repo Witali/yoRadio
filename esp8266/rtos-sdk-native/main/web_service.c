@@ -3,6 +3,7 @@
 #include "memory_profile.h"
 #include "spiffs_log.h"
 #include "json_text.h"
+#include "sdk_rx_diag.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -1119,6 +1120,10 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
     native_audio_output_spi_stats_t output;
     audio_service_health(&health);
     native_audio_output_get_spi_stats(&output);
+#if YORADIO_ESP8266_SDK_RX_DIAG
+    sdk_rx_diag_snapshot_t rx_diag;
+    sdk_rx_diag_snapshot(&rx_diag);
+#endif
     /* A decode-only build also produces PCM callbacks; it is not physical
      * playback and must never satisfy the continuity acceptance test. */
 #if YORADIO_ESP8266_AUDIO_PROFILE_DECODE_ONLY
@@ -1137,6 +1142,11 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
         ",\"transport_phase\":%u,\"transport_result\":%d,\"transport_errno\":%d,\"input_bytes\":%u"
 #endif
+#if YORADIO_ESP8266_SDK_RX_DIAG
+        ",\"rx_custom_fail\":%u,\"rx_enqueue_nomem\":%u,\"rx_enqueue_full\":%u"
+        ",\"tx_transform_fail\":%u,\"tx_driver_fail\":%u"
+        ",\"rx_custom_live\":%u,\"rx_custom_peak\":%u,\"rx_custom_total\":%u"
+#endif
         "}",
         (unsigned)health.generation, (unsigned)health.uptime_ms,
         (unsigned)health.rx_bytes, (unsigned)health.pcm_frames,
@@ -1149,6 +1159,12 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
         , (unsigned)health.transport_phase, (int)health.transport_result,
         (int)health.transport_errno, (unsigned)health.input_bytes
+#endif
+#if YORADIO_ESP8266_SDK_RX_DIAG
+        , (unsigned)rx_diag.rx_custom_fail, (unsigned)rx_diag.rx_enqueue_nomem,
+        (unsigned)rx_diag.rx_enqueue_full, (unsigned)rx_diag.tx_transform_fail,
+        (unsigned)rx_diag.tx_driver_fail, (unsigned)rx_diag.rx_custom_live,
+        (unsigned)rx_diag.rx_custom_peak, (unsigned)rx_diag.rx_custom_total
 #endif
     );
     httpd_resp_set_type(request, "application/json; charset=utf-8");

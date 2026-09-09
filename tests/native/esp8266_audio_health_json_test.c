@@ -4,6 +4,10 @@
 #include <string.h>
 #include <assert.h>
 #include <limits.h>
+#include "sdk_rx_diag.h"
+#if YORADIO_ESP8266_SDK_RX_DIAG
+void sdk_rx_diag_snapshot(sdk_rx_diag_snapshot_t *s) { memset(s, 0xff, sizeof(*s)); }
+#endif
 typedef int esp_err_t;
 typedef struct { int unused; } httpd_req_t;
 typedef struct {
