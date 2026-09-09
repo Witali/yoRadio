@@ -44,7 +44,8 @@ the SDK register definitions. It does not change I2S, SLC-DMA, UART or their
 interrupts. No other component may use this global sigma-delta generator.
 
 The raw target is a high-level density out of 256, inverted for this LED.
-Prescaler 255 gives a 312.5-kHz bit clock from 80 MHz; pulse repetition varies
+Prescaler 255 is the largest hardware divider, giving the minimum 312.5-kHz
+bit clock from 80 MHz; pulse repetition varies
 with density (minimum about 1.22 kHz), rather than classic constant-period
 PWM. Exact off/full brightness bypass modulation and use normal GPIO levels.
 Software does not service individual pulses.
@@ -52,7 +53,8 @@ Software does not service individual pulses.
 References: [Espressif TRM, GPIO/I2S/UART and register appendix](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf),
 [SDK PWM interrupt implementation](https://docs.espressif.com/projects/esp8266-rtos-sdk/en/latest/api-guides/pwm-and-sniffer-coexists.html),
 [NodeMCU sigma-delta target/timing documentation](https://nodemcu.readthedocs.io/en/release/modules/sigma-delta/).
-The raw unsigned target convention follows the working NodeMCU interface;
+The raw unsigned target convention follows the working NodeMCU interface and
+[its register driver](https://github.com/nodemcu/nodemcu-firmware/blob/release/app/driver/sigma_delta.c);
 the TRM's description calls the target byte signed.
 
 ## Verification
