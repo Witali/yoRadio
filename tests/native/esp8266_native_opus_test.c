@@ -95,6 +95,36 @@ static void test_memory(void) {
     c=config();c.decoder_state=&decoder;assert(native_opus_init(&decoder,&c)==NATIVE_OPUS_ERR_MEMORY);
     init();size_t used=12;assert(native_opus_feed(&decoder,NULL,1,&used)==NATIVE_OPUS_ERR_ARGUMENT && used==0);
 }
+static void test_alignment(void) {
+    /* Four-byte addresses are valid for word scratch/history, including on
+     * 64-bit hosts; state additionally contains native pointers. */
+    for(size_t offset=1;offset<8;++offset) {
+        native_opus_config_t c=config();
+        c.decoder_state=state.bytes+offset;c.decoder_state_bytes-=offset;
+        const bool state_aligned=offset%sizeof(void*)==0 && offset%4==0;
+        assert(native_opus_init(&decoder,&c)==(state_aligned?0:NATIVE_OPUS_ERR_MEMORY));
+        c=config();c.scratch=scratch.bytes+offset;
+        assert(native_opus_init(&decoder,&c)==(offset%4?NATIVE_OPUS_ERR_MEMORY:0));
+        c=config();c.iram=iram.bytes+offset;
+        assert(native_opus_init(&decoder,&c)==(offset%4?NATIVE_OPUS_ERR_MEMORY:0));
+    }
+    memset(scratch.bytes,0xa5,sizeof(scratch.bytes));
+    memset(iram.bytes,0xa5,sizeof(iram.bytes));
+    native_opus_config_t c=config();c.scratch=scratch.bytes+4;c.iram=iram.bytes+4;
+    calls=received=0;cancel=false;
+    assert(native_opus_init(&decoder,&c)==0);
+    stream_size=0;headers(13,1,1,0,0,0,19);
+    const uint8_t silk_dtx=0x08,hybrid_dtx=0x68;
+    one(13,2,0,960,&silk_dtx,1);one(13,3,0,1920,&hybrid_dtx,1);
+    one(13,4,4,2880,silence,sizeof(silence));
+    assert(feed_all(7)==0 && received==2880);
+    assert(native_opus_reset(&decoder)==0);
+    assert(feed_all(7)==0 && received==5760 && calls==6);
+    for(size_t i=0;i<4;++i) {
+        assert(scratch.bytes[i]==0xa5 && scratch.bytes[4+c.scratch_bytes+i]==0xa5);
+        assert(iram.bytes[i]==0xa5 && iram.bytes[4+c.iram_bytes+i]==0xa5);
+    }
+}
 static void test_headers(void) {
     const unsigned ch[]={0,3,1,1,1},version[]={1,1,16,1,1},mapping[]={0,0,0,1,0};
     const size_t sizes[]={19,19,19,19,20};
@@ -167,7 +197,7 @@ static void test_chains(void) {
     assert(gain==512 && decoder.input_channels==2 && decoder.pre_skip==240);
 }
 int main(void) {
-    test_memory();test_headers();test_granules();test_failures();test_chains();
+    test_memory();test_alignment();test_headers();test_granules();test_failures();test_chains();
     assert(allocation_count==0);
     printf("Native Opus PASS: state=%zu adapter=%zu PCM=%zu no allocations\n",native_opus_decoder_size(),sizeof(decoder),sizeof(pcm));
     return 0;

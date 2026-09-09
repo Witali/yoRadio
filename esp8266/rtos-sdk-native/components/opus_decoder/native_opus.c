@@ -2,6 +2,7 @@
 #include "opus.h"
 #include "opus_memory.h"
 
+#include <stddef.h>
 #include <string.h>
 
 static uint16_t read16(const uint8_t *p) {
@@ -24,12 +25,17 @@ size_t native_opus_decoder_size(void) {
 }
 
 static bool valid_memory(native_opus_t *s, const native_opus_config_t *c) {
+    /* Match libopus's state alignment without requiring C11 alignof. Decoder
+     * scratch contains at most 32-bit scalars (FFT pairs are two int32s), not
+     * pointers or int64s; the SDK's four-byte-aligned arenas are sufficient. */
+    struct state_alignment { char byte; union { void *pointer; opus_int32 word; } value; };
+    const size_t state_alignment = offsetof(struct state_alignment, value);
     if (!c->decoder_state || !c->scratch || !c->iram || !c->pcm || !c->output ||
         c->decoder_state_bytes < native_opus_decoder_size() ||
         !c->scratch_bytes || c->iram_bytes < NATIVE_OPUS_IRAM_BYTES ||
         c->pcm_samples < NATIVE_OPUS_MAX_SAMPLES ||
-        ((uintptr_t)c->decoder_state & 7u) || ((uintptr_t)c->scratch & 7u) ||
-        ((uintptr_t)c->iram & 7u) || ((uintptr_t)c->pcm & 1u)) return false;
+        ((uintptr_t)c->decoder_state % state_alignment) || ((uintptr_t)c->scratch & 3u) ||
+        ((uintptr_t)c->iram & 3u) || ((uintptr_t)c->pcm & 1u)) return false;
     const uintptr_t bases[] = {(uintptr_t)s, (uintptr_t)c->decoder_state,
         (uintptr_t)c->scratch, (uintptr_t)c->iram, (uintptr_t)c->pcm};
     const size_t sizes[] = {sizeof(*s), c->decoder_state_bytes,

@@ -76,8 +76,9 @@ typedef struct {
 } native_opus_t;
 
 size_t native_opus_decoder_size(void);
-/* State/scratch/IRAM must be 8-byte aligned, PCM 2-byte aligned. All five
- * buffers (including this object) must be disjoint. IRAM has 16 KiB usable
+/* State must be aligned for native pointers and int32_t (4 bytes on ESP8266,
+ * 8 on 64-bit hosts); scratch/IRAM need 4-byte alignment, PCM 2-byte alignment.
+ * All five buffers (including this object) must be disjoint. IRAM has 16 KiB usable
  * capacity; extra supplied bytes are not used. Insufficient scratch during
  * decoding returns ERR_MEMORY, resets codec state and latches the error. */
 int native_opus_init(native_opus_t *decoder, const native_opus_config_t *config);
