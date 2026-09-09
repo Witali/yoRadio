@@ -67,7 +67,11 @@ static int mock_recv(int fd, void *destination, size_t capacity, int flags) {
     memcpy(destination, reply + read_offset, size); read_offset += size;
     return (int)size;
 }
-static bool send_all(int fd, const char *text) { (void)fd; (void)text; return !fail_send; }
+static bool send_all(int fd, const char *text) {
+    (void)fd; (void)text;
+    if (fail_send) errno = ENOMEM;
+    return !fail_send;
+}
 static bool send_all_bytes(int fd, const char *text, size_t size) {
     (void)size; return send_all(fd, text);
 }
@@ -135,6 +139,8 @@ static int open_cases(void) {
         char url[AUDIO_URL_BYTES] = "http://radio.invalid/live";
         http_stream_t stream = empty_stream();
         CHECK(open_http_stream(url, &stream) == cases[i].result);
+        if (cases[i].result == -4)
+            CHECK(errno == (cases[i].reply ? ECONNRESET : ETIMEDOUT));
         CHECK(stream.socket == (cases[i].result == 0 ? last_fd : -1));
         caller_cleanup(stream);
         CHECK(closes == 1 && closed_web == 0);
@@ -143,6 +149,7 @@ static int open_cases(void) {
     char url[AUDIO_URL_BYTES] = "http://radio.invalid/live";
     http_stream_t stream = empty_stream();
     CHECK(open_http_stream(url, &stream) == -3 && stream.socket == -1);
+    CHECK(errno == ENOMEM); /* close() must not hide the allocation failure. */
     caller_cleanup(stream); CHECK(closes == 1 && closed_web == 0);
 
     reset(); read_step = 1;

@@ -300,12 +300,18 @@ static int connect_http(uint16_t port) {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     struct addrinfo *addresses = NULL;
-    if (getaddrinfo(s_host, port_text, &hints, &addresses) != 0) return -1;
+    int dns_error = getaddrinfo(s_host, port_text, &hints, &addresses);
+    if (dns_error != 0) {
+        ESP_LOGE(TAG, "Stream DNS failed: %d, heap %u", dns_error,
+                 (unsigned)esp_get_free_heap_size());
+        return -1;
+    }
     int socket_fd = -1;
+    int saved_error = 0;
     for (struct addrinfo *address = addresses; address; address = address->ai_next) {
         socket_fd = socket(address->ai_family, address->ai_socktype,
                            address->ai_protocol);
-        if (socket_fd < 0) continue;
+        if (socket_fd < 0) { saved_error = errno; continue; }
         set_socket_timeout(socket_fd, SO_RCVTIMEO,
                            SOCKET_CONNECT_TIMEOUT_MS);
         set_socket_timeout(socket_fd, SO_SNDTIMEO,
@@ -320,10 +326,12 @@ static int connect_http(uint16_t port) {
                 fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK) == 0)
                 break;
         }
+        saved_error = errno;
         close(socket_fd);
         socket_fd = -1;
     }
     freeaddrinfo(addresses);
+    if (socket_fd < 0) errno = saved_error;
     return socket_fd;
 }
 
@@ -498,7 +506,9 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                     send_all(socket_fd, "Icy-MetaData: 1\r\n") &&
                     send_all(socket_fd, "Connection: keep-alive\r\n\r\n");
         if (!sent) {
+            int saved_error = errno;
             close(socket_fd);
+            errno = saved_error;
             return -3;
         }
         size_t received_total = 0;
@@ -530,7 +540,11 @@ static int open_http_stream(char *url, http_stream_t *stream) {
                      "Profile header RX failed: received=%d total=%u errno=%d",
                      received, (unsigned)received_total, errno);
 #endif
+            int saved_error = received == 0 ? ECONNRESET : errno;
+            if (saved_error == EAGAIN || saved_error == EWOULDBLOCK)
+                saved_error = ETIMEDOUT;
             close(socket_fd);
+            errno = saved_error;
             return -4;
         }
         if (!header_size)
@@ -1025,8 +1039,9 @@ static void audio_task(void *argument) {
             opened = open_http_stream(command.url, &stream);
             if (opened == 0) break;
             if (attempt + 1U < HTTP_OPEN_ATTEMPTS) {
-                ESP_LOGW(TAG, "Stream open attempt %u failed: %d",
-                         attempt + 1U, opened);
+                ESP_LOGE(TAG, "Stream open attempt %u failed: stage %d errno %d heap %u",
+                         attempt + 1U, opened, errno,
+                         (unsigned)esp_get_free_heap_size());
                 vTaskDelay(pdMS_TO_TICKS(250U));
             }
         }
@@ -1034,8 +1049,8 @@ static void audio_task(void *argument) {
         if (opened != 0 || !generation_current(command.generation)) {
             if (stream.socket >= 0) close(stream.socket);
             if (generation_current(command.generation)) {
-                ESP_LOGW(TAG, "Open stream failed: %d (errno %d)",
-                         opened, errno);
+                ESP_LOGE(TAG, "Open stream failed: stage %d errno %d heap %u",
+                         opened, errno, (unsigned)esp_get_free_heap_size());
                 native_state_set_audio(false, false,
                     opened == -7 ? "HTTPS NOT SUPPORTED" : "CONNECTION ERROR");
                 network_service_set_streaming(false);
