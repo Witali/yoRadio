@@ -15,6 +15,149 @@ bool http_stream_idle_expired(uint32_t now, uint32_t last, uint32_t timeout) {
 #include <strings.h>
 #endif
 
+enum {
+    RESPONSE_STATUS = 1, RESPONSE_DONE = 2, RESPONSE_CR = 4,
+    RESPONSE_LINE = 8, RESPONSE_TRANSFER = 16, RESPONSE_CHUNKED = 32,
+    RESPONSE_UNSUPPORTED = 64, RESPONSE_ERROR = 128,
+};
+
+void http_response_header_init(http_response_header_t *parser) {
+    memset(parser, 0, sizeof(*parser));
+}
+
+static bool response_u32(const char *value, uint32_t *result) {
+    if (!*value) return false;
+    uint32_t parsed = 0;
+    for (; *value; ++value) {
+        if (*value < '0' || *value > '9') return false;
+        unsigned digit = (unsigned)(*value - '0');
+        if (parsed > (UINT32_MAX - digit) / 10U) return false;
+        parsed = parsed * 10U + digit;
+    }
+    *result = parsed;
+    return true;
+}
+
+static bool response_status(http_response_header_t *parser, const char *line) {
+    size_t length = parser->line_bytes, start;
+    if (length >= 7U && memcmp(line, "ICY ", 4) == 0) start = 4;
+    else if (length >= 12U && memcmp(line, "HTTP/1.", 7) == 0 &&
+             line[7] >= '0' && line[7] <= '9' && line[8] == ' ') start = 9;
+    else return false;
+    if (line[start] < '1' || line[start] > '5' ||
+        line[start + 1] < '0' || line[start + 1] > '9' ||
+        line[start + 2] < '0' || line[start + 2] > '9' ||
+        (length > start + 3U && line[start + 3] != ' ')) return false;
+    parser->status = (uint16_t)((line[start] - '0') * 100 +
+        (line[start + 1] - '0') * 10 + line[start + 2] - '0');
+    parser->flags |= RESPONSE_STATUS;
+    return true;
+}
+
+static bool response_field(http_response_header_t *parser, char *line,
+                            char *redirect, size_t redirect_capacity) {
+    char *colon = strchr(line, ':');
+    if (!colon || colon == line) return false;
+    for (char *cursor = line; cursor < colon; ++cursor) {
+        unsigned char c = (unsigned char)*cursor;
+        if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+              (c >= '0' && c <= '9') || strchr("!#$%&'*+-.^_`|~", c)))
+            return false;
+    }
+    *colon++ = '\0';
+    while (*colon == ' ' || *colon == '\t') ++colon;
+    char *end = colon + strlen(colon);
+    while (end > colon && (end[-1] == ' ' || end[-1] == '\t')) --end;
+    *end = '\0';
+    if (strcasecmp(line, "icy-metaint") == 0)
+        return response_u32(colon, &parser->metadata_interval);
+    if (strcasecmp(line, "icy-br") == 0)
+        return response_u32(colon, &parser->bitrate);
+    if (strcasecmp(line, "location") == 0) {
+        size_t size = (size_t)(end - colon);
+        if (size >= redirect_capacity) return false;
+        memcpy(redirect, colon, size + 1U);
+    } else if (strcasecmp(line, "transfer-encoding") == 0) {
+        /* Only one chunked coding is implemented, not gzip or stacked codings. */
+        if ((parser->flags & RESPONSE_TRANSFER) ||
+            !http_stream_header_has_token(colon, "chunked") ||
+            strcasecmp(colon, "chunked") != 0)
+            parser->flags |= RESPONSE_UNSUPPORTED;
+        else parser->flags |= RESPONSE_CHUNKED;
+        parser->flags |= RESPONSE_TRANSFER;
+    }
+    return true;
+}
+
+int http_response_header_feed(http_response_header_t *parser,
+    uint8_t *line, size_t line_capacity, const uint8_t *input, size_t length,
+    size_t *consumed, char *redirect, size_t redirect_capacity) {
+    if (consumed) *consumed = 0;
+    if (!parser || !line || line_capacity < 2U || (!input && length) ||
+        !consumed || !redirect || !redirect_capacity || parser->line_bytes >= line_capacity)
+        return HTTP_RESPONSE_HEADER_ERROR;
+    if (parser->flags & RESPONSE_ERROR) return HTTP_RESPONSE_HEADER_ERROR;
+    if (parser->flags & RESPONSE_DONE) return HTTP_RESPONSE_HEADER_DONE;
+    for (size_t index = 0; index < length; ++index) {
+        unsigned char c = input[index];
+        *consumed = index + 1U;
+        if (parser->total_bytes >= HTTP_RESPONSE_HEADER_MAX_BYTES) goto invalid;
+        ++parser->total_bytes;
+        if (parser->flags & RESPONSE_CR) {
+            if (c != '\n') goto invalid;
+            parser->flags &= (uint8_t)~RESPONSE_CR;
+        } else if (c == '\r') {
+            parser->flags |= RESPONSE_CR;
+            continue;
+        }
+        if (c == '\n') {
+            line[parser->line_bytes] = '\0';
+            if (!(parser->flags & RESPONSE_STATUS)) {
+                if (!response_status(parser, (const char *)line)) goto invalid;
+                parser->line_bytes = 0;
+            } else if (!parser->line_bytes || (parser->flags & RESPONSE_LINE)) {
+                if (parser->line_bytes &&
+                    !response_field(parser, (char *)line, redirect, redirect_capacity)) goto invalid;
+                parser->line_bytes = 0;
+                parser->flags |= RESPONSE_DONE;
+                return HTTP_RESPONSE_HEADER_DONE;
+            } else parser->flags |= RESPONSE_LINE;
+            continue;
+        }
+        if (!c || c == 127U || (c < 32U && c != '\t')) goto invalid;
+        if (parser->flags & RESPONSE_LINE) {
+            parser->flags &= (uint8_t)~RESPONSE_LINE;
+            if (c == ' ' || c == '\t') {
+                /* RFC 9112 5.2: unfold before field interpretation. */
+                c = ' ';
+            } else {
+                /* A following recv may have overwritten the prior terminator
+                 * at line_bytes. c is already saved before restoring it. */
+                line[parser->line_bytes] = '\0';
+                if (!response_field(parser, (char *)line, redirect, redirect_capacity)) goto invalid;
+                parser->line_bytes = 0;
+            }
+        }
+        if (parser->line_bytes >= HTTP_RESPONSE_HEADER_MAX_LINE ||
+            parser->line_bytes >= line_capacity - 1U) goto invalid;
+        line[parser->line_bytes++] = c;
+    }
+    return HTTP_RESPONSE_HEADER_MORE;
+invalid:
+    parser->flags |= RESPONSE_ERROR;
+    return HTTP_RESPONSE_HEADER_ERROR;
+}
+
+bool http_response_header_finished(const http_response_header_t *parser) {
+    return parser && (parser->flags & (RESPONSE_DONE | RESPONSE_ERROR)) == RESPONSE_DONE;
+}
+bool http_response_header_chunked(const http_response_header_t *parser) {
+    return (parser->flags & RESPONSE_CHUNKED) != 0;
+}
+bool http_response_header_unsupported_transfer(const http_response_header_t *parser) {
+    return (parser->flags & RESPONSE_UNSUPPORTED) != 0;
+}
+
 static bool append_bytes(char *output, size_t output_size, size_t *used,
                          const char *data, size_t length) {
     if (!output || !used || !data || *used >= output_size ||

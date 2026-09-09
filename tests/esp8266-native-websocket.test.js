@@ -255,10 +255,10 @@ test("ESP8266 reconnects a clean radio EOF unless control changed", () => {
     audioSource.indexOf("static uint32_t advance_generation"));
   assert.match(retry, /taskENTER_CRITICAL\(\);\s+if \(generation_current\(command->generation\)\)\s+xQueueOverwrite\(s_commands, command\);\s+taskEXIT_CRITICAL\(\);/);
 });
-test("ESP8266 radio checks a header that exactly fills its receive buffer", () => {
+test("ESP8266 radio incrementally reuses the header buffer and preserves the body prefix", () => {
   assert.match(
     audioSource,
-    /while \(received_total < sizeof\(s_work\) - 1U[\s\S]*if \(!header_size\)\s*find_header_end\(s_work, received_total, &header_size\);[\s\S]*if \(!header_size\)/,
+    /while \(!http_response_header_finished\(&headers\)\)[\s\S]*sizeof\(s_work\) - input_start[\s\S]*http_response_header_feed[\s\S]*body_size = \(size_t\)received - consumed;[\s\S]*memmove\(s_work, s_work \+ input_start \+ consumed, body_size\)/,
   );
 });
 

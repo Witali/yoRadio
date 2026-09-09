@@ -401,75 +401,6 @@ static bool send_all_bytes(int socket_fd, const char *data, size_t length) {
 static bool send_all(int socket_fd, const char *text) {
     return send_all_bytes(socket_fd, text, strlen(text));
 }
-static uint8_t *find_header_end(uint8_t *data, size_t size,
-                                size_t *header_size) {
-    for (size_t index = 0; index + 3 < size; ++index) {
-        if (data[index] == '\r' && data[index + 1] == '\n' &&
-            data[index + 2] == '\r' && data[index + 3] == '\n') {
-            *header_size = index + 4;
-            return data + index;
-        }
-    }
-    for (size_t index = 0; index + 1 < size; ++index) {
-        if (data[index] == '\n' && data[index + 1] == '\n') {
-            *header_size = index + 2;
-            return data + index;
-        }
-    }
-    return NULL;
-}
-
-static int parse_headers(size_t header_size, char *redirect,
-                         size_t redirect_size, uint32_t *metadata_interval,
-                         uint32_t *bitrate, bool *chunked,
-                         bool *unsupported_transfer) {
-    s_work[header_size - 1] = '\0';
-    char *cursor = (char *)s_work;
-    char *line_end = strchr(cursor, '\n');
-    if (!line_end) return -1;
-    *line_end = '\0';
-    int status = 0;
-    if (strncmp(cursor, "ICY ", 4) == 0)
-        status = atoi(cursor + 4);
-    else {
-        char *space = strchr(cursor, ' ');
-        if (space) status = atoi(space + 1);
-    }
-    cursor = line_end + 1;
-    while (cursor < (char *)s_work + header_size) {
-        line_end = strchr(cursor, '\n');
-        if (!line_end) break;
-        *line_end = '\0';
-        size_t length = strlen(cursor);
-        if (length && cursor[length - 1] == '\r') cursor[--length] = '\0';
-        char *colon = strchr(cursor, ':');
-        if (colon) {
-            *colon++ = '\0';
-            while (*colon == ' ' || *colon == '\t') ++colon;
-            char *value_end = colon + strlen(colon);
-            while (value_end > colon &&
-                   (value_end[-1] == ' ' || value_end[-1] == '\t'))
-                *--value_end = '\0';
-            if (strcasecmp(cursor, "icy-metaint") == 0)
-                *metadata_interval = strtoul(colon, NULL, 10);
-            else if (strcasecmp(cursor, "icy-br") == 0)
-                *bitrate = strtoul(colon, NULL, 10);
-            else if (strcasecmp(cursor, "transfer-encoding") == 0) {
-                if (http_stream_header_has_token(colon, "chunked") &&
-                    strcasecmp(colon, "chunked") == 0)
-                    *chunked = true;
-                else
-                    *unsupported_transfer = true;
-            } else if (strcasecmp(cursor, "location") == 0) {
-                strncpy(redirect, colon, redirect_size - 1);
-                redirect[redirect_size - 1] = '\0';
-            }
-        }
-        cursor = line_end + 1;
-    }
-    return status;
-}
-
 static int stream_receive(http_stream_t *stream, uint8_t *destination,
                           size_t capacity) {
     while (true) {
@@ -506,7 +437,7 @@ static int stream_receive(http_stream_t *stream, uint8_t *destination,
     }
 }
 
-/* Keep the two redirect URL buffers off audio_task's persistent frame:
+/* Keep redirect URL scratch off audio_task's persistent frame:
  * HTTP setup finishes before the nested codec decode path needs its stack. */
 __attribute__((noinline))
 static int open_http_stream(char *url, http_stream_t *stream) {
@@ -533,21 +464,43 @@ static int open_http_stream(char *url, http_stream_t *stream) {
             errno = saved_error;
             return -3;
         }
-        size_t received_total = 0;
-        size_t header_size = 0;
+        char redirect_url[AUDIO_URL_BYTES];
+        redirect_url[0] = '\0';
+        http_response_header_t headers;
+        http_response_header_init(&headers);
+        size_t body_size = 0;
         int64_t header_deadline =
             esp_timer_get_time() + HTTP_HEADER_TIMEOUT_MS * 1000LL;
-        while (received_total < sizeof(s_work) - 1U &&
-               !find_header_end(s_work, received_total, &header_size)) {
-            int received = recv(socket_fd, s_work + received_total,
-                                sizeof(s_work) - 1U - received_total, 0);
+        while (!http_response_header_finished(&headers)) {
+            /* The deadline also bounds continuously readable trickle headers,
+             * not only EAGAIN. No allocation or second receive buffer. */
+            if (esp_timer_get_time() >= header_deadline) {
+                close(socket_fd);
+                errno = ETIMEDOUT;
+                return -4;
+            }
+            size_t input_start = headers.line_bytes;
+            int received = recv(socket_fd, s_work + input_start,
+                                sizeof(s_work) - input_start, 0);
             if (received > 0) {
 #if YORADIO_ESP8266_AUDIO_PROFILE
-                if (!received_total)
+                if (!headers.total_bytes)
                     ESP_LOGI(TAG, "Profile header RX started: %d bytes",
                              received);
 #endif
-                received_total += (size_t)received;
+                size_t consumed = 0;
+                int parsed = http_response_header_feed(&headers,
+                    s_work, sizeof(s_work), s_work + input_start,
+                    (size_t)received, &consumed, redirect_url, sizeof(redirect_url));
+                if (parsed == HTTP_RESPONSE_HEADER_ERROR) {
+                    close(socket_fd);
+                    errno = EPROTO;
+                    return -5;
+                }
+                if (parsed == HTTP_RESPONSE_HEADER_DONE) {
+                    body_size = (size_t)received - consumed;
+                    memmove(s_work, s_work + input_start + consumed, body_size);
+                }
                 continue;
             }
             if (received < 0 && errno == EINTR) continue;
@@ -560,7 +513,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
 #if YORADIO_ESP8266_AUDIO_PROFILE
             ESP_LOGW(TAG,
                      "Profile header RX failed: received=%d total=%u errno=%d",
-                     received, (unsigned)received_total, errno);
+                     received, (unsigned)headers.total_bytes, errno);
 #endif
             int saved_error = received == 0 ? ECONNRESET : errno;
             if (saved_error == EAGAIN || saved_error == EWOULDBLOCK)
@@ -569,33 +522,17 @@ static int open_http_stream(char *url, http_stream_t *stream) {
             errno = saved_error;
             return -4;
         }
-        if (!header_size)
-            find_header_end(s_work, received_total, &header_size);
-        if (!header_size) {
-            close(socket_fd);
-            return -5;
-        }
-        char redirect_url[AUDIO_URL_BYTES];
-        redirect_url[0] = '\0';
-        uint32_t metadata_interval = 0;
-        uint32_t bitrate = 0;
-        bool chunked = false;
-        bool unsupported_transfer = false;
-        int status = parse_headers(header_size, redirect_url,
-                                   sizeof(redirect_url), &metadata_interval,
-                                   &bitrate, &chunked,
-                                   &unsupported_transfer);
-        size_t body_size = received_total - header_size;
-        memmove(s_work, s_work + header_size, body_size);
+        int status = headers.status;
+        bool chunked = http_response_header_chunked(&headers);
         if (status >= 200 && status < 300) {
-            if (unsupported_transfer) {
+            if (http_response_header_unsupported_transfer(&headers)) {
                 close(socket_fd);
                 errno = EPROTO;
                 return -9;
             }
             stream->last_receive_tick = xTaskGetTickCount();
-            stream->metadata_interval = metadata_interval;
-            stream->advertised_bitrate = bitrate;
+            stream->metadata_interval = headers.metadata_interval;
+            stream->advertised_bitrate = headers.bitrate;
             stream->chunked = chunked;
             http_chunk_decoder_init(&stream->chunk_decoder);
             if (chunked &&
@@ -610,7 +547,7 @@ static int open_http_stream(char *url, http_stream_t *stream) {
              * On failure the caller must not retain a closed/reused fd. */
             stream->socket = socket_fd;
             ESP_LOGI(TAG, "Stream response %d, ICY interval %u%s", status,
-                     (unsigned)metadata_interval,
+                     (unsigned)headers.metadata_interval,
                      chunked ? ", chunked" : "");
             return 0;
         }
@@ -619,11 +556,12 @@ static int open_http_stream(char *url, http_stream_t *stream) {
              status != 307 && status != 308) || !redirect_url[0] ||
             redirect_count == HTTP_MAX_REDIRECTS)
             return -6;
-        char resolved[AUDIO_URL_BYTES];
-        if (!http_stream_resolve_redirect(url, redirect_url, resolved,
-                                          sizeof(resolved)))
+        /* A redirect discards its body, so the existing receive scratch can
+         * resolve Location without another 512-byte stack buffer. */
+        if (!http_stream_resolve_redirect(url, redirect_url, (char *)s_work,
+                                          AUDIO_URL_BYTES))
             return -7;
-        memcpy(url, resolved, strlen(resolved) + 1U);
+        memcpy(url, s_work, strlen((char *)s_work) + 1U);
     }
     return -8;
 }

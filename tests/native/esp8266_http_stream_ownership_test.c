@@ -32,6 +32,7 @@ static unsigned fail_connect;
 static int64_t clock_us;
 static const char *replies[4];
 static size_t read_offset, read_step;
+static unsigned read_cost_us;
 static const char *reply;
 static TickType_t xTaskGetTickCount(void) { return (TickType_t)(clock_us / 1000); }
 static int64_t esp_timer_get_time(void) { return clock_us; }
@@ -65,6 +66,7 @@ static int mock_recv(int fd, void *destination, size_t capacity, int flags) {
     size_t size = remaining < capacity ? remaining : capacity;
     if (read_step && size > read_step) size = read_step;
     memcpy(destination, reply + read_offset, size); read_offset += size;
+    clock_us += read_cost_us;
     return (int)size;
 }
 static bool send_all(int fd, const char *text) {
@@ -87,7 +89,7 @@ static void reset(void) {
     for (size_t i = 0; i < sizeof(replies)/sizeof(replies[0]); ++i) replies[i] = NULL;
     closes = connects = closed_web = 0; last_fd = -1;
     fail_connect = 0; fail_send = false; reuse_closed = true;
-    clock_us = 0; read_step = 0; errno = 0;
+    clock_us = 0; read_step = 0; read_cost_us = 0; errno = 0;
 }
 static http_stream_t empty_stream(void) {
     http_stream_t stream;
@@ -162,7 +164,30 @@ static int open_cases(void) {
     caller_cleanup(stream); CHECK(closes == 2 && closed_web == 0);
     return 0;
 }
+static int wide_headers(void) {
+    char wire[8192];
+    size_t used = (size_t)snprintf(wire, sizeof(wire), "HTTP/1.1 200 OK\r\n");
+    for (unsigned n = 0; n < 60; ++n)
+        used += (size_t)snprintf(wire + used, sizeof(wire) - used,
+            "X-Icy-Description-%u: harmless aggregate padding for a long station response\r\n", n);
+    used += (size_t)snprintf(wire + used, sizeof(wire) - used,
+        "Icy-Br: 56\r\nIcy-Metaint: 4096\r\n\r\nOggSbody");
+    CHECK(used > sizeof(s_work) && used < sizeof(wire));
+    reset(); replies[0] = wire;
+    char url[AUDIO_URL_BYTES] = "http://radio.invalid/opus.opus";
+    http_stream_t stream = empty_stream();
+    CHECK(open_http_stream(url, &stream) == 0);
+    CHECK(stream.advertised_bitrate == 56 && stream.metadata_interval == 4096);
+    CHECK(stream.body_size == 8 && !memcmp(s_work, "OggSbody", 8));
+    caller_cleanup(stream); CHECK(closes == 1 && !closed_web);
+    /* A sender cannot defeat the overall deadline by staying readable. */
+    reset(); replies[0] = wire; read_step = 1; read_cost_us = 1000000;
+    stream = empty_stream();
+    CHECK(open_http_stream(url, &stream) == -4 && errno == ETIMEDOUT);
+    caller_cleanup(stream); CHECK(closes == 1 && !closed_web);
+    return 0;
+}
 int main(void) {
-    if (invalid_chunk(true) || invalid_chunk(false) || successful_retry() || open_cases()) return 1;
+    if (invalid_chunk(true) || invalid_chunk(false) || successful_retry() || open_cases() || wide_headers()) return 1;
     puts("HTTP stream ownership tests passed"); return 0;
 }

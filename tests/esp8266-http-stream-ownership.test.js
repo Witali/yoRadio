@@ -20,7 +20,7 @@ test('actual HTTP opener never publishes a closed socket after a chunk error', t
   assert.ok(cleanup, 'Use production caller cleanup, not a test substitute');
   const fixture = fs.readFileSync(path.join(__dirname, 'native/esp8266_http_stream_ownership_test.c'), 'utf8');
   const code = fixture.replace('/* STREAM_TYPE */', streamType[0])
-    .replace('/* PARSER_IMPLEMENTATION */', section('static uint8_t *find_header_end(', 'static int stream_receive('))
+    .replace('/* PARSER_IMPLEMENTATION */', '') // Pure incremental parser is linked below.
     .replace('/* OPEN_IMPLEMENTATION */', section('static int open_http_stream(', 'static void parse_icy_title('))
     .replace('/* CALLER_CLEANUP */', cleanup[1]);
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'yoradio-http-owner-'));
