@@ -240,7 +240,7 @@ test("ESP8266 radio retries short socket timeouts until the HTTP header deadline
     audioSource,
     /HTTP_HEADER_TIMEOUT_MS \* 1000LL[\s\S]*errno == EAGAIN[\s\S]*errno == EWOULDBLOCK[\s\S]*header_deadline/,
   );
-  assert.match(audioSource, /Open stream failed: %d \(errno %d\)/);
+  assert.match(audioSource, /Open stream failed: stage %d errno %d heap %u/);
   assert.match(
     audioSource,
     /attempt < HTTP_OPEN_ATTEMPTS[\s\S]*open_http_stream\(command\.url, &stream\)[\s\S]*pdMS_TO_TICKS\(250U\)/,
