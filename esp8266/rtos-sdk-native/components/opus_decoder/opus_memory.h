@@ -3,6 +3,12 @@
 #include <stdint.h>
 #include <setjmp.h>
 #include <string.h>
+#ifndef YORADIO_OPUS_WORD_ASM
+#define YORADIO_OPUS_WORD_ASM 0
+#endif
+#if YORADIO_OPUS_WORD_ASM != 0 && YORADIO_OPUS_WORD_ASM != 1
+#error "YORADIO_OPUS_WORD_ASM must be 0 or 1"
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,12 +24,36 @@ void *yoradio_opus_scratch_alloc(size_t count, size_t size, int word_safe);
  * Each history call reserves a distinct aligned region until the next begin. */
 int yoradio_opus_history_begin(void);
 void *yoradio_opus_history(size_t bytes);
+/* Private decoder RAM and audited read-only mapped flash only, never MMIO.
+ * p must address a complete, four-byte-aligned word. The optional LX106 path
+ * fixes the instruction width without volatile-C's per-access MEMW. A compiler
+ * memory clobber retains ordering/alias visibility, including overlapping copy
+ * and read-after-write. The private arena has one CPU owner, no DMA/device
+ * publication and no self-modifying executable code. Hardware/device ordering
+ * is deliberately outside this helper's contract. Keep the C path for hosts
+ * and as the default-off A/B reference; do not change SDK volatile semantics. */
+static inline uint32_t yoradio_opus_private_load_word(const void *p) {
+#if YORADIO_OPUS_WORD_ASM && defined(__XTENSA__)
+    uint32_t value;
+    __asm__ volatile ("l32i %0, %1, 0" : "=a" (value) : "a" (p) : "memory");
+    return value;
+#else
+    return *(const volatile uint32_t *)p;
+#endif
+}
+static inline void yoradio_opus_private_store_word(void *p, uint32_t value) {
+#if YORADIO_OPUS_WORD_ASM && defined(__XTENSA__)
+    __asm__ volatile ("s32i %1, %0, 0" : : "a" (p), "a" (value) : "memory");
+#else
+    *(volatile uint32_t *)p = value;
+#endif
+}
 /* Force full-width IRAM accesses even when only half of a value is consumed. */
 static inline int32_t yoradio_opus_load32(const int32_t *p) {
-    return *(const volatile int32_t *)p;
+    return (int32_t)yoradio_opus_private_load_word(p);
 }
 static inline void yoradio_opus_store32(int32_t *p, int32_t value) {
-    *(volatile int32_t *)p = value;
+    yoradio_opus_private_store_word(p, (uint32_t)value);
 }
 /* Audited static flash tables only: every addressed halfword must belong to
  * a complete, readable, four-byte-aligned word. Native MDCT/FFT tables meet
@@ -34,7 +64,7 @@ static inline yoradio_opus_table_pair yoradio_opus_table_load_pair(const void *p
 #if defined(__XTENSA__)
     /* Do not let the compiler narrow this flash load to exception-emulated
      * l16si/l16ui instructions when it consumes the individual halves. */
-    value.word = *(const volatile uint32_t *)p;
+    value.word = yoradio_opus_private_load_word(p);
 #else
     /* Avoid effective-type/alignment assumptions in portable host builds. */
     memcpy(&value.word, p, sizeof(value.word));

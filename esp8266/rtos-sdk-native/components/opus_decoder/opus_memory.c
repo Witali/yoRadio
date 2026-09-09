@@ -67,22 +67,27 @@ size_t yoradio_opus_scratch_peak_words(void) { return peak_words; }
 
 void yoradio_opus_copy(void *to, const void *from, size_t count, size_t size) {
     if (size == 4U || size == 8U) {
-        /* These paths are called only with typed arrays aligned to 32 bits.
-         * volatile prevents GCC lowering this back to byte-wise libc calls. */
-        volatile uint32_t *dst = to;
-        const volatile uint32_t *src = from;
+        /* Typed private arrays aligned to 32 bits. Both implementations force
+         * word instructions and cannot lower to byte-oriented libc calls. */
+        uint32_t *dst = to;
+        const uint32_t *src = from;
         size_t words = count * (size / 4U);
         if ((uintptr_t)dst > (uintptr_t)src) {
-            while (words) { --words; dst[words] = src[words]; }
+            while (words) {
+                --words;
+                yoradio_opus_private_store_word(dst + words, yoradio_opus_private_load_word(src + words));
+            }
         } else {
-            for (size_t i = 0; i < words; ++i) dst[i] = src[i];
+            for (size_t i = 0; i < words; ++i)
+                yoradio_opus_private_store_word(dst + i, yoradio_opus_private_load_word(src + i));
         }
     } else memmove(to, from, count * size);
 }
 void yoradio_opus_clear(void *to, size_t count, size_t size) {
     if (size == 4U || size == 8U) {
-        volatile uint32_t *dst = to;
-        for (size_t i = 0; i < count * (size / 4U); ++i) dst[i] = 0;
+        uint32_t *dst = to;
+        for (size_t i = 0; i < count * (size / 4U); ++i)
+            yoradio_opus_private_store_word(dst + i, 0);
     } else memset(to, 0, count * size);
 }
 
