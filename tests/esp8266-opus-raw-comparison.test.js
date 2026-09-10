@@ -40,3 +40,12 @@ test('raw A/B refuses missing runs, output benchmarks, failed runs and PCM chang
     const b=make();change(b[5]);assert.throws(()=>compare(make(),b));
   }
 });
+test('different task/wall timing windows retain positive overhead without clamping or dropping the run',()=>{
+  const a=make(),b=make();b[5].final.results[0].wall_us=1199656;
+  b[5].final.empty_task_us=42;
+  const r=compare(a,b);
+  assert.equal(r.candidate.runs,10);assert.equal(r.candidate.cases[0].task_budget_percent.median,50);
+  assert.deepEqual(r.candidate.timing_window_excesses,[{run:6,id:0,task_us:1200000,
+    wall_us:1199656,excess_us:344,empty_task_us:42,packets:120}]);
+  b[5].final.results[0].wall_us=0;assert.throws(()=>compare(a,b));
+});

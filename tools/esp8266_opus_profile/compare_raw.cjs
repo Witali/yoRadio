@@ -20,7 +20,10 @@ function summarize(reports) {
     assert.equal(r.final.results.length,5);assert.equal(r.comparison.length,5);
     for (const [i,v] of r.final.results.entries()) {
       assert.equal(v.id,i);assert.equal(v.error,0);
-      assert.ok(v.samples>0 && v.packets>0 && v.task_us>0 && v.wall_us>=v.task_us);
+      // These are intentionally different windows: wall surrounds decode,
+      // task also includes snapshot/timer/yield bookkeeping. With little
+      // preemption task can exceed wall; retain the excess, never clamp it.
+      assert.ok(v.samples>0 && v.packets>0 && v.task_us>0 && v.wall_us>0);
       assert.ok(v.min_dram>0 && v.stack_free_lifetime>0);
       assert.equal(v.samples,reports[0].final.results[i].samples);
       assert.equal(v.packets,reports[0].final.results[i].packets);
@@ -30,6 +33,9 @@ function summarize(reports) {
     }
   }
   return {runs:reports.length,
+    timing_window_excesses:reports.flatMap((r,i)=>r.final.results.filter(v=>v.task_us>v.wall_us)
+      .map(v=>({run:i+1,id:v.id,task_us:v.task_us,wall_us:v.wall_us,
+        excess_us:v.task_us-v.wall_us,empty_task_us:r.final.empty_task_us??null,packets:v.packets}))),
     observation_errors:reports.flatMap((r,i)=>(r.snapshots||[]).filter(s=>s.error).map(s=>({run:i+1,error:s.error}))),
     dram_after:stats(reports.map(r=>r.final.dram_after)),
     cases:reports[0].final.results.map((first,i)=>{
