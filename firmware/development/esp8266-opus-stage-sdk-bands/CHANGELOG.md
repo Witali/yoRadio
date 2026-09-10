@@ -57,9 +57,15 @@ the second snapshot, but the continuity gate failed.
 
 A later25s window had no new input or PCM, timeout errno116, then
 DECODER INIT ERROR. The preserved snapshot identifies stage8 (scratch
-allocation reserve): free10220B, request6144B, reserve4096B. The guard was
-20B short BEFORE allocator overhead; it was not lowered. After cleanup
-current DRAM26992B. This does not prove a leak. RSSI at final status−48dBm.
+allocation failure): free10220B, request6144B, reserve4096B. Correction after
+source audit: the reserve check is stage10, not stage8; the earlier claim
+that this was a reserve-guard rejection was incorrect. Total CAP8 free size
+does not establish the largest contiguous free block, so fragmentation or
+transient system allocations remain possible, not proved. Even a successful
+6144B allocation would leave less than4096B CAP8 before allocator overhead.
+The current stage10 guard uses combined heap, which must be audited separately
+from the stricter DRAM reserve. No reserve was lowered. After cleanup current
+DRAM26992B; this does not prove a leak. RSSI at final status−48dBm.
 
 Playback explicitly stopped after the failed test. Final live firmware
 responds over HTTP and remains installed; continuous Opus audio is still
