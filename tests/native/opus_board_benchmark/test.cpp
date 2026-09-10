@@ -156,9 +156,9 @@ void successful_run() {
         assert(value.pcm_hash == 0x03c13f4fU);
 #if YORADIO_OPUS_PROFILE_STAGE
         assert(value.stage_calls == value.packets);
-        assert(value.stage_cycles == UINT64_C(16000) * value.packets);
-        assert(value.stage_max_cycles == 16000);
-        assert(final.clock_pair_cycles_min == 0 && final.clock_pair_cycles_max == 0);
+        assert(value.stage_ticks == UINT64_C(100) * value.packets);
+        assert(value.stage_max_ticks == 100);
+        assert(final.clock_pair_ticks_min == 1 && final.clock_pair_ticks_max == 1);
 #endif
         assert(value.wall_us == 2 * kRounds * 251 && value.max_wall_us == 251);
 #if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
@@ -191,7 +191,7 @@ void successful_run() {
 
 extern "C" void test_enter_critical(void) { assert(critical_depth++ == 0); }
 #if YORADIO_OPUS_PROFILE_STAGE
-extern "C" uint32_t opus_stage_profile_clock(void) { return clock_wall * 160; }
+extern "C" uint32_t opus_stage_profile_clock(void) { return (uint32_t)esp_timer_get_time(); }
 #endif
 extern "C" void test_exit_critical(void) { assert(critical_depth-- == 1); }
 extern "C" void vTaskGetInfo(TaskHandle_t task, TaskStatus_t *value, int stack, eTaskState state) {
@@ -272,7 +272,7 @@ extern "C" int yoradio_opus_decode_bounded(void *state, const unsigned char *pac
     ++decode_calls;
     clock_wall += 250; clock_task += 200;
 #if YORADIO_OPUS_PROFILE_STAGE
-    opus_stage_profile_record(16000);
+    opus_stage_profile_record(100);
 #endif
     if (decode_calls == decode_error_at) return decode_error;
     static const int16_t samples[2][4] = {{0, 32767, -32768, -1}, {1234, -2345, 42, -42}};

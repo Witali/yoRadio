@@ -11,7 +11,7 @@ if(CONFIG_YORADIO_OGG_OPUS)
     message(FATAL_ERROR "Opus stage profile requires diagnostic raw-only benchmark")
   endif()
   if(YORADIO_OPUS_PROFILE_STAGE GREATER 0 AND NOT CONFIG_ESP8266_DEFAULT_CPU_FREQ_160)
-    message(FATAL_ERROR "Opus CCOUNT profile requires fixed CPU160; metadata must match the clock")
+    message(FATAL_ERROR "Opus stage experiment requires the matched fixed CPU160 benchmark profile")
   endif()
   file(GLOB OPUS_SOURCES upstream/src/*.c upstream/celt/*.c
        upstream/silk/*.c upstream/silk/fixed/*.c)

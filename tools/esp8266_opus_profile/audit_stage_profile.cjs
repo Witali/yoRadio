@@ -9,8 +9,9 @@ function audit({before='.build/esp8266-opus-block-live',off='.build/esp8266-opus
     const text=build=>cmd(['-dr',object(build)]).replace(/^.*file format.*$/m,'OBJECT').trim();
     const previous=text(before),disabled=text(off),enabled=text(on);
     assert.equal(disabled,previous,'disabled instrumentation changed target instructions: '+file);
-    const clocks=(enabled.match(/\brsr(?:\.ccount)?\s/g)||[]).length;
-    assert.equal(clocks,file.startsWith('celt')?2:0,'only chosen CELT bands scope must read CCOUNT');
+    const clocks=(enabled.match(/R_XTENSA_32\s+opus_stage_profile_clock/g)||[]).length;
+    assert.equal(clocks,file.startsWith('celt')?1:0,'only selected CELT TU may link the SDK clock helper');
+    assert.ok(!/\brsr(?:\.ccount)?\s/.test(enabled),'raw CCOUNT must not be used');
     const stack=build=>fs.readFileSync(object(build).replace(/\.obj$/,'.su'),'utf8').split(/\r?\n/).filter(Boolean)
       .map(line=>line.replace(/^.*?:\d+:\d+:/,''));
     result.objects.push({file,off_instructions_exact:true,clock_reads:clocks,off_stack:stack(off),on_stack:stack(on)});

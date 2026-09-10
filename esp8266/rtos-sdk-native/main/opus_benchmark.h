@@ -15,8 +15,8 @@ typedef struct {
     uint32_t packets, samples, wall_us, task_us, max_wall_us, pcm_hash;
     uint32_t scratch_bytes, scratch_words, min_dram, stack_free;
 #if YORADIO_OPUS_PROFILE_STAGE
-    uint64_t stage_cycles;
-    uint32_t stage_calls, stage_max_cycles;
+    uint64_t stage_ticks;
+    uint32_t stage_calls, stage_max_ticks;
 #endif
 #if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
     uint32_t output_wall_us, max_output_us, output_samples;
@@ -29,7 +29,7 @@ typedef struct {
     uint32_t run, state, current_case, round, cases, rounds;
     uint32_t dram_before, dram_after, state_bytes, empty_task_us;
 #if YORADIO_OPUS_PROFILE_STAGE
-    uint32_t clock_pair_cycles_min, clock_pair_cycles_max;
+    uint32_t clock_pair_ticks_min, clock_pair_ticks_max;
 #endif
     int error;
 } opus_benchmark_status_t;

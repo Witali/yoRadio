@@ -22,10 +22,10 @@
 /* One selected scope per build; no nested timers, allocation, ISR or task.
  * Only the audio owner resets/reads/updates this state, OUTSIDE a web reader.
  * Publish a COPY through the benchmark's existing critical-section snapshot.
- * Cycles include preemption and ISR, NOT exclusive decoder CPU cycles. */
+ * Cycles include preemption and ISR, NOT exclusive decoder CPU ticks. */
 typedef struct {
-    uint64_t cycles;
-    uint32_t calls, max_cycles;
+    uint64_t ticks;
+    uint32_t calls, max_ticks;
 } opus_stage_profile_t;
 
 #if YORADIO_OPUS_PROFILE_STAGE
@@ -35,16 +35,9 @@ extern "C" {
 void opus_stage_profile_reset(void);
 opus_stage_profile_t opus_stage_profile_snapshot(void);
 void opus_stage_profile_record(uint32_t elapsed);
-#if defined(__XTENSA__) && !defined(YORADIO_OPUS_PROFILE_TEST_CLOCK)
-static inline uint32_t opus_stage_profile_clock(void) {
-    uint32_t value;
-    __asm__ volatile ("rsr.ccount %0" : "=a"(value) : : "memory");
-    return value;
-}
-#else
-/* Host monotonic ticks exist only for correctness tests, not board timings. */
+/* Target: coherent SDK microseconds. Host: correctness-only monotonic ticks.
+ * Raw CCOUNT is invalid here: this SDK resets it on every RTOS tick. */
 uint32_t opus_stage_profile_clock(void);
-#endif
 #ifdef __cplusplus
 }
 #endif

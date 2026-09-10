@@ -148,8 +148,8 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
             if (elapsed > clock_max) clock_max = elapsed;
         }
         taskENTER_CRITICAL();
-        s_status.clock_pair_cycles_min = clock_min;
-        s_status.clock_pair_cycles_max = clock_max;
+        s_status.clock_pair_ticks_min = clock_min;
+        s_status.clock_pair_ticks_max = clock_max;
         taskEXIT_CRITICAL();
 #endif
         for (unsigned f = 0; f < OPUS_BENCH_FIXTURE_COUNT && !error; ++f) {
@@ -203,18 +203,22 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
 #endif
 #if YORADIO_OPUS_PROFILE_STAGE
                     opus_stage_profile_reset();
-#endif
+                    uint32_t start = opus_stage_profile_clock();
+#else
                     int64_t start = esp_timer_get_time();
+#endif
                     int decoded = yoradio_opus_decode_bounded(state, packet, entry.length, pcm, kPcmSamples);
-                    uint32_t elapsed = (uint32_t)(esp_timer_get_time() - start);
 #if YORADIO_OPUS_PROFILE_STAGE
+                    uint32_t elapsed = opus_stage_profile_clock() - start;
                     const opus_stage_profile_t stage = opus_stage_profile_snapshot();
                     if (round) {
-                        result.stage_cycles += stage.cycles;
+                        result.stage_ticks += stage.ticks;
                         result.stage_calls += stage.calls;
-                        if (stage.max_cycles > result.stage_max_cycles)
-                            result.stage_max_cycles = stage.max_cycles;
+                        if (stage.max_ticks > result.stage_max_ticks)
+                            result.stage_max_ticks = stage.max_ticks;
                     }
+#else
+                    uint32_t elapsed = (uint32_t)(esp_timer_get_time() - start);
 #endif
 #if !YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
                     vTaskDelay(1);
