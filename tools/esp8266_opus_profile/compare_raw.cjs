@@ -72,6 +72,20 @@ function artifact(directory) {
   assert.equal(sha256(app),manifest.app_sha256.toLowerCase());assert.equal(app.length,manifest.bytes);
   return manifest;
 }
+function auditAttempts(attempts,completed) {
+  if(!attempts.length)return {recorded:completed.length,failed:[]};
+  for(const a of attempts)assert.ok([3,4].includes(a.report.final?.state),'Unfinished attempt: '+a.file);
+  const successful=attempts.filter(a=>a.report.final.state===3);
+  assert.deepEqual(successful.map(a=>a.sha256),completed.map(a=>a.sha256),'Completed attempts omitted or reordered');
+  return {recorded:attempts.length,failed:attempts.filter(a=>a.report.final.state===4).map(a=>({
+    file:a.file,sha256:a.sha256,error:a.report.error,device_error:a.report.final.error,
+    dram_before:a.report.final.dram_before,dram_after:a.report.final.dram_after}))};
+}
+function attemptFiles(directory) {
+  return fs.readdirSync(directory).filter(f=>/^attempt[1-9]\d*\.json$/.test(f))
+    .sort((a,b)=>Number(a.match(/\d+/)[0])-Number(b.match(/\d+/)[0]))
+    .map(file=>{const data=fs.readFileSync(path.join(directory,file));return {file,sha256:sha256(data),report:JSON.parse(data)};});
+}
 function compareArtifacts(ma,mb,feature='opus_fir_flash_word') {
   assert.ok(['opus_fir_flash_word','opus_pulse_flash_word'].includes(feature),'Unknown A/B switch');
   assert.equal(ma[feature],false);assert.equal(mb[feature],true);
@@ -90,10 +104,14 @@ if(require.main===module) {
   compareArtifacts(ma,mb,feature);
   result.artifacts={reference:ma,candidate:mb};
   result.switch=feature;
+  result.attempts={reference:auditAttempts(attemptFiles(value('--reference')),a),candidate:auditAttempts(attemptFiles(value('--candidate')),b)};
+  result.comparison_valid=true;
+  result.passed=!result.attempts.reference.failed.length&&!result.attempts.candidate.failed.length;
   result.inputs={reference:a.map(({file,sha256})=>({file,sha256})),candidate:b.map(({file,sha256})=>({file,sha256}))};
   const output=path.resolve(value('--output'));fs.mkdirSync(path.dirname(output),{recursive:true});
   fs.writeFileSync(output,JSON.stringify(result,null,2)+'\n');
+  if(!result.passed)console.warn('Completed-run CPU comparison is valid, but failed attempts are retained: '+JSON.stringify(result.attempts));
   console.table(result.cases.map(c=>({name:c.name,off:c.reference.task_budget_percent.median,
     on:c.candidate.task_budget_percent.median,reduction:c.median_task_reduction_percent})));
 }
-module.exports={stats,summarize,compare,compareArtifacts};
+module.exports={stats,summarize,compare,compareArtifacts,auditAttempts};

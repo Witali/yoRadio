@@ -1,5 +1,14 @@
 const test=require('node:test'),assert=require('node:assert/strict');
-const {stats,compare,compareArtifacts}=require('../tools/esp8266_opus_profile/compare_raw.cjs');
+const {stats,compare,compareArtifacts,auditAttempts}=require('../tools/esp8266_opus_profile/compare_raw.cjs');
+test('attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts',()=>{
+  const good={file:'attempt1.json',sha256:'a',report:{final:{state:3}}};
+  const bad={file:'attempt2.json',sha256:'b',report:{error:'allocation',final:{state:4,error:-9001,dram_before:16000,dram_after:16000}}};
+  const last={file:'attempt3.json',sha256:'c',report:{final:{state:3}}};
+  const r=auditAttempts([good,bad,last],[good,last]);
+  assert.equal(r.recorded,3);assert.equal(r.failed[0].device_error,-9001);
+  assert.throws(()=>auditAttempts([good,bad,last],[last]),/omitted/);
+  assert.throws(()=>auditAttempts([{...good,report:{final:{state:2}}}],[good]),/Unfinished/);
+});
 test('A/B permits only the selected feature and artifact identity differences',()=>{
   for(const feature of ['opus_fir_flash_word','opus_pulse_flash_word']) {
     const a={cpu_mhz:160,source_revision:'same',[feature]:false,bytes:10,app_sha256:'a'};
