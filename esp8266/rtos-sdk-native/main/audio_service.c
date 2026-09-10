@@ -109,6 +109,8 @@ static volatile uint32_t s_generation;
 static uint32_t s_rx_bytes, s_pcm_frames, s_pcm_rate;
 static TickType_t s_rx_tick, s_pcm_tick;
 
+#include "audio_stage_profile.inc"
+
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
 static volatile uint32_t s_transport_phase;
 static int32_t s_transport_result = INT32_MIN, s_transport_errno;
@@ -731,8 +733,10 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
     trace_pcm_samples(info, pcm, samples);
 #endif
     if (!generation_current(context->generation)) return false;
+    AUDIO_STAGE_BEGIN(output_stage);
     esp_err_t result = native_audio_output_write(
         pcm, samples, info->sample_rate, info->channels);
+    AUDIO_STAGE_END(AUDIO_STAGE_OUTPUT, output_stage);
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "PCM output failed: %s",
                  esp_err_to_name(result));
@@ -1245,8 +1249,10 @@ static void audio_task(void *argument) {
         while (feed == 0 && generation_current(command.generation) &&
                !audio_web_pause_requested()) {
             audio_transport_phase(AUDIO_TRANSPORT_REFILL);
+            AUDIO_STAGE_BEGIN(read_stage);
             int filled = ended ? STREAM_FILL_EOF :
                 stream_input_refill(&stream, codec, &icy, &output);
+            AUDIO_STAGE_END(AUDIO_STAGE_READ, read_stage);
             if (filled == STREAM_FILL_CANCELLED) break;
             if (filled == STREAM_FILL_EOF || filled == STREAM_FILL_TIMEOUT ||
                 filled == STREAM_FILL_ERROR) {
@@ -1290,7 +1296,9 @@ static void audio_task(void *argument) {
                          (unsigned)helix_codec_buffered(codec), filled);
 #endif
             audio_transport_phase(AUDIO_TRANSPORT_DECODE);
+            AUDIO_STAGE_BEGIN(decode_stage);
             int decoded = helix_codec_process_one(codec, pcm_output, &output);
+            AUDIO_STAGE_END(AUDIO_STAGE_DECODE, decode_stage);
             audio_transport_phase(AUDIO_TRANSPORT_REFILL);
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
             if (s_stream_trace_count < 24U)
@@ -1308,6 +1316,7 @@ static void audio_task(void *argument) {
                 playing = true;
                 native_state_set_audio(true, false, NULL);
             }
+            AUDIO_STAGE_BEGIN(wait_stage);
             if (decoded == 0) {
                 /* Give idle/watchdog and deferred Wi-Fi work a turn even on
                  * continuously readable streams or malformed input. */
@@ -1331,6 +1340,7 @@ static void audio_task(void *argument) {
                 ended = true;
                 end_error = errno == ETIMEDOUT ? 0 : -21;
             }
+            AUDIO_STAGE_END(AUDIO_STAGE_WAIT, wait_stage);
             int64_t now = esp_timer_get_time();
             if (!output.decoder_bitrate &&
                 now - output.measured_started_us >= 3000000) {

@@ -2,6 +2,7 @@
 
 #include "esp_err.h"
 #include <stdint.h>
+#include <stddef.h>
 
 typedef enum {
     AUDIO_TRANSPORT_IDLE = 0,
@@ -29,6 +30,10 @@ typedef struct {
 
 /* Allocation-free, read-only progress counters, not a Playing flag. */
 void audio_service_health(audio_service_health_t *health);
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
+/* Read-only diagnostic profile; -1 on insufficient capacity. */
+int audio_service_stage_json(char *body, size_t capacity);
+#endif
 
 esp_err_t audio_service_init(void);
 esp_err_t audio_service_play(const char *url);
