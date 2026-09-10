@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "before": ".build/esp8266-opus-stage-off",
+  "off": ".build/esp8266-opus-celt-off",
+  "on": ".build/esp8266-opus-celt-on",
+  "off_instructions_exact": true,
+  "normalization": "GCC dollar-number local symbol IDs only",
+  "encoder_references_removed": true,
+  "alg_quant_linked": false,
+  "off_stack": [
+    "deinterleave_hadamard\t64\tstatic",
+    "intensity_stereo$isra$1\t48\tstatic",
+    "quant_partition\t112\tstatic",
+    "quant_band\t128\tstatic",
+    "hysteresis_decision\t0\tstatic",
+    "celt_lcg_rand\t0\tstatic",
+    "bitexact_cos\t0\tstatic",
+    "bitexact_log2tan\t0\tstatic",
+    "compute_band_energies\t80\tstatic",
+    "normalise_bands\t80\tstatic",
+    "denormalise_bands\t80\tstatic",
+    "anti_collapse\t112\tstatic",
+    "spreading_decision\t112\tstatic",
+    "haar1\t16\tstatic",
+    "quant_all_bands\t384\tstatic"
+  ],
+  "on_stack": [
+    "compute_theta$isra$3\t80\tstatic",
+    "quant_partition\t144\tstatic",
+    "quant_band\t112\tstatic",
+    "hysteresis_decision\t0\tstatic",
+    "celt_lcg_rand\t0\tstatic",
+    "bitexact_cos\t0\tstatic",
+    "bitexact_log2tan\t0\tstatic",
+    "compute_band_energies\t80\tstatic",
+    "normalise_bands\t80\tstatic",
+    "denormalise_bands\t80\tstatic",
+    "anti_collapse\t112\tstatic",
+    "spreading_decision\t112\tstatic",
+    "haar1\t16\tstatic",
+    "quant_all_bands\t400\tstatic"
+  ],
+  "off_sections": {
+    ".iram0.vectors": 128,
+    ".iram0.text": 22900,
+    ".iram0.bss": 4044,
+    ".dram0.data": 1652,
+    ".dram0.bss": 18768,
+    ".flash.text": 636906,
+    ".flash.rodata": 250652
+  },
+  "on_sections": {
+    ".iram0.vectors": 128,
+    ".iram0.text": 22900,
+    ".iram0.bss": 4044,
+    ".dram0.data": 1652,
+    ".dram0.bss": 18768,
+    ".flash.text": 631014,
+    ".flash.rodata": 250648
+  },
+  "delta": {
+    ".iram0.vectors": 0,
+    ".iram0.text": 0,
+    ".iram0.bss": 0,
+    ".dram0.data": 0,
+    ".dram0.bss": 0,
+    ".flash.text": -5892,
+    ".flash.rodata": -4
+  }
+}

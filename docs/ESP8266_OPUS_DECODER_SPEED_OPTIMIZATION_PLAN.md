@@ -304,6 +304,10 @@ gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upst
   energy/LTP/NLSF остаются гипотезами. Не повторять отклонённый вариант.
 - [ ] P3: A3 exact divisions: power-of-two / reciprocal / bitrate отдельно.
 - [ ] P4: A4 decoder-only CELT specialization, code-size/cache A/B.
+  Подготовлен default-off эксперимент:27 host PCM-сценариев exact, scratch
+  прежний, target flash text−5892B, static RAM0 delta. Некоторые stack frames
+  выросли; скорость и итоговый запас стека требуют physical A/B.
+  [Контракт и воспроизведение](ESP8266_OPUS_CELT_DECODE_ONLY.md).
 - [ ] P5: A5 SILK specialization, A6 exact loop scheduling/unroll.
 - [ ] P6: A7 только при заметном времени соответствующего этапа.
 - [x] P7: bounded block-output для пакетов до120мс из кадров не длиннее20мс.

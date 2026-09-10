@@ -703,6 +703,18 @@ struct split_ctx {
    int qalloc;
 };
 
+/* This radio has no encoder. Keep the upstream path for matched A/B builds;
+   constant propagation must also reach recursive helpers without LTO. */
+static OPUS_INLINE int band_encode(const struct band_ctx *ctx)
+{
+#if defined(YORADIO_OPUS_BOUNDED) && defined(YORADIO_OPUS_CELT_DECODE_ONLY) && YORADIO_OPUS_CELT_DECODE_ONLY
+   (void)ctx;
+   return 0;
+#else
+   return ctx->encode;
+#endif
+}
+
 static void compute_theta(struct band_ctx *ctx, struct split_ctx *sctx,
       celt_norm *X, celt_norm *Y, int N, int *b, int B, int B0,
       int LM,
@@ -724,7 +736,7 @@ static void compute_theta(struct band_ctx *ctx, struct split_ctx *sctx,
    ec_ctx *ec;
    const celt_ener *bandE;
 
-   encode = ctx->encode;
+   encode = band_encode(ctx);
    m = ctx->m;
    i = ctx->i;
    intensity = ctx->intensity;
@@ -916,7 +928,7 @@ static unsigned quant_band_n1(struct band_ctx *ctx, celt_norm *X, celt_norm *Y,
    int encode;
    ec_ctx *ec;
 
-   encode = ctx->encode;
+   encode = band_encode(ctx);
    ec = ctx->ec;
 
    stereo = Y != NULL;
@@ -965,7 +977,7 @@ static unsigned quant_partition(struct band_ctx *ctx, celt_norm *X,
    int spread;
    ec_ctx *ec;
 
-   encode = ctx->encode;
+   encode = band_encode(ctx);
    m = ctx->m;
    i = ctx->i;
    spread = ctx->spread;
@@ -1129,7 +1141,7 @@ static unsigned quant_band(struct band_ctx *ctx, celt_norm *X,
    int encode;
    int tf_change;
 
-   encode = ctx->encode;
+   encode = band_encode(ctx);
    tf_change = ctx->tf_change;
 
    longBlocks = B0==1;
@@ -1255,7 +1267,7 @@ static unsigned quant_band_stereo(struct band_ctx *ctx, celt_norm *X, celt_norm 
    int encode;
    ec_ctx *ec;
 
-   encode = ctx->encode;
+   encode = band_encode(ctx);
    ec = ctx->ec;
 
    /* Special case for one sample */
@@ -1412,6 +1424,14 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
 #endif
       )
 {
+#if defined(YORADIO_OPUS_BOUNDED) && defined(YORADIO_OPUS_CELT_DECODE_ONLY) && YORADIO_OPUS_CELT_DECODE_ONLY
+   /* Reject accidental encoder calls before touching bands or scratch. */
+   if (encode) {
+      ec->error = 1;
+      return;
+   }
+   encode = 0;
+#endif
    int i;
    opus_int32 remaining_bits;
    const opus_int16 * OPUS_RESTRICT eBands = m->eBands;

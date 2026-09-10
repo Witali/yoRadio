@@ -93,7 +93,7 @@ function attemptFiles(directory) {
     .map(file=>{const data=fs.readFileSync(path.join(directory,file));return {file,sha256:sha256(data),report:JSON.parse(data)};});
 }
 function compareArtifacts(ma,mb,feature='opus_fir_flash_word') {
-  assert.ok(['opus_fir_flash_word','opus_pulse_flash_word'].includes(feature),'Unknown A/B switch');
+  assert.ok(['opus_fir_flash_word','opus_pulse_flash_word','opus_celt_decode_only'].includes(feature),'Unknown A/B switch');
   assert.equal(ma[feature],false);assert.equal(mb[feature],true);
   for(const k of new Set([...Object.keys(ma),...Object.keys(mb)]))
     if(![feature,'built_utc','app_sha256','bytes'].includes(k))
