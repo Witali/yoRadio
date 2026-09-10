@@ -6,6 +6,7 @@
 
 #include "esp8266_nodac_i2s.h"
 #include "nodac_buffer_state.h"
+#include "opus_dma_yield.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -61,6 +62,12 @@ static bool s_running;
 static uint32_t s_silence_word;
 static volatile uint32_t s_underruns;
 static volatile uint32_t s_eofs;
+#if YORADIO_ESP8266_OPUS_DMA_YIELD
+static uint32_t s_dma_wait_ticks;
+uint32_t esp8266_nodac_i2s_wait_ticks(void) {
+    return s_dma_wait_ticks;
+}
+#endif
 #if YORADIO_ESP8266_AUDIO_PROFILE || YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK || YORADIO_ESP8266_CODEC_RAM_AUDIO_OUTPUT
 static esp8266_nodac_profile_t s_profile;
 #endif
@@ -310,8 +317,15 @@ static bool acquire_free_buffer(TickType_t ticks_to_wait) {
 #elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
         audio_output_benchmark_spi_wait_begin();
 #endif
+#if YORADIO_ESP8266_OPUS_DMA_YIELD
+        const uint32_t wait_started = xTaskGetTickCount();
+#endif
         uint32_t notified = ulTaskNotifyTake(
             pdTRUE, ticks_to_wait - elapsed);
+#if YORADIO_ESP8266_OPUS_DMA_YIELD
+        s_dma_wait_ticks += opus_dma_wait_credit(
+            wait_started, xTaskGetTickCount(), notified);
+#endif
 #if YORADIO_ESP8266_AUDIO_PROFILE
         audio_profile_spi_wait_end();
 #elif YORADIO_ESP8266_AUDIO_OUTPUT_BENCHMARK
