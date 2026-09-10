@@ -30,10 +30,10 @@ function grouped(data,count,vbr=false,padding=0) {
   }
   return framed(result);
 }
-async function run({output=path.join(__dirname,'block-results.json'),capture,celtDecodeOnly=false}={}) {
+async function run({output=path.join(__dirname,'block-results.json'),capture,celtDecodeOnly=false,divOnce=false}={}) {
   prepareReference();await buildHost({upstreamRoot:defaultOutput,fastInt64:0});
-  const build=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,celtDecodeOnly});
-  const out=path.join(root,'.build/opus-block-regression'+(celtDecodeOnly?'-celt-decode-only':''));fs.mkdirSync(out,{recursive:true});
+  const build=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,celtDecodeOnly,divOnce});
+  const out=path.join(root,'.build/opus-block-regression'+(celtDecodeOnly?'-celt-decode-only':'')+(divOnce?'-div-once':''));fs.mkdirSync(out,{recursive:true});
   const object=path.join(out,'block_probe.o'),binary=path.join(out,'block_probe');
   execute('gcc',[...build.flags,'-Wall','-Wextra','-Werror','-c',hostPath(path.join(__dirname,'block_probe.c')),'-o',hostPath(object)]);
   execute('gcc',[...build.objects.filter(f=>!f.endsWith('probe.c.o')).map(hostPath),hostPath(object),
@@ -70,10 +70,10 @@ async function run({output=path.join(__dirname,'block-results.json'),capture,cel
     process.stderr.write(`${test.name}: exact; ${result.blocks} blocks, scratch ${result.scratch_bytes}/${result.scratch_words}\n`);
   }
   const sources=['native_opus.c','native_opus.h','opus_memory.c','opus_memory.h','upstream/src/opus_decoder.c'];
-  const report={passed:true,celt_decode_only:celtDecodeOnly,scope:'Host generic32 pristine full-packet PCM versus FIR-enabled bounded frame callbacks; mono48k. No board speed claim.',
+  const report={passed:true,celt_decode_only:celtDecodeOnly,div_once:divOnce,scope:'Host generic32 pristine full-packet PCM versus FIR-enabled bounded frame callbacks; mono48k. No board speed claim.',
     source_sha256_lf:Object.fromEntries(sources.map(f=>[f,sha256(Buffer.from(fs.readFileSync(path.join(component,f),'utf8').replace(/\r\n/g,'\n')))])),cases};
   fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');return report;
 }
 module.exports={pack,packets,grouped,run};
 if(require.main===module){const args=process.argv.slice(2),value=k=>{const i=args.indexOf(k);return i<0?undefined:args[i+1];};
-  run({output:value('--output'),capture:value('--capture'),celtDecodeOnly:args.includes('--celt-decode-only')}).then(r=>console.log('PASS '+r.cases.length+' block cases')).catch(e=>{console.error(e.stack);process.exitCode=1;});}
+  run({output:value('--output'),capture:value('--capture'),celtDecodeOnly:args.includes('--celt-decode-only'),divOnce:args.includes('--div-once')}).then(r=>console.log('PASS '+r.cases.length+' block cases')).catch(e=>{console.error(e.stack);process.exitCode=1;});}

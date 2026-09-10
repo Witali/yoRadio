@@ -252,7 +252,17 @@ static OPUS_INLINE opus_val32 celt_exp2(opus_val16 x)
 
 opus_val32 celt_rcp(opus_val32 x);
 
+#if defined(YORADIO_OPUS_BOUNDED) && defined(YORADIO_OPUS_DIV_ONCE) && YORADIO_OPUS_DIV_ONCE
+/* MULT32_32_Q31's generic32 macro evaluates b three times. Keep the exact
+   same reciprocal/partial products, but run the two Newton steps only once. */
+static OPUS_INLINE opus_val32 celt_div(opus_val32 a, opus_val32 b)
+{
+   const opus_val32 reciprocal = celt_rcp(b);
+   return MULT32_32_Q31(a, reciprocal);
+}
+#else
 #define celt_div(a,b) MULT32_32_Q31((opus_val32)(a),celt_rcp(b))
+#endif
 
 opus_val32 frac_div32(opus_val32 a, opus_val32 b);
 

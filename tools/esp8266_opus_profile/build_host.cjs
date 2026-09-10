@@ -39,7 +39,8 @@ function dependencies(depfile) {
   return text.slice(text.indexOf(':') + 1).trim().split(/\s+/).filter(Boolean).map(nativePath);
 }
 
-async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false } = {}) {
+async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false } = {}) {
+  if (divOnce && !bounded) throw Error('divOnce requires bounded decoder.');
   if (celtDecodeOnly && !bounded) throw Error('celtDecodeOnly requires bounded decoder.');
   if (!Number.isInteger(profileStage) || profileStage < 0 || profileStage > 11 || (profileStage && !bounded)) throw Error('profileStage requires bounded and 0..11.');
   if (firFlashWord && !bounded) throw Error('firFlashWord requires bounded decoder.');
@@ -49,7 +50,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   if (fastInt64 !== undefined && !fs.readFileSync(path.join(sourceRoot, 'celt/arch.h'), 'utf8').includes('#ifndef OPUS_FAST_INT64'))
     throw Error('Selected upstream does not support an OPUS_FAST_INT64 override; use a documented diagnostic copy.');
   const out = path.join(root, '.build/esp8266-opus-host' + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
-    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (profileStage ? '-stage-' + profileStage : '') + (celtDecodeOnly ? '-celt-decode-only' : ''));
+    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (profileStage ? '-stage-' + profileStage : '') + (celtDecodeOnly ? '-celt-decode-only' : '') + (divOnce ? '-div-once' : ''));
   const binary = path.join(out, 'probe');
   const sources = ['src', 'celt', 'silk', 'silk/fixed'].flatMap(dir =>
     fs.readdirSync(path.join(sourceRoot, dir)).filter(file => file.endsWith('.c')).sort()
@@ -62,6 +63,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
     ...(bounded ? ['-DYORADIO_OPUS_BOUNDED=1', '-I' + hostPath(component)] : []),
     ...(firFlashWord ? ['-DYORADIO_OPUS_FIR_FLASH_WORD=1'] : []),
     ...(celtDecodeOnly ? ['-DYORADIO_OPUS_CELT_DECODE_ONLY=1'] : []),
+    ...(divOnce ? ['-DYORADIO_OPUS_DIV_ONCE=1'] : []),
     ...(profileStage ? ['-DYORADIO_OPUS_PROFILE_STAGE=' + profileStage] : []),
     ...['include', 'celt', 'silk', 'silk/fixed', 'src'].map(dir => '-I' + hostPath(path.join(sourceRoot, dir)))];
   const objects = sources.map(source => path.join(out, 'objects',
@@ -100,9 +102,9 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   return { binary, out, objects, flags, compiler, compiled: pending.length, linked, reused: false };
 }
 
-function runProbe({ bounded = false, fixture, output, selfTest = true, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false }) {
+function runProbe({ bounded = false, fixture, output, selfTest = true, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false }) {
   const out = path.join(root, '.build/esp8266-opus-host' + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
-    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (profileStage ? '-stage-' + profileStage : '') + (celtDecodeOnly ? '-celt-decode-only' : ''));
+    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (profileStage ? '-stage-' + profileStage : '') + (celtDecodeOnly ? '-celt-decode-only' : '') + (divOnce ? '-div-once' : ''));
   const args = fixture ? [hostPath(path.resolve(fixture)), hostPath(path.resolve(output || path.join(out, 'decoded.pcm'))),
     ...(selfTest ? ['--self-test'] : [])] : [];
   return JSON.parse(execute(hostPath(path.join(out, 'probe')), args).trim());
