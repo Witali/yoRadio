@@ -162,6 +162,7 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
                     /* Last warmup packet yielded and flushed task runtime.
                      * Keep DMA running across all measured round boundaries. */
                     native_audio_output_get_spi_stats(&dma_before);
+                    (void)native_audio_output_fifo_empty(1);
                     pipeline_cpu = task_time();
                     pipeline_start = (uint32_t)esp_timer_get_time();
                 }
@@ -232,6 +233,7 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
                         native_audio_output_get_spi_stats(&dma);
                         result.dma_eofs = dma.chained_transfers - dma_before.chained_transfers;
                         result.dma_misses = dma.queue_empty_events - dma_before.queue_empty_events;
+                        result.fifo_empty_seen = native_audio_output_fifo_empty(0);
                     }
 #endif
                     result.scratch_bytes = yoradio_opus_scratch_peak_bytes();

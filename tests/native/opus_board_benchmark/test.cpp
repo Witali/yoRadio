@@ -35,6 +35,7 @@ unsigned cancel_after, decode_error_at, init_error_at;
 #if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
 unsigned output_calls, output_error_at, output_misses_at, dma_eofs, dma_misses;
 unsigned silence_calls, normalizer_resets, output_sample_count;
+unsigned fifo_empty, fifo_error_at;
 bool oversized_decode, large_decode;
 #endif
 int decode_error = -777;
@@ -99,6 +100,7 @@ void reset_environment() {
 #if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
     output_calls = output_error_at = output_misses_at = dma_eofs = dma_misses = 0;
     silence_calls = normalizer_resets = output_sample_count = 0;
+    fifo_empty = fifo_error_at = 0;
     oversized_decode = large_decode = false;
 #endif
 }
@@ -156,6 +158,7 @@ void successful_run() {
         assert(value.pipeline_wall_us > value.wall_us + value.output_wall_us);
         assert(value.pipeline_task_us > 0 && value.output_wall_us > 0);
         assert(value.dma_eofs == 2 * kRounds && value.dma_misses == 0);
+        assert(value.fifo_empty_seen == 0);
 #else
         assert(value.task_us == 2 * kRounds * 204);
 #endif
@@ -281,6 +284,7 @@ extern "C" esp_err_t native_audio_output_write(int16_t *pcm, size_t count, uint3
     output_sample_count += count;
     ++dma_eofs;
     if (output_calls == output_misses_at) ++dma_misses;
+    if (output_calls == fifo_error_at) fifo_empty = 1;
     clock_wall += 300; clock_task += 100;
     return ESP_OK;
 }
@@ -288,6 +292,11 @@ extern "C" void native_audio_output_silence(void) { ++silence_calls; }
 extern "C" void native_audio_output_reset_normalizer(void) { ++normalizer_resets; }
 extern "C" void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *s) {
     *s = {}; s->chained_transfers = dma_eofs; s->queue_empty_events = dma_misses;
+}
+extern "C" uint32_t native_audio_output_fifo_empty(unsigned clear) {
+    unsigned seen = fifo_empty;
+    if (clear) fifo_empty = 0;
+    return seen;
 }
 #endif
 
@@ -341,6 +350,9 @@ int main() {
     assert(!output_calls);
     reset_environment(); output_misses_at = 4; queue(); run();
     assert(status().state == 3 && result(0).dma_misses == 1); // Never hide output gaps.
+    clean();
+    reset_environment(); fifo_error_at = 4; queue(); run();
+    assert(status().state == 3 && result(0).fifo_empty_seen == 1 && !result(0).dma_misses);
     clean();
 #endif
     successful_run(); successful_run();

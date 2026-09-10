@@ -26,6 +26,14 @@
 #endif
 #include "esp_log.h"
 #include "native_audio_normalizer.h"
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+#include "esp8266/i2s_struct.h"
+uint32_t native_audio_output_fifo_empty(unsigned clear) {
+    const uint32_t empty = I2S0.int_raw.tx_rempty;
+    if (clear) I2S0.int_clr.val = 1U << 5; /* SDK I2S_TX_REMPTY, W1C only this bit. */
+    return empty;
+}
+#endif
 #include "persistent_settings.h"
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
 #include "rc_pdm.h"

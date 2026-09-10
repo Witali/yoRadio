@@ -14,6 +14,7 @@ typedef struct {
 #if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
     uint32_t output_wall_us, max_output_us, output_samples;
     uint32_t pipeline_wall_us, pipeline_task_us, dma_eofs, dma_misses;
+    uint32_t fifo_empty_seen;
 #endif
     int error;
 } opus_benchmark_case_t;

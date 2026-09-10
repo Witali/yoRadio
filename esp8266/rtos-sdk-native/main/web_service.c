@@ -1334,9 +1334,9 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
         if (result == ESP_OK) {
             n = snprintf(row, sizeof(row),
                 ",\"output_wall_us\":%u,\"max_output_us\":%u,\"output_samples\":%u,"
-                "\"pipeline_wall_us\":%u,\"pipeline_task_us\":%u,\"dma_eofs\":%u,\"dma_misses\":%u",
+                "\"pipeline_wall_us\":%u,\"pipeline_task_us\":%u,\"dma_eofs\":%u,\"dma_misses\":%u,\"fifo_empty_seen\":%u",
                 item.output_wall_us, item.max_output_us, item.output_samples,
-                item.pipeline_wall_us, item.pipeline_task_us, item.dma_eofs, item.dma_misses);
+                item.pipeline_wall_us, item.pipeline_task_us, item.dma_eofs, item.dma_misses, item.fifo_empty_seen);
             if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
             else result = httpd_resp_send_chunk(request, row, n);
         }

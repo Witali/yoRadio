@@ -198,6 +198,11 @@ DMA counters bracket the timed phase after warmup. The strict host gate requires
 >=20 seconds, real DMA progress, no missed deadlines, matching decoded/submitted
 PCM and elapsed duration. A completed run with gaps exits unsuccessfully and
 saves all results; it never qualifies real HTTP-radio playback by itself.
+`fifo_empty_seen` also checks the I2S hardware's latched TX-empty flag, cleared
+only after warmup and then read without clearing throughout the scored window.
+It must stay zero. This detects FIFO starvation even if software had a ready
+DMA descriptor. No ISR modification is needed; other profiles that clear this
+flag in the ISR are prohibited in this benchmark.
 Errors -9008 (output failure) and -9010 (oversized PCM result) supplement existing
 allocation/cancel/decoder/golden-PCM errors. Raw benchmark keeps its old timing.
 

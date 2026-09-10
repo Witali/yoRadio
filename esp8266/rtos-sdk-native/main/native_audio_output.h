@@ -23,3 +23,8 @@ void native_audio_output_set_volume_runtime(uint8_t volume);
 void native_audio_output_set_balance_runtime(int8_t balance);
 void native_audio_output_reset_spi_stats(void);
 void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *stats);
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+/* Latched hardware FIFO-empty flag. Clear only at the start of a window;
+ * subsequent reads never clear it, so no event is lost between samples. */
+uint32_t native_audio_output_fifo_empty(unsigned clear);
+#endif

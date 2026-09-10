@@ -1,7 +1,7 @@
 // A completed diagnostic run is not necessarily continuous physical audio.
 function analyzeOutput(item) {
   const fields = ['samples','output_samples','pipeline_wall_us','pipeline_task_us',
-    'output_wall_us','dma_eofs','dma_misses','wall_us','packets','min_dram'];
+    'output_wall_us','dma_eofs','dma_misses','fifo_empty_seen','wall_us','packets','min_dram'];
   const errors = [];
   if (!item || fields.some(k => !Number.isSafeInteger(item[k]) || item[k] < 0))
     return {pass:false,errors:['missing or invalid physical-output counters']};
@@ -11,6 +11,7 @@ function analyzeOutput(item) {
   if (!item.packets || item.output_samples !== item.samples) errors.push('PCM was not fully submitted');
   if (!item.dma_eofs) errors.push('DMA did not progress');
   if (item.dma_misses) errors.push('DMA underruns');
+  if (item.fifo_empty_seen) errors.push('hardware FIFO became empty');
   const ratio = item.pipeline_wall_us ? audio_us / item.pipeline_wall_us : 0;
   if (ratio < 0.98 || ratio > 1.03) errors.push('PCM duration does not match elapsed time');
   if (item.pipeline_task_us > item.pipeline_wall_us) errors.push('invalid task runtime');
