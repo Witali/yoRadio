@@ -143,7 +143,13 @@ node tools/esp8266_opus_profile/run_regressions.cjs --fast-int64 0 --fir-word --
 остаются на обычном доступе. cache_index50 дополнен 2 байтами flash padding,
 все 3 таблицы явно aligned4. 202233 unit-сравнения / 1991405 word reads под
 ASan/UBSan и 22 полного PCM-сценария проходят exact. Статическая RAM и
-GCC stack frames modes/bands/celt не выросли. Board A/B ещё не выполнен.
+GCC stack frames modes/bands/celt не выросли. Два board A/B выполнены,
+по10 завершённых OFF/ON: обычный helper замедлил CELT64 на10.57%, pure ROM
+helper — на6.61%. Pure OFF также имел одну failed allocation attempt,
+она сохранена отдельно; медленные завершённые попытки не исключались.
+Оба варианта отклонены, экспериментальный код/флаг удалены из рабочего
+дерева, доступны в9e40898/f20ed03. Дальнейшие семейства таблиц пока не
+проверены. [Измерения и ограничения](ESP8266_OPUS_PULSE_WORD_BENCHMARK.md).
 
 ### A3. Точные деления и предварительные коэффициенты
 
@@ -271,6 +277,8 @@ gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upst
 - [x] P1: A1 FIR word-pairs, target alignment/asm, regression и10+10 board A/B.
   Сохранён отдельный флаг; raw SILK/Hybrid ускорены. Continuity — отдельный gate.
 - [ ] P2: A2 pulse-cache/energy/LTP/NLSF, по одной группе на коммит.
+  Pulse-cache проверен в двух вариантах и отклонён: регрессия CELT64;
+  energy/LTP/NLSF остаются гипотезами. Не повторять отклонённый вариант.
 - [ ] P3: A3 exact divisions: power-of-two / reciprocal / bitrate отдельно.
 - [ ] P4: A4 decoder-only CELT specialization, code-size/cache A/B.
 - [ ] P5: A5 SILK specialization, A6 exact loop scheduling/unroll.
