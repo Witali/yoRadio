@@ -11,6 +11,14 @@
 #define CACHE_TEMP CACHE_PATH ".tmp"
 /* Bump when the station-filter policy or representation changes. */
 #define CACHE_MAGIC 0x31575a47U
+/* Same source CSV can produce different rows after an application-only OTA.
+ * Invalidate both ways when Opus changes, just like the station offset index.
+ * Version 1 is the original no-Opus representation. No extra header/RAM field. */
+#if CONFIG_YORADIO_OGG_OPUS
+#define CACHE_VERSION 2U
+#else
+#define CACHE_VERSION 1U
+#endif
 typedef struct {
     uint32_t magic, version, source_size, source_crc, body_size, body_crc;
 } cache_header_t;
@@ -46,7 +54,7 @@ static bool cached(cache_workspace_t *w) {
     if (fd < 0) return false;
     cache_header_t h;
     bool valid = read(fd, &h, sizeof(h)) == sizeof(h) &&
-        h.magic == CACHE_MAGIC && h.version == 1 &&
+        h.magic == CACHE_MAGIC && h.version == CACHE_VERSION &&
         h.source_size == w->header.source_size && h.source_crc == w->header.source_crc &&
         h.body_size >= 20 && h.body_size < h.source_size;
     uint32_t size, crc;
@@ -98,7 +106,7 @@ void playlist_web_cache_refresh(void) {
     s_ready = false;
     cache_workspace_t *w = calloc(1, sizeof(*w));
     if (!w) { ESP_LOGW(TAG, "Cache skipped: no transient workspace"); return; }
-    w->header.magic = CACHE_MAGIC; w->header.version = 1;
+    w->header.magic = CACHE_MAGIC; w->header.version = CACHE_VERSION;
     int fd = open(PLAYLIST_PATH, O_RDONLY);
     bool ok = fd >= 0 && checksum(fd, w->input, sizeof(w->input),
                                   &w->header.source_size, &w->header.source_crc);

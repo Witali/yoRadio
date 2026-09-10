@@ -20,16 +20,34 @@ test('actual flash cache validates source and body, rebuilds stale data, reuses 
   const args=['-std=c11','-D_POSIX_C_SOURCE=200809L','-O2','-Wall','-Wextra','-Werror','-fsanitize=undefined',
     '-I'+p(dir),'-I'+p(main),p(path.join(dir,'test.c')),p(path.join(dir,'cache.c')),p(path.join(main,'small_gzip.c')),'-o',p(bin)];
   const opts={encoding:'utf8'};
-  const build=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...args]:args,opts);
-  assert.equal(build.status,0,build.stdout+build.stderr);
+  const buildFor=opus=>{
+    const selected=['-DCONFIG_YORADIO_OGG_OPUS='+opus,...args];
+    const build=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...selected]:selected,opts);
+    assert.equal(build.status,0,build.stdout+build.stderr);
+  };
+  buildFor(0);
   const run=()=>spawnSync(wsl?'wsl.exe':bin,wsl?['--exec',p(bin),p(output)]:[p(output)],opts);
   const supported=Array.from({length:600},(_,i)=>`Радио ${i}\thttp://radio.example:8000/${i}.mp3\t0\r\n`).join('');
-  fs.writeFileSync(csv,supported+'Skip\thttps://radio.example/a.mp3\t0\nSkip\thttp://host/a.ogg\t0\n');
+  const opusRows='Ogg Opus radio\thttp://host/live.opus\t0\nOgg radio\thttp://host/a.ogg\t0\n';
+  fs.writeFileSync(csv,supported+'Skip\thttps://radio.example/a.mp3\t0\n'+opusRows);
   let r=run();assert.equal(r.status,0,r.stderr);assert.match(r.stderr,/Built gzip/);
   assert.deepEqual(zlib.gunzipSync(fs.readFileSync(output)),Buffer.from(supported));
   const first=fs.readFileSync(cache),time=fs.statSync(cache).mtimeMs;
   r=run();assert.equal(r.status,0,r.stderr);assert.match(r.stderr,/Validated gzip/);
   assert.equal(fs.statSync(cache).mtimeMs,time);assert.deepEqual(fs.readFileSync(cache),first);
+  // Application-only OTA: unchanged CSV, but different codec capabilities.
+  // Both programs execute the real cache and station filter against one file.
+  const unchangedSource=fs.readFileSync(csv),sourceTime=fs.statSync(csv).mtimeMs;
+  buildFor(1);
+  r=run();assert.equal(r.status,0,r.stderr);assert.match(r.stderr,/Built gzip/);
+  assert.deepEqual(zlib.gunzipSync(fs.readFileSync(output)),Buffer.from(supported+opusRows));
+  const opusCache=fs.readFileSync(cache),opusTime=fs.statSync(cache).mtimeMs;
+  r=run();assert.equal(r.status,0,r.stderr);assert.match(r.stderr,/Validated gzip/);
+  assert.deepEqual(fs.readFileSync(cache),opusCache);assert.equal(fs.statSync(cache).mtimeMs,opusTime);
+  buildFor(0);
+  r=run();assert.equal(r.status,0,r.stderr);assert.match(r.stderr,/Built gzip/);
+  assert.deepEqual(zlib.gunzipSync(fs.readFileSync(output)),Buffer.from(supported));
+  assert.deepEqual(fs.readFileSync(csv),unchangedSource);assert.equal(fs.statSync(csv).mtimeMs,sourceTime);
   // Same-length content replacement cannot leave a stale cache.
   const next=fs.readFileSync(csv,'utf8').replace(/radio.example/g,'other.example');fs.writeFileSync(csv,next);
   r=run();assert.equal(r.status,0,r.stderr);assert.match(r.stderr,/Built gzip/);
