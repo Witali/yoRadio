@@ -3,13 +3,14 @@
 #include <stdio.h>
 #include <string.h>
 static uint32_t now, missed, ticks, s_generation = 3;
+static unsigned critical_depth;
 typedef struct { uint32_t queue_empty_events; } native_audio_output_spi_stats_t;
 static void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *s) { s->queue_empty_events = missed; }
-static uint32_t esp_timer_get_time(void) { return now; }
+static uint32_t esp_timer_get_time(void) { assert(critical_depth > 0); return now; }
 static uint32_t xTaskGetTickCount(void) { return ticks; }
 #define portTICK_PERIOD_MS 1
-#define taskENTER_CRITICAL() ((void)0)
-#define taskEXIT_CRITICAL() ((void)0)
+#define taskENTER_CRITICAL() (++critical_depth)
+#define taskEXIT_CRITICAL() (assert(critical_depth > 0), --critical_depth)
 #define YORADIO_ESP8266_OPUS_STREAM_TEST 1
 #include "audio_stage_profile.inc"
 int main(void) {
@@ -53,5 +54,6 @@ int main(void) {
     assert(audio_service_stage_json(json, (size_t)n + 1) == n);
     assert(audio_service_stage_json(json, (size_t)n) == -1);
     assert(audio_service_stage_json(json, 0) == -1);
+    assert(critical_depth == 0);
     puts("stage accounting PASS: exclusive nested output, rollover, DMA reset, bounded JSON");
 }

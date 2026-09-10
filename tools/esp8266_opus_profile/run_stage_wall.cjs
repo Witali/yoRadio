@@ -29,6 +29,8 @@ function summarize(samples, seconds = 25) {
       mean_us:calls ? time/calls : 0, maximum_since_boot_us:b.stages[i][1],
       misses:delta(b.stages[i][3],a.stages[i][3])};
   });
+  result.timing_valid = !result.stages.some(s => s.maximum_since_boot_us >= 0x80000000);
+  if (!result.timing_valid) result.profile_error = 'implausible stage maximum; possible non-monotonic SDK clock; retain misses but do not qualify wall timings';
   result.unattributed_misses_approx = continuity.underruns - result.stages.reduce((n,s) => n+s.misses,0);
   result.note = 'Health and profile are successive requests, not an atomic combined snapshot. Maxima are since boot. All failures are retained.';
   return result;

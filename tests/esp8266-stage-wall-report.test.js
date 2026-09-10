@@ -42,6 +42,11 @@ test('v2 separates empty-input waits from post-decode pacing, retaining every mi
   assert.deepEqual(r.stages.slice(3).map(s=>[s.name,s.wall_percent,s.misses]),
     [['post_decode_wait',5,2],['input_wait',2,7]]);
   assert.equal(r.unattributed_misses_approx,0);
+  b.profile.stages[0][1]=0xffffff4b;
+  const badClock=summarize([a,b]);
+  assert.equal(badClock.timing_valid,false);
+  assert.match(badClock.profile_error,/clock/);
+  assert.equal(badClock.stages[4].misses,7);
   b.profile.profile_version=3;
   assert.match(summarize([a,b]).profile_error,/invalid stages/);
   delete b.profile.profile_version;b.profile.stages.pop();

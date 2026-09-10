@@ -9,6 +9,16 @@ typedef struct { uint32_t us, maximum, calls, misses; } audio_stage_stats_t;
 typedef struct { uint32_t us, misses, output_us, output_misses; } audio_stage_mark_t;
 static audio_stage_stats_t s_stages[AUDIO_STAGE_COUNT];
 
+static uint32_t audio_stage_now(void) {
+    /* This SDK combines g_esp_os_us with CCOUNT without locking, while the
+     * tick ISR updates the former and clears the latter. Read one coherent
+     * pair; never mask interrupts across the measured operation itself. */
+    taskENTER_CRITICAL();
+    uint32_t now = (uint32_t)esp_timer_get_time();
+    taskEXIT_CRITICAL();
+    return now;
+}
+
 static uint32_t audio_stage_misses(void) {
     native_audio_output_spi_stats_t stats;
     native_audio_output_get_spi_stats(&stats);
@@ -19,12 +29,12 @@ static audio_stage_mark_t audio_stage_start(void) {
         .misses = audio_stage_misses(),
         .output_us = s_stages[AUDIO_STAGE_OUTPUT].us,
         .output_misses = s_stages[AUDIO_STAGE_OUTPUT].misses,
-        .us = (uint32_t)esp_timer_get_time(),
+        .us = audio_stage_now(),
     };
     return mark;
 }
 static void audio_stage_finish(unsigned stage, audio_stage_mark_t mark) {
-    uint32_t elapsed = (uint32_t)esp_timer_get_time() - mark.us;
+    uint32_t elapsed = audio_stage_now() - mark.us;
     uint32_t misses = audio_stage_misses() - mark.misses;
     /* Starting/reconfiguring DMA resets its counter. Do not interpret that as
      * billions of misses. Ordinary unsigned rollover still produces a delta. */

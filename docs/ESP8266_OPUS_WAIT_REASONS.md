@@ -21,7 +21,7 @@ Profile v2 keeps read/decode-exclusive/output as rows0..2 and splits waits:
 - Row4 `input_wait`: existing wait after process_one needs more compressed bytes.
 
 Neither wait, task priority, input/PCM/DMA size nor decoder is changed.
-An additional16 bytes of static DRAM hold the fourth set of counters;
+An additional16 bytes of static DRAM hold the fifth set of counters;
 the five rows total80 bytes. No ISR, new allocation, per-sample operation
 or timing call is added. The JSON snapshot is16 bytes larger on the stack.
 Counters still measure wall time including preemption, NOT CPU utilization.
@@ -36,3 +36,29 @@ Next: physical repeated samples. If input waits dominate, inspect arrivals
 and buffering; if post-decode waits dominate, revisit pacing with the now
 faster FIR decoder. The previous pre-FIR DMA-aware-yield test did not prove
 a useful gain and must not be represented as already successful.
+
+## Clock race found during measurement
+
+The first v2 image later reported a read maximum4294967115us (uint32(-181)).
+Those microsecond statistics are not qualified; preserve the raw reports
+and their independent DMA counters. This is not evidence of a71-minute stall.
+
+The local SDK and [Espressif timer source](https://github.com/espressif/ESP8266_RTOS_SDK/blob/master/components/esp8266/source/esp_timer.c)
+read the software microsecond accumulator and CCOUNT without exclusion.
+The [tick handler](https://github.com/espressif/ESP8266_RTOS_SDK/blob/master/components/freertos/port/esp8266/port.c)
+adds elapsed time and resets CCOUNT, so a tick between the two reads can
+produce an inconsistent timestamp. This race is a concrete candidate for
+the observed negative duration, not proof that it caused the audio pauses.
+
+Diagnostic timestamps now use a critical section ONLY around the clock
+snapshot; measured work/decoding/network waits remain interruptible. Host
+tests require the clock call to be protected and balanced, retaining the
+rollover checks. Physical qualification of the corrected clock is pending.
+The report reader flags implausible maxima without discarding DMA misses.
+
+Separate existing clock-rate mismatch: nominal48k PDM is clocked at
+160MHz/(8*13*32) =48076.923Hz, ratio625/624. The current resampler uses
+nominal48k. This can consume76.923 extra source samples per second and
+eventually drain finite read-ahead; it cannot explain all observed large
+pauses by itself. Test compensation separately, preserving modulator state
+and accounting for the resulting deliberate resampling change.
