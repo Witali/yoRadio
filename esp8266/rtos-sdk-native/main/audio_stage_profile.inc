@@ -1,8 +1,9 @@
 /* Diagnostic stream profile only. One audio owner; nested PCM output is
  * subtracted from process_one. Wall time includes preemption, not just CPU.
- * 64 bytes of DRAM; no ISR changes, allocations, logging or per-sample hooks. */
+ * 80 bytes of DRAM; no ISR changes, allocations, logging or per-sample hooks. */
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
 enum { AUDIO_STAGE_READ, AUDIO_STAGE_DECODE, AUDIO_STAGE_OUTPUT, AUDIO_STAGE_WAIT,
+       AUDIO_STAGE_INPUT_WAIT,
        AUDIO_STAGE_COUNT };
 typedef struct { uint32_t us, maximum, calls, misses; } audio_stage_stats_t;
 typedef struct { uint32_t us, misses, output_us, output_misses; } audio_stage_mark_t;
@@ -55,7 +56,7 @@ int audio_service_stage_json(char *body, size_t capacity) {
     generation = s_generation;
     uptime = xTaskGetTickCount() * portTICK_PERIOD_MS;
     taskEXIT_CRITICAL();
-    int size = snprintf(body, capacity, "{\"generation\":%u,\"uptime_ms\":%u,\"stages\":[",
+    int size = snprintf(body, capacity, "{\"profile_version\":2,\"generation\":%u,\"uptime_ms\":%u,\"stages\":[",
                         (unsigned)generation, (unsigned)uptime);
     if (size < 0 || (size_t)size >= capacity) return -1;
     for (unsigned i = 0; i < AUDIO_STAGE_COUNT; ++i) {

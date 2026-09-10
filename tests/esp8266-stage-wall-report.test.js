@@ -28,3 +28,22 @@ test('counter rollover works; reset/generation/missing samples cannot pass', () 
   assert.match(summarize([a,b]).profile_error,/mismatch/);
   assert.match(summarize([{error:'timeout'},b]).profile_error,/missing/);
 });
+
+test('v2 separates empty-input waits from post-decode pacing, retaining every miss', () => {
+  const a=sample(1000), b=sample(28000);
+  for(const s of [a,b]) {
+    s.profile.profile_version=2;
+    s.profile.stages.push([s.host_ms*20,1000,s.host_ms,0]);
+  }
+  b.health.underruns=9;
+  b.profile.stages[3][3]=2;b.profile.stages[4][3]=7;
+  const r=summarize([a,b]);
+  assert.equal(r.continuity.pass,false);
+  assert.deepEqual(r.stages.slice(3).map(s=>[s.name,s.wall_percent,s.misses]),
+    [['post_decode_wait',5,2],['input_wait',2,7]]);
+  assert.equal(r.unattributed_misses_approx,0);
+  b.profile.profile_version=3;
+  assert.match(summarize([a,b]).profile_error,/invalid stages/);
+  delete b.profile.profile_version;b.profile.stages.pop();
+  assert.match(summarize([a,b]).profile_error,/version mismatch/);
+});

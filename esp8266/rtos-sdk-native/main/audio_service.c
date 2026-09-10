@@ -1340,7 +1340,11 @@ static void audio_task(void *argument) {
                 ended = true;
                 end_error = errno == ETIMEDOUT ? 0 : -21;
             }
-            AUDIO_STAGE_END(AUDIO_STAGE_WAIT, wait_stage);
+            /* Distinguish voluntary pacing after a decoded packet from
+             * waiting because the incremental parser needs more bytes.
+             * Diagnostic only: the waits and scheduling remain unchanged. */
+            AUDIO_STAGE_END(decoded == 0 ? AUDIO_STAGE_WAIT : AUDIO_STAGE_INPUT_WAIT,
+                            wait_stage);
             int64_t now = esp_timer_get_time();
             if (!output.decoder_bitrate &&
                 now - output.measured_started_us >= 3000000) {

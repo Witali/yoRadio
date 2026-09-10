@@ -34,6 +34,7 @@ test('instrumentation uses existing debug-only profile and leaves scheduling unc
   assert.match(inc, /#else\s+#define AUDIO_STAGE_BEGIN\(name\) \(\(void\)0\)\s+#define AUDIO_STAGE_END\(stage, name\) \(\(void\)0\)/);
   assert.doesNotMatch(inc, /\b(?:malloc|calloc|vTaskDelay|ESP_LOGI)\s*\(/);
   const source = read('esp8266/rtos-sdk-native/main/audio_service.c');
-  for (const stage of ['READ', 'DECODE', 'OUTPUT', 'WAIT']) assert.match(source, new RegExp('AUDIO_STAGE_END\\(AUDIO_STAGE_' + stage));
+  for (const stage of ['READ', 'DECODE', 'OUTPUT']) assert.match(source, new RegExp('AUDIO_STAGE_END\\(AUDIO_STAGE_' + stage));
+  assert.match(source, /AUDIO_STAGE_END\(decoded == 0 \? AUDIO_STAGE_WAIT : AUDIO_STAGE_INPUT_WAIT,\s*wait_stage\)/);
   assert.match(source, /if \(decoded == 0\) \{[^]*?vTaskDelay\(pdMS_TO_TICKS\(1\)\);/);
 });

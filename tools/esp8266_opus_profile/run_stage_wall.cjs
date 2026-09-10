@@ -2,16 +2,22 @@
 // Read-only diagnostic sampling. Start a stream explicitly before running.
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path');
 const {analyze} = require('../test_esp8266_audio_continuity.cjs');
-const names = ['read', 'decode_exclusive', 'output', 'wait'];
+const legacyNames = ['read', 'decode_exclusive', 'output', 'wait'];
+const splitNames = ['read', 'decode_exclusive', 'output', 'post_decode_wait', 'input_wait'];
 const delta = (a,b) => (a-b) >>> 0;
 function summarize(samples, seconds = 25) {
   const continuity = analyze(samples.map(s => ({...s.health, host_ms:s.host_ms, error:s.error})), seconds);
   const result = {continuity, timing_kind:'wall time including preemption and DMA waits, NOT CPU utilization'};
   if (samples.length !== 2 || samples.some(s => s.error)) return {...result, profile_error:'missing samples'};
   const [a,b] = samples.map(s => s.profile);
-  if (![a,b].every(p => p && Array.isArray(p.stages) && p.stages.length === 4 && p.stages.every(s =>
+  if (![a,b].every(p => p && Array.isArray(p.stages) &&
+      ((p.profile_version === undefined && p.stages.length === 4) ||
+       (p.profile_version === 2 && p.stages.length === 5)) && p.stages.every(s =>
     s.length === 4 && s.every(v => Number.isInteger(v) && v >= 0 && v <= 0xffffffff))))
     return {...result, profile_error:'invalid stages'};
+  if (a.profile_version !== b.profile_version)
+    return {...result, profile_error:'profile version mismatch'};
+  const names = a.profile_version === 2 ? splitNames : legacyNames;
   if (a.generation !== b.generation || b.uptime_ms <= a.uptime_ms ||
       b.uptime_ms - a.uptime_ms >= 3600000 || samples.some(s => s.profile.generation !== s.health.generation))
     return {...result, profile_error:'generation/reset/interval mismatch'};

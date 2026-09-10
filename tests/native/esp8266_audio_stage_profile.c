@@ -36,11 +36,19 @@ int main(void) {
     missed = 0; now += 3;
     AUDIO_STAGE_END(AUDIO_STAGE_WAIT, reset);
     assert(s_stages[AUDIO_STAGE_WAIT].misses == 0);
+    AUDIO_STAGE_BEGIN(input_wait);
+    missed += 7; now += 123;
+    AUDIO_STAGE_END(AUDIO_STAGE_INPUT_WAIT, input_wait);
+    assert(s_stages[AUDIO_STAGE_INPUT_WAIT].us == 123);
+    assert(s_stages[AUDIO_STAGE_INPUT_WAIT].misses == 7);
+    assert(s_stages[AUDIO_STAGE_WAIT].misses == 0);
+    assert(sizeof(s_stages) == 80);
     /* Worst-case values fit the shared HTTP buffer; test exact capacity. */
     memset(s_stages, 0xff, sizeof(s_stages));
     char json[1088];
     int n = audio_service_stage_json(json, sizeof(json));
     assert(n > 0 && n < (int)sizeof(json));
+    assert(strstr(json, "\"profile_version\":2"));
     assert(strstr(json, "[4294967295,4294967295,4294967295,4294967295]"));
     assert(audio_service_stage_json(json, (size_t)n + 1) == n);
     assert(audio_service_stage_json(json, (size_t)n) == -1);
