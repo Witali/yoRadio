@@ -287,6 +287,10 @@ gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upst
 - [ ] P0: профиль SILK indices/pulses/parameters/core/resample и CELT
   energy/allocation/bands/synthesis/postfilter/deemphasis. Один выбранный
   этап на сборку или малый bounded набор counters; измерить timer overhead.
+  Инструментарий готов:11 выбираемых этапов,66 PCM/PLC/reset сравнений exact,
+  disabled assembler совпадает с исходным, +128B DRAM только в stage8
+  diagnostic. [Методика](ESP8266_OPUS_STAGE_PROFILE.md). Замеры всех стадий
+  и выбор следующей оптимизации остаются незавершёнными.
 - [x] P1: A1 FIR word-pairs, target alignment/asm, regression и10+10 board A/B.
   Сохранён отдельный флаг; raw SILK/Hybrid ускорены. Continuity — отдельный gate.
 - [ ] P2: A2 pulse-cache/energy/LTP/NLSF, по одной группе на коммит.

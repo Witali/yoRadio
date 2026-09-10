@@ -1244,9 +1244,12 @@ int celt_decode_with_ec_dred(CELTDecoder * OPUS_RESTRICT st, const unsigned char
       } while (++c<2);
    }
    /* Get band energies */
+   OPUS_STAGE_BEGIN(OPUS_STAGE_CELT_ENERGY)
    unquant_coarse_energy(mode, start, end, oldBandE,
          intra_ener, dec, C, LM);
+   OPUS_STAGE_END(OPUS_STAGE_CELT_ENERGY)
 
+   OPUS_STAGE_BEGIN(OPUS_STAGE_CELT_ALLOCATION)
    ALLOC(tf_res, nbEBands, int);
    tf_decode(start, end, isTransient, tf_res, LM, dec);
 
@@ -1306,8 +1309,11 @@ int celt_decode_with_ec_dred(CELTDecoder * OPUS_RESTRICT st, const unsigned char
    codedBands = clt_compute_allocation(mode, start, end, offsets, cap,
          alloc_trim, &intensity, &dual_stereo, bits, &balance, pulses,
          fine_quant, fine_priority, C, LM, dec, 0, 0, 0);
+   OPUS_STAGE_END(OPUS_STAGE_CELT_ALLOCATION)
 
+   OPUS_STAGE_BEGIN(OPUS_STAGE_CELT_ENERGY)
    unquant_fine_energy(mode, start, end, oldBandE, fine_quant, dec, C);
+   OPUS_STAGE_END(OPUS_STAGE_CELT_ENERGY)
 
    c=0; do {
       OPUS_MOVE(decode_mem[c], decode_mem[c]+N, DECODE_BUFFER_SIZE-N+overlap);
@@ -1318,6 +1324,7 @@ int celt_decode_with_ec_dred(CELTDecoder * OPUS_RESTRICT st, const unsigned char
 
    ALLOC(X, C*N, celt_norm);   /**< Interleaved normalised MDCTs */
 
+   OPUS_STAGE_BEGIN(OPUS_STAGE_CELT_BANDS)
    quant_all_bands(0, mode, start, end, X, C==2 ? X+N : NULL, collapse_masks,
          NULL, pulses, shortBlocks, spread_decision, dual_stereo, intensity, tf_res,
          len*(8<<BITRES)-anti_collapse_rsv, balance, dec, LM, codedBands, &st->rng, 0,
@@ -1330,14 +1337,17 @@ int celt_decode_with_ec_dred(CELTDecoder * OPUS_RESTRICT st, const unsigned char
          , CC==1 && C==2 && !accum && st->downsample==1 ? pcm : NULL, N
 #endif
          );
+   OPUS_STAGE_END(OPUS_STAGE_CELT_BANDS)
 
    if (anti_collapse_rsv > 0)
    {
       anti_collapse_on = ec_dec_bits(dec, 1);
    }
 
+   OPUS_STAGE_BEGIN(OPUS_STAGE_CELT_ENERGY)
    unquant_energy_finalise(mode, start, end, oldBandE,
          fine_quant, fine_priority, len*8-ec_tell(dec), dec, C);
+   OPUS_STAGE_END(OPUS_STAGE_CELT_ENERGY)
 
    if (anti_collapse_on)
       anti_collapse(mode, X, collapse_masks, LM, C, N,
@@ -1351,9 +1361,12 @@ int celt_decode_with_ec_dred(CELTDecoder * OPUS_RESTRICT st, const unsigned char
    if (st->prefilter_and_fold) {
       prefilter_and_fold(st, N);
    }
+   OPUS_STAGE_BEGIN(OPUS_STAGE_CELT_SYNTHESIS)
    celt_synthesis(mode, X, out_syn, oldBandE, start, effEnd,
                   C, CC, isTransient, LM, st->downsample, silence, st->arch);
+   OPUS_STAGE_END(OPUS_STAGE_CELT_SYNTHESIS)
 
+   OPUS_STAGE_BEGIN(OPUS_STAGE_CELT_POSTFILTER)
    c=0; do {
       st->postfilter_period=IMAX(st->postfilter_period, COMBFILTER_MINPERIOD);
       st->postfilter_period_old=IMAX(st->postfilter_period_old, COMBFILTER_MINPERIOD);
@@ -1366,6 +1379,7 @@ int celt_decode_with_ec_dred(CELTDecoder * OPUS_RESTRICT st, const unsigned char
                mode->window, overlap, st->arch);
 
    } while (++c<CC);
+   OPUS_STAGE_END(OPUS_STAGE_CELT_POSTFILTER)
    st->postfilter_period_old = st->postfilter_period;
    st->postfilter_gain_old = st->postfilter_gain;
    st->postfilter_tapset_old = st->postfilter_tapset;
@@ -1412,7 +1426,9 @@ int celt_decode_with_ec_dred(CELTDecoder * OPUS_RESTRICT st, const unsigned char
    } while (++c<2);
    st->rng = dec->rng;
 
+   OPUS_STAGE_BEGIN(OPUS_STAGE_CELT_DEEMPHASIS)
    deemphasis(out_syn, pcm, N, CC, st->downsample, mode->preemph, st->preemph_memD, accum);
+   OPUS_STAGE_END(OPUS_STAGE_CELT_DEEMPHASIS)
    st->loss_duration = 0;
    st->prefilter_and_fold = 0;
    RESTORE_STACK;

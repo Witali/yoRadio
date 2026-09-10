@@ -1,0 +1,89 @@
+{
+  "before": ".build/esp8266-opus-block-live",
+  "off": ".build/esp8266-opus-stage-off",
+  "on": ".build/esp8266-opus-stage-bands",
+  "objects": [
+    {
+      "file": "silk/decode_frame.c",
+      "off_instructions_exact": true,
+      "clock_reads": 0,
+      "off_stack": [
+        "silk_decode_frame\t80\tstatic"
+      ],
+      "on_stack": [
+        "silk_decode_frame\t80\tstatic"
+      ]
+    },
+    {
+      "file": "silk/dec_API.c",
+      "off_instructions_exact": true,
+      "clock_reads": 0,
+      "off_stack": [
+        "silk_LoadOSCEModels\t0\tstatic",
+        "silk_Get_Decoder_Size\t0\tstatic",
+        "silk_ResetDecoder\t16\tstatic",
+        "silk_InitDecoder\t16\tstatic",
+        "silk_Decode\t784\tstatic"
+      ],
+      "on_stack": [
+        "silk_LoadOSCEModels\t0\tstatic",
+        "silk_Get_Decoder_Size\t0\tstatic",
+        "silk_ResetDecoder\t16\tstatic",
+        "silk_InitDecoder\t16\tstatic",
+        "silk_Decode\t784\tstatic"
+      ]
+    },
+    {
+      "file": "celt/celt_decoder.c",
+      "off_instructions_exact": true,
+      "clock_reads": 2,
+      "off_stack": [
+        "deemphasis\t96\tstatic",
+        "prefilter_and_fold\t128\tstatic",
+        "celt_synthesis\t144\tstatic",
+        "celt_decoder_get_size\t16\tstatic",
+        "celt_decode_with_ec_dred\t464\tstatic",
+        "celt_decode_with_ec\t32\tstatic",
+        "opus_custom_decoder_ctl\t96\tstatic",
+        "celt_decoder_init\t48\tstatic"
+      ],
+      "on_stack": [
+        "deemphasis\t96\tstatic",
+        "prefilter_and_fold\t128\tstatic",
+        "celt_synthesis\t144\tstatic",
+        "celt_decoder_get_size\t16\tstatic",
+        "celt_decode_with_ec_dred\t464\tstatic",
+        "celt_decode_with_ec\t32\tstatic",
+        "opus_custom_decoder_ctl\t96\tstatic",
+        "celt_decoder_init\t48\tstatic"
+      ]
+    }
+  ],
+  "off_sections": {
+    ".iram0.vectors": 128,
+    ".iram0.text": 22900,
+    ".iram0.bss": 4044,
+    ".dram0.data": 1652,
+    ".dram0.bss": 18768,
+    ".flash.text": 636906,
+    ".flash.rodata": 250652
+  },
+  "on_sections": {
+    ".iram0.vectors": 128,
+    ".iram0.text": 22900,
+    ".iram0.bss": 4044,
+    ".dram0.data": 1652,
+    ".dram0.bss": 18896,
+    ".flash.text": 637290,
+    ".flash.rodata": 250812
+  },
+  "delta": {
+    ".iram0.vectors": 0,
+    ".iram0.text": 0,
+    ".iram0.bss": 0,
+    ".dram0.data": 0,
+    ".dram0.bss": 128,
+    ".flash.text": 384,
+    ".flash.rodata": 160
+  }
+}

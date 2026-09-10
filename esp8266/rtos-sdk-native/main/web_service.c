@@ -1330,6 +1330,15 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
             item.min_dram, item.stack_free, item.error);
         if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
         else result = httpd_resp_send_chunk(request, row, n);
+#if YORADIO_OPUS_PROFILE_STAGE
+        if (result == ESP_OK) {
+            n = snprintf(row, sizeof(row),
+                ",\"stage_cycles\":%llu,\"stage_calls\":%u,\"stage_max_cycles\":%u",
+                (unsigned long long)item.stage_cycles, item.stage_calls, item.stage_max_cycles);
+            if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
+            else result = httpd_resp_send_chunk(request, row, n);
+        }
+#endif
 #if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
         if (result == ESP_OK) {
             n = snprintf(row, sizeof(row),
@@ -1343,7 +1352,18 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
 #endif
         if (result == ESP_OK) result = httpd_resp_send_chunk(request, "}", 1);
     }
+#if YORADIO_OPUS_PROFILE_STAGE
+    if (result == ESP_OK) {
+        n = snprintf(row, sizeof(row),
+            "],\"profile_stage\":%u,\"stage_clock_hz\":160000000,"
+            "\"clock_pair_cycles_min\":%u,\"clock_pair_cycles_max\":%u}",
+            (unsigned)YORADIO_OPUS_PROFILE_STAGE, status.clock_pair_cycles_min, status.clock_pair_cycles_max);
+        if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
+        else result = httpd_resp_send_chunk(request, row, n);
+    }
+#else
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, "]}", 2);
+#endif
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
     return finish_short_response(request, result);
 }

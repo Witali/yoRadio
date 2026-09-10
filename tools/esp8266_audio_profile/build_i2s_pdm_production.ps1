@@ -24,6 +24,8 @@ param(
     [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
     [switch]$OpusBenchmarkOutput,
+    [ValidateRange(0, 11)]
+    [int]$OpusProfileStage = 0,
     [string]$OpusBenchmarkFixtures = '.build/esp8266-opus-board-fixtures'
 )
 $ErrorActionPreference = 'Stop'
@@ -33,6 +35,7 @@ if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
 if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -SpiffsLog' }
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
 if ($OpusBenchmarkOutput -and -not $OpusBenchmark) { throw '-OpusBenchmarkOutput requires -OpusBenchmark' }
+if ($OpusProfileStage -and (-not $OpusBenchmark -or $OpusBenchmarkOutput)) { throw '-OpusProfileStage requires a raw-only Opus benchmark' }
 if ($OpusStreamTest -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusStreamTest requires -Diagnostic and -EnableOpus' }
 if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOpus' }
 if ($OpusIcdfFlashWord -and -not $EnableOpus) { throw '-OpusIcdfFlashWord requires -EnableOpus' }
@@ -152,6 +155,7 @@ try {
         "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
         "-DYORADIO_OPUS_FIR_FLASH_WORD=$taskOpusFirFlashWord",
+        "-DYORADIO_OPUS_PROFILE_STAGE=$OpusProfileStage",
         "-DYORADIO_ESP8266_PDM32_IRAM=$taskPdm32Iram",
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
         "-DYORADIO_ESP8266_PDM32_LOAN_WORDS=$Pdm32LoanWords",
@@ -197,6 +201,7 @@ try {
         opus_word_asm=[bool]$OpusWordAsm
         opus_icdf_flash_word=[bool]$OpusIcdfFlashWord
         opus_fir_flash_word=[bool]$OpusFirFlashWord
+        opus_profile_stage=$OpusProfileStage
         opus_fir_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/resampler_private_IIR_FIR.c).Hash
         opus_fir_table_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/resampler_rom.c).Hash
         opus_fir_helper_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_fir_word.h).Hash

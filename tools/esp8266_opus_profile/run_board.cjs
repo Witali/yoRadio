@@ -5,6 +5,7 @@ const path = require('node:path');
 const http = require('node:http');
 const { performance } = require('node:perf_hooks');
 const {analyzeOutput} = require('./output_benchmark_result.cjs');
+const {analyzeStage} = require('./stage_profile_result.cjs');
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i=args.indexOf(name); return i<0?fallback:args[i+1]; };
 const base = option('--base', 'http://192.168.100.6');
@@ -55,6 +56,7 @@ function request(uri, method='GET') {
           audio_duration_us:item.samples*1000000/48000,
           task_budget_percent:item.samples?item.task_us*4.8/item.samples:null,
           wall_budget_percent:item.samples?item.wall_us*4.8/item.samples:null,
+          ...(s.profile_stage ? {stage:analyzeStage(s,item)} : {}),
           task_budget_minus_empty_estimate_percent:item.samples?
             Math.max(0,item.task_us-s.empty_task_us*item.packets)*4.8/item.samples:null}));
         report.after=await request('/api/native/status'); save();

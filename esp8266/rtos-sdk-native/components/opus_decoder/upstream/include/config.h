@@ -211,6 +211,13 @@
    backward compatibility; new code need not use it. */
 #define STDC_HEADERS 1
 
+#ifdef YORADIO_OPUS_BOUNDED
+#include "../../opus_stage_profile.h"
+#else
+#define OPUS_STAGE_BEGIN(id) ((void)0);
+#define OPUS_STAGE_END(id) ((void)0);
+#endif
+
 /* Make use of alloca */
 #undef USE_ALLOCA
 

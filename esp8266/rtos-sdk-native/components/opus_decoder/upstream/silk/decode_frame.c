@@ -80,23 +80,31 @@ opus_int silk_decode_frame(
         /*********************************************/
         /* Decode quantization indices of side info  */
         /*********************************************/
+        OPUS_STAGE_BEGIN(OPUS_STAGE_SILK_INDICES)
         silk_decode_indices( psDec, psRangeDec, psDec->nFramesDecoded, lostFlag, condCoding );
+        OPUS_STAGE_END(OPUS_STAGE_SILK_INDICES)
 
         /*********************************************/
         /* Decode quantization indices of excitation */
         /*********************************************/
+        OPUS_STAGE_BEGIN(OPUS_STAGE_SILK_PULSES)
         silk_decode_pulses( psRangeDec, pulses, psDec->indices.signalType,
                 psDec->indices.quantOffsetType, psDec->frame_length );
+        OPUS_STAGE_END(OPUS_STAGE_SILK_PULSES)
 
         /********************************************/
         /* Decode parameters and pulse signal       */
         /********************************************/
+        OPUS_STAGE_BEGIN(OPUS_STAGE_SILK_PARAMETERS)
         silk_decode_parameters( psDec, psDecCtrl, condCoding );
+        OPUS_STAGE_END(OPUS_STAGE_SILK_PARAMETERS)
 
         /********************************************************/
         /* Run inverse NSQ                                      */
         /********************************************************/
+        OPUS_STAGE_BEGIN(OPUS_STAGE_SILK_CORE)
         silk_decode_core( psDec, psDecCtrl, pOut, pulses, arch );
+        OPUS_STAGE_END(OPUS_STAGE_SILK_CORE)
 
         /*************************/
         /* Update output buffer. */

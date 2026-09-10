@@ -173,6 +173,12 @@ static int sequence_test(int argc, char **argv) {
     printf(",\"persistent_bytes\":%zu,\"scratch_byte_peak_bytes\":%zu,\"scratch_word_peak_bytes\":%zu,\"scratch_byte_capacity_bytes\":%zu",
            yoradio_opus_scratch_mark().words, yoradio_opus_scratch_peak_bytes(), yoradio_opus_scratch_peak_words(), sizeof(bytes.data));
 #endif
+#if YORADIO_OPUS_PROFILE_STAGE
+    {
+        const opus_stage_profile_t stage = opus_stage_profile_snapshot();
+        printf(",\"profile_stage\":%u,\"stage_calls\":%u", (unsigned)YORADIO_OPUS_PROFILE_STAGE, stage.calls);
+    }
+#endif
     puts("}");
     free(decoder);
     return 0;
@@ -219,6 +225,10 @@ int main(int argc, char **argv) {
 #ifdef YORADIO_OPUS_BOUNDED
     size_t peak_bytes = yoradio_opus_scratch_peak_bytes(), peak_words = yoradio_opus_scratch_peak_words();
 #endif
+#if YORADIO_OPUS_PROFILE_STAGE
+    /* Snapshot before malformed/OOM self-tests. Host ticks are not board speed. */
+    const opus_stage_profile_t stage = opus_stage_profile_snapshot();
+#endif
     if (argc == 4) self_test(decoder, first_packet, first_size);
     printf("{\"libopus\":\"%s\",\"mono_state_bytes\":%d,\"stereo_state_bytes\":%d,"
         "\"output_channels\":1,\"sample_rate\":48000,\"packets\":%u,\"samples\":%u,"
@@ -230,6 +240,9 @@ int main(int argc, char **argv) {
         "\"scratch_byte_capacity_bytes\":%zu,\"scratch_word_capacity_bytes\":%zu,"
         "\"arena_guards_ok\":true,\"oom_reinitialized_exact\":%s", peak_bytes, peak_words,
         sizeof(bytes.data), sizeof(words.data), argc == 4 ? "true" : "null");
+#endif
+#if YORADIO_OPUS_PROFILE_STAGE
+    printf(",\"profile_stage\":%u,\"stage_calls\":%u", (unsigned)YORADIO_OPUS_PROFILE_STAGE, stage.calls);
 #endif
     puts("}");
     free(decoder);

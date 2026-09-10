@@ -2,13 +2,25 @@ if(CONFIG_YORADIO_OGG_OPUS)
   option(YORADIO_OPUS_WORD_ASM "A/B: private Opus LX106 word accesses without volatile-C MEMW" OFF)
   option(YORADIO_OPUS_ICDF_FLASH_WORD "A/B: decode static flash ICDF tables with word loads" OFF)
   option(YORADIO_OPUS_FIR_FLASH_WORD "A/B: SILK resampler flash coefficients as word pairs" OFF)
+  set(YORADIO_OPUS_PROFILE_STAGE 0 CACHE STRING "Diagnostic selected Opus stage, 0 off / 1..11")
+  if(NOT YORADIO_OPUS_PROFILE_STAGE MATCHES "^([0-9]|10|11)$")
+    message(FATAL_ERROR "Opus profile stage must be 0..11")
+  endif()
+  if(YORADIO_OPUS_PROFILE_STAGE GREATER 0 AND
+     (NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT YORADIO_ESP8266_OPUS_BENCHMARK OR YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT))
+    message(FATAL_ERROR "Opus stage profile requires diagnostic raw-only benchmark")
+  endif()
+  if(YORADIO_OPUS_PROFILE_STAGE GREATER 0 AND NOT CONFIG_ESP8266_DEFAULT_CPU_FREQ_160)
+    message(FATAL_ERROR "Opus CCOUNT profile requires fixed CPU160; metadata must match the clock")
+  endif()
   file(GLOB OPUS_SOURCES upstream/src/*.c upstream/celt/*.c
        upstream/silk/*.c upstream/silk/fixed/*.c)
   idf_component_register(SRCS ${OPUS_SOURCES}
-      opus_memory.c ogg_opus_demux.c native_opus.c
+      opus_memory.c opus_stage_profile.c ogg_opus_demux.c native_opus.c
       INCLUDE_DIRS . upstream/include
       PRIV_INCLUDE_DIRS upstream/celt upstream/silk upstream/silk/fixed upstream/src)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_BOUNDED=1)
+  target_compile_definitions(${COMPONENT_LIB} PUBLIC YORADIO_OPUS_PROFILE_STAGE=${YORADIO_OPUS_PROFILE_STAGE})
   if(YORADIO_OPUS_WORD_ASM)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_WORD_ASM=1)
   endif()

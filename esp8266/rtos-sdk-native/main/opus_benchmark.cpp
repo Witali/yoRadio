@@ -5,6 +5,9 @@
 #include "codec_arena_native.h"
 #include "opus.h"
 #include "opus_memory.h"
+#if YORADIO_OPUS_PROFILE_STAGE
+#include "opus_stage_profile.h"
+#endif
 #include "opus_board_fixtures.h"
 #include <string.h>
 extern "C" {
@@ -136,6 +139,19 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
         taskENTER_CRITICAL();
         s_status.empty_task_us = (empty + 8) / 16;
         taskEXIT_CRITICAL();
+#if YORADIO_OPUS_PROFILE_STAGE
+        uint32_t clock_min = UINT32_MAX, clock_max = 0;
+        for (unsigned i = 0; i < 128; ++i) {
+            uint32_t start = opus_stage_profile_clock();
+            uint32_t elapsed = opus_stage_profile_clock() - start;
+            if (elapsed < clock_min) clock_min = elapsed;
+            if (elapsed > clock_max) clock_max = elapsed;
+        }
+        taskENTER_CRITICAL();
+        s_status.clock_pair_cycles_min = clock_min;
+        s_status.clock_pair_cycles_max = clock_max;
+        taskEXIT_CRITICAL();
+#endif
         for (unsigned f = 0; f < OPUS_BENCH_FIXTURE_COUNT && !error; ++f) {
             opus_bench_fixture_t fixture;
             copy_words(&fixture, &opus_bench_fixtures[f], sizeof(fixture));
@@ -185,9 +201,21 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
                     vTaskDelay(1);
                     uint32_t cpu = task_time();
 #endif
+#if YORADIO_OPUS_PROFILE_STAGE
+                    opus_stage_profile_reset();
+#endif
                     int64_t start = esp_timer_get_time();
                     int decoded = yoradio_opus_decode_bounded(state, packet, entry.length, pcm, kPcmSamples);
                     uint32_t elapsed = (uint32_t)(esp_timer_get_time() - start);
+#if YORADIO_OPUS_PROFILE_STAGE
+                    const opus_stage_profile_t stage = opus_stage_profile_snapshot();
+                    if (round) {
+                        result.stage_cycles += stage.cycles;
+                        result.stage_calls += stage.calls;
+                        if (stage.max_cycles > result.stage_max_cycles)
+                            result.stage_max_cycles = stage.max_cycles;
+                    }
+#endif
 #if !YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
                     vTaskDelay(1);
                     cpu = task_time() - cpu;
