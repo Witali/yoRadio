@@ -1,0 +1,513 @@
+TAP version 13
+# bounded: compiled 0/112 objects; link reused
+# Subtest: native Opus streaming adapter validates headers, sample trimming, chains, cancellation and bounded memory
+ok 1 - native Opus streaming adapter validates headers, sample trimming, chains, cancellation and bounded memory
+  ---
+  duration_ms: 9624.1277
+  type: 'test'
+  ...
+# Native live join: strict default, pre-skip, 64-bit granules and reset PASS\\nNative packed Opus:60ms packet, reused960 PCM, cross-frame trim and cancellation PASS\\nNative Opus PASS: state=6654 adapter=2040 PCM=1920 no allocations
+# Subtest: generic32 reference is only an opt-in architecture guard, with verified file provenance
+ok 2 - generic32 reference is only an opt-in architecture guard, with verified file provenance
+  ---
+  duration_ms: 29.1093
+  type: 'test'
+  ...
+# Subtest: arithmetic selection rejects invalid and identical comparison branches before building
+ok 3 - arithmetic selection rejects invalid and identical comparison branches before building
+  ---
+  duration_ms: 1.5311
+  type: 'test'
+  ...
+# Subtest: saved generic32 evidence is bit-exact to its pristine reference and quantifies host64 rounding
+ok 4 - saved generic32 evidence is bit-exact to its pristine reference and quantifies host64 rounding
+  ---
+  duration_ms: 0.8685
+  type: 'test'
+  ...
+# Subtest: packet fixture builder covers CBR/VBR and padding and preserves mode changes and tails
+ok 5 - packet fixture builder covers CBR/VBR and padding and preserves mode changes and tails
+  ---
+  duration_ms: 6.197
+  type: 'test'
+  ...
+# Subtest: capture inspector verifies complete-page CRC and explicitly retains truncated-tail information
+ok 6 - capture inspector verifies complete-page CRC and explicitly retains truncated-tail information
+  ---
+  duration_ms: 3.8816
+  type: 'test'
+  ...
+# Subtest: saved bounded block PCM matches pristine including 120ms packets with no extra PCM or heap allocation
+ok 7 - saved bounded block PCM matches pristine including 120ms packets with no extra PCM or heap allocation
+  ---
+  duration_ms: 1.3373
+  type: 'test'
+  ...
+# Subtest: full block-output corpus can be reproduced
+ok 8 - full block-output corpus can be reproduced # SKIP Set OPUS_BLOCK_TEST=1 for full host comparison
+  ---
+  duration_ms: 0.1705
+  type: 'test'
+  ...
+# Subtest: real board benchmark output=0 stage=0 cleans up OOM/cancel/error and supports repeated runs
+ok 9 - real board benchmark output=0 stage=0 cleans up OOM/cancel/error and supports repeated runs
+  ---
+  duration_ms: 1672.7257
+  type: 'test'
+  ...
+# Opus board benchmark lifecycle PASS: 10 complete runs, 5 allocation-failure sites, queued/running busy, pending/midway cancel, golden PCM, 110 paired allocations/frees
+# Subtest: real board benchmark output=1 stage=0 cleans up OOM/cancel/error and supports repeated runs
+ok 10 - real board benchmark output=1 stage=0 cleans up OOM/cancel/error and supports repeated runs
+  ---
+  duration_ms: 1567.5326
+  type: 'test'
+  ...
+# Opus board benchmark lifecycle PASS: 10 complete runs, 5 allocation-failure sites, queued/running busy, pending/midway cancel, golden PCM, 135 paired allocations/frees
+# Subtest: real board benchmark output=0 stage=8 cleans up OOM/cancel/error and supports repeated runs
+ok 11 - real board benchmark output=0 stage=8 cleans up OOM/cancel/error and supports repeated runs
+  ---
+  duration_ms: 1978.9169
+  type: 'test'
+  ...
+# Opus board benchmark lifecycle PASS: 10 complete runs, 5 allocation-failure sites, queued/running busy, pending/midway cancel, golden PCM, 110 paired allocations/frees
+# Subtest: board PCM FNV-1a32 hashes little-endian bytes with unsigned wrap
+ok 12 - board PCM FNV-1a32 hashes little-endian bytes with unsigned wrap
+  ---
+  duration_ms: 0.8806
+  type: 'test'
+  ...
+# Subtest: board reference rejects host-default arithmetic and bounded decoder
+ok 13 - board reference rejects host-default arithmetic and bounded decoder
+  ---
+  duration_ms: 0.9718
+  type: 'test'
+  ...
+# Subtest: board packet prefix rejects truncated, empty, oversized and bad-duration input
+ok 14 - board packet prefix rejects truncated, empty, oversized and bad-duration input
+  ---
+  duration_ms: 0.8257
+  type: 'test'
+  ...
+# Subtest: five board prefixes retain exact raw bytes and zero-pad each packet to a word
+ok 15 - five board prefixes retain exact raw bytes and zero-pad each packet to a word
+  ---
+  duration_ms: 8.8841
+  type: 'test'
+  ...
+# Subtest: golden fixture selection accepts all canonical names and compact aliases
+ok 16 - golden fixture selection accepts all canonical names and compact aliases
+  ---
+  duration_ms: 0.3552
+  type: 'test'
+  ...
+# Subtest: existing pristine probe generates deterministic fresh-decoder board hashes without a rebuild
+ok 17 - existing pristine probe generates deterministic fresh-decoder board hashes without a rebuild
+  ---
+  duration_ms: 1250.4351
+  type: 'test'
+  ...
+# Subtest: decoder-only CELT is opt-in and guarded before any allocation
+ok 18 - decoder-only CELT is opt-in and guarded before any allocation
+  ---
+  duration_ms: 1.2381
+  type: 'test'
+  ...
+# Subtest: saved CELT regression binds current source and exact PCM, including transitions
+ok 19 - saved CELT regression binds current source and exact PCM, including transitions
+  ---
+  duration_ms: 1.79
+  type: 'test'
+  ...
+# Subtest: CELT A/B rejects any unmatched build setting
+ok 20 - CELT A/B rejects any unmatched build setting
+  ---
+  duration_ms: 1.1593
+  type: 'test'
+  ...
+# Subtest: actual PowerShell flags and cached runtime guards cover live/raw/production
+ok 21 - actual PowerShell flags and cached runtime guards cover live/raw/production
+  ---
+  duration_ms: 643.168
+  type: 'test'
+  ...
+# Subtest: actual CMake gates both components and needs fixtures only for raw benchmark
+ok 22 - actual CMake gates both components and needs fixtures only for raw benchmark
+  ---
+  duration_ms: 339.1813
+  type: 'test'
+  ...
+# Subtest: preprocessed production/live/raw routes and init snapshot have no crossed guards
+ok 23 - preprocessed production/live/raw routes and init snapshot have no crossed guards
+  ---
+  duration_ms: 769.2523
+  type: 'test'
+  ...
+# Subtest: single reciprocal is opt-in and binds complete PCM/arena evidence
+ok 24 - single reciprocal is opt-in and binds complete PCM/arena evidence
+  ---
+  duration_ms: 3.6047
+  type: 'test'
+  ...
+# Subtest: reciprocal board A/B forbids unrelated changes
+ok 25 - reciprocal board A/B forbids unrelated changes
+  ---
+  duration_ms: 1.2503
+  type: 'test'
+  ...
+# Subtest: target reciprocal path follows outlined GCC function and does not add static RAM
+ok 26 - target reciprocal path follows outlined GCC function and does not add static RAM
+  ---
+  duration_ms: 1.2192
+  type: 'test'
+  ...
+# Subtest: archived reciprocal A/B retains all ten attempts and its negative speed result
+ok 27 - archived reciprocal A/B retains all ten attempts and its negative speed result
+  ---
+  duration_ms: 17.2624
+  type: 'test'
+  ...
+# Subtest: compiler-only inlining probe is source-bound and does not claim board timing
+ok 28 - compiler-only inlining probe is source-bound and does not claim board timing
+  ---
+  duration_ms: 1.7126
+  type: 'test'
+  ...
+# Subtest: saved full FIR decoder regression matches current sources and exact PCM
+ok 29 - saved full FIR decoder regression matches current sources and exact PCM
+  ---
+  duration_ms: 1.8574
+  type: 'test'
+  ...
+# Subtest: FIR flash pairs default off; invalid macro values rejected
+ok 30 - FIR flash pairs default off; invalid macro values rejected
+  ---
+  duration_ms: 164.3864
+  type: 'test'
+  ...
+# Subtest: actual FIR pair path is bit exact over all fractional phases, clipping and guard cases
+ok 31 - actual FIR pair path is bit exact over all fractional phases, clipping and guard cases
+  ---
+  duration_ms: 2927.2378
+  type: 'test'
+  ...
+# Subtest: Xtensa actual FIR uses four word table reads and no added persistent RAM or stack
+ok 32 - Xtensa actual FIR uses four word table reads and no added persistent RAM or stack
+  ---
+  duration_ms: 315.0706
+  type: 'test'
+  ...
+# Subtest: fixture server streams exact file with bounded HTTP lifecycle and no directory exposure
+ok 33 - fixture server streams exact file with bounded HTTP lifecycle and no directory exposure
+  ---
+  duration_ms: 32.5986
+  type: 'test'
+  ...
+# Subtest: optional FIN hold preserves payload and can be cancelled by the client
+ok 34 - optional FIN hold preserves payload and can be cancelled by the client
+  ---
+  duration_ms: 36.4836
+  type: 'test'
+  ...
+# {
+#   "passed": true,
+#   "scope": "Isolated exact arithmetic + GCC target audit. Not full PCM, board timing or a production change.",
+#   "host_asan_ubsan": {
+#     "passed": true,
+#     "cases": 1720896,
+#     "original_calls": 3,
+#     "once_calls": 1
+#   },
+#   "target": [
+#     {
+#       "symbol": "opus_div_original",
+#       "celt_rcp_call_sites": 3,
+#       "text_bytes": 100,
+#       "stack_bytes": 32
+#     },
+#     {
+#       "symbol": "opus_div_once",
+#       "celt_rcp_call_sites": 1,
+#       "text_bytes": 60,
+#       "stack_bytes": 16
+#     }
+#   ],
+#   "source_sha256_lf": {
+#     "tools/esp8266_opus_profile/hoist_reciprocal_probe.c": "760b06e4e6af0d270502d3ac9c6ce1e481977834e1e9da55bbf4a09de27f1171",
+#     "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/mathops.h": "345123aa43380536d4c2d18faa560698af274825ac5fb02288c507f7f1519a97",
+#     "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/mathops.c": "1bb9acef1450ce67d6cd63f007e8fcc3ca5ccfea4c9b22131d853da5d9298510",
+#     "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/fixed_generic.h": "0185be2436b154667da33fc7bd8af6c07290980681c767fb2d3c89985cf7d308"
+#   }
+# }
+# Subtest: audit: one reciprocal evaluation is exact and replaces three target calls
+ok 35 - audit: one reciprocal evaluation is exact and replaces three target calls
+  ---
+  duration_ms: 1470.8407
+  type: 'test'
+  ...
+# Subtest: ICDF builder switch requires Opus, defaults OFF, explicitly sets CMake and records a boolean manifest
+ok 36 - ICDF builder switch requires Opus, defaults OFF, explicitly sets CMake and records a boolean manifest
+  ---
+  duration_ms: 612.1658
+  type: 'test'
+  ...
+# bounded: compiled 0/112 objects; link reused
+# Subtest: ICDF word A/B defaults off and rejects invalid macro values
+ok 37 - ICDF word A/B defaults off and rejects invalid macro values
+  ---
+  duration_ms: 171.7373
+  type: 'test'
+  ...
+# Subtest: actual word branch matches legacy entropy state and preserves two-byte DRAM tables under ASan/UBSan
+ok 38 - actual word branch matches legacy entropy state and preserves two-byte DRAM tables under ASan/UBSan
+  ---
+  duration_ms: 7759.1546
+  type: 'test'
+  ...
+# Subtest: Xtensa ICDF range dispatch is outside both loops and only flash reads become word loads
+ok 39 - Xtensa ICDF range dispatch is outside both loops and only flash reads become word loads
+  ---
+  duration_ms: 700.0217
+  type: 'test'
+  ...
+# Subtest: saved ICDF word evidence exercised real flash reads and exactly matched pristine PCM
+ok 40 - saved ICDF word evidence exercised real flash reads and exactly matched pristine PCM
+  ---
+  duration_ms: 1.6965
+  type: 'test'
+  ...
+# Subtest: full real-word-branch Opus PCM corpus can be reproduced
+ok 41 - full real-word-branch Opus PCM corpus can be reproduced # SKIP Set OPUS_ICDF_TEST=1 for all host PCM comparisons.
+  ---
+  duration_ms: 0.1259
+  type: 'test'
+  ...
+# Subtest: Xtensa pitch interpolation keeps IRAM correlation loads at 32 bits
+ok 42 - Xtensa pitch interpolation keeps IRAM correlation loads at 32 bits
+  ---
+  duration_ms: 20.6471
+  type: 'test'
+  ...
+# Subtest: Xtensa CELT IRAM zero fills cannot become raw libc memset
+ok 43 - Xtensa CELT IRAM zero fills cannot become raw libc memset
+  ---
+  duration_ms: 32.4069
+  type: 'test'
+  ...
+# Subtest: Opus corpus pins CBR 12..510 kbps packets and covers SILK, hybrid and CELT
+ok 44 - Opus corpus pins CBR 12..510 kbps packets and covers SILK, hybrid and CELT
+  ---
+  duration_ms: 3.1582
+  type: 'test'
+  ...
+# Subtest: saved Opus host evidence has exact pristine/baseline/bounded PCM and bounded arena usage
+ok 45 - saved Opus host evidence has exact pristine/baseline/bounded PCM and bounded arena usage
+  ---
+  duration_ms: 1.0231
+  type: 'test'
+  ...
+# Subtest: real host decoders reproduce all Opus fixtures, reset and OOM recovery
+ok 46 - real host decoders reproduce all Opus fixtures, reset and OOM recovery # SKIP Set OPUS_HOST_TEST=1 to run GCC (WSL on Windows).
+  ---
+  duration_ms: 0.201
+  type: 'test'
+  ...
+# Subtest: physical benchmark requires actual DMA and 20 seconds without misses, not just decode success
+ok 47 - physical benchmark requires actual DMA and 20 seconds without misses, not just decode success
+  ---
+  duration_ms: 1.0257
+  type: 'test'
+  ...
+# Subtest: actual output CMake gate requires diagnostic raw benchmark and a real PDM32 backend
+ok 48 - actual output CMake gate requires diagnostic raw benchmark and a real PDM32 backend
+  ---
+  duration_ms: 316.7023
+  type: 'test'
+  ...
+# Subtest: phase corpus pins short CELT frames, all packet layouts and mono fallback
+ok 49 - phase corpus pins short CELT frames, all packet layouts and mono fallback
+  ---
+  duration_ms: 4.3243
+  type: 'test'
+  ...
+# Subtest: phase repacketizer encodes CBR/VBR layouts without changing frame bodies
+ok 50 - phase repacketizer encodes CBR/VBR layouts without changing frame bodies
+  ---
+  duration_ms: 4.8558
+  type: 'test'
+  ...
+# Subtest: saved phase evidence is exact with real 6144-byte capacity and exercised guards
+ok 51 - saved phase evidence is exact with real 6144-byte capacity and exercised guards
+  ---
+  duration_ms: 6.4858
+  type: 'test'
+  ...
+# Subtest: real phase decoders reproduce the complete reduced-scratch evidence
+ok 52 - real phase decoders reproduce the complete reduced-scratch evidence # SKIP Set OPUS_PHASE_TEST=1 to run GCC (WSL on Windows) against the independent reference.
+  ---
+  duration_ms: 0.1682
+  type: 'test'
+  ...
+# Subtest: attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+ok 53 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+  ---
+  duration_ms: 2.9388
+  type: 'test'
+  ...
+# Subtest: A/B permits only the selected feature and artifact identity differences
+ok 54 - A/B permits only the selected feature and artifact identity differences
+  ---
+  duration_ms: 0.7706
+  type: 'test'
+  ...
+# Subtest: raw A/B reports true medians and retains a slow outlier and observation timeout
+ok 55 - raw A/B reports true medians and retains a slow outlier and observation timeout
+  ---
+  duration_ms: 1.288
+  type: 'test'
+  ...
+# Subtest: raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+ok 56 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+  ---
+  duration_ms: 5.5135
+  type: 'test'
+  ...
+# Subtest: different task/wall timing windows retain positive overhead without clamping or dropping the run
+ok 57 - different task/wall timing windows retain positive overhead without clamping or dropping the run
+  ---
+  duration_ms: 0.7881
+  type: 'test'
+  ...
+# Subtest: actual audio task keeps Opus on reconnect with bounded cold fallback and cancellation
+ok 58 - actual audio task keeps Opus on reconnect with bounded cold fallback and cancellation
+  ---
+  duration_ms: 1855.1876
+  type: 'test'
+  ...
+# actual reconnect control-flow PASS: Opus=0, 25 paired allocations/frees
+# actual reconnect control-flow PASS: Opus=1, 24 paired allocations/frees
+# {
+#   passed: true,
+#   source_sha256_lf: '34dcbbcb64fd36f389a76fb45438b6eeaad00e9d1857f1ce66dac362f22d34c7',
+#   cases: 512,
+#   samples: 78880,
+#   c_fallback_asan_ubsan: true,
+#   instruction_model_exact: true,
+#   callee_saved_registers_checked: true,
+#   target_assembled: true,
+#   mul16s_sites: 8,
+#   stack_bytes: 16,
+#   scope: 'C fallback execution plus a local instruction-semantics model, not physical assembly execution or speed. Physical golden PCM / A/B remains required.'
+# }
+# Subtest: LX106 rotation instruction model matches sanitized C fallback and preserves ABI
+ok 59 - LX106 rotation instruction model matches sanitized C fallback and preserves ABI
+  ---
+  duration_ms: 1853.4115
+  type: 'test'
+  ...
+# Subtest: rotation experiment is default off and a host with the flag keeps C
+ok 60 - rotation experiment is default off and a host with the flag keeps C
+  ---
+  duration_ms: 271.8558
+  type: 'test'
+  ...
+# Subtest: stage ticks remain wall times, not task CPU, and bad metadata is rejected
+ok 61 - stage ticks remain wall times, not task CPU, and bad metadata is rejected
+  ---
+  duration_ms: 2.0649
+  type: 'test'
+  ...
+# Subtest: SDK epoch and CCOUNT are read coherently, decoder scope is not interrupt-masked
+ok 62 - SDK epoch and CCOUNT are read coherently, decoder scope is not interrupt-masked
+  ---
+  duration_ms: 0.4996
+  type: 'test'
+  ...
+# Subtest: ESP8266 nano printf wire response uses only supported 32-bit words
+ok 63 - ESP8266 nano printf wire response uses only supported 32-bit words
+  ---
+  duration_ms: 0.4599
+  type: 'test'
+  ...
+# Subtest: selected stage counters, timer wrap and 64-bit totals under sanitizers
+ok 64 - selected stage counters, timer wrap and 64-bit totals under sanitizers
+  ---
+  duration_ms: 560.4074
+  type: 'test'
+  ...
+# Subtest: off has no storage or callable instrumentation; invalid stage fails
+ok 65 - off has no storage or callable instrumentation; invalid stage fails
+  ---
+  duration_ms: 338.0511
+  type: 'test'
+  ...
+# Subtest: non-diagnostic and physical-output stage profiles are rejected before configuring
+ok 66 - non-diagnostic and physical-output stage profiles are rejected before configuring
+  ---
+  duration_ms: 0.5519
+  type: 'test'
+  ...
+# Subtest: saved SDK stage series includes all attempts and the unsafe RAM observation
+ok 67 - saved SDK stage series includes all attempts and the unsafe RAM observation
+  ---
+  duration_ms: 3.4194
+  type: 'test'
+  ...
+# Subtest: diagnostic live Opus URL request validates and queues without changing playlist
+ok 68 - diagnostic live Opus URL request validates and queues without changing playlist
+  ---
+  duration_ms: 1323.5595
+  type: 'test'
+  ...
+# Subtest: static audit skips literals and does not count paired call relocations twice
+ok 69 - static audit skips literals and does not count paired call relocations twice
+  ---
+  duration_ms: 1.1308
+  type: 'test'
+  ...
+# Subtest: static audit preserves linked locations and hexadecimal sizes
+ok 70 - static audit preserves linked locations and hexadecimal sizes
+  ---
+  duration_ms: 0.3109
+  type: 'test'
+  ...
+# bounded: compiled 0/112 objects; link reused
+# bounded: compiled 0/112 objects; link reused
+# Subtest: through192 is a separate test corpus, original high-rate fixtures remain intact
+ok 71 - through192 is a separate test corpus, original high-rate fixtures remain intact
+  ---
+  duration_ms: 3.8745
+  type: 'test'
+  ...
+# Subtest: 192kbps test packet selection has honest labels and exact decoder-only PCM
+ok 72 - 192kbps test packet selection has honest labels and exact decoder-only PCM
+  ---
+  duration_ms: 1698.1433
+  type: 'test'
+  ...
+# Subtest: Opus private word access switch defaults off and rejects invalid selections
+ok 73 - Opus private word access switch defaults off and rejects invalid selections
+  ---
+  duration_ms: 169.9615
+  type: 'test'
+  ...
+# Subtest: Opus word-helper C fallbacks preserve overlap, signed halves and alias ordering in both A/B modes
+ok 74 - Opus word-helper C fallbacks preserve overlap, signed halves and alias ordering in both A/B modes
+  ---
+  duration_ms: 1614.596
+  type: 'test'
+  ...
+# Subtest: actual LX106 A/B snippets preserve word width and ordering without MEMW or additional static/stack RAM
+ok 75 - actual LX106 A/B snippets preserve word width and ordering without MEMW or additional static/stack RAM
+  ---
+  duration_ms: 608.4591
+  type: 'test'
+  ...
+1..75
+# tests 75
+# suites 0
+# pass 71
+# fail 0
+# cancelled 0
+# skipped 4
+# todo 0
+# duration_ms 44309.3725

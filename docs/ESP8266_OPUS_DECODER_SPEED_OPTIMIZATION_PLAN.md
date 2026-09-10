@@ -310,6 +310,11 @@ gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upst
   Pulse-cache проверен в двух вариантах и отклонён: регрессия CELT64;
   energy/LTP/NLSF остаются гипотезами. Не повторять отклонённый вариант.
 - [ ] P3: A3 exact divisions: power-of-two / reciprocal / bitrate отдельно.
+  Однократный `celt_rcp` проверен:28 host PCM-сценариев exact, static RAM0 delta,
+  но10+10 raw-прогонов дали CELT64/128/192 регрессию12.08/18.33/24.37%.
+  `OpusDivOnce` остаётся OFF; в рабочий профиль не принимать. GCC изменил
+  inlining, однако причина проигрыша пока не доказана. Другие деления,
+  SAR-loop и LPC10/16 ещё не проверены. [Аудит инвариантов](ESP8266_OPUS_LOOP_INVARIANTS.md).
 - [x] P4: A4 decoder-only CELT specialization проверен и отклонён.
   27 host PCM-сценариев exact, target flash text−5892B, static RAM0 delta,
   но10+10 raw-прогонов до192кбит/с: CELT64/128/192 медленнее на21.39/18.87/21.11%.

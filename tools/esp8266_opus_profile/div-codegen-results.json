@@ -1,0 +1,381 @@
+{
+  "scope": "Compiler-only candidates, not accepted optimization or board speed evidence.",
+  "build": ".build/esp8266-opus-div192-on",
+  "command": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe -DUSING_IBUS_FASTER_GET -DYORADIO_OPUS_BOUNDED=1 -DYORADIO_OPUS_DIV_ONCE=1 -DYORADIO_OPUS_FIR_FLASH_WORD=1 -DYORADIO_OPUS_ICDF_FLASH_WORD=1 -DYORADIO_OPUS_PROFILE_STAGE=0 -DYORADIO_OPUS_WORD_ASM=1 -D__ESP_FILE__=__FILE__ -Iconfig -IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/. -IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include -IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt -IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk -IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed -IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include -IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include  -mlongcalls -Wno-frame-address   -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -nostdlib -Wall -Werror=all -Wno-error=unused-function -Wno-error=unused-but-set-variable -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wextra -Wno-unused-parameter -Wno-sign-compare -ggdb -Os -std=gnu99 -Wno-old-style-declaration -D_GNU_SOURCE -DIDF_VER=\\\"v3.4-dirty\\\" -DGCC_NOT_5_2_0 -DESP_PLATFORM -O3 -fwrapv -fstack-usage -o esp-idf\\opus_decoder\\CMakeFiles\\__idf_opus_decoder.dir\\upstream\\celt\\vq.c.obj   -c C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\upstream\\celt\\vq.c",
+  "source_sha256_lf": {
+    "upstream/celt/vq.c": "373533fc50b258374ac578f20f71191805c07e8f147d21996784e89058de2cfa",
+    "upstream/celt/mathops.h": "345123aa43380536d4c2d18faa560698af274825ac5fb02288c507f7f1519a97",
+    "upstream/celt/fixed_generic.h": "0185be2436b154667da33fc7bd8af6c07290980681c767fb2d3c89985cf7d308"
+  },
+  "reports": [
+    {
+      "name": "configured",
+      "flags": [],
+      "object_sha256": "bbf78ab0ff071745e90296cf995c7a6cc25f330130f81a3bdf3bb7b94cfbc00d",
+      "functions": [
+        {
+          "name": "exp_rotation1",
+          "bytes": 174,
+          "calls": {}
+        },
+        {
+          "name": "exp_rotation1$constprop$3",
+          "bytes": 161,
+          "calls": {}
+        },
+        {
+          "name": "exp_rotation$part$0$constprop$2",
+          "bytes": 431,
+          "calls": {
+            "celt_rcp": 1,
+            "celt_cos_norm": 2,
+            "__udivsi3": 1,
+            ".text.exp_rotation1": 1
+          }
+        },
+        {
+          "name": "exp_rotation",
+          "bytes": 523,
+          "calls": {
+            "celt_rcp": 1,
+            "celt_cos_norm": 2,
+            "__udivsi3": 1,
+            ".text.exp_rotation1": 2,
+            ".text.exp_rotation1$constprop$3": 1
+          }
+        },
+        {
+          "name": "op_pvq_search_c",
+          "bytes": 635,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 2,
+            "memset": 1,
+            "celt_rcp": 2,
+            "yoradio_opus_scratch_restore": 1
+          }
+        },
+        {
+          "name": "alg_quant",
+          "bytes": 1284,
+          "calls": {
+            "yoradio_opus_scratch_mark": 2,
+            "yoradio_opus_scratch_alloc": 3,
+            "celt_rcp": 3,
+            "celt_cos_norm": 2,
+            "__udivsi3": 3,
+            ".text.exp_rotation1$constprop$3": 2,
+            ".text.exp_rotation1": 1,
+            "memset": 1,
+            "yoradio_opus_scratch_restore": 2,
+            "encode_pulses": 1,
+            "celt_rsqrt_norm": 1,
+            ".text.exp_rotation$part$0$constprop$2": 1
+          }
+        },
+        {
+          "name": "alg_unquant",
+          "bytes": 305,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "decode_pulses": 1,
+            "celt_rsqrt_norm": 1,
+            ".text.exp_rotation$part$0$constprop$2": 1,
+            "__udivsi3": 1,
+            "yoradio_opus_scratch_restore": 1
+          }
+        },
+        {
+          "name": "renormalise_vector",
+          "bytes": 181,
+          "calls": {
+            "celt_rsqrt_norm": 2
+          }
+        },
+        {
+          "name": "stereo_itheta",
+          "bytes": 415,
+          "calls": {
+            "celt_sqrt": 2,
+            "celt_rcp": 2
+          }
+        }
+      ],
+      "stack": [
+        "exp_rotation1\t16\tstatic",
+        "exp_rotation1.constprop\t16\tstatic",
+        "exp_rotation$part$0.constprop\t80\tstatic",
+        "exp_rotation\t80\tstatic",
+        "op_pvq_search_c\t96\tstatic",
+        "alg_quant\t128\tstatic",
+        "alg_unquant\t64\tstatic",
+        "renormalise_vector\t32\tstatic",
+        "stereo_itheta\t16\tstatic"
+      ]
+    },
+    {
+      "name": "no-partial",
+      "flags": [
+        "-fno-partial-inlining"
+      ],
+      "object_sha256": "7d020e9866a72c15b351a702b00804cdce99e89090e55c86055ad7902c58a18e",
+      "functions": [
+        {
+          "name": "exp_rotation1",
+          "bytes": 174,
+          "calls": {}
+        },
+        {
+          "name": "exp_rotation$constprop$2",
+          "bytes": 447,
+          "calls": {
+            "celt_rcp": 1,
+            "celt_cos_norm": 2,
+            "__udivsi3": 1,
+            ".text.exp_rotation1": 1
+          }
+        },
+        {
+          "name": "exp_rotation",
+          "bytes": 523,
+          "calls": {
+            "celt_rcp": 1,
+            "celt_cos_norm": 2,
+            "__udivsi3": 1,
+            ".text.exp_rotation1": 3
+          }
+        },
+        {
+          "name": "op_pvq_search_c",
+          "bytes": 635,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 2,
+            "memset": 1,
+            "celt_rcp": 2,
+            "yoradio_opus_scratch_restore": 1
+          }
+        },
+        {
+          "name": "alg_quant",
+          "bytes": 1262,
+          "calls": {
+            "yoradio_opus_scratch_mark": 2,
+            "yoradio_opus_scratch_alloc": 3,
+            "celt_rcp": 3,
+            "celt_cos_norm": 2,
+            "__udivsi3": 3,
+            ".text.exp_rotation1": 3,
+            "memset": 1,
+            "yoradio_opus_scratch_restore": 2,
+            "encode_pulses": 1,
+            "celt_rsqrt_norm": 1,
+            ".text.exp_rotation$constprop$2": 1
+          }
+        },
+        {
+          "name": "alg_unquant",
+          "bytes": 291,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "decode_pulses": 1,
+            "celt_rsqrt_norm": 1,
+            ".text.exp_rotation$constprop$2": 1,
+            "__udivsi3": 1,
+            "yoradio_opus_scratch_restore": 1
+          }
+        },
+        {
+          "name": "renormalise_vector",
+          "bytes": 181,
+          "calls": {
+            "celt_rsqrt_norm": 2
+          }
+        },
+        {
+          "name": "stereo_itheta",
+          "bytes": 415,
+          "calls": {
+            "celt_sqrt": 2,
+            "celt_rcp": 2
+          }
+        }
+      ],
+      "stack": [
+        "exp_rotation1\t16\tstatic",
+        "exp_rotation.constprop\t80\tstatic",
+        "exp_rotation\t80\tstatic",
+        "op_pvq_search_c\t96\tstatic",
+        "alg_quant\t112\tstatic",
+        "alg_unquant\t64\tstatic",
+        "renormalise_vector\t32\tstatic",
+        "stereo_itheta\t16\tstatic"
+      ]
+    },
+    {
+      "name": "inline-1000",
+      "flags": [
+        "-finline-limit=1000"
+      ],
+      "object_sha256": "e0de5f507fa5825b108c71d956caa869d785336bf189c428cd7cdadbe797eb1b",
+      "functions": [
+        {
+          "name": "exp_rotation",
+          "bytes": 920,
+          "calls": {
+            "celt_rcp": 1,
+            "celt_cos_norm": 2,
+            "__udivsi3": 1
+          }
+        },
+        {
+          "name": "op_pvq_search_c",
+          "bytes": 635,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 2,
+            "memset": 1,
+            "celt_rcp": 2,
+            "yoradio_opus_scratch_restore": 1
+          }
+        },
+        {
+          "name": "alg_quant",
+          "bytes": 2096,
+          "calls": {
+            "yoradio_opus_scratch_mark": 2,
+            "yoradio_opus_scratch_alloc": 3,
+            "celt_rcp": 4,
+            "celt_cos_norm": 4,
+            "__udivsi3": 3,
+            "memset": 1,
+            "yoradio_opus_scratch_restore": 2,
+            "encode_pulses": 1,
+            "celt_rsqrt_norm": 1
+          }
+        },
+        {
+          "name": "alg_unquant",
+          "bytes": 922,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "decode_pulses": 1,
+            "celt_rsqrt_norm": 1,
+            "celt_rcp": 1,
+            "celt_cos_norm": 2,
+            "__udivsi3": 2,
+            "yoradio_opus_scratch_restore": 1
+          }
+        },
+        {
+          "name": "renormalise_vector",
+          "bytes": 181,
+          "calls": {
+            "celt_rsqrt_norm": 2
+          }
+        },
+        {
+          "name": "stereo_itheta",
+          "bytes": 415,
+          "calls": {
+            "celt_sqrt": 2,
+            "celt_rcp": 2
+          }
+        }
+      ],
+      "stack": [
+        "exp_rotation\t96\tstatic",
+        "op_pvq_search_c\t96\tstatic",
+        "alg_quant\t144\tstatic",
+        "alg_unquant\t112\tstatic",
+        "renormalise_vector\t32\tstatic",
+        "stereo_itheta\t16\tstatic"
+      ]
+    },
+    {
+      "name": "no-partial-inline-1000",
+      "flags": [
+        "-fno-partial-inlining",
+        "-finline-limit=1000"
+      ],
+      "object_sha256": "1f8e9f9a4e447b83ea33163697ad5497864b7c81d49df0db34e1b23e984b2dc7",
+      "functions": [
+        {
+          "name": "exp_rotation",
+          "bytes": 920,
+          "calls": {
+            "celt_rcp": 1,
+            "celt_cos_norm": 2,
+            "__udivsi3": 1
+          }
+        },
+        {
+          "name": "op_pvq_search_c",
+          "bytes": 635,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 2,
+            "memset": 1,
+            "celt_rcp": 2,
+            "yoradio_opus_scratch_restore": 1
+          }
+        },
+        {
+          "name": "alg_quant",
+          "bytes": 2096,
+          "calls": {
+            "yoradio_opus_scratch_mark": 2,
+            "yoradio_opus_scratch_alloc": 3,
+            "celt_rcp": 4,
+            "celt_cos_norm": 4,
+            "__udivsi3": 3,
+            "memset": 1,
+            "yoradio_opus_scratch_restore": 2,
+            "encode_pulses": 1,
+            "celt_rsqrt_norm": 1
+          }
+        },
+        {
+          "name": "alg_unquant",
+          "bytes": 922,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "decode_pulses": 1,
+            "celt_rsqrt_norm": 1,
+            "celt_rcp": 1,
+            "celt_cos_norm": 2,
+            "__udivsi3": 2,
+            "yoradio_opus_scratch_restore": 1
+          }
+        },
+        {
+          "name": "renormalise_vector",
+          "bytes": 181,
+          "calls": {
+            "celt_rsqrt_norm": 2
+          }
+        },
+        {
+          "name": "stereo_itheta",
+          "bytes": 415,
+          "calls": {
+            "celt_sqrt": 2,
+            "celt_rcp": 2
+          }
+        }
+      ],
+      "stack": [
+        "exp_rotation\t96\tstatic",
+        "op_pvq_search_c\t96\tstatic",
+        "alg_quant\t144\tstatic",
+        "alg_unquant\t112\tstatic",
+        "renormalise_vector\t32\tstatic",
+        "stereo_itheta\t16\tstatic"
+      ]
+    }
+  ]
+}
