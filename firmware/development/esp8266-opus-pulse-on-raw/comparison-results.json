@@ -1,0 +1,1182 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "Raw decoder only. Task CPU includes charged ISR/instrumentation; Wi-Fi and WebUI remain enabled. No network audio, demux, normalization or PDM. Sequential A/B, not interleaved.",
+  "percent_definition": "CPU budget = task microseconds / decoded audio duration * 100. Above 100 cannot sustain realtime even without output.",
+  "reference": {
+    "runs": 10,
+    "observation_errors": [],
+    "dram_after": {
+      "min": 17232,
+      "median": 26460,
+      "mean": 24723.2,
+      "p95": 26668,
+      "max": 26668
+    },
+    "cases": [
+      {
+        "id": 0,
+        "name": "mono12 SILK",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 898651720,
+        "scratch_bytes": 1808,
+        "scratch_words": 14112,
+        "task_budget_percent": {
+          "min": 23.383,
+          "median": 23.401270833333335,
+          "mean": 23.399966666666664,
+          "p95": 23.42375,
+          "max": 23.42375
+        },
+        "wall_budget_percent": {
+          "min": 23.432333333333332,
+          "median": 23.611354166666665,
+          "mean": 23.61134583333334,
+          "p95": 23.741958333333333,
+          "max": 23.741958333333333
+        },
+        "maximum_call_us": {
+          "min": 6209,
+          "median": 6671.5,
+          "mean": 6847.2,
+          "p95": 7844,
+          "max": 7844
+        },
+        "min_dram": {
+          "min": 3096,
+          "median": 8492,
+          "mean": 8046,
+          "p95": 9528,
+          "max": 9528
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1780,
+          "p95": 1852,
+          "max": 1852
+        }
+      },
+      {
+        "id": 1,
+        "name": "mono24 hybrid",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3216561658,
+        "scratch_bytes": 2904,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 58.462250000000004,
+          "median": 58.496270833333334,
+          "mean": 58.49818333333334,
+          "p95": 58.56316666666667,
+          "max": 58.56316666666667
+        },
+        "wall_budget_percent": {
+          "min": 59.137833333333326,
+          "median": 59.32277083333334,
+          "mean": 59.3235,
+          "p95": 59.505,
+          "max": 59.505
+        },
+        "maximum_call_us": {
+          "min": 13266,
+          "median": 14593.5,
+          "mean": 14941.5,
+          "p95": 18071,
+          "max": 18071
+        },
+        "min_dram": {
+          "min": 3272,
+          "median": 9252,
+          "mean": 8733.6,
+          "p95": 9608,
+          "max": 9608
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      {
+        "id": 2,
+        "name": "stereo64 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 2337883435,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 73.86391666666665,
+          "median": 74.14202083333333,
+          "mean": 74.1243875,
+          "p95": 74.223625,
+          "max": 74.223625
+        },
+        "wall_budget_percent": {
+          "min": 74.83679166666667,
+          "median": 77.3595625,
+          "mean": 77.10187499999999,
+          "p95": 77.541375,
+          "max": 77.541375
+        },
+        "maximum_call_us": {
+          "min": 17742,
+          "median": 64661.5,
+          "mean": 56259.2,
+          "p95": 68807,
+          "max": 68807
+        },
+        "min_dram": {
+          "min": 3272,
+          "median": 8962,
+          "mean": 8239.6,
+          "p95": 9564,
+          "max": 9564
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      {
+        "id": 3,
+        "name": "stereo128 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 1528306318,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 99.18395833333334,
+          "median": 99.27995833333333,
+          "mean": 99.28295833333333,
+          "p95": 99.354375,
+          "max": 99.354375
+        },
+        "wall_budget_percent": {
+          "min": 102.58783333333334,
+          "median": 102.90185416666667,
+          "mean": 102.94215000000001,
+          "p95": 103.20516666666666,
+          "max": 103.20516666666666
+        },
+        "maximum_call_us": {
+          "min": 54968,
+          "median": 70399.5,
+          "mean": 68534.9,
+          "p95": 77940,
+          "max": 77940
+        },
+        "min_dram": {
+          "min": 3448,
+          "median": 8896,
+          "mean": 8243.6,
+          "p95": 9528,
+          "max": 9528
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      {
+        "id": 4,
+        "name": "stereo510 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3868245794,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 199.51416666666665,
+          "median": 199.84852083333334,
+          "mean": 200.33125416666664,
+          "p95": 205.23075,
+          "max": 205.23075
+        },
+        "wall_budget_percent": {
+          "min": 204.74337500000001,
+          "median": 207.50845833333332,
+          "mean": 209.0411583333333,
+          "p95": 226.60220833333332,
+          "max": 226.60220833333332
+        },
+        "maximum_call_us": {
+          "min": 73805,
+          "median": 98958,
+          "mean": 96635.8,
+          "p95": 100688,
+          "max": 100688
+        },
+        "min_dram": {
+          "min": 524,
+          "median": 8982,
+          "mean": 7116,
+          "p95": 9424,
+          "max": 9424
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      }
+    ]
+  },
+  "candidate": {
+    "runs": 10,
+    "observation_errors": [
+      {
+        "run": 7,
+        "error": "request timeout"
+      }
+    ],
+    "dram_after": {
+      "min": 18004,
+      "median": 26548,
+      "mean": 24903.2,
+      "p95": 26924,
+      "max": 26924
+    },
+    "cases": [
+      {
+        "id": 0,
+        "name": "mono12 SILK",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 898651720,
+        "scratch_bytes": 1808,
+        "scratch_words": 14112,
+        "task_budget_percent": {
+          "min": 23.83575,
+          "median": 23.8659375,
+          "mean": 23.866366666666664,
+          "p95": 23.892583333333334,
+          "max": 23.892583333333334
+        },
+        "wall_budget_percent": {
+          "min": 23.98625,
+          "median": 24.074937499999997,
+          "mean": 24.10429166666667,
+          "p95": 24.299583333333334,
+          "max": 24.299583333333334
+        },
+        "maximum_call_us": {
+          "min": 6711,
+          "median": 7270.5,
+          "mean": 7262.3,
+          "p95": 7745,
+          "max": 7745
+        },
+        "min_dram": {
+          "min": 5828,
+          "median": 8788,
+          "mean": 8369.6,
+          "p95": 9520,
+          "max": 9520
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1780,
+          "p95": 1852,
+          "max": 1852
+        }
+      },
+      {
+        "id": 1,
+        "name": "mono24 hybrid",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3216561658,
+        "scratch_bytes": 2904,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 57.61954166666667,
+          "median": 57.65527083333333,
+          "mean": 57.65944583333332,
+          "p95": 57.71275,
+          "max": 57.71275
+        },
+        "wall_budget_percent": {
+          "min": 58.15004166666667,
+          "median": 58.525625,
+          "mean": 58.53678750000002,
+          "p95": 58.794875,
+          "max": 58.794875
+        },
+        "maximum_call_us": {
+          "min": 13139,
+          "median": 13966.5,
+          "mean": 14418.6,
+          "p95": 17398,
+          "max": 17398
+        },
+        "min_dram": {
+          "min": 6288,
+          "median": 9428,
+          "mean": 9090,
+          "p95": 9784,
+          "max": 9784
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1780,
+          "p95": 1852,
+          "max": 1852
+        }
+      },
+      {
+        "id": 2,
+        "name": "stereo64 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 2337883435,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 81.90591666666667,
+          "median": 81.97593749999999,
+          "mean": 82.73646666666667,
+          "p95": 89.55645833333334,
+          "max": 89.55645833333334
+        },
+        "wall_budget_percent": {
+          "min": 84.932625,
+          "median": 85.42685416666666,
+          "mean": 88.4699375,
+          "p95": 116.12112499999999,
+          "max": 116.12112499999999
+        },
+        "maximum_call_us": {
+          "min": 48828,
+          "median": 57054.5,
+          "mean": 58110,
+          "p95": 71138,
+          "max": 71138
+        },
+        "min_dram": {
+          "min": 508,
+          "median": 9034,
+          "mean": 8142,
+          "p95": 9608,
+          "max": 9608
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      {
+        "id": 3,
+        "name": "stereo128 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 1528306318,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 102.60925,
+          "median": 102.69070833333333,
+          "mean": 103.90365416666666,
+          "p95": 114.97020833333333,
+          "max": 114.97020833333333
+        },
+        "wall_budget_percent": {
+          "min": 106.20629166666666,
+          "median": 106.61639583333333,
+          "mean": 111.19233750000001,
+          "p95": 152.99854166666665,
+          "max": 152.99854166666665
+        },
+        "maximum_call_us": {
+          "min": 34377,
+          "median": 59894.5,
+          "mean": 62860.4,
+          "p95": 79126,
+          "max": 79126
+        },
+        "min_dram": {
+          "min": 820,
+          "median": 8994,
+          "mean": 8172,
+          "p95": 9520,
+          "max": 9520
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      {
+        "id": 4,
+        "name": "stereo510 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3868245794,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 183.63150000000002,
+          "median": 183.8298125,
+          "mean": 185.96273333333335,
+          "p95": 205.399,
+          "max": 205.399
+        },
+        "wall_budget_percent": {
+          "min": 190.90758333333332,
+          "median": 191.47714583333334,
+          "mean": 199.2791458333333,
+          "p95": 270.037,
+          "max": 270.037
+        },
+        "maximum_call_us": {
+          "min": 60005,
+          "median": 97367,
+          "mean": 93210.9,
+          "p95": 100145,
+          "max": 100145
+        },
+        "min_dram": {
+          "min": 996,
+          "median": 8972,
+          "mean": 7470.8,
+          "p95": 9492,
+          "max": 9492
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "mono12 SILK",
+      "reference": {
+        "id": 0,
+        "name": "mono12 SILK",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 898651720,
+        "scratch_bytes": 1808,
+        "scratch_words": 14112,
+        "task_budget_percent": {
+          "min": 23.383,
+          "median": 23.401270833333335,
+          "mean": 23.399966666666664,
+          "p95": 23.42375,
+          "max": 23.42375
+        },
+        "wall_budget_percent": {
+          "min": 23.432333333333332,
+          "median": 23.611354166666665,
+          "mean": 23.61134583333334,
+          "p95": 23.741958333333333,
+          "max": 23.741958333333333
+        },
+        "maximum_call_us": {
+          "min": 6209,
+          "median": 6671.5,
+          "mean": 6847.2,
+          "p95": 7844,
+          "max": 7844
+        },
+        "min_dram": {
+          "min": 3096,
+          "median": 8492,
+          "mean": 8046,
+          "p95": 9528,
+          "max": 9528
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1780,
+          "p95": 1852,
+          "max": 1852
+        }
+      },
+      "candidate": {
+        "id": 0,
+        "name": "mono12 SILK",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 898651720,
+        "scratch_bytes": 1808,
+        "scratch_words": 14112,
+        "task_budget_percent": {
+          "min": 23.83575,
+          "median": 23.8659375,
+          "mean": 23.866366666666664,
+          "p95": 23.892583333333334,
+          "max": 23.892583333333334
+        },
+        "wall_budget_percent": {
+          "min": 23.98625,
+          "median": 24.074937499999997,
+          "mean": 24.10429166666667,
+          "p95": 24.299583333333334,
+          "max": 24.299583333333334
+        },
+        "maximum_call_us": {
+          "min": 6711,
+          "median": 7270.5,
+          "mean": 7262.3,
+          "p95": 7745,
+          "max": 7745
+        },
+        "min_dram": {
+          "min": 5828,
+          "median": 8788,
+          "mean": 8369.6,
+          "p95": 9520,
+          "max": 9520
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1780,
+          "p95": 1852,
+          "max": 1852
+        }
+      },
+      "median_task_reduction_percent": -1.9856471470121262
+    },
+    {
+      "name": "mono24 hybrid",
+      "reference": {
+        "id": 1,
+        "name": "mono24 hybrid",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3216561658,
+        "scratch_bytes": 2904,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 58.462250000000004,
+          "median": 58.496270833333334,
+          "mean": 58.49818333333334,
+          "p95": 58.56316666666667,
+          "max": 58.56316666666667
+        },
+        "wall_budget_percent": {
+          "min": 59.137833333333326,
+          "median": 59.32277083333334,
+          "mean": 59.3235,
+          "p95": 59.505,
+          "max": 59.505
+        },
+        "maximum_call_us": {
+          "min": 13266,
+          "median": 14593.5,
+          "mean": 14941.5,
+          "p95": 18071,
+          "max": 18071
+        },
+        "min_dram": {
+          "min": 3272,
+          "median": 9252,
+          "mean": 8733.6,
+          "p95": 9608,
+          "max": 9608
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      "candidate": {
+        "id": 1,
+        "name": "mono24 hybrid",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3216561658,
+        "scratch_bytes": 2904,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 57.61954166666667,
+          "median": 57.65527083333333,
+          "mean": 57.65944583333332,
+          "p95": 57.71275,
+          "max": 57.71275
+        },
+        "wall_budget_percent": {
+          "min": 58.15004166666667,
+          "median": 58.525625,
+          "mean": 58.53678750000002,
+          "p95": 58.794875,
+          "max": 58.794875
+        },
+        "maximum_call_us": {
+          "min": 13139,
+          "median": 13966.5,
+          "mean": 14418.6,
+          "p95": 17398,
+          "max": 17398
+        },
+        "min_dram": {
+          "min": 6288,
+          "median": 9428,
+          "mean": 9090,
+          "p95": 9784,
+          "max": 9784
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1780,
+          "p95": 1852,
+          "max": 1852
+        }
+      },
+      "median_task_reduction_percent": 1.437698485765293
+    },
+    {
+      "name": "stereo64 CELT",
+      "reference": {
+        "id": 2,
+        "name": "stereo64 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 2337883435,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 73.86391666666665,
+          "median": 74.14202083333333,
+          "mean": 74.1243875,
+          "p95": 74.223625,
+          "max": 74.223625
+        },
+        "wall_budget_percent": {
+          "min": 74.83679166666667,
+          "median": 77.3595625,
+          "mean": 77.10187499999999,
+          "p95": 77.541375,
+          "max": 77.541375
+        },
+        "maximum_call_us": {
+          "min": 17742,
+          "median": 64661.5,
+          "mean": 56259.2,
+          "p95": 68807,
+          "max": 68807
+        },
+        "min_dram": {
+          "min": 3272,
+          "median": 8962,
+          "mean": 8239.6,
+          "p95": 9564,
+          "max": 9564
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      "candidate": {
+        "id": 2,
+        "name": "stereo64 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 2337883435,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 81.90591666666667,
+          "median": 81.97593749999999,
+          "mean": 82.73646666666667,
+          "p95": 89.55645833333334,
+          "max": 89.55645833333334
+        },
+        "wall_budget_percent": {
+          "min": 84.932625,
+          "median": 85.42685416666666,
+          "mean": 88.4699375,
+          "p95": 116.12112499999999,
+          "max": 116.12112499999999
+        },
+        "maximum_call_us": {
+          "min": 48828,
+          "median": 57054.5,
+          "mean": 58110,
+          "p95": 71138,
+          "max": 71138
+        },
+        "min_dram": {
+          "min": 508,
+          "median": 9034,
+          "mean": 8142,
+          "p95": 9608,
+          "max": 9608
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      "median_task_reduction_percent": -10.566095418786613
+    },
+    {
+      "name": "stereo128 CELT",
+      "reference": {
+        "id": 3,
+        "name": "stereo128 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 1528306318,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 99.18395833333334,
+          "median": 99.27995833333333,
+          "mean": 99.28295833333333,
+          "p95": 99.354375,
+          "max": 99.354375
+        },
+        "wall_budget_percent": {
+          "min": 102.58783333333334,
+          "median": 102.90185416666667,
+          "mean": 102.94215000000001,
+          "p95": 103.20516666666666,
+          "max": 103.20516666666666
+        },
+        "maximum_call_us": {
+          "min": 54968,
+          "median": 70399.5,
+          "mean": 68534.9,
+          "p95": 77940,
+          "max": 77940
+        },
+        "min_dram": {
+          "min": 3448,
+          "median": 8896,
+          "mean": 8243.6,
+          "p95": 9528,
+          "max": 9528
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      "candidate": {
+        "id": 3,
+        "name": "stereo128 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 1528306318,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 102.60925,
+          "median": 102.69070833333333,
+          "mean": 103.90365416666666,
+          "p95": 114.97020833333333,
+          "max": 114.97020833333333
+        },
+        "wall_budget_percent": {
+          "min": 106.20629166666666,
+          "median": 106.61639583333333,
+          "mean": 111.19233750000001,
+          "p95": 152.99854166666665,
+          "max": 152.99854166666665
+        },
+        "maximum_call_us": {
+          "min": 34377,
+          "median": 59894.5,
+          "mean": 62860.4,
+          "p95": 79126,
+          "max": 79126
+        },
+        "min_dram": {
+          "min": 820,
+          "median": 8994,
+          "mean": 8172,
+          "p95": 9520,
+          "max": 9520
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      "median_task_reduction_percent": -3.435486937402188
+    },
+    {
+      "name": "stereo510 CELT",
+      "reference": {
+        "id": 4,
+        "name": "stereo510 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3868245794,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 199.51416666666665,
+          "median": 199.84852083333334,
+          "mean": 200.33125416666664,
+          "p95": 205.23075,
+          "max": 205.23075
+        },
+        "wall_budget_percent": {
+          "min": 204.74337500000001,
+          "median": 207.50845833333332,
+          "mean": 209.0411583333333,
+          "p95": 226.60220833333332,
+          "max": 226.60220833333332
+        },
+        "maximum_call_us": {
+          "min": 73805,
+          "median": 98958,
+          "mean": 96635.8,
+          "p95": 100688,
+          "max": 100688
+        },
+        "min_dram": {
+          "min": 524,
+          "median": 8982,
+          "mean": 7116,
+          "p95": 9424,
+          "max": 9424
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      "candidate": {
+        "id": 4,
+        "name": "stereo510 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3868245794,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 183.63150000000002,
+          "median": 183.8298125,
+          "mean": 185.96273333333335,
+          "p95": 205.399,
+          "max": 205.399
+        },
+        "wall_budget_percent": {
+          "min": 190.90758333333332,
+          "median": 191.47714583333334,
+          "mean": 199.2791458333333,
+          "p95": 270.037,
+          "max": 270.037
+        },
+        "maximum_call_us": {
+          "min": 60005,
+          "median": 97367,
+          "mean": 93210.9,
+          "p95": 100145,
+          "max": 100145
+        },
+        "min_dram": {
+          "min": 996,
+          "median": 8972,
+          "mean": 7470.8,
+          "p95": 9492,
+          "max": 9492
+        },
+        "stack_free_lifetime": {
+          "min": 1772,
+          "median": 1772,
+          "mean": 1772,
+          "p95": 1772,
+          "max": 1772
+        }
+      },
+      "median_task_reduction_percent": 8.015425016176314
+    }
+  ],
+  "artifacts": {
+    "reference": {
+      "purpose": "Experimental Opus native radio, I2S PDM32 DMA; not device-qualified; build does not flash",
+      "diagnostic": true,
+      "experimental_opus": true,
+      "opus_input_bytes": 1024,
+      "opus_scratch_bytes": 6144,
+      "opus_benchmark": true,
+      "opus_benchmark_output": false,
+      "opus_stream_test": true,
+      "freertos_runtime_stats": true,
+      "opus_word_asm": true,
+      "opus_icdf_flash_word": true,
+      "opus_fir_flash_word": true,
+      "opus_pulse_flash_word": false,
+      "opus_pulse_helper_sha256": "F9582B41E2BA6DE7EEF66D2CCAADC6B534E7E42C05000D744A3AE965393ABF3D",
+      "opus_pulse_table_sha256": "0044AC1C064561D575E02E74758C0DAC583DEA054E790A8EF3640C03866B9A4B",
+      "opus_pulse_rate_sha256": "747252731E691203E4F048B97452A3202AF5F131725E7D81D6909643351890DF",
+      "opus_pulse_bands_sha256": "7BEE515318862E38C5974F29FBFF321A9524CF92438D5AA043F8257284C56FA9",
+      "opus_pulse_celt_sha256": "E26E55BDB206DD8DDAD7C20B572535C4795E8A63D99D913422A03A007F8273E9",
+      "opus_fir_source_sha256": "EFC60B0D80939C6AE9B7970ADF1756B5930A9315DAF692EADD87C94CF07AC582",
+      "opus_fir_table_sha256": "B2C427C2A738B8C8292927B0DAE28B11E60274A568079FCDF7AF311A987DD194",
+      "opus_fir_helper_sha256": "2021EEF3CDB6CB9DF9C36639E7D8E572879DC94B689DA315909A56ABC79C53B8",
+      "pdm32_iram": true,
+      "pdm32_batch": true,
+      "pdm32_loan_words": 512,
+      "sdk_rx_diag": true,
+      "sdk_rx_diag_manifest_sha256": "9041939AD205D62C14AC0BEDB0097EEB231B169182A81262F4CD5D074383F74E",
+      "opus_max_packet_ms": 20,
+      "tone_test": false,
+      "web_profile": false,
+      "memory_profile": false,
+      "spiffs_log": false,
+      "spiffs_log_http": false,
+      "spiffs_cache": false,
+      "spiffs_write_cache": false,
+      "audio_level_led": true,
+      "audio_level_led_update_hz": 10,
+      "audio_level_led_max_brightness": 32,
+      "audio_gain_led_source_sha256": "02D12212EB065F96BA051E32AE0045695AF8FE35C1F42BDF1C568BF156299AA0",
+      "audio_level_led_source_sha256": "C8E031445DE956BE2387876169EC3DFCBF2B6006F472914C17861DA4A89FDCA0",
+      "spiffs_log_source_sha256": "F937811F2CA775F1DC1430B6AA86E5BAFED477377043210FC6C992E7879D8444",
+      "web_audio_pause": "off",
+      "log_level": "error",
+      "playlist_web_gzip": true,
+      "built_utc": "2026-09-10T14:04:06.1726379Z",
+      "source_revision": "9e40898de2fd042506f78ada13b31ca1b8de0cff",
+      "app_sha256": "B62153F70568BC8880415482F666EB4C915DC51B6FB406038CEE9965AB7FC9E0",
+      "bytes": 911760,
+      "app_address": "0x10000",
+      "config_sha256": "0ED337FF979A89A382D3FABCB0CED36BB243C006148CFBF159D0AD423396A4B5",
+      "output_source_sha256": "FBAFE6C843AF8AA27DCD020018C431A59643EC72C56FB244C2BF4749B74FBE6A",
+      "web_source_sha256": "EF887506B4E3AC645E8F20D6CEE4F3B25BBE3FDBB37DC156602B17D6B1A326B3",
+      "playlist_source_sha256": "0FEF5C783B9F4902C2861A6FCCAC21C96A6427306CA897E9C6B0AA0CA8C3C5E5",
+      "audio_source_sha256": "4989BBBD4E9854D0E48A59AFC7135BA6C619535C0FF9ADAE5E114ADDC4EBED2D",
+      "web_audio_pause_source_sha256": "600848A39225EF069584F65E30D2E9A44F27EC2C93F33FCC7B4C3D4DC9B75D67",
+      "stream_wait_source_sha256": "7483F7C3D279E199BF3906E60DCA43686F27C8DA33727AE68425639C83814D3B",
+      "http_receive_source_sha256": "59F110E9094361CCCAC94D5D1AFEFFE187C7B5891B27D1CD0DE01E0A6B88277B",
+      "stream_read_wait_ms": 0,
+      "stream_idle_timeout_ms": 1000,
+      "stream_input_bytes": 4096,
+      "stream_prefill_ms": 1000,
+      "codec_bridge_sha256": "8E7BD50B654A1581D9BA55041386D539144D913387678071AAF3BF8A2F248416",
+      "stream_input_sha256": "2C37EA39655D103A40C1599C030D47BCED8FA5FED785C0DC5A3C00BB980F5F8E",
+      "stream_refill_sha256": "1AFE17CC42A3A46916CF460F73DDBC077BA58016E2E5D0DAB156A2D4445EBD23",
+      "network_benchmark": false,
+      "cpu_mhz": 160,
+      "flash": "QIO40",
+      "output": "I2S PDM32 SLC-DMA",
+      "data_gpio": 3,
+      "dma_buffers": 2,
+      "dma_words_per_buffer": 512,
+      "pcm_rate": 48000,
+      "nominal_bit_rate_hz": 1536000,
+      "bit_rate_hz": 1538461,
+      "i2s": true,
+      "partition_layout": "app0/app1 960 KiB, SPIFFS 256 KiB; flash app only"
+    },
+    "candidate": {
+      "purpose": "Experimental Opus native radio, I2S PDM32 DMA; not device-qualified; build does not flash",
+      "diagnostic": true,
+      "experimental_opus": true,
+      "opus_input_bytes": 1024,
+      "opus_scratch_bytes": 6144,
+      "opus_benchmark": true,
+      "opus_benchmark_output": false,
+      "opus_stream_test": true,
+      "freertos_runtime_stats": true,
+      "opus_word_asm": true,
+      "opus_icdf_flash_word": true,
+      "opus_fir_flash_word": true,
+      "opus_pulse_flash_word": true,
+      "opus_pulse_helper_sha256": "F9582B41E2BA6DE7EEF66D2CCAADC6B534E7E42C05000D744A3AE965393ABF3D",
+      "opus_pulse_table_sha256": "0044AC1C064561D575E02E74758C0DAC583DEA054E790A8EF3640C03866B9A4B",
+      "opus_pulse_rate_sha256": "747252731E691203E4F048B97452A3202AF5F131725E7D81D6909643351890DF",
+      "opus_pulse_bands_sha256": "7BEE515318862E38C5974F29FBFF321A9524CF92438D5AA043F8257284C56FA9",
+      "opus_pulse_celt_sha256": "E26E55BDB206DD8DDAD7C20B572535C4795E8A63D99D913422A03A007F8273E9",
+      "opus_fir_source_sha256": "EFC60B0D80939C6AE9B7970ADF1756B5930A9315DAF692EADD87C94CF07AC582",
+      "opus_fir_table_sha256": "B2C427C2A738B8C8292927B0DAE28B11E60274A568079FCDF7AF311A987DD194",
+      "opus_fir_helper_sha256": "2021EEF3CDB6CB9DF9C36639E7D8E572879DC94B689DA315909A56ABC79C53B8",
+      "pdm32_iram": true,
+      "pdm32_batch": true,
+      "pdm32_loan_words": 512,
+      "sdk_rx_diag": true,
+      "sdk_rx_diag_manifest_sha256": "9041939AD205D62C14AC0BEDB0097EEB231B169182A81262F4CD5D074383F74E",
+      "opus_max_packet_ms": 20,
+      "tone_test": false,
+      "web_profile": false,
+      "memory_profile": false,
+      "spiffs_log": false,
+      "spiffs_log_http": false,
+      "spiffs_cache": false,
+      "spiffs_write_cache": false,
+      "audio_level_led": true,
+      "audio_level_led_update_hz": 10,
+      "audio_level_led_max_brightness": 32,
+      "audio_gain_led_source_sha256": "02D12212EB065F96BA051E32AE0045695AF8FE35C1F42BDF1C568BF156299AA0",
+      "audio_level_led_source_sha256": "C8E031445DE956BE2387876169EC3DFCBF2B6006F472914C17861DA4A89FDCA0",
+      "spiffs_log_source_sha256": "F937811F2CA775F1DC1430B6AA86E5BAFED477377043210FC6C992E7879D8444",
+      "web_audio_pause": "off",
+      "log_level": "error",
+      "playlist_web_gzip": true,
+      "built_utc": "2026-09-10T14:05:37.9129700Z",
+      "source_revision": "9e40898de2fd042506f78ada13b31ca1b8de0cff",
+      "app_sha256": "8325D56A06B51B9B3DDD528B6CEDC11FDE64406E52E369055B53520D304C54C0",
+      "bytes": 912672,
+      "app_address": "0x10000",
+      "config_sha256": "0ED337FF979A89A382D3FABCB0CED36BB243C006148CFBF159D0AD423396A4B5",
+      "output_source_sha256": "FBAFE6C843AF8AA27DCD020018C431A59643EC72C56FB244C2BF4749B74FBE6A",
+      "web_source_sha256": "EF887506B4E3AC645E8F20D6CEE4F3B25BBE3FDBB37DC156602B17D6B1A326B3",
+      "playlist_source_sha256": "0FEF5C783B9F4902C2861A6FCCAC21C96A6427306CA897E9C6B0AA0CA8C3C5E5",
+      "audio_source_sha256": "4989BBBD4E9854D0E48A59AFC7135BA6C619535C0FF9ADAE5E114ADDC4EBED2D",
+      "web_audio_pause_source_sha256": "600848A39225EF069584F65E30D2E9A44F27EC2C93F33FCC7B4C3D4DC9B75D67",
+      "stream_wait_source_sha256": "7483F7C3D279E199BF3906E60DCA43686F27C8DA33727AE68425639C83814D3B",
+      "http_receive_source_sha256": "59F110E9094361CCCAC94D5D1AFEFFE187C7B5891B27D1CD0DE01E0A6B88277B",
+      "stream_read_wait_ms": 0,
+      "stream_idle_timeout_ms": 1000,
+      "stream_input_bytes": 4096,
+      "stream_prefill_ms": 1000,
+      "codec_bridge_sha256": "8E7BD50B654A1581D9BA55041386D539144D913387678071AAF3BF8A2F248416",
+      "stream_input_sha256": "2C37EA39655D103A40C1599C030D47BCED8FA5FED785C0DC5A3C00BB980F5F8E",
+      "stream_refill_sha256": "1AFE17CC42A3A46916CF460F73DDBC077BA58016E2E5D0DAB156A2D4445EBD23",
+      "network_benchmark": false,
+      "cpu_mhz": 160,
+      "flash": "QIO40",
+      "output": "I2S PDM32 SLC-DMA",
+      "data_gpio": 3,
+      "dma_buffers": 2,
+      "dma_words_per_buffer": 512,
+      "pcm_rate": 48000,
+      "nominal_bit_rate_hz": 1536000,
+      "bit_rate_hz": 1538461,
+      "i2s": true,
+      "partition_layout": "app0/app1 960 KiB, SPIFFS 256 KiB; flash app only"
+    }
+  },
+  "switch": "opus_pulse_flash_word",
+  "inputs": {
+    "reference": [
+      {
+        "file": "run1.json",
+        "sha256": "495b8f5dc558f4c2d56ff1669fd2335d28dbaeebc6cfdd37e22963fedeba56f8"
+      },
+      {
+        "file": "run2.json",
+        "sha256": "ce016a367e71c4ee63703b68f65ff47dbe4711579ad3f090cb815072019fc326"
+      },
+      {
+        "file": "run3.json",
+        "sha256": "32ec45f590faab79a99b9da0e7bfed55a1e6e2b3f614a0a330a006d334064427"
+      },
+      {
+        "file": "run4.json",
+        "sha256": "dfdb1dc07cbe2335ff63d266278c768c7e96cf206d50a2b03af8691d23773cde"
+      },
+      {
+        "file": "run5.json",
+        "sha256": "ab457ec676e310ad80fbea7f58c66f2e33dd39669ba969eebfff1b37a1fc8c0d"
+      },
+      {
+        "file": "run6.json",
+        "sha256": "048c47a4eeb34af1ecd47c5df2bc0817dfa28c0992e6a2fe0a7affc72b5c5acd"
+      },
+      {
+        "file": "run7.json",
+        "sha256": "2ba6268f32731ef43d4383936f93157594810b59844bfcdba653e53c3558ea8f"
+      },
+      {
+        "file": "run8.json",
+        "sha256": "3ce5231036dbf416e1afed499ca90d6c0fe9a59d07b4af5246c7ed6a751573fa"
+      },
+      {
+        "file": "run9.json",
+        "sha256": "0747be9e92adc85271738e292e8c6b38eca476bd0f36450e5af414040c373462"
+      },
+      {
+        "file": "run10.json",
+        "sha256": "194f2981598d7924f06c9c31fdd53872791733aadfca48fb395775d25ded320d"
+      }
+    ],
+    "candidate": [
+      {
+        "file": "run1.json",
+        "sha256": "8c53f0f8cb98ccf7c8498d0ef21887cda10f45bb579f514375dce2a328bd0b0d"
+      },
+      {
+        "file": "run2.json",
+        "sha256": "c939aaf64627baa1b29aa3ae982e96100beb1243efdf21dfcb53d62d919c8c1a"
+      },
+      {
+        "file": "run3.json",
+        "sha256": "cdaed8b49d34ec35205ebebdb53bf4d79d30231602b5ddd04ed991d6ecad09f9"
+      },
+      {
+        "file": "run4.json",
+        "sha256": "2f115ad78f31f93d16be797a2f62668c55887e8b82239cdec491149e03807ea9"
+      },
+      {
+        "file": "run5.json",
+        "sha256": "15be4b7a92655eb13a26768d04c89c4d0ffe226261578186ede688071dfdd114"
+      },
+      {
+        "file": "run6.json",
+        "sha256": "65f2984d1a0f8842c94935cf0950356ca8a480a172cdf228be1cc599f7544843"
+      },
+      {
+        "file": "run7.json",
+        "sha256": "675a4d81ea174ac83939087a0133aeee536af6b47d12538a55cf0ca9925716b5"
+      },
+      {
+        "file": "run8.json",
+        "sha256": "10509bc6ec99180f0d5b6d1a528f6c677cfb0d157cac4546f16239fd86908d8c"
+      },
+      {
+        "file": "run9.json",
+        "sha256": "7628a439aefa25e4e2ef5735294b5a0fa26f54deb34ae00724815916aeac9da1"
+      },
+      {
+        "file": "run10.json",
+        "sha256": "a4b7e2bb74bf0e04c88c93659aabc171a6b255de16698a502f6bf5e7e85998e3"
+      }
+    ]
+  }
+}
