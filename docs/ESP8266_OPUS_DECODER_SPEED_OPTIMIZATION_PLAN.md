@@ -103,7 +103,12 @@ CMake `YORADIO_OPUS_FIR_FLASH_WORD`, по умолчанию OFF. Сохранё
 таблицы и дробные фазы; результат точный. Полный PCM:5 фикстур и смешанный
 SILK mono/stereo/Hybrid/CELT/PLC — без отличий; scratch не вырос. Xtensa:
 4 word loads, таблица96 байт с alignment>=4, stack80 байт у обоих вариантов,
-добавленная `.data/.bss`0. Скорость на плате ещё не квалифицирована.
+добавленная `.data/.bss`0. A/B на плате,10+10 raw-прогонов: медиана CPU
+SILK59.416→23.401%, Hybrid94.477→58.484%. PCM одинаковый, дополнительной
+статической RAM нет. У чистого CELT FIR не исполняется; его небольшие изменения
+не являются доказательством алгоритмического ускорения. Полный вывод всё ещё
+имеет пропуски, поэтому цель непрерывного радио не завершена.
+[Подробности, исходные данные и ограничения](ESP8266_OPUS_FIR_WORD_BENCHMARK.md).
 
 Воспроизведение проверок:
 
@@ -212,6 +217,23 @@ persistent RAM ради этой микрооптимизации.
   N-sample проход, сохранив `HALF32(a)+HALF32(b)`, а не `(a+b)>>1`, прежнее
   насыщение и lifetime spectral/history.
 
+### A8. Длинные Opus-пакеты без полного большого PCM-буфера
+
+Физический тест2026-09-10: Deutschlandfunk24 по HTTP проходит redirect и
+распознаётся как Opus24, но native adapter возвращает `Opus packet exceeds
+20 ms`. PCM не выдавался. Это ограничение нашей памяти/адаптера, не ошибка
+радиостанции и не доказательство медленного декодера. Лимит20мс не повышать
+просто увеличением PCM-массива: RAM уже ограничена.
+
+Проверить TOC/packet layout записанного фрагмента: несколько отдельных coded
+frames или один SILK40/60мс frame. Repacketizer может разделять лишь первые;
+один SILK40/60мс frame нельзя произвольно разрезать по байтам. Для него изучить
+callback после внутренних подкадров, сохранив entropy/predictor/resampler,
+gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upstream, без
+нового persistent/scratch расхода, затем замерить полный I2S pipeline.
+Этот пункт расширяет набор реальных low-bitrate потоков, но сам по себе
+не ускоряет вычисления. Ускоренный FIR может сделать их более перспективными.
+
 ## Что пока не применять
 
 - SILK side channel: mono API всё ещё должен потреблять entropy symbols.
@@ -237,12 +259,15 @@ persistent RAM ради этой микрооптимизации.
 - [ ] P0: профиль SILK indices/pulses/parameters/core/resample и CELT
   energy/allocation/bands/synthesis/postfilter/deemphasis. Один выбранный
   этап на сборку или малый bounded набор counters; измерить timer overhead.
-- [ ] P1: A1 FIR word-pairs, target alignment/asm, regression и board A/B.
+- [x] P1: A1 FIR word-pairs, target alignment/asm, regression и10+10 board A/B.
+  Сохранён отдельный флаг; raw SILK/Hybrid ускорены. Continuity — отдельный gate.
 - [ ] P2: A2 pulse-cache/energy/LTP/NLSF, по одной группе на коммит.
 - [ ] P3: A3 exact divisions: power-of-two / reciprocal / bitrate отдельно.
 - [ ] P4: A4 decoder-only CELT specialization, code-size/cache A/B.
 - [ ] P5: A5 SILK specialization, A6 exact loop scheduling/unroll.
 - [ ] P6: A7 только при заметном времени соответствующего этапа.
+- [ ] P7: A8 bounded block-output для длинных пакетов, начиная с анализа
+  реального DLF24; не повышать20мс лимит без доказанного RAM/PCM-контракта.
 - [ ] Реальный HTTP Opus ≥20 с без пропусков, затем длительный прогон с
   WebUI, stop/play, сменой кодеков и OOM/reconnect recovery.
 

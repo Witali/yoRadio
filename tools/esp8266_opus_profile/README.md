@@ -280,3 +280,23 @@ the flash loop has no `memw`; otherwise the existing volatile-word fence is
 retained. The `ec_dec_icdf` stack frame is 32 bytes versus 16 bytes before this
 experiment (+16 bytes); static RAM remains unchanged. No physical speedup is
 claimed until a separate board A/B holds the firmware and packet corpus fixed.
+
+## SILK FIR word pairs
+
+`-OpusFirFlashWord` in the firmware builder enables the default-off exact
+four-word/eight-coefficient FIR experiment. It requires `-EnableOpus`.
+The host runner accepts `--fir-word --fast-int64 0`; its candidate binary
+uses a separate cache directory. FIR ASan/UBSan, target alignment/stack and
+saved PCM checks: `node --test tests/esp8266-opus-fir-word.test.js`.
+
+Ten raw-only board runs per profile are archived with their application
+binaries, manifests and OTA records. Reproduce the strict comparison:
+
+```powershell
+node tools/esp8266_opus_profile/compare_raw.cjs --reference firmware/development/esp8266-opus-fir-off-raw --candidate firmware/development/esp8266-opus-fir-on-raw --output .build/opus-fir-comparison.json
+```
+
+It verifies hashes/configurations and keeps slow runs and observation errors.
+An incomplete run or changed PCM is a failure, not a discarded sample.
+SILK/Hybrid speed improved; physical-output and live continuity remain unproven.
+See [results and limitations](../../docs/ESP8266_OPUS_FIR_WORD_BENCHMARK.md).
