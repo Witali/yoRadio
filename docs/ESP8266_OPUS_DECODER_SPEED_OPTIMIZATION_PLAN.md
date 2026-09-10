@@ -296,8 +296,12 @@ gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upst
 - [ ] P4: A4 decoder-only CELT specialization, code-size/cache A/B.
 - [ ] P5: A5 SILK specialization, A6 exact loop scheduling/unroll.
 - [ ] P6: A7 только при заметном времени соответствующего этапа.
-- [ ] P7: A8 bounded block-output для длинных пакетов, начиная с анализа
-  реального DLF24; не повышать20мс лимит без доказанного RAM/PCM-контракта.
+- [x] P7: bounded block-output для пакетов до120мс из кадров не длиннее20мс.
+  DLF24 содержит3×20мс Hybrid; один PCM960 переиспользуется после callback.
+  12 host-сценариев exact, включая1728 реальных блоков DLF24; static RAM
+  не выросла. На плате декодирование заработало, но оба live-прогона
+  провалили continuity. [Контракт и тесты](ESP8266_OPUS_PACKET_BLOCK_OUTPUT.md),
+  [сырая диагностика](../firmware/development/esp8266-opus-block-live/CHANGELOG.md).
 - [ ] Реальный HTTP Opus ≥20 с без пропусков, затем длительный прогон с
   WebUI, stop/play, сменой кодеков и OOM/reconnect recovery.
 
