@@ -310,10 +310,11 @@ gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upst
   Pulse-cache проверен в двух вариантах и отклонён: регрессия CELT64;
   energy/LTP/NLSF остаются гипотезами. Не повторять отклонённый вариант.
 - [ ] P3: A3 exact divisions: power-of-two / reciprocal / bitrate отдельно.
-- [ ] P4: A4 decoder-only CELT specialization, code-size/cache A/B.
-  Подготовлен default-off эксперимент:27 host PCM-сценариев exact, scratch
-  прежний, target flash text−5892B, static RAM0 delta. Некоторые stack frames
-  выросли; скорость и итоговый запас стека требуют physical A/B.
+- [x] P4: A4 decoder-only CELT specialization проверен и отклонён.
+  27 host PCM-сценариев exact, target flash text−5892B, static RAM0 delta,
+  но10+10 raw-прогонов до192кбит/с: CELT64/128/192 медленнее на21.39/18.87/21.11%.
+  Стек lifetime-min1660→1500B; minDRAM1020/828B, RAM-квалификация провалена.
+  Не включать в production; уменьшение ROM само по себе не критерий успеха.
   [Контракт и воспроизведение](ESP8266_OPUS_CELT_DECODE_ONLY.md).
 - [ ] P5: A5 SILK specialization, A6 exact loop scheduling/unroll.
 - [ ] P6: A7 только при заметном времени соответствующего этапа.
