@@ -32,6 +32,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "SigProc_FIX.h"
 #include "resampler_private.h"
 #include "stack_alloc.h"
+#ifdef YORADIO_OPUS_BOUNDED
+#include "opus_fir_word.h"
+#endif
 
 static OPUS_INLINE opus_int16 *silk_resampler_private_IIR_FIR_INTERPOL(
     opus_int16  *out,
@@ -49,6 +52,24 @@ static OPUS_INLINE opus_int16 *silk_resampler_private_IIR_FIR_INTERPOL(
         table_index = silk_SMULWB( index_Q16 & 0xFFFF, 12 );
         buf_ptr = &buf[ index_Q16 >> 16 ];
 
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_FIR_FLASH_WORD
+        /* Preserve all eight MACs and their order. Reuse one pair so we do
+           not materialize a RAM coefficient table or eight live registers. */
+        const opus_int16 *front = silk_resampler_frac_FIR_12[table_index];
+        const opus_int16 *back = silk_resampler_frac_FIR_12[11 - table_index];
+        yoradio_opus_table_pair pair = yoradio_opus_fir_pair(front);
+        res_Q15 = silk_SMULBB(          buf_ptr[ 0 ], pair.half[0] );
+        res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 1 ], pair.half[1] );
+        pair = yoradio_opus_fir_pair(front + 2);
+        res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 2 ], pair.half[0] );
+        res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 3 ], pair.half[1] );
+        pair = yoradio_opus_fir_pair(back + 2);
+        res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 4 ], pair.half[1] );
+        res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 5 ], pair.half[0] );
+        pair = yoradio_opus_fir_pair(back);
+        res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 6 ], pair.half[1] );
+        res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 7 ], pair.half[0] );
+#else
         res_Q15 = silk_SMULBB(          buf_ptr[ 0 ], silk_resampler_frac_FIR_12[      table_index ][ 0 ] );
         res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 1 ], silk_resampler_frac_FIR_12[      table_index ][ 1 ] );
         res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 2 ], silk_resampler_frac_FIR_12[      table_index ][ 2 ] );
@@ -57,6 +78,7 @@ static OPUS_INLINE opus_int16 *silk_resampler_private_IIR_FIR_INTERPOL(
         res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 5 ], silk_resampler_frac_FIR_12[ 11 - table_index ][ 2 ] );
         res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 6 ], silk_resampler_frac_FIR_12[ 11 - table_index ][ 1 ] );
         res_Q15 = silk_SMLABB( res_Q15, buf_ptr[ 7 ], silk_resampler_frac_FIR_12[ 11 - table_index ][ 0 ] );
+#endif
         *out++ = (opus_int16)silk_SAT16( silk_RSHIFT_ROUND( res_Q15, 15 ) );
     }
     return out;

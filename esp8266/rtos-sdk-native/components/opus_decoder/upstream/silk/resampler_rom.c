@@ -80,6 +80,10 @@ silk_DWORD_ALIGN const opus_int16 silk_Resampler_2_3_COEFS_LQ[ 2 + 2 * 2 ] = {
 };
 
 /* Table with interplation fractions of 1/24, 3/24, 5/24, ... , 23/24 : 23/24 (46 Words) */
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_FIR_FLASH_WORD
+/* silk_DWORD_ALIGN is empty on LX106; pair loads need an explicit guarantee. */
+__attribute__((aligned(4)))
+#endif
 silk_DWORD_ALIGN const opus_int16 silk_resampler_frac_FIR_12[ 12 ][ RESAMPLER_ORDER_FIR_12 / 2 ] = {
     {  189,  -600,   617, 30567 },
     {  117,  -159, -1070, 29704 },

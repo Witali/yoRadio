@@ -1,8 +1,8 @@
 # ESP8266: аудит алгоритма Opus и план ускорения
 
 Дата: 2026-09-10. Native fixed-point libopus1.5.2, целевой GCC8.4 из
-сборки `391a85b`, CPU160/QIO40. Новые оптимизации ниже ещё **не применены**:
-это проверяемые гипотезы, а не обещание ускорения.
+сборки `391a85b`, CPU160/QIO40. A1 реализован как выключенный по умолчанию
+эксперимент; остальные пункты ниже — проверяемые гипотезы, не обещание ускорения.
 
 ## Вывод
 
@@ -96,6 +96,24 @@ padding flash; новая постоянная RAM не нужна. Провер
 Для 48000 отсчётов/с этот FIR-путь выполняет 384000 narrow coefficient loads/с.
 Это число операций, **не измеренное число исключений или прогноз ускорения**.
 Другие варианты ресэмплера такого выигрыша не получат.
+
+Эксперимент: `-OpusFirFlashWord` в production-builder (требует `-EnableOpus`),
+CMake `YORADIO_OPUS_FIR_FLASH_WORD`, по умолчанию OFF. Сохранён исходный
+путь для A/B. ASan/UBSan:35 случаев,357590 отсчётов интерполяции, все12 строк
+таблицы и дробные фазы; результат точный. Полный PCM:5 фикстур и смешанный
+SILK mono/stereo/Hybrid/CELT/PLC — без отличий; scratch не вырос. Xtensa:
+4 word loads, таблица96 байт с alignment>=4, stack80 байт у обоих вариантов,
+добавленная `.data/.bss`0. Скорость на плате ещё не квалифицирована.
+
+Воспроизведение проверок:
+
+```powershell
+node --test tests/esp8266-opus-fir-word.test.js
+node tools/esp8266_opus_profile/run_regressions.cjs --fast-int64 0 --fir-word --output .build/opus-fir-regression.json
+```
+
+[Полный PCM-отчёт](../tools/esp8266_opus_profile/fir-word-results.json),
+[целевой assembler/stack](../tools/esp8266_opus_profile/fir-word-xtensa-results.json).
 
 ### A2. Остальные статические таблицы
 

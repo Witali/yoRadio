@@ -15,6 +15,7 @@ param(
     [switch]$NoSpiffsCache,
     [switch]$OpusWordAsm,
     [switch]$OpusIcdfFlashWord,
+    [switch]$OpusFirFlashWord,
     [switch]$Pdm32Iram,
     [switch]$Pdm32Batch,
     [ValidateSet(64, 128, 256, 512)]
@@ -35,6 +36,7 @@ if ($OpusBenchmarkOutput -and -not $OpusBenchmark) { throw '-OpusBenchmarkOutput
 if ($OpusStreamTest -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusStreamTest requires -Diagnostic and -EnableOpus' }
 if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOpus' }
 if ($OpusIcdfFlashWord -and -not $EnableOpus) { throw '-OpusIcdfFlashWord requires -EnableOpus' }
+if ($OpusFirFlashWord -and -not $EnableOpus) { throw '-OpusFirFlashWord requires -EnableOpus' }
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
 if ($Pdm32Batch -and -not $Diagnostic) { throw '-Pdm32Batch requires -Diagnostic until board qualification' }
 if ($Pdm32LoanWords -ne 512 -and -not $Diagnostic) { throw 'Short PDM32 loans require -Diagnostic' }
@@ -119,6 +121,7 @@ try {
     $taskOpusStreamTest = if ($taskOpusStreamTestEnabled) { 'ON' } else { 'OFF' }
     $taskOpusWordAsm = if ($OpusWordAsm) { 'ON' } else { 'OFF' }
     $taskOpusIcdfFlashWord = if ($OpusIcdfFlashWord) { 'ON' } else { 'OFF' }
+    $taskOpusFirFlashWord = if ($OpusFirFlashWord) { 'ON' } else { 'OFF' }
     $taskPdm32Iram = if ($Pdm32Iram) { 'ON' } else { 'OFF' }
     $taskPdm32Batch = if ($Pdm32Batch) { 'ON' } else { 'OFF' }
     $taskSdkRxDiag = if ($SdkRxDiag) { 'ON' } else { 'OFF' }
@@ -148,6 +151,7 @@ try {
         "-DYORADIO_ESP8266_OPUS_STREAM_TEST=$taskOpusStreamTest",
         "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=$taskOpusFirFlashWord",
         "-DYORADIO_ESP8266_PDM32_IRAM=$taskPdm32Iram",
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
         "-DYORADIO_ESP8266_PDM32_LOAN_WORDS=$Pdm32LoanWords",
@@ -192,6 +196,10 @@ try {
         freertos_runtime_stats=[bool]$taskOpusRuntime.enabled
         opus_word_asm=[bool]$OpusWordAsm
         opus_icdf_flash_word=[bool]$OpusIcdfFlashWord
+        opus_fir_flash_word=[bool]$OpusFirFlashWord
+        opus_fir_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/resampler_private_IIR_FIR.c).Hash
+        opus_fir_table_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/resampler_rom.c).Hash
+        opus_fir_helper_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_fir_word.h).Hash
         pdm32_iram=[bool]$Pdm32Iram
         pdm32_batch=[bool]$Pdm32Batch
         pdm32_loan_words=$Pdm32LoanWords
