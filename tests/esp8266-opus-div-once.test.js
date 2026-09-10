@@ -14,3 +14,11 @@ test('reciprocal board A/B forbids unrelated changes',()=>{
   compareArtifacts(a,{...a,opus_div_once:true},'opus_div_once');
   assert.throws(()=>compareArtifacts(a,{...a,opus_div_once:true,opus_rotation_lx106:true},'opus_div_once'),/rotation/);
 });
+test('target reciprocal path follows outlined GCC function and does not add static RAM',()=>{
+  const r=require('../tools/esp8266_opus_profile/div-once-target-results.json');
+  assert.equal(r.passed,true);assert.equal(r.off_instructions_exact,true);
+  assert.equal(r.reciprocal_call_sites.off.alg_unquant,3);
+  assert.equal(r.reciprocal_call_sites.on.alg_unquant,0);
+  assert.equal(r.reciprocal_call_sites.outlined_rotation.celt_rcp,1);
+  for(const k of ['.dram0.data','.dram0.bss','.iram0.bss','.iram0.text'])assert.equal(r.sections.delta[k],0);
+});

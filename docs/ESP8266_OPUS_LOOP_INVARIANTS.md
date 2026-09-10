@@ -126,6 +126,10 @@ Probe не включён в firmware. При внедрении нужны по
   проверены с ASan/UBSan в реальном вызывающем vq.c (не весь кодек).
   [Отчёт](../tools/esp8266_opus_profile/div-once-results.json).
   Физический A/B ещё требуется, одновременно другие новые флаги не включать.
+  Target-аудит: macro-off инструкции совпали с прежними; text−560B,
+  статические DRAM/IRAM без изменений. GCC выделил вращение в helper со
+  стеком80B: alg_unquant112→64B **не означает** уменьшение всего call-chain.
+  В helper ровно один reciprocal. [Target-отчёт](../tools/esp8266_opus_profile/div-once-target-results.json).
 - [ ] Отдельно проверить SAR-loop с C fallback, затем LPC10/16.
 - [ ] Проверить локальные инварианты init_caps, потом таблицы/stride reuse.
 - [ ] Сохранять только ускоряющие варианты. Не увеличивать persistent RAM.

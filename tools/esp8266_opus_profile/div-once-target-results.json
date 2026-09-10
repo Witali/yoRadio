@@ -1,0 +1,76 @@
+{
+  "passed": true,
+  "before": ".build/esp8266-opus-celt192-off",
+  "off": ".build/esp8266-opus-div192-off",
+  "on": ".build/esp8266-opus-div192-on",
+  "off_instructions_exact": true,
+  "normalization": "GCC dollar-number local symbol IDs only",
+  "reciprocal_call_sites": {
+    "off": {
+      "exp_rotation": 3,
+      "alg_unquant": 3,
+      "stereo_itheta": 6
+    },
+    "on": {
+      "exp_rotation": 1,
+      "alg_unquant": 0,
+      "stereo_itheta": 2
+    },
+    "outlined_rotation": {
+      "section": ".text.exp_rotation$part$0$constprop$2",
+      "celt_rcp": 1
+    }
+  },
+  "stack": {
+    "off": {
+      "exp_rotation1": 16,
+      "exp_rotation": 80,
+      "op_pvq_search_c": 96,
+      "alg_quant": 128,
+      "alg_unquant": 112,
+      "renormalise_vector": 32,
+      "stereo_itheta": 32
+    },
+    "on": {
+      "exp_rotation1": 16,
+      "exp_rotation1.constprop": 16,
+      "exp_rotation$part$0.constprop": 80,
+      "exp_rotation": 80,
+      "op_pvq_search_c": 96,
+      "alg_quant": 128,
+      "alg_unquant": 64,
+      "renormalise_vector": 32,
+      "stereo_itheta": 16
+    }
+  },
+  "sections": {
+    "off": {
+      ".iram0.vectors": 128,
+      ".iram0.text": 22900,
+      ".iram0.bss": 4044,
+      ".dram0.data": 1652,
+      ".dram0.bss": 18768,
+      ".flash.text": 636906,
+      ".flash.rodata": 241100
+    },
+    "on": {
+      ".iram0.vectors": 128,
+      ".iram0.text": 22900,
+      ".iram0.bss": 4044,
+      ".dram0.data": 1652,
+      ".dram0.bss": 18768,
+      ".flash.text": 636346,
+      ".flash.rodata": 241100
+    },
+    "delta": {
+      ".iram0.vectors": 0,
+      ".iram0.text": 0,
+      ".iram0.bss": 0,
+      ".dram0.data": 0,
+      ".dram0.bss": 0,
+      ".flash.text": -560,
+      ".flash.rodata": 0
+    }
+  },
+  "scope": "Static target audit, not a CPU speed or total live-stack measurement."
+}
