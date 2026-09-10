@@ -972,8 +972,8 @@ static unsigned quant_partition(struct band_ctx *ctx, celt_norm *X,
    ec = ctx->ec;
 
    /* If we need 1.5 more bit than we can produce, split the band in two. */
-   cache = m->cache.bits + yoradio_opus_pulse_read16(&m->cache.index[(LM+1)*m->nbEBands+i]);
-   if (LM != -1 && b > yoradio_opus_pulse_read8(cache+yoradio_opus_pulse_read8(cache))+12 && N>2)
+   cache = m->cache.bits + m->cache.index[(LM+1)*m->nbEBands+i];
+   if (LM != -1 && b > cache[cache[0]]+12 && N>2)
    {
       int mbits, sbits, delta;
       int itheta;

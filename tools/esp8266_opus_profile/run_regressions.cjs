@@ -38,7 +38,7 @@ function prefixSamples(data, count) {
   return inspectPackets(data.subarray(0, offset)).samples;
 }
 
-async function runRegressions({ noBuild = false, upstreamRoot, output, fastInt64, compareFastInt64, firFlashWord = false, pulseFlashWord = false } = {}) {
+async function runRegressions({ noBuild = false, upstreamRoot, output, fastInt64, compareFastInt64, firFlashWord = false } = {}) {
   if (compareFastInt64 !== undefined) {
     assert.ok((fastInt64 === 0 || fastInt64 === 1) && (compareFastInt64 === 0 || compareFastInt64 === 1), 'Arithmetic comparison requires explicit 0/1 selections');
     assert.notEqual(compareFastInt64, fastInt64, 'Arithmetic comparison must select the other branch');
@@ -52,10 +52,10 @@ async function runRegressions({ noBuild = false, upstreamRoot, output, fastInt64
   }
   const manifest = JSON.parse(fs.readFileSync(path.join(fixtureDirectory, 'manifest.json'), 'utf8'));
   const baselineBuild = await buildHost({ noBuild, fastInt64 });
-  const boundedBuild = await buildHost({ bounded: true, noBuild, fastInt64, firFlashWord, pulseFlashWord });
+  const boundedBuild = await buildHost({ bounded: true, noBuild, fastInt64, firFlashWord });
   const pristineBuild = upstreamRoot ? await buildHost({ upstreamRoot, noBuild, fastInt64 }) : null;
   const qualityBuild = compareFastInt64 === undefined ? null : await buildHost({ upstreamRoot, noBuild, fastInt64: compareFastInt64 });
-  const resultDirectory = path.join(root, '.build/esp8266-opus-regression' + (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (pulseFlashWord ? '-pulse-word' : ''));
+  const resultDirectory = path.join(root, '.build/esp8266-opus-regression' + (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : ''));
   fs.mkdirSync(resultDirectory, { recursive: true });
   const results = [];
   for (const fixture of manifest.fixtures) {
@@ -67,7 +67,7 @@ async function runRegressions({ noBuild = false, upstreamRoot, output, fastInt64
     const baselinePcm = path.join(resultDirectory, fixture.name + '.baseline.pcm');
     const boundedPcm = path.join(resultDirectory, fixture.name + '.bounded.pcm');
     const baseline = runProbe({ fixture: filename, output: baselinePcm, fastInt64 });
-    const bounded = runProbe({ bounded: true, fixture: filename, output: boundedPcm, fastInt64, firFlashWord, pulseFlashWord });
+    const bounded = runProbe({ bounded: true, fixture: filename, output: boundedPcm, fastInt64, firFlashWord });
     const baselineData = fs.readFileSync(baselinePcm);
     const pcm = comparePcm(baselineData, fs.readFileSync(boundedPcm));
     assert.equal(baseline.samples, fixture.samples);
@@ -146,11 +146,6 @@ async function runRegressions({ noBuild = false, upstreamRoot, output, fastInt64
   const passed = mixed.pcm.exact && (!mixed.pristine || mixed.pristine.pcm_vs_baseline.exact) &&
     results.every(result => result.pcm.exact && (!result.pristine || result.pristine.pcm_vs_baseline.exact));
   const report = { schema_version: 1, passed, compiler: baselineBuild.compiler, fir_flash_word:firFlashWord,
-    pulse_flash_word:pulseFlashWord,
-    ...(pulseFlashWord ? { pulse_source_sha256_lf:Object.fromEntries([
-      'opus_pulse_word.h','upstream/celt/rate.h','upstream/celt/bands.c',
-      'upstream/celt/celt.c','upstream/celt/static_modes_fixed.h'
-    ].map(file=>[file,sha256(Buffer.from(fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/components/opus_decoder',file),'utf8').replace(/\r\n/g,'\n')))])) } : {}),
     ...(firFlashWord ? { fir_source_sha256_lf:Object.fromEntries([
       'opus_fir_word.h', 'upstream/silk/resampler_private_IIR_FIR.c', 'upstream/silk/resampler_rom.c'
     ].map(file=>[file,sha256(Buffer.from(fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/components/opus_decoder',file),'utf8').replace(/\r\n/g,'\n')))])) } : {}),
@@ -182,7 +177,7 @@ if (require.main === module) {
   const value = key => { const i = process.argv.indexOf(key); return i < 0 ? undefined : process.argv[i + 1]; };
   const numeric = key => process.argv.includes(key) ? Number(value(key)) : undefined;
   runRegressions({ noBuild: process.argv.includes('--no-build'), upstreamRoot: value('--upstream'), output: value('--output'),
-    fastInt64: numeric('--fast-int64'), compareFastInt64: numeric('--compare-fast-int64'), firFlashWord:process.argv.includes('--fir-word'), pulseFlashWord:process.argv.includes('--pulse-word') })
+    fastInt64: numeric('--fast-int64'), compareFastInt64: numeric('--compare-fast-int64'), firFlashWord:process.argv.includes('--fir-word') })
     .then(report => console.log(`PASS: ${report.fixtures.length} fixtures; exact PCM, reset and OOM recovery.`))
     .catch(error => { console.error(error.stack); process.exitCode = 1; });
 }

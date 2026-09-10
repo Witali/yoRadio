@@ -1,14 +1,18 @@
 # ESP8266: аудит алгоритма Opus и план ускорения
 
 Дата: 2026-09-10. Native fixed-point libopus1.5.2, целевой GCC8.4 из
-сборки `391a85b`, CPU160/QIO40. A1 реализован как выключенный по умолчанию
-эксперимент; остальные пункты ниже — проверяемые гипотезы, не обещание ускорения.
+сборки `391a85b`, CPU160/QIO40. A1 проверен на плате и сохранён как отдельный
+флаг. Два pulse-cache варианта A2 отклонены после измерений. Остальные
+пункты ниже — проверяемые гипотезы, не обещание ускорения.
 
 ## Вывод
 
 Приоритет — статические таблицы, программные деления и специализация циклов,
-а не снижение точности или ещё одна очередь PCM. Самый конкретный новый
-кандидат: восемь narrow flash loads на каждый отсчёт в SILK FIR.
+а не снижение точности или ещё одна очередь PCM. Конкретный кандидат был
+в SILK FIR: восемь narrow flash loads на каждый отсчёт. Его исправление
+уже подтвердило выигрыш. Следующий приоритет — профиль этапов CELT и его
+decoder-only специализация; pulse-cache больше не менять без новой гипотезы,
+объясняющей два отрицательных A/B.
 
 У LX106 есть MUL16S/U, MULL и NSA/NSAU, но нет MULUH/MULSH, аппаратного
 деления, MAC16 и zero-overhead loops. Проверено по core-isa.h используемого
@@ -136,8 +140,8 @@ node tools/esp8266_opus_profile/run_regressions.cjs --fast-int64 0 --fir-word --
 выравнивание, последний элемент. Не превращать все DRAM16/packet-byte
 обращения в word loads. Новая RAM-таблица не нужна; эффект измерять.
 
-Первый эксперимент A2 — static pulse-cache: `rate.h` bits2pulses/pulses2bits,
-проверка split в quant_partition и caps в init_caps. Флаг
+Первый эксперимент A2 был static pulse-cache: `rate.h` bits2pulses/pulses2bits,
+проверка split в quant_partition и caps в init_caps. В ревизиях9e40898/f20ed03 флаг
 `-OpusPulseFlashWord` / `YORADIO_OPUS_PULSE_FLASH_WORD`, default OFF.
 Работает только bounded fixed-point без CUSTOM_MODES; динамические таблицы
 остаются на обычном доступе. cache_index50 дополнен 2 байтами flash padding,
@@ -184,6 +188,15 @@ encode/decode код. Радио передаёт encode=0, но это не г�
 component, сохранив upstream fallback. Возможны меньше ветвей, register
 pressure и flash working set; RAM прежняя. Наличие linked encode-кода не
 доказывает, что он исполняется во время decode. Защиты/API не удалять наугад.
+
+Повторная проверка исходников: единственный production caller
+`celt_decoder.c` вызывает quant_all_bands с первым аргументом0; публичного
+opus_encoder.c в vendored subset нет. Однако пять внутренних функций
+считывают ctx->encode как переменную. Для эксперимента можно сделать её
+compile-time0 только в bounded decoder-сборке; сохранить обычную ветку
+для unbounded reference и явно отклонять невозможный encode-вызов, а не
+незаметно выполнять вместо него decode. Не удалять обработку stereo,
+intensity, transient, PLC и memory guards вместе с encoder-ветвями.
 
 ### A5. SILK: специализация LPC и инварианты подкадра
 

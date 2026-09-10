@@ -6,8 +6,8 @@ const { prepareReference, defaultOutput } = require('./prepare_generic32_referen
 const { inspectPackets, sha256, fixtureDirectory } = require('./fixtures.cjs');
 const { comparePcm, runRegressions } = require('./run_regressions.cjs');
 
-async function phaseBuild(bounded, {firFlashWord=false,pulseFlashWord=false} = {}) {
-  const build = await buildHost({ bounded, fastInt64: 0, ...(bounded ? {firFlashWord,pulseFlashWord} : { upstreamRoot: defaultOutput }) });
+async function phaseBuild(bounded) {
+  const build = await buildHost({ bounded, fastInt64: 0, ...(bounded ? {} : { upstreamRoot: defaultOutput }) });
   const object = path.join(build.out, 'phase_probe.o'), binary = path.join(build.out, 'phase_probe');
   execute('gcc', [...build.flags, '-c', hostPath(path.join(__dirname, 'phase_probe.c')), '-o', hostPath(object)]);
   execute('gcc', [...build.objects.filter(file => !file.endsWith('probe.c.o')).map(hostPath), hostPath(object),
@@ -15,14 +15,14 @@ async function phaseBuild(bounded, {firFlashWord=false,pulseFlashWord=false} = {
     '-no-pie', '-Wl,--gc-sections', '-lm', '-o', hostPath(binary)]);
   return { ...build, binary };
 }
-async function runPhaseRegressions({ output = path.join(__dirname, 'pcm-scratch-results.json'), capacity = 6144, firFlashWord=false, pulseFlashWord=false } = {}) {
+async function runPhaseRegressions({ output = path.join(__dirname, 'pcm-scratch-results.json'), capacity = 6144 } = {}) {
   assert.ok(Number.isInteger(capacity) && capacity > 0 && capacity <= 7680 && capacity % 4 === 0);
   prepareReference();
   const standard = await runRegressions({ fastInt64: 0, upstreamRoot: defaultOutput });
-  const pristine = await phaseBuild(false), bounded = await phaseBuild(true,{firFlashWord,pulseFlashWord});
+  const pristine = await phaseBuild(false), bounded = await phaseBuild(true);
   const directory = path.join(fixtureDirectory, 'phase');
   const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
-  const destination = path.join(root, '.build/esp8266-opus-phase-regression'+(firFlashWord?'-fir-word':'')+(pulseFlashWord?'-pulse-word':''));
+  const destination = path.join(root, '.build/esp8266-opus-phase-regression');
   fs.mkdirSync(destination, { recursive: true });
   const cases = manifest.fixtures.map(fixture => {
     const file = path.join(directory, fixture.name + '.opuspkt'), data = fs.readFileSync(file);
@@ -66,7 +66,6 @@ async function runPhaseRegressions({ output = path.join(__dirname, 'pcm-scratch-
   assert.ok(coverage.borrowed_by_lm.every(count => count > 0));
   assert.ok(coverage.transient_borrowed > 0 && coverage.dual_stereo_borrowed > 0 && coverage.borrow_denied > 0);
   const report = { schema_version: 1, passed: true, arithmetic: 'OPUS_FAST_INT64=0',
-    fir_flash_word:firFlashWord,pulse_flash_word:pulseFlashWord,
     scope: 'Host mono output, maximum 20-ms packets; 48 kHz except explicit downsample-denial guard cases. Independently prepared pristine generic32 comparison. No physical speed, stack or whole-device memory claim; corpus peak is not a universal upper bound.',
     pristine_provenance: standard.pristine_provenance,
     phase_source_sha256_lf: Object.fromEntries(['bands.c', 'bands.h', 'celt_decoder.c'].map(name => {
@@ -79,10 +78,5 @@ async function runPhaseRegressions({ output = path.join(__dirname, 'pcm-scratch-
   return report;
 }
 module.exports = { phaseBuild, runPhaseRegressions };
-if (require.main === module) {
-  const args=process.argv.slice(2),i=args.indexOf('--output');
-  runPhaseRegressions({firFlashWord:args.includes('--fir-word'),pulseFlashWord:args.includes('--pulse-word'),
-    ...(i<0?{}:{output:args[i+1]})})
-    .then(report => console.log(JSON.stringify({ passed: report.passed, coverage: report.coverage })))
-    .catch(error => { console.error(error.stack); process.exitCode = 1; });
-}
+if (require.main === module) runPhaseRegressions().then(report => console.log(JSON.stringify({ passed: report.passed, coverage: report.coverage })))
+  .catch(error => { console.error(error.stack); process.exitCode = 1; });

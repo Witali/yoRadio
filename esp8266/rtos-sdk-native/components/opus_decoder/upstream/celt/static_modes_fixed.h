@@ -47,12 +47,7 @@ static const opus_int16 logN400[21] = {
 
 #ifndef DEF_PULSE_CACHE50
 #define DEF_PULSE_CACHE50
-#if YORADIO_OPUS_PULSE_WORD_ENABLED
-/* Last signed16 index shares its word with zero padding, not another object. */
-__attribute__((aligned(4))) static const opus_int16 cache_index50[106] = {
-#else
 static const opus_int16 cache_index50[105] = {
-#endif
 -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 41, 41, 41,
 82, 82, 123, 164, 200, 222, 0, 0, 0, 0, 0, 0, 0, 0, 41,
 41, 41, 41, 123, 123, 123, 164, 164, 240, 266, 283, 295, 41, 41, 41,
@@ -61,9 +56,6 @@ static const opus_int16 cache_index50[105] = {
 305, 305, 305, 318, 318, 343, 351, 358, 364, 240, 240, 240, 240, 240, 240,
 240, 240, 305, 305, 305, 305, 343, 343, 343, 351, 351, 370, 376, 382, 387,
 };
-#if YORADIO_OPUS_PULSE_WORD_ENABLED
-__attribute__((aligned(4)))
-#endif
 static const unsigned char cache_bits50[392] = {
 40, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
@@ -92,9 +84,6 @@ static const unsigned char cache_bits50[392] = {
 106, 151, 192, 231, 5, 59, 111, 158, 202, 243, 5, 55, 103, 147, 187,
 224, 5, 60, 113, 161, 206, 248, 4, 65, 122, 175, 224, 4, 67, 127,
 182, 234, };
-#if YORADIO_OPUS_PULSE_WORD_ENABLED
-__attribute__((aligned(4)))
-#endif
 static const unsigned char cache_caps50[168] = {
 224, 224, 224, 224, 224, 224, 224, 224, 160, 160, 160, 160, 185, 185, 185,
 178, 178, 168, 134, 61, 37, 224, 224, 224, 224, 224, 224, 224, 224, 240,

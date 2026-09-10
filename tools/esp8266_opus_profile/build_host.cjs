@@ -39,16 +39,15 @@ function dependencies(depfile) {
   return text.slice(text.indexOf(':') + 1).trim().split(/\s+/).filter(Boolean).map(nativePath);
 }
 
-async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, pulseFlashWord = false } = {}) {
+async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false } = {}) {
   if (firFlashWord && !bounded) throw Error('firFlashWord requires bounded decoder.');
-  if (pulseFlashWord && !bounded) throw Error('pulseFlashWord requires bounded decoder.');
   if (bounded && upstreamRoot) throw Error('--upstream is for a pristine unbounded baseline only.');
   if (fastInt64 !== undefined && fastInt64 !== 0 && fastInt64 !== 1) throw Error('fastInt64 must be 0 or 1.');
   const sourceRoot = upstreamRoot ? path.resolve(upstreamRoot) : upstream;
   if (fastInt64 !== undefined && !fs.readFileSync(path.join(sourceRoot, 'celt/arch.h'), 'utf8').includes('#ifndef OPUS_FAST_INT64'))
     throw Error('Selected upstream does not support an OPUS_FAST_INT64 override; use a documented diagnostic copy.');
   const out = path.join(root, '.build/esp8266-opus-host' + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
-    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (pulseFlashWord ? '-pulse-word' : ''));
+    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : ''));
   const binary = path.join(out, 'probe');
   const sources = ['src', 'celt', 'silk', 'silk/fixed'].flatMap(dir =>
     fs.readdirSync(path.join(sourceRoot, dir)).filter(file => file.endsWith('.c')).sort()
@@ -59,7 +58,6 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
     ...(fastInt64 === undefined ? [] : ['-DOPUS_FAST_INT64=' + fastInt64]),
     ...(bounded ? ['-DYORADIO_OPUS_BOUNDED=1', '-I' + hostPath(component)] : []),
     ...(firFlashWord ? ['-DYORADIO_OPUS_FIR_FLASH_WORD=1'] : []),
-    ...(pulseFlashWord ? ['-DYORADIO_OPUS_PULSE_FLASH_WORD=1'] : []),
     ...['include', 'celt', 'silk', 'silk/fixed', 'src'].map(dir => '-I' + hostPath(path.join(sourceRoot, dir)))];
   const objects = sources.map(source => path.join(out, 'objects',
     source.startsWith(sourceRoot + path.sep) ? path.join('upstream', path.relative(sourceRoot, source)) + '.o' :
@@ -97,9 +95,9 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   return { binary, out, objects, flags, compiler, compiled: pending.length, linked, reused: false };
 }
 
-function runProbe({ bounded = false, fixture, output, selfTest = true, upstreamRoot, fastInt64, firFlashWord = false, pulseFlashWord = false }) {
+function runProbe({ bounded = false, fixture, output, selfTest = true, upstreamRoot, fastInt64, firFlashWord = false }) {
   const out = path.join(root, '.build/esp8266-opus-host' + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
-    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (pulseFlashWord ? '-pulse-word' : ''));
+    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : ''));
   const args = fixture ? [hostPath(path.resolve(fixture)), hostPath(path.resolve(output || path.join(out, 'decoded.pcm'))),
     ...(selfTest ? ['--self-test'] : [])] : [];
   return JSON.parse(execute(hostPath(path.join(out, 'probe')), args).trim());

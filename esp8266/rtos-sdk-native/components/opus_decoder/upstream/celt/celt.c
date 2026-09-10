@@ -276,7 +276,7 @@ void init_caps(const CELTMode *m,int *cap,int LM,int C)
    {
       int N;
       N=(m->eBands[i+1]-m->eBands[i])<<LM;
-      cap[i] = (yoradio_opus_pulse_read8(&m->cache.caps[m->nbEBands*(2*LM+C-1)+i])+64)*C*N>>2;
+      cap[i] = (m->cache.caps[m->nbEBands*(2*LM+C-1)+i]+64)*C*N>>2;
    }
 }
 
