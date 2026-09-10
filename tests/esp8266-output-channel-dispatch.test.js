@@ -18,7 +18,8 @@ function section(source, start, end) {
 
 for (const led of [0, 1]) for (const backend of ['pdm', 'rcpdm', 'feedback', 'simple']) {
  for (const batch of backend === 'pdm' ? [0, 1] : [0]) {
-  test(`I2S ${backend} LED=${led} PDM32_BATCH=${batch}: preserves PCM, bits, state and DMA boundaries`, t => {
+  for (const loan of backend === 'pdm' && batch ? [128, 512] : [512]) {
+  test(`I2S ${backend} LED=${led} PDM32_BATCH=${batch} LOAN=${loan}: preserves PCM, bits, state and DMA boundaries`, t => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'yoradio-channel-dispatch-'));
     t.after(() => fs.rmSync(dir, {recursive: true, force: true}));
     const source = fs.readFileSync(path.join(main, 'native_audio_output.c'), 'utf8').replace(/\r\n/g, '\n');
@@ -32,6 +33,7 @@ for (const led of [0, 1]) for (const backend of ['pdm', 'rcpdm', 'feedback', 'si
       `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=${backend === 'pdm' ? 1 : 0}`,
       `CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM=${backend !== 'pdm' ? 1 : 0}`,
       `YORADIO_ESP8266_PDM32_BATCH=${batch}`,
+      `YORADIO_ESP8266_PDM32_LOAN_WORDS=${loan}`,
       `CONFIG_YORADIO_RCPDM_FEEDBACK=${backend === 'feedback' ? 1 : 0}`,
       `RCPDM_TEST_SIMPLE=${backend === 'simple' ? 1 : 0}`,
     ];
@@ -68,5 +70,6 @@ for (const led of [0, 1]) for (const backend of ['pdm', 'rcpdm', 'feedback', 'si
     assert.equal(result.failure_cases, 5670);
     t.diagnostic(JSON.stringify(result));
   });
+  }
  }
 }

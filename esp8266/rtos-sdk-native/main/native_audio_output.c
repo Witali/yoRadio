@@ -565,6 +565,9 @@ void native_audio_output_silence(void) {
 #elif YORADIO_ESP8266_I2S_PDM
 
 #define I2S_PDM_WRITE_TIMEOUT_MS 100U
+#ifndef YORADIO_ESP8266_PDM32_LOAN_WORDS
+#define YORADIO_ESP8266_PDM32_LOAN_WORDS 512
+#endif
 #define I2S_PDM_SILENCE_WORD 0xaaaaaaaaU
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
 #define I2S_PDM_LOG_NAME "I2S RCPDM"
@@ -584,6 +587,13 @@ static esp_err_t i2s_pdm_reserve(i2s_pdm_writer_t *writer) {
     if ((int32_t)(writer->deadline - now) <= 0) return ESP_ERR_TIMEOUT;
     esp_err_t result = esp8266_nodac_i2s_reserve(
         &writer->words, &writer->capacity, writer->deadline - now);
+#if YORADIO_ESP8266_PDM32_LOAN_WORDS < 512
+    /* Diagnostic publication cadence, NOT a smaller DMA buffer. Releasing
+     * this prefix lets EOF consume it between producer loans. The driver
+     * retains ownership of the entire 512-word physical buffer. */
+    if (result == ESP_OK && writer->capacity > YORADIO_ESP8266_PDM32_LOAN_WORDS)
+        writer->capacity = YORADIO_ESP8266_PDM32_LOAN_WORDS;
+#endif
     if (result != ESP_OK)
         ESP_LOGE(TAG, I2S_PDM_LOG_NAME " DMA reserve failed: %s",
                  esp_err_to_name(result));

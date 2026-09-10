@@ -17,6 +17,8 @@ param(
     [switch]$OpusIcdfFlashWord,
     [switch]$Pdm32Iram,
     [switch]$Pdm32Batch,
+    [ValidateSet(64, 128, 256, 512)]
+    [int]$Pdm32LoanWords = 512,
     [switch]$SdkRxDiag,
     [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
@@ -33,6 +35,7 @@ if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOp
 if ($OpusIcdfFlashWord -and -not $EnableOpus) { throw '-OpusIcdfFlashWord requires -EnableOpus' }
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
 if ($Pdm32Batch -and -not $Diagnostic) { throw '-Pdm32Batch requires -Diagnostic until board qualification' }
+if ($Pdm32LoanWords -ne 512 -and -not $Diagnostic) { throw 'Short PDM32 loans require -Diagnostic' }
 if ($SdkRxDiag -and -not $Diagnostic) { throw '-SdkRxDiag requires -Diagnostic' }
 if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
 $taskOpusStreamTestEnabled = [bool]($OpusStreamTest -or $OpusBenchmark)
@@ -143,6 +146,7 @@ try {
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
         "-DYORADIO_ESP8266_PDM32_IRAM=$taskPdm32Iram",
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
+        "-DYORADIO_ESP8266_PDM32_LOAN_WORDS=$Pdm32LoanWords",
         "-DYORADIO_ESP8266_SDK_RX_DIAG=$taskSdkRxDiag",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES=$OpusBenchmarkFixtures",
         '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
@@ -185,6 +189,7 @@ try {
         opus_icdf_flash_word=[bool]$OpusIcdfFlashWord
         pdm32_iram=[bool]$Pdm32Iram
         pdm32_batch=[bool]$Pdm32Batch
+        pdm32_loan_words=$Pdm32LoanWords
         sdk_rx_diag=[bool]$SdkRxDiag
         sdk_rx_diag_manifest_sha256=$(if ($SdkRxDiag) { (Get-FileHash "$taskArtifact/sdk-rxdiag-manifest.json").Hash } else { $null })
         opus_max_packet_ms=$(if ($taskOpusEnabled) { 20 } else { 0 })

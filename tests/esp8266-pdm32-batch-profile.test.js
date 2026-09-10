@@ -6,6 +6,26 @@ const { spawnSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const builder = fs.readFileSync(path.join(root, 'tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), 'utf8');
 
+test('short loan profile validates diagnostics and resets the production limit to 512', () => {
+  const prelude = builder.slice(0, builder.indexOf('$taskRoot ='));
+  const code = '$check = {\n' + prelude + '\nreturn $Pdm32LoanWords\n}\n' + [
+    '$ErrorActionPreference = "Stop"',
+    'if ((& $check) -ne 512) { throw "Wrong default" }',
+    'foreach ($n in @(64,128,256,512)) {',
+    ' if ((& $check -Diagnostic -Pdm32LoanWords $n) -ne $n) { throw "Wrong limit" }',
+    ' $accepted = $true; try { $null = & $check -Pdm32LoanWords $n } catch { $accepted = $false }',
+    ' if ($accepted -ne ($n -eq 512)) { throw "Wrong production acceptance" }',
+    '}',
+    '$accepted = $true; try { $null = & $check -Diagnostic -Pdm32LoanWords 0 } catch { $accepted = $false }',
+    'if ($accepted) { throw "Accepted zero" }',
+  ].join('\n');
+  const result = spawnSync(process.platform === 'win32' ? 'powershell.exe' : 'pwsh',
+    ['-NoProfile','-NonInteractive','-Command',code], {encoding:'utf8'});
+  assert.equal(result.status,0,result.stdout + result.stderr);
+  assert.match(builder,/"-DYORADIO_ESP8266_PDM32_LOAN_WORDS=\$Pdm32LoanWords"/);
+  assert.match(builder,/pdm32_loan_words=\$Pdm32LoanWords/);
+});
+
 test('PDM32 batch builder switch is diagnostic-only, independent of IRAM, and explicitly resets CMake/manifest', t => {
   const shell = process.platform === 'win32' ? 'powershell.exe' : 'pwsh';
   const available = spawnSync(shell, ['-NoProfile', '-Command', '$PSVersionTable.PSVersion.Major'], { encoding: 'utf8' });

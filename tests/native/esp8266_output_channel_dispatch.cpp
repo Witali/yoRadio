@@ -183,7 +183,8 @@ static ReferenceWrite reference_write(Reference &state,
                 loan = true;
             }
             pending.push_back(word);
-            if (pending.size() == dma_capacity && !flush()) return run;
+            const size_t publication = std::min(dma_capacity, size_t(YORADIO_ESP8266_PDM32_LOAN_WORDS));
+            if (pending.size() == publication && !flush()) return run;
             state.phase -= rate;
         }
     }
