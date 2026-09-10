@@ -21,8 +21,8 @@ Entropy, stereo, rounding, PLC и качество не упрощаются.
   содержимого выдаваемого PCM. Полного покрытия всех FEC/DTX/malformed нет.
 - Scratch не вырос: в смешанном пути5968B DRAM /15600B word arena.
   Временный PCM остаётся1920B. Host ABI не равен ABI LX106.
-- ASan/UBSan проверяет ранний отказ encoder-вызова в изменённом bands.c.
-  Это не sanitizer-проверка всего декодера.
+- ASan/UBSan проверяет ранний отказ encoder-вызова и пять полных PCM-фикстур
+  с инструментированным bands.c. Это не sanitizer-проверка всего декодера.
 - XtensaGCC8.4: macro-off инструкции и relocation targets совпадают с прежними
   после нормализации только числовых ID локальных символов GCC. Это не
   сравнение ELF целиком. В macro-on из bands исчезли encoder-вызовы; alg_quant

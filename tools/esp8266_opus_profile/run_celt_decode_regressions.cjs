@@ -29,9 +29,19 @@ async function run(output=path.join(__dirname,'celt-decode-results.json')) {
   const objects=on.objects.filter(o=>!o.endsWith('probe.c.o')&&!o.endsWith(path.join('celt','bands.c.o')));
   execute('gcc',[...flags,...objects.map(hostPath),hostPath(bandObject),hostPath(guardObject),'-Wl,--gc-sections','-lm','-o',hostPath(guard)]);
   execute(hostPath(guard),[]);
-  const report={passed:true,scope:'Exact generic32 PCM, bounded scratch, cancellation/reset/OOM. No host timing claim. Sanitizers cover encoder rejection in bands.c, not the entire decoder.',
+  const sanitized=path.join(dir,'probe-sanitized-bands'),sanitizedPcm=[];
+  execute('gcc',[...flags,...objects.map(hostPath),hostPath(bandObject),hostPath(on.objects.find(o=>o.endsWith('probe.c.o'))),'-Wl,--gc-sections','-lm','-o',hostPath(sanitized)]);
+  for(const f of full.fixtures) {
+    const input=path.join(fixtureDirectory,f.name+'.opuspkt'),reference=path.join(dir,f.name+'.san-reference.pcm'),actual=path.join(dir,f.name+'.sanitized.pcm');
+    runProbe({...options,fixture:input,output:reference});
+    const result=JSON.parse(execute('env',['ASAN_OPTIONS=detect_leaks=0',hostPath(sanitized),hostPath(input),hostPath(actual),'--self-test']));
+    const pcm=comparePcm(fs.readFileSync(reference),fs.readFileSync(actual));assert.equal(pcm.exact,true);
+    assert.equal(result.arena_guards_ok,true);assert.equal(result.oom_reinitialized_exact,true);
+    sanitizedPcm.push({name:f.name,pcm});
+  }
+  const report={passed:true,scope:'Exact generic32 PCM, bounded scratch, cancellation/reset/OOM. No host timing claim. ASan/UBSan instruments bands.c for encoder rejection and five full PCM fixtures, not the entire decoder.',
     source_sha256_lf:sha256(Buffer.from(fs.readFileSync(path.join(component,'upstream/celt/bands.c'),'utf8').replace(/\r\n/g,'\n'))),
-    full,phase,blocks,encoder_guard_asan_ubsan:true};
+    full,phase,blocks,encoder_guard_asan_ubsan:true,sanitized_pcm:sanitizedPcm};
   fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');return report;
 }
 module.exports={run};

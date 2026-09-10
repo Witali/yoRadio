@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "scope": "Exact generic32 PCM, bounded scratch, cancellation/reset/OOM. No host timing claim. Sanitizers cover encoder rejection in bands.c, not the entire decoder.",
+  "scope": "Exact generic32 PCM, bounded scratch, cancellation/reset/OOM. No host timing claim. ASan/UBSan instruments bands.c for encoder rejection and five full PCM fixtures, not the entire decoder.",
   "source_sha256_lf": "f34dfa5f70c5f42dc43cb5d9fe618ad5f1f9abbc12fdccc525d54497a56ee760",
   "full": {
     "schema_version": 1,
@@ -1352,5 +1352,67 @@
       }
     ]
   },
-  "encoder_guard_asan_ubsan": true
+  "encoder_guard_asan_ubsan": true,
+  "sanitized_pcm": [
+    {
+      "name": "mono-12",
+      "pcm": {
+        "exact": true,
+        "compared_samples": 58560,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "a8a8600e916d36721e9154fdab6f93a47e6f3c3dd1a58dd652dd52ba77f4fec4",
+        "actual_pcm_sha256": "a8a8600e916d36721e9154fdab6f93a47e6f3c3dd1a58dd652dd52ba77f4fec4"
+      }
+    },
+    {
+      "name": "mono-24",
+      "pcm": {
+        "exact": true,
+        "compared_samples": 58560,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "fe5175ff35ebcf0af62ef0f4baf61be872924d4e46d185e79ba73aa0cd6bfd3b",
+        "actual_pcm_sha256": "fe5175ff35ebcf0af62ef0f4baf61be872924d4e46d185e79ba73aa0cd6bfd3b"
+      }
+    },
+    {
+      "name": "stereo-64",
+      "pcm": {
+        "exact": true,
+        "compared_samples": 58560,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "6d59ad494186b0230755568ae2238959d551142c3fb2d47822d2acff0999f2ca",
+        "actual_pcm_sha256": "6d59ad494186b0230755568ae2238959d551142c3fb2d47822d2acff0999f2ca"
+      }
+    },
+    {
+      "name": "stereo-128",
+      "pcm": {
+        "exact": true,
+        "compared_samples": 58560,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "0d4e1dea493c3c30daf33208e4e8bff51e34a803d41d68b29a6dc9b976a43d9a",
+        "actual_pcm_sha256": "0d4e1dea493c3c30daf33208e4e8bff51e34a803d41d68b29a6dc9b976a43d9a"
+      }
+    },
+    {
+      "name": "stereo-510",
+      "pcm": {
+        "exact": true,
+        "compared_samples": 58560,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e",
+        "actual_pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e"
+      }
+    }
+  ]
 }

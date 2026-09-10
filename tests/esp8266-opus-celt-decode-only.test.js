@@ -14,6 +14,8 @@ test('saved CELT regression binds current source and exact PCM, including transi
   const r=JSON.parse(fs.readFileSync(path.join(root,'tools/esp8266_opus_profile/celt-decode-results.json'),'utf8'));
   assert.equal(r.source_sha256_lf,sha256(Buffer.from(fs.readFileSync(path.join(component,'upstream/celt/bands.c'),'utf8').replace(/\r\n/g,'\n'))));
   assert.equal(r.passed,true);assert.equal(r.encoder_guard_asan_ubsan,true);
+  assert.equal(r.sanitized_pcm.length,5);
+  for(const c of r.sanitized_pcm)assert.equal(c.pcm.exact,true);
   assert.equal(r.phase.length,10);assert.equal(r.blocks.cases.length,11);
   for(const c of [...r.full.fixtures,r.full.mixed_sequence,...r.phase,...r.blocks.cases])assert.equal(c.pcm.exact,true);
 });
