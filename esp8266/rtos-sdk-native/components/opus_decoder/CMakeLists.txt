@@ -3,6 +3,7 @@ if(CONFIG_YORADIO_OGG_OPUS)
   option(YORADIO_OPUS_ICDF_FLASH_WORD "A/B: decode static flash ICDF tables with word loads" OFF)
   option(YORADIO_OPUS_FIR_FLASH_WORD "A/B: SILK resampler flash coefficients as word pairs" OFF)
   option(YORADIO_OPUS_CELT_DECODE_ONLY "A/B: specialize CELT bands for decoding" OFF)
+  option(YORADIO_OPUS_ROTATION_LX106 "A/B: exact CELT rotation in LX106 assembly" OFF)
   set(YORADIO_OPUS_PROFILE_STAGE 0 CACHE STRING "Diagnostic selected Opus stage, 0 off / 1..11")
   if(NOT YORADIO_OPUS_PROFILE_STAGE MATCHES "^([0-9]|10|11)$")
     message(FATAL_ERROR "Opus profile stage must be 0..11")
@@ -17,7 +18,7 @@ if(CONFIG_YORADIO_OGG_OPUS)
   file(GLOB OPUS_SOURCES upstream/src/*.c upstream/celt/*.c
        upstream/silk/*.c upstream/silk/fixed/*.c)
   idf_component_register(SRCS ${OPUS_SOURCES}
-      opus_memory.c opus_stage_profile.c ogg_opus_demux.c native_opus.c
+      opus_memory.c opus_stage_profile.c opus_rotation_lx106.S ogg_opus_demux.c native_opus.c
       INCLUDE_DIRS . upstream/include
       PRIV_INCLUDE_DIRS upstream/celt upstream/silk upstream/silk/fixed upstream/src)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_BOUNDED=1)
@@ -33,6 +34,9 @@ if(CONFIG_YORADIO_OGG_OPUS)
   endif()
   if(YORADIO_OPUS_CELT_DECODE_ONLY)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_CELT_DECODE_ONLY=1)
+  endif()
+  if(YORADIO_OPUS_ROTATION_LX106)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_ROTATION_LX106=1)
   endif()
   target_compile_options(${COMPONENT_LIB} PRIVATE -O3 -fwrapv -fstack-usage)
 else()

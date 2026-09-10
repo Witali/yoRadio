@@ -4,7 +4,8 @@ const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
 const { root } = require('./build_host.cjs');
 
-const defaultObject = path.join(root, '.build/esp8266-opus-experimental/esp-idf/opus_decoder/CMakeFiles/__idf_opus_decoder.dir/upstream/celt/pitch.c.obj');
+const defaultObject = path.resolve(root, process.env.OPUS_TARGET_BUILD || '.build/esp8266-opus-experimental',
+  'esp-idf/opus_decoder/CMakeFiles/__idf_opus_decoder.dir/upstream/celt/pitch.c.obj');
 const defaultObjdump = path.join(root, '.build/esp8266-tools/tools/xtensa-lx106-elf/esp-2020r3-49-gd5524c1-8.4.0/xtensa-lx106-elf/bin/xtensa-lx106-elf-objdump.exe');
 
 function checkPitchInterpolation({ object = defaultObject, objdump = defaultObjdump } = {}) {

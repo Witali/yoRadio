@@ -39,6 +39,10 @@
 #include "rate.h"
 #include "pitch.h"
 
+#ifdef YORADIO_OPUS_BOUNDED
+#include "opus_rotation.h"
+#endif
+
 #if defined(MIPSr1_ASM)
 #include "mips/vq_mipsr1.h"
 #endif

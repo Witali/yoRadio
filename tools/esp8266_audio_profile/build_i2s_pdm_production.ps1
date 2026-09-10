@@ -17,6 +17,7 @@ param(
     [switch]$OpusIcdfFlashWord,
     [switch]$OpusFirFlashWord,
     [switch]$OpusCeltDecodeOnly,
+    [switch]$OpusRotationLx106,
     [switch]$Pdm32Iram,
     [switch]$Pdm32Batch,
     [ValidateSet(64, 128, 256, 512)]
@@ -42,6 +43,7 @@ if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOp
 if ($OpusIcdfFlashWord -and -not $EnableOpus) { throw '-OpusIcdfFlashWord requires -EnableOpus' }
 if ($OpusFirFlashWord -and -not $EnableOpus) { throw '-OpusFirFlashWord requires -EnableOpus' }
 if ($OpusCeltDecodeOnly -and -not $EnableOpus) { throw '-OpusCeltDecodeOnly requires -EnableOpus' }
+if ($OpusRotationLx106 -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusRotationLx106 requires diagnostic Opus until board qualification' }
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
 if ($Pdm32Batch -and -not $Diagnostic) { throw '-Pdm32Batch requires -Diagnostic until board qualification' }
 if ($Pdm32LoanWords -ne 512 -and -not $Diagnostic) { throw 'Short PDM32 loans require -Diagnostic' }
@@ -128,6 +130,7 @@ try {
     $taskOpusIcdfFlashWord = if ($OpusIcdfFlashWord) { 'ON' } else { 'OFF' }
     $taskOpusFirFlashWord = if ($OpusFirFlashWord) { 'ON' } else { 'OFF' }
     $taskOpusCeltDecodeOnly = if ($OpusCeltDecodeOnly) { 'ON' } else { 'OFF' }
+    $taskOpusRotationLx106 = if ($OpusRotationLx106) { 'ON' } else { 'OFF' }
     $taskPdm32Iram = if ($Pdm32Iram) { 'ON' } else { 'OFF' }
     $taskPdm32Batch = if ($Pdm32Batch) { 'ON' } else { 'OFF' }
     $taskSdkRxDiag = if ($SdkRxDiag) { 'ON' } else { 'OFF' }
@@ -159,6 +162,7 @@ try {
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
         "-DYORADIO_OPUS_FIR_FLASH_WORD=$taskOpusFirFlashWord",
         "-DYORADIO_OPUS_CELT_DECODE_ONLY=$taskOpusCeltDecodeOnly",
+        "-DYORADIO_OPUS_ROTATION_LX106=$taskOpusRotationLx106",
         "-DYORADIO_OPUS_PROFILE_STAGE=$OpusProfileStage",
         "-DYORADIO_ESP8266_PDM32_IRAM=$taskPdm32Iram",
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
@@ -208,6 +212,8 @@ try {
         opus_icdf_flash_word=[bool]$OpusIcdfFlashWord
         opus_fir_flash_word=[bool]$OpusFirFlashWord
         opus_celt_decode_only=[bool]$OpusCeltDecodeOnly
+        opus_rotation_lx106=[bool]$OpusRotationLx106
+        opus_rotation_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_rotation_lx106.S).Hash
         opus_celt_bands_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/bands.c).Hash
         opus_profile_stage=$OpusProfileStage
         opus_fir_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/resampler_private_IIR_FIR.c).Hash
