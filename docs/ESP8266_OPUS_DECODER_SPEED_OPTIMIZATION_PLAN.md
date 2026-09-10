@@ -157,6 +157,13 @@ helper — на6.61%. Pure OFF также имел одну failed allocation at
 
 ### A3. Точные деления и предварительные коэффициенты
 
+Новый приоритет после target-аудита: `celt_div` раскрывает `celt_rcp(b)`
+трижды через MULT32_32_Q31. Локальное сохранение reciprocal даёт3→1 вызов;
+1720896 арифметических сравнений exact под ASan/UBSan. В отдельном target
+probe text100→60B, stack32→16B; это ещё не ускорение всего декодера на плате.
+Также подтверждены SSR в циклах нормализации, LPC_order/2 и выбор LPC10/16
+на каждый sample. [Карта инвариантов, приоритеты и ограничения](ESP8266_OPUS_LOOP_INVARIANTS.md).
+
 `celt/entcode.h:celt_udiv` сейчас использует `/`. Small-div table upstream
 включается для ARM_ASM, не для LX106. В target `ec_decode`2 call-sites
 `__udivsi3`, `ec_decode_bin`1, `ec_dec_uint`4; `quant_all_bands`11,

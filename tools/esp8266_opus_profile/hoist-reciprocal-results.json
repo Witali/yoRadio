@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "scope": "Isolated exact arithmetic + GCC target audit. Not full PCM, board timing or a production change.",
+  "host_asan_ubsan": {
+    "passed": true,
+    "cases": 1720896,
+    "original_calls": 3,
+    "once_calls": 1
+  },
+  "target": [
+    {
+      "symbol": "opus_div_original",
+      "celt_rcp_call_sites": 3,
+      "text_bytes": 100,
+      "stack_bytes": 32,
+      "disassembly": "\r\nC:\\Work\\yoRadio\\.build\\opus-hoist-reciprocal\\probe.o:     file format elf32-xtensa-le\r\n\r\n\r\nDisassembly of section .text.opus_div_original:\r\n\r\n00000000 <opus_div_original>:\r\n   0:\te0c112        \taddi\ta1, a1, -32\r\n   3:\t41e9      \ts32i.n\ta14, a1, 16\r\n   5:\t02ed      \tmov.n\ta14, a2\r\n   7:\t032d      \tmov.n\ta2, a3\r\n   9:\t7109      \ts32i.n\ta0, a1, 28\r\n   b:\t61c9      \ts32i.n\ta12, a1, 24\r\n   d:\t51d9      \ts32i.n\ta13, a1, 20\r\n   f:\t31f9      \ts32i.n\ta15, a1, 12\r\n  11:\t20f330        \tor\ta15, a3, a3\r\n  14:\t000001        \tl32r\ta0, fffc0014 <opus_div_original+0xfffc0014>\r\n\t\t\t14: R_XTENSA_SLOT0_OP\t.literal.opus_div_original\r\n\t\t\t14: R_XTENSA_ASM_EXPAND\tcelt_rcp\r\n  17:\t0000c0        \tcallx0\ta0\r\n  1a:\t20c220        \tor\ta12, a2, a2\r\n  1d:\t202ff0        \tor\ta2, a15, a15\r\n  20:\t000001        \tl32r\ta0, fffc0020 <opus_div_original+0xfffc0020>\r\n\t\t\t20: R_XTENSA_SLOT0_OP\t.literal.opus_div_original+0x4\r\n\t\t\t20: R_XTENSA_ASM_EXPAND\tcelt_rcp\r\n  23:\t0000c0        \tcallx0\ta0\r\n  26:\t02dd      \tmov.n\ta13, a2\r\n  28:\t0f2d      \tmov.n\ta2, a15\r\n  2a:\t000001        \tl32r\ta0, fffc002c <opus_div_original+0xfffc002c>\r\n\t\t\t2a: R_XTENSA_SLOT0_OP\t.literal.opus_div_original+0x8\r\n\t\t\t2a: R_XTENSA_ASM_EXPAND\tcelt_rcp\r\n  2d:\t0000c0        \tcallx0\ta0\r\n  30:\t3130e0        \tsrai\ta3, a14, 16\r\n  33:\t312020        \tsrai\ta2, a2, 16\r\n  36:\tf4e0e0        \textui\ta14, a14, 0, 16\r\n  39:\tf4d0d0        \textui\ta13, a13, 0, 16\r\n  3c:\t8222e0        \tmull\ta2, a2, a14\r\n  3f:\t82dd30        \tmull\ta13, a13, a3\r\n  42:\t31c0c0        \tsrai\ta12, a12, 16\r\n  45:\t82cc30        \tmull\ta12, a12, a3\r\n  48:\t21dfd0        \tsrai\ta13, a13, 15\r\n  4b:\t212f20        \tsrai\ta2, a2, 15\r\n  4e:\t7108      \tl32i.n\ta0, a1, 28\r\n  50:\t22da      \tadd.n\ta2, a2, a13\r\n  52:\t11ccf0        \tslli\ta12, a12, 1\r\n  55:\t22ca      \tadd.n\ta2, a2, a12\r\n  57:\t51d8      \tl32i.n\ta13, a1, 20\r\n  59:\t61c8      \tl32i.n\ta12, a1, 24\r\n  5b:\t41e8      \tl32i.n\ta14, a1, 16\r\n  5d:\t31f8      \tl32i.n\ta15, a1, 12\r\n  5f:\t20c112        \taddi\ta1, a1, 32\r\n  62:\tf00d      \tret.n\r\n"
+    },
+    {
+      "symbol": "opus_div_once",
+      "celt_rcp_call_sites": 1,
+      "text_bytes": 60,
+      "stack_bytes": 16,
+      "disassembly": "\r\nC:\\Work\\yoRadio\\.build\\opus-hoist-reciprocal\\probe.o:     file format elf32-xtensa-le\r\n\r\n\r\nDisassembly of section .text.opus_div_once:\r\n\r\n00000000 <opus_div_once>:\r\n   0:\tf0c112        \taddi\ta1, a1, -16\r\n   3:\t21c9      \ts32i.n\ta12, a1, 8\r\n   5:\t02cd      \tmov.n\ta12, a2\r\n   7:\t032d      \tmov.n\ta2, a3\r\n   9:\t3109      \ts32i.n\ta0, a1, 12\r\n   b:\t000001        \tl32r\ta0, fffc000c <opus_div_once+0xfffc000c>\r\n\t\t\tb: R_XTENSA_SLOT0_OP\t.literal.opus_div_once\r\n\t\t\tb: R_XTENSA_ASM_EXPAND\tcelt_rcp\r\n   e:\t0000c0        \tcallx0\ta0\r\n  11:\t3140c0        \tsrai\ta4, a12, 16\r\n  14:\t315020        \tsrai\ta5, a2, 16\r\n  17:\tf43020        \textui\ta3, a2, 0, 16\r\n  1a:\tf420c0        \textui\ta2, a12, 0, 16\r\n  1d:\t823340        \tmull\ta3, a3, a4\r\n  20:\t822250        \tmull\ta2, a2, a5\r\n  23:\t824450        \tmull\ta4, a4, a5\r\n  26:\t212f20        \tsrai\ta2, a2, 15\r\n  29:\t213f30        \tsrai\ta3, a3, 15\r\n  2c:\t3108      \tl32i.n\ta0, a1, 12\r\n  2e:\t332a      \tadd.n\ta3, a3, a2\r\n  30:\t1124f0        \tslli\ta2, a4, 1\r\n  33:\t232a      \tadd.n\ta2, a3, a2\r\n  35:\t21c8      \tl32i.n\ta12, a1, 8\r\n  37:\t10c112        \taddi\ta1, a1, 16\r\n  3a:\tf00d      \tret.n\r\n"
+    }
+  ],
+  "source_sha256_lf": {
+    "tools/esp8266_opus_profile/hoist_reciprocal_probe.c": "760b06e4e6af0d270502d3ac9c6ce1e481977834e1e9da55bbf4a09de27f1171",
+    "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/mathops.h": "18969073f5f53798a5e9f37d05fcf6a26ad4cc8c9ffb3e5d88d8bc0523c17960",
+    "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/mathops.c": "1bb9acef1450ce67d6cd63f007e8fcc3ca5ccfea4c9b22131d853da5d9298510",
+    "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/fixed_generic.h": "0185be2436b154667da33fc7bd8af6c07290980681c767fb2d3c89985cf7d308"
+  }
+}
