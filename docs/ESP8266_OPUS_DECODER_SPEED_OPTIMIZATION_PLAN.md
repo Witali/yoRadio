@@ -291,6 +291,12 @@ gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upst
   disabled assembler совпадает с исходным, +128B DRAM только в stage8
   diagnostic. [Методика](ESP8266_OPUS_STAGE_PROFILE.md). Замеры всех стадий
   и выбор следующей оптимизации остаются незавершёнными.
+  Stage8 измерен по согласованному SDK времени в10 raw-прогонах: bands/PVQ
+  занимает51.47/61.63/78.34% decode wall для CELT64/128/510; Hybrid24 —12.79%.
+  Следующий приоритет CELT — P4 decoder-only, затем деления/вращения внутри
+  bands. Для Hybrid отдельно измерить SILK core и CELT synthesis. Один
+  прогон имел лишь1052B свободной DRAM; это не успешная RAM-квалификация.
+  [Данные и ограничения](../firmware/development/esp8266-opus-stage-sdk-bands/CHANGELOG.md).
 - [x] P1: A1 FIR word-pairs, target alignment/asm, regression и10+10 board A/B.
   Сохранён отдельный флаг; raw SILK/Hybrid ускорены. Continuity — отдельный gate.
 - [ ] P2: A2 pulse-cache/energy/LTP/NLSF, по одной группе на коммит.
@@ -308,6 +314,11 @@ gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upst
   [сырая диагностика](../firmware/development/esp8266-opus-block-live/CHANGELOG.md).
 - [ ] Реальный HTTP Opus ≥20 с без пропусков, затем длительный прогон с
   WebUI, stop/play, сменой кодеков и OOM/reconnect recovery.
+  Повторный DLF24 на liveff49a46 при финальном RSSI−48dBm снова остановился:
+  TCP timeout, затем stage8 guard:10220B <6144+4096B (не хватает20B ещё до
+  overhead allocator). После cleanup26992B. Проверить отложенное освобождение
+  сетевых буферов/порядок повторной инициализации; не уменьшать резерв и
+  не объявлять это доказанной утечкой. Пропуски DMA сохраняются отдельно.
 
 На каждое изменение: reference/macro-off и candidate на одинаковых данных
 SILK/Hybrid/CELT, mono/stereo, transient/steady,2.5/5/10/20 мс, FEC/PLC/DTX,

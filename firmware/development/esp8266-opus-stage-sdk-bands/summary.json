@@ -1,0 +1,618 @@
+{
+  "scope": "One inclusive-wall stage profile, not a speed comparison or continuity proof",
+  "artifact": {
+    "purpose": "Experimental Opus native radio, I2S PDM32 DMA; not device-qualified; build does not flash",
+    "diagnostic": true,
+    "experimental_opus": true,
+    "opus_input_bytes": 1024,
+    "opus_scratch_bytes": 6144,
+    "opus_benchmark": true,
+    "opus_benchmark_output": false,
+    "opus_stream_test": true,
+    "freertos_runtime_stats": true,
+    "opus_word_asm": true,
+    "opus_icdf_flash_word": true,
+    "opus_fir_flash_word": true,
+    "opus_profile_stage": 8,
+    "opus_fir_source_sha256": "EFC60B0D80939C6AE9B7970ADF1756B5930A9315DAF692EADD87C94CF07AC582",
+    "opus_fir_table_sha256": "B2C427C2A738B8C8292927B0DAE28B11E60274A568079FCDF7AF311A987DD194",
+    "opus_fir_helper_sha256": "2021EEF3CDB6CB9DF9C36639E7D8E572879DC94B689DA315909A56ABC79C53B8",
+    "pdm32_iram": true,
+    "pdm32_batch": true,
+    "pdm32_loan_words": 512,
+    "sdk_rx_diag": true,
+    "sdk_rx_diag_manifest_sha256": "9041939AD205D62C14AC0BEDB0097EEB231B169182A81262F4CD5D074383F74E",
+    "opus_max_packet_ms": 120,
+    "opus_max_coded_frame_ms": 20,
+    "opus_block_output": true,
+    "opus_adapter_sha256": "4B5C924CA6132E2773422BC4287FC92A26D2F00AF8E942572723784AAE2A2681",
+    "opus_decoder_sha256": "CE8395608CBCD15C4130E529348B3E5657E79E2ED18DE51EF2B0DD57A8A3AA98",
+    "tone_test": false,
+    "web_profile": false,
+    "memory_profile": false,
+    "spiffs_log": false,
+    "spiffs_log_http": false,
+    "spiffs_cache": false,
+    "spiffs_write_cache": false,
+    "audio_level_led": true,
+    "audio_level_led_update_hz": 10,
+    "audio_level_led_max_brightness": 32,
+    "audio_gain_led_source_sha256": "02D12212EB065F96BA051E32AE0045695AF8FE35C1F42BDF1C568BF156299AA0",
+    "audio_level_led_source_sha256": "C8E031445DE956BE2387876169EC3DFCBF2B6006F472914C17861DA4A89FDCA0",
+    "spiffs_log_source_sha256": "F937811F2CA775F1DC1430B6AA86E5BAFED477377043210FC6C992E7879D8444",
+    "web_audio_pause": "off",
+    "log_level": "error",
+    "playlist_web_gzip": true,
+    "built_utc": "2026-09-10T15:50:51.2101444Z",
+    "source_revision": "17b1f2f609894ebd38bd87d635341c92d63e01fb",
+    "app_sha256": "DDD4A0041B3004A799A555AA4E7D6B5DE8A88209E2C9E3415ADB813D1BE3ABD5",
+    "bytes": 912960,
+    "app_address": "0x10000",
+    "config_sha256": "0ED337FF979A89A382D3FABCB0CED36BB243C006148CFBF159D0AD423396A4B5",
+    "output_source_sha256": "FBAFE6C843AF8AA27DCD020018C431A59643EC72C56FB244C2BF4749B74FBE6A",
+    "web_source_sha256": "8A192E23D1AE01026AEE9A457CB7518B0B83B717743702A41130B26CB002B73D",
+    "playlist_source_sha256": "0FEF5C783B9F4902C2861A6FCCAC21C96A6427306CA897E9C6B0AA0CA8C3C5E5",
+    "audio_source_sha256": "4989BBBD4E9854D0E48A59AFC7135BA6C619535C0FF9ADAE5E114ADDC4EBED2D",
+    "web_audio_pause_source_sha256": "600848A39225EF069584F65E30D2E9A44F27EC2C93F33FCC7B4C3D4DC9B75D67",
+    "stream_wait_source_sha256": "7483F7C3D279E199BF3906E60DCA43686F27C8DA33727AE68425639C83814D3B",
+    "http_receive_source_sha256": "59F110E9094361CCCAC94D5D1AFEFFE187C7B5891B27D1CD0DE01E0A6B88277B",
+    "stream_read_wait_ms": 0,
+    "stream_idle_timeout_ms": 1000,
+    "stream_input_bytes": 4096,
+    "stream_prefill_ms": 1000,
+    "codec_bridge_sha256": "8E7BD50B654A1581D9BA55041386D539144D913387678071AAF3BF8A2F248416",
+    "stream_input_sha256": "2C37EA39655D103A40C1599C030D47BCED8FA5FED785C0DC5A3C00BB980F5F8E",
+    "stream_refill_sha256": "1AFE17CC42A3A46916CF460F73DDBC077BA58016E2E5D0DAB156A2D4445EBD23",
+    "network_benchmark": false,
+    "cpu_mhz": 160,
+    "flash": "QIO40",
+    "output": "I2S PDM32 SLC-DMA",
+    "data_gpio": 3,
+    "dma_buffers": 2,
+    "dma_words_per_buffer": 512,
+    "pcm_rate": 48000,
+    "nominal_bit_rate_hz": 1536000,
+    "bit_rate_hz": 1538461,
+    "i2s": true,
+    "partition_layout": "app0/app1 960 KiB, SPIFFS 256 KiB; flash app only"
+  },
+  "attempts": [
+    {
+      "file": "run1.json",
+      "sha256": "aa18ea499e8fdd0ebd639a765eb293296d15aa80abf71ae99f03f7e566f29260",
+      "error": null,
+      "state": 3
+    },
+    {
+      "file": "run2.json",
+      "sha256": "7b1c1fda7ba8816e20adfbc697aa92954ab7bbab7b7af63494bfdcc67998d506",
+      "error": null,
+      "state": 3
+    },
+    {
+      "file": "run3.json",
+      "sha256": "9bff1d129a2ff17cde3158d5543d8cc68c9fadabf4b23e441137028041446cd7",
+      "error": null,
+      "state": 3
+    },
+    {
+      "file": "run4.json",
+      "sha256": "789c55ad0b4816503fc195d5bf9a7f2c3c80251b08dbfe1d8aa50e68e9facb38",
+      "error": null,
+      "state": 3
+    },
+    {
+      "file": "run5.json",
+      "sha256": "e3031dab978cddff42b631c2429d54c1dc53c98b6f0968d2ae4c740fd87c0958",
+      "error": null,
+      "state": 3
+    },
+    {
+      "file": "run6.json",
+      "sha256": "557dd806692dd350dea3ff61329b2f67f89efd27c401e5224c704f5d0423d287",
+      "error": null,
+      "state": 3
+    },
+    {
+      "file": "run7.json",
+      "sha256": "aacb171ba515b13fdeecd4bdb4d30cf8dd4492a7c5c8b24ac2f736ab4a51be39",
+      "error": null,
+      "state": 3
+    },
+    {
+      "file": "run8.json",
+      "sha256": "4bfe45d5a1f822358d4e0d69134dac38f7ea267bbb4a7dd5d8b242a381dfd234",
+      "error": null,
+      "state": 3
+    },
+    {
+      "file": "run9.json",
+      "sha256": "f2ee40433d2ad62ca6bb4dc3713bc5c1596a0dea2b0f741256800dacef1aeb81",
+      "error": null,
+      "state": 3
+    },
+    {
+      "file": "run10.json",
+      "sha256": "661426675c399ec52c5b734c1490949581baae2213bd8463909f7d5529a198dc",
+      "error": null,
+      "state": 3
+    }
+  ],
+  "all_attempts_complete": true,
+  "successful": 10,
+  "failed": 0,
+  "raw": {
+    "runs": 10,
+    "timing_window_excesses": [
+      {
+        "run": 1,
+        "id": 0,
+        "task_us": 562809,
+        "wall_us": 562176,
+        "excess_us": 633,
+        "empty_task_us": 57,
+        "packets": 120
+      },
+      {
+        "run": 2,
+        "id": 0,
+        "task_us": 561982,
+        "wall_us": 556717,
+        "excess_us": 5265,
+        "empty_task_us": 54,
+        "packets": 120
+      },
+      {
+        "run": 4,
+        "id": 0,
+        "task_us": 562478,
+        "wall_us": 561280,
+        "excess_us": 1198,
+        "empty_task_us": 50,
+        "packets": 120
+      },
+      {
+        "run": 5,
+        "id": 0,
+        "task_us": 562797,
+        "wall_us": 562664,
+        "excess_us": 133,
+        "empty_task_us": 51,
+        "packets": 120
+      },
+      {
+        "run": 7,
+        "id": 0,
+        "task_us": 562295,
+        "wall_us": 560375,
+        "excess_us": 1920,
+        "empty_task_us": 47,
+        "packets": 120
+      },
+      {
+        "run": 8,
+        "id": 0,
+        "task_us": 562319,
+        "wall_us": 559459,
+        "excess_us": 2860,
+        "empty_task_us": 43,
+        "packets": 120
+      },
+      {
+        "run": 9,
+        "id": 0,
+        "task_us": 562905,
+        "wall_us": 562829,
+        "excess_us": 76,
+        "empty_task_us": 48,
+        "packets": 120
+      }
+    ],
+    "observation_errors": [
+      {
+        "run": 6,
+        "error": "request timeout"
+      }
+    ],
+    "dram_after": {
+      "min": 26892,
+      "median": 26892,
+      "mean": 26892,
+      "p95": 26892,
+      "max": 26892
+    },
+    "cases": [
+      {
+        "id": 0,
+        "name": "mono12 SILK",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 898651720,
+        "scratch_bytes": 1808,
+        "scratch_words": 14112,
+        "task_budget_percent": {
+          "min": 23.415916666666668,
+          "median": 23.44322916666667,
+          "mean": 23.623241666666665,
+          "p95": 25.280208333333334,
+          "max": 25.280208333333334
+        },
+        "wall_budget_percent": {
+          "min": 23.19654166666667,
+          "median": 23.434166666666663,
+          "mean": 24.319616666666665,
+          "p95": 32.61170833333333,
+          "max": 32.61170833333333
+        },
+        "maximum_call_us": {
+          "min": 5641,
+          "median": 6425,
+          "mean": 6689.1,
+          "p95": 8452,
+          "max": 8452
+        },
+        "min_dram": {
+          "min": 1052,
+          "median": 8810,
+          "mean": 8030.4,
+          "p95": 9312,
+          "max": 9312
+        },
+        "stack_free_lifetime": {
+          "min": 1564,
+          "median": 1564,
+          "mean": 1572,
+          "p95": 1644,
+          "max": 1644
+        }
+      },
+      {
+        "id": 1,
+        "name": "mono24 hybrid",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3216561658,
+        "scratch_bytes": 2904,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 58.42283333333333,
+          "median": 58.448770833333334,
+          "mean": 58.76099999999999,
+          "p95": 61.60275,
+          "max": 61.60275
+        },
+        "wall_budget_percent": {
+          "min": 58.87679166666666,
+          "median": 59.06008333333333,
+          "mean": 61.37220833333333,
+          "p95": 82.247875,
+          "max": 82.247875
+        },
+        "maximum_call_us": {
+          "min": 13477,
+          "median": 13598.5,
+          "mean": 14425.7,
+          "p95": 19564,
+          "max": 19564
+        },
+        "min_dram": {
+          "min": 1052,
+          "median": 9398,
+          "mean": 8590.4,
+          "p95": 9664,
+          "max": 9664
+        },
+        "stack_free_lifetime": {
+          "min": 1564,
+          "median": 1564,
+          "mean": 1570.4,
+          "p95": 1628,
+          "max": 1628
+        }
+      },
+      {
+        "id": 2,
+        "name": "stereo64 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 2337883435,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 75.92883333333333,
+          "median": 75.97029166666667,
+          "mean": 76.70853333333332,
+          "p95": 83.15066666666665,
+          "max": 83.15066666666665
+        },
+        "wall_budget_percent": {
+          "min": 76.78829166666667,
+          "median": 76.92789583333334,
+          "mean": 80.51465416666667,
+          "p95": 112.25645833333333,
+          "max": 112.25645833333333
+        },
+        "maximum_call_us": {
+          "min": 17357,
+          "median": 18252,
+          "mean": 19002.3,
+          "p95": 26765,
+          "max": 26765
+        },
+        "min_dram": {
+          "min": 1052,
+          "median": 9398,
+          "mean": 8590.4,
+          "p95": 9664,
+          "max": 9664
+        },
+        "stack_free_lifetime": {
+          "min": 1564,
+          "median": 1564,
+          "mean": 1564,
+          "p95": 1564,
+          "max": 1564
+        }
+      },
+      {
+        "id": 3,
+        "name": "stereo128 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 1528306318,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 96.33625,
+          "median": 96.38022916666667,
+          "mean": 97.4106375,
+          "p95": 106.67537499999999,
+          "max": 106.67537499999999
+        },
+        "wall_budget_percent": {
+          "min": 97.52533333333334,
+          "median": 97.65449999999998,
+          "mean": 102.34297083333334,
+          "p95": 144.32104166666667,
+          "max": 144.32104166666667
+        },
+        "maximum_call_us": {
+          "min": 22793,
+          "median": 23139,
+          "mean": 24257.9,
+          "p95": 34212,
+          "max": 34212
+        },
+        "min_dram": {
+          "min": 1052,
+          "median": 9398,
+          "mean": 8590.4,
+          "p95": 9664,
+          "max": 9664
+        },
+        "stack_free_lifetime": {
+          "min": 1564,
+          "median": 1564,
+          "mean": 1564,
+          "p95": 1564,
+          "max": 1564
+        }
+      },
+      {
+        "id": 4,
+        "name": "stereo510 CELT",
+        "samples_per_run": 115200,
+        "packets_per_run": 120,
+        "pcm_hash": 3868245794,
+        "scratch_bytes": 5488,
+        "scratch_words": 15600,
+        "task_budget_percent": {
+          "min": 172.86795833333335,
+          "median": 172.91189583333335,
+          "mean": 174.09320000000002,
+          "p95": 184.41449999999998,
+          "max": 184.41449999999998
+        },
+        "wall_budget_percent": {
+          "min": 175.11904166666665,
+          "median": 175.30704166666666,
+          "mean": 180.231175,
+          "p95": 223.7945,
+          "max": 223.7945
+        },
+        "maximum_call_us": {
+          "min": 41264,
+          "median": 41459,
+          "mean": 43449.7,
+          "p95": 60509,
+          "max": 60509
+        },
+        "min_dram": {
+          "min": 1932,
+          "median": 9398,
+          "mean": 8678.4,
+          "p95": 9664,
+          "max": 9664
+        },
+        "stack_free_lifetime": {
+          "min": 1564,
+          "median": 1564,
+          "mean": 1564,
+          "p95": 1564,
+          "max": 1564
+        }
+      }
+    ]
+  },
+  "profile_stage": 8,
+  "interval_ms": 30000,
+  "clock_pair_ticks_min": {
+    "min": 1,
+    "median": 1,
+    "mean": 1,
+    "p95": 1,
+    "max": 1
+  },
+  "clock_pair_ticks_max": {
+    "min": 5,
+    "median": 13,
+    "mean": 905.3,
+    "p95": 2920,
+    "max": 2920
+  },
+  "stages": [
+    {
+      "name": "mono12 SILK",
+      "scope": "CELT bands/PVQ",
+      "calls": {
+        "min": 0,
+        "median": 0,
+        "mean": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "inclusive_wall_percent": {
+        "min": 0,
+        "median": 0,
+        "mean": 0,
+        "p95": 0,
+        "max": 0
+      },
+      "max_scope_us": {
+        "min": 0,
+        "median": 0,
+        "mean": 0,
+        "p95": 0,
+        "max": 0
+      }
+    },
+    {
+      "name": "mono24 hybrid",
+      "scope": "CELT bands/PVQ",
+      "calls": {
+        "min": 120,
+        "median": 120,
+        "mean": 120,
+        "p95": 120,
+        "max": 120
+      },
+      "inclusive_wall_percent": {
+        "min": 12.610002547817452,
+        "median": 12.789109767661358,
+        "mean": 12.831683899454774,
+        "p95": 13.406729353189975,
+        "max": 13.406729353189975
+      },
+      "max_scope_us": {
+        "min": 1825,
+        "median": 2714.5,
+        "mean": 2728.4,
+        "p95": 4015,
+        "max": 4015
+      }
+    },
+    {
+      "name": "stereo64 CELT",
+      "scope": "CELT bands/PVQ",
+      "calls": {
+        "min": 120,
+        "median": 120,
+        "mean": 120,
+        "p95": 120,
+        "max": 120
+      },
+      "inclusive_wall_percent": {
+        "min": 51.16891883472718,
+        "median": 51.46596257940508,
+        "mean": 51.86157528456606,
+        "p95": 54.88730232670355,
+        "max": 54.88730232670355
+      },
+      "max_scope_us": {
+        "min": 9852,
+        "median": 10401.5,
+        "mean": 10919,
+        "p95": 15872,
+        "max": 15872
+      }
+    },
+    {
+      "name": "stereo128 CELT",
+      "scope": "CELT bands/PVQ",
+      "calls": {
+        "min": 120,
+        "median": 120,
+        "mean": 120,
+        "p95": 120,
+        "max": 120
+      },
+      "inclusive_wall_percent": {
+        "min": 61.49479933969624,
+        "median": 61.631890036754356,
+        "mean": 61.927134115065016,
+        "p95": 64.59386697192745,
+        "max": 64.59386697192745
+      },
+      "max_scope_us": {
+        "min": 14638,
+        "median": 15415.5,
+        "mean": 16137.3,
+        "p95": 23454,
+        "max": 23454
+      }
+    },
+    {
+      "name": "stereo510 CELT",
+      "scope": "CELT bands/PVQ",
+      "calls": {
+        "min": 120,
+        "median": 120,
+        "mean": 120,
+        "p95": 120,
+        "max": 120
+      },
+      "inclusive_wall_percent": {
+        "min": 78.27391647970691,
+        "median": 78.34269074695439,
+        "mean": 78.4519686497706,
+        "p95": 79.45944828849682,
+        "max": 79.45944828849682
+      },
+      "max_scope_us": {
+        "min": 33523,
+        "median": 33989,
+        "mean": 35643.4,
+        "p95": 49832,
+        "max": 49832
+      }
+    }
+  ],
+  "low_ram": [
+    {
+      "run": "run6.json",
+      "id": 0,
+      "min_dram": 1052
+    },
+    {
+      "run": "run6.json",
+      "id": 1,
+      "min_dram": 1052
+    },
+    {
+      "run": "run6.json",
+      "id": 2,
+      "min_dram": 1052
+    },
+    {
+      "run": "run6.json",
+      "id": 3,
+      "min_dram": 1052
+    },
+    {
+      "run": "run6.json",
+      "id": 4,
+      "min_dram": 1932
+    }
+  ],
+  "ram_reserve_4096_pass": false
+}

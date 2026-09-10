@@ -51,8 +51,8 @@ subtracted from recorded timings. Use a matching stage0 build and repeated
 raw runs to assess instrumentation perturbation, not to claim acceleration.
 
 ```powershell
-tools/esp8266_audio_profile/build_i2s_pdm_production.ps1 -Variant esp8266-opus-stage-bands -Diagnostic -EnableOpus -OpusBenchmark -OpusProfileStage 8 -OpusWordAsm -OpusIcdfFlashWord -OpusFirFlashWord -NoSpiffsCache -Pdm32Iram -Pdm32Batch -WebAudioPause off -SdkRxDiag
-node tools/esp8266_opus_profile/run_board.cjs --interval-ms 3000 --output .build/stage8-run1.json
+tools/esp8266_audio_profile/build_i2s_pdm_production.ps1 -Variant esp8266-opus-stage-sdk-bands -Diagnostic -EnableOpus -OpusBenchmark -OpusProfileStage 8 -OpusWordAsm -OpusIcdfFlashWord -OpusFirFlashWord -NoSpiffsCache -Pdm32Iram -Pdm32Batch -WebAudioPause off -SdkRxDiag
+node tools/esp8266_opus_profile/run_board.cjs --interval-ms 30000 --output .build/stage8-run1.json
 node --test tests/esp8266-opus-stage-profile.test.js tests/esp8266-opus-board-benchmark.test.js
 node tools/esp8266_opus_profile/run_stage_regressions.cjs
 node tools/esp8266_opus_profile/audit_stage_profile.cjs
@@ -62,6 +62,7 @@ Building does not flash. Use app-only OTA explicitly, then restore live
 firmware after tests. No raw UART control on the audio pin. Stage profiles
 are rejected without diagnostic Opus/raw benchmark, with physical output,
 or without fixedCPU160. These tests do not establish continuous playback.
+
 ## Rejected instrumentation attempts
 
 The first physical attempt used `%llu`; SDK nano printf produced invalid

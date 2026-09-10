@@ -48,3 +48,19 @@ test('non-diagnostic and physical-output stage profiles are rejected before conf
   const cmake=fs.readFileSync(path.join(component,'CMakeLists.txt'),'utf8');
   assert.match(cmake,/NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT YORADIO_ESP8266_OPUS_BENCHMARK OR YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT/);
 });
+test('saved SDK stage series includes all attempts and the unsafe RAM observation',()=>{
+  const dir=path.join(root,'firmware/development/esp8266-opus-stage-sdk-bands');
+  const summary=JSON.parse(fs.readFileSync(path.join(dir,'summary.json'),'utf8'));
+  assert.equal(summary.attempts.length,10);assert.equal(summary.successful,10);
+  assert.equal(summary.ram_reserve_4096_pass,false);assert.ok(summary.low_ram.some(v=>v.run==='run6.json'&&v.min_dram===1052));
+  for(let i=1;i<=10;i++) {
+    const report=JSON.parse(fs.readFileSync(path.join(dir,'run'+i+'.json'),'utf8'));
+    assert.equal(report.final.state,3);assert.equal(report.interval_ms,30000);
+    assert.equal(report.final.stage_clock_hz,1000000);
+    report.final.results.forEach((item,n)=>{
+      const stage=analyzeStage(report.final,item);assert.ok(stage.wall_percent_of_decode>=0&&stage.wall_percent_of_decode<=100);
+      assert.equal(item.packets,120);assert.equal(item.samples,115200);
+      assert.equal(item.stage_calls,n?120:0);
+    });
+  }
+});
