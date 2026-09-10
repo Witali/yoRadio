@@ -1,0 +1,1756 @@
+{
+  "date": "2026-09-10T13:02:38.714Z",
+  "build": ".build/esp8266-opus-flash-output512",
+  "kind": "static instruction/call sites, not execution counts, CPU time or proof of invalid access",
+  "notes": [
+    "Narrow loads can be correct DRAM/stack accesses; trace the source pointer before changing them.",
+    "Object inventory includes encoder/PLC paths; linked_symbol does not prove normal decode executes a function.",
+    "Instruction counts omit literals and are not flash byte size or runtime cost."
+  ],
+  "resampler_table": {
+    "address": "0x402d8424",
+    "section": ".flash.rodata",
+    "bytes": 96
+  },
+  "objects": [
+    {
+      "file": "celt/entdec",
+      "functions": [
+        {
+          "name": "ec_dec_init",
+          "instructions": 98,
+          "narrow_load_sites": 4,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x402467f0",
+            "section": ".flash.text",
+            "bytes": 240
+          }
+        },
+        {
+          "name": "ec_decode",
+          "instructions": 27,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 2,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__udivsi3": 2
+          },
+          "linked_symbol": {
+            "address": "0x402468e0",
+            "section": ".flash.text",
+            "bytes": 63
+          }
+        },
+        {
+          "name": "ec_decode_bin",
+          "instructions": 26,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__udivsi3": 1
+          },
+          "linked_symbol": {
+            "address": "0x40246920",
+            "section": ".flash.text",
+            "bytes": 63
+          }
+        },
+        {
+          "name": "ec_dec_update",
+          "instructions": 69,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x40246960",
+            "section": ".flash.text",
+            "bytes": 171
+          }
+        },
+        {
+          "name": "ec_dec_bit_logp",
+          "instructions": 70,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x40246a0c",
+            "section": ".flash.text",
+            "bytes": 172
+          }
+        },
+        {
+          "name": "ec_dec_icdf",
+          "instructions": 94,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x40246ab8",
+            "section": ".flash.text",
+            "bytes": 235
+          }
+        },
+        {
+          "name": "ec_dec_icdf16",
+          "instructions": 74,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "ec_dec_uint",
+          "instructions": 229,
+          "narrow_load_sites": 3,
+          "memw_sites": 0,
+          "software_division_sites": 4,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__udivsi3": 4
+          },
+          "linked_symbol": {
+            "address": "0x40246ba4",
+            "section": ".flash.text",
+            "bytes": 564
+          }
+        },
+        {
+          "name": "ec_dec_bits",
+          "instructions": 32,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x4029842c",
+            "section": ".flash.text",
+            "bytes": 80
+          }
+        }
+      ]
+    },
+    {
+      "file": "celt/rate",
+      "functions": [
+        {
+          "name": "clt_compute_allocation",
+          "instructions": 1015,
+          "narrow_load_sites": 23,
+          "memw_sites": 0,
+          "software_division_sites": 3,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 2,
+            "yoradio_opus_scratch_alloc": 4,
+            "__udivsi3": 3,
+            "ec_enc_bit_logp": 3,
+            "ec_dec_bit_logp": 2,
+            "ec_enc_uint": 1,
+            "ec_dec_uint": 1,
+            "yoradio_opus_scratch_restore": 2
+          },
+          "linked_symbol": {
+            "address": "0x40248230",
+            "section": ".flash.text",
+            "bytes": 2564
+          }
+        }
+      ]
+    },
+    {
+      "file": "celt/bands",
+      "functions": [
+        {
+          "name": "deinterleave_hadamard",
+          "instructions": 95,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "yoradio_opus_copy": 1,
+            "yoradio_opus_scratch_restore": 1
+          },
+          "linked_symbol": {
+            "address": "0x4024d8c0",
+            "section": ".flash.text",
+            "bytes": 229
+          }
+        },
+        {
+          "name": "intensity_stereo$isra$0",
+          "instructions": 89,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 2,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "celt_sqrt": 1,
+            "__divsi3": 2
+          },
+          "linked_symbol": {
+            "address": "0x4024d9a8",
+            "section": ".flash.text",
+            "bytes": 231
+          }
+        },
+        {
+          "name": "quant_partition",
+          "instructions": 837,
+          "narrow_load_sites": 17,
+          "memw_sites": 0,
+          "software_division_sites": 3,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__divsi3": 1,
+            "ec_tell_frac": 6,
+            "__udivsi3": 2,
+            "ec_enc_uint": 1,
+            "ec_dec_uint": 1,
+            "ec_encode": 1,
+            "isqrt32": 2,
+            "ec_dec_update": 1,
+            "alg_quant": 1,
+            "alg_unquant": 1,
+            "yoradio_opus_clear": 1,
+            "renormalise_vector": 1,
+            "ec_decode": 1,
+            "stereo_itheta": 2
+          },
+          "linked_symbol": {
+            "address": "0x4024da90",
+            "section": ".flash.text",
+            "bytes": 2166
+          }
+        },
+        {
+          "name": "quant_band",
+          "instructions": 678,
+          "narrow_load_sites": 21,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__udivsi3": 1,
+            "ec_enc_bits": 1,
+            "ec_dec_bits": 1,
+            "yoradio_opus_copy": 4,
+            ".text.deinterleave_hadamard": 2,
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "yoradio_opus_scratch_restore": 1,
+            "celt_sqrt": 1,
+            ".text.quant_partition": 3
+          },
+          "linked_symbol": {
+            "address": "0x4024e308",
+            "section": ".flash.text",
+            "bytes": 1761
+          }
+        },
+        {
+          "name": "hysteresis_decision",
+          "instructions": 36,
+          "narrow_load_sites": 6,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "celt_lcg_rand",
+          "instructions": 5,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x4024e9ec",
+            "section": ".flash.text",
+            "bytes": 13
+          }
+        },
+        {
+          "name": "bitexact_cos",
+          "instructions": 23,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "bitexact_log2tan",
+          "instructions": 34,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "compute_band_energies",
+          "instructions": 153,
+          "narrow_load_sites": 3,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "celt_sqrt": 2
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "normalise_bands",
+          "instructions": 130,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "celt_rcp": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "denormalise_bands",
+          "instructions": 179,
+          "narrow_load_sites": 10,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__divsi3": 1,
+            "yoradio_opus_clear": 3
+          },
+          "linked_symbol": {
+            "address": "0x4024e9fc",
+            "section": ".flash.text",
+            "bytes": 461
+          }
+        },
+        {
+          "name": "anti_collapse",
+          "instructions": 351,
+          "narrow_load_sites": 9,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__udivsi3": 1,
+            "celt_rsqrt_norm": 1,
+            "renormalise_vector": 1
+          },
+          "linked_symbol": {
+            "address": "0x4024ebcc",
+            "section": ".flash.text",
+            "bytes": 936
+          }
+        },
+        {
+          "name": "spreading_decision",
+          "instructions": 222,
+          "narrow_load_sites": 5,
+          "memw_sites": 0,
+          "software_division_sites": 3,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__udivsi3": 3
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "haar1",
+          "instructions": 39,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "quant_all_bands",
+          "instructions": 3446,
+          "narrow_load_sites": 114,
+          "memw_sites": 0,
+          "software_division_sites": 11,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 4,
+            "yoradio_opus_scratch_alloc": 12,
+            "ec_tell_frac": 10,
+            "__divsi3": 5,
+            "yoradio_opus_copy": 9,
+            ".text.quant_band": 8,
+            "ec_dec_bits": 2,
+            "ec_enc_bits": 2,
+            "ec_encode": 1,
+            "__udivsi3": 6,
+            "ec_dec_update": 1,
+            ".text.intensity_stereo$isra$0": 2,
+            "ec_enc_bit_logp": 1,
+            "ec_dec_bit_logp": 1,
+            ".text.deinterleave_hadamard": 4,
+            "alg_quant": 1,
+            "alg_unquant": 1,
+            "yoradio_opus_clear": 1,
+            "renormalise_vector": 1,
+            "yoradio_opus_scratch_restore": 4,
+            "celt_sqrt": 1,
+            "celt_rsqrt_norm": 2,
+            ".text.quant_partition": 4,
+            "ec_decode": 1,
+            "ec_enc_uint": 1,
+            "ec_dec_uint": 1,
+            "stereo_itheta": 2
+          },
+          "linked_symbol": {
+            "address": "0x40250694",
+            "section": ".flash.text",
+            "bytes": 9420
+          }
+        }
+      ]
+    },
+    {
+      "file": "celt/vq",
+      "functions": [
+        {
+          "name": "exp_rotation1",
+          "instructions": 64,
+          "narrow_load_sites": 4,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x40298a6c",
+            "section": ".flash.text",
+            "bytes": 174
+          }
+        },
+        {
+          "name": "exp_rotation",
+          "instructions": 264,
+          "narrow_load_sites": 8,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "celt_rcp": 3,
+            "celt_cos_norm": 2,
+            "__udivsi3": 1,
+            ".text.exp_rotation1": 2
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "op_pvq_search_c",
+          "instructions": 255,
+          "narrow_load_sites": 11,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 2,
+            "memset": 1,
+            "celt_rcp": 2,
+            "yoradio_opus_scratch_restore": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "alg_quant",
+          "instructions": 714,
+          "narrow_load_sites": 20,
+          "memw_sites": 0,
+          "software_division_sites": 3,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 2,
+            "yoradio_opus_scratch_alloc": 3,
+            "celt_rcp": 8,
+            "celt_cos_norm": 4,
+            "__udivsi3": 3,
+            ".text.exp_rotation1": 2,
+            "memset": 1,
+            "yoradio_opus_scratch_restore": 2,
+            "encode_pulses": 1,
+            "celt_rsqrt_norm": 1
+          },
+          "linked_symbol": {
+            "address": "0x40248c34",
+            "section": ".flash.text",
+            "bytes": 1788
+          }
+        },
+        {
+          "name": "alg_unquant",
+          "instructions": 310,
+          "narrow_load_sites": 5,
+          "memw_sites": 0,
+          "software_division_sites": 2,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "decode_pulses": 1,
+            "celt_rsqrt_norm": 1,
+            "celt_rcp": 3,
+            "celt_cos_norm": 2,
+            "__udivsi3": 2,
+            ".text.exp_rotation1": 1,
+            "yoradio_opus_scratch_restore": 1
+          },
+          "linked_symbol": {
+            "address": "0x40249330",
+            "section": ".flash.text",
+            "bytes": 778
+          }
+        },
+        {
+          "name": "renormalise_vector",
+          "instructions": 68,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "celt_rsqrt_norm": 2
+          },
+          "linked_symbol": {
+            "address": "0x4024963c",
+            "section": ".flash.text",
+            "bytes": 181
+          }
+        },
+        {
+          "name": "stereo_itheta",
+          "instructions": 174,
+          "narrow_load_sites": 4,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "celt_sqrt": 2,
+            "celt_rcp": 6
+          },
+          "linked_symbol": {
+            "address": "0x402496f4",
+            "section": ".flash.text",
+            "bytes": 453
+          }
+        }
+      ]
+    },
+    {
+      "file": "celt/cwrs",
+      "functions": [
+        {
+          "name": "encode_pulses",
+          "instructions": 85,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_enc_uint": 1
+          },
+          "linked_symbol": {
+            "address": "0x40252fb0",
+            "section": ".flash.text",
+            "bytes": 205
+          }
+        },
+        {
+          "name": "decode_pulses",
+          "instructions": 396,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_dec_uint": 1
+          },
+          "linked_symbol": {
+            "address": "0x40253080",
+            "section": ".flash.text",
+            "bytes": 985
+          }
+        }
+      ]
+    },
+    {
+      "file": "celt/quant_bands",
+      "functions": [
+        {
+          "name": "quant_coarse_energy_impl",
+          "instructions": 305,
+          "narrow_load_sites": 7,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_enc_bit_logp": 2,
+            "ec_laplace_encode": 1,
+            "ec_enc_icdf": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "quant_coarse_energy",
+          "instructions": 485,
+          "narrow_load_sites": 3,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 4,
+            "yoradio_opus_copy": 6,
+            ".text.quant_coarse_energy_impl": 3,
+            "ec_tell_frac": 3,
+            "__udivsi3": 1,
+            "yoradio_opus_scratch_restore": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "quant_fine_energy",
+          "instructions": 90,
+          "narrow_load_sites": 3,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_enc_bits": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "quant_energy_finalise",
+          "instructions": 117,
+          "narrow_load_sites": 3,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_enc_bits": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "unquant_coarse_energy",
+          "instructions": 254,
+          "narrow_load_sites": 12,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_dec_bit_logp": 3,
+            "ec_dec_icdf": 3,
+            "ec_laplace_decode": 3
+          },
+          "linked_symbol": {
+            "address": "0x40247e38",
+            "section": ".flash.text",
+            "bytes": 663
+          }
+        },
+        {
+          "name": "unquant_fine_energy",
+          "instructions": 51,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_dec_bits": 1
+          },
+          "linked_symbol": {
+            "address": "0x402480d0",
+            "section": ".flash.text",
+            "bytes": 124
+          }
+        },
+        {
+          "name": "unquant_energy_finalise",
+          "instructions": 95,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_dec_bits": 1
+          },
+          "linked_symbol": {
+            "address": "0x4024814c",
+            "section": ".flash.text",
+            "bytes": 227
+          }
+        },
+        {
+          "name": "amp2Log2",
+          "instructions": 189,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        }
+      ]
+    },
+    {
+      "file": "celt/celt",
+      "functions": [
+        {
+          "name": "resampling_factor",
+          "instructions": 24,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x40252b60",
+            "section": ".flash.text",
+            "bytes": 64
+          }
+        },
+        {
+          "name": "comb_filter",
+          "instructions": 399,
+          "narrow_load_sites": 8,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_copy": 2
+          },
+          "linked_symbol": {
+            "address": "0x40252ba0",
+            "section": ".flash.text",
+            "bytes": 1038
+          }
+        },
+        {
+          "name": "init_caps",
+          "instructions": 34,
+          "narrow_load_sites": 3,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x40298b1c",
+            "section": ".flash.text",
+            "bytes": 87
+          }
+        },
+        {
+          "name": "opus_strerror",
+          "instructions": 9,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_get_version_string",
+          "instructions": 2,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        }
+      ]
+    },
+    {
+      "file": "celt/celt_decoder",
+      "functions": [
+        {
+          "name": "deemphasis",
+          "instructions": 302,
+          "narrow_load_sites": 4,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "__divsi3": 1,
+            "yoradio_opus_scratch_restore": 1
+          },
+          "linked_symbol": {
+            "address": "0x402432e0",
+            "section": ".flash.text",
+            "bytes": 777
+          }
+        },
+        {
+          "name": "prefilter_and_fold",
+          "instructions": 142,
+          "narrow_load_sites": 4,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "comb_filter": 1,
+            "yoradio_opus_scratch_restore": 1
+          },
+          "linked_symbol": {
+            "address": "0x402435ec",
+            "section": ".flash.text",
+            "bytes": 362
+          }
+        },
+        {
+          "name": "celt_synthesis",
+          "instructions": 411,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "denormalise_bands": 5,
+            "yoradio_opus_copy": 2,
+            "clt_mdct_backward_c": 4,
+            "yoradio_opus_scratch_restore": 1
+          },
+          "linked_symbol": {
+            "address": "0x40243758",
+            "section": ".flash.text",
+            "bytes": 1021
+          }
+        },
+        {
+          "name": "celt_decoder_get_size",
+          "instructions": 20,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "opus_custom_mode_create": 1
+          },
+          "linked_symbol": {
+            "address": "0x40243b58",
+            "section": ".flash.text",
+            "bytes": 47
+          }
+        },
+        {
+          "name": "celt_decode_with_ec_dred",
+          "instructions": 2581,
+          "narrow_load_sites": 39,
+          "memw_sites": 0,
+          "software_division_sites": 2,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 4,
+            "yoradio_opus_scratch_alloc": 18,
+            "yoradio_opus_copy": 7,
+            ".text.prefilter_and_fold": 2,
+            "celt_lcg_rand": 1,
+            "renormalise_vector": 1,
+            ".text.celt_synthesis": 2,
+            "pitch_downsample": 1,
+            "pitch_search": 1,
+            "yoradio_opus_scratch_restore": 5,
+            "_celt_autocorr": 1,
+            "_celt_lpc": 1,
+            "celt_fir_c": 1,
+            "frac_div32": 2,
+            "celt_sqrt": 2,
+            "celt_iir": 1,
+            "yoradio_opus_clear": 1,
+            ".text.deemphasis": 2,
+            "__divsi3": 2,
+            "ec_dec_init": 1,
+            "ec_dec_bit_logp": 7,
+            "ec_dec_uint": 1,
+            "ec_dec_bits": 3,
+            "ec_dec_icdf": 4,
+            "unquant_coarse_energy": 1,
+            "ec_tell_frac": 6,
+            "clt_compute_allocation": 1,
+            "unquant_fine_energy": 1,
+            "quant_all_bands": 1,
+            "unquant_energy_finalise": 2,
+            "anti_collapse": 1,
+            "comb_filter": 2,
+            "init_caps": 4
+          },
+          "linked_symbol": {
+            "address": "0x40243b88",
+            "section": ".flash.text",
+            "bytes": 6812
+          }
+        },
+        {
+          "name": "celt_decode_with_ec",
+          "instructions": 9,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "celt_decode_with_ec_dred": 1
+          },
+          "linked_symbol": {
+            "address": "0x40245624",
+            "section": ".flash.text",
+            "bytes": 19
+          }
+        },
+        {
+          "name": "opus_custom_decoder_ctl",
+          "instructions": 255,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__divsi3": 1,
+            "yoradio_opus_clear": 2
+          },
+          "linked_symbol": {
+            "address": "0x40245638",
+            "section": ".flash.text",
+            "bytes": 650
+          }
+        },
+        {
+          "name": "celt_decoder_init",
+          "instructions": 79,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "opus_custom_mode_create": 1,
+            "yoradio_opus_clear": 1,
+            "yoradio_opus_history": 1,
+            "opus_custom_decoder_ctl": 1,
+            "resampling_factor": 1
+          },
+          "linked_symbol": {
+            "address": "0x402458c4",
+            "section": ".flash.text",
+            "bytes": 174
+          }
+        }
+      ]
+    },
+    {
+      "file": "celt/mdct",
+      "functions": [
+        {
+          "name": "clt_mdct_forward_c",
+          "instructions": 397,
+          "narrow_load_sites": 10,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 2,
+            "yoradio_opus_scratch_restore": 1,
+            "opus_fft_impl": 2
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "clt_mdct_backward_c",
+          "instructions": 360,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "opus_fft_impl": 2
+          },
+          "linked_symbol": {
+            "address": "0x4024714c",
+            "section": ".flash.text",
+            "bytes": 925
+          }
+        }
+      ]
+    },
+    {
+      "file": "celt/kiss_fft",
+      "functions": [
+        {
+          "name": "opus_fft_impl",
+          "instructions": 1373,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x402536f4",
+            "section": ".flash.text",
+            "bytes": 3627
+          }
+        },
+        {
+          "name": "opus_fft_c",
+          "instructions": 48,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "opus_fft_impl": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_ifft_c",
+          "instructions": 50,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "opus_fft_impl": 1
+          },
+          "linked_symbol": null
+        }
+      ]
+    },
+    {
+      "file": "silk/decode_frame",
+      "functions": [
+        {
+          "name": "silk_decode_frame",
+          "instructions": 178,
+          "narrow_load_sites": 3,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 2,
+            "silk_decode_indices": 1,
+            "silk_decode_pulses": 1,
+            "silk_decode_parameters": 1,
+            "silk_decode_core": 1,
+            "memmove": 2,
+            "memcpy": 2,
+            "silk_PLC": 2,
+            "silk_CNG": 1,
+            "silk_PLC_glue_frames": 1,
+            "yoradio_opus_scratch_restore": 1
+          },
+          "linked_symbol": {
+            "address": "0x4024a45c",
+            "section": ".flash.text",
+            "bytes": 410
+          }
+        }
+      ]
+    },
+    {
+      "file": "silk/decode_core",
+      "functions": [
+        {
+          "name": "silk_decode_core",
+          "instructions": 1260,
+          "narrow_load_sites": 48,
+          "memw_sites": 1,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 1,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 4,
+            "memcpy": 5,
+            "yoradio_opus_scratch_restore": 1,
+            "__divsi3": 1,
+            "__muldi3": 1,
+            "silk_LPC_analysis_filter": 2
+          },
+          "linked_symbol": {
+            "address": "0x402573b0",
+            "section": ".flash.text",
+            "bytes": 3413
+          }
+        }
+      ]
+    },
+    {
+      "file": "silk/decode_indices",
+      "functions": [
+        {
+          "name": "silk_decode_indices",
+          "instructions": 267,
+          "narrow_load_sites": 12,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_dec_icdf": 19,
+            "silk_NLSF_unpack": 1
+          },
+          "linked_symbol": {
+            "address": "0x4024a5f8",
+            "section": ".flash.text",
+            "bytes": 675
+          }
+        }
+      ]
+    },
+    {
+      "file": "silk/decode_pulses",
+      "functions": [
+        {
+          "name": "silk_decode_pulses",
+          "instructions": 178,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "ec_dec_icdf": 5,
+            "silk_decode_signs": 1,
+            "silk_shell_decoder": 1,
+            "memset": 1
+          },
+          "linked_symbol": {
+            "address": "0x4024adec",
+            "section": ".flash.text",
+            "bytes": 481
+          }
+        }
+      ]
+    },
+    {
+      "file": "silk/decode_parameters",
+      "functions": [
+        {
+          "name": "silk_decode_parameters",
+          "instructions": 395,
+          "narrow_load_sites": 63,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "silk_gains_dequant": 1,
+            "silk_NLSF_decode": 1,
+            "silk_NLSF2A": 2,
+            "memcpy": 2,
+            "silk_bwexpander": 2,
+            "silk_decode_pitch": 1,
+            "memset": 2
+          },
+          "linked_symbol": {
+            "address": "0x4024a89c",
+            "section": ".flash.text",
+            "bytes": 1110
+          }
+        }
+      ]
+    },
+    {
+      "file": "silk/NLSF_decode",
+      "functions": [
+        {
+          "name": "silk_NLSF_decode",
+          "instructions": 119,
+          "narrow_load_sites": 10,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "silk_NLSF_unpack": 1,
+            "__divsi3": 1,
+            "silk_NLSF_stabilize": 1
+          },
+          "linked_symbol": {
+            "address": "0x40255c74",
+            "section": ".flash.text",
+            "bytes": 330
+          }
+        }
+      ]
+    },
+    {
+      "file": "silk/NLSF_stabilize",
+      "functions": [
+        {
+          "name": "silk_NLSF_stabilize",
+          "instructions": 206,
+          "narrow_load_sites": 23,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "silk_insertion_sort_increasing_all_values_int16": 1
+          },
+          "linked_symbol": {
+            "address": "0x40255dc0",
+            "section": ".flash.text",
+            "bytes": 549
+          }
+        }
+      ]
+    },
+    {
+      "file": "silk/dec_API",
+      "functions": [
+        {
+          "name": "silk_LoadOSCEModels",
+          "instructions": 2,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "silk_Get_Decoder_Size",
+          "instructions": 4,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x402498bc",
+            "section": ".flash.text",
+            "bytes": 9
+          }
+        },
+        {
+          "name": "silk_ResetDecoder",
+          "instructions": 32,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "silk_reset_decoder": 2
+          },
+          "linked_symbol": {
+            "address": "0x402498c8",
+            "section": ".flash.text",
+            "bytes": 80
+          }
+        },
+        {
+          "name": "silk_InitDecoder",
+          "instructions": 43,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_history": 1,
+            "silk_init_decoder": 2
+          },
+          "linked_symbol": {
+            "address": "0x40249918",
+            "section": ".flash.text",
+            "bytes": 109
+          }
+        },
+        {
+          "name": "silk_Decode",
+          "instructions": 1036,
+          "narrow_load_sites": 18,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "silk_init_decoder": 1,
+            "yoradio_opus_scratch_restore": 3,
+            "silk_decoder_set_fs": 1,
+            "memcpy": 1,
+            "ec_dec_bit_logp": 2,
+            "ec_dec_icdf": 1,
+            "silk_decode_indices": 2,
+            "silk_decode_pulses": 2,
+            "silk_stereo_decode_pred": 4,
+            "silk_stereo_decode_mid_only": 3,
+            "memset": 3,
+            "yoradio_opus_scratch_alloc": 5,
+            "silk_decode_frame": 1,
+            "silk_stereo_MS_to_LR": 1,
+            "__divsi3": 1,
+            "yoradio_opus_copy": 1,
+            "silk_resampler": 2
+          },
+          "linked_symbol": {
+            "address": "0x40249988",
+            "section": ".flash.text",
+            "bytes": 2769
+          }
+        }
+      ]
+    },
+    {
+      "file": "silk/resampler_private_up2_HQ",
+      "functions": [
+        {
+          "name": "silk_resampler_private_up2_HQ",
+          "instructions": 158,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x4024c244",
+            "section": ".flash.text",
+            "bytes": 385
+          }
+        },
+        {
+          "name": "silk_resampler_private_up2_HQ_wrapper",
+          "instructions": 146,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": {
+            "address": "0x4024c3c8",
+            "section": ".flash.text",
+            "bytes": 365
+          }
+        }
+      ]
+    },
+    {
+      "file": "silk/resampler_private_IIR_FIR",
+      "functions": [
+        {
+          "name": "silk_resampler_private_IIR_FIR",
+          "instructions": 148,
+          "narrow_load_sites": 18,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "yoradio_opus_scratch_alloc": 1,
+            "memcpy": 3,
+            "silk_resampler_private_up2_HQ": 1,
+            "yoradio_opus_scratch_restore": 1
+          },
+          "linked_symbol": {
+            "address": "0x4024b720",
+            "section": ".flash.text",
+            "bytes": 383
+          }
+        }
+      ]
+    },
+    {
+      "file": "src/opus_decoder",
+      "functions": [
+        {
+          "name": "opus_decode_frame",
+          "instructions": 1282,
+          "narrow_load_sites": 18,
+          "memw_sites": 0,
+          "software_division_sites": 6,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_scratch_mark": 1,
+            "__divsi3": 6,
+            "yoradio_opus_scratch_restore": 7,
+            "ec_dec_init": 1,
+            "memset": 3,
+            "yoradio_opus_scratch_alloc": 11,
+            "silk_ResetDecoder": 1,
+            "silk_Decode": 1,
+            "ec_dec_bit_logp": 3,
+            "opus_custom_decoder_ctl": 11,
+            "celt_decode_with_ec": 3,
+            "celt_decode_with_ec_dred": 1,
+            "ec_dec_uint": 1
+          },
+          "linked_symbol": {
+            "address": "0x402412e8",
+            "section": ".flash.text",
+            "bytes": 3501
+          }
+        },
+        {
+          "name": "opus_decode_native$constprop$4",
+          "instructions": 259,
+          "narrow_load_sites": 5,
+          "memw_sites": 0,
+          "software_division_sites": 4,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__divsi3": 2,
+            "__modsi3": 2,
+            ".text.opus_decode_frame": 3,
+            "opus_packet_get_samples_per_frame": 1,
+            "opus_packet_parse_impl": 1
+          },
+          "linked_symbol": {
+            "address": "0x40242098",
+            "section": ".flash.text",
+            "bytes": 698
+          }
+        },
+        {
+          "name": "opus_decoder_get_size",
+          "instructions": 29,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "silk_Get_Decoder_Size": 1,
+            "celt_decoder_get_size": 1
+          },
+          "linked_symbol": {
+            "address": "0x40242354",
+            "section": ".flash.text",
+            "bytes": 62
+          }
+        },
+        {
+          "name": "opus_decoder_init",
+          "instructions": 116,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "yoradio_opus_history_begin": 1,
+            "silk_Get_Decoder_Size": 2,
+            "celt_decoder_get_size": 1,
+            "yoradio_opus_clear": 1,
+            "silk_InitDecoder": 1,
+            "celt_decoder_init": 1,
+            "opus_custom_decoder_ctl": 1,
+            "__divsi3": 1
+          },
+          "linked_symbol": {
+            "address": "0x40242394",
+            "section": ".flash.text",
+            "bytes": 261
+          }
+        },
+        {
+          "name": "opus_decoder_create",
+          "instructions": 80,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "silk_Get_Decoder_Size": 1,
+            "celt_decoder_get_size": 1,
+            "malloc": 1,
+            "opus_decoder_init": 1,
+            "free": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_decode_native",
+          "instructions": 273,
+          "narrow_load_sites": 5,
+          "memw_sites": 0,
+          "software_division_sites": 4,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "__divsi3": 2,
+            "__modsi3": 2,
+            ".text.opus_decode_frame": 3,
+            "opus_packet_get_samples_per_frame": 1,
+            "opus_packet_parse_impl": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_decode",
+          "instructions": 10,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            ".text.opus_decode_native$constprop$4": 1
+          },
+          "linked_symbol": {
+            "address": "0x4024249c",
+            "section": ".flash.text",
+            "bytes": 26
+          }
+        },
+        {
+          "name": "opus_decoder_ctl",
+          "instructions": 296,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "opus_custom_decoder_ctl": 5,
+            "yoradio_opus_clear": 1,
+            "silk_ResetDecoder": 1,
+            "__divsi3": 1
+          },
+          "linked_symbol": {
+            "address": "0x402424b8",
+            "section": ".flash.text",
+            "bytes": 715
+          }
+        },
+        {
+          "name": "opus_decoder_destroy",
+          "instructions": 7,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "free": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_packet_get_bandwidth",
+          "instructions": 23,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_packet_get_nb_channels",
+          "instructions": 6,
+          "narrow_load_sites": 1,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_packet_get_nb_frames",
+          "instructions": 16,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_packet_get_nb_samples",
+          "instructions": 37,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "opus_packet_get_samples_per_frame": 1
+          },
+          "linked_symbol": {
+            "address": "0x40242784",
+            "section": ".flash.text",
+            "bytes": 97
+          }
+        },
+        {
+          "name": "opus_packet_has_lbrr",
+          "instructions": 76,
+          "narrow_load_sites": 4,
+          "memw_sites": 0,
+          "software_division_sites": 1,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "opus_packet_get_samples_per_frame": 1,
+            "__divsi3": 1,
+            "opus_packet_parse": 2
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_decoder_get_nb_samples",
+          "instructions": 39,
+          "narrow_load_sites": 2,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "opus_packet_get_samples_per_frame": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_decoder_get_size",
+          "instructions": 2,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_decoder_init",
+          "instructions": 7,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_decoder_create",
+          "instructions": 23,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "malloc": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_decoder_destroy",
+          "instructions": 7,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {
+            "free": 1
+          },
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_decoder_ctl",
+          "instructions": 2,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_get_size",
+          "instructions": 2,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_alloc",
+          "instructions": 5,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_free",
+          "instructions": 1,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_parse",
+          "instructions": 2,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_dred_process",
+          "instructions": 2,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_decoder_dred_decode",
+          "instructions": 2,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        },
+        {
+          "name": "opus_decoder_dred_decode_float",
+          "instructions": 2,
+          "narrow_load_sites": 0,
+          "memw_sites": 0,
+          "software_division_sites": 0,
+          "software_multiply64_sites": 0,
+          "calls": {},
+          "linked_symbol": null
+        }
+      ]
+    }
+  ]
+}

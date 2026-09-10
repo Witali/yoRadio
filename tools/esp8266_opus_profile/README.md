@@ -1,5 +1,11 @@
 # Fixed-point Opus host regression
 
+See the [whole-decoder optimization audit and checklist](../../docs/ESP8266_OPUS_DECODER_SPEED_OPTIMIZATION_PLAN.md).
+`audit_target.cjs` inventories target instruction sites and linked symbols;
+it is a static inspection tool, not a CPU profiler. Its saved report is
+`target-audit-results.json`. Physical flash-to-DMA results and limitations are
+in [the benchmark report](../../docs/ESP8266_OPUS_FLASH_OUTPUT_BENCHMARK.md).
+
 This harness decodes the committed synthetic corpus to 48 kHz signed 16-bit
 little-endian **mono** PCM, including stereo-to-mono decoding. It compares the
 vendored decoder with `YORADIO_OPUS_BOUNDED` undefined and enabled. The optional
