@@ -15,8 +15,9 @@ typedef struct helix_codec helix_codec_t;
 typedef struct {
     uint32_t sample_rate;
     uint32_t bitrate;
-    uint8_t channels;
+    uint8_t channels; /* Interleaved PCM channels passed to the output callback. */
     uint8_t bits_per_sample;
+    uint8_t source_channels; /* Stream channels before optional mono synthesis. */
 } helix_stream_info_t;
 
 typedef bool (*helix_pcm_callback_t)(void *context,

@@ -743,17 +743,19 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
     s_pcm_rate = info->sample_rate;
     s_pcm_tick = xTaskGetTickCount();
     taskEXIT_CRITICAL();
-    /* A synthesis callback is now only 32 frames. Publish the first format
+    /* Source metadata must not describe the mono PCM output. Keep the output
+     * channel count above for sample stride and health frame accounting.
+     * A synthesis callback is now only 32 frames. Publish the first format
      * and actual changes, not the same state/lock work 18 times per granule. */
     if (context->decoder_bitrate != info->bitrate ||
         context->decoder_sample_rate != info->sample_rate ||
-        context->decoder_channels != info->channels) {
+        context->decoder_channels != info->source_channels) {
         context->decoder_bitrate = info->bitrate;
         context->decoder_sample_rate = info->sample_rate;
-        context->decoder_channels = info->channels;
+        context->decoder_channels = info->source_channels;
         native_state_set_stream(state_codec(context->codec_kind),
                             (info->bitrate + 500U) / 1000U,
-                            info->sample_rate, info->channels);
+                            info->sample_rate, info->source_channels);
     }
     return true;
 }

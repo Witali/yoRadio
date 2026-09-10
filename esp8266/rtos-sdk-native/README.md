@@ -278,6 +278,17 @@ USB flash extraction with the native SPIFFS format remains available.
 Flash writes can disturb audio.
 See [configuration, limits and USB extraction](../../docs/ESP8266_SPIFFS_LOGGING.md).
 
+## Source stream metadata in WebUI
+
+WebUI stream metadata describes the incoming audio, not the hardware's mono
+output. MP3 channels come from the frame header (Helix or libmad), AAC channels
+from the decoder's source configuration, and Opus channels from OpusHead.
+The codec bridge keeps `source_channels` separate from PCM `channels` without
+increasing the 12-byte metadata structure. PCM stride, mono synthesis and I2S
+configuration are unchanged. Source channel changes refresh WebUI even when
+output remains mono. Regression tests: `esp8266-stream-metadata.test.js`,
+`esp8266-stream-input.test.js`, and `esp8266-codec-lifecycle.test.js`.
+
 ## OTA-first updates with audio connected to RX
 
 For the connected Wemos D1 mini, use OTA for subsequent application updates:

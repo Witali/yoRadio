@@ -31,7 +31,7 @@ typedef struct {
     uint8_t volume; /* Legacy gain units; WebUI serializes 0..100 percent. */
     uint32_t bitrate_kbps;
     uint32_t sample_rate_hz;
-    uint8_t channels;
+    uint8_t channels; /* Source stream, not the optional mono PCM output. */
     codec_type_t codec;
     char ip[16];
     char station[128];

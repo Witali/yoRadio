@@ -29,6 +29,9 @@ static bool collect(void *context, const helix_stream_info_t *info,
     result.formats.push_back(info->sample_rate);
     result.formats.push_back(info->bitrate);
     result.formats.push_back(info->channels);
+    result.formats.push_back(info->source_channels);
+    assert(info->source_channels == 2); // All fixtures in this input-queue suite are stereo.
+    assert(info->channels == 1); // Board mono synthesis does not change stream metadata.
     return true;
 }
 

@@ -80,6 +80,7 @@ static bool opus_init_fail;
 static bool opus_reset_fail;
 static int opus_finish_result;
 static unsigned opus_inits, opus_resets, opus_finishes;
+static unsigned opus_source_channels = 2;
 extern "C" size_t native_opus_decoder_size(void) { return 9198; }
 extern "C" void yoradio_opus_memory_bind(void *bytes, size_t byte_capacity,
                                          void *words, size_t word_capacity) {
@@ -125,6 +126,7 @@ extern "C" int native_opus_feed(native_opus_t *d, const uint8_t *data,
     assert(d && consumed && (!size || data));
     *consumed = size < 7 ? size : 7;
     if (!size) return NATIVE_OPUS_NEED_INPUT;
+    d->input_channels = opus_source_channels;
     for (size_t i = 0; i < 960; ++i) d->config.pcm[i] = static_cast<int16_t>(i);
     return d->config.output(d->config.output_ctx, d->config.pcm, 960, 24000) ?
         NATIVE_OPUS_PACKET : NATIVE_OPUS_ERR_CANCELLED;
@@ -327,6 +329,8 @@ static bool receive_pcm(void *context, const helix_stream_info_t *info,
     PcmOutput *output = static_cast<PcmOutput *>(context);
     assert(info->sample_rate == 48000 && info->bitrate == 24000);
     assert(info->channels == 1 && info->bits_per_sample == 16);
+    assert(info->source_channels == opus_source_channels);
+    static_assert(sizeof(helix_stream_info_t) == 12, "Metadata must fit existing padding");
     const size_t offset = output->samples % 960;
     assert(samples == (offset ? 448 : 512));
     assert(pcm[0] == static_cast<int16_t>(offset));
@@ -344,8 +348,10 @@ static void opus_bridge_delivery(const std::map<void *, size_t> &baseline) {
     PcmOutput output = {};
     assert(helix_codec_process_one(c, receive_pcm, &output) == 0);
     assert(output.blocks == 2 && output.samples == 960 && helix_codec_buffered(c) == 7);
+    opus_source_channels = 1; // A following mono logical stream still outputs mono PCM.
     assert(helix_codec_process_one(c, receive_pcm, &output) == 0);
     assert(output.blocks == 4 && output.samples == 1920 && helix_codec_buffered(c) == 0);
+    opus_source_channels = 2;
     assert(helix_codec_process_one(c, receive_pcm, &output) == 1);
     opus_finish_result = NATIVE_OPUS_ERR_TRUNCATED;
     assert(helix_codec_finish(c) == NATIVE_OPUS_ERR_TRUNCATED);

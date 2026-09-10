@@ -61,8 +61,8 @@ test("input queue prefills, tops up, cancels and strips arbitrarily split ICY wi
   assert.match(result.stdout, /Stream input tests passed/);
 });
 
-for (const inputBytes of [1536, 4096, 6144]) {
-  test("queued MP3/AAC PCM is bit-exact with legacy draining, input=" + inputBytes, t => {
+for (const [inputBytes, aacBlocks] of [[1536, 1], [4096, 1], [6144, 1], [4096, 0]]) {
+  test("queued MP3/AAC PCM is bit-exact with legacy draining, input=" + inputBytes + ", AAC blocks=" + aacBlocks, t => {
     const executable = build(t, [
       path.join(audio, "mp3_decoder/mp3_decoder.cpp"),
       path.join(audio, "aac_decoder/aac_decoder.cpp"),
@@ -74,7 +74,7 @@ for (const inputBytes of [1536, 4096, 6144]) {
       audio, path.join(audio, "mp3_decoder"), path.join(audio, "aac_decoder"), bridge,
     ], [
       "YORADIO_ESP8266_NATIVE=1", "YORADIO_HELIX_MP3_MONO=1", "YORADIO_HELIX_MP3_SSO=1",
-      "YORADIO_ESP8266_AAC_BLOCK_OUTPUT=1", "YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES=512",
+      "YORADIO_ESP8266_AAC_BLOCK_OUTPUT=" + aacBlocks, "YORADIO_ESP8266_AAC_PCM_BLOCK_FRAMES=512",
       "CONFIG_YORADIO_STREAM_INPUT_BYTES=" + inputBytes, "PROGMEM=",
     ], true);
     if (!executable) return;
