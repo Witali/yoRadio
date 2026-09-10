@@ -62,3 +62,18 @@ nominal48k. This can consume76.923 extra source samples per second and
 eventually drain finite read-ahead; it cannot explain all observed large
 pauses by itself. Test compensation separately, preserving modulator state
 and accounting for the resulting deliberate resampling change.
+
+## Physical checkpoint and next A/B
+
+The first ten v2 windows completed:0/10 continuous; two have missing HTTP
+observations. All eight observed windows attributed zero misses to voluntary
+post-decode pacing. The other misses remain, including reconnect intervals.
+[Raw attempts and clock-aware reanalysis](../firmware/development/esp8266-opus-wait-v2/CHANGELOG.md).
+
+Source5147be3 now has matching diagnostic builds with1024 and2048 bytes of
+Opus input. Production remains1024; nondefault values require
+`-Diagnostic -EnableOpus -OpusInputBytes 2048`. The6144-byte scratch and4096-byte
+post-init reserve are unchanged. Seventeen host tests passed, including the
+actual bridge/arena lifecycle with2048 input, OOM, switches and cleanup.
+The controlled physical comparison is not yet complete; no buffer increase
+is accepted as a working fix at this checkpoint.
