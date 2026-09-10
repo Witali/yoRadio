@@ -160,7 +160,9 @@ Host GCC используется через WSL на Windows. Первый за
   CNG word-copy и целевые load32 проверены. Host mixed/PLC побитно совпадает.
 - [ ] Проверить target min/free/largest heap при Wi-Fi + WebUI + Opus.
 - [x] Измерить high-water audio stack raw-декодера: 2788 Б свободно из 6144.
-- [ ] Повторить high-water для полного HTTP/Ogg/PCM/PDM пути на стеке 5120 Б.
+- [x] Измерен high-water HTTP/Ogg/PCM/PDM для SILK/CELT на стеке 5120 Б:
+  свободно 1704/1624 Б. Это не worst-case гарантия для всех потоков.
+  См. [раздельный профиль](ESP8266_OPUS_LIVE_STAGE_PROFILE.md).
 - [ ] Проверить IRAM accesses на устройстве, SILK/Hybrid/CELT и OOM/recovery.
 - [ ] Измерить decode-only и полный I2S-PDM CPU, непрерывность не менее 20 с,
   затем час с открытым WebUI; переключения/stop без зависаний.

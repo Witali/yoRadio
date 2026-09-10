@@ -167,6 +167,12 @@ one through eight losses after every eighth packet when `--plc` is supplied.
 
 ## ICDF flash-word A/B (default OFF)
 
+For live read/decode/output/wait attribution and exact 180-second own HTTP
+fixtures, see [the live-stage report](../../docs/ESP8266_OPUS_LIVE_STAGE_PROFILE.md).
+`run_stage_wall.cjs` retains timeouts and strict continuity failures. Its wall
+times are not CPU measurements. A full flash-source decode/PDM/DMA control is
+still pending; the existing raw packet benchmark excludes audio output.
+
 The separate CMake option `-DYORADIO_OPUS_ICDF_FLASH_WORD=ON` enables a bounded
 decoder experiment in `ec_dec_icdf`. It is independent of
 `YORADIO_OPUS_WORD_ASM`. The table address is classified once before either

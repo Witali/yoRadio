@@ -75,18 +75,18 @@ improvement: see ESP8266_OPUS_DMA_YIELD_EXPERIMENT.md.
 ## Memory and startup failure
 
 The profiling image is 884816 bytes; ICDF ON adds 48 bytes. DRAM BSS rises
-from 0x4808 to 0x4848 (exactly64 bytes); IRAM sections do not change.
+from 0x4808 to 0x4848 (exactly 64 bytes); IRAM sections do not change.
 The DMA ISR remains identical: 387 bytes, 151 instructions.
 Measured audio stack watermark: 1704/5120 free on SILK, 1624/5120 on CELT.
-Sampled free IRAM can fall to36 bytes during network activity; no extra
+Sampled free IRAM can fall to 36 bytes during network activity; no extra
 IRAM function is safe to add on these observations alone.
 
 A CELT startup failed at stage8 (scratch allocation/reserve guard):
-free DRAM9980, requested6144, reserve4096. This is 260 bytes short of the
+free DRAM 9980, requested 6144, reserve 4096. This is 260 bytes short of the
 guard, not evidence of a leak or slow arithmetic. After cleanup current DRAM
-was27164. A later explicit retry started. The 4096-byte reserve was NOT lowered.
+was 27164. A later explicit retry started. The 4096-byte reserve was NOT lowered.
 
-Post-OTA health reported reset_reason7; no additional uptime/generation
+Post-OTA health reported reset_reason 7; no additional uptime/generation
 reset occurred in the valid windows. This does not identify the exact reset
 moment or prove a decoder watchdog bug. SDK RX error counters do not observe
 all radio/closed-driver losses, so zero counters cannot exonerate the network.
@@ -97,15 +97,15 @@ Archived profiles: `firmware/development/esp8266-opus-stage-wall/` and
 `firmware/development/esp8266-opus-stage-wall-icdf/` (manifests pin sources).
 All raw JSON observations and OTA reports accompany the corresponding image.
 Files in `tools/esp8266_opus_profile/live-fixtures/` preserve the exact HTTP
-bodies used here. Both are180-second finite files. Serve `/test.opus` through
+bodies used here. Both are 180-second finite files. Serve `/test.opus` through
 `serve_fixture.cjs`; the ESP reconnects on natural EOF, so exclude crossing
 that boundary from unexplained-stall attribution, not from failure recording.
 
 SILK is a loop/re-encode of `tests/fixtures/opus_native/mono-12.opus`:
 FFmpeg `-stream_loop -1`, `-t 180 -ar 48000 -ac 1 -c:a libopus -b:a 12k
 -vbr off -frame_duration 20 -application voip`.
-CELT uses FFmpeg8.1.1 lavfi stereo tones997/10007Hz and1703Hz plus seeded
-white noise7349, 48k, 180seconds, libopus64k, CBR20ms, applicationaudio.
+CELT uses FFmpeg 8.1.1 lavfi stereo tones 997/10007 Hz and 1703 Hz plus seeded
+white noise 7349, 48 kHz, 180 seconds, libopus 64k, CBR 20 ms, application audio.
 Ogg serials can differ on regeneration; use the archived bytes for exact A/B.
 
 | File | Bytes | SHA256 |
@@ -119,10 +119,48 @@ Ogg serials can differ on regeneration; use the archived bytes for exact A/B.
 - [x] Preserve failed samples and use the existing strict continuity gate.
 - [x] Measure full-path stack headroom for SILK and CELT (not a worst-case proof).
 - [ ] Qualify a stable, repeated live ICDF A/B; current reconnects prevent this.
-- [ ] Measure shortened PDM publication loans without changing 2x512-word DMA capacity.
+- [x] Try shortened PDM publication loans without changing 2x512-word DMA capacity:
+  host bit equivalence passes, live improvement remains inconclusive (below).
 - [ ] Test the **full** decode→PDM→DMA path from flash, not just the existing
   raw RAM packet decoder benchmark. Include deterministic tone/noise PCM checks.
 - [ ] Separate PDM compute from its DMA wait, and record deadline-tail distribution.
 - [ ] Reproduce transient startup memory pressure without weakening the reserve.
-- [ ] Finish real HTTP Opus station playback >=20seconds without misses,
+- [ ] Finish real HTTP Opus station playback >=20 seconds without misses,
   then a longer soak with WebUI; only then change production defaults.
+
+## 128-word publication experiment
+
+Source `7666cc8`, 884912-byte diagnostic image; ICDF ON and identical other
+settings. `-Pdm32LoanWords 128` limits a producer loan's visible capacity.
+It does not shrink either 512-word physical buffer or create a third buffer.
+The entire buffer is still owned by the driver; committing a prefix releases
+the loan so the existing EOF code can safely submit that prefix.
+Default remains 512. Non-default limits require a diagnostic PDM32 build.
+
+Twelve host output variants passed (LED on/off; scalar/batched PDM and RC
+variants), including ASan/UBSan for PDM. Each checked 6480 blocks, 1841169
+words and 5670 injected failure cases against a scalar reference with the
+same publication boundaries. No PCM/PDM/state changes were observed.
+Target ISR is byte-identical (151 instructions), RAM/IRAM sections unchanged.
+The application grows 48 bytes versus the ICDF 512-word image.
+
+Physical SILK #1: 28522 ms elapsed, 20873.5 ms PCM, 960 new DMA misses,
+transport timeout/reconnect, minimum sampled heap 6692. SILK #2 has a missing
+HTTP sample. CELT #1 stopped after only 962.83 ms PCM during 32487 ms;
+CELT #2 stayed stopped. All four tests fail and do NOT demonstrate acceleration
+or regression of the publication algorithm independently of transport failures.
+The option remains diagnostic-only for the pending flash-source control; it
+must not be promoted based on these data.
+
+The last CELT attempt reported DECODER INIT ERROR after reconnect. Snapshot:
+stage 10 (post-init reserve check), free DRAM 3216, requested/reserve 4096,
+detail 3276, current DRAM after cleanup 25176. The status minimum heap was
+3040. This guard is at creation/switch, **not on every decoded frame**.
+No lower reserve, new retry policy or allocator change was applied here.
+
+Reports and local fixture server logs accompany
+`firmware/development/esp8266-opus-stage-loan128/`.
+Final board state: this diagnostic image in app1 (0x110000), restored saved
+station 284 Radio Caprice - Hard Bop, stopped. AAC started successfully during
+restoration. Local fixture servers were stopped. No SPIFFS/playlist/Wi-Fi
+upload, UART activity, production default change, push or shutdown.
