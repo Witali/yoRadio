@@ -3,12 +3,22 @@ const {execute,hostPath,root,component}=require('../tools/esp8266_opus_profile/b
 const {analyzeStage}=require('../tools/esp8266_opus_profile/stage_profile_result.cjs');
 test('stage cycles remain wall times, not task CPU, and bad metadata is rejected',()=>{
   const status={profile_stage:8,stage_clock_hz:160000000};
-  const item={stage_cycles:320000,stage_calls:2,stage_max_cycles:160000,wall_us:10000,task_us:9000};
+  const item={stage_cycles_lo:320000,stage_cycles_hi:0,stage_calls:2,stage_max_cycles:160000,wall_us:10000,task_us:9000};
   const value=analyzeStage(status,item);assert.equal(value.wall_us,2000);assert.equal(value.wall_percent_of_decode,20);
   assert.equal(value.max_wall_us,1000);assert.match(value.warning,/NOT exclusive/);
   assert.equal(analyzeStage({},item),null);
   assert.throws(()=>analyzeStage({...status,stage_clock_hz:80000000},item),/metadata/);
   assert.throws(()=>analyzeStage(status,{...item,stage_calls:0}),/Inconsistent/);
+  const wrapped=analyzeStage(status,{...item,stage_cycles_hi:1});
+  assert.equal(wrapped.wall_us,(4294967296+320000)/160);
+  assert.throws(()=>analyzeStage(status,{...item,stage_cycles_lo:4294967296}),/Invalid/);
+  assert.throws(()=>analyzeStage(status,{...item,stage_cycles_hi:0xffffffff}),/Inconsistent/);
+});
+test('ESP8266 nano printf wire response uses only supported 32-bit words',()=>{
+  const source=fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/main/web_service.c'),'utf8');
+  const block=source.slice(source.indexOf('#if YORADIO_OPUS_PROFILE_STAGE',source.indexOf('opus_benchmark_case_snapshot')));
+  assert.match(block,/stage_cycles_lo/);assert.match(block,/stage_cycles_hi/);
+  assert.doesNotMatch(block.split('#endif')[0],/%(?:ll|j|z)/);
 });
 test('selected stage counters, timer wrap and 64-bit totals under sanitizers',()=>{
   const out=path.join(root,'.build/opus-stage-unit');fs.mkdirSync(out,{recursive:true});

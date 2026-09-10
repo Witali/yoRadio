@@ -24,6 +24,9 @@ cycles**, not exclusive CPU. With fixed160MHz, divide by160 for microseconds.
 Each measured scope must finish within one 32-bit counter revolution
 (26.84s). Individual elapsed values subtract modulo2^32; totals are64-bit.
 The existing outer `task_us` remains the separate runtime-statistics measure.
+The wire format uses `stage_cycles_hi` and `stage_cycles_lo`: the SDK's
+nano `printf` does not support `%llu`. Host tools join the two words with
+a safe-integer check. No expensive64-bit decimal formatting on the device.
 Host monotonic ticks test correctness only, not LX106 performance.
 
 Only the audio task owns the16-byte accumulator. It resets it before each

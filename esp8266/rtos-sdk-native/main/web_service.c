@@ -1333,8 +1333,8 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
 #if YORADIO_OPUS_PROFILE_STAGE
         if (result == ESP_OK) {
             n = snprintf(row, sizeof(row),
-                ",\"stage_cycles\":%llu,\"stage_calls\":%u,\"stage_max_cycles\":%u",
-                (unsigned long long)item.stage_cycles, item.stage_calls, item.stage_max_cycles);
+                ",\"stage_cycles_lo\":%u,\"stage_cycles_hi\":%u,\"stage_calls\":%u,\"stage_max_cycles\":%u",
+                (uint32_t)item.stage_cycles, (uint32_t)(item.stage_cycles >> 32), item.stage_calls, item.stage_max_cycles);
             if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
             else result = httpd_resp_send_chunk(request, row, n);
         }
