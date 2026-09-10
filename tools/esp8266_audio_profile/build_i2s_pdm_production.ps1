@@ -12,6 +12,8 @@ param(
     [int]$LedUpdateHz = 10,
     [switch]$NoAudioLevelLed,
     [switch]$EnableOpus,
+    [ValidateSet(1024, 1536, 2048, 3072, 4096)]
+    [int]$OpusInputBytes = 1024,
     [switch]$NoSpiffsCache,
     [switch]$OpusWordAsm,
     [switch]$OpusIcdfFlashWord,
@@ -52,6 +54,9 @@ if ($Pdm32LoanWords -ne 512 -and -not $Diagnostic) { throw 'Short PDM32 loans re
 if ($SdkRxDiag -and -not $Diagnostic) { throw '-SdkRxDiag requires -Diagnostic' }
 if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
 $taskOpusStreamTestEnabled = [bool]($OpusStreamTest -or $OpusBenchmark)
+if ($OpusInputBytes -ne 1024 -and (-not $Diagnostic -or -not $EnableOpus)) {
+    throw '-OpusInputBytes changes require diagnostic Opus until RAM qualification'
+}
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
 $taskVariant = $Variant
 $taskBuild = "$taskRoot/.build/$taskVariant"
@@ -113,7 +118,7 @@ try {
     $taskDefaults = $taskDefaults.Replace('CONFIG_LOG_BOOTLOADER_LEVEL_WARN=y', 'CONFIG_LOG_BOOTLOADER_LEVEL_ERROR=y')
     $taskDefaults = $taskDefaults -replace 'CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=\d+', "CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz"
     if ($NoAudioLevelLed) { $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED=y', '# CONFIG_YORADIO_STATUS_LED is not set') }
-    if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=1024`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144`n" }
+    if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=$OpusInputBytes`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144`n" }
     $taskDefaults = Set-TaskSpiffsCacheDefaults $taskDefaults ([bool]$NoSpiffsCache)
     $taskDefaults = Set-TaskOpusRuntimeDefaults $taskDefaults ([bool]$OpusBenchmark)
     if ($OpusBenchmark) {
@@ -187,7 +192,7 @@ try {
     $taskGzipEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_PLAYLIST_WEB_GZIP=y\r?$'
     $taskOpusEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_OGG_OPUS=y\r?$'
     if ($taskOpusEnabled -ne [bool]$EnableOpus) { throw 'Wrong cached Opus profile; use a fresh -Variant build directory' }
-    if ($taskOpusEnabled -and $taskConfig -notmatch '(?m)^CONFIG_YORADIO_OPUS_INPUT_BYTES=1024\r?$') { throw 'Wrong cached Opus input size; use a fresh -Variant build directory' }
+    if ($taskOpusEnabled -and $taskConfig -notmatch "(?m)^CONFIG_YORADIO_OPUS_INPUT_BYTES=$OpusInputBytes`r?$") { throw 'Wrong cached Opus input size; use a fresh -Variant build directory' }
     if ($taskOpusEnabled -and $taskConfig -notmatch '(?m)^CONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144\r?$') { throw 'Wrong cached Opus scratch size; use a fresh -Variant build directory' }
     $taskLedEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_STATUS_LED=y\r?$'
     if ($taskLedEnabled -eq [bool]$NoAudioLevelLed) { throw 'Wrong cached LED profile; use a fresh -Variant build directory' }
@@ -204,7 +209,7 @@ try {
         purpose=$(if ($EnableOpus) { 'Experimental Opus native radio, I2S PDM32 DMA; not device-qualified; build does not flash' } elseif ($Diagnostic) { 'Diagnostic native radio, I2S PDM32 DMA, error logs only; build does not flash' } else { 'Production native radio, I2S PDM32 DMA, UART error logs only; build does not flash' })
         diagnostic=[bool]$Diagnostic
         experimental_opus=[bool]$taskOpusEnabled
-        opus_input_bytes=$(if ($taskOpusEnabled) { 1024 } else { 0 })
+        opus_input_bytes=$(if ($taskOpusEnabled) { $OpusInputBytes } else { 0 })
         opus_scratch_bytes=$(if ($taskOpusEnabled) { 6144 } else { 0 })
         opus_benchmark=[bool]$OpusBenchmark
         opus_benchmark_output=[bool]$OpusBenchmarkOutput

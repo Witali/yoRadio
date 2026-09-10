@@ -16,7 +16,7 @@ test('native defaults and production manifest use a 4 KiB compressed input', () 
   assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /opus_scratch_bytes=\$\(if \(\$taskOpusEnabled\) \{ 6144 \}/);
 });
 
-for (const [opusInput, opusScratch, diagnostics] of [[0,6144,0], [1024,6144,0], [1024,6144,1], [1536,6144,1], [1024,7680,1], [1536,7680,1]]) {
+for (const [opusInput, opusScratch, diagnostics] of [[0,6144,0], [1024,6144,0], [1024,6144,1], [1536,6144,1], [2048,6144,1], [1024,7680,1], [1536,7680,1]]) {
 const opusEnabled = opusInput !== 0;
 test('real codec bridge and arena pair every allocation/free through OOM and switches' +
   (opusEnabled ? ' with Opus input ' + opusInput + ', scratch ' + opusScratch + ', diagnostics ' + diagnostics : ' with Opus disabled'), t => {
