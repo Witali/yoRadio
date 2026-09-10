@@ -1,6 +1,9 @@
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
+#ifndef YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+#define YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT 0
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,6 +11,10 @@ extern "C" {
 typedef struct {
     uint32_t packets, samples, wall_us, task_us, max_wall_us, pcm_hash;
     uint32_t scratch_bytes, scratch_words, min_dram, stack_free;
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+    uint32_t output_wall_us, max_output_us, output_samples;
+    uint32_t pipeline_wall_us, pipeline_task_us, dma_eofs, dma_misses;
+#endif
     int error;
 } opus_benchmark_case_t;
 typedef struct {

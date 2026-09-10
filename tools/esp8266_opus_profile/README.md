@@ -167,6 +167,40 @@ one through eight losses after every eighth packet when `--plc` is supplied.
 
 ## ICDF flash-word A/B (default OFF)
 
+### Flash packets with physical output (diagnostic)
+
+`-OpusBenchmarkOutput` requires `-OpusBenchmark -Diagnostic -EnableOpus` and
+standard physical I2S PDM32 (not decode-only). It keeps the raw benchmark mode
+unchanged when omitted. Each of the five own 12-packet fixtures runs one warmup
+and 100 measured rounds: 24 seconds of decoded PCM. Decoder state is reset at
+each 240-ms round boundary; the output/DMA is NOT stopped between rounds.
+These deliberate PCM segment boundaries are not an analog quality assessment.
+
+```powershell
+tools/esp8266_audio_profile/build_i2s_pdm_production.ps1 -Variant esp8266-opus-flash-output -Diagnostic -EnableOpus -OpusBenchmark -OpusBenchmarkOutput -OpusWordAsm -OpusIcdfFlashWord -NoSpiffsCache -Pdm32Iram -Pdm32Batch
+node tools/esp8266_opus_profile/run_board.cjs --interval-ms 30000 --output .build/opus-flash-output.json
+```
+
+Build does not flash. Deploy explicitly by native OTA before issuing the POST.
+Physical mode hashes the decoded PCM BEFORE gain/normalization, then passes it
+through the real output API in <=512-sample callbacks, exactly as the native
+Opus adapter does. No extra PCM array, audio TCP socket or demux is used. Wi-Fi,
+WebUI and OTA remain available. Stop/new station/OTA cancels at a packet or
+callback boundary; cleanup silences output and releases the existing four DRAM
+blocks and shared word arena on every failure path.
+
+`physical_output=true` identifies this mode. `wall_us` remains decode wall time,
+but `task_us` is zero (it must not be mistaken for decoder-only CPU). Separate
+`pipeline_task_us` counts full-path task CPU including charged ISR/measurement,
+flash copies, checksum and output; `pipeline_wall_us` includes elapsed waits.
+`output_wall_us` includes normalization/PDM AND DMA waits, not just conversion.
+DMA counters bracket the timed phase after warmup. The strict host gate requires
+>=20 seconds, real DMA progress, no missed deadlines, matching decoded/submitted
+PCM and elapsed duration. A completed run with gaps exits unsuccessfully and
+saves all results; it never qualifies real HTTP-radio playback by itself.
+Errors -9008 (output failure) and -9010 (oversized PCM result) supplement existing
+allocation/cancel/decoder/golden-PCM errors. Raw benchmark keeps its old timing.
+
 For live read/decode/output/wait attribution and exact 180-second own HTTP
 fixtures, see [the live-stage report](../../docs/ESP8266_OPUS_LIVE_STAGE_PROFILE.md).
 `run_stage_wall.cjs` retains timeouts and strict continuity failures. Its wall

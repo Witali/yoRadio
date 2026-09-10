@@ -1313,9 +1313,10 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
     int n = snprintf(row, sizeof(row),
         "{\"run\":%u,\"state\":%u,\"case\":%u,\"round\":%u,\"rounds\":%u,"
         "\"dram_before\":%u,\"dram_after\":%u,\"state_bytes\":%u,\"empty_task_us\":%u,"
-        "\"error\":%d,\"results\":[",
+        "\"error\":%d,\"physical_output\":%s,\"results\":[",
         status.run, status.state, status.current_case, status.round, status.rounds,
-        status.dram_before, status.dram_after, status.state_bytes, status.empty_task_us, status.error);
+        status.dram_before, status.dram_after, status.state_bytes, status.empty_task_us, status.error,
+        YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT ? "true" : "false");
     esp_err_t result = httpd_resp_send_chunk(request, row, n);
     for (unsigned i = 0; result == ESP_OK && i < status.cases; ++i) {
         opus_benchmark_case_t item;
@@ -1323,12 +1324,24 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
         n = snprintf(row, sizeof(row),
             "%s{\"id\":%u,\"packets\":%u,\"samples\":%u,\"wall_us\":%u,\"task_us\":%u,"
             "\"max_wall_us\":%u,\"pcm_hash\":%u,\"scratch_bytes\":%u,\"scratch_words\":%u,"
-            "\"min_dram\":%u,\"stack_free_lifetime\":%u,\"error\":%d}",
+            "\"min_dram\":%u,\"stack_free_lifetime\":%u,\"error\":%d",
             i ? "," : "", i, item.packets, item.samples, item.wall_us, item.task_us,
             item.max_wall_us, item.pcm_hash, item.scratch_bytes, item.scratch_words,
             item.min_dram, item.stack_free, item.error);
         if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
         else result = httpd_resp_send_chunk(request, row, n);
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+        if (result == ESP_OK) {
+            n = snprintf(row, sizeof(row),
+                ",\"output_wall_us\":%u,\"max_output_us\":%u,\"output_samples\":%u,"
+                "\"pipeline_wall_us\":%u,\"pipeline_task_us\":%u,\"dma_eofs\":%u,\"dma_misses\":%u",
+                item.output_wall_us, item.max_output_us, item.output_samples,
+                item.pipeline_wall_us, item.pipeline_task_us, item.dma_eofs, item.dma_misses);
+            if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
+            else result = httpd_resp_send_chunk(request, row, n);
+        }
+#endif
+        if (result == ESP_OK) result = httpd_resp_send_chunk(request, "}", 1);
     }
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, "]}", 2);
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);

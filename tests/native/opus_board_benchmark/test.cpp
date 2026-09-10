@@ -14,10 +14,14 @@ extern "C" {
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+#include "native_audio_output.h"
+#endif
 }
 
 namespace {
 constexpr size_t kStateBytes = 64, kFreeDram = 65536, kGuardBytes = 16;
+constexpr unsigned kRounds = YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT ? 100 : 10;
 constexpr unsigned char kGuard = 0x5a;
 struct Allocation { unsigned char *base; size_t bytes; bool dram; };
 std::map<void *, Allocation> live;
@@ -28,6 +32,11 @@ uint32_t clock_wall, clock_task;
 bool arena_bound, arena_iram = true, reject_bind, reject_unbind, low_reserve;
 bool wrong_pcm, poll_busy, checked_busy;
 unsigned cancel_after, decode_error_at, init_error_at;
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+unsigned output_calls, output_error_at, output_misses_at, dma_eofs, dma_misses;
+unsigned silence_calls, normalizer_resets, output_sample_count;
+bool oversized_decode, large_decode;
+#endif
 int decode_error = -777;
 void *arena_words, *bound_scratch, *bound_words;
 uint32_t generation = 73;
@@ -87,6 +96,11 @@ void reset_environment() {
     reject_bind = reject_unbind = low_reserve = wrong_pcm = poll_busy = checked_busy = false;
     cancel_after = decode_error_at = init_error_at = 0;
     decode_error = -777;
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+    output_calls = output_error_at = output_misses_at = dma_eofs = dma_misses = 0;
+    silence_calls = normalizer_resets = output_sample_count = 0;
+    oversized_decode = large_decode = false;
+#endif
 }
 bool current(uint32_t supplied) {
     assert(supplied == generation);
@@ -106,7 +120,7 @@ void queue() {
     assert(opus_benchmark_request());
     auto queued = status();
     assert(queued.state == 1 && queued.run == prior + 1);
-    assert(queued.cases == 2 && queued.rounds == 10);
+    assert(queued.cases == 2 && queued.rounds == kRounds);
     assert(!queued.error && !result(0).packets && !result(1).packets);
     assert(!opus_benchmark_request());
     assert(status().run == queued.run && status().state == 1);
@@ -127,16 +141,24 @@ void successful_run() {
     assert(final.state == 3 && !final.error && final.current_case == 1);
     assert(final.dram_before == kFreeDram && final.dram_after == kFreeDram);
     assert(final.state_bytes == kStateBytes && final.empty_task_us == 4);
-    assert(decode_calls == 44 && init_calls == 22); // 2 cases * (warmup +10) *2 packets
+    assert(decode_calls == 4 * (kRounds + 1) && init_calls == 2 * (kRounds + 1));
     assert(attempts == 5 && allocations == 5 && frees == 5);
     assert(memory_binds == 3 && memory_unbinds == 1 && releases == 1 && unbinds == 1);
     assert(checked_busy);
     for (unsigned f = 0; f < 2; ++f) {
         const auto value = result(f);
-        assert(!value.error && value.packets == 20 && value.samples == 80);
+        assert(!value.error && value.packets == 2 * kRounds && value.samples == 8 * kRounds);
         assert(value.pcm_hash == 0x03c13f4fU);
-        assert(value.wall_us == 20 * 251 && value.max_wall_us == 251);
-        assert(value.task_us == 20 * 204);
+        assert(value.wall_us == 2 * kRounds * 251 && value.max_wall_us == 251);
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+        assert(value.task_us == 0); // Never label pipeline CPU as decoder-only.
+        assert(value.output_samples == value.samples);
+        assert(value.pipeline_wall_us > value.wall_us + value.output_wall_us);
+        assert(value.pipeline_task_us > 0 && value.output_wall_us > 0);
+        assert(value.dma_eofs == 2 * kRounds && value.dma_misses == 0);
+#else
+        assert(value.task_us == 2 * kRounds * 204);
+#endif
         assert(value.scratch_bytes == 1024 && value.scratch_words == 12000);
         assert(value.stack_free == 1234);
         assert(value.min_dram == kFreeDram - kStateBytes - CONFIG_YORADIO_OPUS_SCRATCH_BYTES - 1920 - 1536);
@@ -146,7 +168,11 @@ void successful_run() {
     assert(!memcmp(&invalid, &zero, sizeof(zero)));
     clean();
     run(); // complete work must not execute twice without a new request
-    assert(decode_calls == 44 && attempts == 5);
+    assert(decode_calls == 4 * (kRounds + 1) && attempts == 5);
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+    assert(silence_calls == 3 && normalizer_resets == 2);
+    assert(output_calls == decode_calls && output_sample_count == decode_calls * 4);
+#endif
     ++completed_runs;
 }
 }
@@ -234,11 +260,36 @@ extern "C" int yoradio_opus_decode_bounded(void *state, const unsigned char *pac
     static const int16_t samples[2][4] = {{0, 32767, -32768, -1}, {1234, -2345, 42, -42}};
     memcpy(pcm, samples[packet[0] - 1], sizeof(samples[0]));
     if (wrong_pcm) pcm[0] ^= 1;
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+    if (oversized_decode) return 961;
+    if (large_decode) { memset(pcm, 0, 600 * sizeof(*pcm)); return 600; }
+#endif
     guards();
     return 4;
 }
 extern "C" size_t yoradio_opus_scratch_peak_bytes(void) { return 1024; }
 extern "C" size_t yoradio_opus_scratch_peak_words(void) { return 12000; }
+
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+extern "C" esp_err_t native_audio_output_write(int16_t *pcm, size_t count, uint32_t rate, uint8_t channels) {
+    assert(count && count <= 512 && rate == 48000 && channels == 1);
+    assert(live.size() == 5 && !critical_depth);
+    ++output_calls;
+    if (output_calls == output_error_at) return ESP_FAIL;
+    /* Like real gain/normalization: mutable PCM must have been hashed first. */
+    for (size_t i=0; i<count; ++i) pcm[i] ^= 1;
+    output_sample_count += count;
+    ++dma_eofs;
+    if (output_calls == output_misses_at) ++dma_misses;
+    clock_wall += 300; clock_task += 100;
+    return ESP_OK;
+}
+extern "C" void native_audio_output_silence(void) { ++silence_calls; }
+extern "C" void native_audio_output_reset_normalizer(void) { ++normalizer_resets; }
+extern "C" void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *s) {
+    *s = {}; s->chained_transfers = dma_eofs; s->queue_empty_events = dma_misses;
+}
+#endif
 
 int main() {
     assert(status().state == 0 && status().run == 0);
@@ -264,13 +315,13 @@ int main() {
     reset_environment(); low_reserve = true; queue(); run(); expect_error(-9001);
     assert(attempts == 5 && !decode_calls && !memory_binds);
 
-    for (unsigned after : {3U, 23U}) {
+    for (unsigned after : {3U, 2 * (kRounds + 1) + 1}) {
         reset_environment(); cancel_after = after; queue(); run(); expect_error(-9002);
-        const unsigned case_index = after < 22 ? 0 : 1;
+        const unsigned case_index = after < 2 * (kRounds + 1) ? 0 : 1;
         assert(decode_calls == after && memory_binds == case_index + 2 && memory_unbinds == 1);
         assert(result(case_index).error == -9002);
         assert(status().round == (case_index == 0 ? 1U : 0U));
-        if (case_index == 1) assert(!result(0).error && result(0).packets == 20);
+        if (case_index == 1) assert(!result(0).error && result(0).packets == 2 * kRounds);
         successful_run();
     }
     reset_environment(); init_error_at = 1; queue(); run(); expect_error(-778);
@@ -281,6 +332,17 @@ int main() {
     reset_environment(); wrong_pcm = true; queue(); run(); expect_error(-9006);
     assert(decode_calls == 2 && !result(0).packets);
     reset_environment(); reject_unbind = true; queue(); run(); expect_error(-9007);
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+    reset_environment(); output_error_at = 4; queue(); run(); expect_error(-9008);
+    assert(silence_calls >= 1 && result(0).error == -9008);
+    reset_environment(); large_decode = true; output_error_at = 2; queue(); run(); expect_error(-9008);
+    assert(output_calls == 2 && output_sample_count == 512); // failure in second callback
+    reset_environment(); oversized_decode = true; queue(); run(); expect_error(-9010);
+    assert(!output_calls);
+    reset_environment(); output_misses_at = 4; queue(); run();
+    assert(status().state == 3 && result(0).dma_misses == 1); // Never hide output gaps.
+    clean();
+#endif
     successful_run(); successful_run();
     assert(total_allocations == total_frees && total_failures == 5);
     printf("Opus board benchmark lifecycle PASS: %u complete runs, 5 allocation-failure sites, "

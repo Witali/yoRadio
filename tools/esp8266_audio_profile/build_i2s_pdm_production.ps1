@@ -22,6 +22,7 @@ param(
     [switch]$SdkRxDiag,
     [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
+    [switch]$OpusBenchmarkOutput,
     [string]$OpusBenchmarkFixtures = '.build/esp8266-opus-board-fixtures'
 )
 $ErrorActionPreference = 'Stop'
@@ -30,6 +31,7 @@ if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
 }
 if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -SpiffsLog' }
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
+if ($OpusBenchmarkOutput -and -not $OpusBenchmark) { throw '-OpusBenchmarkOutput requires -OpusBenchmark' }
 if ($OpusStreamTest -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusStreamTest requires -Diagnostic and -EnableOpus' }
 if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOpus' }
 if ($OpusIcdfFlashWord -and -not $EnableOpus) { throw '-OpusIcdfFlashWord requires -EnableOpus' }
@@ -113,6 +115,7 @@ try {
     $taskSpiffsLogHttp = if ($SpiffsLogHttp) { 'ON' } else { 'OFF' }
     $taskDiagnostic = if ($Diagnostic) { 'ON' } else { 'OFF' }
     $taskOpusBenchmark = if ($OpusBenchmark) { 'ON' } else { 'OFF' }
+    $taskOpusBenchmarkOutput = if ($OpusBenchmarkOutput) { 'ON' } else { 'OFF' }
     $taskOpusStreamTest = if ($taskOpusStreamTestEnabled) { 'ON' } else { 'OFF' }
     $taskOpusWordAsm = if ($OpusWordAsm) { 'ON' } else { 'OFF' }
     $taskOpusIcdfFlashWord = if ($OpusIcdfFlashWord) { 'ON' } else { 'OFF' }
@@ -141,6 +144,7 @@ try {
         "-DYORADIO_ESP8266_SPIFFS_LOG_HTTP=$taskSpiffsLogHttp",
         "-DYORADIO_ESP8266_DIAGNOSTIC=$taskDiagnostic",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK=$taskOpusBenchmark",
+        "-DYORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT=$taskOpusBenchmarkOutput",
         "-DYORADIO_ESP8266_OPUS_STREAM_TEST=$taskOpusStreamTest",
         "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
@@ -183,6 +187,7 @@ try {
         opus_input_bytes=$(if ($taskOpusEnabled) { 1024 } else { 0 })
         opus_scratch_bytes=$(if ($taskOpusEnabled) { 6144 } else { 0 })
         opus_benchmark=[bool]$OpusBenchmark
+        opus_benchmark_output=[bool]$OpusBenchmarkOutput
         opus_stream_test=[bool]$taskOpusStreamTestEnabled
         freertos_runtime_stats=[bool]$taskOpusRuntime.enabled
         opus_word_asm=[bool]$OpusWordAsm

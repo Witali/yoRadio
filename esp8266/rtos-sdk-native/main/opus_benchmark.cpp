@@ -12,13 +12,19 @@ extern "C" {
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+#include "native_audio_output.h"
+#endif
 }
 #if !configGENERATE_RUN_TIME_STATS || !configUSE_TRACE_FACILITY || !CONFIG_FREERTOS_RUN_TIME_STATS_USING_ESP_TIMER
 #error "Opus benchmark needs microsecond FreeRTOS runtime counters"
 #endif
 
 namespace {
-constexpr unsigned kRounds = 10, kPcmSamples = 960, kPacketBytes = 1536;
+/* 12 x 20-ms own packets per round: output mode measures 24 seconds/case.
+ * Round zero warms the SAME decoder/output path but is not scored. */
+constexpr unsigned kRounds = YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT ? 100 : 10;
+constexpr unsigned kPcmSamples = 960, kPacketBytes = 1536;
 opus_benchmark_status_t s_status;
 opus_benchmark_case_t s_results[OPUS_BENCH_FIXTURE_COUNT];
 
@@ -142,9 +148,24 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
             opus_benchmark_case_t result = {};
             result.min_dram = dram_free();
             result.stack_free = UINT32_MAX;
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+            native_audio_output_silence();
+            native_audio_output_reset_normalizer();
+            uint32_t pipeline_start = 0, pipeline_cpu = 0;
+            native_audio_output_spi_stats_t dma_before = {};
+#endif
             unsigned last_round = 0;
             for (unsigned round = 0; round <= kRounds && !error; ++round) {
                 last_round = round;
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+                if (round == 1) {
+                    /* Last warmup packet yielded and flushed task runtime.
+                     * Keep DMA running across all measured round boundaries. */
+                    native_audio_output_get_spi_stats(&dma_before);
+                    pipeline_cpu = task_time();
+                    pipeline_start = (uint32_t)esp_timer_get_time();
+                }
+#endif
                 /* Round zero warms flash/decoder and checks the same golden PCM. */
                 error = opus_decoder_init(static_cast<OpusDecoder *>(state), 48000, 1);
                 uint32_t hash = 2166136261U, samples = 0;
@@ -159,23 +180,60 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
                     }
                     copy_words(packet, reinterpret_cast<const unsigned char *>(opus_bench_payload) + entry.offset,
                                entry.length);
+#if !YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
                     vTaskDelay(1);
                     uint32_t cpu = task_time();
+#endif
                     int64_t start = esp_timer_get_time();
                     int decoded = yoradio_opus_decode_bounded(state, packet, entry.length, pcm, kPcmSamples);
                     uint32_t elapsed = (uint32_t)(esp_timer_get_time() - start);
+#if !YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
                     vTaskDelay(1);
                     cpu = task_time() - cpu;
+#endif
                     if (decoded <= 0) { error = decoded ? decoded : -9005; break; }
+                    if ((unsigned)decoded > kPcmSamples) { error = -9010; break; }
                     hash = pcm_hash(hash, pcm, decoded);
                     samples += decoded;
                     if (round) {
                         ++result.packets;
                         result.samples += decoded;
                         result.wall_us += elapsed;
+#if !YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
                         result.task_us += cpu;
+#endif
                         if (elapsed > result.max_wall_us) result.max_wall_us = elapsed;
                     }
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+                    /* Hash BEFORE output mutates PCM with gain/normalization.
+                     * Match the native Opus adapter's <=512-sample callbacks.
+                     * No extra PCM buffer, TCP socket, Ogg parsing or ICY here. */
+                    const uint32_t output_start = (uint32_t)esp_timer_get_time();
+                    for (unsigned offset = 0; offset < (unsigned)decoded;) {
+                        if (!current(generation)) { error = -9002; break; }
+                        unsigned count = (unsigned)decoded - offset;
+                        if (count > 512) count = 512;
+                        if (native_audio_output_write(pcm + offset, count, 48000, 1) != ESP_OK) {
+                            error = -9008; break;
+                        }
+                        offset += count;
+                        if (round) result.output_samples += count;
+                    }
+                    const uint32_t output_us = (uint32_t)esp_timer_get_time() - output_start;
+                    /* Exactly the ordinary post-packet yield; do not keep the
+                     * raw benchmark's two extra timing yields in this mode. */
+                    vTaskDelay(1);
+                    if (round) {
+                        result.output_wall_us += output_us;
+                        if (output_us > result.max_output_us) result.max_output_us = output_us;
+                        result.pipeline_task_us = task_time() - pipeline_cpu;
+                        result.pipeline_wall_us = (uint32_t)esp_timer_get_time() - pipeline_start;
+                        native_audio_output_spi_stats_t dma;
+                        native_audio_output_get_spi_stats(&dma);
+                        result.dma_eofs = dma.chained_transfers - dma_before.chained_transfers;
+                        result.dma_misses = dma.queue_empty_events - dma_before.queue_empty_events;
+                    }
+#endif
                     result.scratch_bytes = yoradio_opus_scratch_peak_bytes();
                     result.scratch_words = yoradio_opus_scratch_peak_words();
                     uint32_t free = dram_free();
@@ -193,6 +251,11 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
         }
         yoradio_opus_memory_bind(nullptr, 0, nullptr, 0);
     }
+#if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
+    /* Also cancel any in-flight output after OOM, generation changes, decoder
+     * or sink errors. DMA owns its copied PDM, never these freed PCM arrays. */
+    native_audio_output_silence();
+#endif
     heap_caps_free(packet);
     heap_caps_free(pcm);
     heap_caps_free(scratch);
