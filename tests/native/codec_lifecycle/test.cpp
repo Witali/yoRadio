@@ -330,7 +330,8 @@ static bool receive_pcm(void *context, const helix_stream_info_t *info,
     assert(info->sample_rate == 48000 && info->bitrate == 24000);
     assert(info->channels == 1 && info->bits_per_sample == 16);
     assert(info->source_channels == opus_source_channels);
-    static_assert(sizeof(helix_stream_info_t) == 12, "Metadata must fit existing padding");
+    assert(info->source_sample_rate == 48000);
+    static_assert(sizeof(helix_stream_info_t) == 16, "Bounded stream/PCM metadata");
     const size_t offset = output->samples % 960;
     assert(samples == (offset ? 448 : 512));
     assert(pcm[0] == static_cast<int16_t>(offset));

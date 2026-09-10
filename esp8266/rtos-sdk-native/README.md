@@ -283,10 +283,16 @@ See [configuration, limits and USB extraction](../../docs/ESP8266_SPIFFS_LOGGING
 WebUI stream metadata describes the incoming audio, not the hardware's mono
 output. MP3 channels come from the frame header (Helix or libmad), AAC channels
 from the decoder's source configuration, and Opus channels from OpusHead.
-The codec bridge keeps `source_channels` separate from PCM `channels` without
-increasing the 12-byte metadata structure. PCM stride, mono synthesis and I2S
-configuration are unchanged. Source channel changes refresh WebUI even when
-output remains mono. Regression tests: `esp8266-stream-metadata.test.js`,
+The codec bridge keeps `source_channels` and `source_sample_rate` separate
+from PCM `channels` and `sample_rate`. Metadata is 16 bytes (4 bytes more than
+before; no new heap allocation or audio buffer). For HE-AAC, the existing
+`AACGetStreamSampRate()` reports the nominal SBR rate while PCM keeps the AAC
+core rate: this does not enable SBR/PS decoding on ESP8266. Channels describe
+the AAC core configuration; parametric-stereo expansion is not detected.
+WebUI retains fractional kHz (44.1, 22.05) using integer formatting.
+PCM stride, mono synthesis and I2S configuration are unchanged. Source format
+changes refresh WebUI even when output remains mono.
+Regression tests: `esp8266-stream-metadata.test.js`,
 `esp8266-stream-input.test.js`, and `esp8266-codec-lifecycle.test.js`.
 
 ## OTA-first updates with audio connected to RX

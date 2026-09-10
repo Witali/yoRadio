@@ -289,7 +289,7 @@ static bool emit_opus(void *opaque, const int16_t *pcm, size_t samples,
                       uint32_t bitrate) {
     OpusWorkspace *output = static_cast<OpusWorkspace *>(opaque);
     helix_stream_info_t info = {48000U, bitrate, 1, 16,
-        static_cast<uint8_t>(output->stream.input_channels)};
+        static_cast<uint8_t>(output->stream.input_channels), 48000U};
     /* libopus has finished this frame. The output pipeline may apply gain in
      * place, just as it does for MP3/AAC, without touching decoder history. */
     for (size_t offset = 0; offset < samples; offset += 512U) {
@@ -458,6 +458,7 @@ static bool emit_aac_block(void *opaque, short *pcm, int samples) {
         static_cast<uint32_t>(AACGetBitrate()),
         static_cast<uint8_t>(CONFIG_YORADIO_AUDIO_MONO ? 1 : AACGetChannels()), 16,
         static_cast<uint8_t>(AACGetChannels()),
+        static_cast<uint32_t>(AACGetStreamSampRate()),
     };
     return output.callback(output.context, &info, pcm, static_cast<size_t>(samples));
 }
@@ -520,6 +521,7 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
                 s_libmad.frame->header.bitrate,
                 static_cast<uint8_t>(CONFIG_YORADIO_AUDIO_MONO ? 1 : channels), 16,
                 static_cast<uint8_t>(channels),
+                s_libmad.frame->header.samplerate,
             };
             for (unsigned ns = 0; ns < subbands; ++ns) {
                 if (mad_synth_frame_onens(s_libmad.synth,
@@ -557,7 +559,7 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
             context,
             {parsed.sample_rate, parsed.bitrate,
              static_cast<uint8_t>(CONFIG_YORADIO_AUDIO_MONO ? 1 : parsed.channels),
-             16, parsed.channels},
+             16, parsed.channels, parsed.sample_rate},
             false,
         };
         int result = MP3DecodeBlocks(input, &left, codec->pcm,
@@ -634,6 +636,7 @@ static int decode_one(helix_codec *codec, helix_pcm_callback_t callback,
         static_cast<uint8_t>(AACGetChannels()),
         static_cast<uint8_t>(AACGetBitsPerSample()),
         static_cast<uint8_t>(AACGetChannels()),
+        static_cast<uint32_t>(AACGetStreamSampRate()),
     };
     size_t samples = static_cast<size_t>(AACGetOutputSamps());
     if (!samples || samples > codec->pcm_samples) return -7;

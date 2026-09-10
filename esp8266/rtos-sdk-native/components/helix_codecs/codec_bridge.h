@@ -18,6 +18,7 @@ typedef struct {
     uint8_t channels; /* Interleaved PCM channels passed to the output callback. */
     uint8_t bits_per_sample;
     uint8_t source_channels; /* Stream channels before optional mono synthesis. */
+    uint32_t source_sample_rate; /* Nominal stream rate, including AAC SBR. */
 } helix_stream_info_t;
 
 typedef bool (*helix_pcm_callback_t)(void *context,

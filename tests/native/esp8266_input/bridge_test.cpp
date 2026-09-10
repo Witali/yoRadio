@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <vector>
 #include <algorithm>
@@ -20,6 +21,7 @@ struct Result {
     std::vector<int16_t> pcm;
     std::vector<uint32_t> formats;
     bool cancel = false;
+    unsigned source_channels = 2;
 };
 static bool collect(void *context, const helix_stream_info_t *info,
                     int16_t *pcm, size_t samples) {
@@ -30,18 +32,21 @@ static bool collect(void *context, const helix_stream_info_t *info,
     result.formats.push_back(info->bitrate);
     result.formats.push_back(info->channels);
     result.formats.push_back(info->source_channels);
-    assert(info->source_channels == 2); // All fixtures in this input-queue suite are stereo.
+    result.formats.push_back(info->source_sample_rate);
+    assert(info->source_sample_rate == info->sample_rate); // MP3 / AAC-LC fixtures, no SBR.
+    assert(info->source_channels == result.source_channels);
     assert(info->channels == 1); // Board mono synthesis does not change stream metadata.
     return true;
 }
 
 static Result decode(const std::vector<uint8_t> &bytes, bool queued,
-                     size_t chunk) {
+                     size_t chunk, unsigned source_channels) {
     const helix_codec_kind_t kind = helix_codec_detect(bytes.data(), bytes.size());
     assert(kind == HELIX_CODEC_MP3 || kind == HELIX_CODEC_AAC);
     helix_codec_t *codec = helix_codec_create(kind, 0);
     assert(codec);
     Result result;
+    result.source_channels = source_channels;
     size_t offset = 0;
     if (!queued) {
         while (offset < bytes.size()) {
@@ -93,16 +98,18 @@ static Result decode(const std::vector<uint8_t> &bytes, bool queued,
 }
 
 int main(int argc, char **argv) {
-    assert(argc >= 2);
-    for (int i = 1; i < argc; ++i) {
+    assert(argc >= 3 && argc % 2 == 1);
+    for (int i = 1; i < argc; i += 2) {
+        const unsigned channels = (unsigned)std::atoi(argv[i + 1]);
+        assert(channels == 1 || channels == 2);
         FILE *input = fopen(argv[i], "rb"); assert(input);
         std::vector<uint8_t> bytes;
         int value;
         while ((value = fgetc(input)) != EOF) bytes.push_back((uint8_t)value);
         fclose(input);
-        Result original = decode(bytes, false, 1024);
+        Result original = decode(bytes, false, 1024, channels);
         for (size_t chunk : {1U, 73U, 1024U}) {
-            Result queued = decode(bytes, true, chunk);
+            Result queued = decode(bytes, true, chunk, channels);
             assert(original.pcm == queued.pcm);
             assert(original.formats == queued.formats);
         }

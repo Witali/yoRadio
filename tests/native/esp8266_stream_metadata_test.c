@@ -5,7 +5,7 @@
 #include <string.h>
 #include "codec_bridge.h"
 
-_Static_assert(sizeof(helix_stream_info_t) == 12, "Use existing metadata padding");
+_Static_assert(sizeof(helix_stream_info_t) == 16, "Bounded stream/PCM metadata");
 typedef int esp_err_t;
 enum { ESP_OK = 0 };
 #define ESP_LOGE(...) ((void)0)
@@ -55,7 +55,7 @@ int main(void) {
     expected_pcm = pcm;
     for (int kind = HELIX_CODEC_MP3; kind <= HELIX_CODEC_OPUS; ++kind) {
         output_context_t context = {.generation = 42, .codec_kind = kind};
-        helix_stream_info_t info = {48000, 128000, 1, 16, 2};
+        helix_stream_info_t info = {48000, 128000, 1, 16, 2, 48000};
         expected_pcm_channels = 1;
         s_pcm_frames = publishes = writes = 0;
         assert(pcm_output(&context, &info, pcm, 64));
@@ -96,5 +96,20 @@ int main(void) {
         assert(s_pcm_frames == 320 && state.channels == 2);
         assert(!critical_depth);
     }
+    // HE-AAC source metadata must not change the PCM clock or frame accounting.
+    output_context_t context = {.generation = 42, .codec_kind = HELIX_CODEC_AAC};
+    helix_stream_info_t info = {22050, 48000, 1, 16, 2, 44100};
+    expected_pcm_channels = 1;
+    s_pcm_frames = publishes = 0;
+    assert(pcm_output(&context, &info, pcm, 64));
+    assert(s_pcm_rate == 22050 && state.sample_rate_hz == 44100 && s_pcm_frames == 64);
+    char text[64];
+    format_stream(&state, text, sizeof(text));
+    assert(!strcmp(text, "AAC 48 kbps 44.1 kHz stereo"));
+    info.source_sample_rate = 22050; // Following AAC-LC stream, same PCM format.
+    assert(pcm_output(&context, &info, pcm, 64));
+    assert(publishes == 2 && state.sample_rate_hz == 22050 && s_pcm_frames == 128);
+    format_stream(&state, text, sizeof(text));
+    assert(!strcmp(text, "AAC 48 kbps 22.05 kHz stereo"));
     puts("Stream metadata PASS: MP3/AAC/Opus stereo->mono->stereo, PCM stride, dedup and failure paths");
 }

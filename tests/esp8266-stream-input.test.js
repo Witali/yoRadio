@@ -81,8 +81,11 @@ for (const [inputBytes, aacBlocks] of [[1536, 1], [4096, 1], [6144, 1], [4096, 0
     const fixtures = [
       "mp3_composite/mix-064.mp3", "mp3_composite/mix-128.mp3", "mp3_composite/mix-320.mp3",
       "aac_composite/mix-048.aac", "aac_composite/mix-096.aac", "helix_golden/stereo-320.aac",
-    ].map(p => path.join(__dirname, "fixtures", p));
-    const result = spawnSync(executable, fixtures, {encoding: "utf8", timeout: 60000});
+      "helix_mono/mono.mp3", "helix_aac_blocks/mono-22050.aac",
+    ];
+    const fixtureArgs = fixtures.flatMap(p => [path.join(__dirname, "fixtures", p),
+      /\/mono[.-]/.test(p) ? "1" : "2"]);
+    const result = spawnSync(executable, fixtureArgs, {encoding: "utf8", timeout: 60000});
     assert.equal(result.status, 0, result.stdout + "\n" + result.stderr);
     assert.equal((result.stdout.match(/PCM identical/g) || []).length, fixtures.length);
     assert.match(result.stdout, /Codec input tests passed/);

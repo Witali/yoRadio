@@ -252,9 +252,20 @@ static void format_stream(const native_state_t *status, char *output,
     if (!codec[0]) {
         output[0] = '\0';
     } else {
-        snprintf(output, capacity, "%s %lu kbps %lu kHz %s", codec,
+        /* Preserve 44.1/22.05/11.025 kHz without floating point formatting. */
+        char rate[16];
+        const unsigned long khz = status->sample_rate_hz / 1000U;
+        const unsigned long fraction = status->sample_rate_hz % 1000U;
+        if (fraction) {
+            snprintf(rate, sizeof(rate), "%lu.%03lu", khz, fraction);
+            size_t length = strlen(rate);
+            while (length && rate[length - 1U] == '0') rate[--length] = '\0';
+        } else {
+            snprintf(rate, sizeof(rate), "%lu", khz);
+        }
+        snprintf(output, capacity, "%s %lu kbps %s kHz %s", codec,
                  (unsigned long)status->bitrate_kbps,
-                 (unsigned long)(status->sample_rate_hz / 1000U), channels);
+                 rate, channels);
     }
 }
 
