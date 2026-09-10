@@ -5,6 +5,12 @@
 #include <assert.h>
 #include <stdint.h>
 
+#if YORADIO_OPUS_PULSE_WORD_ENABLED
+uint32_t pulse_const_repeat(const void *p) {
+    return yoradio_opus_pulse_word(p)+yoradio_opus_pulse_word(p);
+}
+#endif
+
 #if YORADIO_OPUS_PULSE_WORD_ENABLED && defined(YORADIO_OPUS_PULSE_TEST_HOOKS)
 static unsigned long pulse_reads;
 static unsigned pulse_tables;

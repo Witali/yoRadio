@@ -17,7 +17,17 @@ static inline uint32_t yoradio_opus_pulse_word(const void *p) {
 #if defined(YORADIO_OPUS_PULSE_TEST_HOOKS)
     yoradio_opus_pulse_test_word(p);
 #endif
+#if defined(__XTENSA__) && YORADIO_OPUS_WORD_ASM
+    /* These three static ROM tables never change during execution. Unlike
+     * the IRAM scratch helper this load need not invalidate unrelated memory
+     * or prevent CSE/hoisting. The output is a pure function of its address.
+     * Never use this contract for mutable RAM, DMA, MMIO or custom modes. */
+    uint32_t value;
+    __asm__("l32i %0, %1, 0" : "=a"(value) : "a"(p));
+    return value;
+#else
     return yoradio_opus_table_load_pair(p).word;
+#endif
 }
 static inline unsigned char yoradio_opus_pulse_read8(const unsigned char *p) {
     uintptr_t address = (uintptr_t)p;

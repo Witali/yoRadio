@@ -95,5 +95,13 @@ test('Xtensa pulse tables have complete aligned words and real consumers add no 
     const reference=results.find(r=>!r.on&&r.file===candidate.file);
     assert.deepEqual(candidate.stack,reference.stack,'Target stack changed: '+candidate.file);
   }
+  const repeated=path.join(out,'repeated.o');
+  cmd(defaultCompiler,['-O3','-std=c99','-ffunction-sections','-fdata-sections',
+    '-DYORADIO_OPUS_BOUNDED=1','-DYORADIO_OPUS_WORD_ASM=1','-DYORADIO_OPUS_PULSE_FLASH_WORD=1',
+    '-DPULSE_PROBE_ENTRY=pulse_candidate',...include.map(n=>'-I'+path.join(component,n)),
+    '-c',path.join(root,'tools/esp8266_opus_profile/pulse_probe.c'),'-o',repeated]);
+  const repeatAsm=cmd(defaultObjdump,['-dr','-j','.text.pulse_const_repeat',repeated]);
+  assert.equal((repeatAsm.match(/\sl32i(?:\.n)?\s/g)||[]).length,1,'Immutable reads should be commoned');
+  assert.doesNotMatch(repeatAsm,/\smemw\b/);
   fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(results,null,2)+'\n');
 });
