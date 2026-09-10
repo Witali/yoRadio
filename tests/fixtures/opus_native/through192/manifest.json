@@ -1,0 +1,160 @@
+{
+  "format": "uint16 little-endian length followed by raw Opus packet; repeated until EOF",
+  "source": "Locally synthesized tones (997/10007 Hz left, 1703 Hz right) plus white noise with seed 7349; no recorded audio.",
+  "source_duration_seconds": 1.2,
+  "source_sample_rate": 48000,
+  "encoder": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "output": "Decode all packets to 48 kHz signed 16-bit little-endian mono, including encoder pre-skip/tail samples.",
+  "fixtures": [
+    {
+      "name": "mono-12",
+      "bitrate_kbps": 12,
+      "encoder_channels": 1,
+      "frame_duration_ms": 20,
+      "application": "voip",
+      "opuspkt_sha256": "cf5eb9d0d5ea920535e7e397859bb32fa5488d5ed26c5af8d2565bc4382d47ad",
+      "ogg_sha256": "edd74ad77536dc5daa0abf68fdeacf0d8c7817c2699d6d28b6f52bf288ed0821",
+      "packets": 61,
+      "samples": 58560,
+      "modes": {
+        "SILK": 61,
+        "hybrid": 0,
+        "CELT": 0
+      },
+      "packet_durations_ms": {
+        "20": 61
+      },
+      "packet_channels": {
+        "1": 61
+      },
+      "max_packet_bytes": 30,
+      "packet_file": "../mono-12.opuspkt"
+    },
+    {
+      "name": "mono-24",
+      "bitrate_kbps": 24,
+      "encoder_channels": 1,
+      "frame_duration_ms": 20,
+      "application": "voip",
+      "opuspkt_sha256": "e6501207b86923106e241430d3a86949958cb8f6c1e9b6e1a9b7950b62b3b32f",
+      "ogg_sha256": "5ac2516180ef484a8909d09ac8346f920e932aa866f3264a1f5648a1451c475f",
+      "packets": 61,
+      "samples": 58560,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 61,
+        "CELT": 0
+      },
+      "packet_durations_ms": {
+        "20": 61
+      },
+      "packet_channels": {
+        "1": 61
+      },
+      "max_packet_bytes": 60,
+      "packet_file": "../mono-24.opuspkt"
+    },
+    {
+      "name": "stereo-64",
+      "bitrate_kbps": 64,
+      "encoder_channels": 2,
+      "frame_duration_ms": 20,
+      "application": "audio",
+      "opuspkt_sha256": "9e1dddf3d32f94b6f68d15a2d17b7d6e5a2b97af0874b800599ddbf4b6ce19c3",
+      "ogg_sha256": "473aaa5bd6f716c49b8d31c8a37685fe2bd8d56bf7118460f887c0e2f59b4d5d",
+      "packets": 61,
+      "samples": 58560,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 61
+      },
+      "packet_durations_ms": {
+        "20": 61
+      },
+      "packet_channels": {
+        "2": 61
+      },
+      "max_packet_bytes": 160,
+      "packet_file": "../stereo-64.opuspkt"
+    },
+    {
+      "name": "stereo-128",
+      "bitrate_kbps": 128,
+      "encoder_channels": 2,
+      "frame_duration_ms": 20,
+      "application": "audio",
+      "opuspkt_sha256": "b9225e922d94e2ee2d8f33ba723e3512e424e9f3f5fe2f58657622a91e1dbbcf",
+      "ogg_sha256": "69f5374102255a35ce59368643d045f5599a0b77e51d185478ecfad6cf9a0813",
+      "packets": 61,
+      "samples": 58560,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 61
+      },
+      "packet_durations_ms": {
+        "20": 61
+      },
+      "packet_channels": {
+        "2": 61
+      },
+      "max_packet_bytes": 320,
+      "packet_file": "../stereo-128.opuspkt"
+    },
+    {
+      "name": "stereo-192",
+      "bitrate_kbps": 192,
+      "encoder_channels": 2,
+      "frame_duration_ms": 20,
+      "application": "audio",
+      "opuspkt_sha256": "e1c0ca74f8e8788c64ae86d990fdb8a7879810c8ebf7a7d13823d6622ee80726",
+      "ogg_sha256": "0d65931bc1d9aa52a7eadff8df7738c9e5e285b659effe051b453f825d549dd9",
+      "packets": 61,
+      "samples": 58560,
+      "modes": {
+        "SILK": 0,
+        "hybrid": 0,
+        "CELT": 61
+      },
+      "packet_durations_ms": {
+        "20": 61
+      },
+      "packet_channels": {
+        "2": 61
+      },
+      "max_packet_bytes": 480
+    }
+  ],
+  "purpose": "Physical speed tests through192 kbps. No runtime decoder bitrate restriction.",
+  "command": [
+    "ffmpeg",
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-y",
+    "-f",
+    "lavfi",
+    "-i",
+    "aevalsrc=0.24*sin(2*PI*997*t)+0.04*sin(2*PI*10007*t)|0.19*sin(2*PI*1703*t):s=48000:d=1.2",
+    "-f",
+    "lavfi",
+    "-i",
+    "anoisesrc=color=white:amplitude=0.025:seed=7349:r=48000:d=1.2",
+    "-filter_complex",
+    "[0:a][1:a]amix=inputs=2:normalize=0",
+    "-ac",
+    "2",
+    "-c:a",
+    "libopus",
+    "-application",
+    "audio",
+    "-b:a",
+    "192k",
+    "-vbr",
+    "off",
+    "-frame_duration",
+    "20",
+    "stereo-192.opus"
+  ]
+}

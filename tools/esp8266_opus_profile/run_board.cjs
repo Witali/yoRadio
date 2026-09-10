@@ -12,9 +12,12 @@ const base = option('--base', 'http://192.168.100.6');
 const output = path.resolve(option('--output', '.build/esp8266-opus-board-results.json'));
 const interval = Number(option('--interval-ms','1500'));
 if (!Number.isInteger(interval) || interval < 250 || interval > 60000) throw Error('--interval-ms must be 250..60000');
-const names = ['mono12 SILK', 'mono24 hybrid', 'stereo64 CELT', 'stereo128 CELT', 'stereo510 CELT'];
+const fixturePath=option('--fixtures',null);
+const fixtureManifest=fixturePath?JSON.parse(fs.readFileSync(path.join(fixturePath,'manifest.json'))):null;
+const names = fixtureManifest?fixtureManifest.fixtures.map(f=>f.name):['mono12 SILK', 'mono24 hybrid', 'stereo64 CELT', 'stereo128 CELT', 'stereo510 CELT'];
 const report = {date: new Date().toISOString(), base, mode: 'raw packets in RAM; no network audio or PCM output',
   timing: 'task_us excludes other tasks, includes charged ISR and instrumentation; wall_us includes preemption', snapshots: []};
+if(fixtureManifest)report.fixtures=fixtureManifest;
 function save() { fs.mkdirSync(path.dirname(output), {recursive:true}); fs.writeFileSync(output, JSON.stringify(report,null,2)+'\n'); }
 function request(uri, method='GET') {
   return new Promise((resolve,reject) => {
@@ -51,6 +54,14 @@ function request(uri, method='GET') {
       if(key!==progress) { console.log('PROGRESS',key,'error',s.error); progress=key; }
       if(s.state===3||s.state===4) {
         report.final=s;
+        if(s.state===3&&fixtureManifest) {
+          if(s.results.length!==fixtureManifest.fixtures.length)throw Error('Fixture count mismatch');
+          for(const [i,v] of s.results.entries()) {
+            const f=fixtureManifest.fixtures[i];
+            if(v.pcm_hash!==f.expected_hash||v.samples!==f.samples*s.rounds||v.packets!==f.packet_count*s.rounds)
+              throw Error('Board PCM does not match selected fixture '+f.name);
+          }
+        }
         report.comparison=s.results.map((item,i)=>s.physical_output ?
           ({name:names[i],...item,continuity:analyzeOutput(item)}) : ({name:names[i],...item,
           audio_duration_us:item.samples*1000000/48000,

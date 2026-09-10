@@ -61,9 +61,9 @@ function wordRows(data) {
   return rows.join('\n');
 }
 
-function goldenCaseIndex(name) {
+function goldenCaseIndex(name, selectedCases = cases) {
   if (name === undefined) return -1;
-  const index = cases.findIndex(([canonical]) => name === canonical || name === canonical.replaceAll('-', ''));
+  const index = selectedCases.findIndex(([canonical]) => name === canonical || name === canonical.replaceAll('-', ''));
   assert.ok(index >= 0, 'Unknown golden fixture: ' + name);
   return index;
 }
@@ -118,19 +118,20 @@ ${wordRows(golden ? golden.pcm : Buffer.alloc(4))}
 `;
 }
 
-function buildBoardFixtures({ output = defaultOutput, probe = defaultProbe, golden } = {}) {
-  const goldenIndex = goldenCaseIndex(golden);
+function buildBoardFixtures({ output = defaultOutput, probe = defaultProbe, golden, corpus = fixtureDirectory } = {}) {
   const out = path.resolve(output), binary = path.resolve(probe);
   assert.ok(fs.existsSync(binary), 'Build the pristine host probe once before generating board fixtures');
   const buildFile = path.join(path.dirname(binary), 'build.json');
   assert.ok(fs.existsSync(buildFile), 'Pristine probe build.json is required for provenance');
   const build = JSON.parse(fs.readFileSync(buildFile, 'utf8'));
   validateReference(build);
-  const manifest = JSON.parse(fs.readFileSync(path.join(fixtureDirectory, 'manifest.json'), 'utf8'));
-  const prepared = cases.map(([name, bitrate]) => {
-    const data = fs.readFileSync(path.join(fixtureDirectory, name + '.opuspkt'));
-    const expected = manifest.fixtures.find(fixture => fixture.name === name);
-    assert.ok(expected, name + ' missing from corpus manifest');
+  const manifestData = fs.readFileSync(path.join(corpus, 'manifest.json'));
+  const manifest = JSON.parse(manifestData);
+  const selectedCases = manifest.fixtures.map(f => [f.name, f.bitrate_kbps]);
+  const goldenIndex = goldenCaseIndex(golden, selectedCases);
+  const prepared = manifest.fixtures.map(expected => {
+    const {name, bitrate_kbps:bitrate} = expected;
+    const data = fs.readFileSync(path.resolve(corpus, expected.packet_file || name + '.opuspkt'));
     assert.equal(sha256(data), expected.opuspkt_sha256, name + ' source SHA-256 changed');
     return { name, bitrate, source: data, ...selectPackets(data) };
   });
@@ -171,6 +172,7 @@ function buildBoardFixtures({ output = defaultOutput, probe = defaultProbe, gold
   const header = renderHeader(payload, entries, fixtures, goldenData);
   const report = {
     schema_version: 1, packet_format: 'LP16LE input; header stores raw packets padded to 4 bytes',
+    corpus_manifest_sha256: sha256(manifestData),
     pcm_format: 'signed 16-bit little-endian mono, 48000 Hz; fresh decoder per fixture; no trim or PLC',
     hash_algorithm: 'FNV-1a32 over PCM bytes, offset basis 2166136261, prime 16777619',
     reference: { probe_sha256: sha256(fs.readFileSync(binary)), build_signature: build.signature,
@@ -192,7 +194,7 @@ module.exports = { PACKETS_PER_FIXTURE, MAX_PACKET_BYTES, defaultOutput, default
 if (require.main === module) {
   try {
     const value = key => { const index = process.argv.indexOf(key); return index < 0 ? undefined : process.argv[index + 1]; };
-    const result = buildBoardFixtures({ output: value('--output-dir'), probe: value('--probe'), golden: value('--golden') });
+    const result = buildBoardFixtures({ output: value('--output-dir'), probe: value('--probe'), golden: value('--golden'), corpus:value('--corpus') });
     console.log(`Generated ${result.fixture_count} fixtures / ${result.packet_count} packets; ${result.payload_bytes + result.table_bytes + result.golden_storage_bytes} bytes flash data; golden ${result.golden?.name || 'disabled'}.`);
   } catch (error) { console.error(error.stack); process.exitCode = 1; }
 }
