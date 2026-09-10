@@ -51,6 +51,9 @@
 #include "define.h"
 #include "mathops.h"
 #include "cpu_support.h"
+#ifdef YORADIO_OPUS_BOUNDED
+#include "opus_memory.h"
+#endif
 
 #ifdef ENABLE_DEEP_PLC
 #include "dred_rdovae_dec_data.h"
@@ -678,9 +681,11 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
 
 }
 
-int opus_decode_native(OpusDecoder *st, const unsigned char *data,
+typedef int (*opus_block_output_fn)(void *, opus_val16 *, int);
+static int opus_decode_native_impl(OpusDecoder *st, const unsigned char *data,
       opus_int32 len, opus_val16 *pcm, int frame_size, int decode_fec,
-      int self_delimited, opus_int32 *packet_offset, int soft_clip, const OpusDRED *dred, opus_int32 dred_offset)
+      int self_delimited, opus_int32 *packet_offset, int soft_clip, const OpusDRED *dred, opus_int32 dred_offset,
+      opus_block_output_fn block_output, void *block_context)
 {
    int i, nb_samples;
    int count, offset;
@@ -789,7 +794,7 @@ int opus_decode_native(OpusDecoder *st, const unsigned char *data,
       }
    }
 
-   if (count*packet_frame_size > frame_size)
+   if ((block_output ? packet_frame_size : count*packet_frame_size) > frame_size)
       return OPUS_BUFFER_TOO_SMALL;
 
    /* Update the state as the last step to avoid updating it on an invalid packet */
@@ -802,15 +807,26 @@ int opus_decode_native(OpusDecoder *st, const unsigned char *data,
    for (i=0;i<count;i++)
    {
       int ret;
-      ret = opus_decode_frame(st, data, size[i], pcm+nb_samples*st->channels, frame_size-nb_samples, 0);
+      ret = opus_decode_frame(st, data, size[i],
+            block_output ? pcm : pcm+nb_samples*st->channels,
+            block_output ? frame_size : frame_size-nb_samples, 0);
       if (ret<0)
          return ret;
       celt_assert(ret==packet_frame_size);
       data += size[i];
       nb_samples += ret;
+      if (block_output)
+      {
+         int output_error;
+         if (ret != packet_frame_size) return OPUS_INTERNAL_ERROR;
+         /* Frame history, gain, transitions and scratch restore are complete.
+            Consume before reuse; no packet copy or extra PCM allocation. */
+         output_error = block_output(block_context, pcm, ret);
+         if (output_error) return output_error < 0 ? output_error : OPUS_INTERNAL_ERROR;
+      }
    }
    st->last_packet_duration = nb_samples;
-   if (OPUS_CHECK_ARRAY(pcm, nb_samples*st->channels))
+   if (OPUS_CHECK_ARRAY(pcm, (block_output ? packet_frame_size : nb_samples)*st->channels))
       OPUS_PRINT_INT(nb_samples);
 #ifndef FIXED_POINT
    if (soft_clip)
@@ -820,6 +836,30 @@ int opus_decode_native(OpusDecoder *st, const unsigned char *data,
 #endif
    return nb_samples;
 }
+
+int opus_decode_native(OpusDecoder *st, const unsigned char *data,
+      opus_int32 len, opus_val16 *pcm, int frame_size, int decode_fec,
+      int self_delimited, opus_int32 *packet_offset, int soft_clip, const OpusDRED *dred, opus_int32 dred_offset)
+{
+   return opus_decode_native_impl(st, data, len, pcm, frame_size, decode_fec,
+         self_delimited, packet_offset, soft_clip, dred, dred_offset, NULL, NULL);
+}
+
+#if defined(YORADIO_OPUS_BOUNDED) && defined(FIXED_POINT)
+int yoradio_opus_decode_blocks_native(void *decoder, const unsigned char *packet,
+    int length, int16_t *pcm, int frame_capacity,
+    yoradio_opus_pcm_block_fn output, void *context)
+{
+   OpusDecoder *st = (OpusDecoder *)decoder;
+   /* Explicit native-radio contract. Ordinary opus_decode/FEC/PLC APIs retain
+      their full-buffer behavior. A single SILK40/60 frame is not split here. */
+   if (!st || !packet || length <= 0 || !pcm || !output ||
+       frame_capacity <= 0 || frame_capacity > 960 || st->Fs != 48000 || st->channels != 1)
+      return OPUS_BAD_ARG;
+   return opus_decode_native_impl(st, packet, length, pcm, frame_capacity, 0,
+         0, NULL, 0, NULL, 0, output, context);
+}
+#endif
 
 #ifdef FIXED_POINT
 

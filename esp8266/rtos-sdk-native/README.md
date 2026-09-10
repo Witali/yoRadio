@@ -260,7 +260,9 @@ scripts once they are added rather than invoking a globally installed SDK.
 fixed-point libopus without Arduino. The build helper accepts `-EnableOpus`
 with a fresh `-Variant`; this is not a device-qualified production profile.
 It supports mono/stereo mapping-0 streams at 48-kHz mono output, packets up to
-20 ms / 1536 bytes, bounded shared IRAM/scratch and incremental Ogg parsing.
+120 ms / 1536 bytes when each coded frame is at most20ms. Frames are emitted
+sequentially through the existing960-sample PCM buffer; single SILK40/60ms
+frames remain unsupported. Shared IRAM/scratch and Ogg parsing are bounded.
 MP3/AAC retain their existing settings. See [limits, memory reuse, tests and
 remaining qualification](../../docs/ESP8266_OPUS_NATIVE.md).
 

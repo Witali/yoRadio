@@ -113,8 +113,19 @@ node --test tests/esp8266-opus-memory.test.js
 ```
 
 `OPUS_HOST_NO_BUILD=1` reuses existing binaries; `OPUS_HOST_UPSTREAM` optionally
-adds a pristine tree. Packet duration admission (2.5/10/20 ms, rejection above
-20 ms) belongs to the native adapter tests, not this raw libopus probe.
+adds a pristine tree. Packet admission (up to120ms composed of coded frames
+no longer than20ms, max1536 bytes) belongs to native adapter tests. The raw
+block regression compares the same <=960-sample buffer against pristine
+full-packet decoding, including sink mutation, mode changes and padding:
+
+```powershell
+node tools/esp8266_opus_profile/run_block_regressions.cjs
+node --test tests/esp8266-opus-block-output.test.js tests/esp8266-native-opus.test.js
+```
+
+`inspect_ogg_packets.cjs capture.opus report.json [raw.opuspkt]` verifies CRC
+of complete pages and reports TOC frame counts/durations and truncated tails.
+Private captures are not committed; their metadata/hashes may be saved.
 
 ## CELT phase-buffer reuse
 

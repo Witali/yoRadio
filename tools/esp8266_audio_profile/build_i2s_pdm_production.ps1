@@ -205,7 +205,11 @@ try {
         pdm32_loan_words=$Pdm32LoanWords
         sdk_rx_diag=[bool]$SdkRxDiag
         sdk_rx_diag_manifest_sha256=$(if ($SdkRxDiag) { (Get-FileHash "$taskArtifact/sdk-rxdiag-manifest.json").Hash } else { $null })
-        opus_max_packet_ms=$(if ($taskOpusEnabled) { 20 } else { 0 })
+        opus_max_packet_ms=$(if ($taskOpusEnabled) { 120 } else { 0 })
+        opus_max_coded_frame_ms=$(if ($taskOpusEnabled) { 20 } else { 0 })
+        opus_block_output=[bool]$taskOpusEnabled
+        opus_adapter_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/native_opus.c).Hash
+        opus_decoder_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/src/opus_decoder.c).Hash
         tone_test=$false
         web_profile=$false
         memory_profile=[bool]$MemoryProfile

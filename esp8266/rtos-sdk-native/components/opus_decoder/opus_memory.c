@@ -91,8 +91,10 @@ void yoradio_opus_clear(void *to, size_t count, size_t size) {
     } else memset(to, 0, count * size);
 }
 
-int yoradio_opus_decode_bounded(void *decoder, const unsigned char *packet,
-                               int length, int16_t *pcm, int frame_size) {
+static int decode_bounded(void *decoder, const unsigned char *packet,
+    int length, int16_t *pcm, int frame_size,
+    yoradio_opus_pcm_block_fn output, void *context) {
+    if (decode_active) return OPUS_INVALID_STATE;
     byte_used = 0; word_used = history_bytes;
     decode_active = 1;
     if (setjmp(yoradio_opus_oom)) {
@@ -100,8 +102,20 @@ int yoradio_opus_decode_bounded(void *decoder, const unsigned char *packet,
         decode_active = 0;
         return OPUS_ALLOC_FAIL;
     }
-    int result = opus_decode(decoder, packet, length, pcm, frame_size, 0);
+    int result = output ? yoradio_opus_decode_blocks_native(decoder, packet,
+        length, pcm, frame_size, output, context) :
+        opus_decode(decoder, packet, length, pcm, frame_size, 0);
     byte_used = 0; word_used = history_bytes;
     decode_active = 0;
     return result;
+}
+int yoradio_opus_decode_bounded(void *decoder, const unsigned char *packet,
+                               int length, int16_t *pcm, int frame_size) {
+    return decode_bounded(decoder, packet, length, pcm, frame_size, NULL, NULL);
+}
+int yoradio_opus_decode_blocks_bounded(void *decoder, const unsigned char *packet,
+    int length, int16_t *pcm, int frame_capacity,
+    yoradio_opus_pcm_block_fn output, void *context) {
+    if (!output) return OPUS_BAD_ARG;
+    return decode_bounded(decoder, packet, length, pcm, frame_capacity, output, context);
 }

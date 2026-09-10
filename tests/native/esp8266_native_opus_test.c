@@ -13,6 +13,7 @@ static uint8_t stream[32768];
 static size_t stream_size, calls, received;
 static uint32_t last_bitrate;
 static bool cancel;
+static unsigned cancel_after;
 static unsigned allocation_count;
 /* Real bounded libopus is linked; unexpected heap allocation fails the test. */
 void *__wrap_malloc(size_t n) { (void)n; ++allocation_count; return NULL; }
@@ -23,7 +24,7 @@ static bool output(void *ctx, const int16_t *data, size_t samples, uint32_t bitr
     assert(data >= pcm && data + samples <= pcm + 960);
     for (size_t i=0; i<samples; ++i) assert(data[i] == 0);
     ++calls; received += samples; last_bitrate = bitrate;
-    return !cancel;
+    return !cancel && (!cancel_after || calls < cancel_after);
 }
 static native_opus_config_t config(void) {
     native_opus_config_t c = {state.bytes,sizeof(state.bytes),scratch.bytes,7680,
@@ -31,7 +32,7 @@ static native_opus_config_t config(void) {
     return c;
 }
 static void init(void) {
-    calls=received=0; cancel=false; last_bitrate=0;
+    calls=received=0; cancel=false; cancel_after=0; last_bitrate=0;
     native_opus_config_t c=config(); assert(native_opus_init(&decoder,&c)==0);
 }
 static void put32(uint8_t *p,uint32_t v) {
@@ -181,6 +182,22 @@ static void test_granules(void) {
     init();stream_size=0;headers(35,1,1,1200,0,0,19);one(35,2,4,960,silence,sizeof(silence));
     assert(feed_all(3)==NATIVE_OPUS_ERR_GRANULE && calls==0);
 }
+static void test_packed_frames(void) {
+    const uint8_t packed[]={0xfb,3,0xff,0xfe,0xff,0xfe,0xff,0xfe};
+    for(size_t fragment=1;fragment<=4096;fragment*=4) {
+        init();stream_size=0;headers(37,1,1,1200,0,0,19);
+        one(37,2,0,2880,packed,sizeof(packed));one(37,3,4,4500,packed,sizeof(packed));
+        assert(feed_all(fragment)==0 && received==3300 && calls==4);
+        assert(decoder.decoded_samples==5760 && decoder.audio_packets==2 && decoder.output_samples==3300);
+        assert(last_bitrate==1066); /* entire8-byte/60ms packet, not one frame */
+    }
+    init();stream_size=0;headers(38,1,1,0,0,0,19);one(38,2,4,2880,packed,sizeof(packed));
+    cancel_after=2;assert(feed_all(4096)==NATIVE_OPUS_ERR_CANCELLED && calls==2);
+    assert(decoder.output_samples==960 && decoder.decoded_samples==1920 && !decoder.audio_packets);
+    assert(native_opus_reset(&decoder)==0);calls=received=0;cancel_after=0;
+    assert(feed_all(1)==0 && received==2880 && calls==3);
+    puts("Native packed Opus:60ms packet, reused960 PCM, cross-frame trim and cancellation PASS");
+}
 static void test_failures(void) {
     const uint8_t toc[]={0x80,0x90,0x98,0x10,0x18};const unsigned samples[]={120,480,960,1920,2880};
     for(unsigned i=0;i<sizeof(toc);++i) {
@@ -291,7 +308,7 @@ static void test_live_capture(const char *filename,const char *golden_path) {
 
 int main(int argc,char **argv) {
     test_memory();test_alignment();test_flash_table_reads();test_headers();test_granules();test_failures();test_chains();
-    test_live_join();
+    test_live_join();test_packed_frames();
     assert(argc==1 || argc==3);
     if(argc==3)test_live_capture(argv[1],argv[2]);
     assert(allocation_count==0);

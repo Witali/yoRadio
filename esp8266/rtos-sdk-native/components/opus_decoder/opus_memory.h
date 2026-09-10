@@ -122,6 +122,17 @@ size_t yoradio_opus_scratch_peak_words(void);
 extern jmp_buf yoradio_opus_oom;
 int yoradio_opus_decode_bounded(void *decoder, const unsigned char *packet,
                                int length, int16_t *pcm, int frame_size);
+/* Synchronous mono48k output, one complete coded frame per callback. The
+ * caller may consume/mutate PCM before the same <=960-sample buffer is reused.
+ * Return zero to continue or a negative error to cancel. No re-entry into
+ * the decoder/arena; failed partial packets require a decoder reset. */
+typedef int (*yoradio_opus_pcm_block_fn)(void *context, int16_t *pcm, int samples);
+int yoradio_opus_decode_blocks_native(void *decoder, const unsigned char *packet,
+    int length, int16_t *pcm, int frame_capacity,
+    yoradio_opus_pcm_block_fn output, void *context);
+int yoradio_opus_decode_blocks_bounded(void *decoder, const unsigned char *packet,
+    int length, int16_t *pcm, int frame_capacity,
+    yoradio_opus_pcm_block_fn output, void *context);
 #ifdef __cplusplus
 }
 #endif

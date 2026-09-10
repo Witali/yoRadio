@@ -22,8 +22,10 @@ commit `10d929ac01436dfe8856e0a06fd9ec35a848c6e2`. Arduino-обёртка не �
 
 - Незашифрованные HTTP Ogg Opus, mapping family 0, вход mono/stereo.
 - Выход только mono, 48 кГц, PCM16; декодер сам выполняет downmix stereo.
-- Пакет не более 20 мс / 960 отсчётов и 1536 сжатых байт. Проверяется до decode.
-  Более длинные пакеты и multistream отклоняются с явной ошибкой.
+- Пакет до120мс и1536 сжатых байт, если каждый кодированный кадр не длиннее
+  20мс. Кадры последовательно выдаются через один PCM-буфер960 отсчётов;
+  он не увеличен. Один SILK-кадр40/60мс и multistream пока отклоняются.
+  DLF24 использует именно3×20мс Hybrid, а не один SILK60мс кадр.
 - Pre-skip, signed Q8 output gain, granule offset, обрезка EOS, смена logical
   stream после EOS. OpusTags не подменяет ICY StreamTitle.
 - Инкрементальный Ogg parser: один packet buffer 1536 байт, header/lacing,

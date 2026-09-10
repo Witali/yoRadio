@@ -29,7 +29,10 @@ enum {
     NATIVE_OPUS_ERR_PACKET_SIZE = -111
 };
 
-/* PCM is mono, 48 kHz, valid only during this synchronous callback.
+/* PCM is mono, 48 kHz, <=960 samples per synchronous callback. A packet
+ * containing multiple <=20ms coded frames yields multiple callbacks using
+ * the same PCM buffer; packet duration can reach120ms. Single SILK40/60ms
+ * coded frames remain unsupported. PCM is valid only during the callback.
  * bitrate_bps describes the compressed packet before trimming. Returning
  * false cancels delivery and latches ERR_CANCELLED until reset. */
 typedef bool (*native_opus_pcm_fn)(void *context, const int16_t *pcm,

@@ -106,6 +106,31 @@ static int read_head(native_opus_t *s, const ogg_opus_packet_t *p) {
     return 0;
 }
 
+typedef struct {
+    native_opus_t *decoder;
+    uint64_t position, keep_end;
+} packet_output_t;
+
+static int output_block(void *context, int16_t *pcm, int samples) {
+    packet_output_t *packet = context;
+    native_opus_t *s = packet->decoder;
+    if (samples <= 0 || samples > (int)NATIVE_OPUS_MAX_SAMPLES)
+        return NATIVE_OPUS_ERR_DECODE;
+    const uint64_t end = packet->position + (unsigned)samples;
+    const size_t skip = s->skip_remaining < (unsigned)samples ?
+                        s->skip_remaining : (unsigned)samples;
+    s->skip_remaining -= (uint32_t)skip;
+    s->decoded_samples += (unsigned)samples;
+    const uint64_t begin = packet->position + skip;
+    const uint64_t keep_end = packet->keep_end < end ? packet->keep_end : end;
+    const size_t output = keep_end > begin ? (size_t)(keep_end - begin) : 0;
+    packet->position = end;
+    if (output && !s->config.output(s->config.output_ctx, pcm + skip, output, s->bitrate_bps))
+        return NATIVE_OPUS_ERR_CANCELLED;
+    s->output_samples += output;
+    return 0;
+}
+
 static int packet_received(void *context, const ogg_opus_packet_t *p) {
     native_opus_t *s = context;
     if (p->packet_index == 0) return read_head(s, p);
@@ -123,7 +148,10 @@ static int packet_received(void *context, const ogg_opus_packet_t *p) {
     const int samples = opus_packet_get_nb_samples(p->data, (opus_int32)p->size,
                                                    NATIVE_OPUS_SAMPLE_RATE);
     if (samples <= 0) return fail(s, NATIVE_OPUS_ERR_DECODE);
-    if (samples > (int)NATIVE_OPUS_MAX_SAMPLES)
+    /* A packet can contain up to120ms in multiple coded frames. Only a
+       single coded frame must fit the existing20ms PCM buffer. */
+    if (samples > 5760 || opus_packet_get_samples_per_frame(p->data,
+            NATIVE_OPUS_SAMPLE_RATE) > (int)NATIVE_OPUS_MAX_SAMPLES)
         return fail(s, NATIVE_OPUS_ERR_DURATION);
     if (s->chain_decoded > INT64_MAX - (uint64_t)samples)
         return fail(s, NATIVE_OPUS_ERR_GRANULE);
@@ -158,26 +186,18 @@ static int packet_received(void *context, const ogg_opus_packet_t *p) {
         s->previous_granule = p->page_granule;
     }
 
-    s->libopus_error = yoradio_opus_decode_bounded(s->config.decoder_state,
-        p->data, (int)p->size, s->config.pcm, NATIVE_OPUS_MAX_SAMPLES);
+    packet_output_t output = {s, begin, keep_end};
+    s->bitrate_bps = (uint32_t)((uint64_t)p->size * 8u *
+                               NATIVE_OPUS_SAMPLE_RATE / (unsigned)samples);
+    s->libopus_error = yoradio_opus_decode_blocks_bounded(s->config.decoder_state,
+        p->data, (int)p->size, s->config.pcm, NATIVE_OPUS_MAX_SAMPLES, output_block, &output);
     if (s->libopus_error < 0)
-        return fail(s, s->libopus_error == OPUS_ALLOC_FAIL ?
+        return fail(s, s->libopus_error == NATIVE_OPUS_ERR_CANCELLED ?
+                    NATIVE_OPUS_ERR_CANCELLED : s->libopus_error == OPUS_ALLOC_FAIL ?
                     NATIVE_OPUS_ERR_MEMORY : NATIVE_OPUS_ERR_DECODE);
     if (s->libopus_error != samples) return fail(s, NATIVE_OPUS_ERR_DECODE);
     s->chain_decoded = end;
-    s->decoded_samples += (unsigned)samples;
     ++s->audio_packets;
-    s->bitrate_bps = (uint32_t)((uint64_t)p->size * 8u *
-                               NATIVE_OPUS_SAMPLE_RATE / (unsigned)samples);
-    const size_t skip = s->skip_remaining < (unsigned)samples ?
-                        s->skip_remaining : (unsigned)samples;
-    s->skip_remaining -= (uint32_t)skip;
-    const uint64_t output_begin = begin + skip;
-    const size_t output = keep_end > output_begin ? (size_t)(keep_end - output_begin) : 0;
-    if (output && !s->config.output(s->config.output_ctx, s->config.pcm + skip,
-                                     output, s->bitrate_bps))
-        return fail(s, NATIVE_OPUS_ERR_CANCELLED);
-    s->output_samples += output;
     if (p->page_eos && p->page_last_packet) {
         if (s->skip_remaining) return fail(s, NATIVE_OPUS_ERR_GRANULE);
         s->chain_eos = true;
@@ -220,7 +240,7 @@ const char *native_opus_error_string(int error) {
         case NATIVE_OPUS_ERR_HEADER: return "invalid Opus header";
         case NATIVE_OPUS_ERR_VERSION: return "unsupported Opus header version";
         case NATIVE_OPUS_ERR_MAPPING: return "unsupported Opus channel mapping";
-        case NATIVE_OPUS_ERR_DURATION: return "Opus packet exceeds 20 ms";
+        case NATIVE_OPUS_ERR_DURATION: return "Opus coded frame exceeds 20 ms";
         case NATIVE_OPUS_ERR_DECODE: return "invalid Opus audio packet";
         case NATIVE_OPUS_ERR_GRANULE: return "invalid Opus granule position";
         case NATIVE_OPUS_ERR_CANCELLED: return "PCM output cancelled";
