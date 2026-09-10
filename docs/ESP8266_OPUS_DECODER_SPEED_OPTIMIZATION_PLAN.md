@@ -136,6 +136,15 @@ node tools/esp8266_opus_profile/run_regressions.cjs --fast-int64 0 --fir-word --
 выравнивание, последний элемент. Не превращать все DRAM16/packet-byte
 обращения в word loads. Новая RAM-таблица не нужна; эффект измерять.
 
+Первый эксперимент A2 — static pulse-cache: `rate.h` bits2pulses/pulses2bits,
+проверка split в quant_partition и caps в init_caps. Флаг
+`-OpusPulseFlashWord` / `YORADIO_OPUS_PULSE_FLASH_WORD`, default OFF.
+Работает только bounded fixed-point без CUSTOM_MODES; динамические таблицы
+остаются на обычном доступе. cache_index50 дополнен 2 байтами flash padding,
+все 3 таблицы явно aligned4. 202233 unit-сравнения / 1991405 word reads под
+ASan/UBSan и 22 полного PCM-сценария проходят exact. Статическая RAM и
+GCC stack frames modes/bands/celt не выросли. Board A/B ещё не выполнен.
+
 ### A3. Точные деления и предварительные коэффициенты
 
 `celt/entcode.h:celt_udiv` сейчас использует `/`. Small-div table upstream

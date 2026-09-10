@@ -42,6 +42,13 @@
 
 #include "cwrs.h"
 #include "modes.h"
+#ifdef YORADIO_OPUS_BOUNDED
+#include "opus_pulse_word.h"
+#else
+#define YORADIO_OPUS_PULSE_WORD_ENABLED 0
+#define yoradio_opus_pulse_read8(p) (*(p))
+#define yoradio_opus_pulse_read16(p) (*(p))
+#endif
 
 void compute_pulse_cache(CELTMode *m, int LM);
 
@@ -57,21 +64,21 @@ static OPUS_INLINE int bits2pulses(const CELTMode *m, int band, int LM, int bits
    const unsigned char *cache;
 
    LM++;
-   cache = m->cache.bits + m->cache.index[LM*m->nbEBands+band];
+   cache = m->cache.bits + yoradio_opus_pulse_read16(&m->cache.index[LM*m->nbEBands+band]);
 
    lo = 0;
-   hi = cache[0];
+   hi = yoradio_opus_pulse_read8(cache);
    bits--;
    for (i=0;i<LOG_MAX_PSEUDO;i++)
    {
       int mid = (lo+hi+1)>>1;
       /* OPT: Make sure this is implemented with a conditional move */
-      if ((int)cache[mid] >= bits)
+      if ((int)yoradio_opus_pulse_read8(cache+mid) >= bits)
          hi = mid;
       else
          lo = mid;
    }
-   if (bits- (lo == 0 ? -1 : (int)cache[lo]) <= (int)cache[hi]-bits)
+   if (bits- (lo == 0 ? -1 : (int)yoradio_opus_pulse_read8(cache+lo)) <= (int)yoradio_opus_pulse_read8(cache+hi)-bits)
       return lo;
    else
       return hi;
@@ -82,8 +89,8 @@ static OPUS_INLINE int pulses2bits(const CELTMode *m, int band, int LM, int puls
    const unsigned char *cache;
 
    LM++;
-   cache = m->cache.bits + m->cache.index[LM*m->nbEBands+band];
-   return pulses == 0 ? 0 : cache[pulses]+1;
+   cache = m->cache.bits + yoradio_opus_pulse_read16(&m->cache.index[LM*m->nbEBands+band]);
+   return pulses == 0 ? 0 : yoradio_opus_pulse_read8(cache+pulses)+1;
 }
 
 /** Compute the pulse allocation, i.e. how many pulses will go in each

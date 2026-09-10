@@ -1,9 +1,10 @@
 {
   "schema_version": 1,
   "passed": true,
-  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
-  "scope": "Actual flash-word branch on host, mapped 0x40200000..0x40300000 with guard pages. Only constant readonly CDFs copied there by a test-only linker wrapper; local CDF and packet reads remain unmodified. No target speed claim.",
   "arithmetic": "OPUS_FAST_INT64=0",
+  "fir_flash_word": true,
+  "pulse_flash_word": true,
+  "scope": "Host mono output, maximum 20-ms packets; 48 kHz except explicit downsample-denial guard cases. Independently prepared pristine generic32 comparison. No physical speed, stack or whole-device memory claim; corpus peak is not a universal upper bound.",
   "pristine_provenance": {
     "schema_version": 1,
     "source": ".build/upstream-radio-review-2026-09-09/esp8266audio/src/libopus",
@@ -20,34 +21,265 @@
     "manifest": ".build/esp8266-opus-pristine-generic32/opus-generic32-provenance.json",
     "manifest_sha256": "140227118e1447c5d91990c23a027ea6b2806db398bd4170b9d7eb576c75e929"
   },
-  "source_sha256_lf": {
-    "opus_memory.h": "9a2e58f1e6e26de1dfca526b1511d5237a905a787cfe958cc5b9793cf5fe92a0",
-    "upstream/celt/entdec.c": "7e26c38ce429596b1281894894b583b0caa82cba5ced753ee5d5705fe365d5f6",
-    "CMakeLists.txt": "9f705a565360d67b2c03b8ba9dc6dbf4a6ab4722aee8d1ba4843cc82b9688bb9"
+  "phase_source_sha256_lf": {
+    "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/bands.c": "f9462853b29cd5b0fed9b1e20c6be9aecfecacb45d470e87e4331c6be4e5e186",
+    "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/bands.h": "e82626dde655c9e7c97d247b54739587ee5af1f840ce32efae32cd7184129591",
+    "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/celt_decoder.c": "e6b9dd6561240f11082974588096fcb799322e1bc9a6ffdb1a9e21a10f492fc7"
   },
-  "unit": {
+  "standard_regression": {
     "passed": true,
-    "sequences": 269,
-    "symbols": 137728,
-    "icdf_flash_calls": 135680,
-    "icdf_dram_calls": 2048,
-    "icdf_word_loads": 640175
+    "fixtures": [
+      {
+        "name": "mono-12",
+        "pcm": {
+          "exact": true,
+          "compared_samples": 58560,
+          "mismatched_samples": 0,
+          "max_absolute_error": 0,
+          "snr_db": "Infinity",
+          "reference_pcm_sha256": "a8a8600e916d36721e9154fdab6f93a47e6f3c3dd1a58dd652dd52ba77f4fec4",
+          "actual_pcm_sha256": "a8a8600e916d36721e9154fdab6f93a47e6f3c3dd1a58dd652dd52ba77f4fec4"
+        },
+        "bounded": {
+          "libopus": "libopus 1.5.2-fixed",
+          "mono_state_bytes": 6654,
+          "stereo_state_bytes": 6702,
+          "output_channels": 1,
+          "sample_rate": 48000,
+          "packets": 61,
+          "samples": 58560,
+          "modes": {
+            "SILK": 61,
+            "hybrid": 0,
+            "CELT": 0
+          },
+          "reset_exact": true,
+          "scratch_byte_peak_bytes": 1808,
+          "scratch_word_peak_bytes": 14112,
+          "scratch_byte_capacity_bytes": 7680,
+          "scratch_word_capacity_bytes": 16384,
+          "arena_guards_ok": true,
+          "oom_reinitialized_exact": true
+        }
+      },
+      {
+        "name": "mono-24",
+        "pcm": {
+          "exact": true,
+          "compared_samples": 58560,
+          "mismatched_samples": 0,
+          "max_absolute_error": 0,
+          "snr_db": "Infinity",
+          "reference_pcm_sha256": "fe5175ff35ebcf0af62ef0f4baf61be872924d4e46d185e79ba73aa0cd6bfd3b",
+          "actual_pcm_sha256": "fe5175ff35ebcf0af62ef0f4baf61be872924d4e46d185e79ba73aa0cd6bfd3b"
+        },
+        "bounded": {
+          "libopus": "libopus 1.5.2-fixed",
+          "mono_state_bytes": 6654,
+          "stereo_state_bytes": 6702,
+          "output_channels": 1,
+          "sample_rate": 48000,
+          "packets": 61,
+          "samples": 58560,
+          "modes": {
+            "SILK": 0,
+            "hybrid": 61,
+            "CELT": 0
+          },
+          "reset_exact": true,
+          "scratch_byte_peak_bytes": 2904,
+          "scratch_word_peak_bytes": 15600,
+          "scratch_byte_capacity_bytes": 7680,
+          "scratch_word_capacity_bytes": 16384,
+          "arena_guards_ok": true,
+          "oom_reinitialized_exact": true
+        }
+      },
+      {
+        "name": "stereo-64",
+        "pcm": {
+          "exact": true,
+          "compared_samples": 58560,
+          "mismatched_samples": 0,
+          "max_absolute_error": 0,
+          "snr_db": "Infinity",
+          "reference_pcm_sha256": "6d59ad494186b0230755568ae2238959d551142c3fb2d47822d2acff0999f2ca",
+          "actual_pcm_sha256": "6d59ad494186b0230755568ae2238959d551142c3fb2d47822d2acff0999f2ca"
+        },
+        "bounded": {
+          "libopus": "libopus 1.5.2-fixed",
+          "mono_state_bytes": 6654,
+          "stereo_state_bytes": 6702,
+          "output_channels": 1,
+          "sample_rate": 48000,
+          "packets": 61,
+          "samples": 58560,
+          "modes": {
+            "SILK": 0,
+            "hybrid": 0,
+            "CELT": 61
+          },
+          "reset_exact": true,
+          "scratch_byte_peak_bytes": 5488,
+          "scratch_word_peak_bytes": 15600,
+          "scratch_byte_capacity_bytes": 7680,
+          "scratch_word_capacity_bytes": 16384,
+          "arena_guards_ok": true,
+          "oom_reinitialized_exact": true
+        }
+      },
+      {
+        "name": "stereo-128",
+        "pcm": {
+          "exact": true,
+          "compared_samples": 58560,
+          "mismatched_samples": 0,
+          "max_absolute_error": 0,
+          "snr_db": "Infinity",
+          "reference_pcm_sha256": "0d4e1dea493c3c30daf33208e4e8bff51e34a803d41d68b29a6dc9b976a43d9a",
+          "actual_pcm_sha256": "0d4e1dea493c3c30daf33208e4e8bff51e34a803d41d68b29a6dc9b976a43d9a"
+        },
+        "bounded": {
+          "libopus": "libopus 1.5.2-fixed",
+          "mono_state_bytes": 6654,
+          "stereo_state_bytes": 6702,
+          "output_channels": 1,
+          "sample_rate": 48000,
+          "packets": 61,
+          "samples": 58560,
+          "modes": {
+            "SILK": 0,
+            "hybrid": 0,
+            "CELT": 61
+          },
+          "reset_exact": true,
+          "scratch_byte_peak_bytes": 5488,
+          "scratch_word_peak_bytes": 15600,
+          "scratch_byte_capacity_bytes": 7680,
+          "scratch_word_capacity_bytes": 16384,
+          "arena_guards_ok": true,
+          "oom_reinitialized_exact": true
+        }
+      },
+      {
+        "name": "stereo-510",
+        "pcm": {
+          "exact": true,
+          "compared_samples": 58560,
+          "mismatched_samples": 0,
+          "max_absolute_error": 0,
+          "snr_db": "Infinity",
+          "reference_pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e",
+          "actual_pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e"
+        },
+        "bounded": {
+          "libopus": "libopus 1.5.2-fixed",
+          "mono_state_bytes": 6654,
+          "stereo_state_bytes": 6702,
+          "output_channels": 1,
+          "sample_rate": 48000,
+          "packets": 61,
+          "samples": 58560,
+          "modes": {
+            "SILK": 0,
+            "hybrid": 0,
+            "CELT": 61
+          },
+          "reset_exact": true,
+          "scratch_byte_peak_bytes": 5488,
+          "scratch_word_peak_bytes": 15600,
+          "scratch_byte_capacity_bytes": 7680,
+          "scratch_word_capacity_bytes": 16384,
+          "arena_guards_ok": true,
+          "oom_reinitialized_exact": true
+        }
+      }
+    ],
+    "mixed": {
+      "route": [
+        "mono-12.opuspkt",
+        "mixed-silk-stereo.opuspkt",
+        "mono-12.opuspkt",
+        "mono-24.opuspkt",
+        "stereo-128.opuspkt",
+        "mixed-silk-stereo.opuspkt"
+      ],
+      "plc_every_packets": 8,
+      "silk_stereo_packet_sha256": "380c00449fb9e52919b0e372172e334125cdcdbf07d34a124a442a5cded4648c",
+      "baseline": {
+        "sequence_packets": 286,
+        "plc_frames": 35,
+        "samples": 308160,
+        "reset_exact": true
+      },
+      "bounded": {
+        "sequence_packets": 286,
+        "plc_frames": 35,
+        "samples": 308160,
+        "reset_exact": true,
+        "persistent_bytes": 11232,
+        "scratch_byte_peak_bytes": 5968,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 308160,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "4d572f297d69fe5898ee98315cafe8144e7adaca306bcf7595451ad4f4b1ec48",
+        "actual_pcm_sha256": "4d572f297d69fe5898ee98315cafe8144e7adaca306bcf7595451ad4f4b1ec48"
+      },
+      "pristine": {
+        "decoder": {
+          "sequence_packets": 286,
+          "plc_frames": 35,
+          "samples": 308160,
+          "reset_exact": true
+        },
+        "pcm_vs_baseline": {
+          "exact": true,
+          "compared_samples": 308160,
+          "mismatched_samples": 0,
+          "max_absolute_error": 0,
+          "snr_db": "Infinity",
+          "reference_pcm_sha256": "4d572f297d69fe5898ee98315cafe8144e7adaca306bcf7595451ad4f4b1ec48",
+          "actual_pcm_sha256": "4d572f297d69fe5898ee98315cafe8144e7adaca306bcf7595451ad4f4b1ec48"
+        }
+      }
+    }
   },
-  "address_undefined_sanitizers": {
-    "passed": true,
-    "sequences": 269,
-    "symbols": 137728,
-    "icdf_flash_calls": 135680,
-    "icdf_dram_calls": 2048,
-    "icdf_word_loads": 640175
+  "coverage": {
+    "borrowed_by_lm": [
+      1028,
+      516,
+      520,
+      678
+    ],
+    "transient_borrowed": 148,
+    "dual_stereo_borrowed": 794,
+    "borrow_denied": 1466
   },
-  "legacy_phase_passed": true,
   "cases": [
     {
       "name": "stereo-2_5ms",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-2_5ms.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "e8edba9c4b4543db8cbd0ddc8d96a3c7a2ec215f142f2264e18bf46812b351a1"
       ],
+      "pristine": {
+        "samples": 15480,
+        "packets": 129,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 15480,
         "packets": 129,
@@ -69,12 +301,6 @@
         "dual_stereo_borrowed": 0,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 516,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 1974,
-        "readonly_tables_transferred": 516
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 15480,
@@ -87,9 +313,22 @@
     },
     {
       "name": "stereo-2_5ms-packed20",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-2_5ms-packed20.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "3136b5863c895ea05796ad002aeca2037f2c6d3fbed55dc15be72fb1c4889324"
       ],
+      "pristine": {
+        "samples": 15360,
+        "packets": 16,
+        "plc_frames": 0,
+        "multiframe_packets": 16,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 15360,
         "packets": 16,
@@ -111,12 +350,6 @@
         "dual_stereo_borrowed": 0,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 512,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 1962,
-        "readonly_tables_transferred": 512
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 15360,
@@ -129,9 +362,22 @@
     },
     {
       "name": "stereo-5ms",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-5ms.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "461364e76a20c49b4307844cffe630e556de88891d5125f57818ab74368eee00"
       ],
+      "pristine": {
+        "samples": 15600,
+        "packets": 65,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 15600,
         "packets": 65,
@@ -153,12 +399,6 @@
         "dual_stereo_borrowed": 56,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 260,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 1000,
-        "readonly_tables_transferred": 260
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 15600,
@@ -171,9 +411,22 @@
     },
     {
       "name": "stereo-5ms-packed20",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-5ms-packed20.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "4610fc31766bcc409af108de4444b6760eba1ca027ee8694b49917aef4cb7849"
       ],
+      "pristine": {
+        "samples": 15360,
+        "packets": 16,
+        "plc_frames": 0,
+        "multiframe_packets": 16,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 15360,
         "packets": 16,
@@ -195,12 +448,6 @@
         "dual_stereo_borrowed": 56,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 256,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 990,
-        "readonly_tables_transferred": 256
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 15360,
@@ -213,9 +460,22 @@
     },
     {
       "name": "stereo-10ms",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-10ms.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "bcb44a05e3123435b54d1ba959b08a7532973e643d80e57d2c59e9926b37aa02"
       ],
+      "pristine": {
+        "samples": 15840,
+        "packets": 33,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 15840,
         "packets": 33,
@@ -237,12 +497,6 @@
         "dual_stereo_borrowed": 60,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 132,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 494,
-        "readonly_tables_transferred": 132
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 15840,
@@ -255,9 +509,22 @@
     },
     {
       "name": "stereo-10ms-packed20",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-10ms-packed20.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "1c5350bc9c4b2cfd3e3bed37dd8e80ea7b40219b5d5009e09cd90c407396055b"
       ],
+      "pristine": {
+        "samples": 15360,
+        "packets": 16,
+        "plc_frames": 0,
+        "multiframe_packets": 16,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 15360,
         "packets": 16,
@@ -279,12 +546,6 @@
         "dual_stereo_borrowed": 60,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 128,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 484,
-        "readonly_tables_transferred": 128
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 15360,
@@ -297,9 +558,22 @@
     },
     {
       "name": "stereo-20ms",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-20ms.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "3ace4c3db8a1b39c6a7558274dd71fc31fc6753ad825f46cc1b3ee51ee5bebfa"
       ],
+      "pristine": {
+        "samples": 16320,
+        "packets": 17,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 16320,
         "packets": 17,
@@ -321,12 +595,6 @@
         "dual_stereo_borrowed": 30,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 68,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 240,
-        "readonly_tables_transferred": 68
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 16320,
@@ -339,9 +607,22 @@
     },
     {
       "name": "mono-20ms",
+      "route": [
+        "tests/fixtures/opus_native/phase/mono-20ms.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "aa316afd1415f9b597afbf5e6d49da2f1459639afe34d6179afc759d3bfa69bf"
       ],
+      "pristine": {
+        "samples": 16320,
+        "packets": 17,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 16320,
         "packets": 17,
@@ -363,12 +644,6 @@
         "dual_stereo_borrowed": 0,
         "borrow_denied": 34
       },
-      "coverage": {
-        "icdf_flash_calls": 68,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 240,
-        "readonly_tables_transferred": 68
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 16320,
@@ -381,9 +656,22 @@
     },
     {
       "name": "stereo-10ms-vbr",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-10ms-vbr.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "3589bf6006336e2fb72e97221ce0d0b33c7c07ab9c1ebc5aa9c33788c8e97ccb"
       ],
+      "pristine": {
+        "samples": 15840,
+        "packets": 33,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 15840,
         "packets": 33,
@@ -405,12 +693,6 @@
         "dual_stereo_borrowed": 60,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 132,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 494,
-        "readonly_tables_transferred": 132
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 15840,
@@ -423,9 +705,22 @@
     },
     {
       "name": "stereo-10ms-vbr-packed20",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-10ms-vbr-packed20.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "501ade152d7c66df7718e7e359c4f9965fe3fcde917c72dd209cadb0fd635cb9"
       ],
+      "pristine": {
+        "samples": 15360,
+        "packets": 16,
+        "plc_frames": 0,
+        "multiframe_packets": 16,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 15360,
         "packets": 16,
@@ -447,12 +742,6 @@
         "dual_stereo_borrowed": 60,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 128,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 484,
-        "readonly_tables_transferred": 128
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 15360,
@@ -465,6 +754,19 @@
     },
     {
       "name": "all-phase-mixed-plc",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-2_5ms.opuspkt",
+        "tests/fixtures/opus_native/phase/stereo-2_5ms-packed20.opuspkt",
+        "tests/fixtures/opus_native/phase/stereo-5ms.opuspkt",
+        "tests/fixtures/opus_native/phase/stereo-5ms-packed20.opuspkt",
+        "tests/fixtures/opus_native/phase/stereo-10ms.opuspkt",
+        "tests/fixtures/opus_native/phase/stereo-10ms-packed20.opuspkt",
+        "tests/fixtures/opus_native/phase/stereo-20ms.opuspkt",
+        "tests/fixtures/opus_native/phase/mono-20ms.opuspkt",
+        "tests/fixtures/opus_native/phase/stereo-10ms-vbr.opuspkt",
+        "tests/fixtures/opus_native/phase/stereo-10ms-vbr-packed20.opuspkt"
+      ],
+      "plc_burst": 1,
       "input_sha256": [
         "e8edba9c4b4543db8cbd0ddc8d96a3c7a2ec215f142f2264e18bf46812b351a1",
         "3136b5863c895ea05796ad002aeca2037f2c6d3fbed55dc15be72fb1c4889324",
@@ -477,6 +779,15 @@
         "3589bf6006336e2fb72e97221ce0d0b33c7c07ab9c1ebc5aa9c33788c8e97ccb",
         "501ade152d7c66df7718e7e359c4f9965fe3fcde917c72dd209cadb0fd635cb9"
       ],
+      "pristine": {
+        "samples": 199080,
+        "packets": 358,
+        "plc_frames": 44,
+        "multiframe_packets": 64,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 199080,
         "packets": 358,
@@ -498,12 +809,6 @@
         "dual_stereo_borrowed": 382,
         "borrow_denied": 34
       },
-      "coverage": {
-        "icdf_flash_calls": 2200,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 8362,
-        "readonly_tables_transferred": 2200
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 199080,
@@ -516,6 +821,15 @@
     },
     {
       "name": "standard-mixed-plc",
+      "route": [
+        "tests/fixtures/opus_native/mono-12.opuspkt",
+        ".build/esp8266-opus-regression-int64-0/mixed-silk-stereo.opuspkt",
+        "tests/fixtures/opus_native/mono-12.opuspkt",
+        "tests/fixtures/opus_native/mono-24.opuspkt",
+        "tests/fixtures/opus_native/stereo-128.opuspkt",
+        ".build/esp8266-opus-regression-int64-0/mixed-silk-stereo.opuspkt"
+      ],
+      "plc_burst": 1,
       "input_sha256": [
         "cf5eb9d0d5ea920535e7e397859bb32fa5488d5ed26c5af8d2565bc4382d47ad",
         "6c3e2fd0214f0e840b2dfc6ac31f1cb36e9481b43f657064f23097927091cbd1",
@@ -524,6 +838,15 @@
         "b9225e922d94e2ee2d8f33ba723e3512e424e9f3f5fe2f58657622a91e1dbbcf",
         "6c3e2fd0214f0e840b2dfc6ac31f1cb36e9481b43f657064f23097927091cbd1"
       ],
+      "pristine": {
+        "samples": 308160,
+        "packets": 286,
+        "plc_frames": 35,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 308160,
         "packets": 286,
@@ -545,12 +868,6 @@
         "dual_stereo_borrowed": 6,
         "borrow_denied": 122
       },
-      "coverage": {
-        "icdf_flash_calls": 77612,
-        "icdf_dram_calls": 15652,
-        "icdf_word_loads": 200684,
-        "readonly_tables_transferred": 77612
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 308160,
@@ -563,6 +880,15 @@
     },
     {
       "name": "standard-burst-plc",
+      "route": [
+        "tests/fixtures/opus_native/mono-12.opuspkt",
+        ".build/esp8266-opus-regression-int64-0/mixed-silk-stereo.opuspkt",
+        "tests/fixtures/opus_native/mono-12.opuspkt",
+        "tests/fixtures/opus_native/mono-24.opuspkt",
+        "tests/fixtures/opus_native/stereo-128.opuspkt",
+        ".build/esp8266-opus-regression-int64-0/mixed-silk-stereo.opuspkt"
+      ],
+      "plc_burst": 6,
       "input_sha256": [
         "cf5eb9d0d5ea920535e7e397859bb32fa5488d5ed26c5af8d2565bc4382d47ad",
         "6c3e2fd0214f0e840b2dfc6ac31f1cb36e9481b43f657064f23097927091cbd1",
@@ -571,6 +897,15 @@
         "b9225e922d94e2ee2d8f33ba723e3512e424e9f3f5fe2f58657622a91e1dbbcf",
         "6c3e2fd0214f0e840b2dfc6ac31f1cb36e9481b43f657064f23097927091cbd1"
       ],
+      "pristine": {
+        "samples": 476160,
+        "packets": 286,
+        "plc_frames": 210,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 476160,
         "packets": 286,
@@ -592,12 +927,6 @@
         "dual_stereo_borrowed": 6,
         "borrow_denied": 122
       },
-      "coverage": {
-        "icdf_flash_calls": 77612,
-        "icdf_dram_calls": 15652,
-        "icdf_word_loads": 200684,
-        "readonly_tables_transferred": 77612
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 476160,
@@ -610,9 +939,22 @@
     },
     {
       "name": "standard-clean-mono-12",
+      "route": [
+        "tests/fixtures/opus_native/mono-12.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "cf5eb9d0d5ea920535e7e397859bb32fa5488d5ed26c5af8d2565bc4382d47ad"
       ],
+      "pristine": {
+        "samples": 58560,
+        "packets": 61,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 58560,
         "packets": 61,
@@ -634,12 +976,6 @@
         "dual_stereo_borrowed": 0,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 15474,
-        "icdf_dram_calls": 2506,
-        "icdf_word_loads": 40566,
-        "readonly_tables_transferred": 15474
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 58560,
@@ -652,9 +988,22 @@
     },
     {
       "name": "standard-clean-mono-24",
+      "route": [
+        "tests/fixtures/opus_native/mono-24.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "e6501207b86923106e241430d3a86949958cb8f6c1e9b6e1a9b7950b62b3b32f"
       ],
+      "pristine": {
+        "samples": 58560,
+        "packets": 61,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 58560,
         "packets": 61,
@@ -676,12 +1025,6 @@
         "dual_stereo_borrowed": 0,
         "borrow_denied": 122
       },
-      "coverage": {
-        "icdf_flash_calls": 23874,
-        "icdf_dram_calls": 6188,
-        "icdf_word_loads": 61048,
-        "readonly_tables_transferred": 23874
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 58560,
@@ -694,9 +1037,22 @@
     },
     {
       "name": "standard-clean-stereo-64",
+      "route": [
+        "tests/fixtures/opus_native/stereo-64.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "9e1dddf3d32f94b6f68d15a2d17b7d6e5a2b97af0874b800599ddbf4b6ce19c3"
       ],
+      "pristine": {
+        "samples": 58560,
+        "packets": 61,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 58560,
         "packets": 61,
@@ -717,12 +1073,6 @@
         "transient_borrowed": 4,
         "dual_stereo_borrowed": 6,
         "borrow_denied": 0
-      },
-      "coverage": {
-        "icdf_flash_calls": 362,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 842,
-        "readonly_tables_transferred": 362
       },
       "pcm": {
         "exact": true,
@@ -736,9 +1086,22 @@
     },
     {
       "name": "standard-clean-stereo-128",
+      "route": [
+        "tests/fixtures/opus_native/stereo-128.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "b9225e922d94e2ee2d8f33ba723e3512e424e9f3f5fe2f58657622a91e1dbbcf"
       ],
+      "pristine": {
+        "samples": 58560,
+        "packets": 61,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 58560,
         "packets": 61,
@@ -759,12 +1122,6 @@
         "transient_borrowed": 4,
         "dual_stereo_borrowed": 6,
         "borrow_denied": 0
-      },
-      "coverage": {
-        "icdf_flash_calls": 362,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 964,
-        "readonly_tables_transferred": 362
       },
       "pcm": {
         "exact": true,
@@ -778,9 +1135,22 @@
     },
     {
       "name": "standard-clean-stereo-510",
+      "route": [
+        "tests/fixtures/opus_native/stereo-510.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "478933ec0c177f880a514677e3c3964276d4df99ad4c2bfadd09af256090abc1"
       ],
+      "pristine": {
+        "samples": 58560,
+        "packets": 61,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 58560,
         "packets": 61,
@@ -802,12 +1172,6 @@
         "dual_stereo_borrowed": 6,
         "borrow_denied": 0
       },
-      "coverage": {
-        "icdf_flash_calls": 362,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 964,
-        "readonly_tables_transferred": 362
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 58560,
@@ -820,9 +1184,22 @@
     },
     {
       "name": "downsample-8000-guard",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-2_5ms.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "e8edba9c4b4543db8cbd0ddc8d96a3c7a2ec215f142f2264e18bf46812b351a1"
       ],
+      "pristine": {
+        "samples": 2580,
+        "packets": 129,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 8000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 2580,
         "packets": 129,
@@ -844,12 +1221,6 @@
         "dual_stereo_borrowed": 0,
         "borrow_denied": 258
       },
-      "coverage": {
-        "icdf_flash_calls": 516,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 1974,
-        "readonly_tables_transferred": 516
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 2580,
@@ -862,9 +1233,22 @@
     },
     {
       "name": "downsample-12000-guard",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-2_5ms.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "e8edba9c4b4543db8cbd0ddc8d96a3c7a2ec215f142f2264e18bf46812b351a1"
       ],
+      "pristine": {
+        "samples": 3870,
+        "packets": 129,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 12000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 3870,
         "packets": 129,
@@ -886,12 +1270,6 @@
         "dual_stereo_borrowed": 0,
         "borrow_denied": 258
       },
-      "coverage": {
-        "icdf_flash_calls": 516,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 1974,
-        "readonly_tables_transferred": 516
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 3870,
@@ -904,9 +1282,22 @@
     },
     {
       "name": "downsample-16000-guard",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-2_5ms.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "e8edba9c4b4543db8cbd0ddc8d96a3c7a2ec215f142f2264e18bf46812b351a1"
       ],
+      "pristine": {
+        "samples": 5160,
+        "packets": 129,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 16000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 5160,
         "packets": 129,
@@ -928,12 +1319,6 @@
         "dual_stereo_borrowed": 0,
         "borrow_denied": 258
       },
-      "coverage": {
-        "icdf_flash_calls": 516,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 1974,
-        "readonly_tables_transferred": 516
-      },
       "pcm": {
         "exact": true,
         "compared_samples": 5160,
@@ -946,9 +1331,22 @@
     },
     {
       "name": "downsample-24000-guard",
+      "route": [
+        "tests/fixtures/opus_native/phase/stereo-2_5ms.opuspkt"
+      ],
+      "plc_burst": 0,
       "input_sha256": [
         "e8edba9c4b4543db8cbd0ddc8d96a3c7a2ec215f142f2264e18bf46812b351a1"
       ],
+      "pristine": {
+        "samples": 7740,
+        "packets": 129,
+        "plc_frames": 0,
+        "multiframe_packets": 0,
+        "sample_rate": 24000,
+        "reset_exact": true,
+        "pcm_guards_ok": true
+      },
       "bounded": {
         "samples": 7740,
         "packets": 129,
@@ -969,12 +1367,6 @@
         "transient_borrowed": 0,
         "dual_stereo_borrowed": 0,
         "borrow_denied": 258
-      },
-      "coverage": {
-        "icdf_flash_calls": 516,
-        "icdf_dram_calls": 0,
-        "icdf_word_loads": 1974,
-        "readonly_tables_transferred": 516
       },
       "pcm": {
         "exact": true,

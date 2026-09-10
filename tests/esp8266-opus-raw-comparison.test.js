@@ -1,5 +1,15 @@
 const test=require('node:test'),assert=require('node:assert/strict');
-const {stats,compare}=require('../tools/esp8266_opus_profile/compare_raw.cjs');
+const {stats,compare,compareArtifacts}=require('../tools/esp8266_opus_profile/compare_raw.cjs');
+test('A/B permits only the selected feature and artifact identity differences',()=>{
+  for(const feature of ['opus_fir_flash_word','opus_pulse_flash_word']) {
+    const a={cpu_mhz:160,source_revision:'same',[feature]:false,bytes:10,app_sha256:'a'};
+    const b={...a,[feature]:true,bytes:12,app_sha256:'b'};
+    compareArtifacts(a,b,feature);
+    assert.throws(()=>compareArtifacts(a,{...b,cpu_mhz:80},feature),/cpu_mhz/);
+    assert.throws(()=>compareArtifacts(a,{...b,source_revision:'other'},feature),/source_revision/);
+    assert.throws(()=>compareArtifacts(a,b,'cpu_mhz'),/Unknown/);
+  }
+});
 const make=()=>Array.from({length:10},()=>({final:{state:3,error:0,physical_output:false,dram_after:25000,
   results:Array.from({length:5},(_,id)=>({id,error:0,samples:115200,packets:120,
     pcm_hash:123+id,task_us:1200000,wall_us:1300000,max_wall_us:30000,

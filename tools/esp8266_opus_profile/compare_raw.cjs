@@ -72,6 +72,13 @@ function artifact(directory) {
   assert.equal(sha256(app),manifest.app_sha256.toLowerCase());assert.equal(app.length,manifest.bytes);
   return manifest;
 }
+function compareArtifacts(ma,mb,feature='opus_fir_flash_word') {
+  assert.ok(['opus_fir_flash_word','opus_pulse_flash_word'].includes(feature),'Unknown A/B switch');
+  assert.equal(ma[feature],false);assert.equal(mb[feature],true);
+  for(const k of new Set([...Object.keys(ma),...Object.keys(mb)]))
+    if(![feature,'built_utc','app_sha256','bytes'].includes(k))
+      assert.deepEqual(mb[k],ma[k],`Build settings differ: ${k}`);
+}
 if(require.main===module) {
   const args=process.argv.slice(2),value=(key)=>{const i=args.indexOf(key);assert.ok(i>=0,`Missing ${key}`);return args[i+1];};
   const count=args.includes('--runs')?Number(value('--runs')):10;
@@ -79,15 +86,14 @@ if(require.main===module) {
   const a=load(value('--reference'),count),b=load(value('--candidate'),count);
   const result=compare(a.map(v=>v.report),b.map(v=>v.report));
   const ma=artifact(value('--reference')),mb=artifact(value('--candidate'));
-  assert.equal(ma.opus_fir_flash_word,false);assert.equal(mb.opus_fir_flash_word,true);
-  for(const k of new Set([...Object.keys(ma),...Object.keys(mb)]))
-    if(!['opus_fir_flash_word','built_utc','app_sha256','bytes'].includes(k))
-      assert.deepEqual(mb[k],ma[k],`Build settings differ: ${k}`);
+  const feature=args.includes('--switch')?value('--switch'):'opus_fir_flash_word';
+  compareArtifacts(ma,mb,feature);
   result.artifacts={reference:ma,candidate:mb};
+  result.switch=feature;
   result.inputs={reference:a.map(({file,sha256})=>({file,sha256})),candidate:b.map(({file,sha256})=>({file,sha256}))};
   const output=path.resolve(value('--output'));fs.mkdirSync(path.dirname(output),{recursive:true});
   fs.writeFileSync(output,JSON.stringify(result,null,2)+'\n');
   console.table(result.cases.map(c=>({name:c.name,off:c.reference.task_budget_percent.median,
     on:c.candidate.task_budget_percent.median,reduction:c.median_task_reduction_percent})));
 }
-module.exports={stats,summarize,compare};
+module.exports={stats,summarize,compare,compareArtifacts};
