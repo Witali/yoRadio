@@ -17,7 +17,6 @@ param(
     [switch]$OpusIcdfFlashWord,
     [switch]$Pdm32Iram,
     [switch]$Pdm32Batch,
-    [switch]$OpusDmaYield,
     [switch]$SdkRxDiag,
     [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
@@ -35,7 +34,6 @@ if ($OpusIcdfFlashWord -and -not $EnableOpus) { throw '-OpusIcdfFlashWord requir
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
 if ($Pdm32Batch -and -not $Diagnostic) { throw '-Pdm32Batch requires -Diagnostic until board qualification' }
 if ($SdkRxDiag -and -not $Diagnostic) { throw '-SdkRxDiag requires -Diagnostic' }
-if ($OpusDmaYield -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusDmaYield requires -Diagnostic and -EnableOpus' }
 if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
 $taskOpusStreamTestEnabled = [bool]($OpusStreamTest -or $OpusBenchmark)
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
@@ -117,7 +115,6 @@ try {
     $taskOpusIcdfFlashWord = if ($OpusIcdfFlashWord) { 'ON' } else { 'OFF' }
     $taskPdm32Iram = if ($Pdm32Iram) { 'ON' } else { 'OFF' }
     $taskPdm32Batch = if ($Pdm32Batch) { 'ON' } else { 'OFF' }
-    $taskOpusDmaYield = if ($OpusDmaYield) { 'ON' } else { 'OFF' }
     $taskSdkRxDiag = if ($SdkRxDiag) { 'ON' } else { 'OFF' }
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
@@ -146,7 +143,6 @@ try {
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
         "-DYORADIO_ESP8266_PDM32_IRAM=$taskPdm32Iram",
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
-        "-DYORADIO_ESP8266_OPUS_DMA_YIELD=$taskOpusDmaYield",
         "-DYORADIO_ESP8266_SDK_RX_DIAG=$taskSdkRxDiag",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES=$OpusBenchmarkFixtures",
         '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
@@ -189,7 +185,6 @@ try {
         opus_icdf_flash_word=[bool]$OpusIcdfFlashWord
         pdm32_iram=[bool]$Pdm32Iram
         pdm32_batch=[bool]$Pdm32Batch
-        opus_dma_yield=[bool]$OpusDmaYield
         sdk_rx_diag=[bool]$SdkRxDiag
         sdk_rx_diag_manifest_sha256=$(if ($SdkRxDiag) { (Get-FileHash "$taskArtifact/sdk-rxdiag-manifest.json").Hash } else { $null })
         opus_max_packet_ms=$(if ($taskOpusEnabled) { 20 } else { 0 })

@@ -2,7 +2,6 @@
 #include "web_audio_pause_config.h"
 #include "memory_profile.h"
 #include "opus_benchmark.h"
-#include "opus_dma_yield.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -109,9 +108,6 @@ static TaskHandle_t s_audio_task;
 static volatile uint32_t s_generation;
 static uint32_t s_rx_bytes, s_pcm_frames, s_pcm_rate;
 static TickType_t s_rx_tick, s_pcm_tick;
-#if YORADIO_ESP8266_OPUS_DMA_YIELD
-static uint32_t s_frame_yields, s_frame_yield_skips;
-#endif
 
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
 static volatile uint32_t s_transport_phase;
@@ -153,10 +149,6 @@ void audio_service_health(audio_service_health_t *health) {
         .sample_rate = s_pcm_rate,
         .rx_age_ms = (now - s_rx_tick) * portTICK_PERIOD_MS,
         .pcm_age_ms = (now - s_pcm_tick) * portTICK_PERIOD_MS,
-#if YORADIO_ESP8266_OPUS_DMA_YIELD
-        .frame_yields = s_frame_yields,
-        .frame_yield_skips = s_frame_yield_skips,
-#endif
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
         .transport_phase = s_transport_phase,
         .transport_result = s_transport_result,
@@ -1298,9 +1290,6 @@ static void audio_task(void *argument) {
                          (unsigned)helix_codec_buffered(codec), filled);
 #endif
             audio_transport_phase(AUDIO_TRANSPORT_DECODE);
-#if YORADIO_ESP8266_OPUS_DMA_YIELD
-            const uint32_t dma_wait_before = esp8266_nodac_i2s_wait_ticks();
-#endif
             int decoded = helix_codec_process_one(codec, pcm_output, &output);
             audio_transport_phase(AUDIO_TRANSPORT_REFILL);
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
@@ -1322,20 +1311,7 @@ static void audio_task(void *argument) {
             if (decoded == 0) {
                 /* Give idle/watchdog and deferred Wi-Fi work a turn even on
                  * continuously readable streams or malformed input. */
-#if YORADIO_ESP8266_OPUS_DMA_YIELD
-                if (opus_dma_needs_frame_delay(codec_kind == HELIX_CODEC_OPUS,
-                        dma_wait_before, esp8266_nodac_i2s_wait_ticks())) {
-                    ++s_frame_yields;
-                    vTaskDelay(pdMS_TO_TICKS(1));
-                } else {
-                    /* This packet already spent >= one tick waiting on DMA.
-                     * Do not consume another tick of the small output queue.
-                     * Headers, no-wait packets and other codecs still delay. */
-                    ++s_frame_yield_skips;
-                }
-#else
                 vTaskDelay(pdMS_TO_TICKS(1));
-#endif
             } else if (ended) {
                 /* Drain all complete queued frames before reconnecting.
                  * Only the final incomplete frame is discarded. */

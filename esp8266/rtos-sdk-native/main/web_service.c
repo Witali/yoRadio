@@ -1150,9 +1150,6 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
         "\"pcm_frames\":%u,\"sample_rate\":%u,\"rx_age_ms\":%u,"
         "\"pcm_age_ms\":%u,\"underruns\":%u,\"free_heap\":%u,"
         "\"dma_eofs\":%u,\"output_enabled\":%s,\"audio_stack_free\":%u,\"free_iram\":%u"
-#if YORADIO_ESP8266_OPUS_DMA_YIELD
-        ",\"frame_yields\":%u,\"frame_yield_skips\":%u"
-#endif
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
         ",\"transport_phase\":%u,\"transport_result\":%d,\"transport_errno\":%d,\"input_bytes\":%u"
 #endif
@@ -1171,9 +1168,6 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
         (unsigned)output.chained_transfers, output_enabled,
         (unsigned)health.stack_free,
         (unsigned)heap_caps_get_free_size(MALLOC_CAP_EXEC)
-#if YORADIO_ESP8266_OPUS_DMA_YIELD
-        , (unsigned)health.frame_yields, (unsigned)health.frame_yield_skips
-#endif
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
         , (unsigned)health.transport_phase, (int)health.transport_result,
         (int)health.transport_errno, (unsigned)health.input_bytes

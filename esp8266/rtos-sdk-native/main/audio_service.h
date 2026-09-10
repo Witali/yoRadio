@@ -18,9 +18,6 @@ typedef struct {
     uint32_t generation, uptime_ms, rx_bytes, pcm_frames, sample_rate;
     uint32_t rx_age_ms, pcm_age_ms;
     uint32_t stack_free;
-#if YORADIO_ESP8266_OPUS_DMA_YIELD
-    uint32_t frame_yields, frame_yield_skips;
-#endif
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
     uint32_t transport_phase;
     /* Terminal STREAM_FILL_* result (EOF=3, timeout=4, error=-1), or
