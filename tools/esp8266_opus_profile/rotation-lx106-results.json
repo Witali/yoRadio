@@ -1,13 +1,15 @@
 {
   "passed": true,
-  "source_sha256_lf": "34dcbbcb64fd36f389a76fb45438b6eeaad00e9d1857f1ce66dac362f22d34c7",
-  "cases": 512,
-  "samples": 78880,
+  "source_sha256_lf": "5a7a072da7f9f21d8e6d4d761e873328affa0ee7852e76481bf3b3413164bf31",
+  "cases": 1512,
+  "samples": 574328,
+  "asm_cases": 1120,
+  "asm_samples": 511264,
   "c_fallback_asan_ubsan": true,
   "instruction_model_exact": true,
   "callee_saved_registers_checked": true,
   "target_assembled": true,
   "mul16s_sites": 8,
-  "stack_bytes": 16,
-  "scope": "C fallback execution plus a local instruction-semantics model, not physical assembly execution or speed. Physical golden PCM / A/B remains required."
+  "stack_bytes": 0,
+  "scope": "All vectors run sanitized C; stride1 vectors additionally run the actual ASM instruction model. Other strides remain C. Not physical execution or speed; board golden PCM / A/B remains required."
 }

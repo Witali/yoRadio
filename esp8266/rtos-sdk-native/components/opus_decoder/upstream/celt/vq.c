@@ -53,6 +53,13 @@ static void exp_rotation1(celt_norm *X, int len, int stride, opus_val16 c, opus_
    int i;
    opus_val16 ms;
    celt_norm *Xptr;
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_USE_LX106_ROTATION
+   if (stride == 1)
+   {
+      yoradio_opus_exp_rotation1_stride1_lx106(X, len, c, s);
+      return;
+   }
+#endif
    Xptr = X;
    ms = NEG16(s);
    for (i=0;i<len-stride;i++)

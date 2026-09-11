@@ -18,9 +18,9 @@
 #if YORADIO_OPUS_USE_LX106_ROTATION && !defined(__ASSEMBLER__) && defined(YORADIO_OPUS_BOUNDED) && defined(FIXED_POINT)
 /* Enabled only by the ESP8266 component. Other architectures keep C even
  * when the experiment flag is supplied to a portable host build. */
-#define OVERRIDE_vq_exp_rotation1
-void yoradio_opus_exp_rotation1_lx106(celt_norm *X, int len, int stride,
-                                     opus_val16 c, opus_val16 s);
-#define exp_rotation1 yoradio_opus_exp_rotation1_lx106
+/* Only adjacent coefficients use ASM. vq.c retains its original C loops for
+ * every other stride, including dynamic stride2. No change to the algorithm. */
+void yoradio_opus_exp_rotation1_stride1_lx106(celt_norm *X, int len,
+                                             opus_val16 c, opus_val16 s);
 #endif
 #endif

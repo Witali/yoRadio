@@ -2,7 +2,8 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {run}=require('../tools/esp8266_opus_profile/check_rotation_lx106.cjs');
 const {root,component,execute,hostPath}=require('../tools/esp8266_opus_profile/build_host.cjs');
 test('LX106 rotation instruction model matches sanitized C fallback and preserves ABI',{timeout:180000},()=>{
-  const r=run();assert.equal(r.passed,true);assert.equal(r.cases,512);assert.equal(r.stack_bytes,16);
+  const r=run();assert.equal(r.passed,true);assert.equal(r.cases,1512);assert.equal(r.stack_bytes,0);
+  assert.equal(r.asm_cases,1120);
   assert.equal(r.instruction_model_exact,true);assert.equal(r.c_fallback_asan_ubsan,true);
 });
 test('rotation experiment is default off and a host with the flag keeps C',()=>{
@@ -12,4 +13,7 @@ test('rotation experiment is default off and a host with the flag keeps C',()=>{
   assert.throws(()=>execute('gcc',['-DYORADIO_OPUS_ROTATION_LX106=2',...args]),/must be 0 or 1/);
   assert.match(fs.readFileSync(path.join(component,'CMakeLists.txt'),'utf8'),/option\(YORADIO_OPUS_ROTATION_LX106 [^\n]+ OFF\)/);
   assert.match(fs.readFileSync(path.join(root,'tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'),'utf8'),/OpusRotationLx106.*requires diagnostic Opus/);
+  const source=fs.readFileSync(path.join(component,'upstream/celt/vq.c'),'utf8');
+  assert.match(source,/if \(stride == 1\)\s*\{\s*yoradio_opus_exp_rotation1_stride1_lx106\(X, len, c, s\);\s*return;/);
+  assert.doesNotMatch(fs.readFileSync(header,'utf8'),/#define (?:exp_rotation1|OVERRIDE_vq_exp_rotation1)/);
 });

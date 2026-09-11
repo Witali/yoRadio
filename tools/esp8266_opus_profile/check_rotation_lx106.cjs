@@ -16,7 +16,8 @@ function model(text,vector) {
   }
   const r=new Int32Array(16),initial=new Int32Array(16),memory=Buffer.alloc(65536),base=4096,stack=32768;
   for(let i=0;i<16;i++)r[i]=(0x123456+i*713)|0;
-  r[1]=stack;r[2]=base+8;r[3]=vector.n;r[4]=vector.stride;r[5]=vector.c;r[6]=vector.s;initial.set(r);
+  assert.equal(vector.stride,1,'Specialized assembly requires stride1');
+  r[1]=stack;r[2]=base+8;r[3]=vector.n;r[4]=vector.c;r[5]=vector.s;initial.set(r);
   for(let i=0;i<vector.n+8;i++)memory.writeUInt16LE(0x5aa5,base+i*2);
   vector.samples.forEach((v,i)=>memory.writeInt16LE(v,base+8+i*2));
   const reg=a=>{assert.match(a,/^a(?:[0-9]|1[0-5])$/);return Number(a.slice(1));};
@@ -28,6 +29,9 @@ function model(text,vector) {
     const set=v=>{r[reg(a[0])]=v;};
     switch(op){
       case 'bge':if(val(a[0])>=val(a[1]))pc=labels.get(a[2]);break;
+      case 'blt':if(val(a[0])<val(a[1]))pc=labels.get(a[2]);break;
+      case 'bne':if(val(a[0])!==val(a[1]))pc=labels.get(a[2]);break;
+      case 'mov':set(val(a[1]));break;
       case 'blti':if(val(a[0])<val(a[1]))pc=labels.get(a[2]);break;
       case 'bnez':if(val(a[0])!==0)pc=labels.get(a[1]);break;
       case 'add':case 'addi':case 'addmi':set(val(a[1])+val(a[2]));break;
@@ -56,6 +60,11 @@ function run(output=path.join(__dirname,'rotation-lx106-results.json')) {
     for(const stride of [...new Set([1,2,3,Math.floor(n/2),n])].filter(s=>s>0&&s<=n))
       for(const [c,s] of [[32767,0],[0,32767],[23170,23170],[-32768,-32768],[32767,-32768],[32767,32767],[-1,1],[(random()<<16)>>16,(random()<<16)>>16]])
         vectors.push({n,stride,c,s,samples:Array.from({length:n},(_,i)=>i%7===0?-32768:i%7===1?32767:(random()<<16)>>16)});
+  for(let i=0;i<1000;i++) {
+    const n=1+random()%960;
+    vectors.push({n,stride:1,c:(random()<<16)>>16,s:(random()<<16)>>16,
+      samples:Array.from({length:n},()=>((random()<<16)>>16))});
+  }
   const input=path.join(out,'vectors.bin'),reference=path.join(out,'reference.bin');
   fs.writeFileSync(input,Buffer.concat(vectors.map(v=>{const b=Buffer.alloc(16+v.n*2);[v.n,v.stride,v.c,v.s].forEach((x,i)=>b.writeInt32LE(x,i*4));v.samples.forEach((x,i)=>b.writeInt16LE(x,16+i*2));return b;})));
   const includes=['','upstream/include','upstream/celt','upstream/silk'].map(p=>'-I'+hostPath(path.join(component,p)));
@@ -63,16 +72,24 @@ function run(output=path.join(__dirname,'rotation-lx106-results.json')) {
   execute('gcc',['-O3','-std=c99','-fwrapv','-ffunction-sections','-fdata-sections','-fno-pie','-no-pie','-fsanitize=address,undefined','-fno-sanitize-recover=all',
     '-DYORADIO_OPUS_BOUNDED=1','-DYORADIO_OPUS_ROTATION_LX106=1',...includes,hostPath(path.join(__dirname,'rotation_reference.c')),'-Wl,--gc-sections','-lm','-o',hostPath(binary)]);
   execute('env',['ASAN_OPTIONS=detect_leaks=0',hostPath(binary),hostPath(input),hostPath(reference)]);
-  const actual=Buffer.concat(vectors.map(v=>model(fs.readFileSync(source,'utf8'),v)));
-  assert.deepEqual(actual,fs.readFileSync(reference),'Assembly instruction model differs from original C');
+  const golden=fs.readFileSync(reference),text=fs.readFileSync(source,'utf8');
+  let offset=0,asmCases=0,asmSamples=0;
+  for(const v of vectors) {
+    const expected=golden.subarray(offset,offset+2*(v.n+8));offset+=2*(v.n+8);
+    if(v.stride!==1)continue; // Target dispatch must keep the C fallback.
+    assert.deepEqual(model(text,v),expected,'Assembly instruction model differs from original C');
+    asmCases++;asmSamples+=v.n;
+  }
+  assert.equal(offset,golden.length);
   const cmd=(program,args)=>{const r=spawnSync(program,args,{encoding:'utf8',maxBuffer:4e6});assert.equal(r.status,0,r.stderr);return r.stdout;};
   const sdk=path.join(root,'.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include');
   const object=path.join(out,'rotation.o');cmd(defaultCompiler,['-DYORADIO_OPUS_ROTATION_LX106=1','-I'+component,'-I'+sdk,'-c',source,'-o',object]);
   const asm=cmd(defaultObjdump,['-dr',object]);
   assert.equal((asm.match(/\smul16s\s/g)||[]).length,8);assert.doesNotMatch(asm,/\s(?:mull|call\w*|rsil|memw)\s/);
+  assert.doesNotMatch(asm,/\ba(?:1|12|13|14|15)\b/,'Leaf must not use stack or callee-saved registers');
   const report={passed:true,source_sha256_lf:sha256(Buffer.from(fs.readFileSync(source,'utf8').replace(/\r\n/g,'\n'))),
-    cases:vectors.length,samples:vectors.reduce((n,v)=>n+v.n,0),c_fallback_asan_ubsan:true,instruction_model_exact:true,callee_saved_registers_checked:true,
-    target_assembled:true,mul16s_sites:8,stack_bytes:16,scope:'C fallback execution plus a local instruction-semantics model, not physical assembly execution or speed. Physical golden PCM / A/B remains required.'};
+    cases:vectors.length,samples:vectors.reduce((n,v)=>n+v.n,0),asm_cases:asmCases,asm_samples:asmSamples,c_fallback_asan_ubsan:true,instruction_model_exact:true,callee_saved_registers_checked:true,
+    target_assembled:true,mul16s_sites:8,stack_bytes:0,scope:'All vectors run sanitized C; stride1 vectors additionally run the actual ASM instruction model. Other strides remain C. Not physical execution or speed; board golden PCM / A/B remains required.'};
   fs.writeFileSync(path.join(out,'rotation.asm'),asm);fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');console.log(report);return report;
 }
 module.exports={run,model};if(require.main===module)run();

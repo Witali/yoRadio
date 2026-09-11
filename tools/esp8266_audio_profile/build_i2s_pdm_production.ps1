@@ -231,6 +231,9 @@ try {
         opus_pcm_publish=[bool]$OpusPcmPublish
         opus_mathops_header_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/mathops.h).Hash
         opus_rotation_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_rotation_lx106.S).Hash
+        opus_rotation_header_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_rotation.h).Hash
+        opus_vq_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/vq.c).Hash
+        opus_rotation_implementation='stride1-register-carry-v2'
         opus_celt_bands_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/bands.c).Hash
         opus_profile_stage=$OpusProfileStage
         opus_fir_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/resampler_private_IIR_FIR.c).Hash
