@@ -4,6 +4,22 @@ const {summarize} = require('../tools/esp8266_opus_profile/compare_output_series
 const directory = path.resolve(__dirname, '../firmware/development/esp8266-opus-flash-publish-off');
 const read = name => JSON.parse(fs.readFileSync(path.join(directory, name), 'utf8').replace(/^\uFEFF/, ''));
 
+test('saved flash publication A/B reproduces all twenty attempts and keeps the candidate unqualified', () => {
+  const candidate = path.resolve(directory, '../esp8266-opus-flash-publish-on');
+  const combined = JSON.parse(fs.readFileSync(path.join(candidate, 'comparison.json'), 'utf8'));
+  for (const [dir,key] of [[directory,'reference'],[candidate,'candidate']]) {
+    const reports=Array.from({length:10},(_,i)=>JSON.parse(fs.readFileSync(path.join(dir,`attempt${i+1}.json`),'utf8')));
+    const summary=JSON.parse(JSON.stringify(summarize(reports)));
+    for(const [k,v] of Object.entries(summary)) assert.deepEqual(combined[key][k],v,k);
+    for(const r of reports) assert.equal(r.fixtures.header_sha256,combined[key].manifest.opus_benchmark_header_sha256.toLowerCase());
+  }
+  assert.equal(combined.qualified_candidate,false);
+  assert.deepEqual(combined.candidate.cases.map(c=>c.continuous),[10,0,0,0,0]);
+  assert.deepEqual(combined.candidate.cases.map(c=>c.dma_misses.median),[0,35,53,231.5,829]);
+  assert.deepEqual(combined.candidate.observation_errors.map(e=>e.attempt),[1,2,3,4,10]);
+  assert.equal(combined.target.before.isr_section_sha256,combined.target.after.isr_section_sha256);
+});
+
 test('saved flash-output control retains all ten attempts, exact PCM and failed continuity/RAM gates', () => {
   const manifest = read('manifest.json');
   assert.equal(manifest.opus_pcm_publish, false);

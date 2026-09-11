@@ -25,7 +25,8 @@ observation timeout. See docs/ESP8266_OPUS_PCM_PUBLICATION.md for context.
 All ten attempts completed with matching PCM hashes, packet counts and sample
 counts. All raw reports/logs are retained. A completed measurement does not
 mean continuous output: nine SILK12 windows passed, and every24/64/128/192
-window failed the digital continuity gate. The ON comparison is still running.
+window failed the digital continuity gate. The completed ON comparison is
+saved in ../esp8266-opus-flash-publish-on/comparison.json.
 
 | Corpus | Median pipeline CPU budget | Continuous windows | Median / maximum DMA misses | Lowest observed free DRAM |
 |---|---:|---:|---:|---:|

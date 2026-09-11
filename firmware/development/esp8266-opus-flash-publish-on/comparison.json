@@ -1,0 +1,2522 @@
+{
+  "scope": "Own flash packets -> Opus -> PDM/DMA, Wi-Fi/WebUI enabled; pipeline CPU includes hash/output/charged ISR. Not pure decoder CPU. All attempted runs retained. Sequential A/B.",
+  "reference": {
+    "manifest": {
+      "purpose": "Experimental Opus native radio, I2S PDM32 DMA; not device-qualified; build does not flash",
+      "diagnostic": true,
+      "experimental_opus": true,
+      "opus_input_bytes": 1024,
+      "opus_scratch_bytes": 6144,
+      "opus_benchmark": true,
+      "opus_benchmark_output": true,
+      "opus_benchmark_source_sha256": "6F83425973B52850AAEF861DAC74E72C7702D9378B2BF4DEFE1CDF8C94D56CF8",
+      "opus_benchmark_manifest_sha256": "41D5A368C567984C35492A2ACD96996365391C9DB6AD911BF5CA1883D578DF45",
+      "opus_benchmark_header_sha256": "CD3D55D30806BD143810CB6EC56E34DB69956C7CCB011F46F85AE2AAC5D65D7A",
+      "opus_stream_test": true,
+      "freertos_runtime_stats": true,
+      "opus_word_asm": true,
+      "opus_icdf_flash_word": true,
+      "opus_fir_flash_word": true,
+      "opus_celt_decode_only": false,
+      "opus_rotation_lx106": false,
+      "opus_div_once": false,
+      "opus_pcm_publish": false,
+      "opus_mathops_header_sha256": "47B05BF22F8D7956282FBE431AAC6F20EBF0CBEF65E81150FC439DA8E49BEE08",
+      "opus_rotation_source_sha256": "34DCBBCB64FD36F389A76FB45438B6EEAAD00E9D1857F1CE66DAC362F22D34C7",
+      "opus_celt_bands_sha256": "BD3B69FD2B17A218947E66A0EFF1980E6DCD2A2BFD0F3CD4B75BC4BC15AD73C2",
+      "opus_profile_stage": 0,
+      "opus_fir_source_sha256": "EFC60B0D80939C6AE9B7970ADF1756B5930A9315DAF692EADD87C94CF07AC582",
+      "opus_fir_table_sha256": "B2C427C2A738B8C8292927B0DAE28B11E60274A568079FCDF7AF311A987DD194",
+      "opus_fir_helper_sha256": "2021EEF3CDB6CB9DF9C36639E7D8E572879DC94B689DA315909A56ABC79C53B8",
+      "pdm32_iram": true,
+      "pdm32_batch": true,
+      "pdm32_loan_words": 512,
+      "sdk_rx_diag": true,
+      "sdk_rx_diag_manifest_sha256": "9041939AD205D62C14AC0BEDB0097EEB231B169182A81262F4CD5D074383F74E",
+      "opus_max_packet_ms": 120,
+      "opus_max_coded_frame_ms": 20,
+      "opus_block_output": true,
+      "opus_adapter_sha256": "4B5C924CA6132E2773422BC4287FC92A26D2F00AF8E942572723784AAE2A2681",
+      "opus_decoder_sha256": "CE8395608CBCD15C4130E529348B3E5657E79E2ED18DE51EF2B0DD57A8A3AA98",
+      "tone_test": false,
+      "web_profile": false,
+      "memory_profile": false,
+      "spiffs_log": false,
+      "spiffs_log_http": false,
+      "spiffs_cache": false,
+      "spiffs_write_cache": false,
+      "audio_level_led": true,
+      "audio_level_led_update_hz": 10,
+      "audio_level_led_max_brightness": 32,
+      "audio_gain_led_source_sha256": "02D12212EB065F96BA051E32AE0045695AF8FE35C1F42BDF1C568BF156299AA0",
+      "audio_level_led_source_sha256": "C8E031445DE956BE2387876169EC3DFCBF2B6006F472914C17861DA4A89FDCA0",
+      "spiffs_log_source_sha256": "F937811F2CA775F1DC1430B6AA86E5BAFED477377043210FC6C992E7879D8444",
+      "web_audio_pause": "off",
+      "log_level": "error",
+      "playlist_web_gzip": true,
+      "built_utc": "2026-09-11T14:56:43.3839013Z",
+      "source_revision": "eee18c2a2c2fb1cd949108f16f05b061c4e40be8",
+      "app_sha256": "6F47FD8B68AB0A9BC5260A4F620FD0060009B98525637B5203E13277EFE495A2",
+      "bytes": 903664,
+      "app_address": "0x10000",
+      "config_sha256": "0ED337FF979A89A382D3FABCB0CED36BB243C006148CFBF159D0AD423396A4B5",
+      "output_source_sha256": "EB06D375E07A2FBC4CBBF9F6775F9612699BD79C196A392FD8962F11748BBFBA",
+      "web_source_sha256": "8A192E23D1AE01026AEE9A457CB7518B0B83B717743702A41130B26CB002B73D",
+      "playlist_source_sha256": "0FEF5C783B9F4902C2861A6FCCAC21C96A6427306CA897E9C6B0AA0CA8C3C5E5",
+      "audio_source_sha256": "22F20CDF729D0C6B95FEA8F94D5491FAF6EE68A6F7813DB5DB7CB33AB7312B25",
+      "web_audio_pause_source_sha256": "600848A39225EF069584F65E30D2E9A44F27EC2C93F33FCC7B4C3D4DC9B75D67",
+      "stream_wait_source_sha256": "7483F7C3D279E199BF3906E60DCA43686F27C8DA33727AE68425639C83814D3B",
+      "http_receive_source_sha256": "59F110E9094361CCCAC94D5D1AFEFFE187C7B5891B27D1CD0DE01E0A6B88277B",
+      "stream_read_wait_ms": 0,
+      "stream_idle_timeout_ms": 1000,
+      "stream_input_bytes": 4096,
+      "stream_prefill_ms": 1000,
+      "codec_bridge_sha256": "8E7BD50B654A1581D9BA55041386D539144D913387678071AAF3BF8A2F248416",
+      "stream_input_sha256": "2C37EA39655D103A40C1599C030D47BCED8FA5FED785C0DC5A3C00BB980F5F8E",
+      "stream_refill_sha256": "1AFE17CC42A3A46916CF460F73DDBC077BA58016E2E5D0DAB156A2D4445EBD23",
+      "network_benchmark": false,
+      "cpu_mhz": 160,
+      "flash": "QIO40",
+      "output": "I2S PDM32 SLC-DMA",
+      "data_gpio": 3,
+      "dma_buffers": 2,
+      "dma_words_per_buffer": 512,
+      "pcm_rate": 48000,
+      "nominal_bit_rate_hz": 1536000,
+      "bit_rate_hz": 1538461,
+      "i2s": true,
+      "partition_layout": "app0/app1 960 KiB, SPIFFS 256 KiB; flash app only"
+    },
+    "inputs": [
+      {
+        "file": "attempt1.json",
+        "sha256_lf": "5aca8871bf41f0eccdff91503ce10c5cecb1ddb364e2ef22016ad8747c3fb44a"
+      },
+      {
+        "file": "attempt2.json",
+        "sha256_lf": "906457f8eb6589dd2c5de31e4961735252cad2b7879240f224a3ba28c2ca4404"
+      },
+      {
+        "file": "attempt3.json",
+        "sha256_lf": "b6c849e8a6a8d164df3fa7c92f7b71b542e7d422b022e7ab649f9b6163b74a68"
+      },
+      {
+        "file": "attempt4.json",
+        "sha256_lf": "7884551ae39e87a00b62825f9b1f6b1c06c4144083470dab96d9dd81711b3836"
+      },
+      {
+        "file": "attempt5.json",
+        "sha256_lf": "27c243c2d2bb2c261a5087eaf51fc9e26bfc565440d48f1653a031e2e134712b"
+      },
+      {
+        "file": "attempt6.json",
+        "sha256_lf": "a93c15dba2a7c6c242fc93aa3092e60ad147969e02020b7f2c3d99f8650344f3"
+      },
+      {
+        "file": "attempt7.json",
+        "sha256_lf": "4ce80d53de8b57be31df8704b1ce65e6fe95b1df026b84b0286fc6d5b93e95b5"
+      },
+      {
+        "file": "attempt8.json",
+        "sha256_lf": "0428423c1324b928c8eaa4456ae101fd06df8f1c10c8306ac1c92edce1f52928"
+      },
+      {
+        "file": "attempt9.json",
+        "sha256_lf": "db6bce6e2665b32ddfd86c70460f6a2166d3c7c3f8d52b2c51f164c1ad7d8ab1"
+      },
+      {
+        "file": "attempt10.json",
+        "sha256_lf": "4450f2951baf650810e5f815bbdc5ac772911ed34339681797db9b674b181c0f"
+      }
+    ],
+    "attempted": [
+      {
+        "attempt": 1,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 364,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029858889915277,
+            "pipeline_cpu_budget_percent": 36.88729583333333,
+            "pipeline_cpu_elapsed_percent": 36.99743720388931,
+            "decode_wall_budget_percent": 24.268479166666665,
+            "output_wall_budget_percent": 71.23073333333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0007105044581652,
+            "pipeline_cpu_budget_percent": 68.33029583333334,
+            "pipeline_cpu_elapsed_percent": 68.37884481315066,
+            "decode_wall_budget_percent": 56.55761666666667,
+            "output_wall_budget_percent": 39.091679166666665,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0001649438686597,
+            "pipeline_cpu_budget_percent": 79.24623333333334,
+            "pipeline_cpu_elapsed_percent": 79.25930451363604,
+            "decode_wall_budget_percent": 67.560525,
+            "output_wall_budget_percent": 28.1135625,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.8876721862123206,
+            "pipeline_cpu_budget_percent": 92.8931875,
+            "pipeline_cpu_elapsed_percent": 82.458698832356,
+            "decode_wall_budget_percent": 90.66031666666667,
+            "output_wall_budget_percent": 17.481204166666668,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.8918320005523412,
+            "pipeline_cpu_budget_percent": 100.8435875,
+            "pipeline_cpu_elapsed_percent": 89.93553838300008,
+            "decode_wall_budget_percent": 94.16126666666666,
+            "output_wall_budget_percent": 13.591316666666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 2,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 1732,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029389035111345,
+            "pipeline_cpu_budget_percent": 36.854616666666665,
+            "pipeline_cpu_elapsed_percent": 36.962928828989845,
+            "decode_wall_budget_percent": 24.212945833333333,
+            "output_wall_budget_percent": 71.22045833333334,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0013429260316742,
+            "pipeline_cpu_budget_percent": 68.34383333333334,
+            "pipeline_cpu_elapsed_percent": 68.43561404622108,
+            "decode_wall_budget_percent": 56.49678333333333,
+            "output_wall_budget_percent": 39.1139625,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0005550579183802,
+            "pipeline_cpu_budget_percent": 79.23885416666667,
+            "pipeline_cpu_elapsed_percent": 79.28283632011525,
+            "decode_wall_budget_percent": 67.51214583333334,
+            "output_wall_budget_percent": 28.056383333333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9928147514401399,
+            "pipeline_cpu_budget_percent": 89.73582083333334,
+            "pipeline_cpu_elapsed_percent": 89.09104665592275,
+            "decode_wall_budget_percent": 78.25719583333333,
+            "output_wall_budget_percent": 18.067854166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9470497761864887,
+            "pipeline_cpu_budget_percent": 99.19244166666667,
+            "pipeline_cpu_elapsed_percent": 93.940179679808,
+            "decode_wall_budget_percent": 87.95961666666666,
+            "output_wall_budget_percent": 13.246383333333334,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 3,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 7984,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029539082084047,
+            "pipeline_cpu_budget_percent": 36.8552375,
+            "pipeline_cpu_elapsed_percent": 36.96410448857395,
+            "decode_wall_budget_percent": 24.2290625,
+            "output_wall_budget_percent": 71.25785,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0007320354839566,
+            "pipeline_cpu_budget_percent": 68.32508333333334,
+            "pipeline_cpu_elapsed_percent": 68.37509971877762,
+            "decode_wall_budget_percent": 56.46929166666666,
+            "output_wall_budget_percent": 39.132079166666664,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0001290999979915,
+            "pipeline_cpu_budget_percent": 79.1753875,
+            "pipeline_cpu_elapsed_percent": 79.18560904236722,
+            "decode_wall_budget_percent": 67.378475,
+            "output_wall_budget_percent": 28.296525,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9931099685564833,
+            "pipeline_cpu_budget_percent": 89.70073333333333,
+            "pipeline_cpu_elapsed_percent": 89.08269246016015,
+            "decode_wall_budget_percent": 78.11660416666666,
+            "output_wall_budget_percent": 18.086695833333334,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9492209881778085,
+            "pipeline_cpu_budget_percent": 99.11916666666667,
+            "pipeline_cpu_elapsed_percent": 94.08599333069424,
+            "decode_wall_budget_percent": 87.73910416666666,
+            "output_wall_budget_percent": 13.143475,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 4,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 6516,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029369336540503,
+            "pipeline_cpu_budget_percent": 36.86504166666667,
+            "pipeline_cpu_elapsed_percent": 36.973311848195465,
+            "decode_wall_budget_percent": 24.248908333333333,
+            "output_wall_budget_percent": 71.2199125,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0004888221636954,
+            "pipeline_cpu_budget_percent": 68.34127083333334,
+            "pipeline_cpu_elapsed_percent": 68.37467756121178,
+            "decode_wall_budget_percent": 56.535266666666665,
+            "output_wall_budget_percent": 39.04669166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0000090000810007,
+            "pipeline_cpu_budget_percent": 79.25041666666667,
+            "pipeline_cpu_elapsed_percent": 79.25112992683601,
+            "decode_wall_budget_percent": 67.59462083333334,
+            "output_wall_budget_percent": 28.101725,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9935640645761996,
+            "pipeline_cpu_budget_percent": 89.72992916666666,
+            "pipeline_cpu_elapsed_percent": 89.15243313696782,
+            "decode_wall_budget_percent": 78.13774166666667,
+            "output_wall_budget_percent": 18.062370833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9493719331083612,
+            "pipeline_cpu_budget_percent": 99.1202,
+            "pipeline_cpu_elapsed_percent": 94.10193588408738,
+            "decode_wall_budget_percent": 87.66285833333333,
+            "output_wall_budget_percent": 13.3561125,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 5,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 4460,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029634645066066,
+            "pipeline_cpu_budget_percent": 36.8576375,
+            "pipeline_cpu_elapsed_percent": 36.96686380052862,
+            "decode_wall_budget_percent": 24.244070833333332,
+            "output_wall_budget_percent": 71.2114625,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0013093788978054,
+            "pipeline_cpu_budget_percent": 68.34024583333333,
+            "pipeline_cpu_elapsed_percent": 68.42972910909833,
+            "decode_wall_budget_percent": 56.447154166666664,
+            "output_wall_budget_percent": 39.1613125,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0003119306036932,
+            "pipeline_cpu_budget_percent": 79.18898333333334,
+            "pipeline_cpu_elapsed_percent": 79.21368480071035,
+            "decode_wall_budget_percent": 67.4156125,
+            "output_wall_budget_percent": 28.295783333333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9938489034947868,
+            "pipeline_cpu_budget_percent": 89.7342375,
+            "pipeline_cpu_elapsed_percent": 89.18227354531578,
+            "decode_wall_budget_percent": 78.2593625,
+            "output_wall_budget_percent": 17.889879166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9488980447006891,
+            "pipeline_cpu_budget_percent": 99.17205,
+            "pipeline_cpu_elapsed_percent": 94.10416433395898,
+            "decode_wall_budget_percent": 87.76477916666667,
+            "output_wall_budget_percent": 13.22155,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 6,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 0,
+        "total_cases": 5,
+        "min_dram": 3644,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0029322814691002,
+            "pipeline_cpu_budget_percent": 36.90444166666666,
+            "pipeline_cpu_elapsed_percent": 37.01265587709332,
+            "decode_wall_budget_percent": 24.3518125,
+            "output_wall_budget_percent": 71.10329166666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0005704919421556,
+            "pipeline_cpu_budget_percent": 68.36084583333333,
+            "pipeline_cpu_elapsed_percent": 68.3998451450402,
+            "decode_wall_budget_percent": 56.59702083333333,
+            "output_wall_budget_percent": 39.06225833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0003196438061812,
+            "pipeline_cpu_budget_percent": 79.24030833333333,
+            "pipeline_cpu_elapsed_percent": 79.26563700709197,
+            "decode_wall_budget_percent": 67.5581625,
+            "output_wall_budget_percent": 28.108558333333335,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9930481252223755,
+            "pipeline_cpu_budget_percent": 89.73493333333333,
+            "pipeline_cpu_elapsed_percent": 89.11110731362152,
+            "decode_wall_budget_percent": 78.26200833333333,
+            "output_wall_budget_percent": 18.0177375,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9476850975096889,
+            "pipeline_cpu_budget_percent": 99.16396666666667,
+            "pipeline_cpu_elapsed_percent": 93.97621341994754,
+            "decode_wall_budget_percent": 87.7948875,
+            "output_wall_budget_percent": 13.183195833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 7,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 7152,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029688714402023,
+            "pipeline_cpu_budget_percent": 36.855470833333335,
+            "pipeline_cpu_elapsed_percent": 36.964889988105625,
+            "decode_wall_budget_percent": 24.213629166666667,
+            "output_wall_budget_percent": 71.26434166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.000360755097307,
+            "pipeline_cpu_budget_percent": 68.32919583333333,
+            "pipeline_cpu_elapsed_percent": 68.35384593902509,
+            "decode_wall_budget_percent": 56.485366666666664,
+            "output_wall_budget_percent": 39.147445833333336,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0002503126407383,
+            "pipeline_cpu_budget_percent": 79.19687083333334,
+            "pipeline_cpu_elapsed_percent": 79.21669481120983,
+            "decode_wall_budget_percent": 67.40814583333334,
+            "output_wall_budget_percent": 28.251566666666665,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9943929496214015,
+            "pipeline_cpu_budget_percent": 89.71557083333333,
+            "pipeline_cpu_elapsed_percent": 89.21253110792611,
+            "decode_wall_budget_percent": 78.09894583333333,
+            "output_wall_budget_percent": 18.0277625,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9491462093690776,
+            "pipeline_cpu_budget_percent": 99.12820833333333,
+            "pipeline_cpu_elapsed_percent": 94.08716318113154,
+            "decode_wall_budget_percent": 87.7525875,
+            "output_wall_budget_percent": 13.222216666666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 8,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 5684,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029303535492473,
+            "pipeline_cpu_budget_percent": 36.8977375,
+            "pipeline_cpu_elapsed_percent": 37.005860916042316,
+            "decode_wall_budget_percent": 24.3757375,
+            "output_wall_budget_percent": 71.11460416666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0013866284092467,
+            "pipeline_cpu_budget_percent": 68.34072083333334,
+            "pipeline_cpu_elapsed_percent": 68.43548401834924,
+            "decode_wall_budget_percent": 56.465579166666664,
+            "output_wall_budget_percent": 39.1052125,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0004090422471488,
+            "pipeline_cpu_budget_percent": 79.19220416666667,
+            "pipeline_cpu_elapsed_percent": 79.22459712381567,
+            "decode_wall_budget_percent": 67.41214166666667,
+            "output_wall_budget_percent": 28.285833333333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9938206303663467,
+            "pipeline_cpu_budget_percent": 89.71579166666666,
+            "pipeline_cpu_elapsed_percent": 89.1614046279825,
+            "decode_wall_budget_percent": 78.0823125,
+            "output_wall_budget_percent": 18.105029166666668,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9515611371488635,
+            "pipeline_cpu_budget_percent": 99.08793333333334,
+            "pipeline_cpu_elapsed_percent": 94.28822652039744,
+            "decode_wall_budget_percent": 87.42750416666667,
+            "output_wall_budget_percent": 13.2205,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 9,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 8660,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029851345065752,
+            "pipeline_cpu_budget_percent": 36.8584,
+            "pipeline_cpu_elapsed_percent": 36.96842728169715,
+            "decode_wall_budget_percent": 24.2513,
+            "output_wall_budget_percent": 71.2087625,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0006402429821348,
+            "pipeline_cpu_budget_percent": 68.31307916666667,
+            "pipeline_cpu_elapsed_percent": 68.35681613619114,
+            "decode_wall_budget_percent": 56.356095833333335,
+            "output_wall_budget_percent": 39.310341666666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.000242600507398,
+            "pipeline_cpu_budget_percent": 79.205075,
+            "pipeline_cpu_elapsed_percent": 79.2242901913835,
+            "decode_wall_budget_percent": 67.41394166666667,
+            "output_wall_budget_percent": 28.263829166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9943077538272977,
+            "pipeline_cpu_budget_percent": 89.74109166666666,
+            "pipeline_cpu_elapsed_percent": 89.23026328109296,
+            "decode_wall_budget_percent": 78.1462625,
+            "output_wall_budget_percent": 17.975558333333332,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.949310197589029,
+            "pipeline_cpu_budget_percent": 99.11969583333334,
+            "pipeline_cpu_elapsed_percent": 94.09533803650612,
+            "decode_wall_budget_percent": 87.72522916666667,
+            "output_wall_budget_percent": 13.181820833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 10,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 8180,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029705480206,
+            "pipeline_cpu_budget_percent": 36.87858333333333,
+            "pipeline_cpu_elapsed_percent": 36.9881329360567,
+            "decode_wall_budget_percent": 24.293833333333332,
+            "output_wall_budget_percent": 71.1782,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0007433020876255,
+            "pipeline_cpu_budget_percent": 68.33605833333333,
+            "pipeline_cpu_elapsed_percent": 68.3868526681526,
+            "decode_wall_budget_percent": 56.52738333333333,
+            "output_wall_budget_percent": 39.097625,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0001077616113137,
+            "pipeline_cpu_budget_percent": 79.21132083333333,
+            "pipeline_cpu_elapsed_percent": 79.21985677290061,
+            "decode_wall_budget_percent": 67.49265,
+            "output_wall_budget_percent": 28.225195833333334,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.994472555789496,
+            "pipeline_cpu_budget_percent": 89.73135833333333,
+            "pipeline_cpu_elapsed_percent": 89.2353732562131,
+            "decode_wall_budget_percent": 78.1595375,
+            "output_wall_budget_percent": 17.989604166666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9477865570456735,
+            "pipeline_cpu_budget_percent": 99.16120833333333,
+            "pipeline_cpu_elapsed_percent": 93.98366023873875,
+            "decode_wall_budget_percent": 87.85022083333334,
+            "output_wall_budget_percent": 13.232495833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      }
+    ],
+    "completed": 10,
+    "cases": [
+      {
+        "name": "mono-12",
+        "completed": 10,
+        "continuous": 9,
+        "low_ram_attempts": [],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 36.854616666666665,
+          "median": 36.86172083333334,
+          "mean": 36.871446250000005,
+          "p95": 36.90444166666666,
+          "max": 36.90444166666666
+        },
+        "decode_wall_budget_percent": {
+          "min": 24.212945833333333,
+          "median": 24.250104166666667,
+          "mean": 24.26897791666667,
+          "p95": 24.3757375,
+          "max": 24.3757375
+        },
+        "dma_misses": {
+          "min": 0,
+          "median": 0,
+          "mean": 0.1,
+          "p95": 1,
+          "max": 1
+        },
+        "pcm_elapsed_ratio": {
+          "min": 1.0029303535492473,
+          "median": 1.0029586863575055,
+          "mean": 1.002956628785745,
+          "p95": 1.0029858889915277,
+          "max": 1.0029858889915277
+        },
+        "min_dram": {
+          "min": 7152,
+          "median": 8660,
+          "mean": 8484,
+          "p95": 9344,
+          "max": 9344
+        },
+        "max_decode_call_us": {
+          "min": 6839,
+          "median": 7541,
+          "mean": 7389.5,
+          "p95": 8071,
+          "max": 8071
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1556,
+          "p95": 1628,
+          "max": 1628
+        }
+      },
+      {
+        "name": "mono-24",
+        "completed": 10,
+        "continuous": 0,
+        "low_ram_attempts": [
+          2
+        ],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 68.31307916666667,
+          "median": 68.33815208333333,
+          "mean": 68.33606291666668,
+          "p95": 68.36084583333333,
+          "max": 68.36084583333333
+        },
+        "decode_wall_budget_percent": {
+          "min": 56.356095833333335,
+          "median": 56.491074999999995,
+          "mean": 56.49375583333333,
+          "p95": 56.59702083333333,
+          "max": 56.59702083333333
+        },
+        "dma_misses": {
+          "min": 28,
+          "median": 40,
+          "mean": 38.3,
+          "p95": 47,
+          "max": 47
+        },
+        "pcm_elapsed_ratio": {
+          "min": 1.000360755097307,
+          "median": 1.000721269971061,
+          "mean": 1.0008285087553765,
+          "p95": 1.0013866284092467,
+          "max": 1.0013866284092467
+        },
+        "min_dram": {
+          "min": 3244,
+          "median": 9206,
+          "mean": 8138,
+          "p95": 10232,
+          "max": 10232
+        },
+        "max_decode_call_us": {
+          "min": 34773,
+          "median": 42646,
+          "mean": 46588.7,
+          "p95": 63888,
+          "max": 63888
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1548,
+          "p95": 1548,
+          "max": 1548
+        }
+      },
+      {
+        "name": "stereo-64",
+        "completed": 10,
+        "continuous": 0,
+        "low_ram_attempts": [
+          2,
+          6
+        ],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 79.1753875,
+          "median": 79.20819791666666,
+          "mean": 79.21456541666666,
+          "p95": 79.25041666666667,
+          "max": 79.25041666666667
+        },
+        "decode_wall_budget_percent": {
+          "min": 67.378475,
+          "median": 67.45413124999999,
+          "mean": 67.47464208333334,
+          "p95": 67.59462083333334,
+          "max": 67.59462083333334
+        },
+        "dma_misses": {
+          "min": 43,
+          "median": 49,
+          "mean": 48.9,
+          "p95": 53,
+          "max": 53
+        },
+        "pcm_elapsed_ratio": {
+          "min": 1.0000090000810007,
+          "median": 1.000246456574068,
+          "mean": 1.0002499393282505,
+          "p95": 1.0005550579183802,
+          "max": 1.0005550579183802
+        },
+        "min_dram": {
+          "min": 1732,
+          "median": 8522,
+          "mean": 7394.8,
+          "p95": 9548,
+          "max": 9548
+        },
+        "max_decode_call_us": {
+          "min": 45736,
+          "median": 58654,
+          "mean": 58666.4,
+          "p95": 69028,
+          "max": 69028
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1548,
+          "p95": 1548,
+          "max": 1548
+        }
+      },
+      {
+        "name": "stereo-128",
+        "completed": 10,
+        "continuous": 0,
+        "low_ram_attempts": [
+          1
+        ],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 89.70073333333333,
+          "median": 89.73279791666667,
+          "mean": 90.04326541666667,
+          "p95": 92.8931875,
+          "max": 92.8931875
+        },
+        "decode_wall_budget_percent": {
+          "min": 78.0823125,
+          "median": 78.1529,
+          "mean": 79.41802874999999,
+          "p95": 90.66031666666667,
+          "max": 90.66031666666667
+        },
+        "dma_misses": {
+          "min": 154,
+          "median": 168.5,
+          "mean": 384.8,
+          "p95": 2337,
+          "max": 2337
+        },
+        "pcm_elapsed_ratio": {
+          "min": 0.8876721862123206,
+          "median": 0.9936923474712731,
+          "mean": 0.9831051889106849,
+          "p95": 0.994472555789496,
+          "max": 0.994472555789496
+        },
+        "min_dram": {
+          "min": 364,
+          "median": 8522,
+          "mean": 7519.2,
+          "p95": 10128,
+          "max": 10128
+        },
+        "max_decode_call_us": {
+          "min": 52577,
+          "median": 69942,
+          "mean": 69828.7,
+          "p95": 81092,
+          "max": 81092
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1548,
+          "p95": 1548,
+          "max": 1548
+        }
+      },
+      {
+        "name": "stereo-192",
+        "completed": 10,
+        "continuous": 0,
+        "low_ram_attempts": [
+          1
+        ],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 99.08793333333334,
+          "median": 99.14470833333334,
+          "mean": 99.31084583333333,
+          "p95": 100.8435875,
+          "max": 100.8435875
+        },
+        "decode_wall_budget_percent": {
+          "min": 87.42750416666667,
+          "median": 87.75868333333334,
+          "mean": 88.38380541666666,
+          "p95": 94.16126666666666,
+          "max": 94.16126666666666
+        },
+        "dma_misses": {
+          "min": 972,
+          "median": 1023.5,
+          "mean": 1147.5,
+          "p95": 2243,
+          "max": 2243
+        },
+        "pcm_elapsed_ratio": {
+          "min": 0.8918320005523412,
+          "median": 0.9490221270348833,
+          "mean": 0.943186194138802,
+          "p95": 0.9515611371488635,
+          "max": 0.9515611371488635
+        },
+        "min_dram": {
+          "min": 500,
+          "median": 8864,
+          "mean": 8035.6,
+          "p95": 10336,
+          "max": 10336
+        },
+        "max_decode_call_us": {
+          "min": 22064,
+          "median": 72499.5,
+          "mean": 63547.6,
+          "p95": 87435,
+          "max": 87435
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1548,
+          "p95": 1548,
+          "max": 1548
+        }
+      }
+    ],
+    "observation_errors": [
+      {
+        "attempt": 1,
+        "error": "request timeout"
+      },
+      {
+        "attempt": 8,
+        "error": "read ECONNRESET"
+      }
+    ],
+    "device_failures": [],
+    "global_min_heap": {
+      "min": 192,
+      "median": 192,
+      "mean": 192,
+      "p95": 192,
+      "max": 192
+    },
+    "all_observed_gates_pass": false
+  },
+  "candidate": {
+    "manifest": {
+      "purpose": "Experimental Opus native radio, I2S PDM32 DMA; not device-qualified; build does not flash",
+      "diagnostic": true,
+      "experimental_opus": true,
+      "opus_input_bytes": 1024,
+      "opus_scratch_bytes": 6144,
+      "opus_benchmark": true,
+      "opus_benchmark_output": true,
+      "opus_benchmark_source_sha256": "6F83425973B52850AAEF861DAC74E72C7702D9378B2BF4DEFE1CDF8C94D56CF8",
+      "opus_benchmark_manifest_sha256": "41D5A368C567984C35492A2ACD96996365391C9DB6AD911BF5CA1883D578DF45",
+      "opus_benchmark_header_sha256": "CD3D55D30806BD143810CB6EC56E34DB69956C7CCB011F46F85AE2AAC5D65D7A",
+      "opus_stream_test": true,
+      "freertos_runtime_stats": true,
+      "opus_word_asm": true,
+      "opus_icdf_flash_word": true,
+      "opus_fir_flash_word": true,
+      "opus_celt_decode_only": false,
+      "opus_rotation_lx106": false,
+      "opus_div_once": false,
+      "opus_pcm_publish": true,
+      "opus_mathops_header_sha256": "47B05BF22F8D7956282FBE431AAC6F20EBF0CBEF65E81150FC439DA8E49BEE08",
+      "opus_rotation_source_sha256": "34DCBBCB64FD36F389A76FB45438B6EEAAD00E9D1857F1CE66DAC362F22D34C7",
+      "opus_celt_bands_sha256": "BD3B69FD2B17A218947E66A0EFF1980E6DCD2A2BFD0F3CD4B75BC4BC15AD73C2",
+      "opus_profile_stage": 0,
+      "opus_fir_source_sha256": "EFC60B0D80939C6AE9B7970ADF1756B5930A9315DAF692EADD87C94CF07AC582",
+      "opus_fir_table_sha256": "B2C427C2A738B8C8292927B0DAE28B11E60274A568079FCDF7AF311A987DD194",
+      "opus_fir_helper_sha256": "2021EEF3CDB6CB9DF9C36639E7D8E572879DC94B689DA315909A56ABC79C53B8",
+      "pdm32_iram": true,
+      "pdm32_batch": true,
+      "pdm32_loan_words": 512,
+      "sdk_rx_diag": true,
+      "sdk_rx_diag_manifest_sha256": "9041939AD205D62C14AC0BEDB0097EEB231B169182A81262F4CD5D074383F74E",
+      "opus_max_packet_ms": 120,
+      "opus_max_coded_frame_ms": 20,
+      "opus_block_output": true,
+      "opus_adapter_sha256": "4B5C924CA6132E2773422BC4287FC92A26D2F00AF8E942572723784AAE2A2681",
+      "opus_decoder_sha256": "CE8395608CBCD15C4130E529348B3E5657E79E2ED18DE51EF2B0DD57A8A3AA98",
+      "tone_test": false,
+      "web_profile": false,
+      "memory_profile": false,
+      "spiffs_log": false,
+      "spiffs_log_http": false,
+      "spiffs_cache": false,
+      "spiffs_write_cache": false,
+      "audio_level_led": true,
+      "audio_level_led_update_hz": 10,
+      "audio_level_led_max_brightness": 32,
+      "audio_gain_led_source_sha256": "02D12212EB065F96BA051E32AE0045695AF8FE35C1F42BDF1C568BF156299AA0",
+      "audio_level_led_source_sha256": "C8E031445DE956BE2387876169EC3DFCBF2B6006F472914C17861DA4A89FDCA0",
+      "spiffs_log_source_sha256": "F937811F2CA775F1DC1430B6AA86E5BAFED477377043210FC6C992E7879D8444",
+      "web_audio_pause": "off",
+      "log_level": "error",
+      "playlist_web_gzip": true,
+      "built_utc": "2026-09-11T14:57:21.3418956Z",
+      "source_revision": "eee18c2a2c2fb1cd949108f16f05b061c4e40be8",
+      "app_sha256": "07FEA5D4E3495CAE087234CAC50111F5F844085EB519FFB5D8BC975A238748A1",
+      "bytes": 903808,
+      "app_address": "0x10000",
+      "config_sha256": "0ED337FF979A89A382D3FABCB0CED36BB243C006148CFBF159D0AD423396A4B5",
+      "output_source_sha256": "EB06D375E07A2FBC4CBBF9F6775F9612699BD79C196A392FD8962F11748BBFBA",
+      "web_source_sha256": "8A192E23D1AE01026AEE9A457CB7518B0B83B717743702A41130B26CB002B73D",
+      "playlist_source_sha256": "0FEF5C783B9F4902C2861A6FCCAC21C96A6427306CA897E9C6B0AA0CA8C3C5E5",
+      "audio_source_sha256": "22F20CDF729D0C6B95FEA8F94D5491FAF6EE68A6F7813DB5DB7CB33AB7312B25",
+      "web_audio_pause_source_sha256": "600848A39225EF069584F65E30D2E9A44F27EC2C93F33FCC7B4C3D4DC9B75D67",
+      "stream_wait_source_sha256": "7483F7C3D279E199BF3906E60DCA43686F27C8DA33727AE68425639C83814D3B",
+      "http_receive_source_sha256": "59F110E9094361CCCAC94D5D1AFEFFE187C7B5891B27D1CD0DE01E0A6B88277B",
+      "stream_read_wait_ms": 0,
+      "stream_idle_timeout_ms": 1000,
+      "stream_input_bytes": 4096,
+      "stream_prefill_ms": 1000,
+      "codec_bridge_sha256": "8E7BD50B654A1581D9BA55041386D539144D913387678071AAF3BF8A2F248416",
+      "stream_input_sha256": "2C37EA39655D103A40C1599C030D47BCED8FA5FED785C0DC5A3C00BB980F5F8E",
+      "stream_refill_sha256": "1AFE17CC42A3A46916CF460F73DDBC077BA58016E2E5D0DAB156A2D4445EBD23",
+      "network_benchmark": false,
+      "cpu_mhz": 160,
+      "flash": "QIO40",
+      "output": "I2S PDM32 SLC-DMA",
+      "data_gpio": 3,
+      "dma_buffers": 2,
+      "dma_words_per_buffer": 512,
+      "pcm_rate": 48000,
+      "nominal_bit_rate_hz": 1536000,
+      "bit_rate_hz": 1538461,
+      "i2s": true,
+      "partition_layout": "app0/app1 960 KiB, SPIFFS 256 KiB; flash app only"
+    },
+    "inputs": [
+      {
+        "file": "attempt1.json",
+        "sha256_lf": "30cddca0e718b2322ab5463af16805c437795a22d172f9a48bad066d5251d922"
+      },
+      {
+        "file": "attempt2.json",
+        "sha256_lf": "8b1715bc145ab8b17f766e35a4cef8904962ce622889f5174b54ea50a88aae47"
+      },
+      {
+        "file": "attempt3.json",
+        "sha256_lf": "7470cb33dc0959d5b5048277830b5b6813ae24ba5e062ebdc446eb08b53c2092"
+      },
+      {
+        "file": "attempt4.json",
+        "sha256_lf": "8e1d62b56fb12cc71caf6d3bfecf0ca11181f14f6a6536a6d911313fbd85dcda"
+      },
+      {
+        "file": "attempt5.json",
+        "sha256_lf": "60fbb581a0832e1a91cbb27e61138d86191e45c39ad5b059c1f1d1e374d4b75d"
+      },
+      {
+        "file": "attempt6.json",
+        "sha256_lf": "9f1962c54d0f8c0647c2fed77d8d400d00a34a61a531b85ef9933096d3c1cfef"
+      },
+      {
+        "file": "attempt7.json",
+        "sha256_lf": "4bd526e6a3fdf84990d48f14089b7fd56a503cc9bc01dd9f409e0036be2b9d3d"
+      },
+      {
+        "file": "attempt8.json",
+        "sha256_lf": "95430948308482986a2b0afcd76aedb73865b1c05b42a7c50831f3e0fa12f5ae"
+      },
+      {
+        "file": "attempt9.json",
+        "sha256_lf": "361800cdfe6d31c6196ef5eec9324a53fdd128654cbd255880af5234cee62230"
+      },
+      {
+        "file": "attempt10.json",
+        "sha256_lf": "ab4b9e3e6c4e5dcb0fb34314e6a628e0393f5443645af5b61a399465073bf8ef"
+      }
+    ],
+    "attempted": [
+      {
+        "attempt": 1,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 4608,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.002970212704072,
+            "pipeline_cpu_budget_percent": 36.780995833333336,
+            "pipeline_cpu_elapsed_percent": 36.89024321442592,
+            "decode_wall_budget_percent": 24.247720833333332,
+            "output_wall_budget_percent": 71.22585416666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0011770087208776,
+            "pipeline_cpu_budget_percent": 68.31405,
+            "pipeline_cpu_elapsed_percent": 68.39445623260846,
+            "decode_wall_budget_percent": 56.26099583333333,
+            "output_wall_budget_percent": 39.319691666666664,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0011742104865322,
+            "pipeline_cpu_budget_percent": 78.75282916666667,
+            "pipeline_cpu_elapsed_percent": 78.84530156451825,
+            "decode_wall_budget_percent": 66.80319166666666,
+            "output_wall_budget_percent": 28.729120833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9912278401207315,
+            "pipeline_cpu_budget_percent": 88.64520416666667,
+            "pipeline_cpu_elapsed_percent": 87.86759426318628,
+            "decode_wall_budget_percent": 76.91044166666667,
+            "output_wall_budget_percent": 19.4810125,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9607763457183943,
+            "pipeline_cpu_budget_percent": 97.61775833333333,
+            "pipeline_cpu_elapsed_percent": 93.78883312872134,
+            "decode_wall_budget_percent": 85.94784166666666,
+            "output_wall_budget_percent": 13.608670833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 2,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 2420,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.002936766006996,
+            "pipeline_cpu_budget_percent": 36.769975,
+            "pipeline_cpu_elapsed_percent": 36.8779598126581,
+            "decode_wall_budget_percent": 24.283195833333334,
+            "output_wall_budget_percent": 71.22235,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0004909492462197,
+            "pipeline_cpu_budget_percent": 68.29564166666667,
+            "pipeline_cpu_elapsed_percent": 68.32917136046301,
+            "decode_wall_budget_percent": 56.2481125,
+            "output_wall_budget_percent": 39.353345833333336,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0000089167461743,
+            "pipeline_cpu_budget_percent": 78.77255416666667,
+            "pipeline_cpu_elapsed_percent": 78.77325656153768,
+            "decode_wall_budget_percent": 66.98387083333333,
+            "output_wall_budget_percent": 28.660770833333334,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9916114218596358,
+            "pipeline_cpu_budget_percent": 88.64320416666666,
+            "pipeline_cpu_elapsed_percent": 87.89961372190233,
+            "decode_wall_budget_percent": 76.88332083333333,
+            "output_wall_budget_percent": 19.541979166666668,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9585199302053713,
+            "pipeline_cpu_budget_percent": 97.6324,
+            "pipeline_cpu_elapsed_percent": 93.5826012337829,
+            "decode_wall_budget_percent": 85.95315416666666,
+            "output_wall_budget_percent": 13.773970833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 3,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 500,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029383167443853,
+            "pipeline_cpu_budget_percent": 36.78259166666667,
+            "pipeline_cpu_elapsed_percent": 36.890670571662724,
+            "decode_wall_budget_percent": 24.297908333333332,
+            "output_wall_budget_percent": 71.16160416666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0010455503671272,
+            "pipeline_cpu_budget_percent": 68.330275,
+            "pipeline_cpu_elapsed_percent": 68.40171774411215,
+            "decode_wall_budget_percent": 56.3268,
+            "output_wall_budget_percent": 39.21237083333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9996941352485362,
+            "pipeline_cpu_budget_percent": 78.79037083333333,
+            "pipeline_cpu_elapsed_percent": 78.76627163614066,
+            "decode_wall_budget_percent": 67.05189583333333,
+            "output_wall_budget_percent": 28.658454166666665,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.8968503624228368,
+            "pipeline_cpu_budget_percent": 91.48114166666667,
+            "pipeline_cpu_elapsed_percent": 82.04489505860488,
+            "decode_wall_budget_percent": 88.44249166666667,
+            "output_wall_budget_percent": 18.560120833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9016837817519491,
+            "pipeline_cpu_budget_percent": 99.23314583333334,
+            "pipeline_cpu_elapsed_percent": 89.47691821014267,
+            "decode_wall_budget_percent": 92.3642,
+            "output_wall_budget_percent": 13.838154166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 4,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 2416,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.002930563105394,
+            "pipeline_cpu_budget_percent": 36.7727125,
+            "pipeline_cpu_elapsed_percent": 36.88047725453776,
+            "decode_wall_budget_percent": 24.243808333333334,
+            "output_wall_budget_percent": 71.26807916666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0005600634955416,
+            "pipeline_cpu_budget_percent": 68.30290416666666,
+            "pipeline_cpu_elapsed_percent": 68.3411581299299,
+            "decode_wall_budget_percent": 56.353829166666664,
+            "output_wall_budget_percent": 39.292770833333336,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.000922516919761,
+            "pipeline_cpu_budget_percent": 78.76715833333333,
+            "pipeline_cpu_elapsed_percent": 78.83982236961734,
+            "decode_wall_budget_percent": 66.86894166666667,
+            "output_wall_budget_percent": 28.713183333333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.99014622974594,
+            "pipeline_cpu_budget_percent": 88.671,
+            "pipeline_cpu_elapsed_percent": 87.79725633780225,
+            "decode_wall_budget_percent": 77.0326125,
+            "output_wall_budget_percent": 19.545054166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9600249990509753,
+            "pipeline_cpu_budget_percent": 97.5725125,
+            "pipeline_cpu_elapsed_percent": 93.67205122021377,
+            "decode_wall_budget_percent": 85.74862916666666,
+            "output_wall_budget_percent": 13.8676375,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 5,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 2024,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029397836625455,
+            "pipeline_cpu_budget_percent": 36.7814625,
+            "pipeline_cpu_elapsed_percent": 36.889592042542034,
+            "decode_wall_budget_percent": 24.246883333333333,
+            "output_wall_budget_percent": 71.2182875,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0014398201013508,
+            "pipeline_cpu_budget_percent": 68.35277083333334,
+            "pipeline_cpu_elapsed_percent": 68.45118652676219,
+            "decode_wall_budget_percent": 56.4051125,
+            "output_wall_budget_percent": 39.09316666666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9995797183775772,
+            "pipeline_cpu_budget_percent": 78.84706666666666,
+            "pipeline_cpu_elapsed_percent": 78.81392869356472,
+            "decode_wall_budget_percent": 67.24187083333334,
+            "output_wall_budget_percent": 28.473454166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.989666275872196,
+            "pipeline_cpu_budget_percent": 88.69730416666667,
+            "pipeline_cpu_elapsed_percent": 87.78073069452842,
+            "decode_wall_budget_percent": 77.12308333333333,
+            "output_wall_budget_percent": 19.415875,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9555704341411301,
+            "pipeline_cpu_budget_percent": 97.67830833333333,
+            "pipeline_cpu_elapsed_percent": 93.3385035002545,
+            "decode_wall_budget_percent": 86.25384583333333,
+            "output_wall_budget_percent": 13.864720833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 6,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 4324,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.00297951782094,
+            "pipeline_cpu_budget_percent": 36.78307083333333,
+            "pipeline_cpu_elapsed_percent": 36.892666648390154,
+            "decode_wall_budget_percent": 24.265533333333334,
+            "output_wall_budget_percent": 71.23220833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0014752565091094,
+            "pipeline_cpu_budget_percent": 68.33184166666666,
+            "pipeline_cpu_elapsed_percent": 68.43264866086484,
+            "decode_wall_budget_percent": 56.28935,
+            "output_wall_budget_percent": 39.21782916666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9999177151046945,
+            "pipeline_cpu_budget_percent": 78.79609166666667,
+            "pipeline_cpu_elapsed_percent": 78.7896079385134,
+            "decode_wall_budget_percent": 67.00245,
+            "output_wall_budget_percent": 28.663779166666668,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9895349668054311,
+            "pipeline_cpu_budget_percent": 88.67137083333333,
+            "pipeline_cpu_elapsed_percent": 87.74342199415457,
+            "decode_wall_budget_percent": 77.0007875,
+            "output_wall_budget_percent": 19.5294375,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.957255204716205,
+            "pipeline_cpu_budget_percent": 97.63153333333334,
+            "pipeline_cpu_elapsed_percent": 93.45829342775698,
+            "decode_wall_budget_percent": 86.0568375,
+            "output_wall_budget_percent": 13.764833333333334,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 7,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 8180,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029686618680467,
+            "pipeline_cpu_budget_percent": 36.790645833333336,
+            "pipeline_cpu_elapsed_percent": 36.89986482071956,
+            "decode_wall_budget_percent": 24.2755375,
+            "output_wall_budget_percent": 71.20172083333334,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0006245982127426,
+            "pipeline_cpu_budget_percent": 68.32930416666666,
+            "pipeline_cpu_elapsed_percent": 68.37198252792712,
+            "decode_wall_budget_percent": 56.33555,
+            "output_wall_budget_percent": 39.241620833333336,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.000068296330737,
+            "pipeline_cpu_budget_percent": 78.77188333333334,
+            "pipeline_cpu_elapsed_percent": 78.77726316393024,
+            "decode_wall_budget_percent": 66.9608125,
+            "output_wall_budget_percent": 28.725079166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9903428777490629,
+            "pipeline_cpu_budget_percent": 88.678,
+            "pipeline_cpu_elapsed_percent": 87.8216257130314,
+            "decode_wall_budget_percent": 77.07413333333334,
+            "output_wall_budget_percent": 19.532516666666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9582003081811741,
+            "pipeline_cpu_budget_percent": 97.6259,
+            "pipeline_cpu_elapsed_percent": 93.54516746646449,
+            "decode_wall_budget_percent": 86.0658875,
+            "output_wall_budget_percent": 13.806304166666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 8,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 888,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029291381253231,
+            "pipeline_cpu_budget_percent": 36.772079166666664,
+            "pipeline_cpu_elapsed_percent": 36.87978966570115,
+            "decode_wall_budget_percent": 24.259625,
+            "output_wall_budget_percent": 71.25132083333334,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0010142359656657,
+            "pipeline_cpu_budget_percent": 68.29579166666667,
+            "pipeline_cpu_elapsed_percent": 68.36505971487861,
+            "decode_wall_budget_percent": 56.21747083333333,
+            "output_wall_budget_percent": 39.35729583333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0000180836603463,
+            "pipeline_cpu_budget_percent": 78.7898375,
+            "pipeline_cpu_elapsed_percent": 78.79126230866008,
+            "decode_wall_budget_percent": 66.96185833333334,
+            "output_wall_budget_percent": 28.667475,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9902847700020296,
+            "pipeline_cpu_budget_percent": 88.69956666666667,
+            "pipeline_cpu_elapsed_percent": 87.8378299757797,
+            "decode_wall_budget_percent": 77.055525,
+            "output_wall_budget_percent": 19.518941666666667,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9591394984076086,
+            "pipeline_cpu_budget_percent": 97.61264583333333,
+            "pipeline_cpu_elapsed_percent": 93.62414416282289,
+            "decode_wall_budget_percent": 86.0092,
+            "output_wall_budget_percent": 13.726420833333334,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 9,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 2540,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029288866586723,
+            "pipeline_cpu_budget_percent": 36.78592916666667,
+            "pipeline_cpu_elapsed_percent": 36.89367098382978,
+            "decode_wall_budget_percent": 24.307995833333333,
+            "output_wall_budget_percent": 71.1786,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0014166289987974,
+            "pipeline_cpu_budget_percent": 68.33994166666666,
+            "pipeline_cpu_elapsed_percent": 68.43675400980779,
+            "decode_wall_budget_percent": 56.4154125,
+            "output_wall_budget_percent": 39.12510833333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0000951757242231,
+            "pipeline_cpu_budget_percent": 78.76685416666666,
+            "pipeline_cpu_elapsed_percent": 78.77435085905675,
+            "decode_wall_budget_percent": 66.9385125,
+            "output_wall_budget_percent": 28.712525,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.990485111130985,
+            "pipeline_cpu_budget_percent": 88.63471666666666,
+            "pipeline_cpu_elapsed_percent": 87.7913671876467,
+            "decode_wall_budget_percent": 76.9216125,
+            "output_wall_budget_percent": 19.598879166666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9614476324712593,
+            "pipeline_cpu_budget_percent": 97.5797125,
+            "pipeline_cpu_elapsed_percent": 93.81778356035115,
+            "decode_wall_budget_percent": 85.7435,
+            "output_wall_budget_percent": 13.762616666666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      },
+      {
+        "attempt": 10,
+        "terminal": true,
+        "completed": true,
+        "continuous_cases": 1,
+        "total_cases": 5,
+        "min_dram": 1572,
+        "cases": [
+          {
+            "name": "mono-12",
+            "pass": true,
+            "errors": [],
+            "audio_us": 24000000,
+            "ratio": 1.0029270006628095,
+            "pipeline_cpu_budget_percent": 36.758091666666665,
+            "pipeline_cpu_elapsed_percent": 36.86568262533861,
+            "decode_wall_budget_percent": 24.217320833333332,
+            "output_wall_budget_percent": 71.28033333333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "mono-24",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 1.0009073224878353,
+            "pipeline_cpu_budget_percent": 68.30452083333333,
+            "pipeline_cpu_elapsed_percent": 68.36649506110622,
+            "decode_wall_budget_percent": 56.2719125,
+            "output_wall_budget_percent": 39.307604166666664,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-64",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.8971455519972105,
+            "pipeline_cpu_budget_percent": 82.6334875,
+            "pipeline_cpu_elapsed_percent": 74.1342657566421,
+            "decode_wall_budget_percent": 84.15942916666667,
+            "output_wall_budget_percent": 22.3554875,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-128",
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.9899860436717494,
+            "pipeline_cpu_budget_percent": 88.69960833333333,
+            "pipeline_cpu_elapsed_percent": 87.8113743291504,
+            "decode_wall_budget_percent": 77.15351666666666,
+            "output_wall_budget_percent": 19.415754166666666,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          },
+          {
+            "name": "stereo-192",
+            "pass": false,
+            "errors": [
+              "DMA underruns",
+              "PCM duration does not match elapsed time"
+            ],
+            "audio_us": 24000000,
+            "ratio": 0.960124931456081,
+            "pipeline_cpu_budget_percent": 97.6119125,
+            "pipeline_cpu_elapsed_percent": 93.71963079835949,
+            "decode_wall_budget_percent": 85.89056666666667,
+            "output_wall_budget_percent": 13.730883333333333,
+            "timing": "pipeline task CPU includes flash copy/hash/output/ISR charged to task; output wall includes DMA waits; no audio network or Ogg demux"
+          }
+        ]
+      }
+    ],
+    "completed": 10,
+    "cases": [
+      {
+        "name": "mono-12",
+        "completed": 10,
+        "continuous": 10,
+        "low_ram_attempts": [],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 36.758091666666665,
+          "median": 36.78122916666667,
+          "mean": 36.777755416666665,
+          "p95": 36.790645833333336,
+          "max": 36.790645833333336
+        },
+        "decode_wall_budget_percent": {
+          "min": 24.217320833333332,
+          "median": 24.26257916666667,
+          "mean": 24.264552916666666,
+          "p95": 24.307995833333333,
+          "max": 24.307995833333333
+        },
+        "dma_misses": {
+          "min": 0,
+          "median": 0,
+          "mean": 0,
+          "p95": 0,
+          "max": 0
+        },
+        "pcm_elapsed_ratio": {
+          "min": 1.0029270006628095,
+          "median": 1.0029375413756907,
+          "mean": 1.0029448847359186,
+          "p95": 1.00297951782094,
+          "max": 1.00297951782094
+        },
+        "min_dram": {
+          "min": 7140,
+          "median": 8666,
+          "mean": 8640.4,
+          "p95": 9344,
+          "max": 9344
+        },
+        "max_decode_call_us": {
+          "min": 7156,
+          "median": 7695,
+          "mean": 7642.9,
+          "p95": 8062,
+          "max": 8062
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1556,
+          "p95": 1628,
+          "max": 1628
+        }
+      },
+      {
+        "name": "mono-24",
+        "completed": 10,
+        "continuous": 0,
+        "low_ram_attempts": [
+          3,
+          5,
+          9
+        ],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 68.29564166666667,
+          "median": 68.32167708333333,
+          "mean": 68.31970416666665,
+          "p95": 68.35277083333334,
+          "max": 68.35277083333334
+        },
+        "decode_wall_budget_percent": {
+          "min": 56.21747083333333,
+          "median": 56.308075,
+          "mean": 56.31245458333334,
+          "p95": 56.4154125,
+          "max": 56.4154125
+        },
+        "dma_misses": {
+          "min": 27,
+          "median": 35,
+          "mean": 35.1,
+          "p95": 44,
+          "max": 44
+        },
+        "pcm_elapsed_ratio": {
+          "min": 1.0004909492462197,
+          "median": 1.0010298931663963,
+          "mean": 1.0010151434105268,
+          "p95": 1.0014752565091094,
+          "max": 1.0014752565091094
+        },
+        "min_dram": {
+          "min": 1732,
+          "median": 6044,
+          "mean": 5981.6,
+          "p95": 9548,
+          "max": 9548
+        },
+        "max_decode_call_us": {
+          "min": 33760,
+          "median": 45460.5,
+          "mean": 44878.3,
+          "p95": 53418,
+          "max": 53418
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1548,
+          "p95": 1548,
+          "max": 1548
+        }
+      },
+      {
+        "name": "stereo-64",
+        "completed": 10,
+        "continuous": 0,
+        "low_ram_attempts": [
+          4,
+          10
+        ],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 78.75282916666667,
+          "median": 78.78119583333333,
+          "mean": 79.16881333333335,
+          "p95": 82.6334875,
+          "max": 82.6334875
+        },
+        "decode_wall_budget_percent": {
+          "min": 66.80319166666666,
+          "median": 66.97286458333333,
+          "mean": 68.69728333333333,
+          "p95": 84.15942916666667,
+          "max": 84.15942916666667
+        },
+        "dma_misses": {
+          "min": 32,
+          "median": 53,
+          "mean": 257.8,
+          "p95": 2123,
+          "max": 2123
+        },
+        "pcm_elapsed_ratio": {
+          "min": 0.8971455519972105,
+          "median": 1.0000135002032602,
+          "mean": 0.9898624320595791,
+          "p95": 1.0011742104865322,
+          "max": 1.0011742104865322
+        },
+        "min_dram": {
+          "min": 1572,
+          "median": 9206,
+          "mean": 7564,
+          "p95": 10136,
+          "max": 10136
+        },
+        "max_decode_call_us": {
+          "min": 36307,
+          "median": 49173.5,
+          "mean": 53295.3,
+          "p95": 81589,
+          "max": 81589
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1548,
+          "p95": 1548,
+          "max": 1548
+        }
+      },
+      {
+        "name": "stereo-128",
+        "completed": 10,
+        "continuous": 0,
+        "low_ram_attempts": [
+          2,
+          3
+        ],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 88.63471666666666,
+          "median": 88.67468541666666,
+          "mean": 88.95211166666667,
+          "p95": 91.48114166666667,
+          "max": 91.48114166666667
+        },
+        "decode_wall_budget_percent": {
+          "min": 76.88332083333333,
+          "median": 77.04406875000001,
+          "mean": 78.1597525,
+          "p95": 88.44249166666667,
+          "max": 88.44249166666667
+        },
+        "dma_misses": {
+          "min": 206,
+          "median": 231.5,
+          "mean": 419,
+          "p95": 2130,
+          "max": 2130
+        },
+        "pcm_elapsed_ratio": {
+          "min": 0.8968503624228368,
+          "median": 0.9902154998739848,
+          "mean": 0.9810135899380599,
+          "p95": 0.9916114218596358,
+          "max": 0.9916114218596358
+        },
+        "min_dram": {
+          "min": 500,
+          "median": 7196,
+          "mean": 6330.8,
+          "p95": 10104,
+          "max": 10104
+        },
+        "max_decode_call_us": {
+          "min": 43039,
+          "median": 61695.5,
+          "mean": 62276.7,
+          "p95": 89996,
+          "max": 89996
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1548,
+          "p95": 1548,
+          "max": 1548
+        }
+      },
+      {
+        "name": "stereo-192",
+        "completed": 10,
+        "continuous": 0,
+        "low_ram_attempts": [
+          3,
+          8
+        ],
+        "invalid_timing_attempts": [],
+        "pipeline_cpu_budget_percent": {
+          "min": 97.5725125,
+          "median": 97.62182916666666,
+          "mean": 97.77958291666667,
+          "p95": 99.23314583333334,
+          "max": 99.23314583333334
+        },
+        "decode_wall_budget_percent": {
+          "min": 85.7435,
+          "median": 85.98117708333334,
+          "mean": 86.60336625,
+          "p95": 92.3642,
+          "max": 92.3642
+        },
+        "dma_misses": {
+          "min": 777,
+          "median": 829,
+          "mean": 944.8,
+          "p95": 2022,
+          "max": 2022
+        },
+        "pcm_elapsed_ratio": {
+          "min": 0.9016837817519491,
+          "median": 0.9588297143064899,
+          "mean": 0.9532743066100148,
+          "p95": 0.9614476324712593,
+          "max": 0.9614476324712593
+        },
+        "min_dram": {
+          "min": 500,
+          "median": 9682,
+          "mean": 7109.2,
+          "p95": 10336,
+          "max": 10336
+        },
+        "max_decode_call_us": {
+          "min": 20480,
+          "median": 27653,
+          "mean": 39345.7,
+          "p95": 69412,
+          "max": 69412
+        },
+        "stack_free_lifetime": {
+          "min": 1548,
+          "median": 1548,
+          "mean": 1548,
+          "p95": 1548,
+          "max": 1548
+        }
+      }
+    ],
+    "observation_errors": [
+      {
+        "attempt": 1,
+        "error": "read ECONNRESET"
+      },
+      {
+        "attempt": 2,
+        "error": "read ECONNRESET"
+      },
+      {
+        "attempt": 3,
+        "error": "request timeout"
+      },
+      {
+        "attempt": 4,
+        "error": "read ECONNRESET"
+      },
+      {
+        "attempt": 10,
+        "error": "request timeout"
+      }
+    ],
+    "device_failures": [],
+    "global_min_heap": {
+      "min": 192,
+      "median": 192,
+      "mean": 795.2,
+      "p95": 4156,
+      "max": 4156
+    },
+    "all_observed_gates_pass": false
+  },
+  "target": {
+    "before": {
+      "sections": {
+        ".iram0.vectors": 128,
+        ".iram0.text": 22900,
+        ".iram0.bss": 4044,
+        ".dram0.data": 1652,
+        ".dram0.bss": 18944,
+        ".flash.text": 637622,
+        ".flash.rodata": 241272
+      },
+      "isr_bytes": 387,
+      "isr_section_sha256": "914cdfe2fb0863ba26c726ebbd1465133695f4043614969be3f849c85a6cba00",
+      "app_elf_sha256": "890540c31826908443f96b961e4497419466b9b25e65f161e4796c17e25b0b21"
+    },
+    "after": {
+      "sections": {
+        ".iram0.vectors": 128,
+        ".iram0.text": 22900,
+        ".iram0.bss": 4044,
+        ".dram0.data": 1652,
+        ".dram0.bss": 18944,
+        ".flash.text": 637762,
+        ".flash.rodata": 241276
+      },
+      "isr_bytes": 387,
+      "isr_section_sha256": "914cdfe2fb0863ba26c726ebbd1465133695f4043614969be3f849c85a6cba00",
+      "app_elf_sha256": "b21f2fc4005271d03e16312c007821d4b944614037e13486f2423c748044a60c"
+    }
+  },
+  "qualified_candidate": false,
+  "note": "Observed RAM floor is 4096B. Sampling is not a worst-case memory proof; a completed run is not automatically continuous audio."
+}

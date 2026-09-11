@@ -1,6 +1,6 @@
 # Opus: publish completed PCM batches before the next decode
 
-2026-09-11. Experimental, default OFF; no continuity improvement claimed yet.
+2026-09-11. Experimental, default OFF; not qualified as a general radio fix.
 
 ## Evidence and hypothesis
 
@@ -45,6 +45,8 @@ other tail lengths and must remain valid; no assumption that every call is448.
   sizes, not heap/stack safety guarantees during network use.
 - [x] At least10 attempted physical windows per variant on the same fixture;
   retain start failures, transport errors, missing samples and DMA misses.
+- [x] Matched flash-output A/B,10+10 attempts; all reports retained. Only
+  SILK12 passed individual continuity windows; overall qualification failed.
 - [ ] Qualify real Opus radio >=20s and WebUI; faster raw decoder alone is not
   completion. Reject candidate if no repeatable benefit or if RAM regresses.
 
@@ -58,9 +60,9 @@ The next benchmark implementation applies the same publication after every
 successful <=512-sample output batch, including its final partial batch.
 Write/publication errors stop the benchmark and release allocations; the raw
 decoder-only path is unchanged. Its source SHA256 is recorded in new build
-manifests. Physical flash-output A/B remains pending and must use matching
-new OFF/ON builds, not compare against these radio images or old benchmark
-images. This isolates audio transport, but retains Wi-Fi/WebUI interruptions,
+manifests. The completed physical flash-output A/B below uses matching
+new OFF/ON builds, not these radio images or old benchmark images.
+This isolates audio transport, but retains Wi-Fi/WebUI interruptions,
 as before; CPU and wall time must still be reported separately.
 
 Comparison after both series finish:
@@ -161,3 +163,55 @@ DRAM scratch proposal is already contradicted by CELT measurements. Even
 packets. Keep the6144B allocation until a separate lifetime/coverage proof
 justifies changing it. FFT/MDCT word-access fixes are also already present;
 do not repeat them as a newly discovered narrow-flash-load optimization.
+
+## Completed matched flash-output A/B, 2026-09-11
+
+Sourceeee18c2, apps903664/903808B, identical corpus header
+cd3d55d30806bd143810cb6ec56e34db69956c7ccb011f46f85ae2aac5d65d7a.
+Ten attempted runs per variant, all completed with exact PCM/counts.
+Each window is24s PCM from repeated12-packet rounds, resetting the decoder
+every240ms but not DMA. No audio TCP/Ogg/ICY; Wi-Fi/WebUI remain active,
+status polling every30s. These are not24s of distinct decoder history.
+
+| Corpus | Median pipeline CPU OFF / ON | Continuous windows OFF / ON | Median DMA misses OFF / ON |
+|---|---:|---:|---:|
+| SILK mono12 | 36.862% / 36.781% | 9/10 / 10/10 | 0 / 0 |
+| Hybrid mono24 | 68.338% / 68.322% | 0/10 / 0/10 | 40 / 35 |
+| CELT stereo64 → mono | 79.208% / 78.781% | 0/10 / 0/10 | 49 / 53 |
+| CELT stereo128 → mono | 89.733% / 88.675% | 0/10 / 0/10 | 168.5 / 231.5 |
+| CELT stereo192 → mono | 99.145% / 97.622% | 0/10 / 0/10 | 1023.5 / 829 |
+
+CPU includes hashing, normalization/PDM, charged ISR and benchmark overhead,
+not just the decoder. Saved maxima and outliers remain part of the result.
+Both variants reached192B lifetime minimum heap; this persists after the
+original event and is not proof of a new OOM on every later run. Lowest
+per-case free DRAM OFF:7152/3244/1732/364/500B; ON:7140/1732/1572/500/500B.
+Both fail even the diagnostic4096B reserve gate; no RAM safety is claimed.
+Static RAM and ISR are identical, so this is dynamic pressure, not evidence
+that publication statically allocated an extra buffer. No leak conclusion.
+
+OFF had observation errors in attempts1/8; ON in1/2/3/4/10. They all remain
+in the ten-run series. No analog recording; zero FIFO-empty alone is not a
+pass because the neutral-word DMA fallback can keep the hardware clocked.
+The A/B was sequential; local host regressions/compilation also ran during
+parts of ON. This is not isolated instruction timing or a guarantee that
+sub-percent differences reproduce under other network/cache conditions.
+
+Decision: publication stays experimental/default OFF. The SILK12 result is
+promising, but it does not remove Hybrid/CELT misses or real-radio transport
+failures. Some maximum decode wall times grow sharply between HTTP snapshots;
+preemption/cache effects are hypotheses, not attribution of those delays to
+a specific decoder function. Repeated initialization is another benchmark
+factor to isolate, not a proven cause. Adaptive WebUI CPU budgeting is saved
+as an unimplemented experiment in ESP8266_WEBUI_REPAIR_TODO.md.
+
+The actual compiled HTTP component is the local
+esp8266/rtos-sdk-native/components/esp_http_server fork: it already coalesces
+headers and small chunk framing using request scratch. The unmodified SDK
+source's separate CRLF/header sends must not be mistaken for current behavior.
+QIO80 is also not a free fix: the board README records unstable QIO80 boots;
+the controlled profiles deliberately keep QIO40.
+
+[Full comparison and input hashes](../firmware/development/esp8266-opus-flash-publish-on/comparison.json).
+The next independent compute experiment measures the existing LX106 CELT
+rotation assembly against C on the same raw corpus; no production change yet.
