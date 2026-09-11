@@ -51,9 +51,17 @@ other tail lengths and must remain valid; no assumption that every call is448.
 No production default has been changed. Raw Opus CPU figures remain in
 [the invariant audit](ESP8266_OPUS_LOOP_INVARIANTS.md); they do not measure PDM.
 
-The flag currently applies to the native radio callback in audio_service.c.
-The separate raw/flash-output benchmark bypasses that callback: its old
+In the c9728ad radio A/B images the flag applies only to audio_service.c.
+The old separate flash-output benchmark bypassed that callback: old
 measurements must not be presented as evidence for this publication change.
+The next benchmark implementation applies the same publication after every
+successful <=512-sample output batch, including its final partial batch.
+Write/publication errors stop the benchmark and release allocations; the raw
+decoder-only path is unchanged. Its source SHA256 is recorded in new build
+manifests. Physical flash-output A/B remains pending and must use matching
+new OFF/ON builds, not compare against these radio images or old benchmark
+images. This isolates audio transport, but retains Wi-Fi/WebUI interruptions,
+as before; CPU and wall time must still be reported separately.
 
 Comparison after both series finish:
 

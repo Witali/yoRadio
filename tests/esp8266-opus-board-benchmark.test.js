@@ -13,7 +13,7 @@ function execute(program, args, options = {}) {
     { encoding: 'utf8', timeout: 60000, ...options });
 }
 
-for (const [outputMode, profileStage] of [[0, 0], [1, 0], [0, 8]]) test(`real board benchmark output=${outputMode} stage=${profileStage} cleans up OOM/cancel/error and supports repeated runs`, t => {
+for (const [outputMode, profileStage, publish] of [[0, 0, 0], [1, 0, 0], [1, 0, 1], [0, 8, 0]]) test(`real board benchmark output=${outputMode} stage=${profileStage} publish=${publish} cleans up OOM/cancel/error and supports repeated runs`, t => {
   const compiler = execute('g++', ['--version']);
   if (compiler.error?.code === 'ENOENT' || compiler.status !== 0)
     return t.skip('C++ compiler unavailable (g++ via WSL on Windows).');
@@ -26,6 +26,7 @@ for (const [outputMode, profileStage] of [[0, 0], [1, 0], [0, 8]]) test(`real bo
     '-fsanitize=address,undefined', '-fno-sanitize-recover=all', '-fno-omit-frame-pointer', '-fno-pie', '-no-pie',
     '-DYORADIO_ESP8266_OPUS_BENCHMARK=1', '-DCONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144',
     '-DYORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT=' + outputMode,
+    '-DYORADIO_ESP8266_OPUS_PCM_PUBLISH=' + publish,
     '-DYORADIO_OPUS_PROFILE_STAGE=' + profileStage,
     ...(profileStage ? ['-DYORADIO_OPUS_PROFILE_TEST_CLOCK=1', '-I' + hostPath(path.join(root, 'esp8266/rtos-sdk-native/components/opus_decoder')),
       hostPath(path.join(root, 'esp8266/rtos-sdk-native/components/opus_decoder/opus_stage_profile.c'))] : []),

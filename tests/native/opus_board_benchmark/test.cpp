@@ -39,6 +39,7 @@ unsigned cancel_after, decode_error_at, init_error_at;
 unsigned output_calls, output_error_at, output_misses_at, dma_eofs, dma_misses;
 unsigned silence_calls, normalizer_resets, output_sample_count;
 unsigned fifo_empty, fifo_error_at;
+unsigned publish_calls, publish_error_at;
 bool oversized_decode, large_decode;
 #endif
 int decode_error = -777;
@@ -104,6 +105,7 @@ void reset_environment() {
     output_calls = output_error_at = output_misses_at = dma_eofs = dma_misses = 0;
     silence_calls = normalizer_resets = output_sample_count = 0;
     fifo_empty = fifo_error_at = 0;
+    publish_calls = publish_error_at = 0;
     oversized_decode = large_decode = false;
 #endif
 }
@@ -184,6 +186,11 @@ void successful_run() {
 #if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
     assert(silence_calls == 3 && normalizer_resets == 2);
     assert(output_calls == decode_calls && output_sample_count == decode_calls * 4);
+#if YORADIO_ESP8266_OPUS_PCM_PUBLISH
+    assert(publish_calls == output_calls);
+#else
+    assert(publish_calls == 0);
+#endif
 #endif
     ++completed_runs;
 }
@@ -304,6 +311,13 @@ extern "C" esp_err_t native_audio_output_write(int16_t *pcm, size_t count, uint3
     return ESP_OK;
 }
 extern "C" void native_audio_output_silence(void) { ++silence_calls; }
+extern "C" esp_err_t native_audio_output_publish_pending(void) {
+    assert(critical_depth == 0 && output_calls > 0);
+    ++publish_calls;
+    // A failed write must not publish an incomplete batch.
+    assert(output_calls != output_error_at);
+    return publish_calls == publish_error_at ? ESP_FAIL : ESP_OK;
+}
 extern "C" void native_audio_output_reset_normalizer(void) { ++normalizer_resets; }
 extern "C" void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *s) {
     *s = {}; s->chained_transfers = dma_eofs; s->queue_empty_events = dma_misses;
@@ -361,6 +375,13 @@ int main() {
     assert(silence_calls >= 1 && result(0).error == -9008);
     reset_environment(); large_decode = true; output_error_at = 2; queue(); run(); expect_error(-9008);
     assert(output_calls == 2 && output_sample_count == 512); // failure in second callback
+#if YORADIO_ESP8266_OPUS_PCM_PUBLISH
+    assert(publish_calls == 1);
+    reset_environment(); publish_error_at = 4; queue(); run(); expect_error(-9008);
+    assert(output_calls == 4 && publish_calls == 4 && silence_calls >= 1);
+    reset_environment(); large_decode = true; publish_error_at = 2; queue(); run(); expect_error(-9008);
+    assert(output_calls == 2 && publish_calls == 2 && output_sample_count == 600);
+#endif
     reset_environment(); oversized_decode = true; queue(); run(); expect_error(-9010);
     assert(!output_calls);
     reset_environment(); output_misses_at = 4; queue(); run();

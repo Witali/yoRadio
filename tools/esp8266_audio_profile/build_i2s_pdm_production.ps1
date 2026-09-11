@@ -217,6 +217,7 @@ try {
         opus_scratch_bytes=$(if ($taskOpusEnabled) { 6144 } else { 0 })
         opus_benchmark=[bool]$OpusBenchmark
         opus_benchmark_output=[bool]$OpusBenchmarkOutput
+        opus_benchmark_source_sha256=$(if ($OpusBenchmark) { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/opus_benchmark.cpp").Hash } else { $null })
         opus_benchmark_manifest_sha256=$(if ($OpusBenchmark) { (Get-FileHash "$OpusBenchmarkFixtures/manifest.json").Hash } else { $null })
         opus_benchmark_header_sha256=$(if ($OpusBenchmark) { (Get-FileHash "$OpusBenchmarkFixtures/opus_board_fixtures.h").Hash } else { $null })
         opus_stream_test=[bool]$taskOpusStreamTestEnabled

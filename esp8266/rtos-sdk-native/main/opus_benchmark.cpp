@@ -246,7 +246,13 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
                         if (!current(generation)) { error = -9002; break; }
                         unsigned count = (unsigned)decoded - offset;
                         if (count > 512) count = 512;
-                        if (native_audio_output_write(pcm + offset, count, 48000, 1) != ESP_OK) {
+                        esp_err_t sink = native_audio_output_write(pcm + offset, count, 48000, 1);
+#if YORADIO_ESP8266_OPUS_PCM_PUBLISH
+                        // Match the radio callback, including the final partial
+                        // batch. Raw-only benchmarks never enter this path.
+                        if (sink == ESP_OK) sink = native_audio_output_publish_pending();
+#endif
+                        if (sink != ESP_OK) {
                             error = -9008; break;
                         }
                         offset += count;
