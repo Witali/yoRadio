@@ -28,6 +28,8 @@ param(
     [int]$Pdm32LoanWords = 512,
     [ValidateSet(512, 768)]
     [int]$DmaBufferWords = 512,
+    [ValidateRange(250, 60000)]
+    [int]$StreamIdleTimeoutMs = 1000,
     [switch]$SdkRxDiag,
     [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
@@ -110,6 +112,17 @@ function Get-TaskOpusRuntimeProfile([string]$Config, [bool]$Benchmark) {
     }
     return [pscustomobject]@{ enabled = $Benchmark }
 }
+function Set-TaskStreamIdleDefaults([string]$Defaults, [int]$TimeoutMs) {
+    if ($TimeoutMs -lt 250 -or $TimeoutMs -gt 60000) { throw 'Stream idle timeout must be 250..60000 ms' }
+    $taskText = $Defaults -replace '(?m)^CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS=[^\r\n]*\r?\n?', ''
+    return $taskText + "`nCONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS=$TimeoutMs`n"
+}
+function Assert-TaskStreamIdleConfig([string]$Config, [int]$TimeoutMs) {
+    $taskMatches = [regex]::Matches($Config, '(?m)^CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS=(\d+)\r?$')
+    if ($taskMatches.Count -ne 1 -or [int]$taskMatches[0].Groups[1].Value -ne $TimeoutMs) {
+        throw 'Wrong cached stream idle timeout; use a fresh -Variant build directory'
+    }
+}
 Push-Location $taskRoot
 try {
     $env:IDF_PATH = (Resolve-Path $SdkPath).Path
@@ -126,6 +139,7 @@ try {
     if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=$OpusInputBytes`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144`n" }
     $taskDefaults = Set-TaskSpiffsCacheDefaults $taskDefaults ([bool]$NoSpiffsCache)
     $taskDefaults = Set-TaskOpusRuntimeDefaults $taskDefaults ([bool]$OpusBenchmark)
+    $taskDefaults = Set-TaskStreamIdleDefaults $taskDefaults $StreamIdleTimeoutMs
     if ($OpusBenchmark) {
         $OpusBenchmarkFixtures = (Resolve-Path $OpusBenchmarkFixtures).Path.Replace('\', '/')
     }
@@ -190,7 +204,8 @@ try {
     $taskConfig = Get-Content "$taskBuild/sdkconfig" -Raw
     $taskSpiffsCache = Get-TaskSpiffsCacheProfile $taskConfig ([bool]$NoSpiffsCache)
     $taskOpusRuntime = Get-TaskOpusRuntimeProfile $taskConfig ([bool]$OpusBenchmark)
-    foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHMODE_QIO=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y', 'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0', 'CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS=1000')) {
+    Assert-TaskStreamIdleConfig $taskConfig $StreamIdleTimeoutMs
+    foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHMODE_QIO=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y', 'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
     if ($taskConfig -match '(?m)^CONFIG_YORADIO_AUDIO_OUTPUT_(SPI_PDM|I2S_RCPDM|I2S_PCM)=y') { throw 'Only standard I2S PDM is allowed' }
@@ -280,7 +295,7 @@ try {
         web_audio_pause_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/audio_web_pause.inc).Hash
         stream_wait_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_read_wait.h).Hash
         http_receive_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/esp_http_server/src/httpd_txrx.c).Hash
-        stream_read_wait_ms=0; stream_idle_timeout_ms=1000
+        stream_read_wait_ms=0; stream_idle_timeout_ms=$StreamIdleTimeoutMs
         stream_input_bytes=4096; stream_prefill_ms=1000
         codec_bridge_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/helix_codecs/codec_bridge.cpp).Hash
         stream_input_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_input_buffer.h).Hash

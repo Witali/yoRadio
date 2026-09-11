@@ -98,6 +98,14 @@ releases the decoder/stream during static-page loading and reconnects after
 the last request. Default: `off`. This is a build-time policy, independent of
 debug logging; see [pause modes and limitations](../../docs/ESP8266_WEB_AUDIO_PAUSE.md).
 
+`-StreamIdleTimeoutMs 3000` overrides the existing receive-inactivity setting
+for a named build; default remains1000ms, allowed250..60000ms. This changes
+the time before reopening an inactive stream, not a blocking read duration:
+Stop/generation checks and short readiness waits remain unchanged. The builder
+checks the generated sdkconfig and records the selected value in its manifest.
+Some real Ogg streams arrive in bursts over1s apart; test this independently
+of DMA capacity. A longer timeout does not create audio data during a gap.
+
 Experimental low-level RC-PDM feedback, interpolation and dither are documented
 in [RC-PDM Feedback](../../docs/ESP8266_RCPDM_FEEDBACK.md). This is opt-in via
 `CONFIG_YORADIO_RCPDM_FEEDBACK`; the production PDM32 default is unchanged.
