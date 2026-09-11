@@ -1,0 +1,28 @@
+{
+  "source_revision": "0fb3e1b",
+  "runner_revision": "633ce21",
+  "fixture_sha256": "7c74081965bc8dc3f17433870b1c0aee0e8dd5c6dd16cede6b6da1cf1a89cbfb",
+  "attempts": 10,
+  "qualified": 0,
+  "accepted": 10,
+  "reserve_refusals": 9,
+  "free_dram_on_failure": [
+    1456,
+    3288
+  ],
+  "largest_on_failure": [
+    964,
+    2140
+  ],
+  "consumer_stack_observed_min": 1160,
+  "main_audio_stack_observed_min": 1496,
+  "boot_lifetime_min_heap": 1280,
+  "reset_attempt": 10,
+  "reset_reason": 7,
+  "notes": [
+    "All ten attempted windows retained. Nine refuse initialization; last spans WDT restart, not continuous playback.",
+    "Stack watermark includes only brief pre-series successful output; no complete gain/error-path qualification.",
+    "Idle DMA EOF/miss deltas after refusal are not audio performance. No speed-up claimed.",
+    "Reserve retained at4096. Exact oldDMA512 firmware restored by app-only OTA."
+  ]
+}

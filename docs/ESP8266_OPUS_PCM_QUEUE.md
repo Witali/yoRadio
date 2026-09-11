@@ -213,5 +213,41 @@ The build helper now accepts `-PcmStackBytes 1536` only with `-OpusPcmQueue`.
 Default stays2048B and the queue stays OFF. Host concurrent ownership/error
 tests run for both sizes; physical gain/normalization/error-path stack and
 continuous playback qualification remain necessary. The smaller task saves
-512B, but the queue profile still uses about1.5KiB more total RAM than oldDMA512
-after accounting for its extra PCM and task stack/TCB.
+512B, but the queue profile still adds1488B plus TCB/allocation overhead versus
+oldDMA512:1920B extra PCM +1536B stack -1968B static DRAM saved.
+
+### Physical result with1536B consumer stack: NOT qualified
+
+Artifact `firmware/development/esp8266-opus-pcm-queue256-stack1536/`,
+source0fb3e1b, app889872B. Application-only OTA succeeded. No serial reset,
+UART commands, Wi-Fi adapter changes, playlist or SPIFFS writes were used.
+
+The exploratory start briefly produced42576 PCM frames over several retries,
+then stopped. Its last recorded queue generation submitted/output648 samples,
+error0; these short counters are not a continuous interval. Subsequently all
+ten controlled LAN starts were accepted, but none qualified:
+
+- Attempts1..9: stage10, the post-init heap-reserve guard, not a failed scratch
+  allocation. At the failure snapshot total CAP8 free was1456..3288B, largest
+  block964..2140B; the protected reserve remained4096B. This is insufficient
+  total memory in this profile; fragmentation alone is not its explanation.
+- Attempt10: status/first health response timed out, then uptime/generation
+  restarted and SDK reset reason7 (`ESP_RST_WDT`) appeared. Its precise trigger
+  is unknown without a pre-reset trace. It is not a valid performance window.
+- Consumer watermark1160B free out of1536; main audio1496B free out of5120.
+  These originate from the brief exploratory output, not full sustained
+  normalization/error-path coverage. The boot-lifetime heap low was1280B,
+  which is not a per-window playback minimum.
+- Refused-init windows contain idle DMA misses, not meaningful audio underrun
+  rates. No output-speed or sound-quality improvement is claimed.
+
+The old b77b61c DMA512 image was restored by OTA, active app0x10000 confirmed.
+Final root HTTP200 in101ms and status HTTP200 in43ms are individual checks,
+not a complete WebUI responsiveness qualification. Radio is stopped. Own
+fixture server was stopped; its TCP trace and every failed run remain saved.
+
+Next: find additional real DRAM savings before enlarging ready PCM, investigate
+the WDT/reconnect failure path, then repeat continuous qualification. Do not
+lower the4KiB reserve or protected5KiB audio/WebUI stacks to make init pass.
+The memory snapshots and host ownership tests are useful diagnostics, but the
+goal of uninterrupted actual Opus-radio playback is still unachieved.
