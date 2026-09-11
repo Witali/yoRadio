@@ -39,7 +39,10 @@ other tail lengths and must remain valid; no assumption that every call is448.
   PDM32/128, RCPDM, Simple and Feedback, six sample rates, mono/stereo,
   normalization on/off and six batch sizes; every resulting PCM/PDM value
   matches. Ten initial tests and seven expanded tests pass, no skips.
-- [ ] Compile matching ON/OFF images; compare static RAM, IRAM and ISR.
+- [x] Compile matching ON/OFF images from c9728ad:885520/885648B. Static
+  DRAM data1652B/BSS18520B and IRAM text22848B/BSS4040B unchanged. ISR387B
+  section is byte-identical. Only flash text grew128B. These are static
+  sizes, not heap/stack safety guarantees during network use.
 - [ ] At least10 attempted physical windows per variant on the same fixture;
   retain start failures, transport errors, missing samples and DMA misses.
 - [ ] Recheck real Opus radio >=20s and WebUI; faster raw decoder alone is not
@@ -47,3 +50,21 @@ other tail lengths and must remain valid; no assumption that every call is448.
 
 No production default has been changed. Raw Opus CPU figures remain in
 [the invariant audit](ESP8266_OPUS_LOOP_INVARIANTS.md); they do not measure PDM.
+
+The flag currently applies to the native radio callback in audio_service.c.
+The separate raw/flash-output benchmark bypasses that callback: its old
+measurements must not be presented as evidence for this publication change.
+
+Comparison after both series finish:
+
+```powershell
+node tools/esp8266_opus_profile/compare_publication.cjs firmware/development/esp8266-opus-publish-off firmware/development/esp8266-opus-publish-on firmware/development/esp8266-opus-publish-on/comparison.json
+```
+
+Each attempt explicitly POSTs the unchanged local `/test.opus` URL to
+`/api/native/opus-stream`, preserves its response in startN.log, waits3s,
+then runs `run_stage_wall.cjs --seconds 25 --output runN.json`. A POST
+timeout remains an unconfirmed start, even if the earlier stream continues.
+Ten attempts per variant; no discarded observation failures or retries
+substituted for failed windows. The source fixture SHA256 is
+807878b973cbe75f518338d5afacb3fcf5c168999bee6420c7813df42b3002aa.
