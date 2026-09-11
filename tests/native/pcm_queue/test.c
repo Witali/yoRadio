@@ -26,7 +26,7 @@ void mock_exit(void) { assert(depth==1);--depth;pthread_mutex_unlock(&critical);
 static void *entry(void *p) { current=p;current->entry(current->arg);return NULL; }
 int xTaskCreate(void (*fn)(void *),const char *name,unsigned stack,void *arg,
                 unsigned priority,TaskHandle_t *task) {
-    assert(!strcmp(name,"pcm-output") && stack==2048 && priority==6);
+    assert(!strcmp(name,"pcm-output") && stack==AUDIO_PCM_QUEUE_STACK_BYTES && priority==6);
     worker.entry=fn;worker.arg=arg;*task=&worker;
     assert(!pthread_create(&worker.thread,NULL,entry,&worker));return pdPASS;
 }

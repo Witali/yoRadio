@@ -62,6 +62,11 @@ test('PCM consumer is diagnostic-only and rejects incompatible pipelines', t => 
   const valid=Object.fromEntries([...required.map(k=>[k,'ON']),...forbidden.map(k=>[k,'OFF']),['YORADIO_ESP8266_OPUS_PCM_QUEUE','ON']]);
   const run=values=>spawnSync(command,[...Object.entries(values).map(([k,v])=>'-D'+k+'='+v),'-P',script],{encoding:'utf8'});
   assert.equal(run({}).status,0);assert.equal(run(valid).status,0);
+  for (const bytes of [256,512,1024,1536,2048,4096]) {
+    assert.equal(run({...valid,YORADIO_ESP8266_PCM_STACK_BYTES:bytes}).status===0,
+      bytes===1536||bytes===2048,'stack '+bytes);
+  }
+  assert.notEqual(run({YORADIO_ESP8266_PCM_STACK_BYTES:1536}).status,0);
   for(const k of [...required,...forbidden]) {
     const result=run({...valid,[k]:valid[k]==='ON'?'OFF':'ON'});
     assert.notEqual(result.status,0,k);assert.match(result.stderr,/PCM queue requires/);

@@ -178,3 +178,40 @@ Next gates before another hardware promotion:
   RAM or scheduling. No missing-window bug has yet been established in lwIP.
 - [ ] Obtain10 qualified continuous windows, then test actual Stop/Play and
   cross-codec switching; host ownership tests alone are insufficient.
+
+## Follow-up: separate input starvation from output scheduling
+
+2026-09-11. A fresh DMA512 run of the own CELT64 LAN fixture receives data
+for over87 seconds. The host TCP_INFO samples show a changing receive window,
+no sampled zero window in the first87 seconds, and some retransmissions.
+This does not rule out short unsampled stalls, but does not support a permanently
+closed TCP window. Bytes accepted by the host socket are not delivered bytes.
+
+In the saved steady window:27.998s board time,27.200s PCM,697 new DMA misses,
+6668B minimum of the two free-heap samples. The decode-exclusive stage accounts
+for73.54% wall time, output17.79%, read3.81%. These are wall-time intervals,
+NOT task CPU utilization, and non-atomic stage miss counters must not be summed
+to attribute every DMA miss. The old synchronous path is not continuous even
+when input is arriving. This is a reason to test the consumer, not proof it works.
+
+The diagnostic `/api/native/opus-stream` snapshot now includes the largest
+CAP8 block at the first init failure, and current free/largest CAP8. It uses one
+allocator lock, no allocations/logs and no periodic timer; corrupt links return
+UINT32_MAX rather than being followed. It is coupled to the untraced v3.4 SDK
+allocator and is absent from production. Bounds/CAP8/sentinel/fragmentation
+tests run under ASan/UBSan; lifecycle tests preserve the pre-cleanup snapshot.
+Do not poll the heap walk in a tight playback loop: the SDK lock masks interrupts.
+
+`audit_pcm_stack.cjs` recompiles the exact target commands with `-fstack-usage`.
+Maximum individual frames:queue64B, output144B, normalizer wrapper16B,
+normalizer64B, DMA driver80B. Individual frames do not prove total call depth
+or ISR margin. Together with the earlier1672/2048B observed free watermark,
+this permits a conservative diagnostic trial with1536B, not a claim of safety
+for every path. Main audio remains5120B; decoder heap reserve remains4096B.
+
+The build helper now accepts `-PcmStackBytes 1536` only with `-OpusPcmQueue`.
+Default stays2048B and the queue stays OFF. Host concurrent ownership/error
+tests run for both sizes; physical gain/normalization/error-path stack and
+continuous playback qualification remain necessary. The smaller task saves
+512B, but the queue profile still uses about1.5KiB more total RAM than oldDMA512
+after accounting for its extra PCM and task stack/TCB.

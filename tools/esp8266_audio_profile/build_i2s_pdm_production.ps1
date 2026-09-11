@@ -24,6 +24,8 @@ param(
     [switch]$OpusPcmPublish,
     [switch]$OpusPcmLeases,
     [switch]$OpusPcmQueue,
+    [ValidateSet(1536, 2048)]
+    [int]$PcmStackBytes = 2048,
     [switch]$Pdm32Iram,
     [switch]$Pdm32Batch,
     [ValidateSet(64, 128, 256, 512)]
@@ -62,6 +64,7 @@ if ($OpusPcmQueue) {
     $OpusPcmLeases = $true
 }
 if ($DmaBufferWords -eq 256 -and -not $OpusPcmQueue) { throw 'DMA256 requires -OpusPcmQueue' }
+if ($PcmStackBytes -ne 2048 -and -not $OpusPcmQueue) { throw 'PCM stack override requires -OpusPcmQueue' }
 if ($OpusPcmLeases -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusPcmLeases requires diagnostic Opus until queue qualification' }
 if ($OpusRotationLx106 -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusRotationLx106 requires diagnostic Opus until board qualification' }
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
@@ -210,6 +213,7 @@ try {
         "-DYORADIO_ESP8266_OPUS_PCM_PUBLISH=$taskOpusPcmPublish",
         "-DYORADIO_OPUS_PCM_LEASES=$taskOpusPcmLeases",
         "-DYORADIO_ESP8266_OPUS_PCM_QUEUE=$taskOpusPcmQueue",
+        "-DYORADIO_ESP8266_PCM_STACK_BYTES=$PcmStackBytes",
         "-DYORADIO_ESP8266_PDM32_LOAN_WORDS=$Pdm32LoanWords",
         "-DYORADIO_ESP8266_DMA_BUFFER_WORDS=$DmaBufferWords",
         "-DYORADIO_ESP8266_SDK_RX_DIAG=$taskSdkRxDiag",
@@ -264,6 +268,7 @@ try {
         opus_pcm_publish=[bool]$OpusPcmPublish
         opus_pcm_leases=[bool]$OpusPcmLeases
         opus_pcm_queue=[bool]$OpusPcmQueue
+        opus_pcm_stack_bytes=$(if ($OpusPcmQueue) { $PcmStackBytes } else { 0 })
         opus_pcm_queue_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/audio_pcm_queue.c" -Algorithm SHA256).Hash
         opus_pcm_queue_header_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/audio_pcm_queue.h" -Algorithm SHA256).Hash
         opus_mathops_header_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/mathops.h).Hash

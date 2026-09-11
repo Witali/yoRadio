@@ -7,7 +7,12 @@
 /* Exactly two existing decoder frame slots, never an additional PCM copy. */
 #define AUDIO_PCM_QUEUE_SLOTS 2U
 #define AUDIO_PCM_QUEUE_FRAMES 960U
+#ifndef AUDIO_PCM_QUEUE_STACK_BYTES
 #define AUDIO_PCM_QUEUE_STACK_BYTES 2048U
+#endif
+#if AUDIO_PCM_QUEUE_STACK_BYTES != 1536 && AUDIO_PCM_QUEUE_STACK_BYTES != 2048
+#error "PCM consumer stack supports only audited diagnostic sizes"
+#endif
 typedef bool (*audio_pcm_generation_fn)(uint32_t generation);
 typedef void (*audio_pcm_progress_fn)(uint32_t generation, size_t frames);
 typedef struct {
