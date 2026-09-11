@@ -26,6 +26,10 @@ async function attempt(url,io) {
   try{result.status=await io.request('/api/native/status');}
   catch(e){result.status_error=e.message;}
   try{result.trace=await io.capture();}catch(e){result.capture_error=e.message;}
+  // After (never inside) the timing window: one diagnostic-only allocator
+  // snapshot. Preserve failure evidence without changing qualification gates.
+  try{result.init_diagnostic=await io.request('/api/native/opus-stream');}
+  catch(e){result.init_diagnostic_error=e.message;}
   result.pass=result.start?.http===202 && result.start.body?.queued===true &&
     result.status?.http===200 && result.status.body?.playing===true &&
     result.status.body?.codec==='OPUS' &&
@@ -64,7 +68,8 @@ async function main() {
     summary.qualified+=Number(result.pass);
     summary.results.push({attempt:i,pass:result.pass,start_error:result.start_error,
       status:result.status?.body,continuity:result.trace?.result?.continuity,
-      profile_error:result.trace?.result?.profile_error,capture_error:result.capture_error});
+      profile_error:result.trace?.result?.profile_error,capture_error:result.capture_error,
+      init_diagnostic:result.init_diagnostic,init_diagnostic_error:result.init_diagnostic_error});
     fs.writeFileSync(path.join(dir,'live-series.json'),JSON.stringify(summary,null,2)+'\n');
     console.log(JSON.stringify(summary.results.at(-1)));
   }
