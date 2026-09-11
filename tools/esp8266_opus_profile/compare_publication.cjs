@@ -17,6 +17,19 @@ function checkManifests(a,b) {
   for(const k of new Set([...Object.keys(a),...Object.keys(b)]))
     if(!allowed.includes(k))assert.deepEqual(b[k],a[k],`Unrelated build difference: ${k}`);
 }
+function readStartStatus(directory,run) {
+  let start;
+  try { start=fs.readFileSync(path.join(directory,`start${run}.log`),'utf8').replace(/^\uFEFF/,''); }
+  catch(e) {
+    if(e.code!=='ENOENT')throw e;
+    // curl with no stdout may leave no Tee-Object file. This is evidence of
+    // an unconfirmed start, not grounds to drop the entire attempted window.
+    return {start_confirmed:false,start_missing:true,start_sha256_lf:null};
+  }
+  let confirmed=false;try { confirmed=JSON.parse(start).queued===true; }catch {}
+  return {start_confirmed:confirmed,start_missing:false,
+    start_sha256_lf:sha256(Buffer.from(start.replace(/\r\n/g,'\n')))};
+}
 function readSeries(directory) {
   const read=f=>fs.readFileSync(path.join(directory,f));
   const manifest=JSON.parse(read('manifest.json').toString().replace(/^\uFEFF/,''));
@@ -25,11 +38,10 @@ function readSeries(directory) {
   const reports=[],inputs=[],unconfirmedStarts=[];
   for(let i=1;i<=10;i++) {
     const text=read(`run${i}.json`).toString();reports.push(JSON.parse(text));
-    const start=read(`start${i}.log`).toString().replace(/^\uFEFF/,'');
-    let confirmed=false;try { confirmed=JSON.parse(start).queued===true; }catch {}
-    if(!confirmed)unconfirmedStarts.push(i);
+    const start=readStartStatus(directory,i);
+    if(!start.start_confirmed)unconfirmedStarts.push(i);
     inputs.push({run:i,sha256_lf:sha256(Buffer.from(text.replace(/\r\n/g,'\n'))),
-      start_confirmed:confirmed,start_sha256_lf:sha256(Buffer.from(start.replace(/\r\n/g,'\n')))});
+      ...start});
   }
   return {manifest,inputs,unconfirmed_starts:unconfirmedStarts,...summarizeSeries(reports)};
 }
@@ -64,14 +76,14 @@ function compare(a,b,output) {
   const result={scope:'Own SILK12 HTTP, ten requested starts per variant (unconfirmed starts listed), 3s startup allowance then 25s requested sparse health window. Failures retained. Not raw CPU timing.',
     fixture:{name:'silk12.opus',bytes:fixture.length,sha256:sha256(fixture)},
     reference,candidate,target:{before,after},
-    candidate_all_windows_continuous:candidate.all_qualified,
+    candidate_all_windows_continuous:candidate.all_qualified&&!candidate.unconfirmed_starts.length,
     all_starts_confirmed:!reference.unconfirmed_starts.length&&!candidate.unconfirmed_starts.length};
   fs.writeFileSync(output,JSON.stringify(result,null,2)+'\n');
   console.log(JSON.stringify({qualified:[reference.qualified,candidate.qualified],
     before:reference.observed_only,after:candidate.observed_only},null,2));
   return result;
 }
-module.exports={checkManifests,targetEvidence,compare};
+module.exports={checkManifests,readStartStatus,targetEvidence,compare};
 if(require.main===module) {
   const [a,b,out]=process.argv.slice(2);assert.ok(a&&b&&out,'reference candidate output required');compare(a,b,out);
 }
