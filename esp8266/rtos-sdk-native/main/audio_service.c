@@ -736,6 +736,10 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
     AUDIO_STAGE_BEGIN(output_stage);
     esp_err_t result = native_audio_output_write(
         pcm, samples, info->sample_rate, info->channels);
+#if YORADIO_ESP8266_OPUS_PCM_PUBLISH
+    if (result == ESP_OK && context->codec_kind == HELIX_CODEC_OPUS)
+        result = native_audio_output_publish_pending();
+#endif
     AUDIO_STAGE_END(AUDIO_STAGE_OUTPUT, output_stage);
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "PCM output failed: %s",

@@ -400,6 +400,23 @@ esp_err_t esp8266_nodac_i2s_commit(size_t count) {
     return ESP_OK;
 }
 
+esp_err_t esp8266_nodac_i2s_publish_pending(void) {
+    esp_err_t result = ESP_OK;
+    taskENTER_CRITICAL();
+    if (s_reserved_words) {
+        result = ESP_ERR_INVALID_STATE;
+    } else if (s_current_buffer && s_current_position) {
+        unsigned index = s_current_buffer == s_buffers[0] ? 0U : 1U;
+        /* Commit already recorded the exact descriptor length. No new
+         * words, copies, descriptor changes or access to active DMA here. */
+        __asm__ __volatile__("memw" ::: "memory");
+        if (nodac_state_publish(&s_state, index)) s_current_buffer = NULL;
+        else result = ESP_ERR_INVALID_STATE;
+    }
+    taskEXIT_CRITICAL();
+    return result;
+}
+
 esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
                                   TickType_t ticks_to_wait) {
     if (!words && word_count) return ESP_ERR_INVALID_ARG;

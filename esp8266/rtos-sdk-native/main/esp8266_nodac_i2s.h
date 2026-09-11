@@ -25,6 +25,10 @@ esp_err_t esp8266_nodac_i2s_write(const uint32_t *words, size_t word_count,
 esp_err_t esp8266_nodac_i2s_reserve(uint32_t **words, size_t *capacity,
                                     TickType_t ticks_to_wait);
 esp_err_t esp8266_nodac_i2s_commit(size_t word_count);
+/* End a producer batch without padding: transfer its committed prefix to
+ * READY now, rather than appending the next batch to the same buffer.
+ * Single producer; rejects a live writable loan. Empty/already READY is OK. */
+esp_err_t esp8266_nodac_i2s_publish_pending(void);
 /* Single-producer API: call silence between writes, never concurrently.
  * Mute is applied at the next EOF, without modifying active DMA memory. */
 void esp8266_nodac_i2s_silence(uint32_t silence_word);

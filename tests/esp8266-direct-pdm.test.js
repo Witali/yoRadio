@@ -30,8 +30,8 @@ test('production direct DMA writer preserves PCM/PDM across chunk boundaries and
   const producer = driver.slice(driver.indexOf('static bool acquire_free_buffer('),
     driver.indexOf('void esp8266_nodac_i2s_reset_underruns('));
   assert.ok(producer.includes('esp8266_nodac_i2s_reserve('));
-  assert.equal((producer.match(/__asm__ __volatile__\("memw" ::: "memory"\);/g) || []).length, 1);
-  fs.writeFileSync(path.join(dir, 'producer.inc'), producer.replace(
+  assert.equal((producer.match(/__asm__ __volatile__\("memw" ::: "memory"\);/g) || []).length, 2);
+  fs.writeFileSync(path.join(dir, 'producer.inc'), producer.replaceAll(
     '__asm__ __volatile__("memw" ::: "memory");',
     'std::atomic_thread_fence(std::memory_order_seq_cst);'));
   const start = output.indexOf('#elif YORADIO_ESP8266_I2S_PDM\n\n#define I2S_PDM_WRITE_TIMEOUT_MS');

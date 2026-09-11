@@ -1275,6 +1275,14 @@ void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *stats) {
 #endif
 }
 
+esp_err_t native_audio_output_publish_pending(void) {
+#if YORADIO_ESP8266_I2S_PDM
+    return esp8266_nodac_i2s_publish_pending();
+#else
+    return ESP_OK;
+#endif
+}
+
 void native_audio_output_reload_settings(void) {
     persistent_settings_t settings;
     persistent_settings_get(&settings);

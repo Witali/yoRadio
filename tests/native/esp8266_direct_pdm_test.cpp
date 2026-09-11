@@ -266,7 +266,7 @@ static void prefix_handoff() {
     assert(transmitted == expected);
 }
 
-static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned chunk) {
+static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned chunk, bool publish = false) {
     normalizer = AudioNormalizer();
     storedSettings.volume = 193;
     storedSettings.balance = -3;
@@ -285,6 +285,7 @@ static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned c
         assert(native_audio_output_write(out.pcm.data() + start * channels,
             count * channels, rate, channels) == ESP_OK);
         assert(s_reserved_words == 0 && critical == 0);
+        if (publish) assert(esp8266_nodac_i2s_publish_pending() == ESP_OK);
         if(start % 3 == 0) eof(); // independent interrupt schedule
     }
     out.pdm = committed;
@@ -320,7 +321,50 @@ static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned c
     return out;
 }
 
+static void explicit_batch_publication() {
+    for (unsigned count : {1U, 64U, 120U, 136U, 448U, 480U, 512U}) {
+        esp8266_nodac_i2s_init(0xaaaaaaaaU, 8, 13);
+        assert(esp8266_nodac_i2s_publish_pending() == ESP_OK);
+        uint32_t *loan; size_t capacity;
+        assert(esp8266_nodac_i2s_reserve(&loan, &capacity, 10) == ESP_OK);
+        assert(esp8266_nodac_i2s_publish_pending() == ESP_ERR_INVALID_STATE);
+        for (unsigned i = 0; i < count; ++i) {
+            loan[i] = 1000U + i;
+            eof(); // publication must never expose an outstanding loan
+            assert(transmitted.empty());
+        }
+        assert(driver_commit(count) == ESP_OK);
+        assert(esp8266_nodac_i2s_publish_pending() == ESP_OK);
+        assert(s_current_buffer == nullptr && s_state.state[1] == NODAC_READY);
+        assert(s_descriptors[1].datalen == count * sizeof(uint32_t));
+        assert(esp8266_nodac_i2s_publish_pending() == ESP_OK); // idempotent
+        eof(); eof();
+        assert(transmitted.size() == count);
+        for (unsigned i = 0; i < count; ++i) assert(transmitted[i] == 1000U + i);
+        assert(critical == 0 && s_reserved_words == 0);
+    }
+    // Complete Opus frames retain 512/448 boundaries, not a drifting tail.
+    esp8266_nodac_i2s_init(0xaaaaaaaaU, 8, 13);
+    uint32_t sequence = 0;
+    for (unsigned frame = 0; frame < 100; ++frame) {
+        for (unsigned count : {512U, 448U}) {
+            uint32_t *loan; size_t capacity;
+            assert(esp8266_nodac_i2s_reserve(&loan, &capacity, 100) == ESP_OK);
+            assert(capacity == 512);
+            for (unsigned i = 0; i < count; ++i) loan[i] = sequence++;
+            assert(driver_commit(count) == ESP_OK);
+            assert(esp8266_nodac_i2s_publish_pending() == ESP_OK);
+        }
+    }
+    eof(); eof();
+    assert(transmitted.size() == sequence);
+    for (unsigned i = 0; i < sequence; ++i) assert(transmitted[i] == i);
+    esp8266_nodac_i2s_silence(0xaaaaaaaaU);
+    assert(esp8266_nodac_i2s_publish_pending() == ESP_OK);
+}
+
 int main() {
+    explicit_batch_publication();
     balance_regression();
     prefix_handoff();
     std::vector<uint32_t> monoReference;
@@ -348,6 +392,9 @@ int main() {
                 const Render actual = render(rate, channels, normalize, chunk);
                 assert(actual.pcm == baseline.pcm);
                 assert(actual.pdm == baseline.pdm);
+                const Render published = render(rate, channels, normalize, chunk, true);
+                assert(published.pcm == actual.pcm);
+                assert(published.pdm == actual.pdm);
             }
         }
     assert(native_audio_output_init() == ESP_OK);
