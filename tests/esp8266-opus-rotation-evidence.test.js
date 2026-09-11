@@ -9,7 +9,8 @@ test('archived universal rotation keeps all twenty exact-PCM attempts and the CE
   const runs=dirs.map((dir,k)=>Array.from({length:10},(_,i)=>{
     const file='run'+(i+1)+'.json',bytes=fs.readFileSync(path.join(dir,file));
     assert.ok(fs.statSync(path.join(dir,'run'+(i+1)+'.log')).size>0);
-    assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),saved.inputs[k?'candidate':'reference'][i].sha256);
+    // Git on Windows can convert text to CRLF; archived input hashes used LF.
+    assert.equal(crypto.createHash('sha256').update(bytes.toString('utf8').replace(/\r\n/g,'\n')).digest('hex'),saved.inputs[k?'candidate':'reference'][i].sha256);
     return JSON.parse(bytes);
   }));
   const actual=JSON.parse(JSON.stringify(compare(...runs)));
