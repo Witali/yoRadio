@@ -23,11 +23,12 @@ param(
     [switch]$OpusDivOnce,
     [switch]$OpusPcmPublish,
     [switch]$OpusPcmLeases,
+    [switch]$OpusPcmQueue,
     [switch]$Pdm32Iram,
     [switch]$Pdm32Batch,
     [ValidateSet(64, 128, 256, 512)]
     [int]$Pdm32LoanWords = 512,
-    [ValidateSet(512, 768)]
+    [ValidateSet(256, 512, 768)]
     [int]$DmaBufferWords = 512,
     [ValidateRange(250, 60000)]
     [int]$StreamIdleTimeoutMs = 1000,
@@ -54,6 +55,13 @@ if ($OpusFirFlashWord -and -not $EnableOpus) { throw '-OpusFirFlashWord requires
 if ($OpusCeltDecodeOnly -and -not $EnableOpus) { throw '-OpusCeltDecodeOnly requires -EnableOpus' }
 if ($OpusDivOnce -and -not $EnableOpus) { throw '-OpusDivOnce requires -EnableOpus' }
 if ($OpusPcmPublish -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusPcmPublish requires diagnostic Opus until board qualification' }
+if ($OpusPcmQueue) {
+    if (-not $EnableOpus -or -not $Diagnostic -or $OpusBenchmark -or $OpusPcmPublish -or $WebAudioPause -ne 'off') {
+        throw '-OpusPcmQueue requires diagnostic live Opus without benchmark/publication/WebUI pause'
+    }
+    $OpusPcmLeases = $true
+}
+if ($DmaBufferWords -eq 256 -and -not $OpusPcmQueue) { throw 'DMA256 requires -OpusPcmQueue' }
 if ($OpusPcmLeases -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusPcmLeases requires diagnostic Opus until queue qualification' }
 if ($OpusRotationLx106 -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusRotationLx106 requires diagnostic Opus until board qualification' }
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
@@ -164,6 +172,7 @@ try {
     $taskPdm32Batch = if ($Pdm32Batch) { 'ON' } else { 'OFF' }
     $taskOpusPcmPublish = if ($OpusPcmPublish) { 'ON' } else { 'OFF' }
     $taskOpusPcmLeases = if ($OpusPcmLeases) { 'ON' } else { 'OFF' }
+    $taskOpusPcmQueue = if ($OpusPcmQueue) { 'ON' } else { 'OFF' }
     $taskSdkRxDiag = if ($SdkRxDiag) { 'ON' } else { 'OFF' }
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
@@ -200,6 +209,7 @@ try {
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
         "-DYORADIO_ESP8266_OPUS_PCM_PUBLISH=$taskOpusPcmPublish",
         "-DYORADIO_OPUS_PCM_LEASES=$taskOpusPcmLeases",
+        "-DYORADIO_ESP8266_OPUS_PCM_QUEUE=$taskOpusPcmQueue",
         "-DYORADIO_ESP8266_PDM32_LOAN_WORDS=$Pdm32LoanWords",
         "-DYORADIO_ESP8266_DMA_BUFFER_WORDS=$DmaBufferWords",
         "-DYORADIO_ESP8266_SDK_RX_DIAG=$taskSdkRxDiag",
@@ -253,6 +263,9 @@ try {
         opus_div_once=[bool]$OpusDivOnce
         opus_pcm_publish=[bool]$OpusPcmPublish
         opus_pcm_leases=[bool]$OpusPcmLeases
+        opus_pcm_queue=[bool]$OpusPcmQueue
+        opus_pcm_queue_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/audio_pcm_queue.c" -Algorithm SHA256).Hash
+        opus_pcm_queue_header_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/audio_pcm_queue.h" -Algorithm SHA256).Hash
         opus_mathops_header_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/mathops.h).Hash
         opus_rotation_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_rotation_lx106.S).Hash
         opus_rotation_header_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_rotation.h).Hash

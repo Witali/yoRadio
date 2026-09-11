@@ -67,21 +67,54 @@ open; do not confuse this compile check with a running asynchronous queue.
 
 ## Remaining integration and qualification
 
-- [ ] Opt-in diagnostic build with two256-word DMA buffers; keep512 default.
-- [ ] Extend native adapter/bridge to use the two PCM slots, including pre-skip,
+- [x] Opt-in diagnostic build with two256-word DMA buffers; keep512 default.
+- [x] Extend native adapter/bridge to use the two PCM slots, including pre-skip,
   EOS trimming and packets with no output; do not copy into another full ring.
-- [ ] One consumer owns all gain/normalizer/PDM state. Stop/switch waits for
+- [x] One consumer owns all gain/normalizer/PDM state. Stop/switch waits for
   acknowledgement before resetting output or freeing queued PCM. No conversion
   in ISR and no blocking wait with interrupts disabled.
-- [ ] Budget its stack and TCB explicitly; retain4KiB decoder heap reserve and
+- [x] Budget its stack and TCB explicitly; retain4KiB decoder heap reserve and
   the documented audio-stack minimum. Existing app task runs potentially slow
   network/WebUI/storage maintenance and cannot just become this consumer.
 - [ ] Measure stack watermark, min DRAM, ready PCM and DMA occupancy, task CPU,
   underruns and stop/switch latency. DMA256 needs service roughly every5.33ms.
-- [ ] Exact PCM/PDM sequence and ownership tests with cancellation and faults.
+- [x] Exact PCM/PDM sequence and ownership tests with cancellation and faults.
 - [ ] At least10 matched board attempts, at least20s uninterrupted Opus audio
   per qualifying interval, plus WebUI and codec-switch tests. Keep all failures.
 
 Do not lower memory guards or accept lossy u-law/A-law to make a test pass.
 Buffering cannot cure average CPU demand above100%, and it does not fix TCP
 receive/reconnect failures. Those remain independent qualification blockers.
+
+## Diagnostic consumer implementation (2026-09-11)
+
+`-OpusPcmQueue -DmaBufferWords 256` enables the actual native adapter/bridge
+and `audio_pcm_queue.c`, not merely the lease API. Both remain OFF by default.
+The queue replaces the decoder PCM workspace with3840B, without another copy.
+It adds a2048B consumer stack plus the SDK TCB and small static slot/health state.
+The main audio stack stays5120B. Net RAM must be measured on the board; the
+2176B buffer saving relative to DMA768 is mostly consumed by the new task.
+
+The consumer has priority6 (decoder5), blocks on DMA or missing PCM, and keeps
+the previous512+remainder normalization boundaries. The ISR only services DMA.
+Stop discards ready frames, waits for an in-flight write, then detaches PCM;
+only afterwards may the audio owner reset/free the decoder. Startup failures
+delete the new task. Volume/normalizer controls are snapshotted atomically;
+normalizer reset is performed by the output owner, never concurrently.
+
+Host evidence: direct DMA256/512/768 output is bit-exact at6 sample rates with
+mono/stereo and normalization; the actual queue C source passes ASan/UBSan
+with two host threads, backpressure,25 in-flight Stops and output failure/reuse.
+Native adapter leases pass111 acquisitions:86 transferred,25 trimmed/aborted,
+zero stranded slots. The actual codec bridge passes100 mixed-codec allocation
+cycles and67 fault sites with the enlarged pool. Both PCM comparison reports
+remain12/12 exact including the retained DLF capture. Mock RTOS stack values
+are NOT ESP8266 stack measurements.
+
+`/api/native/audio` adds `pcm_ready`, `pcm_stack_free`, `pcm_submitted`,
+`pcm_output`, `pcm_output_calls`, `pcm_output_us`, `pcm_error`. PCM progress is
+counted after output writes, not enqueue. `pcm_output_us` is consumer WALL
+time including DMA waits/preemption, NOT CPU time. The older OUTPUT stage
+measures enqueue on this profile and must not be compared as physical output
+CPU work. Worst-case diagnostic JSON fits the existing1088B shared scratch;
+overflow is rejected, not sent as truncated JSON. Board qualification pending.

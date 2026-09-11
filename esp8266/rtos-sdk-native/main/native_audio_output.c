@@ -122,6 +122,9 @@ static bool s_normalization_enabled;
 static uint8_t s_normalization_max_gain_db;
 static int8_t s_normalization_target_db;
 static uint16_t s_normalization_time_ms;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+static bool s_normalizer_reset_pending;
+#endif
 
 #define VOLUME_DENOMINATOR 254U
 /* Signed: negating 16U wraps and clamps neutral balance to -16 (mute). */
@@ -968,17 +971,32 @@ static inline __attribute__((always_inline)) esp_err_t i2s_pdm_write_channels(
     int16_t *samples, size_t sample_count, uint32_t sample_rate,
     const uint8_t channels) {
     size_t frames = sample_count / channels;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    taskENTER_CRITICAL();
+    bool reset_normalizer = s_normalizer_reset_pending;
+    s_normalizer_reset_pending = false;
+#endif
+    const bool normalization_enabled = s_normalization_enabled;
+    const uint8_t normalization_max_gain_db = s_normalization_max_gain_db;
+    const int8_t normalization_target_db = s_normalization_target_db;
+    const uint16_t normalization_time_ms = s_normalization_time_ms;
+    const uint8_t volume = s_volume;
+    const int8_t balance = s_balance;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    taskEXIT_CRITICAL();
+    if (reset_normalizer) native_audio_normalizer_reset();
+#endif
     native_audio_normalizer_configure(
-        s_normalization_enabled, s_normalization_max_gain_db,
-        s_normalization_target_db, s_normalization_time_ms, sample_rate);
+        normalization_enabled, normalization_max_gain_db,
+        normalization_target_db, normalization_time_ms, sample_rate);
     native_audio_normalizer_process(samples, frames, channels);
     /* Mono PDM has no independent L/R channels to balance. */
-    uint8_t left_balance = channels == 2 && s_balance < 0
-        ? (uint8_t)(BALANCE_DENOMINATOR + s_balance) : BALANCE_DENOMINATOR;
-    uint8_t right_balance = channels == 2 && s_balance > 0
-        ? (uint8_t)(BALANCE_DENOMINATOR - s_balance) : BALANCE_DENOMINATOR;
-    uint32_t left_gain = channel_gain_q15(s_volume, left_balance);
-    uint32_t right_gain = channel_gain_q15(s_volume, right_balance);
+    uint8_t left_balance = channels == 2 && balance < 0
+        ? (uint8_t)(BALANCE_DENOMINATOR + balance) : BALANCE_DENOMINATOR;
+    uint8_t right_balance = channels == 2 && balance > 0
+        ? (uint8_t)(BALANCE_DENOMINATOR - balance) : BALANCE_DENOMINATOR;
+    uint32_t left_gain = channel_gain_q15(volume, left_balance);
+    uint32_t right_gain = channel_gain_q15(volume, right_balance);
     output_gain_with_led(samples, frames, channels, left_gain, right_gain);
 #if defined(YORADIO_ESP8266_AUDIO_TRACE)
     trace_output_pcm(samples, frames, channels);
@@ -1286,6 +1304,9 @@ esp_err_t native_audio_output_publish_pending(void) {
 void native_audio_output_reload_settings(void) {
     persistent_settings_t settings;
     persistent_settings_get(&settings);
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    taskENTER_CRITICAL();
+#endif
     s_volume = settings.volume > VOLUME_DENOMINATOR
                    ? VOLUME_DENOMINATOR : settings.volume;
     s_balance = settings.balance < -BALANCE_DENOMINATOR
@@ -1296,21 +1317,42 @@ void native_audio_output_reload_settings(void) {
     s_normalization_max_gain_db = settings.normalization_max_gain_db;
     s_normalization_target_db = settings.normalization_target_db;
     s_normalization_time_ms = settings.normalization_time_ms;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    taskEXIT_CRITICAL();
+#endif
 }
 
 void native_audio_output_reset_normalizer(void) {
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    taskENTER_CRITICAL();
+    s_normalizer_reset_pending = true;
+    taskEXIT_CRITICAL();
+#else
     native_audio_normalizer_reset();
+#endif
 }
 
 uint8_t native_audio_output_volume(void) { return s_volume; }
 
 void native_audio_output_set_volume_runtime(uint8_t volume) {
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    taskENTER_CRITICAL();
+#endif
     s_volume = volume > VOLUME_DENOMINATOR ? VOLUME_DENOMINATOR : volume;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    taskEXIT_CRITICAL();
+#endif
 }
 
 void native_audio_output_set_balance_runtime(int8_t balance) {
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    taskENTER_CRITICAL();
+#endif
     s_balance = balance < -BALANCE_DENOMINATOR
                     ? -BALANCE_DENOMINATOR
                     : (balance > BALANCE_DENOMINATOR
                            ? BALANCE_DENOMINATOR : balance);
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    taskEXIT_CRITICAL();
+#endif
 }

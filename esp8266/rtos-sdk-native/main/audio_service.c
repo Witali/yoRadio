@@ -15,6 +15,9 @@
 #include <unistd.h>
 
 #include "codec_bridge.h"
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+#include "audio_pcm_queue.h"
+#endif
 #include "http_stream_protocol.h"
 #include "stream_input_buffer.h"
 #include "esp_log.h"
@@ -297,6 +300,9 @@ static void log_audio_stack(const char *event) {
 static void release_codec(helix_codec_t **codec,
                           helix_codec_kind_t *codec_kind,
                           const char *reason) {
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    audio_pcm_queue_stop();
+#endif
     if (!*codec) {
         *codec_kind = 0;
         return;
@@ -317,6 +323,17 @@ static void release_codec(helix_codec_t **codec,
 static bool generation_current(uint32_t generation) {
     return s_generation == generation;
 }
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+static void queued_pcm_progress(uint32_t generation, size_t frames) {
+    taskENTER_CRITICAL();
+    if (s_generation == generation) {
+        s_pcm_frames += frames;
+        s_pcm_rate = 48000U;
+        s_pcm_tick = xTaskGetTickCount();
+    }
+    taskEXIT_CRITICAL();
+}
+#endif
 
 #include "stream_read_wait.h"
 
@@ -734,7 +751,13 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
 #endif
     if (!generation_current(context->generation)) return false;
     AUDIO_STAGE_BEGIN(output_stage);
-    esp_err_t result = native_audio_output_write(
+    esp_err_t result;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    if (context->codec_kind == HELIX_CODEC_OPUS)
+        result = audio_pcm_queue_submit(pcm, samples) ? ESP_OK : ESP_ERR_INVALID_STATE;
+    else
+#endif
+    result = native_audio_output_write(
         pcm, samples, info->sample_rate, info->channels);
 #if YORADIO_ESP8266_OPUS_PCM_PUBLISH
     if (result == ESP_OK && context->codec_kind == HELIX_CODEC_OPUS)
@@ -746,11 +769,16 @@ static bool pcm_output(void *opaque, const helix_stream_info_t *info,
                  esp_err_to_name(result));
         return false;
     }
-    taskENTER_CRITICAL();
-    s_pcm_frames += samples / info->channels;
-    s_pcm_rate = info->sample_rate;
-    s_pcm_tick = xTaskGetTickCount();
-    taskEXIT_CRITICAL();
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    if (context->codec_kind != HELIX_CODEC_OPUS)
+#endif
+    {
+        taskENTER_CRITICAL();
+        s_pcm_frames += samples / info->channels;
+        s_pcm_rate = info->sample_rate;
+        s_pcm_tick = xTaskGetTickCount();
+        taskEXIT_CRITICAL();
+    }
     /* Source metadata must not describe the mono PCM output. Keep the output
      * channel count above for sample stride and health frame accounting.
      * A synthesis callback is now only 32 frames. Publish the first format
@@ -1102,6 +1130,9 @@ static void audio_task(void *argument) {
         audio_web_pause_gate(&codec, &codec_kind);
         if (xQueueReceive(s_commands, &command, AUDIO_WEB_QUEUE_WAIT) != pdPASS)
             continue;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+        audio_pcm_queue_stop();
+#endif
         if (!command.play) {
             native_audio_output_silence();
             release_codec(&codec, &codec_kind, "stop");
@@ -1201,6 +1232,15 @@ static void audio_task(void *argument) {
             ? helix_codec_switch(codec, codec_kind) == 0
             : (codec = helix_codec_create(codec_kind,
                                           CODEC_HEAP_RESERVE_BYTES)) != NULL;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+        if (decoder_ready && codec_kind == HELIX_CODEC_OPUS) {
+            size_t pool_samples = 0;
+            int16_t *pool = helix_codec_pcm_pool(codec, &pool_samples);
+            decoder_ready = audio_pcm_queue_begin(pool, pool_samples, command.generation) == ESP_OK &&
+                helix_codec_bind_pcm_leases(codec, audio_pcm_queue_acquire,
+                                           audio_pcm_queue_release, NULL) == 0;
+        }
+#endif
 #if YORADIO_ESP8266_AUDIO_PROFILE
         ESP_LOGI(TAG, "Profile decoder switch end: ready=%d free_heap=%u",
                  decoder_ready, (unsigned)esp_get_free_heap_size());
@@ -1363,6 +1403,14 @@ static void audio_task(void *argument) {
         }
         if (audio_web_pause_checkpoint(&stream, &command)) continue;
         audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+        if (feed == 0 && generation_current(command.generation)) audio_pcm_queue_drain();
+        audio_pcm_queue_stop();
+        audio_pcm_queue_health_t queue_health;
+        audio_pcm_queue_health(&queue_health);
+        if (queue_health.error)
+            ESP_LOGE(TAG, "PCM queue output failed: %u", (unsigned)queue_health.error);
+#endif
         int stream_closed = close(stream.socket);
         (void)stream_closed;
         audio_transport_phase(AUDIO_TRANSPORT_IDLE);
@@ -1410,6 +1458,13 @@ esp_err_t audio_service_init(void) {
     if (!helix_codec_prepare()) return ESP_ERR_NO_MEM;
     s_commands = xQueueCreate(1, sizeof(audio_command_t));
     if (!s_commands) return ESP_ERR_NO_MEM;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    esp_err_t pcm_queue_result = audio_pcm_queue_init(generation_current, queued_pcm_progress);
+    if (pcm_queue_result != ESP_OK) {
+        vQueueDelete(s_commands); s_commands = NULL;
+        return pcm_queue_result;
+    }
+#endif
 #if YORADIO_ESP8266_KARADIO_PIPELINE
     s_karadio_state = KARADIO_PIPELINE_IDLE;
     if (xTaskCreate(karadio_network_worker, "karadio-net",
@@ -1427,6 +1482,9 @@ esp_err_t audio_service_init(void) {
     if (xTaskCreate(audio_task, "audio", AUDIO_STACK_BYTES, NULL,
                     AUDIO_TASK_PRIORITY, &s_audio_task) !=
         pdPASS) {
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+        audio_pcm_queue_deinit();
+#endif
 #if YORADIO_ESP8266_KARADIO_PIPELINE
         vTaskDelete(s_karadio_network_task);
         s_karadio_network_task = NULL;

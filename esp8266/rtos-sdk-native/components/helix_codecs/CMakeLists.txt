@@ -50,6 +50,12 @@ if(YORADIO_ESP8266_OPUS_STREAM_TEST OR YORADIO_ESP8266_OPUS_BENCHMARK)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_ESP8266_OPUS_STREAM_TEST=1)
 endif()
+if(YORADIO_ESP8266_OPUS_PCM_QUEUE)
+  if(NOT YORADIO_OPUS_PCM_LEASES OR NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT CONFIG_YORADIO_OGG_OPUS)
+    message(FATAL_ERROR "PCM queue bridge requires diagnostic Opus leases")
+  endif()
+  target_compile_definitions(${COMPONENT_LIB} PUBLIC YORADIO_ESP8266_OPUS_PCM_QUEUE=1)
+endif()
 option(YORADIO_ESP8266_MP3_SHARED_REORDER
   "Reuse IMDCT output as MP3 reorder scratch (OFF for A/B comparison)" ON)
 option(YORADIO_ESP8266_AAC_BLOCK_OUTPUT "Stream AAC PCM in bounded blocks" ON)

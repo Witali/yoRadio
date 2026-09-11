@@ -27,6 +27,9 @@
 #include "lwip/tcp.h"
 #include "native_audio_output.h"
 #include "audio_service.h"
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+#include "audio_pcm_queue.h"
+#endif
 #if YORADIO_ESP8266_OPUS_BENCHMARK
 #include "opus_benchmark.h"
 #endif
@@ -1140,6 +1143,10 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
     native_audio_output_spi_stats_t output;
     audio_service_health(&health);
     native_audio_output_get_spi_stats(&output);
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    audio_pcm_queue_health_t pcm_queue;
+    audio_pcm_queue_health(&pcm_queue);
+#endif
 #if YORADIO_ESP8266_SDK_RX_DIAG
     sdk_rx_diag_snapshot_t rx_diag;
     sdk_rx_diag_snapshot(&rx_diag);
@@ -1154,11 +1161,15 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
     /* Serialized HTTP task: reuse its scratch instead of extending the stack
      * buffer for diagnostic fields. send_string copies before returning. */
     char *body = s_async_message;
-    snprintf(body, sizeof(s_async_message),
+    int body_size = snprintf(body, sizeof(s_async_message),
         "{\"generation\":%u,\"uptime_ms\":%u,\"rx_bytes\":%u,"
         "\"pcm_frames\":%u,\"sample_rate\":%u,\"rx_age_ms\":%u,"
         "\"pcm_age_ms\":%u,\"underruns\":%u,\"free_heap\":%u,"
         "\"dma_eofs\":%u,\"output_enabled\":%s,\"audio_stack_free\":%u,\"free_iram\":%u"
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+        ",\"pcm_ready\":%u,\"pcm_stack_free\":%u,\"pcm_submitted\":%u,\"pcm_output\":%u"
+        ",\"pcm_output_calls\":%u,\"pcm_output_us\":%u,\"pcm_error\":%u"
+#endif
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
         ",\"transport_phase\":%u,\"transport_result\":%d,\"transport_errno\":%d,\"input_bytes\":%u"
 #endif
@@ -1177,6 +1188,11 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
         (unsigned)output.chained_transfers, output_enabled,
         (unsigned)health.stack_free,
         (unsigned)heap_caps_get_free_size(MALLOC_CAP_EXEC)
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+        , (unsigned)pcm_queue.ready_frames, (unsigned)pcm_queue.stack_free,
+        (unsigned)pcm_queue.submitted_frames, (unsigned)pcm_queue.output_frames,
+        (unsigned)pcm_queue.output_calls, (unsigned)pcm_queue.output_us, (unsigned)pcm_queue.error
+#endif
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
         , (unsigned)health.transport_phase, (int)health.transport_result,
         (int)health.transport_errno, (unsigned)health.input_bytes
@@ -1189,6 +1205,9 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
         , (unsigned)esp_reset_reason()
 #endif
     );
+    if (body_size < 0 || (size_t)body_size >= sizeof(s_async_message))
+        return finish_short_response(request, httpd_resp_send_err(request,
+            HTTPD_500_INTERNAL_SERVER_ERROR, "Audio status exceeds response buffer"));
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return finish_short_response(request, send_string(request, body));

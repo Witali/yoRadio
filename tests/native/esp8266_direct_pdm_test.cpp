@@ -145,6 +145,9 @@ static bool s_normalization_enabled;
 static uint8_t s_normalization_max_gain_db = 12;
 static int8_t s_normalization_target_db = -3;
 static uint16_t s_normalization_time_ms = 5000;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+static bool s_normalizer_reset_pending;
+#endif
 static AudioNormalizer normalizer;
 static persistent_settings_t storedSettings;
 void persistent_settings_get(persistent_settings_t *out) { *out = storedSettings; }
@@ -330,7 +333,10 @@ static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned c
 }
 
 static void explicit_batch_publication() {
-    for (unsigned count : {1U, 64U, 120U, 136U, 448U, 480U, 512U}) {
+    for (unsigned count : {1U, 64U, 120U, 136U, unsigned(TEST_DMA_WORDS), 448U, 480U, 512U}) {
+        // A raw reserve never grants more than one physical buffer. Larger
+        // logical PCM batches are exercised by the segmented loop below.
+        if (count > TEST_DMA_WORDS) continue;
         esp8266_nodac_i2s_init(0xaaaaaaaaU, 8, 13);
         assert(esp8266_nodac_i2s_publish_pending() == ESP_OK);
         uint32_t *loan; size_t capacity;
@@ -356,11 +362,15 @@ static void explicit_batch_publication() {
     uint32_t sequence = 0;
     for (unsigned frame = 0; frame < 100; ++frame) {
         for (unsigned count : {512U, 448U}) {
-            uint32_t *loan; size_t capacity;
-            assert(esp8266_nodac_i2s_reserve(&loan, &capacity, 100) == ESP_OK);
-            assert(capacity == TEST_DMA_WORDS);
-            for (unsigned i = 0; i < count; ++i) loan[i] = sequence++;
-            assert(driver_commit(count) == ESP_OK);
+            for (unsigned done = 0; done < count;) {
+                uint32_t *loan; size_t capacity;
+                assert(esp8266_nodac_i2s_reserve(&loan, &capacity, 100) == ESP_OK);
+                assert(capacity && capacity <= TEST_DMA_WORDS);
+                unsigned part = std::min(unsigned(capacity), count - done);
+                for (unsigned i = 0; i < part; ++i) loan[i] = sequence++;
+                assert(driver_commit(part) == ESP_OK);
+                done += part;
+            }
             assert(esp8266_nodac_i2s_publish_pending() == ESP_OK);
         }
     }

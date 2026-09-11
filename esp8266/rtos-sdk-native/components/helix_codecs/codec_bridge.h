@@ -3,6 +3,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#ifndef YORADIO_ESP8266_OPUS_PCM_QUEUE
+#define YORADIO_ESP8266_OPUS_PCM_QUEUE 0
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,6 +59,15 @@ size_t helix_codec_workspace_size(void);
 size_t helix_codec_arena_used(const helix_codec_t *codec);
 size_t helix_codec_dram_used(const helix_codec_t *codec);
 size_t helix_codec_iram_used(const helix_codec_t *codec);
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+/* Audio owner only, between decode calls, with the previous consumer stopped.
+ * The Opus pool contains two contiguous 960-sample mono frame slots. */
+typedef int (*helix_pcm_acquire_fn)(void *context, int16_t **pcm, int samples);
+typedef void (*helix_pcm_release_fn)(void *context, int16_t *pcm);
+int16_t *helix_codec_pcm_pool(helix_codec_t *codec, size_t *samples);
+int helix_codec_bind_pcm_leases(helix_codec_t *codec, helix_pcm_acquire_fn acquire,
+                               helix_pcm_release_fn release, void *context);
+#endif
 
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
 typedef enum {

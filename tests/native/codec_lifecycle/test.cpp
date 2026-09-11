@@ -95,7 +95,7 @@ extern "C" int native_opus_init_ex(native_opus_t *d, const native_opus_config_t 
     assert(d && config && config->output && config->output_ctx);
     assert(config->decoder_state_bytes == native_opus_decoder_size());
     assert(config->scratch_bytes == CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
-    assert(config->iram_bytes == 16384 && config->pcm_samples == 960);
+    assert(config->iram_bytes == 16384 && config->pcm_samples == (YORADIO_ESP8266_OPUS_PCM_QUEUE ? 1920 : 960));
     assert(live.at(config->decoder_state) == config->decoder_state_bytes);
     assert(live.at(config->scratch) == config->scratch_bytes);
     assert(live.at(config->iram) == config->iram_bytes);
@@ -127,9 +127,17 @@ extern "C" int native_opus_feed(native_opus_t *d, const uint8_t *data,
     *consumed = size < 7 ? size : 7;
     if (!size) return NATIVE_OPUS_NEED_INPUT;
     d->input_channels = opus_source_channels;
-    for (size_t i = 0; i < 960; ++i) d->config.pcm[i] = static_cast<int16_t>(i);
-    return d->config.output(d->config.output_ctx, d->config.pcm, 960, 24000) ?
-        NATIVE_OPUS_PACKET : NATIVE_OPUS_ERR_CANCELLED;
+    int16_t *pcm=d->config.pcm;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    int acquired=d->config.acquire_pcm(d->config.output_ctx,&pcm,960);
+    if(acquired) return acquired;
+#endif
+    for (size_t i = 0; i < 960; ++i) pcm[i] = static_cast<int16_t>(i);
+    bool ok=d->config.output(d->config.output_ctx, pcm, 960, 24000);
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    if(!ok) d->config.release_pcm(d->config.output_ctx,pcm);
+#endif
+    return ok ? NATIVE_OPUS_PACKET : NATIVE_OPUS_ERR_CANCELLED;
 }
 extern "C" int native_opus_finish(native_opus_t *d) {
     assert(d); ++opus_finishes;
@@ -323,6 +331,18 @@ static void opus_reserve_and_init_failures(const std::map<void *, size_t> &basel
            unsigned(CONFIG_YORADIO_OPUS_INPUT_BYTES), unsigned(CONFIG_YORADIO_OPUS_SCRATCH_BYTES));
 }
 
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+static int16_t *test_pcm_pool;
+static bool test_pcm_owned;
+static int test_acquire(void *context,int16_t **pcm,int samples) {
+    assert(context==test_pcm_pool && samples==960 && !test_pcm_owned);
+    *pcm=test_pcm_pool+960; test_pcm_owned=true; return 0;
+}
+static void test_release(void *context,int16_t *pcm) {
+    assert(context==test_pcm_pool && pcm==test_pcm_pool+960 && test_pcm_owned);
+    test_pcm_owned=false;
+}
+#endif
 struct PcmOutput { unsigned blocks; size_t samples; bool cancel; };
 static bool receive_pcm(void *context, const helix_stream_info_t *info,
                         int16_t *pcm, size_t samples) {
@@ -333,14 +353,25 @@ static bool receive_pcm(void *context, const helix_stream_info_t *info,
     assert(info->source_sample_rate == 48000);
     static_assert(sizeof(helix_stream_info_t) == 16, "Bounded stream/PCM metadata");
     const size_t offset = output->samples % 960;
-    assert(samples == (offset ? 448 : 512));
+    assert(samples == (YORADIO_ESP8266_OPUS_PCM_QUEUE ? 960 : (offset ? 448 : 512)));
     assert(pcm[0] == static_cast<int16_t>(offset));
     ++output->blocks; output->samples += samples;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    assert(pcm==test_pcm_pool+960 && test_pcm_owned);
+    if(!output->cancel) test_pcm_owned=false;
+#endif
     return !output->cancel;
 }
 
 static void opus_bridge_delivery(const std::map<void *, size_t> &baseline) {
     helix_codec_t *c = helix_codec_create(HELIX_CODEC_OPUS, 1152); assert(c);
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    size_t pool_samples=0;
+    test_pcm_pool=helix_codec_pcm_pool(c,&pool_samples);
+    assert(test_pcm_pool && pool_samples==1920 && live.at(test_pcm_pool)==3840);
+    assert(helix_codec_bind_pcm_leases(c,test_acquire,test_release,test_pcm_pool)==0);
+    assert(helix_codec_bind_pcm_leases(c,nullptr,test_release,test_pcm_pool)<0);
+#endif
     size_t capacity = 0;
     uint8_t *input = helix_codec_write_pointer(c, &capacity);
     memset(input, 0x5a, 14);
@@ -348,10 +379,10 @@ static void opus_bridge_delivery(const std::map<void *, size_t> &baseline) {
     const unsigned before = attempts;
     PcmOutput output = {};
     assert(helix_codec_process_one(c, receive_pcm, &output) == 0);
-    assert(output.blocks == 2 && output.samples == 960 && helix_codec_buffered(c) == 7);
+    assert(output.blocks == (YORADIO_ESP8266_OPUS_PCM_QUEUE ? 1 : 2) && output.samples == 960 && helix_codec_buffered(c) == 7);
     opus_source_channels = 1; // A following mono logical stream still outputs mono PCM.
     assert(helix_codec_process_one(c, receive_pcm, &output) == 0);
-    assert(output.blocks == 4 && output.samples == 1920 && helix_codec_buffered(c) == 0);
+    assert(output.blocks == (YORADIO_ESP8266_OPUS_PCM_QUEUE ? 2 : 4) && output.samples == 1920 && helix_codec_buffered(c) == 0);
     opus_source_channels = 2;
     assert(helix_codec_process_one(c, receive_pcm, &output) == 1);
     opus_finish_result = NATIVE_OPUS_ERR_TRUNCATED;
@@ -364,6 +395,9 @@ static void opus_bridge_delivery(const std::map<void *, size_t> &baseline) {
     assert(helix_codec_feed(c, packet, sizeof(packet), false, receive_pcm, &output) ==
            NATIVE_OPUS_ERR_CANCELLED);
     assert(output.blocks == 1 && attempts == before);
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    assert(!test_pcm_owned);
+#endif
     helix_codec_destroy(c); clean(baseline);
     puts("Opus adapter routing, bounded PCM callbacks and finish/cancellation PASS");
 }

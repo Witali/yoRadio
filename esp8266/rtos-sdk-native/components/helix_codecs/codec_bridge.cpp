@@ -116,7 +116,8 @@ constexpr size_t kLegacyMaxPcmSamples = kAacPcmSamples > kMp3PcmSamples ? kAacPc
 constexpr size_t kLegacyMaxPcmSamples = kMp3PcmSamples;
 #endif
 #if CONFIG_YORADIO_OGG_OPUS
-constexpr size_t kMaxPcmSamples = kLegacyMaxPcmSamples > 960U ? kLegacyMaxPcmSamples : 960U;
+constexpr size_t kOpusPcmSamples = YORADIO_ESP8266_OPUS_PCM_QUEUE ? 1920U : 960U;
+constexpr size_t kMaxPcmSamples = kLegacyMaxPcmSamples > kOpusPcmSamples ? kLegacyMaxPcmSamples : kOpusPcmSamples;
 #else
 constexpr size_t kMaxPcmSamples = kLegacyMaxPcmSamples;
 #endif
@@ -134,7 +135,7 @@ size_t input_storage_bytes(size_t capacity) {
 
 size_t pcm_samples_for_kind(helix_codec_kind_t kind) {
 #if CONFIG_YORADIO_OGG_OPUS
-    if (kind == HELIX_CODEC_OPUS) return 960U;
+    if (kind == HELIX_CODEC_OPUS) return kOpusPcmSamples;
 #endif
 #if CONFIG_YORADIO_HELIX_AAC
     if (kind == HELIX_CODEC_AAC) return kAacPcmSamples;
@@ -282,14 +283,33 @@ struct OpusWorkspace {
     void *words;
     helix_pcm_callback_t callback;
     void *context;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    helix_pcm_acquire_fn acquire;
+    helix_pcm_release_fn release;
+    void *lease_context;
+#endif
 };
 static OpusWorkspace *s_opus;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+static int acquire_opus(void *opaque, int16_t **pcm, int samples) {
+    OpusWorkspace *workspace = static_cast<OpusWorkspace *>(opaque);
+    return workspace->acquire ? workspace->acquire(workspace->lease_context, pcm, samples)
+                              : NATIVE_OPUS_ERR_CANCELLED;
+}
+static void release_opus(void *opaque, int16_t *pcm) {
+    OpusWorkspace *workspace = static_cast<OpusWorkspace *>(opaque);
+    if (workspace->release) workspace->release(workspace->lease_context, pcm);
+}
+#endif
 
 static bool emit_opus(void *opaque, const int16_t *pcm, size_t samples,
                       uint32_t bitrate) {
     OpusWorkspace *output = static_cast<OpusWorkspace *>(opaque);
     helix_stream_info_t info = {48000U, bitrate, 1, 16,
         static_cast<uint8_t>(output->stream.input_channels), 48000U};
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    return output->callback(output->context, &info, const_cast<int16_t *>(pcm), samples);
+#else
     /* libopus has finished this frame. The output pipeline may apply gain in
      * place, just as it does for MP3/AAC, without touching decoder history. */
     for (size_t offset = 0; offset < samples; offset += 512U) {
@@ -298,6 +318,7 @@ static bool emit_opus(void *opaque, const int16_t *pcm, size_t samples,
                               const_cast<int16_t *>(pcm + offset), count)) return false;
     }
     return true;
+#endif
 }
 
 static void opus_free() {
@@ -344,6 +365,10 @@ static bool opus_allocate(helix_codec *codec) {
     config.pcm_samples = codec->pcm_samples;
     config.output = emit_opus;
     config.output_ctx = s_opus;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+    config.acquire_pcm = acquire_opus;
+    config.release_pcm = release_opus;
+#endif
     const int result = native_opus_init_ex(&s_opus->stream, &config, true);
     if (result != 0)
         opus_init_failed(codec->kind, HELIX_OPUS_INIT_NATIVE, native_opus_decoder_size(), codec->reserve_heap_bytes, result);
@@ -880,6 +905,22 @@ extern "C" size_t helix_codec_input_capacity(void) {
 extern "C" size_t helix_codec_active_input_capacity(const helix_codec_t *codec) {
     return codec ? codec->input_capacity : kInputBytes;
 }
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+extern "C" int16_t *helix_codec_pcm_pool(helix_codec_t *codec, size_t *samples) {
+    if (samples) *samples = 0;
+    if (!codec || codec->kind != HELIX_CODEC_OPUS || !s_opus || !samples) return nullptr;
+    *samples = codec->pcm_samples;
+    return codec->pcm;
+}
+extern "C" int helix_codec_bind_pcm_leases(helix_codec_t *codec,
+    helix_pcm_acquire_fn acquire, helix_pcm_release_fn release, void *context) {
+    if (!codec || codec->kind != HELIX_CODEC_OPUS || !s_opus || !acquire || !release) return -1;
+    s_opus->acquire = acquire;
+    s_opus->release = release;
+    s_opus->lease_context = context;
+    return 0;
+}
+#endif
 
 extern "C" int helix_codec_buffer_commit(helix_codec_t *codec, size_t size) {
     if (!codec) return -1;
