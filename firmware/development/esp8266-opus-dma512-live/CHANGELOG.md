@@ -12,3 +12,8 @@ attempts retained. Startup showed playing in5/9 available status responses.
 First full window:28.219s elapsed,26.960s PCM,1046 new DMA underruns. Later
 errors include Decoder Init Error and HTTP response timeouts. Lifetime heap
 minimum eventually3124B, not a per-window value. Not continuous/qualified.
+
+Post-series read-only init diagnostic:stage10 reserve gate, free_dram3952B,
+detail4012B < required4096B; current_dram26792B after the failed decoder was
+released. This establishes the last init failure's low-memory condition,
+not the cause of the preceding receive timeout and not a persistent leak.
