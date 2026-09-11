@@ -135,3 +135,29 @@ No runtime bitrate limit is introduced.
 [All raw attempts, matched manifests, ISR evidence and summary](../firmware/development/esp8266-opus-publish-on/comparison.json).
 Both artifact directories also retain start logs and local TCP telemetry;
 accepted_wire_bytes is the PC write-queue count, not proof of delivery.
+
+## Follow-up source audit (no behavior change)
+
+Before adding another transport workaround, the actual SDK89a3f254b63819035f65d9c5dcdae8864f1a6a8a
+was inspected. lwIP api_msg.c netconn_drain already frees queued receive
+pbufs; its full close calls tcp_close. tcp.c tcp_close_shutdown sends RST
+and purges unread/refused data, and tcp_in.c aborts data arriving after
+TF_RXCLOSED. Adding shutdown(RDWR) before every close is therefore not a
+demonstrated fix. The successful-close cached Opus decoder is already reused;
+an open failure explicitly releases it before retrying. No new leak was
+established by this audit, and no close/reconnect code was changed.
+
+web_service.c session_opened already enables TCP_NODELAY. The diagnostic
+Opus status handler uses a384-byte stack row and chunked sends, not a
+malloc'ed full JSON body. The effect of its many short writes and underlying
+TCP queues on live heap/timing remains a hypothesis to measure; it must not
+be described as an identified full-body allocation or missing NODELAY.
+The current matched series retains the same30s polling protocol throughout.
+
+The saved through192 raw baseline reports DRAM scratch peaks1808/2904/5488/
+5488/5488B for12/24/64/128/192kbps; IRAM word peaks14112/15600B. Thus a4-KiB
+DRAM scratch proposal is already contradicted by CELT measurements. Even
+5488B is an observed corpus peak, not a universal bound for all supported
+packets. Keep the6144B allocation until a separate lifetime/coverage proof
+justifies changing it. FFT/MDCT word-access fixes are also already present;
+do not repeat them as a newly discovered narrow-flash-load optimization.
