@@ -1206,8 +1206,7 @@ static esp_err_t audio_health_handler(httpd_req_t *request) {
 #endif
     );
     if (body_size < 0 || (size_t)body_size >= sizeof(s_async_message))
-        return finish_short_response(request, httpd_resp_send_err(request,
-            HTTPD_500_INTERNAL_SERVER_ERROR, "Audio status exceeds response buffer"));
+        return finish_short_response(request, httpd_resp_send_500(request));
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return finish_short_response(request, send_string(request, body));
