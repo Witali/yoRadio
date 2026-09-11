@@ -93,7 +93,8 @@ void yoradio_opus_clear(void *to, size_t count, size_t size) {
 
 static int decode_bounded(void *decoder, const unsigned char *packet,
     int length, int16_t *pcm, int frame_size,
-    yoradio_opus_pcm_block_fn output, void *context) {
+    yoradio_opus_pcm_block_fn output, void *context,
+    yoradio_opus_pcm_acquire_fn acquire) {
     if (decode_active) return OPUS_INVALID_STATE;
     byte_used = 0; word_used = history_bytes;
     decode_active = 1;
@@ -102,7 +103,9 @@ static int decode_bounded(void *decoder, const unsigned char *packet,
         decode_active = 0;
         return OPUS_ALLOC_FAIL;
     }
-    int result = output ? yoradio_opus_decode_blocks_native(decoder, packet,
+    int result = acquire ? yoradio_opus_decode_leased_native(decoder, packet,
+        length, frame_size, acquire, output, context) :
+        output ? yoradio_opus_decode_blocks_native(decoder, packet,
         length, pcm, frame_size, output, context) :
         opus_decode(decoder, packet, length, pcm, frame_size, 0);
     byte_used = 0; word_used = history_bytes;
@@ -111,11 +114,43 @@ static int decode_bounded(void *decoder, const unsigned char *packet,
 }
 int yoradio_opus_decode_bounded(void *decoder, const unsigned char *packet,
                                int length, int16_t *pcm, int frame_size) {
-    return decode_bounded(decoder, packet, length, pcm, frame_size, NULL, NULL);
+    return decode_bounded(decoder, packet, length, pcm, frame_size, NULL, NULL, NULL);
 }
 int yoradio_opus_decode_blocks_bounded(void *decoder, const unsigned char *packet,
     int length, int16_t *pcm, int frame_capacity,
     yoradio_opus_pcm_block_fn output, void *context) {
     if (!output) return OPUS_BAD_ARG;
-    return decode_bounded(decoder, packet, length, pcm, frame_capacity, output, context);
+    return decode_bounded(decoder, packet, length, pcm, frame_capacity, output, context, NULL);
+}
+
+typedef struct {
+    yoradio_opus_pcm_acquire_fn acquire;
+    yoradio_opus_pcm_block_fn output;
+    void *context;
+    int16_t *current;
+} pcm_lease_t;
+static int lease_acquire(void *context, int16_t **pcm, int samples) {
+    pcm_lease_t *lease = context;
+    *pcm = NULL;
+    int result = lease->acquire(lease->context, pcm, samples);
+    if (!result) lease->current = *pcm;
+    return result;
+}
+static int lease_output(void *context, int16_t *pcm, int samples) {
+    pcm_lease_t *lease = context;
+    int result = lease->output(lease->context, pcm, samples);
+    if (!result) lease->current = NULL;
+    return result;
+}
+int yoradio_opus_decode_leased_bounded(void *decoder, const unsigned char *packet,
+    int length, int frame_capacity, yoradio_opus_pcm_acquire_fn acquire,
+    yoradio_opus_pcm_block_fn output, yoradio_opus_pcm_abort_fn abort, void *context) {
+    if (!acquire || !output || !abort) return OPUS_BAD_ARG;
+    /* This object is outside decode_bounded's setjmp scope, so its current
+     * lease survives a scratch-OOM longjmp without indeterminate locals. */
+    pcm_lease_t lease = {acquire, output, context, NULL};
+    int result = decode_bounded(decoder, packet, length, NULL, frame_capacity,
+        lease_output, &lease, lease_acquire);
+    if (lease.current) abort(context, lease.current);
+    return result;
 }

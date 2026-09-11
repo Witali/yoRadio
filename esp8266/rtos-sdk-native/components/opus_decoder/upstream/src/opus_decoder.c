@@ -682,10 +682,12 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
 }
 
 typedef int (*opus_block_output_fn)(void *, opus_val16 *, int);
+typedef int (*opus_block_acquire_fn)(void *, opus_val16 **, int);
 static int opus_decode_native_impl(OpusDecoder *st, const unsigned char *data,
       opus_int32 len, opus_val16 *pcm, int frame_size, int decode_fec,
       int self_delimited, opus_int32 *packet_offset, int soft_clip, const OpusDRED *dred, opus_int32 dred_offset,
-      opus_block_output_fn block_output, void *block_context)
+      opus_block_output_fn block_output, void *block_context,
+      opus_block_acquire_fn block_acquire)
 {
    int i, nb_samples;
    int count, offset;
@@ -807,8 +809,16 @@ static int opus_decode_native_impl(OpusDecoder *st, const unsigned char *data,
    for (i=0;i<count;i++)
    {
       int ret;
+      opus_val16 *frame_pcm = block_output ? pcm : pcm+nb_samples*st->channels;
+      if (block_acquire)
+      {
+         ret = block_acquire(block_context, &frame_pcm, packet_frame_size);
+         if (ret) return ret < 0 ? ret : OPUS_INTERNAL_ERROR;
+         if (!frame_pcm || ((uintptr_t)frame_pcm & (sizeof(opus_val16)-1)))
+            return OPUS_BAD_ARG;
+      }
       ret = opus_decode_frame(st, data, size[i],
-            block_output ? pcm : pcm+nb_samples*st->channels,
+            frame_pcm,
             block_output ? frame_size : frame_size-nb_samples, 0);
       if (ret<0)
          return ret;
@@ -821,12 +831,16 @@ static int opus_decode_native_impl(OpusDecoder *st, const unsigned char *data,
          if (ret != packet_frame_size) return OPUS_INTERNAL_ERROR;
          /* Frame history, gain, transitions and scratch restore are complete.
             Consume before reuse; no packet copy or extra PCM allocation. */
-         output_error = block_output(block_context, pcm, ret);
+         /* A leased buffer can be consumed or reused immediately after this
+            callback. Complete diagnostics before transferring ownership. */
+         if (OPUS_CHECK_ARRAY(frame_pcm, ret*st->channels))
+            OPUS_PRINT_INT(ret);
+         output_error = block_output(block_context, frame_pcm, ret);
          if (output_error) return output_error < 0 ? output_error : OPUS_INTERNAL_ERROR;
       }
    }
    st->last_packet_duration = nb_samples;
-   if (OPUS_CHECK_ARRAY(pcm, (block_output ? packet_frame_size : nb_samples)*st->channels))
+   if (!block_output && OPUS_CHECK_ARRAY(pcm, nb_samples*st->channels))
       OPUS_PRINT_INT(nb_samples);
 #ifndef FIXED_POINT
    if (soft_clip)
@@ -842,7 +856,7 @@ int opus_decode_native(OpusDecoder *st, const unsigned char *data,
       int self_delimited, opus_int32 *packet_offset, int soft_clip, const OpusDRED *dred, opus_int32 dred_offset)
 {
    return opus_decode_native_impl(st, data, len, pcm, frame_size, decode_fec,
-         self_delimited, packet_offset, soft_clip, dred, dred_offset, NULL, NULL);
+         self_delimited, packet_offset, soft_clip, dred, dred_offset, NULL, NULL, NULL);
 }
 
 #if defined(YORADIO_OPUS_BOUNDED) && defined(FIXED_POINT)
@@ -857,7 +871,18 @@ int yoradio_opus_decode_blocks_native(void *decoder, const unsigned char *packet
        frame_capacity <= 0 || frame_capacity > 960 || st->Fs != 48000 || st->channels != 1)
       return OPUS_BAD_ARG;
    return opus_decode_native_impl(st, packet, length, pcm, frame_capacity, 0,
-         0, NULL, 0, NULL, 0, output, context);
+         0, NULL, 0, NULL, 0, output, context, NULL);
+}
+int yoradio_opus_decode_leased_native(void *decoder, const unsigned char *packet,
+    int length, int frame_capacity, yoradio_opus_pcm_acquire_fn acquire,
+    yoradio_opus_pcm_block_fn output, void *context)
+{
+   OpusDecoder *st = (OpusDecoder *)decoder;
+   if (!st || !packet || length <= 0 || !acquire || !output ||
+       frame_capacity <= 0 || frame_capacity > 960 || st->Fs != 48000 || st->channels != 1)
+      return OPUS_BAD_ARG;
+   return opus_decode_native_impl(st, packet, length, NULL, frame_capacity, 0,
+         0, NULL, 0, NULL, 0, output, context, acquire);
 }
 #endif
 

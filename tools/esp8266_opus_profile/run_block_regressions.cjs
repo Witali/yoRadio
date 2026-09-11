@@ -30,18 +30,24 @@ function grouped(data,count,vbr=false,padding=0) {
   }
   return framed(result);
 }
-async function run({output=path.join(__dirname,'block-results.json'),capture,celtDecodeOnly=false,divOnce=false}={}) {
+async function run({output,capture,celtDecodeOnly=false,divOnce=false,leased=false}={}) {
+  output ||= path.join(__dirname,leased?'leased-results.json':'block-results.json');
   prepareReference();await buildHost({upstreamRoot:defaultOutput,fastInt64:0});
   const build=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,celtDecodeOnly,divOnce});
   const out=path.join(root,'.build/opus-block-regression'+(celtDecodeOnly?'-celt-decode-only':'')+(divOnce?'-div-once':''));fs.mkdirSync(out,{recursive:true});
-  const object=path.join(out,'block_probe.o'),binary=path.join(out,'block_probe');
-  execute('gcc',[...build.flags,'-Wall','-Wextra','-Werror','-c',hostPath(path.join(__dirname,'block_probe.c')),'-o',hostPath(object)]);
-  execute('gcc',[...build.objects.filter(f=>!f.endsWith('probe.c.o')).map(hostPath),hostPath(object),
-    '-Wl,--gc-sections','-Wl,--wrap=malloc','-Wl,--wrap=calloc','-Wl,--wrap=realloc','-lm','-o',hostPath(binary)]);
+  const probe=leased?'leased_probe':'block_probe';
+  const binary=path.join(out,probe);
+  for(const name of leased?['block_probe','leased_probe']:['block_probe']) {
+    const object=path.join(out,name+'.o');
+    execute('gcc',[...build.flags,'-Wall','-Wextra','-Werror','-c',hostPath(path.join(__dirname,name+'.c')),'-o',hostPath(object)]);
+    execute('gcc',[...build.objects.filter(f=>!f.endsWith('probe.c.o')).map(hostPath),hostPath(object),
+      '-Wl,--gc-sections','-Wl,--wrap=malloc','-Wl,--wrap=calloc','-Wl,--wrap=realloc','-lm','-o',hostPath(path.join(out,name))]);
+  }
   const inputs=[];
   const elementary=file=>{
     const output=path.join(out,path.basename(file)+'.unpacked');
-    execute(hostPath(binary),['--unpack',hostPath(file),hostPath(output)]);
+    // The unmodified block probe supplies only fixture unpacking in lease mode.
+    execute(hostPath(path.join(out,'block_probe')),['--unpack',hostPath(file),hostPath(output)]);
     return fs.readFileSync(output);
   };
   for(const [name,count] of [['mono-12',2],['mono-12',6],['mono-24',3],['mono-24',6],['stereo-64',3],['stereo-64',6],['stereo-128',3]]) {
@@ -63,17 +69,19 @@ async function run({output=path.join(__dirname,'block-results.json'),capture,cel
     const expected=runProbe({upstreamRoot:defaultOutput,fastInt64:0,fixture:input,output:reference,selfTest:false});
     const result=JSON.parse(execute(hostPath(binary),[hostPath(input),hostPath(actual)]));
     assert.equal(result.samples,expected.samples);assert.equal(result.packets,before.packets);
-    assert.equal(result.allocations,0);assert.equal(result.pcm_bytes,1920);assert.ok(result.largest_block<=960);
+    assert.equal(result.allocations,0);assert.equal(result.pcm_bytes,leased?3840:1920);assert.ok(result.largest_block<=960);
+    if(leased){assert.equal(result.delayed_consumer,true);assert.equal(result.failure_cleanup,true);}
     assert.ok(result.scratch_bytes<=6144&&result.scratch_words<=16384);
     const pcm=comparePcm(fs.readFileSync(reference),fs.readFileSync(actual));assert.equal(pcm.exact,true,test.name);
     cases.push({name:test.name,input_sha256:sha256(test.data),...before,result,pcm});
     process.stderr.write(`${test.name}: exact; ${result.blocks} blocks, scratch ${result.scratch_bytes}/${result.scratch_words}\n`);
   }
   const sources=['native_opus.c','native_opus.h','opus_memory.c','opus_memory.h','upstream/src/opus_decoder.c'];
-  const report={passed:true,celt_decode_only:celtDecodeOnly,div_once:divOnce,scope:'Host generic32 pristine full-packet PCM versus FIR-enabled bounded frame callbacks; mono48k. No board speed claim.',
+  const report={passed:true,leased,celt_decode_only:celtDecodeOnly,div_once:divOnce,scope:'Host generic32 pristine full-packet PCM versus FIR-enabled bounded frame callbacks; mono48k. No board speed claim.',
+    probe_sha256_lf:sha256(Buffer.from(fs.readFileSync(path.join(__dirname,probe+'.c'),'utf8').replace(/\r\n/g,'\n'))),
     source_sha256_lf:Object.fromEntries(sources.map(f=>[f,sha256(Buffer.from(fs.readFileSync(path.join(component,f),'utf8').replace(/\r\n/g,'\n')))])),cases};
   fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');return report;
 }
 module.exports={pack,packets,grouped,run};
 if(require.main===module){const args=process.argv.slice(2),value=k=>{const i=args.indexOf(k);return i<0?undefined:args[i+1];};
-  run({output:value('--output'),capture:value('--capture'),celtDecodeOnly:args.includes('--celt-decode-only'),divOnce:args.includes('--div-once')}).then(r=>console.log('PASS '+r.cases.length+' block cases')).catch(e=>{console.error(e.stack);process.exitCode=1;});}
+  run({output:value('--output'),capture:value('--capture'),leased:args.includes('--leased'),celtDecodeOnly:args.includes('--celt-decode-only'),divOnce:args.includes('--div-once')}).then(r=>console.log('PASS '+r.cases.length+' block cases')).catch(e=>{console.error(e.stack);process.exitCode=1;});}

@@ -133,6 +133,23 @@ int yoradio_opus_decode_blocks_native(void *decoder, const unsigned char *packet
 int yoradio_opus_decode_blocks_bounded(void *decoder, const unsigned char *packet,
     int length, int16_t *pcm, int frame_capacity,
     yoradio_opus_pcm_block_fn output, void *context);
+/* Optional zero-copy frame ownership for a future PCM consumer task.
+ * acquire returns 0 and a writable, aligned buffer for at least `samples`
+ * int16 values, or a negative cancellation/error without granting a lease.
+ * A successful output (return 0) transfers that lease to the caller; libopus
+ * never accesses its PCM again. Before handing it back to acquire, the caller
+ * must finish consuming it. abort returns an uncommitted lease after decode
+ * failure, scratch OOM or a nonzero output result. It must not re-enter Opus.
+ * No callbacks or PCM allocations occur for rejected arguments or re-entry.
+ * Reset/release of caller-owned queued buffers remains the caller's duty. */
+typedef int (*yoradio_opus_pcm_acquire_fn)(void *context, int16_t **pcm, int samples);
+typedef void (*yoradio_opus_pcm_abort_fn)(void *context, int16_t *pcm);
+int yoradio_opus_decode_leased_native(void *decoder, const unsigned char *packet,
+    int length, int frame_capacity, yoradio_opus_pcm_acquire_fn acquire,
+    yoradio_opus_pcm_block_fn output, void *context);
+int yoradio_opus_decode_leased_bounded(void *decoder, const unsigned char *packet,
+    int length, int frame_capacity, yoradio_opus_pcm_acquire_fn acquire,
+    yoradio_opus_pcm_block_fn output, yoradio_opus_pcm_abort_fn abort, void *context);
 #ifdef __cplusplus
 }
 #endif
