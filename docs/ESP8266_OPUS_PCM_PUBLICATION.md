@@ -43,9 +43,9 @@ other tail lengths and must remain valid; no assumption that every call is448.
   DRAM data1652B/BSS18520B and IRAM text22848B/BSS4040B unchanged. ISR387B
   section is byte-identical. Only flash text grew128B. These are static
   sizes, not heap/stack safety guarantees during network use.
-- [ ] At least10 attempted physical windows per variant on the same fixture;
+- [x] At least10 attempted physical windows per variant on the same fixture;
   retain start failures, transport errors, missing samples and DMA misses.
-- [ ] Recheck real Opus radio >=20s and WebUI; faster raw decoder alone is not
+- [ ] Qualify real Opus radio >=20s and WebUI; faster raw decoder alone is not
   completion. Reject candidate if no repeatable benefit or if RAM regresses.
 
 No production default has been changed. Raw Opus CPU figures remain in
@@ -76,3 +76,62 @@ timeout remains an unconfirmed start, even if the earlier stream continues.
 Ten attempts per variant; no discarded observation failures or retries
 substituted for failed windows. The source fixture SHA256 is
 807878b973cbe75f518338d5afacb3fcf5c168999bee6420c7813df42b3002aa.
+
+## Physical radio-path result, 2026-09-11
+
+Both application-only OTA operations passed. Ten attempts per variant on
+the same own SILK12 file, CPU160/QIO40, source c9728ad. These are sequential
+Wi-Fi runs, not simultaneous or isolated CPU timings. The source server was
+restarted between series after a PC restart; its payload/hash and options
+were unchanged. OFF has two unconfirmed POST starts (4,8), and all ten ON
+POSTs were confirmed. Missing responses remain failed attempts.
+
+| Attempt | OFF DMA misses | ON DMA misses |
+|---|---:|---:|
+| 1 | 956 | 2 |
+| 2 | 2289 | 566 |
+| 3 | 11 | missing health |
+| 4 | 9; start unconfirmed | 0 |
+| 5 | missing health | missing health |
+| 6 | missing health | 0 |
+| 7 | missing health | missing health |
+| 8 | missing health; start unconfirmed | 848 |
+| 9 | missing health | 0 |
+| 10 | missing health | missing health |
+
+Health continuity qualified0/10 OFF and3/10 ON. ON windows4/6/9 lasted
+28211/29031/28024ms, with PCM/elapsed ratios1.00419/1.00408/1.00414.
+The separately requested profile for ON6 includes one output miss beyond
+the health interval. Thus these are precisely bounded **health windows**,
+not a claim that the full attempted playback or every surrounding second
+was gap-free. The fixture output is physically submitted to GPIO3 DMA;
+there was no analog recording or listening-quality verification here.
+
+ON1 has2 misses attributed to output without input waits. OFF3/4 have11/9
+output misses without input waits. This supports another controlled output
+experiment, but does not establish an overall speedup: many other windows
+had transport timeouts or unavailable observations. Never compare the
+median of only visible windows as a successful ten-run speed result.
+
+Lowest heap in complete health pairs:6528B OFF,6336B ON; these include
+network allocations and are not decoder-owned RAM. Static RAM and ISR
+remain identical, as verified in comparison.json. No RAM saving is claimed.
+
+The real56-kbit Opus follow-up failed: first health timed out; the second
+showed stale PCM and transport timeout116. Subsequent status reported
+DECODER INIT ERROR. Its allocation diagnostic is stage10, free_dram3284,
+requested_bytes4096, reserve_bytes4096, detail3344: the post-allocation
+reserve gate rejected the decoder, **not** a failed4096-byte allocation.
+After cleanup free heap was27064B; RSSI at that later snapshot was-50dBm.
+Neither this single RSSI nor the recovered heap proves the absence of
+network loss or a leak. Playback was explicitly stopped after the test.
+
+Decision: keep publication experimental/default OFF. It has promising
+output-only windows but is not a fix for all radio pauses. Next compare
+matching flash-output builds using the same12/24/64/128/192-kbit corpus,
+then resolve transport/reconnect RAM pressure and recheck real stations.
+No runtime bitrate limit is introduced.
+
+[All raw attempts, matched manifests, ISR evidence and summary](../firmware/development/esp8266-opus-publish-on/comparison.json).
+Both artifact directories also retain start logs and local TCP telemetry;
+accepted_wire_bytes is the PC write-queue count, not proof of delivery.
