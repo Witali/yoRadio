@@ -16,7 +16,11 @@ Matched candidate ../esp8266-opus-stride1-on differs only by rotation flag.
 Static IRAM vectors128/text22900/BSS4044, DRAM data1652/BSS18784, rodata241116.
 DMA ISR387B, same hash914cdfe2fb0863ba26c726ebbd1465133695f4043614969be3f849c85a6cba00.
 C exp_rotation1/exp_rotation/alg_unquant object instruction sections match
-the previous rotation192-off control byte for byte. Physical runs pending.
+the previous rotation192-off control byte for byte. Physical10 runs complete:
+exact PCM, no observation errors, all failures/outliers retained. CPU medians
+23.479/55.368/63.842/76.249/88.524 percent; dynamic DRAM minimum7612B,
+stack headroom1660B. One timing-window excess retained in comparison.json.
+Matched ASM candidate slowed CELT8.42/9.23/8.65%; default stays C.
 
 ```powershell
 tools/esp8266_opus_profile/run_raw_series.ps1 -Directory firmware/development/esp8266-opus-stride1-off -Fixtures .build/esp8266-opus-board-through192 -Attempts 10

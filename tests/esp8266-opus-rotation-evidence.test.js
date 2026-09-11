@@ -3,8 +3,9 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const {compare,compareArtifacts}=require('../tools/esp8266_opus_profile/compare_raw.cjs');
 const base=path.resolve(__dirname,'../firmware/development');
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8').replace(/^\uFEFF/,''));
-test('archived universal rotation keeps all twenty exact-PCM attempts and the CELT slowdown',()=>{
-  const dirs=['off','on'].map(x=>path.join(base,'esp8266-opus-rotation192-'+x));
+for (const variant of ['rotation192','stride1'])
+test('archived '+variant+' rotation keeps all twenty exact-PCM attempts and the CELT slowdown',()=>{
+  const dirs=['off','on'].map(x=>path.join(base,'esp8266-opus-'+variant+'-'+x));
   const saved=read(path.join(dirs[1],'comparison.json'));
   const runs=dirs.map((dir,k)=>Array.from({length:10},(_,i)=>{
     const file='run'+(i+1)+'.json',bytes=fs.readFileSync(path.join(dir,file));
