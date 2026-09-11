@@ -94,6 +94,7 @@ typedef struct {
     uint32_t requested_bytes;
     uint32_t reserve_bytes;
     int32_t detail;
+    uint32_t largest_dram; /* UINT32_MAX: invalid allocator links */
 } helix_opus_init_failure_t;
 void helix_codec_opus_init_failure_snapshot(helix_opus_init_failure_t *out);
 #endif

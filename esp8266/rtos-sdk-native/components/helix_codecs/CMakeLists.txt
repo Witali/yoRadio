@@ -36,6 +36,9 @@ endif()
 # Dependencies are scanned before Kconfig values are available. The Opus
 # component itself has no sources when its experimental option is disabled.
 set(YORADIO_CODEC_REQUIRES esp8266 log opus_decoder)
+if(YORADIO_ESP8266_OPUS_STREAM_TEST OR YORADIO_ESP8266_OPUS_BENCHMARK)
+  list(APPEND YORADIO_HELIX_SOURCES "native_heap_diag.c")
+endif()
 idf_component_register(
   SRCS ${YORADIO_HELIX_SOURCES}
   INCLUDE_DIRS ${YORADIO_CODEC_INCLUDES}

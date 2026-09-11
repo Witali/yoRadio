@@ -17,6 +17,7 @@
 #include "esp_heap_caps.h"
 #include "esp_system.h"
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
+#include "native_heap_diag.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #endif
@@ -41,7 +42,7 @@ extern "C" void audio_profile_decode_end(void);
 namespace {
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
 static helix_opus_init_failure_t s_opus_init_failure;
-static_assert(sizeof(s_opus_init_failure) == 20, "Keep init diagnostics bounded");
+static_assert(sizeof(s_opus_init_failure) == 24, "Keep init diagnostics bounded");
 static void opus_init_diagnostic_reset() {
     taskENTER_CRITICAL();
     s_opus_init_failure = {};
@@ -50,10 +51,11 @@ static void opus_init_diagnostic_reset() {
 static void opus_init_failed(helix_codec_kind_t kind, uint32_t stage,
                              size_t requested, size_t reserve, int32_t detail) {
     if (kind != HELIX_CODEC_OPUS) return;
+    const native_heap_diag_t heap = native_heap_diag_snapshot();
     const helix_opus_init_failure_t failure = {
-        stage, static_cast<uint32_t>(heap_caps_get_free_size(MALLOC_CAP_8BIT)),
+        stage, heap.free_dram,
         static_cast<uint32_t>(requested),
-        static_cast<uint32_t>(std::max(reserve, size_t(4096))), detail};
+        static_cast<uint32_t>(std::max(reserve, size_t(4096))), detail, heap.largest_dram};
     taskENTER_CRITICAL();
     if (!s_opus_init_failure.stage) s_opus_init_failure = failure;
     taskEXIT_CRITICAL();

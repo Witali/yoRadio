@@ -35,6 +35,7 @@
 #endif
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
 #include "codec_bridge.h"
+#include "native_heap_diag.h"
 #endif
 #include "native_state.h"
 #include "persistent_settings.h"
@@ -1287,13 +1288,16 @@ static esp_err_t opus_test_stream_status_handler(httpd_req_t *request) {
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     helix_opus_init_failure_t failure;
     helix_codec_opus_init_failure_snapshot(&failure);
+    native_heap_diag_t current = native_heap_diag_snapshot();
     char body[256];
     int n = snprintf(body, sizeof(body),
         "{\"stage\":%u,\"free_dram\":%u,\"requested_bytes\":%u,"
-        "\"reserve_bytes\":%u,\"detail\":%d,\"current_dram\":%u}",
+        "\"reserve_bytes\":%u,\"detail\":%d,\"largest_dram\":%u,"
+        "\"current_dram\":%u,\"current_largest\":%u}",
         (unsigned)failure.stage, (unsigned)failure.free_dram,
         (unsigned)failure.requested_bytes, (unsigned)failure.reserve_bytes,
-        (int)failure.detail, (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
+        (int)failure.detail, (unsigned)failure.largest_dram,
+        (unsigned)current.free_dram, (unsigned)current.largest_dram);
     if (n < 0 || (size_t)n >= sizeof(body)) return ESP_FAIL;
     return finish_short_response(request, send_string(request, body));
 }

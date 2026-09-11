@@ -5,6 +5,7 @@
 #include <map>
 #include "esp_heap_caps.h"
 #include "codec_bridge.h"
+#include "native_heap_diag.h"
 #include "codec_arena_native.h"
 #include "CodecMemoryArena.h"
 #if CONFIG_YORADIO_OGG_OPUS
@@ -70,6 +71,13 @@ size_t heap_caps_get_free_size(unsigned caps) {
         if (live_caps.at(allocation.first)&MALLOC_CAP_8BIT) used+=allocation.second;
     return used<reported_dram_budget?reported_dram_budget-used:0;
 }
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
+/* The real heap walk is separately sanitizer-tested. Keep this value distinct
+ * from total free so allocation-failure snapshots cannot confuse the fields. */
+extern "C" native_heap_diag_t native_heap_diag_snapshot(void) {
+    return {(uint32_t)heap_caps_get_free_size(MALLOC_CAP_8BIT), 1234};
+}
+#endif
 
 #if CONFIG_YORADIO_OGG_OPUS
 /* Stub only the low-level adapter: the actual bridge, native_opus_t layout,
@@ -408,8 +416,8 @@ static helix_opus_init_failure_t init_failure(unsigned stage) {
     const unsigned before=attempts;
     helix_codec_opus_init_failure_snapshot(&failure);
     assert(attempts==before && !critical_depth && failure.stage==stage);
-    if (stage) assert(failure.reserve_bytes==4096 && failure.requested_bytes);
-    else assert(!failure.free_dram && !failure.requested_bytes && !failure.reserve_bytes && !failure.detail);
+    if (stage) assert(failure.reserve_bytes==4096 && failure.requested_bytes && failure.largest_dram==1234);
+    else assert(!failure.free_dram && !failure.requested_bytes && !failure.reserve_bytes && !failure.detail && !failure.largest_dram);
     return failure;
 }
 static void opus_diagnostics(const std::map<void *, size_t> &baseline) {
