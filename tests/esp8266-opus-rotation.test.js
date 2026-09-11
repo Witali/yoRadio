@@ -4,6 +4,7 @@ const {root,component,execute,hostPath}=require('../tools/esp8266_opus_profile/b
 test('LX106 rotation instruction model matches sanitized C fallback and preserves ABI',{timeout:180000},()=>{
   const r=run();assert.equal(r.passed,true);assert.equal(r.cases,1512);assert.equal(r.stack_bytes,0);
   assert.equal(r.asm_cases,1120);
+  assert.equal(r.dispatch_asan_ubsan,true);assert.equal(r.dispatch_only_stride1,true);
   assert.equal(r.instruction_model_exact,true);assert.equal(r.c_fallback_asan_ubsan,true);
 });
 test('rotation experiment is default off and a host with the flag keeps C',()=>{

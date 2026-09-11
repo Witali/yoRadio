@@ -81,6 +81,12 @@ function run(output=path.join(__dirname,'rotation-lx106-results.json')) {
     asmCases++;asmSamples+=v.n;
   }
   assert.equal(offset,golden.length);
+  const dispatcher=path.join(out,'dispatch'),dispatchOutput=path.join(out,'dispatch.bin');
+  execute('gcc',['-O3','-std=c99','-fwrapv','-ffunction-sections','-fdata-sections','-fno-pie','-no-pie','-fsanitize=address,undefined','-fno-sanitize-recover=all',
+    '-DYORADIO_OPUS_BOUNDED=1','-DYORADIO_OPUS_USE_LX106_ROTATION=1','-DROTATION_TEST_DISPATCH=1',
+    ...includes,hostPath(path.join(__dirname,'rotation_reference.c')),'-Wl,--gc-sections','-lm','-o',hostPath(dispatcher)]);
+  execute('env',['ASAN_OPTIONS=detect_leaks=0',hostPath(dispatcher),hostPath(input),hostPath(dispatchOutput)]);
+  assert.deepEqual(fs.readFileSync(dispatchOutput),golden,'Real C dispatcher changes output');
   const cmd=(program,args)=>{const r=spawnSync(program,args,{encoding:'utf8',maxBuffer:4e6});assert.equal(r.status,0,r.stderr);return r.stdout;};
   const sdk=path.join(root,'.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include');
   const object=path.join(out,'rotation.o');cmd(defaultCompiler,['-DYORADIO_OPUS_ROTATION_LX106=1','-I'+component,'-I'+sdk,'-c',source,'-o',object]);
@@ -89,7 +95,8 @@ function run(output=path.join(__dirname,'rotation-lx106-results.json')) {
   assert.doesNotMatch(asm,/\ba(?:1|12|13|14|15)\b/,'Leaf must not use stack or callee-saved registers');
   const report={passed:true,source_sha256_lf:sha256(Buffer.from(fs.readFileSync(source,'utf8').replace(/\r\n/g,'\n'))),
     cases:vectors.length,samples:vectors.reduce((n,v)=>n+v.n,0),asm_cases:asmCases,asm_samples:asmSamples,c_fallback_asan_ubsan:true,instruction_model_exact:true,callee_saved_registers_checked:true,
-    target_assembled:true,mul16s_sites:8,stack_bytes:0,scope:'All vectors run sanitized C; stride1 vectors additionally run the actual ASM instruction model. Other strides remain C. Not physical execution or speed; board golden PCM / A/B remains required.'};
+    dispatch_asan_ubsan:true,dispatch_only_stride1:true,
+    target_assembled:true,mul16s_sites:8,stack_bytes:0,scope:'All vectors run sanitized C and real C dispatch with a host scalar stand-in; stride1 vectors additionally run the actual ASM instruction model. Not physical execution or speed; board golden PCM / A/B remains required.'};
   fs.writeFileSync(path.join(out,'rotation.asm'),asm);fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');console.log(report);return report;
 }
 module.exports={run,model};if(require.main===module)run();

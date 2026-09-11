@@ -8,8 +8,10 @@
   "c_fallback_asan_ubsan": true,
   "instruction_model_exact": true,
   "callee_saved_registers_checked": true,
+  "dispatch_asan_ubsan": true,
+  "dispatch_only_stride1": true,
   "target_assembled": true,
   "mul16s_sites": 8,
   "stack_bytes": 0,
-  "scope": "All vectors run sanitized C; stride1 vectors additionally run the actual ASM instruction model. Other strides remain C. Not physical execution or speed; board golden PCM / A/B remains required."
+  "scope": "All vectors run sanitized C and real C dispatch with a host scalar stand-in; stride1 vectors additionally run the actual ASM instruction model. Not physical execution or speed; board golden PCM / A/B remains required."
 }
