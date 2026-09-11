@@ -38,11 +38,14 @@ enum { ESP_OK = 0, ESP_ERR_INVALID_ARG = 1, ESP_ERR_INVALID_STATE = 2, ESP_ERR_T
 #define pdMS_TO_TICKS(ms) (ms)
 #define ESP_LOGE(...) ((void)0)
 #define ESP_LOGI(...) ((void)0)
-#define NODAC_DMA_BUFFER_WORDS 512U
+#ifndef TEST_DMA_WORDS
+#define TEST_DMA_WORDS 512U
+#endif
+#define NODAC_DMA_BUFFER_WORDS TEST_DMA_WORDS
 #define NODAC_DMA_BUFFER_BYTES (NODAC_DMA_BUFFER_WORDS * sizeof(uint32_t))
-#define ESP8266_NODAC_DMA_BUFFER_WORDS 512U
+#define ESP8266_NODAC_DMA_BUFFER_WORDS TEST_DMA_WORDS
 #define ESP8266_NODAC_DMA_BUFFER_COUNT 2U
-static uint32_t s_buffers[2][512];
+static uint32_t s_buffers[2][TEST_DMA_WORDS];
 #include "descriptor.inc"
 static nodac_dma_descriptor_t s_descriptors[2];
 static nodac_buffer_state_t s_state;
@@ -66,8 +69,11 @@ static void eof() {
         s_buffers[old] + s_descriptors[old].datalen / sizeof(uint32_t));
     publish_committed_prefix();
     if(nodac_state_eof(&s_state))
-        std::fill(s_buffers[old], s_buffers[old] + 512, s_silence_word);
-    if(s_state.silent) s_descriptors[s_state.active].control = s_running ? 0xc0100100U : 0xc0800800U;
+        std::fill(s_buffers[old], s_buffers[old] + TEST_DMA_WORDS, s_silence_word);
+    if(s_state.silent) {
+        const uint32_t bytes = s_running ? 256U : NODAC_DMA_BUFFER_BYTES;
+        s_descriptors[s_state.active].control = 0xc0000000U | (bytes << 12) | bytes;
+    }
     assert(s_state.state[s_state.active] == NODAC_DMA);
 }
 #define taskENTER_CRITICAL() (++critical)
@@ -100,11 +106,12 @@ static esp_err_t esp8266_nodac_i2s_init(uint32_t silence, uint8_t, uint8_t) {
     ticks = waits = critical = 0;
     autoEof = true;
     s_silence_word = silence;
-    std::fill(&s_buffers[0][0], &s_buffers[0][0] + 512, silence);
-    std::fill(&s_buffers[1][0], &s_buffers[1][0] + 512, silence);
+    std::fill(&s_buffers[0][0], &s_buffers[0][0] + TEST_DMA_WORDS, silence);
+    std::fill(&s_buffers[1][0], &s_buffers[1][0] + TEST_DMA_WORDS, silence);
     committed.clear();
     transmitted.clear();
-    s_descriptors[0].control = s_descriptors[1].control = 0xc0800800U;
+    s_descriptors[0].control = s_descriptors[1].control =
+        0xc0000000U | (NODAC_DMA_BUFFER_BYTES << 12) | NODAC_DMA_BUFFER_BYTES;
     return ESP_OK;
 }
 
@@ -170,32 +177,32 @@ static void ownership() {
     size_t capacity;
     assert(driver_commit(0) == ESP_ERR_INVALID_STATE);
     assert(esp8266_nodac_i2s_reserve(nullptr, &capacity, 0) == ESP_ERR_INVALID_ARG);
-    assert(esp8266_nodac_i2s_reserve(&words, &capacity, 0) == ESP_OK && capacity == 512);
+    assert(esp8266_nodac_i2s_reserve(&words, &capacity, 0) == ESP_OK && capacity == TEST_DMA_WORDS);
     uint32_t *second;
     size_t secondCapacity;
     assert(esp8266_nodac_i2s_reserve(&second, &secondCapacity, 0) == ESP_ERR_INVALID_STATE);
     assert(second == nullptr && secondCapacity == 0);
     assert(esp8266_nodac_i2s_write(words, 1, 0) == ESP_ERR_INVALID_STATE);
-    assert(driver_commit(513) == ESP_ERR_INVALID_ARG);
+    assert(driver_commit(TEST_DMA_WORDS + 1) == ESP_ERR_INVALID_ARG);
     // Interrupt after EVERY word, even after the final store but before commit.
-    for(unsigned i = 0; i < 512; ++i) {
+    for(unsigned i = 0; i < TEST_DMA_WORDS; ++i) {
         words[i] = i;
         eof();
         assert(s_state.active == 0 && s_state.state[1] == NODAC_FILLING);
         assert(words[i] == i);
     }
     assert(driver_commit(32) == ESP_OK);
-    assert(esp8266_nodac_i2s_reserve(&words, &capacity, 0) == ESP_OK && capacity == 480);
+    assert(esp8266_nodac_i2s_reserve(&words, &capacity, 0) == ESP_OK && capacity == TEST_DMA_WORDS - 32);
     assert(driver_commit(0) == ESP_OK); // cancel, keep already committed prefix
-    assert(esp8266_nodac_i2s_reserve(&words, &capacity, 0) == ESP_OK && capacity == 480);
-    assert(driver_commit(480) == ESP_OK && s_state.state[1] == NODAC_READY);
+    assert(esp8266_nodac_i2s_reserve(&words, &capacity, 0) == ESP_OK && capacity == TEST_DMA_WORDS - 32);
+    assert(driver_commit(TEST_DMA_WORDS - 32) == ESP_OK && s_state.state[1] == NODAC_READY);
     autoEof = false;
     assert(esp8266_nodac_i2s_reserve(&words, &capacity, 7) == ESP_ERR_TIMEOUT);
     assert(words == nullptr && capacity == 0 && !s_waiting && ticks == 7);
     autoEof = true;
     eof();
     assert(s_state.active == 1);
-    for(unsigned i = 0; i < 512; ++i) assert(s_buffers[1][i] == i);
+    for(unsigned i = 0; i < TEST_DMA_WORDS; ++i) assert(s_buffers[1][i] == i);
     assert(esp8266_nodac_i2s_reserve(&words, &capacity, 0) == ESP_OK);
     words[0] = 99;
     assert(driver_commit(1) == ESP_OK);
@@ -208,8 +215,9 @@ static void ownership() {
     std::vector<uint32_t> input(1300);
     for(unsigned i = 0; i < input.size(); ++i) input[i] = 4000 + i;
     assert(esp8266_nodac_i2s_write(input.data(), input.size(), 100) == ESP_OK);
-    assert(s_current_position == 276 && s_reserved_words == 0);
-    for(unsigned i = 0; i < 276; ++i) assert(s_current_buffer[i] == 5024 + i);
+    const unsigned tail = 1300 % TEST_DMA_WORDS;
+    assert(s_current_position == tail && s_reserved_words == 0);
+    for(unsigned i = 0; i < tail; ++i) assert(s_current_buffer[i] == 5300 - tail + i);
     assert(critical == 0);
 }
 
@@ -229,20 +237,20 @@ static void prefix_handoff() {
     assert(s_state.active == 1 && !s_state.silent && s_current_buffer == nullptr);
     assert(s_descriptors[1].datalen == 128);
     assert(esp8266_nodac_i2s_reserve(&loan, &capacity, 10) == ESP_OK);
-    assert(capacity == 512 && loan == s_buffers[0]);
-    for(unsigned i = 0; i < 512; ++i) loan[i] = 2000 + i;
-    assert(driver_commit(512) == ESP_OK);
+    assert(capacity == TEST_DMA_WORDS && loan == s_buffers[0]);
+    for(unsigned i = 0; i < TEST_DMA_WORDS; ++i) loan[i] = 2000 + i;
+    assert(driver_commit(TEST_DMA_WORDS) == ESP_OK);
     eof();
     assert(transmitted.size() == 32 && s_state.active == 0);
     for(unsigned i = 0; i < 32; ++i) assert(transmitted[i] == 1000 + i);
-    assert(s_descriptors[0].datalen == 2048);
+    assert(s_descriptors[0].datalen == NODAC_DMA_BUFFER_BYTES);
     eof();
-    assert(transmitted.size() == 544 && s_state.silent);
-    for(unsigned i = 0; i < 512; ++i) assert(transmitted[32 + i] == 2000 + i);
+    assert(transmitted.size() == TEST_DMA_WORDS + 32 && s_state.silent);
+    for(unsigned i = 0; i < TEST_DMA_WORDS; ++i) assert(transmitted[32 + i] == 2000 + i);
     assert(s_descriptors[0].datalen == 256); // short neutral retry while playing
     esp8266_nodac_i2s_silence(0xaaaaaaaaU);
     eof();
-    assert(s_descriptors[s_state.active].datalen == 2048); // idle cadence
+    assert(s_descriptors[s_state.active].datalen == NODAC_DMA_BUFFER_BYTES); // idle cadence
 
     // Random EOFs before/inside/after loans: compare actual DMA sequence,
     // excluding deliberate neutral underrun intervals, with input words.
@@ -350,7 +358,7 @@ static void explicit_batch_publication() {
         for (unsigned count : {512U, 448U}) {
             uint32_t *loan; size_t capacity;
             assert(esp8266_nodac_i2s_reserve(&loan, &capacity, 100) == ESP_OK);
-            assert(capacity == 512);
+            assert(capacity == TEST_DMA_WORDS);
             for (unsigned i = 0; i < count; ++i) loan[i] = sequence++;
             assert(driver_commit(count) == ESP_OK);
             assert(esp8266_nodac_i2s_publish_pending() == ESP_OK);

@@ -598,7 +598,7 @@ static esp_err_t i2s_pdm_reserve(i2s_pdm_writer_t *writer) {
 #if YORADIO_ESP8266_PDM32_LOAN_WORDS < 512
     /* Diagnostic publication cadence, NOT a smaller DMA buffer. Releasing
      * this prefix lets EOF consume it between producer loans. The driver
-     * retains ownership of the entire 512-word physical buffer. */
+     * retains ownership of the entire physical buffer. */
     if (result == ESP_OK && writer->capacity > YORADIO_ESP8266_PDM32_LOAN_WORDS)
         writer->capacity = YORADIO_ESP8266_PDM32_LOAN_WORDS;
 #endif

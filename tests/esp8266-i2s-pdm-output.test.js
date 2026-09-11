@@ -93,7 +93,8 @@ test("I2S PDM submits only complete finite DMA buffers with neutral underrun fal
   assert.doesNotMatch(i2sPdm, /pdMS_TO_TICKS\(I2S_PDM_WRITE_TIMEOUT_MS\)\);[\s\S]*esp8266_nodac_i2s_write/);
   assert.doesNotMatch(i2sPdm, /i2s_driver_install|\bi2s_write\(/);
   assert.match(nodacHeader, /ESP8266_NODAC_DMA_BUFFER_COUNT 2U/);
-  assert.match(nodacHeader, /ESP8266_NODAC_DMA_BUFFER_WORDS 512U/);
+  assert.match(nodacHeader, /YORADIO_ESP8266_DMA_BUFFER_WORDS 512/);
+  assert.match(nodacHeader, /ESP8266_NODAC_DMA_BUFFER_WORDS YORADIO_ESP8266_DMA_BUFFER_WORDS/);
   assert.match(nodacHeader, /producer\/DMA ping-pong/);
   assert.match(nodac, /NODAC_DMA_BUFFER_COUNT ESP8266_NODAC_DMA_BUFFER_COUNT/);
   assert.match(nodac, /NODAC_DMA_BUFFER_WORDS ESP8266_NODAC_DMA_BUFFER_WORDS/);

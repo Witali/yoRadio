@@ -26,6 +26,8 @@ param(
     [switch]$Pdm32Batch,
     [ValidateSet(64, 128, 256, 512)]
     [int]$Pdm32LoanWords = 512,
+    [ValidateSet(512, 768)]
+    [int]$DmaBufferWords = 512,
     [switch]$SdkRxDiag,
     [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
@@ -53,6 +55,7 @@ if ($OpusRotationLx106 -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-O
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
 if ($Pdm32Batch -and -not $Diagnostic) { throw '-Pdm32Batch requires -Diagnostic until board qualification' }
 if ($Pdm32LoanWords -ne 512 -and -not $Diagnostic) { throw 'Short PDM32 loans require -Diagnostic' }
+if ($DmaBufferWords -ne 512 -and (-not $Diagnostic -or -not $EnableOpus)) { throw 'Larger DMA buffers require diagnostic Opus' }
 if ($SdkRxDiag -and -not $Diagnostic) { throw '-SdkRxDiag requires -Diagnostic' }
 if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
 $taskOpusStreamTestEnabled = [bool]($OpusStreamTest -or $OpusBenchmark)
@@ -180,6 +183,7 @@ try {
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
         "-DYORADIO_ESP8266_OPUS_PCM_PUBLISH=$taskOpusPcmPublish",
         "-DYORADIO_ESP8266_PDM32_LOAN_WORDS=$Pdm32LoanWords",
+        "-DYORADIO_ESP8266_DMA_BUFFER_WORDS=$DmaBufferWords",
         "-DYORADIO_ESP8266_SDK_RX_DIAG=$taskSdkRxDiag",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES=$OpusBenchmarkFixtures",
         '-DYORADIO_ESP8266_HELIX_STAGE_PROFILE=OFF') "$taskBuild/configure.log"
@@ -282,7 +286,9 @@ try {
         stream_input_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_input_buffer.h).Hash
         stream_refill_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/stream_input_refill.inc).Hash
         network_benchmark=$false
-        cpu_mhz=160; flash='QIO40'; output='I2S PDM32 SLC-DMA'; data_gpio=3; dma_buffers=2; dma_words_per_buffer=512
+        cpu_mhz=160; flash='QIO40'; output='I2S PDM32 SLC-DMA'; data_gpio=3; dma_buffers=2; dma_words_per_buffer=$DmaBufferWords
+        dma_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/esp8266_nodac_i2s.c).Hash
+        dma_header_sha256=(Get-FileHash esp8266/rtos-sdk-native/main/esp8266_nodac_i2s.h).Hash
         pcm_rate=48000; nominal_bit_rate_hz=1536000; bit_rate_hz=1538461; i2s=$true
         partition_layout='app0/app1 960 KiB, SPIFFS 256 KiB; flash app only'
     }

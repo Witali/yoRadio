@@ -7,10 +7,18 @@
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
 
-/* Two 2048-byte buffers implement producer/DMA ping-pong at 4 KiB.
+/* Two producer/DMA ping-pong buffers; default 512 words each (4 KiB total).
+ * The diagnostic 768-word
+ * variant adds 2 KiB of DRAM, without changing ownership or PCM/PDM bits.
  * Only committed data is submitted; no unguarded circular DMA link. */
+#ifndef YORADIO_ESP8266_DMA_BUFFER_WORDS
+#define YORADIO_ESP8266_DMA_BUFFER_WORDS 512
+#endif
+#if YORADIO_ESP8266_DMA_BUFFER_WORDS != 512 && YORADIO_ESP8266_DMA_BUFFER_WORDS != 768
+#error "DMA buffer words must be 512 or diagnostic 768"
+#endif
 #define ESP8266_NODAC_DMA_BUFFER_COUNT 2U
-#define ESP8266_NODAC_DMA_BUFFER_WORDS 512U
+#define ESP8266_NODAC_DMA_BUFFER_WORDS YORADIO_ESP8266_DMA_BUFFER_WORDS
 
 esp_err_t esp8266_nodac_i2s_init(uint32_t silence_word,
                                  uint8_t bck_div, uint8_t clkm_div);

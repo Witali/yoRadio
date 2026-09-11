@@ -155,8 +155,8 @@ static void IRAM_ATTR __attribute__((optimize("Os"))) nodac_slc_isr(void *arg) {
         if (s_state.silent) {
 #if YORADIO_ESP8266_DMA_COMMITTED_PREFIX
             /* Retry quickly while playing: a missed deadline must not force
-             * another 10.7 ms neutral block. Stop retains the quiet 512-word
-             * cadence. Capacity remains 512 words in both buffers. */
+             * another full neutral block. Stop retains the configured full
+             * buffer cadence; both physical capacities remain unchanged. */
             const uint32_t bytes = s_running ? 64U * sizeof(uint32_t)
                                             : NODAC_DMA_BUFFER_BYTES;
             s_descriptors[s_state.active].control =

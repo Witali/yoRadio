@@ -24,6 +24,15 @@ test('PDM32 batch CMake option is OFF by default and rejects non-standard backen
   fs.writeFileSync(script, 'cmake_minimum_required(VERSION 3.13)\n' + block);
   const run = options => spawnSync(command, [...options, '-P', script], {encoding:'utf8'});
   assert.equal(run([]).status, 0, 'default must allow ordinary non-PDM32 builds');
+  for (const words of [512,768,1024]) for(const diag of [false,true])
+  for(const opus of [false,true]) for(const pdm of [false,true]) {
+    const result = run(['-DYORADIO_ESP8266_DMA_BUFFER_WORDS='+words,
+      '-DYORADIO_ESP8266_DIAGNOSTIC='+ (diag?'ON':'OFF'),
+      '-DCONFIG_YORADIO_OGG_OPUS='+ (opus?'ON':'OFF'),
+      '-DCONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM='+ (pdm?'ON':'OFF'),
+      '-DCONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=ON']);
+    assert.equal(result.status === 0, words===512 || (words===768 && diag && opus && pdm), result.stdout+result.stderr);
+  }
   for (const enabled of [false,true]) for (const pdm of [false,true]) for (const os32 of [false,true]) {
     const result = run(['-DYORADIO_ESP8266_PDM32_BATCH=' + (enabled ? 'ON':'OFF'),
       '-DCONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=' + (pdm ? 'ON':'OFF'),

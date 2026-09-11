@@ -43,7 +43,8 @@ test('production direct DMA writer preserves PCM/PDM across chunk boundaries and
   fs.writeFileSync(path.join(dir, 'output.inc'), helpers + output.slice(
     output.indexOf('\n', start) + 1, end));
   for(const mode of ['PDM32', 'RCPDM', 'RCPDM_SIMPLE', 'RCPDM_FEEDBACK', 'PDM128']) {
-    const exe = path.join(dir, mode + (process.platform === 'win32' ? '.exe' : ''));
+   for(const dmaWords of (mode === 'PDM32' ? [512, 768] : [512])) {
+    const exe = path.join(dir, mode + '-' + dmaWords + (process.platform === 'win32' ? '.exe' : ''));
     const files = [path.join(__dirname, 'native/esp8266_direct_pdm_test.cpp'), path.join(audio, 'AudioNormalizer.cpp')];
     let build;
     if(process.platform === 'win32') {
@@ -56,15 +57,16 @@ test('production direct DMA writer preserves PCM/PDM across chunk boundaries and
         }
       if(!vcvars) return t.skip('Visual C++ build tools are not installed');
       const batch = path.join(dir, 'build.cmd');
-      fs.writeFileSync(batch, `@call "${vcvars}" >nul\r\n@if errorlevel 1 exit /b %errorlevel%\r\n@cl /nologo /std:c++20 /O2 /EHsc /W3 /DTEST_${mode}=1 /I"${source}" /I"${audio}" /I"${dir}" ${files.map(p => `"${p}"`).join(' ')} /Fe:"${exe}"\r\n`);
+      fs.writeFileSync(batch, `@call "${vcvars}" >nul\r\n@if errorlevel 1 exit /b %errorlevel%\r\n@cl /nologo /std:c++20 /O2 /EHsc /W3 /DTEST_${mode}=1 /DTEST_DMA_WORDS=${dmaWords} /I"${source}" /I"${audio}" /I"${dir}" ${files.map(p => `"${p}"`).join(' ')} /Fe:"${exe}"\r\n`);
       build = spawnSync('cmd.exe', ['/d', '/c', batch], {cwd:dir, encoding:'utf8'});
     } else {
-      build = spawnSync('c++', ['-std=c++20', '-O2', `-DTEST_${mode}=1`, `-I${source}`, `-I${audio}`, `-I${dir}`, ...files, '-o', exe], {cwd:dir, encoding:'utf8'});
+      build = spawnSync('c++', ['-std=c++20', '-O2', `-DTEST_${mode}=1`, `-DTEST_DMA_WORDS=${dmaWords}`, `-I${source}`, `-I${audio}`, `-I${dir}`, ...files, '-o', exe], {cwd:dir, encoding:'utf8'});
       if(build.error?.code === 'ENOENT') return t.skip('Host C++ compiler not installed');
     }
     assert.equal(build.status, 0, build.stdout + build.stderr);
     const run = spawnSync(exe, [], {encoding:'utf8'});
     assert.equal(run.status, 0, run.stdout + run.stderr);
-    t.diagnostic(`${mode}: ${run.stdout.trim()}`);
+    t.diagnostic(`${mode} DMA${dmaWords}: ${run.stdout.trim()}`);
+   }
   }
 });
