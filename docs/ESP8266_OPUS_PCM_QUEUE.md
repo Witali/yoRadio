@@ -118,3 +118,63 @@ time including DMA waits/preemption, NOT CPU time. The older OUTPUT stage
 measures enqueue on this profile and must not be compared as physical output
 CPU work. Worst-case diagnostic JSON fits the existing1088B shared scratch;
 overflow is rejected, not sent as truncated JSON. Board qualification pending.
+
+## Board result: NOT qualified (2026-09-11)
+
+Source27f0818, app889408B; OTA confirmed slot0x110000. Exact artifact,
+manifest, OTA reports and every failed run are in
+`firmware/development/esp8266-opus-pcm-queue256/`.
+
+| Series | Attempts | Accepted starts | Valid20s intervals | Observations |
+| --- | ---: | ---: | ---: | --- |
+| Nightwave Plaza, actual~64kbps | 10 | 10 | 0 | Receive timeout116;6 missing profile windows; no successful start-status replies |
+| Own CELT64 file, LAN HTTP | 10 | 10 | 0 | First short decode, then9 observed decoder-init failures |
+
+Both input sources can deliver a short PCM segment: the first remote attempt
+submitted/output23688 samples; the first local attempt22728. No queue error
+was reported in captured health samples, and submitted/output totals matched
+after drain. This does NOT establish continuous playback or rule out unseen
+failures. Silent/idle DMA EOFs after playback stops are not useful underrun
+measurements, and no CPU utilization is inferred from these wall-time traces.
+
+Lowest observed free consumer stack1672/2048B; main audio stack1496/5120B.
+These came from short successful output paths, not all gain/error scenarios.
+Local-series boot-lifetime heap minimum4004B. Most health samples were taken
+AFTER Stop/init failure, so their24..27KiB free heap is not playback headroom.
+
+The diagnostic snapshot identifies stage8 (scratch allocation), requested6144B,
+free DRAM8304B before cleanup,24820B afterwards. This is an allocation failure,
+not stage10 (reserve guard). Fragmentation/contiguous allocation availability is
+the leading explanation; largest free block was not measured. No leak is
+proven by this snapshot. The4KiB reserve was not lowered.
+
+A reset boundary occurred between remote and local series: uptime/generation
+restarted and SDK reset reason changed7 to2. In this SDK2 is `ESP_RST_EXT`;
+the cause is unknown, and this task did not issue UART/reset commands. Do not
+treat the two series as one uninterrupted run. LAN source socket bytes record
+bytes handed to the host socket, NOT bytes received by ESP8266.
+
+Static DRAM BSS:18520B (oldDMA512) ->16552B (queueDMA256), a1968B saving.
+Dynamic PCM grows1920B, and the consumer adds2048B stack plus its TCB, so total
+application RAM grows roughly2KiB rather than shrinking. IRAM sections stay
+unchanged; ISR code changes387 ->389B due to configuration, not identical-code
+timing. This profile also uses3000ms inactivity versus old512 profile1000ms;
+it is not a single-variable performance A/B.
+
+Decision: retain the implementation only as an OFF-by-default experiment.
+The idea remains efficient per millisecond of buffered audio, but this
+implementation has not solved the actual device failures. Restore the exact
+pre-test DMA512 image by OTA; its confirmation is in `restore-dma512-ota.json`.
+That rollback itself is not evidence that old Opus playback is qualified.
+
+Next gates before another hardware promotion:
+
+- [ ] Measure largest DRAM block and allocation lifetimes around HTTP setup,
+  Opus state/scratch allocation and reconnect; avoid fixing it by lowering guards.
+- [ ] Audit consumer call-chain stack and exercise normalization/error paths
+  before trying a smaller consumer stack (main audio remains>=5120B).
+- [ ] Trace TCP window updates and packet arrival on the LAN control. The local
+  failure excludes the remote station as the only possible cause, not Wi-Fi,
+  RAM or scheduling. No missing-window bug has yet been established in lwIP.
+- [ ] Obtain10 qualified continuous windows, then test actual Stop/Play and
+  cross-codec switching; host ownership tests alone are insufficient.

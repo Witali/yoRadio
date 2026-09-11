@@ -1,0 +1,29 @@
+{
+  "baseline": {
+    "name": "esp8266-opus-dma512-live",
+    "sections": {
+      ".iram0.vectors": 128,
+      ".iram0.text": 22848,
+      ".iram0.bss": 4040,
+      ".dram0.data": 1652,
+      ".dram0.bss": 18520,
+      ".flash.text": 633454,
+      ".flash.rodata": 227360
+    },
+    "isr_bytes": 387
+  },
+  "candidate": {
+    "name": "esp8266-opus-pcm-queue256",
+    "sections": {
+      ".iram0.vectors": 128,
+      ".iram0.text": 22848,
+      ".iram0.bss": 4040,
+      ".dram0.data": 1652,
+      ".dram0.bss": 16552,
+      ".flash.text": 637166,
+      ".flash.rodata": 227528
+    },
+    "isr_bytes": 389
+  },
+  "note": "Different DMA size and consumer; not an identical-ISR A/B. Dynamic PCM +1920 B and consumer stack2048 B plus TCB are excluded from static sections."
+}
