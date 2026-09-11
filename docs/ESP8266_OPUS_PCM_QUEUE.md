@@ -58,6 +58,13 @@ consumer simulation needs3840B PCM versus1920B for the synchronous baseline;
 peak codec scratch is unchanged (worst mixed-mode5968B DRAM /15600B IRAM).
 No allocations occur during decoding. This does not yet include an RTOS task.
 
+Target compile check, source136a6a1: saved `esp8266-opus-pcm-lease-off` and
+`esp8266-opus-pcm-lease-api`, neither flashed. API ON costs208B flash, zero
+additional STATIC RAM; the future3840B PCM pool and consumer stack are not
+allocated yet. DMA ISR section identical (387B), and OFF retains the older
+DMA512 section sizes. Hardware scheduling/codec-speed qualification remains
+open; do not confuse this compile check with a running asynchronous queue.
+
 ## Remaining integration and qualification
 
 - [ ] Opt-in diagnostic build with two256-word DMA buffers; keep512 default.
