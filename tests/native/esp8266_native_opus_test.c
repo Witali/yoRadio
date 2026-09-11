@@ -7,7 +7,7 @@
 
 typedef union { uint64_t align; uint8_t bytes[32768]; } aligned_buffer;
 static aligned_buffer state, scratch, iram;
-static int16_t pcm[NATIVE_OPUS_MAX_SAMPLES];
+static int16_t pcm[NATIVE_OPUS_MAX_SAMPLES * 2];
 static native_opus_t decoder;
 static uint8_t stream[32768];
 static size_t stream_size, calls, received;
@@ -15,23 +15,69 @@ static uint32_t last_bitrate;
 static bool cancel;
 static unsigned cancel_after;
 static unsigned allocation_count;
+#if YORADIO_OPUS_PCM_LEASES
+static bool leased;
+static unsigned owned[2], acquired, released, transferred;
+static int held = -1;
+static const int16_t *held_data;
+static size_t held_samples;
+static void consume_held(void) {
+    if (held < 0) return;
+    assert(owned[held] == 2);
+    for (size_t i=0;i<held_samples;++i) assert(held_data[i] == 0);
+    memset(pcm+held*960,0x5a,960*sizeof(*pcm));
+    owned[held]=0; held=-1;
+}
+static int acquire_pcm(void *ctx,int16_t **data,int samples) {
+    assert(ctx == &calls && samples>0 && samples<=960);
+    for (unsigned i=0;i<2;++i) if (!owned[i]) {
+        owned[i]=1; *data=pcm+i*960; ++acquired; return 0;
+    }
+    assert(!"both slots still owned"); return NATIVE_OPUS_ERR_CANCELLED;
+}
+static void release_pcm(void *ctx,int16_t *data) {
+    assert(ctx == &calls && (data==pcm || data==pcm+960));
+    unsigned i=(unsigned)(data-pcm)/960;
+    assert(owned[i]==1); owned[i]=0; ++released;
+}
+static void check_leases(void) {
+    consume_held();
+    assert(!owned[0] && !owned[1] && acquired==released+transferred);
+}
+#endif
 /* Real bounded libopus is linked; unexpected heap allocation fails the test. */
 void *__wrap_malloc(size_t n) { (void)n; ++allocation_count; return NULL; }
 void *__wrap_calloc(size_t n, size_t z) { (void)n; (void)z; ++allocation_count; return NULL; }
 void *__wrap_realloc(void *p, size_t n) { (void)p; (void)n; ++allocation_count; return NULL; }
 static bool output(void *ctx, const int16_t *data, size_t samples, uint32_t bitrate) {
     assert(ctx == &calls && samples && samples <= 960);
-    assert(data >= pcm && data + samples <= pcm + 960);
+    assert(data >= pcm && data + samples <= pcm + sizeof(pcm)/sizeof(*pcm));
     for (size_t i=0; i<samples; ++i) assert(data[i] == 0);
     ++calls; received += samples; last_bitrate = bitrate;
-    return !cancel && (!cancel_after || calls < cancel_after);
+    bool accepted=!cancel && (!cancel_after || calls < cancel_after);
+#if YORADIO_OPUS_PCM_LEASES
+    if (leased && accepted) {
+        unsigned index=(unsigned)(data-pcm)/960;
+        assert(owned[index]==1);
+        consume_held(); /* previous PCM survives the next complete decode */
+        owned[index]=2; held=(int)index; held_data=data; held_samples=samples; ++transferred;
+    }
+#endif
+    return accepted;
 }
 static native_opus_config_t config(void) {
-    native_opus_config_t c = {state.bytes,sizeof(state.bytes),scratch.bytes,7680,
-        iram.bytes,NATIVE_OPUS_IRAM_BYTES,pcm,960,output,&calls};
+    native_opus_config_t c = {.decoder_state=state.bytes,.decoder_state_bytes=sizeof(state.bytes),
+        .scratch=scratch.bytes,.scratch_bytes=7680,.iram=iram.bytes,.iram_bytes=NATIVE_OPUS_IRAM_BYTES,
+        .pcm=pcm,.pcm_samples=960,.output=output,.output_ctx=&calls};
+#if YORADIO_OPUS_PCM_LEASES
+    if (leased) { c.pcm_samples=1920; c.acquire_pcm=acquire_pcm; c.release_pcm=release_pcm; }
+#endif
     return c;
 }
 static void init(void) {
+#if YORADIO_OPUS_PCM_LEASES
+    check_leases();
+#endif
     calls=received=0; cancel=false; cancel_after=0; last_bitrate=0;
     native_opus_config_t c=config(); assert(native_opus_init(&decoder,&c)==0);
 }
@@ -311,6 +357,17 @@ int main(int argc,char **argv) {
     test_live_join();test_packed_frames();
     assert(argc==1 || argc==3);
     if(argc==3)test_live_capture(argv[1],argv[2]);
+#if YORADIO_OPUS_PCM_LEASES
+    leased=true;
+    test_memory();test_alignment();test_headers();test_granules();test_failures();test_chains();
+    test_live_join();test_packed_frames();check_leases();
+    native_opus_config_t c=config();c.release_pcm=NULL;
+    assert(native_opus_init(&decoder,&c)==NATIVE_OPUS_ERR_MEMORY);
+    c=config();c.pcm_samples=SIZE_MAX;
+    assert(native_opus_init(&decoder,&c)==NATIVE_OPUS_ERR_MEMORY);
+    printf("Native PCM leases: %u acquired, %u transferred, %u trimmed/aborted; no stranded slots PASS\n",
+        acquired,transferred,released);
+#endif
     assert(allocation_count==0);
     printf("Native Opus PASS: state=%zu adapter=%zu PCM=%zu no allocations\n",native_opus_decoder_size(),sizeof(decoder),sizeof(pcm));
     return 0;

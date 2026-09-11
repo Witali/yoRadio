@@ -25,6 +25,12 @@ size_t native_opus_decoder_size(void) {
 }
 
 static bool valid_memory(native_opus_t *s, const native_opus_config_t *c) {
+    size_t pcm_samples = NATIVE_OPUS_MAX_SAMPLES;
+#if YORADIO_OPUS_PCM_LEASES
+    if (!!c->acquire_pcm != !!c->release_pcm) return false;
+    if (c->acquire_pcm) pcm_samples = c->pcm_samples;
+#endif
+    if (pcm_samples > SIZE_MAX / sizeof(int16_t)) return false;
     /* Match libopus's state alignment without requiring C11 alignof. Decoder
      * scratch contains at most 32-bit scalars (FFT pairs are two int32s), not
      * pointers or int64s; the SDK's four-byte-aligned arenas are sufficient. */
@@ -40,7 +46,7 @@ static bool valid_memory(native_opus_t *s, const native_opus_config_t *c) {
         (uintptr_t)c->scratch, (uintptr_t)c->iram, (uintptr_t)c->pcm};
     const size_t sizes[] = {sizeof(*s), c->decoder_state_bytes,
         c->scratch_bytes, NATIVE_OPUS_IRAM_BYTES,
-        NATIVE_OPUS_MAX_SAMPLES * sizeof(int16_t)};
+        pcm_samples * sizeof(int16_t)};
     for (size_t i = 0; i < 5; ++i) {
         if (sizes[i] > UINTPTR_MAX - bases[i]) return false;
         for (size_t j = 0; j < i; ++j)
@@ -111,6 +117,27 @@ typedef struct {
     uint64_t position, keep_end;
 } packet_output_t;
 
+#if YORADIO_OPUS_PCM_LEASES
+static int acquire_block(void *context, int16_t **pcm, int samples) {
+    native_opus_t *s = ((packet_output_t *)context)->decoder;
+    int result = s->config.acquire_pcm(s->config.output_ctx, pcm, samples);
+    if (result) return result;
+    uintptr_t base = (uintptr_t)s->config.pcm, address = (uintptr_t)*pcm;
+    size_t bytes = s->config.pcm_samples * sizeof(int16_t);
+    size_t needed = (size_t)samples * sizeof(int16_t);
+    if (!*pcm || (address & 1U) || address < base || address - base > bytes ||
+        needed > bytes - (address - base)) {
+        if (*pcm) s->config.release_pcm(s->config.output_ctx, *pcm);
+        return NATIVE_OPUS_ERR_MEMORY;
+    }
+    return 0;
+}
+static void release_block(void *context, int16_t *pcm) {
+    native_opus_t *s = ((packet_output_t *)context)->decoder;
+    s->config.release_pcm(s->config.output_ctx, pcm);
+}
+#endif
+
 static int output_block(void *context, int16_t *pcm, int samples) {
     packet_output_t *packet = context;
     native_opus_t *s = packet->decoder;
@@ -127,6 +154,9 @@ static int output_block(void *context, int16_t *pcm, int samples) {
     packet->position = end;
     if (output && !s->config.output(s->config.output_ctx, pcm + skip, output, s->bitrate_bps))
         return NATIVE_OPUS_ERR_CANCELLED;
+#if YORADIO_OPUS_PCM_LEASES
+    if (!output && s->config.acquire_pcm) release_block(context, pcm);
+#endif
     s->output_samples += output;
     return 0;
 }
@@ -189,6 +219,13 @@ static int packet_received(void *context, const ogg_opus_packet_t *p) {
     packet_output_t output = {s, begin, keep_end};
     s->bitrate_bps = (uint32_t)((uint64_t)p->size * 8u *
                                NATIVE_OPUS_SAMPLE_RATE / (unsigned)samples);
+#if YORADIO_OPUS_PCM_LEASES
+    if (s->config.acquire_pcm)
+        s->libopus_error = yoradio_opus_decode_leased_bounded(s->config.decoder_state,
+            p->data, (int)p->size, NATIVE_OPUS_MAX_SAMPLES,
+            acquire_block, output_block, release_block, &output);
+    else
+#endif
     s->libopus_error = yoradio_opus_decode_blocks_bounded(s->config.decoder_state,
         p->data, (int)p->size, s->config.pcm, NATIVE_OPUS_MAX_SAMPLES, output_block, &output);
     if (s->libopus_error < 0)

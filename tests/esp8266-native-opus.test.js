@@ -5,7 +5,9 @@ const path = require('node:path');
 const {buildHost, hostPath, execute, root, component} =
   require('../tools/esp8266_opus_profile/build_host.cjs');
 
-test('native Opus streaming adapter validates headers, sample trimming, chains, cancellation and bounded memory',
+for (const pcmLeases of process.env.YORADIO_OPUS_PCM_LEASES === undefined ?
+  [false,true] : [process.env.YORADIO_OPUS_PCM_LEASES === '1'])
+test('native Opus streaming adapter validates headers, trimming, cancellation and bounded memory; leases='+pcmLeases,
   {timeout: 180000}, async t => {
     try { execute('gcc', ['--version']); }
     catch (error) {
@@ -15,7 +17,7 @@ test('native Opus streaming adapter validates headers, sample trimming, chains, 
     }
     const fastInt64 = process.env.YORADIO_OPUS_FAST_INT64 === undefined ? undefined :
       Number(process.env.YORADIO_OPUS_FAST_INT64);
-    const build = await buildHost({bounded: true, fastInt64,
+    const build = await buildHost({bounded: true, fastInt64, pcmLeases,
       noBuild: process.env.YORADIO_OPUS_NO_BUILD === '1'});
     const directory = fs.mkdtempSync(path.join(build.out, 'adapter-test-'));
     t.after(() => fs.rmSync(directory, {recursive: true, force: true}));
@@ -36,6 +38,7 @@ test('native Opus streaming adapter validates headers, sample trimming, chains, 
       [hostPath(path.resolve(capture)), hostPath(path.resolve(golden))] : []);
     assert.match(result, /Native Opus PASS/);
     assert.match(result, /no allocations/);
+    if (pcmLeases) assert.match(result, /Native PCM leases: .*no stranded slots PASS/);
     assert.match(result, /Native live join: strict default, pre-skip, 64-bit granules and reset PASS/);
     t.diagnostic(result.trim());
   });

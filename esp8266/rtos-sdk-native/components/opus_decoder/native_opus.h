@@ -32,11 +32,16 @@ enum {
 /* PCM is mono, 48 kHz, <=960 samples per synchronous callback. A packet
  * containing multiple <=20ms coded frames yields multiple callbacks using
  * the same PCM buffer; packet duration can reach120ms. Single SILK40/60ms
- * coded frames remain unsupported. PCM is valid only during the callback.
+ * coded frames remain unsupported. PCM is valid only during the callback
+ * unless acquire_pcm/release_pcm explicitly enable ownership transfer below.
  * bitrate_bps describes the compressed packet before trimming. Returning
  * false cancels delivery and latches ERR_CANCELLED until reset. */
 typedef bool (*native_opus_pcm_fn)(void *context, const int16_t *pcm,
                                   size_t samples, uint32_t bitrate_bps);
+#if YORADIO_OPUS_PCM_LEASES
+typedef int (*native_opus_pcm_acquire_fn)(void *context, int16_t **pcm, int samples);
+typedef void (*native_opus_pcm_release_fn)(void *context, int16_t *pcm);
+#endif
 
 typedef struct {
     void *decoder_state;
@@ -49,6 +54,14 @@ typedef struct {
     size_t pcm_samples;
     native_opus_pcm_fn output;
     void *output_ctx;
+#if YORADIO_OPUS_PCM_LEASES
+    /* Both NULL keeps synchronous reuse. Otherwise acquire grants a region
+     * inside the complete caller-owned pcm/pcm_samples pool. Successful
+     * output transfers it; release handles empty trimmed frames and errors.
+     * Output receives a possibly pre-skip-trimmed pointer into that region. */
+    native_opus_pcm_acquire_fn acquire_pcm;
+    native_opus_pcm_release_fn release_pcm;
+#endif
 } native_opus_config_t;
 
 /* Caller-owned storage. Only one active adapter may use the shared Opus
