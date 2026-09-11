@@ -28,6 +28,12 @@ After application-only OTA and confirmed slot change:
 tools/esp8266_opus_profile/run_raw_series.ps1 -Directory firmware/development/esp8266-opus-rotation192-off -Fixtures .build/esp8266-opus-board-through192 -Attempts 10
 ```
 
+Physical series completed: ten terminal runs, exact PCM, no observation errors.
+Median raw CPU:23.480/55.377/63.886/76.289/88.555%. These are decoder-only
+measurements, not continuous output. The matched universal ASM candidate was
+slower for CELT; see its comparison.json. Earlier pending statements above
+describe the build-time state, before these saved runs.
+
 Every attempt remains runN.json/log, including failures. Unknown state or
 invalid PCM stops the series; do not silently restart or replace results.
 See [the rotation contract](../../../docs/ESP8266_OPUS_ROTATION_ASM.md).

@@ -18,5 +18,11 @@ tools/esp8266_opus_profile/run_raw_series.ps1 -Directory firmware/development/es
 node tools/esp8266_opus_profile/compare_raw.cjs --reference firmware/development/esp8266-opus-rotation192-off --candidate firmware/development/esp8266-opus-rotation192-on --switch opus_rotation_lx106 --runs 10 --output firmware/development/esp8266-opus-rotation192-on/comparison.json
 ```
 
+Physical series completed: ten terminal runs, exact PCM, no observation errors.
+Median raw CPU:23.053/55.251/65.993/82.221/96.593%. CELT is slower by
+3.3/7.8/9.1%; this candidate is rejected for production. comparison.json
+passed means a valid measurement, not an accepted optimization. Earlier
+pending statements above describe the build-time state, before these runs.
+
 Use application-only OTA, not UART. Keep all failed/slow attempts. A speed
 improvement alone does not meet the goal of uninterrupted Opus radio.
