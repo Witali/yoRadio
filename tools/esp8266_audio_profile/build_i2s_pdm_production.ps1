@@ -22,6 +22,7 @@ param(
     [switch]$OpusRotationLx106,
     [switch]$OpusDivOnce,
     [switch]$OpusPcmPublish,
+    [switch]$OpusPcmLeases,
     [switch]$Pdm32Iram,
     [switch]$Pdm32Batch,
     [ValidateSet(64, 128, 256, 512)]
@@ -53,6 +54,7 @@ if ($OpusFirFlashWord -and -not $EnableOpus) { throw '-OpusFirFlashWord requires
 if ($OpusCeltDecodeOnly -and -not $EnableOpus) { throw '-OpusCeltDecodeOnly requires -EnableOpus' }
 if ($OpusDivOnce -and -not $EnableOpus) { throw '-OpusDivOnce requires -EnableOpus' }
 if ($OpusPcmPublish -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusPcmPublish requires diagnostic Opus until board qualification' }
+if ($OpusPcmLeases -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusPcmLeases requires diagnostic Opus until queue qualification' }
 if ($OpusRotationLx106 -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusRotationLx106 requires diagnostic Opus until board qualification' }
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
 if ($Pdm32Batch -and -not $Diagnostic) { throw '-Pdm32Batch requires -Diagnostic until board qualification' }
@@ -161,6 +163,7 @@ try {
     $taskPdm32Iram = if ($Pdm32Iram) { 'ON' } else { 'OFF' }
     $taskPdm32Batch = if ($Pdm32Batch) { 'ON' } else { 'OFF' }
     $taskOpusPcmPublish = if ($OpusPcmPublish) { 'ON' } else { 'OFF' }
+    $taskOpusPcmLeases = if ($OpusPcmLeases) { 'ON' } else { 'OFF' }
     $taskSdkRxDiag = if ($SdkRxDiag) { 'ON' } else { 'OFF' }
     Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
@@ -196,6 +199,7 @@ try {
         "-DYORADIO_ESP8266_PDM32_IRAM=$taskPdm32Iram",
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
         "-DYORADIO_ESP8266_OPUS_PCM_PUBLISH=$taskOpusPcmPublish",
+        "-DYORADIO_OPUS_PCM_LEASES=$taskOpusPcmLeases",
         "-DYORADIO_ESP8266_PDM32_LOAN_WORDS=$Pdm32LoanWords",
         "-DYORADIO_ESP8266_DMA_BUFFER_WORDS=$DmaBufferWords",
         "-DYORADIO_ESP8266_SDK_RX_DIAG=$taskSdkRxDiag",
@@ -248,6 +252,7 @@ try {
         opus_rotation_lx106=[bool]$OpusRotationLx106
         opus_div_once=[bool]$OpusDivOnce
         opus_pcm_publish=[bool]$OpusPcmPublish
+        opus_pcm_leases=[bool]$OpusPcmLeases
         opus_mathops_header_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/mathops.h).Hash
         opus_rotation_source_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_rotation_lx106.S).Hash
         opus_rotation_header_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_rotation.h).Hash

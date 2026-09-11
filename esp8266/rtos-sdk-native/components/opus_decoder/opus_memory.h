@@ -3,6 +3,12 @@
 #include <stdint.h>
 #include <setjmp.h>
 #include <string.h>
+#ifndef YORADIO_OPUS_PCM_LEASES
+#define YORADIO_OPUS_PCM_LEASES 0
+#endif
+#if YORADIO_OPUS_PCM_LEASES != 0 && YORADIO_OPUS_PCM_LEASES != 1
+#error "YORADIO_OPUS_PCM_LEASES must be 0 or 1"
+#endif
 #ifndef YORADIO_OPUS_WORD_ASM
 #define YORADIO_OPUS_WORD_ASM 0
 #endif
@@ -133,6 +139,7 @@ int yoradio_opus_decode_blocks_native(void *decoder, const unsigned char *packet
 int yoradio_opus_decode_blocks_bounded(void *decoder, const unsigned char *packet,
     int length, int16_t *pcm, int frame_capacity,
     yoradio_opus_pcm_block_fn output, void *context);
+#if YORADIO_OPUS_PCM_LEASES
 /* Optional zero-copy frame ownership for a future PCM consumer task.
  * acquire returns 0 and a writable, aligned buffer for at least `samples`
  * int16 values, or a negative cancellation/error without granting a lease.
@@ -150,6 +157,7 @@ int yoradio_opus_decode_leased_native(void *decoder, const unsigned char *packet
 int yoradio_opus_decode_leased_bounded(void *decoder, const unsigned char *packet,
     int length, int frame_capacity, yoradio_opus_pcm_acquire_fn acquire,
     yoradio_opus_pcm_block_fn output, yoradio_opus_pcm_abort_fn abort, void *context);
+#endif
 #ifdef __cplusplus
 }
 #endif

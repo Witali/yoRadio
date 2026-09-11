@@ -2,6 +2,9 @@
 
 2026-09-11. Goal: continuous real Opus radio, not only fast raw decoding.
 No production buffer/default change in this first step.
+The new API is compiled only with `YORADIO_OPUS_PCM_LEASES=1`; the build helper
+exposes `-OpusPcmLeases`, requiring diagnostic Opus. Default OFF removes the
+new acquire branch and wrappers from production. It does not start a consumer.
 
 At mono 48 kHz, PCM16 costs 96 kB/s; PDM32 costs 192 kB/s. Two768-word
 DMA buffers cost6144B and hold at most32ms. The existing decoder's separate

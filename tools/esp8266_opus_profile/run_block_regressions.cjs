@@ -33,7 +33,7 @@ function grouped(data,count,vbr=false,padding=0) {
 async function run({output,capture,celtDecodeOnly=false,divOnce=false,leased=false}={}) {
   output ||= path.join(__dirname,leased?'leased-results.json':'block-results.json');
   prepareReference();await buildHost({upstreamRoot:defaultOutput,fastInt64:0});
-  const build=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,celtDecodeOnly,divOnce});
+  const build=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,celtDecodeOnly,divOnce,pcmLeases:leased});
   const out=path.join(root,'.build/opus-block-regression'+(celtDecodeOnly?'-celt-decode-only':'')+(divOnce?'-div-once':''));fs.mkdirSync(out,{recursive:true});
   const probe=leased?'leased_probe':'block_probe';
   const binary=path.join(out,probe);

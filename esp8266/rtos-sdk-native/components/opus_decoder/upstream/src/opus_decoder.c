@@ -810,6 +810,7 @@ static int opus_decode_native_impl(OpusDecoder *st, const unsigned char *data,
    {
       int ret;
       opus_val16 *frame_pcm = block_output ? pcm : pcm+nb_samples*st->channels;
+#if YORADIO_OPUS_PCM_LEASES
       if (block_acquire)
       {
          ret = block_acquire(block_context, &frame_pcm, packet_frame_size);
@@ -817,6 +818,9 @@ static int opus_decode_native_impl(OpusDecoder *st, const unsigned char *data,
          if (!frame_pcm || ((uintptr_t)frame_pcm & (sizeof(opus_val16)-1)))
             return OPUS_BAD_ARG;
       }
+#else
+      (void)block_acquire;
+#endif
       ret = opus_decode_frame(st, data, size[i],
             frame_pcm,
             block_output ? frame_size : frame_size-nb_samples, 0);
@@ -873,6 +877,7 @@ int yoradio_opus_decode_blocks_native(void *decoder, const unsigned char *packet
    return opus_decode_native_impl(st, packet, length, pcm, frame_capacity, 0,
          0, NULL, 0, NULL, 0, output, context, NULL);
 }
+#if YORADIO_OPUS_PCM_LEASES
 int yoradio_opus_decode_leased_native(void *decoder, const unsigned char *packet,
     int length, int frame_capacity, yoradio_opus_pcm_acquire_fn acquire,
     yoradio_opus_pcm_block_fn output, void *context)
@@ -884,6 +889,7 @@ int yoradio_opus_decode_leased_native(void *decoder, const unsigned char *packet
    return opus_decode_native_impl(st, packet, length, NULL, frame_capacity, 0,
          0, NULL, 0, NULL, 0, output, context, acquire);
 }
+#endif
 #endif
 
 #ifdef FIXED_POINT
