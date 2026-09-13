@@ -3,6 +3,24 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus ASM inner-product unroll4 (rejected)
+
+- `development/esp8266-opus-bands-inner4-v1/app.bin`, 903280 B,
+  SHA256 `f5f698a8bbe33a7d3aba466f5764d2396e5c44b93b49a4a4802bef081b39d658`.
+  Diagnostic raw-RAM benchmark, not an ordinary radio release. Opt-in
+  `bands-inner4-asm`, implementation `b6217542`; default remains unchanged.
+- Expands the renormalise_vector energy loop by four for N>=8, retains exact
+  scalar tail and order. 6162 actual-instruction cases, 56 Node tests and
+  exact ASan/UBSan host PCM through320/510 kbit/s, PLC/reset/OOM.
+  No new RAM/stack, image +64 B versus tell-inline. Host-only length census
+  records 31 calls per0.24 s at192 kbit/s, not a dominant decoding loop.
+- All30 physical A/B/A retained: CPU192 88.103 / 94.984 / 88.120%,
+  about7.81% more time. Rejected; no arithmetic/quality degradation.
+  [Detailed report](../docs/ESP8266_OPUS_ASM_INNER4.md).
+- Restored ordinary `esp8266-opus-live512-idle3s-20260913` via OTA, stopped
+  as initially. HTTP/status/audio, WebSocket and playlist verified. Root HTML
+  HTTP200 in130 ms is not a full-browser timing. No UART/SPIFFS changes.
+
 ## Development - 2026-09-14: ESP8266 Opus ASM PVQ cache reuse (rejected)
 
 - `development/esp8266-opus-bands-cache-reuse-v1/app.bin`, 903232 B,

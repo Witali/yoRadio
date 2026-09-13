@@ -55,7 +55,11 @@ function report(){
  const compact=rows=>rows.map(({report,...r})=>r);
  const result={schema:1,build,initial,repeated,host,selection:{initial:selectHighBitrate(initial.cases),repeated:selectHighBitrate(repeated.cases)},inputs:{before:compact(a),candidate:compact(b),after:compact(a2)},scope:'30 physical A/B/A attempts; raw RAM packets through192, no output/profiler. Host compatibility also320/510. No discarded runs; not live qualification.'};
  for(const f of ['initial-snapshot.json','ota-before.json','ota-candidate.json','ota-after.json'])fs.copyFileSync(path.join(experiment,f),path.join(dest,f));
- for(const f of ['host.log','correctness.json','regression.log'])fs.copyFileSync(path.join(root,'.build/opus-bands-inner4',f),path.join(dest,f));
+ const census=read(path.join(root,'.build/opus-bands-inner4/census.json'));
+ assert.equal(census.passed,true);assert.equal(census.recipe_sha256_lf,sourceHash(path.join(__dirname,'profile_inner4.cjs')));
+ for(const c of census.cases){assert.equal(c.pcm.exact,true);assert.equal(c.samples,c.pcm.compared_samples);assert.equal(c.audio_duration_ms,c.samples/48);}
+ result.host_length_census=census;
+ for(const f of ['host.log','correctness.json','regression.log','census.json','census.log'])fs.copyFileSync(path.join(root,'.build/opus-bands-inner4',f),path.join(dest,f));
  fs.writeFileSync(path.join(dest,'comparison.json'),JSON.stringify(result,null,2)+'\n');
  console.table(initial.cases.map((c,i)=>({name:c.name,A:c.reference.task_budget_percent.median,B:c.candidate.task_budget_percent.median,A2:repeated.cases[i].reference.task_budget_percent.median,reduction:c.median_task_reduction_percent})));
  console.log(JSON.stringify(result.selection));return result;
