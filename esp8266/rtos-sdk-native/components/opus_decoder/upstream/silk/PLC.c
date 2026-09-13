@@ -33,6 +33,27 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "stack_alloc.h"
 #include "PLC.h"
 
+#ifndef YORADIO_OPUS_SILK_PLC_IRAM
+#define YORADIO_OPUS_SILK_PLC_IRAM 0
+#endif
+#if YORADIO_OPUS_SILK_PLC_IRAM != 0 && YORADIO_OPUS_SILK_PLC_IRAM != 1
+#error "YORADIO_OPUS_SILK_PLC_IRAM must be 0 or 1"
+#endif
+#if YORADIO_OPUS_SILK_PLC_IRAM
+#if !defined(YORADIO_OPUS_BOUNDED) || defined(SMALL_FOOTPRINT) || defined(ENABLE_DEEP_PLC) || defined(ENABLE_OSCE)
+#error "PLC IRAM requires bounded plain SILK without int16 scratch aliases"
+#endif
+/* Only sLTP_Q14 and its two aliases are audited. Other SILK temporaries
+ * remain byte-accessible. These helpers also work for the DRAM fallback. */
+#define PLC_WORD(p, i) yoradio_opus_load32((p) + (i))
+#define PLC_STORE_WORD(p, i, v) yoradio_opus_store32((p) + (i), (v))
+#define PLC_COPY_WORDS(to, from, n) yoradio_opus_copy((to), (from), (n), sizeof(opus_int32))
+#else
+#define PLC_WORD(p, i) ((p)[i])
+#define PLC_STORE_WORD(p, i, v) ((p)[i] = (v))
+#define PLC_COPY_WORDS(to, from, n) silk_memcpy((to), (from), (n) * sizeof(opus_int32))
+#endif
+
 #ifdef ENABLE_DEEP_PLC
 #include "lpcnet.h"
 #endif
@@ -247,7 +268,12 @@ static OPUS_INLINE void silk_PLC_conceal(
     opus_int32 prevGain_Q10[2];
     SAVE_STACK;
 
+#if YORADIO_OPUS_SILK_PLC_IRAM
+    sLTP_Q14 = (opus_int32 *)yoradio_opus_scratch_alloc(
+        psDec->ltp_mem_length + psDec->frame_length, sizeof(opus_int32), 1);
+#else
     ALLOC( sLTP_Q14, psDec->ltp_mem_length + psDec->frame_length, opus_int32 );
+#endif
 #ifdef SMALL_FOOTPRINT
     /* Ugly hack that breaks aliasing rules to save stack: put sLTP at the very end of sLTP_Q14. */
     sLTP = ((opus_int16*)&sLTP_Q14[psDec->ltp_mem_length + psDec->frame_length])-psDec->ltp_mem_length;
@@ -327,7 +353,7 @@ static OPUS_INLINE void silk_PLC_conceal(
     inv_gain_Q30 = silk_INVERSE32_varQ( psPLC->prevGain_Q16[ 1 ], 46 );
     inv_gain_Q30 = silk_min( inv_gain_Q30, silk_int32_MAX >> 1 );
     for( i = idx + psDec->LPC_order; i < psDec->ltp_mem_length; i++ ) {
-        sLTP_Q14[ i ] = silk_SMULWB( inv_gain_Q30, sLTP[ i ] );
+        PLC_STORE_WORD(sLTP_Q14, i, silk_SMULWB(inv_gain_Q30, sLTP[i]));
     }
 
     /***************************/
@@ -340,11 +366,11 @@ static OPUS_INLINE void silk_PLC_conceal(
             /* Unrolled loop */
             /* Avoids introducing a bias because silk_SMLAWB() always rounds to -inf */
             LTP_pred_Q12 = 2;
-            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, pred_lag_ptr[  0 ], B_Q14[ 0 ] );
-            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, pred_lag_ptr[ -1 ], B_Q14[ 1 ] );
-            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, pred_lag_ptr[ -2 ], B_Q14[ 2 ] );
-            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, pred_lag_ptr[ -3 ], B_Q14[ 3 ] );
-            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, pred_lag_ptr[ -4 ], B_Q14[ 4 ] );
+            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, PLC_WORD(pred_lag_ptr,  0), B_Q14[ 0 ] );
+            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, PLC_WORD(pred_lag_ptr, -1), B_Q14[ 1 ] );
+            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, PLC_WORD(pred_lag_ptr, -2), B_Q14[ 2 ] );
+            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, PLC_WORD(pred_lag_ptr, -3), B_Q14[ 3 ] );
+            LTP_pred_Q12 = silk_SMLAWB( LTP_pred_Q12, PLC_WORD(pred_lag_ptr, -4), B_Q14[ 4 ] );
             pred_lag_ptr++;
 
             /* Generate LPC excitation */
@@ -352,7 +378,7 @@ static OPUS_INLINE void silk_PLC_conceal(
             idx = silk_RSHIFT( rand_seed, 25 ) & RAND_BUF_MASK;
 #ifdef YORADIO_OPUS_BOUNDED
             const opus_int32 excitation = yoradio_opus_load32(&rand_ptr[idx]);
-            sLTP_Q14[sLTP_buf_idx] = silk_LSHIFT32(silk_SMLAWB(LTP_pred_Q12, excitation, rand_scale_Q14), 2);
+            PLC_STORE_WORD(sLTP_Q14, sLTP_buf_idx, silk_LSHIFT32(silk_SMLAWB(LTP_pred_Q12, excitation, rand_scale_Q14), 2));
 #else
             sLTP_Q14[ sLTP_buf_idx ] = silk_LSHIFT32( silk_SMLAWB( LTP_pred_Q12, rand_ptr[ idx ], rand_scale_Q14 ), 2 );
 #endif
@@ -378,33 +404,33 @@ static OPUS_INLINE void silk_PLC_conceal(
     sLPC_Q14_ptr = &sLTP_Q14[ psDec->ltp_mem_length - MAX_LPC_ORDER ];
 
     /* Copy LPC state */
-    silk_memcpy( sLPC_Q14_ptr, psDec->sLPC_Q14_buf, MAX_LPC_ORDER * sizeof( opus_int32 ) );
+    PLC_COPY_WORDS(sLPC_Q14_ptr, psDec->sLPC_Q14_buf, MAX_LPC_ORDER);
 
     celt_assert( psDec->LPC_order >= 10 ); /* check that unrolling works */
     for( i = 0; i < psDec->frame_length; i++ ) {
         /* partly unrolled */
         /* Avoids introducing a bias because silk_SMLAWB() always rounds to -inf */
         LPC_pred_Q10 = silk_RSHIFT( psDec->LPC_order, 1 );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i -  1 ], A_Q12[ 0 ] );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i -  2 ], A_Q12[ 1 ] );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i -  3 ], A_Q12[ 2 ] );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i -  4 ], A_Q12[ 3 ] );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i -  5 ], A_Q12[ 4 ] );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i -  6 ], A_Q12[ 5 ] );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i -  7 ], A_Q12[ 6 ] );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i -  8 ], A_Q12[ 7 ] );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i -  9 ], A_Q12[ 8 ] );
-        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i - 10 ], A_Q12[ 9 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i -  1), A_Q12[ 0 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i -  2), A_Q12[ 1 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i -  3), A_Q12[ 2 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i -  4), A_Q12[ 3 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i -  5), A_Q12[ 4 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i -  6), A_Q12[ 5 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i -  7), A_Q12[ 6 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i -  8), A_Q12[ 7 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i -  9), A_Q12[ 8 ] );
+        LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i - 10), A_Q12[ 9 ] );
         for( j = 10; j < psDec->LPC_order; j++ ) {
-            LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, sLPC_Q14_ptr[ MAX_LPC_ORDER + i - j - 1 ], A_Q12[ j ] );
+            LPC_pred_Q10 = silk_SMLAWB( LPC_pred_Q10, PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i - j - 1), A_Q12[ j ] );
         }
 
         /* Add prediction to LPC excitation */
-        sLPC_Q14_ptr[ MAX_LPC_ORDER + i ] = silk_ADD_SAT32( sLPC_Q14_ptr[ MAX_LPC_ORDER + i ],
-                                            silk_LSHIFT_SAT32( LPC_pred_Q10, 4 ));
+        PLC_STORE_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i,
+            silk_ADD_SAT32(PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i), silk_LSHIFT_SAT32(LPC_pred_Q10, 4)));
 
         /* Scale with Gain */
-        frame[ i ] = (opus_int16)silk_SAT16( silk_SAT16( silk_RSHIFT_ROUND( silk_SMULWW( sLPC_Q14_ptr[ MAX_LPC_ORDER + i ], prevGain_Q10[ 1 ] ), 8 ) ) );
+        frame[ i ] = (opus_int16)silk_SAT16( silk_SAT16( silk_RSHIFT_ROUND( silk_SMULWW( PLC_WORD(sLPC_Q14_ptr, MAX_LPC_ORDER + i), prevGain_Q10[ 1 ] ), 8 ) ) );
     }
 #ifdef ENABLE_DEEP_PLC
     if ( lpcnet != NULL && lpcnet->loaded && psDec->sPLC.fs_kHz == 16 ) {
@@ -426,7 +452,7 @@ static OPUS_INLINE void silk_PLC_conceal(
 #endif
 
     /* Save LPC state */
-    silk_memcpy( psDec->sLPC_Q14_buf, &sLPC_Q14_ptr[ psDec->frame_length ], MAX_LPC_ORDER * sizeof( opus_int32 ) );
+    PLC_COPY_WORDS(psDec->sLPC_Q14_buf, &sLPC_Q14_ptr[psDec->frame_length], MAX_LPC_ORDER);
 
     /**************************************/
     /* Update states                      */

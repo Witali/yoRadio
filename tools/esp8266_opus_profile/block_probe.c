@@ -8,7 +8,10 @@
 #include "opus_memory.h"
 #define GUARD 0x5a39ce71U
 static struct { uint32_t before; int16_t data[960]; uint32_t after; } pcm;
-static struct { uint32_t before, data[1536], after; } scratch;
+#ifndef OPUS_BLOCK_SCRATCH_BYTES
+#define OPUS_BLOCK_SCRATCH_BYTES 6144
+#endif
+static struct { uint32_t before, data[OPUS_BLOCK_SCRATCH_BYTES/4], after; } scratch;
 static struct { uint32_t before, data[4096], after; } words;
 static unsigned char packet[16384];
 static OpusDecoder *decoder;

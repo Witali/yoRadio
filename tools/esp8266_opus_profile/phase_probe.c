@@ -20,11 +20,17 @@ static void check(int condition, const char *message) {
 #ifdef YORADIO_OPUS_BOUNDED
 static struct { uint32_t before[2], data[4096], after[2]; } words;
 static struct { uint32_t before[2], data[1920], after[2]; } bytes;
-static size_t active_capacity;
+static size_t active_capacity, active_word_capacity;
+static unsigned word_dram_fallbacks, word_arena_allocations;
 static unsigned trace_peak;
 void *__real_yoradio_opus_scratch_alloc(size_t count, size_t size, int word_safe);
 void *__wrap_yoradio_opus_scratch_alloc(size_t count, size_t size, int word_safe) {
     void *result = __real_yoradio_opus_scratch_alloc(count, size, word_safe);
+    if (word_safe && count && size) {
+        uintptr_t address = (uintptr_t)result;
+        word_dram_fallbacks += address >= (uintptr_t)bytes.data && address < (uintptr_t)bytes.data + active_capacity;
+        word_arena_allocations += address >= (uintptr_t)words.data && address < (uintptr_t)words.data + active_word_capacity;
+    }
     opus_scratch_mark mark = yoradio_opus_scratch_mark();
     if (mark.bytes > trace_peak) {
         trace_peak = mark.bytes;
@@ -66,6 +72,7 @@ static void guards_ok(unsigned used) {
         bytes.before[0] == GUARD && bytes.before[1] == GUARD && bytes.after[0] == GUARD && bytes.after[1] == GUARD,
         "scratch arena guard corrupted");
     for (size_t i = active_capacity / 4; i < 1920; i++) check(bytes.data[i] == GUARD, "scratch wrote past logical capacity");
+    for (size_t i = active_word_capacity / 4; i < 4096; i++) check(words.data[i] == GUARD, "scratch wrote past logical word capacity");
 #endif
 }
 int main(int argc, char **argv) {
@@ -83,8 +90,11 @@ int main(int argc, char **argv) {
     size_t capacity = getenv("OPUS_PHASE_CAPACITY") ? strtoul(getenv("OPUS_PHASE_CAPACITY"), NULL, 10) : sizeof(bytes.data);
     check(capacity <= sizeof(bytes.data) && capacity % 4 == 0, "invalid requested scratch capacity");
     active_capacity = capacity;
+    active_word_capacity = getenv("OPUS_PHASE_WORD_CAPACITY") ? strtoul(getenv("OPUS_PHASE_WORD_CAPACITY"), NULL, 10) : sizeof(words.data);
+    check(active_word_capacity <= sizeof(words.data) && active_word_capacity % 4 == 0, "invalid word capacity");
     for (unsigned i = 0; i < 1920; i++) bytes.data[i] = GUARD;
-    yoradio_opus_memory_bind(bytes.data, capacity, words.data, sizeof(words.data));
+    for (unsigned i = 0; i < 4096; i++) words.data[i] = GUARD;
+    yoradio_opus_memory_bind(bytes.data, capacity, words.data, active_word_capacity);
 #endif
     check(opus_decoder_init(decoder, rate, 1) == OPUS_OK, "decoder init failed");
     FILE *out = fopen(argv[1], "w+b");
@@ -145,6 +155,8 @@ int main(int argc, char **argv) {
         "\"borrowed_by_lm\":[%u,%u,%u,%u],\"transient_borrowed\":%u,\"dual_stereo_borrowed\":%u,\"borrow_denied\":%u",
         yoradio_opus_scratch_peak_bytes(), yoradio_opus_scratch_peak_words(), capacity,
         borrowed[0], borrowed[1], borrowed[2], borrowed[3], transient_borrowed, dual_borrowed, denied);
+    printf(",\"word_capacity_bytes\":%zu,\"word_arena_allocations\":%u,\"word_dram_fallbacks\":%u",
+        active_word_capacity, word_arena_allocations, word_dram_fallbacks);
 #if YORADIO_OPUS_CELT_SILK_SCRATCH
     printf(",\"scratch_loan_peak_bytes\":%zu", yoradio_opus_scratch_peak_loan());
 #endif

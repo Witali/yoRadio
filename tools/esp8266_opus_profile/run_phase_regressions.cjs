@@ -6,8 +6,8 @@ const { prepareReference, defaultOutput } = require('./prepare_generic32_referen
 const { inspectPackets, sha256, fixtureDirectory } = require('./fixtures.cjs');
 const { comparePcm, runRegressions } = require('./run_regressions.cjs');
 
-async function phaseBuild(bounded, { silkScratch = false, sanitize = false, autocorrCompact = false } = {}) {
-  const build = await buildHost({ bounded, silkScratch: bounded && silkScratch, sanitize: bounded && sanitize, autocorrCompact: bounded && autocorrCompact, fastInt64: 0, ...(bounded ? {} : { upstreamRoot: defaultOutput }) });
+async function phaseBuild(bounded, { silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false } = {}) {
+  const build = await buildHost({ bounded, silkScratch: bounded && silkScratch, sanitize: bounded && sanitize, autocorrCompact: bounded && autocorrCompact, silkPlcIram: bounded && silkPlcIram, fastInt64: 0, ...(bounded ? {} : { upstreamRoot: defaultOutput }) });
   const object = path.join(build.out, 'phase_probe.o'), binary = path.join(build.out, 'phase_probe');
   execute('gcc', [...build.flags, '-c', hostPath(path.join(__dirname, 'phase_probe.c')), '-o', hostPath(object)]);
   execute('gcc', [...build.linkFlags, ...build.objects.filter(file => !file.endsWith('probe.c.o')).map(hostPath), hostPath(object),
@@ -15,15 +15,15 @@ async function phaseBuild(bounded, { silkScratch = false, sanitize = false, auto
     '-no-pie', '-Wl,--gc-sections', '-lm', '-o', hostPath(binary)]);
   return { ...build, binary };
 }
-async function runPhaseRegressions({ output, capacity = 6144, silkScratch = false, sanitize = false, autocorrCompact = false } = {}) {
+async function runPhaseRegressions({ output, capacity = 6144, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false } = {}) {
   output ||= path.join(__dirname, silkScratch ? 'silk-scratch-phase-results.json' : 'pcm-scratch-results.json');
   assert.ok(Number.isInteger(capacity) && capacity > 0 && capacity <= 7680 && capacity % 4 === 0);
   prepareReference();
   const standard = await runRegressions({ fastInt64: 0, upstreamRoot: defaultOutput });
-  const pristine = await phaseBuild(false), bounded = await phaseBuild(true, { silkScratch, sanitize, autocorrCompact });
+  const pristine = await phaseBuild(false), bounded = await phaseBuild(true, { silkScratch, sanitize, autocorrCompact, silkPlcIram });
   const directory = path.join(fixtureDirectory, 'phase');
   const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
-  const destination = path.join(root, '.build/esp8266-opus-phase-regression' + (silkScratch ? '-silk-scratch' : '') + (sanitize ? '-sanitize' : '') + (autocorrCompact ? '-autocorr-compact' : ''));
+  const destination = path.join(root, '.build/esp8266-opus-phase-regression' + (silkScratch ? '-silk-scratch' : '') + (sanitize ? '-sanitize' : '') + (autocorrCompact ? '-autocorr-compact' : '') + (silkPlcIram ? '-plc-iram' : ''));
   fs.mkdirSync(destination, { recursive: true });
   const cases = manifest.fixtures.map(fixture => {
     const file = path.join(directory, fixture.name + '.opuspkt'), data = fs.readFileSync(file);
@@ -66,11 +66,11 @@ async function runPhaseRegressions({ output, capacity = 6144, silkScratch = fals
   }, { borrowed_by_lm: [0, 0, 0, 0], transient_borrowed: 0, dual_stereo_borrowed: 0, borrow_denied: 0 });
   assert.ok(coverage.borrowed_by_lm.every(count => count > 0));
   assert.ok(coverage.transient_borrowed > 0 && coverage.dual_stereo_borrowed > 0 && coverage.borrow_denied > 0);
-  const report = { schema_version: 1, passed: true, silk_scratch: silkScratch, autocorr_compact: autocorrCompact, sanitizers: sanitize ? ['address', 'undefined'] : [], arithmetic: 'OPUS_FAST_INT64=0',
+  const report = { schema_version: 1, passed: true, silk_scratch: silkScratch, autocorr_compact: autocorrCompact, silk_plc_iram: silkPlcIram, sanitizers: sanitize ? ['address', 'undefined'] : [], arithmetic: 'OPUS_FAST_INT64=0',
     scope: 'Host mono output, maximum 20-ms packets; 48 kHz except explicit downsample-denial guard cases. Independently prepared pristine generic32 comparison. No physical speed, stack or whole-device memory claim; corpus peak is not a universal upper bound.',
     pristine_provenance: standard.pristine_provenance,
     phase_source_sha256_lf: Object.fromEntries(['upstream/celt/bands.c', 'upstream/celt/bands.h', 'upstream/celt/celt_decoder.c',
-      'upstream/src/opus_decoder.c', 'upstream/celt/celt_lpc.c', 'opus_memory.c', 'opus_memory.h'].map(name => {
+      'upstream/src/opus_decoder.c', 'upstream/celt/celt_lpc.c', 'upstream/silk/PLC.c', 'opus_memory.c', 'opus_memory.h'].map(name => {
       const file = 'esp8266/rtos-sdk-native/components/opus_decoder/' + name;
       return [file, sha256(Buffer.from(fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n')))];
     })),
@@ -83,7 +83,7 @@ module.exports = { phaseBuild, runPhaseRegressions };
 if (require.main === module) {
   const value = key => { const i = process.argv.indexOf(key); return i < 0 ? undefined : process.argv[i + 1]; };
   runPhaseRegressions({ output: value('--output'), capacity: value('--capacity') === undefined ? 6144 : Number(value('--capacity')),
-    silkScratch: process.argv.includes('--silk-scratch'), sanitize: process.argv.includes('--sanitize'), autocorrCompact: process.argv.includes('--autocorr-compact') })
+    silkScratch: process.argv.includes('--silk-scratch'), sanitize: process.argv.includes('--sanitize'), autocorrCompact: process.argv.includes('--autocorr-compact'), silkPlcIram: process.argv.includes('--silk-plc-iram') })
     .then(report => console.log(JSON.stringify({ passed: report.passed, coverage: report.coverage })))
     .catch(error => { console.error(error.stack); process.exitCode = 1; });
 }

@@ -10,10 +10,11 @@ function audit(buildName,outputName) {
   const out=path.resolve(root,outputName||'.build/opus-scratch-stack-'+buildName);
   if(!out.startsWith(root+path.sep)||fs.existsSync(out))throw Error('Use a new output directory inside the project');
   fs.mkdirSync(out,{recursive:true});const results=[];
-  for(const mode of ['baseline','silk','silk-compact']) {
+  for(const mode of ['baseline','silk','silk-compact','silk-compact-plc-iram']) {
     const defines=['YORADIO_OPUS_CELT_SILK_SCRATCH='+(mode!=='baseline'?1:0),
-      'YORADIO_OPUS_AUTOCORR_COMPACT='+(mode==='silk-compact'?1:0)];
-    for(const name of ['celt_lpc.c','opus_decoder.c','opus_memory.c']) {
+      'YORADIO_OPUS_AUTOCORR_COMPACT='+(mode.includes('compact')?1:0),
+      'YORADIO_OPUS_SILK_PLC_IRAM='+(mode.includes('plc-iram')?1:0)];
+    for(const name of ['celt_lpc.c','opus_decoder.c','opus_memory.c','PLC.c']) {
       const matches=commands.filter(c=>path.basename(c.file)===name);
       if(matches.length!==1)throw Error('Expected one compile command for '+name);
       const command=matches[0];if(/(?:^|\s)"/.test(command.command))throw Error('Quoted command requires argv parser');

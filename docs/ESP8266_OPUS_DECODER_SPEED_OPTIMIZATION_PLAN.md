@@ -367,6 +367,11 @@ target RAM/CPU и непрерывное воспроизведение ещё �
 сравнений и22 phase cases точны; corpus peak4464B, target frame64→160B.
 CPU пока не измерен. Далее аудит32-битного SILK PLC scratch для IRAM.
 
+Продолжение 2026-09-13: [PLC word-arena и diagnostic scratch4352](ESP8266_OPUS_PLC_IRAM.md).
+22 phase/11 lease-сценариев и native adapter проходят с4352; пик4168.
+Fallback в DRAM проверен отдельно. Полная сборка и аппаратная приёмка очереди
+PCM остаются обязательными; default6144 и heap reserve4096 не изменены.
+
 ```powershell
 node tools/esp8266_opus_profile/audit_target.cjs --build .build/esp8266-opus-flash-output512 --output .build/opus-target-audit.json
 node --test tests/esp8266-opus-target-audit.test.js

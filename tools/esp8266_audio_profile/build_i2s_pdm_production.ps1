@@ -14,6 +14,9 @@ param(
     [switch]$EnableOpus,
     [ValidateSet(1024, 1536, 2048, 3072, 4096)]
     [int]$OpusInputBytes = 1024,
+    [switch]$OpusLowRam,
+    [ValidateSet(4352, 6144)]
+    [int]$OpusScratchBytes = 6144,
     [switch]$NoSpiffsCache,
     [switch]$OpusWordAsm,
     [switch]$OpusIcdfFlashWord,
@@ -54,6 +57,8 @@ if ($OpusStreamTest -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-Opus
 if ($OpusWordAsm -and -not $EnableOpus) { throw '-OpusWordAsm requires -EnableOpus' }
 if ($OpusIcdfFlashWord -and -not $EnableOpus) { throw '-OpusIcdfFlashWord requires -EnableOpus' }
 if ($OpusFirFlashWord -and -not $EnableOpus) { throw '-OpusFirFlashWord requires -EnableOpus' }
+if ($OpusLowRam -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusLowRam requires diagnostic Opus until device qualification' }
+if ($OpusScratchBytes -ne 6144 -and -not $OpusLowRam) { throw 'Reduced Opus scratch requires -OpusLowRam' }
 if ($OpusCeltDecodeOnly -and -not $EnableOpus) { throw '-OpusCeltDecodeOnly requires -EnableOpus' }
 if ($OpusDivOnce -and -not $EnableOpus) { throw '-OpusDivOnce requires -EnableOpus' }
 if ($OpusPcmPublish -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusPcmPublish requires diagnostic Opus until board qualification' }
@@ -149,7 +154,7 @@ try {
     $taskDefaults = $taskDefaults.Replace('CONFIG_LOG_BOOTLOADER_LEVEL_WARN=y', 'CONFIG_LOG_BOOTLOADER_LEVEL_ERROR=y')
     $taskDefaults = $taskDefaults -replace 'CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=\d+', "CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz"
     if ($NoAudioLevelLed) { $taskDefaults = $taskDefaults.Replace('CONFIG_YORADIO_STATUS_LED=y', '# CONFIG_YORADIO_STATUS_LED is not set') }
-    if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=$OpusInputBytes`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144`n" }
+    if ($EnableOpus) { $taskDefaults += "`nCONFIG_YORADIO_OGG_OPUS=y`nCONFIG_YORADIO_OPUS_INPUT_BYTES=$OpusInputBytes`nCONFIG_YORADIO_OPUS_SCRATCH_BYTES=$OpusScratchBytes`n" }
     $taskDefaults = Set-TaskSpiffsCacheDefaults $taskDefaults ([bool]$NoSpiffsCache)
     $taskDefaults = Set-TaskOpusRuntimeDefaults $taskDefaults ([bool]$OpusBenchmark)
     $taskDefaults = Set-TaskStreamIdleDefaults $taskDefaults $StreamIdleTimeoutMs
@@ -168,6 +173,7 @@ try {
     $taskOpusWordAsm = if ($OpusWordAsm) { 'ON' } else { 'OFF' }
     $taskOpusIcdfFlashWord = if ($OpusIcdfFlashWord) { 'ON' } else { 'OFF' }
     $taskOpusFirFlashWord = if ($OpusFirFlashWord) { 'ON' } else { 'OFF' }
+    $taskOpusLowRam = if ($OpusLowRam) { 'ON' } else { 'OFF' }
     $taskOpusCeltDecodeOnly = if ($OpusCeltDecodeOnly) { 'ON' } else { 'OFF' }
     $taskOpusRotationLx106 = if ($OpusRotationLx106) { 'ON' } else { 'OFF' }
     $taskOpusDivOnce = if ($OpusDivOnce) { 'ON' } else { 'OFF' }
@@ -204,6 +210,7 @@ try {
         "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
         "-DYORADIO_OPUS_FIR_FLASH_WORD=$taskOpusFirFlashWord",
+        "-DYORADIO_OPUS_LOW_RAM=$taskOpusLowRam",
         "-DYORADIO_OPUS_CELT_DECODE_ONLY=$taskOpusCeltDecodeOnly",
         "-DYORADIO_OPUS_ROTATION_LX106=$taskOpusRotationLx106",
         "-DYORADIO_OPUS_DIV_ONCE=$taskOpusDivOnce",
@@ -234,7 +241,7 @@ try {
     $taskOpusEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_OGG_OPUS=y\r?$'
     if ($taskOpusEnabled -ne [bool]$EnableOpus) { throw 'Wrong cached Opus profile; use a fresh -Variant build directory' }
     if ($taskOpusEnabled -and $taskConfig -notmatch "(?m)^CONFIG_YORADIO_OPUS_INPUT_BYTES=$OpusInputBytes`r?$") { throw 'Wrong cached Opus input size; use a fresh -Variant build directory' }
-    if ($taskOpusEnabled -and $taskConfig -notmatch '(?m)^CONFIG_YORADIO_OPUS_SCRATCH_BYTES=6144\r?$') { throw 'Wrong cached Opus scratch size; use a fresh -Variant build directory' }
+    if ($taskOpusEnabled -and $taskConfig -notmatch "(?m)^CONFIG_YORADIO_OPUS_SCRATCH_BYTES=$OpusScratchBytes`r?$") { throw 'Wrong cached Opus scratch size; use a fresh -Variant build directory' }
     $taskLedEnabled = $taskConfig -match '(?m)^CONFIG_YORADIO_STATUS_LED=y\r?$'
     if ($taskLedEnabled -eq [bool]$NoAudioLevelLed) { throw 'Wrong cached LED profile; use a fresh -Variant build directory' }
     if ($taskLedEnabled -and $taskConfig -notmatch "(?m)^CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz`r?$") { throw 'Wrong cached LED refresh rate; use a fresh -Variant build directory' }
@@ -251,7 +258,12 @@ try {
         diagnostic=[bool]$Diagnostic
         experimental_opus=[bool]$taskOpusEnabled
         opus_input_bytes=$(if ($taskOpusEnabled) { $OpusInputBytes } else { 0 })
-        opus_scratch_bytes=$(if ($taskOpusEnabled) { 6144 } else { 0 })
+        opus_scratch_bytes=$(if ($taskOpusEnabled) { $OpusScratchBytes } else { 0 })
+        opus_low_ram=[bool]$OpusLowRam
+        opus_plc_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/PLC.c").Hash
+        opus_lpc_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/celt_lpc.c").Hash
+        opus_memory_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/opus_memory.c").Hash
+        opus_memory_header_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/opus_memory.h").Hash
         opus_benchmark=[bool]$OpusBenchmark
         opus_benchmark_output=[bool]$OpusBenchmarkOutput
         opus_benchmark_source_sha256=$(if ($OpusBenchmark) { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/opus_benchmark.cpp").Hash } else { $null })

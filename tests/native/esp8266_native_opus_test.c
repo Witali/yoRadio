@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef NATIVE_OPUS_TEST_SCRATCH_BYTES
+#define NATIVE_OPUS_TEST_SCRATCH_BYTES 7680
+#endif
+
 typedef union { uint64_t align; uint8_t bytes[32768]; } aligned_buffer;
 static aligned_buffer state, scratch, iram;
 static int16_t pcm[NATIVE_OPUS_MAX_SAMPLES * 2];
@@ -67,7 +71,7 @@ static bool output(void *ctx, const int16_t *data, size_t samples, uint32_t bitr
 }
 static native_opus_config_t config(void) {
     native_opus_config_t c = {.decoder_state=state.bytes,.decoder_state_bytes=sizeof(state.bytes),
-        .scratch=scratch.bytes,.scratch_bytes=7680,.iram=iram.bytes,.iram_bytes=NATIVE_OPUS_IRAM_BYTES,
+        .scratch=scratch.bytes,.scratch_bytes=NATIVE_OPUS_TEST_SCRATCH_BYTES,.iram=iram.bytes,.iram_bytes=NATIVE_OPUS_IRAM_BYTES,
         .pcm=pcm,.pcm_samples=960,.output=output,.output_ctx=&calls};
 #if YORADIO_OPUS_PCM_LEASES
     if (leased) { c.pcm_samples=1920; c.acquire_pcm=acquire_pcm; c.release_pcm=release_pcm; }
@@ -342,7 +346,7 @@ static void test_live_capture(const char *filename,const char *golden_path) {
     assert(file && golden);
     capture_output_t capture={golden,false,0};
     native_opus_config_t c=config();c.output=capture_output;c.output_ctx=&capture;
-    c.scratch_bytes=6144;
+    if(c.scratch_bytes>6144)c.scratch_bytes=6144;
     assert(native_opus_init(&decoder,&c)==0);
     assert(feed_capture(file)==NATIVE_OPUS_ERR_DEMUX);
     assert(decoder.demux_error==OGG_OPUS_DEMUX_ERR_SEQUENCE && !capture.samples);

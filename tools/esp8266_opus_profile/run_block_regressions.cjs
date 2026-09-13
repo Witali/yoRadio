@@ -30,16 +30,18 @@ function grouped(data,count,vbr=false,padding=0) {
   }
   return framed(result);
 }
-async function run({output,capture,celtDecodeOnly=false,divOnce=false,leased=false,silkScratch=false}={}) {
+async function run({output,capture,celtDecodeOnly=false,divOnce=false,leased=false,silkScratch=false,lowRam=false,scratchBytes=6144}={}) {
+  assert.ok(Number.isInteger(scratchBytes)&&scratchBytes>=3072&&scratchBytes<=6144&&scratchBytes%4===0);
+  if(lowRam)silkScratch=true;
   output ||= path.join(__dirname,leased?'leased-results.json':'block-results.json');
   prepareReference();await buildHost({upstreamRoot:defaultOutput,fastInt64:0});
-  const build=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,celtDecodeOnly,divOnce,pcmLeases:leased,silkScratch});
-  const out=path.join(root,'.build/opus-block-regression'+(celtDecodeOnly?'-celt-decode-only':'')+(divOnce?'-div-once':'')+(silkScratch?'-silk-scratch':''));fs.mkdirSync(out,{recursive:true});
+  const build=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,celtDecodeOnly,divOnce,pcmLeases:leased,silkScratch,autocorrCompact:lowRam,silkPlcIram:lowRam});
+  const out=path.join(root,'.build/opus-block-regression'+(celtDecodeOnly?'-celt-decode-only':'')+(divOnce?'-div-once':'')+(silkScratch?'-silk-scratch':'')+(lowRam?'-low-ram':'')+'-scratch'+scratchBytes);fs.mkdirSync(out,{recursive:true});
   const probe=leased?'leased_probe':'block_probe';
   const binary=path.join(out,probe);
   for(const name of leased?['block_probe','leased_probe']:['block_probe']) {
     const object=path.join(out,name+'.o');
-    execute('gcc',[...build.flags,'-Wall','-Wextra','-Werror','-c',hostPath(path.join(__dirname,name+'.c')),'-o',hostPath(object)]);
+    execute('gcc',[...build.flags,'-DOPUS_BLOCK_SCRATCH_BYTES='+scratchBytes,'-Wall','-Wextra','-Werror','-c',hostPath(path.join(__dirname,name+'.c')),'-o',hostPath(object)]);
     execute('gcc',[...build.objects.filter(f=>!f.endsWith('probe.c.o')).map(hostPath),hostPath(object),
       '-Wl,--gc-sections','-Wl,--wrap=malloc','-Wl,--wrap=calloc','-Wl,--wrap=realloc','-lm','-o',hostPath(path.join(out,name))]);
   }
@@ -71,17 +73,17 @@ async function run({output,capture,celtDecodeOnly=false,divOnce=false,leased=fal
     assert.equal(result.samples,expected.samples);assert.equal(result.packets,before.packets);
     assert.equal(result.allocations,0);assert.equal(result.pcm_bytes,leased?3840:1920);assert.ok(result.largest_block<=960);
     if(leased){assert.equal(result.delayed_consumer,true);assert.equal(result.failure_cleanup,true);}
-    assert.ok(result.scratch_bytes<=6144&&result.scratch_words<=16384);
+    assert.ok(result.scratch_bytes<=scratchBytes&&result.scratch_words<=16384);
     const pcm=comparePcm(fs.readFileSync(reference),fs.readFileSync(actual));assert.equal(pcm.exact,true,test.name);
     cases.push({name:test.name,input_sha256:sha256(test.data),...before,result,pcm});
     process.stderr.write(`${test.name}: exact; ${result.blocks} blocks, scratch ${result.scratch_bytes}/${result.scratch_words}\n`);
   }
-  const sources=['native_opus.c','native_opus.h','opus_memory.c','opus_memory.h','upstream/src/opus_decoder.c'];
-  const report={passed:true,leased,silk_scratch:silkScratch,celt_decode_only:celtDecodeOnly,div_once:divOnce,scope:'Host generic32 pristine full-packet PCM versus FIR-enabled bounded frame callbacks; mono48k. No board speed claim.',
+  const sources=['native_opus.c','native_opus.h','opus_memory.c','opus_memory.h','upstream/src/opus_decoder.c','upstream/celt/celt_lpc.c','upstream/silk/PLC.c'];
+  const report={passed:true,leased,silk_scratch:silkScratch,low_ram:lowRam,scratch_capacity_bytes:scratchBytes,celt_decode_only:celtDecodeOnly,div_once:divOnce,scope:'Host generic32 pristine full-packet PCM versus FIR-enabled bounded frame callbacks; mono48k. No board speed claim.',
     probe_sha256_lf:sha256(Buffer.from(fs.readFileSync(path.join(__dirname,probe+'.c'),'utf8').replace(/\r\n/g,'\n'))),
     source_sha256_lf:Object.fromEntries(sources.map(f=>[f,sha256(Buffer.from(fs.readFileSync(path.join(component,f),'utf8').replace(/\r\n/g,'\n')))])),cases};
   fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');return report;
 }
 module.exports={pack,packets,grouped,run};
 if(require.main===module){const args=process.argv.slice(2),value=k=>{const i=args.indexOf(k);return i<0?undefined:args[i+1];};
-  run({output:value('--output'),capture:value('--capture'),leased:args.includes('--leased'),silkScratch:args.includes('--silk-scratch'),celtDecodeOnly:args.includes('--celt-decode-only'),divOnce:args.includes('--div-once')}).then(r=>console.log('PASS '+r.cases.length+' block cases')).catch(e=>{console.error(e.stack);process.exitCode=1;});}
+  run({output:value('--output'),capture:value('--capture'),leased:args.includes('--leased'),silkScratch:args.includes('--silk-scratch'),lowRam:args.includes('--low-ram'),scratchBytes:value('--scratch-bytes')===undefined?6144:Number(value('--scratch-bytes')),celtDecodeOnly:args.includes('--celt-decode-only'),divOnce:args.includes('--div-once')}).then(r=>console.log('PASS '+r.cases.length+' block cases')).catch(e=>{console.error(e.stack);process.exitCode=1;});}

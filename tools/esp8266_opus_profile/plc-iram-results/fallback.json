@@ -1,0 +1,312 @@
+{
+  "passed": true,
+  "scope": "Host generic32 mono SILK with PLC. Restrict IRAM to11232 persistent bytes to force DRAM fallback. No physical width/speed proof.",
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "input_sha256": "cf5eb9d0d5ea920535e7e397859bb32fa5488d5ed26c5af8d2565bc4382d47ad",
+  "source_sha256_lf": {
+    "upstream/silk/PLC.c": "795e271af059c36297360624b1b19fd50089ed5862bf9a1fc2d035d77338266d",
+    "opus_memory.c": "a6a88764ce240ee3133e73a9181f51fdf37d07a289c6a99eb4ef3f61e5917d18",
+    "opus_memory.h": "100331d49d54e1970f6227ce66e26c4749fe3e92b026a4edbef0919ecfdeaf09"
+  },
+  "cases": [
+    {
+      "name": "rate48000-burst1-words16384",
+      "bounded": {
+        "samples": 65280,
+        "packets": 61,
+        "plc_frames": 7,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true,
+        "scratch_byte_peak_bytes": 1808,
+        "scratch_word_peak_bytes": 14112,
+        "scratch_byte_capacity_bytes": 6144,
+        "borrowed_by_lm": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "transient_borrowed": 0,
+        "dual_stereo_borrowed": 0,
+        "borrow_denied": 0,
+        "word_capacity_bytes": 16384,
+        "word_arena_allocations": 258,
+        "word_dram_fallbacks": 0,
+        "scratch_loan_peak_bytes": 0
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 65280,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "c188ee6de1f00ab123c372671040b977a9a1e481945c592e46393b29ea5d243b",
+        "actual_pcm_sha256": "c188ee6de1f00ab123c372671040b977a9a1e481945c592e46393b29ea5d243b"
+      }
+    },
+    {
+      "name": "rate48000-burst1-words11232",
+      "bounded": {
+        "samples": 65280,
+        "packets": 61,
+        "plc_frames": 7,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true,
+        "scratch_byte_peak_bytes": 4688,
+        "scratch_word_peak_bytes": 11232,
+        "scratch_byte_capacity_bytes": 6144,
+        "borrowed_by_lm": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "transient_borrowed": 0,
+        "dual_stereo_borrowed": 0,
+        "borrow_denied": 0,
+        "word_capacity_bytes": 11232,
+        "word_arena_allocations": 0,
+        "word_dram_fallbacks": 258,
+        "scratch_loan_peak_bytes": 0
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 65280,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "c188ee6de1f00ab123c372671040b977a9a1e481945c592e46393b29ea5d243b",
+        "actual_pcm_sha256": "c188ee6de1f00ab123c372671040b977a9a1e481945c592e46393b29ea5d243b"
+      }
+    },
+    {
+      "name": "rate48000-burst6-words16384",
+      "bounded": {
+        "samples": 98880,
+        "packets": 61,
+        "plc_frames": 42,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true,
+        "scratch_byte_peak_bytes": 1808,
+        "scratch_word_peak_bytes": 14112,
+        "scratch_byte_capacity_bytes": 6144,
+        "borrowed_by_lm": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "transient_borrowed": 0,
+        "dual_stereo_borrowed": 0,
+        "borrow_denied": 0,
+        "word_capacity_bytes": 16384,
+        "word_arena_allocations": 328,
+        "word_dram_fallbacks": 0,
+        "scratch_loan_peak_bytes": 0
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 98880,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "54bd15d3134e58391c2e71709913d1cab0d52789028c0e54dca476ee319e346d",
+        "actual_pcm_sha256": "54bd15d3134e58391c2e71709913d1cab0d52789028c0e54dca476ee319e346d"
+      }
+    },
+    {
+      "name": "rate48000-burst6-words11232",
+      "bounded": {
+        "samples": 98880,
+        "packets": 61,
+        "plc_frames": 42,
+        "multiframe_packets": 0,
+        "sample_rate": 48000,
+        "reset_exact": true,
+        "pcm_guards_ok": true,
+        "scratch_byte_peak_bytes": 4688,
+        "scratch_word_peak_bytes": 11232,
+        "scratch_byte_capacity_bytes": 6144,
+        "borrowed_by_lm": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "transient_borrowed": 0,
+        "dual_stereo_borrowed": 0,
+        "borrow_denied": 0,
+        "word_capacity_bytes": 11232,
+        "word_arena_allocations": 0,
+        "word_dram_fallbacks": 328,
+        "scratch_loan_peak_bytes": 0
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 98880,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "54bd15d3134e58391c2e71709913d1cab0d52789028c0e54dca476ee319e346d",
+        "actual_pcm_sha256": "54bd15d3134e58391c2e71709913d1cab0d52789028c0e54dca476ee319e346d"
+      }
+    },
+    {
+      "name": "rate24000-burst1-words16384",
+      "bounded": {
+        "samples": 32640,
+        "packets": 61,
+        "plc_frames": 7,
+        "multiframe_packets": 0,
+        "sample_rate": 24000,
+        "reset_exact": true,
+        "pcm_guards_ok": true,
+        "scratch_byte_peak_bytes": 1808,
+        "scratch_word_peak_bytes": 14112,
+        "scratch_byte_capacity_bytes": 6144,
+        "borrowed_by_lm": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "transient_borrowed": 0,
+        "dual_stereo_borrowed": 0,
+        "borrow_denied": 0,
+        "word_capacity_bytes": 16384,
+        "word_arena_allocations": 258,
+        "word_dram_fallbacks": 0,
+        "scratch_loan_peak_bytes": 0
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 32640,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "7c7c85e019191dfc69cb61461afc44593f31aab6c910c43a27a6550919df16d2",
+        "actual_pcm_sha256": "7c7c85e019191dfc69cb61461afc44593f31aab6c910c43a27a6550919df16d2"
+      }
+    },
+    {
+      "name": "rate24000-burst1-words11232",
+      "bounded": {
+        "samples": 32640,
+        "packets": 61,
+        "plc_frames": 7,
+        "multiframe_packets": 0,
+        "sample_rate": 24000,
+        "reset_exact": true,
+        "pcm_guards_ok": true,
+        "scratch_byte_peak_bytes": 4688,
+        "scratch_word_peak_bytes": 11232,
+        "scratch_byte_capacity_bytes": 6144,
+        "borrowed_by_lm": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "transient_borrowed": 0,
+        "dual_stereo_borrowed": 0,
+        "borrow_denied": 0,
+        "word_capacity_bytes": 11232,
+        "word_arena_allocations": 0,
+        "word_dram_fallbacks": 258,
+        "scratch_loan_peak_bytes": 0
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 32640,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "7c7c85e019191dfc69cb61461afc44593f31aab6c910c43a27a6550919df16d2",
+        "actual_pcm_sha256": "7c7c85e019191dfc69cb61461afc44593f31aab6c910c43a27a6550919df16d2"
+      }
+    },
+    {
+      "name": "rate24000-burst6-words16384",
+      "bounded": {
+        "samples": 49440,
+        "packets": 61,
+        "plc_frames": 42,
+        "multiframe_packets": 0,
+        "sample_rate": 24000,
+        "reset_exact": true,
+        "pcm_guards_ok": true,
+        "scratch_byte_peak_bytes": 1808,
+        "scratch_word_peak_bytes": 14112,
+        "scratch_byte_capacity_bytes": 6144,
+        "borrowed_by_lm": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "transient_borrowed": 0,
+        "dual_stereo_borrowed": 0,
+        "borrow_denied": 0,
+        "word_capacity_bytes": 16384,
+        "word_arena_allocations": 328,
+        "word_dram_fallbacks": 0,
+        "scratch_loan_peak_bytes": 0
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 49440,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "3ea8042284e389934a64c8fd9881aff14697ceb04be78250b50ade7f00ab7148",
+        "actual_pcm_sha256": "3ea8042284e389934a64c8fd9881aff14697ceb04be78250b50ade7f00ab7148"
+      }
+    },
+    {
+      "name": "rate24000-burst6-words11232",
+      "bounded": {
+        "samples": 49440,
+        "packets": 61,
+        "plc_frames": 42,
+        "multiframe_packets": 0,
+        "sample_rate": 24000,
+        "reset_exact": true,
+        "pcm_guards_ok": true,
+        "scratch_byte_peak_bytes": 4688,
+        "scratch_word_peak_bytes": 11232,
+        "scratch_byte_capacity_bytes": 6144,
+        "borrowed_by_lm": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "transient_borrowed": 0,
+        "dual_stereo_borrowed": 0,
+        "borrow_denied": 0,
+        "word_capacity_bytes": 11232,
+        "word_arena_allocations": 0,
+        "word_dram_fallbacks": 328,
+        "scratch_loan_peak_bytes": 0
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 49440,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "3ea8042284e389934a64c8fd9881aff14697ceb04be78250b50ade7f00ab7148",
+        "actual_pcm_sha256": "3ea8042284e389934a64c8fd9881aff14697ceb04be78250b50ade7f00ab7148"
+      }
+    }
+  ]
+}

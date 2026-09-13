@@ -17,8 +17,12 @@ test('native Opus streaming adapter validates headers, trimming, cancellation an
     }
     const fastInt64 = process.env.YORADIO_OPUS_FAST_INT64 === undefined ? undefined :
       Number(process.env.YORADIO_OPUS_FAST_INT64);
+    const lowRam = process.env.YORADIO_OPUS_LOW_RAM === '1';
+    const scratchBytes = Number(process.env.YORADIO_OPUS_TEST_SCRATCH_BYTES || (lowRam ? 4352 : 7680));
+    assert.ok(Number.isInteger(scratchBytes) && scratchBytes >= 3072 && scratchBytes <= 7680 && scratchBytes % 4 === 0);
     const build = await buildHost({bounded: true, fastInt64, pcmLeases,
-      silkScratch: process.env.YORADIO_OPUS_SILK_SCRATCH === '1',
+      silkScratch: lowRam || process.env.YORADIO_OPUS_SILK_SCRATCH === '1',
+      autocorrCompact: lowRam, silkPlcIram: lowRam,
       noBuild: process.env.YORADIO_OPUS_NO_BUILD === '1'});
     const directory = fs.mkdtempSync(path.join(build.out, 'adapter-test-'));
     t.after(() => fs.rmSync(directory, {recursive: true, force: true}));
@@ -26,7 +30,8 @@ test('native Opus streaming adapter validates headers, trimming, cancellation an
     for (const name of ['native_opus.c', 'ogg_opus_demux.c', 'test.c']) {
       const source = name === 'test.c' ? path.join(__dirname, 'native/esp8266_native_opus_test.c') : path.join(component, name);
       const object = path.join(directory, name + '.o');
-      execute('gcc', [...build.flags, '-Wall', '-Wextra', '-Werror', '-c', hostPath(source), '-o', hostPath(object)]);
+      execute('gcc', [...build.flags, '-DNATIVE_OPUS_TEST_SCRATCH_BYTES=' + scratchBytes,
+        '-Wall', '-Wextra', '-Werror', '-c', hostPath(source), '-o', hostPath(object)]);
       objects.push(object);
     }
     const binary = path.join(directory, 'test');
@@ -41,5 +46,5 @@ test('native Opus streaming adapter validates headers, trimming, cancellation an
     assert.match(result, /no allocations/);
     if (pcmLeases) assert.match(result, /Native PCM leases: .*no stranded slots PASS/);
     assert.match(result, /Native live join: strict default, pre-skip, 64-bit granules and reset PASS/);
-    t.diagnostic(result.trim());
+    t.diagnostic('scratch=' + scratchBytes + ', lowRam=' + lowRam + '\n' + result.trim());
   });
