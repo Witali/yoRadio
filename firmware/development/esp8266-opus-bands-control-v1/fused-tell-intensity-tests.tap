@@ -1,0 +1,148 @@
+TAP version 13
+# Subtest: compiler command parser does not invoke a shell and keeps quoted definitions
+ok 1 - compiler command parser does not invoke a shell and keeps quoted definitions
+  ---
+  duration_ms: 2.7192
+  type: 'test'
+  ...
+# Subtest: full ASM snapshot covers every upstream unit and both variants verify
+ok 2 - full ASM snapshot covers every upstream unit and both variants verify
+  ---
+  duration_ms: 235.1754
+  type: 'test'
+  ...
+# Subtest: annotations preserve comments and describe the function ABI
+ok 3 - annotations preserve comments and describe the function ABI
+  ---
+  duration_ms: 0.845
+  type: 'test'
+  ...
+# Subtest: stale source hashes and a different exported feature set fail closed
+ok 4 - stale source hashes and a different exported feature set fail closed
+  ---
+  duration_ms: 10.8641
+  type: 'test'
+  ...
+# Subtest: ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+ok 5 - ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+  ---
+  duration_ms: 0.5591
+  type: 'test'
+  ...
+# Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
+ok 6 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
+  ---
+  duration_ms: 1.7498
+  type: 'test'
+  ...
+# Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+ok 7 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+  ---
+  duration_ms: 1.0089
+  type: 'test'
+  ...
+# Subtest: intensity overlay is one decoder-only early branch, not entropy removal
+ok 8 - intensity overlay is one decoder-only early branch, not entropy removal
+  ---
+  duration_ms: 105.4501
+  type: 'test'
+  ...
+# Subtest: early qn=1 preserves final qn across intensity/N/budget boundaries
+ok 9 - early qn=1 preserves final qn across intensity/N/budget boundaries
+  ---
+  duration_ms: 11.9503
+  type: 'test'
+  ...
+# Subtest: only three reviewed block-count division sites change; arbitrary entropy division stays
+ok 10 - only three reviewed block-count division sites change; arbitrary entropy division stays
+  ---
+  duration_ms: 100.5636
+  type: 'test'
+  ...
+# Subtest: NSAU-based unsigned shift equals integer division, including uint32 high bit
+ok 11 - NSAU-based unsigned shift equals integer division, including uint32 high bit
+  ---
+  duration_ms: 215.0491
+  type: 'test'
+  ...
+# Subtest: assembly equivalence check retains operands and branch graph, permits density encodings
+ok 12 - assembly equivalence check retains operands and branch graph, permits density encodings
+  ---
+  duration_ms: 1.0168
+  type: 'test'
+  ...
+# Subtest: combined ASM is precisely intensity on block shifts, with unchanged vq overlay
+ok 13 - combined ASM is precisely intensity on block shifts, with unchanged vq overlay
+  ---
+  duration_ms: 265.1061
+  type: 'test'
+  ...
+# Subtest: 10000 exact ASM loops: raw iy, PCM, mask, live registers, guards and word loads
+ok 14 - 10000 exact ASM loops: raw iy, PCM, mask, live registers, guards and word loads
+  ---
+  duration_ms: 10516.3998
+  type: 'test'
+  ...
+# Subtest: scope/hash/frame guards and original rotation/fallback stay unchanged
+ok 15 - scope/hash/frame guards and original rotation/fallback stay unchanged
+  ---
+  duration_ms: 68.7868
+  type: 'test'
+  ...
+# Subtest: actual ASM snippet has exact lookup/guards and preserves live registers
+ok 16 - actual ASM snippet has exact lookup/guards and preserves live registers
+  ---
+  duration_ms: 358.4544
+  type: 'test'
+  ...
+# Subtest: C mirror matches original rate.h including custom pointer and budget fallback
+ok 17 - C mirror matches original rate.h including custom pointer and budget fallback
+  ---
+  duration_ms: 4701.8468
+  type: 'test'
+  ...
+# Subtest: ASM overlays are reproducible and baseline remains protected
+ok 18 - ASM overlays are reproducible and baseline remains protected
+  ---
+  duration_ms: 91.1607
+  type: 'test'
+  ...
+# Subtest: host path counter keeps PCM and counts complete block distribution on pinned corpus
+ok 19 - host path counter keeps PCM and counts complete block distribution on pinned corpus
+  ---
+  duration_ms: 11339.5379
+  type: 'test'
+  ...
+# Subtest: macro arithmetic is the exact GCC leaf body without return
+ok 20 - macro arithmetic is the exact GCC leaf body without return
+  ---
+  duration_ms: 2.6522
+  type: 'test'
+  ...
+# Subtest: only four pinned quant_partition calls are expanded and baseline stays exact
+ok 21 - only four pinned quant_partition calls are expanded and baseline stays exact
+  ---
+  duration_ms: 109.5495
+  type: 'test'
+  ...
+# Subtest: actual macro preserves results and live registers at every normalized threshold
+ok 22 - actual macro preserves results and live registers at every normalized threshold
+  ---
+  duration_ms: 292.3897
+  type: 'test'
+  ...
+# Subtest: tell + intensity is exactly either composition order, with one correction table
+ok 23 - tell + intensity is exactly either composition order, with one correction table
+  ---
+  duration_ms: 265.1577
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11490.3486
