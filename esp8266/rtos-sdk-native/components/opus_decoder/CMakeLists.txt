@@ -1,4 +1,9 @@
 set(YORADIO_OPUS_BACKEND "c" CACHE STRING "Opus implementation: c or diagnostic ASM backend")
+option(YORADIO_OPUS_BANDS_TEXT_LITERALS "Experiment: place tell-inline bands literal pools in text" OFF)
+if(YORADIO_OPUS_BANDS_TEXT_LITERALS AND
+   (NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT YORADIO_OPUS_BACKEND STREQUAL "bands-tell-inline-asm"))
+  message(FATAL_ERROR "Bands text literals require diagnostic bands-tell-inline-asm")
+endif()
 set_property(CACHE YORADIO_OPUS_BACKEND PROPERTY STRINGS c gcc-asm optimized-asm hoisted-asm bands-intensity-asm bands-blocks-asm bands-combined-asm bands-pulse-lookup-asm bands-tell-inline-asm bands-fused-asm bands-tell-intensity-asm bands-update-fast-asm bands-tell-update-asm bands-tell-bits1-asm bands-layout32-asm bands-layout128-asm)
 if(NOT YORADIO_OPUS_BACKEND MATCHES "^(c|gcc-asm|optimized-asm|hoisted-asm|bands-intensity-asm|bands-blocks-asm|bands-combined-asm|bands-pulse-lookup-asm|bands-tell-inline-asm|bands-fused-asm|bands-tell-intensity-asm|bands-update-fast-asm|bands-tell-update-asm|bands-tell-bits1-asm|bands-layout32-asm|bands-layout128-asm)$")
   message(FATAL_ERROR "Unknown YORADIO_OPUS_BACKEND")
@@ -58,6 +63,20 @@ if(CONFIG_YORADIO_OGG_OPUS)
        upstream/silk/*.c upstream/silk/fixed/*.c)
   if(NOT YORADIO_OPUS_BACKEND STREQUAL "c")
     include(asm/select.cmake)
+  endif()
+  if(YORADIO_OPUS_BANDS_TEXT_LITERALS)
+    # Placement-only: pinned ASM, ABI and arithmetic are not regenerated.
+    # Apply to exactly one translation unit, not all decoder literals.
+    set(OPUS_BANDS_LITERAL_UNITS 0)
+    foreach(src IN LISTS OPUS_SOURCES)
+      if(src MATCHES "/bands-tell-inline/upstream/celt/bands[.]c[.]s$")
+        set_property(SOURCE "${src}" APPEND PROPERTY COMPILE_OPTIONS "-Wa,--text-section-literals")
+        math(EXPR OPUS_BANDS_LITERAL_UNITS "${OPUS_BANDS_LITERAL_UNITS}+1")
+      endif()
+    endforeach()
+    if(NOT OPUS_BANDS_LITERAL_UNITS EQUAL 1)
+      message(FATAL_ERROR "Expected exactly one pinned bands ASM unit")
+    endif()
   endif()
   idf_component_register(SRCS ${OPUS_SOURCES}
       opus_memory.c opus_stage_profile.c opus_rotation_lx106.S ogg_opus_demux.c native_opus.c

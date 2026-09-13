@@ -63,7 +63,7 @@ function linkedGraph(text,resolveWord,resolveAddress){
  });
  return {graph,physical_instruction_count:rows.length,relaxed_indirect_calls:relaxed};
 }
-function inspect(v){
+function inspect(v,names=['quant_partition','quant_band','quant_all_bands','ec_tell_frac','ec_dec_bits']){
  const elf=path.join(root,'.build',v,'yoradio_esp8266_helix_native.elf');
  const sections=Object.fromEntries([...run(path.join(bin,'xtensa-lx106-elf-size.exe'),['-A',elf]).matchAll(/^(\.(?:iram0|dram0|flash)\.\S+)\s+(\d+)\s+/gm)].map(m=>[m[1],Number(m[2])]));
  const all=[...run(path.join(bin,'xtensa-lx106-elf-nm.exe'),['-S',elf]).matchAll(/^([0-9a-f]+)\s+([0-9a-f]+)\s+(\S)\s+(.+)$/gm)].map(m=>({address:parseInt(m[1],16),bytes:parseInt(m[2],16),type:m[3],name:m[4]}));
@@ -73,7 +73,7 @@ function inspect(v){
   return inside.length?inside[0].name+'+0x'+(a-inside[0].address).toString(16):'0x'+a.toString(16);
  };
  const functions={};
- for(const name of ['quant_partition','quant_band','quant_all_bands','ec_tell_frac','ec_dec_bits']){
+ for(const name of names){
   const s=all.find(s=>s.name===name);assert.ok(s);
   // Follow real entry/branch boundaries. Linear objdump misdecodes unreachable
   // alignment zeros after J as the beginning of the next valid instruction.

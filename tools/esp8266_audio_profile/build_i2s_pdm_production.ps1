@@ -15,6 +15,7 @@ param(
     [switch]$EnableOpus,
     [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm', 'bands-blocks-asm', 'bands-combined-asm', 'bands-pulse-lookup-asm', 'bands-tell-inline-asm', 'bands-fused-asm', 'bands-tell-intensity-asm', 'bands-update-fast-asm', 'bands-tell-update-asm', 'bands-tell-bits1-asm', 'bands-layout32-asm', 'bands-layout128-asm')]
     [string]$OpusBackend = 'c',
+    [switch]$OpusBandsTextLiterals,
     [ValidateSet(1024, 1536, 2048, 3072, 4096)]
     [int]$OpusInputBytes = 1024,
     [switch]$OpusLowRam,
@@ -65,6 +66,7 @@ if ($OpusBackend -ne 'c') {
     if (-not $OpusWordAsm -or -not $OpusIcdfFlashWord -or -not $OpusFirFlashWord) { throw 'Pinned ASM requires -OpusWordAsm -OpusIcdfFlashWord -OpusFirFlashWord' }
     if ($OpusLowRam -or $OpusPcmLeases -or $OpusCeltDecodeOnly -or $OpusRotationLx106 -or $OpusDivOnce -or $OpusProfileStage) { throw 'Other decoder experiments require a separately regenerated ASM snapshot' }
 }
+if ($OpusBandsTextLiterals -and (-not $Diagnostic -or $OpusBackend -ne 'bands-tell-inline-asm')) { throw '-OpusBandsTextLiterals requires diagnostic bands-tell-inline-asm' }
 if ($OpusBenchmarkOutput -and -not $OpusBenchmark) { throw '-OpusBenchmarkOutput requires -OpusBenchmark' }
 if ($OpusProfileStage -and (-not $OpusBenchmark -or $OpusBenchmarkOutput)) { throw '-OpusProfileStage requires a raw-only Opus benchmark' }
 if ($OpusStreamTest -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusStreamTest requires -Diagnostic and -EnableOpus' }
@@ -187,6 +189,7 @@ try {
     $taskOpusBenchmarkOutput = if ($OpusBenchmarkOutput) { 'ON' } else { 'OFF' }
     $taskOpusStreamTest = if ($taskOpusStreamTestEnabled) { 'ON' } else { 'OFF' }
     $taskOpusWordAsm = if ($OpusWordAsm) { 'ON' } else { 'OFF' }
+    $taskOpusBandsTextLiterals = if ($OpusBandsTextLiterals) { 'ON' } else { 'OFF' }
     $taskOpusIcdfFlashWord = if ($OpusIcdfFlashWord) { 'ON' } else { 'OFF' }
     $taskOpusFirFlashWord = if ($OpusFirFlashWord) { 'ON' } else { 'OFF' }
     $taskOpusPvqIram = if ($OpusPvqIram) { 'ON' } else { 'OFF' }
@@ -228,6 +231,7 @@ try {
         "-DYORADIO_ESP8266_OPUS_STREAM_TEST=$taskOpusStreamTest",
         "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
         "-DYORADIO_OPUS_BACKEND=$OpusBackend",
+        "-DYORADIO_OPUS_BANDS_TEXT_LITERALS=$taskOpusBandsTextLiterals",
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
         "-DYORADIO_OPUS_FIR_FLASH_WORD=$taskOpusFirFlashWord",
         "-DYORADIO_OPUS_PVQ_IRAM=$taskOpusPvqIram",
@@ -284,6 +288,7 @@ try {
         opus_scratch_bytes=$(if ($taskOpusEnabled) { $OpusScratchBytes } else { 0 })
         opus_low_ram=[bool]$OpusLowRam
         opus_backend=$OpusBackend
+        opus_bands_text_literals=[bool]$OpusBandsTextLiterals
         opus_bands_layout_manifest_sha256=$(if ($OpusBackend -match '^bands-layout(32|128)-asm$') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-layout$($Matches[1]).json").Hash } else { $null })
         opus_bands_tell_bits1_manifest_sha256=$(if ($OpusBackend -eq 'bands-tell-bits1-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-tell-bits1.json").Hash } else { $null })
         opus_bands_tell_update_manifest_sha256=$(if ($OpusBackend -eq 'bands-tell-update-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-tell-update.json").Hash } else { $null })
