@@ -30,11 +30,11 @@ function grouped(data,count,vbr=false,padding=0) {
   }
   return framed(result);
 }
-async function run({output,capture,celtDecodeOnly=false,divOnce=false,leased=false}={}) {
+async function run({output,capture,celtDecodeOnly=false,divOnce=false,leased=false,silkScratch=false}={}) {
   output ||= path.join(__dirname,leased?'leased-results.json':'block-results.json');
   prepareReference();await buildHost({upstreamRoot:defaultOutput,fastInt64:0});
-  const build=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,celtDecodeOnly,divOnce,pcmLeases:leased});
-  const out=path.join(root,'.build/opus-block-regression'+(celtDecodeOnly?'-celt-decode-only':'')+(divOnce?'-div-once':''));fs.mkdirSync(out,{recursive:true});
+  const build=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,celtDecodeOnly,divOnce,pcmLeases:leased,silkScratch});
+  const out=path.join(root,'.build/opus-block-regression'+(celtDecodeOnly?'-celt-decode-only':'')+(divOnce?'-div-once':'')+(silkScratch?'-silk-scratch':''));fs.mkdirSync(out,{recursive:true});
   const probe=leased?'leased_probe':'block_probe';
   const binary=path.join(out,probe);
   for(const name of leased?['block_probe','leased_probe']:['block_probe']) {
@@ -77,11 +77,11 @@ async function run({output,capture,celtDecodeOnly=false,divOnce=false,leased=fal
     process.stderr.write(`${test.name}: exact; ${result.blocks} blocks, scratch ${result.scratch_bytes}/${result.scratch_words}\n`);
   }
   const sources=['native_opus.c','native_opus.h','opus_memory.c','opus_memory.h','upstream/src/opus_decoder.c'];
-  const report={passed:true,leased,celt_decode_only:celtDecodeOnly,div_once:divOnce,scope:'Host generic32 pristine full-packet PCM versus FIR-enabled bounded frame callbacks; mono48k. No board speed claim.',
+  const report={passed:true,leased,silk_scratch:silkScratch,celt_decode_only:celtDecodeOnly,div_once:divOnce,scope:'Host generic32 pristine full-packet PCM versus FIR-enabled bounded frame callbacks; mono48k. No board speed claim.',
     probe_sha256_lf:sha256(Buffer.from(fs.readFileSync(path.join(__dirname,probe+'.c'),'utf8').replace(/\r\n/g,'\n'))),
     source_sha256_lf:Object.fromEntries(sources.map(f=>[f,sha256(Buffer.from(fs.readFileSync(path.join(component,f),'utf8').replace(/\r\n/g,'\n')))])),cases};
   fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');return report;
 }
 module.exports={pack,packets,grouped,run};
 if(require.main===module){const args=process.argv.slice(2),value=k=>{const i=args.indexOf(k);return i<0?undefined:args[i+1];};
-  run({output:value('--output'),capture:value('--capture'),leased:args.includes('--leased'),celtDecodeOnly:args.includes('--celt-decode-only'),divOnce:args.includes('--div-once')}).then(r=>console.log('PASS '+r.cases.length+' block cases')).catch(e=>{console.error(e.stack);process.exitCode=1;});}
+  run({output:value('--output'),capture:value('--capture'),leased:args.includes('--leased'),silkScratch:args.includes('--silk-scratch'),celtDecodeOnly:args.includes('--celt-decode-only'),divOnce:args.includes('--div-once')}).then(r=>console.log('PASS '+r.cases.length+' block cases')).catch(e=>{console.error(e.stack);process.exitCode=1;});}

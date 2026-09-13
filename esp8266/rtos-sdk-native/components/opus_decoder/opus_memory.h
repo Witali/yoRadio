@@ -3,6 +3,12 @@
 #include <stdint.h>
 #include <setjmp.h>
 #include <string.h>
+#ifndef YORADIO_OPUS_CELT_SILK_SCRATCH
+#define YORADIO_OPUS_CELT_SILK_SCRATCH 0
+#endif
+#if YORADIO_OPUS_CELT_SILK_SCRATCH != 0 && YORADIO_OPUS_CELT_SILK_SCRATCH != 1
+#error "YORADIO_OPUS_CELT_SILK_SCRATCH must be 0 or 1"
+#endif
 #ifndef YORADIO_OPUS_PCM_LEASES
 #define YORADIO_OPUS_PCM_LEASES 0
 #endif
@@ -25,7 +31,21 @@
 extern "C" {
 #endif
 
-typedef struct { size_t bytes, words; } opus_scratch_mark;
+typedef struct {
+    size_t bytes, words;
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+    size_t loan;
+#endif
+} opus_scratch_mark;
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+/* Experimental: only an Opus CELT frame may lend dormant SILK channels.
+ * Owner must preserve excitation pointers and restore them even after OOM.
+ * Never lend the SILK super-struct, PCM or IRAM. */
+int yoradio_opus_scratch_lend(void *buffer, size_t size);
+void yoradio_opus_scratch_unlend(void);
+size_t yoradio_opus_scratch_peak_loan(void);
+void yoradio_opus_silk_scratch_restore(void *decoder);
+#endif
 /* One active decoder. Binding/unbinding occurs outside decode calls. */
 void yoradio_opus_memory_bind(void *bytes, size_t byte_capacity,
                               void *words, size_t word_capacity);

@@ -18,6 +18,7 @@ test('native Opus streaming adapter validates headers, trimming, cancellation an
     const fastInt64 = process.env.YORADIO_OPUS_FAST_INT64 === undefined ? undefined :
       Number(process.env.YORADIO_OPUS_FAST_INT64);
     const build = await buildHost({bounded: true, fastInt64, pcmLeases,
+      silkScratch: process.env.YORADIO_OPUS_SILK_SCRATCH === '1',
       noBuild: process.env.YORADIO_OPUS_NO_BUILD === '1'});
     const directory = fs.mkdtempSync(path.join(build.out, 'adapter-test-'));
     t.after(() => fs.rmSync(directory, {recursive: true, force: true}));

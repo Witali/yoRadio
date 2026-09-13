@@ -84,6 +84,11 @@ struct OpusDecoder {
    int          bandwidth;
    int          mode;
    int          prev_mode;
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_CELT_SILK_SCRATCH
+   int          silk_scratch_dirty;
+   int          silk_loan_active;
+   opus_int32  *silk_exc_saved[2];
+#endif
    int          frame_size;
    int          prev_redundancy;
    int          last_packet_duration;
@@ -93,6 +98,22 @@ struct OpusDecoder {
 
    opus_uint32  rangeFinal;
 };
+
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_CELT_SILK_SCRATCH
+#if DECODER_NUM_CHANNELS != 2 || defined(ENABLE_OSCE) || defined(ENABLE_DEEP_PLC)
+#error "SILK scratch lending is audited only for the bounded two-channel decoder"
+#endif
+void yoradio_opus_silk_scratch_restore(void *decoder) {
+   OpusDecoder *st = (OpusDecoder *)decoder;
+   if (st && st->silk_loan_active) {
+      silk_decoder_state *channels = (silk_decoder_state *)((char *)st + st->silk_dec_offset);
+      channels[0].exc_Q14 = st->silk_exc_saved[0];
+      channels[1].exc_Q14 = st->silk_exc_saved[1];
+      st->silk_loan_active = 0;
+   }
+   yoradio_opus_scratch_unlend();
+}
+#endif
 
 #if defined(ENABLE_HARDENING) || defined(ENABLE_ASSERTIONS)
 static void validate_opus_decoder(OpusDecoder *st)
@@ -400,8 +421,16 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
 #endif
          pcm_ptr = pcm_silk;
 
-      if (st->prev_mode==MODE_CELT_ONLY)
+      if (st->prev_mode==MODE_CELT_ONLY
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_CELT_SILK_SCRATCH
+          || st->silk_scratch_dirty
+#endif
+         ) {
          silk_ResetDecoder( silk_dec );
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_CELT_SILK_SCRATCH
+         st->silk_scratch_dirty = 0;
+#endif
+      }
 
       /* The SILK PLC cannot produce frames of less than 10 ms */
       st->DecControl.payloadSize_ms = IMAX(10, 1000 * audiosize / st->Fs);
@@ -566,12 +595,35 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
       if (mode != st->prev_mode && st->prev_mode > 0 && !st->prev_redundancy)
          MUST_SUCCEED(celt_decoder_ctl(celt_dec, OPUS_RESET_STATE));
       /* Decode CELT */
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_CELT_SILK_SCRATCH
+      /* Only the primary CELT-only path can discard SILK history. Hybrid and
+       * redundancy calls must preserve it. Any SILK transition PLC above has
+       * already finished. Excitation pointers live in the Opus header while
+       * lent and are restored on both normal return and bounded OOM longjmp.
+       * The SILK super-struct is excluded. Channel bodies reset before reuse.
+       * st->mode is the outer packet's mode, while local mode may be CELT PLC
+       * nested inside a CELT->SILK/Hybrid transition. That nested call runs
+       * AFTER the new SILK state was decoded and must not overwrite it. */
+      if (mode == MODE_CELT_ONLY && st->mode == MODE_CELT_ONLY) {
+         silk_decoder_state *channels = (silk_decoder_state *)silk_dec;
+         uintptr_t first = ((uintptr_t)channels + 7U) & ~(uintptr_t)7U;
+         size_t size = (uintptr_t)(&channels[2]) - first;
+         st->silk_exc_saved[0] = channels[0].exc_Q14;
+         st->silk_exc_saved[1] = channels[1].exc_Q14;
+         if (yoradio_opus_scratch_lend((void *)first, size)) {
+            st->silk_loan_active = 1; st->silk_scratch_dirty = 1;
+         }
+      }
+#endif
       celt_ret = celt_decode_with_ec_dred(celt_dec, decode_fec ? NULL : data,
                                      len, pcm, celt_frame_size, &dec, celt_accum
 #ifdef ENABLE_DEEP_PLC
                                      , &st->lpcnet
 #endif
                                      );
+#if defined(YORADIO_OPUS_BOUNDED) && YORADIO_OPUS_CELT_SILK_SCRATCH
+      if (mode == MODE_CELT_ONLY) yoradio_opus_silk_scratch_restore(st);
+#endif
    } else {
       unsigned char silence[2] = {0xFF, 0xFF};
       if (!celt_accum)

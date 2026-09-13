@@ -97,10 +97,17 @@ static void self_test(OpusDecoder *decoder, const unsigned char *packet, int len
     check(guards_ok(), "reset corrupted arena guards");
 #ifdef YORADIO_OPUS_BOUNDED
     persistent_test(decoder);
-    // Zero DRAM scratch forces the bounded wrapper's OOM path on every fixture.
+    // Zero DRAM may be sufficient for CELT when dormant SILK is lent. Force
+    // the SILK path instead; the dedicated loan fault probe tests longjmp
+    // at each allocation while SILK bodies (and pointers) are overwritten.
     bind_arenas(0);
     check(opus_decoder_init(decoder, 48000, 1) == OPUS_OK, "small-arena initialization failed");
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+    const unsigned char silk_oom[] = {0x08, 0, 0, 0};
+    check(decode(decoder, silk_oom, sizeof(silk_oom), actual) == OPUS_ALLOC_FAIL, "undersized SILK scratch did not return OPUS_ALLOC_FAIL");
+#else
     check(decode(decoder, packet, length, actual) == OPUS_ALLOC_FAIL, "undersized scratch did not return OPUS_ALLOC_FAIL");
+#endif
     check(guards_ok(), "OOM corrupted arena guards");
     // OOM may interrupt state updates. Rebind and reinitialize before reuse.
     initialize(decoder);

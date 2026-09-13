@@ -359,6 +359,10 @@ candidate, сохранить заключение. Успешный пункт 
 
 ## Статический аудит воспроизводим
 
+Host-этап 2026-09-13: [переиспользование SILK state для CELT](ESP8266_OPUS_SILK_SCRATCH.md).
+22 phase/11 block/11 lease cases и8182 OOM инъекции прошли; OFF по умолчанию,
+target RAM/CPU и непрерывное воспроизведение ещё не подтверждены.
+
 ```powershell
 node tools/esp8266_opus_profile/audit_target.cjs --build .build/esp8266-opus-flash-output512 --output .build/opus-target-audit.json
 node --test tests/esp8266-opus-target-audit.test.js

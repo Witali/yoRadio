@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "packets": 72,
+  "injected_ooms": 8182,
+  "reset_without_rebind_exact": true,
+  "decoder_state_bytes": 6678,
+  "loan_peak_bytes": 5488,
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "scope": "Host generic32 mono48k. Fault after each allocation while SILK is lent; poisoned allocated memory, OPUS_ALLOC_FAIL, then reset without rebind and exact SILK PCM. No target speed/memory qualification.",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "flags": [
+    "-O2",
+    "-std=c99",
+    "-fwrapv",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-fsanitize=address,undefined",
+    "-fno-sanitize-recover=all",
+    "-g",
+    "-fno-omit-frame-pointer",
+    "-DYORADIO_OPUS_CELT_SILK_SCRATCH=1",
+    "-DOPUS_FAST_INT64=0",
+    "-DYORADIO_OPUS_BOUNDED=1",
+    "-I/mnt/c/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder",
+    "-I/mnt/c/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+    "-I/mnt/c/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+    "-I/mnt/c/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+    "-I/mnt/c/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+    "-I/mnt/c/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src"
+  ],
+  "inputs": {
+    "mono-12": "cf5eb9d0d5ea920535e7e397859bb32fa5488d5ed26c5af8d2565bc4382d47ad",
+    "stereo-64": "9e1dddf3d32f94b6f68d15a2d17b7d6e5a2b97af0874b800599ddbf4b6ce19c3",
+    "stereo-128": "b9225e922d94e2ee2d8f33ba723e3512e424e9f3f5fe2f58657622a91e1dbbcf",
+    "stereo-510": "478933ec0c177f880a514677e3c3964276d4df99ad4c2bfadd09af256090abc1",
+    "phase/stereo-2_5ms": "e8edba9c4b4543db8cbd0ddc8d96a3c7a2ec215f142f2264e18bf46812b351a1",
+    "phase/stereo-5ms": "461364e76a20c49b4307844cffe630e556de88891d5125f57818ab74368eee00",
+    "phase/stereo-10ms": "bcb44a05e3123435b54d1ba959b08a7532973e643d80e57d2c59e9926b37aa02"
+  },
+  "source_sha256_lf": {
+    "opus_memory.c": "a6a88764ce240ee3133e73a9181f51fdf37d07a289c6a99eb4ef3f61e5917d18",
+    "opus_memory.h": "100331d49d54e1970f6227ce66e26c4749fe3e92b026a4edbef0919ecfdeaf09",
+    "upstream/src/opus_decoder.c": "1b7cd3c83d0af7951a0ca844db3ca28156a89c0e5959a0be6fb2cc50ead66a7a"
+  }
+}

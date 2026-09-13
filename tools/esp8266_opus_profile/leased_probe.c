@@ -111,10 +111,12 @@ static void failure_tests(void) {
         acquire,consume,aborted,decoder)==OPUS_BAD_ARG);
     assert(acquisitions==1 && !blocks && aborts==1 && !held[0] && !held[1]);
     active=0;init();
-    /* Preserve initialized persistent history but force decode-time scratch OOM. */
+    /* CELT may borrow dormant SILK bodies without any DRAM scratch. A SILK
+     * packet must still fail and return its uncommitted PCM lease on OOM. */
+    const unsigned char silk_oom[]={0x08,0,0,0};
     yoradio_opus_memory_bind(scratch.data,8,words.data,sizeof(words.data));
     assert(opus_decoder_init(decoder,48000,1)==OPUS_OK);active=1;
-    assert(yoradio_opus_decode_leased_bounded(decoder,packed,sizeof(packed),960,
+    assert(yoradio_opus_decode_leased_bounded(decoder,silk_oom,sizeof(silk_oom),960,
         acquire,consume,aborted,decoder)==OPUS_ALLOC_FAIL);
     assert(acquisitions==1 && !blocks && aborts==1 && !held[0] && !held[1]);
     active=0;guards();init();active=1;

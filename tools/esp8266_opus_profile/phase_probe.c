@@ -145,6 +145,9 @@ int main(int argc, char **argv) {
         "\"borrowed_by_lm\":[%u,%u,%u,%u],\"transient_borrowed\":%u,\"dual_stereo_borrowed\":%u,\"borrow_denied\":%u",
         yoradio_opus_scratch_peak_bytes(), yoradio_opus_scratch_peak_words(), capacity,
         borrowed[0], borrowed[1], borrowed[2], borrowed[3], transient_borrowed, dual_borrowed, denied);
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+    printf(",\"scratch_loan_peak_bytes\":%zu", yoradio_opus_scratch_peak_loan());
+#endif
 #endif
     puts("}");
     free(decoder);

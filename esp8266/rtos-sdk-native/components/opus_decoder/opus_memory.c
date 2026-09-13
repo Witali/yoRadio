@@ -7,6 +7,20 @@ static size_t byte_capacity, word_capacity, byte_used, word_used;
 static size_t history_bytes, peak_bytes, peak_words;
 static int decode_active;
 jmp_buf yoradio_opus_oom;
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+static unsigned char *loan_base;
+static size_t loan_capacity, loan_used, peak_loan;
+void yoradio_opus_scratch_unlend(void) {
+    loan_base = NULL; loan_capacity = loan_used = 0;
+}
+int yoradio_opus_scratch_lend(void *buffer, size_t size) {
+    if (!decode_active || loan_base || !buffer || ((uintptr_t)buffer & 7U) ||
+        size > UINTPTR_MAX - (uintptr_t)buffer) return 0;
+    loan_base = buffer; loan_capacity = size & ~(size_t)7U; loan_used = 0;
+    return 1;
+}
+size_t yoradio_opus_scratch_peak_loan(void) { return peak_loan; }
+#endif
 
 void yoradio_opus_memory_bind(void *bytes, size_t bytes_size,
                               void *words, size_t words_size) {
@@ -14,6 +28,9 @@ void yoradio_opus_memory_bind(void *bytes, size_t bytes_size,
     byte_capacity = bytes_size; word_capacity = words_size;
     byte_used = word_used = history_bytes = peak_bytes = peak_words = 0;
     decode_active = 0;
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+    yoradio_opus_scratch_unlend(); peak_loan = 0;
+#endif
 }
 
 int yoradio_opus_history_begin(void) {
@@ -37,10 +54,17 @@ void *yoradio_opus_history(size_t bytes) {
 }
 
 opus_scratch_mark yoradio_opus_scratch_mark(void) {
-    opus_scratch_mark mark = {byte_used, word_used}; return mark;
+    opus_scratch_mark mark = {byte_used, word_used
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+        , loan_used
+#endif
+    }; return mark;
 }
 void yoradio_opus_scratch_restore(opus_scratch_mark mark) {
     byte_used = mark.bytes; word_used = mark.words;
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+    loan_used = mark.loan;
+#endif
 }
 void *yoradio_opus_scratch_alloc(size_t count, size_t size, int word_safe) {
     if (size && count > SIZE_MAX / size) longjmp(yoradio_opus_oom, 1);
@@ -55,6 +79,14 @@ void *yoradio_opus_scratch_alloc(size_t count, size_t size, int word_safe) {
         if (word_used > peak_words) peak_words = word_used;
         return result;
     }
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+    if (loan_base && loan_used <= loan_capacity && bytes <= loan_capacity - loan_used) {
+        void *result = loan_base + loan_used;
+        loan_used += bytes;
+        if (loan_used > peak_loan) peak_loan = loan_used;
+        return result;
+    }
+#endif
     if (!byte_base || byte_used > byte_capacity || bytes > byte_capacity - byte_used)
         longjmp(yoradio_opus_oom, 1);
     void *result = byte_base + byte_used;
@@ -99,6 +131,9 @@ static int decode_bounded(void *decoder, const unsigned char *packet,
     byte_used = 0; word_used = history_bytes;
     decode_active = 1;
     if (setjmp(yoradio_opus_oom)) {
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+        yoradio_opus_silk_scratch_restore(decoder);
+#endif
         byte_used = 0; word_used = history_bytes;
         decode_active = 0;
         return OPUS_ALLOC_FAIL;
@@ -115,6 +150,9 @@ static int decode_bounded(void *decoder, const unsigned char *packet,
         opus_decode(decoder, packet, length, pcm, frame_size, 0);
     byte_used = 0; word_used = history_bytes;
     decode_active = 0;
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+    yoradio_opus_silk_scratch_restore(decoder);
+#endif
     return result;
 }
 int yoradio_opus_decode_bounded(void *decoder, const unsigned char *packet,

@@ -255,8 +255,17 @@ static void test_failures(void) {
     cancel=true;assert(feed_all(4096)==NATIVE_OPUS_ERR_CANCELLED && calls==1 && !decoder.output_samples);
     assert(native_opus_finish(&decoder)==NATIVE_OPUS_ERR_CANCELLED && native_opus_reset(&decoder)==0);
     calls=received=0;cancel=false;assert(feed_all(4096)==0 && received==960);
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+    /* CELT can now succeed without DRAM scratch. Force SILK allocation for
+     * this adapter error test; loan-time fault injection has its own probe. */
+    const uint8_t silk_oom[]={0x08,0,0,0};
+    stream_size=0;headers(41,1,1,0,0,0,19);one(41,2,4,960,silk_oom,sizeof(silk_oom));
+#endif
     init();native_opus_config_t c=config();c.scratch_bytes=8;assert(native_opus_init(&decoder,&c)==0);
     assert(feed_all(4096)==NATIVE_OPUS_ERR_MEMORY && decoder.libopus_error==OPUS_ALLOC_FAIL && !calls);
+#if YORADIO_OPUS_CELT_SILK_SCRATCH
+    stream_size=0;headers(41,1,1,0,0,0,19);one(41,2,4,960,silence,sizeof(silence));
+#endif
     init();assert(feed_all(4096)==0 && received==960);
     init();--stream_size;assert(feed_all(1)==NATIVE_OPUS_ERR_TRUNCATED);
     init();++stream_size;stream[stream_size-1]^=1;assert(feed_all(4096)==NATIVE_OPUS_ERR_DEMUX && !calls);

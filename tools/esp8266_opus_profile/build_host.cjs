@@ -39,7 +39,8 @@ function dependencies(depfile) {
   return text.slice(text.indexOf(':') + 1).trim().split(/\s+/).filter(Boolean).map(nativePath);
 }
 
-async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false } = {}) {
+async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false } = {}) {
+  if (silkScratch && !bounded) throw Error('silkScratch requires bounded decoder.');
   if (pcmLeases && !bounded) throw Error('pcmLeases requires bounded decoder.');
   if (divOnce && !bounded) throw Error('divOnce requires bounded decoder.');
   if (celtDecodeOnly && !bounded) throw Error('celtDecodeOnly requires bounded decoder.');
@@ -50,8 +51,9 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   const sourceRoot = upstreamRoot ? path.resolve(upstreamRoot) : upstream;
   if (fastInt64 !== undefined && !fs.readFileSync(path.join(sourceRoot, 'celt/arch.h'), 'utf8').includes('#ifndef OPUS_FAST_INT64'))
     throw Error('Selected upstream does not support an OPUS_FAST_INT64 override; use a documented diagnostic copy.');
-  const out = path.join(root, '.build/esp8266-opus-host' + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
-    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (profileStage ? '-stage-' + profileStage : '') + (celtDecodeOnly ? '-celt-decode-only' : '') + (divOnce ? '-div-once' : '') + (pcmLeases ? '-pcm-leases' : ''));
+  const out = path.join(root, '.build/esp8266-opus-host' + (sanitize ? '-sanitize' : '') + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
+    (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (profileStage ? '-stage-' + profileStage : '') + (celtDecodeOnly ? '-celt-decode-only' : '') + (divOnce ? '-div-once' : '') + (pcmLeases ? '-pcm-leases' : '') + (silkScratch ? '-silk-scratch' : ''));
+  const linkFlags = sanitize ? ['-fsanitize=address,undefined', '-fno-sanitize-recover=all'] : [];
   const binary = path.join(out, 'probe');
   const sources = ['src', 'celt', 'silk', 'silk/fixed'].flatMap(dir =>
     fs.readdirSync(path.join(sourceRoot, dir)).filter(file => file.endsWith('.c')).sort()
@@ -60,6 +62,8 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   if (profileStage) sources.push(path.join(component, 'opus_stage_profile.c'));
   sources.push(path.join(__dirname, 'probe.c'));
   const flags = ['-O2', '-std=c99', '-fwrapv', '-ffunction-sections', '-fdata-sections',
+    ...linkFlags, ...(sanitize ? ['-g', '-fno-omit-frame-pointer'] : []),
+    ...(silkScratch ? ['-DYORADIO_OPUS_CELT_SILK_SCRATCH=1'] : []),
     ...(fastInt64 === undefined ? [] : ['-DOPUS_FAST_INT64=' + fastInt64]),
     ...(bounded ? ['-DYORADIO_OPUS_BOUNDED=1', '-I' + hostPath(component)] : []),
     ...(firFlashWord ? ['-DYORADIO_OPUS_FIR_FLASH_WORD=1'] : []),
@@ -77,7 +81,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
     if (!fs.existsSync(binary) || !previous) throw Error(`No incremental host build in ${out}; omit --no-build once.`);
     if (JSON.stringify(previous.flags) !== JSON.stringify(flags) || JSON.stringify(previous.sources) !== JSON.stringify(sources))
       throw Error('Existing host cache uses different flags or sources; omit --no-build.');
-    return { binary, out, objects, flags, compiler: previous.compiler, compiled: 0, linked: false, reused: true };
+    return { binary, out, objects, flags, linkFlags, compiler: previous.compiler, compiled: 0, linked: false, reused: true };
   }
   fs.mkdirSync(out, { recursive: true });
   const compiler = execute('gcc', ['--version']).split(/\r?\n/)[0];
@@ -98,10 +102,10 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
     }
   }));
   const linked = pending.length > 0 || !fs.existsSync(binary);
-  if (linked) execute('gcc', [...objects.map(hostPath), '-Wl,--gc-sections', '-lm', '-o', hostPath(binary)]);
+  if (linked) execute('gcc', [...linkFlags, ...objects.map(hostPath), '-Wl,--gc-sections', '-lm', '-o', hostPath(binary)]);
   fs.writeFileSync(buildfile, JSON.stringify({ signature, compiler, flags, sources }, null, 2) + '\n');
   process.stderr.write(`${bounded ? 'bounded' : 'baseline'}: compiled ${pending.length}/${sources.length} objects; ${linked ? 'linked' : 'link reused'}\n`);
-  return { binary, out, objects, flags, compiler, compiled: pending.length, linked, reused: false };
+  return { binary, out, objects, flags, linkFlags, compiler, compiled: pending.length, linked, reused: false };
 }
 
 function runProbe({ bounded = false, fixture, output, selfTest = true, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false }) {
