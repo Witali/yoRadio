@@ -18,8 +18,10 @@ function archive(source,dest){
  return reports;
 }
 function report(kind){
- assert.ok(['intensity','blocks','combined','pulse-lookup','tell-inline','fused'].includes(kind));
- const fresh=['pulse-lookup','tell-inline','fused'].includes(kind);
+ assert.ok(['intensity','blocks','combined','pulse-lookup','tell-inline','fused','tell-intensity'].includes(kind));
+ const fresh=['pulse-lookup','tell-inline','fused','tell-intensity'].includes(kind);
+ // Two candidates bracketed by the same fresh A controls; do not count them twice.
+ const seriesKind=kind==='tell-intensity'?'fused':kind;
  const av='esp8266-opus-functions-control-v2',bv='esp8266-opus-bands-'+kind+'-v1';
  const art=path.join(root,'firmware/development',bv),control=path.join(root,'firmware/development/esp8266-opus-bands-control-v1');
  const aa=path.join(root,'firmware/development',av),ma=read(path.join(aa,'manifest.json')),mb=read(path.join(art,'manifest.json'));
@@ -28,7 +30,7 @@ function report(kind){
   assert.equal(m.opus_benchmark,true);assert.equal(m.opus_benchmark_output,false);assert.equal(m.opus_function_profile,false);assert.equal(m.opus_profile_stage,0);
  }
  assert.equal(ma.opus_backend,'gcc-asm');assert.equal(mb.opus_backend,'bands-'+kind+'-asm');
- const identity=['opus_backend','opus_asm_optimization_sha256','opus_bands_blocks_manifest_sha256','opus_bands_combined_manifest_sha256','opus_bands_pulse_lookup_manifest_sha256','opus_bands_tell_inline_manifest_sha256','opus_bands_fused_manifest_sha256','built_utc','source_revision','app_sha256','bytes'];
+ const identity=['opus_backend','opus_asm_optimization_sha256','opus_bands_blocks_manifest_sha256','opus_bands_combined_manifest_sha256','opus_bands_pulse_lookup_manifest_sha256','opus_bands_tell_inline_manifest_sha256','opus_bands_fused_manifest_sha256','opus_bands_tell_intensity_manifest_sha256','built_utc','source_revision','app_sha256','bytes'];
  for(const k of new Set([...Object.keys(ma),...Object.keys(mb)]))if(!identity.includes(k))assert.deepEqual(mb[k]??null,ma[k]??null,'Build profile differs: '+k);
  const recipe=path.join(component,'asm/lx106/bands-'+kind+'.json'),rm=read(recipe);
  const selected=kind==='intensity'?mb.opus_asm_optimization_sha256:mb['opus_bands_'+kind.replaceAll('-','_')+'_manifest_sha256'];
@@ -39,13 +41,13 @@ function report(kind){
   else fs.copyFileSync(path.join(aa,file),dest);
  }
  const a=fresh
-  ?archive(path.join(root,'.build/opus-'+kind+'-control-20260913'),path.join(control,kind+'-20260913'))
+  ?archive(path.join(root,'.build/opus-'+seriesKind+'-control-20260913'),path.join(control,seriesKind+'-20260913'))
   :archive(path.join(root,'.build/opus-bands-control-20260913'),path.join(control,'initial'));
  const b=archive(path.join(root,'.build/opus-bands-'+kind+'-20260913'),path.join(art,'runs'));
  const result=compare(a.map(v=>v.report),b.map(v=>v.report));
- const repeated=path.join(root,['tell-inline','fused'].includes(kind)?'.build/opus-'+kind+'-control-repeat-20260913':'.build/opus-bands-control-repeat-20260913');
- if((!fresh||['tell-inline','fused'].includes(kind))&&fs.existsSync(path.join(repeated,'run10.json'))&&read(path.join(repeated,'run10.json')).final?.state===3){
-  const a2=archive(repeated,path.join(control,['tell-inline','fused'].includes(kind)?kind+'-repeat-20260913':'repeated'));result.repeated_control=compare(a2.map(v=>v.report),b.map(v=>v.report));
+ const repeated=path.join(root,['tell-inline','fused'].includes(seriesKind)?'.build/opus-'+seriesKind+'-control-repeat-20260913':'.build/opus-bands-control-repeat-20260913');
+ if((!fresh||['tell-inline','fused'].includes(seriesKind))&&fs.existsSync(path.join(repeated,'run10.json'))&&read(path.join(repeated,'run10.json')).final?.state===3){
+  const a2=archive(repeated,path.join(control,['tell-inline','fused'].includes(seriesKind)?seriesKind+'-repeat-20260913':'repeated'));result.repeated_control=compare(a2.map(v=>v.report),b.map(v=>v.report));
   result.repeated_control_inputs=a2.map(({report,...r})=>r);
  }
  const sections=variant=>{
@@ -55,7 +57,7 @@ function report(kind){
  const sa=sections(av),sb=sections(bv);assert.ok(Object.keys(sa).length>=5);
  for(const s of Object.keys(sa).filter(s=>!s.startsWith('.flash.')))assert.equal(sb[s],sa[s],'Static RAM changed: '+s);
  result.build={reference:ma,candidate:mb,reference_sections:sa,candidate_sections:sb,recipe_manifest:rm,recipe_manifest_sha256:sourceHash(recipe),static_ram_delta:0};
- if(kind==='tell-inline'){
+ if(['tell-inline','tell-intensity'].includes(kind)){
   const symbols=variant=>{
    const nm=run(path.join(compilerBin,'xtensa-lx106-elf-nm.exe'),['-S',path.join(root,'.build',variant,'yoradio_esp8266_helix_native.elf')]);
    return Object.fromEntries([...nm.matchAll(/^([0-9a-f]+)\s+([0-9a-f]+)\s+\S\s+(ec_tell_frac|quant_partition|quant_all_bands|correction\$2307|y_opus_tell_correction)$/gm)]
