@@ -80,8 +80,10 @@ test('actual CMake gates both components and needs fixtures only for raw benchma
   t.after(() => fs.rmSync(dir, {recursive:true, force:true}));
   fs.writeFileSync(path.join(dir, 'opus_board_fixtures.h'), '/* isolated fixture sentinel */\n');
   const mainBlock = main.slice(main.indexOf('option(YORADIO_ESP8266_DIAGNOSTIC'), main.indexOf('option(YORADIO_ESP8266_SPIFFS_LOG_HTTP'));
-  const helixBlock = helix.match(/if\(YORADIO_ESP8266_OPUS_STREAM_TEST OR YORADIO_ESP8266_OPUS_BENCHMARK\)[^]*?endif\(\)/)?.[0];
-  assert.ok(helixBlock);
+  // Both source registration and compile definitions have this gate. Checking
+  // only the first match stopped exercising the definition after heap diagnostics.
+  const helixBlocks = [...helix.matchAll(/if\(YORADIO_ESP8266_OPUS_STREAM_TEST OR YORADIO_ESP8266_OPUS_BENCHMARK\)[^]*?endif\(\)/g)].map(match => match[0]);
+  assert.equal(helixBlocks.length, 2);
   const script = path.join(dir, 'profile.cmake');
   // Check Helix before main: component ordering must not matter.
   fs.writeFileSync(script, [
@@ -92,12 +94,18 @@ test('actual CMake gates both components and needs fixtures only for raw benchma
     '  message(FATAL_ERROR "Wrong Helix definition")',
     ' endif()',
     ' set(HELIX_STREAM ON PARENT_SCOPE)',
-    'endfunction()', helixBlock, mainBlock,
+    'endfunction()', ...helixBlocks, mainBlock,
     'if(YORADIO_ESP8266_OPUS_STREAM_TEST AND NOT HELIX_STREAM)',
     ' message(FATAL_ERROR "Missing Helix diagnostic definition")',
     'endif()',
     'if(NOT YORADIO_ESP8266_OPUS_STREAM_TEST AND HELIX_STREAM)',
     ' message(FATAL_ERROR "Production has diagnostic storage")',
+    'endif()',
+    'list(FIND YORADIO_HELIX_SOURCES "native_heap_diag.c" HEAP_SOURCE)',
+    'if(YORADIO_ESP8266_OPUS_STREAM_TEST AND HEAP_SOURCE LESS 0)',
+    ' message(FATAL_ERROR "Missing diagnostic heap source")',
+    'elseif(NOT YORADIO_ESP8266_OPUS_STREAM_TEST AND NOT HEAP_SOURCE LESS 0)',
+    ' message(FATAL_ERROR "Production contains diagnostic heap source")',
     'endif()',
     'list(FIND YORADIO_SOURCES "opus_benchmark.cpp" RAW_SOURCE)',
     'if(YORADIO_ESP8266_OPUS_BENCHMARK AND RAW_SOURCE LESS 0)',
