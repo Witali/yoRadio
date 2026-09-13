@@ -210,6 +210,11 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
 #if YORADIO_OPUS_PROFILE_STAGE
                     opus_stage_profile_reset();
                     uint32_t start = opus_stage_profile_clock();
+#elif YORADIO_OPUS_FUNCTION_PROFILE
+                    // Use the SAME SDK runtime clock as nested scopes. The
+                    // ordinary esp_timer path uses a different time source.
+                    uint32_t start, clock_cpu;
+                    yoradio_opus_function_clock(&start, &clock_cpu);
 #else
                     int64_t start = esp_timer_get_time();
 #endif
@@ -229,6 +234,10 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
                         if (stage.max_ticks > result.stage_max_ticks)
                             result.stage_max_ticks = stage.max_ticks;
                     }
+#elif YORADIO_OPUS_FUNCTION_PROFILE
+                    uint32_t end;
+                    yoradio_opus_function_clock(&end, &clock_cpu);
+                    uint32_t elapsed = end - start;
 #else
                     uint32_t elapsed = (uint32_t)(esp_timer_get_time() - start);
 #endif

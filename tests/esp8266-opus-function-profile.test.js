@@ -33,4 +33,7 @@ test('profiling remains diagnostic-only and outside upstream ASM sources',()=>{
  const adapter=fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/cmake/opus_task_clock.c.in'),'utf8');
  assert.match(adapter,/pxCurrentTCB->ulRunTimeCounter \+ \(now - ulTaskSwitchedInTime\)/);
  assert.match(adapter,/taskENTER_CRITICAL/);assert.match(adapter,/taskEXIT_CRITICAL/);
+ const bench=fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/main/opus_benchmark.cpp'),'utf8');
+ assert.match(bench,/yoradio_opus_function_clock\(&start, &clock_cpu\)/);
+ assert.match(bench,/yoradio_opus_function_clock\(&end, &clock_cpu\)/);
 });
