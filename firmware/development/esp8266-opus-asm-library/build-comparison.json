@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "scope": "Full linked images, static sections and symbol size; no device CPU/heap watermark measurement",
+  "results": [
+    {
+      "variant": "esp8266-opus-gcc-asm-v1",
+      "app_bytes": 902992,
+      "app_sha256": "CAEDD7FF4EFB9B90D5AB4E3B107594C864102C914CB3870BFF4D880D5B1D5350",
+      "sections": {
+        ".iram0.vectors": 128,
+        ".iram0.text": 22900,
+        ".iram0.bss": 4044,
+        ".dram0.data": 1652,
+        ".dram0.bss": 18752,
+        ".flash.text": 637006,
+        ".flash.rodata": 241224
+      },
+      "ec_dec_update_bytes": 171
+    },
+    {
+      "variant": "esp8266-opus-optimized-asm-v1",
+      "app_bytes": 902912,
+      "app_sha256": "A959A77E1006F55D7B636685F0A6DF0F1BC4ED23DC2B41A3594AC446BEF20396",
+      "sections": {
+        ".iram0.vectors": 128,
+        ".iram0.text": 22900,
+        ".iram0.bss": 4044,
+        ".dram0.data": 1652,
+        ".dram0.bss": 18752,
+        ".flash.text": 636922,
+        ".flash.rodata": 241228
+      },
+      "ec_dec_update_bytes": 107
+    }
+  ],
+  "app_delta_bytes": -80,
+  "static_ram_delta_bytes": 0,
+  "ec_dec_update_stack_bytes": {
+    "gcc": 16,
+    "optimized": 0
+  },
+  "physical_speed_measured": false
+}
