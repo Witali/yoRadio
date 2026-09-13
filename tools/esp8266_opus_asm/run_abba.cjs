@@ -33,6 +33,16 @@ function checkArtifacts(aDir,bDir,fixtures,experiment='backend'){
       assert.deepEqual(a[key],b[key],'Unmatched build setting: '+key);
   return {A:a,B:b};
 }
+function checkLiveIram(health,proof,artifacts){
+  assert.equal(proof.reference_app_sha256,artifacts.A.app_sha256.toLowerCase());
+  assert.equal(proof.candidate_app_sha256,artifacts.B.app_sha256.toLowerCase());
+  assert.ok(Number.isInteger(proof.iram_text_growth)&&proof.iram_text_growth>0);
+  assert.ok(Number.isInteger(health.free_iram)&&health.free_iram>=0);
+  const required=proof.iram_text_growth+2048;
+  assert.ok(health.free_iram>=required,
+    `IRAM preflight refused: ${health.free_iram} bytes free, need at least ${required}; do not borrow decoder arena or silently spill into DRAM`);
+  return {free_iram:health.free_iram,required,margin:health.free_iram-required};
+}
 async function run({reference,candidate,fixtures,directory,base='http://192.168.100.6',cycles=5,experiment='backend',interval=1500}){
   assert.ok(Number.isInteger(interval)&&interval>=250&&interval<=60000);
   const artifacts=checkArtifacts(reference,candidate,fixtures,experiment),order=plan(cycles);
@@ -52,6 +62,12 @@ async function run({reference,candidate,fixtures,directory,base='http://192.168.
     const before=await fetch(new URL('/api/native/opus-benchmark',base),{signal:AbortSignal.timeout(8000)});
     assert.equal(before.status,200);report.before=await before.json();save();
     assert.ok([0,3,4].includes(report.before.state),'A benchmark is already active; observe that run');
+    if(experiment==='pvq-iram'){
+      const response=await fetch(new URL('/api/native/audio',base),{signal:AbortSignal.timeout(8000)});
+      assert.equal(response.status,200);report.iram_preflight_health=await response.json();save();
+      report.iram_preflight=checkLiveIram(report.iram_preflight_health,
+        read(path.join(candidate,'link-proof.json')),artifacts);save();
+    }
     let loaded=null;
     const reports={A:[],B:[]};
     for(const [index,backend] of order.entries()){
@@ -82,7 +98,7 @@ async function run({reference,candidate,fixtures,directory,base='http://192.168.
     console.table(result.cases.map(c=>({name:c.name,A:c.reference.task_budget_percent.median,B:c.candidate.task_budget_percent.median,reduction:c.median_task_reduction_percent})));
   }catch(error){report.error=error.stack;save();throw error;}
 }
-module.exports={plan,checkArtifacts};
+module.exports={plan,checkArtifacts,checkLiveIram};
 if(require.main===module){
   const args=process.argv.slice(2),value=k=>{const i=args.indexOf(k);assert.ok(i>=0,'Missing '+k);return path.resolve(args[i+1]);};
   const optional=(k,f)=>args.includes(k)?args[args.indexOf(k)+1]:f;

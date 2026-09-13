@@ -33,7 +33,9 @@ function check(reference,candidate,bin){
  assert.deepEqual(moves.sort(),wanted,'Unexpected functions moved to IRAM');
  const functions=wanted.map(name=>{
   const old=a.filter(x=>x.name===name),next=b.filter(x=>x.name===name);
-  assert.equal(old.length,1);assert.equal(next.length,1);assert.equal(next[0].size,old[0].size);
+  assert.equal(old.length,1);assert.equal(next.length,1);
+  // IRAM-to-flash calls may no longer relax to short CALL0. Linked sizes can
+  // change even with identical object instructions/relocations (checked below).
   return {name,reference:old[0],candidate:next[0]};
  });
  const sa=sections(tool('size',['-A',reference])),sb=sections(tool('size',['-A',candidate]));
@@ -49,7 +51,10 @@ function check(reference,candidate,bin){
  return {functions,reference_sections:sa,candidate_sections:sb,iram_text_growth:sb['.iram0.text']-sa['.iram0.text'],
   iram_end:end,arena_bytes:arena,conservative_headroom:headroom,required_headroom:guard,
   opus_disassembly_sha256:hash(da),reference_elf_sha256:hash(fs.readFileSync(reference)),
-  candidate_elf_sha256:hash(fs.readFileSync(candidate)),note:'Static link proof only; physical arena allocation and DRAM safety still require testing.'};
+  candidate_elf_sha256:hash(fs.readFileSync(candidate)),
+  reference_app_sha256:hash(fs.readFileSync(reference.replace(/\.elf$/,'.bin'))),
+  candidate_app_sha256:hash(fs.readFileSync(candidate.replace(/\.elf$/,'.bin'))),
+  note:'Static link proof only; physical arena allocation and DRAM safety still require testing.'};
 }
 module.exports={symbols,sections,check};
 if(require.main===module){

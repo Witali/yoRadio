@@ -1,6 +1,15 @@
 const test=require('node:test'),assert=require('node:assert/strict'),path=require('node:path');
-const {plan,checkArtifacts}=require('../tools/esp8266_opus_asm/run_abba.cjs');
+const {plan,checkArtifacts,checkLiveIram}=require('../tools/esp8266_opus_asm/run_abba.cjs');
 const fs=require('node:fs'),os=require('node:os'),crypto=require('node:crypto');
+test('IRAM link capacity never substitutes for measured runtime headroom',()=>{
+ const proof={reference_app_sha256:'a'.repeat(64),candidate_app_sha256:'b'.repeat(64),iram_text_growth:1834};
+ const artifacts={A:{app_sha256:proof.reference_app_sha256},B:{app_sha256:proof.candidate_app_sha256}};
+ assert.throws(()=>checkLiveIram({free_iram:112},proof,artifacts),/IRAM preflight refused/);
+ assert.throws(()=>checkLiveIram({free_iram:3881},proof,artifacts));
+ assert.equal(checkLiveIram({free_iram:3882},proof,artifacts).margin,0);
+ assert.throws(()=>checkLiveIram({},proof,artifacts));
+ assert.throws(()=>checkLiveIram({free_iram:8000},{...proof,candidate_app_sha256:'c'.repeat(64)},artifacts));
+});
 test('ABBA preserves ten trials per variant and alternates first-run bias',()=>{
  const p=plan();assert.equal(p.length,20);assert.equal(p.filter(v=>v==='A').length,10);
  for(let i=0;i<p.length;i+=4)assert.deepEqual(p.slice(i,i+4),['A','B','B','A']);
