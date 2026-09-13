@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {component,sourceHash}=require('./export.cjs');
 function verify(mode, directory=path.join(component,'asm/lx106'), componentRoot=component){
- assert.ok(['gcc-asm','optimized-asm','hoisted-asm'].includes(mode),'Unknown ASM selection');
+ assert.ok(['gcc-asm','optimized-asm','hoisted-asm','bands-intensity-asm'].includes(mode),'Unknown ASM selection');
  const manifest=JSON.parse(fs.readFileSync(path.join(directory,'manifest.json'),'utf8'));
  assert.equal(manifest.roundtrip_exact,true);
  assert.equal(manifest.cpu,'LX106');assert.equal(manifest.abi,'call0');
@@ -14,6 +14,13 @@ function verify(mode, directory=path.join(component,'asm/lx106'), componentRoot=
  const actual=['src','celt','silk','silk/fixed'].flatMap(d=>fs.readdirSync(path.join(componentRoot,'upstream',d)).filter(f=>f.endsWith('.c')).map(f=>'upstream/'+d+'/'+f)).sort();
  assert.deepEqual(manifest.files.map(f=>f.source).sort(),actual,'ASM corpus does not cover current C units');
  let optimization;
+ if(mode==='bands-intensity-asm'){
+  optimization=JSON.parse(fs.readFileSync(path.join(directory,'bands-intensity.json'),'utf8'));
+  assert.equal(optimization.base_manifest_sha256,sourceHash(path.join(directory,'manifest.json')));
+  assert.equal(sourceHash(path.join(directory,optimization.overlay)),optimization.overlay_sha256_lf);
+  assert.equal(sourceHash(path.join(__dirname,'bands.cjs')),optimization.recipe_sha256_lf);
+  assert.equal(optimization.source,'upstream/celt/bands.c');
+ }
  if(mode==='optimized-asm'||mode==='hoisted-asm'){
   optimization=JSON.parse(fs.readFileSync(path.join(directory,mode==='hoisted-asm'?'hoisted.json':'optimized.json'),'utf8'));
   assert.equal(optimization.base_manifest_sha256,sourceHash(path.join(directory,'manifest.json')));
@@ -23,7 +30,7 @@ function verify(mode, directory=path.join(component,'asm/lx106'), componentRoot=
  const files=manifest.files.map(f=>{
   assert.equal(f.section_contents_exact,true,'Unverified ASM tables/section contents');
   const file=path.join(directory,f.asm);assert.equal(sourceHash(file),f.asm_sha256_lf,'Modified GCC baseline: '+f.asm);
-  return optimization&&f.source===(mode==='hoisted-asm'?'upstream/celt/vq.c':'upstream/celt/entdec.c')?path.join(directory,optimization.overlay):file;
+  return optimization&&f.source===(mode==='bands-intensity-asm'?optimization.source:mode==='hoisted-asm'?'upstream/celt/vq.c':'upstream/celt/entdec.c')?path.join(directory,optimization.overlay):file;
  });
  return {manifest,files};
 }

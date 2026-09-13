@@ -39,7 +39,8 @@ function dependencies(depfile) {
   return text.slice(text.indexOf(':') + 1).trim().split(/\s+/).filter(Boolean).map(nativePath);
 }
 
-async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false, asmEntropyModel = false } = {}) {
+async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false, asmEntropyModel = false, asmBandsModel = '' } = {}) {
+  if (asmBandsModel && (!bounded || !require('../esp8266_opus_asm/bands.cjs').kinds.includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
   if (asmEntropyModel && !bounded) throw Error('asmEntropyModel requires bounded decoder.');
   if (silkPlcIram && !bounded) throw Error('silkPlcIram requires bounded decoder.');
   if (autocorrCompact && !bounded) throw Error('autocorrCompact requires bounded decoder.');
@@ -54,7 +55,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   const sourceRoot = upstreamRoot ? path.resolve(upstreamRoot) : upstream;
   if (fastInt64 !== undefined && !fs.readFileSync(path.join(sourceRoot, 'celt/arch.h'), 'utf8').includes('#ifndef OPUS_FAST_INT64'))
     throw Error('Selected upstream does not support an OPUS_FAST_INT64 override; use a documented diagnostic copy.');
-  const out = path.join(root, '.build/esp8266-opus-host' + (asmEntropyModel ? '-asm-model' : '') + (silkPlcIram ? '-plc-iram' : '') + (autocorrCompact ? '-autocorr-compact' : '') + (sanitize ? '-sanitize' : '') + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
+  const out = path.join(root, '.build/esp8266-opus-host' + (asmBandsModel ? '-bands-' + asmBandsModel : '') + (asmEntropyModel ? '-asm-model' : '') + (silkPlcIram ? '-plc-iram' : '') + (autocorrCompact ? '-autocorr-compact' : '') + (sanitize ? '-sanitize' : '') + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
     (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (profileStage ? '-stage-' + profileStage : '') + (celtDecodeOnly ? '-celt-decode-only' : '') + (divOnce ? '-div-once' : '') + (pcmLeases ? '-pcm-leases' : '') + (silkScratch ? '-silk-scratch' : ''));
   const linkFlags = sanitize ? ['-fsanitize=address,undefined', '-fno-sanitize-recover=all'] : [];
   const binary = path.join(out, 'probe');
@@ -62,6 +63,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
     fs.readdirSync(path.join(sourceRoot, dir)).filter(file => file.endsWith('.c')).sort()
       .map(file => path.join(sourceRoot, dir, file)));
   if (bounded) sources.push(path.join(component, 'opus_memory.c'));
+  if (asmBandsModel) sources[sources.indexOf(path.join(sourceRoot, 'celt/bands.c'))] = require('../esp8266_opus_asm/bands.cjs').cModel(asmBandsModel);
   if (asmEntropyModel) {
     const generated = require('../esp8266_opus_asm/model.cjs').generateModel();
     sources[sources.indexOf(path.join(sourceRoot, 'celt/entdec.c'))] = generated.reference;
