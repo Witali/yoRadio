@@ -1,0 +1,35 @@
+# The checked-in snapshot was generated with this exact decoder feature set.
+# Reject incompatible state ABI, instrumentation, stale source and unknown ASM.
+if(NOT YORADIO_ESP8266_DIAGNOSTIC)
+  message(FATAL_ERROR "Opus ASM backends require diagnostic firmware until board qualification")
+endif()
+foreach(flag YORADIO_OPUS_WORD_ASM YORADIO_OPUS_ICDF_FLASH_WORD YORADIO_OPUS_FIR_FLASH_WORD)
+  if(NOT ${flag})
+    message(FATAL_ERROR "Pinned Opus ASM snapshot requires ${flag}=ON")
+  endif()
+endforeach()
+foreach(flag YORADIO_OPUS_LOW_RAM YORADIO_OPUS_PCM_LEASES YORADIO_OPUS_CELT_DECODE_ONLY YORADIO_OPUS_ROTATION_LX106 YORADIO_OPUS_DIV_ONCE)
+  if(${flag})
+    message(FATAL_ERROR "Pinned Opus ASM snapshot requires ${flag}=OFF; regenerate before combining experiments")
+  endif()
+endforeach()
+if(NOT YORADIO_OPUS_PROFILE_STAGE EQUAL 0)
+  message(FATAL_ERROR "Pinned Opus ASM snapshot has stage profiling OFF")
+endif()
+find_program(YORADIO_ASM_NODE node)
+if(NOT YORADIO_ASM_NODE)
+  message(FATAL_ERROR "Node.js is needed to verify the Opus ASM snapshot")
+endif()
+get_filename_component(asm_repo "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
+execute_process(COMMAND "${YORADIO_ASM_NODE}" "${asm_repo}/tools/esp8266_opus_asm/verify.cjs"
+  "${YORADIO_OPUS_BACKEND}" --cmake-output "${CMAKE_CURRENT_BINARY_DIR}/opus-asm-sources.cmake"
+  RESULT_VARIABLE asm_result OUTPUT_VARIABLE asm_output ERROR_VARIABLE asm_error)
+if(NOT asm_result EQUAL 0)
+  message(FATAL_ERROR "Opus ASM validation failed: ${asm_output}\n${asm_error}")
+endif()
+message(STATUS "${asm_output}")
+include("${CMAKE_CURRENT_BINARY_DIR}/opus-asm-sources.cmake")
+# Reconfigure on edits so the hash guard is not only a first-build check.
+file(GLOB_RECURSE asm_guard_files "${CMAKE_CURRENT_LIST_DIR}/../upstream/*.c" "${CMAKE_CURRENT_LIST_DIR}/../upstream/*.h"
+  "${CMAKE_CURRENT_LIST_DIR}/lx106/*.s" "${CMAKE_CURRENT_LIST_DIR}/lx106/*.json" "${CMAKE_CURRENT_LIST_DIR}/../*.h")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${asm_guard_files})

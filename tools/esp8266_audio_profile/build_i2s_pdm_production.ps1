@@ -1,5 +1,6 @@
 param(
     [string]$SdkPath = '.worktree/esp8266-native-port/.build/esp8266-rtos-sdk',
+    [string]$RuntimeRoot = '',
     [ValidatePattern('^[a-zA-Z0-9_-]+$')]
     [string]$Variant = 'esp8266-i2s-pdm-production',
     [ValidateSet('off', 'short', 'long')]
@@ -12,6 +13,8 @@ param(
     [int]$LedUpdateHz = 10,
     [switch]$NoAudioLevelLed,
     [switch]$EnableOpus,
+    [ValidateSet('c', 'gcc-asm', 'optimized-asm')]
+    [string]$OpusBackend = 'c',
     [ValidateSet(1024, 1536, 2048, 3072, 4096)]
     [int]$OpusInputBytes = 1024,
     [switch]$OpusLowRam,
@@ -51,6 +54,11 @@ if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
 }
 if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -SpiffsLog' }
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
+if ($OpusBackend -ne 'c') {
+    if (-not $Diagnostic -or -not $EnableOpus) { throw 'Opus ASM backend requires diagnostic Opus' }
+    if (-not $OpusWordAsm -or -not $OpusIcdfFlashWord -or -not $OpusFirFlashWord) { throw 'Pinned ASM requires -OpusWordAsm -OpusIcdfFlashWord -OpusFirFlashWord' }
+    if ($OpusLowRam -or $OpusPcmLeases -or $OpusCeltDecodeOnly -or $OpusRotationLx106 -or $OpusDivOnce -or $OpusProfileStage) { throw 'Other decoder experiments require a separately regenerated ASM snapshot' }
+}
 if ($OpusBenchmarkOutput -and -not $OpusBenchmark) { throw '-OpusBenchmarkOutput requires -OpusBenchmark' }
 if ($OpusProfileStage -and (-not $OpusBenchmark -or $OpusBenchmarkOutput)) { throw '-OpusProfileStage requires a raw-only Opus benchmark' }
 if ($OpusStreamTest -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusStreamTest requires -Diagnostic and -EnableOpus' }
@@ -83,6 +91,8 @@ if ($OpusInputBytes -ne 1024 -and (-not $Diagnostic -or -not $EnableOpus)) {
     throw '-OpusInputBytes changes require diagnostic Opus until RAM qualification'
 }
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\', '/')
+if (-not $RuntimeRoot) { $RuntimeRoot = "$taskRoot/.build" }
+$taskRuntime = (Resolve-Path -LiteralPath $RuntimeRoot).Path.Replace('\', '/')
 $taskVariant = $Variant
 $taskBuild = "$taskRoot/.build/$taskVariant"
 $taskArtifact = "$taskRoot/firmware/development/$taskVariant"
@@ -144,9 +154,9 @@ function Assert-TaskStreamIdleConfig([string]$Config, [int]$TimeoutMs) {
 Push-Location $taskRoot
 try {
     $env:IDF_PATH = (Resolve-Path $SdkPath).Path
-    $env:IDF_TOOLS_PATH = "$taskRoot/.build/esp8266-tools"
-    $taskCompiler = "$taskRoot/.build/esp8266-tools/tools/xtensa-lx106-elf/esp-2020r3-49-gd5524c1-8.4.0/xtensa-lx106-elf/bin"
-    $env:PATH = "$taskRoot/.build/esp8266-python/Scripts;$taskCompiler;$taskRoot/.build/esp8266-tools/tools/ninja/1.9.0;$taskRoot/.build/esp8266-tools/tools/mconf/v4.6.0.0-idf-20190628/mconf-v4.6.0.0-idf-20190628-win32;$env:PATH"
+    $env:IDF_TOOLS_PATH = "$taskRuntime/esp8266-tools"
+    $taskCompiler = "$taskRuntime/esp8266-tools/tools/xtensa-lx106-elf/esp-2020r3-49-gd5524c1-8.4.0/xtensa-lx106-elf/bin"
+    $env:PATH = "$taskRuntime/esp8266-python/Scripts;$taskCompiler;$taskRuntime/esp8266-tools/tools/ninja/1.9.0;$taskRuntime/esp8266-tools/tools/mconf/v4.6.0.0-idf-20190628/mconf-v4.6.0.0-idf-20190628-win32;$env:PATH"
     New-Item -ItemType Directory -Path $taskBuild -Force | Out-Null
     # Inherit canonical I2S PDM/codec/RAM/flash defaults, suppress routine logs.
     $taskDefaults = Get-Content esp8266/rtos-sdk-native/sdkconfig.defaults -Raw
@@ -183,7 +193,7 @@ try {
     $taskOpusPcmLeases = if ($OpusPcmLeases) { 'ON' } else { 'OFF' }
     $taskOpusPcmQueue = if ($OpusPcmQueue) { 'ON' } else { 'OFF' }
     $taskSdkRxDiag = if ($SdkRxDiag) { 'ON' } else { 'OFF' }
-    Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
+    Invoke-TaskTool "$taskRuntime/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
         "-DSDKCONFIG=$taskBuild/sdkconfig", "-DSDKCONFIG_DEFAULTS=$taskBuild/production.defaults",
         '-DYORADIO_ESP8266_FIXED_I2S=OFF', '-DYORADIO_ESP8266_SPI_PDM_FAST_ISR=ON',
@@ -208,6 +218,7 @@ try {
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT=$taskOpusBenchmarkOutput",
         "-DYORADIO_ESP8266_OPUS_STREAM_TEST=$taskOpusStreamTest",
         "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
+        "-DYORADIO_OPUS_BACKEND=$OpusBackend",
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
         "-DYORADIO_OPUS_FIR_FLASH_WORD=$taskOpusFirFlashWord",
         "-DYORADIO_OPUS_LOW_RAM=$taskOpusLowRam",
@@ -246,7 +257,7 @@ try {
     if ($taskLedEnabled -eq [bool]$NoAudioLevelLed) { throw 'Wrong cached LED profile; use a fresh -Variant build directory' }
     if ($taskLedEnabled -and $taskConfig -notmatch "(?m)^CONFIG_YORADIO_STATUS_LED_UPDATE_HZ=$LedUpdateHz`r?$") { throw 'Wrong cached LED refresh rate; use a fresh -Variant build directory' }
     Write-Output "Building $taskVariant, CPU160, QIO40"
-    Invoke-TaskTool "$taskRoot/.build/esp8266-tools/tools/ninja/1.9.0/ninja.exe" @('-C', $taskBuild) "$taskBuild/build.log"
+    Invoke-TaskTool "$taskRuntime/esp8266-tools/tools/ninja/1.9.0/ninja.exe" @('-C', $taskBuild) "$taskBuild/build.log"
     New-Item -ItemType Directory -Path $taskArtifact -Force | Out-Null
     Copy-Item "$taskBuild/yoradio_esp8266_helix_native.bin" "$taskArtifact/app.bin"
     Copy-Item "$taskBuild/sdkconfig" "$taskArtifact/sdkconfig"
@@ -260,6 +271,9 @@ try {
         opus_input_bytes=$(if ($taskOpusEnabled) { $OpusInputBytes } else { 0 })
         opus_scratch_bytes=$(if ($taskOpusEnabled) { $OpusScratchBytes } else { 0 })
         opus_low_ram=[bool]$OpusLowRam
+        opus_backend=$OpusBackend
+        opus_asm_manifest_sha256=$(if ($OpusBackend -ne 'c') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/manifest.json").Hash } else { $null })
+        opus_asm_optimization_sha256=$(if ($OpusBackend -eq 'optimized-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/optimized.json").Hash } else { $null })
         opus_plc_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/PLC.c").Hash
         opus_lpc_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/celt_lpc.c").Hash
         opus_memory_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/opus_memory.c").Hash

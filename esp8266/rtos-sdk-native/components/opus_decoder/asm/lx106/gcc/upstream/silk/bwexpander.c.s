@@ -1,0 +1,178 @@
+# Generated GCC baseline; DO NOT edit. Optimize with reviewed overlay patches.
+# Origin: upstream/silk/bwexpander.c; upstream licenses remain in upstream/COPYING and source headers.
+# Flags and hashes: asm/lx106/manifest.json. This is compiler output, not handwritten ASM.
+	.file	"bwexpander.c"
+# GNU C99 (crosstool-NG esp-2020r3-49-gd5524c1) version 8.4.0 (xtensa-lx106-elf)
+#	compiled by GNU C version 6.3.0 20170516, GMP version 6.1.2, MPFR version 4.0.1, MPC version 1.1.0, isl version isl-0.19-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed:
+# -I C:/Work/yoRadio/.build/esp8266-opus-baseline6144-raw192/config
+# -I @OPUS@/.
+# -I @OPUS@/upstream/include
+# -I @OPUS@/upstream/celt
+# -I @OPUS@/upstream/silk
+# -I @OPUS@/upstream/silk/fixed
+# -I @OPUS@/upstream/src
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include
+# -I C:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include
+# -iprefix c:\work\yoradio\.build\esp8266-tools\tools\xtensa-lx106-elf\esp-2020r3-49-gd5524c1-8.4.0\xtensa-lx106-elf\bin\../lib/gcc/xtensa-lx106-elf/8.4.0/
+# -MMD @OPUS@\asm\lx106\gcc\upstream\silk\bwexpander.c.s.d
+# -MF @OPUS@\asm\lx106\gcc\upstream\silk\bwexpander.c.s.raw.d
+# -MQ @OPUS@\asm\lx106\gcc\upstream\silk\bwexpander.c.s.raw
+# -D USING_IBUS_FASTER_GET -D YORADIO_OPUS_BOUNDED=1
+# -D YORADIO_OPUS_FIR_FLASH_WORD=1 -D YORADIO_OPUS_ICDF_FLASH_WORD=1
+# -D YORADIO_OPUS_PROFILE_STAGE=0 -D YORADIO_OPUS_WORD_ASM=1
+# -D __ESP_FILE__=__FILE__ -D _GNU_SOURCE -D IDF_VER="v3.4"
+# -D GCC_NOT_5_2_0 -D ESP_PLATFORM
+# @OPUS@\upstream\silk\bwexpander.c
+# -mlongcalls
+# -auxbase-strip @OPUS@\asm\lx106\gcc\upstream\silk\bwexpander.c.s.raw
+# -g0 -Os -O3 -Wno-frame-address -Wall -Werror=all
+# -Wno-error=unused-function -Wno-error=unused-but-set-variable
+# -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wextra
+# -Wno-unused-parameter -Wno-sign-compare -Wno-old-style-declaration
+# -std=gnu99 -ffunction-sections -fdata-sections
+# -fstrict-volatile-bitfields -fwrapv -fverbose-asm
+# options enabled:  -faggressive-loop-optimizations -falign-functions
+# -falign-jumps -falign-labels -falign-loops -fauto-inc-dec
+# -fbranch-count-reg -fcaller-saves -fchkp-check-incomplete-type
+# -fchkp-check-read -fchkp-check-write -fchkp-instrument-calls
+# -fchkp-narrow-bounds -fchkp-optimize -fchkp-store-bounds
+# -fchkp-use-static-bounds -fchkp-use-static-const-bounds
+# -fchkp-use-wrappers -fcode-hoisting -fcombine-stack-adjustments -fcommon
+# -fcompare-elim -fcprop-registers -fcrossjumping -fcse-follow-jumps
+# -fdata-sections -fdefer-pop -fdelete-null-pointer-checks -fdevirtualize
+# -fdevirtualize-speculatively -fearly-inlining
+# -feliminate-unused-debug-types -fexpensive-optimizations
+# -fforward-propagate -ffp-int-builtin-inexact -ffunction-cse
+# -ffunction-sections -fgcse -fgcse-after-reload -fgcse-lm -fgnu-runtime
+# -fgnu-unique -fguess-branch-probability -fhoist-adjacent-loads -fident
+# -fif-conversion -fif-conversion2 -findirect-inlining -finline
+# -finline-atomics -finline-functions -finline-functions-called-once
+# -finline-small-functions -fipa-bit-cp -fipa-cp -fipa-cp-clone -fipa-icf
+# -fipa-icf-functions -fipa-icf-variables -fipa-profile -fipa-pure-const
+# -fipa-ra -fipa-reference -fipa-sra -fipa-vrp -fira-hoist-pressure
+# -fira-share-save-slots -fira-share-spill-slots
+# -fisolate-erroneous-paths-dereference -fivopts -fkeep-static-consts
+# -fleading-underscore -flifetime-dse -floop-interchange
+# -floop-unroll-and-jam -flra-remat -flto-odr-type-merging -fmath-errno
+# -fmerge-constants -fmerge-debug-strings -fmove-loop-invariants
+# -fomit-frame-pointer -foptimize-sibling-calls -foptimize-strlen
+# -fpartial-inlining -fpeel-loops -fpeephole -fpeephole2 -fplt
+# -fpredictive-commoning -fprefetch-loop-arrays -freg-struct-return
+# -freorder-functions -frerun-cse-after-loop
+# -fsched-critical-path-heuristic -fsched-dep-count-heuristic
+# -fsched-group-heuristic -fsched-interblock -fsched-last-insn-heuristic
+# -fsched-rank-heuristic -fsched-spec -fsched-spec-insn-heuristic
+# -fsched-stalled-insns-dep -fschedule-fusion -fschedule-insns
+# -fschedule-insns2 -fsemantic-interposition -fshow-column -fshrink-wrap
+# -fshrink-wrap-separate -fsigned-zeros -fsplit-ivs-in-unroller
+# -fsplit-loops -fsplit-paths -fsplit-wide-types -fssa-backprop
+# -fssa-phiopt -fstdarg-opt -fstore-merging -fstrict-aliasing
+# -fstrict-volatile-bitfields -fsync-libcalls -fthread-jumps
+# -ftoplevel-reorder -ftrapping-math -ftree-bit-ccp -ftree-builtin-call-dce
+# -ftree-ccp -ftree-ch -ftree-coalesce-vars -ftree-copy-prop -ftree-cselim
+# -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-forwprop -ftree-fre
+# -ftree-loop-distribute-patterns -ftree-loop-distribution
+# -ftree-loop-if-convert -ftree-loop-im -ftree-loop-ivcanon
+# -ftree-loop-optimize -ftree-loop-vectorize -ftree-parallelize-loops=
+# -ftree-partial-pre -ftree-phiprop -ftree-pre -ftree-pta -ftree-reassoc
+# -ftree-scev-cprop -ftree-sink -ftree-slp-vectorize -ftree-slsr -ftree-sra
+# -ftree-switch-conversion -ftree-tail-merge -ftree-ter -ftree-vrp
+# -funit-at-a-time -funswitch-loops -fverbose-asm -fwrapv
+# -fzero-initialized-in-bss -mserialize-volatile
+
+	.text
+	.section	.text.silk_bwexpander,"ax",@progbits
+	.literal_position
+	.literal .LC0, -65536
+	.align	4
+	.global	silk_bwexpander
+	.type	silk_bwexpander, @function
+# Function: silk_bwexpander
+# Module: upstream/silk/bwexpander.c
+# Fixed-point Opus SILK processing; see C source context below.
+# ABI: LX106 call0, arguments a2..a7 then caller stack; result a2 (a2/a3 for 64-bit).
+# Callee preserves a12..a15 and a1; leaf/stack use is visible in the prologue.
+# GCC-specialized clones may remove/reorder arguments: use annotated operands below.
+# Memory: retain exact load/store widths. IRAM data requires aligned 32-bit accesses.
+# C context: #include "SigProc_FIX.h"
+# C context:
+# C context: /* Chirp (bandwidth expand) LP AR filter */
+# C context: void silk_bwexpander(
+# C context: opus_int16                  *ar,                /* I/O  AR filter to be expanded (without leading 1)                */
+# C context: const opus_int              d,                  /* I    Length of ar                                                */
+# C context: opus_int32                  chirp_Q16           /* I    Chirp factor (typically in the range 0 to 1)                */
+# C context: )
+silk_bwexpander:
+# @OPUS@\upstream\silk\bwexpander.c:42:     opus_int32 chirp_minus_one_Q16 = chirp_Q16 - 65536;
+	l32r	a9, .LC0	#, tmp75
+# @OPUS@\upstream\silk\bwexpander.c:46:     for( i = 0; i < d - 1; i++ ) {
+	addi.n	a5, a3, -1	# tmp76, d,
+# @OPUS@\upstream\silk\bwexpander.c:42:     opus_int32 chirp_minus_one_Q16 = chirp_Q16 - 65536;
+	add.n	a9, a4, a9	# chirp_minus_one_Q16, chirp_Q16, tmp75
+# @OPUS@\upstream\silk\bwexpander.c:46:     for( i = 0; i < d - 1; i++ ) {
+	blti	a5, 1, .L2	# tmp76,,
+	addi	a8, a2, -2	# tmp77, ar,
+	slli	a5, a3, 1	# tmp78, d,
+	mov.n	a7, a2	# ivtmp$6, ar
+	add.n	a8, a8, a5	# _71, tmp77, tmp78
+.L3:
+# @OPUS@\upstream\silk\bwexpander.c:47:         ar[ i ]    = (opus_int16)silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, ar[ i ]             ), 16 );
+	l16si	a5, a7, 0	# MEM[base: _81, offset: 0B], tmp79
+# @OPUS@\upstream\silk\bwexpander.c:48:         chirp_Q16 +=             silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, chirp_minus_one_Q16 ), 16 );
+	mull	a6, a9, a4	# tmp86, chirp_minus_one_Q16, chirp_Q16
+# @OPUS@\upstream\silk\bwexpander.c:47:         ar[ i ]    = (opus_int16)silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, ar[ i ]             ), 16 );
+	mull	a5, a5, a4	# tmp82, tmp79, chirp_Q16
+# @OPUS@\upstream\silk\bwexpander.c:48:         chirp_Q16 +=             silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, chirp_minus_one_Q16 ), 16 );
+	srai	a6, a6, 15	# tmp87, tmp86,
+# @OPUS@\upstream\silk\bwexpander.c:47:         ar[ i ]    = (opus_int16)silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, ar[ i ]             ), 16 );
+	srai	a5, a5, 15	# tmp83, tmp82,
+	addi.n	a5, a5, 1	# tmp84, tmp83,
+	srai	a5, a5, 1	# tmp85, tmp84,
+# @OPUS@\upstream\silk\bwexpander.c:48:         chirp_Q16 +=             silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, chirp_minus_one_Q16 ), 16 );
+	addi.n	a6, a6, 1	# tmp88, tmp87,
+# @OPUS@\upstream\silk\bwexpander.c:47:         ar[ i ]    = (opus_int16)silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, ar[ i ]             ), 16 );
+	s16i	a5, a7, 0	# MEM[base: _81, offset: 0B], tmp85
+# @OPUS@\upstream\silk\bwexpander.c:48:         chirp_Q16 +=             silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, chirp_minus_one_Q16 ), 16 );
+	srai	a5, a6, 1	# _14, tmp88,
+	addi.n	a7, a7, 2	# ivtmp$6, ivtmp$6,
+# @OPUS@\upstream\silk\bwexpander.c:48:         chirp_Q16 +=             silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, chirp_minus_one_Q16 ), 16 );
+	add.n	a4, a4, a5	# chirp_Q16, chirp_Q16, _14
+# @OPUS@\upstream\silk\bwexpander.c:46:     for( i = 0; i < d - 1; i++ ) {
+	bne	a8, a7, .L3	# _71, ivtmp$6,
+.L2:
+# @OPUS@\upstream\silk\bwexpander.c:50:     ar[ d - 1 ] = (opus_int16)silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, ar[ d - 1 ] ), 16 );
+	slli	a3, a3, 1	# tmp89, d,
+	addi	a3, a3, -2	# tmp91, tmp89,
+	add.n	a2, a2, a3	# _19, ar, tmp91
+	l16si	a3, a2, 0	# *_19, tmp92
+	mull	a3, a3, a4	# tmp95, tmp92, chirp_Q16
+	srai	a3, a3, 15	# tmp96, tmp95,
+	addi.n	a3, a3, 1	# tmp97, tmp96,
+	srai	a3, a3, 1	# tmp98, tmp97,
+# @OPUS@\upstream\silk\bwexpander.c:50:     ar[ d - 1 ] = (opus_int16)silk_RSHIFT_ROUND( silk_MUL( chirp_Q16, ar[ d - 1 ] ), 16 );
+	s16i	a3, a2, 0	# *_19, tmp98
+# @OPUS@\upstream\silk\bwexpander.c:51: }
+	ret.n
+	.size	silk_bwexpander, .-silk_bwexpander
+	.ident	"GCC: (crosstool-NG esp-2020r3-49-gd5524c1) 8.4.0"

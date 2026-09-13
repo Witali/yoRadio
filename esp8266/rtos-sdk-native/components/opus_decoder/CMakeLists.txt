@@ -1,3 +1,11 @@
+set(YORADIO_OPUS_BACKEND "c" CACHE STRING "Opus implementation: c, gcc-asm, optimized-asm")
+set_property(CACHE YORADIO_OPUS_BACKEND PROPERTY STRINGS c gcc-asm optimized-asm)
+if(NOT YORADIO_OPUS_BACKEND MATCHES "^(c|gcc-asm|optimized-asm)$")
+  message(FATAL_ERROR "Unknown YORADIO_OPUS_BACKEND")
+endif()
+if(NOT CONFIG_YORADIO_OGG_OPUS AND NOT YORADIO_OPUS_BACKEND STREQUAL "c")
+  message(FATAL_ERROR "Opus ASM backend requires CONFIG_YORADIO_OGG_OPUS")
+endif()
 if(CONFIG_YORADIO_OGG_OPUS)
   option(YORADIO_OPUS_LOW_RAM "Diagnostic SILK loan, compact autocorrelation and PLC IRAM" OFF)
   if(YORADIO_OPUS_LOW_RAM AND NOT YORADIO_ESP8266_DIAGNOSTIC)
@@ -26,6 +34,9 @@ if(CONFIG_YORADIO_OGG_OPUS)
   endif()
   file(GLOB OPUS_SOURCES upstream/src/*.c upstream/celt/*.c
        upstream/silk/*.c upstream/silk/fixed/*.c)
+  if(NOT YORADIO_OPUS_BACKEND STREQUAL "c")
+    include(asm/select.cmake)
+  endif()
   idf_component_register(SRCS ${OPUS_SOURCES}
       opus_memory.c opus_stage_profile.c opus_rotation_lx106.S ogg_opus_demux.c native_opus.c
       INCLUDE_DIRS . upstream/include
@@ -59,6 +70,11 @@ if(CONFIG_YORADIO_OGG_OPUS)
     target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_DIV_ONCE=1)
   endif()
   target_compile_options(${COMPONENT_LIB} PRIVATE -O3 -fwrapv -fstack-usage)
+  # The SDK sets -mlongcalls for C/C++, but not ASM. Preserve the GCC export
+  # assembler relaxation for calls from flash to ROM/IRAM and libgcc.
+  if(NOT YORADIO_OPUS_BACKEND STREQUAL "c")
+    target_compile_options(${COMPONENT_LIB} PRIVATE "$<$<COMPILE_LANGUAGE:ASM>:-mlongcalls>" "$<$<COMPILE_LANGUAGE:ASM>:-g0>")
+  endif()
 else()
   idf_component_register()
 endif()

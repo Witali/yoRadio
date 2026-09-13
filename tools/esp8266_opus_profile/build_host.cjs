@@ -39,7 +39,8 @@ function dependencies(depfile) {
   return text.slice(text.indexOf(':') + 1).trim().split(/\s+/).filter(Boolean).map(nativePath);
 }
 
-async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false } = {}) {
+async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false, asmEntropyModel = false } = {}) {
+  if (asmEntropyModel && !bounded) throw Error('asmEntropyModel requires bounded decoder.');
   if (silkPlcIram && !bounded) throw Error('silkPlcIram requires bounded decoder.');
   if (autocorrCompact && !bounded) throw Error('autocorrCompact requires bounded decoder.');
   if (silkScratch && !bounded) throw Error('silkScratch requires bounded decoder.');
@@ -53,7 +54,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   const sourceRoot = upstreamRoot ? path.resolve(upstreamRoot) : upstream;
   if (fastInt64 !== undefined && !fs.readFileSync(path.join(sourceRoot, 'celt/arch.h'), 'utf8').includes('#ifndef OPUS_FAST_INT64'))
     throw Error('Selected upstream does not support an OPUS_FAST_INT64 override; use a documented diagnostic copy.');
-  const out = path.join(root, '.build/esp8266-opus-host' + (silkPlcIram ? '-plc-iram' : '') + (autocorrCompact ? '-autocorr-compact' : '') + (sanitize ? '-sanitize' : '') + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
+  const out = path.join(root, '.build/esp8266-opus-host' + (asmEntropyModel ? '-asm-model' : '') + (silkPlcIram ? '-plc-iram' : '') + (autocorrCompact ? '-autocorr-compact' : '') + (sanitize ? '-sanitize' : '') + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
     (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (profileStage ? '-stage-' + profileStage : '') + (celtDecodeOnly ? '-celt-decode-only' : '') + (divOnce ? '-div-once' : '') + (pcmLeases ? '-pcm-leases' : '') + (silkScratch ? '-silk-scratch' : ''));
   const linkFlags = sanitize ? ['-fsanitize=address,undefined', '-fno-sanitize-recover=all'] : [];
   const binary = path.join(out, 'probe');
@@ -61,6 +62,11 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
     fs.readdirSync(path.join(sourceRoot, dir)).filter(file => file.endsWith('.c')).sort()
       .map(file => path.join(sourceRoot, dir, file)));
   if (bounded) sources.push(path.join(component, 'opus_memory.c'));
+  if (asmEntropyModel) {
+    const generated = require('../esp8266_opus_asm/model.cjs').generateModel();
+    sources[sources.indexOf(path.join(sourceRoot, 'celt/entdec.c'))] = generated.reference;
+    sources.push(generated.model);
+  }
   if (profileStage) sources.push(path.join(component, 'opus_stage_profile.c'));
   sources.push(path.join(__dirname, 'probe.c'));
   const flags = ['-O2', '-std=c99', '-fwrapv', '-ffunction-sections', '-fdata-sections',
@@ -78,7 +84,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
     ...['include', 'celt', 'silk', 'silk/fixed', 'src'].map(dir => '-I' + hostPath(path.join(sourceRoot, dir)))];
   const objects = sources.map(source => path.join(out, 'objects',
     source.startsWith(sourceRoot + path.sep) ? path.join('upstream', path.relative(sourceRoot, source)) + '.o' :
-      source.startsWith(component + path.sep) ? path.relative(component, source) + '.o' : 'probe.c.o'));
+      source.startsWith(component + path.sep) ? path.relative(component, source) + '.o' : path.basename(source) + '.o'));
   const buildfile = path.join(out, 'build.json');
   const previous = fs.existsSync(buildfile) ? JSON.parse(fs.readFileSync(buildfile, 'utf8')) : null;
   if (noBuild) {

@@ -1,0 +1,7033 @@
+{
+  "schema": 1,
+  "compiler": "xtensa-lx106-elf-gcc.exe (crosstool-NG esp-2020r3-49-gd5524c1) 8.4.0",
+  "cpu": "LX106",
+  "abi": "call0",
+  "optimization": "O3",
+  "fixed_point": true,
+  "kind": "GCC-generated baseline, not handwritten",
+  "feature_defines": [
+    "YORADIO_OPUS_BOUNDED=1",
+    "YORADIO_OPUS_FIR_FLASH_WORD=1",
+    "YORADIO_OPUS_ICDF_FLASH_WORD=1",
+    "YORADIO_OPUS_PROFILE_STAGE=0",
+    "YORADIO_OPUS_WORD_ASM=1"
+  ],
+  "source_commit": "c470f5595dccd44b1b53c67799f3d636b2f1e8a5",
+  "protected_sources": {
+    "upstream/celt/_kiss_fft_guts.h": "0214dfe2aabb3b81d88fe814b8253fc2ec6da12bbbc98e08c1011a5bd60e3b29",
+    "upstream/celt/arch.h": "3ebe56f61e0ccc0ddf0a44f47e230c6e2dc3eee3600b479f19a6adcc6ca5c177",
+    "upstream/celt/bands.c": "f34dfa5f70c5f42dc43cb5d9fe618ad5f1f9abbc12fdccc525d54497a56ee760",
+    "upstream/celt/bands.h": "e82626dde655c9e7c97d247b54739587ee5af1f840ce32efae32cd7184129591",
+    "upstream/celt/celt.c": "7fc63f4f65f0bea60af57ab90e7fcfb08c01f8066e77088a0ae0c19f23185ebf",
+    "upstream/celt/celt.h": "310d09b94f97b639c3c9fcc701da0c12479bb0c956592f474d77b22f2f1f2d28",
+    "upstream/celt/celt_decoder.c": "bd3bd2b0082a2e0cdff65d43882eca1f3ed6734dc4de04ab3e1a33f8392b5e05",
+    "upstream/celt/celt_lpc.c": "11cf6e09bfefbc0e79688f5a32cc9dbee205509d6239a4967e63674129ac4585",
+    "upstream/celt/celt_lpc.h": "02f9b93d364d80c0a2cf41593b0b249b5dd82eabe543cbf439dfeb5c7ceeb8fe",
+    "upstream/celt/config.h": "329941aac22bf5ce1411bf2ab7518a3d87f84e3e87dc869cc0a7c08afa448037",
+    "upstream/celt/cpu_support.h": "02bf67720c974a87fa96aad556c4847acc3370ecd16a95170193724197bc9c0e",
+    "upstream/celt/cwrs.c": "7cf571339a139063b6a6b3d29b32cdb0760cda81307f14eab0bfae40eecaa520",
+    "upstream/celt/cwrs.h": "7705be67d58e7fbdea384dde5f3c404ef814fbb8ecbfca61f731d11e8201bdc7",
+    "upstream/celt/ecintrin.h": "c1100f45bdf70d2243740a7891a5def54cf483b51d024a35ac915b630639b556",
+    "upstream/celt/entcode.c": "9df7a4830a2466e7d77c46359607d77a8a5ce08037d0f49572a106b02085c1df",
+    "upstream/celt/entcode.h": "08b8432b85d844efe4357a1ab6a3b4573d325d50ea918179b5d38384ee256d0c",
+    "upstream/celt/entdec.c": "7e26c38ce429596b1281894894b583b0caa82cba5ced753ee5d5705fe365d5f6",
+    "upstream/celt/entdec.h": "31485453c516ad9be38a03b50a3c450fd5a9b7c7fad2d9e6c05357fd07efe0a9",
+    "upstream/celt/entenc.c": "23694e69bcd49510f4e6a2e40b849e67dea65f8e0b5726adf60d1ed9535b6478",
+    "upstream/celt/entenc.h": "1d94e58c8c007d4012fbdc85c365fb68f9a1a75af100f5f61d259d886434c8a5",
+    "upstream/celt/fixed_generic.h": "0185be2436b154667da33fc7bd8af6c07290980681c767fb2d3c89985cf7d308",
+    "upstream/celt/float_cast.h": "eb057e62df3e9fb1d4d9bb4a25804e89886037a7c5465bc8f1069570e572b003",
+    "upstream/celt/kiss_fft.c": "5f2d308de8fc9cbbb3b9ddc52d0dabb19ebdc6a91a95a4ca8a981afa2e0e9c9b",
+    "upstream/celt/kiss_fft.h": "4d527e0570217179632b49f7eb720ffb6bb3068a49c9700f2599e9ad42406dcc",
+    "upstream/celt/laplace.c": "ba82b13169c6655756ed295e9f08ebeb1d22bb7217334eee3bdaecf9f1f464e2",
+    "upstream/celt/laplace.h": "27102a1e7f24879c6871df971b7215b119d574bc25a3af9740c343d3b285ae82",
+    "upstream/celt/mathops.c": "1bb9acef1450ce67d6cd63f007e8fcc3ca5ccfea4c9b22131d853da5d9298510",
+    "upstream/celt/mathops.h": "345123aa43380536d4c2d18faa560698af274825ac5fb02288c507f7f1519a97",
+    "upstream/celt/mdct.c": "886e209ac71bc53c752e709148476c9dd374b69eec935c588b509a85e094b8e6",
+    "upstream/celt/mdct.h": "c70bd44adeaccc26aa70c8678acb4f0ecb6371c2290741ffe87c44ab3f03ab3a",
+    "upstream/celt/mfrngcod.h": "5974c2341889a1c2e9775c2a21b3a55d4cbc1ebef90fe4412789aca4f4a19504",
+    "upstream/celt/modes.c": "12d2f63b668328261473218ef8b96ad38c383a6df171c8176531c04e13ce9923",
+    "upstream/celt/modes.h": "c38ac61f218a9ff27a0222bb2ebffe9bd8203041fa0a38fe733ece7f1bed0b1a",
+    "upstream/celt/opus_custom.h": "606743c93f41ead33bd037b283f796dd0d533da7423f89e95b4bdc95eb89bc2d",
+    "upstream/celt/opus_defines.h": "ccc671b9be24a459e443ce78c16e181ddbcfafe8d516c216d63fa57795a8626f",
+    "upstream/celt/opus_types.h": "592f58cd56b0f719b1441d3db55725b1719c4dbecaf48d57b8b808a27dc9b4d6",
+    "upstream/celt/os_support.h": "c5f65d6e1e4a32609d87a44e59a8de6eb270647d59fca0c65e62590d470f235a",
+    "upstream/celt/pitch.c": "f0cb85414a8daf2e253a7a4a674646652ef817df40e32bffe5aa3b2bbe7bbb21",
+    "upstream/celt/pitch.h": "9104a47681a39cb58051869434af85557fe0d31aab16d73ddb4ca508b6cb5877",
+    "upstream/celt/quant_bands.c": "a09e566d18906aabe0ffe65bd9b58a695c8aa1ff7da5ceebcf32d7e7b50c816d",
+    "upstream/celt/quant_bands.h": "fbe7d733d3dcfd7d2fd3436fb50a62c62a327997b479c9c72770900b7e6abfe0",
+    "upstream/celt/rate.c": "5bc158186d35553e6155d0afdcf46de2b9ba02dba9cac541d0a6f847848e799a",
+    "upstream/celt/rate.h": "fd7d4e7263e57fe57f6d0e2d9c8bf0e59a98ade0d5af561ebbc2df40328a28a6",
+    "upstream/celt/stack_alloc.h": "2c5c6f1a3bdeadbfa1721ea10eb5cd29834d8b0d5a5838781920a4ab0cc3e1bc",
+    "upstream/celt/static_modes_fixed.h": "fd5405b0b95073d6fa8810395a79a50e9457de20a4eb65e67421c01da01ce7c6",
+    "upstream/celt/vq.c": "3f669c0e96e23c029cd2bdfbf2ffbc49cab96a55df46f5150060e12207deb4ef",
+    "upstream/celt/vq.h": "7ae88b5432a9ddd666ab61c9a608107535a7ecc7126df5a42787147049abc1ae",
+    "upstream/silk/A2NLSF.c": "7aca2e48d7bca2542b0344bb49ea40c2b8114caf9df96071e91a4767342a046a",
+    "upstream/silk/API.h": "09005f6b5df3cff217181ea542cb80ab326d2264d8c64c5244749614d205406d",
+    "upstream/silk/CNG.c": "89883e6b8af734b7e5642b4415c071c05201ebd8ba47b16903eac6866eccfd61",
+    "upstream/silk/HP_variable_cutoff.c": "8ee927910605060c1424568dd071c851f58a8ce47c6fb8e8b827d2f498c68362",
+    "upstream/silk/Inlines.h": "d8d637375bd1e1525ba20dfb9103781becabd9aef9decd64cc3a5402cbc2e838",
+    "upstream/silk/LPC_analysis_filter.c": "c75b7e1a321e742d3433bd0527a8417ea9a2d66c7c9aad3b122959022a1c561a",
+    "upstream/silk/LPC_fit.c": "6bb5aaf1d62d6ff4f40d5ffbaf2e0ca2c436b50249f42e5c29cd338adce0f0aa",
+    "upstream/silk/LPC_inv_pred_gain.c": "27a76fd7f5d661bcc40e65e4862fbfb95978cf0ecfa4c8422c529f3d0c6dd97c",
+    "upstream/silk/LP_variable_cutoff.c": "ece3b5dbbd56c69ee43f0cce4ffc49afc344ee63c084267b62f595a8e926d87b",
+    "upstream/silk/MacroCount.h": "d6cf28f491e4521002c2569e6a08a2edf07fa0e3e57b86aab4b9938bb5f06a9a",
+    "upstream/silk/MacroDebug.h": "aefab84ea6848a81b1c48bbcf60935f70751ded68853d5c7d0ebb1249bd75773",
+    "upstream/silk/NLSF2A.c": "403d1532b220a0d423f144b21bbaae25662fde36617df835786750232b69b217",
+    "upstream/silk/NLSF_VQ.c": "9b44e8f406d83591bb7d0caaedd8f355bf226d391df9a95041155425b019e8a7",
+    "upstream/silk/NLSF_VQ_weights_laroia.c": "020ca1026acd01ed9a24e2ec973ca7e13ad9bee380daf4532742667ba29b33de",
+    "upstream/silk/NLSF_decode.c": "1a6b4f544ac86dde6617279735e45a156ec532be9b5b27aca9a94abd5c151c73",
+    "upstream/silk/NLSF_del_dec_quant.c": "40a83dd5afeaf66f7a06d11bd1b2789697b405e6936dac5ce9c405d7ce489088",
+    "upstream/silk/NLSF_encode.c": "ed3cb5948f4f6a141c2044b2d4a0baf24d20c25e833f601ffe71f780d9f517e5",
+    "upstream/silk/NLSF_stabilize.c": "783f778941e36e7e6e57112657a1bc32d348f1c8e7d580807e1d8386c3f51bcd",
+    "upstream/silk/NLSF_unpack.c": "caf93ce0ade5db6fef66cc3f5ee84d618c285e8abf209b0825d8f470f1915185",
+    "upstream/silk/PLC.c": "795e271af059c36297360624b1b19fd50089ed5862bf9a1fc2d035d77338266d",
+    "upstream/silk/PLC.h": "5b895f276954967fc43beec3a34395eee7c21f0b34e72278f12aeb02429fb3ec",
+    "upstream/silk/SigProc_FIX.h": "5ece0b4b125f14e1bc5b24dd6e5b3cf59faff7f375ad084d0c87369fa30ed88c",
+    "upstream/silk/VQ_WMat_EC.c": "86f88436532f0c2beab906fbdcc3e0c0a35b938e1aa67ee924ff2e049f1d0747",
+    "upstream/silk/ana_filt_bank_1.c": "eaa57272e342d5d107ba7cc58ed08d58898f84596618dc57f9ca471f5862c85d",
+    "upstream/silk/arch.h": "0758a1b151f6e0b6b4cdc0166bb35c41ab2e1aaf213db23312ad7fb77c75ed9b",
+    "upstream/silk/biquad_alt.c": "a2db5a19df2a21fff8dc2e46e7a0a3bedc8829b4b84acdd54fe5159d0d849593",
+    "upstream/silk/bwexpander.c": "fc15c0b29f0f19be9008b8960eabaa1da6bdfbf94c9dcd85c108fc3cfd41fb85",
+    "upstream/silk/bwexpander_32.c": "e307bc7a8cca2fea917dd0a032722f66e2f069c13b06f3ca68ee83418ff6b2b3",
+    "upstream/silk/celt_lpc.h": "3064b8cb8c3acc05cb78f9c6a2eef5a3bafd687859e6e62b9242710b05165d69",
+    "upstream/silk/check_control_input.c": "090574b4c492ef4754454c6577bc6dde21993211a6f7287f4dafd0ffa2c6900d",
+    "upstream/silk/code_signs.c": "36458eaa27481b955f98f5755dee4dff2ce23f868f8fe9195cf1484f9ebf6a10",
+    "upstream/silk/config.h": "7bb393052e17439c1dc883924e643bcf99a6a952c6dea2583e0f67af44a734dc",
+    "upstream/silk/control.h": "19de9db5a13970beac7e403caae865779765941d5691624a0c65d414fd32fa0b",
+    "upstream/silk/control_SNR.c": "42633a0e336aedcdd32dca14e87bc6b24d88f5bc5bf7057e6f1c4dffe2be3a0b",
+    "upstream/silk/control_audio_bandwidth.c": "e40202554d3033e3f8a4830fc6e4a050c8c82801e533a2f6f7f23e5aa468a92e",
+    "upstream/silk/control_codec.c": "cd49e266e81371bc0cd158c5c03ff961d98b8b23cfc639bb9089dbc0eebbda2f",
+    "upstream/silk/cpu_support.h": "04497bbe75882f5c3a21fffd163fcc40ece0627d0ea0902056768da7663fef38",
+    "upstream/silk/debug.c": "fa00c137cde47da903fd2b20a193a314bfadb7a2dc7363d20880d27bc7cd072f",
+    "upstream/silk/debug.h": "90ac71f372fb650f3918e0c9b4144a0bd2874d0df0b308426187a5fd236955fd",
+    "upstream/silk/dec_API.c": "9f9af426af1daa932c77ccc226840567169c8bb5e1f43f5d22bde14e810c0805",
+    "upstream/silk/decode_core.c": "a82f1eaaed955cd8e63028b591749658b00616e46da2dea679844461d06b1d7e",
+    "upstream/silk/decode_frame.c": "08b65e7fa30ea8798d8ad4e281a6a9419951fc6aac9499fc2b5a5a53266dbba1",
+    "upstream/silk/decode_indices.c": "b149dc20615d61f76c69b7333ed3ef7a6eeb2715a141dbfc1474517d52be5d9b",
+    "upstream/silk/decode_parameters.c": "c2cb2581e2c6a34cffb07bd7daca72478c735f4f3860591000ce4a1d26629735",
+    "upstream/silk/decode_pitch.c": "f892dc0d2f8b5460b861a45b7e4f4214a984eed909e95abc31fc8b4dcd748eab",
+    "upstream/silk/decode_pulses.c": "dfaf085b43f489507d4d211fdd0ed0f13546ac8deff1746111362ca2aa3c9d4f",
+    "upstream/silk/decoder_set_fs.c": "2b217e5d11d18f2318770298836a54e82f25343b986f100d63f09e884e1a16db",
+    "upstream/silk/define.h": "78cabc3f77cf94fec0aee9044c5f117b29896a84e9f26815daf6e82f02b726d3",
+    "upstream/silk/ecintrin.h": "1620921ce31ff4043e87f8fac68cdb94259eaf5702e7470539b7f6c475b01515",
+    "upstream/silk/encode_indices.c": "da3c6df828ff933ad81348e94ee000308f762a10c7023640b52612578d882729",
+    "upstream/silk/encode_pulses.c": "dea9c1ef3d25c7baa28a8e59261c80cbee3c24c3f641d5a5fcb77db95d97469d",
+    "upstream/silk/entdec.h": "ad8621dba71ff85925a74be8f960735d2d98f7c958ecabffb4df8a807614e00c",
+    "upstream/silk/entenc.h": "d6c65e67e08e5337288e12030343c0d805247fdad1a9313d336d99b25b42661c",
+    "upstream/silk/errors.h": "3bbf21416af6475200e55cbfeacf8dccef88455e31352735e4d4fecdda84ddd6",
+    "upstream/silk/fixed/LTP_analysis_filter_FIX.c": "d8141c6f797f11f2a2c2c4b063459e25cf2254fa16667efd7dd1c5e9d5060cfd",
+    "upstream/silk/fixed/LTP_scale_ctrl_FIX.c": "9a3b40d42d8736ffbf89f3849fe20dbc9e334c158baeb45143c71dc9aa6b0af4",
+    "upstream/silk/fixed/PLC.h": "f972e4b7db916b73f0242ebf15b9168bda606c8b4cf6f886c2aff33f939efd1c",
+    "upstream/silk/fixed/SigProc_FIX.h": "b510bf00adf0f702a955ffb861ac8cd0b83e614a3663a66f81eadfd4d2070bd1",
+    "upstream/silk/fixed/apply_sine_window_FIX.c": "cd6095bf126076a321fe55843f62455bb9e9326fb61f0c718d2d9bd7baa88b0b",
+    "upstream/silk/fixed/autocorr_FIX.c": "93a1dcadd43981783d692161de642dc7e13de54e53e01afe67e73437499ef9f3",
+    "upstream/silk/fixed/burg_modified_FIX.c": "a60c05305bc20e46c969de79cae539dc9bdf67f77ef32033765bf8d12c9936c8",
+    "upstream/silk/fixed/celt_lpc.h": "2c0ec74ada1579f9da560eccd9d7d2b3625393655331564f5967b7ab62e6c457",
+    "upstream/silk/fixed/config.h": "0bc23aab861e0f77744a08200541950d8c06cc6219fc2309390b120092243571",
+    "upstream/silk/fixed/control.h": "75fcf338622d89db56e057fffe549bc666818375777bce7dbc06b332c051ea0d",
+    "upstream/silk/fixed/corrMatrix_FIX.c": "f2f41c998eb560da842cca83ebc62cc56d28c10c48960a984b9e0715e08883d3",
+    "upstream/silk/fixed/debug.h": "f9efd50b1705e50d23e44df4a02a3e21c876e24830e64037f2016eaba0d49c0b",
+    "upstream/silk/fixed/define.h": "70656345b1d87b09d841fb646154c7f865e35916b207c755bca0a3da6f34e240",
+    "upstream/silk/fixed/entenc.h": "238dc086008e78e163cbb21dc1a6338bcae01b6378c1dcbfaf0cf14fcd235c15",
+    "upstream/silk/fixed/find_LPC_FIX.c": "6595fcb823411bfcfa4ed95ccbd8388b2aeef2e7cbb9a1bfbd6cb9992ff60e9c",
+    "upstream/silk/fixed/find_LTP_FIX.c": "c8a13a3b0525cc9590fc11f7045f36920a54f9bf298910d6f33f9d64c4bf0e9e",
+    "upstream/silk/fixed/find_pred_coefs_FIX.c": "58318437f58f32d747d7c0f0f3d4a883ae26890d77a483f8e6b95b46bed369ba",
+    "upstream/silk/fixed/k2a_FIX.c": "ce275b00b9ea7ca99f846b31e35b6296befda6f475c56cf4be45d576c465be0d",
+    "upstream/silk/fixed/k2a_Q16_FIX.c": "87b68fd36c75788c2e756c5aa0d845e82e010f2e5a8e4cf865ed0ffa60a58391",
+    "upstream/silk/fixed/main.h": "e2d4393dc867d808bb48a3bbe2c49992e13f193407b786e5ecafb8e491ea8394",
+    "upstream/silk/fixed/main_FIX.h": "69c40d33a6da18d946773f2f0b3a02341a85a75182a956633b6c165334852e0b",
+    "upstream/silk/fixed/pitch.h": "d2c2980639b7c953108e61da14ccbd631a8860c3808284569acacea5f09d3c24",
+    "upstream/silk/fixed/process_gains_FIX.c": "5d3baae8ba95cd8858611f53965777d642d26196039d522c1d1fe29ff77fa9b6",
+    "upstream/silk/fixed/regularize_correlations_FIX.c": "8bef888dc96060989307fe427499ce226e1fc72f743c86b8595899e2ded376e4",
+    "upstream/silk/fixed/residual_energy16_FIX.c": "d6b8253b0ef60fdff38459817612dae560a5f6b32e6a3edbfe169af317d193e8",
+    "upstream/silk/fixed/residual_energy_FIX.c": "e2ea94d15a0640673c10cd4b9b2d3c3b83aa436f530cd060c81ecc4d2adec73d",
+    "upstream/silk/fixed/schur64_FIX.c": "382b19ae72f3ef06d09677e5820813390852bae2507965461e94ed40ebe6a0e7",
+    "upstream/silk/fixed/schur_FIX.c": "52c5678c5658fa18d20644cf3a03f93838d36d69e82465890e41d7b913271001",
+    "upstream/silk/fixed/stack_alloc.h": "053d3833fe2ba47f7051ea0433bfcda7cffe017183c6a3c16a38d2a46bd4ec12",
+    "upstream/silk/fixed/structs.h": "9471e3ffc01ccd18e3729be71cb7bd6bc91accb6ad3ad698e73fc482c84661b1",
+    "upstream/silk/fixed/structs_FIX.h": "a01a3611c279d8f8d56d75f609fae8d4d3788bbf09891fabb709f904630523c6",
+    "upstream/silk/fixed/tuning_parameters.h": "47c117cb30aa487b28ad0baf61f2065b67386afc4227f704e70f213f49ce763f",
+    "upstream/silk/fixed/typedef.h": "cfefa60c83c626b78eeb8f1ec7436c16ec1024886d989f7081180472dfa52afd",
+    "upstream/silk/fixed/vector_ops_FIX.c": "d28363008af9e6451750136d14fc4df8c44d09fe92210f83ab4d0a5487ebe69f",
+    "upstream/silk/fixed/warped_autocorrelation_FIX.c": "89c813de0d02d1ca806652374ddb920f88b08e8f7a69fda44240bef6b97564d4",
+    "upstream/silk/gain_quant.c": "9edcdbe658efbe43b366361f180dc699b1130c1f88f90bf10c9105c984f10ea8",
+    "upstream/silk/init_decoder.c": "098081ff0632d802988d45571aaf0b15417c036ec4c78706ea7ca4aca1d6c9b7",
+    "upstream/silk/inner_prod_aligned.c": "78e9d5d4692c2ac7bfdc7cc108fabcc78f7bcf14a4d5882f2b7ccce5bfd52ca8",
+    "upstream/silk/interpolate.c": "6f8cf8745124908c248e38ceed41e2b3568a41f41351b3e25fdf1af9982be5b2",
+    "upstream/silk/lin2log.c": "7a51a499749e33b2b8adc650f24eb3225aa73a2e98dca33058a400ba99565cdf",
+    "upstream/silk/log2lin.c": "91e923ceebe38e5d64c00a66dc14b5e2197381c92574a85040e60e3deb57d53e",
+    "upstream/silk/macros.h": "82ba3e4e241ac65c711634c8979f21a253bdbbf8a9dc2ec93a4a6342e1ca6813",
+    "upstream/silk/main.h": "3d981830c549cf5668c1ff45c58705150a2113307f66913f85d4d971ce5c9eee",
+    "upstream/silk/main_FIX.h": "8af404cc9ed53c64c1568e2922c92bea889215933ab1a27f59c0555a10a0fc2b",
+    "upstream/silk/opus_defines.h": "ccc671b9be24a459e443ce78c16e181ddbcfafe8d516c216d63fa57795a8626f",
+    "upstream/silk/opus_types.h": "592f58cd56b0f719b1441d3db55725b1719c4dbecaf48d57b8b808a27dc9b4d6",
+    "upstream/silk/os_support.h": "fba89e12c4bb2c71779f5a10bd1f157d04e0af40a348e182148ac267d06a9102",
+    "upstream/silk/pitch_est_defines.h": "ed1230792944c3cdbf1762f5e8a612baaf7349d66d57ade4764f5f7a0961dc98",
+    "upstream/silk/pitch_est_tables.c": "443594d2821212340c4f21d214b28ed2ce3ca449fd898191a49db73cfad4dc8e",
+    "upstream/silk/process_NLSFs.c": "3c569dfbe6a80b1134eae25bba6ed8ec541f86b14662502ba8e658cbaecef946",
+    "upstream/silk/quant_LTP_gains.c": "6b1f592fddb7238643c2a35dc691042f721d14200f45cade1f91d52737bee833",
+    "upstream/silk/resampler.c": "24886a95fc8aab01502e33932d7ad3364ec1bac516ac8431871dff680a7772f4",
+    "upstream/silk/resampler_down2.c": "6103c045450526d02a6ada7cdf1382e7e2c83ee0b7af8f9bd5f472b2ba42ae18",
+    "upstream/silk/resampler_down2_3.c": "00f635968fd6eb6f01d87771fad3e80353e3abce8a5d8ac5aaa2bd5038593941",
+    "upstream/silk/resampler_private.h": "b14e6d03394a911d15eb9860922b7ecdd346d07f728f262d22e42f7bfc17ea3c",
+    "upstream/silk/resampler_private_AR2.c": "b4ed9ade0170fff42c38de32473d04ba22f823fa78da4a32ecdc9c3c823ade90",
+    "upstream/silk/resampler_private_IIR_FIR.c": "711c5693575902756f90a674bf9db5adb6a8a7e233f5b82be3db7ebe4b71b5a9",
+    "upstream/silk/resampler_private_down_FIR.c": "29b276d027eba552a208a371dc043bc89fff6afaceee23e000e10835898cf346",
+    "upstream/silk/resampler_private_up2_HQ.c": "137afaa45fba2ae5a7e9c8ce2af5f4ca0a9d9e01a684e59cbb6af69fed62553c",
+    "upstream/silk/resampler_rom.c": "670ade48e05067524887d12add428b0121f774f44389d84af5c06a8384a301a4",
+    "upstream/silk/resampler_rom.h": "68088e0750482fa05be18d571a02b791576376e3cdc48fd2cc127cf333599efc",
+    "upstream/silk/resampler_structs.h": "b038e84c7d79bcd31bbf524dba64103d17ab66c5006cd2b6ad7ba3289226cd18",
+    "upstream/silk/shell_coder.c": "f54463a2cf918c9c876abbf397ac686e74d42724bc9107252e05fd0689cd1ec0",
+    "upstream/silk/sigm_Q15.c": "3c539b4dde8c7197aa8fda4e54117e0ea796eb261203afe42438c89bda8d2aa2",
+    "upstream/silk/sort.c": "06565ab1ebde95b4e593d7d99d30ee5652337791f8260dc95c5db6c8c240560a",
+    "upstream/silk/stack_alloc.h": "12ebdf46f1d6d93efd6b6a3b6acfa3deaebccfc61a4d54f76ff81e445d24981a",
+    "upstream/silk/stereo_LR_to_MS.c": "7045e59a6e5c49707a11e8f5adac7ff2f3a8438055afe9115f43e58f96d9963d",
+    "upstream/silk/stereo_MS_to_LR.c": "7d93879e47f71db11ceeacf4225cc7a02522d0a97c983f06349075dc80d8c543",
+    "upstream/silk/stereo_decode_pred.c": "5a0b4d1336e73d76fc319f841ef997e039fc20264d3b60ada9039af9d83df94a",
+    "upstream/silk/stereo_encode_pred.c": "aaeb2a5bc741f46049c251c8fb99f2338fcb5c33d63e3c548073f706e953725f",
+    "upstream/silk/stereo_find_predictor.c": "39d3ee565379b1727c502bcb58e9474192ecf831e9dbee73185f9781322b07b0",
+    "upstream/silk/stereo_quant_pred.c": "fecc90892aefc12f7b4a6171a74b1ec7a329ff00127db291673e6f212a6ba11e",
+    "upstream/silk/structs.h": "b2ed1cc9a80f7dd16134d2a964b765305c102df123fd33617319f5dfa862cf6b",
+    "upstream/silk/sum_sqr_shift.c": "9849bd84c1c1427eae321d5857eb900332f5488870352bdecf069f738fffd438",
+    "upstream/silk/table_LSF_cos.c": "252d28ee3536df99d55e8f471cb8f271b3300964bfcc8e7eaece9a5882f3f4bb",
+    "upstream/silk/tables.h": "ec392c03ba77e7a049fab3c504463f2c6710c4d2c4a777897007a7b0a1b9f959",
+    "upstream/silk/tables_LTP.c": "856574054503e8f316904d2cdbb8d48ddbe5bec18e2787004f81a6c29bb6e656",
+    "upstream/silk/tables_NLSF_CB_NB_MB.c": "73545475b0e7b89c6b0f252a563ae5eb83bdb8fa93f093a791e9c51bcce74c2d",
+    "upstream/silk/tables_NLSF_CB_WB.c": "6e070f5d09f76061fb1affdede32137fe6689fa63d4d47ac4b0c9122a251bdb7",
+    "upstream/silk/tables_gain.c": "37bde82e567e0dcd172bdc1a2867044b190d001a1c0a97c7bce67f3ba47eb9d8",
+    "upstream/silk/tables_other.c": "7d66f3167414bb957e218c2f1848074266a648327e223f25f34bb60c633f62c0",
+    "upstream/silk/tables_pitch_lag.c": "d1c00d859c1c4be406cf016653d4cb08b9a2f0395ed97bb6befd9a43726e9735",
+    "upstream/silk/tables_pulses_per_block.c": "53b124b186c44f464f8e5679ce78ec1a4a9b23406d4b33b4b22e559369e502a9",
+    "upstream/silk/tuning_parameters.h": "752c03100137fb26204db35af2d435912a80fefe848a6aac1f709757d53f204c",
+    "upstream/silk/typedef.h": "b14426bec77050ddc0c70de297a9f60d7289d5a56912d4074f71ec2231f7a441",
+    "upstream/src/API.h": "7431604d0384646dcd3eb6ff0558f7f5e9b1228f4976ed6bd2a486763ce20f5b",
+    "upstream/src/arch.h": "0758a1b151f6e0b6b4cdc0166bb35c41ab2e1aaf213db23312ad7fb77c75ed9b",
+    "upstream/src/celt.h": "858b78c5a99b01164a5b2468336110a113edc98aac523139cb2ad92fe30af2f8",
+    "upstream/src/config.h": "7bb393052e17439c1dc883924e643bcf99a6a952c6dea2583e0f67af44a734dc",
+    "upstream/src/cpu_support.h": "04497bbe75882f5c3a21fffd163fcc40ece0627d0ea0902056768da7663fef38",
+    "upstream/src/define.h": "eb4de13ce6e304ef7bced458c4acfa9b01d266339c0ff9af424d2b3c086d9c7d",
+    "upstream/src/entdec.h": "ad8621dba71ff85925a74be8f960735d2d98f7c958ecabffb4df8a807614e00c",
+    "upstream/src/float_cast.h": "3a1a2314d99acb366fdde2537df440eca0adfbcce39db3e09a8128b81364452b",
+    "upstream/src/mathops.h": "50d633529ab0b5ed9eb3234749d7939138f994b95049761d181568dfa65364c7",
+    "upstream/src/modes.h": "5443317d0b3530ab7fdee4fb07d7ca9fb36d6122e3462bcd6b2f851378daef41",
+    "upstream/src/opus.c": "92a8cd974199f850d87d98801f8cc7adbe5a5c015176c7dae44c39c37ea0b400",
+    "upstream/src/opus.h": "4f0d27bf1c04b6b55f82559ddf3fb59a1b1f390d5a5b1d09efe5dd254731a4dc",
+    "upstream/src/opus_decoder.c": "1b7cd3c83d0af7951a0ca844db3ca28156a89c0e5959a0be6fb2cc50ead66a7a",
+    "upstream/src/opus_private.h": "f1ef77713a0291194ddd118a3b8f874e0ab7f0b06692db9ac939197ca03d61c5",
+    "upstream/src/os_support.h": "fba89e12c4bb2c71779f5a10bd1f157d04e0af40a348e182148ac267d06a9102",
+    "upstream/src/stack_alloc.h": "12ebdf46f1d6d93efd6b6a3b6acfa3deaebccfc61a4d54f76ff81e445d24981a",
+    "upstream/src/structs.h": "6ff2e991182b8fb0253a842b197128bda75993f8b13fbe0a7e46479a9f99f693"
+  },
+  "files": [
+    {
+      "source": "upstream/celt/bands.c",
+      "asm": "gcc/upstream/celt/bands.c.s",
+      "source_sha256_lf": "f34dfa5f70c5f42dc43cb5d9fe618ad5f1f9abbc12fdccc525d54497a56ee760",
+      "asm_sha256_lf": "0a5986e669f2dd24d2beff59a53003e652f7a7756be77bb9925c0584c90820e0",
+      "functions": [
+        "deinterleave_hadamard",
+        "intensity_stereo$isra$1",
+        "quant_partition",
+        "quant_band",
+        "hysteresis_decision",
+        "celt_lcg_rand",
+        "bitexact_cos",
+        "bitexact_log2tan",
+        "compute_band_energies",
+        "normalise_bands",
+        "denormalise_bands",
+        "anti_collapse",
+        "spreading_decision",
+        "haar1",
+        "quant_all_bands"
+      ],
+      "sections": [
+        {
+          "name": ".literal.deinterleave_hadamard",
+          "bytes": 24
+        },
+        {
+          "name": ".literal.intensity_stereo$isra$1",
+          "bytes": 12
+        },
+        {
+          "name": ".literal.quant_partition",
+          "bytes": 136
+        },
+        {
+          "name": ".literal.quant_band",
+          "bytes": 92
+        },
+        {
+          "name": ".literal.celt_lcg_rand",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.bitexact_cos",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.bitexact_log2tan",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.compute_band_energies",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.normalise_bands",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.denormalise_bands",
+          "bytes": 48
+        },
+        {
+          "name": ".literal.anti_collapse",
+          "bytes": 56
+        },
+        {
+          "name": ".literal.spreading_decision",
+          "bytes": 12
+        },
+        {
+          "name": ".literal.haar1",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.quant_all_bands",
+          "bytes": 448
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.deinterleave_hadamard",
+          "bytes": 237
+        },
+        {
+          "name": ".text.intensity_stereo$isra$1",
+          "bytes": 235
+        },
+        {
+          "name": ".text.quant_partition",
+          "bytes": 2198
+        },
+        {
+          "name": ".text.quant_band",
+          "bytes": 1777
+        },
+        {
+          "name": ".text.hysteresis_decision",
+          "bytes": 98
+        },
+        {
+          "name": ".text.celt_lcg_rand",
+          "bytes": 13
+        },
+        {
+          "name": ".text.bitexact_cos",
+          "bytes": 66
+        },
+        {
+          "name": ".text.bitexact_log2tan",
+          "bytes": 97
+        },
+        {
+          "name": ".text.compute_band_energies",
+          "bytes": 383
+        },
+        {
+          "name": ".text.normalise_bands",
+          "bytes": 321
+        },
+        {
+          "name": ".text.denormalise_bands",
+          "bytes": 465
+        },
+        {
+          "name": ".text.anti_collapse",
+          "bytes": 944
+        },
+        {
+          "name": ".text.spreading_decision",
+          "bytes": 556
+        },
+        {
+          "name": ".text.haar1",
+          "bytes": 103
+        },
+        {
+          "name": ".text.quant_all_bands",
+          "bytes": 9548
+        },
+        {
+          "name": ".rodata.bit_deinterleave_table$4337",
+          "bytes": 16
+        },
+        {
+          "name": ".rodata.bit_interleave_table$4327",
+          "bytes": 16
+        },
+        {
+          "name": ".rodata.exp2_table8$4166",
+          "bytes": 16
+        },
+        {
+          "name": ".rodata.ordery_table",
+          "bytes": 120
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 112
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 8868
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/celt.c",
+      "asm": "gcc/upstream/celt/celt.c.s",
+      "source_sha256_lf": "7fc63f4f65f0bea60af57ab90e7fcfb08c01f8066e77088a0ae0c19f23185ebf",
+      "asm_sha256_lf": "6bbec6b53cd4a59e57c03c576e3a335a800c50188bbe06228875632b567bedbf",
+      "functions": [
+        "resampling_factor",
+        "comb_filter",
+        "init_caps",
+        "opus_strerror",
+        "opus_get_version_string"
+      ],
+      "sections": [
+        {
+          "name": ".literal.resampling_factor",
+          "bytes": 20
+        },
+        {
+          "name": ".literal.comb_filter",
+          "bytes": 24
+        },
+        {
+          "name": ".literal.opus_strerror",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.opus_get_version_string",
+          "bytes": 4
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.resampling_factor",
+          "bytes": 64
+        },
+        {
+          "name": ".text.comb_filter",
+          "bytes": 1042
+        },
+        {
+          "name": ".text.init_caps",
+          "bytes": 87
+        },
+        {
+          "name": ".rodata.opus_strerror.str1.4",
+          "bytes": 14
+        },
+        {
+          "name": ".text.opus_strerror",
+          "bytes": 24
+        },
+        {
+          "name": ".rodata.opus_get_version_string.str1.4",
+          "bytes": 20
+        },
+        {
+          "name": ".text.opus_get_version_string",
+          "bytes": 5
+        },
+        {
+          "name": ".rodata.str1.4",
+          "bytes": 149
+        },
+        {
+          "name": ".rodata.error_strings$3953",
+          "bytes": 32
+        },
+        {
+          "name": ".rodata.gains$3933",
+          "bytes": 18
+        },
+        {
+          "name": ".rodata.tf_select_table",
+          "bytes": 32
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 32
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 600
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/celt_decoder.c",
+      "asm": "gcc/upstream/celt/celt_decoder.c.s",
+      "source_sha256_lf": "bd3bd2b0082a2e0cdff65d43882eca1f3ed6734dc4de04ab3e1a33f8392b5e05",
+      "asm_sha256_lf": "6a8d1e9e2dbd6c15af5a8adedf3aff634d76b86b2890f46b9c1cfb5a21c15473",
+      "functions": [
+        "deemphasis",
+        "prefilter_and_fold",
+        "celt_synthesis",
+        "celt_decoder_get_size",
+        "celt_decode_with_ec_dred",
+        "celt_decode_with_ec",
+        "opus_custom_decoder_ctl",
+        "celt_decoder_init"
+      ],
+      "sections": [
+        {
+          "name": ".literal.deemphasis",
+          "bytes": 24
+        },
+        {
+          "name": ".literal.prefilter_and_fold",
+          "bytes": 20
+        },
+        {
+          "name": ".literal.celt_synthesis",
+          "bytes": 64
+        },
+        {
+          "name": ".literal.celt_decoder_get_size",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.celt_decode_with_ec_dred",
+          "bytes": 436
+        },
+        {
+          "name": ".literal.celt_decode_with_ec",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.opus_custom_decoder_ctl",
+          "bytes": 76
+        },
+        {
+          "name": ".literal.celt_decoder_init",
+          "bytes": 28
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.deemphasis",
+          "bytes": 785
+        },
+        {
+          "name": ".text.prefilter_and_fold",
+          "bytes": 366
+        },
+        {
+          "name": ".text.celt_synthesis",
+          "bytes": 1045
+        },
+        {
+          "name": ".text.celt_decoder_get_size",
+          "bytes": 51
+        },
+        {
+          "name": ".text.celt_decode_with_ec_dred",
+          "bytes": 7044
+        },
+        {
+          "name": ".text.celt_decode_with_ec",
+          "bytes": 23
+        },
+        {
+          "name": ".text.opus_custom_decoder_ctl",
+          "bytes": 654
+        },
+        {
+          "name": ".text.celt_decoder_init",
+          "bytes": 190
+        },
+        {
+          "name": ".rodata.tapset_icdf",
+          "bytes": 3
+        },
+        {
+          "name": ".rodata.spread_icdf",
+          "bytes": 4
+        },
+        {
+          "name": ".rodata.trim_icdf",
+          "bytes": 11
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 64
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 5244
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/celt_lpc.c",
+      "asm": "gcc/upstream/celt/celt_lpc.c.s",
+      "source_sha256_lf": "11cf6e09bfefbc0e79688f5a32cc9dbee205509d6239a4967e63674129ac4585",
+      "asm_sha256_lf": "4593457f1660e60fd1c3f2d9cc0de70766698ed26faec606b5451da87d6f7ca9",
+      "functions": [
+        "_celt_lpc",
+        "celt_fir_c",
+        "celt_iir",
+        "_celt_autocorr"
+      ],
+      "sections": [
+        {
+          "name": ".literal._celt_lpc",
+          "bytes": 44
+        },
+        {
+          "name": ".literal.celt_fir_c",
+          "bytes": 20
+        },
+        {
+          "name": ".literal.celt_iir",
+          "bytes": 28
+        },
+        {
+          "name": ".literal._celt_autocorr",
+          "bytes": 32
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text._celt_lpc",
+          "bytes": 785
+        },
+        {
+          "name": ".text.celt_fir_c",
+          "bytes": 929
+        },
+        {
+          "name": ".text.celt_iir",
+          "bytes": 1234
+        },
+        {
+          "name": ".text._celt_autocorr",
+          "bytes": 721
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 32
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1908
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/cwrs.c",
+      "asm": "gcc/upstream/celt/cwrs.c.s",
+      "source_sha256_lf": "7cf571339a139063b6a6b3d29b32cdb0760cda81307f14eab0bfae40eecaa520",
+      "asm_sha256_lf": "16eef76dfc482104ca6efb0d2a41f5ba3c0edf9129e5cbc85dc9e6e7b3436afd",
+      "functions": [
+        "encode_pulses",
+        "decode_pulses"
+      ],
+      "sections": [
+        {
+          "name": ".literal.encode_pulses",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.decode_pulses",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.encode_pulses",
+          "bytes": 205
+        },
+        {
+          "name": ".text.decode_pulses",
+          "bytes": 989
+        },
+        {
+          "name": ".rodata.CELT_PVQ_U_ROW",
+          "bytes": 60
+        },
+        {
+          "name": ".rodata.CELT_PVQ_U_DATA",
+          "bytes": 5088
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 552
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/entcode.c",
+      "asm": "gcc/upstream/celt/entcode.c.s",
+      "source_sha256_lf": "9df7a4830a2466e7d77c46359607d77a8a5ce08037d0f49572a106b02085c1df",
+      "asm_sha256_lf": "227d301b0c9b2a4c44110ce1a2345626f496ea3d2a217683e7415f4c3b01ae93",
+      "functions": [
+        "ec_tell_frac"
+      ],
+      "sections": [
+        {
+          "name": ".literal.ec_tell_frac",
+          "bytes": 4
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.ec_tell_frac",
+          "bytes": 57
+        },
+        {
+          "name": ".rodata.correction$2307",
+          "bytes": 32
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 72
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "asm": "gcc/upstream/celt/entdec.c.s",
+      "source_sha256_lf": "7e26c38ce429596b1281894894b583b0caa82cba5ced753ee5d5705fe365d5f6",
+      "asm_sha256_lf": "99c8008bab054aed6d6209fd8253e61d91c6a851675992f2f8871bba015f15a6",
+      "functions": [
+        "ec_dec_init",
+        "ec_decode",
+        "ec_decode_bin",
+        "ec_dec_update",
+        "ec_dec_bit_logp",
+        "ec_dec_icdf",
+        "ec_dec_icdf16",
+        "ec_dec_uint",
+        "ec_dec_bits"
+      ],
+      "sections": [
+        {
+          "name": ".literal.ec_dec_init",
+          "bytes": 12
+        },
+        {
+          "name": ".literal.ec_decode",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.ec_decode_bin",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.ec_dec_update",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.ec_dec_bit_logp",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.ec_dec_icdf",
+          "bytes": 16
+        },
+        {
+          "name": ".literal.ec_dec_icdf16",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.ec_dec_uint",
+          "bytes": 24
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.ec_dec_init",
+          "bytes": 240
+        },
+        {
+          "name": ".text.ec_decode",
+          "bytes": 63
+        },
+        {
+          "name": ".text.ec_decode_bin",
+          "bytes": 63
+        },
+        {
+          "name": ".text.ec_dec_update",
+          "bytes": 171
+        },
+        {
+          "name": ".text.ec_dec_bit_logp",
+          "bytes": 172
+        },
+        {
+          "name": ".text.ec_dec_icdf",
+          "bytes": 235
+        },
+        {
+          "name": ".text.ec_dec_icdf16",
+          "bytes": 181
+        },
+        {
+          "name": ".text.ec_dec_uint",
+          "bytes": 564
+        },
+        {
+          "name": ".text.ec_dec_bits",
+          "bytes": 80
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 64
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1236
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "asm": "gcc/upstream/celt/entenc.c.s",
+      "source_sha256_lf": "23694e69bcd49510f4e6a2e40b849e67dea65f8e0b5726adf60d1ed9535b6478",
+      "asm_sha256_lf": "49c73820ce189c5af462742397f1e80521509fd3533fdf1ab57a3b8997ff4e96",
+      "functions": [
+        "ec_enc_init",
+        "ec_encode",
+        "ec_encode_bin",
+        "ec_enc_bit_logp",
+        "ec_enc_icdf",
+        "ec_enc_icdf16",
+        "ec_enc_uint",
+        "ec_enc_bits",
+        "ec_enc_patch_initial_bits",
+        "ec_enc_shrink",
+        "ec_enc_done"
+      ],
+      "sections": [
+        {
+          "name": ".literal.ec_enc_init",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.ec_encode",
+          "bytes": 12
+        },
+        {
+          "name": ".literal.ec_encode_bin",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.ec_enc_bit_logp",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.ec_enc_icdf",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.ec_enc_icdf16",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.ec_enc_uint",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.ec_enc_patch_initial_bits",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.ec_enc_shrink",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.ec_enc_done",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.ec_enc_init",
+          "bytes": 35
+        },
+        {
+          "name": ".text.ec_encode",
+          "bytes": 260
+        },
+        {
+          "name": ".text.ec_encode_bin",
+          "bytes": 244
+        },
+        {
+          "name": ".text.ec_enc_bit_logp",
+          "bytes": 212
+        },
+        {
+          "name": ".text.ec_enc_icdf",
+          "bytes": 252
+        },
+        {
+          "name": ".text.ec_enc_icdf16",
+          "bytes": 244
+        },
+        {
+          "name": ".text.ec_enc_uint",
+          "bytes": 191
+        },
+        {
+          "name": ".text.ec_enc_bits",
+          "bytes": 108
+        },
+        {
+          "name": ".text.ec_enc_patch_initial_bits",
+          "bytes": 130
+        },
+        {
+          "name": ".text.ec_enc_shrink",
+          "bytes": 50
+        },
+        {
+          "name": ".text.ec_enc_done",
+          "bytes": 505
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 80
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 2100
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/kiss_fft.c",
+      "asm": "gcc/upstream/celt/kiss_fft.c.s",
+      "source_sha256_lf": "5f2d308de8fc9cbbb3b9ddc52d0dabb19ebdc6a91a95a4ca8a981afa2e0e9c9b",
+      "asm_sha256_lf": "cc1e27dc7d00af4d07d74fccee431ffadc93df8e0bbc4b94df657b96ddf11795",
+      "functions": [
+        "opus_fft_impl",
+        "opus_fft_c",
+        "opus_ifft_c"
+      ],
+      "sections": [
+        {
+          "name": ".literal.opus_fft_impl",
+          "bytes": 24
+        },
+        {
+          "name": ".literal.opus_fft_c",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.opus_ifft_c",
+          "bytes": 4
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.opus_fft_impl",
+          "bytes": 3627
+        },
+        {
+          "name": ".text.opus_fft_c",
+          "bytes": 121
+        },
+        {
+          "name": ".text.opus_ifft_c",
+          "bytes": 119
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 24
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1092
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/laplace.c",
+      "asm": "gcc/upstream/celt/laplace.c.s",
+      "source_sha256_lf": "ba82b13169c6655756ed295e9f08ebeb1d22bb7217334eee3bdaecf9f1f464e2",
+      "asm_sha256_lf": "f4dd1bb3039887e90f86f34ed280d59f17a688e03d365891d1e4f98dc9e39c66",
+      "functions": [
+        "ec_laplace_encode",
+        "ec_laplace_decode",
+        "ec_laplace_encode_p0",
+        "ec_laplace_decode_p0"
+      ],
+      "sections": [
+        {
+          "name": ".literal.ec_laplace_encode",
+          "bytes": 16
+        },
+        {
+          "name": ".literal.ec_laplace_decode",
+          "bytes": 20
+        },
+        {
+          "name": ".literal.ec_laplace_encode_p0",
+          "bytes": 16
+        },
+        {
+          "name": ".literal.ec_laplace_decode_p0",
+          "bytes": 12
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.ec_laplace_encode",
+          "bytes": 166
+        },
+        {
+          "name": ".text.ec_laplace_decode",
+          "bytes": 185
+        },
+        {
+          "name": ".text.ec_laplace_encode_p0",
+          "bytes": 241
+        },
+        {
+          "name": ".text.ec_laplace_decode_p0",
+          "bytes": 209
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 32
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 756
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/mathops.c",
+      "asm": "gcc/upstream/celt/mathops.c.s",
+      "source_sha256_lf": "1bb9acef1450ce67d6cd63f007e8fcc3ca5ccfea4c9b22131d853da5d9298510",
+      "asm_sha256_lf": "18765e9d9b5c24c3be061bd921d09e3d384c164cdf509af47319321bebe9f5ec",
+      "functions": [
+        "isqrt32",
+        "celt_rsqrt_norm",
+        "celt_sqrt",
+        "celt_cos_norm",
+        "celt_rcp",
+        "frac_div32"
+      ],
+      "sections": [
+        {
+          "name": ".literal.celt_rsqrt_norm",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.celt_sqrt",
+          "bytes": 20
+        },
+        {
+          "name": ".literal.celt_cos_norm",
+          "bytes": 32
+        },
+        {
+          "name": ".literal.celt_rcp",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.frac_div32",
+          "bytes": 24
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.isqrt32",
+          "bytes": 489
+        },
+        {
+          "name": ".text.celt_rsqrt_norm",
+          "bytes": 111
+        },
+        {
+          "name": ".text.celt_sqrt",
+          "bytes": 159
+        },
+        {
+          "name": ".text.celt_cos_norm",
+          "bytes": 238
+        },
+        {
+          "name": ".text.celt_rcp",
+          "bytes": 165
+        },
+        {
+          "name": ".text.frac_div32",
+          "bytes": 203
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 40
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 756
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/mdct.c",
+      "asm": "gcc/upstream/celt/mdct.c.s",
+      "source_sha256_lf": "886e209ac71bc53c752e709148476c9dd374b69eec935c588b509a85e094b8e6",
+      "asm_sha256_lf": "fe36255422bd9864de647aa27b57968de0aa68d867aabf72204ae9617ab5e5ac",
+      "functions": [
+        "clt_mdct_forward_c",
+        "clt_mdct_backward_c"
+      ],
+      "sections": [
+        {
+          "name": ".literal.clt_mdct_forward_c",
+          "bytes": 28
+        },
+        {
+          "name": ".literal.clt_mdct_backward_c",
+          "bytes": 12
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.clt_mdct_forward_c",
+          "bytes": 1012
+        },
+        {
+          "name": ".text.clt_mdct_backward_c",
+          "bytes": 929
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 672
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/modes.c",
+      "asm": "gcc/upstream/celt/modes.c.s",
+      "source_sha256_lf": "12d2f63b668328261473218ef8b96ad38c383a6df171c8176531c04e13ce9923",
+      "asm_sha256_lf": "a0d2df0abc716197160707e31758973e9464e0c3c95b0f554b815c04a3bd84bf",
+      "functions": [
+        "opus_custom_mode_create"
+      ],
+      "sections": [
+        {
+          "name": ".literal.opus_custom_mode_create",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.opus_custom_mode_create",
+          "bytes": 56
+        },
+        {
+          "name": ".rodata.mode48000_960_120",
+          "bytes": 100
+        },
+        {
+          "name": ".rodata.mdct_twiddles960",
+          "bytes": 3600
+        },
+        {
+          "name": ".rodata.fft_state48000_960_3",
+          "bytes": 60
+        },
+        {
+          "name": ".rodata.fft_state48000_960_2",
+          "bytes": 60
+        },
+        {
+          "name": ".rodata.fft_state48000_960_1",
+          "bytes": 60
+        },
+        {
+          "name": ".rodata.fft_state48000_960_0",
+          "bytes": 60
+        },
+        {
+          "name": ".rodata.fft_bitrev60",
+          "bytes": 120
+        },
+        {
+          "name": ".rodata.fft_bitrev120",
+          "bytes": 240
+        },
+        {
+          "name": ".rodata.fft_bitrev240",
+          "bytes": 480
+        },
+        {
+          "name": ".rodata.fft_bitrev480",
+          "bytes": 960
+        },
+        {
+          "name": ".rodata.fft_twiddles48000_960",
+          "bytes": 1920
+        },
+        {
+          "name": ".rodata.cache_caps50",
+          "bytes": 168
+        },
+        {
+          "name": ".rodata.cache_bits50",
+          "bytes": 392
+        },
+        {
+          "name": ".rodata.cache_index50",
+          "bytes": 210
+        },
+        {
+          "name": ".rodata.logN400",
+          "bytes": 42
+        },
+        {
+          "name": ".rodata.window120",
+          "bytes": 240
+        },
+        {
+          "name": ".rodata.band_allocation",
+          "bytes": 231
+        },
+        {
+          "name": ".rodata.eband5ms",
+          "bytes": 44
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 336
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/pitch.c",
+      "asm": "gcc/upstream/celt/pitch.c.s",
+      "source_sha256_lf": "f0cb85414a8daf2e253a7a4a674646652ef817df40e32bffe5aa3b2bbe7bbb21",
+      "asm_sha256_lf": "5271485884441f450e16fab1506d2b25f16e8635d0f4de6ccad73f0d56ae2f83",
+      "functions": [
+        "find_best_pitch",
+        "compute_pitch_gain$part$0",
+        "pitch_downsample",
+        "celt_pitch_xcorr_c",
+        "pitch_search",
+        "remove_doubling"
+      ],
+      "sections": [
+        {
+          "name": ".literal.compute_pitch_gain$part$0",
+          "bytes": 12
+        },
+        {
+          "name": ".literal.pitch_downsample",
+          "bytes": 32
+        },
+        {
+          "name": ".literal.pitch_search",
+          "bytes": 32
+        },
+        {
+          "name": ".literal.remove_doubling",
+          "bytes": 60
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.find_best_pitch",
+          "bytes": 343
+        },
+        {
+          "name": ".text.compute_pitch_gain$part$0",
+          "bytes": 225
+        },
+        {
+          "name": ".text.pitch_downsample",
+          "bytes": 800
+        },
+        {
+          "name": ".text.celt_pitch_xcorr_c",
+          "bytes": 684
+        },
+        {
+          "name": ".text.pitch_search",
+          "bytes": 1541
+        },
+        {
+          "name": ".text.remove_doubling",
+          "bytes": 1133
+        },
+        {
+          "name": ".rodata.second_check",
+          "bytes": 64
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 32
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 2568
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/quant_bands.c",
+      "asm": "gcc/upstream/celt/quant_bands.c.s",
+      "source_sha256_lf": "a09e566d18906aabe0ffe65bd9b58a695c8aa1ff7da5ceebcf32d7e7b50c816d",
+      "asm_sha256_lf": "3588fd138209d427000b7afb1bc4ec020b6e9feb04397d2aa6eb369875c1e0ff",
+      "functions": [
+        "quant_coarse_energy_impl",
+        "quant_coarse_energy",
+        "quant_fine_energy",
+        "quant_energy_finalise",
+        "unquant_coarse_energy",
+        "unquant_fine_energy",
+        "unquant_energy_finalise",
+        "amp2Log2"
+      ],
+      "sections": [
+        {
+          "name": ".literal.quant_coarse_energy_impl",
+          "bytes": 52
+        },
+        {
+          "name": ".literal.quant_coarse_energy",
+          "bytes": 92
+        },
+        {
+          "name": ".literal.quant_fine_energy",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.quant_energy_finalise",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.unquant_coarse_energy",
+          "bytes": 68
+        },
+        {
+          "name": ".literal.unquant_fine_energy",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.unquant_energy_finalise",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.amp2Log2",
+          "bytes": 36
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.quant_coarse_energy_impl",
+          "bytes": 795
+        },
+        {
+          "name": ".text.quant_coarse_energy",
+          "bytes": 1299
+        },
+        {
+          "name": ".text.quant_fine_energy",
+          "bytes": 223
+        },
+        {
+          "name": ".text.quant_energy_finalise",
+          "bytes": 292
+        },
+        {
+          "name": ".text.unquant_coarse_energy",
+          "bytes": 683
+        },
+        {
+          "name": ".text.unquant_fine_energy",
+          "bytes": 124
+        },
+        {
+          "name": ".text.unquant_energy_finalise",
+          "bytes": 227
+        },
+        {
+          "name": ".text.amp2Log2",
+          "bytes": 479
+        },
+        {
+          "name": ".rodata.small_energy_icdf",
+          "bytes": 3
+        },
+        {
+          "name": ".rodata.e_prob_model",
+          "bytes": 336
+        },
+        {
+          "name": ".rodata.beta_coef",
+          "bytes": 8
+        },
+        {
+          "name": ".rodata.pred_coef",
+          "bytes": 8
+        },
+        {
+          "name": ".rodata.eMeans",
+          "bytes": 25
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 64
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1920
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/rate.c",
+      "asm": "gcc/upstream/celt/rate.c.s",
+      "source_sha256_lf": "5bc158186d35553e6155d0afdcf46de2b9ba02dba9cac541d0a6f847848e799a",
+      "asm_sha256_lf": "73cd1d9c30ff80d137395d9a892dd62c485b0f41587414a2f68611b43e2d3c53",
+      "functions": [
+        "clt_compute_allocation"
+      ],
+      "sections": [
+        {
+          "name": ".literal.clt_compute_allocation",
+          "bytes": 76
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.clt_compute_allocation",
+          "bytes": 2600
+        },
+        {
+          "name": ".rodata.LOG2_FRAC_TABLE",
+          "bytes": 24
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1404
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/celt/vq.c",
+      "asm": "gcc/upstream/celt/vq.c.s",
+      "source_sha256_lf": "3f669c0e96e23c029cd2bdfbf2ffbc49cab96a55df46f5150060e12207deb4ef",
+      "asm_sha256_lf": "2184504d1bfd0cf22660dcf6bac46aef8710011e5a0a84c3bf59aa952208a6be",
+      "functions": [
+        "exp_rotation1",
+        "exp_rotation",
+        "op_pvq_search_c",
+        "alg_quant",
+        "alg_unquant",
+        "renormalise_vector",
+        "stereo_itheta"
+      ],
+      "sections": [
+        {
+          "name": ".literal.exp_rotation",
+          "bytes": 40
+        },
+        {
+          "name": ".literal.op_pvq_search_c",
+          "bytes": 32
+        },
+        {
+          "name": ".literal.alg_quant",
+          "bytes": 120
+        },
+        {
+          "name": ".literal.alg_unquant",
+          "bytes": 60
+        },
+        {
+          "name": ".literal.renormalise_vector",
+          "bytes": 12
+        },
+        {
+          "name": ".literal.stereo_itheta",
+          "bytes": 52
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.exp_rotation1",
+          "bytes": 174
+        },
+        {
+          "name": ".text.exp_rotation",
+          "bytes": 683
+        },
+        {
+          "name": ".text.op_pvq_search_c",
+          "bytes": 635
+        },
+        {
+          "name": ".text.alg_quant",
+          "bytes": 1848
+        },
+        {
+          "name": ".text.alg_unquant",
+          "bytes": 806
+        },
+        {
+          "name": ".text.renormalise_vector",
+          "bytes": 181
+        },
+        {
+          "name": ".text.stereo_itheta",
+          "bytes": 477
+        },
+        {
+          "name": ".rodata.SPREAD_FACTOR$3797",
+          "bytes": 12
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 48
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 2160
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/A2NLSF.c",
+      "asm": "gcc/upstream/silk/A2NLSF.c.s",
+      "source_sha256_lf": "7aca2e48d7bca2542b0344bb49ea40c2b8114caf9df96071e91a4767342a046a",
+      "asm_sha256_lf": "82ebecd0e7a1d434f38a9aa2f2a0e63b45c99555709f798f8a44cd123de3b4d5",
+      "functions": [
+        "silk_A2NLSF"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_A2NLSF",
+          "bytes": 44
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_A2NLSF",
+          "bytes": 4050
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1716
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/CNG.c",
+      "asm": "gcc/upstream/silk/CNG.c.s",
+      "source_sha256_lf": "89883e6b8af734b7e5642b4415c071c05201ebd8ba47b16903eac6866eccfd61",
+      "asm_sha256_lf": "e23830abe0184230a78269d1f468ef77e16bb7817d9a5b874740731025457ead",
+      "functions": [
+        "silk_CNG_Reset",
+        "silk_CNG"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_CNG_Reset",
+          "bytes": 12
+        },
+        {
+          "name": ".literal.silk_CNG",
+          "bytes": 112
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_CNG_Reset",
+          "bytes": 199
+        },
+        {
+          "name": ".text.silk_CNG",
+          "bytes": 3231
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 900
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/HP_variable_cutoff.c",
+      "asm": "gcc/upstream/silk/HP_variable_cutoff.c.s",
+      "source_sha256_lf": "8ee927910605060c1424568dd071c851f58a8ce47c6fb8e8b827d2f498c68362",
+      "asm_sha256_lf": "78074674776882da7915dc73ffc0efc4cf8e29a2260fd46e85fb51f4ab525d59",
+      "functions": [
+        "silk_HP_variable_cutoff"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_HP_variable_cutoff",
+          "bytes": 56
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_HP_variable_cutoff",
+          "bytes": 387
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 192
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/LPC_analysis_filter.c",
+      "asm": "gcc/upstream/silk/LPC_analysis_filter.c.s",
+      "source_sha256_lf": "c75b7e1a321e742d3433bd0527a8417ea9a2d66c7c9aad3b122959022a1c561a",
+      "asm_sha256_lf": "2a91f371bb2d806807da5772740851dc3b7c8a098a93381bf848a0f04777a65c",
+      "functions": [
+        "silk_LPC_analysis_filter"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_LPC_analysis_filter",
+          "bytes": 12
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_LPC_analysis_filter",
+          "bytes": 256
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 120
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/LPC_fit.c",
+      "asm": "gcc/upstream/silk/LPC_fit.c.s",
+      "source_sha256_lf": "6bb5aaf1d62d6ff4f40d5ffbaf2e0ca2c436b50249f42e5c29cd338adce0f0aa",
+      "asm_sha256_lf": "aa69b427719497373103fd6235145a74e36d22c3aeca794989e539af9af1e47b",
+      "functions": [
+        "silk_LPC_fit"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_LPC_fit",
+          "bytes": 28
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_LPC_fit",
+          "bytes": 395
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 360
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/LPC_inv_pred_gain.c",
+      "asm": "gcc/upstream/silk/LPC_inv_pred_gain.c.s",
+      "source_sha256_lf": "27a76fd7f5d661bcc40e65e4862fbfb95978cf0ecfa4c8422c529f3d0c6dd97c",
+      "asm_sha256_lf": "f584c6507ec031009d4677e37f8f180269fd2fb302172f970df8cb34b08aa133",
+      "functions": [
+        "silk_LPC_inverse_pred_gain_c"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_LPC_inverse_pred_gain_c",
+          "bytes": 108
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_LPC_inverse_pred_gain_c",
+          "bytes": 1403
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 780
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/LP_variable_cutoff.c",
+      "asm": "gcc/upstream/silk/LP_variable_cutoff.c.s",
+      "source_sha256_lf": "ece3b5dbbd56c69ee43f0cce4ffc49afc344ee63c084267b62f595a8e926d87b",
+      "asm_sha256_lf": "e00555838d09449acafa71dcf86eea619d23cd41355b0664564d76bc5f4b8352",
+      "functions": [
+        "silk_LP_variable_cutoff"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_LP_variable_cutoff",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_LP_variable_cutoff",
+          "bytes": 664
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 144
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/NLSF2A.c",
+      "asm": "gcc/upstream/silk/NLSF2A.c.s",
+      "source_sha256_lf": "403d1532b220a0d423f144b21bbaae25662fde36617df835786750232b69b217",
+      "asm_sha256_lf": "bbf244af6596de447dfd97be8725db5d89e47f890ff6e2ebf031640af7476fb8",
+      "functions": [
+        "silk_NLSF2A"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_NLSF2A",
+          "bytes": 64
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_NLSF2A",
+          "bytes": 2361
+        },
+        {
+          "name": ".rodata.ordering10$3186",
+          "bytes": 10
+        },
+        {
+          "name": ".rodata.ordering16$3185",
+          "bytes": 16
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 780
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/NLSF_VQ.c",
+      "asm": "gcc/upstream/silk/NLSF_VQ.c.s",
+      "source_sha256_lf": "9b44e8f406d83591bb7d0caaedd8f355bf226d391df9a95041155425b019e8a7",
+      "asm_sha256_lf": "fc58532c40b64e284863862dc6cdf23146997c18545ad1ee7bed52c643a7c16d",
+      "functions": [
+        "silk_NLSF_VQ"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_NLSF_VQ",
+          "bytes": 190
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 96
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/NLSF_VQ_weights_laroia.c",
+      "asm": "gcc/upstream/silk/NLSF_VQ_weights_laroia.c.s",
+      "source_sha256_lf": "020ca1026acd01ed9a24e2ec973ca7e13ad9bee380daf4532742667ba29b33de",
+      "asm_sha256_lf": "be7b23149aaee6bb0dff0e22d7ae3b61a7f03234c9708882042c8bcdde9d5659",
+      "functions": [
+        "silk_NLSF_VQ_weights_laroia"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_NLSF_VQ_weights_laroia",
+          "bytes": 32
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_NLSF_VQ_weights_laroia",
+          "bytes": 255
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 168
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/NLSF_decode.c",
+      "asm": "gcc/upstream/silk/NLSF_decode.c.s",
+      "source_sha256_lf": "1a6b4f544ac86dde6617279735e45a156ec532be9b5b27aca9a94abd5c151c73",
+      "asm_sha256_lf": "bd4c3c0bbf4453a8d94dd8b953266446beee9d6218598a16ba2901c8a5de7713",
+      "functions": [
+        "silk_NLSF_decode"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_NLSF_decode",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_NLSF_decode",
+          "bytes": 330
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 180
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/NLSF_del_dec_quant.c",
+      "asm": "gcc/upstream/silk/NLSF_del_dec_quant.c.s",
+      "source_sha256_lf": "40a83dd5afeaf66f7a06d11bd1b2789697b405e6936dac5ce9c405d7ce489088",
+      "asm_sha256_lf": "66b38c523b545d0368bbfd6b1f13a0c1649611c2ba50852ab8ed72197ffd1211",
+      "functions": [
+        "silk_NLSF_del_dec_quant"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_NLSF_del_dec_quant",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_NLSF_del_dec_quant",
+          "bytes": 2195
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1284
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/NLSF_encode.c",
+      "asm": "gcc/upstream/silk/NLSF_encode.c.s",
+      "source_sha256_lf": "ed3cb5948f4f6a141c2044b2d4a0baf24d20c25e833f601ffe71f780d9f517e5",
+      "asm_sha256_lf": "1e99e3774210c25e0452571b9502b3f83fedafeefe6f6a94ca8d492778d15dbb",
+      "functions": [
+        "silk_NLSF_encode"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_NLSF_encode",
+          "bytes": 84
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_NLSF_encode",
+          "bytes": 1017
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 312
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/NLSF_stabilize.c",
+      "asm": "gcc/upstream/silk/NLSF_stabilize.c.s",
+      "source_sha256_lf": "783f778941e36e7e6e57112657a1bc32d348f1c8e7d580807e1d8386c3f51bcd",
+      "asm_sha256_lf": "bec1766ffe66eb63a80818dd5b551d8eea12887e58136352f5f5e0cb112d2adb",
+      "functions": [
+        "silk_NLSF_stabilize"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_NLSF_stabilize",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_NLSF_stabilize",
+          "bytes": 553
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 516
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/NLSF_unpack.c",
+      "asm": "gcc/upstream/silk/NLSF_unpack.c.s",
+      "source_sha256_lf": "caf93ce0ade5db6fef66cc3f5ee84d618c285e8abf209b0825d8f470f1915185",
+      "asm_sha256_lf": "e41fa4a402661ea22decd485a39599c6529adc9624ad5e0a59497fcd2c4885f9",
+      "functions": [
+        "silk_NLSF_unpack"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_NLSF_unpack",
+          "bytes": 111
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 60
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/PLC.c",
+      "asm": "gcc/upstream/silk/PLC.c.s",
+      "source_sha256_lf": "795e271af059c36297360624b1b19fd50089ed5862bf9a1fc2d035d77338266d",
+      "asm_sha256_lf": "8bfb998d8cc44ad96076d59ade4252a2398531715ec737ff0fb055043d371b8e",
+      "functions": [
+        "silk_PLC_Reset",
+        "silk_PLC",
+        "silk_PLC_glue_frames"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_PLC_Reset",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.silk_PLC",
+          "bytes": 188
+        },
+        {
+          "name": ".literal.silk_PLC_glue_frames",
+          "bytes": 32
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_PLC_Reset",
+          "bytes": 35
+        },
+        {
+          "name": ".text.silk_PLC",
+          "bytes": 3809
+        },
+        {
+          "name": ".text.silk_PLC_glue_frames",
+          "bytes": 439
+        },
+        {
+          "name": ".rodata.PLC_RAND_ATTENUATE_UV_Q15",
+          "bytes": 4
+        },
+        {
+          "name": ".rodata.PLC_RAND_ATTENUATE_V_Q15",
+          "bytes": 4
+        },
+        {
+          "name": ".rodata.HARM_ATT_Q15",
+          "bytes": 4
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 24
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1332
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/VQ_WMat_EC.c",
+      "asm": "gcc/upstream/silk/VQ_WMat_EC.c.s",
+      "source_sha256_lf": "86f88436532f0c2beab906fbdcc3e0c0a35b938e1aa67ee924ff2e049f1d0747",
+      "asm_sha256_lf": "164fa07fa764777e42f1939e4ae4118eb26d8a79e324065d35762f80065d2837",
+      "functions": [
+        "silk_VQ_WMat_EC_c"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_VQ_WMat_EC_c",
+          "bytes": 12
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_VQ_WMat_EC_c",
+          "bytes": 548
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 84
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/ana_filt_bank_1.c",
+      "asm": "gcc/upstream/silk/ana_filt_bank_1.c.s",
+      "source_sha256_lf": "eaa57272e342d5d107ba7cc58ed08d58898f84596618dc57f9ca471f5862c85d",
+      "asm_sha256_lf": "b1802cea4e76c205787198235b6f1c34e5098aa8fc98a374ba7b4b0ec1e067c0",
+      "functions": [
+        "silk_ana_filt_bank_1"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_ana_filt_bank_1",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_ana_filt_bank_1",
+          "bytes": 202
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 96
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/biquad_alt.c",
+      "asm": "gcc/upstream/silk/biquad_alt.c.s",
+      "source_sha256_lf": "a2db5a19df2a21fff8dc2e46e7a0a3bedc8829b4b84acdd54fe5159d0d849593",
+      "asm_sha256_lf": "3f0a6996f0c8fac247592f18e946f6403b701835fd6686637773ea0c58a98531",
+      "functions": [
+        "silk_biquad_alt_stride1",
+        "silk_biquad_alt_stride2_c"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_biquad_alt_stride1",
+          "bytes": 12
+        },
+        {
+          "name": ".literal.silk_biquad_alt_stride2_c",
+          "bytes": 12
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_biquad_alt_stride1",
+          "bytes": 282
+        },
+        {
+          "name": ".text.silk_biquad_alt_stride2_c",
+          "bytes": 545
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 180
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/bwexpander.c",
+      "asm": "gcc/upstream/silk/bwexpander.c.s",
+      "source_sha256_lf": "fc15c0b29f0f19be9008b8960eabaa1da6bdfbf94c9dcd85c108fc3cfd41fb85",
+      "asm_sha256_lf": "f5d871126d68e04eeff99b2868b7c973b0f520cadba493d3f07947ba624e2289",
+      "functions": [
+        "silk_bwexpander"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_bwexpander",
+          "bytes": 4
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_bwexpander",
+          "bytes": 83
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 72
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/bwexpander_32.c",
+      "asm": "gcc/upstream/silk/bwexpander_32.c.s",
+      "source_sha256_lf": "e307bc7a8cca2fea917dd0a032722f66e2f069c13b06f3ca68ee83418ff6b2b3",
+      "asm_sha256_lf": "76a50f3abee7678bfe6662451fb85945bb15fca4122f405884ed298bff1cedb4",
+      "functions": [
+        "silk_bwexpander_32"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_bwexpander_32",
+          "bytes": 4
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_bwexpander_32",
+          "bytes": 132
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 72
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/check_control_input.c",
+      "asm": "gcc/upstream/silk/check_control_input.c.s",
+      "source_sha256_lf": "090574b4c492ef4754454c6577bc6dde21993211a6f7287f4dafd0ffa2c6900d",
+      "asm_sha256_lf": "eafa0ced7e6d2695932d37642a4846005cf5b0b668f779214f943d8abb4b3c02",
+      "functions": [
+        "check_control_input"
+      ],
+      "sections": [
+        {
+          "name": ".literal.check_control_input",
+          "bytes": 28
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.check_control_input",
+          "bytes": 335
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 300
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/code_signs.c",
+      "asm": "gcc/upstream/silk/code_signs.c.s",
+      "source_sha256_lf": "36458eaa27481b955f98f5755dee4dff2ce23f868f8fe9195cf1484f9ebf6a10",
+      "asm_sha256_lf": "9cffb4dee95c7edd50fc729c3388bb712d4924fa2ca63d6ba1427a893920800d",
+      "functions": [
+        "silk_encode_signs",
+        "silk_decode_signs"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_encode_signs",
+          "bytes": 68
+        },
+        {
+          "name": ".literal.silk_decode_signs",
+          "bytes": 68
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_encode_signs",
+          "bytes": 535
+        },
+        {
+          "name": ".text.silk_decode_signs",
+          "bytes": 636
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 552
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/control_SNR.c",
+      "asm": "gcc/upstream/silk/control_SNR.c.s",
+      "source_sha256_lf": "42633a0e336aedcdd32dca14e87bc6b24d88f5bc5bf7057e6f1c4dffe2be3a0b",
+      "asm_sha256_lf": "1ab167d5c7c45916a6e3023f4233fc01569b23cffd2e4461e6bab37cfb55b5b7",
+      "functions": [
+        "silk_control_SNR"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_control_SNR",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_control_SNR",
+          "bytes": 140
+        },
+        {
+          "name": ".rodata.silk_TargetRate_WB_21",
+          "bytes": 191
+        },
+        {
+          "name": ".rodata.silk_TargetRate_MB_21",
+          "bytes": 155
+        },
+        {
+          "name": ".rodata.silk_TargetRate_NB_21",
+          "bytes": 107
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 168
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/control_audio_bandwidth.c",
+      "asm": "gcc/upstream/silk/control_audio_bandwidth.c.s",
+      "source_sha256_lf": "e40202554d3033e3f8a4830fc6e4a050c8c82801e533a2f6f7f23e5aa468a92e",
+      "asm_sha256_lf": "3e4a38c3095798071bfefb3c92d35454e7f86bb8639234357ce64ec0101b6212",
+      "functions": [
+        "silk_control_audio_bandwidth"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_control_audio_bandwidth",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_control_audio_bandwidth",
+          "bytes": 323
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 372
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/control_codec.c",
+      "asm": "gcc/upstream/silk/control_codec.c.s",
+      "source_sha256_lf": "cd49e266e81371bc0cd158c5c03ff961d98b8b23cfc639bb9089dbc0eebbda2f",
+      "asm_sha256_lf": "d68d835ce715aaef076c277290a7d05b00094f6ff94b35ac992c34444700e6e8",
+      "functions": [
+        "silk_setup_resamplers",
+        "silk_control_encoder"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_setup_resamplers",
+          "bytes": 48
+        },
+        {
+          "name": ".literal.silk_control_encoder",
+          "bytes": 100
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_setup_resamplers",
+          "bytes": 319
+        },
+        {
+          "name": ".text.silk_control_encoder",
+          "bytes": 1122
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 732
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/debug.c",
+      "asm": "gcc/upstream/silk/debug.c.s",
+      "source_sha256_lf": "fa00c137cde47da903fd2b20a193a314bfadb7a2dc7363d20880d27bc7cd072f",
+      "asm_sha256_lf": "7f2ca415192c2a1665ba288301b6c1ba7f093359e5ca5bc7d9b8531f925710f2",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/dec_API.c",
+      "asm": "gcc/upstream/silk/dec_API.c.s",
+      "source_sha256_lf": "9f9af426af1daa932c77ccc226840567169c8bb5e1f43f5d22bde14e810c0805",
+      "asm_sha256_lf": "1d979738a9c951f504054777196213af29f3a67984af3a70837f6c0d06dd4b46",
+      "functions": [
+        "silk_LoadOSCEModels",
+        "silk_Get_Decoder_Size",
+        "silk_ResetDecoder",
+        "silk_InitDecoder",
+        "silk_Decode"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_Get_Decoder_Size",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.silk_ResetDecoder",
+          "bytes": 16
+        },
+        {
+          "name": ".literal.silk_InitDecoder",
+          "bytes": 24
+        },
+        {
+          "name": ".literal.silk_Decode",
+          "bytes": 188
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_LoadOSCEModels",
+          "bytes": 4
+        },
+        {
+          "name": ".text.silk_Get_Decoder_Size",
+          "bytes": 9
+        },
+        {
+          "name": ".text.silk_ResetDecoder",
+          "bytes": 88
+        },
+        {
+          "name": ".text.silk_InitDecoder",
+          "bytes": 121
+        },
+        {
+          "name": ".rodata",
+          "bytes": 12
+        },
+        {
+          "name": ".text.silk_Decode",
+          "bytes": 2837
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 32
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1884
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/decode_core.c",
+      "asm": "gcc/upstream/silk/decode_core.c.s",
+      "source_sha256_lf": "a82f1eaaed955cd8e63028b591749658b00616e46da2dea679844461d06b1d7e",
+      "asm_sha256_lf": "f0b2c7a3d2fb4503b37689702f563a9c3bf144f2b960d9407058676823568a8f",
+      "functions": [
+        "silk_decode_core"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_decode_core",
+          "bytes": 116
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_decode_core",
+          "bytes": 3437
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 900
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/decode_frame.c",
+      "asm": "gcc/upstream/silk/decode_frame.c.s",
+      "source_sha256_lf": "08b65e7fa30ea8798d8ad4e281a6a9419951fc6aac9499fc2b5a5a53266dbba1",
+      "asm_sha256_lf": "15c5e20c5851b75547e8e6e8b30dcb6894001a40e224a228ad4cbc124390993f",
+      "functions": [
+        "silk_decode_frame"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_decode_frame",
+          "bytes": 64
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_decode_frame",
+          "bytes": 450
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 84
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/decode_indices.c",
+      "asm": "gcc/upstream/silk/decode_indices.c.s",
+      "source_sha256_lf": "b149dc20615d61f76c69b7333ed3ef7a6eeb2715a141dbfc1474517d52be5d9b",
+      "asm_sha256_lf": "747891e53d67ed24a0245d4e1417ee78d237879e38f01eb83051a7738fb8271a",
+      "functions": [
+        "silk_decode_indices"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_decode_indices",
+          "bytes": 132
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_decode_indices",
+          "bytes": 731
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 348
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/decode_parameters.c",
+      "asm": "gcc/upstream/silk/decode_parameters.c.s",
+      "source_sha256_lf": "c2cb2581e2c6a34cffb07bd7daca72478c735f4f3860591000ce4a1d26629735",
+      "asm_sha256_lf": "b76361f121eb782d8f5d7c12a34093a861fa83598abc4cebfd5f0f5a48240abc",
+      "functions": [
+        "silk_decode_parameters"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_decode_parameters",
+          "bytes": 56
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_decode_parameters",
+          "bytes": 1130
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 204
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/decode_pitch.c",
+      "asm": "gcc/upstream/silk/decode_pitch.c.s",
+      "source_sha256_lf": "f892dc0d2f8b5460b861a45b7e4f4214a984eed909e95abc31fc8b4dcd748eab",
+      "asm_sha256_lf": "0492c9d2190fad4b81539649e37d380f97d40f7c330422e680bdd0b0c63b954d",
+      "functions": [
+        "silk_decode_pitch"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_decode_pitch",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_decode_pitch",
+          "bytes": 247
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 300
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/decode_pulses.c",
+      "asm": "gcc/upstream/silk/decode_pulses.c.s",
+      "source_sha256_lf": "dfaf085b43f489507d4d211fdd0ed0f13546ac8deff1746111362ca2aa3c9d4f",
+      "asm_sha256_lf": "5e009507ed3ebee2cab641d53ab5a76c1cc4f68075973cf3a04d32d1b192b70c",
+      "functions": [
+        "silk_decode_pulses"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_decode_pulses",
+          "bytes": 52
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_decode_pulses",
+          "bytes": 501
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 276
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/decoder_set_fs.c",
+      "asm": "gcc/upstream/silk/decoder_set_fs.c.s",
+      "source_sha256_lf": "2b217e5d11d18f2318770298836a54e82f25343b986f100d63f09e884e1a16db",
+      "asm_sha256_lf": "65d492fe6f728252996b48fff2538dbeafa2b6ccf8ba9c81db60036e1e0e7923",
+      "functions": [
+        "silk_decoder_set_fs"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_decoder_set_fs",
+          "bytes": 48
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_decoder_set_fs",
+          "bytes": 335
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 300
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/encode_indices.c",
+      "asm": "gcc/upstream/silk/encode_indices.c.s",
+      "source_sha256_lf": "da3c6df828ff933ad81348e94ee000308f762a10c7023640b52612578d882729",
+      "asm_sha256_lf": "9cf277b3dd3458272f5e92314bcdc94e65c8f397fa564991b47196ff86e4b40c",
+      "functions": [
+        "silk_encode_indices"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_encode_indices",
+          "bytes": 172
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_encode_indices",
+          "bytes": 1020
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 384
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/encode_pulses.c",
+      "asm": "gcc/upstream/silk/encode_pulses.c.s",
+      "source_sha256_lf": "dea9c1ef3d25c7baa28a8e59261c80cbee3c24c3f641d5a5fcb77db95d97469d",
+      "asm_sha256_lf": "7dadaf6c011fe0b993c0be5b83cdc46c443f406ab995b53db32ae3652c8f9ade",
+      "functions": [
+        "silk_encode_pulses"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_encode_pulses",
+          "bytes": 92
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_encode_pulses",
+          "bytes": 1674
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 888
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/LTP_analysis_filter_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/LTP_analysis_filter_FIX.c.s",
+      "source_sha256_lf": "d8141c6f797f11f2a2c2c4b063459e25cf2254fa16667efd7dd1c5e9d5060cfd",
+      "asm_sha256_lf": "c0f5d7b6fdae733f44625c2ce4eba1650be6070a347f7ab3e111b4d8772ad4ba",
+      "functions": [
+        "silk_LTP_analysis_filter_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_LTP_analysis_filter_FIX",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_LTP_analysis_filter_FIX",
+          "bytes": 313
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 120
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/LTP_scale_ctrl_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/LTP_scale_ctrl_FIX.c.s",
+      "source_sha256_lf": "9a3b40d42d8736ffbf89f3849fe20dbc9e334c158baeb45143c71dc9aa6b0af4",
+      "asm_sha256_lf": "f6abaeb6bbfae2a82a6a97ac76bf4c75c91ba2cda3b43fdad0825c8c393714ba",
+      "functions": [
+        "silk_LTP_scale_ctrl_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_LTP_scale_ctrl_FIX",
+          "bytes": 24
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_LTP_scale_ctrl_FIX",
+          "bytes": 183
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 108
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/apply_sine_window_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/apply_sine_window_FIX.c.s",
+      "source_sha256_lf": "cd6095bf126076a321fe55843f62455bb9e9326fb61f0c718d2d9bd7baa88b0b",
+      "asm_sha256_lf": "967c16d6b1b2e72f468c360f811bce12440cc2d58ef39fb63ca3da9d75ad5773",
+      "functions": [
+        "silk_apply_sine_window"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_apply_sine_window",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_apply_sine_window",
+          "bytes": 276
+        },
+        {
+          "name": ".rodata.freq_table_Q16",
+          "bytes": 54
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 144
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/autocorr_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/autocorr_FIX.c.s",
+      "source_sha256_lf": "93a1dcadd43981783d692161de642dc7e13de54e53e01afe67e73437499ef9f3",
+      "asm_sha256_lf": "3caa0448f605e483f2a27a4adf89f29eb02db9f91a6f43746cb1d4a41653ced0",
+      "functions": [
+        "silk_autocorr"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_autocorr",
+          "bytes": 4
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_autocorr",
+          "bytes": 49
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 60
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/burg_modified_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/burg_modified_FIX.c.s",
+      "source_sha256_lf": "a60c05305bc20e46c969de79cae539dc9bdf67f77ef32033765bf8d12c9936c8",
+      "asm_sha256_lf": "2ee1d45429bbce799e339f8784c9df60ed4ad55d49e4571f728997eac5ec078f",
+      "functions": [
+        "silk_burg_modified_c"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_burg_modified_c",
+          "bytes": 172
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_burg_modified_c",
+          "bytes": 3927
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1464
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/corrMatrix_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/corrMatrix_FIX.c.s",
+      "source_sha256_lf": "f2f41c998eb560da842cca83ebc62cc56d28c10c48960a984b9e0715e08883d3",
+      "asm_sha256_lf": "f57ca960c37089d24a158dfd2a007bf7ecca73400575a2ed3fbc05762bed30dc",
+      "functions": [
+        "silk_corrVector_FIX",
+        "silk_corrMatrix_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_corrVector_FIX",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.silk_corrMatrix_FIX",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_corrVector_FIX",
+          "bytes": 155
+        },
+        {
+          "name": ".text.silk_corrMatrix_FIX",
+          "bytes": 658
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 444
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/find_LPC_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/find_LPC_FIX.c.s",
+      "source_sha256_lf": "6595fcb823411bfcfa4ed95ccbd8388b2aeef2e7cbb9a1bfbd6cb9992ff60e9c",
+      "asm_sha256_lf": "beea29eaa136594c555f33fc47fac9ddb971e2facb323ef07414d1cae0bd943b",
+      "functions": [
+        "silk_find_LPC_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_find_LPC_FIX",
+          "bytes": 52
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_find_LPC_FIX",
+          "bytes": 626
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 240
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/find_LTP_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/find_LTP_FIX.c.s",
+      "source_sha256_lf": "c8a13a3b0525cc9590fc11f7045f36920a54f9bf298910d6f33f9d64c4bf0e9e",
+      "asm_sha256_lf": "0d39ef54aa080675eba474f4089f45db52cd5604252a694c9d7166daf3bf753b",
+      "functions": [
+        "silk_find_LTP_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_find_LTP_FIX",
+          "bytes": 36
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_find_LTP_FIX",
+          "bytes": 476
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 144
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/find_pred_coefs_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/find_pred_coefs_FIX.c.s",
+      "source_sha256_lf": "58318437f58f32d747d7c0f0f3d4a883ae26890d77a483f8e6b95b46bed369ba",
+      "asm_sha256_lf": "a879cf4d66ef97fac2b039484d0c16d904ca86963d17c4b251df89d1a30a1d36",
+      "functions": [
+        "silk_find_pred_coefs_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_find_pred_coefs_FIX",
+          "bytes": 164
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_find_pred_coefs_FIX",
+          "bytes": 2203
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 1080
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/k2a_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/k2a_FIX.c.s",
+      "source_sha256_lf": "ce275b00b9ea7ca99f846b31e35b6296befda6f475c56cf4be45d576c465be0d",
+      "asm_sha256_lf": "3145f956a040620a7237dd973c870d715f82b992390234750aee6633d435c286",
+      "functions": [
+        "silk_k2a"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_k2a",
+          "bytes": 152
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 96
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/k2a_Q16_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/k2a_Q16_FIX.c.s",
+      "source_sha256_lf": "87b68fd36c75788c2e756c5aa0d845e82e010f2e5a8e4cf865ed0ffa60a58391",
+      "asm_sha256_lf": "5dba3a832736b7203c31790def6fc2973cdce3d211285e0dd29714f8f817f4e7",
+      "functions": [
+        "silk_k2a_Q16"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_k2a_Q16",
+          "bytes": 207
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 132
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/process_gains_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/process_gains_FIX.c.s",
+      "source_sha256_lf": "5d3baae8ba95cd8858611f53965777d642d26196039d522c1d1fe29ff77fa9b6",
+      "asm_sha256_lf": "685ebb0786680e33701d7f00aa5eb9e69a4dea2430bbca7e1463000153c428e9",
+      "functions": [
+        "silk_process_gains_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_process_gains_FIX",
+          "bytes": 80
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_process_gains_FIX",
+          "bytes": 993
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 516
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/regularize_correlations_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/regularize_correlations_FIX.c.s",
+      "source_sha256_lf": "8bef888dc96060989307fe427499ce226e1fc72f743c86b8595899e2ded376e4",
+      "asm_sha256_lf": "fecc32822a730a1511a1ff403a14a8d65efa2c1734340939359d3e27d9c75941",
+      "functions": [
+        "silk_regularize_correlations_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_regularize_correlations_FIX",
+          "bytes": 32
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 60
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/residual_energy16_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/residual_energy16_FIX.c.s",
+      "source_sha256_lf": "d6b8253b0ef60fdff38459817612dae560a5f6b32e6a3edbfe169af317d193e8",
+      "asm_sha256_lf": "a73c65e58513132b67f41ac51a0e7fd21a26e4e9b846765d70169d825afb906f",
+      "functions": [
+        "silk_residual_energy16_covar_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_residual_energy16_covar_FIX",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_residual_energy16_covar_FIX",
+          "bytes": 1641
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 348
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/residual_energy_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/residual_energy_FIX.c.s",
+      "source_sha256_lf": "e2ea94d15a0640673c10cd4b9b2d3c3b83aa436f530cd060c81ecc4d2adec73d",
+      "asm_sha256_lf": "d44b310a57a52f5ee9f191162cab94982c9c12eb99e2816f5e7cd86b9efb19d1",
+      "functions": [
+        "silk_residual_energy_FIX"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_residual_energy_FIX",
+          "bytes": 32
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_residual_energy_FIX",
+          "bytes": 364
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 156
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/schur64_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/schur64_FIX.c.s",
+      "source_sha256_lf": "382b19ae72f3ef06d09677e5820813390852bae2507965461e94ed40ebe6a0e7",
+      "asm_sha256_lf": "5bf6019222a30f22206092658f5a28a2eac457a4f77df608ee2166a017400336",
+      "functions": [
+        "silk_schur64"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_schur64",
+          "bytes": 44
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_schur64",
+          "bytes": 638
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 408
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/schur_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/schur_FIX.c.s",
+      "source_sha256_lf": "52c5678c5658fa18d20644cf3a03f93838d36d69e82465890e41d7b913271001",
+      "asm_sha256_lf": "4f28c774bf61876b830377bbbddcf4877d5a9e6c1fdcad43ab84be7a3c2a38fd",
+      "functions": [
+        "silk_schur"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_schur",
+          "bytes": 24
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_schur",
+          "bytes": 442
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 432
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/vector_ops_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/vector_ops_FIX.c.s",
+      "source_sha256_lf": "d28363008af9e6451750136d14fc4df8c44d09fe92210f83ab4d0a5487ebe69f",
+      "asm_sha256_lf": "78bd992ae4ac9f0d5ca5392d09711f2e4c27d4e17e58280024fd5bc1c685ee2c",
+      "functions": [
+        "silk_scale_copy_vector16",
+        "silk_scale_vector32_Q26_lshift_18",
+        "silk_inner_prod_aligned",
+        "silk_inner_prod16_c"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_scale_vector32_Q26_lshift_18",
+          "bytes": 4
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_scale_copy_vector16",
+          "bytes": 40
+        },
+        {
+          "name": ".text.silk_scale_vector32_Q26_lshift_18",
+          "bytes": 76
+        },
+        {
+          "name": ".text.silk_inner_prod_aligned",
+          "bytes": 37
+        },
+        {
+          "name": ".text.silk_inner_prod16_c",
+          "bytes": 63
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 288
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/fixed/warped_autocorrelation_FIX.c",
+      "asm": "gcc/upstream/silk/fixed/warped_autocorrelation_FIX.c.s",
+      "source_sha256_lf": "89c813de0d02d1ca806652374ddb920f88b08e8f7a69fda44240bef6b97564d4",
+      "asm_sha256_lf": "918a94d056574c11b92950240be7c62e7cef70fdba41440a46eba1b00da3457e",
+      "functions": [
+        "silk_warped_autocorrelation_FIX_c"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_warped_autocorrelation_FIX_c",
+          "bytes": 20
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_warped_autocorrelation_FIX_c",
+          "bytes": 683
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 324
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/gain_quant.c",
+      "asm": "gcc/upstream/silk/gain_quant.c.s",
+      "source_sha256_lf": "9edcdbe658efbe43b366361f180dc699b1130c1f88f90bf10c9105c984f10ea8",
+      "asm_sha256_lf": "840e65945cdc3cc8f28e00387da43b20061a9a600f458859aed3a9f328cecf9f",
+      "functions": [
+        "silk_gains_quant",
+        "silk_gains_dequant",
+        "silk_gains_ID"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_gains_quant",
+          "bytes": 32
+        },
+        {
+          "name": ".literal.silk_gains_dequant",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_gains_quant",
+          "bytes": 429
+        },
+        {
+          "name": ".text.silk_gains_dequant",
+          "bytes": 225
+        },
+        {
+          "name": ".text.silk_gains_ID",
+          "bytes": 36
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 480
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/init_decoder.c",
+      "asm": "gcc/upstream/silk/init_decoder.c.s",
+      "source_sha256_lf": "098081ff0632d802988d45571aaf0b15417c036ec4c78706ea7ca4aca1d6c9b7",
+      "asm_sha256_lf": "50c51ce51e87588e37d45e5d9f32efc7560f2511aa0efc9fea812f489ec44c85",
+      "functions": [
+        "silk_reset_decoder",
+        "silk_init_decoder"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_reset_decoder",
+          "bytes": 24
+        },
+        {
+          "name": ".literal.silk_init_decoder",
+          "bytes": 32
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_reset_decoder",
+          "bytes": 87
+        },
+        {
+          "name": ".text.silk_init_decoder",
+          "bytes": 103
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 96
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/inner_prod_aligned.c",
+      "asm": "gcc/upstream/silk/inner_prod_aligned.c.s",
+      "source_sha256_lf": "78e9d5d4692c2ac7bfdc7cc108fabcc78f7bcf14a4d5882f2b7ccce5bfd52ca8",
+      "asm_sha256_lf": "abdeb5ac1b5d94827d86bb9dc9c55ab6e7abe476c1d017faa8fde0197627e38b",
+      "functions": [
+        "silk_inner_prod_aligned_scale"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_inner_prod_aligned_scale",
+          "bytes": 44
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 72
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/interpolate.c",
+      "asm": "gcc/upstream/silk/interpolate.c.s",
+      "source_sha256_lf": "6f8cf8745124908c248e38ceed41e2b3568a41f41351b3e25fdf1af9982be5b2",
+      "asm_sha256_lf": "decaa86d3da4cd33fc4b3462ab090e0e46fb3789d2069d69c9d3d51bc82f8e40",
+      "functions": [
+        "silk_interpolate"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_interpolate",
+          "bytes": 46
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 60
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/lin2log.c",
+      "asm": "gcc/upstream/silk/lin2log.c.s",
+      "source_sha256_lf": "7a51a499749e33b2b8adc650f24eb3225aa73a2e98dca33058a400ba99565cdf",
+      "asm_sha256_lf": "fdd1e83e7ad3aa050cc7c5338497bb84da746e3c78de82434d5efb5f8665362b",
+      "functions": [
+        "silk_lin2log"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_lin2log",
+          "bytes": 164
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 96
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/log2lin.c",
+      "asm": "gcc/upstream/silk/log2lin.c.s",
+      "source_sha256_lf": "91e923ceebe38e5d64c00a66dc14b5e2197381c92574a85040e60e3deb57d53e",
+      "asm_sha256_lf": "57b7d01ceb213745c95ce8e0c8d11d1aba5643ad4f5a1ef2c0e29697a7e024cd",
+      "functions": [
+        "silk_log2lin"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_log2lin",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_log2lin",
+          "bytes": 80
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 84
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/pitch_est_tables.c",
+      "asm": "gcc/upstream/silk/pitch_est_tables.c.s",
+      "source_sha256_lf": "443594d2821212340c4f21d214b28ed2ce3ca449fd898191a49db73cfad4dc8e",
+      "asm_sha256_lf": "b3253a44ca7c8048fce2d73d3c4917f25b8b12392222ddf877390b3c186ec36f",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_nb_cbk_searchs_stage3",
+          "bytes": 3
+        },
+        {
+          "name": ".rodata.silk_Lag_range_stage3",
+          "bytes": 24
+        },
+        {
+          "name": ".rodata.silk_CB_lags_stage3",
+          "bytes": 136
+        },
+        {
+          "name": ".rodata.silk_CB_lags_stage2",
+          "bytes": 44
+        },
+        {
+          "name": ".rodata.silk_Lag_range_stage3_10_ms",
+          "bytes": 4
+        },
+        {
+          "name": ".rodata.silk_CB_lags_stage3_10_ms",
+          "bytes": 24
+        },
+        {
+          "name": ".rodata.silk_CB_lags_stage2_10_ms",
+          "bytes": 6
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 84
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/process_NLSFs.c",
+      "asm": "gcc/upstream/silk/process_NLSFs.c.s",
+      "source_sha256_lf": "3c569dfbe6a80b1134eae25bba6ed8ec541f86b14662502ba8e658cbaecef946",
+      "asm_sha256_lf": "7fc7d087a940535171c314171007e705336651cb816d25f990fda67e9367d872",
+      "functions": [
+        "silk_process_NLSFs"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_process_NLSFs",
+          "bytes": 52
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_process_NLSFs",
+          "bytes": 826
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 96
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/quant_LTP_gains.c",
+      "asm": "gcc/upstream/silk/quant_LTP_gains.c.s",
+      "source_sha256_lf": "6b1f592fddb7238643c2a35dc691042f721d14200f45cade1f91d52737bee833",
+      "asm_sha256_lf": "be12ee607548dc206ab36c689efe67e318675e4769059a0e579feefdcce14a18",
+      "functions": [
+        "silk_quant_LTP_gains"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_quant_LTP_gains",
+          "bytes": 48
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_quant_LTP_gains",
+          "bytes": 618
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 192
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/resampler.c",
+      "asm": "gcc/upstream/silk/resampler.c.s",
+      "source_sha256_lf": "24886a95fc8aab01502e33932d7ad3364ec1bac516ac8431871dff680a7772f4",
+      "asm_sha256_lf": "452d84433e55f84ecb5484c8f577f070bb820cd2ff53a75c37d6ef02092cb655",
+      "functions": [
+        "silk_resampler_init",
+        "silk_resampler"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_resampler_init",
+          "bytes": 76
+        },
+        {
+          "name": ".literal.silk_resampler",
+          "bytes": 40
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_resampler_init",
+          "bytes": 753
+        },
+        {
+          "name": ".text.silk_resampler",
+          "bytes": 313
+        },
+        {
+          "name": ".rodata.delay_matrix_dec",
+          "bytes": 15
+        },
+        {
+          "name": ".rodata.delay_matrix_enc",
+          "bytes": 15
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 612
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/resampler_down2.c",
+      "asm": "gcc/upstream/silk/resampler_down2.c.s",
+      "source_sha256_lf": "6103c045450526d02a6ada7cdf1382e7e2c83ee0b7af8f9bd5f472b2ba42ae18",
+      "asm_sha256_lf": "699066bb5e60f5e6e0bf3c19fbaf2782e4bbaefc20b1b6a682c62e8a2e083530",
+      "functions": [
+        "silk_resampler_down2"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_resampler_down2",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_resampler_down2",
+          "bytes": 167
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 84
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/resampler_down2_3.c",
+      "asm": "gcc/upstream/silk/resampler_down2_3.c.s",
+      "source_sha256_lf": "00f635968fd6eb6f01d87771fad3e80353e3abce8a5d8ac5aaa2bd5038593941",
+      "asm_sha256_lf": "c02993b100bf51ebfd0960dfd86189811d6bb3ac0e81ce6a12aab0012065fdf2",
+      "functions": [
+        "silk_resampler_down2_3"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_resampler_down2_3",
+          "bytes": 40
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_resampler_down2_3",
+          "bytes": 468
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 132
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/resampler_private_AR2.c",
+      "asm": "gcc/upstream/silk/resampler_private_AR2.c.s",
+      "source_sha256_lf": "b4ed9ade0170fff42c38de32473d04ba22f823fa78da4a32ecdc9c3c823ade90",
+      "asm_sha256_lf": "ff2b8b1ef2176a334c629f94953460297893233d45938aae7d0c5beebcf48a87",
+      "functions": [
+        "silk_resampler_private_AR2"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_resampler_private_AR2",
+          "bytes": 84
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 60
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/resampler_private_IIR_FIR.c",
+      "asm": "gcc/upstream/silk/resampler_private_IIR_FIR.c.s",
+      "source_sha256_lf": "711c5693575902756f90a674bf9db5adb6a8a7e233f5b82be3db7ebe4b71b5a9",
+      "asm_sha256_lf": "b53109943e447c892c39eb6f4e16d6e8e4ca49c542764185bee08e52850f0ed8",
+      "functions": [
+        "silk_resampler_private_IIR_FIR"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_resampler_private_IIR_FIR",
+          "bytes": 40
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_resampler_private_IIR_FIR",
+          "bytes": 375
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 120
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/resampler_private_down_FIR.c",
+      "asm": "gcc/upstream/silk/resampler_private_down_FIR.c.s",
+      "source_sha256_lf": "29b276d027eba552a208a371dc043bc89fff6afaceee23e000e10835898cf346",
+      "asm_sha256_lf": "95ce61e61c1f14061b0a347400ce6d8a2eb1237575654a9f1dc5bbd5c9d7b27c",
+      "functions": [
+        "silk_resampler_private_down_FIR"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_resampler_private_down_FIR",
+          "bytes": 36
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_resampler_private_down_FIR",
+          "bytes": 2474
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 264
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/resampler_private_up2_HQ.c",
+      "asm": "gcc/upstream/silk/resampler_private_up2_HQ.c.s",
+      "source_sha256_lf": "137afaa45fba2ae5a7e9c8ce2af5f4ca0a9d9e01a684e59cbb6af69fed62553c",
+      "asm_sha256_lf": "136e6eec713722694b8f62f080e7abd3f0e712252410d8f89f591b0c4d0e8f72",
+      "functions": [
+        "silk_resampler_private_up2_HQ",
+        "silk_resampler_private_up2_HQ_wrapper"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_resampler_private_up2_HQ",
+          "bytes": 28
+        },
+        {
+          "name": ".literal.silk_resampler_private_up2_HQ_wrapper",
+          "bytes": 28
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_resampler_private_up2_HQ",
+          "bytes": 385
+        },
+        {
+          "name": ".text.silk_resampler_private_up2_HQ_wrapper",
+          "bytes": 365
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 192
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/resampler_rom.c",
+      "asm": "gcc/upstream/silk/resampler_rom.c.s",
+      "source_sha256_lf": "670ade48e05067524887d12add428b0121f774f44389d84af5c06a8384a301a4",
+      "asm_sha256_lf": "d6548bcaa0a282062d0e183711633038ca492f2e0758a65aaf4716d86d2b5dea",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_resampler_frac_FIR_12",
+          "bytes": 96
+        },
+        {
+          "name": ".rodata.silk_Resampler_2_3_COEFS_LQ",
+          "bytes": 12
+        },
+        {
+          "name": ".rodata.silk_Resampler_1_6_COEFS",
+          "bytes": 40
+        },
+        {
+          "name": ".rodata.silk_Resampler_1_4_COEFS",
+          "bytes": 40
+        },
+        {
+          "name": ".rodata.silk_Resampler_1_3_COEFS",
+          "bytes": 40
+        },
+        {
+          "name": ".rodata.silk_Resampler_1_2_COEFS",
+          "bytes": 28
+        },
+        {
+          "name": ".rodata.silk_Resampler_2_3_COEFS",
+          "bytes": 40
+        },
+        {
+          "name": ".rodata.silk_Resampler_3_4_COEFS",
+          "bytes": 58
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 96
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/shell_coder.c",
+      "asm": "gcc/upstream/silk/shell_coder.c.s",
+      "source_sha256_lf": "f54463a2cf918c9c876abbf397ac686e74d42724bc9107252e05fd0689cd1ec0",
+      "asm_sha256_lf": "abe4abec214b1545e72757b97bbcf8d448934479cd1cb97934f410e643f4df5d",
+      "functions": [
+        "silk_shell_encoder",
+        "silk_shell_decoder"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_shell_encoder",
+          "bytes": 80
+        },
+        {
+          "name": ".literal.silk_shell_decoder",
+          "bytes": 80
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_shell_encoder",
+          "bytes": 664
+        },
+        {
+          "name": ".text.silk_shell_decoder",
+          "bytes": 861
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 756
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/sigm_Q15.c",
+      "asm": "gcc/upstream/silk/sigm_Q15.c.s",
+      "source_sha256_lf": "3c539b4dde8c7197aa8fda4e54117e0ea796eb261203afe42438c89bda8d2aa2",
+      "asm_sha256_lf": "aca7320991bd69b8735f70731199f18740d91c38928aabbc7038e116a7dfe200",
+      "functions": [
+        "silk_sigm_Q15"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_sigm_Q15",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_sigm_Q15",
+          "bytes": 90
+        },
+        {
+          "name": ".rodata.sigm_LUT_neg_Q15",
+          "bytes": 24
+        },
+        {
+          "name": ".rodata.sigm_LUT_pos_Q15",
+          "bytes": 24
+        },
+        {
+          "name": ".rodata.sigm_LUT_slope_Q10",
+          "bytes": 24
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 120
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/sort.c",
+      "asm": "gcc/upstream/silk/sort.c.s",
+      "source_sha256_lf": "06565ab1ebde95b4e593d7d99d30ee5652337791f8260dc95c5db6c8c240560a",
+      "asm_sha256_lf": "973d274cc5f0cf92d2f00c4adc60c9be15fa0156fe241a947a9a8673f5cfb310",
+      "functions": [
+        "silk_insertion_sort_increasing",
+        "silk_insertion_sort_decreasing_int16",
+        "silk_insertion_sort_increasing_all_values_int16"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_insertion_sort_increasing",
+          "bytes": 242
+        },
+        {
+          "name": ".text.silk_insertion_sort_decreasing_int16",
+          "bytes": 245
+        },
+        {
+          "name": ".text.silk_insertion_sort_increasing_all_values_int16",
+          "bytes": 56
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 636
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/stereo_LR_to_MS.c",
+      "asm": "gcc/upstream/silk/stereo_LR_to_MS.c.s",
+      "source_sha256_lf": "7045e59a6e5c49707a11e8f5adac7ff2f3a8438055afe9115f43e58f96d9963d",
+      "asm_sha256_lf": "ca3d685712860dae64d17252693722049cc19d0691818e7e2b6e439f2a9b81a1",
+      "functions": [
+        "silk_stereo_LR_to_MS"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_stereo_LR_to_MS",
+          "bytes": 136
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_stereo_LR_to_MS",
+          "bytes": 2421
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 900
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/stereo_MS_to_LR.c",
+      "asm": "gcc/upstream/silk/stereo_MS_to_LR.c.s",
+      "source_sha256_lf": "7d93879e47f71db11ceeacf4225cc7a02522d0a97c983f06349075dc80d8c543",
+      "asm_sha256_lf": "2c6c14d6e76d5f59bf6aab0b85c620408105d551ef8f0c478a23d6bc6a107892",
+      "functions": [
+        "silk_stereo_MS_to_LR"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_stereo_MS_to_LR",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_stereo_MS_to_LR",
+          "bytes": 612
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 228
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/stereo_decode_pred.c",
+      "asm": "gcc/upstream/silk/stereo_decode_pred.c.s",
+      "source_sha256_lf": "5a0b4d1336e73d76fc319f841ef997e039fc20264d3b60ada9039af9d83df94a",
+      "asm_sha256_lf": "6adcaaca27ce0eb70d06d66d5269f2c86d97dfbc6336c8509759d4ee9e509657",
+      "functions": [
+        "silk_stereo_decode_pred",
+        "silk_stereo_decode_mid_only"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_stereo_decode_pred",
+          "bytes": 44
+        },
+        {
+          "name": ".literal.silk_stereo_decode_mid_only",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_stereo_decode_pred",
+          "bytes": 276
+        },
+        {
+          "name": ".text.silk_stereo_decode_mid_only",
+          "bytes": 31
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 96
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/stereo_encode_pred.c",
+      "asm": "gcc/upstream/silk/stereo_encode_pred.c.s",
+      "source_sha256_lf": "aaeb2a5bc741f46049c251c8fb99f2338fcb5c33d63e3c548073f706e953725f",
+      "asm_sha256_lf": "09b4aafd1cb117846eca0b5c2f63df7d0122dd1cc39338647dd780dbfd8c09c2",
+      "functions": [
+        "silk_stereo_encode_pred",
+        "silk_stereo_encode_mid_only"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_stereo_encode_pred",
+          "bytes": 32
+        },
+        {
+          "name": ".literal.silk_stereo_encode_mid_only",
+          "bytes": 8
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_stereo_encode_pred",
+          "bytes": 161
+        },
+        {
+          "name": ".text.silk_stereo_encode_mid_only",
+          "bytes": 29
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 16
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 96
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/stereo_find_predictor.c",
+      "asm": "gcc/upstream/silk/stereo_find_predictor.c.s",
+      "source_sha256_lf": "39d3ee565379b1727c502bcb58e9474192ecf831e9dbee73185f9781322b07b0",
+      "asm_sha256_lf": "5a15a689ae9351033a279467a252008b2518f41366da6f44a11e82c675393f60",
+      "functions": [
+        "silk_stereo_find_predictor"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_stereo_find_predictor",
+          "bytes": 64
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_stereo_find_predictor",
+          "bytes": 1038
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 564
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/stereo_quant_pred.c",
+      "asm": "gcc/upstream/silk/stereo_quant_pred.c.s",
+      "source_sha256_lf": "fecc90892aefc12f7b4a6171a74b1ec7a329ff00127db291673e6f212a6ba11e",
+      "asm_sha256_lf": "96bfd144f96f1f100a022c7bd2a384a515931fde58f44beba162b961cb07bd29",
+      "functions": [
+        "silk_stereo_quant_pred"
+      ],
+      "sections": [
+        {
+          "name": ".literal.silk_stereo_quant_pred",
+          "bytes": 16
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_stereo_quant_pred",
+          "bytes": 286
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 8
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 204
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/sum_sqr_shift.c",
+      "asm": "gcc/upstream/silk/sum_sqr_shift.c.s",
+      "source_sha256_lf": "9849bd84c1c1427eae321d5857eb900332f5488870352bdecf069f738fffd438",
+      "asm_sha256_lf": "abbfbec6a23d57d01a6337a407f4984c664a3fbfd8f46bc881e73dcb988b75e6",
+      "functions": [
+        "silk_sum_sqr_shift"
+      ],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.silk_sum_sqr_shift",
+          "bytes": 201
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 156
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/table_LSF_cos.c",
+      "asm": "gcc/upstream/silk/table_LSF_cos.c.s",
+      "source_sha256_lf": "252d28ee3536df99d55e8f471cb8f271b3300964bfcc8e7eaece9a5882f3f4bb",
+      "asm_sha256_lf": "150156905bb33df4b1af2c565341351161f30ae15358cc557e3c08f0f917b009",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_LSFCosTab_FIX_Q12",
+          "bytes": 258
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 12
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/tables_LTP.c",
+      "asm": "gcc/upstream/silk/tables_LTP.c.s",
+      "source_sha256_lf": "856574054503e8f316904d2cdbb8d48ddbe5bec18e2787004f81a6c29bb6e656",
+      "asm_sha256_lf": "608b6b508edc59330e3e1c7e28f2f424c909eb52f71db3f6653a4f17313fa93d",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_LTP_vq_sizes",
+          "bytes": 3
+        },
+        {
+          "name": ".rodata.silk_LTP_vq_gain_ptrs_Q7",
+          "bytes": 12
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_vq_2_gain",
+          "bytes": 32
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_vq_1_gain",
+          "bytes": 16
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_vq_0_gain",
+          "bytes": 8
+        },
+        {
+          "name": ".rodata.silk_LTP_vq_ptrs_Q7",
+          "bytes": 12
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_vq_2",
+          "bytes": 160
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_vq_1",
+          "bytes": 80
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_vq_0",
+          "bytes": 40
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_BITS_Q5_ptrs",
+          "bytes": 12
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_iCDF_ptrs",
+          "bytes": 12
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_BITS_Q5_2",
+          "bytes": 32
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_BITS_Q5_1",
+          "bytes": 16
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_BITS_Q5_0",
+          "bytes": 8
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_iCDF_2",
+          "bytes": 32
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_iCDF_1",
+          "bytes": 16
+        },
+        {
+          "name": ".rodata.silk_LTP_gain_iCDF_0",
+          "bytes": 8
+        },
+        {
+          "name": ".rodata.silk_LTP_per_index_iCDF",
+          "bytes": 3
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 216
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/tables_NLSF_CB_NB_MB.c",
+      "asm": "gcc/upstream/silk/tables_NLSF_CB_NB_MB.c.s",
+      "source_sha256_lf": "73545475b0e7b89c6b0f252a563ae5eb83bdb8fa93f093a791e9c51bcce74c2d",
+      "asm_sha256_lf": "c223cffec32bf6f46101b56c70dabb0993c861cf74f2587c7580a4ae94208512",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB_NB_MB",
+          "bytes": 40
+        },
+        {
+          "name": ".rodata.silk_NLSF_DELTA_MIN_NB_MB_Q15",
+          "bytes": 22
+        },
+        {
+          "name": ".rodata.silk_NLSF_PRED_NB_MB_Q8",
+          "bytes": 18
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB2_BITS_NB_MB_Q5",
+          "bytes": 72
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB2_iCDF_NB_MB",
+          "bytes": 72
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB2_SELECT_NB_MB",
+          "bytes": 160
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB1_iCDF_NB_MB",
+          "bytes": 64
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB1_Wght_Q9",
+          "bytes": 640
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB1_NB_MB_Q8",
+          "bytes": 320
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 108
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/tables_NLSF_CB_WB.c",
+      "asm": "gcc/upstream/silk/tables_NLSF_CB_WB.c.s",
+      "source_sha256_lf": "6e070f5d09f76061fb1affdede32137fe6689fa63d4d47ac4b0c9122a251bdb7",
+      "asm_sha256_lf": "6c98d05b81f6b7185d757019a2ac341a8d119553e3e0227463a072b3fcbe37a0",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB_WB",
+          "bytes": 40
+        },
+        {
+          "name": ".rodata.silk_NLSF_DELTA_MIN_WB_Q15",
+          "bytes": 34
+        },
+        {
+          "name": ".rodata.silk_NLSF_PRED_WB_Q8",
+          "bytes": 30
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB2_BITS_WB_Q5",
+          "bytes": 72
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB2_iCDF_WB",
+          "bytes": 72
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB2_SELECT_WB",
+          "bytes": 256
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB1_iCDF_WB",
+          "bytes": 64
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB1_WB_Wght_Q9",
+          "bytes": 1024
+        },
+        {
+          "name": ".rodata.silk_NLSF_CB1_WB_Q8",
+          "bytes": 512
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 108
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/tables_gain.c",
+      "asm": "gcc/upstream/silk/tables_gain.c.s",
+      "source_sha256_lf": "37bde82e567e0dcd172bdc1a2867044b190d001a1c0a97c7bce67f3ba47eb9d8",
+      "asm_sha256_lf": "7fbfe52d1cff9969d24fe2150e4bc6cd4f80661d072a3a69d7d731b6996238b9",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_delta_gain_iCDF",
+          "bytes": 41
+        },
+        {
+          "name": ".rodata.silk_gain_iCDF",
+          "bytes": 24
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 24
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/tables_other.c",
+      "asm": "gcc/upstream/silk/tables_other.c.s",
+      "source_sha256_lf": "7d66f3167414bb957e218c2f1848074266a648327e223f25f34bb60c633f62c0",
+      "asm_sha256_lf": "e4fb42d0f2b0a886ac4a71f1bcaea89460f4712120d2f2182e173dee51d0eb71",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_Transition_LP_A_Q28",
+          "bytes": 40
+        },
+        {
+          "name": ".rodata.silk_Transition_LP_B_Q28",
+          "bytes": 60
+        },
+        {
+          "name": ".rodata.silk_NLSF_EXT_iCDF",
+          "bytes": 7
+        },
+        {
+          "name": ".rodata.silk_uniform8_iCDF",
+          "bytes": 8
+        },
+        {
+          "name": ".rodata.silk_uniform6_iCDF",
+          "bytes": 6
+        },
+        {
+          "name": ".rodata.silk_uniform5_iCDF",
+          "bytes": 5
+        },
+        {
+          "name": ".rodata.silk_uniform4_iCDF",
+          "bytes": 4
+        },
+        {
+          "name": ".rodata.silk_uniform3_iCDF",
+          "bytes": 3
+        },
+        {
+          "name": ".rodata.silk_LTPScales_table_Q14",
+          "bytes": 6
+        },
+        {
+          "name": ".rodata.silk_Quantization_Offsets_Q10",
+          "bytes": 8
+        },
+        {
+          "name": ".rodata.silk_NLSF_interpolation_factor_iCDF",
+          "bytes": 5
+        },
+        {
+          "name": ".rodata.silk_type_offset_no_VAD_iCDF",
+          "bytes": 2
+        },
+        {
+          "name": ".rodata.silk_type_offset_VAD_iCDF",
+          "bytes": 4
+        },
+        {
+          "name": ".rodata.silk_LTPscale_iCDF",
+          "bytes": 3
+        },
+        {
+          "name": ".rodata.silk_lsb_iCDF",
+          "bytes": 2
+        },
+        {
+          "name": ".rodata.silk_LBRR_flags_iCDF_ptr",
+          "bytes": 8
+        },
+        {
+          "name": ".rodata.silk_LBRR_flags_3_iCDF",
+          "bytes": 7
+        },
+        {
+          "name": ".rodata.silk_LBRR_flags_2_iCDF",
+          "bytes": 3
+        },
+        {
+          "name": ".rodata.silk_stereo_only_code_mid_iCDF",
+          "bytes": 2
+        },
+        {
+          "name": ".rodata.silk_stereo_pred_joint_iCDF",
+          "bytes": 25
+        },
+        {
+          "name": ".rodata.silk_stereo_pred_quant_Q13",
+          "bytes": 32
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 252
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/tables_pitch_lag.c",
+      "asm": "gcc/upstream/silk/tables_pitch_lag.c.s",
+      "source_sha256_lf": "d1c00d859c1c4be406cf016653d4cb08b9a2f0395ed97bb6befd9a43726e9735",
+      "asm_sha256_lf": "d30f2a7e0277b8df2142f5d897ecb6997c3a1a7abafb997507b71fcbb497430a",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_pitch_contour_10_ms_NB_iCDF",
+          "bytes": 3
+        },
+        {
+          "name": ".rodata.silk_pitch_contour_10_ms_iCDF",
+          "bytes": 12
+        },
+        {
+          "name": ".rodata.silk_pitch_contour_NB_iCDF",
+          "bytes": 11
+        },
+        {
+          "name": ".rodata.silk_pitch_contour_iCDF",
+          "bytes": 34
+        },
+        {
+          "name": ".rodata.silk_pitch_delta_iCDF",
+          "bytes": 21
+        },
+        {
+          "name": ".rodata.silk_pitch_lag_iCDF",
+          "bytes": 32
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 72
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/silk/tables_pulses_per_block.c",
+      "asm": "gcc/upstream/silk/tables_pulses_per_block.c.s",
+      "source_sha256_lf": "53b124b186c44f464f8e5679ce78ec1a4a9b23406d4b33b4b22e559369e502a9",
+      "asm_sha256_lf": "31545a234abde684ee735541841f04f057568944f1d2dfddaab49e8b87334109",
+      "functions": [],
+      "sections": [
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".rodata.silk_sign_iCDF",
+          "bytes": 42
+        },
+        {
+          "name": ".rodata.silk_shell_code_table_offsets",
+          "bytes": 17
+        },
+        {
+          "name": ".rodata.silk_shell_code_table3",
+          "bytes": 152
+        },
+        {
+          "name": ".rodata.silk_shell_code_table2",
+          "bytes": 152
+        },
+        {
+          "name": ".rodata.silk_shell_code_table1",
+          "bytes": 152
+        },
+        {
+          "name": ".rodata.silk_shell_code_table0",
+          "bytes": 152
+        },
+        {
+          "name": ".rodata.silk_rate_levels_BITS_Q5",
+          "bytes": 18
+        },
+        {
+          "name": ".rodata.silk_rate_levels_iCDF",
+          "bytes": 18
+        },
+        {
+          "name": ".rodata.silk_pulses_per_block_BITS_Q5",
+          "bytes": 162
+        },
+        {
+          "name": ".rodata.silk_pulses_per_block_iCDF",
+          "bytes": 180
+        },
+        {
+          "name": ".rodata.silk_max_pulses_table",
+          "bytes": 4
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 132
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/src/opus.c",
+      "asm": "gcc/upstream/src/opus.c.s",
+      "source_sha256_lf": "92a8cd974199f850d87d98801f8cc7adbe5a5c015176c7dae44c39c37ea0b400",
+      "asm_sha256_lf": "dfb8bab524e5b82ada2c9720dbfd8bf0bd54ed4432e086bfd2ca388f100ff6c2",
+      "functions": [
+        "encode_size",
+        "opus_packet_get_samples_per_frame",
+        "opus_packet_parse_impl",
+        "opus_packet_parse"
+      ],
+      "sections": [
+        {
+          "name": ".literal.opus_packet_get_samples_per_frame",
+          "bytes": 20
+        },
+        {
+          "name": ".literal.opus_packet_parse_impl",
+          "bytes": 24
+        },
+        {
+          "name": ".literal.opus_packet_parse",
+          "bytes": 24
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.encode_size",
+          "bytes": 41
+        },
+        {
+          "name": ".text.opus_packet_get_samples_per_frame",
+          "bytes": 131
+        },
+        {
+          "name": ".text.opus_packet_parse_impl",
+          "bytes": 1136
+        },
+        {
+          "name": ".text.opus_packet_parse",
+          "bytes": 745
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 24
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 2124
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "asm": "gcc/upstream/src/opus_decoder.c.s",
+      "source_sha256_lf": "1b7cd3c83d0af7951a0ca844db3ca28156a89c0e5959a0be6fb2cc50ead66a7a",
+      "asm_sha256_lf": "85b4ac0607a6709491812e92bdf1b286d9de7fb877766a6ec85ab7836731e303",
+      "functions": [
+        "opus_decode_frame",
+        "opus_decode_native_impl$isra$3",
+        "opus_decoder_get_size",
+        "opus_decoder_init",
+        "opus_decoder_create",
+        "opus_decode_native",
+        "yoradio_opus_decode_blocks_native",
+        "opus_decode",
+        "opus_decoder_ctl",
+        "opus_decoder_destroy",
+        "opus_packet_get_bandwidth",
+        "opus_packet_get_nb_channels",
+        "opus_packet_get_nb_frames",
+        "opus_packet_get_nb_samples",
+        "opus_packet_has_lbrr",
+        "opus_decoder_get_nb_samples",
+        "opus_dred_decoder_get_size",
+        "opus_dred_decoder_init",
+        "opus_dred_decoder_create",
+        "opus_dred_decoder_destroy",
+        "opus_dred_decoder_ctl",
+        "opus_dred_get_size",
+        "opus_dred_alloc",
+        "opus_dred_free",
+        "opus_dred_parse",
+        "opus_dred_process",
+        "opus_decoder_dred_decode",
+        "opus_decoder_dred_decode_float"
+      ],
+      "sections": [
+        {
+          "name": ".literal.opus_decode_frame",
+          "bytes": 284
+        },
+        {
+          "name": ".literal.opus_decode_native_impl$isra$3",
+          "bytes": 40
+        },
+        {
+          "name": ".literal.opus_decoder_get_size",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.opus_decoder_init",
+          "bytes": 60
+        },
+        {
+          "name": ".literal.opus_decoder_create",
+          "bytes": 40
+        },
+        {
+          "name": ".literal.opus_decode_native",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.yoradio_opus_decode_blocks_native",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.opus_decode",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.opus_decoder_ctl",
+          "bytes": 68
+        },
+        {
+          "name": ".literal.opus_decoder_destroy",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.opus_packet_get_nb_samples",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.opus_packet_has_lbrr",
+          "bytes": 20
+        },
+        {
+          "name": ".literal.opus_decoder_get_nb_samples",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.opus_dred_decoder_init",
+          "bytes": 4
+        },
+        {
+          "name": ".literal.opus_dred_decoder_create",
+          "bytes": 8
+        },
+        {
+          "name": ".literal.opus_dred_decoder_destroy",
+          "bytes": 4
+        },
+        {
+          "name": ".text",
+          "bytes": 0
+        },
+        {
+          "name": ".data",
+          "bytes": 0
+        },
+        {
+          "name": ".bss",
+          "bytes": 0
+        },
+        {
+          "name": ".text.opus_decode_frame",
+          "bytes": 3573
+        },
+        {
+          "name": ".text.opus_decode_native_impl$isra$3",
+          "bytes": 880
+        },
+        {
+          "name": ".text.opus_decoder_get_size",
+          "bytes": 70
+        },
+        {
+          "name": ".text.opus_decoder_init",
+          "bytes": 289
+        },
+        {
+          "name": ".text.opus_decoder_create",
+          "bytes": 193
+        },
+        {
+          "name": ".text.opus_decode_native",
+          "bytes": 36
+        },
+        {
+          "name": ".text.yoradio_opus_decode_blocks_native",
+          "bytes": 97
+        },
+        {
+          "name": ".text.opus_decode",
+          "bytes": 40
+        },
+        {
+          "name": ".text.opus_decoder_ctl",
+          "bytes": 724
+        },
+        {
+          "name": ".rodata.opus_decoder_ctl",
+          "bytes": 156
+        },
+        {
+          "name": ".text.opus_decoder_destroy",
+          "bytes": 19
+        },
+        {
+          "name": ".text.opus_packet_get_bandwidth",
+          "bytes": 67
+        },
+        {
+          "name": ".text.opus_packet_get_nb_channels",
+          "bytes": 15
+        },
+        {
+          "name": ".text.opus_packet_get_nb_frames",
+          "bytes": 42
+        },
+        {
+          "name": ".text.opus_packet_get_nb_samples",
+          "bytes": 97
+        },
+        {
+          "name": ".text.opus_packet_has_lbrr",
+          "bytes": 207
+        },
+        {
+          "name": ".text.opus_decoder_get_nb_samples",
+          "bytes": 101
+        },
+        {
+          "name": ".text.opus_dred_decoder_get_size",
+          "bytes": 4
+        },
+        {
+          "name": ".text.opus_dred_decoder_init",
+          "bytes": 15
+        },
+        {
+          "name": ".text.opus_dred_decoder_create",
+          "bytes": 53
+        },
+        {
+          "name": ".text.opus_dred_decoder_destroy",
+          "bytes": 19
+        },
+        {
+          "name": ".text.opus_dred_decoder_ctl",
+          "bytes": 4
+        },
+        {
+          "name": ".text.opus_dred_get_size",
+          "bytes": 4
+        },
+        {
+          "name": ".text.opus_dred_alloc",
+          "bytes": 10
+        },
+        {
+          "name": ".text.opus_dred_free",
+          "bytes": 2
+        },
+        {
+          "name": ".text.opus_dred_parse",
+          "bytes": 4
+        },
+        {
+          "name": ".text.opus_dred_process",
+          "bytes": 4
+        },
+        {
+          "name": ".text.opus_decoder_dred_decode",
+          "bytes": 4
+        },
+        {
+          "name": ".text.opus_decoder_dred_decode_float",
+          "bytes": 4
+        },
+        {
+          "name": ".rodata.CSWTCH$60",
+          "bytes": 16
+        },
+        {
+          "name": ".comment",
+          "bytes": 50
+        },
+        {
+          "name": ".xtensa.info",
+          "bytes": 56
+        },
+        {
+          "name": ".xt.lit",
+          "bytes": 128
+        },
+        {
+          "name": ".xt.prop",
+          "bytes": 5388
+        }
+      ],
+      "roundtrip_exact": true,
+      "section_contents_exact": true
+    }
+  ],
+  "library_sha256": "4146249c636c54df79fa0d6f29d6dfe9d5c6f9cf4ad3c18a1437600dc75d3fcc",
+  "library_bytes": 659130,
+  "roundtrip_exact": true
+}
