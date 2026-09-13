@@ -7,6 +7,14 @@ if(NOT CONFIG_YORADIO_OGG_OPUS AND NOT YORADIO_OPUS_BACKEND STREQUAL "c")
   message(FATAL_ERROR "Opus ASM backend requires CONFIG_YORADIO_OGG_OPUS")
 endif()
 if(CONFIG_YORADIO_OGG_OPUS)
+  option(YORADIO_OPUS_PVQ_IRAM "Diagnostic placement of decode_pulses/alg_unquant in IRAM" OFF)
+  set(OPUS_LDFRAGMENTS "")
+  if(YORADIO_OPUS_PVQ_IRAM)
+    if(NOT YORADIO_ESP8266_DIAGNOSTIC)
+      message(FATAL_ERROR "PVQ IRAM placement requires diagnostic firmware until board qualification")
+    endif()
+    list(APPEND OPUS_LDFRAGMENTS "opus_pvq_iram.lf")
+  endif()
   option(YORADIO_OPUS_LOW_RAM "Diagnostic SILK loan, compact autocorrelation and PLC IRAM" OFF)
   if(YORADIO_OPUS_LOW_RAM AND NOT YORADIO_ESP8266_DIAGNOSTIC)
     message(FATAL_ERROR "Low-RAM Opus requires diagnostic firmware until device qualification")
@@ -40,7 +48,8 @@ if(CONFIG_YORADIO_OGG_OPUS)
   idf_component_register(SRCS ${OPUS_SOURCES}
       opus_memory.c opus_stage_profile.c opus_rotation_lx106.S ogg_opus_demux.c native_opus.c
       INCLUDE_DIRS . upstream/include
-      PRIV_INCLUDE_DIRS upstream/celt upstream/silk upstream/silk/fixed upstream/src)
+      PRIV_INCLUDE_DIRS upstream/celt upstream/silk upstream/silk/fixed upstream/src
+      LDFRAGMENTS ${OPUS_LDFRAGMENTS})
   target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_BOUNDED=1)
   if(YORADIO_OPUS_LOW_RAM)
     # scratch-mark ABI is shared with any consumer of opus_memory.h.

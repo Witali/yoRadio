@@ -1,0 +1,7 @@
+# Diagnostic placement only: code/literals, not rodata, PCM or scratch.
+# Object stems match C (.c.obj) and the generated ASM (.c.s.obj) backends.
+[mapping:yoradio_opus_pvq_iram]
+archive: libopus_decoder.a
+entries:
+    cwrs:decode_pulses (noflash_text)
+    vq:alg_unquant (noflash_text)

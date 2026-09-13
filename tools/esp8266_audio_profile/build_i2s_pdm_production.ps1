@@ -24,6 +24,7 @@ param(
     [switch]$OpusWordAsm,
     [switch]$OpusIcdfFlashWord,
     [switch]$OpusFirFlashWord,
+    [switch]$OpusPvqIram,
     [switch]$OpusCeltDecodeOnly,
     [switch]$OpusRotationLx106,
     [switch]$OpusDivOnce,
@@ -54,6 +55,7 @@ if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
 }
 if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -SpiffsLog' }
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
+if ($OpusPvqIram -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusPvqIram requires diagnostic Opus' }
 if ($OpusBackend -ne 'c') {
     if (-not $Diagnostic -or -not $EnableOpus) { throw 'Opus ASM backend requires diagnostic Opus' }
     if (-not $OpusWordAsm -or -not $OpusIcdfFlashWord -or -not $OpusFirFlashWord) { throw 'Pinned ASM requires -OpusWordAsm -OpusIcdfFlashWord -OpusFirFlashWord' }
@@ -183,6 +185,7 @@ try {
     $taskOpusWordAsm = if ($OpusWordAsm) { 'ON' } else { 'OFF' }
     $taskOpusIcdfFlashWord = if ($OpusIcdfFlashWord) { 'ON' } else { 'OFF' }
     $taskOpusFirFlashWord = if ($OpusFirFlashWord) { 'ON' } else { 'OFF' }
+    $taskOpusPvqIram = if ($OpusPvqIram) { 'ON' } else { 'OFF' }
     $taskOpusLowRam = if ($OpusLowRam) { 'ON' } else { 'OFF' }
     $taskOpusCeltDecodeOnly = if ($OpusCeltDecodeOnly) { 'ON' } else { 'OFF' }
     $taskOpusRotationLx106 = if ($OpusRotationLx106) { 'ON' } else { 'OFF' }
@@ -221,6 +224,7 @@ try {
         "-DYORADIO_OPUS_BACKEND=$OpusBackend",
         "-DYORADIO_OPUS_ICDF_FLASH_WORD=$taskOpusIcdfFlashWord",
         "-DYORADIO_OPUS_FIR_FLASH_WORD=$taskOpusFirFlashWord",
+        "-DYORADIO_OPUS_PVQ_IRAM=$taskOpusPvqIram",
         "-DYORADIO_OPUS_LOW_RAM=$taskOpusLowRam",
         "-DYORADIO_OPUS_CELT_DECODE_ONLY=$taskOpusCeltDecodeOnly",
         "-DYORADIO_OPUS_ROTATION_LX106=$taskOpusRotationLx106",
@@ -288,6 +292,8 @@ try {
         opus_word_asm=[bool]$OpusWordAsm
         opus_icdf_flash_word=[bool]$OpusIcdfFlashWord
         opus_fir_flash_word=[bool]$OpusFirFlashWord
+        opus_pvq_iram=[bool]$OpusPvqIram
+        opus_pvq_iram_fragment_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/opus_pvq_iram.lf").Hash
         opus_celt_decode_only=[bool]$OpusCeltDecodeOnly
         opus_rotation_lx106=[bool]$OpusRotationLx106
         opus_div_once=[bool]$OpusDivOnce
