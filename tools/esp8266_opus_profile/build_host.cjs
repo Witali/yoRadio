@@ -40,7 +40,7 @@ function dependencies(depfile) {
 }
 
 async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false, asmEntropyModel = false, asmBandsModel = '' } = {}) {
-  if (asmBandsModel && (!bounded || !require('../esp8266_opus_asm/bands.cjs').kinds.includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
+  if (asmBandsModel && (!bounded || !['intensity','blocks'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
   if (asmEntropyModel && !bounded) throw Error('asmEntropyModel requires bounded decoder.');
   if (silkPlcIram && !bounded) throw Error('silkPlcIram requires bounded decoder.');
   if (autocorrCompact && !bounded) throw Error('autocorrCompact requires bounded decoder.');
@@ -63,7 +63,10 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
     fs.readdirSync(path.join(sourceRoot, dir)).filter(file => file.endsWith('.c')).sort()
       .map(file => path.join(sourceRoot, dir, file)));
   if (bounded) sources.push(path.join(component, 'opus_memory.c'));
-  if (asmBandsModel) sources[sources.indexOf(path.join(sourceRoot, 'celt/bands.c'))] = require('../esp8266_opus_asm/bands.cjs').cModel(asmBandsModel);
+  const modelSources = [];
+  if (asmBandsModel==='intensity') sources[sources.indexOf(path.join(sourceRoot, 'celt/bands.c'))] = require('../esp8266_opus_asm/bands.cjs').cModel(asmBandsModel);
+  if (asmBandsModel==='blocks') for(const model of require('../esp8266_opus_asm/blocks.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
+  if (asmBandsModel) modelSources.push(...sources.filter(source=>source.includes('opus-bands-')));
   if (asmEntropyModel) {
     const generated = require('../esp8266_opus_asm/model.cjs').generateModel();
     sources[sources.indexOf(path.join(sourceRoot, 'celt/entdec.c'))] = generated.reference;
@@ -97,7 +100,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   }
   fs.mkdirSync(out, { recursive: true });
   const compiler = execute('gcc', ['--version']).split(/\r?\n/)[0];
-  const signature = crypto.createHash('sha256').update(JSON.stringify({ compiler, flags, sources })).digest('hex');
+  const signature = crypto.createHash('sha256').update(JSON.stringify({ compiler, flags, sources, modelSources })).digest('hex');
   const pending = sources.flatMap((source, index) => {
     const object = objects[index], deps = dependencies(object + '.d');
     const stamp = fs.existsSync(object) ? fs.statSync(object).mtimeMs : 0;
@@ -110,7 +113,11 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
     while (cursor < pending.length) {
       const { source, object } = pending[cursor++];
       fs.mkdirSync(path.dirname(object), { recursive: true });
-      await compile([...flags, '-MMD', '-MF', hostPath(object + '.d'), '-c', hostPath(source), '-o', hostPath(object)]);
+      // A copied CELT unit must still resolve celt/config.h before the component
+      // config.h, just like #include "config.h" in its original directory.
+      // Otherwise WORD_SCRATCH silently changes from IRAM to DRAM in the model.
+      const modelIncludes = modelSources.includes(source) ? ['-I' + hostPath(path.join(upstream, 'celt'))] : [];
+      await compile([...modelIncludes, ...flags, '-MMD', '-MF', hostPath(object + '.d'), '-c', hostPath(source), '-o', hostPath(object)]);
     }
   }));
   const linked = pending.length > 0 || !fs.existsSync(binary);

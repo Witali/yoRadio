@@ -13,7 +13,7 @@ param(
     [int]$LedUpdateHz = 10,
     [switch]$NoAudioLevelLed,
     [switch]$EnableOpus,
-    [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm')]
+    [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm', 'bands-blocks-asm')]
     [string]$OpusBackend = 'c',
     [ValidateSet(1024, 1536, 2048, 3072, 4096)]
     [int]$OpusInputBytes = 1024,
@@ -284,6 +284,7 @@ try {
         opus_scratch_bytes=$(if ($taskOpusEnabled) { $OpusScratchBytes } else { 0 })
         opus_low_ram=[bool]$OpusLowRam
         opus_backend=$OpusBackend
+        opus_bands_blocks_manifest_sha256=$(if ($OpusBackend -eq 'bands-blocks-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-blocks.json").Hash } else { $null })
         opus_asm_manifest_sha256=$(if ($OpusBackend -ne 'c') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/manifest.json").Hash } else { $null })
         opus_asm_optimization_sha256=$(if ($OpusBackend -eq 'optimized-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/optimized.json").Hash } elseif ($OpusBackend -eq 'hoisted-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/hoisted.json").Hash } elseif ($OpusBackend -eq 'bands-intensity-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-intensity.json").Hash } else { $null })
         opus_plc_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/PLC.c").Hash
