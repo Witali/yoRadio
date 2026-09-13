@@ -322,6 +322,11 @@ gain, PLC/FEC и Ogg pre-skip/granule. Сравнить полный PCM с upst
   disabled assembler совпадает с исходным, +128B DRAM только в stage8
   diagnostic. [Методика](ESP8266_OPUS_STAGE_PROFILE.md). Замеры всех стадий
   и выбор следующей оптимизации остаются незавершёнными.
+  Дополнительно2026-09-13 выполнен [функциональный профиль192кбит/с](ESP8266_OPUS_FUNCTION_PROFILE.md):
+  bounded external-call counters и coarse bands/MDCT/FFT, по10 попыток.
+  Частоты вызовов и CPU/self/max сохранены. Обёртки заметно меняют скорость,
+  поэтому это ориентир для выбора горячих участков, не точные production
+  доли. P0 целиком не закрывается: SILK и другие режимы ещё требуют профиля.
   Stage8 измерен по согласованному SDK времени в10 raw-прогонах: bands/PVQ
   занимает51.47/61.63/78.34% decode wall для CELT64/128/510; Hybrid24 —12.79%.
   Следующий приоритет CELT — P4 decoder-only, затем деления/вращения внутри

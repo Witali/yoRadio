@@ -23,3 +23,11 @@ the previous selected station unchanged. Free heap27628B, lifetime minimum
 24748B, web stack free2288B in a follow-up status sample. These are idle
 figures, not decode/RAM or live audio qualification. No new Opus radio
 continuity claim is made. The raw benchmark is no longer the active image.
+
+## Restoration after function profiling, 2026-09-13
+
+Application-only OTA again succeeded,0x110000 ->0x10000,885552B, HTTP200/OK,
+19.41s upload. See restore-after-function-profile.json. Wi-Fi connected,
+RSSI-61dBm, no error; station unchanged and stopped as before profiling.
+Free heap27628B, lifetime minimum24748B, web stack free2836B. Existing image
+unchanged; profiler no longer runs. No Wi-Fi/playlist/SPIFFS writes.
