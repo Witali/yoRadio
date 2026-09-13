@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {component,sourceHash}=require('./export.cjs');
 function verify(mode, directory=path.join(component,'asm/lx106'), componentRoot=component){
- assert.ok(['gcc-asm','optimized-asm','hoisted-asm','bands-intensity-asm','bands-blocks-asm','bands-combined-asm','bands-pulse-lookup-asm','bands-tell-inline-asm','bands-fused-asm','bands-tell-intensity-asm','bands-update-fast-asm','bands-tell-update-asm','bands-tell-bits1-asm','bands-layout32-asm','bands-layout128-asm','bands-cache-reuse-asm'].includes(mode),'Unknown ASM selection');
+ assert.ok(['gcc-asm','optimized-asm','hoisted-asm','bands-intensity-asm','bands-blocks-asm','bands-combined-asm','bands-pulse-lookup-asm','bands-tell-inline-asm','bands-fused-asm','bands-tell-intensity-asm','bands-update-fast-asm','bands-tell-update-asm','bands-tell-bits1-asm','bands-layout32-asm','bands-layout128-asm','bands-cache-reuse-asm','bands-inner4-asm'].includes(mode),'Unknown ASM selection');
  const manifest=JSON.parse(fs.readFileSync(path.join(directory,'manifest.json'),'utf8'));
  assert.equal(manifest.roundtrip_exact,true);
  assert.equal(manifest.cpu,'LX106');assert.equal(manifest.abi,'call0');
@@ -15,6 +15,20 @@ function verify(mode, directory=path.join(component,'asm/lx106'), componentRoot=
  assert.deepEqual(manifest.files.map(f=>f.source).sort(),actual,'ASM corpus does not cover current C units');
  let optimization;
  let overlays=[];
+ if(mode==='bands-inner4-asm'){
+  const r=JSON.parse(fs.readFileSync(path.join(directory,'bands-inner4.json'),'utf8'));
+  assert.equal(r.base_manifest_sha256,sourceHash(path.join(directory,'manifest.json')));
+  assert.equal(r.recipe_sha256_lf,sourceHash(path.join(__dirname,'inner4.cjs')));
+  assert.equal(r.parent_sha256_lf,sourceHash(path.join(directory,'bands-tell-inline.json')));
+  assert.deepEqual(Object.keys(r.dependencies),['inner4_loop.inc.s']);
+  assert.equal(r.dependencies['inner4_loop.inc.s'],sourceHash(path.join(__dirname,'inner4_loop.inc.s')));
+  assert.equal(r.additional_static_ram_bytes,0);assert.equal(r.stack_change_bytes,0);
+  assert.equal(r.unroll_elements,4);assert.equal(r.threshold_elements,8);
+  verify('bands-tell-inline-asm',directory,componentRoot);
+  assert.deepEqual(r.files.map(f=>f.source),['upstream/celt/bands.c','upstream/celt/entcode.c','upstream/celt/vq.c']);
+  for(const f of r.files)assert.equal(sourceHash(path.join(directory,f.overlay)),f.overlay_sha256_lf);
+  overlays=r.files;
+ }
  if(mode==='bands-cache-reuse-asm'){
   const r=JSON.parse(fs.readFileSync(path.join(directory,'bands-cache-reuse.json'),'utf8'));
   assert.equal(r.base_manifest_sha256,sourceHash(path.join(directory,'manifest.json')));

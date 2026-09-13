@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "candidate": "bands-inner4-v1",
+  "base_manifest_sha256": "c98bc13abf082c51acf4a582f467ba94f256d2e45ae1e5ff6bf0e6ccdf8844dc",
+  "recipe_sha256_lf": "2242d94ead0cc6fd8289b5c5276912d48002f52569481eaa4e0c1395fd0963ff",
+  "parent_sha256_lf": "794eda0bf7c1b1c87b51f87c38691b5b7ba8edb40efcc979cac93adcb3cd8171",
+  "dependencies": {
+    "inner4_loop.inc.s": "e0161d39f2984e7747ced159a4a4ce424faa97d3fee8c92d11b269ab7d1b6043"
+  },
+  "files": [
+    {
+      "source": "upstream/celt/bands.c",
+      "overlay": "bands-tell-inline/upstream/celt/bands.c.s",
+      "overlay_sha256_lf": "dc3aca2b04ecfc63e4a9b3ab502a2559a88a2651a9b5b53fea272936255c2cf5"
+    },
+    {
+      "source": "upstream/celt/entcode.c",
+      "overlay": "bands-tell-inline/upstream/celt/entcode.c.s",
+      "overlay_sha256_lf": "5596f73af4f21afefed77288009aab8f346019d91249b35100166a166b13443a"
+    },
+    {
+      "source": "upstream/celt/vq.c",
+      "overlay": "bands-inner4/upstream/celt/vq.c.s",
+      "overlay_sha256_lf": "0527eeded9ef492dc663d971fefb8c489264140ace9b642893bcc80d922bdf53",
+      "sections_before": {
+        ".literal.exp_rotation": 40,
+        ".literal.op_pvq_search_c": 32,
+        ".literal.alg_quant": 120,
+        ".literal.alg_unquant": 60,
+        ".literal.renormalise_vector": 12,
+        ".literal.stereo_itheta": 52,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.exp_rotation1": 174,
+        ".text.exp_rotation": 683,
+        ".text.op_pvq_search_c": 635,
+        ".text.alg_quant": 1848,
+        ".text.alg_unquant": 806,
+        ".text.renormalise_vector": 181,
+        ".text.stereo_itheta": 477,
+        ".rodata.SPREAD_FACTOR$3797": 12,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 48,
+        ".xt.prop": 2160
+      },
+      "sections_after": {
+        ".literal.exp_rotation": 40,
+        ".literal.op_pvq_search_c": 32,
+        ".literal.alg_quant": 120,
+        ".literal.alg_unquant": 60,
+        ".literal.renormalise_vector": 12,
+        ".literal.stereo_itheta": 52,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.exp_rotation1": 174,
+        ".text.exp_rotation": 683,
+        ".text.op_pvq_search_c": 635,
+        ".text.alg_quant": 1848,
+        ".text.alg_unquant": 806,
+        ".text.renormalise_vector": 233,
+        ".text.stereo_itheta": 477,
+        ".rodata.SPREAD_FACTOR$3797": 12,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 48,
+        ".xt.prop": 2184
+      }
+    }
+  ],
+  "unroll_elements": 4,
+  "threshold_elements": 8,
+  "changed_function": "renormalise_vector",
+  "additional_static_ram_bytes": 0,
+  "stack_change_bytes": 0,
+  "physical_speed_measured": false
+}
