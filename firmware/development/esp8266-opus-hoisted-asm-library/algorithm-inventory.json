@@ -1,0 +1,4301 @@
+{
+  "date": "2026-09-13T14:27:37.112Z",
+  "scope": "Every exported function; linked marks name presence in the control ELF. Static counts, not hotness, latency or flash-vs-RAM attribution.",
+  "baseline_manifest_sha256": "c98bc13abf082c51acf4a582f467ba94f256d2e45ae1e5ff6bf0e6ccdf8844dc",
+  "functions": [
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "deinterleave_hadamard",
+      "linked": true,
+      "linked_bytes": 229,
+      "instructions": 89,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 16,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "intensity_stereo$isra$1",
+      "linked": true,
+      "linked_bytes": 231,
+      "instructions": 86,
+      "sar_setups": 4,
+      "narrow_loads": 2,
+      "stack_accesses": 14,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "celt_sqrt",
+        "__divsi3",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "quant_partition",
+      "linked": true,
+      "linked_bytes": 2170,
+      "instructions": 805,
+      "sar_setups": 15,
+      "narrow_loads": 17,
+      "stack_accesses": 172,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__udivsi3",
+        "__udivsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "ec_tell_frac",
+        "ec_tell_frac",
+        "__udivsi3",
+        "ec_enc_uint",
+        "ec_dec_uint",
+        "ec_encode",
+        "isqrt32",
+        "isqrt32",
+        "ec_dec_update",
+        "__udivsi3",
+        "ec_tell_frac",
+        "quant_partition",
+        "quant_partition",
+        "quant_partition",
+        "quant_partition",
+        "alg_quant",
+        "alg_unquant",
+        "yoradio_opus_clear",
+        "renormalise_vector",
+        "ec_tell_frac",
+        "ec_decode",
+        "stereo_itheta",
+        "ec_tell_frac",
+        "stereo_itheta",
+        "ec_tell_frac"
+      ]
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "quant_band",
+      "linked": true,
+      "linked_bytes": 1761,
+      "instructions": 653,
+      "sar_setups": 27,
+      "narrow_loads": 21,
+      "stack_accesses": 169,
+      "arithmetic_helpers": [
+        "__udivsi3"
+      ],
+      "calls": [
+        "__udivsi3",
+        "ec_enc_bits",
+        "ec_dec_bits",
+        "yoradio_opus_copy",
+        "yoradio_opus_copy",
+        "yoradio_opus_copy",
+        "deinterleave_hadamard",
+        "deinterleave_hadamard",
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "yoradio_opus_scratch_restore",
+        "celt_sqrt",
+        "quant_partition",
+        "quant_partition",
+        "quant_partition"
+      ]
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "hysteresis_decision",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 36,
+      "sar_setups": 0,
+      "narrow_loads": 6,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "celt_lcg_rand",
+      "linked": true,
+      "linked_bytes": 13,
+      "instructions": 5,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "bitexact_cos",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 23,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "bitexact_log2tan",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 34,
+      "sar_setups": 2,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "compute_band_energies",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 147,
+      "sar_setups": 8,
+      "narrow_loads": 3,
+      "stack_accesses": 39,
+      "arithmetic_helpers": [],
+      "calls": [
+        "celt_sqrt",
+        "celt_sqrt"
+      ]
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "normalise_bands",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 127,
+      "sar_setups": 4,
+      "narrow_loads": 2,
+      "stack_accesses": 40,
+      "arithmetic_helpers": [],
+      "calls": [
+        "celt_rcp"
+      ]
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "denormalise_bands",
+      "linked": true,
+      "linked_bytes": 461,
+      "instructions": 173,
+      "sar_setups": 3,
+      "narrow_loads": 10,
+      "stack_accesses": 41,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "yoradio_opus_clear",
+        "yoradio_opus_clear",
+        "yoradio_opus_clear"
+      ]
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "anti_collapse",
+      "linked": true,
+      "linked_bytes": 936,
+      "instructions": 343,
+      "sar_setups": 12,
+      "narrow_loads": 9,
+      "stack_accesses": 80,
+      "arithmetic_helpers": [
+        "__udivsi3"
+      ],
+      "calls": [
+        "__udivsi3",
+        "celt_rsqrt_norm",
+        "renormalise_vector"
+      ]
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "spreading_decision",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 214,
+      "sar_setups": 0,
+      "narrow_loads": 5,
+      "stack_accesses": 75,
+      "arithmetic_helpers": [
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3"
+      ],
+      "calls": [
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3"
+      ]
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "haar1",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 39,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/bands.c",
+      "name": "quant_all_bands",
+      "linked": true,
+      "linked_bytes": 9416,
+      "instructions": 3291,
+      "sar_setups": 105,
+      "narrow_loads": 114,
+      "stack_accesses": 986,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__udivsi3",
+        "__divsi3",
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "ec_tell_frac",
+        "__divsi3",
+        "yoradio_opus_copy",
+        "yoradio_opus_copy",
+        "quant_band",
+        "quant_band",
+        "ec_dec_bits",
+        "ec_enc_bits",
+        "__divsi3",
+        "ec_tell_frac",
+        "__divsi3",
+        "__divsi3",
+        "ec_encode",
+        "__udivsi3",
+        "__divsi3",
+        "ec_dec_update",
+        "intensity_stereo$isra$1",
+        "ec_tell_frac",
+        "intensity_stereo$isra$1",
+        "ec_enc_bit_logp",
+        "ec_dec_bit_logp",
+        "ec_tell_frac",
+        "ec_tell_frac",
+        "ec_enc_bits",
+        "ec_dec_bits",
+        "__udivsi3",
+        "yoradio_opus_copy",
+        "yoradio_opus_copy",
+        "yoradio_opus_copy",
+        "deinterleave_hadamard",
+        "deinterleave_hadamard",
+        "alg_quant",
+        "alg_unquant",
+        "yoradio_opus_clear",
+        "renormalise_vector",
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "yoradio_opus_scratch_restore",
+        "celt_sqrt",
+        "quant_band",
+        "__udivsi3",
+        "deinterleave_hadamard",
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "yoradio_opus_scratch_restore",
+        "__udivsi3",
+        "deinterleave_hadamard",
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "yoradio_opus_scratch_restore",
+        "quant_band",
+        "celt_rsqrt_norm",
+        "celt_rsqrt_norm",
+        "yoradio_opus_copy",
+        "quant_band",
+        "yoradio_opus_scratch_restore",
+        "quant_partition",
+        "quant_partition",
+        "quant_partition",
+        "quant_partition",
+        "ec_tell_frac",
+        "__udivsi3",
+        "ec_tell_frac",
+        "ec_decode",
+        "ec_tell_frac",
+        "ec_enc_uint",
+        "__udivsi3",
+        "ec_dec_uint",
+        "stereo_itheta",
+        "ec_tell_frac",
+        "stereo_itheta",
+        "ec_tell_frac",
+        "quant_band",
+        "quant_band",
+        "quant_band"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt.c",
+      "name": "resampling_factor",
+      "linked": true,
+      "linked_bytes": 64,
+      "instructions": 24,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/celt.c",
+      "name": "comb_filter",
+      "linked": true,
+      "linked_bytes": 1038,
+      "instructions": 391,
+      "sar_setups": 6,
+      "narrow_loads": 8,
+      "stack_accesses": 119,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_copy",
+        "yoradio_opus_copy"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt.c",
+      "name": "init_caps",
+      "linked": true,
+      "linked_bytes": 87,
+      "instructions": 34,
+      "sar_setups": 1,
+      "narrow_loads": 3,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/celt.c",
+      "name": "opus_strerror",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 9,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/celt.c",
+      "name": "opus_get_version_string",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 2,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/celt_decoder.c",
+      "name": "deemphasis",
+      "linked": true,
+      "linked_bytes": 777,
+      "instructions": 292,
+      "sar_setups": 0,
+      "narrow_loads": 4,
+      "stack_accesses": 70,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "__divsi3",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_decoder.c",
+      "name": "prefilter_and_fold",
+      "linked": true,
+      "linked_bytes": 362,
+      "instructions": 138,
+      "sar_setups": 0,
+      "narrow_loads": 4,
+      "stack_accesses": 48,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "comb_filter",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_decoder.c",
+      "name": "celt_synthesis",
+      "linked": true,
+      "linked_bytes": 1021,
+      "instructions": 391,
+      "sar_setups": 3,
+      "narrow_loads": 0,
+      "stack_accesses": 192,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "denormalise_bands",
+        "yoradio_opus_copy",
+        "clt_mdct_backward_c",
+        "clt_mdct_backward_c",
+        "denormalise_bands",
+        "denormalise_bands",
+        "clt_mdct_backward_c",
+        "denormalise_bands",
+        "clt_mdct_backward_c",
+        "yoradio_opus_scratch_restore",
+        "denormalise_bands",
+        "yoradio_opus_copy"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_decoder.c",
+      "name": "celt_decoder_get_size",
+      "linked": true,
+      "linked_bytes": 47,
+      "instructions": 19,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_custom_mode_create"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_decoder.c",
+      "name": "celt_decode_with_ec_dred",
+      "linked": true,
+      "linked_bytes": 6820,
+      "instructions": 2464,
+      "sar_setups": 9,
+      "narrow_loads": 39,
+      "stack_accesses": 845,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "prefilter_and_fold",
+        "celt_lcg_rand",
+        "renormalise_vector",
+        "celt_synthesis",
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "pitch_downsample",
+        "pitch_search",
+        "yoradio_opus_scratch_restore",
+        "yoradio_opus_scratch_alloc",
+        "_celt_autocorr",
+        "_celt_lpc",
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "celt_fir_c",
+        "yoradio_opus_copy",
+        "yoradio_opus_scratch_restore",
+        "frac_div32",
+        "celt_sqrt",
+        "yoradio_opus_copy",
+        "celt_iir",
+        "yoradio_opus_clear",
+        "frac_div32",
+        "celt_sqrt",
+        "yoradio_opus_scratch_restore",
+        "deemphasis",
+        "yoradio_opus_scratch_restore",
+        "__divsi3",
+        "ec_dec_init",
+        "ec_dec_bit_logp",
+        "ec_dec_bit_logp",
+        "ec_dec_uint",
+        "ec_dec_bits",
+        "ec_dec_bits",
+        "ec_dec_icdf",
+        "ec_dec_bit_logp",
+        "ec_dec_bit_logp",
+        "unquant_coarse_energy",
+        "yoradio_opus_scratch_alloc",
+        "ec_dec_bit_logp",
+        "ec_dec_bit_logp",
+        "ec_dec_bit_logp",
+        "ec_tell_frac",
+        "yoradio_opus_scratch_alloc",
+        "ec_dec_icdf",
+        "ec_tell_frac",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "clt_compute_allocation",
+        "unquant_fine_energy",
+        "yoradio_opus_copy",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "quant_all_bands",
+        "ec_dec_bits",
+        "unquant_energy_finalise",
+        "anti_collapse",
+        "prefilter_and_fold",
+        "celt_synthesis",
+        "comb_filter",
+        "comb_filter",
+        "yoradio_opus_copy",
+        "yoradio_opus_copy",
+        "yoradio_opus_copy",
+        "deemphasis",
+        "yoradio_opus_scratch_restore",
+        "__divsi3",
+        "unquant_energy_finalise",
+        "yoradio_opus_scratch_alloc",
+        "init_caps",
+        "yoradio_opus_scratch_alloc",
+        "ec_tell_frac",
+        "yoradio_opus_scratch_alloc",
+        "init_caps",
+        "yoradio_opus_scratch_alloc",
+        "ec_tell_frac",
+        "ec_dec_icdf",
+        "yoradio_opus_scratch_alloc",
+        "init_caps",
+        "yoradio_opus_scratch_alloc",
+        "ec_tell_frac",
+        "ec_dec_icdf",
+        "yoradio_opus_scratch_alloc",
+        "init_caps",
+        "yoradio_opus_scratch_alloc",
+        "ec_tell_frac"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_decoder.c",
+      "name": "celt_decode_with_ec",
+      "linked": true,
+      "linked_bytes": 19,
+      "instructions": 8,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [],
+      "calls": [
+        "celt_decode_with_ec_dred"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_decoder.c",
+      "name": "opus_custom_decoder_ctl",
+      "linked": true,
+      "linked_bytes": 650,
+      "instructions": 238,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 45,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "yoradio_opus_clear",
+        "yoradio_opus_clear"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_decoder.c",
+      "name": "celt_decoder_init",
+      "linked": true,
+      "linked_bytes": 174,
+      "instructions": 73,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 12,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_custom_mode_create",
+        "yoradio_opus_clear",
+        "yoradio_opus_history",
+        "opus_custom_decoder_ctl",
+        "resampling_factor"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_lpc.c",
+      "name": "_celt_lpc",
+      "linked": true,
+      "linked_bytes": 773,
+      "instructions": 275,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 53,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_clear",
+        "frac_div32",
+        "__divsi3",
+        "yoradio_opus_clear",
+        "frac_div32"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_lpc.c",
+      "name": "celt_fir_c",
+      "linked": true,
+      "linked_bytes": 921,
+      "instructions": 351,
+      "sar_setups": 0,
+      "narrow_loads": 25,
+      "stack_accesses": 132,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_lpc.c",
+      "name": "celt_iir",
+      "linked": true,
+      "linked_bytes": 1226,
+      "instructions": 466,
+      "sar_setups": 0,
+      "narrow_loads": 27,
+      "stack_accesses": 153,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "memset",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/celt_lpc.c",
+      "name": "_celt_autocorr",
+      "linked": true,
+      "linked_bytes": 713,
+      "instructions": 272,
+      "sar_setups": 4,
+      "narrow_loads": 12,
+      "stack_accesses": 30,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "celt_pitch_xcorr_c",
+        "celt_pitch_xcorr_c",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/cwrs.c",
+      "name": "encode_pulses",
+      "linked": true,
+      "linked_bytes": 205,
+      "instructions": 84,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 8,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_enc_uint"
+      ]
+    },
+    {
+      "source": "upstream/celt/cwrs.c",
+      "name": "decode_pulses",
+      "linked": true,
+      "linked_bytes": 985,
+      "instructions": 378,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 22,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_uint"
+      ]
+    },
+    {
+      "source": "upstream/celt/entcode.c",
+      "name": "ec_tell_frac",
+      "linked": true,
+      "linked_bytes": 57,
+      "instructions": 22,
+      "sar_setups": 1,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "name": "ec_dec_init",
+      "linked": true,
+      "linked_bytes": 240,
+      "instructions": 97,
+      "sar_setups": 1,
+      "narrow_loads": 4,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "name": "ec_decode",
+      "linked": true,
+      "linked_bytes": 63,
+      "instructions": 25,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [
+        "__udivsi3",
+        "__udivsi3"
+      ],
+      "calls": [
+        "__udivsi3",
+        "__udivsi3"
+      ]
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "name": "ec_decode_bin",
+      "linked": true,
+      "linked_bytes": 63,
+      "instructions": 25,
+      "sar_setups": 2,
+      "narrow_loads": 0,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [
+        "__udivsi3"
+      ],
+      "calls": [
+        "__udivsi3"
+      ]
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "name": "ec_dec_update",
+      "linked": true,
+      "linked_bytes": 171,
+      "instructions": 69,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 8,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "name": "ec_dec_bit_logp",
+      "linked": true,
+      "linked_bytes": 172,
+      "instructions": 70,
+      "sar_setups": 1,
+      "narrow_loads": 1,
+      "stack_accesses": 8,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "name": "ec_dec_icdf",
+      "linked": true,
+      "linked_bytes": 235,
+      "instructions": 94,
+      "sar_setups": 2,
+      "narrow_loads": 2,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "name": "ec_dec_icdf16",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 74,
+      "sar_setups": 1,
+      "narrow_loads": 2,
+      "stack_accesses": 8,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "name": "ec_dec_uint",
+      "linked": true,
+      "linked_bytes": 564,
+      "instructions": 223,
+      "sar_setups": 5,
+      "narrow_loads": 3,
+      "stack_accesses": 30,
+      "arithmetic_helpers": [
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3"
+      ],
+      "calls": [
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3"
+      ]
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "name": "ec_dec_bits",
+      "linked": true,
+      "linked_bytes": 80,
+      "instructions": 32,
+      "sar_setups": 3,
+      "narrow_loads": 1,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_enc_init",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 17,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_encode",
+      "linked": true,
+      "linked_bytes": 260,
+      "instructions": 107,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 12,
+      "arithmetic_helpers": [
+        "__udivsi3"
+      ],
+      "calls": [
+        "__udivsi3"
+      ]
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_encode_bin",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 99,
+      "sar_setups": 2,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_enc_bit_logp",
+      "linked": true,
+      "linked_bytes": 212,
+      "instructions": 87,
+      "sar_setups": 1,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_enc_icdf",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 101,
+      "sar_setups": 1,
+      "narrow_loads": 4,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_enc_icdf16",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 99,
+      "sar_setups": 1,
+      "narrow_loads": 2,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_enc_uint",
+      "linked": true,
+      "linked_bytes": 191,
+      "instructions": 75,
+      "sar_setups": 4,
+      "narrow_loads": 0,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_encode",
+        "ec_encode"
+      ]
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_enc_bits",
+      "linked": true,
+      "linked_bytes": 108,
+      "instructions": 46,
+      "sar_setups": 1,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_enc_patch_initial_bits",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 49,
+      "sar_setups": 6,
+      "narrow_loads": 1,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_enc_shrink",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 21,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_copy"
+      ]
+    },
+    {
+      "source": "upstream/celt/entenc.c",
+      "name": "ec_enc_done",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 209,
+      "sar_setups": 2,
+      "narrow_loads": 1,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_clear"
+      ]
+    },
+    {
+      "source": "upstream/celt/kiss_fft.c",
+      "name": "opus_fft_impl",
+      "linked": true,
+      "linked_bytes": 3627,
+      "instructions": 1350,
+      "sar_setups": 3,
+      "narrow_loads": 0,
+      "stack_accesses": 374,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/kiss_fft.c",
+      "name": "opus_fft_c",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 47,
+      "sar_setups": 2,
+      "narrow_loads": 2,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_fft_impl"
+      ]
+    },
+    {
+      "source": "upstream/celt/kiss_fft.c",
+      "name": "opus_ifft_c",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 49,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_fft_impl"
+      ]
+    },
+    {
+      "source": "upstream/celt/laplace.c",
+      "name": "ec_laplace_encode",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 63,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_encode_bin"
+      ]
+    },
+    {
+      "source": "upstream/celt/laplace.c",
+      "name": "ec_laplace_decode",
+      "linked": true,
+      "linked_bytes": 181,
+      "instructions": 72,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_decode_bin",
+        "ec_dec_update"
+      ]
+    },
+    {
+      "source": "upstream/celt/laplace.c",
+      "name": "ec_laplace_encode_p0",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 89,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 21,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_enc_icdf16",
+        "ec_enc_icdf16",
+        "ec_enc_icdf16"
+      ]
+    },
+    {
+      "source": "upstream/celt/laplace.c",
+      "name": "ec_laplace_decode_p0",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 78,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 21,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_icdf16",
+        "ec_dec_icdf16"
+      ]
+    },
+    {
+      "source": "upstream/celt/mathops.c",
+      "name": "isqrt32",
+      "linked": true,
+      "linked_bytes": 489,
+      "instructions": 163,
+      "sar_setups": 17,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/mathops.c",
+      "name": "celt_rsqrt_norm",
+      "linked": true,
+      "linked_bytes": 111,
+      "instructions": 39,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/mathops.c",
+      "name": "celt_sqrt",
+      "linked": true,
+      "linked_bytes": 159,
+      "instructions": 53,
+      "sar_setups": 4,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/mathops.c",
+      "name": "celt_cos_norm",
+      "linked": true,
+      "linked_bytes": 238,
+      "instructions": 81,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/mathops.c",
+      "name": "celt_rcp",
+      "linked": true,
+      "linked_bytes": 165,
+      "instructions": 58,
+      "sar_setups": 4,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/mathops.c",
+      "name": "frac_div32",
+      "linked": true,
+      "linked_bytes": 203,
+      "instructions": 71,
+      "sar_setups": 4,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": [
+        "celt_rcp"
+      ]
+    },
+    {
+      "source": "upstream/celt/mdct.c",
+      "name": "clt_mdct_forward_c",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 387,
+      "sar_setups": 3,
+      "narrow_loads": 10,
+      "stack_accesses": 79,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_restore",
+        "opus_fft_impl",
+        "opus_fft_impl"
+      ]
+    },
+    {
+      "source": "upstream/celt/mdct.c",
+      "name": "clt_mdct_backward_c",
+      "linked": true,
+      "linked_bytes": 929,
+      "instructions": 353,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 68,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_fft_impl",
+        "opus_fft_impl"
+      ]
+    },
+    {
+      "source": "upstream/celt/modes.c",
+      "name": "opus_custom_mode_create",
+      "linked": true,
+      "linked_bytes": 56,
+      "instructions": 21,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/pitch.c",
+      "name": "find_best_pitch",
+      "linked": true,
+      "linked_bytes": 343,
+      "instructions": 132,
+      "sar_setups": 6,
+      "narrow_loads": 3,
+      "stack_accesses": 29,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/pitch.c",
+      "name": "compute_pitch_gain$part$0",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 79,
+      "sar_setups": 6,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": [
+        "celt_rsqrt_norm"
+      ]
+    },
+    {
+      "source": "upstream/celt/pitch.c",
+      "name": "pitch_downsample",
+      "linked": true,
+      "linked_bytes": 796,
+      "instructions": 297,
+      "sar_setups": 11,
+      "narrow_loads": 7,
+      "stack_accesses": 40,
+      "arithmetic_helpers": [],
+      "calls": [
+        "_celt_autocorr",
+        "_celt_lpc"
+      ]
+    },
+    {
+      "source": "upstream/celt/pitch.c",
+      "name": "celt_pitch_xcorr_c",
+      "linked": true,
+      "linked_bytes": 684,
+      "instructions": 276,
+      "sar_setups": 0,
+      "narrow_loads": 19,
+      "stack_accesses": 112,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/pitch.c",
+      "name": "pitch_search",
+      "linked": true,
+      "linked_bytes": 1525,
+      "instructions": 571,
+      "sar_setups": 3,
+      "narrow_loads": 27,
+      "stack_accesses": 183,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "find_best_pitch",
+        "find_best_pitch",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/pitch.c",
+      "name": "remove_doubling",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 417,
+      "sar_setups": 2,
+      "narrow_loads": 11,
+      "stack_accesses": 128,
+      "arithmetic_helpers": [
+        "__udivsi3",
+        "__udivsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "compute_pitch_gain$part$0",
+        "__udivsi3",
+        "__udivsi3",
+        "compute_pitch_gain$part$0",
+        "frac_div32",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/quant_bands.c",
+      "name": "quant_coarse_energy_impl",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 300,
+      "sar_setups": 0,
+      "narrow_loads": 7,
+      "stack_accesses": 97,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_enc_bit_logp",
+        "ec_laplace_encode",
+        "ec_enc_icdf",
+        "ec_enc_bit_logp"
+      ]
+    },
+    {
+      "source": "upstream/celt/quant_bands.c",
+      "name": "quant_coarse_energy",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 465,
+      "sar_setups": 0,
+      "narrow_loads": 3,
+      "stack_accesses": 226,
+      "arithmetic_helpers": [
+        "__udivsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "quant_coarse_energy_impl",
+        "ec_tell_frac",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "quant_coarse_energy_impl",
+        "yoradio_opus_copy",
+        "ec_tell_frac",
+        "__udivsi3",
+        "yoradio_opus_copy",
+        "yoradio_opus_copy",
+        "yoradio_opus_scratch_restore",
+        "ec_tell_frac",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "quant_coarse_energy_impl"
+      ]
+    },
+    {
+      "source": "upstream/celt/quant_bands.c",
+      "name": "quant_fine_energy",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 88,
+      "sar_setups": 3,
+      "narrow_loads": 3,
+      "stack_accesses": 26,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_enc_bits"
+      ]
+    },
+    {
+      "source": "upstream/celt/quant_bands.c",
+      "name": "quant_energy_finalise",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 113,
+      "sar_setups": 2,
+      "narrow_loads": 3,
+      "stack_accesses": 39,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_enc_bits"
+      ]
+    },
+    {
+      "source": "upstream/celt/quant_bands.c",
+      "name": "unquant_coarse_energy",
+      "linked": true,
+      "linked_bytes": 663,
+      "instructions": 242,
+      "sar_setups": 0,
+      "narrow_loads": 12,
+      "stack_accesses": 46,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_bit_logp",
+        "ec_dec_icdf",
+        "ec_laplace_decode",
+        "ec_dec_bit_logp",
+        "ec_dec_icdf",
+        "ec_laplace_decode",
+        "ec_laplace_decode",
+        "ec_dec_icdf",
+        "ec_dec_bit_logp"
+      ]
+    },
+    {
+      "source": "upstream/celt/quant_bands.c",
+      "name": "unquant_fine_energy",
+      "linked": true,
+      "linked_bytes": 124,
+      "instructions": 50,
+      "sar_setups": 1,
+      "narrow_loads": 1,
+      "stack_accesses": 17,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_bits"
+      ]
+    },
+    {
+      "source": "upstream/celt/quant_bands.c",
+      "name": "unquant_energy_finalise",
+      "linked": true,
+      "linked_bytes": 227,
+      "instructions": 94,
+      "sar_setups": 1,
+      "narrow_loads": 1,
+      "stack_accesses": 35,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_bits"
+      ]
+    },
+    {
+      "source": "upstream/celt/quant_bands.c",
+      "name": "amp2Log2",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 185,
+      "sar_setups": 2,
+      "narrow_loads": 1,
+      "stack_accesses": 38,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/rate.c",
+      "name": "clt_compute_allocation",
+      "linked": true,
+      "linked_bytes": 2564,
+      "instructions": 987,
+      "sar_setups": 12,
+      "narrow_loads": 23,
+      "stack_accesses": 335,
+      "arithmetic_helpers": [
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_mark",
+        "__udivsi3",
+        "ec_enc_bit_logp",
+        "ec_enc_bit_logp",
+        "ec_dec_bit_logp",
+        "ec_enc_uint",
+        "ec_dec_uint",
+        "ec_enc_bit_logp",
+        "ec_dec_bit_logp",
+        "__udivsi3",
+        "__udivsi3",
+        "yoradio_opus_scratch_restore",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/vq.c",
+      "name": "exp_rotation1",
+      "linked": true,
+      "linked_bytes": 174,
+      "instructions": 64,
+      "sar_setups": 0,
+      "narrow_loads": 4,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/celt/vq.c",
+      "name": "exp_rotation",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 253,
+      "sar_setups": 0,
+      "narrow_loads": 8,
+      "stack_accesses": 63,
+      "arithmetic_helpers": [
+        "__udivsi3"
+      ],
+      "calls": [
+        "celt_rcp",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_cos_norm",
+        "celt_cos_norm",
+        "__udivsi3",
+        "exp_rotation1",
+        "exp_rotation1"
+      ]
+    },
+    {
+      "source": "upstream/celt/vq.c",
+      "name": "op_pvq_search_c",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 246,
+      "sar_setups": 2,
+      "narrow_loads": 11,
+      "stack_accesses": 57,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "memset",
+        "celt_rcp",
+        "celt_rcp",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/vq.c",
+      "name": "alg_quant",
+      "linked": true,
+      "linked_bytes": 1788,
+      "instructions": 681,
+      "sar_setups": 7,
+      "narrow_loads": 20,
+      "stack_accesses": 151,
+      "arithmetic_helpers": [
+        "__udivsi3",
+        "__udivsi3",
+        "__udivsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_cos_norm",
+        "celt_cos_norm",
+        "__udivsi3",
+        "exp_rotation1",
+        "memset",
+        "celt_rcp",
+        "celt_rcp",
+        "yoradio_opus_scratch_restore",
+        "encode_pulses",
+        "celt_rsqrt_norm",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_cos_norm",
+        "celt_cos_norm",
+        "__udivsi3",
+        "exp_rotation1",
+        "__udivsi3",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/vq.c",
+      "name": "alg_unquant",
+      "linked": true,
+      "linked_bytes": 778,
+      "instructions": 295,
+      "sar_setups": 5,
+      "narrow_loads": 5,
+      "stack_accesses": 75,
+      "arithmetic_helpers": [
+        "__udivsi3",
+        "__udivsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "decode_pulses",
+        "celt_rsqrt_norm",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_cos_norm",
+        "celt_cos_norm",
+        "__udivsi3",
+        "exp_rotation1",
+        "__udivsi3",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/celt/vq.c",
+      "name": "renormalise_vector",
+      "linked": true,
+      "linked_bytes": 181,
+      "instructions": 65,
+      "sar_setups": 4,
+      "narrow_loads": 2,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [],
+      "calls": [
+        "celt_rsqrt_norm",
+        "celt_rsqrt_norm"
+      ]
+    },
+    {
+      "source": "upstream/celt/vq.c",
+      "name": "stereo_itheta",
+      "linked": true,
+      "linked_bytes": 453,
+      "instructions": 165,
+      "sar_setups": 0,
+      "narrow_loads": 4,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [],
+      "calls": [
+        "celt_sqrt",
+        "celt_sqrt",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_rcp",
+        "celt_rcp"
+      ]
+    },
+    {
+      "source": "upstream/silk/A2NLSF.c",
+      "name": "silk_A2NLSF",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 1498,
+      "sar_setups": 2,
+      "narrow_loads": 6,
+      "stack_accesses": 276,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "silk_bwexpander_32"
+      ]
+    },
+    {
+      "source": "upstream/silk/CNG.c",
+      "name": "silk_CNG_Reset",
+      "linked": true,
+      "linked_bytes": 199,
+      "instructions": 73,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/CNG.c",
+      "name": "silk_CNG",
+      "linked": true,
+      "linked_bytes": 3227,
+      "instructions": 1121,
+      "sar_setups": 10,
+      "narrow_loads": 52,
+      "stack_accesses": 141,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "__divsi3",
+        "memmove",
+        "yoradio_opus_copy",
+        "yoradio_opus_scratch_alloc",
+        "memcpy",
+        "memset",
+        "yoradio_opus_scratch_restore",
+        "silk_NLSF2A",
+        "memcpy",
+        "silk_NLSF2A",
+        "memcpy"
+      ]
+    },
+    {
+      "source": "upstream/silk/HP_variable_cutoff.c",
+      "name": "silk_HP_variable_cutoff",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 128,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 14,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_lin2log"
+      ]
+    },
+    {
+      "source": "upstream/silk/LPC_analysis_filter.c",
+      "name": "silk_LPC_analysis_filter",
+      "linked": true,
+      "linked_bytes": 256,
+      "instructions": 94,
+      "sar_setups": 0,
+      "narrow_loads": 17,
+      "stack_accesses": 17,
+      "arithmetic_helpers": [],
+      "calls": [
+        "memset"
+      ]
+    },
+    {
+      "source": "upstream/silk/LPC_fit.c",
+      "name": "silk_LPC_fit",
+      "linked": true,
+      "linked_bytes": 391,
+      "instructions": 149,
+      "sar_setups": 4,
+      "narrow_loads": 0,
+      "stack_accesses": 19,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "silk_bwexpander_32"
+      ]
+    },
+    {
+      "source": "upstream/silk/LPC_inv_pred_gain.c",
+      "name": "silk_LPC_inverse_pred_gain_c",
+      "linked": true,
+      "linked_bytes": 1403,
+      "instructions": 470,
+      "sar_setups": 8,
+      "narrow_loads": 1,
+      "stack_accesses": 107,
+      "arithmetic_helpers": [
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/LP_variable_cutoff.c",
+      "name": "silk_LP_variable_cutoff",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 265,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 79,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_biquad_alt_stride1"
+      ]
+    },
+    {
+      "source": "upstream/silk/NLSF2A.c",
+      "name": "silk_NLSF2A",
+      "linked": true,
+      "linked_bytes": 2357,
+      "instructions": 856,
+      "sar_setups": 1,
+      "narrow_loads": 4,
+      "stack_accesses": 148,
+      "arithmetic_helpers": [
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "silk_LPC_fit",
+        "silk_bwexpander_32",
+        "silk_LPC_inverse_pred_gain_c"
+      ]
+    },
+    {
+      "source": "upstream/silk/NLSF_VQ.c",
+      "name": "silk_NLSF_VQ",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 73,
+      "sar_setups": 0,
+      "narrow_loads": 6,
+      "stack_accesses": 19,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/NLSF_VQ_weights_laroia.c",
+      "name": "silk_NLSF_VQ_weights_laroia",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 94,
+      "sar_setups": 0,
+      "narrow_loads": 7,
+      "stack_accesses": 24,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/NLSF_decode.c",
+      "name": "silk_NLSF_decode",
+      "linked": true,
+      "linked_bytes": 330,
+      "instructions": 116,
+      "sar_setups": 0,
+      "narrow_loads": 10,
+      "stack_accesses": 25,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "silk_NLSF_unpack",
+        "__divsi3",
+        "silk_NLSF_stabilize"
+      ]
+    },
+    {
+      "source": "upstream/silk/NLSF_del_dec_quant.c",
+      "name": "silk_NLSF_del_dec_quant",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 791,
+      "sar_setups": 0,
+      "narrow_loads": 56,
+      "stack_accesses": 146,
+      "arithmetic_helpers": [],
+      "calls": [
+        "memcpy",
+        "memcpy"
+      ]
+    },
+    {
+      "source": "upstream/silk/NLSF_encode.c",
+      "name": "silk_NLSF_encode",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 339,
+      "sar_setups": 6,
+      "narrow_loads": 18,
+      "stack_accesses": 123,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "silk_NLSF_stabilize",
+        "yoradio_opus_scratch_alloc",
+        "silk_NLSF_VQ",
+        "yoradio_opus_scratch_alloc",
+        "silk_insertion_sort_increasing",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "silk_NLSF_unpack",
+        "silk_NLSF_del_dec_quant",
+        "__divsi3",
+        "__muldi3",
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_insertion_sort_increasing",
+        "memcpy",
+        "silk_NLSF_decode",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/silk/NLSF_stabilize.c",
+      "name": "silk_NLSF_stabilize",
+      "linked": true,
+      "linked_bytes": 549,
+      "instructions": 205,
+      "sar_setups": 0,
+      "narrow_loads": 23,
+      "stack_accesses": 30,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_insertion_sort_increasing_all_values_int16"
+      ]
+    },
+    {
+      "source": "upstream/silk/NLSF_unpack.c",
+      "name": "silk_NLSF_unpack",
+      "linked": true,
+      "linked_bytes": 111,
+      "instructions": 43,
+      "sar_setups": 0,
+      "narrow_loads": 7,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/PLC.c",
+      "name": "silk_PLC_Reset",
+      "linked": true,
+      "linked_bytes": 35,
+      "instructions": 13,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/PLC.c",
+      "name": "silk_PLC",
+      "linked": true,
+      "linked_bytes": 3781,
+      "instructions": 1330,
+      "sar_setups": 9,
+      "narrow_loads": 123,
+      "stack_accesses": 251,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "memset",
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "silk_sum_sqr_shift",
+        "silk_sum_sqr_shift",
+        "yoradio_opus_scratch_restore",
+        "silk_bwexpander",
+        "memcpy",
+        "silk_LPC_inverse_pred_gain_c",
+        "silk_LPC_analysis_filter",
+        "__divsi3",
+        "memcpy",
+        "memcpy",
+        "yoradio_opus_scratch_restore",
+        "__divsi3",
+        "__divsi3",
+        "memcpy"
+      ]
+    },
+    {
+      "source": "upstream/silk/PLC.c",
+      "name": "silk_PLC_glue_frames",
+      "linked": true,
+      "linked_bytes": 439,
+      "instructions": 156,
+      "sar_setups": 7,
+      "narrow_loads": 2,
+      "stack_accesses": 23,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "silk_sum_sqr_shift",
+        "silk_sum_sqr_shift",
+        "__divsi3",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/VQ_WMat_EC.c",
+      "name": "silk_VQ_WMat_EC_c",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 214,
+      "sar_setups": 0,
+      "narrow_loads": 8,
+      "stack_accesses": 61,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_lin2log"
+      ]
+    },
+    {
+      "source": "upstream/silk/ana_filt_bank_1.c",
+      "name": "silk_ana_filt_bank_1",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 76,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 12,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/biquad_alt.c",
+      "name": "silk_biquad_alt_stride1",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 108,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 18,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/biquad_alt.c",
+      "name": "silk_biquad_alt_stride2_c",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 214,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 54,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/bwexpander.c",
+      "name": "silk_bwexpander",
+      "linked": true,
+      "linked_bytes": 83,
+      "instructions": 31,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/bwexpander_32.c",
+      "name": "silk_bwexpander_32",
+      "linked": true,
+      "linked_bytes": 132,
+      "instructions": 51,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 2,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/check_control_input.c",
+      "name": "check_control_input",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 126,
+      "sar_setups": 1,
+      "narrow_loads": 0,
+      "stack_accesses": 2,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/code_signs.c",
+      "name": "silk_encode_signs",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 189,
+      "sar_setups": 0,
+      "narrow_loads": 17,
+      "stack_accesses": 14,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/code_signs.c",
+      "name": "silk_decode_signs",
+      "linked": true,
+      "linked_bytes": 588,
+      "instructions": 221,
+      "sar_setups": 0,
+      "narrow_loads": 33,
+      "stack_accesses": 14,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/control_SNR.c",
+      "name": "silk_control_SNR",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 51,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 8,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/control_audio_bandwidth.c",
+      "name": "silk_control_audio_bandwidth",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 121,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 8,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/control_codec.c",
+      "name": "silk_setup_resamplers",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 114,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 25,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "silk_resampler_init",
+        "yoradio_opus_scratch_alloc",
+        "silk_resampler_init",
+        "__divsi3",
+        "yoradio_opus_scratch_alloc",
+        "silk_resampler",
+        "silk_resampler_init",
+        "silk_resampler",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/silk/control_codec.c",
+      "name": "silk_control_encoder",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 428,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 43,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "silk_setup_resamplers",
+        "silk_control_audio_bandwidth",
+        "silk_setup_resamplers",
+        "__divsi3",
+        "memset",
+        "memset",
+        "memset"
+      ]
+    },
+    {
+      "source": "upstream/silk/dec_API.c",
+      "name": "silk_LoadOSCEModels",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 2,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/dec_API.c",
+      "name": "silk_Get_Decoder_Size",
+      "linked": true,
+      "linked_bytes": 9,
+      "instructions": 4,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/dec_API.c",
+      "name": "silk_ResetDecoder",
+      "linked": true,
+      "linked_bytes": 80,
+      "instructions": 30,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_reset_decoder",
+        "silk_reset_decoder"
+      ]
+    },
+    {
+      "source": "upstream/silk/dec_API.c",
+      "name": "silk_InitDecoder",
+      "linked": true,
+      "linked_bytes": 109,
+      "instructions": 40,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_history",
+        "silk_init_decoder",
+        "silk_init_decoder"
+      ]
+    },
+    {
+      "source": "upstream/silk/dec_API.c",
+      "name": "silk_Decode",
+      "linked": true,
+      "linked_bytes": 2769,
+      "instructions": 976,
+      "sar_setups": 0,
+      "narrow_loads": 18,
+      "stack_accesses": 223,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "silk_init_decoder",
+        "yoradio_opus_scratch_restore",
+        "yoradio_opus_scratch_restore",
+        "silk_decoder_set_fs",
+        "memcpy",
+        "ec_dec_bit_logp",
+        "ec_dec_bit_logp",
+        "ec_dec_icdf",
+        "silk_decode_indices",
+        "silk_decode_pulses",
+        "silk_stereo_decode_pred",
+        "silk_stereo_decode_mid_only",
+        "silk_stereo_decode_pred",
+        "silk_stereo_decode_mid_only",
+        "silk_decode_indices",
+        "silk_decode_pulses",
+        "silk_stereo_decode_mid_only",
+        "memset",
+        "memset",
+        "yoradio_opus_scratch_alloc",
+        "silk_decode_frame",
+        "memset",
+        "silk_stereo_MS_to_LR",
+        "__divsi3",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_copy",
+        "silk_resampler",
+        "silk_resampler",
+        "yoradio_opus_scratch_restore",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "silk_stereo_decode_pred",
+        "silk_stereo_decode_pred"
+      ]
+    },
+    {
+      "source": "upstream/silk/decode_core.c",
+      "name": "silk_decode_core",
+      "linked": true,
+      "linked_bytes": 3413,
+      "instructions": 1231,
+      "sar_setups": 10,
+      "narrow_loads": 48,
+      "stack_accesses": 352,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "memcpy",
+        "memcpy",
+        "yoradio_opus_scratch_restore",
+        "memcpy",
+        "__divsi3",
+        "__muldi3",
+        "memcpy",
+        "memcpy",
+        "silk_LPC_analysis_filter",
+        "silk_LPC_analysis_filter"
+      ]
+    },
+    {
+      "source": "upstream/silk/decode_frame.c",
+      "name": "silk_decode_frame",
+      "linked": true,
+      "linked_bytes": 410,
+      "instructions": 160,
+      "sar_setups": 0,
+      "narrow_loads": 3,
+      "stack_accesses": 44,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "silk_decode_indices",
+        "silk_decode_pulses",
+        "silk_decode_parameters",
+        "silk_decode_core",
+        "memmove",
+        "memcpy",
+        "silk_PLC",
+        "silk_PLC",
+        "memmove",
+        "memcpy",
+        "silk_CNG",
+        "silk_PLC_glue_frames",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/silk/decode_indices.c",
+      "name": "silk_decode_indices",
+      "linked": true,
+      "linked_bytes": 675,
+      "instructions": 245,
+      "sar_setups": 0,
+      "narrow_loads": 12,
+      "stack_accesses": 25,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "silk_NLSF_unpack",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/decode_parameters.c",
+      "name": "silk_decode_parameters",
+      "linked": true,
+      "linked_bytes": 1110,
+      "instructions": 369,
+      "sar_setups": 0,
+      "narrow_loads": 63,
+      "stack_accesses": 54,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_gains_dequant",
+        "silk_NLSF_decode",
+        "silk_NLSF2A",
+        "silk_NLSF2A",
+        "memcpy",
+        "memcpy",
+        "silk_bwexpander",
+        "silk_bwexpander",
+        "silk_decode_pitch",
+        "memset",
+        "memset"
+      ]
+    },
+    {
+      "source": "upstream/silk/decode_pitch.c",
+      "name": "silk_decode_pitch",
+      "linked": true,
+      "linked_bytes": 247,
+      "instructions": 87,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/decode_pulses.c",
+      "name": "silk_decode_pulses",
+      "linked": true,
+      "linked_bytes": 481,
+      "instructions": 170,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 62,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_icdf",
+        "silk_decode_signs",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "silk_shell_decoder",
+        "memset",
+        "ec_dec_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/decoder_set_fs.c",
+      "name": "silk_decoder_set_fs",
+      "linked": true,
+      "linked_bytes": 335,
+      "instructions": 124,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 19,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_resampler_init",
+        "memset",
+        "memset"
+      ]
+    },
+    {
+      "source": "upstream/silk/encode_indices.c",
+      "name": "silk_encode_indices",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 340,
+      "sar_setups": 0,
+      "narrow_loads": 34,
+      "stack_accesses": 49,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "silk_NLSF_unpack",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "__divsi3",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/encode_pulses.c",
+      "name": "silk_encode_pulses",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 606,
+      "sar_setups": 1,
+      "narrow_loads": 12,
+      "stack_accesses": 237,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "memset",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "ec_enc_icdf",
+        "silk_encode_signs",
+        "yoradio_opus_scratch_restore",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "silk_shell_encoder",
+        "ec_enc_icdf",
+        "ec_enc_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/LTP_analysis_filter_FIX.c",
+      "name": "silk_LTP_analysis_filter_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 122,
+      "sar_setups": 0,
+      "narrow_loads": 11,
+      "stack_accesses": 51,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/fixed/LTP_scale_ctrl_FIX.c",
+      "name": "silk_LTP_scale_ctrl_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 65,
+      "sar_setups": 0,
+      "narrow_loads": 5,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "silk_log2lin",
+        "silk_log2lin"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/apply_sine_window_FIX.c",
+      "name": "silk_apply_sine_window",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 102,
+      "sar_setups": 0,
+      "narrow_loads": 5,
+      "stack_accesses": 8,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/fixed/autocorr_FIX.c",
+      "name": "silk_autocorr",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 21,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 5,
+      "arithmetic_helpers": [],
+      "calls": [
+        "_celt_autocorr"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/burg_modified_FIX.c",
+      "name": "silk_burg_modified_c",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 1383,
+      "sar_setups": 40,
+      "narrow_loads": 14,
+      "stack_accesses": 428,
+      "arithmetic_helpers": [
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "silk_inner_prod16_c",
+        "__muldi3",
+        "memset",
+        "__muldi3",
+        "memset",
+        "silk_inner_prod16_c",
+        "celt_pitch_xcorr_c",
+        "memcpy",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "memset",
+        "__muldi3",
+        "__muldi3",
+        "silk_inner_prod16_c",
+        "silk_inner_prod_aligned",
+        "__muldi3",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/corrMatrix_FIX.c",
+      "name": "silk_corrVector_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 62,
+      "sar_setups": 1,
+      "narrow_loads": 2,
+      "stack_accesses": 13,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_inner_prod_aligned"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/corrMatrix_FIX.c",
+      "name": "silk_corrMatrix_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 267,
+      "sar_setups": 6,
+      "narrow_loads": 13,
+      "stack_accesses": 85,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_sum_sqr_shift",
+        "silk_inner_prod_aligned"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/find_LPC_FIX.c",
+      "name": "silk_find_LPC_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 208,
+      "sar_setups": 6,
+      "narrow_loads": 1,
+      "stack_accesses": 69,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "silk_burg_modified_c",
+        "silk_burg_modified_c",
+        "silk_A2NLSF",
+        "yoradio_opus_scratch_alloc",
+        "silk_interpolate",
+        "silk_NLSF2A",
+        "silk_LPC_analysis_filter",
+        "silk_sum_sqr_shift",
+        "silk_sum_sqr_shift",
+        "silk_A2NLSF",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/find_LTP_FIX.c",
+      "name": "silk_find_LTP_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 173,
+      "sar_setups": 3,
+      "narrow_loads": 0,
+      "stack_accesses": 51,
+      "arithmetic_helpers": [
+        "__divdi3",
+        "__divdi3",
+        "__divdi3",
+        "__divdi3",
+        "__divdi3",
+        "__divdi3"
+      ],
+      "calls": [
+        "silk_sum_sqr_shift",
+        "silk_corrMatrix_FIX",
+        "silk_corrVector_FIX",
+        "__divdi3",
+        "__divdi3",
+        "__divdi3",
+        "__divdi3",
+        "__divdi3",
+        "__divdi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/find_pred_coefs_FIX.c",
+      "name": "silk_find_pred_coefs_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 756,
+      "sar_setups": 30,
+      "narrow_loads": 2,
+      "stack_accesses": 156,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__divsi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "silk_find_LTP_FIX",
+        "silk_quant_LTP_gains",
+        "silk_LTP_scale_ctrl_FIX",
+        "silk_LTP_analysis_filter_FIX",
+        "silk_scale_copy_vector16",
+        "memset",
+        "silk_log2lin",
+        "__divsi3",
+        "__muldi3",
+        "silk_find_LPC_FIX",
+        "silk_process_NLSFs",
+        "silk_residual_energy_FIX",
+        "memcpy",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/k2a_FIX.c",
+      "name": "silk_k2a",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 61,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 11,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/fixed/k2a_Q16_FIX.c",
+      "name": "silk_k2a_Q16",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 83,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 26,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/fixed/process_gains_FIX.c",
+      "name": "silk_process_gains_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 349,
+      "sar_setups": 9,
+      "narrow_loads": 8,
+      "stack_accesses": 42,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "silk_log2lin",
+        "__divsi3",
+        "silk_sigm_Q15",
+        "memcpy",
+        "silk_gains_quant",
+        "__muldi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/regularize_correlations_FIX.c",
+      "name": "silk_regularize_correlations_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 14,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/fixed/residual_energy16_FIX.c",
+      "name": "silk_residual_energy16_covar_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 563,
+      "sar_setups": 20,
+      "narrow_loads": 48,
+      "stack_accesses": 39,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/fixed/residual_energy_FIX.c",
+      "name": "silk_residual_energy_FIX",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 141,
+      "sar_setups": 2,
+      "narrow_loads": 0,
+      "stack_accesses": 57,
+      "arithmetic_helpers": [
+        "__muldi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "silk_LPC_analysis_filter",
+        "silk_sum_sqr_shift",
+        "silk_sum_sqr_shift",
+        "yoradio_opus_scratch_restore",
+        "__muldi3",
+        "__muldi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/schur64_FIX.c",
+      "name": "silk_schur64",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 224,
+      "sar_setups": 6,
+      "narrow_loads": 0,
+      "stack_accesses": 55,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "memset",
+        "__divsi3",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3",
+        "memset"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/schur_FIX.c",
+      "name": "silk_schur",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 164,
+      "sar_setups": 1,
+      "narrow_loads": 0,
+      "stack_accesses": 24,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "memset"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/vector_ops_FIX.c",
+      "name": "silk_scale_copy_vector16",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 15,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/fixed/vector_ops_FIX.c",
+      "name": "silk_scale_vector32_Q26_lshift_18",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 31,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [
+        "__muldi3"
+      ],
+      "calls": [
+        "__muldi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/fixed/vector_ops_FIX.c",
+      "name": "silk_inner_prod_aligned",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 15,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/fixed/vector_ops_FIX.c",
+      "name": "silk_inner_prod16_c",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 27,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/fixed/warped_autocorrelation_FIX.c",
+      "name": "silk_warped_autocorrelation_FIX_c",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 249,
+      "sar_setups": 4,
+      "narrow_loads": 1,
+      "stack_accesses": 54,
+      "arithmetic_helpers": [
+        "__muldi3",
+        "__muldi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "memset",
+        "memset",
+        "__muldi3",
+        "__muldi3",
+        "__muldi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/gain_quant.c",
+      "name": "silk_gains_quant",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 156,
+      "sar_setups": 0,
+      "narrow_loads": 8,
+      "stack_accesses": 17,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_lin2log",
+        "silk_lin2log",
+        "silk_log2lin"
+      ]
+    },
+    {
+      "source": "upstream/silk/gain_quant.c",
+      "name": "silk_gains_dequant",
+      "linked": true,
+      "linked_bytes": 225,
+      "instructions": 85,
+      "sar_setups": 0,
+      "narrow_loads": 4,
+      "stack_accesses": 19,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_log2lin"
+      ]
+    },
+    {
+      "source": "upstream/silk/gain_quant.c",
+      "name": "silk_gains_ID",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 14,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/init_decoder.c",
+      "name": "silk_reset_decoder",
+      "linked": true,
+      "linked_bytes": 79,
+      "instructions": 31,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": [
+        "memset",
+        "yoradio_opus_clear",
+        "silk_CNG_Reset",
+        "silk_PLC_Reset"
+      ]
+    },
+    {
+      "source": "upstream/silk/init_decoder.c",
+      "name": "silk_init_decoder",
+      "linked": true,
+      "linked_bytes": 95,
+      "instructions": 36,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": [
+        "memset",
+        "memset",
+        "yoradio_opus_clear",
+        "silk_CNG_Reset",
+        "silk_PLC_Reset"
+      ]
+    },
+    {
+      "source": "upstream/silk/inner_prod_aligned.c",
+      "name": "silk_inner_prod_aligned_scale",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 17,
+      "sar_setups": 1,
+      "narrow_loads": 2,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/interpolate.c",
+      "name": "silk_interpolate",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 17,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/lin2log.c",
+      "name": "silk_lin2log",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 59,
+      "sar_setups": 2,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/log2lin.c",
+      "name": "silk_log2lin",
+      "linked": true,
+      "linked_bytes": 80,
+      "instructions": 29,
+      "sar_setups": 2,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/process_NLSFs.c",
+      "name": "silk_process_NLSFs",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 267,
+      "sar_setups": 0,
+      "narrow_loads": 38,
+      "stack_accesses": 66,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_NLSF_VQ_weights_laroia",
+        "silk_interpolate",
+        "silk_NLSF_VQ_weights_laroia",
+        "silk_NLSF_encode",
+        "silk_NLSF2A",
+        "silk_interpolate",
+        "silk_NLSF2A",
+        "silk_NLSF_encode",
+        "silk_NLSF2A",
+        "memcpy"
+      ]
+    },
+    {
+      "source": "upstream/silk/quant_LTP_gains.c",
+      "name": "silk_quant_LTP_gains",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 215,
+      "sar_setups": 0,
+      "narrow_loads": 12,
+      "stack_accesses": 73,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_log2lin",
+        "silk_VQ_WMat_EC_c",
+        "silk_lin2log",
+        "silk_lin2log",
+        "memcpy",
+        "silk_lin2log"
+      ]
+    },
+    {
+      "source": "upstream/silk/resampler.c",
+      "name": "silk_resampler_init",
+      "linked": true,
+      "linked_bytes": 753,
+      "instructions": 276,
+      "sar_setups": 6,
+      "narrow_loads": 1,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "memset",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/resampler.c",
+      "name": "silk_resampler",
+      "linked": true,
+      "linked_bytes": 293,
+      "instructions": 110,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 24,
+      "arithmetic_helpers": [],
+      "calls": [
+        "memcpy",
+        "silk_resampler_private_up2_HQ_wrapper",
+        "silk_resampler_private_up2_HQ_wrapper",
+        "silk_resampler_private_IIR_FIR",
+        "silk_resampler_private_IIR_FIR",
+        "silk_resampler_private_down_FIR",
+        "silk_resampler_private_down_FIR",
+        "memcpy",
+        "memcpy",
+        "memcpy"
+      ]
+    },
+    {
+      "source": "upstream/silk/resampler_down2.c",
+      "name": "silk_resampler_down2",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 64,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 12,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/resampler_down2_3.c",
+      "name": "silk_resampler_down2_3",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 172,
+      "sar_setups": 0,
+      "narrow_loads": 4,
+      "stack_accesses": 57,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "memcpy",
+        "silk_resampler_private_AR2",
+        "memcpy",
+        "memcpy",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/silk/resampler_private_AR2.c",
+      "name": "silk_resampler_private_AR2",
+      "linked": true,
+      "linked_bytes": 84,
+      "instructions": 33,
+      "sar_setups": 0,
+      "narrow_loads": 3,
+      "stack_accesses": 2,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/resampler_private_IIR_FIR.c",
+      "name": "silk_resampler_private_IIR_FIR",
+      "linked": true,
+      "linked_bytes": 363,
+      "instructions": 134,
+      "sar_setups": 0,
+      "narrow_loads": 8,
+      "stack_accesses": 30,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "memcpy",
+        "silk_resampler_private_up2_HQ",
+        "memcpy",
+        "memcpy",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/silk/resampler_private_down_FIR.c",
+      "name": "silk_resampler_private_down_FIR",
+      "linked": true,
+      "linked_bytes": 2466,
+      "instructions": 930,
+      "sar_setups": 0,
+      "narrow_loads": 49,
+      "stack_accesses": 306,
+      "arithmetic_helpers": [],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "memcpy",
+        "silk_resampler_private_AR2",
+        "memcpy",
+        "memcpy",
+        "yoradio_opus_scratch_restore"
+      ]
+    },
+    {
+      "source": "upstream/silk/resampler_private_up2_HQ.c",
+      "name": "silk_resampler_private_up2_HQ",
+      "linked": true,
+      "linked_bytes": 385,
+      "instructions": 156,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 45,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/resampler_private_up2_HQ.c",
+      "name": "silk_resampler_private_up2_HQ_wrapper",
+      "linked": true,
+      "linked_bytes": 365,
+      "instructions": 144,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 33,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/shell_coder.c",
+      "name": "silk_shell_encoder",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 256,
+      "sar_setups": 0,
+      "narrow_loads": 15,
+      "stack_accesses": 68,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/shell_coder.c",
+      "name": "silk_shell_decoder",
+      "linked": true,
+      "linked_bytes": 857,
+      "instructions": 309,
+      "sar_setups": 0,
+      "narrow_loads": 15,
+      "stack_accesses": 53,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/sigm_Q15.c",
+      "name": "silk_sigm_Q15",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 33,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/sort.c",
+      "name": "silk_insertion_sort_increasing",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 99,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 12,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/sort.c",
+      "name": "silk_insertion_sort_decreasing_int16",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 98,
+      "sar_setups": 0,
+      "narrow_loads": 6,
+      "stack_accesses": 12,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/sort.c",
+      "name": "silk_insertion_sort_increasing_all_values_int16",
+      "linked": true,
+      "linked_bytes": 56,
+      "instructions": 21,
+      "sar_setups": 0,
+      "narrow_loads": 3,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/silk/stereo_LR_to_MS.c",
+      "name": "silk_stereo_LR_to_MS",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 862,
+      "sar_setups": 12,
+      "narrow_loads": 47,
+      "stack_accesses": 206,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "silk_stereo_find_predictor",
+        "silk_stereo_find_predictor",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3",
+        "silk_stereo_quant_pred",
+        "silk_stereo_quant_pred",
+        "silk_stereo_quant_pred",
+        "silk_stereo_quant_pred",
+        "silk_stereo_quant_pred",
+        "__divsi3",
+        "yoradio_opus_scratch_restore",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc"
+      ]
+    },
+    {
+      "source": "upstream/silk/stereo_MS_to_LR.c",
+      "name": "silk_stereo_MS_to_LR",
+      "linked": true,
+      "linked_bytes": 612,
+      "instructions": 228,
+      "sar_setups": 0,
+      "narrow_loads": 30,
+      "stack_accesses": 35,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/stereo_decode_pred.c",
+      "name": "silk_stereo_decode_pred",
+      "linked": true,
+      "linked_bytes": 256,
+      "instructions": 102,
+      "sar_setups": 0,
+      "narrow_loads": 4,
+      "stack_accesses": 16,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "ec_dec_icdf",
+        "__divsi3",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf",
+        "ec_dec_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/stereo_decode_pred.c",
+      "name": "silk_stereo_decode_mid_only",
+      "linked": true,
+      "linked_bytes": 31,
+      "instructions": 12,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_dec_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/stereo_encode_pred.c",
+      "name": "silk_stereo_encode_pred",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 58,
+      "sar_setups": 0,
+      "narrow_loads": 6,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf",
+        "ec_enc_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/stereo_encode_pred.c",
+      "name": "silk_stereo_encode_mid_only",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 10,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 2,
+      "arithmetic_helpers": [],
+      "calls": [
+        "ec_enc_icdf"
+      ]
+    },
+    {
+      "source": "upstream/silk/stereo_find_predictor.c",
+      "name": "silk_stereo_find_predictor",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 376,
+      "sar_setups": 22,
+      "narrow_loads": 0,
+      "stack_accesses": 48,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3"
+      ],
+      "calls": [
+        "silk_sum_sqr_shift",
+        "silk_sum_sqr_shift",
+        "silk_inner_prod_aligned_scale",
+        "__divsi3",
+        "__muldi3",
+        "__divsi3",
+        "__muldi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/stereo_quant_pred.c",
+      "name": "silk_stereo_quant_pred",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 110,
+      "sar_setups": 0,
+      "narrow_loads": 3,
+      "stack_accesses": 18,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/silk/sum_sqr_shift.c",
+      "name": "silk_sum_sqr_shift",
+      "linked": true,
+      "linked_bytes": 201,
+      "instructions": 77,
+      "sar_setups": 4,
+      "narrow_loads": 6,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus.c",
+      "name": "encode_size",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 14,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus.c",
+      "name": "opus_packet_get_samples_per_frame",
+      "linked": true,
+      "linked_bytes": 131,
+      "instructions": 38,
+      "sar_setups": 2,
+      "narrow_loads": 1,
+      "stack_accesses": 2,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/src/opus.c",
+      "name": "opus_packet_parse_impl",
+      "linked": true,
+      "linked_bytes": 1136,
+      "instructions": 406,
+      "sar_setups": 3,
+      "narrow_loads": 15,
+      "stack_accesses": 48,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/src/opus.c",
+      "name": "opus_packet_parse",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 267,
+      "sar_setups": 2,
+      "narrow_loads": 9,
+      "stack_accesses": 35,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decode_frame",
+      "linked": true,
+      "linked_bytes": 3501,
+      "instructions": 1209,
+      "sar_setups": 2,
+      "narrow_loads": 18,
+      "stack_accesses": 372,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3",
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_scratch_mark",
+        "__divsi3",
+        "yoradio_opus_scratch_restore",
+        "__divsi3",
+        "ec_dec_init",
+        "memset",
+        "opus_decode_frame",
+        "yoradio_opus_scratch_restore",
+        "yoradio_opus_scratch_restore",
+        "yoradio_opus_scratch_alloc",
+        "opus_decode_frame",
+        "yoradio_opus_scratch_restore",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "silk_ResetDecoder",
+        "__divsi3",
+        "silk_Decode",
+        "memset",
+        "yoradio_opus_scratch_restore",
+        "ec_dec_bit_logp",
+        "yoradio_opus_scratch_alloc",
+        "opus_decode_frame",
+        "opus_custom_decoder_ctl",
+        "opus_custom_decoder_ctl",
+        "yoradio_opus_scratch_alloc",
+        "opus_custom_decoder_ctl",
+        "celt_decode_with_ec",
+        "opus_custom_decoder_ctl",
+        "opus_custom_decoder_ctl",
+        "opus_custom_decoder_ctl",
+        "celt_decode_with_ec_dred",
+        "memset",
+        "opus_custom_decoder_ctl",
+        "celt_decode_with_ec",
+        "opus_custom_decoder_ctl",
+        "yoradio_opus_scratch_restore",
+        "opus_custom_decoder_ctl",
+        "opus_custom_decoder_ctl",
+        "celt_decode_with_ec",
+        "opus_custom_decoder_ctl",
+        "__divsi3",
+        "__divsi3",
+        "yoradio_opus_scratch_restore",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "ec_dec_bit_logp",
+        "ec_dec_uint",
+        "ec_dec_bit_logp",
+        "__divsi3",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc",
+        "yoradio_opus_scratch_alloc"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decode_native_impl$isra$3",
+      "linked": true,
+      "linked_bytes": 872,
+      "instructions": 312,
+      "sar_setups": 0,
+      "narrow_loads": 7,
+      "stack_accesses": 91,
+      "arithmetic_helpers": [
+        "__divsi3",
+        "__modsi3",
+        "__divsi3",
+        "__modsi3"
+      ],
+      "calls": [
+        "__divsi3",
+        "__modsi3",
+        "opus_decode_frame",
+        "opus_packet_get_samples_per_frame",
+        "opus_packet_parse_impl",
+        "opus_decode_native_impl$isra$3",
+        "opus_decode_native_impl$isra$3",
+        "opus_decode_frame",
+        "opus_decode_frame",
+        "a8",
+        "opus_decode_frame",
+        "__divsi3",
+        "__modsi3"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decoder_get_size",
+      "linked": true,
+      "linked_bytes": 62,
+      "instructions": 27,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 9,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_Get_Decoder_Size",
+        "celt_decoder_get_size"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decoder_init",
+      "linked": true,
+      "linked_bytes": 265,
+      "instructions": 106,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 19,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "yoradio_opus_history_begin",
+        "silk_Get_Decoder_Size",
+        "celt_decoder_get_size",
+        "yoradio_opus_clear",
+        "silk_Get_Decoder_Size",
+        "silk_InitDecoder",
+        "celt_decoder_init",
+        "opus_custom_decoder_ctl",
+        "__divsi3"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decoder_create",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 75,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 13,
+      "arithmetic_helpers": [],
+      "calls": [
+        "silk_Get_Decoder_Size",
+        "celt_decoder_get_size",
+        "malloc",
+        "opus_decoder_init",
+        "free"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decode_native",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 15,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_decode_native_impl$isra$3"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "yoradio_opus_decode_blocks_native",
+      "linked": true,
+      "linked_bytes": 97,
+      "instructions": 38,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 8,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_decode_native_impl$isra$3"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decode",
+      "linked": true,
+      "linked_bytes": 36,
+      "instructions": 15,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 7,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_decode_native_impl$isra$3"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decoder_ctl",
+      "linked": true,
+      "linked_bytes": 716,
+      "instructions": 285,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 70,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "opus_custom_decoder_ctl",
+        "yoradio_opus_clear",
+        "opus_custom_decoder_ctl",
+        "silk_ResetDecoder",
+        "__divsi3",
+        "opus_custom_decoder_ctl",
+        "opus_custom_decoder_ctl",
+        "opus_custom_decoder_ctl"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decoder_destroy",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 6,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 2,
+      "arithmetic_helpers": [],
+      "calls": [
+        "free"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_packet_get_bandwidth",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 23,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_packet_get_nb_channels",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 6,
+      "sar_setups": 0,
+      "narrow_loads": 1,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_packet_get_nb_frames",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 16,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_packet_get_nb_samples",
+      "linked": true,
+      "linked_bytes": 97,
+      "instructions": 36,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_packet_get_samples_per_frame"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_packet_has_lbrr",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 71,
+      "sar_setups": 3,
+      "narrow_loads": 4,
+      "stack_accesses": 10,
+      "arithmetic_helpers": [
+        "__divsi3"
+      ],
+      "calls": [
+        "opus_packet_get_samples_per_frame",
+        "__divsi3",
+        "opus_packet_parse",
+        "opus_packet_parse"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decoder_get_nb_samples",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 38,
+      "sar_setups": 0,
+      "narrow_loads": 2,
+      "stack_accesses": 6,
+      "arithmetic_helpers": [],
+      "calls": [
+        "opus_packet_get_samples_per_frame"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_decoder_get_size",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 2,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_decoder_init",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 7,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_decoder_create",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 22,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 4,
+      "arithmetic_helpers": [],
+      "calls": [
+        "malloc"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_decoder_destroy",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 6,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 2,
+      "arithmetic_helpers": [],
+      "calls": [
+        "free"
+      ]
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_decoder_ctl",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 2,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_get_size",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 2,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_alloc",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 5,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_free",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 1,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_parse",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 2,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_dred_process",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 2,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decoder_dred_decode",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 2,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    },
+    {
+      "source": "upstream/src/opus_decoder.c",
+      "name": "opus_decoder_dred_decode_float",
+      "linked": false,
+      "linked_bytes": null,
+      "instructions": 2,
+      "sar_setups": 0,
+      "narrow_loads": 0,
+      "stack_accesses": 0,
+      "arithmetic_helpers": [],
+      "calls": []
+    }
+  ]
+}

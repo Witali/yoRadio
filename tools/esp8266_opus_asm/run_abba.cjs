@@ -17,7 +17,7 @@ function checkArtifacts(aDir,bDir,fixtures){
     assert.equal(m.opus_benchmark_manifest_sha256.toLowerCase(),hash(fs.readFileSync(path.join(fixtures,'manifest.json'))));
     return m;
   });
-  const [a,b]=manifests;assert.equal(a.opus_backend,'gcc-asm');assert.equal(b.opus_backend,'optimized-asm');
+  const [a,b]=manifests;assert.equal(a.opus_backend,'gcc-asm');assert.ok(['optimized-asm','hoisted-asm'].includes(b.opus_backend));
   assert.equal(a.opus_asm_optimization_sha256,null);assert.match(b.opus_asm_optimization_sha256,/^[0-9a-f]{64}$/i);
   for(const key of new Set([...Object.keys(a),...Object.keys(b)]))
     if(!['opus_backend','opus_asm_optimization_sha256','built_utc','app_sha256','bytes'].includes(key))
