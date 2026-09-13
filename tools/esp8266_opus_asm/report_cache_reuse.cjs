@@ -30,13 +30,17 @@ function preflight(){
  assert.equal(sites.length,1,'missing linked reuse branch');
  const target=sites[0][2].match(/\bj\s+([0-9a-f]+)/)[1];
  assert.ok(lines.some(l=>l.trimStart().startsWith(target+':')&&/\bl32i\.n\s+a6,\s*a12,\s*32$/.test(l)),'reuse does not join cost consumer');
- assert.equal(a.functions.quant_partition.disassembly.match(/addi\s+a1,\s*a1,\s*-112/)?.[0],b.functions.quant_partition.disassembly.match(/addi\s+a1,\s*a1,\s*-112/)?.[0]);
+ for(const image of [a,b])assert.match(image.functions.quant_partition.disassembly,/addi\s+a1,\s*a1,\s*-112/,'Missing 112-byte stack frame');
  const result={schema:1,manifests,recipe:rm,reference:a,candidate:b,linked_reuse_path:sites[0],unchanged_linked_graphs:names.filter(n=>n!=='quant_partition'),static_ram_delta:0};
  fs.writeFileSync(path.join(dest,'preflight.json'),JSON.stringify(result,null,2)+'\n');
  console.log(JSON.stringify({bytes:mb.bytes,static_ram_delta:0,sections:{A:a.sections,B:b.sections},linked_reuse_path:sites[0]}));return result;
 }
 function report(){
  const build=preflight(),a=archive(path.join(experiment,'before'),path.join(dest,'controls/before')),b=archive(path.join(experiment,'candidate'),path.join(dest,'runs')),a2=archive(path.join(experiment,'after'),path.join(dest,'controls/after'));
+ for(const [stage,rows]of [['before',a],['candidate',b],['after',a2]]){
+  const ota=read(path.join(experiment,'ota-'+stage+'.json'));assert.equal(ota.pass,true);
+  for(const r of rows){assert.equal(r.report.before.data.app_address,ota.after.app_address);assert.equal(r.report.after.data.app_address,ota.after.app_address);}
+ }
  const fixtures=read(path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures/manifest.json'));
  for(const r of [...a,...b,...a2]){assert.equal(r.report.interval_ms,15000);assert.equal(r.report.final.profile_stage??0,0);assert.ok(!r.report.final.functions);for(const [i,v]of r.report.final.results.entries()){assert.equal(v.pcm_hash,fixtures.fixtures[i].expected_hash);assert.equal(v.samples,fixtures.fixtures[i].samples*r.report.final.rounds);assert.equal(v.packets,fixtures.fixtures[i].packet_count*r.report.final.rounds);}}
  const initial=compare(a.map(x=>x.report),b.map(x=>x.report)),repeated=compare(a2.map(x=>x.report),b.map(x=>x.report));

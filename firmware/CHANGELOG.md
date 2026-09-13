@@ -3,6 +3,22 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus ASM PVQ cache reuse (rejected)
+
+- `development/esp8266-opus-bands-cache-reuse-v1/app.bin`, 903232 B,
+  SHA256 `a3110a46703df7a543616619d27c957c574de72e7baf1a854e98bc2194faf463`.
+  Diagnostic raw-RAM benchmark only, not an ordinary radio release. Opt-in
+  `bands-cache-reuse-asm`; source recipe committed as `e0157c50`.
+- Reuses the loaded cache[lo] cost without new buffers. 376832 instruction
+  cases, 53 Node tests, exact host PCM through320/510 kbit/s, PLC/reset/OOM.
+  Static RAM and stack unchanged, image +16 B versus best tell-inline.
+- All 30 physical A/B/A runs retained: median CPU192 88.135 / 92.242 / 88.165%.
+  Candidate slower on every fixture; rejected, default unchanged. Exact PCM
+  on board, no decoder errors. See [report](../docs/ESP8266_OPUS_ASM_CACHE_REUSE.md).
+- Restored ordinary `esp8266-opus-live512-idle3s-20260913` via OTA; native
+  status/audio, WebSocket, playlist and root HTTP200 verified. Initial stopped
+  state retained; no UART/USB recovery or SPIFFS update.
+
 ## Development - 2026-09-09: optional ESP8266 Ogg Opus
 
 - Source `6a9f8ea`. Experimental app 881536 B; Opus-disabled regression app 763936 B.
