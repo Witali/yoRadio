@@ -80,7 +80,10 @@ function inspect(v){
   const disassembly=reachableDisassembly(elf,s);
   functions[name]={...s,disassembly,...linkedGraph(disassembly,a=>wordAt(elf,a),resolve)};
  }
- return {elf_sha256:hash(fs.readFileSync(elf)),sections,functions};
+ const functionSizes={};for(const s of all.filter(s=>/^[Tt]$/.test(s.type)&&s.bytes))
+  (functionSizes[s.name]??=[]).push(s.bytes);
+ for(const a of Object.values(functionSizes))a.sort((x,y)=>x-y);
+ return {elf_sha256:hash(fs.readFileSync(elf)),sections,functions,function_sizes:functionSizes};
 }
 function preflight(n){
  assert.ok([32,128].includes(n));const av=art(control),bv=art(variant(n)),ma=read(path.join(av,'manifest.json')),mb=read(path.join(bv,'manifest.json'));
@@ -97,7 +100,10 @@ function preflight(n){
  const a=inspect(control),b=inspect(variant(n));assert.ok(Object.keys(a.sections).length>=5);
  for(const [s,size] of Object.entries(a.sections).filter(([s])=>!s.startsWith('.flash.')))assert.equal(b.sections[s],size,'Static RAM changed: '+s);
  for(const name of Object.keys(a.functions))assert.deepEqual(b.functions[name].graph,a.functions[name].graph,'Linked graph changed: '+name);
- const result={reference_manifest:ma,candidate_manifest:mb,recipe:rm,reference:a,candidate:b,static_ram_delta:0,linked_hot_graphs_exact:true};
+ const otherSizeChanges=[...new Set([...Object.keys(a.function_sizes),...Object.keys(b.function_sizes)])]
+  .filter(k=>JSON.stringify(a.function_sizes[k])!==JSON.stringify(b.function_sizes[k]))
+  .map(name=>({name,before:a.function_sizes[name],after:b.function_sizes[name]}));
+ const result={reference_manifest:ma,candidate_manifest:mb,recipe:rm,reference:a,candidate:b,other_linked_function_size_changes:otherSizeChanges,static_ram_delta:0,linked_hot_graphs_exact:true};
  fs.writeFileSync(path.join(bv,'preflight.json'),JSON.stringify(result,null,2)+'\n');
  console.log(JSON.stringify({pad:n,bytes:mb.bytes,static_ram_delta:0,linked_hot_graphs_exact:true,functions:Object.fromEntries(Object.entries(b.functions).map(([k,v])=>[k,{address:v.address,bytes:v.bytes,instructions:v.physical_instruction_count,indirect_calls:v.relaxed_indirect_calls}]))}));return result;
 }
@@ -119,6 +125,15 @@ function report(n){
  const selection={initial:selectHighBitrate(initial.cases),repeated:selectHighBitrate(repeated.cases)};
  const compact=rows=>rows.map(({report,...r})=>r);
  const result={schema:1,initial,repeated,selection,build,host,inputs:{reference:compact(a),candidate:compact(b),repeated:compact(a2)},scope:'Placement-only, ten A/ten B/ten C/ten A; the two candidates share the same controls. Raw-only, no live qualification.'};
+ for(const [source,name] of [
+  ['.build/opus-layout-20260913/host-parent.log','host-parent.log'],
+  ['.build/opus-layout-20260913/regression-final.log','regression.log'],
+  ['.build/opus-layout-20260913/ota-control.json','controls/ota-before.json'],
+  ['.build/opus-layout-20260913/ota-control-repeat.json','controls/ota-after.json']]){
+  const from=path.join(root,source),to=path.join(dest,name);
+  if(fs.existsSync(to))assert.equal(hash(fs.readFileSync(to)),hash(fs.readFileSync(from)),'Evidence already differs: '+to);
+  else fs.copyFileSync(from,to);
+ }
  fs.writeFileSync(path.join(dest,'comparison.json'),JSON.stringify(result,null,2)+'\n');
  console.table(initial.cases.map((c,i)=>({name:c.name,A:c.reference.task_budget_percent.median,B:c.candidate.task_budget_percent.median,A2:repeated.cases[i].reference.task_budget_percent.median,reduction:c.median_task_reduction_percent})));
  console.log(JSON.stringify(selection));return result;
