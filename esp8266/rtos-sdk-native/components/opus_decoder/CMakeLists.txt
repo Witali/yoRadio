@@ -1,6 +1,6 @@
 set(YORADIO_OPUS_BACKEND "c" CACHE STRING "Opus implementation: c or diagnostic ASM backend")
-set_property(CACHE YORADIO_OPUS_BACKEND PROPERTY STRINGS c gcc-asm optimized-asm hoisted-asm bands-intensity-asm bands-blocks-asm bands-combined-asm bands-pulse-lookup-asm)
-if(NOT YORADIO_OPUS_BACKEND MATCHES "^(c|gcc-asm|optimized-asm|hoisted-asm|bands-intensity-asm|bands-blocks-asm|bands-combined-asm|bands-pulse-lookup-asm)$")
+set_property(CACHE YORADIO_OPUS_BACKEND PROPERTY STRINGS c gcc-asm optimized-asm hoisted-asm bands-intensity-asm bands-blocks-asm bands-combined-asm bands-pulse-lookup-asm bands-tell-inline-asm)
+if(NOT YORADIO_OPUS_BACKEND MATCHES "^(c|gcc-asm|optimized-asm|hoisted-asm|bands-intensity-asm|bands-blocks-asm|bands-combined-asm|bands-pulse-lookup-asm|bands-tell-inline-asm)$")
   message(FATAL_ERROR "Unknown YORADIO_OPUS_BACKEND")
 endif()
 if(NOT CONFIG_YORADIO_OGG_OPUS AND NOT YORADIO_OPUS_BACKEND STREQUAL "c")

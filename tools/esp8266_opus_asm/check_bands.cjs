@@ -6,7 +6,7 @@ async function check(kind){
  const base=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,sanitize:true});
  const candidate=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,sanitize:true,asmBandsModel:kind});
  const out=path.join(root,'.build/opus-bands-'+kind),fixtures=path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures');
- const report={scope:'Host semantic mirror, exact PCM/guards; not LX106 execution or timing',kind,recipe_sha256_lf:sourceHash(path.join(__dirname,kind==='intensity'?'bands.cjs':kind==='pulse-lookup'?'pulse_lookup.cjs':kind+'.cjs')),cases:[]};
+ const report={scope:'Host semantic mirror, exact PCM/guards; not LX106 execution or timing',kind,recipe_sha256_lf:sourceHash(path.join(__dirname,kind==='intensity'?'bands.cjs':kind.replaceAll('-','_')+'.cjs')),cases:[]};
  const probe=(bin,args)=>JSON.parse(execute('env',['ASAN_OPTIONS=detect_leaks=0',hostPath(bin),...args]));
  const compare=(name,args)=>{
   const a=path.join(out,name+'.base.pcm'),b=path.join(out,name+'.candidate.pcm');
