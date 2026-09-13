@@ -418,6 +418,13 @@ Entropy, balance, remaining_bits, seed и folding зависят от преды
 
 ## Журнал исполнения
 
+- 2026-09-14: следующий кандидат пункта 2 — повторное использование cache[lo]
+  в quant_partition, отдельный `bands-cache-reuse-asm` поверх tell-inline.
+  376832 instruction cases, 53 Node PASS, host exact PCM до510 кбит/с,
+  linked-путь подтверждён; RAM прежняя, flash +16 B. Начата физическая
+  серия 10 A / 10 B / 10 A, до её завершения принятия по скорости нет.
+  [Обоснование и проверки](ESP8266_OPUS_ASM_CACHE_REUSE.md).
+
 - 2026-09-14: в пункте повторных вычислений проверен кандидат `tell-zero`:
   два одинаковых entropy tell при mono theta qn=1. Полный аудит текущего
   стандартного режима (64 пары полоса/LM, 1 032 884 бюджета) доказал

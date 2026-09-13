@@ -21,6 +21,11 @@ async function check(kind){
  };
  for(const f of JSON.parse(fs.readFileSync(path.join(fixtures,'manifest.json'))).fixtures)
   compare(f.name,pcm=>[hostPath(path.join(fixtures,f.name+'.opuspkt')),hostPath(pcm),'--self-test']);
+ if(kind==='cache-reuse'){
+  const high=require('./high_fixtures.cjs').generate();
+  report.high_fixtures=high.map(f=>({name:f.name,command:f.command,sha256:require('node:crypto').createHash('sha256').update(fs.readFileSync(f.file)).digest('hex')}));
+  for(const f of high)compare(f.name,pcm=>[hostPath(f.file),hostPath(pcm),'--self-test']);
+ }
  compare('mixed',pcm=>['--sequence',hostPath(pcm),...['mono-12','mono-24','stereo-64','stereo-192','mono-12'].map(n=>hostPath(path.join(fixtures,n+'.opuspkt')))]);
  report.passed=true;fs.writeFileSync(path.join(out,'correctness.json'),JSON.stringify(report,null,2)+'\n');
 }

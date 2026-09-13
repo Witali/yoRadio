@@ -1,0 +1,54 @@
+// Strict A/B/A report: best tell-inline control, no discarded board attempts.
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const {root,component,sourceHash,hash,run}=require('./export.cjs');
+const {inspect}=require('./report_layout.cjs'),{archive}=require('./report_bands.cjs');
+const {compare}=require('../esp8266_opus_profile/compare_raw.cjs'),{selectHighBitrate}=require('./selection.cjs');
+const control='esp8266-opus-bands-tell-inline-v1',candidate='esp8266-opus-bands-cache-reuse-v1';
+const dest=path.join(root,'firmware/development',candidate),experiment=path.join(root,'.build/opus-cache-reuse-board');
+const read=p=>JSON.parse(fs.readFileSync(p,'utf8').replace(/^\uFEFF/,''));
+function preflight(){
+ require('./verify.cjs').verify('bands-cache-reuse-asm');
+ const manifests=[control,candidate].map(v=>{const d=path.join(root,'firmware/development',v),m=read(path.join(d,'manifest.json')),app=fs.readFileSync(path.join(d,'app.bin'));assert.equal(app.length,m.bytes);assert.equal(hash(app),m.app_sha256.toLowerCase());return m;});
+ const [ma,mb]=manifests;
+ assert.equal(ma.opus_backend,'bands-tell-inline-asm');assert.equal(mb.opus_backend,'bands-cache-reuse-asm');
+ for(const m of manifests){assert.equal(m.diagnostic,true);assert.equal(m.opus_benchmark,true);assert.equal(m.opus_benchmark_output,false);assert.equal(m.opus_function_profile,false);assert.equal(m.opus_profile_stage,0);assert.equal(m.opus_bands_text_literals??false,false);}
+ const identity=['opus_backend','opus_bands_tell_inline_manifest_sha256','opus_bands_cache_reuse_manifest_sha256','built_utc','source_revision','app_sha256','bytes','opus_bands_text_literals'];
+ for(const k of new Set([...Object.keys(ma),...Object.keys(mb)]))if(!identity.includes(k))assert.deepEqual(mb[k]??null,ma[k]??null,'Build profile changed: '+k);
+ const rm=read(path.join(component,'asm/lx106/bands-cache-reuse.json'));
+ assert.equal(mb.opus_bands_cache_reuse_manifest_sha256.toLowerCase(),hash(fs.readFileSync(path.join(component,'asm/lx106/bands-cache-reuse.json'))));
+ assert.equal(rm.parent_sha256_lf,ma.opus_bands_tell_inline_manifest_sha256.toLowerCase());
+ const bin='C:/Work/yoRadio/.build/esp8266-tools/tools/xtensa-lx106-elf/esp-2020r3-49-gd5524c1-8.4.0/xtensa-lx106-elf/bin';
+ const obj=path.join(root,'.build',candidate,'esp-idf/opus_decoder/CMakeFiles/__idf_opus_decoder.dir/asm/lx106/bands-cache-reuse/upstream/celt/bands.c.obj');
+ const all=run(path.join(bin,'xtensa-lx106-elf-nm.exe'),['-S',path.join(root,'.build',control,'yoradio_esp8266_helix_native.elf')]);
+ const names=[...run(path.join(bin,'xtensa-lx106-elf-nm.exe'),['-S',obj]).matchAll(/^[0-9a-f]+\s+[0-9a-f]+\s+[Tt]\s+(\S+)$/gm)].map(m=>m[1]).filter(n=>new RegExp('\\s'+n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$','m').test(all));
+ names.push('ec_tell_frac','ec_dec_bits');assert.ok(names.includes('quant_partition'));
+ const a=inspect(control,names),b=inspect(candidate,names);
+ for(const [s,bytes]of Object.entries(a.sections).filter(([s])=>!s.startsWith('.flash.')))assert.equal(b.sections[s],bytes,'Static RAM changed: '+s);
+ for(const name of names.filter(n=>n!=='quant_partition'))assert.deepEqual(b.functions[name].graph,a.functions[name].graph,'Unrelated linked graph changed: '+name);
+ const lines=b.functions.quant_partition.disassembly.split('\n');
+ const sites=lines.flatMap((line,i)=>/\bblt\s+a9,\s*a8,/.test(line)&&/\bmov\.n\s+a8,\s*a11$/.test(lines[i+1]||'')&&/\bj\s+/.test(lines[i+2]||'')?[lines.slice(i,i+3)]:[]);
+ assert.equal(sites.length,1,'missing linked reuse branch');
+ const target=sites[0][2].match(/\bj\s+([0-9a-f]+)/)[1];
+ assert.ok(lines.some(l=>l.trimStart().startsWith(target+':')&&/\bl32i\.n\s+a6,\s*a12,\s*32$/.test(l)),'reuse does not join cost consumer');
+ assert.equal(a.functions.quant_partition.disassembly.match(/addi\s+a1,\s*a1,\s*-112/)?.[0],b.functions.quant_partition.disassembly.match(/addi\s+a1,\s*a1,\s*-112/)?.[0]);
+ const result={schema:1,manifests,recipe:rm,reference:a,candidate:b,linked_reuse_path:sites[0],unchanged_linked_graphs:names.filter(n=>n!=='quant_partition'),static_ram_delta:0};
+ fs.writeFileSync(path.join(dest,'preflight.json'),JSON.stringify(result,null,2)+'\n');
+ console.log(JSON.stringify({bytes:mb.bytes,static_ram_delta:0,sections:{A:a.sections,B:b.sections},linked_reuse_path:sites[0]}));return result;
+}
+function report(){
+ const build=preflight(),a=archive(path.join(experiment,'before'),path.join(dest,'controls/before')),b=archive(path.join(experiment,'candidate'),path.join(dest,'runs')),a2=archive(path.join(experiment,'after'),path.join(dest,'controls/after'));
+ const fixtures=read(path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures/manifest.json'));
+ for(const r of [...a,...b,...a2]){assert.equal(r.report.interval_ms,15000);assert.equal(r.report.final.profile_stage??0,0);assert.ok(!r.report.final.functions);for(const [i,v]of r.report.final.results.entries()){assert.equal(v.pcm_hash,fixtures.fixtures[i].expected_hash);assert.equal(v.samples,fixtures.fixtures[i].samples*r.report.final.rounds);assert.equal(v.packets,fixtures.fixtures[i].packet_count*r.report.final.rounds);}}
+ const initial=compare(a.map(x=>x.report),b.map(x=>x.report)),repeated=compare(a2.map(x=>x.report),b.map(x=>x.report));
+ const host=read(path.join(root,'.build/opus-bands-cache-reuse/correctness.json'));assert.equal(host.passed,true);assert.equal(host.recipe_sha256_lf,build.recipe.recipe_sha256_lf);assert.ok(host.cases.some(c=>c.name==='stereo-510'));assert.ok(host.cases.some(c=>c.name==='stereo-320-20ms'));
+ const fixtureHash=sourceHash(path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures/manifest.json'));
+ for(const m of build.manifests)assert.equal(m.opus_benchmark_manifest_sha256.toLowerCase(),fixtureHash);
+ const compact=rows=>rows.map(({report,...r})=>r);
+ const result={schema:1,build,initial,repeated,host,selection:{initial:selectHighBitrate(initial.cases),repeated:selectHighBitrate(repeated.cases)},inputs:{before:compact(a),candidate:compact(b),after:compact(a2)},scope:'30 physical A/B/A attempts; raw RAM packets through192, no output/profiler. Host compatibility also320/510. No discarded runs; not live qualification.'};
+ for(const f of ['ota-before.json','ota-candidate.json','ota-after.json'])fs.copyFileSync(path.join(experiment,f),path.join(dest,f));
+ for(const [f,to]of [['host.log','host.log'],['correctness.json','correctness.json'],['regression.log','regression.log']])fs.copyFileSync(path.join(root,'.build/opus-bands-cache-reuse',f),path.join(dest,to));
+ fs.writeFileSync(path.join(dest,'comparison.json'),JSON.stringify(result,null,2)+'\n');
+ console.table(initial.cases.map((c,i)=>({name:c.name,A:c.reference.task_budget_percent.median,B:c.candidate.task_budget_percent.median,A2:repeated.cases[i].reference.task_budget_percent.median,reduction:c.median_task_reduction_percent})));
+ console.log(JSON.stringify(result.selection));return result;
+}
+module.exports={preflight,report};if(require.main===module){if(process.argv.includes('--preflight'))preflight();else report();}
