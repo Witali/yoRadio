@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {component,sourceHash}=require('./export.cjs');
 function verify(mode, directory=path.join(component,'asm/lx106'), componentRoot=component){
- assert.ok(['gcc-asm','optimized-asm','hoisted-asm','bands-intensity-asm','bands-blocks-asm'].includes(mode),'Unknown ASM selection');
+ assert.ok(['gcc-asm','optimized-asm','hoisted-asm','bands-intensity-asm','bands-blocks-asm','bands-combined-asm'].includes(mode),'Unknown ASM selection');
  const manifest=JSON.parse(fs.readFileSync(path.join(directory,'manifest.json'),'utf8'));
  assert.equal(manifest.roundtrip_exact,true);
  assert.equal(manifest.cpu,'LX106');assert.equal(manifest.abi,'call0');
@@ -15,10 +15,16 @@ function verify(mode, directory=path.join(component,'asm/lx106'), componentRoot=
  assert.deepEqual(manifest.files.map(f=>f.source).sort(),actual,'ASM corpus does not cover current C units');
  let optimization;
  let overlays=[];
- if(mode==='bands-blocks-asm'){
-  const r=JSON.parse(fs.readFileSync(path.join(directory,'bands-blocks.json'),'utf8'));
+ if(mode==='bands-blocks-asm'||mode==='bands-combined-asm'){
+  const kind=mode==='bands-blocks-asm'?'blocks':'combined';
+  const r=JSON.parse(fs.readFileSync(path.join(directory,'bands-'+kind+'.json'),'utf8'));
   assert.equal(r.base_manifest_sha256,sourceHash(path.join(directory,'manifest.json')));
-  assert.equal(r.recipe_sha256_lf,sourceHash(path.join(__dirname,'blocks.cjs')));
+  assert.equal(r.recipe_sha256_lf,sourceHash(path.join(__dirname,kind+'.cjs')));
+  if(kind==='combined'){
+   assert.deepEqual(Object.keys(r.parents),['bands-intensity.json','bands-blocks.json']);
+   for(const [f,h] of Object.entries(r.parents))assert.equal(sourceHash(path.join(directory,f)),h);
+   verify('bands-intensity-asm',directory,componentRoot);verify('bands-blocks-asm',directory,componentRoot);
+  }
   assert.deepEqual(r.files.map(f=>f.source),['upstream/celt/bands.c','upstream/celt/vq.c']);
   for(const f of r.files)assert.equal(sourceHash(path.join(directory,f.overlay)),f.overlay_sha256_lf);
   overlays=r.files;
