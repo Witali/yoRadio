@@ -93,6 +93,10 @@ Remove-Item Env:YORADIO_OPUS_FAST_INT64
 
 ## Следующие обязательные проверки
 
+Продолжение: [компактная автокорреляция PLC](ESP8266_OPUS_AUTOCORR_SCRATCH.md)
+прошла host-сравнения и target stack audit; пик corpus4464B. Default и
+размер реально выделяемого scratch не менялись, hardware приёмка впереди.
+
 - [ ] Дополнительные DRAM savings: пик SILK PLC4464 и CELT PLC4624. В trace
   видны SILK PLC temporaries и1024×int16 temporary в `_celt_autocorr`.
   Проверить отложенное выделение только при window/shift и отдельную ёмкость

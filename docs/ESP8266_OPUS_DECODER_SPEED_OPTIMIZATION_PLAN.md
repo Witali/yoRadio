@@ -363,6 +363,10 @@ Host-этап 2026-09-13: [переиспользование SILK state для 
 22 phase/11 block/11 lease cases и8182 OOM инъекции прошли; OFF по умолчанию,
 target RAM/CPU и непрерывное воспроизведение ещё не подтверждены.
 
+[Компактная автокорреляция PLC](ESP8266_OPUS_AUTOCORR_SCRATCH.md):811 прямых
+сравнений и22 phase cases точны; corpus peak4464B, target frame64→160B.
+CPU пока не измерен. Далее аудит32-битного SILK PLC scratch для IRAM.
+
 ```powershell
 node tools/esp8266_opus_profile/audit_target.cjs --build .build/esp8266-opus-flash-output512 --output .build/opus-target-audit.json
 node --test tests/esp8266-opus-target-audit.test.js

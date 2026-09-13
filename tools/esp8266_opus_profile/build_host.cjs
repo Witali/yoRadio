@@ -39,7 +39,8 @@ function dependencies(depfile) {
   return text.slice(text.indexOf(':') + 1).trim().split(/\s+/).filter(Boolean).map(nativePath);
 }
 
-async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false } = {}) {
+async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false } = {}) {
+  if (autocorrCompact && !bounded) throw Error('autocorrCompact requires bounded decoder.');
   if (silkScratch && !bounded) throw Error('silkScratch requires bounded decoder.');
   if (pcmLeases && !bounded) throw Error('pcmLeases requires bounded decoder.');
   if (divOnce && !bounded) throw Error('divOnce requires bounded decoder.');
@@ -51,7 +52,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   const sourceRoot = upstreamRoot ? path.resolve(upstreamRoot) : upstream;
   if (fastInt64 !== undefined && !fs.readFileSync(path.join(sourceRoot, 'celt/arch.h'), 'utf8').includes('#ifndef OPUS_FAST_INT64'))
     throw Error('Selected upstream does not support an OPUS_FAST_INT64 override; use a documented diagnostic copy.');
-  const out = path.join(root, '.build/esp8266-opus-host' + (sanitize ? '-sanitize' : '') + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
+  const out = path.join(root, '.build/esp8266-opus-host' + (autocorrCompact ? '-autocorr-compact' : '') + (sanitize ? '-sanitize' : '') + (bounded ? '-bounded' : upstreamRoot ? '-pristine' : '') +
     (fastInt64 === undefined ? '' : '-int64-' + fastInt64) + (firFlashWord ? '-fir-word' : '') + (profileStage ? '-stage-' + profileStage : '') + (celtDecodeOnly ? '-celt-decode-only' : '') + (divOnce ? '-div-once' : '') + (pcmLeases ? '-pcm-leases' : '') + (silkScratch ? '-silk-scratch' : ''));
   const linkFlags = sanitize ? ['-fsanitize=address,undefined', '-fno-sanitize-recover=all'] : [];
   const binary = path.join(out, 'probe');
@@ -64,6 +65,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   const flags = ['-O2', '-std=c99', '-fwrapv', '-ffunction-sections', '-fdata-sections',
     ...linkFlags, ...(sanitize ? ['-g', '-fno-omit-frame-pointer'] : []),
     ...(silkScratch ? ['-DYORADIO_OPUS_CELT_SILK_SCRATCH=1'] : []),
+    ...(autocorrCompact ? ['-DYORADIO_OPUS_AUTOCORR_COMPACT=1'] : []),
     ...(fastInt64 === undefined ? [] : ['-DOPUS_FAST_INT64=' + fastInt64]),
     ...(bounded ? ['-DYORADIO_OPUS_BOUNDED=1', '-I' + hostPath(component)] : []),
     ...(firFlashWord ? ['-DYORADIO_OPUS_FIR_FLASH_WORD=1'] : []),

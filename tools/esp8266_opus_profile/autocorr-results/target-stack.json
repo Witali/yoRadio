@@ -1,0 +1,1492 @@
+{
+  "build": "esp8266-opus-pcm-queue256-stack1536",
+  "scope": "Individual LX106 GCC stack frames only. No linked image, summed call-depth, ISR margin or physical speed claim.",
+  "results": [
+    {
+      "mode": "baseline",
+      "name": "celt_lpc.c",
+      "source": "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/celt_lpc.c",
+      "source_sha256_lf": "11cf6e09bfefbc0e79688f5a32cc9dbee205509d6239a4967e63674129ac4585",
+      "compiler": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe",
+      "arguments": [
+        "-DUSING_IBUS_FASTER_GET",
+        "-DYORADIO_OPUS_BOUNDED=1",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=1",
+        "-DYORADIO_OPUS_PCM_LEASES=1",
+        "-DYORADIO_OPUS_PROFILE_STAGE=0",
+        "-DYORADIO_OPUS_WORD_ASM=1",
+        "-D__ESP_FILE__=__FILE__",
+        "-Iconfig",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/.",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include",
+        "-mlongcalls",
+        "-Wno-frame-address",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fstrict-volatile-bitfields",
+        "-nostdlib",
+        "-Wall",
+        "-Werror=all",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=unused-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-ggdb",
+        "-Os",
+        "-std=gnu99",
+        "-Wno-old-style-declaration",
+        "-D_GNU_SOURCE",
+        "-DIDF_VER=\"v3.4-dirty\"",
+        "-DGCC_NOT_5_2_0",
+        "-DESP_PLATFORM",
+        "-O3",
+        "-fwrapv",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.build\\opus-scratch-stack-qualified-20260913\\baseline-celt_lpc.c.obj",
+        "-c",
+        "C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\upstream\\celt\\celt_lpc.c",
+        "-fstack-usage",
+        "-DYORADIO_OPUS_CELT_SILK_SCRATCH=0",
+        "-DYORADIO_OPUS_AUTOCORR_COMPACT=0"
+      ],
+      "frames": [
+        {
+          "symbol": "celt_lpc.c:98:6:_celt_lpc",
+          "bytes": 160,
+          "kind": "static"
+        },
+        {
+          "symbol": "celt_lpc.c:200:6:celt_fir_c",
+          "bytes": 144,
+          "kind": "static"
+        },
+        {
+          "symbol": "celt_lpc.c:248:6:celt_iir",
+          "bytes": 160,
+          "kind": "static"
+        },
+        {
+          "symbol": "celt_lpc.c:338:5:_celt_autocorr",
+          "bytes": 64,
+          "kind": "static"
+        }
+      ]
+    },
+    {
+      "mode": "baseline",
+      "name": "opus_decoder.c",
+      "source": "esp8266/rtos-sdk-native/components/opus_decoder/upstream/src/opus_decoder.c",
+      "source_sha256_lf": "1b7cd3c83d0af7951a0ca844db3ca28156a89c0e5959a0be6fb2cc50ead66a7a",
+      "compiler": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe",
+      "arguments": [
+        "-DUSING_IBUS_FASTER_GET",
+        "-DYORADIO_OPUS_BOUNDED=1",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=1",
+        "-DYORADIO_OPUS_PCM_LEASES=1",
+        "-DYORADIO_OPUS_PROFILE_STAGE=0",
+        "-DYORADIO_OPUS_WORD_ASM=1",
+        "-D__ESP_FILE__=__FILE__",
+        "-Iconfig",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/.",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include",
+        "-mlongcalls",
+        "-Wno-frame-address",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fstrict-volatile-bitfields",
+        "-nostdlib",
+        "-Wall",
+        "-Werror=all",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=unused-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-ggdb",
+        "-Os",
+        "-std=gnu99",
+        "-Wno-old-style-declaration",
+        "-D_GNU_SOURCE",
+        "-DIDF_VER=\"v3.4-dirty\"",
+        "-DGCC_NOT_5_2_0",
+        "-DESP_PLATFORM",
+        "-O3",
+        "-fwrapv",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.build\\opus-scratch-stack-qualified-20260913\\baseline-opus_decoder.c.obj",
+        "-c",
+        "C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\upstream\\src\\opus_decoder.c",
+        "-fstack-usage",
+        "-DYORADIO_OPUS_CELT_SILK_SCRATCH=0",
+        "-DYORADIO_OPUS_AUTOCORR_COMPACT=0"
+      ],
+      "frames": [
+        {
+          "symbol": "opus_decoder.c:272:12:opus_decode_frame",
+          "bytes": 240,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:738:12:opus_decode_native_impl$isra$3",
+          "bytes": 224,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:139:5:opus_decoder_get_size",
+          "bytes": 32,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:153:5:opus_decoder_init",
+          "bytes": 64,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:211:14:opus_decoder_create",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:910:5:opus_decode_native",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:919:5:yoradio_opus_decode_blocks_native",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:933:5:yoradio_opus_decode_leased_native",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:949:5:opus_decode",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1040:5:opus_decoder_ctl",
+          "bytes": 64,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1211:6:opus_decoder_destroy",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1217:5:opus_packet_get_bandwidth",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1235:5:opus_packet_get_nb_channels",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1240:5:opus_packet_get_nb_frames",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1256:5:opus_packet_get_nb_samples",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1273:5:opus_packet_has_lbrr",
+          "bytes": 304,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1298:5:opus_decoder_get_nb_samples",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1328:5:opus_dred_decoder_get_size",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1346:5:opus_dred_decoder_init",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1360:18:opus_dred_decoder_create",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1382:6:opus_dred_decoder_destroy",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1388:5:opus_dred_decoder_ctl",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1496:5:opus_dred_get_size",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1505:11:opus_dred_alloc",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1524:6:opus_dred_free",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1533:5:opus_dred_parse",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1572:5:opus_dred_process",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1594:5:opus_decoder_dred_decode",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1628:5:opus_decoder_dred_decode_float",
+          "bytes": 0,
+          "kind": "static"
+        }
+      ]
+    },
+    {
+      "mode": "baseline",
+      "name": "opus_memory.c",
+      "source": "esp8266/rtos-sdk-native/components/opus_decoder/opus_memory.c",
+      "source_sha256_lf": "a6a88764ce240ee3133e73a9181f51fdf37d07a289c6a99eb4ef3f61e5917d18",
+      "compiler": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe",
+      "arguments": [
+        "-DUSING_IBUS_FASTER_GET",
+        "-DYORADIO_OPUS_BOUNDED=1",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=1",
+        "-DYORADIO_OPUS_PCM_LEASES=1",
+        "-DYORADIO_OPUS_PROFILE_STAGE=0",
+        "-DYORADIO_OPUS_WORD_ASM=1",
+        "-D__ESP_FILE__=__FILE__",
+        "-Iconfig",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/.",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include",
+        "-mlongcalls",
+        "-Wno-frame-address",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fstrict-volatile-bitfields",
+        "-nostdlib",
+        "-Wall",
+        "-Werror=all",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=unused-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-ggdb",
+        "-Os",
+        "-std=gnu99",
+        "-Wno-old-style-declaration",
+        "-D_GNU_SOURCE",
+        "-DIDF_VER=\"v3.4-dirty\"",
+        "-DGCC_NOT_5_2_0",
+        "-DESP_PLATFORM",
+        "-O3",
+        "-fwrapv",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.build\\opus-scratch-stack-qualified-20260913\\baseline-opus_memory.c.obj",
+        "-c",
+        "C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\opus_memory.c",
+        "-fstack-usage",
+        "-DYORADIO_OPUS_CELT_SILK_SCRATCH=0",
+        "-DYORADIO_OPUS_AUTOCORR_COMPACT=0"
+      ],
+      "frames": [
+        {
+          "symbol": "opus_memory.c:176:12:lease_acquire",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:183:12:lease_output",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:126:12:decode_bounded",
+          "bytes": 64,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:25:6:yoradio_opus_memory_bind",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:36:5:yoradio_opus_history_begin",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:42:7:yoradio_opus_history",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:56:19:yoradio_opus_scratch_mark",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:63:6:yoradio_opus_scratch_restore",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:69:7:yoradio_opus_scratch_alloc",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:97:8:yoradio_opus_scratch_peak_bytes",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:98:8:yoradio_opus_scratch_peak_words",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:100:6:yoradio_opus_copy",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:118:6:yoradio_opus_clear",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:158:5:yoradio_opus_decode_bounded",
+          "bytes": 32,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:162:5:yoradio_opus_decode_blocks_bounded",
+          "bytes": 32,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:189:5:yoradio_opus_decode_leased_bounded",
+          "bytes": 48,
+          "kind": "static"
+        }
+      ]
+    },
+    {
+      "mode": "silk",
+      "name": "celt_lpc.c",
+      "source": "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/celt_lpc.c",
+      "source_sha256_lf": "11cf6e09bfefbc0e79688f5a32cc9dbee205509d6239a4967e63674129ac4585",
+      "compiler": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe",
+      "arguments": [
+        "-DUSING_IBUS_FASTER_GET",
+        "-DYORADIO_OPUS_BOUNDED=1",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=1",
+        "-DYORADIO_OPUS_PCM_LEASES=1",
+        "-DYORADIO_OPUS_PROFILE_STAGE=0",
+        "-DYORADIO_OPUS_WORD_ASM=1",
+        "-D__ESP_FILE__=__FILE__",
+        "-Iconfig",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/.",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include",
+        "-mlongcalls",
+        "-Wno-frame-address",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fstrict-volatile-bitfields",
+        "-nostdlib",
+        "-Wall",
+        "-Werror=all",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=unused-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-ggdb",
+        "-Os",
+        "-std=gnu99",
+        "-Wno-old-style-declaration",
+        "-D_GNU_SOURCE",
+        "-DIDF_VER=\"v3.4-dirty\"",
+        "-DGCC_NOT_5_2_0",
+        "-DESP_PLATFORM",
+        "-O3",
+        "-fwrapv",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.build\\opus-scratch-stack-qualified-20260913\\silk-celt_lpc.c.obj",
+        "-c",
+        "C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\upstream\\celt\\celt_lpc.c",
+        "-fstack-usage",
+        "-DYORADIO_OPUS_CELT_SILK_SCRATCH=1",
+        "-DYORADIO_OPUS_AUTOCORR_COMPACT=0"
+      ],
+      "frames": [
+        {
+          "symbol": "celt_lpc.c:98:6:_celt_lpc",
+          "bytes": 160,
+          "kind": "static"
+        },
+        {
+          "symbol": "celt_lpc.c:200:6:celt_fir_c",
+          "bytes": 144,
+          "kind": "static"
+        },
+        {
+          "symbol": "celt_lpc.c:248:6:celt_iir",
+          "bytes": 160,
+          "kind": "static"
+        },
+        {
+          "symbol": "celt_lpc.c:338:5:_celt_autocorr",
+          "bytes": 64,
+          "kind": "static"
+        }
+      ]
+    },
+    {
+      "mode": "silk",
+      "name": "opus_decoder.c",
+      "source": "esp8266/rtos-sdk-native/components/opus_decoder/upstream/src/opus_decoder.c",
+      "source_sha256_lf": "1b7cd3c83d0af7951a0ca844db3ca28156a89c0e5959a0be6fb2cc50ead66a7a",
+      "compiler": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe",
+      "arguments": [
+        "-DUSING_IBUS_FASTER_GET",
+        "-DYORADIO_OPUS_BOUNDED=1",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=1",
+        "-DYORADIO_OPUS_PCM_LEASES=1",
+        "-DYORADIO_OPUS_PROFILE_STAGE=0",
+        "-DYORADIO_OPUS_WORD_ASM=1",
+        "-D__ESP_FILE__=__FILE__",
+        "-Iconfig",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/.",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include",
+        "-mlongcalls",
+        "-Wno-frame-address",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fstrict-volatile-bitfields",
+        "-nostdlib",
+        "-Wall",
+        "-Werror=all",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=unused-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-ggdb",
+        "-Os",
+        "-std=gnu99",
+        "-Wno-old-style-declaration",
+        "-D_GNU_SOURCE",
+        "-DIDF_VER=\"v3.4-dirty\"",
+        "-DGCC_NOT_5_2_0",
+        "-DESP_PLATFORM",
+        "-O3",
+        "-fwrapv",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.build\\opus-scratch-stack-qualified-20260913\\silk-opus_decoder.c.obj",
+        "-c",
+        "C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\upstream\\src\\opus_decoder.c",
+        "-fstack-usage",
+        "-DYORADIO_OPUS_CELT_SILK_SCRATCH=1",
+        "-DYORADIO_OPUS_AUTOCORR_COMPACT=0"
+      ],
+      "frames": [
+        {
+          "symbol": "opus_decoder.c:272:12:opus_decode_frame",
+          "bytes": 240,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:738:12:opus_decode_native_impl$isra$3",
+          "bytes": 224,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:106:6:yoradio_opus_silk_scratch_restore",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:139:5:opus_decoder_get_size",
+          "bytes": 32,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:153:5:opus_decoder_init",
+          "bytes": 64,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:211:14:opus_decoder_create",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:910:5:opus_decode_native",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:919:5:yoradio_opus_decode_blocks_native",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:933:5:yoradio_opus_decode_leased_native",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:949:5:opus_decode",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1040:5:opus_decoder_ctl",
+          "bytes": 64,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1211:6:opus_decoder_destroy",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1217:5:opus_packet_get_bandwidth",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1235:5:opus_packet_get_nb_channels",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1240:5:opus_packet_get_nb_frames",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1256:5:opus_packet_get_nb_samples",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1273:5:opus_packet_has_lbrr",
+          "bytes": 304,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1298:5:opus_decoder_get_nb_samples",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1328:5:opus_dred_decoder_get_size",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1346:5:opus_dred_decoder_init",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1360:18:opus_dred_decoder_create",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1382:6:opus_dred_decoder_destroy",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1388:5:opus_dred_decoder_ctl",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1496:5:opus_dred_get_size",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1505:11:opus_dred_alloc",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1524:6:opus_dred_free",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1533:5:opus_dred_parse",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1572:5:opus_dred_process",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1594:5:opus_decoder_dred_decode",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1628:5:opus_decoder_dred_decode_float",
+          "bytes": 0,
+          "kind": "static"
+        }
+      ]
+    },
+    {
+      "mode": "silk",
+      "name": "opus_memory.c",
+      "source": "esp8266/rtos-sdk-native/components/opus_decoder/opus_memory.c",
+      "source_sha256_lf": "a6a88764ce240ee3133e73a9181f51fdf37d07a289c6a99eb4ef3f61e5917d18",
+      "compiler": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe",
+      "arguments": [
+        "-DUSING_IBUS_FASTER_GET",
+        "-DYORADIO_OPUS_BOUNDED=1",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=1",
+        "-DYORADIO_OPUS_PCM_LEASES=1",
+        "-DYORADIO_OPUS_PROFILE_STAGE=0",
+        "-DYORADIO_OPUS_WORD_ASM=1",
+        "-D__ESP_FILE__=__FILE__",
+        "-Iconfig",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/.",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include",
+        "-mlongcalls",
+        "-Wno-frame-address",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fstrict-volatile-bitfields",
+        "-nostdlib",
+        "-Wall",
+        "-Werror=all",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=unused-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-ggdb",
+        "-Os",
+        "-std=gnu99",
+        "-Wno-old-style-declaration",
+        "-D_GNU_SOURCE",
+        "-DIDF_VER=\"v3.4-dirty\"",
+        "-DGCC_NOT_5_2_0",
+        "-DESP_PLATFORM",
+        "-O3",
+        "-fwrapv",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.build\\opus-scratch-stack-qualified-20260913\\silk-opus_memory.c.obj",
+        "-c",
+        "C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\opus_memory.c",
+        "-fstack-usage",
+        "-DYORADIO_OPUS_CELT_SILK_SCRATCH=1",
+        "-DYORADIO_OPUS_AUTOCORR_COMPACT=0"
+      ],
+      "frames": [
+        {
+          "symbol": "opus_memory.c:176:12:lease_acquire",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:183:12:lease_output",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:126:12:decode_bounded",
+          "bytes": 64,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:13:6:yoradio_opus_scratch_unlend",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:16:5:yoradio_opus_scratch_lend",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:22:8:yoradio_opus_scratch_peak_loan",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:25:6:yoradio_opus_memory_bind",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:36:5:yoradio_opus_history_begin",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:42:7:yoradio_opus_history",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:56:19:yoradio_opus_scratch_mark",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:63:6:yoradio_opus_scratch_restore",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:69:7:yoradio_opus_scratch_alloc",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:97:8:yoradio_opus_scratch_peak_bytes",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:98:8:yoradio_opus_scratch_peak_words",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:100:6:yoradio_opus_copy",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:118:6:yoradio_opus_clear",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:158:5:yoradio_opus_decode_bounded",
+          "bytes": 32,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:162:5:yoradio_opus_decode_blocks_bounded",
+          "bytes": 32,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:189:5:yoradio_opus_decode_leased_bounded",
+          "bytes": 48,
+          "kind": "static"
+        }
+      ]
+    },
+    {
+      "mode": "silk-compact",
+      "name": "celt_lpc.c",
+      "source": "esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/celt_lpc.c",
+      "source_sha256_lf": "11cf6e09bfefbc0e79688f5a32cc9dbee205509d6239a4967e63674129ac4585",
+      "compiler": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe",
+      "arguments": [
+        "-DUSING_IBUS_FASTER_GET",
+        "-DYORADIO_OPUS_BOUNDED=1",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=1",
+        "-DYORADIO_OPUS_PCM_LEASES=1",
+        "-DYORADIO_OPUS_PROFILE_STAGE=0",
+        "-DYORADIO_OPUS_WORD_ASM=1",
+        "-D__ESP_FILE__=__FILE__",
+        "-Iconfig",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/.",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include",
+        "-mlongcalls",
+        "-Wno-frame-address",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fstrict-volatile-bitfields",
+        "-nostdlib",
+        "-Wall",
+        "-Werror=all",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=unused-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-ggdb",
+        "-Os",
+        "-std=gnu99",
+        "-Wno-old-style-declaration",
+        "-D_GNU_SOURCE",
+        "-DIDF_VER=\"v3.4-dirty\"",
+        "-DGCC_NOT_5_2_0",
+        "-DESP_PLATFORM",
+        "-O3",
+        "-fwrapv",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.build\\opus-scratch-stack-qualified-20260913\\silk-compact-celt_lpc.c.obj",
+        "-c",
+        "C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\upstream\\celt\\celt_lpc.c",
+        "-fstack-usage",
+        "-DYORADIO_OPUS_CELT_SILK_SCRATCH=1",
+        "-DYORADIO_OPUS_AUTOCORR_COMPACT=1"
+      ],
+      "frames": [
+        {
+          "symbol": "celt_lpc.c:98:6:_celt_lpc",
+          "bytes": 160,
+          "kind": "static"
+        },
+        {
+          "symbol": "celt_lpc.c:200:6:celt_fir_c",
+          "bytes": 144,
+          "kind": "static"
+        },
+        {
+          "symbol": "celt_lpc.c:248:6:celt_iir",
+          "bytes": 160,
+          "kind": "static"
+        },
+        {
+          "symbol": "celt_lpc.c:338:5:_celt_autocorr",
+          "bytes": 160,
+          "kind": "static"
+        }
+      ]
+    },
+    {
+      "mode": "silk-compact",
+      "name": "opus_decoder.c",
+      "source": "esp8266/rtos-sdk-native/components/opus_decoder/upstream/src/opus_decoder.c",
+      "source_sha256_lf": "1b7cd3c83d0af7951a0ca844db3ca28156a89c0e5959a0be6fb2cc50ead66a7a",
+      "compiler": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe",
+      "arguments": [
+        "-DUSING_IBUS_FASTER_GET",
+        "-DYORADIO_OPUS_BOUNDED=1",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=1",
+        "-DYORADIO_OPUS_PCM_LEASES=1",
+        "-DYORADIO_OPUS_PROFILE_STAGE=0",
+        "-DYORADIO_OPUS_WORD_ASM=1",
+        "-D__ESP_FILE__=__FILE__",
+        "-Iconfig",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/.",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include",
+        "-mlongcalls",
+        "-Wno-frame-address",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fstrict-volatile-bitfields",
+        "-nostdlib",
+        "-Wall",
+        "-Werror=all",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=unused-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-ggdb",
+        "-Os",
+        "-std=gnu99",
+        "-Wno-old-style-declaration",
+        "-D_GNU_SOURCE",
+        "-DIDF_VER=\"v3.4-dirty\"",
+        "-DGCC_NOT_5_2_0",
+        "-DESP_PLATFORM",
+        "-O3",
+        "-fwrapv",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.build\\opus-scratch-stack-qualified-20260913\\silk-compact-opus_decoder.c.obj",
+        "-c",
+        "C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\upstream\\src\\opus_decoder.c",
+        "-fstack-usage",
+        "-DYORADIO_OPUS_CELT_SILK_SCRATCH=1",
+        "-DYORADIO_OPUS_AUTOCORR_COMPACT=1"
+      ],
+      "frames": [
+        {
+          "symbol": "opus_decoder.c:272:12:opus_decode_frame",
+          "bytes": 240,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:738:12:opus_decode_native_impl$isra$3",
+          "bytes": 224,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:106:6:yoradio_opus_silk_scratch_restore",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:139:5:opus_decoder_get_size",
+          "bytes": 32,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:153:5:opus_decoder_init",
+          "bytes": 64,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:211:14:opus_decoder_create",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:910:5:opus_decode_native",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:919:5:yoradio_opus_decode_blocks_native",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:933:5:yoradio_opus_decode_leased_native",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:949:5:opus_decode",
+          "bytes": 48,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1040:5:opus_decoder_ctl",
+          "bytes": 64,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1211:6:opus_decoder_destroy",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1217:5:opus_packet_get_bandwidth",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1235:5:opus_packet_get_nb_channels",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1240:5:opus_packet_get_nb_frames",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1256:5:opus_packet_get_nb_samples",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1273:5:opus_packet_has_lbrr",
+          "bytes": 304,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1298:5:opus_decoder_get_nb_samples",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1328:5:opus_dred_decoder_get_size",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1346:5:opus_dred_decoder_init",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1360:18:opus_dred_decoder_create",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1382:6:opus_dred_decoder_destroy",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1388:5:opus_dred_decoder_ctl",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1496:5:opus_dred_get_size",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1505:11:opus_dred_alloc",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1524:6:opus_dred_free",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1533:5:opus_dred_parse",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1572:5:opus_dred_process",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1594:5:opus_decoder_dred_decode",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_decoder.c:1628:5:opus_decoder_dred_decode_float",
+          "bytes": 0,
+          "kind": "static"
+        }
+      ]
+    },
+    {
+      "mode": "silk-compact",
+      "name": "opus_memory.c",
+      "source": "esp8266/rtos-sdk-native/components/opus_decoder/opus_memory.c",
+      "source_sha256_lf": "a6a88764ce240ee3133e73a9181f51fdf37d07a289c6a99eb4ef3f61e5917d18",
+      "compiler": "C:\\Work\\yoRadio\\.build\\esp8266-tools\\tools\\xtensa-lx106-elf\\esp-2020r3-49-gd5524c1-8.4.0\\xtensa-lx106-elf\\bin\\xtensa-lx106-elf-gcc.exe",
+      "arguments": [
+        "-DUSING_IBUS_FASTER_GET",
+        "-DYORADIO_OPUS_BOUNDED=1",
+        "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+        "-DYORADIO_OPUS_ICDF_FLASH_WORD=1",
+        "-DYORADIO_OPUS_PCM_LEASES=1",
+        "-DYORADIO_OPUS_PROFILE_STAGE=0",
+        "-DYORADIO_OPUS_WORD_ASM=1",
+        "-D__ESP_FILE__=__FILE__",
+        "-Iconfig",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/.",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+        "-IC:/Work/yoRadio/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/newlib/platform_include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/include/freertos/private",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/freertos/port/esp8266/include/freertos",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/heap/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/log/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/include/apps/sntp",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/lwip/port/esp8266/include/arch",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp8266/include/driver",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_common/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/esp_event/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/tcpip_adapter/include",
+        "-IC:/Work/yoRadio/.worktree/esp8266-native-port/.build/esp8266-rtos-sdk/components/vfs/include",
+        "-mlongcalls",
+        "-Wno-frame-address",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fstrict-volatile-bitfields",
+        "-nostdlib",
+        "-Wall",
+        "-Werror=all",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=unused-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-ggdb",
+        "-Os",
+        "-std=gnu99",
+        "-Wno-old-style-declaration",
+        "-D_GNU_SOURCE",
+        "-DIDF_VER=\"v3.4-dirty\"",
+        "-DGCC_NOT_5_2_0",
+        "-DESP_PLATFORM",
+        "-O3",
+        "-fwrapv",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.build\\opus-scratch-stack-qualified-20260913\\silk-compact-opus_memory.c.obj",
+        "-c",
+        "C:\\Work\\yoRadio\\esp8266\\rtos-sdk-native\\components\\opus_decoder\\opus_memory.c",
+        "-fstack-usage",
+        "-DYORADIO_OPUS_CELT_SILK_SCRATCH=1",
+        "-DYORADIO_OPUS_AUTOCORR_COMPACT=1"
+      ],
+      "frames": [
+        {
+          "symbol": "opus_memory.c:176:12:lease_acquire",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:183:12:lease_output",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:126:12:decode_bounded",
+          "bytes": 64,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:13:6:yoradio_opus_scratch_unlend",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:16:5:yoradio_opus_scratch_lend",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:22:8:yoradio_opus_scratch_peak_loan",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:25:6:yoradio_opus_memory_bind",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:36:5:yoradio_opus_history_begin",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:42:7:yoradio_opus_history",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:56:19:yoradio_opus_scratch_mark",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:63:6:yoradio_opus_scratch_restore",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:69:7:yoradio_opus_scratch_alloc",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:97:8:yoradio_opus_scratch_peak_bytes",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:98:8:yoradio_opus_scratch_peak_words",
+          "bytes": 0,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:100:6:yoradio_opus_copy",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:118:6:yoradio_opus_clear",
+          "bytes": 16,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:158:5:yoradio_opus_decode_bounded",
+          "bytes": 32,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:162:5:yoradio_opus_decode_blocks_bounded",
+          "bytes": 32,
+          "kind": "static"
+        },
+        {
+          "symbol": "opus_memory.c:189:5:yoradio_opus_decode_leased_bounded",
+          "bytes": 48,
+          "kind": "static"
+        }
+      ]
+    }
+  ]
+}

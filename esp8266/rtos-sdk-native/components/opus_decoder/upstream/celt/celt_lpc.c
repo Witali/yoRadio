@@ -34,6 +34,67 @@
 #include "mathops.h"
 #include "pitch.h"
 
+/* Host/diagnostic A/B only until the target RAM/stack budget is qualified. */
+#ifndef YORADIO_OPUS_AUTOCORR_COMPACT
+#define YORADIO_OPUS_AUTOCORR_COMPACT 0
+#endif
+#if YORADIO_OPUS_AUTOCORR_COMPACT != 0 && YORADIO_OPUS_AUTOCORR_COMPACT != 1
+#error "YORADIO_OPUS_AUTOCORR_COMPACT must be 0 or 1"
+#endif
+#if YORADIO_OPUS_AUTOCORR_COMPACT && (!defined(YORADIO_OPUS_BOUNDED) || !defined(FIXED_POINT))
+#error "Compact autocorrelation requires the bounded fixed-point decoder"
+#endif
+
+#if YORADIO_OPUS_AUTOCORR_COMPACT
+static opus_val16 autocorr_window_sample(const opus_val16 *x,
+      const opus_val16 *window, int i, int n, int overlap)
+{
+   if (i < overlap) return MULT16_16_Q15(x[i], window[i]);
+   if (i >= n-overlap) return MULT16_16_Q15(x[i], window[n-i-1]);
+   return x[i];
+}
+
+/* Exact low-memory alternative for decoder lag4/24. The original xcorr plus
+ * tail sums the same products; fixed-point additions wrap modulo 2^32. Keep
+ * window rounding BEFORE scaling, and the original final normalization.
+ * A 32-entry ring replaces n int16 samples, at a potential CPU/stack cost. */
+static int autocorr_compact(const opus_val16 *x, opus_val32 *ac,
+      const opus_val16 *window, int overlap, int lag, int n)
+{
+   opus_val16 history[32];
+   opus_val32 ac0 = 1+(n<<7);
+   int i, k, shift;
+   for (i=0;i<n;i++) {
+      opus_val16 value = autocorr_window_sample(x, window, i, n, overlap);
+      ac0 += SHR32(MULT16_16(value,value),9);
+   }
+   shift = (celt_ilog2(ac0)-30+10)/2;
+   if (shift < 0) shift = 0;
+   for (k=0;k<=lag;k++) ac[k] = 0;
+   for (i=0;i<n;i++) {
+      opus_val16 value = autocorr_window_sample(x, window, i, n, overlap);
+      int last = IMIN(i,lag);
+      if (shift > 0) value = PSHR32(value,shift);
+      history[i&31] = value;
+      for (k=0;k<=last;k++)
+         ac[k] = MAC16_16(ac[k], value, history[(i-k)&31]);
+   }
+   shift = 2*shift;
+   if (shift<=0) ac[0] += SHL32((opus_int32)1, -shift);
+   if (ac[0] < 268435456) {
+      int shift2 = 29 - EC_ILOG(ac[0]);
+      for (i=0;i<=lag;i++) ac[i] = SHL32(ac[i],shift2);
+      shift -= shift2;
+   } else if (ac[0] >= 536870912) {
+      int shift2=1;
+      if (ac[0] >= 1073741824) shift2++;
+      for (i=0;i<=lag;i++) ac[i] = SHR32(ac[i],shift2);
+      shift += shift2;
+   }
+   return shift;
+}
+#endif
+
 void _celt_lpc(
       opus_val16       *_lpc, /* out: [0...p-1] LPC coefficients      */
 const opus_val32 *ac,  /* in:  [0...p] autocorrelation values  */
@@ -291,6 +352,13 @@ int _celt_autocorr(
    const opus_val16 *xptr;
    VARDECL(opus_val16, xx);
    SAVE_STACK;
+#if YORADIO_OPUS_AUTOCORR_COMPACT
+   if (n>0 && lag>=0 && lag<=CELT_LPC_ORDER && lag<n && overlap>=0 && overlap<=n/2) {
+      int result = autocorr_compact(x, ac, window, overlap, lag, n);
+      RESTORE_STACK;
+      return result;
+   }
+#endif
    ALLOC(xx, n, opus_val16);
    celt_assert(n>0);
    celt_assert(overlap>=0);
