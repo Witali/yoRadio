@@ -114,14 +114,47 @@ MOV density encoding в соседних функциях. Инструкции,
 Исправлена приоритетность include только для копий CELT, тесты повторены: пики
 стали одинаковы. Это дефект harness, не результат ASM на микроконтроллере.
 
-## Следующий кандидат: обратная таблица
+## Обратная таблица: реализована, но замедляет декодирование
 
 `pulse_inverse.cjs` проверяет все 23 строки и b=−256..16383 (382720 комбинаций)
 против **настоящей функции bits2pulses из rate.h**, а не только JS-модели.
 Точное совпадение, включая повторы и tie-breaking. Предполагаемые runtime
 таблицы: 5980 B packed lookup + 392 B offset map = 6372 B flash. Reference arrays
-в host harness нужны только тесту. ASM-интеграция, custom-mode fallback и замер
-скорости ещё впереди; выигрыша по скорости этому прототипу не приписываем.
+в host harness нужны только тесту.
+
+`bands-pulse-lookup-asm` реализован отдельным overlay: inline lookup без helper,
+без новых stack slots, с сохранением исходного поиска для неизвестных указателей
+на cache/custom modes и бюджетов вне 0..256. Реальные инструкции snippet
+проверены интерпретатором по значениям/live registers (не по тактам).
+5911 сочетаний штатной строки и бюджета используют быстрый путь; полный PCM,
+PLC/reset/OOM и scratch совпадают. Финальная регрессия: 25/25 Node-тестов PASS.
+
+Свежая независимая серия: 10 контролей + 10 lookup, все попытки завершены,
+PCM hashes/samples/packets совпадают, ошибок наблюдения нет. Всего в семействе
+bands теперь **70 физических запусков**, а не 50.
+
+| Поток, кбит/с | Свежий контроль CPU, % | Lookup CPU, % | Рост времени |
+|---|---:|---:|---:|
+| Mono 12 | 22,772 | 23,090 | +1,40% |
+| Mono 24 | 54,689 | 55,078 | +0,71% |
+| Stereo 64 | 65,561 | 70,350 | +7,30% |
+| Stereo 128 | 80,749 | 87,892 | +8,85% |
+| Stereo 192 | 92,896 | 104,139 | +12,10% |
+
+**Не принят**: на 192 кбит/с средний CPU-бюджет уже превышает realtime.
+Сохранён только воспроизводимый эксперимент; default C не менялся.
+Лучший кандидат остаётся intensity, 89,397%; цель 70% не достигнута.
+
+Image 909504 B против 902992 B (+6512 B); flash text 637142 против 637006 B,
+rodata 247600 против 241224 B. Статические RAM-секции прежние, стек 5120 B
+с минимумом остатка 1660 B. Минимум DRAM: контроль 8168 B, lookup 8176 B;
+это различие наблюдений, не выигрыш памяти. После cleanup медиана обоих —
+26476 B. Максимальный wall-вызов lookup на 192 кбит/с — 25,264 мс.
+
+Причина замедления не локализована. Дополнительные проверки, таблицы, их доступ
+и изменившееся размещение кода остаются кандидатами. Нельзя утверждать,
+что все 12,10% вызваны именно cache misses. Предварительная оценка скорости:
+[ограничения и план проверки](ESP8266_OPUS_ASM_PERFORMANCE_SCREENING.md).
 
 ## Flash и кэш: подтверждённая конфигурация и гипотеза
 
@@ -173,6 +206,10 @@ Function/stage profiler отключён. Серии A/B/A/C/D последов�
 - `firmware/development/esp8266-opus-bands-combined-v1` — отрицательный результат
   комбинации, 10 запусков, app, manifest, sdkconfig, comparison и layout audit.
 - `firmware/development/esp8266-opus-bands-pulse-inverse/prototype.json` — проверка таблицы.
+- `firmware/development/esp8266-opus-bands-control-v1/pulse-lookup-20260913/`
+  — ещё 10 свежих контролей.
+- `firmware/development/esp8266-opus-bands-pulse-lookup-v1/` — app, sdkconfig,
+  manifest, comparison, 10 запусков, OTA отчёты и отрицательный результат.
 
 Сборка через `tools/esp8266_audio_profile/build_i2s_pdm_production.ps1`:
 `-Diagnostic -EnableOpus -OpusBackend bands-intensity-asm` (или `bands-blocks-asm`),
@@ -190,3 +227,6 @@ Host: `node tools/esp8266_opus_asm/check_bands.cjs intensity` / `blocks`.
 `esp8266-opus-live512-idle3s-20260913`, I2S PDM на GPIO3, состояние stopped.
 Доказательство восстановления сохранено вместе с контрольной серией:
 `restore-after-combined.json`, HTTP подтвердил слот 0x110000 и stopped.
+После lookup обычная прошивка также восстановлена через OTA, теперь в слоте
+0x10000; HTTP status подтвердил Wi-Fi, отсутствие ошибки и stopped.
+Отчёт `esp8266-opus-bands-pulse-lookup-v1/restore.json`, `pass: true`.

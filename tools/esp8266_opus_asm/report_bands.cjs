@@ -18,7 +18,7 @@ function archive(source,dest){
  return reports;
 }
 function report(kind){
- assert.ok(['intensity','blocks','combined'].includes(kind));
+ assert.ok(['intensity','blocks','combined','pulse-lookup'].includes(kind));
  const av='esp8266-opus-functions-control-v2',bv='esp8266-opus-bands-'+kind+'-v1';
  const art=path.join(root,'firmware/development',bv),control=path.join(root,'firmware/development/esp8266-opus-bands-control-v1');
  const aa=path.join(root,'firmware/development',av),ma=read(path.join(aa,'manifest.json')),mb=read(path.join(art,'manifest.json'));
@@ -27,21 +27,23 @@ function report(kind){
   assert.equal(m.opus_benchmark,true);assert.equal(m.opus_benchmark_output,false);assert.equal(m.opus_function_profile,false);assert.equal(m.opus_profile_stage,0);
  }
  assert.equal(ma.opus_backend,'gcc-asm');assert.equal(mb.opus_backend,'bands-'+kind+'-asm');
- const identity=['opus_backend','opus_asm_optimization_sha256','opus_bands_blocks_manifest_sha256','opus_bands_combined_manifest_sha256','built_utc','source_revision','app_sha256','bytes'];
+ const identity=['opus_backend','opus_asm_optimization_sha256','opus_bands_blocks_manifest_sha256','opus_bands_combined_manifest_sha256','opus_bands_pulse_lookup_manifest_sha256','built_utc','source_revision','app_sha256','bytes'];
  for(const k of new Set([...Object.keys(ma),...Object.keys(mb)]))if(!identity.includes(k))assert.deepEqual(mb[k]??null,ma[k]??null,'Build profile differs: '+k);
  const recipe=path.join(component,'asm/lx106/bands-'+kind+'.json'),rm=read(recipe);
- const selected=kind==='intensity'?mb.opus_asm_optimization_sha256:mb['opus_bands_'+kind+'_manifest_sha256'];
+ const selected=kind==='intensity'?mb.opus_asm_optimization_sha256:mb['opus_bands_'+kind.replaceAll('-','_')+'_manifest_sha256'];
  assert.equal(selected.toLowerCase(),hash(fs.readFileSync(recipe)));
  fs.mkdirSync(control,{recursive:true});
  for(const file of ['app.bin','manifest.json']){
   const dest=path.join(control,file);if(fs.existsSync(dest))assert.equal(hash(fs.readFileSync(dest)),hash(fs.readFileSync(path.join(aa,file))));
   else fs.copyFileSync(path.join(aa,file),dest);
  }
- const a=archive(path.join(root,'.build/opus-bands-control-20260913'),path.join(control,'initial'));
+ const a=kind==='pulse-lookup'
+  ?archive(path.join(root,'.build/opus-pulse-lookup-control-20260913'),path.join(control,'pulse-lookup-20260913'))
+  :archive(path.join(root,'.build/opus-bands-control-20260913'),path.join(control,'initial'));
  const b=archive(path.join(root,'.build/opus-bands-'+kind+'-20260913'),path.join(art,'runs'));
  const result=compare(a.map(v=>v.report),b.map(v=>v.report));
  const repeated=path.join(root,'.build/opus-bands-control-repeat-20260913');
- if(fs.existsSync(path.join(repeated,'run10.json'))&&read(path.join(repeated,'run10.json')).final?.state===3){
+ if(kind!=='pulse-lookup'&&fs.existsSync(path.join(repeated,'run10.json'))&&read(path.join(repeated,'run10.json')).final?.state===3){
   const a2=archive(repeated,path.join(control,'repeated'));result.repeated_control=compare(a2.map(v=>v.report),b.map(v=>v.report));
   result.repeated_control_inputs=a2.map(({report,...r})=>r);
  }
@@ -55,7 +57,8 @@ function report(kind){
  result.inputs={reference:a.map(({report,...r})=>r),candidate:b.map(({report,...r})=>r)};
  const host=path.join(root,'.build/opus-bands-'+kind+'/correctness.json');result.host=read(host);assert.equal(result.host.passed,true);assert.equal(result.host.recipe_sha256_lf,rm.recipe_sha256_lf);
  result.selection={initial:selectHighBitrate(result.cases),repeated_control:result.repeated_control?selectHighBitrate(result.repeated_control.cases):null};
- result.selection.accepted_for_experimental_asm=result.selection.initial.accepted_for_experimental_asm&&!!result.selection.repeated_control?.accepted_for_experimental_asm;
+ result.selection.accepted_for_experimental_asm=result.selection.initial.accepted_for_experimental_asm&&
+  (kind==='pulse-lookup'||!!result.selection.repeated_control?.accepted_for_experimental_asm);
  const fixtures=read(path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures/manifest.json'));
  for(const run of [...a,...b])for(const [i,v] of run.report.final.results.entries()){
   assert.equal(v.pcm_hash,fixtures.fixtures[i].expected_hash);assert.equal(v.samples,fixtures.fixtures[i].samples*run.report.final.rounds);
