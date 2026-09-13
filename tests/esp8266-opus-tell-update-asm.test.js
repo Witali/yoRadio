@@ -2,6 +2,14 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {component,root}=require('../tools/esp8266_opus_asm/export.cjs');
 const tell=require('../tools/esp8266_opus_asm/tell_inline.cjs'),update=require('../tools/esp8266_opus_asm/update_fast.cjs');
 const combo=require('../tools/esp8266_opus_asm/tell_update.cjs'),{verify}=require('../tools/esp8266_opus_asm/verify.cjs');
+test('absolute report distinguishes relative slowdown from CPU percentage points',()=>{
+ const {absolute}=require('../tools/esp8266_opus_asm/report_tell_update.cjs');
+ const c={name:'mono12',reference:{task_budget_percent:{median:20}},candidate:{task_budget_percent:{median:20.4}},median_task_reduction_percent:-2};
+ const [v]=absolute([c]);
+ assert.ok(Math.abs(v.cpu_percentage_points-0.4)<1e-10);
+ assert.ok(Math.abs(v.delta_us_per_20ms_audio-80)<1e-9);
+ assert.equal(v.relative_reduction_percent,-2);
+});
 test('tell/update composition changes only six exact sites and retains one shared table',()=>{
  const base=path.join(component,'asm/lx106'),source=combo.source;
  const original=fs.readFileSync(path.join(base,'gcc',source+'.s'),'utf8');
