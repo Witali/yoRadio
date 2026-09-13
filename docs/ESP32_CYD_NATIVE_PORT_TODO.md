@@ -1,5 +1,9 @@
 # TODO: перенос возможностей ESP32-C3 OLED native в ESP32 CYD native
 
+Аудит Git и план переноса улучшений ESP8266 от 2026-09-13:
+[приоритеты CYD](ESP32_CYD_ESP8266_IMPROVEMENTS_PLAN.md).
+Он уточняет текущее состояние по исходникам и дополняет этот TODO.
+
 Цель: привести ESP32 CYD native к возможностям ESP32-C3 OLED native и
 оригинальной Arduino-прошивки YoRadio, сохранив аппаратные преимущества CYD:
 двухъядерный ESP32, TFT, touch, SD и варианты PDM/DAC.
