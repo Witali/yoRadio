@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {root,component,execute,hostPath}=require('../tools/esp8266_opus_profile/build_host.cjs');
-const {names,analyzeFunctions}=require('../tools/esp8266_opus_profile/function_profile_result.cjs');
+const {names,analyzeFunctions,summarizeFunctions}=require('../tools/esp8266_opus_profile/function_profile_result.cjs');
 function sample(){
  const rows=names.map((_,id)=>({id,calls:0,cpu_us:0,self_cpu_us:0,max_cpu_us:0,wall_us:0,self_wall_us:0,max_wall_us:0}));
  Object.assign(rows[0],{calls:2,cpu_us:100,self_cpu_us:70,max_cpu_us:60,wall_us:150,self_wall_us:100,max_wall_us:80});
@@ -26,10 +26,24 @@ test('nested CPU and wall scopes, preemption, wrap, overflow and OOM remain cohe
   hostPath(path.join(component,'opus_function_profile.c')),'-o',hostPath(binary)]);
  execute(hostPath(binary),[]);
 });
+test('series pools exact totals and retains maxima rather than averaging percentages',()=>{
+ const reports=Array.from({length:10},()=>({final:sample()}));
+ const last=reports[9].final;
+ last.functions[0].cpu_us+=100;last.functions[0].self_cpu_us+=100;
+ last.functions[0].max_cpu_us=160;last.functions[0].wall_us+=100;
+ last.functions[0].self_wall_us+=100;last.functions[0].max_wall_us=180;
+ last.results[0].task_us+=100;last.results[0].wall_us+=100;
+ const r=summarizeFunctions(reports);
+ assert.equal(r.frames,20);assert.equal(r.rows[2].self_cpu_percent,200/1100*100);
+ assert.equal(r.rows[0].max_cpu_us,160);assert.equal(r.rows[0].mean_cpu_us,55);
+ assert.throws(()=>summarizeFunctions(reports.slice(0,9)));
+ reports[0].error='timeout';assert.throws(()=>summarizeFunctions(reports));
+});
 test('profiling remains diagnostic-only and outside upstream ASM sources',()=>{
  const cm=fs.readFileSync(path.join(component,'CMakeLists.txt'),'utf8');
  assert.match(cm,/option\(YORADIO_OPUS_FUNCTION_PROFILE[^\n]+OFF\)/);
  assert.match(cm,/Function profile requires fixed160 diagnostic raw-only/);
+ assert.match(cm,/if\(YORADIO_OPUS_FUNCTION_PROFILE_COARSE\)[\s\S]*set\(OPUS_PROFILE_SYMBOLS yoradio_opus_decode_bounded quant_all_bands\s+clt_mdct_backward_c opus_fft_impl\)/);
  const adapter=fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/cmake/opus_task_clock.c.in'),'utf8');
  assert.match(adapter,/pxCurrentTCB->ulRunTimeCounter \+ \(now - ulTaskSwitchedInTime\)/);
  assert.match(adapter,/taskENTER_CRITICAL/);assert.match(adapter,/taskEXIT_CRITICAL/);

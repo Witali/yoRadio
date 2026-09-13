@@ -28,4 +28,25 @@ function analyzeFunctions(s){
    inclusive_cpu_percent:100*r.cpu_us/root.cpu_us,self_cpu_percent:100*r.self_cpu_us/root.cpu_us,
    inclusive_wall_percent:100*r.wall_us/root.wall_us,self_wall_percent:100*r.self_wall_us/root.wall_us}))};
 }
-module.exports={names,analyzeFunctions};
+function summarizeFunctions(reports){
+ assert.ok(reports.length>=10,'At least ten complete function profiles required');
+ const profiles=reports.map(r=>{assert.ok(!r.error,r.error);return analyzeFunctions(r.final);});
+ const first=profiles[0], seconds=profiles.reduce((n,p)=>n+p.audio_seconds,0);
+ for(const p of profiles)assert.equal(p.case_id,first.case_id);
+ const rows=names.map((name,id)=>{
+  const values=profiles.map(p=>p.rows[id]);
+  for(const v of values)assert.equal(v.calls,values[0].calls,'Call path changed: '+name);
+  const row={id,name};
+  for(const key of ['calls','cpu_us','self_cpu_us','wall_us','self_wall_us'])
+   row[key]=values.reduce((n,v)=>n+v[key],0);
+  for(const key of ['max_cpu_us','max_wall_us'])row[key]=Math.max(...values.map(v=>v[key]));
+  return row;
+ });
+ const root=rows[0];
+ return {runs:reports.length,case_id:first.case_id,audio_seconds:seconds,frames:root.calls,
+  scope:first.scope,rows:rows.map(r=>({...r,calls_per_frame:r.calls/root.calls,
+   calls_per_audio_second:r.calls/seconds,mean_cpu_us:r.calls?r.cpu_us/r.calls:0,
+   inclusive_cpu_percent:100*r.cpu_us/root.cpu_us,self_cpu_percent:100*r.self_cpu_us/root.cpu_us,
+   inclusive_wall_percent:100*r.wall_us/root.wall_us,self_wall_percent:100*r.self_wall_us/root.wall_us}))};
+}
+module.exports={names,analyzeFunctions,summarizeFunctions};

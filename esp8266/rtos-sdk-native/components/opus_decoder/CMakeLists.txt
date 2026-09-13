@@ -8,6 +8,10 @@ if(NOT CONFIG_YORADIO_OGG_OPUS AND NOT YORADIO_OPUS_BACKEND STREQUAL "c")
 endif()
 if(CONFIG_YORADIO_OGG_OPUS)
   option(YORADIO_OPUS_FUNCTION_PROFILE "Diagnostic external function CPU/wall/call profiler" OFF)
+  option(YORADIO_OPUS_FUNCTION_PROFILE_COARSE "Measure only root, bands, MDCT and FFT" OFF)
+  if(YORADIO_OPUS_FUNCTION_PROFILE_COARSE AND NOT YORADIO_OPUS_FUNCTION_PROFILE)
+    message(FATAL_ERROR "Coarse function profile requires function profiling")
+  endif()
   if(YORADIO_OPUS_FUNCTION_PROFILE AND
      (NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT YORADIO_ESP8266_OPUS_BENCHMARK OR
       YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT OR YORADIO_OPUS_PROFILE_STAGE OR
@@ -63,9 +67,15 @@ if(CONFIG_YORADIO_OGG_OPUS)
   if(YORADIO_OPUS_FUNCTION_PROFILE)
     target_sources(${COMPONENT_LIB} PRIVATE opus_function_profile.c opus_function_wrappers.c)
     target_compile_definitions(${COMPONENT_LIB} PUBLIC YORADIO_OPUS_FUNCTION_PROFILE=1)
-    foreach(fn yoradio_opus_decode_bounded celt_decode_with_ec quant_all_bands alg_unquant
+    set(OPUS_PROFILE_SYMBOLS yoradio_opus_decode_bounded celt_decode_with_ec quant_all_bands alg_unquant
         decode_pulses renormalise_vector clt_mdct_backward_c opus_fft_impl ec_decode
         ec_dec_update ec_dec_uint ec_dec_icdf ec_dec_bits ec_dec_bit_logp)
+    if(YORADIO_OPUS_FUNCTION_PROFILE_COARSE)
+      # Do not wrap frequent leaves at all: even a disabled wrapper adds cost.
+      set(OPUS_PROFILE_SYMBOLS yoradio_opus_decode_bounded quant_all_bands
+          clt_mdct_backward_c opus_fft_impl)
+    endif()
+    foreach(fn IN LISTS OPUS_PROFILE_SYMBOLS)
       target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${fn}")
     endforeach()
   endif()

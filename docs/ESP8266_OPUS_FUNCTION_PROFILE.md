@@ -39,6 +39,13 @@ live partial rows are hidden.32 empty clock pairs characterize minimum/maximum
 clock cost, not full wrapper/cache overhead; no speculative cost is subtracted.
 A matching uninstrumented control and repeated board trials are required.
 
+`-OpusFunctionProfile -OpusFunctionProfileCoarse` intercepts only root,
+quant_all_bands, clt_mdct_backward_c and opus_fft_impl. All other symbols
+are linked directly, without even a disabled wrapper. This gives a second,
+less intrusive estimate of the major-stage shares; its overhead must still
+be measured against an uninstrumented control. Detailed and coarse self
+shares are different decompositions and must never be mixed in one total.
+
 Tests cover nesting, preemption, timestamps wrapping, totals overflowing,
 OOM unwinding, disabled instrumentation, ABI and full exact PCM for five
 fixtures plus mixed-mode PLC/reset. Host timing is synthetic, not LX106 speed.
