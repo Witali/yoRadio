@@ -1,7 +1,7 @@
 // Placement-only experiment: pinned bands ASM assembled with text literals.
 // No instruction timing model: validate final ELF, then retain all board runs.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const {root,hash,run}=require('./export.cjs');
+const {root,component,hash,sourceHash,run}=require('./export.cjs');
 const {inspect}=require('./report_layout.cjs');
 const {archive}=require('./report_bands.cjs');
 const {compare}=require('../esp8266_opus_profile/compare_raw.cjs');
@@ -40,7 +40,8 @@ function preflight(){
  for(const [s,bytes] of Object.entries(a.sections).filter(([s])=>!s.startsWith('.flash.')))assert.equal(b.sections[s],bytes,'Static RAM changed: '+s);
  for(const name of names){assert.deepEqual(b.functions[name].graph,a.functions[name].graph,'Linked graph changed: '+name);for(const f of [a.functions[name],b.functions[name]])f.literal_sites=literalSites(f);}
  const changed=names.filter(n=>JSON.stringify(a.functions[n].literal_sites)!==JSON.stringify(b.functions[n].literal_sites));assert.ok(changed.length,'No actual placement change');
- const r={schema:1,manifests,command,reference:a,candidate:b,changed_literal_functions:changed,linked_graphs_exact:true,static_ram_delta:0};
+ const otherSizeChanges=[...new Set([...Object.keys(a.function_sizes),...Object.keys(b.function_sizes)])].filter(k=>JSON.stringify(a.function_sizes[k])!==JSON.stringify(b.function_sizes[k])).map(name=>({name,before:a.function_sizes[name],after:b.function_sizes[name]}));
+ const r={schema:1,manifests,command,reference:a,candidate:b,changed_literal_functions:changed,other_linked_function_size_changes:otherSizeChanges,linked_graphs_exact:true,static_ram_delta:0};
  fs.writeFileSync(path.join(dest,'preflight.json'),JSON.stringify(r,null,2)+'\n');
  console.log(JSON.stringify({functions:names.length,changed_literal_functions:changed,static_ram_delta:0,sections:{A:a.sections,B:b.sections},bytes:manifests.map(m=>m.bytes)}));return r;
 }
@@ -50,6 +51,9 @@ function report(){
  for(const r of [...a,...b,...a2]){assert.equal(r.report.interval_ms,15000);assert.equal(r.report.final.profile_stage??0,0);assert.ok(!r.report.final.functions);for(const [i,v] of r.report.final.results.entries()){assert.equal(v.pcm_hash,fixtures.fixtures[i].expected_hash);assert.equal(v.samples,fixtures.fixtures[i].samples*r.report.final.rounds);assert.equal(v.packets,fixtures.fixtures[i].packet_count*r.report.final.rounds);}}
  const initial=compare(a.map(x=>x.report),b.map(x=>x.report)),repeated=compare(a2.map(x=>x.report),b.map(x=>x.report));
  const host=read(path.join(root,'.build/opus-bands-tell-inline/correctness.json'));assert.equal(host.passed,true);
+ assert.equal(host.recipe_sha256_lf,read(path.join(component,'asm/lx106/bands-tell-inline.json')).recipe_sha256_lf);
+ const fixtureHash=sourceHash(path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures/manifest.json'));
+ for(const m of build.manifests)assert.equal(m.opus_benchmark_manifest_sha256.toLowerCase(),fixtureHash);
  const compact=rows=>rows.map(({report,...r})=>r);
  const result={schema:1,build,initial,repeated,host,selection:{initial:selectHighBitrate(initial.cases),repeated:selectHighBitrate(repeated.cases)},inputs:{before:compact(a),candidate:compact(b),after:compact(a2)},scope:'30 physical A/B/A attempts; raw RAM packets, no output/profiler, no discarded runs. Not live qualification.'};
  for(const f of ['host-parent.log','regression.log','ota-before.json','ota-before.log','ota-candidate.json','ota-candidate.log','ota-after.json','ota-after.log']){const bytes=fs.readFileSync(path.join(experiment,f)),to=path.join(dest,f);if(fs.existsSync(to))assert.equal(hash(fs.readFileSync(to)),hash(bytes));else fs.writeFileSync(to,bytes);}
