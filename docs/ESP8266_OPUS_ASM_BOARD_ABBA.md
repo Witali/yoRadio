@@ -80,6 +80,49 @@ on quant_all_bands, quant_partition, alg_unquant, transforms and SILK decode
 using actual stage profiles. [Inventory](../firmware/development/esp8266-opus-hoisted-asm-library/algorithm-inventory.json).
 
 - [x] Exact snippet semantics and target build/section inspection.
-- [ ] Full physical PCM/hash test and matched10+10 CPU measurements.
+- [x] Full physical PCM/hash test and matched10+10 CPU measurements (negative result below).
 - [ ] Further loop-invariant experiments where profiles show material cost.
 - [ ]192kbps <=70% decoder CPU, RAM safety and continuous real-radio output.
+
+### Physical result: invariant SAR is not a speed improvement
+
+Five matched ABBA cycles, 10 runs per variant, source ab2b244, with no
+discarded attempts. All five fixture PCM hashes and counts match exactly.
+
+| Fixture | GCC ASM CPU median | Hoisted SAR CPU median |
+|---|---:|---:|
+| mono12 |22.774%|22.813%|
+| mono24 |54.818%|54.662%|
+| stereo64 -> mono |65.838%|65.779%|
+| stereo128 -> mono |80.957%|81.602%|
+| stereo192 -> mono |93.449%|94.833%|
+
+At192 the change is **1.481% slower**, not faster. Keep it diagnostic-only;
+do not change the default backend. Moving fewer source instructions is not
+proof of a faster linked program. Both apps are902992B and have identical
+static RAM sections; no RAM saving was achieved. The lowest sampled free
+DRAM was868B (control) /688B (candidate). These samples are below the live
+4096B reserve and do not qualify safe live playback. Post-cleanup minimum
+DRAM17220/17216B; no observation errors. Do not discard low-memory trials.
+
+[All20 raw trials, OTA reports and matched comparison](../firmware/development/esp8266-opus-hoisted-asm-library/board-abba-20260913/raw/comparison.json).
+
+## CELT/PVQ stage8 profile
+
+Ten additional raw runs of the C stage8 diagnostic build all match the PCM
+reference. At192kbps, `quant_all_bands` and its callees account for a median
+**61.884% of decode wall time** (range61.419..62.526%). This is inclusive
+wall time with preemption, not exclusive function CPU. The separate
+instrumented build measured90.072% median decoder CPU; it is not a matched
+speed comparison with the ASM builds above. The stage8 median share is
+48.525% at64kbps and56.519% at128kbps.
+
+Minimum sampled DRAM2632B, and several mono12 task/wall timing-window
+inconsistencies are retained in the report. Neither a clean hash nor the
+diagnostic runner's `passed` flag certifies CPU deadlines or RAM safety.
+The next isolated experiment tests placement of two small PVQ functions in
+unused IRAM, without changing arithmetic, DRAM buffers or the16KiB arena.
+Poll benchmark status less frequently in both arms to reduce observer load;
+do not compare those measurements as a matched test against this series.
+
+[Stage8 summary and all10 retained trials](../firmware/development/esp8266-opus-stage8-192-20260913/board-20260913/summary.json).
