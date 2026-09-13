@@ -12,3 +12,14 @@ it is not an asserted fix for decode/output underruns. Full parameters and
 image SHA256 are in manifest.json. Build does not change board defaults.
 No physical qualification at build time; later evidence must be recorded
 separately. No Wi-Fi, playlist, SPIFFS or partition changes are included.
+
+## Restoration after ASM experiments, 2026-09-13
+
+Application-only OTA succeeded: slot0x110000 ->0x10000, HTTP200/OK,
+885552B,19.18s upload, then the expected running slot was observed.
+See `restore-after-asm-tests.json` for exact hash and complete OTA evidence.
+HTTP status confirms Wi-Fi connected, RSSI-55dBm, no error, stopped, and
+the previous selected station unchanged. Free heap27628B, lifetime minimum
+24748B, web stack free2288B in a follow-up status sample. These are idle
+figures, not decode/RAM or live audio qualification. No new Opus radio
+continuity claim is made. The raw benchmark is no longer the active image.
