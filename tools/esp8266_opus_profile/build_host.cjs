@@ -40,7 +40,7 @@ function dependencies(depfile) {
 }
 
 async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false, asmEntropyModel = false, asmBandsModel = '' } = {}) {
-  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
+  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline','fused'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
   if (asmEntropyModel && !bounded) throw Error('asmEntropyModel requires bounded decoder.');
   if (silkPlcIram && !bounded) throw Error('silkPlcIram requires bounded decoder.');
   if (autocorrCompact && !bounded) throw Error('autocorrCompact requires bounded decoder.');
@@ -65,6 +65,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   if (bounded) sources.push(path.join(component, 'opus_memory.c'));
   const modelSources = [];
   if (asmBandsModel==='tell-inline') for(const model of require('../esp8266_opus_asm/tell_inline.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
+  if (asmBandsModel==='fused') for(const model of require('../esp8266_opus_asm/fused.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='intensity') sources[sources.indexOf(path.join(sourceRoot, 'celt/bands.c'))] = require('../esp8266_opus_asm/bands.cjs').cModel(asmBandsModel);
   if (asmBandsModel==='blocks') for(const model of require('../esp8266_opus_asm/blocks.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='combined') for(const model of require('../esp8266_opus_asm/combined.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;

@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "candidate": "bands-fused-v1",
+  "base_manifest_sha256": "c98bc13abf082c51acf4a582f467ba94f256d2e45ae1e5ff6bf0e6ccdf8844dc",
+  "recipe_sha256_lf": "d06b6c4745f9f55b69066513cfe963327a695df7e5d8e16c0c438296b86e2f1f",
+  "dependencies": {
+    "fused_normalize.inc.s": "74b17b78d755302e92e838c27e3d99e20795ff2e79adee69f904577a071eeff5",
+    "../../tests/native/esp8266_opus_fused_normalize_test.c": "61aa084c3724fafa504df6c689a5d32cdbb2106e286957b7b3661b01958c5f88"
+  },
+  "files": [
+    {
+      "source": "upstream/celt/vq.c",
+      "overlay": "bands-fused/upstream/celt/vq.c.s",
+      "overlay_sha256_lf": "9f0063fafda9c3dc32e89f0700114009e4e1c71d6eb608ffc5dd95bd7b7bc84d",
+      "sections_before": {
+        ".literal.exp_rotation": 40,
+        ".literal.op_pvq_search_c": 32,
+        ".literal.alg_quant": 120,
+        ".literal.alg_unquant": 60,
+        ".literal.renormalise_vector": 12,
+        ".literal.stereo_itheta": 52,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.exp_rotation1": 174,
+        ".text.exp_rotation": 683,
+        ".text.op_pvq_search_c": 635,
+        ".text.alg_quant": 1848,
+        ".text.alg_unquant": 806,
+        ".text.renormalise_vector": 181,
+        ".text.stereo_itheta": 477,
+        ".rodata.SPREAD_FACTOR$3797": 12,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 48,
+        ".xt.prop": 2160
+      },
+      "sections_after": {
+        ".literal.exp_rotation": 40,
+        ".literal.op_pvq_search_c": 32,
+        ".literal.alg_quant": 120,
+        ".literal.alg_unquant": 60,
+        ".literal.renormalise_vector": 12,
+        ".literal.stereo_itheta": 52,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.exp_rotation1": 174,
+        ".text.exp_rotation": 683,
+        ".text.op_pvq_search_c": 635,
+        ".text.alg_quant": 1848,
+        ".text.alg_unquant": 916,
+        ".text.renormalise_vector": 181,
+        ".text.stereo_itheta": 477,
+        ".rodata.SPREAD_FACTOR$3797": 12,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 48,
+        ".xt.prop": 2220
+      }
+    }
+  ],
+  "additional_heap_bytes": 0,
+  "additional_static_ram_bytes": 0,
+  "stack_change_bytes": 0,
+  "stack_frame_bytes": 112,
+  "mask_slot": 72,
+  "physical_speed_measured": false
+}
