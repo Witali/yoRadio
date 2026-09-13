@@ -5,6 +5,9 @@
 #include "codec_arena_native.h"
 #include "opus.h"
 #include "opus_memory.h"
+#if YORADIO_OPUS_FUNCTION_PROFILE
+#include "opus_function_profile.h"
+#endif
 #if YORADIO_OPUS_PROFILE_STAGE
 #include "opus_stage_profile.h"
 #endif
@@ -162,6 +165,9 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
             /* Reset scratch high-water for this case, outside active decode. */
             yoradio_opus_memory_bind(scratch, CONFIG_YORADIO_OPUS_SCRATCH_BYTES, words, 16384);
             opus_benchmark_case_t result = {};
+#if YORADIO_OPUS_FUNCTION_PROFILE
+            opus_function_profile_reset();
+#endif
             result.min_dram = dram_free();
             result.stack_free = UINT32_MAX;
 #if YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
@@ -207,7 +213,13 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
 #else
                     int64_t start = esp_timer_get_time();
 #endif
+#if YORADIO_OPUS_FUNCTION_PROFILE
+                    opus_function_profile_enable(round != 0);
+#endif
                     int decoded = yoradio_opus_decode_bounded(state, packet, entry.length, pcm, kPcmSamples);
+#if YORADIO_OPUS_FUNCTION_PROFILE
+                    opus_function_profile_enable(0);
+#endif
 #if YORADIO_OPUS_PROFILE_STAGE
                     uint32_t elapsed = opus_stage_profile_clock() - start;
                     const opus_stage_profile_t stage = opus_stage_profile_snapshot();

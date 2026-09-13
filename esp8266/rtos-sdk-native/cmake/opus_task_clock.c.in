@@ -1,0 +1,18 @@
+/* Build-local diagnostic adapter. The downloaded SDK is never modified.
+ * Include the original scheduler unchanged so no TCB offsets are guessed. */
+#include "@opus_profile_tasks@"
+#if !configGENERATE_RUN_TIME_STATS || !CONFIG_FREERTOS_RUN_TIME_STATS_USING_ESP_TIMER
+#error "Function profiling needs coherent SDK microsecond runtime statistics"
+#endif
+void yoradio_opus_function_clock(uint32_t *wall, uint32_t *cpu) {
+    taskENTER_CRITICAL();
+    uint32_t now;
+#ifdef portALT_GET_RUN_TIME_COUNTER_VALUE
+    portALT_GET_RUN_TIME_COUNTER_VALUE(now);
+#else
+    now = (uint32_t)portGET_RUN_TIME_COUNTER_VALUE();
+#endif
+    *wall = now;
+    *cpu = pxCurrentTCB->ulRunTimeCounter + (now - ulTaskSwitchedInTime);
+    taskEXIT_CRITICAL();
+}

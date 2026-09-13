@@ -32,6 +32,9 @@
 #endif
 #if YORADIO_ESP8266_OPUS_BENCHMARK
 #include "opus_benchmark.h"
+#if YORADIO_OPUS_FUNCTION_PROFILE
+#include "opus_function_profile.h"
+#endif
 #endif
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
 #include "codec_bridge.h"
@@ -1384,7 +1387,34 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
         else result = httpd_resp_send_chunk(request, row, n);
     }
 #else
+#if YORADIO_OPUS_FUNCTION_PROFILE
+    if (result == ESP_OK) {
+        /* Profile rows belong only to the final completed case. One serialized
+         * HTTP owner can start a new run; never expose a live 7-word row. */
+        const bool terminal = status.state == 3 || status.state == 4;
+        n = snprintf(row, sizeof(row),
+            "],\"function_case\":%u,\"function_error\":%u,\"function_clock_hz\":1000000,"
+            "\"function_clock_min_us\":%u,\"function_clock_max_us\":%u,\"functions\":[",
+            status.current_case, terminal ? opus_function_profile_error() : 0,
+            terminal ? opus_function_profile_clock_min() : 0,
+            terminal ? opus_function_profile_clock_max() : 0);
+        if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
+        else result = httpd_resp_send_chunk(request, row, n);
+        for (unsigned i = 0; terminal && i < OPUS_FUNCTION_COUNT && result == ESP_OK; ++i) {
+            opus_function_row_t f = opus_function_profile_row(i);
+            n = snprintf(row, sizeof(row),
+                "%s{\"id\":%u,\"calls\":%u,\"cpu_us\":%u,\"self_cpu_us\":%u,\"max_cpu_us\":%u,"
+                "\"wall_us\":%u,\"self_wall_us\":%u,\"max_wall_us\":%u}",
+                i ? "," : "", i, f.calls, f.cpu_us, f.self_cpu_us, f.max_cpu_us,
+                f.wall_us, f.self_wall_us, f.max_wall_us);
+            if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
+            else result = httpd_resp_send_chunk(request, row, n);
+        }
+        if (result == ESP_OK) result = httpd_resp_send_chunk(request, "]}", 2);
+    }
+#else
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, "]}", 2);
+#endif
 #endif
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
     return finish_short_response(request, result);

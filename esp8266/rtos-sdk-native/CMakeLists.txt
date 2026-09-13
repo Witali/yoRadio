@@ -19,6 +19,7 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yoradio_esp8266_helix_native)
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/sdk_rx_diag.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/opus_function_profile.cmake")
 
 # Instrument the configured SDK through its supported hook, not by modifying
 # the downloaded SDK. Nothing is injected into ordinary non-profiled builds.

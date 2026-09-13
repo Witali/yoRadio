@@ -7,6 +7,13 @@ if(NOT CONFIG_YORADIO_OGG_OPUS AND NOT YORADIO_OPUS_BACKEND STREQUAL "c")
   message(FATAL_ERROR "Opus ASM backend requires CONFIG_YORADIO_OGG_OPUS")
 endif()
 if(CONFIG_YORADIO_OGG_OPUS)
+  option(YORADIO_OPUS_FUNCTION_PROFILE "Diagnostic external function CPU/wall/call profiler" OFF)
+  if(YORADIO_OPUS_FUNCTION_PROFILE AND
+     (NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT YORADIO_ESP8266_OPUS_BENCHMARK OR
+      YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT OR YORADIO_OPUS_PROFILE_STAGE OR
+      NOT CONFIG_ESP8266_DEFAULT_CPU_FREQ_160))
+    message(FATAL_ERROR "Function profile requires fixed160 diagnostic raw-only Opus, no stage profile")
+  endif()
   # ldgen's object-symbol mappings understand foo.c.obj, but not foo.c.s.obj.
   # Replace the .s extension for generated units; instructions are unchanged.
   set(CMAKE_ASM_OUTPUT_EXTENSION_REPLACE 1)
@@ -53,6 +60,15 @@ if(CONFIG_YORADIO_OGG_OPUS)
       INCLUDE_DIRS . upstream/include
       PRIV_INCLUDE_DIRS upstream/celt upstream/silk upstream/silk/fixed upstream/src
       LDFRAGMENTS ${OPUS_LDFRAGMENTS})
+  if(YORADIO_OPUS_FUNCTION_PROFILE)
+    target_sources(${COMPONENT_LIB} PRIVATE opus_function_profile.c opus_function_wrappers.c)
+    target_compile_definitions(${COMPONENT_LIB} PUBLIC YORADIO_OPUS_FUNCTION_PROFILE=1)
+    foreach(fn yoradio_opus_decode_bounded celt_decode_with_ec quant_all_bands alg_unquant
+        decode_pulses renormalise_vector clt_mdct_backward_c opus_fft_impl ec_decode
+        ec_dec_update ec_dec_uint ec_dec_icdf ec_dec_bits ec_dec_bit_logp)
+      target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${fn}")
+    endforeach()
+  endif()
   target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_OPUS_BOUNDED=1)
   if(YORADIO_OPUS_LOW_RAM)
     # scratch-mark ABI is shared with any consumer of opus_memory.h.

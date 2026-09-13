@@ -6,6 +6,7 @@ const http = require('node:http');
 const { performance } = require('node:perf_hooks');
 const {analyzeOutput} = require('./output_benchmark_result.cjs');
 const {analyzeStage} = require('./stage_profile_result.cjs');
+const {analyzeFunctions} = require('./function_profile_result.cjs');
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i=args.indexOf(name); return i<0?fallback:args[i+1]; };
 const base = option('--base', 'http://192.168.100.6');
@@ -70,6 +71,7 @@ function request(uri, method='GET') {
           ...(s.profile_stage ? {stage:analyzeStage(s,item)} : {}),
           task_budget_minus_empty_estimate_percent:item.samples?
             Math.max(0,item.task_us-s.empty_task_us*item.packets)*4.8/item.samples:null}));
+        if(s.functions&&s.state===3)report.function_profile=analyzeFunctions(s);
         report.after=await request('/api/native/status'); save();
         console.log(JSON.stringify({final:report.final,comparison:report.comparison},null,2));
         if(s.state!==3)throw Error('Device benchmark error '+s.error);
