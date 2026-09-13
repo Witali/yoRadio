@@ -1,0 +1,25 @@
+{
+  "scope": "Pinned pair only. Same object instruction semantics and branch graph; linker retains an indirect close call in candidate. Not evidence of an HTTP correctness bug, cache-miss count or measured timing attribution.",
+  "object_instructions_equal": true,
+  "object_instruction_count": 1162,
+  "normalized_object_sha256": "159743ff804610b419e615a81479ab53813e6fc34025b47be9e0ec12f8f04e75",
+  "variants": [
+    {
+      "variant": "esp8266-opus-functions-control-v2",
+      "elf_sha256": "468eb9bc9c2ab73f0773987ae02279902c457e1db6638f69b74d8831b2b26be1",
+      "object_sha256": "e8f85ecd59781f7126cda2f9e50f001bc88997233f9a835c8f71d43e48a03c3f",
+      "snippet": "\r\nC:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\.build\\esp8266-opus-functions-control-v2\\yoradio_esp8266_helix_native.elf:     file format elf32-xtensa-le\r\n\r\n\r\nDisassembly of section .flash.text:\r\n\r\n40222300 <static_handler+0xadc>:\r\n40222300:\t0d2d      \tmov.n\ta2, a13\r\n40222302:\t7373c5        \tcall0\t40295a40 <close>\r\n40222305:\tff6dc6        \tj\t402220c0 <static_handler+0x89c>\r\n40222308:\t252122        \tl32i\ta2, a1, 148\r\n"
+    },
+    {
+      "variant": "esp8266-opus-bands-update-fast-v1",
+      "elf_sha256": "fed04d5c508895dfbb7c93a4360c01e5ef4d6aad739d8108914f1aabf396b1d9",
+      "object_sha256": "60ac5d76cf8ed4584be1c606a3b9684b2f5ef8220ecf6cca17cad8aa2dcb1533",
+      "snippet": "\r\nC:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\.build\\esp8266-opus-bands-update-fast-v1\\yoradio_esp8266_helix_native.elf:     file format elf32-xtensa-le\r\n\r\n\r\nDisassembly of section .flash.text:\r\n\r\n40222300 <static_handler+0xadc>:\r\n40222300:\t0d2d      \tmov.n\ta2, a13\r\n40222302:\tb86301        \tl32r\ta0, 40210490 <_stext+0x480>\r\n40222305:\t0000c0        \tcallx0\ta0\r\n40222308:\tff6d06        \tj\t402220c0 <static_handler+0x89c>\r\n"
+    }
+  ],
+  "candidate_literal": {
+    "address": "0x40210490",
+    "value": "0x40295ab4",
+    "target": "close"
+  }
+}

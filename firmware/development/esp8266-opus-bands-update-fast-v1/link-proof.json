@@ -1,0 +1,76 @@
+{
+  "scope": "Matched build profiles/static RAM, linked section and symbol inventory. Addresses are NOT held fixed; cache effects are not isolated.",
+  "profiles_match": true,
+  "changes": [
+    "opus_backend",
+    "built_utc",
+    "source_revision",
+    "app_sha256",
+    "bytes",
+    "opus_bands_update_fast_manifest_sha256"
+  ],
+  "variants": [
+    {
+      "variant": "esp8266-opus-functions-control-v2",
+      "elf_sha256": "468eb9bc9c2ab73f0773987ae02279902c457e1db6638f69b74d8831b2b26be1",
+      "sections": {
+        ".iram0.vectors": 128,
+        ".iram0.text": 22900,
+        ".iram0.bss": 4044,
+        ".dram0.data": 1652,
+        ".dram0.bss": 18752,
+        ".flash.text": 637006,
+        ".flash.rodata": 241224
+      },
+      "symbols": {
+        "ec_dec_update": {
+          "address": "0x402469d8",
+          "bytes": 171
+        },
+        "quant_all_bands": {
+          "address": "0x40250700",
+          "bytes": 9416
+        },
+        "quant_band": {
+          "address": "0x4024e374",
+          "bytes": 1761
+        },
+        "quant_partition": {
+          "address": "0x4024daf8",
+          "bytes": 2170
+        }
+      }
+    },
+    {
+      "variant": "esp8266-opus-bands-update-fast-v1",
+      "elf_sha256": "fed04d5c508895dfbb7c93a4360c01e5ef4d6aad739d8108914f1aabf396b1d9",
+      "sections": {
+        ".iram0.vectors": 128,
+        ".iram0.text": 22900,
+        ".iram0.bss": 4044,
+        ".dram0.data": 1652,
+        ".dram0.bss": 18752,
+        ".flash.text": 637122,
+        ".flash.rodata": 241228
+      },
+      "symbols": {
+        "ec_dec_update": {
+          "address": "0x402469dc",
+          "bytes": 171
+        },
+        "quant_all_bands": {
+          "address": "0x40250738",
+          "bytes": 9468
+        },
+        "quant_band": {
+          "address": "0x4024e3ac",
+          "bytes": 1761
+        },
+        "quant_partition": {
+          "address": "0x4024dafc",
+          "bytes": 2222
+        }
+      }
+    }
+  ]
+}
