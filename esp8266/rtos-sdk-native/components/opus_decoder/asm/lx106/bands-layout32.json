@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "candidate": "bands-layout32-v1",
+  "pad_bytes": 32,
+  "pad_before": "quant_partition",
+  "base_manifest_sha256": "c98bc13abf082c51acf4a582f467ba94f256d2e45ae1e5ff6bf0e6ccdf8844dc",
+  "recipe_sha256_lf": "fd989fdf06b8e1145bfa92693ee9b41776c7b03d8900b229716a73bde934c3f2",
+  "parent_sha256_lf": "794eda0bf7c1b1c87b51f87c38691b5b7ba8edb40efcc979cac93adcb3cd8171",
+  "files": [
+    {
+      "source": "upstream/celt/bands.c",
+      "overlay": "bands-layout32/upstream/celt/bands.c.s",
+      "overlay_sha256_lf": "2ec33147a8f04784bae895a24fada0a5a030a395f84924337d8f294b44aa5af4",
+      "sections_before": {
+        ".literal.deinterleave_hadamard": 24,
+        ".literal.intensity_stereo$isra$1": 12,
+        ".literal.quant_partition": 124,
+        ".literal.quant_band": 92,
+        ".literal.celt_lcg_rand": 8,
+        ".literal.bitexact_cos": 8,
+        ".literal.bitexact_log2tan": 8,
+        ".literal.compute_band_energies": 8,
+        ".literal.normalise_bands": 4,
+        ".literal.denormalise_bands": 48,
+        ".literal.anti_collapse": 56,
+        ".literal.spreading_decision": 12,
+        ".literal.haar1": 4,
+        ".literal.quant_all_bands": 448,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.deinterleave_hadamard": 237,
+        ".text.intensity_stereo$isra$1": 235,
+        ".text.quant_partition": 2402,
+        ".text.quant_band": 1777,
+        ".text.hysteresis_decision": 98,
+        ".text.celt_lcg_rand": 13,
+        ".text.bitexact_cos": 66,
+        ".text.bitexact_log2tan": 97,
+        ".text.compute_band_energies": 383,
+        ".text.normalise_bands": 321,
+        ".text.denormalise_bands": 465,
+        ".text.anti_collapse": 944,
+        ".text.spreading_decision": 556,
+        ".text.haar1": 103,
+        ".text.quant_all_bands": 9548,
+        ".rodata.bit_deinterleave_table$4337": 16,
+        ".rodata.bit_interleave_table$4327": 16,
+        ".rodata.exp2_table8$4166": 16,
+        ".rodata.ordery_table": 120,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 112,
+        ".xt.prop": 8916
+      },
+      "sections_after": {
+        ".literal.deinterleave_hadamard": 24,
+        ".literal.intensity_stereo$isra$1": 12,
+        ".literal.quant_partition": 124,
+        ".literal.quant_band": 92,
+        ".literal.celt_lcg_rand": 8,
+        ".literal.bitexact_cos": 8,
+        ".literal.bitexact_log2tan": 8,
+        ".literal.compute_band_energies": 8,
+        ".literal.normalise_bands": 4,
+        ".literal.denormalise_bands": 48,
+        ".literal.anti_collapse": 56,
+        ".literal.spreading_decision": 12,
+        ".literal.haar1": 4,
+        ".literal.quant_all_bands": 448,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.deinterleave_hadamard": 237,
+        ".text.intensity_stereo$isra$1": 235,
+        ".text.quant_partition": 2434,
+        ".text.quant_band": 1777,
+        ".text.hysteresis_decision": 98,
+        ".text.celt_lcg_rand": 13,
+        ".text.bitexact_cos": 66,
+        ".text.bitexact_log2tan": 97,
+        ".text.compute_band_energies": 383,
+        ".text.normalise_bands": 321,
+        ".text.denormalise_bands": 465,
+        ".text.anti_collapse": 944,
+        ".text.spreading_decision": 556,
+        ".text.haar1": 103,
+        ".text.quant_all_bands": 9548,
+        ".rodata.bit_deinterleave_table$4337": 16,
+        ".rodata.bit_interleave_table$4327": 16,
+        ".rodata.exp2_table8$4166": 16,
+        ".rodata.ordery_table": 120,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 112,
+        ".xt.prop": 8916
+      },
+      "entry_before": {
+        "address": 0,
+        "bytes": 2402
+      },
+      "entry_after": {
+        "address": 32,
+        "bytes": 2402
+      },
+      "relocated_literals": [
+        {
+          "section": ".literal.quant_band",
+          "offset": 80,
+          "delta": 32
+        },
+        {
+          "section": ".literal.quant_band",
+          "offset": 84,
+          "delta": 32
+        },
+        {
+          "section": ".literal.quant_band",
+          "offset": 88,
+          "delta": 32
+        },
+        {
+          "section": ".literal.quant_all_bands",
+          "offset": 372,
+          "delta": 32
+        },
+        {
+          "section": ".literal.quant_all_bands",
+          "offset": 376,
+          "delta": 32
+        },
+        {
+          "section": ".literal.quant_all_bands",
+          "offset": 380,
+          "delta": 32
+        },
+        {
+          "section": ".literal.quant_all_bands",
+          "offset": 384,
+          "delta": 32
+        }
+      ],
+      "object_instruction_graph_exact": true
+    },
+    {
+      "source": "upstream/celt/entcode.c",
+      "overlay": "bands-tell-inline/upstream/celt/entcode.c.s",
+      "overlay_sha256_lf": "5596f73af4f21afefed77288009aab8f346019d91249b35100166a166b13443a"
+    }
+  ],
+  "additional_static_ram_bytes": 0,
+  "stack_change_bytes": 0,
+  "physical_speed_measured": false
+}
