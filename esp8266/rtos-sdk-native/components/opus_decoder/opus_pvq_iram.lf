@@ -1,20 +1,8 @@
 # Diagnostic placement only: code/literals, not rodata, PCM or scratch.
-# Exact section selectors support both C and ASM archive object names. The
-# pinned SDK's symbol mapping parser only recognizes .o and .c.obj, not
-# generated .c.s.obj. IRAM precedes flash in its project linker template;
-# check_iram.cjs verifies the resulting ELF rather than trusting this order.
-[sections:yoradio_pvq_code]
-entries:
-    .literal.decode_pulses
-    .text.decode_pulses
-    .literal.alg_unquant
-    .text.alg_unquant
-
-[scheme:yoradio_pvq_iram]
-entries:
-    yoradio_pvq_code -> iram0_text
-
+# CMake replaces the generated .s extension, yielding SDK-compatible .c.obj.
+# No special selectors/SDK parser changes are needed for either backend.
 [mapping:yoradio_opus_pvq_iram]
 archive: libopus_decoder.a
 entries:
-    * (yoradio_pvq_iram)
+    cwrs:decode_pulses (noflash_text)
+    vq:alg_unquant (noflash_text)

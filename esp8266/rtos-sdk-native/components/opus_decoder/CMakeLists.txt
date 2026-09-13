@@ -7,6 +7,9 @@ if(NOT CONFIG_YORADIO_OGG_OPUS AND NOT YORADIO_OPUS_BACKEND STREQUAL "c")
   message(FATAL_ERROR "Opus ASM backend requires CONFIG_YORADIO_OGG_OPUS")
 endif()
 if(CONFIG_YORADIO_OGG_OPUS)
+  # ldgen's object-symbol mappings understand foo.c.obj, but not foo.c.s.obj.
+  # Replace the .s extension for generated units; instructions are unchanged.
+  set(CMAKE_ASM_OUTPUT_EXTENSION_REPLACE 1)
   option(YORADIO_OPUS_PVQ_IRAM "Diagnostic placement of decode_pulses/alg_unquant in IRAM" OFF)
   set(OPUS_LDFRAGMENTS "")
   if(YORADIO_OPUS_PVQ_IRAM)
