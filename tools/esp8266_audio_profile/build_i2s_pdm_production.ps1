@@ -13,7 +13,7 @@ param(
     [int]$LedUpdateHz = 10,
     [switch]$NoAudioLevelLed,
     [switch]$EnableOpus,
-    [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm', 'bands-blocks-asm', 'bands-combined-asm', 'bands-pulse-lookup-asm', 'bands-tell-inline-asm', 'bands-fused-asm', 'bands-tell-intensity-asm', 'bands-update-fast-asm', 'bands-tell-update-asm')]
+    [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm', 'bands-blocks-asm', 'bands-combined-asm', 'bands-pulse-lookup-asm', 'bands-tell-inline-asm', 'bands-fused-asm', 'bands-tell-intensity-asm', 'bands-update-fast-asm', 'bands-tell-update-asm', 'bands-tell-bits1-asm')]
     [string]$OpusBackend = 'c',
     [ValidateSet(1024, 1536, 2048, 3072, 4096)]
     [int]$OpusInputBytes = 1024,
@@ -284,6 +284,7 @@ try {
         opus_scratch_bytes=$(if ($taskOpusEnabled) { $OpusScratchBytes } else { 0 })
         opus_low_ram=[bool]$OpusLowRam
         opus_backend=$OpusBackend
+        opus_bands_tell_bits1_manifest_sha256=$(if ($OpusBackend -eq 'bands-tell-bits1-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-tell-bits1.json").Hash } else { $null })
         opus_bands_tell_update_manifest_sha256=$(if ($OpusBackend -eq 'bands-tell-update-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-tell-update.json").Hash } else { $null })
         opus_bands_tell_inline_manifest_sha256=$(if ($OpusBackend -eq 'bands-tell-inline-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-tell-inline.json").Hash } else { $null })
         opus_bands_fused_manifest_sha256=$(if ($OpusBackend -eq 'bands-fused-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-fused.json").Hash } else { $null })
