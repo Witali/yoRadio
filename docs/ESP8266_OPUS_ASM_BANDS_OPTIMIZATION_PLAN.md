@@ -787,3 +787,9 @@ Entropy, balance, remaining_bits, seed и folding зависят от преды
   Повторно упаковать штатным SDK elf2image v3; проверить XOR и appended SHA,
   а также побайтовую неизменность вне разрешённого блока/checksum/digest.
   Не менять в этом же опыте кэш, частоту flash, арену или алгоритм арифметики.
+
+Подготовлен [partition-frozen](ESP8266_OPUS_ASM_PARTITION_FROZEN.md) поверх
+принятого PVQ row-loop:1859 B live +523 B padding в исходных2382 B.
+Остальной ELF и RAM прежние, actual projected CFG/ROM calls/literals точны;
+24 host PCM/PLC/reset/OOM пройдены. Физические10 A/B/A ещё не выполнены;
+это не принятие прежней отклонённой перелинковки и не достижение70%.
