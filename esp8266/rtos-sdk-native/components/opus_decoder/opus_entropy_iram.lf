@@ -1,0 +1,12 @@
+# Placement-only experiment on the protected GCC ASM / tell-inline backend.
+# ec_decode: range quotient; ec_dec_update: entropy interval update;
+# ec_dec_bit_logp: binary entropy symbol. Keep exact instructions and call0 ABI.
+# Place only code/literals, not rodata/state. PDM32 task packer moves to flash;
+# main/pdm32_iram.lf MUST still keep cold __moddi3 in flash. Check linked sizes.
+# These functions are NOT made safe for cache-off use: callees may be in flash.
+[mapping:yoradio_opus_entropy_iram]
+archive: libopus_decoder.a
+entries:
+    entdec:ec_decode (noflash_text)
+    entdec:ec_dec_update (noflash_text)
+    entdec:ec_dec_bit_logp (noflash_text)

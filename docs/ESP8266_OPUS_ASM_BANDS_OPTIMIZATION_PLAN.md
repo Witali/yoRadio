@@ -155,6 +155,10 @@ linked ASM, частоты путей, калибровка коротких п�
       Следующий кандидат: обмен456 B task-only PDM32 packer в IRAM на
       горячие ASM entropy-функции. Сохранить cold __moddi3 во flash,
       проверить все секции и отдельно влияние на live PDM; ISR не переносить.
+      Собран отдельный -OpusEntropyIramSwap: ec_decode/ec_dec_update/logp
+      помещены в IRAM, packer во flash, cold modulo mapping сохранён.
+      Linked graphs прежние, IRAM−56 B/DRAM0, PDM493216 слов exact UBSan.
+      Физический A/B/A начат; [метод и результаты](ESP8266_OPUS_ASM_ENTROPY_IRAM.md).
       [Метод frozen-layout A/B](ESP8266_OPUS_ASM_FROZEN_DIV.md).
 - [ ] **3. Циклы по длине вектора: короткий и unroll2/unroll4.** Начать
       с действительно горячих скалярных произведений, например

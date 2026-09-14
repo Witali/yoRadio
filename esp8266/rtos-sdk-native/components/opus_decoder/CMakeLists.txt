@@ -1,4 +1,12 @@
 set(YORADIO_OPUS_BACKEND "c" CACHE STRING "Opus implementation: c or diagnostic ASM backend")
+option(YORADIO_OPUS_ENTROPY_IRAM_SWAP "Experiment: exchange PDM32 IRAM for three pinned ASM entropy leaves" OFF)
+if(YORADIO_OPUS_ENTROPY_IRAM_SWAP AND
+   (NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT CONFIG_YORADIO_OGG_OPUS OR
+    NOT YORADIO_OPUS_BACKEND STREQUAL "bands-tell-inline-asm" OR
+    NOT YORADIO_ESP8266_PDM32_IRAM OR YORADIO_OPUS_PVQ_IRAM OR
+    NOT CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM OR NOT CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32))
+  message(FATAL_ERROR "Entropy IRAM exchange requires diagnostic tell-inline ASM, PDM32 IRAM control, no PVQ placement")
+endif()
 option(YORADIO_OPUS_BANDS_TEXT_LITERALS "Experiment: place tell-inline bands literal pools in text" OFF)
 if(YORADIO_OPUS_BANDS_TEXT_LITERALS AND
    (NOT YORADIO_ESP8266_DIAGNOSTIC OR NOT YORADIO_OPUS_BACKEND STREQUAL "bands-tell-inline-asm"))
@@ -28,6 +36,9 @@ if(CONFIG_YORADIO_OGG_OPUS)
   set(CMAKE_ASM_OUTPUT_EXTENSION_REPLACE 1)
   option(YORADIO_OPUS_PVQ_IRAM "Diagnostic placement of decode_pulses/alg_unquant in IRAM" OFF)
   set(OPUS_LDFRAGMENTS "")
+  if(YORADIO_OPUS_ENTROPY_IRAM_SWAP)
+    list(APPEND OPUS_LDFRAGMENTS "opus_entropy_iram.lf")
+  endif()
   if(YORADIO_OPUS_PVQ_IRAM)
     if(NOT YORADIO_ESP8266_DIAGNOSTIC)
       message(FATAL_ERROR "PVQ IRAM placement requires diagnostic firmware until board qualification")

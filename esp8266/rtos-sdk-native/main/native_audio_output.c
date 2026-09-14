@@ -679,11 +679,22 @@ static inline __attribute__((always_inline)) void i2s_rcpdm_fill(
 #if YORADIO_ESP8266_PDM32_IRAM != 0 && YORADIO_ESP8266_PDM32_IRAM != 1
 #error "YORADIO_ESP8266_PDM32_IRAM must be 0 or 1"
 #endif
-#if YORADIO_ESP8266_PDM32_IRAM
+#ifndef YORADIO_OPUS_ENTROPY_IRAM_SWAP
+#define YORADIO_OPUS_ENTROPY_IRAM_SWAP 0
+#endif
+#if YORADIO_OPUS_ENTROPY_IRAM_SWAP != 0 && YORADIO_OPUS_ENTROPY_IRAM_SWAP != 1
+#error "YORADIO_OPUS_ENTROPY_IRAM_SWAP must be 0 or 1"
+#endif
+#if YORADIO_OPUS_ENTROPY_IRAM_SWAP && !YORADIO_ESP8266_PDM32_IRAM
+#error "Entropy exchange must retain the PDM32 cold-modulo flash mapping"
+#endif
+#if YORADIO_ESP8266_PDM32_IRAM && !YORADIO_OPUS_ENTROPY_IRAM_SWAP
 /* Experimental placement only; pdm32_iram.lf recovers space from a cold
  * task-only libgcc helper. The shared codec arena remains 16384 bytes. */
 #define PDM32_CODE_ATTR IRAM_ATTR
 #else
+/* Entropy exchange only moves this task-called packer. DMA/ISR code stays
+ * in IRAM and pdm32_iram.lf still places cold __moddi3 in flash. */
 #define PDM32_CODE_ATTR
 #endif
 static uint32_t PDM32_CODE_ATTR __attribute__((noinline))

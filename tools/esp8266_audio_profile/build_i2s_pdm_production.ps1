@@ -16,6 +16,7 @@ param(
     [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm', 'bands-blocks-asm', 'bands-combined-asm', 'bands-pulse-lookup-asm', 'bands-tell-inline-asm', 'bands-fused-asm', 'bands-tell-intensity-asm', 'bands-update-fast-asm', 'bands-tell-update-asm', 'bands-tell-bits1-asm', 'bands-layout32-asm', 'bands-layout128-asm', 'bands-cache-reuse-asm', 'bands-inner4-asm', 'bands-logp-asm', 'bands-pvq-addx-asm', 'bands-small-div-asm', 'bands-small-div-tail-asm')]
     [string]$OpusBackend = 'c',
     [switch]$OpusBandsTextLiterals,
+    [switch]$OpusEntropyIramSwap,
     [ValidateSet(1024, 1536, 2048, 3072, 4096)]
     [int]$OpusInputBytes = 1024,
     [switch]$OpusLowRam,
@@ -70,6 +71,7 @@ if ($OpusBackend -ne 'c') {
     if ($OpusLowRam -or $OpusPcmLeases -or $OpusCeltDecodeOnly -or $OpusRotationLx106 -or $OpusDivOnce -or $OpusProfileStage) { throw 'Other decoder experiments require a separately regenerated ASM snapshot' }
 }
 if ($OpusBandsTextLiterals -and (-not $Diagnostic -or $OpusBackend -ne 'bands-tell-inline-asm')) { throw '-OpusBandsTextLiterals requires diagnostic bands-tell-inline-asm' }
+if ($OpusEntropyIramSwap -and (-not $Diagnostic -or -not $EnableOpus -or $OpusBackend -ne 'bands-tell-inline-asm' -or -not $Pdm32Iram -or $OpusPvqIram)) { throw '-OpusEntropyIramSwap requires diagnostic tell-inline ASM and -Pdm32Iram without PVQ placement' }
 if ($OpusBenchmarkOutput -and -not $OpusBenchmark) { throw '-OpusBenchmarkOutput requires -OpusBenchmark' }
 if ($OpusProfileStage -and (-not $OpusBenchmark -or $OpusBenchmarkOutput)) { throw '-OpusProfileStage requires a raw-only Opus benchmark' }
 if ($OpusStreamTest -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusStreamTest requires -Diagnostic and -EnableOpus' }
@@ -205,6 +207,7 @@ try {
     $taskOpusRotationLx106 = if ($OpusRotationLx106) { 'ON' } else { 'OFF' }
     $taskOpusDivOnce = if ($OpusDivOnce) { 'ON' } else { 'OFF' }
     $taskPdm32Iram = if ($Pdm32Iram) { 'ON' } else { 'OFF' }
+    $taskEntropyIramSwap = if ($OpusEntropyIramSwap) { 'ON' } else { 'OFF' }
     $taskPdm32Batch = if ($Pdm32Batch) { 'ON' } else { 'OFF' }
     $taskOpusPcmPublish = if ($OpusPcmPublish) { 'ON' } else { 'OFF' }
     $taskOpusPcmLeases = if ($OpusPcmLeases) { 'ON' } else { 'OFF' }
@@ -250,6 +253,7 @@ try {
         "-DYORADIO_OPUS_DIV_ONCE=$taskOpusDivOnce",
         "-DYORADIO_OPUS_PROFILE_STAGE=$OpusProfileStage",
         "-DYORADIO_ESP8266_PDM32_IRAM=$taskPdm32Iram",
+        "-DYORADIO_OPUS_ENTROPY_IRAM_SWAP=$taskEntropyIramSwap",
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
         "-DYORADIO_ESP8266_OPUS_PCM_PUBLISH=$taskOpusPcmPublish",
         "-DYORADIO_OPUS_PCM_LEASES=$taskOpusPcmLeases",
@@ -355,6 +359,8 @@ try {
         opus_fir_table_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/resampler_rom.c).Hash
         opus_fir_helper_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/opus_fir_word.h).Hash
         pdm32_iram=[bool]$Pdm32Iram
+        opus_entropy_iram_swap=[bool]$OpusEntropyIramSwap
+        opus_entropy_iram_fragment_sha256=$(if ($OpusEntropyIramSwap) { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/opus_entropy_iram.lf").Hash } else { $null })
         pdm32_batch=[bool]$Pdm32Batch
         pdm32_loan_words=$Pdm32LoanWords
         sdk_rx_diag=[bool]$SdkRxDiag

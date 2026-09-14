@@ -26,14 +26,16 @@ function extractPacker() {
   fs.mkdirSync(directory, { recursive: true });
   fs.writeFileSync(path.join(directory, 'pdm32_under_test.inc'), text);
 }
-function checkBits() {
+function checkBits({ entropySwap = false } = {}) {
   extractPacker();
   assert.throws(() => execute('gcc', ['-std=c99', '-DYORADIO_ESP8266_PDM32_IRAM=2',
     '-I' + hostPath(directory), '-E', hostPath(probe), '-o', '/dev/null']), /must be 0 or 1/);
-  return [0, 1].map(enabled => {
-    const binary = path.join(directory, 'host-' + enabled);
+  return (entropySwap ? [1] : [0, 1]).map(enabled => {
+    const binary = path.join(directory, 'host-' + enabled + (entropySwap ? '-entropy-swap' : ''));
     execute('gcc', ['-std=c99', '-O2', '-Wall', '-Wextra', '-Werror', '-fsanitize=undefined',
-      '-DYORADIO_ESP8266_PDM32_IRAM=' + enabled, '-I' + hostPath(directory), hostPath(probe), '-o', hostPath(binary)]);
+      '-DYORADIO_ESP8266_PDM32_IRAM=' + enabled,
+      '-DYORADIO_OPUS_ENTROPY_IRAM_SWAP=' + Number(entropySwap),
+      '-I' + hostPath(directory), hostPath(probe), '-o', hostPath(binary)]);
     const result = JSON.parse(execute(hostPath(binary), []));
     assert.equal(result.passed, true); assert.equal(result.words, 493216);
     return result;

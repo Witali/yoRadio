@@ -1,0 +1,59 @@
+TAP version 13
+# {"passed":true,"iram_delta":-56,"bytes":903152,"placement":[["ec_decode",1074812964,63],["ec_dec_update",1074813028,171],["ec_dec_bit_logp",1074813200,172]]}
+# Subtest: entropy IRAM exchange executes actual CMake guards and requires the matching control
+ok 1 - entropy IRAM exchange executes actual CMake guards and requires the matching control
+  ---
+  duration_ms: 203.8057
+  type: 'test'
+  ...
+# Subtest: exchanged PDM packer retains 493216 exact words and states under UBSan
+ok 2 - exchanged PDM packer retains 493216 exact words and states under UBSan
+  ---
+  duration_ms: 3839.8098
+  type: 'test'
+  ...
+# Subtest: actual linked ASM exchange preserves graphs, ISR placement and RAM budget
+ok 3 - actual linked ASM exchange preserves graphs, ISR placement and RAM budget
+  ---
+  duration_ms: 21210.9828
+  type: 'test'
+  ...
+# Subtest: PDM32 IRAM builder switch is opt-in, diagnostic-only, and explicitly clears CMake cache
+ok 4 - PDM32 IRAM builder switch is opt-in, diagnostic-only, and explicitly clears CMake cache
+  ---
+  duration_ms: 663.6044
+  type: 'test'
+  ...
+# Subtest: PDM32 IRAM is default-off, standard-PDM-only and maps one cold object without shrinking the codec arena
+ok 5 - PDM32 IRAM is default-off, standard-PDM-only and maps one cold object without shrinking the codec arena
+  ---
+  duration_ms: 1.8217
+  type: 'test'
+  ...
+# Subtest: Both placements execute actual packer body with identical words and state under UBSan
+ok 6 - Both placements execute actual packer body with identical words and state under UBSan
+  ---
+  duration_ms: 4472.3499
+  type: 'test'
+  ...
+# Subtest: Actual CMake option block registers the fragment only for explicit standard PDM32
+ok 7 - Actual CMake option block registers the fragment only for explicit standard PDM32
+  ---
+  duration_ms: 152.6932
+  type: 'test'
+  ...
+# Subtest: SDK-generated linker and minimal target ELF prove targeted placement, cold callers and unchanged RAM/stack
+ok 8 - SDK-generated linker and minimal target ELF prove targeted placement, cold callers and unchanged RAM/stack # SKIP Pinned SDK build is unavailable
+  ---
+  duration_ms: 0.1084
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 25331.6244
