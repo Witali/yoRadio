@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "candidate": "bands-partition-decode-v1",
+  "base_manifest_sha256": "c98bc13abf082c51acf4a582f467ba94f256d2e45ae1e5ff6bf0e6ccdf8844dc",
+  "parent_sha256_lf": "794eda0bf7c1b1c87b51f87c38691b5b7ba8edb40efcc979cac93adcb3cd8171",
+  "recipe_sha256_lf": "0d219e83ca7f1db7c225ba73ae401628cfca3d881d3e308e55c0da50e02572b6",
+  "files": [
+    {
+      "source": "upstream/celt/bands.c",
+      "overlay": "bands-partition-decode/upstream/celt/bands.c.s",
+      "overlay_sha256_lf": "7b991439beb374ed5ae1ec21bdd2fca6e04ea096646c7a9a3d32fbc1ad2a9da1"
+    },
+    {
+      "source": "upstream/celt/entcode.c",
+      "overlay": "bands-tell-inline/upstream/celt/entcode.c.s",
+      "overlay_sha256_lf": "5596f73af4f21afefed77288009aab8f346019d91249b35100166a166b13443a",
+      "sections_before": {
+        ".literal.ec_tell_frac": 4,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.ec_tell_frac": 57,
+        ".rodata.correction$2307": 32,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 8,
+        ".xt.prop": 72
+      },
+      "sections_after": {
+        ".literal.ec_tell_frac": 4,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.ec_tell_frac": 57,
+        ".rodata.correction$2307": 32,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 8,
+        ".xt.prop": 72
+      }
+    }
+  ],
+  "proof": {
+    "branches": [
+      {
+        "index": 78,
+        "row": 137,
+        "original": "bnez.n\ta7, .L28",
+        "taken": false,
+        "target": 767
+      },
+      {
+        "index": 106,
+        "row": 181,
+        "original": "beqz.n\ta7, .L128",
+        "taken": true,
+        "target": 744
+      },
+      {
+        "index": 655,
+        "row": 1034,
+        "original": "beqz.n\ta7, .L65",
+        "taken": true,
+        "target": 668
+      }
+    ],
+    "removed_instructions": 179,
+    "iterations": 860
+  },
+  "additional_static_ram_bytes": 0,
+  "stack_change_bytes": 0,
+  "scope": "Only quant_partition; immutable decoder encode=0 precondition requires independent call-chain audit; physical speed not yet known"
+}

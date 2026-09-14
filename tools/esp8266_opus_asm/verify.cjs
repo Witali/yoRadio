@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {component,sourceHash}=require('./export.cjs');
 function verify(mode, directory=path.join(component,'asm/lx106'), componentRoot=component){
- assert.ok(['gcc-asm','optimized-asm','hoisted-asm','bands-intensity-asm','bands-blocks-asm','bands-combined-asm','bands-pulse-lookup-asm','bands-tell-inline-asm','bands-fused-asm','bands-tell-intensity-asm','bands-update-fast-asm','bands-tell-update-asm','bands-tell-bits1-asm','bands-layout32-asm','bands-layout128-asm','bands-cache-reuse-asm','bands-inner4-asm','bands-logp-asm','bands-pvq-addx-asm','bands-small-div-asm','bands-small-div-tail-asm','bands-small-div-inline-asm','bands-folding8-asm'].includes(mode),'Unknown ASM selection');
+ assert.ok(['gcc-asm','optimized-asm','hoisted-asm','bands-intensity-asm','bands-blocks-asm','bands-combined-asm','bands-pulse-lookup-asm','bands-tell-inline-asm','bands-fused-asm','bands-tell-intensity-asm','bands-update-fast-asm','bands-tell-update-asm','bands-tell-bits1-asm','bands-layout32-asm','bands-layout128-asm','bands-cache-reuse-asm','bands-inner4-asm','bands-logp-asm','bands-pvq-addx-asm','bands-small-div-asm','bands-small-div-tail-asm','bands-small-div-inline-asm','bands-folding8-asm','bands-partition-decode-asm'].includes(mode),'Unknown ASM selection');
  const manifest=JSON.parse(fs.readFileSync(path.join(directory,'manifest.json'),'utf8'));
  assert.equal(manifest.roundtrip_exact,true);
  assert.equal(manifest.cpu,'LX106');assert.equal(manifest.abi,'call0');
@@ -15,6 +15,22 @@ function verify(mode, directory=path.join(component,'asm/lx106'), componentRoot=
  assert.deepEqual(manifest.files.map(f=>f.source).sort(),actual,'ASM corpus does not cover current C units');
  let optimization;
  let overlays=[];
+ if(mode==='bands-partition-decode-asm'){
+  verify('bands-tell-inline-asm',directory,componentRoot);
+  const r=JSON.parse(fs.readFileSync(path.join(directory,'bands-partition-decode.json'),'utf8'));
+  assert.equal(r.base_manifest_sha256,sourceHash(path.join(directory,'manifest.json')));
+  assert.equal(r.parent_sha256_lf,sourceHash(path.join(directory,'bands-tell-inline.json')));
+  assert.equal(r.recipe_sha256_lf,sourceHash(path.join(__dirname,'partition_decode.cjs')));
+  assert.equal(r.additional_static_ram_bytes,0);assert.equal(r.stack_change_bytes,0);
+  assert.deepEqual(r.files.map(f=>f.source),['upstream/celt/bands.c','upstream/celt/entcode.c']);
+  for(const f of r.files)assert.equal(sourceHash(path.join(directory,f.overlay)),f.overlay_sha256_lf);
+  const parent=JSON.parse(fs.readFileSync(path.join(directory,'bands-tell-inline.json')));
+  const original=fs.readFileSync(path.join(directory,parent.files[0].overlay),'utf8');
+  const candidate=require('./partition_decode.cjs').specialize(original);
+  assert.equal(fs.readFileSync(path.join(directory,r.files[0].overlay),'utf8').replace(/\r\n/g,'\n'),candidate.text);
+  assert.deepEqual(r.proof,candidate.proof);assert.deepEqual(r.files[1],parent.files[1]);
+  overlays=r.files;
+ }
  if(mode==='bands-folding8-asm'){
   verify('bands-tell-inline-asm',directory,componentRoot);
   const r=JSON.parse(fs.readFileSync(path.join(directory,'bands-folding8.json'),'utf8'));

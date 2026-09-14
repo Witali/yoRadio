@@ -13,7 +13,7 @@ param(
     [int]$LedUpdateHz = 10,
     [switch]$NoAudioLevelLed,
     [switch]$EnableOpus,
-    [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm', 'bands-blocks-asm', 'bands-combined-asm', 'bands-pulse-lookup-asm', 'bands-tell-inline-asm', 'bands-fused-asm', 'bands-tell-intensity-asm', 'bands-update-fast-asm', 'bands-tell-update-asm', 'bands-tell-bits1-asm', 'bands-layout32-asm', 'bands-layout128-asm', 'bands-cache-reuse-asm', 'bands-inner4-asm', 'bands-logp-asm', 'bands-pvq-addx-asm', 'bands-small-div-asm', 'bands-small-div-tail-asm', 'bands-small-div-inline-asm', 'bands-folding8-asm')]
+    [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm', 'bands-blocks-asm', 'bands-combined-asm', 'bands-pulse-lookup-asm', 'bands-tell-inline-asm', 'bands-fused-asm', 'bands-tell-intensity-asm', 'bands-update-fast-asm', 'bands-tell-update-asm', 'bands-tell-bits1-asm', 'bands-layout32-asm', 'bands-layout128-asm', 'bands-cache-reuse-asm', 'bands-inner4-asm', 'bands-logp-asm', 'bands-pvq-addx-asm', 'bands-small-div-asm', 'bands-small-div-tail-asm', 'bands-small-div-inline-asm', 'bands-folding8-asm', 'bands-partition-decode-asm')]
     [string]$OpusBackend = 'c',
     [switch]$OpusBandsTextLiterals,
     [switch]$OpusEntropyIramSwap,
@@ -299,6 +299,7 @@ try {
         opus_scratch_bytes=$(if ($taskOpusEnabled) { $OpusScratchBytes } else { 0 })
         opus_low_ram=[bool]$OpusLowRam
         opus_backend=$OpusBackend
+        opus_bands_partition_decode_manifest_sha256=$(if ($OpusBackend -eq 'bands-partition-decode-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-partition-decode.json").Hash } else { $null })
         opus_bands_folding8_manifest_sha256=$(if ($OpusBackend -eq 'bands-folding8-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-folding8.json").Hash } else { $null })
         opus_bands_small_div_inline_manifest_sha256=$(if ($OpusBackend -eq 'bands-small-div-inline-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-small-div-inline.json").Hash } else { $null })
         opus_bands_small_div_manifest_sha256=$(if ($OpusBackend -eq 'bands-small-div-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-small-div.json").Hash } else { $null })

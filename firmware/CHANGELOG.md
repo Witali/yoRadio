@@ -3,6 +3,18 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus ASM partition decoder-only
+
+- `development/esp8266-opus-partition-decode-v1/app.bin`,902672 B; control
+  `esp8266-opus-folding-control-v1`,903216 B. CPU160/QIO40/cache16 raw-RAM
+  benchmark; optional `bands-partition-decode-asm`, default unchanged.
+- Three proven encode=0 branches and179 unreachable instructions removed
+  directly from GCC ASM; quant_partition2382→1870 B, original112-byte frame,
+  calls/registers/rounding retained. No RAM growth, C fallback unchanged.
+- Linked decoder CFG and caller checked;24 host PCM/guard scenarios exact,
+  including510 kbps and120ms compound packets. Physical measurements pending.
+  [Proof and experiment](../docs/ESP8266_OPUS_ASM_PARTITION_DECODE.md).
+
 ## Development - 2026-09-14: ESP8266 Opus folding8 (rejected)
 
 - `development/esp8266-opus-folding8-v1/app.bin`,903344 B; matched control
