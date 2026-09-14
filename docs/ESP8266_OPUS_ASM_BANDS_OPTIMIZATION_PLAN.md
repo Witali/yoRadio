@@ -814,5 +814,13 @@ Ordinary восстановлен OTA/HTTP102мс/WS/плейлист/stopped167
 Подготовлен [ec_dec_bits low/high ASM](ESP8266_OPUS_ASM_EC_BITS.md): один35-byte
 хвост,14→13 инструкций с сохранением SAR, refill/EOF и entropy state.
 32 symbolic и81120 linked numeric cases,24 host exact PCM до510 пройдены;
-RAM/frame/остальные адреса прежние. Физические10 A/B/A пока не завершены,
-это не принятое ускорение и не достижение80%.
+RAM/frame/остальные адреса прежние. Физические10 A/B/A завершены:
+CPU19287.35529 /87.32860 /87.33156%;12876.62877 /76.66525 /76.63775%.
+Оба speed gate FAIL: кандидат не принят, C/default прежние. Все30 PCM
+точны; max19224.502мс, DRAM8352 /8160 /8176 B, stack1660 B.
+A2/run4/mono12 window excess341мкс сохранён без фильтрации.
+Итоговые65 связанных ASM-регрессий PASS/0skip, включая30-run отчёт.
+Ordinary восстановлен OTA/HTTP101.5мс/WS/плейлист/stopped167.
+Цель80% не достигнута, accepted baseline остаётся PVQ row-loop87.3%.
+Следующий независимый пункт — reuse ROW[k-j] в many-dimensions PVQ из
+opportunity list; это не повтор уже принятого many-pulses row-loop.

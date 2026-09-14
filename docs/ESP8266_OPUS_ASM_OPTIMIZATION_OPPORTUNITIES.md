@@ -231,11 +231,11 @@ Default прежний; причина небольшого замедления
 
 ## 4. Извлечение младших битов в ec_dec_bits
 
-- [ ] Проверить замену построения маски использованием уже вычисленной
+- [x] Проверить замену построения маски использованием уже вычисленной
       старшей части: high = word >> bits; low = word ^ (high << bits).
-- [ ] Сохранить весь entropy state: end_window, nend_bits, nbits_total,
+- [x] Сохранить весь entropy state: end_window, nend_bits, nbits_total,
       пополнение буфера, обработку исчерпания входа и возвращаемое значение.
-- [ ] Проверить допустимый диапазон bits, unsigned shifts, ABI и SAR;
+- [x] Проверить допустимый диапазон bits, unsigned shifts, ABI и SAR;
       при необходимости восстановить исходное значение SAR.
 
 Место: gcc/upstream/celt/entdec.c.s, ec_dec_bits, строка 1496.
@@ -254,13 +254,19 @@ Default прежний; причина небольшого замедления
 Предварительно это13 инструкций/33 B вместо14/35 B **с восстановлением SAR**;
 экономия только одной инструкции, не обещание заметного CPU-выигрыша.
 
-- [ ] Собрать отдельный frozen-range хвост, padding только после RET;
+- [x] Собрать отдельный frozen-range хвост, padding только после RET;
       сохранить остальные байты ELF, entropy state и порядок записей.
-- [ ] Проверить unsigned bits0..25, все биты window, refill/exhaustion,
+- [x] Проверить unsigned bits0..25, все биты window, refill/exhaustion,
       ABI/callee-saved и SAR; caller-saved временные могут отличаться только
       в рамках доказанного call0 контракта, не на внутреннем общем переходе.
-- [ ] Независимые numeric/symbolic проверки готового ASM, host exact PCM
+- [x] Независимые numeric/symbolic проверки готового ASM, host exact PCM
       до510 и10 A/B/A. Не принимать только по уменьшению14→13 инструкций.
+
+[Опыт ec_dec_bits](ESP8266_OPUS_ASM_EC_BITS.md) завершён:32 symbolic,
+81120 linked numeric,24 host PCM,30 физических A/B/A точны. Но CPU192
+87.35529 /87.32860 /87.33156%, а12876.62877 /76.66525 /76.63775%:
+оба speed gate FAIL. Кандидат отклонён, RAM/frame прежние. Все max/RAM
+и341мкс window excess сохранены. Ordinary восстановлен OTA/HTTP/WS.
 
 ## 5. Повторное использование адресов строк PVQ
 
