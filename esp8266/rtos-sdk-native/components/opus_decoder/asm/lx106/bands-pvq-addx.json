@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "candidate": "bands-pvq-addx-v1",
+  "base_manifest_sha256": "c98bc13abf082c51acf4a582f467ba94f256d2e45ae1e5ff6bf0e6ccdf8844dc",
+  "recipe_sha256_lf": "d19b240ce9550de7d06fe77f527247da74cb01c5610e330a04c33aee4cb1ecfa",
+  "parent_sha256_lf": "794eda0bf7c1b1c87b51f87c38691b5b7ba8edb40efcc979cac93adcb3cd8171",
+  "files": [
+    {
+      "source": "upstream/celt/bands.c",
+      "overlay": "bands-tell-inline/upstream/celt/bands.c.s",
+      "overlay_sha256_lf": "dc3aca2b04ecfc63e4a9b3ab502a2559a88a2651a9b5b53fea272936255c2cf5"
+    },
+    {
+      "source": "upstream/celt/entcode.c",
+      "overlay": "bands-tell-inline/upstream/celt/entcode.c.s",
+      "overlay_sha256_lf": "5596f73af4f21afefed77288009aab8f346019d91249b35100166a166b13443a"
+    },
+    {
+      "source": "upstream/celt/cwrs.c",
+      "overlay": "bands-pvq-addx/upstream/celt/cwrs.c.s",
+      "overlay_sha256_lf": "2217211d3a3ad041fb50cf5d071577cd76295fec5d79cae97391072b2827aa30",
+      "sections_before": {
+        ".literal.encode_pulses": 8,
+        ".literal.decode_pulses": 8,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.encode_pulses": 205,
+        ".text.decode_pulses": 989,
+        ".rodata.CELT_PVQ_U_ROW": 60,
+        ".rodata.CELT_PVQ_U_DATA": 5088,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 16,
+        ".xt.prop": 552
+      },
+      "sections_after": {
+        ".literal.encode_pulses": 8,
+        ".literal.decode_pulses": 8,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.encode_pulses": 205,
+        ".text.decode_pulses": 949,
+        ".rodata.CELT_PVQ_U_ROW": 60,
+        ".rodata.CELT_PVQ_U_DATA": 5088,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 16,
+        ".xt.prop": 552
+      }
+    }
+  ],
+  "changed_function": "decode_pulses",
+  "fused_pairs": 20,
+  "object_instruction_graph_exact": true,
+  "additional_static_ram_bytes": 0,
+  "stack_change_bytes": 0,
+  "physical_speed_measured": false
+}

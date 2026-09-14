@@ -1,0 +1,123 @@
+TAP version 13
+# Subtest: compiler command parser does not invoke a shell and keeps quoted definitions
+ok 1 - compiler command parser does not invoke a shell and keeps quoted definitions
+  ---
+  duration_ms: 2.8447
+  type: 'test'
+  ...
+# Subtest: full ASM snapshot covers every upstream unit and both variants verify
+ok 2 - full ASM snapshot covers every upstream unit and both variants verify
+  ---
+  duration_ms: 157.2992
+  type: 'test'
+  ...
+# Subtest: annotations preserve comments and describe the function ABI
+ok 3 - annotations preserve comments and describe the function ABI
+  ---
+  duration_ms: 0.5822
+  type: 'test'
+  ...
+# Subtest: stale source hashes and a different exported feature set fail closed
+ok 4 - stale source hashes and a different exported feature set fail closed
+  ---
+  duration_ms: 7.694
+  type: 'test'
+  ...
+# Subtest: ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+ok 5 - ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+  ---
+  duration_ms: 0.416
+  type: 'test'
+  ...
+# Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
+ok 6 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
+  ---
+  duration_ms: 1.0091
+  type: 'test'
+  ...
+# Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+ok 7 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+  ---
+  duration_ms: 0.7264
+  type: 'test'
+  ...
+# Subtest: intensity overlay is one decoder-only early branch, not entropy removal
+ok 8 - intensity overlay is one decoder-only early branch, not entropy removal
+  ---
+  duration_ms: 79.0686
+  type: 'test'
+  ...
+# Subtest: early qn=1 preserves final qn across intensity/N/budget boundaries
+ok 9 - early qn=1 preserves final qn across intensity/N/budget boundaries
+  ---
+  duration_ms: 6.1607
+  type: 'test'
+  ...
+# Subtest: linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
+ok 10 - linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
+  ---
+  duration_ms: 2.888
+  type: 'test'
+  ...
+# Subtest: linked graph retains branch destinations, register operations and numeric literals
+ok 11 - linked graph retains branch destinations, register operations and numeric literals
+  ---
+  duration_ms: 1.0348
+  type: 'test'
+  ...
+# Subtest: CFG follows real targets, never decodes padding after J, rejects reachable garbage
+ok 12 - CFG follows real targets, never decodes padding after J, rejects reachable garbage
+  ---
+  duration_ms: 5.5928
+  type: 'test'
+  ...
+# {
+#   instruction_pairs: 20,
+#   register_state_checks: 200000,
+#   scope: 'local instruction equivalence, not board cycles'
+# }
+# Subtest: twenty actual ASM replacements preserve all registers, including aliases and wrapping
+ok 13 - twenty actual ASM replacements preserve all registers, including aliases and wrapping
+  ---
+  duration_ms: 362.2025
+  type: 'test'
+  ...
+# Subtest: only selected function changes; no labels between operations, ABI/stack/table data unchanged
+ok 14 - only selected function changes; no labels between operations, ABI/stack/table data unchanged
+  ---
+  duration_ms: 115.1113
+  type: 'test'
+  ...
+# Subtest: GAS long-branch normalization preserves both edges, rejects entry into jump
+ok 15 - GAS long-branch normalization preserves both edges, rejects entry into jump
+  ---
+  duration_ms: 0.6438
+  type: 'test'
+  ...
+# Subtest: macro arithmetic is the exact GCC leaf body without return
+ok 16 - macro arithmetic is the exact GCC leaf body without return
+  ---
+  duration_ms: 1.641
+  type: 'test'
+  ...
+# Subtest: only four pinned quant_partition calls are expanded and baseline stays exact
+ok 17 - only four pinned quant_partition calls are expanded and baseline stays exact
+  ---
+  duration_ms: 70.4801
+  type: 'test'
+  ...
+# Subtest: actual macro preserves results and live registers at every normalized threshold
+ok 18 - actual macro preserves results and live registers at every normalized threshold
+  ---
+  duration_ms: 198.9609
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 585.572

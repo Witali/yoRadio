@@ -13,7 +13,7 @@ param(
     [int]$LedUpdateHz = 10,
     [switch]$NoAudioLevelLed,
     [switch]$EnableOpus,
-    [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm', 'bands-blocks-asm', 'bands-combined-asm', 'bands-pulse-lookup-asm', 'bands-tell-inline-asm', 'bands-fused-asm', 'bands-tell-intensity-asm', 'bands-update-fast-asm', 'bands-tell-update-asm', 'bands-tell-bits1-asm', 'bands-layout32-asm', 'bands-layout128-asm', 'bands-cache-reuse-asm', 'bands-inner4-asm', 'bands-logp-asm')]
+    [ValidateSet('c', 'gcc-asm', 'optimized-asm', 'hoisted-asm', 'bands-intensity-asm', 'bands-blocks-asm', 'bands-combined-asm', 'bands-pulse-lookup-asm', 'bands-tell-inline-asm', 'bands-fused-asm', 'bands-tell-intensity-asm', 'bands-update-fast-asm', 'bands-tell-update-asm', 'bands-tell-bits1-asm', 'bands-layout32-asm', 'bands-layout128-asm', 'bands-cache-reuse-asm', 'bands-inner4-asm', 'bands-logp-asm', 'bands-pvq-addx-asm')]
     [string]$OpusBackend = 'c',
     [switch]$OpusBandsTextLiterals,
     [ValidateSet(1024, 1536, 2048, 3072, 4096)]
@@ -288,6 +288,7 @@ try {
         opus_scratch_bytes=$(if ($taskOpusEnabled) { $OpusScratchBytes } else { 0 })
         opus_low_ram=[bool]$OpusLowRam
         opus_backend=$OpusBackend
+        opus_bands_pvq_addx_manifest_sha256=$(if ($OpusBackend -eq 'bands-pvq-addx-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-pvq-addx.json").Hash } else { $null })
         opus_bands_logp_manifest_sha256=$(if ($OpusBackend -eq 'bands-logp-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-logp.json").Hash } else { $null })
         opus_bands_cache_reuse_manifest_sha256=$(if ($OpusBackend -eq 'bands-cache-reuse-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-cache-reuse.json").Hash } else { $null })
         opus_bands_inner4_manifest_sha256=$(if ($OpusBackend -eq 'bands-inner4-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-inner4.json").Hash } else { $null })
