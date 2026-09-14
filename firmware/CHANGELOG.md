@@ -3,6 +3,21 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus MDCT halfword selection
+
+- `development/esp8266-opus-mdct-half-{control,candidate}-v1/app.bin`,903216 B.
+  Five17-byte ASM selector replacements, unchanged other ELF bytes/addresses,
+  RAM/stack/aligned loads. CPU160/QIO40, tell-inline raw benchmark, default OFF.
+- All30 A/B/A exact PCM, no decoder/observation errors.18 related tests PASS,
+  0 skipped. Symbolic all-word/parity/ABI proof and fresh11-case host parent.
+- CPU19288.11908 /88.06342 /88.10215%; tiny0.044–0.063% relative time gain.
+  CPU128 also improves; both saved high-bitrate criteria pass. Experimental
+  recipe retained, no production change. Max192 call23.009ms NOT improved.
+- Free DRAM minima6116 /6836 /8032 B, stack1660 B. All attempts/maxima archived.
+  Ordinary live512-idle3s restored OTA; HTTP200/WS/current167/stopped/playlist
+  verified. Goal70% and continuous I2S qualification remain incomplete.
+  [Details and evidence](../docs/ESP8266_OPUS_ASM_MDCT_HALF.md).
+
 ## Development - 2026-09-14: ESP8266 Opus frozen-layout reloads (rejected)
 
 - `development/esp8266-opus-frozen-reloads-control-v1/app.bin` and
