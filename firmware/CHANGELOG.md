@@ -3,6 +3,16 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus MDCT post-rotation pairs
+
+- `development/esp8266-opus-mdct-post-pair-{control,candidate}-v1/app.bin`,
+  903216 B, CPU160/QIO40 raw diagnostic, accepted three-table parent.
+- One276-byte loop, four cached words, table loads8→4 per iteration pair.
+  Exact modular32/in-place events, no new RAM/frame or other ELF-byte changes.
+-225 symbolic pairs/all standard transforms,16 numeric full transforms,
+  12 pre-deployment regressions PASS. Physical A/B/A pending; default unchanged.
+  [Details](../docs/ESP8266_OPUS_ASM_MDCT_POST_PAIR.md).
+
 ## Development - 2026-09-14: ESP8266 Opus MDCT MUL16S (not accepted)
 
 - `development/esp8266-opus-mdct-mul16-{control,candidate}-v1/app.bin`,903216 B.
