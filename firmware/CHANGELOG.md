@@ -3,6 +3,19 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus exact small-div inline (experiment)
+
+- `development/esp8266-opus-small-div-inline-v1/app.bin`, 904080 B,
+  compared with current-source `esp8266-opus-inline-control-v1`, 903216 B.
+  Full hashes/build configuration are in their manifests. Opt-in
+  `bands-small-div-inline-asm`, CPU160/QIO40/cache16; no board default change.
+- Three exact reciprocal divisions expand inline, one516 B flash table,
+  original ROM fallback and C backend retained. No RAM/stack growth.
+- Linked-instruction model1,050,880 cases +20 fallback; exact semantic host
+  PCM through510 kbps; 10 regression tests pass. Physical speed pending.
+- These are raw-RAM benchmark builds, not normal radio. See
+  [experiment](../docs/ESP8266_OPUS_ASM_SMALL_DIV_INLINE.md).
+
 ## Development - 2026-09-14: ESP8266 Opus ASM bit_logp shrink-wrap (rejected)
 
 - `development/esp8266-opus-bands-logp-v1/app.bin`, 903232 B,
