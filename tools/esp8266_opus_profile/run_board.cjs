@@ -37,6 +37,7 @@ function request(uri, method='GET') {
 (async()=>{
   report.before=await request('/api/native/status');
   const previous=await request('/api/native/opus-benchmark');
+  if(previous.data.division_microbenchmark)throw Error('Helper microbenchmark is not raw decoder CPU; use run_division.cjs');
   if (previous.data.physical_output) {
     report.mode = 'own raw Opus packets from flash to physical PDM/DMA, no audio network or Ogg demux';
     report.timing = 'decode/output wall stages; full-pipeline task CPU including charged ISR and instrumentation, not decoder-only CPU';

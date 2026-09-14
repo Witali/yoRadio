@@ -105,6 +105,9 @@ extern "C" void opus_benchmark_case_snapshot(unsigned index, opus_benchmark_case
     taskEXIT_CRITICAL();
 }
 
+#if YORADIO_ESP8266_OPUS_DIVISION_BENCHMARK
+#include "opus_division_benchmark.inc"
+#else
 extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
     uint32_t generation, bool (*current)(uint32_t)) {
     taskENTER_CRITICAL();
@@ -332,3 +335,4 @@ extern "C" __attribute__((noinline)) void opus_benchmark_run_pending(
     s_status.state = error ? 4 : 3;
     taskEXIT_CRITICAL();
 }
+#endif

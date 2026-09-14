@@ -48,6 +48,8 @@ param(
     [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
     [switch]$OpusBenchmarkOutput,
+    [switch]$OpusDivisionBenchmark,
+    [string]$OpusDivisionFixtures = '.build/opus-bands-division-census',
     [ValidateRange(0, 11)]
     [int]$OpusProfileStage = 0,
     [string]$OpusBenchmarkFixtures = '.build/esp8266-opus-board-fixtures'
@@ -58,6 +60,7 @@ if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
 }
 if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -SpiffsLog' }
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
+if ($OpusDivisionBenchmark -and (-not $OpusBenchmark -or -not $Diagnostic -or $OpusBackend -ne 'bands-small-div-asm' -or $OpusBenchmarkOutput -or $OpusFunctionProfile -or $OpusProfileStage)) { throw '-OpusDivisionBenchmark requires diagnostic raw small-div ASM without profiling/output' }
 if ($OpusPvqIram -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusPvqIram requires diagnostic Opus' }
 if ($OpusFunctionProfile -and (-not $Diagnostic -or -not $EnableOpus -or -not $OpusBenchmark -or $OpusBenchmarkOutput -or $OpusProfileStage)) { throw '-OpusFunctionProfile requires diagnostic raw-only Opus' }
 if ($OpusFunctionProfileCoarse -and -not $OpusFunctionProfile) { throw '-OpusFunctionProfileCoarse requires -OpusFunctionProfile' }
@@ -187,6 +190,8 @@ try {
     $taskDiagnostic = if ($Diagnostic) { 'ON' } else { 'OFF' }
     $taskOpusBenchmark = if ($OpusBenchmark) { 'ON' } else { 'OFF' }
     $taskOpusBenchmarkOutput = if ($OpusBenchmarkOutput) { 'ON' } else { 'OFF' }
+    $taskOpusDivisionBenchmark = if ($OpusDivisionBenchmark) { 'ON' } else { 'OFF' }
+    if ($OpusDivisionBenchmark) { $OpusDivisionFixtures = (Resolve-Path $OpusDivisionFixtures).Path.Replace('\', '/') }
     $taskOpusStreamTest = if ($taskOpusStreamTestEnabled) { 'ON' } else { 'OFF' }
     $taskOpusWordAsm = if ($OpusWordAsm) { 'ON' } else { 'OFF' }
     $taskOpusBandsTextLiterals = if ($OpusBandsTextLiterals) { 'ON' } else { 'OFF' }
@@ -228,6 +233,8 @@ try {
         "-DYORADIO_ESP8266_DIAGNOSTIC=$taskDiagnostic",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK=$taskOpusBenchmark",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT=$taskOpusBenchmarkOutput",
+        "-DYORADIO_ESP8266_OPUS_DIVISION_BENCHMARK=$taskOpusDivisionBenchmark",
+        "-DYORADIO_ESP8266_OPUS_DIVISION_FIXTURES=$OpusDivisionFixtures",
         "-DYORADIO_ESP8266_OPUS_STREAM_TEST=$taskOpusStreamTest",
         "-DYORADIO_OPUS_WORD_ASM=$taskOpusWordAsm",
         "-DYORADIO_OPUS_BACKEND=$OpusBackend",
@@ -312,6 +319,9 @@ try {
         opus_memory_header_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/opus_memory.h").Hash
         opus_benchmark=[bool]$OpusBenchmark
         opus_benchmark_output=[bool]$OpusBenchmarkOutput
+        opus_division_benchmark=[bool]$OpusDivisionBenchmark
+        opus_division_source_sha256=$(if ($OpusDivisionBenchmark) { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/opus_division_benchmark.inc").Hash } else { $null })
+        opus_division_header_sha256=$(if ($OpusDivisionBenchmark) { (Get-FileHash "$OpusDivisionFixtures/opus_division_fixtures.h").Hash } else { $null })
         opus_benchmark_source_sha256=$(if ($OpusBenchmark) { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/opus_benchmark.cpp").Hash } else { $null })
         opus_benchmark_manifest_sha256=$(if ($OpusBenchmark) { (Get-FileHash "$OpusBenchmarkFixtures/manifest.json").Hash } else { $null })
         opus_benchmark_header_sha256=$(if ($OpusBenchmark) { (Get-FileHash "$OpusBenchmarkFixtures/opus_board_fixtures.h").Hash } else { $null })

@@ -1,0 +1,228 @@
+{
+  "scope": "20 paired same-image helper microbenchmarks; complete operands from RAM; NOT raw decoder CPU or cache-miss counters",
+  "units": "microseconds, SDK wall timer; includes timer/loop/hash/interrupts/preemption, no subtraction",
+  "groups": [
+    {
+      "warm": false,
+      "runs": 10,
+      "cases": [
+        {
+          "name": "mono-12",
+          "actual_divisions_per_audio": 0,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          },
+          "candidate_us": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          },
+          "median_reduction_percent": null,
+          "max_reference_batch_us": 0,
+          "max_candidate_batch_us": 0,
+          "min_dram": 22860,
+          "min_stack": 3996
+        },
+        {
+          "name": "mono-24",
+          "actual_divisions_per_audio": 112,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 1719,
+            "median": 5281.5,
+            "max": 11796
+          },
+          "candidate_us": {
+            "min": 920,
+            "median": 3145.5,
+            "max": 6344
+          },
+          "median_reduction_percent": 40.4430559500142,
+          "max_reference_batch_us": 8362,
+          "max_candidate_batch_us": 3136,
+          "min_dram": 21116,
+          "min_stack": 3996
+        },
+        {
+          "name": "stereo-64",
+          "actual_divisions_per_audio": 871,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 13710,
+            "median": 16112,
+            "max": 23212
+          },
+          "candidate_us": {
+            "min": 5385,
+            "median": 6224.5,
+            "max": 9748
+          },
+          "median_reduction_percent": 61.36730387288978,
+          "max_reference_batch_us": 4540,
+          "max_candidate_batch_us": 4417,
+          "min_dram": 21636,
+          "min_stack": 3996
+        },
+        {
+          "name": "stereo-128",
+          "actual_divisions_per_audio": 2017,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 27730,
+            "median": 27745,
+            "max": 30151
+          },
+          "candidate_us": {
+            "min": 12684,
+            "median": 12725.5,
+            "max": 13160
+          },
+          "median_reduction_percent": 54.134078212290504,
+          "max_reference_batch_us": 1313,
+          "max_candidate_batch_us": 514,
+          "min_dram": 23592,
+          "min_stack": 3996
+        },
+        {
+          "name": "stereo-192",
+          "actual_divisions_per_audio": 3163,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 42597,
+            "median": 43608.5,
+            "max": 44935
+          },
+          "candidate_us": {
+            "min": 22952,
+            "median": 23104.5,
+            "max": 25061
+          },
+          "median_reduction_percent": 47.018356513065115,
+          "max_reference_batch_us": 1541,
+          "max_candidate_batch_us": 1244,
+          "min_dram": 23592,
+          "min_stack": 3996
+        }
+      ]
+    },
+    {
+      "warm": true,
+      "runs": 10,
+      "cases": [
+        {
+          "name": "mono-12",
+          "actual_divisions_per_audio": 0,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          },
+          "candidate_us": {
+            "min": 0,
+            "median": 0,
+            "max": 0
+          },
+          "median_reduction_percent": null,
+          "max_reference_batch_us": 0,
+          "max_candidate_batch_us": 0,
+          "min_dram": 23180,
+          "min_stack": 3996
+        },
+        {
+          "name": "mono-24",
+          "actual_divisions_per_audio": 112,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 1645,
+            "median": 2622.5,
+            "max": 12715
+          },
+          "candidate_us": {
+            "min": 631,
+            "median": 649.5,
+            "max": 2152
+          },
+          "median_reduction_percent": 75.23355576739752,
+          "max_reference_batch_us": 7931,
+          "max_candidate_batch_us": 1546,
+          "min_dram": 21628,
+          "min_stack": 3996
+        },
+        {
+          "name": "stereo-64",
+          "actual_divisions_per_audio": 871,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 12222,
+            "median": 14772.5,
+            "max": 20020
+          },
+          "candidate_us": {
+            "min": 4613,
+            "median": 5716,
+            "max": 11963
+          },
+          "median_reduction_percent": 61.306481638179044,
+          "max_reference_batch_us": 4792,
+          "max_candidate_batch_us": 4445,
+          "min_dram": 21128,
+          "min_stack": 3996
+        },
+        {
+          "name": "stereo-128",
+          "actual_divisions_per_audio": 2017,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 27476,
+            "median": 27499.5,
+            "max": 29222
+          },
+          "candidate_us": {
+            "min": 11306,
+            "median": 11325,
+            "max": 12364
+          },
+          "median_reduction_percent": 58.81743304423716,
+          "max_reference_batch_us": 1309,
+          "max_candidate_batch_us": 1152,
+          "min_dram": 23592,
+          "min_stack": 3996
+        },
+        {
+          "name": "stereo-192",
+          "actual_divisions_per_audio": 3163,
+          "audio_ms": 240,
+          "reference_us": {
+            "min": 42150,
+            "median": 43494,
+            "max": 44662
+          },
+          "candidate_us": {
+            "min": 20771,
+            "median": 21485.5,
+            "max": 22869
+          },
+          "median_reduction_percent": 50.601232353887895,
+          "max_reference_batch_us": 1561,
+          "max_candidate_batch_us": 1220,
+          "min_dram": 23740,
+          "min_stack": 3996
+        }
+      ]
+    }
+  ],
+  "observations_with_errors": 0,
+  "failed_v1": "../esp8266-opus-division-micro-v1/failed-run.json (CCOUNT reset, invalid timing, retained)",
+  "min_dram": 21116,
+  "min_stack": 3996,
+  "heap_after": {
+    "min": 25420,
+    "median": 25596,
+    "max": 26476
+  },
+  "goal_decoder_cpu_improved": false
+}

@@ -1,0 +1,140 @@
+TAP version 13
+# Subtest: real board benchmark output=0 stage=0 publish=0 cleans up OOM/cancel/error and supports repeated runs
+ok 1 - real board benchmark output=0 stage=0 publish=0 cleans up OOM/cancel/error and supports repeated runs
+  ---
+  duration_ms: 5125.533
+  type: 'test'
+  ...
+# Opus board benchmark lifecycle PASS: 10 complete runs, 5 allocation-failure sites, queued/running busy, pending/midway cancel, golden PCM, 110 paired allocations/frees
+# Subtest: real board benchmark output=1 stage=0 publish=0 cleans up OOM/cancel/error and supports repeated runs
+ok 2 - real board benchmark output=1 stage=0 publish=0 cleans up OOM/cancel/error and supports repeated runs
+  ---
+  duration_ms: 1573.5065
+  type: 'test'
+  ...
+# Opus board benchmark lifecycle PASS: 10 complete runs, 5 allocation-failure sites, queued/running busy, pending/midway cancel, golden PCM, 135 paired allocations/frees
+# Subtest: real board benchmark output=1 stage=0 publish=1 cleans up OOM/cancel/error and supports repeated runs
+ok 3 - real board benchmark output=1 stage=0 publish=1 cleans up OOM/cancel/error and supports repeated runs
+  ---
+  duration_ms: 1586.9581
+  type: 'test'
+  ...
+# Opus board benchmark lifecycle PASS: 10 complete runs, 5 allocation-failure sites, queued/running busy, pending/midway cancel, golden PCM, 145 paired allocations/frees
+# Subtest: real board benchmark output=0 stage=8 publish=0 cleans up OOM/cancel/error and supports repeated runs
+ok 4 - real board benchmark output=0 stage=8 publish=0 cleans up OOM/cancel/error and supports repeated runs
+  ---
+  duration_ms: 1999.6462
+  type: 'test'
+  ...
+# Opus board benchmark lifecycle PASS: 10 complete runs, 5 allocation-failure sites, queued/running busy, pending/midway cancel, golden PCM, 110 paired allocations/frees
+# Subtest: paired helper validator checks every operand count/hash and distinct schema
+ok 5 - paired helper validator checks every operand count/hash and distinct schema
+  ---
+  duration_ms: 2.1143
+  type: 'test'
+  ...
+# Subtest: microbenchmark remains opt-in, bounded, cancellation-aware and without UART/cache tricks
+ok 6 - microbenchmark remains opt-in, bounded, cancellation-aware and without UART/cache tricks
+  ---
+  duration_ms: 0.7331
+  type: 'test'
+  ...
+# Subtest: division census preserves uint32 operands, order and duplicates
+ok 7 - division census preserves uint32 operands, order and duplicates
+  ---
+  duration_ms: 1.7564
+  type: 'test'
+  ...
+# Subtest: division census accepts zero calls but rejects malformed or invalid operands
+ok 8 - division census accepts zero calls but rejects malformed or invalid operands
+  ---
+  duration_ms: 6.3324
+  type: 'test'
+  ...
+# Subtest: instrument only the rng/ft division and fail closed on upstream changes
+ok 9 - instrument only the rng/ft division and fail closed on upstream changes
+  ---
+  duration_ms: 0.6085
+  type: 'test'
+  ...
+# Subtest: attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+ok 10 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+  ---
+  duration_ms: 3.989
+  type: 'test'
+  ...
+# Subtest: A/B permits only the selected feature and artifact identity differences
+ok 11 - A/B permits only the selected feature and artifact identity differences
+  ---
+  duration_ms: 1.1628
+  type: 'test'
+  ...
+# Subtest: raw A/B reports true medians and retains a slow outlier and observation timeout
+ok 12 - raw A/B reports true medians and retains a slow outlier and observation timeout
+  ---
+  duration_ms: 1.3806
+  type: 'test'
+  ...
+# Subtest: raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+ok 13 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+  ---
+  duration_ms: 5.7801
+  type: 'test'
+  ...
+# Subtest: different task/wall timing windows retain positive overhead without clamping or dropping the run
+ok 14 - different task/wall timing windows retain positive overhead without clamping or dropping the run
+  ---
+  duration_ms: 0.8652
+  type: 'test'
+  ...
+# Subtest: raw series verifies PCM and retains terminal device failures without counting them as speed passes
+ok 15 - raw series verifies PCM and retains terminal device failures without counting them as speed passes
+  ---
+  duration_ms: 1.7315
+  type: 'test'
+  ...
+# Subtest: raw series does not restart unknown/physical/missing observations or incorrect PCM
+ok 16 - raw series does not restart unknown/physical/missing observations or incorrect PCM
+  ---
+  duration_ms: 6.2056
+  type: 'test'
+  ...
+# Subtest: coefficients exactly match the original Xiph odd-divisor table
+ok 17 - coefficients exactly match the original Xiph odd-divisor table
+  ---
+  duration_ms: 2.0284
+  type: 'test'
+  ...
+# Subtest: helper CFG follows fallback branch over padding and rejects reachable garbage
+ok 18 - helper CFG follows fallback branch over padding and rejects reachable garbage
+  ---
+  duration_ms: 6.0625
+  type: 'test'
+  ...
+# Subtest: LX106 exact small division: boundaries, quotient edges and ABI
+ok 19 - LX106 exact small division: boundaries, quotient edges and ABI
+  ---
+  duration_ms: 4257.2118
+  type: 'test'
+  ...
+# Subtest: large/zero divisors retain original args and tail-call libgcc
+ok 20 - large/zero divisors retain original args and tail-call libgcc
+  ---
+  duration_ms: 0.4098
+  type: 'test'
+  ...
+# Subtest: only rng/ft sites change; ext division and other functions stay intact
+ok 21 - only rng/ft sites change; ext division and other functions stay intact
+  ---
+  duration_ms: 1.0597
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10378.0676

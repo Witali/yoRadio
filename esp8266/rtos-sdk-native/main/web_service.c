@@ -1343,9 +1343,25 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
         status.dram_before, status.dram_after, status.state_bytes, status.empty_task_us, status.error,
         YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT ? "true" : "false");
     esp_err_t result = httpd_resp_send_chunk(request, row, n);
+#if YORADIO_ESP8266_OPUS_DIVISION_BENCHMARK
+    /* Distinct schema: helper wall microseconds, never decoder CPU. */
+    n = snprintf(row, sizeof(row),
+        "],\"division_microbenchmark\":true,\"clock_hz\":1000000,\"warm\":%s,\"divisions\":[",
+        (status.run & 1U) ? "false" : "true");
+    if (result == ESP_OK) result = httpd_resp_send_chunk(request, row, n);
+#endif
     for (unsigned i = 0; result == ESP_OK && i < status.cases; ++i) {
         opus_benchmark_case_t item;
         opus_benchmark_case_snapshot(i, &item);
+#if YORADIO_ESP8266_OPUS_DIVISION_BENCHMARK
+        n = snprintf(row, sizeof(row),
+            "%s{\"id\":%u,\"calls\":%u,\"batches\":%u,\"reference_ticks\":%u,\"candidate_ticks\":%u,"
+            "\"reference_max\":%u,\"candidate_max\":%u,\"reference_hash\":%u,\"candidate_hash\":%u,"
+            "\"min_dram\":%u,\"stack_free_lifetime\":%u,\"error\":%d",
+            i ? "," : "", i, item.calls, item.batches, item.reference_ticks, item.candidate_ticks,
+            item.reference_max, item.candidate_max, item.reference_hash, item.candidate_hash,
+            item.min_dram, item.stack_free, item.error);
+#else
         n = snprintf(row, sizeof(row),
             "%s{\"id\":%u,\"packets\":%u,\"samples\":%u,\"wall_us\":%u,\"task_us\":%u,"
             "\"max_wall_us\":%u,\"pcm_hash\":%u,\"scratch_bytes\":%u,\"scratch_words\":%u,"
@@ -1353,6 +1369,7 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
             i ? "," : "", i, item.packets, item.samples, item.wall_us, item.task_us,
             item.max_wall_us, item.pcm_hash, item.scratch_bytes, item.scratch_words,
             item.min_dram, item.stack_free, item.error);
+#endif
         if (n < 0 || (size_t)n >= sizeof(row)) result = ESP_FAIL;
         else result = httpd_resp_send_chunk(request, row, n);
 #if YORADIO_OPUS_PROFILE_STAGE

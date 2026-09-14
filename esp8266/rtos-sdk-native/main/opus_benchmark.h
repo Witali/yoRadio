@@ -7,11 +7,20 @@
 #ifndef YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
 #define YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT 0
 #endif
+#ifndef YORADIO_ESP8266_OPUS_DIVISION_BENCHMARK
+#define YORADIO_ESP8266_OPUS_DIVISION_BENCHMARK 0
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 typedef struct {
+#if YORADIO_ESP8266_OPUS_DIVISION_BENCHMARK
+    /* Same 44 bytes as raw case; no extra persistent measurement RAM. */
+    uint32_t calls, batches, reference_ticks, candidate_ticks;
+    uint32_t reference_max, candidate_max, reference_hash, candidate_hash;
+    uint32_t min_dram, stack_free;
+#else
     uint32_t packets, samples, wall_us, task_us, max_wall_us, pcm_hash;
     uint32_t scratch_bytes, scratch_words, min_dram, stack_free;
 #if YORADIO_OPUS_PROFILE_STAGE
@@ -22,6 +31,7 @@ typedef struct {
     uint32_t output_wall_us, max_output_us, output_samples;
     uint32_t pipeline_wall_us, pipeline_task_us, dma_eofs, dma_misses;
     uint32_t fifo_empty_seen;
+#endif
 #endif
     int error;
 } opus_benchmark_case_t;
