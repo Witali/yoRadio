@@ -33,3 +33,53 @@ test('actual linked ASM exchange preserves graphs, ISR placement and RAM budget'
  const c=structuredClone(p.candidate);c.functions.ec_decode.graph[0]='ret';
  assert.throws(()=>checkPlacement(p.control,c));
 });
+
+test('extra relaxation audit preserves branches and compares full anonymous readonly data',()=>{
+ const {withoutIdentityMoves,stringAt,blockAt,audit}=require('../tools/esp8266_opus_asm/audit_entropy_relaxation.cjs');
+ assert.deepEqual(withoutIdentityMoves(['beqz a2, instruction:2','mov a1, a1','mov a3, a3','ret ']),['beqz a2, instruction:1','ret ']);
+ assert.deepEqual(withoutIdentityMoves(['mov a1, a2','ret ']),['mov a1, a2','ret ']);
+ assert.throws(()=>withoutIdentityMoves(['j instruction:1','mov a1, a1']));
+ const r=audit();assert.equal(r.passed,true);assert.equal(r.names.length,19);
+ const {sections}=require('../tools/esp8266_opus_asm/frozen_div.cjs');
+ const base=path.join(root,'.build/esp8266-opus-entropy-control-v1/yoradio_esp8266_helix_native');
+ const elf=fs.readFileSync(base+'.elf'),map=fs.readFileSync(base+'.map','utf8');
+ const tamper=addr=>{const b=Buffer.from(elf),s=sections(b).find(s=>s.type===1&&addr>=s.address&&addr<s.address+s.bytes);assert.ok(s);b[s.offset+addr-s.address]^=1;return b;};
+ const str=r.strings.find(s=>s.kind==='string'),data=r.strings.find(s=>s.kind==='rodata');assert.ok(str&&data);
+ assert.equal(stringAt(elf,str.from),str.bytes_hex_including_nul);
+ assert.notEqual(stringAt(tamper(str.from),str.from),str.bytes_hex_including_nul);
+ assert.equal(blockAt(elf,map,data.from).size,12);
+ assert.equal(blockAt(elf,map,data.from).bytes_hex,'060000000400000003000000');
+ assert.notDeepEqual(blockAt(tamper(data.from),map,data.from),blockAt(elf,map,data.from));
+ assert.equal(blockAt(elf,map,data.from+4),null,'Only entire input section may be compared');
+ assert.equal(stringAt(elf,0x40100000),null);
+});
+
+test('all thirty entropy-placement measurements and the rejected result remain reproducible',()=>{
+ const {hash}=require('../tools/esp8266_opus_asm/export.cjs');
+ const {compare}=require('../tools/esp8266_opus_profile/compare_raw.cjs');
+ const {selectHighBitrate}=require('../tools/esp8266_opus_asm/selection.cjs');
+ const {validateRun}=require('../tools/esp8266_opus_asm/report_small_div_tail.cjs');
+ const dir=path.join(root,'firmware/development/esp8266-opus-entropy-iram-v1');
+ const read=p=>JSON.parse(fs.readFileSync(p));
+ const r=read(path.join(dir,'comparison.json')),fixtures=read(path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures/manifest.json'));
+ const groups={};
+ for(const [n,sub]of [['before','controls/before'],['candidate','runs'],['after','controls/after']]){
+  assert.equal(fs.readdirSync(path.join(dir,sub)).filter(x=>/^run\d+\.json$/.test(x)).length,10);
+  const ota=read(path.join(dir,'ota-'+n+'.json'));assert.equal(ota.pass,true);
+  assert.equal(ota.sha256,r.proof.manifests[n==='candidate'?1:0].app_sha256.toLowerCase());
+  assert.equal(r.inputs[n].length,10);
+  groups[n]=r.inputs[n].map((p,i)=>{
+   const file=path.join(root,p.file);assert.equal(file,path.join(dir,sub,'run'+(i+1)+'.json'));
+   const bytes=fs.readFileSync(file);assert.equal(hash(bytes),p.sha256);
+   const v=JSON.parse(bytes);validateRun(v,fixtures,ota.after.app_address);return v;
+  });
+ }
+ assert.deepEqual(compare(groups.before,groups.candidate),r.initial);
+ assert.deepEqual(compare(groups.after,groups.candidate),r.repeated);
+ for(const n of ['initial','repeated']){
+  assert.deepEqual(selectHighBitrate(r[n].cases),r.selection[n]);
+  assert.equal(r.selection[n].accepted_for_experimental_asm,false);
+  assert.equal(r.selection[n].target_192_cpu_at_most_70,false);
+ }
+ assert.equal(r.proof.static_dram_delta,0);assert.equal(r.proof.static_iram_delta,-56);
+});
