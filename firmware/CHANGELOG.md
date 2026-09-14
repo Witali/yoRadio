@@ -3,6 +3,17 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus frozen-layout reload experiment
+
+- `development/esp8266-opus-frozen-reloads-control-v1/app.bin` and
+  `development/esp8266-opus-frozen-reloads-candidate-v1/app.bin`,903216 B each.
+  CPU160/QIO40, raw-RAM tell-inline parent; no production/default change.
+- Eight redundant private-stack L32I replaced by same-size MOV.N/OR.
+  Every other ELF byte/address, instruction count, RAM and stack unchanged.
+- Symbolic/linked proof, image XOR/SHA and six targeted tests pass;
+  parent host PCM through510 kbps/mixed exact. Physical A/B/A pending.
+  [Recipe, scope and checks](../docs/ESP8266_OPUS_ASM_FROZEN_RELOADS.md).
+
 ## Development - 2026-09-14: ESP8266 Opus ASM partition decoder-only (rejected)
 
 - `development/esp8266-opus-partition-decode-v1/app.bin`,902672 B; control
