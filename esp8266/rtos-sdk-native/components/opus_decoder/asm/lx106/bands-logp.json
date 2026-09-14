@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "candidate": "bands-logp-v1",
+  "base_manifest_sha256": "c98bc13abf082c51acf4a582f467ba94f256d2e45ae1e5ff6bf0e6ccdf8844dc",
+  "recipe_sha256_lf": "df7fa3ff3ef9c4540b51bab610c68e4e571295f077e8d3c4e293879d4c9c3666",
+  "parent_sha256_lf": "794eda0bf7c1b1c87b51f87c38691b5b7ba8edb40efcc979cac93adcb3cd8171",
+  "dependencies": {
+    "logp_prefix.inc.s": "0470513b35a1540bd8e6d263d3565b3431d6af001f8ab1d83d72b4ff5f86e541"
+  },
+  "files": [
+    {
+      "source": "upstream/celt/bands.c",
+      "overlay": "bands-tell-inline/upstream/celt/bands.c.s",
+      "overlay_sha256_lf": "dc3aca2b04ecfc63e4a9b3ab502a2559a88a2651a9b5b53fea272936255c2cf5"
+    },
+    {
+      "source": "upstream/celt/entcode.c",
+      "overlay": "bands-tell-inline/upstream/celt/entcode.c.s",
+      "overlay_sha256_lf": "5596f73af4f21afefed77288009aab8f346019d91249b35100166a166b13443a"
+    },
+    {
+      "source": "upstream/celt/entdec.c",
+      "overlay": "bands-logp/upstream/celt/entdec.c.s",
+      "overlay_sha256_lf": "15fec20e5d734b068a70e2a02c1fef7974db5a15d4cb820760039f2bc6732bd0",
+      "sections_before": {
+        ".literal.ec_dec_init": 12,
+        ".literal.ec_decode": 8,
+        ".literal.ec_decode_bin": 4,
+        ".literal.ec_dec_update": 8,
+        ".literal.ec_dec_bit_logp": 8,
+        ".literal.ec_dec_icdf": 16,
+        ".literal.ec_dec_icdf16": 8,
+        ".literal.ec_dec_uint": 24,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.ec_dec_init": 240,
+        ".text.ec_decode": 63,
+        ".text.ec_decode_bin": 63,
+        ".text.ec_dec_update": 171,
+        ".text.ec_dec_bit_logp": 172,
+        ".text.ec_dec_icdf": 235,
+        ".text.ec_dec_icdf16": 181,
+        ".text.ec_dec_uint": 564,
+        ".text.ec_dec_bits": 80,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 64,
+        ".xt.prop": 1236
+      },
+      "sections_after": {
+        ".literal.ec_dec_init": 12,
+        ".literal.ec_decode": 8,
+        ".literal.ec_decode_bin": 4,
+        ".literal.ec_dec_update": 8,
+        ".literal.ec_dec_bit_logp": 8,
+        ".literal.ec_dec_icdf": 16,
+        ".literal.ec_dec_icdf16": 8,
+        ".literal.ec_dec_uint": 24,
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.ec_dec_init": 240,
+        ".text.ec_decode": 63,
+        ".text.ec_decode_bin": 63,
+        ".text.ec_dec_update": 171,
+        ".text.ec_dec_bit_logp": 176,
+        ".text.ec_dec_icdf": 235,
+        ".text.ec_dec_icdf16": 181,
+        ".text.ec_dec_uint": 563,
+        ".text.ec_dec_bits": 80,
+        ".comment": 50,
+        ".xtensa.info": 56,
+        ".xt.lit": 64,
+        ".xt.prop": 1248
+      }
+    }
+  ],
+  "changed_function": "ec_dec_bit_logp",
+  "additional_static_ram_bytes": 0,
+  "stack_before_bytes": 16,
+  "stack_fast_bytes": 0,
+  "stack_cold_bytes": 16,
+  "physical_speed_measured": false
+}

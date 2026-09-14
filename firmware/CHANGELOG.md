@@ -3,6 +3,17 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus ASM bit_logp shrink-wrap (experiment)
+
+- `development/esp8266-opus-bands-logp-v1/app.bin`, 903232 B,
+  SHA256 `4d702c39ecb911d6d941059cb66323f72058bee0d03823cfbf62c7a9940b2b5d`.
+  Opt-in `bands-logp-asm` raw-RAM benchmark, not ordinary radio/default.
+- Shared entropy leaf delays its 16-byte frame to normalization; fast path
+  saves11 instructions, cold path count unchanged. No static RAM growth.
+  100000 instruction cases,58 Node PASS, exact host PCM through510 kbit/s.
+- Board A/B/A not yet complete; no speed/70% claim.
+  [Recipe and measurements](../docs/ESP8266_OPUS_ASM_LOGP.md).
+
 ## Development - 2026-09-14: ESP8266 Opus ASM inner-product unroll4 (rejected)
 
 - `development/esp8266-opus-bands-inner4-v1/app.bin`, 903280 B,
