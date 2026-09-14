@@ -50,9 +50,22 @@ function report(){
   before_192:previous.initial.cases[4].reference.task_budget_percent.median,
   after_192:previous.repeated.cases[4].reference.task_budget_percent.median,
   scope:'Historical same-profile best tell-inline reference; not an extra physical run in this frozen pair'};
+ const censusFile=path.join(root,'firmware/development/esp8266-opus-division-micro-v2/census/census.json');
+ const census=read(censusFile);assert.equal(census.passed,true);
+ assert.equal(census.manifest_sha256,hash(fs.readFileSync(path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures/manifest.json'))));
+ const attribution={source:path.relative(root,censusFile).replaceAll('\\','/'),sha256:hash(fs.readFileSync(censusFile)),
+  scope:'Total raw-decoder time difference divided by host operand count, including downstream cache effects. NOT an exclusive helper timer or measured cache-miss count.',
+  cases:initial.cases.map((c,i)=>{
+   const h=census.cases[i];assert.equal(h.name,c.name);
+   const rounds=groups.candidate[0].report.final.rounds,calls=h.calls*rounds;
+   assert.equal(h.samples*rounds,c.candidate.samples_per_run);
+   const extra=(c.candidate.task_budget_percent.median-c.reference.task_budget_percent.median)*c.candidate.samples_per_run/4.8;
+   return {name:c.name,host_calls_per_round:h.calls,rounds,calls_per_run:calls,extra_total_us:extra,extra_us_per_host_call:calls?extra/calls:null,
+    powers:h.powers,power_percent:h.calls?100*h.powers/h.calls:null,fallback:h.fallback};
+  })};
  const result={schema:1,scope:'Thirty frozen-layout raw A/B/A attempts. Paired ROM vs ASM identifies callee effect at these addresses, not cache misses or production qualification.',
   pair,initial,repeated,relative_pair_selection:{initial:selectHighBitrate(initial.cases),repeated:selectHighBitrate(repeated.cases)},
-  historical_best:anchor,
+  historical_best:anchor,attribution,
   candidate_beats_both_historical_192:initial.cases[4].candidate.task_budget_percent.median<Math.min(anchor.before_192,anchor.after_192),
   inputs:Object.fromEntries(Object.entries(groups).map(([k,rows])=>[k,rows.map(({report,...r})=>r)]))};
  fs.writeFileSync(path.join(dest,'comparison.json'),JSON.stringify(result,null,2)+'\n');

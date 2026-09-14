@@ -1,0 +1,2712 @@
+{
+  "schema": 1,
+  "scope": "Thirty frozen-layout raw A/B/A attempts. Paired ROM vs ASM identifies callee effect at these addresses, not cache misses or production qualification.",
+  "pair": {
+    "proof": {
+      "schema": 1,
+      "parent": "esp8266-opus-small-div-tail-v1",
+      "parent_manifest_sha256": "3ea43fb1a5bd3f6f41ad21b0c39535ec289ef05ce12786316a5acd7bda45bd15",
+      "recipe_sha256_lf": "c8cebaab34802067ee2899d33600d4f10ce7d2a8b584bd82b8bb2cc401104d8f",
+      "esptool_sha256": "3131baae8d94c76813c13798c33f42817f4a692b1d650c7b301849a139b7b503",
+      "scope": "Frozen-layout diagnostic only. All ELF bytes identical except one aligned literal target word; no RAM or instruction changes.",
+      "parent_elf_sha256": "54dd742d13718999430e733c4c070830e44b2e0183b7f03f1ba860ad18c675ad",
+      "rom_elf_sha256": "3a258149c133ae08fd559346ba8c2217c3f73d06fa04d8a174ee383081be04f5",
+      "elf_bytes": 7646524,
+      "literal": 1075910828,
+      "elf_offset": 39084,
+      "helper": 1076779116,
+      "rom": 1073799708,
+      "calls": [
+        {
+          "function": "ec_decode",
+          "instruction": 1076128111,
+          "literal": 1075910828,
+          "asm": [
+            "4024696f:\t2bcf01        \tl32r\ta0, 402118ac <_stext+0x189c>",
+            "40246972:\t0000c0        \tcallx0\ta0"
+          ]
+        },
+        {
+          "function": "ec_dec_uint",
+          "instruction": 1076128868,
+          "literal": 1075910828,
+          "asm": [
+            "40246c64:\t2b1201        \tl32r\ta0, 402118ac <_stext+0x189c>",
+            "40246c67:\t0000c0        \tcallx0\ta0"
+          ]
+        },
+        {
+          "function": "ec_dec_uint",
+          "instruction": 1076129174,
+          "literal": 1075910828,
+          "asm": [
+            "40246d96:\t2ac501        \tl32r\ta0, 402118ac <_stext+0x189c>",
+            "40246d99:\t0000c0        \tcallx0\ta0"
+          ]
+        }
+      ],
+      "sections": {
+        "asm": [
+          {
+            "nameOffset": 39,
+            "type": 1,
+            "flags": 6,
+            "address": 1074790400,
+            "offset": 8192,
+            "bytes": 128,
+            "name": ".iram0.vectors",
+            "sha256": "6a0af1141bd575d91c36a7a141719e12dc553c8d284cf8c7ef1c89d9cbdad216"
+          },
+          {
+            "nameOffset": 54,
+            "type": 1,
+            "flags": 6,
+            "address": 1074790528,
+            "offset": 8320,
+            "bytes": 22900,
+            "name": ".iram0.text",
+            "sha256": "3c6303410c72ddfe56c0ed37c14a38bc17c1685c6da2ae6f4e86a6635cdc0f4e"
+          },
+          {
+            "nameOffset": 66,
+            "type": 8,
+            "flags": 3,
+            "address": 1074813432,
+            "offset": 31220,
+            "bytes": 4044,
+            "name": ".iram0.bss",
+            "sha256": null
+          },
+          {
+            "nameOffset": 77,
+            "type": 1,
+            "flags": 3,
+            "address": 1073643520,
+            "offset": 4096,
+            "bytes": 1652,
+            "name": ".dram0.data",
+            "sha256": "dd804c652d5261c18a349f15809d83e802671fe59c1c89ceedd558558deaf717"
+          },
+          {
+            "nameOffset": 97,
+            "type": 8,
+            "flags": 3,
+            "address": 1073645184,
+            "offset": 5748,
+            "bytes": 18752,
+            "name": ".dram0.bss",
+            "sha256": null
+          },
+          {
+            "nameOffset": 108,
+            "type": 1,
+            "flags": 6,
+            "address": 1075904528,
+            "offset": 32784,
+            "bytes": 637234,
+            "name": ".flash.text",
+            "sha256": "a44177107804eca3fb70aae07a3cc857b1e75197ecce183907655d822d5257ff"
+          },
+          {
+            "nameOffset": 120,
+            "type": 1,
+            "flags": 7,
+            "address": 1076541764,
+            "offset": 670020,
+            "bytes": 241868,
+            "name": ".flash.rodata",
+            "sha256": "6103ccea9ebf16e99f0f8f3fa8bae9f82ad5c864f5e1d74f80442d759d8bb1ad"
+          }
+        ],
+        "rom": [
+          {
+            "nameOffset": 39,
+            "type": 1,
+            "flags": 6,
+            "address": 1074790400,
+            "offset": 8192,
+            "bytes": 128,
+            "name": ".iram0.vectors",
+            "sha256": "6a0af1141bd575d91c36a7a141719e12dc553c8d284cf8c7ef1c89d9cbdad216"
+          },
+          {
+            "nameOffset": 54,
+            "type": 1,
+            "flags": 6,
+            "address": 1074790528,
+            "offset": 8320,
+            "bytes": 22900,
+            "name": ".iram0.text",
+            "sha256": "3c6303410c72ddfe56c0ed37c14a38bc17c1685c6da2ae6f4e86a6635cdc0f4e"
+          },
+          {
+            "nameOffset": 66,
+            "type": 8,
+            "flags": 3,
+            "address": 1074813432,
+            "offset": 31220,
+            "bytes": 4044,
+            "name": ".iram0.bss",
+            "sha256": null
+          },
+          {
+            "nameOffset": 77,
+            "type": 1,
+            "flags": 3,
+            "address": 1073643520,
+            "offset": 4096,
+            "bytes": 1652,
+            "name": ".dram0.data",
+            "sha256": "dd804c652d5261c18a349f15809d83e802671fe59c1c89ceedd558558deaf717"
+          },
+          {
+            "nameOffset": 97,
+            "type": 8,
+            "flags": 3,
+            "address": 1073645184,
+            "offset": 5748,
+            "bytes": 18752,
+            "name": ".dram0.bss",
+            "sha256": null
+          },
+          {
+            "nameOffset": 108,
+            "type": 1,
+            "flags": 6,
+            "address": 1075904528,
+            "offset": 32784,
+            "bytes": 637234,
+            "name": ".flash.text",
+            "sha256": "baeffc5aa0d480e7f149cbcf41ad853ab7b836ae4cd228efb178d925853f5d89"
+          },
+          {
+            "nameOffset": 120,
+            "type": 1,
+            "flags": 7,
+            "address": 1076541764,
+            "offset": 670020,
+            "bytes": 241868,
+            "name": ".flash.rodata",
+            "sha256": "6103ccea9ebf16e99f0f8f3fa8bae9f82ad5c864f5e1d74f80442d759d8bb1ad"
+          }
+        ]
+      },
+      "imageProof": {
+        "literal_offset": 6316,
+        "changed_offsets": [
+          6316,
+          6317,
+          6318,
+          903839,
+          903840,
+          903841,
+          903842,
+          903843,
+          903844,
+          903845,
+          903846,
+          903847,
+          903848,
+          903849,
+          903850,
+          903851,
+          903852,
+          903853,
+          903854,
+          903855,
+          903856,
+          903857,
+          903858,
+          903859,
+          903860,
+          903861,
+          903862,
+          903863,
+          903864,
+          903865,
+          903866,
+          903867,
+          903868,
+          903869,
+          903870,
+          903871
+        ],
+        "reference": {
+          "header": "e90502205c1b2140",
+          "segments": [
+            {
+              "address": 1075904528,
+              "bytes": 637236,
+              "offset": 16,
+              "sha256": "a674b4cec5ca8dbc4eed5d1b581d313466171687f3127685818b9e8c785fcea3"
+            },
+            {
+              "address": 1076541764,
+              "bytes": 241860,
+              "offset": 637260,
+              "sha256": "2a22b135bc43c905d535497de0b2686c2a575da75f7aee47b1a0a3c107f6bc0c"
+            },
+            {
+              "address": 1073643520,
+              "bytes": 1652,
+              "offset": 879128,
+              "sha256": "dd804c652d5261c18a349f15809d83e802671fe59c1c89ceedd558558deaf717"
+            },
+            {
+              "address": 1074790400,
+              "bytes": 128,
+              "offset": 880788,
+              "sha256": "6a0af1141bd575d91c36a7a141719e12dc553c8d284cf8c7ef1c89d9cbdad216"
+            },
+            {
+              "address": 1074790528,
+              "bytes": 22900,
+              "offset": 880924,
+              "sha256": "3c6303410c72ddfe56c0ed37c14a38bc17c1685c6da2ae6f4e86a6635cdc0f4e"
+            }
+          ],
+          "checksumOffset": 903839,
+          "checksum": 237,
+          "sha256": "e6909d96c87ad3c282383f8e7c05e947d574c57e17af36100c57b433fffd7c86"
+        },
+        "candidate": {
+          "header": "e90502205c1b2140",
+          "segments": [
+            {
+              "address": 1075904528,
+              "bytes": 637236,
+              "offset": 16,
+              "sha256": "1ba7c482551b1d5ebd42bfd275ad942ff34a6369368a89addd05a808c8f4ad5f"
+            },
+            {
+              "address": 1076541764,
+              "bytes": 241860,
+              "offset": 637260,
+              "sha256": "2a22b135bc43c905d535497de0b2686c2a575da75f7aee47b1a0a3c107f6bc0c"
+            },
+            {
+              "address": 1073643520,
+              "bytes": 1652,
+              "offset": 879128,
+              "sha256": "dd804c652d5261c18a349f15809d83e802671fe59c1c89ceedd558558deaf717"
+            },
+            {
+              "address": 1074790400,
+              "bytes": 128,
+              "offset": 880788,
+              "sha256": "6a0af1141bd575d91c36a7a141719e12dc553c8d284cf8c7ef1c89d9cbdad216"
+            },
+            {
+              "address": 1074790528,
+              "bytes": 22900,
+              "offset": 880924,
+              "sha256": "3c6303410c72ddfe56c0ed37c14a38bc17c1685c6da2ae6f4e86a6635cdc0f4e"
+            }
+          ],
+          "checksumOffset": 903839,
+          "checksum": 9,
+          "sha256": "a13383fee3041bf4db9edce0a748ac5ae2c9e08dcedc41832a26f936b01ebd7b"
+        }
+      },
+      "static_ram_delta": 0,
+      "packaging": {
+        "chip": "esp8266",
+        "version": 3,
+        "header_mode": "dio",
+        "frequency": "40m",
+        "size": "4MB",
+        "sdk_config": "QIO40; SDK uses DIO image header then enables quad mode in bootloader",
+        "logs": {
+          "asm": "esptool.py v2.4.0\r\n",
+          "rom": "esptool.py v2.4.0\r\n"
+        }
+      }
+    },
+    "manifests": {
+      "rom": {
+        "purpose": "Frozen-layout rom entropy division diagnostic; not production; no flashing by generator",
+        "diagnostic": true,
+        "experimental_opus": true,
+        "opus_input_bytes": 1024,
+        "opus_scratch_bytes": 6144,
+        "opus_low_ram": false,
+        "opus_backend": "bands-small-div-tail-asm",
+        "opus_bands_small_div_manifest_sha256": null,
+        "opus_bands_small_div_tail_manifest_sha256": "9272A33542766F6E8C56C18975C30E3F7F5E271A6BECD7BD8604DBBC0F5D41D3",
+        "opus_bands_pvq_addx_manifest_sha256": null,
+        "opus_bands_logp_manifest_sha256": null,
+        "opus_bands_cache_reuse_manifest_sha256": null,
+        "opus_bands_inner4_manifest_sha256": null,
+        "opus_bands_text_literals": false,
+        "opus_bands_layout_manifest_sha256": null,
+        "opus_bands_tell_bits1_manifest_sha256": null,
+        "opus_bands_tell_update_manifest_sha256": null,
+        "opus_bands_tell_inline_manifest_sha256": null,
+        "opus_bands_fused_manifest_sha256": null,
+        "opus_bands_tell_intensity_manifest_sha256": null,
+        "opus_bands_update_fast_manifest_sha256": null,
+        "opus_bands_pulse_lookup_manifest_sha256": null,
+        "opus_bands_combined_manifest_sha256": null,
+        "opus_bands_blocks_manifest_sha256": null,
+        "opus_asm_manifest_sha256": "C98BC13ABF082C51ACF4A582F467BA94F256D2E45AE1E5FF6BF0E6CCDF8844DC",
+        "opus_asm_optimization_sha256": null,
+        "opus_plc_source_sha256": "5A11C53CACFE74D11B28C404954E2A4A572AF8266CE9CDE928641D1C6001D746",
+        "opus_lpc_source_sha256": "C401BBC518AF9E6E5A75165AE47F7A267C117B224E1D4B534032A5CDF5DA0D82",
+        "opus_memory_source_sha256": "C5376DF7CCF2ADBA2ACA7E439B0D9C8DB91EA3BE7828FF5857734BDC2438236C",
+        "opus_memory_header_sha256": "7128ADAEA06AF61948292513B8EBC2D70267552605EB694E5AAC5ED630ED4C1B",
+        "opus_benchmark": true,
+        "opus_benchmark_output": false,
+        "opus_division_benchmark": false,
+        "opus_division_source_sha256": null,
+        "opus_division_header_sha256": null,
+        "opus_benchmark_source_sha256": "4A59471656E78B9EB92121637975A528C4E628CFDC7A4D094D1AFA91967B7ADF",
+        "opus_benchmark_manifest_sha256": "41D5A368C567984C35492A2ACD96996365391C9DB6AD911BF5CA1883D578DF45",
+        "opus_benchmark_header_sha256": "CD3D55D30806BD143810CB6EC56E34DB69956C7CCB011F46F85AE2AAC5D65D7A",
+        "opus_stream_test": true,
+        "freertos_runtime_stats": true,
+        "opus_word_asm": true,
+        "opus_icdf_flash_word": true,
+        "opus_fir_flash_word": true,
+        "opus_pvq_iram": false,
+        "opus_function_profile": false,
+        "opus_function_profile_coarse": false,
+        "opus_pvq_iram_fragment_sha256": "7841399B480DFBE16C0721AE119886F4C46C7BFCAFA85832E5921C4C1B76DF28",
+        "opus_celt_decode_only": false,
+        "opus_rotation_lx106": false,
+        "opus_div_once": false,
+        "opus_pcm_publish": false,
+        "opus_pcm_leases": false,
+        "opus_pcm_queue": false,
+        "opus_pcm_stack_bytes": 0,
+        "opus_pcm_queue_source_sha256": "BF1D51B9D054333561527FBDBFFED6DFCB18E2DA8F7CF048A82EB1417F160E41",
+        "opus_pcm_queue_header_sha256": "94E13732F70DCD83F3AED5102E20962EE551908EEE8EA55115B5354F5E20A474",
+        "opus_mathops_header_sha256": "A4284A22310FBA4E4D4E9D93D11578CCF926E4838C8A3E1E2AEE1042DB0AC6F3",
+        "opus_rotation_source_sha256": "1350DAF8FDC898AB100D4EAE67B5BB2E383C5C2A63C2A4A2581764374A131AFA",
+        "opus_rotation_header_sha256": "1FAEF7726051EE2EAD5165FC10156A139F10EE4E76A79F5E5CBFC6EB00652978",
+        "opus_vq_source_sha256": "58631F21CA9B3E0B2C4B7BE0ACBB43943348127722967C30ED3E18F193321CCE",
+        "opus_rotation_implementation": "stride1-register-carry-v2",
+        "opus_celt_bands_sha256": "25DA7421ED192A70E221769D5B9C96F6A21C0B4636D797FB70BBC345E502AD7B",
+        "opus_profile_stage": 0,
+        "opus_fir_source_sha256": "79130539A0C667EC636FF27B2DF2192F66591670678D951A8CB81986C806D9EA",
+        "opus_fir_table_sha256": "9FE7D9CC3272DE9AE5BEC954A49A017A290D9DD99C3550DB1C2F2C2B85F95A95",
+        "opus_fir_helper_sha256": "377D39F22415606CC655E66FD446A46DD1E1221A0B3552AB58CF263F568598F4",
+        "pdm32_iram": true,
+        "pdm32_batch": true,
+        "pdm32_loan_words": 512,
+        "sdk_rx_diag": false,
+        "sdk_rx_diag_manifest_sha256": null,
+        "opus_max_packet_ms": 120,
+        "opus_max_coded_frame_ms": 20,
+        "opus_block_output": true,
+        "opus_adapter_sha256": "95813F214545BEA5A28975774285F709213ED9BF3B1D8398630E827429A1C9E7",
+        "opus_decoder_sha256": "969729EC70AC5DA83D7B14A775C522524F669222B345B808925664F87DC77B29",
+        "tone_test": false,
+        "web_profile": false,
+        "memory_profile": false,
+        "spiffs_log": false,
+        "spiffs_log_http": false,
+        "spiffs_cache": false,
+        "spiffs_write_cache": false,
+        "audio_level_led": true,
+        "audio_level_led_update_hz": 10,
+        "audio_level_led_max_brightness": 32,
+        "audio_gain_led_source_sha256": "2D9D24DE877CAFE24775F10BDDAC7C2A9127A1BAE2EE5BC2CCBC81D365B73779",
+        "audio_level_led_source_sha256": "D2B0DD644AEB586B01FBACD5AC7A3FDBD8D591240FF1CC9CDD0BCEBD3CFDCF41",
+        "spiffs_log_source_sha256": "C8B82E82E58699C25D363849617B9F332EF74494B401D35C677FAA9BAFB9FBDC",
+        "web_audio_pause": "off",
+        "log_level": "error",
+        "playlist_web_gzip": true,
+        "built_utc": "2026-09-14T10:59:35.7140321Z",
+        "source_revision": "144fe2b69e692ae94aeb42953a7a92cb881cfe13",
+        "app_sha256": "a13383fee3041bf4db9edce0a748ac5ae2c9e08dcedc41832a26f936b01ebd7b",
+        "bytes": 903872,
+        "app_address": "0x10000",
+        "config_sha256": "0ED337FF979A89A382D3FABCB0CED36BB243C006148CFBF159D0AD423396A4B5",
+        "output_source_sha256": "D6AB4AA8193AA0ED8B3F512735F369825168179521C81BB6A4576ACC1672E468",
+        "web_source_sha256": "2F30242A92EF39EF1C06055A6B2975B829AF3D53A3C85E3DD28EC50628894D5A",
+        "playlist_source_sha256": "6123659A5909FA24389943C9A34339ADDDB60721C134EB034D0F94C724E34943",
+        "audio_source_sha256": "5A48B70DE39E60DB2B212CD7370318D7BB2223E7D2E0A328AF4BE98E54C03696",
+        "web_audio_pause_source_sha256": "4FA574505BE30922ADD039C60244B5F58010611D5249E28B2C8389F3BF6647DF",
+        "stream_wait_source_sha256": "D4AF3379ABBEEDD928B067DCAA56C9EEBEC8E6CAC7D8BF16E47857EDBA9787C5",
+        "http_receive_source_sha256": "5EA6ED739A3DCB8DA0CDE5F76F160ED1C7833F3DB2ADD230F70260092951E5F7",
+        "stream_read_wait_ms": 0,
+        "stream_idle_timeout_ms": 1000,
+        "stream_input_bytes": 4096,
+        "stream_prefill_ms": 1000,
+        "codec_bridge_sha256": "A7CEA50378EFF9415FE03D9EED8186D6709A0255DE03C37AA1E0FC00A6086C2D",
+        "stream_input_sha256": "EE2A17651D9AF7181CB3034B1B27F747411D72BFD5E2AE4E72DAFDD325DDD590",
+        "stream_refill_sha256": "E77F3AB3FBBBA9827B601267FFE79A51E79AE7DC020B2AB6E63614C1389984AC",
+        "network_benchmark": false,
+        "cpu_mhz": 160,
+        "flash": "QIO40",
+        "output": "I2S PDM32 SLC-DMA",
+        "data_gpio": 3,
+        "dma_buffers": 2,
+        "dma_words_per_buffer": 512,
+        "dma_source_sha256": "4666E7FC0254535572941B428910A570FE1FD4B854450F307E53F73E4A3F7FEA",
+        "dma_header_sha256": "3A3064FB2DBF2B85B0DAD552999BBB3357A3D4451D215E16164B9315AEE9F622",
+        "pcm_rate": 48000,
+        "nominal_bit_rate_hz": 1536000,
+        "bit_rate_hz": 1538461,
+        "i2s": true,
+        "partition_layout": "app0/app1 960 KiB, SPIFFS 256 KiB; flash app only",
+        "post_link_division_target": "rom",
+        "post_link_recipe_sha256_lf": "c8cebaab34802067ee2899d33600d4f10ce7d2a8b584bd82b8bb2cc401104d8f",
+        "post_link_parent_app_sha256": "e6909d96c87ad3c282383f8e7c05e947d574c57e17af36100c57b433fffd7c86",
+        "post_link_parent_elf_sha256": "54dd742d13718999430e733c4c070830e44b2e0183b7f03f1ba860ad18c675ad",
+        "post_link_literal": 1075910828
+      },
+      "asm": {
+        "purpose": "Frozen-layout asm entropy division diagnostic; not production; no flashing by generator",
+        "diagnostic": true,
+        "experimental_opus": true,
+        "opus_input_bytes": 1024,
+        "opus_scratch_bytes": 6144,
+        "opus_low_ram": false,
+        "opus_backend": "bands-small-div-tail-asm",
+        "opus_bands_small_div_manifest_sha256": null,
+        "opus_bands_small_div_tail_manifest_sha256": "9272A33542766F6E8C56C18975C30E3F7F5E271A6BECD7BD8604DBBC0F5D41D3",
+        "opus_bands_pvq_addx_manifest_sha256": null,
+        "opus_bands_logp_manifest_sha256": null,
+        "opus_bands_cache_reuse_manifest_sha256": null,
+        "opus_bands_inner4_manifest_sha256": null,
+        "opus_bands_text_literals": false,
+        "opus_bands_layout_manifest_sha256": null,
+        "opus_bands_tell_bits1_manifest_sha256": null,
+        "opus_bands_tell_update_manifest_sha256": null,
+        "opus_bands_tell_inline_manifest_sha256": null,
+        "opus_bands_fused_manifest_sha256": null,
+        "opus_bands_tell_intensity_manifest_sha256": null,
+        "opus_bands_update_fast_manifest_sha256": null,
+        "opus_bands_pulse_lookup_manifest_sha256": null,
+        "opus_bands_combined_manifest_sha256": null,
+        "opus_bands_blocks_manifest_sha256": null,
+        "opus_asm_manifest_sha256": "C98BC13ABF082C51ACF4A582F467BA94F256D2E45AE1E5FF6BF0E6CCDF8844DC",
+        "opus_asm_optimization_sha256": null,
+        "opus_plc_source_sha256": "5A11C53CACFE74D11B28C404954E2A4A572AF8266CE9CDE928641D1C6001D746",
+        "opus_lpc_source_sha256": "C401BBC518AF9E6E5A75165AE47F7A267C117B224E1D4B534032A5CDF5DA0D82",
+        "opus_memory_source_sha256": "C5376DF7CCF2ADBA2ACA7E439B0D9C8DB91EA3BE7828FF5857734BDC2438236C",
+        "opus_memory_header_sha256": "7128ADAEA06AF61948292513B8EBC2D70267552605EB694E5AAC5ED630ED4C1B",
+        "opus_benchmark": true,
+        "opus_benchmark_output": false,
+        "opus_division_benchmark": false,
+        "opus_division_source_sha256": null,
+        "opus_division_header_sha256": null,
+        "opus_benchmark_source_sha256": "4A59471656E78B9EB92121637975A528C4E628CFDC7A4D094D1AFA91967B7ADF",
+        "opus_benchmark_manifest_sha256": "41D5A368C567984C35492A2ACD96996365391C9DB6AD911BF5CA1883D578DF45",
+        "opus_benchmark_header_sha256": "CD3D55D30806BD143810CB6EC56E34DB69956C7CCB011F46F85AE2AAC5D65D7A",
+        "opus_stream_test": true,
+        "freertos_runtime_stats": true,
+        "opus_word_asm": true,
+        "opus_icdf_flash_word": true,
+        "opus_fir_flash_word": true,
+        "opus_pvq_iram": false,
+        "opus_function_profile": false,
+        "opus_function_profile_coarse": false,
+        "opus_pvq_iram_fragment_sha256": "7841399B480DFBE16C0721AE119886F4C46C7BFCAFA85832E5921C4C1B76DF28",
+        "opus_celt_decode_only": false,
+        "opus_rotation_lx106": false,
+        "opus_div_once": false,
+        "opus_pcm_publish": false,
+        "opus_pcm_leases": false,
+        "opus_pcm_queue": false,
+        "opus_pcm_stack_bytes": 0,
+        "opus_pcm_queue_source_sha256": "BF1D51B9D054333561527FBDBFFED6DFCB18E2DA8F7CF048A82EB1417F160E41",
+        "opus_pcm_queue_header_sha256": "94E13732F70DCD83F3AED5102E20962EE551908EEE8EA55115B5354F5E20A474",
+        "opus_mathops_header_sha256": "A4284A22310FBA4E4D4E9D93D11578CCF926E4838C8A3E1E2AEE1042DB0AC6F3",
+        "opus_rotation_source_sha256": "1350DAF8FDC898AB100D4EAE67B5BB2E383C5C2A63C2A4A2581764374A131AFA",
+        "opus_rotation_header_sha256": "1FAEF7726051EE2EAD5165FC10156A139F10EE4E76A79F5E5CBFC6EB00652978",
+        "opus_vq_source_sha256": "58631F21CA9B3E0B2C4B7BE0ACBB43943348127722967C30ED3E18F193321CCE",
+        "opus_rotation_implementation": "stride1-register-carry-v2",
+        "opus_celt_bands_sha256": "25DA7421ED192A70E221769D5B9C96F6A21C0B4636D797FB70BBC345E502AD7B",
+        "opus_profile_stage": 0,
+        "opus_fir_source_sha256": "79130539A0C667EC636FF27B2DF2192F66591670678D951A8CB81986C806D9EA",
+        "opus_fir_table_sha256": "9FE7D9CC3272DE9AE5BEC954A49A017A290D9DD99C3550DB1C2F2C2B85F95A95",
+        "opus_fir_helper_sha256": "377D39F22415606CC655E66FD446A46DD1E1221A0B3552AB58CF263F568598F4",
+        "pdm32_iram": true,
+        "pdm32_batch": true,
+        "pdm32_loan_words": 512,
+        "sdk_rx_diag": false,
+        "sdk_rx_diag_manifest_sha256": null,
+        "opus_max_packet_ms": 120,
+        "opus_max_coded_frame_ms": 20,
+        "opus_block_output": true,
+        "opus_adapter_sha256": "95813F214545BEA5A28975774285F709213ED9BF3B1D8398630E827429A1C9E7",
+        "opus_decoder_sha256": "969729EC70AC5DA83D7B14A775C522524F669222B345B808925664F87DC77B29",
+        "tone_test": false,
+        "web_profile": false,
+        "memory_profile": false,
+        "spiffs_log": false,
+        "spiffs_log_http": false,
+        "spiffs_cache": false,
+        "spiffs_write_cache": false,
+        "audio_level_led": true,
+        "audio_level_led_update_hz": 10,
+        "audio_level_led_max_brightness": 32,
+        "audio_gain_led_source_sha256": "2D9D24DE877CAFE24775F10BDDAC7C2A9127A1BAE2EE5BC2CCBC81D365B73779",
+        "audio_level_led_source_sha256": "D2B0DD644AEB586B01FBACD5AC7A3FDBD8D591240FF1CC9CDD0BCEBD3CFDCF41",
+        "spiffs_log_source_sha256": "C8B82E82E58699C25D363849617B9F332EF74494B401D35C677FAA9BAFB9FBDC",
+        "web_audio_pause": "off",
+        "log_level": "error",
+        "playlist_web_gzip": true,
+        "built_utc": "2026-09-14T10:59:35.7140321Z",
+        "source_revision": "144fe2b69e692ae94aeb42953a7a92cb881cfe13",
+        "app_sha256": "e6909d96c87ad3c282383f8e7c05e947d574c57e17af36100c57b433fffd7c86",
+        "bytes": 903872,
+        "app_address": "0x10000",
+        "config_sha256": "0ED337FF979A89A382D3FABCB0CED36BB243C006148CFBF159D0AD423396A4B5",
+        "output_source_sha256": "D6AB4AA8193AA0ED8B3F512735F369825168179521C81BB6A4576ACC1672E468",
+        "web_source_sha256": "2F30242A92EF39EF1C06055A6B2975B829AF3D53A3C85E3DD28EC50628894D5A",
+        "playlist_source_sha256": "6123659A5909FA24389943C9A34339ADDDB60721C134EB034D0F94C724E34943",
+        "audio_source_sha256": "5A48B70DE39E60DB2B212CD7370318D7BB2223E7D2E0A328AF4BE98E54C03696",
+        "web_audio_pause_source_sha256": "4FA574505BE30922ADD039C60244B5F58010611D5249E28B2C8389F3BF6647DF",
+        "stream_wait_source_sha256": "D4AF3379ABBEEDD928B067DCAA56C9EEBEC8E6CAC7D8BF16E47857EDBA9787C5",
+        "http_receive_source_sha256": "5EA6ED739A3DCB8DA0CDE5F76F160ED1C7833F3DB2ADD230F70260092951E5F7",
+        "stream_read_wait_ms": 0,
+        "stream_idle_timeout_ms": 1000,
+        "stream_input_bytes": 4096,
+        "stream_prefill_ms": 1000,
+        "codec_bridge_sha256": "A7CEA50378EFF9415FE03D9EED8186D6709A0255DE03C37AA1E0FC00A6086C2D",
+        "stream_input_sha256": "EE2A17651D9AF7181CB3034B1B27F747411D72BFD5E2AE4E72DAFDD325DDD590",
+        "stream_refill_sha256": "E77F3AB3FBBBA9827B601267FFE79A51E79AE7DC020B2AB6E63614C1389984AC",
+        "network_benchmark": false,
+        "cpu_mhz": 160,
+        "flash": "QIO40",
+        "output": "I2S PDM32 SLC-DMA",
+        "data_gpio": 3,
+        "dma_buffers": 2,
+        "dma_words_per_buffer": 512,
+        "dma_source_sha256": "4666E7FC0254535572941B428910A570FE1FD4B854450F307E53F73E4A3F7FEA",
+        "dma_header_sha256": "3A3064FB2DBF2B85B0DAD552999BBB3357A3D4451D215E16164B9315AEE9F622",
+        "pcm_rate": 48000,
+        "nominal_bit_rate_hz": 1536000,
+        "bit_rate_hz": 1538461,
+        "i2s": true,
+        "partition_layout": "app0/app1 960 KiB, SPIFFS 256 KiB; flash app only",
+        "post_link_division_target": "asm",
+        "post_link_recipe_sha256_lf": "c8cebaab34802067ee2899d33600d4f10ce7d2a8b584bd82b8bb2cc401104d8f",
+        "post_link_parent_app_sha256": "e6909d96c87ad3c282383f8e7c05e947d574c57e17af36100c57b433fffd7c86",
+        "post_link_parent_elf_sha256": "54dd742d13718999430e733c4c070830e44b2e0183b7f03f1ba860ad18c675ad",
+        "post_link_literal": 1075910828
+      }
+    }
+  },
+  "initial": {
+    "schema_version": 1,
+    "passed": true,
+    "scope": "Raw decoder only. Task CPU includes charged ISR/instrumentation; Wi-Fi and WebUI remain enabled. No network audio, demux, normalization or PDM. Sequential A/B, not interleaved.",
+    "percent_definition": "CPU budget = task microseconds / decoded audio duration * 100. Above 100 cannot sustain realtime even without output.",
+    "reference": {
+      "runs": 10,
+      "timing_window_excesses": [
+        {
+          "run": 2,
+          "id": 0,
+          "task_us": 554394,
+          "wall_us": 554347,
+          "excess_us": 47,
+          "empty_task_us": 57,
+          "packets": 120
+        }
+      ],
+      "observation_errors": [],
+      "dram_after": {
+        "min": 26116,
+        "median": 26476,
+        "mean": 26492.8,
+        "p95": 26652,
+        "max": 26652
+      },
+      "cases": [
+        {
+          "id": 0,
+          "name": "mono-12",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 898651720,
+          "scratch_bytes": 1808,
+          "scratch_words": 14112,
+          "task_budget_percent": {
+            "min": 23.099749999999997,
+            "median": 23.126041666666666,
+            "mean": 23.128483333333328,
+            "p95": 23.16358333333333,
+            "max": 23.16358333333333
+          },
+          "wall_budget_percent": {
+            "min": 23.097791666666666,
+            "median": 23.229895833333334,
+            "mean": 23.256491666666665,
+            "p95": 23.449083333333334,
+            "max": 23.449083333333334
+          },
+          "maximum_call_us": {
+            "min": 6669,
+            "median": 6689.5,
+            "mean": 6969.3,
+            "p95": 8370,
+            "max": 8370
+          },
+          "min_dram": {
+            "min": 8168,
+            "median": 9032,
+            "mean": 8976.4,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        {
+          "id": 1,
+          "name": "mono-24",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 3216561658,
+          "scratch_bytes": 2904,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 54.92604166666667,
+            "median": 54.94295833333333,
+            "mean": 54.949225,
+            "p95": 54.9835,
+            "max": 54.9835
+          },
+          "wall_budget_percent": {
+            "min": 55.6525,
+            "median": 55.796729166666665,
+            "mean": 55.8383625,
+            "p95": 56.12916666666667,
+            "max": 56.12916666666667
+          },
+          "maximum_call_us": {
+            "min": 12776,
+            "median": 13659,
+            "mean": 13815.9,
+            "p95": 15857,
+            "max": 15857
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9712,
+            "mean": 9693.6,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1666.4,
+            "p95": 1724,
+            "max": 1724
+          }
+        },
+        {
+          "id": 2,
+          "name": "stereo-64",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 2337883435,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 65.91,
+            "median": 65.96033333333332,
+            "mean": 65.95757916666666,
+            "p95": 66.01558333333332,
+            "max": 66.01558333333332
+          },
+          "wall_budget_percent": {
+            "min": 66.80458333333333,
+            "median": 67.09985416666666,
+            "mean": 67.07162916666667,
+            "p95": 67.25058333333332,
+            "max": 67.25058333333332
+          },
+          "maximum_call_us": {
+            "min": 16228,
+            "median": 17021,
+            "mean": 17059.7,
+            "p95": 18424,
+            "max": 18424
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9712,
+            "mean": 9693.6,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1666.4,
+            "p95": 1724,
+            "max": 1724
+          }
+        },
+        {
+          "id": 3,
+          "name": "stereo-128",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1528306318,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 79.12625,
+            "median": 79.15335416666666,
+            "mean": 79.17242916666667,
+            "p95": 79.27083333333333,
+            "max": 79.27083333333333
+          },
+          "wall_budget_percent": {
+            "min": 80.295875,
+            "median": 80.56510416666667,
+            "mean": 80.56297916666666,
+            "p95": 80.91758333333333,
+            "max": 80.91758333333333
+          },
+          "maximum_call_us": {
+            "min": 18896,
+            "median": 19958,
+            "mean": 20470.5,
+            "p95": 25392,
+            "max": 25392
+          },
+          "min_dram": {
+            "min": 9616,
+            "median": 9766,
+            "mean": 9722,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        {
+          "id": 4,
+          "name": "stereo-192",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1717014079,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 91.13708333333334,
+            "median": 91.20160416666667,
+            "mean": 91.20033333333333,
+            "p95": 91.25375,
+            "max": 91.25375
+          },
+          "wall_budget_percent": {
+            "min": 92.48724999999999,
+            "median": 92.64458333333333,
+            "mean": 92.66806666666666,
+            "p95": 92.88829166666666,
+            "max": 92.88829166666666
+          },
+          "maximum_call_us": {
+            "min": 21304,
+            "median": 22469.5,
+            "mean": 22219.9,
+            "p95": 23076,
+            "max": 23076
+          },
+          "min_dram": {
+            "min": 9616,
+            "median": 9976,
+            "mean": 9992.8,
+            "p95": 10152,
+            "max": 10152
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        }
+      ]
+    },
+    "candidate": {
+      "runs": 10,
+      "timing_window_excesses": [
+        {
+          "run": 6,
+          "id": 0,
+          "task_us": 554223,
+          "wall_us": 552246,
+          "excess_us": 1977,
+          "empty_task_us": 55,
+          "packets": 120
+        }
+      ],
+      "observation_errors": [],
+      "dram_after": {
+        "min": 26300,
+        "median": 26476,
+        "mean": 26440.8,
+        "p95": 26828,
+        "max": 26828
+      },
+      "cases": [
+        {
+          "id": 0,
+          "name": "mono-12",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 898651720,
+          "scratch_bytes": 1808,
+          "scratch_words": 14112,
+          "task_budget_percent": {
+            "min": 23.092624999999998,
+            "median": 23.117375,
+            "mean": 23.122366666666665,
+            "p95": 23.187291666666667,
+            "max": 23.187291666666667
+          },
+          "wall_budget_percent": {
+            "min": 23.01025,
+            "median": 23.214916666666667,
+            "mean": 23.224895833333328,
+            "p95": 23.511125,
+            "max": 23.511125
+          },
+          "maximum_call_us": {
+            "min": 6019,
+            "median": 6775.5,
+            "mean": 6875.6,
+            "p95": 7803,
+            "max": 7803
+          },
+          "min_dram": {
+            "min": 8168,
+            "median": 9208,
+            "mean": 9018.8,
+            "p95": 9624,
+            "max": 9624
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        {
+          "id": 1,
+          "name": "mono-24",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 3216561658,
+          "scratch_bytes": 2904,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 55.401625,
+            "median": 55.421416666666666,
+            "mean": 55.42573749999999,
+            "p95": 55.46033333333333,
+            "max": 55.46033333333333
+          },
+          "wall_budget_percent": {
+            "min": 56.03125,
+            "median": 56.31295833333333,
+            "mean": 56.328483333333324,
+            "p95": 56.617333333333335,
+            "max": 56.617333333333335
+          },
+          "maximum_call_us": {
+            "min": 12904,
+            "median": 13853,
+            "mean": 13744.1,
+            "p95": 14463,
+            "max": 14463
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9603.6,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        {
+          "id": 2,
+          "name": "stereo-64",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 2337883435,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 69.06195833333334,
+            "median": 69.09945833333333,
+            "mean": 69.10004166666667,
+            "p95": 69.17383333333333,
+            "max": 69.17383333333333
+          },
+          "wall_budget_percent": {
+            "min": 69.98270833333333,
+            "median": 70.1600625,
+            "mean": 70.13488750000002,
+            "p95": 70.268625,
+            "max": 70.268625
+          },
+          "maximum_call_us": {
+            "min": 16716,
+            "median": 17523.5,
+            "mean": 17650.3,
+            "p95": 18848,
+            "max": 18848
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9588.8,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        {
+          "id": 3,
+          "name": "stereo-128",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1528306318,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 86.78037499999999,
+            "median": 86.81841666666666,
+            "mean": 86.82190833333333,
+            "p95": 86.86545833333332,
+            "max": 86.86545833333332
+          },
+          "wall_budget_percent": {
+            "min": 88.08083333333333,
+            "median": 88.18591666666666,
+            "mean": 88.24580416666666,
+            "p95": 88.498125,
+            "max": 88.498125
+          },
+          "maximum_call_us": {
+            "min": 20421,
+            "median": 21234,
+            "mean": 21273.3,
+            "p95": 22255,
+            "max": 22255
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9618.4,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        {
+          "id": 4,
+          "name": "stereo-192",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1717014079,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 103.57379166666665,
+            "median": 103.61966666666666,
+            "mean": 103.62779166666667,
+            "p95": 103.76904166666667,
+            "max": 103.76904166666667
+          },
+          "wall_budget_percent": {
+            "min": 105.24345833333334,
+            "median": 105.35202083333334,
+            "mean": 105.40687500000001,
+            "p95": 105.83520833333333,
+            "max": 105.83520833333333
+          },
+          "maximum_call_us": {
+            "min": 23508,
+            "median": 24120,
+            "mean": 24199.8,
+            "p95": 25191,
+            "max": 25191
+          },
+          "min_dram": {
+            "min": 9800,
+            "median": 9976,
+            "mean": 9905.6,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        }
+      ]
+    },
+    "cases": [
+      {
+        "name": "mono-12",
+        "reference": {
+          "id": 0,
+          "name": "mono-12",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 898651720,
+          "scratch_bytes": 1808,
+          "scratch_words": 14112,
+          "task_budget_percent": {
+            "min": 23.099749999999997,
+            "median": 23.126041666666666,
+            "mean": 23.128483333333328,
+            "p95": 23.16358333333333,
+            "max": 23.16358333333333
+          },
+          "wall_budget_percent": {
+            "min": 23.097791666666666,
+            "median": 23.229895833333334,
+            "mean": 23.256491666666665,
+            "p95": 23.449083333333334,
+            "max": 23.449083333333334
+          },
+          "maximum_call_us": {
+            "min": 6669,
+            "median": 6689.5,
+            "mean": 6969.3,
+            "p95": 8370,
+            "max": 8370
+          },
+          "min_dram": {
+            "min": 8168,
+            "median": 9032,
+            "mean": 8976.4,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        "candidate": {
+          "id": 0,
+          "name": "mono-12",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 898651720,
+          "scratch_bytes": 1808,
+          "scratch_words": 14112,
+          "task_budget_percent": {
+            "min": 23.092624999999998,
+            "median": 23.117375,
+            "mean": 23.122366666666665,
+            "p95": 23.187291666666667,
+            "max": 23.187291666666667
+          },
+          "wall_budget_percent": {
+            "min": 23.01025,
+            "median": 23.214916666666667,
+            "mean": 23.224895833333328,
+            "p95": 23.511125,
+            "max": 23.511125
+          },
+          "maximum_call_us": {
+            "min": 6019,
+            "median": 6775.5,
+            "mean": 6875.6,
+            "p95": 7803,
+            "max": 7803
+          },
+          "min_dram": {
+            "min": 8168,
+            "median": 9208,
+            "mean": 9018.8,
+            "p95": 9624,
+            "max": 9624
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        "median_task_reduction_percent": 0.0374757893788602
+      },
+      {
+        "name": "mono-24",
+        "reference": {
+          "id": 1,
+          "name": "mono-24",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 3216561658,
+          "scratch_bytes": 2904,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 54.92604166666667,
+            "median": 54.94295833333333,
+            "mean": 54.949225,
+            "p95": 54.9835,
+            "max": 54.9835
+          },
+          "wall_budget_percent": {
+            "min": 55.6525,
+            "median": 55.796729166666665,
+            "mean": 55.8383625,
+            "p95": 56.12916666666667,
+            "max": 56.12916666666667
+          },
+          "maximum_call_us": {
+            "min": 12776,
+            "median": 13659,
+            "mean": 13815.9,
+            "p95": 15857,
+            "max": 15857
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9712,
+            "mean": 9693.6,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1666.4,
+            "p95": 1724,
+            "max": 1724
+          }
+        },
+        "candidate": {
+          "id": 1,
+          "name": "mono-24",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 3216561658,
+          "scratch_bytes": 2904,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 55.401625,
+            "median": 55.421416666666666,
+            "mean": 55.42573749999999,
+            "p95": 55.46033333333333,
+            "max": 55.46033333333333
+          },
+          "wall_budget_percent": {
+            "min": 56.03125,
+            "median": 56.31295833333333,
+            "mean": 56.328483333333324,
+            "p95": 56.617333333333335,
+            "max": 56.617333333333335
+          },
+          "maximum_call_us": {
+            "min": 12904,
+            "median": 13853,
+            "mean": 13744.1,
+            "p95": 14463,
+            "max": 14463
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9603.6,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        "median_task_reduction_percent": -0.8708273959887158
+      },
+      {
+        "name": "stereo-64",
+        "reference": {
+          "id": 2,
+          "name": "stereo-64",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 2337883435,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 65.91,
+            "median": 65.96033333333332,
+            "mean": 65.95757916666666,
+            "p95": 66.01558333333332,
+            "max": 66.01558333333332
+          },
+          "wall_budget_percent": {
+            "min": 66.80458333333333,
+            "median": 67.09985416666666,
+            "mean": 67.07162916666667,
+            "p95": 67.25058333333332,
+            "max": 67.25058333333332
+          },
+          "maximum_call_us": {
+            "min": 16228,
+            "median": 17021,
+            "mean": 17059.7,
+            "p95": 18424,
+            "max": 18424
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9712,
+            "mean": 9693.6,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1666.4,
+            "p95": 1724,
+            "max": 1724
+          }
+        },
+        "candidate": {
+          "id": 2,
+          "name": "stereo-64",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 2337883435,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 69.06195833333334,
+            "median": 69.09945833333333,
+            "mean": 69.10004166666667,
+            "p95": 69.17383333333333,
+            "max": 69.17383333333333
+          },
+          "wall_budget_percent": {
+            "min": 69.98270833333333,
+            "median": 70.1600625,
+            "mean": 70.13488750000002,
+            "p95": 70.268625,
+            "max": 70.268625
+          },
+          "maximum_call_us": {
+            "min": 16716,
+            "median": 17523.5,
+            "mean": 17650.3,
+            "p95": 18848,
+            "max": 18848
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9588.8,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "median_task_reduction_percent": -4.759110273346123
+      },
+      {
+        "name": "stereo-128",
+        "reference": {
+          "id": 3,
+          "name": "stereo-128",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1528306318,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 79.12625,
+            "median": 79.15335416666666,
+            "mean": 79.17242916666667,
+            "p95": 79.27083333333333,
+            "max": 79.27083333333333
+          },
+          "wall_budget_percent": {
+            "min": 80.295875,
+            "median": 80.56510416666667,
+            "mean": 80.56297916666666,
+            "p95": 80.91758333333333,
+            "max": 80.91758333333333
+          },
+          "maximum_call_us": {
+            "min": 18896,
+            "median": 19958,
+            "mean": 20470.5,
+            "p95": 25392,
+            "max": 25392
+          },
+          "min_dram": {
+            "min": 9616,
+            "median": 9766,
+            "mean": 9722,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "candidate": {
+          "id": 3,
+          "name": "stereo-128",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1528306318,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 86.78037499999999,
+            "median": 86.81841666666666,
+            "mean": 86.82190833333333,
+            "p95": 86.86545833333332,
+            "max": 86.86545833333332
+          },
+          "wall_budget_percent": {
+            "min": 88.08083333333333,
+            "median": 88.18591666666666,
+            "mean": 88.24580416666666,
+            "p95": 88.498125,
+            "max": 88.498125
+          },
+          "maximum_call_us": {
+            "min": 20421,
+            "median": 21234,
+            "mean": 21273.3,
+            "p95": 22255,
+            "max": 22255
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9618.4,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "median_task_reduction_percent": -9.683812620069542
+      },
+      {
+        "name": "stereo-192",
+        "reference": {
+          "id": 4,
+          "name": "stereo-192",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1717014079,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 91.13708333333334,
+            "median": 91.20160416666667,
+            "mean": 91.20033333333333,
+            "p95": 91.25375,
+            "max": 91.25375
+          },
+          "wall_budget_percent": {
+            "min": 92.48724999999999,
+            "median": 92.64458333333333,
+            "mean": 92.66806666666666,
+            "p95": 92.88829166666666,
+            "max": 92.88829166666666
+          },
+          "maximum_call_us": {
+            "min": 21304,
+            "median": 22469.5,
+            "mean": 22219.9,
+            "p95": 23076,
+            "max": 23076
+          },
+          "min_dram": {
+            "min": 9616,
+            "median": 9976,
+            "mean": 9992.8,
+            "p95": 10152,
+            "max": 10152
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "candidate": {
+          "id": 4,
+          "name": "stereo-192",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1717014079,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 103.57379166666665,
+            "median": 103.61966666666666,
+            "mean": 103.62779166666667,
+            "p95": 103.76904166666667,
+            "max": 103.76904166666667
+          },
+          "wall_budget_percent": {
+            "min": 105.24345833333334,
+            "median": 105.35202083333334,
+            "mean": 105.40687500000001,
+            "p95": 105.83520833333333,
+            "max": 105.83520833333333
+          },
+          "maximum_call_us": {
+            "min": 23508,
+            "median": 24120,
+            "mean": 24199.8,
+            "p95": 25191,
+            "max": 25191
+          },
+          "min_dram": {
+            "min": 9800,
+            "median": 9976,
+            "mean": 9905.6,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "median_task_reduction_percent": -13.616057100603808
+      }
+    ]
+  },
+  "repeated": {
+    "schema_version": 1,
+    "passed": true,
+    "scope": "Raw decoder only. Task CPU includes charged ISR/instrumentation; Wi-Fi and WebUI remain enabled. No network audio, demux, normalization or PDM. Sequential A/B, not interleaved.",
+    "percent_definition": "CPU budget = task microseconds / decoded audio duration * 100. Above 100 cannot sustain realtime even without output.",
+    "reference": {
+      "runs": 10,
+      "timing_window_excesses": [],
+      "observation_errors": [],
+      "dram_after": {
+        "min": 26300,
+        "median": 26392,
+        "mean": 26424,
+        "p95": 26652,
+        "max": 26652
+      },
+      "cases": [
+        {
+          "id": 0,
+          "name": "mono-12",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 898651720,
+          "scratch_bytes": 1808,
+          "scratch_words": 14112,
+          "task_budget_percent": {
+            "min": 23.107833333333332,
+            "median": 23.131375,
+            "mean": 23.1361125,
+            "p95": 23.169749999999997,
+            "max": 23.169749999999997
+          },
+          "wall_budget_percent": {
+            "min": 23.127,
+            "median": 23.257958333333335,
+            "mean": 23.287466666666667,
+            "p95": 23.569499999999998,
+            "max": 23.569499999999998
+          },
+          "maximum_call_us": {
+            "min": 6665,
+            "median": 6897,
+            "mean": 7195.4,
+            "p95": 8962,
+            "max": 8962
+          },
+          "min_dram": {
+            "min": 8852,
+            "median": 9536,
+            "mean": 9429.2,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        {
+          "id": 1,
+          "name": "mono-24",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 3216561658,
+          "scratch_bytes": 2904,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 54.921625,
+            "median": 54.966270833333326,
+            "mean": 54.96613749999999,
+            "p95": 55.032374999999995,
+            "max": 55.032374999999995
+          },
+          "wall_budget_percent": {
+            "min": 55.680499999999995,
+            "median": 55.93189583333333,
+            "mean": 55.9306375,
+            "p95": 56.25825,
+            "max": 56.25825
+          },
+          "maximum_call_us": {
+            "min": 13605,
+            "median": 14054,
+            "mean": 14262.5,
+            "p95": 15165,
+            "max": 15165
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9607.2,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1666.4,
+            "p95": 1724,
+            "max": 1724
+          }
+        },
+        {
+          "id": 2,
+          "name": "stereo-64",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 2337883435,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 65.89608333333334,
+            "median": 65.964,
+            "mean": 65.97249166666667,
+            "p95": 66.10220833333332,
+            "max": 66.10220833333332
+          },
+          "wall_budget_percent": {
+            "min": 66.64125,
+            "median": 66.97733333333332,
+            "mean": 67.0514625,
+            "p95": 67.59174999999999,
+            "max": 67.59174999999999
+          },
+          "maximum_call_us": {
+            "min": 15958,
+            "median": 16529.5,
+            "mean": 16814.9,
+            "p95": 18359,
+            "max": 18359
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9607.2,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        {
+          "id": 3,
+          "name": "stereo-128",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1528306318,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 79.08958333333334,
+            "median": 79.163,
+            "mean": 79.16007083333334,
+            "p95": 79.25774999999999,
+            "max": 79.25774999999999
+          },
+          "wall_budget_percent": {
+            "min": 80.30879166666665,
+            "median": 80.50458333333333,
+            "mean": 80.56034583333333,
+            "p95": 81.01220833333333,
+            "max": 81.01220833333333
+          },
+          "maximum_call_us": {
+            "min": 18519,
+            "median": 19359,
+            "mean": 19632.4,
+            "p95": 21531,
+            "max": 21531
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9752,
+            "mean": 9680,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        {
+          "id": 4,
+          "name": "stereo-192",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1717014079,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 91.15950000000001,
+            "median": 91.18904166666667,
+            "mean": 91.21141666666668,
+            "p95": 91.29433333333333,
+            "max": 91.29433333333333
+          },
+          "wall_budget_percent": {
+            "min": 92.575375,
+            "median": 92.66004166666667,
+            "mean": 92.718375,
+            "p95": 93.15433333333333,
+            "max": 93.15433333333333
+          },
+          "maximum_call_us": {
+            "min": 21370,
+            "median": 22525.5,
+            "mean": 22241.4,
+            "p95": 23056,
+            "max": 23056
+          },
+          "min_dram": {
+            "min": 9800,
+            "median": 9892,
+            "mean": 9924,
+            "p95": 10152,
+            "max": 10152
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        }
+      ]
+    },
+    "candidate": {
+      "runs": 10,
+      "timing_window_excesses": [
+        {
+          "run": 6,
+          "id": 0,
+          "task_us": 554223,
+          "wall_us": 552246,
+          "excess_us": 1977,
+          "empty_task_us": 55,
+          "packets": 120
+        }
+      ],
+      "observation_errors": [],
+      "dram_after": {
+        "min": 26300,
+        "median": 26476,
+        "mean": 26440.8,
+        "p95": 26828,
+        "max": 26828
+      },
+      "cases": [
+        {
+          "id": 0,
+          "name": "mono-12",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 898651720,
+          "scratch_bytes": 1808,
+          "scratch_words": 14112,
+          "task_budget_percent": {
+            "min": 23.092624999999998,
+            "median": 23.117375,
+            "mean": 23.122366666666665,
+            "p95": 23.187291666666667,
+            "max": 23.187291666666667
+          },
+          "wall_budget_percent": {
+            "min": 23.01025,
+            "median": 23.214916666666667,
+            "mean": 23.224895833333328,
+            "p95": 23.511125,
+            "max": 23.511125
+          },
+          "maximum_call_us": {
+            "min": 6019,
+            "median": 6775.5,
+            "mean": 6875.6,
+            "p95": 7803,
+            "max": 7803
+          },
+          "min_dram": {
+            "min": 8168,
+            "median": 9208,
+            "mean": 9018.8,
+            "p95": 9624,
+            "max": 9624
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        {
+          "id": 1,
+          "name": "mono-24",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 3216561658,
+          "scratch_bytes": 2904,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 55.401625,
+            "median": 55.421416666666666,
+            "mean": 55.42573749999999,
+            "p95": 55.46033333333333,
+            "max": 55.46033333333333
+          },
+          "wall_budget_percent": {
+            "min": 56.03125,
+            "median": 56.31295833333333,
+            "mean": 56.328483333333324,
+            "p95": 56.617333333333335,
+            "max": 56.617333333333335
+          },
+          "maximum_call_us": {
+            "min": 12904,
+            "median": 13853,
+            "mean": 13744.1,
+            "p95": 14463,
+            "max": 14463
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9603.6,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        {
+          "id": 2,
+          "name": "stereo-64",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 2337883435,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 69.06195833333334,
+            "median": 69.09945833333333,
+            "mean": 69.10004166666667,
+            "p95": 69.17383333333333,
+            "max": 69.17383333333333
+          },
+          "wall_budget_percent": {
+            "min": 69.98270833333333,
+            "median": 70.1600625,
+            "mean": 70.13488750000002,
+            "p95": 70.268625,
+            "max": 70.268625
+          },
+          "maximum_call_us": {
+            "min": 16716,
+            "median": 17523.5,
+            "mean": 17650.3,
+            "p95": 18848,
+            "max": 18848
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9588.8,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        {
+          "id": 3,
+          "name": "stereo-128",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1528306318,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 86.78037499999999,
+            "median": 86.81841666666666,
+            "mean": 86.82190833333333,
+            "p95": 86.86545833333332,
+            "max": 86.86545833333332
+          },
+          "wall_budget_percent": {
+            "min": 88.08083333333333,
+            "median": 88.18591666666666,
+            "mean": 88.24580416666666,
+            "p95": 88.498125,
+            "max": 88.498125
+          },
+          "maximum_call_us": {
+            "min": 20421,
+            "median": 21234,
+            "mean": 21273.3,
+            "p95": 22255,
+            "max": 22255
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9618.4,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        {
+          "id": 4,
+          "name": "stereo-192",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1717014079,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 103.57379166666665,
+            "median": 103.61966666666666,
+            "mean": 103.62779166666667,
+            "p95": 103.76904166666667,
+            "max": 103.76904166666667
+          },
+          "wall_budget_percent": {
+            "min": 105.24345833333334,
+            "median": 105.35202083333334,
+            "mean": 105.40687500000001,
+            "p95": 105.83520833333333,
+            "max": 105.83520833333333
+          },
+          "maximum_call_us": {
+            "min": 23508,
+            "median": 24120,
+            "mean": 24199.8,
+            "p95": 25191,
+            "max": 25191
+          },
+          "min_dram": {
+            "min": 9800,
+            "median": 9976,
+            "mean": 9905.6,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        }
+      ]
+    },
+    "cases": [
+      {
+        "name": "mono-12",
+        "reference": {
+          "id": 0,
+          "name": "mono-12",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 898651720,
+          "scratch_bytes": 1808,
+          "scratch_words": 14112,
+          "task_budget_percent": {
+            "min": 23.107833333333332,
+            "median": 23.131375,
+            "mean": 23.1361125,
+            "p95": 23.169749999999997,
+            "max": 23.169749999999997
+          },
+          "wall_budget_percent": {
+            "min": 23.127,
+            "median": 23.257958333333335,
+            "mean": 23.287466666666667,
+            "p95": 23.569499999999998,
+            "max": 23.569499999999998
+          },
+          "maximum_call_us": {
+            "min": 6665,
+            "median": 6897,
+            "mean": 7195.4,
+            "p95": 8962,
+            "max": 8962
+          },
+          "min_dram": {
+            "min": 8852,
+            "median": 9536,
+            "mean": 9429.2,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        "candidate": {
+          "id": 0,
+          "name": "mono-12",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 898651720,
+          "scratch_bytes": 1808,
+          "scratch_words": 14112,
+          "task_budget_percent": {
+            "min": 23.092624999999998,
+            "median": 23.117375,
+            "mean": 23.122366666666665,
+            "p95": 23.187291666666667,
+            "max": 23.187291666666667
+          },
+          "wall_budget_percent": {
+            "min": 23.01025,
+            "median": 23.214916666666667,
+            "mean": 23.224895833333328,
+            "p95": 23.511125,
+            "max": 23.511125
+          },
+          "maximum_call_us": {
+            "min": 6019,
+            "median": 6775.5,
+            "mean": 6875.6,
+            "p95": 7803,
+            "max": 7803
+          },
+          "min_dram": {
+            "min": 8168,
+            "median": 9208,
+            "mean": 9018.8,
+            "p95": 9624,
+            "max": 9624
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        "median_task_reduction_percent": 0.06052385558575901
+      },
+      {
+        "name": "mono-24",
+        "reference": {
+          "id": 1,
+          "name": "mono-24",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 3216561658,
+          "scratch_bytes": 2904,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 54.921625,
+            "median": 54.966270833333326,
+            "mean": 54.96613749999999,
+            "p95": 55.032374999999995,
+            "max": 55.032374999999995
+          },
+          "wall_budget_percent": {
+            "min": 55.680499999999995,
+            "median": 55.93189583333333,
+            "mean": 55.9306375,
+            "p95": 56.25825,
+            "max": 56.25825
+          },
+          "maximum_call_us": {
+            "min": 13605,
+            "median": 14054,
+            "mean": 14262.5,
+            "p95": 15165,
+            "max": 15165
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9607.2,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1666.4,
+            "p95": 1724,
+            "max": 1724
+          }
+        },
+        "candidate": {
+          "id": 1,
+          "name": "mono-24",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 3216561658,
+          "scratch_bytes": 2904,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 55.401625,
+            "median": 55.421416666666666,
+            "mean": 55.42573749999999,
+            "p95": 55.46033333333333,
+            "max": 55.46033333333333
+          },
+          "wall_budget_percent": {
+            "min": 56.03125,
+            "median": 56.31295833333333,
+            "mean": 56.328483333333324,
+            "p95": 56.617333333333335,
+            "max": 56.617333333333335
+          },
+          "maximum_call_us": {
+            "min": 12904,
+            "median": 13853,
+            "mean": 13744.1,
+            "p95": 14463,
+            "max": 14463
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9603.6,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1668,
+            "p95": 1740,
+            "max": 1740
+          }
+        },
+        "median_task_reduction_percent": -0.8280456840767281
+      },
+      {
+        "name": "stereo-64",
+        "reference": {
+          "id": 2,
+          "name": "stereo-64",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 2337883435,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 65.89608333333334,
+            "median": 65.964,
+            "mean": 65.97249166666667,
+            "p95": 66.10220833333332,
+            "max": 66.10220833333332
+          },
+          "wall_budget_percent": {
+            "min": 66.64125,
+            "median": 66.97733333333332,
+            "mean": 67.0514625,
+            "p95": 67.59174999999999,
+            "max": 67.59174999999999
+          },
+          "maximum_call_us": {
+            "min": 15958,
+            "median": 16529.5,
+            "mean": 16814.9,
+            "p95": 18359,
+            "max": 18359
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9607.2,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "candidate": {
+          "id": 2,
+          "name": "stereo-64",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 2337883435,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 69.06195833333334,
+            "median": 69.09945833333333,
+            "mean": 69.10004166666667,
+            "p95": 69.17383333333333,
+            "max": 69.17383333333333
+          },
+          "wall_budget_percent": {
+            "min": 69.98270833333333,
+            "median": 70.1600625,
+            "mean": 70.13488750000002,
+            "p95": 70.268625,
+            "max": 70.268625
+          },
+          "maximum_call_us": {
+            "min": 16716,
+            "median": 17523.5,
+            "mean": 17650.3,
+            "p95": 18848,
+            "max": 18848
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9588.8,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "median_task_reduction_percent": -4.753287146524365
+      },
+      {
+        "name": "stereo-128",
+        "reference": {
+          "id": 3,
+          "name": "stereo-128",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1528306318,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 79.08958333333334,
+            "median": 79.163,
+            "mean": 79.16007083333334,
+            "p95": 79.25774999999999,
+            "max": 79.25774999999999
+          },
+          "wall_budget_percent": {
+            "min": 80.30879166666665,
+            "median": 80.50458333333333,
+            "mean": 80.56034583333333,
+            "p95": 81.01220833333333,
+            "max": 81.01220833333333
+          },
+          "maximum_call_us": {
+            "min": 18519,
+            "median": 19359,
+            "mean": 19632.4,
+            "p95": 21531,
+            "max": 21531
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9752,
+            "mean": 9680,
+            "p95": 9800,
+            "max": 9800
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "candidate": {
+          "id": 3,
+          "name": "stereo-128",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1528306318,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 86.78037499999999,
+            "median": 86.81841666666666,
+            "mean": 86.82190833333333,
+            "p95": 86.86545833333332,
+            "max": 86.86545833333332
+          },
+          "wall_budget_percent": {
+            "min": 88.08083333333333,
+            "median": 88.18591666666666,
+            "mean": 88.24580416666666,
+            "p95": 88.498125,
+            "max": 88.498125
+          },
+          "maximum_call_us": {
+            "min": 20421,
+            "median": 21234,
+            "mean": 21273.3,
+            "p95": 22255,
+            "max": 22255
+          },
+          "min_dram": {
+            "min": 9448,
+            "median": 9624,
+            "mean": 9618.4,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "median_task_reduction_percent": -9.67044789442879
+      },
+      {
+        "name": "stereo-192",
+        "reference": {
+          "id": 4,
+          "name": "stereo-192",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1717014079,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 91.15950000000001,
+            "median": 91.18904166666667,
+            "mean": 91.21141666666668,
+            "p95": 91.29433333333333,
+            "max": 91.29433333333333
+          },
+          "wall_budget_percent": {
+            "min": 92.575375,
+            "median": 92.66004166666667,
+            "mean": 92.718375,
+            "p95": 93.15433333333333,
+            "max": 93.15433333333333
+          },
+          "maximum_call_us": {
+            "min": 21370,
+            "median": 22525.5,
+            "mean": 22241.4,
+            "p95": 23056,
+            "max": 23056
+          },
+          "min_dram": {
+            "min": 9800,
+            "median": 9892,
+            "mean": 9924,
+            "p95": 10152,
+            "max": 10152
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "candidate": {
+          "id": 4,
+          "name": "stereo-192",
+          "samples_per_run": 115200,
+          "packets_per_run": 120,
+          "pcm_hash": 1717014079,
+          "scratch_bytes": 5488,
+          "scratch_words": 15600,
+          "task_budget_percent": {
+            "min": 103.57379166666665,
+            "median": 103.61966666666666,
+            "mean": 103.62779166666667,
+            "p95": 103.76904166666667,
+            "max": 103.76904166666667
+          },
+          "wall_budget_percent": {
+            "min": 105.24345833333334,
+            "median": 105.35202083333334,
+            "mean": 105.40687500000001,
+            "p95": 105.83520833333333,
+            "max": 105.83520833333333
+          },
+          "maximum_call_us": {
+            "min": 23508,
+            "median": 24120,
+            "mean": 24199.8,
+            "p95": 25191,
+            "max": 25191
+          },
+          "min_dram": {
+            "min": 9800,
+            "median": 9976,
+            "mean": 9905.6,
+            "p95": 9976,
+            "max": 9976
+          },
+          "stack_free_lifetime": {
+            "min": 1660,
+            "median": 1660,
+            "mean": 1660,
+            "p95": 1660,
+            "max": 1660
+          }
+        },
+        "median_task_reduction_percent": -13.631709219446586
+      }
+    ]
+  },
+  "relative_pair_selection": {
+    "initial": {
+      "policy": "High bitrate relative time gains must exceed small lower-bitrate relative regressions; both 128/192 checked. Exactness/RAM checked separately.",
+      "minimum_high_bitrate_gain_percent": -13.616057100603808,
+      "maximum_low_bitrate_slowdown_percent": 4.759110273346123,
+      "all_median_raw_budgets_below_100": false,
+      "accepted_for_experimental_asm": false,
+      "target_192_cpu_at_most_70": false
+    },
+    "repeated": {
+      "policy": "High bitrate relative time gains must exceed small lower-bitrate relative regressions; both 128/192 checked. Exactness/RAM checked separately.",
+      "minimum_high_bitrate_gain_percent": -13.631709219446586,
+      "maximum_low_bitrate_slowdown_percent": 4.753287146524365,
+      "all_median_raw_budgets_below_100": false,
+      "accepted_for_experimental_asm": false,
+      "target_192_cpu_at_most_70": false
+    }
+  },
+  "historical_best": {
+    "file": "firmware/development/esp8266-opus-small-div-tail-v1/comparison.json",
+    "sha256": "6e4c7b28f9d746732d551d06dd2ace554877ca372d7cc534228a8911fa4c4087",
+    "before_192": 88.14385416666667,
+    "after_192": 88.118875,
+    "scope": "Historical same-profile best tell-inline reference; not an extra physical run in this frozen pair"
+  },
+  "attribution": {
+    "source": "firmware/development/esp8266-opus-division-micro-v2/census/census.json",
+    "sha256": "8966887138983fe951fe2e05fad1b05e5c038b3027358a59c0a2f51415ee31bd",
+    "scope": "Total raw-decoder time difference divided by host operand count, including downstream cache effects. NOT an exclusive helper timer or measured cache-miss count.",
+    "cases": [
+      {
+        "name": "mono-12",
+        "host_calls_per_round": 0,
+        "rounds": 10,
+        "calls_per_run": 0,
+        "extra_total_us": -207.9999999999984,
+        "extra_us_per_host_call": null,
+        "powers": 0,
+        "power_percent": null,
+        "fallback": 0
+      },
+      {
+        "name": "mono-24",
+        "host_calls_per_round": 112,
+        "rounds": 10,
+        "calls_per_run": 1120,
+        "extra_total_us": 11483.000000000062,
+        "extra_us_per_host_call": 10.252678571428627,
+        "powers": 25,
+        "power_percent": 22.321428571428573,
+        "fallback": 1
+      },
+      {
+        "name": "stereo-64",
+        "host_calls_per_round": 871,
+        "rounds": 10,
+        "calls_per_run": 8710,
+        "extra_total_us": 75339.00000000017,
+        "extra_us_per_host_call": 8.64971297359359,
+        "powers": 62,
+        "power_percent": 7.1182548794489096,
+        "fallback": 16
+      },
+      {
+        "name": "stereo-128",
+        "host_calls_per_round": 2017,
+        "rounds": 10,
+        "calls_per_run": 20170,
+        "extra_total_us": 183961.50000000012,
+        "extra_us_per_host_call": 9.120550322260788,
+        "powers": 151,
+        "power_percent": 7.486365889935548,
+        "fallback": 117
+      },
+      {
+        "name": "stereo-192",
+        "host_calls_per_round": 3163,
+        "rounds": 10,
+        "calls_per_run": 31630,
+        "extra_total_us": 298033.49999999977,
+        "extra_us_per_host_call": 9.422494467277893,
+        "powers": 130,
+        "power_percent": 4.110022130888397,
+        "fallback": 590
+      }
+    ]
+  },
+  "candidate_beats_both_historical_192": false,
+  "inputs": {
+    "before": [
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run1.json",
+        "sha256": "1ea3cad396d43c300177d541933392b683498a8f95274357727b4f81faeba104"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run2.json",
+        "sha256": "5deeae568b841d4a1178d5c288344f56bc9a6b9994ce03eb7eaf0eb2b5da02c9"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run3.json",
+        "sha256": "4b6f1ee4ffbb741739b27411fa3c51911510a9ebb064b0add1a5f6811b61d381"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run4.json",
+        "sha256": "09590eeeb2481a2f9f1f73b60321acb286c3d96c57fb621a7a436090443fd6b6"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run5.json",
+        "sha256": "b3e90280d0ece7ff7031def26048ed0606f7d1ae57d8971ff3dcaa7e92043dec"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run6.json",
+        "sha256": "d2de7e51acf0ce630bb9753d0e6bfcc1fcd409d066dc0b3fd35abd74c81de429"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run7.json",
+        "sha256": "7eac6ba54edb8adaedeaf0fae4a86a99c2e6fdef017fe6050836c10795c9762f"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run8.json",
+        "sha256": "64edfae29fa829e1a9ece277313bf719fc4330939d8b79eea39d9db2f1d18d27"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run9.json",
+        "sha256": "60a5b62d1a3bf6243a498412570511f2340807da103e24db207b314972a841b1"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/before/run10.json",
+        "sha256": "43f875d7f9678ff40584d8d6474de17196223929aa5c99e0c3458c8c7aa152af"
+      }
+    ],
+    "candidate": [
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run1.json",
+        "sha256": "8151b282496d81820b3bb071efa33a68a3e40b4d0a098794b336c0352a41565f"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run2.json",
+        "sha256": "478dfc8d4a9c442e98c567c531402b5947878eeb7969fb1acf13fe7b53a6b452"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run3.json",
+        "sha256": "fdbc2152411b9eaf5519467151827473fe88523743d20bec21d3fe383a2c015b"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run4.json",
+        "sha256": "9fbc45db696943205791eeb14ac4dd806fbd6f9f6598556c95a880c634676f1a"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run5.json",
+        "sha256": "574042c00e500a25a1b033bbb8f26484eb003f142f391641607c5887dcb19552"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run6.json",
+        "sha256": "2998c2c84707c6499fb67b03d109849e7119357209e7f37384e7c8200c1e04ab"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run7.json",
+        "sha256": "88c56bb34b12c27dd5a0752e1948552b8f9d7af1434ffc6ff0f17f46008b8c44"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run8.json",
+        "sha256": "414ca437c455a6c4d4bac1bdfd18e504d2498ce645d1e2dca4cfb6ae47084a18"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run9.json",
+        "sha256": "f342e0e56406e82e8fdde30588724add4393e5d4d4faa897fc4d2a584e9a5a57"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/runs/run10.json",
+        "sha256": "fac45ba4f3cca725d5f5933790121c75f8552e3e2a43e35c98d5f519ff764945"
+      }
+    ],
+    "after": [
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run1.json",
+        "sha256": "01fefc1fe6c1fa0c2aec4e27db6004c7b01d48af513a6f4795d8f5099db99099"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run2.json",
+        "sha256": "20f2d98fa31eafb39a39a4136131d498e9e5aaed319bcf76741f360a27da13a4"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run3.json",
+        "sha256": "9805518a5938fdff2739045aebfbdd5b83b4ad5427bb57bed649c4a97d3c3922"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run4.json",
+        "sha256": "a1ccc64558615b3ac159e29beac2227b7c3ad7e5c0d93ad19c288b2ae4258b1e"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run5.json",
+        "sha256": "d4f7e6f00a7babfb9428b88eff019a5197388c6910af665aaf5b2b54da2d9869"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run6.json",
+        "sha256": "880df36dec55e445a26829f9a4a773183dd07b932ceb0fe45610f620d81dee89"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run7.json",
+        "sha256": "37c92655092c381f0bd3b3b2a405ac10d7606a240eb054ca9ef293c8cc8cd84a"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run8.json",
+        "sha256": "f61ada82ef533ca30da75413496d04f59c7f38c5849ab3776b76c7eeb106535b"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run9.json",
+        "sha256": "c6d26c976f2b89d62f2c8d6cba0dbcaa27b8d9b522d6744086f624bf07403e4c"
+      },
+      {
+        "file": "firmware/development/esp8266-opus-frozen-div-asm-v1/controls/after/run10.json",
+        "sha256": "e52c9b3db0e7c7bb6c8e177b86b4101bfbb76d1e6ce5d895de5b74e1cf43a431"
+      }
+    ]
+  }
+}
