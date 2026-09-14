@@ -34,3 +34,40 @@ test('raw report rejects changed fixtures, PCM, incomplete runs and profilers',(
   r=>{r.after.data.app_address=0;},r=>{r.error='observation incomplete';}
  ]){const r=structuredClone(original);change(r);assert.throws(()=>validateRun(r,fixtures,address));}
 });
+
+test('archived tail A/B/A retains every physical attempt and negative speed result',()=>{
+ const {root,hash}=require('../tools/esp8266_opus_asm/export.cjs');
+ const {compare}=require('../tools/esp8266_opus_profile/compare_raw.cjs');
+ const {selectHighBitrate}=require('../tools/esp8266_opus_asm/selection.cjs');
+ const {validateRun}=require('../tools/esp8266_opus_asm/report_small_div_tail.cjs');
+ const dir=path.join(root,'firmware/development/esp8266-opus-small-div-tail-v1');
+ const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+ const result=read(path.join(dir,'comparison.json'));
+ const fixtures=read(path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures/manifest.json'));
+ const groups={};
+ for(const [name,subdir]of [['before','controls/before'],['candidate','runs'],['after','controls/after']]){
+  assert.equal(fs.readdirSync(path.join(dir,subdir)).filter(n=>/^run\d+\.json$/.test(n)).length,10);
+  const inputs=result.inputs[name];assert.equal(inputs.length,10);
+  const ota=read(path.join(dir,'ota-'+name+'.json'));assert.equal(ota.pass,true);
+  const manifest=result.proof.manifests[name==='candidate'?1:0];
+  assert.equal(ota.sha256,manifest.app_sha256.toLowerCase());
+  groups[name]=inputs.map((r,i)=>{
+   const file=path.join(root,r.file);assert.equal(file,path.join(dir,subdir,'run'+(i+1)+'.json'));
+   const bytes=fs.readFileSync(file);assert.equal(hash(bytes),r.sha256);
+   const report=JSON.parse(bytes);validateRun(report,fixtures,ota.after.app_address);return report;
+  });
+ }
+ assert.deepEqual(compare(groups.before,groups.candidate),result.initial);
+ assert.deepEqual(compare(groups.after,groups.candidate),result.repeated);
+ for(const name of ['initial','repeated']){
+  assert.deepEqual(selectHighBitrate(result[name].cases),result.selection[name]);
+  assert.equal(result.selection[name].accepted_for_experimental_asm,false);
+  assert.equal(result.selection[name].target_192_cpu_at_most_70,false);
+ }
+ for(const [i,variant]of ['esp8266-opus-tail-control-v1','esp8266-opus-small-div-tail-v1'].entries()){
+  const bytes=fs.readFileSync(path.join(root,'firmware/development',variant,'app.bin'));
+  assert.equal(hash(bytes),result.proof.manifests[i].app_sha256.toLowerCase());
+  assert.equal(bytes.length,result.proof.manifests[i].bytes);
+ }
+ assert.equal(result.proof.static_ram_delta,0);
+});
