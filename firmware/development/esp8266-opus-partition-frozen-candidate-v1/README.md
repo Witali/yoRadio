@@ -11,4 +11,4 @@ Candidate REJECTED; active80% CPU target also not met. RAM/frames unchanged;
 transient candidate run3 DRAM388 B retained, cause not established.
 All JSON/logs, maximum calls, host24 checks and ordinary OTA restoration saved.
 Final selected ASM regression suite:57 PASS,0 fail,0 skipped; regression-final.log.
-See [experiment](../../../../docs/ESP8266_OPUS_ASM_PARTITION_FROZEN.md).
+See [experiment](../../../docs/ESP8266_OPUS_ASM_PARTITION_FROZEN.md).
