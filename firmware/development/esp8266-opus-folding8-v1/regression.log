@@ -2,135 +2,147 @@ TAP version 13
 # Subtest: compiler command parser does not invoke a shell and keeps quoted definitions
 ok 1 - compiler command parser does not invoke a shell and keeps quoted definitions
   ---
-  duration_ms: 2.3429
+  duration_ms: 2.0874
   type: 'test'
   ...
 # Subtest: full ASM snapshot covers every upstream unit and both variants verify
 ok 2 - full ASM snapshot covers every upstream unit and both variants verify
   ---
-  duration_ms: 389.4297
+  duration_ms: 159.7704
   type: 'test'
   ...
 # Subtest: annotations preserve comments and describe the function ABI
 ok 3 - annotations preserve comments and describe the function ABI
   ---
-  duration_ms: 0.5672
+  duration_ms: 0.566
   type: 'test'
   ...
 # Subtest: stale source hashes and a different exported feature set fail closed
 ok 4 - stale source hashes and a different exported feature set fail closed
   ---
-  duration_ms: 7.6135
+  duration_ms: 7.2672
   type: 'test'
   ...
 # Subtest: ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
 ok 5 - ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
   ---
-  duration_ms: 0.3688
+  duration_ms: 0.4121
   type: 'test'
   ...
 # Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
 ok 6 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
   ---
-  duration_ms: 1.0325
+  duration_ms: 1.128
   type: 'test'
   ...
 # Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
 ok 7 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
   ---
-  duration_ms: 0.7199
+  duration_ms: 1.002
+  type: 'test'
+  ...
+# Subtest: folding8 archive retains all 30 actual A/B/A measurements and maxima
+ok 8 - folding8 archive retains all 30 actual A/B/A measurements and maxima
+  ---
+  duration_ms: 39.8132
+  type: 'test'
+  ...
+# Subtest: ordinary firmware restored by OTA and HTTP/WebSocket state verified
+ok 9 - ordinary firmware restored by OTA and HTTP/WebSocket state verified
+  ---
+  duration_ms: 2.4868
   type: 'test'
   ...
 # Subtest: coefficients use original integer sqrt, not the system floating sqrt
-ok 8 - coefficients use original integer sqrt, not the system floating sqrt
+ok 10 - coefficients use original integer sqrt, not the system floating sqrt
   ---
-  duration_ms: 6.9649
+  duration_ms: 6.705
   type: 'test'
   ...
 # Subtest: 84 standard band/LM combinations are preserved and census is exact PCM through 510
-ok 9 - 84 standard band/LM combinations are preserved and census is exact PCM through 510
+ok 11 - 84 standard band/LM combinations are preserved and census is exact PCM through 510
   ---
-  duration_ms: 2.0136
+  duration_ms: 1.782
   type: 'test'
   ...
 # Subtest: ASM changes only the dynamic folding call; constant-N2 and C fallback remain
-ok 10 - ASM changes only the dynamic folding call; constant-N2 and C fallback remain
+ok 12 - ASM changes only the dynamic folding call; constant-N2 and C fallback remain
   ---
-  duration_ms: 298.2849
+  duration_ms: 127.1442
   type: 'test'
   ...
 # Subtest: actual linked graph has valid table bounds, original fallback arguments and no RAM growth
-ok 11 - actual linked graph has valid table bounds, original fallback arguments and no RAM growth
+ok 13 - actual linked graph has valid table bounds, original fallback arguments and no RAM growth
   ---
-  duration_ms: 16.5357
+  duration_ms: 14.353
   type: 'test'
   ...
 # Subtest: linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
-ok 12 - linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
+ok 14 - linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
   ---
-  duration_ms: 2.313
+  duration_ms: 2.3382
   type: 'test'
   ...
 # Subtest: linked graph retains branch destinations, register operations and numeric literals
-ok 13 - linked graph retains branch destinations, register operations and numeric literals
+ok 15 - linked graph retains branch destinations, register operations and numeric literals
   ---
-  duration_ms: 1.2961
+  duration_ms: 0.9189
   type: 'test'
   ...
 # Subtest: CFG follows real targets, never decodes padding after J, rejects reachable garbage
-ok 14 - CFG follows real targets, never decodes padding after J, rejects reachable garbage
+ok 16 - CFG follows real targets, never decodes padding after J, rejects reachable garbage
   ---
-  duration_ms: 4.9336
+  duration_ms: 5.557
   type: 'test'
   ...
 # Subtest: attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
-ok 15 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+ok 17 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
   ---
-  duration_ms: 3.4238
+  duration_ms: 4.4628
   type: 'test'
   ...
 # Subtest: A/B permits only the selected feature and artifact identity differences
-ok 16 - A/B permits only the selected feature and artifact identity differences
+ok 18 - A/B permits only the selected feature and artifact identity differences
   ---
-  duration_ms: 0.8466
+  duration_ms: 1.1876
   type: 'test'
   ...
 # Subtest: raw A/B reports true medians and retains a slow outlier and observation timeout
-ok 17 - raw A/B reports true medians and retains a slow outlier and observation timeout
+ok 19 - raw A/B reports true medians and retains a slow outlier and observation timeout
   ---
-  duration_ms: 1.8525
+  duration_ms: 1.3346
   type: 'test'
   ...
 # Subtest: raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
-ok 18 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+ok 20 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
   ---
-  duration_ms: 7.0329
+  duration_ms: 5.8408
   type: 'test'
   ...
 # Subtest: different task/wall timing windows retain positive overhead without clamping or dropping the run
-ok 19 - different task/wall timing windows retain positive overhead without clamping or dropping the run
+ok 21 - different task/wall timing windows retain positive overhead without clamping or dropping the run
   ---
-  duration_ms: 1.0427
+  duration_ms: 0.8705
   type: 'test'
   ...
 # Subtest: raw series verifies PCM and retains terminal device failures without counting them as speed passes
-ok 20 - raw series verifies PCM and retains terminal device failures without counting them as speed passes
+ok 22 - raw series verifies PCM and retains terminal device failures without counting them as speed passes
   ---
-  duration_ms: 1.4835
+  duration_ms: 2.0968
   type: 'test'
   ...
 # Subtest: raw series does not restart unknown/physical/missing observations or incorrect PCM
-ok 21 - raw series does not restart unknown/physical/missing observations or incorrect PCM
+ok 23 - raw series does not restart unknown/physical/missing observations or incorrect PCM
   ---
-  duration_ms: 5.5389
+  duration_ms: 8.3652
   type: 'test'
   ...
-1..21
-# tests 21
+1..23
+# tests 23
 # suites 0
-# pass 21
+# pass 23
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 478.8359
+# duration_ms 271.1919

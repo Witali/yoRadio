@@ -3,7 +3,7 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-14: ESP8266 Opus folding8 (experiment)
+## Development - 2026-09-14: ESP8266 Opus folding8 (rejected)
 
 - `development/esp8266-opus-folding8-v1/app.bin`,903344 B; matched control
   `esp8266-opus-folding-control-v1`,903216 B. CPU160/QIO40/cache16 raw-RAM
@@ -12,7 +12,11 @@ entries are retained; changes are published under a new firmware version.
   all other sizes keep the original sqrt. Original fixed-point coefficients,
   no RAM/stack growth, unchanged C backend and constant-N2 site.
 - Host PCM through510/mixed/PLC/reset/OOM exact;108193 actual-instruction
-  cases,21 related tests. Physical A/B/A measurements pending; no speed claim.
+  cases. All30 raw A/B/A attempts retained: CPU192 88.1440 /89.5171 /88.1026%,
+  about1.56–1.61% more time; CPU128 also slower. Rejected, default OFF.
+- Minimum sampled DRAM6796 /8852 /8392 B, stack1660 B, no PCM errors.
+  Ordinary live512-idle3s restored OTA; HTTP200/WS/playlist/current167 checked.
+  No live qualification of this rejected candidate. Goal70% remains unmet.
   [Implementation and checks](../docs/ESP8266_OPUS_ASM_FOLDING8.md).
 
 ## Development - 2026-09-14: ESP8266 Opus exact small-div inline (rejected)
