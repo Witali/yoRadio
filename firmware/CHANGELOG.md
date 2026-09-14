@@ -3,6 +3,16 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus three-table MDCT pair experiment
+
+- `development/esp8266-opus-mdct-three-pair-{control,candidate}-v1/app.bin`,
+  903216 B, CPU160/QIO40 raw-RAM diagnostic; accepted MDCT-half parent.
+- One193-byte pre-rotation range: cached t0/t1/bitrev pairs and shared parity,
+  rescheduled exact modular32 arithmetic. No RAM/stack growth or other ELF changes.
+- 450 symbolic pairs/all four transforms and16 numeric full transforms exact;
+  12 related regressions PASS. Physical10 A/10 B/10 A pending; default unchanged.
+  [Recipe and evidence](../docs/ESP8266_OPUS_ASM_MDCT_THREE_PAIR.md).
+
 ## Development - 2026-09-14: ESP8266 Opus paired bitrev reads (not accepted)
 
 - `development/esp8266-opus-mdct-bitrev-pair-{control,candidate}-v1/app.bin`,
