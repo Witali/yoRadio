@@ -3,15 +3,21 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-14: ESP8266 Opus frozen-layout reload experiment
+## Development - 2026-09-14: ESP8266 Opus frozen-layout reloads (rejected)
 
 - `development/esp8266-opus-frozen-reloads-control-v1/app.bin` and
   `development/esp8266-opus-frozen-reloads-candidate-v1/app.bin`,903216 B each.
   CPU160/QIO40, raw-RAM tell-inline parent; no production/default change.
 - Eight redundant private-stack L32I replaced by same-size MOV.N/OR.
   Every other ELF byte/address, instruction count, RAM and stack unchanged.
-- Symbolic/linked proof, image XOR/SHA and six targeted tests pass;
-  parent host PCM through510 kbps/mixed exact. Physical A/B/A pending.
+- Symbolic/linked proof, image XOR/SHA, parent host PCM through510 kbps/mixed
+  and all30 physical PCM runs pass.19 final regression tests pass,0 skipped.
+- CPU192 A/B/A2:88.17585 /88.13479 /88.13423%; no reproducible improvement.
+  CPU128 also not better; candidate rejected, default unchanged.
+- All outliers retained: A2/run2 HTTP observation timeout, DRAM minimum556 B
+  (allocator lifetime520 B), no decoder error. Stack free1660 B in all groups.
+- Ordinary live512-idle3s restored OTA; station167/playlist/stopped state,
+  HTTP200/WS verified. Goal70% and live candidate qualification not achieved.
   [Recipe, scope and checks](../docs/ESP8266_OPUS_ASM_FROZEN_RELOADS.md).
 
 ## Development - 2026-09-14: ESP8266 Opus ASM partition decoder-only (rejected)
