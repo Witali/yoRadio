@@ -3,7 +3,7 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-14: ESP8266 Opus ASM partition decoder-only
+## Development - 2026-09-14: ESP8266 Opus ASM partition decoder-only (rejected)
 
 - `development/esp8266-opus-partition-decode-v1/app.bin`,902672 B; control
   `esp8266-opus-folding-control-v1`,903216 B. CPU160/QIO40/cache16 raw-RAM
@@ -12,7 +12,12 @@ entries are retained; changes are published under a new firmware version.
   directly from GCC ASM; quant_partition2382→1870 B, original112-byte frame,
   calls/registers/rounding retained. No RAM growth, C fallback unchanged.
 - Linked decoder CFG and caller checked;24 host PCM/guard scenarios exact,
-  including510 kbps and120ms compound packets. Physical measurements pending.
+  including510 kbps and120ms compound packets.
+- All30 physical A/B/A retained: CPU192 88.1312 /98.3201 /88.1099%,
+  about11.56–11.59% more time; CPU128 also slower. Rejected, default OFF.
+  Minimum sampled DRAM8168 /8168 /8176 B, stack1660 B, no PCM errors.
+- Ordinary live512-idle3s restored OTA; HTTP200/WS/playlist/current167 checked.
+  No live qualification of the rejected candidate; goal70% remains unmet.
   [Proof and experiment](../docs/ESP8266_OPUS_ASM_PARTITION_DECODE.md).
 
 ## Development - 2026-09-14: ESP8266 Opus folding8 (rejected)

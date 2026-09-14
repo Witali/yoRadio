@@ -2,159 +2,183 @@ TAP version 13
 # Subtest: compiler command parser does not invoke a shell and keeps quoted definitions
 ok 1 - compiler command parser does not invoke a shell and keeps quoted definitions
   ---
-  duration_ms: 3.2727
+  duration_ms: 2.7525
   type: 'test'
   ...
 # Subtest: full ASM snapshot covers every upstream unit and both variants verify
 ok 2 - full ASM snapshot covers every upstream unit and both variants verify
   ---
-  duration_ms: 172.8691
+  duration_ms: 192.0575
   type: 'test'
   ...
 # Subtest: annotations preserve comments and describe the function ABI
 ok 3 - annotations preserve comments and describe the function ABI
   ---
-  duration_ms: 0.5493
+  duration_ms: 0.5692
   type: 'test'
   ...
 # Subtest: stale source hashes and a different exported feature set fail closed
 ok 4 - stale source hashes and a different exported feature set fail closed
   ---
-  duration_ms: 7.7626
+  duration_ms: 7.8706
   type: 'test'
   ...
 # Subtest: ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
 ok 5 - ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
   ---
-  duration_ms: 0.4039
+  duration_ms: 0.3889
   type: 'test'
   ...
 # Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
 ok 6 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
   ---
-  duration_ms: 1.3407
+  duration_ms: 1.621
   type: 'test'
   ...
 # Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
 ok 7 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
   ---
-  duration_ms: 0.9916
+  duration_ms: 1.1766
+  type: 'test'
+  ...
+# Subtest: folding8 archive retains all 30 actual A/B/A measurements and maxima
+ok 8 - folding8 archive retains all 30 actual A/B/A measurements and maxima
+  ---
+  duration_ms: 49.9327
+  type: 'test'
+  ...
+# Subtest: ordinary firmware restored by OTA and HTTP/WebSocket state verified
+ok 9 - ordinary firmware restored by OTA and HTTP/WebSocket state verified
+  ---
+  duration_ms: 3.9866
   type: 'test'
   ...
 # Subtest: coefficients use original integer sqrt, not the system floating sqrt
-ok 8 - coefficients use original integer sqrt, not the system floating sqrt
+ok 10 - coefficients use original integer sqrt, not the system floating sqrt
   ---
-  duration_ms: 5.7815
+  duration_ms: 5.8655
   type: 'test'
   ...
 # Subtest: 84 standard band/LM combinations are preserved and census is exact PCM through 510
-ok 9 - 84 standard band/LM combinations are preserved and census is exact PCM through 510
+ok 11 - 84 standard band/LM combinations are preserved and census is exact PCM through 510
   ---
-  duration_ms: 1.8699
+  duration_ms: 2.4742
   type: 'test'
   ...
 # Subtest: ASM changes only the dynamic folding call; constant-N2 and C fallback remain
-ok 10 - ASM changes only the dynamic folding call; constant-N2 and C fallback remain
+ok 12 - ASM changes only the dynamic folding call; constant-N2 and C fallback remain
   ---
-  duration_ms: 128.1355
+  duration_ms: 148.051
   type: 'test'
   ...
 # Subtest: actual linked graph has valid table bounds, original fallback arguments and no RAM growth
-ok 11 - actual linked graph has valid table bounds, original fallback arguments and no RAM growth
+ok 13 - actual linked graph has valid table bounds, original fallback arguments and no RAM growth
   ---
-  duration_ms: 14.2229
+  duration_ms: 14.8077
   type: 'test'
   ...
 # Subtest: desktop fixture reader accepts the complete uint16 packet container
-ok 12 - desktop fixture reader accepts the complete uint16 packet container
+ok 14 - desktop fixture reader accepts the complete uint16 packet container
   ---
-  duration_ms: 2.089
+  duration_ms: 2.2759
   type: 'test'
   ...
 # Subtest: linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
-ok 13 - linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
+ok 15 - linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
   ---
-  duration_ms: 2.2878
+  duration_ms: 2.911
   type: 'test'
   ...
 # Subtest: linked graph retains branch destinations, register operations and numeric literals
-ok 14 - linked graph retains branch destinations, register operations and numeric literals
+ok 16 - linked graph retains branch destinations, register operations and numeric literals
   ---
-  duration_ms: 0.9371
+  duration_ms: 1.2619
   type: 'test'
   ...
 # Subtest: CFG follows real targets, never decodes padding after J, rejects reachable garbage
-ok 15 - CFG follows real targets, never decodes padding after J, rejects reachable garbage
+ok 17 - CFG follows real targets, never decodes padding after J, rejects reachable garbage
   ---
-  duration_ms: 4.4939
+  duration_ms: 6.5394
+  type: 'test'
+  ...
+# Subtest: partition decoder-only archive retains all 30 actual A/B/A measurements and maxima
+ok 18 - partition decoder-only archive retains all 30 actual A/B/A measurements and maxima
+  ---
+  duration_ms: 45.9961
+  type: 'test'
+  ...
+# Subtest: ordinary firmware restored by OTA and HTTP/WebSocket state verified
+ok 19 - ordinary firmware restored by OTA and HTTP/WebSocket state verified
+  ---
+  duration_ms: 3.0207
   type: 'test'
   ...
 # Subtest: only immutable ctx.encode makes the three partition branches constant
-ok 16 - only immutable ctx.encode makes the three partition branches constant
+ok 20 - only immutable ctx.encode makes the three partition branches constant
   ---
-  duration_ms: 27.9617
+  duration_ms: 31.2118
   type: 'test'
   ...
 # Subtest: proof fails closed for ctx writes, escaped frame and unknown instruction
-ok 17 - proof fails closed for ctx writes, escaped frame and unknown instruction
+ok 21 - proof fails closed for ctx writes, escaped frame and unknown instruction
   ---
-  duration_ms: 9.1718
+  duration_ms: 10.4428
   type: 'test'
   ...
 # Subtest: linked decoder projection is exact without RAM or stack growth
-ok 18 - linked decoder projection is exact without RAM or stack growth
+ok 22 - linked decoder projection is exact without RAM or stack growth
   ---
-  duration_ms: 39.5489
+  duration_ms: 41.9584
   type: 'test'
   ...
 # Subtest: attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
-ok 19 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+ok 23 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
   ---
-  duration_ms: 3.1143
+  duration_ms: 5.5521
   type: 'test'
   ...
 # Subtest: A/B permits only the selected feature and artifact identity differences
-ok 20 - A/B permits only the selected feature and artifact identity differences
+ok 24 - A/B permits only the selected feature and artifact identity differences
   ---
-  duration_ms: 1.105
+  duration_ms: 1.3306
   type: 'test'
   ...
 # Subtest: raw A/B reports true medians and retains a slow outlier and observation timeout
-ok 21 - raw A/B reports true medians and retains a slow outlier and observation timeout
+ok 25 - raw A/B reports true medians and retains a slow outlier and observation timeout
   ---
-  duration_ms: 2.1924
+  duration_ms: 2.334
   type: 'test'
   ...
 # Subtest: raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
-ok 22 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+ok 26 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
   ---
-  duration_ms: 7.4639
+  duration_ms: 9.3802
   type: 'test'
   ...
 # Subtest: different task/wall timing windows retain positive overhead without clamping or dropping the run
-ok 23 - different task/wall timing windows retain positive overhead without clamping or dropping the run
+ok 27 - different task/wall timing windows retain positive overhead without clamping or dropping the run
   ---
-  duration_ms: 0.9136
+  duration_ms: 1.3045
   type: 'test'
   ...
 # Subtest: raw series verifies PCM and retains terminal device failures without counting them as speed passes
-ok 24 - raw series verifies PCM and retains terminal device failures without counting them as speed passes
+ok 28 - raw series verifies PCM and retains terminal device failures without counting them as speed passes
   ---
-  duration_ms: 2.3697
+  duration_ms: 2.1482
   type: 'test'
   ...
 # Subtest: raw series does not restart unknown/physical/missing observations or incorrect PCM
-ok 25 - raw series does not restart unknown/physical/missing observations or incorrect PCM
+ok 29 - raw series does not restart unknown/physical/missing observations or incorrect PCM
   ---
-  duration_ms: 6.7443
+  duration_ms: 7.5058
   type: 'test'
   ...
-1..25
-# tests 25
+1..29
+# tests 29
 # suites 0
-# pass 25
+# pass 29
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 268.5098
+# duration_ms 302.347
