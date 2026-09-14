@@ -1,0 +1,178 @@
+TAP version 13
+# Subtest: compiler command parser does not invoke a shell and keeps quoted definitions
+ok 1 - compiler command parser does not invoke a shell and keeps quoted definitions
+  ---
+  duration_ms: 3.208
+  type: 'test'
+  ...
+# Subtest: full ASM snapshot covers every upstream unit and both variants verify
+ok 2 - full ASM snapshot covers every upstream unit and both variants verify
+  ---
+  duration_ms: 352.6547
+  type: 'test'
+  ...
+# Subtest: annotations preserve comments and describe the function ABI
+ok 3 - annotations preserve comments and describe the function ABI
+  ---
+  duration_ms: 0.9156
+  type: 'test'
+  ...
+# Subtest: stale source hashes and a different exported feature set fail closed
+ok 4 - stale source hashes and a different exported feature set fail closed
+  ---
+  duration_ms: 9.4917
+  type: 'test'
+  ...
+# Subtest: ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+ok 5 - ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+  ---
+  duration_ms: 0.8583
+  type: 'test'
+  ...
+# Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
+ok 6 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
+  ---
+  duration_ms: 1.2818
+  type: 'test'
+  ...
+# Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+ok 7 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+  ---
+  duration_ms: 1.0868
+  type: 'test'
+  ...
+# Subtest: desktop fixture reader accepts the complete uint16 packet container
+ok 8 - desktop fixture reader accepts the complete uint16 packet container
+  ---
+  duration_ms: 2.0634
+  type: 'test'
+  ...
+# Subtest: actual MDCT ASM preserves every register bit for all words and both halfword parities
+ok 9 - actual MDCT ASM preserves every register bit for all words and both halfword parities
+  ---
+  duration_ms: 28.5774
+  type: 'test'
+  ...
+# Subtest: selector matching refuses interior entries, duplicate/missing source, and aliasing registers
+ok 10 - selector matching refuses interior entries, duplicate/missing source, and aliasing registers
+  ---
+  duration_ms: 9.8593
+  type: 'test'
+  ...
+# Subtest: assembled code has exact local targets, operation order and untouched instructions outside selectors
+ok 11 - assembled code has exact local targets, operation order and untouched instructions outside selectors
+  ---
+  duration_ms: 16.7684
+  type: 'test'
+  ...
+# Subtest: five 17-byte patches cannot alter other ELF bytes or RAM/stack/address metadata
+ok 12 - five 17-byte patches cannot alter other ELF bytes or RAM/stack/address metadata
+  ---
+  duration_ms: 292.4049
+  type: 'test'
+  ...
+# Subtest: image hashes, recipe and exact opcode evidence validate; mixed benchmark profiles refused
+ok 13 - image hashes, recipe and exact opcode evidence validate; mixed benchmark profiles refused
+  ---
+  duration_ms: 205.1677
+  type: 'test'
+  ...
+# Subtest: all thirty MUL16S results, including anomalous control7, are retained and independently recomputed
+ok 14 - all thirty MUL16S results, including anomalous control7, are retained and independently recomputed
+  ---
+  duration_ms: 843.7717
+  type: 'test'
+  ...
+# Subtest: ordinary radio restored OTA with unchanged station and playlist, valid HTTP and WebSocket state
+ok 15 - ordinary radio restored OTA with unchanged station and playlist, valid HTTP and WebSocket state
+  ---
+  duration_ms: 3.2365
+  type: 'test'
+  ...
+# Subtest: fixed-point signed-width proof selects exactly16 safe products, never unsigned low16
+ok 16 - fixed-point signed-width proof selects exactly16 safe products, never unsigned low16
+  ---
+  duration_ms: 9.7121
+  type: 'test'
+  ...
+# Subtest: all branch paths and loop backedges join widths; calls and unknown instructions fail safely
+ok 17 - all branch paths and loop backedges join widths; calls and unknown instructions fail safely
+  ---
+  duration_ms: 0.9493
+  type: 'test'
+  ...
+# Subtest: 589824 integer edge products match exact BigInt, with full-domain algebraic bound
+ok 18 - 589824 integer edge products match exact BigInt, with full-domain algebraic bound
+  ---
+  duration_ms: 40.3143
+  type: 'test'
+  ...
+# Subtest: actual opcodes change only MULL into same-width MUL16S, preserving CFG and ABI
+ok 19 - actual opcodes change only MULL into same-width MUL16S, preserving CFG and ABI
+  ---
+  duration_ms: 18.6312
+  type: 'test'
+  ...
+# Subtest: sixteen3-byte patches preserve other ELF/app bytes, RAM, stack and benchmark settings
+ok 20 - sixteen3-byte patches preserve other ELF/app bytes, RAM, stack and benchmark settings
+  ---
+  duration_ms: 938.7902
+  type: 'test'
+  ...
+# Subtest: all450 table pairs preserve arbitrary32-bit PCM and separately rounded multiply terms
+ok 21 - all450 table pairs preserve arbitrary32-bit PCM and separately rounded multiply terms
+  ---
+  duration_ms: 239.9189
+  type: 'test'
+  ...
+# Subtest: parity, pointer advance, loop targets and boundary ABI mutations fail
+ok 22 - parity, pointer advance, loop targets and boundary ABI mutations fail
+  ---
+  duration_ms: 18.7119
+  type: 'test'
+  ...
+# Subtest: all four linked trig/bitrev ranges share parity, are immutable and bounded
+ok 23 - all four linked trig/bitrev ranges share parity, are immutable and bounded
+  ---
+  duration_ms: 35.7195
+  type: 'test'
+  ...
+# Subtest: numeric full transforms agree for PCM32 edge cases, random data, strides and aliasing
+ok 24 - numeric full transforms agree for PCM32 edge cases, random data, strides and aliasing
+  ---
+  duration_ms: 468.6322
+  type: 'test'
+  ...
+# Subtest: one193-byte range changes; RAM, frame, rest of ELF/app and settings stay fixed
+ok 25 - one193-byte range changes; RAM, frame, rest of ELF/app and settings stay fixed
+  ---
+  duration_ms: 664.8975
+  type: 'test'
+  ...
+# Subtest: macro arithmetic is the exact GCC leaf body without return
+ok 26 - macro arithmetic is the exact GCC leaf body without return
+  ---
+  duration_ms: 2.3058
+  type: 'test'
+  ...
+# Subtest: only four pinned quant_partition calls are expanded and baseline stays exact
+ok 27 - only four pinned quant_partition calls are expanded and baseline stays exact
+  ---
+  duration_ms: 128.8856
+  type: 'test'
+  ...
+# Subtest: actual macro preserves results and live registers at every normalized threshold
+ok 28 - actual macro preserves results and live registers at every normalized threshold
+  ---
+  duration_ms: 265.6889
+  type: 'test'
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1578.138

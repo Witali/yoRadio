@@ -3,14 +3,20 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-14: ESP8266 Opus MDCT MUL16S experiment
+## Development - 2026-09-14: ESP8266 Opus MDCT MUL16S (not accepted)
 
 - `development/esp8266-opus-mdct-mul16-{control,candidate}-v1/app.bin`,903216 B.
   CPU160/QIO40 raw-RAM diagnostic, parent accepted three-table MDCT pairs.
--16 signed16 products use MUL16S instead of MULL; full CFG range proof,
+- 16 signed16 products use MUL16S instead of MULL; full CFG range proof,
   same widths/addresses/operands, no RAM/frame growth. Unsigned products unchanged.
--12 related regressions and589824 numeric edge pairs pass; physical A/B/A
-  pending, no production/default change. [Details](../docs/ESP8266_OPUS_ASM_MDCT_MUL16.md).
+- 589824 numeric edge pairs,28 final related regressions PASS/0skip.
+- All30 A/B/A exact PCM: CPU19287.66965 /87.68683 /87.67142%, no gain;
+  both selection gates FAIL. RAM/frame/scratch unchanged, candidate rejected.
+- Control/run7 timeout/min DRAM1044 B retained, no excluded attempts;
+  minima A/B/A2:1044/8032/8172 B, stack1660 B. All maxima archived.
+- Ordinary C-backend radio restored OTA/HTTP/WS/current167/stopped/playlist;
+  no production/default change. Goal70%/live I2S still unmet.
+  [Details](../docs/ESP8266_OPUS_ASM_MDCT_MUL16.md).
 
 ## Development - 2026-09-14: ESP8266 Opus three-table MDCT pair experiment
 
