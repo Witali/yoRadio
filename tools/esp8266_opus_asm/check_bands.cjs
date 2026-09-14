@@ -2,6 +2,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
 const {root,sourceHash}=require('./export.cjs');
 const {buildHost,execute,hostPath}=require('../esp8266_opus_profile/build_host.cjs');
 const {comparePcm}=require('../esp8266_opus_profile/run_regressions.cjs');
+const {verifyStates}=require('./host_state.cjs');
 async function check(kind){
  const base=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,sanitize:true});
  const candidate=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,sanitize:true,asmBandsModel:kind});
@@ -12,11 +13,7 @@ async function check(kind){
   const a=path.join(out,name+'.base.pcm'),b=path.join(out,name+'.candidate.pcm');
   const reference=probe(base.binary,args(a)),result=probe(candidate.binary,args(b));
   const pcm=comparePcm(fs.readFileSync(a),fs.readFileSync(b));assert.equal(pcm.exact,true,name);
-  for(const k of ['samples','scratch_byte_peak_bytes','scratch_word_peak_bytes','persistent_bytes','reset_exact','oom_reinitialized_exact','arena_guards_ok','plc_frames'])
-   assert.deepEqual(result[k],reference[k],name+' '+k);
-  assert.equal(result.reset_exact,true);
-  if(name==='mixed') assert.ok(result.plc_frames>0);
-  else {assert.equal(result.arena_guards_ok,true);assert.equal(result.oom_reinitialized_exact,true);}
+  verifyStates(reference,result,name==='mixed');
   report.cases.push({name,pcm,reference,candidate:result});console.log(name,'exact PCM');
  };
  for(const f of JSON.parse(fs.readFileSync(path.join(fixtures,'manifest.json'))).fixtures)
