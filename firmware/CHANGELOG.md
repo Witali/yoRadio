@@ -3,6 +3,15 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus MDCT MUL16S experiment
+
+- `development/esp8266-opus-mdct-mul16-{control,candidate}-v1/app.bin`,903216 B.
+  CPU160/QIO40 raw-RAM diagnostic, parent accepted three-table MDCT pairs.
+-16 signed16 products use MUL16S instead of MULL; full CFG range proof,
+  same widths/addresses/operands, no RAM/frame growth. Unsigned products unchanged.
+-12 related regressions and589824 numeric edge pairs pass; physical A/B/A
+  pending, no production/default change. [Details](../docs/ESP8266_OPUS_ASM_MDCT_MUL16.md).
+
 ## Development - 2026-09-14: ESP8266 Opus three-table MDCT pair experiment
 
 - `development/esp8266-opus-mdct-three-pair-{control,candidate}-v1/app.bin`,
