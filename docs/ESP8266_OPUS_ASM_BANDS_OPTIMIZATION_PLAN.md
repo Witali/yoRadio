@@ -810,3 +810,9 @@ Ordinary восстановлен OTA/HTTP102мс/WS/плейлист/stopped167
 Текущая цель80% не достигнута; лучший ASM по-прежнему accepted PVQ row-loop,
 около87.3%. Следующий независимый пункт — `ec_dec_bits` из opportunity list,
 а не очередная decoder-only перелинковка без нового обоснования.
+
+Подготовлен [ec_dec_bits low/high ASM](ESP8266_OPUS_ASM_EC_BITS.md): один35-byte
+хвост,14→13 инструкций с сохранением SAR, refill/EOF и entropy state.
+32 symbolic и81120 linked numeric cases,24 host exact PCM до510 пройдены;
+RAM/frame/остальные адреса прежние. Физические10 A/B/A пока не завершены,
+это не принятое ускорение и не достижение80%.
