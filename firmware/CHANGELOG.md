@@ -3,6 +3,16 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus FFT scheduled-load experiment
+
+- `development/esp8266-opus-fft-schedule-{control,candidate}-v1/app.bin`,
+  903216 B, CPU160/QIO40 raw diagnostic, accepted MDCT post-pair parent.
+- One19-byte radix-5 fragment moves an independent pointer read before use;
+  seven instructions instead of eight, no NOP or new RAM/frame/other ELF changes.
+- Exact symbolic register/memory/alias proof,648 numeric overlap cases,
+  12 pre-deployment regressions PASS. Physical A/B/A pending; default unchanged.
+  [Details](../docs/ESP8266_OPUS_ASM_FFT_SCHEDULE.md).
+
 ## Development - 2026-09-14: ESP8266 Opus FFT three-load experiment (not accepted)
 
 - `development/esp8266-opus-fft-load3-{control,candidate}-v1/app.bin`,
