@@ -9,8 +9,14 @@ entries are retained; changes are published under a new firmware version.
   903216 B, CPU160/QIO40 raw diagnostic, accepted three-table parent.
 - One276-byte loop, four cached words, table loads8→4 per iteration pair.
   Exact modular32/in-place events, no new RAM/frame or other ELF-byte changes.
--225 symbolic pairs/all standard transforms,16 numeric full transforms,
-  12 pre-deployment regressions PASS. Physical A/B/A pending; default unchanged.
+- 225 symbolic pairs/all standard transforms,16 numeric full transforms,
+  28 final related regressions PASS/0skip,11 host semantic-parent cases exact.
+- All30 A/B/A exact PCM: CPU19287.66144 /87.48144 /87.67425%; both high-bitrate
+  selection gates PASS, accepted experimentally. No static RAM/frame growth.
+- Minimum free DRAM1224 /8216 /8168 B, task stack free1660 B. All outliers
+  retained: A/run6 timeout, A2/mono12 accounting excesses; all maxima archived.
+- Ordinary restored OTA, HTTP200/WS/current167/stopped/playlist verified.
+  Default unchanged; goal70%/continuous I2S unproven, max192 call21.829ms.
   [Details](../docs/ESP8266_OPUS_ASM_MDCT_POST_PAIR.md).
 
 ## Development - 2026-09-14: ESP8266 Opus MDCT MUL16S (not accepted)

@@ -9,8 +9,8 @@ The rejected MUL16S experiment is NOT included; all multiplications stay MULL.
 - [x] Reassociate yr sums to release a14, without another array or spill.
 - [x] Prove exact PCM32/table-word arithmetic and in-place event sequence.
 - [x] Check all four standard transforms, central pair and exit liveness.
-- [ ] Complete 10 control / 10 candidate / 10 repeated control target runs.
-- [ ] Save speed/RAM/maxima decision and restore ordinary radio via OTA.
+- [x] Complete 10 control / 10 candidate / 10 repeated control target runs.
+- [x] Save speed/RAM/maxima decision and restore ordinary radio via OTA.
 
 ## Mechanism and correctness scope
 
@@ -69,3 +69,60 @@ preflight.json, parent.elf.gz, patches.s/elf and sdkconfig archived beside app.
 Host semantic parent testing is distinct from execution of the new Xtensa
 instructions. Target PCM hashes and linked opcode/proof checks cover those.
 No production/default change. Goal70% and continuous I2S/WebUI not yet proven.
+
+## Physical result: accepted as an experimental ASM baseline
+
+All30 A/B/A attempts completed with exact target PCM hashes, state3/error0.
+The five RAM fixtures use12/24 kbit/s mono and64/128/192 kbit/s stereo input,
+48kHz and20ms packets, decoded to mono PCM16. Each run decodes120 packets
+per fixture. They contain reproducible tones plus seeded noise, not a long
+real-radio recording. Network audio, audio output and function/stage profiling
+are disabled; task timing still includes charged interrupts/bookkeeping.
+
+| Input | A CPU median % | B CPU median % | A2 CPU median % | Max call A/B/A2, us |
+| --- | ---: | ---: | ---: | --- |
+| mono12 | 23.094688 | 23.088167 | 23.082854 | 8295 /9143 /7308 |
+| mono24 | 54.519146 | 54.320000 | 54.511229 | 19634 /14993 /16925 |
+| stereo64 | 64.876917 | 64.632062 | 64.878167 | 23734 /17211 /18311 |
+| stereo128 | 76.897875 | 76.682625 | 76.908667 | 29323 /19727 /18794 |
+| stereo192 | 87.661438 | 87.481438 | 87.674250 | 30844 /21829 /22193 |
+
+192 relative time gains are0.20534% and0.21992%;128 also improves in both
+comparisons. The worst low-bitrate relative loss is0.023015% (mono12 vs A2),
+less than either high-bitrate gain. Both saved selection gates PASS.
+This is a small measured improvement, not evidence of a general instruction
+latency or a cache-miss explanation. New experimental raw best87.481438%.
+The70% target remains false; the maximum192 call21.829ms still exceeds a
+20ms packet duration. Continuous I2S playback has NOT been qualified.
+
+Static sections, frame96 B, scratch sizes and all non-patch ELF bytes are
+unchanged. Minimum free DRAM A/B/A2:1224 /8216 /8168 B; minimum lifetime
+task stack free1660 B for all three series. Median free DRAM after completion:
+26384 /26476 /26476 B. These heap minima vary with network/other activity;
+do not interpret them as changed decoder allocations.
+
+No attempt was excluded. A/run6 has an HTTP observation timeout and the1224 B
+minimum, but later terminal state3/error0 and every PCM hash are valid. Its
+192 CPU100.936833% and30.844ms maximum remain in the report. The cause of this
+transient is not established. A2/mono12 runs2/6/10 show task-window excesses
+over measured wall time of2077/1617/588us, also retained without correction.
+They are measurement-accounting anomalies, not negative waiting time.
+
+All28 final related regressions PASS,0 skipped. These re-derive image/proof
+hashes, all30 archived runs and selection results, and restoration checks.
+The11-case host semantic-parent check includes320/510 kbit/s and exact PCM;
+it does not execute the new target instructions. Standard transform coverage
+for those instructions is provided by the linked symbolic/numeric proof.
+This is not a claim that the entire repository test suite passes.
+
+Archived in firmware/development/esp8266-opus-mdct-post-pair-candidate-v1:
+comparison.json, controls/before, runs, controls/after, OTA evidence,
+host-parent.json and regression-final.log. Reproduce the report with
+`node tools/esp8266_opus_asm/report_mdct_post_pair.cjs`.
+
+Ordinary C-backend radio restored via OTA to0x10000, app SHA256
+661becd301b07885d493ceb1b513d9e874b7d86e4ada8231da8657aa90983c4b.
+HTTP root200 in99.5531ms (response transfer, not browser rendering), WebSocket
+getindex/current167/stopped, station and playlist unchanged. RSSI-59dBm,
+free heap27452 B/min24748 B, WebUI stack free2324 B. No UART/reset or default
+profile change. The board is left stopped as before the experiment.
