@@ -3,13 +3,18 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-14: ESP8266 Opus FFT three-load experiment
+## Development - 2026-09-14: ESP8266 Opus FFT three-load experiment (not accepted)
 
 - `development/esp8266-opus-fft-load3-{control,candidate}-v1/app.bin`,
   903216 B, CPU160/QIO40 raw diagnostic, accepted MDCT post-pair parent.
 - One8-byte radix-5 group uses three L32I instead of four, no executed padding.
   Exact registers/data read order, all other ELF bytes/RAM/frame unchanged.
-- 10 pre-deployment regressions PASS. Physical A/B/A pending, default unchanged.
+- All30 A/B/A exact PCM: CPU19287.47015 /87.47965 /87.47535%; both speed gates
+  FAIL, no reproducible gain. Candidate rejected; default unchanged.
+- 33 final related regressions PASS/0skip,11 host semantic-parent cases exact.
+  Free DRAM minima8176 /8352 /8024 B, stack free1660 B, static RAM/frame same.
+- Every attempt/maximum/accounting excess retained; ordinary restored OTA,
+  HTTP200/WS/current167/stopped/playlist verified. Goal70%/live I2S unmet.
   [Details](../docs/ESP8266_OPUS_ASM_FFT_LOAD3.md).
 
 ## Development - 2026-09-14: ESP8266 Opus MDCT post-rotation pairs
