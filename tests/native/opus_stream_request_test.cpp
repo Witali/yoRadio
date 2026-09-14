@@ -4,6 +4,9 @@
 #include <string>
 #include <cstdio>
 #include <cstdint>
+#define YORADIO_ESP8266_OPUS_STREAM_TEST 1
+#include "../../esp8266/rtos-sdk-native/components/helix_codecs/codec_bridge.h"
+#include "../../esp8266/rtos-sdk-native/components/helix_codecs/native_heap_diag.h"
 using esp_err_t = int;
 static constexpr int ESP_OK = 0, ESP_FAIL = -1;
 struct httpd_req_t {
@@ -15,11 +18,10 @@ struct httpd_req_t {
 static unsigned queued, named;
 static int queue_result;
 static std::string queued_url;
-struct helix_opus_init_failure_t { uint32_t stage, free_dram, requested_bytes, reserve_bytes; int32_t detail; };
 static helix_opus_init_failure_t diagnostic;
-static void helix_codec_opus_init_failure_snapshot(helix_opus_init_failure_t *out) { *out = diagnostic; }
-static constexpr unsigned MALLOC_CAP_8BIT = 4;
-static size_t heap_caps_get_free_size(unsigned caps) { assert(caps == MALLOC_CAP_8BIT); return UINT32_MAX; }
+static native_heap_diag_t heap_diagnostic;
+void helix_codec_opus_init_failure_snapshot(helix_opus_init_failure_t *out) { *out = diagnostic; }
+native_heap_diag_t native_heap_diag_snapshot(void) { return heap_diagnostic; }
 static void prepare_short_response(httpd_req_t *) {}
 static void httpd_resp_set_type(httpd_req_t *, const char *) {}
 static void httpd_resp_set_hdr(httpd_req_t *, const char *, const char *) {}
@@ -45,9 +47,15 @@ static httpd_req_t run(std::string input, bool error = false) {
 }
 int main() {
     httpd_req_t status{0, "", "", ""};
-    diagnostic = {UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, INT32_MIN};
+    diagnostic = {UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, INT32_MIN, UINT32_MAX};
+    heap_diagnostic = {UINT32_MAX, UINT32_MAX};
     assert(opus_test_stream_status_handler(&status) == ESP_OK);
-    assert(status.output == "{\"stage\":4294967295,\"free_dram\":4294967295,\"requested_bytes\":4294967295,\"reserve_bytes\":4294967295,\"detail\":-2147483648,\"current_dram\":4294967295}");
+    assert(status.output == "{\"stage\":4294967295,\"free_dram\":4294967295,\"requested_bytes\":4294967295,\"reserve_bytes\":4294967295,\"detail\":-2147483648,\"largest_dram\":4294967295,\"current_dram\":4294967295,\"current_largest\":4294967295}");
+    assert(status.output.size() < 256);
+    diagnostic = {HELIX_OPUS_INIT_SCRATCH, 2000, 6144, 1024, -7, 512};
+    heap_diagnostic = {27000, 19000};
+    assert(opus_test_stream_status_handler(&status) == ESP_OK);
+    assert(status.output == "{\"stage\":8,\"free_dram\":2000,\"requested_bytes\":6144,\"reserve_bytes\":1024,\"detail\":-7,\"largest_dram\":512,\"current_dram\":27000,\"current_largest\":19000}");
     assert(!queued && !named);
     for (const std::string &input : {std::string(""), std::string("http://"),
             std::string("https://example.org/a"), std::string("http://a/\r\nX: a"),
