@@ -3,7 +3,7 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-14: ESP8266 Opus ASM bit_logp shrink-wrap (experiment)
+## Development - 2026-09-14: ESP8266 Opus ASM bit_logp shrink-wrap (rejected)
 
 - `development/esp8266-opus-bands-logp-v1/app.bin`, 903232 B,
   SHA256 `4d702c39ecb911d6d941059cb66323f72058bee0d03823cfbf62c7a9940b2b5d`.
@@ -11,7 +11,12 @@ entries are retained; changes are published under a new firmware version.
 - Shared entropy leaf delays its 16-byte frame to normalization; fast path
   saves11 instructions, cold path count unchanged. No static RAM growth.
   100000 instruction cases,58 Node PASS, exact host PCM through510 kbit/s.
-- Board A/B/A not yet complete; no speed/70% claim.
+- All30 board A/B/A attempts retained: CPU192 88.100 /92.442 /88.121%,
+  about4.93% more time, rejected. Includes run9 CPU192106.260%, minimum
+  sampled DRAM1356 B; all PCM exact, no discarded attempts or decoder errors.
+- Ordinary live512-idle3s firmware restored OTA, initially stopped state
+  retained. HTTP/status/audio, WebSocket, playlist verified. Root137ms is
+  a single HTTP response, not full-browser timing. Goal70% remains unmet.
   [Recipe and measurements](../docs/ESP8266_OPUS_ASM_LOGP.md).
 
 ## Development - 2026-09-14: ESP8266 Opus ASM inner-product unroll4 (rejected)

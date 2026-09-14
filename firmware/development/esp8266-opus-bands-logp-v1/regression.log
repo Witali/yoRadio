@@ -1,0 +1,370 @@
+TAP version 13
+# Subtest: IRAM link capacity never substitutes for measured runtime headroom
+ok 1 - IRAM link capacity never substitutes for measured runtime headroom
+  ---
+  duration_ms: 17.705
+  type: 'test'
+  ...
+# Subtest: ABBA preserves ten trials per variant and alternates first-run bias
+ok 2 - ABBA preserves ten trials per variant and alternates first-run bias
+  ---
+  duration_ms: 2.0697
+  type: 'test'
+  ...
+# Subtest: IRAM experiment permits placement only and rejects mismatched RAM or corpus
+ok 3 - IRAM experiment permits placement only and rejects mismatched RAM or corpus
+  ---
+  duration_ms: 88.2877
+  type: 'test'
+  ...
+# Subtest: matching physical A/B artifacts and raw fixtures are verified before OTA
+ok 4 - matching physical A/B artifacts and raw fixtures are verified before OTA
+  ---
+  duration_ms: 18.2395
+  type: 'test'
+  ...
+# Subtest: compiler command parser does not invoke a shell and keeps quoted definitions
+ok 5 - compiler command parser does not invoke a shell and keeps quoted definitions
+  ---
+  duration_ms: 2.9434
+  type: 'test'
+  ...
+# Subtest: full ASM snapshot covers every upstream unit and both variants verify
+ok 6 - full ASM snapshot covers every upstream unit and both variants verify
+  ---
+  duration_ms: 261.9636
+  type: 'test'
+  ...
+# Subtest: annotations preserve comments and describe the function ABI
+ok 7 - annotations preserve comments and describe the function ABI
+  ---
+  duration_ms: 0.8722
+  type: 'test'
+  ...
+# Subtest: stale source hashes and a different exported feature set fail closed
+ok 8 - stale source hashes and a different exported feature set fail closed
+  ---
+  duration_ms: 23.4093
+  type: 'test'
+  ...
+# Subtest: ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+ok 9 - ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+  ---
+  duration_ms: 0.5415
+  type: 'test'
+  ...
+# Subtest: hoisted SAR keeps every register, store and exact rounding for 10000 cases
+ok 10 - hoisted SAR keeps every register, store and exact rounding for 10000 cases
+  ---
+  duration_ms: 29199.4814
+  type: 'test'
+  ...
+# Subtest: transform refuses calls, new shift writes, invariant mutation and external entries
+ok 11 - transform refuses calls, new shift writes, invariant mutation and external entries
+  ---
+  duration_ms: 3.5131
+  type: 'test'
+  ...
+# Subtest: LF and CRLF comments preserve every non-SSR instruction
+ok 12 - LF and CRLF comments preserve every non-SSR instruction
+  ---
+  duration_ms: 3.1471
+  type: 'test'
+  ...
+# Subtest: all three snapshots keep hashes, comments and independent entropy implementation
+ok 13 - all three snapshots keep hashes, comments and independent entropy implementation
+  ---
+  duration_ms: 75.2126
+  type: 'test'
+  ...
+# Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
+ok 14 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
+  ---
+  duration_ms: 1.5515
+  type: 'test'
+  ...
+# Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+ok 15 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+  ---
+  duration_ms: 1.2472
+  type: 'test'
+  ...
+# Subtest: intensity overlay is one decoder-only early branch, not entropy removal
+ok 16 - intensity overlay is one decoder-only early branch, not entropy removal
+  ---
+  duration_ms: 121.739
+  type: 'test'
+  ...
+# Subtest: early qn=1 preserves final qn across intensity/N/budget boundaries
+ok 17 - early qn=1 preserves final qn across intensity/N/budget boundaries
+  ---
+  duration_ms: 13.4337
+  type: 'test'
+  ...
+# Subtest: only three reviewed block-count division sites change; arbitrary entropy division stays
+ok 18 - only three reviewed block-count division sites change; arbitrary entropy division stays
+  ---
+  duration_ms: 190.8425
+  type: 'test'
+  ...
+# Subtest: NSAU-based unsigned shift equals integer division, including uint32 high bit
+ok 19 - NSAU-based unsigned shift equals integer division, including uint32 high bit
+  ---
+  duration_ms: 302.343
+  type: 'test'
+  ...
+# Subtest: assembly equivalence check retains operands and branch graph, permits density encodings
+ok 20 - assembly equivalence check retains operands and branch graph, permits density encodings
+  ---
+  duration_ms: 1.2724
+  type: 'test'
+  ...
+# { total: 376832, pathsWithSavedLoad: 1956 }
+# Subtest: real ASM preserves all 16 registers and exact cost across every standard cache/budget
+ok 21 - real ASM preserves all 16 registers and exact cost across every standard cache/budget
+  ---
+  duration_ms: 6753.8773
+  type: 'test'
+  ...
+# Subtest: only three anchored edits; no whole qn=1 branch removal or new storage
+ok 22 - only three anchored edits; no whole qn=1 branch removal or new storage
+  ---
+  duration_ms: 2.0392
+  type: 'test'
+  ...
+# Subtest: backend verifies pinned sources and remains opt-in
+ok 23 - backend verifies pinned sources and remains opt-in
+  ---
+  duration_ms: 158.7565
+  type: 'test'
+  ...
+# Subtest: combined ASM is precisely intensity on block shifts, with unchanged vq overlay
+ok 24 - combined ASM is precisely intensity on block shifts, with unchanged vq overlay
+  ---
+  duration_ms: 390.7525
+  type: 'test'
+  ...
+# Subtest: 10000 exact ASM loops: raw iy, PCM, mask, live registers, guards and word loads
+ok 25 - 10000 exact ASM loops: raw iy, PCM, mask, live registers, guards and word loads
+  ---
+  duration_ms: 14364.7636
+  type: 'test'
+  ...
+# Subtest: scope/hash/frame guards and original rotation/fallback stay unchanged
+ok 26 - scope/hash/frame guards and original rotation/fallback stay unchanged
+  ---
+  duration_ms: 89.075
+  type: 'test'
+  ...
+# {
+#   asmVectorCases: 6162,
+#   maxN: 2048,
+#   scope: 'actual source instructions, not target cycle timing'
+# }
+# Subtest: actual ASM inner product: every length/tail, full int16 range and overflow
+ok 27 - actual ASM inner product: every length/tail, full int16 range and overflow
+  ---
+  duration_ms: 3475.953
+  type: 'test'
+  ...
+# Subtest: only energy loop changed; zero-length guard, scaling, ABI and all other functions preserved
+ok 28 - only energy loop changed; zero-length guard, scaling, ABI and all other functions preserved
+  ---
+  duration_ms: 3.8037
+  type: 'test'
+  ...
+# Subtest: selectable overlay is pinned and default remains C
+ok 29 - selectable overlay is pinned and default remains C
+  ---
+  duration_ms: 194.1523
+  type: 'test'
+  ...
+# Subtest: placement overlays change only unreachable prefix; parent, C and GCC stay pinned
+ok 30 - placement overlays change only unreachable prefix; parent, C and GCC stay pinned
+  ---
+  duration_ms: 577.1853
+  type: 'test'
+  ...
+# Subtest: only relocated quant_partition entry literals normalize; numeric data remain checked
+ok 31 - only relocated quant_partition entry literals normalize; numeric data remain checked
+  ---
+  duration_ms: 1.4789
+  type: 'test'
+  ...
+# Subtest: both placement modes exposed through build configuration
+ok 32 - both placement modes exposed through build configuration
+  ---
+  duration_ms: 0.5857
+  type: 'test'
+  ...
+# Subtest: linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
+ok 33 - linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
+  ---
+  duration_ms: 3.6955
+  type: 'test'
+  ...
+# Subtest: linked graph retains branch destinations, register operations and numeric literals
+ok 34 - linked graph retains branch destinations, register operations and numeric literals
+  ---
+  duration_ms: 1.6721
+  type: 'test'
+  ...
+# Subtest: CFG follows real targets, never decodes padding after J, rejects reachable garbage
+ok 35 - CFG follows real targets, never decodes padding after J, rejects reachable garbage
+  ---
+  duration_ms: 8.4477
+  type: 'test'
+  ...
+# Subtest: literal profile differs only by placement and artifact identity
+ok 36 - literal profile differs only by placement and artifact identity
+  ---
+  duration_ms: 3.3935
+  type: 'test'
+  ...
+# Subtest: text literal option is scoped to exactly one pinned bands ASM unit
+ok 37 - text literal option is scoped to exactly one pinned bands ASM unit
+  ---
+  duration_ms: 0.9282
+  type: 'test'
+  ...
+# Subtest: literal offsets are recorded without claiming cache misses
+ok 38 - literal offsets are recorded without claiming cache misses
+  ---
+  duration_ms: 0.9315
+  type: 'test'
+  ...
+# Subtest: build flag defaults OFF and protects production/C fallback
+ok 39 - build flag defaults OFF and protects production/C fallback
+  ---
+  duration_ms: 0.4581
+  type: 'test'
+  ...
+# {
+#   states: 100000,
+#   fast: 81194,
+#   cold: 18806,
+#   scope: 'actual ASM semantics; not cycles'
+# }
+# Subtest: logp complete ASM matches scalar math, padding and call0 ABI on 100000 states
+ok 40 - logp complete ASM matches scalar math, padding and call0 ABI on 100000 states
+  ---
+  duration_ms: 2181.1587
+  type: 'test'
+  ...
+# Subtest: only prefix changed; normalization identical, C default intact and generated overlay pinned
+ok 41 - only prefix changed; normalization identical, C default intact and generated overlay pinned
+  ---
+  duration_ms: 163.1882
+  type: 'test'
+  ...
+# Subtest: actual ASM snippet has exact lookup/guards and preserves live registers
+ok 42 - actual ASM snippet has exact lookup/guards and preserves live registers
+  ---
+  duration_ms: 573.5342
+  type: 'test'
+  ...
+# Subtest: C mirror matches original rate.h including custom pointer and budget fallback
+ok 43 - C mirror matches original rate.h including custom pointer and budget fallback
+  ---
+  duration_ms: 5986.7429
+  type: 'test'
+  ...
+# Subtest: ASM overlays are reproducible and baseline remains protected
+ok 44 - ASM overlays are reproducible and baseline remains protected
+  ---
+  duration_ms: 95.1794
+  type: 'test'
+  ...
+# Subtest: only three constant-one sites added to pinned tell-inline; C/GCC remain protected
+ok 45 - only three constant-one sites added to pinned tell-inline; C/GCC remain protected
+  ---
+  duration_ms: 263.9574
+  type: 'test'
+  ...
+# Subtest: 100000 interpreted macro executions: bit, counters, cold state and preserved registers
+ok 46 - 100000 interpreted macro executions: bit, counters, cold state and preserved registers
+  ---
+  duration_ms: 780.0902
+  type: 'test'
+  ...
+# Subtest: macro arithmetic is the exact GCC leaf body without return
+ok 47 - macro arithmetic is the exact GCC leaf body without return
+  ---
+  duration_ms: 2.7189
+  type: 'test'
+  ...
+# Subtest: only four pinned quant_partition calls are expanded and baseline stays exact
+ok 48 - only four pinned quant_partition calls are expanded and baseline stays exact
+  ---
+  duration_ms: 128.2522
+  type: 'test'
+  ...
+# Subtest: actual macro preserves results and live registers at every normalized threshold
+ok 49 - actual macro preserves results and live registers at every normalized threshold
+  ---
+  duration_ms: 492.968
+  type: 'test'
+  ...
+# Subtest: tell + intensity is exactly either composition order, with one correction table
+ok 50 - tell + intensity is exactly either composition order, with one correction table
+  ---
+  duration_ms: 380.7218
+  type: 'test'
+  ...
+# Subtest: absolute report distinguishes relative slowdown from CPU percentage points
+ok 51 - absolute report distinguishes relative slowdown from CPU percentage points
+  ---
+  duration_ms: 24.6804
+  type: 'test'
+  ...
+# Subtest: tell/update composition changes only six exact sites and retains one shared table
+ok 52 - tell/update composition changes only six exact sites and retains one shared table
+  ---
+  duration_ms: 395.3179
+  type: 'test'
+  ...
+# Subtest: source/table evidence stays pinned until the host proof is rerun
+ok 53 - source/table evidence stays pinned until the host proof is rerun
+  ---
+  duration_ms: 25.2685
+  type: 'test'
+  ...
+# Subtest: all standard-mode split budgets exclude qb < 4, independently of bitrate
+ok 54 - all standard-mode split budgets exclude qb < 4, independently of bitrate
+  ---
+  duration_ms: 24.7186
+  type: 'test'
+  ...
+# Subtest: proof rejects a weakened caller guard; generic low-budget theta is not dead
+ok 55 - proof rejects a weakened caller guard; generic low-budget theta is not dead
+  ---
+  duration_ms: 1.7833
+  type: 'test'
+  ...
+# Subtest: screened-out ASM only replaces the no-entropy calculation, not its branch
+ok 56 - screened-out ASM only replaces the no-entropy calculation, not its branch
+  ---
+  duration_ms: 42.1668
+  type: 'test'
+  ...
+# Subtest: two decoder call sites only; protected baseline and shared function unchanged
+ok 57 - two decoder call sites only; protected baseline and shared function unchanged
+  ---
+  duration_ms: 120.9943
+  type: 'test'
+  ...
+# Subtest: 100000 real macro executions preserve uint32 math, registers and cold-path state
+ok 58 - 100000 real macro executions preserve uint32 math, registers and cold-path state
+  ---
+  duration_ms: 684.1953
+  type: 'test'
+  ...
+1..58
+# tests 58
+# suites 0
+# pass 58
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 29430.8861
