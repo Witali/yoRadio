@@ -40,7 +40,7 @@ function dependencies(depfile) {
 }
 
 async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false, asmEntropyModel = false, asmBandsModel = '' } = {}) {
-  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline','fused','tell-intensity','update-fast','tell-update','tell-bits1','cache-reuse','inner4','logp'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
+  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline','fused','tell-intensity','update-fast','tell-update','tell-bits1','cache-reuse','inner4','logp','small-div'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
   if (asmEntropyModel && !bounded) throw Error('asmEntropyModel requires bounded decoder.');
   if (silkPlcIram && !bounded) throw Error('silkPlcIram requires bounded decoder.');
   if (autocorrCompact && !bounded) throw Error('autocorrCompact requires bounded decoder.');
@@ -64,6 +64,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
       .map(file => path.join(sourceRoot, dir, file)));
   if (bounded) sources.push(path.join(component, 'opus_memory.c'));
   const modelSources = [];
+  if (asmBandsModel==='small-div') for(const model of require('../esp8266_opus_asm/small_div.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='logp') for(const model of require('../esp8266_opus_asm/logp.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='inner4') for(const model of require('../esp8266_opus_asm/inner4.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='cache-reuse') for(const model of require('../esp8266_opus_asm/cache_reuse.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;

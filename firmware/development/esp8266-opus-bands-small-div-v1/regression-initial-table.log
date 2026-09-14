@@ -1,0 +1,415 @@
+TAP version 13
+# Subtest: compiler command parser does not invoke a shell and keeps quoted definitions
+ok 1 - compiler command parser does not invoke a shell and keeps quoted definitions
+  ---
+  duration_ms: 2.1304
+  type: 'test'
+  ...
+# Subtest: full ASM snapshot covers every upstream unit and both variants verify
+ok 2 - full ASM snapshot covers every upstream unit and both variants verify
+  ---
+  duration_ms: 161.7089
+  type: 'test'
+  ...
+# Subtest: annotations preserve comments and describe the function ABI
+ok 3 - annotations preserve comments and describe the function ABI
+  ---
+  duration_ms: 0.5948
+  type: 'test'
+  ...
+# Subtest: stale source hashes and a different exported feature set fail closed
+ok 4 - stale source hashes and a different exported feature set fail closed
+  ---
+  duration_ms: 7.7892
+  type: 'test'
+  ...
+# Subtest: ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+ok 5 - ASM backend is opt-in, diagnostic only and ABI-incompatible features are rejected
+  ---
+  duration_ms: 0.4182
+  type: 'test'
+  ...
+# Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
+ok 6 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
+  ---
+  duration_ms: 1.0359
+  type: 'test'
+  ...
+# Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+ok 7 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+  ---
+  duration_ms: 0.7622
+  type: 'test'
+  ...
+# Subtest: intensity overlay is one decoder-only early branch, not entropy removal
+ok 8 - intensity overlay is one decoder-only early branch, not entropy removal
+  ---
+  duration_ms: 74.7535
+  type: 'test'
+  ...
+# Subtest: early qn=1 preserves final qn across intensity/N/budget boundaries
+ok 9 - early qn=1 preserves final qn across intensity/N/budget boundaries
+  ---
+  duration_ms: 6.2298
+  type: 'test'
+  ...
+# Subtest: linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
+ok 10 - linked graph compares direct CALL0 and relocated indirect CALLX0 without hiding cost
+  ---
+  duration_ms: 2.0601
+  type: 'test'
+  ...
+# Subtest: linked graph retains branch destinations, register operations and numeric literals
+ok 11 - linked graph retains branch destinations, register operations and numeric literals
+  ---
+  duration_ms: 0.9701
+  type: 'test'
+  ...
+# Subtest: CFG follows real targets, never decodes padding after J, rejects reachable garbage
+ok 12 - CFG follows real targets, never decodes padding after J, rejects reachable garbage
+  ---
+  duration_ms: 5.3629
+  type: 'test'
+  ...
+# Subtest: coefficients exactly match the original Xiph odd-divisor table
+not ok 13 - coefficients exactly match the original Xiph odd-divisor table
+  ---
+  duration_ms: 2.7335
+  type: 'test'
+  location: 'C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tests\\esp8266-opus-small-div.test.js:5:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    ... Skipped lines
+    
+      [
+        4294967295,
+        1431655765,
+        858993459,
+        613566756,
+    ...
+        16843009,
+    -   16711935
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 4294967295
+    1: 1431655765
+    2: 858993459
+    3: 613566756
+    4: 477218588
+    5: 390451572
+    6: 330382099
+    7: 286331153
+    8: 252645135
+    9: 226050910
+    10: 204522252
+    11: 186737708
+    12: 171798691
+    13: 159072862
+    14: 148102320
+    15: 138547332
+    16: 130150524
+    17: 122713351
+    18: 116080197
+    19: 110127366
+    20: 104755299
+    21: 99882960
+    22: 95443717
+    23: 91382282
+    24: 87652393
+    25: 84215045
+    26: 81037118
+    27: 78090314
+    28: 75350303
+    29: 72796055
+    30: 70409299
+    31: 68174084
+    32: 66076419
+    33: 64103989
+    34: 62245902
+    35: 60492497
+    36: 58835168
+    37: 57266230
+    38: 55778796
+    39: 54366674
+    40: 53024287
+    41: 51746593
+    42: 50529027
+    43: 49367440
+    44: 48258059
+    45: 47197442
+    46: 46182444
+    47: 45210182
+    48: 44278013
+    49: 43383508
+    50: 42524428
+    51: 41698711
+    52: 40904450
+    53: 40139881
+    54: 39403369
+    55: 38693399
+    56: 38008560
+    57: 37347541
+    58: 36709122
+    59: 36092162
+    60: 35495597
+    61: 34918433
+    62: 34359738
+    63: 33818640
+    64: 33294320
+    65: 32786009
+    66: 32292987
+    67: 31814572
+    68: 31350126
+    69: 30899045
+    70: 30460760
+    71: 30034736
+    72: 29620464
+    73: 29217464
+    74: 28825283
+    75: 28443492
+    76: 28071681
+    77: 27709466
+    78: 27356479
+    79: 27012372
+    80: 26676815
+    81: 26349492
+    82: 26030104
+    83: 25718367
+    84: 25414007
+    85: 25116767
+    86: 24826400
+    87: 24542670
+    88: 24265351
+    89: 23994230
+    90: 23729101
+    91: 23469766
+    92: 23216039
+    93: 22967739
+    94: 22724694
+    95: 22486739
+    96: 22253716
+    97: 22025473
+    98: 21801864
+    99: 21582750
+    100: 21367996
+    101: 21157474
+    102: 20951059
+    103: 20748634
+    104: 20550082
+    105: 20355295
+    106: 20164165
+    107: 19976592
+    108: 19792476
+    109: 19611722
+    110: 19434241
+    111: 19259943
+    112: 19088743
+    113: 18920560
+    114: 18755315
+    115: 18592932
+    116: 18433336
+    117: 18276456
+    118: 18122224
+    119: 17970574
+    120: 17821441
+    121: 17674762
+    122: 17530478
+    123: 17388531
+    124: 17248864
+    125: 17111423
+    126: 16976155
+    127: 16843009
+    128: 16711935
+  actual:
+    0: 4294967295
+    1: 1431655765
+    2: 858993459
+    3: 613566756
+    4: 477218588
+    5: 390451572
+    6: 330382099
+    7: 286331153
+    8: 252645135
+    9: 226050910
+    10: 204522252
+    11: 186737708
+    12: 171798691
+    13: 159072862
+    14: 148102320
+    15: 138547332
+    16: 130150524
+    17: 122713351
+    18: 116080197
+    19: 110127366
+    20: 104755299
+    21: 99882960
+    22: 95443717
+    23: 91382282
+    24: 87652393
+    25: 84215045
+    26: 81037118
+    27: 78090314
+    28: 75350303
+    29: 72796055
+    30: 70409299
+    31: 68174084
+    32: 66076419
+    33: 64103989
+    34: 62245902
+    35: 60492497
+    36: 58835168
+    37: 57266230
+    38: 55778796
+    39: 54366674
+    40: 53024287
+    41: 51746593
+    42: 50529027
+    43: 49367440
+    44: 48258059
+    45: 47197442
+    46: 46182444
+    47: 45210182
+    48: 44278013
+    49: 43383508
+    50: 42524428
+    51: 41698711
+    52: 40904450
+    53: 40139881
+    54: 39403369
+    55: 38693399
+    56: 38008560
+    57: 37347541
+    58: 36709122
+    59: 36092162
+    60: 35495597
+    61: 34918433
+    62: 34359738
+    63: 33818640
+    64: 33294320
+    65: 32786009
+    66: 32292987
+    67: 31814572
+    68: 31350126
+    69: 30899045
+    70: 30460760
+    71: 30034736
+    72: 29620464
+    73: 29217464
+    74: 28825283
+    75: 28443492
+    76: 28071681
+    77: 27709466
+    78: 27356479
+    79: 27012372
+    80: 26676815
+    81: 26349492
+    82: 26030104
+    83: 25718367
+    84: 25414007
+    85: 25116767
+    86: 24826400
+    87: 24542670
+    88: 24265351
+    89: 23994230
+    90: 23729101
+    91: 23469766
+    92: 23216039
+    93: 22967739
+    94: 22724694
+    95: 22486739
+    96: 22253716
+    97: 22025473
+    98: 21801864
+    99: 21582750
+    100: 21367996
+    101: 21157474
+    102: 20951059
+    103: 20748634
+    104: 20550082
+    105: 20355295
+    106: 20164165
+    107: 19976592
+    108: 19792476
+    109: 19611722
+    110: 19434241
+    111: 19259943
+    112: 19088743
+    113: 18920560
+    114: 18755315
+    115: 18592932
+    116: 18433336
+    117: 18276456
+    118: 18122224
+    119: 17970574
+    120: 17821441
+    121: 17674762
+    122: 17530478
+    123: 17388531
+    124: 17248864
+    125: 17111423
+    126: 16976155
+    127: 16843009
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tests\esp8266-opus-small-div.test.js:8:9)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: helper CFG follows fallback branch over padding and rejects reachable garbage
+ok 14 - helper CFG follows fallback branch over padding and rejects reachable garbage
+  ---
+  duration_ms: 6.9425
+  type: 'test'
+  ...
+# Subtest: LX106 exact small division: boundaries, quotient edges and ABI
+ok 15 - LX106 exact small division: boundaries, quotient edges and ABI
+  ---
+  duration_ms: 3831.5113
+  type: 'test'
+  ...
+# Subtest: large/zero divisors retain original args and tail-call libgcc
+ok 16 - large/zero divisors retain original args and tail-call libgcc
+  ---
+  duration_ms: 0.4225
+  type: 'test'
+  ...
+# Subtest: only rng/ft sites change; ext division and other functions stay intact
+ok 17 - only rng/ft sites change; ext division and other functions stay intact
+  ---
+  duration_ms: 1.0241
+  type: 'test'
+  ...
+# Subtest: macro arithmetic is the exact GCC leaf body without return
+ok 18 - macro arithmetic is the exact GCC leaf body without return
+  ---
+  duration_ms: 1.9518
+  type: 'test'
+  ...
+# Subtest: only four pinned quant_partition calls are expanded and baseline stays exact
+ok 19 - only four pinned quant_partition calls are expanded and baseline stays exact
+  ---
+  duration_ms: 75.8399
+  type: 'test'
+  ...
+# Subtest: actual macro preserves results and live registers at every normalized threshold
+ok 20 - actual macro preserves results and live registers at every normalized threshold
+  ---
+  duration_ms: 206.812
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 19
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3966.0837
