@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <string.h>
 #include "opus.h"
+/* Desktop-only framed-fixture reader: a little-endian uint16 byte length.
+ * Long, high-rate compound packets can exceed 4096 bytes. This is not an
+ * embedded input buffer and does not change the firmware RAM budget. */
+#define OPUS_PROBE_PACKET_CAPACITY UINT16_MAX
 #ifdef YORADIO_OPUS_BOUNDED
 #include "config.h"
 #include "structs.h"
@@ -139,7 +143,7 @@ static int sequence_test(int argc, char **argv) {
             FILE *in = fopen(argv[fixture], "rb");
             check(in != NULL, "cannot open sequence input");
             for (;;) {
-                unsigned char length[2], packet[4096];
+                unsigned char length[2], packet[OPUS_PROBE_PACKET_CAPACITY];
                 int16_t pcm[5760];
                 size_t read = fread(length, 1, 2, in);
                 if (!read) break;
@@ -204,7 +208,7 @@ int main(int argc, char **argv) {
     initialize(decoder);
     FILE *in = fopen(argv[1], "rb"), *out = fopen(argv[2], "wb");
     check(in && out, "cannot open input/output");
-    unsigned char packet[4096], first_packet[4096];
+    unsigned char packet[OPUS_PROBE_PACKET_CAPACITY], first_packet[OPUS_PROBE_PACKET_CAPACITY];
     unsigned first_size = 0, samples = 0, packets = 0, silk = 0, hybrid = 0, celt = 0;
     int16_t pcm[5760];
     for (;;) {
