@@ -3,7 +3,7 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-14: ESP8266 Opus exact small-div inline (experiment)
+## Development - 2026-09-14: ESP8266 Opus exact small-div inline (rejected)
 
 - `development/esp8266-opus-small-div-inline-v1/app.bin`, 904080 B,
   compared with current-source `esp8266-opus-inline-control-v1`, 903216 B.
@@ -12,7 +12,12 @@ entries are retained; changes are published under a new firmware version.
 - Three exact reciprocal divisions expand inline, one516 B flash table,
   original ROM fallback and C backend retained. No RAM/stack growth.
 - Linked-instruction model1,050,880 cases +20 fallback; exact semantic host
-  PCM through510 kbps; 10 regression tests pass. Physical speed pending.
+  PCM through510 kbps; 29 related regression tests pass, no skips.
+- All30 A/B/A board attempts retained: CPU192 88.1175 /101.9579 /88.1273%,
+  about15.7% more time; CPU128 also regresses. Rejected, not enabled by default.
+  Minimum sampled DRAM8168 /8168 /8344 B, stack free1660 B, no PCM errors.
+- Ordinary live512-idle3s app restored OTA, HTTP200/playlist/WebSocket/current167
+  stopped state verified. No live qualification of the rejected decoder.
 - These are raw-RAM benchmark builds, not normal radio. See
   [experiment](../docs/ESP8266_OPUS_ASM_SMALL_DIV_INLINE.md).
 
