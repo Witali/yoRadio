@@ -3,6 +3,18 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus folding8 (experiment)
+
+- `development/esp8266-opus-folding8-v1/app.bin`,903344 B; matched control
+  `esp8266-opus-folding-control-v1`,903216 B. CPU160/QIO40/cache16 raw-RAM
+  benchmark, opt-in `bands-folding8-asm`, not ordinary radio/default.
+- One folding sqrt site uses a92 B flash table for N0 multiples of8 <=176;
+  all other sizes keep the original sqrt. Original fixed-point coefficients,
+  no RAM/stack growth, unchanged C backend and constant-N2 site.
+- Host PCM through510/mixed/PLC/reset/OOM exact;108193 actual-instruction
+  cases,21 related tests. Physical A/B/A measurements pending; no speed claim.
+  [Implementation and checks](../docs/ESP8266_OPUS_ASM_FOLDING8.md).
+
 ## Development - 2026-09-14: ESP8266 Opus exact small-div inline (rejected)
 
 - `development/esp8266-opus-small-div-inline-v1/app.bin`, 904080 B,

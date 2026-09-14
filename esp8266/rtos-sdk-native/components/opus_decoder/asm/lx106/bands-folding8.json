@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "candidate": "bands-folding8-v1",
+  "base_manifest_sha256": "c98bc13abf082c51acf4a582f467ba94f256d2e45ae1e5ff6bf0e6ccdf8844dc",
+  "parent_sha256_lf": "794eda0bf7c1b1c87b51f87c38691b5b7ba8edb40efcc979cac93adcb3cd8171",
+  "recipe_sha256_lf": "1cbd69383d1846bb92eafd66b6fd32c376ce99b162ca2deeec672ce2f5546ff7",
+  "census_sha256_lf": "840b39ddda59cdd84acdbec4408e89fab2c8813279decf4485ef39bd2a007f47",
+  "files": [
+    {
+      "source": "upstream/celt/bands.c",
+      "overlay": "bands-folding8/upstream/celt/bands.c.s",
+      "overlay_sha256_lf": "e987389961b8622b36fc5ec2108bdc5efaf5d973643c9b974c2955c86ed0ef0a"
+    },
+    {
+      "source": "upstream/celt/entcode.c",
+      "overlay": "bands-tell-inline/upstream/celt/entcode.c.s",
+      "overlay_sha256_lf": "5596f73af4f21afefed77288009aab8f346019d91249b35100166a166b13443a"
+    }
+  ],
+  "table_bytes": 92,
+  "additional_static_ram_bytes": 0,
+  "stack_change_bytes": 0,
+  "changed_calls": 1,
+  "scope": "Exact fixed-point sqrt coefficients at one dynamic folding site; constant N2 site and all other sqrt calls unchanged; physical speed required"
+}
