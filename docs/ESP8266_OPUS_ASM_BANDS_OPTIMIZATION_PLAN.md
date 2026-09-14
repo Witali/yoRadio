@@ -874,3 +874,9 @@ OTA/HTTP109.6мс/WS/плейлист/stopped167. Цель80% и live I2S ещё
 Следующий независимый опыт — many-dimensions ROW[k-j] reuse из opportunity list.
 Итоговые62 связанные регрессии PASS/0skip, включая физический отчёт
 и проверку возврата ordinary; все артефакты сохранены с описанием в firmware.
+
+Подготовлен [PVQ many-dimensions pointer reuse](ESP8266_OPUS_ASM_PVQ_DIM_POINTER.md):
+свободный a0 хранит адрес ROW[k-j], следующие пробы используют decrement.
+Один286-byte диапазон,116→103 команды, RAM/frame прежние; первый успешный
+поиск без дополнительной работы. Все15 symbolic выходов,6720 numeric случаев
+и24 host PCM/ASan/UBSan сценария до510 точны. Следующий шаг —10 A/B/A на плате.

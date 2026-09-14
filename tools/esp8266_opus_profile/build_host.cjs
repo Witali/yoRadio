@@ -40,7 +40,7 @@ function dependencies(depfile) {
 }
 
 async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false, asmEntropyModel = false, asmBandsModel = '' } = {}) {
-  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline','fused','tell-intensity','update-fast','tell-update','tell-bits1','cache-reuse','inner4','logp','small-div','folding8','partition-decode','ec-bits','micro-bundle'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
+  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline','fused','tell-intensity','update-fast','tell-update','tell-bits1','cache-reuse','inner4','logp','small-div','folding8','partition-decode','ec-bits','micro-bundle','pvq-dim-pointer'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
   if (asmEntropyModel && !bounded) throw Error('asmEntropyModel requires bounded decoder.');
   if (silkPlcIram && !bounded) throw Error('silkPlcIram requires bounded decoder.');
   if (autocorrCompact && !bounded) throw Error('autocorrCompact requires bounded decoder.');
@@ -65,6 +65,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   if (bounded) sources.push(path.join(component, 'opus_memory.c'));
   const modelSources = [];
   if (asmBandsModel==='micro-bundle') for(const model of require('../esp8266_opus_asm/micro_bundle.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
+  if (asmBandsModel==='pvq-dim-pointer') for(const model of require('../esp8266_opus_asm/pvq_dim_pointer.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='ec-bits') for(const model of require('../esp8266_opus_asm/ec_bits.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='partition-decode') for(const model of require('../esp8266_opus_asm/partition_decode.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='small-div') for(const model of require('../esp8266_opus_asm/small_div.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
