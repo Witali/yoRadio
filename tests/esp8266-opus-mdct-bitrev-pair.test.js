@@ -1,0 +1,18 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),zlib=require('node:zlib');
+const f=require('../tools/esp8266_opus_asm/mdct_bitrev_pair.cjs'),base=require('../tools/esp8266_opus_asm/frozen_reloads.cjs'),{hash}=require('../tools/esp8266_opus_asm/export.cjs');
+const proof=JSON.parse(fs.readFileSync(path.join(f.art('candidate'),'preflight.json'))),p=proof.patches[0],fn=proof.functions[f.names[0]],now=proof.actual_functions[f.names[0]].disassembly;
+test('actual paired ASM has exact signed16 results for all word bits, both iterations and live registers',()=>{assert.deepEqual(f.prove(fn.disassembly,now,p),proof.symbolicProof);assert.equal(proof.symbolicProof.phases.reduce((s,x)=>s+x.old_loads,0),2);assert.equal(proof.symbolicProof.phases.reduce((s,x)=>s+x.new_loads,0),1);
+ const bad=now.replace('srai\ta6, a0, 16','srai\ta6, a0, 15');assert.notEqual(bad,now);assert.throws(()=>f.prove(fn.disassembly,bad,p));});
+test('a0 cache is caller-safe and removed scratch values cannot be read before overwrite',()=>{assert.deepEqual(f.liveness(fn,p),proof.liveness);assert.equal(proof.liveness.frame_bytes,96);
+ assert.throws(()=>f.liveness({...fn,disassembly:fn.disassembly.replace('mull\ta15, a10, a2','mull\ta15, a0, a2')},p),/a0/);
+ assert.throws(()=>f.liveness({...fn,disassembly:fn.disassembly.replace('l32i\ta8, a1, 4','l32i\ta8, a5, 4')},p),/Scratch/);
+ assert.throws(()=>f.liveness({...fn,disassembly:fn.disassembly.replace('addi.n\ta12, a12, 2','addi.n\ta12, a12, 4')},p));});
+test('matching and opcode checks reject branch bypass, wrong targets, wrong widths and live-code changes',()=>{assert.deepEqual(f.findPatch(fn),(({before_hex,after_hex,...q})=>q)(p));f.validateActual(fn.disassembly,now,p);
+ assert.throws(()=>f.findPatch({...fn,disassembly:fn.disassembly+'\n40249000: 000000 j '+(p.address+3).toString(16)+' <bad>'}),/Interior/);
+ assert.throws(()=>f.validateActual(fn.disassembly,now.replace('bbsi\ta12, 1,','bbsi\ta12, 2,'),p));
+ assert.throws(()=>f.validateActual(fn.disassembly,now.replace('addi\ta1, a1, -96','addi\ta1, a1, -112'),p));});
+test('all four actual immutable tables are aligned and cover complete standard transforms',()=>{const a=zlib.gunzipSync(fs.readFileSync(path.join(f.art('candidate'),'parent.elf.gz'))),report=require('../tools/esp8266_opus_asm/report_mdct_bitrev_pair.cjs');report.tableWords(a,proof.tables);
+ const bad=structuredClone(proof.tables);bad.supported_standard_transforms[0].address+=2;assert.throws(()=>report.tableWords(a,bad));
+ const bad2=structuredClone(proof.tables);bad2.supported_standard_transforms[3].n=59;assert.throws(()=>report.tableWords(a,bad2));});
+test('only one24-byte code range can change, never addresses, RAM, stack or other app bytes',()=>{const a=zlib.gunzipSync(fs.readFileSync(path.join(f.art('candidate'),'parent.elf.gz'))),b=base.patchElf(a,[p]);assert.equal(hash(b),proof.candidate_elf_sha256);const off=base.offsetAt(a,p.address,p.bytes);assert.deepEqual(a.subarray(0,off),b.subarray(0,off));assert.deepEqual(a.subarray(off+p.bytes),b.subarray(off+p.bytes));assert.equal(proof.static_ram_delta,0);assert.equal(proof.stack_delta,0);});
+test('archived image, parent, recipe and profile evidence reproduce and mismatched profiles fail',()=>{const {manifests}=require('../tools/esp8266_opus_asm/report_mdct_bitrev_pair.cjs').verifyPair();for(const change of [m=>m.cpu_mhz=80,m=>m.flash='QIO80',m=>m.opus_benchmark_output=true,m=>m.post_link_mdct_variant='control',m=>m.opus_function_profile=true]){const b=structuredClone(manifests.candidate);change(b);assert.throws(()=>f.manifestPair(manifests.control,b));}});
