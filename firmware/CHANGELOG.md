@@ -10,7 +10,13 @@ entries are retained; changes are published under a new firmware version.
 - One193-byte pre-rotation range: cached t0/t1/bitrev pairs and shared parity,
   rescheduled exact modular32 arithmetic. No RAM/stack growth or other ELF changes.
 - 450 symbolic pairs/all four transforms and16 numeric full transforms exact;
-  12 related regressions PASS. Physical10 A/10 B/10 A pending; default unchanged.
+  23 final related regressions PASS/0skip, fresh11-case host semantic parent.
+- All30 A/B/A retained, PCM exact. CPU192:88.05410 /87.68704 /88.06704%;
+  both128/192 relative gains exceed minor mono12 loss: accepted experimentally.
+  Free DRAM minima8176 /8168 /8384 B, stack1660 B, static RAM/codec scratch same.
+- Candidate maximum192 call21.932ms;70%/continuous I2S still unproven.
+  Ordinary C-backend radio restored OTA, HTTP200/WS/current167/stopped/playlist
+  verified. No default/profile change or UART recovery.
   [Recipe and evidence](../docs/ESP8266_OPUS_ASM_MDCT_THREE_PAIR.md).
 
 ## Development - 2026-09-14: ESP8266 Opus paired bitrev reads (not accepted)
