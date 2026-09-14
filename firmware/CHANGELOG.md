@@ -3,6 +3,21 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-14: ESP8266 Opus paired bitrev reads (not accepted)
+
+- `development/esp8266-opus-mdct-bitrev-pair-{control,candidate}-v1/app.bin`,
+  903216 B. CPU160/QIO40 raw diagnostic; parent is accepted MDCT-half variant.
+- One24-byte pre-rotation replacement caches two int16 entries in a0.
+  Half as many bitrev loads, no new RAM/stack, all other ELF bytes unchanged.
+  Pinned standard tables/ABI/liveness/signed bits checked; C/default unchanged.
+- All30 A/B/A exact PCM,24 related tests PASS/0skip. CPU192:
+  88.05546 /88.02013 /88.07158%; candidate NOT accepted: repeated128 gain
+  0.01595% is below mono12 slowdown0.02031%. Max192 call22.621ms not improved.
+- DRAM minima8004 /8172 /8168 B, stack1660 B. All attempts/maxima retained.
+  Ordinary radio restored OTA, root HTTP200/WS/current167/stopped/playlist
+  verified. Goal70% and continuous I2S qualification remain unmet.
+  [Detailed results](../docs/ESP8266_OPUS_ASM_MDCT_BITREV_PAIR.md).
+
 ## Development - 2026-09-14: ESP8266 Opus MDCT halfword selection
 
 - `development/esp8266-opus-mdct-half-{control,candidate}-v1/app.bin`,903216 B.
