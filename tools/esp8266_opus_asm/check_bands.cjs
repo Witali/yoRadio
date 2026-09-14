@@ -7,6 +7,7 @@ async function check(kind){
  const base=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,sanitize:true});
  const candidate=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,sanitize:true,asmBandsModel:kind});
  const out=path.join(root,'.build/opus-bands-'+kind),fixtures=path.join(root,'firmware/development/esp8266-opus-asm-library/fixtures');
+ fs.mkdirSync(out,{recursive:true});
  const report={scope:'Host semantic mirror, exact PCM/guards; not LX106 execution or timing',kind,recipe_sha256_lf:sourceHash(path.join(__dirname,kind==='intensity'?'bands.cjs':kind.replaceAll('-','_')+'.cjs')),cases:[]};
  const probe=(bin,args)=>JSON.parse(execute('env',['ASAN_OPTIONS=detect_leaks=0',hostPath(bin),...args]));
  const compare=(name,args)=>{
@@ -18,13 +19,13 @@ async function check(kind){
  };
  for(const f of JSON.parse(fs.readFileSync(path.join(fixtures,'manifest.json'))).fixtures)
   compare(f.name,pcm=>[hostPath(path.join(fixtures,f.name+'.opuspkt')),hostPath(pcm),'--self-test']);
- if(kind==='cache-reuse'||kind==='inner4'||kind==='logp'||kind==='tell-inline'||kind==='small-div'||kind==='folding8'||kind==='partition-decode'||kind==='ec-bits'){
+ if(kind==='cache-reuse'||kind==='inner4'||kind==='logp'||kind==='tell-inline'||kind==='small-div'||kind==='folding8'||kind==='partition-decode'||kind==='ec-bits'||kind==='micro-bundle'){
   const high=require('./high_fixtures.cjs').generate();
   report.high_fixtures=high.map(f=>({name:f.name,command:f.command,sha256:require('node:crypto').createHash('sha256').update(fs.readFileSync(f.file)).digest('hex')}));
   for(const f of high)compare(f.name,pcm=>[hostPath(f.file),hostPath(pcm),'--self-test']);
  }
  compare('mixed',pcm=>['--sequence',hostPath(pcm),...['mono-12','mono-24','stereo-64','stereo-192','mono-12'].map(n=>hostPath(path.join(fixtures,n+'.opuspkt')))]);
- if(kind==='partition-decode'||kind==='ec-bits'){
+ if(kind==='partition-decode'||kind==='ec-bits'||kind==='micro-bundle'){
   const phase=path.join(root,'tests/fixtures/opus_native/phase');
   for(const name of fs.readdirSync(phase).filter(n=>n.endsWith('.opuspkt')).sort())compare('phase-'+name,pcm=>[hostPath(path.join(phase,name)),hostPath(pcm),'--self-test']);
   const {grouped}=require('../esp8266_opus_profile/run_block_regressions.cjs');

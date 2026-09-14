@@ -857,3 +857,11 @@ Ordinary восстановлен OTA/HTTP101.5мс/WS/плейлист/stopped1
 Цель80% не достигнута, accepted baseline остаётся PVQ row-loop87.3%.
 Следующий независимый пункт — reuse ROW[k-j] в many-dimensions PVQ из
 opportunity list; это не повтор уже принятого many-pulses row-loop.
+
+По уточнению о накоплении микроправок собран отдельный
+[micro-bundle](ESP8266_OPUS_ASM_MICRO_BUNDLE.md): ec_dec_bits + FFT load3 +
+16 signed16 MULL→MUL16S на актуальном MDCT layout. 18 непересекающихся
+диапазонов, 91 байт; RAM/стек/прочие адреса неизменны. Linked symbolic/range
+проверки и 24 host PCM/ASan/UBSan сценария до510 точны. Это кандидат для
+проверки совокупного эффекта, а не принятие старых отдельных FAIL.
+Следующий шаг — 10 A/B/A на плате относительно принятого PVQ row-loop.
