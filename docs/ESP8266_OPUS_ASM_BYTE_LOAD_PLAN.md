@@ -2,7 +2,7 @@
 
 2026-09-15. [Narrow candidate accepted experimentally](ESP8266_OPUS_ASM_PVQ_BYTE_WORD.md)
 after30 physical A/B/A and exact PCM; CPU19284.01121%.
-Updated after the third experiment: accepted pvq-row-word82.00615% is the
+Updated after the fourth experiment: accepted pvq-endpoint-word80.99456% is the
 control for future comparisons; earlier results below retain their history.
 No firmware default, CPU/flash clock or RAM budget change.
 
@@ -154,7 +154,7 @@ endpoint reads, not the duplicate selected-cost read already removed.
   For a single fixed continuation, a candidate may use a0 to save SAR and
   jump back directly rather than RET; prove recursion/return restoration,
   interrupt semantics and all live registers before using that pattern.
-- [ ] Prove new encoder-only storage/entries and exact linked endpoint
+- [x] Prove new encoder-only storage/entries and exact linked endpoint
   selection/cost/remaining_bits behavior, then host and10 A/10 B/10 A.
   Existing adjustment-loop read0x4024e258 is a separate candidate/census.
 
@@ -165,7 +165,7 @@ also finds a8/a10 live later at0x4024db88/0x4024db8a and a11 immediately
 live at0x4024db39. Do not choose them as free scratch. A separate two-site
 scheduling/return proof or save/restore is required, as is careful treatment
 of the last halfword in the210-byte table (length not divisible by4).
-None of these follow-up candidates is implemented or timed yet.
+The index and adjustment-loop candidates remain unimplemented and untimed.
 
 [Endpoint word candidate implemented and locally verified](ESP8266_OPUS_ASM_PVQ_ENDPOINT_WORD.md):
 upper ADD destination changed to reuse the a10 leaf; lower fixed J fragment
@@ -173,4 +173,15 @@ preserves SAR via dead a0. Four patches56 bytes, same image903216 B and RAM/
 IRAM/frame.50176 direct cases+378304 complete searches,804309 word loads exact;
 24 host scenarios pass. Disconnected120 encoder-only instructions are still
 in the ELF and independently proven dead; full outside-byte equality retained.
-Physical10 A/10 B/10 A pending. Index/adjustment-loop candidates remain unbuilt.
+Physical10 A/10 B/10 A completed, exact PCM in all30 runs:
+CPU19281.98187 /80.99456 /82.01310%,CPU12873.29400 /72.59856 /73.28813%.
+Both high-bitrate gates PASS; no RAM/frame growth. MinDRAM8344 /8176 /8344 B,
+free stack1660 B, B192max20.495ms. No decoder/HTTP observation errors;
+A/run8 mono12 task>wall267us retained. Ordinary C radio restored OTA with
+matching stopped167/playlist and HTTP/WS. Default unchanged.
+Accepted experimental control80.99456%;80% and20second live gate pending.
+Final147 related regressions PASS/0skip; full log retained with the image.
+Index/adjustment-loop candidates remain unbuilt. Read-only ELF inspection
+finds the210-byte index followed by two zero padding bytes inside flash.rodata;
+any later word-read recipe must independently authenticate those bytes and
+the containing section, not assume every layout has readable padding.

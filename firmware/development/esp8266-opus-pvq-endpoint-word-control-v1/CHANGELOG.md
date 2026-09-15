@@ -4,8 +4,10 @@ Experimental raw Opus ASM benchmark; not ordinary radio or a default profile.
 CPU160MHz/runtime QIO40, RAM-preloaded packets; physical audio output OFF.
 Application-only native WebUI OTA. Never send UART commands or reset GPIO3.
 
-Parent row-word accepted raw CPU19282.00615%. New upper read reuses a10
-leaf; new lower fixed-continuation fragment uses a0 for SAR. Image903216 B,
-four frozen-layout patches,total56 bytes; unchanged RAM/IRAM/frame/tables.
-Host24 cases and actual linked search exact. Physical speed still pending.
-See docs/ESP8266_OPUS_ASM_PVQ_ENDPOINT_WORD.md, manifest.json and preflight.json.
+Unchanged accepted row-word app,903216 B; no endpoint-word patches.
+All20 control attempts completed, exact PCM; median CPU19281.98187% before
+and82.01310% after the candidate. Candidate80.99456% passes both comparisons.
+No decoder/HTTP observation errors. Minimum DRAM8344 B and stack1660 B
+in both controls; A/run8 mono12 timing excess267us retained.
+Ordinary radio restored through OTA after all30 A/B/A attempts.
+See the candidate artifact directory for full comparisons, logs and restoration.

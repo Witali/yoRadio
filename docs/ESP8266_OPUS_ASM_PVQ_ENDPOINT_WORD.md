@@ -1,7 +1,8 @@
 # Opus ASM: original endpoint costs through word loads
 
 2026-09-15. Parent: accepted row-word82.00615% raw CPU192.
-Experimental candidate; physical speed and80%/live qualification pending.
+Accepted experimental candidate after30 physical A/B/A runs:80.99456% raw
+CPU192. The80% target and live I2S/WebUI qualification remain unproven.
 
 ## Minimal change and ABI
 
@@ -74,9 +75,62 @@ All145 related preflight regressions passed,0 failures/skips,180.14seconds.
 The complete log is retained beside the candidate image. This is not the
 whole repository suite and does not establish physical acceleration.
 
-Pending10 A/10 B/10 A against row-word at160MHz/runtime QIO40. Identical
+Completed10 A/10 B/10 A against row-word at160MHz/runtime QIO40. Identical
 RAM-preloaded packets, no audio/network input or stage/function profiling.
 Retain every attempt/error/maximum/minimum RAM and low-rate regression.
 Accept only the high-bitrate criterion against both controls without RAM
 growth; the current CPU target is80%, not the legacy70% report field.
-Restore ordinary radio using OTA afterwards; no UART commands or reset.
+Ordinary radio restored using OTA afterwards; no UART commands or reset.
+
+## Physical results
+
+All30 attempts completed with exact PCM. Median raw CPU, percent:
+
+|kbps|A:row-word|B:endpoint-word|A2:row-word|Maximum call A/B/A2,us|
+|---|---:|---:|---:|---|
+|12|23.08423|23.09308|23.09133|7181 /7639 /7830|
+|24|54.15513|54.10419|54.15635|15608 /14540 /14886|
+|64|63.19948|62.86158|63.20721|17445 /16972 /17688|
+|128|73.29400|72.59856|73.28813|20985 /18844 /20058|
+|192|81.98187|80.99456|82.01310|22197 /20495 /21980|
+
+Both high-bitrate gates PASS. Relative decode-time reduction at192 is
+1.20431% /1.24193%, at1280.94883% /0.94089%. Mono12 is slower by
+0.03836% /0.00758%, less than either high-bitrate gain. No bitrate cap.
+New experimental control:80.9945625% CPU192. Its ten-run range is
+80.94275..81.04154%,mean80.99285%. Another1.22794% relative time reduction
+is needed to reach80%; do not mistake rounding to81% for passing the goal.
+
+Static RAM/IRAM and112-byte frame unchanged. Free stack minimum1660 B in
+every group. Observed free DRAM minima A/B/A2:8344 /8176 /8344 B;
+at192:9800 /9792 /9800 B. Post-run free DRAM minimum26300 B in each group.
+These are dynamic free-memory observations, not allocation sizes or a
+claim that the ASM change saves RAM. No decoder or HTTP observation errors
+occurred in these30 runs. A/run8 mono12 has task>wall excess267us; it is
+retained without subtraction/clamping. All B/A2 windows are retained too.
+
+Maximum B19220.495ms improved against both controls but still exceeds20ms;
+raw median and this maximum do not establish uninterrupted I2S output.
+The benchmark has no physical output and no network audio input.
+
+Source/proofs commit8b0bdc7c; census0304c89f. [All30 attempts, manifests,
+hashes and independently checked comparisons](../firmware/development/esp8266-opus-pvq-endpoint-word-candidate-v1/comparison.json)
+are archived with the candidate image. Firmware default remains unchanged.
+
+## Ordinary restoration
+
+Restored ordinary live512-idle3s C-backend through OTA to0x10000,885552 B,
+SHA256661becd301b07885d493ceb1b513d9e874b7d86e4ada8231da8657aa90983c4b.
+CPU160/QIO40,I2S PDM32 GPIO3,2x512 DMA,benchmark OFF. HTTP/WebSocket/getindex/
+playerwrap,stopped station167 and playlist hash match the fresh pre-test
+snapshot. Empty error; heap27628/min24748 B,RSSI-61dBm.
+Root returned HTTP200 in104.1972ms,27249gzip bytes,unchanged SHA256
+7fdfd886707344338e824fe30430ee327482d627c153e322f7cc2fa321989a3f.
+No SPIFFS/NVS update or UART/reset. Root transfer is not full-browser latency;
+restoring a stopped ordinary image is not20seconds of live ASM playback.
+
+Final147 related regressions PASS,0 failures/skips,206.19seconds. The new
+results tests independently recompute all30 attempts, medians, maxima, free
+memory, acceptance gates, image proofs and ordinary restoration. The complete
+final-tests.log is archived beside the image; this is the related suite,
+not every repository test. Current80% and live qualification remain pending.
