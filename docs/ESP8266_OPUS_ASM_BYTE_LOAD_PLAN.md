@@ -192,9 +192,29 @@ the containing section, not assume every layout has readable padding.
   exact PCM/memory under sanitizers; independent row-count agreement.
   At1923026 reads/0.24s=12608.33/s;last index24 reads. No negative indices
   observed, but retain signed semantics for every16-bit value.
-- [ ] Prove moving original return store0x4024db36 to0x4024db22, and moving
+- [x] Prove moving original return store0x4024db36 to0x4024db22, and moving
   the index load to the old store site via a fixed-continuation helper.
   No intervening use of a2 or a0 may be ignored. Authenticate final word
   padding, dead storage, interrupt/return behavior and all live registers.
 - [ ] Exact host/linked verification, unchanged bytes outside patches,
   no RAM/frame growth, then10 A/10 B/10 A and ordinary OTA restoration.
+
+[Index-word v2 built and locally verified](ESP8266_OPUS_ASM_PVQ_INDEX_WORD.md):
+29-byte/10-instruction fixed-J helper,35 patched bytes,unchanged903216-byte
+image and static RAM/frame. Signed extraction uses SLLI16/SRAI16; initial
+SEXT assembly failure retained, never flashed. All137792 linked prefix
+cases and24 host PCM/state cases exact. Full154 related preflight PASS/0skip,
+229.79seconds. Physical gate pending; accepted baseline still80.99456%.
+
+### Subsequent independent hypothesis: two constant halfword paths
+
+- [ ] Because the index is int16-aligned, test address bit1 and specialize
+  phase0/2 instead of using variable SAR. Low half:word,SLLI16,SRAI16;
+  high half:subtract2,word,SRAI16. Both return by a fixed J. First confirm
+  the target bit-test branch instruction with the actual LX106 assembler.
+- [ ] Prove all registers including a0 and SAR unchanged except a2 result;
+  then the original return store may remain in its original place. Use the
+  accepted endpoint-word parent as a separate candidate, not a silent v2 edit.
+- [ ] Reuse the full signed/bounds/PCM proof and at least10 physical trials
+  per compared variant. Fewer dynamic instructions are a hypothesis, not
+  proof of faster execution: branch and flash-layout costs must be measured.
