@@ -75,9 +75,12 @@ L8UI a4,a4,0 sites:0x4024db52 (upper cost before split decision) and
 a0/a11 dead after both instructions; this alone is not a complete proof
 of a new helper or a measured speedup.
 
-- [ ] Count each selected load on the actual audio corpus. The existing
+- [x] Count each selected load on the actual audio corpus. The existing
   search census gives1765 first probes per0.24s at192, but does not count
   every pre-split upper-cost read; do not extrapolate that count blindly.
+  [Completed census](ESP8266_OPUS_PVQ_A4_WORD_PROFILE.md):1765 first probes
+  and2596 upper reads per0.24s at192,18170.83/s total.10 exact PCM files
+  through510, unchanged scratch/state/guards, ASan/UBSan and3 regressions PASS.
 - [ ] Prototype an a4-input/output leaf with saved/restored SAR and dead a11,
   retaining a0 return correctness. A possible25-byte slot is0x4024de08:
   inside the old helper's32-byte unreachable padding, aligned4. Prove no
