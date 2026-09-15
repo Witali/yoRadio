@@ -1,0 +1,1135 @@
+{
+  "schema": 1,
+  "scope": "Host original-value table reads and partition N=2 census. No target change, no timing, no claim that host inlining matches GCC LX106.",
+  "recipe_sha256_lf": "4050606cbc5a3340589a05b6eb59c693a6f8d4d9ff5855893601528b631617fd",
+  "observer_sha256_lf": "7e42851b1b9d7826c0b09b89f422f3d716928a70165ba7eecf6f82461a6b1386",
+  "parent_recipe_sha256_lf": "de9b5471fe6d27a5f1a0256c082fddc5b5718d4693f2a33c1d23256066227969",
+  "generated_model_sha256_lf": "2e1d4cab16d3256e811fc48e95917219246b09b268d27e67382ade5b25772b44",
+  "linked_inventory": {
+    "elf_sha256": "7962acee59c360c20771baf64ae4a5c3885cfc8422110660f94fc5e3a5c22594",
+    "tables": [
+      {
+        "name": "logN",
+        "address": 1076714072,
+        "bytes": 42,
+        "values": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          8,
+          8,
+          8,
+          16,
+          16,
+          16,
+          21,
+          21,
+          24,
+          29,
+          34,
+          36
+        ],
+        "sha256": "f3a66823d7cb4bc6dd763320971cb4f640b827db206d7ffd64c9058edc3d6861",
+        "last_aligned_word_hex": "24000000"
+      },
+      {
+        "name": "exp2_table8",
+        "address": 1076720856,
+        "bytes": 16,
+        "values": [
+          16384,
+          17866,
+          19483,
+          21247,
+          23170,
+          25267,
+          27554,
+          30048
+        ],
+        "sha256": "54671ca12061a6851837605366bbafdaad2596f10312651b5a6bd6e2b7c607ea",
+        "last_aligned_word_hex": "a26b6075"
+      }
+    ],
+    "loads": [
+      {
+        "address": 1076157329,
+        "text": "l16si a4, a10, 0"
+      },
+      {
+        "address": 1076157558,
+        "text": "l16si a3, a3, 0"
+      }
+    ],
+    "scope": "Pinned quant_partition instruction/table inventory; host call counts are semantic, not a per-PC trace. No new helper, full ABI proof or timing."
+  },
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "flags": [
+    "-O2",
+    "-std=c99",
+    "-fwrapv",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-fsanitize=address,undefined",
+    "-fno-sanitize-recover=all",
+    "-g",
+    "-fno-omit-frame-pointer",
+    "-DOPUS_FAST_INT64=0",
+    "-DYORADIO_OPUS_BOUNDED=1",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp8266-opus-asm/esp8266/rtos-sdk-native/components/opus_decoder",
+    "-DYORADIO_OPUS_FIR_FLASH_WORD=1",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp8266-opus-asm/esp8266/rtos-sdk-native/components/opus_decoder/upstream/include",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp8266-opus-asm/esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp8266-opus-asm/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp8266-opus-asm/esp8266/rtos-sdk-native/components/opus_decoder/upstream/silk/fixed",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp8266-opus-asm/esp8266/rtos-sdk-native/components/opus_decoder/upstream/src"
+  ],
+  "cases": [
+    {
+      "name": "mono-12",
+      "fixture_sha256": "a7f7a02ab057eedb324edfe747a2acfbbfd16692fa0bef9476b53bf05006ac9e",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 12,
+          "hybrid": 0,
+          "CELT": 0
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 1808,
+        "scratch_word_peak_bytes": 14112,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 12,
+          "hybrid": 0,
+          "CELT": 0
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 1808,
+        "scratch_word_peak_bytes": 14112,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 11520,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "d37696a743b1df685447dab0d2b74585e890f71c09fde36d5d0d2de6dde7f241",
+        "actual_pcm_sha256": "d37696a743b1df685447dab0d2b74585e890f71c09fde36d5d0d2de6dde7f241"
+      },
+      "counts": {
+        "logn": [
+          0,
+          0
+        ],
+        "exp2": [
+          0,
+          0
+        ],
+        "logn_index": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "exp2_index": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "partition": 0,
+        "partition_n2": 0,
+        "search": 0,
+        "search_n2": 0
+      },
+      "seconds": 0.24,
+      "table_reads_per_audio_second": 0
+    },
+    {
+      "name": "mono-24",
+      "fixture_sha256": "0fe8dae1542848eb99f987ea8459440511f305afe381bdf34ed8743a1870f7ee",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 12,
+          "CELT": 0
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 2904,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 12,
+          "CELT": 0
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 2904,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 11520,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "8c2a6fca10cdc9a8936acaf335808298ffeb19c2838f64ceab80e22fe0fcd69b",
+        "actual_pcm_sha256": "8c2a6fca10cdc9a8936acaf335808298ffeb19c2838f64ceab80e22fe0fcd69b"
+      },
+      "counts": {
+        "logn": [
+          54,
+          0
+        ],
+        "exp2": [
+          54,
+          0
+        ],
+        "logn_index": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          18,
+          36,
+          0,
+          0
+        ],
+        "exp2_index": [
+          7,
+          4,
+          3,
+          5,
+          11,
+          11,
+          7,
+          6
+        ],
+        "partition": 156,
+        "partition_n2": 0,
+        "search": 102,
+        "search_n2": 0
+      },
+      "seconds": 0.24,
+      "table_reads_per_audio_second": 450
+    },
+    {
+      "name": "stereo-64",
+      "fixture_sha256": "41c53944dbacbbac30a8b09d7e9510e68b2bce5f14bd39062052f7750c1d413c",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 12
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 12
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 11520,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "2c15e13880b82a098ae454b7ea2b6641810d4778d70858c62af5c32905232411",
+        "actual_pcm_sha256": "2c15e13880b82a098ae454b7ea2b6641810d4778d70858c62af5c32905232411"
+      },
+      "counts": {
+        "logn": [
+          171,
+          237
+        ],
+        "exp2": [
+          171,
+          225
+        ],
+        "logn_index": [
+          11,
+          11,
+          11,
+          11,
+          12,
+          15,
+          11,
+          11,
+          12,
+          12,
+          11,
+          12,
+          24,
+          22,
+          22,
+          31,
+          25,
+          30,
+          61,
+          41,
+          12
+        ],
+        "exp2_index": [
+          46,
+          40,
+          55,
+          38,
+          49,
+          37,
+          55,
+          76
+        ],
+        "partition": 846,
+        "partition_n2": 0,
+        "search": 675,
+        "search_n2": 0
+      },
+      "seconds": 0.24,
+      "table_reads_per_audio_second": 3350
+    },
+    {
+      "name": "stereo-128",
+      "fixture_sha256": "4e2c4165c8391220d3c1278d6ed2bfb9529e5027aa2e5944a434f5bfbb3de4c5",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 12
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 12
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 11520,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "2265e622054782ac78b79129c0869f47559c0c1c5e670fa601a170da9abac4c9",
+        "actual_pcm_sha256": "2265e622054782ac78b79129c0869f47559c0c1c5e670fa601a170da9abac4c9"
+      },
+      "counts": {
+        "logn": [
+          700,
+          232
+        ],
+        "exp2": [
+          700,
+          221
+        ],
+        "logn_index": [
+          18,
+          12,
+          11,
+          13,
+          29,
+          31,
+          14,
+          13,
+          35,
+          22,
+          23,
+          23,
+          48,
+          46,
+          46,
+          86,
+          81,
+          94,
+          129,
+          141,
+          17
+        ],
+        "exp2_index": [
+          125,
+          107,
+          123,
+          106,
+          100,
+          107,
+          129,
+          124
+        ],
+        "partition": 1904,
+        "partition_n2": 0,
+        "search": 1204,
+        "search_n2": 0
+      },
+      "seconds": 0.24,
+      "table_reads_per_audio_second": 7720.833333333334
+    },
+    {
+      "name": "stereo-192",
+      "fixture_sha256": "e7a1728de71ee59e8d9024036978dcb2a4bea219404db8f754cf6f0e7db90561",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 12
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 12,
+        "samples": 11520,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 12
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 11520,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6",
+        "actual_pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6"
+      },
+      "counts": {
+        "logn": [
+          1261,
+          231
+        ],
+        "exp2": [
+          1261,
+          231
+        ],
+        "logn_index": [
+          22,
+          15,
+          12,
+          22,
+          34,
+          32,
+          28,
+          13,
+          35,
+          34,
+          42,
+          46,
+          90,
+          89,
+          80,
+          94,
+          94,
+          119,
+          203,
+          196,
+          192
+        ],
+        "exp2_index": [
+          143,
+          141,
+          198,
+          196,
+          226,
+          216,
+          197,
+          175
+        ],
+        "partition": 3026,
+        "partition_n2": 2,
+        "search": 1765,
+        "search_n2": 2
+      },
+      "seconds": 0.24,
+      "table_reads_per_audio_second": 12433.333333333334
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "fixture_sha256": "e10625ce5b722a6744120d68de610846875ddbaf5bd50bee631acb4396b188b8",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 97,
+        "samples": 11640,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 97
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 688,
+        "scratch_word_peak_bytes": 12240,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 97,
+        "samples": 11640,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 97
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 688,
+        "scratch_word_peak_bytes": 12240,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 11640,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48",
+        "actual_pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48"
+      },
+      "counts": {
+        "logn": [
+          650,
+          1261
+        ],
+        "exp2": [
+          650,
+          1261
+        ],
+        "logn_index": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          97,
+          97,
+          97,
+          97,
+          183,
+          131,
+          102,
+          183,
+          147,
+          193,
+          194,
+          195,
+          195
+        ],
+        "exp2_index": [
+          359,
+          237,
+          356,
+          303,
+          188,
+          161,
+          125,
+          182
+        ],
+        "partition": 3434,
+        "partition_n2": 638,
+        "search": 2784,
+        "search_n2": 638
+      },
+      "seconds": 0.2425,
+      "table_reads_per_audio_second": 15760.824742268042
+    },
+    {
+      "name": "stereo-320-5ms",
+      "fixture_sha256": "213b9f4a7b638f54cdec86f3981a2b7f24e3a3897980232f62500bbfef7d5909",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 49,
+        "samples": 11760,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 49
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 1408,
+        "scratch_word_peak_bytes": 12720,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 49,
+        "samples": 11760,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 49
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 1408,
+        "scratch_word_peak_bytes": 12720,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 11760,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "4eb3efc6c453ba1da0c36d391504a0247876521947997dab20649009cb9a3e1a",
+        "actual_pcm_sha256": "4eb3efc6c453ba1da0c36d391504a0247876521947997dab20649009cb9a3e1a"
+      },
+      "counts": {
+        "logn": [
+          1276,
+          1029
+        ],
+        "exp2": [
+          1276,
+          1029
+        ],
+        "logn_index": [
+          49,
+          49,
+          49,
+          49,
+          49,
+          49,
+          49,
+          49,
+          49,
+          49,
+          52,
+          89,
+          186,
+          162,
+          152,
+          194,
+          192,
+          197,
+          197,
+          197,
+          197
+        ],
+        "exp2_index": [
+          1125,
+          193,
+          171,
+          197,
+          201,
+          115,
+          122,
+          181
+        ],
+        "partition": 4218,
+        "partition_n2": 890,
+        "search": 2942,
+        "search_n2": 890
+      },
+      "seconds": 0.245,
+      "table_reads_per_audio_second": 18816.326530612245
+    },
+    {
+      "name": "stereo-320-10ms",
+      "fixture_sha256": "ce81ef76fa8fbd1292ec1defb1a8164195dfd24510e2b17cbd0bc9c62d37f4ad",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 25,
+        "samples": 12000,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 25
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 2768,
+        "scratch_word_peak_bytes": 13680,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 25,
+        "samples": 12000,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 25
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 2768,
+        "scratch_word_peak_bytes": 13680,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 12000,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "9d808178dec05d38c305d1c0a858e1222eefaff3bf50a423d51562cb827f730c",
+        "actual_pcm_sha256": "9d808178dec05d38c305d1c0a858e1222eefaff3bf50a423d51562cb827f730c"
+      },
+      "counts": {
+        "logn": [
+          1734,
+          441
+        ],
+        "exp2": [
+          1734,
+          441
+        ],
+        "logn_index": [
+          23,
+          21,
+          21,
+          21,
+          24,
+          25,
+          22,
+          21,
+          60,
+          46,
+          51,
+          81,
+          173,
+          172,
+          166,
+          191,
+          191,
+          193,
+          226,
+          224,
+          223
+        ],
+        "exp2_index": [
+          1421,
+          135,
+          96,
+          93,
+          94,
+          99,
+          124,
+          113
+        ],
+        "partition": 4518,
+        "partition_n2": 544,
+        "search": 2784,
+        "search_n2": 544
+      },
+      "seconds": 0.25,
+      "table_reads_per_audio_second": 17400
+    },
+    {
+      "name": "stereo-320-20ms",
+      "fixture_sha256": "57e77698af5a7777862db1239b0c6047a951e35e64c248f4b18d1e48e9f4c65d",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 13,
+        "samples": 12480,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 13
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 13,
+        "samples": 12480,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 13
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 12480,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142",
+        "actual_pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142"
+      },
+      "counts": {
+        "logn": [
+          2119,
+          273
+        ],
+        "exp2": [
+          2119,
+          273
+        ],
+        "logn_index": [
+          27,
+          27,
+          22,
+          35,
+          44,
+          47,
+          41,
+          30,
+          81,
+          64,
+          64,
+          100,
+          198,
+          198,
+          195,
+          201,
+          202,
+          206,
+          206,
+          202,
+          202
+        ],
+        "exp2_index": [
+          1852,
+          43,
+          62,
+          95,
+          80,
+          93,
+          83,
+          84
+        ],
+        "partition": 4784,
+        "partition_n2": 694,
+        "search": 2665,
+        "search_n2": 694
+      },
+      "seconds": 0.26,
+      "table_reads_per_audio_second": 18400
+    },
+    {
+      "name": "stereo-510",
+      "fixture_sha256": "478933ec0c177f880a514677e3c3964276d4df99ad4c2bfadd09af256090abc1",
+      "reference": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 61,
+        "samples": 58560,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 61
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "probe": {
+        "libopus": "libopus 1.5.2-fixed",
+        "mono_state_bytes": 6654,
+        "stereo_state_bytes": 6702,
+        "output_channels": 1,
+        "sample_rate": 48000,
+        "packets": 61,
+        "samples": 58560,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 61
+        },
+        "reset_exact": null,
+        "scratch_byte_peak_bytes": 5488,
+        "scratch_word_peak_bytes": 15600,
+        "scratch_byte_capacity_bytes": 7680,
+        "scratch_word_capacity_bytes": 16384,
+        "arena_guards_ok": true,
+        "oom_reinitialized_exact": null
+      },
+      "pcm": {
+        "exact": true,
+        "compared_samples": 58560,
+        "mismatched_samples": 0,
+        "max_absolute_error": 0,
+        "snr_db": "Infinity",
+        "reference_pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e",
+        "actual_pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e"
+      },
+      "counts": {
+        "logn": [
+          17189,
+          1218
+        ],
+        "exp2": [
+          17189,
+          1218
+        ],
+        "logn_index": [
+          424,
+          423,
+          424,
+          422,
+          422,
+          422,
+          422,
+          422,
+          908,
+          908,
+          908,
+          908,
+          1516,
+          1021,
+          1021,
+          1021,
+          1021,
+          1876,
+          1876,
+          1021,
+          1021
+        ],
+        "exp2_index": [
+          18275,
+          20,
+          13,
+          16,
+          17,
+          23,
+          13,
+          30
+        ],
+        "partition": 36940,
+        "partition_n2": 11354,
+        "search": 19751,
+        "search_n2": 11354
+      },
+      "seconds": 1.22,
+      "table_reads_per_audio_second": 30175.409836065573
+    }
+  ],
+  "passed": true
+}
