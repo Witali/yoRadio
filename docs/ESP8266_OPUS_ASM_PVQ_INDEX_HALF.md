@@ -1,7 +1,7 @@
 # Opus ASM: phase-specialized signed index word extraction
 
 2026-09-15. Independent experiment on accepted index-word80.08060% CPU192.
-Host24 exact PCM scenarios and linked packaging complete; physical gate pending.
+Host24 exact PCM scenarios, linked packaging and30 physical A/B/A complete.
 Current goal80% and20second continuous I2S/WebUI remain unqualified.
 
 ## Hypothesis and ABI
@@ -39,9 +39,9 @@ was fixed with narrow patches and the failed host invocation was retained.
 - [x] Authenticate parent's occupied helper, original dead-storage proof,
   last-word padding and complete table bounds; freeze all outside bytes.
 - [x] Run positive and negative regressions; unchanged static RAM/frame.
-- [ ] Physical10 A/10 B/10 A at160MHz/QIO40, RAM packets/no output/profiling.
+- [x] Physical10 A/10 B/10 A at160MHz/QIO40, RAM packets/no output/profiling.
   Preserve all attempts, errors, maxima, RAM and lower-rate regressions.
-- [ ] Restore ordinary radio through OTA and verify station/playlist/HTTP/WS.
+- [x] Restore ordinary radio through OTA and verify station/playlist/HTTP/WS.
 - [ ] Accept only measured speed without RAM growth, then qualify real audio.
 
 Recipes:tools/esp8266_opus_asm/pvq_index_half.cjs and commented .s;
@@ -54,4 +54,44 @@ bytes/addresses,903216-byte image and static RAM/IRAM/frame unchanged.
 Candidate SHA2560d76ec891f194e58e385339f1777e38c187b1bd0616a3c3bc8dfce91a033468e.
 Control SHA25642f3b445aa7515c69cdcc1f563f9f177f7ed16b75bbabd4eb62358f0bbff5391.
 Full160 related preflight regressions PASS/0skip,258.95seconds, log retained.
-Fresh physical A/B/A is in progress; no speed conclusion yet.
+
+## Physical result
+
+All30 runs retained; raw packets in RAM, no audio output/network input or
+function/stage profiling, CPU160/QIO40 unchanged. Exact fixture PCM hashes.
+
+| kbps | A CPU% | B CPU% | A2 CPU% | Maximum call A/B/A2, us |
+|---|---:|---:|---:|---:|
+|12 mono|23.09496|23.08627|23.08671|8861 /7827 /7297|
+|24 mono|54.13296|54.12010|54.11319|19704 /14283 /14272|
+|64 stereo|62.68185|62.62602|62.62654|23467 /16062 /16569|
+|128 stereo|72.06458|72.00285|72.02125|28924 /17979 /18255|
+|192 stereo|80.05594|80.01998|80.04450|29877 /20371 /22845|
+
+Relative192 gain0.04492/0.03063%;128 gain0.08566/0.02554%.
+The repeated-control mono24 slowdown0.01278% is smaller than both high-rate
+gains:both acceptance gates pass. This is a small experimental gain, not a
+robust guarantee that each run is faster. Default unchanged.80.01998>80;
+another0.02497% relative reduction is needed for the raw target alone.
+
+Min sampled DRAM A/B/A2:1044 /8020 /8176 B;192-only1532 /9800 /9624 B.
+Post-run minima18276 /26016 /26124 B; all free stack minima1660 B.
+Static DRAM/IRAM/frame unchanged by linked proof. A/run3 and4 had HTTP
+observation timeouts and CPU19292.35/92.32%; both are retained, not filtered.
+The next runs recovered without a reset. These observations do not prove a
+leak or attribute the slowdown to network or decoder instructions.
+B/run2 mono12 task553230us>wall552951us by279us retained, no subtraction of
+the52us empty estimate. No decoder errors; B/A2 have no observation errors.
+
+The20.371ms maximum B call still leaves a deadline question for live DMA;
+average raw CPU is not proof of uninterrupted I2S or usable WebUI.
+Raw evidence and comparison.json are saved beside the candidate image.
+
+Ordinary C radio restored OTA to0x10000. HTTP/WS, stopped station167 and
+playlist hash unchanged. Root HTTP200/27249 gzip bytes/103.15ms;
+free heap27628 B,min24748 B,RSSI-61dBm. This is root transfer only, not a
+full browser latency or20second live qualification of the ASM candidate.
+Final165 related regressions PASS/0skip in346.60seconds, including physical
+report, restoration and adjustment census. Full final-tests.log retained.
+Two separate Git attribute regressions also PASS:hashed JSON stays LF on
+Windows checkout, while raw logs retain their original bytes.

@@ -2,8 +2,8 @@
 
 Дата: 2026-09-13. Ветка: `codex/esp8266-opus-asm`.
 
-Последний подтверждённый результат,2026-09-15: [pvq-index-word ASM](ESP8266_OPUS_ASM_PVQ_INDEX_WORD.md),
-80.08060% raw CPU192 после30 A/B/A, exact PCM и без роста static RAM/стека.
+Последний подтверждённый результат,2026-09-15: [pvq-index-half ASM](ESP8266_OPUS_ASM_PVQ_INDEX_HALF.md),
+80.01998% raw CPU192 после30 A/B/A, exact PCM и без роста static RAM/стека.
 Цель80% и непрерывное I2S PDM/WebUI ещё не достигнуты; default прежний.
 Ниже сохранены в том числе исторические промежуточные результаты.
 

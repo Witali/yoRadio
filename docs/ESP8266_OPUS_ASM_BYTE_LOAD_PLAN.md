@@ -2,7 +2,7 @@
 
 2026-09-15. [Narrow candidate accepted experimentally](ESP8266_OPUS_ASM_PVQ_BYTE_WORD.md)
 after30 physical A/B/A and exact PCM; CPU19284.01121%.
-Updated after the fifth experiment: accepted pvq-index-word80.08060% is the
+Updated after the sixth experiment: accepted pvq-index-half80.01998% is the
 control for future comparisons; earlier results below retain their history.
 No firmware default, CPU/flash clock or RAM budget change.
 
@@ -228,7 +228,13 @@ accepted index-word v2 as direct control while restoring original endpoint
 load/store order. BBCI and ordinary ADDI-2 assemble; ADDI.N-2 does not.
 Five helper instructions per phase,25 live bytes/29-byte slot;24 host cases
 exact. Linked137792 cases and160 related preflight regressions pass;
-image903216 B, static RAM/frame unchanged. Physical qualification pending.
+image903216 B, static RAM/frame unchanged. Physical30 A/B/A complete:
+CPU19280.05594 /80.01998 /80.04450%; both high-bitrate gates PASS.
+Small gain accepted experimentally,80% and live20second gates not reached.
+All failures retained:two control observation timeouts/minDRAM1044 B;
+B mono12 accounting excess279us. Candidate minDRAM8020 B/stack1660 B.
+Final165 related regressions PASS/0skip; ordinary C radio restored OTA with
+matching stopped167/playlist/HTTP/WS. Default unchanged.
 
 ### Remaining adjustment-loop read: counted, lower priority
 
@@ -242,3 +248,17 @@ image903216 B, static RAM/frame unchanged. Physical qualification pending.
   fixed shifts. Prove dead scratch, all four phases, complete bounds and
   new storage/entry ABI first. More branches/code can outweigh two fewer
   executed instructions; require fresh physical A/B/A. No implementation yet.
+
+Read-only refinement of that next hypothesis on the accepted halfword ELF:
+the a10 leaf0x4024ddec has six CALL0 sites, not the original five:
+e1c3/e1d6/e1ea/e204/e21f/e284 (all prefixed0x4024). The added site is the
+upper endpoint. Existing same-corpus counts give6516+1765=8281 calls per
+0.24s,34504.17/s; not cycles. Try this one register family first.
+Possible sequence:EXTUI a11,address,0,2;SUB aligned,address,a11;L32I;
+two BBCI decisions;constant EXTUI0/8/16/24;RET. a11 and a0 must retain
+the already proven caller-dead contract; SAR remains untouched.
+Candidate storage0x4024dcc4..0x4024dcee is42 bytes of original encoder-only
+instructions, outside the halfword slot. Its predecessor falls through,
+so prove that predecessor and every incoming edge encoder-only too; do not
+reuse the prior unconditional-J premise. Authenticate bytes and all other
+addresses. This is only an inventory, not a packaged or timed candidate.
