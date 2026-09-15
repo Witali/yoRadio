@@ -229,3 +229,16 @@ load/store order. BBCI and ordinary ADDI-2 assemble; ADDI.N-2 does not.
 Five helper instructions per phase,25 live bytes/29-byte slot;24 host cases
 exact. Linked137792 cases and160 related preflight regressions pass;
 image903216 B, static RAM/frame unchanged. Physical qualification pending.
+
+### Remaining adjustment-loop read: counted, lower priority
+
+- [x] [Host census](ESP8266_OPUS_PVQ_ADJUSTMENT_PROFILE.md) for the cost
+  after q--:at192 only10 actual reads/0.24s=41.67/s versus12608.33 index
+  reads/s. At24 four calls reach q=0 and do not load a byte. All10 files
+  exact PCM/state/scratch/guards under sanitizers; no target change/timing.
+- [ ] Do not prioritize this rare read alone. A possible separate next
+  hypothesis is phase-specific constant EXTUI for the already frequent
+  byte helpers:avoid SAR save/restore with one saved address phase and
+  fixed shifts. Prove dead scratch, all four phases, complete bounds and
+  new storage/entry ABI first. More branches/code can outweigh two fewer
+  executed instructions; require fresh physical A/B/A. No implementation yet.
