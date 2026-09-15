@@ -2,7 +2,7 @@
 
 2026-09-15. [Narrow candidate accepted experimentally](ESP8266_OPUS_ASM_PVQ_BYTE_WORD.md)
 after30 physical A/B/A and exact PCM; CPU19284.01121%.
-Updated after the second experiment: accepted pvq-a4-word82.83819% is the
+Updated after the third experiment: accepted pvq-row-word82.00615% is the
 control for future comparisons; earlier results below retain their history.
 No firmware default, CPU/flash clock or RAM budget change.
 
@@ -118,7 +118,7 @@ ordinary restored OTA. Accepted experimentally;80%/live qualification pending.
   audit finds candidate spans0x4024dc95..0x4024ddd9 and0x4024e3e8..0x4024e433,
   outside existing helpers. Size alone is insufficient: verify all incoming
   branches, alignment and fallthroughs, preserve every outside byte/address.
-- [ ] Prove complete static-table bounds, exact PCM/state/split behavior,
+- [x] Prove complete static-table bounds, exact PCM/state/split behavior,
   then10 A/10 B/10 A against accepted a4-word with all errors/maxima/RAM.
 
 Important for liveness audits: private internal leaf CALL0 sites do not have
@@ -131,4 +131,35 @@ before using any other scratch register.
 27-byte encoder-only slot,25 live helper bytes; source a2 preserved, a6 result,
 SAR/a0/a11 proven.185168 linked numeric cases and24 host scenarios exact.
 Image903216 B, outside bytes/addresses/table/RAM/frame unchanged. Physical
-10 A/10 B/10 A still pending; no new speed or live-audio claim.
+30 A/B/A completed:19282.82325 /82.00615 /82.84056%,both gates PASS.
+Accepted experimental control82.00615%;80% and live qualification pending.
+All attempts retained, including two A2 observation timeouts,minDRAM800 B.
+
+## Follow-up inventory after row-length implementation
+
+Read-only linked inspection2026-09-15 found two remaining endpoint-cost
+reads in quant_partition:0x4024e21f L8UI a10,a9,0 (upper),0x4024e22a
+L8UI a11,a11,0 (lower when low index is nonzero). These are the original
+endpoint reads, not the duplicate selected-cost read already removed.
+
+- [ ] Count each endpoint read on the same host corpus; do not assume the
+  lower read always executes or equate source counters with measured target
+  instruction timing. Check ownership/address provenance and full word bounds.
+- [ ] Try independent narrow word extraction. At the upper continuation
+  a0/a11 are dead; at the lower continuation a0 is dead but a11 is the
+  live result, not available as SAR scratch. Verify all actual private calls.
+  For a single fixed continuation, a candidate may use a0 to save SAR and
+  jump back directly rather than RET; prove recursion/return restoration,
+  interrupt semantics and all live registers before using that pattern.
+- [ ] Prove new encoder-only storage/entries and exact linked endpoint
+  selection/cost/remaining_bits behavior, then host and10 A/10 B/10 A.
+  Existing adjustment-loop read0x4024e258 is a separate candidate/census.
+
+The index L16SI a2,a2,0 at0x4024db22 is another possible follow-up, but it
+precedes the original saved return at0x4024db36. Blind CALL0 replacement
+would lose that return. Read-only liveness with actual private clobbers
+also finds a8/a10 live later at0x4024db88/0x4024db8a and a11 immediately
+live at0x4024db39. Do not choose them as free scratch. A separate two-site
+scheduling/return proof or save/restore is required, as is careful treatment
+of the last halfword in the210-byte table (length not divisible by4).
+None of these follow-up candidates is implemented or timed yet.
