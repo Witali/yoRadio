@@ -1,0 +1,55 @@
+TAP version 13
+# Subtest: linked last-step shortcut preserves image, all live registers and every standard-table budget
+ok 1 - linked last-step shortcut preserves image, all live registers and every standard-table budget
+  ---
+  duration_ms: 23267.7366
+  type: 'test'
+  ...
+# Subtest: encoder storage is rejected unless the original private encode predicate is known zero
+ok 2 - encoder storage is rejected unless the original private encode predicate is known zero
+  ---
+  duration_ms: 18.2574
+  type: 'test'
+  ...
+# Subtest: scratch-register liveness refuses a downstream read before redefinition
+ok 3 - scratch-register liveness refuses a downstream read before redefinition
+  ---
+  duration_ms: 16.8452
+  type: 'test'
+  ...
+# Subtest: actual instruction model detects changed condition and out-of-row reads
+not ok 4 - actual instruction model detects changed condition and out-of-row reads
+  ---
+  duration_ms: 7495.6598
+  type: 'test'
+  location: 'C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tests\\esp8266-opus-bits-fifth.test.js:33:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tests\esp8266-opus-bits-fifth.test.js:39:9)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: actual host shortcut preserves24 PCM/state/PLC/reset/OOM cases through510kbps without source changes
+ok 5 - actual host shortcut preserves24 PCM/state/PLC/reset/OOM cases through510kbps without source changes
+  ---
+  duration_ms: 6.0416
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 4
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 30907.9494
