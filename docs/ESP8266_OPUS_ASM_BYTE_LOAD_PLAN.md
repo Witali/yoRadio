@@ -2,7 +2,7 @@
 
 2026-09-15. [Narrow candidate accepted experimentally](ESP8266_OPUS_ASM_PVQ_BYTE_WORD.md)
 after30 physical A/B/A and exact PCM; CPU19284.01121%.
-Updated after the fourth experiment: accepted pvq-endpoint-word80.99456% is the
+Updated after the fifth experiment: accepted pvq-index-word80.08060% is the
 control for future comparisons; earlier results below retain their history.
 No firmware default, CPU/flash clock or RAM budget change.
 
@@ -196,7 +196,7 @@ the containing section, not assume every layout has readable padding.
   the index load to the old store site via a fixed-continuation helper.
   No intervening use of a2 or a0 may be ignored. Authenticate final word
   padding, dead storage, interrupt/return behavior and all live registers.
-- [ ] Exact host/linked verification, unchanged bytes outside patches,
+- [x] Exact host/linked verification, unchanged bytes outside patches,
   no RAM/frame growth, then10 A/10 B/10 A and ordinary OTA restoration.
 
 [Index-word v2 built and locally verified](ESP8266_OPUS_ASM_PVQ_INDEX_WORD.md):
@@ -204,7 +204,11 @@ the containing section, not assume every layout has readable padding.
 image and static RAM/frame. Signed extraction uses SLLI16/SRAI16; initial
 SEXT assembly failure retained, never flashed. All137792 linked prefix
 cases and24 host PCM/state cases exact. Full154 related preflight PASS/0skip,
-229.79seconds. Physical gate pending; accepted baseline still80.99456%.
+229.79seconds. Physical30 A/B/A complete:CPU19280.97738 /80.08060 /80.99402%,
+both high-bitrate gates PASS. MinDRAM8528 /8168 /8176 B, stack1660 B;
+no decoder/observation errors. A2/run10 mono12 accounting excess784us retained.
+Ordinary C radio restored OTA; HTTP/WS/station/playlist preserved.
+Accepted experimental baseline80.08060%;80%/20second live gate still pending.
 
 ### Subsequent independent hypothesis: two constant halfword paths
 

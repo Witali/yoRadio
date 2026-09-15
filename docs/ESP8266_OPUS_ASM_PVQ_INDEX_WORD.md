@@ -1,7 +1,8 @@
 # Opus ASM: signed PVQ index through a word load
 
 2026-09-15. Parent: accepted endpoint-word80.99456% raw CPU192.
-Experimental v2; physical speed,80% and live I2S/WebUI qualification pending.
+Experimental v2;30 physical A/B/A completed. Raw CPU19280.08060%;80% and
+live I2S/WebUI qualification still pending. Not a firmware default.
 
 ## Instruction and memory contract
 
@@ -63,7 +64,42 @@ Recipes:pvq_index_word.cjs,commented pvq_index_word.s,
 pvq_index_word_proof.cjs. Host/source and negative regression tests retained.
 Full154 related preflight regressions PASS,0 failures/skips,229.79seconds.
 The complete log is retained beside the image; this is not the whole repository.
-Pending10 A/10 B/10 A at160MHz/runtime QIO40 with packets in
-RAM, no output/network input/stage profiler, then ordinary OTA restoration.
-Keep every attempt,error,maximum,minRAM and low-rate regression. Current
-CPU threshold80%; legacy70% report field is not the goal. Default unchanged.
+## Physical results
+
+Completed10 A/10 B/10 A at160MHz/runtime QIO40 with packets in RAM,
+no output/network audio input/stage or function profiler. All30 attempts
+retained and exact PCM hashes checked; no observation or decoder errors.
+
+| kbps | A control CPU% | B candidate CPU% | A2 control CPU% | Maximum call A/B/A2, us |
+|---|---:|---:|---:|---:|
+|12 mono|23.09056|23.08538|23.08613|7771 /7393 /7768|
+|24 mono|54.11052|54.12444|54.11308|14224 /13929 /14995|
+|64 stereo|62.87167|62.64767|62.84769|16515 /16816 /18108|
+|128 stereo|72.59440|72.02094|72.60467|19272 /18818 /20403|
+|192 stereo|80.97738|80.08060|80.99402|21047 /21318 /20826|
+
+Relative192 time reduction1.1074/1.1278%;128 reduction0.78995/0.80398%.
+Both exceed mono24 slowdown0.02572/0.02098%; both acceptance gates pass.
+Accepted experimentally, not production.80.08060 is still greater than80:
+another0.10065% relative time reduction is needed even for the raw gate.
+The21.318ms maximum did not improve; raw mean is not a DMA deadline proof.
+
+Sampled minDRAM A/B/A2:8528 /8168 /8176 B;192-only9976 /9800 /9800 B.
+Post-run minimum26476 /26300 /26300 B; free stack minimum1660 B for all.
+Static RAM/IRAM/frame unchanged by byte/section proof; sampled heap changes
+are not interpreted as a changed decoder allocation. A2/run10 mono12 had
+task_us553794 versus wall_us553010:784us accounting excess retained,
+without subtracting the55us empty estimate or removing the observation.
+
+Ordinary C radio restored through application-only OTA to0x10000.
+Restoration evidence checks HTTP/WS, stopped station167 and playlist hash.
+This is not a live20second qualification of the ASM candidate. Firmware
+default and SPIFFS/settings unchanged. Current CPU threshold80%; legacy70%
+report field is not the goal.
+
+Reproduce report:node tools/esp8266_opus_asm/report_pvq_index_word.cjs.
+Raw JSON/logs and comparison.json are retained with the candidate image.
+Final156 related regressions PASS/0skip in244.84seconds, including independent
+physical-report and ordinary-restoration checks. Full final-tests.log retained.
+Restored root HTTP200,27249 gzip bytes in110.54ms; free heap27628 B,
+minimum24748 B,RSSI-72dBm. Root transfer is not a full-browser latency test.
