@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: exp2 direct table32 preserves exact signed arithmetic, all registers at join, memory and image size
+ok 1 - exp2 direct table32 preserves exact signed arithmetic, all registers at join, memory and image size
+  ---
+  duration_ms: 91039.008
+  type: 'test'
+  ...
+# Subtest: table32 proof rejects changed scaling, load, immediate kill, outside bytes and interior entries
+ok 2 - table32 proof rejects changed scaling, load, immediate kill, outside bytes and interior entries
+  ---
+  duration_ms: 139.6689
+  type: 'test'
+  ...
+# Subtest: literal audit finds every byte-aligned reader and rejects aliases or new readers
+ok 3 - literal audit finds every byte-aligned reader and rejects aliases or new readers
+  ---
+  duration_ms: 198.6352
+  type: 'test'
+  ...
+# Subtest: old constants, sign-extended copy, literal pointer and originally dead bytes are authenticated
+ok 4 - old constants, sign-extended copy, literal pointer and originally dead bytes are authenticated
+  ---
+  duration_ms: 172.6521
+  type: 'test'
+  ...
+# Subtest: inline data path also agrees on unclamped bit patterns and preserves arbitrary SAR
+ok 5 - inline data path also agrees on unclamped bit patterns and preserves arbitrary SAR
+  ---
+  duration_ms: 63.7347
+  type: 'test'
+  ...
+# Subtest: table32 host model preserves24 exact PCM/state/PLC/reset/OOM cases through510kbps and120ms
+ok 6 - table32 host model preserves24 exact PCM/state/PLC/reset/OOM cases through510kbps and120ms
+  ---
+  duration_ms: 1.3894
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 91733.8818
