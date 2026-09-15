@@ -81,12 +81,12 @@ of a new helper or a measured speedup.
   [Completed census](ESP8266_OPUS_PVQ_A4_WORD_PROFILE.md):1765 first probes
   and2596 upper reads per0.24s at192,18170.83/s total.10 exact PCM files
   through510, unchanged scratch/state/guards, ASan/UBSan and3 regressions PASS.
-- [ ] Prototype an a4-input/output leaf with saved/restored SAR and dead a11,
+- [x] Prototype an a4-input/output leaf with saved/restored SAR and dead a11,
   retaining a0 return correctness. A possible25-byte slot is0x4024de08:
   inside the old helper's32-byte unreachable padding, aligned4. Prove no
   branch/fallthrough/external entry reaches it, no overlap with the first
   helper or sixth-probe stub, and preserve every outside byte/address.
-- [ ] Prove static-table provenance and complete aligned-word bounds at
+- [x] Prove static-table provenance and complete aligned-word bounds at
   both sites, all byte phases/SAR/live registers, split/no-split paths and
   recursive decoder calls. Inherit the prior verified private encode=0
   contract explicitly; do not treat arbitrary unreachable code as free.
@@ -95,4 +95,7 @@ of a new helper or a measured speedup.
   all errors/maxima, stack and RAM. The extra live instructions can affect
   flash/cache even though total image size is unchanged.
 
-No new ASM candidate has been implemented or flashed for these two sites.
+[Candidate implemented and locally verified](ESP8266_OPUS_ASM_PVQ_A4_WORD.md):
+three patch ranges, unchanged image903216 B/static RAM/frame. Actual linked
+378304 search and79902 split-threshold cases, plus24 exact host scenarios.
+The candidate has not yet been flashed; physical comparison is pending.

@@ -6,7 +6,7 @@ const {selectHighBitrate}=require('./selection.cjs'),{wordAt}=require('./audit_u
 const bin='C:/Work/yoRadio/.build/esp8266-tools/tools/xtensa-lx106-elf/esp-2020r3-49-gd5524c1-8.4.0/xtensa-lx106-elf/bin';
 const control='esp8266-opus-bands-tell-inline-v1',variant=n=>'esp8266-opus-bands-layout'+n+'-v1';
 const art=v=>path.join(root,'firmware/development',v),read=p=>JSON.parse(fs.readFileSync(p,'utf8').replace(/^\uFEFF/,''));
-function reachableDisassembly(elf,s,readBlock=(start,end)=>run(path.join(bin,'xtensa-lx106-elf-objdump.exe'),['-d','--start-address=0x'+start.toString(16),'--stop-address=0x'+end.toString(16),elf])){
+function reachableDisassembly(elf,s,readBlock=(start,end)=>run(path.join(bin,'xtensa-lx106-elf-objdump.exe'),['-d','--start-address=0x'+start.toString(16),'--stop-address=0x'+end.toString(16),elf]),{followInternalCalls=false}={}){
  const pending=[s.address],rows=new Map(),end=s.address+s.bytes;
  while(pending.length){
   const start=pending.pop();if(rows.has(start))continue;
@@ -21,6 +21,13 @@ function reachableDisassembly(elf,s,readBlock=(start,end)=>run(path.join(bin,'xt
    rows.set(address,line);next+=m[2].length/2;
    if(/^b|^j$/.test(m[3])){
     const t=m[4].match(/(?:^|,\s*)([0-9a-f]+)\s+<[^>]+>$/);assert.ok(t,'Unresolved branch');pending.push(parseInt(t[1],16));
+   }
+   // Opt-in for post-link leaves placed inside a function's old dead padding.
+   // Also retain the caller continuation; CALL0 is not a tail jump. External
+   // callees remain outside this function, recursive entry is deduplicated.
+   if(followInternalCalls && m[3]==='call0'){
+    const t=m[4].match(/^([0-9a-f]+)\s+<[^>]+>$/);assert.ok(t,'Unresolved internal call');
+    const at=parseInt(t[1],16);if(at>=s.address&&at<end)pending.push(at);
    }
    if(/^(j|ret(?:\.n)?)$/.test(m[3])){stopped=true;break;}
   }
@@ -63,7 +70,7 @@ function linkedGraph(text,resolveWord,resolveAddress){
  });
  return {graph,physical_instruction_count:rows.length,relaxed_indirect_calls:relaxed};
 }
-function inspect(v,names=['quant_partition','quant_band','quant_all_bands','ec_tell_frac','ec_dec_bits']){
+function inspect(v,names=['quant_partition','quant_band','quant_all_bands','ec_tell_frac','ec_dec_bits'],{internalCalls=[]}={}){
  const elf=path.join(root,'.build',v,'yoradio_esp8266_helix_native.elf');
  const sections=Object.fromEntries([...run(path.join(bin,'xtensa-lx106-elf-size.exe'),['-A',elf]).matchAll(/^(\.(?:iram0|dram0|flash)\.\S+)\s+(\d+)\s+/gm)].map(m=>[m[1],Number(m[2])]));
  const all=[...run(path.join(bin,'xtensa-lx106-elf-nm.exe'),['-S',elf]).matchAll(/^([0-9a-f]+)\s+([0-9a-f]+)\s+(\S)\s+(.+)$/gm)].map(m=>({address:parseInt(m[1],16),bytes:parseInt(m[2],16),type:m[3],name:m[4]}));
@@ -77,7 +84,7 @@ function inspect(v,names=['quant_partition','quant_band','quant_all_bands','ec_t
   const s=all.find(s=>s.name===name);assert.ok(s);
   // Follow real entry/branch boundaries. Linear objdump misdecodes unreachable
   // alignment zeros after J as the beginning of the next valid instruction.
-  const disassembly=reachableDisassembly(elf,s);
+  const disassembly=reachableDisassembly(elf,s,undefined,{followInternalCalls:internalCalls.includes(name)});
   functions[name]={...s,disassembly,...linkedGraph(disassembly,a=>wordAt(elf,a),resolve)};
  }
  const functionSizes={};for(const s of all.filter(s=>/^[Tt]$/.test(s.type)&&s.bytes))
