@@ -1,6 +1,7 @@
 #include "network_service.h"
 
 #include <stdio.h>
+#include <stdatomic.h>
 #include <string.h>
 
 #include "board_config.h"
@@ -35,6 +36,7 @@ static size_t s_credential_index;
 static esp_timer_handle_t s_softap_reboot_timer;
 static int s_retries;
 static bool s_have_credentials;
+static atomic_bool s_stopping_for_sleep;
 
 static void rssi_task(void *argument) {
     (void)argument;
@@ -98,6 +100,7 @@ static esp_err_t select_credential(size_t index) {
 static void event_handler(void *arg, esp_event_base_t base, int32_t id,
                           void *event_data) {
     (void)arg;
+    if (atomic_load(&s_stopping_for_sleep)) return;
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
@@ -181,6 +184,13 @@ static esp_err_t start_access_point(void) {
                             "Start SoftAP reboot timer");
     }
     return ESP_OK;
+}
+
+esp_err_t network_service_prepare_sleep(void) {
+    atomic_store(&s_stopping_for_sleep, true);
+    esp_err_t result = esp_wifi_stop();
+    if (result != ESP_OK) atomic_store(&s_stopping_for_sleep, false);
+    return result;
 }
 
 esp_err_t network_service_start(native_state_t *state) {

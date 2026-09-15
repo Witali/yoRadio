@@ -7,6 +7,7 @@
 #include "board_config.h"
 #include "cpu_profiler.h"
 #include "display_settings.h"
+#include "deep_sleep_clock.h"
 #include "driver/gpio.h"
 #include "encoder_input.h"
 #include "esp_check.h"
@@ -170,7 +171,7 @@ static void button_gpio_isr(void *argument) {
     }
 }
 
-static esp_err_t execute_button_action(button_action_t action) {
+static esp_err_t execute_button_action_awake(button_action_t action) {
     switch (action) {
         case BUTTON_ACTION_TOGGLE:
             return radio_control_toggle();
@@ -181,6 +182,13 @@ static esp_err_t execute_button_action(button_action_t action) {
         default:
             return ESP_ERR_INVALID_ARG;
     }
+}
+
+static esp_err_t execute_button_action(button_action_t action) {
+    if (!deep_sleep_clock_begin_activity()) return ESP_ERR_INVALID_STATE;
+    esp_err_t result = execute_button_action_awake(action);
+    deep_sleep_clock_end_activity();
+    return result;
 }
 
 static void show_button_status(button_status_t status, uint32_t now_ms) {
@@ -211,16 +219,19 @@ static const char *button_status_text(button_status_t status) {
 #ifdef CONFIG_YORADIO_ROTARY_ENCODER
 static esp_err_t encoder_rotate_volume(int32_t delta, void *context) {
     (void)context;
+    if (!deep_sleep_clock_begin_activity()) return ESP_ERR_INVALID_STATE;
     display_settings_note_activity();
     int32_t volume = (int32_t)native_audio_output_get_volume() + delta;
     if (volume < 0) volume = 0;
     if (volume > 254) volume = 254;
     native_audio_output_set_volume((uint8_t)volume);
+    deep_sleep_clock_end_activity();
     return ESP_OK;
 }
 
 static esp_err_t encoder_toggle_playback(void *context) {
     (void)context;
+    if (!deep_sleep_clock_begin_activity()) return ESP_ERR_INVALID_STATE;
     display_settings_note_activity();
     native_state_t before;
     native_state_snapshot(&s_state, &before);
@@ -230,6 +241,7 @@ static esp_err_t encoder_toggle_playback(void *context) {
             !before.audio_running,
             (uint32_t)(esp_timer_get_time() / 1000U));
     }
+    deep_sleep_clock_end_activity();
     return result;
 }
 #endif
@@ -629,6 +641,8 @@ static void display_task(void *argument) {
                     previous_clock_tick = clock_tick;
                 }
             }
+            if (!state.audio_running && !screensaver_power_off)
+                deep_sleep_clock_try_enter(&s_state, &s_display);
             screensaver_was_active = true;
             screensaver_was_power_off = screensaver_power_off;
             previous = state;
@@ -846,6 +860,7 @@ static void button_task(void *argument) {
         .intr_type = GPIO_INTR_DISABLE,
     };
     ESP_ERROR_CHECK(gpio_config(&config));
+    deep_sleep_clock_wait_for_release(BOARD_BOOT_BUTTON);
     esp_err_t isr_result = gpio_install_isr_service(0);
     ESP_ERROR_CHECK(isr_result == ESP_OK || isr_result == ESP_ERR_INVALID_STATE
                         ? ESP_OK
@@ -934,11 +949,15 @@ static void services_task(void *argument) {
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Web server failed: %s", esp_err_to_name(result));
     }
+    if (result == ESP_OK) deep_sleep_clock_set_ready();
     vTaskDelete(NULL);
 }
 #endif
 
 void app_main(void) {
+#ifndef YORADIO_CODEC_BENCHMARK
+    deep_sleep_clock_boot();
+#endif
     ESP_LOGI(TAG, "Starting pure ESP-IDF ESP32-C3 OLED yoRadio");
     native_state_init(&s_state);
     ESP_ERROR_CHECK(cpu_profiler_start());

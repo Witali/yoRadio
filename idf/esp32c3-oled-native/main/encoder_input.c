@@ -1,4 +1,5 @@
 #include "encoder_input.h"
+#include "deep_sleep_clock.h"
 
 #include "sdkconfig.h"
 
@@ -275,6 +276,7 @@ esp_err_t encoder_input_start(const encoder_input_callbacks_t *callbacks) {
     };
     ESP_RETURN_ON_ERROR(gpio_config(&button_config), TAG,
                         "Configure encoder button");
+    deep_sleep_clock_wait_for_release(button_pin);
 #endif
 
     esp_err_t result = gpio_install_isr_service(0);

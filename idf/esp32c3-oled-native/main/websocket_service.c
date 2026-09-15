@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "audio_service.h"
+#include "deep_sleep_clock.h"
 #include "board_config.h"
 #include "display_settings.h"
 #include "esp_check.h"
@@ -556,7 +557,7 @@ static void handle_command(httpd_req_t *request, char *command) {
     }
 }
 
-static esp_err_t websocket_handler(httpd_req_t *request) {
+static esp_err_t websocket_handler_awake(httpd_req_t *request) {
     if (request->method == HTTP_GET) {
         ESP_LOGI(TAG, "WebUI client connected on socket %d",
                  httpd_req_to_sockfd(request));
@@ -576,6 +577,13 @@ static esp_err_t websocket_handler(httpd_req_t *request) {
     payload[frame.len] = '\0';
     handle_command(request, payload);
     return ESP_OK;
+}
+
+static esp_err_t websocket_handler(httpd_req_t *request) {
+    if (!deep_sleep_clock_begin_activity()) return ESP_FAIL;
+    esp_err_t result = websocket_handler_awake(request);
+    deep_sleep_clock_end_activity();
+    return result;
 }
 
 typedef struct {

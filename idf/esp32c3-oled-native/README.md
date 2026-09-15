@@ -51,6 +51,18 @@ and track name follows the same timing and separator rules. The optional
 A/B builds; eligible 10-to-15-glyph strings then use the SSD1306 scroll engine,
 while longer strings continue to use software scrolling without truncation.
 
+### Optional deep-sleep clock
+
+Build with `-DeepSleepClock` (also supported by the root and production build
+scripts) to sleep while the stopped-radio screensaver displays the clock.
+It is disabled without this switch. An RTC wake stub updates the colon every
+500 ms and the digits on minute changes, without booting the application.
+Wi-Fi, WebUI and USB are unavailable asleep. Hold BOOT for over 500 ms to
+restore the station screen, release it, then press again to play.
+Short clicks between timer wakes can be missed. A synchronized clock is
+required; setup/AP, playing and Blank modes stay awake.
+See [build instructions, limitations and tests](../../docs/ESP32C3_DEEP_SLEEP_CLOCK.md).
+
 ### Optional rotary encoder
 
 An EC11/KY-040 encoder can be enabled with the supplied

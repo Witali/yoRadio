@@ -1,5 +1,17 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_DEEP_SLEEP_CLOCK
+    bool "Deep sleep while showing the stopped-radio clock"
+    depends on !YORADIO_QEMU
+    default n
+    help
+        Opt-in mode enabled by build.ps1 -DeepSleepClock. Stops Wi-Fi and
+        I2S, then uses an RTC wake stub to update the OLED every 500 ms.
+        WebUI and USB are unavailable asleep. Hold BOOT for over 500 ms
+        to restore the station screen; press again to play. GPIO9 cannot
+        wake the C3 directly, so brief clicks can be missed.
+        Requires synchronized time; setup/AP mode stays awake.
+
 config YORADIO_WEB_SEND_TIMEOUT_SECONDS
     int "Web content send timeout (seconds)"
     range 5 120

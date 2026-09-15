@@ -122,7 +122,7 @@ static void fill_ramp(size_t frames, uint32_t first, uint32_t count,
     for (size_t frame = 0; frame < frames; ++frame) {
         int16_t value = first + frame < count
                             ? ramp_sample(first + frame, count, ramp_up)
-                            : 0;
+                            : (ramp_up ? 0 : INT16_MIN);
         s_frame_buffer[frame * 2] = value;
         s_frame_buffer[frame * 2 + 1] = value;
     }
@@ -424,6 +424,33 @@ int8_t native_audio_output_get_balance(void) {
 void native_audio_output_idle(void) {
     // DMA descriptors auto-clear to PCM zero; only the level LED must decay.
     audio_level_led_update_peak(0);
+}
+
+esp_err_t native_audio_output_suspend(void) {
+    if (!s_pdm) return ESP_OK;
+    s_buffered_frames = 0;
+    uint32_t count = ramp_frames();
+    for (uint32_t first = 0; first < count; first += PDM_DMA_FRAMES) {
+        fill_ramp(PDM_DMA_FRAMES, first, count, false);
+        ESP_RETURN_ON_ERROR(pdm_write_block(s_frame_buffer, PDM_DMA_FRAMES),
+                            TAG, "sleep bias ramp");
+    }
+    // Pad with constant-low PDM. Stop while this tail is still queued so
+    // DMA auto-clear cannot restore 50% duty after the downward ramp.
+    fill_ramp(PDM_DMA_FRAMES, count, count, false);
+    for (unsigned tail = 0; tail < 2; ++tail) {
+        ESP_RETURN_ON_ERROR(pdm_write_block(s_frame_buffer, PDM_DMA_FRAMES),
+                            TAG, "sleep bias tail");
+    }
+    vTaskDelay(pdMS_TO_TICKS((PDM_DMA_DESCRIPTORS - 2U) * PDM_DMA_FRAMES *
+                              1000U / PDM_OUTPUT_SAMPLE_RATE +
+                              PDM_BIAS_SETTLE_MS));
+    ESP_RETURN_ON_ERROR(i2s_channel_disable(s_pdm), TAG, "stop PDM for sleep");
+    s_pdm_running = false;
+    ESP_ERROR_CHECK(i2s_del_channel(s_pdm));
+    s_pdm = NULL;
+    hold_pdm_low();
+    return ESP_OK;
 }
 
 const char *native_audio_output_name(void) {

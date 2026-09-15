@@ -1230,10 +1230,48 @@ static void decoder_task(void *argument) {
     }
 }
 
+#ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
+static TaskHandle_t s_output_task;
+static SemaphoreHandle_t s_output_suspended;
+static atomic_bool s_suspend_output;
+static esp_err_t s_suspend_result;
+
+esp_err_t audio_service_suspend_output(void) {
+    if (!s_output_suspended || !s_output_task) return ESP_ERR_INVALID_STATE;
+    atomic_store(&s_suspend_output, true);
+    xSemaphoreTake(s_output_suspended, portMAX_DELAY);
+    return s_suspend_result;
+}
+
+esp_err_t audio_service_resume_output(void) {
+    xTaskNotifyGive(s_output_task);
+    xSemaphoreTake(s_output_suspended, portMAX_DELAY);
+    return s_suspend_result;
+}
+#endif
+
 static void output_task(void *argument) {
     (void)argument;
+#ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
+    s_output_task = xTaskGetCurrentTaskHandle();
+#endif
     uint32_t sample_rate = 0;
     while (true) {
+#ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
+        if (atomic_exchange(&s_suspend_output, false)) {
+            s_suspend_result = native_audio_output_suspend();
+            xSemaphoreGive(s_output_suspended);
+            if (s_suspend_result == ESP_OK) {
+                ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+                // Reserve I2S again before the sleep gate admits a new Play.
+                // Otherwise TLS/decoder allocations could take its DMA memory.
+                s_suspend_result = native_audio_output_configure(
+                    sample_rate ? sample_rate : 48000U);
+                sample_rate = 0;
+                xSemaphoreGive(s_output_suspended);
+            }
+        }
+#endif
         size_t item_size = 0;
         pcm_packet_t *packet = xRingbufferReceive(s_pcm, &item_size,
                                                   pdMS_TO_TICKS(5));
@@ -1271,6 +1309,10 @@ static void output_task(void *argument) {
 
 esp_err_t audio_service_start(native_state_t *state) {
     s_state = state;
+#ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
+    s_output_suspended = xSemaphoreCreateBinary();
+    if (!s_output_suspended) return ESP_ERR_NO_MEM;
+#endif
     ESP_RETURN_ON_ERROR(native_audio_output_init(), TAG,
                         "initialize audio output");
     ESP_RETURN_ON_ERROR(audio_level_led_init(), TAG,

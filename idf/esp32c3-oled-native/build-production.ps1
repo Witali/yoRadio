@@ -6,12 +6,22 @@ param(
     [string]$FirmwareOutputDirectory = "",
     [switch]$NoFirmwareExport,
     [switch]$Setup,
+    [switch]$DeepSleepClock,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")
 )
 
 $ErrorActionPreference = "Stop"
+if ($DeepSleepClock) {
+    if (-not $PSBoundParameters.ContainsKey("BuildDirectory")) {
+        $BuildDirectory = "build-production-deep-sleep-clock"
+    }
+    if (-not $PSBoundParameters.ContainsKey("Sdkconfig")) {
+        $Sdkconfig = "$BuildDirectory/sdkconfig"
+    }
+}
 $buildArguments = @{
+    DeepSleepClock = $DeepSleepClock
     BuildDirectory = $BuildDirectory
     Sdkconfig = $Sdkconfig
     SdkconfigDefaults = @(
@@ -48,7 +58,11 @@ if ($buildExitCode -eq 0 -and $shouldExportApplication -and -not $NoFirmwareExpo
 
     $repositoryRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
     $resolvedFirmwareOutput = if ([string]::IsNullOrWhiteSpace($FirmwareOutputDirectory)) {
-        Join-Path $repositoryRoot "firmware\development\esp32c3-oled-native-production"
+        if ($DeepSleepClock) {
+            Join-Path $repositoryRoot "firmware\development\esp32c3-oled-native-deep-sleep-clock"
+        } else {
+            Join-Path $repositoryRoot "firmware\development\esp32c3-oled-native-production"
+        }
     } elseif ([IO.Path]::IsPathRooted($FirmwareOutputDirectory)) {
         $FirmwareOutputDirectory
     } else {
