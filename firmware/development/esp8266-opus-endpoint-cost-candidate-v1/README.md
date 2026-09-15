@@ -10,7 +10,11 @@ app903216 bytes, SHA256:
 
 preflight.json records linked proof and parent hashes; host.json records24
 exact PCM/state/PLC/reset/OOM cases through510kbps. Parent ELF and patch ELF
-are retained for independent verification. Physical A/B/A pending.
+are retained for independent verification. All30 physical A/B/A completed:
+CPU19286.47023 /85.96527 /86.49377%, both high-bitrate gates PASS.
+Accepted experimental raw baseline, no static RAM/frame increase.
+All attempts/maxima retained; candidate maximum19226.714ms.
+Ordinary radio restored OTA with matching station/playlist and HTTP/WS.
 Not production and not a continuous audio qualification.
 
 See docs/ESP8266_OPUS_ASM_ENDPOINT_COST.md for scope and protocol.

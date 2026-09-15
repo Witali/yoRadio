@@ -3,6 +3,22 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-15: ESP8266 Opus cached PVQ endpoint costs
+
+- development/esp8266-opus-endpoint-cost-{control,candidate}-v1/app.bin,
+  903216 B, CPU160/QIO40 raw ASM benchmark over accepted bits-fourth.
+- Eight same-width point replacements retain both already-read endpoint
+  costs: exact branches/q/cost/ABI, no code relocation or RAM/frame growth.
+  378304 linked cases,24 host PCM/state/PLC/reset/OOM cases through510kbps.
+- All30 A/B/A retained: CPU19286.47023 /85.96527 /86.49377%;128
+  76.07402 /75.71290 /76.11025%. Both high-bitrate acceptance gates PASS.
+  New experimental raw baseline; default unchanged.80% target still unmet.
+- Free DRAM minima8040 /6800 /8896 B, free stack1660 B. No observation
+  errors; all maxima/window excess retained, candidate192 maximum26.714ms.
+- Ordinary C radio restored OTA; HTTP200/WS/current167/stopped/playlist
+  verified. This does not qualify continuous I2S PDM playback.
+  [Details](../docs/ESP8266_OPUS_ASM_ENDPOINT_COST.md).
+
 ## Development - 2026-09-14: ESP8266 Opus FFT scheduled-load experiment (not accepted)
 
 - `development/esp8266-opus-fft-schedule-{control,candidate}-v1/app.bin`,
