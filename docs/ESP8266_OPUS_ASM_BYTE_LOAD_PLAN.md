@@ -105,9 +105,12 @@ ordinary restored OTA. Accepted experimentally;80%/live qualification pending.
 
 ## Next independent candidate: row length cache[0]
 
-- [ ] Count actual quant_partition entries/row-length loads on the audio
+- [x] Count actual quant_partition entries/row-length loads on the audio
   corpus. Do not reuse only no-split or LM!=-1 counts for this unconditional
   target read at0x4024db47: L8UI a6,a2,0.
+  [Host census completed](ESP8266_OPUS_PVQ_ROW_WORD_PROFILE.md):3026 reads
+  per0.24s at192,12608.33/s.10 exact PCM files through510, state/scratch/
+  guards unchanged; counts independently agree with earlier upper probes.
 - [ ] Prototype an a2-input/a6-output word leaf. Preserve a2 and every other
   live register/SAR, use only proven dead scratch, no stack/table/RAM growth.
   The original return is already saved at sp+108 before this site.
