@@ -1115,3 +1115,11 @@ A2/run1 mono12 window excess254мкс не исключён. Ordinary C/I2S PDM
 пересчёт всех30 попыток/максимумов/минимумов и проверку восстановления.
 Следующий приоритет — чтение cache[0] в0x4024db47, отдельно от уже принятых
 a4/a10 проб; сначала частота и точное доказательство register/source ownership.
+
+Подготовлен [row-length word ASM](ESP8266_OPUS_ASM_PVQ_ROW_WORD.md): одно
+L8UI a6,a2,0 заменено CALL0 в25-byte leaf с прежним a2 и SAR. Использованы
+27 bytes доказанно encoder-only кода без сдвига других адресов/таблиц/RAM.
+Census192:12608.33 чтений/с аудио.185168 linked numeric cases и24 host
+PCM/state/PLC/reset/OOM сценария до510кбит/с/120мс точны.136 связанных
+preflight регрессий PASS/0skip. Физическая серия30 A/B/A ещё не завершена;
+подтверждённый baseline пока82.83819%, default прежний.

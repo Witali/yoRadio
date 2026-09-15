@@ -111,10 +111,10 @@ ordinary restored OTA. Accepted experimentally;80%/live qualification pending.
   [Host census completed](ESP8266_OPUS_PVQ_ROW_WORD_PROFILE.md):3026 reads
   per0.24s at192,12608.33/s.10 exact PCM files through510, state/scratch/
   guards unchanged; counts independently agree with earlier upper probes.
-- [ ] Prototype an a2-input/a6-output word leaf. Preserve a2 and every other
+- [x] Prototype an a2-input/a6-output word leaf. Preserve a2 and every other
   live register/SAR, use only proven dead scratch, no stack/table/RAM growth.
   The original return is already saved at sp+108 before this site.
-- [ ] Locate and prove a new encoder-only slot: the original private-contract
+- [x] Locate and prove a new encoder-only slot: the original private-contract
   audit finds candidate spans0x4024dc95..0x4024ddd9 and0x4024e3e8..0x4024e433,
   outside existing helpers. Size alone is insufficient: verify all incoming
   branches, alignment and fallthroughs, preserve every outside byte/address.
@@ -125,5 +125,10 @@ Important for liveness audits: private internal leaf CALL0 sites do not have
 the full generic C call-clobber set. Current proofs use only a0/a11, which
 these helpers actually overwrite. Do not infer that a8/a9 are dead merely
 because deadReg stops at a CALL0; model each internal helper's real clobbers
-before using any other scratch register. No new code has been implemented
-or timed for the row-length proposal.
+before using any other scratch register.
+
+[Row-length candidate built and locally verified](ESP8266_OPUS_ASM_PVQ_ROW_WORD.md):
+27-byte encoder-only slot,25 live helper bytes; source a2 preserved, a6 result,
+SAR/a0/a11 proven.185168 linked numeric cases and24 host scenarios exact.
+Image903216 B, outside bytes/addresses/table/RAM/frame unchanged. Physical
+10 A/10 B/10 A still pending; no new speed or live-audio claim.
