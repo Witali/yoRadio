@@ -40,7 +40,7 @@ function dependencies(depfile) {
 }
 
 async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false, asmEntropyModel = false, asmBandsModel = '' } = {}) {
-  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline','fused','tell-intensity','update-fast','tell-update','tell-bits1','cache-reuse','inner4','logp','small-div','folding8','partition-decode','ec-bits','micro-bundle','pvq-dim-pointer','partition-points','bits-fifth','bits-fourth','endpoint-cost','pvq-byte-word','pvq-a4-word','pvq-row-word','pvq-endpoint-word','pvq-index-word','pvq-index-half','pvq-logn-word'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
+  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline','fused','tell-intensity','update-fast','tell-update','tell-bits1','cache-reuse','inner4','logp','small-div','folding8','partition-decode','ec-bits','micro-bundle','pvq-dim-pointer','partition-points','bits-fifth','bits-fourth','endpoint-cost','pvq-byte-word','pvq-a4-word','pvq-row-word','pvq-endpoint-word','pvq-index-word','pvq-index-half','pvq-logn-word','pvq-exp2-word'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
   if (asmEntropyModel && !bounded) throw Error('asmEntropyModel requires bounded decoder.');
   if (silkPlcIram && !bounded) throw Error('silkPlcIram requires bounded decoder.');
   if (autocorrCompact && !bounded) throw Error('autocorrCompact requires bounded decoder.');
@@ -74,6 +74,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
   if (asmBandsModel==='pvq-index-word') for(const model of require('../esp8266_opus_asm/pvq_index_word.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='pvq-index-half') for(const model of require('../esp8266_opus_asm/pvq_index_half.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='pvq-logn-word') for(const model of require('../esp8266_opus_asm/pvq_logn_word.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
+  if (asmBandsModel==='pvq-exp2-word') for(const model of require('../esp8266_opus_asm/pvq_exp2_word.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='micro-bundle') for(const model of require('../esp8266_opus_asm/micro_bundle.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='pvq-dim-pointer') for(const model of require('../esp8266_opus_asm/pvq_dim_pointer.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='partition-points') for(const model of require('../esp8266_opus_asm/partition_points.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
