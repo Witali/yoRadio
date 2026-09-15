@@ -8,5 +8,9 @@ a53e2684fbfbe7c52743c0fcb0ec50301b7d6106a4b055a8659d84ffe7817b05
 
 preflight.json contains actual linked/SAR/register/table proofs.
 host.json contains24 exact PCM/state/PLC/reset/OOM cases through510kbps.
-Physical comparison pending; not production or continuous-audio qualification.
+All30 A/B/A complete: CPU19285.91985 /84.01121 /85.91904%; both high-bitrate
+gates PASS, exact PCM, unchanged static RAM/frame. Experimental raw baseline
+accepted, not production or continuous-audio qualification. Default unchanged.
+Min free DRAM1252 B retained;192 maximum call21.428ms. Ordinary restored OTA.
+See CHANGELOG.md and comparison.json for all rates, maxima and limitations.
 See docs/ESP8266_OPUS_ASM_PVQ_BYTE_WORD.md.

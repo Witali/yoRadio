@@ -1,7 +1,7 @@
 # Opus ASM: word extraction for five PVQ byte probes
 
 2026-09-15. Experimental candidate over accepted endpoint-cost, not production.
-Physical speed not yet established. CPU160, runtime QIO40; no RAM growth.
+Physical gain confirmed by30 A/B/A. CPU160, runtime QIO40; no static RAM growth.
 
 116 related preflight regressions PASS,0 failures/skips,103.42seconds.
 preflight-tests.log and the generator/host/helper-test logs are retained
@@ -81,5 +81,55 @@ pvq_byte_word_proof.cjs. Original C/GCC snapshots unchanged.
 or function/stage profiler. Preserve every attempt, maximum, memory minimum
 and observation error. Compare both fresh controls at128/192 and lower
 bitrates, then restore ordinary radio through OTA. No GPIO3/UART commands.
+
+## Physical results
+
+All30 attempts completed with exact PCM and no decoder/HTTP observation
+errors. Median raw decoder CPU, percent; A/A2 are accepted endpoint-cost:
+
+| kbps | A | B: byte-word | A2 | Maximum call A/B/A2, us |
+|---|---:|---:|---:|---|
+|12|23.08269|23.09767|23.07910|8625 /8310 /7875|
+|24|54.24179|54.19331|54.24304|14581 /16054 /14562|
+|64|64.10235|63.43875|64.01488|17057 /17118 /17257|
+|128|75.70981|74.43904|75.69485|19277 /21842 /19288|
+|192|85.91985|84.01121|85.91904|22101 /21428 /21069|
+
+Both high-bitrate gates PASS:192 relative time gain2.22143% /2.22050%,
+128 gain1.67848% /1.65905%, exceeding mono12 loss0.06489% /0.08043%.
+Accepted as the new experimental raw baseline,84.01121%; default unchanged.
+Another4.77461% reduction in current decoder time is needed to reach80%.
+Candidate192 range83.95267..84.18454%, mean84.03786%.
+
+Static RAM/IRAM/frame/arenas unchanged. Minimum observed free DRAM A/B/A2:
+8860 /1252 /7492 B; minimum free stack1660 B in every group. B/run1 had
+the1252 B minimum on12/24/64/128, retained without filtering. At192 the
+minima are9800 /9800 /9808 B. Cleanup free DRAM minima26300 /26164 /26308 B.
+These are observations, not new allocation sizes or a live-memory safety
+claim. No OOM occurred; the cause of the low B/run1 memory is not established.
+
+All maxima retained: B19221.428ms is lower than A but higher than A2;
+B12821.842ms is worse than both controls. Average acceleration does not
+establish a safe DMA deadline. Different accounting windows give task>wall
+on mono12 A/run1 by478us, B/run3 by521us, A2/run9 by24us; retained, not
+clamped or excluded. No timing measurement is replaced by an empty-loop
+subtraction. See the archived comparison and all30 JSON/log pairs:
+[comparison.json](../firmware/development/esp8266-opus-pvq-byte-word-candidate-v1/comparison.json).
+
+Final118 related regressions PASS,0 failures/skips,116.90seconds. The results
+test independently recomputes every median, maximum, minimum and acceptance
+gate from all30 archived attempts, rechecks the linked proof and validates
+the ordinary restoration. final-tests.log retained beside the image.
+This is the related Opus suite, not all repository tests.
+
+## Restore and remaining qualification
+
+Ordinary live512-idle3s C-backend radio restored OTA to0x10000, SHA256
+661becd301b07885d493ceb1b513d9e874b7d86e4ada8231da8657aa90983c4b.
+CPU160/QIO40, I2S PDM32/GPIO3,2x512 DMA; benchmark OFF. Stopped station167,
+playlist hash, empty error, getindex and WebSocket playerwrap verified.
+Root HTTP200:27249 gzip bytes in105.8124ms, heap27628/min24748, RSSI-62dBm.
+This measures the root document, not full browser loading; playback was
+not started in this restoration check. No UART/reset or SPIFFS upload.
 
 The80% raw CPU goal and20seconds continuous I2S PDM/WebUI remain unproven.

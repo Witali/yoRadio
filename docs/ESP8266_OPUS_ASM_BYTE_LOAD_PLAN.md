@@ -1,8 +1,8 @@
 # Next Opus ASM experiment: narrow flash-byte access
 
-2026-09-15. [Narrow candidate implemented](ESP8266_OPUS_ASM_PVQ_BYTE_WORD.md)
-and locally verified; physical comparison not yet complete.
-Control for future comparisons: accepted endpoint-cost, CPU19285.96527%.
+2026-09-15. [Narrow candidate accepted experimentally](ESP8266_OPUS_ASM_PVQ_BYTE_WORD.md)
+after30 physical A/B/A and exact PCM; CPU19284.01121%.
+Control for the next experiment: accepted pvq-byte-word, not endpoint-cost.
 No firmware default, CPU/flash clock or RAM budget change.
 
 ## Verified premise and prior failures
@@ -54,13 +54,42 @@ other linked addresses, tables and register pressure kept fixed.
 - [x] Verify assembled instructions and all outside bytes/addresses, exact
   PCM/state/PLC/reset/OOM through510kbps and compound120ms packets, plus
   negative ABI/SAR/boundary tests. Keep original C and GCC ASM snapshots.
-- [ ] Compare against accepted endpoint-cost with10 A/10 B/10 A at160/QIO40.
+- [x] Compare against accepted endpoint-cost with10 A/10 B/10 A at160/QIO40.
   All raw packets preloaded in RAM; no output/profiling; retain all errors,
   maxima, RAM and low-bitrate cases. A local load microbenchmark cannot
   substitute for this whole-decoder comparison.
-- [ ] Keep only a demonstrated high-bitrate gain without RAM growth.
-  Then80% raw threshold and20seconds live I2S/WebUI remain separate gates.
+- [x] Keep only a demonstrated high-bitrate gain without RAM growth.
+  Both controls confirm192 gain2.22% and128 gain1.66–1.68%; mono12 loss
+  0.065–0.080%. Static RAM/IRAM/frame unchanged; every observation retained.
+- [ ] Reach80% raw CPU and qualify20seconds live I2S/WebUI separately.
 
 This can avoid exception overhead, but the previous negative word-access
 experiments make it a hypothesis requiring an isolated test, not a guaranteed
 speed improvement. Do not infer cache misses or exact instruction timings.
+
+## Next independent candidate: two a4 byte probes
+
+Read-only inventory of the accepted linked image found two same-register
+L8UI a4,a4,0 sites:0x4024db52 (upper cost before split decision) and
+0x4024e1ad (first binary-search probe). Current deadReg traversal proves
+a0/a11 dead after both instructions; this alone is not a complete proof
+of a new helper or a measured speedup.
+
+- [ ] Count each selected load on the actual audio corpus. The existing
+  search census gives1765 first probes per0.24s at192, but does not count
+  every pre-split upper-cost read; do not extrapolate that count blindly.
+- [ ] Prototype an a4-input/output leaf with saved/restored SAR and dead a11,
+  retaining a0 return correctness. A possible25-byte slot is0x4024de08:
+  inside the old helper's32-byte unreachable padding, aligned4. Prove no
+  branch/fallthrough/external entry reaches it, no overlap with the first
+  helper or sixth-probe stub, and preserve every outside byte/address.
+- [ ] Prove static-table provenance and complete aligned-word bounds at
+  both sites, all byte phases/SAR/live registers, split/no-split paths and
+  recursive decoder calls. Inherit the prior verified private encode=0
+  contract explicitly; do not treat arbitrary unreachable code as free.
+- [ ] Extend the host model and actual-linked tests, then10 A/10 B/10 A
+  against accepted pvq-byte-word. Preserve exact PCM through510kbps/120ms,
+  all errors/maxima, stack and RAM. The extra live instructions can affect
+  flash/cache even though total image size is unchanged.
+
+No new ASM candidate has been implemented or flashed for these two sites.
