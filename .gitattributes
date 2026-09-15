@@ -112,3 +112,10 @@ firmware/development/esp8266-opus-pvq-a4-word-*/**/*.json text eol=lf
 firmware/development/esp8266-opus-pvq-a4-word-*/*.log -text whitespace=cr-at-eol
 firmware/development/esp8266-opus-pvq-a4-word-*/**/*.log -text whitespace=cr-at-eol
 firmware/development/esp8266-opus-pvq-a4-word-*/*.elf.gz filter=lfs diff=lfs merge=lfs -text
+
+# All later PVQ experiments also authenticate raw JSON bytes. Keep their
+# hashes reproducible after a Windows checkout with core.autocrlf=true.
+firmware/development/esp8266-opus-pvq-*/*.json text eol=lf
+firmware/development/esp8266-opus-pvq-*/**/*.json text eol=lf
+firmware/development/esp8266-opus-pvq-*/*.log -text whitespace=cr-at-eol
+firmware/development/esp8266-opus-pvq-*/**/*.log -text whitespace=cr-at-eol
