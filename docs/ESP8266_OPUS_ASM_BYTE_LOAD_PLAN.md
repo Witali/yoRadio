@@ -1,6 +1,7 @@
 # Next Opus ASM experiment: narrow flash-byte access
 
-2026-09-15. Hypothesis, not implemented or physically measured.
+2026-09-15. [Narrow candidate implemented](ESP8266_OPUS_ASM_PVQ_BYTE_WORD.md)
+and locally verified; physical comparison not yet complete.
 Control for future comparisons: accepted endpoint-cost, CPU19285.96527%.
 No firmware default, CPU/flash clock or RAM budget change.
 
@@ -34,23 +35,23 @@ other linked addresses, tables and register pressure kept fixed.
 ## Checklist
 
 - [x] Inspect the actual SDK exception handler and remaining linked loads.
-- [ ] Inventory eligible static table loads and their dynamic frequency;
+- [x] Inventory eligible static table loads and their dynamic frequency;
   choose a small homogeneous set before changing every access.
-- [ ] Prototype one word-extract sequence for the same source/destination
+- [x] Prototype one word-extract sequence for the same source/destination
   register, preserving byte value, SAR and all live registers. Consider
   save-SAR/SSA8L/align/L32I/SRL/EXTUI/restore-SAR, not an unaligned L32I.
   Do not assume a spare register or free SAR at the insertion point.
-- [ ] If a3-byte CALL0 replaces L8UI, prove a0 lifetime across all caller
+- [x] If a3-byte CALL0 replaces L8UI, prove a0 lifetime across all caller
   continuations, original return restoration and helper ABI. Helper storage
   may use only independently proven unused decoder-inaccessible code slots,
   excluding the sixth-probe stub already occupying0x4024e27b..0x4024e297.
   No new task stack or persistent RAM. A leaf helper is only a candidate:
   call/return overhead and flash placement must be measured.
-- [ ] Prove each aligned word lies within the complete readable static table
+- [x] Prove each aligned word lies within the complete readable static table
   storage, not merely that the byte was valid. Account for row offsets,
   last byte, endianness and arrays requiring padding. Keep dynamic RAM/MMIO
   and unsupported/custom-mode accesses unchanged.
-- [ ] Verify assembled instructions and all outside bytes/addresses, exact
+- [x] Verify assembled instructions and all outside bytes/addresses, exact
   PCM/state/PLC/reset/OOM through510kbps and compound120ms packets, plus
   negative ABI/SAR/boundary tests. Keep original C and GCC ASM snapshots.
 - [ ] Compare against accepted endpoint-cost with10 A/10 B/10 A at160/QIO40.
