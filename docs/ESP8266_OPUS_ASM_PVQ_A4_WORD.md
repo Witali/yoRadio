@@ -1,7 +1,7 @@
 # Opus ASM: word reads for the two remaining a4 PVQ probes
 
 2026-09-15. Candidate over accepted pvq-byte-word84.01121% raw CPU192.
-Physical speed not yet established; no change to the firmware default.
+Physical gain confirmed by30 A/B/A; no change to the firmware default.
 
 Pre-deployment127 related regressions PASS,0 failures/skips,134.70seconds.
 The complete log is retained as preflight-tests.log beside the image.
@@ -50,13 +50,61 @@ Control SHA256:a53e2684fbfbe7c52743c0fcb0ec50301b7d6106a4b055a8659d84ffe7817b05.
 Candidate SHA256:fe34751b8dae0cbd87a58a1b767aa02a82b006aa8b452f66065446dbc9dbdae9.
 Original C and GCC snapshots remain unchanged.
 
-## Physical qualification still required
+## Physical measurements
 
 10 A /10 B /10 A at CPU160/runtime QIO40, same RAM-preloaded packets,
 no physical output or function/stage profiler. Keep every attempt, error,
 maximum and RAM minimum, including low-bitrate regressions. Compare both
 fresh controls; restore ordinary radio via OTA afterwards. No UART/GPIO3.
 
-The80% raw goal and20seconds continuous I2S PDM/WebUI are not established
-by these local results. The accepted baseline remains pvq-byte-word until
-the physical comparison completes.
+All30 attempts completed with exact PCM. Median raw CPU, percent:
+
+| kbps | A: byte-word | B: a4-word | A2: byte-word | Maximum call A/B/A2, us |
+|---|---:|---:|---:|---|
+|12|23.09273|23.09377|23.09846|8246 /7753 /7875|
+|24|54.19171|54.16746|54.17313|19760 /14862 /14253|
+|64|63.47258|63.41017|63.44331|22595 /18012 /16423|
+|128|74.45779|73.76998|74.45352|29511 /20167 /20181|
+|192|84.00988|82.83819|84.02250|31029 /21407 /23309|
+
+Both high-bitrate gates PASS:192 relative time gain1.39470% /1.40952%,
+128 gain0.92376% /0.91808%. Mono12 loss against A is0.00451%; against A2
+no low-bitrate median is worse. Accepted as the experimental raw baseline,
+82.83819%; another3.42618% reduction is needed to reach80%. Candidate192
+range82.78900..82.94513%, mean82.85589%. No default/profile clock change.
+
+Static RAM/IRAM/frame unchanged. Minimum free stack1660 B in all groups;
+observed free DRAM minima544 /8028 /8352 B. At192:856 /9800 /9972 B.
+Post-run raw free DRAM minima17600 /26300 /26192 B. These dynamic observations
+are not new allocation sizes or proof of a memory saving by the candidate.
+
+A/run3 had one HTTP observation timeout, decoded192 at96.92825% CPU, and
+recorded minimum DRAM544 B (status allocator lifetime floor520 B). It
+completed with exact PCM and is retained in every comparison. Its later
+status read showed26572 B free. The cause of the low-memory/slow interval
+is unknown; neither network starvation nor fragmentation is established.
+Candidate and A2 have no observation errors. A2/run1 mono12 task>wall by254us
+is retained as a timing-window discrepancy, without clamping or subtraction.
+
+All maxima are retained. B19221.407ms is better than both controls but still
+not a deadline guarantee for20ms frames; B24/64 maxima are worse than A2.
+Source/proofs commit7f075c57; census9ddab73f. Full raw JSON/log/SHA/OTA and
+independent comparisons are in
+[comparison.json](../firmware/development/esp8266-opus-pvq-a4-word-candidate-v1/comparison.json).
+
+Final129 related regressions PASS,0 failures/skips,143.00seconds. The results
+test independently recomputes all30 attempts, medians/maxima/minima and
+acceptance gates, rechecks linked proofs and validates ordinary restoration.
+final-tests.log retained beside the image; not the entire repository suite.
+
+## Ordinary restoration and remaining qualification
+
+Ordinary live512-idle3s C-backend radio restored OTA to0x10000, SHA256
+661becd301b07885d493ceb1b513d9e874b7d86e4ada8231da8657aa90983c4b.
+CPU160/QIO40, I2S PDM32/GPIO3,2x512 DMA; benchmark OFF. Stopped station167,
+unchanged playlist hash, empty error and WebSocket/getindex/playerwrap checked.
+Root HTTP200:27249 gzip bytes in108.702ms, heap27628/min24748, RSSI-74dBm.
+This measures the root document, not all browser resources; playback was
+not started as part of restoration. No UART/reset or SPIFFS upload.
+
+The80% raw goal and20seconds continuous I2S PDM/WebUI remain unproven.

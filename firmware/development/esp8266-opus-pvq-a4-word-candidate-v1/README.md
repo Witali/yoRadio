@@ -6,6 +6,8 @@ No new RAM/stack/table; all outside addresses unchanged; image903216 B.
 SHA256:fe34751b8dae0cbd87a58a1b767aa02a82b006aa8b452f66065446dbc9dbdae9.
 
 preflight.json contains actual linked/SAR/register/table proofs; host.json
-contains24 exact PCM/state scenarios through510kbps and120ms. Physical
-comparison pending. Not production or continuous-audio qualification.
+contains24 exact PCM/state scenarios through510kbps and120ms. All30 A/B/A
+completed: CPU19284.00988 /82.83819 /84.02250%, both high-bitrate gates PASS.
+Accepted experimental raw baseline; not production or continuous-audio
+qualification. No default change; ordinary radio restored OTA afterwards.
 See docs/ESP8266_OPUS_ASM_PVQ_A4_WORD.md and CHANGELOG.md.

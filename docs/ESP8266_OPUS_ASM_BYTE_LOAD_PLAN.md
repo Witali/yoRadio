@@ -2,7 +2,8 @@
 
 2026-09-15. [Narrow candidate accepted experimentally](ESP8266_OPUS_ASM_PVQ_BYTE_WORD.md)
 after30 physical A/B/A and exact PCM; CPU19284.01121%.
-Control for the next experiment: accepted pvq-byte-word, not endpoint-cost.
+Updated after the second experiment: accepted pvq-a4-word82.83819% is the
+control for future comparisons; earlier results below retain their history.
 No firmware default, CPU/flash clock or RAM budget change.
 
 ## Verified premise and prior failures
@@ -90,7 +91,7 @@ of a new helper or a measured speedup.
   both sites, all byte phases/SAR/live registers, split/no-split paths and
   recursive decoder calls. Inherit the prior verified private encode=0
   contract explicitly; do not treat arbitrary unreachable code as free.
-- [ ] Extend the host model and actual-linked tests, then10 A/10 B/10 A
+- [x] Extend the host model and actual-linked tests, then10 A/10 B/10 A
   against accepted pvq-byte-word. Preserve exact PCM through510kbps/120ms,
   all errors/maxima, stack and RAM. The extra live instructions can affect
   flash/cache even though total image size is unchanged.
@@ -98,4 +99,28 @@ of a new helper or a measured speedup.
 [Candidate implemented and locally verified](ESP8266_OPUS_ASM_PVQ_A4_WORD.md):
 three patch ranges, unchanged image903216 B/static RAM/frame. Actual linked
 378304 search and79902 split-threshold cases, plus24 exact host scenarios.
-The candidate has not yet been flashed; physical comparison is pending.
+Physical30 A/B/A completed: CPU19284.00988 /82.83819 /84.02250%, both gates
+PASS. Exact PCM/static RAM/frame preserved, all observations retained,
+ordinary restored OTA. Accepted experimentally;80%/live qualification pending.
+
+## Next independent candidate: row length cache[0]
+
+- [ ] Count actual quant_partition entries/row-length loads on the audio
+  corpus. Do not reuse only no-split or LM!=-1 counts for this unconditional
+  target read at0x4024db47: L8UI a6,a2,0.
+- [ ] Prototype an a2-input/a6-output word leaf. Preserve a2 and every other
+  live register/SAR, use only proven dead scratch, no stack/table/RAM growth.
+  The original return is already saved at sp+108 before this site.
+- [ ] Locate and prove a new encoder-only slot: the original private-contract
+  audit finds candidate spans0x4024dc95..0x4024ddd9 and0x4024e3e8..0x4024e433,
+  outside existing helpers. Size alone is insufficient: verify all incoming
+  branches, alignment and fallthroughs, preserve every outside byte/address.
+- [ ] Prove complete static-table bounds, exact PCM/state/split behavior,
+  then10 A/10 B/10 A against accepted a4-word with all errors/maxima/RAM.
+
+Important for liveness audits: private internal leaf CALL0 sites do not have
+the full generic C call-clobber set. Current proofs use only a0/a11, which
+these helpers actually overwrite. Do not infer that a8/a9 are dead merely
+because deadReg stops at a CALL0; model each internal helper's real clobbers
+before using any other scratch register. No new code has been implemented
+or timed for the row-length proposal.
