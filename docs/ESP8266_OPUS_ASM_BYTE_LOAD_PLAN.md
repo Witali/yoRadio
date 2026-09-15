@@ -185,3 +185,16 @@ Index/adjustment-loop candidates remain unbuilt. Read-only ELF inspection
 finds the210-byte index followed by two zero padding bytes inside flash.rodata;
 any later word-read recipe must independently authenticate those bytes and
 the containing section, not assume every layout has readable padding.
+
+## Next candidate: signed index word access
+
+- [x] [Host index census](ESP8266_OPUS_PVQ_INDEX_WORD_PROFILE.md):all10 files
+  exact PCM/memory under sanitizers; independent row-count agreement.
+  At1923026 reads/0.24s=12608.33/s;last index24 reads. No negative indices
+  observed, but retain signed semantics for every16-bit value.
+- [ ] Prove moving original return store0x4024db36 to0x4024db22, and moving
+  the index load to the old store site via a fixed-continuation helper.
+  No intervening use of a2 or a0 may be ignored. Authenticate final word
+  padding, dead storage, interrupt/return behavior and all live registers.
+- [ ] Exact host/linked verification, unchanged bytes outside patches,
+  no RAM/frame growth, then10 A/10 B/10 A and ordinary OTA restoration.
