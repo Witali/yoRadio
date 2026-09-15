@@ -148,7 +148,7 @@ endpoint reads, not the duplicate selected-cost read already removed.
   [Completed host census](ESP8266_OPUS_PVQ_ENDPOINT_WORD_PROFILE.md):at192,
   1765 upper+1647 lower reads per0.24s,14216.67/s;10 files exact PCM/state/
   scratch/guards, matching independent first-search counts. Not target timing.
-- [ ] Try independent narrow word extraction. At the upper continuation
+- [x] Try independent narrow word extraction. At the upper continuation
   a0/a11 are dead; at the lower continuation a0 is dead but a11 is the
   live result, not available as SAR scratch. Verify all actual private calls.
   For a single fixed continuation, a candidate may use a0 to save SAR and
@@ -166,3 +166,11 @@ live at0x4024db39. Do not choose them as free scratch. A separate two-site
 scheduling/return proof or save/restore is required, as is careful treatment
 of the last halfword in the210-byte table (length not divisible by4).
 None of these follow-up candidates is implemented or timed yet.
+
+[Endpoint word candidate implemented and locally verified](ESP8266_OPUS_ASM_PVQ_ENDPOINT_WORD.md):
+upper ADD destination changed to reuse the a10 leaf; lower fixed J fragment
+preserves SAR via dead a0. Four patches56 bytes, same image903216 B and RAM/
+IRAM/frame.50176 direct cases+378304 complete searches,804309 word loads exact;
+24 host scenarios pass. Disconnected120 encoder-only instructions are still
+in the ELF and independently proven dead; full outside-byte equality retained.
+Physical10 A/10 B/10 A pending. Index/adjustment-loop candidates remain unbuilt.

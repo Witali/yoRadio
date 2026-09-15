@@ -1,0 +1,65 @@
+node:assert:150
+  throw new AssertionError(obj);
+  ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  [
+    'rsr.sar a11',
+    'ssa8l a10',
+    'srli a10, a10, 2',
+    'slli a10, a10, 2',
+...
+    'ret.n',
++   'rsr.sar a11',
++   'ssa8l a4',
++   'srli a4, a4, 2',
++   'slli a4, a4, 2',
++   'l32i a4, a4, 0',
++   'srl a4, a4',
++   'extui a4, a4, 0, 8',
++   'wsr.sar a11',
++   'ret.n'
+  ]
+
+    at Object.helperSymbolic (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tools\esp8266_opus_asm\pvq_byte_word_proof.cjs:48:9)
+    at Object.prove (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tools\esp8266_opus_asm\pvq_endpoint_word_proof.cjs:198:86)
+    at prove (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tools\esp8266_opus_asm\pvq_endpoint_word.cjs:25:19)
+    at generate (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tools\esp8266_opus_asm\pvq_endpoint_word.cjs:71:17)
+    at Object.<anonymous> (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tools\esp8266_opus_asm\pvq_endpoint_word.cjs:109:26)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Object..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+    at Function._load (node:internal/modules/cjs/loader:1309:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [
+    'rsr.sar a11',          'ssa8l a10',
+    'srli a10, a10, 2',     'slli a10, a10, 2',
+    'l32i a10, a10, 0',     'srl a10, a10',
+    'extui a10, a10, 0, 8', 'wsr.sar a11',
+    'ret.n',                'rsr.sar a11',
+    'ssa8l a4',             'srli a4, a4, 2',
+    'slli a4, a4, 2',       'l32i a4, a4, 0',
+    'srl a4, a4',           'extui a4, a4, 0, 8',
+    'wsr.sar a11',          'ret.n'
+  ],
+  expected: [
+    'rsr.sar a11',
+    'ssa8l a10',
+    'srli a10, a10, 2',
+    'slli a10, a10, 2',
+    'l32i a10, a10, 0',
+    'srl a10, a10',
+    'extui a10, a10, 0, 8',
+    'wsr.sar a11',
+    'ret.n'
+  ],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.22.3
