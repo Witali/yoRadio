@@ -142,9 +142,12 @@ reads in quant_partition:0x4024e21f L8UI a10,a9,0 (upper),0x4024e22a
 L8UI a11,a11,0 (lower when low index is nonzero). These are the original
 endpoint reads, not the duplicate selected-cost read already removed.
 
-- [ ] Count each endpoint read on the same host corpus; do not assume the
+- [x] Count each endpoint read on the same host corpus; do not assume the
   lower read always executes or equate source counters with measured target
   instruction timing. Check ownership/address provenance and full word bounds.
+  [Completed host census](ESP8266_OPUS_PVQ_ENDPOINT_WORD_PROFILE.md):at192,
+  1765 upper+1647 lower reads per0.24s,14216.67/s;10 files exact PCM/state/
+  scratch/guards, matching independent first-search counts. Not target timing.
 - [ ] Try independent narrow word extraction. At the upper continuation
   a0/a11 are dead; at the lower continuation a0 is dead but a11 is the
   live result, not available as SAR scratch. Verify all actual private calls.
