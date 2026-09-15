@@ -212,13 +212,20 @@ Accepted experimental baseline80.08060%;80%/20second live gate still pending.
 
 ### Subsequent independent hypothesis: two constant halfword paths
 
-- [ ] Because the index is int16-aligned, test address bit1 and specialize
+- [x] Because the index is int16-aligned, test address bit1 and specialize
   phase0/2 instead of using variable SAR. Low half:word,SLLI16,SRAI16;
   high half:subtract2,word,SRAI16. Both return by a fixed J. First confirm
   the target bit-test branch instruction with the actual LX106 assembler.
-- [ ] Prove all registers including a0 and SAR unchanged except a2 result;
+- [x] Prove all registers including a0 and SAR unchanged except a2 result;
   then the original return store may remain in its original place. Use the
-  accepted endpoint-word parent as a separate candidate, not a silent v2 edit.
+  accepted parent as a separate candidate, not a silent v2 edit.
 - [ ] Reuse the full signed/bounds/PCM proof and at least10 physical trials
   per compared variant. Fewer dynamic instructions are a hypothesis, not
   proof of faster execution: branch and flash-layout costs must be measured.
+
+[Independent halfword candidate](ESP8266_OPUS_ASM_PVQ_INDEX_HALF.md) now uses
+accepted index-word v2 as direct control while restoring original endpoint
+load/store order. BBCI and ordinary ADDI-2 assemble; ADDI.N-2 does not.
+Five helper instructions per phase,25 live bytes/29-byte slot;24 host cases
+exact. Linked137792 cases and160 related preflight regressions pass;
+image903216 B, static RAM/frame unchanged. Physical qualification pending.
