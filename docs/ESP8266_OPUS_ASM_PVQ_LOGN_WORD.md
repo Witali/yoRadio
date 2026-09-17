@@ -2,7 +2,8 @@
 
 2026-09-15. Independent candidate over accepted pvq-index-half80.019979%
 CPU192. Target build, exact host PCM and linked semantic proofs completed.
-Physical A/B/A and live qualification are NOT completed. Default unchanged.
+Physical A/B/A completed2026-09-17: rejected (see results below).
+Live qualification is NOT completed. Default unchanged.
 
 ## Change and proof
 
@@ -34,8 +35,8 @@ out-of-line quant_partition clone; stereo theta and other logN uses remain.
   mixed/phase fixtures and120ms/48-frame compound packets.
 - [x]4 focused positive/negative regressions; full174 related regressions
   PASS/0skip in465.90seconds. Both complete logs retained beside the image.
-- [ ] At least10 physical runs of control/candidate, preferably10 A/10 B/10 A2.
-- [ ] Retain only measured high-bitrate gain without RAM growth; evaluate
+- [x] At least10 physical runs of control/candidate:10 A/10 B/10 A2.
+- [x] Retain only measured high-bitrate gain without RAM growth; evaluate
   active80% threshold and additionally the requested78% next target.
 - [ ] Qualify continuous I2S PDM>=20s and working WebUI separately.
 
@@ -80,3 +81,42 @@ When the board returns, take a fresh initial snapshot before any OTA; do not
 use an unavailable-status report as the restoration baseline. After trials,
 restore the ordinary app and verify HTTP/WS/station/playlist. Never claim
 this candidate improves speed or reaches the goal before those measurements.
+
+## Physical results,2026-09-17: reject this helper
+
+Board returned at192.168.100.6, initial RSSI-59dBm, stopped, free heap27628B.
+All three app-only OTAs verified the alternate slot. CPU160MHz/QIO40, same
+RAM packets and15s observation interval, no PCM output or function profiler.
+All30 requested attempts completed and retained; exact PCM hashes at every
+bitrate. The earlier unavailable observations above remain historical evidence.
+
+| kbps | A CPU% | B CPU% | A2 CPU% |
+| ---: | ---: | ---: | ---: |
+| 12 | 23.099542 | 23.089521 | 23.092687 |
+| 24 | 54.129333 | 54.114812 | 54.116229 |
+| 64 | 62.624354 | 62.738271 | 62.659833 |
+| 128 | 72.013813 | 72.095604 | 72.029958 |
+| 192 | 80.041021 | 80.005042 | 80.047250 |
+
+The192 improvement is only0.045/0.053% relative to the two controls.
+At128 it is0.114/0.091% slower; at64 it is0.182/0.125% slower.
+Both selection gates reject it. Even the raw80% threshold is NOT met:
+80.005042 must not be rounded down to claim success.78% also remains unmet.
+Do not combine this helper with the next candidate or change the default.
+
+Static RAM/stack delta0, app903216B. Observed minimum DRAM A/B/A2:
+4004/6668/8184B; minimum at192:9800/9800/9808B. These dynamic minima
+include changing network state and are not evidence of an allocator saving.
+Stack watermark1660B in every group. Maximum192 call21374/21599/22287us;
+no HTTP observation failures. A2 mono12 run2/run7 had task-minus-wall
+excess1816/1270us, retained unchanged because measurement windows differ.
+
+Evidence: candidate artifact comparison.json, all30 run JSON/logs and three
+OTA reports. `esp8266-opus-word-load-board.test.js` recomputes all results,
+validates hashes/PCM/slots/CPU gates and rejects corrupted PCM or missing runs.
+That test passes. The original signed-word proof was rerun before OTA.
+
+The A2 control is also the initial control for the next exp2-table32 experiment;
+it is one physical ten-run series, not twenty new measurements. No UART,
+SPIFFS/NVS upload or PC network-setting change was made. Ordinary-app restoration
+and full-path testing are recorded at the end of the overall board session.
