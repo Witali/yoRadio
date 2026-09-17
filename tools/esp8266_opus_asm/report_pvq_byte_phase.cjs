@@ -18,7 +18,7 @@ function report(){
  const result={pair,initial,repeated,selection:{initial:selectHighBitrate(initial.cases),repeated:selectHighBitrate(repeated.cases)},
   inputs:Object.fromEntries(Object.entries(groups).map(([k,rs])=>[k,rs.map(({report,...r})=>r)])),
   scope:'All30 independent frozen-layout a10 byte-phase A/B/A raw attempts retained. Packets in RAM; no output or function/stage profiler. Not live qualification.',
-  current_cpu_target:evaluateRawCpuTarget(initial.cases),aspirational_78_cpu_target:evaluateRawCpuTarget(initial.cases,78)};
+  current_cpu_target:evaluateRawCpuTarget(initial.cases,80),aspirational_78_cpu_target:evaluateRawCpuTarget(initial.cases,78)};
  fs.writeFileSync(path.join(dest,'comparison.json'),JSON.stringify(result,null,2)+'\n');
  console.table(initial.cases.map((c,i)=>({name:c.name,A:c.reference.task_budget_percent.median,B:c.candidate.task_budget_percent.median,A2:repeated.cases[i].reference.task_budget_percent.median,reduction:c.median_task_reduction_percent})));
  console.log(JSON.stringify(result.selection));return result;

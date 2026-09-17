@@ -21,7 +21,7 @@ test('ec_dec_bits physical report retains all30 attempts with exact PCM and inde
  }
  assert.deepEqual(compare(groups.before,groups.candidate),r.initial);assert.deepEqual(compare(groups.after,groups.candidate),r.repeated);
  for(const k of['initial','repeated']){assert.deepEqual(selectHighBitrate(r[k].cases),r.selection[k]);assert.equal(r.selection[k].accepted_for_experimental_asm,false);}
- assert.deepEqual(r.current_cpu_target,evaluateRawCpuTarget(r.initial.cases));assert.equal(r.current_cpu_target.maximum_percent,80);assert.equal(r.current_cpu_target.raw_cpu_target_met,false);
+ assert.deepEqual(r.current_cpu_target,evaluateRawCpuTarget(r.initial.cases,80));assert.equal(r.current_cpu_target.maximum_percent,80);assert.equal(r.current_cpu_target.raw_cpu_target_met,false);
  // All observations, including timing-window excess and HTTP errors, remain
  // in the independently re-computed compare() objects above; nothing filtered.
  assert.deepEqual(r.repeated.reference.timing_window_excesses.map(v=>[v.run,v.id,v.excess_us]),[[4,0,341]]);

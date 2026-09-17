@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 
 // Current user target. Historical selection.cjs reports retain their original
 // 70% informational field; it is not the active goal or the acceptance gate.
-const CURRENT_RAW_CPU_TARGET_PERCENT = 80;
+const CURRENT_RAW_CPU_TARGET_PERCENT = 75;
 
 function evaluateRawCpuTarget(cases, maximumPercent = CURRENT_RAW_CPU_TARGET_PERCENT) {
   assert.ok(Number.isFinite(maximumPercent) && maximumPercent > 0 && maximumPercent <= 100,

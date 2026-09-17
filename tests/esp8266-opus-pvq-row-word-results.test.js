@@ -21,7 +21,7 @@ test('pvq-row-word PVQ physical report retains all30 attempts with exact PCM and
  }
  assert.deepEqual(compare(groups.before,groups.candidate),r.initial);assert.deepEqual(compare(groups.after,groups.candidate),r.repeated);
  for(const k of['initial','repeated']){assert.deepEqual(selectHighBitrate(r[k].cases),r.selection[k]);}
- assert.deepEqual(r.current_cpu_target,evaluateRawCpuTarget(r.initial.cases));assert.equal(r.current_cpu_target.maximum_percent,80);
+ assert.deepEqual(r.current_cpu_target,evaluateRawCpuTarget(r.initial.cases,80));assert.equal(r.current_cpu_target.maximum_percent,80);
  // All observations, including timing-window excess and HTTP errors, remain
  // in the independently re-computed compare() objects above; nothing filtered.
  const h=read(path.join(dir,'host.json'));assert.equal(h.passed,true);assert.equal(h.cases.length,24);assert.equal(h.compound.length,3);assert.ok(h.cases.some(c=>c.name==='stereo-510'));assert.ok(h.cases.every(c=>c.pcm.exact&&c.pcm.max_absolute_error===0));

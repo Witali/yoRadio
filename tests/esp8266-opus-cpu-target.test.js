@@ -3,13 +3,13 @@ const {CURRENT_RAW_CPU_TARGET_PERCENT, evaluateRawCpuTarget} = require('../tools
 const {selectHighBitrate} = require('../tools/esp8266_opus_asm/selection.cjs');
 const cases = median => [{name: 'stereo-192', candidate: {task_budget_percent: {median}}}];
 
-test('current 80% raw CPU target uses an inclusive, unrounded median threshold', () => {
-  assert.equal(CURRENT_RAW_CPU_TARGET_PERCENT, 80);
-  for (const [value, pass] of [[79.999, true], [80, true], [80.001, false], [87.3076875, false], [101, false]]) {
+test('current 75% raw CPU target uses an inclusive, unrounded median threshold', () => {
+  assert.equal(CURRENT_RAW_CPU_TARGET_PERCENT, 75);
+  for (const [value, pass] of [[74.999, true], [75, true], [75.001, false], [79.62652083333333, false], [101, false]]) {
     const result = evaluateRawCpuTarget(cases(value));
     assert.equal(result.raw_cpu_target_met, pass);
     assert.equal(result.measured_median_percent, value);
-    assert.equal(result.maximum_percent, 80);
+    assert.equal(result.maximum_percent, 75);
     assert.match(result.scope, /Does not qualify continuous I2S PDM or WebUI/);
   }
 });

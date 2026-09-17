@@ -28,7 +28,7 @@ for(const kind of ['logn-word','exp2-table32','exp2-word','byte-phase']) test(ki
   assert.deepEqual(report.initial,initial);assert.deepEqual(report.repeated,repeated);
   assert.deepEqual(report.selection.initial,selectHighBitrate(initial.cases));
   assert.deepEqual(report.selection.repeated,selectHighBitrate(repeated.cases));
-  assert.deepEqual(report.current_cpu_target,evaluateRawCpuTarget(initial.cases));
+  assert.deepEqual(report.current_cpu_target,evaluateRawCpuTarget(initial.cases,80));
   assert.deepEqual(report.aspirational_78_cpu_target,evaluateRawCpuTarget(initial.cases,78));
   const corrupt=structuredClone(groups.candidate[0]);corrupt.final.results[4].pcm_hash^=1;
   assert.throws(()=>validateRun(corrupt,fixtures,corrupt.before.data.app_address));
