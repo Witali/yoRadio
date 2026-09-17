@@ -1,0 +1,55 @@
+TAP version 13
+# Subtest: linked qn table preserves all GPRs and SAR for the entire guarded domain with unchanged RAM
+ok 1 - linked qn table preserves all GPRs and SAR for the entire guarded domain with unchanged RAM
+  ---
+  duration_ms: 129821.6904
+  type: 'test'
+  ...
+# Subtest: proof rejects changed rounding, SAR, upper/lower guards and extra entries
+ok 2 - proof rejects changed rounding, SAR, upper/lower guards and extra entries
+  ---
+  duration_ms: 750.9032
+  type: 'test'
+  ...
+# Subtest: all table words, original constants, literal and unexpected readers are authenticated
+not ok 3 - all table words, original constants, literal and unexpected readers are authenticated
+  ---
+  duration_ms: 308.7753
+  type: 'test'
+  location: 'C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tests\\esp8266-opus-pvq-qn-table.test.js:21:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Allocated executable range
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    Object.offsetAt (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tools\esp8266_opus_asm\frozen_reloads.cjs:52:159)
+    TestContext.<anonymous> (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tests\esp8266-opus-pvq-qn-table.test.js:24:89)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: host model retains24 exact PCM/state/PLC/reset/OOM scenarios through510kbps and120ms
+ok 4 - host model retains24 exact PCM/state/PLC/reset/OOM scenarios through510kbps and120ms
+  ---
+  duration_ms: 1.7342
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 3
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 131045.5064
