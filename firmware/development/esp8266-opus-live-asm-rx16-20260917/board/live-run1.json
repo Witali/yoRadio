@@ -1,0 +1,61 @@
+{
+  "date": "2026-09-17T20:23:15.989Z",
+  "url": "http://st01.sslstream.dlf.de/dlf/01/low/opus/stream.opus?aggregator=web",
+  "start": {
+    "http": 202,
+    "body": {
+      "queued": true
+    }
+  },
+  "status": {
+    "http": 200,
+    "body": {
+      "firmware": "esp8266-native",
+      "port": 80,
+      "websocket": "/ws",
+      "network": 1,
+      "rssi": -61,
+      "playing": true,
+      "station": "OPUS TEST",
+      "codec": "OPUS",
+      "bitrate": 24,
+      "connecting": false,
+      "error": "",
+      "free_heap": 6516,
+      "min_heap": 5208,
+      "web_stack_free": 2324,
+      "app_address": 1114112
+    }
+  },
+  "trace": {
+    "date": "2026-09-17T20:23:22.297Z",
+    "base": "http://192.168.100.6",
+    "seconds": 25,
+    "request_timeout_ms": 5000,
+    "samples": [
+      {
+        "error": "request timeout /api/native/audio",
+        "host_ms": 5019.762900000001,
+        "request_ms": 5019.711200000001
+      },
+      {
+        "error": "request timeout /api/native/audio",
+        "host_ms": 37035.1525,
+        "request_ms": 5002.031800000004
+      }
+    ],
+    "result": {
+      "continuity": {
+        "pass": false,
+        "errors": [
+          "missing health samples"
+        ]
+      },
+      "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+      "profile_error": "missing samples"
+    },
+    "runner_exit": 1
+  },
+  "init_diagnostic_error": "request timeout /api/native/opus-stream",
+  "pass": false
+}
