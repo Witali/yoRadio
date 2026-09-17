@@ -2,9 +2,11 @@ param(
     [Parameter(Mandatory=$true)][string]$Directory,
     [Parameter(Mandatory=$true)][string]$Fixtures,
     [ValidateRange(10,100)][int]$Attempts=10,
-    [ValidateRange(250,60000)][int]$IntervalMs=1500
+    [ValidateRange(250,60000)][int]$IntervalMs=15000
 )
 $ErrorActionPreference='Stop'
+# Match the established raw-ASM validation protocol. Faster observation is an
+# explicit diagnostic override, not comparable with the15-second CPU baseline.
 $taskRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $taskDirectory=[IO.Path]::GetFullPath((Join-Path $taskRoot $Directory))
 if(-not $taskDirectory.StartsWith($taskRoot+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw 'Reports must stay in repository'}
