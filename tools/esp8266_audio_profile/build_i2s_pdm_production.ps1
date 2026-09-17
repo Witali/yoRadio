@@ -23,6 +23,7 @@ param(
     [ValidateSet(4352, 6144)]
     [int]$OpusScratchBytes = 6144,
     [switch]$NoSpiffsCache,
+    [switch]$NoTcpOutOfOrder,
     [switch]$OpusWordAsm,
     [switch]$OpusIcdfFlashWord,
     [switch]$OpusFirFlashWord,
@@ -99,6 +100,7 @@ if ($Pdm32LoanWords -ne 512 -and -not $Diagnostic) { throw 'Short PDM32 loans re
 if ($DmaBufferWords -ne 512 -and (-not $Diagnostic -or -not $EnableOpus)) { throw 'Larger DMA buffers require diagnostic Opus' }
 if ($SdkRxDiag -and -not $Diagnostic) { throw '-SdkRxDiag requires -Diagnostic' }
 if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
+if ($NoTcpOutOfOrder -and -not $Diagnostic) { throw '-NoTcpOutOfOrder requires -Diagnostic until live qualification' }
 $taskOpusStreamTestEnabled = [bool]($OpusStreamTest -or $OpusBenchmark)
 if ($OpusInputBytes -ne 1024 -and (-not $Diagnostic -or -not $EnableOpus)) {
     throw '-OpusInputBytes changes require diagnostic Opus until RAM qualification'
@@ -164,6 +166,15 @@ function Assert-TaskStreamIdleConfig([string]$Config, [int]$TimeoutMs) {
         throw 'Wrong cached stream idle timeout; use a fresh -Variant build directory'
     }
 }
+function Set-TaskTcpQueueDefaults([string]$Defaults, [bool]$Disabled) {
+    if (-not $Disabled) { return $Defaults }
+    $taskText = $Defaults -replace '(?m)^(?:CONFIG_LWIP_TCP_QUEUE_OOSEQ=[^\r\n]*|# CONFIG_LWIP_TCP_QUEUE_OOSEQ is not set)\r?\n?', ''
+    return $taskText + "`n# CONFIG_LWIP_TCP_QUEUE_OOSEQ is not set`n"
+}
+function Assert-TaskTcpQueueConfig([string]$Config, [bool]$Disabled) {
+    $taskEnabled = $Config -match '(?m)^CONFIG_LWIP_TCP_QUEUE_OOSEQ=y\r?$'
+    if ($taskEnabled -eq $Disabled) { throw 'Wrong cached TCP out-of-order queue profile; use a fresh -Variant build directory' }
+}
 Push-Location $taskRoot
 try {
     $env:IDF_PATH = (Resolve-Path $SdkPath).Path
@@ -181,6 +192,7 @@ try {
     $taskDefaults = Set-TaskSpiffsCacheDefaults $taskDefaults ([bool]$NoSpiffsCache)
     $taskDefaults = Set-TaskOpusRuntimeDefaults $taskDefaults ([bool]$OpusBenchmark)
     $taskDefaults = Set-TaskStreamIdleDefaults $taskDefaults $StreamIdleTimeoutMs
+    $taskDefaults = Set-TaskTcpQueueDefaults $taskDefaults ([bool]$NoTcpOutOfOrder)
     if ($OpusBenchmark) {
         $OpusBenchmarkFixtures = (Resolve-Path $OpusBenchmarkFixtures).Path.Replace('\', '/')
     }
@@ -268,6 +280,7 @@ try {
     $taskSpiffsCache = Get-TaskSpiffsCacheProfile $taskConfig ([bool]$NoSpiffsCache)
     $taskOpusRuntime = Get-TaskOpusRuntimeProfile $taskConfig ([bool]$OpusBenchmark)
     Assert-TaskStreamIdleConfig $taskConfig $StreamIdleTimeoutMs
+    Assert-TaskTcpQueueConfig $taskConfig ([bool]$NoTcpOutOfOrder)
     foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHMODE_QIO=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y', 'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
@@ -299,6 +312,7 @@ try {
         opus_scratch_bytes=$(if ($taskOpusEnabled) { $OpusScratchBytes } else { 0 })
         opus_low_ram=[bool]$OpusLowRam
         opus_backend=$OpusBackend
+        tcp_queue_ooseq=(-not [bool]$NoTcpOutOfOrder)
         opus_bands_partition_decode_manifest_sha256=$(if ($OpusBackend -eq 'bands-partition-decode-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-partition-decode.json").Hash } else { $null })
         opus_bands_folding8_manifest_sha256=$(if ($OpusBackend -eq 'bands-folding8-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-folding8.json").Hash } else { $null })
         opus_bands_small_div_inline_manifest_sha256=$(if ($OpusBackend -eq 'bands-small-div-inline-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-small-div-inline.json").Hash } else { $null })
