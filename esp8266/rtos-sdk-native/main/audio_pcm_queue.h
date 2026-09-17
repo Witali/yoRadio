@@ -7,8 +7,14 @@
 #define YORADIO_ESP8266_OPUS_PCM_APP_TASK 0
 #endif
 
-/* Exactly two existing decoder frame slots, never an additional PCM copy. */
-#define AUDIO_PCM_QUEUE_SLOTS 2U
+/* Decoder-owned frame slots, never an additional PCM copy. */
+#ifndef YORADIO_ESP8266_OPUS_PCM_SLOTS
+#define YORADIO_ESP8266_OPUS_PCM_SLOTS 2
+#endif
+#if YORADIO_ESP8266_OPUS_PCM_SLOTS != 2 && YORADIO_ESP8266_OPUS_PCM_SLOTS != 3
+#error "PCM queue supports two or three decoder-owned slots"
+#endif
+#define AUDIO_PCM_QUEUE_SLOTS YORADIO_ESP8266_OPUS_PCM_SLOTS
 #define AUDIO_PCM_QUEUE_FRAMES 960U
 #ifndef AUDIO_PCM_QUEUE_STACK_BYTES
 #define AUDIO_PCM_QUEUE_STACK_BYTES 2048U

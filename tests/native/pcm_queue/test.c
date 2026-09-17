@@ -85,8 +85,8 @@ esp_err_t native_audio_output_write(int16_t *pcm,size_t count,uint32_t rate,uint
     memset(pcm,0xa5,count*sizeof(*pcm));writing=false;return ESP_OK;
 }
 static int16_t *begin(unsigned gen) {
-    generation=gen;int16_t *pool=malloc(1920*sizeof(int16_t));assert(pool);
-    assert(audio_pcm_queue_begin(pool,1920,gen)==ESP_OK);return pool;
+    generation=gen;int16_t *pool=malloc(AUDIO_PCM_QUEUE_SLOTS*AUDIO_PCM_QUEUE_FRAMES*sizeof(int16_t));assert(pool);
+    assert(audio_pcm_queue_begin(pool,AUDIO_PCM_QUEUE_SLOTS*AUDIO_PCM_QUEUE_FRAMES,gen)==ESP_OK);return pool;
 }
 static void submit(unsigned frame,unsigned skip) {
     int16_t *pcm=NULL;assert(audio_pcm_queue_acquire(NULL,&pcm,960)==0 && pcm);
@@ -115,7 +115,7 @@ int main(void) {
     audio_pcm_queue_health_t empty;audio_pcm_queue_health(&empty);
     assert(!empty.service_calls && !empty.service_us && !empty.service_misses);
 #endif
-    assert(audio_pcm_queue_begin(pool,1920,1)==ESP_ERR_INVALID_STATE);
+    assert(audio_pcm_queue_begin(pool,AUDIO_PCM_QUEUE_SLOTS*AUDIO_PCM_QUEUE_FRAMES,1)==ESP_ERR_INVALID_STATE);
     int16_t *pcm=NULL;assert(audio_pcm_queue_acquire(NULL,&pcm,961)==-108);
     assert(audio_pcm_queue_acquire(NULL,&pcm,960)==0);
     assert(!audio_pcm_queue_submit(pcm+950,20));audio_pcm_queue_release(NULL,pcm);
@@ -141,7 +141,8 @@ int main(void) {
         write_delay=10000;pool=begin(10+i);submit(i,0);
         for(unsigned n=0;!writing && n<2000;++n)usleep(1000);
         assert(writing);generation=1000;
-        audio_pcm_queue_stop();assert(!writing);memset(pool,0xcc,3840);free(pool);
+        audio_pcm_queue_stop();assert(!writing);
+        memset(pool,0xcc,AUDIO_PCM_QUEUE_SLOTS*AUDIO_PCM_QUEUE_FRAMES*sizeof(int16_t));free(pool);
     }
     /* A physical-output error returns ownership, cancels producers and permits reuse. */
     write_delay=100;pool=begin(1001);fail_call=write_calls+1;submit(3,0);
@@ -158,6 +159,6 @@ int main(void) {
     assert(!finish); /* deinit must never delete the existing app task */
     vTaskDelete(&worker);
 #endif
-    puts("PCM queue PASS: exact order, two slots, trim, backpressure, 25 in-flight stops, error/reuse; no ISR work");
+    puts("PCM queue PASS: exact order, bounded slots, trim, backpressure, 25 in-flight stops, error/reuse; no ISR work");
     return 0;
 }

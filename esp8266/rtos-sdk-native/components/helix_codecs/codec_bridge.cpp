@@ -118,7 +118,13 @@ constexpr size_t kLegacyMaxPcmSamples = kAacPcmSamples > kMp3PcmSamples ? kAacPc
 constexpr size_t kLegacyMaxPcmSamples = kMp3PcmSamples;
 #endif
 #if CONFIG_YORADIO_OGG_OPUS
-constexpr size_t kOpusPcmSamples = YORADIO_ESP8266_OPUS_PCM_QUEUE ? 1920U : 960U;
+#ifndef YORADIO_ESP8266_OPUS_PCM_SLOTS
+#define YORADIO_ESP8266_OPUS_PCM_SLOTS 2
+#endif
+static_assert(YORADIO_ESP8266_OPUS_PCM_SLOTS == 2 || YORADIO_ESP8266_OPUS_PCM_SLOTS == 3,
+              "Unsupported Opus PCM slot count");
+constexpr size_t kOpusPcmSamples = 960U *
+    (YORADIO_ESP8266_OPUS_PCM_QUEUE ? YORADIO_ESP8266_OPUS_PCM_SLOTS : 1U);
 constexpr size_t kMaxPcmSamples = kLegacyMaxPcmSamples > kOpusPcmSamples ? kLegacyMaxPcmSamples : kOpusPcmSamples;
 #else
 constexpr size_t kMaxPcmSamples = kLegacyMaxPcmSamples;
