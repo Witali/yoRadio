@@ -24,6 +24,7 @@ param(
     [int]$OpusScratchBytes = 6144,
     [switch]$NoSpiffsCache,
     [switch]$NoTcpOutOfOrder,
+    [switch]$TcpFullMss,
     [switch]$OpusWordAsm,
     [switch]$OpusIcdfFlashWord,
     [switch]$OpusFirFlashWord,
@@ -101,6 +102,7 @@ if ($DmaBufferWords -ne 512 -and (-not $Diagnostic -or -not $EnableOpus)) { thro
 if ($SdkRxDiag -and -not $Diagnostic) { throw '-SdkRxDiag requires -Diagnostic' }
 if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
 if ($NoTcpOutOfOrder -and -not $Diagnostic) { throw '-NoTcpOutOfOrder requires -Diagnostic until live qualification' }
+if ($TcpFullMss -and -not $Diagnostic) { throw '-TcpFullMss requires -Diagnostic until live qualification' }
 $taskOpusStreamTestEnabled = [bool]($OpusStreamTest -or $OpusBenchmark)
 if ($OpusInputBytes -ne 1024 -and (-not $Diagnostic -or -not $EnableOpus)) {
     throw '-OpusInputBytes changes require diagnostic Opus until RAM qualification'
@@ -166,6 +168,21 @@ function Assert-TaskStreamIdleConfig([string]$Config, [int]$TimeoutMs) {
         throw 'Wrong cached stream idle timeout; use a fresh -Variant build directory'
     }
 }
+function Set-TaskTcpFullMssDefaults([string]$Defaults, [bool]$Enabled) {
+    if (-not $Enabled) { return $Defaults }
+    $taskText = $Defaults -replace '(?m)^CONFIG_LWIP_TCP_(MSS|SND_BUF_DEFAULT|WND_DEFAULT)=[^\r\n]*\r?\n?', ''
+    return $taskText + "`nCONFIG_LWIP_TCP_MSS=1460`nCONFIG_LWIP_TCP_SND_BUF_DEFAULT=2920`nCONFIG_LWIP_TCP_WND_DEFAULT=2920`n"
+}
+function Assert-TaskTcpFullMssConfig([string]$Config, [bool]$Enabled) {
+    $taskValues = if ($Enabled) { @(1460,2920,2920) } else { @(536,2440,2440) }
+    $taskKeys = @('MSS','SND_BUF_DEFAULT','WND_DEFAULT')
+    for ($taskIndex=0; $taskIndex -lt 3; ++$taskIndex) {
+        $taskMatches = [regex]::Matches($Config, "(?m)^CONFIG_LWIP_TCP_$($taskKeys[$taskIndex])=(\d+)`r?$")
+        if ($taskMatches.Count -ne 1 -or [int]$taskMatches[0].Groups[1].Value -ne $taskValues[$taskIndex]) {
+            throw 'Wrong cached TCP MSS/window profile; use a fresh -Variant build directory'
+        }
+    }
+}
 function Set-TaskTcpQueueDefaults([string]$Defaults, [bool]$Disabled) {
     if (-not $Disabled) { return $Defaults }
     $taskText = $Defaults -replace '(?m)^(?:CONFIG_LWIP_TCP_QUEUE_OOSEQ=[^\r\n]*|# CONFIG_LWIP_TCP_QUEUE_OOSEQ is not set)\r?\n?', ''
@@ -193,6 +210,7 @@ try {
     $taskDefaults = Set-TaskOpusRuntimeDefaults $taskDefaults ([bool]$OpusBenchmark)
     $taskDefaults = Set-TaskStreamIdleDefaults $taskDefaults $StreamIdleTimeoutMs
     $taskDefaults = Set-TaskTcpQueueDefaults $taskDefaults ([bool]$NoTcpOutOfOrder)
+    $taskDefaults = Set-TaskTcpFullMssDefaults $taskDefaults ([bool]$TcpFullMss)
     if ($OpusBenchmark) {
         $OpusBenchmarkFixtures = (Resolve-Path $OpusBenchmarkFixtures).Path.Replace('\', '/')
     }
@@ -281,6 +299,7 @@ try {
     $taskOpusRuntime = Get-TaskOpusRuntimeProfile $taskConfig ([bool]$OpusBenchmark)
     Assert-TaskStreamIdleConfig $taskConfig $StreamIdleTimeoutMs
     Assert-TaskTcpQueueConfig $taskConfig ([bool]$NoTcpOutOfOrder)
+    Assert-TaskTcpFullMssConfig $taskConfig ([bool]$TcpFullMss)
     foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHMODE_QIO=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y', 'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
@@ -313,6 +332,9 @@ try {
         opus_low_ram=[bool]$OpusLowRam
         opus_backend=$OpusBackend
         tcp_queue_ooseq=(-not [bool]$NoTcpOutOfOrder)
+        tcp_full_mss=[bool]$TcpFullMss
+        tcp_mss=$(if ($TcpFullMss) { 1460 } else { 536 })
+        tcp_window_bytes=$(if ($TcpFullMss) { 2920 } else { 2440 })
         opus_bands_partition_decode_manifest_sha256=$(if ($OpusBackend -eq 'bands-partition-decode-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-partition-decode.json").Hash } else { $null })
         opus_bands_folding8_manifest_sha256=$(if ($OpusBackend -eq 'bands-folding8-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-folding8.json").Hash } else { $null })
         opus_bands_small_div_inline_manifest_sha256=$(if ($OpusBackend -eq 'bands-small-div-inline-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-small-div-inline.json").Hash } else { $null })
