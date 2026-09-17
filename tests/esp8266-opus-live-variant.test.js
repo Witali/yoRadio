@@ -5,17 +5,17 @@ const f=require('../tools/esp8266_opus_asm/live_variant.cjs');
 const {root,hash,sourceHash}=require('../tools/esp8266_opus_asm/export.cjs');
 const frozen=require('../tools/esp8266_opus_asm/frozen_reloads.cjs');
 const {sections,inspectImage}=require('../tools/esp8266_opus_asm/frozen_div.cjs');
-for(const [variant,input] of [['input2k',2048],['noooseq',1024],['noooseq-input2k',2048],['pcmqueue',1024],['pcmqueue-tcp',1024],['pcmqueue128',1024],['rxdiag',1024],['refill',1024],['mss1460',1024],['refillqueue',1024],['rx16queue',1024],['rx16',1024]]) {
+for(const [variant,input] of [['input2k',2048],['noooseq',1024],['noooseq-input2k',2048],['pcmqueue',1024],['pcmqueue-tcp',1024],['pcmqueue128',1024],['rxdiag',1024],['refill',1024],['mss1460',1024],['refillqueue',1024],['rx16queue',1024],['rx16',1024],['txdiag',1024],['noled',1024],['apppcm',1024]]) {
 const directory=path.join(root,`firmware/development/esp8266-opus-live-asm-${variant}-20260917`);
 const read=n=>JSON.parse(fs.readFileSync(path.join(directory,n),'utf8'));
 
 test(`${variant} live profile preserves all18 accepted stages and exact loaded bytes`,()=>{
  const p=read('preflight.json'),m=read('manifest.json');
- const recipe=['rxdiag','refill','mss1460','refillqueue','rx16queue','rx16'].includes(variant)?'live_variant_v2.cjs':'live_variant.cjs';
+ const recipe=['rxdiag','refill','mss1460','refillqueue','rx16queue','rx16','txdiag','noled','apppcm'].includes(variant)?'live_variant_v2.cjs':'live_variant.cjs';
  assert.equal(p.recipe_sha256_lf,sourceHash(path.join(root,'tools/esp8266_opus_asm',recipe)));
  assert.equal(p.records.length,18);
  assert.equal(m.opus_input_bytes,input);assert.equal(m.opus_scratch_bytes,6144);
- const tcpQueue=['input2k','pcmqueue-tcp','pcmqueue128','rxdiag','refill','mss1460','refillqueue','rx16queue','rx16'].includes(variant);
+ const tcpQueue=['input2k','pcmqueue-tcp','pcmqueue128','rxdiag','refill','mss1460','refillqueue','rx16queue','rx16','txdiag','noled','apppcm'].includes(variant);
  const config=fs.readFileSync(path.join(directory,'sdkconfig'),'utf8');
  if(variant.startsWith('rx16')) {
   assert.equal(m.wifi_rx_buffers,16);assert.equal(m.wifi_continuous_rx_buffers,16);
@@ -35,6 +35,15 @@ test(`${variant} live profile preserves all18 accepted stages and exact loaded b
  if(variant.startsWith('pcmqueue') || variant==='refillqueue' || variant==='rx16queue') {
   assert.equal(m.opus_pcm_queue,true);assert.equal(m.opus_packet_dispatcher,'c-leased');
   assert.equal(m.opus_pcm_stack_bytes,1536);
+ }
+ if(variant==='apppcm') {
+  assert.equal(m.opus_pcm_queue,true);assert.equal(m.opus_pcm_app_task,true);
+  assert.equal(m.opus_pcm_stack_bytes,0);assert.equal(m.opus_packet_dispatcher,'c-leased');
+  assert.equal(m.dma_words_per_buffer,128);
+ }
+ if(['txdiag','noled','apppcm'].includes(variant)) {
+  assert.equal(m.sdk_rx_diag,true);assert.equal(m.wifi_rx_buffers,14);
+  assert.equal(m.audio_level_led,variant==='txdiag');
  }
  assert.equal(m.opus_benchmark,false);assert.equal(m.tone_test,false);
  assert.equal(m.freertos_runtime_stats,false);assert.equal(m.i2s,true);assert.equal(m.data_gpio,3);
