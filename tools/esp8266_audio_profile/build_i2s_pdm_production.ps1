@@ -25,6 +25,8 @@ param(
     [switch]$NoSpiffsCache,
     [switch]$NoTcpOutOfOrder,
     [switch]$TcpFullMss,
+    [ValidateSet(14, 16)]
+    [int]$WifiRxBuffers = 14,
     [switch]$OpusWordAsm,
     [switch]$OpusIcdfFlashWord,
     [switch]$OpusFirFlashWord,
@@ -103,6 +105,7 @@ if ($SdkRxDiag -and -not $Diagnostic) { throw '-SdkRxDiag requires -Diagnostic' 
 if ($NoSpiffsCache -and -not $EnableOpus) { throw '-NoSpiffsCache requires -EnableOpus' }
 if ($NoTcpOutOfOrder -and -not $Diagnostic) { throw '-NoTcpOutOfOrder requires -Diagnostic until live qualification' }
 if ($TcpFullMss -and -not $Diagnostic) { throw '-TcpFullMss requires -Diagnostic until live qualification' }
+if ($WifiRxBuffers -ne 14 -and -not $Diagnostic) { throw '-WifiRxBuffers requires -Diagnostic until live qualification' }
 $taskOpusStreamTestEnabled = [bool]($OpusStreamTest -or $OpusBenchmark)
 if ($OpusInputBytes -ne 1024 -and (-not $Diagnostic -or -not $EnableOpus)) {
     throw '-OpusInputBytes changes require diagnostic Opus until RAM qualification'
@@ -168,6 +171,19 @@ function Assert-TaskStreamIdleConfig([string]$Config, [int]$TimeoutMs) {
         throw 'Wrong cached stream idle timeout; use a fresh -Variant build directory'
     }
 }
+function Set-TaskWifiRxDefaults([string]$Defaults, [int]$Count) {
+    if ($Count -notin @(14,16)) { throw 'WiFi RX buffer count must be 14 or 16' }
+    $taskText = $Defaults -replace '(?m)^CONFIG_ESP8266_WIFI_(RX_BUFFER_NUM|LEFT_CONTINUOUS_RX_BUFFER_NUM)=[^\r\n]*\r?\n?', ''
+    return $taskText + "`nCONFIG_ESP8266_WIFI_RX_BUFFER_NUM=$Count`nCONFIG_ESP8266_WIFI_LEFT_CONTINUOUS_RX_BUFFER_NUM=$Count`n"
+}
+function Assert-TaskWifiRxConfig([string]$Config, [int]$Count) {
+    foreach ($taskKey in @('RX_BUFFER_NUM','LEFT_CONTINUOUS_RX_BUFFER_NUM')) {
+        $taskMatches = [regex]::Matches($Config, "(?m)^CONFIG_ESP8266_WIFI_$taskKey=(\d+)`r?$")
+        if ($taskMatches.Count -ne 1 -or [int]$taskMatches[0].Groups[1].Value -ne $Count) {
+            throw 'Wrong cached WiFi RX buffer profile; use a fresh -Variant build directory'
+        }
+    }
+}
 function Set-TaskTcpFullMssDefaults([string]$Defaults, [bool]$Enabled) {
     if (-not $Enabled) { return $Defaults }
     $taskText = $Defaults -replace '(?m)^CONFIG_LWIP_TCP_(MSS|SND_BUF_DEFAULT|WND_DEFAULT)=[^\r\n]*\r?\n?', ''
@@ -211,6 +227,7 @@ try {
     $taskDefaults = Set-TaskStreamIdleDefaults $taskDefaults $StreamIdleTimeoutMs
     $taskDefaults = Set-TaskTcpQueueDefaults $taskDefaults ([bool]$NoTcpOutOfOrder)
     $taskDefaults = Set-TaskTcpFullMssDefaults $taskDefaults ([bool]$TcpFullMss)
+    $taskDefaults = Set-TaskWifiRxDefaults $taskDefaults $WifiRxBuffers
     if ($OpusBenchmark) {
         $OpusBenchmarkFixtures = (Resolve-Path $OpusBenchmarkFixtures).Path.Replace('\', '/')
     }
@@ -300,6 +317,7 @@ try {
     Assert-TaskStreamIdleConfig $taskConfig $StreamIdleTimeoutMs
     Assert-TaskTcpQueueConfig $taskConfig ([bool]$NoTcpOutOfOrder)
     Assert-TaskTcpFullMssConfig $taskConfig ([bool]$TcpFullMss)
+    Assert-TaskWifiRxConfig $taskConfig $WifiRxBuffers
     foreach ($taskRequired in @('CONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM=y', 'CONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=y', 'CONFIG_ESPTOOLPY_FLASHMODE_QIO=y', 'CONFIG_ESPTOOLPY_FLASHFREQ_40M=y', 'CONFIG_LOG_DEFAULT_LEVEL=1', 'CONFIG_LOG_BOOTLOADER_LEVEL=1', 'CONFIG_YORADIO_HELIX_MP3_SSO=y', 'CONFIG_YORADIO_HELIX_AAC=y', 'CONFIG_YORADIO_AUDIO_MONO=y', 'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0')) {
         if ($taskConfig -notmatch "(?m)^$taskRequired`r?$") { throw "Wrong cached profile: $taskRequired" }
     }
@@ -333,6 +351,8 @@ try {
         opus_backend=$OpusBackend
         tcp_queue_ooseq=(-not [bool]$NoTcpOutOfOrder)
         tcp_full_mss=[bool]$TcpFullMss
+        wifi_rx_buffers=$WifiRxBuffers
+        wifi_continuous_rx_buffers=$WifiRxBuffers
         tcp_mss=$(if ($TcpFullMss) { 1460 } else { 536 })
         tcp_window_bytes=$(if ($TcpFullMss) { 2920 } else { 2440 })
         opus_bands_partition_decode_manifest_sha256=$(if ($OpusBackend -eq 'bands-partition-decode-asm') { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/asm/lx106/bands-partition-decode.json").Hash } else { $null })
