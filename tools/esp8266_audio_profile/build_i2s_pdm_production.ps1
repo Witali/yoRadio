@@ -44,6 +44,7 @@ param(
     [int]$PcmStackBytes = 2048,
     [switch]$Pdm32Iram,
     [switch]$Pdm32Batch,
+    [switch]$Pdm32ClockCompensate,
     [ValidateSet(64, 128, 256, 512)]
     [int]$Pdm32LoanWords = 512,
     [ValidateSet(128, 192, 256, 512, 768)]
@@ -101,6 +102,7 @@ if ($OpusPcmLeases -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusP
 if ($OpusRotationLx106 -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusRotationLx106 requires diagnostic Opus until board qualification' }
 if ($Pdm32Iram -and -not $Diagnostic) { throw '-Pdm32Iram requires -Diagnostic until board qualification' }
 if ($Pdm32Batch -and -not $Diagnostic) { throw '-Pdm32Batch requires -Diagnostic until board qualification' }
+if ($Pdm32ClockCompensate -and -not $Diagnostic) { throw '-Pdm32ClockCompensate requires -Diagnostic until board qualification' }
 if ($Pdm32LoanWords -ne 512 -and -not $Diagnostic) { throw 'Short PDM32 loans require -Diagnostic' }
 if ($DmaBufferWords -ne 512 -and (-not $Diagnostic -or -not $EnableOpus)) { throw 'Larger DMA buffers require diagnostic Opus' }
 if ($SdkRxDiag -and -not $Diagnostic) { throw '-SdkRxDiag requires -Diagnostic' }
@@ -258,6 +260,7 @@ try {
     $taskPdm32Iram = if ($Pdm32Iram) { 'ON' } else { 'OFF' }
     $taskEntropyIramSwap = if ($OpusEntropyIramSwap) { 'ON' } else { 'OFF' }
     $taskPdm32Batch = if ($Pdm32Batch) { 'ON' } else { 'OFF' }
+    $taskPdm32ClockCompensate = if ($Pdm32ClockCompensate) { 'ON' } else { 'OFF' }
     $taskOpusPcmPublish = if ($OpusPcmPublish) { 'ON' } else { 'OFF' }
     $taskOpusPcmLeases = if ($OpusPcmLeases) { 'ON' } else { 'OFF' }
     $taskOpusPcmQueue = if ($OpusPcmQueue) { 'ON' } else { 'OFF' }
@@ -305,6 +308,7 @@ try {
         "-DYORADIO_ESP8266_PDM32_IRAM=$taskPdm32Iram",
         "-DYORADIO_OPUS_ENTROPY_IRAM_SWAP=$taskEntropyIramSwap",
         "-DYORADIO_ESP8266_PDM32_BATCH=$taskPdm32Batch",
+        "-DYORADIO_ESP8266_PDM32_CLOCK_COMPENSATE=$taskPdm32ClockCompensate",
         "-DYORADIO_ESP8266_OPUS_PCM_PUBLISH=$taskOpusPcmPublish",
         "-DYORADIO_OPUS_PCM_LEASES=$taskOpusPcmLeases",
         "-DYORADIO_ESP8266_OPUS_PCM_QUEUE=$taskOpusPcmQueue",
@@ -427,6 +431,7 @@ try {
         opus_entropy_iram_swap=[bool]$OpusEntropyIramSwap
         opus_entropy_iram_fragment_sha256=$(if ($OpusEntropyIramSwap) { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/opus_entropy_iram.lf").Hash } else { $null })
         pdm32_batch=[bool]$Pdm32Batch
+        pdm32_clock_compensate=[bool]$Pdm32ClockCompensate
         pdm32_loan_words=$Pdm32LoanWords
         sdk_rx_diag=[bool]$SdkRxDiag
         sdk_rx_diag_manifest_sha256=$(if ($SdkRxDiag) { (Get-FileHash "$taskArtifact/sdk-rxdiag-manifest.json").Hash } else { $null })

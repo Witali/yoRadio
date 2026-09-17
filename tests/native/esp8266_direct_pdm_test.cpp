@@ -5,6 +5,7 @@
 #include <cstring>
 #include <vector>
 #include <algorithm>
+#define _Static_assert static_assert
 #include "nodac_buffer_state.h"
 #include "AudioNormalizer.h"
 #include "rc_pdm.h"
@@ -128,6 +129,10 @@ static esp_err_t esp8266_nodac_i2s_init(uint32_t silence, uint8_t, uint8_t) {
 #define BOARD_I2S_PDM_SAMPLE_RATE 48000U
 #define BOARD_I2S_PDM_BCK_DIV 8U
 #define BOARD_I2S_PDM_CLKM_DIV 13U
+#define BOARD_I2S_PDM_CARRIER_BITS_PER_SAMPLE 32U
+#if TEST_PDM32_CLOCK
+#define YORADIO_ESP8266_PDM32_CLOCK_COMPENSATE 1
+#endif
 #define BOARD_I2S_DATA_GPIO 3
 #include "gain_config.inc"
 static uint32_t s_input_sample_rate, s_resample_phase, s_pdm_integrator;
@@ -325,6 +330,30 @@ static Render render(unsigned rate, uint8_t channels, bool normalize, unsigned c
 #if TEST_RCPDM_FEEDBACK
     assert(s_rcpdm.error == reference.error && s_rcpdm.random == reference.random && s_rcpdm.previous == reference.previous);
 #endif
+#endif
+#if TEST_PDM32_CLOCK
+    if (rate == 48000U) {
+        assert(out.pdm.size() == static_cast<size_t>(frames) * 625U / 624U);
+        uint32_t accumulator = 0;
+        for (size_t j = 1; j <= out.pdm.size(); ++j) {
+            /* Independent absolute-time64-bit oracle, not the state machine. */
+            uint64_t tick = j * 624ULL;
+            size_t k = (tick + 624U) / 625U - 1U;
+            auto mono = [&](size_t n) -> int32_t {
+                return channels == 1 ? out.pcm[n] :
+                    (int32_t(out.pcm[n * 2]) + out.pcm[n * 2 + 1]) / 2;
+            };
+            int32_t a = mono(k ? k - 1 : 0), b = mono(k);
+            int32_t sample = b - int32_t(int64_t(b - a) * int64_t((k + 1) * 625U - tick) / 625);
+            uint32_t word = 0;
+            for (unsigned bit = 0; bit < 32; ++bit) {
+                accumulator += uint32_t(sample + 32768);
+                word = (word << 1) | (accumulator >= 65536);
+                if (accumulator >= 65536) accumulator -= 65536;
+            }
+            assert(out.pdm[j - 1] == word);
+        }
+    } else
 #endif
     assert(out.pdm.size() == static_cast<size_t>(frames) * 48000U / rate * (BOARD_I2S_PDM_OVERSAMPLE / 32U));
     native_audio_output_silence();

@@ -576,6 +576,13 @@ void native_audio_output_silence(void) {
 #elif YORADIO_ESP8266_I2S_PDM
 
 #define I2S_PDM_WRITE_TIMEOUT_MS 100U
+#if YORADIO_ESP8266_PDM32_CLOCK_COMPENSATE
+#include "pdm_clock_resampler.h"
+static pdm_clock_resampler_t s_clock_resampler;
+_Static_assert(BOARD_I2S_PDM_BCK_DIV * BOARD_I2S_PDM_CLKM_DIV *
+               BOARD_I2S_PDM_CARRIER_BITS_PER_SAMPLE == 3328U,
+               "Clock compensation is derived for the625/624 ratio");
+#endif
 #ifndef YORADIO_ESP8266_PDM32_LOAN_WORDS
 #define YORADIO_ESP8266_PDM32_LOAN_WORDS 512
 #endif
@@ -926,6 +933,9 @@ static esp_err_t i2s_pdm_finish_partial_word(i2s_pdm_writer_t *writer) {
 }
 
 static esp_err_t i2s_pdm_fill_dma_silence(void) {
+#if YORADIO_ESP8266_PDM32_CLOCK_COMPENSATE
+    memset(&s_clock_resampler, 0, sizeof(s_clock_resampler));
+#endif
     esp8266_nodac_i2s_silence(I2S_PDM_SILENCE_WORD);
     return ESP_OK;
 }
@@ -938,6 +948,9 @@ esp_err_t native_audio_output_init(void) {
         s_i2s_started = true;
         s_input_sample_rate = 0;
         s_resample_phase = 0;
+#if YORADIO_ESP8266_PDM32_CLOCK_COMPENSATE
+        memset(&s_clock_resampler, 0, sizeof(s_clock_resampler));
+#endif
 #if CONFIG_YORADIO_RCPDM_FEEDBACK
         rc_pdm_feedback_init(&s_rcpdm, RC_FB_DEFAULT_SEED);
 #elif CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM
@@ -1021,6 +1034,24 @@ static inline __attribute__((always_inline)) esp_err_t i2s_pdm_write_channels(
         .deadline = xTaskGetTickCount() +
                     pdMS_TO_TICKS(I2S_PDM_WRITE_TIMEOUT_MS),
     };
+#if YORADIO_ESP8266_PDM32_CLOCK_COMPENSATE
+    /* Diagnostic48k path. Other rates retain the existing resampler;
+     * switching rates resets the interpolation history. */
+    if (sample_rate == 48000U) {
+        for (size_t frame = 0; frame < frames; ++frame) {
+            int32_t mono = samples[frame * channels];
+            if (channels == 2) mono = (mono + samples[frame * 2U + 1U]) / 2;
+            int16_t converted[2];
+            unsigned count = pdm_clock_resample(&s_clock_resampler, (int16_t)mono, converted);
+            for (unsigned i = 0; i < count; ++i) {
+                esp_err_t result = i2s_pdm_emit_sample(converted[i], &writer);
+                if (result != ESP_OK) return result;
+            }
+        }
+        return i2s_pdm_flush(&writer);
+    }
+    memset(&s_clock_resampler, 0, sizeof(s_clock_resampler));
+#endif
 #if CONFIG_YORADIO_AUDIO_OUTPUT_I2S_RCPDM && !RCPDM_DISABLE_BATCH
     if (sample_rate == BOARD_I2S_PDM_SAMPLE_RATE && s_resample_phase == 0) {
         size_t frame = 0;
