@@ -31,7 +31,10 @@ test('paced and buffered responses preserve every source byte and HTTP framing',
  for(const route of ['/buffered.opus','/live.opus']) {
   const r=await get(route);assert.equal(r.status,200);assert.equal(Number(r.headers['content-length']),input.length);
   assert.equal(r.headers.connection,'close');assert.equal(r.headers['transfer-encoding'],undefined);assert.deepEqual(r.data,input);
-  if(route==='/live.opus')assert.ok(r.ms>=1000,'real-time pacing must not send all audio immediately');
+  // The final page starts at993.5ms after subtracting encoder pre-skip,
+  // not at a whole1000ms. Allow the timer's fractional-ms truncation only.
+  if(route==='/live.opus')assert.ok(r.ms>=pages(input).at(-1).dueMs-2,
+   'real-time pacing must follow page granules: elapsed '+r.ms);
  }
  assert.equal((await get('/buffered.opus','HEAD')).data.length,0);
  assert.equal((await get('/buffered.opus','POST')).status,405);
