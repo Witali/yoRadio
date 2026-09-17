@@ -3,6 +3,23 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-17: aligned positive eBands ASM (not accepted)
+
+- `development/esp8266-opus-ebands-u16-aligned-{control,candidate}-v1/app.bin`,
+  903216B, CPU160/runtimeQIO40. EXTUI saves one instruction per helper call;
+  unreachable padding preserves five original cross-branch entry addresses.
+- 401280 numeric cases, symbolic ABI/bit proof,24 exact PCM host scenarios,
+  all30 physical A/B/A2 retained;20 local regressions PASS. No RAM/frame growth.
+- CPU19277.875625/77.859187/77.879229%, CPU128
+  70.385687/70.404708/70.372021%. Both high-bitrate gates FAIL; not accepted.
+  Keep eBands-final baseline and C/default profile unchanged.75% not reached.
+- DRAM minima2940/5184/7484B, stack free1660B; max192
+  19.949/20.980/20.771ms. A2/run2 mono12 task>wall2615us preserved.
+- Ordinary accepted ASM6914f484... restored OTA, station167/stopped,
+  playlist/settings retained; HTTP200/169.5ms and WS observed while stopped.
+  No UART/reset. No new continuous I2S qualification.
+  [Method and full evidence](../docs/ESP8266_OPUS_ASM_EBANDS_U16_ALIGNED.md).
+
 ## Development - 2026-09-17: accepted Opus ASM in ordinary ESP8266 radio
 
 - `development/esp8266-opus-live-asm-ebands-final-20260917/app.bin`,
