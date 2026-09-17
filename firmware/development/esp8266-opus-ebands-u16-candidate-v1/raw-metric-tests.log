@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
+ok 1 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
+  ---
+  duration_ms: 1.0105
+  type: 'test'
+  ...
+# Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+ok 2 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+  ---
+  duration_ms: 0.8174
+  type: 'test'
+  ...
+# Subtest: current 75% raw CPU target uses an inclusive, unrounded median threshold
+ok 3 - current 75% raw CPU target uses an inclusive, unrounded median threshold
+  ---
+  duration_ms: 1.1843
+  type: 'test'
+  ...
+# Subtest: raw target rejects missing, ambiguous and invalid evidence or thresholds
+ok 4 - raw target rejects missing, ambiguous and invalid evidence or thresholds
+  ---
+  duration_ms: 2.1368
+  type: 'test'
+  ...
+# Subtest: active CPU target is independent of historical 70% field and relative-speed acceptance
+ok 5 - active CPU target is independent of historical 70% field and relative-speed acceptance
+  ---
+  duration_ms: 0.4086
+  type: 'test'
+  ...
+# Subtest: attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+ok 6 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+  ---
+  duration_ms: 3.1176
+  type: 'test'
+  ...
+# Subtest: A/B permits only the selected feature and artifact identity differences
+ok 7 - A/B permits only the selected feature and artifact identity differences
+  ---
+  duration_ms: 0.8607
+  type: 'test'
+  ...
+# Subtest: raw A/B reports true medians and retains a slow outlier and observation timeout
+ok 8 - raw A/B reports true medians and retains a slow outlier and observation timeout
+  ---
+  duration_ms: 1.4004
+  type: 'test'
+  ...
+# Subtest: raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+ok 9 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+  ---
+  duration_ms: 5.9424
+  type: 'test'
+  ...
+# Subtest: different task/wall timing windows retain positive overhead without clamping or dropping the run
+ok 10 - different task/wall timing windows retain positive overhead without clamping or dropping the run
+  ---
+  duration_ms: 0.8188
+  type: 'test'
+  ...
+# Subtest: raw-series default observation interval matches the physical evidence validator
+ok 11 - raw-series default observation interval matches the physical evidence validator
+  ---
+  duration_ms: 1.32
+  type: 'test'
+  ...
+# Subtest: raw series verifies PCM and retains terminal device failures without counting them as speed passes
+ok 12 - raw series verifies PCM and retains terminal device failures without counting them as speed passes
+  ---
+  duration_ms: 1.4435
+  type: 'test'
+  ...
+# Subtest: raw series does not restart unknown/physical/missing observations or incorrect PCM
+ok 13 - raw series does not restart unknown/physical/missing observations or incorrect PCM
+  ---
+  duration_ms: 5.5634
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 135.8208
