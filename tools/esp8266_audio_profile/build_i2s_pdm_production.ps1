@@ -69,7 +69,7 @@ if ($OpusFunctionProfileCoarse -and -not $OpusFunctionProfile) { throw '-OpusFun
 if ($OpusBackend -ne 'c') {
     if (-not $Diagnostic -or -not $EnableOpus) { throw 'Opus ASM backend requires diagnostic Opus' }
     if (-not $OpusWordAsm -or -not $OpusIcdfFlashWord -or -not $OpusFirFlashWord) { throw 'Pinned ASM requires -OpusWordAsm -OpusIcdfFlashWord -OpusFirFlashWord' }
-    if ($OpusLowRam -or $OpusPcmLeases -or $OpusCeltDecodeOnly -or $OpusRotationLx106 -or $OpusDivOnce -or $OpusProfileStage) { throw 'Other decoder experiments require a separately regenerated ASM snapshot' }
+    if ($OpusLowRam -or $OpusCeltDecodeOnly -or $OpusRotationLx106 -or $OpusDivOnce -or $OpusProfileStage) { throw 'Other decoder experiments require a separately regenerated ASM snapshot' }
 }
 if ($OpusBandsTextLiterals -and (-not $Diagnostic -or $OpusBackend -ne 'bands-tell-inline-asm')) { throw '-OpusBandsTextLiterals requires diagnostic bands-tell-inline-asm' }
 if ($OpusEntropyIramSwap -and (-not $Diagnostic -or -not $EnableOpus -or $OpusBackend -ne 'bands-tell-inline-asm' -or -not $Pdm32Iram -or $OpusPvqIram)) { throw '-OpusEntropyIramSwap requires diagnostic tell-inline ASM and -Pdm32Iram without PVQ placement' }
@@ -361,6 +361,7 @@ try {
         opus_div_once=[bool]$OpusDivOnce
         opus_pcm_publish=[bool]$OpusPcmPublish
         opus_pcm_leases=[bool]$OpusPcmLeases
+        opus_packet_dispatcher=$(if ($OpusPcmLeases) { 'c-leased' } elseif ($OpusBackend -ne 'c') { 'frozen-asm' } else { 'c' })
         opus_pcm_queue=[bool]$OpusPcmQueue
         opus_pcm_stack_bytes=$(if ($OpusPcmQueue) { $PcmStackBytes } else { 0 })
         opus_pcm_queue_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/audio_pcm_queue.c" -Algorithm SHA256).Hash

@@ -1,16 +1,21 @@
 {
   "passed": true,
   "leased": true,
+  "silk_scratch": false,
+  "low_ram": false,
+  "scratch_capacity_bytes": 6144,
   "celt_decode_only": false,
   "div_once": false,
   "scope": "Host generic32 pristine full-packet PCM versus FIR-enabled bounded frame callbacks; mono48k. No board speed claim.",
-  "probe_sha256_lf": "2a943d3ec719eb6e5cedfbf1dce230632c9598bf0321941e3ef0dc851771db08",
+  "probe_sha256_lf": "9fdb39a109fdab3aee51d53f2e050cfe7223dff09774c06350f484586445f536",
   "source_sha256_lf": {
     "native_opus.c": "ee8884f44de5eac413fd5b07fd603a21a5b08a368194a9251b842235377fc34c",
     "native_opus.h": "ca8019e2a2095da4a0146e9566a399ac720d4666575b9a354a90dd0ede38370c",
-    "opus_memory.c": "d54815bf61ef56c8374dfb6e13add2108bbac08cf6b3086b0b9f40a6cb2e11aa",
-    "opus_memory.h": "91fe49fbbc08a2638ecd1fcb6e24d4e450041b18340b4966436a4d7b5d0b2016",
-    "upstream/src/opus_decoder.c": "55e597582d17422aaaddc3a0d947f12f130ad4dd3f7c854b5022f1fd556f6f45"
+    "opus_memory.c": "a6a88764ce240ee3133e73a9181f51fdf37d07a289c6a99eb4ef3f61e5917d18",
+    "opus_memory.h": "100331d49d54e1970f6227ce66e26c4749fe3e92b026a4edbef0919ecfdeaf09",
+    "upstream/src/opus_decoder.c": "1b7cd3c83d0af7951a0ca844db3ca28156a89c0e5959a0be6fb2cc50ead66a7a",
+    "upstream/celt/celt_lpc.c": "11cf6e09bfefbc0e79688f5a32cc9dbee205509d6239a4967e63674129ac4585",
+    "upstream/silk/PLC.c": "795e271af059c36297360624b1b19fd50089ed5862bf9a1fc2d035d77338266d"
   },
   "cases": [
     {
@@ -489,25 +494,25 @@
     },
     {
       "name": "private-live-capture",
-      "input_sha256": "8f550f4cda894c8c2303bcd37b293d708ece1c8bfe32c74ae7de6156a912c200",
-      "packets": 576,
-      "samples": 1658880,
+      "input_sha256": "3048130bee9756bef2730a105b378b27f4e5433edd01bf7ce9dcf54d88296c98",
+      "packets": 873,
+      "samples": 2514240,
       "modes": {
         "SILK": 0,
-        "hybrid": 576,
+        "hybrid": 873,
         "CELT": 0
       },
       "packet_durations_ms": {
-        "60": 576
+        "60": 873
       },
       "packet_channels": {
-        "1": 576
+        "1": 873
       },
       "max_packet_bytes": 180,
       "result": {
-        "packets": 576,
-        "samples": 1658880,
-        "blocks": 1728,
+        "packets": 873,
+        "samples": 2514240,
+        "blocks": 2619,
         "largest_block": 960,
         "pcm_bytes": 3840,
         "scratch_bytes": 2904,
@@ -521,12 +526,12 @@
       },
       "pcm": {
         "exact": true,
-        "compared_samples": 1658880,
+        "compared_samples": 2514240,
         "mismatched_samples": 0,
         "max_absolute_error": 0,
         "snr_db": "Infinity",
-        "reference_pcm_sha256": "885863e9dd80385924c1122f45a7429ba6157a2d3a7234b1e4849a586be3cd0c",
-        "actual_pcm_sha256": "885863e9dd80385924c1122f45a7429ba6157a2d3a7234b1e4849a586be3cd0c"
+        "reference_pcm_sha256": "bf8a278659591a7bbc1f01a5bd907bda651d7a743f7bd3d338deabdbab82db2a",
+        "actual_pcm_sha256": "bf8a278659591a7bbc1f01a5bd907bda651d7a743f7bd3d338deabdbab82db2a"
       }
     }
   ]
