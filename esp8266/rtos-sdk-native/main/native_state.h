@@ -42,6 +42,9 @@ typedef struct {
 } native_state_t;
 
 void native_state_init(void);
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+bool native_state_take_service_notification(void);
+#endif
 void native_state_snapshot(native_state_t *output);
 bool native_state_audio_active(void);
 void native_state_update(const native_state_t *input);

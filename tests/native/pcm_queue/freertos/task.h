@@ -7,3 +7,5 @@ uint32_t ulTaskNotifyTake(int clear, TickType_t ticks);
 TaskHandle_t xTaskGetCurrentTaskHandle(void);
 unsigned uxTaskGetStackHighWaterMark(TaskHandle_t task);
 void vTaskDelete(TaskHandle_t task);
+unsigned uxTaskPriorityGet(TaskHandle_t task);
+void vTaskPrioritySet(TaskHandle_t task, unsigned priority);

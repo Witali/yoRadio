@@ -13,6 +13,9 @@ static int16_t *s_pool;
 static uint32_t s_generation;
 static bool s_running, s_busy;
 static TaskHandle_t s_worker, s_producer;
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+static unsigned s_worker_base_priority;
+#endif
 static audio_pcm_generation_fn s_valid;
 static audio_pcm_progress_fn s_progress;
 static audio_pcm_queue_health_t s_health;
@@ -32,9 +35,7 @@ static void notify_producer(void) {
     taskEXIT_CRITICAL();
     if (producer) xTaskNotifyGive(producer);
 }
-static void output_task(void *unused) {
-    (void)unused;
-    for (;;) {
+static bool output_once(void) {
         unsigned index = AUDIO_PCM_QUEUE_SLOTS;
         int16_t *pcm = NULL;
         uint16_t count = 0;
@@ -53,9 +54,7 @@ static void output_task(void *unused) {
         }
         taskEXIT_CRITICAL();
         if (!pcm) {
-            notify_producer();
-            ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-            continue;
+            return false;
         }
         esp_err_t result = ESP_OK;
         /* Preserve the old callback boundaries (512 plus remainder), including
@@ -85,19 +84,45 @@ static void output_task(void *unused) {
         if (!s_running) discard_ready();
         taskEXIT_CRITICAL();
         notify_producer();
+        return true;
+}
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+bool audio_pcm_queue_poll(void) {
+    if (xTaskGetCurrentTaskHandle() != s_worker) return false;
+    return output_once();
+}
+bool audio_pcm_queue_pending(void) {
+    taskENTER_CRITICAL();
+    bool pending = s_running && s_count;
+    taskEXIT_CRITICAL();
+    return pending;
+}
+#else
+static void output_task(void *unused) {
+    (void)unused;
+    for (;;) {
+        if (!output_once()) ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
 }
+#endif
 esp_err_t audio_pcm_queue_init(audio_pcm_generation_fn valid, audio_pcm_progress_fn progress) {
     if (!valid || !progress || s_worker) return ESP_ERR_INVALID_STATE;
     s_valid = valid; s_progress = progress;
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    s_worker = xTaskGetCurrentTaskHandle();
+    s_worker_base_priority = uxTaskPriorityGet(s_worker);
+#else
     if (xTaskCreate(output_task, "pcm-output", AUDIO_PCM_QUEUE_STACK_BYTES, NULL,
                     6U, &s_worker) != pdPASS) { s_worker = NULL; return ESP_ERR_NO_MEM; }
+#endif
     return ESP_OK;
 }
 void audio_pcm_queue_deinit(void) {
     if (!s_worker) return;
     audio_pcm_queue_stop();
+#if !YORADIO_ESP8266_OPUS_PCM_APP_TASK
     vTaskDelete(s_worker);
+#endif
     s_worker = NULL;
 }
 esp_err_t audio_pcm_queue_begin(int16_t *pool, size_t samples, uint32_t generation) {
@@ -112,6 +137,9 @@ esp_err_t audio_pcm_queue_begin(int16_t *pool, size_t samples, uint32_t generati
     s_producer = xTaskGetCurrentTaskHandle();
     s_running = true;
     taskEXIT_CRITICAL();
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    vTaskPrioritySet(s_worker, 6U);
+#endif
     return ESP_OK;
 }
 int audio_pcm_queue_acquire(void *unused, int16_t **pcm, int samples) {
@@ -186,7 +214,12 @@ void audio_pcm_queue_stop(void) {
             owned = owned || s_slots[i].state == SLOT_FILLING || s_slots[i].state == SLOT_READING;
         if (!owned) { s_pool = NULL; s_producer = NULL; }
         taskEXIT_CRITICAL();
-        if (!owned) return;
+        if (!owned) {
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+            vTaskPrioritySet(s_worker, s_worker_base_priority);
+#endif
+            return;
+        }
         /* Never free/reset still-owned PCM after a timeout. The DMA write has
          * its own bounded timeout; this owner sleeps until its acknowledgement. */
         ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(20U));

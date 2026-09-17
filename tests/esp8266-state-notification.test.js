@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const test=require('node:test'),{spawnSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..');
 const read=name=>fs.readFileSync(path.join(root,'esp8266/rtos-sdk-native/main',name),'utf8');
-test('actual native state wakes its consumer after unlocking, not for every bitrate sample',()=>{
+for(const appTask of [0,1]) test('actual native state wakes its consumer after unlocking, not for every bitrate sample, app '+appTask,()=>{
   const strip=s=>s.replace(/^#(?:include|pragma).*$/gm,'');
   const source=`#include <assert.h>
 #include <stdbool.h>
@@ -11,6 +11,11 @@ test('actual native state wakes its consumer after unlocking, not for every bitr
 typedef int SemaphoreHandle_t;
 typedef int TaskHandle_t;
 static int held, notifications;
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+static int critical;
+#define taskENTER_CRITICAL() do { assert(!held && !critical);critical=1; } while(0)
+#define taskEXIT_CRITICAL() do { assert(critical);critical=0; } while(0)
+#endif
 #define portMAX_DELAY 0
 #define pdMS_TO_TICKS(x) (x)
 static int xTaskGetTickCount(void) { return 0; }
@@ -42,12 +47,22 @@ int main(void) {
   native_state_set_audio(false,false,"Error"); assert(notifications==8);
   native_state_t snapshot; native_state_snapshot(&snapshot);
   assert(snapshot.station_index==2 && !snapshot.playing && !snapshot.title[0]);
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+  assert(native_state_take_service_notification());
+  assert(!native_state_take_service_notification());
+  xTaskNotifyGive(42); /* PCM/DMA alone must not enqueue HTTP work */
+  assert(!native_state_take_service_notification());
+  native_state_set_title("New song");
+  notifications=0; /* DMA wait consumed the wake, not the latched state */
+  assert(native_state_take_service_notification());
+  assert(!native_state_take_service_notification());
+#endif
 }
 `;
   const dir=fs.mkdtempSync(path.join(root,'.build/state-notify-'));
   const file=path.join(dir,'test.c'),bin=path.join(dir,'test');fs.writeFileSync(file,source);
   const wsl=process.platform==='win32',p=f=>wsl?'/mnt/'+f[0].toLowerCase()+f.slice(2).replace(/\\/g,'/'):f;
-  const opts={encoding:'utf8'},args=['-std=c11','-Wall','-Wextra','-Werror',p(file),'-o',p(bin)];
+  const opts={encoding:'utf8'},args=['-std=c11','-Wall','-Wextra','-Werror','-DYORADIO_ESP8266_OPUS_PCM_APP_TASK='+appTask,p(file),'-o',p(bin)];
   let r=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...args]:args,opts);
   assert.equal(r.status,0,r.stdout+r.stderr);
   r=spawnSync(wsl?'wsl.exe':bin,wsl?['--exec',p(bin)]:[],opts);

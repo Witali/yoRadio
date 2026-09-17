@@ -39,6 +39,7 @@ param(
     [switch]$OpusPcmPublish,
     [switch]$OpusPcmLeases,
     [switch]$OpusPcmQueue,
+    [switch]$OpusPcmAppTask,
     [ValidateSet(1536, 2048)]
     [int]$PcmStackBytes = 2048,
     [switch]$Pdm32Iram,
@@ -87,6 +88,7 @@ if ($OpusScratchBytes -ne 6144 -and -not $OpusLowRam) { throw 'Reduced Opus scra
 if ($OpusCeltDecodeOnly -and -not $EnableOpus) { throw '-OpusCeltDecodeOnly requires -EnableOpus' }
 if ($OpusDivOnce -and -not $EnableOpus) { throw '-OpusDivOnce requires -EnableOpus' }
 if ($OpusPcmPublish -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusPcmPublish requires diagnostic Opus until board qualification' }
+if ($OpusPcmAppTask -and -not $OpusPcmQueue) { throw '-OpusPcmAppTask requires -OpusPcmQueue' }
 if ($OpusPcmQueue) {
     if (-not $EnableOpus -or -not $Diagnostic -or $OpusBenchmark -or $OpusPcmPublish -or $WebAudioPause -ne 'off') {
         throw '-OpusPcmQueue requires diagnostic live Opus without benchmark/publication/WebUI pause'
@@ -259,6 +261,7 @@ try {
     $taskOpusPcmPublish = if ($OpusPcmPublish) { 'ON' } else { 'OFF' }
     $taskOpusPcmLeases = if ($OpusPcmLeases) { 'ON' } else { 'OFF' }
     $taskOpusPcmQueue = if ($OpusPcmQueue) { 'ON' } else { 'OFF' }
+    $taskOpusPcmAppTask = if ($OpusPcmAppTask) { 'ON' } else { 'OFF' }
     $taskSdkRxDiag = if ($SdkRxDiag) { 'ON' } else { 'OFF' }
     Invoke-TaskTool "$taskRuntime/esp8266-tools/tools/cmake/3.13.4/bin/cmake.exe" @(
         '-S', 'esp8266/rtos-sdk-native', '-B', $taskBuild, '-G', 'Ninja',
@@ -305,6 +308,7 @@ try {
         "-DYORADIO_ESP8266_OPUS_PCM_PUBLISH=$taskOpusPcmPublish",
         "-DYORADIO_OPUS_PCM_LEASES=$taskOpusPcmLeases",
         "-DYORADIO_ESP8266_OPUS_PCM_QUEUE=$taskOpusPcmQueue",
+        "-DYORADIO_ESP8266_OPUS_PCM_APP_TASK=$taskOpusPcmAppTask",
         "-DYORADIO_ESP8266_PCM_STACK_BYTES=$PcmStackBytes",
         "-DYORADIO_ESP8266_PDM32_LOAN_WORDS=$Pdm32LoanWords",
         "-DYORADIO_ESP8266_DMA_BUFFER_WORDS=$DmaBufferWords",
@@ -405,7 +409,8 @@ try {
         opus_pcm_leases=[bool]$OpusPcmLeases
         opus_packet_dispatcher=$(if ($OpusPcmLeases) { 'c-leased' } elseif ($OpusBackend -ne 'c') { 'frozen-asm' } else { 'c' })
         opus_pcm_queue=[bool]$OpusPcmQueue
-        opus_pcm_stack_bytes=$(if ($OpusPcmQueue) { $PcmStackBytes } else { 0 })
+        opus_pcm_app_task=[bool]$OpusPcmAppTask
+        opus_pcm_stack_bytes=$(if ($OpusPcmQueue -and -not $OpusPcmAppTask) { $PcmStackBytes } else { 0 })
         opus_pcm_queue_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/audio_pcm_queue.c" -Algorithm SHA256).Hash
         opus_pcm_queue_header_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/audio_pcm_queue.h" -Algorithm SHA256).Hash
         opus_mathops_header_sha256=(Get-FileHash esp8266/rtos-sdk-native/components/opus_decoder/upstream/celt/mathops.h).Hash

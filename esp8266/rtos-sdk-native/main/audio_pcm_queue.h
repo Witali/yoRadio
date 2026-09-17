@@ -3,6 +3,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "esp_err.h"
+#ifndef YORADIO_ESP8266_OPUS_PCM_APP_TASK
+#define YORADIO_ESP8266_OPUS_PCM_APP_TASK 0
+#endif
 
 /* Exactly two existing decoder frame slots, never an additional PCM copy. */
 #define AUDIO_PCM_QUEUE_SLOTS 2U
@@ -32,3 +35,9 @@ bool audio_pcm_queue_submit(int16_t *pcm, size_t samples);
 void audio_pcm_queue_stop(void);
 void audio_pcm_queue_drain(void);
 void audio_pcm_queue_health(audio_pcm_queue_health_t *health);
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+/* Called only by the app owner; consumes at most one frame. Existing DMA
+ * backpressure sleeps this same task; no new task, stack or PCM copy. */
+bool audio_pcm_queue_poll(void);
+bool audio_pcm_queue_pending(void);
+#endif

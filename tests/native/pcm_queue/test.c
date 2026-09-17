@@ -19,6 +19,7 @@ static _Thread_local struct mock_task *current;
 static _Thread_local unsigned depth;
 static atomic_bool finish, writing;
 static atomic_uint generation, write_delay, fail_call, write_calls, progressed;
+static atomic_uint worker_priority;
 static int16_t actual[150000], expected[150000];
 static size_t actual_count, expected_count;
 void mock_enter(void) { assert(!depth);pthread_mutex_lock(&critical);++depth; }
@@ -26,11 +27,25 @@ void mock_exit(void) { assert(depth==1);--depth;pthread_mutex_unlock(&critical);
 static void *entry(void *p) { current=p;current->entry(current->arg);return NULL; }
 int xTaskCreate(void (*fn)(void *),const char *name,unsigned stack,void *arg,
                 unsigned priority,TaskHandle_t *task) {
+    assert(!YORADIO_ESP8266_OPUS_PCM_APP_TASK); /* no hidden extra task */
     assert(!strcmp(name,"pcm-output") && stack==AUDIO_PCM_QUEUE_STACK_BYTES && priority==6);
     worker.entry=fn;worker.arg=arg;*task=&worker;
     assert(!pthread_create(&worker.thread,NULL,entry,&worker));return pdPASS;
 }
 TaskHandle_t xTaskGetCurrentTaskHandle(void) { return current?current:&producer; }
+unsigned uxTaskPriorityGet(TaskHandle_t task) { assert(task==&worker);return worker_priority; }
+void vTaskPrioritySet(TaskHandle_t task,unsigned priority) {
+    assert(!depth && task==&worker && (priority==2 || priority==6));worker_priority=priority;
+}
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+static void app_pump(void *unused) {
+    (void)unused;
+    for (;;) {
+        audio_pcm_queue_poll();
+        if (!audio_pcm_queue_pending()) ulTaskNotifyTake(pdTRUE,portMAX_DELAY);
+    }
+}
+#endif
 void xTaskNotifyGive(TaskHandle_t task) {
     assert(!depth && task);pthread_mutex_lock(&task->mutex);
     ++task->notifications;pthread_cond_signal(&task->event);pthread_mutex_unlock(&task->mutex);
@@ -81,10 +96,22 @@ static void submit(unsigned frame,unsigned skip) {
     assert(!audio_pcm_queue_submit(pcm+skip,960-skip)); /* duplicate handoff */
 }
 int main(void) {
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    current=&worker;worker_priority=2;
+#endif
     assert(audio_pcm_queue_init(valid,progress)==ESP_OK);
     assert(audio_pcm_queue_init(valid,progress)==ESP_ERR_INVALID_STATE);
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    current=&producer;
+    assert(!audio_pcm_queue_poll()); /* only the registered app may read */
+    worker.entry=app_pump;worker.arg=NULL;
+    assert(!pthread_create(&worker.thread,NULL,entry,&worker));
+#endif
     assert(audio_pcm_queue_begin(NULL,1920,1)==ESP_ERR_INVALID_ARG);
     write_delay=100;int16_t *pool=begin(1);
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    assert(worker_priority==6);
+#endif
     assert(audio_pcm_queue_begin(pool,1920,1)==ESP_ERR_INVALID_STATE);
     int16_t *pcm=NULL;assert(audio_pcm_queue_acquire(NULL,&pcm,961)==-108);
     assert(audio_pcm_queue_acquire(NULL,&pcm,960)==0);
@@ -94,6 +121,9 @@ int main(void) {
     assert(h.submitted_frames==expected_count && h.output_frames==expected_count);
     assert(h.stack_free==777 && !h.ready_frames && !h.error);
     audio_pcm_queue_stop();assert(!writing);free(pool);
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    assert(worker_priority==2);
+#endif
     assert(actual_count==expected_count && !memcmp(actual,expected,actual_count*sizeof(*actual)));
     assert(progressed==actual_count);assert(audio_pcm_queue_acquire(NULL,&pcm,960)==-108);
     /* Stop during an in-flight consumer read; freeing the pool must be safe. */
@@ -111,6 +141,10 @@ int main(void) {
     pool=begin(1002);submit(4,120);audio_pcm_queue_drain();audio_pcm_queue_health(&h);
     assert(!h.error && h.output_frames==840);audio_pcm_queue_stop();free(pool);
     audio_pcm_queue_deinit();audio_pcm_queue_deinit();
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    assert(!finish); /* deinit must never delete the existing app task */
+    vTaskDelete(&worker);
+#endif
     puts("PCM queue PASS: exact order, two slots, trim, backpressure, 25 in-flight stops, error/reuse; no ISR work");
     return 0;
 }

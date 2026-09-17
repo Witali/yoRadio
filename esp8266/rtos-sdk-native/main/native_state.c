@@ -7,8 +7,25 @@
 static SemaphoreHandle_t s_lock;
 static native_state_t s_state;
 static TaskHandle_t s_consumer_task;
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+static bool s_service_notification;
+bool native_state_take_service_notification(void) {
+    taskENTER_CRITICAL();
+    bool pending = s_service_notification;
+    s_service_notification = false;
+    taskEXIT_CRITICAL();
+    return pending;
+}
+#endif
 
 static void notify_consumer(void) {
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    /* DMA waits can consume a task wakeup. Keep real state changes latched,
+     * separate from high-rate PCM/DMA notifications to this same app task. */
+    taskENTER_CRITICAL();
+    s_service_notification = true;
+    taskEXIT_CRITICAL();
+#endif
     /* app_main already waits on a notification for BOOT edges. Reuse that
      * wakeup, after unlocking state; never run HTTP on the audio task. */
     if (s_consumer_task) xTaskNotifyGive(s_consumer_task);

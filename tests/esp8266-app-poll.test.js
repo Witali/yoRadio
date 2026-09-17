@@ -8,13 +8,13 @@ const end = app.indexOf('    /* End background poll scheduling. */');
 assert.ok(start >= 0 && end > start);
 // Execute the real app loop with virtual ticks/notifications, not a copy of
 // a rate-limit predicate. GPIO, services and RTOS waits are deterministic mocks.
-for (const hz of [0, 10, 20]) test(`app loop: LED ${hz} Hz does not accelerate services or delay controls`, t => {
+for (const hz of [0, 10, 20]) for (const appTask of [0,1]) test(`app loop: LED ${hz} Hz PCM app ${appTask} does not accelerate services or delay controls`, t => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'yoradio-app-poll-'));
   t.after(() => fs.rmSync(dir, {recursive: true, force: true}));
   const fixture = fs.readFileSync(path.join(__dirname, 'native/esp8266_app_poll_test.c'), 'utf8');
   const file = path.join(dir, 'test.c'), exe = path.join(dir, process.platform === 'win32' ? 'test.exe' : 'test');
   fs.writeFileSync(file, fixture.replace('/* APP_LOOP */', app.slice(start, end)));
-  const flags = [`CONFIG_YORADIO_STATUS_LED=${hz ? 1 : 0}`, `LED_HZ=${hz || 20}`];
+  const flags = [`CONFIG_YORADIO_STATUS_LED=${hz ? 1 : 0}`, `LED_HZ=${hz || 20}`, `YORADIO_ESP8266_OPUS_PCM_APP_TASK=${appTask}`];
   let build;
   if (process.platform === 'win32') {
     let vc; const base = 'C:/Program Files/Microsoft Visual Studio';

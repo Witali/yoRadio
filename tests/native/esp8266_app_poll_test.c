@@ -15,6 +15,14 @@ static uint32_t service_times[128];
 static uint32_t led_tick;
 static bool events, delayed_service, debounce_posted;
 static unsigned event_index;
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+static bool service_notification;
+static bool native_state_take_service_notification(void) {
+    bool result = service_notification;service_notification = false;return result;
+}
+static void audio_pcm_queue_poll(void) { }
+static bool audio_pcm_queue_pending(void) { return false; }
+#endif
 static const uint32_t event_times[] = {75, 243, 612};
 static TickType_t xTaskGetTickCount(void) { return origin + elapsed_ms; }
 static void input_service_poll(void) { ++input_polls; }
@@ -49,13 +57,22 @@ static TickType_t status_led_wait_ticks(TickType_t maximum) {
 }
 #endif
 static uint32_t ulTaskNotifyTake(int clear, TickType_t wait) {
-    assert(clear == pdTRUE && ++waits < 250); // Reject a busy loop.
+    assert(clear == pdTRUE && ++waits < 1000); // Reject a busy loop.
     if (events && elapsed_ms == 115 && !debounce_posted) {
         pending = 1; debounce_posted = true; // Debounce action posts state once.
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+        service_notification = true;
+#endif
     }
     if (pending) { uint32_t result = pending; pending = 0; return result; }
     uint32_t next = elapsed_ms + wait;
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    if (next > elapsed_ms + 5) next = elapsed_ms + 5; // frequent PCM-only wakes
+#endif
     if (events && event_index < 3 && event_times[event_index] <= next) {
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+        service_notification = true;
+#endif
         elapsed_ms = event_times[event_index++]; return 1;
     }
     if (next > 2000) longjmp(finished, 1);
@@ -69,6 +86,9 @@ static void run_case(bool with_events, bool slow_service, uint32_t first_tick) {
     elapsed_ms = pending = input_polls = waits = led_updates = event_index = 0;
     origin = led_tick = first_tick; events = with_events; delayed_service = slow_service;
     debounce_posted = false;
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    service_notification = true;
+#endif
     memset(service_calls, 0, sizeof(service_calls)); memset(service_times, 0, sizeof(service_times));
     if (!setjmp(finished)) run_actual_loop();
     for (unsigned i = 0; i < 6; ++i) assert(service_calls[i] == service_calls[0]);

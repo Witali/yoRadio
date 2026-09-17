@@ -7,6 +7,9 @@
 #include "board_config.h"
 #include "spi_pdm_config.h"
 #include "audio_service.h"
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+#include "audio_pcm_queue.h"
+#endif
 #if CONFIG_YORADIO_OLED
 #include "display_service.h"
 #endif
@@ -121,7 +124,15 @@ void app_main(void) {
     TickType_t service_tick = xTaskGetTickCount();
     uint32_t notifications = 1;
     for (;;) {
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+        audio_pcm_queue_poll();
+#endif
         input_service_poll();
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+        /* Do not enqueue HTTP work for every PCM/DMA wake. Actual state
+         * changes remain latched across output waits and are handled now. */
+        notifications = native_state_take_service_notification();
+#endif
         TickType_t now = xTaskGetTickCount();
         if (notifications || (TickType_t)(now - service_tick) >= service_period) {
             service_tick = now;
@@ -140,6 +151,9 @@ void app_main(void) {
         wait = input_service_wait_ticks(wait);
 #if CONFIG_YORADIO_STATUS_LED
         wait = status_led_wait_ticks(wait);
+#endif
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+        if (audio_pcm_queue_pending()) wait = 0;
 #endif
         notifications = ulTaskNotifyTake(pdTRUE, wait);
     }
