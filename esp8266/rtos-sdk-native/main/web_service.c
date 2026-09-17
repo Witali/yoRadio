@@ -1134,6 +1134,15 @@ static esp_err_t wifi_file_handler(httpd_req_t *request) {
 
 static esp_err_t audio_health_handler(httpd_req_t *request) {
     prepare_short_response(request);
+#if YORADIO_ESP8266_MEMORY_PROFILE
+    if (strchr(request->uri, '?') && !strcmp(strchr(request->uri, '?'), "?memory=1")) {
+        int size = memory_profile_json(s_async_message, sizeof(s_async_message));
+        if (size < 0) return ESP_FAIL;
+        httpd_resp_set_type(request, "application/json; charset=utf-8");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        return finish_short_response(request, httpd_resp_send(request, s_async_message, size));
+    }
+#endif
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
     if (strchr(request->uri, '?') && !strcmp(strchr(request->uri, '?'), "?stages=1")) {
         int size = audio_service_stage_json(s_async_message, sizeof(s_async_message));

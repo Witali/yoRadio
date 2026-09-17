@@ -1,0 +1,1430 @@
+{
+  "scope": "Intrusive C-backend RAM/TCP diagnosis: three sequential HTTP requests per sample. Not ASM CPU or uninterrupted playback qualification.",
+  "app_sha256": "a19dcb320e1e96a58e8a458b7a74f8d61998cc6c5b4efa7e651a5475a6bc782b",
+  "restored_app_sha256": "661becd301b07885d493ceb1b513d9e874b7d86e4ada8231da8657aa90983c4b",
+  "runs": [
+    {
+      "attempt": 1,
+      "file": "attempt-1.json",
+      "sha256": "7a7e1dcddb7bdbcbbbce1f6a4ad04d83de9c5bf86cab7b7295c119bed633fe61",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [
+        {
+          "sample": 1,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 1,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 2,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 2,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        }
+      ],
+      "final_error": "DECODER INIT ERROR",
+      "final_connecting": false,
+      "last_init": {
+        "stage": 10,
+        "free_dram": 3708,
+        "requested_bytes": 4096,
+        "reserve_bytes": 4096,
+        "detail": 3768,
+        "largest_dram": 2616,
+        "current_dram": 25572,
+        "current_largest": 24568
+      },
+      "dram_sampled": {
+        "min": 6436,
+        "max": 25748
+      },
+      "largest_sampled": {
+        "min": 3700,
+        "max": 23680
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 1
+      },
+      "client_ooseq_payload": {
+        "min": 0,
+        "max": 1072
+      },
+      "closing_only_ooseq_samples": [
+        {
+          "at_ms": 120459,
+          "age_ms": 1,
+          "dram": 24812,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 122506,
+          "age_ms": 1,
+          "dram": 24276,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        }
+      ],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 0,
+        "max": 2
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 2956
+      },
+      "pcm_frames_counter": {
+        "min": 0,
+        "max": 141768
+      },
+      "transport_phases": [
+        0,
+        4,
+        5
+      ],
+      "heap_valid": true
+    },
+    {
+      "attempt": 2,
+      "file": "attempt-2.json",
+      "sha256": "9252f3e63d6ef26d2ed9d14527b821680c00dccbd0ff3c92f339461180576e12",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [],
+      "final_error": "DECODER INIT ERROR",
+      "final_connecting": false,
+      "last_init": {
+        "stage": 10,
+        "free_dram": 3728,
+        "requested_bytes": 4096,
+        "reserve_bytes": 4096,
+        "detail": 3764,
+        "largest_dram": 2864,
+        "current_dram": 25716,
+        "current_largest": 24696
+      },
+      "dram_sampled": {
+        "min": 23928,
+        "max": 25900
+      },
+      "largest_sampled": {
+        "min": 22660,
+        "max": 24872
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 1
+      },
+      "client_ooseq_payload": {
+        "min": 0,
+        "max": 0
+      },
+      "closing_only_ooseq_samples": [],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 0,
+        "max": 0
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 1464
+      },
+      "pcm_frames_counter": {
+        "min": 141768,
+        "max": 141768
+      },
+      "transport_phases": [
+        0,
+        4
+      ],
+      "heap_valid": true
+    },
+    {
+      "attempt": 3,
+      "file": "attempt-3.json",
+      "sha256": "a91eead45f7e67e3c25923079bc57bbe4efef5b582a43bf8212eaa7d576ee14c",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [
+        {
+          "sample": 1,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 1,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 2,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 2,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 3,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 3,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        }
+      ],
+      "final_error": "DECODER INIT ERROR",
+      "final_connecting": false,
+      "last_init": {
+        "stage": 8,
+        "free_dram": 10448,
+        "requested_bytes": 6144,
+        "reserve_bytes": 4096,
+        "detail": 0,
+        "largest_dram": 5508,
+        "current_dram": 25588,
+        "current_largest": 24464
+      },
+      "dram_sampled": {
+        "min": 7296,
+        "max": 25924
+      },
+      "largest_sampled": {
+        "min": 4700,
+        "max": 24872
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 1
+      },
+      "client_ooseq_payload": {
+        "min": 0,
+        "max": 1072
+      },
+      "closing_only_ooseq_samples": [],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 0,
+        "max": 1
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 1464
+      },
+      "pcm_frames_counter": {
+        "min": 141768,
+        "max": 163224
+      },
+      "transport_phases": [
+        0,
+        2,
+        4
+      ],
+      "heap_valid": true
+    },
+    {
+      "attempt": 4,
+      "file": "attempt-4.json",
+      "sha256": "eda73e4f57734ed8f500a5bf40560794e9f4f595c6f0dbab669f88ac10ef243f",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [
+        {
+          "sample": 1,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 1,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 1,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 2,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 3,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 3,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 4,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 4,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 5,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 5,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 5,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 6,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 6,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 7,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 7,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        }
+      ],
+      "final_error": "",
+      "final_connecting": true,
+      "last_init": {
+        "stage": 8,
+        "free_dram": 10448,
+        "requested_bytes": 6144,
+        "reserve_bytes": 4096,
+        "detail": 0,
+        "largest_dram": 5508,
+        "current_dram": 24036,
+        "current_largest": 22752
+      },
+      "dram_sampled": {
+        "min": 6360,
+        "max": 24104
+      },
+      "largest_sampled": {
+        "min": 3708,
+        "max": 22752
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 2
+      },
+      "client_ooseq_payload": {
+        "min": 0,
+        "max": 1608
+      },
+      "closing_only_ooseq_samples": [],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 0,
+        "max": 3
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 1464
+      },
+      "pcm_frames_counter": {
+        "min": 163224,
+        "max": 463416
+      },
+      "transport_phases": [
+        4,
+        6
+      ],
+      "heap_valid": true
+    },
+    {
+      "attempt": 5,
+      "file": "attempt-5.json",
+      "sha256": "ff1019ba95ca41bff9f37396db4f654787f4e7a5a754c932228c78dd376a7fc5",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [
+        {
+          "sample": 0,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 0,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 1,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 1,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 1,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 2,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 2,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 2,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 3,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 3,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        }
+      ],
+      "final_error": "DECODER INIT ERROR",
+      "final_connecting": false,
+      "last_init": {
+        "stage": 10,
+        "free_dram": 2264,
+        "requested_bytes": 4096,
+        "reserve_bytes": 4096,
+        "detail": 2324,
+        "largest_dram": 744,
+        "current_dram": 23824,
+        "current_largest": 22680
+      },
+      "dram_sampled": {
+        "min": 6540,
+        "max": 24660
+      },
+      "largest_sampled": {
+        "min": 4944,
+        "max": 22680
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 1
+      },
+      "client_ooseq_payload": {
+        "min": 1072,
+        "max": 1072
+      },
+      "closing_only_ooseq_samples": [
+        {
+          "at_ms": 281824,
+          "age_ms": 1,
+          "dram": 24660,
+          "states": [
+            "FIN_WAIT_1",
+            "FIN_WAIT_2"
+          ],
+          "pcbs": 2,
+          "payload": 1072
+        },
+        {
+          "at_ms": 283871,
+          "age_ms": 0,
+          "dram": 24136,
+          "states": [
+            "FIN_WAIT_1",
+            "FIN_WAIT_2"
+          ],
+          "pcbs": 2,
+          "payload": 1072
+        },
+        {
+          "at_ms": 285919,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 287970,
+          "age_ms": 0,
+          "dram": 23824,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        }
+      ],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 2,
+        "max": 2
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 1464
+      },
+      "pcm_frames_counter": {
+        "min": 479112,
+        "max": 479112
+      },
+      "transport_phases": [
+        0
+      ],
+      "heap_valid": true
+    },
+    {
+      "attempt": 6,
+      "file": "attempt-6.json",
+      "sha256": "d2df392bb6d919b1c5e3dbfecd5a736eb1620ea2d032773c3fc11a9c31a2a9db",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [],
+      "final_error": "DECODER INIT ERROR",
+      "final_connecting": false,
+      "last_init": {
+        "stage": 10,
+        "free_dram": 3684,
+        "requested_bytes": 4096,
+        "reserve_bytes": 4096,
+        "detail": 3744,
+        "largest_dram": 2544,
+        "current_dram": 23960,
+        "current_largest": 22680
+      },
+      "dram_sampled": {
+        "min": 22004,
+        "max": 23960
+      },
+      "largest_sampled": {
+        "min": 20736,
+        "max": 22680
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 1
+      },
+      "client_ooseq_payload": {
+        "min": 1072,
+        "max": 1072
+      },
+      "closing_only_ooseq_samples": [
+        {
+          "at_ms": 291118,
+          "age_ms": 0,
+          "dram": 23956,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 293182,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 295231,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 297280,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 299328,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 301380,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 303425,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        }
+      ],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 2,
+        "max": 2
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 1464
+      },
+      "pcm_frames_counter": {
+        "min": 479112,
+        "max": 479112
+      },
+      "transport_phases": [
+        0
+      ],
+      "heap_valid": true
+    },
+    {
+      "attempt": 7,
+      "file": "attempt-7.json",
+      "sha256": "eb4ac72d2fb4c74a735accd08bda0a25966986ef833eee6722f5964b79a9891e",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [],
+      "final_error": "DECODER INIT ERROR",
+      "final_connecting": false,
+      "last_init": {
+        "stage": 10,
+        "free_dram": 2988,
+        "requested_bytes": 4096,
+        "reserve_bytes": 4096,
+        "detail": 3024,
+        "largest_dram": 1008,
+        "current_dram": 23960,
+        "current_largest": 22680
+      },
+      "dram_sampled": {
+        "min": 22308,
+        "max": 24132
+      },
+      "largest_sampled": {
+        "min": 21004,
+        "max": 22680
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 1
+      },
+      "client_ooseq_payload": {
+        "min": 1072,
+        "max": 1072
+      },
+      "closing_only_ooseq_samples": [
+        {
+          "at_ms": 305600,
+          "age_ms": 0,
+          "dram": 24132,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 307646,
+          "age_ms": 0,
+          "dram": 23956,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 309695,
+          "age_ms": 0,
+          "dram": 23956,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 311743,
+          "age_ms": 0,
+          "dram": 23956,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 313809,
+          "age_ms": 0,
+          "dram": 23956,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 315874,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 317922,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        }
+      ],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 2,
+        "max": 2
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 1464
+      },
+      "pcm_frames_counter": {
+        "min": 479112,
+        "max": 479112
+      },
+      "transport_phases": [
+        0,
+        4
+      ],
+      "heap_valid": true
+    },
+    {
+      "attempt": 8,
+      "file": "attempt-8.json",
+      "sha256": "27c06e51070f6069bde8914583fb973f031b2788ea4780172448c50de505663b",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [
+        {
+          "sample": 0,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 0,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 1,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        }
+      ],
+      "final_error": "DECODER INIT ERROR",
+      "final_connecting": false,
+      "last_init": {
+        "stage": 10,
+        "free_dram": 3868,
+        "requested_bytes": 4096,
+        "reserve_bytes": 4096,
+        "detail": 3928,
+        "largest_dram": 2544,
+        "current_dram": 23956,
+        "current_largest": 22680
+      },
+      "dram_sampled": {
+        "min": 22140,
+        "max": 23960
+      },
+      "largest_sampled": {
+        "min": 21184,
+        "max": 22680
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 1
+      },
+      "client_ooseq_payload": {
+        "min": 1072,
+        "max": 1608
+      },
+      "closing_only_ooseq_samples": [
+        {
+          "at_ms": 333855,
+          "age_ms": 0,
+          "dram": 23676,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 2,
+          "payload": 1608
+        },
+        {
+          "at_ms": 335910,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1",
+            "FIN_WAIT_2"
+          ],
+          "pcbs": 2,
+          "payload": 1072
+        },
+        {
+          "at_ms": 337965,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1",
+            "FIN_WAIT_2"
+          ],
+          "pcbs": 2,
+          "payload": 1072
+        },
+        {
+          "at_ms": 340021,
+          "age_ms": 1,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 342079,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 344135,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        }
+      ],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 2,
+        "max": 3
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 1464
+      },
+      "pcm_frames_counter": {
+        "min": 482640,
+        "max": 482640
+      },
+      "transport_phases": [
+        0,
+        2
+      ],
+      "heap_valid": true
+    },
+    {
+      "attempt": 9,
+      "file": "attempt-9.json",
+      "sha256": "35255d808126c3e7359e975e9130d764fc94c20cd21c9e66f99c7559a03b06f8",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [],
+      "final_error": "DECODER INIT ERROR",
+      "final_connecting": false,
+      "last_init": {
+        "stage": 10,
+        "free_dram": 2876,
+        "requested_bytes": 4096,
+        "reserve_bytes": 4096,
+        "detail": 2892,
+        "largest_dram": 1060,
+        "current_dram": 23960,
+        "current_largest": 22680
+      },
+      "dram_sampled": {
+        "min": 22404,
+        "max": 23960
+      },
+      "largest_sampled": {
+        "min": 21256,
+        "max": 22680
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 1
+      },
+      "client_ooseq_payload": {
+        "min": 1072,
+        "max": 1072
+      },
+      "closing_only_ooseq_samples": [
+        {
+          "at_ms": 346295,
+          "age_ms": 1,
+          "dram": 23952,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 348342,
+          "age_ms": 0,
+          "dram": 23956,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 350391,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 352439,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 354492,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 356549,
+          "age_ms": 1,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        },
+        {
+          "at_ms": 358603,
+          "age_ms": 0,
+          "dram": 23960,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 1,
+          "payload": 1072
+        }
+      ],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 2,
+        "max": 2
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 1464
+      },
+      "pcm_frames_counter": {
+        "min": 482640,
+        "max": 482640
+      },
+      "transport_phases": [
+        0,
+        4
+      ],
+      "heap_valid": true
+    },
+    {
+      "attempt": 10,
+      "file": "attempt-10.json",
+      "sha256": "a9b7ca50b27e701681f9cc5be927a3591f34ec73f699619e3f246ef1a58252f0",
+      "observations": 8,
+      "observable": true,
+      "start_error": null,
+      "request_errors": [
+        {
+          "sample": 0,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        },
+        {
+          "sample": 0,
+          "route": "init_error",
+          "error": "request timeout /api/native/opus-stream"
+        },
+        {
+          "sample": 1,
+          "route": "memory_error",
+          "error": "request timeout /api/native/audio?memory=1"
+        },
+        {
+          "sample": 1,
+          "route": "audio_error",
+          "error": "request timeout /api/native/audio"
+        }
+      ],
+      "final_error": "DECODER INIT ERROR",
+      "final_connecting": false,
+      "last_init": {
+        "stage": 10,
+        "free_dram": 2756,
+        "requested_bytes": 4096,
+        "reserve_bytes": 4096,
+        "detail": 2816,
+        "largest_dram": 1224,
+        "current_dram": 23148,
+        "current_largest": 22080
+      },
+      "dram_sampled": {
+        "min": 22232,
+        "max": 23852
+      },
+      "largest_sampled": {
+        "min": 21360,
+        "max": 22080
+      },
+      "tcp_age_ms": {
+        "min": 0,
+        "max": 1
+      },
+      "client_ooseq_payload": {
+        "min": 1072,
+        "max": 1608
+      },
+      "closing_only_ooseq_samples": [
+        {
+          "at_ms": 374811,
+          "age_ms": 0,
+          "dram": 23852,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 2,
+          "payload": 1608
+        },
+        {
+          "at_ms": 376860,
+          "age_ms": 1,
+          "dram": 23324,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 2,
+          "payload": 1608
+        },
+        {
+          "at_ms": 378909,
+          "age_ms": 0,
+          "dram": 23148,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 2,
+          "payload": 1608
+        },
+        {
+          "at_ms": 380957,
+          "age_ms": 0,
+          "dram": 23144,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 2,
+          "payload": 1608
+        },
+        {
+          "at_ms": 383008,
+          "age_ms": 0,
+          "dram": 23144,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 2,
+          "payload": 1608
+        },
+        {
+          "at_ms": 385070,
+          "age_ms": 1,
+          "dram": 23148,
+          "states": [
+            "FIN_WAIT_1"
+          ],
+          "pcbs": 2,
+          "payload": 1608
+        }
+      ],
+      "sdk_rx_failures": {
+        "rx_custom_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_nomem": {
+          "min": 0,
+          "max": 0
+        },
+        "rx_enqueue_full": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_transform_fail": {
+          "min": 0,
+          "max": 0
+        },
+        "tx_driver_fail": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "rx_custom_live": {
+        "min": 3,
+        "max": 3
+      },
+      "audio_stack_free": {
+        "min": 1464,
+        "max": 1464
+      },
+      "pcm_frames_counter": {
+        "min": 486168,
+        "max": 486168
+      },
+      "transport_phases": [
+        0
+      ],
+      "heap_valid": true
+    }
+  ],
+  "totals": {
+    "requests_failed": 42,
+    "closing_only_ooseq_observations": 39,
+    "last_init_stages": {
+      "8": 2,
+      "10": 8
+    }
+  },
+  "limitations": [
+    "Snapshots are sequential, not simultaneous. TCP cache age is explicit.",
+    "OOO counters are payload, not allocated pbuf RAM; netconn mailboxes and driver buffers are not included.",
+    "Non-port80 PCBs are grouped as client, not identified individually by connection or radio URL.",
+    "Latched init diagnostics can belong to an internal reconnect; do not count them as every init attempt.",
+    "Stopped neutral DMA underruns are not active-audio gaps. PCM counters do not prove continuity.",
+    "No A/B speed claim or proof of the first timeout cause follows from this experiment."
+  ],
+  "restored": {
+    "status": {
+      "firmware": "esp8266-native",
+      "port": 80,
+      "websocket": "/ws",
+      "network": 1,
+      "rssi": -58,
+      "playing": false,
+      "station": "Radio Caprice - Broken Beat / Bruk [1]",
+      "codec": "",
+      "bitrate": 0,
+      "connecting": false,
+      "error": "",
+      "free_heap": 27628,
+      "min_heap": 24748,
+      "web_stack_free": 2324,
+      "app_address": 1114112
+    },
+    "playlist_sha256": "79b401c4d433e39ab1134a9d0776f62eea888eedffaa79c3a35851ae2fac5185",
+    "websocket_messages": 6
+  }
+}

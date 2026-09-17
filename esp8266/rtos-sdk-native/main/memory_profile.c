@@ -11,12 +11,25 @@
 #include "freertos/task.h"
 #include "native_state.h"
 #include <limits.h>
+#include <stdio.h>
 #include "lwip/tcpip.h"
 #include "lwip/priv/tcp_priv.h"
+#include "memory_tcp_snapshot.h"
 
 static volatile bool s_tcp_pending;
+static memory_tcp_snapshot_t s_tcp_snapshot;
+static uint32_t s_tcp_samples, s_tcp_request_failures;
+static const char s_tcp_log_request;
 static void tcp_memory_sample(void *context) {
-    (void)context;
+    memory_tcp_snapshot_t snapshot;
+    memory_tcp_capture(&snapshot, tcp_active_pcbs, tcp_tw_pcbs,
+                       xTaskGetTickCount() * portTICK_PERIOD_MS);
+    taskENTER_CRITICAL();
+    s_tcp_snapshot = snapshot;
+    ++s_tcp_samples;
+    s_tcp_pending = false;
+    taskEXIT_CRITICAL();
+    if (!context) return; /* HTTP-triggered samples never print in TCP/IP. */
     unsigned active = 0, timewait = 0;
     for (struct tcp_pcb *p = tcp_active_pcbs; p; p = p->next) {
         unsigned queued = 0;
@@ -31,7 +44,19 @@ static void tcp_memory_sample(void *context) {
     }
     for (struct tcp_pcb *p = tcp_tw_pcbs; p; p = p->next) ++timewait;
     ESP_LOGE("memory", "tcp active=%u timewait=%u", active, timewait);
-    s_tcp_pending = false;
+}
+
+static void request_tcp_sample(void *context) {
+    taskENTER_CRITICAL();
+    bool request = !s_tcp_pending;
+    if (request) s_tcp_pending = true;
+    taskEXIT_CRITICAL();
+    if (request && tcpip_try_callback(tcp_memory_sample, context) != ERR_OK) {
+        taskENTER_CRITICAL();
+        ++s_tcp_request_failures;
+        s_tcp_pending = false; /* A later request may retry; no busy loop. */
+        taskEXIT_CRITICAL();
+    }
 }
 
 #ifdef CONFIG_HEAP_TRACING
@@ -102,6 +127,39 @@ void memory_profile_register(enum memory_profile_task task) {
         s_tasks[task] = xTaskGetCurrentTaskHandle();
 }
 
+int memory_profile_json(char *output, size_t capacity) {
+    if (!output || !capacity) return -1;
+    request_tcp_sample(NULL);
+    heap_sample_t heap = sample_heap();
+    memory_tcp_snapshot_t tcp;
+    uint32_t samples, failures;
+    bool pending;
+    taskENTER_CRITICAL();
+    tcp = s_tcp_snapshot;
+    samples = s_tcp_samples;
+    failures = s_tcp_request_failures;
+    pending = s_tcp_pending;
+    taskEXIT_CRITICAL();
+    uint32_t now = xTaskGetTickCount() * portTICK_PERIOD_MS;
+    int size = snprintf(output, capacity,
+        "{\"current_dram\":%u,\"largest_dram\":%u,\"allocator_min_dram\":%u,"
+        "\"free_blocks\":%u,\"heap_valid\":%s,\"heap_ms\":%u,"
+        "\"tcp_valid\":%s,\"tcp_samples\":%u,\"tcp_age_ms\":%u,"
+        "\"tcp_pending\":%s,\"tcp_queue_failures\":%u,\"tcp_timewait\":%u,"
+        "\"web\":{\"pcbs\":%u,\"states\":%u,\"window\":%u,\"ooseq\":%u,"
+        "\"refused\":%u,\"unsent\":%u,\"unacked\":%u},"
+        "\"client\":{\"pcbs\":%u,\"states\":%u,\"window\":%u,\"ooseq\":%u,"
+        "\"refused\":%u,\"unsent\":%u,\"unacked\":%u}}",
+        heap.free, heap.largest, heap.low, heap.blocks, heap.valid ? "true" : "false", (unsigned)now,
+        samples ? "true" : "false", (unsigned)samples, (unsigned)(samples ? now-tcp.sampled_ms : 0),
+        pending ? "true" : "false", (unsigned)failures, (unsigned)tcp.timewait,
+        (unsigned)tcp.web.pcbs, (unsigned)tcp.web.states, (unsigned)tcp.web.window,
+        (unsigned)tcp.web.ooseq, (unsigned)tcp.web.refused, (unsigned)tcp.web.unsent, (unsigned)tcp.web.unacked,
+        (unsigned)tcp.client.pcbs, (unsigned)tcp.client.states, (unsigned)tcp.client.window,
+        (unsigned)tcp.client.ooseq, (unsigned)tcp.client.refused, (unsigned)tcp.client.unsent, (unsigned)tcp.client.unacked);
+    return size >= 0 && (size_t)size < capacity ? size : -1;
+}
+
 static unsigned stack_free(enum memory_profile_task task) {
     return s_tasks[task] ? uxTaskGetStackHighWaterMark(s_tasks[task]) : 0;
 }
@@ -136,9 +194,5 @@ void memory_profile_poll(void) {
     s_low_free = s_low_largest = UINT_MAX;
     /* Inspect PCBs only on the TCP/IP owner task; no unsafe cross-task walk.
      * This entire module is compiled out of ordinary production builds. */
-    if (!s_tcp_pending) {
-        s_tcp_pending = true;
-        if (tcpip_try_callback(tcp_memory_sample, NULL) != ERR_OK)
-            s_tcp_pending = false;
-    }
+    request_tcp_sample((void *)&s_tcp_log_request);
 }

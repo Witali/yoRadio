@@ -38,8 +38,9 @@ Normalized source snapshots and experimental lifecycle tests are archived.
   state/scratch/reserve failure snapshots, heap and continuity evidence.
 - [x] Reject allocation-order-only changes as a live-radio fix; restore
   original runtime code and re-run19 lifecycle/reconnect tests (all PASS).
-- [ ] Before further live changes, measure TCP/pbuf and decoder live memory
-  together and recover real DRAM, keeping the4096-B reserve and full scratch.
+- [x] Measure TCP/pbuf and decoder live memory together: ten diagnostic
+  starts archived in [live TCP memory](ESP8266_OPUS_LIVE_TCP_MEMORY.md).
+- [ ] Recover real DRAM, keeping the4096-B reserve and full scratch.
   Do not blindly repeat ordering changes or reduce guards to hide the error.
 - [ ] Reintegrate the accepted ASM chain with any future useful live fix
   without losing its fixed-layout patches. C tests do not qualify ASM timing.

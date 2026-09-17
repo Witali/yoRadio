@@ -1,0 +1,73 @@
+TAP version 13
+# Subtest: memory diagnostics are compiled out of the ordinary firmware
+ok 1 - memory diagnostics are compiled out of the ordinary firmware
+  ---
+  duration_ms: 1.3368
+  type: 'test'
+  ...
+# Subtest: read-only heap walk uses the SDK lock, flags and allocation alignment
+ok 2 - read-only heap walk uses the SDK lock, flags and allocation alignment
+  ---
+  duration_ms: 0.4374
+  type: 'test'
+  ...
+# Subtest: reports separate byte-addressable DRAM, IRAM and sampled minima
+ok 3 - reports separate byte-addressable DRAM, IRAM and sampled minima
+  ---
+  duration_ms: 1.3742
+  type: 'test'
+  ...
+# Subtest: physical workload disconnect errors settle once without recursive close
+ok 4 - physical workload disconnect errors settle once without recursive close
+  ---
+  duration_ms: 16.8386
+  type: 'test'
+  ...
+# Subtest: actual sampler and HTTP formatter handle queue lifetime without blocking or mutation
+not ok 5 - actual sampler and HTTP formatter handle queue lifetime without blocking or mutation
+  ---
+  duration_ms: 3833.5503
+  type: 'test'
+  location: 'C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tests\\esp8266-memory-tcp-http.test.js:10:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    
+    /mnt/c/Work/yoRadio/.worktree/esp8266-opus-asm/.build/memory-tcp-http-test/functions.inc: In function ‘tcp_memory_sample’:
+    /mnt/c/Work/yoRadio/.worktree/esp8266-opus-asm/.build/memory-tcp-http-test/functions.inc:23:34: error: ‘struct tcp_pcb’ has no member named ‘remote_port’
+       23 |                  p->local_port, p->remote_port, p->state, queued,
+          |                                  ^~
+    /mnt/c/Work/yoRadio/.worktree/esp8266-opus-asm/.build/memory-tcp-http-test/functions.inc:22:9: note: in expansion of macro ‘ESP_LOGE’
+       22 |         ESP_LOGE("memory", "tcp local=%u remote=%u state=%u ooseq=%u refused=%u wnd=%u",
+          |         ^~~~~~~~
+    
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    run (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tests\esp8266-memory-tcp-http.test.js:8:9)
+    TestContext.<anonymous> (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tests\esp8266-memory-tcp-http.test.js:19:3)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: TCP owner snapshot is diagnostic-only and uses shared HTTP output storage
+ok 6 - TCP owner snapshot is diagnostic-only and uses shared HTTP output storage
+  ---
+  duration_ms: 1.9178
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 5
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3916.2978
