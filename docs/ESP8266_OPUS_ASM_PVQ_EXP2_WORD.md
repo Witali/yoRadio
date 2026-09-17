@@ -4,6 +4,9 @@
 80.019979% CPU192, not over the unmeasured logN candidate. This is an
 experiment, not a production/default change or evidence of reaching78%.
 
+2026-09-17: physical30 A/B/A completed. Helper rejected:80.328125% CPU192,
+slower than both controls. The independent direct exp2-table32 is preferable.
+
 ## Change and proof
 
 Replace only `0x4024dc76: l16si a3,a3,0` in quant_partition with a fixed J.
@@ -33,8 +36,8 @@ stereo theta and other inlined clones remain unchanged. C fallback preserved.
   SAR,112-byte frame and all outside ELF bytes are unchanged.
 - [x] Four focused positive/negative tests PASS in110.99s; complete related
   suite178 tests PASS/0fail/0skip in487.12s. Full logs retained with the image.
-- [ ] At least10 physical control/candidate runs, preferably10 A/10 B/10 A2.
-- [ ] Record medians, maxima, all failures and free RAM/stack; accept only a
+- [x] At least10 physical control/candidate runs:10 A/10 B/10 A2.
+- [x] Record medians, maxima, all failures and free RAM/stack; accept only a
   measured high-bitrate gain without increased RAM. Check80% and78% separately.
 - [ ] Qualify I2S PDM>=20s and WebUI separately before any production promotion.
 
@@ -80,3 +83,34 @@ board-initial/recheck/final-unavailable.json. The ARP entry was Unreachable
 with no resolved MAC. No physical test was counted as passed or replaced by
 host timing. Physical speed, runtime free heap/stack and live output remain
 unmeasured for this candidate; no production promotion has occurred.
+
+## Physical results2026-09-17: rejected
+
+The unavailability paragraphs above are historical. All30 raw attempts and
+three app-only OTA operations completed; all PCM hashes match the fixtures.
+Control A reuses the actual last10 control runs from exp2-table32. Across
+logN/table32/exp2-helper there are70 unique physical runs, not90; the two
+shared boundaries are checked by the evidence regression test.
+
+| kbps | A CPU% | B CPU% | A2 CPU% |
+| ---: | ---: | ---: | ---: |
+| 12 | 23.098063 | 23.084354 | 23.087812 |
+| 24 | 54.128083 | 54.123771 | 54.111813 |
+| 64 | 62.623646 | 62.944292 | 62.608833 |
+| 128 | 72.011875 | 72.398792 | 72.033083 |
+| 192 | 80.044312 | 80.328125 | 80.059792 |
+
+Relative slowdown at192:0.355/0.335%; at128:0.537/0.508%.
+Both selection checks reject the helper; neither80% nor78% raw gate passes.
+Choose the independently measured direct table32 (79.626521% CPU192),
+not this helper. Do not combine alternatives that replace the same load.
+
+Static RAM/stack delta0, app903216B. Observed minimum DRAM A/B/A2:
+3628/7668/8164B; at192:9800/9624/9800B. Stack watermark1660B in all groups.
+Maximum192 calls20402/20457/20785us. No HTTP observation errors.
+Candidate mono12 run2 task>wall by468us is preserved, not subtracted.
+
+All30 run JSON/logs, OTA reports and comparison.json are next to app.bin.
+Fresh local related tests:18 PASS/0skip (118.99s). The board evidence test
+additionally recomputes all three experiments and checks shared controls.
+This completes the independent helper comparison, not live playback QA.

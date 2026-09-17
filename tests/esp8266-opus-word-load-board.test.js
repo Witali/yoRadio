@@ -9,7 +9,7 @@ const {validateRun}=require('../tools/esp8266_opus_asm/report_small_div_tail.cjs
 const {selectHighBitrate}=require('../tools/esp8266_opus_asm/selection.cjs');
 const {evaluateRawCpuTarget}=require('../tools/esp8266_opus_asm/cpu_target.cjs');
 const fixtures=read('firmware/development/esp8266-opus-asm-library/fixtures/manifest.json');
-for(const kind of ['logn-word','exp2-table32']) test(kind+' physical A/B/A keeps all30 attempts, exact PCM, RAM and CPU gates',()=>{
+for(const kind of ['logn-word','exp2-table32','exp2-word']) test(kind+' physical A/B/A keeps all30 attempts, exact PCM, RAM and CPU gates',()=>{
   const dir='firmware/development/esp8266-opus-pvq-'+kind+'-candidate-v1';
   const report=read(dir+'/comparison.json'),groups={};
   assert.equal(report.pair.proof.static_ram_delta,0);
@@ -37,7 +37,9 @@ for(const kind of ['logn-word','exp2-table32']) test(kind+' physical A/B/A keeps
 test('adjacent experiments share one physical control, not an extra ten runs',()=>{
   const a=read('firmware/development/esp8266-opus-pvq-logn-word-candidate-v1/comparison.json');
   const b=read('firmware/development/esp8266-opus-pvq-exp2-table32-candidate-v1/comparison.json');
+  const c=read('firmware/development/esp8266-opus-pvq-exp2-word-candidate-v1/comparison.json');
   assert.deepEqual(a.inputs.after.map(r=>r.sha256),b.inputs.before.map(r=>r.sha256));
-  const hashes=[a,b].flatMap(r=>Object.values(r.inputs).flat().map(x=>x.sha256));
-  assert.equal(hashes.length,60);assert.equal(new Set(hashes).size,50);
+  assert.deepEqual(b.inputs.after.map(r=>r.sha256),c.inputs.before.map(r=>r.sha256));
+  const hashes=[a,b,c].flatMap(r=>Object.values(r.inputs).flat().map(x=>x.sha256));
+  assert.equal(hashes.length,90);assert.equal(new Set(hashes).size,70);
 });
