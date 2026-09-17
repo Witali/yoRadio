@@ -100,4 +100,8 @@ test("native startup buffers before decoding and does not announce Playing until
   assert.match(loop, /stream_input_refill[\s\S]*stream_prefill_ready[\s\S]*helix_codec_process_one/);
   assert.match(loop, /output.decoder_sample_rate[\s\S]*native_state_set_audio\(true, false, NULL\)/);
   assert.match(loop, /else if \(ended\)[\s\S]*feed = end_error/);
+  // A full user buffer is not an empty socket. Do not impose select's TCP/IP
+  // round trip when the incremental Ogg parser consumes a complete refill.
+  assert.match(loop, /else if \(filled == STREAM_FILL_AGAIN &&\s*!stream_wait_after_empty\(&stream, command.generation, wait_ms\)\)/);
+  assert.doesNotMatch(loop, /else if \(!stream_wait_after_empty\(/);
 });

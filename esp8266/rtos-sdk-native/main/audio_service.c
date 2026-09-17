@@ -1377,16 +1377,21 @@ static void audio_task(void *argument) {
             } else if (helix_codec_buffered(codec) == helix_codec_active_input_capacity(codec)) {
                 feed = -20; /* No progress is possible in a full input queue. */
                 break;
-            } else if (!stream_wait_after_empty(&stream, command.generation, wait_ms)) {
+            } else if (filled == STREAM_FILL_AGAIN &&
+                       !stream_wait_after_empty(&stream, command.generation, wait_ms)) {
                 audio_transport_latch(command.generation,
                     errno == ETIMEDOUT ? STREAM_FILL_TIMEOUT : STREAM_FILL_ERROR,
                     errno, helix_codec_buffered(codec));
                 ended = true;
                 end_error = errno == ETIMEDOUT ? 0 : -21;
             }
-            /* Distinguish voluntary pacing after a decoded packet from
+            /* FULL/YIELD means recv has not reached EAGAIN. A parser needing
+             * more input must refill immediately, not add a polling sleep
+             * (or a select round trip) while DMA runs out of committed PCM.
+             * Cancellation and the refill work/time budget remain bounded.
+             * Distinguish voluntary pacing after a decoded packet from
              * waiting because the incremental parser needs more bytes.
-             * Diagnostic only: the waits and scheduling remain unchanged. */
+             * These counters are diagnostic only. */
             AUDIO_STAGE_END(decoded == 0 ? AUDIO_STAGE_WAIT : AUDIO_STAGE_INPUT_WAIT,
                             wait_stage);
             int64_t now = esp_timer_get_time();

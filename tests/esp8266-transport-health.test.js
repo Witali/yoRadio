@@ -20,8 +20,8 @@ test('transport health latches terminal refill across reconnect and has no produ
     .replace('/* TERMINAL_FILL */', section('            if (filled == STREAM_FILL_EOF || filled == STREAM_FILL_TIMEOUT ||', '            if (prefill) {'));
   // Call placement is actual source, not a second state machine in the test.
   assert.match(audio, /audio_transport_phase\(AUDIO_TRANSPORT_DNS\);\s+int dns_error = getaddrinfo/);
-  assert.match(audio, /audio_transport_phase\(AUDIO_TRANSPORT_CLOSE\);\s+int stream_closed = close\(stream.socket\);\s+\(void\)stream_closed;\s+audio_transport_phase\(AUDIO_TRANSPORT_IDLE\)/);
-  assert.match(audio, /audio_transport_phase\(AUDIO_TRANSPORT_DECODE\);\s+int decoded = helix_codec_process_one[\s\S]*?audio_transport_phase\(AUDIO_TRANSPORT_REFILL\)/);
+  assert.match(audio, /audio_transport_phase\(AUDIO_TRANSPORT_CLOSE\);\s+(?:#if YORADIO_ESP8266_OPUS_PCM_QUEUE[\s\S]*?#endif\s+)?int stream_closed = close\(stream.socket\);\s+\(void\)stream_closed;\s+audio_transport_phase\(AUDIO_TRANSPORT_IDLE\)/);
+  assert.match(audio, /audio_transport_phase\(AUDIO_TRANSPORT_DECODE\);\s+AUDIO_STAGE_BEGIN\(decode_stage\);\s+int decoded = helix_codec_process_one[\s\S]*?audio_transport_phase\(AUDIO_TRANSPORT_REFILL\)/);
   assert.match(audio, /release_codec\(&codec, &codec_kind, "decoder init error"\);\s+audio_transport_phase\(AUDIO_TRANSPORT_IDLE\)/);
   const windows = process.platform === 'win32';
   const run = (program, args) => spawnSync(windows ? 'wsl.exe' : program,

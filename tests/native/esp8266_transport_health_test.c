@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 typedef uint32_t TickType_t;
 static unsigned critical_depth;
 #define taskENTER_CRITICAL() (++critical_depth)
@@ -14,6 +15,13 @@ static unsigned s_audio_task = 1;
 static unsigned uxTaskGetStackHighWaterMark(unsigned task) {
     assert(task == 1 && critical_depth == 0); return 1648;
 }
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
+static int64_t esp_timer_get_time(void) { return 1000000; }
+typedef struct { uint32_t queue_empty_events; } native_audio_output_spi_stats_t;
+static void native_audio_output_get_spi_stats(native_audio_output_spi_stats_t *out) {
+    out->queue_empty_events = 0;
+}
+#endif
 /* HEALTH */
 /* ADVANCE */
 /* FILL_ENUM */
@@ -22,6 +30,8 @@ static void terminal_fill(int filled, bool *was_ended, unsigned bytes) {
     bool ended = *was_ended;
     int end_error = 0;
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
+    AUDIO_STAGE_BEGIN(mark);
+    AUDIO_STAGE_END(AUDIO_STAGE_READ, mark);
     const struct { uint32_t generation; } command = {s_generation};
     unsigned codec = bytes;
 #else
