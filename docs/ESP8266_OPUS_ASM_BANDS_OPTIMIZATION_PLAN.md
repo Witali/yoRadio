@@ -1279,11 +1279,14 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
 
 ### Следующее семейство после qn: eBands, а не массовая замена L16
 
-- [ ] Сделать host census обращений к неизменной eBands в `bands.c`,
+- [x] Сделать host census обращений к неизменной eBands в `bands.c`,
   `celt_decoder.c`, `rate.c`, отдельно от PCM/стека и динамических массивов.
   В accepted linked `quant_all_bands` статически114 узких load-инструкций,
   но это **не114 чтений за кадр и не114 flash-чтений**. Источник каждого
   указателя и динамическую частоту ещё нужно доказать.
+  [Census завершён](ESP8266_OPUS_EBANDS_PROFILE.md):10 exact PCM потоков,
+  hottest linked pair в clt_compute_allocation4200 раз/с на192. Это
+  уточняет приоритет: сначала эта пара в rate.c, не весь quant_all_bands.
 - [ ] Для подтверждённых соседних eBands[i]/eBands[i+1] проверить одно
   aligned-word чтение с извлечением пары; при переходе границы слова
   использовать корректный второй load. Сохранить signedness, последний
