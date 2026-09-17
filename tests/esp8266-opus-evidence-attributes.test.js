@@ -14,7 +14,7 @@ test('PVQ logs retain raw line endings and JSON normalization is byte-reproducib
  assert.equal(hash('{"value":1}\n'),hash('{"value":1}\r\n'));
 });
 test('new memory and qn JSON evidence keeps LF and native logs retain their bytes',()=>{
- for(const dir of['esp8266-opus-live-memory-diag-v1/evidence/runs','esp8266-opus-pvq-qn-table-candidate-v1/qualified/before','esp8266-opus-ebands-pair-candidate-v1/before']){
+ for(const dir of['esp8266-opus-live-memory-diag-v1/evidence/runs','esp8266-opus-pvq-qn-table-candidate-v1/qualified/before','esp8266-opus-ebands-pair-candidate-v1/before','esp8266-opus-ebands-more-candidate-v1/before']){
   const prefix='firmware/development/'+dir;
   const json=execFileSync('git',['check-attr','text','eol','--',prefix+'/run1.json'],{cwd:root,encoding:'utf8'});
   assert.match(json,/: text: set/);assert.match(json,/: eol: lf/);
