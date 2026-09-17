@@ -3,6 +3,22 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-17: ESP8266 Opus byte-phase helper (not accepted)
+
+- `development/esp8266-opus-pvq-byte-phase-{control,candidate}-v1/app.bin`,
+  903216B, CPU160/runtimeQIO40, frozen accepted exp2-table32 parent.
+- Six a10 calls use a seven-instruction phase leaf instead of nine SAR
+  instructions; exact linked proof, no RAM/IRAM/frame growth, C unchanged.
+- All30 physical A/B/A attempts retained with exact PCM: CPU192
+  79.618646 /80.282333 /79.643604%, CPU12871.839771 /72.508813 /71.860083%.
+  Both speed gates fail: candidate rejected; default and accepted baseline
+  unchanged.78% is not reached and continuous I2S is not qualified.
+- Free DRAM minima8168 /8032 /8352B, free stack1660B. No decoder/HTTP
+  observation errors; candidate mono12 task>wall712us retained unchanged.
+  Final14 regressions PASS/0skip. Prior diagnostic C-radio restored OTA;
+  HTTP200107.34ms/WS/current167/stopped/settings/playlist verified.
+  [Full result and evidence](../docs/ESP8266_OPUS_ASM_PVQ_BYTE_PHASE.md).
+
 ## Development - 2026-09-15: ESP8266 Opus cached PVQ endpoint costs
 
 - development/esp8266-opus-endpoint-cost-{control,candidate}-v1/app.bin,

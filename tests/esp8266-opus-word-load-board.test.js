@@ -9,7 +9,7 @@ const {validateRun}=require('../tools/esp8266_opus_asm/report_small_div_tail.cjs
 const {selectHighBitrate}=require('../tools/esp8266_opus_asm/selection.cjs');
 const {evaluateRawCpuTarget}=require('../tools/esp8266_opus_asm/cpu_target.cjs');
 const fixtures=read('firmware/development/esp8266-opus-asm-library/fixtures/manifest.json');
-for(const kind of ['logn-word','exp2-table32','exp2-word']) test(kind+' physical A/B/A keeps all30 attempts, exact PCM, RAM and CPU gates',()=>{
+for(const kind of ['logn-word','exp2-table32','exp2-word','byte-phase']) test(kind+' physical A/B/A keeps all30 attempts, exact PCM, RAM and CPU gates',()=>{
   const dir='firmware/development/esp8266-opus-pvq-'+kind+'-candidate-v1';
   const report=read(dir+'/comparison.json'),groups={};
   assert.equal(report.pair.proof.static_ram_delta,0);
@@ -42,4 +42,28 @@ test('adjacent experiments share one physical control, not an extra ten runs',()
   assert.deepEqual(b.inputs.after.map(r=>r.sha256),c.inputs.before.map(r=>r.sha256));
   const hashes=[a,b,c].flatMap(r=>Object.values(r.inputs).flat().map(x=>x.sha256));
   assert.equal(hashes.length,90);assert.equal(new Set(hashes).size,70);
+});
+
+test('byte-phase experiment restores the prior radio app, settings and playlist',()=>{
+  const dir='firmware/development/esp8266-opus-pvq-byte-phase-candidate-v1';
+  const before=read(dir+'/initial.json'),after=read(dir+'/restored.json');
+  const ota=read(dir+'/ota-restore.json'),http=read(dir+'/restored-root.json');
+  const ordinary='firmware/development/esp8266-opus-live512-idle3s-20260913';
+  const manifest=read(ordinary+'/manifest.json');
+  assert.equal(manifest.opus_benchmark,false);
+  assert.equal(ota.pass,true);assert.equal(ota.sha256,hash(ordinary+'/app.bin'));
+  assert.equal(after.status.app_address,ota.target);
+  assert.equal(after.status.playing,false);assert.equal(after.status.error,'');
+  assert.equal(after.status.station,before.status.station);
+  assert.equal(after.playlist.wire_sha256,before.playlist.wire_sha256);
+  for(const r of [before,after]){
+    assert.ok(r.index.messages.some(m=>m.current===167));
+    const values=r.index.messages.flatMap(m=>m.payload||[]);
+    assert.ok(values.some(v=>v.id==='volume'&&v.value===100));
+    assert.ok(values.some(v=>v.id==='balance'&&v.value===0));
+  }
+  assert.equal(http.http,200);assert.equal(http.encoding,'gzip');
+  assert.equal(http.bytes,27249);
+  assert.equal(http.sha256,'7fdfd886707344338e824fe30430ee327482d627c153e322f7cc2fa321989a3f');
+  assert.ok(Number.isFinite(http.ms)&&http.ms>0); // One stopped sample, not a live SLA.
 });
