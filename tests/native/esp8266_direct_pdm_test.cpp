@@ -411,6 +411,11 @@ static void explicit_batch_publication() {
 }
 
 int main() {
+#if TEST_PDM32_CLOCK
+    /* Exhaustive domain, including both extreme PCM transitions. */
+    for (uint32_t n = 0; n <= 65535U * 624U; ++n)
+        assert(pdm_clock_div625(n) == n / 625U);
+#endif
     explicit_batch_publication();
     balance_regression();
     prefix_handoff();

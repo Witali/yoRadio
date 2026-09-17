@@ -24,6 +24,14 @@ test('PDM32 batch CMake option is OFF by default and rejects non-standard backen
   fs.writeFileSync(script, 'cmake_minimum_required(VERSION 3.13)\n' + block);
   const run = options => spawnSync(command, [...options, '-P', script], {encoding:'utf8'});
   assert.equal(run([]).status, 0, 'default must allow ordinary non-PDM32 builds');
+  assert.match(block, /option\(YORADIO_ESP8266_PDM32_CLOCK_COMPENSATE\s+"[^"]+" OFF\)/);
+  for (const diag of [false,true]) for (const pdm of [false,true]) for (const os32 of [false,true]) {
+    const result = run(['-DYORADIO_ESP8266_PDM32_CLOCK_COMPENSATE=ON',
+      '-DYORADIO_ESP8266_DIAGNOSTIC='+(diag?'ON':'OFF'),
+      '-DCONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM='+(pdm?'ON':'OFF'),
+      '-DCONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32='+(os32?'ON':'OFF')]);
+    assert.equal(result.status===0,diag&&pdm&&os32,result.stdout+result.stderr);
+  }
   for (const words of [64,128,192,256,512,768,1024]) for(const diag of [false,true])
   for(const queue of [false,true])
   for(const opus of [false,true]) for(const pdm of [false,true]) {

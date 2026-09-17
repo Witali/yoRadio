@@ -10,7 +10,10 @@ word per48k PCM sample slowly drains a live input reservoir: approximately
 `-Diagnostic -Pdm32ClockCompensate` tests a causal linear resampler for the
 48k input path:624 input samples become625 output samples. One previous PCM
 sample, phase and priming flag cost8 static bytes. No allocation, floating
-point or decoder changes. Constant division625 is strength-reduced by GCC.
+point or decoder changes. GCC originally emitted __divsi3 even for constant
+625. The follow-up uses an exact bounded reciprocal:ceil(2^26/625), two
+15-bit-split32-bit products and a single quotient correction. An exhaustive
+host test checks every numerator0..40893840 against ordinary division.
 The largest signed product is65535*624, safely within int32. First sample
 is held rather than interpolated from an artificial zero. Stop/init/rate
 changes reset interpolation history. Other rates retain the existing path;
