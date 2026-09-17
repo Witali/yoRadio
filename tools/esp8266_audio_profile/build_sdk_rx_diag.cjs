@@ -55,6 +55,12 @@ const specs = [
     patches: [
       include('#include "esp_aio.h"\n'),
       {
+        anchor: 'static int low_level_send_cb(esp_aio_t* aio)\n{\n    struct pbuf* pbuf = aio->arg;\n',
+        replacement: 'static int low_level_send_cb(esp_aio_t* aio)\n{\n    struct pbuf* pbuf = aio->arg;\n' +
+          call('    ', 'const wifi_tx_status_t *diag_status = (const wifi_tx_status_t *)&aio->ret;') +
+          call('    ', 'sdk_rx_diag_tx_complete(diag_status->wifi_tx_result == TX_STATUS_SUCCESS, diag_status->wifi_tx_src, diag_status->wifi_tx_lrc);'),
+      },
+      {
         anchor: '    if (!p) {\n        LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output: lack memory\\n"));\n',
         replacement: '    if (!p) {\n' + call('        ', 'sdk_rx_diag_count(SDK_RX_DIAG_TX_TRANSFORM_FAIL);') +
           '        LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output: lack memory\\n"));\n',
@@ -116,7 +122,7 @@ function generate(sdkDirectory, outputDirectory) {
       throw new Error(`Overlay output is not an unlinked regular file: ${filename}`);
   }
   const manifest = {
-    format: 1, diagnostic: 'YORADIO_ESP8266_SDK_RX_DIAG', counterBytes: 32,
+    format: 2, diagnostic: 'YORADIO_ESP8266_SDK_RX_DIAG', counterBytes: 48,
     normalization: 'CRLF to LF only',
     files: prepared.map(({spec, text, originalSha256}) => ({
       source: spec.source, output: spec.output, component: spec.component,

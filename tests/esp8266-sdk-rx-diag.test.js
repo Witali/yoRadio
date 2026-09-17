@@ -36,7 +36,7 @@ sdkTest('SDK overlay is pinned, deterministic, LF/CRLF tolerant and does not mod
   const originalHashes = overlay.specs.map(spec => overlay.sha256(fs.readFileSync(path.join(sdk, spec.source))));
   const manifest = overlay.generate(copied, out);
   const manifestText = fs.readFileSync(path.join(out, 'manifest.json'), 'utf8');
-  assert.equal(manifest.counterBytes, 32);
+  assert.equal(manifest.counterBytes, 48);
   assert.equal(manifest.files.length, 3);
   assert.deepEqual(fs.readdirSync(out).sort(), ['manifest.json', ...overlay.specs.map(s => s.output)].sort());
   overlay.generate(copied, out);
@@ -101,7 +101,7 @@ function unixRun(command, args, options = {}) {
 }
 function success(result) { assert.equal(result.status, 0, result.stdout + '\n' + result.stderr); }
 
-test('real counter module and generated SDK flow: ASan/UBSan, concurrent snapshots, ownership and 32-byte state', t => {
+test('real counter module and generated SDK flow: ASan/UBSan, concurrent snapshots, ownership and 48-byte state', t => {
   const dir = temporary(t), inc = path.join(dir, 'sdk_fragments.inc');
   if (haveSdk) {
     const out = path.join(dir, 'overlay');
@@ -117,6 +117,7 @@ test('real counter module and generated SDK flow: ASan/UBSan, concurrent snapsho
       extract(adapter, 'static int tcpip_adapter_recv_cb(') + '\n' +
       extract(tcpip, 'err_t\ntcpip_inpkt(') + '\n' +
       extract(wlan, 'static inline struct pbuf* ethernetif_transform_pbuf(') + '\n' +
+      extract(wlan, 'static int low_level_send_cb(esp_aio_t* aio)\n{') + '\n' +
       extract(wlan, 'static int8_t low_level_output('));
   }
   const common = ['-std=c11', '-Wall', '-Wextra', '-Werror', '-Wno-pointer-to-int-cast', '-O1',
@@ -135,7 +136,7 @@ test('real counter module and generated SDK flow: ASan/UBSan, concurrent snapsho
     '-I' + unix(fixture), '-c', unix(path.join(main, 'sdk_rx_diag.c')), '-o', unix(plain)]));
   const symbols = unixRun('nm', ['-S', unix(plain)]);
   success(symbols);
-  assert.match(symbols.stdout, /0000000000000020 b s_sdk_rx_diag/);
+  assert.match(symbols.stdout, /0000000000000030 b s_sdk_rx_diag/);
   const allocated = symbols.stdout.split('\n').filter(line => / [bBdD] /.test(line));
   assert.equal(allocated.length, 1, symbols.stdout);
   assert.doesNotMatch(symbols.stdout, / U (malloc|calloc|free|printf|xTaskCreate|sys_arch_protect)/);
@@ -233,6 +234,20 @@ test('production defaults omit diagnostic source and module has no allocation, l
   assert.match(cmake, /option\(YORADIO_ESP8266_SDK_RX_DIAG\s+"[^"]+" OFF\)/);
   assert.match(mainCmake, /if\(YORADIO_ESP8266_SDK_RX_DIAG\)[\s\S]+?list\(APPEND YORADIO_SOURCES "sdk_rx_diag\.c"\)/);
   assert.doesNotMatch(module, /\b(malloc|calloc|free|printf|xTaskCreate|sys_arch_protect|SYS_ARCH_PROTECT)\s*\(/);
-  assert.equal((module.match(/taskENTER_CRITICAL\(\)/g) || []).length, 4);
-  assert.equal((module.match(/taskEXIT_CRITICAL\(\)/g) || []).length, 4);
+  assert.equal((module.match(/taskENTER_CRITICAL\(\)/g) || []).length, 5);
+  assert.equal((module.match(/taskEXIT_CRITICAL\(\)/g) || []).length, 5);
+});
+
+test('WiFi completion response fits existing scratch at uint32 maxima', () => {
+  const web = fs.readFileSync(path.join(main, 'web_service.c'), 'utf8');
+  const route = web.slice(web.indexOf('static esp_err_t audio_health_handler'));
+  const block = route.slice(route.indexOf('#if YORADIO_ESP8266_SDK_RX_DIAG'), route.indexOf('#endif'));
+  assert.match(block, /\?wifi=1/);
+  const literal = block.split('\n').find(line => line.includes('tx_completed')).trim().slice(0, -1);
+  const format = JSON.parse(literal);
+  assert.equal((format.match(/%u/g) || []).length, 4);
+  const worst = format.replaceAll('%u', '4294967295');
+  assert.ok(worst.length < 128);
+  assert.equal(Object.keys(JSON.parse(worst)).length, 4);
+  assert.match(block, /size >= sizeof\(s_async_message\)/);
 });

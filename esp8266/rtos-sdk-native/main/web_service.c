@@ -1134,6 +1134,22 @@ static esp_err_t wifi_file_handler(httpd_req_t *request) {
 
 static esp_err_t audio_health_handler(httpd_req_t *request) {
     prepare_short_response(request);
+#if YORADIO_ESP8266_SDK_RX_DIAG
+    if (strchr(request->uri, '?') && !strcmp(strchr(request->uri, '?'), "?wifi=1")) {
+        sdk_rx_diag_snapshot_t wifi;
+        sdk_rx_diag_snapshot(&wifi);
+        /* Separate bounded diagnostic response: do not enlarge normal health
+         * or the shared HTTP scratch. No packet-time logging/allocation. */
+        int size = snprintf(s_async_message, sizeof(s_async_message),
+            "{\"tx_completed\":%u,\"tx_failed\":%u,\"tx_src\":%u,\"tx_lrc\":%u}",
+            (unsigned)wifi.tx_completed, (unsigned)wifi.tx_completed_fail,
+            (unsigned)wifi.tx_src_total, (unsigned)wifi.tx_lrc_total);
+        if (size < 0 || (size_t)size >= sizeof(s_async_message)) return ESP_FAIL;
+        httpd_resp_set_type(request, "application/json; charset=utf-8");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        return finish_short_response(request, httpd_resp_send(request, s_async_message, size));
+    }
+#endif
 #if YORADIO_ESP8266_MEMORY_PROFILE
     if (strchr(request->uri, '?') && !strcmp(strchr(request->uri, '?'), "?memory=1")) {
         int size = memory_profile_json(s_async_message, sizeof(s_async_message));

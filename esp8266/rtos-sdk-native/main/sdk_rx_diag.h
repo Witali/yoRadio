@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-/* Diagnostic lifetime counters, modulo 2^32. Exactly 32 bytes of backing RAM.
+/* Diagnostic lifetime counters, modulo 2^32. Exactly 48 bytes of backing RAM.
  * custom_live/peak count software custom pbuf wrappers, NOT all Wi-Fi RX
  * descriptors. Drops inside the closed Wi-Fi driver are not observable here.
  * Do not reset these counters on reconnect: RX callbacks may still own pbufs.
@@ -25,6 +25,10 @@ typedef struct {
     uint32_t rx_custom_live;
     uint32_t rx_custom_peak;
     uint32_t rx_custom_total;
+    uint32_t tx_completed;
+    uint32_t tx_completed_fail;
+    uint32_t tx_src_total;
+    uint32_t tx_lrc_total;
 } sdk_rx_diag_snapshot_t;
 
 typedef enum {
@@ -39,7 +43,10 @@ typedef enum {
 void sdk_rx_diag_count(sdk_rx_diag_event_t event);
 void sdk_rx_diag_custom_acquire(void);
 void sdk_rx_diag_custom_release(void);
-/* All eight words form one consistent snapshot; NULL is ignored. */
+/* A driver's accepted enqueue is NOT a successful over-the-air completion.
+ * SRC/LRC are the SDK completion status fields, not TCP retransmissions. */
+void sdk_rx_diag_tx_complete(unsigned success, unsigned src, unsigned lrc);
+/* All twelve words form one consistent snapshot; NULL is ignored. */
 void sdk_rx_diag_snapshot(sdk_rx_diag_snapshot_t *out);
 #endif
 

@@ -43,6 +43,10 @@ struct tcpip_msg {
 typedef struct esp_aio {
     int fd; void *pbuf; uint16_t len; int (*cb)(struct esp_aio *); void *arg; int ret;
 } esp_aio_t;
+typedef struct {
+    unsigned wifi_tx_result:8, wifi_tx_src:6, wifi_tx_lrc:6, wifi_tx_rate:8, unused:4;
+} wifi_tx_status_t;
+#define TX_STATUS_SUCCESS 1
 #define ERR_OK 0
 #define ERR_MEM -1
 #define ERR_ARG -2
@@ -135,7 +139,7 @@ static struct pbuf *pbuf_alloc(int layer, uint16_t len, int type)
     return &tx_copy;
 }
 static int netif_is_up(struct netif *netif) {return netif->up;}
-static int low_level_send_cb(esp_aio_t *aio) {pbuf_free(aio->arg); return 0;}
+static int low_level_send_cb(esp_aio_t *aio);
 static int ieee80211_output_pbuf(esp_aio_t *aio)
 {
     assert(critical_depth == 0 && aio->arg && aio->cb == low_level_send_cb);
@@ -213,11 +217,28 @@ static void test_sdk_flow(void)
     driver_result = ERR_OK;
     assert(low_level_output(&netif, &packet) == ERR_OK);
     assert(tx_copy.ref == 1 && !memcmp(copy_payload, bytes, sizeof(bytes)));
-    pbuf_free(&tx_copy); /* eventual asynchronous TX completion */
+    esp_aio_t completion = {.arg = &tx_copy};
+    wifi_tx_status_t status = {.wifi_tx_result = TX_STATUS_SUCCESS, .wifi_tx_src = 2, .wifi_tx_lrc = 3};
+    memcpy(&completion.ret, &status, sizeof(status));
+    assert(low_level_send_cb(&completion) == 0);
+    assert(tx_copy.ref == 0);
+    assert(snapshot().tx_completed == before.tx_completed + 1);
+    assert(snapshot().tx_completed_fail == before.tx_completed_fail);
+    assert(snapshot().tx_src_total == before.tx_src_total + 2);
+    assert(snapshot().tx_lrc_total == before.tx_lrc_total + 3);
     packet.flags = 0;
     assert(low_level_output(&netif, &packet) == ERR_OK);
     assert(packet.ref == 2);
-    pbuf_free(&packet);
+    completion.arg = &packet;
+    status.wifi_tx_result = 2;
+    status.wifi_tx_src = 63;
+    status.wifi_tx_lrc = 63;
+    memcpy(&completion.ret, &status, sizeof(status));
+    assert(low_level_send_cb(&completion) == 0);
+    assert(snapshot().tx_completed == before.tx_completed + 2);
+    assert(snapshot().tx_completed_fail == before.tx_completed_fail + 1);
+    assert(snapshot().tx_src_total == before.tx_src_total + 65);
+    assert(snapshot().tx_lrc_total == before.tx_lrc_total + 66);
     assert(packet.ref == 1 && malloc_live == 0);
     puts("SDK RX/TX injected control-flow tests passed");
 }
@@ -229,6 +250,7 @@ static void *worker(void *unused)
     for (unsigned i = 0; i < 10000; ++i) {
         sdk_rx_diag_custom_acquire();
         sdk_rx_diag_count(SDK_RX_DIAG_ENQUEUE_NOMEM);
+        sdk_rx_diag_tx_complete(i & 1U, 2, 3);
         sdk_rx_diag_snapshot_t value = snapshot();
         assert(value.rx_custom_live >= 1 && value.rx_custom_live <= 4);
         sdk_rx_diag_custom_release();
@@ -238,7 +260,7 @@ static void *worker(void *unused)
 
 int main(void)
 {
-    assert(sizeof(sdk_rx_diag_snapshot_t) == 32);
+    assert(sizeof(sdk_rx_diag_snapshot_t) == 48);
     sdk_rx_diag_snapshot(NULL);
     sdk_rx_diag_snapshot_t before = snapshot();
     sdk_rx_diag_count((sdk_rx_diag_event_t)-1);
@@ -259,8 +281,12 @@ int main(void)
     after = snapshot();
     assert(after.rx_custom_total == before.rx_custom_total + 40000);
     assert(after.rx_enqueue_nomem == before.rx_enqueue_nomem + 40000);
+    assert(after.tx_completed == before.tx_completed + 40000);
+    assert(after.tx_completed_fail == before.tx_completed_fail + 20000);
+    assert(after.tx_src_total == before.tx_src_total + 80000);
+    assert(after.tx_lrc_total == before.tx_lrc_total + 120000);
     assert(after.rx_custom_live == 0 && after.rx_custom_peak >= 1 && after.rx_custom_peak <= 4);
     assert(critical_depth == 0);
-    puts("SDK diagnostics: 32 bytes, balanced lifetime, concurrent snapshots passed");
+    puts("SDK diagnostics: 48 bytes, balanced lifetime, concurrent snapshots passed");
     return 0;
 }

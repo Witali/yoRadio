@@ -4,7 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-typedef char sdk_rx_diag_is_32_bytes[(sizeof(sdk_rx_diag_snapshot_t) == 32) ? 1 : -1];
+typedef char sdk_rx_diag_is_48_bytes[(sizeof(sdk_rx_diag_snapshot_t) == 48) ? 1 : -1];
 static sdk_rx_diag_snapshot_t s_sdk_rx_diag;
 
 /* These SDK callbacks run in task context. The ESP8266 port critical section
@@ -47,6 +47,15 @@ void sdk_rx_diag_snapshot(sdk_rx_diag_snapshot_t *out)
     if (!out) return;
     taskENTER_CRITICAL();
     *out = s_sdk_rx_diag;
+    taskEXIT_CRITICAL();
+}
+void sdk_rx_diag_tx_complete(unsigned success, unsigned src, unsigned lrc)
+{
+    taskENTER_CRITICAL();
+    ++s_sdk_rx_diag.tx_completed;
+    s_sdk_rx_diag.tx_completed_fail += !success;
+    s_sdk_rx_diag.tx_src_total += src;
+    s_sdk_rx_diag.tx_lrc_total += lrc;
     taskEXIT_CRITICAL();
 }
 #endif
