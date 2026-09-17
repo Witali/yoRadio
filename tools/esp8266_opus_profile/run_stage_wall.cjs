@@ -35,7 +35,7 @@ function summarize(samples, seconds = 25) {
   result.note = 'Health and profile are successive requests, not an atomic combined snapshot. Maxima are since boot. All failures are retained.';
   return result;
 }
-function json(base, route) {
+function json(base, route, timeoutMs = 5000) {
   return new Promise((resolve,reject) => {
     const req = http.get(new URL(route, base), {agent:false, headers:{Connection:'close'}}, res => {
       let body = '';
@@ -44,24 +44,35 @@ function json(base, route) {
       res.on('error',reject);
       res.on('end', () => {try {if (res.statusCode !== 200) throw Error('HTTP '+res.statusCode); resolve(JSON.parse(body));}catch(e){reject(e);}});
     });
-    const timeout = setTimeout(() => req.destroy(Error('request timeout')), 5000);
+    const timeout = setTimeout(() => req.destroy(Error('request timeout '+route)), timeoutMs);
     req.on('close', () => clearTimeout(timeout)); req.on('error',reject);
   });
+}
+async function collectSample(read, started, now = () => performance.now()) {
+  const begin = now(), row = {};
+  try {
+    row.health = await read('/api/native/audio');
+    row.host_ms = now() - started;
+    row.profile = await read('/api/native/audio?stages=1');
+  } catch (e) {
+    // A late profile response must not erase the already received health.
+    // Retain the error too: incomplete samples still cannot qualify a run.
+    row.error = e.message;
+    row.host_ms ??= now() - started;
+  }
+  row.request_ms = now() - begin;
+  return row;
 }
 async function main() {
   const args = process.argv.slice(2), opt = (key, d) => args.includes(key) ? args[args.indexOf(key)+1] : d;
   const base = opt('--base','http://192.168.100.6'), output = opt('--output','.build/opus-stage-wall.json');
   const seconds = Number(opt('--seconds','25'));
+  const timeoutMs = Number(opt('--request-timeout-ms','5000'));
   if (!Number.isInteger(seconds) || seconds < 20 || seconds > 55) throw Error('--seconds must be 20..55');
-  const report = {date:new Date().toISOString(), base, seconds, samples:[]}, started = performance.now();
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 1000 || timeoutMs > 15000) throw Error('--request-timeout-ms must be 1000..15000');
+  const report = {date:new Date().toISOString(), base, seconds, request_timeout_ms:timeoutMs, samples:[]}, started = performance.now();
   for (let i=0; i<2; ++i) {
-    const begin = performance.now();
-    try {
-      const health = await json(base,'/api/native/audio');
-      const host_ms = performance.now()-started;
-      const profile = await json(base,'/api/native/audio?stages=1');
-      report.samples.push({health,profile,host_ms,request_ms:performance.now()-begin});
-    } catch(e) {report.samples.push({error:e.message,host_ms:performance.now()-started});}
+    report.samples.push(await collectSample(route => json(base,route,timeoutMs), started));
     console.log(JSON.stringify(report.samples.at(-1)));
     if (!i) await new Promise(r => setTimeout(r,(seconds+2)*1000));
   }
@@ -71,5 +82,5 @@ async function main() {
   console.log(JSON.stringify(report.result));
   process.exitCode = report.result.continuity.pass && !report.result.profile_error ? 0 : 1;
 }
-module.exports = {summarize};
+module.exports = {summarize, collectSample};
 if (require.main === module) main().catch(e => {console.error(e);process.exitCode=1;});
