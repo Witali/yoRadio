@@ -5,8 +5,8 @@ const f=require('../tools/esp8266_opus_asm/live_variant.cjs');
 const {root,hash,sourceHash}=require('../tools/esp8266_opus_asm/export.cjs');
 const frozen=require('../tools/esp8266_opus_asm/frozen_reloads.cjs');
 const {sections,inspectImage}=require('../tools/esp8266_opus_asm/frozen_div.cjs');
-for(const [variant,input] of [['input2k',2048],['noooseq',1024],['noooseq-input2k',2048],['pcmqueue',1024],['pcmqueue-tcp',1024],['pcmqueue128',1024],['rxdiag',1024],['refill',1024],['mss1460',1024],['refillqueue',1024],['rx16queue',1024],['rx16',1024],['txdiag',1024],['noled',1024],['apppcm',1024],['apppcm2k',2048],['apppcm2k256',2048],['appdiag',2048],['dma192',2048],['clockfast',2048]]) {
-const appConsumer=variant.startsWith('apppcm')||['appdiag','dma192','clockfast'].includes(variant);
+for(const [variant,input] of [['input2k',2048],['noooseq',1024],['noooseq-input2k',2048],['pcmqueue',1024],['pcmqueue-tcp',1024],['pcmqueue128',1024],['rxdiag',1024],['refill',1024],['mss1460',1024],['refillqueue',1024],['rx16queue',1024],['rx16',1024],['txdiag',1024],['noled',1024],['apppcm',1024],['apppcm2k',2048],['apppcm2k256',2048],['appdiag',2048],['dma192',2048],['clockfast',2048],['appdma512',1024]]) {
+const appConsumer=variant.startsWith('app')||['dma192','clockfast'].includes(variant);
 const directory=path.join(root,`firmware/development/esp8266-opus-live-asm-${variant}-20260917`);
 const read=n=>JSON.parse(fs.readFileSync(path.join(directory,n),'utf8'));
 
@@ -40,7 +40,7 @@ test(`${variant} live profile preserves all18 accepted stages and exact loaded b
  if(appConsumer) {
   assert.equal(m.opus_pcm_queue,true);assert.equal(m.opus_pcm_app_task,true);
   assert.equal(m.opus_pcm_stack_bytes,0);assert.equal(m.opus_packet_dispatcher,'c-leased');
-  assert.equal(m.dma_words_per_buffer,variant==='apppcm2k256'?256:variant==='dma192'?192:128);
+  assert.equal(m.dma_words_per_buffer,variant==='appdma512'?512:variant==='apppcm2k256'?256:variant==='dma192'?192:128);
   if(variant==='clockfast') assert.equal(m.pdm32_clock_compensate,true);
  }
  if(['txdiag','noled'].includes(variant)||appConsumer) {
