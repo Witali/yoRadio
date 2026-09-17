@@ -335,27 +335,44 @@ static void opus_free() {
     CodecArenaRelease(CODEC_ARENA_OPUS);
 }
 
-static bool opus_allocate(helix_codec *codec) {
+static bool opus_allocate_workspace(helix_codec *codec) {
     if (!CodecArenaPreallocatedInIram() || CodecArenaPreallocatedBytes() < 16384U) {
         opus_init_failed(codec->kind, HELIX_OPUS_INIT_IRAM, 16384U, codec->reserve_heap_bytes, 0);
         ESP_LOGE(kTag, "Opus requires the 16-KiB IRAM codec arena");
         return false;
     }
+    /* Keep the large byte-oriented allocations ahead of the small demux
+     * object. Otherwise that object can split the only chunk which fits
+     * state + scratch after a network reconnect. Sizes/reserve stay intact.
+     * Until the workspace exists these locals own the two allocations. */
+    void *state = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, native_opus_decoder_size());
+    if (!state) {
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_STATE, native_opus_decoder_size(), codec->reserve_heap_bytes, 0);
+        return false;
+    }
+    void *scratch = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
+    if (!scratch) {
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_SCRATCH, CONFIG_YORADIO_OPUS_SCRATCH_BYTES, codec->reserve_heap_bytes, 0);
+        CodecArenaFree(state);
+        return false;
+    }
     s_opus = static_cast<OpusWorkspace *>(CodecArenaCalloc(CODEC_ARENA_OPUS, 1, sizeof(OpusWorkspace)));
     if (!s_opus) {
         opus_init_failed(codec->kind, HELIX_OPUS_INIT_WORKSPACE, sizeof(OpusWorkspace), codec->reserve_heap_bytes, 0);
+        CodecArenaFree(scratch);
+        CodecArenaFree(state);
         return false;
     }
+    s_opus->state = state;
+    s_opus->scratch = scratch;
     s_opus->words = CodecArenaCalloc32(CODEC_ARENA_OPUS, 1, 16384U);
     if (!s_opus->words)
         opus_init_failed(codec->kind, HELIX_OPUS_INIT_IRAM, 16384U, codec->reserve_heap_bytes, 0);
-    s_opus->state = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, native_opus_decoder_size());
-    if (!s_opus->state)
-        opus_init_failed(codec->kind, HELIX_OPUS_INIT_STATE, native_opus_decoder_size(), codec->reserve_heap_bytes, 0);
-    s_opus->scratch = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
-    if (!s_opus->scratch)
-        opus_init_failed(codec->kind, HELIX_OPUS_INIT_SCRATCH, CONFIG_YORADIO_OPUS_SCRATCH_BYTES, codec->reserve_heap_bytes, 0);
-    if (!s_opus->words || !s_opus->state || !s_opus->scratch) return false;
+    if (!s_opus->words) return false;
+    return true;
+}
+
+static bool opus_initialize(helix_codec *codec) {
     native_opus_config_t config = {};
     config.decoder_state = s_opus->state;
     config.decoder_state_bytes = native_opus_decoder_size();
@@ -410,7 +427,8 @@ static bool allocate_decoder(helix_codec *codec, helix_codec_kind_t kind) {
     if (kind == HELIX_CODEC_AAC) return AACDecoder_AllocateBuffers();
 #endif
 #if CONFIG_YORADIO_OGG_OPUS
-    if (kind == HELIX_CODEC_OPUS) return opus_allocate(codec);
+    if (kind == HELIX_CODEC_OPUS)
+        return opus_allocate_workspace(codec) && opus_initialize(codec);
 #endif
     return false;
 }
@@ -718,9 +736,25 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
         heap_caps_calloc(1, sizeof(*codec), MALLOC_CAP_8BIT));
     if (!codec)
         opus_init_failed(kind, HELIX_OPUS_INIT_CODEC, sizeof(*codec), reserve_heap_bytes, 0);
-    if (codec) {
-        codec->pcm_samples = pcm_samples_for_kind(kind);
-        codec->input_capacity = input_bytes_for_kind(kind);
+    if (!codec) return nullptr;
+    codec->reserve_heap_bytes = reserve_heap_bytes;
+    codec->pcm_samples = pcm_samples_for_kind(kind);
+    codec->input_capacity = input_bytes_for_kind(kind);
+    if (!CodecArenaBind(nullptr, kArenaBytes)) {
+        opus_init_failed(kind, HELIX_OPUS_INIT_ARENA_BIND, kArenaBytes, reserve_heap_bytes, 0);
+        heap_caps_free(codec);
+        return nullptr;
+    }
+    bool workspace_ready = true;
+#if CONFIG_YORADIO_OGG_OPUS
+    if (kind == HELIX_CODEC_OPUS) {
+        /* Reserve both large blocks before even the input/PCM buffers can
+         * fragment them. No native initialization until every buffer exists. */
+        codec->kind = kind;
+        workspace_ready = opus_allocate_workspace(codec);
+    }
+#endif
+    if (workspace_ready) {
         codec->input = static_cast<uint8_t *>(
             heap_caps_calloc(1, input_storage_bytes(codec->input_capacity), MALLOC_CAP_8BIT));
         if (!codec->input)
@@ -731,20 +765,14 @@ extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t kind,
         if (!codec->pcm)
             opus_init_failed(kind, HELIX_OPUS_INIT_PCM, sizeof(int16_t) * codec->pcm_samples, reserve_heap_bytes, 0);
     }
-    if (!codec || !codec->input || !codec->pcm ||
-        !CodecArenaBind(nullptr, kArenaBytes)) {
-        if (codec && codec->input && codec->pcm)
-            opus_init_failed(kind, HELIX_OPUS_INIT_ARENA_BIND, kArenaBytes, reserve_heap_bytes, 0);
-        if (codec) {
-            heap_caps_free(codec->pcm);
-            heap_caps_free(codec->input);
-        }
-        heap_caps_free(codec);
-        ESP_LOGE(kTag, "Heap cannot allocate codec input/PCM workspace");
-        return nullptr;
+    bool allocated = false;
+    if (workspace_ready && codec->input && codec->pcm) {
+#if CONFIG_YORADIO_OGG_OPUS
+        if (kind == HELIX_CODEC_OPUS) allocated = opus_initialize(codec);
+        else
+#endif
+        allocated = allocate_decoder(codec, kind);
     }
-    codec->reserve_heap_bytes = reserve_heap_bytes;
-    bool allocated = allocate_decoder(codec, kind);
     if (!allocated) {
         free_decoder(codec);
         CodecArenaUnbind();

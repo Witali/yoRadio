@@ -341,21 +341,34 @@ static bool opus_allocate(helix_codec *codec) {
         ESP_LOGE(kTag, "Opus requires the 16-KiB IRAM codec arena");
         return false;
     }
+    /* Keep the large byte-oriented allocations ahead of the small demux
+     * object. Otherwise that object can split the only chunk which fits
+     * state + scratch after a network reconnect. Sizes/reserve stay intact.
+     * Until the workspace exists these locals own the two allocations. */
+    void *state = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, native_opus_decoder_size());
+    if (!state) {
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_STATE, native_opus_decoder_size(), codec->reserve_heap_bytes, 0);
+        return false;
+    }
+    void *scratch = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
+    if (!scratch) {
+        opus_init_failed(codec->kind, HELIX_OPUS_INIT_SCRATCH, CONFIG_YORADIO_OPUS_SCRATCH_BYTES, codec->reserve_heap_bytes, 0);
+        CodecArenaFree(state);
+        return false;
+    }
     s_opus = static_cast<OpusWorkspace *>(CodecArenaCalloc(CODEC_ARENA_OPUS, 1, sizeof(OpusWorkspace)));
     if (!s_opus) {
         opus_init_failed(codec->kind, HELIX_OPUS_INIT_WORKSPACE, sizeof(OpusWorkspace), codec->reserve_heap_bytes, 0);
+        CodecArenaFree(scratch);
+        CodecArenaFree(state);
         return false;
     }
+    s_opus->state = state;
+    s_opus->scratch = scratch;
     s_opus->words = CodecArenaCalloc32(CODEC_ARENA_OPUS, 1, 16384U);
     if (!s_opus->words)
         opus_init_failed(codec->kind, HELIX_OPUS_INIT_IRAM, 16384U, codec->reserve_heap_bytes, 0);
-    s_opus->state = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, native_opus_decoder_size());
-    if (!s_opus->state)
-        opus_init_failed(codec->kind, HELIX_OPUS_INIT_STATE, native_opus_decoder_size(), codec->reserve_heap_bytes, 0);
-    s_opus->scratch = CodecArenaCalloc(CODEC_ARENA_OPUS, 1, CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
-    if (!s_opus->scratch)
-        opus_init_failed(codec->kind, HELIX_OPUS_INIT_SCRATCH, CONFIG_YORADIO_OPUS_SCRATCH_BYTES, codec->reserve_heap_bytes, 0);
-    if (!s_opus->words || !s_opus->state || !s_opus->scratch) return false;
+    if (!s_opus->words) return false;
     native_opus_config_t config = {};
     config.decoder_state = s_opus->state;
     config.decoder_state_bytes = native_opus_decoder_size();

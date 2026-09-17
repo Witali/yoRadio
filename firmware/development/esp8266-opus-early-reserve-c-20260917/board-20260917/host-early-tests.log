@@ -1,0 +1,133 @@
+TAP version 13
+# Subtest: libmad follows the same symmetric CodecArena ownership as Helix
+ok 1 - libmad follows the same symmetric CodecArena ownership as Helix
+  ---
+  duration_ms: 1.0202
+  type: 'test'
+  ...
+# Subtest: ESP8266 reports DRAM and IRAM separately and enforces reserve after allocation
+ok 2 - ESP8266 reports DRAM and IRAM separately and enforces reserve after allocation
+  ---
+  duration_ms: 0.3343
+  type: 'test'
+  ...
+# Subtest: audio workspace is lazy, reusable for station changes, and released on stop
+ok 3 - audio workspace is lazy, reusable for station changes, and released on stop
+  ---
+  duration_ms: 0.3249
+  type: 'test'
+  ...
+# Subtest: full codec profile reserves IRAM for AAC and MP3 while libmad-only stays smaller
+ok 4 - full codec profile reserves IRAM for AAC and MP3 while libmad-only stays smaller
+  ---
+  duration_ms: 0.2151
+  type: 'test'
+  ...
+# Subtest: ESP8266 splits the word-only IMDCT output into the IRAM arena
+ok 5 - ESP8266 splits the word-only IMDCT output into the IRAM arena
+  ---
+  duration_ms: 1.0671
+  type: 'test'
+  ...
+# Subtest: ESP8266 preserves heap for lwIP after starting the MP3 decoder
+ok 6 - ESP8266 preserves heap for lwIP after starting the MP3 decoder
+  ---
+  duration_ms: 0.2913
+  type: 'test'
+  ...
+# Subtest: audio stack watermark is sampled on demand outside the critical section
+ok 7 - audio stack watermark is sampled on demand outside the critical section
+  ---
+  duration_ms: 0.2412
+  type: 'test'
+  ...
+# Subtest: libmad places only aligned Layer III word workspaces in ESP8266 IRAM
+ok 8 - libmad places only aligned Layer III word workspaces in ESP8266 IRAM
+  ---
+  duration_ms: 0.2567
+  type: 'test'
+  ...
+# Subtest: native defaults and production manifest use a 4 KiB compressed input
+ok 9 - native defaults and production manifest use a 4 KiB compressed input
+  ---
+  duration_ms: 2.5729
+  type: 'test'
+  ...
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus disabled
+ok 10 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus disabled
+  ---
+  duration_ms: 3716.3054
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 35 allocation failure sites; 3376 allocations, 3375 frees, 1 permanent IRAM allocation
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 6144, diagnostics 0, PCM queue 0
+ok 11 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 6144, diagnostics 0, PCM queue 0
+  ---
+  duration_ms: 3760.9418
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nOpus input 1024, scratch 6144, reserve and allocation-free reset PASS\\r\\nOpus large-first fragmentation: old scratch OOM, new exact-size fit, 10 reset/free cycles PASS\\r\\nOpus adapter routing, bounded PCM callbacks and finish/cancellation PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 67 allocation failure sites; 5127 allocations, 5126 frees, 1 permanent IRAM allocation
+# Opus refuses DRAM fallback arena without leaking
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 6144, diagnostics 1, PCM queue 0
+ok 12 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 6144, diagnostics 1, PCM queue 0
+  ---
+  duration_ms: 3769.7663
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nOpus input 1024, scratch 6144, reserve and allocation-free reset PASS\\r\\nOpus large-first fragmentation: old scratch OOM, new exact-size fit, 10 reset/free cycles PASS\\r\\nOpus adapter routing, bounded PCM callbacks and finish/cancellation PASS\\r\\nOpus init diagnostics: allocation stages, CAP8 before cleanup, native, reserve, retry PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 67 allocation failure sites; 5203 allocations, 5202 frees, 1 permanent IRAM allocation
+# Opus refuses DRAM fallback arena without leaking
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1536, scratch 6144, diagnostics 1, PCM queue 0
+ok 13 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1536, scratch 6144, diagnostics 1, PCM queue 0
+  ---
+  duration_ms: 3849.5735
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nOpus input 1536, scratch 6144, reserve and allocation-free reset PASS\\r\\nOpus large-first fragmentation: old scratch OOM, new exact-size fit, 10 reset/free cycles PASS\\r\\nOpus adapter routing, bounded PCM callbacks and finish/cancellation PASS\\r\\nOpus init diagnostics: allocation stages, CAP8 before cleanup, native, reserve, retry PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 67 allocation failure sites; 5203 allocations, 5202 frees, 1 permanent IRAM allocation
+# Opus refuses DRAM fallback arena without leaking
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 2048, scratch 6144, diagnostics 1, PCM queue 0
+ok 14 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 2048, scratch 6144, diagnostics 1, PCM queue 0
+  ---
+  duration_ms: 3894.1674
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nOpus input 2048, scratch 6144, reserve and allocation-free reset PASS\\r\\nOpus large-first fragmentation: old scratch OOM, new exact-size fit, 10 reset/free cycles PASS\\r\\nOpus adapter routing, bounded PCM callbacks and finish/cancellation PASS\\r\\nOpus init diagnostics: allocation stages, CAP8 before cleanup, native, reserve, retry PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 67 allocation failure sites; 5203 allocations, 5202 frees, 1 permanent IRAM allocation
+# Opus refuses DRAM fallback arena without leaking
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 7680, diagnostics 1, PCM queue 0
+ok 15 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 7680, diagnostics 1, PCM queue 0
+  ---
+  duration_ms: 3865.2558
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nOpus input 1024, scratch 7680, reserve and allocation-free reset PASS\\r\\nOpus large-first fragmentation: old scratch OOM, new exact-size fit, 10 reset/free cycles PASS\\r\\nOpus adapter routing, bounded PCM callbacks and finish/cancellation PASS\\r\\nOpus init diagnostics: allocation stages, CAP8 before cleanup, native, reserve, retry PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 67 allocation failure sites; 5203 allocations, 5202 frees, 1 permanent IRAM allocation
+# Opus refuses DRAM fallback arena without leaking
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1536, scratch 7680, diagnostics 1, PCM queue 0
+ok 16 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1536, scratch 7680, diagnostics 1, PCM queue 0
+  ---
+  duration_ms: 3873.7489
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nOpus input 1536, scratch 7680, reserve and allocation-free reset PASS\\r\\nOpus large-first fragmentation: old scratch OOM, new exact-size fit, 10 reset/free cycles PASS\\r\\nOpus adapter routing, bounded PCM callbacks and finish/cancellation PASS\\r\\nOpus init diagnostics: allocation stages, CAP8 before cleanup, native, reserve, retry PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 67 allocation failure sites; 5203 allocations, 5202 frees, 1 permanent IRAM allocation
+# Opus refuses DRAM fallback arena without leaking
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 6144, diagnostics 1, PCM queue 1
+ok 17 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 6144, diagnostics 1, PCM queue 1
+  ---
+  duration_ms: 3905.8872
+  type: 'test'
+  ...
+# Ogg Opus detection and Vorbis exclusion PASS\\r\\nOpus input 1024, scratch 6144, reserve and allocation-free reset PASS\\r\\nOpus large-first fragmentation: old scratch OOM, new exact-size fit, 10 reset/free cycles PASS\\r\\nOpus adapter routing, bounded PCM callbacks and finish/cancellation PASS\\r\\nOpus init diagnostics: allocation stages, CAP8 before cleanup, native, reserve, retry PASS\\r\\nCodec lifecycle PASS: 100 mixed cycles, 67 allocation failure sites; 5203 allocations, 5202 frees, 1 permanent IRAM allocation
+# Opus refuses DRAM fallback arena without leaking
+# Subtest: network reconnect keeps only Opus and still releases it for a cold open retry
+ok 18 - network reconnect keeps only Opus and still releases it for a cold open retry
+  ---
+  duration_ms: 0.5718
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 30726.4825

@@ -10,6 +10,12 @@ Investigate allocation/reconnect ownership before adding PCM leases: current
 runtime init does not consistently leave the required4096B reserve. Do not
 lower the guard or infer active-audio underrun rates from stopped DMA counters.
 
+Later2026-09-17: [three allocation-order profiles](ESP8266_OPUS_LARGE_FIRST_ALLOCATION.md)
+completed30 physical starts,0 qualified windows. Earlier reservation changes
+scratch fragmentation failures into reserve failures (DRAM3308..4020B),
+not a working radio. Both changes reverted. Recover actual live DRAM before
+retrying this family; account for network allocations as well as the codec.
+
 The synchronous radio path decodes a complete coded frame before supplying
 PCM. Current DMA512 capacity is at most21.33ms; a partly consumed/filled
 descriptor provides less. Raw CPU averages below100% do not establish that

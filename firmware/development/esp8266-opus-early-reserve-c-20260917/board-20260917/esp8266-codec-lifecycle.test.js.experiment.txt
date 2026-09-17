@@ -59,6 +59,7 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
   assert.match(run.stdout,/Codec lifecycle PASS/);
   t.diagnostic(run.stdout.trim());
   if (opusEnabled) {
+    assert.match(run.stdout, /Opus large-first fragmentation: old large-block OOM, new exact-size fit, 10 reset\/free cycles PASS/);
     if (diagnostics) assert.match(run.stdout, /Opus init diagnostics: allocation stages, CAP8 before cleanup, native, reserve, retry PASS/);
     assert.ok(run.stdout.includes('Opus input ' + opusInput + ', scratch ' + opusScratch + ', reserve and allocation-free reset PASS'));
     const fallback=spawnSync(exe,['--dram-arena'],{encoding:'utf8',timeout:60000});

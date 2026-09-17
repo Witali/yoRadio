@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <map>
+#include <vector>
 #include "esp_heap_caps.h"
 #include "codec_bridge.h"
 #include "native_heap_diag.h"
@@ -24,6 +25,18 @@ void test_codec_enter_critical(void) { assert(!critical_depth); ++critical_depth
 void test_codec_exit_critical(void) { assert(critical_depth==1); --critical_depth; }
 static bool reject_iram;
 static unsigned allocations, frees, failures, attempts, tested_failure_sites;
+static bool record_allocations;
+static std::vector<size_t> allocation_sizes;
+// Bounded first-fit fragmentation model, not a timing/SDK allocator emulator.
+static std::vector<size_t> free_chunks;
+static std::map<void *, size_t> chunk_owners;
+static size_t rounded(size_t n) { return (n + 15u) & ~size_t(15u); }
+static size_t take_chunk(std::vector<size_t> &chunks, size_t bytes) {
+    for (size_t i=0;i<chunks.size();++i) if (chunks[i]>=rounded(bytes)) {
+        chunks[i]-=rounded(bytes); return i;
+    }
+    return chunks.size();
+}
 void *heap_caps_malloc(size_t size, unsigned caps) {
     assert(!critical_depth);
     ++attempts;
@@ -35,9 +48,16 @@ void *heap_caps_malloc(size_t size, unsigned caps) {
         ++failures; return nullptr;
     }
     if (fail_after > 0) --fail_after;
+    size_t chunk=free_chunks.size();
+    if ((caps & MALLOC_CAP_8BIT) && !free_chunks.empty()) {
+        chunk=take_chunk(free_chunks,size);
+        if (chunk==free_chunks.size()) { ++failures; return nullptr; }
+    }
     void *p = malloc(size); assert(p);
     assert(live.emplace(p, size).second); ++allocations;
     assert(live_caps.emplace(p,caps).second);
+    if (chunk<free_chunks.size()) assert(chunk_owners.emplace(p,chunk).second);
+    if (record_allocations && (caps & MALLOC_CAP_8BIT)) allocation_sizes.push_back(size);
     return p;
 }
 void *heap_caps_calloc(size_t count, size_t size, unsigned caps) {
@@ -48,6 +68,10 @@ void *heap_caps_calloc(size_t count, size_t size, unsigned caps) {
 void heap_caps_free(void *p) {
     assert(!critical_depth);
     if (!p) return;
+    if (chunk_owners.count(p)) {
+        free_chunks.at(chunk_owners.at(p))+=rounded(live.at(p));
+        chunk_owners.erase(p);
+    }
     assert(live.erase(p) == 1); // double free/unowned pointer fails immediately
     assert(live_caps.erase(p) == 1);
     ++frees; free(p);
@@ -294,6 +318,42 @@ static void detection(void) {
 }
 
 #if CONFIG_YORADIO_OGG_OPUS
+static void opus_fragmented_allocation(const std::map<void *, size_t> &baseline) {
+    allocation_sizes.clear(); record_allocations=true;
+    helix_codec_t *c=helix_codec_create(HELIX_CODEC_OPUS,1152); assert(c);
+    record_allocations=false;
+    assert(allocation_sizes.size()==6);
+    assert(allocation_sizes[1]==native_opus_decoder_size());
+    assert(allocation_sizes[2]==CONFIG_YORADIO_OPUS_SCRATCH_BYTES);
+    const size_t workspace=allocation_sizes[3];
+    assert(workspace<4096 && allocation_sizes[2]>4096);
+    helix_codec_destroy(c); clean(baseline);
+    size_t large=64;
+    for (size_t i=0;i<3;++i) large+=rounded(allocation_sizes[i]);
+    // Neither small fragment can hold scratch, but they fit all small
+    // objects after the large allocations have consumed the first chunk.
+    const std::vector<size_t> layout={large,6144-16,6144-16,4096};
+    auto old_chunks=layout;
+    const size_t old_order[]={0,4,5,3,1,2};
+    size_t completed=0;
+    for (auto i:old_order) {
+        if (take_chunk(old_chunks,allocation_sizes[i])==old_chunks.size()) break;
+        ++completed;
+    }
+    assert(completed<6); // Old ordering cannot allocate both large blocks.
+    for (int cycle=0;cycle<10;++cycle) {
+        free_chunks=layout;
+        c=helix_codec_create(HELIX_CODEC_OPUS,1152); assert(c);
+        capacity_and_owner(c,HELIX_CODEC_OPUS);
+        const auto allocated=free_chunks;
+        assert(helix_codec_switch(c,HELIX_CODEC_OPUS)==0 && free_chunks==allocated);
+        helix_codec_destroy(c); clean(baseline);
+        assert(free_chunks==layout && chunk_owners.empty());
+        free_chunks.clear();
+    }
+    puts("Opus large-first fragmentation: old large-block OOM, new exact-size fit, 10 reset/free cycles PASS");
+}
+
 static void opus_reserve_and_init_failures(const std::map<void *, size_t> &baseline) {
     for (auto legacy : {HELIX_CODEC_MP3, HELIX_CODEC_AAC}) {
         reported_free_heap = 1152;
@@ -421,8 +481,8 @@ static helix_opus_init_failure_t init_failure(unsigned stage) {
     return failure;
 }
 static void opus_diagnostics(const std::map<void *, size_t> &baseline) {
-    const unsigned stages[]={HELIX_OPUS_INIT_CODEC,HELIX_OPUS_INIT_INPUT,HELIX_OPUS_INIT_PCM,
-        HELIX_OPUS_INIT_WORKSPACE,HELIX_OPUS_INIT_STATE,HELIX_OPUS_INIT_SCRATCH};
+    const unsigned stages[]={HELIX_OPUS_INIT_CODEC,HELIX_OPUS_INIT_STATE,HELIX_OPUS_INIT_SCRATCH,
+        HELIX_OPUS_INIT_WORKSPACE,HELIX_OPUS_INIT_INPUT,HELIX_OPUS_INIT_PCM};
     for(unsigned site=0;site<sizeof(stages)/sizeof(stages[0]);++site) {
         first_failed_bytes=first_failed_dram=0;fail_after=static_cast<int>(site);
         assert(!helix_codec_create(HELIX_CODEC_OPUS,1152));fail_after=-1;
@@ -494,6 +554,7 @@ int main(int argc, char **argv) {
     detection();
 #if CONFIG_YORADIO_OGG_OPUS
     opus_reserve_and_init_failures(baseline);
+    opus_fragmented_allocation(baseline);
     opus_bridge_delivery(baseline);
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
     opus_diagnostics(baseline);
