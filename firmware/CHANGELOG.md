@@ -3,6 +3,24 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-17: accepted Opus ASM in ordinary ESP8266 radio
+
+- `development/esp8266-opus-live-asm-ebands-final-20260917/app.bin`,
+  885792B, CPU160/runtimeQIO40, I2S PDM32 GPIO3,2x512DMA.
+- Full accepted18-stage ASM chain relocated from raw eBands-final into
+  ordinary radio. Benchmark/tone/runtime profiling OFF; diagnostic API ON.
+  Graph/literal/image proofs exact; no static RAM, IRAM or stack growth.
+  All24 host PCM scenarios exact;11 regressions PASS,0skip.
+- OTA installed this image, slot0x10000. Ten real-station attempts saved:
+  no qualified uninterrupted20s window, including HTTP/WS timeouts and
+  incomplete observations. Final PCM age28.39s/input0/transport timeout;
+  no latched decoder-init error in the final snapshot. Min heap1440B.
+- New ASM remains installed, original selection167/stopped restored,
+  playlist unchanged. Idle pages HTTP200 in121/99ms; this does not qualify
+  WebUI responsiveness during playback. Default production profile is
+  unchanged; do not label this build stable or claim a new raw CPU result.
+  [Method, limitations and full results](../docs/ESP8266_OPUS_ACCEPTED_ASM_LIVE.md).
+
 ## Development - 2026-09-17: ESP8266 Opus byte-phase helper (not accepted)
 
 - `development/esp8266-opus-pvq-byte-phase-{control,candidate}-v1/app.bin`,

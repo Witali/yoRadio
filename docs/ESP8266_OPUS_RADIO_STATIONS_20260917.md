@@ -102,7 +102,7 @@ node tools/esp8266_opus_profile/run_stage_wall.cjs --seconds 25 --output .build/
 
 ```powershell
 node tools/esp8266_opus_profile/report_live_stations.cjs tests/results/esp8266-opus-live-stations-20260917
-node --test tests/esp8266-audio-continuity.test.js tests/esp8266-opus-stage-wall.test.js tests/esp8266-opus-live-stations-results.test.js
+node --test tests/esp8266-audio-continuity.test.js tests/esp8266-stage-wall-report.test.js tests/esp8266-opus-live-stations-results.test.js
 ```
 
 После проверки восстановлена станция167 `Radio Caprice - Broken Beat / Bruk [1]`,
