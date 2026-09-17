@@ -2,6 +2,14 @@
 
 Status: hypothesis, NOT implemented or qualified. 2026-09-13.
 
+2026-09-17 update: direct exp2-table32 reaches79.626521% raw CPU192,
+but its10 live LAN starts qualify0 windows. First PCM total3.5735s followed
+by receive timeout; later scratch6144B allocations fail with largest5076B.
+See [complete evidence and recovery](ESP8266_OPUS_WORD_LOAD_BOARD_20260917.md).
+Investigate allocation/reconnect ownership before adding PCM leases: current
+runtime init does not consistently leave the required4096B reserve. Do not
+lower the guard or infer active-audio underrun rates from stopped DMA counters.
+
 The synchronous radio path decodes a complete coded frame before supplying
 PCM. Current DMA512 capacity is at most21.33ms; a partly consumed/filled
 descriptor provides less. Raw CPU averages below100% do not establish that

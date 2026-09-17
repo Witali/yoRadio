@@ -1,0 +1,107 @@
+{
+  "date": "2026-09-17T11:26:46.479Z",
+  "url": "http://192.168.100.253:8765/test.opus",
+  "start": {
+    "http": 202,
+    "body": {
+      "queued": true
+    }
+  },
+  "status_error": "request timeout /api/native/status",
+  "trace": {
+    "date": "2026-09-17T11:26:59.569Z",
+    "base": "http://192.168.100.6",
+    "seconds": 25,
+    "samples": [
+      {
+        "error": "request timeout",
+        "host_ms": 5006.2582
+      },
+      {
+        "health": {
+          "generation": 1,
+          "uptime_ms": 53982,
+          "rx_bytes": 90512,
+          "pcm_frames": 171528,
+          "sample_rate": 48000,
+          "rx_age_ms": 39125,
+          "pcm_age_ms": 39105,
+          "underruns": 6859,
+          "free_heap": 24108,
+          "dma_eofs": 7218,
+          "output_enabled": true,
+          "audio_stack_free": 1468,
+          "free_iram": 80,
+          "transport_phase": 0,
+          "transport_result": 4,
+          "transport_errno": 116,
+          "input_bytes": 0
+        },
+        "profile": {
+          "profile_version": 2,
+          "generation": 1,
+          "uptime_ms": 54000,
+          "stages": [
+            [
+              628990,
+              2793,
+              2754,
+              300
+            ],
+            [
+              3442895,
+              26487,
+              2753,
+              473
+            ],
+            [
+              478043,
+              4047,
+              358,
+              131
+            ],
+            [
+              95997,
+              1976,
+              181,
+              0
+            ],
+            [
+              2023501,
+              2727,
+              2571,
+              1444
+            ]
+          ]
+        },
+        "host_ms": 32035.143799999998,
+        "request_ms": 33.84219999999914
+      }
+    ],
+    "result": {
+      "continuity": {
+        "pass": false,
+        "errors": [
+          "missing health samples"
+        ]
+      },
+      "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+      "profile_error": "missing samples"
+    },
+    "runner_exit": 1
+  },
+  "init_diagnostic": {
+    "http": 200,
+    "body": {
+      "stage": 8,
+      "free_dram": 10032,
+      "requested_bytes": 6144,
+      "reserve_bytes": 4096,
+      "detail": 0,
+      "largest_dram": 5076,
+      "current_dram": 23676,
+      "current_largest": 17788
+    }
+  },
+  "pass": false
+}

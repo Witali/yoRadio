@@ -1,0 +1,242 @@
+{
+  "date": "2026-09-17T11:28:03.846Z",
+  "url": "http://192.168.100.253:8765/test.opus",
+  "start": {
+    "http": 202,
+    "body": {
+      "queued": true
+    }
+  },
+  "status": {
+    "http": 200,
+    "body": {
+      "firmware": "esp8266-native",
+      "port": 80,
+      "websocket": "/ws",
+      "network": 1,
+      "rssi": -59,
+      "playing": false,
+      "station": "OPUS TEST",
+      "codec": "",
+      "bitrate": 0,
+      "connecting": false,
+      "error": "DECODER INIT ERROR",
+      "free_heap": 23404,
+      "min_heap": 4676,
+      "web_stack_free": 2320,
+      "app_address": 65536
+    }
+  },
+  "trace": {
+    "date": "2026-09-17T11:28:08.938Z",
+    "base": "http://192.168.100.6",
+    "seconds": 25,
+    "samples": [
+      {
+        "health": {
+          "generation": 3,
+          "uptime_ms": 91247,
+          "rx_bytes": 90512,
+          "pcm_frames": 171528,
+          "sample_rate": 48000,
+          "rx_age_ms": 76390,
+          "pcm_age_ms": 76370,
+          "underruns": 10366,
+          "free_heap": 23228,
+          "dma_eofs": 10725,
+          "output_enabled": true,
+          "audio_stack_free": 1468,
+          "free_iram": 80,
+          "transport_phase": 0,
+          "transport_result": -2147483648,
+          "transport_errno": 0,
+          "input_bytes": 0
+        },
+        "profile": {
+          "profile_version": 2,
+          "generation": 3,
+          "uptime_ms": 91266,
+          "stages": [
+            [
+              628990,
+              2793,
+              2754,
+              300
+            ],
+            [
+              3442895,
+              26487,
+              2753,
+              473
+            ],
+            [
+              478043,
+              4047,
+              358,
+              131
+            ],
+            [
+              95997,
+              1976,
+              181,
+              0
+            ],
+            [
+              2023501,
+              2727,
+              2571,
+              1444
+            ]
+          ]
+        },
+        "host_ms": 18.3124,
+        "request_ms": 36.2082
+      },
+      {
+        "health": {
+          "generation": 3,
+          "uptime_ms": 118222,
+          "rx_bytes": 90512,
+          "pcm_frames": 171528,
+          "sample_rate": 48000,
+          "rx_age_ms": 103365,
+          "pcm_age_ms": 103345,
+          "underruns": 12905,
+          "free_heap": 24108,
+          "dma_eofs": 13264,
+          "output_enabled": true,
+          "audio_stack_free": 1468,
+          "free_iram": 80,
+          "transport_phase": 0,
+          "transport_result": -2147483648,
+          "transport_errno": 0,
+          "input_bytes": 0
+        },
+        "profile": {
+          "profile_version": 2,
+          "generation": 3,
+          "uptime_ms": 118241,
+          "stages": [
+            [
+              628990,
+              2793,
+              2754,
+              300
+            ],
+            [
+              3442895,
+              26487,
+              2753,
+              473
+            ],
+            [
+              478043,
+              4047,
+              358,
+              131
+            ],
+            [
+              95997,
+              1976,
+              181,
+              0
+            ],
+            [
+              2023501,
+              2727,
+              2571,
+              1444
+            ]
+          ]
+        },
+        "host_ms": 27055.096,
+        "request_ms": 33.05840000000171
+      }
+    ],
+    "result": {
+      "continuity": {
+        "pass": false,
+        "errors": [
+          "PCM stopped progressing",
+          "DMA underrun or counter reset",
+          "PCM duration does not match elapsed time",
+          "no stream bytes received"
+        ],
+        "wallMs": 27036.783600000002,
+        "boardMs": 26975,
+        "frames": 0,
+        "audioMs": 0,
+        "underruns": 2539,
+        "ratio": 0,
+        "minHeap": 23228
+      },
+      "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+      "profile_board_ms": 26975,
+      "stages": [
+        {
+          "name": "read",
+          "wall_ms": 0,
+          "wall_percent": 0,
+          "calls": 0,
+          "mean_us": 0,
+          "maximum_since_boot_us": 2793,
+          "misses": 0
+        },
+        {
+          "name": "decode_exclusive",
+          "wall_ms": 0,
+          "wall_percent": 0,
+          "calls": 0,
+          "mean_us": 0,
+          "maximum_since_boot_us": 26487,
+          "misses": 0
+        },
+        {
+          "name": "output",
+          "wall_ms": 0,
+          "wall_percent": 0,
+          "calls": 0,
+          "mean_us": 0,
+          "maximum_since_boot_us": 4047,
+          "misses": 0
+        },
+        {
+          "name": "post_decode_wait",
+          "wall_ms": 0,
+          "wall_percent": 0,
+          "calls": 0,
+          "mean_us": 0,
+          "maximum_since_boot_us": 1976,
+          "misses": 0
+        },
+        {
+          "name": "input_wait",
+          "wall_ms": 0,
+          "wall_percent": 0,
+          "calls": 0,
+          "mean_us": 0,
+          "maximum_since_boot_us": 2727,
+          "misses": 0
+        }
+      ],
+      "timing_valid": true,
+      "unattributed_misses_approx": 2539,
+      "note": "Health and profile are successive requests, not an atomic combined snapshot. Maxima are since boot. All failures are retained."
+    },
+    "runner_exit": 1
+  },
+  "init_diagnostic": {
+    "http": 200,
+    "body": {
+      "stage": 8,
+      "free_dram": 8376,
+      "requested_bytes": 6144,
+      "reserve_bytes": 4096,
+      "detail": 0,
+      "largest_dram": 5076,
+      "current_dram": 23676,
+      "current_largest": 17788
+    }
+  },
+  "pass": false
+}
