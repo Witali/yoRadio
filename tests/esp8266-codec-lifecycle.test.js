@@ -13,7 +13,8 @@ test('native defaults and production manifest use a 4 KiB compressed input', () 
   assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /stream_input_bytes=4096/);
   assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /Wrong cached Opus input size/);
   assert.match(read('esp8266/rtos-sdk-native/main/Kconfig.projbuild'), /config YORADIO_OPUS_SCRATCH_BYTES[\s\S]*?default 6144/);
-  assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /opus_scratch_bytes=\$\(if \(\$taskOpusEnabled\) \{ 6144 \}/);
+  assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /\[int\]\$OpusScratchBytes = 6144/);
+  assert.match(read('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'), /opus_scratch_bytes=\$\(if \(\$taskOpusEnabled\) \{ \$OpusScratchBytes \}/);
 });
 
 for (const [opusInput, opusScratch, diagnostics, pcmQueue=0] of [[0,6144,0], [1024,6144,0], [1024,6144,1], [1536,6144,1], [2048,6144,1], [1024,7680,1], [1536,7680,1], [1024,6144,1,1]]) {
@@ -58,6 +59,7 @@ test('real codec bridge and arena pair every allocation/free through OOM and swi
   assert.match(run.stdout,/Codec lifecycle PASS/);
   t.diagnostic(run.stdout.trim());
   if (opusEnabled) {
+    assert.match(run.stdout, /Opus large-first fragmentation: old scratch OOM, new exact-size fit, 10 reset\/free cycles PASS/);
     if (diagnostics) assert.match(run.stdout, /Opus init diagnostics: allocation stages, CAP8 before cleanup, native, reserve, retry PASS/);
     assert.ok(run.stdout.includes('Opus input ' + opusInput + ', scratch ' + opusScratch + ', reserve and allocation-free reset PASS'));
     const fallback=spawnSync(exe,['--dram-arena'],{encoding:'utf8',timeout:60000});
