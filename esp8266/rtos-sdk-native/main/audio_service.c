@@ -17,6 +17,7 @@
 #include "codec_bridge.h"
 #if YORADIO_ESP8266_OPUS_PCM_QUEUE
 #include "audio_pcm_queue.h"
+#include "esp8266_nodac_i2s.h"
 #endif
 #include "http_stream_protocol.h"
 #include "stream_input_buffer.h"
@@ -1286,6 +1287,9 @@ static void audio_task(void *argument) {
         }
         int64_t prefill_started = esp_timer_get_time();
         bool prefill = true, ended = false, playing = false;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+        uint32_t last_decoded_misses = esp8266_nodac_i2s_underruns();
+#endif
         int end_error = 0;
         /* Keep command latency bounded even when a profile uses a longer
          * select() wait. Normal playback never waits just to fill the queue. */
@@ -1325,6 +1329,9 @@ static void audio_task(void *argument) {
                     continue;
                 }
                 prefill = false;
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+                last_decoded_misses = esp8266_nodac_i2s_underruns();
+#endif
                 ESP_LOGI(TAG, "Input prefill %u/%u bytes in %u ms",
                          (unsigned)helix_codec_buffered(codec),
                          (unsigned)helix_codec_active_input_capacity(codec),
@@ -1355,11 +1362,29 @@ static void audio_task(void *argument) {
                 feed = decoded;
                 break;
             }
-            if (!playing && output.decoder_sample_rate &&
+            if (!playing && decoded == 0 && output.decoder_sample_rate &&
                 generation_current(command.generation)) {
                 playing = true;
                 native_state_set_audio(true, false, NULL);
             }
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+            if (codec_kind == HELIX_CODEC_OPUS) {
+                uint32_t misses = esp8266_nodac_i2s_underruns();
+                if (stream_rebuffer_needed(playing, decoded > 0,
+                        filled == STREAM_FILL_AGAIN, ended, misses, last_decoded_misses)) {
+                    /* Keep codec history, pending PCM, Ogg/ICY parser state,
+                     * and the TCP connection. Let the output consumer drain;
+                     * DMA emits neutral silence once it is empty. Do not
+                     * repeatedly resume with only one newly received packet. */
+                    prefill = true;
+                    prefill_started = esp_timer_get_time();
+                    playing = false;
+                    native_state_set_audio(false, true, "BUFFERING");
+                    continue;
+                }
+                if (decoded == 0) last_decoded_misses = misses;
+            }
+#endif
             AUDIO_STAGE_BEGIN(wait_stage);
             if (decoded == 0) {
                 /* Give idle/watchdog and deferred Wi-Fi work a turn even on

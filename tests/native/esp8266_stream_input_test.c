@@ -126,6 +126,17 @@ static void test_icy_split_everywhere(void) {
 }
 
 int main(void) {
+    for (unsigned mask = 0; mask < 32; ++mask) {
+        bool playing = !!(mask & 1), needs = !!(mask & 2);
+        bool empty = !!(mask & 4), ended = !!(mask & 8), missed = !!(mask & 16);
+        assert(stream_rebuffer_needed(playing, needs, empty, ended, missed ? 8U : 7U, 7U) ==
+               (playing && needs && empty && !ended && missed));
+    }
+    assert(stream_rebuffer_needed(true, true, true, false, 0U, UINT32_MAX));
+    /* After underflow, receiving a single packet must not restart playback.
+     * The same bounded prefill predicate then resumes on full/timeout/EOF. */
+    assert(!stream_prefill_ready(180, 2048, false, 60000, 1000));
+    assert(stream_prefill_ready(2048, 2048, false, 700000, 1000));
     test_fill_and_refill(); test_partial_network();
     test_cancel_and_budget(); test_icy_split_everywhere();
     puts("Stream input tests passed");

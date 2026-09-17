@@ -55,3 +55,12 @@ static inline bool stream_prefill_ready(size_t buffered, size_t capacity,
     return buffered == capacity || ended ||
         elapsed_us >= (int64_t)timeout_ms * 1000;
 }
+
+/* Rebuild read-ahead only after an actual audible underflow while the
+ * decoder needs input and recv reached EAGAIN. Normal packet boundaries,
+ * startup, EOF and decoder errors must never introduce a buffering pause. */
+static inline bool stream_rebuffer_needed(bool playing, bool needs_input,
+        bool would_block, bool ended, uint32_t misses, uint32_t last_decoded_misses) {
+    return playing && needs_input && would_block && !ended &&
+        misses != last_decoded_misses;
+}
