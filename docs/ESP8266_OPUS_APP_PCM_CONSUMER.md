@@ -35,3 +35,16 @@ priority restoration and prohibition on deleting the shared app task. The
 real app loop is tested with frequent PCM wakeups, immediate control events,
 tick wrap and delayed background work, with LED OFF/10/20Hz. Native-state
 tests distinguish real status changes from PCM-only wakes.
+
+## Background-service attribution (diagnostic app mode only)
+
+The four additional uint32 counters cost16 static bytes, no heap or task.
+They measure the interval after each PCM poll and before sleeping: controls,
+background network/time/WebUI/storage service and wait-deadline calculation.
+`GET /api/native/audio?pcm=1` returns calls, total/max wall microseconds and
+DMA underruns observed inside that interval. The normal health response
+does not grow. Startup before the first PCM and stopped neutral output are
+not counted; all active intervals, including preemption, are retained.
+Counters reset on queue begin and wrap modulo2^32. This is not CPU time or
+proof that the service itself (rather than preemption) consumed the interval.
+No changes to decoder arithmetic, output pacing, priority or memory guards.

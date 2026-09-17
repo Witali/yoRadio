@@ -111,6 +111,9 @@ int main(void) {
     write_delay=100;int16_t *pool=begin(1);
 #if YORADIO_ESP8266_OPUS_PCM_APP_TASK
     assert(worker_priority==6);
+    audio_pcm_queue_record_service(100,10); /* no PCM yet: startup not measured */
+    audio_pcm_queue_health_t empty;audio_pcm_queue_health(&empty);
+    assert(!empty.service_calls && !empty.service_us && !empty.service_misses);
 #endif
     assert(audio_pcm_queue_begin(pool,1920,1)==ESP_ERR_INVALID_STATE);
     int16_t *pcm=NULL;assert(audio_pcm_queue_acquire(NULL,&pcm,961)==-108);
@@ -120,9 +123,16 @@ int main(void) {
     audio_pcm_queue_drain();audio_pcm_queue_health_t h;audio_pcm_queue_health(&h);
     assert(h.submitted_frames==expected_count && h.output_frames==expected_count);
     assert(h.stack_free==777 && !h.ready_frames && !h.error);
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    audio_pcm_queue_record_service(7,2);audio_pcm_queue_record_service(11,3);
+    audio_pcm_queue_health(&h);
+    assert(h.service_calls==2 && h.service_us==18 && h.service_max_us==11 && h.service_misses==5);
+#endif
     audio_pcm_queue_stop();assert(!writing);free(pool);
 #if YORADIO_ESP8266_OPUS_PCM_APP_TASK
     assert(worker_priority==2);
+    audio_pcm_queue_record_service(100,10);audio_pcm_queue_health(&h);
+    assert(h.service_calls==2 && h.service_us==18 && h.service_misses==5);
 #endif
     assert(actual_count==expected_count && !memcmp(actual,expected,actual_count*sizeof(*actual)));
     assert(progressed==actual_count);assert(audio_pcm_queue_acquire(NULL,&pcm,960)==-108);
@@ -139,6 +149,9 @@ int main(void) {
     assert(audio_pcm_queue_acquire(NULL,&pcm,960)==-108);
     audio_pcm_queue_stop();free(pool);fail_call=0;
     pool=begin(1002);submit(4,120);audio_pcm_queue_drain();audio_pcm_queue_health(&h);
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    assert(!h.service_calls && !h.service_us && !h.service_max_us && !h.service_misses);
+#endif
     assert(!h.error && h.output_frames==840);audio_pcm_queue_stop();free(pool);
     audio_pcm_queue_deinit();audio_pcm_queue_deinit();
 #if YORADIO_ESP8266_OPUS_PCM_APP_TASK

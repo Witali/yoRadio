@@ -9,6 +9,8 @@
 #include "audio_service.h"
 #if YORADIO_ESP8266_OPUS_PCM_APP_TASK
 #include "audio_pcm_queue.h"
+#include "esp8266_nodac_i2s.h"
+#include "esp_timer.h"
 #endif
 #if CONFIG_YORADIO_OLED
 #include "display_service.h"
@@ -126,6 +128,8 @@ void app_main(void) {
     for (;;) {
 #if YORADIO_ESP8266_OPUS_PCM_APP_TASK
         audio_pcm_queue_poll();
+        uint32_t service_started = (uint32_t)esp_timer_get_time();
+        uint32_t service_misses = esp8266_nodac_i2s_underruns();
 #endif
         input_service_poll();
 #if YORADIO_ESP8266_OPUS_PCM_APP_TASK
@@ -154,6 +158,8 @@ void app_main(void) {
 #endif
 #if YORADIO_ESP8266_OPUS_PCM_APP_TASK
         if (audio_pcm_queue_pending()) wait = 0;
+        audio_pcm_queue_record_service((uint32_t)esp_timer_get_time() - service_started,
+            esp8266_nodac_i2s_underruns() - service_misses);
 #endif
         notifications = ulTaskNotifyTake(pdTRUE, wait);
     }

@@ -22,6 +22,13 @@ static bool native_state_take_service_notification(void) {
 }
 static void audio_pcm_queue_poll(void) { }
 static bool audio_pcm_queue_pending(void) { return false; }
+static uint32_t service_measured_us, service_measured_max, service_measured_misses;
+static uint64_t esp_timer_get_time(void) { return (uint64_t)(origin + elapsed_ms) * 1000U; }
+static uint32_t esp8266_nodac_i2s_underruns(void) { return elapsed_ms / 2U; }
+static void audio_pcm_queue_record_service(uint32_t us, uint32_t misses) {
+    service_measured_us += us;service_measured_misses += misses;
+    if(us > service_measured_max) service_measured_max = us;
+}
 #endif
 static const uint32_t event_times[] = {75, 243, 612};
 static TickType_t xTaskGetTickCount(void) { return origin + elapsed_ms; }
@@ -88,6 +95,7 @@ static void run_case(bool with_events, bool slow_service, uint32_t first_tick) {
     debounce_posted = false;
 #if YORADIO_ESP8266_OPUS_PCM_APP_TASK
     service_notification = true;
+    service_measured_us = service_measured_max = service_measured_misses = 0;
 #endif
     memset(service_calls, 0, sizeof(service_calls)); memset(service_times, 0, sizeof(service_times));
     if (!setjmp(finished)) run_actual_loop();
@@ -117,6 +125,11 @@ static void run_case(bool with_events, bool slow_service, uint32_t first_tick) {
         assert(service_times[1] == 250 && service_times[2] == 560);
         assert(service_times[3] == 810); // No replay of missed periodic ticks.
     }
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    assert(service_measured_us == (slow_service ? 310000U : 0U));
+    assert(service_measured_max == service_measured_us);
+    assert(service_measured_misses == (slow_service ? 155U : 0U));
+#endif
 }
 int main(void) {
     run_case(false, false, 0);

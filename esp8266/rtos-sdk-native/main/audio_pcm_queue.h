@@ -21,6 +21,9 @@ typedef void (*audio_pcm_progress_fn)(uint32_t generation, size_t frames);
 typedef struct {
     uint32_t ready_frames, stack_free, submitted_frames, output_frames;
     uint32_t output_calls, output_us, error;
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    uint32_t service_calls, service_us, service_max_us, service_misses;
+#endif
 } audio_pcm_queue_health_t;
 esp_err_t audio_pcm_queue_init(audio_pcm_generation_fn valid, audio_pcm_progress_fn progress);
 /* Startup unwind only; normal playback retains the task/stack. */
@@ -40,4 +43,6 @@ void audio_pcm_queue_health(audio_pcm_queue_health_t *health);
  * backpressure sleeps this same task; no new task, stack or PCM copy. */
 bool audio_pcm_queue_poll(void);
 bool audio_pcm_queue_pending(void);
+/* Diagnostic wall time (including preemption), not CPU time. No allocation. */
+void audio_pcm_queue_record_service(uint32_t elapsed_us, uint32_t misses);
 #endif

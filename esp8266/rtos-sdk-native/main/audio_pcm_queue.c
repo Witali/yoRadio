@@ -97,6 +97,17 @@ bool audio_pcm_queue_pending(void) {
     taskEXIT_CRITICAL();
     return pending;
 }
+void audio_pcm_queue_record_service(uint32_t elapsed_us, uint32_t misses) {
+    taskENTER_CRITICAL();
+    /* Exclude startup/stop neutral output, not failed active intervals. */
+    if (s_running && s_health.output_frames) {
+        ++s_health.service_calls;
+        s_health.service_us += elapsed_us;
+        if (elapsed_us > s_health.service_max_us) s_health.service_max_us = elapsed_us;
+        s_health.service_misses += misses;
+    }
+    taskEXIT_CRITICAL();
+}
 #else
 static void output_task(void *unused) {
     (void)unused;

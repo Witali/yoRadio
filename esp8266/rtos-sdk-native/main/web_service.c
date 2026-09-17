@@ -1134,6 +1134,20 @@ static esp_err_t wifi_file_handler(httpd_req_t *request) {
 
 static esp_err_t audio_health_handler(httpd_req_t *request) {
     prepare_short_response(request);
+#if YORADIO_ESP8266_OPUS_PCM_APP_TASK
+    if (strchr(request->uri, '?') && !strcmp(strchr(request->uri, '?'), "?pcm=1")) {
+        audio_pcm_queue_health_t queue;
+        audio_pcm_queue_health(&queue);
+        int size = snprintf(s_async_message, sizeof(s_async_message),
+            "{\"service_calls\":%u,\"service_us\":%u,\"service_max_us\":%u,\"service_misses\":%u}",
+            (unsigned)queue.service_calls, (unsigned)queue.service_us,
+            (unsigned)queue.service_max_us, (unsigned)queue.service_misses);
+        if (size < 0 || (size_t)size >= sizeof(s_async_message)) return ESP_FAIL;
+        httpd_resp_set_type(request, "application/json; charset=utf-8");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        return finish_short_response(request, httpd_resp_send(request, s_async_message, size));
+    }
+#endif
 #if YORADIO_ESP8266_SDK_RX_DIAG
     if (strchr(request->uri, '?') && !strcmp(strchr(request->uri, '?'), "?wifi=1")) {
         sdk_rx_diag_snapshot_t wifi;
