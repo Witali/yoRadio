@@ -33,6 +33,9 @@ void audio_service_health(audio_service_health_t *health);
 #if YORADIO_ESP8266_OPUS_STREAM_TEST
 /* Read-only diagnostic profile; -1 on insufficient capacity. */
 int audio_service_stage_json(char *body, size_t capacity);
+#if YORADIO_ESP8266_OPUS_PCM_QUEUE
+int audio_service_quiet_json(char *body, size_t capacity);
+#endif
 #endif
 
 esp_err_t audio_service_init(void);

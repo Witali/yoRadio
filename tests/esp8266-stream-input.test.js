@@ -105,3 +105,11 @@ test("native startup buffers before decoding and does not announce Playing until
   assert.match(loop, /else if \(filled == STREAM_FILL_AGAIN &&\s*!stream_wait_after_empty\(&stream, command.generation, wait_ms\)\)/);
   assert.doesNotMatch(loop, /else if \(!stream_wait_after_empty\(/);
 });
+
+test("autonomous audio windows retain stalls, generation changes and counter wrap", t => {
+  const executable = build(t, [path.join(native, "esp8266_audio_window_test.c")], [main]);
+  if (!executable) return;
+  const result = spawnSync(executable, [], {encoding:"utf8", timeout:10000});
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /Autonomous audio window PASS/);
+});

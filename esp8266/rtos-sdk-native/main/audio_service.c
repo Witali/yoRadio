@@ -112,6 +112,26 @@ static TaskHandle_t s_audio_task;
 static volatile uint32_t s_generation;
 static uint32_t s_rx_bytes, s_pcm_frames, s_pcm_rate;
 static TickType_t s_rx_tick, s_pcm_tick;
+#if YORADIO_ESP8266_OPUS_STREAM_TEST && YORADIO_ESP8266_OPUS_PCM_QUEUE
+#include "audio_quiet_window.h"
+static audio_window_state_t s_quiet_window;
+_Static_assert(sizeof(s_quiet_window) == 48, "Bound quiet-window RAM");
+int audio_service_quiet_json(char *body, size_t capacity) {
+    taskENTER_CRITICAL();
+    audio_window_result_t r = s_quiet_window.result;
+    bool valid = s_quiet_window.valid && r.generation == s_generation;
+    uint32_t now = xTaskGetTickCount() * portTICK_PERIOD_MS;
+    taskEXIT_CRITICAL();
+    int size = snprintf(body, capacity,
+        "{\"valid\":%s,\"generation\":%u,\"start_ms\":%u,\"end_ms\":%u,"
+        "\"frames\":%u,\"underruns\":%u,\"age_ms\":%u,\"sample_rate\":48000}",
+        valid ? "true" : "false", (unsigned)r.generation,
+        (unsigned)r.start.ms, (unsigned)r.end.ms,
+        (unsigned)(r.end.frames - r.start.frames),
+        (unsigned)(r.end.misses - r.start.misses), (unsigned)(now - r.end.ms));
+    return size < 0 || (size_t)size >= capacity ? -1 : size;
+}
+#endif
 
 #include "audio_stage_profile.inc"
 
@@ -331,6 +351,11 @@ static void queued_pcm_progress(uint32_t generation, size_t frames) {
         s_pcm_frames += frames;
         s_pcm_rate = 48000U;
         s_pcm_tick = xTaskGetTickCount();
+#if YORADIO_ESP8266_OPUS_STREAM_TEST
+        audio_window_record(&s_quiet_window, generation,
+            s_pcm_tick * portTICK_PERIOD_MS, s_pcm_frames,
+            esp8266_nodac_i2s_underruns());
+#endif
     }
     taskEXIT_CRITICAL();
 }
