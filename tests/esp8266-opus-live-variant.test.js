@@ -5,17 +5,22 @@ const f=require('../tools/esp8266_opus_asm/live_variant.cjs');
 const {root,hash,sourceHash}=require('../tools/esp8266_opus_asm/export.cjs');
 const frozen=require('../tools/esp8266_opus_asm/frozen_reloads.cjs');
 const {sections,inspectImage}=require('../tools/esp8266_opus_asm/frozen_div.cjs');
-for(const [variant,input] of [['input2k',2048],['noooseq',1024],['noooseq-input2k',2048],['pcmqueue',1024]]) {
+for(const [variant,input] of [['input2k',2048],['noooseq',1024],['noooseq-input2k',2048],['pcmqueue',1024],['pcmqueue-tcp',1024],['pcmqueue128',1024],['rxdiag',1024]]) {
 const directory=path.join(root,`firmware/development/esp8266-opus-live-asm-${variant}-20260917`);
 const read=n=>JSON.parse(fs.readFileSync(path.join(directory,n),'utf8'));
 
 test(`${variant} live profile preserves all18 accepted stages and exact loaded bytes`,()=>{
  const p=read('preflight.json'),m=read('manifest.json');
- assert.equal(p.recipe_sha256_lf,sourceHash(path.join(root,'tools/esp8266_opus_asm/live_variant.cjs')));
+ const recipe=variant==='rxdiag'?'live_variant_v2.cjs':'live_variant.cjs';
+ assert.equal(p.recipe_sha256_lf,sourceHash(path.join(root,'tools/esp8266_opus_asm',recipe)));
  assert.equal(p.records.length,18);
  assert.equal(m.opus_input_bytes,input);assert.equal(m.opus_scratch_bytes,6144);
- if(variant!=='input2k') assert.equal(m.tcp_queue_ooseq,false);
- if(variant==='pcmqueue') {
+ const tcpQueue=['input2k','pcmqueue-tcp','pcmqueue128','rxdiag'].includes(variant);
+ const config=fs.readFileSync(path.join(directory,'sdkconfig'),'utf8');
+ assert.equal(/^CONFIG_LWIP_TCP_QUEUE_OOSEQ=y\r?$/m.test(config),tcpQueue);
+ // The first dated input2k manifest predates the explicit OOSEQ field.
+ if(variant!=='input2k') assert.equal(m.tcp_queue_ooseq,tcpQueue);
+ if(variant.startsWith('pcmqueue')) {
   assert.equal(m.opus_pcm_queue,true);assert.equal(m.opus_packet_dispatcher,'c-leased');
   assert.equal(m.opus_pcm_stack_bytes,1536);
  }

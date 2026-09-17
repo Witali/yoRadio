@@ -1,0 +1,54 @@
+TAP version 13
+# Subtest: production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+ok 1 - production direct DMA writer preserves PCM/PDM across chunk boundaries and EOF races
+  ---
+  duration_ms: 25630.382
+  type: 'test'
+  ...
+# PDM32 DMA128: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM32 DMA256: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM32 DMA512: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM32 DMA768: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM DMA512: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_SIMPLE DMA512: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# RCPDM_FEEDBACK DMA512: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# PDM128 DMA512: PCM/PDM bit-exact at 6 rates, mono/stereo, normalization on/off, 1/32/64/128/256/512/576 frames; ownership, EOF, timeout, cancel and stop passed
+# Subtest: short loan profile validates diagnostics and resets the production limit to 512
+ok 2 - short loan profile validates diagnostics and resets the production limit to 512
+  ---
+  duration_ms: 490.4093
+  type: 'test'
+  ...
+# Subtest: PDM32 batch builder switch is diagnostic-only, independent of IRAM, and explicitly resets CMake/manifest
+ok 3 - PDM32 batch builder switch is diagnostic-only, independent of IRAM, and explicitly resets CMake/manifest
+  ---
+  duration_ms: 803.6751
+  type: 'test'
+  ...
+# Subtest: PDM32 batch CMake option is OFF by default and rejects non-standard backends
+ok 4 - PDM32 batch CMake option is OFF by default and rejects non-standard backends
+  ---
+  duration_ms: 2995.6675
+  type: 'test'
+  ...
+# Subtest: PCM consumer is diagnostic-only and rejects incompatible pipelines
+ok 5 - PCM consumer is diagnostic-only and rejects incompatible pipelines
+  ---
+  duration_ms: 570.3995
+  type: 'test'
+  ...
+# Subtest: maximal diagnostic audio JSON fits existing shared scratch
+ok 6 - maximal diagnostic audio JSON fits existing shared scratch
+  ---
+  duration_ms: 0.8584
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 25705.7934

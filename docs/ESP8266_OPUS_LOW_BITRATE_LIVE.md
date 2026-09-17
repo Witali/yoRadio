@@ -84,11 +84,49 @@ The dated original recipe/evidence are retained unmodified.
   complete windows had450..3931 underrun events, three windows were incomplete.
   RAM retention improved but playback did not qualify. Retransmission stalls
   remain possible; disabling OOSEQ is not promoted to the board default.
-- Input2KiB with TCP OOSEQ OFF and asynchronous PCM output are tested as
-  separate variants. Their manifests identify the actual flags; do not mix
-  their timing series or infer CPU utilization from output wall time.
+- Input2KiB with TCP OOSEQ OFF:0/10 qualified, nine incomplete HTTP timing
+  windows. No init-failure stage latched; the one complete interval had
+  25.3135s PCM /28.001s elapsed and2104 underruns. Minimum boot heap3640B.
+  This is not an improvement in reliable playback or WebUI responsiveness.
+- Asynchronous PCM output is tested as a separate variant. Its manifest
+  identifies the actual flags; do not mix timing series or infer CPU
+  utilization from output wall time.
+
+The first PCM-queue trial (TCP OOSEQ OFF) also failed qualification:0/10,
+nine incomplete windows; attempt8 refused init at stage10 (3924B CAP8 free,
+4096B reserve). Captured queue-error counters remained0 and consumer stack
+watermark1160/1536B free, but this does not prove uninterrupted output.
+Later even ICMP was intermittent:5/6 ping requests lost, the successful one
+took7ms; the subsequent status returned in251ms with RSSI-57dBm and Playing.
+This identifies network availability as a separate observable failure, not
+proof that RF signal strength, the decoder or a deadlock is its cause.
 
 Every completed attempt, including timeout/error responses, is saved under
 the corresponding `firmware/development/esp8266-opus-live-asm-*/board/`.
 Increased compressed input alone is not a demonstrated fix. No heap guard,
 Ogg CRC, decoder correctness check or continuous-output criterion was relaxed.
+
+## PCM output follow-up (2026-09-17)
+
+- PCM queue / DMA256 / TCP OOSEQ ON, Plaza (~64kbps CELT):0/10 qualified,
+  four incomplete windows. Scratch allocation failed with9440B free but
+  only4960B contiguous; other starts failed the unchanged4096B reserve.
+  Two decreases in board uptime show resets; cause is not established.
+- PCM queue / DMA128 / TCP OOSEQ ON, DLF24:0/10 qualified, six incomplete
+  windows. Some starts succeeded with6.5–7.8KiB free, but TCP timeout and
+  later fragmented scratch allocation remained. Complete intervals included
+  27.0735/27.989s PCM with669 misses and19.8228/32.283s with5946 misses.
+  Queue error remained0 in captured samples; this is not continuity proof.
+- Stop after the first queued trial restored a14.6ms status response and
+  ~26KiB heap. This is load correlation, not proof of a particular cause.
+
+These profiles are not production defaults. Main stack remains5120B and
+consumer1536B. No UART reset/recovery or Wi-Fi adapter changes were used.
+
+Next diagnostic image retains synchronous DMA512 and all18 accepted ASM
+stages and enables existing32B SDK RX counters. The new rebase v2 audits
+every possible L32R encoding against reachable instruction boundaries:
+linear objdump had invented a second table reader inside SPIFFS alignment
+padding. The original recipes/evidence remain unchanged; positive tests
+also preserve genuinely shared literal readers. This script correction
+does not change decoder arithmetic or fix live audio by itself.
