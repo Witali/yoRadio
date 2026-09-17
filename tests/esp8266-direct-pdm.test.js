@@ -43,7 +43,7 @@ test('production direct DMA writer preserves PCM/PDM across chunk boundaries and
   fs.writeFileSync(path.join(dir, 'output.inc'), helpers + output.slice(
     output.indexOf('\n', start) + 1, end));
   for(const mode of ['PDM32', 'RCPDM', 'RCPDM_SIMPLE', 'RCPDM_FEEDBACK', 'PDM128']) {
-   for(const dmaWords of (mode === 'PDM32' ? [128, 256, 512, 768] : [512])) {
+   for(const dmaWords of (mode === 'PDM32' ? [128, 192, 256, 512, 768] : [512])) {
     const exe = path.join(dir, mode + '-' + dmaWords + (process.platform === 'win32' ? '.exe' : ''));
     const files = [path.join(__dirname, 'native/esp8266_direct_pdm_test.cpp'), path.join(audio, 'AudioNormalizer.cpp')];
     const queueDefine = dmaWords<=256 ? ' /DYORADIO_ESP8266_OPUS_PCM_QUEUE=1' : '';

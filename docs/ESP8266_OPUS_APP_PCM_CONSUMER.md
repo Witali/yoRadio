@@ -48,3 +48,18 @@ not counted; all active intervals, including preemption, are retained.
 Counters reset on queue begin and wrap modulo2^32. This is not CPU time or
 proof that the service itself (rather than preemption) consumed the interval.
 No changes to decoder arithmetic, output pacing, priority or memory guards.
+
+## DMA192 follow-up hypothesis
+
+DMA128 steady Kultur24 samples still show short misses without input waits.
+Full960-frame PCM output leaves a64-word tail with128-word DMA, while192
+divides960 exactly. Diagnostic192 gives4ms per full block, adds512 DRAM bytes
+versus128 and needs512 fewer bytes than the rejected256 variant. No padding,
+new copy, PCM samples or PDM decisions are introduced; pre-skip and other
+valid frame lengths still use exact partial descriptors. Default remains512.
+Physical qualification is required; divisibility alone does not prove a fix.
+
+The appdiag board also returned an implausible service maximum4294966397us,
+consistent with a small backward step of the SDK microsecond clock. Such
+wall timing is invalid, not a multi-hour service delay. Keep the raw evidence;
+DMA miss and tick-based continuity counters are separate. No CPU claim.
