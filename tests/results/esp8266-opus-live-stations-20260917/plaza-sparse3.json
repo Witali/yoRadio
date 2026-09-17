@@ -1,0 +1,196 @@
+{
+  "date": "2026-09-17T17:13:54.563Z",
+  "base": "http://192.168.100.6",
+  "seconds": 25,
+  "samples": [
+    {
+      "health": {
+        "generation": 4,
+        "uptime_ms": 583068,
+        "rx_bytes": 921315,
+        "pcm_frames": 5347584,
+        "sample_rate": 48000,
+        "rx_age_ms": 8334,
+        "pcm_age_ms": 8235,
+        "underruns": 68518,
+        "free_heap": 7944,
+        "dma_eofs": 79672,
+        "output_enabled": true,
+        "audio_stack_free": 1464,
+        "free_iram": 60,
+        "transport_phase": 2,
+        "transport_result": 4,
+        "transport_errno": 116,
+        "input_bytes": 0
+      },
+      "profile": {
+        "profile_version": 2,
+        "generation": 4,
+        "uptime_ms": 583086,
+        "stages": [
+          [
+            7110456,
+            4279,
+            26805,
+            2225
+          ],
+          [
+            86151620,
+            41596,
+            26805,
+            1909
+          ],
+          [
+            21292622,
+            8987,
+            11147,
+            1539
+          ],
+          [
+            3102411,
+            3589,
+            5592,
+            5
+          ],
+          [
+            17104982,
+            4057,
+            21205,
+            12774
+          ]
+        ]
+      },
+      "host_ms": 18.812700000000003,
+      "request_ms": 35.236
+    },
+    {
+      "health": {
+        "generation": 4,
+        "uptime_ms": 610457,
+        "rx_bytes": 1129050,
+        "pcm_frames": 6576072,
+        "sample_rate": 48000,
+        "rx_age_ms": 309,
+        "pcm_age_ms": 209,
+        "underruns": 69406,
+        "free_heap": 9204,
+        "dma_eofs": 83120,
+        "output_enabled": true,
+        "audio_stack_free": 1464,
+        "free_iram": 80,
+        "transport_phase": 5,
+        "transport_result": 4,
+        "transport_errno": 116,
+        "input_bytes": 0
+      },
+      "profile": {
+        "profile_version": 2,
+        "generation": 4,
+        "uptime_ms": 610609,
+        "stages": [
+          [
+            8167324,
+            4279,
+            28431,
+            2264
+          ],
+          [
+            105420632,
+            41596,
+            28431,
+            2209
+          ],
+          [
+            26551375,
+            8987,
+            13719,
+            1870
+          ],
+          [
+            3836699,
+            4034,
+            6880,
+            5
+          ],
+          [
+            17381085,
+            4057,
+            21543,
+            12940
+          ]
+        ]
+      },
+      "host_ms": 27501.753399999998,
+      "request_ms": 598.1262999999999
+    }
+  ],
+  "result": {
+    "continuity": {
+      "pass": false,
+      "errors": [
+        "PCM stopped progressing",
+        "DMA underrun or counter reset",
+        "PCM duration does not match elapsed time"
+      ],
+      "wallMs": 27482.9407,
+      "boardMs": 27389,
+      "frames": 1228488,
+      "audioMs": 25593.5,
+      "underruns": 888,
+      "ratio": 0.9344444850122312,
+      "minHeap": 7944
+    },
+    "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+    "profile_board_ms": 27523,
+    "stages": [
+      {
+        "name": "read",
+        "wall_ms": 1056.868,
+        "wall_percent": 3.839944773462195,
+        "calls": 1626,
+        "mean_us": 649.9803198031981,
+        "maximum_since_boot_us": 4279,
+        "misses": 39
+      },
+      {
+        "name": "decode_exclusive",
+        "wall_ms": 19269.012,
+        "wall_percent": 70.01058024197944,
+        "calls": 1626,
+        "mean_us": 11850.560885608857,
+        "maximum_since_boot_us": 41596,
+        "misses": 300
+      },
+      {
+        "name": "output",
+        "wall_ms": 5258.753,
+        "wall_percent": 19.10675798423137,
+        "calls": 2572,
+        "mean_us": 2044.6162519440124,
+        "maximum_since_boot_us": 8987,
+        "misses": 331
+      },
+      {
+        "name": "post_decode_wait",
+        "wall_ms": 734.288,
+        "wall_percent": 2.6679068415507032,
+        "calls": 1288,
+        "mean_us": 570.0993788819876,
+        "maximum_since_boot_us": 4034,
+        "misses": 0
+      },
+      {
+        "name": "input_wait",
+        "wall_ms": 276.103,
+        "wall_percent": 1.0031718925989173,
+        "calls": 338,
+        "mean_us": 816.8727810650887,
+        "maximum_since_boot_us": 4057,
+        "misses": 166
+      }
+    ],
+    "timing_valid": true,
+    "unattributed_misses_approx": 52,
+    "note": "Health and profile are successive requests, not an atomic combined snapshot. Maxima are since boot. All failures are retained."
+  }
+}

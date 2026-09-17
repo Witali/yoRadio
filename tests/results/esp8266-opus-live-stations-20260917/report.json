@@ -1,0 +1,509 @@
+{
+  "date": "2026-09-17T17:06:46.130Z",
+  "firmware": "existing ordinary radio, C Opus backend, not raw benchmark",
+  "note": "Stage percentages are elapsed wall time, not CPU utilization. No acoustic recording. Underruns are events, not silence duration.",
+  "results": [
+    {
+      "name": "r2rock",
+      "starts": [
+        {
+          "file": "r2rock-start1.json",
+          "command": "play=512",
+          "error": "Error: request timeout /api/native/status\n    at Timeout._onTimeout (C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tools\\esp8266_audio_profile\\check_prefill_board.cjs:39:44)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
+          "status": null
+        },
+        {
+          "file": "r2rock-start2.json",
+          "command": "play=512",
+          "error": "Error: request timeout /api/native/status\n    at Timeout._onTimeout (C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tools\\esp8266_audio_profile\\check_prefill_board.cjs:39:44)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
+          "status": null
+        }
+      ],
+      "windows": [
+        {
+          "file": "r2rock-sparse2.json",
+          "continuity": {
+            "pass": false,
+            "errors": [
+              "PCM stopped progressing",
+              "DMA underrun or counter reset",
+              "PCM duration does not match elapsed time"
+            ],
+            "wallMs": 30051.474299999998,
+            "boardMs": 29980,
+            "frames": 10896,
+            "audioMs": 227,
+            "underruns": 7192,
+            "ratio": 0.007571714476317545,
+            "minHeap": 22968
+          },
+          "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+          "profile_board_ms": 29980,
+          "stages": [
+            {
+              "name": "read",
+              "wall_ms": 763.994,
+              "wall_percent": 2.5483455637091392,
+              "calls": 5886,
+              "mean_us": 129.7985049269453,
+              "maximum_since_boot_us": 4279,
+              "misses": 613
+            },
+            {
+              "name": "decode_exclusive",
+              "wall_ms": 365.232,
+              "wall_percent": 1.2182521681120748,
+              "calls": 5886,
+              "mean_us": 62.05096839959225,
+              "maximum_since_boot_us": 41596,
+              "misses": 149
+            },
+            {
+              "name": "output",
+              "wall_ms": 36.749,
+              "wall_percent": 0.1225783855903936,
+              "calls": 24,
+              "mean_us": 1531.2083333333333,
+              "maximum_since_boot_us": 8925,
+              "misses": 12
+            },
+            {
+              "name": "post_decode_wait",
+              "wall_ms": 10.699,
+              "wall_percent": 0.035687124749833224,
+              "calls": 16,
+              "mean_us": 668.6875,
+              "maximum_since_boot_us": 3589,
+              "misses": 1
+            },
+            {
+              "name": "input_wait",
+              "wall_ms": 4727.213,
+              "wall_percent": 15.76788859239493,
+              "calls": 5868,
+              "mean_us": 805.5918541240627,
+              "maximum_since_boot_us": 4057,
+              "misses": 3554
+            }
+          ],
+          "timing_valid": true,
+          "unattributed_misses_approx": 2863,
+          "note": "Health and profile are successive requests, not an atomic combined snapshot. Maxima are since boot. All failures are retained."
+        },
+        {
+          "file": "r2rock-sparse3.json",
+          "continuity": {
+            "pass": false,
+            "errors": [
+              "PCM stopped progressing",
+              "DMA underrun or counter reset",
+              "PCM duration does not match elapsed time"
+            ],
+            "wallMs": 27037.209799999997,
+            "boardMs": 26974,
+            "frames": 0,
+            "audioMs": 0,
+            "underruns": 2539,
+            "ratio": 0,
+            "minHeap": 22616
+          },
+          "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+          "profile_board_ms": 26974,
+          "stages": [
+            {
+              "name": "read",
+              "wall_ms": 0,
+              "wall_percent": 0,
+              "calls": 0,
+              "mean_us": 0,
+              "maximum_since_boot_us": 4279,
+              "misses": 0
+            },
+            {
+              "name": "decode_exclusive",
+              "wall_ms": 0,
+              "wall_percent": 0,
+              "calls": 0,
+              "mean_us": 0,
+              "maximum_since_boot_us": 41596,
+              "misses": 0
+            },
+            {
+              "name": "output",
+              "wall_ms": 0,
+              "wall_percent": 0,
+              "calls": 0,
+              "mean_us": 0,
+              "maximum_since_boot_us": 8925,
+              "misses": 0
+            },
+            {
+              "name": "post_decode_wait",
+              "wall_ms": 0,
+              "wall_percent": 0,
+              "calls": 0,
+              "mean_us": 0,
+              "maximum_since_boot_us": 3589,
+              "misses": 0
+            },
+            {
+              "name": "input_wait",
+              "wall_ms": 0,
+              "wall_percent": 0,
+              "calls": 0,
+              "mean_us": 0,
+              "maximum_since_boot_us": 4057,
+              "misses": 0
+            }
+          ],
+          "timing_valid": true,
+          "unattributed_misses_approx": 2539,
+          "note": "Health and profile are successive requests, not an atomic combined snapshot. Maxima are since boot. All failures are retained."
+        }
+      ],
+      "source": {
+        "sha256": "804e0b8cd7c1697504f540fbe6065a94b94d033a5ba7314904a25dfdf6dd8536",
+        "capture_bytes": 462690,
+        "complete_bytes": 462690,
+        "pages": 30,
+        "trailing_bytes": 0,
+        "partial_packet_bytes": 0,
+        "layouts": [
+          {
+            "mode": "CELT",
+            "toc": 252,
+            "frame_ms": 20,
+            "frames": 1,
+            "packet_ms": 20,
+            "count": 1400
+          }
+        ],
+        "packets": 1400,
+        "samples": 1344000,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 1400
+        },
+        "packet_durations_ms": {
+          "20": 1400
+        },
+        "packet_channels": {
+          "2": 1400
+        },
+        "max_packet_bytes": 635
+      },
+      "host_decode_exit": 0,
+      "diagnostic": [
+        {
+          "route": "/api/native/status",
+          "http": 200,
+          "ms": 42.3793,
+          "body": {
+            "firmware": "esp8266-native",
+            "port": 80,
+            "websocket": "/ws",
+            "network": 1,
+            "rssi": -56,
+            "playing": false,
+            "station": "Ogg Opus — R2Rock",
+            "codec": "OPUS",
+            "bitrate": 126,
+            "connecting": false,
+            "error": "DECODER INIT ERROR",
+            "free_heap": 27344,
+            "min_heap": 896,
+            "web_stack_free": 2288,
+            "app_address": 1114112
+          }
+        },
+        {
+          "route": "/api/native/opus-stream",
+          "http": 200,
+          "ms": 12.887900000000002,
+          "body": {
+            "stage": 10,
+            "free_dram": 4020,
+            "requested_bytes": 4096,
+            "reserve_bytes": 4096,
+            "detail": 4080,
+            "largest_dram": 2276,
+            "current_dram": 27080,
+            "current_largest": 25464
+          }
+        }
+      ],
+      "uninterrupted_windows": 0
+    },
+    {
+      "name": "plaza",
+      "starts": [
+        {
+          "file": "plaza-start1.json",
+          "command": "play=513",
+          "error": "Error: request timeout /api/native/status\n    at Timeout._onTimeout (C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tools\\esp8266_audio_profile\\check_prefill_board.cjs:39:44)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
+          "status": null
+        },
+        {
+          "file": "plaza-start2.json",
+          "command": "play=513",
+          "error": "Error: request timeout /api/native/status\n    at Timeout._onTimeout (C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tools\\esp8266_audio_profile\\check_prefill_board.cjs:39:44)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
+          "status": null
+        }
+      ],
+      "windows": [
+        {
+          "file": "plaza-sparse1.json",
+          "continuity": {
+            "pass": false,
+            "errors": [
+              "missing health samples"
+            ]
+          },
+          "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+          "profile_error": "missing samples"
+        },
+        {
+          "file": "plaza-sparse2.json",
+          "continuity": {
+            "pass": false,
+            "errors": [
+              "DMA underrun or counter reset",
+              "PCM duration does not match elapsed time"
+            ],
+            "wallMs": 28300.372900000002,
+            "boardMs": 28234,
+            "frames": 1316160,
+            "audioMs": 27420,
+            "underruns": 704,
+            "ratio": 0.9711695119359637,
+            "minHeap": 6516
+          },
+          "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+          "profile_board_ms": 27476,
+          "stages": [
+            {
+              "name": "read",
+              "wall_ms": 1060.77,
+              "wall_percent": 3.860714805648566,
+              "calls": 1383,
+              "mean_us": 767.0065075921909,
+              "maximum_since_boot_us": 4279,
+              "misses": 2
+            },
+            {
+              "name": "decode_exclusive",
+              "wall_ms": 20512.784,
+              "wall_percent": 74.65709710292619,
+              "calls": 1382,
+              "mean_us": 14842.82489146165,
+              "maximum_since_boot_us": 36193,
+              "misses": 282
+            },
+            {
+              "name": "output",
+              "wall_ms": 4986.768,
+              "wall_percent": 18.14954141796477,
+              "calls": 2675,
+              "mean_us": 1864.212336448598,
+              "maximum_since_boot_us": 8925,
+              "misses": 326
+            },
+            {
+              "name": "post_decode_wait",
+              "wall_ms": 741.889,
+              "wall_percent": 2.7001346629785994,
+              "calls": 1340,
+              "mean_us": 553.6485074626866,
+              "maximum_since_boot_us": 3589,
+              "misses": 0
+            },
+            {
+              "name": "input_wait",
+              "wall_ms": 35.774,
+              "wall_percent": 0.1302009026059106,
+              "calls": 42,
+              "mean_us": 851.7619047619048,
+              "maximum_since_boot_us": 4057,
+              "misses": 19
+            }
+          ],
+          "timing_valid": true,
+          "unattributed_misses_approx": 75,
+          "note": "Health and profile are successive requests, not an atomic combined snapshot. Maxima are since boot. All failures are retained."
+        },
+        {
+          "file": "plaza-sparse3.json",
+          "continuity": {
+            "pass": false,
+            "errors": [
+              "PCM stopped progressing",
+              "DMA underrun or counter reset",
+              "PCM duration does not match elapsed time"
+            ],
+            "wallMs": 27482.9407,
+            "boardMs": 27389,
+            "frames": 1228488,
+            "audioMs": 25593.5,
+            "underruns": 888,
+            "ratio": 0.9344444850122312,
+            "minHeap": 7944
+          },
+          "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+          "profile_board_ms": 27523,
+          "stages": [
+            {
+              "name": "read",
+              "wall_ms": 1056.868,
+              "wall_percent": 3.839944773462195,
+              "calls": 1626,
+              "mean_us": 649.9803198031981,
+              "maximum_since_boot_us": 4279,
+              "misses": 39
+            },
+            {
+              "name": "decode_exclusive",
+              "wall_ms": 19269.012,
+              "wall_percent": 70.01058024197944,
+              "calls": 1626,
+              "mean_us": 11850.560885608857,
+              "maximum_since_boot_us": 41596,
+              "misses": 300
+            },
+            {
+              "name": "output",
+              "wall_ms": 5258.753,
+              "wall_percent": 19.10675798423137,
+              "calls": 2572,
+              "mean_us": 2044.6162519440124,
+              "maximum_since_boot_us": 8987,
+              "misses": 331
+            },
+            {
+              "name": "post_decode_wait",
+              "wall_ms": 734.288,
+              "wall_percent": 2.6679068415507032,
+              "calls": 1288,
+              "mean_us": 570.0993788819876,
+              "maximum_since_boot_us": 4034,
+              "misses": 0
+            },
+            {
+              "name": "input_wait",
+              "wall_ms": 276.103,
+              "wall_percent": 1.0031718925989173,
+              "calls": 338,
+              "mean_us": 816.8727810650887,
+              "maximum_since_boot_us": 4057,
+              "misses": 166
+            }
+          ],
+          "timing_valid": true,
+          "unattributed_misses_approx": 52,
+          "note": "Health and profile are successive requests, not an atomic combined snapshot. Maxima are since boot. All failures are retained."
+        },
+        {
+          "file": "plaza-sparse4.json",
+          "continuity": {
+            "pass": false,
+            "errors": [
+              "missing health samples"
+            ]
+          },
+          "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+          "profile_error": "missing samples"
+        }
+      ],
+      "source": {
+        "sha256": "728685eb39da7b8c4cb86ecfdfe40de4c30e3bd108273880b0e83d77c426fda1",
+        "capture_bytes": 260414,
+        "complete_bytes": 260414,
+        "pages": 34,
+        "trailing_bytes": 0,
+        "partial_packet_bytes": 0,
+        "layouts": [
+          {
+            "mode": "CELT",
+            "toc": 252,
+            "frame_ms": 20,
+            "frames": 1,
+            "packet_ms": 20,
+            "count": 1600
+          }
+        ],
+        "packets": 1600,
+        "samples": 1536000,
+        "modes": {
+          "SILK": 0,
+          "hybrid": 0,
+          "CELT": 1600
+        },
+        "packet_durations_ms": {
+          "20": 1600
+        },
+        "packet_channels": {
+          "2": 1600
+        },
+        "max_packet_bytes": 280
+      },
+      "host_decode_exit": 0,
+      "diagnostic": [
+        {
+          "route": "/api/native/status",
+          "http": 200,
+          "ms": 1081.8675999999998,
+          "body": {
+            "firmware": "esp8266-native",
+            "port": 80,
+            "websocket": "/ws",
+            "network": 1,
+            "rssi": -53,
+            "playing": true,
+            "station": "Ogg Opus — Nightwave Plaza 128 kbps",
+            "codec": "OPUS",
+            "bitrate": 62,
+            "connecting": false,
+            "error": "",
+            "free_heap": 6092,
+            "min_heap": 1744,
+            "web_stack_free": 2288,
+            "app_address": 1114112
+          }
+        },
+        {
+          "route": "/api/native/opus-stream",
+          "http": 200,
+          "ms": 3256.9216,
+          "body": {
+            "stage": 0,
+            "free_dram": 0,
+            "requested_bytes": 0,
+            "reserve_bytes": 0,
+            "detail": 0,
+            "largest_dram": 0,
+            "current_dram": 6736,
+            "current_largest": 4892
+          }
+        }
+      ],
+      "uninterrupted_windows": 0
+    }
+  ],
+  "first_probe": {
+    "file": "r2rock-sample1.json",
+    "pass": false,
+    "observations": 6,
+    "failures": 6
+  },
+  "windows_total": 7,
+  "uninterrupted_windows": 0,
+  "restoration": {
+    "station_before": 167,
+    "station_after": 167,
+    "stopped": true,
+    "slot_unchanged": true,
+    "playlist_unchanged": true,
+    "free_heap": 27344,
+    "minimum_heap_since_boot": 896
+  }
+}
