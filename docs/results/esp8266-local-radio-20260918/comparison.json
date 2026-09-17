@@ -1,0 +1,715 @@
+{
+  "date": "2026-09-17T22:17:17.508Z",
+  "cases": [
+    {
+      "name": "hybrid24-buffered",
+      "url": "http://192.168.100.253:8765/buffered.opus",
+      "pass": false,
+      "init": {
+        "stage": 8,
+        "free_dram": 8216,
+        "requested_bytes": 6144,
+        "reserve_bytes": 4096,
+        "detail": 0,
+        "largest_dram": 4400,
+        "current_dram": 28116,
+        "current_largest": 21564
+      },
+      "windows": [
+        {
+          "result": {
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "board_ms": 25008,
+            "audio_ms": 25060,
+            "ratio": 1.0020793346129238,
+            "underruns": 11
+          },
+          "generation": 2,
+          "age_ms": 14780,
+          "free_heap": 7596,
+          "pcm_age_ms": 7,
+          "status_error": "request timeout /api/native/status"
+        },
+        {
+          "result": {
+            "pass": false,
+            "errors": [
+              "stale window",
+              "DMA underruns"
+            ],
+            "board_ms": 25008,
+            "audio_ms": 25060,
+            "ratio": 1.0020793346129238,
+            "underruns": 11
+          },
+          "generation": 2,
+          "age_ms": 95720,
+          "free_heap": 28372,
+          "min_heap": 3988,
+          "pcm_age_ms": 73118,
+          "rssi": -61,
+          "playing": false,
+          "error": "DECODER INIT ERROR"
+        }
+      ]
+    },
+    {
+      "name": "hybrid24-paced",
+      "url": "http://192.168.100.253:8765/live.opus",
+      "pass": false,
+      "init": {
+        "stage": 8,
+        "free_dram": 10212,
+        "requested_bytes": 6144,
+        "reserve_bytes": 4096,
+        "detail": 0,
+        "largest_dram": 5600,
+        "current_dram": 27936,
+        "current_largest": 21620
+      },
+      "windows": [
+        {
+          "result": {
+            "pass": false,
+            "errors": [
+              "no complete current-generation window",
+              "stale window",
+              "DMA underruns"
+            ],
+            "board_ms": 25008,
+            "audio_ms": 25060,
+            "ratio": 1.0020793346129238,
+            "underruns": 11
+          },
+          "generation": 2,
+          "age_ms": 198754,
+          "free_heap": 28372,
+          "min_heap": 3988,
+          "pcm_age_ms": 176146,
+          "rssi": -57,
+          "playing": false,
+          "error": "DECODER INIT ERROR"
+        },
+        {
+          "result": {
+            "pass": false,
+            "errors": [
+              "no complete current-generation window",
+              "stale window",
+              "DMA underruns"
+            ],
+            "board_ms": 25008,
+            "audio_ms": 25060,
+            "ratio": 1.0020793346129238,
+            "underruns": 11
+          },
+          "generation": 2,
+          "age_ms": 263708,
+          "free_heap": 28372,
+          "min_heap": 3988,
+          "pcm_age_ms": 241105,
+          "rssi": -61,
+          "playing": false,
+          "error": "DECODER INIT ERROR"
+        }
+      ]
+    },
+    {
+      "name": "hybrid24-paced-clean",
+      "url": "http://192.168.100.253:8765/live.opus",
+      "pass": false,
+      "windows": [
+        {
+          "result": {
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "board_ms": 25001,
+            "audio_ms": 25040,
+            "ratio": 1.001559937602496,
+            "underruns": 21
+          },
+          "generation": 1,
+          "age_ms": 15780,
+          "free_heap": 8000,
+          "min_heap": 4388,
+          "pcm_age_ms": 4,
+          "rssi": -60,
+          "playing": true,
+          "error": ""
+        },
+        {
+          "result": {
+            "pass": false,
+            "errors": [
+              "DMA underruns"
+            ],
+            "board_ms": 25010,
+            "audio_ms": 25050.666666666668,
+            "ratio": 1.0016260162601627,
+            "underruns": 20
+          },
+          "generation": 1,
+          "age_ms": 10081,
+          "free_heap": 6512,
+          "pcm_age_ms": 5,
+          "status_error": "request timeout /api/native/status"
+        }
+      ]
+    },
+    {
+      "name": "silk12-paced-clean",
+      "url": "http://192.168.100.253:8766/live.opus",
+      "pass": false,
+      "init": {
+        "stage": 8,
+        "free_dram": 8484,
+        "requested_bytes": 6144,
+        "reserve_bytes": 4096,
+        "detail": 0,
+        "largest_dram": 4920,
+        "current_dram": 26080,
+        "current_largest": 20140
+      },
+      "windows": [
+        {
+          "result": {
+            "pass": false,
+            "errors": [
+              "quiet response timeout"
+            ]
+          },
+          "free_heap": 26476,
+          "min_heap": 4784,
+          "pcm_age_ms": 17898,
+          "rssi": -54,
+          "playing": false,
+          "error": "DECODER INIT ERROR"
+        }
+      ]
+    }
+  ],
+  "servers": [
+    {
+      "name": "server12.jsonl",
+      "source": {
+        "utc": "2026-09-17T22:07:25.394Z",
+        "event": "listen",
+        "host": "192.168.100.253",
+        "port": 8766,
+        "file": "mono-12-20ms.opus",
+        "bytes": 870186,
+        "sha256": "b28f06ae44c80b1ce6c77ace87ca21e813437c28d8d42ebca72707311f60445f",
+        "duration_ms": 300000,
+        "lifetime_seconds": 900
+      },
+      "connections": [
+        {
+          "request": {
+            "utc": "2026-09-17T22:14:22.736Z",
+            "event": "request",
+            "id": 1,
+            "mode": "paced",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:15:27.514Z",
+            "event": "closed",
+            "id": 1,
+            "mode": "paced",
+            "complete": false,
+            "bytes": 190948,
+            "pages": 3292,
+            "elapsed_ms": 64777.66119999997,
+            "max_late_ms": 28.0166999999783,
+            "drain_wait_ms": 0
+          },
+          "samples": 128,
+          "min_window": 544,
+          "zero_window_samples": 0,
+          "last_tcp": {
+            "utc": "2026-09-17T22:15:27.107Z",
+            "event": "tcp",
+            "id": 1,
+            "ms": 64368.999300000025,
+            "accepted_wire_bytes": 189879,
+            "local_port": 8766,
+            "peer_port": 52590,
+            "peer_address": "192.168.100.6",
+            "mss": 536,
+            "rtt_us": 18717,
+            "min_rtt_us": 1952,
+            "in_flight": 1798,
+            "cwnd": 536,
+            "snd_wnd": 2440,
+            "bytes_out": 314304,
+            "bytes_in": 127,
+            "bytes_retrans": 132602,
+            "fast_retrans": 272,
+            "dup_acks": 823,
+            "rto_episodes": 2,
+            "sample_call_ms": 0.08409999997820705
+          }
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:15:38.095Z",
+            "event": "request",
+            "id": 2,
+            "mode": "paced",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:15:38.115Z",
+            "event": "closed",
+            "id": 2,
+            "mode": "paced",
+            "complete": false,
+            "bytes": 3144,
+            "pages": 54,
+            "elapsed_ms": 19.458900000026915,
+            "max_late_ms": 0.9035000000149012,
+            "drain_wait_ms": 0
+          },
+          "samples": 0,
+          "min_window": null,
+          "zero_window_samples": 0
+        }
+      ]
+    },
+    {
+      "name": "server24.jsonl",
+      "source": {
+        "utc": "2026-09-17T22:04:23.879Z",
+        "event": "listen",
+        "host": "192.168.100.253",
+        "port": 8765,
+        "file": "mono-24-60ms.opus",
+        "bytes": 1040336,
+        "sha256": "2d38cb1acc628c6263eb93600c6890c37aa4135350a59ed8ea03f4f51e5ee013",
+        "duration_ms": 300000,
+        "lifetime_seconds": 900
+      },
+      "connections": [
+        {
+          "request": {
+            "utc": "2026-09-17T22:05:14.921Z",
+            "event": "request",
+            "id": 1,
+            "mode": "buffered",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:06:42.111Z",
+            "event": "closed",
+            "id": 1,
+            "mode": "buffered",
+            "complete": false,
+            "bytes": 312336,
+            "pages": 1503,
+            "elapsed_ms": 87190.0215,
+            "max_late_ms": 0,
+            "drain_wait_ms": 60624.27180000001
+          },
+          "samples": 173,
+          "min_window": 0,
+          "zero_window_samples": 1,
+          "last_tcp": {
+            "utc": "2026-09-17T22:06:42.079Z",
+            "event": "tcp",
+            "id": 1,
+            "ms": 87155.5159,
+            "accepted_wire_bytes": 312486,
+            "local_port": 8765,
+            "peer_port": 65263,
+            "peer_address": "192.168.100.6",
+            "mss": 536,
+            "rtt_us": 93218,
+            "min_rtt_us": 2762,
+            "in_flight": 1984,
+            "cwnd": 536,
+            "snd_wnd": 2072,
+            "bytes_out": 333776,
+            "bytes_in": 131,
+            "bytes_retrans": 5360,
+            "fast_retrans": 1,
+            "dup_acks": 11,
+            "rto_episodes": 4,
+            "sample_call_ms": 0.06830000001355074
+          }
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:06:26.743Z",
+            "event": "request",
+            "id": 2,
+            "mode": "buffered",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:06:48.813Z",
+            "event": "closed",
+            "id": 2,
+            "mode": "buffered",
+            "complete": false,
+            "bytes": 98720,
+            "pages": 476,
+            "elapsed_ms": 22069.832400000014,
+            "max_late_ms": 0,
+            "drain_wait_ms": 97.50370000001567
+          },
+          "samples": 44,
+          "min_window": 2392,
+          "zero_window_samples": 0,
+          "last_tcp": {
+            "utc": "2026-09-17T22:06:48.672Z",
+            "event": "tcp",
+            "id": 2,
+            "ms": 21927.071099999986,
+            "accepted_wire_bytes": 98870,
+            "local_port": 8765,
+            "peer_port": 65264,
+            "peer_address": "192.168.100.6",
+            "mss": 536,
+            "rtt_us": 75620,
+            "min_rtt_us": 2815,
+            "in_flight": 2144,
+            "cwnd": 536,
+            "snd_wnd": 2440,
+            "bytes_out": 10008,
+            "bytes_in": 131,
+            "bytes_retrans": 4824,
+            "fast_retrans": 0,
+            "dup_acks": 3,
+            "rto_episodes": 3,
+            "sample_call_ms": 0.06389999997918494
+          }
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:06:40.915Z",
+            "event": "request",
+            "id": 3,
+            "mode": "buffered",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:06:40.935Z",
+            "event": "closed",
+            "id": 3,
+            "mode": "buffered",
+            "complete": false,
+            "bytes": 98720,
+            "pages": 476,
+            "elapsed_ms": 19.96779999998398,
+            "max_late_ms": 0,
+            "drain_wait_ms": 3.9834999999729916
+          },
+          "samples": 0,
+          "min_window": null,
+          "zero_window_samples": 0
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:08:19.319Z",
+            "event": "request",
+            "id": 4,
+            "mode": "paced",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:08:19.336Z",
+            "event": "closed",
+            "id": 4,
+            "mode": "paced",
+            "complete": false,
+            "bytes": 3664,
+            "pages": 19,
+            "elapsed_ms": 17.10370000000694,
+            "max_late_ms": 0.678699999989476,
+            "drain_wait_ms": 0
+          },
+          "samples": 0,
+          "min_window": null,
+          "zero_window_samples": 0
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:11:01.478Z",
+            "event": "request",
+            "id": 5,
+            "mode": "paced",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:12:11.382Z",
+            "event": "closed",
+            "id": 5,
+            "mode": "paced",
+            "complete": false,
+            "bytes": 245984,
+            "pages": 1184,
+            "elapsed_ms": 69894.54930000001,
+            "max_late_ms": 26.941300000005867,
+            "drain_wait_ms": 0
+          },
+          "samples": 138,
+          "min_window": 120,
+          "zero_window_samples": 0,
+          "last_tcp": {
+            "utc": "2026-09-17T22:12:10.974Z",
+            "event": "tcp",
+            "id": 5,
+            "ms": 69485.57399999996,
+            "accepted_wire_bytes": 244678,
+            "local_port": 8765,
+            "peer_port": 59832,
+            "peer_address": "192.168.100.6",
+            "mss": 536,
+            "rtt_us": 51257,
+            "min_rtt_us": 2326,
+            "in_flight": 1608,
+            "cwnd": 536,
+            "snd_wnd": 1904,
+            "bytes_out": 309184,
+            "bytes_in": 127,
+            "bytes_retrans": 73656,
+            "fast_retrans": 104,
+            "dup_acks": 334,
+            "rto_episodes": 8,
+            "sample_call_ms": 0.043800000043120235
+          }
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:12:14.706Z",
+            "event": "request",
+            "id": 6,
+            "mode": "paced",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:12:18.798Z",
+            "event": "closed",
+            "id": 6,
+            "mode": "paced",
+            "complete": false,
+            "bytes": 17808,
+            "pages": 87,
+            "elapsed_ms": 4091.8682000000263,
+            "max_late_ms": 14.696799999976065,
+            "drain_wait_ms": 0
+          },
+          "samples": 8,
+          "min_window": 1832,
+          "zero_window_samples": 0,
+          "last_tcp": {
+            "utc": "2026-09-17T22:12:18.575Z",
+            "event": "tcp",
+            "id": 6,
+            "ms": 3868.877700000012,
+            "accepted_wire_bytes": 17334,
+            "local_port": 8765,
+            "peer_port": 59833,
+            "peer_address": "192.168.100.6",
+            "mss": 536,
+            "rtt_us": 107613,
+            "min_rtt_us": 2934,
+            "in_flight": 1708,
+            "cwnd": 536,
+            "snd_wnd": 1832,
+            "bytes_out": 10454,
+            "bytes_in": 127,
+            "bytes_retrans": 2928,
+            "fast_retrans": 0,
+            "dup_acks": 4,
+            "rto_episodes": 3,
+            "sample_call_ms": 0.07319999998435378
+          }
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:12:24.899Z",
+            "event": "request",
+            "id": 7,
+            "mode": "paced",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:13:29.742Z",
+            "event": "closed",
+            "id": 7,
+            "mode": "paced",
+            "complete": false,
+            "bytes": 228512,
+            "pages": 1100,
+            "elapsed_ms": 64842.92140000005,
+            "max_late_ms": 27.90809999994235,
+            "drain_wait_ms": 0
+          },
+          "samples": 128,
+          "min_window": 0,
+          "zero_window_samples": 52,
+          "last_tcp": {
+            "utc": "2026-09-17T22:13:29.555Z",
+            "event": "tcp",
+            "id": 7,
+            "ms": 64655.01900000003,
+            "accepted_wire_bytes": 228038,
+            "local_port": 8765,
+            "peer_port": 59834,
+            "peer_address": "192.168.100.6",
+            "mss": 536,
+            "rtt_us": 62357,
+            "min_rtt_us": 2468,
+            "in_flight": 2048,
+            "cwnd": 536,
+            "snd_wnd": 2048,
+            "bytes_out": 244382,
+            "bytes_in": 131,
+            "bytes_retrans": 13488,
+            "fast_retrans": 3,
+            "dup_acks": 23,
+            "rto_episodes": 9,
+            "sample_call_ms": 0.053300000028684735
+          }
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:13:33.067Z",
+            "event": "request",
+            "id": 8,
+            "mode": "paced",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:13:36.221Z",
+            "event": "closed",
+            "id": 8,
+            "mode": "paced",
+            "complete": false,
+            "bytes": 14688,
+            "pages": 72,
+            "elapsed_ms": 3153.8424999999115,
+            "max_late_ms": 14.443199999979697,
+            "drain_wait_ms": 0
+          },
+          "samples": 7,
+          "min_window": 1856,
+          "zero_window_samples": 0,
+          "last_tcp": {
+            "utc": "2026-09-17T22:13:36.096Z",
+            "event": "tcp",
+            "id": 8,
+            "ms": 3028.0099000000628,
+            "accepted_wire_bytes": 14422,
+            "local_port": 8765,
+            "peer_port": 59835,
+            "peer_address": "192.168.100.6",
+            "mss": 536,
+            "rtt_us": 85492,
+            "min_rtt_us": 3037,
+            "in_flight": 1856,
+            "cwnd": 536,
+            "snd_wnd": 1856,
+            "bytes_out": 5818,
+            "bytes_in": 127,
+            "bytes_retrans": 1072,
+            "fast_retrans": 0,
+            "dup_acks": 2,
+            "rto_episodes": 2,
+            "sample_call_ms": 0.09109999996144325
+          }
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:13:47.809Z",
+            "event": "request",
+            "id": 9,
+            "mode": "paced",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:13:51.124Z",
+            "event": "closed",
+            "id": 9,
+            "mode": "paced",
+            "complete": false,
+            "bytes": 15104,
+            "pages": 74,
+            "elapsed_ms": 3315.409400000004,
+            "max_late_ms": 26.741399999940768,
+            "drain_wait_ms": 0
+          },
+          "samples": 6,
+          "min_window": 2440,
+          "zero_window_samples": 0,
+          "last_tcp": {
+            "utc": "2026-09-17T22:13:50.796Z",
+            "event": "tcp",
+            "id": 9,
+            "ms": 2986.4016999999294,
+            "accepted_wire_bytes": 14214,
+            "local_port": 8765,
+            "peer_port": 59837,
+            "peer_address": "192.168.100.6",
+            "mss": 536,
+            "rtt_us": 3835,
+            "min_rtt_us": 2659,
+            "in_flight": 2320,
+            "cwnd": 536,
+            "snd_wnd": 2440,
+            "bytes_out": 8996,
+            "bytes_in": 127,
+            "bytes_retrans": 2680,
+            "fast_retrans": 1,
+            "dup_acks": 4,
+            "rto_episodes": 2,
+            "sample_call_ms": 0.05869999993592501
+          }
+        },
+        {
+          "request": {
+            "utc": "2026-09-17T22:14:01.738Z",
+            "event": "request",
+            "id": 10,
+            "mode": "paced",
+            "remote": "192.168.100.6",
+            "method": "GET"
+          },
+          "closed": {
+            "utc": "2026-09-17T22:14:01.754Z",
+            "event": "closed",
+            "id": 10,
+            "mode": "paced",
+            "complete": false,
+            "bytes": 3872,
+            "pages": 20,
+            "elapsed_ms": 15.962599999969825,
+            "max_late_ms": 0.6088999999919906,
+            "drain_wait_ms": 0
+          },
+          "samples": 0,
+          "min_window": null,
+          "zero_window_samples": 0
+        }
+      ]
+    }
+  ],
+  "note": "TCP retransmissions can include congestion/window effects; not proof of RF loss. Autonomous windows are wall time, not CPU utilization."
+}

@@ -1,5 +1,9 @@
 # Playback checkpoint — 2026-09-18
 
+Later follow-up: see ESP8266_LOCAL_RADIO_2026-09-18.md. A LAN-only station
+reproduced underruns and scratch-allocation failures. No firmware change;
+the board was left stopped after that experiment, not playing Kultur.
+
 Stopped at the user's explicit save-and-shutdown request, without pushing.
 Branch:codex/esp8266-opus-asm, worktree:.worktree/esp8266-opus-asm.
 
