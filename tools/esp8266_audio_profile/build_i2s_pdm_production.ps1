@@ -42,7 +42,7 @@ param(
     [switch]$Pdm32Batch,
     [ValidateSet(64, 128, 256, 512)]
     [int]$Pdm32LoanWords = 512,
-    [ValidateSet(256, 512, 768)]
+    [ValidateSet(128, 256, 512, 768)]
     [int]$DmaBufferWords = 512,
     [ValidateRange(250, 60000)]
     [int]$StreamIdleTimeoutMs = 1000,
@@ -90,7 +90,7 @@ if ($OpusPcmQueue) {
     }
     $OpusPcmLeases = $true
 }
-if ($DmaBufferWords -eq 256 -and -not $OpusPcmQueue) { throw 'DMA256 requires -OpusPcmQueue' }
+if ($DmaBufferWords -le 256 -and -not $OpusPcmQueue) { throw 'DMA128/256 requires -OpusPcmQueue' }
 if ($PcmStackBytes -ne 2048 -and -not $OpusPcmQueue) { throw 'PCM stack override requires -OpusPcmQueue' }
 if ($OpusPcmLeases -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusPcmLeases requires diagnostic Opus until queue qualification' }
 if ($OpusRotationLx106 -and (-not $EnableOpus -or -not $Diagnostic)) { throw '-OpusRotationLx106 requires diagnostic Opus until board qualification' }

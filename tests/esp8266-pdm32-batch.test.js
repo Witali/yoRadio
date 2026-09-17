@@ -24,7 +24,7 @@ test('PDM32 batch CMake option is OFF by default and rejects non-standard backen
   fs.writeFileSync(script, 'cmake_minimum_required(VERSION 3.13)\n' + block);
   const run = options => spawnSync(command, [...options, '-P', script], {encoding:'utf8'});
   assert.equal(run([]).status, 0, 'default must allow ordinary non-PDM32 builds');
-  for (const words of [256,512,768,1024]) for(const diag of [false,true])
+  for (const words of [64,128,256,512,768,1024]) for(const diag of [false,true])
   for(const queue of [false,true])
   for(const opus of [false,true]) for(const pdm of [false,true]) {
     const result = run(['-DYORADIO_ESP8266_DMA_BUFFER_WORDS='+words,
@@ -33,7 +33,7 @@ test('PDM32 batch CMake option is OFF by default and rejects non-standard backen
       '-DCONFIG_YORADIO_OGG_OPUS='+ (opus?'ON':'OFF'),
       '-DCONFIG_YORADIO_AUDIO_OUTPUT_I2S_PDM='+ (pdm?'ON':'OFF'),
       '-DCONFIG_YORADIO_I2S_PDM_OVERSAMPLE_32=ON']);
-    assert.equal(result.status === 0, words===512 || ((words===768 || (words===256 && queue)) && diag && opus && pdm), result.stdout+result.stderr);
+    assert.equal(result.status === 0, words===512 || ((words===768 || ([128,256].includes(words) && queue)) && diag && opus && pdm), result.stdout+result.stderr);
   }
   for (const enabled of [false,true]) for (const pdm of [false,true]) for (const os32 of [false,true]) {
     const result = run(['-DYORADIO_ESP8266_PDM32_BATCH=' + (enabled ? 'ON':'OFF'),

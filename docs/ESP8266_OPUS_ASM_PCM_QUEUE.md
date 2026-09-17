@@ -34,3 +34,17 @@ Host correctness does not establish board throughput or continuous playback.
 - [ ] Stop/Play and codec-switch verification, heap/stack watermark checks.
 
 No production promotion is implied by a successful build or by `playing=true`.
+
+## Smaller DMA experiment
+
+`-DmaBufferWords 128` is now accepted only with diagnostic Opus PCM queue.
+Two128-word descriptors consume1024B, saving1024B versus DMA256. The PCM pool
+remains3840B, consumer stack1536B, main stack5120B and heap reserve4096B.
+This is not a claim of lower total RAM than the old synchronous pipeline:
+the extra PCM slot and consumer task still have to be included.
+
+At the nominal48kHz PDM32 rate a full128-word block lasts2.67ms, so smaller
+DMA increases interrupt/service frequency. Qualification must measure misses,
+not just successful allocation. Six host tests passed: actual direct writer
+PCM/PDM equivalence through mono/stereo/rate/normalization boundaries and EOF
+races, configuration guards and diagnostic response capacity. Default512 stays.

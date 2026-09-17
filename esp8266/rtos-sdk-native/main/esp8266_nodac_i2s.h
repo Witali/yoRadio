@@ -8,14 +8,15 @@
 #include "freertos/FreeRTOS.h"
 
 /* Two producer/DMA ping-pong buffers; default 512 words each (4 KiB total).
+ * Diagnostic 128/256-word variants require the separate PCM queue in CMake.
  * The diagnostic 768-word
  * variant adds 2 KiB of DRAM, without changing ownership or PCM/PDM bits.
  * Only committed data is submitted; no unguarded circular DMA link. */
 #ifndef YORADIO_ESP8266_DMA_BUFFER_WORDS
 #define YORADIO_ESP8266_DMA_BUFFER_WORDS 512
 #endif
-#if YORADIO_ESP8266_DMA_BUFFER_WORDS != 256 && YORADIO_ESP8266_DMA_BUFFER_WORDS != 512 && YORADIO_ESP8266_DMA_BUFFER_WORDS != 768
-#error "DMA buffer words must be diagnostic 256, 512 or diagnostic 768"
+#if YORADIO_ESP8266_DMA_BUFFER_WORDS != 128 && YORADIO_ESP8266_DMA_BUFFER_WORDS != 256 && YORADIO_ESP8266_DMA_BUFFER_WORDS != 512 && YORADIO_ESP8266_DMA_BUFFER_WORDS != 768
+#error "DMA buffer words must be diagnostic 128/256, 512 or diagnostic 768"
 #endif
 #define ESP8266_NODAC_DMA_BUFFER_COUNT 2U
 #define ESP8266_NODAC_DMA_BUFFER_WORDS YORADIO_ESP8266_DMA_BUFFER_WORDS
