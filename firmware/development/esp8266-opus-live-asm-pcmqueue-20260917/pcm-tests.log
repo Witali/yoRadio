@@ -1,0 +1,54 @@
+TAP version 13
+# Subtest: lease adapter replaces only the packet dispatcher, retaining every hot ASM unit
+ok 1 - lease adapter replaces only the packet dispatcher, retaining every hot ASM unit
+  ---
+  duration_ms: 47.0618
+  type: 'test'
+  ...
+# Subtest: missing/duplicate frozen dispatcher is rejected
+ok 2 - missing/duplicate frozen dispatcher is rejected
+  ---
+  duration_ms: 110.9237
+  type: 'test'
+  ...
+# Subtest: authenticated corpus and incompatible state ABI guards remain before selection
+ok 3 - authenticated corpus and incompatible state ABI guards remain before selection
+  ---
+  duration_ms: 0.4429
+  type: 'test'
+  ...
+# Subtest: leased PCM keeps exact samples with delayed consumption, bounded memory and failure cleanup
+ok 4 - leased PCM keeps exact samples with delayed consumption, bounded memory and failure cleanup
+  ---
+  duration_ms: 5.6104
+  type: 'test'
+  ...
+# Subtest: leased PCM full corpus is reproducible
+ok 5 - leased PCM full corpus is reproducible # SKIP Set OPUS_LEASE_TEST=1 for full decoder comparison
+  ---
+  duration_ms: 0.1961
+  type: 'test'
+  ...
+# Subtest: actual PCM queue survives concurrent ownership, backpressure, stop and output failure, stack 1536
+ok 6 - actual PCM queue survives concurrent ownership, backpressure, stop and output failure, stack 1536
+  ---
+  duration_ms: 3672.0346
+  type: 'test'
+  ...
+# PCM queue PASS: exact order, two slots, trim, backpressure, 25 in-flight stops, error/reuse; no ISR work
+# Subtest: actual PCM queue survives concurrent ownership, backpressure, stop and output failure, stack 2048
+ok 7 - actual PCM queue survives concurrent ownership, backpressure, stop and output failure, stack 2048
+  ---
+  duration_ms: 1365.1449
+  type: 'test'
+  ...
+# PCM queue PASS: exact order, two slots, trim, backpressure, 25 in-flight stops, error/reuse; no ISR work
+1..7
+# tests 7
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 5148.1598

@@ -1,0 +1,239 @@
+{
+  "date": "2026-09-17T18:34:00.018Z",
+  "url": "http://st01.sslstream.dlf.de/dlf/01/low/opus/stream.opus?aggregator=web",
+  "start": {
+    "http": 202,
+    "body": {
+      "queued": true
+    }
+  },
+  "status": {
+    "http": 200,
+    "body": {
+      "firmware": "esp8266-native",
+      "port": 80,
+      "websocket": "/ws",
+      "network": 1,
+      "rssi": -55,
+      "playing": true,
+      "station": "OPUS TEST",
+      "codec": "OPUS",
+      "bitrate": 24,
+      "connecting": false,
+      "error": "",
+      "free_heap": 7496,
+      "min_heap": 5324,
+      "web_stack_free": 2312,
+      "app_address": 1114112
+    }
+  },
+  "trace": {
+    "date": "2026-09-17T18:34:05.132Z",
+    "base": "http://192.168.100.6",
+    "seconds": 25,
+    "samples": [
+      {
+        "health": {
+          "generation": 1,
+          "uptime_ms": 36718,
+          "rx_bytes": 17672,
+          "pcm_frames": 261768,
+          "sample_rate": 48000,
+          "rx_age_ms": 6,
+          "pcm_age_ms": 9,
+          "underruns": 3203,
+          "free_heap": 7320,
+          "dma_eofs": 3749,
+          "output_enabled": true,
+          "audio_stack_free": 1544,
+          "free_iram": 80,
+          "transport_phase": 6,
+          "transport_result": -2147483648,
+          "transport_errno": 0,
+          "input_bytes": 0
+        },
+        "profile": {
+          "profile_version": 2,
+          "generation": 1,
+          "uptime_ms": 37771,
+          "stages": [
+            [
+              139049,
+              3482,
+              490,
+              39
+            ],
+            [
+              3950087,
+              48553,
+              489,
+              38
+            ],
+            [
+              2378548,
+              9260,
+              650,
+              9
+            ],
+            [
+              62946,
+              2830,
+              110,
+              0
+            ],
+            [
+              304968,
+              1526,
+              379,
+              212
+            ]
+          ]
+        },
+        "host_ms": 1035.7909,
+        "request_ms": 2084.9937
+      },
+      {
+        "health": {
+          "generation": 1,
+          "uptime_ms": 64731,
+          "rx_bytes": 101917,
+          "pcm_frames": 1583240,
+          "sample_rate": 48000,
+          "rx_age_ms": 59,
+          "pcm_age_ms": 1,
+          "underruns": 3653,
+          "free_heap": 7200,
+          "dma_eofs": 6952,
+          "output_enabled": true,
+          "audio_stack_free": 1544,
+          "free_iram": 80,
+          "transport_phase": 6,
+          "transport_result": -2147483648,
+          "transport_errno": 0,
+          "input_bytes": 0
+        },
+        "profile": {
+          "profile_version": 2,
+          "generation": 1,
+          "uptime_ms": 65766,
+          "stages": [
+            [
+              572982,
+              3482,
+              1533,
+              101
+            ],
+            [
+              20483967,
+              53005,
+              1533,
+              82
+            ],
+            [
+              12687041,
+              9260,
+              3402,
+              16
+            ],
+            [
+              294872,
+              2830,
+              569,
+              0
+            ],
+            [
+              773156,
+              1762,
+              963,
+              536
+            ]
+          ]
+        },
+        "host_ms": 29116.392499999998,
+        "request_ms": 3457.406899999998
+      }
+    ],
+    "result": {
+      "continuity": {
+        "pass": false,
+        "errors": [
+          "DMA underrun or counter reset"
+        ],
+        "wallMs": 28080.601599999998,
+        "boardMs": 28013,
+        "frames": 1321472,
+        "audioMs": 27530.666666666668,
+        "underruns": 450,
+        "ratio": 0.9827818036863837,
+        "minHeap": 7200
+      },
+      "timing_kind": "wall time including preemption and DMA waits, NOT CPU utilization",
+      "profile_board_ms": 27995,
+      "stages": [
+        {
+          "name": "read",
+          "wall_ms": 433.933,
+          "wall_percent": 1.5500375066976246,
+          "calls": 1043,
+          "mean_us": 416.0431447746884,
+          "maximum_since_boot_us": 3482,
+          "misses": 62
+        },
+        {
+          "name": "decode_exclusive",
+          "wall_ms": 16533.88,
+          "wall_percent": 59.060117878192536,
+          "calls": 1044,
+          "mean_us": 15837.04980842912,
+          "maximum_since_boot_us": 53005,
+          "misses": 44
+        },
+        {
+          "name": "output",
+          "wall_ms": 10308.493,
+          "wall_percent": 36.82262189676728,
+          "calls": 2752,
+          "mean_us": 3745.8186773255816,
+          "maximum_since_boot_us": 9260,
+          "misses": 7
+        },
+        {
+          "name": "post_decode_wait",
+          "wall_ms": 231.926,
+          "wall_percent": 0.8284550812645115,
+          "calls": 459,
+          "mean_us": 505.2854030501089,
+          "maximum_since_boot_us": 2830,
+          "misses": 0
+        },
+        {
+          "name": "input_wait",
+          "wall_ms": 468.188,
+          "wall_percent": 1.6723986426147526,
+          "calls": 584,
+          "mean_us": 801.6917808219179,
+          "maximum_since_boot_us": 1762,
+          "misses": 324
+        }
+      ],
+      "timing_valid": true,
+      "unattributed_misses_approx": 13,
+      "note": "Health and profile are successive requests, not an atomic combined snapshot. Maxima are since boot. All failures are retained."
+    },
+    "runner_exit": 1
+  },
+  "init_diagnostic": {
+    "http": 200,
+    "body": {
+      "stage": 0,
+      "free_dram": 0,
+      "requested_bytes": 0,
+      "reserve_bytes": 0,
+      "detail": 0,
+      "largest_dram": 0,
+      "current_dram": 8708,
+      "current_largest": 5996
+    }
+  },
+  "pass": false
+}
