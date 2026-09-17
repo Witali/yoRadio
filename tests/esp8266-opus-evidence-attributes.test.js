@@ -14,7 +14,7 @@ test('PVQ logs retain raw line endings and JSON normalization is byte-reproducib
  assert.equal(hash('{"value":1}\n'),hash('{"value":1}\r\n'));
 });
 test('new memory and qn JSON evidence keeps LF and native logs retain their bytes',()=>{
- for(const dir of['esp8266-opus-live-memory-diag-v1/evidence/runs','esp8266-opus-pvq-qn-table-candidate-v1/qualified/before','esp8266-opus-ebands-pair-candidate-v1/before','esp8266-opus-ebands-more-candidate-v1/before']){
+ for(const dir of['esp8266-opus-live-memory-diag-v1/evidence/runs','esp8266-opus-pvq-qn-table-candidate-v1/qualified/before','esp8266-opus-ebands-pair-candidate-v1/before','esp8266-opus-ebands-more-candidate-v1/before','esp8266-opus-allocation-byte-candidate-v1/before']){
   const prefix='firmware/development/'+dir;
   const json=execFileSync('git',['check-attr','text','eol','--',prefix+'/run1.json'],{cwd:root,encoding:'utf8'});
   assert.match(json,/: text: set/);assert.match(json,/: eol: lf/);
@@ -26,7 +26,9 @@ test('qn parent ELF archive is LFS-managed binary',()=>{
  const out=execFileSync('git',['check-attr','filter','text','--',file],{cwd:root,encoding:'utf8'});
  assert.match(out,/: filter: lfs/);assert.match(out,/: text: unset/);
 });
-test('eBands parent ELF archive is LFS-managed binary',()=>{
- const file='firmware/development/esp8266-opus-ebands-pair-candidate-v1/parent.elf.gz';
- const out=git(['check-attr','filter','text','--',file]);assert.match(out,/: filter: lfs/);assert.match(out,/: text: unset/);
+test('eBands and allocation parent ELF archives are LFS-managed binary',()=>{
+ for(const family of ['ebands-pair','ebands-more','allocation-byte']){
+  const file='firmware/development/esp8266-opus-'+family+'-candidate-v1/parent.elf.gz';
+  const out=git(['check-attr','filter','text','--',file]);assert.match(out,/: filter: lfs/);assert.match(out,/: text: unset/);
+ }
 });
