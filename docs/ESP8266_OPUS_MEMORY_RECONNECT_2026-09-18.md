@@ -290,3 +290,25 @@ explained solely by TCP TIME-WAIT.
   profile changes the scratch-mark layout and is not a safe flag-only switch.
 - [ ] Complete the separate CPU target and continuous-audio qualification.
   These memory corrections do not establish a decoder speed improvement.
+
+### Current-source deployment requested after the quant-locals experiment
+
+The cancellation fix is no longer merely source-tested: it was compiled
+from `a82a4551` together with all 18 accepted ASM transformations, uploaded
+by native OTA and booted in slot 0x110000. The image is 890336 B with unchanged
+IRAM/DRAM static sections. This updates the historical "not flashed" status
+above; targeted on-board cancellation/fault injection is still outstanding.
+
+Artifact and complete evidence:
+[current radio changelog](../firmware/development/esp8266-opus-live-asm-current-20260918/CHANGELOG.md).
+SHA256: `c63a757ccab9dd2f2ab02159cce88ac5a5500e65383d7ff46808165f7f3bfbd3`.
+
+HTTP/WS/playlist checks after OTA passed, but the existing Nightwave Plaza
+Opus station still failed continuity: 23189.33 ms PCM in a 25007-ms quiet
+window, 1419 DMA underruns, then CONNECTION ERROR. Boot minimum combined
+heap reached 452 B. No decoder-init failure was latched. Subsequent current
+DRAM/largest block were 29104/27036 B; the final stopped status had no error
+and combined free heap 28832 B. These are different observation times, not
+an allocation trace or proof that all fragmentation is resolved. Failed
+Play-status and Stop requests are retained. The new image remains installed,
+stopped, after successful idempotent Stop cleanup. No serial/reset was used.
