@@ -1221,13 +1221,17 @@ static void audio_task(void *argument) {
         }
 
         size_t detect_size = stream.body_size;
+        /* Keep the cached decoder's identity until detection succeeds for
+         * the current command. Cancellation while sniffing must not relabel
+         * live Opus storage as unknown/MP3/AAC and force a cold open retry. */
+        helix_codec_kind_t detected_kind = 0;
         uint32_t audio_until_metadata = stream.metadata_interval;
         if (audio_until_metadata && detect_size <= audio_until_metadata)
             audio_until_metadata -= (uint32_t)detect_size;
         audio_transport_phase(AUDIO_TRANSPORT_REFILL);
         while (generation_current(command.generation) &&
                !audio_web_pause_requested() &&
-               !(codec_kind = helix_codec_detect(s_work, detect_size))) {
+               !(detected_kind = helix_codec_detect(s_work, detect_size))) {
             if (detect_size == sizeof(s_work)) break;
             if (stream.metadata_interval && !audio_until_metadata) break;
             size_t wanted = sizeof(s_work) - detect_size;
@@ -1248,11 +1252,11 @@ static void audio_task(void *argument) {
         }
 #if YORADIO_ESP8266_AUDIO_PROFILE
         ESP_LOGI(TAG, "Profile detection: codec=%d bytes=%u free_heap=%u",
-                 (int)codec_kind, (unsigned)detect_size,
+                 (int)detected_kind, (unsigned)detect_size,
                  (unsigned)esp_get_free_heap_size());
 #endif
         if (audio_web_pause_checkpoint(&stream, &command)) continue;
-        if (!codec_kind || !generation_current(command.generation)) {
+        if (!detected_kind || !generation_current(command.generation)) {
             audio_transport_phase(AUDIO_TRANSPORT_CLOSE);
             close(stream.socket);
             if (generation_current(command.generation)) {
@@ -1266,6 +1270,7 @@ static void audio_task(void *argument) {
 #if YORADIO_ESP8266_AUDIO_PROFILE
         ESP_LOGI(TAG, "Profile decoder switch begin");
 #endif
+        codec_kind = detected_kind;
         bool decoder_ready = codec
             ? helix_codec_switch(codec, codec_kind) == 0
             : (codec = helix_codec_create(codec_kind,

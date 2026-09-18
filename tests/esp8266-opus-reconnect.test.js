@@ -29,11 +29,12 @@ test('actual audio task keeps Opus on reconnect with bounded cold fallback and c
     REQUEUE: section(audio, 'static void requeue_if_current(', 'static uint32_t advance_generation('),
     STOP: section(task, '        if (!command.play) {', '        opus_benchmark_cancel_pending();'),
     OPEN: section(task, '        int opened = -1;', '        size_t detect_size = stream.body_size;'),
+    DETECT: section(task, '        size_t detect_size = stream.body_size;', '        bool decoder_ready = codec'),
     SNIFF: section(task, '        bool decoder_ready = codec', '        log_audio_stack("decoder ready");'),
     RECONNECT: section(task, '        int stream_closed = close(stream.socket);', '\n    }\n}\n#endif'),
   };
   for (const [name, value] of Object.entries(replacements)) code = code.replace('/* ' + name + ' */', value);
-  assert.doesNotMatch(code, /\/\* (?:DEFINES|RELEASE|REQUEUE|STOP|OPEN|SNIFF|RECONNECT) \*\//);
+  assert.doesNotMatch(code, /\/\* (?:DEFINES|RELEASE|REQUEUE|STOP|OPEN|DETECT|SNIFF|RECONNECT) \*\//);
   const windows = process.platform === 'win32';
   const run = (program, args) => spawnSync(windows ? 'wsl.exe' : program,
     windows ? ['--exec', program, ...args] : args,

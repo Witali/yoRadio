@@ -180,11 +180,59 @@ computer shutdown was performed.
 
 ## Remaining work
 
+### Follow-up: cancellation during format detection
+
+The additional code audit found a third avoidable workspace-lifetime defect.
+`audio_task` previously wrote each `helix_codec_detect` result directly into
+`codec_kind`, which is also used to decide whether a cached decoder can survive
+an HTTP open retry. A new Stop/Next/Play command can invalidate the stream while
+its header is incomplete, or immediately after a different signature is found.
+The old Opus object then remained allocated, but `codec_kind` became zero or
+MP3/AAC. A subsequent non-memory open failure consequently discarded its large
+blocks instead of reusing them. This is unnecessary heap churn, not an observed
+lost-pointer leak. Its occurrence in the earlier physical failures is unproven.
+
+Detection now uses a separate local `detected_kind`. The retained type changes
+only after detection and the generation check succeed, immediately before the
+actual decoder switch. Genuine unsupported streams, final connection failures,
+Stop, memory pressure and decoder errors still clean up normally. No new heap
+allocation, global state, output buffer, Opus ABI or ASM modification is involved.
+
+Validation:
+
+- The regression compiles the actual production detection/open/cleanup branches.
+  Before the fix, cancellation reproduced the incorrect cached identity. After
+  the fix it passes with Opus enabled and disabled under ASan/UBSan. Cases include
+  cancellation during incomplete-header receive and after another codec's
+  signature, subsequent timeout/retry, unsupported streams and real codec changes.
+- The combined memory-lifecycle, codec-ownership, reconnect and diagnostic HTTP
+  suite passes **21/21**, no skips. The eight lifecycle configurations each run
+  100 mixed-codec cycles with injected allocation failures; all codec DRAM returns
+  to baseline. The retained shared IRAM block is intentional. Network/decoder
+  stubs in these tests do not prove the whole Wi-Fi SDK free from leaks.
+- Recompiled `audio_service.c` using the existing full-radio LX106 GCC8.4/O3
+  configuration. `.text.audio_task` is 5030 rather than 5050 bytes; the individual
+  function stack frame remains 832 bytes (`0x340`) and all writable static sections
+  are unchanged. This is an object-level check, not a new linked/qualified image
+  or a decoder speed measurement.
+
+Evidence: [follow-up results](results/esp8266-opus-memory-reconnect-20260918/followup/).
+The restored board runs the existing heapreserve ordinary ASM radio, application
+SHA256 `dfa1c0a298dde56f33d5bb88627b4c9aa643deca12d5329ce4a0398e6f60b273`,
+slot `0x10000`. OTA and HTTP/WebSocket/playlist checks passed; playback remains
+stopped, RSSI -60 dBm and combined free heap 30340 bytes at the status snapshot.
+**The additional detection-cancellation fix is source-tested, not flashed.**
+This stopped snapshot is not a playback or fragmentation endurance test.
+
+### Next memory work
+
 - [ ] Determine all allocations responsible for persistent holes using a
   bounded low-overhead trace, if failures recur; distinguish network
   retention from decoder lifetime and total-headroom limits.
 - [ ] Qualify repeated full-radio codec switches and long playback with
   concurrent WebUI without unbounded memory growth.
+- [ ] Build/relocate and physically qualify the detection-cancellation fix;
+  trace total byte-addressable DRAM and its largest block at lifecycle boundaries.
 - [ ] Consider a reusable DRAM pool only after measuring total capacity and
   the largest boot-time block. Do not blindly reserve the whole arena limit.
 - [ ] If considering segmented scratch/PCM loans, prove contiguous-array

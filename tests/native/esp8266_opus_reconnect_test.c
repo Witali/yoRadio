@@ -19,7 +19,7 @@
 #define taskEXIT_CRITICAL() ((void)0)
 /* DEFINES */
 typedef struct { uint32_t generation; bool play; char url[64]; } audio_command_t;
-typedef struct { int socket; } http_stream_t;
+typedef struct { int socket; size_t body_size; uint32_t metadata_interval; } http_stream_t;
 struct helix_codec { helix_codec_kind_t kind; };
 enum { CLOSE, SILENCE, DESTROY, WARM_OPEN, COLD_OPEN, RESET, OLD_FREE,
        NEW_ALLOC, REQUEUE_EVENT, DELAY, BENCHMARK };
@@ -35,6 +35,10 @@ static helix_codec_kind_t held_kind;
 static audio_command_t queued;
 static int s_commands;
 static size_t free_dram = 8192;
+static uint8_t s_work[128];
+static helix_codec_kind_t detected_kind;
+static bool cancel_on_detect, cancel_on_receive;
+#define STREAM_READ_WAIT_MS 5U
 #if CONFIG_YORADIO_OGG_OPUS
 static size_t heap_caps_get_free_size(unsigned caps) {
     assert(caps == MALLOC_CAP_8BIT); return free_dram;
@@ -77,6 +81,22 @@ static int mock_close(int socket) {
     return 0;
 }
 #define close mock_close
+helix_codec_kind_t helix_codec_detect(const uint8_t *data, size_t size) {
+    assert(data == s_work && size <= sizeof(s_work));
+    if (cancel_on_detect) newer_command();
+    return detected_kind;
+}
+static int stream_receive(http_stream_t *stream, uint8_t *destination, size_t wanted) {
+    assert(stream->socket >= 3 && destination >= s_work && wanted <= sizeof(s_work));
+    if (cancel_on_receive) {
+        newer_command(); errno = EAGAIN; return -1;
+    }
+    return 0;
+}
+static bool stream_wait_after_empty(http_stream_t *stream, uint32_t value, unsigned ms) {
+    assert(stream->socket >= 3 && ms == STREAM_READ_WAIT_MS);
+    return generation_current(value);
+}
 static int open_http_stream(char *url, http_stream_t *stream) {
     assert(url[0] && opens < HTTP_OPEN_ATTEMPTS);
     event(held ? WARM_OPEN : COLD_OPEN);
@@ -120,7 +140,7 @@ static audio_command_t command(void) {
 }
 static void finish_transport(int feed) {
     audio_command_t command = {generation, true, "http://test.invalid/opus"};
-    http_stream_t stream = {3};
+    http_stream_t stream = {.socket = 3};
     helix_codec_t *codec = held;
     helix_codec_kind_t codec_kind = held_kind;
     for (unsigned once = 0; once < 1; ++once) {
@@ -129,7 +149,7 @@ static void finish_transport(int feed) {
     held = codec; held_kind = codec_kind;
 }
 static bool open_command(audio_command_t command, http_stream_t *out) {
-    http_stream_t stream = {-1};
+    http_stream_t stream = {.socket = -1};
     helix_codec_t *codec = held;
     helix_codec_kind_t codec_kind = held_kind;
     bool success = false;
@@ -160,12 +180,25 @@ static void stop_command(void) {
     }
     held = codec; held_kind = codec_kind;
 }
+static bool detect_stream(audio_command_t command, http_stream_t stream) {
+    helix_codec_t *codec = held;
+    helix_codec_kind_t codec_kind = held_kind;
+    bool success = false;
+    for (unsigned once = 0; once < 1; ++once) {
+        /* DETECT */
+        success = true;
+    }
+    held = codec; held_kind = codec_kind;
+    return success;
+}
 static void setup(helix_codec_kind_t kind) {
     assert(!held && allocations == frees);
     memset(sockets, 0, sizeof(sockets)); memset(open_results, 0, sizeof(open_results));
     memset(open_errors, 0, sizeof(open_errors));
     pause_requested = close_fails = reset_fails = create_fails = false;
     change_on_close = change_on_open = change_on_delay = false;
+    cancel_on_detect = cancel_on_receive = false;
+    detected_kind = 0;
     free_dram = 8192;
     generation = 100; queued = command();
     held = helix_codec_create(kind, CODEC_HEAP_RESERVE_BYTES); held_kind = kind;
@@ -282,10 +315,46 @@ static void newer_generation_wins(void) {
     assert(!open_command(queued, &stream) && !opens);
     pause_requested = false; stop_command(); cleanup();
 }
+static void cancelled_detection_preserves_cached_kind(void) {
+    /* sniffing an incomplete/new signature must not relabel a live decoder.
+     * Otherwise a later non-memory open error destroys cached Opus storage. */
+    for (unsigned when = 0; when < 2; ++when) {
+        const helix_codec_kind_t original = CONFIG_YORADIO_OGG_OPUS ? HELIX_CODEC_OPUS : HELIX_CODEC_MP3;
+        setup(original);
+        const unsigned before = allocations;
+        detected_kind = when ? HELIX_CODEC_AAC : 0;
+        cancel_on_detect = when != 0; cancel_on_receive = when == 0;
+        assert(!detect_stream(command(), (http_stream_t){.socket = 3}));
+        assert(held && held->kind == original && held_kind == original && !sockets[3]);
+        assert(allocations == before && position(DESTROY) == 128);
+        cancel_on_detect = cancel_on_receive = false;
+        queued.play = true;
+        open_results[0] = -2; open_errors[0] = ETIMEDOUT;
+        http_stream_t stream;
+        assert(open_command(queued, &stream));
+        if (CONFIG_YORADIO_OGG_OPUS) assert(held && position(DESTROY) == 128);
+        assert(after_sniff(original, stream));
+        cleanup();
+    }
+    setup(HELIX_CODEC_OPUS);
+    assert(!detect_stream(command(), (http_stream_t){.socket = 3}));
+    assert(!held && !sockets[3]); /* Genuine unsupported stream still cleans up. */
+    cleanup();
+    setup(HELIX_CODEC_OPUS); detected_kind = HELIX_CODEC_MP3;
+    assert(detect_stream(command(), (http_stream_t){.socket = 3}));
+    assert(held_kind == HELIX_CODEC_MP3 && held->kind == HELIX_CODEC_OPUS);
+    /* The normal next statement switches the actual decoder, old-before-new. */
+    sockets[4] = true;
+    assert(after_sniff(held_kind, (http_stream_t){.socket = 4}));
+    assert(held->kind == HELIX_CODEC_MP3 && position(OLD_FREE) < position(NEW_ALLOC));
+    cleanup();
+    puts("cancelled stream detection preserves cached decoder identity PASS");
+}
 int main(void) {
     assert(HTTP_OPEN_ATTEMPTS == 2);
     retention_and_reset(); failed_open_falls_back_once();
     switches_errors_and_stop(); newer_generation_wins();
+    cancelled_detection_preserves_cached_kind();
     assert(allocations == frees && !held);
     printf("actual reconnect control-flow PASS: Opus=%d, %u paired allocations/frees\n",
            CONFIG_YORADIO_OGG_OPUS, allocations);
