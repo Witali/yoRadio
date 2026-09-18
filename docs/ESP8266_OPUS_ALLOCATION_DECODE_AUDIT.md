@@ -56,3 +56,11 @@ node --test tests/esp8266-opus-allocation-decode-audit.test.js
 
 [Pinned linked instructions and conditional CFG result](results/esp8266-opus-allocation-decode-audit-20260918.json)
 and [four passing tests](results/esp8266-opus-allocation-decode-audit-20260918.log).
+
+## Follow-up
+
+The separate [decoder-only candidate](ESP8266_OPUS_ALLOCATION_DECODE.md)
+completes the pointer-range, indirect-call and linked-CFG checks above.
+It preserves this conditional audit as historical evidence; the original
+checker still deliberately does not authorize specialization on its own.
+See the follow-up for PCM tests, physical speed gates and promotion status.
