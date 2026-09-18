@@ -1533,11 +1533,15 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   MinDRAM2440/1756/1724B, max19219927/19984/20322us, все попытки сохранены.
   33 локальных регрессии PASS; ordinary radio восстановлена OTA, HTTP/WS/
   playlist проверены. Цели75% raw и20с I2S+WebUI не достигнуты.
-- [ ] Отдельно проверить ещё23 constant stack loads в quant_all_bands:
+- [x] Подготовлен отдельный [quant-locals](ESP8266_OPUS_QUANT_LOCALS.md): ещё23 constant stack loads в quant_all_bands:
   census41 включает18 текущих флагов; локальные копии SP124/132/140/192/220/240
   требуют проверки значения именно в точке чтения (SP132 бывает0 и1).
   [Адреса и условия](ESP8266_OPUS_QUANT_FLAGS.md) сохранены. Не смешивать с
   текущим A/B/A; сначала linked proof без изменения внутренних адресов.
+  Все23 L32I -> MOVI имеют3 байта;69B patch, frame384B и все PCs прежние.
+  24 host PCM/state/ASan/UBSan сценария PASS, флаги SP32/36 не изменяются.
+- [ ] Quant-locals: свежий10A/10B/10A2, оба speed gate, RAM и75% CPU;
+  затем ordinary OTA restore. Parent accepted eBands-final, не quant-flags.
 - [ ] Отдельная гипотеза load+constant branch -> J для пяти resynth-пар:
   доказать liveness регистра назначения на всех successors, отсутствие
   interior entries и аргументы callees; текущий MOVI proof этого не разрешает.
