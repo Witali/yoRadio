@@ -1519,12 +1519,16 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   minDRAM1052/1928/4648B, timeout A/run6 и90.111542% не исключены.
   Ordinary heapreserve ASM восстановлено OTA, HTTP/WS/playlist проверены.
   27 локальных проверок PASS; результат не достигает75% и не доказывает20s I2S.
-- [ ] Следующий отдельный quant-кандидат поверх accepted eBands-final:
+- [x] Подготовлен отдельный [quant-flags кандидат](ESP8266_OPUS_QUANT_FLAGS.md) поверх accepted eBands-final:
   census нашёл18 decoder-reachable загрузок неизменяемых encode/resynth из
   stack32/36. Проверить in-place MOVI при сохранённых ширинах инструкций и
   всех внутренних адресах. Для удаления загрузки нужна отдельная liveness-
   проверка всех CFG-путей. Не использовать отклонённое уплотнение; не обещать
   выигрыш по числу операций. Contract/linked proof, exact PCM и новый A/B/A.
+  18 in-place MOVI,37B patch; все3370 адресов инструкций и frame384B сохранены.
+  App903216B, RAM/стек без роста;24 exact PCM/state/ASan/UBSan сценария PASS.
+- [ ] Для quant-flags завершить новый10A/10B/10A2, проверить оба speed gate
+  и75% CPU, затем восстановить ordinary radio. Пока baseline не изменён.
 
 ### 2026-09-18: условный CFG-аудит allocation
 

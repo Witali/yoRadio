@@ -40,7 +40,7 @@ function dependencies(depfile) {
 }
 
 async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamRoot, fastInt64, firFlashWord = false, profileStage = 0, celtDecodeOnly = false, divOnce = false, pcmLeases = false, silkScratch = false, sanitize = false, autocorrCompact = false, silkPlcIram = false, asmEntropyModel = false, asmBandsModel = '' } = {}) {
-  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline','fused','tell-intensity','update-fast','tell-update','tell-bits1','cache-reuse','inner4','logp','small-div','folding8','partition-decode','ec-bits','micro-bundle','pvq-dim-pointer','partition-points','bits-fifth','bits-fourth','endpoint-cost','pvq-byte-word','pvq-a4-word','pvq-row-word','pvq-endpoint-word','pvq-index-word','pvq-index-half','pvq-logn-word','pvq-exp2-word','pvq-exp2-table32','pvq-qn-table','ebands-pair','ebands-more','allocation-byte','ebands-final','ebands-u16','ebands-u16-aligned','ebands-quant','ebands-src','allocation-decode','quant-decode'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
+  if (asmBandsModel && (!bounded || !['intensity','blocks','combined','pulse-lookup','tell-inline','fused','tell-intensity','update-fast','tell-update','tell-bits1','cache-reuse','inner4','logp','small-div','folding8','partition-decode','ec-bits','micro-bundle','pvq-dim-pointer','partition-points','bits-fifth','bits-fourth','endpoint-cost','pvq-byte-word','pvq-a4-word','pvq-row-word','pvq-endpoint-word','pvq-index-word','pvq-index-half','pvq-logn-word','pvq-exp2-word','pvq-exp2-table32','pvq-qn-table','ebands-pair','ebands-more','allocation-byte','ebands-final','ebands-u16','ebands-u16-aligned','ebands-quant','ebands-src','allocation-decode','quant-decode','quant-flags'].includes(asmBandsModel))) throw Error('Unknown/bounded-only ASM bands model');
   if (asmEntropyModel && !bounded) throw Error('asmEntropyModel requires bounded decoder.');
   if (silkPlcIram && !bounded) throw Error('silkPlcIram requires bounded decoder.');
   if (autocorrCompact && !bounded) throw Error('autocorrCompact requires bounded decoder.');
@@ -64,6 +64,7 @@ async function buildHost({ bounded = false, noBuild = false, jobs = 4, upstreamR
       .map(file => path.join(sourceRoot, dir, file)));
   if (bounded) sources.push(path.join(component, 'opus_memory.c'));
   const modelSources = [];
+  if (asmBandsModel==='quant-flags') for(const model of require('../esp8266_opus_asm/quant_flags.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='bits-fifth') for(const model of require('../esp8266_opus_asm/bits_fifth.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='bits-fourth') for(const model of require('../esp8266_opus_asm/bits_fourth.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
   if (asmBandsModel==='endpoint-cost') for(const model of require('../esp8266_opus_asm/endpoint_cost.cjs').cModels()) sources[sources.indexOf(path.join(component, model.source))] = model.file;
