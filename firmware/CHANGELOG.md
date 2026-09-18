@@ -3,6 +3,17 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-18: decoder-only quant_all_bands ASM preflight
+
+- Separate `esp8266-opus-quant-decode-{control,candidate}-v2`,903216B,
+  CPU160/runtime QIO40 raw benchmark over accepted eBands-final.
+- 557 unreachable instructions omitted,27 constant checks removed and5
+  changed to jumps. Live7687B in the previous9416-B slot; exact retained
+  CFG/operands/references, unchanged384-B frame and static RAM.
+- 24 exact host PCM/state/ASan/UBSan cases. Physical A/B/A pending;
+  not accepted or qualified for live I2S/WebUI. C fallback unchanged.
+- [Report and remaining gates](../docs/ESP8266_OPUS_QUANT_DECODE.md).
+
 ## Development - 2026-09-18: decoder-only allocation ASM (rejected)
 
 - Separate `esp8266-opus-allocation-decode-{control,candidate}-v1` raw

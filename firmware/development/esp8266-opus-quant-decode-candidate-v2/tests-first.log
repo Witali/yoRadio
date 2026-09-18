@@ -1,0 +1,60 @@
+TAP version 13
+# Subtest: decode-only reachability needs explicit context and private-frame contracts
+ok 1 - decode-only reachability needs explicit context and private-frame contracts
+  ---
+  duration_ms: 225.6337
+  type: 'test'
+  ...
+# Subtest: new stack escapes, encode stores, partial writes or a stack pivot reject the audit
+ok 2 - new stack escapes, encode stores, partial writes or a stack pivot reject the audit
+  ---
+  duration_ms: 28.6318
+  type: 'test'
+  ...
+# Subtest: native zero caller, immutable context fields and literal false matches are checked
+not ok 3 - native zero caller, immutable context fields and literal false matches are checked
+  ---
+  duration_ms: 1899.4039
+  type: 'test'
+  location: 'C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tests\\esp8266-opus-quant-decode.test.js:28:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tests\esp8266-opus-quant-decode.test.js:35:9)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: every removed instruction is commented; no RAM or frame increase
+ok 4 - every removed instruction is commented; no RAM or frame increase
+  ---
+  duration_ms: 194.0169
+  type: 'test'
+  ...
+# Subtest: linked arithmetic, memory, literal, call and branch mutations cannot pass
+ok 5 - linked arithmetic, memory, literal, call and branch mutations cannot pass
+  ---
+  duration_ms: 184.2703
+  type: 'test'
+  ...
+# Subtest: bounded C semantic model passes all24 PCM/state/ASan/UBSan cases
+ok 6 - bounded C semantic model passes all24 PCM/state/ASan/UBSan cases
+  ---
+  duration_ms: 17.0718
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 5
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2679.283

@@ -1502,10 +1502,17 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   minDRAM5324/1580/900B и B/run10 task>wall1216us сохранены. Восстановлена
   обычная accepted ASM-прошивка с исправлениями памяти, проверены HTTP/WS/
   плейлист.75% CPU и20s I2S+WebUI не подтверждены. Не включать SRC в baseline.
-- [ ] Аудит decoder-only специализации quant_all_bands целиком по encode=0:
+- [x] Аудит decoder-only специализации quant_all_bands целиком по encode=0:
   все callers, aliases band_ctx, theta_rdo и сохранённые копии контекста.
   Только доказанно недостижимые encoder-пути, без ограничения валидных
   режимов/битрейтов; C fallback и PLC сохраняются. Выигрыш не доказан.
+  [Новый frozen-layout кандидат](ESP8266_OPUS_QUANT_DECODE.md) сохраняет
+  frame384B и регистры; C decode-only flag не используется в прошивке.
+  Проверены encode/resynth, private slots и 11 ROM-calls.557 недостижимых
+  инструкций,27 удалённых постоянных проверок,5 заменены на jump; live7687B
+  в прежних9416B. App903216B, RAM/стек без роста.24 exact host сценария PASS.
+- [ ] Для quant_all_bands выполнить свежий10A/10B/10A2 и оба speed gate,
+  затем восстановить ordinary radio. Не принимать по размеру кода/host PCM.
 
 ### 2026-09-18: условный CFG-аудит allocation
 
