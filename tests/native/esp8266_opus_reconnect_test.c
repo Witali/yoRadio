@@ -13,6 +13,7 @@
 #define ESP_LOGW(...) ((void)0)
 #define ESP_LOGE(...) ((void)0)
 #define audio_transport_phase(phase) ((void)0)
+#define MALLOC_CAP_8BIT 1U
 #define pdMS_TO_TICKS(ms) (ms)
 #define taskENTER_CRITICAL() ((void)0)
 #define taskEXIT_CRITICAL() ((void)0)
@@ -33,6 +34,12 @@ static helix_codec_t *held;
 static helix_codec_kind_t held_kind;
 static audio_command_t queued;
 static int s_commands;
+static size_t free_dram = 8192;
+#if CONFIG_YORADIO_OGG_OPUS
+static size_t heap_caps_get_free_size(unsigned caps) {
+    assert(caps == MALLOC_CAP_8BIT); return free_dram;
+}
+#endif
 
 static void event(unsigned value) { assert(event_count < 128); events[event_count++] = value; }
 static unsigned position(unsigned value) {
@@ -76,7 +83,8 @@ static int open_http_stream(char *url, http_stream_t *stream) {
     const unsigned attempt = opens++;
     if (change_on_open) newer_command();
     if (open_results[attempt]) {
-        errno = open_errors[attempt]; return open_results[attempt];
+        if (open_errors[attempt]) errno = open_errors[attempt];
+        return open_results[attempt];
     }
     const int socket = 4 + (int)attempt;
     assert(!sockets[socket]); sockets[socket] = true; stream->socket = socket;
@@ -92,7 +100,7 @@ void helix_codec_destroy(helix_codec_t *codec) {
     assert(codec && codec == held); event(DESTROY); free(codec); held = NULL; ++frees;
 }
 int helix_codec_switch(helix_codec_t *codec, helix_codec_kind_t kind) {
-    assert(codec == held && sockets[4]); ++switches;
+    assert(codec == held && (sockets[4] || sockets[5])); ++switches;
     if (codec->kind == kind) {
         ++resets; event(RESET); return reset_fails ? -2 : 0;
     }
@@ -158,6 +166,7 @@ static void setup(helix_codec_kind_t kind) {
     memset(open_errors, 0, sizeof(open_errors));
     pause_requested = close_fails = reset_fails = create_fails = false;
     change_on_close = change_on_open = change_on_delay = false;
+    free_dram = 8192;
     generation = 100; queued = command();
     held = helix_codec_create(kind, CODEC_HEAP_RESERVE_BYTES); held_kind = kind;
     sockets[3] = true;
@@ -189,24 +198,43 @@ static void retention_and_reset(void) {
     }
 }
 static void failed_open_falls_back_once(void) {
-    for (unsigned failed = 0; failed < 3; ++failed) {
+    const int errors[] = {ENOMEM, ENOBUFS, ETIMEDOUT, EPROTO, ECONNRESET,
+                          EHOSTUNREACH, ECONNREFUSED, 0};
+    for (unsigned failed = 0; failed < sizeof(errors)/sizeof(errors[0]); ++failed) {
         setup(HELIX_CODEC_OPUS); finish_transport(0);
-        open_results[0] = -2; open_errors[0] = failed == 0 ? ENOMEM : failed == 1 ? ETIMEDOUT : EPROTO;
+        open_results[0] = -2; open_errors[0] = errors[failed];
+        errno = ENOMEM; /* A stale errno must not discard the workspace. */
+        const bool keep = CONFIG_YORADIO_OGG_OPUS && failed >= 2;
+        const unsigned before = allocations;
         http_stream_t stream;
         assert(open_command(queued, &stream) && opens == 2);
-        assert(!held && delays == 2); /* Existing 250ms recovery + retry. */
-        assert(position(DESTROY) < position(COLD_OPEN));
-        if (CONFIG_YORADIO_OGG_OPUS) assert(position(WARM_OPEN) < position(DESTROY));
-        assert(after_sniff(HELIX_CODEC_OPUS, stream) && held && !resets);
+        assert(!!held == keep && delays == 2);
+        if (keep) assert(position(DESTROY) == 128 && position(COLD_OPEN) == 128);
+        else {
+            assert(position(DESTROY) < position(COLD_OPEN));
+            if (CONFIG_YORADIO_OGG_OPUS) assert(position(WARM_OPEN) < position(DESTROY));
+        }
+        assert(after_sniff(HELIX_CODEC_OPUS, stream) && held && resets == (unsigned)keep);
+        assert(allocations == before + !keep);
         cleanup();
     }
+    for (unsigned low = 0; low < 2; ++low) {
+        setup(HELIX_CODEC_OPUS); finish_transport(0);
+        free_dram = low ? 4095 : 4096;
+        open_results[0] = -4; open_errors[0] = ETIMEDOUT;
+        http_stream_t stream; assert(open_command(queued, &stream));
+        assert(!!held == (CONFIG_YORADIO_OGG_OPUS && !low));
+        cleanup();
+    }
+    for (unsigned memory = 0; memory < 2; ++memory) {
     setup(HELIX_CODEC_OPUS); finish_transport(0);
     open_results[0] = open_results[1] = -2;
-    open_errors[0] = open_errors[1] = ENOMEM;
+    open_errors[0] = open_errors[1] = memory ? ENOMEM : ETIMEDOUT;
     http_stream_t stream;
     assert(!open_command(queued, &stream) && opens == 2 && !held);
     assert(requeues == 1); /* No third attempt or automatic allocation loop. */
     cleanup();
+    }
 }
 static void switches_errors_and_stop(void) {
     setup(HELIX_CODEC_OPUS); finish_transport(0);

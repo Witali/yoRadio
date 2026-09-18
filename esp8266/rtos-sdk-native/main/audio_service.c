@@ -21,6 +21,7 @@
 #endif
 #include "http_stream_protocol.h"
 #include "stream_input_buffer.h"
+#include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
@@ -1180,14 +1181,25 @@ static void audio_task(void *argument) {
              attempt < HTTP_OPEN_ATTEMPTS &&
              generation_current(command.generation) &&
              !audio_web_pause_requested(); ++attempt) {
+            errno = 0; /* HTTP status/URL errors need not set errno. */
             opened = open_http_stream(command.url, &stream);
             if (opened == 0) break;
-            /* Reuse a decoder on successful switches, but do not reserve
-             * its DRAM throughout repeated failed TCP/DNS handshakes. */
+            const int open_error = errno;
+            (void)open_error; /* Also build with Opus and logging disabled. */
+            /* A timeout/refusal is not evidence of memory pressure. Keep
+             * Opus's large blocks for the second bounded attempt, otherwise
+             * network allocations can fragment the holes before re-init.
+             * Memory errors/low DRAM still get a cold retry; final failure,
+             * Stop, codec changes and decoder errors retain their cleanup. */
+#if CONFIG_YORADIO_OGG_OPUS
+            if (!codec || codec_kind != HELIX_CODEC_OPUS ||
+                open_error == ENOMEM || open_error == ENOBUFS ||
+                heap_caps_get_free_size(MALLOC_CAP_8BIT) < 4096U)
+#endif
             release_codec(&codec, &codec_kind, "connection retry");
             if (attempt + 1U < HTTP_OPEN_ATTEMPTS) {
                 ESP_LOGE(TAG, "Stream open attempt %u failed: stage %d errno %d heap %u",
-                         attempt + 1U, opened, errno,
+                         attempt + 1U, opened, open_error,
                          (unsigned)esp_get_free_heap_size());
                 vTaskDelay(pdMS_TO_TICKS(250U));
             }
@@ -1476,8 +1488,8 @@ static void audio_task(void *argument) {
             native_audio_output_silence();
             /* Keep Opus's large DRAM blocks after a successful TCP close:
              * rebuilding them after HTTP allocations can fail on fragmentation.
-             * The next failed open attempt releases the cached codec,
-             * so the existing second attempt still gets a cold handshake.
+             * The next open attempt releases it only for memory pressure;
+             * ordinary network failures keep it for one bounded retry.
              * Successful sniffing resets same-kind Opus without allocation;
              * another codec kind still frees the old decoder before its init. */
 #if CONFIG_YORADIO_OGG_OPUS
