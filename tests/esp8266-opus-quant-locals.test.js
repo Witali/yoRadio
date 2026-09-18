@@ -48,7 +48,8 @@ test('host origin checks pass24 exact PCM/state/ASan/UBSan scenarios including h
  const source=fs.readFileSync(f.cModels().find(m=>m.source==='upstream/celt/bands.c').file,'utf8');
  assert.match(source,/if \(value != expected\) abort\(\)/);assert.match(source,/lowband_offset = y_quant_flag\(0, 0\)/);
  assert.match(source,/int resynth = y_quant_flag\(!encode \|\| theta_rdo, 1\)/);
- const r=f.read(path.join(root,'.build/opus-bands-quant-locals/correctness.json'));
+ // Read the committed evidence, not an optional disposable host-build cache.
+ const r=f.read(path.join(f.art('candidate'),'correctness.json'));
  assert.equal(r.passed,true);assert.equal(r.cases.length,24);assert.ok(r.cases.every(c=>c.pcm.exact));
  assert.ok(r.cases.some(c=>c.name==='stereo-510'));assert.ok(r.cases.some(c=>c.name==='320-48frames'));
 });

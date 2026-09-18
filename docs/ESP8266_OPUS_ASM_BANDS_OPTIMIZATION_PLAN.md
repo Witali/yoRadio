@@ -1540,8 +1540,13 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   текущим A/B/A; сначала linked proof без изменения внутренних адресов.
   Все23 L32I -> MOVI имеют3 байта;69B patch, frame384B и все PCs прежние.
   24 host PCM/state/ASan/UBSan сценария PASS, флаги SP32/36 не изменяются.
-- [ ] Quant-locals: свежий10A/10B/10A2, оба speed gate, RAM и75% CPU;
-  затем ordinary OTA restore. Parent accepted eBands-final, не quant-flags.
+- [x] Quant-locals: свежий 10A/10B/10A2 завершён; оба speed gate FAIL,
+  **не принят**. CPU192: 77.868250/77.876125/77.881708%, CPU128:
+  70.364667/70.373354/70.374750%. Все PCM точны, static RAM/frame прежние.
+  MinDRAM 904/896/740 B; max192 19977/28429/27993 us. B/run8 и A2/run5
+  с timeout и 90% CPU сохранены. 42 локальных проверки PASS.
+  Ordinary heapreserve radio восстановлена OTA, HTTP/WS/playlist проверены.
+  Parent/baseline accepted eBands-final; цели 75% и 20s live не достигнуты.
 - [ ] Отдельная гипотеза load+constant branch -> J для пяти resynth-пар:
   доказать liveness регистра назначения на всех successors, отсутствие
   interior entries и аргументы callees; текущий MOVI proof этого не разрешает.
