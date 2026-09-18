@@ -432,7 +432,13 @@ static bool update_codec_memory(helix_codec *codec) {
     size_t free_heap = esp_get_free_heap_size();
     size_t reserve = codec->reserve_heap_bytes;
 #if CONFIG_YORADIO_OGG_OPUS
-    if (codec->kind == HELIX_CODEC_OPUS) reserve = std::max(reserve, size_t(4096));
+    if (codec->kind == HELIX_CODEC_OPUS) {
+        reserve = std::max(reserve, size_t(4096));
+        /* ESP8266 esp_get_free_heap_size includes word-only IRAM. That
+         * cannot back network buffers or Opus byte scratch; protect actual
+         * DRAM, not a misleading sum of different memory capabilities. */
+        free_heap = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+    }
 #endif
     if (free_heap >= reserve) return true;
     opus_init_failed(codec->kind, HELIX_OPUS_INIT_RESERVE, reserve, reserve, static_cast<int32_t>(free_heap));

@@ -262,8 +262,9 @@ static void allocation_failures(const std::map<void *, size_t> &baseline) {
             }
         }
         reported_free_heap = 0;
+        reported_dram_budget = 0;
         assert(!helix_codec_create(first, 1152));
-        reported_free_heap = 65536; clean(baseline);
+        reported_free_heap = reported_dram_budget = 65536; clean(baseline);
     }
 }
 
@@ -300,11 +301,15 @@ static void opus_reserve_and_init_failures(const std::map<void *, size_t> &basel
         helix_codec_t *c = helix_codec_create(legacy, 1152); assert(c);
         helix_codec_destroy(c); clean(baseline);
     }
+    reported_free_heap = reported_dram_budget = 65536;
+    helix_codec_t *probe = helix_codec_create(HELIX_CODEC_OPUS, 1152); assert(probe);
+    const size_t opus_dram = 65536 - heap_caps_get_free_size(MALLOC_CAP_8BIT);
+    helix_codec_destroy(probe); clean(baseline);
     for (size_t reserve : {size_t(0), size_t(1152), size_t(8192)}) {
         const size_t required = reserve > 4096 ? reserve : 4096;
-        reported_free_heap = required - 1;
+        reported_dram_budget = opus_dram + required - 1;
         assert(!helix_codec_create(HELIX_CODEC_OPUS, reserve)); clean(baseline);
-        reported_free_heap = required;
+        reported_dram_budget = opus_dram + required;
         helix_codec_t *c = helix_codec_create(HELIX_CODEC_OPUS, reserve); assert(c);
         const unsigned before = attempts, resets = opus_resets;
         const auto original = live;
@@ -314,7 +319,7 @@ static void opus_reserve_and_init_failures(const std::map<void *, size_t> &basel
         assert(helix_codec_buffered(c) == 0);
         helix_codec_destroy(c); clean(baseline);
     }
-    reported_free_heap = 65536;
+    reported_free_heap = reported_dram_budget = 65536;
     opus_init_fail = true;
     assert(!helix_codec_create(HELIX_CODEC_OPUS, 1152)); clean(baseline);
     opus_init_fail = false;
@@ -327,13 +332,13 @@ static void opus_reserve_and_init_failures(const std::map<void *, size_t> &basel
             assert(!opus_bound_bytes && !opus_bound_words);
             assert(helix_codec_switch(c, HELIX_CODEC_OPUS) == 0);
         }
-        reported_free_heap = 4095;
+        reported_dram_budget = opus_dram + 4095;
         assert(helix_codec_switch(c, HELIX_CODEC_MP3) == 0);
         assert(helix_codec_switch(c, HELIX_CODEC_OPUS) < 0);
-        reported_free_heap = 4096;
+        reported_dram_budget = opus_dram + 4096;
         assert(helix_codec_switch(c, HELIX_CODEC_OPUS) == 0);
         helix_codec_destroy(c); clean(baseline);
-        reported_free_heap = 65536;
+        reported_free_heap = reported_dram_budget = 65536;
     }
     printf("Opus input %u, scratch %u, reserve and allocation-free reset PASS\n",
            unsigned(CONFIG_YORADIO_OPUS_INPUT_BYTES), unsigned(CONFIG_YORADIO_OPUS_SCRATCH_BYTES));
@@ -444,10 +449,10 @@ static void opus_diagnostics(const std::map<void *, size_t> &baseline) {
     assert(init_failure(HELIX_OPUS_INIT_NATIVE).detail==NATIVE_OPUS_ERR_MEMORY);
     opus_reset_fail=false;assert(helix_codec_switch(c,HELIX_CODEC_OPUS)==0);init_failure(HELIX_OPUS_INIT_NONE);
     helix_codec_destroy(c);clean(baseline);
-    reported_free_heap=4095;reported_dram_budget=24000;
+    reported_free_heap=65536;reported_dram_budget=24000;
     assert(!helix_codec_create(HELIX_CODEC_OPUS,1152));
     const auto failure=init_failure(HELIX_OPUS_INIT_RESERVE);
-    assert(failure.detail==4095 && failure.requested_bytes==4096 && failure.free_dram<4095);
+    assert(failure.detail==static_cast<int32_t>(failure.free_dram) && failure.requested_bytes==4096 && failure.free_dram<4095);
     assert(failure.free_dram<heap_caps_get_free_size(MALLOC_CAP_8BIT));clean(baseline);
     reported_free_heap=reported_dram_budget=65536;
     c=helix_codec_create(HELIX_CODEC_OPUS,1152);assert(c);init_failure(HELIX_OPUS_INIT_NONE);
