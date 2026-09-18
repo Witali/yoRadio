@@ -1519,3 +1519,15 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   косвенных callees по accepted ELF; историческая linker-map недостаточна.
   Затем независимый CFG-proof нового packed ASM, PCM и новый A/B/A.
   Кандидат пока не создан, ускорение и уменьшение app не объявлены.
+
+### 2026-09-18: allocation decoder-only candidate
+
+- [x] Дополнен аудит ranges/aliases и accepted ELF. Локальные scalar outputs
+  callerSP+180/+232/+236 не пересекают аргументы +40/+44/+48; массивы из
+  bounded scratch. Единственный decoder caller, косвенные calls — ROM udiv.
+- [x] [Отдельный ASM-кандидат](ESP8266_OPUS_ALLOCATION_DECODE.md): удалены67
+  encoder-инструкций и3 проверки,930 retained инструкций/CFG точны. Live
+  2345B вместо2564B; app903216B, RAM и stack192B без изменений. Семь
+  регрессий и24 exact host PCM/state/ASan/UBSan сценария PASS.
+- [ ] Новый10A/10B/10A2, оба speed gate, затем ordinary radio restore.
+  До физических замеров кандидат не принят. CPU75% и live20s не достигнуты.

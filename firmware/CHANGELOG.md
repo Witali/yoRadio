@@ -3,6 +3,16 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-18: decoder-only allocation ASM preflight
+
+- Separate `esp8266-opus-allocation-decode-{control,candidate}-v1` raw
+  benchmark pair over accepted eBands-final.67 encoder instructions and3
+  constant checks removed, exact retained CFG. Live function2345B; app
+  903216B, RAM and192B frame unchanged. C fallback untouched.
+- Seven regressions and24 exact host PCM/state cases pass. Target timing
+  and speed selection pending; not promoted or a live-audio qualification.
+- [Report](../docs/ESP8266_OPUS_ALLOCATION_DECODE.md).
+
 ## Development - 2026-09-18: branchless eBands-SRC hardware result (rejected)
 
 - Existing `esp8266-opus-ebands-src-{control,candidate}-v2`,903216B, now
