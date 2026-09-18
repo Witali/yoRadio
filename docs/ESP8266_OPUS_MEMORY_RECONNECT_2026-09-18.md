@@ -224,6 +224,56 @@ stopped, RSSI -60 dBm and combined free heap 30340 bytes at the status snapshot.
 **The additional detection-cancellation fix is source-tested, not flashed.**
 This stopped snapshot is not a playback or fragmentation endurance test.
 
+### Recheck of the user's full-firmware fragmentation report
+
+The source was re-audited at `d10739f4`; the three lifecycle/reserve fixes
+above are already in this branch. No additional decoder algorithm, RAM
+reservation, buffer-size or allocator change is justified by this recheck.
+In particular, converting all tracked DRAM allocations into one larger
+late-allocated slab would require an even larger contiguous block. A pool
+reserved at boot has a different tradeoff: that RAM is unavailable to the
+network even when playback is stopped. Measure it before adopting it.
+
+Fresh local verification:
+
+```text
+node --test tests/esp8266-codec-lifecycle.test.js tests/esp8266-audio-memory-lifecycle.test.js tests/esp8266-opus-reconnect.test.js tests/esp8266-memory-tcp-http.test.js
+21 passed; 0 failed; 0 skipped; 31.567 s
+```
+
+This includes eight compiled bridge/arena configurations with 100 mixed-codec
+cycles each, injected allocation failures, allocation-free same-kind Opus
+reset, and sanitizer checks of the actual reconnect/cancellation branches.
+The bridge harness uses codec stubs; it checks allocation ownership rather
+than the whole decoder/network implementation. The single retained IRAM
+allocation is intentional and is accounted for separately from returned DRAM.
+
+Read-only board observations in this recheck (no OTA, Play/Stop, reset or UART):
+
+| Endpoint / field | Observation |
+| --- | --- |
+| Status | HTTP200, 25.3 ms; stopped, no error, RSSI -60 dBm, slot0x10000 |
+| Combined free heap in status | 30368 B |
+| Audio snapshot | uptime437201 ms; no received audio bytes or PCM frames since boot |
+| Opus diagnostic | HTTP200, 26.8 ms; no latched init failure (`stage=0`) |
+| Current byte-addressable DRAM / largest block | 29952 / 28156 B |
+
+These are sequential snapshots, so their totals must not be subtracted to
+attribute memory to an individual module. The running image has
+`memory_profile=false`: `/api/native/audio?memory=1` returned ordinary audio
+health, **not** the optional heap/TCP breakdown. The DRAM/largest values above
+come from `/api/native/opus-stream`. The board was idle after a recent boot;
+these observations neither reproduce the earlier playback fragmentation nor
+prove its absence. The cancellation fix remains source-tested, not flashed.
+
+Conclusion: the saved failures show both a too-small contiguous block and
+insufficient total headroom for scratch6144 plus reserve4096. Avoidable
+decoder destruction/reallocation has been corrected in source, but there is
+no evidence that ASM per-frame scratch allocation itself fragments the heap.
+The unresolved roughly4-KiB retention from the earlier full-radio test still
+needs allocation/lifetime attribution, rather than being labelled a leak or
+explained solely by TCP TIME-WAIT.
+
 ### Next memory work
 
 - [ ] Determine all allocations responsible for persistent holes using a
