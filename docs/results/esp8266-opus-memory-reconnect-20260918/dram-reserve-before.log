@@ -1,0 +1,36 @@
+TAP version 13
+# Subtest: real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 6144, diagnostics 1, PCM queue 0
+not ok 1 - real codec bridge and arena pair every allocation/free through OOM and switches with Opus input 1024, scratch 6144, diagnostics 1, PCM queue 0
+  ---
+  duration_ms: 3945.5672
+  type: 'test'
+  location: 'C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tests\\esp8266-codec-lifecycle.test.js:22:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    
+    Assertion failed: !helix_codec_create(HELIX_CODEC_OPUS, reserve), file C:\Work\yoRadio\.worktree\esp8266-opus-asm\tests\native\codec_lifecycle\test.cpp, line 311
+    
+    
+    3221226505 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 3221226505
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tests\esp8266-codec-lifecycle.test.js:58:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4016.9754

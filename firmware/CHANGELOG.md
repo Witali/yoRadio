@@ -3,6 +3,18 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-18: full Opus ASM reconnect / DRAM reserve
+
+- `development/esp8266-opus-live-asm-heapreserve-20260918/app.bin`,890352B,
+  normal player with the accepted18-stage ASM chain, CPU160/QIO40/I2S PDM32.
+  Preserve Opus on bounded non-memory reconnect retry; use CAP8 DRAM for
+  the4096-B reserve. Static RAM unchanged; app+80B.
+- Host19/19 plus ten reconnect sanitizer repeats and5/5 station tests pass.
+  OTA to0x10000 confirmed; target recovered from10 injected HTTP503s without
+  decoder-init failure. Later stream stalled with CONNECTION ERROR, DMA
+  underruns and a WebUI timeout: NOT continuous-audio qualified.
+- [Arena audit, remaining memory delta and raw evidence](../docs/ESP8266_OPUS_MEMORY_RECONNECT_2026-09-18.md).
+
 ## Development - 2026-09-18: branchless eBands-SRC (preflight only)
 
 - `development/esp8266-opus-ebands-src-{control,candidate}-v2/app.bin`,

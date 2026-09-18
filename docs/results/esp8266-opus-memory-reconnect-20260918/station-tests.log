@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: local station validates Ogg framing, checksum, sequence and duration
+ok 1 - local station validates Ogg framing, checksum, sequence and duration
+  ---
+  duration_ms: 3.3814
+  type: 'test'
+  ...
+# Subtest: long own-signal fixtures have verified checksums and five-minute granules
+ok 2 - long own-signal fixtures have verified checksums and five-minute granules
+  ---
+  duration_ms: 71.6085
+  type: 'test'
+  ...
+# Subtest: paced and buffered responses preserve every source byte and HTTP framing
+ok 3 - paced and buffered responses preserve every source byte and HTTP framing
+  ---
+  duration_ms: 1032.9576
+  type: 'test'
+  ...
+# Subtest: short stream changes only final EOS/checksum, preserving Opus packets and granules
+ok 4 - short stream changes only final EOS/checksum, preserving Opus packets and granules
+  ---
+  duration_ms: 96.9369
+  type: 'test'
+  ...
+# Subtest: ten finite valid streams alternate with ten well-framed 503s, then full stream
+ok 5 - ten finite valid streams alternate with ten well-framed 503s, then full stream
+  ---
+  duration_ms: 156.1466
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1184.7

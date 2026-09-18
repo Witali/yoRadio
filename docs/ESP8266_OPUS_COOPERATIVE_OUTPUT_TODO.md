@@ -2,6 +2,17 @@
 
 Status: hypothesis, NOT implemented or qualified. 2026-09-13.
 
+2026-09-18 memory update: [arena/reconnect audit and fixes](ESP8266_OPUS_MEMORY_RECONNECT_2026-09-18.md).
+The full ASM player uses the common codec arena; its DRAM allocations are
+separate tracked blocks, not a preallocated slab. Preserve Opus across the
+second non-memory open attempt and check actual CAP8 DRAM for the4096-B
+reserve (both implemented,19 host tests and10 sanitizer repetitions pass).
+All10 injected HTTP503 recoveries reached the next stream on the board,
+without a latched decoder-init error. Later normal streaming still stalled
+with CONNECTION ERROR; continuity and the post-Stop roughly4-KiB memory
+difference require further tracing. Do not mark playback or leak freedom
+qualified from this result.
+
 2026-09-17 update: direct exp2-table32 reaches79.626521% raw CPU192,
 but its10 live LAN starts qualify0 windows. First PCM total3.5735s followed
 by receive timeout; later scratch6144B allocations fail with largest5076B.
