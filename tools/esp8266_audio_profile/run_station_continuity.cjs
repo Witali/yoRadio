@@ -17,7 +17,7 @@ function command(base,value) {
     function finish(error) {
       if(finished)return; finished=true; clearTimeout(timer); clearTimeout(linger);
       result.ms=performance.now()-start; if(error)result.error=error;
-      if(ws.readyState===WebSocket.OPEN)ws.close();
+      if(ws.readyState===WebSocket.OPEN||ws.readyState===WebSocket.CONNECTING)ws.close();
       resolve(result);
     }
     const timer=setTimeout(()=>finish('WebSocket command timeout'),8000);
@@ -42,13 +42,14 @@ function evaluate(r) {
   if(r.command?.error)errors.push(r.command.error);
   if(!before?.playing||before?.connecting||before?.error||!after?.playing||after?.connecting||after?.error)
     errors.push('station not playing cleanly at both boundaries');
-  if(before?.station!==r.name||after?.station!==r.name)errors.push('station identity mismatch');
-  if(before?.app_address!==after?.app_address)errors.push('application slot changed');
+  if(!before||!after)errors.push('missing status sample');
+  if((before&&before.station!==r.name)||(after&&after.station!==r.name))errors.push('station identity mismatch');
+  if(before&&after&&before.app_address!==after.app_address)errors.push('application slot changed');
   const continuity=analyze([sample(start||{},0),sample(end||{},r.observed_ms||0)],60);
   if(!continuity.pass)errors.push(...continuity.errors);
   if(start?.http===200&&end?.http===200&&end.body.uptime_ms<start.body.uptime_ms)
     errors.push('board uptime reset');
-  const opus=before?.codec==='OPUS' && after?.codec==='OPUS';
+  const opus=before?.codec==='OPUS' || after?.codec==='OPUS';
   let quiet;
   if(opus) {
     quiet=analyzeQuiet(r.quiet?.body);
@@ -59,7 +60,9 @@ function evaluate(r) {
   }
   const driverDelta=start?.http===200&&end?.http===200 ?
     delta(end.body.tx_driver_fail,start.body.tx_driver_fail):null;
+  const activeFormat=before?.playing&&after?.playing&&before?.codec===after?.codec;
   return {pass:!errors.length,errors,continuity,quiet,tx_driver_fail_delta:driverDelta,
+    format_confirmed_while_playing:!!activeFormat,
     codec:after?.codec,bitrate:after?.bitrate,rssi:[before?.rssi,after?.rssi],
     boundary_heap:[start?.body?.free_heap,end?.body?.free_heap],
     boot_min_heap:after?.min_heap,

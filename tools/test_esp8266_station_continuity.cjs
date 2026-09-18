@@ -14,6 +14,12 @@ test('a single new DMA miss fails',()=>{const r=fixture();r.after.audio.body.und
 test('no PCM and stopped state never pass',()=>{const r=fixture();r.after.audio.body.pcm_frames=100;r.after.status.body.playing=false;assert.equal(evaluate(r).pass,false);});
 test('wrong station fails even with flowing PCM',()=>{const r=fixture();r.after.status.body.station='other';assert.equal(evaluate(r).pass,false);});
 test('missing measurement cannot become a pass',()=>{const r=fixture();r.after.audio={error:'timeout'};assert.equal(evaluate(r).pass,false);});
+test('missing status is not evidence of a reboot or wrong station',()=>{
+  const r=fixture();r.before.status={error:'timeout'};const e=evaluate(r);
+  assert.equal(e.pass,false);assert.ok(e.errors.includes('missing status sample'));
+  assert.ok(!e.errors.includes('application slot changed'));assert.ok(!e.errors.includes('station identity mismatch'));
+  assert.equal(e.format_confirmed_while_playing,false);
+});
 test('Opus requires a current autonomous window inside observation',()=>{
   const r=fixture();for(const side of [r.before,r.after]){side.status.body.codec='OPUS';side.audio.body.sample_rate=48000;}
   r.after.audio.body.pcm_frames=100+48000*65;
