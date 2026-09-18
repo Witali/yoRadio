@@ -1527,8 +1527,20 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   выигрыш по числу операций. Contract/linked proof, exact PCM и новый A/B/A.
   18 in-place MOVI,37B patch; все3370 адресов инструкций и frame384B сохранены.
   App903216B, RAM/стек без роста;24 exact PCM/state/ASan/UBSan сценария PASS.
-- [ ] Для quant-flags завершить новый10A/10B/10A2, проверить оба speed gate
-  и75% CPU, затем восстановить ordinary radio. Пока baseline не изменён.
+- [x] Для quant-flags завершён новый10A/10B/10A2, exact PCM; CPU192
+  77.869750/77.851083/77.856958%, CPU12870.365792/70.364854/70.378833%.
+  Первый speed gate FAIL, повторный PASS: **не принят**, baseline eBands-final.
+  MinDRAM2440/1756/1724B, max19219927/19984/20322us, все попытки сохранены.
+  33 локальных регрессии PASS; ordinary radio восстановлена OTA, HTTP/WS/
+  playlist проверены. Цели75% raw и20с I2S+WebUI не достигнуты.
+- [ ] Отдельно проверить ещё23 constant stack loads в quant_all_bands:
+  census41 включает18 текущих флагов; локальные копии SP124/132/140/192/220/240
+  требуют проверки значения именно в точке чтения (SP132 бывает0 и1).
+  [Адреса и условия](ESP8266_OPUS_QUANT_FLAGS.md) сохранены. Не смешивать с
+  текущим A/B/A; сначала linked proof без изменения внутренних адресов.
+- [ ] Отдельная гипотеза load+constant branch -> J для пяти resynth-пар:
+  доказать liveness регистра назначения на всех successors, отсутствие
+  interior entries и аргументы callees; текущий MOVI proof этого не разрешает.
 
 ### 2026-09-18: условный CFG-аудит allocation
 
