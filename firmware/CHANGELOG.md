@@ -3,6 +3,21 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-18: quant_all_bands eBands leaf reuse (rejected)
+
+- `development/esp8266-opus-ebands-quant-{control,candidate}-v1/app.bin`,
+  903216B, CPU160/runtimeQIO40, raw decoder only. One15B replacement,
+  existing signed-pair helper reused; no RAM/IRAM/frame or image growth.
+- 132416 linked numeric cases, symbolic signed/ABI proof, CFG and negative
+  tests;24 exact host PCM/state/PLC/OOM cases through510kbps/120ms.
+- All30 physical A/B/A2 retained. CPU19277.863875/78.206833/77.887833%,
+  CPU12870.377792/70.715292/70.396313%. Both speed gates FAIL. Rejected;
+  accepted eBands-final and production defaults unchanged.75% not reached.
+- Max192 wall call27.899/20.224/19.927ms; min DRAM1224/904/896B,
+  stack-free1660B. The A/run4 90.066125% CPU outlier is included.
+  No new continuous I2S or playback-time WebUI qualification.
+  [Full experiment](../docs/ESP8266_OPUS_ASM_EBANDS_QUANT.md).
+
 ## Development - 2026-09-17: aligned positive eBands ASM (not accepted)
 
 - `development/esp8266-opus-ebands-u16-aligned-{control,candidate}-v1/app.bin`,
