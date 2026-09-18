@@ -1,8 +1,8 @@
 # Decoder-only quant_all_bands ASM — 2026-09-18
 
-Experimental frozen-layout overlay over accepted eBands-final, not the
-rejected allocation-decode candidate. No production/default change and
-no speed claim before the fresh physical A/B/A gate. The active goal is
+Rejected frozen-layout overlay over accepted eBands-final, not the
+rejected allocation-decode candidate. The fresh physical A/B/A below
+shows a regression; no production/default change. The active goal is
 <=75% raw CPU at 192 kb/s, then >=20 seconds continuous I2S plus WebUI.
 
 ## Change and invariants
@@ -67,13 +67,77 @@ it now pins the actual call-argument address. The failed test log is retained.
 
 ## Required physical gate
 
-- [ ] Fresh 10 A / 10 B / 10 A2 at CPU160/runtime QIO40, observation every15s.
-- [ ] All attempts, exact target PCM, maxima, low DRAM and polling failures.
-- [ ] Both relative high-bitrate versus low-bitrate gates, plus separate75% goal.
-- [ ] Restore ordinary heapreserve ASM radio; verify HTTP/WS/playlist.
+- [x] Fresh 10 A / 10 B / 10 A2 at CPU160/runtime QIO40, observation every15s.
+- [x] All attempts, exact target PCM, maxima, low DRAM and polling failures.
+- [x] Both relative high-bitrate versus low-bitrate gates, plus separate75% goal.
+- [x] Restore ordinary heapreserve ASM radio; verify HTTP/WS/playlist.
 - [ ] Only if accepted: full-radio relocation and >=20s I2S/WebUI qualification.
 
 No UART commands, GPIO3 reset, partition/SPIFFS or PC Wi-Fi changes.
+
+## Physical result: reject, keep eBands-final
+
+All30 fresh attempts completed with exact target PCM hashes, sample/packet
+counts and unchanged scratch peaks. The10 earlier A-only runs are retained
+separately as `preliminary-control`: the user's memory audit interrupted that
+experiment before any B run, and ordinary radio was restored. They are not
+silently discarded or pooled into the fresh A/B/A medians.
+
+| Input kb/s | A CPU % | B CPU % | A2 CPU % |
+| --- | ---: | ---: | ---: |
+| mono12 | 23.103625 | 23.076813 | 23.081917 |
+| mono24 | 53.890812 | 54.091875 | 53.879458 |
+| stereo64 | 61.193021 | 63.346438 | 61.188521 |
+| stereo128 | 70.394375 | 74.089958 | 70.363958 |
+| stereo192 | 77.860125 | 81.874792 | 77.869875 |
+
+Both high-bitrate gates FAIL. Relative time at192 worsens by5.156255% versus
+A and5.143089% versus A2; at128 by5.249828% and5.295325%. The75% goal is not
+met. Shorter live code is not faster here. Packing changes internal branch/
+instruction placement even though all external addresses remain fixed;
+cache/alignment is a hypothesis, not a measured cause of the regression.
+
+All maxima and unusual observations remain in the reports:
+
+- Max192 wall-call:28685/21016/19972us for A/B/A2. A/run6 includes an HTTP
+  observation timeout and90.111542% raw CPU192; not removed as an outlier.
+- Minimum sampled DRAM1052/1928/4648B; lifetime free stack1660B in all groups.
+  Different sampled free heaps do not establish a decoder memory saving.
+- B/run1 mono12 task exceeds its differently delimited wall window by185us;
+  A2/run2 by414us. No clamping or subtraction. Charged ISR/bookkeeping remain
+  within the established raw task-time metric, not ideal instruction cycles.
+- Static RAM, original384-B function frame and903216-B image stay unchanged.
+  This is not live decoding, PDM timing or an audio-continuity qualification.
+
+The paired image/ELF/retained-CFG proof is rechecked by
+`tools/esp8266_opus_asm/report_quant_decode.cjs`. Three passing result tests verify
+every one of40 saved run files and hashes (30 fresh plus10 preliminary),
+recompute both gates/medians and require confirmed ordinary-radio restoration.
+The combined local ASM/memory/reconnect/diagnostic-HTTP suite passes27/27.
+
+Ordinary heapreserve accepted ASM radio was restored by OTA HTTP200/OK,
+slot0x110000 ->0x10000, app SHA256
+`dfa1c0a298dde56f33d5bb88627b4c9aa643deca12d5329ce4a0398e6f60b273`.
+Status: stopped, no error, original Nightwave selection, RSSI-53dBm,
+combined free heap30188B. HTTP/WS/getindex/playlist passed. No browser-rendering
+or acoustic qualification is claimed. Source-only cancellation fix0edf328d
+is not in this restored existing image; its separate live qualification remains.
+
+Evidence is next to the candidate image: `comparison.json`, all40 raw JSON/log
+pairs, OTA records, `before-restore.json`, `restored-webui.json` and test logs.
+Do not use this candidate as the next optimization parent: keep accepted
+`esp8266-opus-ebands-final-candidate-v2`.
+
+### Separate next hypothesis
+
+A read-only census found18 remaining loads of immutable context fields
+SP+32 (encode=0) and SP+36 (resynth=1) in the decoder-reachable original ASM.
+Consider in-place constant materialization over the accepted parent, keeping
+instruction widths and all internal addresses unchanged. Removing a load
+altogether additionally requires register-liveness proof on every successor.
+The census is not an implementation or a speed result; do not reapply this
+rejected packed function or assume fewer DRAM reads guarantee an improvement.
+Save a separate contract/linked proof, exact PCM and fresh physical A/B/A.
 
 ```text
 node tools/esp8266_opus_asm/audit_quant_decode.cjs

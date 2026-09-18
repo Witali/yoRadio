@@ -1,0 +1,131 @@
+{
+  "table": [
+    {
+      "name": "mono-12",
+      "A": 23.103625,
+      "B": 23.0768125,
+      "A2": 23.081916666666668,
+      "delta_initial": -0.1160532167571171,
+      "delta_repeated": -0.022113270489532155
+    },
+    {
+      "name": "mono-24",
+      "A": 53.890812499999996,
+      "B": 54.091875,
+      "A2": 53.87945833333333,
+      "delta_initial": 0.37309235224465276,
+      "delta_repeated": 0.3942442504758059
+    },
+    {
+      "name": "stereo-64",
+      "A": 61.19302083333333,
+      "B": 63.3464375,
+      "A2": 61.18852083333333,
+      "delta_initial": 3.5190559925645237,
+      "delta_repeated": 3.5266691158370334
+    },
+    {
+      "name": "stereo-128",
+      "A": 70.394375,
+      "B": 74.08995833333333,
+      "A2": 70.36395833333333,
+      "delta_initial": 5.249827608148139,
+      "delta_repeated": 5.295324606880292
+    },
+    {
+      "name": "stereo-192",
+      "A": 77.860125,
+      "B": 81.87479166666667,
+      "A2": 77.869875,
+      "delta_initial": 5.1562551006264945,
+      "delta_repeated": 5.143088603476853
+    }
+  ],
+  "groups": {
+    "A": {
+      "min_dram": 1052,
+      "min_stack": 1660,
+      "max192": 28685,
+      "dram_after": {
+        "min": 18292,
+        "median": 26396,
+        "mean": 25633.6,
+        "p95": 26836,
+        "max": 26836
+      },
+      "observations": [
+        {
+          "run": 6,
+          "error": "request timeout"
+        }
+      ],
+      "timing_excess": []
+    },
+    "B": {
+      "min_dram": 1928,
+      "min_stack": 1660,
+      "max192": 21016,
+      "dram_after": {
+        "min": 26300,
+        "median": 26476,
+        "mean": 26457.6,
+        "p95": 26652,
+        "max": 26652
+      },
+      "observations": [],
+      "timing_excess": [
+        {
+          "run": 1,
+          "id": 0,
+          "task_us": 553611,
+          "wall_us": 553426,
+          "excess_us": 185,
+          "empty_task_us": 51,
+          "packets": 120
+        }
+      ]
+    },
+    "A2": {
+      "min_dram": 4648,
+      "min_stack": 1660,
+      "max192": 19972,
+      "dram_after": {
+        "min": 26172,
+        "median": 26308,
+        "mean": 26368,
+        "p95": 26524,
+        "max": 26524
+      },
+      "observations": [],
+      "timing_excess": [
+        {
+          "run": 2,
+          "id": 0,
+          "task_us": 553592,
+          "wall_us": 553178,
+          "excess_us": 414,
+          "empty_task_us": 50,
+          "packets": 120
+        }
+      ]
+    }
+  },
+  "gates": {
+    "initial": {
+      "policy": "High bitrate relative time gains must exceed small lower-bitrate relative regressions; both 128/192 checked. Exactness/RAM checked separately.",
+      "minimum_high_bitrate_gain_percent": -5.249827608148139,
+      "maximum_low_bitrate_slowdown_percent": 3.5190559925645237,
+      "all_median_raw_budgets_below_100": true,
+      "accepted_for_experimental_asm": false,
+      "target_192_cpu_at_most_70": false
+    },
+    "repeated": {
+      "policy": "High bitrate relative time gains must exceed small lower-bitrate relative regressions; both 128/192 checked. Exactness/RAM checked separately.",
+      "minimum_high_bitrate_gain_percent": -5.295324606880292,
+      "maximum_low_bitrate_slowdown_percent": 3.5266691158370334,
+      "all_median_raw_budgets_below_100": true,
+      "accepted_for_experimental_asm": false,
+      "target_192_cpu_at_most_70": false
+    }
+  }
+}

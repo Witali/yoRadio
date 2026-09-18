@@ -1511,8 +1511,20 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   Проверены encode/resynth, private slots и 11 ROM-calls.557 недостижимых
   инструкций,27 удалённых постоянных проверок,5 заменены на jump; live7687B
   в прежних9416B. App903216B, RAM/стек без роста.24 exact host сценария PASS.
-- [ ] Для quant_all_bands выполнить свежий10A/10B/10A2 и оба speed gate,
-  затем восстановить ordinary radio. Не принимать по размеру кода/host PCM.
+- [x] Для quant_all_bands выполнен свежий10A/10B/10A2 и оба speed gate,
+  затем восстановлено ordinary radio. CPU19277.860125/81.874792/77.869875%,
+  CPU12870.394375/74.089958/70.363958%. Оба gate FAIL: **отклонён**,
+  baseline по-прежнему eBands-final. Все30 PCM точны; ещё10 прежних A-only
+  сохранены отдельно после прерывания опыта аудитом памяти. RAM/frame прежние,
+  minDRAM1052/1928/4648B, timeout A/run6 и90.111542% не исключены.
+  Ordinary heapreserve ASM восстановлено OTA, HTTP/WS/playlist проверены.
+  27 локальных проверок PASS; результат не достигает75% и не доказывает20s I2S.
+- [ ] Следующий отдельный quant-кандидат поверх accepted eBands-final:
+  census нашёл18 decoder-reachable загрузок неизменяемых encode/resynth из
+  stack32/36. Проверить in-place MOVI при сохранённых ширинах инструкций и
+  всех внутренних адресах. Для удаления загрузки нужна отдельная liveness-
+  проверка всех CFG-путей. Не использовать отклонённое уплотнение; не обещать
+  выигрыш по числу операций. Contract/linked proof, exact PCM и новый A/B/A.
 
 ### 2026-09-18: условный CFG-аудит allocation
 
