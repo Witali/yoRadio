@@ -3,6 +3,17 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-18: branchless eBands-SRC (preflight only)
+
+- `development/esp8266-opus-ebands-src-{control,candidate}-v2/app.bin`,
+  903216B, CPU160/runtimeQIO40, raw decoder only. One existing36B leaf
+  replaced, no RAM/stack/image growth;31B live code plus5B unreachable pad.
+- 132416 numerical cases, symbolic signed16/SAR/bounds proof,24 exact host
+  PCM/state/OOM/PLC scenarios and6 regressions passed. Never flashed;
+  physical10A/10B/10A2 and speed acceptance remain pending.
+- v2 corrects the host model's loop selection; candidate binary unchanged.
+  [Preflight and limitations](../docs/ESP8266_OPUS_ASM_EBANDS_SRC.md).
+
 ## Development - 2026-09-18: quant_all_bands eBands leaf reuse (rejected)
 
 - `development/esp8266-opus-ebands-quant-{control,candidate}-v1/app.bin`,
