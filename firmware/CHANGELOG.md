@@ -3,6 +3,17 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-18: branchless eBands-SRC hardware result (rejected)
+
+- Existing `esp8266-opus-ebands-src-{control,candidate}-v2`,903216B, now
+  tested with30 new physical A/B/A attempts. Exact target PCM; unchanged
+  RAM/stack/layout. CPU19277.878917/77.872167/77.863833%, CPU128
+  70.353646/70.378500/70.363833%. Both speed gates fail; keep eBands-final.
+- All maxima/low-DRAM observations and task>wall excess retained. Restored
+  ordinary heapreserve ASM radio by OTA; HTTP/WS/playlist checked, stopped.
+  Neither75% CPU nor continuous20s I2S/WebUI is newly qualified.
+- [Complete result](../docs/ESP8266_OPUS_ASM_EBANDS_SRC.md).
+
 ## Development - 2026-09-18: full Opus ASM reconnect / DRAM reserve
 
 - `development/esp8266-opus-live-asm-heapreserve-20260918/app.bin`,890352B,
