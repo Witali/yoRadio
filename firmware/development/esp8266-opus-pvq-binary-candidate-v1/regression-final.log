@@ -1,0 +1,228 @@
+TAP version 13
+# Subtest: current 75% raw CPU target uses an inclusive, unrounded median threshold
+ok 1 - current 75% raw CPU target uses an inclusive, unrounded median threshold
+  ---
+  duration_ms: 1.7092
+  type: 'test'
+  ...
+# Subtest: raw target rejects missing, ambiguous and invalid evidence or thresholds
+ok 2 - raw target rejects missing, ambiguous and invalid evidence or thresholds
+  ---
+  duration_ms: 2.1313
+  type: 'test'
+  ...
+# Subtest: active CPU target is independent of historical 70% field and relative-speed acceptance
+ok 3 - active CPU target is independent of historical 70% field and relative-speed acceptance
+  ---
+  duration_ms: 0.3405
+  type: 'test'
+  ...
+# Subtest: all24 saved PCM scenarios also preserve actual persistent states and scratch fields
+ok 4 - all24 saved PCM scenarios also preserve actual persistent states and scratch fields
+  ---
+  duration_ms: 2.1571
+  type: 'test'
+  ...
+# Subtest: host memory checks reject missing fields on both sides as well as silent size growth
+ok 5 - host memory checks reject missing fields on both sides as well as silent size growth
+  ---
+  duration_ms: 4.919
+  type: 'test'
+  ...
+# ┌─────────┬────────────────────┬──────────┬──────────────────┬──────────────────┬─────────────┬─────────────┬────────────────────┬───────────────────┬────────────────────┬────────────────────────────┬─────────────────────┐
+# │ (index) │ name               │ searches │ old_instructions │ new_instructions │ old_U_reads │ new_U_reads │ fewer_instructions │ more_instructions │ equal_instructions │ instruction_change_percent │ read_change_percent │
+# ├─────────┼────────────────────┼──────────┼──────────────────┼──────────────────┼─────────────┼─────────────┼────────────────────┼───────────────────┼────────────────────┼────────────────────────────┼─────────────────────┤
+# │ 0       │ 'mono-12'          │ 0        │ 0                │ 0                │ 0           │ 0           │ 0                  │ 0                 │ 0                  │ null                       │ null                │
+# │ 1       │ 'mono-24'          │ 35       │ 643              │ 1960             │ 124         │ 154         │ 1                  │ 34                │ 0                  │ 204.82115085536546         │ 24.193548387096776  │
+# │ 2       │ 'stereo-64'        │ 841      │ 14681            │ 33898            │ 2803        │ 2379        │ 18                 │ 821               │ 2                  │ 130.8970778557319          │ -15.126650017838028 │
+# │ 3       │ 'stereo-128'       │ 3272     │ 60732            │ 134966           │ 11682       │ 9594        │ 72                 │ 3192              │ 8                  │ 122.23210169268262         │ -17.873651771956855 │
+# │ 4       │ 'stereo-192'       │ 5205     │ 119961           │ 237196           │ 24259       │ 17587       │ 263                │ 4918              │ 24                 │ 97.72759480164386          │ -27.503194690630284 │
+# │ 5       │ 'stereo-320-2.5ms' │ 4870     │ 204382           │ 261703           │ 45485       │ 20595       │ 893                │ 3956              │ 21                 │ 28.046011879715426         │ -54.72133670440804  │
+# │ 6       │ 'stereo-320-5ms'   │ 5153     │ 239413           │ 276463           │ 53872       │ 21774       │ 1062               │ 4062              │ 29                 │ 15.475350127186083         │ -59.58197208197209  │
+# │ 7       │ 'stereo-320-10ms'  │ 6845     │ 284349           │ 352331           │ 63208       │ 27369       │ 1097               │ 5717              │ 31                 │ 23.90794411093411          │ -56.700101253005954 │
+# │ 8       │ 'stereo-320-20ms'  │ 6010     │ 292130           │ 326364           │ 66093       │ 25785       │ 1243               │ 4733              │ 34                 │ 11.718755348646148         │ -60.9867913394762   │
+# │ 9       │ 'stereo-510'       │ 28607    │ 1644283          │ 1645117          │ 377680      │ 132249      │ 7370               │ 21081             │ 156                │ 0.05072119580389334        │ -64.98384876085575  │
+# └─────────┴────────────────────┴──────────┴──────────────────┴──────────────────┴─────────────┴─────────────┴────────────────────┴───────────────────┴────────────────────┴────────────────────────────┴─────────────────────┘
+# Subtest: all30 physical attempts match hashes, PCM and confirmed OTA slots
+ok 6 - all30 physical attempts match hashes, PCM and confirmed OTA slots
+  ---
+  duration_ms: 47.0213
+  type: 'test'
+  ...
+# Subtest: medians, outliers and speed/75-percent gates reproduce from every saved attempt
+ok 7 - medians, outliers and speed/75-percent gates reproduce from every saved attempt
+  ---
+  duration_ms: 55.2529
+  type: 'test'
+  ...
+# Subtest: terminal benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist responses
+ok 8 - terminal benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist responses
+  ---
+  duration_ms: 3.9414
+  type: 'test'
+  ...
+# Subtest: linked instruction census reproduces the recorded real searches
+ok 9 - linked instruction census reproduces the recorded real searches
+  ---
+  duration_ms: 2500.9173
+  type: 'test'
+  ...
+# Subtest: linked binary search matches every U-row interval without RAM or stack growth
+ok 10 - linked binary search matches every U-row interval without RAM or stack growth
+  ---
+  duration_ms: 8023.277
+  type: 'test'
+  ...
+# Subtest: real flash table monotonicity, pointers and final diagonal are checked
+ok 11 - real flash table monotonicity, pointers and final diagonal are checked
+  ---
+  duration_ms: 143.3126
+  type: 'test'
+  ...
+# Subtest: branch, midpoint, load width and wrong cached value mutations are rejected
+ok 12 - branch, midpoint, load width and wrong cached value mutations are rejected
+  ---
+  duration_ms: 17.2981
+  type: 'test'
+  ...
+# Subtest: decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+ok 13 - decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+  ---
+  duration_ms: 2974.6748
+  type: 'test'
+  ...
+# Subtest: host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+ok 14 - host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+  ---
+  duration_ms: 2.3586
+  type: 'test'
+  ...
+# Subtest: PVQ pointer cache preserves all15 linked exits and6720 numeric unsigned/sign/boundary paths
+ok 15 - PVQ pointer cache preserves all15 linked exits and6720 numeric unsigned/sign/boundary paths
+  ---
+  duration_ms: 675.8534
+  type: 'test'
+  ...
+# Subtest: PVQ proof rejects bad pointer steps, changed branch predicates, interior entry and a0 liveness violations
+ok 16 - PVQ proof rejects bad pointer steps, changed branch predicates, interior entry and a0 liveness violations
+  ---
+  duration_ms: 21.9242
+  type: 'test'
+  ...
+# Subtest: PVQ pointer images keep all unrelated bytes, tables, RAM and existing accepted overlays
+ok 17 - PVQ pointer images keep all unrelated bytes, tables, RAM and existing accepted overlays
+  ---
+  duration_ms: 20244.4815
+  type: 'test'
+  ...
+# Subtest: PVQ host mirror changes only many-dimensions search and preserves24 exact PCM/state/PLC/reset/OOM cases
+ok 18 - PVQ host mirror changes only many-dimensions search and preserves24 exact PCM/state/PLC/reset/OOM cases
+  ---
+  duration_ms: 4.7067
+  type: 'test'
+  ...
+# Subtest: PVQ linked loop preserves registers/read order by induction with four instructions per continuing probe
+ok 19 - PVQ linked loop preserves registers/read order by induction with four instructions per continuing probe
+  ---
+  duration_ms: 17416.5232
+  type: 'test'
+  ...
+# Subtest: PVQ patch cannot admit new interior entries, extra loads, changed return registers or a reversed branch
+ok 20 - PVQ patch cannot admit new interior entries, extra loads, changed return registers or a reversed branch
+  ---
+  duration_ms: 37.9621
+  type: 'test'
+  ...
+# Subtest: PVQ fixed-address images differ in one35-byte block only, valid checksums, no RAM growth or rejected FFT inheritance
+ok 21 - PVQ fixed-address images differ in one35-byte block only, valid checksums, no RAM growth or rejected FFT inheritance
+  ---
+  duration_ms: 15391.1137
+  type: 'test'
+  ...
+# Subtest: all modeled search brackets return the identical coordinate
+ok 22 - all modeled search brackets return the identical coordinate
+  ---
+  duration_ms: 75.9109
+  type: 'test'
+  ...
+# Subtest: linear model includes its final successful load; binary reuses initial q
+ok 23 - linear model includes its final successful load; binary reuses initial q
+  ---
+  duration_ms: 0.9109
+  type: 'test'
+  ...
+# Subtest: empty SILK corpus is not described as a search speedup
+ok 24 - empty SILK corpus is not described as a search speedup
+  ---
+  duration_ms: 0.2933
+  type: 'test'
+  ...
+# Subtest: invalid bounds fail rather than narrowing the decoded domain
+ok 25 - invalid bounds fail rather than narrowing the decoded domain
+  ---
+  duration_ms: 6.3046
+  type: 'test'
+  ...
+# Subtest: archived search census is reproducible from all ten unchanged pulse traces
+ok 26 - archived search census is reproducible from all ten unchanged pulse traces
+  ---
+  duration_ms: 71.5378
+  type: 'test'
+  ...
+# Subtest: attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+ok 27 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+  ---
+  duration_ms: 4.7105
+  type: 'test'
+  ...
+# Subtest: A/B permits only the selected feature and artifact identity differences
+ok 28 - A/B permits only the selected feature and artifact identity differences
+  ---
+  duration_ms: 1.2976
+  type: 'test'
+  ...
+# Subtest: raw A/B reports true medians and retains a slow outlier and observation timeout
+ok 29 - raw A/B reports true medians and retains a slow outlier and observation timeout
+  ---
+  duration_ms: 2.406
+  type: 'test'
+  ...
+# Subtest: raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+ok 30 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+  ---
+  duration_ms: 13.379
+  type: 'test'
+  ...
+# Subtest: different task/wall timing windows retain positive overhead without clamping or dropping the run
+ok 31 - different task/wall timing windows retain positive overhead without clamping or dropping the run
+  ---
+  duration_ms: 1.3038
+  type: 'test'
+  ...
+# Subtest: raw-series default observation interval matches the physical evidence validator
+ok 32 - raw-series default observation interval matches the physical evidence validator
+  ---
+  duration_ms: 2.003
+  type: 'test'
+  ...
+# Subtest: raw series verifies PCM and retains terminal device failures without counting them as speed passes
+ok 33 - raw series verifies PCM and retains terminal device failures without counting them as speed passes
+  ---
+  duration_ms: 2.5616
+  type: 'test'
+  ...
+# Subtest: raw series does not restart unknown/physical/missing observations or incorrect PCM
+ok 34 - raw series does not restart unknown/physical/missing observations or incorrect PCM
+  ---
+  duration_ms: 7.9528
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 34
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 33016.7568

@@ -3,7 +3,7 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-19: exact PVQ binary search ASM candidate
+## Development - 2026-09-19: exact PVQ binary search ASM (rejected)
 
 - Separate `esp8266-opus-pvq-binary-{control,candidate}-v1`,903216B,
   CPU160/runtime QIO40 raw benchmark over accepted eBands-final.
@@ -13,8 +13,12 @@ entries are retained; changes are published under a new firmware version.
 - 303906 linked interval checks,24 exact PCM/state/ASan/UBSan host cases and
   five regressions with negative mutations pass. No bitrate restriction.
 - Candidate SHA256: `992fcaa4ff29f1fb153b795998e7e5938fafbc607cc0124596e442d6d4d022dc`.
-- Physical A/B/A2 is pending. Not accepted as production/default or evidence
-  of75% CPU/live continuity. [Details](../docs/ESP8266_OPUS_PVQ_BINARY.md).
+- Fresh10A/10B/10A2 all exact; CPU19277.872438/78.451979/77.871979%,
+  CPU12870.387604/70.802042/70.376375%. Both speed gates FAIL; rejected.
+- MinDRAM756/196/1928B, stack-free1660B; max19227986/19852/20323us.
+  A/run1 timeout and90.004750% CPU retained.34 local regressions pass.
+- Ordinary main image restored OTA, HTTP/WS/playlist checked. No production
+  change or75% CPU/live continuity qualification. [Details](../docs/ESP8266_OPUS_PVQ_BINARY.md).
 
 ## Development - 2026-09-18: decoder-only quant_all_bands ASM (rejected)
 
