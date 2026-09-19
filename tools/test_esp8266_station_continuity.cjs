@@ -11,6 +11,15 @@ function fixture() {
 }
 test('MP3 supports 44.1kHz and ignores historical underruns/minimum heap',()=>assert.equal(evaluate(fixture()).pass,true));
 test('a single new DMA miss fails',()=>{const r=fixture();r.after.audio.body.underruns++;assert.equal(evaluate(r).pass,false);});
+test('ordinary Opus checks real output counters without requiring compiled-out diagnostics',()=>{
+  const r=fixture();r.require_autonomous_opus=false;
+  for(const side of [r.before,r.after]){side.status.body.codec='OPUS';side.audio.body.sample_rate=48000;}
+  r.after.audio.body.pcm_frames=100+48000*65;
+  assert.equal(evaluate(r).pass,true);assert.match(evaluate(r).limitation,/endpoint counters only/);
+  r.after.audio.body.underruns++;assert.equal(evaluate(r).pass,false);
+  r.after.audio.body.underruns--;r.after.audio.body.output_enabled=false;
+  assert.equal(evaluate(r).pass,false);
+});
 test('no PCM and stopped state never pass',()=>{const r=fixture();r.after.audio.body.pcm_frames=100;r.after.status.body.playing=false;assert.equal(evaluate(r).pass,false);});
 test('wrong station fails even with flowing PCM',()=>{const r=fixture();r.after.status.body.station='other';assert.equal(evaluate(r).pass,false);});
 test('missing measurement cannot become a pass',()=>{const r=fixture();r.after.audio={error:'timeout'};assert.equal(evaluate(r).pass,false);});
