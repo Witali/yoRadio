@@ -1,0 +1,80 @@
+TAP version 13
+# Subtest: ICDF builder switch requires Opus, defaults OFF, explicitly sets CMake and records a boolean manifest
+ok 1 - ICDF builder switch requires Opus, defaults OFF, explicitly sets CMake and records a boolean manifest
+  ---
+  duration_ms: 1123.7138
+  type: 'test'
+  ...
+# Subtest: PCM lease build switch defaults off and requires diagnostic Opus
+ok 2 - PCM lease build switch defaults off and requires diagnostic Opus
+  ---
+  duration_ms: 576.4836
+  type: 'test'
+  ...
+# Subtest: actual Opus component CMake enforces lease diagnostic gate and definition
+ok 3 - actual Opus component CMake enforces lease diagnostic gate and definition
+  ---
+  duration_ms: 182.2528
+  type: 'test'
+  ...
+# Subtest: Opus PCM publication is explicit, diagnostic-only and defaults off
+ok 4 - Opus PCM publication is explicit, diagnostic-only and defaults off
+  ---
+  duration_ms: 559.7746
+  type: 'test'
+  ...
+# Subtest: app PCM requires diagnostic queue, has no extra stack and is explicitly off by default
+ok 5 - app PCM requires diagnostic queue, has no extra stack and is explicitly off by default
+  ---
+  duration_ms: 617.6992
+  type: 'test'
+  ...
+# Subtest: short loan profile validates diagnostics and resets the production limit to 512
+ok 6 - short loan profile validates diagnostics and resets the production limit to 512
+  ---
+  duration_ms: 592.6888
+  type: 'test'
+  ...
+# Subtest: PDM32 batch builder switch is diagnostic-only, independent of IRAM, and explicitly resets CMake/manifest
+not ok 7 - PDM32 batch builder switch is diagnostic-only, independent of IRAM, and explicitly resets CMake/manifest
+  ---
+  duration_ms: 957.456
+  type: 'test'
+  location: 'C:\\Work\\yoRadio\\.worktree\\esp8266-opus-asm\\tests\\esp8266-pdm32-batch-profile.test.js:29:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Join-Path : Cannot bind argument to parameter 'Path' because it is an empty string.
+    At line:73 char:18
+    +     & (Join-Path $PSScriptRoot '../../esp8266/rtos-sdk-native/build.p ...
+    +                  ~~~~~~~~~~~~~
+        + CategoryInfo          : InvalidData: (:) [Join-Path], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : ParameterArgumentValidationErrorEmptyStringNotAllowed,Microsoft.PowerShell.Commands.Join 
+       PathCommand
+     
+    
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Work\yoRadio\.worktree\esp8266-opus-asm\tests\esp8266-pdm32-batch-profile.test.js:63:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 6
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1709.5112

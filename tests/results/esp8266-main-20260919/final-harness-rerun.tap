@@ -1,0 +1,119 @@
+TAP version 13
+# Subtest: PDM32 IRAM builder switch is opt-in, diagnostic-only, and explicitly clears CMake cache
+ok 1 - PDM32 IRAM builder switch is opt-in, diagnostic-only, and explicitly clears CMake cache
+  ---
+  duration_ms: 723.1893
+  type: 'test'
+  ...
+# Subtest: actual flash cache validates source and body, rebuilds stale data, reuses unchanged files
+ok 2 - actual flash cache validates source and body, rebuilds stale data, reuses unchanged files
+  ---
+  duration_ms: 7519.9742
+  type: 'test'
+  ...
+# Subtest: disabled cache needs no compressor or cache object code
+ok 3 - disabled cache needs no compressor or cache object code
+  ---
+  duration_ms: 402.3305
+  type: 'test'
+  ...
+# Subtest: playlist upload rebuilds cache under the same lock; requests never compress
+ok 4 - playlist upload rebuilds cache under the same lock; requests never compress
+  ---
+  duration_ms: 0.6427
+  type: 'test'
+  ...
+# Subtest: SDK overlay is pinned, deterministic, LF/CRLF tolerant and does not modify SDK sources
+ok 5 - SDK overlay is pinned, deterministic, LF/CRLF tolerant and does not modify SDK sources # SKIP Install the pinned ESP8266 SDK or set YORADIO_TEST_SDK_PATH
+  ---
+  duration_ms: 1.0626
+  type: 'test'
+  ...
+# Subtest: hash changes and missing/duplicate anchors fail closed before producing output
+ok 6 - hash changes and missing/duplicate anchors fail closed before producing output # SKIP Install the pinned ESP8266 SDK or set YORADIO_TEST_SDK_PATH
+  ---
+  duration_ms: 0.1398
+  type: 'test'
+  ...
+# Subtest: CLI rejects unknown or incomplete arguments without a hash-bypass switch
+ok 7 - CLI rejects unknown or incomplete arguments without a hash-bypass switch
+  ---
+  duration_ms: 189.015
+  type: 'test'
+  ...
+# Subtest: real counter module and generated SDK flow: ASan/UBSan, concurrent snapshots, ownership and 48-byte state
+ok 8 - real counter module and generated SDK flow: ASan/UBSan, concurrent snapshots, ownership and 48-byte state
+  ---
+  duration_ms: 5106.3124
+  type: 'test'
+  ...
+# Subtest: actual CMake targets: exact replacement, OFF restoration and fail-closed diagnostics/membership
+ok 9 - actual CMake targets: exact replacement, OFF restoration and fail-closed diagnostics/membership # SKIP Install the pinned ESP8266 SDK or set YORADIO_TEST_SDK_PATH
+  ---
+  duration_ms: 0.1066
+  type: 'test'
+  ...
+# Subtest: production defaults omit diagnostic source and module has no allocation, logging or task creation
+ok 10 - production defaults omit diagnostic source and module has no allocation, logging or task creation
+  ---
+  duration_ms: 1.2793
+  type: 'test'
+  ...
+# Subtest: WiFi completion response fits existing scratch at uint32 maxima
+ok 11 - WiFi completion response fits existing scratch at uint32 maxima
+  ---
+  duration_ms: 0.8634
+  type: 'test'
+  ...
+# Subtest: real PCM callback publishes source channels while output and frame accounting stay mono
+ok 12 - real PCM callback publishes source channels while output and frame accounting stay mono
+  ---
+  duration_ms: 4685.0611
+  type: 'test'
+  ...
+# Stream metadata PASS: MP3/AAC/Opus stereo->mono->stereo, PCM stride, dedup and failure paths
+# Subtest: Web audio pause off: execute production helpers
+ok 13 - Web audio pause off: execute production helpers
+  ---
+  duration_ms: 2511.8006
+  type: 'test'
+  ...
+# Subtest: Web audio pause short: execute production helpers
+ok 14 - Web audio pause short: execute production helpers
+  ---
+  duration_ms: 2608.5077
+  type: 'test'
+  ...
+# Subtest: Web audio pause long: execute production helpers
+ok 15 - Web audio pause long: execute production helpers
+  ---
+  duration_ms: 2273.1982
+  type: 'test'
+  ...
+# Subtest: pause checkpoints surround open/detect/decode and leave generation semantics intact
+ok 16 - pause checkpoints surround open/detect/decode and leave generation semantics intact
+  ---
+  duration_ms: 0.6462
+  type: 'test'
+  ...
+# Subtest: only static GETs request long pause; errors always release it
+ok 17 - only static GETs request long pause; errors always release it
+  ---
+  duration_ms: 0.4224
+  type: 'test'
+  ...
+# Subtest: build switch validates all values and rejects long pause for KaRadio
+ok 18 - build switch validates all values and rejects long pause for KaRadio
+  ---
+  duration_ms: 155.8572
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 3
+# todo 0
+# duration_ms 8012.7875

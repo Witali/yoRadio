@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: ICDF builder switch requires Opus, defaults OFF, explicitly sets CMake and records a boolean manifest
+ok 1 - ICDF builder switch requires Opus, defaults OFF, explicitly sets CMake and records a boolean manifest
+  ---
+  duration_ms: 1037.6254
+  type: 'test'
+  ...
+# Subtest: PCM lease build switch defaults off and requires diagnostic Opus
+ok 2 - PCM lease build switch defaults off and requires diagnostic Opus
+  ---
+  duration_ms: 560.9814
+  type: 'test'
+  ...
+# Subtest: actual Opus component CMake enforces lease diagnostic gate and definition
+ok 3 - actual Opus component CMake enforces lease diagnostic gate and definition
+  ---
+  duration_ms: 179.4399
+  type: 'test'
+  ...
+# Subtest: Opus PCM publication is explicit, diagnostic-only and defaults off
+ok 4 - Opus PCM publication is explicit, diagnostic-only and defaults off
+  ---
+  duration_ms: 539.8784
+  type: 'test'
+  ...
+# Subtest: app PCM requires diagnostic queue, has no extra stack and is explicitly off by default
+ok 5 - app PCM requires diagnostic queue, has no extra stack and is explicitly off by default
+  ---
+  duration_ms: 542.3811
+  type: 'test'
+  ...
+# Subtest: short loan profile validates diagnostics and resets the production limit to 512
+ok 6 - short loan profile validates diagnostics and resets the production limit to 512
+  ---
+  duration_ms: 567.9062
+  type: 'test'
+  ...
+# Subtest: PDM32 batch builder switch is diagnostic-only, independent of IRAM, and explicitly resets CMake/manifest
+ok 7 - PDM32 batch builder switch is diagnostic-only, independent of IRAM, and explicitly resets CMake/manifest
+  ---
+  duration_ms: 805.4551
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1527.3062

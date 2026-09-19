@@ -1,0 +1,101 @@
+TAP version 13
+# Subtest: all ESP8266 native output backends ignore balance for mono PCM
+ok 1 - all ESP8266 native output backends ignore balance for mono PCM
+  ---
+  duration_ms: 3.1853
+  type: 'test'
+  ...
+# Subtest: runtime and restored balance use a signed lower bound
+ok 2 - runtime and restored balance use a signed lower bound
+  ---
+  duration_ms: 0.3276
+  type: 'test'
+  ...
+# Subtest: ESP8266 channel choice defaults to mono and retains an explicit stereo profile
+ok 3 - ESP8266 channel choice defaults to mono and retains an explicit stereo profile
+  ---
+  duration_ms: 10.9168
+  type: 'test'
+  ...
+# Subtest: ESP8266 Helix MP3 streams 32 frames while libmad retains granule PCM
+ok 4 - ESP8266 Helix MP3 streams 32 frames while libmad retains granule PCM
+  ---
+  duration_ms: 1.4018
+  type: 'test'
+  ...
+# Subtest: ESP8266 AAC reserves only its active bounded PCM block
+ok 5 - ESP8266 AAC reserves only its active bounded PCM block
+  ---
+  duration_ms: 0.6582
+  type: 'test'
+  ...
+# Subtest: ESP8266 enables AAC and refills/yields between compressed frames
+ok 6 - ESP8266 enables AAC and refills/yields between compressed frames
+  ---
+  duration_ms: 0.3833
+  type: 'test'
+  ...
+# Subtest: ESP8266 granule API preserves the conventional full-frame API
+ok 7 - ESP8266 granule API preserves the conventional full-frame API
+  ---
+  duration_ms: 1.7124
+  type: 'test'
+  ...
+# Subtest: 32-frame callbacks publish stream format only on change
+ok 8 - 32-frame callbacks publish stream format only on change
+  ---
+  duration_ms: 1.1274
+  type: 'test'
+  ...
+# Subtest: ESP8266 error concealment cannot overrun the granule PCM buffer
+ok 9 - ESP8266 error concealment cannot overrun the granule PCM buffer
+  ---
+  duration_ms: 0.83
+  type: 'test'
+  ...
+# Subtest: LAN source preserves HTTP framing, exact encoded prefix, and pacing
+ok 10 - LAN source preserves HTTP framing, exact encoded prefix, and pacing
+  ---
+  duration_ms: 268.2071
+  type: 'test'
+  ...
+# Subtest: network diagnostic retains decoder memory and distinguishes app gaps from socket emptiness
+ok 11 - network diagnostic retains decoder memory and distinguishes app gaps from socket emptiness
+  ---
+  duration_ms: 1.797
+  type: 'test'
+  ...
+# Subtest: full read-size comparison holds readiness and output constant
+ok 12 - full read-size comparison holds readiness and output constant
+  ---
+  duration_ms: 1.4768
+  type: 'test'
+  ...
+# Subtest: network report does not discard failed or partial measurements
+ok 13 - network report does not discard failed or partial measurements
+  ---
+  duration_ms: 3.8937
+  type: 'test'
+  ...
+# Subtest: runtime report separates task residency and baseline from receive elapsed time
+ok 14 - runtime report separates task residency and baseline from receive elapsed time
+  ---
+  duration_ms: 1.8065
+  type: 'test'
+  ...
+# {"path":"/mp3-128","rate_kbps":128,"bytes_written":4096,"elapsed_ms":267,"peer_closed":true}
+# Subtest: build timeout is explicit, bounded, repeatable and checked against cached sdkconfig
+ok 15 - build timeout is explicit, bounded, repeatable and checked against cached sdkconfig
+  ---
+  duration_ms: 562.2844
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 746.5096

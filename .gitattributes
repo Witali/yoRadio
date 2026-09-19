@@ -169,3 +169,9 @@ docs/results/esp8266-opus-memory-reconnect-20260918/followup/*.log -text whitesp
 docs/results/esp8266-opus-memory-reconnect-20260918/followup/*.json text eol=lf
 firmware/development/esp8266-main/*.json text eol=lf
 firmware/development/esp8266-main/*.elf.gz filter=lfs diff=lfs merge=lfs -text
+
+# Preserve the full initial failure output and subsequent reruns verbatim.
+tests/results/esp8266-main-20260919/**/*.json text eol=lf
+tests/results/esp8266-main-20260919/*.json text eol=lf
+tests/results/esp8266-main-20260919/*.tap -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
+tests/results/esp8266-main-20260919/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol

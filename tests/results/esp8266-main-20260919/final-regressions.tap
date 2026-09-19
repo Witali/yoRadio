@@ -1,0 +1,300 @@
+TAP version 13
+# Subtest: all ESP8266 native output backends ignore balance for mono PCM
+ok 1 - all ESP8266 native output backends ignore balance for mono PCM
+  ---
+  duration_ms: 0.9432
+  type: 'test'
+  ...
+# Subtest: runtime and restored balance use a signed lower bound
+ok 2 - runtime and restored balance use a signed lower bound
+  ---
+  duration_ms: 0.1974
+  type: 'test'
+  ...
+# Subtest: ESP8266 channel choice defaults to mono and retains an explicit stereo profile
+ok 3 - ESP8266 channel choice defaults to mono and retains an explicit stereo profile
+  ---
+  duration_ms: 2.9181
+  type: 'test'
+  ...
+# Subtest: ESP8266 Helix MP3 streams 32 frames while libmad retains granule PCM
+ok 4 - ESP8266 Helix MP3 streams 32 frames while libmad retains granule PCM
+  ---
+  duration_ms: 0.2561
+  type: 'test'
+  ...
+# Subtest: ESP8266 AAC reserves only its active bounded PCM block
+ok 5 - ESP8266 AAC reserves only its active bounded PCM block
+  ---
+  duration_ms: 0.3481
+  type: 'test'
+  ...
+# Subtest: ESP8266 enables AAC and refills/yields between compressed frames
+ok 6 - ESP8266 enables AAC and refills/yields between compressed frames
+  ---
+  duration_ms: 0.2251
+  type: 'test'
+  ...
+# Subtest: ESP8266 granule API preserves the conventional full-frame API
+ok 7 - ESP8266 granule API preserves the conventional full-frame API
+  ---
+  duration_ms: 0.7744
+  type: 'test'
+  ...
+# Subtest: 32-frame callbacks publish stream format only on change
+ok 8 - 32-frame callbacks publish stream format only on change
+  ---
+  duration_ms: 0.5267
+  type: 'test'
+  ...
+# Subtest: ESP8266 error concealment cannot overrun the granule PCM buffer
+ok 9 - ESP8266 error concealment cannot overrun the granule PCM buffer
+  ---
+  duration_ms: 0.4241
+  type: 'test'
+  ...
+# Subtest: LAN source preserves HTTP framing, exact encoded prefix, and pacing
+ok 10 - LAN source preserves HTTP framing, exact encoded prefix, and pacing
+  ---
+  duration_ms: 240.2657
+  type: 'test'
+  ...
+# Subtest: network diagnostic retains decoder memory and distinguishes app gaps from socket emptiness
+ok 11 - network diagnostic retains decoder memory and distinguishes app gaps from socket emptiness
+  ---
+  duration_ms: 1.0909
+  type: 'test'
+  ...
+# Subtest: full read-size comparison holds readiness and output constant
+ok 12 - full read-size comparison holds readiness and output constant
+  ---
+  duration_ms: 0.4199
+  type: 'test'
+  ...
+# Subtest: network report does not discard failed or partial measurements
+ok 13 - network report does not discard failed or partial measurements
+  ---
+  duration_ms: 3.4922
+  type: 'test'
+  ...
+# Subtest: runtime report separates task residency and baseline from receive elapsed time
+ok 14 - runtime report separates task residency and baseline from receive elapsed time
+  ---
+  duration_ms: 0.7986
+  type: 'test'
+  ...
+# {"path":"/mp3-128","rate_kbps":128,"bytes_written":4096,"elapsed_ms":267,"peer_closed":true}
+# Subtest: ICDF builder switch requires Opus, defaults OFF, explicitly sets CMake and records a boolean manifest
+ok 15 - ICDF builder switch requires Opus, defaults OFF, explicitly sets CMake and records a boolean manifest
+  ---
+  duration_ms: 781.3431
+  type: 'test'
+  ...
+# Subtest: PCM lease build switch defaults off and requires diagnostic Opus
+ok 16 - PCM lease build switch defaults off and requires diagnostic Opus
+  ---
+  duration_ms: 354.096
+  type: 'test'
+  ...
+# Subtest: actual Opus component CMake enforces lease diagnostic gate and definition
+ok 17 - actual Opus component CMake enforces lease diagnostic gate and definition
+  ---
+  duration_ms: 155.7093
+  type: 'test'
+  ...
+# Subtest: Opus PCM publication is explicit, diagnostic-only and defaults off
+ok 18 - Opus PCM publication is explicit, diagnostic-only and defaults off
+  ---
+  duration_ms: 355.4434
+  type: 'test'
+  ...
+# Subtest: app PCM requires diagnostic queue, has no extra stack and is explicitly off by default
+ok 19 - app PCM requires diagnostic queue, has no extra stack and is explicitly off by default
+  ---
+  duration_ms: 393.3012
+  type: 'test'
+  ...
+# Subtest: short loan profile validates diagnostics and resets the production limit to 512
+ok 20 - short loan profile validates diagnostics and resets the production limit to 512
+  ---
+  duration_ms: 386.9341
+  type: 'test'
+  ...
+# Subtest: PDM32 batch builder switch is diagnostic-only, independent of IRAM, and explicitly resets CMake/manifest
+ok 21 - PDM32 batch builder switch is diagnostic-only, independent of IRAM, and explicitly resets CMake/manifest
+  ---
+  duration_ms: 796.6389
+  type: 'test'
+  ...
+# Subtest: PDM32 IRAM builder switch is opt-in, diagnostic-only, and explicitly clears CMake cache
+ok 22 - PDM32 IRAM builder switch is opt-in, diagnostic-only, and explicitly clears CMake cache
+  ---
+  duration_ms: 740.0523
+  type: 'test'
+  ...
+# Subtest: actual flash cache validates source and body, rebuilds stale data, reuses unchanged files
+ok 23 - actual flash cache validates source and body, rebuilds stale data, reuses unchanged files
+  ---
+  duration_ms: 7550.8635
+  type: 'test'
+  ...
+# Subtest: disabled cache needs no compressor or cache object code
+ok 24 - disabled cache needs no compressor or cache object code
+  ---
+  duration_ms: 417.6072
+  type: 'test'
+  ...
+# Subtest: playlist upload rebuilds cache under the same lock; requests never compress
+ok 25 - playlist upload rebuilds cache under the same lock; requests never compress
+  ---
+  duration_ms: 0.7221
+  type: 'test'
+  ...
+# Subtest: SDK RX counters require diagnostics and are explicitly OFF for normal builds
+ok 26 - SDK RX counters require diagnostics and are explicitly OFF for normal builds
+  ---
+  duration_ms: 500.72
+  type: 'test'
+  ...
+# Subtest: SDK overlay is pinned, deterministic, LF/CRLF tolerant and does not modify SDK sources
+ok 27 - SDK overlay is pinned, deterministic, LF/CRLF tolerant and does not modify SDK sources # SKIP Install the pinned ESP8266 SDK or set YORADIO_TEST_SDK_PATH
+  ---
+  duration_ms: 1.1234
+  type: 'test'
+  ...
+# Subtest: hash changes and missing/duplicate anchors fail closed before producing output
+ok 28 - hash changes and missing/duplicate anchors fail closed before producing output # SKIP Install the pinned ESP8266 SDK or set YORADIO_TEST_SDK_PATH
+  ---
+  duration_ms: 0.13
+  type: 'test'
+  ...
+# Subtest: CLI rejects unknown or incomplete arguments without a hash-bypass switch
+ok 29 - CLI rejects unknown or incomplete arguments without a hash-bypass switch
+  ---
+  duration_ms: 176.95
+  type: 'test'
+  ...
+# Subtest: real counter module and generated SDK flow: ASan/UBSan, concurrent snapshots, ownership and 48-byte state
+ok 30 - real counter module and generated SDK flow: ASan/UBSan, concurrent snapshots, ownership and 48-byte state
+  ---
+  duration_ms: 4526.1126
+  type: 'test'
+  ...
+# Subtest: actual CMake targets: exact replacement, OFF restoration and fail-closed diagnostics/membership
+ok 31 - actual CMake targets: exact replacement, OFF restoration and fail-closed diagnostics/membership # SKIP Install the pinned ESP8266 SDK or set YORADIO_TEST_SDK_PATH
+  ---
+  duration_ms: 0.1355
+  type: 'test'
+  ...
+# Subtest: production defaults omit diagnostic source and module has no allocation, logging or task creation
+ok 32 - production defaults omit diagnostic source and module has no allocation, logging or task creation
+  ---
+  duration_ms: 1.0026
+  type: 'test'
+  ...
+# Subtest: WiFi completion response fits existing scratch at uint32 maxima
+ok 33 - WiFi completion response fits existing scratch at uint32 maxima
+  ---
+  duration_ms: 0.5688
+  type: 'test'
+  ...
+# Subtest: real PCM callback publishes source channels while output and frame accounting stay mono
+ok 34 - real PCM callback publishes source channels while output and frame accounting stay mono
+  ---
+  duration_ms: 4072.9048
+  type: 'test'
+  ...
+# Stream metadata PASS: MP3/AAC/Opus stereo->mono->stereo, PCM stride, dedup and failure paths
+# Subtest: Web audio pause off: execute production helpers
+ok 35 - Web audio pause off: execute production helpers
+  ---
+  duration_ms: 2486.8167
+  type: 'test'
+  ...
+# Subtest: Web audio pause short: execute production helpers
+ok 36 - Web audio pause short: execute production helpers
+  ---
+  duration_ms: 2413.3899
+  type: 'test'
+  ...
+# Subtest: Web audio pause long: execute production helpers
+ok 37 - Web audio pause long: execute production helpers
+  ---
+  duration_ms: 2277.3303
+  type: 'test'
+  ...
+# Subtest: pause checkpoints surround open/detect/decode and leave generation semantics intact
+ok 38 - pause checkpoints surround open/detect/decode and leave generation semantics intact
+  ---
+  duration_ms: 0.5482
+  type: 'test'
+  ...
+# Subtest: only static GETs request long pause; errors always release it
+ok 39 - only static GETs request long pause; errors always release it
+  ---
+  duration_ms: 0.2794
+  type: 'test'
+  ...
+# Subtest: build switch validates all values and rejects long pause for KaRadio
+ok 40 - build switch validates all values and rejects long pause for KaRadio
+  ---
+  duration_ms: 146.4407
+  type: 'test'
+  ...
+# Subtest: MP3 supports 44.1kHz and ignores historical underruns/minimum heap
+ok 41 - MP3 supports 44.1kHz and ignores historical underruns/minimum heap
+  ---
+  duration_ms: 3.5165
+  type: 'test'
+  ...
+# Subtest: a single new DMA miss fails
+ok 42 - a single new DMA miss fails
+  ---
+  duration_ms: 0.1723
+  type: 'test'
+  ...
+# Subtest: ordinary Opus checks real output counters without requiring compiled-out diagnostics
+ok 43 - ordinary Opus checks real output counters without requiring compiled-out diagnostics
+  ---
+  duration_ms: 0.3236
+  type: 'test'
+  ...
+# Subtest: no PCM and stopped state never pass
+ok 44 - no PCM and stopped state never pass
+  ---
+  duration_ms: 0.1526
+  type: 'test'
+  ...
+# Subtest: wrong station fails even with flowing PCM
+ok 45 - wrong station fails even with flowing PCM
+  ---
+  duration_ms: 0.158
+  type: 'test'
+  ...
+# Subtest: missing measurement cannot become a pass
+ok 46 - missing measurement cannot become a pass
+  ---
+  duration_ms: 0.4111
+  type: 'test'
+  ...
+# Subtest: missing status is not evidence of a reboot or wrong station
+ok 47 - missing status is not evidence of a reboot or wrong station
+  ---
+  duration_ms: 0.3698
+  type: 'test'
+  ...
+# Subtest: Opus requires a current autonomous window inside observation
+ok 48 - Opus requires a current autonomous window inside observation
+  ---
+  duration_ms: 0.5378
+  type: 'test'
+  ...
+1..48
+# tests 48
+# suites 0
+# pass 45
+# fail 0
+# cancelled 0
+# skipped 3
+# todo 0
+# duration_ms 9180.6578
