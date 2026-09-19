@@ -3,7 +3,7 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-19: exact PVQ static tree8 ASM experiment
+## Development - 2026-09-19: exact PVQ static tree8 ASM (rejected)
 
 - Separate `esp8266-opus-pvq-tree8-{control,candidate}-v1`,903216B.
   Fixed-address static comparisons and short linear fallback; accepted
@@ -14,8 +14,15 @@ entries are retained; changes are published under a new firmware version.
   five negative/positive regressions PASS. No bitrate restriction.
 - Candidate SHA256: `4a0d2cc23420428aff7c14db443e75d331e852a132da605259707715763f0984`.
 - At192kb/s recorded search instructions −11.81%, U reads −23.19%.
-  These are counts, not CPU timing. Physical10A/10B/10A2 pending;
-  no production promotion or75% CPU/live qualification.
+  These are counts, not CPU timing. Fresh10A/10B/10A2: CPU192
+  77.859979/85.456188/77.875938%, CPU12870.380958/73.446500/70.361438%.
+  Both speed gates FAIL; rejected despite fewer instructions/loads.
+- All30 physical PCM hashes exact. MinDRAM1576/2080/1928B,
+  stack-free1660B, max192 call19960/22555/20085us; no discarded attempts.
+- Ordinary main restored OTA; HTTP/WS/playlist checked. Added report readiness
+  guard after an intermediate run10 snapshot was copied prematurely; that copy
+  is preserved separately and not counted as a completed attempt.
+  Combined30 regressions PASS. No production promotion or75% CPU/live qualification.
 - [Details](../docs/ESP8266_OPUS_PVQ_TREE8.md).
 
 ## Development - 2026-09-19: exact PVQ binary search ASM (rejected)

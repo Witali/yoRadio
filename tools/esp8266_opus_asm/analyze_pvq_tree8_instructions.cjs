@@ -13,17 +13,22 @@ function analyze(){
   const bytes=fs.readFileSync(path.join(dir,c.name+'.jsonl'));assert.equal(hash(bytes),c.trace_sha256);
   const rows=bytes.toString().trim().split(/\r?\n/).filter(Boolean).map(JSON.parse);
   let oldSteps=0,newSteps=0,oldReads=0,newReads=0,slower=0,faster=0,equal=0;
+  const paths={short_linear:0,tree_calls:0,leaves:Array(8).fill(0),linear_tail:0};
   for(const[n,k,t]of rows){
    const row=p.table.rows.find(r=>r.n===n);assert.ok(row);assert.ok(k>=n&&t>=n&&t<=k&&k+1-n<row.values.length);
    const mem=new Map(row.values.slice(0,k-n+1).map((v,i)=>[row.address+4*(n+i),v]));
    const r=Array(16).fill(0);r[2]=row.values[t-n];r[5]=k;r[6]=row.address;r[9]=(k<<16)>>>0;r[11]=row.values[0];r[12]=k;r[13]=n;r[15]=row.address+4*(k+1);
    const a=sem.emulate(before,r,mem),b=sem.emulate(after,r,mem);
+   if(k-n<8)paths.short_linear++;
+   else{paths.tree_calls++;if(k-t<8)paths.leaves[k-t]++;else paths.linear_tail++;}
    assert.equal(a.registers[12],t);assert.equal(b.registers[12],t);
    oldSteps+=a.steps;newSteps+=b.steps;oldReads+=a.reads.length;newReads+=b.reads.length;
    if(a.steps>b.steps)faster++;else if(a.steps<b.steps)slower++;else equal++;
   }
   assert.equal(rows.length,c.counts.rows);assert.equal(oldReads,c.counts.table_probes.linear);assert.equal(newReads,prefix.cases.find(x=>x.name===c.name).trees[8].U_reads);
-  result.cases.push({name:c.name,searches:rows.length,old_instructions:oldSteps,new_instructions:newSteps,old_U_reads:oldReads,new_U_reads:newReads,
+  assert.equal(paths.short_linear+paths.tree_calls,rows.length);
+  assert.equal(paths.leaves.reduce((a,b)=>a+b,0)+paths.linear_tail,paths.tree_calls);
+  result.cases.push({name:c.name,searches:rows.length,paths,old_instructions:oldSteps,new_instructions:newSteps,old_U_reads:oldReads,new_U_reads:newReads,
    fewer_instructions:faster,more_instructions:slower,equal_instructions:equal,
    instruction_change_percent:oldSteps?100*(newSteps/oldSteps-1):null,read_change_percent:oldReads?100*(newReads/oldReads-1):null});
  }

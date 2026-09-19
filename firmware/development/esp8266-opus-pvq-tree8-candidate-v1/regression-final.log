@@ -1,0 +1,234 @@
+TAP version 13
+# Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
+ok 1 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
+  ---
+  duration_ms: 1.6603
+  type: 'test'
+  ...
+# Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+ok 2 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+  ---
+  duration_ms: 1.1183
+  type: 'test'
+  ...
+# Subtest: current 75% raw CPU target uses an inclusive, unrounded median threshold
+ok 3 - current 75% raw CPU target uses an inclusive, unrounded median threshold
+  ---
+  duration_ms: 1.4657
+  type: 'test'
+  ...
+# Subtest: raw target rejects missing, ambiguous and invalid evidence or thresholds
+ok 4 - raw target rejects missing, ambiguous and invalid evidence or thresholds
+  ---
+  duration_ms: 2.1082
+  type: 'test'
+  ...
+# Subtest: active CPU target is independent of historical 70% field and relative-speed acceptance
+ok 5 - active CPU target is independent of historical 70% field and relative-speed acceptance
+  ---
+  duration_ms: 0.3
+  type: 'test'
+  ...
+# ┌─────────┬────────────────────┬──────────┬──────────────────┬──────────────────┬─────────────┬─────────────┬────────────────────┬───────────────────┬────────────────────┬────────────────────────────┬─────────────────────┐
+# │ (index) │ name               │ searches │ old_instructions │ new_instructions │ old_U_reads │ new_U_reads │ fewer_instructions │ more_instructions │ equal_instructions │ instruction_change_percent │ read_change_percent │
+# ├─────────┼────────────────────┼──────────┼──────────────────┼──────────────────┼─────────────┼─────────────┼────────────────────┼───────────────────┼────────────────────┼────────────────────────────┼─────────────────────┤
+# │ 0       │ 'mono-12'          │ 0        │ 0                │ 0                │ 0           │ 0           │ 0                  │ 0                 │ 0                  │ null                       │ null                │
+# │ 1       │ 'mono-24'          │ 35       │ 643              │ 1960             │ 124         │ 154         │ 1                  │ 34                │ 0                  │ 204.82115085536546         │ 24.193548387096776  │
+# │ 2       │ 'stereo-64'        │ 841      │ 14681            │ 33898            │ 2803        │ 2379        │ 18                 │ 821               │ 2                  │ 130.8970778557319          │ -15.126650017838028 │
+# │ 3       │ 'stereo-128'       │ 3272     │ 60732            │ 134966           │ 11682       │ 9594        │ 72                 │ 3192              │ 8                  │ 122.23210169268262         │ -17.873651771956855 │
+# │ 4       │ 'stereo-192'       │ 5205     │ 119961           │ 237196           │ 24259       │ 17587       │ 263                │ 4918              │ 24                 │ 97.72759480164386          │ -27.503194690630284 │
+# │ 5       │ 'stereo-320-2.5ms' │ 4870     │ 204382           │ 261703           │ 45485       │ 20595       │ 893                │ 3956              │ 21                 │ 28.046011879715426         │ -54.72133670440804  │
+# │ 6       │ 'stereo-320-5ms'   │ 5153     │ 239413           │ 276463           │ 53872       │ 21774       │ 1062               │ 4062              │ 29                 │ 15.475350127186083         │ -59.58197208197209  │
+# │ 7       │ 'stereo-320-10ms'  │ 6845     │ 284349           │ 352331           │ 63208       │ 27369       │ 1097               │ 5717              │ 31                 │ 23.90794411093411          │ -56.700101253005954 │
+# │ 8       │ 'stereo-320-20ms'  │ 6010     │ 292130           │ 326364           │ 66093       │ 25785       │ 1243               │ 4733              │ 34                 │ 11.718755348646148         │ -60.9867913394762   │
+# │ 9       │ 'stereo-510'       │ 28607    │ 1644283          │ 1645117          │ 377680      │ 132249      │ 7370               │ 21081             │ 156                │ 0.05072119580389334        │ -64.98384876085575  │
+# └─────────┴────────────────────┴──────────┴──────────────────┴──────────────────┴─────────────┴─────────────┴────────────────────┴───────────────────┴────────────────────┴────────────────────────────┴─────────────────────┘
+# Subtest: all30 physical attempts match hashes, PCM and confirmed OTA slots
+ok 6 - all30 physical attempts match hashes, PCM and confirmed OTA slots
+  ---
+  duration_ms: 41.7745
+  type: 'test'
+  ...
+# Subtest: medians, outliers and speed/75-percent gates reproduce from every saved attempt
+ok 7 - medians, outliers and speed/75-percent gates reproduce from every saved attempt
+  ---
+  duration_ms: 40.2256
+  type: 'test'
+  ...
+# Subtest: terminal benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist responses
+ok 8 - terminal benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist responses
+  ---
+  duration_ms: 3.2177
+  type: 'test'
+  ...
+# Subtest: linked instruction census reproduces the recorded real searches
+ok 9 - linked instruction census reproduces the recorded real searches
+  ---
+  duration_ms: 3389.5267
+  type: 'test'
+  ...
+# Subtest: linked binary search matches every U-row interval without RAM or stack growth
+ok 10 - linked binary search matches every U-row interval without RAM or stack growth
+  ---
+  duration_ms: 9563.9079
+  type: 'test'
+  ...
+# Subtest: real flash table monotonicity, pointers and final diagonal are checked
+ok 11 - real flash table monotonicity, pointers and final diagonal are checked
+  ---
+  duration_ms: 176.7918
+  type: 'test'
+  ...
+# Subtest: branch, midpoint, load width and wrong cached value mutations are rejected
+ok 12 - branch, midpoint, load width and wrong cached value mutations are rejected
+  ---
+  duration_ms: 17.1027
+  type: 'test'
+  ...
+# Subtest: decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+ok 13 - decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+  ---
+  duration_ms: 2853.4222
+  type: 'test'
+  ...
+# Subtest: host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+ok 14 - host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+  ---
+  duration_ms: 2.1626
+  type: 'test'
+  ...
+# ┌─────────┬────────────────────┬────────┬────────┬────────┬────────┬────────┬────────────┬────────────┬────────────┬────────────┐
+# │ (index) │ name               │ linear │ binary │ tree4  │ tree8  │ tree16 │ prefix0min │ prefix0max │ prefix2min │ prefix2max │
+# ├─────────┼────────────────────┼────────┼────────┼────────┼────────┼────────┼────────────┼────────────┼────────────┼────────────┤
+# │ 0       │ 'mono-12'          │ 0      │ 0      │ 0      │ 0      │ 0      │ 0          │ 0          │ 0          │ 0          │
+# │ 1       │ 'mono-24'          │ 124    │ 154    │ 115    │ 112    │ 118    │ 121        │ 130        │ 74         │ 105        │
+# │ 2       │ 'stereo-64'        │ 2803   │ 2379   │ 2471   │ 2390   │ 2511   │ 2068       │ 2657       │ 1721       │ 2373       │
+# │ 3       │ 'stereo-128'       │ 11682  │ 9594   │ 10099  │ 9832   │ 10461  │ 8000       │ 10533      │ 6639       │ 9327       │
+# │ 4       │ 'stereo-192'       │ 24259  │ 17587  │ 19688  │ 18633  │ 18928  │ 14502      │ 18538      │ 10834      │ 15258      │
+# │ 5       │ 'stereo-320-2.5ms' │ 45485  │ 20595  │ 39465  │ 36489  │ 29982  │ 20813      │ 24505      │ 12031      │ 16304      │
+# │ 6       │ 'stereo-320-5ms'   │ 53872  │ 21774  │ 47474  │ 44418  │ 37214  │ 23656      │ 28004      │ 13099      │ 17709      │
+# │ 7       │ 'stereo-320-10ms'  │ 63208  │ 27369  │ 55032  │ 51890  │ 45312  │ 28366      │ 34081      │ 16613      │ 22861      │
+# │ 8       │ 'stereo-320-20ms'  │ 66093  │ 25785  │ 58169  │ 54621  │ 46373  │ 28252      │ 33436      │ 15292      │ 20782      │
+# │ 9       │ 'stereo-510'       │ 377680 │ 132249 │ 336787 │ 315354 │ 259819 │ 156820     │ 179787     │ 79624      │ 105454     │
+# └─────────┴────────────────────┴────────┴────────┴────────┴────────┴────────┴────────────┴────────────┴────────────┴────────────┘
+# Subtest: alphabetic tree preserves ordered leaves and favours frequent results
+ok 15 - alphabetic tree preserves ordered leaves and favours frequent results
+  ---
+  duration_ms: 2.287
+  type: 'test'
+  ...
+# Subtest: all real U intervals pass tree/prefix verification without limiting bitrate
+ok 16 - all real U intervals pass tree/prefix verification without limiting bitrate
+  ---
+  duration_ms: 290.3481
+  type: 'test'
+  ...
+# Subtest: search census is reproducible and includes metadata reads and high bitrates
+ok 17 - search census is reproducible and includes metadata reads and high bitrates
+  ---
+  duration_ms: 668.4086
+  type: 'test'
+  ...
+# ┌─────────┬────────────────────┬──────────┬──────────┬──────────────────┬──────────────────┬─────────────┬─────────────┬────────────────────┬───────────────────┬────────────────────┬────────────────────────────┬─────────────────────┐
+# │ (index) │ name               │ searches │ paths    │ old_instructions │ new_instructions │ old_U_reads │ new_U_reads │ fewer_instructions │ more_instructions │ equal_instructions │ instruction_change_percent │ read_change_percent │
+# ├─────────┼────────────────────┼──────────┼──────────┼──────────────────┼──────────────────┼─────────────┼─────────────┼────────────────────┼───────────────────┼────────────────────┼────────────────────────────┼─────────────────────┤
+# │ 0       │ 'mono-12'          │ 0        │ [Object] │ 0                │ 0                │ 0           │ 0           │ 0                  │ 0                 │ 0                  │ null                       │ null                │
+# │ 1       │ 'mono-24'          │ 35       │ [Object] │ 643              │ 653              │ 124         │ 112         │ 11                 │ 24                │ 0                  │ 1.5552099533437058         │ -9.677419354838712  │
+# │ 2       │ 'stereo-64'        │ 841      │ [Object] │ 14681            │ 14531            │ 2803        │ 2390        │ 189                │ 652               │ 0                  │ -1.0217287650704954        │ -14.734213342846946 │
+# │ 3       │ 'stereo-128'       │ 3272     │ [Object] │ 60732            │ 59105            │ 11682       │ 9832        │ 817                │ 2455              │ 0                  │ -2.678983073173946         │ -15.836329395651427 │
+# │ 4       │ 'stereo-192'       │ 5205     │ [Object] │ 119961           │ 105794           │ 24259       │ 18633       │ 2053               │ 3152              │ 0                  │ -11.80967147656322         │ -23.1913928851148   │
+# │ 5       │ 'stereo-320-2.5ms' │ 4870     │ [Object] │ 204382           │ 175671           │ 45485       │ 36489       │ 2410               │ 2460              │ 0                  │ -14.04771457369044         │ -19.777948774321207 │
+# │ 6       │ 'stereo-320-5ms'   │ 5153     │ [Object] │ 239413           │ 209355           │ 53872       │ 44418       │ 2516               │ 2637              │ 0                  │ -12.554873795491472        │ -17.54900504900505  │
+# │ 7       │ 'stereo-320-10ms'  │ 6845     │ [Object] │ 284349           │ 249496           │ 63208       │ 51890       │ 3225               │ 3620              │ 0                  │ -12.25712065103095         │ -17.905961270725225 │
+# │ 8       │ 'stereo-320-20ms'  │ 6010     │ [Object] │ 292130           │ 255183           │ 66093       │ 54621       │ 3114               │ 2896              │ 0                  │ -12.647451477082116        │ -17.35736008351868  │
+# │ 9       │ 'stereo-510'       │ 28607    │ [Object] │ 1644283          │ 1436455          │ 377680      │ 315354      │ 15680              │ 12927             │ 0                  │ -12.639430073776836        │ -16.502330014827372 │
+# └─────────┴────────────────────┴──────────┴──────────┴──────────────────┴──────────────────┴─────────────┴─────────────┴────────────────────┴───────────────────┴────────────────────┴────────────────────────────┴─────────────────────┘
+# Subtest: report refuses intermediate producer snapshots before archival
+ok 18 - report refuses intermediate producer snapshots before archival
+  ---
+  duration_ms: 52.4658
+  type: 'test'
+  ...
+# Subtest: all30 physical attempts match hashes, PCM and confirmed OTA slots
+ok 19 - all30 physical attempts match hashes, PCM and confirmed OTA slots
+  ---
+  duration_ms: 37.2729
+  type: 'test'
+  ...
+# Subtest: medians, outliers and speed/75-percent gates reproduce from every saved attempt
+ok 20 - medians, outliers and speed/75-percent gates reproduce from every saved attempt
+  ---
+  duration_ms: 36.2413
+  type: 'test'
+  ...
+# Subtest: terminal benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist responses
+ok 21 - terminal benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist responses
+  ---
+  duration_ms: 3.3491
+  type: 'test'
+  ...
+# Subtest: linked instruction census reproduces the recorded real searches
+ok 22 - linked instruction census reproduces the recorded real searches
+  ---
+  duration_ms: 5258.4737
+  type: 'test'
+  ...
+# Subtest: linked static tree search matches every U-row interval without RAM or stack growth
+ok 23 - linked static tree search matches every U-row interval without RAM or stack growth
+  ---
+  duration_ms: 13252.211
+  type: 'test'
+  ...
+# Subtest: real flash table monotonicity, pointers and final diagonal are checked
+ok 24 - real flash table monotonicity, pointers and final diagonal are checked
+  ---
+  duration_ms: 141.48
+  type: 'test'
+  ...
+# Subtest: branch, leaf offset, load width and wrong cached value mutations are rejected
+ok 25 - branch, leaf offset, load width and wrong cached value mutations are rejected
+  ---
+  duration_ms: 25.3282
+  type: 'test'
+  ...
+# Subtest: decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+ok 26 - decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+  ---
+  duration_ms: 2546.0954
+  type: 'test'
+  ...
+# Subtest: host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+ok 27 - host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+  ---
+  duration_ms: 1.6475
+  type: 'test'
+  ...
+# Subtest: short stream changes only final EOS/checksum, preserving Opus packets and granules
+ok 28 - short stream changes only final EOS/checksum, preserving Opus packets and granules
+  ---
+  duration_ms: 116.8579
+  type: 'test'
+  ...
+# Subtest: ten finite valid streams alternate with ten well-framed 503s, then full stream
+ok 29 - ten finite valid streams alternate with ten well-framed 503s, then full stream
+  ---
+  duration_ms: 196.4723
+  type: 'test'
+  ...
+# Subtest: actual audio task keeps Opus on reconnect with bounded cold fallback and cancellation
+ok 30 - actual audio task keeps Opus on reconnect with bounded cold fallback and cancellation
+  ---
+  duration_ms: 6144.6515
+  type: 'test'
+  ...
+# cancelled stream detection preserves cached decoder identity PASS\\nactual reconnect control-flow PASS: Opus=0, 45 paired allocations/frees
+# cancelled stream detection preserves cached decoder identity PASS\\nactual reconnect control-flow PASS: Opus=1, 36 paired allocations/frees
+1..30
+# tests 30
+# suites 0
+# pass 30
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16184.4459

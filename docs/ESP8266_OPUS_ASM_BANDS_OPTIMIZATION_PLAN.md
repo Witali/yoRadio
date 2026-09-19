@@ -1618,10 +1618,14 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
 - [x] [Статическое ASM-дерево8](ESP8266_OPUS_PVQ_TREE8.md): без midpoint и RAM-узлов,
   p/ABI сохранены.303906 linked случаев,24 exact PCM/state/ASan/UBSan,
   пять защитных тестов PASS. На192 инструкции поиска −11.81%, U-loads −23.19%.
-  Физический speed gate ещё не проверен; production не изменён.
+  Физический10A/10B/10A2: CPU19277.859979/85.456188/77.875938%,
+  CPU12870.380958/73.446500/70.361438%. Оба speed gate FAIL; отклонён.
+  MinDRAM1576/2080/1928B, stack-free1660B; ordinary radio восстановлена OTA,
+  HTTP/WS/playlist отвечают. Меньше инструкций не означает меньше CPU.
 - [ ] Отдельный prefix0+NSAU при K-N>=8:352B packed или1408B word flash,
   не смешивать packing/layout и не повторять большую lookup без основания.
-- [ ] Linked инструкции, полный exact PCM/state и10A/10B/10A2 для кандидатов.
+- [x] Linked инструкции, полный exact PCM/state и10A/10B/10A2 для дерева8.
+- [ ] Повторить такой протокол для prefix0-кандидата; ни75% raw CPU, ни20s live пока не достигнуты.
 
 ### 2026-09-19: switch и вычисляемые таблицы переходов
 
