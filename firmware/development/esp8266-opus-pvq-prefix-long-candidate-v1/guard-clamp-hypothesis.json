@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "recipe_sha256_lf": "645c83a559bf4f58bdfedb9ec6e8f69eef441bbb5ebbf04de65d1f503891c42e",
+  "parent_elf_sha256": "100ad31e1c67efc7cab5e8ed37dcab51ee3b8e544e9df65cc3d29b029b7ea24b",
+  "scope": "Hypothetical one-instruction ADDI K,-5 after successful long guard; exact rank bounds and modeled instruction differences, not linked ASM or CPU. Prefix and guard otherwise unchanged. Residual indices absent in traces; retain conservative min/max.",
+  "cases": [
+    {
+      "name": "mono-12",
+      "searches": 0,
+      "eligible": 0,
+      "min_saved_U_reads": 0,
+      "max_saved_U_reads": 0,
+      "min_saved_instructions": 0,
+      "max_saved_instructions": 0
+    },
+    {
+      "name": "mono-24",
+      "searches": 35,
+      "eligible": 6,
+      "min_saved_U_reads": 9,
+      "max_saved_U_reads": 13,
+      "min_saved_instructions": 32,
+      "max_saved_instructions": 51
+    },
+    {
+      "name": "stereo-64",
+      "searches": 841,
+      "eligible": 116,
+      "min_saved_U_reads": 68,
+      "max_saved_U_reads": 122,
+      "min_saved_instructions": 209,
+      "max_saved_instructions": 467
+    },
+    {
+      "name": "stereo-128",
+      "searches": 3272,
+      "eligible": 459,
+      "min_saved_U_reads": 208,
+      "max_saved_U_reads": 394,
+      "min_saved_instructions": 559,
+      "max_saved_instructions": 1424
+    },
+    {
+      "name": "stereo-192",
+      "searches": 5205,
+      "eligible": 1306,
+      "min_saved_U_reads": 651,
+      "max_saved_U_reads": 1180,
+      "min_saved_instructions": 1737,
+      "max_saved_instructions": 4157
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "searches": 4870,
+      "eligible": 1937,
+      "min_saved_U_reads": 1579,
+      "max_saved_U_reads": 2013,
+      "min_saved_instructions": 4751,
+      "max_saved_instructions": 6689
+    },
+    {
+      "name": "stereo-320-5ms",
+      "searches": 5153,
+      "eligible": 2030,
+      "min_saved_U_reads": 1669,
+      "max_saved_U_reads": 2171,
+      "min_saved_instructions": 5042,
+      "max_saved_instructions": 7308
+    },
+    {
+      "name": "stereo-320-10ms",
+      "searches": 6845,
+      "eligible": 2453,
+      "min_saved_U_reads": 2080,
+      "max_saved_U_reads": 2805,
+      "min_saved_instructions": 6493,
+      "max_saved_instructions": 9746
+    },
+    {
+      "name": "stereo-320-20ms",
+      "searches": 6010,
+      "eligible": 2431,
+      "min_saved_U_reads": 2080,
+      "max_saved_U_reads": 2707,
+      "min_saved_instructions": 6448,
+      "max_saved_instructions": 9229
+    },
+    {
+      "name": "stereo-510",
+      "searches": 28607,
+      "eligible": 13086,
+      "min_saved_U_reads": 11736,
+      "max_saved_U_reads": 14379,
+      "min_saved_instructions": 36327,
+      "max_saved_instructions": 47921
+    }
+  ],
+  "linear_loop_layout": {
+    "original": {
+      "start": 1076179764,
+      "end_exclusive": 1076179774,
+      "start_mod4": 0,
+      "instructions": [
+        {
+          "address": 1076179764,
+          "bytes": 2,
+          "text": "l32i a8, a6, 0"
+        },
+        {
+          "address": 1076179766,
+          "bytes": 3,
+          "text": "addi a6, a6, -4"
+        },
+        {
+          "address": 1076179769,
+          "bytes": 2,
+          "text": "addi a12, a12, -1"
+        },
+        {
+          "address": 1076179771,
+          "bytes": 3,
+          "text": "bltu a2, a8, 40253334 <decode_pulses+372>"
+        }
+      ],
+      "scope": "Address observation only; does not establish a fetch/cache cycle penalty."
+    },
+    "long_guard": {
+      "start": 1076179770,
+      "end_exclusive": 1076179780,
+      "start_mod4": 2,
+      "instructions": [
+        {
+          "address": 1076179770,
+          "bytes": 2,
+          "text": "l32i a8, a6, 0"
+        },
+        {
+          "address": 1076179772,
+          "bytes": 3,
+          "text": "addi a6, a6, -4"
+        },
+        {
+          "address": 1076179775,
+          "bytes": 2,
+          "text": "addi a12, a12, -1"
+        },
+        {
+          "address": 1076179777,
+          "bytes": 3,
+          "text": "bltu a2, a8, 4025333a <decode_pulses+378>"
+        }
+      ],
+      "scope": "Address observation only; does not establish a fetch/cache cycle penalty."
+    }
+  }
+}

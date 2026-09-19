@@ -3,7 +3,7 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-19: long-search-only PVQ prefix ASM (experiment)
+## Development - 2026-09-19: long-search-only PVQ prefix ASM (rejected)
 
 - Separate `esp8266-opus-pvq-prefix-long-{control,candidate}-v1`,903216B,
   accepted eBands-final parent, CPU160/runtime QIO40 raw RAM-input benchmark.
@@ -15,7 +15,14 @@ entries are retained; changes are published under a new firmware version.
 - Candidate SHA256: `5068480b5e4e609f334676861fbfd2b7a215b930c9f01a2037113b6e6c818bab`.
 - Linked192 trace has1306 helper calls instead of3159; total instruction
   bounds122889..128848 vs119961 original. Counts are not CPU measurements.
-  Fresh10A/10B/10A2 is pending. Not a production promotion or target qualification.
+  Fresh10A/10B/10A2: CPU19277.874542/79.198646/77.876375%, CPU128
+  70.374063/71.240313/70.379729%. Both speed gates FAIL; rejected.
+- All30 attempts/150 PCM hashes retained. MinDRAM2272/396/1356B, stack1660B;
+  max192 call19837/20004/28183us. A2/run6 timeout and89.963417% CPU retained.
+- Ordinary main restored OTA, HTTP/WS/playlist checked. No production promotion
+  or75% CPU/live qualification. Next clamp and loop-placement hypotheses saved.
+- Final combined43 regression tests PASS, including prior prefix0 evidence,
+  all30 run hashes, both speed gates, low heap/timeout retention and restore.
 - [Details](../docs/ESP8266_OPUS_PVQ_PREFIX_LONG.md).
 
 ## Development - 2026-09-19: packed PVQ prefix0 ASM (rejected)
