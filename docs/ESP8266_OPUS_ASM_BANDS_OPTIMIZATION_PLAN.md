@@ -1635,6 +1635,10 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
 - [ ] Prefix0: дополнительный U(N,K-4) guard перед подготовкой, только при K-N>=8.
   По трассам192 вызовы3159→1306, на1281405→459, но добавляется U-read.
   Не принимать по числу вызовов: отдельный linked/PCM/10A/10B/10A2 опыт.
+- [x] [Отдельный long-only guard собран](ESP8266_OPUS_PVQ_PREFIX_LONG.md):
+ 337686 linked случаев,256 SAR-phase,24 exact host PCM/state/sanitizer сценария.
+ RAM/frame/app size без роста; C fallback и принятая цепочка не изменены.
+- [ ] Long-only guard: закончить новый10A/10B/10A2 и оба speed gate.
 - [x] Linked инструкции, полный exact PCM/state и10A/10B/10A2 для дерева8.
 - [x] Полный протокол выполнен для packed prefix0, без отбора успешных попыток.
 - [ ] Повторить для следующего prefix0-варианта; ни75% raw CPU, ни20s live пока не достигнуты.

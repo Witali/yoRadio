@@ -1,0 +1,80 @@
+# Exact exponent-bound PVQ search, LX106 call0 leaf; C fallback unchanged.
+# Entry: a2=index, a12=K, a13=N, a15=&row[K+1], a9/a5=K<<16/sign16(K).
+# Original guards guarantee K>=N>2 and index>=U(N,N). No new RAM; SAR preserved.
+.section .text.patch0,"ax",@progbits
+.begin no-transform
+pvq_prefix_long_site:
+    addi a15, a15, -4
+    sub a8, a12, a13
+    bgei a8, 8, .Lprobe
+.Lfallback:
+    l32i.n a8, a15, 0
+    bgeu a2, a8, pvq_prefix_long_fast
+    addi a6, a15, -4
+.Lshort:
+    l32i.n a8, a6, 0
+    addi a6, a6, -4
+    addi.n a12, a12, -1
+    bltu a2, a8, .Lshort
+    addi.n a6, a13, -1
+    j pvq_prefix_long_flags
+.Lprobe:
+# K-N>=8 proves K-4 is in the row. Skip prefix preparation for distance<=4.
+# a3 is dead at the shared join; a15 still addresses row[K]. Strict index<U
+# selects true answer<=K-5. Equality MUST take the unchanged linear path.
+    addi a3, a15, -16
+    l32i.n a8, a3, 0
+    bgeu a2, a8, .Lfallback
+.Ltree:
+    call0 pvq_prefix_long_leaf
+# Return directly into original SLLI/SRAI/J at0x40253354 (shared column path).
+.end no-transform
+
+#94 decoder-dead bytes inside quant_all_bands; entry is already word aligned.
+.section .text.patch1,"ax",@progbits
+.begin no-transform
+.global pvq_prefix_long_leaf
+pvq_prefix_long_leaf:
+# K-N>=8 and index<U(N,K-4). a2>=U(N,N)>0; NSAU yields0..31.
+# Prefix keys are (N-3)*32+clz(index), packed four bounds per aligned word.
+# Table values bound the answer from above; MIN with original K preserves it.
+# a9 temporarily saves SAR; a3 is dead at the original join. No stack or stores.
+    nsau a8, a2
+    slli a3, a13, 5
+    add.n a8, a8, a3
+    extui a3, a8, 0, 2
+    srli a8, a8, 2
+    l32r a11, pvq_prefix_long_literal
+    addx4 a8, a8, a11
+    l32i.n a8, a8, 0
+    rsr a9, SAR
+    slli a3, a3, 3
+    ssr a3
+    srl a8, a8
+    wsr a9, SAR
+    extui a8, a8, 0, 8
+    bltu a12, a8, .Lbounded
+    mov.n a12, a8
+.Lbounded:
+    addx4 a6, a12, a6
+    l32i.n a8, a6, 0
+    bgeu a2, a8, .Ldone
+    addi a6, a6, -4
+.Llinear:
+    l32i.n a8, a6, 0
+    addi a6, a6, -4
+    addi.n a12, a12, -1
+    bltu a2, a8, .Llinear
+.Ldone:
+    addi.n a6, a13, -1
+    ret.n
+    .space 94 - (. - pvq_prefix_long_leaf), 0
+.end no-transform
+
+# Audited unused alg_quant encoder storage. Read-only bytes; never executed.
+.section .text.patch2,"ax",@progbits
+.global pvq_prefix_long_literal
+pvq_prefix_long_literal:
+    .long pvq_prefix_long_table - 96
+pvq_prefix_long_table:
+@TABLE_BYTES@

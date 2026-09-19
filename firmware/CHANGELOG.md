@@ -3,6 +3,21 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-19: long-search-only PVQ prefix ASM (experiment)
+
+- Separate `esp8266-opus-pvq-prefix-long-{control,candidate}-v1`,903216B,
+  accepted eBands-final parent, CPU160/runtime QIO40 raw RAM-input benchmark.
+- Three instructions use8B existing padding to test index<U(N,K-4) only when
+  K-N>=8. Short-distance searches avoid the packed-prefix helper entirely.
+- All other addresses, RAM and48B frame unchanged. C fallback unchanged.
+  337686 linked cases plus256 SAR-phase checks and24 exact host PCM/state/
+  sanitizer scenarios pass; seven positive/negative regression tests pass.
+- Candidate SHA256: `5068480b5e4e609f334676861fbfd2b7a215b930c9f01a2037113b6e6c818bab`.
+- Linked192 trace has1306 helper calls instead of3159; total instruction
+  bounds122889..128848 vs119961 original. Counts are not CPU measurements.
+  Fresh10A/10B/10A2 is pending. Not a production promotion or target qualification.
+- [Details](../docs/ESP8266_OPUS_PVQ_PREFIX_LONG.md).
+
 ## Development - 2026-09-19: packed PVQ prefix0 ASM (rejected)
 
 - Separate `esp8266-opus-pvq-prefix0-{control,candidate}-v1`,903216B.
