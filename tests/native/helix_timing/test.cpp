@@ -21,7 +21,8 @@ extern "C" UBaseType_t uxTaskGetStackHighWaterMark(TaskHandle_t){return 2048;}
 extern "C" int64_t esp_timer_get_time(){return wall;}
 extern "C" size_t heap_caps_get_free_size(unsigned){return 25000-active*10000;}
 extern "C" helix_codec_t *helix_codec_create(helix_codec_kind_t k,size_t){
-    if(fail_alloc)return nullptr;assert(!active);active=1;++creates;decoder.kind=k;return &decoder;
+    if(fail_alloc)return nullptr;
+    assert(!active);active=1;++creates;decoder.kind=k;return &decoder;
 }
 extern "C" void helix_codec_destroy(helix_codec_t *p){assert(p==&decoder&&active);active=0;++destroys;}
 extern "C" uint8_t *helix_codec_write_pointer(helix_codec_t *,size_t *n){*n=sizeof(decoder.input);return (uint8_t*)decoder.input;}

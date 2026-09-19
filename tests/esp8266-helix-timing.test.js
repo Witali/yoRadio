@@ -7,7 +7,7 @@ test('Helix timed owner cleans up OOM, cancellation and decoder errors, supports
   if(exec('g++',['--version']).status!==0)return t.skip('g++ unavailable');
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'helix-timing-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
   const binary=path.join(dir,'test'),main=path.join(root,'esp8266/rtos-sdk-native/main');
-  const args=['-std=c++17','-O1','-g','-Wall','-Wextra','-Werror','-Wno-misleading-indentation','-fsanitize=address,undefined',
+  const args=['-std=c++17','-O1','-g','-Wall','-Wextra','-Werror','-fsanitize=address,undefined',
     '-fno-pie','-no-pie','-DYORADIO_ESP8266_OPUS_BENCHMARK=1',
     ...['tests/native/helix_timing','tests/native/opus_board_benchmark','esp8266/rtos-sdk-native/main','esp8266/rtos-sdk-native/components/helix_codecs'].map(p=>'-I'+host(path.join(root,p))),
     host(path.join(main,'helix_timing_benchmark.cpp')),host(path.join(root,'tests/native/helix_timing/test.cpp')),'-o',host(binary)];
