@@ -16,7 +16,7 @@ test('SDK RX counters require diagnostics and are explicitly OFF for normal buil
     '$profile = [ordered]@{\n' + manifest + '\n}\n' +
     'return [pscustomobject]@{ argument = ' + argument + '; profile = ($profile | ConvertTo-Json | ConvertFrom-Json) }\n}\n' + [
       "$ErrorActionPreference = 'Stop'",
-      '$default = & $validate',
+      '$default = & $validate -EnableOpus:$false',
       'if ($default.argument -ne "-DYORADIO_ESP8266_SDK_RX_DIAG=OFF" -or $default.profile.sdk_rx_diag) { throw "Wrong default" }',
       'foreach ($diag in @($false, $true)) { foreach ($enabled in @($true, $false)) {',
       ' $ok = $true',
