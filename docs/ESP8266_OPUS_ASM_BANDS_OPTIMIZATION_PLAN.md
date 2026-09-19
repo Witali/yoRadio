@@ -1598,3 +1598,16 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   но общий пик RAM и безопасность mask/aliasing/Ryy ещё надо доказать.
 - [ ] Снять allocation-site lifetime и N/глубину рекурсии; оценить leaf N=2/4
   и компактные DFS-продолжения. Не считать heap→stack экономией.
+
+### 2026-09-19: switch и вычисляемые таблицы переходов
+
+[Аудит предложения пользователя](ESP8266_OPUS_SWITCH_DISPATCH.md).
+- [x] opus_decoder_ctl уже использует GCC jump table/JX; PVQ switch не имеет.
+  FFT radix2/3/4/5 использует сравнения: в linked ASM2/3/4/5 инструкций
+  dispatch для radix3/2/4/5 соответственно, не гарантированные такты.
+- [ ] Проверить частоту FFT dispatch, затем отдельный flash jump-table опыт
+  с guards/default и нулевым ростом RAM. Верифицировать все JX destinations,
+  не ослаблять текущий запрет JX без доказательства control flow.
+- [ ] Отдельно рассмотреть готовые FFT stage plans во flash, чтобы убрать
+  подготовку factors/fstride вместе с dispatch. Stack-массив fstride32B;
+  реальное уменьшение frame и скорость ещё не доказаны. Общий fallback сохранить.
