@@ -56,6 +56,7 @@ param(
     [switch]$SdkRxDiag,
     [switch]$OpusStreamTest,
     [switch]$OpusBenchmark,
+    [string]$HelixTimingFixtures = '',
     [switch]$OpusBenchmarkOutput,
     [switch]$OpusDivisionBenchmark,
     [string]$OpusDivisionFixtures = '.build/opus-bands-division-census',
@@ -77,6 +78,8 @@ if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
 }
 if ($SpiffsLogHttp -and -not $SpiffsLog) { throw '-SpiffsLogHttp requires -SpiffsLog' }
 if ($OpusBenchmark -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusBenchmark requires -Diagnostic and -EnableOpus' }
+if ($HelixTimingFixtures -and (-not $OpusBenchmark -or $OpusBenchmarkOutput -or $OpusDivisionBenchmark -or $OpusProfileStage -or $OpusFunctionProfile)) { throw 'Helix timing requires a raw diagnostic benchmark without other profiling' }
+if ($HelixTimingFixtures) { $HelixTimingFixtures = (Resolve-Path $HelixTimingFixtures).Path.Replace('\', '/') }
 if ($OpusDivisionBenchmark -and (-not $OpusBenchmark -or -not $Diagnostic -or $OpusBackend -ne 'bands-small-div-asm' -or $OpusBenchmarkOutput -or $OpusFunctionProfile -or $OpusProfileStage)) { throw '-OpusDivisionBenchmark requires diagnostic raw small-div ASM without profiling/output' }
 if ($OpusPvqIram -and (-not $Diagnostic -or -not $EnableOpus)) { throw '-OpusPvqIram requires diagnostic Opus' }
 if ($OpusFunctionProfile -and (-not $Diagnostic -or -not $EnableOpus -or -not $OpusBenchmark -or $OpusBenchmarkOutput -or $OpusProfileStage)) { throw '-OpusFunctionProfile requires diagnostic raw-only Opus' }
@@ -253,6 +256,7 @@ try {
     $taskSpiffsLogHttp = if ($SpiffsLogHttp) { 'ON' } else { 'OFF' }
     $taskDiagnostic = if ($Diagnostic) { 'ON' } else { 'OFF' }
     $taskOpusBenchmark = if ($OpusBenchmark) { 'ON' } else { 'OFF' }
+    $taskHelixTiming = if ($HelixTimingFixtures) { 'ON' } else { 'OFF' }
     $taskOpusBenchmarkOutput = if ($OpusBenchmarkOutput) { 'ON' } else { 'OFF' }
     $taskOpusDivisionBenchmark = if ($OpusDivisionBenchmark) { 'ON' } else { 'OFF' }
     if ($OpusDivisionBenchmark) { $OpusDivisionFixtures = (Resolve-Path $OpusDivisionFixtures).Path.Replace('\', '/') }
@@ -299,6 +303,8 @@ try {
         "-DYORADIO_ESP8266_SPIFFS_LOG_HTTP=$taskSpiffsLogHttp",
         "-DYORADIO_ESP8266_DIAGNOSTIC=$taskDiagnostic",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK=$taskOpusBenchmark",
+        "-DYORADIO_ESP8266_HELIX_TIMING=$taskHelixTiming",
+        "-DYORADIO_ESP8266_HELIX_TIMING_FIXTURES=$HelixTimingFixtures",
         "-DYORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT=$taskOpusBenchmarkOutput",
         "-DYORADIO_ESP8266_OPUS_DIVISION_BENCHMARK=$taskOpusDivisionBenchmark",
         "-DYORADIO_ESP8266_OPUS_DIVISION_FIXTURES=$OpusDivisionFixtures",
@@ -402,6 +408,9 @@ try {
         opus_memory_source_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/opus_memory.c").Hash
         opus_memory_header_sha256=(Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/components/opus_decoder/opus_memory.h").Hash
         opus_benchmark=[bool]$OpusBenchmark
+        helix_timing=[bool]$HelixTimingFixtures
+        helix_timing_manifest_sha256=$(if ($HelixTimingFixtures) { (Get-FileHash "$HelixTimingFixtures/manifest.json").Hash } else { $null })
+        helix_timing_source_sha256=$(if ($HelixTimingFixtures) { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/helix_timing_benchmark.cpp").Hash } else { $null })
         opus_benchmark_output=[bool]$OpusBenchmarkOutput
         opus_division_benchmark=[bool]$OpusDivisionBenchmark
         opus_division_source_sha256=$(if ($OpusDivisionBenchmark) { (Get-FileHash "$taskRoot/esp8266/rtos-sdk-native/main/opus_division_benchmark.inc").Hash } else { $null })

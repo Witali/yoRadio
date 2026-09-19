@@ -15,6 +15,9 @@ const interval = Number(option('--interval-ms','1500'));
 if (!Number.isInteger(interval) || interval < 250 || interval > 60000) throw Error('--interval-ms must be 250..60000');
 const fixturePath=option('--fixtures',null);
 const fixtureManifest=fixturePath?JSON.parse(fs.readFileSync(path.join(fixturePath,'manifest.json'))):null;
+const helix=args.includes('--helix');
+if(helix&&(!fixtureManifest||!fixtureManifest.fixtures.every(f=>['MP3','AAC'].includes(f.codec))))
+  throw Error('--helix requires the Helix timing fixture manifest');
 const names = fixtureManifest?fixtureManifest.fixtures.map(f=>f.name):['mono12 SILK', 'mono24 hybrid', 'stereo64 CELT', 'stereo128 CELT', 'stereo510 CELT'];
 const report = {date: new Date().toISOString(), base, mode: 'raw packets in RAM; no network audio or PCM output',
   timing: 'task_us excludes other tasks, includes charged ISR and instrumentation; wall_us includes preemption', snapshots: []};
@@ -37,6 +40,8 @@ function request(uri, method='GET') {
 (async()=>{
   report.before=await request('/api/native/status');
   const previous=await request('/api/native/opus-benchmark');
+  if(Boolean(previous.data.helix_timing)!==helix)throw Error('Wrong benchmark image: Helix/Opus marker differs');
+  if(helix)report.mode='MP3/AAC frames copied to RAM before timed process_one; no network audio or output';
   if(previous.data.division_microbenchmark)throw Error('Helper microbenchmark is not raw decoder CPU; use run_division.cjs');
   if (previous.data.physical_output) {
     report.mode = 'own raw Opus packets from flash to physical PDM/DMA, no audio network or Ogg demux';
@@ -60,7 +65,7 @@ function request(uri, method='GET') {
           if(s.results.length!==fixtureManifest.fixtures.length)throw Error('Fixture count mismatch');
           for(const [i,v] of s.results.entries()) {
             const f=fixtureManifest.fixtures[i];
-            if(v.pcm_hash!==f.expected_hash||v.samples!==f.samples*s.rounds||v.packets!==f.packet_count*s.rounds)
+            if((!helix&&v.pcm_hash!==f.expected_hash)||v.error||v.samples!==f.samples*s.rounds||v.packets!==f.packet_count*s.rounds)
               throw Error('Board PCM does not match selected fixture '+f.name);
           }
         }

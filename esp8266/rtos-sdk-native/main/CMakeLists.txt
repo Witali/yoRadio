@@ -72,6 +72,16 @@ option(YORADIO_ESP8266_OPUS_BENCHMARK
   "Run raw flash-fixture Opus benchmark on request while preserving WebUI/OTA" OFF)
 option(YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT
   "Include physical PDM/DMA output in the Opus flash-fixture benchmark" OFF)
+option(YORADIO_ESP8266_HELIX_TIMING "Use benchmark API for MP3/AAC CPU-only timing" OFF)
+set(YORADIO_ESP8266_HELIX_TIMING_FIXTURES "" CACHE PATH "Generated Helix timing fixtures")
+if(YORADIO_ESP8266_HELIX_TIMING)
+  if(NOT YORADIO_ESP8266_OPUS_BENCHMARK OR NOT YORADIO_ESP8266_DIAGNOSTIC OR
+     YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT OR YORADIO_ESP8266_OPUS_DIVISION_BENCHMARK OR
+     YORADIO_OPUS_PROFILE_STAGE OR YORADIO_OPUS_FUNCTION_PROFILE OR
+     NOT EXISTS "${YORADIO_ESP8266_HELIX_TIMING_FIXTURES}/helix_timing_fixtures.h")
+    message(FATAL_ERROR "Helix timing requires diagnostic raw benchmark and generated fixtures, no other profiling")
+  endif()
+endif()
 option(YORADIO_ESP8266_OPUS_DIVISION_BENCHMARK "Same-image ROM/ASM division microbenchmark" OFF)
 set(YORADIO_ESP8266_OPUS_DIVISION_FIXTURES "" CACHE PATH "Complete division operand census")
 if(YORADIO_ESP8266_OPUS_DIVISION_BENCHMARK)
@@ -106,7 +116,11 @@ if(YORADIO_ESP8266_OPUS_BENCHMARK)
   if(NOT EXISTS "${YORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES}/opus_board_fixtures.h")
     message(FATAL_ERROR "Generate raw Opus fixtures with build_board_fixtures.cjs first")
   endif()
-  list(APPEND YORADIO_SOURCES "opus_benchmark.cpp")
+  if(YORADIO_ESP8266_HELIX_TIMING)
+    list(APPEND YORADIO_SOURCES "helix_timing_benchmark.cpp")
+  else()
+    list(APPEND YORADIO_SOURCES "opus_benchmark.cpp")
+  endif()
 endif()
 option(YORADIO_ESP8266_SPIFFS_LOG_HTTP
   "Allow read-only LAN download of SPIFFS logs in diagnostic builds" OFF)
@@ -349,6 +363,9 @@ add_custom_command(OUTPUT "${WEB_BUNDLE_HEADER}"
 add_custom_target(yoradio_web_bundle DEPENDS "${WEB_BUNDLE_HEADER}")
 add_dependencies(${COMPONENT_LIB} yoradio_web_bundle)
 target_include_directories(${COMPONENT_LIB} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+if(YORADIO_ESP8266_HELIX_TIMING)
+  target_include_directories(${COMPONENT_LIB} PRIVATE "${YORADIO_ESP8266_HELIX_TIMING_FIXTURES}")
+endif()
 if(YORADIO_ESP8266_OPUS_BENCHMARK)
   target_include_directories(${COMPONENT_LIB} PRIVATE "${YORADIO_ESP8266_OPUS_BENCHMARK_FIXTURES}")
 endif()
@@ -362,6 +379,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -O3
   $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++14>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
   YORADIO_ESP8266_NATIVE=1
+  YORADIO_ESP8266_HELIX_TIMING=$<BOOL:${YORADIO_ESP8266_HELIX_TIMING}>
   YORADIO_ESP8266_OPUS_PCM_QUEUE=$<BOOL:${YORADIO_ESP8266_OPUS_PCM_QUEUE}>
   YORADIO_ESP8266_OPUS_PCM_APP_TASK=$<BOOL:${YORADIO_ESP8266_OPUS_PCM_APP_TASK}>
   YORADIO_ESP8266_OPUS_PCM_SLOTS=${YORADIO_ESP8266_OPUS_PCM_SLOTS}

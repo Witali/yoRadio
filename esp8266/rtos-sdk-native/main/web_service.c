@@ -1384,9 +1384,14 @@ static esp_err_t opus_benchmark_status_handler(httpd_req_t *request) {
     opus_benchmark_snapshot(&status);
     char row[384];
     int n = snprintf(row, sizeof(row),
-        "{\"run\":%u,\"state\":%u,\"case\":%u,\"round\":%u,\"rounds\":%u,"
+        "{\"helix_timing\":%s,\"run\":%u,\"state\":%u,\"case\":%u,\"round\":%u,\"rounds\":%u,"
         "\"dram_before\":%u,\"dram_after\":%u,\"state_bytes\":%u,\"empty_task_us\":%u,"
         "\"error\":%d,\"physical_output\":%s,\"results\":[",
+#if YORADIO_ESP8266_HELIX_TIMING
+        "true",
+#else
+        "false",
+#endif
         status.run, status.state, status.current_case, status.round, status.rounds,
         status.dram_before, status.dram_after, status.state_bytes, status.empty_task_us, status.error,
         YORADIO_ESP8266_OPUS_BENCHMARK_OUTPUT ? "true" : "false");
