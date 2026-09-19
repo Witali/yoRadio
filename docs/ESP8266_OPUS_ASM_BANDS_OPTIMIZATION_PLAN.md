@@ -1636,8 +1636,12 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
  18 вместо26 инструкций helper,1408B вместо352B flash-таблицы, прежняя RAM/frame/app.
  337686 linked случаев +256 SAR,24 exact host PCM/state/ASan/UBSan,
  восемь регрессий PASS. Long guard/K-=5 не добавлены.
-- [ ] Word-prefix: полный свежий10A/10B/10A2 против принятой линейной базы;
- оба high-bitrate gate, все попытки/RAM/максимумы, затем ordinary restore.
+- [x] Word-prefix: полный10A/10B/10A2, оба high-bitrate gate FAIL; отклонён.
+ CPU19277.855083/79.556229/77.861167%, CPU12870.368000/71.716854/70.365604%.
+ Все150 PCM exact, все30 попыток сохранены, minDRAM1748/2948/376B,
+ stack-free1660B. Нет ошибок наблюдения/декодирования, static RAM/frame прежние.
+ Ordinary main восстановлен OTA, HTTP/WS/playlist проверены;75%/20s не достигнуты.
+ Итоговые59 регрессий PASS; следующий отдельный опыт — N3 fixed buckets ниже.
 - [x] [N=3 fixed-bucket модель](ESP8266_OPUS_PVQ_N3_BUCKETS.md):570828 случаев,
   две регрессии, все trace12..510; начальный U(K) fast return сохранён,
   после него upper bound K-1. Shift6/word1024B/K>=12 на192 даёт21333..21867
