@@ -1,0 +1,178 @@
+TAP version 13
+# Subtest: N4 lookup covers every index in its domain with exact rank and p
+ok 1 - N4 lookup covers every index in its domain with exact rank and p
+  ---
+  duration_ms: 81.7149
+  type: 'test'
+  ...
+# Subtest: in-place model preserves a guarded fallback, raw mask order, and no scratch fast path
+ok 2 - in-place model preserves a guarded fallback, raw mask order, and no scratch fast path
+  ---
+  duration_ms: 0.7209
+  type: 'test'
+  ...
+# Subtest: all five semantic candidates pass 24 full-stream cases without larger arena peaks
+ok 3 - all five semantic candidates pass 24 full-stream cases without larger arena peaks
+  ---
+  duration_ms: 2.5081
+  type: 'test'
+  ...
+# Subtest: direct raw-vector, red-zone and zero-gain mask checks are retained
+ok 4 - direct raw-vector, red-zone and zero-gain mask checks are retained
+  ---
+  duration_ms: 0.6174
+  type: 'test'
+  ...
+# Subtest: observed peak is in synthesis, not the removed PVQ allocation
+ok 5 - observed peak is in synthesis, not the removed PVQ allocation
+  ---
+  duration_ms: 1.4499
+  type: 'test'
+  ...
+# Subtest: LX106 audit retains the short-leaf frame regression instead of promoting it
+ok 6 - LX106 audit retains the short-leaf frame regression instead of promoting it
+  ---
+  duration_ms: 0.9301
+  type: 'test'
+  ...
+# Subtest: saved search estimates are bounds on reads, not speed measurements
+ok 7 - saved search estimates are bounds on reads, not speed measurements
+  ---
+  duration_ms: 0.6879
+  type: 'test'
+  ...
+# Subtest: all archived evidence matches its inventory
+ok 8 - all archived evidence matches its inventory
+  ---
+  duration_ms: 17.655
+  type: 'test'
+  ...
+# Subtest: linked clone keeps instructions, literals, stack and fallback
+ok 9 - linked clone keeps instructions, literals, stack and fallback
+  ---
+  duration_ms: 169.2127
+  type: 'test'
+  ...
+# Subtest: guard rejects other B and unsafe K without corrupting arguments
+ok 10 - guard rejects other B and unsafe K without corrupting arguments
+  ---
+  duration_ms: 283.8898
+  type: 'test'
+  ...
+# Subtest: proof rejects a changed output-store width
+ok 11 - proof rejects a changed output-store width
+  ---
+  duration_ms: 144.2215
+  type: 'test'
+  ...
+# Subtest: proof rejects changing the original fallback
+ok 12 - proof rejects changing the original fallback
+  ---
+  duration_ms: 152.298
+  type: 'test'
+  ...
+# Subtest: pulse decode changes five stores, one stride and the final X offset
+ok 13 - pulse decode changes five stores, one stride and the final X offset
+  ---
+  duration_ms: 1.4998
+  type: 'test'
+  ...
+# Subtest: patched function entry is an LX106 J to the proven guard
+ok 14 - patched function entry is an LX106 J to the proven guard
+  ---
+  duration_ms: 144.8064
+  type: 'test'
+  ...
+# Subtest: ISA interpreter arithmetic shift and signed halfword boundaries
+ok 15 - ISA interpreter arithmetic shift and signed halfword boundaries
+  ---
+  duration_ms: 0.6604
+  type: 'test'
+  ...
+# Subtest: in-place report refuses partial/nonterminal/error observations
+ok 16 - in-place report refuses partial/nonterminal/error observations
+  ---
+  duration_ms: 3.6583
+  type: 'test'
+  ...
+# Subtest: all30 in-place attempts and150 PCM results are retained with correct OTA identities
+ok 17 - all30 in-place attempts and150 PCM results are retained with correct OTA identities
+  ---
+  duration_ms: 31.4144
+  type: 'test'
+  ...
+# Subtest: in-place statistics and decisions reproduce including all low-memory measurements
+ok 18 - in-place statistics and decisions reproduce including all low-memory measurements
+  ---
+  duration_ms: 43.7395
+  type: 'test'
+  ...
+# Subtest: ordinary firmware restored after terminal benchmark with working status and playlist
+ok 19 - ordinary firmware restored after terminal benchmark with working status and playlist
+  ---
+  duration_ms: 7.8602
+  type: 'test'
+  ...
+# Subtest: slow A2/run7 and its timeout remain in the rejected in-place result
+ok 20 - slow A2/run7 and its timeout remain in the rejected in-place result
+  ---
+  duration_ms: 1.6753
+  type: 'test'
+  ...
+# Subtest: attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+ok 21 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+  ---
+  duration_ms: 4.3695
+  type: 'test'
+  ...
+# Subtest: A/B permits only the selected feature and artifact identity differences
+ok 22 - A/B permits only the selected feature and artifact identity differences
+  ---
+  duration_ms: 1.0689
+  type: 'test'
+  ...
+# Subtest: raw A/B reports true medians and retains a slow outlier and observation timeout
+ok 23 - raw A/B reports true medians and retains a slow outlier and observation timeout
+  ---
+  duration_ms: 1.9704
+  type: 'test'
+  ...
+# Subtest: raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+ok 24 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+  ---
+  duration_ms: 7.7213
+  type: 'test'
+  ...
+# Subtest: different task/wall timing windows retain positive overhead without clamping or dropping the run
+ok 25 - different task/wall timing windows retain positive overhead without clamping or dropping the run
+  ---
+  duration_ms: 0.9905
+  type: 'test'
+  ...
+# Subtest: raw-series default observation interval matches the physical evidence validator
+ok 26 - raw-series default observation interval matches the physical evidence validator
+  ---
+  duration_ms: 1.5371
+  type: 'test'
+  ...
+# Subtest: raw series verifies PCM and retains terminal device failures without counting them as speed passes
+ok 27 - raw series verifies PCM and retains terminal device failures without counting them as speed passes
+  ---
+  duration_ms: 1.6168
+  type: 'test'
+  ...
+# Subtest: raw series does not restart unknown/physical/missing observations or incorrect PCM
+ok 28 - raw series does not restart unknown/physical/missing observations or incorrect PCM
+  ---
+  duration_ms: 7.1697
+  type: 'test'
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1081.8682

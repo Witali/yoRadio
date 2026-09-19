@@ -8,7 +8,9 @@ Opus RAM-packet benchmark, no audio output or function/stage profiling.
 - Original paths for other B/K, bitrates unrestricted, old C fallback intact.
 - Fixed section sizes, same app size 903216 B, static RAM and stack unchanged.
 - App SHA256: `8f696562ce88c6f013ab57c4770bcf877d3d4ed15b06c725eaa56a3f3331b3c4`.
-- Local PCM/ISA proofs passed. Physical A/B/A status and final decision:
+- Local PCM/ISA proofs passed; all150 board PCM hashes exact in30 A/B/A runs.
+- REJECTED: CPU192 A/B/A2=77.878188/78.883083/77.870771%; no peak RAM gain.
+- Ordinary I2S PDM radio restored by OTA. Full measurements and final decision:
   [experiment report](../../../docs/ESP8266_OPUS_PVQ_INPLACE_ASM.md).
 
 Do not use this benchmark image as ordinary radio firmware. Restore the

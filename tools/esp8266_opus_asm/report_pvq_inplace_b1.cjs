@@ -25,6 +25,7 @@ function report(){
  const host=f.read(path.join(root,'.build/opus-algorithm-candidates/inplace-b1/results.json'));
  assert.equal(host.passed,true);assert.equal(host.cases.length,24);for(const c of host.cases)assert.equal(c.pcm.exact,true);
  evidence.push(saveEvidence(path.join(root,'.build/opus-algorithm-candidates/inplace-b1/results.json'),path.join(dest,'host-pcm.json')));
+ for(const name of['initial.json','before-restore.json','ota-restore.json','restored-webui.json'])evidence.push(saveEvidence(path.join(experiment,name),path.join(dest,name)));
  const initial=compare(groups.before.map(r=>r.report),groups.candidate.map(r=>r.report));
  const repeated=compare(groups.after.map(r=>r.report),groups.candidate.map(r=>r.report));
  const selection={initial:selectHighBitrate(initial.cases),repeated:selectHighBitrate(repeated.cases)};

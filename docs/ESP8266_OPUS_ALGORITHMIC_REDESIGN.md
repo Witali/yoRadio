@@ -120,6 +120,9 @@ SILK/Hybrid/CELT, mono/stereo, PLC/FEC,120мс, высокие битрейты 
   максимум word arena в celt_synthesis/freq[960].
 - [x] Host-прототип PVQ→X для B=1 и B>1: exact PCM/state/guards/OOM;
   общий пик памяти прежний, убрать arena calls на fast path удалось.
+- [x] [B=1 linked ASM и10A/10B/10A2](ESP8266_OPUS_PVQ_INPLACE_ASM.md):
+  точность сохранена, но CPU19277,878→78,883% (повторный контроль77,871%).
+  RAM peak прежний. Конкретный вариант отклонён, ordinary firmware восстановлена.
 - [x] Измерить N=2/4/глубину quant_partition и два leaf-прототипа:
   расширенный путь покрывает485/3026 вызовов192k, но GCC frame160→176B.
 - [x] N4-префикс:1044B flash,65472 точных индекса,24 PCM/state сценария.
