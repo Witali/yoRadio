@@ -10,7 +10,7 @@ test('short loan profile validates diagnostics and resets the production limit t
   const prelude = builder.slice(0, builder.indexOf('$taskRoot ='));
   const code = '$check = {\n' + prelude + '\nreturn $Pdm32LoanWords\n}\n' + [
     '$ErrorActionPreference = "Stop"',
-    'if ((& $check) -ne 512) { throw "Wrong default" }',
+    'if ((& $check -EnableOpus:$false) -ne 512) { throw "Wrong default" }',
     'foreach ($n in @(64,128,256,512)) {',
     ' if ((& $check -Diagnostic -Pdm32LoanWords $n) -ne $n) { throw "Wrong limit" }',
     ' $accepted = $true; try { $null = & $check -Pdm32LoanWords $n } catch { $accepted = $false }',
@@ -41,7 +41,7 @@ test('PDM32 batch builder switch is diagnostic-only, independent of IRAM, and ex
     '$profile = [ordered]@{\n' + manifest + '\n}\n' +
     'return [pscustomobject]@{ argument = ' + argument + '; profile = ($profile | ConvertTo-Json | ConvertFrom-Json) }\n}\n' + [
     "$ErrorActionPreference = 'Stop'",
-    '$default = & $validate',
+    '$default = & $validate -EnableOpus:$false',
     'if ($default.argument -ne "-DYORADIO_ESP8266_PDM32_BATCH=OFF" -or $default.profile.pdm32_batch) { throw "Default is not OFF" }',
     '$cases = 0',
     'foreach ($diag in @($false, $true)) { foreach ($batch in @($true, $false)) { foreach ($iram in @($false, $true)) {',

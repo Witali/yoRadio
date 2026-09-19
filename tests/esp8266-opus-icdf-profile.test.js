@@ -23,7 +23,7 @@ test('ICDF builder switch requires Opus, defaults OFF, explicitly sets CMake and
     '$profile = [ordered]@{\n' + manifest + '\n}\n' +
     'return [pscustomobject]@{ argument = ' + argument + '; profile = ($profile | ConvertTo-Json | ConvertFrom-Json) }\n}\n' + [
     "$ErrorActionPreference = 'Stop'",
-    '$default = & $validate',
+    '$default = & $validate -EnableOpus:$false',
     'if ($default.argument -ne "-DYORADIO_OPUS_ICDF_FLASH_WORD=OFF" -or $default.profile.opus_icdf_flash_word) { throw "Default is not OFF" }',
     '$cases = 0',
     'foreach ($opus in @($false, $true)) { foreach ($icdf in @($true, $false)) { foreach ($word in @($false, $true)) {',

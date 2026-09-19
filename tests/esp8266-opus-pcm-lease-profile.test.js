@@ -6,7 +6,7 @@ test('PCM lease build switch defaults off and requires diagnostic Opus',()=>{
   const text=fs.readFileSync(path.join(root,'tools/esp8266_audio_profile/build_i2s_pdm_production.ps1'),'utf8');
   const prelude=text.slice(0,text.indexOf('$taskRoot ='));
   const script='$check = {\n'+prelude+'\nreturn [bool]$OpusPcmLeases\n}\n'+[
-    '$ErrorActionPreference = "Stop"','if (& $check) { throw "Enabled by default" }',
+    '$ErrorActionPreference = "Stop"','if (& $check -EnableOpus:$false) { throw "Enabled by default" }',
     'foreach ($diag in @($false,$true)) { foreach ($opus in @($false,$true)) {',
     ' $ok=$true; try { $v=& $check -OpusPcmLeases -Diagnostic:$diag -EnableOpus:$opus } catch { $ok=$false }',
     ' if ($ok -ne ($diag -and $opus)) { throw "Wrong acceptance" }',

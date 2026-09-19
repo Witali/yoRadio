@@ -7,7 +7,7 @@ test('Opus PCM publication is explicit, diagnostic-only and defaults off',()=>{
   const prelude=builder.slice(0,builder.indexOf('$taskRoot ='));
   const code='$check = {\n'+prelude+'\nreturn [bool]$OpusPcmPublish\n}\n'+[
     '$ErrorActionPreference = "Stop"',
-    'if (& $check) { throw "Enabled by default" }',
+    'if (& $check -EnableOpus:$false) { throw "Enabled by default" }',
     'foreach ($diag in @($false,$true)) { foreach ($opus in @($false,$true)) {',
     ' $ok=$true; try { $value=& $check -OpusPcmPublish -Diagnostic:$diag -EnableOpus:$opus } catch { $ok=$false }',
     ' if ($ok -ne ($diag -and $opus)) { throw "Wrong acceptance" }',

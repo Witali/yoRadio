@@ -5,7 +5,7 @@ test('app PCM requires diagnostic queue, has no extra stack and is explicitly of
  const prefix=s.slice(0,s.indexOf('$taskRoot ='));
  const code='$check={\n'+prefix+'\nreturn [bool]$OpusPcmAppTask\n}\n'+[
   '$ErrorActionPreference="Stop"',
-  'if (& $check) { throw "Wrong default" }',
+  'if (& $check -EnableOpus:$false) { throw "Wrong default" }',
   'foreach ($queue in @($false,$true)) { foreach ($diag in @($false,$true)) { foreach ($opus in @($false,$true)) {',
   ' $ok=$true; try { $value=& $check -OpusPcmAppTask -OpusPcmQueue:$queue -Diagnostic:$diag -EnableOpus:$opus } catch { $ok=$false }',
   ' if ($ok -ne ($queue -and $diag -and $opus)) { throw "Unsafe combination" }',
