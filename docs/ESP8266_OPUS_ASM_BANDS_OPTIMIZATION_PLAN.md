@@ -1593,7 +1593,12 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
 - [x] Host census linear/binary/prefix/galloping PVQ:171436 диапазонов,
   10 файлов12..510, exact PCM/ASan/UBSan. На192 проб24259→17587 (−27.50%),
   на24 растут124→154. Это не CPU-ускорение и не новая прошивка.
-- [ ] Проверить реальные U-таблицы/ранги и bounded ASM-поиск, цену ветвей/spills.
+- [x] Проверить реальные U-таблицы/ранги и bounded ASM-поиск:
+  [PVQ binary](ESP8266_OPUS_PVQ_BINARY.md), 303906 linked случаев,
+  24 exact host PCM/state/sanitizer сценария, пять регрессий. Frame48B,
+  app903216B, без роста RAM и новых spills; адреса вне двух патчей прежние.
+- [ ] PVQ binary: новый 10A/10B/10A2, проверить реальную цену ветвей и flash,
+  затем восстановить ordinary radio. Число чтений не заменяет CPU-замер.
 - [ ] Исследовать PVQ→int16 X вместо iy[N]: локально −align8(4N) scratch,
   но общий пик RAM и безопасность mask/aliasing/Ryy ещё надо доказать.
 - [ ] Снять allocation-site lifetime и N/глубину рекурсии; оценить leaf N=2/4

@@ -3,6 +3,19 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-19: exact PVQ binary search ASM candidate
+
+- Separate `esp8266-opus-pvq-binary-{control,candidate}-v1`,903216B,
+  CPU160/runtime QIO40 raw benchmark over accepted eBands-final.
+- Replace only the linear U-row search with an exact binary search. Existing
+  flash table/registers,48B frame, no added RAM. Two fixed-address patches;
+  helper uses audited decoder-unreachable encoder storage. C fallback unchanged.
+- 303906 linked interval checks,24 exact PCM/state/ASan/UBSan host cases and
+  five regressions with negative mutations pass. No bitrate restriction.
+- Candidate SHA256: `992fcaa4ff29f1fb153b795998e7e5938fafbc607cc0124596e442d6d4d022dc`.
+- Physical A/B/A2 is pending. Not accepted as production/default or evidence
+  of75% CPU/live continuity. [Details](../docs/ESP8266_OPUS_PVQ_BINARY.md).
+
 ## Development - 2026-09-18: decoder-only quant_all_bands ASM (rejected)
 
 - Separate `esp8266-opus-quant-decode-{control,candidate}-v2`,903216B,
