@@ -116,9 +116,15 @@ SILK/Hybrid/CELT, mono/stereo, PLC/FEC,120мс, высокие битрейты 
 - [ ] Другой независимый опыт: короткий линейный fast path, частичное
   разворачивание, общее обновление указателя/K. Сначала динамический instruction
   census на сохранённых реальных поисках; не путать инструкции с тактами.
-- [ ] Снять allocation-site lifetime: изменит ли удаление iy общий пик.
-- [ ] Host-прототип PVQ→X для B=1 с exact PCM/state/guards/OOM, затем B>1.
-- [ ] Измерить N=2/4/глубину quant_partition перед leaf/DFS rewrite.
+- [x] Снять allocation-site lifetime: удаление iy общий пик на корпусе не меняет;
+  максимум word arena в celt_synthesis/freq[960].
+- [x] Host-прототип PVQ→X для B=1 и B>1: exact PCM/state/guards/OOM;
+  общий пик памяти прежний, убрать arena calls на fast path удалось.
+- [x] Измерить N=2/4/глубину quant_partition и два leaf-прототипа:
+  расширенный путь покрывает485/3026 вызовов192k, но GCC frame160→176B.
+- [x] N4-префикс:1044B flash,65472 точных индекса,24 PCM/state сценария.
+  Подробности, включая отрицательные результаты и очередь ASM/board проверок:
+  [проверка трёх направлений](ESP8266_OPUS_ALGORITHMIC_CANDIDATES_CHECK.md).
 - [ ] Только прошедшие proofs кандидаты проверять10A/10B/10A2 с RAM/stack аудитом.
 
 Повторение: `node --test tests/esp8266-opus-pvq-search-analysis.test.js` и

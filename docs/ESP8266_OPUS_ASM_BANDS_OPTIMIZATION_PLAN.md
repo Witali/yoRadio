@@ -1717,3 +1717,22 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   случаев,24 host exact PCM/state/sanitizer сценария,11 регрессий PASS.
   Helper23 инструкции/66B, прежние RAM/frame/site. На192 инструкции122440
   против119961 принятой базы и126433 скалярного N3; CPU ещё измеряется.
+
+### 2026-09-19: N4, PVQ без iy и короткие листья — локальная проверка
+
+[Полный отчёт и воспроизводимые тесты](ESP8266_OPUS_ALGORITHMIC_CANDIDATES_CHECK.md).
+- [x] N4 single-threshold prefix: 1044 B flash, 65472 точных индекса,
+  9658561 сочетание с исходным K; GCC frame decode_pulses прежний 48 B.
+- [x] PVQ→int16 X: B=1 и общий B, маска до normalise, guarded fallback;
+  на fast path нет mark/alloc/restore. 84018 векторов и 27200 normalise/mask
+  проверок, в том числе gain=0, без изменения PCM.
+- [x] Allocation-site наблюдатель: общий word peak 15600 B определяется
+  celt_synthesis/freq[960], не iy. Уменьшать арену по этому опыту нельзя.
+- [x] Два short-leaf прототипа и частоты: 8 либо 485 из 3026 вызовов192k.
+  Расширенный C-путь увеличивает свой GCC frame160→176 B и не принимается.
+- [x] Пять кандидатов ×24 full PCM/state/sanitizer сценария,10 observer runs,
+  итоговые19 регрессий PASS. Production, frozen ASM и плата не изменены.
+- [ ] Отдельные ASM overlays для N4 и in-place; для leaf нужен собственный
+  короткий пролог без wrapper-frame. Не смешивать эксперименты.
+- [ ] Linked ABI/width/control-flow audit, затем10A/10B/10A2 на плате и live
+  I2S/WebUI для принятых вариантов. CPU-ускорение пока не установлено.
