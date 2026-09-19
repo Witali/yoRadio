@@ -1,0 +1,517 @@
+{
+  "schema": 1,
+  "recipe_sha256_lf": "9e924fb8967ff49291209bea81f688ed39a1b66b39b7e51d112fa4957407fc43",
+  "table_sha256": "a708167506ee9b9ddff5e6a5b7867aac3812331cf40433cc92787496f36ab53a",
+  "unit": {
+    "interval_endpoint_cases": 120408,
+    "dense_index_cases_at_max_k": 61588,
+    "maximum_search_k": 175,
+    "maximum_initial_p": 60901,
+    "maximum_delta": 696,
+    "formula": "U(3,k)=2*k*k-2*k+1; U(3,k)-U(3,k-1)=4*(k-1)",
+    "scope": "Exact rank and p model for the stored N=3 row, not linked ASM or full-decoder PCM/CPU validation."
+  },
+  "scope": "Host rank/read model only. Initial U(K) fast return retained. Only N=3 uses finite differences; other dimensions and guarded small K retain the old search. No bitrate cap, new flash table or per-decoder array. Linked register/stack cost and physical CPU remain unmeasured. Trace counts omit common U(N,N) and sign probes as before.",
+  "cases": [
+    {
+      "name": "mono-12",
+      "trace_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 0,
+          "proposed_reads": 0,
+          "removed_loads": 0,
+          "arithmetic_searches": 0,
+          "arithmetic_steps": 0,
+          "failed_initial_probes": 0,
+          "initial_probe_fast_returns": 0,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 0,
+          "proposed_reads": 0,
+          "removed_loads": 0,
+          "arithmetic_searches": 0,
+          "arithmetic_steps": 0,
+          "failed_initial_probes": 0,
+          "initial_probe_fast_returns": 0,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 0,
+          "proposed_reads": 0,
+          "removed_loads": 0,
+          "arithmetic_searches": 0,
+          "arithmetic_steps": 0,
+          "failed_initial_probes": 0,
+          "initial_probe_fast_returns": 0,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 0,
+          "proposed_reads": 0,
+          "removed_loads": 0,
+          "arithmetic_searches": 0,
+          "arithmetic_steps": 0,
+          "failed_initial_probes": 0,
+          "initial_probe_fast_returns": 0,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "mono-24",
+      "trace_sha256": "f832306f7188a42e4074b4e9e10902580dedbbd5e39618d7564016b323da0c93",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 124,
+          "proposed_reads": 71,
+          "removed_loads": 53,
+          "arithmetic_searches": 8,
+          "arithmetic_steps": 53,
+          "failed_initial_probes": 28,
+          "initial_probe_fast_returns": 7,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 124,
+          "proposed_reads": 71,
+          "removed_loads": 53,
+          "arithmetic_searches": 8,
+          "arithmetic_steps": 53,
+          "failed_initial_probes": 28,
+          "initial_probe_fast_returns": 7,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 124,
+          "proposed_reads": 71,
+          "removed_loads": 53,
+          "arithmetic_searches": 8,
+          "arithmetic_steps": 53,
+          "failed_initial_probes": 28,
+          "initial_probe_fast_returns": 7,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 124,
+          "proposed_reads": 83,
+          "removed_loads": 41,
+          "arithmetic_searches": 6,
+          "arithmetic_steps": 41,
+          "failed_initial_probes": 28,
+          "initial_probe_fast_returns": 7,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "stereo-64",
+      "trace_sha256": "20ac83e48f9bf41cb548a00e0944c596e963e1bed3dc54fa6b8c2c82b426d3ba",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 2803,
+          "proposed_reads": 2299,
+          "removed_loads": 504,
+          "arithmetic_searches": 118,
+          "arithmetic_steps": 504,
+          "failed_initial_probes": 657,
+          "initial_probe_fast_returns": 184,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 2803,
+          "proposed_reads": 2395,
+          "removed_loads": 408,
+          "arithmetic_searches": 61,
+          "arithmetic_steps": 408,
+          "failed_initial_probes": 657,
+          "initial_probe_fast_returns": 184,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 2803,
+          "proposed_reads": 2471,
+          "removed_loads": 332,
+          "arithmetic_searches": 40,
+          "arithmetic_steps": 332,
+          "failed_initial_probes": 657,
+          "initial_probe_fast_returns": 184,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 2803,
+          "proposed_reads": 2574,
+          "removed_loads": 229,
+          "arithmetic_searches": 21,
+          "arithmetic_steps": 229,
+          "failed_initial_probes": 657,
+          "initial_probe_fast_returns": 184,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "stereo-128",
+      "trace_sha256": "831bde3e6e0c5c3c1e99ae2c99191caa262d652f6c4ff816843db34e5c048fbb",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 11682,
+          "proposed_reads": 9798,
+          "removed_loads": 1884,
+          "arithmetic_searches": 482,
+          "arithmetic_steps": 1884,
+          "failed_initial_probes": 2683,
+          "initial_probe_fast_returns": 589,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 11682,
+          "proposed_reads": 10108,
+          "removed_loads": 1574,
+          "arithmetic_searches": 292,
+          "arithmetic_steps": 1574,
+          "failed_initial_probes": 2683,
+          "initial_probe_fast_returns": 589,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 11682,
+          "proposed_reads": 10424,
+          "removed_loads": 1258,
+          "arithmetic_searches": 189,
+          "arithmetic_steps": 1258,
+          "failed_initial_probes": 2683,
+          "initial_probe_fast_returns": 589,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 11682,
+          "proposed_reads": 10746,
+          "removed_loads": 936,
+          "arithmetic_searches": 115,
+          "arithmetic_steps": 936,
+          "failed_initial_probes": 2683,
+          "initial_probe_fast_returns": 589,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "stereo-192",
+      "trace_sha256": "667a3e553aeabd921184e2bb8125291fe230c9aaa757b862b52fde9b51bd7079",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 24259,
+          "proposed_reads": 18357,
+          "removed_loads": 5902,
+          "arithmetic_searches": 1021,
+          "arithmetic_steps": 5902,
+          "failed_initial_probes": 4430,
+          "initial_probe_fast_returns": 775,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 24259,
+          "proposed_reads": 18720,
+          "removed_loads": 5539,
+          "arithmetic_searches": 814,
+          "arithmetic_steps": 5539,
+          "failed_initial_probes": 4430,
+          "initial_probe_fast_returns": 775,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 24259,
+          "proposed_reads": 19322,
+          "removed_loads": 4937,
+          "arithmetic_searches": 623,
+          "arithmetic_steps": 4937,
+          "failed_initial_probes": 4430,
+          "initial_probe_fast_returns": 775,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 24259,
+          "proposed_reads": 20007,
+          "removed_loads": 4252,
+          "arithmetic_searches": 471,
+          "arithmetic_steps": 4252,
+          "failed_initial_probes": 4430,
+          "initial_probe_fast_returns": 775,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "trace_sha256": "02e9c78c6c064265bd4a5818b49ff681d19201a2ec8a53f18ebb65fc611ee87f",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 45485,
+          "proposed_reads": 27261,
+          "removed_loads": 18224,
+          "arithmetic_searches": 1125,
+          "arithmetic_steps": 18224,
+          "failed_initial_probes": 4393,
+          "initial_probe_fast_returns": 477,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 45485,
+          "proposed_reads": 27501,
+          "removed_loads": 17984,
+          "arithmetic_searches": 993,
+          "arithmetic_steps": 17984,
+          "failed_initial_probes": 4393,
+          "initial_probe_fast_returns": 477,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 45485,
+          "proposed_reads": 27769,
+          "removed_loads": 17716,
+          "arithmetic_searches": 905,
+          "arithmetic_steps": 17716,
+          "failed_initial_probes": 4393,
+          "initial_probe_fast_returns": 477,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 45485,
+          "proposed_reads": 27981,
+          "removed_loads": 17504,
+          "arithmetic_searches": 856,
+          "arithmetic_steps": 17504,
+          "failed_initial_probes": 4393,
+          "initial_probe_fast_returns": 477,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "stereo-320-5ms",
+      "trace_sha256": "d7e2c7308b5d10ceeae4d51879092b95fd657c483681e2f3fd7d9017dfb44853",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 53872,
+          "proposed_reads": 29160,
+          "removed_loads": 24712,
+          "arithmetic_searches": 1316,
+          "arithmetic_steps": 24712,
+          "failed_initial_probes": 4693,
+          "initial_probe_fast_returns": 460,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 53872,
+          "proposed_reads": 29390,
+          "removed_loads": 24482,
+          "arithmetic_searches": 1178,
+          "arithmetic_steps": 24482,
+          "failed_initial_probes": 4693,
+          "initial_probe_fast_returns": 460,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 53872,
+          "proposed_reads": 29873,
+          "removed_loads": 23999,
+          "arithmetic_searches": 1037,
+          "arithmetic_steps": 23999,
+          "failed_initial_probes": 4693,
+          "initial_probe_fast_returns": 460,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 53872,
+          "proposed_reads": 30255,
+          "removed_loads": 23617,
+          "arithmetic_searches": 953,
+          "arithmetic_steps": 23617,
+          "failed_initial_probes": 4693,
+          "initial_probe_fast_returns": 460,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "stereo-320-10ms",
+      "trace_sha256": "03b3644b0f099976c3419e9f77f05a22e0bd28bc2a280922a1710cf023d9e39b",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 63208,
+          "proposed_reads": 35351,
+          "removed_loads": 27857,
+          "arithmetic_searches": 1694,
+          "arithmetic_steps": 27857,
+          "failed_initial_probes": 6168,
+          "initial_probe_fast_returns": 677,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 63208,
+          "proposed_reads": 35768,
+          "removed_loads": 27440,
+          "arithmetic_searches": 1447,
+          "arithmetic_steps": 27440,
+          "failed_initial_probes": 6168,
+          "initial_probe_fast_returns": 677,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 63208,
+          "proposed_reads": 36460,
+          "removed_loads": 26748,
+          "arithmetic_searches": 1229,
+          "arithmetic_steps": 26748,
+          "failed_initial_probes": 6168,
+          "initial_probe_fast_returns": 677,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 63208,
+          "proposed_reads": 36916,
+          "removed_loads": 26292,
+          "arithmetic_searches": 1116,
+          "arithmetic_steps": 26292,
+          "failed_initial_probes": 6168,
+          "initial_probe_fast_returns": 677,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "stereo-320-20ms",
+      "trace_sha256": "f5ac5494bc8ce459f4c4d25e8818b3878b087c8154fb0f1651d98d53e8612d3a",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 66093,
+          "proposed_reads": 33980,
+          "removed_loads": 32113,
+          "arithmetic_searches": 1556,
+          "arithmetic_steps": 32113,
+          "failed_initial_probes": 5437,
+          "initial_probe_fast_returns": 573,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 66093,
+          "proposed_reads": 34242,
+          "removed_loads": 31851,
+          "arithmetic_searches": 1403,
+          "arithmetic_steps": 31851,
+          "failed_initial_probes": 5437,
+          "initial_probe_fast_returns": 573,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 66093,
+          "proposed_reads": 34713,
+          "removed_loads": 31380,
+          "arithmetic_searches": 1254,
+          "arithmetic_steps": 31380,
+          "failed_initial_probes": 5437,
+          "initial_probe_fast_returns": 573,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 66093,
+          "proposed_reads": 35097,
+          "removed_loads": 30996,
+          "arithmetic_searches": 1167,
+          "arithmetic_steps": 30996,
+          "failed_initial_probes": 5437,
+          "initial_probe_fast_returns": 573,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    },
+    {
+      "name": "stereo-510",
+      "trace_sha256": "bd862e93765b8ff1b36df93aaf86106fb46cf548ac3964c667a05673860c63de",
+      "variants": [
+        {
+          "gate": 3,
+          "linear_reads": 377680,
+          "proposed_reads": 198882,
+          "removed_loads": 178798,
+          "arithmetic_searches": 7129,
+          "arithmetic_steps": 178798,
+          "failed_initial_probes": 26239,
+          "initial_probe_fast_returns": 2368,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 8,
+          "linear_reads": 377680,
+          "proposed_reads": 200029,
+          "removed_loads": 177651,
+          "arithmetic_searches": 6461,
+          "arithmetic_steps": 177651,
+          "failed_initial_probes": 26239,
+          "initial_probe_fast_returns": 2368,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 12,
+          "linear_reads": 377680,
+          "proposed_reads": 201464,
+          "removed_loads": 176216,
+          "arithmetic_searches": 5996,
+          "arithmetic_steps": 176216,
+          "failed_initial_probes": 26239,
+          "initial_probe_fast_returns": 2368,
+          "new_lookup_table_bytes": 0
+        },
+        {
+          "gate": 16,
+          "linear_reads": 377680,
+          "proposed_reads": 202230,
+          "removed_loads": 175450,
+          "arithmetic_searches": 5818,
+          "arithmetic_steps": 175450,
+          "failed_initial_probes": 26239,
+          "initial_probe_fast_returns": 2368,
+          "new_lookup_table_bytes": 0
+        }
+      ]
+    }
+  ]
+}
