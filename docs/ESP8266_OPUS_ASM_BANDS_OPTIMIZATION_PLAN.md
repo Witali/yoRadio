@@ -1624,6 +1624,11 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   HTTP/WS/playlist отвечают. Меньше инструкций не означает меньше CPU.
 - [ ] Отдельный prefix0+NSAU при K-N>=8:352B packed или1408B word flash,
   не смешивать packing/layout и не повторять большую lookup без основания.
+- [x] [Packed prefix0 ASM собран](ESP8266_OPUS_PVQ_PREFIX0.md):337686 linked случаев,
+  256 SAR-phase проверок,24 exact PCM/state/sanitizer сценария, семь тестов PASS.
+  RAM/frame/app size без роста. Физический speed gate пока не пройден.
+- [ ] Для prefix0 отдельно проверить word1408B и вынос базового указателя
+  во временно свободный a0 до цикла; сначала полное доказательство CFG/живости.
 - [x] Linked инструкции, полный exact PCM/state и10A/10B/10A2 для дерева8.
 - [ ] Повторить такой протокол для prefix0-кандидата; ни75% raw CPU, ни20s live пока не достигнуты.
 

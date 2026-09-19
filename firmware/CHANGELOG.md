@@ -3,6 +3,21 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-19: packed PVQ prefix0 ASM experiment
+
+- Separate `esp8266-opus-pvq-prefix0-{control,candidate}-v1`,903216B.
+  CPU160/runtime QIO40 raw RAM-input benchmark over accepted eBands-final.
+- NSAU selects a packed352B upper-bound table, then exact linear search.
+  Original short-range fallback, word-only loads, SAR restored; no new RAM/frame.
+- Data uses audited unreachable alg_quant encoder storage. All other linked
+  addresses/bytes unchanged. C fallback untouched; decoder-only experiment.
+- 337686 linked interval/CLZ-boundary checks plus256 SAR-phase checks,
+  24 exact host PCM/state/sanitizer cases and seven regressions PASS.
+- Candidate SHA256: `35444571d8e3d0a16daaf372371203c7766646ddc0ed03648e460123cd74470e`.
+- Reads decrease but instruction bounds increase at128/192. Physical10A/10B/10A2
+  pending; no speed claim, production promotion or75% CPU/live qualification.
+- [Details and invariant-hoisting hypotheses](../docs/ESP8266_OPUS_PVQ_PREFIX0.md).
+
 ## Development - 2026-09-19: exact PVQ static tree8 ASM (rejected)
 
 - Separate `esp8266-opus-pvq-tree8-{control,candidate}-v1`,903216B.
