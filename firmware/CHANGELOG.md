@@ -3,6 +3,19 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-19: exact N3 PVQ differences ASM experiment
+
+- Separate `esp8266-opus-pvq-n3-diff-{control,candidate}-v1`,903216B,
+  accepted eBands-final parent, CPU160/runtime QIO40 raw RAM-input benchmark.
+- After the unchanged initial fast return, N=3 updates U with exact finite
+  differences. Eight-instruction helper, no new table, loads/stores/SAR;
+  other N retain linear search. Same static RAM,48B frame and linked layout.
+- Candidate SHA256: `a54cbfffc1ec2377e4cd835f1897fdacc8d2e9e3f1e56cbe85277fd9e147bb79`.
+- 303906 linked cases,24 exact host PCM/state/sanitizer cases, eight regressions
+  PASS. On192: instructions119961→126433, loads24259→18357. Not CPU evidence.
+- Physical10A/10B/10A2 pending; no production promotion or75%/live qualification.
+- [Details](../docs/ESP8266_OPUS_PVQ_N3_DIFF_ASM.md).
+
 ## Development - 2026-09-19: direct-word PVQ prefix ASM (rejected)
 
 - Separate `esp8266-opus-pvq-prefix-word-{control,candidate}-v1`,903216B,

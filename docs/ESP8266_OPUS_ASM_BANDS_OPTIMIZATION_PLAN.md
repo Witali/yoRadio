@@ -1694,6 +1694,10 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   Число итераций прежнее; это не linked ASM/PCM/CPU-ускорение.
 - [ ] Отдельный N3-difference ASM: не портить первый fast return, проверить
   delta-регистр/ABI/stack, полный host PCM и10A/10B/10A2 с памятью.
+- [x] [N3-difference ASM подготовлен](ESP8266_OPUS_PVQ_N3_DIFF_ASM.md):303906 linked
+  случаев,24 host exact PCM/state/sanitizer сценария, восемь регрессий PASS.
+  Helper8 инструкций без loads/stores/SAR; RAM/frame/app size неизменны.
+  На192 инструкции119961→126433, U-reads24259→18357; CPU ещё измеряется.
 - [ ] Двухуровневая статическая radix-таблица только для неоднозначных
   префиксов: сначала размер/инструкции/все metadata loads, без heap и bitrate cap.
 - [ ] N=4 конечными разностями как независимый опыт после N=3; не допускать
