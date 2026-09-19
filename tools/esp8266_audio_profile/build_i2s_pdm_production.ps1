@@ -64,6 +64,14 @@ param(
     [string]$OpusBenchmarkFixtures = '.build/esp8266-opus-board-fixtures'
 )
 $ErrorActionPreference = 'Stop'
+# Ordinary invocation selects the main accepted-Opus radio. Explicit feature
+# switches retain the low-level builder for existing A/B recipes.
+if (-not @($PSBoundParameters.Keys | Where-Object { $_ -notin @('SdkPath','RuntimeRoot','Variant') }).Count) {
+    $taskMainArgs = @{}
+    foreach ($taskKey in $PSBoundParameters.Keys) { $taskMainArgs[$taskKey] = $PSBoundParameters[$taskKey] }
+    & (Join-Path $PSScriptRoot '../../esp8266/rtos-sdk-native/build.ps1') @taskMainArgs
+    return
+}
 if (($SpiffsLog -or $SpiffsLogHttp -or $MemoryProfile) -and -not $Diagnostic) {
     throw 'Diagnostic facilities require -Diagnostic; production must not contain SPIFFS logging/HTTP export'
 }

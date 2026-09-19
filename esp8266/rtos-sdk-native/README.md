@@ -1,5 +1,35 @@
 # yoRadio ESP8266 native
 
+## Main firmware (2026-09-19)
+
+The canonical build now includes MP3 Helix SSO, Helix AAC and the accepted
+fixed-point Opus LX106 ASM chain. Run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File esp8266/rtos-sdk-native/build.ps1
+```
+
+The old `build_i2s_pdm_production.ps1` command without experimental switches
+delegates here too. The app is saved under `firmware/development/esp8266-main/`
+with its changelog, manifest, selection and exact post-link proof. No flashing
+is performed. `-Profile c -Variant esp8266-main-c` retains the C Opus fallback.
+Explicit feature switches on the low-level builder still select custom/A-B
+builds; direct CMake builds are base images, not the authenticated final ASM app.
+
+Main keeps CPU160/QIO40, I2S PDM32 GPIO3, **2×512-word DMA**, 1024-byte Opus input
+and 6144-byte scratch. Experimental small DMA, PCM queue, reduced scratch,
+clock compensation and profiling remain off. Only the accepted 18-stage chain
+is applied; rejected quant/allocation/eBands-SRC experiments remain opt-in or
+historical evidence, not selected firmware. The diagnostic *build authorization*
+is needed by the pinned ASM guard; it does not enable stream tests, stage
+counters, HTTP log export, benchmarks or extra tasks in this main profile.
+Routine logs are off; explicit errors remain enabled.
+
+"Main" identifies the default build, **not a claim that live Opus is qualified**.
+Prior DMA128 diagnostic firmware failed live station continuity tests. This
+profile retains the ordinary DMA512 output and still needs separate on-board
+qualification. See [integration record](../../docs/ESP8266_OPUS_MAIN_2026-09-19.md).
+
 ## Volume control
 
 The player slider and WebSocket `volume=N` use **0..100 inclusive** (step 1).
@@ -27,7 +57,7 @@ See the
 
 This target uses the official Espressif `ESP8266_RTOS_SDK v3.4` and follows
 the ESP-IDF-style component/CMake layout. It is deliberately HTTP-only. The
-normal profile uses the yoRadio Helix MP3 and AAC decoders; an experimental
+normal profile uses the yoRadio Helix MP3/AAC and accepted ASM Opus decoders; an experimental
 ESP8266Audio `libmad-8266` MP3 backend can be selected at compile time with
 `CONFIG_YORADIO_MP3_DECODER_LIBMAD` while AAC remains on Helix.
 
@@ -88,7 +118,7 @@ powershell -ExecutionPolicy Bypass -File tools/esp8266_audio_profile/build_i2s_p
 
 This uses a separate build directory, validates I2S PDM32/mono/Helix/QIO40
 selections, and saves the app, configuration and manifest under
-`firmware/development/esp8266-i2s-pdm-production/`. It does not flash.
+`firmware/development/esp8266-main/` through the main wrapper above. It does not flash.
 DATA is GPIO3/RX (not the temporary SPI debug output GPIO13/D7); do not send
 UART application commands while I2S owns RX.
 
@@ -126,7 +156,8 @@ the default delta-sigma I2S PDM. See [RCPDM configuration and filter](../../docs
 For the algorithms, Simple variants, output bitrates, quality trade-offs and
 measured CPU cost, see the [RC-PDM versus PDM overview](../../docs/RC_PDM_OVERVIEW.md).
 
-The tracked `sdkconfig.defaults` is the authoritative default for this board.
+The tracked `sdkconfig.defaults` supplies the hardware defaults for this board;
+`build.ps1` adds the main Opus selection and its authenticated packaging step.
 It explicitly selects QIO 40 MHz flash, a 160 MHz CPU, Helix MP3 SSO, Helix
 AAC, mono decoded PCM, I2S-PDM on GPIO3, genuine PDM32 at nominal 1.536 MHz, and the static
 2 x 512-word SLC-DMA ping-pong buffers. The 3072-byte main task also owns the button and
@@ -144,7 +175,7 @@ This frees 2048 DRAM bytes compared with the previous 6144-byte default.
 See [prefill behavior, RAM budget and test limits](../../docs/ESP8266_INPUT_PREFILL_2026-09-09.md).
 Larger values remain build-time options and need hardware stress testing.
 
-Configure every ordinary or diagnostic build with the tracked defaults path,
+For advanced C-backend/base-image builds use the tracked defaults path,
 for example:
 
 ```sh
@@ -262,13 +293,16 @@ further without a new on-device high-water and full Web API test.
 The project is under active implementation; use the repository setup/build
 scripts once they are added rather than invoking a globally installed SDK.
 
-## Experimental Ogg Opus
+## Ogg Opus and qualification limits
 
-`CONFIG_YORADIO_OGG_OPUS` (default OFF, mono output only) adds vendored
-fixed-point libopus without Arduino. The build helper accepts `-EnableOpus`
-with a fresh `-Variant`; this is not a device-qualified production profile.
+`CONFIG_YORADIO_OGG_OPUS` adds vendored fixed-point libopus without Arduino
+(mono output only). The canonical main build enables it and the accepted ASM
+chain. The bare SDK option remains OFF for low-level MP3/AAC experiments;
+the low-level helper also accepts `-EnableOpus` with a fresh `-Variant`.
+This is not yet a device-qualified production profile.
 It supports mono/stereo mapping-0 streams at 48-kHz mono output, packets up to
-120 ms / 1536 bytes when each coded frame is at most20ms. Frames are emitted
+120 ms when each coded frame is at most20ms. Packet capacity is build-time
+configurable; main uses 1024 bytes. Frames are emitted
 sequentially through the existing960-sample PCM buffer; single SILK40/60ms
 frames remain unsupported. Shared IRAM/scratch and Ogg parsing are bounded.
 MP3/AAC retain their existing settings. See [limits, memory reuse, tests and
