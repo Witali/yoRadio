@@ -1713,3 +1713,7 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   на1281184; не CPU/linked ASM. [Описание](ESP8266_OPUS_PVQ_SEARCH_NEXT.md).
 - [ ] Проверить N3-unroll4 отдельной ASM-сборкой и полным протоколом. Site/guard
   сохранить, не принимать по количеству инструкций или без учёта кэша.
+- [x] [Unroll4 ASM подготовлен](ESP8266_OPUS_PVQ_N3_UNROLL4_ASM.md):303906 linked
+  случаев,24 host exact PCM/state/sanitizer сценария,11 регрессий PASS.
+  Helper23 инструкции/66B, прежние RAM/frame/site. На192 инструкции122440
+  против119961 принятой базы и126433 скалярного N3; CPU ещё измеряется.

@@ -3,6 +3,19 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-19: four-step N3 PVQ ASM experiment
+
+- Separate `esp8266-opus-pvq-n3-unroll4-{control,candidate}-v1`,903216B,
+  accepted eBands-final parent, CPU160/runtime QIO40 RAM-input raw benchmark.
+- Exact four-step finite differences with delayed K updates and checked early
+  exits. Same site as scalar N3, helper23 instructions/66B; no new table,
+  stores/SAR, RAM/frame or other linked-address growth. Production unchanged.
+- Candidate SHA256: `ce4647efde438926d1aa3b628ce88dd959c103cadc5f9eabb4924cfe1f63b77d`.
+- 303906 linked cases,24 exact host PCM/state/sanitizer cases,11 regressions PASS.
+  On192 instructions119961→122440, U-loads24259→18357; counts are not CPU.
+- Physical10A/10B/10A2 pending; no75% CPU/live qualification.
+- [Details](../docs/ESP8266_OPUS_PVQ_N3_UNROLL4_ASM.md).
+
 ## Development - 2026-09-19: exact N3 PVQ differences ASM (rejected)
 
 - Separate `esp8266-opus-pvq-n3-diff-{control,candidate}-v1`,903216B,
