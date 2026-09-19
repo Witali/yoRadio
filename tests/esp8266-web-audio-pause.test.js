@@ -55,7 +55,7 @@ test('pause checkpoints surround open/detect/decode and leave generation semanti
   const native = audio.slice(audio.lastIndexOf('static void audio_task('), audio.indexOf('esp_err_t audio_service_init('));
   assert.equal((native.match(/audio_web_pause_checkpoint/g) || []).length, 4);
   assert.match(native, /audio_web_pause_gate[\s\S]*?xQueueReceive\(s_commands, &command, AUDIO_WEB_QUEUE_WAIT\)/);
-  assert.match(native, /audio_web_pause_checkpoint[^\n]+\n\s*close\(stream.socket\)/);
+  assert.match(native, /audio_web_pause_checkpoint\(&stream, &command\)\) continue;\s*audio_transport_phase\(AUDIO_TRANSPORT_CLOSE\);[\s\S]*?int stream_closed = close\(stream.socket\)/);
   const pause = read('audio_web_pause.inc');
   assert.doesNotMatch(pause, /vTaskSuspend|vTaskDelete|malloc\(|advance_generation\(/);
   assert.match(pause, /requeue_if_current\(command\)/);

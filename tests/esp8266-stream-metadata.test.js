@@ -19,6 +19,7 @@ test('real PCM callback publishes source channels while output and frame account
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'esp8266-stream-metadata-'));
   t.after(() => fs.rmSync(dir, {recursive: true, force: true}));
   fs.writeFileSync(path.join(dir, 'metadata_under_test.inc'),
+    fs.readFileSync(path.join(main, 'audio_stage_profile.inc'), 'utf8') + '\n' +
     audio.slice(contextStart, contextEnd) + '\n' + audio.slice(start, end) + '\n' + web.slice(formatStart, formatEnd));
   const executable = path.join(dir, 'test');
   execute('gcc', ['-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',

@@ -241,7 +241,9 @@ test('production defaults omit diagnostic source and module has no allocation, l
 test('WiFi completion response fits existing scratch at uint32 maxima', () => {
   const web = fs.readFileSync(path.join(main, 'web_service.c'), 'utf8');
   const route = web.slice(web.indexOf('static esp_err_t audio_health_handler'));
-  const block = route.slice(route.indexOf('#if YORADIO_ESP8266_SDK_RX_DIAG'), route.indexOf('#endif'));
+  const start = route.indexOf('#if YORADIO_ESP8266_SDK_RX_DIAG');
+  assert.ok(start >= 0);
+  const block = route.slice(start, route.indexOf('#endif', start));
   assert.match(block, /\?wifi=1/);
   const literal = block.split('\n').find(line => line.includes('tx_completed')).trim().slice(0, -1);
   const format = JSON.parse(literal);
@@ -249,5 +251,6 @@ test('WiFi completion response fits existing scratch at uint32 maxima', () => {
   const worst = format.replaceAll('%u', '4294967295');
   assert.ok(worst.length < 128);
   assert.equal(Object.keys(JSON.parse(worst)).length, 4);
-  assert.match(block, /size >= sizeof\(s_async_message\)/);
+  assert.match(block, /snprintf\(s_async_message, sizeof\(s_async_message\)/);
+  assert.match(block, /httpd_resp_send\(request, s_async_message, size\)/);
 });

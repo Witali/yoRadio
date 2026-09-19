@@ -14,7 +14,7 @@ test('PDM32 IRAM builder switch is opt-in, diagnostic-only, and explicitly clear
   const prelude = builder.slice(0, builder.indexOf('$taskRoot ='));
   const code = '$validate = {\n' + prelude + '\nreturn [bool]$Pdm32Iram\n}\n' + [
     "$ErrorActionPreference = 'Stop'",
-    "if (& $validate) { throw 'Default must be OFF' }",
+    "if (& $validate -EnableOpus:$false) { throw 'Default must be OFF' }",
     'foreach ($diag in @($false, $true)) { foreach ($enabled in @($false, $true)) {',
     '  $ok = $true',
     '  try { $value = & $validate -Diagnostic:$diag -Pdm32Iram:$enabled } catch { $ok = $false }',

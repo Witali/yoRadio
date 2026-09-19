@@ -7,7 +7,9 @@ test('actual flash cache validates source and body, rebuilds stale data, reuses 
   const csv=path.join(dir,'playlist.csv'),cache=csv+'.web.gz',output=path.join(dir,'served.gz'),bin=path.join(dir,'cache-test');
   fs.copyFileSync(path.join(main,'playlist_web_cache.c'),path.join(dir,'cache.c'));
   fs.writeFileSync(path.join(dir,'sdkconfig.h'),'#define CONFIG_YORADIO_PLAYLIST_WEB_GZIP 1\n');
-  fs.writeFileSync(path.join(dir,'playlist_service.h'),`#include <stdbool.h>\n#define PLAYLIST_PATH ${JSON.stringify(p(csv))}\nbool playlist_service_entry_supported(char *line);\n`);
+  // Firmware paths are short SPIFFS names; a long host worktree path must not
+  // overflow the unchanged embedded file-replacement scratch buffer.
+  fs.writeFileSync(path.join(dir,'playlist_service.h'),`#include <stdbool.h>\n#define PLAYLIST_PATH "playlist.csv"\nbool playlist_service_entry_supported(char *line);\n`);
   fs.writeFileSync(path.join(dir,'esp_log.h'),'#include <stdio.h>\n#define ESP_LOGI(tag,...) do { (void)(tag); fprintf(stderr,__VA_ARGS__); fputc(10,stderr); } while(0)\n#define ESP_LOGW ESP_LOGI\n');
   const service=fs.readFileSync(path.join(main,'playlist_service.c'),'utf8');
   const filter=service.slice(service.indexOf('static bool has_unsupported_extension('),service.indexOf('static bool parse_line('));
@@ -19,7 +21,7 @@ test('actual flash cache validates source and body, rebuilds stale data, reuses 
   `);
   const args=['-std=c11','-D_POSIX_C_SOURCE=200809L','-O2','-Wall','-Wextra','-Werror','-fsanitize=undefined',
     '-I'+p(dir),'-I'+p(main),p(path.join(dir,'test.c')),p(path.join(dir,'cache.c')),p(path.join(main,'small_gzip.c')),'-o',p(bin)];
-  const opts={encoding:'utf8'};
+  const opts={encoding:'utf8',cwd:dir};
   const buildFor=opus=>{
     const selected=['-DCONFIG_YORADIO_OGG_OPUS='+opus,...args];
     const build=spawnSync(wsl?'wsl.exe':'cc',wsl?['--exec','gcc',...selected]:selected,opts);
