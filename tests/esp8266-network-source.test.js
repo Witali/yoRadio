@@ -43,7 +43,9 @@ test('network diagnostic retains decoder memory and distinguishes app gaps from 
   const build=fs.readFileSync('tools/esp8266_audio_profile/build_i2s_pdm_production.ps1','utf8');
   assert.match(build,/-DYORADIO_ESP8266_NETWORK_BENCHMARK=OFF/);
   assert.match(build,/'CONFIG_YORADIO_STREAM_READ_WAIT_MS=0'/);
-  assert.match(build,/'CONFIG_YORADIO_STREAM_IDLE_TIMEOUT_MS=1000'/);
+  assert.match(build,/\[int\]\$StreamIdleTimeoutMs = 1000/);
+  assert.match(build,/Set-TaskStreamIdleDefaults \$taskDefaults \$StreamIdleTimeoutMs/);
+  assert.match(build,/Assert-TaskStreamIdleConfig \$taskConfig \$StreamIdleTimeoutMs/);
   assert.match(build,/http_receive_source_sha256=/);
   assert.match(build,/network_benchmark=\$false/);
 });

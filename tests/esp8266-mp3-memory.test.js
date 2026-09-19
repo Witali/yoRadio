@@ -88,7 +88,7 @@ test("ESP8266 granule API preserves the conventional full-frame API", () => {
 });
 
 test("32-frame callbacks publish stream format only on change", () => {
-  assert.match(audioService, /context->decoder_bitrate != info->bitrate \|\|[\s\S]*context->decoder_sample_rate != info->sample_rate \|\|[\s\S]*context->decoder_channels != info->channels[\s\S]*native_state_set_stream/);
+  assert.match(audioService, /context->decoder_bitrate != info->bitrate \|\|[\s\S]*context->decoder_sample_rate != info->source_sample_rate \|\|[\s\S]*context->decoder_channels != info->source_channels[\s\S]*native_state_set_stream/);
   assert.match(decoder, /m_OutputBufferSamples = required;[\s\S]*context, true\);[\s\S]*m_OutputBufferSamples = 0/);
 });
 

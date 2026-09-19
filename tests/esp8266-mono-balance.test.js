@@ -5,8 +5,10 @@ const path = require('node:path');
 const output = fs.readFileSync(path.join(__dirname, '../esp8266/rtos-sdk-native/main/native_audio_output.c'), 'utf8');
 
 test('all ESP8266 native output backends ignore balance for mono PCM', () => {
-  assert.equal((output.match(/left_balance = channels == 2 && s_balance < 0/g) || []).length, 3);
-  assert.equal((output.match(/right_balance = channels == 2 && s_balance > 0/g) || []).length, 3);
+  // I2S takes a stable per-block snapshot; the other backends read s_balance.
+  assert.match(output, /const int8_t balance = s_balance/);
+  assert.equal((output.match(/left_balance = channels == 2 && (?:s_balance|balance) < 0/g) || []).length, 3);
+  assert.equal((output.match(/right_balance = channels == 2 && (?:s_balance|balance) > 0/g) || []).length, 3);
 });
 
 test('runtime and restored balance use a signed lower bound', () => {
