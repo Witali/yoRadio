@@ -124,7 +124,7 @@ frozen ASM quant_partition имеет 112 B; нельзя называть 160 B
 - [x] Атрибуция общего пика памяти: synthesis, а не iy.
 - [x] Частоты/depth коротких листьев; проверено два конкретных прототипа.
 - [x] Сохранить отрицательный результат GCC frame, не включать его по умолчанию.
-- [ ] Перенести лучший in-place путь в отдельный ASM overlay: проверить S16I
+- [x] Перенести B=1 in-place путь в [отдельный ASM overlay](ESP8266_OPUS_PVQ_INPLACE_ASM.md): проверить S16I
   только в X, регистры, ABI, ветви, отсутствие arena calls на fast path.
 - [ ] Отдельный fixed-address N4 ASM lookup; не смешивать с PVQ→X.
 - [ ] Если продолжать leaf: пролог/epilogue short-entry на ASM без роста стека.

@@ -1736,3 +1736,15 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   короткий пролог без wrapper-frame. Не смешивать эксперименты.
 - [ ] Linked ABI/width/control-flow audit, затем10A/10B/10A2 на плате и live
   I2S/WebUI для принятых вариантов. CPU-ускорение пока не установлено.
+
+### 2026-09-19: отдельный PVQ→X ASM, B=1
+
+[Рецепт, проверки и замеры](ESP8266_OPUS_PVQ_INPLACE_ASM.md).
+- [x] Клонировать принятый linked ASM без потери прежних оптимизаций;
+  сохранять fallback, rotation и frames112/48 B, без роста static RAM.
+- [x] Удалить iy/mark/alloc/restore при B=1; 1676 B в encoder-dead flash,
+  остальные адреса/секции прежние. Не уменьшать arena: общий пик не снизился.
+- [x] 83951 linked-vector,2625 normalise,80 guard проверок;24 host PCM/state
+  сценария;14 регрессий, в том числе mutation tests.
+- [ ] Завершить10A/10B/10A2 и принять либо отклонить по измеренной скорости.
+- [ ] Только после принятия — ordinary I2S/WebUI; цель75% не объявлять по модели.
