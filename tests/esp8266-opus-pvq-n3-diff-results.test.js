@@ -50,6 +50,19 @@ test('linked instruction census matches the independent finite-difference model'
  assert.equal(proof.semantic.stores,0);assert.equal(proof.semantic.sar_writes,0);
 });
 
+test('N3 low-heap and timeout outliers remain in the rejected result',()=>{
+ const low=read(path.join(dir,'candidate/run4.json')),slow=read(path.join(dir,'candidate/run9.json'));
+ assert.equal(Math.min(...low.final.results.map(x=>x.min_dram)),380);
+ assert.equal(slow.final.state,3);assert.equal(slow.final.error,0);
+ assert.ok(slow.snapshots.some(s=>s.error==='request timeout'));
+ assert.equal(slow.final.results[4].task_us,2161556);
+ assert.equal(slow.final.results[4].max_wall_us,28402);
+ const r=result();assert.equal(r.inputs.candidate.length,10);
+ assert.equal(r.accepted_for_experimental_asm,false);
+ assert.equal(r.selection.initial.accepted_for_experimental_asm,false);
+ assert.equal(r.selection.repeated.accepted_for_experimental_asm,false);
+});
+
 test('finished benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist checks',()=>{
  const before=read(path.join(dir,'before-restore.json'));assert.equal(before.final.state,3);assert.equal(before.final.error,0);
  assert.equal(before.start,undefined);assert.equal(before.final.physical_output,false);

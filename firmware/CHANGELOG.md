@@ -3,7 +3,7 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-19: exact N3 PVQ differences ASM experiment
+## Development - 2026-09-19: exact N3 PVQ differences ASM (rejected)
 
 - Separate `esp8266-opus-pvq-n3-diff-{control,candidate}-v1`,903216B,
   accepted eBands-final parent, CPU160/runtime QIO40 raw RAM-input benchmark.
@@ -13,7 +13,14 @@ entries are retained; changes are published under a new firmware version.
 - Candidate SHA256: `a54cbfffc1ec2377e4cd835f1897fdacc8d2e9e3f1e56cbe85277fd9e147bb79`.
 - 303906 linked cases,24 exact host PCM/state/sanitizer cases, eight regressions
   PASS. On192: instructions119961→126433, loads24259→18357. Not CPU evidence.
-- Physical10A/10B/10A2 pending; no production promotion or75%/live qualification.
+- Physical10A/10B/10A2: CPU19277.864479/77.917854/77.865688%, CPU128
+  70.401292/70.446354/70.388875%. Both speed gates FAIL; rejected.
+- All150 PCM hashes exact. MinDRAM1588/380/564B, stack1660B. B/run9 timeout
+  and90.064833% CPU192 retained; max192 call19675/28402/19978us.
+- Ordinary main restored OTA; HTTP/WS/playlist verified, stopped/error-free.
+  No production promotion or75%/live qualification.
+- Final43 regression tests PASS, including all30 archived attempts, low-heap/
+  timeout retention, both speed gates, prior prefix evidence and ordinary restore.
 - [Details](../docs/ESP8266_OPUS_PVQ_N3_DIFF_ASM.md).
 
 ## Development - 2026-09-19: direct-word PVQ prefix ASM (rejected)

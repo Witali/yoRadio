@@ -1,0 +1,355 @@
+TAP version 13
+# verified 570828
+# ┌─────────┬────────────────────┬────────┬───────┬──────┬──────────────────┬───────────┬───────────┬──────────────┬────────────────────┬────────────────────┐
+# │ (index) │ name               │ old    │ shift │ gate │ flash_word_bytes │ min_reads │ max_reads │ helper_calls │ min_metadata_reads │ max_metadata_reads │
+# ├─────────┼────────────────────┼────────┼───────┼──────┼──────────────────┼───────────┼───────────┼──────────────┼────────────────────┼────────────────────┤
+# │ 0       │ 'mono-12'          │ 0      │ 6     │ 12   │ 1024             │ 0         │ 0         │ 0            │ 0                  │ 0                  │
+# │ 1       │ 'mono-12'          │ 0      │ 6     │ 16   │ 1024             │ 0         │ 0         │ 0            │ 0                  │ 0                  │
+# │ 2       │ 'mono-12'          │ 0      │ 8     │ 12   │ 1024             │ 0         │ 0         │ 0            │ 0                  │ 0                  │
+# │ 3       │ 'mono-12'          │ 0      │ 8     │ 16   │ 1024             │ 0         │ 0         │ 0            │ 0                  │ 0                  │
+# │ 4       │ 'mono-24'          │ 124    │ 6     │ 12   │ 1024             │ 95        │ 104       │ 8            │ 16                 │ 16                 │
+# │ 5       │ 'mono-24'          │ 124    │ 6     │ 16   │ 1024             │ 101       │ 106       │ 6            │ 12                 │ 12                 │
+# │ 6       │ 'mono-24'          │ 124    │ 8     │ 12   │ 1024             │ 103       │ 109       │ 8            │ 16                 │ 16                 │
+# │ 7       │ 'mono-24'          │ 124    │ 8     │ 16   │ 1024             │ 103       │ 109       │ 6            │ 12                 │ 12                 │
+# │ 8       │ 'stereo-64'        │ 2803   │ 6     │ 12   │ 1024             │ 2606      │ 2638      │ 40           │ 80                 │ 80                 │
+# │ 9       │ 'stereo-64'        │ 2803   │ 6     │ 16   │ 1024             │ 2637      │ 2660      │ 21           │ 42                 │ 42                 │
+# │ 10      │ 'stereo-64'        │ 2803   │ 8     │ 12   │ 1024             │ 2659      │ 2690      │ 40           │ 80                 │ 80                 │
+# │ 11      │ 'stereo-64'        │ 2803   │ 8     │ 16   │ 1024             │ 2647      │ 2676      │ 21           │ 42                 │ 42                 │
+# │ 12      │ 'stereo-128'       │ 11682  │ 6     │ 12   │ 1024             │ 11038     │ 11193     │ 189          │ 376                │ 376                │
+# │ 13      │ 'stereo-128'       │ 11682  │ 6     │ 16   │ 1024             │ 11106     │ 11203     │ 115          │ 228                │ 228                │
+# │ 14      │ 'stereo-128'       │ 11682  │ 8     │ 12   │ 1024             │ 11317     │ 11404     │ 189          │ 378                │ 378                │
+# │ 15      │ 'stereo-128'       │ 11682  │ 8     │ 16   │ 1024             │ 11249     │ 11316     │ 115          │ 230                │ 230                │
+# │ 16      │ 'stereo-192'       │ 24259  │ 6     │ 12   │ 1024             │ 21333     │ 21867     │ 623          │ 1246               │ 1246               │
+# │ 17      │ 'stereo-192'       │ 24259  │ 6     │ 16   │ 1024             │ 21479     │ 21913     │ 471          │ 942                │ 942                │
+# │ 18      │ 'stereo-192'       │ 24259  │ 8     │ 12   │ 1024             │ 22266     │ 22619     │ 623          │ 1246               │ 1246               │
+# │ 19      │ 'stereo-192'       │ 24259  │ 8     │ 16   │ 1024             │ 22119     │ 22451     │ 471          │ 942                │ 942                │
+# │ 20      │ 'stereo-320-2.5ms' │ 45485  │ 6     │ 12   │ 1024             │ 30869     │ 31714     │ 905          │ 1744               │ 1748               │
+# │ 21      │ 'stereo-320-2.5ms' │ 45485  │ 6     │ 16   │ 1024             │ 30907     │ 31718     │ 856          │ 1646               │ 1650               │
+# │ 22      │ 'stereo-320-2.5ms' │ 45485  │ 8     │ 12   │ 1024             │ 31183     │ 31923     │ 905          │ 1810               │ 1810               │
+# │ 23      │ 'stereo-320-2.5ms' │ 45485  │ 8     │ 16   │ 1024             │ 31129     │ 31862     │ 856          │ 1712               │ 1712               │
+# │ 24      │ 'stereo-320-5ms'   │ 53872  │ 6     │ 12   │ 1024             │ 34700     │ 35787     │ 1037         │ 1840               │ 1854               │
+# │ 25      │ 'stereo-320-5ms'   │ 53872  │ 6     │ 16   │ 1024             │ 34784     │ 35812     │ 953          │ 1672               │ 1686               │
+# │ 26      │ 'stereo-320-5ms'   │ 53872  │ 8     │ 12   │ 1024             │ 33716     │ 34593     │ 1037         │ 2074               │ 2074               │
+# │ 27      │ 'stereo-320-5ms'   │ 53872  │ 8     │ 16   │ 1024             │ 33636     │ 34496     │ 953          │ 1906               │ 1906               │
+# │ 28      │ 'stereo-320-10ms'  │ 63208  │ 6     │ 12   │ 1024             │ 42699     │ 43792     │ 1229         │ 2132               │ 2140               │
+# │ 29      │ 'stereo-320-10ms'  │ 63208  │ 6     │ 16   │ 1024             │ 42762     │ 43780     │ 1116         │ 1906               │ 1914               │
+# │ 30      │ 'stereo-320-10ms'  │ 63208  │ 8     │ 12   │ 1024             │ 41160     │ 42198     │ 1229         │ 2458               │ 2458               │
+# │ 31      │ 'stereo-320-10ms'  │ 63208  │ 8     │ 16   │ 1024             │ 41040     │ 42062     │ 1116         │ 2232               │ 2232               │
+# │ 32      │ 'stereo-320-20ms'  │ 66093  │ 6     │ 12   │ 1024             │ 41521     │ 42832     │ 1254         │ 2104               │ 2130               │
+# │ 33      │ 'stereo-320-20ms'  │ 66093  │ 6     │ 16   │ 1024             │ 41601     │ 42845     │ 1167         │ 1930               │ 1956               │
+# │ 34      │ 'stereo-320-20ms'  │ 66093  │ 8     │ 12   │ 1024             │ 39396     │ 40431     │ 1254         │ 2508               │ 2508               │
+# │ 35      │ 'stereo-320-20ms'  │ 66093  │ 8     │ 16   │ 1024             │ 39312     │ 40322     │ 1167         │ 2334               │ 2334               │
+# │ 36      │ 'stereo-510'       │ 377680 │ 6     │ 12   │ 1024             │ 237190    │ 243177    │ 5996         │ 9608               │ 9708               │
+# │ 37      │ 'stereo-510'       │ 377680 │ 6     │ 16   │ 1024             │ 237335    │ 243195    │ 5818         │ 9252               │ 9352               │
+# │ 38      │ 'stereo-510'       │ 377680 │ 8     │ 12   │ 1024             │ 221985    │ 227394    │ 5996         │ 11992              │ 11992              │
+# │ 39      │ 'stereo-510'       │ 377680 │ 8     │ 16   │ 1024             │ 221793    │ 227180    │ 5818         │ 11636              │ 11636              │
+# └─────────┴────────────────────┴────────┴───────┴──────┴──────────────────┴───────────┴───────────┴──────────────┴────────────────────┴────────────────────┘
+# Subtest: N3 bucket model covers all intervals, domain edges and rejected corrupt formula
+ok 1 - N3 bucket model covers all intervals, domain edges and rejected corrupt formula
+  ---
+  duration_ms: 113.7367
+  type: 'test'
+  ...
+# Subtest: saved read-only counts reproduce all traces without promising MCU acceleration
+ok 2 - saved read-only counts reproduce all traces without promising MCU acceleration
+  ---
+  duration_ms: 418.5874
+  type: 'test'
+  ...
+# ┌─────────┬────────────────────┬──────────┬──────────────────┬──────────────────┬─────────────┬─────────────┬────────────────────┬───────────────────┬────────────────────┬────────────────────────────┬─────────────────────┐
+# │ (index) │ name               │ searches │ old_instructions │ new_instructions │ old_U_reads │ new_U_reads │ fewer_instructions │ more_instructions │ equal_instructions │ instruction_change_percent │ read_change_percent │
+# ├─────────┼────────────────────┼──────────┼──────────────────┼──────────────────┼─────────────┼─────────────┼────────────────────┼───────────────────┼────────────────────┼────────────────────────────┼─────────────────────┤
+# │ 0       │ 'mono-12'          │ 0        │ 0                │ 0                │ 0           │ 0           │ 0                  │ 0                 │ 0                  │ null                       │ null                │
+# │ 1       │ 'mono-24'          │ 35       │ 643              │ 687              │ 124         │ 71          │ 0                  │ 28                │ 7                  │ 6.842923794712297          │ -42.74193548387096  │
+# │ 2       │ 'stereo-64'        │ 841      │ 14681            │ 15574            │ 2803        │ 2299        │ 0                  │ 657               │ 184                │ 6.082691914719707          │ -17.980734926864073 │
+# │ 3       │ 'stereo-128'       │ 3272     │ 60732            │ 64379            │ 11682       │ 9798        │ 0                  │ 2683              │ 589                │ 6.005071461502998          │ -16.127375449409342 │
+# │ 4       │ 'stereo-192'       │ 5205     │ 119961           │ 126433           │ 24259       │ 18357       │ 0                  │ 4430              │ 775                │ 5.395086736522714          │ -24.329114967640876 │
+# │ 5       │ 'stereo-320-2.5ms' │ 4870     │ 204382           │ 211025           │ 45485       │ 27261       │ 0                  │ 4393              │ 477                │ 3.2502862287285605         │ -40.065955809607566 │
+# │ 6       │ 'stereo-320-5ms'   │ 5153     │ 239413           │ 246738           │ 53872       │ 29160       │ 0                  │ 4693              │ 460                │ 3.0595665231211377         │ -45.87169587169587  │
+# │ 7       │ 'stereo-320-10ms'  │ 6845     │ 284349           │ 293905           │ 63208       │ 35351       │ 0                  │ 6168              │ 677                │ 3.360658908594716          │ -44.07195291735223  │
+# │ 8       │ 'stereo-320-20ms'  │ 6010     │ 292130           │ 300679           │ 66093       │ 33980       │ 0                  │ 5437              │ 573                │ 2.9264368603019175         │ -48.587596265867795 │
+# │ 9       │ 'stereo-510'       │ 28607    │ 1644283          │ 1684780          │ 377680      │ 198882      │ 0                  │ 26239             │ 2368               │ 2.462897202002323          │ -47.34113535267952  │
+# └─────────┴────────────────────┴──────────┴──────────────────┴──────────────────┴─────────────┴─────────────┴────────────────────┴───────────────────┴────────────────────┴────────────────────────────┴─────────────────────┘
+# Subtest: N3 report refuses intermediate snapshots before immutable archival
+ok 3 - N3 report refuses intermediate snapshots before immutable archival
+  ---
+  duration_ms: 68.6122
+  type: 'test'
+  ...
+# Subtest: all30 physical attempts match hashes, PCM and confirmed OTA slots
+ok 4 - all30 physical attempts match hashes, PCM and confirmed OTA slots
+  ---
+  duration_ms: 79.3098
+  type: 'test'
+  ...
+# Subtest: N3 medians and both speed/75-percent gates reproduce without excluding outliers
+ok 5 - N3 medians and both speed/75-percent gates reproduce without excluding outliers
+  ---
+  duration_ms: 46.7718
+  type: 'test'
+  ...
+# Subtest: linked instruction census matches the independent finite-difference model
+ok 6 - linked instruction census matches the independent finite-difference model
+  ---
+  duration_ms: 2690.8913
+  type: 'test'
+  ...
+# Subtest: N3 low-heap and timeout outliers remain in the rejected result
+ok 7 - N3 low-heap and timeout outliers remain in the rejected result
+  ---
+  duration_ms: 6.4823
+  type: 'test'
+  ...
+# Subtest: finished benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist checks
+ok 8 - finished benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist checks
+  ---
+  duration_ms: 2.2813
+  type: 'test'
+  ...
+# Subtest: linked N3 differences match every U-row interval without RAM or stack growth
+ok 9 - linked N3 differences match every U-row interval without RAM or stack growth
+  ---
+  duration_ms: 13593.885
+  type: 'test'
+  ...
+# Subtest: real flash table monotonicity, pointers and final diagonal are checked
+ok 10 - real flash table monotonicity, pointers and final diagonal are checked
+  ---
+  duration_ms: 158.3704
+  type: 'test'
+  ...
+# Subtest: wrong branch, delta, subtraction and return mutations are rejected
+ok 11 - wrong branch, delta, subtraction and return mutations are rejected
+  ---
+  duration_ms: 19.8124
+  type: 'test'
+  ...
+# Subtest: decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+ok 12 - decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+  ---
+  duration_ms: 2879.3012
+  type: 'test'
+  ...
+# Subtest: host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+ok 13 - host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+  ---
+  duration_ms: 1.7342
+  type: 'test'
+  ...
+# Subtest: finite-difference model proves every stored N3 interval and the full largest-K index domain
+ok 14 - finite-difference model proves every stored N3 interval and the full largest-K index domain
+  ---
+  duration_ms: 99.5983
+  type: 'test'
+  ...
+# Subtest: first probe, small-K gate and other dimensions retain their exact fallback semantics
+ok 15 - first probe, small-K gate and other dimensions retain their exact fallback semantics
+  ---
+  duration_ms: 6.2475
+  type: 'test'
+  ...
+# Subtest: all ten traces reproduce the archived load counts; no CPU claim or bitrate cap
+ok 16 - all ten traces reproduce the archived load counts; no CPU claim or bitrate cap
+  ---
+  duration_ms: 404.227
+  type: 'test'
+  ...
+# Subtest: unrolled K update exits at every phase without losing p or crossing U(3,3)
+ok 17 - unrolled K update exits at every phase without losing p or crossing U(3,3)
+  ---
+  duration_ms: 16.1592
+  type: 'test'
+  ...
+# Subtest: saved unroll4 hypothesis reproduces every stored interval and all10 traces
+ok 18 - saved unroll4 hypothesis reproduces every stored interval and all10 traces
+  ---
+  duration_ms: 121.9043
+  type: 'test'
+  ...
+# ┌─────────┬────────────────────┬──────────┬──────────────────┬──────────────────┬──────────────────┬─────────────┬─────────────┬─────────────┬───────────────┬───────────────────┬──────────────┬──────────────┬─────────────────────────┬─────────────────┬─────────────────┐
+# │ (index) │ name               │ searches │ old_instructions │ min_instructions │ max_instructions │ old_U_reads │ min_U_reads │ max_U_reads │ literal_reads │ prefix_word_reads │ helper_calls │ short_linear │ hypothetical_long_guard │ min_total_reads │ max_total_reads │
+# ├─────────┼────────────────────┼──────────┼──────────────────┼──────────────────┼──────────────────┼─────────────┼─────────────┼─────────────┼───────────────┼───────────────────┼──────────────┼──────────────┼─────────────────────────┼─────────────────┼─────────────────┤
+# │ 0       │ 'mono-12'          │ 0        │ 0                │ 0                │ 0                │ 0           │ 0           │ 0           │ 0             │ 0                 │ 0            │ 0            │ [Object]                │ 0               │ 0               │
+# │ 1       │ 'mono-24'          │ 35       │ 643              │ 875              │ 915              │ 124         │ 86          │ 95          │ 32            │ 32                │ 32           │ 3            │ [Object]                │ 150             │ 159             │
+# │ 2       │ 'stereo-64'        │ 841      │ 14681            │ 15595            │ 16705            │ 2803        │ 1790        │ 2042        │ 336           │ 336               │ 336          │ 505          │ [Object]                │ 2462            │ 2714            │
+# │ 3       │ 'stereo-128'       │ 3272     │ 60732            │ 62716            │ 67904            │ 11682       │ 7123        │ 8310        │ 1405          │ 1405              │ 1405         │ 1867         │ [Object]                │ 9933            │ 11120           │
+# │ 4       │ 'stereo-192'       │ 5205     │ 119961           │ 111543           │ 122784           │ 24259       │ 11885       │ 14477       │ 3159          │ 3159              │ 3159         │ 2046         │ [Object]                │ 18203           │ 20795           │
+# │ 5       │ 'stereo-320-2.5ms' │ 4870     │ 204382           │ 136650           │ 146543           │ 45485       │ 18465       │ 20800       │ 3145          │ 3145              │ 3145         │ 1725         │ [Object]                │ 24755           │ 27090           │
+# │ 6       │ 'stereo-320-5ms'   │ 5153     │ 239413           │ 151696           │ 163943           │ 53872       │ 21351       │ 24247       │ 3305          │ 3305              │ 3305         │ 1848         │ [Object]                │ 27961           │ 30857           │
+# │ 7       │ 'stereo-320-10ms'  │ 6845     │ 284349           │ 188154           │ 204219           │ 63208       │ 25291       │ 29081       │ 4298          │ 4298              │ 4298         │ 2547         │ [Object]                │ 33887           │ 37677           │
+# │ 8       │ 'stereo-320-20ms'  │ 6010     │ 292130           │ 179779           │ 195236           │ 66093       │ 25178       │ 28853       │ 4037          │ 4037              │ 4037         │ 1973         │ [Object]                │ 33252           │ 36927           │
+# │ 9       │ 'stereo-510'       │ 28607    │ 1644283          │ 947567           │ 1014358          │ 377680      │ 141563      │ 157526      │ 19530         │ 19530             │ 19530        │ 9077         │ [Object]                │ 180623          │ 196586          │
+# └─────────┴────────────────────┴──────────┴──────────────────┴──────────────────┴──────────────────┴─────────────┴─────────────┴─────────────┴───────────────┴───────────────────┴──────────────┴──────────────┴─────────────────────────┴─────────────────┴─────────────────┘
+# Subtest: report refuses intermediate producer snapshots before archival
+ok 19 - report refuses intermediate producer snapshots before archival
+  ---
+  duration_ms: 75.6105
+  type: 'test'
+  ...
+# Subtest: all30 physical attempts match hashes, PCM and confirmed OTA slots
+ok 20 - all30 physical attempts match hashes, PCM and confirmed OTA slots
+  ---
+  duration_ms: 47.2284
+  type: 'test'
+  ...
+# Subtest: medians, outliers and speed/75-percent gates reproduce from every saved attempt
+ok 21 - medians, outliers and speed/75-percent gates reproduce from every saved attempt
+  ---
+  duration_ms: 44.6577
+  type: 'test'
+  ...
+# Subtest: small RAM reserve is retained although PCM is exact and the speed candidate is rejected
+ok 22 - small RAM reserve is retained although PCM is exact and the speed candidate is rejected
+  ---
+  duration_ms: 9.2193
+  type: 'test'
+  ...
+# Subtest: terminal benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist responses
+ok 23 - terminal benchmark is followed by ordinary-radio OTA and HTTP/WS/playlist responses
+  ---
+  duration_ms: 4.2909
+  type: 'test'
+  ...
+# Subtest: linked instruction census reproduces the recorded real searches
+ok 24 - linked instruction census reproduces the recorded real searches
+  ---
+  duration_ms: 9306.5551
+  type: 'test'
+  ...
+# Subtest: word representation retains every packed bound and identical site instructions
+ok 25 - word representation retains every packed bound and identical site instructions
+  ---
+  duration_ms: 25.3943
+  type: 'test'
+  ...
+# Subtest: linked direct-word prefix search matches every U-row interval without RAM or stack growth
+ok 26 - linked direct-word prefix search matches every U-row interval without RAM or stack growth
+  ---
+  duration_ms: 10313.7033
+  type: 'test'
+  ...
+# Subtest: real flash table monotonicity, pointers and final diagonal are checked
+ok 27 - real flash table monotonicity, pointers and final diagonal are checked
+  ---
+  duration_ms: 169.8397
+  type: 'test'
+  ...
+# Subtest: branch, index scaling and word width mutations are rejected
+ok 28 - branch, index scaling and word width mutations are rejected
+  ---
+  duration_ms: 31.7904
+  type: 'test'
+  ...
+# Subtest: decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+ok 29 - decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+  ---
+  duration_ms: 3719.6682
+  type: 'test'
+  ...
+# Subtest: host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+ok 30 - host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+  ---
+  duration_ms: 1.8863
+  type: 'test'
+  ...
+# Subtest: word bounds are exact flash bytes; pointer and byte mutations fail closed
+ok 31 - word bounds are exact flash bytes; pointer and byte mutations fail closed
+  ---
+  duration_ms: 187.0825
+  type: 'test'
+  ...
+# Subtest: full encoder storage is unreachable and has no address-taken references
+ok 32 - full encoder storage is unreachable and has no address-taken references
+  ---
+  duration_ms: 3679.2979
+  type: 'test'
+  ...
+# ┌─────────┬────────────────────┬────────┬────────┬────────┬────────┬────────┬────────────┬────────────┬────────────┬────────────┐
+# │ (index) │ name               │ linear │ binary │ tree4  │ tree8  │ tree16 │ prefix0min │ prefix0max │ prefix2min │ prefix2max │
+# ├─────────┼────────────────────┼────────┼────────┼────────┼────────┼────────┼────────────┼────────────┼────────────┼────────────┤
+# │ 0       │ 'mono-12'          │ 0      │ 0      │ 0      │ 0      │ 0      │ 0          │ 0          │ 0          │ 0          │
+# │ 1       │ 'mono-24'          │ 124    │ 154    │ 115    │ 112    │ 118    │ 121        │ 130        │ 74         │ 105        │
+# │ 2       │ 'stereo-64'        │ 2803   │ 2379   │ 2471   │ 2390   │ 2511   │ 2068       │ 2657       │ 1721       │ 2373       │
+# │ 3       │ 'stereo-128'       │ 11682  │ 9594   │ 10099  │ 9832   │ 10461  │ 8000       │ 10533      │ 6639       │ 9327       │
+# │ 4       │ 'stereo-192'       │ 24259  │ 17587  │ 19688  │ 18633  │ 18928  │ 14502      │ 18538      │ 10834      │ 15258      │
+# │ 5       │ 'stereo-320-2.5ms' │ 45485  │ 20595  │ 39465  │ 36489  │ 29982  │ 20813      │ 24505      │ 12031      │ 16304      │
+# │ 6       │ 'stereo-320-5ms'   │ 53872  │ 21774  │ 47474  │ 44418  │ 37214  │ 23656      │ 28004      │ 13099      │ 17709      │
+# │ 7       │ 'stereo-320-10ms'  │ 63208  │ 27369  │ 55032  │ 51890  │ 45312  │ 28366      │ 34081      │ 16613      │ 22861      │
+# │ 8       │ 'stereo-320-20ms'  │ 66093  │ 25785  │ 58169  │ 54621  │ 46373  │ 28252      │ 33436      │ 15292      │ 20782      │
+# │ 9       │ 'stereo-510'       │ 377680 │ 132249 │ 336787 │ 315354 │ 259819 │ 156820     │ 179787     │ 79624      │ 105454     │
+# └─────────┴────────────────────┴────────┴────────┴────────┴────────┴────────┴────────────┴────────────┴────────────┴────────────┘
+# Subtest: alphabetic tree preserves ordered leaves and favours frequent results
+ok 33 - alphabetic tree preserves ordered leaves and favours frequent results
+  ---
+  duration_ms: 2.3819
+  type: 'test'
+  ...
+# Subtest: all real U intervals pass tree/prefix verification without limiting bitrate
+ok 34 - all real U intervals pass tree/prefix verification without limiting bitrate
+  ---
+  duration_ms: 360.6911
+  type: 'test'
+  ...
+# Subtest: search census is reproducible and includes metadata reads and high bitrates
+ok 35 - search census is reproducible and includes metadata reads and high bitrates
+  ---
+  duration_ms: 664.8267
+  type: 'test'
+  ...
+# Subtest: attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+ok 36 - attempt audit retains a terminal failure and forbids dropping completed or unfinished attempts
+  ---
+  duration_ms: 5.2339
+  type: 'test'
+  ...
+# Subtest: A/B permits only the selected feature and artifact identity differences
+ok 37 - A/B permits only the selected feature and artifact identity differences
+  ---
+  duration_ms: 2.0556
+  type: 'test'
+  ...
+# Subtest: raw A/B reports true medians and retains a slow outlier and observation timeout
+ok 38 - raw A/B reports true medians and retains a slow outlier and observation timeout
+  ---
+  duration_ms: 2.3018
+  type: 'test'
+  ...
+# Subtest: raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+ok 39 - raw A/B refuses missing runs, output benchmarks, failed runs and PCM changes
+  ---
+  duration_ms: 11.9705
+  type: 'test'
+  ...
+# Subtest: different task/wall timing windows retain positive overhead without clamping or dropping the run
+ok 40 - different task/wall timing windows retain positive overhead without clamping or dropping the run
+  ---
+  duration_ms: 1.3303
+  type: 'test'
+  ...
+# Subtest: raw-series default observation interval matches the physical evidence validator
+ok 41 - raw-series default observation interval matches the physical evidence validator
+  ---
+  duration_ms: 2.091
+  type: 'test'
+  ...
+# Subtest: raw series verifies PCM and retains terminal device failures without counting them as speed passes
+ok 42 - raw series verifies PCM and retains terminal device failures without counting them as speed passes
+  ---
+  duration_ms: 2.1917
+  type: 'test'
+  ...
+# Subtest: raw series does not restart unknown/physical/missing observations or incorrect PCM
+ok 43 - raw series does not restart unknown/physical/missing observations or incorrect PCM
+  ---
+  duration_ms: 10.1049
+  type: 'test'
+  ...
+1..43
+# tests 43
+# suites 0
+# pass 43
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18395.1778

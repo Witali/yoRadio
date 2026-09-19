@@ -1,7 +1,8 @@
 # Opus ASM: N=3 PVQ конечными разностями
 
 2026-09-19. Отдельный кандидат над принятой eBands-final цепочкой,
-`esp8266-opus-pvq-n3-diff-{control,candidate}-v1`. Не production default.
+`esp8266-opus-pvq-n3-diff-{control,candidate}-v1`. Физический опыт завершён:
+оба speed gate FAIL, кандидат отклонён. Не production default.
 
 ## Алгоритм и ABI
 
@@ -47,10 +48,10 @@ a0 уже сохранялся существующим48B frame и мёртв �
  48 packed frames, mixed modes. Это semantic mirror, не измерение LX106.
 - [x] Восемь связанных регрессий PASS, включая повреждённые delta/branch/load
  и повторную проверку недостижимого encoder-хранилища.
-- [ ] 10A/10B/10A2: CPU160, runtime QIO40, пакеты из RAM, без аудиовывода,
+- [x] 10A/10B/10A2: CPU160, runtime QIO40, пакеты из RAM, без аудиовывода,
  function/stage profiling. Все попытки и максимумы сохранять.
-- [ ] Два high-bitrate gate относительно потерь на низких, RAM/stack audit.
-- [ ] Восстановление ordinary radio и HTTP/WS/playlist; дальнейшая live
+- [x] Два high-bitrate gate относительно потерь на низких: оба FAIL. RAM/stack audit.
+- [x] Восстановление ordinary radio и HTTP/WS/playlist; дальнейшая live
  квалификация отдельно, только после принятия нового ASM-варианта.
 
 Цель75% raw CPU и20s I2S PDM/WebUI пока не подтверждена.
@@ -66,3 +67,41 @@ App903216B, candidate SHA256:
 `analyze_pvq_n3_diff_instructions.cjs`, `report_pvq_n3_diff.cjs` в
 `tools/esp8266_opus_asm/`; тесты `esp8266-opus-pvq-n3-diff*.test.js`.
 Предварительная [host-модель](ESP8266_OPUS_PVQ_SEARCH_NEXT.md) не заменяет этот протокол.
+
+## Физический результат
+
+Каждая серия содержит10 попыток, по120 пакетов/2,4с аудио каждого битрейта.
+Все150 PCM-хешей точны; ошибки наблюдения/низкую память не исключали.
+
+| Поток | Контроль A, CPU% | Кандидат B, CPU% | Контроль A2, CPU% |
+| --- | ---: | ---: | ---: |
+|12кбит/с mono|23,091938|23,106396|23,093333|
+|24кбит/с mono|53,904958|53,921854|53,905875|
+|64кбит/с stereo|61,184917|61,204063|61,202188|
+|128кбит/с stereo|70,401292|70,446354|70,388875|
+|192кбит/с stereo|77,864479|77,917854|77,865688|
+
+Ускорения нет: на192 относительная разница около−0,06855% к A и−0,06700%
+к A2. Разница мала; это не доказательство конкретного аппаратного штрафа.
+Но оба строгих high-bitrate gate отрицательны, поэтому вариант не принят.
+Нельзя объединять его с принятой ASM-цепочкой как успешную оптимизацию.
+
+MinDRAM A/B/A2:1588/380/564B; stack-free1660B. Static RAM/frame одинаковы,
+но динамический запас очень мал. Max192 call19675/28402/19978мкс.
+B/run9 имел request timeout, затем подтверждённое завершение state3/error0:
+CPU19290,064833%, max28402мкс. Он сохранён в медианах/максимумах; причина
+выброса не доказана, приписывать его Wi-Fi без дополнительной трассы нельзя.
+
+После terminal state3/error0 ordinary main883264B восстановлен OTA в0x110000,
+SHA256 `671048e01e53790d875136d9f0136d60bc0dfd4242217de09a6f46c18b670cfe`.
+HTTP, WebSocket initial state и playlist отвечают; радио остановлено,
+error пуст, RSSI−56dBm, free_heap25932B. Это восстановление, не20s live QA.
+
+Следующий отдельный опыт: [unroll4-модель](ESP8266_OPUS_PVQ_SEARCH_NEXT.md).
+На192 она обещает лишь3993 меньше modeled инструкций, а не доказанное CPU
+ускорение. Нужны собственные linked/PCM/10A/10B/10A2 проверки.
+
+Итоговые43 регрессии PASS: новый ASM/PCM, все30 физических попыток и их хеши,
+low-heap/timeout retention, обе CPU-проверки, восстановление ordinary радио,
+предыдущий word-prefix, host-модели и общий raw-протокол.
+Лог: `firmware/development/esp8266-opus-pvq-n3-diff-candidate-v1/regression-tests.log`.
