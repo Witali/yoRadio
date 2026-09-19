@@ -3,6 +3,19 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-19: direct-word PVQ prefix ASM (experiment)
+
+- Separate `esp8266-opus-pvq-prefix-word-{control,candidate}-v1`,903216B,
+  accepted eBands-final parent, CPU160/runtime QIO40 RAM-input benchmark.
+- Same mathematical prefix bounds, now1408B direct words instead of352 packed
+  bytes. Helper26→18 instructions; no SAR operations, RAM/frame unchanged.
+  Audited unreachable encoder storage, identical other linked addresses/bytes.
+- 337686 linked interval/CLZ cases,256 SAR checks,24 exact host PCM/state/
+  sanitizer scenarios and eight regressions PASS. C fallback unchanged.
+- Candidate SHA256: `dc859ad6b216fb8fa17a9f9ccda6595e0e122157f1849f6f627db10824fcafcb`.
+- Fresh10A/10B/10A2 pending. No production promotion or75% CPU/live qualification.
+- [Details](../docs/ESP8266_OPUS_PVQ_PREFIX_WORD.md).
+
 ## Development - 2026-09-19: long-search-only PVQ prefix ASM (rejected)
 
 - Separate `esp8266-opus-pvq-prefix-long-{control,candidate}-v1`,903216B,

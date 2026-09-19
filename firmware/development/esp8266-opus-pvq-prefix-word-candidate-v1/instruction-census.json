@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "recipe_sha256_lf": "998374ee59270c5fb76c6a343627aea98d15da0e5047f658e54dbf7de929fa42",
+  "candidate_elf_sha256": "9e142d1bdba52d7806356a33b97e8165779e3e21d512b00363b2f25b95ee1649",
+  "scope": "Instruction and load min/max over all residual indices consistent with each recorded answer. Includes pointer-literal and direct-word-prefix loads separately. Not cycles/cache timing; actual residual indices are not in these traces.",
+  "cases": [
+    {
+      "name": "mono-12",
+      "searches": 0,
+      "old_instructions": 0,
+      "min_instructions": 0,
+      "max_instructions": 0,
+      "old_U_reads": 0,
+      "min_U_reads": 0,
+      "max_U_reads": 0,
+      "literal_reads": 0,
+      "prefix_word_reads": 0,
+      "helper_calls": 0,
+      "short_linear": 0,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 0,
+        "extra_U_reads": 0
+      },
+      "min_total_reads": 0,
+      "max_total_reads": 0
+    },
+    {
+      "name": "mono-24",
+      "searches": 35,
+      "old_instructions": 643,
+      "min_instructions": 875,
+      "max_instructions": 915,
+      "old_U_reads": 124,
+      "min_U_reads": 86,
+      "max_U_reads": 95,
+      "literal_reads": 32,
+      "prefix_word_reads": 32,
+      "helper_calls": 32,
+      "short_linear": 3,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 6,
+        "extra_U_reads": 32
+      },
+      "min_total_reads": 150,
+      "max_total_reads": 159
+    },
+    {
+      "name": "stereo-64",
+      "searches": 841,
+      "old_instructions": 14681,
+      "min_instructions": 15595,
+      "max_instructions": 16705,
+      "old_U_reads": 2803,
+      "min_U_reads": 1790,
+      "max_U_reads": 2042,
+      "literal_reads": 336,
+      "prefix_word_reads": 336,
+      "helper_calls": 336,
+      "short_linear": 505,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 116,
+        "extra_U_reads": 336
+      },
+      "min_total_reads": 2462,
+      "max_total_reads": 2714
+    },
+    {
+      "name": "stereo-128",
+      "searches": 3272,
+      "old_instructions": 60732,
+      "min_instructions": 62716,
+      "max_instructions": 67904,
+      "old_U_reads": 11682,
+      "min_U_reads": 7123,
+      "max_U_reads": 8310,
+      "literal_reads": 1405,
+      "prefix_word_reads": 1405,
+      "helper_calls": 1405,
+      "short_linear": 1867,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 459,
+        "extra_U_reads": 1405
+      },
+      "min_total_reads": 9933,
+      "max_total_reads": 11120
+    },
+    {
+      "name": "stereo-192",
+      "searches": 5205,
+      "old_instructions": 119961,
+      "min_instructions": 111543,
+      "max_instructions": 122784,
+      "old_U_reads": 24259,
+      "min_U_reads": 11885,
+      "max_U_reads": 14477,
+      "literal_reads": 3159,
+      "prefix_word_reads": 3159,
+      "helper_calls": 3159,
+      "short_linear": 2046,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 1306,
+        "extra_U_reads": 3159
+      },
+      "min_total_reads": 18203,
+      "max_total_reads": 20795
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "searches": 4870,
+      "old_instructions": 204382,
+      "min_instructions": 136650,
+      "max_instructions": 146543,
+      "old_U_reads": 45485,
+      "min_U_reads": 18465,
+      "max_U_reads": 20800,
+      "literal_reads": 3145,
+      "prefix_word_reads": 3145,
+      "helper_calls": 3145,
+      "short_linear": 1725,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 1937,
+        "extra_U_reads": 3145
+      },
+      "min_total_reads": 24755,
+      "max_total_reads": 27090
+    },
+    {
+      "name": "stereo-320-5ms",
+      "searches": 5153,
+      "old_instructions": 239413,
+      "min_instructions": 151696,
+      "max_instructions": 163943,
+      "old_U_reads": 53872,
+      "min_U_reads": 21351,
+      "max_U_reads": 24247,
+      "literal_reads": 3305,
+      "prefix_word_reads": 3305,
+      "helper_calls": 3305,
+      "short_linear": 1848,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 2030,
+        "extra_U_reads": 3305
+      },
+      "min_total_reads": 27961,
+      "max_total_reads": 30857
+    },
+    {
+      "name": "stereo-320-10ms",
+      "searches": 6845,
+      "old_instructions": 284349,
+      "min_instructions": 188154,
+      "max_instructions": 204219,
+      "old_U_reads": 63208,
+      "min_U_reads": 25291,
+      "max_U_reads": 29081,
+      "literal_reads": 4298,
+      "prefix_word_reads": 4298,
+      "helper_calls": 4298,
+      "short_linear": 2547,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 2453,
+        "extra_U_reads": 4298
+      },
+      "min_total_reads": 33887,
+      "max_total_reads": 37677
+    },
+    {
+      "name": "stereo-320-20ms",
+      "searches": 6010,
+      "old_instructions": 292130,
+      "min_instructions": 179779,
+      "max_instructions": 195236,
+      "old_U_reads": 66093,
+      "min_U_reads": 25178,
+      "max_U_reads": 28853,
+      "literal_reads": 4037,
+      "prefix_word_reads": 4037,
+      "helper_calls": 4037,
+      "short_linear": 1973,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 2431,
+        "extra_U_reads": 4037
+      },
+      "min_total_reads": 33252,
+      "max_total_reads": 36927
+    },
+    {
+      "name": "stereo-510",
+      "searches": 28607,
+      "old_instructions": 1644283,
+      "min_instructions": 947567,
+      "max_instructions": 1014358,
+      "old_U_reads": 377680,
+      "min_U_reads": 141563,
+      "max_U_reads": 157526,
+      "literal_reads": 19530,
+      "prefix_word_reads": 19530,
+      "helper_calls": 19530,
+      "short_linear": 9077,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 13086,
+        "extra_U_reads": 19530
+      },
+      "min_total_reads": 180623,
+      "max_total_reads": 196586
+    }
+  ]
+}
