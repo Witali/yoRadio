@@ -1,0 +1,1282 @@
+{
+  "schema": 1,
+  "recipe_sha256_lf": "c18e870c78c371104ee1e424f10b99740345eacbe5825848365b251c098ce02b",
+  "table_sha256": "a708167506ee9b9ddff5e6a5b7867aac3812331cf40433cc92787496f36ab53a",
+  "scope": "Host-only ordered decision trees and exponent/mantissa prefix bounds. No bitstream change, firmware mutation, RAM claim or CPU speed measurement. Prefix counts are rigorous min/max over unknown ranks within observed answer intervals, not actual rank trace timings.",
+  "training": "Even-numbered searches of128/192 traces, one pseudocount per leaf; odd searches held out but from the same recordings, not independent audio.",
+  "trees": [
+    {
+      "limit": 4,
+      "weights": [
+        297,
+        603,
+        618,
+        467,
+        1267
+      ],
+      "tree": [
+        4,
+        [
+          2,
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            3,
+            2,
+            3
+          ]
+        ],
+        4
+      ],
+      "training_cost": 7222,
+      "internal_nodes": 4
+    },
+    {
+      "limit": 8,
+      "weights": [
+        173,
+        339,
+        376,
+        299,
+        235,
+        192,
+        151,
+        112,
+        426
+      ],
+      "tree": [
+        4,
+        [
+          2,
+          [
+            1,
+            0,
+            1
+          ],
+          [
+            3,
+            2,
+            3
+          ]
+        ],
+        [
+          6,
+          [
+            5,
+            4,
+            5
+          ],
+          [
+            8,
+            [
+              7,
+              6,
+              7
+            ],
+            8
+          ]
+        ]
+      ],
+      "training_cost": 7172,
+      "internal_nodes": 8
+    },
+    {
+      "limit": 16,
+      "weights": [
+        64,
+        128,
+        161,
+        105,
+        95,
+        88,
+        82,
+        66,
+        52,
+        58,
+        36,
+        32,
+        28,
+        36,
+        24,
+        14,
+        77
+      ],
+      "tree": [
+        6,
+        [
+          3,
+          [
+            2,
+            [
+              1,
+              0,
+              1
+            ],
+            2
+          ],
+          [
+            4,
+            3,
+            [
+              5,
+              4,
+              5
+            ]
+          ]
+        ],
+        [
+          10,
+          [
+            8,
+            [
+              7,
+              6,
+              7
+            ],
+            [
+              9,
+              8,
+              9
+            ]
+          ],
+          [
+            14,
+            [
+              12,
+              [
+                11,
+                10,
+                11
+              ],
+              [
+                13,
+                12,
+                13
+              ]
+            ],
+            [
+              16,
+              [
+                15,
+                14,
+                15
+              ],
+              16
+            ]
+          ]
+        ]
+      ],
+      "training_cost": 4488,
+      "internal_nodes": 16
+    }
+  ],
+  "unit": {
+    "cases": 101302,
+    "scope": "Every interval endpoint of all stored U rows with K+1 available. Table lookup upper bounds are monotone within each answer interval. Exact rank-search results; not a new decoder/ASM/PCM timing test."
+  },
+  "cases": [
+    {
+      "name": "mono-12",
+      "trace_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "searches": 0,
+      "linear": 0,
+      "binary": 0,
+      "trees": {
+        "4": {
+          "U_reads": 0,
+          "heldout_U_reads": 0,
+          "heldout_linear": 0,
+          "fallback_searches": 0
+        },
+        "8": {
+          "U_reads": 0,
+          "heldout_U_reads": 0,
+          "heldout_linear": 0,
+          "fallback_searches": 0
+        },
+        "16": {
+          "U_reads": 0,
+          "heldout_U_reads": 0,
+          "heldout_linear": 0,
+          "fallback_searches": 0
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "1": {
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "2": {
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "3": {
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 0,
+          "U_reads_max": 0,
+          "prefix_reads": 0
+        }
+      }
+    },
+    {
+      "name": "mono-24",
+      "trace_sha256": "f832306f7188a42e4074b4e9e10902580dedbbd5e39618d7564016b323da0c93",
+      "searches": 35,
+      "linear": 124,
+      "binary": 154,
+      "trees": {
+        "4": {
+          "U_reads": 115,
+          "heldout_U_reads": 65,
+          "heldout_linear": 87,
+          "fallback_searches": 3
+        },
+        "8": {
+          "U_reads": 112,
+          "heldout_U_reads": 62,
+          "heldout_linear": 87,
+          "fallback_searches": 3
+        },
+        "16": {
+          "U_reads": 118,
+          "heldout_U_reads": 66,
+          "heldout_linear": 87,
+          "fallback_searches": 11
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 86,
+          "U_reads_max": 95,
+          "prefix_reads": 35
+        },
+        "1": {
+          "U_reads_min": 58,
+          "U_reads_max": 85,
+          "prefix_reads": 35
+        },
+        "2": {
+          "U_reads_min": 39,
+          "U_reads_max": 70,
+          "prefix_reads": 35
+        },
+        "3": {
+          "U_reads_min": 35,
+          "U_reads_max": 63,
+          "prefix_reads": 35
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 86,
+          "U_reads_max": 95,
+          "prefix_reads": 32
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 58,
+          "U_reads_max": 85,
+          "prefix_reads": 32
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 39,
+          "U_reads_max": 70,
+          "prefix_reads": 32
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 35,
+          "U_reads_max": 63,
+          "prefix_reads": 32
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 100,
+          "U_reads_max": 102,
+          "prefix_reads": 24
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 76,
+          "U_reads_max": 94,
+          "prefix_reads": 24
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 57,
+          "U_reads_max": 82,
+          "prefix_reads": 24
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 53,
+          "U_reads_max": 75,
+          "prefix_reads": 24
+        }
+      }
+    },
+    {
+      "name": "stereo-64",
+      "trace_sha256": "20ac83e48f9bf41cb548a00e0944c596e963e1bed3dc54fa6b8c2c82b426d3ba",
+      "searches": 841,
+      "linear": 2803,
+      "binary": 2379,
+      "trees": {
+        "4": {
+          "U_reads": 2471,
+          "heldout_U_reads": 1262,
+          "heldout_linear": 1430,
+          "fallback_searches": 304
+        },
+        "8": {
+          "U_reads": 2390,
+          "heldout_U_reads": 1208,
+          "heldout_linear": 1430,
+          "fallback_searches": 505
+        },
+        "16": {
+          "U_reads": 2511,
+          "heldout_U_reads": 1261,
+          "heldout_linear": 1430,
+          "fallback_searches": 687
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 1227,
+          "U_reads_max": 1816,
+          "prefix_reads": 841
+        },
+        "1": {
+          "U_reads_min": 984,
+          "U_reads_max": 1622,
+          "prefix_reads": 841
+        },
+        "2": {
+          "U_reads_min": 880,
+          "U_reads_max": 1532,
+          "prefix_reads": 841
+        },
+        "3": {
+          "U_reads_min": 851,
+          "U_reads_max": 1507,
+          "prefix_reads": 841
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 1790,
+          "U_reads_max": 2042,
+          "prefix_reads": 336
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 1610,
+          "U_reads_max": 1890,
+          "prefix_reads": 336
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 1508,
+          "U_reads_max": 1801,
+          "prefix_reads": 336
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 1479,
+          "U_reads_max": 1776,
+          "prefix_reads": 336
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 2256,
+          "U_reads_max": 2358,
+          "prefix_reads": 154
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 2136,
+          "U_reads_max": 2261,
+          "prefix_reads": 154
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 2062,
+          "U_reads_max": 2194,
+          "prefix_reads": 154
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 2035,
+          "U_reads_max": 2175,
+          "prefix_reads": 154
+        }
+      }
+    },
+    {
+      "name": "stereo-128",
+      "trace_sha256": "831bde3e6e0c5c3c1e99ae2c99191caa262d652f6c4ff816843db34e5c048fbb",
+      "searches": 3272,
+      "linear": 11682,
+      "binary": 9594,
+      "trees": {
+        "4": {
+          "U_reads": 10099,
+          "heldout_U_reads": 5087,
+          "heldout_linear": 5903,
+          "fallback_searches": 970
+        },
+        "8": {
+          "U_reads": 9832,
+          "heldout_U_reads": 4947,
+          "heldout_linear": 5903,
+          "fallback_searches": 1867
+        },
+        "16": {
+          "U_reads": 10461,
+          "heldout_U_reads": 5293,
+          "heldout_linear": 5903,
+          "fallback_searches": 2656
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 4728,
+          "U_reads_max": 7261,
+          "prefix_reads": 3272
+        },
+        "1": {
+          "U_reads_min": 3723,
+          "U_reads_max": 6402,
+          "prefix_reads": 3272
+        },
+        "2": {
+          "U_reads_min": 3367,
+          "U_reads_max": 6055,
+          "prefix_reads": 3272
+        },
+        "3": {
+          "U_reads_min": 3280,
+          "U_reads_max": 5971,
+          "prefix_reads": 3272
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 7123,
+          "U_reads_max": 8310,
+          "prefix_reads": 1405
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 6365,
+          "U_reads_max": 7640,
+          "prefix_reads": 1405
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 6018,
+          "U_reads_max": 7308,
+          "prefix_reads": 1405
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 5931,
+          "U_reads_max": 7224,
+          "prefix_reads": 1405
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 9162,
+          "U_reads_max": 9701,
+          "prefix_reads": 616
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 8761,
+          "U_reads_max": 9308,
+          "prefix_reads": 616
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 8514,
+          "U_reads_max": 9072,
+          "prefix_reads": 616
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 8436,
+          "U_reads_max": 9006,
+          "prefix_reads": 616
+        }
+      }
+    },
+    {
+      "name": "stereo-192",
+      "trace_sha256": "667a3e553aeabd921184e2bb8125291fe230c9aaa757b862b52fde9b51bd7079",
+      "searches": 5205,
+      "linear": 24259,
+      "binary": 17587,
+      "trees": {
+        "4": {
+          "U_reads": 19688,
+          "heldout_U_reads": 9781,
+          "heldout_linear": 12049,
+          "fallback_searches": 1048
+        },
+        "8": {
+          "U_reads": 18633,
+          "heldout_U_reads": 9205,
+          "heldout_linear": 12049,
+          "fallback_searches": 2046
+        },
+        "16": {
+          "U_reads": 18928,
+          "heldout_U_reads": 9379,
+          "heldout_linear": 12049,
+          "fallback_searches": 3575
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 9297,
+          "U_reads_max": 13333,
+          "prefix_reads": 5205
+        },
+        "1": {
+          "U_reads_min": 6765,
+          "U_reads_max": 11067,
+          "prefix_reads": 5205
+        },
+        "2": {
+          "U_reads_min": 5629,
+          "U_reads_max": 10053,
+          "prefix_reads": 5205
+        },
+        "3": {
+          "U_reads_min": 5269,
+          "U_reads_max": 9682,
+          "prefix_reads": 5205
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 11885,
+          "U_reads_max": 14477,
+          "prefix_reads": 3159
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 9628,
+          "U_reads_max": 12445,
+          "prefix_reads": 3159
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 8511,
+          "U_reads_max": 11450,
+          "prefix_reads": 3159
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 8151,
+          "U_reads_max": 11079,
+          "prefix_reads": 3159
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 15975,
+          "U_reads_max": 17315,
+          "prefix_reads": 1630
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 14395,
+          "U_reads_max": 15854,
+          "prefix_reads": 1630
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 13509,
+          "U_reads_max": 15064,
+          "prefix_reads": 1630
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 13177,
+          "U_reads_max": 14717,
+          "prefix_reads": 1630
+        }
+      }
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "trace_sha256": "02e9c78c6c064265bd4a5818b49ff681d19201a2ec8a53f18ebb65fc611ee87f",
+      "searches": 4870,
+      "linear": 45485,
+      "binary": 20595,
+      "trees": {
+        "4": {
+          "U_reads": 39465,
+          "heldout_U_reads": 19412,
+          "heldout_linear": 22428,
+          "fallback_searches": 522
+        },
+        "8": {
+          "U_reads": 36489,
+          "heldout_U_reads": 17952,
+          "heldout_linear": 22428,
+          "fallback_searches": 1725
+        },
+        "16": {
+          "U_reads": 29982,
+          "heldout_U_reads": 14649,
+          "heldout_linear": 22428,
+          "fallback_searches": 2545
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 15943,
+          "U_reads_max": 19635,
+          "prefix_reads": 4870
+        },
+        "1": {
+          "U_reads_min": 10244,
+          "U_reads_max": 14321,
+          "prefix_reads": 4870
+        },
+        "2": {
+          "U_reads_min": 7161,
+          "U_reads_max": 11434,
+          "prefix_reads": 4870
+        },
+        "3": {
+          "U_reads_min": 5677,
+          "U_reads_max": 10001,
+          "prefix_reads": 4870
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 18465,
+          "U_reads_max": 20800,
+          "prefix_reads": 3145
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 13032,
+          "U_reads_max": 15716,
+          "prefix_reads": 3145
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 9956,
+          "U_reads_max": 12840,
+          "prefix_reads": 3145
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 8472,
+          "U_reads_max": 11407,
+          "prefix_reads": 3145
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 20447,
+          "U_reads_max": 22114,
+          "prefix_reads": 2325
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 15359,
+          "U_reads_max": 17316,
+          "prefix_reads": 2325
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 12373,
+          "U_reads_max": 14507,
+          "prefix_reads": 2325
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 10891,
+          "U_reads_max": 13079,
+          "prefix_reads": 2325
+        }
+      }
+    },
+    {
+      "name": "stereo-320-5ms",
+      "trace_sha256": "d7e2c7308b5d10ceeae4d51879092b95fd657c483681e2f3fd7d9017dfb44853",
+      "searches": 5153,
+      "linear": 53872,
+      "binary": 21774,
+      "trees": {
+        "4": {
+          "U_reads": 47474,
+          "heldout_U_reads": 23456,
+          "heldout_linear": 26590,
+          "fallback_searches": 524
+        },
+        "8": {
+          "U_reads": 44418,
+          "heldout_U_reads": 21903,
+          "heldout_linear": 26590,
+          "fallback_searches": 1848
+        },
+        "16": {
+          "U_reads": 37214,
+          "heldout_U_reads": 18379,
+          "heldout_linear": 26590,
+          "fallback_searches": 2827
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 18503,
+          "U_reads_max": 22851,
+          "prefix_reads": 5153
+        },
+        "1": {
+          "U_reads_min": 11468,
+          "U_reads_max": 16024,
+          "prefix_reads": 5153
+        },
+        "2": {
+          "U_reads_min": 7946,
+          "U_reads_max": 12556,
+          "prefix_reads": 5153
+        },
+        "3": {
+          "U_reads_min": 6129,
+          "U_reads_max": 10861,
+          "prefix_reads": 5153
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 21351,
+          "U_reads_max": 24247,
+          "prefix_reads": 3305
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 14634,
+          "U_reads_max": 17678,
+          "prefix_reads": 3305
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 11126,
+          "U_reads_max": 14218,
+          "prefix_reads": 3305
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 9309,
+          "U_reads_max": 12523,
+          "prefix_reads": 3305
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 23857,
+          "U_reads_max": 25885,
+          "prefix_reads": 2326
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 17540,
+          "U_reads_max": 19693,
+          "prefix_reads": 2326
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 14159,
+          "U_reads_max": 16356,
+          "prefix_reads": 2326
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 12357,
+          "U_reads_max": 14672,
+          "prefix_reads": 2326
+        }
+      }
+    },
+    {
+      "name": "stereo-320-10ms",
+      "trace_sha256": "03b3644b0f099976c3419e9f77f05a22e0bd28bc2a280922a1710cf023d9e39b",
+      "searches": 6845,
+      "linear": 63208,
+      "binary": 27369,
+      "trees": {
+        "4": {
+          "U_reads": 55032,
+          "heldout_U_reads": 27531,
+          "heldout_linear": 31601,
+          "fallback_searches": 975
+        },
+        "8": {
+          "U_reads": 51890,
+          "heldout_U_reads": 25945,
+          "heldout_linear": 31601,
+          "fallback_searches": 2547
+        },
+        "16": {
+          "U_reads": 45312,
+          "heldout_U_reads": 22724,
+          "heldout_linear": 31601,
+          "fallback_searches": 4005
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 21521,
+          "U_reads_max": 27236,
+          "prefix_reads": 6845
+        },
+        "1": {
+          "U_reads_min": 13616,
+          "U_reads_max": 19852,
+          "prefix_reads": 6845
+        },
+        "2": {
+          "U_reads_min": 9768,
+          "U_reads_max": 16016,
+          "prefix_reads": 6845
+        },
+        "3": {
+          "U_reads_min": 7890,
+          "U_reads_max": 14099,
+          "prefix_reads": 6845
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 25291,
+          "U_reads_max": 29081,
+          "prefix_reads": 4298
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 17815,
+          "U_reads_max": 21995,
+          "prefix_reads": 4298
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 13982,
+          "U_reads_max": 18170,
+          "prefix_reads": 4298
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 12104,
+          "U_reads_max": 16253,
+          "prefix_reads": 4298
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 29121,
+          "U_reads_max": 31674,
+          "prefix_reads": 2840
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 22297,
+          "U_reads_max": 25165,
+          "prefix_reads": 2840
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 18713,
+          "U_reads_max": 21546,
+          "prefix_reads": 2840
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 16855,
+          "U_reads_max": 19653,
+          "prefix_reads": 2840
+        }
+      }
+    },
+    {
+      "name": "stereo-320-20ms",
+      "trace_sha256": "f5ac5494bc8ce459f4c4d25e8818b3878b087c8154fb0f1651d98d53e8612d3a",
+      "searches": 6010,
+      "linear": 66093,
+      "binary": 25785,
+      "trees": {
+        "4": {
+          "U_reads": 58169,
+          "heldout_U_reads": 28777,
+          "heldout_linear": 32628,
+          "fallback_searches": 609
+        },
+        "8": {
+          "U_reads": 54621,
+          "heldout_U_reads": 27016,
+          "heldout_linear": 32628,
+          "fallback_searches": 1973
+        },
+        "16": {
+          "U_reads": 46373,
+          "heldout_U_reads": 22916,
+          "heldout_linear": 32628,
+          "fallback_searches": 3131
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 22242,
+          "U_reads_max": 27426,
+          "prefix_reads": 6010
+        },
+        "1": {
+          "U_reads_min": 13776,
+          "U_reads_max": 19225,
+          "prefix_reads": 6010
+        },
+        "2": {
+          "U_reads_min": 9282,
+          "U_reads_max": 14772,
+          "prefix_reads": 6010
+        },
+        "3": {
+          "U_reads_min": 7174,
+          "U_reads_max": 12724,
+          "prefix_reads": 6010
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 25178,
+          "U_reads_max": 28853,
+          "prefix_reads": 4037
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 17018,
+          "U_reads_max": 20901,
+          "prefix_reads": 4037
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 12535,
+          "U_reads_max": 16457,
+          "prefix_reads": 4037
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 10427,
+          "U_reads_max": 14409,
+          "prefix_reads": 4037
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 28172,
+          "U_reads_max": 30908,
+          "prefix_reads": 2879
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 20526,
+          "U_reads_max": 23375,
+          "prefix_reads": 2879
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 16201,
+          "U_reads_max": 19065,
+          "prefix_reads": 2879
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 14113,
+          "U_reads_max": 17035,
+          "prefix_reads": 2879
+        }
+      }
+    },
+    {
+      "name": "stereo-510",
+      "trace_sha256": "bd862e93765b8ff1b36df93aaf86106fb46cf548ac3964c667a05673860c63de",
+      "searches": 28607,
+      "linear": 377680,
+      "binary": 132249,
+      "trees": {
+        "4": {
+          "U_reads": 336787,
+          "heldout_U_reads": 167775,
+          "heldout_linear": 188033,
+          "fallback_searches": 2652
+        },
+        "8": {
+          "U_reads": 315354,
+          "heldout_U_reads": 157116,
+          "heldout_linear": 188033,
+          "fallback_searches": 9077
+        },
+        "16": {
+          "U_reads": 259819,
+          "heldout_U_reads": 129767,
+          "heldout_linear": 188033,
+          "fallback_searches": 13187
+        }
+      },
+      "prefix": {
+        "0": {
+          "U_reads_min": 128213,
+          "U_reads_max": 151180,
+          "prefix_reads": 28607
+        },
+        "1": {
+          "U_reads_min": 77311,
+          "U_reads_max": 103080,
+          "prefix_reads": 28607
+        },
+        "2": {
+          "U_reads_min": 51017,
+          "U_reads_max": 76847,
+          "prefix_reads": 28607
+        },
+        "3": {
+          "U_reads_min": 37180,
+          "U_reads_max": 63323,
+          "prefix_reads": 28607
+        }
+      },
+      "prefix_gated": {
+        "8:0": {
+          "gate": 8,
+          "bits": 0,
+          "U_reads_min": 141563,
+          "U_reads_max": 157526,
+          "prefix_reads": 19530
+        },
+        "8:1": {
+          "gate": 8,
+          "bits": 1,
+          "U_reads_min": 92215,
+          "U_reads_max": 110555,
+          "prefix_reads": 19530
+        },
+        "8:2": {
+          "gate": 8,
+          "bits": 2,
+          "U_reads_min": 65960,
+          "U_reads_max": 84373,
+          "prefix_reads": 19530
+        },
+        "8:3": {
+          "gate": 8,
+          "bits": 3,
+          "U_reads_min": 52123,
+          "U_reads_max": 70849,
+          "prefix_reads": 19530
+        },
+        "16:0": {
+          "gate": 16,
+          "bits": 0,
+          "U_reads_min": 151552,
+          "U_reads_max": 164115,
+          "prefix_reads": 15420
+        },
+        "16:1": {
+          "gate": 16,
+          "bits": 1,
+          "U_reads_min": 103913,
+          "U_reads_max": 118523,
+          "prefix_reads": 15420
+        },
+        "16:2": {
+          "gate": 16,
+          "bits": 2,
+          "U_reads_min": 78088,
+          "U_reads_max": 92747,
+          "prefix_reads": 15420
+        },
+        "16:3": {
+          "gate": 16,
+          "bits": 3,
+          "U_reads_min": 64271,
+          "U_reads_max": 79244,
+          "prefix_reads": 15420
+        }
+      }
+    }
+  ],
+  "prefix_storage": [
+    {
+      "bits": 0,
+      "rows": 11,
+      "entries": 352,
+      "packed_byte_flash_bytes": 352,
+      "direct_word_flash_bytes": 1408
+    },
+    {
+      "bits": 1,
+      "rows": 11,
+      "entries": 704,
+      "packed_byte_flash_bytes": 704,
+      "direct_word_flash_bytes": 2816
+    },
+    {
+      "bits": 2,
+      "rows": 11,
+      "entries": 1408,
+      "packed_byte_flash_bytes": 1408,
+      "direct_word_flash_bytes": 5632
+    },
+    {
+      "bits": 3,
+      "rows": 11,
+      "entries": 2816,
+      "packed_byte_flash_bytes": 2816,
+      "direct_word_flash_bytes": 11264
+    }
+  ]
+}
