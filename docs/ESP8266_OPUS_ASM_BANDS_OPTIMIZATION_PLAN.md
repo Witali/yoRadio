@@ -1615,7 +1615,10 @@ ASan/UBSan и3 регрессии PASS. Target ASM ещё не изменён: �
   101302 граничных комбинации реальных U-строк, три регрессии PASS.
   На192 дерево8:24259→18633 U-reads; prefix0/порог8:15044..17636
   чтений с metadata. Это не CPU и не прошивка; точный index в трассе не сохранён.
-- [ ] Статическое ASM-дерево8: без midpoint и RAM-узлов, сохранить p и ABI.
+- [x] [Статическое ASM-дерево8](ESP8266_OPUS_PVQ_TREE8.md): без midpoint и RAM-узлов,
+  p/ABI сохранены.303906 linked случаев,24 exact PCM/state/ASan/UBSan,
+  пять защитных тестов PASS. На192 инструкции поиска −11.81%, U-loads −23.19%.
+  Физический speed gate ещё не проверен; production не изменён.
 - [ ] Отдельный prefix0+NSAU при K-N>=8:352B packed или1408B word flash,
   не смешивать packing/layout и не повторять большую lookup без основания.
 - [ ] Linked инструкции, полный exact PCM/state и10A/10B/10A2 для кандидатов.

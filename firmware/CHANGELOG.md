@@ -3,6 +3,21 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-19: exact PVQ static tree8 ASM experiment
+
+- Separate `esp8266-opus-pvq-tree8-{control,candidate}-v1`,903216B.
+  Fixed-address static comparisons and short linear fallback; accepted
+  eBands-final parent, CPU160/runtime QIO40, raw RAM-input benchmark.
+- No new RAM/stack/table, same48B decode_pulses frame. Audited decoder-only
+  helper storage, all other ELF bytes unchanged. C fallback untouched.
+- 303906 linked interval cases and24 exact host PCM/state/sanitizer cases;
+  five negative/positive regressions PASS. No bitrate restriction.
+- Candidate SHA256: `4a0d2cc23420428aff7c14db443e75d331e852a132da605259707715763f0984`.
+- At192kb/s recorded search instructions −11.81%, U reads −23.19%.
+  These are counts, not CPU timing. Physical10A/10B/10A2 pending;
+  no production promotion or75% CPU/live qualification.
+- [Details](../docs/ESP8266_OPUS_PVQ_TREE8.md).
+
 ## Development - 2026-09-19: exact PVQ binary search ASM (rejected)
 
 - Separate `esp8266-opus-pvq-binary-{control,candidate}-v1`,903216B,
