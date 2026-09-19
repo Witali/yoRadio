@@ -1,0 +1,898 @@
+{
+  "schema": 1,
+  "recipe_sha256_lf": "e8bfdb4e2bad19892d7efb608676e86762baa911aa21969c0312f4f709eebbb7",
+  "table_sha256": "a708167506ee9b9ddff5e6a5b7867aac3812331cf40433cc92787496f36ab53a",
+  "unit": {
+    "cases": 570828,
+    "word_table_bytes": 1024,
+    "formula": "U(3,k)=2*k*k-2*k+1",
+    "scope": "All N=3 stored answer intervals, both sides of every64-index boundary, including domain fallback. Exact rank model, not a firmware or full-decoder timing test."
+  },
+  "scope": "Next hypothesis only: keep initial U(K) fast return, specialize N=3; k-1 is a proved upper bound after failed initial probe. Fixed1024B word table, shift6/domain16384 or shift8/domain65536; no bitrate cap, ordinary search outside domain. Includes two metadata loads. No instruction/CPU/RAM-growth claim for an unbuilt ASM implementation.",
+  "cases": [
+    {
+      "name": "mono-12",
+      "trace_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "linear_reads": 0,
+      "byN": [],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 0,
+          "max_reads": 0,
+          "helper_calls": 0,
+          "min_metadata_reads": 0,
+          "max_metadata_reads": 0
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 0,
+          "max_reads": 0,
+          "helper_calls": 0,
+          "min_metadata_reads": 0,
+          "max_metadata_reads": 0
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 0,
+          "max_reads": 0,
+          "helper_calls": 0,
+          "min_metadata_reads": 0,
+          "max_metadata_reads": 0
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 0,
+          "max_reads": 0,
+          "helper_calls": 0,
+          "min_metadata_reads": 0,
+          "max_metadata_reads": 0
+        }
+      ]
+    },
+    {
+      "name": "mono-24",
+      "trace_sha256": "f832306f7188a42e4074b4e9e10902580dedbbd5e39618d7564016b323da0c93",
+      "linear_reads": 124,
+      "byN": [
+        {
+          "n": 3,
+          "count": 8,
+          "linear_reads": 61
+        },
+        {
+          "n": 4,
+          "count": 10,
+          "linear_reads": 23
+        },
+        {
+          "n": 5,
+          "count": 8,
+          "linear_reads": 25
+        },
+        {
+          "n": 6,
+          "count": 9,
+          "linear_reads": 15
+        }
+      ],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 95,
+          "max_reads": 104,
+          "helper_calls": 8,
+          "min_metadata_reads": 16,
+          "max_metadata_reads": 16
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 101,
+          "max_reads": 106,
+          "helper_calls": 6,
+          "min_metadata_reads": 12,
+          "max_metadata_reads": 12
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 103,
+          "max_reads": 109,
+          "helper_calls": 8,
+          "min_metadata_reads": 16,
+          "max_metadata_reads": 16
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 103,
+          "max_reads": 109,
+          "helper_calls": 6,
+          "min_metadata_reads": 12,
+          "max_metadata_reads": 12
+        }
+      ]
+    },
+    {
+      "name": "stereo-64",
+      "trace_sha256": "20ac83e48f9bf41cb548a00e0944c596e963e1bed3dc54fa6b8c2c82b426d3ba",
+      "linear_reads": 2803,
+      "byN": [
+        {
+          "n": 3,
+          "count": 152,
+          "linear_reads": 656
+        },
+        {
+          "n": 4,
+          "count": 157,
+          "linear_reads": 477
+        },
+        {
+          "n": 5,
+          "count": 140,
+          "linear_reads": 438
+        },
+        {
+          "n": 6,
+          "count": 145,
+          "linear_reads": 426
+        },
+        {
+          "n": 7,
+          "count": 119,
+          "linear_reads": 354
+        },
+        {
+          "n": 8,
+          "count": 121,
+          "linear_reads": 443
+        },
+        {
+          "n": 9,
+          "count": 2,
+          "linear_reads": 3
+        },
+        {
+          "n": 10,
+          "count": 2,
+          "linear_reads": 2
+        },
+        {
+          "n": 11,
+          "count": 2,
+          "linear_reads": 3
+        },
+        {
+          "n": 12,
+          "count": 1,
+          "linear_reads": 1
+        }
+      ],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 2606,
+          "max_reads": 2638,
+          "helper_calls": 40,
+          "min_metadata_reads": 80,
+          "max_metadata_reads": 80
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 2637,
+          "max_reads": 2660,
+          "helper_calls": 21,
+          "min_metadata_reads": 42,
+          "max_metadata_reads": 42
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 2659,
+          "max_reads": 2690,
+          "helper_calls": 40,
+          "min_metadata_reads": 80,
+          "max_metadata_reads": 80
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 2647,
+          "max_reads": 2676,
+          "helper_calls": 21,
+          "min_metadata_reads": 42,
+          "max_metadata_reads": 42
+        }
+      ]
+    },
+    {
+      "name": "stereo-128",
+      "trace_sha256": "831bde3e6e0c5c3c1e99ae2c99191caa262d652f6c4ff816843db34e5c048fbb",
+      "linear_reads": 11682,
+      "byN": [
+        {
+          "n": 3,
+          "count": 580,
+          "linear_reads": 2464
+        },
+        {
+          "n": 4,
+          "count": 642,
+          "linear_reads": 2601
+        },
+        {
+          "n": 5,
+          "count": 549,
+          "linear_reads": 1768
+        },
+        {
+          "n": 6,
+          "count": 559,
+          "linear_reads": 1831
+        },
+        {
+          "n": 7,
+          "count": 412,
+          "linear_reads": 1388
+        },
+        {
+          "n": 8,
+          "count": 429,
+          "linear_reads": 1432
+        },
+        {
+          "n": 9,
+          "count": 26,
+          "linear_reads": 63
+        },
+        {
+          "n": 10,
+          "count": 24,
+          "linear_reads": 43
+        },
+        {
+          "n": 11,
+          "count": 25,
+          "linear_reads": 47
+        },
+        {
+          "n": 12,
+          "count": 26,
+          "linear_reads": 45
+        }
+      ],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 11038,
+          "max_reads": 11193,
+          "helper_calls": 189,
+          "min_metadata_reads": 376,
+          "max_metadata_reads": 376
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 11106,
+          "max_reads": 11203,
+          "helper_calls": 115,
+          "min_metadata_reads": 228,
+          "max_metadata_reads": 228
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 11317,
+          "max_reads": 11404,
+          "helper_calls": 189,
+          "min_metadata_reads": 378,
+          "max_metadata_reads": 378
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 11249,
+          "max_reads": 11316,
+          "helper_calls": 115,
+          "min_metadata_reads": 230,
+          "max_metadata_reads": 230
+        }
+      ]
+    },
+    {
+      "name": "stereo-192",
+      "trace_sha256": "667a3e553aeabd921184e2bb8125291fe230c9aaa757b862b52fde9b51bd7079",
+      "linear_reads": 24259,
+      "byN": [
+        {
+          "n": 3,
+          "count": 1128,
+          "linear_reads": 7030
+        },
+        {
+          "n": 4,
+          "count": 1192,
+          "linear_reads": 7003
+        },
+        {
+          "n": 5,
+          "count": 737,
+          "linear_reads": 2928
+        },
+        {
+          "n": 6,
+          "count": 748,
+          "linear_reads": 2990
+        },
+        {
+          "n": 7,
+          "count": 528,
+          "linear_reads": 1735
+        },
+        {
+          "n": 8,
+          "count": 533,
+          "linear_reads": 1728
+        },
+        {
+          "n": 9,
+          "count": 229,
+          "linear_reads": 662
+        },
+        {
+          "n": 10,
+          "count": 50,
+          "linear_reads": 91
+        },
+        {
+          "n": 11,
+          "count": 41,
+          "linear_reads": 58
+        },
+        {
+          "n": 12,
+          "count": 19,
+          "linear_reads": 34
+        }
+      ],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 21333,
+          "max_reads": 21867,
+          "helper_calls": 623,
+          "min_metadata_reads": 1246,
+          "max_metadata_reads": 1246
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 21479,
+          "max_reads": 21913,
+          "helper_calls": 471,
+          "min_metadata_reads": 942,
+          "max_metadata_reads": 942
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 22266,
+          "max_reads": 22619,
+          "helper_calls": 623,
+          "min_metadata_reads": 1246,
+          "max_metadata_reads": 1246
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 22119,
+          "max_reads": 22451,
+          "helper_calls": 471,
+          "min_metadata_reads": 942,
+          "max_metadata_reads": 942
+        }
+      ]
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "trace_sha256": "02e9c78c6c064265bd4a5818b49ff681d19201a2ec8a53f18ebb65fc611ee87f",
+      "linear_reads": 45485,
+      "byN": [
+        {
+          "n": 3,
+          "count": 1184,
+          "linear_reads": 19408
+        },
+        {
+          "n": 4,
+          "count": 945,
+          "linear_reads": 12507
+        },
+        {
+          "n": 5,
+          "count": 604,
+          "linear_reads": 4412
+        },
+        {
+          "n": 6,
+          "count": 620,
+          "linear_reads": 4514
+        },
+        {
+          "n": 7,
+          "count": 373,
+          "linear_reads": 1148
+        },
+        {
+          "n": 8,
+          "count": 377,
+          "linear_reads": 1225
+        },
+        {
+          "n": 9,
+          "count": 384,
+          "linear_reads": 1230
+        },
+        {
+          "n": 10,
+          "count": 191,
+          "linear_reads": 506
+        },
+        {
+          "n": 11,
+          "count": 192,
+          "linear_reads": 535
+        }
+      ],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 30869,
+          "max_reads": 31714,
+          "helper_calls": 905,
+          "min_metadata_reads": 1744,
+          "max_metadata_reads": 1748
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 30907,
+          "max_reads": 31718,
+          "helper_calls": 856,
+          "min_metadata_reads": 1646,
+          "max_metadata_reads": 1650
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 31183,
+          "max_reads": 31923,
+          "helper_calls": 905,
+          "min_metadata_reads": 1810,
+          "max_metadata_reads": 1810
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 31129,
+          "max_reads": 31862,
+          "helper_calls": 856,
+          "min_metadata_reads": 1712,
+          "max_metadata_reads": 1712
+        }
+      ]
+    },
+    {
+      "name": "stereo-320-5ms",
+      "trace_sha256": "d7e2c7308b5d10ceeae4d51879092b95fd657c483681e2f3fd7d9017dfb44853",
+      "linear_reads": 53872,
+      "byN": [
+        {
+          "n": 3,
+          "count": 1396,
+          "linear_reads": 26108
+        },
+        {
+          "n": 4,
+          "count": 1072,
+          "linear_reads": 14325
+        },
+        {
+          "n": 5,
+          "count": 559,
+          "linear_reads": 4436
+        },
+        {
+          "n": 6,
+          "count": 578,
+          "linear_reads": 4229
+        },
+        {
+          "n": 7,
+          "count": 383,
+          "linear_reads": 1200
+        },
+        {
+          "n": 8,
+          "count": 387,
+          "linear_reads": 1250
+        },
+        {
+          "n": 9,
+          "count": 388,
+          "linear_reads": 1262
+        },
+        {
+          "n": 10,
+          "count": 194,
+          "linear_reads": 525
+        },
+        {
+          "n": 11,
+          "count": 196,
+          "linear_reads": 537
+        }
+      ],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 34700,
+          "max_reads": 35787,
+          "helper_calls": 1037,
+          "min_metadata_reads": 1840,
+          "max_metadata_reads": 1854
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 34784,
+          "max_reads": 35812,
+          "helper_calls": 953,
+          "min_metadata_reads": 1672,
+          "max_metadata_reads": 1686
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 33716,
+          "max_reads": 34593,
+          "helper_calls": 1037,
+          "min_metadata_reads": 2074,
+          "max_metadata_reads": 2074
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 33636,
+          "max_reads": 34496,
+          "helper_calls": 953,
+          "min_metadata_reads": 1906,
+          "max_metadata_reads": 1906
+        }
+      ]
+    },
+    {
+      "name": "stereo-320-10ms",
+      "trace_sha256": "03b3644b0f099976c3419e9f77f05a22e0bd28bc2a280922a1710cf023d9e39b",
+      "linear_reads": 63208,
+      "byN": [
+        {
+          "n": 3,
+          "count": 1794,
+          "linear_reads": 29651
+        },
+        {
+          "n": 4,
+          "count": 1548,
+          "linear_reads": 17722
+        },
+        {
+          "n": 5,
+          "count": 792,
+          "linear_reads": 4790
+        },
+        {
+          "n": 6,
+          "count": 820,
+          "linear_reads": 4910
+        },
+        {
+          "n": 7,
+          "count": 526,
+          "linear_reads": 1760
+        },
+        {
+          "n": 8,
+          "count": 538,
+          "linear_reads": 1957
+        },
+        {
+          "n": 9,
+          "count": 425,
+          "linear_reads": 1338
+        },
+        {
+          "n": 10,
+          "count": 200,
+          "linear_reads": 529
+        },
+        {
+          "n": 11,
+          "count": 202,
+          "linear_reads": 551
+        }
+      ],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 42699,
+          "max_reads": 43792,
+          "helper_calls": 1229,
+          "min_metadata_reads": 2132,
+          "max_metadata_reads": 2140
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 42762,
+          "max_reads": 43780,
+          "helper_calls": 1116,
+          "min_metadata_reads": 1906,
+          "max_metadata_reads": 1914
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 41160,
+          "max_reads": 42198,
+          "helper_calls": 1229,
+          "min_metadata_reads": 2458,
+          "max_metadata_reads": 2458
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 41040,
+          "max_reads": 42062,
+          "helper_calls": 1116,
+          "min_metadata_reads": 2232,
+          "max_metadata_reads": 2232
+        }
+      ]
+    },
+    {
+      "name": "stereo-320-20ms",
+      "trace_sha256": "f5ac5494bc8ce459f4c4d25e8818b3878b087c8154fb0f1651d98d53e8612d3a",
+      "linear_reads": 66093,
+      "byN": [
+        {
+          "n": 3,
+          "count": 1641,
+          "linear_reads": 33754
+        },
+        {
+          "n": 4,
+          "count": 1294,
+          "linear_reads": 17294
+        },
+        {
+          "n": 5,
+          "count": 647,
+          "linear_reads": 4536
+        },
+        {
+          "n": 6,
+          "count": 677,
+          "linear_reads": 4710
+        },
+        {
+          "n": 7,
+          "count": 476,
+          "linear_reads": 1605
+        },
+        {
+          "n": 8,
+          "count": 489,
+          "linear_reads": 1804
+        },
+        {
+          "n": 9,
+          "count": 392,
+          "linear_reads": 1320
+        },
+        {
+          "n": 10,
+          "count": 197,
+          "linear_reads": 550
+        },
+        {
+          "n": 11,
+          "count": 197,
+          "linear_reads": 520
+        }
+      ],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 41521,
+          "max_reads": 42832,
+          "helper_calls": 1254,
+          "min_metadata_reads": 2104,
+          "max_metadata_reads": 2130
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 41601,
+          "max_reads": 42845,
+          "helper_calls": 1167,
+          "min_metadata_reads": 1930,
+          "max_metadata_reads": 1956
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 39396,
+          "max_reads": 40431,
+          "helper_calls": 1254,
+          "min_metadata_reads": 2508,
+          "max_metadata_reads": 2508
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 39312,
+          "max_reads": 40322,
+          "helper_calls": 1167,
+          "min_metadata_reads": 2334,
+          "max_metadata_reads": 2334
+        }
+      ]
+    },
+    {
+      "name": "stereo-510",
+      "trace_sha256": "bd862e93765b8ff1b36df93aaf86106fb46cf548ac3964c667a05673860c63de",
+      "linear_reads": 377680,
+      "byN": [
+        {
+          "n": 3,
+          "count": 7419,
+          "linear_reads": 186217
+        },
+        {
+          "n": 4,
+          "count": 5576,
+          "linear_reads": 96015
+        },
+        {
+          "n": 5,
+          "count": 3770,
+          "linear_reads": 35891
+        },
+        {
+          "n": 6,
+          "count": 3849,
+          "linear_reads": 34670
+        },
+        {
+          "n": 7,
+          "count": 1967,
+          "linear_reads": 6386
+        },
+        {
+          "n": 8,
+          "count": 1987,
+          "linear_reads": 6471
+        },
+        {
+          "n": 9,
+          "count": 2015,
+          "linear_reads": 6660
+        },
+        {
+          "n": 10,
+          "count": 1008,
+          "linear_reads": 2653
+        },
+        {
+          "n": 11,
+          "count": 1016,
+          "linear_reads": 2717
+        }
+      ],
+      "variants": [
+        {
+          "shift": 6,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 237190,
+          "max_reads": 243177,
+          "helper_calls": 5996,
+          "min_metadata_reads": 9608,
+          "max_metadata_reads": 9708
+        },
+        {
+          "shift": 6,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 237335,
+          "max_reads": 243195,
+          "helper_calls": 5818,
+          "min_metadata_reads": 9252,
+          "max_metadata_reads": 9352
+        },
+        {
+          "shift": 8,
+          "gate": 12,
+          "flash_word_bytes": 1024,
+          "min_reads": 221985,
+          "max_reads": 227394,
+          "helper_calls": 5996,
+          "min_metadata_reads": 11992,
+          "max_metadata_reads": 11992
+        },
+        {
+          "shift": 8,
+          "gate": 16,
+          "flash_word_bytes": 1024,
+          "min_reads": 221793,
+          "max_reads": 227180,
+          "helper_calls": 5818,
+          "min_metadata_reads": 11636,
+          "max_metadata_reads": 11636
+        }
+      ]
+    }
+  ]
+}
