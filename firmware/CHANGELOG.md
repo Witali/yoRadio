@@ -3,7 +3,7 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
-## Development - 2026-09-19: packed PVQ prefix0 ASM experiment
+## Development - 2026-09-19: packed PVQ prefix0 ASM (rejected)
 
 - Separate `esp8266-opus-pvq-prefix0-{control,candidate}-v1`,903216B.
   CPU160/runtime QIO40 raw RAM-input benchmark over accepted eBands-final.
@@ -14,8 +14,12 @@ entries are retained; changes are published under a new firmware version.
 - 337686 linked interval/CLZ-boundary checks plus256 SAR-phase checks,
   24 exact host PCM/state/sanitizer cases and seven regressions PASS.
 - Candidate SHA256: `35444571d8e3d0a16daaf372371203c7766646ddc0ed03648e460123cd74470e`.
-- Reads decrease but instruction bounds increase at128/192. Physical10A/10B/10A2
-  pending; no speed claim, production promotion or75% CPU/live qualification.
+- Reads decrease but instruction bounds increase at128/192. Fresh10A/10B/10A2:
+  CPU19277.883438/79.582521/77.878250%; CPU12870.439167/71.808438/70.366167%.
+  Both speed gates FAIL; rejected. All30 attempts retained with exact target PCM.
+- MinDRAM888/1576/6644B, stack-free1660B; max192 call20475/19955/20362us.
+  No observation/decoder errors. Ordinary main restored OTA; HTTP/WS/playlist checked.
+  Combined33 regressions PASS. No production promotion or75% CPU/live qualification.
 - [Details and invariant-hoisting hypotheses](../docs/ESP8266_OPUS_PVQ_PREFIX0.md).
 
 ## Development - 2026-09-19: exact PVQ static tree8 ASM (rejected)

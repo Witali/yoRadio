@@ -15,6 +15,7 @@ function analyze(){
    const bytes=fs.readFileSync(path.join(dir,c.name+'.jsonl'));assert.equal(hash(bytes),c.trace_sha256);
    const rows=bytes.toString().trim().split(/\r?\n/).filter(Boolean).map(JSON.parse);
    const sums={old_instructions:0,min_instructions:0,max_instructions:0,old_U_reads:0,min_U_reads:0,max_U_reads:0,literal_reads:0,prefix_word_reads:0,helper_calls:0,short_linear:0};
+   const longGuard={hypothetical:true,condition:'K-N>=8 && index<U(N,K-4)',prefix_calls:0,extra_U_reads:0};
    for(const[n,k,t]of rows){
      const row=p.table.rows.find(r=>r.n===n),lo=row.values[t-n],hi=row.values[t+1-n]-1;
      const memory=new Map([...extra,...row.values.slice(0,k-n+1).map((v,i)=>[row.address+4*(n+i),v])]);
@@ -33,10 +34,14 @@ function analyze(){
      }
      sums.min_instructions+=Math.min(...observations.map(x=>x.steps));sums.max_instructions+=Math.max(...observations.map(x=>x.steps));
      sums.min_U_reads+=Math.min(...observations.map(x=>x.U_reads));sums.max_U_reads+=Math.max(...observations.map(x=>x.U_reads));
-     if(k-n>=8){sums.literal_reads++;sums.prefix_word_reads++;sums.helper_calls++;}else sums.short_linear++;
+     if(k-n>=8){
+       sums.literal_reads++;sums.prefix_word_reads++;sums.helper_calls++;
+       const bound=row.values[k-4-n];assert.equal(lo<bound,k-t>=5);assert.equal(hi<bound,k-t>=5);
+       longGuard.extra_U_reads++;if(k-t>=5)longGuard.prefix_calls++;
+     }else sums.short_linear++;
    }
    assert.equal(rows.length,c.counts.rows);assert.equal(sums.old_U_reads,c.counts.table_probes.linear);
-   result.cases.push({name:c.name,searches:rows.length,...sums,
+   result.cases.push({name:c.name,searches:rows.length,...sums,hypothetical_long_guard:longGuard,
      min_total_reads:sums.min_U_reads+sums.literal_reads+sums.prefix_word_reads,
      max_total_reads:sums.max_U_reads+sums.literal_reads+sums.prefix_word_reads});
  }

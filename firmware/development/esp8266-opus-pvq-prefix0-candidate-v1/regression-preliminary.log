@@ -1,0 +1,134 @@
+TAP version 13
+# Subtest: accepts smaller low-bitrate regressions when high-bitrate gains dominate
+ok 1 - accepts smaller low-bitrate regressions when high-bitrate gains dominate
+  ---
+  duration_ms: 1.4384
+  type: 'test'
+  ...
+# Subtest: rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+ok 2 - rejects high-bitrate slowdown, dominant low-bitrate loss and realtime budget failure
+  ---
+  duration_ms: 1.0522
+  type: 'test'
+  ...
+# Subtest: current 75% raw CPU target uses an inclusive, unrounded median threshold
+ok 3 - current 75% raw CPU target uses an inclusive, unrounded median threshold
+  ---
+  duration_ms: 1.152
+  type: 'test'
+  ...
+# Subtest: raw target rejects missing, ambiguous and invalid evidence or thresholds
+ok 4 - raw target rejects missing, ambiguous and invalid evidence or thresholds
+  ---
+  duration_ms: 1.5864
+  type: 'test'
+  ...
+# Subtest: active CPU target is independent of historical 70% field and relative-speed acceptance
+ok 5 - active CPU target is independent of historical 70% field and relative-speed acceptance
+  ---
+  duration_ms: 0.3363
+  type: 'test'
+  ...
+# ┌─────────┬────────────────────┬────────┬────────┬────────┬────────┬────────┬────────────┬────────────┬────────────┬────────────┐
+# │ (index) │ name               │ linear │ binary │ tree4  │ tree8  │ tree16 │ prefix0min │ prefix0max │ prefix2min │ prefix2max │
+# ├─────────┼────────────────────┼────────┼────────┼────────┼────────┼────────┼────────────┼────────────┼────────────┼────────────┤
+# │ 0       │ 'mono-12'          │ 0      │ 0      │ 0      │ 0      │ 0      │ 0          │ 0          │ 0          │ 0          │
+# │ 1       │ 'mono-24'          │ 124    │ 154    │ 115    │ 112    │ 118    │ 121        │ 130        │ 74         │ 105        │
+# │ 2       │ 'stereo-64'        │ 2803   │ 2379   │ 2471   │ 2390   │ 2511   │ 2068       │ 2657       │ 1721       │ 2373       │
+# │ 3       │ 'stereo-128'       │ 11682  │ 9594   │ 10099  │ 9832   │ 10461  │ 8000       │ 10533      │ 6639       │ 9327       │
+# │ 4       │ 'stereo-192'       │ 24259  │ 17587  │ 19688  │ 18633  │ 18928  │ 14502      │ 18538      │ 10834      │ 15258      │
+# │ 5       │ 'stereo-320-2.5ms' │ 45485  │ 20595  │ 39465  │ 36489  │ 29982  │ 20813      │ 24505      │ 12031      │ 16304      │
+# │ 6       │ 'stereo-320-5ms'   │ 53872  │ 21774  │ 47474  │ 44418  │ 37214  │ 23656      │ 28004      │ 13099      │ 17709      │
+# │ 7       │ 'stereo-320-10ms'  │ 63208  │ 27369  │ 55032  │ 51890  │ 45312  │ 28366      │ 34081      │ 16613      │ 22861      │
+# │ 8       │ 'stereo-320-20ms'  │ 66093  │ 25785  │ 58169  │ 54621  │ 46373  │ 28252      │ 33436      │ 15292      │ 20782      │
+# │ 9       │ 'stereo-510'       │ 377680 │ 132249 │ 336787 │ 315354 │ 259819 │ 156820     │ 179787     │ 79624      │ 105454     │
+# └─────────┴────────────────────┴────────┴────────┴────────┴────────┴────────┴────────────┴────────────┴────────────┴────────────┘
+# Subtest: alphabetic tree preserves ordered leaves and favours frequent results
+ok 6 - alphabetic tree preserves ordered leaves and favours frequent results
+  ---
+  duration_ms: 2.3502
+  type: 'test'
+  ...
+# Subtest: all real U intervals pass tree/prefix verification without limiting bitrate
+ok 7 - all real U intervals pass tree/prefix verification without limiting bitrate
+  ---
+  duration_ms: 260.0637
+  type: 'test'
+  ...
+# Subtest: search census is reproducible and includes metadata reads and high bitrates
+ok 8 - search census is reproducible and includes metadata reads and high bitrates
+  ---
+  duration_ms: 639.1723
+  type: 'test'
+  ...
+# Subtest: linked packed prefix search matches every U-row interval without RAM or stack growth
+ok 9 - linked packed prefix search matches every U-row interval without RAM or stack growth
+  ---
+  duration_ms: 10688.9806
+  type: 'test'
+  ...
+# Subtest: real flash table monotonicity, pointers and final diagonal are checked
+ok 10 - real flash table monotonicity, pointers and final diagonal are checked
+  ---
+  duration_ms: 181.6376
+  type: 'test'
+  ...
+# Subtest: branch, extraction, word width and SAR restoration mutations are rejected
+ok 11 - branch, extraction, word width and SAR restoration mutations are rejected
+  ---
+  duration_ms: 29.4764
+  type: 'test'
+  ...
+# Subtest: decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+ok 12 - decoder-dead storage contract is revalidated; all other ELF bytes stay exact
+  ---
+  duration_ms: 3876.5701
+  type: 'test'
+  ...
+# Subtest: host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+ok 13 - host semantic mirror passes24 exact PCM/state/sanitizer cases without bitrate cap
+  ---
+  duration_ms: 5.4199
+  type: 'test'
+  ...
+# Subtest: packed bounds are exact flash bytes; pointer and byte mutations fail closed
+ok 14 - packed bounds are exact flash bytes; pointer and byte mutations fail closed
+  ---
+  duration_ms: 158.1452
+  type: 'test'
+  ...
+# Subtest: full encoder storage is unreachable and has no address-taken references
+ok 15 - full encoder storage is unreachable and has no address-taken references
+  ---
+  duration_ms: 3839.6053
+  type: 'test'
+  ...
+# Subtest: short stream changes only final EOS/checksum, preserving Opus packets and granules
+ok 16 - short stream changes only final EOS/checksum, preserving Opus packets and granules
+  ---
+  duration_ms: 109.5503
+  type: 'test'
+  ...
+# Subtest: ten finite valid streams alternate with ten well-framed 503s, then full stream
+ok 17 - ten finite valid streams alternate with ten well-framed 503s, then full stream
+  ---
+  duration_ms: 177.4355
+  type: 'test'
+  ...
+# Subtest: actual audio task keeps Opus on reconnect with bounded cold fallback and cancellation
+ok 18 - actual audio task keeps Opus on reconnect with bounded cold fallback and cancellation
+  ---
+  duration_ms: 6045.136
+  type: 'test'
+  ...
+# cancelled stream detection preserves cached decoder identity PASS\\nactual reconnect control-flow PASS: Opus=0, 45 paired allocations/frees
+# cancelled stream detection preserves cached decoder identity PASS\\nactual reconnect control-flow PASS: Opus=1, 36 paired allocations/frees
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18971.5767

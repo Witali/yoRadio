@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "recipe_sha256_lf": "c901f9f5d50d22ea7c7b3e4935252cf89ac61cc610dc84c0404f3444a60a0655",
+  "recipe_sha256_lf": "50302e20782f397fad8bafcf6189e47a27f727da1334ff304f4bbbb5389280f5",
   "candidate_elf_sha256": "7989b625a50fc6cc79d2e92ce1d1b3a1cdbe24877d36115bafa030049d8e6e9b",
   "scope": "Instruction and load min/max over all residual indices consistent with each recorded answer. Includes pointer-literal and packed-prefix word loads separately. Not cycles/cache timing; actual residual indices are not in these traces.",
   "cases": [
@@ -17,6 +17,12 @@
       "prefix_word_reads": 0,
       "helper_calls": 0,
       "short_linear": 0,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 0,
+        "extra_U_reads": 0
+      },
       "min_total_reads": 0,
       "max_total_reads": 0
     },
@@ -33,6 +39,12 @@
       "prefix_word_reads": 32,
       "helper_calls": 32,
       "short_linear": 3,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 6,
+        "extra_U_reads": 32
+      },
       "min_total_reads": 150,
       "max_total_reads": 159
     },
@@ -49,6 +61,12 @@
       "prefix_word_reads": 336,
       "helper_calls": 336,
       "short_linear": 505,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 116,
+        "extra_U_reads": 336
+      },
       "min_total_reads": 2462,
       "max_total_reads": 2714
     },
@@ -65,6 +83,12 @@
       "prefix_word_reads": 1405,
       "helper_calls": 1405,
       "short_linear": 1867,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 459,
+        "extra_U_reads": 1405
+      },
       "min_total_reads": 9933,
       "max_total_reads": 11120
     },
@@ -81,6 +105,12 @@
       "prefix_word_reads": 3159,
       "helper_calls": 3159,
       "short_linear": 2046,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 1306,
+        "extra_U_reads": 3159
+      },
       "min_total_reads": 18203,
       "max_total_reads": 20795
     },
@@ -97,6 +127,12 @@
       "prefix_word_reads": 3145,
       "helper_calls": 3145,
       "short_linear": 1725,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 1937,
+        "extra_U_reads": 3145
+      },
       "min_total_reads": 24755,
       "max_total_reads": 27090
     },
@@ -113,6 +149,12 @@
       "prefix_word_reads": 3305,
       "helper_calls": 3305,
       "short_linear": 1848,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 2030,
+        "extra_U_reads": 3305
+      },
       "min_total_reads": 27961,
       "max_total_reads": 30857
     },
@@ -129,6 +171,12 @@
       "prefix_word_reads": 4298,
       "helper_calls": 4298,
       "short_linear": 2547,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 2453,
+        "extra_U_reads": 4298
+      },
       "min_total_reads": 33887,
       "max_total_reads": 37677
     },
@@ -145,6 +193,12 @@
       "prefix_word_reads": 4037,
       "helper_calls": 4037,
       "short_linear": 1973,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 2431,
+        "extra_U_reads": 4037
+      },
       "min_total_reads": 33252,
       "max_total_reads": 36927
     },
@@ -161,6 +215,12 @@
       "prefix_word_reads": 19530,
       "helper_calls": 19530,
       "short_linear": 9077,
+      "hypothetical_long_guard": {
+        "hypothetical": true,
+        "condition": "K-N>=8 && index<U(N,K-4)",
+        "prefix_calls": 13086,
+        "extra_U_reads": 19530
+      },
       "min_total_reads": 180623,
       "max_total_reads": 196586
     }
