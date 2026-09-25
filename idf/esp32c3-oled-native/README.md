@@ -63,6 +63,17 @@ Short clicks between timer wakes can be missed. A synchronized clock is
 required; setup/AP, playing and Blank modes stay awake.
 See [build instructions, limitations and tests](../../docs/ESP32C3_DEEP_SLEEP_CLOCK.md).
 
+### Optional external RTC crystal
+
+Use `-Rtc32kCrystal` in the root, native or production build script to select
+an external passive 32.768 kHz crystal on GPIO0 (XTAL_32K_P) and GPIO1
+(XTAL_32K_N). Combine it with `-DeepSleepClock` for the sleeping clock.
+The switch selects 3000 calibration cycles and separate build/firmware paths.
+Without it, the scripts select the internal RC source and 1024 cycles, including
+when reusing an existing sdkconfig. ESP-IDF falls back to RC if the crystal
+fails to start. Builds reject encoder or LED assignments to the crystal pins.
+See [wiring, commands and validation](../../docs/ESP32C3_RTC_32K_CRYSTAL.md).
+
 ### Optional rotary encoder
 
 An EC11/KY-040 encoder can be enabled with the supplied

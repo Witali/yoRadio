@@ -165,6 +165,18 @@ static void test_elapsed_time(void) {
     }
     assert(clock.fractional_us == (ticks * clock.calibration) % (1U << 19));
 }
+static void test_32k_half_seconds(void) {
+    // ESP-IDF calibration is microseconds per tick in Q19: exactly 16000000
+    // at 32768 Hz. Half a second is 16384 ticks, independent of the RC rate.
+    rtc_clock_state_t clock = {.calibration = 16000000};
+    for (uint64_t half_second = 1; half_second <= 345600; ++half_second) {
+        rtc_clock_advance(&clock, half_second * 16384);
+        assert(clock.second_of_day == (half_second / 2) % 86400);
+        assert(clock.microsecond == (half_second % 2) * 500000);
+        assert(clock.fractional_us == 0);
+        assert(rtc_clock_next_tick_us(&clock) == 500000);
+    }
+}
 int main(void) {
     test_colon();
     test_minute(12 * 3600 + 34 * 60 + 59, 12 * 60 + 35);
@@ -172,5 +184,6 @@ int main(void) {
     test_minute(86399, 0);
     test_recovery();
     test_elapsed_time();
+    test_32k_half_seconds();
     puts("PASS: actual RTC wake stub, I2C bytes, half-second edges, hour/day rollover, recovery and elapsed-time drift");
 }

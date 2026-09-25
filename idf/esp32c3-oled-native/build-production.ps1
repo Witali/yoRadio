@@ -7,14 +7,16 @@ param(
     [switch]$NoFirmwareExport,
     [switch]$Setup,
     [switch]$DeepSleepClock,
+    [switch]$Rtc32kCrystal,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")
 )
 
 $ErrorActionPreference = "Stop"
-if ($DeepSleepClock) {
+if ($DeepSleepClock -or $Rtc32kCrystal) {
     if (-not $PSBoundParameters.ContainsKey("BuildDirectory")) {
-        $BuildDirectory = "build-production-deep-sleep-clock"
+        if ($DeepSleepClock) { $BuildDirectory += "-deep-sleep-clock" }
+        if ($Rtc32kCrystal) { $BuildDirectory += "-rtc32k" }
     }
     if (-not $PSBoundParameters.ContainsKey("Sdkconfig")) {
         $Sdkconfig = "$BuildDirectory/sdkconfig"
@@ -22,6 +24,7 @@ if ($DeepSleepClock) {
 }
 $buildArguments = @{
     DeepSleepClock = $DeepSleepClock
+    Rtc32kCrystal = $Rtc32kCrystal
     BuildDirectory = $BuildDirectory
     Sdkconfig = $Sdkconfig
     SdkconfigDefaults = @(
@@ -58,7 +61,11 @@ if ($buildExitCode -eq 0 -and $shouldExportApplication -and -not $NoFirmwareExpo
 
     $repositoryRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
     $resolvedFirmwareOutput = if ([string]::IsNullOrWhiteSpace($FirmwareOutputDirectory)) {
-        if ($DeepSleepClock) {
+        if ($DeepSleepClock -and $Rtc32kCrystal) {
+            Join-Path $repositoryRoot "firmware\development\esp32c3-oled-native-deep-sleep-clock-rtc32k"
+        } elseif ($Rtc32kCrystal) {
+            Join-Path $repositoryRoot "firmware\development\esp32c3-oled-native-production-rtc32k"
+        } elseif ($DeepSleepClock) {
             Join-Path $repositoryRoot "firmware\development\esp32c3-oled-native-deep-sleep-clock"
         } else {
             Join-Path $repositoryRoot "firmware\development\esp32c3-oled-native-production"

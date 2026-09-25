@@ -6,15 +6,17 @@ param(
     [string[]]$SdkconfigDefaults = @("sdkconfig.defaults"),
     [switch]$Setup,
     [switch]$DeepSleepClock,
+    [switch]$Rtc32kCrystal,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")
 )
 
 $ErrorActionPreference = "Stop"
 $project = $PSScriptRoot
-if ($DeepSleepClock) {
+if ($DeepSleepClock -or $Rtc32kCrystal) {
     if (-not $PSBoundParameters.ContainsKey("BuildDirectory")) {
-        $BuildDirectory = "build-deep-sleep-clock"
+        if ($DeepSleepClock) { $BuildDirectory += "-deep-sleep-clock" }
+        if ($Rtc32kCrystal) { $BuildDirectory += "-rtc32k" }
     }
     if (-not $PSBoundParameters.ContainsKey("Sdkconfig")) {
         $Sdkconfig = "$BuildDirectory/sdkconfig"
@@ -93,6 +95,19 @@ try {
         $clockSetting = if ($DeepSleepClock) {
             "CONFIG_YORADIO_DEEP_SLEEP_CLOCK=y"
         } else { "# CONFIG_YORADIO_DEEP_SLEEP_CLOCK is not set" }
+        # Clear all choice members, calibration and deprecated ESP32C3 aliases.
+        # Otherwise a reused sdkconfig can retain the previous RTC source or
+        # the RC calibration length (too short for reliable crystal startup).
+        $clockConfig = [regex]::Replace($clockConfig,
+            '(?m)^(?:CONFIG_(?:ESP32C3_)?RTC_CLK_(?:SRC_(?:INT_RC|EXT_CRYS|EXT_OSC|INT_8MD256)|CAL_CYCLES)=.*|# CONFIG_(?:ESP32C3_)?RTC_CLK_(?:SRC_(?:INT_RC|EXT_CRYS|EXT_OSC|INT_8MD256)|CAL_CYCLES) is not set)\r?\n?', '')
+        $rtcSource = if ($Rtc32kCrystal) { "EXT_CRYS" } else { "INT_RC" }
+        $rtcSettings = foreach ($source in @("INT_RC", "EXT_CRYS", "EXT_OSC", "INT_8MD256")) {
+            if ($source -eq $rtcSource) { "CONFIG_RTC_CLK_SRC_$source=y" }
+            else { "# CONFIG_RTC_CLK_SRC_$source is not set" }
+        }
+        $calibrationCycles = if ($Rtc32kCrystal) { 3000 } else { 1024 }
+        $rtcSettings += "CONFIG_RTC_CLK_CAL_CYCLES=$calibrationCycles"
+        $clockSetting += [Environment]::NewLine + ($rtcSettings -join [Environment]::NewLine)
         New-Item -ItemType Directory -Force -Path (Split-Path $clockConfigPath) | Out-Null
         [IO.File]::WriteAllText($clockConfigPath,
             $clockConfig.TrimEnd() + [Environment]::NewLine + $clockSetting + [Environment]::NewLine,

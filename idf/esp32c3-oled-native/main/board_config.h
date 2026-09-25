@@ -1,6 +1,25 @@
 #pragma once
 
 #include "driver/gpio.h"
+#include "sdkconfig.h"
+
+// The passive 32.768 kHz RTC crystal owns GPIO0/XTAL_32K_P and GPIO1/XTAL_32K_N.
+// Reject conflicts even when using idf.py directly, before normal drivers or
+// the deep-sleep wake stub can reconfigure those pins as digital GPIOs.
+#if defined(CONFIG_RTC_CLK_SRC_EXT_CRYS)
+#if CONFIG_YORADIO_ROTARY_ENCODER && \
+    (CONFIG_YORADIO_ROTARY_ENCODER_GPIO_A <= 1 || \
+     CONFIG_YORADIO_ROTARY_ENCODER_GPIO_B <= 1)
+#error "RTC 32k crystal reserves GPIO0 and GPIO1: move encoder phases or disable the encoder"
+#endif
+#if CONFIG_YORADIO_ROTARY_ENCODER && CONFIG_YORADIO_ROTARY_ENCODER_BUTTON && \
+    CONFIG_YORADIO_ROTARY_ENCODER_BUTTON_GPIO <= 1
+#error "RTC 32k crystal reserves GPIO0 and GPIO1: move or disable the encoder button"
+#endif
+#if CONFIG_YORADIO_AUDIO_LEVEL_LED && CONFIG_YORADIO_AUDIO_LEVEL_LED_GPIO <= 1
+#error "RTC 32k crystal reserves GPIO0 and GPIO1: move or disable the audio level LED"
+#endif
+#endif
 
 // ESP32-C3 SuperMini OLED / 01Space-style 0.42-inch board.
 #define BOARD_OLED_SDA GPIO_NUM_5
