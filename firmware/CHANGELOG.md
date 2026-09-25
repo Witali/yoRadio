@@ -3,6 +3,21 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-25: ESP32-C3 external 32.768 kHz RTC crystal
+
+- Add `-Rtc32kCrystal` to the root, native and production build scripts.
+  It selects a passive crystal on GPIO0/1 with 3000 calibration cycles and
+  combines independently with `-DeepSleepClock`; absent switch restores RC.
+- Save separate `esp32c3-oled-native-production-rtc32k` and
+  `esp32c3-oled-native-deep-sleep-clock-rtc32k` application images from
+  source commit `63572edf`. GPIO conflicts with encoder/LED are rejected.
+- Both production builds pass. All four switch combinations are verified
+  on one sdkconfig, including deprecated aliases and compiler headers.
+  All 89 C3 regressions, 16 GPIO configuration cases, compiled wake-stub tests,
+  two days of 32768 Hz half-second ticks and the RTC/ROM ELF audit pass.
+- Physical crystal startup and drift remain untested; no board was flashed.
+- [Wiring and build instructions](../docs/ESP32C3_RTC_32K_CRYSTAL.md).
+
 ## Development - 2026-09-18: decoder-only quant_all_bands ASM (rejected)
 
 - Separate `esp8266-opus-quant-decode-{control,candidate}-v2`,903216B,
