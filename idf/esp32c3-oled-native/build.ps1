@@ -5,12 +5,21 @@ param(
     [string]$Sdkconfig = "sdkconfig",
     [string[]]$SdkconfigDefaults = @("sdkconfig.defaults"),
     [switch]$Setup,
+    [switch]$DeepSleepClock,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$IdfArguments = @("build")
 )
 
 $ErrorActionPreference = "Stop"
 $project = $PSScriptRoot
+if ($DeepSleepClock) {
+    if (-not $PSBoundParameters.ContainsKey("BuildDirectory")) {
+        $BuildDirectory = "build-deep-sleep-clock"
+    }
+    if (-not $PSBoundParameters.ContainsKey("Sdkconfig")) {
+        $Sdkconfig = "$BuildDirectory/sdkconfig"
+    }
+}
 $worktreeRoot = [IO.Path]::GetFullPath((Join-Path $project "..\.."))
 if ([string]::IsNullOrWhiteSpace($DependencyRoot)) {
     $DependencyRoot = Join-Path $worktreeRoot ".idf"
@@ -69,6 +78,25 @@ try {
     }
     Push-Location $project
     try {
+        # Explicitly apply both ON and OFF so reusing a build directory cannot
+        # silently leave this opt-in mode enabled from an earlier build.
+        $clockConfigPath = if ([IO.Path]::IsPathRooted($Sdkconfig)) {
+            $Sdkconfig
+        } else {
+            Join-Path $project $Sdkconfig
+        }
+        $clockConfig = if (Test-Path -LiteralPath $clockConfigPath) {
+            [IO.File]::ReadAllText($clockConfigPath)
+        } else { "" }
+        $clockConfig = [regex]::Replace($clockConfig,
+            '(?m)^(?:CONFIG_YORADIO_DEEP_SLEEP_CLOCK=.*|# CONFIG_YORADIO_DEEP_SLEEP_CLOCK is not set)\r?\n?', '')
+        $clockSetting = if ($DeepSleepClock) {
+            "CONFIG_YORADIO_DEEP_SLEEP_CLOCK=y"
+        } else { "# CONFIG_YORADIO_DEEP_SLEEP_CLOCK is not set" }
+        New-Item -ItemType Directory -Force -Path (Split-Path $clockConfigPath) | Out-Null
+        [IO.File]::WriteAllText($clockConfigPath,
+            $clockConfig.TrimEnd() + [Environment]::NewLine + $clockSetting + [Environment]::NewLine,
+            [Text.UTF8Encoding]::new($false))
         $arguments = @(
             (Join-Path $idf "tools\idf.py"),
             "-B", $BuildDirectory,

@@ -7,6 +7,8 @@
 #include <string.h>
 
 #include "audio_service.h"
+#include "deep_sleep_clock.h"
+#include "display_settings.h"
 #include "board_config.h"
 #include "esp_check.h"
 #include "esp_http_server.h"
@@ -743,6 +745,41 @@ static esp_err_t static_handler(httpd_req_t *request) {
     return ESP_OK;
 }
 
+static esp_err_t with_awake_request(httpd_req_t *request,
+                                     esp_err_t (*handler)(httpd_req_t *)) {
+    if (!deep_sleep_clock_begin_activity()) {
+        httpd_resp_set_status(request, "503 Service Unavailable");
+        return httpd_resp_sendstr(request, "Clock is entering sleep");
+    }
+    display_settings_note_activity();
+    esp_err_t result = handler(request);
+    display_settings_note_activity();
+    deep_sleep_clock_end_activity();
+    return result;
+}
+
+static esp_err_t sleep_guarded_reconnect_handler(httpd_req_t *request) {
+    return with_awake_request(request, reconnect_handler);
+}
+static esp_err_t sleep_guarded_play_handler(httpd_req_t *request) {
+    return with_awake_request(request, play_handler);
+}
+static esp_err_t sleep_guarded_stop_handler(httpd_req_t *request) {
+    return with_awake_request(request, stop_handler);
+}
+static esp_err_t sleep_guarded_upload_handler(httpd_req_t *request) {
+    return with_awake_request(request, upload_handler);
+}
+static esp_err_t sleep_guarded_webboard_upload_handler(httpd_req_t *request) {
+    return with_awake_request(request, webboard_upload_handler);
+}
+static esp_err_t sleep_guarded_emergency_handler(httpd_req_t *request) {
+    return with_awake_request(request, emergency_handler);
+}
+static esp_err_t sleep_guarded_recovery_wifi_handler(httpd_req_t *request) {
+    return with_awake_request(request, recovery_wifi_handler);
+}
+
 esp_err_t web_service_start(native_state_t *state) {
     s_state = state;
     ESP_RETURN_ON_ERROR(start_static_workers(), TAG,
@@ -768,22 +805,22 @@ esp_err_t web_service_start(native_state_t *state) {
     httpd_uri_t reconnect = {
         .uri = "/api/native/reconnect",
         .method = HTTP_POST,
-        .handler = reconnect_handler,
+        .handler = sleep_guarded_reconnect_handler,
     };
     httpd_uri_t play = {
         .uri = "/api/native/play*",
         .method = HTTP_POST,
-        .handler = play_handler,
+        .handler = sleep_guarded_play_handler,
     };
     httpd_uri_t stop = {
         .uri = "/api/native/stop",
         .method = HTTP_POST,
-        .handler = stop_handler,
+        .handler = sleep_guarded_stop_handler,
     };
     httpd_uri_t upload = {
         .uri = "/upload",
         .method = HTTP_POST,
-        .handler = upload_handler,
+        .handler = sleep_guarded_upload_handler,
     };
     httpd_uri_t webboard_page = {
         .uri = "/webboard",
@@ -793,17 +830,17 @@ esp_err_t web_service_start(native_state_t *state) {
     httpd_uri_t webboard_upload = {
         .uri = "/webboard",
         .method = HTTP_POST,
-        .handler = webboard_upload_handler,
+        .handler = sleep_guarded_webboard_upload_handler,
     };
     httpd_uri_t emergency = {
         .uri = "/emergency",
         .method = HTTP_GET,
-        .handler = emergency_handler,
+        .handler = sleep_guarded_emergency_handler,
     };
     httpd_uri_t recovery_wifi = {
         .uri = "/",
         .method = HTTP_POST,
-        .handler = recovery_wifi_handler,
+        .handler = sleep_guarded_recovery_wifi_handler,
     };
     httpd_uri_t files = {
         .uri = "/*",

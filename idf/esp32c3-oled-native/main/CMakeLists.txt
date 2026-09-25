@@ -23,6 +23,8 @@ set(NATIVE_SRCS
   "audio_service.c"
   "cpu_profiler.c"
   "display_settings.c"
+  "deep_sleep_clock.c"
+  "rtc_wake_stub_clock.c"
   "encoder_input.c"
   "native_audio_normalizer.cpp"
   "native_state.c"
@@ -54,6 +56,7 @@ idf_component_register(
     esp_http_client
     esp_http_server
     esp_hw_support
+    esp_hal_rtc_timer
     esp_lcd
     esp_netif
     esp_partition
