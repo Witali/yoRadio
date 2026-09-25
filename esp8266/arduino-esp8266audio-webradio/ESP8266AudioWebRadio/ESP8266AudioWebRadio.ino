@@ -7,6 +7,8 @@
   distributed under GPL-3.0-or-later; see the repository LICENSE file.
 */
 
+#include <type_traits>
+
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <ESP8266WebServer.h>
@@ -18,6 +20,14 @@
 #include "AudioGeneratorMP3.h"
 #include "AudioOutputI2SNoDAC.h"
 
+#ifndef WEBRADIO_ALLOW_AP_PLAYBACK
+#define WEBRADIO_ALLOW_AP_PLAYBACK 0
+#endif
+
+#ifndef WEBRADIO_TEST_NULL_OUTPUT
+#define WEBRADIO_TEST_NULL_OUTPUT 0
+#endif
+
 namespace {
 
 constexpr uint32_t kSettingsMagic = 0x59415245UL;  // "YARE"
@@ -25,12 +35,105 @@ constexpr uint16_t kSettingsVersion = 1;
 constexpr uint32_t kWifiConnectTimeoutMs = 15000;
 constexpr uint32_t kRetryDelayMs = 2500;
 constexpr uint32_t kButtonDebounceMs = 35;
-constexpr size_t kStreamBufferBytes = 5 * 1024;
+constexpr size_t kStreamBufferBytes = 4 * 1024;
 constexpr size_t kCodecWorkspaceBytes = 29192;
 constexpr uint8_t kBootButtonPin = 0;
 constexpr char kAccessPointName[] = "WebRadio";
 
 enum class Codec : uint8_t { Mp3 = 0, Aac = 1 };
+
+class MeteredAudioOutputI2SNoDAC final : public AudioOutputI2SNoDAC {
+ public:
+  bool SetRate(int hz) override {
+    sampleRate_ = hz;
+    return AudioOutputI2SNoDAC::SetRate(hz);
+  }
+
+  bool SetChannels(int channels) override {
+    channels_ = channels;
+    return AudioOutputI2SNoDAC::SetChannels(channels);
+  }
+
+  bool ConsumeSample(int16_t sample[2]) override {
+    if (!AudioOutputI2SNoDAC::ConsumeSample(sample)) return false;
+    ++sampleCount_;
+    return true;
+  }
+
+  void resetPlaybackCounters() {
+    sampleCount_ = 0;
+    sampleRate_ = 0;
+    channels_ = 0;
+  }
+
+  uint32_t sampleCount() const { return sampleCount_; }
+  uint32_t sampleRate() const { return sampleRate_; }
+  uint8_t channels() const { return channels_; }
+
+ private:
+  uint32_t sampleCount_ = 0;
+  uint32_t sampleRate_ = 0;
+  uint8_t channels_ = 0;
+};
+
+class MeteredAudioOutputNull final : public AudioOutput {
+ public:
+  bool SetRate(int hz) override {
+    sampleRate_ = hz > 0 ? static_cast<uint32_t>(hz) : 0;
+    samplePeriodUs_ = sampleRate_ ? 1000000UL / sampleRate_ : 0;
+    return AudioOutput::SetRate(hz);
+  }
+
+  bool SetChannels(int channels) override {
+    channels_ = channels;
+    return AudioOutput::SetChannels(channels);
+  }
+
+  bool begin() override {
+    running_ = true;
+    nextSampleAt_ = micros();
+    return true;
+  }
+
+  bool ConsumeSample(int16_t sample[2]) override {
+    (void)sample;
+    if (!running_ || !samplePeriodUs_) return false;
+    const uint32_t now = micros();
+    if (static_cast<int32_t>(now - nextSampleAt_) < 0) return false;
+    if (static_cast<int32_t>(now - nextSampleAt_) > 100000)
+      nextSampleAt_ = now;
+    nextSampleAt_ += samplePeriodUs_;
+    ++sampleCount_;
+    return true;
+  }
+
+  bool stop() override {
+    running_ = false;
+    return true;
+  }
+
+  void resetPlaybackCounters() {
+    sampleCount_ = 0;
+    sampleRate_ = 0;
+    channels_ = 0;
+  }
+
+  uint32_t sampleCount() const { return sampleCount_; }
+  uint32_t sampleRate() const { return sampleRate_; }
+  uint8_t channels() const { return channels_; }
+
+ private:
+  uint32_t sampleCount_ = 0;
+  uint32_t sampleRate_ = 0;
+  uint32_t samplePeriodUs_ = 0;
+  uint32_t nextSampleAt_ = 0;
+  uint8_t channels_ = 0;
+  bool running_ = false;
+};
+
+using WebRadioAudioOutput =
+    std::conditional<WEBRADIO_TEST_NULL_OUTPUT, MeteredAudioOutputNull,
+                     MeteredAudioOutputI2SNoDAC>::type;
 
 struct Settings {
   uint32_t magic;
@@ -48,7 +151,7 @@ Settings settings{};
 AudioFileSourceICYStream *source = nullptr;
 AudioFileSourceBuffer *streamBuffer = nullptr;
 AudioGenerator *decoder = nullptr;
-AudioOutputI2SNoDAC *audioOutput = nullptr;
+WebRadioAudioOutput *audioOutput = nullptr;
 void *streamStorage = nullptr;
 void *codecStorage = nullptr;
 
@@ -171,7 +274,8 @@ void stopPlaying(bool userRequest) {
 void startPlaying() {
   startRequested = false;
   stopPlaying(false);
-  if (accessPointMode || !settings.url[0]) {
+  if ((accessPointMode && !WEBRADIO_ALLOW_AP_PLAYBACK) ||
+      !settings.url[0]) {
     strlcpy(playerStatus, "No stream URL", sizeof(playerStatus));
     userStopped = true;
     return;
@@ -192,6 +296,7 @@ void startPlaying() {
     decoder = new AudioGeneratorMP3(codecStorage, kCodecWorkspaceBytes);
   }
   if (decoder) decoder->RegisterStatusCB(statusCallback, nullptr);
+  audioOutput->resetPlaybackCounters();
 
   if (!source || !streamBuffer || !decoder ||
       !decoder->begin(streamBuffer, audioOutput)) {
@@ -240,8 +345,12 @@ void sendStatus() {
   used = appendJsonString(payload, sizeof(payload), used, settings.url);
   snprintf(payload + used, sizeof(payload) - used,
            ",\"codec\":\"%s\",\"volume\":%u,\"free_heap\":%u,"
-           "\"rssi\":%d}",
-           codecName(), settings.volume, ESP.getFreeHeap(), WiFi.RSSI());
+           "\"rssi\":%d,\"samples\":%u,\"sample_rate\":%u,"
+           "\"channels\":%u}",
+           codecName(), settings.volume, ESP.getFreeHeap(), WiFi.RSSI(),
+           audioOutput ? audioOutput->sampleCount() : 0,
+           audioOutput ? audioOutput->sampleRate() : 0,
+           audioOutput ? audioOutput->channels() : 0);
   server.sendHeader(F("Cache-Control"), F("no-store"));
   server.send(200, F("application/json; charset=utf-8"), payload);
 }
@@ -255,11 +364,13 @@ void setupWebServer() {
   server.on("/", HTTP_GET, []() {
     server.sendHeader(F("Cache-Control"), F("no-store"));
     server.send_P(200, PSTR("text/html; charset=utf-8"),
-                  accessPointMode ? kWifiPage : kPlayerPage);
+                  accessPointMode && !WEBRADIO_ALLOW_AP_PLAYBACK
+                      ? kWifiPage
+                      : kPlayerPage);
   });
   server.on("/api/status", HTTP_GET, sendStatus);
   server.on("/api/play", HTTP_GET, []() {
-    if (accessPointMode) {
+    if (accessPointMode && !WEBRADIO_ALLOW_AP_PLAYBACK) {
       server.send(409, F("text/plain"), F("Wi-Fi setup mode"));
       return;
     }
@@ -381,7 +492,7 @@ void setup() {
   }
 
   loadSettings();
-  audioOutput = new AudioOutputI2SNoDAC();
+  audioOutput = new WebRadioAudioOutput();
   if (!audioOutput) {
     Serial.println(F("FATAL: cannot allocate NoDAC output"));
     while (true) delay(1000);

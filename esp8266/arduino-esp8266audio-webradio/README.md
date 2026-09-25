@@ -40,6 +40,14 @@ Wemos D1 mini, 160 MHz CPU, QIO flash at 40 MHz, 4 MiB flash and lwIP v2
 high-bandwidth settings supplied by the board profile. A successful build is
 copied to `firmware/development/web-radio/app.bin`.
 
+## Tests
+
+WebRadio-specific tests live in `tests/webradio`. The normal source checks run
+with `npm test`. The opt-in physical test starts a local HTTP server for the
+repository's reproducible MP3 and AAC fixtures, selects both streams through
+the Web API, and verifies that decoded samples reach the I2S output. See
+`tests/webradio/README.md` for invocation and network requirements.
+
 ## Upstream basis
 
 - [ESP8266Audio WebRadio](https://github.com/earlephilhower/ESP8266Audio/tree/2.4.1/examples/WebRadio)
