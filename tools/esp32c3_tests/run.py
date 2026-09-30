@@ -35,7 +35,7 @@ class Capture:
             except OSError:
                 self.rows.append(dict(at=time.monotonic(), line='serial capture interrupted'))
                 return
-            if re.search(r'PERF |Memory .*: free=|assert failed|Guru Meditation|CORRUPT HEAP', line):
+            if re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP', line):
                 self.rows.append(dict(at=time.monotonic(), line=line))
 
     def since(self, at):
@@ -102,7 +102,9 @@ class Suite:
     def fault(self, mode):
         name = 'lc-48000-stereo'
         self.start(name, mode, 'aac')
-        samples = self.observe(20 if mode == 'stall' else 7, 'fault:' + mode)
+        # A truncated Content-Length body can be classified only after the
+        # firmware's 10 s stream watchdog, plus the initial 3 s of valid data.
+        samples = self.observe(20 if mode in ('stall','drop') else 7, 'fault:' + mode)
         require(any(not r['audio'] for r in samples[-3:]), 'Fault did not leave playback')
         # A new command must supersede the failed connection and stale callbacks.
         self.start('lc-22050-mono', hint='aac')
@@ -146,16 +148,20 @@ class Suite:
         finally:
             self.board.stop()
 
-    def tls_rejection(self, origin):
-        if not origin:
-            raise Blocked('Provide untrusted --https-origin and test certificate for TLS rejection')
+    def tls_rejection(self, origin, server):
+        if not origin or server is None:
+            raise Blocked('Provide untrusted --https-origin and --tls-cert/key to capture handshake rejection')
+        first_event = len(server.events)
         self.start('lc-48000-stereo',hint='aac',origin=origin)
         samples = self.observe(12,'untrusted-tls')
         require(not any(s['audio'] for s in samples), 'Untrusted TLS connection was accepted')
+        errors = [e['reason'] for e in server.events[first_event:] if e['mode']=='tls-handshake-failure']
+        require(any('CERTIFICATE' in e or 'UNKNOWN_CA' in e for e in errors),
+                'No certificate-rejection alert observed; connection failure alone is insufficient')
         self.start('lc-48000-stereo',hint='aac')
         try:
             check_playback(self.observe(7,'after-tls-rejection'),self.specs['lc-48000-stereo'])
-            return dict(untrusted_rejected=True, http_recovered=True)
+            return dict(untrusted_rejected=True, http_recovered=True, tls_alerts=errors)
         finally:
             self.board.stop()
 
@@ -301,7 +307,7 @@ def main():
             if 'websocket' in args.suite:
                 report.case('websocket-format-and-reconnect',suite.websocket_format)
             if 'tls-rejection' in args.suite:
-                report.case('untrusted-tls-rejected',lambda: suite.tls_rejection(args.https_origin))
+                report.case('untrusted-tls-rejected',lambda: suite.tls_rejection(args.https_origin,tls))
             if 'boot-time' in args.suite:
                 for cycle in range(args.cycles):
                     report.case('boot-ready:'+str(cycle+1),suite.boot_time)
@@ -311,6 +317,8 @@ def main():
                 if 'load' in args.suite:
                     report.case('cpu-under-http-load:'+name, lambda n=name: suite.sustained(40,n,cpu=True,load=True))
             report.data['server_events'] = server.events
+            if tls:
+                report.data['tls_events'] = tls.events
     finally:
         if tls:
             tls.__exit__()

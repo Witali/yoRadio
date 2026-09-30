@@ -154,6 +154,9 @@ python tools/audio_test_server/make_test_certificate.py --host PC_LAN_IP --outpu
 python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --suite tls-rejection --https-origin https://PC_LAN_IP:8771 --tls-cert .build/untrusted-tls/cert.pem --tls-key .build/untrusted-tls/key.pem --output .build/c3-tests/tls-rejection
 ```
 
+The negative test also requires the local TLS listener to record a certificate
+rejection alert. An unreachable server alone cannot make this test pass.
+
 ### CPU, memory, switching and soak
 
 These require the no-sleep diagnostic image with USB logs and FreeRTOS runtime

@@ -136,6 +136,7 @@ class AcceptanceTests(unittest.TestCase):
                     urlopen(url,timeout=3).close()
                 with urlopen(url,context=ssl.create_default_context(cafile=str(certpath))) as response:
                     self.assertEqual(response.read(),b'abc')
+                self.assertTrue(any(e['mode']=='tls-handshake-failure' for e in server.events))
 
     def test_ota_image_identity_and_negative_payloads(self):
         data=bytearray(4096); data[0]=0xe9

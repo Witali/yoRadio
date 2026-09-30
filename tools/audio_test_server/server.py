@@ -95,7 +95,15 @@ class Server:
                     self.close_connection = True
                     event['seconds'] = time.monotonic() - started
 
-        self.http = ThreadingHTTPServer((host, port), Handler)
+        class TrackingServer(ThreadingHTTPServer):
+            def get_request(self):
+                try:
+                    return super().get_request()
+                except ssl.SSLError as error:
+                    outer.events.append(dict(mode='tls-handshake-failure', reason=error.reason))
+                    raise
+
+        self.http = TrackingServer((host, port), Handler)
         self.http.daemon_threads = True
         if cert:
             context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
