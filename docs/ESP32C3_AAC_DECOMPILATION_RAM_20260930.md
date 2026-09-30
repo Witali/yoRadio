@@ -21,6 +21,14 @@ to avoid overflow. This is a maximum error bound, not an RMS/average allowance.
 Pure allocation/layout changes should remain byte-identical. Any arithmetic
 change needs an output error bound as well as regression measurements.
 
+**Decoding speed must ultimately be preserved.** The user permits a temporary
+slowdown while reducing RAM, provided that subsequent speed optimization remains
+an explicit task. For each candidate, record the RAM gain and measured timing
+change against the unmodified decoder. A slower prototype can advance the RAM
+work, but its performance follow-up stays open until remeasurement confirms
+that the slowdown has been recovered within measurement variability. Do not
+recover speed by removing format support or exceeding the one-LSB PCM limit.
+
 **This audit does not enable a new optimization or establish that full HE/v2 now
 fits the complete radio.** No firmware was flashed. The allocation failures and
 operating-heap requirements in the [memory report](ESP32C3_AAC_MEMORY_20260930.md)
@@ -326,6 +334,17 @@ signal histories cannot be placed in read-only Flash.
    Wi-Fi streaming, OLED, PDM, WebUI polling/OTA and codec transitions. Measure
    peak live bytes, largest free block, stack high-water and CPU/cache cost.
    Retain the existing operating-heap margin; isolated decoding is insufficient.
+6. Compare decoding speed per profile/rate/channel configuration using identical
+   inputs, CPU/Flash clocks, compiler options and instrumentation. Record cycles
+   or time per decoded audio second, tail/maximum decode-call latency and total
+   radio CPU/underruns; include copying and packing/unpacking overhead. Repeat
+   measurements to distinguish a regression from normal variability. If the
+   original full radio cannot allocate HE/PS, compare with the working isolated
+   original decoder as well; core-only fallback is not an equivalent baseline.
+   Keep QEMU estimates separate from physical C3 qualification. For any slowdown,
+   save its percentage, affected cases and a concrete speed-optimization TODO,
+   then repeat the same A/B after that optimization. Temporary slowdown does not
+   relax real-time playback checks or close the performance task.
 
 Use the existing [testing guide](ESP32C3_TESTING.md) and allocation/QEMU tools.
 This audit ran decompilation, disassembly comparisons and a reference layout

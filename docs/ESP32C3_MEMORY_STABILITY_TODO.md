@@ -37,6 +37,10 @@ The [AAC decompilation audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md)
 recovers 176 linked functions and documents RAM candidates. Preserve the complete
 existing format/tool support; the user permits at most one output PCM LSB of
 error per sample/channel. Layout-only changes should remain byte-identical.
+The final speed target is no decoding slowdown versus the unmodified decoder
+within measurement variability. A temporary slowdown is allowed during RAM
+optimization, with a measured regression and an explicit follow-up to recover
+speed while preserving full format support and the one-LSB output limit.
 
 - [x] Decompile the shipped decoder, verify critical allocations/offsets against
   disassembly and save reproducible evidence. Probe reference pointer-table
@@ -52,6 +56,13 @@ error per sample/channel. Layout-only changes should remain byte-identical.
 - [ ] Evaluate compact mode-specific PS state and synthesis ring storage.
   Do not add overlapping mode-specific savings or narrow arithmetic without
   proving the one-LSB output limit and preserving all supported configurations.
+- [ ] Benchmark every RAM candidate against the original decoder on matching
+  inputs and settings: time/cycles per audio second, tail/maximum decode-call
+  latency, total CPU and underruns, including copy/packing costs. Record each
+  temporary slowdown by profile and percentage; create and complete a targeted
+  speed-optimization follow-up, then repeat A/B to confirm recovery. Keep QEMU
+  estimates separate from physical C3 results; core-only fallback is not a
+  valid speed baseline for full SBR/PS.
 
 ### Execution plan and decision gates
 
