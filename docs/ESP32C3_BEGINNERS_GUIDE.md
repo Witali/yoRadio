@@ -1,8 +1,16 @@
 # Build and flash yoRadio on an ESP32-C3 OLED board: beginner's guide
 
 This guide starts with a Windows computer that has no development tools installed.
-It explains how to download the source, compile the firmware, install it on a
-board for the first time, and update it later.
+It explains how to install a ready-made firmware image or compile the firmware
+yourself, program a board for the first time, and update it later.
+
+**Choose your route after steps 1 and 2:**
+
+- **Install an existing binary:** follow [Prebuilt firmware: no compilation](#prebuilt-firmware-no-compilation).
+  This uses Git, PowerShell, Python and esptool, without downloading a compiler or ESP-IDF.
+- **Compile the latest source:** continue with [step 3](#3-install-the-firmware-toolchain).
+
+Both routes include instructions for a new board and for updating an existing radio.
 
 **Target board:** ESP32-C3 SuperMini / 01Space-style board with a 0.42-inch,
 72x40 SSD1306 OLED and 4 MB flash. The firmware target is
@@ -10,13 +18,15 @@ board for the first time, and update it later.
 and audio hardware must match the [board documentation](ESP32-C3-0.42-OLED.md).
 
 **Computer:** an x64 Windows 10 or Windows 11 PC with an Internet connection.
-Allow roughly 10 GB or more of free disk space for sources, tools and builds.
+Allow roughly 10 GB or more of free disk space if you compile from source.
+Installing a prebuilt image does not need the compiler/ESP-IDF downloads.
 Use a USB **data** cable; a charging-only cable cannot program the board.
 
 ## How to use the commands
 
 Copy the commands inside each code block into the indicated terminal and press
-Enter. Run the blocks in order and wait for each operation to finish. Do not copy
+Enter. Follow the blocks for your chosen route and wait for each operation to
+finish. Do not copy
 the triple backticks around a block. If a command fails, resolve that error before
 continuing. Lines starting with `#` are comments.
 
@@ -60,8 +70,9 @@ git lfs version
 The first command must show PowerShell 7.4 or newer. The other commands should
 print version numbers. If Git is not recognized, close and reopen PowerShell 7.
 
-You do not need to install Python, Arduino IDE, PlatformIO, Visual Studio or
-ESP-IDF separately. The project's setup script installs its own pinned tools.
+For the source-build route, the project's setup script installs its own Python
+and ESP-IDF tools. For the prebuilt route, install Python as described in that
+section. Neither route needs Arduino IDE, PlatformIO or Visual Studio.
 
 ## 2. Download the latest source
 
@@ -86,7 +97,248 @@ This downloads the latest `main` branch. The last command shows the source
 revision you will build. Skipping Git LFS downloads avoids downloading archived
 firmware for other boards; the ESP32-C3 build downloads its own required decoder
 libraries during setup. Existing archive `.bin` files may be small LFS pointer
-files; the commands below compile and flash a new, real image.
+files. The prebuilt route below explicitly downloads the selected binaries with
+Git LFS; the source-build route creates a new image locally.
+
+## Prebuilt firmware: no compilation
+
+### What to skip if you only flash firmware
+
+**You do not need to compile anything. Skip steps 3, 4, 5, 8 and 11.**
+Do not run `setup.ps1` or `build-production.ps1`: even the build script's flashing
+commands compile an application first. You do not need ESP-IDF, the compiler,
+CMake, Ninja, Arduino IDE, PlatformIO or Visual Studio.
+
+| Main guide step | What to do when installing a prebuilt image |
+| --- | --- |
+| 1. Install Git and PowerShell | Do this once. Skip the installers if the version checks already pass. |
+| 2. Download the source | Do this once to obtain the firmware manifests and helper scripts. If `C:\yoRadio` is already this repository on `main`, run `git pull --ff-only origin main` there instead of cloning again. Download the actual binaries in P3. |
+| 3. Install the firmware toolchain | **Skip.** Install only Python and esptool in P2. |
+| 4. Choose build options | **Skip.** Choose an already compiled variant in P1 instead. |
+| 5. Compile | **Skip.** Download and check the selected binary in P3 instead. |
+| 6 and 7. Programming mode and COM port | **Required.** Follow these when P4 directs you to them. |
+| 8. Flash using the build script | **Skip.** Use P5 for a first installation or P6 for an update. |
+| 9. Start the radio and configure Wi-Fi | Check startup after every flash. Configure Wi-Fi after a first installation; skip entering it again after P6 if the saved network still works. |
+| 10. Enable the sleeping clock | Only needed for a `deep-sleep-clock` variant. Skip changing the settings if the Clock screensaver is already enabled. |
+| 11. Rebuild for a later update | **Skip.** For another prebuilt update, repeat P3, P4 and P6. |
+
+**First installation, in order:** steps 1 and 2 once, then P1, P2, P3, P4, **P5**,
+and step 9. Also follow step 10 if you chose a sleeping-clock variant.
+
+**Update an existing native radio:** choose the variant in P1, complete P2 only
+if the flashing tools are missing, then follow P3, P4 and **P6**. Restart and
+check the OLED/WebUI. Skip P5 to keep the existing Wi-Fi settings and playlist.
+Do not skip the binary download/hash checks or programming-mode/COM-port checks.
+
+### P1. Choose an available firmware variant
+
+The following five **native ESP-IDF** variants use the board's stereo PDM audio
+outputs (left GPIO10, right GPIO3) and the same native 4 MiB partition layout.
+The directory name is the value to use for `$variant` in the commands below.
+
+| Directory under `firmware/development/` | Features | Saved source | Files and details |
+| --- | --- | --- | --- |
+| `esp32c3-oled-native-production` | Ordinary radio; internal RTC oscillator; deep sleep off; logs off. | `eef49d1`, 2026-08-29 | `app.bin`, recovery `full.bin` and boot files. [Manifest](../firmware/development/esp32c3-oled-native-production/manifest.md). |
+| `esp32c3-oled-native-development` | Ordinary radio with application diagnostic logs; internal RTC oscillator; deep sleep off. | `eef49d1`, 2026-08-29 | `app.bin`, recovery `full.bin` and boot files. [Manifest](../firmware/development/esp32c3-oled-native-development/manifest.md). |
+| `esp32c3-oled-native-deep-sleep-clock` | Production radio with the sleeping clock; internal RTC oscillator; logs off. | `66626be7` | Application only. [Manifest](../firmware/development/esp32c3-oled-native-deep-sleep-clock/manifest.json). |
+| `esp32c3-oled-native-production-rtc32k` | Production radio using an external 32.768 kHz crystal; deep sleep off; logs off. | `63572edf` | Application only. [Manifest](../firmware/development/esp32c3-oled-native-production-rtc32k/manifest.md). |
+| `esp32c3-oled-native-deep-sleep-clock-rtc32k` | Production radio with both the sleeping clock and external crystal; logs off. | `63572edf` | Application only. [Manifest](../firmware/development/esp32c3-oled-native-deep-sleep-clock-rtc32k/manifest.md). |
+
+These are **saved builds**, not automatically rebuilt copies of today's `main`.
+The manifest identifies each image's source and validation. The sleeping-clock
+and crystal images have build/host-test validation but are marked as not tested
+on physical hardware. Compile from source if you need the newest code with your
+own combination of options.
+
+Choose `esp32c3-oled-native-production` for the archived ordinary radio, or choose
+one of the other rows for its listed features. A prebuilt binary's features are
+fixed: passing build switches to esptool cannot enable or disable them.
+
+The `rtc32k` variants require the external crystal circuit on GPIO0/GPIO1.
+See [crystal wiring](ESP32C3_RTC_32K_CRYSTAL.md); those pins cannot also serve the
+encoder. The sleeping-clock variants need the WebUI Clock screensaver enabled
+and synchronized time, as explained in step 10.
+
+**Historical alternative:** [0.9.724 / esp32c3-oled-042-i2s](../firmware/0.9.724/esp32c3-oled-042-i2s/manifest.md)
+is an Arduino firmware with external I2S audio (BCLK GPIO1, WS GPIO3, DIN GPIO10)
+and a different SPIFFS partition at `0x370000`. It includes a `factory.bin` with
+WebUI. It is not the current native PDM firmware; use its own manifest and wiring
+instructions. Do not mix its application, filesystem or boot files with the
+native installation commands below.
+
+### P2. Install only the flashing tool
+
+If you already completed this section on this PC, skip the installation below.
+Restore the variable in a new terminal and check the tool:
+
+```powershell
+$flashPython = (Resolve-Path "C:\yoRadio\.build\flash-tools\Scripts\python.exe").Path
+& $flashPython -m esptool version
+```
+
+If that reports esptool 5.3.1, continue to P3. Otherwise, install it:
+
+1. Open the [official Python Windows downloads page](https://www.python.org/downloads/windows/).
+2. Select a stable **Python 3.13 Windows installer (64-bit)**. Use the regular
+   installer, with pip and the Python launcher enabled.
+3. Finish installation, close PowerShell, and open PowerShell 7 again.
+4. Run:
+
+```powershell
+Set-Location C:\yoRadio
+py -3.13 --version
+py -3.13 -m venv .build\flash-tools
+$flashPython = (Resolve-Path ".build\flash-tools\Scripts\python.exe").Path
+& $flashPython -m pip install "esptool==5.3.1"
+& $flashPython -m esptool version
+```
+
+The final command should show esptool 5.3.1. This installs a small, separate
+Python environment for flashing; no firmware compilation takes place. If `py`
+is not recognized, check that the Python launcher was installed and reopen the
+terminal. Keep this terminal open so `$flashPython` remains available.
+
+### P3. Download the actual binary files and check them
+
+Change the first line to one of the five native directory names in the table:
+
+```powershell
+$variant = "esp32c3-oled-native-production"
+$firmware = Join-Path "C:\yoRadio\firmware\development" $variant
+$installFiles = "C:\yoRadio\firmware\development\esp32c3-oled-native-installation"
+
+Set-Location C:\yoRadio
+git lfs pull --include="firmware/development/$variant/app.bin,firmware/development/esp32c3-oled-native-installation/*.bin" --exclude=""
+if ($LASTEXITCODE -ne 0) { throw "Firmware download failed; do not flash." }
+```
+
+This works even though step 2 enabled `--skip-smudge`. It downloads only the
+chosen application and the shared installation files. Do not save GitHub's HTML
+file page as `.bin`, and do not flash a Git LFS pointer file.
+
+Check the installation-file hashes automatically:
+
+```powershell
+$installManifest = Get-Content "$installFiles\manifest.json" -Raw | ConvertFrom-Json
+foreach ($file in $installManifest.files) {
+    $binaryPath = Join-Path $installFiles $file.file
+    $actualHash = (Get-FileHash -LiteralPath $binaryPath -Algorithm SHA256).Hash
+    if ($actualHash -ne $file.sha256) {
+        throw "Wrong or incomplete download: $binaryPath"
+    }
+}
+
+& $flashPython -m esptool --chip esp32c3 image-info "$firmware\app.bin"
+if ($LASTEXITCODE -ne 0) { throw "Invalid application image; do not flash." }
+Get-FileHash -LiteralPath "$firmware\app.bin" -Algorithm SHA256
+```
+
+`image-info` must report an ESP32-C3 application. Compare the final SHA-256 with
+the selected variant's manifest linked in the table. If it differs, stop and
+check the download. These checks do not connect to the board.
+
+The [shared installation package](../firmware/development/esp32c3-oled-native-installation/manifest.md)
+contains a production bootloader, the native partition table, an initial OTA
+selector, and a ready-made SPIFFS image with WebUI and the repository playlist.
+It contains no Wi-Fi credentials. Use your selected variant's `app.bin` with it.
+The shared bootloader is quiet; the development application still provides its
+own application logs.
+
+Wi-Fi credentials entered during setup are saved on the board in
+`/data/wifi.csv`. P6 deliberately preserves that file: a radio remembering your
+network after an update does not mean its downloaded application contains your
+credentials. A flash dump or a backup of the configured board's filesystem can
+contain them.
+
+### P4. Enter programming mode and select the port
+
+Follow steps 6 and 7: hold BOOT, press and release RESET, release BOOT, then
+identify the board's COM port. Set the actual port in this terminal:
+
+```powershell
+$port = "COM7"
+```
+
+COM7 is only an example. Close any serial monitor that is using that port.
+**Choose either P5 or P6 below**, depending on whether this is a first installation
+or an update. Do not run both procedures as routine steps.
+
+### P5. First installation: application, boot files and WebUI
+
+Use this for a new board or when installing the native partition layout.
+It replaces the bootloader, partition table, OTA selector and SPIFFS. Existing
+SPIFFS contents, including Wi-Fi credentials and playlists, are overwritten.
+NVS is not erased by this command. Save any existing files you want to retain
+before using this installation procedure.
+
+```powershell
+& $flashPython -m esptool --chip esp32c3 --port $port --baud 460800 --before usb-reset --after no-reset write-flash `
+    --flash-mode dio --flash-freq 80m --flash-size 4MB `
+    0x0 "$installFiles\bootloader.bin" `
+    0x8000 "$installFiles\partitions.bin" `
+    0xe000 "$installFiles\boot_app0.bin" `
+    0x10000 "$firmware\app.bin" `
+    0x3b0000 "$installFiles\spiffs.bin"
+```
+
+Wait until all writes and verification finish successfully. Release BOOT, then
+press RESET, or unplug and reconnect USB without holding BOOT. The command uses
+`--after no-reset` so the final restart is explicit. Continue with step 9 to
+configure Wi-Fi. For a sleeping-clock image, also follow step 10.
+
+The older production/development `full.bin` files are recovery images with an
+empty SPIFFS region: they do not install the WebUI. The command above uses the
+separate SPIFFS image as well. An `app.bin` alone cannot initialize a blank board.
+Do not write `app.bin` at `0x0`; that address belongs to the bootloader.
+
+### P6. Update an existing native radio: preserve settings and WebUI
+
+Use this only when the board already has the native layout: application slot 0
+at `0x10000`, application slot 1 at `0x1e0000`, and 256 KiB SPIFFS at `0x3b0000`.
+If it runs the old Arduino firmware or an unknown layout, use P5 after backing
+up its data.
+
+```powershell
+& $flashPython -m esptool --chip esp32c3 --port $port --baud 460800 --before usb-reset --after no-reset write-flash `
+    --flash-mode dio --flash-freq 80m --flash-size 4MB `
+    0xe000 "$installFiles\boot_app0.bin" `
+    0x10000 "$firmware\app.bin"
+```
+
+This writes the selected application into slot 0 and resets the OTA boot selector
+so slot 0 is used, including if an earlier OTA update selected slot 1. It preserves
+NVS, Wi-Fi credentials, playlist and SPIFFS WebUI files. It also replaces the old
+OTA selection/rollback state. Bootloader, partition table and filesystem are not
+written. A WebUI update is a separate operation; P5 replaces the filesystem.
+
+After successful writing and verification, restart with RESET without holding
+BOOT. For connection/transfer errors, repeat programming mode and try `115200`
+instead of `460800` in the same command.
+
+If a manual restart leaves the board in its downloader, the project's reset
+script can use this Python environment:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+.\.agents\skills\flash-reset-esp32c3-oled\scripts\reset_esp32c3_oled.ps1 -Port $port -PythonPath $flashPython
+```
+
+The [reset skill](../.agents/skills/flash-reset-esp32c3-oled/SKILL.md) describes this
+recovery method. Confirm startup on the OLED and through the WebUI. No serial
+logs are expected from the production application variants.
+
+For another prebuilt update later, run `git pull --ff-only origin main` in
+`C:\yoRadio`, select the desired variant, and repeat P3, P4 and P6. If you reopened
+PowerShell, set `$flashPython` to `(Resolve-Path "C:\yoRadio\.build\flash-tools\Scripts\python.exe").Path`
+again. Pulling a newer Git revision does not imply that every archived binary
+was rebuilt; check its manifest.
+
+The command syntax follows [Espressif's esptool reference](https://docs.espressif.com/projects/esptool/en/latest/esp32c3/esptool/basic-commands.html).
+The files and offsets were checked offline. These instructions and the shared
+installation package have not been validated by flashing a physical board.
+
+**The prebuilt route is complete here.** Use steps 6, 7, 9 and (when applicable)
+10 only as directed above. Skip the source-build steps 3, 4, 5, 8 and 11 below.
 
 ## 3. Install the firmware toolchain
 
@@ -217,6 +469,9 @@ consult the official Espressif connection guide linked above.
 
 ## 8. Flash the board for the first time
 
+**Source-build route only.** If you are installing a prebuilt image, skip this
+section and use P5 or P6 instead.
+
 **First installation uses `flash`.** It writes the bootloader, partition table,
 initial OTA selection, application and SPIFFS filesystem. SPIFFS contains the
 WebUI and playlist. On a previously configured radio, this also replaces saved
@@ -256,7 +511,9 @@ Audio playback also requires the correct external audio circuit described in the
 [board hardware guide](ESP32-C3-0.42-OLED.md).
 
 If the board stays in the bootloader after flashing, use the project's recovery
-script from `C:\yoRadio`:
+script from `C:\yoRadio`. Prebuilt users should use the command with
+`-PythonPath $flashPython` in P6; the following command is for the source-build
+route after running setup:
 
 ```powershell
 .\.agents\skills\flash-reset-esp32c3-oled\scripts\reset_esp32c3_oled.ps1 -Port $port
@@ -268,9 +525,10 @@ a returned COM port alone does not prove that the radio is running. The reset
 procedure is documented in the project's
 [ESP32-C3 reset skill](../.agents/skills/flash-reset-esp32c3-oled/SKILL.md).
 
-## 10. Enable the sleeping clock, if you built it
+## 10. Enable the sleeping clock, if your firmware includes it
 
-This section applies only when `DeepSleepClock = $true` was used during compilation.
+This section applies when `DeepSleepClock = $true` was used during compilation,
+or when you installed a prebuilt `deep-sleep-clock` variant.
 
 1. In the WebUI, enable the screensaver for the stopped radio and select **Clock**.
 2. Wait for the radio to synchronize its time over the network.
@@ -285,6 +543,9 @@ explained in [Espressif's USB Serial/JTAG documentation](https://docs.espressif.
 See [the project's deep-sleep instructions](ESP32C3_DEEP_SLEEP_CLOCK.md) for details.
 
 ## 11. Update the firmware later without replacing your settings
+
+This section rebuilds from source. To install another existing binary without
+compiling, use P3, P4 and P6 in the prebuilt section instead.
 
 For later updates of this native firmware with the same partition layout, use
 **`app-flash`**. It updates the application without writing NVS or SPIFFS, preserving
@@ -332,6 +593,7 @@ build script turn that feature off, even in a previously used configuration.
 | --- | --- |
 | `git` is not recognized | Complete the Git installation and open a new PowerShell 7 window. |
 | `git lfs` is not recognized | Install Git LFS, reopen PowerShell, and check `git lfs version`. |
+| `image-info` fails or a firmware hash differs | Repeat the targeted `git lfs pull` in P3; do not flash a pointer file or HTML download. |
 | Scripts are disabled | Run the process-scoped execution-policy command from step 3 in the same terminal. |
 | `Start-Process` does not accept `-Environment` | Use PowerShell 7.4 or newer. Check `$PSVersionTable.PSVersion`. |
 | `$buildOptions` or `$port` is missing after reopening the terminal | Repeat the option block and set the current COM port. |

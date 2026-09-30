@@ -1,0 +1,50 @@
+{
+  "target": "esp32c3-oled-native",
+  "variant": "shared-installation-files",
+  "esp_idf": "v6.0.2",
+  "flash_size_bytes": 4194304,
+  "flash_mode": "dio",
+  "flash_frequency": "80m",
+  "contains_application": false,
+  "contains_wifi_credentials": false,
+  "files": [
+    {
+      "file": "bootloader.bin",
+      "size_bytes": 13200,
+      "flash_offset": "0x0",
+      "sha256": "b443314aaac9c274348009799c0ec715994dd8e136215d70982f6683fd6f6a50",
+      "source_commit": "eef49d1a9421222e0359f84a540d29b96fb765b3"
+    },
+    {
+      "file": "partitions.bin",
+      "size_bytes": 3072,
+      "flash_offset": "0x8000",
+      "sha256": "f26d55c34a06f24ed917555cc4608a87f7c2300a6a71e20153d6dd43816e2f18",
+      "source_commit": "eef49d1a9421222e0359f84a540d29b96fb765b3"
+    },
+    {
+      "file": "boot_app0.bin",
+      "size_bytes": 8192,
+      "flash_offset": "0xe000",
+      "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f",
+      "source_commit": "eef49d1a9421222e0359f84a540d29b96fb765b3"
+    },
+    {
+      "file": "spiffs.bin",
+      "size_bytes": 262144,
+      "flash_offset": "0x3b0000",
+      "sha256": "267ed480f7f9d74f86efdec0ea05163d3012e3bb9520c1f67efafb39719842fb",
+      "source_commit": "63572edf79803f6939a64c466f24ec1c3d79602a"
+    }
+  ],
+  "hardware_tested": false,
+  "validation": [
+    "SPIFFS inputs match tracked source at 63572edf, allowing Windows CRLF in the two text files; no wifi.csv",
+    "SPIFFS regenerated with ESP-IDF settings and byte-identical to production build",
+    "Partition table and initial OTA selector match the RTC crystal production build",
+    "Initial OTA selector is 8192 erased bytes, selecting app0 on this partition table",
+    "All five native variant applications pass esptool 5.3.1 image-info and fit app0",
+    "Offline merge-bin with every variant verifies the documented app and SPIFFS offsets",
+    "SPIFFS decoded and gzip contents expanded; only 13 public source files, no Wi-Fi credential file or known local credentials"
+  ]
+}

@@ -96,7 +96,9 @@ before connecting a module.
 ## Reproducible setup and build
 
 For a clean Windows installation, start with the
-[beginner's build and flashing guide](../../docs/ESP32C3_BEGINNERS_GUIDE.md).
+[beginner's guide](../../docs/ESP32C3_BEGINNERS_GUIDE.md), including a
+[prebuilt firmware route](../../docs/ESP32C3_BEGINNERS_GUIDE.md#prebuilt-firmware-no-compilation)
+that needs no compiler or ESP-IDF installation.
 
 This is the repository's default firmware target. From the repository root,
 run:

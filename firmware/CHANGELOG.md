@@ -3,6 +3,23 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-30: ESP32-C3 prebuilt installation files
+
+- Add `esp32c3-oled-native-installation` with a shared native bootloader,
+  partition table, initial OTA selector and 256 KiB SPIFFS image. Select an
+  existing native variant's application separately; no firmware was recompiled.
+- Boot files are unchanged from the `eef49d1` production archive. SPIFFS comes
+  from the successful `63572edf` crystal production build and contains the
+  repository WebUI and playlist, without Wi-Fi credentials.
+- All SPIFFS inputs match Git (allowing Windows text line endings); regeneration
+  with the ESP-IDF build settings is byte-identical. Partition/OTA files match
+  the crystal build. Manifests record offsets, provenance and SHA-256 hashes.
+- Extend the English beginner's guide with all five native variants, the legacy
+  Arduino/I2S distinction, selective Git LFS download, esptool-only setup, full
+  first installation and updates that preserve NVS/SPIFFS and select app0.
+- Physical flashing remains untested for this packaging/documentation change.
+- [Prebuilt installation instructions](../docs/ESP32C3_BEGINNERS_GUIDE.md#prebuilt-firmware-no-compilation).
+
 ## Development - 2026-09-25: ESP32-C3 external 32.768 kHz RTC crystal
 
 - Add `-Rtc32kCrystal` to the root, native and production build scripts.
