@@ -84,6 +84,13 @@ commit. Record rejected candidates as well as improvements.
      The current adapter requires a complete 8,192-byte SBR stereo frame. Preserve
      the ability to receive legal ADTS frames up to the existing 8,191-byte limit;
      reducing a constant or splitting a network read is not a framing solution.
+     Implemented adaptive ADTS storage: a 7-byte inline header, checked growth
+     rounded to 128 bytes and capped at the original 8,191-byte frame limit.
+     Capacity is reused until close, including PCM retries; OOM preserves the
+     buffered header and returns an error. Host tests cover maximum/CRC frames,
+     1-byte chunks, failed create/grow/open and truncated-frame cleanup. The
+     real LC/HE/v2 QEMU output remains byte-identical to the fixed-buffer baseline.
+     [Per-fixture capacities and provenance](../tests/results/esp32c3-aac-adts-20260930/provenance.json).
    - [ ] Audit system RAM candidates separately: stack reductions only after
      worst-path measurements, heap-function placement in flash only after a
      cache-disabled/ISR call audit, and Wi-Fi pool changes only with throughput,

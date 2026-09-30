@@ -153,3 +153,10 @@ typedef struct { bool aac_plus_enable; } esp_aac_dec_cfg_t;
         str(MAIN / "native_aac_decoder.c"), "-o", str(executable),
     ], check=True)
     subprocess.run([str(executable)], check=True)
+    executable = tmp / "aac-memory"
+    subprocess.run([
+        os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
+        "-I" + str(tmp), "-I" + str(MAIN),
+        str(ROOT / "tests/native/esp32c3_aac_memory_test.c"), "-o", str(executable),
+    ], check=True)
+    subprocess.run([str(executable)], check=True)

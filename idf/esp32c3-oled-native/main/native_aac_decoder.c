@@ -12,26 +12,49 @@
 #define AAC_MEMORY(stage) ((void)0)
 #endif
 
-// ADTS has a 13-bit frame length. Keep at most one complete encoded frame;
-// network chunk boundaries must never become decoder reset boundaries.
+// ADTS has a 13-bit frame length. Grow to fit one complete frame, retaining
+// capacity until close. Network chunks never become decoder reset boundaries.
+#define ADTS_FRAME_MAX 8191
 struct native_aac_decoder {
     esp_audio_simple_dec_handle_t codec;
     size_t used;
+    size_t capacity;
+    uint8_t *data;
     uint16_t signature;
-    uint8_t data[8191];
+    uint8_t header[7];
 };
 
 native_aac_decoder_t *native_aac_decoder_create(void) {
     codec_memory_trace_dump("aac-before-adts");
     AAC_MEMORY("aac-before-adts");
-    return calloc(1, sizeof(native_aac_decoder_t));
+    native_aac_decoder_t *decoder = calloc(1, sizeof(*decoder));
+    if (decoder) {
+        decoder->data = decoder->header;
+        decoder->capacity = sizeof(decoder->header);
+    }
+    return decoder;
 }
 
 void native_aac_decoder_destroy(native_aac_decoder_t *decoder) {
     if (!decoder) return;
     if (decoder->codec) esp_audio_simple_dec_close(decoder->codec);
     codec_memory_trace_dump("aac-close");
+    if (decoder->data != decoder->header) free(decoder->data);
     free(decoder);
+}
+
+static bool reserve_frame(native_aac_decoder_t *decoder, size_t needed) {
+    if (needed <= decoder->capacity) return true;
+    // At most 128 bytes of slack avoids reallocating for every VBR frame.
+    size_t capacity = (needed + 127) & ~(size_t)127;
+    if (capacity > ADTS_FRAME_MAX) capacity = ADTS_FRAME_MAX;
+    bool inline_header = decoder->data == decoder->header;
+    uint8_t *resized = realloc(inline_header ? NULL : decoder->data, capacity);
+    if (!resized) return false;
+    if (inline_header) memcpy(resized, decoder->header, decoder->used);
+    decoder->data = resized;
+    decoder->capacity = capacity;
+    return true;
 }
 
 esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
@@ -58,6 +81,8 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                 continue;
             }
             needed = frame_size;
+            if (!reserve_frame(decoder, needed)) return ESP_AUDIO_ERR_MEM_LACK;
+            p = decoder->data; // Growth may move the frame/header.
             if (decoder->used == needed) {
                 bool opened = false;
                 uint16_t signature = ((p[1] & 8) << 8) |
