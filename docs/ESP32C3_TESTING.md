@@ -8,6 +8,10 @@ The [2026-09-30 physical results](../tests/results/esp32c3-acceptance-20260930/R
 record passing OTA checks and outstanding HE-AAC, EOF and HTTP-load failures.
 Tests not run are identified separately from failures.
 
+The subsequent [EOF correction and regression tests](ESP32C3_EOF_STATUS.md)
+separate terminal playback status from full-rate HE-AAC acceptance. They include
+a deterministic delayed-output regression and FFmpeg/FDK complete-file references.
+
 For allocation phases, per-task stack margins and reproducible SBR structure
 sizes, see the [AAC memory investigation](ESP32C3_AAC_MEMORY_20260930.md) and
 `tools/esp32c3_tests/memory.py`. Its survey is separate from a passing load/soak test.
@@ -43,6 +47,7 @@ retain both failures and passes; the production default remains DIO 80 MHz.
 | C3-T14 | Real browser rendering, OLED appearance and physical audio | Manual procedure below | Upload form/progress/errors are usable; whole OLED updates; stereo channels and audio continuity are checked physically. |
 | C3-T15 | Power interruption during OTA | Manual procedure below | Dedicated recoverable test board boots the previous/new valid app after interruption at each stage; do not assume automatic rollback exists. |
 | C3-T16 | Future AAC buffer-reuse equivalence and error paths | Existing `run-esp32c3-stream-format.py`, new full-radio matrix and procedure below | New implementation must additionally pass PCM/state equivalence, ownership, cancellation/OOM and all HE/v2 acceptance cases. The optimization itself is still planned. |
+| C3-T17 | Stable terminal status after buffered decoder output | `tests/run-esp32c3-eof.py`, `run.py --suite eof`, `reference_eof.py` | EOF follows queued PCM; stopped REST/WebSocket status stays stopped and clears stream parameters. Exercise all eleven fixtures with AUTO/explicit codecs, late metadata, stale generations, cancellation and failures. Profile/rate acceptance remains a separate requirement. |
 
 ## What “all formats” means here
 
@@ -83,6 +88,7 @@ From a WSL shell in the same checkout:
 ```sh
 python3 tests/run-esp32c3-ota.py
 python3 tests/run-esp32c3-stream-format.py
+python3 tests/run-esp32c3-eof.py
 ```
 
 The new host tests exercise the acceptance checks against valid and invalid

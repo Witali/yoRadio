@@ -15,8 +15,8 @@ isolated workload. It does not certify Wi-Fi, OTA or total radio CPU usage.
 
 ## Images and method
 
-These results describe the images **before** the subsequent EOF status
-correction. Later results for that correction
+These results describe the images **before** the subsequent
+[EOF status correction](ESP32C3_EOF_STATUS.md). Later results for that correction
 must not be substituted for failed cases in this record.
 
 The physical board is the same ESP32-C3 SuperMini OLED revision 0.4, with

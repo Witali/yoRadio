@@ -199,3 +199,8 @@ firmware/development/esp32c3-oled-native-?io80-*/sdkconfig -text whitespace=cr-a
 tests/results/esp32c3-qio80-acceptance-20260930/**/*.json -text whitespace=cr-at-eol
 tests/results/esp32c3-qio80-acceptance-20260930/*.json -text whitespace=cr-at-eol
 tests/results/esp32c3-qio80-acceptance-20260930/**/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol,-space-before-tab
+
+# Preserve exact EOF regression evidence and its original line endings.
+tests/results/esp32c3-eof-20260930/**/*.json -text whitespace=cr-at-eol
+tests/results/esp32c3-eof-20260930/*.json -text whitespace=cr-at-eol
+tests/results/esp32c3-eof-20260930/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol,-space-before-tab

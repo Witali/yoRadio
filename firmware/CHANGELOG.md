@@ -3,6 +3,28 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-30: ESP32-C3 terminal status after EOF
+
+- Fix the race that left playback active after a finite HE-AAC or other audio
+  file ended. Completion now follows decoder output through the PCM queue;
+  late metadata cannot turn a finished stream back into a playing stream.
+- Add deterministic ordering/error/cancellation tests, a separate physical
+  EOF matrix and complete-file FFmpeg/FDK reference checks for six AAC fixtures.
+  The AAC parsing, profiles, sample rates and known SBR memory limit are unchanged.
+- Archive `esp32c3-oled-native-{dio80,qio80}-eof` builds from `69410cd5`, with
+  their matching bootloaders/configurations. Update
+  `development/esp32c3-oled-native-production/` with the same DIO application
+  and a clean recovery image containing no saved NVS/SPIFFS data.
+- The physical DIO EOF matrix passed all 22 cases. QIO passed 21 initially;
+  the case interrupted by an HTTP observation failure passed on a separate
+  repeat. Keep both attempts. These are terminal-status tests, not full-rate
+  HE-AAC acceptance; the complete radio still falls back to the AAC core.
+- All 15 exact-image DIO OTA/restoration checks passed. Both flash modes passed
+  network-fault and WebSocket checks; DIO Stop/Play replacement also passed.
+  The board resumed the saved station with unchanged Wi-Fi/playlist/settings.
+- DIO 80 MHz remains the default, with deep sleep disabled in these images.
+  [Cause, reference sources and validation](../docs/ESP32C3_EOF_STATUS.md).
+
 ## Development - 2026-09-30: ESP32-C3 Quad flash qualification
 
 - Archive standalone `esp32c3-flash-{dio80,qio40,qio80}-test` images and

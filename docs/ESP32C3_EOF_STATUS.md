@@ -29,6 +29,11 @@ limit. It does not claim measurement of the final physical DAC/PDM sample.
 
 ## Documentation and decoder references
 
+- [FFmpeg ADTS header parser](https://ffmpeg.org/doxygen/7.1/adts__header_8c_source.html)
+  reads `aac_frame_length` and the count of raw data blocks as frame boundaries.
+  A complete ADTS frame is not a player-completion event: in these finite HTTP
+  fixtures, body completion and decoder drain are separate stages. No ADTS
+  syntax or HE-AAC profile handling was changed for this status fix.
 - [HTTP/1.1, RFC 9112 §6.3 and §8](https://www.rfc-editor.org/rfc/rfc9112.html#name-message-body-length)
   defines body completion separately from an incomplete response. The HTTP
   reader retains its completeness/watchdog checks; a temporary lack of data
@@ -101,3 +106,70 @@ python3 tools/esp32c3_tests/reference_eof.py --fdk-reference /path/to/fdk-refere
 Reference decoding validates the fixtures and EOF/drain distinction. Physical
 firmware status must still pass the separate board test; reference results do
 not replace it.
+
+## Physical verification, 2026-09-30
+
+Both quiet builds use source `69410cd5`, ESP-IDF 6.0.2 and codec package 2.6.2
+on the same ESP32-C3 SuperMini OLED board (160 MHz, 4 MiB flash, no PSRAM).
+Deep sleep and profiling are disabled. Both Wi-Fi IRAM options remain disabled.
+The exact images, matching bootloaders and configurations are retained under
+`firmware/development/esp32c3-oled-native-{dio80,qio80}-eof/`.
+
+The [retained results](../tests/results/esp32c3-eof-20260930/README.md) include
+all attempts, technical REST observations, reference-decoder output and image
+identities. EOF checks require decoded playback before completion, repeated
+stopped REST samples with cleared PCM metadata, and a stopped WebSocket snapshot.
+
+The first QIO matrix passed 21 of 22 EOF cases. An HTTP request failed during
+the terminal observation of explicit-codec AAC-LC 320 kbit/s; the partial samples
+and `URLError` remain in the initial report. A separate repeat of that fixture
+passed with both AUTO and explicit AAC. All six HE/v2 EOF cases passed in the
+initial run. Network drop/stall/503 recovery, redirect, jitter and WebSocket
+reconnect also passed.
+
+The DIO matrix passed all 22 EOF cases (eleven fixtures, AUTO and explicit
+codec selection), including all six HE/v2 cases. Every successful case retained
+the stopped status in both REST and a fresh WebSocket snapshot.
+The five network fault/redirect/jitter checks and WebSocket reconnect passed
+in DIO as well. The separate Stop/Play generation-replacement check passed.
+
+All 15 DIO OTA/restoration cases passed on this exact image: ten invalid or
+interrupted uploads, a round trip through both application slots, upload while
+playing, slow upload and final restoration. Application ELF identity was checked
+after boot; Wi-Fi, playlist and exposed settings were compared in memory and
+remained unchanged. The final reboot resumed the saved station with decoded
+AAC PCM at 44.1 kHz stereo. The board is left running the fixed DIO80 image
+without deep sleep, also archived as `esp32c3-oled-native-production/app.bin`.
+
+| Check | Result |
+| --- | --- |
+| DIO EOF, 11 fixtures × AUTO/explicit | 22/22 PASS |
+| QIO initial EOF matrix | 21/22 PASS; one interrupted HTTP observation |
+| QIO separate repeat of affected fixture | 2/2 PASS |
+| Network faults/redirect/jitter | 5/5 PASS in each flash mode |
+| WebSocket reconnect | PASS in each mode |
+| Stop/Play generation replacement | PASS in DIO |
+| Exact-image OTA and restoration | 15/15 PASS in DIO |
+| C3/shared-WebUI Node tests | 151 PASS |
+| Python acceptance infrastructure | 16 PASS |
+| Production EOF and stream-format/Helix/framing host regressions | PASS |
+| Firmware artifact consistency | 4 PASS |
+
+No fresh CPU benchmark, optical OLED inspection or acoustic test is claimed
+for this status correction. The terminal REST/WebSocket observations and
+production-code state tests are retained independently of those measurements.
+
+The HE/v2 board observations still show AAC-core fallback. Their passing EOF
+status must not be described as successful full-rate SBR/PS playback. The six
+full-profile FFmpeg/FDK references above are host results, not board results.
+
+After installing the DIO application and its matching bootloader, the first
+watchdog reset returned USB but did not make HTTP available within the helper's
+25-second limit. One further watchdog reset returned HTTP successfully and
+verified the exact application identity. This observation is retained separately
+from EOF results; it is not evidence of a causal link between Wi-Fi and flash mode.
+
+Only the bootloader and active application partition were written over USB.
+The clean public `full.bin` was packaged from build outputs and was not flashed
+over the user's configuration. The full QIO qualification gate remains separate;
+the production default stays DIO 80 MHz.
