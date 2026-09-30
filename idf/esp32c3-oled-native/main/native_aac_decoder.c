@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "aac_decoder_config.h"
+#include "codec_memory_trace.h"
 #if CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
 #include "cpu_profiler.h"
 #define AAC_MEMORY(stage) cpu_profiler_memory(stage)
@@ -20,6 +21,7 @@ struct native_aac_decoder {
 };
 
 native_aac_decoder_t *native_aac_decoder_create(void) {
+    codec_memory_trace_dump("aac-before-adts");
     AAC_MEMORY("aac-before-adts");
     return calloc(1, sizeof(native_aac_decoder_t));
 }
@@ -27,6 +29,7 @@ native_aac_decoder_t *native_aac_decoder_create(void) {
 void native_aac_decoder_destroy(native_aac_decoder_t *decoder) {
     if (!decoder) return;
     if (decoder->codec) esp_audio_simple_dec_close(decoder->codec);
+    codec_memory_trace_dump("aac-close");
     free(decoder);
 }
 
@@ -60,6 +63,7 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                     ((p[2] & 0xfd) << 2) | (p[3] >> 6);
                 if (!decoder->codec || signature != decoder->signature) {
                     if (decoder->codec) esp_audio_simple_dec_close(decoder->codec);
+                    codec_memory_trace_dump("aac-reopen-close");
                     decoder->codec = NULL;
                     AAC_MEMORY("aac-before-open");
                     esp_aac_dec_cfg_t aac = native_aac_decoder_config();
@@ -72,6 +76,7 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                     // across incompatible ADTS configurations otherwise.
                     esp_audio_err_t result = esp_audio_simple_dec_open(
                         &config, &decoder->codec);
+                    codec_memory_trace_dump("aac-open");
                     if (result != ESP_AUDIO_ERR_OK) return result;
                     decoder->signature = signature;
                     opened = true;
@@ -82,6 +87,7 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                 };
                 esp_audio_err_t result = esp_audio_simple_dec_process(
                     decoder->codec, &frame, output);
+                codec_memory_trace_dump("aac-process");
                 if (opened) AAC_MEMORY("aac-after-first-process");
                 // Keep the frame for a larger PCM buffer retry. The caller
                 // still advances input bytes already copied into our buffer.

@@ -3,7 +3,7 @@ get_filename_component(YORADIO_ROOT
 
 if(YORADIO_HARDWARE_CACHE_TEST OR YORADIO_HARDWARE_FLASH_TEST)
   idf_component_register(
-    SRCS "hardware_cache_test.c" "native_aac_decoder.c"
+    SRCS "hardware_cache_test.c" "native_aac_decoder.c" "codec_memory_trace.c"
     INCLUDE_DIRS "."
     REQUIRES esp_audio_codec esp_timer esp_hw_support esp_system hal riscv soc
              esp_hal_mspi app_update bootloader_support esp_partition spi_flash)
@@ -39,6 +39,7 @@ endif()
 
 set(NATIVE_SRCS
   "app_main.c"
+  "codec_memory_trace.c"
   "audio_service.c"
   "native_aac_decoder.c"
   "cpu_profiler.c"

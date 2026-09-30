@@ -1,5 +1,13 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_CODEC_MEMORY_TRACE
+    bool "Trace codec allocation lifetimes (diagnostic only)"
+    default n
+    help
+        Replace esp_audio_codec's weak allocation shims with bounded tracking.
+        Requires INFO logs. Adds fixed RAM overhead and logs after AAC calls;
+        do not use this build for CPU timing or as a production profile.
+
 config YORADIO_AAC_PLUS
     bool "Decode full HE-AAC SBR/PS with Espressif AAC"
     depends on YORADIO_AAC_DECODER_ESPRESSIF

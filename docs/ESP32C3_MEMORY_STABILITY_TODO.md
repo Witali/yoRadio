@@ -30,7 +30,10 @@ benchmark used about 12.2 KiB. A fix must preserve other codecs and user setting
 
 ### Execution plan and decision gates
 
-Status: **planned, not implemented**. The baseline is the fixed EOF application
+Status: **in progress**. The bounded SDK allocation tracer and its host checks
+are implemented; real-decoder QEMU traces confirm allocation lifetimes and
+close/reopen cleanup. Physical peak-budget qualification and the memory-saving
+changes below remain pending. The baseline is the fixed EOF application
 from `69410cd5`, archived and tested in `1bfc8b64`: DIO 80 MHz, no deep sleep,
 Espressif AAC Plus, no PSRAM. The [EOF correction](ESP32C3_EOF_STATUS.md) is
 complete; it does not resolve SBR memory allocation. Keep its regressions passing.

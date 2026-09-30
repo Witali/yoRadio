@@ -199,6 +199,46 @@ record, all AAC modes and the existing user buffer setting.
 
 ## Reproduce
 
+### Allocation lifetime trace added during implementation
+
+`CONFIG_YORADIO_CODEC_MEMORY_TRACE=y` enables diagnostic-only replacements for
+the codec's weak `media_lib_module_malloc/calloc/realloc` and `media_lib_free`
+shims. The ABI was checked against the linked 2.6.2 binary and Espressif's
+[media allocator declarations](https://github.com/espressif/esp-adf-libs/blob/master/media_lib_sal/include/media_lib_os.h).
+The ordinary build leaves the shims unchanged. The tracer uses 64 live slots
+and 64 queued events, no allocations or logging inside its hooks, and reports
+overflow rather than silently accepting an incomplete trace. Event/slot arrays
+cost 2,560 bytes on C3, plus small counters and a lock. INFO logging is required.
+
+The [retained QEMU trace](../tests/results/esp32c3-aac-allocations-20260930/provenance.json)
+runs the actual RISC-V decoder with full-rate HE/v2, configuration changes,
+close/reopen and the existing implicit-SBR limitation check:
+
+| Requested payload through media shims | Bytes |
+| --- | ---: |
+| Registration objects retained after close | 72 |
+| Open AAC Plus decoder, excluding registration | 51,200 |
+| Decoder after successful SBR/PS setup, excluding registration | 107,508 |
+| Peak including registration | 107,580 |
+
+The 55,128-byte SBR object and 1,180-byte control allocation are simultaneous
+with the open decoder's state. All tracked per-decoder objects are released on
+close; registration objects survive. No trace events were lost. These are
+requested payload sizes, not the full heap budget: allocator overhead, transient
+realloc copies, the ADTS wrapper, caller PCM and radio services are excluded.
+This isolated run does not establish that the complete radio has enough RAM.
+
+```sh
+python3 tests/run-esp32c3-memory-trace.py
+python3 tools/esp32c3_tests/allocations.py path/to/trace.log --output .build/allocations.json
+```
+
+The host test executes the real tracer and rejects overflow/missing events in
+the analyzer. The real Helix/stream-format/framing regressions also passed.
+Do not use trace-enabled runs as CPU benchmarks; logging changes scheduling.
+
+### Physical heap and stack survey
+
 Build the diagnostic radio as in [testing](ESP32C3_TESTING.md), with the added
 profiler snapshots. Install only the application through OTA, then run:
 
