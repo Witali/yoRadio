@@ -90,10 +90,12 @@ esp_err_t oled_display_init(oled_display_t *display) {
     display->bus = bus;
     display->device = device;
 
-    // EastRising 72x40 sequence used by U8g2 and the proven Arduino profile.
+    // EastRising 72x40 sequence, with page addressing for write_page() and
+    // the RTC clock writer. Reassert it after CPU resets: the OLED stays on
+    // and may retain a narrow horizontal window from an older clock image.
     const uint8_t init[] = {
         0xae, 0xd5, 0x80, 0xa8, 0x27, 0xd3, 0x00, 0xad, 0x30,
-        0x8d, 0x14, 0x40, 0xa6, 0xa4, 0x20, 0x00, 0xa1, 0xc8,
+        0x8d, 0x14, 0x40, 0xa6, 0xa4, 0x20, 0x02, 0xa1, 0xc8,
         0xda, 0x12, 0x81, BOARD_OLED_CONTRAST, 0xd9, 0x22, 0xdb, 0x20,
         0x2e, 0xaf,
     };

@@ -8,12 +8,40 @@
 // Execute the actual wake stub against an I2C wire model. The model decodes
 // START/STOP, eight data bits and ACK; it does not call its private renderer.
 gpio_dev_t GPIO;
-static unsigned levels[22], bits, value, transactions, bytes[4];
-static uint8_t wire[4][400];
+static unsigned levels[22], bits, value, transactions, bytes[12];
+static uint8_t wire[12][400];
 static bool started, nack, stuck;
 static uint64_t now_ticks, sleep_us;
 static jmp_buf slept;
 static unsigned default_wakes;
+static uint8_t oled_ram[8][128];
+static unsigned oled_page, oled_column;
+
+// Interpret the page-addressed controller protocol used by the 72x40 driver.
+// Keep hidden columns/pages too, so an update cannot silently wrap elsewhere.
+static void apply_oled_transaction(unsigned transaction) {
+    assert(bytes[transaction] >= 2);
+    assert(wire[transaction][0] == BOARD_OLED_ADDRESS * 2U);
+    unsigned control = wire[transaction][1];
+    for (unsigned i = 2; i < bytes[transaction]; ++i) {
+        uint8_t value = wire[transaction][i];
+        if (control == 0x40) {
+            oled_ram[oled_page][oled_column] = value;
+            oled_column = (oled_column + 1U) % 128U;
+        } else {
+            assert(control == 0x00);
+            if ((value & 0xf8U) == 0xb0U) oled_page = value & 7U;
+            else if ((value & 0xf0U) == 0x10U)
+                oled_column = (oled_column & 0x0fU) | ((value & 7U) << 4);
+            else if ((value & 0xf0U) == 0x00U)
+                oled_column = (oled_column & 0x70U) | (value & 0x0fU);
+            else assert(!"Command is incompatible with the OLED page writer");
+        }
+    }
+}
+static void apply_oled_updates(void) {
+    for (unsigned t = 0; t < transactions; ++t) apply_oled_transaction(t);
+}
 
 void esp_rom_gpio_pad_select_gpio(unsigned pin) { (void)pin; }
 void esp_rom_gpio_connect_out_signal(unsigned pin, unsigned signal, bool inv, bool oen) {
@@ -31,7 +59,7 @@ void gpio_ll_set_level(gpio_dev_t *gpio, unsigned pin, unsigned level) {
         if (!old && level && started) {
             started = false;
             ++transactions;
-            assert(transactions < 4);
+            assert(transactions < 12);
         }
     }
     if (pin != BOARD_OLED_SCL || old == level || !started) return;
@@ -62,6 +90,8 @@ void esp_wake_stub_sleep(void (*stub)(void)) {
 }
 static void reset(void) {
     memset(&g_rtc_clock, 0, sizeof(g_rtc_clock));
+    memset(oled_ram, 0xa5, sizeof(oled_ram)); // previous radio screen
+    oled_page = 7; oled_column = 113; // no assumed controller cursor
     memset(wire, 0, sizeof(wire));
     memset(bytes, 0, sizeof(bytes));
     for (unsigned i = 0; i < 22; ++i) levels[i] = 1;
@@ -81,12 +111,30 @@ static bool run_stub(void) {
     return false;
 }
 static void check_address(unsigned left, unsigned right) {
-    const uint8_t expected[] = {0x78, 0x00, 0x21, (uint8_t)(28 + left),
-                                (uint8_t)(28 + right), 0x22, 0, 4};
-    assert(transactions == 2);
-    assert(bytes[0] == sizeof(expected));
-    assert(memcmp(wire[0], expected, sizeof(expected)) == 0);
-    assert(wire[1][0] == 0x78 && wire[1][1] == 0x40);
+    apply_oled_updates();
+    assert(transactions == 10);
+    for (unsigned page = 0; page < 5; ++page) {
+        const unsigned t = page * 2U;
+        const unsigned column = 28U + left;
+        const uint8_t expected[] = {0x78, 0x00,
+            (uint8_t)(0x10U | (column >> 4)), (uint8_t)(column & 0x0fU),
+            (uint8_t)(0xb0U | page)};
+        assert(bytes[t] == sizeof(expected));
+        assert(memcmp(wire[t], expected, sizeof(expected)) == 0);
+        assert(wire[t + 1][0] == 0x78 && wire[t + 1][1] == 0x40);
+        assert(bytes[t + 1] == 2U + right - left + 1U);
+    }
+    for (unsigned page = 0; page < 8; ++page) {
+        for (unsigned column = 0; column < 128; ++column) {
+            if (page < 5 && column >= 28U + left && column <= 28U + right) {
+                unsigned x = column - 28U;
+                uint8_t expected = x >= 34 && x <= 36
+                    ? (g_rtc_clock.colon_on ? g_rtc_clock.colon[page * 3U + x - 34U] : 0)
+                    : g_rtc_clock.framebuffer[page * 72U + x];
+                assert(oled_ram[page][column] == expected);
+            } else assert(oled_ram[page][column] == 0xa5);
+        }
+    }
 }
 static void test_colon(void) {
     reset();
@@ -96,8 +144,8 @@ static void test_colon(void) {
     now_ticks = 60000; // cross the OFF edge without a minute change
     assert(run_stub());
     check_address(34, 36);
-    assert(bytes[1] == 17);
-    for (unsigned i = 2; i < 17; ++i) assert(wire[1][i] == 0);
+    for (unsigned page = 0; page < 5; ++page)
+        for (unsigned i = 2; i < 5; ++i) assert(wire[page * 2U + 1U][i] == 0);
     assert(!g_rtc_clock.colon_on);
     assert(sleep_us == rtc_clock_next_tick_us(&g_rtc_clock));
     assert(sleep_us > 0 && sleep_us <= 500000);
@@ -107,7 +155,8 @@ static void test_colon(void) {
     now_ticks = 1000;
     assert(run_stub());
     check_address(34, 36);
-    assert(memcmp(wire[1] + 2, g_rtc_clock.colon, 15) == 0);
+    for (unsigned page = 0; page < 5; ++page)
+        assert(memcmp(wire[page * 2U + 1U] + 2, g_rtc_clock.colon + page * 3U, 3) == 0);
 }
 static void test_minute(unsigned second, unsigned next_minute) {
     reset();
@@ -117,14 +166,13 @@ static void test_minute(unsigned second, unsigned next_minute) {
     now_ticks = 300000; // elapsed wake time, not a synthetic +500 ms
     assert(run_stub());
     check_address(0, 71);
-    assert(bytes[1] == 362);
     assert(g_rtc_clock.displayed_minute == next_minute);
     unsigned digits[] = {next_minute / 600, next_minute / 60 % 10,
                           next_minute % 60 / 10, next_minute % 10};
     const unsigned left[] = {2, 18, 40, 56};
     for (unsigned page = 0; page < 5; ++page) {
         for (unsigned d = 0; d < 4; ++d) {
-            assert(memcmp(wire[1] + 2 + page * 72 + left[d],
+            assert(memcmp(wire[page * 2U + 1U] + 2 + left[d],
                           g_rtc_clock.digits[digits[d]] + page * 13, 13) == 0);
         }
     }
@@ -185,5 +233,5 @@ int main(void) {
     test_recovery();
     test_elapsed_time();
     test_32k_half_seconds();
-    puts("PASS: actual RTC wake stub, I2C bytes, half-second edges, hour/day rollover, recovery and elapsed-time drift");
+    puts("PASS: actual RTC wake stub, OLED RAM coverage, I2C bytes, half-second edges, hour/day rollover, recovery and elapsed-time drift");
 }

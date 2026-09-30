@@ -101,21 +101,26 @@ static void render_digits(unsigned minute_of_day) {
 static bool present(bool full, bool colon_on) {
     unsigned left = full ? 0 : 34;
     unsigned right = full ? 71 : 36;
-    bool ok = start(0x00) && byte(0x21) && byte(28U + left) &&
-              byte(28U + right) && byte(0x22) && byte(0) && byte(4);
-    stop();
-    if (!ok) return false;
-    ok = start(0x40);
-    for (unsigned page = 0; ok && page < RTC_CLOCK_PAGES; ++page) {
+    // Match oled_display_present(): address every visible page explicitly.
+    // A retained horizontal column window would also corrupt the normal UI
+    // after a watchdog reset, because the OLED itself remains powered.
+    unsigned column = 28U + left;
+    for (unsigned page = 0; page < RTC_CLOCK_PAGES; ++page) {
+        bool ok = start(0x00) && byte(0x10U | (column >> 4)) &&
+                  byte(column & 0x0fU) && byte(0xb0U | page);
+        stop();
+        if (!ok) return false;
+        ok = start(0x40);
         for (unsigned x = left; ok && x <= right; ++x) {
             uint8_t value = x >= 34 && x <= 36
                 ? (colon_on ? g_rtc_clock.colon[page * 3U + x - 34U] : 0)
                 : g_rtc_clock.framebuffer[page * 72U + x];
             ok = byte(value);
         }
+        stop();
+        if (!ok) return false;
     }
-    stop();
-    return ok;
+    return true;
 }
 
 static bool user_pressed(void) {
