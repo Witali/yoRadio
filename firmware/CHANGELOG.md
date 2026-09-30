@@ -3,6 +3,17 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-30: ESP32-C3 AAC allocation baseline
+
+- Archive `esp32c3-aac-memory-trace-radio` from `8740af78`: DIO 80 MHz,
+  no deep sleep, CPU/heap diagnostics and the bounded codec allocation trace.
+- Installed through WebUI OTA; Wi-Fi, playlist and settings matched before/after.
+- Physical LC 48 kHz stereo passed. HE 48 kHz and HEv2 44.1 kHz failed full-rate
+  acceptance: both requested the 55,128-byte SBR object with only about 33 KiB
+  total heap and 11,776 bytes in the largest block. Retain these failures as
+  the baseline, not a qualified production update.
+- [Allocation evidence](../tests/results/esp32c3-aac-allocations-20260930/radio-baseline/report.json).
+
 ## Development - 2026-09-30: ESP32-C3 terminal status after EOF
 
 - Fix the race that left playback active after a finite HE-AAC or other audio

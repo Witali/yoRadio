@@ -75,6 +75,22 @@ inferred from metadata alone.
 
 ## What occupies the SBR object
 
+### Physical allocation-trace baseline
+
+The diagnostic radio from `8740af78` was installed by WebUI OTA with unchanged
+Wi-Fi, playlist and settings. Its [saved survey](../tests/results/esp32c3-aac-allocations-20260930/radio-baseline/report.json)
+passes LC 48 kHz stereo and fails HE/v2 full-output validation. Both failures
+coincide with a rejected 55,128-byte SDK request: 33,564/33,376 bytes free,
+largest block 11,776 bytes. The tracer costs 2,576 bytes of static C3 RAM;
+profiler/diagnostic costs from the earlier survey remain additional overhead.
+
+The physical library registration set retains **108 bytes** after decoder
+close (the isolated AAC QEMU build retains 72). Both traces return to their
+own initial registration baseline with no lost events. This confirms why an
+arena must distinguish registration lifetime from decoder lifetime. The
+physical SDK peak is only 51,308 requested bytes because SBR allocation fails;
+it must not be mistaken for the full-SBR requirement of 107,508 decoder bytes.
+
 The primary reference is Android's PacketVideo implementation at
 [`437ced8a…`, `s_sbr_channel.h`](https://android.googlesource.com/platform/frameworks/av/+/437ced8a14944bf5450df50c5e7e7a6dfe20ea40/media/libstagefright/codecs/aacdec/s_sbr_channel.h).
 Compiling its headers with the C3 compiler and `AAC_PLUS`, `HQ_SBR`,
