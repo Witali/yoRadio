@@ -1,0 +1,138 @@
+{
+  "board": {
+    "version": "v0.9.693-1068-gfb64725c",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "fdcbb41da0bf8d41b67cb6d3795f9b921cfe8d6de06d7e2ffe150f4a67fd44ec"
+  },
+  "cases": [
+    {
+      "name": "ota:wrong-chip",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 2.094
+    },
+    {
+      "name": "ota:wrong-project",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 1.89
+    },
+    {
+      "name": "ota:corrupt-image",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 20.531
+    },
+    {
+      "name": "ota:truncated-image",
+      "result": "FAIL",
+      "reason": "Booted app hash/partition did not match the uploaded image",
+      "seconds": 62.985
+    },
+    {
+      "name": "ota:extra-byte",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.0
+    },
+    {
+      "name": "ota:missing-boundary",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.015
+    },
+    {
+      "name": "ota:spiffs-target",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.016
+    },
+    {
+      "name": "ota:oversized-request",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.0
+    },
+    {
+      "name": "ota:disconnect",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.0
+    },
+    {
+      "name": "ota:stall",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.015
+    },
+    {
+      "name": "ota:roundtrip:1",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.0
+    },
+    {
+      "name": "ota:roundtrip:2",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.016
+    },
+    {
+      "name": "ota:while-playing",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.016
+    },
+    {
+      "name": "ota:slow",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.0
+    },
+    {
+      "name": "restore-saved-station",
+      "result": "FAIL",
+      "reason": "URLError",
+      "seconds": 5.015
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "created_utc": "2026-09-30T19:53:11.858891+00:00",
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/allocations.py": "be4a62b636aacc596d57cc39319ce2e07d4b6f0d2e072868204c4c1a85525d5f",
+    "tools/esp32c3_tests/common.py": "114bb5dfeaae880642d9c0f8ec61ea0aa02a4cbc3e4e281e16bca13e31d25caa",
+    "tools/esp32c3_tests/compare_latency.py": "4c87e574da2d5fd58e8035412eb605f8e1ac4b86e72152c15a58b0c03e2640a0",
+    "tools/esp32c3_tests/memory.py": "f2132c658c7ba4db7ca207752df1ddb46650b9ae44ef072f9196e23a0b109d41",
+    "tools/esp32c3_tests/ota.py": "cc73747925a07184a7f63ddacad60c98b0582e7f02fbc2858511961354a1ab7e",
+    "tools/esp32c3_tests/reference_eof.py": "9dbaa1d1ce971fe26fdd02a98156344334641ed9c889863cd76ac205941693ab",
+    "tools/esp32c3_tests/run.py": "166d82ccbebaeb26056ffec7559522817b4c7ec8a8a654a22fcf42740da0db0e",
+    "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+    "tools/audio_test_server/generate.py": "b2a445923e17b92ed4c420639a8d082f7ec82b919ee5650d6de20df9421943e9",
+    "tools/audio_test_server/make_test_certificate.py": "123f3056b2de232fa9aac8042690119b16c02339386b06d1463e03a305ff1199",
+    "tools/audio_test_server/server.py": "b29cf832e9ab196da000d2cca78189e25b3cd1f830b50c03cd368bf657d7a9f4"
+  },
+  "image": {
+    "app_elf_sha256": "fdcbb41da0bf8d41b67cb6d3795f9b921cfe8d6de06d7e2ffe150f4a67fd44ec",
+    "sha256": "d7640d4e80e230827b8365cf08fc67eac0a223b8f2f7f44cf8ff9a4eccbd2bfc",
+    "bytes": 1393120
+  }
+}

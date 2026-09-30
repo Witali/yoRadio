@@ -15,6 +15,12 @@ entries are retained; changes are published under a new firmware version.
   `esp32c3-aac-buffers-quiet` (normal quiet configuration, no deep sleep), with
   source/configuration/image identities. Host fault/sanitizer checks and real
   QEMU PCM equivalence pass. Physical qualification is recorded in the report.
+- Quiet-image HTTP checks pass 16/16 MP3/FLAC/Vorbis/Opus/AAC-LC format cases,
+  five network-fault cases and WebSocket reconnect. Six HE/v2 format cases still
+  fail; their separate six EOF-status cases pass. Initial OTA loses network
+  after a truncated-image rejection and requires USB watchdog reset; retain
+  that failure. The independent complete retry passes all 15 OTA/restoration
+  checks with unchanged settings. The board is left on the quiet image.
 - Retain three heap-in-Flash experiments: `esp32c3-aac-heapflash-radio`,
   `esp32c3-aac-heapflash-minimal`, and `esp32c3-aac-heapflash-minimal-usb`.
   The middle image lacks a console and cannot supply RAM evidence. The last

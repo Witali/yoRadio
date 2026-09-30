@@ -142,7 +142,47 @@ source-available replacement with full SBR **and PS**. The current Helix LC path
 is not such a replacement. Existing 16 KiB decoder stack and full TLS buffers
 were retained; any further stack/pool changes need their own worst-path tests.
 
-### Full-radio heap, bytes
+## Regression checks for the buffer changes
+
+The quiet `esp32c3-aac-buffers-quiet` application uses the normal memory-placement
+settings, DIO 80 MHz and no deep sleep. Firmware sources match `fb64725c`;
+its ELF identity is `fdcbb41da0bf8d41b67cb6d3795f9b921cfe8d6de06d7e2ffe150f4a67fd44ec`.
+
+- The physical [HTTP/fault/WebSocket run](../tests/results/esp32c3-aac-buffers-qualification-20260930/http/report.json)
+  passes all 16 MP3/FLAC/Vorbis/Opus/AAC-LC format cases (AUTO and explicit
+  codec), all five network-fault cases, reconnect and saved-station restoration.
+  All six HE/v2 full-format cases still fail, consistently with the SBR budget.
+- The separate [HE/v2 EOF regression](../tests/results/esp32c3-aac-buffers-qualification-20260930/eof/report.json)
+  passes all six AUTO/explicit cases and restoration. Correct terminal state
+  does not count as successful SBR/PS output.
+- Host C callbacks, actual Helix adapter, ADTS/PCM fault injection, codec trace,
+  EOF ordering and OTA parser/service tests pass. Address/undefined-behavior
+  sanitizers pass on the host C paths. The selected Node suites pass 66/66;
+  acceptance-oracle tests pass 16/16 and cache/profile/Quad evidence tests 19/19.
+- The [initial exact-image OTA run](../tests/results/esp32c3-aac-buffers-qualification-20260930/ota-initial.json)
+  passes three rejection checks, then loses network access after rejecting the
+  truncated image; subsequent requests/restoration fail. USB watchdog reset
+  [restores HTTP and the same app/slot](../tests/results/esp32c3-aac-buffers-qualification-20260930/ota-recovery.json)
+  without rewriting flash. The saved station plays again. The connection-loss
+  cause is unproven; retain this failure even if a separate retry passes.
+- The [complete independent OTA retry](../tests/results/esp32c3-aac-buffers-qualification-20260930/ota-retry.json)
+  passes **15/15**: invalid requests, both app slots, update during playback,
+  paced upload and final restoration. ELF identity and Wi-Fi/playlist/settings
+  equality are checked. This pass does not explain or erase the initial outage.
+
+The [final snapshot](../tests/results/esp32c3-aac-buffers-qualification-20260930/summary.json)
+confirms the quiet buffer-optimized image, the restored 10-block setting and
+active saved-station playback. Deep sleep, allocation tracing, CPU profiling
+and experimental heap-in-Flash placement are disabled in this image.
+
+Full-plan acceptance remains open: full-rate HE/v2, the unchanged-header LC→PS
+transition, a compatible internal-SBR memory rewrite, trusted HTTPS fixture
+matrix, one-hour full-format soaks, exhaustive AAC/state coverage, worst-case
+controls/stack/IRQ paths, the intermittent OTA connection loss and physical
+stereo/OLED inspection. These results do
+not qualify a source-available replacement or the experimental heap placement.
+
+## Original full-radio heap survey, before buffer changes
 
 | Stage | Total free | Largest block |
 | --- | ---: | ---: |
