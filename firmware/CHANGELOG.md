@@ -3,6 +3,20 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-30: ESP32-C3 Quad flash qualification
+
+- Archive standalone `esp32c3-flash-{dio80,qio40,qio80}-test` images and
+  matching bootloaders/configurations. Actual SPI0 mode/clock, 96 complete
+  image CRC passes and 432 AAC decoder windows passed on the physical C3.
+- Archive full-radio `esp32c3-oled-native-qio80-candidate` and matched
+  `esp32c3-oled-native-{dio80,qio80}-profile` builds from `6c3da5e9`.
+  All disable deep sleep; profiling variants retain CPU/heap diagnostics.
+- Keep normal production at DIO 80 MHz: the full-radio QIO acceptance gate
+  did not pass. Retain failed network/load/format results as well as passes;
+  no causal relationship between RSSI and flash mode was established.
+- [Standalone flash results](../docs/ESP32C3_FLASH_QUAD_20260930.md) and
+  [full-radio acceptance](../docs/ESP32C3_QIO80_ACCEPTANCE_20260930.md).
+
 ## Development - 2026-09-30: ESP32-C3 prebuilt installation files
 
 - Add `esp32c3-oled-native-installation` with a shared native bootloader,

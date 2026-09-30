@@ -20,6 +20,8 @@ The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passin
 standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
 AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained
 evidence and rejection paths. This does not replace full-radio QIO acceptance.
+The subsequent [full-radio QIO 80 MHz results](ESP32C3_QIO80_ACCEPTANCE_20260930.md)
+retain both failures and passes; the production default remains DIO 80 MHz.
 
 ## Gaps found and corresponding tests
 

@@ -192,3 +192,10 @@ tools/codec_benchmark/cache/*.sh text eol=lf
 tests/results/esp32c3-cache-qemu-20260930/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
 tests/results/esp32c3-cache-qemu-20260930/*.json text eol=lf
 tests/fixtures/esp32c3_calibration/manifest.json text eol=lf
+
+# Preserve exact bytes used by the physical C3 Quad provenance hashes.
+firmware/development/esp32c3-flash-*-test/sdkconfig -text whitespace=cr-at-eol
+firmware/development/esp32c3-oled-native-?io80-*/sdkconfig -text whitespace=cr-at-eol
+tests/results/esp32c3-qio80-acceptance-20260930/**/*.json -text whitespace=cr-at-eol
+tests/results/esp32c3-qio80-acceptance-20260930/*.json -text whitespace=cr-at-eol
+tests/results/esp32c3-qio80-acceptance-20260930/**/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol,-space-before-tab

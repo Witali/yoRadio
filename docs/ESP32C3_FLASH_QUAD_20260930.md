@@ -5,6 +5,10 @@ This was checked on physical hardware, using the SPI0 controller registers,
 repeated mapped flash reads and AAC decoding. The production defaults remain
 **DIO 80 MHz**; this experiment does not change the shipping flash mode.
 
+The later [full-radio QIO 80 MHz acceptance run](ESP32C3_QIO80_ACCEPTANCE_20260930.md)
+did not pass the promotion gate. It records playback, network, CPU/heap and
+OTA results separately from these successful standalone measurements.
+
 ## Board and test conditions
 
 - ESP32-C3 QFN32 revision 0.4, embedded XMC 4 MiB flash, JEDEC ID `0x464016`.

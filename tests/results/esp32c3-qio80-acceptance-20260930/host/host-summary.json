@@ -1,0 +1,43 @@
+{
+  "python_suites": {
+    "acceptance": 15,
+    "cache_hardware": 7,
+    "cache_trace": 9,
+    "flash_quad": 7,
+    "radio_profile": 5
+  },
+  "python_all_passed": true,
+  "native_wsl_suites_passed": [
+    "stream-format:callbacks/PCM/WebUI/OLED",
+    "stream-format:Helix AAC transitions",
+    "stream-format:AAC framing",
+    "deep-sleep clock wake stub",
+    "RTC crystal pins (16 configurations)",
+    "OTA streaming",
+    "OTA HTTP"
+  ],
+  "node_all_repository": {
+    "tests": 1172,
+    "passed": 1111,
+    "failed": 39,
+    "skipped": 22,
+    "note": "See node-failures.json; broader ESP8266 evidence/test infrastructure is outside the C3 mode comparison"
+  },
+  "node_c3_and_shared_webui": {
+    "tests": 151,
+    "passed": 151,
+    "failed": 0
+  },
+  "firmware_archive_after_fix": {
+    "tests": 4,
+    "passed": 4,
+    "commit": "c4eb5f33",
+    "change": "Replace obsolete fixed source revision with exact app descriptor/version and per-row size/hash checks"
+  },
+  "browser_ui": {
+    "result": "BLOCKED",
+    "reason": "cua_repl browser runtime exited twice: Windows sandbox setup refresh helper error"
+  },
+  "python_total": 43,
+  "python_note": "Other suites passed in the initial 42-test run; acceptance rerun passed 15 tests after commit 716f7964 added partial-observation coverage."
+}
