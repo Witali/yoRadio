@@ -6,10 +6,13 @@ corpus meets 1 LSB, 2 means measured precision rejection, 1 means harness failur
 Neither a corpus pass nor experiment completion qualifies production firmware.
 """
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
+import math
 import re
 import statistics
+import struct
 import subprocess
 import sys
 from pathlib import Path
@@ -38,7 +41,12 @@ def parse_log(log):
         for key in row.keys() - {"case", "precision"}:
             row[key] = int(row[key])
         rows.append(row)
-    expected = {(case, bands, run) for case in CASES
+    external = re.findall(r"BFP16_EXTERNAL (.*)", log)
+    if len(external) > 1:
+        raise ValueError("Duplicate external recording header")
+    external = ({k: int(v) for k, v in re.findall(r"(\w+)=(\d+)", external[0])} if external else None)
+    cases = ("external",) if external else CASES
+    expected = {(case, bands, run) for case in cases
                 for bands in ((32,) if case.startswith("lc") else (32, 8, 1, 0))
                 for run in (1, 2, 3)}
     actual = {(r["case"], r["bands"], r["run"]) for r in rows}
@@ -54,13 +62,13 @@ def parse_log(log):
                 bool(maximum > 1) != bool(r["over_one"]) or
                 bool(maximum) != bool(r["different"])):
             raise ValueError(f"Inconsistent error counts/maximum: {r}")
-        if r["case"].startswith("lc") or not r["bands"]:
+        if r["case"].startswith("lc") or not r["bands"] or (external and not external["sbr"]):
             if r["different"] or r["complex_rows"] or r["real_rows"]:
                 raise ValueError(f"Unquantized control changed: {r}")
         elif not (r["complex_rows"] + r["real_rows"] and r["changed_qmf"]):
             raise ValueError(f"Quantization hook not exercised: {r}")
     summaries = []
-    for case in CASES:
+    for case in cases:
         for bands in ((32,) if case.startswith("lc") else (32, 8, 1, 0)):
             group = [r for r in rows if r["case"] == case and r["bands"] == bands]
             overheads = [100 * (r["bfp_work"] / r["ref_work"] - 1) for r in group]
@@ -70,9 +78,91 @@ def parse_log(log):
                               "over_one_per_run": [r["over_one"] for r in group],
                               "instruction_overhead_median_percent": round(statistics.median(overheads), 3),
                               "instruction_overhead_range_percent": [round(min(overheads), 3), round(max(overheads), 3)]})
-    return {"precision_limit_lsb": 1, "precision_pass": all(not r["over_one"] for r in rows),
+    result = {"precision_limit_lsb": 1, "precision_pass": all(not r["over_one"] for r in rows),
             "ram_saved_bytes": 0, "timing_unit": "QEMU guest instructions, not hardware CPU time",
             "summaries": summaries, "runs": rows}
+    if external:
+        result["external"] = external
+        result["error_statistics"] = parse_statistics(log, rows, external)
+    return result
+
+
+def bin_bounds(index):
+    if not 0 <= index < 4111:
+        raise ValueError("Histogram index outside uint16 absolute-error range")
+    return (index, index) if index < 4096 else ((index - 4095) * 4096, (index - 4094) * 4096 - 1)
+
+
+def error_summary(s, hist):
+    count = s["samples"]
+    if sum(hist.values()) != count or count <= 0:
+        raise ValueError("Histogram sample count differs from PCM count")
+    if s["over_one"] != count - hist.get(0, 0) - hist.get(1, 0):
+        raise ValueError("Histogram contradicts one-LSB exceedance count")
+    if abs(s["signed_sum"]) > s["abs_sum"]:
+        raise ValueError("Signed error sum exceeds absolute error sum")
+    if not hist or not bin_bounds(max(hist))[0] <= s["maximum"] <= bin_bounds(max(hist))[1]:
+        raise ValueError("Histogram contradicts maximum error")
+    for power, key in ((1, "abs_sum"), (2, "square_sum")):
+        lower = sum(bin_bounds(i)[0] ** power * n for i, n in hist.items())
+        upper = sum(bin_bounds(i)[1] ** power * n for i, n in hist.items())
+        if not lower <= s[key] <= upper:
+            raise ValueError("Error moments contradict histogram")
+    quantiles = {}
+    for label, numerator in (("p50", 500), ("p90", 900), ("p95", 950), ("p99", 990), ("p999", 999)):
+        target = (count * numerator + 999) // 1000
+        cumulative = 0
+        for index, n in sorted(hist.items()):
+            cumulative += n
+            if cumulative >= target:
+                lo, hi = bin_bounds(index)
+                quantiles[label] = [lo, min(hi, s["maximum"])]
+                break
+    return {"mean_absolute_error_lsb": s["abs_sum"] / count,
+            "rms_error_lsb": math.sqrt(s["square_sum"] / count),
+            "mean_signed_error_lsb": s["signed_sum"] / count,
+            "over_one_percent": 100 * s["over_one"] / count,
+            "identical_percent": 100 * hist.get(0, 0) / count,
+            "reference_rms_lsb": math.sqrt(s["signal_square_sum"] / count),
+            "error_to_full_scale_dbfs": 10 * math.log10(s["square_sum"] / count / 32768 ** 2) if s["square_sum"] else None,
+            "signal_to_error_db": 10 * math.log10(s["signal_square_sum"] / s["square_sum"]) if s["square_sum"] and s["signal_square_sum"] else None,
+            "absolute_error_percentile_bounds_lsb": quantiles}
+
+
+def parse_statistics(log, rows, external):
+    stats, histograms = {}, {}
+    for line in log.splitlines():
+        if "BFP16_STATS " in line:
+            s = dict(re.findall(r"(\w+)=([\w.-]+)", line.split("BFP16_STATS ", 1)[1]))
+            s = {k: (v if k == "case" else int(v)) for k, v in s.items()}
+            key = (s["bands"], s["run"], s["channel"])
+            if key in stats:
+                raise ValueError("Duplicate channel statistics")
+            stats[key] = s
+        elif "BFP16_HIST " in line:
+            fields = dict(re.findall(r"(\w+)=([^ ]+)", line.split("BFP16_HIST ", 1)[1]))
+            key = tuple(int(fields[k]) for k in ("bands", "run", "channel"))
+            histogram = histograms.setdefault(key, {})
+            for index, n in re.findall(r"(\d+):(\d+)", fields["bins"]):
+                index, n = int(index), int(n)
+                bin_bounds(index)
+                if index in histogram or not n:
+                    raise ValueError("Duplicate/empty histogram entry")
+                histogram[index] = n
+    expected = {(r["bands"], r["run"], ch) for r in rows for ch in range(external["channels"])}
+    if set(stats) != expected or set(histograms) != expected:
+        raise ValueError("Missing/extra per-channel statistics or histogram")
+    for r in rows:
+        if sum(stats[(r["bands"], r["run"], ch)]["over_one"] for ch in range(external["channels"])) != r["over_one"]:
+            raise ValueError("Per-channel exceedances differ from paired result")
+        for ch in range(external["channels"]):
+            key = r["bands"], r["run"], ch
+            s = stats[key]
+            if s["samples"] * external["channels"] != r["samples"] or s["maximum"] != r["max_l" if ch == 0 else "max_r"]:
+                raise ValueError("Channel statistics disagree with paired comparison")
+            s["derived"] = error_summary(s, histograms[key])
+            s["histogram"] = {str(k): v for k, v in sorted(histograms[key].items())}
+    return list(stats.values())
 
 
 def run(args):
@@ -104,6 +194,29 @@ def run(args):
     with (output / "merge.log").open("w") as log:
         subprocess.run(merge, stdout=log, stderr=subprocess.STDOUT, check=True)
 
+    recording = None
+    if args.input:
+        data = args.input.read_bytes()
+        if not 0 < len(data) <= 0x1d0000 - 32:
+            raise ValueError("Recording must fit the disposable app1 test region")
+        probe = json.loads(subprocess.check_output([args.ffprobe, "-v", "error", "-show_entries",
+                            "stream=codec_name,profile,sample_rate,channels", "-show_entries",
+                            "format=format_name,duration,bit_rate", "-of", "json", str(args.input)], text=True))
+        if probe["format"]["format_name"] != "aac" or len(probe["streams"]) != 1 or probe["streams"][0]["codec_name"] != "aac":
+            raise ValueError("External input must be one raw ADTS AAC stream")
+        info = probe["streams"][0]
+        if info["profile"] not in ("LC", "HE-AAC", "HE-AACv2"):
+            raise ValueError("Unrecognized AAC profile; specify a supported test input")
+        header = struct.pack("<8I", 0x31504642, len(data), int(info["sample_rate"]), info["channels"],
+                             int(info["profile"] != "LC"), 1, 3, 1)
+        with flash.open("r+b") as stream:
+            stream.seek(0x1e0000)
+            stream.write(header + data)
+        recording = {"file": str(args.input.resolve()), "sha256": sha256(args.input), "bytes": len(data),
+                     "source_url": args.source_url, "ffprobe": probe,
+                     "file_completed_utc": datetime.fromtimestamp(args.input.stat().st_mtime, timezone.utc).isoformat(),
+                     "transcoding": False}
+
     def guest_path(path):
         if not args.wsl:
             return str(path)
@@ -123,6 +236,8 @@ def run(args):
                             "sdkconfig_sha256": sha256(build / "sdkconfig"),
                             "fixtures": manifest, "qemu_command": command,
                             "qemu_log_sha256": sha256(output / "qemu.log")}
+    if recording:
+        result["provenance"]["recording"] = recording
     (output / "result.json").write_text(json.dumps(result, indent=2) + "\n", newline="\n")
     for row in result["summaries"]:
         print(f"{row['case']:20s} bands={row['bands']:2d} max_error={row['max_pcm_error_lsb']:4d} LSB "
@@ -140,4 +255,7 @@ if __name__ == "__main__":
     parser.add_argument("--bios", required=True, help="QEMU BIOS directory in the selected environment")
     parser.add_argument("--wsl", action="store_true", help="Run Linux QEMU via WSL from Windows")
     parser.add_argument("--timeout", type=int, default=600)
+    parser.add_argument("--input", type=Path, help="Optional real ADTS recording; default runs the synthetic matrix")
+    parser.add_argument("--source-url", default=None, help="Provenance only; the runner makes no network requests")
+    parser.add_argument("--ffprobe", default="ffprobe", help="FFprobe executable for external input format verification")
     sys.exit(run(parser.parse_args()))

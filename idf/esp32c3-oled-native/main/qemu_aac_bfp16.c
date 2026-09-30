@@ -7,12 +7,14 @@
 #include "decoder_pcm.h"
 #include "esp_audio_codec_version.h"
 #include "esp_log.h"
+#include "esp_partition.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <assert.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #define FIXTURE(name, symbol) \
@@ -29,6 +31,65 @@ static const char *TAG = "aac_bfp16";
 static unsigned group_bands; // Zero means the unmodified reference path.
 static uint32_t complex_rows, real_rows, changed_values;
 static unsigned max_shift;
+static unsigned fixture_repeats = 2;
+static bool detailed_statistics;
+
+// Exact absolute-error bins 0..4095, then 4096-wide bins up to 65535.
+// Two channels use 32,888 bytes, allocated only for external recordings.
+#define ERROR_BINS (4096 + 15)
+typedef struct {
+    uint64_t samples, absolute_sum, square_sum, signal_square_sum, over_one;
+    int64_t signed_sum;
+    uint32_t maximum, clipped_ref, clipped_bfp;
+    uint64_t max_at;
+    int16_t max_ref, max_bfp;
+} error_stats_t;
+
+static void accumulate_error(error_stats_t *s, uint32_t *hist, int16_t ref, int16_t bfp) {
+    int32_t delta = (int32_t)bfp - ref;
+    uint32_t error = delta < 0 ? -delta : delta;
+    s->signed_sum += delta;
+    s->absolute_sum += error;
+    s->square_sum += (uint64_t)error * error;
+    s->signal_square_sum += (uint64_t)((int64_t)ref * ref);
+    s->over_one += error > 1;
+    s->clipped_ref += ref == INT16_MIN || ref == INT16_MAX;
+    s->clipped_bfp += bfp == INT16_MIN || bfp == INT16_MAX;
+    if (error > s->maximum) {
+        s->maximum = error; s->max_at = s->samples;
+        s->max_ref = ref; s->max_bfp = bfp;
+    }
+    ++s->samples;
+    unsigned bin = error < 4096 ? error : 4096 + (error - 4096) / 4096;
+    assert(bin < ERROR_BINS);
+    ++hist[bin];
+}
+
+static void print_statistics(const char *name, unsigned bands, unsigned run,
+                             unsigned channel, const error_stats_t *s, const uint32_t *hist) {
+    ESP_LOGI(TAG, "BFP16_STATS case=%s bands=%u run=%u channel=%u samples=%" PRIu64
+             " abs_sum=%" PRIu64 " square_sum=%" PRIu64 " signal_square_sum=%" PRIu64
+             " signed_sum=%" PRId64 " over_one=%" PRIu64 " maximum=%" PRIu32
+             " max_at=%" PRIu64 " max_ref=%d max_bfp=%d clipped_ref=%" PRIu32 " clipped_bfp=%" PRIu32,
+             name, bands, run, channel, s->samples, s->absolute_sum, s->square_sum,
+             s->signal_square_sum, s->signed_sum, s->over_one, s->maximum, s->max_at,
+             s->max_ref, s->max_bfp, s->clipped_ref, s->clipped_bfp);
+    char text[512];
+    unsigned used = 0, entries = 0;
+    for (unsigned bin = 0; bin < ERROR_BINS; ++bin) {
+        if (!hist[bin]) continue;
+        int n = snprintf(text + used, sizeof(text) - used, "%u:%" PRIu32 ",", bin, hist[bin]);
+        assert(n > 0 && n < sizeof(text) - used);
+        used += n;
+        if (++entries == 32) {
+            ESP_LOGI(TAG, "BFP16_HIST case=%s bands=%u run=%u channel=%u bins=%s",
+                     name, bands, run, channel, text);
+            used = entries = 0;
+        }
+    }
+    if (entries) ESP_LOGI(TAG, "BFP16_HIST case=%s bands=%u run=%u channel=%u bins=%s",
+                         name, bands, run, channel, text);
+}
 
 // Complementing negative values permits the asymmetric signed range, including
 // INT32_MIN, without abs(INT32_MIN) or implementation-defined signed shifts.
@@ -181,6 +242,9 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
     uint8_t *pcm[2] = {malloc(NATIVE_AAC_PCM_FRAME_BYTES + 16),
                        malloc(NATIVE_AAC_PCM_FRAME_BYTES + 16)};
     assert(dec[0] && dec[1] && pcm[0] && pcm[1]);
+    uint32_t *hist = detailed_statistics ? calloc(f->channels * ERROR_BINS, sizeof(uint32_t)) : NULL;
+    error_stats_t stats[2] = {0};
+    assert(!detailed_statistics || hist);
     for (unsigned leg = 0; leg < 2; ++leg)
         memset(pcm[leg] + NATIVE_AAC_PCM_FRAME_BYTES, 0xa5, 16);
     uint64_t work[2] = {0}, samples = 0, different = 0, over_one = 0;
@@ -190,7 +254,7 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
     complex_rows = real_rows = changed_values = max_shift = 0;
     // A second pass through the fixture exercises retained filter/PS histories.
     // Both passes (including decoder startup) contribute to fidelity and timing.
-    for (unsigned repeat = 0; repeat < 2; ++repeat) {
+    for (unsigned repeat = 0; repeat < fixture_repeats; ++repeat) {
         for (const uint8_t *p = f->start; p < f->end;) {
             size_t count = (size_t)(f->end - p);
             if (count > 997) count = 997;
@@ -235,6 +299,8 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
                     int32_t delta = (int32_t)candidate[i] - reference[i];
                     uint32_t error = delta < 0 ? -delta : delta;
                     unsigned channel = i % f->channels;
+                    if (hist) accumulate_error(stats + channel, hist + channel * ERROR_BINS,
+                                               reference[i], candidate[i]);
                     if (error > max_error[channel]) max_error[channel] = error;
                     different += error != 0;
                     over_one += error > 1;
@@ -265,14 +331,54 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
     if (over_one)
         ESP_LOGI(TAG, "BFP16_FIRST_ERROR case=%s bands=%u run=%u sample=%" PRIu64
                  " ref=%d bfp=%d", f->name, bands, run, first_bad, first_ref, first_candidate);
+    if (hist) {
+        for (unsigned channel = 0; channel < f->channels; ++channel)
+            print_statistics(f->name, bands, run, channel, stats + channel, hist + channel * ERROR_BINS);
+        free(hist);
+    }
     for (unsigned leg = 0; leg < 2; ++leg) {
         native_aac_decoder_destroy(dec[leg]); free(pcm[leg]);
     }
 }
 
+static bool external_fixture(void) {
+    const esp_partition_t *partition = esp_partition_find_first(
+        ESP_PARTITION_TYPE_APP, ESP_PARTITION_SUBTYPE_APP_OTA_1, NULL);
+    assert(partition);
+    uint32_t header[8];
+    assert(esp_partition_read(partition, 0, header, sizeof(header)) == ESP_OK);
+    if (header[0] != 0x31504642) return false;
+    assert(header[1] && header[1] <= partition->size - sizeof(header));
+    assert(header[2] >= 8000 && header[2] <= 96000);
+    assert(header[3] >= 1 && header[3] <= 2 && header[4] <= 1);
+    assert(header[5] == 1 && header[6] == 3 && header[7] == 1);
+    const void *mapped;
+    esp_partition_mmap_handle_t handle;
+    assert(esp_partition_mmap(partition, 0, sizeof(header) + header[1],
+                              ESP_PARTITION_MMAP_DATA, &mapped, &handle) == ESP_OK);
+    const uint8_t *start = (const uint8_t *)mapped + sizeof(header);
+    fixture_t fixture = {"external", start, start + header[1], header[2], header[3], header[4]};
+    fixture_repeats = 1; // One continuous recording; no looping at the boundary.
+    detailed_statistics = true;
+    ESP_LOGI(TAG, "BFP16_EXTERNAL bytes=%" PRIu32 " rate=%" PRIu32 " channels=%u sbr=%u runs=3 repeats=1",
+             header[1], header[2], fixture.channels, fixture.sbr);
+    const unsigned groups[] = {32, 8, 1, 0};
+    for (unsigned g = 0; g < 4; ++g)
+        for (unsigned run = 1; run <= 3; ++run)
+            compare_fixture(&fixture, groups[g], run);
+    esp_partition_munmap(handle);
+    detailed_statistics = false;
+    fixture_repeats = 2;
+    return true;
+}
+
 void qemu_aac_bfp16_test(void) {
     check_counter();
     arithmetic_tests();
+    if (external_fixture()) {
+        ESP_LOGI(TAG, "BFP16_EXPERIMENT_COMPLETE external recording; inspect precision per case");
+        return;
+    }
     ESP_LOGI(TAG, "BFP16_ENV codec=%s groups=32,8,1 control=0 runs=3 repeats=2 baseline=wrap-bypass RAM_saved=0",
              esp_audio_codec_get_version());
     const fixture_t fixtures[] = {

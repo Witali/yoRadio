@@ -71,6 +71,9 @@ speed while preserving full format support and the one-LSB output limit.
   groups reach 5,689/342/3 LSB respectively across HE/v2 fixtures. Controls are
   byte-identical. The prototype saves no RAM; the 10,160-byte row-storage saving
   remains hypothetical. See the [experiment and retained tests](ESP32C3_AAC_BFP16_20260930.md).
+  [Real-radio captures](ESP32C3_AAC_BFP16_REAL_20260930.md) confirm the failure:
+  finest blocking still reaches 3 LSB, with 0.925–1.383% of HE/v2 samples above
+  one LSB; per-channel error distributions and repeated-run statistics are saved.
 - [ ] Recover speed for any precision-qualified compact representation: fuse
   scans with QMF production, unpack only active work, then repeat A/B and board
   tests. BFP16's diagnostic pack/unpack adds roughly 3.4–8.0% median QEMU guest

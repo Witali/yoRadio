@@ -35,6 +35,9 @@ three block sizes and instruction counts. Its harness completes, but all tested
 HE/v2 BFP16 block sizes **fail** the one-LSB limit. Run
 `python tests/test-aac-bfp16.py` to validate the retained evidence and negative
 parser cases; that regression pass preserves a measured optimization failure.
+The [real-recording extension](ESP32C3_AAC_BFP16_REAL_20260930.md) adds 60 paired
+comparisons, per-channel error moments/histograms and independent FFprobe frame
+counts. Validate that retained evidence with `python tests/test-aac-bfp16-real.py`.
 
 | ID | Previously missing coverage | Test created | Acceptance |
 | --- | --- | --- | --- |
