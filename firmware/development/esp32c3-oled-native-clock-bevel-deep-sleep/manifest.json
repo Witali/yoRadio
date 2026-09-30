@@ -1,24 +1,44 @@
 {
   "target": "esp32c3-oled-native",
   "variant": "esp32c3-oled-native-clock-bevel-deep-sleep",
-  "source_commit": "55c9f2f71ce0f166140edaac6b36bb1b51d9713d",
-  "app_version": "v0.9.693-1031-g55c9f2f7-dirty",
+  "source_commit": "919073e43d3f9081d435d47e27752f1aadb662be",
+  "app_version": "v0.9.693-1035-g919073e4-dirty",
   "esp_idf": "v6.0.2",
   "production": true,
   "deep_sleep_clock": true,
   "external_rtc_crystal": false,
-  "size_bytes": 1311744,
-  "sha256": "9fcc37030c76d4dd4aa9199ec567ebb0beec02ad1f678103b6fced9c560970bd",
-  "change": "Clock horizontal segments shortened by one pixel at each end and vertical segments extended by one pixel at each end; the ordinary and deep-sleep clock share the same glyphs",
+  "size_bytes": 1314704,
+  "sha256": "a6ad4f9a0fcbf656b72b0736c671e191abf1b4bf7b574722322270ee4c1b4218",
+  "change": "Approved straight clock font: trapezoidal top/bottom bars widened by one pixel at each end, vertical outer ends trimmed by one pixel, one-pixel diagonal gaps; shared ordinary and RTC glyphs",
   "validation": [
     "production build",
     "89 ESP32-C3 regression tests",
     "actual RTC wake-stub host tests",
     "2880 ordinary and RTC-rendered clock frames matched pixel for pixel",
-    "application scan found no known board Wi-Fi values"
+    "exact requested pixel changes and one-pixel diagonal gaps checked",
+    "application scan found no known board Wi-Fi values",
+    "linked RTC audit: 3704/8192 bytes; external dependencies restricted to RTC, ROM and GPIO"
   ],
-  "hardware_tested": false,
+  "hardware_tested": true,
+  "hardware_validation": {
+    "date": "2026-09-30",
+    "board": "ESP32-C3 SuperMini 0.42-inch OLED, 4 MiB flash",
+    "flash_offset": "0x10000",
+    "application_digest_verified": true,
+    "preserved_partitions_verified": [
+      "nvs",
+      "otadata",
+      "spiffs"
+    ],
+    "watchdog_reset": true,
+    "web_ui_http_status": 200,
+    "wifi_client_connected": true,
+    "clock_enabled": true,
+    "clock_timeout_seconds": 20,
+    "oled_visual_confirmation": "pending"
+  },
+  "build_note": "The -dirty version suffix is from the already-exported ordinary firmware artifact; the source files match source_commit.",
   "known_limitations": [
-    "The previously reported partial OLED screen during deep sleep is still unresolved; this font change does not fix it. See docs/ESP32C3_HARDWARE_VALIDATION_20260930.md."
+    "The previously reported partial OLED screen during deep sleep has not been revalidated visually; this font change is not a fix for that defect. See docs/ESP32C3_HARDWARE_VALIDATION_20260930.md."
   ]
 }

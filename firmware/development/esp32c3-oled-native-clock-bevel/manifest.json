@@ -1,20 +1,21 @@
 {
   "target": "esp32c3-oled-native",
   "variant": "esp32c3-oled-native-clock-bevel",
-  "source_commit": "55c9f2f71ce0f166140edaac6b36bb1b51d9713d",
-  "app_version": "v0.9.693-1031-g55c9f2f7",
+  "source_commit": "919073e43d3f9081d435d47e27752f1aadb662be",
+  "app_version": "v0.9.693-1035-g919073e4",
   "esp_idf": "v6.0.2",
   "production": true,
   "deep_sleep_clock": false,
   "external_rtc_crystal": false,
-  "size_bytes": 1298880,
-  "sha256": "de5cbbc95e2cda0ed55a8182350471874d9272cccbf346939ec06053dd78b755",
-  "change": "Clock horizontal segments shortened by one pixel at each end and vertical segments extended by one pixel at each end; the ordinary and deep-sleep clock share the same glyphs",
+  "size_bytes": 1301840,
+  "sha256": "6cf6ea19b00a501e06a596e0bb98ed83c40cf6679519d16a9b92fb437e74073d",
+  "change": "Approved straight clock font: trapezoidal top/bottom bars widened by one pixel at each end, vertical outer ends trimmed by one pixel, one-pixel diagonal gaps; shared ordinary and RTC glyphs",
   "validation": [
     "production build",
     "89 ESP32-C3 regression tests",
     "actual RTC wake-stub host tests",
     "2880 ordinary and RTC-rendered clock frames matched pixel for pixel",
+    "exact requested pixel changes and one-pixel diagonal gaps checked",
     "application scan found no known board Wi-Fi values"
   ],
   "hardware_tested": false
