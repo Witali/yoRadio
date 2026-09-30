@@ -57,6 +57,15 @@ config YORADIO_QEMU_AAC_TEST
         layouts and stream changes, and write the result to the virtual OLED.
         Test fixtures are included only in this emulator image.
 
+config YORADIO_QEMU_AAC_PROFILE
+    bool "Count AAC decoder instructions in QEMU (requires icount)"
+    depends on YORADIO_QEMU_AAC_TEST
+    default n
+    help
+        Measure instruction demand using the RISC-V minstret counter.
+        run-qemu.ps1 enables fixed icount automatically for this profile.
+        These are instruction counts, not hardware CPU cycle measurements.
+
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n

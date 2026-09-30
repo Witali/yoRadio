@@ -73,6 +73,11 @@ $qemuArguments = @(
     "-nographic", "-no-reboot", "-snapshot",
     "-audiodev", "wav,id=audio0,path=$AudioOutput,out.frequency=48000"
 )
+$builtConfig = Get-Content -LiteralPath (Join-Path $buildPath "config/sdkconfig.h") -Raw
+$instructionProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_PROFILE 1'
+if ($instructionProfile) {
+    $qemuArguments += @("-icount", "shift=0,align=off,sleep=off")
+}
 if (-not [string]::IsNullOrWhiteSpace($QemuBiosDirectory)) {
     $qemuArguments += @("-L", [IO.Path]::GetFullPath($QemuBiosDirectory))
 }
@@ -95,9 +100,11 @@ if ($joinedOutput -notmatch "QEMU_OLED_PASS" -or
     throw "QEMU OLED/audio validation failed; see $log"
 }
 
-$builtConfig = Get-Content -LiteralPath (Join-Path $buildPath "config/sdkconfig.h") -Raw
 if ($builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_TEST 1' -and
     $joinedOutput -notmatch 'QEMU_AAC_FORMAT_PASS') {
     throw "QEMU AAC validation failed; see $log"
+}
+if ($instructionProfile -and $joinedOutput -notmatch 'QEMU_AAC_WORK_PASS') {
+    throw "QEMU AAC instruction profiling failed; see $log"
 }
 Write-Host "QEMU smoke test passed; log: $log; audio: $AudioOutput"

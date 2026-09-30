@@ -1,5 +1,6 @@
 // Emulator-only integration checks against the real ESP32-C3 codec library.
 #include <assert.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,6 +28,88 @@ FIXTURE(he48, "he_48000_stereo");
 FIXTURE(hev2, "hev2_44100_stereo");
 
 static const char *TAG = "qemu_aac";
+
+#ifdef CONFIG_YORADIO_QEMU_AAC_PROFILE
+static inline uint32_t instruction_count(void) {
+    uint32_t value;
+    __asm__ volatile("csrr %0, minstret" : "=r"(value) :: "memory");
+    return value;
+}
+
+static void check_instruction_counter(void) {
+    // Fail rather than publish host ticks as guest instructions when someone
+    // launches this image without -icount. Mask IRQs only for this tiny probe.
+    portMUX_TYPE lock = portMUX_INITIALIZER_UNLOCKED;
+    uint32_t before, after;
+    taskENTER_CRITICAL(&lock);
+    __asm__ volatile("csrr %0, minstret\n"
+                     ".rept 1024\n nop\n .endr\n"
+                     "csrr %1, minstret\n"
+                     : "=r"(before), "=r"(after) :: "memory");
+    taskEXIT_CRITICAL(&lock);
+    ESP_LOGI(TAG, "QEMU_AAC_WORK_COUNTER nop1024=%" PRIu32, after - before);
+    assert(after - before == 1025);
+}
+
+static void profile_fixture(const char *name, const uint8_t *start,
+                            const uint8_t *end, uint32_t rate, uint8_t channels) {
+    uint8_t *pcm = malloc(16384);
+    assert(pcm);
+    for (unsigned run = 1; run <= 3; ++run) {
+        size_t heap_before = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+        native_aac_decoder_t *decoder = native_aac_decoder_create();
+        assert(decoder);
+        uint64_t instructions = 0, samples = 0;
+        uint32_t frames = 0, max_call = 0;
+        // Warm up once, then measure eight complete repeats without reopening
+        // the decoder. No PCM output, UI drawing or logging in the measured call.
+        for (unsigned repeat = 0; repeat <= 8; ++repeat) {
+            for (const uint8_t *p = start; p < end;) {
+                size_t count = (size_t)(end - p);
+                if (count > 997) count = 997;
+                esp_audio_simple_dec_raw_t raw = {.buffer = (uint8_t *)p, .len = count};
+                while (raw.len) {
+                    esp_audio_simple_dec_out_t output = {.buffer = pcm, .len = 16384};
+                    uint32_t before = instruction_count();
+                    esp_audio_err_t result = native_aac_decoder_process(decoder, &raw, &output);
+                    uint32_t work = instruction_count() - before;
+                    assert(result == ESP_AUDIO_ERR_OK);
+                    assert(raw.consumed <= raw.len && (raw.consumed || output.decoded_size));
+                    raw.buffer += raw.consumed;
+                    raw.len -= raw.consumed;
+                    if (repeat) {
+                        instructions += work;
+                        if (work > max_call) max_call = work;
+                    }
+                    if (output.decoded_size) {
+                        esp_audio_simple_dec_info_t info;
+                        assert(native_aac_decoder_get_info(decoder, &info) == ESP_AUDIO_ERR_OK);
+                        assert(info.sample_rate == rate && info.channel == channels && info.bits_per_sample == 16);
+                        assert(output.decoded_size % (2 * channels) == 0);
+                        if (repeat) {
+                            samples += output.decoded_size / (2 * channels);
+                            ++frames;
+                        }
+                    }
+                }
+                p += count;
+            }
+            // Keep the RTOS responsive without including voluntary sleeps in
+            // the counter. Tick interrupts during decode remain in the count.
+            vTaskDelay(1);
+        }
+        assert(frames > 80 && samples >= 4 * rate);
+        size_t heap_after = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+        ESP_LOGI(TAG, "QEMU_AAC_WORK case=%s run=%u instructions=%" PRIu64
+                 " samples=%" PRIu64 " rate=%" PRIu32 " channels=%u frames=%" PRIu32
+                 " max_call=%" PRIu32 " decoder_heap=%u",
+                 name, run, instructions, samples, rate, channels, frames, max_call,
+                 (unsigned)(heap_before - heap_after));
+        native_aac_decoder_destroy(decoder);
+    }
+    free(pcm);
+}
+#endif
 
 static void check_fixture(native_aac_decoder_t *decoder,
                            native_state_t *state, oled_display_t *display,
@@ -125,5 +208,15 @@ void qemu_aac_test(native_state_t *state, oled_display_t *display) {
     native_aac_decoder_destroy(decoder);
     native_state_begin_stream(state, 2);
     assert(!state->sample_rate_hz && !state->channels && !state->audio_running);
+#ifdef CONFIG_YORADIO_QEMU_AAC_PROFILE
+    check_instruction_counter();
+    profile_fixture("lc44100_stereo", lc44_start, lc44_end, 44100, 2);
+    profile_fixture("lc22050_mono", lc22_start, lc22_end, 22050, 1);
+    profile_fixture("lc48000_stereo", lc48_start, lc48_end, 48000, 2);
+    profile_fixture("he44100_stereo", he44_start, he44_end, 44100, 2);
+    profile_fixture("he48000_stereo", he48_start, he48_end, 48000, 2);
+    profile_fixture("hev2_44100_stereo", hev2_start, hev2_end, 44100, 2);
+    ESP_LOGI(TAG, "QEMU_AAC_WORK_PASS instruction demand only; no hardware CPU timing");
+#endif
     ESP_LOGI(TAG, "QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes");
 }

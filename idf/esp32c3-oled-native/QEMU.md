@@ -71,3 +71,31 @@ restores full decoding. It is not counted as successful full-rate playback.
 Host tests separately execute the production callback, PCM packet, OLED snapshot
 and WebSocket formatter paths (`python3 tests/run-esp32c3-stream-format.py`).
 The emulator does not serve the WebUI over Wi-Fi or establish hardware CPU margin.
+
+## AAC instruction-demand profile
+
+In the same QEMU `menuconfig`, also enable **Count AAC decoder instructions in
+QEMU (requires icount)** (`CONFIG_YORADIO_QEMU_AAC_PROFILE=y`). Rebuild and run
+using the commands above. The runner detects this option in the built configuration
+and adds `-icount shift=0,align=off,sleep=off`; it requires `QEMU_AAC_WORK_PASS`.
+
+The firmware first checks `minstret` against exactly 1,024 NOPs (1,025 instructions
+including the counter read). This rejects an ordinary QEMU run where the same CSR
+would expose host ticks. It then measures three independent runs per fixture,
+each with one unmeasured warm-up and eight measured repeats. Only ADTS/AAC decode
+calls are counted; output, UI, deliberate delays and logging are outside the interval.
+
+Summarize the log from the repository root:
+
+```powershell
+python tools/codec_benchmark/summarize_qemu_aac.py `
+  idf/esp32c3-oled-native/build-qemu-aac/qemu-smoke.log `
+  --output .build/aac-instruction-demand.json
+```
+
+Results are instructions per second of decoded audio, calculated from actual PCM
+sample counts. A separately labelled hypothetical percentage assumes one cycle
+per instruction at 160 MHz. **It is not measured ESP32-C3 CPU utilization.**
+QEMU does not model instruction latency or cache/memory stalls, and this isolated
+test excludes Wi-Fi/TLS and physical output. See the
+[measured results and limits](../../docs/ESP32C3_AAC_CPU_PROFILE_20260930.md).

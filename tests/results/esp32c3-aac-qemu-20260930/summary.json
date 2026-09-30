@@ -1,0 +1,273 @@
+{
+  "measurement": "RISC-V guest instructions in production ADTS/AAC decode calls",
+  "hardware_cpu_load_measured": false,
+  "qemu_icount": "shift=0,align=off,sleep=off",
+  "counter_calibration": {
+    "nop_instructions": 1024,
+    "observed_including_counter_read": 1025
+  },
+  "warmup_repeats": 1,
+  "measured_repeats_per_run": 8,
+  "runs_per_case": 3,
+  "log_sha256_utf8_lf": "f72169d581e4c9fb54d08a343af1034abb3014aeb39f3409c723c11db898a900",
+  "limitations": [
+    "QEMU is not cycle accurate; the 160 MHz percentage assumes one cycle per instruction.",
+    "Measured calls include ADTS assembly and incidental RTOS interrupts, exclude deliberate delays, UI and PCM output.",
+    "No Wi-Fi, TCP/TLS, physical PDM output, cache stalls, or hardware instruction latency is modeled.",
+    "Original half-second synthetic fixtures repeated; not a worst-case music/corpus benchmark."
+  ],
+  "cases": [
+    {
+      "case": "lc44100_stereo",
+      "median_million_instructions_per_audio_second": 11.140916821289062,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 6.963073013305664,
+      "decoder_heap_bytes": 61412,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 49668784,
+          "samples": 196608,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 192,
+          "max_call": 385485,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 11140916.821289062
+        },
+        {
+          "run": 2,
+          "instructions": 49668784,
+          "samples": 196608,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 192,
+          "max_call": 385485,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 11140916.821289062
+        },
+        {
+          "run": 3,
+          "instructions": 49668784,
+          "samples": 196608,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 192,
+          "max_call": 385485,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 11140916.821289062
+        }
+      ]
+    },
+    {
+      "case": "lc22050_mono",
+      "median_million_instructions_per_audio_second": 3.269488927283654,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 2.043430579552284,
+      "decoder_heap_bytes": 61412,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 15790816,
+          "samples": 106496,
+          "rate": 22050,
+          "channels": 1,
+          "frames": 104,
+          "max_call": 277472,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 3269488.927283654
+        },
+        {
+          "run": 2,
+          "instructions": 15790816,
+          "samples": 106496,
+          "rate": 22050,
+          "channels": 1,
+          "frames": 104,
+          "max_call": 277472,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 3269488.927283654
+        },
+        {
+          "run": 3,
+          "instructions": 15790816,
+          "samples": 106496,
+          "rate": 22050,
+          "channels": 1,
+          "frames": 104,
+          "max_call": 277472,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 3269488.927283654
+        }
+      ]
+    },
+    {
+      "case": "lc48000_stereo",
+      "median_million_instructions_per_audio_second": 12.06054266826923,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 7.537839167668269,
+      "decoder_heap_bytes": 61412,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 53516648,
+          "samples": 212992,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 208,
+          "max_call": 367169,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 12060542.66826923
+        },
+        {
+          "run": 2,
+          "instructions": 53516648,
+          "samples": 212992,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 208,
+          "max_call": 367169,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 12060542.66826923
+        },
+        {
+          "run": 3,
+          "instructions": 53516648,
+          "samples": 212992,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 208,
+          "max_call": 367169,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 12060542.66826923
+        }
+      ]
+    },
+    {
+      "case": "he44100_stereo",
+      "median_million_instructions_per_audio_second": 27.829951611328124,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 17.393719757080078,
+      "decoder_heap_bytes": 117932,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 144751088,
+          "samples": 229376,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 112,
+          "max_call": 1568467,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 27829951.611328125
+        },
+        {
+          "run": 2,
+          "instructions": 144751088,
+          "samples": 229376,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 112,
+          "max_call": 1568467,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 27829951.611328125
+        },
+        {
+          "run": 3,
+          "instructions": 144751088,
+          "samples": 229376,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 112,
+          "max_call": 1568467,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 27829951.611328125
+        }
+      ]
+    },
+    {
+      "case": "he48000_stereo",
+      "median_million_instructions_per_audio_second": 30.63465625,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 19.14666015625,
+      "decoder_heap_bytes": 117932,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 156849440,
+          "samples": 245760,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1594538,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 30634656.25
+        },
+        {
+          "run": 2,
+          "instructions": 156849440,
+          "samples": 245760,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1594538,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 30634656.25
+        },
+        {
+          "run": 3,
+          "instructions": 156849440,
+          "samples": 245760,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1594538,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 30634656.25
+        }
+      ]
+    },
+    {
+      "case": "hev2_44100_stereo",
+      "median_million_instructions_per_audio_second": 36.524304755859376,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 22.827690472412108,
+      "decoder_heap_bytes": 117932,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 203542248,
+          "samples": 245760,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1843707,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 36524304.755859375
+        },
+        {
+          "run": 2,
+          "instructions": 203542248,
+          "samples": 245760,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1843707,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 36524304.755859375
+        },
+        {
+          "run": 3,
+          "instructions": 203542248,
+          "samples": 245760,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1843707,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 36524304.755859375
+        }
+      ]
+    }
+  ]
+}

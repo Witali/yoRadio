@@ -52,6 +52,8 @@ HE-AACv2 after the limitation below. `QEMU_AAC_FORMAT_PASS`, `QEMU_AUDIO_PASS`,
 synthetic tones; FFprobe independently verified their profiles and layouts.
 
 Reproduction commands: [QEMU guide](../idf/esp32c3-oled-native/QEMU.md).
+Follow-up: [AAC instruction-demand measurements](ESP32C3_AAC_CPU_PROFILE_20260930.md)
+compare LC/HE/HEv2 in QEMU; they do not measure physical CPU utilization.
 
 ## Saved production-target development images
 
