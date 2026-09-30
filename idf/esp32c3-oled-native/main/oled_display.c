@@ -319,6 +319,21 @@ static void draw_filled_rectangle(oled_display_t *display, int x, int y,
     }
 }
 
+static void draw_clock_segment(oled_display_t *display, int x, int y,
+                               int width, int height) {
+    // Cut both ends at 45 degrees. With three-pixel-thick segments this
+    // removes one pixel at each corner, keeping the existing glyph bounds.
+    const int bevel = CLOCK_SEGMENT_THICKNESS / 2;
+    for (int row = 0; row < height; ++row) {
+        int inset = 0;
+        if (row < bevel) inset = bevel - row;
+        else if (row >= height - bevel) inset = row - (height - bevel) + 1;
+        for (int column = inset; column < width - inset; ++column) {
+            draw_pixel(display, x + column, y + row, true);
+        }
+    }
+}
+
 static void draw_clock_digit(oled_display_t *display, int x, int y,
                              int digit) {
     enum {
@@ -359,38 +374,38 @@ static void draw_clock_digit(oled_display_t *display, int x, int y,
     const int vertical_height =
         (CLOCK_DIGIT_HEIGHT - 3 * CLOCK_SEGMENT_THICKNESS) / 2;
     if (enabled & SEGMENT_TOP) {
-        draw_filled_rectangle(display, x + CLOCK_SEGMENT_THICKNESS, y,
-                              horizontal_width, CLOCK_SEGMENT_THICKNESS);
+        draw_clock_segment(display, x + CLOCK_SEGMENT_THICKNESS, y,
+                           horizontal_width, CLOCK_SEGMENT_THICKNESS);
     }
     if (enabled & SEGMENT_MIDDLE) {
-        draw_filled_rectangle(
+        draw_clock_segment(
             display, x + CLOCK_SEGMENT_THICKNESS,
             y + CLOCK_SEGMENT_THICKNESS + vertical_height, horizontal_width,
             CLOCK_SEGMENT_THICKNESS);
     }
     if (enabled & SEGMENT_BOTTOM) {
-        draw_filled_rectangle(display, x + CLOCK_SEGMENT_THICKNESS,
-                              y + CLOCK_DIGIT_HEIGHT - CLOCK_SEGMENT_THICKNESS,
-                              horizontal_width, CLOCK_SEGMENT_THICKNESS);
+        draw_clock_segment(display, x + CLOCK_SEGMENT_THICKNESS,
+                           y + CLOCK_DIGIT_HEIGHT - CLOCK_SEGMENT_THICKNESS,
+                           horizontal_width, CLOCK_SEGMENT_THICKNESS);
     }
     if (enabled & SEGMENT_UPPER_LEFT) {
-        draw_filled_rectangle(display, x, y + CLOCK_SEGMENT_THICKNESS,
-                              CLOCK_SEGMENT_THICKNESS, vertical_height);
+        draw_clock_segment(display, x, y + CLOCK_SEGMENT_THICKNESS,
+                           CLOCK_SEGMENT_THICKNESS, vertical_height);
     }
     if (enabled & SEGMENT_UPPER_RIGHT) {
-        draw_filled_rectangle(
+        draw_clock_segment(
             display, x + CLOCK_DIGIT_WIDTH - CLOCK_SEGMENT_THICKNESS,
             y + CLOCK_SEGMENT_THICKNESS, CLOCK_SEGMENT_THICKNESS,
             vertical_height);
     }
     if (enabled & SEGMENT_LOWER_LEFT) {
-        draw_filled_rectangle(
+        draw_clock_segment(
             display, x,
             y + 2 * CLOCK_SEGMENT_THICKNESS + vertical_height,
             CLOCK_SEGMENT_THICKNESS, vertical_height);
     }
     if (enabled & SEGMENT_LOWER_RIGHT) {
-        draw_filled_rectangle(
+        draw_clock_segment(
             display, x + CLOCK_DIGIT_WIDTH - CLOCK_SEGMENT_THICKNESS,
             y + 2 * CLOCK_SEGMENT_THICKNESS + vertical_height,
             CLOCK_SEGMENT_THICKNESS, vertical_height);
