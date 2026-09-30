@@ -133,6 +133,12 @@ controlled warm/cold-cache workloads, then validate the model on a separate run.
 The counters are declared in ESP-IDF's ESP32-C3 `soc/extmem_reg.h` as
 `EXTMEM_IBUS_ACS_MISS_CNT_REG` and `EXTMEM_DBUS_ACS_FLASH_MISS_CNT_REG`.
 
+The follow-up [QEMU cache experiment](ESP32C3_CACHE_QEMU_20260930.md) uses a
+separate plugin-enabled Linux emulator and a host cache model to compare
+continuous and cold-call traffic. Its modelled miss counts are saved separately
+from these historical calibration profiles. They do not supply the missing
+physical stall costs, and no existing coefficient is changed by that experiment.
+
 ### Measurement setup
 
 - Recovered original 11-second generated noise/tone files, not the half-second

@@ -33,6 +33,7 @@ if (-not $SkipBuild) {
 
 $builtConfig = Get-Content -LiteralPath (Join-Path $buildPath "config/sdkconfig.h") -Raw
 $instructionProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_PROFILE 1'
+$cacheProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_CACHE_TEST 1'
 if ($CodecCalibration -and -not $instructionProfile) {
     throw "Codec calibration requires CONFIG_YORADIO_QEMU_AAC_PROFILE=y"
 }
@@ -104,7 +105,7 @@ $qemuArguments = @(
     "-nographic", "-no-reboot", "-snapshot",
     "-audiodev", "wav,id=audio0,path=$AudioOutput,out.frequency=48000"
 )
-if ($instructionProfile) {
+if ($instructionProfile -or $cacheProfile) {
     $qemuArguments += @("-icount", "shift=0,align=off,sleep=off")
 }
 if (-not [string]::IsNullOrWhiteSpace($QemuBiosDirectory)) {
@@ -129,7 +130,7 @@ if ($joinedOutput -notmatch "QEMU_OLED_PASS" -or
     throw "QEMU OLED/audio validation failed; see $log"
 }
 
-if ($builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_TEST 1' -and
+if (-not $cacheProfile -and $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_TEST 1' -and
     $joinedOutput -notmatch 'QEMU_AAC_FORMAT_PASS') {
     throw "QEMU AAC validation failed; see $log"
 }
@@ -141,5 +142,8 @@ if ($instructionProfile -and $joinedOutput -notmatch 'QEMU_AAC_CAL_PASS') {
 }
 if ($CodecCalibration -and $joinedOutput -notmatch "QEMU_CODEC_CAL_PASS codec=$CodecCalibration") {
     throw "QEMU $CodecCalibration calibration failed; see $log"
+}
+if ($cacheProfile -and $joinedOutput -notmatch 'QEMU_CACHE_PASS') {
+    throw "QEMU cache trace fixture failed; see $log"
 }
 Write-Host "QEMU smoke test passed; log: $log; audio: $AudioOutput"

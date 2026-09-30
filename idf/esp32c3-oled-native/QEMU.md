@@ -41,6 +41,18 @@ speaker quality, or real-time CPU margin; those still require the physical board
 Hardware debug and production builds do not enable
 `CONFIG_YORADIO_QEMU` and retain their normal behavior.
 
+## Flash-cache traffic experiment
+
+`CONFIG_YORADIO_QEMU_CACHE_TEST=y` selects a short AAC-LC / HE-AAC / HE-AAC v2
+workload with markers for an optional host TCG plugin. It requires
+`CONFIG_YORADIO_QEMU_AAC_TEST=y` and the instruction profile disabled.
+`run-qemu.ps1` adds `icount` and checks `QEMU_CACHE_PASS` for this configuration.
+The plugin requires a separate Linux QEMU build with plugins enabled; it compares
+continuous LRU/FIFO caches and an LRU cache emptied before each decoder call.
+These are modelled flash accesses/misses, not physical cache counters or CPU
+timings. See the [build and repeat instructions](../../tools/codec_benchmark/cache/README.md)
+and [saved results](../../docs/ESP32C3_CACHE_QEMU_20260930.md).
+
 ## Actual AAC decoder regression
 
 Use a separate configuration, enable **yoRadio ESP32-C3 OLED → Run AAC

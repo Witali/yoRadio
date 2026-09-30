@@ -137,7 +137,10 @@ static void qemu_smoke_task(void *argument) {
     }
     ESP_LOGI(TAG, "QEMU_AUDIO_PASS %u stereo frames", QEMU_TONE_FRAMES);
 
-#ifdef CONFIG_YORADIO_QEMU_AAC_TEST
+#ifdef CONFIG_YORADIO_QEMU_CACHE_TEST
+    extern void qemu_cache_test(void);
+    qemu_cache_test();
+#elif defined(CONFIG_YORADIO_QEMU_AAC_TEST)
     extern void qemu_aac_test(native_state_t *, oled_display_t *);
     qemu_aac_test(&s_state, &s_display);
 #endif
@@ -956,7 +959,7 @@ void app_main(void) {
     ESP_ERROR_CHECK(oled_display_init(&s_display));
     ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));
     ESP_ERROR_CHECK(native_audio_output_init());
-#ifdef CONFIG_YORADIO_QEMU_AAC_PROFILE
+#if defined(CONFIG_YORADIO_QEMU_AAC_PROFILE) || defined(CONFIG_YORADIO_QEMU_CACHE_TEST)
     // Real codec implementations need the production decoder's stack, plus
     // space for the parent smoke task's PCM array and regression harness.
     const uint32_t qemu_stack = BOARD_TASK_STACK_AUDIO_DECODER + 4096;

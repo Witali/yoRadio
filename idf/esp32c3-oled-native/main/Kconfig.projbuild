@@ -66,6 +66,15 @@ config YORADIO_QEMU_AAC_PROFILE
         run-qemu.ps1 enables fixed icount automatically for this profile.
         These are instruction counts, not hardware CPU cycle measurements.
 
+config YORADIO_QEMU_CACHE_TEST
+    bool "Run short AAC flash-cache traces with a QEMU plugin"
+    depends on YORADIO_QEMU_AAC_TEST && !YORADIO_QEMU_AAC_PROFILE
+    default n
+    help
+        Emit no-op markers around decoder calls for the host cache model.
+        Requires icount and tools/codec_benchmark/cache/esp32c3_cache.c.
+        Modelled misses are not physical cache counters or CPU timings.
+
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n
