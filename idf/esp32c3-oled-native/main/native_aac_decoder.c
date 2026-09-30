@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "aac_decoder_config.h"
+#if CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+#include "cpu_profiler.h"
+#define AAC_MEMORY(stage) cpu_profiler_memory(stage)
+#else
+#define AAC_MEMORY(stage) ((void)0)
+#endif
 
 // ADTS has a 13-bit frame length. Keep at most one complete encoded frame;
 // network chunk boundaries must never become decoder reset boundaries.
@@ -14,6 +20,7 @@ struct native_aac_decoder {
 };
 
 native_aac_decoder_t *native_aac_decoder_create(void) {
+    AAC_MEMORY("aac-before-adts");
     return calloc(1, sizeof(native_aac_decoder_t));
 }
 
@@ -48,11 +55,13 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
             }
             needed = frame_size;
             if (decoder->used == needed) {
+                bool opened = false;
                 uint16_t signature = ((p[1] & 8) << 8) |
                     ((p[2] & 0xfd) << 2) | (p[3] >> 6);
                 if (!decoder->codec || signature != decoder->signature) {
                     if (decoder->codec) esp_audio_simple_dec_close(decoder->codec);
                     decoder->codec = NULL;
+                    AAC_MEMORY("aac-before-open");
                     esp_aac_dec_cfg_t aac = native_aac_decoder_config();
                     esp_audio_simple_dec_cfg_t config = {
                         .dec_type = ESP_AUDIO_SIMPLE_DEC_TYPE_AAC,
@@ -65,12 +74,15 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                         &config, &decoder->codec);
                     if (result != ESP_AUDIO_ERR_OK) return result;
                     decoder->signature = signature;
+                    opened = true;
+                    AAC_MEMORY("aac-after-open");
                 }
                 esp_audio_simple_dec_raw_t frame = {
                     .buffer = decoder->data, .len = needed,
                 };
                 esp_audio_err_t result = esp_audio_simple_dec_process(
                     decoder->codec, &frame, output);
+                if (opened) AAC_MEMORY("aac-after-first-process");
                 // Keep the frame for a larger PCM buffer retry. The caller
                 // still advances input bytes already copied into our buffer.
                 if (result != ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) decoder->used = 0;

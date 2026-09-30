@@ -17,6 +17,16 @@
 
 static const char *const TAG = "cpu_profile";
 
+void cpu_profiler_memory(const char *stage) {
+    multi_heap_info_t info;
+    heap_caps_get_info(&info, MALLOC_CAP_8BIT);
+    ESP_LOGI(TAG, "PERF RAM: stage=%s free=%u largest=%u allocated=%u blocks=%u",
+             stage, (unsigned)info.total_free_bytes,
+             (unsigned)info.largest_free_block,
+             (unsigned)info.total_allocated_bytes,
+             (unsigned)info.allocated_blocks);
+}
+
 static void allocation_failed(size_t size, uint32_t caps, const char *function) {
     ESP_LOGE(TAG, "PERF allocation failed: requested=%u caps=0x%lx function=%s free=%u largest=%u",
              (unsigned)size, (unsigned long)caps, function,
@@ -59,6 +69,7 @@ static void cpu_profiler_task(void *argument) {
     TaskStatus_t current[CPU_PROFILE_MAX_TASKS];
     task_sample_t next[CPU_PROFILE_MAX_TASKS];
     bool primed = false;
+    unsigned stack_interval = 0;
 
     for (;;) {
         vTaskDelay(pdMS_TO_TICKS(CPU_PROFILE_INTERVAL_MS));
@@ -70,6 +81,18 @@ static void cpu_profiler_task(void *argument) {
             ESP_LOGW(TAG, "Task snapshot unavailable (tasks=%u)",
                      (unsigned)count);
             continue;
+        }
+
+        // Report bytes of minimum unused stack, not instantaneous free space.
+        // This survey is diagnostic evidence, not permission to shrink stacks
+        // before exercising TLS, OTA, all codecs and user interactions.
+        if (++stack_interval == 6) {
+            stack_interval = 0;
+            for (UBaseType_t i = 0; i < count; ++i) {
+                ESP_LOGI(TAG, "PERF STACK: name=%s minimum_free=%u",
+                         current[i].pcTaskName,
+                         (unsigned)current[i].usStackHighWaterMark);
+            }
         }
 
         configRUN_TIME_COUNTER_TYPE interval_total = total - s_previous_total;

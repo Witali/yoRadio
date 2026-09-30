@@ -8,6 +8,10 @@ The [2026-09-30 physical results](../tests/results/esp32c3-acceptance-20260930/R
 record passing OTA checks and outstanding HE-AAC, EOF and HTTP-load failures.
 Tests not run are identified separately from failures.
 
+For allocation phases, per-task stack margins and reproducible SBR structure
+sizes, see the [AAC memory investigation](ESP32C3_AAC_MEMORY_20260930.md) and
+`tools/esp32c3_tests/memory.py`. Its survey is separate from a passing load/soak test.
+
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.

@@ -890,7 +890,9 @@ static void button_task(void *argument) {
 
 static void services_task(void *argument) {
     (void)argument;
+    cpu_profiler_memory("before-network");
     esp_err_t result = network_service_start(&s_state);
+    cpu_profiler_memory("after-network");
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Network failed: %s", esp_err_to_name(result));
         native_state_set_network(&s_state, NATIVE_NETWORK_ERROR, 0);
@@ -900,6 +902,7 @@ static void services_task(void *argument) {
         ESP_LOGE(TAG, "Time service failed: %s", esp_err_to_name(result));
     }
     result = audio_service_start(&s_state);
+    cpu_profiler_memory("after-audio");
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Audio service failed: %s", esp_err_to_name(result));
     }
@@ -920,6 +923,7 @@ static void services_task(void *argument) {
     }
 #endif
     result = web_service_start(&s_state);
+    cpu_profiler_memory("after-web");
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Web server failed: %s", esp_err_to_name(result));
     }
@@ -934,6 +938,7 @@ void app_main(void) {
 #endif
     ESP_LOGI(TAG, "Starting pure ESP-IDF ESP32-C3 OLED yoRadio");
     native_state_init(&s_state);
+    cpu_profiler_memory("app-start");
     ESP_ERROR_CHECK(cpu_profiler_start());
 
 #ifdef YORADIO_CODEC_BENCHMARK

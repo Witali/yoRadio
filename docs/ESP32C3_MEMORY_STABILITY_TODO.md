@@ -28,6 +28,21 @@ benchmark used about 12.2 KiB. A fix must preserve other codecs and user setting
 
 ## AAC memory reuse during decoding — planned, 2026-09-30
 
+The [RAM/SBR investigation](ESP32C3_AAC_MEMORY_20260930.md) now maps the 55,128-byte
+object, verifies existing PS reuse against the binary, and measures the full
+radio. The 24 KiB Helix arena is not allocated in the current Espressif build.
+
+- [x] Measure startup/AAC heap phases and task stack margins on physical C3.
+- [x] Identify SBR channel/PS storage and already shared scratch using pinned
+  primary source, a 32-bit layout probe and actual binary offsets.
+- [ ] Prototype an Espressif-AAC adapter for the common codec arena, with
+  free/realloc and complete cleanup across AAC configuration changes. Budget
+  roughly 107 KiB for observed SDK state before margin, not the existing 24 KiB.
+  First recover the measured total-RAM shortfall; reservation alone is no fix.
+- [ ] Evaluate source-level separation of SBR persistent history and shared
+  QMF scratch, including a distinct PS-safe lifetime map. Splitting an embedded
+  array requires rebuilding its users; an allocator override cannot do it.
+
 - [ ] Reduce peak AAC memory by reusing buffers whose lifetimes do not overlap,
   using the ESP8266 implementation as a reference. **Preserve the full AAC
   feature set; do not trade supported formats for lower RAM use.**

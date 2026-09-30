@@ -1,0 +1,901 @@
+{
+  "source": "https://android.googlesource.com/platform/frameworks/av/+/437ced8a14944bf5450df50c5e7e7a6dfe20ea40/media/libstagefright/codecs/aacdec/",
+  "revision": "437ced8a14944bf5450df50c5e7e7a6dfe20ea40",
+  "scope": "32-bit upstream reference; compare offsets with the actual Espressif ELF separately",
+  "compiler": "riscv32-esp-elf-g++.exe (crosstool-NG esp-15.2.0_20251204) 15.2.0",
+  "flags": [
+    "-g",
+    "-nostdlib",
+    "-Wl,-e,0"
+  ],
+  "headers_sha256": {
+    "s_tdec_int_file.h": "e5b9ae07bc7faf503c52390d47e763ea2d1351aa560fd0e9384a131afd1abead",
+    "s_adif_header.h": "1a663496d0d50c813edfa54ff74b067c4cd9f700ca9f67b9fb3f4acde930da79",
+    "e_adif_const.h": "5319c67af93861abeee964d8930e90ddbdc9d6a3a4be17b57d21f7c00b3ce7a7",
+    "s_hcb.h": "a84fd435ea65ac5bf6d7cfb2f5cceca6e9018ae6b785682710ed9f293cda9ba2",
+    "s_sbr_dec.h": "afe1a53e76abda5e9ba949899cb277f49e6caf5fd1c01a90ef587525d0743d50",
+    "s_frameinfo.h": "0c640ec413266e65139b02a05e4339a8b49b099c37cd53b7c0359d9b092ba3fe",
+    "s_mc_info.h": "0dc9c9e6afb5f675b6d63e7ff2019e32030abd87e224ed36f7b38f7487e7fd19",
+    "e_infoinitconst.h": "cf0f2a38e1364b622299429e374e99cea5968947f97469934dc451c36aa6fb08",
+    "s_sbr_channel.h": "ff53b5adcd5c681136691752a07ff12851f48a9ddb8e22c348f2cc8ff0337487",
+    "s_patch.h": "34c0b9e8894bf5818d04e23aa48bd3cf71bad2cef2566771b4b6f057ab820e35",
+    "s_bits.h": "36cf610925e9f18ad0390b21a9b1713d3f483a62a2f9664acb680f68eed3c60f",
+    "s_pulseinfo.h": "35e10778f14503be346ddfcd9b830d06ae77d8a51bb19b1dc05fde82f314ecd3",
+    "e_rawbitstreamconst.h": "4c07af9129b299e9e96d7f90c9db4cd530294af900a19998078f39734339c819",
+    "s_ch_info.h": "e18d295a02382a9ebd5ef067f685abd5b237608c82d22dad102cf249622acaf7",
+    "e_sbr_sync_state.h": "9a6363b89c4a6bd43dd91f2bda667f5671745627a69a5dcfa3fe7d0be36320ae",
+    "chans.h": "171bb43b253aa3c4c9b61ddd1fdf6a6852df291f3b05d258ebba4074a15c8b78",
+    "s_progconfig.h": "b28bacdc086a1ed17c72652b07bbb3f461a986e69a1f4cc05a7370c01f830994",
+    "s_sbrbitstream.h": "0ce598b598c22b957917d719127fec37520becf5363cff6ead4cc34df64fc084",
+    "s_tdec_int_chan.h": "07662ff1cb83ad140fc58d62c0da9bc2b73ebbb2d9108aed4fa9ca4cf8514757",
+    "s_sbr_frame_data.h": "6f4fde7f43435cfb523f44a7a5ee691de7d8a9dfc68d935f9d60d3b26892fa81",
+    "e_tmp4audioobjecttype.h": "1c90843fb34a1e99cf2f221c349336ee3edfd8ae91e7378e1b7137b3f3338020",
+    "s_elelist.h": "a8923f713c799fc61e425f715f2f0d1ebce7682ec3c36ed3932e864896705bcc",
+    "s_huffman.h": "f241ad25e6ed9244effe8d7198b4ecc5e7b9249b13b24d9b580b3ebc724eaeed",
+    "e_invf_mode.h": "bbd8ef34d30cc39f157eb28f9bf0981c85428cc2fd70f19d0f9b47926b417ec2",
+    "pv_audio_type_defs.h": "960aabd55d7e4c90dc01ea8b3441c4fbf5753764389716f85148a53c15a15b99",
+    "s_mixdown.h": "1de8a9fbf04088f69358ba4b3afc95426397d05aeb00490e5ef7b39056c02876",
+    "s_lt_pred_status.h": "d321a1734d59b98321f990462cd771823d58caf73409aaa8d601ce1305975438",
+    "s_ps_dec.h": "a5d936586e97c899a8d27111e455884249c970d25a66daff4363c7a2ddb10614",
+    "e_blockswitching.h": "d4a15df724e707f726d0d206e2c1898bf743cc0b4e9bc5ea3176b5849cb9a49b",
+    "window_block_fxp.h": "16b2aaeeec8658d1e0b492057ad657453d974da932117c8e21cacbb946e29e85",
+    "e_window_sequence.h": "db86d1cfc5597d8da0f21650005d2e00c6c5fa07fe75c4a9c3fe126b6683e5db",
+    "sbr_constants.h": "9565925dbb5f3fcdd4d65b72f88dc936f1f33dcbb6425df668006c319ec7b1a4",
+    "e_window_shape.h": "f27a523c961c360ce44196bb5d4463c702f6f43968f4b1ebebda77251adedfa9",
+    "s_tns_frame_info.h": "ee15a4ec64d62842218364809a4e839e5ed03301749b1dcc1086f44256bee116",
+    "s_sbr_header_data.h": "4a7e9f4bd61c82b72937644c2c31f0081e7de78d10b88c3d94a0bb4e1e489f9e",
+    "e_tns_const.h": "f3fc470aae81a11b03f36b7a0b25902abf97f0a14ee47d08e797376d7d78a0ee",
+    "s_sbr_element_stream.h": "f967ca6aeb3c4a6dd89ae8c4183e1b32195e409dbebb1255c2d52d9b28802355",
+    "s_wnd_shape.h": "1b057920be6e1b1cc934c4325ec12d4e4d31bb235f46ae85156e5c2602830d31",
+    "s_sectinfo.h": "71f94aa4a06adfec46d4bb7ea5660378f794c436813a93f713804ab34670a0f3",
+    "s_hybrid.h": "8aba11a127b38d5a86a9ce6b13ea3716d42fde14779129bd509b1afe1623490d",
+    "e_coupling_mode.h": "edfa1f69baa899bbf839c24a4effa7d9df040d587b1dfdb3d7fd93022b6e0d58",
+    "e_sbr_header_status.h": "c2e86b59ef894c42bc2fb6f23442a21a8d1dc7a58396668d26e3437c8b54fc47",
+    "s_tnsfilt.h": "f313af41c59b844398f4ba9f433534ea6b8abf8814d3336a9c498c1deea80f06",
+    "e_sr_mode.h": "00c885397f7397d4edf49b90a8267fcb2be237a29cfef24bdf03b61ca00643d0",
+    "e_sbr_master_status.h": "d41fcc64406818570d0e9bd4518fa41850ecf6c215026f1239a32b1af53bf724",
+    "ps_constants.h": "0fe01a123b0fbe305ae057385871938ef45982b30a01dc3fde56b1cc072d03a5"
+  },
+  "structures": {
+    "SBR_FRAME_DATA": {
+      "bytes": 25784,
+      "fields": [
+        {
+          "name": "nScaleFactors",
+          "offset": 0,
+          "size": 4
+        },
+        {
+          "name": "nNoiseFactors",
+          "offset": 4,
+          "size": 4
+        },
+        {
+          "name": "crcCheckSum",
+          "offset": 8,
+          "size": 4
+        },
+        {
+          "name": "frameClass",
+          "offset": 12,
+          "size": 4
+        },
+        {
+          "name": "frameInfo",
+          "offset": 16,
+          "size": 140
+        },
+        {
+          "name": "nSfb",
+          "offset": 156,
+          "size": 8
+        },
+        {
+          "name": "nNfb",
+          "offset": 164,
+          "size": 4
+        },
+        {
+          "name": "offset",
+          "offset": 168,
+          "size": 4
+        },
+        {
+          "name": "ampRes",
+          "offset": 172,
+          "size": 4
+        },
+        {
+          "name": "nNoiseFloorEnvelopes",
+          "offset": 176,
+          "size": 4
+        },
+        {
+          "name": "p",
+          "offset": 180,
+          "size": 4
+        },
+        {
+          "name": "prevEnvIsShort",
+          "offset": 184,
+          "size": 4
+        },
+        {
+          "name": "reset_flag",
+          "offset": 188,
+          "size": 4
+        },
+        {
+          "name": "sbr_header",
+          "offset": 192,
+          "size": 64
+        },
+        {
+          "name": "domain_vec1",
+          "offset": 256,
+          "size": 20
+        },
+        {
+          "name": "domain_vec2",
+          "offset": 276,
+          "size": 20
+        },
+        {
+          "name": "sbr_invf_mode",
+          "offset": 296,
+          "size": 40
+        },
+        {
+          "name": "sbr_invf_mode_prev",
+          "offset": 336,
+          "size": 40
+        },
+        {
+          "name": "coupling",
+          "offset": 376,
+          "size": 4
+        },
+        {
+          "name": "addHarmonics",
+          "offset": 380,
+          "size": 1160
+        },
+        {
+          "name": "hFp",
+          "offset": 1540,
+          "size": 256
+        },
+        {
+          "name": "harm_index",
+          "offset": 1796,
+          "size": 4
+        },
+        {
+          "name": "phase_index",
+          "offset": 1800,
+          "size": 4
+        },
+        {
+          "name": "sUp",
+          "offset": 1804,
+          "size": 4
+        },
+        {
+          "name": "iEnvelope_man",
+          "offset": 1808,
+          "size": 1160
+        },
+        {
+          "name": "iEnvelope_exp",
+          "offset": 2968,
+          "size": 1160
+        },
+        {
+          "name": "sfb_nrg_prev_man",
+          "offset": 4128,
+          "size": 232
+        },
+        {
+          "name": "sbrNoiseFloorLevel_man",
+          "offset": 4360,
+          "size": 40
+        },
+        {
+          "name": "sbrNoiseFloorLevel_exp",
+          "offset": 4400,
+          "size": 40
+        },
+        {
+          "name": "prevNoiseLevel_man",
+          "offset": 4440,
+          "size": 40
+        },
+        {
+          "name": "BwVector",
+          "offset": 4480,
+          "size": 24
+        },
+        {
+          "name": "BwVectorOld",
+          "offset": 4504,
+          "size": 24
+        },
+        {
+          "name": "codecQmfBufferReal",
+          "offset": 4528,
+          "size": 5120
+        },
+        {
+          "name": "sbrQmfBufferReal",
+          "offset": 9648,
+          "size": 4
+        },
+        {
+          "name": "HistsbrQmfBufferReal",
+          "offset": 9652,
+          "size": 1152
+        },
+        {
+          "name": "codecQmfBufferImag",
+          "offset": 10804,
+          "size": 5120
+        },
+        {
+          "name": "sbrQmfBufferImag",
+          "offset": 15924,
+          "size": 4
+        },
+        {
+          "name": "HistsbrQmfBufferImag",
+          "offset": 15928,
+          "size": 1152
+        },
+        {
+          "name": "V",
+          "offset": 17080,
+          "size": 2304
+        },
+        {
+          "name": "degreeAlias",
+          "offset": 19384,
+          "size": 256
+        },
+        {
+          "name": "fBuffer_man",
+          "offset": 19640,
+          "size": 1280
+        },
+        {
+          "name": "fBufferN_man",
+          "offset": 20920,
+          "size": 1280
+        },
+        {
+          "name": "fBuffer_exp",
+          "offset": 22200,
+          "size": 1280
+        },
+        {
+          "name": "fBufferN_exp",
+          "offset": 23480,
+          "size": 1280
+        },
+        {
+          "name": "fBuf_man",
+          "offset": 24760,
+          "size": 256
+        },
+        {
+          "name": "fBuf_exp",
+          "offset": 25016,
+          "size": 256
+        },
+        {
+          "name": "fBufN_man",
+          "offset": 25272,
+          "size": 256
+        },
+        {
+          "name": "fBufN_exp",
+          "offset": 25528,
+          "size": 256
+        }
+      ]
+    },
+    "STRUCT_PS_DEC": {
+      "bytes": 3536,
+      "fields": [
+        {
+          "name": "psDetected",
+          "offset": 0,
+          "size": 4
+        },
+        {
+          "name": "R_ch_qmf_filter_history",
+          "offset": 4,
+          "size": 4
+        },
+        {
+          "name": "invNoSubSamples",
+          "offset": 8,
+          "size": 4
+        },
+        {
+          "name": "bForceMono",
+          "offset": 12,
+          "size": 4
+        },
+        {
+          "name": "noSubSamples",
+          "offset": 16,
+          "size": 4
+        },
+        {
+          "name": "usb",
+          "offset": 20,
+          "size": 4
+        },
+        {
+          "name": "lastUsb",
+          "offset": 24,
+          "size": 4
+        },
+        {
+          "name": "bPsDataAvail",
+          "offset": 28,
+          "size": 4
+        },
+        {
+          "name": "bEnableIid",
+          "offset": 32,
+          "size": 4
+        },
+        {
+          "name": "bEnableIcc",
+          "offset": 36,
+          "size": 4
+        },
+        {
+          "name": "bEnableExt",
+          "offset": 40,
+          "size": 4
+        },
+        {
+          "name": "bFineIidQ",
+          "offset": 44,
+          "size": 4
+        },
+        {
+          "name": "aIidPrevFrameIndex",
+          "offset": 48,
+          "size": 136
+        },
+        {
+          "name": "aIccPrevFrameIndex",
+          "offset": 184,
+          "size": 136
+        },
+        {
+          "name": "freqResIid",
+          "offset": 320,
+          "size": 4
+        },
+        {
+          "name": "freqResIcc",
+          "offset": 324,
+          "size": 4
+        },
+        {
+          "name": "bFrameClass",
+          "offset": 328,
+          "size": 4
+        },
+        {
+          "name": "noEnv",
+          "offset": 332,
+          "size": 4
+        },
+        {
+          "name": "aEnvStartStop",
+          "offset": 336,
+          "size": 24
+        },
+        {
+          "name": "abIidDtFlag",
+          "offset": 360,
+          "size": 20
+        },
+        {
+          "name": "abIccDtFlag",
+          "offset": 380,
+          "size": 20
+        },
+        {
+          "name": "delayBufIndex",
+          "offset": 400,
+          "size": 4
+        },
+        {
+          "name": "aDelayRBufIndexSer",
+          "offset": 404,
+          "size": 12
+        },
+        {
+          "name": "aaaRealDelayRBufferSerQmf",
+          "offset": 416,
+          "size": 12
+        },
+        {
+          "name": "aaaImagDelayRBufferSerQmf",
+          "offset": 428,
+          "size": 12
+        },
+        {
+          "name": "aaaRealDelayRBufferSerSubQmf",
+          "offset": 440,
+          "size": 12
+        },
+        {
+          "name": "aaaImagDelayRBufferSerSubQmf",
+          "offset": 452,
+          "size": 12
+        },
+        {
+          "name": "aaRealDelayBufferQmf",
+          "offset": 464,
+          "size": 4
+        },
+        {
+          "name": "aaImagDelayBufferQmf",
+          "offset": 468,
+          "size": 4
+        },
+        {
+          "name": "aaRealDelayBufferSubQmf",
+          "offset": 472,
+          "size": 4
+        },
+        {
+          "name": "aaImagDelayBufferSubQmf",
+          "offset": 476,
+          "size": 4
+        },
+        {
+          "name": "aPeakDecayFast",
+          "offset": 480,
+          "size": 4
+        },
+        {
+          "name": "aPrevNrg",
+          "offset": 484,
+          "size": 4
+        },
+        {
+          "name": "aPrevPeakDiff",
+          "offset": 488,
+          "size": 4
+        },
+        {
+          "name": "mHybridRealLeft",
+          "offset": 492,
+          "size": 4
+        },
+        {
+          "name": "mHybridImagLeft",
+          "offset": 496,
+          "size": 4
+        },
+        {
+          "name": "mHybridRealRight",
+          "offset": 500,
+          "size": 4
+        },
+        {
+          "name": "mHybridImagRight",
+          "offset": 504,
+          "size": 4
+        },
+        {
+          "name": "hHybrid",
+          "offset": 508,
+          "size": 4
+        },
+        {
+          "name": "h11Prev",
+          "offset": 512,
+          "size": 88
+        },
+        {
+          "name": "h12Prev",
+          "offset": 600,
+          "size": 88
+        },
+        {
+          "name": "h21Prev",
+          "offset": 688,
+          "size": 88
+        },
+        {
+          "name": "h22Prev",
+          "offset": 776,
+          "size": 88
+        },
+        {
+          "name": "H11",
+          "offset": 864,
+          "size": 88
+        },
+        {
+          "name": "H12",
+          "offset": 952,
+          "size": 88
+        },
+        {
+          "name": "H21",
+          "offset": 1040,
+          "size": 88
+        },
+        {
+          "name": "H22",
+          "offset": 1128,
+          "size": 88
+        },
+        {
+          "name": "deltaH11",
+          "offset": 1216,
+          "size": 88
+        },
+        {
+          "name": "deltaH12",
+          "offset": 1304,
+          "size": 88
+        },
+        {
+          "name": "deltaH21",
+          "offset": 1392,
+          "size": 88
+        },
+        {
+          "name": "deltaH22",
+          "offset": 1480,
+          "size": 88
+        },
+        {
+          "name": "qmfBufferReal",
+          "offset": 1568,
+          "size": 4
+        },
+        {
+          "name": "qmfBufferImag",
+          "offset": 1572,
+          "size": 4
+        },
+        {
+          "name": "aDelayBufIndex",
+          "offset": 1576,
+          "size": 164
+        },
+        {
+          "name": "aNoSampleDelay",
+          "offset": 1740,
+          "size": 164
+        },
+        {
+          "name": "aaIidIndex",
+          "offset": 1904,
+          "size": 816
+        },
+        {
+          "name": "aaIccIndex",
+          "offset": 2720,
+          "size": 816
+        }
+      ]
+    },
+    "SBR_CHANNEL": {
+      "bytes": 25792,
+      "fields": [
+        {
+          "name": "outFrameSize",
+          "offset": 0,
+          "size": 4
+        },
+        {
+          "name": "syncState",
+          "offset": 4,
+          "size": 4
+        },
+        {
+          "name": "frameData",
+          "offset": 8,
+          "size": 25784
+        }
+      ]
+    },
+    "SBRDECODER_DATA": {
+      "bytes": 55128,
+      "fields": [
+        {
+          "name": "SbrChannel",
+          "offset": 0,
+          "size": 51584
+        },
+        {
+          "name": "setStreamType",
+          "offset": 51584,
+          "size": 4
+        },
+        {
+          "name": "hParametricStereoDec",
+          "offset": 51588,
+          "size": 4
+        },
+        {
+          "name": "ParametricStereoDec",
+          "offset": 51592,
+          "size": 3536
+        }
+      ]
+    },
+    "SBR_DEC": {
+      "bytes": 1180,
+      "fields": [
+        {
+          "name": "outSampleRate",
+          "offset": 0,
+          "size": 4
+        },
+        {
+          "name": "LC_aacP_DecoderFlag",
+          "offset": 4,
+          "size": 4
+        },
+        {
+          "name": "startIndexCodecQmf",
+          "offset": 8,
+          "size": 4
+        },
+        {
+          "name": "lowBandAddSamples",
+          "offset": 12,
+          "size": 4
+        },
+        {
+          "name": "noCols",
+          "offset": 16,
+          "size": 4
+        },
+        {
+          "name": "qmfBufLen",
+          "offset": 20,
+          "size": 4
+        },
+        {
+          "name": "bufWriteOffs",
+          "offset": 24,
+          "size": 4
+        },
+        {
+          "name": "bufReadOffs",
+          "offset": 28,
+          "size": 4
+        },
+        {
+          "name": "sbStopCodec",
+          "offset": 32,
+          "size": 4
+        },
+        {
+          "name": "lowSubband",
+          "offset": 36,
+          "size": 4
+        },
+        {
+          "name": "prevLowSubband",
+          "offset": 40,
+          "size": 4
+        },
+        {
+          "name": "highSubband",
+          "offset": 44,
+          "size": 4
+        },
+        {
+          "name": "noSubbands",
+          "offset": 48,
+          "size": 4
+        },
+        {
+          "name": "FreqBandTable",
+          "offset": 52,
+          "size": 472
+        },
+        {
+          "name": "FreqBandTableNoise",
+          "offset": 524,
+          "size": 24
+        },
+        {
+          "name": "V_k_master",
+          "offset": 548,
+          "size": 236
+        },
+        {
+          "name": "NSfb",
+          "offset": 784,
+          "size": 8
+        },
+        {
+          "name": "NoNoiseBands",
+          "offset": 792,
+          "size": 4
+        },
+        {
+          "name": "Num_Master",
+          "offset": 796,
+          "size": 4
+        },
+        {
+          "name": "Patch",
+          "offset": 800,
+          "size": 28
+        },
+        {
+          "name": "gateMode",
+          "offset": 828,
+          "size": 16
+        },
+        {
+          "name": "limSbc",
+          "offset": 844,
+          "size": 208
+        },
+        {
+          "name": "sqrt_cache",
+          "offset": 1052,
+          "size": 128
+        }
+      ]
+    },
+    "tDec_Int_File": {
+      "bytes": 108344,
+      "fields": [
+        {
+          "name": "bno",
+          "offset": 0,
+          "size": 4
+        },
+        {
+          "name": "status",
+          "offset": 4,
+          "size": 4
+        },
+        {
+          "name": "aacPlusEnabled",
+          "offset": 8,
+          "size": 1
+        },
+        {
+          "name": "aacConfigUtilityEnabled",
+          "offset": 9,
+          "size": 1
+        },
+        {
+          "name": "current_program",
+          "offset": 12,
+          "size": 4
+        },
+        {
+          "name": "frameLength",
+          "offset": 16,
+          "size": 4
+        },
+        {
+          "name": "adif_test",
+          "offset": 20,
+          "size": 4
+        },
+        {
+          "name": "inputStream",
+          "offset": 24,
+          "size": 20
+        },
+        {
+          "name": "prog_config",
+          "offset": 44,
+          "size": 1376
+        },
+        {
+          "name": "SFBWidth128",
+          "offset": 1420,
+          "size": 64
+        },
+        {
+          "name": "longFrameInfo",
+          "offset": 1484,
+          "size": 696
+        },
+        {
+          "name": "shortFrameInfo",
+          "offset": 2180,
+          "size": 696
+        },
+        {
+          "name": "winmap",
+          "offset": 2876,
+          "size": 16
+        },
+        {
+          "name": "pns_cur_noise_state",
+          "offset": 2892,
+          "size": 4
+        },
+        {
+          "name": "mc_info",
+          "offset": 2896,
+          "size": 104
+        },
+        {
+          "name": "ltp_buffer_state",
+          "offset": 3000,
+          "size": 4
+        },
+        {
+          "name": "perChan",
+          "offset": 3004,
+          "size": 18792
+        },
+        {
+          "name": "fxpCoef",
+          "offset": 21796,
+          "size": 16384
+        },
+        {
+          "name": "sbrDecoderData",
+          "offset": 38180,
+          "size": 55128
+        },
+        {
+          "name": "sbrDec",
+          "offset": 93308,
+          "size": 1180
+        },
+        {
+          "name": "sbrBitStr",
+          "offset": 94488,
+          "size": 1044
+        },
+        {
+          "name": "syncword",
+          "offset": 95532,
+          "size": 4
+        },
+        {
+          "name": "invoke",
+          "offset": 95536,
+          "size": 4
+        },
+        {
+          "name": "mask",
+          "offset": 95540,
+          "size": 512
+        },
+        {
+          "name": "hasmask",
+          "offset": 96052,
+          "size": 4
+        },
+        {
+          "name": "scratch",
+          "offset": 96056,
+          "size": 4096
+        },
+        {
+          "name": "share",
+          "offset": 100152,
+          "size": 8192
+        }
+      ]
+    }
+  }
+}
