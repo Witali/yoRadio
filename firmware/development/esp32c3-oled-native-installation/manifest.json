@@ -37,7 +37,7 @@
       "source_commit": "63572edf79803f6939a64c466f24ec1c3d79602a"
     }
   ],
-  "hardware_tested": false,
+  "hardware_tested": true,
   "validation": [
     "SPIFFS inputs match tracked source at 63572edf, allowing Windows CRLF in the two text files; no wifi.csv",
     "SPIFFS regenerated with ESP-IDF settings and byte-identical to production build",
@@ -46,5 +46,10 @@
     "All five native variant applications pass esptool 5.3.1 image-info and fit app0",
     "Offline merge-bin with every variant verifies the documented app and SPIFFS offsets",
     "SPIFFS decoded and gzip contents expanded; only 13 public source files, no Wi-Fi credential file or known local credentials"
-  ]
+  ],
+  "hardware_validation": {
+    "date": "2026-09-30",
+    "report": "../../../docs/ESP32C3_HARDWARE_VALIDATION_20260930.md",
+    "scope": "Shared installation files with the ordinary production app; write verification, AP setup, HTTP assets and Wi-Fi configuration passed. This does not validate every application variant."
+  }
 }

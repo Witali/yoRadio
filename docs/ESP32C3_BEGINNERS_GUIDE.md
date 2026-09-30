@@ -145,10 +145,14 @@ The directory name is the value to use for `$variant` in the commands below.
 | `esp32c3-oled-native-deep-sleep-clock-rtc32k` | Production radio with both the sleeping clock and external crystal; logs off. | `63572edf` | Application only. [Manifest](../firmware/development/esp32c3-oled-native-deep-sleep-clock-rtc32k/manifest.md). |
 
 These are **saved builds**, not automatically rebuilt copies of today's `main`.
-The manifest identifies each image's source and validation. The sleeping-clock
-and crystal images have build/host-test validation but are marked as not tested
-on physical hardware. Compile from source if you need the newest code with your
-own combination of options.
+The manifest identifies each image's source and validation. On 30 September 2026,
+the ordinary production image was installed on a physical board, and an update
+to the development image preserved NVS and SPIFFS byte for byte. The archived
+internal-oscillator sleeping-clock image failed the OLED switching check:
+part of the station screen remained beside the minutes. Use an ordinary variant
+while this defect is being investigated. External-crystal variants have not been
+tested on hardware. See the [hardware validation report](ESP32C3_HARDWARE_VALIDATION_20260930.md).
+Compile from source if you need the newest code with your own combination of options.
 
 Choose `esp32c3-oled-native-production` for the archived ordinary radio, or choose
 one of the other rows for its listed features. A prebuilt binary's features are
@@ -505,6 +509,9 @@ sequence and retry at a lower baud rate:
 8. The board restarts. Reconnect your phone or PC to your usual network, then
    open the radio's new IP address shown on its OLED or in your router's device list.
 
+The AP address is **192.168.4.1**, even when the current OLED screen only says
+"AP mode" and does not display an address.
+
 The native WebUI and AP behavior are described in the
 [target README](../idf/esp32c3-oled-native/README.md#native-http-server-and-webui).
 Audio playback also requires the correct external audio circuit described in the
@@ -526,6 +533,11 @@ procedure is documented in the project's
 [ESP32-C3 reset skill](../.agents/skills/flash-reset-esp32c3-oled/SKILL.md).
 
 ## 10. Enable the sleeping clock, if your firmware includes it
+
+**Known hardware issue:** the sleeping-clock image tested on 30 September 2026
+left part of the radio screen visible. Keep `DeepSleepClock = $false` for normal
+use until the fix has passed the OLED check. Ordinary Clock screensaver mode is
+also available without deep sleep; USB and Wi-Fi remain active in that mode.
 
 This section applies when `DeepSleepClock = $true` was used during compilation,
 or when you installed a prebuilt `deep-sleep-clock` variant.
@@ -606,7 +618,11 @@ build script turn that feature off, even in a previously used configuration.
 | Compile error says GPIO0/1 are reserved for the RTC crystal | Disable conflicting encoder/LED options, move their pins, or disable the crystal option when that hardware is absent. |
 | Setup or compilation fails | Keep the first error and the preceding lines. Do not flash an old file while assuming the new build succeeded. |
 
-The commands were checked against the repository's native ESP32-C3 scripts and
-pinned ESP-IDF v6.0.2 configuration. This guide has not been validated by a complete
-installation on a freshly installed Windows PC or by flashing a board during its
-preparation.
+The prebuilt first-install and update commands, source builds and source
+`app-flash` command were exercised on a physical ESP32-C3 OLED board on
+30 September 2026. Validation used PowerShell 7.6.5, Python 3.13.14 with
+esptool 5.3.1 for prebuilt flashing, and ESP-IDF v6.0.2 for source builds.
+See [the validation report](ESP32C3_HARDWARE_VALIDATION_20260930.md) for results
+and limitations. A completely fresh Windows installation, the source `flash`
+command, browser rendering and the external-crystal variants have not yet been
+validated in that hardware run.

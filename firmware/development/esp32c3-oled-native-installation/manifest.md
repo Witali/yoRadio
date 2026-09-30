@@ -37,7 +37,10 @@ and OTA selector match the production RTC-crystal build; the selector is 8192 by
 of `0xff`. Manifest hashes identify all files. All five native application
 variants pass esptool 5.3.1 `image-info`, fit the application partition, and were
 merged offline with this package to verify the documented offsets and contents.
-Hardware flashing was not performed for this packaging task.
+On 30 September 2026 these shared files were flashed with the ordinary
+production application. Write verification, AP setup, HTTP assets and Wi-Fi
+configuration passed. This does not validate the sleeping-clock or crystal
+features of other applications. See the [hardware report](../../../docs/ESP32C3_HARDWARE_VALIDATION_20260930.md).
 
 SPIFFS was also decoded and its gzip files decompressed. Its 13 files contain only
 the tracked WebUI assets, playlist and `.gitignore`; no `wifi.csv`, deleted file

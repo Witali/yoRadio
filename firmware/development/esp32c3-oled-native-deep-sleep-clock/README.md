@@ -7,7 +7,10 @@ Application version: `v0.9.693-770-g66626be7`.
 - SHA-256: `05d397215be054c994a8b0bc9e821c6810b624c3ece500bada559d620d5fb462`.
 - RTC timer: 500 ms; wake code and data: 3712/8192 bytes including reserved memory.
 - Build, host wake-stub tests, 89 C3 regression tests and ELF audit passed.
-- Not flashed or measured on the physical board.
+- Hardware test on 30 September 2026 **failed** the OLED transition: station
+  content remained beside the clock minutes. Use an ordinary variant while
+  this defect is investigated. Power consumption was not measured.
+  See the [hardware report](../../../docs/ESP32C3_HARDWARE_VALIDATION_20260930.md).
 
 Build from the worktree root:
 
