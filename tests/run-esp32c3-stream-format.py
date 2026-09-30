@@ -11,6 +11,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
 MAIN = ROOT / "idf/esp32c3-oled-native/main"
+SANITIZERS = (["-fsanitize=address,undefined", "-fno-omit-frame-pointer"]
+              if os.environ.get("C3_MEMORY_SANITIZE") == "1" else [])
 
 
 def function(source, name):
@@ -80,7 +82,7 @@ static void run_espressif_frame(uint32_t generation, native_codec_t codec,
     executable = tmp / "stream-format"
     subprocess.run([
         os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra",
-        "-Werror", "-I" + str(tmp), "-I" + str(MAIN),
+        "-Werror", *SANITIZERS, "-I" + str(tmp), "-I" + str(MAIN),
         "-I" + str(ROOT / "idf/components/custom_legacy_codecs"),
         "-I" + str(ROOT / "idf/esp32c3-oled-native/components/custom_flac"),
         str(ROOT / "tests/native/esp32c3_stream_format_test.c"),
@@ -90,7 +92,7 @@ static void run_espressif_frame(uint32_t generation, native_codec_t codec,
     executable = tmp / "pcm-workspace"
     subprocess.run([
         os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
-        "-I" + str(MAIN), str(ROOT / "tests/native/esp32c3_pcm_workspace_test.c"),
+        *SANITIZERS, "-I" + str(MAIN), str(ROOT / "tests/native/esp32c3_pcm_workspace_test.c"),
         "-o", str(executable),
     ], check=True)
     subprocess.run([str(executable)], check=True)
@@ -148,7 +150,7 @@ typedef struct { bool aac_plus_enable; } esp_aac_dec_cfg_t;
     executable = tmp / "aac-framing"
     subprocess.run([
         os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
-        "-I" + str(tmp), "-I" + str(MAIN),
+        *SANITIZERS, "-I" + str(tmp), "-I" + str(MAIN),
         str(ROOT / "tests/native/esp32c3_aac_framing_test.c"),
         str(MAIN / "native_aac_decoder.c"), "-o", str(executable),
     ], check=True)
@@ -156,7 +158,7 @@ typedef struct { bool aac_plus_enable; } esp_aac_dec_cfg_t;
     executable = tmp / "aac-memory"
     subprocess.run([
         os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
-        "-I" + str(tmp), "-I" + str(MAIN),
+        *SANITIZERS, "-I" + str(tmp), "-I" + str(MAIN),
         str(ROOT / "tests/native/esp32c3_aac_memory_test.c"), "-o", str(executable),
     ], check=True)
     subprocess.run([str(executable)], check=True)

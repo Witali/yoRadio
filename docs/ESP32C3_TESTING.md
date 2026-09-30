@@ -90,7 +90,12 @@ python3 tests/run-esp32c3-ota.py
 python3 tests/run-esp32c3-stream-format.py
 python3 tests/run-esp32c3-eof.py
 python3 tests/run-esp32c3-memory-trace.py
+C3_MEMORY_SANITIZE=1 python3 tests/run-esp32c3-stream-format.py
 ```
+
+The sanitizer mode instruments the host C callbacks, PCM workspace and ADTS
+adapter/fault tests with AddressSanitizer and UndefinedBehaviorSanitizer.
+It does not instrument the precompiled Espressif library or the Helix C++ test.
 
 For the same deterministic QEMU fixture sequence, compare the baseline and
 candidate captures with `python tests/compare-pcm-wav.py before.wav after.wav`.
