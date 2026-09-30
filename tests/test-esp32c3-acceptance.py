@@ -73,6 +73,10 @@ class AcceptanceTests(unittest.TestCase):
             common.check_cpu(rows+[dict(line='PERF allocation failed: requested=55128')])
         with self.assertRaises(common.Failure):
             common.check_cpu([])
+        timed=[dict(row,at=5*(i//2+1)) for i,row in enumerate(rows)]
+        common.check_cpu(timed,start=0,end=20)
+        with self.assertRaisesRegex(common.Failure,'gap'):
+            common.check_cpu(timed,start=0,end=40)
 
     def test_heap_recovery_rejects_leak_and_missing_evidence(self):
         initial = [dict(heap=50000,largest=20000,tasks=12)]*2

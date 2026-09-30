@@ -227,7 +227,7 @@ class Suite:
             evidence = dict(duration=seconds, status_samples=len(samples),
                             max_http_ms=max(s['request_ms'] for s in samples))
             if cpu:
-                evidence.update(check_cpu(self.capture.since(started+10)))
+                evidence.update(check_cpu(self.capture.since(started+10),start=started+10,end=time.monotonic()))
             return evidence
         finally:
             self.board.stop()

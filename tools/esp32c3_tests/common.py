@@ -137,7 +137,7 @@ def check_transitions(samples, expected, minimum=2):
     raise Failure(f'Missing full-rate transition {phase + 1}/{len(expected)}')
 
 
-def check_cpu(records, max_busy=85, min_heap=8192, min_largest=4096):
+def check_cpu(records, max_busy=85, min_heap=8192, min_largest=4096, start=None, end=None):
     cpu, decode = [], []
     for row in records:
         line = row['line']
@@ -152,6 +152,11 @@ def check_cpu(records, max_busy=85, min_heap=8192, min_largest=4096):
         if match:
             decode.append(tuple(map(int, match.groups())))
     require(len(cpu) >= 3 and len(decode) >= 3, 'Missing CPU/decoder windows; use profiling firmware')
+    if start is not None and end is not None:
+        for pattern in ('PERF CPU:', r'PERF (?:AAC|MP3|FLAC|OGG):'):
+            times = [r['at'] for r in records if re.search(pattern,r['line'])]
+            require(all(b-a < 11 for a,b in zip([start]+times,times+[end])),
+                    'CPU/decoder evidence has a gap longer than two intervals')
     require(max(r['busy'] for r in cpu) <= max_busy, 'CPU budget exceeded')
     require(min(r['heap'] for r in cpu) >= min_heap, 'Free heap below budget')
     require(min(r['largest'] for r in cpu) >= min_largest, 'Largest heap block below budget')

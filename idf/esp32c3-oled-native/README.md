@@ -39,6 +39,15 @@ the AAC core. Full-rate HE/v2 passed the isolated hardware decoder benchmark.
 See the [hardware measurements](../../docs/ESP32C3_CACHE_HARDWARE_20260930.md)
 and [remaining memory work](../../docs/ESP32C3_MEMORY_STABILITY_TODO.md).
 
+### Acceptance tests
+
+The [testing guide](../../docs/ESP32C3_TESTING.md) lists missing coverage,
+executable HTTP/HTTPS, codec-switching, CPU/heap and OTA tests, plus procedures
+for physical audio, interrupt timing and power-cut recovery. Test outcomes are
+recorded separately as PASS, FAIL or BLOCKED. The
+[audio fixture server](../../tools/audio_test_server/README.md) is shared with
+ESP8266, CYD and other HTTP players; it contains no C3 control commands.
+
 ### Connections and controls
 
 - ESP32-C3, one RISC-V core at 160 MHz, 4 MiB flash;
