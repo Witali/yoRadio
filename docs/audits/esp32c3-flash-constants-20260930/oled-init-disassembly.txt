@@ -1,0 +1,195 @@
+
+idf/esp32c3-oled-native/build-constants-audit/yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4200fc80 <oled_display_init>:
+4200fc80:	1e050163          	beqz	a0,4200fe62 <oled_display_init+0x1e2>
+4200fc84:	7171                	addi	sp,sp,-176
+4200fc86:	17000613          	li	a2,368
+4200fc8a:	4581                	li	a1,0
+4200fc8c:	d706                	sw	ra,172(sp)
+4200fc8e:	d326                	sw	s1,164(sp)
+4200fc90:	84aa                	mv	s1,a0
+4200fc92:	fdff0097          	auipc	ra,0xfdff0
+4200fc96:	6c2080e7          	jalr	1730(ra) # 40000354 <memset>
+4200fc9a:	57fd                	li	a5,-1
+4200fc9c:	d8be                	sw	a5,112(sp)
+4200fc9e:	4795                	li	a5,5
+4200fca0:	dabe                	sw	a5,116(sp)
+4200fca2:	4799                	li	a5,6
+4200fca4:	dcbe                	sw	a5,120(sp)
+4200fca6:	47a9                	li	a5,10
+4200fca8:	c102                	sw	zero,128(sp)
+4200fcaa:	debe                	sw	a5,124(sp)
+4200fcac:	479d                	li	a5,7
+4200fcae:	c702                	sw	zero,140(sp)
+4200fcb0:	08f10023          	sb	a5,128(sp)
+4200fcb4:	086c                	addi	a1,sp,28
+4200fcb6:	4785                	li	a5,1
+4200fcb8:	1888                	addi	a0,sp,112
+4200fcba:	08f10623          	sb	a5,140(sp)
+4200fcbe:	c302                	sw	zero,132(sp)
+4200fcc0:	c502                	sw	zero,136(sp)
+4200fcc2:	ce02                	sw	zero,28(sp)
+4200fcc4:	627e30ef          	jal	420f3aea <i2c_new_master_bus>
+4200fcc8:	87aa                	mv	a5,a0
+4200fcca:	e555                	bnez	a0,4200fd76 <oled_display_init+0xf6>
+4200fccc:	4572                	lw	a0,28(sp)
+4200fcce:	000627b7          	lui	a5,0x62
+4200fcd2:	a8078793          	addi	a5,a5,-1408 # 61a80 <CSR_UINTSTATUS+0x60dcf>
+4200fcd6:	d402                	sw	zero,40(sp)
+4200fcd8:	d63e                	sw	a5,44(sp)
+4200fcda:	1010                	addi	a2,sp,32
+4200fcdc:	03c00793          	li	a5,60
+4200fce0:	104c                	addi	a1,sp,36
+4200fce2:	02f11423          	sh	a5,40(sp)
+4200fce6:	d202                	sw	zero,36(sp)
+4200fce8:	d802                	sw	zero,48(sp)
+4200fcea:	da02                	sw	zero,52(sp)
+4200fcec:	d002                	sw	zero,32(sp)
+4200fcee:	26ae40ef          	jal	420f3f58 <i2c_master_bus_add_device>
+4200fcf2:	87aa                	mv	a5,a0
+4200fcf4:	4572                	lw	a0,28(sp)
+4200fcf6:	e7c9                	bnez	a5,4200fd80 <oled_display_init+0x100>
+4200fcf8:	3c1117b7          	lui	a5,0x3c111
+4200fcfc:	a9878793          	addi	a5,a5,-1384 # 3c110a98 <boot_logo_72x40+0x168>
+4200fd00:	4798                	lw	a4,8(a5)
+4200fd02:	4390                	lw	a2,0(a5)
+4200fd04:	43d4                	lw	a3,4(a5)
+4200fd06:	ceba                	sw	a4,92(sp)
+4200fd08:	4bd8                	lw	a4,20(a5)
+4200fd0a:	cab2                	sw	a2,84(sp)
+4200fd0c:	ccb6                	sw	a3,88(sp)
+4200fd0e:	47d0                	lw	a2,12(a5)
+4200fd10:	4b94                	lw	a3,16(a5)
+4200fd12:	d4ba                	sw	a4,104(sp)
+4200fd14:	4f98                	lw	a4,24(a5)
+4200fd16:	5782                	lw	a5,32(sp)
+4200fd18:	d14a                	sw	s2,160(sp)
+4200fd1a:	cf4e                	sw	s3,156(sp)
+4200fd1c:	cd52                	sw	s4,152(sp)
+4200fd1e:	d522                	sw	s0,168(sp)
+4200fd20:	c088                	sw	a0,0(s1)
+4200fd22:	d0b2                	sw	a2,96(sp)
+4200fd24:	d2b6                	sw	a3,100(sp)
+4200fd26:	02010c23          	sb	zero,56(sp)
+4200fd2a:	d6ba                	sw	a4,108(sp)
+4200fd2c:	c0dc                	sw	a5,4(s1)
+4200fd2e:	05410993          	addi	s3,sp,84
+4200fd32:	4971                	li	s2,28
+4200fd34:	4a61                	li	s4,24
+4200fd36:	a021                	j	4200fd3e <oled_display_init+0xbe>
+4200fd38:	99a2                	add	s3,s3,s0
+4200fd3a:	04090c63          	beqz	s2,4200fd92 <oled_display_init+0x112>
+4200fd3e:	85ce                	mv	a1,s3
+4200fd40:	03910513          	addi	a0,sp,57
+4200fd44:	844a                	mv	s0,s2
+4200fd46:	012a7363          	bgeu	s4,s2,4200fd4c <oled_display_init+0xcc>
+4200fd4a:	4461                	li	s0,24
+4200fd4c:	8622                	mv	a2,s0
+4200fd4e:	fe377097          	auipc	ra,0xfe377
+4200fd52:	e18080e7          	jalr	-488(ra) # 40386b66 <memcpy>
+4200fd56:	40c8                	lw	a0,4(s1)
+4200fd58:	00140613          	addi	a2,s0,1
+4200fd5c:	182c                	addi	a1,sp,56
+4200fd5e:	06400693          	li	a3,100
+4200fd62:	3b6e40ef          	jal	420f4118 <i2c_master_transmit>
+4200fd66:	87aa                	mv	a5,a0
+4200fd68:	40890933          	sub	s2,s2,s0
+4200fd6c:	d571                	beqz	a0,4200fd38 <oled_display_init+0xb8>
+4200fd6e:	542a                	lw	s0,168(sp)
+4200fd70:	590a                	lw	s2,160(sp)
+4200fd72:	49fa                	lw	s3,156(sp)
+4200fd74:	4a6a                	lw	s4,152(sp)
+4200fd76:	50ba                	lw	ra,172(sp)
+4200fd78:	549a                	lw	s1,164(sp)
+4200fd7a:	853e                	mv	a0,a5
+4200fd7c:	614d                	addi	sp,sp,176
+4200fd7e:	8082                	ret
+4200fd80:	c63e                	sw	a5,12(sp)
+4200fd82:	294e40ef          	jal	420f4016 <i2c_del_master_bus>
+4200fd86:	47b2                	lw	a5,12(sp)
+4200fd88:	50ba                	lw	ra,172(sp)
+4200fd8a:	549a                	lw	s1,164(sp)
+4200fd8c:	853e                	mv	a0,a5
+4200fd8e:	614d                	addi	sp,sp,176
+4200fd90:	8082                	ret
+4200fd92:	16800613          	li	a2,360
+4200fd96:	4581                	li	a1,0
+4200fd98:	00848513          	addi	a0,s1,8
+4200fd9c:	cb56                	sw	s5,148(sp)
+4200fd9e:	c95a                	sw	s6,144(sp)
+4200fda0:	fdff0097          	auipc	ra,0xfdff0
+4200fda4:	5b4080e7          	jalr	1460(ra) # 40000354 <memset>
+4200fda8:	40c8                	lw	a0,4(s1)
+4200fdaa:	c161                	beqz	a0,4200fe6a <oled_display_init+0x1ea>
+4200fdac:	6a05                	lui	s4,0x1
+4200fdae:	c11a0a13          	addi	s4,s4,-1007 # c11 <ALIGN_VECTOR_TABLE+0xb11>
+4200fdb2:	8aa6                	mv	s5,s1
+4200fdb4:	04800993          	li	s3,72
+4200fdb8:	fb096793          	ori	a5,s2,-80
+4200fdbc:	06400693          	li	a3,100
+4200fdc0:	4611                	li	a2,4
+4200fdc2:	182c                	addi	a1,sp,56
+4200fdc4:	00f10d23          	sb	a5,26(sp)
+4200fdc8:	02f10da3          	sb	a5,59(sp)
+4200fdcc:	01411c23          	sh	s4,24(sp)
+4200fdd0:	02010c23          	sb	zero,56(sp)
+4200fdd4:	03411ca3          	sh	s4,57(sp)
+4200fdd8:	340e40ef          	jal	420f4118 <i2c_master_transmit>
+4200fddc:	87aa                	mv	a5,a0
+4200fdde:	ed29                	bnez	a0,4200fe38 <oled_display_init+0x1b8>
+4200fde0:	04000793          	li	a5,64
+4200fde4:	02f10c23          	sb	a5,56(sp)
+4200fde8:	4401                	li	s0,0
+4200fdea:	008a8b13          	addi	s6,s5,8
+4200fdee:	a019                	j	4200fdf4 <oled_display_init+0x174>
+4200fdf0:	05340f63          	beq	s0,s3,4200fe4e <oled_display_init+0x1ce>
+4200fdf4:	008b07b3          	add	a5,s6,s0
+4200fdf8:	0007ae03          	lw	t3,0(a5)
+4200fdfc:	0047a303          	lw	t1,4(a5)
+4200fe00:	0087a883          	lw	a7,8(a5)
+4200fe04:	00c7a803          	lw	a6,12(a5)
+4200fe08:	4b98                	lw	a4,16(a5)
+4200fe0a:	40c8                	lw	a0,4(s1)
+4200fe0c:	4bdc                	lw	a5,20(a5)
+4200fe0e:	06400693          	li	a3,100
+4200fe12:	4665                	li	a2,25
+4200fe14:	182c                	addi	a1,sp,56
+4200fe16:	04f126a3          	sw	a5,77(sp)
+4200fe1a:	03c12ca3          	sw	t3,57(sp)
+4200fe1e:	02612ea3          	sw	t1,61(sp)
+4200fe22:	051120a3          	sw	a7,65(sp)
+4200fe26:	050122a3          	sw	a6,69(sp)
+4200fe2a:	04e124a3          	sw	a4,73(sp)
+4200fe2e:	2eae40ef          	jal	420f4118 <i2c_master_transmit>
+4200fe32:	87aa                	mv	a5,a0
+4200fe34:	0461                	addi	s0,s0,24
+4200fe36:	dd4d                	beqz	a0,4200fdf0 <oled_display_init+0x170>
+4200fe38:	542a                	lw	s0,168(sp)
+4200fe3a:	50ba                	lw	ra,172(sp)
+4200fe3c:	590a                	lw	s2,160(sp)
+4200fe3e:	49fa                	lw	s3,156(sp)
+4200fe40:	4a6a                	lw	s4,152(sp)
+4200fe42:	4ada                	lw	s5,148(sp)
+4200fe44:	4b4a                	lw	s6,144(sp)
+4200fe46:	549a                	lw	s1,164(sp)
+4200fe48:	853e                	mv	a0,a5
+4200fe4a:	614d                	addi	sp,sp,176
+4200fe4c:	8082                	ret
+4200fe4e:	0905                	addi	s2,s2,1
+4200fe50:	0ff97913          	zext.b	s2,s2
+4200fe54:	4715                	li	a4,5
+4200fe56:	fee901e3          	beq	s2,a4,4200fe38 <oled_display_init+0x1b8>
+4200fe5a:	40c8                	lw	a0,4(s1)
+4200fe5c:	048a8a93          	addi	s5,s5,72
+4200fe60:	bfa1                	j	4200fdb8 <oled_display_init+0x138>
+4200fe62:	10200793          	li	a5,258
+4200fe66:	853e                	mv	a0,a5
+4200fe68:	8082                	ret
+4200fe6a:	10300793          	li	a5,259
+4200fe6e:	b7e9                	j	4200fe38 <oled_display_init+0x1b8>

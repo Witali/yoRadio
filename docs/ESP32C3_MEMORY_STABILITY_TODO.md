@@ -3,6 +3,11 @@
 Goal: keep HTTPS radio playback reliable on the ESP32-C3 OLED board by
 avoiding repeated allocation and release of large heap blocks.
 
+The [Flash constant audit](ESP32C3_FLASH_CONSTANT_CANDIDATES_20260930.md) records
+source and ELF candidates, including string copies and SDK placement limits.
+Large application/codec constants are already in Flash; the listed candidates
+are not implemented savings and do not yet resolve the SBR allocation deficit.
+
 ## Physical AAC findings, 2026-09-30
 
 See the [hardware report](ESP32C3_CACHE_HARDWARE_20260930.md). Isolated full-rate
