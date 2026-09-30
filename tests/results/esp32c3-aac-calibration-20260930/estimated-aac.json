@@ -308,14 +308,33 @@
   ],
   "calibration": {
     "id": "esp32c3-espressif-aac-160mhz-20260930",
-    "sha256_utf8_lf": "dd6e0c9b77ef2a04eb59ef7945aa1b876a54af7da6dc383d25988f90ef646ae1",
+    "sha256_utf8_lf": "24bbf718d2232ec3c20100266945d5ae74e26569a76e92f43ad644266da502cf",
     "factor": 2.018192916067804,
     "observed_factor_range": [
       1.770877919668221,
       2.0208442837150766
     ],
+    "cache_accounting": {
+      "reference_cache_stalls_included_in_factor": true,
+      "separate_cache_stall_cycles_measured": false,
+      "reference_cache_stall_cycles": null,
+      "refill_penalty_cycles": null,
+      "qemu_cache_miss_counts_available": false,
+      "cache": {
+        "bytes": 16384,
+        "ways": 8,
+        "line_bytes": 32,
+        "read_only": true,
+        "dirty_line_writeback_applicable": false
+      },
+      "policy": "Use the saved factor with its reference cache cost included; do not add an unmeasured extra cache multiplier.",
+      "future_delta_model": "cycles = instructions * factor + target_cache_stall_cycles - instructions / reference_instructions * reference_cache_stall_cycles",
+      "future_delta_model_status": "Requires separately established reference and target stall costs; unavailable in retained measurements.",
+      "hardware_reference": "https://documentation.espressif.com/esp32-c3_datasheet_en.html"
+    },
     "limitations": [
       "Empirical decoder-call elapsed-time factor, not a universal CPU CPI or emulator speed multiplier.",
+      "Reference cache refill/stall costs are already included; their separate share was not measured. Adding another cache penalty would double-count it.",
       "Observed range spans two historical firmware builds; it is not a confidence interval or guaranteed bound.",
       "Hardware decode times are floored to milliseconds; counter/timer overhead and preemption are included.",
       "AAC-LC rate/bitrate/channel or adapter changes are extrapolations; HE-AAC SBR/PS transfer is unvalidated.",

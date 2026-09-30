@@ -96,6 +96,7 @@ def build_profile(logs, aac_path=None):
         "qemu_codec_version": "2.6.2", "icount": "shift=0,align=off,sleep=off",
         "qemu_decoder_runtime_version": DECODER_RUNTIME,
         "formula": aac["formula"],
+        "cache_accounting": aac["cache_accounting"],
         "universal_factor_supported": False,
         "aac_profile": {"file": aac_path.name, "sha256_utf8_lf": text_hash(aac_text),
                         "factor": aac["factor"], "observed_factor_range": aac["observed_factor_range"]},

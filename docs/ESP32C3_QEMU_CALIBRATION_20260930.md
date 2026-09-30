@@ -33,6 +33,12 @@ Helix/minimp3 need their own calibration.
 
 ## How to apply
 
+The factor is the ratio between the measured decoder time on the board and the
+time implied by QEMU's instruction count **assuming one CPU cycle per instruction**.
+For example, 16 million instructions per second of audio imply 10% at 160 MHz.
+With the AAC factor, the estimate is `10% × 2.0182 ≈ 20.2%` for decoding alone.
+It does not multiply how long QEMU takes to run on the host computer.
+
 ```text
 instruction demand = counted instructions / decoded audio seconds
 estimated decoder % = instruction demand / 160,000,000 × 100 × codec factor
@@ -64,6 +70,55 @@ instruction mix changes. Keeping the version constant alone does not guarantee
 the factor transfers to a different workload.
 
 ## Method and evidence
+
+### Cache refill and eviction costs
+
+**The saved factors already include cache stalls from their physical reference
+runs.** The hardware timer surrounds the decoder call, so time waiting for flash
+refills contributes to that call's elapsed time. The fit combines instruction
+latency, cache/memory delays, timer overhead and possible preemption. It does not
+identify the share of each. Adding a generic cache multiplier or a full refill
+cost on top would count the reference cache cost twice.
+
+ESP32-C3 has a unified **16 KiB, eight-way, read-only cache with 32-byte lines**.
+A miss can require a flash refill. Eviction discards the old read-only line;
+there is no dirty-line writeback to flash. PCM buffers in internal RAM should
+not be assigned a flash-cache writeback cost. See the official
+[ESP32-C3 datasheet, section 4.1.2.3](https://documentation.espressif.com/esp32-c3_datasheet_en.html)
+and [TRM, System and Memory](https://documentation.espressif.com/esp32-c3_technical_reference_manual_en.pdf).
+Critical-word-first/early-restart behavior also means full line transfer time
+is not automatically equal to CPU stall time.
+
+The installed QEMU implementation (`hw/misc/esp32c3_cache.c`) copies a 64 KiB
+flash page into its memory region when the MMU mapping changes; it does not
+simulate line residency, replacement or refill timing. Its build also has TCG
+plugins disabled. Zero returned by an unimplemented cache counter is **missing
+measurement**, not evidence of zero misses. The retained physical logs contain
+no separate cache-counter or stall measurements either.
+
+A future cache-aware refinement must replace the reference cache share, rather
+than add it again. One possible additive model, with all terms in CPU cycles, is:
+
+```text
+estimated cycles = N × K + S_target − (N / N_reference) × S_reference
+```
+
+`N` is the new instruction count; `K` is the saved factor; `N_reference` is the
+calibration instruction count. `S_reference` and `S_target` are separately
+established cache stall costs in the corresponding decoder intervals. This model
+assumes the remaining instruction cost transfers between the workloads. Miss
+counts alone do not establish these stall costs: effective refill penalties,
+prefetch, bus contention and early restart must also be characterized.
+
+Those inputs are currently unavailable, so **no additional numeric cache
+correction is applied**. The JSON profiles record this explicitly in
+`cache_accounting`, using `null` for unknown penalties rather than zero. Future
+work should capture hardware cache access/miss counters and cycle timings on
+controlled warm/cold-cache workloads, then validate the model on a separate run.
+The counters are declared in ESP-IDF's ESP32-C3 `soc/extmem_reg.h` as
+`EXTMEM_IBUS_ACS_MISS_CNT_REG` and `EXTMEM_DBUS_ACS_FLASH_MISS_CNT_REG`.
+
+### Measurement setup
 
 - Recovered original 11-second generated noise/tone files, not the half-second
   AAC fixtures used for stream-format regression. [Fixture manifest](../tests/fixtures/esp32c3_calibration/manifest.json).

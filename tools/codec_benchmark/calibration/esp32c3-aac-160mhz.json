@@ -14,6 +14,24 @@
     2.0208442837150766
   ],
   "formula": "estimated decoder percent = instructions_per_audio_second / cpu_hz * 100 * factor",
+  "cache_accounting": {
+    "reference_cache_stalls_included_in_factor": true,
+    "separate_cache_stall_cycles_measured": false,
+    "reference_cache_stall_cycles": null,
+    "refill_penalty_cycles": null,
+    "qemu_cache_miss_counts_available": false,
+    "cache": {
+      "bytes": 16384,
+      "ways": 8,
+      "line_bytes": 32,
+      "read_only": true,
+      "dirty_line_writeback_applicable": false
+    },
+    "policy": "Use the saved factor with its reference cache cost included; do not add an unmeasured extra cache multiplier.",
+    "future_delta_model": "cycles = instructions * factor + target_cache_stall_cycles - instructions / reference_instructions * reference_cache_stall_cycles",
+    "future_delta_model_status": "Requires separately established reference and target stall costs; unavailable in retained measurements.",
+    "hardware_reference": "https://documentation.espressif.com/esp32-c3_datasheet_en.html"
+  },
   "hardware_total_cpu_load_measured": false,
   "he_aac_hardware_validated": false,
   "calibration_fixture": {
@@ -201,6 +219,7 @@
   ],
   "limitations": [
     "Empirical decoder-call elapsed-time factor, not a universal CPU CPI or emulator speed multiplier.",
+    "Reference cache refill/stall costs are already included; their separate share was not measured. Adding another cache penalty would double-count it.",
     "Observed range spans two historical firmware builds; it is not a confidence interval or guaranteed bound.",
     "Hardware decode times are floored to milliseconds; counter/timer overhead and preemption are included.",
     "AAC-LC rate/bitrate/channel or adapter changes are extrapolations; HE-AAC SBR/PS transfer is unvalidated.",

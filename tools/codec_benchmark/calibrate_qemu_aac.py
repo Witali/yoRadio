@@ -14,6 +14,24 @@ EXPECTED = {1: (335, 202528, 970752), 2: (334, 202447, 962560)}
 HARDWARE = ("hardware-optimized.log", "hardware-backend-comparison.log")
 DECODER_RUNTIME = "v2.6.0-4-gfd141ab"
 
+# The factor fits total elapsed decoder-call time on the reference board.
+# Do not add a second cache penalty without first removing its reference share.
+CACHE_ACCOUNTING = {
+    "reference_cache_stalls_included_in_factor": True,
+    "separate_cache_stall_cycles_measured": False,
+    "reference_cache_stall_cycles": None,
+    "refill_penalty_cycles": None,
+    "qemu_cache_miss_counts_available": False,
+    "cache": {
+        "bytes": 16384, "ways": 8, "line_bytes": 32,
+        "read_only": True, "dirty_line_writeback_applicable": False,
+    },
+    "policy": "Use the saved factor with its reference cache cost included; do not add an unmeasured extra cache multiplier.",
+    "future_delta_model": "cycles = instructions * factor + target_cache_stall_cycles - instructions / reference_instructions * reference_cache_stall_cycles",
+    "future_delta_model_status": "Requires separately established reference and target stall costs; unavailable in retained measurements.",
+    "hardware_reference": "https://documentation.espressif.com/esp32-c3_datasheet_en.html",
+}
+
 
 def text_hash(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -106,6 +124,7 @@ def calibrate(text, hardware_texts, fixture):
         "factor_selection": "Weighted later backend-comparison run; about 2.02",
         "observed_factor_range": [min(factors), max(factors)],
         "formula": "estimated decoder percent = instructions_per_audio_second / cpu_hz * 100 * factor",
+        "cache_accounting": CACHE_ACCOUNTING,
         "hardware_total_cpu_load_measured": False,
         "he_aac_hardware_validated": False,
         "calibration_fixture": {"sha256": FIXTURE_SHA256, "bytes": len(fixture),
@@ -116,6 +135,7 @@ def calibrate(text, hardware_texts, fixture):
         "qemu_windows": [{"path": key[0], **value} for key, value in counts.items()],
         "limitations": [
             "Empirical decoder-call elapsed-time factor, not a universal CPU CPI or emulator speed multiplier.",
+            "Reference cache refill/stall costs are already included; their separate share was not measured. Adding another cache penalty would double-count it.",
             "Observed range spans two historical firmware builds; it is not a confidence interval or guaranteed bound.",
             "Hardware decode times are floored to milliseconds; counter/timer overhead and preemption are included.",
             "AAC-LC rate/bitrate/channel or adapter changes are extrapolations; HE-AAC SBR/PS transfer is unvalidated.",

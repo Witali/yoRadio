@@ -94,6 +94,7 @@ if args.calibration:
     output["calibration"] = {
         "id": calibration["id"], "sha256_utf8_lf": hashlib.sha256(calibration_text.encode("utf-8")).hexdigest(),
         "factor": factor, "observed_factor_range": [low, high],
+        "cache_accounting": calibration.get("cache_accounting"),
         "limitations": calibration["limitations"],
     }
     for case in results:
