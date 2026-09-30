@@ -23,7 +23,7 @@ test("ESP32-C3 board documentation covers the supported hardware", () => {
   assert.match(document, /Left PDM audio \| 10/);
   assert.match(document, /GPIO10 for the left[\s\S]*GPIO3 for the right/);
   assert.match(document, /R1 1 kOhm[\s\S]*R2 1 kOhm/);
-  assert.match(document, /C1 4\.7 nF[\s\S]*C2 4\.7 nF/);
+  assert.match(document, /C1 4\.7 nF[\s\S]*C2 2\.2 nF/);
   assert.match(document, /C3 1\.\.4\.7 uF/);
   assert.match(document, /R3 \| 47 to 100 kOhm/);
   assert.match(document, /Never connect a[\s\S]*low-impedance load directly/);
