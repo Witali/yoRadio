@@ -95,6 +95,9 @@ before connecting a module.
 
 ## Reproducible setup and build
 
+For a clean Windows installation, start with the
+[beginner's build and flashing guide](../../docs/ESP32C3_BEGINNERS_GUIDE.md).
+
 This is the repository's default firmware target. From the repository root,
 run:
 
