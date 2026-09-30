@@ -395,34 +395,34 @@ static void draw_clock_digit(oled_display_t *display, int x, int y,
     const int lower_y = middle_y + CLOCK_SEGMENT_THICKNESS - 1;
     const int right_x = x + CLOCK_DIGIT_WIDTH - CLOCK_SEGMENT_THICKNESS;
     if (enabled & SEGMENT_TOP) {
-        draw_clock_horizontal_segment(display, x + 2, y,
-                                      CLOCK_DIGIT_WIDTH - 4, 1);
+        draw_clock_horizontal_segment(display, x + 1, y,
+                                      CLOCK_DIGIT_WIDTH - 2, 1);
     }
     if (enabled & SEGMENT_MIDDLE) {
         draw_clock_horizontal_segment(display, x + 2, y + middle_y,
                                       CLOCK_DIGIT_WIDTH - 4, 0);
     }
     if (enabled & SEGMENT_BOTTOM) {
-        draw_clock_horizontal_segment(display, x + 2, y + bottom_y,
-                                      CLOCK_DIGIT_WIDTH - 4, -1);
+        draw_clock_horizontal_segment(display, x + 1, y + bottom_y,
+                                      CLOCK_DIGIT_WIDTH - 2, -1);
     }
-    // Extend the vertical ends to meet the diagonal gaps; preserve the
-    // full-width body rather than cutting it shorter for the bevels.
+    // Trim one pixel from each outer end to follow the wider top/bottom
+    // bars with a one-pixel diagonal gap. Keep the middle-facing ends fixed.
     if (enabled & SEGMENT_UPPER_LEFT) {
-        draw_clock_vertical_segment(display, x, y, middle_y + 1,
+        draw_clock_vertical_segment(display, x, y + 1, middle_y,
                                     false, false);
     }
     if (enabled & SEGMENT_UPPER_RIGHT) {
-        draw_clock_vertical_segment(display, right_x, y, middle_y + 1,
+        draw_clock_vertical_segment(display, right_x, y + 1, middle_y,
                                     true, false);
     }
     if (enabled & SEGMENT_LOWER_LEFT) {
         draw_clock_vertical_segment(display, x, y + lower_y,
-                                    CLOCK_DIGIT_HEIGHT - lower_y, false, true);
+                                    CLOCK_DIGIT_HEIGHT - lower_y - 1, false, true);
     }
     if (enabled & SEGMENT_LOWER_RIGHT) {
         draw_clock_vertical_segment(display, right_x, y + lower_y,
-                                    CLOCK_DIGIT_HEIGHT - lower_y, true, true);
+                                    CLOCK_DIGIT_HEIGHT - lower_y - 1, true, true);
     }
 }
 
