@@ -53,9 +53,35 @@ speed while preserving full format support and the one-LSB output limit.
   conservative candidate), with a separately verified PS layout.
 - [ ] Evaluate retaining four smoothing history rows plus existing current
   vectors (2,048-byte candidate), preserving all five filter taps.
-- [ ] Evaluate compact mode-specific PS state and synthesis ring storage.
-  Do not add overlapping mode-specific savings or narrow arithmetic without
-  proving the one-LSB output limit and preserving all supported configurations.
+- [ ] Allocate PS control on demand (up to 3,536 bytes while PS is absent),
+  preserving PS appearing later in a stream and transitions in both directions.
+- [ ] Replace the unused right SBR channel in PS mode with compact PS-specific
+  state (16,004-byte upper bound before retained control/alignment, not a proven
+  saving). Preserve both synthesis histories and every PS delay/filter state.
+- [ ] Use genuine synthesis history rings and explicit scratch lifetimes;
+  measure the saving. Do not simply shrink the existing 12 KiB scratch block.
+- [ ] Narrow stored smoothing exponents to 16 bits only after proving their
+  ranges (2,560-byte candidate for the original two-channel layout).
+- [ ] Prototype **24-bit signed QMF mantissas with a shared block exponent**
+  first among QMF precision candidates: 15,440 versus 20,480 bytes, a 5,040-byte
+  storage saving for one byte of exponent per 32-complex-sample row. Compare
+  smaller blocks, include unpacking workspace and measure output error/CPU.
+- [ ] Evaluate 16-bit QMF mantissas with shared exponents as a higher-risk
+  alternative (10,160-byte storage saving with the same blocking). Accept only
+  if the maximum PCM error stays within one LSB for all supported cases.
+- [ ] Compare densely packed custom float24 and fixed-point int24 storage
+  (5,120-byte storage saving each). Specify sign/exponent/fraction allocation
+  for float24; 24 storage bits do not imply 24 significant bits. Keep integer
+  processing where possible and account for conversion/packing cost on C3.
+- [ ] Investigate exact packing of bounded flags, counters and relative offsets;
+  preserve their ranges and ownership. Quantify savings separately.
+- [ ] Explore lossless delta/residual compression of inactive history blocks
+  only with a bounded raw fallback and complete peak-memory accounting. Do not
+  rely on average compression to fit every stream; plain mu-law/A-law does not
+  establish the required one-LSB accuracy.
+- [ ] Split large arrays into smaller allocations and evaluate a common codec
+  arena as detailed below. These address fragmentation/ownership, not payload
+  size by themselves; the optional Helix arena is not reclaimable resident RAM.
 - [ ] Benchmark every RAM candidate against the original decoder on matching
   inputs and settings: time/cycles per audio second, tail/maximum decode-call
   latency, total CPU and underruns, including copy/packing costs. Record each
@@ -63,6 +89,12 @@ speed while preserving full format support and the one-LSB output limit.
   speed-optimization follow-up, then repeat A/B to confirm recovery. Keep QEMU
   estimates separate from physical C3 results; core-only fallback is not a
   valid speed baseline for full SBR/PS.
+
+The estimates above are **unimplemented candidates**, not measured production
+savings. They overlap and must not be summed: QMF representations are mutually
+exclusive, workspace sharing changes the amount left to pack, and PS uses a
+different layout. See the [representation comparison](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md#qmf-storage-representations-float24-and-shared-exponents)
+for assumptions, rounding/phase risks and the required accuracy/speed checks.
 
 ### Execution plan and decision gates
 

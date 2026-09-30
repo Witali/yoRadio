@@ -226,6 +226,57 @@ not an additional saving**. Right-channel savings overlap proposals 1–3.
   particular music sample has small values. A corpus maximum is not a proof
   for every supported input.
 
+### QMF storage representations: float24 and shared exponents
+
+The consolidated [optimization checklist](ESP32C3_MEMORY_STABILITY_TODO.md#aac-memory-reuse-during-decoding--planned-2026-09-30)
+includes these alternatives. They have not been implemented or qualified.
+
+For the existing two-channel low-band matrices, there are 80 rows, each holding
+32 complex samples (64 signed real/imaginary components). One possible block
+floating-point (BFP) layout uses one shared exponent byte for all components in
+each row. Store signed integer mantissas densely and reconstruct the original
+fixed-point scale with `q_approx = mantissa * 2^shift`. Real and imaginary parts
+share the scale. Exponent bytes can live in a separate array to avoid padding.
+
+| Storage scheme | Stored bytes | Potential saving versus 20,480 bytes |
+| --- | ---: | ---: |
+| Existing int32 | 20,480 | 0 |
+| Packed int24 at a specified fixed scale | 15,360 | 5,120 |
+| Custom packed float24 with an exponent per component | 15,360 | 5,120 |
+| Signed 24-bit mantissas + 80 shared exponent bytes | 15,440 | 5,040 |
+| Signed 16-bit mantissas + 80 shared exponent bytes | 10,320 | 10,160 |
+
+These are **storage arithmetic**, excluding temporary decoded workspaces,
+alignment, extra metadata and allocator overhead. Retaining a complete int32
+copy alongside the packed matrices defeats the saving. Keeping int32 mantissas
+and merely adding a common exponent also saves no memory.
+
+Define float24 explicitly; for example, one sign bit, seven exponent bits and
+16 fraction bits give 17 significant bits for normalized values with an implicit
+leading one. A 24-bit signed BFP mantissa instead dedicates its bits to the signed
+integer, with the scale stored once per block. BFP precision depends on the
+largest component: a strong tone may force rounding away weak components in the
+same row. Smaller blocks can improve this at the cost of more exponent metadata.
+Round carefully, handle carry/overflow when choosing the shift, and bound error
+after the entire SBR/PS/synthesis chain rather than just after unpacking.
+
+**First precision experiment: BFP with signed 24-bit mantissas**, compared with
+smaller blocks and the original fixed-point backend. Start with a storage-only
+adapter that retains existing arithmetic and its required scale; measure whether
+packing/unpacking at the actual access points meets the RAM and timing goals.
+ESP32-C3 [uses software floating-point arithmetic](https://developer.espressif.com/blog/2025/10/cores_with_fpu/),
+so changing the DSP kernels to float is a separate performance risk. Shared-scale
+integer storage can use integer shifts/rounding; its speed is still unmeasured.
+See [XMOS's BFP explanation](https://www.xmos.com/documentation/XM-014926-PC/html/modules/core/modules/xcore_math/lib_xcore_math/doc/programming_guide/src/bfp_background.html)
+for the general representation and headroom tradeoff.
+
+Preserve complete AAC support, limit every output PCM sample's absolute error
+to one LSB, and compare decoding speed with the original backend. Any temporary
+slowdown requires a recorded follow-up to recover speed. Neither BFP24 nor BFP16
+has yet been shown to satisfy the accuracy limit; their byte counts are not an
+acceptance result. These alternatives also overlap workspace sharing and other
+mode-specific savings.
+
 ## Can SBR state be compressed? What about mu-law / A-law?
 
 The SBR allocation is mostly **mutable decoder state**, not the compressed AAC
