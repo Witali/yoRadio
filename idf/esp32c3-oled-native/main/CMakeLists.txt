@@ -30,11 +30,13 @@ set(NATIVE_SRCS
   "native_state.c"
   "network_service.c"
   "oled_display.c"
+  "ota_upload.c"
   "radio_control.c"
   "runtime_settings.c"
   "time_service.c"
   "web_pages_bridge.cpp"
   "web_service.c"
+  "web_ota.c"
   "websocket_service.c")
 
 if(CONFIG_YORADIO_QEMU)
@@ -47,6 +49,8 @@ idf_component_register(
   SRCS ${NATIVE_SRCS}
   INCLUDE_DIRS "."
   REQUIRES
+    app_update
+    bootloader_support
     efuse
     esp_adc
     esp_driver_gpio
@@ -84,6 +88,13 @@ if(YORADIO_CODEC_BENCHMARK)
     YORADIO_CODEC_BENCHMARK=1)
 endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+
+# Ship the same shared WebUI script with application OTA, including capability
+# labels and upload error handling, without rewriting users' SPIFFS contents.
+configure_file("${YORADIO_ROOT}/data/www/script.js.gz"
+               "${CMAKE_CURRENT_BINARY_DIR}/native-script.js.gz" COPYONLY)
+target_add_binary_data(${COMPONENT_LIB}
+                      "${CMAKE_CURRENT_BINARY_DIR}/native-script.js.gz" BINARY)
 
 set(NATIVE_SPIFFS_ROOT "${CMAKE_CURRENT_BINARY_DIR}/spiffs-root")
 file(REMOVE_RECURSE "${NATIVE_SPIFFS_ROOT}")

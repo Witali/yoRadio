@@ -136,11 +136,14 @@ WebRadio PCM-счётчики/null-output, изменение буфера 5→4
 
 ### C3-06 · P1 · Application OTA
 
-- [ ] Добавить отсутствующий handler через `esp_ota_*`: streaming в неактивный
-  app-слот, проверка размера/target/образа, abort при ошибке. `/webboard` сейчас
-  не следует считать готовым application OTA endpoint.
-- [ ] Согласовать форму shared UI. Не менять разметку ради ESP8266-порта.
-  Rollback/self-test планировать вместе с совместимостью bootloader.
+- [x] Добавлен `POST /update` через `esp_ota_*`: streaming в неактивный
+  app-слот, проверка размера, ESP32-C3, project name, целостности и длины образа,
+  abort при ошибке. `/webboard` остаётся пофайловым импортом.
+- [x] Сохранены shared UI и Arduino-контракт `updatetarget` + `update` → `OK`.
+  Пункт SPIFFS скрыт на native C3, как на native ESP8266; для Arduino/CYD
+  оба пункта сохранены. Общий JS включён в C3 app.bin для доставки через OTA.
+  Страница Update и активная загрузка удерживают проснувшуюся плату от сна.
+- [ ] Rollback/self-test планировать вместе с совместимостью bootloader.
 - [ ] Обрыв, неверный образ, первый запуск и восстановление старой версии;
   сохранить NVS/Wi-Fi/playlist. HTTP 200 сам по себе не доказывает успешную OTA.
   Сырой SPIFFS OTA не делать обязательным вместо пофайлового импорта.

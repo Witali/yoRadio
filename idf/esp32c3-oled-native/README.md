@@ -194,8 +194,10 @@ Changing from the former 128 KiB layout moves SPIFFS from `0x3d0000` to
 serial reflash, then write the new partition table and SPIFFS image together;
 flashing the application alone cannot migrate the existing filesystem.
 
-Flashing only `app-flash` preserves Wi-Fi settings, playlists and WebUI. Use
-`spiffs-flash` only when the filesystem should be replaced explicitly.
+Use WebUI OTA for later application updates. For USB recovery after OTA,
+follow [P6 in the beginner's guide](../../docs/ESP32C3_BEGINNERS_GUIDE.md#p6-update-an-existing-native-radio-preserve-settings-and-webui),
+which also resets the boot selector: `app-flash` alone may leave the previous
+`app1` selected. Use `spiffs-flash` only to explicitly replace the filesystem.
 
 Wi-Fi client credentials are read from `/data/wifi.csv` in the existing
 tab-separated yoRadio format. If the file is absent or the connection fails,
@@ -210,8 +212,11 @@ the built-in ESP-IDF WebSocket endpoint at `/ws`. No Arduino networking layer,
 AsyncWebServer, AsyncTCP, or third-party WebSocket library is linked.
 
 All static WebUI resources under `/www` are stored only as `.gz` files. A
-request such as `/script.js` reads `/www/script.js.gz` and returns the compressed
+request such as `/style.css` reads `/www/style.css.gz` and returns compressed
 bytes with `Content-Encoding: gzip`; decompression is performed by the browser.
+The shared `script.js.gz` is embedded in the C3 application and takes precedence
+over its SPIFFS copy, so application OTA also installs its compatible JavaScript.
+The form, styles and remaining assets stay shared with Arduino/CYD and ESP8266.
 Uncompressed WebUI uploads are rejected so they cannot shadow a compressed
 asset. Mutable `/data/wifi.csv` and `/data/playlist.csv` remain plain text.
 
@@ -234,6 +239,31 @@ The native service exposes:
 - `POST /api/native/reconnect`;
 - `POST /api/native/play?codec=auto`, with a stream URL in the request body;
 - `POST /api/native/stop`.
+- `GET /api/native/ota`: running version, ELF hash, slot and maximum image size;
+- `POST /update`: the original Arduino multipart contract, `updatetarget=fw`
+  or `firmware`, followed by one file named `update`; success is plain `OK`.
+
+### Application OTA
+
+Use the shared **Update** page at `/update.html` with this target's `app.bin`.
+The emergency form at `/emergency` uses the same upload endpoint. A first USB
+application update is required for older native images without this handler.
+See [browser and command-line steps](../../docs/ESP32C3_BEGINNERS_GUIDE.md#webui-ota-no-tools-required).
+
+The receiver keeps a bounded workspace (512-byte multipart buffer, 4 KiB flash
+buffer and 1 KiB receive buffer) and writes only the inactive 1,900,544-byte app
+slot. It checks chip ID and project name before erasing, rejects oversized,
+duplicate or incomplete uploads, verifies the image with ESP-IDF, checks its
+exact on-flash length, and selects the new slot only after successful completion.
+Failures abort the OTA handle. Receive deadlines are 10 seconds without data
+and 180 seconds overall. NVS, SPIFFS and the running app are not written.
+
+Playback stops without changing saved Smart Start or station settings. The
+Update page refreshes the idle timer while awake; the upload holds a deep-sleep
+activity lease through validation and restart. Wake a sleeping radio with BOOT.
+Raw SPIFFS OTA is unavailable; use Board's file importer. The existing bootloader
+and partition layout stay unchanged. Automatic first-boot rollback/self-test is
+not enabled; a bootable but malfunctioning application may need USB recovery.
 
 Codec selection may be `auto`, `mp3`, `aac`, `flac`, `ogg`, `vorbis` or
 `opus`. These endpoints and the shared WebSocket protocol are served by the

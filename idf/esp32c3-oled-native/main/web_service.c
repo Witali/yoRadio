@@ -21,6 +21,7 @@
 #include "network_service.h"
 #include "radio_control.h"
 #include "web_pages_bridge.h"
+#include "web_ota.h"
 #include "websocket_service.h"
 
 #define WEBBOARD_UPLOAD_MAX (96 * 1024)
@@ -608,6 +609,16 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
     }
     memcpy(uri, request->uri, uri_len);
     uri[uri_len] = '\0';
+    if (strcmp(uri, "/script.js") == 0 || strcmp(uri, "/script.js.gz") == 0) {
+        extern const uint8_t script_start[] asm("_binary_native_script_js_gz_start");
+        extern const uint8_t script_end[] asm("_binary_native_script_js_gz_end");
+        httpd_resp_set_type(request, "application/javascript; charset=utf-8");
+        httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
+        httpd_resp_set_hdr(request, "Connection", "close");
+        return finish_static_response(request, httpd_resp_send(request,
+            (const char *)script_start, script_end - script_start));
+    }
     if (strcmp(uri, "/") == 0 || strcmp(uri, "/index.html") == 0 ||
         strcmp(uri, "/settings.html") == 0 ||
         strcmp(uri, "/update.html") == 0 || strcmp(uri, "/ir.html") == 0) {
@@ -623,13 +634,16 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
     if (strcmp(uri, "/variables.js") == 0) {
         native_state_t state;
         native_state_snapshot(s_state, &state);
-        char variables[256];
+        char variables[512];
         snprintf(variables, sizeof(variables),
                  "var yoVersion='idf-%s';\n"
-                 "var webUiRevision='native04';\n"
+                 "var webUiRevision='native05-ota';\n"
                  "var formAction='%s';\n"
                  "var playMode='%s';\n"
-                 "var equalizerEnabled=false;\n",
+                 "var equalizerEnabled=false;\n"
+                 "var nativeFirmwareOnly=true;\n"
+                 "var nativeFirmwareName='ESP32-C3 OLED native';\n"
+                 "var nativeFirmwareInfo='/api/native/ota';\n",
                  esp_get_idf_version(),
                  state.network_mode == NATIVE_NETWORK_CLIENT &&
                          web_ui_available()
@@ -785,7 +799,7 @@ esp_err_t web_service_start(native_state_t *state) {
     ESP_RETURN_ON_ERROR(start_static_workers(), TAG,
                         "start static content workers");
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.stack_size = 6144;
+    config.stack_size = 8192;
     // Browsers commonly fetch six assets in parallel. Keep those connections
     // plus the persistent WebSocket alive; with four sockets the LRU purge
     // closed /ws during page startup and the shared UI spinner never stopped.
@@ -801,6 +815,13 @@ esp_err_t web_service_start(native_state_t *state) {
         .uri = "/api/native/status",
         .method = HTTP_GET,
         .handler = status_handler,
+    };
+    httpd_uri_t ota = {
+        .uri = "/update", .method = HTTP_POST, .handler = web_ota_handler,
+    };
+    httpd_uri_t ota_info = {
+        .uri = "/api/native/ota", .method = HTTP_GET,
+        .handler = web_ota_info_handler,
     };
     httpd_uri_t reconnect = {
         .uri = "/api/native/reconnect",
@@ -849,6 +870,10 @@ esp_err_t web_service_start(native_state_t *state) {
     };
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &status), TAG,
                         "Status route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &ota), TAG,
+                        "OTA route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &ota_info), TAG,
+                        "OTA info route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &reconnect), TAG,
                         "Reconnect route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &play), TAG,

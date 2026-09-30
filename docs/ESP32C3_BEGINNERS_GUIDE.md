@@ -4,7 +4,13 @@ This guide starts with a Windows computer that has no development tools installe
 It explains how to install a ready-made firmware image or compile the firmware
 yourself, program a board for the first time, and update it later.
 
-**Choose your route after steps 1 and 2:**
+**Already running a native firmware with WebUI OTA support?** You only need a
+browser and the matching `app.bin`: follow [WebUI OTA](#webui-ota-no-tools-required).
+Skip installation steps 1–10, USB drivers, programming mode and all esptool
+commands. A blank board, an Arduino installation or an older native firmware
+without OTA support needs the USB installation route once.
+
+**Otherwise, choose your route after steps 1 and 2:**
 
 - **Install an existing binary:** follow [Prebuilt firmware: no compilation](#prebuilt-firmware-no-compilation).
   This uses Git, PowerShell, Python and esptool, without downloading a compiler or ESP-IDF.
@@ -33,6 +39,55 @@ continuing. Lines starting with `#` are comments.
 The examples use `C:\yoRadio`. Keep this short path to avoid problems with spaces
 and long filenames. Building and flashing normally do not need an administrator
 terminal; software installers may request administrator approval.
+
+## WebUI OTA: no tools required
+
+OTA updates the application over your local Wi-Fi network. It keeps Wi-Fi
+credentials, settings, playlist and SPIFFS files. Keep the radio powered during
+the update. This route requires the existing native 4 MiB partition layout and
+a firmware that already implements OTA; it cannot migrate an Arduino installation.
+
+1. Download the **actual binary** `app.bin` for **ESP32-C3 OLED native** from
+   the repository's firmware directory (use **Download raw file** on GitHub),
+   or use the `app.bin` produced by your own build. A Git LFS pointer text file
+   or a saved GitHub HTML page is not a firmware binary.
+   The OTA builds are `esp32c3-oled-native-webui-ota` (ordinary clock) and
+   `esp32c3-oled-native-webui-ota-deep-sleep` (sleeping clock), under
+   `firmware/development/`. Both use the internal RTC oscillator.
+   Choose the same features you want to keep; OTA does not add build options.
+2. Connect the computer to the radio's local network and open its IP address
+   in a browser. With deep sleep enabled, hold **BOOT for over 500 ms** and
+   release it first. The Update page keeps the awake board available while open.
+3. Open **Update**, or append `/update.html` to the radio's address, for example
+   `http://192.168.100.4/update.html` (replace the IP with yours).
+4. Select **firmware**, choose `app.bin`, then press **Update**. The layout and
+   progress bar are the shared Arduino/CYD/ESP8266 WebUI. On native C3 only
+   application updates are offered; use **Board** for individual WebUI files.
+5. Wait for verification and the automatic restart. The radio stops playing
+   during the upload. Check that the player and OLED return, then open Update
+   again to see the running firmware version. A progress bar at 100% means the
+   browser sent the bytes; the server must still accept the image.
+6. If the upload fails, read the error and retry after reconnecting. A rejected
+   or incomplete image does not select a new boot slot. A successfully accepted
+   update reboots even if the browser loses the final response; check the radio
+   before sending it again. There is no automatic rollback for an application
+   that passes image validation but fails after boot; retain the USB recovery route.
+
+Upload only the native C3 **application** image, up to 1,900,544 bytes. Do not
+select `full.bin`, `factory.bin`, a bootloader, SPIFFS image, ESP8266/CYD image,
+or the historical Arduino C3 firmware. Application OTA also cannot change the
+bootloader or partition table. An older prebuilt application may remove OTA
+support if installed; check its manifest before downgrading.
+
+For command-line use with the same upload format (optional):
+
+```powershell
+curl.exe --fail-with-body -F "updatetarget=firmware" -F "update=@C:\path\to\app.bin" http://192.168.100.4/update
+```
+
+The successful response is `OK`. After reboot,
+`http://192.168.100.4/api/native/ota` reports the running version, application
+ELF hash and app slot. The app slot alternates between `app0` and `app1`.
 
 ## 1. Install Git and PowerShell
 
@@ -556,14 +611,12 @@ See [the project's deep-sleep instructions](ESP32C3_DEEP_SLEEP_CLOCK.md) for det
 
 ## 11. Update the firmware later without replacing your settings
 
-This section rebuilds from source. To install another existing binary without
-compiling, use P3, P4 and P6 in the prebuilt section instead.
+For a ready-made binary and a radio that already supports OTA, follow
+[WebUI OTA](#webui-ota-no-tools-required); no compilation or USB connection is
+required. The commands below rebuild from source for the same OTA workflow.
 
-For later updates of this native firmware with the same partition layout, use
-**`app-flash`**. It updates the application without writing NVS or SPIFFS, preserving
-settings, Wi-Fi credentials, playlist and WebUI files. It does not update the
-WebUI assets. If an update requires a partition or filesystem migration, follow
-that release's instructions and back up your data first.
+If an update requires a partition or filesystem migration, follow that release's
+instructions and back up your data first.
 
 Open PowerShell 7 and run:
 
@@ -587,17 +640,21 @@ $buildOptions = @{
 .\idf\esp32c3-oled-native\build-production.ps1 @buildOptions
 ```
 
-Enter programming mode and identify the port again as in steps 6 and 7. Its
-number may have changed. Replace COM7 below with the current number:
+Upload `firmware/development/local-esp32c3/app.bin` through **Update** as described
+above. For example, replacing the IP with the radio's current address:
 
 ```powershell
-$port = "COM7"
-.\idf\esp32c3-oled-native\build-production.ps1 @buildOptions -IdfArguments @("-p", $port, "-b", "460800", "app-flash")
+curl.exe --fail-with-body -F "updatetarget=firmware" -F "update=@firmware/development/local-esp32c3/app.bin" http://192.168.100.4/update
 ```
 
-Restart with RESET after successful flashing if necessary. Reuse the same
-`$buildOptions` for every build/flash call: omitting a feature switch makes the
-build script turn that feature off, even in a previously used configuration.
+If the installed firmware lacks OTA support, use the application-only USB update
+in **P6**, setting `$firmware` to `firmware/development/local-esp32c3` for this
+build. Complete P2–P4 first if their tools and boot files are not available.
+P6 resets the boot selector as well as writing `app0`: `app-flash` alone can
+leave the old `app1` selected after an OTA update.
+
+Reuse the same `$buildOptions` for every build: omitting a feature switch makes
+the build script turn that feature off, even in a previously used configuration.
 
 ## Troubleshooting
 
