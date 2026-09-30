@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import Mock, patch
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
@@ -18,6 +19,7 @@ sys.path.insert(0,str(ROOT/'tools/esp32c3_tests'))
 import common
 import ota
 import compare_latency
+import run as acceptance_run
 from audio_test_server.server import Server
 
 
@@ -50,6 +52,21 @@ class AcceptanceTests(unittest.TestCase):
     def test_valid_mono_and_stereo(self):
         common.check_playback([state()]*6,self.specs['lc-48000-stereo'])
         common.check_playback([state(22050,1,'AAC PCM 22.05 kHz mono')]*6,self.specs['lc-22050-mono'])
+
+    def test_observations_survive_transport_failure_without_exception_details(self):
+        board = Mock()
+        board.status.side_effect = [{k:v for k,v in state().items() if k != 'seconds'},
+                                    TimeoutError('private stream details')]
+        with tempfile.TemporaryDirectory() as tmp, patch.object(acceptance_run.time, 'sleep'):
+            suite = acceptance_run.Suite(board, 'http://localhost', {}, None, tmp)
+            with self.assertRaises(TimeoutError):
+                suite.observe(60, 'interrupted-test')
+            raw = (Path(tmp)/'status.json').read_text()
+            rows = json.loads(raw)
+            self.assertEqual(len(rows[0]['samples']), 1)
+            self.assertEqual(rows[0]['interrupted'], 'TimeoutError')
+            self.assertGreaterEqual(rows[0]['elapsed_seconds'], 0)
+            self.assertNotIn('private stream details', raw)
 
     def test_transition_order_and_implicit_sbr_regression(self):
         expected = [self.specs['lc-22050-mono'],self.specs['hev2-44100-stereo'],self.specs['lc-48000-stereo']]

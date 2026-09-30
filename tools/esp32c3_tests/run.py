@@ -61,15 +61,23 @@ class Suite:
     def observe(self, seconds, name, interval=.4):
         start = time.monotonic()
         samples = []
-        while time.monotonic() - start < seconds:
-            requested = time.monotonic()
-            state = self.board.status()
-            row = dict(seconds=time.monotonic() - start, request_ms=(time.monotonic()-requested)*1000, **state)
-            samples.append(row)
-            time.sleep(interval)
-        self.observations.append(dict(case=name, samples=samples))
-        # Save each batch before any assertion, including failures.
-        (self.output / 'status.json').write_text(json.dumps(self.observations, indent=2)+'\n', encoding='utf-8')
+        batch = dict(case=name, samples=samples)
+        try:
+            while time.monotonic() - start < seconds:
+                requested = time.monotonic()
+                state = self.board.status()
+                row = dict(seconds=time.monotonic() - start, request_ms=(time.monotonic()-requested)*1000, **state)
+                samples.append(row)
+                time.sleep(interval)
+        except Exception as error:
+            # Keep partial evidence on transport failures without retaining URLs
+            # or exception text that could contain station/credential details.
+            batch['interrupted'] = type(error).__name__
+            batch['elapsed_seconds'] = time.monotonic() - start
+            raise
+        finally:
+            self.observations.append(batch)
+            (self.output / 'status.json').write_text(json.dumps(self.observations, indent=2)+'\n', encoding='utf-8')
         return samples
 
     def start(self, name, mode='file', hint='auto', origin=None):
