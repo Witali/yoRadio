@@ -71,11 +71,15 @@ commit. Record rejected candidates as well as improvements.
      not add all allocation sizes together or count already shared memory twice.
 
 2. **Recover RAM outside SBR before reserving a large arena.**
-   - [ ] In `audio_service.c`, evaluate an AAC-specific initial caller PCM
+   - [x] In `audio_service.c`, evaluate an AAC-specific initial caller PCM
      workspace of 8,192 bytes instead of the shared 12,288-byte default: a
-     **candidate** saving of 4,096 bytes. Verify the supported output layouts,
-     needed-size/retry contract and transitions; other codecs retain the space
-     they need. This alone cannot close the measured deficit.
+     saving of 4,096 requested bytes. AAC also shrinks a retained larger
+     workspace after the previous decoder closes. Host checks cover transitions,
+     grow/shrink failure and preservation of the old buffer; other codecs retain
+     their capacity and needed-size growth. The real decoder's LC/HE/v2 QEMU
+     output (328,770 stereo frames) matches the previous capture byte-for-byte
+     with 8 KiB PCM plus an overrun guard. [Evidence](../tests/results/esp32c3-aac-pcm-20260930/pcm-equivalence.json).
+     This alone cannot close the measured deficit; physical qualification follows.
    - [ ] Check bounded-output support before attempting smaller PCM chunks.
      The current adapter requires a complete 8,192-byte SBR stereo frame. Preserve
      the ability to receive legal ADTS frames up to the existing 8,191-byte limit;

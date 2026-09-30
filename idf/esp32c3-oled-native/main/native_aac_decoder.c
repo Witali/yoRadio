@@ -4,6 +4,7 @@
 #include <string.h>
 #include "aac_decoder_config.h"
 #include "codec_memory_trace.h"
+#include "decoder_pcm.h"
 #if CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
 #include "cpu_profiler.h"
 #define AAC_MEMORY(stage) cpu_profiler_memory(stage)
@@ -40,8 +41,8 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
     output->decoded_size = 0;
     // SBR stereo produces 2048 samples/channel. The SDK can split that frame
     // across calls for smaller buffers; keep one frame atomic here instead.
-    if (output->len < 8192) {
-        output->needed_size = 8192;
+    if (output->len < NATIVE_AAC_PCM_FRAME_BYTES) {
+        output->needed_size = NATIVE_AAC_PCM_FRAME_BYTES;
         return ESP_AUDIO_ERR_BUFF_NOT_ENOUGH;
     }
     for (;;) {

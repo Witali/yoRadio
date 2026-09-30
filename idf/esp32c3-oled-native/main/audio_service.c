@@ -1,5 +1,6 @@
 #include "audio_service.h"
 #include "audio_completion.h"
+#include "decoder_pcm.h"
 
 #include <stdatomic.h>
 #include <stdlib.h>
@@ -39,7 +40,6 @@
 #include "runtime_settings.h"
 #define STREAM_CHUNK_SIZE 2048
 #define STREAM_READ_TIMEOUT_MS 250
-#define DECODE_BUFFER_INITIAL 12288
 #define PCM_RING_SIZE (8 * 1024)
 #define PCM_PACKET_DATA_SIZE 3584
 #define MAX_HTTP_REDIRECTS 5
@@ -1036,21 +1036,14 @@ static void decoder_task(void *argument) {
                     continue;
                 }
 #endif
-                if (output_size < DECODE_BUFFER_INITIAL) {
-                    uint8_t *resized =
-                        realloc(output, DECODE_BUFFER_INITIAL);
-                    if (!resized) {
-                        ESP_LOGE(TAG,
-                                 "%s PCM buffer allocation failed: %lu",
-                                 codec_name(codec),
-                                 (unsigned long)DECODE_BUFFER_INITIAL);
-                        state_set_audio(generation, false, "NO MEMORY");
-                        failed_generation = generation;
-                        vRingbufferReturnItem(s_encoded, packet);
-                        continue;
-                    }
-                    output = resized;
-                    output_size = DECODE_BUFFER_INITIAL;
+                if (!decoder_pcm_prepare(&output, &output_size,
+                                         codec == NATIVE_CODEC_AAC)) {
+                    ESP_LOGE(TAG, "%s PCM buffer allocation failed",
+                             codec_name(codec));
+                    state_set_audio(generation, false, "NO MEMORY");
+                    failed_generation = generation;
+                    vRingbufferReturnItem(s_encoded, packet);
+                    continue;
                 }
                 esp_audio_simple_dec_cfg_t cfg = {
                     .dec_type = simple_decoder_type(codec),
@@ -1217,13 +1210,13 @@ static void decoder_task(void *argument) {
                     raw.buffer += raw.consumed;
                     raw.len -= raw.consumed;
                 }
-                uint8_t *larger = realloc(output, frame.needed_size);
-                if (!larger) {
+                if (frame.needed_size <= output_size ||
+                    !decoder_pcm_resize(&output, &output_size,
+                                        frame.needed_size)) {
                     state_set_audio(generation, false, "PCM allocation failed");
+                    failed_generation = generation;
                     break;
                 }
-                output = larger;
-                output_size = frame.needed_size;
                 retry_pcm = true;
                 continue;
             }

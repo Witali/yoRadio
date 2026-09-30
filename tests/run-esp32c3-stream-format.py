@@ -87,6 +87,13 @@ static void run_espressif_frame(uint32_t generation, native_codec_t codec,
         str(MAIN / "native_state.c"), "-o", str(executable),
     ], check=True)
     subprocess.run([str(executable)], check=True)
+    executable = tmp / "pcm-workspace"
+    subprocess.run([
+        os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
+        "-I" + str(MAIN), str(ROOT / "tests/native/esp32c3_pcm_workspace_test.c"),
+        "-o", str(executable),
+    ], check=True)
+    subprocess.run([str(executable)], check=True)
     # Run the shared adapter with the actual Helix AAC decoder as well.
     (tmp / "sdkconfig.h").write_text("")
     (tmp / "esp_log.h").write_text(

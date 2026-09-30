@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "native_aac_decoder.h"
+#include "decoder_pcm.h"
 #include "esp_audio_dec_default.h"
 #include "esp_audio_codec_version.h"
 #include "esp_aac_dec.h"
@@ -119,8 +120,9 @@ static void check_fixture(native_aac_decoder_t *decoder,
                            native_state_t *state, oled_display_t *display,
                            const char *name, const uint8_t *start,
                            const uint8_t *end, uint32_t rate, uint8_t channels) {
-    uint8_t *pcm = malloc(16384);
+    uint8_t *pcm = malloc(NATIVE_AAC_PCM_FRAME_BYTES + 16);
     assert(pcm);
+    memset(pcm + NATIVE_AAC_PCM_FRAME_BYTES, 0xa5, 16);
     size_t frames = 0;
     size_t samples = 0;
     // Exercise the SDK's streaming parser across non-aligned network chunks.
@@ -131,9 +133,13 @@ static void check_fixture(native_aac_decoder_t *decoder,
             .buffer = (uint8_t *)start, .len = size,
         };
         while (raw.len) {
-            esp_audio_simple_dec_out_t output = {.buffer = pcm, .len = 16384};
+            esp_audio_simple_dec_out_t output = {
+                .buffer = pcm, .len = NATIVE_AAC_PCM_FRAME_BYTES};
             assert(native_aac_decoder_process(decoder, &raw, &output) ==
                    ESP_AUDIO_ERR_OK);
+            assert(output.decoded_size <= NATIVE_AAC_PCM_FRAME_BYTES);
+            for (unsigned i = 0; i < 16; ++i)
+                assert(pcm[NATIVE_AAC_PCM_FRAME_BYTES + i] == 0xa5);
             assert(raw.consumed <= raw.len);
             assert(raw.consumed || output.decoded_size);
             raw.buffer += raw.consumed;
