@@ -1,0 +1,43 @@
+{
+  "target": "esp32c3-oled-native",
+  "variant": "esp32c3-oled-native-webui-ota-deep-sleep",
+  "source_commit": "ab56a923e1ff8bc5f1d92fa7d03e88a8aaff2ec4",
+  "app_version": "v0.9.693-1039-gab56a923",
+  "esp_idf": "v6.0.2",
+  "production": true,
+  "deep_sleep_clock": true,
+  "external_rtc_crystal": false,
+  "size_bytes": 1337456,
+  "sha256": "b7016b762b0b74648833a9cd2ecbbd33c103dfe82355aaf6e5b3390e027241cc",
+  "app_elf_sha256": "4d2a0f8a1a865575cf902a96ac455bce6839f371a08b57b323c4c988338655ac",
+  "application_ota": true,
+  "flash_layout": "native 4 MiB; app0 0x10000, app1 0x1e0000, each 0x1d0000",
+  "change": "Application OTA through shared Arduino/CYD/ESP8266 WebUI; streaming image validation and failure cleanup; preserves approved clock font",
+  "validation": [
+    "164 Node regression tests",
+    "Executable C parser and HTTP fault-injection tests",
+    "RTC wake-stub host tests",
+    "Production build",
+    "Known board Wi-Fi credential byte scan passed",
+    "RTC link audit: 3704/8192 bytes, 9 dependencies restricted to RTC/ROM/GPIO"
+  ],
+  "hardware_tested": true,
+  "hardware_validation": {
+    "date": "2026-09-30",
+    "method": "HTTP POST /update using shared WebUI multipart contract",
+    "boot_partition_and_elf_sha256_verified": true,
+    "nvs_spiffs_verified_byte_for_byte_after_normal_ota_round_trip": true,
+    "wifi_playlist_readback_unchanged": true,
+    "negative_upload_cases_passed": 10,
+    "report": "../../../docs/ESP32C3_WEBUI_OTA_VALIDATION_20260930.md",
+    "slow_upload_with_20_second_clock_timeout": "Passed: about 26 s upload, verified boot into app0",
+    "update_page_keep_awake": "7 HTTP requests over 35.9 s",
+    "original_clock_settings_restored": true
+  },
+  "known_limitations": [
+    "No automatic first-boot rollback; USB recovery remains necessary for a bootable but malfunctioning application.",
+    "Raw SPIFFS, bootloader and partition-table OTA are not supported.",
+    "Browser rendering/clicking was not visually verified because the browser automation runtime failed to start.",
+    "Earlier partial OLED clock/radio transition has not been visually revalidated; this OTA change is not a display fix."
+  ]
+}

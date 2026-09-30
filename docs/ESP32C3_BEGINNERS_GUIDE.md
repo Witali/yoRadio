@@ -187,12 +187,14 @@ Do not skip the binary download/hash checks or programming-mode/COM-port checks.
 
 ### P1. Choose an available firmware variant
 
-The following five **native ESP-IDF** variants use the board's stereo PDM audio
+The following **native ESP-IDF** variants use the board's stereo PDM audio
 outputs (left GPIO10, right GPIO3) and the same native 4 MiB partition layout.
 The directory name is the value to use for `$variant` in the commands below.
 
 | Directory under `firmware/development/` | Features | Saved source | Files and details |
 | --- | --- | --- | --- |
+| `esp32c3-oled-native-webui-ota` | WebUI application OTA, approved clock font, ordinary clock; internal RTC; logs off. | `ab56a923` | Application only. [Manifest](../firmware/development/esp32c3-oled-native-webui-ota/manifest.json). |
+| `esp32c3-oled-native-webui-ota-deep-sleep` | WebUI application OTA and sleeping clock; internal RTC; logs off. | `ab56a923` | Application only. [Manifest](../firmware/development/esp32c3-oled-native-webui-ota-deep-sleep/manifest.json). |
 | `esp32c3-oled-native-production` | Ordinary radio; internal RTC oscillator; deep sleep off; logs off. | `eef49d1`, 2026-08-29 | `app.bin`, recovery `full.bin` and boot files. [Manifest](../firmware/development/esp32c3-oled-native-production/manifest.md). |
 | `esp32c3-oled-native-development` | Ordinary radio with application diagnostic logs; internal RTC oscillator; deep sleep off. | `eef49d1`, 2026-08-29 | `app.bin`, recovery `full.bin` and boot files. [Manifest](../firmware/development/esp32c3-oled-native-development/manifest.md). |
 | `esp32c3-oled-native-deep-sleep-clock` | Production radio with the sleeping clock; internal RTC oscillator; logs off. | `66626be7` | Application only. [Manifest](../firmware/development/esp32c3-oled-native-deep-sleep-clock/manifest.json). |
@@ -209,7 +211,8 @@ while this defect is being investigated. External-crystal variants have not been
 tested on hardware. See the [hardware validation report](ESP32C3_HARDWARE_VALIDATION_20260930.md).
 Compile from source if you need the newest code with your own combination of options.
 
-Choose `esp32c3-oled-native-production` for the archived ordinary radio, or choose
+Choose `esp32c3-oled-native-webui-ota` for the ordinary radio with application
+OTA, `esp32c3-oled-native-production` for the older archived build, or choose
 one of the other rows for its listed features. A prebuilt binary's features are
 fixed: passing build switches to esptool cannot enable or disable them.
 

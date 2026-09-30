@@ -238,10 +238,14 @@ The native service exposes:
 - `GET /api/native/status`;
 - `POST /api/native/reconnect`;
 - `POST /api/native/play?codec=auto`, with a stream URL in the request body;
-- `POST /api/native/stop`.
+- `POST /api/native/stop`;
 - `GET /api/native/ota`: running version, ELF hash, slot and maximum image size;
 - `POST /update`: the original Arduino multipart contract, `updatetarget=fw`
   or `firmware`, followed by one file named `update`; success is plain `OK`.
+
+Codec selection may be `auto`, `mp3`, `aac`, `flac`, `ogg`, `vorbis` or
+`opus`. These endpoints and the shared WebSocket protocol are served by the
+same native ESP-IDF HTTP server.
 
 ### Application OTA
 
@@ -264,7 +268,3 @@ activity lease through validation and restart. Wake a sleeping radio with BOOT.
 Raw SPIFFS OTA is unavailable; use Board's file importer. The existing bootloader
 and partition layout stay unchanged. Automatic first-boot rollback/self-test is
 not enabled; a bootable but malfunctioning application may need USB recovery.
-
-Codec selection may be `auto`, `mp3`, `aac`, `flac`, `ogg`, `vorbis` or
-`opus`. These endpoints and the shared WebSocket protocol are served by the
-same native ESP-IDF HTTP server.
