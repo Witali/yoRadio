@@ -319,14 +319,20 @@ static void draw_filled_rectangle(oled_display_t *display, int x, int y,
     }
 }
 
-static void draw_clock_segment(oled_display_t *display, int x, int y,
-                               int width, int height) {
-    // Horizontal segments have one-pixel tips and 45-degree edges.
-    const int bevel = CLOCK_SEGMENT_THICKNESS / 2;
-    for (int row = 0; row < height; ++row) {
-        int inset = 0;
-        if (row < bevel) inset = bevel - row;
-        else if (row >= height - bevel) inset = row - (height - bevel) + 1;
+static void draw_clock_horizontal_segment(oled_display_t *display, int x,
+                                          int y, int width, int taper) {
+    // Outer bars are trapezoids with straight 45-degree cuts. Only the
+    // middle bar has pointed ends; top/bottom bars have no centre-row spur.
+    for (int row = 0; row < CLOCK_SEGMENT_THICKNESS; ++row) {
+        int inset;
+        if (taper > 0) {
+            inset = row;
+        } else if (taper < 0) {
+            inset = CLOCK_SEGMENT_THICKNESS - 1 - row;
+        } else {
+            inset = row - CLOCK_SEGMENT_THICKNESS / 2;
+            if (inset < 0) inset = -inset;
+        }
         for (int column = inset; column < width - inset; ++column) {
             draw_pixel(display, x + column, y + row, true);
         }
@@ -334,12 +340,16 @@ static void draw_clock_segment(oled_display_t *display, int x, int y,
 }
 
 static void draw_clock_vertical_segment(oled_display_t *display, int x, int y,
-                                        int height, bool right) {
-    // Cut diagonally across the full thickness at both ends. The outside
-    // edge is longest; mirror the cuts on the right side of the digit.
+                                        int height, bool right, bool lower) {
+    // The outer end follows the top/bottom trapezoid with a one-pixel
+    // diagonal gap. At the middle bar, remove only the inside corner:
+    // the two-pixel end stays broad instead of forming a single-pixel spur.
     for (int inset = 0; inset < CLOCK_SEGMENT_THICKNESS; ++inset) {
         int column = right ? CLOCK_SEGMENT_THICKNESS - 1 - inset : inset;
-        for (int row = inset; row < height - inset; ++row) {
+        int middle_cut = inset == CLOCK_SEGMENT_THICKNESS - 1 ? 1 : 0;
+        int first_row = lower ? middle_cut : inset;
+        int end_row = lower ? height - inset : height - middle_cut;
+        for (int row = first_row; row < end_row; ++row) {
             draw_pixel(display, x + column, y + row, true);
         }
     }
@@ -382,36 +392,37 @@ static void draw_clock_digit(oled_display_t *display, int x, int y,
                           : SEGMENT_MIDDLE;
     const int middle_y = (CLOCK_DIGIT_HEIGHT - CLOCK_SEGMENT_THICKNESS) / 2;
     const int bottom_y = CLOCK_DIGIT_HEIGHT - CLOCK_SEGMENT_THICKNESS;
-    const int upper_y = CLOCK_SEGMENT_THICKNESS;
-    const int lower_y = middle_y + CLOCK_SEGMENT_THICKNESS;
+    const int lower_y = middle_y + CLOCK_SEGMENT_THICKNESS - 1;
     const int right_x = x + CLOCK_DIGIT_WIDTH - CLOCK_SEGMENT_THICKNESS;
     if (enabled & SEGMENT_TOP) {
-        draw_clock_segment(display, x + 2, y, CLOCK_DIGIT_WIDTH - 4,
-                           CLOCK_SEGMENT_THICKNESS);
+        draw_clock_horizontal_segment(display, x + 2, y,
+                                      CLOCK_DIGIT_WIDTH - 4, 1);
     }
     if (enabled & SEGMENT_MIDDLE) {
-        draw_clock_segment(display, x + 2, y + middle_y, CLOCK_DIGIT_WIDTH - 4,
-                           CLOCK_SEGMENT_THICKNESS);
+        draw_clock_horizontal_segment(display, x + 2, y + middle_y,
+                                      CLOCK_DIGIT_WIDTH - 4, 0);
     }
     if (enabled & SEGMENT_BOTTOM) {
-        draw_clock_segment(display, x + 2, y + bottom_y, CLOCK_DIGIT_WIDTH - 4,
-                           CLOCK_SEGMENT_THICKNESS);
+        draw_clock_horizontal_segment(display, x + 2, y + bottom_y,
+                                      CLOCK_DIGIT_WIDTH - 4, -1);
     }
+    // Extend the vertical ends to meet the diagonal gaps; preserve the
+    // full-width body rather than cutting it shorter for the bevels.
     if (enabled & SEGMENT_UPPER_LEFT) {
-        draw_clock_vertical_segment(display, x, y + upper_y - 1,
-                                    middle_y - upper_y + 2, false);
+        draw_clock_vertical_segment(display, x, y, middle_y + 1,
+                                    false, false);
     }
     if (enabled & SEGMENT_UPPER_RIGHT) {
-        draw_clock_vertical_segment(display, right_x, y + upper_y - 1,
-                                    middle_y - upper_y + 2, true);
+        draw_clock_vertical_segment(display, right_x, y, middle_y + 1,
+                                    true, false);
     }
     if (enabled & SEGMENT_LOWER_LEFT) {
-        draw_clock_vertical_segment(display, x, y + lower_y - 1,
-                                    bottom_y - lower_y + 2, false);
+        draw_clock_vertical_segment(display, x, y + lower_y,
+                                    CLOCK_DIGIT_HEIGHT - lower_y, false, true);
     }
     if (enabled & SEGMENT_LOWER_RIGHT) {
-        draw_clock_vertical_segment(display, right_x, y + lower_y - 1,
-                                    bottom_y - lower_y + 2, true);
+        draw_clock_vertical_segment(display, right_x, y + lower_y,
+                                    CLOCK_DIGIT_HEIGHT - lower_y, true, true);
     }
 }
 
