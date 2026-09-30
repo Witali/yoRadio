@@ -321,14 +321,25 @@ static void draw_filled_rectangle(oled_display_t *display, int x, int y,
 
 static void draw_clock_segment(oled_display_t *display, int x, int y,
                                int width, int height) {
-    // Hexagonal segments: one-pixel tips and 45-degree edges. Keeping only
-    // a diagonal pixel gap between neighbours gives the classic LED shape.
+    // Horizontal segments have one-pixel tips and 45-degree edges.
     const int bevel = CLOCK_SEGMENT_THICKNESS / 2;
     for (int row = 0; row < height; ++row) {
         int inset = 0;
         if (row < bevel) inset = bevel - row;
         else if (row >= height - bevel) inset = row - (height - bevel) + 1;
         for (int column = inset; column < width - inset; ++column) {
+            draw_pixel(display, x + column, y + row, true);
+        }
+    }
+}
+
+static void draw_clock_vertical_segment(oled_display_t *display, int x, int y,
+                                        int height, bool right) {
+    // Cut diagonally across the full thickness at both ends. The outside
+    // edge is longest; mirror the cuts on the right side of the digit.
+    for (int inset = 0; inset < CLOCK_SEGMENT_THICKNESS; ++inset) {
+        int column = right ? CLOCK_SEGMENT_THICKNESS - 1 - inset : inset;
+        for (int row = inset; row < height - inset; ++row) {
             draw_pixel(display, x + column, y + row, true);
         }
     }
@@ -387,20 +398,20 @@ static void draw_clock_digit(oled_display_t *display, int x, int y,
                            CLOCK_SEGMENT_THICKNESS);
     }
     if (enabled & SEGMENT_UPPER_LEFT) {
-        draw_clock_segment(display, x, y + upper_y - 1, CLOCK_SEGMENT_THICKNESS,
-                           middle_y - upper_y + 2);
+        draw_clock_vertical_segment(display, x, y + upper_y - 1,
+                                    middle_y - upper_y + 2, false);
     }
     if (enabled & SEGMENT_UPPER_RIGHT) {
-        draw_clock_segment(display, right_x, y + upper_y - 1,
-                           CLOCK_SEGMENT_THICKNESS, middle_y - upper_y + 2);
+        draw_clock_vertical_segment(display, right_x, y + upper_y - 1,
+                                    middle_y - upper_y + 2, true);
     }
     if (enabled & SEGMENT_LOWER_LEFT) {
-        draw_clock_segment(display, x, y + lower_y - 1, CLOCK_SEGMENT_THICKNESS,
-                           bottom_y - lower_y + 2);
+        draw_clock_vertical_segment(display, x, y + lower_y - 1,
+                                    bottom_y - lower_y + 2, false);
     }
     if (enabled & SEGMENT_LOWER_RIGHT) {
-        draw_clock_segment(display, right_x, y + lower_y - 1,
-                           CLOCK_SEGMENT_THICKNESS, bottom_y - lower_y + 2);
+        draw_clock_vertical_segment(display, right_x, y + lower_y - 1,
+                                    bottom_y - lower_y + 2, true);
     }
 }
 
