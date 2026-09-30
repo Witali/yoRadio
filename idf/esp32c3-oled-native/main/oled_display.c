@@ -375,32 +375,32 @@ static void draw_clock_digit(oled_display_t *display, int x, int y,
     const int lower_y = middle_y + CLOCK_SEGMENT_THICKNESS;
     const int right_x = x + CLOCK_DIGIT_WIDTH - CLOCK_SEGMENT_THICKNESS;
     if (enabled & SEGMENT_TOP) {
-        draw_clock_segment(display, x + 1, y, CLOCK_DIGIT_WIDTH - 2,
+        draw_clock_segment(display, x + 2, y, CLOCK_DIGIT_WIDTH - 4,
                            CLOCK_SEGMENT_THICKNESS);
     }
     if (enabled & SEGMENT_MIDDLE) {
-        draw_clock_segment(display, x + 1, y + middle_y, CLOCK_DIGIT_WIDTH - 2,
+        draw_clock_segment(display, x + 2, y + middle_y, CLOCK_DIGIT_WIDTH - 4,
                            CLOCK_SEGMENT_THICKNESS);
     }
     if (enabled & SEGMENT_BOTTOM) {
-        draw_clock_segment(display, x + 1, y + bottom_y, CLOCK_DIGIT_WIDTH - 2,
+        draw_clock_segment(display, x + 2, y + bottom_y, CLOCK_DIGIT_WIDTH - 4,
                            CLOCK_SEGMENT_THICKNESS);
     }
     if (enabled & SEGMENT_UPPER_LEFT) {
-        draw_clock_segment(display, x, y + upper_y, CLOCK_SEGMENT_THICKNESS,
-                           middle_y - upper_y);
+        draw_clock_segment(display, x, y + upper_y - 1, CLOCK_SEGMENT_THICKNESS,
+                           middle_y - upper_y + 2);
     }
     if (enabled & SEGMENT_UPPER_RIGHT) {
-        draw_clock_segment(display, right_x, y + upper_y,
-                           CLOCK_SEGMENT_THICKNESS, middle_y - upper_y);
+        draw_clock_segment(display, right_x, y + upper_y - 1,
+                           CLOCK_SEGMENT_THICKNESS, middle_y - upper_y + 2);
     }
     if (enabled & SEGMENT_LOWER_LEFT) {
-        draw_clock_segment(display, x, y + lower_y, CLOCK_SEGMENT_THICKNESS,
-                           bottom_y - lower_y);
+        draw_clock_segment(display, x, y + lower_y - 1, CLOCK_SEGMENT_THICKNESS,
+                           bottom_y - lower_y + 2);
     }
     if (enabled & SEGMENT_LOWER_RIGHT) {
-        draw_clock_segment(display, right_x, y + lower_y,
-                           CLOCK_SEGMENT_THICKNESS, bottom_y - lower_y);
+        draw_clock_segment(display, right_x, y + lower_y - 1,
+                           CLOCK_SEGMENT_THICKNESS, bottom_y - lower_y + 2);
     }
 }
 
