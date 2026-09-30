@@ -229,7 +229,10 @@ not an additional saving**. Right-channel savings overlap proposals 1–3.
 ### QMF storage representations: float24 and shared exponents
 
 The consolidated [optimization checklist](ESP32C3_MEMORY_STABILITY_TODO.md#aac-memory-reuse-during-decoding--planned-2026-09-30)
-includes these alternatives. They have not been implemented or qualified.
+includes these alternatives. No compact storage layout has been qualified.
+The later [BFP16 numerical experiment](ESP32C3_AAC_BFP16_20260930.md) executes
+the real decoder and rejects the tested 32/8/1-subband groups: their maximum
+PCM errors reach 5,689/342/3 LSB, respectively. Actual RAM saving remains zero.
 
 For the existing two-channel low-band matrices, there are 80 rows, each holding
 32 complex samples (64 signed real/imaginary components). One possible block
@@ -260,13 +263,14 @@ same row. Smaller blocks can improve this at the cost of more exponent metadata.
 Round carefully, handle carry/overflow when choosing the shift, and bound error
 after the entire SBR/PS/synthesis chain rather than just after unpacking.
 
-**First precision experiment: BFP with signed 24-bit mantissas**, compared with
+**Next precision experiment: BFP with signed 24-bit mantissas**, compared with
 smaller blocks and the original fixed-point backend. Start with a storage-only
 adapter that retains existing arithmetic and its required scale; measure whether
 packing/unpacking at the actual access points meets the RAM and timing goals.
 ESP32-C3 [uses software floating-point arithmetic](https://developer.espressif.com/blog/2025/10/cores_with_fpu/),
 so changing the DSP kernels to float is a separate performance risk. Shared-scale
-integer storage can use integer shifts/rounding; its speed is still unmeasured.
+integer storage can use integer shifts/rounding. The BFP16 numerical hook adds
+about 3.4–8.0% median guest instructions in QEMU; BFP24 speed remains unmeasured.
 See [XMOS's BFP explanation](https://www.xmos.com/documentation/XM-014926-PC/html/modules/core/modules/xcore_math/lib_xcore_math/doc/programming_guide/src/bfp_background.html)
 for the general representation and headroom tradeoff.
 
@@ -398,8 +402,10 @@ signal histories cannot be placed in read-only Flash.
    relax real-time playback checks or close the performance task.
 
 Use the existing [testing guide](ESP32C3_TESTING.md) and allocation/QEMU tools.
-This audit ran decompilation, disassembly comparisons and a reference layout
-probe only. It did **not** run PCM tests of any proposed altered algorithm.
+The original audit ran decompilation, disassembly comparisons and a reference
+layout probe. The subsequent [BFP16 experiment](ESP32C3_AAC_BFP16_20260930.md)
+adds raw-PCM differential tests and rejects that numerical representation;
+it does not change allocation sizes or qualify a production RAM optimization.
 
 Recommended order: pointer-table compaction → low-band work/history separation
 → current smoothing-row reuse → mode-specific PS state. Consider internal

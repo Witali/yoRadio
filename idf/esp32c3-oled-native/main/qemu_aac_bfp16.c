@@ -1,0 +1,291 @@
+// QEMU-only BFP16 fidelity gate for esp_audio_codec 2.6.2 / ESP32-C3.
+// The ABI was checked against calc_sbr_anafilterbank and sbr_dec disassembly.
+// Packing then expanding at the analysis boundary models low-band QMF storage
+// loss, including the history copied by sbr_dec. It DOES NOT reduce live RAM.
+#include "qemu_aac_bfp16.h"
+#include "native_aac_decoder.h"
+#include "decoder_pcm.h"
+#include "esp_audio_codec_version.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include <assert.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define FIXTURE(name, symbol) \
+    extern const uint8_t name##_start[] asm("_binary_" symbol "_aac_start"); \
+    extern const uint8_t name##_end[] asm("_binary_" symbol "_aac_end")
+FIXTURE(lc44, "lc_44100_stereo");
+FIXTURE(lc22, "lc_22050_mono");
+FIXTURE(lc48, "lc_48000_stereo");
+FIXTURE(he44, "he_44100_stereo");
+FIXTURE(he48, "he_48000_stereo");
+FIXTURE(hev2, "hev2_44100_stereo");
+
+static const char *TAG = "aac_bfp16";
+static unsigned group_bands; // Zero means the unmodified reference path.
+static uint32_t complex_rows, real_rows, changed_values;
+static unsigned max_shift;
+
+// Complementing negative values permits the asymmetric signed range, including
+// INT32_MIN, without abs(INT32_MIN) or implementation-defined signed shifts.
+static unsigned block_shift(const int32_t *real, const int32_t *imag, unsigned n) {
+    uint32_t peak = 0;
+    for (unsigned i = 0; i < n; ++i) {
+        uint32_t r = real[i] < 0 ? ~(uint32_t)real[i] : (uint32_t)real[i];
+        if (r > peak) peak = r;
+        if (imag) {
+            uint32_t q = imag[i] < 0 ? ~(uint32_t)imag[i] : (uint32_t)imag[i];
+            if (q > peak) peak = q;
+        }
+    }
+    unsigned shift = 0;
+    while (peak > INT16_MAX) { peak >>= 1; ++shift; }
+    assert(shift <= 16);
+    return shift;
+}
+
+// Nearest, ties away from zero; saturate a rounding carry at the int16 boundary.
+// This also keeps reconstruction in int32 range, even at INT32_MIN/MAX.
+static int16_t pack_value(int32_t value, unsigned shift) {
+    uint32_t magnitude = value < 0 ? 0u - (uint32_t)value : (uint32_t)value;
+    if (shift) magnitude = (magnitude + (1u << (shift - 1))) >> shift;
+    uint32_t limit = value < 0 ? 32768u : 32767u;
+    if (magnitude > limit) magnitude = limit;
+    return (int16_t)(value < 0 ? -(int32_t)magnitude : (int32_t)magnitude);
+}
+
+static int32_t unpack_value(int16_t value, unsigned shift) {
+    // Multiplication of these bounded operands is defined, unlike left-shifting
+    // a negative signed number. One exponent step means multiplying by two.
+    return (int32_t)value * (int32_t)(1u << shift);
+}
+
+static void roundtrip_row(int32_t *real, int32_t *imag) {
+    struct {
+        uint32_t before;
+        int16_t real[32], imag[32];
+        uint32_t after;
+    } packed = {.before = 0x1234abcd, .after = 0x9876dcba};
+    for (unsigned base = 0; base < 32; base += group_bands) {
+        unsigned shift = block_shift(real + base, imag ? imag + base : NULL, group_bands);
+        if (shift > max_shift) max_shift = shift;
+        for (unsigned i = base; i < base + group_bands; ++i) {
+            packed.real[i] = pack_value(real[i], shift);
+            if (imag) packed.imag[i] = pack_value(imag[i], shift);
+        }
+        for (unsigned i = base; i < base + group_bands; ++i) {
+            int32_t value = unpack_value(packed.real[i], shift);
+            changed_values += value != real[i];
+            real[i] = value;
+            if (imag) {
+                value = unpack_value(packed.imag[i], shift);
+                changed_values += value != imag[i];
+                imag[i] = value;
+            }
+        }
+    }
+    assert(packed.before == 0x1234abcd && packed.after == 0x9876dcba);
+}
+
+void __real_calc_sbr_anafilterbank(int32_t *, int32_t *, const int16_t *, int32_t *, int32_t);
+void __real_calc_sbr_anafilterbank_LC(int32_t *, const int16_t *, int32_t *, int32_t);
+
+void __wrap_calc_sbr_anafilterbank(int32_t *real, int32_t *imag,
+                                 const int16_t *input, int32_t *scratch, int32_t bands) {
+    __real_calc_sbr_anafilterbank(real, imag, input, scratch, bands);
+    if (group_bands) { ++complex_rows; roundtrip_row(real, imag); }
+}
+
+void __wrap_calc_sbr_anafilterbank_LC(int32_t *real, const int16_t *input,
+                                    int32_t *scratch, int32_t bands) {
+    __real_calc_sbr_anafilterbank_LC(real, input, scratch, bands);
+    if (group_bands) { ++real_rows; roundtrip_row(real, NULL); }
+}
+
+static void check_value(int32_t value, unsigned shift) {
+    int64_t scale = (int64_t)1 << shift;
+    int64_t magnitude = value < 0 ? -(int64_t)value : (int64_t)value;
+    int64_t expected = (magnitude + scale / 2) / scale;
+    int64_t limit = value < 0 ? 32768 : 32767;
+    if (expected > limit) expected = limit;
+    if (value < 0) expected = -expected;
+    int16_t packed = pack_value(value, shift);
+    assert(packed == expected);
+    int32_t reconstructed = unpack_value(packed, shift);
+    assert(reconstructed == expected * scale);
+    int64_t error = (int64_t)reconstructed - value;
+    if (error < 0) error = -error;
+    // Boundary saturation can cost just under one step; otherwise half a step.
+    assert(error <= (shift ? scale - 1 : 0));
+}
+
+static void arithmetic_tests(void) {
+    for (int32_t v = INT16_MIN; v <= INT16_MAX; ++v) {
+        assert(block_shift(&v, NULL, 1) == 0);
+        check_value(v, 0);
+    }
+    const int32_t edges[] = {INT32_MIN, INT32_MIN + 1, INT32_MAX, INT32_MAX - 1,
+                            -65536, -32769, -32768, -1, 0, 1, 32767, 32768, 65535};
+    for (unsigned i = 0; i < sizeof(edges) / sizeof(edges[0]); ++i)
+        check_value(edges[i], block_shift(edges + i, NULL, 1));
+    uint32_t rng = 0x51bfc316;
+    for (unsigned k = 0; k < 4096; ++k) {
+        int32_t row[64];
+        for (unsigned i = 0; i < 64; ++i) {
+            rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5;
+            memcpy(row + i, &rng, sizeof(rng));
+        }
+        for (unsigned n = 1; n <= 32; n *= 2) {
+            unsigned shift = block_shift(row, row + 32, n);
+            for (unsigned i = 0; i < n; ++i) {
+                check_value(row[i], shift);
+                check_value(row[32 + i], shift);
+            }
+        }
+        if (!(k % 128)) vTaskDelay(1);
+    }
+    ESP_LOGI(TAG, "BFP16_ARITHMETIC_PASS int16-exhaustive int32-edges random-blocks=4096");
+}
+
+static inline uint32_t instructions(void) {
+    uint32_t count;
+    __asm__ volatile("csrr %0, minstret" : "=r"(count) :: "memory");
+    return count;
+}
+
+static void check_counter(void) {
+    portMUX_TYPE lock = portMUX_INITIALIZER_UNLOCKED;
+    uint32_t before, after;
+    taskENTER_CRITICAL(&lock);
+    __asm__ volatile("csrr %0, minstret\n.rept 1024\n nop\n.endr\ncsrr %1, minstret\n"
+                     : "=r"(before), "=r"(after) :: "memory");
+    taskEXIT_CRITICAL(&lock);
+    assert(after - before == 1025);
+    ESP_LOGI(TAG, "BFP16_COUNTER_PASS nop1024=%" PRIu32, after - before);
+}
+
+typedef struct {
+    const char *name;
+    const uint8_t *start, *end;
+    uint32_t rate;
+    uint8_t channels;
+    bool sbr;
+} fixture_t;
+
+static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
+    native_aac_decoder_t *dec[2] = {native_aac_decoder_create(), native_aac_decoder_create()};
+    uint8_t *pcm[2] = {malloc(NATIVE_AAC_PCM_FRAME_BYTES + 16),
+                       malloc(NATIVE_AAC_PCM_FRAME_BYTES + 16)};
+    assert(dec[0] && dec[1] && pcm[0] && pcm[1]);
+    for (unsigned leg = 0; leg < 2; ++leg)
+        memset(pcm[leg] + NATIVE_AAC_PCM_FRAME_BYTES, 0xa5, 16);
+    uint64_t work[2] = {0}, samples = 0, different = 0, over_one = 0;
+    uint32_t worst_call[2] = {0}, max_error[2] = {0}, frames = 0;
+    uint64_t first_bad = UINT64_MAX;
+    int first_ref = 0, first_candidate = 0;
+    complex_rows = real_rows = changed_values = max_shift = 0;
+    // A second pass through the fixture exercises retained filter/PS histories.
+    // Both passes (including decoder startup) contribute to fidelity and timing.
+    for (unsigned repeat = 0; repeat < 2; ++repeat) {
+        for (const uint8_t *p = f->start; p < f->end;) {
+            size_t count = (size_t)(f->end - p);
+            if (count > 997) count = 997;
+            esp_audio_simple_dec_raw_t raw[2] = {
+                {.buffer = (uint8_t *)p, .len = count},
+                {.buffer = (uint8_t *)p, .len = count}};
+            while (raw[0].len) {
+                esp_audio_simple_dec_out_t output[2] = {
+                    {.buffer = pcm[0], .len = NATIVE_AAC_PCM_FRAME_BYTES},
+                    {.buffer = pcm[1], .len = NATIVE_AAC_PCM_FRAME_BYTES}};
+                for (unsigned order = 0; order < 2; ++order) {
+                    unsigned leg = order ^ (run & 1);
+                    group_bands = leg ? bands : 0;
+                    uint32_t before = instructions();
+                    esp_audio_err_t result = native_aac_decoder_process(dec[leg], &raw[leg], &output[leg]);
+                    uint32_t elapsed = instructions() - before;
+                    work[leg] += elapsed;
+                    if (elapsed > worst_call[leg]) worst_call[leg] = elapsed;
+                    group_bands = 0;
+                    assert(result == ESP_AUDIO_ERR_OK);
+                    assert(raw[leg].consumed <= raw[leg].len);
+                    assert(raw[leg].consumed || output[leg].decoded_size);
+                    assert(output[leg].decoded_size <= NATIVE_AAC_PCM_FRAME_BYTES);
+                    for (unsigned i = 0; i < 16; ++i)
+                        assert(pcm[leg][NATIVE_AAC_PCM_FRAME_BYTES + i] == 0xa5);
+                }
+                assert(raw[0].consumed == raw[1].consumed);
+                assert(output[0].decoded_size == output[1].decoded_size);
+                for (unsigned leg = 0; leg < 2; ++leg) {
+                    raw[leg].buffer += raw[leg].consumed;
+                    raw[leg].len -= raw[leg].consumed;
+                    if (output[leg].decoded_size) {
+                        esp_audio_simple_dec_info_t info;
+                        assert(native_aac_decoder_get_info(dec[leg], &info) == ESP_AUDIO_ERR_OK);
+                        assert(info.sample_rate == f->rate && info.channel == f->channels && info.bits_per_sample == 16);
+                    }
+                }
+                assert(output[0].decoded_size % (2 * f->channels) == 0);
+                const int16_t *reference = (const int16_t *)pcm[0];
+                const int16_t *candidate = (const int16_t *)pcm[1];
+                for (unsigned i = 0; i < output[0].decoded_size / 2; ++i) {
+                    int32_t delta = (int32_t)candidate[i] - reference[i];
+                    uint32_t error = delta < 0 ? -delta : delta;
+                    unsigned channel = i % f->channels;
+                    if (error > max_error[channel]) max_error[channel] = error;
+                    different += error != 0;
+                    over_one += error > 1;
+                    if (error > 1 && first_bad == UINT64_MAX) {
+                        first_bad = samples + i;
+                        first_ref = reference[i]; first_candidate = candidate[i];
+                    }
+                }
+                samples += output[0].decoded_size / 2;
+                frames += output[0].decoded_size != 0;
+            }
+            p += count;
+            vTaskDelay(1);
+        }
+    }
+    assert(frames > 10 && samples >= f->rate * f->channels / 2);
+    if (f->sbr && bands) assert(complex_rows + real_rows > 0 && changed_values > 0);
+    else assert(!complex_rows && !real_rows && !different);
+    ESP_LOGI(TAG, "BFP16_RESULT case=%s bands=%u run=%u samples=%" PRIu64
+             " frames=%" PRIu32 " max_l=%" PRIu32 " max_r=%" PRIu32
+             " different=%" PRIu64 " over_one=%" PRIu64 " complex_rows=%" PRIu32
+             " real_rows=%" PRIu32 " changed_qmf=%" PRIu32 " max_shift=%u"
+             " ref_work=%" PRIu64 " bfp_work=%" PRIu64 " ref_max_call=%" PRIu32
+             " bfp_max_call=%" PRIu32 " precision=%s",
+             f->name, bands, run, samples, frames, max_error[0], max_error[1], different,
+             over_one, complex_rows, real_rows, changed_values, max_shift,
+             work[0], work[1], worst_call[0], worst_call[1], over_one ? "FAIL" : "PASS");
+    if (over_one)
+        ESP_LOGI(TAG, "BFP16_FIRST_ERROR case=%s bands=%u run=%u sample=%" PRIu64
+                 " ref=%d bfp=%d", f->name, bands, run, first_bad, first_ref, first_candidate);
+    for (unsigned leg = 0; leg < 2; ++leg) {
+        native_aac_decoder_destroy(dec[leg]); free(pcm[leg]);
+    }
+}
+
+void qemu_aac_bfp16_test(void) {
+    check_counter();
+    arithmetic_tests();
+    ESP_LOGI(TAG, "BFP16_ENV codec=%s groups=32,8,1 control=0 runs=3 repeats=2 baseline=wrap-bypass RAM_saved=0",
+             esp_audio_codec_get_version());
+    const fixture_t fixtures[] = {
+        {"lc44100_stereo", lc44_start, lc44_end, 44100, 2, false},
+        {"lc22050_mono", lc22_start, lc22_end, 22050, 1, false},
+        {"lc48000_stereo", lc48_start, lc48_end, 48000, 2, false},
+        {"he44100_stereo", he44_start, he44_end, 44100, 2, true},
+        {"he48000_stereo", he48_start, he48_end, 48000, 2, true},
+        {"hev2_44100_stereo", hev2_start, hev2_end, 44100, 2, true}};
+    const unsigned groups[] = {32, 8, 1, 0};
+    for (unsigned i = 0; i < sizeof(fixtures) / sizeof(fixtures[0]); ++i)
+        for (unsigned g = 0; g < (fixtures[i].sbr ? 4 : 1); ++g)
+            for (unsigned run = 1; run <= 3; ++run)
+                compare_fixture(fixtures + i, groups[g], run);
+    ESP_LOGI(TAG, "BFP16_EXPERIMENT_COMPLETE inspect precision per case; no production approval");
+}

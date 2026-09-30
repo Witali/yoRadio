@@ -63,12 +63,18 @@ speed while preserving full format support and the one-LSB output limit.
 - [ ] Narrow stored smoothing exponents to 16 bits only after proving their
   ranges (2,560-byte candidate for the original two-channel layout).
 - [ ] Prototype **24-bit signed QMF mantissas with a shared block exponent**
-  first among QMF precision candidates: 15,440 versus 20,480 bytes, a 5,040-byte
+  after the failed BFP16 gate: 15,440 versus 20,480 bytes, a 5,040-byte
   storage saving for one byte of exponent per 32-complex-sample row. Compare
   smaller blocks, include unpacking workspace and measure output error/CPU.
-- [ ] Evaluate 16-bit QMF mantissas with shared exponents as a higher-risk
-  alternative (10,160-byte storage saving with the same blocking). Accept only
-  if the maximum PCM error stays within one LSB for all supported cases.
+- [x] Evaluate 16-bit QMF mantissas with shared exponents at the real decoder's
+  analysis boundary in QEMU. **Rejected by the one-LSB PCM gate:** 32/8/1-subband
+  groups reach 5,689/342/3 LSB respectively across HE/v2 fixtures. Controls are
+  byte-identical. The prototype saves no RAM; the 10,160-byte row-storage saving
+  remains hypothetical. See the [experiment and retained tests](ESP32C3_AAC_BFP16_20260930.md).
+- [ ] Recover speed for any precision-qualified compact representation: fuse
+  scans with QMF production, unpack only active work, then repeat A/B and board
+  tests. BFP16's diagnostic pack/unpack adds roughly 3.4–8.0% median QEMU guest
+  instructions per tested HE/v2 case; this is not physical CPU timing.
 - [ ] Compare densely packed custom float24 and fixed-point int24 storage
   (5,120-byte storage saving each). Specify sign/exponent/fraction allocation
   for float24; 24 storage bits do not imply 24 significant bits. Keep integer

@@ -83,6 +83,18 @@ config YORADIO_QEMU_CACHE_TEST
         Requires icount and tools/codec_benchmark/cache/esp32c3_cache.c.
         Modelled misses are not physical cache counters or CPU timings.
 
+config YORADIO_QEMU_AAC_BFP16_TEST
+    bool "Compare SBR QMF BFP16 storage against original PCM in QEMU"
+    depends on YORADIO_QEMU_AAC_TEST && !YORADIO_QEMU_AAC_PROFILE && !YORADIO_QEMU_CACHE_TEST
+    default n
+    help
+        Numerical experiment: quantize low-band QMF at the analysis boundary
+        using signed 16-bit mantissas and one exponent per group. Compare raw
+        PCM from separate reference/candidate decoders and count instructions.
+        Requires QEMU icount. Does not reduce allocation sizes or enable this
+        lossy representation in production. Precision failures are reported
+        as results; experiment completion is not a precision approval.
+
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n

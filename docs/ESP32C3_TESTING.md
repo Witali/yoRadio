@@ -29,6 +29,13 @@ retain both failures and passes; the production default remains DIO 80 MHz.
 
 ## Gaps found and corresponding tests
 
+The [BFP16 QMF experiment](ESP32C3_AAC_BFP16_20260930.md) adds paired real-decoder
+raw-PCM comparisons in QEMU, arithmetic boundary tests, unquantized controls,
+three block sizes and instruction counts. Its harness completes, but all tested
+HE/v2 BFP16 block sizes **fail** the one-LSB limit. Run
+`python tests/test-aac-bfp16.py` to validate the retained evidence and negative
+parser cases; that regression pass preserves a measured optimization failure.
+
 | ID | Previously missing coverage | Test created | Acceptance |
 | --- | --- | --- | --- |
 | C3-T01 | Repeatable production RAM-policy regression | `tests/test-esp32c3-acceptance.py`, `ProductionConfigTests` | Execute the actual PowerShell production wrapper against saved configs: both Wi-Fi IRAM options become disabled, other values survive, second run is idempotent; relative and absolute paths work. |

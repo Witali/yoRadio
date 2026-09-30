@@ -34,6 +34,7 @@ if (-not $SkipBuild) {
 $builtConfig = Get-Content -LiteralPath (Join-Path $buildPath "config/sdkconfig.h") -Raw
 $instructionProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_PROFILE 1'
 $cacheProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_CACHE_TEST 1'
+$bfp16Profile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_BFP16_TEST 1'
 if ($CodecCalibration -and -not $instructionProfile) {
     throw "Codec calibration requires CONFIG_YORADIO_QEMU_AAC_PROFILE=y"
 }
@@ -105,7 +106,7 @@ $qemuArguments = @(
     "-nographic", "-no-reboot", "-snapshot",
     "-audiodev", "wav,id=audio0,path=$AudioOutput,out.frequency=48000"
 )
-if ($instructionProfile -or $cacheProfile) {
+if ($instructionProfile -or $cacheProfile -or $bfp16Profile) {
     $qemuArguments += @("-icount", "shift=0,align=off,sleep=off")
 }
 if (-not [string]::IsNullOrWhiteSpace($QemuBiosDirectory)) {
@@ -136,6 +137,12 @@ if (-not $cacheProfile -and $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC
 }
 if ($instructionProfile -and $joinedOutput -notmatch 'QEMU_AAC_WORK_PASS') {
     throw "QEMU AAC instruction profiling failed; see $log"
+}
+if ($bfp16Profile -and $joinedOutput -notmatch 'BFP16_EXPERIMENT_COMPLETE') {
+    throw "QEMU BFP16 experiment incomplete; see $log"
+}
+if ($bfp16Profile -and $joinedOutput -match 'precision=FAIL') {
+    Write-Warning "BFP16 exceeds the one-LSB PCM limit; see BFP16_RESULT in $log"
 }
 if ($instructionProfile -and $joinedOutput -notmatch 'QEMU_AAC_CAL_PASS') {
     throw "QEMU AAC hardware calibration fixture failed; see $log"

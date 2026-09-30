@@ -18,6 +18,9 @@
 #include "native_audio_output.h"
 #include "native_state.h"
 #include "oled_display.h"
+#ifdef CONFIG_YORADIO_QEMU_AAC_BFP16_TEST
+#include "qemu_aac_bfp16.h"
+#endif
 
 #define FIXTURE(name, symbol) \
     extern const uint8_t name##_start[] asm("_binary_" symbol "_aac_start"); \
@@ -231,6 +234,9 @@ void qemu_aac_test(native_state_t *state, oled_display_t *display) {
     profile_fixture("he48000_stereo", he48_start, he48_end, 48000, 2);
     profile_fixture("hev2_44100_stereo", hev2_start, hev2_end, 44100, 2);
     ESP_LOGI(TAG, "QEMU_AAC_WORK_PASS instruction demand only; no hardware CPU timing");
+#endif
+#ifdef CONFIG_YORADIO_QEMU_AAC_BFP16_TEST
+    qemu_aac_bfp16_test();
 #endif
     ESP_LOGI(TAG, "QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes");
 }

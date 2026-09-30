@@ -64,6 +64,9 @@ if(CONFIG_YORADIO_QEMU)
   list(APPEND NATIVE_SRCS "native_audio_output_qemu.c")
   if(CONFIG_YORADIO_QEMU_AAC_TEST)
     list(APPEND NATIVE_SRCS "qemu_aac_test.c")
+    if(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST)
+      list(APPEND NATIVE_SRCS "qemu_aac_bfp16.c")
+    endif()
     if(CONFIG_YORADIO_QEMU_CACHE_TEST)
       list(APPEND NATIVE_SRCS "qemu_cache_test.c")
     endif()
@@ -120,6 +123,12 @@ if(YORADIO_CODEC_BENCHMARK)
     YORADIO_CODEC_BENCHMARK=1)
 endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+
+if(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST)
+  target_link_options(${COMPONENT_LIB} INTERFACE
+    "-Wl,--wrap=calc_sbr_anafilterbank"
+    "-Wl,--wrap=calc_sbr_anafilterbank_LC")
+endif()
 
 if(CONFIG_YORADIO_QEMU_AAC_TEST)
   foreach(FIXTURE lc-44100-stereo lc-22050-mono lc-48000-stereo
