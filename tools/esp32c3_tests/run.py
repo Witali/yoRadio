@@ -135,6 +135,40 @@ class Suite:
         finally:
             self.board.stop()
 
+    def eof(self, name, hint='auto'):
+        """Check terminal status independently of HE-AAC full-rate acceptance."""
+        self.start(name, hint=hint)
+        try:
+            samples = self.observe(max(7, self.specs[name]['seconds']-3), name+':playing')
+            require(any(s['audio'] and s.get('pcm_sample_rate') for s in samples),
+                    'No decoded playback before EOF')
+            tail = self.observe(10, name+':terminal')
+            stopped = next((i for i,s in enumerate(tail) if not s['audio']), None)
+            require(stopped is not None and len(tail)-stopped >= 2,
+                    'No confirmed stopped state after EOF')
+            require(all(not s['audio'] and s['format']=='stream ended' and
+                        not s['pcm_sample_rate'] and not s['pcm_channels']
+                        for s in tail[stopped:]),
+                    'EOF state was replaced by stale PCM metadata or a decode error')
+            with self.board.websocket() as ws:
+                ws.send('getindex')
+                deadline = time.monotonic()+5
+                while time.monotonic() < deadline:
+                    message = json.loads(ws.recv(timeout=5))
+                    values = {p['id']:p['value'] for p in message.get('payload',[])}
+                    if 'fmt' in values:
+                        require(values['fmt']=='stream ended' and
+                                values.get('playerwrap')!='playing',
+                                'WebSocket did not retain terminal state')
+                        break
+                else:
+                    raise Failure('No WebSocket EOF snapshot')
+            return dict(scope='EOF state only; decoded profile acceptance is separate',
+                        observed_formats=sorted({s['format'] for s in samples if s['audio']}),
+                        terminal_samples=len(tail)-stopped, websocket_stopped=True)
+        finally:
+            self.board.stop()
+
     def websocket_format(self):
         self.start('lc-48000-stereo','stream','aac')
         try:
@@ -252,7 +286,7 @@ def main():
     parser.add_argument('--board', required=True)
     parser.add_argument('--host', required=True, help='Local IPv4 reachable from board')
     parser.add_argument('--port', type=int, default=8770)
-    parser.add_argument('--suite', action='append', choices=('http','https','tls-rejection','transitions','faults','switch','soak','load','websocket','boot-time'), required=True)
+    parser.add_argument('--suite', action='append', choices=('http','https','eof','tls-rejection','transitions','faults','switch','soak','load','websocket','boot-time'), required=True)
     parser.add_argument('--case', action='append', help='Restrict matrix/switch/soak/load fixtures')
     parser.add_argument('--serial-port')
     parser.add_argument('--fixture-manifest', type=Path)
@@ -305,6 +339,10 @@ def main():
                 for name, sequence in sequences.items():
                     report.case('transition:'+name, lambda n=name,s=sequence: suite.transition(n,s))
                 report.case('stop-play-generation', suite.stop_race)
+            if 'eof' in args.suite:
+                for name in names:
+                    for hint in ('auto',specs[name]['codec']):
+                        report.case(f'eof:{name}:{hint}',lambda n=name,h=hint: suite.eof(n,h))
             if 'faults' in args.suite:
                 for mode in ('drop','stall','error'):
                     report.case('network:'+mode, lambda m=mode: suite.fault(m))

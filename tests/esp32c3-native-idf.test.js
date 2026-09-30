@@ -984,10 +984,8 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
   );
   assert.match(audio, /open_stream[\s\S]*state_set_audio\(command\.generation, true, "connected"\)/);
   assert.match(audio, /state_set_audio\(generation, true, codec_name\(\*codec\)\)/);
-  assert.match(
-    audio,
-    /command\.generation[\s\S]*state_set_audio\(command\.generation, false,[\s\S]*"stream ended"/,
-  );
+  // EOF ordering is executed by run-esp32c3-eof.py. The network reader must
+  // not publish stopped before buffered decoder callbacks and PCM complete.
   assert.match(audioHeader, /audio_service_buffer_fill_percent/);
   assert.match(
     audio,

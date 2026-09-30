@@ -68,6 +68,31 @@ class AcceptanceTests(unittest.TestCase):
             self.assertGreaterEqual(rows[0]['elapsed_seconds'], 0)
             self.assertNotIn('private stream details', raw)
 
+    def test_eof_acceptance_rejects_resurrection_and_decode_error(self):
+        terminal = dict(state(), audio=False, pcm_sample_rate=0, pcm_channels=0,
+                        format='stream ended')
+        message = json.dumps(dict(payload=[dict(id='fmt',value='stream ended'),
+                                            dict(id='playerwrap',value='stopped')]))
+        for tail, passed in [([terminal]*3,True),
+                             ([terminal,state(),terminal],False),
+                             ([dict(terminal,format='decode failed')]*3,False),
+                             ([terminal],False)]:
+            with tempfile.TemporaryDirectory() as tmp, self.subTest(tail=tail):
+                board = Mock()
+                socket = Mock()
+                socket.recv.return_value = message
+                from contextlib import nullcontext
+                board.websocket.return_value = nullcontext(socket)
+                suite = acceptance_run.Suite(board,'http://localhost',self.specs,None,tmp)
+                suite.start = Mock()
+                suite.observe = Mock(side_effect=[[state()]*6, tail])
+                if passed:
+                    self.assertTrue(suite.eof('he-48000-stereo')['websocket_stopped'])
+                else:
+                    with self.assertRaises(common.Failure):
+                        suite.eof('he-48000-stereo')
+                board.stop.assert_called_once()
+
     def test_transition_order_and_implicit_sbr_regression(self):
         expected = [self.specs['lc-22050-mono'],self.specs['hev2-44100-stereo'],self.specs['lc-48000-stereo']]
         mono = state(22050,1,'AAC PCM 22.05 kHz mono')

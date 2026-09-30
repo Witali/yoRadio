@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "native_state.h"
+#include "audio_completion.h"
 #include "custom_flac_adapter.h"
 #include "custom_legacy_adapter.h"
 

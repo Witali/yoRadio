@@ -1,4 +1,5 @@
 #include "audio_service.h"
+#include "audio_completion.h"
 
 #include <stdatomic.h>
 #include <stdlib.h>
@@ -64,7 +65,7 @@ typedef struct {
     uint32_t generation;
     native_codec_t codec;
     uint16_t data_size;
-    bool end_of_stream;
+    uint8_t end_of_stream;
     uint8_t data[];
 } encoded_packet_t;
 
@@ -74,6 +75,7 @@ typedef struct {
     uint8_t bits_per_sample;
     uint8_t channels;
     uint16_t data_size;
+    uint32_t end_of_stream; // Keep the following PCM payload word-aligned.
     uint8_t data[];
 } pcm_packet_t;
 
@@ -327,7 +329,7 @@ static esp_err_t open_stream(esp_http_client_handle_t client,
 }
 
 static bool send_encoded(uint32_t generation, native_codec_t codec,
-                         const uint8_t *data, size_t size, bool eos) {
+                         const uint8_t *data, size_t size, uint8_t eos) {
     size_t packet_size = sizeof(encoded_packet_t) + size;
     encoded_packet_t *packet = NULL;
     while (xRingbufferSendAcquire(s_encoded, (void **)&packet, packet_size,
@@ -462,7 +464,7 @@ static void play_flash_fixture(const play_command_t *command,
         }
         offset += (uint32_t)chunk;
     }
-    send_encoded(command->generation, codec, NULL, 0, true);
+    send_encoded(command->generation, codec, NULL, 0, AUDIO_END_EOF);
     ESP_LOGI(TAG, "Codec fixture complete: %lu/%lu bytes",
              (unsigned long)offset, (unsigned long)command->fixture_size);
 }
@@ -674,14 +676,15 @@ static void stream_task(void *argument) {
                 break;
             }
         }
-        send_encoded(command.generation, codec, NULL, 0, true);
+        uint8_t end_reason = stream_stalled ? AUDIO_END_BUFFER_STALLED
+                             : stream_read_failed ? AUDIO_END_READ_FAILED
+                                                  : AUDIO_END_EOF;
+        send_encoded(command.generation, codec, NULL, 0, end_reason);
         dispose_http_client(client);
         if (atomic_load(&s_generation) == command.generation) {
-            state_set_audio(command.generation, false, stream_stalled
-                                       ? "buffer stalled"
-                                       : (stream_read_failed
-                                              ? "stream read failed"
-                                              : "stream ended"));
+            // The decoder still owns buffered input. Its last format callback
+            // must precede the terminal state, including delayed HE-AAC PCM.
+            // output_task publishes completion after the PCM queue drains.
             network_service_set_streaming(false);
         }
     }
@@ -718,6 +721,7 @@ static bool send_pcm(uint32_t generation,
         packet->sample_rate = info->sample_rate;
         packet->bits_per_sample = info->bits_per_sample;
         packet->channels = info->channel;
+        packet->end_of_stream = AUDIO_CONTINUE;
         packet->data_size = (uint16_t)chunk;
         memcpy(packet->data, data, chunk);
         if (xRingbufferSendComplete(s_pcm, packet) != pdTRUE) return false;
@@ -725,6 +729,34 @@ static bool send_pcm(uint32_t generation,
         size -= chunk;
     }
     return true;
+}
+
+static bool send_pcm_end(uint32_t generation, uint8_t reason) {
+    pcm_packet_t *packet = NULL;
+    for (;;) {
+        if (generation != atomic_load(&s_generation)) return false;
+        if (xRingbufferSendAcquire(s_pcm, (void **)&packet, sizeof(*packet),
+                                  pdMS_TO_TICKS(250)) == pdTRUE) break;
+    }
+    memset(packet, 0, sizeof(*packet));
+    packet->generation = generation;
+    packet->end_of_stream = reason;
+    return xRingbufferSendComplete(s_pcm, packet) == pdTRUE;
+}
+
+static void return_decoded_packet(encoded_packet_t *packet,
+                                  uint32_t failed_generation) {
+    if (packet->end_of_stream && packet->generation != failed_generation) {
+        send_pcm_end(packet->generation, packet->end_of_stream);
+    }
+    vRingbufferReturnItem(s_encoded, packet);
+}
+
+static void finish_pcm_stream(const pcm_packet_t *packet) {
+    // native_state checks the generation under its lock: an old completion
+    // cannot stop a new Play, even if that command raced this queue read.
+    state_set_audio(packet->generation, false,
+                    audio_completion_status(packet->end_of_stream));
 }
 
 static bool update_stream_info(uint32_t generation, const char *codec,
@@ -912,6 +944,11 @@ static void decoder_task(void *argument) {
             vRingbufferReturnItem(s_encoded, packet);
             continue;
         }
+        if (packet->codec == NATIVE_CODEC_AUTO && packet->end_of_stream) {
+            // Empty HTTP body: there was no first chunk to identify a codec.
+            return_decoded_packet(packet, failed_generation);
+            continue;
+        }
         if (packet->generation != generation || packet->codec != codec) {
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
@@ -1086,7 +1123,7 @@ static void decoder_task(void *argument) {
                     failed_generation = generation;
                 }
             }
-            vRingbufferReturnItem(s_encoded, packet);
+            return_decoded_packet(packet, failed_generation);
             continue;
         }
 #endif
@@ -1137,7 +1174,7 @@ static void decoder_task(void *argument) {
                     failed_generation = generation;
                 }
             }
-            vRingbufferReturnItem(s_encoded, packet);
+            return_decoded_packet(packet, failed_generation);
             continue;
         }
 #endif
@@ -1259,7 +1296,7 @@ static void decoder_task(void *argument) {
             }
             if (packet->end_of_stream || raw.len == 0) break;
         }
-        vRingbufferReturnItem(s_encoded, packet);
+        return_decoded_packet(packet, failed_generation);
     }
 }
 
@@ -1313,6 +1350,11 @@ static void output_task(void *argument) {
             continue;
         }
         if (packet->generation != atomic_load(&s_generation)) {
+            vRingbufferReturnItem(s_pcm, packet);
+            continue;
+        }
+        if (packet->end_of_stream) {
+            finish_pcm_stream(packet);
             vRingbufferReturnItem(s_pcm, packet);
             continue;
         }
