@@ -16,6 +16,11 @@ The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.
 
+The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
+standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
+AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained
+evidence and rejection paths. This does not replace full-radio QIO acceptance.
+
 ## Gaps found and corresponding tests
 
 | ID | Previously missing coverage | Test created | Acceptance |

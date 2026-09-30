@@ -19,12 +19,14 @@ def rows(log, prefix):
             for line in log.splitlines() if line.startswith(prefix + " ")]
 
 
-def parse(log, runtime):
+def parse(log, runtime, *, flash_mhz=80, flash_test=False):
+    if rows(log, "FLASH_ENV") and not flash_test:
+        raise ValueError("Use analyze_flash.py for flash-mode experiments; keep calibration scoped to its original image")
     env = rows(log, "CACHE_HW_ENV")
     expected = dict(target="esp32c3", runtime=runtime, cpu_hz=str(CPU_HZ),
                     pcer="1" if runtime == "hardware" else "0",
                     codec_version="v2.6.0-4-gfd141ab", deep_sleep="0",
-                    irq_masked="1", flash_mode="dio", flash_mhz="80")
+                    irq_masked="1", flash_mode="dio", flash_mhz=str(flash_mhz))
     if env != [expected] or log.count(f"CACHE_HW_PASS runtime={runtime}") != 1:
         raise ValueError("Missing or inconsistent environment/completion marker")
     if re.search(r"assert failed|Guru Meditation|CORRUPT HEAP|abort\(\)", log):

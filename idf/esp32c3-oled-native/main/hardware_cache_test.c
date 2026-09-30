@@ -25,6 +25,15 @@
 #include "riscv/rv_utils.h"
 #include "soc/extmem_reg.h"
 #include "soc/soc.h"
+#ifdef YORADIO_HARDWARE_FLASH_TEST
+#include "esp_flash.h"
+#include "esp_image_format.h"
+#include "esp_ota_ops.h"
+#include "esp_partition.h"
+#include "esp_rom_crc.h"
+#include "hal/spimem_flash_ll.h"
+#include "soc/spi_mem_reg.h"
+#endif
 
 #if defined(CONFIG_YORADIO_DEEP_SLEEP_CLOCK) || !defined(CONFIG_YORADIO_AAC_PLUS)
 #error "Cache bench requires full AAC Plus and deep sleep disabled"
@@ -136,6 +145,64 @@ static void cache_probes(void) {
     }
 }
 
+#ifdef YORADIO_HARDWARE_FLASH_TEST
+// Read the cache controller, not just the requested sdkconfig or image header.
+// This diagnostic is specific to C3 at its normal PLL/CPU configuration.
+static void flash_check(void) {
+    assert(!s_emulated);
+    uint32_t ctrl = REG_READ(SPI_MEM_CTRL_REG(0));
+    uint32_t clock = REG_READ(SPI_MEM_CLOCK_REG(0));
+    const uint32_t mode_mask = SPI_MEM_FREAD_QIO | SPI_MEM_FREAD_DIO |
+                               SPI_MEM_FREAD_QUAD | SPI_MEM_FREAD_DUAL;
+#if CONFIG_ESPTOOLPY_FLASHMODE_QIO
+    const uint32_t expected_mode = SPI_MEM_FREAD_QIO;
+#elif CONFIG_ESPTOOLPY_FLASHMODE_DIO
+    const uint32_t expected_mode = SPI_MEM_FREAD_DIO;
+#else
+#error "Flash comparison supports only DIO and QIO"
+#endif
+    unsigned source_mhz = spimem_flash_ll_get_source_freq_mhz();
+    unsigned divider = (clock & SPI_MEM_CLK_EQU_SYSCLK) ? 1 :
+        ((clock >> SPI_MEM_CLKCNT_N_S) & SPI_MEM_CLKCNT_N_V) + 1;
+    unsigned mhz = source_mhz / divider;
+    uint32_t id, size;
+    ESP_ERROR_CHECK(esp_flash_read_id(NULL, &id));
+    ESP_ERROR_CHECK(esp_flash_get_physical_size(NULL, &size));
+    report("FLASH_ENV configured=%s configured_mhz=%s ctrl=0x%08" PRIx32
+           " clock=0x%08" PRIx32 " source_mhz=%u divider=%u actual_mhz=%u"
+           " jedec=0x%06" PRIx32 " physical_bytes=%" PRIu32 "\n",
+           CONFIG_ESPTOOLPY_FLASHMODE, CONFIG_ESPTOOLPY_FLASHFREQ,
+           ctrl, clock, source_mhz, divider, mhz, id, size);
+    assert((ctrl & mode_mask) == expected_mode);
+    assert(mhz == (unsigned)atoi(CONFIG_ESPTOOLPY_FLASHFREQ));
+
+    const esp_partition_t *part = esp_ota_get_running_partition();
+    assert(part);
+    esp_partition_pos_t pos = {.offset = part->address, .size = part->size};
+    esp_image_metadata_t meta = {0};
+    ESP_ERROR_CHECK(esp_image_verify(ESP_IMAGE_VERIFY_SILENT, &pos, &meta));
+    const void *mapped;
+    esp_partition_mmap_handle_t handle;
+    ESP_ERROR_CHECK(esp_partition_mmap(part, 0, meta.image_len,
+                                    ESP_PARTITION_MMAP_DATA, &mapped, &handle));
+    uint32_t previous = 0;
+    for (unsigned pass = 1; pass <= 16; ++pass) {
+        taskENTER_CRITICAL(&s_lock);
+        cold_cache();
+        taskEXIT_CRITICAL(&s_lock);
+        // ROM CRC reads through SPI0/cache over an image larger than the cache.
+        // Host validation also compares every CRC with the saved app.bin bytes.
+        uint32_t crc = esp_rom_crc32_le(0, mapped, meta.image_len);
+        report("FLASH_READ pass=%u offset=0x%08" PRIx32 " bytes=%" PRIu32
+               " crc32=0x%08" PRIx32 "\n", pass, part->address, meta.image_len, crc);
+        assert(pass == 1 || crc == previous);
+        previous = crc;
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+    esp_partition_munmap(handle);
+}
+#endif
+
 static void profile(const char *name, const uint8_t *start, const uint8_t *end,
                     unsigned rate, unsigned expected_samples, unsigned round, bool cold) {
     uint8_t *input = malloc(2048), *pcm = malloc(16384);
@@ -200,11 +267,15 @@ static void bench_task(void *unused) {
     esp_log_set_vprintf(report_v);
     vTaskDelay(pdMS_TO_TICKS(8000)); // Let the host attach its passive USB reader.
     report("CACHE_HW_ENV target=esp32c3 runtime=%s cpu_hz=%d pcer=%u codec_version=%s "
-           "deep_sleep=0 irq_masked=1 flash_mode=dio flash_mhz=80\n",
+           "deep_sleep=0 irq_masked=1 flash_mode=%s flash_mhz=%u\n",
            s_emulated ? "qemu" : "hardware", esp_clk_cpu_freq(), pcer,
-           esp_audio_codec_get_version());
+           esp_audio_codec_get_version(), CONFIG_ESPTOOLPY_FLASHMODE,
+           (unsigned)atoi(CONFIG_ESPTOOLPY_FLASHFREQ));
     assert(s_emulated || pcer == 1);
     assert(esp_clk_cpu_freq() == 160000000);
+#ifdef YORADIO_HARDWARE_FLASH_TEST
+    flash_check();
+#endif
     if (s_emulated) {
         uint32_t before, after;
         __asm__ volatile("csrr %0, minstret\n.rept 1024\nnop\n.endr\ncsrr %1, minstret"

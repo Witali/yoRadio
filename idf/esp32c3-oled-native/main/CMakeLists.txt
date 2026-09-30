@@ -1,12 +1,16 @@
 get_filename_component(YORADIO_ROOT
   "${CMAKE_CURRENT_LIST_DIR}/../../../yoRadio" ABSOLUTE)
 
-if(YORADIO_HARDWARE_CACHE_TEST)
+if(YORADIO_HARDWARE_CACHE_TEST OR YORADIO_HARDWARE_FLASH_TEST)
   idf_component_register(
     SRCS "hardware_cache_test.c" "native_aac_decoder.c"
     INCLUDE_DIRS "."
-    REQUIRES esp_audio_codec esp_timer esp_hw_support esp_system hal riscv soc)
+    REQUIRES esp_audio_codec esp_timer esp_hw_support esp_system hal riscv soc
+             esp_hal_mspi app_update bootloader_support esp_partition spi_flash)
   target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+  if(YORADIO_HARDWARE_FLASH_TEST)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_HARDWARE_FLASH_TEST=1)
+  endif()
   foreach(FIXTURE lc-48000-stereo he-48000-stereo hev2-44100-stereo)
     configure_file("${YORADIO_ROOT}/../tests/fixtures/aac_stream_format/${FIXTURE}.aac"
                    "${CMAKE_CURRENT_BINARY_DIR}/${FIXTURE}.aac" COPYONLY)
@@ -85,6 +89,7 @@ idf_component_register(
     esp_http_client
     esp_http_server
     esp_hw_support
+    esp_hal_mspi
     esp_hal_rtc_timer
     esp_lcd
     esp_netif
@@ -96,6 +101,7 @@ idf_component_register(
     mbedtls
     nvs_flash
     spiffs
+    spi_flash
     audio_level_led
     native_audio_settings
     custom_flac
