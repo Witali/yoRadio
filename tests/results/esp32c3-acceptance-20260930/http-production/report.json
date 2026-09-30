@@ -1,0 +1,327 @@
+{
+  "board": {
+    "version": "v0.9.693-1049-g3903c058-dirty",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "b0f5c3a1e55bc3b309f6f56f197b7d40bf0d3b4c1c1196de9b2c8288b72832f3"
+  },
+  "cases": [
+    {
+      "name": "http:mp3-320:auto",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 19.953
+    },
+    {
+      "name": "http:mp3-320:mp3",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 17.657
+    },
+    {
+      "name": "http:flac-level8:auto",
+      "result": "PASS",
+      "evidence": {
+        "samples": 5,
+        "rate": 48000,
+        "channels": 2
+      },
+      "seconds": 21.562
+    },
+    {
+      "name": "http:flac-level8:flac",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 18.016
+    },
+    {
+      "name": "http:vorbis-q10:auto",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 17.703
+    },
+    {
+      "name": "http:vorbis-q10:vorbis",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 17.594
+    },
+    {
+      "name": "http:opus-510:auto",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 17.578
+    },
+    {
+      "name": "http:opus-510:opus",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 17.656
+    },
+    {
+      "name": "http:aac-lc-320:auto",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 17.812
+    },
+    {
+      "name": "http:aac-lc-320:aac",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 17.688
+    },
+    {
+      "name": "http:lc-44100-stereo:auto",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 18.969
+    },
+    {
+      "name": "http:lc-44100-stereo:aac",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 18.968
+    },
+    {
+      "name": "http:lc-22050-mono:auto",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 19.125
+    },
+    {
+      "name": "http:lc-22050-mono:aac",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 18.657
+    },
+    {
+      "name": "http:lc-48000-stereo:auto",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 19.468
+    },
+    {
+      "name": "http:lc-48000-stereo:aac",
+      "result": "FAIL",
+      "reason": "Finite stream never reached EOF",
+      "seconds": 18.61
+    },
+    {
+      "name": "http:he-44100-stereo:auto",
+      "result": "FAIL",
+      "reason": "Wrong decoded rate/channels/profile",
+      "seconds": 10.172
+    },
+    {
+      "name": "http:he-44100-stereo:aac",
+      "result": "FAIL",
+      "reason": "Wrong decoded rate/channels/profile",
+      "seconds": 10.156
+    },
+    {
+      "name": "http:he-48000-stereo:auto",
+      "result": "FAIL",
+      "reason": "Wrong decoded rate/channels/profile",
+      "seconds": 10.359
+    },
+    {
+      "name": "http:he-48000-stereo:aac",
+      "result": "FAIL",
+      "reason": "Wrong decoded rate/channels/profile",
+      "seconds": 10.703
+    },
+    {
+      "name": "http:hev2-44100-stereo:auto",
+      "result": "FAIL",
+      "reason": "Wrong decoded rate/channels/profile",
+      "seconds": 10.094
+    },
+    {
+      "name": "http:hev2-44100-stereo:aac",
+      "result": "FAIL",
+      "reason": "Wrong decoded rate/channels/profile",
+      "seconds": 10.172
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "rebooted": true
+      },
+      "seconds": 4.375
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "fixture_hashes": {
+    "mp3-320": "6d8d1a363390c3ba01965ab034a298d58cf4ef4c6e6599cf7d0a7c8b70acc80c",
+    "flac-level8": "d9a54de9e470158428bb340d2278baa6a36a5f5571ea8083af390ec46ca39aad",
+    "vorbis-q10": "09d6cfa599f2c4a25f5745e5c8a605b5a1583a42d7990b9e5242b8990adff12f",
+    "opus-510": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+    "aac-lc-320": "1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5",
+    "lc-44100-stereo": "5705b8cb1ffcdf9414205bc962eec42b8f72ad48030601b4c1fbf3ed171fceb7",
+    "lc-22050-mono": "3709216e19cd58f1892f6287b950aa4ae83c2cb485ba5d284a01e9865f142b21",
+    "lc-48000-stereo": "8b054b26ffdb49e78a50a905aee78952ae822d292e86a3c99972030d642c0982",
+    "he-44100-stereo": "cec9c7851b2b8ee001c804e2ed1e544b772d3c107990a49a7f4dd853f219b4c9",
+    "he-48000-stereo": "c2ac6e74fb70efc3cbff67f50a06586fca634ceed97df05f60b410272d92f0c2",
+    "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e"
+  },
+  "requested_suites": [
+    "http"
+  ],
+  "server_events": [
+    {
+      "mode": "file",
+      "fixture": "mp3-320",
+      "sent": 441645,
+      "complete": true,
+      "seconds": 10.780999999959022
+    },
+    {
+      "mode": "file",
+      "fixture": "mp3-320",
+      "sent": 441645,
+      "complete": true,
+      "seconds": 10.797000000020489
+    },
+    {
+      "mode": "file",
+      "fixture": "flac-level8",
+      "sent": 1771852,
+      "complete": true,
+      "seconds": 15.01600000000326
+    },
+    {
+      "mode": "file",
+      "fixture": "flac-level8",
+      "sent": 1771852,
+      "complete": true,
+      "seconds": 11.71899999998277
+    },
+    {
+      "mode": "file",
+      "fixture": "vorbis-q10",
+      "sent": 703584,
+      "complete": true,
+      "seconds": 10.797000000020489
+    },
+    {
+      "mode": "file",
+      "fixture": "vorbis-q10",
+      "sent": 703584,
+      "complete": true,
+      "seconds": 10.797000000020489
+    },
+    {
+      "mode": "file",
+      "fixture": "opus-510",
+      "sent": 706319,
+      "complete": true,
+      "seconds": 10.795999999972992
+    },
+    {
+      "mode": "file",
+      "fixture": "opus-510",
+      "sent": 706319,
+      "complete": true,
+      "seconds": 10.797000000020489
+    },
+    {
+      "mode": "file",
+      "fixture": "aac-lc-320",
+      "sent": 443706,
+      "complete": true,
+      "seconds": 10.797000000020489
+    },
+    {
+      "mode": "file",
+      "fixture": "aac-lc-320",
+      "sent": 443706,
+      "complete": true,
+      "seconds": 10.796999999962281
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-44100-stereo",
+      "sent": 196746,
+      "complete": true,
+      "seconds": 12.01600000000326
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-44100-stereo",
+      "sent": 196746,
+      "complete": true,
+      "seconds": 12.03100000001723
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-22050-mono",
+      "sent": 193180,
+      "complete": true,
+      "seconds": 11.84399999998277
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-22050-mono",
+      "sent": 193180,
+      "complete": true,
+      "seconds": 11.84399999998277
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-48000-stereo",
+      "sent": 198264,
+      "complete": true,
+      "seconds": 11.98499999998603
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-48000-stereo",
+      "sent": 198264,
+      "complete": true,
+      "seconds": 11.96799999999348
+    },
+    {
+      "mode": "file",
+      "fixture": "he-44100-stereo",
+      "sent": 76800,
+      "complete": false,
+      "seconds": 9.40600000001723
+    },
+    {
+      "mode": "file",
+      "fixture": "he-44100-stereo",
+      "sent": 78848,
+      "complete": false,
+      "seconds": 9.65600000001723
+    },
+    {
+      "mode": "file",
+      "fixture": "he-48000-stereo",
+      "sent": 78848,
+      "complete": false,
+      "seconds": 9.687999999965541
+    },
+    {
+      "mode": "file",
+      "fixture": "he-48000-stereo",
+      "sent": 80896,
+      "complete": false,
+      "seconds": 9.922000000020489
+    },
+    {
+      "mode": "file",
+      "fixture": "hev2-44100-stereo",
+      "sent": 39936,
+      "complete": false,
+      "seconds": 9.797000000020489
+    },
+    {
+      "mode": "file",
+      "fixture": "hev2-44100-stereo",
+      "sent": 37888,
+      "complete": false,
+      "seconds": 9.186999999976251
+    }
+  ]
+}

@@ -4,6 +4,10 @@ This document defines the acceptance tests added after the 2026-09-30 audit.
 **A test exists, a test ran, and a test passed are three different states.**
 Keep failed measurements. Never accept AAC-core fallback as successful HE-AAC.
 
+The [2026-09-30 physical results](../tests/results/esp32c3-acceptance-20260930/README.md)
+record passing OTA checks and outstanding HE-AAC, EOF and HTTP-load failures.
+Tests not run are identified separately from failures.
+
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.
