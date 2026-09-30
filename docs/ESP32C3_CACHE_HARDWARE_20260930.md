@@ -29,6 +29,49 @@ normal Wi-Fi interference or a worst-case execution-time guarantee. A small
 cold/continuous difference does not mean cache stalls are small: both runs
 already miss frequently within calls.
 
+## Full-radio test and memory defect
+
+The separate diagnostic radio build enabled FreeRTOS runtime accounting and
+streamed the same fixtures over LAN HTTP, with PDM output, OLED tasks and 1 Hz
+WebUI status polling. The initial build could not initialize AAC: a 12,288-byte
+allocation failed with 14,848 bytes free but only a 7,680-byte contiguous block.
+
+Disabling `ESP_WIFI_IRAM_OPT` and `ESP_WIFI_RX_IRAM_OPT` moved optional Wi-Fi
+speed-optimized code to cached flash. Diagnostic `.iram0.text` fell from
+`0x12332` to `0xd75a` (19,416 bytes), and the DRAM region boundary moved by
+19,456 bytes. AAC-LC then ran at **48 kHz stereo** in real time, with **34.775%
+mean total CPU** (34.0–35.4% over four stable five-second windows), 18.4% in
+the decoder task and 5.9% in output. Minimum observed free heap was 20,144 bytes.
+Decoder elapsed time was 17.714% per audio second; task accounting, interrupt
+handling and elapsed decoder time are different metrics and need not match.
+The task CPU figures do not independently separate interrupt service time.
+
+**Full-radio HE-AAC did not pass the full-rate check.** The library requested a
+further 55,128-byte SBR block, failed, and silently produced only the core:
+24 kHz stereo for HE and 22.05 kHz mono for v2. The enabled AAC Plus flag did
+not prevent this fallback. Core-only full-radio CPU figures are deliberately
+not presented as full HE/v2 performance. In-stream changes were observed, but
+the required full-rate/stereo transitions are not considered verified.
+
+The Wi-Fi placement change is retained in the C3 defaults and production build
+wrapper (including reused sdkconfigs). It fixes the measured LC initialization
+failure. Further HE memory work is tracked in the
+[memory TODO](ESP32C3_MEMORY_STABILITY_TODO.md). The retained
+[live logs](../tests/results/esp32c3-radio-hardware-20260930/) include both the
+failure and RAM-saving runs; the strict analyzer rejects the HE/v2 fallback.
+
+This SDK-supported setting trades some peak network throughput/cache-miss
+latency for RAM. The measured ELF still places `wDev_ProcessFiq` in IRAM
+(`0x403837a4`) and `ppTask` in ROM (`0x40001720`); `wifi_sta_receive` and
+`wifi_transmit_wrap` are in flash. It does not relocate all interrupt code.
+Connection-time and worst-case interrupt-latency A/B tests were not performed.
+See Espressif's [RAM tuning guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32c3/api-guides/performance/ram-usage.html)
+and [IRAM-safe interrupt requirements](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/system/intr_alloc.html).
+
+After profiling, the quiet production application with the RAM-saving settings
+and **deep sleep disabled** was installed through WebUI OTA. A further 25-second
+LAN test verified actual 48 kHz stereo LC playback in this shipping build.
+
 ## Physical data-cache probe
 
 The probe runs from IRAM and reads one word per distinct 32-byte flash line.

@@ -1,0 +1,32 @@
+{
+  "kind": "physical_radio_aac_profile",
+  "cpu_hz": 160000000,
+  "deep_sleep": false,
+  "warmup_seconds_excluded": 10,
+  "source": "paced LAN HTTP tone fixtures; USB logs and 1 Hz status polling",
+  "cpu_method": "FreeRTOS runtime accounting: busy = total - idle",
+  "cases": {
+    "lc-48000-stereo": {
+      "cpu_windows": 4,
+      "status_samples": 19,
+      "mean_busy_percent": 34.775,
+      "min_busy_percent": 34.0,
+      "max_busy_percent": 35.4,
+      "mean_task_percent": {
+        "decode": 18.4,
+        "output": 5.9,
+        "wifi": 2.75,
+        "tcpip": 0.0,
+        "web": 0.325,
+        "stream": 0.5
+      },
+      "min_free_heap_bytes": 20144,
+      "pcm_rate": 48000,
+      "channels": 2,
+      "mean_decoder_elapsed_percent": 17.713943746259726,
+      "audio_seconds_per_wall_second": 1.001718487730797,
+      "format": "AAC PCM 48 kHz stereo"
+    }
+  },
+  "format_changes_in_one_http_stream_verified": false
+}

@@ -40,6 +40,26 @@ if ($Setup) {
     $buildArguments.Setup = $true
 }
 
+# SDK defaults do not override an existing sdkconfig. Apply the production
+# RAM policy there too, so an older build directory cannot retain Wi-Fi code
+# in IRAM and reproduce the measured AAC allocation failure.
+$productionConfigPath = if ([IO.Path]::IsPathRooted($Sdkconfig)) {
+    $Sdkconfig
+} else {
+    Join-Path $PSScriptRoot $Sdkconfig
+}
+if (Test-Path -LiteralPath $productionConfigPath -PathType Leaf) {
+    $productionConfig = [IO.File]::ReadAllText($productionConfigPath)
+    foreach ($option in @('ESP_WIFI_IRAM_OPT', 'ESP_WIFI_RX_IRAM_OPT')) {
+        $pattern = '(?m)^(?:CONFIG_' + $option + '=.*|# CONFIG_' + $option + ' is not set)\r?\n?'
+        $productionConfig = [regex]::Replace($productionConfig, $pattern, '')
+        $productionConfig = $productionConfig.TrimEnd() + [Environment]::NewLine +
+            '# CONFIG_' + $option + ' is not set' + [Environment]::NewLine
+    }
+    [IO.File]::WriteAllText($productionConfigPath, $productionConfig,
+                          [Text.UTF8Encoding]::new($false))
+}
+
 & (Join-Path $PSScriptRoot "build.ps1") @buildArguments
 $buildExitCode = $LASTEXITCODE
 

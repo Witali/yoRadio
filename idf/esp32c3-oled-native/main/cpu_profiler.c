@@ -17,6 +17,13 @@
 
 static const char *const TAG = "cpu_profile";
 
+static void allocation_failed(size_t size, uint32_t caps, const char *function) {
+    ESP_LOGE(TAG, "PERF allocation failed: requested=%u caps=0x%lx function=%s free=%u largest=%u",
+             (unsigned)size, (unsigned long)caps, function,
+             (unsigned)heap_caps_get_free_size(caps),
+             (unsigned)heap_caps_get_largest_free_block(caps));
+}
+
 typedef struct {
     TaskHandle_t handle;
     configRUN_TIME_COUNTER_TYPE counter;
@@ -141,6 +148,7 @@ static void cpu_profiler_task(void *argument) {
 }
 
 esp_err_t cpu_profiler_start(void) {
+    ESP_ERROR_CHECK(heap_caps_register_failed_alloc_callback(allocation_failed));
     return xTaskCreate(cpu_profiler_task, "cpu_profile",
                        CPU_PROFILE_STACK_BYTES, NULL, 1, NULL) == pdPASS
                ? ESP_OK

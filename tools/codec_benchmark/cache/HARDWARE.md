@@ -92,3 +92,50 @@ See the [hardware report](../../../docs/ESP32C3_CACHE_HARDWARE_20260930.md)
 for the timing boundaries, measured factors and limitations. The older AAC
 calibration CLI still uses its historical 320 kbit/s reference; this experiment
 does not silently replace that factor.
+
+## Full-radio CPU and format checks
+
+For a separate diagnostic build with Wi-Fi, OLED and audio output:
+
+```powershell
+.\idf\esp32c3-oled-native\build.ps1 `
+  -BuildDirectory build-hardware-radio-profile `
+  -Sdkconfig build-hardware-radio-profile/sdkconfig `
+  -SdkconfigDefaults @('sdkconfig.defaults','../../tools/codec_benchmark/cache/sdkconfig.radio-profile.defaults','../../tools/codec_benchmark/cache/sdkconfig.radio-ram.defaults') `
+  -DependencyRoot C:\Work\yoRadio\.idf
+```
+
+Save the resulting app under `firmware/development/esp32c3-oled-radio-profile/`.
+For an already working native C3 OTA endpoint (replace its address):
+
+```powershell
+curl.exe --fail -F updatetarget=fw `
+  -F 'update=@firmware/development/esp32c3-oled-radio-profile/app.bin;type=application/octet-stream' `
+  http://BOARD_IP/update
+
+python tools/codec_benchmark/cache/profile_radio.py --board http://BOARD_IP `
+  --host PC_LAN_IP --serial-port COM9 --seconds 35 --output .build/radio-profile
+python tools/codec_benchmark/cache/analyze_radio.py .build/radio-profile
+```
+
+The host serves only the three known tone fixtures. The script temporarily plays
+them without changing the saved playlist/station or Wi-Fi, then stops playback
+and closes its listener/serial reader. The `changing` case changes ADTS formats
+inside one HTTP response. Restart the radio afterward to restore its saved
+station. Diagnostic capture retains performance/decoder messages and technical
+status fields, excluding normal Wi-Fi setup logs and station names.
+
+The strict analyzer requires full-rate stereo, real-time progress, at least three
+stable CPU windows, and all three formats in one connection. It **must reject**
+the recorded full-radio HE fallback. To summarize only the successful LC subset:
+
+```powershell
+python tools/codec_benchmark/cache/analyze_radio.py .build/radio-profile `
+  --case lc-48000-stereo --skip-changing
+```
+
+For existing diagnostic sdkconfigs, explicitly set both Wi-Fi IRAM options to
+`n` in menuconfig; defaults do not override saved selections. Production builds
+apply that RAM policy automatically. Baseline comparisons need a separate
+diagnostic config with both options `y`. Do not mistake CPU measured while
+decoding failed, or while only AAC core played, for full HE/v2 performance.

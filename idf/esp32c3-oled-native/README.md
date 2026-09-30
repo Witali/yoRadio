@@ -13,6 +13,34 @@ network, WebUI and audio pipeline sources were carried over from that target.
 
 ## Hardware profile
 
+### RAM policy for Wi-Fi and AAC
+
+The C3 defaults and `build-production.ps1` disable `CONFIG_ESP_WIFI_IRAM_OPT`
+and `CONFIG_ESP_WIFI_RX_IRAM_OPT`. The production wrapper also updates an
+existing sdkconfig, since ESP-IDF defaults alone do not replace saved choices.
+Frequently used Wi-Fi routines then execute from cached flash, freeing about
+19 KiB of internal RAM in the measured build. This resolved an AAC-LC allocation
+failure in the full radio; 48 kHz stereo playback used about 35% total CPU in
+the diagnostic LAN test. It trades peak Wi-Fi throughput and some cache-miss
+latency for heap space. Connection-time and worst-case interrupt-latency A/B
+measurements have not been performed.
+
+These are supported SDK placement options, not a manual relocation of every
+interrupt handler. The measured ELF keeps `wDev_ProcessFiq` in IRAM and `ppTask`
+in ROM; ordinary Wi-Fi receive/transmit functions move to flash. Do not infer
+that every networking callback remains cache-independent. See Espressif's
+[RAM guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32c3/api-guides/performance/ram-usage.html)
+and [interrupt allocation guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/system/intr_alloc.html).
+Use `build.ps1` with a separate sdkconfig to compare Wi-Fi IRAM settings.
+
+Full HE-AAC still needs a further memory-layout fix: its additional 55,128-byte
+SBR allocation failed in the full radio and the codec silently output only
+the AAC core. Full-rate HE/v2 passed the isolated hardware decoder benchmark.
+See the [hardware measurements](../../docs/ESP32C3_CACHE_HARDWARE_20260930.md)
+and [remaining memory work](../../docs/ESP32C3_MEMORY_STABILITY_TODO.md).
+
+### Connections and controls
+
 - ESP32-C3, one RISC-V core at 160 MHz, 4 MiB flash;
 - native USB Serial/JTAG console;
 - SSD1306 72x40 OLED at I2C address `0x3c`, SDA GPIO5, SCL GPIO6;
