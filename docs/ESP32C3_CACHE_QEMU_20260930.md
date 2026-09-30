@@ -1,5 +1,9 @@
 # ESP32-C3 QEMU cache-traffic experiment — 2026-09-30
 
+Follow-up: [physical board measurements](ESP32C3_CACHE_HARDWARE_20260930.md)
+now provide actual cycle timing and a cold-data-line probe in a separate test
+image. The model-only results below remain unchanged.
+
 **Two independent QEMU boots produced identical cache traces for AAC-LC,
 HE-AAC and HE-AAC v2.** The experiment adds reproducible modelled miss counts;
 it does not measure physical cache latency or change the saved CPU coefficients.

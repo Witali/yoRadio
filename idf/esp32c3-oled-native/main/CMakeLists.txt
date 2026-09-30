@@ -1,6 +1,21 @@
 get_filename_component(YORADIO_ROOT
   "${CMAKE_CURRENT_LIST_DIR}/../../../yoRadio" ABSOLUTE)
 
+if(YORADIO_HARDWARE_CACHE_TEST)
+  idf_component_register(
+    SRCS "hardware_cache_test.c" "native_aac_decoder.c"
+    INCLUDE_DIRS "."
+    REQUIRES esp_audio_codec esp_timer esp_hw_support esp_system hal riscv soc)
+  target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+  foreach(FIXTURE lc-48000-stereo he-48000-stereo hev2-44100-stereo)
+    configure_file("${YORADIO_ROOT}/../tests/fixtures/aac_stream_format/${FIXTURE}.aac"
+                   "${CMAKE_CURRENT_BINARY_DIR}/${FIXTURE}.aac" COPYONLY)
+    target_add_binary_data(${COMPONENT_LIB}
+                          "${CMAKE_CURRENT_BINARY_DIR}/${FIXTURE}.aac" BINARY)
+  endforeach()
+  return()
+endif()
+
 if(YORADIO_OVERCLOCK_EXPERIMENT)
   idf_component_register(
     SRCS "overclock_experiment.c"

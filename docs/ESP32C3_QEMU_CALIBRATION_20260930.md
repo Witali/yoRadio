@@ -1,5 +1,10 @@
 # ESP32-C3 QEMU codec calibration — 2026-09-30
 
+Later the same day, [physical cache/AAC measurements](ESP32C3_CACHE_HARDWARE_20260930.md)
+validated LC, HE and HE-v2 with an identical board/QEMU test image. Their scoped
+factors differ from the historical LC factor below; the old extrapolations are
+retained as provenance, not promoted to hardware measurements.
+
 ## Saved factors
 
 The original physical-board test files were replayed through the Espressif RISC-V

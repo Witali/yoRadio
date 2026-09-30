@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "target": "esp32c3",
+  "cpu_hz": 160000000,
+  "kind": "same_image_hardware_aac_cache_calibration",
+  "deep_sleep": false,
+  "hardware_runs": 2,
+  "qemu_runs": 2,
+  "hardware_decoder_timing_measured": true,
+  "whole_radio_cpu_measured": false,
+  "universal_refill_penalty_cycles": null,
+  "historical_factor_replaced": false,
+  "instruction_cache_line_semantics_independently_validated": false,
+  "data_cache_line_semantics_validated": true,
+  "cases": {
+    "lc48000_stereo": {
+      "rate": 48000,
+      "channels": 2,
+      "samples_per_pass": 26624,
+      "modes": {
+        "continuous": {
+          "windows": 24,
+          "mean_cycles": 14828145.333333334,
+          "min_cycles": 14814128,
+          "max_cycles": 14848122,
+          "cycle_spread_percent": 0.22925321566401335,
+          "mean_qemu_instructions": 6796226,
+          "decoder_cpu_percent": 16.708396935096157,
+          "effective_cycles_per_instruction": 2.1818205182307553,
+          "historical_2_018_factor_error_percent": -7.499590401489009,
+          "mean_instruction_misses_raw": 12437,
+          "mean_data_misses": 6106.333333333333,
+          "maximum_call_us": 4773
+        },
+        "cold": {
+          "windows": 24,
+          "mean_cycles": 15119344,
+          "min_cycles": 15119344,
+          "max_cycles": 15119344,
+          "cycle_spread_percent": 0.0,
+          "mean_qemu_instructions": 6796226,
+          "decoder_cpu_percent": 17.03652043269231,
+          "effective_cycles_per_instruction": 2.224667631712071,
+          "historical_2_018_factor_error_percent": -9.28114890966284,
+          "mean_instruction_misses_raw": 13226,
+          "mean_data_misses": 6292,
+          "maximum_call_us": 4796
+        }
+      },
+      "cold_extra_cycles": 291198.66666666605,
+      "cold_extra_decoder_percent_points": 0.32812349759615245,
+      "cold_relative_slowdown_percent": 1.9638239315881134,
+      "cold_extra_misses_raw": 974.666666666667,
+      "observed_delta_cycles_per_extra_miss": 298.7674418604644
+    },
+    "he48000_stereo": {
+      "rate": 48000,
+      "channels": 2,
+      "samples_per_pass": 30720,
+      "modes": {
+        "continuous": {
+          "windows": 24,
+          "mean_cycles": 35380088.333333336,
+          "min_cycles": 35379159,
+          "max_cycles": 35381645,
+          "cycle_spread_percent": 0.007026551139664104,
+          "mean_qemu_instructions": 19642325,
+          "decoder_cpu_percent": 34.55086751302083,
+          "effective_cycles_per_instruction": 1.8012169299374354,
+          "historical_2_018_factor_error_percent": 12.046077433766133,
+          "mean_instruction_misses_raw": 23102.666666666668,
+          "mean_data_misses": 5682,
+          "maximum_call_us": 17925
+        },
+        "cold": {
+          "windows": 24,
+          "mean_cycles": 35405957,
+          "min_cycles": 35405229,
+          "max_cycles": 35407413,
+          "cycle_spread_percent": 0.006168453517581801,
+          "mean_qemu_instructions": 19642325,
+          "decoder_cpu_percent": 34.5761298828125,
+          "effective_cycles_per_instruction": 1.8025339159188132,
+          "historical_2_018_factor_error_percent": 11.964213169274096,
+          "mean_instruction_misses_raw": 23184,
+          "mean_data_misses": 5680,
+          "maximum_call_us": 17935
+        }
+      },
+      "cold_extra_cycles": 25868.666666664183,
+      "cold_extra_decoder_percent_points": 0.02526236979166896,
+      "cold_relative_slowdown_percent": 0.07311645585206758,
+      "cold_extra_misses_raw": 79.33333333333212,
+      "observed_delta_cycles_per_extra_miss": 326.0756302520745
+    },
+    "hev2_44100_stereo": {
+      "rate": 44100,
+      "channels": 2,
+      "samples_per_pass": 30720,
+      "modes": {
+        "continuous": {
+          "windows": 24,
+          "mean_cycles": 49687538,
+          "min_cycles": 49686394,
+          "max_cycles": 49688848,
+          "cycle_spread_percent": 0.0049388641473844,
+          "mean_qemu_instructions": 25411020.333333332,
+          "decoder_cpu_percent": 44.58049368896485,
+          "effective_cycles_per_instruction": 1.9553539113430065,
+          "historical_2_018_factor_error_percent": 3.2136895709911295,
+          "mean_instruction_misses_raw": 36249.333333333336,
+          "mean_data_misses": 10010.333333333334,
+          "maximum_call_us": 22523
+        },
+        "cold": {
+          "windows": 24,
+          "mean_cycles": 49722711.333333336,
+          "min_cycles": 49722004,
+          "max_cycles": 49723824,
+          "cycle_spread_percent": 0.0036602991896379153,
+          "mean_qemu_instructions": 25411020.333333332,
+          "decoder_cpu_percent": 44.612051794433604,
+          "effective_cycles_per_instruction": 1.956738087691376,
+          "historical_2_018_factor_error_percent": 3.14067727116889,
+          "mean_instruction_misses_raw": 36358,
+          "mean_data_misses": 10010.333333333334,
+          "maximum_call_us": 22534
+        }
+      },
+      "cold_extra_cycles": 35173.33333333582,
+      "cold_extra_decoder_percent_points": 0.03155810546875415,
+      "cold_relative_slowdown_percent": 0.07078904439446329,
+      "cold_extra_misses_raw": 108.66666666666606,
+      "observed_delta_cycles_per_extra_miss": 323.6809815951167
+    }
+  },
+  "probes": {
+    "1": {
+      "cold_cycles": 115,
+      "warm_cycles": 12,
+      "extra_cycles_per_cold_line": 103.0
+    },
+    "8": {
+      "cold_cycles": 2397,
+      "warm_cycles": 61,
+      "extra_cycles_per_cold_line": 292.0
+    },
+    "64": {
+      "cold_cycles": 20653,
+      "warm_cycles": 453,
+      "extra_cycles_per_cold_line": 315.625
+    },
+    "256": {
+      "cold_cycles": 83245,
+      "warm_cycles": 1797,
+      "extra_cycles_per_cold_line": 318.15625
+    }
+  },
+  "log_sha256": {
+    "hardware-run-1.log": "8cd7d4bfee5dd8227e2d05fd5af4722d2f3828736847602d1d332c0d09561ee1",
+    "hardware-run-2.log": "c92a28aaad85ae328a865073c144d9d231cd19ce57f91f97173b58459d94dea5",
+    "qemu-run-1.log": "d50f50db566843bcace624e43b54f7fceba6ddc21cb30d668caddd18b9854cdc",
+    "qemu-run-2.log": "d50f50db566843bcace624e43b54f7fceba6ddc21cb30d668caddd18b9854cdc"
+  }
+}

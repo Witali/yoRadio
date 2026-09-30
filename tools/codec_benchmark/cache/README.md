@@ -1,5 +1,9 @@
 # ESP32-C3 flash-cache trace experiment
 
+For physical-board measurements and the identical-image hardware/QEMU comparison,
+see [HARDWARE.md](HARDWARE.md) and the
+[hardware report](../../../docs/ESP32C3_CACHE_HARDWARE_20260930.md).
+
 This test executes the actual Espressif RISC-V AAC decoder in QEMU and feeds
 its flash accesses into three cache models. It measures **modelled traffic**,
 not hardware cache misses, stall cycles or CPU utilization. It does not change
