@@ -46,7 +46,7 @@ retain both failures and passes; the production default remains DIO 80 MHz.
 | C3-T13 | Interrupt-latency A/B under flash/Wi-Fi load | Manual procedure below + `compare_latency.py --kind irq` | External edge timing, full provenance, at least 30 samples and an explicit absolute deadline. Host HTTP timing cannot substitute. |
 | C3-T14 | Real browser rendering, OLED appearance and physical audio | Manual procedure below | Upload form/progress/errors are usable; whole OLED updates; stereo channels and audio continuity are checked physically. |
 | C3-T15 | Power interruption during OTA | Manual procedure below | Dedicated recoverable test board boots the previous/new valid app after interruption at each stage; do not assume automatic rollback exists. |
-| C3-T16 | Future AAC buffer-reuse equivalence and error paths | Existing `run-esp32c3-stream-format.py`, new full-radio matrix and procedure below | New implementation must additionally pass PCM/state equivalence, ownership, cancellation/OOM and all HE/v2 acceptance cases. The optimization itself is still planned. |
+| C3-T16 | AAC buffer-reuse equivalence and error paths | `run-esp32c3-stream-format.py`, `run-esp32c3-memory-trace.py`, `compare-pcm-wav.py`, real-decoder QEMU and full-radio matrix | Adaptive ADTS and 8 KiB PCM pass host OOM/retry checks and byte-identical fixture output. Full-radio HE/v2 and internal-state/exhaustive-profile coverage remain open. |
 | C3-T17 | Stable terminal status after buffered decoder output | `tests/run-esp32c3-eof.py`, `run.py --suite eof`, `reference_eof.py` | EOF follows queued PCM; stopped REST/WebSocket status stays stopped and clears stream parameters. Exercise all eleven fixtures with AUTO/explicit codecs, late metadata, stale generations, cancellation and failures. Profile/rate acceptance remains a separate requirement. |
 
 ## What “all formats” means here
@@ -89,7 +89,22 @@ From a WSL shell in the same checkout:
 python3 tests/run-esp32c3-ota.py
 python3 tests/run-esp32c3-stream-format.py
 python3 tests/run-esp32c3-eof.py
+python3 tests/run-esp32c3-memory-trace.py
 ```
+
+For the same deterministic QEMU fixture sequence, compare the baseline and
+candidate captures with `python tests/compare-pcm-wav.py before.wav after.wav`.
+The tool checks layout/duration, non-silent data and every PCM byte. Keep both
+image/configuration identities with the result; equal captures alone cannot
+prove a different decoder's internal-state equivalence.
+
+`memory.py --minimal` checks existing INFO-level production RAM logs without
+requiring the extra profiler task, runtime counters or allocation-trace arrays.
+It still rejects incorrect HE/v2 output. `--audio-buffer-blocks 14` temporarily
+selects the maximum compressed buffer, reboots to apply it, then restores the
+original value and verifies Wi-Fi/playlist/settings against an in-memory snapshot.
+The original non-private buffer count is saved in the report for recovery if
+the test process is interrupted. This does not test stacks or CPU in minimal mode.
 
 The new host tests exercise the acceptance checks against valid and invalid
 evidence, including the retained physical SBR failure, actual HTTP/TLS server
