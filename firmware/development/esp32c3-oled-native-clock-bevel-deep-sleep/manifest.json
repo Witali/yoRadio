@@ -1,0 +1,24 @@
+{
+  "target": "esp32c3-oled-native",
+  "variant": "esp32c3-oled-native-clock-bevel-deep-sleep",
+  "source_commit": "55ed25f7b30c313b2c2d37e8cbae2fe3a58dee0f",
+  "app_version": "v0.9.693-1029-g55ed25f7",
+  "esp_idf": "v6.0.2",
+  "production": true,
+  "deep_sleep_clock": true,
+  "external_rtc_crystal": false,
+  "size_bytes": 1311888,
+  "sha256": "945a87afaf2caa65d82eda2b74afa018d7df09e398e32bf0721b29484021351b",
+  "change": "Straight seven-segment clock digits with pointed 45-degree ends and narrow diagonal gaps, shared by ordinary rendering and the RTC glyph cache",
+  "validation": [
+    "production build",
+    "89 ESP32-C3 regression tests",
+    "actual RTC wake-stub host tests",
+    "2880 ordinary and RTC-rendered clock frames matched pixel for pixel",
+    "application scan found no known board Wi-Fi values"
+  ],
+  "hardware_tested": false,
+  "known_limitations": [
+    "The previously reported partial OLED screen during deep sleep is still unresolved; this font change does not fix it. See docs/ESP32C3_HARDWARE_VALIDATION_20260930.md."
+  ]
+}
