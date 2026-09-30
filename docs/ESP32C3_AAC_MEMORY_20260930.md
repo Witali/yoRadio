@@ -2,6 +2,9 @@
 
 ## Conclusions
 
+The next implementation steps, dependencies and acceptance gates are saved in
+the [AAC/SBR memory execution plan](ESP32C3_MEMORY_STABILITY_TODO.md#execution-plan-and-decision-gates).
+
 1. **The Helix arena mechanism can be shared with Espressif AAC, but the current
    24 KiB arena cannot hold it.** Production Espressif AAC does not use this
    arena; it is not a spare resident 24 KiB block that can simply be reclaimed.

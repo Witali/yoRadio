@@ -28,6 +28,131 @@ benchmark used about 12.2 KiB. A fix must preserve other codecs and user setting
 
 ## AAC memory reuse during decoding — planned, 2026-09-30
 
+### Execution plan and decision gates
+
+Status: **planned, not implemented**. The baseline is the fixed EOF application
+from `69410cd5`, archived and tested in `1bfc8b64`: DIO 80 MHz, no deep sleep,
+Espressif AAC Plus, no PSRAM. The [EOF correction](ESP32C3_EOF_STATUS.md) is
+complete; it does not resolve SBR memory allocation. Keep its regressions passing.
+
+**Objective:** full-rate AAC-LC, HE-AAC v1 and HE-AAC v2 in the complete C3 radio,
+with both output channels and all existing supported rates/bitrates preserved.
+Do not obtain a memory saving by imposing a 22/24 kHz ceiling, disabling SBR/PS,
+forcing mono, or replacing production AAC with the current LC-only Helix path.
+
+The [measured allocation map](ESP32C3_AAC_MEMORY_20260930.md) is the starting
+point, not a universal capacity calculation:
+
+| Item | Recorded size / estimate | Planning consequence |
+| --- | ---: | --- |
+| SBR object plus control object | 55,128 + 1,180 bytes | The shipped binary needs the first object contiguous |
+| Free heap at the measured failure | 36,192 bytes; largest block 13,312 bytes | Recover at least the 20,116-byte arithmetic deficit **plus** operating headroom; also address fragmentation |
+| SDK state with SBR | Roughly 107 KiB before margin | Budget estimate, not a proven arena size for every stream |
+| SDK state, ADTS wrapper and caller PCM | Roughly 127 KiB before margin | These allocations coexist; moving them into one pool does not reduce their total |
+| Existing C3 Helix arena capacity | 24 KiB | Not resident in the production Espressif build; cannot count it as reclaimable RAM |
+
+Proceed in this order; keep each accepted change and its evidence in a focused
+commit. Record rejected candidates as well as improvements.
+
+1. **Establish the peak live allocation budget.**
+   - [ ] Trace allocation size, owner, lifetime and peak overlap through decoder
+     open, first LC/SBR/PS frame, format changes, EOF, Stop and close. Use bounded,
+     preallocated trace storage; do not allocate from the hook being measured.
+   - [ ] Distinguish persistent history, frame-local scratch, input framing,
+     caller PCM and queued/DMA-owned output. Separate decoder-owned allocations
+     from registration/global objects that survive decoder close.
+   - [ ] Measure total free RAM, largest block, stack margins and transient TLS/
+     WebUI/OTA demand on the physical board, including the largest selectable
+     audio buffer. Record instrumentation overhead and remeasure the quiet build.
+   - Gate: save a lifetime diagram and a worst-observed concurrent budget. Do
+     not add all allocation sizes together or count already shared memory twice.
+
+2. **Recover RAM outside SBR before reserving a large arena.**
+   - [ ] In `audio_service.c`, evaluate an AAC-specific initial caller PCM
+     workspace of 8,192 bytes instead of the shared 12,288-byte default: a
+     **candidate** saving of 4,096 bytes. Verify the supported output layouts,
+     needed-size/retry contract and transitions; other codecs retain the space
+     they need. This alone cannot close the measured deficit.
+   - [ ] Check bounded-output support before attempting smaller PCM chunks.
+     The current adapter requires a complete 8,192-byte SBR stereo frame. Preserve
+     the ability to receive legal ADTS frames up to the existing 8,191-byte limit;
+     reducing a constant or splitting a network read is not a framing solution.
+   - [ ] Audit system RAM candidates separately: stack reductions only after
+     worst-path measurements, heap-function placement in flash only after a
+     cache-disabled/ISR call audit, and Wi-Fi pool changes only with throughput,
+     reconnect and concurrent WebUI tests. Preserve the shared 16 KiB decoder
+     stack, full TLS receive capability and the user's buffer setting.
+   - Gate: quantify actual peak savings. The already disabled Wi-Fi IRAM options
+     and existing scratch overlays are baseline savings, not new gains.
+
+3. **Prototype a common codec arena with correct ownership.**
+   - [ ] Reuse the Helix arena's single-owner concept for Espressif AAC; avoid
+     reserving independent pools for mutually exclusive decoder owners. Pin and
+     verify the media allocator ABI and route only the intended allocations.
+   - [ ] Implement alignment, zeroing, overflow checks, individual frees and
+     realloc semantics, including preservation of old data on realloc failure.
+     The existing bump allocator with no-op free is insufficient for repeated
+     AAC reopen/configuration changes within one session.
+   - [ ] Keep long-lived registration objects outside resets. Transfer ownership
+     only after decoder close and release of all consumers; test open failure,
+     repeated LC/HE/PS changes, Stop, cancellation and switching to other codecs.
+   - Gate: reserve a measured budget early enough to avoid fragmentation **only
+     once it fits the concurrent system budget**. An early reservation prototype
+     may measure placement; it must not starve networking or be called a RAM saving.
+
+4. **Reduce decoder-internal storage where source access permits.**
+   - [ ] Obtain buildable compatible source or evaluate an equally capable
+     source-available decoder. Rebuild all users of changed structures, including
+     optimized routines. Allocator interception cannot split the shipped
+     `SBRDECODER_DATA` object, whose fields are accessed at fixed offsets.
+   - [ ] Separate persistent low-band QMF history from frame-local work; evaluate
+     one workspace for sequential stereo channels. The investigation estimates
+     **6,144 bytes** of potential ordinary-stereo savings, not a measured result
+     and not an automatic saving for HEv2/PS.
+   - [ ] Map a separate PS-safe layout: the right SBR channel already holds live
+     PS state for a mono AAC core. Preserve filter delays, smoothing history,
+     overlap, decorrelation and both output channels across frames.
+   - [ ] Evaluate splitting large embedded arrays into smaller blocks and sharing
+     envelope/synthesis scratch after its last reader. Splitting alone saves no
+     payload RAM; never overlay input or PCM still owned by a queue/DMA consumer.
+   - Gate: prove lifetimes and equivalence before combining optimizations. Do not
+     add the estimated PCM and QMF savings unless they coexist in the same build.
+     If compatible source is unavailable, retain internal-layout changes as blocked
+     work; do not patch binary offsets or substitute an LC-only decoder.
+
+5. **Prove compatibility and failure handling.**
+   - [ ] Compare optimized PCM and persistent state with the unchanged same
+     decoder, bit-exactly where applicable. Use FFmpeg/FDK for independent profile,
+     layout, duration and drain checks; different decoder PCM is not assumed exact.
+   - [ ] Cover LC/HE/v2, distinct left/right audio, window sequences, supported
+     rates/bitrates and actual input paths; add missing fixture coverage explicitly.
+     Test truncated/malformed input, allocation failure at every stage, failed
+     realloc, backpressure, cancellation, reset, EOF and repeated owner changes.
+   - [ ] Require correct LC -> SBR/PS transitions, including unchanged ADTS core
+     headers. The existing detection/reopen limitation is a separate acceptance
+     item; lower RAM consumption does not automatically fix it.
+   - Gate: full decoded rate/channels and truthful OLED/WebUI metadata. AAC-core
+     fallback is a failure of HE/v2 acceptance, even if audio and EOF still work.
+
+6. **Qualify the complete radio and retain the result.**
+   - [ ] Run the [C3 acceptance suites](ESP32C3_TESTING.md): HTTP and trusted
+     HTTPS matrices, format transitions, EOF, faults, switching/heap recovery,
+     WebSocket, concurrent load, one-hour LC/HE/v2 soaks and exact-image OTA.
+     Recheck MP3, FLAC, Vorbis and Opus and inspect physical stereo output/OLED.
+   - [ ] Compare total and decoder CPU, peak call time, RAM/largest-block minima,
+     task stacks and actual underruns against the baseline. Use the existing
+     published budgets; predeclare any additional regression limit before A/B.
+     QEMU helps isolate decoder behavior but does not qualify full-radio memory,
+     Wi-Fi, TLS or real-time output.
+   - [ ] Save source/library/configuration hashes, allocation maps, failed and
+     passing results, and successful test images under `firmware/development/`.
+     Update manifests/changelog and preserve Wi-Fi, playlist and user settings.
+   - Completion gate: full-rate HE/v2 works with the normal radio services and
+     sustained load, all supported formats remain available, and the tests pass.
+     A larger arena, isolated decode or a few saved KiB alone is not completion.
+
+### Existing findings and detailed checklist
+
 The [RAM/SBR investigation](ESP32C3_AAC_MEMORY_20260930.md) now maps the 55,128-byte
 object, verifies existing PS reuse against the binary, and measures the full
 radio. The 24 KiB Helix arena is not allocated in the current Espressif build.
