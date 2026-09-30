@@ -21,7 +21,7 @@ typedef struct {
     uint32_t magic_word;
     uint8_t reserved1[12];
     char version[32], project_name[32];
-    uint8_t reserved2[176];
+    uint8_t reserved2[64], app_elf_sha256[32], reserved3[80];
 } esp_app_desc_t;
 typedef struct { uint32_t offset, size; } esp_partition_pos_t;
 typedef struct { uint32_t image_len; } esp_image_metadata_t;

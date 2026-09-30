@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include <string.h>
 #include "audio_service.h"
 #include "deep_sleep_clock.h"
@@ -11,8 +12,26 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "ota_upload.h"
+#include "lwip/sockets.h"
+#include "lwip/tcp.h"
 
 static bool s_reboot_pending;
+
+static void finish_rejection(httpd_req_t *request) {
+    /* A close with unread upload bytes can reset TCP and discard our error in
+     * the browser. Send FIN first, then briefly drain the peer. Never let an
+     * oversized body or a silent sender keep the HTTP task occupied forever. */
+    int fd = httpd_req_to_sockfd(request);
+    if (shutdown(fd, SHUT_WR) != 0) return;
+    int64_t deadline = esp_timer_get_time() + 250000;
+    char discard[256];
+    while (esp_timer_get_time() < deadline) {
+        int n = recv(fd, discard, sizeof(discard), MSG_DONTWAIT);
+        if (n == 0 || (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK &&
+                      errno != EINTR)) break;
+        vTaskDelay(1);
+    }
+}
 
 static void ota_reboot(void *argument) {
     (void)argument;
@@ -45,12 +64,16 @@ static bool boundary_from_request(httpd_req_t *request, char *boundary,
 }
 
 esp_err_t web_ota_handler(httpd_req_t *request) {
+    int no_delay = 1;
+    (void)setsockopt(httpd_req_to_sockfd(request), IPPROTO_TCP, TCP_NODELAY,
+                     &no_delay, sizeof(no_delay));
     httpd_resp_set_type(request, "text/plain; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     httpd_resp_set_hdr(request, "Connection", "close");
     if (s_reboot_pending || !deep_sleep_clock_begin_activity()) {
         httpd_resp_set_status(request, "503 Service Unavailable");
         httpd_resp_sendstr(request, "Radio is sleeping or rebooting; wake it and retry");
+        finish_rejection(request);
         return ESP_FAIL;
     }
     display_settings_note_activity();
@@ -112,6 +135,7 @@ done:
         // between changing otadata and booting the new application.
         xTaskNotifyGive(reboot);
     } else {
+        finish_rejection(request);
         display_settings_note_activity();
         deep_sleep_clock_end_activity();
     }
@@ -140,7 +164,9 @@ esp_err_t web_ota_info_handler(httpd_req_t *request) {
     }
     version[used] = 0;
     char hash[65], body[448];
-    esp_app_get_elf_sha256(hash, sizeof(hash));
+    // esp_app_get_elf_sha256() may use a shortened CONFIG_APP_RETRIEVE_LEN_ELF_SHA.
+    for (size_t i = 0; i < sizeof(app->app_elf_sha256); ++i)
+        snprintf(hash + i * 2, 3, "%02x", app->app_elf_sha256[i]);
     snprintf(body, sizeof(body),
              "{\"version\":\"%s\",\"partition\":\"%s\",\"max_size\":%lu,"
              "\"app_elf_sha256\":\"%s\"}", version,

@@ -22,3 +22,7 @@ void vTaskDelay(unsigned);
 int xTaskCreate(void (*)(void *), const char *, unsigned, void *, unsigned, TaskHandle_t *);
 void vTaskDelete(TaskHandle_t);
 void xTaskNotifyGive(TaskHandle_t);
+int httpd_req_to_sockfd(httpd_req_t *);
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>

@@ -9,6 +9,16 @@ static size_t read_offset;
 static int64_t now_us;
 static const char *content_type;
 static char response[512];
+static bool half_closed;
+int httpd_req_to_sockfd(httpd_req_t *req) { (void)req; return 42; }
+int setsockopt(int fd, int level, int option, const void *value, socklen_t size) {
+    (void)fd; (void)level; (void)option; (void)value; (void)size; return 0;
+}
+int shutdown(int fd, int how) { assert(fd==42 && how==SHUT_WR && replies); half_closed=true; return 0; }
+ssize_t recv(int fd, void *buffer, size_t size, int flags) {
+    (void)buffer; (void)size; assert(fd==42 && flags==MSG_DONTWAIT && half_closed);
+    errno=EAGAIN; return -1;
+}
 bool deep_sleep_clock_begin_activity(void) {
     if (sleeping) return false;
     ++activity; return true;
@@ -64,6 +74,7 @@ static void reset_http(void) {
     reset(); activity = replies = notifications = deleted = stopped = notes = 0;
     sleeping = task_failure = send_failure = s_reboot_pending = false;
     status_code = 200; transport_error = 0; read_offset = 0; now_us = 0;
+    half_closed=false;
     content_type = "multipart/form-data; boundary=\"test-boundary\"";
     esp_image_header_t header = {.magic=ESP_IMAGE_HEADER_MAGIC, .chip_id=5};
     memset(image, 0, sizeof(image)); memcpy(image, &header, sizeof(header));
@@ -89,6 +100,7 @@ int main(void) {
             assert(!open_handle && activity==(scenario==13 ? 1 : 0));
             assert(selects==(scenario==5 ? 1U : 0U));
             assert(deleted==(scenario==5 ? 1 : 0));
+            assert(half_closed);
         }
         assert(replies==1);
     }
@@ -99,5 +111,6 @@ int main(void) {
     reset_http(); strcpy(app.version, "test\"\\\nversion");
     assert(web_ota_info_handler(&req)==ESP_OK && activity==0 && notes==1);
     assert(strstr(response,"test\\u0022\\u005c\\u000aversion"));
+    assert(strstr(response,"\"app_elf_sha256\":\"0000000000000000000000000000000000000000000000000000000000000000\""));
     puts("C3 OTA HTTP deadlines, failure cleanup, deep-sleep lease and reboot ordering passed");
 }

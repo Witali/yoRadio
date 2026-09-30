@@ -14,7 +14,8 @@ with tempfile.TemporaryDirectory(prefix="yoradio-c3-ota-") as temporary:
     for name in ("esp_ota_ops.h", "esp_app_format.h", "esp_image_format.h"):
         (tmp / name).write_text('#include "esp32c3_ota_mock.h"\n')
     for name in ("esp_http_server.h", "esp_err.h", "esp_system.h", "esp_timer.h",
-                 "freertos/FreeRTOS.h", "freertos/semphr.h", "freertos/task.h"):
+                 "freertos/FreeRTOS.h", "freertos/semphr.h", "freertos/task.h",
+                 "lwip/sockets.h", "lwip/tcp.h"):
         header = tmp / name
         header.parent.mkdir(parents=True, exist_ok=True)
         header.write_text('#include "esp32c3_ota_http_mock.h"\n')
