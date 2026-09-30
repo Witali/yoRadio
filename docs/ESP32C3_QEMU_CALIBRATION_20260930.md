@@ -89,6 +89,21 @@ and [TRM, System and Memory](https://documentation.espressif.com/esp32-c3_techni
 Critical-word-first/early-restart behavior also means full line transfer time
 is not automatically equal to CPU stall time.
 
+The read-only/no-writeback statement and the JSON cache flags are specific to
+**ESP32-C3**, not the entire ESP32 family. On a chip with a writeback-capable
+PSRAM cache, such as **ESP32-S3**, modified (dirty) lines can be written back to
+PSRAM by cache replacement or explicit synchronization. A model for that target
+must account for refill and writeback traffic, bus contention, and any cache
+maintenance needed for DMA; buffered transfers need not stall the CPU for their
+entire duration. It requires a separate calibration for that chip and PSRAM
+configuration, rather than reusing the C3 factors.
+
+PSRAM presence alone does not imply writeback support: ESP-IDF explicitly notes
+that the original ESP32 does not support cache writeback. Check the target's
+`SOC_CACHE_WRITEBACK_SUPPORTED` capability and cache policy. See Espressif's
+[ESP32-S3 memory synchronization documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-reference/system/mm_sync.html),
+including `esp_cache_msync()` and the chip-specific API notes.
+
 The installed QEMU implementation (`hw/misc/esp32c3_cache.c`) copies a 64 KiB
 flash page into its memory region when the MMU mapping changes; it does not
 simulate line residency, replacement or refill timing. Its build also has TCG
