@@ -1,0 +1,23 @@
+{
+  "scope": "Illustrative G.711 round trip of every signed 16-bit input; NOT an SBR simulation",
+  "implementation": "Python audioop",
+  "python_version": "3.12.10",
+  "inputs": 65536,
+  "pcm_bits": 16,
+  "results": {
+    "mu-law": {
+      "max_absolute_error": 644,
+      "input_at_first_max": -32768,
+      "output_at_first_max": -32124,
+      "samples_exceeding_one_lsb": 64787,
+      "sample_30000_output": 30076
+    },
+    "A-law": {
+      "max_absolute_error": 512,
+      "input_at_first_max": -32768,
+      "output_at_first_max": -32256,
+      "samples_exceeding_one_lsb": 64768,
+      "sample_30000_output": 30208
+    }
+  }
+}

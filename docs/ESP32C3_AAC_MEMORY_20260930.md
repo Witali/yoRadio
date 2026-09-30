@@ -254,6 +254,13 @@ Espressif's core requirement is 35,460 bytes and its initialization allocates
 several extra objects separately; the upstream monolithic core is 108,344.
 Do not substitute upstream core offsets into the Espressif binary.
 
+The later [decompilation audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md)
+also confirms **reordered fields inside SBR_FRAME_DATA**, despite matching
+aggregate sizes: the imaginary low-band QMF matrix is at `0x25b0` in Espressif
+versus `0x2a34` in the reference. Use the recovered field map, not reference
+offsets, for any binary-level investigation. The audit records new pointer-table,
+smoothing-history and PS layout candidates and the one-LSB PCM accuracy limit.
+
 | Storage inside both SBR channels | Bytes | Lifetime / reuse constraint |
 | --- | ---: | --- |
 | Low-band QMF real/imaginary matrices, `40 × 32` each | 20,480 | Current-frame work plus prior-frame rows; cannot discard all rows |

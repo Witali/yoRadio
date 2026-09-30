@@ -33,6 +33,26 @@ benchmark used about 12.2 KiB. A fix must preserve other codecs and user setting
 
 ## AAC memory reuse during decoding — planned, 2026-09-30
 
+The [AAC decompilation audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md)
+recovers 176 linked functions and documents RAM candidates. Preserve the complete
+existing format/tool support; the user permits at most one output PCM LSB of
+error per sample/channel. Layout-only changes should remain byte-identical.
+
+- [x] Decompile the shipped decoder, verify critical allocations/offsets against
+  disassembly and save reproducible evidence. Probe reference pointer-table
+  compaction on RV32: 55,128 → 53,240 bytes; no decoder change executed.
+- [ ] Obtain/build a compatible full-feature source backend; account for the
+  confirmed Espressif/reference SBR field-order differences before layout edits.
+- [ ] Compact smoothing pointer tables (1,888-byte candidate), then validate
+  full-format output, reset paths and PS aliases.
+- [ ] Separate stereo low-band QMF work from retained histories (6,144-byte
+  conservative candidate), with a separately verified PS layout.
+- [ ] Evaluate retaining four smoothing history rows plus existing current
+  vectors (2,048-byte candidate), preserving all five filter taps.
+- [ ] Evaluate compact mode-specific PS state and synthesis ring storage.
+  Do not add overlapping mode-specific savings or narrow arithmetic without
+  proving the one-LSB output limit and preserving all supported configurations.
+
 ### Execution plan and decision gates
 
 Status: **partially implemented; full-rate HE/v2 still fails on the radio**.

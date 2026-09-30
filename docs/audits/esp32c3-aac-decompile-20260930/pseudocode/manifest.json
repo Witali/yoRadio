@@ -1,0 +1,2172 @@
+{
+  "program": "yoradio_esp32c3_oled_native.elf",
+  "sha256": "6a4028f1d5ac44207d5978d7be15f43978f1ee057210b6ad18e24a6861ea4b8d",
+  "language": "RISCV:LE:32:default",
+  "compiler": "gcc",
+  "selection": "@.build/aac-decompile-20260930/archive-functions.txt",
+  "scope": "Direct-call graph only; inferred prototypes are not an ABI specification",
+  "functions": [
+    {
+      "name": "media_lib_module_malloc",
+      "address": "ram:42024378",
+      "body_bytes": 10,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "media_lib_module_malloc.c"
+    },
+    {
+      "name": "media_lib_module_calloc",
+      "address": "ram:42024382",
+      "body_bytes": 12,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "media_lib_module_calloc.c"
+    },
+    {
+      "name": "media_lib_free",
+      "address": "ram:4202439a",
+      "body_bytes": 12,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "free"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "media_lib_free.c"
+    },
+    {
+      "name": "esp_aac_dec_parse_frame",
+      "address": "ram:42025c1a",
+      "body_bytes": 302,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "esp_log",
+        "esp_log_timestamp"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "esp_aac_dec_parse_frame.c"
+    },
+    {
+      "name": "esp_log_writev",
+      "address": "ram:42026234",
+      "body_bytes": 2,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "esp_log_writev.c"
+    },
+    {
+      "name": "esp_log",
+      "address": "ram:42026236",
+      "body_bytes": 34,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "esp_log_writev"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "esp_log.c"
+    },
+    {
+      "name": "codec_register.part.0",
+      "address": "ram:42026258",
+      "body_bytes": 46,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "esp_log",
+        "esp_log_timestamp"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "codec_register.part.0.c"
+    },
+    {
+      "name": "esp_audio_dec_register",
+      "address": "ram:420262b0",
+      "body_bytes": 292,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "codec_register.part.0",
+        "esp_log",
+        "esp_log_timestamp",
+        "media_lib_module_calloc"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "esp_audio_dec_register.c"
+    },
+    {
+      "name": "esp_aac_dec_decode",
+      "address": "ram:42026966",
+      "body_bytes": 528,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "PVMP4AudioDecodeFrame",
+        "esp_log",
+        "esp_log_timestamp",
+        "media_lib_module_malloc",
+        "memcpy"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "esp_aac_dec_decode.c"
+    },
+    {
+      "name": "esp_aac_dec_close",
+      "address": "ram:42026b76",
+      "body_bytes": 60,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "PVMP4AudioDecoderDeInit",
+        "media_lib_free"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "esp_aac_dec_close.c"
+    },
+    {
+      "name": "esp_aac_dec_open",
+      "address": "ram:42026bb2",
+      "body_bytes": 452,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "PVMP4AudioDecoderGetMemRequirements",
+        "PVMP4AudioDecoderInitLibrary",
+        "esp_aac_dec_close",
+        "esp_log",
+        "esp_log_timestamp",
+        "media_lib_module_calloc"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "esp_aac_dec_open.c"
+    },
+    {
+      "name": "esp_aac_dec_reset",
+      "address": "ram:42026d76",
+      "body_bytes": 74,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "PVMP4AudioDecoderResetBuffer",
+        "esp_log",
+        "esp_log_timestamp"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "esp_aac_dec_reset.c"
+    },
+    {
+      "name": "esp_aac_dec_register",
+      "address": "ram:42026dc0",
+      "body_bytes": 20,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "esp_audio_dec_register"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "esp_aac_dec_register.c"
+    },
+    {
+      "name": "PVMP4AudioDecodeFrame",
+      "address": "ram:42026dd4",
+      "body_bytes": 3198,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "apply_ms_synt",
+        "apply_tns",
+        "byte_align",
+        "get_adif_header",
+        "get_adts_header",
+        "get_dse",
+        "get_prog_config",
+        "get_sbr_bitstream",
+        "getfill",
+        "huffdecode",
+        "long_term_prediction",
+        "long_term_synthesis",
+        "media_lib_module_calloc",
+        "pns_intensity_right",
+        "pns_left",
+        "puts",
+        "q_normalize",
+        "sbr_applied",
+        "sbr_open",
+        "trans4m_freq_2_time_fxp_1",
+        "trans4m_freq_2_time_fxp_2",
+        "trans4m_time_2_freq_fxp"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "PVMP4AudioDecodeFrame.c"
+    },
+    {
+      "name": "PVMP4AudioDecoderGetMemRequirements",
+      "address": "ram:42027a52",
+      "body_bytes": 8,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "PVMP4AudioDecoderGetMemRequirements.c"
+    },
+    {
+      "name": "raw_stream_parameter_setup",
+      "address": "ram:42027a5a",
+      "body_bytes": 86,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "set_mc_info"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "raw_stream_parameter_setup.c"
+    },
+    {
+      "name": "PVMP4AudioDecoderDeInit",
+      "address": "ram:42027ab0",
+      "body_bytes": 144,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "media_lib_free"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "PVMP4AudioDecoderDeInit.c"
+    },
+    {
+      "name": "PVMP4AudioDecoderInitLibrary",
+      "address": "ram:42027b40",
+      "body_bytes": 372,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "infoinit",
+        "media_lib_module_calloc",
+        "memset",
+        "raw_stream_parameter_setup"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "PVMP4AudioDecoderInitLibrary.c"
+    },
+    {
+      "name": "PVMP4AudioDecoderResetBuffer",
+      "address": "ram:42027cb4",
+      "body_bytes": 940,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "PVMP4AudioDecoderResetBuffer.c"
+    },
+    {
+      "name": "q_normalize",
+      "address": "ram:42028060",
+      "body_bytes": 486,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "q_normalize.c"
+    },
+    {
+      "name": "sbr_applied",
+      "address": "ram:42028246",
+      "body_bytes": 734,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "decode_noise_floorlevels",
+        "init_sbr_dec",
+        "ps_allocate_decoder",
+        "ps_bstr_decoding",
+        "sbr_dec",
+        "sbr_decode_envelope",
+        "sbr_envelope_unmapping",
+        "sbr_read_data",
+        "sbr_requantize_envelope_data"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_applied.c"
+    },
+    {
+      "name": "sbr_dec",
+      "address": "ram:42028524",
+      "body_bytes": 3466,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "calc_sbr_anafilterbank",
+        "calc_sbr_anafilterbank_LC",
+        "calc_sbr_envelope",
+        "calc_sbr_synfilterbank",
+        "calc_sbr_synfilterbank_LC",
+        "memcpy",
+        "memmove",
+        "memset",
+        "ps_applied",
+        "ps_init_stereo_mixing",
+        "sbr_generate_high_freq"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_dec.c"
+    },
+    {
+      "name": "mapLowResEnergyVal.part.0",
+      "address": "ram:420292ae",
+      "body_bytes": 56,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "mapLowResEnergyVal.part.0.c"
+    },
+    {
+      "name": "sbr_decode_envelope",
+      "address": "ram:420292e6",
+      "body_bytes": 418,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "mapLowResEnergyVal.part.0"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_decode_envelope.c"
+    },
+    {
+      "name": "sbr_envelope_unmapping",
+      "address": "ram:42029488",
+      "body_bytes": 720,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_envelope_unmapping.c"
+    },
+    {
+      "name": "high_freq_coeff_LC",
+      "address": "ram:42029758",
+      "body_bytes": 722,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "calc_auto_corr_LC",
+        "pv_div"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "high_freq_coeff_LC.c"
+    },
+    {
+      "name": "high_freq_generation_LC",
+      "address": "ram:42029a2a",
+      "body_bytes": 590,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "high_freq_generation_LC.c"
+    },
+    {
+      "name": "high_freq_coeff",
+      "address": "ram:42029c78",
+      "body_bytes": 626,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "calc_auto_corr",
+        "pv_div"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "high_freq_coeff.c"
+    },
+    {
+      "name": "high_freq_generation",
+      "address": "ram:42029eea",
+      "body_bytes": 778,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "high_freq_generation.c"
+    },
+    {
+      "name": "sbr_generate_high_freq",
+      "address": "ram:4202a1f4",
+      "body_bytes": 684,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "high_freq_coeff",
+        "high_freq_coeff_LC",
+        "high_freq_generation",
+        "high_freq_generation_LC",
+        "memmove",
+        "memset",
+        "sbr_inv_filt_levelemphasis"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_generate_high_freq.c"
+    },
+    {
+      "name": "sbr_inv_filt_levelemphasis",
+      "address": "ram:4202a4a0",
+      "body_bytes": 578,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_inv_filt_levelemphasis.c"
+    },
+    {
+      "name": "sbr_open",
+      "address": "ram:4202a6e2",
+      "body_bytes": 192,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "init_sbr_dec",
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_open.c"
+    },
+    {
+      "name": "sbr_read_data",
+      "address": "ram:4202a7a2",
+      "body_bytes": 338,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits",
+        "sbr_crc_check",
+        "sbr_get_cpe",
+        "sbr_get_header_data",
+        "sbr_get_sce",
+        "sbr_reset_dec"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_read_data.c"
+    },
+    {
+      "name": "sbr_requantize_envelope_data",
+      "address": "ram:4202a8f4",
+      "body_bytes": 136,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_requantize_envelope_data.c"
+    },
+    {
+      "name": "sbr_reset_dec",
+      "address": "ram:4202a97c",
+      "body_bytes": 408,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memcpy",
+        "pv_log2",
+        "sbr_downsample_lo_res",
+        "sbr_find_start_andstop_band",
+        "sbr_update_freq_scale"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_reset_dec.c"
+    },
+    {
+      "name": "cumSum.part.0",
+      "address": "ram:4202ab14",
+      "body_bytes": 82,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "cumSum.part.0.c"
+    },
+    {
+      "name": "CalcBands",
+      "address": "ram:4202ab66",
+      "body_bytes": 128,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_log2",
+        "pv_pow2"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "CalcBands.c"
+    },
+    {
+      "name": "sbr_update_freq_scale",
+      "address": "ram:4202abe6",
+      "body_bytes": 616,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "CalcBands",
+        "cumSum.part.0",
+        "pv_log2",
+        "shellsort"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_update_freq_scale.c"
+    },
+    {
+      "name": "set_mc_info",
+      "address": "ram:4202ae4e",
+      "body_bytes": 102,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "infoinit"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "set_mc_info.c"
+    },
+    {
+      "name": "shellsort",
+      "address": "ram:4202aeb4",
+      "body_bytes": 148,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "shellsort.c"
+    },
+    {
+      "name": "trans4m_freq_2_time_fxp_1",
+      "address": "ram:4202af48",
+      "body_bytes": 2574,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "imdct_fxp",
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "trans4m_freq_2_time_fxp_1.c"
+    },
+    {
+      "name": "trans4m_freq_2_time_fxp_2",
+      "address": "ram:4202b956",
+      "body_bytes": 2568,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "imdct_fxp",
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "trans4m_freq_2_time_fxp_2.c"
+    },
+    {
+      "name": "trans4m_time_2_freq_fxp",
+      "address": "ram:4202c35e",
+      "body_bytes": 636,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "mdct_fxp",
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "trans4m_time_2_freq_fxp.c"
+    },
+    {
+      "name": "calc_sbr_synfilterbank_LC",
+      "address": "ram:42037942",
+      "body_bytes": 1076,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "synthesis_sub_band_LC",
+        "synthesis_sub_band_LC_down_sampled"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "calc_sbr_synfilterbank_LC.c"
+    },
+    {
+      "name": "calc_sbr_synfilterbank",
+      "address": "ram:42037d76",
+      "body_bytes": 1074,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "synthesis_sub_band",
+        "synthesis_sub_band_down_sampled"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "calc_sbr_synfilterbank.c"
+    },
+    {
+      "name": "apply_ms_synt",
+      "address": "ram:42040bc6",
+      "body_bytes": 286,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "ms_synt"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "apply_ms_synt.c"
+    },
+    {
+      "name": "apply_tns",
+      "address": "ram:42040ce4",
+      "body_bytes": 476,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "tns_ar_filter",
+        "tns_inv_filter"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "apply_tns.c"
+    },
+    {
+      "name": "buf_getbits",
+      "address": "ram:42040ec0",
+      "body_bytes": 76,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "buf_getbits.c"
+    },
+    {
+      "name": "buf_get_1bit",
+      "address": "ram:42040f0c",
+      "body_bytes": 66,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "buf_get_1bit.c"
+    },
+    {
+      "name": "byte_align",
+      "address": "ram:42040f4e",
+      "body_bytes": 10,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "byte_align.c"
+    },
+    {
+      "name": "calc_auto_corr_LC",
+      "address": "ram:42040f58",
+      "body_bytes": 962,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "calc_auto_corr_LC.c"
+    },
+    {
+      "name": "calc_auto_corr",
+      "address": "ram:4204131a",
+      "body_bytes": 1912,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "calc_auto_corr.c"
+    },
+    {
+      "name": "calc_sbr_anafilterbank_LC",
+      "address": "ram:42041a92",
+      "body_bytes": 44,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "analysis_sub_band_LC",
+        "calc_sbr_anafilterbank_LC_core"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "calc_sbr_anafilterbank_LC.c"
+    },
+    {
+      "name": "calc_sbr_anafilterbank",
+      "address": "ram:42041abe",
+      "body_bytes": 422,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "analysis_sub_band"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "calc_sbr_anafilterbank.c"
+    },
+    {
+      "name": "envelope_application_LC",
+      "address": "ram:42041c64",
+      "body_bytes": 1648,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "envelope_application_LC.c"
+    },
+    {
+      "name": "energy_estimation_LC",
+      "address": "ram:420422d4",
+      "body_bytes": 400,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "energy_estimation_LC.c"
+    },
+    {
+      "name": "envelope_application",
+      "address": "ram:42042464",
+      "body_bytes": 3368,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memmove"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "envelope_application.c"
+    },
+    {
+      "name": "energy_estimation",
+      "address": "ram:4204318c",
+      "body_bytes": 426,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "energy_estimation.c"
+    },
+    {
+      "name": "calc_sbr_envelope",
+      "address": "ram:42043336",
+      "body_bytes": 3570,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "energy_estimation",
+        "energy_estimation_LC",
+        "envelope_application",
+        "envelope_application_LC",
+        "memcpy",
+        "memset",
+        "pv_div",
+        "pv_sqrt",
+        "sbr_aliasing_reduction",
+        "sbr_create_limiter_bands"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "calc_sbr_envelope.c"
+    },
+    {
+      "name": "decode_noise_floorlevels",
+      "address": "ram:42044128",
+      "body_bytes": 256,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "decode_noise_floorlevels.c"
+    },
+    {
+      "name": "get_adif_header",
+      "address": "ram:42044228",
+      "body_bytes": 602,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "get_prog_config"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "get_adif_header.c"
+    },
+    {
+      "name": "get_adts_header",
+      "address": "ram:42044482",
+      "body_bytes": 782,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "find_adts_syncword",
+        "set_mc_info"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "get_adts_header.c"
+    },
+    {
+      "name": "get_dse",
+      "address": "ram:42044790",
+      "body_bytes": 384,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "byte_align"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "get_dse.c"
+    },
+    {
+      "name": "get_prog_config",
+      "address": "ram:42044910",
+      "body_bytes": 1464,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "byte_align",
+        "get_ele_list",
+        "set_mc_info"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "get_prog_config.c"
+    },
+    {
+      "name": "get_sbr_bitstream",
+      "address": "ram:42044ec8",
+      "body_bytes": 456,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "get_sbr_bitstream.c"
+    },
+    {
+      "name": "getfill",
+      "address": "ram:42045090",
+      "body_bytes": 186,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "getfill.c"
+    },
+    {
+      "name": "huffdecode",
+      "address": "ram:4204514a",
+      "body_bytes": 620,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "get_ics_info",
+        "getics",
+        "getmask"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "huffdecode.c"
+    },
+    {
+      "name": "imdct_fxp",
+      "address": "ram:420453b6",
+      "body_bytes": 694,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "fft_rx4_short",
+        "inv_long_complex_rot",
+        "inv_short_complex_rot",
+        "mix_radix_fft",
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "imdct_fxp.c"
+    },
+    {
+      "name": "infoinit",
+      "address": "ram:4204566c",
+      "body_bytes": 542,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "infoinit.c"
+    },
+    {
+      "name": "init_sbr_dec",
+      "address": "ram:4204588a",
+      "body_bytes": 186,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "init_sbr_dec.c"
+    },
+    {
+      "name": "inv_long_complex_rot",
+      "address": "ram:42045944",
+      "body_bytes": 542,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "inv_long_complex_rot.c"
+    },
+    {
+      "name": "inv_short_complex_rot",
+      "address": "ram:42045b62",
+      "body_bytes": 328,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "inv_short_complex_rot.c"
+    },
+    {
+      "name": "long_term_prediction",
+      "address": "ram:42045caa",
+      "body_bytes": 282,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memset",
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "long_term_prediction.c"
+    },
+    {
+      "name": "long_term_synthesis",
+      "address": "ram:42045dc4",
+      "body_bytes": 1456,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "long_term_synthesis.c"
+    },
+    {
+      "name": "mdct_fxp",
+      "address": "ram:42046374",
+      "body_bytes": 454,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "fft_rx4_short",
+        "fwd_long_complex_rot",
+        "fwd_short_complex_rot",
+        "mix_radix_fft"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "mdct_fxp.c"
+    },
+    {
+      "name": "mix_radix_fft",
+      "address": "ram:4204653a",
+      "body_bytes": 482,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "digit_reversal_swapping",
+        "fft_rx4_long",
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "mix_radix_fft.c"
+    },
+    {
+      "name": "ms_synt",
+      "address": "ram:4204671c",
+      "body_bytes": 292,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memcpy"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "ms_synt.c"
+    },
+    {
+      "name": "pns_intensity_right",
+      "address": "ram:42046840",
+      "body_bytes": 524,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "gen_rand_vector",
+        "intensity_right",
+        "pns_corr"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "pns_intensity_right.c"
+    },
+    {
+      "name": "pns_left",
+      "address": "ram:42046a4c",
+      "body_bytes": 356,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "gen_rand_vector"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "pns_left.c"
+    },
+    {
+      "name": "ps_allocate_decoder",
+      "address": "ram:42046bb0",
+      "body_bytes": 574,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "ps_hybrid_filter_bank_allocation"
+      ],
+      "pseudocode_contains_warning": true,
+      "file": "ps_allocate_decoder.c"
+    },
+    {
+      "name": "ps_applied",
+      "address": "ram:42046dee",
+      "body_bytes": 128,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "ps_decorrelate",
+        "ps_hybrid_analysis",
+        "ps_hybrid_synthesis",
+        "ps_stereo_processing"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "ps_applied.c"
+    },
+    {
+      "name": "ps_bstr_decoding",
+      "address": "ram:42046e6e",
+      "body_bytes": 884,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "differential_Decoding",
+        "map34IndexTo20",
+        "memmove",
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "ps_bstr_decoding.c"
+    },
+    {
+      "name": "GetNrBitsAvailable",
+      "address": "ram:420471e2",
+      "body_bytes": 10,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "GetNrBitsAvailable.c"
+    },
+    {
+      "name": "differential_Decoding",
+      "address": "ram:420471ec",
+      "body_bytes": 294,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "differential_Decoding.c"
+    },
+    {
+      "name": "map34IndexTo20",
+      "address": "ram:42047312",
+      "body_bytes": 288,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "map34IndexTo20.c"
+    },
+    {
+      "name": "ps_decorrelate",
+      "address": "ram:42047432",
+      "body_bytes": 1130,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "ps_all_pass_fract_delay_filter_type_I",
+        "ps_all_pass_fract_delay_filter_type_II",
+        "ps_pwr_transient_detection"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "ps_decorrelate.c"
+    },
+    {
+      "name": "ps_hybrid_analysis",
+      "address": "ram:4204789c",
+      "body_bytes": 318,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "eight_ch_filtering",
+        "memmove",
+        "two_ch_filtering"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "ps_hybrid_analysis.c"
+    },
+    {
+      "name": "ps_hybrid_filter_bank_allocation",
+      "address": "ram:420479da",
+      "body_bytes": 194,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "ps_hybrid_filter_bank_allocation.c"
+    },
+    {
+      "name": "ps_hybrid_synthesis",
+      "address": "ram:42047a9c",
+      "body_bytes": 148,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "ps_hybrid_synthesis.c"
+    },
+    {
+      "name": "ps_init_stereo_mixing",
+      "address": "ram:42047b30",
+      "body_bytes": 996,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_cosine",
+        "pv_sine"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "ps_init_stereo_mixing.c"
+    },
+    {
+      "name": "ps_pwr_transient_detection",
+      "address": "ram:42047f14",
+      "body_bytes": 474,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_div"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "ps_pwr_transient_detection.c"
+    },
+    {
+      "name": "ps_stereo_processing",
+      "address": "ram:420480ee",
+      "body_bytes": 670,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "ps_stereo_processing.c"
+    },
+    {
+      "name": "pv_div",
+      "address": "ram:4204838c",
+      "body_bytes": 178,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "pv_div.c"
+    },
+    {
+      "name": "pv_log2",
+      "address": "ram:4204843e",
+      "body_bytes": 132,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pv_log2.c"
+    },
+    {
+      "name": "pv_normalize",
+      "address": "ram:420484c2",
+      "body_bytes": 208,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pv_normalize.c"
+    },
+    {
+      "name": "pv_pow2",
+      "address": "ram:42048592",
+      "body_bytes": 150,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pv_pow2.c"
+    },
+    {
+      "name": "pv_sine",
+      "address": "ram:42048628",
+      "body_bytes": 116,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pv_sine.c"
+    },
+    {
+      "name": "pv_cosine",
+      "address": "ram:4204869c",
+      "body_bytes": 62,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_sine"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "pv_cosine.c"
+    },
+    {
+      "name": "pv_sqrt",
+      "address": "ram:420486da",
+      "body_bytes": 338,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pv_sqrt.c"
+    },
+    {
+      "name": "sbr_aliasing_reduction",
+      "address": "ram:4204882c",
+      "body_bytes": 972,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memset",
+        "pv_div",
+        "pv_normalize",
+        "pv_sqrt"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_aliasing_reduction.c"
+    },
+    {
+      "name": "sbr_crc_check",
+      "address": "ram:42048bf8",
+      "body_bytes": 176,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits",
+        "check_crc"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_crc_check.c"
+    },
+    {
+      "name": "sbr_create_limiter_bands",
+      "address": "ram:42048ca8",
+      "body_bytes": 636,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memcpy",
+        "pv_log2",
+        "shellsort"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_create_limiter_bands.c"
+    },
+    {
+      "name": "sbr_downsample_lo_res",
+      "address": "ram:42048f24",
+      "body_bytes": 82,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_downsample_lo_res.c"
+    },
+    {
+      "name": "sbr_find_start_andstop_band",
+      "address": "ram:42048f76",
+      "body_bytes": 182,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "get_sbr_startfreq",
+        "get_sbr_stopfreq"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_find_start_andstop_band.c"
+    },
+    {
+      "name": "sbr_get_cpe",
+      "address": "ram:4204902c",
+      "body_bytes": 486,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits",
+        "extractFrameInfo",
+        "memset",
+        "sbr_extract_extended_data",
+        "sbr_get_additional_data",
+        "sbr_get_dir_control_data",
+        "sbr_get_envelope",
+        "sbr_get_noise_floor_data"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_get_cpe.c"
+    },
+    {
+      "name": "sbr_get_dir_control_data",
+      "address": "ram:42049212",
+      "body_bytes": 118,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_get_dir_control_data.c"
+    },
+    {
+      "name": "sbr_get_envelope",
+      "address": "ram:42049288",
+      "body_bytes": 480,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits",
+        "sbr_decode_huff_cw"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_get_envelope.c"
+    },
+    {
+      "name": "sbr_get_header_data",
+      "address": "ram:42049468",
+      "body_bytes": 328,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits",
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_get_header_data.c"
+    },
+    {
+      "name": "sbr_get_noise_floor_data",
+      "address": "ram:420495b0",
+      "body_bytes": 286,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits",
+        "sbr_decode_huff_cw"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_get_noise_floor_data.c"
+    },
+    {
+      "name": "sbr_get_sce",
+      "address": "ram:420496ce",
+      "body_bytes": 194,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits",
+        "extractFrameInfo",
+        "memset",
+        "sbr_extract_extended_data",
+        "sbr_get_additional_data",
+        "sbr_get_dir_control_data",
+        "sbr_get_envelope",
+        "sbr_get_noise_floor_data"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_get_sce.c"
+    },
+    {
+      "name": "synthesis_sub_band_LC",
+      "address": "ram:42049790",
+      "body_bytes": 168,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dct_16",
+        "pv_split_LC",
+        "synthesis_sub_band_LC_core1",
+        "synthesis_sub_band_LC_core2"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "synthesis_sub_band_LC.c"
+    },
+    {
+      "name": "synthesis_sub_band_LC_down_sampled",
+      "address": "ram:42049838",
+      "body_bytes": 102,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dct_32"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "synthesis_sub_band_LC_down_sampled.c"
+    },
+    {
+      "name": "synthesis_sub_band",
+      "address": "ram:4204989e",
+      "body_bytes": 258,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dct_64"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "synthesis_sub_band.c"
+    },
+    {
+      "name": "synthesis_sub_band_down_sampled",
+      "address": "ram:420499a0",
+      "body_bytes": 250,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "mdct_32"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "synthesis_sub_band_down_sampled.c"
+    },
+    {
+      "name": "tns_ar_filter",
+      "address": "ram:42049a9a",
+      "body_bytes": 446,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "tns_ar_filter.c"
+    },
+    {
+      "name": "tns_inv_filter",
+      "address": "ram:42049c58",
+      "body_bytes": 246,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "tns_inv_filter.c"
+    },
+    {
+      "name": "calc_sbr_anafilterbank_LC_core",
+      "address": "ram:4204e418",
+      "body_bytes": 698,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "calc_sbr_anafilterbank_LC_core.c"
+    },
+    {
+      "name": "synthesis_sub_band_LC_core2",
+      "address": "ram:4204e6d2",
+      "body_bytes": 130,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "synthesis_sub_band_LC_core2.c"
+    },
+    {
+      "name": "synthesis_sub_band_LC_core1",
+      "address": "ram:4204e754",
+      "body_bytes": 486,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "synthesis_sub_band_LC_core1.c"
+    },
+    {
+      "name": "analysis_sub_band_LC",
+      "address": "ram:420563f6",
+      "body_bytes": 284,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dst_32",
+        "idct_32"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "analysis_sub_band_LC.c"
+    },
+    {
+      "name": "analysis_sub_band",
+      "address": "ram:42056512",
+      "body_bytes": 622,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "mdct_32",
+        "mdst_32",
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "analysis_sub_band.c"
+    },
+    {
+      "name": "check_crc",
+      "address": "ram:42056780",
+      "body_bytes": 80,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "check_crc.c"
+    },
+    {
+      "name": "dct_16",
+      "address": "ram:420567d0",
+      "body_bytes": 682,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "dct_16.c"
+    },
+    {
+      "name": "pv_split_LC",
+      "address": "ram:42056a7a",
+      "body_bytes": 78,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pv_split_LC.c"
+    },
+    {
+      "name": "pv_split",
+      "address": "ram:42056ac8",
+      "body_bytes": 100,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pv_split.c"
+    },
+    {
+      "name": "pv_split_z",
+      "address": "ram:42056b2c",
+      "body_bytes": 100,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pv_split_z.c"
+    },
+    {
+      "name": "pv_merge_in_place_N32",
+      "address": "ram:42056b90",
+      "body_bytes": 248,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pv_merge_in_place_N32.c"
+    },
+    {
+      "name": "dct_64",
+      "address": "ram:42056c88",
+      "body_bytes": 962,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dct_16",
+        "pv_merge_in_place_N32",
+        "pv_split",
+        "pv_split_z"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "dct_64.c"
+    },
+    {
+      "name": "digit_reversal_swapping",
+      "address": "ram:4205704a",
+      "body_bytes": 128,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "digit_reversal_swapping.c"
+    },
+    {
+      "name": "dst_32",
+      "address": "ram:420570ca",
+      "body_bytes": 414,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dst_16"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "dst_32.c"
+    },
+    {
+      "name": "extractFrameInfo",
+      "address": "ram:42057268",
+      "body_bytes": 1528,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits",
+        "memcpy"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "extractFrameInfo.c"
+    },
+    {
+      "name": "fft_rx4_long",
+      "address": "ram:42057860",
+      "body_bytes": 840,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "fft_rx4_long.c"
+    },
+    {
+      "name": "fft_rx4_short",
+      "address": "ram:42057ba8",
+      "body_bytes": 1042,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "fft_rx4_short.c"
+    },
+    {
+      "name": "find_adts_syncword",
+      "address": "ram:42057fba",
+      "body_bytes": 398,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "find_adts_syncword.c"
+    },
+    {
+      "name": "fwd_long_complex_rot",
+      "address": "ram:42058148",
+      "body_bytes": 260,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "fwd_long_complex_rot.c"
+    },
+    {
+      "name": "fwd_short_complex_rot",
+      "address": "ram:4205824c",
+      "body_bytes": 164,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "pv_normalize"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "fwd_short_complex_rot.c"
+    },
+    {
+      "name": "gen_rand_vector",
+      "address": "ram:420582f0",
+      "body_bytes": 348,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "gen_rand_vector.c"
+    },
+    {
+      "name": "get_ele_list",
+      "address": "ram:4205844c",
+      "body_bytes": 166,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "get_ele_list.c"
+    },
+    {
+      "name": "get_ics_info",
+      "address": "ram:420584f2",
+      "body_bytes": 406,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "getgroup"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "get_ics_info.c"
+    },
+    {
+      "name": "get_sbr_startfreq",
+      "address": "ram:42058688",
+      "body_bytes": 176,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "get_sbr_startfreq.c"
+    },
+    {
+      "name": "get_sbr_stopfreq",
+      "address": "ram:42058738",
+      "body_bytes": 98,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "get_sbr_stopfreq.c"
+    },
+    {
+      "name": "getgroup",
+      "address": "ram:4205879a",
+      "body_bytes": 106,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "getgroup.c"
+    },
+    {
+      "name": "getics",
+      "address": "ram:42058804",
+      "body_bytes": 842,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "calc_gsfb_table",
+        "get_ics_info",
+        "get_pulse_data",
+        "get_tns",
+        "huffcb",
+        "hufffac",
+        "huffspec_fxp",
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "getics.c"
+    },
+    {
+      "name": "getmask",
+      "address": "ram:42058b4e",
+      "body_bytes": 528,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "getmask.c"
+    },
+    {
+      "name": "huffcb",
+      "address": "ram:42058d5e",
+      "body_bytes": 410,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "huffcb.c"
+    },
+    {
+      "name": "hufffac",
+      "address": "ram:42058ef8",
+      "body_bytes": 636,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "decode_huff_scl",
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "hufffac.c"
+    },
+    {
+      "name": "huffspec_fxp",
+      "address": "ram:42059174",
+      "body_bytes": 998,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "decode_huff_cw_tab8",
+        "deinterleave",
+        "esc_iquant_scaling",
+        "memset",
+        "pulse_nc",
+        "pv_normalize",
+        "unpack_idx_sgn"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "huffspec_fxp.c"
+    },
+    {
+      "name": "idct_32",
+      "address": "ram:4205955a",
+      "body_bytes": 366,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "idct_16"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "idct_32.c"
+    },
+    {
+      "name": "intensity_right",
+      "address": "ram:420596c8",
+      "body_bytes": 226,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "intensity_right.c"
+    },
+    {
+      "name": "mdst_32",
+      "address": "ram:420597aa",
+      "body_bytes": 328,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dst_32"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "mdst_32.c"
+    },
+    {
+      "name": "mdct_32",
+      "address": "ram:420598f2",
+      "body_bytes": 334,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dct_16",
+        "pv_merge_in_place_N32",
+        "pv_split"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "mdct_32.c"
+    },
+    {
+      "name": "dct_32",
+      "address": "ram:42059a40",
+      "body_bytes": 46,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dct_16",
+        "pv_merge_in_place_N32",
+        "pv_split"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "dct_32.c"
+    },
+    {
+      "name": "pns_corr",
+      "address": "ram:42059a6e",
+      "body_bytes": 136,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pns_corr.c"
+    },
+    {
+      "name": "ps_all_pass_fract_delay_filter_type_I",
+      "address": "ram:42059af6",
+      "body_bytes": 446,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "ps_all_pass_fract_delay_filter_type_I.c"
+    },
+    {
+      "name": "ps_all_pass_fract_delay_filter_type_II",
+      "address": "ram:42059cb4",
+      "body_bytes": 480,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "ps_all_pass_fract_delay_filter_type_II.c"
+    },
+    {
+      "name": "two_ch_filtering",
+      "address": "ram:42059e94",
+      "body_bytes": 144,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "two_ch_filtering.c"
+    },
+    {
+      "name": "eight_ch_filtering",
+      "address": "ram:42059f24",
+      "body_bytes": 690,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "ps_fft_rx8"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "eight_ch_filtering.c"
+    },
+    {
+      "name": "ps_fft_rx8",
+      "address": "ram:4205a1d6",
+      "body_bytes": 478,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "ps_fft_rx8.c"
+    },
+    {
+      "name": "pulse_nc",
+      "address": "ram:4205a3b4",
+      "body_bytes": 94,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "pulse_nc.c"
+    },
+    {
+      "name": "sbr_decode_huff_cw",
+      "address": "ram:4205a412",
+      "body_bytes": 56,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_get_1bit"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_decode_huff_cw.c"
+    },
+    {
+      "name": "sbr_extract_extended_data",
+      "address": "ram:4205a44a",
+      "body_bytes": 168,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_get_1bit",
+        "buf_getbits",
+        "ps_read_data"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_extract_extended_data.c"
+    },
+    {
+      "name": "sbr_get_additional_data",
+      "address": "ram:4205a4f2",
+      "body_bytes": 76,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "buf_getbits"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "sbr_get_additional_data.c"
+    },
+    {
+      "name": "unpack_idx_sgn",
+      "address": "ram:4205a60e",
+      "body_bytes": 484,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "unpack_idx_sgn.c"
+    },
+    {
+      "name": "calc_gsfb_table",
+      "address": "ram:4205affc",
+      "body_bytes": 146,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "calc_gsfb_table.c"
+    },
+    {
+      "name": "decode_huff_cw_tab8",
+      "address": "ram:4205b6d6",
+      "body_bytes": 294,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "decode_huff_cw_tab8.c"
+    },
+    {
+      "name": "decode_huff_scl",
+      "address": "ram:4205bc68",
+      "body_bytes": 288,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "decode_huff_scl.c"
+    },
+    {
+      "name": "deinterleave",
+      "address": "ram:4205bd88",
+      "body_bytes": 160,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memcpy"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "deinterleave.c"
+    },
+    {
+      "name": "dst_16",
+      "address": "ram:4205be28",
+      "body_bytes": 236,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "dst_8"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "dst_16.c"
+    },
+    {
+      "name": "dst_8",
+      "address": "ram:4205bf14",
+      "body_bytes": 262,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "dst_8.c"
+    },
+    {
+      "name": "esc_iquant_scaling",
+      "address": "ram:4205c01a",
+      "body_bytes": 1530,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "memset"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "esc_iquant_scaling.c"
+    },
+    {
+      "name": "get_pulse_data",
+      "address": "ram:4205c614",
+      "body_bytes": 192,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "get_pulse_data.c"
+    },
+    {
+      "name": "get_tns",
+      "address": "ram:4205c6d4",
+      "body_bytes": 906,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "tns_decode_coef"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "get_tns.c"
+    },
+    {
+      "name": "idct_16",
+      "address": "ram:4205ca5e",
+      "body_bytes": 366,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "idct_8"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "idct_16.c"
+    },
+    {
+      "name": "idct_8",
+      "address": "ram:4205cbcc",
+      "body_bytes": 274,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "idct_8.c"
+    },
+    {
+      "name": "ps_read_data",
+      "address": "ram:4205ccde",
+      "body_bytes": 740,
+      "completed": true,
+      "warning": "",
+      "calls": [
+        "GetNrBitsAvailable",
+        "buf_get_1bit",
+        "buf_getbits",
+        "sbr_decode_huff_cw"
+      ],
+      "pseudocode_contains_warning": false,
+      "file": "ps_read_data.c"
+    },
+    {
+      "name": "tns_decode_coef",
+      "address": "ram:4205cfc2",
+      "body_bytes": 454,
+      "completed": true,
+      "warning": "",
+      "calls": [],
+      "pseudocode_contains_warning": false,
+      "file": "tns_decode_coef.c"
+    }
+  ]
+}

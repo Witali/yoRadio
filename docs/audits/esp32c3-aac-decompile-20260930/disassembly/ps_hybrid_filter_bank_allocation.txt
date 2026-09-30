@@ -1,0 +1,73 @@
+
+idf\esp32c3-oled-native\build-constants-audit\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+420479da <ps_hybrid_filter_bank_allocation>:
+420479da:	0006af03          	lw	t5,0(a3)
+420479de:	00052023          	sw	zero,0(a0)
+420479e2:	00259f93          	slli	t6,a1,0x2
+420479e6:	01cf0813          	addi	a6,t5,28
+420479ea:	010f2223          	sw	a6,4(t5)
+420479ee:	01f80333          	add	t1,a6,t6
+420479f2:	08b05663          	blez	a1,42047a7e <ps_hybrid_filter_bank_allocation+0xa4>
+420479f6:	4e01                	li	t3,0
+420479f8:	4881                	li	a7,0
+420479fa:	421c                	lw	a5,0(a2)
+420479fc:	0885                	addi	a7,a7,1
+420479fe:	0611                	addi	a2,a2,4
+42047a00:	ffe78713          	addi	a4,a5,-2
+42047a04:	00f82023          	sw	a5,0(a6)
+42047a08:	9b75                	andi	a4,a4,-3
+42047a0a:	ff878e93          	addi	t4,a5,-8
+42047a0e:	c319                	beqz	a4,42047a14 <ps_hybrid_filter_bank_allocation+0x3a>
+42047a10:	060e9563          	bnez	t4,42047a7a <ps_hybrid_filter_bank_allocation+0xa0>
+42047a14:	00fe5363          	bge	t3,a5,42047a1a <ps_hybrid_filter_bank_allocation+0x40>
+42047a18:	8e3e                	mv	t3,a5
+42047a1a:	0811                	addi	a6,a6,4
+42047a1c:	fd159fe3          	bne	a1,a7,420479fa <ps_hybrid_filter_bank_allocation+0x20>
+42047a20:	01f308b3          	add	a7,t1,t6
+42047a24:	9fc6                	add	t6,t6,a7
+42047a26:	4831                	li	a6,12
+42047a28:	00bf2023          	sw	a1,0(t5)
+42047a2c:	006f2623          	sw	t1,12(t5)
+42047a30:	011f2823          	sw	a7,16(t5)
+42047a34:	879a                	mv	a5,t1
+42047a36:	877e                	mv	a4,t6
+42047a38:	8646                	mv	a2,a7
+42047a3a:	010f2423          	sw	a6,8(t5)
+42047a3e:	c398                	sw	a4,0(a5)
+42047a40:	03070813          	addi	a6,a4,48
+42047a44:	01062023          	sw	a6,0(a2)
+42047a48:	0791                	addi	a5,a5,4
+42047a4a:	06070713          	addi	a4,a4,96
+42047a4e:	0611                	addi	a2,a2,4
+42047a50:	fef897e3          	bne	a7,a5,42047a3e <ps_hybrid_filter_bank_allocation+0x64>
+42047a54:	00159793          	slli	a5,a1,0x1
+42047a58:	97ae                	add	a5,a5,a1
+42047a5a:	0796                	slli	a5,a5,0x5
+42047a5c:	0e0a                	slli	t3,t3,0x2
+42047a5e:	9fbe                	add	t6,t6,a5
+42047a60:	01cf87b3          	add	a5,t6,t3
+42047a64:	9e3e                	add	t3,t3,a5
+42047a66:	01ff2a23          	sw	t6,20(t5)
+42047a6a:	00ff2c23          	sw	a5,24(t5)
+42047a6e:	01e52023          	sw	t5,0(a0)
+42047a72:	01c6a023          	sw	t3,0(a3)
+42047a76:	4501                	li	a0,0
+42047a78:	8082                	ret
+42047a7a:	4505                	li	a0,1
+42047a7c:	8082                	ret
+42047a7e:	01f307b3          	add	a5,t1,t6
+42047a82:	9fbe                	add	t6,t6,a5
+42047a84:	4731                	li	a4,12
+42047a86:	00ff2823          	sw	a5,16(t5)
+42047a8a:	00bf2023          	sw	a1,0(t5)
+42047a8e:	006f2623          	sw	t1,12(t5)
+42047a92:	8e7e                	mv	t3,t6
+42047a94:	87fe                	mv	a5,t6
+42047a96:	00ef2423          	sw	a4,8(t5)
+42047a9a:	b7f1                	j	42047a66 <ps_hybrid_filter_bank_allocation+0x8c>
