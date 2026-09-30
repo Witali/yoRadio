@@ -21,6 +21,7 @@ endif()
 set(NATIVE_SRCS
   "app_main.c"
   "audio_service.c"
+  "native_aac_decoder.c"
   "cpu_profiler.c"
   "display_settings.c"
   "deep_sleep_clock.c"
@@ -41,6 +42,9 @@ set(NATIVE_SRCS
 
 if(CONFIG_YORADIO_QEMU)
   list(APPEND NATIVE_SRCS "native_audio_output_qemu.c")
+  if(CONFIG_YORADIO_QEMU_AAC_TEST)
+    list(APPEND NATIVE_SRCS "qemu_aac_test.c")
+  endif()
 else()
   list(APPEND NATIVE_SRCS "native_audio_output.c")
 endif()
@@ -88,6 +92,16 @@ if(YORADIO_CODEC_BENCHMARK)
     YORADIO_CODEC_BENCHMARK=1)
 endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+
+if(CONFIG_YORADIO_QEMU_AAC_TEST)
+  foreach(FIXTURE lc-44100-stereo lc-22050-mono lc-48000-stereo
+                  he-44100-stereo he-48000-stereo hev2-44100-stereo)
+    configure_file("${YORADIO_ROOT}/../tests/fixtures/aac_stream_format/${FIXTURE}.aac"
+                   "${CMAKE_CURRENT_BINARY_DIR}/${FIXTURE}.aac" COPYONLY)
+    target_add_binary_data(${COMPONENT_LIB}
+                          "${CMAKE_CURRENT_BINARY_DIR}/${FIXTURE}.aac" BINARY)
+  endforeach()
+endif()
 
 # Ship the same shared WebUI script with application OTA, including capability
 # labels and upload error handling, without rewriting users' SPIFFS contents.

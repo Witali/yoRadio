@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "audio_level_led.h"
+#include "native_aac_decoder.h"
 #include "board_config.h"
 #include "esp_audio_dec_default.h"
 #include "esp_audio_simple_dec.h"
@@ -166,6 +167,7 @@ static uint32_t advance_generation(native_codec_t target_codec) {
     atomic_store(&s_decoder_target_codec, (unsigned)target_codec);
     atomic_store(&s_generation, generation);
     portEXIT_CRITICAL(&s_generation_lock);
+    native_state_begin_stream(s_state, generation);
     return generation;
 }
 
@@ -273,14 +275,9 @@ static void decode_stats_report(decode_stats_t *stats, int64_t now_us) {
     decode_stats_reset(stats, stats->generation, stats->codec, now_us);
 }
 
-static void state_set_audio(bool running, const char *format) {
-    if (!s_state || !s_state->lock) return;
-    if (xSemaphoreTake(s_state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
-        s_state->audio_running = running;
-        if (format) strlcpy(s_state->stream_format, format,
-                            sizeof(s_state->stream_format));
-        xSemaphoreGive(s_state->lock);
-    }
+static void state_set_audio(uint32_t generation, bool running,
+                             const char *format) {
+    native_state_set_audio(s_state, generation, running, format);
 }
 
 static bool http_status_is_redirect(int status) {
@@ -355,8 +352,7 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
         if (*codec == NATIVE_CODEC_AUTO) {
             *codec = codec_from_signature(data, size);
         }
-        native_state_set_stream_info(s_state, codec_name(*codec), 0, 0);
-        state_set_audio(true, codec_name(*codec));
+        state_set_audio(generation, true, codec_name(*codec));
     }
     return send_encoded(generation, *codec, data, size, false);
 }
@@ -376,7 +372,7 @@ static void stream_bitrate_add(uint32_t generation,
     if (bitrate && bitrate <= UINT32_MAX &&
         generation == atomic_load(&s_generation)) {
         atomic_store(&s_measured_bitrate_ready, true);
-        native_state_set_bitrate(s_state,
+        native_state_set_bitrate(s_state, generation,
                                  ((uint32_t)bitrate + 500U) / 1000U);
         ESP_LOGI(TAG, "Measured stream bitrate: %llu bit/s",
                  (unsigned long long)bitrate);
@@ -390,7 +386,7 @@ static void reset_decoder_bitrate_tracking(void) {
     s_bitrate_updated_us = 0;
 }
 
-static void state_set_decoder_bitrate(uint32_t bitrate_bps) {
+static void state_set_decoder_bitrate(uint32_t generation, uint32_t bitrate_bps) {
     if (!bitrate_bps || atomic_load(&s_measured_bitrate_ready)) return;
     if (bitrate_bps == s_published_bitrate_bps) return;
     int64_t now_us = esp_timer_get_time();
@@ -400,7 +396,7 @@ static void state_set_decoder_bitrate(uint32_t bitrate_bps) {
     }
     s_published_bitrate_bps = bitrate_bps;
     s_bitrate_updated_us = now_us;
-    native_state_set_bitrate(s_state, (bitrate_bps + 500U) / 1000U);
+    native_state_set_bitrate(s_state, generation, (bitrate_bps + 500U) / 1000U);
     ESP_LOGI(TAG, "Decoder bitrate: %lu bit/s",
              (unsigned long)bitrate_bps);
 }
@@ -437,7 +433,7 @@ static void play_flash_fixture(const play_command_t *command,
         command->fixture_size > partition->size) {
         ESP_LOGE(TAG, "Invalid codec fixture size %lu",
                  (unsigned long)command->fixture_size);
-        state_set_audio(false, "invalid flash fixture");
+        state_set_audio(command->generation, false, "invalid flash fixture");
         return;
     }
 
@@ -456,7 +452,7 @@ static void play_flash_fixture(const play_command_t *command,
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Codec fixture read failed at %lu: %s",
                      (unsigned long)offset, esp_err_to_name(result));
-            state_set_audio(false, "flash read failed");
+            state_set_audio(command->generation, false, "flash read failed");
             break;
         }
         if (!send_stream_audio(command->generation, &codec, buffer, chunk,
@@ -513,7 +509,7 @@ static void stream_task(void *argument) {
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (!client) {
             if (atomic_load(&s_generation) == command.generation) {
-                state_set_audio(false, "HTTP allocation failed");
+                state_set_audio(command.generation, false, "HTTP allocation failed");
                 network_service_set_streaming(false);
             }
             continue;
@@ -524,7 +520,7 @@ static void stream_task(void *argument) {
             ESP_LOGE(TAG, "Stream connection failed for %s: %s", command.url,
                      esp_err_to_name(result));
             if (atomic_load(&s_generation) == command.generation) {
-                state_set_audio(false, "connection failed");
+                state_set_audio(command.generation, false, "connection failed");
                 network_service_set_streaming(false);
             }
             dispose_http_client(client);
@@ -543,7 +539,7 @@ static void stream_task(void *argument) {
         }
         // Match the original yoRadio player state: a successfully opened
         // HTTP/ICY stream is playing even before its first PCM frame arrives.
-        state_set_audio(true, "connected");
+        state_set_audio(command.generation, true, "connected");
         native_codec_t codec = command.requested_codec;
         if (codec == NATIVE_CODEC_AUTO) {
             char *content_type = NULL;
@@ -568,7 +564,7 @@ static void stream_task(void *argument) {
             unsigned long icy_bitrate =
                 strtoul(icy_bitrate_text, NULL, 10);
             if (icy_bitrate > 0 && icy_bitrate <= UINT32_MAX) {
-                native_state_set_bitrate(s_state, (uint32_t)icy_bitrate);
+                native_state_set_bitrate(s_state, command.generation, (uint32_t)icy_bitrate);
                 ESP_LOGI(TAG, "ICY bitrate: %lu kbit/s", icy_bitrate);
             }
         }
@@ -681,7 +677,7 @@ static void stream_task(void *argument) {
         send_encoded(command.generation, codec, NULL, 0, true);
         dispose_http_client(client);
         if (atomic_load(&s_generation) == command.generation) {
-            state_set_audio(false, stream_stalled
+            state_set_audio(command.generation, false, stream_stalled
                                        ? "buffer stalled"
                                        : (stream_read_failed
                                               ? "stream read failed"
@@ -704,9 +700,14 @@ static void log_runtime_memory(const char *stage) {
 static bool send_pcm(uint32_t generation,
                      const esp_audio_simple_dec_info_t *info,
                      const uint8_t *data, size_t size) {
+    size_t frame_bytes = (size_t)info->channel * info->bits_per_sample / 8U;
+    if (!frame_bytes || frame_bytes > PCM_PACKET_DATA_SIZE ||
+        size % frame_bytes) return false;
     while (size) {
+        if (generation != atomic_load(&s_generation)) return false;
         size_t chunk = size > PCM_PACKET_DATA_SIZE ? PCM_PACKET_DATA_SIZE
                                                    : size;
+        chunk -= chunk % frame_bytes;
         size_t packet_size = sizeof(pcm_packet_t) + chunk;
         pcm_packet_t *packet = NULL;
         while (xRingbufferSendAcquire(s_pcm, (void **)&packet, packet_size,
@@ -726,6 +727,30 @@ static bool send_pcm(uint32_t generation,
     return true;
 }
 
+static bool update_stream_info(uint32_t generation, const char *codec,
+                                const esp_audio_simple_dec_info_t *latest,
+                                esp_audio_simple_dec_info_t *current,
+                                bool *ready, uint32_t source_rate,
+                                uint8_t source_channels, bool core_channels,
+                                bool format_is_pcm) {
+    if (generation != atomic_load(&s_generation) || !latest->sample_rate ||
+        !latest->channel || !latest->bits_per_sample) return false;
+    *current = *latest;
+    *ready = true;
+    native_stream_info_t info = {
+        .codec = codec,
+        .sample_rate_hz = source_rate ? source_rate : latest->sample_rate,
+        .channels = source_channels ? source_channels : latest->channel,
+        .bits_per_sample = latest->bits_per_sample,
+        .pcm_sample_rate_hz = latest->sample_rate,
+        .pcm_channels = latest->channel,
+        .channels_are_core = core_channels,
+        .format_is_pcm = format_is_pcm,
+    };
+    native_state_set_stream_info(s_state, generation, &info);
+    return true;
+}
+
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
 typedef struct {
     uint32_t generation;
@@ -735,26 +760,18 @@ typedef struct {
 } custom_flac_output_context_t;
 
 static bool custom_flac_output(void *user, const custom_flac_info_t *info,
-                               const uint8_t *pcm, size_t pcm_size) {
+                                 const uint8_t *pcm, size_t pcm_size) {
     custom_flac_output_context_t *context = user;
-    if (context->generation != atomic_load(&s_generation)) return false;
-    if (!*context->stream_info_ready) {
-        *context->stream_info = (esp_audio_simple_dec_info_t){
-            .sample_rate = info->sample_rate,
-            .bits_per_sample = info->bits_per_sample,
-            .channel = info->channels,
-            .bitrate = info->bitrate,
-        };
-        *context->stream_info_ready = true;
-        char format[48];
-        snprintf(format, sizeof(format), "FLAC %lu kHz %s",
-                 (unsigned long)(info->sample_rate / 1000),
-                 info->channels == 1 ? "mono" : "stereo");
-        native_state_set_stream_info(s_state, "FLAC", info->sample_rate,
-                                     info->channels);
-        state_set_audio(true, format);
-    }
-    state_set_decoder_bitrate(info->bitrate);
+    const esp_audio_simple_dec_info_t latest = {
+        .sample_rate = info->sample_rate,
+        .bits_per_sample = info->bits_per_sample,
+        .channel = info->channels,
+        .bitrate = info->bitrate,
+    };
+    if (!update_stream_info(context->generation, "FLAC", &latest,
+                            context->stream_info, context->stream_info_ready,
+                            0, 0, false, false)) return false;
+    state_set_decoder_bitrate(context->generation, info->bitrate);
     decode_stats_add_audio(context->stats, context->stream_info, pcm_size);
     return send_pcm(context->generation, context->stream_info, pcm, pcm_size);
 }
@@ -771,26 +788,23 @@ typedef struct {
 static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
                                  const uint8_t *pcm, size_t pcm_size) {
     custom_legacy_output_context_t *context = user;
-    if (context->generation != atomic_load(&s_generation)) return false;
-    if (!*context->stream_info_ready) {
-        *context->stream_info = (esp_audio_simple_dec_info_t){
-            .sample_rate = info->sample_rate,
-            .bits_per_sample = info->bits_per_sample,
-            .channel = info->channels,
-            .bitrate = info->bitrate,
-        };
-        *context->stream_info_ready = true;
-        char format[48];
-        snprintf(format, sizeof(format), "%s %lu kHz %s",
-                 codec_name(context->stats->codec),
-                 (unsigned long)(info->sample_rate / 1000),
-                 info->channels == 1 ? "mono" : "stereo");
-        native_state_set_stream_info(
-            s_state, codec_name(context->stats->codec), info->sample_rate,
-            info->channels);
-        state_set_audio(true, format);
+    const esp_audio_simple_dec_info_t latest = {
+        .sample_rate = info->sample_rate,
+        .bits_per_sample = info->bits_per_sample,
+        .channel = info->channels,
+        .bitrate = info->bitrate,
+    };
+    const char *label = codec_name(context->stats->codec);
+    if (context->stats->codec == NATIVE_CODEC_AAC) {
+        if (info->aac_sbr) label = "HE-AAC";
+        else if (info->aac_profile_known && info->aac_profile == 1)
+            label = "AAC-LC";
     }
-    state_set_decoder_bitrate(info->bitrate);
+    if (!update_stream_info(context->generation, label, &latest,
+                            context->stream_info, context->stream_info_ready,
+                            info->stream_sample_rate, info->stream_channels,
+                            info->channels_are_core, false)) return false;
+    state_set_decoder_bitrate(context->generation, info->bitrate);
     decode_stats_add_audio(context->stats, context->stream_info, pcm_size);
     return send_pcm(context->generation, context->stream_info, pcm, pcm_size);
 }
@@ -815,6 +829,7 @@ static void decoder_task(void *argument) {
     uint8_t *output = NULL;
     size_t output_size = 0;
     esp_audio_simple_dec_handle_t decoder = NULL;
+    native_aac_decoder_t *aac_decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
     custom_flac_decoder_t *flac_decoder = NULL;
 #endif
@@ -836,7 +851,7 @@ static void decoder_task(void *argument) {
     while (true) {
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
-            bool had_simple_decoder = decoder != NULL;
+            bool had_simple_decoder = decoder != NULL || aac_decoder != NULL;
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             bool had_legacy_decoder = legacy_decoder != NULL;
 #endif
@@ -844,6 +859,8 @@ static void decoder_task(void *argument) {
                 &s_decoder_target_codec);
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
+            native_aac_decoder_destroy(aac_decoder);
+            aac_decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
             flac_decoder = NULL;
@@ -858,7 +875,7 @@ static void decoder_task(void *argument) {
                 !codec_uses_custom_legacy(target_codec) &&
                 !custom_legacy_decoder_discard_arena()) {
                 ESP_LOGE(TAG, "Old codec arena is still in use");
-                state_set_audio(false, "DECODER BUSY");
+                state_set_audio(generation, false, "DECODER BUSY");
             }
 #endif
             // The simple decoder is already closed. Its reusable PCM buffer
@@ -898,6 +915,8 @@ static void decoder_task(void *argument) {
         if (packet->generation != generation || packet->codec != codec) {
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
+            native_aac_decoder_destroy(aac_decoder);
+            aac_decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
             flac_decoder = NULL;
@@ -925,7 +944,7 @@ static void decoder_task(void *argument) {
                 flac_decoder = custom_flac_decoder_create();
                 if (!flac_decoder) {
                     ESP_LOGE(TAG, "Custom FLAC decoder allocation failed");
-                    state_set_audio(false, "NO MEMORY");
+                    state_set_audio(generation, false, "NO MEMORY");
                     failed_generation = generation;
                 }
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -955,7 +974,7 @@ static void decoder_task(void *argument) {
                 if (!legacy_decoder) {
                     ESP_LOGE(TAG, "Custom %s decoder allocation failed",
                              codec_name(codec));
-                    state_set_audio(false, "NO MEMORY");
+                    state_set_audio(generation, false, "NO MEMORY");
                     failed_generation = generation;
                 }
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -974,7 +993,7 @@ static void decoder_task(void *argument) {
                 // arena to the heap only when crossing decoder families.
                 if (!custom_legacy_decoder_discard_arena()) {
                     ESP_LOGE(TAG, "Old codec arena is still in use");
-                    state_set_audio(false, "decoder release failed");
+                    state_set_audio(generation, false, "decoder release failed");
                     failed_generation = generation;
                     vRingbufferReturnItem(s_encoded, packet);
                     continue;
@@ -988,7 +1007,7 @@ static void decoder_task(void *argument) {
                                  "%s PCM buffer allocation failed: %lu",
                                  codec_name(codec),
                                  (unsigned long)DECODE_BUFFER_INITIAL);
-                        state_set_audio(false, "NO MEMORY");
+                        state_set_audio(generation, false, "NO MEMORY");
                         failed_generation = generation;
                         vRingbufferReturnItem(s_encoded, packet);
                         continue;
@@ -1002,12 +1021,18 @@ static void decoder_task(void *argument) {
                     .cfg_size = 0,
                     .use_frame_dec = false,
                 };
-                esp_audio_err_t open_result =
-                    esp_audio_simple_dec_open(&cfg, &decoder);
+                esp_audio_err_t open_result;
+#ifdef CONFIG_YORADIO_AAC_DECODER_ESPRESSIF
+                if (codec == NATIVE_CODEC_AAC) {
+                    aac_decoder = native_aac_decoder_create();
+                    open_result = aac_decoder ? ESP_AUDIO_ERR_OK : ESP_AUDIO_ERR_MEM_LACK;
+                } else
+#endif
+                open_result = esp_audio_simple_dec_open(&cfg, &decoder);
                 if (open_result != ESP_AUDIO_ERR_OK) {
                     ESP_LOGE(TAG, "%s decoder open failed: %d",
                              codec_name(codec), open_result);
-                    state_set_audio(
+                    state_set_audio(generation,
                         false,
                         open_result == ESP_AUDIO_ERR_MEM_LACK
                             ? "NO MEMORY" : "DECODER ERROR");
@@ -1056,7 +1081,7 @@ static void decoder_task(void *argument) {
                 decode_stats_report(&stats, esp_timer_get_time());
                 if (result < 0 && generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom FLAC decode error: %d", result);
-                    state_set_audio(false,
+                    state_set_audio(generation, false,
                                     result == -5 || result == -6 ? "NO MEMORY" : "decode failed");
                     failed_generation = generation;
                 }
@@ -1108,7 +1133,7 @@ static void decoder_task(void *argument) {
                 if (result < 0 && generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom %s decode error: %d",
                              codec_name(codec), result);
-                    state_set_audio(false, "decode failed");
+                    state_set_audio(generation, false, "decode failed");
                     failed_generation = generation;
                 }
             }
@@ -1116,7 +1141,7 @@ static void decoder_task(void *argument) {
             continue;
         }
 #endif
-        if (!decoder) {
+        if (!decoder && !aac_decoder) {
             vRingbufferReturnItem(s_encoded, packet);
             continue;
         }
@@ -1125,15 +1150,18 @@ static void decoder_task(void *argument) {
             .len = packet->data_size,
             .eos = packet->end_of_stream,
         };
-        while (raw.len || raw.eos) {
+        bool retry_pcm = false;
+        while (raw.len || raw.eos || retry_pcm) {
+            retry_pcm = false;
             esp_audio_simple_dec_out_t frame = {
                 .buffer = output,
                 .len = output_size,
             };
             raw.consumed = 0;
             int64_t decode_started_us = esp_timer_get_time();
-            esp_audio_err_t result =
-                esp_audio_simple_dec_process(decoder, &raw, &frame);
+            esp_audio_err_t result = aac_decoder
+                ? native_aac_decoder_process(aac_decoder, &raw, &frame)
+                : esp_audio_simple_dec_process(decoder, &raw, &frame);
             uint32_t decode_call_us =
                 (uint32_t)(esp_timer_get_time() - decode_started_us);
             stats.decode_us += decode_call_us;
@@ -1147,19 +1175,25 @@ static void decoder_task(void *argument) {
             if ((stats.calls & 31U) == 0U) vTaskDelay(1);
             if (generation != atomic_load(&s_generation)) break;
             if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
+                if (aac_decoder) {
+                    stats.input_bytes += raw.consumed;
+                    raw.buffer += raw.consumed;
+                    raw.len -= raw.consumed;
+                }
                 uint8_t *larger = realloc(output, frame.needed_size);
                 if (!larger) {
-                    state_set_audio(false, "PCM allocation failed");
+                    state_set_audio(generation, false, "PCM allocation failed");
                     break;
                 }
                 output = larger;
                 output_size = frame.needed_size;
+                retry_pcm = true;
                 continue;
             }
             if (result != ESP_AUDIO_ERR_OK) {
                 ESP_LOGW(TAG, "%s decode error: %d", codec_name(codec),
                          result);
-                state_set_audio(false, "decode failed");
+                state_set_audio(generation, false, "decode failed");
                 failed_generation = generation;
                 break;
             }
@@ -1167,7 +1201,7 @@ static void decoder_task(void *argument) {
                 ESP_LOGE(TAG, "%s decoder consumed invalid input size %lu/%lu",
                          codec_name(codec), (unsigned long)raw.consumed,
                          (unsigned long)raw.len);
-                state_set_audio(false, "decoder input error");
+                state_set_audio(generation, false, "decoder input error");
                 failed_generation = generation;
                 break;
             }
@@ -1176,24 +1210,23 @@ static void decoder_task(void *argument) {
             raw.len -= raw.consumed;
             if (frame.decoded_size) {
                 esp_audio_simple_dec_info_t latest_info = {0};
-                if (esp_audio_simple_dec_get_info(decoder, &latest_info) ==
-                    ESP_AUDIO_ERR_OK) {
-                    if (!stream_info_ready) {
-                        stream_info = latest_info;
-                        stream_info_ready = true;
-                        char format[48];
-                        snprintf(format, sizeof(format), "%s %lu kHz %s",
-                                 codec_name(codec),
-                                 (unsigned long)(stream_info.sample_rate / 1000),
-                                 stream_info.channel == 1 ? "mono" : "stereo");
-                        native_state_set_stream_info(
-                            s_state, codec_name(codec), stream_info.sample_rate,
-                            stream_info.channel);
-                        state_set_audio(true, format);
-                    } else if (latest_info.bitrate) {
-                        stream_info.bitrate = latest_info.bitrate;
-                    }
-                    state_set_decoder_bitrate(latest_info.bitrate);
+                esp_audio_err_t info_result = aac_decoder
+                    ? native_aac_decoder_get_info(aac_decoder, &latest_info)
+                    : esp_audio_simple_dec_get_info(decoder, &latest_info);
+                if (info_result == ESP_AUDIO_ERR_OK) {
+                    bool format_is_pcm = codec == NATIVE_CODEC_AAC;
+                    const char *label = aac_decoder
+                        ? native_aac_decoder_label(aac_decoder, &latest_info,
+                                                   &format_is_pcm)
+                        : codec_name(codec);
+                    stream_info_ready = update_stream_info(
+                        generation, label, &latest_info,
+                        &stream_info, &stream_info_ready, 0, 0, false,
+                        format_is_pcm);
+                    state_set_decoder_bitrate(generation, latest_info.bitrate);
+                } else {
+                    // Never send a frame with another frame's stale layout.
+                    stream_info_ready = false;
                 }
                 if (stream_info_ready) {
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -1220,7 +1253,7 @@ static void decoder_task(void *argument) {
             if (!raw.consumed && !frame.decoded_size && !raw.eos) {
                 ESP_LOGE(TAG, "%s decoder made no input progress",
                          codec_name(codec));
-                state_set_audio(false, "decoder stalled");
+                state_set_audio(generation, false, "decoder stalled");
                 failed_generation = generation;
                 break;
             }
@@ -1375,12 +1408,10 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     strlcpy(s_last_url, url, sizeof(s_last_url));
     s_last_codec = codec;
     atomic_store(&s_measured_bitrate_ready, false);
-    native_state_set_bitrate(s_state, 0);
-    native_state_set_stream_info(s_state, "", 0, 0);
     native_state_set_station(s_state, url);
     // Clear a previous station's playing state before the command is queued.
     // The stream task switches it back after open_stream() succeeds.
-    state_set_audio(false, "connecting");
+    state_set_audio(command.generation, false, "connecting");
     if (xQueueOverwrite(s_commands, &command) == pdTRUE) return ESP_OK;
     if (atomic_load(&s_generation) == command.generation) {
         network_service_set_streaming(false);
@@ -1450,12 +1481,10 @@ esp_err_t audio_service_resume(void) {
 }
 
 void audio_service_stop(void) {
-    advance_generation(NATIVE_CODEC_AUTO);
+    uint32_t generation = advance_generation(NATIVE_CODEC_AUTO);
     network_service_set_streaming(false);
     native_state_set_title(s_state, "");
-    native_state_set_bitrate(s_state, 0);
-    native_state_set_stream_info(s_state, "", 0, 0);
-    state_set_audio(false, "stopped");
+    state_set_audio(generation, false, "stopped");
 }
 
 uint8_t audio_service_buffer_fill_percent(void) {

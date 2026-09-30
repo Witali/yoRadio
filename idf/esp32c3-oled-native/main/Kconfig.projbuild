@@ -1,5 +1,15 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_AAC_PLUS
+    bool "Decode full HE-AAC SBR/PS with Espressif AAC"
+    depends on YORADIO_AAC_DECODER_ESPRESSIF
+    default y
+    help
+        Reconstruct the high-frequency SBR band and HE-AAC v2 stereo instead
+        of playing only the lower-rate AAC core. Uses more CPU and RAM.
+        If disabled, status explicitly labels the decoder's PCM parameters;
+        the public API cannot confirm the nominal source format in that mode.
+
 config YORADIO_DEEP_SLEEP_CLOCK
     bool "Deep sleep while showing the stopped-radio clock"
     depends on !YORADIO_QEMU
@@ -37,6 +47,15 @@ config YORADIO_QEMU
         Skip peripherals that the ESP32-C3 QEMU machine does not emulate and
         run deterministic NVS, SPIFFS and FreeRTOS startup checks instead.
         This option is intended only for sdkconfig.qemu.defaults.
+
+config YORADIO_QEMU_AAC_TEST
+    bool "Run AAC stream-format regression fixtures in QEMU"
+    depends on YORADIO_QEMU && YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS
+    default n
+    help
+        Decode generated AAC-LC, HE-AAC and HE-AAC v2 fixtures, verify PCM
+        layouts and stream changes, and write the result to the virtual OLED.
+        Test fixtures are included only in this emulator image.
 
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"

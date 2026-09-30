@@ -95,4 +95,9 @@ if ($joinedOutput -notmatch "QEMU_OLED_PASS" -or
     throw "QEMU OLED/audio validation failed; see $log"
 }
 
+$builtConfig = Get-Content -LiteralPath (Join-Path $buildPath "config/sdkconfig.h") -Raw
+if ($builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_TEST 1' -and
+    $joinedOutput -notmatch 'QEMU_AAC_FORMAT_PASS') {
+    throw "QEMU AAC validation failed; see $log"
+}
 Write-Host "QEMU smoke test passed; log: $log; audio: $AudioOutput"

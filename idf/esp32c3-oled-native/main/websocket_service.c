@@ -36,11 +36,14 @@ typedef struct {
     uint32_t bitrate_kbps;
     uint32_t sample_rate_hz;
     uint8_t channels;
+    uint8_t bits_per_sample;
+    uint32_t pcm_sample_rate_hz;
+    uint8_t pcm_channels;
     uint16_t current_item;
     bool station_uppercase;
     char station[144];
     char title[192];
-    char codec[8];
+    char codec[16];
     char stream_format[48];
 } webui_status_key_t;
 
@@ -166,6 +169,9 @@ static void capture_status_key(webui_status_key_t *key) {
     key->bitrate_kbps = state.bitrate_kbps;
     key->sample_rate_hz = state.sample_rate_hz;
     key->channels = state.channels;
+    key->bits_per_sample = state.bits_per_sample;
+    key->pcm_sample_rate_hz = state.pcm_sample_rate_hz;
+    key->pcm_channels = state.pcm_channels;
     key->current_item = radio_control_current_item();
     key->station_uppercase = display_settings_get_station_uppercase();
     radio_control_current_name(key->station, sizeof(key->station));

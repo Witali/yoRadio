@@ -145,7 +145,7 @@ alternative implementation in this repository:
 | Codec | Implementations | Default |
 |---|---|---|
 | MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | Espressif |
-| AAC | Espressif, yoRadio Helix AAC-LC | Helix |
+| AAC | Espressif with AAC Plus (SBR/PS), yoRadio Helix AAC core | Espressif + AAC Plus |
 | FLAC | optimized yoRadio FLAC, Espressif | yoRadio |
 
 The choices are under **yoRadio ESP32-C3 OLED** in `menuconfig`, and can also
@@ -156,6 +156,42 @@ no independent alternative for them. The yoRadio backends compile directly
 from the shared sources through a small ESP-IDF compatibility layer; Arduino
 Core is not linked. Backend alternatives are compile-time diagnostics and are
 not exposed as a WebUI setting.
+
+### AAC and current stream parameters
+
+Fresh builds enable `CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y` and
+`CONFIG_YORADIO_AAC_PLUS=y`. This reconstructs the HE-AAC high-frequency band
+and HE-AAC v2 stereo; HE-AAC is not capped at its 22.05/24 kHz core rate.
+The emulator tests actual 44.1/48 kHz PCM. AAC Plus uses more CPU and RAM;
+real-board playback margin with Wi-Fi still needs measurement.
+
+An existing `sdkconfig` keeps its saved decoder choice. To change it, run
+`./build.ps1 menuconfig` (PowerShell: `.\build.ps1 menuconfig`), select
+**yoRadio codec backends → AAC decoder → Espressif**, then enable
+**yoRadio ESP32-C3 OLED → Decode full HE-AAC SBR/PS with Espressif AAC**.
+Rebuild with the same build directory, SDK configuration and Deep Sleep options.
+Helix remains available as a smaller core-only alternative on C3.
+
+OLED and WebUI use the current confirmed format, including decimal kHz and
+mono/stereo. PCM rate/channels are tracked separately from source metadata;
+Stop and station changes clear stale parameters. OLED retains a snapshot only
+until its current scrolling line finishes. WebUI updates independently of bitrate.
+`GET /api/status` also exposes `sample_rate`, `channels`, `bits_per_sample`,
+`pcm_sample_rate`, `pcm_channels`, `format_is_pcm` and `channels_are_core`.
+
+The Espressif API exposes decoded PCM, without explicit AAC profile/SBR/PS flags.
+The ADTS adapter identifies `HE-AAC` when output rate is twice the core rate and
+`HE-AACv2` when a mono core also produces stereo. Otherwise it reports, for example,
+`AAC PCM 44.1 kHz stereo`, without claiming an unconfirmed source profile.
+With Helix, `HE-AAC 44.1 kHz core mono` means SBR was detected but PS stereo was
+not confirmed; the actual PCM may still be 22.05 kHz mono.
+
+ADTS rate/channel/profile changes recreate the Espressif decoder at the frame
+boundary. **Known SDK limitation:** introducing SBR/PS with an identical ADTS
+configuration after AAC-LC can leave core-only output until Stop/Play or a stream
+restart. The status then explicitly reports actual `AAC PCM` parameters.
+This case remains in the TODO; it is not hidden by doubling the displayed rate.
+See the [validation report](../../docs/ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md).
 
 Both native ESP-IDF profiles default to Espressif MP3. With the deterministic
 320 kbit/s fixture, the 160 MHz C3 measured 27.9% decoder time for Espressif

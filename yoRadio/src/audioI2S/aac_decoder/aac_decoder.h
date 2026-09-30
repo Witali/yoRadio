@@ -462,6 +462,7 @@ int AACDecodeBlocks(uint8_t *inbuf, int *bytesLeft, short *pcm, int capacity,
 #endif
 int AACGetSampRate();
 int AACGetStreamSampRate();
+bool AACGetSBRPresent();
 int AACGetChannels();
 int AACGetID(); // 0-MPEG4, 1-MPEG2
 uint8_t AACGetProfile(); // 0-Main, 1-LC, 2-SSR, 3-reserved

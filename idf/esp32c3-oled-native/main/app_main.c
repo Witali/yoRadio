@@ -137,6 +137,11 @@ static void qemu_smoke_task(void *argument) {
     }
     ESP_LOGI(TAG, "QEMU_AUDIO_PASS %u stereo frames", QEMU_TONE_FRAMES);
 
+#ifdef CONFIG_YORADIO_QEMU_AAC_TEST
+    extern void qemu_aac_test(native_state_t *, oled_display_t *);
+    qemu_aac_test(&s_state, &s_display);
+#endif
+
     oled_display_clear(&s_display);
     oled_display_draw_large_text(&s_display, 8, 12, "QEMU OK", 0, false,
                                  false, false);
@@ -463,6 +468,8 @@ static bool display_state_changed(const native_state_t *current,
     // updates do not interrupt an autonomous station-title scroll.
     return strcmp(current->station, previous->station) != 0 ||
            strcmp(current->title, previous->title) != 0 ||
+           current->audio_running != previous->audio_running ||
+           current->audio_generation != previous->audio_generation ||
            current->network_mode != previous->network_mode ||
            current->ipv4 != previous->ipv4;
 }
@@ -486,45 +493,7 @@ static display_scroll_t *scroll_for_owner(display_scroll_owner_t owner,
 
 static void format_stream_details(const native_state_t *state, char *output,
                                   size_t output_size) {
-    char bitrate[20] = "";
-    char sample_rate[20] = "";
-    char channels[16] = "";
-    if (state->bitrate_kbps) {
-        snprintf(bitrate, sizeof(bitrate), "%lu kbps",
-                 (unsigned long)state->bitrate_kbps);
-    }
-    if (state->sample_rate_hz) {
-        uint32_t tenths_khz = (state->sample_rate_hz + 50U) / 100U;
-        if (tenths_khz % 10U) {
-            snprintf(sample_rate, sizeof(sample_rate), "%lu.%lu kHz",
-                     (unsigned long)(tenths_khz / 10U),
-                     (unsigned long)(tenths_khz % 10U));
-        } else {
-            snprintf(sample_rate, sizeof(sample_rate), "%lu kHz",
-                     (unsigned long)(tenths_khz / 10U));
-        }
-    }
-    if (state->channels == 1) {
-        strcpy(channels, "mono");
-    } else if (state->channels == 2) {
-        strcpy(channels, "stereo");
-    } else if (state->channels) {
-        snprintf(channels, sizeof(channels), "%u channels", state->channels);
-    }
-
-    const char *parts[] = {state->codec, bitrate, sample_rate, channels};
-    size_t written = 0;
-    output[0] = '\0';
-    for (size_t index = 0; index < sizeof(parts) / sizeof(parts[0]); ++index) {
-        if (!parts[index][0] || written + 1 >= output_size) continue;
-        int result = snprintf(output + written, output_size - written,
-                              "%s%s", written ? " " : "", parts[index]);
-        if (result < 0) break;
-        size_t added = (size_t)result;
-        written += added < output_size - written
-                       ? added
-                       : output_size - written - 1;
-    }
+    native_state_format_stream_details(state, output, output_size);
 }
 
 static void draw_status(const native_state_t *state,
@@ -696,6 +665,8 @@ static void display_task(void *argument) {
             }
         }
         bool title_changed = strcmp(state.title, previous.title) != 0 ||
+                             state.audio_generation != previous.audio_generation ||
+                             state.audio_running != previous.audio_running ||
                              audio_info_changed;
         if (title_changed) {
             show_stream_info = audio_info && !state.title[0];

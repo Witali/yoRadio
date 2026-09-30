@@ -40,3 +40,34 @@ or Wi-Fi radio. It cannot validate RF behavior, electrical pin assignments,
 speaker quality, or real-time CPU margin; those still require the physical board.
 Hardware debug and production builds do not enable
 `CONFIG_YORADIO_QEMU` and retain their normal behavior.
+
+## Actual AAC decoder regression
+
+Use a separate configuration, enable **yoRadio ESP32-C3 OLED → Run AAC
+stream-format regression fixtures in QEMU**, and build/run it:
+
+```powershell
+.\build-qemu.ps1 -BuildDirectory build-qemu-aac `
+  -Sdkconfig build-qemu-aac/sdkconfig menuconfig
+.\build-qemu.ps1 -BuildDirectory build-qemu-aac `
+  -Sdkconfig build-qemu-aac/sdkconfig
+.\run-qemu.ps1 -SkipBuild -BuildDirectory build-qemu-aac `
+  -QemuExecutable C:\path\to\qemu-system-riscv32.exe `
+  -QemuBiosDirectory C:\path\to\qemu\pc-bios
+```
+
+This requires Espressif AAC and `CONFIG_YORADIO_AAC_PLUS=y`. It embeds original
+synthetic fixtures from `tests/fixtures/aac_stream_format/` and executes the
+actual RISC-V decoder through the production ADTS adapter. Every output frame
+is checked for its rate, channel count and 16-bit sample layout, then sent to
+the emulated PCM output. The shared state formatter is presented on the OLED.
+The runner additionally requires `QEMU_AAC_FORMAT_PASS` for this configuration.
+
+Cases cover AAC-LC 44.1 kHz stereo → 22.05 kHz mono → 48 kHz stereo,
+HE-AAC 44.1/48 kHz stereo, HE-AAC v2 44.1 kHz stereo, and stream restart.
+`QEMU_AAC_LIMITATION` records the known SDK case where SBR/PS starts after LC
+with identical ADTS headers: actual core PCM is reported honestly and a restart
+restores full decoding. It is not counted as successful full-rate playback.
+Host tests separately execute the production callback, PCM packet, OLED snapshot
+and WebSocket formatter paths (`python3 tests/run-esp32c3-stream-format.py`).
+The emulator does not serve the WebUI over Wi-Fi or establish hardware CPU margin.
