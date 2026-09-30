@@ -956,7 +956,14 @@ void app_main(void) {
     ESP_ERROR_CHECK(oled_display_init(&s_display));
     ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));
     ESP_ERROR_CHECK(native_audio_output_init());
-    ESP_ERROR_CHECK(xTaskCreate(qemu_smoke_task, "qemu_smoke", 4096, NULL, 3,
+#ifdef CONFIG_YORADIO_QEMU_AAC_PROFILE
+    // Real codec implementations need the production decoder's stack, plus
+    // space for the parent smoke task's PCM array and regression harness.
+    const uint32_t qemu_stack = BOARD_TASK_STACK_AUDIO_DECODER + 4096;
+#else
+    const uint32_t qemu_stack = 4096;
+#endif
+    ESP_ERROR_CHECK(xTaskCreate(qemu_smoke_task, "qemu_smoke", qemu_stack, NULL, 3,
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);

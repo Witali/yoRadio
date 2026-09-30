@@ -184,3 +184,8 @@ tests/results/esp8266-codec-timing-20260919/*.json text eol=lf
 tests/results/esp8266-codec-timing-20260919/*.tap -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
 tests/results/esp8266-codec-timing-20260919/**/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
 firmware/development/esp8266-helix-timing-20260919/*.json text eol=lf
+
+# Preserve original decoder timing evidence, including UART line endings.
+tests/results/esp32c3-aac-calibration-20260930/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
+tools/codec_benchmark/calibration/*.json text eol=lf
+tests/fixtures/esp32c3_calibration/manifest.json text eol=lf

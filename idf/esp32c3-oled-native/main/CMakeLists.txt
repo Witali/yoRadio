@@ -44,6 +44,9 @@ if(CONFIG_YORADIO_QEMU)
   list(APPEND NATIVE_SRCS "native_audio_output_qemu.c")
   if(CONFIG_YORADIO_QEMU_AAC_TEST)
     list(APPEND NATIVE_SRCS "qemu_aac_test.c")
+    if(CONFIG_YORADIO_QEMU_AAC_PROFILE)
+      list(APPEND NATIVE_SRCS "qemu_aac_calibration.c" "qemu_codec_calibration.c")
+    endif()
   endif()
 else()
   list(APPEND NATIVE_SRCS "native_audio_output.c")
@@ -101,6 +104,14 @@ if(CONFIG_YORADIO_QEMU_AAC_TEST)
     target_add_binary_data(${COMPONENT_LIB}
                           "${CMAKE_CURRENT_BINARY_DIR}/${FIXTURE}.aac" BINARY)
   endforeach()
+endif()
+
+# Keep the original physical-board fixture byte-for-byte for timing calibration.
+if(CONFIG_YORADIO_QEMU_AAC_PROFILE)
+  configure_file("${YORADIO_ROOT}/../tests/fixtures/esp32c3_calibration/aac-lc-320.aac"
+                 "${CMAKE_CURRENT_BINARY_DIR}/aac-lc-320.aac" COPYONLY)
+  target_add_binary_data(${COMPONENT_LIB}
+                        "${CMAKE_CURRENT_BINARY_DIR}/aac-lc-320.aac" BINARY)
 endif()
 
 # Ship the same shared WebUI script with application OTA, including capability

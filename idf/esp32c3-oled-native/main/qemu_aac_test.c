@@ -6,6 +6,7 @@
 
 #include "native_aac_decoder.h"
 #include "esp_audio_dec_default.h"
+#include "esp_audio_codec_version.h"
 #include "esp_aac_dec.h"
 #include "esp_audio_simple_dec.h"
 #include "esp_audio_simple_dec_default.h"
@@ -30,6 +31,9 @@ FIXTURE(hev2, "hev2_44100_stereo");
 static const char *TAG = "qemu_aac";
 
 #ifdef CONFIG_YORADIO_QEMU_AAC_PROFILE
+void qemu_aac_calibration(void);
+void qemu_codec_calibration(void);
+
 static inline uint32_t instruction_count(void) {
     uint32_t value;
     __asm__ volatile("csrr %0, minstret" : "=r"(value) :: "memory");
@@ -210,6 +214,10 @@ void qemu_aac_test(native_state_t *state, oled_display_t *display) {
     assert(!state->sample_rate_hz && !state->channels && !state->audio_running);
 #ifdef CONFIG_YORADIO_QEMU_AAC_PROFILE
     check_instruction_counter();
+    ESP_LOGI(TAG, "QEMU_AAC_WORK_ENV target=esp32c3 cpu_hz=%d codec_version=%s",
+             CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ * 1000000, esp_audio_codec_get_version());
+    qemu_aac_calibration();
+    qemu_codec_calibration();
     profile_fixture("lc44100_stereo", lc44_start, lc44_end, 44100, 2);
     profile_fixture("lc22050_mono", lc22_start, lc22_end, 22050, 1);
     profile_fixture("lc48000_stereo", lc48_start, lc48_end, 48000, 2);

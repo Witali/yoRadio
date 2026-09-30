@@ -1,0 +1,327 @@
+{
+  "measurement": "RISC-V guest instructions in production ADTS/AAC decode calls",
+  "hardware_cpu_load_measured": false,
+  "qemu_icount": "shift=0,align=off,sleep=off",
+  "counter_calibration": {
+    "nop_instructions": 1024,
+    "observed_including_counter_read": 1025
+  },
+  "warmup_repeats": 1,
+  "measured_repeats_per_run": 8,
+  "runs_per_case": 3,
+  "log_sha256_utf8_lf": "087de5c009cca4b1cea71b2dbc2188b7de2e692948988cf78713abf6d21facc0",
+  "limitations": [
+    "QEMU is not cycle accurate; the 160 MHz percentage assumes one cycle per instruction.",
+    "Measured calls include ADTS assembly and incidental RTOS interrupts, exclude deliberate delays, UI and PCM output.",
+    "No Wi-Fi, TCP/TLS, physical PDM output, cache stalls, or hardware instruction latency is modeled.",
+    "Original half-second synthetic fixtures repeated; not a worst-case music/corpus benchmark."
+  ],
+  "cases": [
+    {
+      "case": "lc44100_stereo",
+      "median_million_instructions_per_audio_second": 11.140916821289062,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 6.963073013305664,
+      "decoder_heap_bytes": 61412,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 49668784,
+          "samples": 196608,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 192,
+          "max_call": 385485,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 11140916.821289062
+        },
+        {
+          "run": 2,
+          "instructions": 49668784,
+          "samples": 196608,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 192,
+          "max_call": 385485,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 11140916.821289062
+        },
+        {
+          "run": 3,
+          "instructions": 49668784,
+          "samples": 196608,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 192,
+          "max_call": 385485,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 11140916.821289062
+        }
+      ],
+      "estimated_decoder_percent_at_160MHz": 14.052824629516387,
+      "estimate_using_observed_factor_range_percent": [
+        12.330752252300664,
+        14.071286296029465
+      ],
+      "estimate_status": "AAC-LC extrapolation across fixture/layout/adapter"
+    },
+    {
+      "case": "lc22050_mono",
+      "median_million_instructions_per_audio_second": 3.269488927283654,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 2.043430579552284,
+      "decoder_heap_bytes": 61412,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 15790816,
+          "samples": 106496,
+          "rate": 22050,
+          "channels": 1,
+          "frames": 104,
+          "max_call": 277472,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 3269488.927283654
+        },
+        {
+          "run": 2,
+          "instructions": 15790816,
+          "samples": 106496,
+          "rate": 22050,
+          "channels": 1,
+          "frames": 104,
+          "max_call": 277472,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 3269488.927283654
+        },
+        {
+          "run": 3,
+          "instructions": 15790816,
+          "samples": 106496,
+          "rate": 22050,
+          "channels": 1,
+          "frames": 104,
+          "max_call": 277472,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 3269488.927283654
+        }
+      ],
+      "estimated_decoder_percent_at_160MHz": 4.1240371201287465,
+      "estimate_using_observed_factor_range_percent": [
+        3.6186660937039754,
+        4.129455005856819
+      ],
+      "estimate_status": "AAC-LC extrapolation across fixture/layout/adapter"
+    },
+    {
+      "case": "lc48000_stereo",
+      "median_million_instructions_per_audio_second": 12.06054266826923,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 7.537839167668269,
+      "decoder_heap_bytes": 61412,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 53516648,
+          "samples": 212992,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 208,
+          "max_call": 367169,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 12060542.66826923
+        },
+        {
+          "run": 2,
+          "instructions": 53516648,
+          "samples": 212992,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 208,
+          "max_call": 367169,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 12060542.66826923
+        },
+        {
+          "run": 3,
+          "instructions": 53516648,
+          "samples": 212992,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 208,
+          "max_call": 367169,
+          "decoder_heap": 61412,
+          "instructions_per_audio_second": 12060542.66826923
+        }
+      ],
+      "estimated_decoder_percent_at_160MHz": 15.21281361064653,
+      "estimate_using_observed_factor_range_percent": [
+        13.348592944034017,
+        15.23279919354603
+      ],
+      "estimate_status": "AAC-LC extrapolation across fixture/layout/adapter"
+    },
+    {
+      "case": "he44100_stereo",
+      "median_million_instructions_per_audio_second": 27.829951611328124,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 17.393719757080078,
+      "decoder_heap_bytes": 117932,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 144751088,
+          "samples": 229376,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 112,
+          "max_call": 1568467,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 27829951.611328125
+        },
+        {
+          "run": 2,
+          "instructions": 144751088,
+          "samples": 229376,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 112,
+          "max_call": 1568467,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 27829951.611328125
+        },
+        {
+          "run": 3,
+          "instructions": 144751088,
+          "samples": 229376,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 112,
+          "max_call": 1568467,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 27829951.611328125
+        }
+      ],
+      "estimated_decoder_percent_at_160MHz": 35.10388199780761,
+      "estimate_using_observed_factor_range_percent": [
+        30.80215425871,
+        35.14999914363727
+      ],
+      "estimate_status": "unvalidated SBR/PS extrapolation from AAC-LC"
+    },
+    {
+      "case": "he48000_stereo",
+      "median_million_instructions_per_audio_second": 30.63465625,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 19.14666015625,
+      "decoder_heap_bytes": 117932,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 156849440,
+          "samples": 245760,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1594538,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 30634656.25
+        },
+        {
+          "run": 2,
+          "instructions": 156849440,
+          "samples": 245760,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1594538,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 30634656.25
+        },
+        {
+          "run": 3,
+          "instructions": 156849440,
+          "samples": 245760,
+          "rate": 48000,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1594538,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 30634656.25
+        }
+      ],
+      "estimated_decoder_percent_at_160MHz": 38.641653893701424,
+      "estimate_using_observed_factor_range_percent": [
+        33.90639770609442,
+        38.692418728993026
+      ],
+      "estimate_status": "unvalidated SBR/PS extrapolation from AAC-LC"
+    },
+    {
+      "case": "hev2_44100_stereo",
+      "median_million_instructions_per_audio_second": 36.524304755859376,
+      "run_spread_percent": 0.0,
+      "hypothetical_decoder_percent_at_160MHz_1_cycle_per_instruction": 22.827690472412108,
+      "decoder_heap_bytes": 117932,
+      "runs": [
+        {
+          "run": 1,
+          "instructions": 203542248,
+          "samples": 245760,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1843707,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 36524304.755859375
+        },
+        {
+          "run": 2,
+          "instructions": 203542248,
+          "samples": 245760,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1843707,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 36524304.755859375
+        },
+        {
+          "run": 3,
+          "instructions": 203542248,
+          "samples": 245760,
+          "rate": 44100,
+          "channels": 2,
+          "frames": 120,
+          "max_call": 1843707,
+          "decoder_heap": 117932,
+          "instructions_per_audio_second": 36524304.755859375
+        }
+      ],
+      "estimated_decoder_percent_at_160MHz": 46.07068320161061,
+      "estimate_using_observed_factor_range_percent": [
+        40.42505301461522,
+        46.131207801591124
+      ],
+      "estimate_status": "unvalidated SBR/PS extrapolation from AAC-LC"
+    }
+  ],
+  "calibration": {
+    "id": "esp32c3-espressif-aac-160mhz-20260930",
+    "sha256_utf8_lf": "dd6e0c9b77ef2a04eb59ef7945aa1b876a54af7da6dc383d25988f90ef646ae1",
+    "factor": 2.018192916067804,
+    "observed_factor_range": [
+      1.770877919668221,
+      2.0208442837150766
+    ],
+    "limitations": [
+      "Empirical decoder-call elapsed-time factor, not a universal CPU CPI or emulator speed multiplier.",
+      "Observed range spans two historical firmware builds; it is not a confidence interval or guaranteed bound.",
+      "Hardware decode times are floored to milliseconds; counter/timer overhead and preemption are included.",
+      "AAC-LC rate/bitrate/channel or adapter changes are extrapolations; HE-AAC SBR/PS transfer is unvalidated.",
+      "No estimate of total radio CPU: Wi-Fi, TLS, PDM, display and other work must be added separately.",
+      "Historical logs lack a fixture hash and codec archive hash; recovered bytes match saved lengths and both exact PCM/input/call windows.",
+      "Recalibrate when codec library, target, clock, memory placement or instruction mix changes."
+    ]
+  }
+}

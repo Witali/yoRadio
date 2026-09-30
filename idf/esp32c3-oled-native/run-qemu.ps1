@@ -5,6 +5,8 @@ param(
     [string]$AudioOutput = "",
     [string]$BuildDirectory = "build-qemu",
     [string]$DependencyRoot = "",
+    [ValidateSet("mp3", "flac", "vorbis", "opus")]
+    [string]$CodecCalibration = "",
     [switch]$SkipBuild
 )
 
@@ -27,6 +29,12 @@ if (-not $SkipBuild) {
         -Sdkconfig (Join-Path $BuildDirectory "sdkconfig") `
         -DependencyRoot $DependencyRoot
     if ($LASTEXITCODE -ne 0) { throw "QEMU firmware build failed" }
+}
+
+$builtConfig = Get-Content -LiteralPath (Join-Path $buildPath "config/sdkconfig.h") -Raw
+$instructionProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_PROFILE 1'
+if ($CodecCalibration -and -not $instructionProfile) {
+    throw "Codec calibration requires CONFIG_YORADIO_QEMU_AAC_PROFILE=y"
 }
 
 if ([string]::IsNullOrWhiteSpace($QemuExecutable)) {
@@ -65,6 +73,29 @@ $flashImage = Join-Path $buildPath "qemu-flash.bin"
     --pad-to-size 4MB
 if ($LASTEXITCODE -ne 0) { throw "QEMU flash image merge failed" }
 
+if ($CodecCalibration) {
+    $fixtureRoot = Join-Path $worktreeRoot "tests/fixtures/esp32c3_calibration"
+    $manifest = Get-Content -LiteralPath (Join-Path $fixtureRoot "manifest.json") -Raw | ConvertFrom-Json
+    $entry = $manifest.fixtures | Where-Object { $_.codec -eq $CodecCalibration }
+    if (@($entry).Count -ne 1) { throw "Missing calibration fixture: $CodecCalibration" }
+    $fixturePath = Join-Path $fixtureRoot $entry.file
+    $fixture = [IO.File]::ReadAllBytes($fixturePath)
+    if ($fixture.Length -ne $entry.bytes -or $fixture.Length -gt (0x1d0000 - 16) -or
+        (Get-FileHash -LiteralPath $fixturePath -Algorithm SHA256).Hash -ne $entry.sha256) {
+        throw "Calibration fixture size/hash mismatch: $CodecCalibration"
+    }
+    # Only modify the disposable QEMU image. No flashing or device I/O.
+    $stream = [IO.File]::Open($flashImage, [IO.FileMode]::Open, [IO.FileAccess]::Write)
+    try {
+        $stream.Position = 0x1e0000
+        foreach ($value in @(0x5143414c, $entry.id, $fixture.Length, 0)) {
+            $bytes = [BitConverter]::GetBytes([uint32]$value)
+            $stream.Write($bytes, 0, 4)
+        }
+        $stream.Write($fixture, 0, $fixture.Length)
+    } finally { $stream.Dispose() }
+}
+
 if (Test-Path -LiteralPath $AudioOutput -PathType Leaf) {
     Remove-Item -LiteralPath $AudioOutput -Force
 }
@@ -73,8 +104,6 @@ $qemuArguments = @(
     "-nographic", "-no-reboot", "-snapshot",
     "-audiodev", "wav,id=audio0,path=$AudioOutput,out.frequency=48000"
 )
-$builtConfig = Get-Content -LiteralPath (Join-Path $buildPath "config/sdkconfig.h") -Raw
-$instructionProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_PROFILE 1'
 if ($instructionProfile) {
     $qemuArguments += @("-icount", "shift=0,align=off,sleep=off")
 }
@@ -106,5 +135,11 @@ if ($builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_TEST 1' -and
 }
 if ($instructionProfile -and $joinedOutput -notmatch 'QEMU_AAC_WORK_PASS') {
     throw "QEMU AAC instruction profiling failed; see $log"
+}
+if ($instructionProfile -and $joinedOutput -notmatch 'QEMU_AAC_CAL_PASS') {
+    throw "QEMU AAC hardware calibration fixture failed; see $log"
+}
+if ($CodecCalibration -and $joinedOutput -notmatch "QEMU_CODEC_CAL_PASS codec=$CodecCalibration") {
+    throw "QEMU $CodecCalibration calibration failed; see $log"
 }
 Write-Host "QEMU smoke test passed; log: $log; audio: $AudioOutput"

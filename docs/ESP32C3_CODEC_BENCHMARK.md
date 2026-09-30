@@ -46,6 +46,10 @@ single call and uninterrupted playback must also pass.
 
 ## Result summary
 
+For emulator-only work, see [saved per-codec QEMU correction factors and repeat
+commands](ESP32C3_QEMU_CALIBRATION_20260930.md). These fit the retained hardware
+windows; they do not measure total radio CPU load.
+
 | Codec fixture | Encoded limit | Baseline | Optimized | Stable |
 | --- | ---: | ---: | ---: | :---: |
 | MP3 | CBR 320 kbit/s | 26.3%, x3.79 | 26.1%, x3.82 | [x] |

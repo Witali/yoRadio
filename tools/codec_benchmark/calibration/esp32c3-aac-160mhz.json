@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "id": "esp32c3-espressif-aac-160mhz-20260930",
+  "target": "esp32c3",
+  "cpu_hz": 160000000,
+  "decoder": "Espressif AAC",
+  "qemu_codec_version": "2.6.2",
+  "qemu_decoder_runtime_version": "v2.6.0-4-gfd141ab",
+  "icount": "shift=0,align=off,sleep=off",
+  "factor": 2.018192916067804,
+  "factor_selection": "Weighted later backend-comparison run; about 2.02",
+  "observed_factor_range": [
+    1.770877919668221,
+    2.0208442837150766
+  ],
+  "formula": "estimated decoder percent = instructions_per_audio_second / cpu_hz * 100 * factor",
+  "hardware_total_cpu_load_measured": false,
+  "he_aac_hardware_validated": false,
+  "calibration_fixture": {
+    "sha256": "1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5",
+    "bytes": 443706,
+    "codec": "AAC-LC",
+    "sample_rate": 48000,
+    "channels": 2,
+    "target_bitrate": 320000
+  },
+  "qemu_log_sha256_utf8_lf": "087de5c009cca4b1cea71b2dbc2188b7de2e692948988cf78713abf6d21facc0",
+  "hardware_runs": [
+    {
+      "log": "hardware-optimized.log",
+      "log_sha256_utf8_lf": "111db70b5d646ab64d148fa2e4022e3ef9c8ce74cba945958940a51e3047cc09",
+      "windows": [
+        {
+          "window": 1,
+          "decode_ms_floor": 949,
+          "pcm_bytes": 970752,
+          "input_bytes": 202528,
+          "calls": 335,
+          "instructions": 85508815,
+          "hardware_decode_percent_approx": 18.769778481012658,
+          "qemu_decode_percent_at_1_cpi": 10.57021546182753,
+          "effective_cycles_per_instruction": 1.7757233567088961,
+          "current_path_instruction_ratio": 0.9937503987162025
+        },
+        {
+          "window": 2,
+          "decode_ms_floor": 941,
+          "pcm_bytes": 962560,
+          "input_bytes": 202447,
+          "calls": 334,
+          "instructions": 85019977,
+          "hardware_decode_percent_approx": 18.76994680851064,
+          "qemu_decode_percent_at_1_cpi": 10.599232504986702,
+          "effective_cycles_per_instruction": 1.770877919668221,
+          "current_path_instruction_ratio": 0.9934125364442289
+        }
+      ],
+      "weighted_factor": 1.773307583155811
+    },
+    {
+      "log": "hardware-backend-comparison.log",
+      "log_sha256_utf8_lf": "70b490af50ec574cdbcb34d805d219abedc205b767aee63328615896103630c9",
+      "windows": [
+        {
+          "window": 1,
+          "decode_ms_floor": 1080,
+          "pcm_bytes": 970752,
+          "input_bytes": 202528,
+          "calls": 335,
+          "instructions": 85508815,
+          "hardware_decode_percent_approx": 21.360759493670887,
+          "qemu_decode_percent_at_1_cpi": 10.57021546182753,
+          "effective_cycles_per_instruction": 2.0208442837150766,
+          "current_path_instruction_ratio": 0.9937503987162025
+        },
+        {
+          "window": 2,
+          "decode_ms_floor": 1071,
+          "pcm_bytes": 962560,
+          "input_bytes": 202447,
+          "calls": 334,
+          "instructions": 85019977,
+          "hardware_decode_percent_approx": 21.363031914893615,
+          "qemu_decode_percent_at_1_cpi": 10.599232504986702,
+          "effective_cycles_per_instruction": 2.0155263038944367,
+          "current_path_instruction_ratio": 0.9934125364442289
+        }
+      ],
+      "weighted_factor": 2.018192916067804
+    }
+  ],
+  "qemu_windows": [
+    {
+      "path": "legacy",
+      "run": 1,
+      "window": 1,
+      "instructions": 85508815,
+      "calls": 335,
+      "consumed": 202528,
+      "pcm": 970752
+    },
+    {
+      "path": "legacy",
+      "run": 1,
+      "window": 2,
+      "instructions": 85019977,
+      "calls": 334,
+      "consumed": 202447,
+      "pcm": 962560
+    },
+    {
+      "path": "legacy",
+      "run": 2,
+      "window": 1,
+      "instructions": 85508815,
+      "calls": 335,
+      "consumed": 202528,
+      "pcm": 970752
+    },
+    {
+      "path": "legacy",
+      "run": 2,
+      "window": 2,
+      "instructions": 85019977,
+      "calls": 334,
+      "consumed": 202447,
+      "pcm": 962560
+    },
+    {
+      "path": "legacy",
+      "run": 3,
+      "window": 1,
+      "instructions": 85508815,
+      "calls": 335,
+      "consumed": 202528,
+      "pcm": 970752
+    },
+    {
+      "path": "legacy",
+      "run": 3,
+      "window": 2,
+      "instructions": 85019977,
+      "calls": 334,
+      "consumed": 202447,
+      "pcm": 962560
+    },
+    {
+      "path": "current",
+      "run": 1,
+      "window": 1,
+      "instructions": 84974419,
+      "calls": 335,
+      "consumed": 202528,
+      "pcm": 970752
+    },
+    {
+      "path": "current",
+      "run": 1,
+      "window": 2,
+      "instructions": 84459911,
+      "calls": 334,
+      "consumed": 202447,
+      "pcm": 962560
+    },
+    {
+      "path": "current",
+      "run": 2,
+      "window": 1,
+      "instructions": 84974419,
+      "calls": 335,
+      "consumed": 202528,
+      "pcm": 970752
+    },
+    {
+      "path": "current",
+      "run": 2,
+      "window": 2,
+      "instructions": 84459911,
+      "calls": 334,
+      "consumed": 202447,
+      "pcm": 962560
+    },
+    {
+      "path": "current",
+      "run": 3,
+      "window": 1,
+      "instructions": 84974419,
+      "calls": 335,
+      "consumed": 202528,
+      "pcm": 970752
+    },
+    {
+      "path": "current",
+      "run": 3,
+      "window": 2,
+      "instructions": 84459911,
+      "calls": 334,
+      "consumed": 202447,
+      "pcm": 962560
+    }
+  ],
+  "limitations": [
+    "Empirical decoder-call elapsed-time factor, not a universal CPU CPI or emulator speed multiplier.",
+    "Observed range spans two historical firmware builds; it is not a confidence interval or guaranteed bound.",
+    "Hardware decode times are floored to milliseconds; counter/timer overhead and preemption are included.",
+    "AAC-LC rate/bitrate/channel or adapter changes are extrapolations; HE-AAC SBR/PS transfer is unvalidated.",
+    "No estimate of total radio CPU: Wi-Fi, TLS, PDM, display and other work must be added separately.",
+    "Historical logs lack a fixture hash and codec archive hash; recovered bytes match saved lengths and both exact PCM/input/call windows.",
+    "Recalibrate when codec library, target, clock, memory placement or instruction mix changes."
+  ]
+}

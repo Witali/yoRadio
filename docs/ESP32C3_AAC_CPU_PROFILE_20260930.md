@@ -2,6 +2,11 @@
 
 ## Result
 
+Follow-up: [physical-board calibration and per-codec factors](ESP32C3_QEMU_CALIBRATION_20260930.md)
+now provide an empirical estimate for compatible runs. The original instruction
+measurements below remain unchanged; the follow-up labels HE-AAC estimates as
+unvalidated extrapolations from AAC-LC.
+
 The actual Espressif AAC Plus RISC-V decoder was profiled in the ESP32-C3 QEMU
 emulator. **Physical CPU utilization was not measured.** The board was neither
 flashed nor reset; the user requested emulator testing.

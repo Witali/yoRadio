@@ -99,3 +99,22 @@ per instruction at 160 MHz. **It is not measured ESP32-C3 CPU utilization.**
 QEMU does not model instruction latency or cache/memory stalls, and this isolated
 test excludes Wi-Fi/TLS and physical output. See the
 [measured results and limits](../../docs/ESP32C3_AAC_CPU_PROFILE_20260930.md).
+
+### Physical-board calibration suite
+
+The instruction profile also embeds the original hardware AAC-LC 320 kbit/s
+fixture and requires `QEMU_AAC_CAL_PASS`. It checks two exact input/PCM/call windows
+against retained physical measurements, for both the historical SDK parser and
+current AAC adapter. A runtime decoder build ID is logged for compatibility checks.
+
+For another original fixture, pass `-CodecCalibration mp3`, `flac`, `vorbis` or
+`opus` to `run-qemu.ps1`. The runner verifies the fixture SHA-256, injects it into
+the unused app1 region of the disposable QEMU image, and requires that codec's
+pass marker too. This never accesses a physical board. The optional profile uses
+a larger test-task stack for FLAC/Opus; production stacks are unchanged.
+
+Run all saved cases from the repository root with
+`tools/codec_benchmark/run-qemu-calibration.ps1` (same QEMU/dependency arguments).
+Results go to `.build/qemu-codec-calibration/`. See the
+[calibration report](../../docs/ESP32C3_QEMU_CALIBRATION_20260930.md) for commands,
+saved JSON profiles and the limits of transferring a factor to another workload.
