@@ -1,0 +1,34 @@
+{
+  "target": "esp32c3-oled-native",
+  "variant": "esp32c3-oled-native-stream-format-helix-core",
+  "source_commit": "7b5d257c5d4564f551ed45a8866128dde4e5e3be",
+  "app_version": "v0.9.693-1042-g7b5d257c",
+  "esp_idf": "v6.0.2",
+  "audio_codec_version": "2.6.2",
+  "audio_codec_commit": "67b8d0e98f58c774b8652480893037273190e8dc",
+  "production": true,
+  "release": false,
+  "qemu_image": false,
+  "aac_backend": "Helix AAC core",
+  "aac_plus": false,
+  "deep_sleep_clock": true,
+  "external_rtc_crystal": false,
+  "hardware_tested": false,
+  "size_bytes": 1338128,
+  "sha256": "1f30a3008e607269739f0dd05e6fb64a78a89c7b0bcc2186c99c35ff4f5f520f",
+  "validation": [
+    "ESP-IDF production build and OTA partition size check",
+    "esptool image checksum and validation hash",
+    "104 C3/shared regression tests",
+    "3 executable stream-format, Helix and ADTS host suites",
+    "RTC wake-stub host test and 16 pin configurations",
+    "Linked RTC audit: 3704/8192 bytes, 9 external references restricted to RTC/ROM/GPIO"
+  ],
+  "emulator_validation": "Shared metadata verified by host tests and real Helix fixture decoding; this Helix firmware profile was not run in QEMU",
+  "known_limitations": [
+    "Physical Wi-Fi/TLS, CPU headroom and audio quality have not been tested for these images.",
+    "Espressif: implicit SBR/PS after LC with identical ADTS headers requires Stop/Play; status reports actual PCM.",
+    "Helix: SBR synthesis is disabled; source and core PCM rates differ and PS stereo is not claimed."
+  ],
+  "report": "../../../docs/ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md"
+}

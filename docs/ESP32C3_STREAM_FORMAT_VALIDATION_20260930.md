@@ -53,6 +53,23 @@ synthetic tones; FFprobe independently verified their profiles and layouts.
 
 Reproduction commands: [QEMU guide](../idf/esp32c3-oled-native/QEMU.md).
 
+## Saved production-target development images
+
+Built from source commit `7b5d257c` with ESP-IDF v6.0.2 and Espressif audio codec
+2.6.2 (`esp-adf-libs` commit `67b8d0e98f58c774b8652480893037273190e8dc`).
+All images fit the existing OTA slot and have valid esptool checksums/hashes.
+Each folder includes `app.bin`, SHA-256 and exact settings in `manifest.json`.
+
+| Variant | Bytes | AAC | Deep Sleep |
+|---|---:|---|---|
+| [Ordinary](../firmware/development/esp32c3-oled-native-stream-format-espressif/README.md) | 1,393,488 | Espressif + SBR/PS | off |
+| [Deep Sleep](../firmware/development/esp32c3-oled-native-stream-format-deep-sleep/README.md) | 1,406,352 | Espressif + SBR/PS | on |
+| [Helix alternative](../firmware/development/esp32c3-oled-native-stream-format-helix-core/README.md) | 1,338,128 | Core only | on |
+
+All use the internal RTC RC oscillator. The linked Deep Sleep images use
+3,704/8,192 RTC bytes; all nine external wake-stub dependencies resolve to RTC,
+ROM or GPIO registers. These are application images, not flash/NVS backups.
+
 ## Remaining limits
 
 - The Espressif library retains core-only mode when SBR/PS appears after LC
