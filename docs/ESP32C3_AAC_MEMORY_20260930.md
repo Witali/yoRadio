@@ -18,8 +18,8 @@ the [AAC/SBR memory execution plan](ESP32C3_MEMORY_STABILITY_TODO.md#execution-p
    20 KiB of total heap for SBR plus its control object in the measured LAN case,
    before reserving operating headroom. A larger arena alone creates no RAM.
 
-This is an investigation, not an HE-AAC fix. The board was restored to its
-previous quiet production image without deep sleep; its saved station plays.
+This investigation is now followed by the implementation results below.
+The buffer changes reduce RAM use; they do not yet fix full-radio HE-AAC.
 
 ## Evidence and scope
 
@@ -33,6 +33,114 @@ includes the exact ELF/image hashes, configuration, heap/stack log, playback
 observations, linker sections, selected binary disassembly and reference types.
 The measured application ELF identity is
 `3c6eb7f97d80861ae209a0b87e242ed5befa0f627788334213811df2e4a9f184`.
+
+## Implementation: PCM and ADTS buffers
+
+`35162f8e` reduces the caller AAC PCM workspace from 12,288 to **8,192 bytes**.
+It still holds a complete 2,048-sample/channel stereo SBR frame. Before AAC
+opens it also shrinks a larger buffer retained from a different codec. Other
+codecs retain their 12 KiB minimum and needed-size growth. Resize failure keeps
+the old allocation valid and marks the generation failed, so EOF cannot replace
+the allocation error with a success status.
+
+`d77ea5b9` replaces the always-resident 8,191-byte ADTS array with a 7-byte inline
+header and one growable frame buffer. It rounds capacity to 128 bytes, caps it
+at the original **8,191-byte legal frame limit**, and retains capacity until
+decoder close. CRC, resynchronization and arbitrary network chunk boundaries
+still work. A pending frame survives a PCM retry; failed growth preserves both
+the old storage and consumed-input accounting. It does not allocate per frame
+once the high-water capacity is reached.
+
+On the six retained fixtures, requested wrapper + caller PCM payload falls by
+**11,504–12,016 bytes**. This is stream-dependent, not a universal fixed saving.
+At maximum ADTS capacity the new wrapper itself is 15 bytes larger than the old
+wrapper; the separate 4 KiB PCM saving remains. A moving `realloc` can briefly
+hold old and new input buffers simultaneously. The SDK allocation tracer does
+not include this transient or either caller-owned buffer.
+
+### Lifetime boundaries
+
+| Owner | Allocated / first needed | Last use / release | May share with |
+| --- | --- | --- | --- |
+| Codec registration | Application registration | Application lifetime | Never reset with a decoder arena |
+| SDK AAC state before SBR, 51,200 requested bytes | SDK open | SDK close on format change, Stop or replacement | A later mutually exclusive codec only |
+| SBR/PS, 55,128 + 1,180 bytes | First extended AAC frame | SDK close | Cannot overlap live AAC core or persistent histories |
+| ADTS header/frame | Header arrival; grows for validated frame size | Pending PCM retry completes; capacity freed at close | No queue/DMA alias |
+| Caller PCM, initially 8,192 bytes for AAC | Before decoder creation | Frame copied to the PCM queue; buffer retained between calls | Next decoded frame after copy |
+| PCM queue and PDM DMA | Output pipeline creation | Output task/DMA completes consumption | Cannot overlay decoder scratch while consumers still own it |
+
+The new host tests execute the production allocator/framing code with injected
+create, grow, shrink and SDK-open failures, maximum/CRC frames, truncated input,
+and 1-byte chunks. Real Espressif-decoder QEMU tests cover LC mono/stereo,
+44.1/48 kHz HE, HEv2 stereo and configuration changes. **328,770 captured stereo
+frames match the previous output byte-for-byte**, including resampling/output;
+an output guard checks the 8 KiB boundary. This is equivalence for the retained
+fixture sequence, not exhaustive AAC-profile or internal-state coverage.
+
+Evidence: [PCM](../tests/results/esp32c3-aac-pcm-20260930/pcm-equivalence.json),
+[ADTS capacities and provenance](../tests/results/esp32c3-aac-adts-20260930/provenance.json),
+[physical buffer survey](../tests/results/esp32c3-aac-adts-20260930/radio/report.json).
+
+### Physical comparison with identical diagnostics
+
+All three images use DIO 80 MHz, no deep sleep, the same saved audio-buffer
+setting, CPU profiling and bounded SDK tracing. Stacks, TLS buffers, PCM/DMA
+queues and Wi-Fi buffer counts are unchanged.
+
+| After first process | Original free / largest | New buffers free / largest | New buffers + heap in Flash free / largest |
+| --- | ---: | ---: | ---: |
+| LC 48 kHz stereo | 30,092 / 11,776 | 42,476 / 22,528 | 51,572 / 38,912 |
+| HE 48 kHz, SBR failed | 33,564 / 11,776 | 45,964 / 22,528 | 55,112 / 38,912 |
+| HEv2 44.1 kHz, SBR failed | 33,376 / 11,776 | 46,088 / 22,528 | 55,236 / 38,912 |
+
+Heap deltas include allocator rounding and concurrent network activity. All HE
+and v2 rows are **failed full-output tests**, not reduced-rate successes. The
+new buffers alone recover roughly 12 KiB on the board. Mean total CPU over the
+selected stable LC windows is 36.06% baseline, 35.95% with new buffers, 36.58%
+with heap in Flash. These short sequential diagnostic observations are similar;
+they do not qualify production CPU, IRQ latency, long soaks or full-SBR performance.
+[CPU windows and scope](../tests/results/esp32c3-aac-heapflash-20260930/cpu-summary.json).
+
+### Heap placement experiment — not a default
+
+The separate `esp32c3-aac-heapflash-radio` image enables
+`CONFIG_HEAP_PLACE_FUNCTION_INTO_FLASH` and disables the dependent SPI-master
+IRAM option. Application-entry free heap increases by **9,072 bytes**.
+The pinned ESP-IDF 6.0.2 `docs/en/api-guides/performance/ram-usage.rst` and
+`components/heap/Kconfig` require avoiding heap calls in cache-disabled ISRs.
+The board uses I2C OLED and I2S PDM, with their IRAM-safe ISR modes disabled;
+there is no application SPI-master client. Encoder handlers only sample GPIO
+and post preallocated queue items and are registered with flags 0. Project heap
+calls and allocation-trace dumps occur in task context. This audit applies to
+this board configuration, not arbitrary ESP32 firmware or other ISR callbacks.
+
+WebSocket reconnect and LC playback passed, but the existing 40-second HTTP-load
+oracle rejected its first/last heap-window comparison. Free heap oscillated
+with requests; this result alone proves neither a leak nor a cause in Flash
+placement. Keep the [failed load result](../tests/results/esp32c3-aac-heapflash-20260930/load/report.json).
+The option remains experimental and is **not enabled in defaults**. Even its
+diagnostic HE baseline lacks room for the complete 56,308-byte SBR/control pair
+plus the required network headroom, and the largest block remains too small.
+
+The [minimal-overhead repeat with the maximum 14-block audio buffer](../tests/results/esp32c3-aac-heapflash-20260930/minimal-max-usb/report.json)
+disables runtime profiling and allocation tracing, retaining INFO logs over
+USB. HE and v2 still fail full-rate output. After their first decoded core frame,
+free/largest RAM is **59,184 / 38,912** and **59,316 / 38,912 bytes**. Adding the
+56,308-byte SBR/control payload at the first checkpoint would leave only
+**2,876 bytes**, before allocator overhead, below the existing 8,192-byte free
+heap budget. The largest block also fails the 55,128-byte request. The earlier
+no-console attempt retained no RAM evidence and is saved as a failed survey;
+it is not used for this budget. Both attempts restored the original 10-block
+setting and verified Wi-Fi, playlist and all exposed settings unchanged.
+
+The arena and internal-SBR stages therefore remain open. No early 107+ KiB pool
+has been enabled: reservation changes placement but cannot satisfy an inadequate
+concurrent budget. The pinned public codec package provides this decoder as a
+RISC-V archive, without compatible buildable SBR implementation sources. Internal
+array splitting/overlays remain blocked on those sources or qualification of a
+source-available replacement with full SBR **and PS**. The current Helix LC path
+is not such a replacement. Existing 16 KiB decoder stack and full TLS buffers
+were retained; any further stack/pool changes need their own worst-path tests.
 
 ### Full-radio heap, bytes
 
@@ -188,8 +296,10 @@ A safe shared-arena implementation needs:
    individual frees forever would exhaust a bump allocator within one session.
 4. A C3-specific budget and early reservation. About 52.7 kB at open plus
    56.3 kB for SBR/control suggests **at least roughly 107 KiB for SDK state**
-   in this workload, before arena margin. Including ADTS and caller PCM brings
-   this near 127 KiB. These are budget estimates, not a proven universal size.
+   in this workload, before arena margin. The original fixed ADTS and 12 KiB
+   caller PCM brought this near 127 KiB; the new caller buffers reduce that part
+   by the stream-dependent amounts above. These are budget estimates, not a
+   proven universal size.
 5. Enough separate heap for networking, TLS, WebUI, PCM/encoded rings, tasks and
    other codecs. Using one pool avoids two simultaneous decoder reservations;
    it does not reclaim 24 KiB that production is already using elsewhere.
@@ -210,7 +320,8 @@ The heap component currently occupies roughly 8 KiB of internal RAM code/data;
 `CONFIG_HEAP_PLACE_FUNCTION_INTO_FLASH` is a candidate, not an accepted change.
 The SDK permits it only if heap functions are not called by cache-disabled IRAM
 ISRs. Smaller Wi-Fi pools also need throughput/reconnect/load A/B tests. Neither
-candidate has been enabled by this investigation. Preserve the full TLS receive
+candidate is enabled in board defaults. Heap placement was tested separately
+as described above. Preserve the full TLS receive
 record, all AAC modes and the existing user buffer setting.
 
 ## Reproduce

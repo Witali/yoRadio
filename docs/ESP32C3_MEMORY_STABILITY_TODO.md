@@ -30,10 +30,13 @@ benchmark used about 12.2 KiB. A fix must preserve other codecs and user setting
 
 ### Execution plan and decision gates
 
-Status: **in progress**. The bounded SDK allocation tracer and its host checks
-are implemented; real-decoder QEMU traces confirm allocation lifetimes and
-close/reopen cleanup. Physical peak-budget qualification and the memory-saving
-changes below remain pending. The baseline is the fixed EOF application
+Status: **partially implemented; full-rate HE/v2 still fails on the radio**.
+Bounded SDK tracing, an 8 KiB AAC PCM workspace and adaptive full-size ADTS
+storage are implemented and committed. Real-decoder QEMU output is byte-identical
+to the previous capture; physical surveys recover roughly 12 KiB. An additional
+heap-in-Flash experiment recovers 9,072 bytes but is not qualified or enabled by
+default. See [implementation evidence and limitations](ESP32C3_AAC_MEMORY_20260930.md#implementation-pcm-and-adts-buffers).
+The baseline is the fixed EOF application
 from `69410cd5`, archived and tested in `1bfc8b64`: DIO 80 MHz, no deep sleep,
 Espressif AAC Plus, no PSRAM. The [EOF correction](ESP32C3_EOF_STATUS.md) is
 complete; it does not resolve SBR memory allocation. Keep its regressions passing.

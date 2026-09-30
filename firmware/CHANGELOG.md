@@ -3,6 +3,27 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-30: ESP32-C3 AAC buffer memory reduction
+
+- AAC caller PCM now starts at 8 KiB and shrinks a larger retained workspace at
+  a decoder boundary. Other codecs keep their capacity/growth behavior.
+- ADTS input grows to the validated frame size and reuses capacity, preserving
+  the full 8,191-byte frame limit, CRC, fragmented input and retry semantics.
+  The physical radio recovers roughly 12 KiB; no frequency/channel/profile cap
+  was added. Full-rate HE/v2 still fails its SBR allocation/format gate.
+- Retain `esp32c3-aac-buffers-radio` (diagnostics) and
+  `esp32c3-aac-buffers-quiet` (normal quiet configuration, no deep sleep), with
+  source/configuration/image identities. Host fault/sanitizer checks and real
+  QEMU PCM equivalence pass. Physical qualification is recorded in the report.
+- Retain three heap-in-Flash experiments: `esp32c3-aac-heapflash-radio`,
+  `esp32c3-aac-heapflash-minimal`, and `esp32c3-aac-heapflash-minimal-usb`.
+  The middle image lacks a console and cannot supply RAM evidence. The last
+  repeats the maximum-buffer survey without profiling/trace arrays. Heap
+  placement saves another 9,072 bytes but remains disabled in board defaults.
+  Keep the failed HTTP-load check and HE/v2 cases; these images do not qualify
+  the complete AAC/SBR memory plan or a larger production arena.
+- [Implementation, memory budgets and remaining gates](../docs/ESP32C3_AAC_MEMORY_20260930.md#implementation-pcm-and-adts-buffers).
+
 ## Development - 2026-09-30: ESP32-C3 AAC allocation baseline
 
 - Archive `esp32c3-aac-memory-trace-radio` from `8740af78`: DIO 80 MHz,
