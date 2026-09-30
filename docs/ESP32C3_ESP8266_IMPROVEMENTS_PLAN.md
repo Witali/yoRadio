@@ -171,6 +171,13 @@ WebRadio PCM-счётчики/null-output, изменение буфера 5→4
 
 ### C3-08 · P2 · Decoder memory и скорость
 
+- [ ] Дополнение 2026-09-30: исследовать повторное использование временной
+  памяти AAC и выдачу PCM блоками по образцу ESP8266. Обязательно сохранить
+  все поддерживаемые варианты AAC, включая HE-AAC/SBR и HE-AAC v2/PS,
+  полную частоту и stereo. Нынешний ESP8266 block API исключает SBR, а C3
+  использует бинарный Espressif decoder; прямое включение флага не подходит.
+  [Подробный план и критерии проверки](ESP32C3_MEMORY_STABILITY_TODO.md#aac-memory-reuse-during-decoding--planned-2026-09-30)
+  учитывают обнаруженную на плате нехватку блока 55 128 байт для SBR.
 - [ ] Общий Helix adapter сейчас имеет `pcm[1152*2]`. Подключить MP3 block API
   и shared reorder отдельно, сохранив stereo и владение PCM до передачи ring.
 - [ ] AAC blocks отдельно от Huffman/window ускорений. На ESP8266 вариант 512
