@@ -58,6 +58,25 @@ actions and restoration rules. Earlier filtered logs cannot retroactively
 recover a discarded panic PC. Host filter checks are in
 `tests/test-esp32c3-panic-capture.py`.
 
+For contiguous-allocation failures, add `sdkconfig.heap-layout.defaults` to an
+awake HTTP-profiler build. `CONFIG_YORADIO_HEAP_LAYOUT_DIAGNOSTICS` logs selected
+blocks at the existing AAC memory checkpoints: all free areas >=256 bytes and
+their immediate neighbors, plus allocations >=1024 bytes. Each capture is
+bounded at 128 rows; `dropped` must be zero before interpreting it as a complete
+selection. It does not enumerate every small block. Only addresses, sizes and
+allocation state are retained; payload memory is never read.
+
+The capture table uses at most 1600 bytes of the existing AAC task stack on
+RV32 and no persistent heap/BSS table. Callbacks only copy metadata while IDF
+holds the individual heap lock; logs are emitted afterward. Heaps are visited
+sequentially, so the combined view is not an atomic global snapshot. Raw walker
+sizes differ from the allocator's rounded maximum allocatable size. SDK codec
+malloc/calloc addresses are also logged for allocations >=1024 bytes; these
+are allocation events, not a complete ownership/lifetime trace. Logging changes
+scheduling and can change transient network demand, so do not use this image
+for performance qualification. Host ASan/UBSan selection/bounds checks:
+`python tests/run-heap-layout-capture.py` in an environment with `cc`.
+
 The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
 standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
 AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained

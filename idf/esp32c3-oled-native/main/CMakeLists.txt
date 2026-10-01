@@ -96,6 +96,10 @@ if(CONFIG_YORADIO_AAC_PS_PC16 OR CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST)
   list(APPEND NATIVE_SRCS "aac_ps_pc16.c")
 endif()
 
+if(CONFIG_YORADIO_HEAP_LAYOUT_DIAGNOSTICS)
+  list(APPEND NATIVE_SRCS "heap_layout_diagnostic.c")
+endif()
+
 idf_component_register(
   SRCS ${NATIVE_SRCS}
   INCLUDE_DIRS "."
@@ -141,6 +145,12 @@ if(YORADIO_CODEC_BENCHMARK)
     YORADIO_CODEC_BENCHMARK=1)
 endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+
+if(CONFIG_YORADIO_HEAP_LAYOUT_DIAGNOSTICS)
+  target_link_options(${COMPONENT_LIB} INTERFACE
+    "-Wl,--wrap=cpu_profiler_memory" "-Wl,--wrap=media_lib_module_malloc"
+    "-Wl,--wrap=media_lib_module_calloc")
+endif()
 
 if(CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE OR CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE)
   file(SHA256 "$ENV{YORADIO_AUDIO_CODEC_COMPONENT}/lib/esp32c3/libesp_audio_codec.a" AAC_RESERVE_SHA256)

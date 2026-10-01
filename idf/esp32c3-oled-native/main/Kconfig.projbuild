@@ -176,6 +176,17 @@ config YORADIO_AAC_EARLY_SBR_RESERVE
         FreeRTOS TLS slot 1. No DSP or allocation size changes; reject silent
         core-only fallback when SBR allocation fails. Not qualified by default.
 
+config YORADIO_HEAP_LAYOUT_DIAGNOSTICS
+    bool "Log selected heap blocks around AAC allocation phases"
+    depends on FREERTOS_GENERATE_RUN_TIME_STATS && !YORADIO_QEMU && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_AAC_EARLY_SBR_RESERVE && !YORADIO_AAC_EARLY_SCRATCH_RESERVE
+    default n
+    help
+        Temporary diagnostic. Uses about 1.6 KiB of the existing AAC task stack,
+        no persistent allocation table. Captures free areas >=256 bytes, their
+        immediate neighbors and allocations >=1024 bytes. Bounded at 128 rows;
+        reports truncation. Logs metadata only, outside heap locks. USB logging
+        changes scheduling; this is not a CPU benchmark or a production option.
+
 config YORADIO_QEMU_AAC_RESET_TEST
     bool "Reproduce and repair AAC reset with guarded core allocations"
     depends on YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
