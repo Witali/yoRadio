@@ -115,3 +115,25 @@ PC16, CPU profile, and HTTP profile defaults in that order. It is saved under
 `firmware/development/esp32c3-aac-ps-pc16-radio/`; never flash a QEMU image.
 The private ABI is pinned to the audited Espressif 2.6.2 archive. Licensing and
 reference-source attribution follow the [PS write port](ESP32C3_AAC_PS_WRITE_PORT_20261001.md).
+
+## Physical PC16 follow-up and cache
+
+The PC16 image without a decoded-value cache passes 35-second LC48, HE48 and
+HEv2 HTTP streams. Measured mean total/decode-task CPU is 36.433/18.617%,
+50.517/35.933%, and 68.133/53.883%, respectively. Minimum sampled free/largest
+heap is 75624/57344 B, 21316/7680 B, and 21608/7680 B. These are short runtime
+counter measurements, not an exhaustive stress or acoustic test.
+
+In the separate 12-switch, three-cycle test, four starts fail: HEv2 in all
+three cycles and HE48 in the second. The 51596-byte allocation sees a largest
+block of 45056 B, despite 75860–75988 B free. Opus, LC and the other two HE48
+starts pass. Idle heap settles at 144728–144736 B, largest 94208 B; there is no
+growing leak across these checkpoints. Compression has not fixed fragmentation.
+[Physical CPU/heap/switching/OTA records](../tests/results/esp32c3-aac-pc16-write-20261001/hardware/).
+
+After testing, the board was restored by application-only OTA to the previous
+uninstrumented bounded-Wi-Fi image, with Wi-Fi, playlist and settings unchanged.
+That image's earlier finite/continuous passes do not qualify all switching paths.
+
+The subsequent [288-byte reconstructed-value cache](ESP32C3_AAC_PC16_CACHE_20261001.md)
+preserves PCM but increases guest instruction work; it remains off by default.

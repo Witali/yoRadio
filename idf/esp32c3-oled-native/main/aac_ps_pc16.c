@@ -104,6 +104,9 @@ Copyright (c) ISO/IEC 2003.
 // Arithmetic is int32; only decorrelation delay storage uses 16+16 plus nibbles.
 #include "sdkconfig.h"
 #include "packed_complex16_fast.h"
+#ifdef CONFIG_YORADIO_AAC_PS_PC16_CACHE
+#include "packed_complex16_cache.h"
+#endif
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -150,18 +153,41 @@ static int32_t complex_mul(int32_t a, int32_t b, int32_t phase) {
 _Static_assert(PC16_DATA+4*PAIRS==PC16_EXPONENTS,"Contiguous mantissas");
 _Static_assert(PC16_EXPONENTS+4*((PAIRS+7)/8)==PC16_END,"Packed exponent words");
 _Static_assert(PC16_END<0x93b4,"Packed history must precede relocated PS control");
-typedef struct { uint32_t *mantissas,*exponents; } storage_t;
+typedef struct {
+    uint32_t *mantissas,*exponents;
+#ifdef CONFIG_YORADIO_AAC_PS_PC16_CACHE
+    pc16_cache_t *cache;
+#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
+    unsigned hits,misses;
+#endif
+#endif
+} storage_t;
 #ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
 void aac_ps_pc16_test_store(uint32_t,unsigned,int32_t,int32_t,unsigned);
 #endif
-static void load(const storage_t *s,const int32_t *r,const int32_t *i,int32_t *re,int32_t *im) {
+static void load(storage_t *s,unsigned slot,const int32_t *r,const int32_t *i,int32_t *re,int32_t *im) {
     (void)i;size_t n=(const uint32_t*)r-s->mantissas;assert(n<PAIRS);
+#ifdef CONFIG_YORADIO_AAC_PS_PC16_CACHE
+    bool hit=pc16_cache_load(s->cache,slot,s->mantissas,s->exponents,PAIRS,n,re,im);
+#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
+    if(hit)++s->hits;else ++s->misses;
+#else
+    (void)hit;
+#endif
+#else
+    (void)slot;
     pc16_load(s->mantissas,s->exponents,n,re,im);
+#endif
 }
-static void save(const storage_t *s,int32_t *r,int32_t *i,int32_t re,int32_t im) {
+static void save(const storage_t *s,unsigned slot,int32_t *r,int32_t *i,int32_t re,int32_t im) {
     (void)i;size_t n=(uint32_t*)r-s->mantissas;assert(n<PAIRS);
     unsigned exponent,clipped,bit=(n&7u)*4u;
     uint32_t packed=pc16_pack_fast(re,im,&exponent,&clipped);
+#ifdef CONFIG_YORADIO_AAC_PS_PC16_CACHE
+    pc16_cache_invalidate(s->cache,slot,n);
+#else
+    (void)slot;
+#endif
     s->mantissas[n]=packed;
     s->exponents[n/8u]=(s->exponents[n/8u]&~(15u<<bit))|(exponent<<bit);
 #ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
@@ -202,7 +228,7 @@ void aac_ps_pc16_allocate(void *owner,uint32_t samples,bool initialize) {
     int32_t *mix=(int32_t*)((uint8_t*)ps+0x200);
     for(unsigned b=0;b<22;++b){mix[b]=0x40000000;mix[b+22]=0x40000000;}
 }
-static void allpass(const storage_t *storage,ps_prefix_t *ps, unsigned band, bool hybrid, int32_t *r, int32_t *i) {
+static void allpass(storage_t *storage,ps_prefix_t *ps, unsigned band, bool hybrid, int32_t *r, int32_t *i) {
     const int32_t *phase = hybrid ? aaFractDelayPhaseFactorSerSubQmf[band] : aaFractDelayPhaseFactorSerQmf[band];
     static const int16_t hybrid_decay[3] = {0x5362, 0x4849, 0x7d53};
     const int16_t *decay = hybrid ? hybrid_decay : aRevLinkDecaySerCoeff[band + 3];
@@ -210,7 +236,7 @@ static void allpass(const storage_t *storage,ps_prefix_t *ps, unsigned band, boo
         unsigned row = ps->serial_index[link]; assert(row < link + 3);
         int32_t *pr = hybrid ? &ps->sub_serial_real[link][row][band] : &ps->serial_real[link][row][band];
         int32_t *pi = hybrid ? &ps->sub_serial_imag[link][row][band] : &ps->serial_imag[link][row][band];
-        int32_t dr, di; load(storage,pr, pi, &dr, &di);
+        int32_t dr, di; load(storage,link+1,pr, pi, &dr, &di);
         dr = shl(dr, 1); di = shl(di, 1);
         int32_t rr = complex_mul(dr, neg(di), phase[link]);
         int32_t ii = complex_mul(di, dr, phase[link]);
@@ -220,7 +246,7 @@ static void allpass(const storage_t *storage,ps_prefix_t *ps, unsigned band, boo
         ii = add(ii, mulhi(shl(neg(*i), shift), coefficient));
         int32_t next_r = add(*r, mulhi(shl(rr, shift), coefficient));
         int32_t next_i = add(*i, mulhi(shl(ii, shift), coefficient));
-        save(storage,pr, pi, next_r, next_i);
+        save(storage,link+1,pr, pi, next_r, next_i);
         *r = link < 2 ? rr : shl(rr, 2);
         *i = link < 2 ? ii : shl(ii, 2);
     }
@@ -234,15 +260,20 @@ static void transient(int32_t factor, int32_t *r, int32_t *i) {
 
 void aac_ps_pc16_decode(void *owner,void *state,int32_t *lr,int32_t *li,int32_t *rr,int32_t *ri,int32_t *scratch) {
     ps_prefix_t *ps=state;
-    storage_t storage={(uint32_t*)((uint8_t*)owner+PC16_DATA),(uint32_t*)((uint8_t*)owner+PC16_EXPONENTS)};
+    storage_t storage={.mantissas=(uint32_t*)((uint8_t*)owner+PC16_DATA),
+                       .exponents=(uint32_t*)((uint8_t*)owner+PC16_EXPONENTS)};
+#ifdef CONFIG_YORADIO_AAC_PS_PC16_CACHE
+    pc16_cache_t cache;
+    pc16_cache_init(&cache);storage.cache=&cache;
+#endif
     assert(ps->delay_index >= 0 && ps->delay_index < 2);
     int32_t usb; memcpy(&usb, (uint8_t *)state + 0x14, 4); assert(usb >= 0 && usb <= 64);
     ps_pwr_transient_detection(state, lr, li, scratch);
     for (unsigned gr = 0; gr < 10; ++gr) {
         unsigned band = (unsigned)groupBorders[gr]; assert(band < 10);
         int32_t *pr = &ps->sub_delay_real[band][ps->delay_index], *pi = &ps->sub_delay_imag[band][ps->delay_index];
-        int32_t a, b; load(&storage,pr, pi, &a, &b);
-        save(&storage,pr, pi, ps->hybrid_left_real[band], ps->hybrid_left_imag[band]);
+        int32_t a, b; load(&storage,0,pr, pi, &a, &b);
+        save(&storage,0,pr, pi, ps->hybrid_left_real[band], ps->hybrid_left_imag[band]);
         a >>= 1; b >>= 1;
         int32_t r = complex_mul(a, neg(b), aFractDelayPhaseFactorSubQmf[band]);
         int32_t i = complex_mul(b, a, aFractDelayPhaseFactorSubQmf[band]);
@@ -255,7 +286,7 @@ void aac_ps_pc16_decode(void *owner,void *state,int32_t *lr,int32_t *li,int32_t 
         for (unsigned band = (unsigned)groupBorders[gr]; band < end; ++band) {
             unsigned index = band - 3;
             int32_t *pr = &ps->delay_real[index][ps->delay_index], *pi = &ps->delay_imag[index][ps->delay_index];
-            int32_t a, b; load(&storage,pr, pi, &a, &b); save(&storage,pr, pi, lr[band], li[band]);
+            int32_t a, b; load(&storage,0,pr, pi, &a, &b); save(&storage,0,pr, pi, lr[band], li[band]);
             a >>= 1; b >>= 1;
             int32_t r = complex_mul(a, neg(b), aFractDelayPhaseFactor[index]);
             int32_t i = complex_mul(b, a, aFractDelayPhaseFactor[index]);
@@ -271,10 +302,14 @@ void aac_ps_pc16_decode(void *owner,void *state,int32_t *lr,int32_t *li,int32_t 
             ps->long_index[band-23] = (row + 1) % 14;
         }
         int32_t *pr = &ps->delay_real[index][row], *pi = &ps->delay_imag[index][row];
-        int32_t r, i; load(&storage,pr, pi, &r, &i); save(&storage,pr, pi, lr[band], li[band]);
+        int32_t r, i; load(&storage,0,pr, pi, &r, &i); save(&storage,0,pr, pi, lr[band], li[band]);
         transient(scratch[band < 35 ? 18 : 19], &r, &i); rr[band] = r; ri[band] = i;
     }
     ps->delay_index = (ps->delay_index + 1) & 1;
     for (unsigned link = 0; link < 3; ++link)
         ps->serial_index[link] = (ps->serial_index[link] + 1) % (link + 3);
+#if defined(CONFIG_YORADIO_AAC_PS_PC16_CACHE) && defined(CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST)
+    extern void aac_ps_pc16_test_cache(unsigned,unsigned,unsigned);
+    aac_ps_pc16_test_cache(storage.hits,storage.misses,sizeof(cache));
+#endif
 }

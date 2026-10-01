@@ -106,6 +106,10 @@ At the user's request, [16+16 with grouped exponents](ESP32C3_AAC_PC16_WRITES_20
 is also implemented as a separate, optional PS-write experiment. It passes
 81 paired development checks (maximum 3 LSB), shrinks delay payload by 2156 B,
 but frees no additional heap in the fixed owner and increases guest work.
-Do not enable it by default or count it as the full-radio memory fix. Next
-measure a small cache of reconstructed values against this exact baseline,
-then pursue a layout that can actually release the unused owner bytes.
+Do not enable it by default or count it as the full-radio memory fix. The
+[288-byte reconstructed-value cache](ESP32C3_AAC_PC16_CACHE_20261001.md) is now
+implemented and checked: PCM is unchanged, but work increases by 12.3–13.6%
+over PC16. Keep it off. Physical PC16 passes short continuous AAC streams but
+still fails four of twelve switches. Continue with packing-speed work and a
+layout that can actually release the unused owner bytes; neither experiment
+has achieved reliable full-radio HE playback yet.

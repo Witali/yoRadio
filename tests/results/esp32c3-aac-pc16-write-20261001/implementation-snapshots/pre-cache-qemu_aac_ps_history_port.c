@@ -150,7 +150,6 @@ void __real_ps_allocate_decoder(void *, uint32_t);
 static unsigned selected, repetition;
 static struct {
     uint32_t calls, stores, changed, maximum_shift, allocations, pairs, guards, saturations;
-    uint32_t cache_hits,cache_misses,cache_bytes;
 } stats;
 static ps_prefix_t *owners[2];
 static unsigned owner_count;
@@ -158,9 +157,6 @@ static unsigned owner_count;
 static const char *TAG = "ps_port";
 
 #ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
-void aac_ps_pc16_test_cache(unsigned hits,unsigned misses,unsigned bytes) {
-    stats.cache_hits+=hits;stats.cache_misses+=misses;stats.cache_bytes=bytes;
-}
 void aac_ps_pc16_test_store(uint32_t word,unsigned exponent,int32_t re,int32_t im,unsigned clipped) {
     ++stats.stores;stats.saturations+=clipped;
     if(repetition==1) {
@@ -377,14 +373,12 @@ void packed_history_report(const char *name, unsigned variant, unsigned run, uin
     *rows = stats.calls; *changed = stats.changed; *shift = stats.maximum_shift;
     ESP_LOGI(TAG, PS_TEST_NAME "_STORAGE case=%s variant=%u run=%u calls=%" PRIu32 " stores=%" PRIu32
              " allocations=%" PRIu32 " pairs=%" PRIu32 " guards=%" PRIu32 " saturations=%" PRIu32
-             " cache_bytes=%" PRIu32 " cache_hits=%" PRIu32 " cache_misses=%" PRIu32
 #ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
              " native_payload=4936 packed_payload=2780 heap_saved=0",
 #else
              " native_payload=4936 packed_payload=2468 heap_saved=0",
 #endif
-             name, variant, run, stats.calls, stats.stores, stats.allocations, stats.pairs, stats.guards, stats.saturations,
-             stats.cache_bytes,stats.cache_hits,stats.cache_misses);
+             name, variant, run, stats.calls, stats.stores, stats.allocations, stats.pairs, stats.guards, stats.saturations);
 }
 void packed_history_arithmetic_tests(void) {
     assert(mulhi(INT32_MIN, INT32_MIN) == 0x40000000);

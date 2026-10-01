@@ -213,15 +213,6 @@ config YORADIO_AAC_PS_PC16
         remains int32. Require PCM <=5 LSB during development, <=2 finally,
         plus speed and full-radio lifecycle qualification.
 
-config YORADIO_AAC_PS_PC16_CACHE
-    bool "Cache reconstructed PC16 complex delays"
-    depends on YORADIO_AAC_PS_PC16 || YORADIO_QEMU_AAC_PC16_WRITE_TEST
-    default n
-    help
-        Four eight-pair cache lines, 288 stack bytes during PS decorrelation.
-        Packed writes invalidate entries so rounding remains identical.
-        Experimental: measure instruction cost and stack before enabling.
-
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n
