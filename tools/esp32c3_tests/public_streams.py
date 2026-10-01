@@ -71,8 +71,8 @@ def no_runtime_faults(rows):
     require(serial_health(rows)['result'] == 'PASS', 'Serial panic or capture failure')
     require(not any(re.search(r'^(ESP-ROM:|rst:|waiting for download)', r['line'])
                     for r in rows), 'Unexpected reboot during playback')
-    require(not any(re.search(r'allocation failed|decode (?:error|failed)', r['line'])
-                    for r in rows), 'Runtime allocation/decoder failure')
+    require(not any(re.search(r'allocation failed|decode (?:error|failed)|TLS failure:', r['line'])
+                    for r in rows), 'Runtime allocation/decoder/TLS failure')
 
 
 def metrics(samples, rows, spec, seconds, start, end):

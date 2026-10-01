@@ -24,7 +24,8 @@ class PublicStreams(unittest.TestCase):
     def test_faults_and_resets_fail_even_if_later_playback_is_good(self):
         for line in ('rst:0xc', 'ESP-ROM:esp32c3', 'assert failed: owner',
                      'serial capture interrupted', 'allocation failed size=55128',
-                     'decode error', 'PANIC registers: MEPC=0x40380000'):
+                     'decode error', 'PANIC registers: MEPC=0x40380000',
+                     'TLS failure: component=Dynamic Impl allocation_bytes=16432'):
             with self.subTest(line=line), self.assertRaises(Failure):
                 no_runtime_faults([dict(at=1, line=line), dict(at=2, line='PERF CPU: busy=50')])
 

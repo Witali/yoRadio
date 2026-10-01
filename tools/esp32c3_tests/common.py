@@ -141,7 +141,7 @@ def check_cpu(records, max_busy=85, min_heap=8192, min_largest=4096, start=None,
     cpu, decode = [], []
     for row in records:
         line = row['line']
-        require(not re.search(r'allocation failed|decode (?:error|failed)|Fail to|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted', line),
+        require(not re.search(r'allocation failed|decode (?:error|failed)|TLS failure:|Fail to|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted', line),
                 'Runtime decoder/memory failure')
         if 'PERF CPU:' in line:
             fields = {k: float(v) for k,v in re.findall(r'(busy|idle|heap|largest)=([\d.]+)', line)}

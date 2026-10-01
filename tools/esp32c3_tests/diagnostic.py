@@ -13,6 +13,15 @@ import run
 
 
 def filter_line(line):
+    # TLS logs may contain hostnames, certificate subjects or URLs. Retain the
+    # failure category and an allocation size only, never the arbitrary message.
+    tls = re.match(r'^(?:\x1b\[[0-9;]*m)?E \(\d+\) '
+                   r'(Dynamic Impl|SSL TLS|SSL client|SSL Server|'
+                   r'esp-tls-mbedtls|esp-tls|esp-x509-crt-bundle):', line)
+    if tls:
+        size = re.search(r'\balloc\((\d+) bytes\) failed\b', line[tls.end():])
+        return ('TLS failure: component=' + tls.group(1) +
+                (' allocation_bytes=' + size.group(1) if size else ''))
     if re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|'
                  r'assert failed|Guru Meditation|CORRUPT HEAP', line):
         return line

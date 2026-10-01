@@ -28,6 +28,17 @@ class PanicFilter(unittest.TestCase):
                      'E (12) audio: allocation failed', 'rst:0x1 (POWERON_RESET)'):
             self.assertEqual(filter_line(line), line)
 
+    def test_tls_errors_are_retained_without_private_message_text(self):
+        self.assertEqual(filter_line('E (12) Dynamic Impl: alloc(16432 bytes) failed'),
+                         'TLS failure: component=Dynamic Impl allocation_bytes=16432')
+        for tag in ('esp-tls', 'esp-tls-mbedtls', 'esp-x509-crt-bundle',
+                    'SSL TLS', 'SSL client', 'SSL Server'):
+            with self.subTest(tag=tag):
+                self.assertEqual(filter_line('\x1b[0;31mE (12) '+tag+
+                    ': certificate/URL private-secret allocation failed\x1b[0m'),
+                    'TLS failure: component='+tag)
+        self.assertIsNone(filter_line('I (12) esp-tls: private-secret'))
+
 
 if __name__ == '__main__':
     unittest.main()
