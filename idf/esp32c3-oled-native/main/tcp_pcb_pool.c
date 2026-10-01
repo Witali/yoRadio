@@ -6,9 +6,36 @@
 #include "lwip/tcp.h"
 #ifdef CONFIG_YORADIO_TCP_PCB_POOL_DIAGNOSTICS
 #include "esp_log.h"
+// Retain bounded metadata without serial output on ordinary allocation/free.
+// Dump only after an ownership failure, outside the critical section.
+typedef struct { uint32_t event; uintptr_t caller; } pool_event_t;
+static pool_event_t s_history[128];
+static uint32_t s_history_sequence;
+static void pool_trace(unsigned action, unsigned slot, unsigned state,
+                       bool owned, uintptr_t caller) {
+    SYS_ARCH_DECL_PROTECT(level);
+    SYS_ARCH_PROTECT(level);
+    uint32_t sequence = s_history_sequence++;
+    s_history[sequence % 128] = (pool_event_t){
+        (slot & 255U) | ((state & 255U) << 8) | ((uint32_t)owned << 16) | (action << 17), caller};
+    SYS_ARCH_UNPROTECT(level);
+    if (action != 2) return;
+    // On firmware, lwIP's core lock serializes all PCB lifetimes. This path
+    // terminates in the existing assertion; history is diagnostic, not recovery.
+    uint32_t first = sequence < 127 ? 0 : sequence-127;
+    unsigned count = sequence < 127 ? (unsigned)sequence+1 : 128;
+    for (unsigned offset = 0; offset < count; ++offset) {
+        uint32_t n = first+offset;
+        pool_event_t entry = s_history[n % 128];
+        unsigned kind = entry.event >> 17;
+        ESP_LOGI("tcp_pool", "PERF TCP_POOL: sequence=%lu action=%s slot=%u state=%u owned=%u caller=%p",
+                 (unsigned long)n, kind == 0 ? "alloc" : kind == 1 ? "free" : "invalid-free",
+                 (unsigned)(entry.event & 255U), (unsigned)((entry.event >> 8) & 255U),
+                 (unsigned)((entry.event >> 16) & 1U), (void *)entry.caller);
+    }
+}
 #define POOL_TRACE(action, p, slot, state, owned) \
-    ESP_LOGI("tcp_pool", "PERF TCP_POOL: action=%s address=%p slot=%u state=%u owned=%u", \
-             action, p, (unsigned)(slot), (unsigned)(state), (unsigned)(owned))
+    pool_trace(action, (unsigned)(slot), (unsigned)(state), owned, (uintptr_t)__builtin_return_address(0))
 #else
 #define POOL_TRACE(action, p, slot, state, owned) ((void)0)
 #endif
@@ -49,7 +76,7 @@ void *__wrap_memp_malloc(memp_t type) {
     }
 #endif
     SYS_ARCH_UNPROTECT(level);
-    POOL_TRACE("alloc", result, result ? ((struct tcp_pcb *)result-s_pcbs) : MEMP_NUM_TCP_PCB, 0, result != NULL);
+    POOL_TRACE(0, result, result ? ((struct tcp_pcb *)result-s_pcbs) : MEMP_NUM_TCP_PCB, 0, result != NULL);
     // Like memp_malloc, return uninitialized storage. tcp_alloc performs the
     // existing full memset and field initialization before publishing a PCB.
     return result;
@@ -69,7 +96,7 @@ void __wrap_memp_free(memp_t type, void *p) {
     unsigned state = ((struct tcp_pcb *)p)->state;
     if (!s_used[i]) {
         SYS_ARCH_UNPROTECT(level);
-        POOL_TRACE("invalid-free", p, i, state, false);
+        POOL_TRACE(2, p, i, state, false);
         LWIP_ASSERT("TCP PCB is allocated", false);
         return;
     }
@@ -80,5 +107,5 @@ void __wrap_memp_free(memp_t type, void *p) {
     --memp_pools[MEMP_TCP_PCB]->stats->used;
 #endif
     SYS_ARCH_UNPROTECT(level);
-    POOL_TRACE("free", p, i, state, true);
+    POOL_TRACE(1, p, i, state, true);
 }

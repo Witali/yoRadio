@@ -205,12 +205,13 @@ config YORADIO_TCP_ALLOCATION_DIAGNOSTICS
         Pass through the unmodified lwIP allocator and protocol behavior.
 
 config YORADIO_TCP_PCB_POOL_DIAGNOSTICS
-    bool "Log experimental TCP PCB pool lifetimes"
+    bool "Retain experimental TCP PCB pool lifetimes"
     depends on YORADIO_TCP_PCB_POOL
     default n
     help
-        Diagnostic only. Logs pool slot ownership and TCP state, without
-        addresses of remote hosts, ports or payloads. Changes scheduling;
+        Diagnostic only. Keeps the last 128 pool ownership/state/caller events,
+        printing them only on an ownership assertion. No remote host address,
+        port or payload. Costs 1028 B DRAM on C3 and changes timing/layout;
         do not use this mode to qualify performance.
 
 config YORADIO_TCP_PCB_POOL

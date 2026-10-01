@@ -13,7 +13,7 @@ import ota
 
 
 FAULT = re.compile(r'assert failed|Guru Meditation|CORRUPT HEAP|PANIC registers:|'
-                   r'serial capture interrupted|TCP_POOL: action=invalid-free')
+                   r'serial capture interrupted|TCP_POOL:.*\baction=invalid-free')
 
 
 def serial_health(rows):

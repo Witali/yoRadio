@@ -17,7 +17,8 @@ class SerialHealth(unittest.TestCase):
     def test_fault_survives_later_successful_boot(self):
         for marker in ('assert failed: TCP PCB is allocated', 'Guru Meditation Error',
                        'PANIC registers: MEPC=0x40386b58', 'CORRUPT HEAP:',
-                       'PERF TCP_POOL: action=invalid-free', 'serial capture interrupted'):
+                       'PERF TCP_POOL: action=invalid-free',
+                       'PERF TCP_POOL: sequence=12 action=invalid-free', 'serial capture interrupted'):
             rows = [dict(at=1, line=marker), dict(at=2, line='ESP-ROM:esp32c3'),
                     dict(at=3, line='PERF RAM: stage=app-start free=288880')]
             health = serial_health(rows)

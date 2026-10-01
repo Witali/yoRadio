@@ -2,14 +2,17 @@
 from pathlib import Path
 import subprocess
 import tempfile
+import signal
 
 ROOT = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='tcp-pool-') as directory:
     tmp = Path(directory)
     (tmp/'lwip').mkdir()
     (tmp/'esp_attr.h').write_text('#define RTC_DATA_ATTR\n')
-    (tmp/'esp_log.h').write_text('''static inline void pool_test_log(const char *tag, const char *format, ...)
-{(void)tag; (void)format;}
+    (tmp/'esp_log.h').write_text('''#include <stdio.h>
+#include <stdarg.h>
+static inline void pool_test_log(const char *tag, const char *format, ...)
+{(void)tag; va_list ap; va_start(ap, format); vprintf(format, ap); va_end(ap); puts(""); fflush(stdout);}
 #define ESP_LOGI pool_test_log
 ''')
     (tmp/'lwip/memp.h').write_text('''#pragma once
@@ -59,7 +62,15 @@ static void *worker(void *arg) {
     }
     return NULL;
 }
-int main(void) {
+int main(int argc, char **argv) {
+    (void)argv;
+    if (argc > 1) {
+        void *p = __wrap_memp_malloc(MEMP_TCP_PCB);
+        assert(p);
+        __wrap_memp_free(MEMP_TCP_PCB, p);
+        __wrap_memp_free(MEMP_TCP_PCB, p); // Expected ownership assertion.
+        return 99;
+    }
     void *ordinary = __wrap_memp_malloc(MEMP_OTHER);
     __wrap_memp_free(MEMP_OTHER, ordinary);
     assert(forwarded_alloc == 1 && forwarded_free == 1);
@@ -100,3 +111,9 @@ int main(void) {
                                 *options, str(tmp/'test.c'), '-o', str(exe)], check=True)
                 print('diagnostic_trace=' + str(trace), flush=True)
                 subprocess.run([str(exe)], check=True)
+                invalid = subprocess.run([str(exe), '--invalid-free'], capture_output=True, text=True)
+                assert invalid.returncode == -signal.SIGABRT, invalid.stderr
+                if trace:
+                    assert invalid.stdout.count('PERF TCP_POOL:') == 3, invalid.stdout
+                    assert 'action=invalid-free slot=0 state=0 owned=0' in invalid.stdout
+                print('invalid free asserted; bounded history checked' if trace else 'invalid free asserted', flush=True)
