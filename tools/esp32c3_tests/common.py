@@ -30,6 +30,36 @@ def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
+TLS_CERTIFICATE_REJECTED = ('TLS failure: component=esp-x509-crt-bundle '
+                            'certificate_verification_failed=true')
+
+
+def filter_tls_line(line):
+    # Never retain arbitrary certificate subjects, URLs or hostnames.
+    tls = re.match(r'^(?:\x1b\[[0-9;]*m)?E \(\d+\) '
+                   r'(Dynamic Impl|SSL TLS|SSL client|SSL Server|'
+                   r'esp-tls-mbedtls|esp-tls|esp-x509-crt-bundle):', line)
+    if not tls:
+        return None
+    body = re.sub(r'\x1b\[[0-9;]*m', '', line[tls.end():]).strip()
+    if tls.group(1) == 'esp-x509-crt-bundle' and body == 'Failed to verify certificate':
+        return TLS_CERTIFICATE_REJECTED
+    size = re.search(r'\balloc\((\d+) bytes\) failed\b', body)
+    return ('TLS failure: component=' + tls.group(1) +
+            (' allocation_bytes=' + size.group(1) if size else ''))
+
+
+def check_certificate_rejection(alerts, rows):
+    bundle_rejected = any(r['line'] == TLS_CERTIFICATE_REJECTED for r in rows)
+    # The ESP-IDF verification callback can yield BADCERT_OTHER, which the
+    # pinned mbedTLS maps to ACCESS_DENIED. That alert alone is not proof.
+    require(any('CERTIFICATE' in alert or 'UNKNOWN_CA' in alert or
+                alert == 'TLSV1_ALERT_ACCESS_DENIED' and bundle_rejected
+                for alert in alerts),
+            'No certificate-rejection evidence; connection failure alone is insufficient')
+    return bundle_rejected
+
+
 def fixtures(extra_manifest=None):
     from audio_test_server.fixtures import load_fixtures
     specs = load_fixtures(extra_manifest)

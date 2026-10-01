@@ -6,6 +6,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools/esp32c3_tests'))
 from diagnostic import filter_line
+from common import TLS_CERTIFICATE_REJECTED
 
 
 class PanicFilter(unittest.TestCase):
@@ -38,6 +39,14 @@ class PanicFilter(unittest.TestCase):
                     ': certificate/URL private-secret allocation failed\x1b[0m'),
                     'TLS failure: component='+tag)
         self.assertIsNone(filter_line('I (12) esp-tls: private-secret'))
+
+    def test_only_fixed_certificate_verification_message_proves_rejection(self):
+        self.assertEqual(filter_line('\x1b[0;31mE (12) esp-x509-crt-bundle: '
+            'Failed to verify certificate\x1b[0m'), TLS_CERTIFICATE_REJECTED)
+        for text in ('No certificates in bundle', 'Failed to allocate memory',
+                     'Failed to verify certificate for private-subject'):
+            self.assertEqual(filter_line('E (12) esp-x509-crt-bundle: '+text),
+                             'TLS failure: component=esp-x509-crt-bundle')
 
 
 if __name__ == '__main__':

@@ -129,6 +129,18 @@ class AcceptanceTests(unittest.TestCase):
             with self.assertRaises(common.Failure):
                 common.check_recovery_heap(initial,final)
 
+    def test_access_denied_needs_independent_certificate_rejection_evidence(self):
+        alert = ['TLSV1_ALERT_ACCESS_DENIED']
+        proof = [dict(line=common.TLS_CERTIFICATE_REJECTED)]
+        self.assertTrue(common.check_certificate_rejection(alert, proof))
+        for alerts, rows in ((alert, []), ([], proof),
+                            (alert, [dict(line='TLS failure: component=esp-x509-crt-bundle')]),
+                            (['UNEXPECTED_EOF_WHILE_READING'], proof)):
+            with self.subTest(alerts=alerts, rows=rows), self.assertRaises(common.Failure):
+                common.check_certificate_rejection(alerts, rows)
+        for value in ('TLSV1_ALERT_UNKNOWN_CA', 'SSLV3_ALERT_BAD_CERTIFICATE'):
+            common.check_certificate_rejection([value], [])
+
     def test_real_recorded_he_failure_is_rejected(self):
         rows = json.loads((ROOT/'tests/results/esp32c3-radio-hardware-20260930/wifi-flash/radio-status.json').read_text())
         for name in ('he-48000-stereo','hev2-44100-stereo'):

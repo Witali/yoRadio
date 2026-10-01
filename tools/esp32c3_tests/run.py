@@ -9,7 +9,8 @@ import threading
 import time
 
 from common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
-                    check_recovery_heap, check_transitions, fixtures, require)
+                    check_recovery_heap, check_transitions, fixtures, require,
+                    filter_tls_line, check_certificate_rejection)
 from audio_test_server.server import Server
 from audio_test_server.fixtures import SEQUENCES
 
@@ -35,7 +36,10 @@ class Capture:
             except OSError:
                 self.rows.append(dict(at=time.monotonic(), line='serial capture interrupted'))
                 return
-            if re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP', line):
+            tls = filter_tls_line(line)
+            if tls:
+                self.rows.append(dict(at=time.monotonic(), line=tls))
+            elif re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP', line):
                 self.rows.append(dict(at=time.monotonic(), line=line))
 
     def since(self, at):
@@ -194,16 +198,17 @@ class Suite:
         if not origin or server is None:
             raise Blocked('Provide untrusted --https-origin and --tls-cert/key to capture handshake rejection')
         first_event = len(server.events)
+        started = time.monotonic()
         self.start('lc-48000-stereo',hint='aac',origin=origin)
         samples = self.observe(12,'untrusted-tls')
         require(not any(s['audio'] for s in samples), 'Untrusted TLS connection was accepted')
         errors = [e['reason'] for e in server.events[first_event:] if e['mode']=='tls-handshake-failure']
-        require(any('CERTIFICATE' in e or 'UNKNOWN_CA' in e for e in errors),
-                'No certificate-rejection alert observed; connection failure alone is insufficient')
+        bundle_rejected = check_certificate_rejection(errors, self.capture.since(started))
         self.start('lc-48000-stereo',hint='aac')
         try:
             check_playback(self.observe(7,'after-tls-rejection'),self.specs['lc-48000-stereo'])
-            return dict(untrusted_rejected=True, http_recovered=True, tls_alerts=errors)
+            return dict(untrusted_rejected=True, http_recovered=True, tls_alerts=errors,
+                        certificate_bundle_rejected=bundle_rejected)
         finally:
             self.board.stop()
 
