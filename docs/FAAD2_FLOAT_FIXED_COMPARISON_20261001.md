@@ -12,6 +12,13 @@ These numbers measure **fixed PCM minus float PCM**. Floating-point is the
 comparison reference, not a demonstrated bit-exact ground truth. This test does
 not establish which path is more faithful to an independent reference decoder.
 
+The consolidated table is saved as
+[Excel](../outputs/01a0a51b-5ba3-70a3-8fba-6f4113c001fe/faad-float-fixed.xlsx)
+and [CSV](../tests/results/faad2-arithmetic-20261001/summary.csv): all 11 inputs,
+31 rows including whole-input and per-channel results, with 20 columns of
+measurements and context. Filter `Scope` to `All` for one row per input; do not
+sum those aggregate rows together with their individual channels.
+
 | Input | Actual output | Maximum absolute difference, LSB | RMS difference, LSB | Signal/difference, dB |
 | --- | --- | ---: | ---: | ---: |
 | Synthetic LC 22.05 kHz mono | 44.1 kHz mono (*) | 2 | 0.687543 | 77.16 |
@@ -133,3 +140,8 @@ contains source/input/output hashes and exact compiler commands. Adjacent logs,
 frame/state traces and `*.errors.json` retain the diagnoses. The validation test
 checks these measurements, including the large discrepancies; passing it does
 not declare arithmetic equivalence or qualify a production decoder.
+
+To regenerate the consolidated table, run
+`tools/codec_benchmark/export_faad_arithmetic.mjs` with the bundled Node runtime
+and `@oai/artifact-tool` dependency. The builder header describes the local
+dependency link. It reads the retained JSON without decoding or modifying it.
