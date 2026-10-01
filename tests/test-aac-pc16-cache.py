@@ -24,8 +24,10 @@ class CacheEvidenceTests(unittest.TestCase):
             self.assertEqual(digest(EVIDENCE/'sdkconfig'),report['provenance']['sdkconfig_sha256'])
             self.assertIn('CONFIG_YORADIO_AAC_PS_PC16_CACHE=y',(EVIDENCE/'sdkconfig').read_text())
         self.assertEqual(runs,45)
-        for path,value in read(EVIDENCE/'implementation.json')['files'].items():
-            self.assertEqual(digest(ROOT/path),value,path)
+        manifest=read(EVIDENCE/'implementation.json')
+        for path,value in manifest['files'].items():
+            snapshot=manifest.get('snapshots',{}).get(path)
+            self.assertEqual(digest(EVIDENCE/snapshot if snapshot else ROOT/path),value,path)
 
     def test_error_distributions_unchanged(self):
         for name in ('synthetic','abba64'):

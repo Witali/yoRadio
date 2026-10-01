@@ -145,6 +145,11 @@ symbols. Archive hash, original instruction bytes, immediate bounds and absence
 of overlapping relocations are checked before writing. Constants with global
 symbols are also renamed to isolate the A/B legs. The SDK archive stays intact.
 
+The [typed ABI follow-up](ESP32C3_AAC_ABI_20261001.md) replaces adapter field
+offsets with named struct members. The patcher now obtains replacement offsets
+from `offsetof`/`sizeof` in an RV32 compiler object. Its seven patched objects
+remain byte-identical; the original evidence below retains its original source.
+
 `qemu_aac_smoothing.c` selects the original/candidate frame controller, measures
 actual guarded allocation blocks and checks both guards after decode and on free.
 The patched allocator request remains intercepted at 55128 so the same failure

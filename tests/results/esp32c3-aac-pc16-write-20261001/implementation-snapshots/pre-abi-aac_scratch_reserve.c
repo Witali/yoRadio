@@ -7,9 +7,6 @@
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#ifdef CONFIG_YORADIO_AAC_RELOCATE_PS
-#include "aac_sbr_abi.h"
-#endif
 
 // Pinned 2.6.2 initialization allocates this workspace after the 35460-byte
 // core and several small owners. Request it before the caller PCM/core instead,
@@ -45,11 +42,11 @@ void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
     }
     size_t request=size;
 #ifdef CONFIG_YORADIO_AAC_RELOCATE_PS
-    if(state && n==1 && size==sizeof(aac_sbr_owner_abi_t))request=sizeof(aac_sbr_relocated_owner_abi_t);
+    if(state && n==1 && size==55128)request=51596;
 #endif
     void *p=__real_media_lib_module_calloc(module,n,request);
 #ifdef CONFIG_YORADIO_AAC_RELOCATE_PS
-    if(state && n==1 && size==sizeof(aac_sbr_owner_abi_t) && p) {
+    if(state && n==1 && size==55128 && p) {
         assert(!state->owner);
         state->owner=p;state->ps_active=false;
 #ifdef CONFIG_YORADIO_AAC_PS_PC16
@@ -67,15 +64,15 @@ void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
 // Same lossless layout as the guarded 81-case QEMU trial. A mono core with
 // PS does not use the right SBR work area [0x93b4,0xa780); both PS delay/hybrid
 // data below it and right synthesis history above it remain untouched.
-static aac_sbr_relocated_owner_abi_t *sbr_owner(aac_scratch_reserve_t *state) {
-    return (void *)state->owner;
-}
-static aac_ps_abi_t *relocated_ps(aac_scratch_reserve_t *state) {
-    return &sbr_owner(state)->channel[1].ps_overlay.relocated_ps;
-}
+#define PS_POINTER 0xc984u
+#define PS_SENTINEL 0xc988u
+#define PS_RELOCATED 0x93b4u
+#define PS_BYTES 3536u
+_Static_assert(sizeof(void*)==4,"Pinned RV32 pointer layout");
+_Static_assert(PS_RELOCATED+PS_BYTES<=0xa780,"PS must precede right synthesis");
 static void ps_pointer(aac_scratch_reserve_t *state) {
-    aac_sbr_relocated_owner_abi_t *owner=sbr_owner(state);
-    owner->ps=state->ps_active?relocated_ps(state):(void *)&owner->inactive_ps;
+    void *p=state->owner+(state->ps_active?PS_RELOCATED:PS_SENTINEL);
+    memcpy(state->owner+PS_POINTER,&p,4);
 }
 void __real_media_lib_free(void *);
 void __wrap_media_lib_free(void *p) {
@@ -104,12 +101,11 @@ int __wrap_ps_read_data(void *ps,void *bits,unsigned count) {
     aac_scratch_reserve_t *state=pvTaskGetThreadLocalStoragePointer(NULL,AAC_TLS_SLOT);
     if(!state || !state->inside_sbr)return __real_ps_read_data(ps,bits,count);
     if(!state->ps_active) {
-        aac_ps_abi_t *control=relocated_ps(state);
-        memset(control,0,sizeof(*control));
-        control->detected=sbr_owner(state)->inactive_ps;
+        memset(state->owner+PS_RELOCATED,0,PS_BYTES);
+        memcpy(state->owner+PS_RELOCATED,state->owner+PS_SENTINEL,4);
         state->ps_active=true;ps_pointer(state);
     }
-    return __real_ps_read_data(relocated_ps(state),bits,count);
+    return __real_ps_read_data(state->owner+PS_RELOCATED,bits,count);
 }
 #ifdef CONFIG_YORADIO_AAC_PS_PC16
 void aac_ps_pc16_allocate(void *,uint32_t,bool);
@@ -125,7 +121,7 @@ void __wrap_ps_allocate_decoder(void *owner,uint32_t samples) {
 void __wrap_ps_decorrelate(void *ps,int32_t *lr,int32_t *li,int32_t *rr,int32_t *ri,int32_t *scratch) {
     aac_scratch_reserve_t *s=pvTaskGetThreadLocalStoragePointer(NULL,AAC_TLS_SLOT);
     if(!s || !s->ps_packed){__real_ps_decorrelate(ps,lr,li,rr,ri,scratch);return;}
-    assert(s->inside_sbr && ps==relocated_ps(s));
+    assert(s->inside_sbr && ps==s->owner+PS_RELOCATED);
     aac_ps_pc16_decode(s->owner,ps,lr,li,rr,ri,scratch);
 }
 #endif

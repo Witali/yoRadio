@@ -17,6 +17,9 @@ initializes, reads, writes, resets or frees it, including indirect pointer users
 and overlapping storage. Verify index bounds and lifetime across frames and
 format changes against native instructions. Change the size only after this
 access map is complete and all affected callers can be updated consistently.
+Use the checked types in `aac_sbr_abi.h` for fields and allocation sizes;
+derive machine-code replacement offsets from the compiler layout object.
+Keep numeric private-ABI expectations at the checked binary boundary.
 
 ## Execution sequence
 
@@ -88,6 +91,11 @@ access map is complete and all affected callers can be updated consistently.
 6. No production option is enabled yet. Remaining lifetime and hardware gates
    are listed in the relocation report; the full-radio memory shortage is not
    claimed fixed by a QEMU block-size measurement.
+7. [Typed ABI access](ESP32C3_AAC_ABI_20261001.md) replaces raw field offsets in
+   smoothing, PS relocation/PC16 and repaired reset. Compiler-derived patches
+   reproduce the seven earlier objects exactly. Reset, PCM, ownership and host
+   sanitizer checks pass. This adds no RAM saving; full-radio integration and
+   the remaining QMF/hybrid/synthesis/IMDCT candidates still need qualification.
 
 ## Updated product objective
 

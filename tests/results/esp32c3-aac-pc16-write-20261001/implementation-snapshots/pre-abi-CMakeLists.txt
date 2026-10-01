@@ -71,11 +71,7 @@ if(CONFIG_YORADIO_QEMU)
     endif()
     if(CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST)
       if(CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST)
-        if(CONFIG_YORADIO_QEMU_AAC_SMOOTHING_TEST)
-          list(APPEND NATIVE_SRCS "qemu_aac_smoothing.c" "qemu_aac_smoothing_fir.c")
-        else()
-          list(APPEND NATIVE_SRCS "qemu_aac_sbr_layout.c")
-        endif()
+        list(APPEND NATIVE_SRCS "qemu_aac_sbr_layout.c")
         if(CONFIG_YORADIO_QEMU_AAC_RESET_TEST)
           list(APPEND NATIVE_SRCS "qemu_aac_reset.c")
         endif()
@@ -98,18 +94,6 @@ endif()
 
 if(CONFIG_YORADIO_AAC_PS_PC16 OR CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST)
   list(APPEND NATIVE_SRCS "aac_ps_pc16.c")
-endif()
-
-if(CONFIG_YORADIO_HEAP_LAYOUT_DIAGNOSTICS)
-  list(APPEND NATIVE_SRCS "heap_layout_diagnostic.c")
-endif()
-
-if(CONFIG_YORADIO_TCP_ALLOCATION_DIAGNOSTICS)
-  list(APPEND NATIVE_SRCS "tcp_allocation_diagnostic.c")
-endif()
-
-if(CONFIG_YORADIO_TCP_PCB_POOL)
-  list(APPEND NATIVE_SRCS "tcp_pcb_pool.c")
 endif()
 
 idf_component_register(
@@ -158,24 +142,6 @@ if(YORADIO_CODEC_BENCHMARK)
 endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
 
-if(CONFIG_YORADIO_HEAP_LAYOUT_DIAGNOSTICS)
-  target_link_options(${COMPONENT_LIB} INTERFACE
-    "-Wl,--wrap=cpu_profiler_memory" "-Wl,--wrap=media_lib_module_malloc"
-    "-Wl,--wrap=media_lib_module_calloc")
-endif()
-
-if(CONFIG_YORADIO_TCP_ALLOCATION_DIAGNOSTICS)
-  target_link_options(${COMPONENT_LIB} INTERFACE
-    "-Wl,--wrap=memp_malloc" "-Wl,--wrap=memp_free"
-    "-Wl,--undefined=__wrap_memp_malloc")
-endif()
-
-if(CONFIG_YORADIO_TCP_PCB_POOL)
-  target_link_options(${COMPONENT_LIB} INTERFACE
-    "-Wl,--wrap=memp_malloc" "-Wl,--wrap=memp_free"
-    "-Wl,--undefined=__wrap_memp_malloc")
-endif()
-
 if(CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE OR CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE)
   file(SHA256 "$ENV{YORADIO_AUDIO_CODEC_COMPONENT}/lib/esp32c3/libesp_audio_codec.a" AAC_RESERVE_SHA256)
   if(NOT AAC_RESERVE_SHA256 STREQUAL "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909")
@@ -209,36 +175,7 @@ if(CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST)
     endif()
     if(CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST)
       target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=media_lib_module_calloc"
-        "-Wl,--wrap=media_lib_free" "-Wl,--wrap=ps_read_data")
-      if(CONFIG_YORADIO_QEMU_AAC_SMOOTHING_TEST)
-        target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=PVMP4AudioDecodeFrame"
-          "-Wl,--wrap=PVMP4AudioDecoderResetBuffer")
-        set(COMPACT5_DIR "${CMAKE_CURRENT_BINARY_DIR}/compact5")
-        file(MAKE_DIRECTORY "${COMPACT5_DIR}")
-        execute_process(COMMAND "${CMAKE_C_COMPILER}" -std=c11 -march=rv32imc -mabi=ilp32
-          -I "${CMAKE_CURRENT_LIST_DIR}" -c "${YORADIO_ROOT}/../tools/codec_benchmark/aac_abi_layout.c"
-          -o "${COMPACT5_DIR}/layout.o" RESULT_VARIABLE COMPACT5_LAYOUT_RESULT)
-        if(NOT COMPACT5_LAYOUT_RESULT EQUAL 0)
-          message(FATAL_ERROR "AAC compiler ABI layout checks failed")
-        endif()
-        execute_process(COMMAND "${PYTHON}" "${YORADIO_ROOT}/../tools/codec_benchmark/compact_sbr_tables.py"
-          --archive "${PINNED_AAC_ARCHIVE}" --output "${COMPACT5_DIR}"
-          --ar "${CMAKE_AR}" --objcopy "${CMAKE_OBJCOPY}"
-          --layout-object "${COMPACT5_DIR}/layout.o"
-          RESULT_VARIABLE COMPACT5_RESULT)
-        if(NOT COMPACT5_RESULT EQUAL 0)
-          message(FATAL_ERROR "Compact SBR table ABI patch failed")
-        endif()
-        foreach(FUNC init_sbr_dec sbr_open sbr_read_data sbr_applied ps_allocate_decoder sbr_dec pvmp4audiodecoderframe)
-          target_sources(${COMPONENT_LIB} PRIVATE "${COMPACT5_DIR}/${FUNC}.c.obj")
-        endforeach()
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-          "${YORADIO_ROOT}/../tools/codec_benchmark/compact_sbr_tables.py"
-          "${YORADIO_ROOT}/../tools/codec_benchmark/aac_abi_layout.c"
-          "${CMAKE_CURRENT_LIST_DIR}/aac_sbr_abi.h")
-      else()
-        target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=sbr_applied")
-      endif()
+        "-Wl,--wrap=media_lib_free" "-Wl,--wrap=sbr_applied" "-Wl,--wrap=ps_read_data")
       if(CONFIG_YORADIO_QEMU_AAC_RESET_TEST)
         target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=PVMP4AudioDecoderResetBuffer" "-Wl,--wrap=sbr_open")
       endif()

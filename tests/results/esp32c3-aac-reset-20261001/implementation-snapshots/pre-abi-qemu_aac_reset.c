@@ -3,7 +3,6 @@
 // inferred by the decompiler. No DSP arithmetic is changed.
 #include "native_aac_decoder.h"
 #include "qemu_aac_packed_history.h"
-#include "aac_sbr_abi.h"
 #include "esp_log.h"
 #include "esp_partition.h"
 #include <assert.h>
@@ -11,9 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CORE_BYTES sizeof(aac_core_abi_t)
-// Deliberately retain the invalid historical offset only for the contained
-// vendor-bug reproduction. The repair below uses typed members exclusively.
+#define CORE_BYTES 35460u
 #define OLD_PS_POINTER 0x153dcu
 #define PADDED_BYTES (OLD_PS_POINTER+4u)
 #define GUARD 16u
@@ -29,6 +26,9 @@ void aac_sbr_layout_assert_idle(void);
 esp_audio_err_t native_aac_decoder_reset_for_test(native_aac_decoder_t *);
 
 static uint32_t word(void *base,size_t offset) { uint32_t v; memcpy(&v,(uint8_t*)base+offset,4);return v; }
+static void put(void *base,size_t offset,uint32_t value) { memcpy((uint8_t*)base+offset,&value,4); }
+static void *ptr(void *base,size_t offset) { return (void*)(uintptr_t)word(base,offset); }
+static void zero(void *base,size_t offset,size_t bytes) { memset((uint8_t*)base+offset,0,bytes); }
 static void guards(core_t *c) {
     for(unsigned i=0;i<GUARD;++i) { assert(c->raw[i]==0xa5);assert(c->core[c->bytes+i]==0x5a); }
 }
@@ -49,61 +49,46 @@ bool qemu_aac_reset_free(void *p) {
     return false;
 }
 
-static void repaired_reset(aac_core_abi_t *core) {
-    for(unsigned ch=0;ch<AAC_SBR_CHANNELS;++ch)
-        memset(core->channel[ch].overlap,0,sizeof(core->channel[ch].overlap));
-    aac_sbr_relocated_owner_abi_t *sbr=core->sbr;
-    if(sbr && !sbr->initialize_ps && core->plus_enabled) {
-        aac_ps_abi_t *ps=aac_sbr_layout_ps(sbr);
-        sbr->ps=ps; // Correct owner, replacing the vendor's out-of-core write.
-        for(unsigned ch=0;ch<AAC_SBR_CHANNELS;++ch) {
-            aac_core_channel_abi_t *channel=&core->channel[ch];
-            memset(channel->ltp_history,0,288*sizeof(channel->ltp_history[0]));
-            memset(channel->ltp_history+1312,0,288*sizeof(channel->ltp_history[0]));
-            aac_sbr_frame_abi_t *frame=&sbr->channel[ch].frame;
-            memset(frame->synthesis,0,sizeof(frame->synthesis));
-            memset(frame->previous_noise,0,sizeof(frame->previous_noise));
-        }
-        aac_sbr_frame_abi_t *left=&sbr->channel[0].frame;
-        aac_sbr_frame_abi_t *right=&sbr->channel[1].frame;
-        memset(left->low_real,0,8*sizeof(left->low_real[0]));
-        memset(left->previous_bandwidth,0,sizeof(left->previous_bandwidth));
-        memset(left->gain_mantissa,0,sizeof(left->gain_mantissa));
-        memset(left->noise_mantissa,0,sizeof(left->noise_mantissa));
-        memset(left->high_real_history,0,sizeof(left->high_real_history));
-        memset(left->high_imag_history,0,sizeof(left->high_imag_history));
-        aac_sbr_control_abi_t *control=core->sbr_control;
-        if(control->low_complexity==1) {
-            memset(right->low_real,0,8*sizeof(right->low_real[0]));
-            memset(right->high_real_history,0,sizeof(right->high_real_history));
-            memset(right->previous_bandwidth,0,sizeof(right->previous_bandwidth));
-            memset(right->gain_mantissa,0,sizeof(right->gain_mantissa));
-            memset(right->noise_mantissa,0,sizeof(right->noise_mantissa));
-        } else if(core->channels==1) {
-            aac_hybrid_abi_t *hybrid=ps->hybrid;
+static void repaired_reset(uint8_t *core) {
+    zero(core,0x1570,0x1000);zero(core,0x3a24,0x1000);
+    uint8_t *sbr=ptr(core,0x8a58);
+    if(sbr && !word(sbr,0xc980) && core[8]) {
+        void *ps=aac_sbr_layout_ps(sbr);
+        put(sbr,0xc984,(uintptr_t)ps); // Correct owner, replacing core+0x153dc.
+        zero(core,0xf0,0x240);zero(core,0xb30,0x240);
+        zero(sbr,0x42c0,0x900);zero(sbr,0x1160,40);
+        zero(core,0x25a4,0x240);zero(core,0x2fe4,0x240);
+        zero(sbr,0xa780,0x900);zero(sbr,0x7620,40);
+        zero(sbr,0x11b8,0x400);zero(sbr,0x11a0,24);
+        zero(sbr,0x4cc0,0x500);zero(sbr,0x51c0,0x500);
+        zero(sbr,0x3e40,0x480);zero(sbr,0x39bc,0x480);
+        void *control=ptr(core,0x8a5c);
+        if(word(control,4)==1) {
+            zero(sbr,0x7678,0x400);zero(sbr,0xa300,0x480);zero(sbr,0x7660,24);
+            zero(sbr,0xb180,0x500);zero(sbr,0xb680,0x500);
+        } else if(word(core,0xc0)==1) {
+            void *hybrid=ptr(ps,0x1fc);
             for(unsigned row=0;row<3;++row) {
-                memset(hybrid->real_history[row],0,12*sizeof(int32_t));
-                memset(hybrid->imag_history[row],0,12*sizeof(int32_t));
+                memset(ptr(ptr(hybrid,12),row*4),0,48);
+                memset(ptr(ptr(hybrid,16),row*4),0,48);
             }
         }
-        for(unsigned ch=0;ch<AAC_SBR_CHANNELS;++ch)sbr->channel[ch].sync_state=1;
-        control->output_rate=0;sbr->initialize_ps=1;ps->detected=0;
+        put(sbr,4,1);put(sbr,0x64c4,1);put(control,0,0);put(sbr,0xc980,1);put(ps,0,0);
     }
-    core->frame_number=0;core->plus_enabled=core->requested_plus;
+    put(core,0,0);core[8]=core[0x8a80];
 }
 void __wrap_PVMP4AudioDecoderResetBuffer(void *core) {
     if(!enabled) { __real_PVMP4AudioDecoderResetBuffer(core);return; }
     core_t *c=cores+leg;assert(c->core==core);guards(c);
     if(leg) repaired_reset(core);
     else {
-        aac_core_abi_t *decoder=core;
-        aac_sbr_owner_abi_t *sbr=decoder->sbr;
-        bool will_write=sbr && !sbr->initialize_ps && decoder->plus_enabled;
+        uint8_t *sbr=ptr(core,0x8a58);
+        bool will_write=sbr && !word(sbr,0xc980) && ((uint8_t*)core)[8];
         memset(c->core+CORE_BYTES,0xa6,PADDED_BYTES-CORE_BYTES);
         __real_PVMP4AudioDecoderResetBuffer(core);
         size_t end=will_write ? OLD_PS_POINTER : PADDED_BYTES;
         for(size_t i=CORE_BYTES;i<end;++i) assert(c->core[i]==0xa6);
-        if(will_write) { assert(word(core,OLD_PS_POINTER)==(uintptr_t)&sbr->embedded_ps);++observed; }
+        if(will_write) { assert(word(core,OLD_PS_POINTER)==(uintptr_t)(sbr+0xc988));++observed; }
     }
     guards(c);++resets;
 }
@@ -164,5 +149,5 @@ void qemu_aac_reset_test(void) {
         ESP_LOGI(TAG,"AACRESET_PASS case=%s cycles=3 resets=2 samples=%lu PCM=exact guards=pass cleanup=complete",files[f].name,(unsigned long)samples[0]);
     }
     enabled=0;free(pcm);free(reference);assert(observed==6 && resets==24);
-    ESP_LOGI(TAG,"AACRESET_COMPLETE baseline_oob_writes=%u paired_reset_calls=%u core_bytes=%u old_offset=%u",observed,resets,(unsigned)CORE_BYTES,OLD_PS_POINTER);
+    ESP_LOGI(TAG,"AACRESET_COMPLETE baseline_oob_writes=%u paired_reset_calls=%u core_bytes=%u old_offset=%u",observed,resets,CORE_BYTES,OLD_PS_POINTER);
 }

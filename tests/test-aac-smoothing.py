@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Replay compact smoothing evidence; reject missing coverage and ABI changes."""
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -9,10 +10,14 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
-import compact_sbr_tables as patch
 import run_aac_smoothing as runner
 
 EVIDENCE=ROOT/'tests/results/esp32c3-aac-smoothing-20261001'
+# Replay the exact patcher used to produce this historical evidence. Current
+# compiler-derived patches are checked independently by test-aac-abi.py.
+spec=importlib.util.spec_from_file_location('smoothing_snapshot_patcher',EVIDENCE/'implementation-snapshots/compact_sbr_tables.py')
+patch=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(patch)
 NAMES=('synthetic','abba64','groovesalad16','groovesalad32','groovesalad64','groovesalad128')
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 

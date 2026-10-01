@@ -1,7 +1,6 @@
 // QEMU-only, pinned Espressif 2.6.2 ABI. Lossless PS-control relocation trial.
 // All DSP stays in the original archive; this changes ownership/layout only.
 #include "qemu_aac_packed_history.h"
-#include "aac_sbr_abi.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #include <assert.h>
@@ -10,9 +9,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ORIGINAL_SIZE sizeof(aac_sbr_owner_abi_t)
-#define COMPACT_SIZE sizeof(aac_sbr_relocated_owner_abi_t)
+#define ORIGINAL_SIZE 55128u
+#define COMPACT_SIZE 51596u
+#define PS_POINTER 0xc984u
+#define PS_SENTINEL 0xc988u
+#define PS_RELOCATED 0x93b4u
+#define PS_BYTES 3536u
 #define GUARD_BYTES 16u
+_Static_assert(PS_RELOCATED + PS_BYTES <= 0xa780, "PS control must precede right synthesis V");
 
 typedef struct { uint8_t *owner, *allocation; size_t size, physical; unsigned variant, ps; } owner_t;
 static owner_t owners[4];
@@ -33,8 +37,8 @@ static owner_t *find(void *p) {
     return NULL;
 }
 static void pointer(owner_t *o) {
-    aac_sbr_relocated_owner_abi_t *sbr=(void *)o->owner;
-    sbr->ps=o->ps?&sbr->channel[1].ps_overlay.relocated_ps:(void *)&sbr->inactive_ps;
+    void *ps=o->owner+(o->ps ? PS_RELOCATED : PS_SENTINEL);
+    memcpy(o->owner+PS_POINTER,&ps,4);
 }
 static void check(owner_t *o) {
     for (unsigned n=0;n<GUARD_BYTES;++n) {
@@ -91,17 +95,15 @@ int __wrap_sbr_applied(void *owner,void *stream,void *left,void *right,
 int __wrap_ps_read_data(void *ps,void *bits,unsigned count) {
     if (!active) return __real_ps_read_data(ps,bits,count);
     owner_t *o=active;
-    aac_sbr_relocated_owner_abi_t *sbr=(void *)o->owner;
-    aac_ps_abi_t *relocated=&sbr->channel[1].ps_overlay.relocated_ps;
     if (!o->ps) {
         // Right-channel QMF/envelope work is unused for a mono core with PS.
         // Keep hybrid/delay data [0x7678,0x93b4) and synthesis V intact.
-        memset(relocated,0,sizeof(*relocated));
-        relocated->detected=sbr->inactive_ps;
+        memset(o->owner+PS_RELOCATED,0,PS_BYTES);
+        memcpy(o->owner+PS_RELOCATED,o->owner+PS_SENTINEL,4);
         o->ps=1; pointer(o);
     }
     ++ps_reads;
-    return __real_ps_read_data(relocated,bits,count);
+    return __real_ps_read_data(o->owner+PS_RELOCATED,bits,count);
 }
 
 void packed_history_reset(unsigned run) {
@@ -121,8 +123,7 @@ void packed_history_report(const char *name,unsigned variant,unsigned run,uint32
              (unsigned)(sizeof(owners)+sizeof(active)+sizeof(selected)+sizeof(calls)+sizeof(allocations)+sizeof(frees)+sizeof(ps_reads)+sizeof(fail_size)+sizeof(requested)+sizeof(physical)),2*GUARD_BYTES);
 }
 void packed_history_arithmetic_tests(void) {
-    const unsigned start=offsetof(aac_sbr_relocated_owner_abi_t,channel[1].ps_overlay.relocated_ps);
-    ESP_LOGI(TAG,"SBRLAYOUT_LAYOUT_PASS native DSP; PS=%u..%u owner=%u",start,start+(unsigned)sizeof(aac_ps_abi_t),(unsigned)COMPACT_SIZE);
+    ESP_LOGI(TAG,"SBRLAYOUT_LAYOUT_PASS native DSP; PS=%u..%u owner=%u",PS_RELOCATED,PS_RELOCATED+PS_BYTES,COMPACT_SIZE);
 }
 
 void aac_sbr_layout_fail_next(size_t size) { unsigned leg=selected==1; assert(!fail_size[leg]); fail_size[leg]=size; }
@@ -135,7 +136,7 @@ void aac_sbr_layout_assert_idle(void) {
 #ifdef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
 void *aac_sbr_layout_ps(void *owner) {
     owner_t *o=find(owner);assert(o && o->variant==1);pointer(o);
-    return ((aac_sbr_relocated_owner_abi_t *)(void *)o->owner)->ps;
+    void *ps;memcpy(&ps,o->owner+PS_POINTER,4);return ps;
 }
 void __real_sbr_open(int,void *,void *,int);
 int init_sbr_dec(int,int,void *,void *);
@@ -145,17 +146,14 @@ void __wrap_sbr_open(int rate,void *control,void *owner,int downsample) {
     if(!o || o->variant!=1 || !o->ps) { __real_sbr_open(rate,control,owner,downsample);return; }
     // A reset clears both channel workspaces but keeps the original tail PS
     // control. Preserve the relocated control with two disjoint zero ranges.
-    aac_sbr_relocated_owner_abi_t *sbr=owner;
-    const size_t start=offsetof(aac_sbr_relocated_owner_abi_t,channel[1].ps_overlay.relocated_ps);
-    const size_t end=start+sizeof(aac_ps_abi_t);
-    memset(owner,0,start);
-    memset(o->owner+end,0,offsetof(aac_sbr_relocated_owner_abi_t,initialize_ps)-end);
-    for(unsigned ch=0;ch<AAC_SBR_CHANNELS;++ch) {
-        aac_sbr_channel_abi_t *channel=&sbr->channel[ch];
-        memcpy(&channel->frame.header,defaultHeader,sizeof(channel->frame.header));
-        if(downsample || rate>24000)channel->frame.header.sample_rate_mode=1;
-        channel->frame_size=init_sbr_dec(rate,sbr->channel[0].frame.header.sample_rate_mode,control,&channel->frame);
-        channel->sync_state=1;channel->frame.startup=1;
+    memset(owner,0,PS_RELOCATED);
+    memset(o->owner+PS_RELOCATED+PS_BYTES,0,0xc980-PS_RELOCATED-PS_BYTES);
+    for(unsigned ch=0;ch<2;++ch) {
+        uint32_t *channel=(uint32_t*)(o->owner+ch*0x64c0);
+        memcpy(channel+0x32,defaultHeader,64);
+        if(downsample || rate>24000)channel[0x35]=1;
+        channel[0]=init_sbr_dec(rate,((uint32_t*)owner)[0x35],control,channel+2);
+        channel[1]=1;channel[0x1c5]=1;
     }
     check(o);
 }
