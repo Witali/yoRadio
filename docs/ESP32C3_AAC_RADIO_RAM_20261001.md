@@ -162,3 +162,25 @@ BOOT 1500 B, output 1228 B, decoder 5036 B. This supports the initial smaller
 service-stack choice for these paths; TLS, OTA and broader stress remain gates.
 The diagnostic image's heap layout also differs from the uninstrumented image.
 Successful allocation here does not erase the latter's broader-matrix failures.
+
+## Repeated switching and bounded Wi-Fi follow-up
+
+The corrected three-cycle test runs 12 switches among Opus, LC48, HE48 and
+HEv2 on the HTTP-profiler image. Five switches fail full HE/v2 output. Settled
+idle heap returns to 145020–145036 B and the largest block to 94208 B; this
+sequence does not demonstrate a growing leak. The earlier two-cycle invocation
+has now been repeated correctly; the result remains a playback failure.
+[Switch evidence](../tests/results/esp32c3-aac-radio-ram-20261001/http-profile-switch/switching.json).
+
+The separate `sdkconfig.aac-bounded-wifi.defaults` caps dynamic RX and TX
+buffers at six, after the compact profile's six static RX buffers. This is a
+peak network allocation experiment, not a decoder payload reduction. The
+uninstrumented physical image passes eight finite HTTP checks: LC48, HE48,
+HEv2 and Opus, each with automatic and explicit codec selection. HE48 remains
+48 kHz stereo and HEv2 remains 44.1 kHz stereo.
+[HTTP evidence](../tests/results/esp32c3-aac-radio-ram-20261001/bounded-wifi/http/report.json).
+
+This is not sufficient for a new production default: repeated switching,
+high-bitrate/load, recovery, stack, TLS and OTA acceptance remain necessary.
+The fixture server paces both finite-file and continuous routes at 1.02 times
+playback rate; the previous failures cannot be attributed to an unpaced server.
