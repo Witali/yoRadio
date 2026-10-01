@@ -8,6 +8,10 @@ with tempfile.TemporaryDirectory(prefix='tcp-pool-') as directory:
     tmp = Path(directory)
     (tmp/'lwip').mkdir()
     (tmp/'esp_attr.h').write_text('#define RTC_DATA_ATTR\n')
+    (tmp/'esp_log.h').write_text('''static inline void pool_test_log(const char *tag, const char *format, ...)
+{(void)tag; (void)format;}
+#define ESP_LOGI pool_test_log
+''')
     (tmp/'lwip/memp.h').write_text('''#pragma once
 #include <assert.h>
 #define MEMP_MEM_MALLOC 1
@@ -25,7 +29,7 @@ extern pthread_mutex_t lock;
 #define SYS_ARCH_PROTECT(level) do {level = pthread_mutex_lock(&lock); assert(!level);} while(0)
 #define SYS_ARCH_UNPROTECT(level) do {(void)level; assert(!pthread_mutex_unlock(&lock));} while(0)
 ''')
-    (tmp/'lwip/tcp.h').write_text('#pragma once\nstruct tcp_pcb {unsigned words[42];};\n')
+    (tmp/'lwip/tcp.h').write_text('#pragma once\nstruct tcp_pcb {union {unsigned words[42]; unsigned state;};};\n')
     (tmp/'test.c').write_text(r'''
 #include <assert.h>
 #include <pthread.h>
@@ -86,10 +90,13 @@ int main(void) {
 ''')
     for count in (1, 16, 32):
         for stats in (0, 1):
-            exe = tmp/f'pool-{count}-{stats}'
-            subprocess.run(['cc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                            '-fsanitize=address,undefined', '-fno-omit-frame-pointer', '-pthread',
-                            '-DMEMP_NUM_TCP_PCB='+str(count), '-DMEMP_STATS='+str(stats),
-                            '-I'+str(tmp), '-I'+str(ROOT/'idf/esp32c3-oled-native/main'),
-                            str(tmp/'test.c'), '-o', str(exe)], check=True)
-            subprocess.run([str(exe)], check=True)
+            for trace in (False, True):
+                exe = tmp/f'pool-{count}-{stats}-{trace}'
+                options = ['-DCONFIG_YORADIO_TCP_PCB_POOL_DIAGNOSTICS=1'] if trace else []
+                subprocess.run(['cc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
+                                '-fsanitize=address,undefined', '-fno-omit-frame-pointer', '-pthread',
+                                '-DMEMP_NUM_TCP_PCB='+str(count), '-DMEMP_STATS='+str(stats),
+                                '-I'+str(tmp), '-I'+str(ROOT/'idf/esp32c3-oled-native/main'),
+                                *options, str(tmp/'test.c'), '-o', str(exe)], check=True)
+                print('diagnostic_trace=' + str(trace), flush=True)
+                subprocess.run([str(exe)], check=True)

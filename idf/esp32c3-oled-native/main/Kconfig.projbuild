@@ -204,6 +204,15 @@ config YORADIO_TCP_ALLOCATION_DIAGNOSTICS
         pointer, structure size and state on release, never IP/port/payload.
         Pass through the unmodified lwIP allocator and protocol behavior.
 
+config YORADIO_TCP_PCB_POOL_DIAGNOSTICS
+    bool "Log experimental TCP PCB pool lifetimes"
+    depends on YORADIO_TCP_PCB_POOL
+    default n
+    help
+        Diagnostic only. Logs pool slot ownership and TCP state, without
+        addresses of remote hosts, ports or payloads. Changes scheduling;
+        do not use this mode to qualify performance.
+
 config YORADIO_TCP_PCB_POOL
     bool "Keep TCP control blocks in a fixed RTC RAM pool"
     depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU && !YORADIO_TCP_ALLOCATION_DIAGNOSTICS
