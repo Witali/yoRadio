@@ -83,6 +83,25 @@ separate option forwards lwIP allocation/free unchanged and logs the PCB state
 before release. It never logs IP addresses, ports or packet contents. Retain
 the exact ELF/config: a matching size alone does not prove block ownership.
 
+`sdkconfig.tcp-pcb-pool.defaults` enables the separate experimental PCB pool.
+Its capacity remains `CONFIG_LWIP_MAX_ACTIVE_TCP`, including active and TIME_WAIT
+PCBs, exactly as in this IDF's heap-backed allocator. The 168-byte C3 structures
+use RTC RAM, with one ownership byte per slot in ordinary DRAM. The protocol,
+TIME_WAIT duration, packet allocations and codec code are unchanged. The pool
+cost is reserved RAM, not a reduction of each PCB's payload. Allocation exhaustion
+still returns NULL to TCP's existing recovery/reaping logic; other memp types
+are forwarded unchanged. Ownership flags reset on boot independently of retained
+RTC contents, which `tcp_alloc` initializes before publishing a reused PCB.
+
+This build option is off by default and mutually exclusive with the passive
+TCP allocation trace. The implementation requires IDF's heap-backed memp mode
+without memp overflow instrumentation; static assertions reject an incompatible
+configuration. Memp usage/error statistics remain supported. Host checks run
+with `python tests/run-tcp-pcb-pool.py`: configured capacities 1/16/32, statistics
+off/on, exhaustion/reuse, forwarding, alignment and 40000 concurrent lifetimes
+per variant under ASan/UBSan. Physical qualification must include early mixed-codec
+switches, WebUI traffic/OTA, TLS and the deep-sleep RTC footprint before promotion.
+
 The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
 standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
 AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained

@@ -204,6 +204,18 @@ config YORADIO_TCP_ALLOCATION_DIAGNOSTICS
         pointer, structure size and state on release, never IP/port/payload.
         Pass through the unmodified lwIP allocator and protocol behavior.
 
+config YORADIO_TCP_PCB_POOL
+    bool "Keep TCP control blocks in a fixed RTC RAM pool"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU && !YORADIO_TCP_ALLOCATION_DIAGNOSTICS
+    default n
+    help
+        Placement experiment: keep exactly LWIP_MAX_ACTIVE_TCP control blocks
+        in RTC RAM so long-lived TIME_WAIT nodes cannot divide the large AAC
+        heap region. TCP limits, timers, packet buffers and DSP are unchanged.
+        Costs sizeof(tcp_pcb) times the configured count in RTC RAM plus one
+        DRAM ownership byte per slot. Requires heap-backed memp without its
+        overflow instrumentation. Qualify switching, TLS, WebUI/OTA and sleep.
+
 config YORADIO_AAC_EARLY_SCRATCH_RESERVE
     bool "Place AAC scratch workspace before core and caller PCM"
     depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_AAC_EARLY_SBR_RESERVE && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
