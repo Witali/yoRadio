@@ -54,6 +54,17 @@ with no serial panics or extra resets, and 21/21 mixed-codec switches with full
 SBR/PS. HTTPS/load/soak, implicit AAC transitions and physical RTC sleep gates
 remain open; the pool stays optional pending broader qualification.
 
+The subsequent [public radio HTTP/HTTPS load test](ESP32C3_PUBLIC_HTTPS_20261001.md)
+passes AAC-LC and MP3 but reproduces full HE/v2 failures on real streams. HTTPS
+has only 39892–41888 bytes free when SBR requests 55128; HTTP has about 60 KiB
+free but a largest block of 53248 bytes. Both continue with reduced core PCM.
+Keep total RAM and fragmentation as separate open problems; the local 21/21
+switch result does not qualify this workload. Settings and idle heap recover.
+With one-second HTTP polling after a reboot, full HE 44.1 kHz starts, but later
+1700-byte allocations fail and sampled free/largest RAM falls to 6232/1728 bytes.
+The next fix must preserve operating headroom after SBR allocation as well as
+make its initial allocation possible.
+
 ## AAC memory reuse during decoding — planned, 2026-09-30
 
 The [AAC decompilation audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md)

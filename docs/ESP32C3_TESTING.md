@@ -388,6 +388,8 @@ No broadcast audio, titles or private board settings are saved. Streams and
 their encoding may change; this short live-radio test does not replace the
 controlled HTTPS fixture matrix, PCM comparisons, physical listening or one-hour
 soaks. A server/probe failure remains a failed case, not a board playback pass.
+The [2026-10-01 physical results](ESP32C3_PUBLIC_HTTPS_20261001.md) retain LC/MP3
+passes and HE/v2 allocation failures under both HTTPS and HTTP load.
 
 ### CPU, memory, switching and soak
 

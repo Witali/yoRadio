@@ -403,7 +403,12 @@ tests/test-esp32c3-half-close-hardware.py text eol=lf
 tests/results/esp32c3-lwip-half-close-20261001/*.json text eol=lf
 tests/results/esp32c3-lwip-half-close-20261001/**/*.json text eol=lf
 tools/esp32c3_tests/public_streams.py text eol=lf
+tools/esp32c3_tests/summarize_public.py text eol=lf
 tools/esp32c3_tests/public_streams.json text eol=lf
 tests/test-esp32c3-public-streams.py text eol=lf
+tests/test-esp32c3-public-https-evidence.py text eol=lf
 tests/results/esp32c3-public-https-20261001/*.json text eol=lf
 tests/results/esp32c3-public-https-20261001/**/*.json text eol=lf
+# Preserve the Windows runner's exact raw bytes used by summary SHA-256 checks.
+tests/results/esp32c3-public-https-20261001/**/report.json -text whitespace=cr-at-eol
+tests/results/esp32c3-public-https-20261001/**/status.json -text whitespace=cr-at-eol

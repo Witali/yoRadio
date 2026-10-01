@@ -1,0 +1,348 @@
+{
+  "board": {
+    "version": "v0.9.693-1112-g66fc377e-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "7b9414f9d153c1762d250755267c6ab5bf3603991ad0bbf4379262d94466dae3"
+  },
+  "metric": "FreeRTOS task runtime; mean of samples 5..35 s after first PCM checkpoint",
+  "cases": [
+    {
+      "name": "groovesalad-128-aac",
+      "playback_result": "PASS",
+      "busy_mean": 49.54,
+      "decode_mean": 20.5,
+      "minimum_free": 62912,
+      "minimum_largest": 51200,
+      "samples": [
+        {
+          "busy": 49.9,
+          "decode": 20.6,
+          "heap": 66504,
+          "largest": 51200
+        },
+        {
+          "busy": 49.0,
+          "decode": 20.4,
+          "heap": 66552,
+          "largest": 51200
+        },
+        {
+          "busy": 49.8,
+          "decode": 20.5,
+          "heap": 66496,
+          "largest": 53248
+        },
+        {
+          "busy": 49.7,
+          "decode": 20.4,
+          "heap": 62912,
+          "largest": 53248
+        },
+        {
+          "busy": 49.3,
+          "decode": 20.6,
+          "heap": 68200,
+          "largest": 51200
+        }
+      ],
+      "transport": "http",
+      "reference": {
+        "codec": "aac",
+        "profile": "LC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "AAC PCM"
+      },
+      "observed_formats": [
+        "AAC PCM 44.1 kHz stereo"
+      ],
+      "acceptance": {
+        "name": "http:groovesalad-128-aac",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "LC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "AAC PCM"
+            },
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 248,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 0.6089999999967404,
+          "status_samples": 330,
+          "max_http_ms": 110.00000004423782,
+          "p95_http_ms": 94.0000000409782,
+          "median_http_ms": 78.00000003771856,
+          "mean_busy": 49.422222222222224,
+          "peak_busy": 49.8,
+          "minimum_heap": 62900.0,
+          "minimum_largest": 51200.0,
+          "audio_wall_ratio": 1.0017978425888934
+        },
+        "seconds": 62.516
+      }
+    },
+    {
+      "name": "groovesalad-64-aac",
+      "playback_result": "FAIL",
+      "busy_mean": 34.5,
+      "decode_mean": 10.04,
+      "minimum_free": 61304,
+      "minimum_largest": 49152,
+      "samples": [
+        {
+          "busy": 34.5,
+          "decode": 10.0,
+          "heap": 61304,
+          "largest": 51200
+        },
+        {
+          "busy": 34.7,
+          "decode": 10.1,
+          "heap": 66588,
+          "largest": 51200
+        },
+        {
+          "busy": 34.3,
+          "decode": 10.0,
+          "heap": 66552,
+          "largest": 51200
+        },
+        {
+          "busy": 34.6,
+          "decode": 10.1,
+          "heap": 63088,
+          "largest": 49152
+        },
+        {
+          "busy": 34.4,
+          "decode": 10.0,
+          "heap": 64780,
+          "largest": 49152
+        }
+      ],
+      "transport": "http",
+      "reference": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC "
+      },
+      "observed_formats": [
+        "AAC PCM 22.05 kHz stereo"
+      ],
+      "acceptance": {
+        "name": "http:groovesalad-64-aac",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder failure",
+        "seconds": 62.25
+      }
+    },
+    {
+      "name": "groovesalad-16-aac",
+      "playback_result": "FAIL",
+      "busy_mean": 25.94,
+      "decode_mean": 4.58,
+      "minimum_free": 54428,
+      "minimum_largest": 40960,
+      "samples": [
+        {
+          "busy": 26.3,
+          "decode": 4.6,
+          "heap": 56204,
+          "largest": 40960
+        },
+        {
+          "busy": 26.4,
+          "decode": 4.6,
+          "heap": 54452,
+          "largest": 45056
+        },
+        {
+          "busy": 23.4,
+          "decode": 4.6,
+          "heap": 54428,
+          "largest": 43008
+        },
+        {
+          "busy": 26.4,
+          "decode": 4.5,
+          "heap": 54444,
+          "largest": 43008
+        },
+        {
+          "busy": 27.2,
+          "decode": 4.6,
+          "heap": 57980,
+          "largest": 45056
+        }
+      ],
+      "transport": "http",
+      "reference": {
+        "codec": "aac",
+        "profile": "HE-AACv2",
+        "rate": 32000,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AACv2 "
+      },
+      "observed_formats": [
+        "AAC PCM 16 kHz mono"
+      ],
+      "acceptance": {
+        "name": "http:groovesalad-16-aac",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder failure",
+        "seconds": 62.25
+      }
+    },
+    {
+      "name": "groovesalad-256-mp3",
+      "playback_result": "PASS",
+      "busy_mean": 57.533,
+      "decode_mean": 26.15,
+      "minimum_free": 86256,
+      "minimum_largest": 69632,
+      "samples": [
+        {
+          "busy": 57.5,
+          "decode": 25.8,
+          "heap": 86256,
+          "largest": 69632
+        },
+        {
+          "busy": 57.4,
+          "decode": 26.0,
+          "heap": 88012,
+          "largest": 69632
+        },
+        {
+          "busy": 57.8,
+          "decode": 26.3,
+          "heap": 88028,
+          "largest": 69632
+        },
+        {
+          "busy": 57.6,
+          "decode": 26.3,
+          "heap": 88024,
+          "largest": 69632
+        },
+        {
+          "busy": 57.5,
+          "decode": 26.2,
+          "heap": 88016,
+          "largest": 69632
+        },
+        {
+          "busy": 57.4,
+          "decode": 26.3,
+          "heap": 88016,
+          "largest": 69632
+        }
+      ],
+      "transport": "http",
+      "reference": {
+        "codec": "mp3",
+        "profile": null,
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "MP3"
+      },
+      "observed_formats": [
+        "MP3 44.1 kHz stereo"
+      ],
+      "acceptance": {
+        "name": "http:groovesalad-256-mp3",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "mp3",
+              "profile": null,
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "MP3"
+            },
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 251,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 0.6410000000032596,
+          "status_samples": 333,
+          "max_http_ms": 125.0,
+          "p95_http_ms": 94.0000000409782,
+          "median_http_ms": 77.9999999795109,
+          "mean_busy": 57.477777777777774,
+          "peak_busy": 58.3,
+          "minimum_heap": 87960.0,
+          "minimum_largest": 69632.0,
+          "audio_wall_ratio": 1.001553311882836
+        },
+        "seconds": 62.609
+      }
+    }
+  ],
+  "minimum_stack_free": {
+    "httpd": 2888,
+    "display": 1680,
+    "IDLE": 1252,
+    "tcpip": 2644,
+    "radio_stream": 2584,
+    "audio_decode": 15088,
+    "wifi_rssi": 1592,
+    "audio_output": 1220,
+    "websocket_statu": 1900,
+    "boot_button": 1500,
+    "time_sync": 1516,
+    "esp_timer": 3684,
+    "wifi": 1620,
+    "sys_evt": 2076,
+    "web_static_0": 580,
+    "web_static_1": 448
+  },
+  "no_pcm": [],
+  "input_sha256": {
+    "report.json": "02eb61f733f04928ddc223d2db3837c880f1936bd11e8574ef439e331f1837bd",
+    "status.json": "924e35bc59466555bfb9575e840fddb0e111ee12a20594a6db742ff46c457946",
+    "performance.json": "ffce00b5316e21ffe3fb1d56d776160afda5cfe0a55902fbe96fa8b8c7ddaddb"
+  },
+  "source_sha256": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+  "allocation_failures": [
+    {
+      "at": 380445.765,
+      "line": "E (105714) cpu_profile: PERF allocation failed: requested=55128 caps=0x1800 function=heap_caps_malloc free=60236 largest=53248"
+    },
+    {
+      "at": 380507.921,
+      "line": "E (167868) cpu_profile: PERF allocation failed: requested=55128 caps=0x1800 function=heap_caps_malloc free=60376 largest=53248"
+    }
+  ],
+  "reset_banners": [
+    {
+      "at": 380643.203,
+      "line": "rst:0xc (RTC_SW_CPU_RST),boot:0xc (SPI_FAST_FLASH_BOOT)"
+    }
+  ],
+  "panic_or_capture_errors": [],
+  "note": "Read observed_formats together with the failure: core-only CPU is not full HE-AAC CPU; full PCM can still fail allocation/heap budgets. A 60-second live test is not a soak or a frozen PCM equivalence test."
+}

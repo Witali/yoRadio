@@ -1,0 +1,352 @@
+{
+  "board": {
+    "version": "v0.9.693-1112-g66fc377e-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "7b9414f9d153c1762d250755267c6ab5bf3603991ad0bbf4379262d94466dae3"
+  },
+  "metric": "FreeRTOS task runtime; mean of samples 5..35 s after first PCM checkpoint",
+  "cases": [
+    {
+      "name": "groovesalad-64-aac",
+      "playback_result": "FAIL",
+      "busy_mean": 50.56,
+      "decode_mean": 34.02,
+      "minimum_free": 6232,
+      "minimum_largest": 1728,
+      "samples": [
+        {
+          "busy": 47.5,
+          "decode": 32.8,
+          "heap": 15280,
+          "largest": 4608
+        },
+        {
+          "busy": 51.4,
+          "decode": 34.4,
+          "heap": 7972,
+          "largest": 2944
+        },
+        {
+          "busy": 50.7,
+          "decode": 33.8,
+          "heap": 8120,
+          "largest": 3072
+        },
+        {
+          "busy": 51.7,
+          "decode": 34.6,
+          "heap": 9812,
+          "largest": 3456
+        },
+        {
+          "busy": 51.5,
+          "decode": 34.5,
+          "heap": 6232,
+          "largest": 1728
+        }
+      ],
+      "transport": "http",
+      "reference": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC "
+      },
+      "observed_formats": [
+        "HE-AAC 44.1 kHz stereo"
+      ],
+      "acceptance": {
+        "name": "http:groovesalad-64-aac",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder failure",
+        "seconds": 64.61
+      }
+    }
+  ],
+  "minimum_stack_free": {
+    "httpd": 4456,
+    "display": 1680,
+    "IDLE": 1252,
+    "radio_stream": 2584,
+    "tcpip": 2644,
+    "audio_decode": 14392,
+    "audio_output": 1220,
+    "wifi_rssi": 1592,
+    "websocket_statu": 1900,
+    "boot_button": 1500,
+    "time_sync": 1516,
+    "esp_timer": 3720,
+    "wifi": 1620,
+    "sys_evt": 2076,
+    "web_static_0": 580,
+    "web_static_1": 400
+  },
+  "no_pcm": [],
+  "input_sha256": {
+    "report.json": "4a10ec9434d8af7669ee3542e86f3a8e67fad36717aef0056fe0d1206f641e8c",
+    "status.json": "c5acc3d12f75c45dad5021381d0b1e15c4042a6872e2b61ac4830709092a0c99",
+    "performance.json": "fe3beb9bd446cbafda4f6a16bc2ca92b1687a08854905eb3364cf9da95257dda"
+  },
+  "source_sha256": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+  "allocation_failures": [
+    {
+      "at": 380710.765,
+      "line": "E (67564) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5172 largest=1408"
+    },
+    {
+      "at": 380710.984,
+      "line": "E (67777) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5208 largest=1408"
+    },
+    {
+      "at": 380710.984,
+      "line": "E (67779) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5208 largest=1408"
+    },
+    {
+      "at": 380710.984,
+      "line": "E (67780) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5208 largest=1408"
+    },
+    {
+      "at": 380710.984,
+      "line": "E (67781) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5208 largest=1408"
+    },
+    {
+      "at": 380713.031,
+      "line": "E (69827) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4600 largest=1408"
+    },
+    {
+      "at": 380713.968,
+      "line": "E (70758) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5148 largest=1408"
+    },
+    {
+      "at": 380714.234,
+      "line": "E (71030) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5188 largest=1408"
+    },
+    {
+      "at": 380714.234,
+      "line": "E (71031) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5188 largest=1408"
+    },
+    {
+      "at": 380718.5,
+      "line": "E (75296) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4888 largest=1408"
+    },
+    {
+      "at": 380719.578,
+      "line": "E (76373) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5100 largest=1408"
+    },
+    {
+      "at": 380719.718,
+      "line": "E (76513) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5136 largest=1408"
+    },
+    {
+      "at": 380720.546,
+      "line": "E (77332) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4952 largest=1408"
+    },
+    {
+      "at": 380721.843,
+      "line": "E (78641) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4688 largest=1408"
+    },
+    {
+      "at": 380721.875,
+      "line": "E (78664) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4884 largest=1408"
+    },
+    {
+      "at": 380722.968,
+      "line": "E (79757) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5080 largest=1408"
+    },
+    {
+      "at": 380723.046,
+      "line": "E (79844) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5080 largest=1408"
+    },
+    {
+      "at": 380723.703,
+      "line": "E (80489) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4868 largest=1664"
+    },
+    {
+      "at": 380723.875,
+      "line": "E (80669) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5108 largest=1664"
+    },
+    {
+      "at": 380727.593,
+      "line": "E (84378) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5152 largest=1664"
+    },
+    {
+      "at": 380727.687,
+      "line": "E (84477) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5152 largest=1664"
+    },
+    {
+      "at": 380727.687,
+      "line": "E (84478) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5152 largest=1664"
+    },
+    {
+      "at": 380729.906,
+      "line": "E (86704) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5220 largest=1664"
+    },
+    {
+      "at": 380730.0,
+      "line": "E (86797) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5252 largest=1664"
+    },
+    {
+      "at": 380732.015,
+      "line": "E (88800) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4880 largest=1408"
+    },
+    {
+      "at": 380734.75,
+      "line": "E (91533) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5168 largest=1408"
+    },
+    {
+      "at": 380734.812,
+      "line": "E (91600) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5168 largest=1408"
+    },
+    {
+      "at": 380734.812,
+      "line": "E (91601) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5168 largest=1408"
+    },
+    {
+      "at": 380734.812,
+      "line": "E (91602) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5168 largest=1408"
+    },
+    {
+      "at": 380738.078,
+      "line": "E (94874) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=3400 largest=1216"
+    },
+    {
+      "at": 380738.64,
+      "line": "E (95438) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=3432 largest=1216"
+    },
+    {
+      "at": 380740.437,
+      "line": "E (97226) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5156 largest=1664"
+    },
+    {
+      "at": 380740.468,
+      "line": "E (97257) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5156 largest=1664"
+    },
+    {
+      "at": 380740.468,
+      "line": "E (97258) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5156 largest=1664"
+    },
+    {
+      "at": 380742.89,
+      "line": "E (99682) cpu_profile: PERF allocation failed: requested=1512 caps=0x1800 function=heap_caps_malloc free=4368 largest=1408"
+    },
+    {
+      "at": 380742.937,
+      "line": "E (99733) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4672 largest=1408"
+    },
+    {
+      "at": 380743.5,
+      "line": "E (100297) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4660 largest=1408"
+    },
+    {
+      "at": 380745.031,
+      "line": "E (101819) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6660 largest=1536"
+    },
+    {
+      "at": 380746.781,
+      "line": "E (103573) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=3408 largest=1216"
+    },
+    {
+      "at": 380746.796,
+      "line": "E (103583) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=3408 largest=1216"
+    },
+    {
+      "at": 380748.859,
+      "line": "E (105651) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4896 largest=1408"
+    },
+    {
+      "at": 380749.875,
+      "line": "E (106669) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4780 largest=1408"
+    },
+    {
+      "at": 380750.593,
+      "line": "E (107385) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4828 largest=1408"
+    },
+    {
+      "at": 380751.421,
+      "line": "E (108220) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5160 largest=1408"
+    },
+    {
+      "at": 380751.546,
+      "line": "E (108334) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5192 largest=1408"
+    },
+    {
+      "at": 380751.921,
+      "line": "E (108717) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5192 largest=1664"
+    },
+    {
+      "at": 380755.015,
+      "line": "E (111813) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5092 largest=1664"
+    },
+    {
+      "at": 380755.046,
+      "line": "E (111835) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5160 largest=1664"
+    },
+    {
+      "at": 380755.296,
+      "line": "E (112088) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5192 largest=1664"
+    },
+    {
+      "at": 380759.64,
+      "line": "E (116429) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5148 largest=1408"
+    },
+    {
+      "at": 380759.843,
+      "line": "E (116638) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5180 largest=1408"
+    },
+    {
+      "at": 380759.843,
+      "line": "E (116640) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5180 largest=1408"
+    },
+    {
+      "at": 380765.203,
+      "line": "E (122001) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5176 largest=1408"
+    },
+    {
+      "at": 380765.296,
+      "line": "E (122096) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5208 largest=1408"
+    },
+    {
+      "at": 380765.734,
+      "line": "E (122527) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5208 largest=1408"
+    },
+    {
+      "at": 380765.734,
+      "line": "E (122528) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5208 largest=1408"
+    },
+    {
+      "at": 380768.687,
+      "line": "E (125474) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5116 largest=1408"
+    },
+    {
+      "at": 380768.812,
+      "line": "E (125603) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5148 largest=1408"
+    },
+    {
+      "at": 380769.265,
+      "line": "E (126058) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=5180 largest=1408"
+    },
+    {
+      "at": 380770.812,
+      "line": "E (127610) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4816 largest=1408"
+    },
+    {
+      "at": 380771.25,
+      "line": "E (128045) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4932 largest=1408"
+    },
+    {
+      "at": 380771.343,
+      "line": "E (128135) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4424 largest=1408"
+    }
+  ],
+  "reset_banners": [
+    {
+      "at": 380785.281,
+      "line": "rst:0xc (RTC_SW_CPU_RST),boot:0xc (SPI_FAST_FLASH_BOOT)"
+    }
+  ],
+  "panic_or_capture_errors": [],
+  "note": "Read observed_formats together with the failure: core-only CPU is not full HE-AAC CPU; full PCM can still fail allocation/heap budgets. A 60-second live test is not a soak or a frozen PCM equivalence test."
+}

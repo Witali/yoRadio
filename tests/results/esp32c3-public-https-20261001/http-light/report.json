@@ -1,0 +1,138 @@
+{
+  "board": {
+    "version": "v0.9.693-1112-g66fc377e-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "7b9414f9d153c1762d250755267c6ab5bf3603991ad0bbf4379262d94466dae3"
+  },
+  "cases": [
+    {
+      "name": "idle:baseline",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 146028,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 146028,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.422
+    },
+    {
+      "name": "http:groovesalad-64-aac",
+      "result": "FAIL",
+      "reason": "Runtime allocation/decoder failure",
+      "seconds": 64.61
+    },
+    {
+      "name": "idle:recovery",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 145976,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 145976,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 145976,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ],
+        "no_unexpected_resets": true
+      },
+      "seconds": 12.625
+    },
+    {
+      "name": "restore",
+      "result": "PASS",
+      "evidence": {
+        "saved_station_playing": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 9.765
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "created_utc": "2026-10-01T19:16:33.437864+00:00",
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/allocations.py": "be4a62b636aacc596d57cc39319ce2e07d4b6f0d2e072868204c4c1a85525d5f",
+    "tools/esp32c3_tests/common.py": "114bb5dfeaae880642d9c0f8ec61ea0aa02a4cbc3e4e281e16bca13e31d25caa",
+    "tools/esp32c3_tests/compare_latency.py": "4c87e574da2d5fd58e8035412eb605f8e1ac4b86e72152c15a58b0c03e2640a0",
+    "tools/esp32c3_tests/diagnostic.py": "d4c7ca7ea6b6fde33a7fc3915212e78a13014f4633705004667ba6f8f28f1f9e",
+    "tools/esp32c3_tests/flash_constants.py": "3293a89f412dd1366ad271533b2d647623b901a5cc42482c0e00db9e378c0119",
+    "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+    "tools/esp32c3_tests/memory.py": "f2132c658c7ba4db7ca207752df1ddb46650b9ae44ef072f9196e23a0b109d41",
+    "tools/esp32c3_tests/ota.py": "cc73747925a07184a7f63ddacad60c98b0582e7f02fbc2858511961354a1ab7e",
+    "tools/esp32c3_tests/ota_diagnostic.py": "f2a0e7af81611a13ab5fb20a7cc468b200bd2f7d6b3ee1983def841ddf2716ef",
+    "tools/esp32c3_tests/ota_transition.py": "9764cda4a1570d59d8243218492eca4c46e13dbc1fa1952fe7b6cc748b8d6707",
+    "tools/esp32c3_tests/pool_settle.py": "534d7ff3c116d99ce30210e7b8b48b307a0f9fff8cbb427acfe667f09deded64",
+    "tools/esp32c3_tests/public_streams.py": "8dc827add5dfd2e6244048683ba080d66ba1744a9ca9478908855c4b43bcdd6e",
+    "tools/esp32c3_tests/reference_eof.py": "9dbaa1d1ce971fe26fdd02a98156344334641ed9c889863cd76ac205941693ab",
+    "tools/esp32c3_tests/run.py": "166d82ccbebaeb26056ffec7559522817b4c7ec8a8a654a22fcf42740da0db0e",
+    "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+    "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+    "tools/esp32c3_tests/summarize_public.py": "936261e9e79df0e62cff0ad6fd3c858a739e57f99c0c79e6ae8c6a6506c93816",
+    "tools/esp32c3_tests/transport.py": "5f90cfbbc35df0a408ce4aff97fde14a6398742ec98eb74b54f3a7f49623f60b",
+    "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+    "tools/audio_test_server/generate.py": "b2a445923e17b92ed4c420639a8d082f7ec82b919ee5650d6de20df9421943e9",
+    "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+    "tools/audio_test_server/make_test_certificate.py": "123f3056b2de232fa9aac8042690119b16c02339386b06d1463e03a305ff1199",
+    "tools/audio_test_server/server.py": "b29cf832e9ab196da000d2cca78189e25b3cd1f830b50c03cd368bf657d7a9f4"
+  },
+  "image": {
+    "app_elf_sha256": "7b9414f9d153c1762d250755267c6ab5bf3603991ad0bbf4379262d94466dae3",
+    "sha256": "2da9c04a2a34df7892e36be44d676e067a5896774fac69cf9c4f6f16c8f030d9",
+    "bytes": 1541936
+  },
+  "public_urls": {
+    "groovesalad-64-aac": "https://ice5.somafm.com/groovesalad-64-aac"
+  },
+  "playback_urls": {
+    "groovesalad-64-aac": "http://ice5.somafm.com/groovesalad-64-aac"
+  },
+  "transport": "http",
+  "sources": [
+    "https://somafm.com/groovesalad/directstreamlinks.html",
+    "https://somafm.com/about/faq.html"
+  ],
+  "seconds": 60,
+  "interval": 1.0,
+  "manifest_sha256": "a095ed8e01ab76dae105024e3a8ba0f72b3c2d9044155b0864568c76f0b6e36a",
+  "sdkconfig_sha256": "b83dfe0880a7a202b04759c4f3481aeca203cec3c2565815abff750b8f8856ac",
+  "ffprobe_version": "ffprobe version 8.1.1-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+  "reference_probes": {
+    "groovesalad-64-aac": {
+      "spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC "
+      },
+      "tls_verify": true
+    }
+  },
+  "windows": {
+    "groovesalad-64-aac": {
+      "start": 380709.531,
+      "end": 380771.031
+    }
+  }
+}
