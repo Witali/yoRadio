@@ -5,6 +5,11 @@ including local functions, unreferenced Huffman/prediction helpers and the five
 optimized filter cores located separately in the archive. All exports completed.
 `ps_allocate_decoder` retains a Ghidra type-propagation warning.
 
+A [separate symbolic export](../esp32c3-aac-symbolic-20261001/README.md) now adds
+compiler-checked SBR/PS structures and records remaining numeric-access review
+candidates across all 186 functions. The raw files and their hashes below remain
+unchanged.
+
 The selection includes all AAC-specific executable code present in the pinned
 Espressif archive, rather than only the earlier direct-call closure. The earlier
 audit also included generic SDK registration/allocation helpers; these are

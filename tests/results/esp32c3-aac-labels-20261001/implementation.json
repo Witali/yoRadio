@@ -1,0 +1,168 @@
+{
+  "base_commit": "e88b4f792c7f36b40a8a7f6dcb050079b3b40750",
+  "files": {
+    "idf/esp32c3-oled-native/main/aac_sbr_abi.h": {
+      "snapshot": "implementation-snapshots/aac_sbr_abi.h",
+      "sha256": "2613f67434d6920073d8473c29d6d32c095853e63a33110f8eecd21774756c80"
+    },
+    "idf/esp32c3-oled-native/main/aac_ps_pc16.c": {
+      "snapshot": "implementation-snapshots/aac_ps_pc16.c",
+      "sha256": "a7b18dbd5da8c7b8940dbcf8ad31b11bfd74d20a15128dd4313a8b31feef71a5"
+    },
+    "idf/esp32c3-oled-native/main/qemu_aac_packed_history.c": {
+      "snapshot": "implementation-snapshots/qemu_aac_packed_history.c",
+      "sha256": "d4e0da461492601cc038afab2c9d9559dc7b0ade804ebecdf7e379818024ffd6"
+    },
+    "idf/esp32c3-oled-native/main/qemu_aac_ps_history_port.c": {
+      "snapshot": "implementation-snapshots/qemu_aac_ps_history_port.c",
+      "sha256": "eb9d06c0ada77bfc38a7cd26bf8caa1d4a3491b80311df303ff52498f433523f"
+    },
+    "idf/esp32c3-oled-native/main/qemu_aac_bfp16.c": {
+      "snapshot": "implementation-snapshots/qemu_aac_bfp16.c",
+      "sha256": "48ed3e7d6846f16acee3aba322be147f402f51006b8abccc38cd044ffdae1d8c"
+    },
+    "idf/esp32c3-oled-native/main/aac_scratch_reserve.c": {
+      "snapshot": "implementation-snapshots/aac_scratch_reserve.c",
+      "sha256": "422a60601f5746247678cadb38cdcb173f6e77bf716b1239db1db48a43397e8a"
+    },
+    "tools/codec_benchmark/run_aac_packed_history.py": {
+      "snapshot": "implementation-snapshots/run_aac_packed_history.py",
+      "sha256": "f4bbd0f85f496ec4cc25676fb63250fded908ea27b992410a85e3661c4338f6b"
+    },
+    "tools/codec_benchmark/run_aac_pc16_history.py": {
+      "snapshot": "implementation-snapshots/run_aac_pc16_history.py",
+      "sha256": "61c625aa0f039b34a011094894180b274ac313f845c907fa7f43b88abbf48585"
+    },
+    "tools/codec_benchmark/run_aac_ps_history_port.py": {
+      "snapshot": "implementation-snapshots/run_aac_ps_history_port.py",
+      "sha256": "aed5b503fd554c36da4f885ae72c2b807c350f3a7fc9e6ece69418df9ea29a2f"
+    },
+    "tools/codec_benchmark/run_aac_pc16_write.py": {
+      "snapshot": "implementation-snapshots/run_aac_pc16_write.py",
+      "sha256": "3d1b087f0d347eeb071f4366404faa18f881a4159b8582fc621eedeed43d43a2"
+    },
+    "tools/codec_benchmark/run_aac_pc16_cache.py": {
+      "snapshot": "implementation-snapshots/run_aac_pc16_cache.py",
+      "sha256": "d360b861adbf25745d509e4e6dbae835fe40fb344c60f68d0e9c005aa6c8b2be"
+    },
+    "tools/codec_benchmark/run_aac_pc16_owner.py": {
+      "snapshot": "implementation-snapshots/run_aac_pc16_owner.py",
+      "sha256": "3516b2bfe2c108f7e78cdc89c5f8d0d136ace5cf710b1157718512d9174129d8"
+    },
+    "tools/codec_benchmark/run_aac_bfp16.py": {
+      "snapshot": "implementation-snapshots/run_aac_bfp16.py",
+      "sha256": "83ffcd3ea803b56717976ca93eb9327a731b4b92c3891ba0637f467c9dc3e124"
+    }
+  },
+  "first_three_variants_header": {
+    "snapshot": "implementation-snapshots/pre-hybrid-aac_sbr_abi.h",
+    "sha256": "995fba00bc1c85a816f2ac555928067ed58dc894a5ceadf22ffe9d9701091a2f"
+  },
+  "paired_runs": 345,
+  "candidate_scalar_pcm_samples": 228956160,
+  "comparisons": [
+    {
+      "variant": "packed-history",
+      "case": "synthetic",
+      "runs": 81,
+      "samples": 9345024,
+      "precision_pass": false,
+      "max_error_lsb": 7,
+      "previous_pcm_statistics_identical": true
+    },
+    {
+      "variant": "packed-history",
+      "case": "abba64",
+      "runs": 24,
+      "samples": 63504384,
+      "precision_pass": true,
+      "max_error_lsb": 3,
+      "previous_pcm_statistics_identical": true
+    },
+    {
+      "variant": "pc16-history",
+      "case": "synthetic",
+      "runs": 81,
+      "samples": 9345024,
+      "precision_pass": true,
+      "max_error_lsb": 3,
+      "previous_pcm_statistics_identical": true
+    },
+    {
+      "variant": "pc16-history",
+      "case": "abba64",
+      "runs": 24,
+      "samples": 63504384,
+      "precision_pass": true,
+      "max_error_lsb": 3,
+      "previous_pcm_statistics_identical": true
+    },
+    {
+      "variant": "ps-port",
+      "case": "synthetic",
+      "runs": 36,
+      "samples": 3938304,
+      "precision_pass": true,
+      "max_error_lsb": 3,
+      "previous_pcm_statistics_identical": true
+    },
+    {
+      "variant": "ps-port",
+      "case": "abba64",
+      "runs": 9,
+      "samples": 23814144,
+      "precision_pass": true,
+      "max_error_lsb": 3,
+      "previous_pcm_statistics_identical": true
+    },
+    {
+      "variant": "pc16-write",
+      "case": "synthetic",
+      "runs": 36,
+      "samples": 3938304,
+      "precision_pass": true,
+      "max_error_lsb": 2,
+      "previous_pcm_statistics_identical": true
+    },
+    {
+      "variant": "pc16-write",
+      "case": "abba64",
+      "runs": 9,
+      "samples": 23814144,
+      "precision_pass": true,
+      "max_error_lsb": 3,
+      "previous_pcm_statistics_identical": true
+    },
+    {
+      "variant": "pc16-cache",
+      "case": "synthetic",
+      "runs": 36,
+      "samples": 3938304,
+      "precision_pass": true,
+      "max_error_lsb": 2,
+      "previous_pcm_statistics_identical": true
+    },
+    {
+      "variant": "pc16-cache",
+      "case": "abba64",
+      "runs": 9,
+      "samples": 23814144,
+      "precision_pass": true,
+      "max_error_lsb": 3,
+      "previous_pcm_statistics_identical": true
+    }
+  ],
+  "owner_pcm": {
+    "frames": 328770,
+    "channels": 2,
+    "rate": 48000,
+    "sample_width": 2,
+    "max_pcm_error_lsb": 0,
+    "different_samples": 0,
+    "over_two": 0,
+    "over_five": 0,
+    "pcm_sha256": "66484d0f5d3b813335db9f5ebc9ebf426de871bf6ff131b2afbf824d902aadfe",
+    "reference_wav_sha256": "446987644bded901988115eccf9028cdd9f190fe9f2c7d63f869737cafa82c28",
+    "note": "Post-conversion output; paired raw decoder PCM is tested separately."
+  }
+}
