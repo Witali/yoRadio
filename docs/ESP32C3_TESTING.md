@@ -63,7 +63,10 @@ awake HTTP-profiler build. `CONFIG_YORADIO_HEAP_LAYOUT_DIAGNOSTICS` logs selecte
 blocks at the existing AAC memory checkpoints: all free areas >=256 bytes and
 their immediate neighbors, plus allocations >=1024 bytes. Each capture is
 bounded at 128 rows; `dropped` must be zero before interpreting it as a complete
-selection. It does not enumerate every small block. Only addresses, sizes and
+selection, and received rows must match the declared count. The
+[physical heap/TCP investigation](ESP32C3_HEAP_LAYOUT_20261001.md) retains two
+incomplete serial captures and excludes them from topology conclusions.
+It does not enumerate every small block. Only addresses, sizes and
 allocation state are retained; payload memory is never read.
 
 The capture table uses at most 1600 bytes of the existing AAC task stack on
