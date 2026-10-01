@@ -35,6 +35,15 @@ AAC passes on this board, but the full radio has a separate heap limitation:
 Do not reduce the shared 16 KiB decoder task stack blindly: the retained Opus
 benchmark used about 12.2 KiB. A fix must preserve other codecs and user settings.
 
+The [2026-10-01 conservative IRAM test](ESP32C3_CONSERVATIVE_IRAM_20261001.md)
+recovers 3584 bytes with Auto Suspend disabled. Clean-start AAC and 15 OTA gates
+pass, but HE/v2 fail in the first of three mixed-codec cycles: SBR requests 55128
+bytes with 75632–79340 bytes free and a largest block of 47104. Later cycles pass;
+settled idle heap recovers. Next measure the live allocations dividing those free
+areas, accounting for instrumentation overhead, before retrying reservation or
+splitting owners. The static WebUI workers have only 448/564 bytes of observed
+unused stack during OTA negative tests; keep their current stack sizes.
+
 ## AAC memory reuse during decoding — planned, 2026-09-30
 
 The [AAC decompilation audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md)

@@ -279,3 +279,8 @@ The later [Wi-Fi buffer balance experiment](ESP32C3_WIFI_BUFFER_BALANCE_20261001
 uses the same IRAM layout with dynamic RX/TX limits of 16. It investigates the
 unfinished FLAC transfers above and records a separate image, test outcomes and
 final board state; it does not rewrite this six-buffer audit's failures.
+
+The [conservative follow-up](ESP32C3_CONSERVATIVE_IRAM_20261001.md) keeps
+Auto Suspend off after the later OTA panic and measures the smaller 3584-byte
+gain on hardware. It retains first-cycle HE/v2 allocation failures rather than
+promoting the profile from successful clean-start playback alone.

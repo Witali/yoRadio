@@ -35,6 +35,13 @@ the original app; startup and saved playback were verified after a manual
 reset. The failures block promotion of the Auto Suspend profile despite
 earlier successful playback and OTA checks.
 
+The [conservative IRAM follow-up](ESP32C3_CONSERVATIVE_IRAM_20261001.md)
+disables Auto Suspend and passes all 15 repeat OTA gates from the new image.
+Its 3584-byte capacity gain still leaves two first-cycle HE/v2 switching failures.
+`tests/test-esp32c3-conservative-iram.py` validates the retained successes,
+failures, exact configuration and source/image fingerprints; it does not turn
+this experimental image into a production-qualified build.
+
 For new hardware investigations, `diagnostic.py` wraps the existing `run`,
 `memory`, `ota_transition` or `pool_settle` runner and keeps filtered panic
 MEPC/RA/MCAUSE evidence alongside CPU/heap logs. For example:
