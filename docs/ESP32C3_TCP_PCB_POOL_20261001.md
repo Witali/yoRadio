@@ -1,5 +1,11 @@
 # ESP32-C3 RTC TCP PCB pool — 2026-10-01
 
+**Follow-up:** the [TCP half-close fix](ESP32C3_LWIP_HALF_CLOSE_20261001.md)
+reproduces the ownership defect with both allocators. Its separate fixed image
+passes 15 OTA gates with clean serial capture and 21 mixed-codec switches.
+The failed images below remain rejected historical evidence; broader pool
+qualification is still incomplete.
+
 ## Purpose and scope
 
 The optional `CONFIG_YORADIO_TCP_PCB_POOL` keeps TCP control blocks out of the

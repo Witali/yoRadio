@@ -120,6 +120,12 @@ returns failure on panic/capture errors even if HTTP/hash checks pass. Both
 dumps them on an ownership failure; its 1028-byte DRAM cost and timing effects
 make it a diagnostic build, not a performance result.
 
+The [half-close fix](ESP32C3_LWIP_HALF_CLOSE_20261001.md) now passes the same 15
+OTA gates with serial-health PASS and exactly the five expected software resets,
+plus 21/21 mixed-codec switches. Run `tests/test-esp32c3-half-close-hardware.py`
+to validate its exact image/configuration, retained checks and CPU survey.
+These results supersede the ownership failure for the fixed image only.
+
 The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
 standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
 AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained

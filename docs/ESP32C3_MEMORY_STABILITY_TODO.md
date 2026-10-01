@@ -43,14 +43,16 @@ settled idle heap recovers. The subsequent [heap/TCP trace](ESP32C3_HEAP_LAYOUT_
 identifies a 168-byte TIME_WAIT PCB splitting the large region. The
 [optional RTC PCB pool](ESP32C3_TCP_PCB_POOL_20261001.md) passes 21/21 switches
 with full SBR/PS but is rejected after two ownership assertions during OTA.
-Resolve that invalid ownership state before promotion; HTTP success after an
-automatic reboot does not qualify OTA. Bounded pool history and a serial-health
+HTTP success after an automatic reboot does not qualify OTA. Bounded pool history and a serial-health
 gate are available. The static WebUI workers have only 448/564 bytes of observed
 unused stack during OTA negative tests; keep their current stack sizes.
 
 The [half-close correction](ESP32C3_LWIP_HALF_CLOSE_20261001.md) reproduces the
 ownership error in real lwIP with both allocators and passes six fixed host
-scenarios for each. Physical OTA/mixed-codec qualification remains required.
+scenarios for each. The fixed physical image passes all 15 repeat OTA checks
+with no serial panics or extra resets, and 21/21 mixed-codec switches with full
+SBR/PS. HTTPS/load/soak, implicit AAC transitions and physical RTC sleep gates
+remain open; the pool stays optional pending broader qualification.
 
 ## AAC memory reuse during decoding — planned, 2026-09-30
 
