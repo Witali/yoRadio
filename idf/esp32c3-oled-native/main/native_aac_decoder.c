@@ -137,6 +137,14 @@ esp_audio_err_t native_aac_decoder_get_info(native_aac_decoder_t *decoder,
     return esp_audio_simple_dec_get_info(decoder->codec, info);
 }
 
+#ifdef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
+// Test only: fixture boundaries contain no partial ADTS frame.
+esp_audio_err_t native_aac_decoder_reset_for_test(native_aac_decoder_t *decoder) {
+    if (!decoder || !decoder->codec || decoder->used) return ESP_AUDIO_ERR_INVALID_PARAMETER;
+    return esp_audio_simple_dec_reset(decoder->codec);
+}
+#endif
+
 const char *native_aac_decoder_label(native_aac_decoder_t *decoder,
     const esp_audio_simple_dec_info_t *info, bool *format_is_pcm) {
     static const uint32_t rates[] = {

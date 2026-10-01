@@ -62,8 +62,9 @@ Do not sum overlapping candidates. Keep failed trials and original controls.
    size 55296 → 53248 B (2048 B saved). Test state totals 144 B. All 81 paired
    comparisons are bit-exact; extra guest instructions are 0.010–0.017% for SBR.
 3. Close/reopen, 21 format segments and two allocation failures pass paired
-   checks. Direct reset remains open: the vendor function retains an offset
-   beyond the separately allocated AAC core. Safely reproduce and repair it.
+   checks. [Direct reset is reproduced and repaired](ESP32C3_AAC_RESET_20261001.md):
+   six contained vendor writes beyond the core, 24 reset calls, 887808 subsequent
+   PCM samples identical with the source repair and relocated PS owner.
 4. Packed PS writes are not combined with this layout: their holes do not shrink
    the full-stereo channel allocation and do not extend the free region needed
    for PS control. They add quantization and measured work without an additional
@@ -76,3 +77,11 @@ Do not sum overlapping candidates. Keep failed trials and original controls.
 6. No production option is enabled yet. Remaining lifetime and hardware gates
    are listed in the relocation report; the full-radio memory shortage is not
    claimed fixed by a QEMU block-size measurement.
+
+## Updated product objective
+
+The user's objective is reliable radio playback across the existing codec
+families, AAC first, without crashes or allocation failures. Prioritize full-radio
+allocation ownership/reservation, peak RAM and physical playback acceptance over
+additional representation studies. Keep the existing AAC quality/rate constraints
+and test MP3, FLAC, Vorbis and Opus when changing shared memory or task resources.

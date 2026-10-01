@@ -502,11 +502,6 @@ static bool external_fixture(void) {
 }
 
 void qemu_aac_bfp16_test(void) {
-#ifdef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
-    void qemu_aac_reset_test(void);
-    qemu_aac_reset_test();
-    return;
-#endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
     layout_lifecycle();
 #endif

@@ -397,8 +397,11 @@ Do not create a fake internal-state test or mark this planned optimization done.
 evidence and rejects missing measurements, false savings and failed cleanup.
 For executable RV32 tests, use the build and runner in the
 [SBR layout report](ESP32C3_AAC_SBR_LAYOUT_20261001.md). The variant tests eleven
-inputs, delayed PS, 21 lifecycle segments and two allocation failures. Vendor
-reset, wider streams and full-radio hardware acceptance are separate open gates.
+inputs, delayed PS, 21 lifecycle segments and two allocation failures. The
+[reset reproduction and repair](ESP32C3_AAC_RESET_20261001.md), checked by
+`python tests/test-aac-reset.py`, adds six formats and 24 native/repaired reset
+calls with byte-identical subsequent PCM. Wider streams and full-radio hardware
+acceptance remain separate gates.
 
 All automated suites return nonzero for FAIL or BLOCKED. Keep `report.json`,
 `status.json`, `performance.json`, fixture hashes and exact app/config identity

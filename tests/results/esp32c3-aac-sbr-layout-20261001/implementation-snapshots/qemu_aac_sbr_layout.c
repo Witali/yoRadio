@@ -48,10 +48,6 @@ static void check(owner_t *o) {
 }
 
 void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
-#ifdef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
-    bool qemu_aac_reset_calloc(const char *,size_t,size_t,void **);
-    void *p; if(qemu_aac_reset_calloc(module,n,size,&p)) return p;
-#endif
     unsigned failed_leg=selected==1;
     if (n==1 && fail_size[failed_leg] && size==fail_size[failed_leg]) { fail_size[failed_leg]=0; return NULL; }
     if (n!=1 || size!=ORIGINAL_SIZE) return __real_media_lib_module_calloc(module,n,size);
@@ -70,10 +66,6 @@ void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
     return o->owner;
 }
 void __wrap_media_lib_free(void *p) {
-#ifdef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
-    bool qemu_aac_reset_free(void *);
-    if(qemu_aac_reset_free(p)) return;
-#endif
     owner_t *o=find(p);
     if (!o) { __real_media_lib_free(p); return; }
     check(o); void *raw=o->allocation; memset(o,0,sizeof(*o)); ++frees;
@@ -132,29 +124,3 @@ void aac_sbr_layout_assert_idle(void) {
     for (unsigned n=0;n<4;++n) assert(!owners[n].owner);
     assert(allocations==frees);
 }
-
-#ifdef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
-void *aac_sbr_layout_ps(void *owner) {
-    owner_t *o=find(owner);assert(o && o->variant==1);pointer(o);
-    void *ps;memcpy(&ps,o->owner+PS_POINTER,4);return ps;
-}
-void __real_sbr_open(int,void *,void *,int);
-int init_sbr_dec(int,int,void *,void *);
-extern const uint32_t defaultHeader[16];
-void __wrap_sbr_open(int rate,void *control,void *owner,int downsample) {
-    owner_t *o=find(owner);
-    if(!o || o->variant!=1 || !o->ps) { __real_sbr_open(rate,control,owner,downsample);return; }
-    // A reset clears both channel workspaces but keeps the original tail PS
-    // control. Preserve the relocated control with two disjoint zero ranges.
-    memset(owner,0,PS_RELOCATED);
-    memset(o->owner+PS_RELOCATED+PS_BYTES,0,0xc980-PS_RELOCATED-PS_BYTES);
-    for(unsigned ch=0;ch<2;++ch) {
-        uint32_t *channel=(uint32_t*)(o->owner+ch*0x64c0);
-        memcpy(channel+0x32,defaultHeader,64);
-        if(downsample || rate>24000)channel[0x35]=1;
-        channel[0]=init_sbr_dec(rate,((uint32_t*)owner)[0x35],control,channel+2);
-        channel[1]=1;channel[0x1c5]=1;
-    }
-    check(o);
-}
-#endif

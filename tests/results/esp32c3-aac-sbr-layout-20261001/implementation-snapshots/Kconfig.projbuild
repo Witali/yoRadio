@@ -142,14 +142,6 @@ config YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
         Pinned private-ABI experiment with paired PCM and guarded allocations.
         Never enable this test owner registry in production firmware.
 
-config YORADIO_QEMU_AAC_RESET_TEST
-    bool "Reproduce and repair AAC reset with guarded core allocations"
-    depends on YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
-    default n
-    help
-        QEMU-only. Pad the baseline core to contain a stale vendor offset,
-        compare repaired reset and subsequent PCM on the smaller SBR owner.
-
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n
