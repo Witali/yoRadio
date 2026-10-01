@@ -20,6 +20,12 @@ The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.
 
+The [IRAM placement audit](ESP32C3_IRAM_REDUCTION_20261001.md) compares matched
+ELF/MAP files and physical playback/OTA evidence. The standalone
+`tools/esp32c3_tests/iram_inventory.py` reports aliased SRAM capacity without
+double-counting IRAM as additional DRAM. Auto Suspend is an optional,
+hardware-specific experiment, not a global default.
+
 The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
 standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
 AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained

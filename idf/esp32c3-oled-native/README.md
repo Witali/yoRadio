@@ -33,11 +33,17 @@ that every networking callback remains cache-independent. See Espressif's
 and [interrupt allocation guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/system/intr_alloc.html).
 Use `build.ps1` with a separate sdkconfig to compare Wi-Fi IRAM settings.
 
-Full HE-AAC still needs a further memory-layout fix: its additional 55,128-byte
+The default full-radio profile still needs a memory-layout fix: its 55,128-byte
 SBR allocation failed in the full radio and the codec silently output only
 the AAC core. Full-rate HE/v2 passed the isolated hardware decoder benchmark.
 See the [hardware measurements](../../docs/ESP32C3_CACHE_HARDWARE_20260930.md)
 and [remaining memory work](../../docs/ESP32C3_MEMORY_STABILITY_TODO.md).
+
+The optional [IRAM placement profiles](../../docs/ESP32C3_IRAM_REDUCTION_20261001.md)
+compare a 3584-byte conservative capacity saving with a 23392-byte saving using
+Flash Auto Suspend on the tested XMC-D chip. These use supported SDK placement
+options and retain all Flash APIs. Read the measured qualification limits before
+using the profiles; they are not applied by the production build wrapper.
 
 ### Acceptance tests
 

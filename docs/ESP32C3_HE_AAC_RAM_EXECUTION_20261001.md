@@ -80,6 +80,12 @@ Do not sum overlapping candidates. Keep failed trials and original controls.
 
 ## Updated product objective
 
+The [IRAM placement audit](ESP32C3_IRAM_REDUCTION_20261001.md) adds a separate
+full-radio candidate: 23392 B more DRAM capacity using supported SDK placement
+options and Flash Auto Suspend on XMC-D. This changes neither AAC representation
+nor its owner allocation. Qualification and limitations are recorded there;
+it does not promote the codec compression or global production defaults.
+
 The user's objective is reliable radio playback across the existing codec
 families, AAC first, without crashes or allocation failures. Prioritize full-radio
 allocation ownership/reservation, peak RAM and physical playback acceptance over
