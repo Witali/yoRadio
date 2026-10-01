@@ -33,7 +33,8 @@ class PsWritePortTests(unittest.TestCase):
         self.assertEqual(sum(len(r['runs']) for r in self.results.values()), 81)
         manifest = json.loads((EVIDENCE / 'implementation.json').read_text())
         for path, digest in manifest['files'].items():
-            self.assertEqual(common.sha256(ROOT / path), digest, path)
+            snapshot = manifest.get('snapshots', {}).get(path)
+            self.assertEqual(common.sha256(EVIDENCE / snapshot if snapshot else ROOT / path), digest, path)
 
     def test_native_source_and_bypass_are_bit_exact(self):
         for result in self.results.values():

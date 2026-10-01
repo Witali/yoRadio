@@ -54,5 +54,25 @@ Do not sum overlapping candidates. Keep failed trials and original controls.
 
 ## Progress
 
-Implementation started. Each completed experiment will be recorded below with
-measured gains, quality, overhead and remaining limits.
+1. Full AAC archive inventory/decompilation is complete: 144 members, 186
+   functions, zero export failures. This includes unreferenced and optimized
+   filter-bank functions. Pseudocode is an audit aid, not original C source.
+2. [Lossless PS relocation](ESP32C3_AAC_SBR_LAYOUT_20261001.md) is implemented
+   in a guarded QEMU build: requested SBR size 55128 → 51596 B; measured block
+   size 55296 → 53248 B (2048 B saved). Test state totals 144 B. All 81 paired
+   comparisons are bit-exact; extra guest instructions are 0.010–0.017% for SBR.
+3. Close/reopen, 21 format segments and two allocation failures pass paired
+   checks. Direct reset remains open: the vendor function retains an offset
+   beyond the separately allocated AAC core. Safely reproduce and repair it.
+4. Packed PS writes are not combined with this layout: their holes do not shrink
+   the full-stereo channel allocation and do not extend the free region needed
+   for PS control. They add quantization and measured work without an additional
+   heap saving here. Keep the lossless implementation; retain packed writes as
+   a separate measured experiment for a future fully variable owner layout.
+5. Smoothing pointer tables are the next lossless candidate. The decompilation
+   shows five initialized entries in four 64-entry tables per channel, giving
+   1888 B of potential payload reduction. All absolute offsets and the channel
+   stride must change consistently before requesting a smaller allocation.
+6. No production option is enabled yet. Remaining lifetime and hardware gates
+   are listed in the relocation report; the full-radio memory shortage is not
+   claimed fixed by a QEMU block-size measurement.

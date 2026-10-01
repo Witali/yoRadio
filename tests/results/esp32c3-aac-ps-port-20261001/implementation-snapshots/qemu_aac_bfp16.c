@@ -31,9 +31,7 @@ FIXTURE(hev2, "hev2_44100_stereo");
 #ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
 #include "qemu_aac_packed_history.h"
 #define PCM_ERROR_LIMIT CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_ERROR_LIMIT
-#ifdef CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
-#define TEST_LABEL "SBRLAYOUT"
-#elif defined(CONFIG_YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST)
+#ifdef CONFIG_YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
 #define TEST_LABEL "PSPORT"
 #elif defined(CONFIG_YORADIO_QEMU_AAC_PC16_HISTORY_TEST)
 #define TEST_LABEL "PCX16"
@@ -42,7 +40,7 @@ FIXTURE(hev2, "hev2_44100_stereo");
 #endif
 #define VARIANT_LABEL "variant"
 #define CANDIDATE_LABEL "packed"
-#if defined(CONFIG_YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST) || defined(CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST)
+#ifdef CONFIG_YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
 static const unsigned groups[] = {7, 1, 0};
 #else
 static const unsigned groups[] = {1, 2, 3, 4, 5, 6, 7, 0};
@@ -62,9 +60,6 @@ static uint32_t complex_rows, real_rows, changed_values;
 static unsigned max_shift;
 static unsigned fixture_repeats = 2;
 static bool detailed_statistics;
-#ifdef CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
-void aac_sbr_layout_assert_idle(void);
-#endif
 
 // Exact absolute-error bins 0..4095, then 4096-wide bins up to 65535.
 // Two channels use 32,888 bytes, allocated only for external recordings.
@@ -397,79 +392,7 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
     for (unsigned leg = 0; leg < 2; ++leg) {
         native_aac_decoder_destroy(dec[leg]); free(pcm[leg]);
     }
-#ifdef CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
-    aac_sbr_layout_assert_idle();
-#endif
 }
-
-#ifdef CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
-void aac_sbr_layout_fail_next(size_t);
-void aac_sbr_layout_assert_idle(void);
-
-static void layout_lifecycle(void) {
-    const fixture_t sequence[] = {
-        {"v2",hev2_start,hev2_end,44100,2,true},
-        {"he44",he44_start,he44_end,44100,2,true},
-        {"lc48",lc48_start,lc48_end,48000,2,false},
-        {"he48",he48_start,he48_end,48000,2,true},
-        {"lc22",lc22_start,lc22_end,22050,1,false},
-        {"lc44",lc44_start,lc44_end,44100,2,false},
-        {"v2",hev2_start,hev2_end,44100,2,true},
-    };
-    uint8_t *pcm[2]={malloc(NATIVE_AAC_PCM_FRAME_BYTES),malloc(NATIVE_AAC_PCM_FRAME_BYTES)};
-    assert(pcm[0] && pcm[1]);
-    uint64_t samples=0;
-    for (unsigned trial=0;trial<3;++trial) {
-        packed_history_reset(0);
-        native_aac_decoder_t *dec[2]={native_aac_decoder_create(),native_aac_decoder_create()};
-        assert(dec[0] && dec[1]);
-        size_t failed=trial==1 ? 55128 : trial==2 ? 1180 : 0;
-        for (unsigned cycle=0;cycle<(failed?1:3);++cycle) {
-            for (unsigned f=0;f<(failed?1:sizeof(sequence)/sizeof(sequence[0]));++f) {
-                const fixture_t *input=sequence+f;
-                unsigned injected=0;
-                for (const uint8_t *p=input->start;p<input->end;) {
-                    size_t count=(size_t)(input->end-p); if(count>193)count=193;
-                    esp_audio_simple_dec_raw_t raw[2]={{.buffer=(uint8_t*)p,.len=count},{.buffer=(uint8_t*)p,.len=count}};
-                    while(raw[0].len) {
-                        esp_audio_simple_dec_out_t out[2]={{.buffer=pcm[0],.len=NATIVE_AAC_PCM_FRAME_BYTES},{.buffer=pcm[1],.len=NATIVE_AAC_PCM_FRAME_BYTES}};
-                        esp_audio_err_t status[2];
-                        for(unsigned leg=0;leg<2;++leg) {
-                            packed_history_select(leg);
-                            if(failed && !(injected&(1u<<leg))) { aac_sbr_layout_fail_next(failed); injected|=1u<<leg; }
-                            status[leg]=native_aac_decoder_process(dec[leg],&raw[leg],&out[leg]);
-                            // An injected request may occur only when a full ADTS frame arrives.
-                            // Pending injections are tracked separately for both decoder legs.
-                        }
-                        packed_history_select(0);
-                        assert(status[0]==status[1] && status[0]==ESP_AUDIO_ERR_OK);
-                        assert(raw[0].consumed==raw[1].consumed && out[0].decoded_size==out[1].decoded_size);
-                        assert(raw[0].consumed || out[0].decoded_size);
-                        assert(!memcmp(pcm[0],pcm[1],out[0].decoded_size));
-                        for(unsigned leg=0;leg<2;++leg) {
-                            if(out[leg].decoded_size) {
-                                esp_audio_simple_dec_info_t info;
-                                assert(native_aac_decoder_get_info(dec[leg],&info)==ESP_AUDIO_ERR_OK);
-                                assert(info.bits_per_sample==16);
-                                assert(info.sample_rate==(failed?22050:input->rate));
-                                assert(info.channel==(failed?1:input->channels));
-                            }
-                            raw[leg].buffer+=raw[leg].consumed; raw[leg].len-=raw[leg].consumed;
-                        }
-                        samples+=out[0].decoded_size/2;
-                    }
-                    p+=count;
-                }
-            }
-        }
-        for(unsigned leg=0;leg<2;++leg) native_aac_decoder_destroy(dec[leg]);
-        aac_sbr_layout_assert_idle();
-        ESP_LOGI(TAG,"SBRLAYOUT_LIFECYCLE_PASS trial=%u allocation_failure=%u PCM=exact cleanup=complete",trial,(unsigned)failed);
-    }
-    free(pcm[0]);free(pcm[1]);
-    ESP_LOGI(TAG,"SBRLAYOUT_LIFECYCLE_COMPLETE samples=%"PRIu64" segments=21 failure_paths=2",samples);
-}
-#endif
 
 static bool external_fixture(void) {
     const esp_partition_t *partition = esp_partition_find_first(
@@ -502,9 +425,6 @@ static bool external_fixture(void) {
 }
 
 void qemu_aac_bfp16_test(void) {
-#ifdef CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
-    layout_lifecycle();
-#endif
     check_counter();
 #ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
     ESP_LOGI(TAG, TEST_LABEL "_LIMIT development=%u production=2", PCM_ERROR_LIMIT);

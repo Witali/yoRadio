@@ -134,14 +134,6 @@ config YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
         The closed SBR owner allocation is unchanged; only delay payload shrinks.
         QEMU-only qualification, never a production memory-saving claim.
 
-config YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
-    bool "Test lossless AAC SBR allocation changes in QEMU"
-    depends on YORADIO_QEMU_AAC_PACKED_HISTORY_TEST && !YORADIO_QEMU_AAC_PC16_HISTORY_TEST && !YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST && !YORADIO_CODEC_MEMORY_TRACE
-    default n
-    help
-        Pinned private-ABI experiment with paired PCM and guarded allocations.
-        Never enable this test owner registry in production firmware.
-
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n
