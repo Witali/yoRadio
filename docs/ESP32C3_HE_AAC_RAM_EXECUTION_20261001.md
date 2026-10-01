@@ -12,6 +12,12 @@ Count actual requested allocations and allocator/adapter overhead, including
 peak live memory. Smaller payload in an unchanged allocation is not freed RAM.
 Do not sum overlapping candidates. Keep failed trials and original controls.
 
+Before reducing any allocation or array, record every function that allocates,
+initializes, reads, writes, resets or frees it, including indirect pointer users
+and overlapping storage. Verify index bounds and lifetime across frames and
+format changes against native instructions. Change the size only after this
+access map is complete and all affected callers can be updated consistently.
+
 ## Execution sequence
 
 1. **Baseline and harness.** Retain the 107508-byte decoder payload baseline
@@ -70,10 +76,15 @@ Do not sum overlapping candidates. Keep failed trials and original controls.
    for PS control. They add quantization and measured work without an additional
    heap saving here. Keep the lossless implementation; retain packed writes as
    a separate measured experiment for a future fully variable owner layout.
-5. Smoothing pointer tables are the next lossless candidate. The decompilation
-   shows five initialized entries in four 64-entry tables per channel, giving
-   1888 B of potential payload reduction. All absolute offsets and the channel
-   stride must change consistently before requesting a smaller allocation.
+5. [Compact smoothing pointer tables](ESP32C3_AAC_SMOOTHING_TABLES_20261001.md)
+   now run in a guarded QEMU experiment. Standard and function-access audit confirm
+   five time entries per table; all `[5][64]` data matrices remain. Seven native
+   functions have consistent new offsets/strides. Payload falls by 1888 B; an
+   unguarded allocator probe saves 2048 B (guarded block saving is zero due to bin
+   rounding). All 81 paired comparisons (24 candidate and 57 control runs),
+   explicit smoothing-mode tests, complete
+   initialization/pointer comparison and lifecycle checks pass. Production reset,
+   malformed-input and hardware gates remain; this is not enabled in the radio.
 6. No production option is enabled yet. Remaining lifetime and hardware gates
    are listed in the relocation report; the full-radio memory shortage is not
    claimed fixed by a QEMU block-size measurement.

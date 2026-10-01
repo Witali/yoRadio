@@ -18,7 +18,7 @@ def records(log, kind):
 def key(row): return row['case'],row['variant'],row['run']
 
 
-def parse_log(log, *, candidate_size=51596, require_block_saving=True):
+def parse_log(log):
     for marker in ('SBRLAYOUT_LAYOUT_PASS','SBRLAYOUT_COUNTER_PASS nop1024=1025',
                    'SBRLAYOUT_EXPERIMENT_COMPLETE','SBRLAYOUT_LIFECYCLE_COMPLETE',
                    'QEMU_AAC_FORMAT_PASS','QEMU_SMOKE_PASS'):
@@ -50,11 +50,11 @@ def parse_log(log, *, candidate_size=51596, require_block_saving=True):
         if m['allocations'] not in (0,2) or m['frees']!=0:
             raise ValueError('Unexpected live owner count')
         if m['variant']==1 and m['calls']:
-            if (m['reference'],m['candidate'])!=(55128,candidate_size):
+            if (m['reference'],m['candidate'])!=(55128,51596):
                 raise ValueError('Allocation did not shrink as specified')
             if m['physical_reference']<m['reference']+32 or m['physical_candidate']<m['candidate']+32:
                 raise ValueError('Allocator size is smaller than its guarded request')
-            if (require_block_saving and m['physical_reference']<=m['physical_candidate']) or m['allocations']!=2:
+            if m['physical_reference']<=m['physical_candidate'] or m['allocations']!=2:
                 raise ValueError('No measured allocation saving')
         elif any(m[k] for k in ('candidate','physical_candidate','calls','ps_reads')):
             raise ValueError('Unexpected compact storage in control')
