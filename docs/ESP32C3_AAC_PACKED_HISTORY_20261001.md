@@ -31,6 +31,12 @@ Its FAAD2 measurements and CPU estimates describe another implementation and
 were not independently reproduced here. They do not qualify our fixed-point
 Espressif backend.
 
+The subsequent [pinned FAAD2 source and scaling comparison](FAAD2_HISTORY_SCALING_20261001.md)
+implements a separate 60-case host comparison. It follows the supplied fixed/full
+SBR/PS build recommendation, measures the factor-512 signal scale and preserves
+overflow-invalid trials. It does not reproduce the original study's unavailable
+integration code or replace the firmware backend.
+
 ### Why the supplied study reports smaller errors
 
 An exact cause is not established without its original quantizer/integration

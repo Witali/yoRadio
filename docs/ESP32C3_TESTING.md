@@ -48,6 +48,13 @@ fails precision (3 LSB real, 7 LSB synthetic). Run
 `python tests/test-aac-packed-history.py`; a passing evidence test preserves
 that rejection. Inactive history paths are explicitly marked as not exercised.
 
+The [FAAD2 scaling comparison](FAAD2_HISTORY_SCALING_20261001.md) adds 60 paired
+host runs in fixed and float modes on the same inputs, plus 98,304 exact scaling
+invariance checks. `python tests/test-faad-history-comparison.py` validates the
+raw evidence, source hashes and rejection of overflow-bypassed large-scale trials.
+This is a reference backend comparison; it does not qualify a firmware backend
+replacement, C3 memory savings or physical decoding speed.
+
 | ID | Previously missing coverage | Test created | Acceptance |
 | --- | --- | --- | --- |
 | C3-T01 | Repeatable production RAM-policy regression | `tests/test-esp32c3-acceptance.py`, `ProductionConfigTests` | Execute the actual PowerShell production wrapper against saved configs: both Wi-Fi IRAM options become disabled, other values survive, second run is idempotent; relative and absolute paths work. |

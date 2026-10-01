@@ -47,6 +47,17 @@ speed while preserving full format support and the two-LSB output limit.
 - [x] Decompile the shipped decoder, verify critical allocations/offsets against
   disassembly and save reproducible evidence. Probe reference pointer-table
   compaction on RV32: 55,128 → 53,240 bytes; no decoder change executed.
+- [x] Download pinned FAAD2 and compare fixed/full-complex SBR/PS scaling on
+  matching inputs. The [60-case host study](FAAD2_HISTORY_SCALING_20261001.md)
+  reaches 2 LSB real / 3 LSB synthetic for its fixed history scope, within the
+  temporary ±5 limit. It does not establish C3 RAM/CPU viability or qualify the
+  final ±2 limit. Global rescaling alone does not add mantissa precision.
+- [ ] Add the requested compact-storage build option, enabled by default for
+  development, once an actual memory-saving implementation passes the ±5 gate.
+  The QEMU pack/restore switch currently saves no heap and is not that option.
+- [ ] Verify actual PS activation when labelling streams: the Groove Salad
+  16 kbps capture is mono without PS in FAAD2, while the current C3 backend
+  duplicates it to stereo. FFprobe's HE-AAC v2 label alone does not prove PS.
 - [ ] Obtain/build a compatible full-feature source backend; account for the
   confirmed Espressif/reference SBR field-order differences before layout edits.
 - [ ] Compact smoothing pointer tables (1,888-byte candidate), then validate
