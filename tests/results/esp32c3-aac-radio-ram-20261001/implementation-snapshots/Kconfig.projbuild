@@ -150,15 +150,6 @@ config YORADIO_COMPACT_SERVICE_STACKS
         shared decoder's 16384-byte stack. Require all-codec and WebUI/OTA
         stack/load measurements before enabling in the production profile.
 
-config YORADIO_CPU_PROFILE_HTTP
-    bool "Sample runtime diagnostics in the existing HTTP task"
-    depends on FREERTOS_GENERATE_RUN_TIME_STATS
-    default n
-    help
-        Diagnostic only. Poll /api/native/status regularly to emit the existing
-        CPU/heap/stack logs, at most once per five seconds. Avoids allocating a
-        separate 4096-byte profiler task stack. Uses the HTTP server's stack.
-
 config YORADIO_AAC_EARLY_SBR_RESERVE
     bool "Reserve AAC SBR state before core and PCM allocations"
     depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_QEMU_AAC_SBR_LAYOUT_TEST

@@ -416,3 +416,22 @@ and implicit SBR introduction without changed ADTS configuration. See
 
 Historical reports do not certify the newest binary. Record which of the
 above cases actually ran and passed for each hand-off image.
+
+## CPU diagnostics without a separate profiler stack
+
+For tight C3 HE-AAC budgets, add `sdkconfig.cpu-profile-http.defaults` after
+`sdkconfig.cpu-profile.defaults`. This enables `CONFIG_YORADIO_CPU_PROFILE_HTTP`:
+the existing `/api/native/status` handler samples runtime counters at most once
+per five seconds, using the HTTP task's existing stack. It does not create the
+normal 4096-byte `cpu_profile` task. Runtime accounting and the small previous
+counter table still have overhead; this is not an uninstrumented production image.
+
+Poll status regularly using the physical `memory.py` or `run.py` suites. Without
+polling there are no periodic CPU samples. Preserve the exact config with the
+report, and check the HTTP task's stack high-water mark as well as decode/output
+tasks. Under `--suite switch`, use at least three cycles. Never label the CPU
+usage of reduced-rate AAC-core fallback as full HE/SBR performance.
+
+The [RAM profile report](ESP32C3_AAC_RADIO_RAM_20261001.md) includes the physical
+comparison and the distinction between elapsed decode-call time and total
+FreeRTOS CPU utilization.

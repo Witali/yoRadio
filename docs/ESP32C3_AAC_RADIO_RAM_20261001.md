@@ -129,3 +129,36 @@ largest block is 47104 bytes, below the 55128-byte SBR request. This distinguish
 the contiguous-block problem from simply running out of all heap. It does not
 yet identify which live allocations prevent coalescing. Do not qualify the
 profile from the earlier clean-start continuous-stream test alone.
+
+## Physical CPU and stack measurements
+
+The ordinary 4 KiB profiler-task build again fails the 55128-byte SBR request:
+callbacks report 69680/72548 free bytes with a 51200-byte largest block.
+Its HE/v2 CPU readings measure **fallback**, not full HE, and are excluded
+from full-output comparisons. MP3, Vorbis and Opus pass; the generated long
+24-bit FLAC fixture returns custom decoder error -4, also recorded in the
+[older QIO/DIO acceptance](ESP32C3_QIO80_ACCEPTANCE_20260930.md).
+[Profiler-task evidence](../tests/results/esp32c3-aac-radio-ram-20261001/profile/summary.json).
+
+`CONFIG_YORADIO_CPU_PROFILE_HTTP` reuses the existing HTTP task for the same
+counter sampling and eliminates the separate profiler stack/TCB. It remains a
+diagnostic option. After a fresh boot this image passes the following 35-second
+streams with the original full-rate decoder:
+
+| Input | Total CPU, mean | Decode-task CPU, mean | Minimum free / largest in sampled window |
+| --- | ---: | ---: | ---: |
+| AAC-LC 48 kHz stereo | 36.75% | 18.65% | 75472 / 65536 B |
+| HE-AAC 48 kHz stereo | 50.72% | 36.08% | 17316 / 8192 B |
+| HE-AAC v2 44.1 kHz stereo | 55.60% | 40.47% | 19388 / 9728 B |
+| Opus 48 kHz stereo | 61.72% | 42.32% | 89604 / 73728 B |
+
+[Raw records, intervals and summary](../tests/results/esp32c3-aac-radio-ram-20261001/http-profile/summary.json).
+Means use runtime-counter samples 5–35 seconds after the first PCM checkpoint.
+They are short HTTP-polling measurements, not worst-case load or long-soak
+certification. No new QEMU calibration coefficient is inferred from them.
+
+Minimum unused stack over this sequence: HTTP 4372 B, WebSocket status 1896 B,
+BOOT 1500 B, output 1228 B, decoder 5036 B. This supports the initial smaller
+service-stack choice for these paths; TLS, OTA and broader stress remain gates.
+The diagnostic image's heap layout also differs from the uninstrumented image.
+Successful allocation here does not erase the latter's broader-matrix failures.

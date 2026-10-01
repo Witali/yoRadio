@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "audio_service.h"
+#include "cpu_profiler.h"
 #include "deep_sleep_clock.h"
 #include "display_settings.h"
 #include "board_config.h"
@@ -82,6 +83,7 @@ static bool web_ui_available(void) {
 }
 
 static esp_err_t status_handler(httpd_req_t *request) {
+    cpu_profiler_poll();
     native_state_t state;
     native_state_snapshot(s_state, &state);
     const char *mode = "starting";
