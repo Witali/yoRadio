@@ -35,6 +35,22 @@ the original app; startup and saved playback were verified after a manual
 reset. The failures block promotion of the Auto Suspend profile despite
 earlier successful playback and OTA checks.
 
+For new hardware investigations, `diagnostic.py` wraps the existing `run`,
+`memory`, `ota_transition` or `pool_settle` runner and keeps filtered panic
+MEPC/RA/MCAUSE evidence alongside CPU/heap logs. For example:
+
+```powershell
+python tools/esp32c3_tests/diagnostic.py memory --board http://BOARD_IP `
+  --host PC_LAN_IP --serial-port COM9 --output .build/c3-memory-diagnostic
+```
+
+It retains possible code addresses from stack/backtrace lines, not raw stack
+contents. These candidates are not a verified unwind. The wrapper does not
+change firmware or settings on its own; the selected runner retains its normal
+actions and restoration rules. Earlier filtered logs cannot retroactively
+recover a discarded panic PC. Host filter checks are in
+`tests/test-esp32c3-panic-capture.py`.
+
 The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
 standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
 AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained
