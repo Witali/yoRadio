@@ -356,11 +356,15 @@ separate negative test use a newly generated, intentionally untrusted cert:
 
 ```powershell
 python tools/audio_test_server/make_test_certificate.py --host PC_LAN_IP --output .build/untrusted-tls
-python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --suite tls-rejection --https-origin https://PC_LAN_IP:8771 --tls-cert .build/untrusted-tls/cert.pem --tls-key .build/untrusted-tls/key.pem --output .build/c3-tests/tls-rejection
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --suite tls-rejection --https-origin https://PC_LAN_IP:8771 --tls-cert .build/untrusted-tls/cert.pem --tls-key .build/untrusted-tls/key.pem --output .build/c3-tests/tls-rejection
 ```
 
 The negative test also requires the local TLS listener to record a certificate
 rejection alert. An unreachable server alone cannot make this test pass.
+ESP-IDF's bundle callback can produce `TLSV1_ALERT_ACCESS_DENIED`; that alert
+is accepted only together with a fresh, sanitized serial message confirming
+certificate verification failure. Generic TLS errors or an empty bundle alone
+are insufficient. The test then requires successful HTTP playback recovery.
 
 For public radio HTTPS plus concurrent WebUI requests, use the separate runner:
 
@@ -390,6 +394,9 @@ controlled HTTPS fixture matrix, PCM comparisons, physical listening or one-hour
 soaks. A server/probe failure remains a failed case, not a board playback pass.
 The [2026-10-01 physical results](ESP32C3_PUBLIC_HTTPS_20261001.md) retain LC/MP3
 passes and HE/v2 allocation failures under both HTTPS and HTTP load.
+The [dynamic TLS follow-up](ESP32C3_TLS_DYNAMIC_20261001.md) uses the same
+runner and records improved LC/MP3 free memory with continuing HE/v2 failures.
+TLS error logs are sanitized before retention and fail the playback check.
 
 ### CPU, memory, switching and soak
 

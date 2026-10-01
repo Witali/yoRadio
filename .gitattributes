@@ -421,3 +421,10 @@ tests/results/esp32c3-aac-pc16-cache-20261001/implementation-snapshots/pre-abi-*
 tests/results/esp32c3-aac-abi-20261001/** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
 tests/results/esp32c3-aac-labels-20261001/** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
 docs/audits/esp32c3-aac-symbolic-20261001/** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
+
+# Keep exact TLS trial bytes for artifact and measurement SHA-256 checks.
+tests/results/esp32c3-tls-dynamic-20261001/** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
+firmware/development/esp32c3-tls-dynamic/sdkconfig -text whitespace=cr-at-eol
+firmware/development/esp32c3-tls-dynamic/*.json -text whitespace=cr-at-eol
+idf/esp32c3-oled-native/sdkconfig.tls-dynamic.defaults text eol=lf
+tests/test-esp32c3-tls-dynamic-evidence.py text eol=lf

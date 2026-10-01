@@ -148,3 +148,11 @@ over PC16. Keep it off. Physical PC16 passes short continuous AAC streams but
 still fails four of twelve switches. Continue with packing-speed work and a
 layout that can actually release the unused owner bytes; neither experiment
 has achieved reliable full-radio HE playback yet.
+
+The [dynamic TLS-buffer trial](ESP32C3_TLS_DYNAMIC_20261001.md) keeps full
+16 KiB RX / 4 KiB TX capacity and certificate verification, while improving
+observed LC/MP3 HTTPS free RAM by about 18–21 KiB. Public HE/v2 still fail
+their 55128-byte allocation, with largest blocks of 47104–51200 bytes.
+Keep the transport option experimental and combine future **measured** decoder
+size reductions with headroom for live TLS records and network allocations.
+Neither a payload estimate nor core-only fallback qualifies full playback.

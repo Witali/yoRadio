@@ -10,6 +10,12 @@ fail that allocation. With lighter HTTP polling, full SBR starts, but smaller
 allocations fail during playback. TLS adds pressure, but is not the only
 remaining obstacle.
 
+The subsequent [dynamic TLS-buffer experiment](ESP32C3_TLS_DYNAMIC_20261001.md)
+recovers roughly 18–21 KiB in the passing LC/MP3 HTTPS observations while
+preserving record capacity and certificate verification. Public HE/v2 still
+fail the SBR allocation; this is an optional follow-up, not a change to the
+image or historical results below.
+
 This extends the [passing local HTTP/OTA checks](ESP32C3_LWIP_HALF_CLOSE_20261001.md).
 It does not invalidate those recorded results or qualify streams they did not
 exercise. The firmware, decoder arithmetic, settings and TLS configuration
