@@ -2,6 +2,11 @@
 
 ## Result so far
 
+**The broader matrix still fails full-rate HE/v2 after preceding playback.**
+Keep this profile experimental. The clean-start result below is insufficient
+to qualify station switching; investigate allocator geometry and transient
+network demand before changing product defaults.
+
 The compact service/Wi-Fi profile plays the retained AAC-LC 48 kHz stereo,
 HE-AAC 48 kHz stereo and HE-AAC v2 44.1 kHz stereo streams on the physical C3.
 Each was observed for 35 seconds after a fresh boot, with WebUI polling.
@@ -28,6 +33,13 @@ The compact profile's minimum-ever heap reaches **13636 bytes** during this
 sequence. LC's observed free-heap difference is 12560 bytes. Do not subtract
 HE rows as a RAM regression: only the new image allocates and runs full SBR/PS.
 Wi-Fi traffic and allocator rounding affect these observations.
+
+In the successful continuous sequence, elapsed decoder-call time divided by
+generated audio duration is 18.00% for LC, 36.40% for HE and 41.01% for HEv2
+([windows and calculation](../tests/results/esp32c3-aac-radio-ram-20261001/decode-work.json)).
+This includes time spent inside decode calls and any preemption during them;
+it is not total CPU utilization or a no-regression comparison against full HE
+on the failing baseline. Dedicated task accounting remains to be measured.
 
 The selected build profile, `sdkconfig.aac-ram.defaults`, changes:
 
@@ -97,3 +109,23 @@ Remaining acceptance: all-codec/EOF/switch/fault matrix, stack and physical CPU
 load, sustained HE/v2, maximum compressed-buffer setting, HTTPS and OTA under
 the compact profile. The known implicit LC→SBR transition with identical ADTS
 headers also remains open. Product defaults have not been changed.
+
+## Broader matrix on the same physical image
+
+[Complete results](../tests/results/esp32c3-aac-radio-ram-20261001/acceptance/report.json):
+46 PASS, eight playback/transition failures, and one unexecuted switching test
+reported as FAIL because the invocation requested two cycles where three are
+required. That last item is a test invocation error, not a firmware failure;
+repeat it with profiling firmware and at least three cycles.
+
+MP3, FLAC, Vorbis, Opus and LC pass both automatic detection and explicit codec
+selection. All 22 terminal-EOF checks pass, as do network interruption, recovery,
+redirect, jitter, Stop/Play generation ordering and WebSocket reconnect checks.
+EOF pass is independent of full HE acceptance: the six HE/v2 HTTP cases and
+both format-transition sequences still fail their full-output requirements.
+
+At failed HE first-frame checkpoints, free heap is roughly 79 KB while the
+largest block is 47104 bytes, below the 55128-byte SBR request. This distinguishes
+the contiguous-block problem from simply running out of all heap. It does not
+yet identify which live allocations prevent coalescing. Do not qualify the
+profile from the earlier clean-start continuous-stream test alone.
