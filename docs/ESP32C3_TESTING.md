@@ -71,6 +71,13 @@ bit-identical controls. `python tests/test-faad-ps-patch.py` checks frame traces
 delayed mono-to-stereo PS activation, source/PCM hashes and integer error counts.
 The measured 9600-byte host PS-structure reduction is not a full-radio RAM result.
 
+The [pristine FAAD float32/fixed comparison](FAAD2_FLOAT_FIXED_COMPARISON_20261001.md)
+adds 22 main decodes and 22 fresh-process repeatability controls. LC differs by
+up to 2 LSB, but synthetic HE/v2 and PS onset expose much larger existing
+arithmetic-path discrepancies. `python tests/test-faad-arithmetic-comparison.py`
+validates hashes, full output rates, channel transitions, histograms and retained
+transients. This is separate from the additional error allowed for packed storage.
+
 | ID | Previously missing coverage | Test created | Acceptance |
 | --- | --- | --- | --- |
 | C3-T01 | Repeatable production RAM-policy regression | `tests/test-esp32c3-acceptance.py`, `ProductionConfigTests` | Execute the actual PowerShell production wrapper against saved configs: both Wi-Fi IRAM options become disabled, other values survive, second run is idempotent; relative and absolute paths work. |

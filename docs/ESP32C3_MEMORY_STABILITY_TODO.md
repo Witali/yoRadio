@@ -60,6 +60,13 @@ speed while preserving full format support and the two-LSB output limit.
 - [ ] Add the requested compact-storage build option, enabled by default for
   development, once an actual memory-saving implementation passes the ±5 gate.
   The QEMU pack/restore switch currently saves no heap and is not that option.
+- [x] Compare pristine FAAD float32 and fixed PCM on the same LC/HE/v2 corpus:
+  [baseline arithmetic comparison](FAAD2_FLOAT_FIXED_COMPARISON_20261001.md),
+  22 main decodes plus 22 repeatability controls. This is distinct from the
+  additional error of history compression against the same arithmetic backend.
+- [ ] Isolate the sustained synthetic SBR differences (up to 7678 PCM LSB) and
+  PS-onset transient (10211 LSB) between pristine FAAD float and fixed paths;
+  compare against an independent reference before accepting a backend change.
 - [x] Select `shift=exponent+1` (1..16) for 16+16 mantissas with eight independent
   four-bit exponents per word. Add block pack/unpack and verify arithmetic,
   rounding, saturation, nibble isolation and tails under UBSan. See the
