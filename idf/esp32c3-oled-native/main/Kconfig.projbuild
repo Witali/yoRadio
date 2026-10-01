@@ -195,6 +195,15 @@ config YORADIO_QEMU_AAC_RESET_TEST
         QEMU-only. Pad the baseline core to contain a stale vendor offset,
         compare repaired reset and subsequent PCM on the smaller SBR owner.
 
+config YORADIO_TCP_ALLOCATION_DIAGNOSTICS
+    bool "Trace TCP control-block allocation and release"
+    depends on YORADIO_HEAP_LAYOUT_DIAGNOSTICS
+    default n
+    help
+        Correlate fragmentation with TCP control-block lifetimes. Log only
+        pointer, structure size and state on release, never IP/port/payload.
+        Pass through the unmodified lwIP allocator and protocol behavior.
+
 config YORADIO_AAC_EARLY_SCRATCH_RESERVE
     bool "Place AAC scratch workspace before core and caller PCM"
     depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_AAC_EARLY_SBR_RESERVE && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_QEMU_AAC_PACKED_HISTORY_TEST

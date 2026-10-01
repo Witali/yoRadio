@@ -77,6 +77,12 @@ scheduling and can change transient network demand, so do not use this image
 for performance qualification. Host ASan/UBSan selection/bounds checks:
 `python tests/run-heap-layout-capture.py` in an environment with `cc`.
 
+Add `sdkconfig.tcp-allocation.defaults` to that diagnostic build to correlate
+the selected addresses with `PERF TCP_ALLOC` and `PERF TCP_FREE` records. This
+separate option forwards lwIP allocation/free unchanged and logs the PCB state
+before release. It never logs IP addresses, ports or packet contents. Retain
+the exact ELF/config: a matching size alone does not prove block ownership.
+
 The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
 standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
 AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained

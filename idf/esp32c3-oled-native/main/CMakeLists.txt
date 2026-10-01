@@ -100,6 +100,10 @@ if(CONFIG_YORADIO_HEAP_LAYOUT_DIAGNOSTICS)
   list(APPEND NATIVE_SRCS "heap_layout_diagnostic.c")
 endif()
 
+if(CONFIG_YORADIO_TCP_ALLOCATION_DIAGNOSTICS)
+  list(APPEND NATIVE_SRCS "tcp_allocation_diagnostic.c")
+endif()
+
 idf_component_register(
   SRCS ${NATIVE_SRCS}
   INCLUDE_DIRS "."
@@ -150,6 +154,12 @@ if(CONFIG_YORADIO_HEAP_LAYOUT_DIAGNOSTICS)
   target_link_options(${COMPONENT_LIB} INTERFACE
     "-Wl,--wrap=cpu_profiler_memory" "-Wl,--wrap=media_lib_module_malloc"
     "-Wl,--wrap=media_lib_module_calloc")
+endif()
+
+if(CONFIG_YORADIO_TCP_ALLOCATION_DIAGNOSTICS)
+  target_link_options(${COMPONENT_LIB} INTERFACE
+    "-Wl,--wrap=memp_malloc" "-Wl,--wrap=memp_free"
+    "-Wl,--undefined=__wrap_memp_malloc")
 endif()
 
 if(CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE OR CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE)
