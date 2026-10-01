@@ -64,6 +64,13 @@ temporary ±5 gate but fail the final ±2 gate (maximum 3). Validate logs, block
 coverage, scalar equivalence and both gates with `python tests/test-aac-pc16-history.py`.
 Reduced live allocations and physical CPU speed remain unqualified.
 
+The [supplied FAAD PS patch test](FAAD2_PS_PATCH_QUALITY_20261001.md) adds 33 host
+decodes from pristine, patch-disabled and patch-enabled sources. Both active-PS
+inputs reach 2 LSB; nine inactive-PS inputs and every disabled-patch decode are
+bit-identical controls. `python tests/test-faad-ps-patch.py` checks frame traces,
+delayed mono-to-stereo PS activation, source/PCM hashes and integer error counts.
+The measured 9600-byte host PS-structure reduction is not a full-radio RAM result.
+
 | ID | Previously missing coverage | Test created | Acceptance |
 | --- | --- | --- | --- |
 | C3-T01 | Repeatable production RAM-policy regression | `tests/test-esp32c3-acceptance.py`, `ProductionConfigTests` | Execute the actual PowerShell production wrapper against saved configs: both Wi-Fi IRAM options become disabled, other values survive, second run is idempotent; relative and absolute paths work. |

@@ -1,0 +1,1036 @@
+{
+  "patch_sha256": "44bc82a60793946a9477da17d841abf8444da80a279aa7ae48e4005cb49cdbd1",
+  "source_revision": "e8e76f0a44db45aed773a3f62fe35a63c867a738",
+  "source_archive_sha256": "36f5aa8cbfcc442cdaced7f29dbe66276c62a1432d3c639405c07bcdf47614ab",
+  "probe_sha256": "4ee45a1540d42e97b07880982e2c35ae9efe997a40b1df90946234ef44675a1e",
+  "reference_quantizer_sha256": "0373d2b02b9db3586700af00be896ab009df6168b2c04409f75c58ac12f81a1c",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "build_commands": {
+    "baseline": [
+      "gcc",
+      "-O2",
+      "-fno-strict-aliasing",
+      "-ffloat-store",
+      "-DFIXED_POINT=1",
+      "-DAPPLY_DRC",
+      "-DHAVE_INTTYPES_H=1",
+      "-DHAVE_MEMCPY=1",
+      "-DHAVE_STRING_H=1",
+      "-DHAVE_STRINGS_H=1",
+      "-DHAVE_SYS_STAT_H=1",
+      "-DHAVE_SYS_TYPES_H=1",
+      "-DHAVE_LRINTF=1",
+      "-DPACKAGE_VERSION=\"comparison\"",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/idf/esp32c3-oled-native/main",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/bits.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/cfft.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/common.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/decoder.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/drc.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/drm_dec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/error.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/filtbank.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/hcr.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/huffman.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ic_predict.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/is.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/lt_predict.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/mdct.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/mp4.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ms.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/output.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/pns.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ps_dec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ps_syntax.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/pulse.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/rvlc.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_dct.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_dec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_e_nf.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_fbt.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_hfadj.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_hfgen.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_huff.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_qmf.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_syntax.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_tf_grid.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/specrec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ssr.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ssr_fb.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ssr_ipqf.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/syntax.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad2-comparison/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/tns.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/tools/codec_benchmark/faad_decode_probe.c",
+      "-lm",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/baseline"
+    ],
+    "disabled": [
+      "gcc",
+      "-O2",
+      "-fno-strict-aliasing",
+      "-ffloat-store",
+      "-DFIXED_POINT=1",
+      "-DAPPLY_DRC",
+      "-DHAVE_INTTYPES_H=1",
+      "-DHAVE_MEMCPY=1",
+      "-DHAVE_STRING_H=1",
+      "-DHAVE_STRINGS_H=1",
+      "-DHAVE_SYS_STAT_H=1",
+      "-DHAVE_SYS_TYPES_H=1",
+      "-DHAVE_LRINTF=1",
+      "-DPACKAGE_VERSION=\"comparison\"",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/idf/esp32c3-oled-native/main",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/bits.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/cfft.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/common.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/decoder.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/drc.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/drm_dec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/error.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/filtbank.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/hcr.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/huffman.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ic_predict.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/is.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/lt_predict.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/mdct.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/mp4.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ms.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/output.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/pns.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ps_dec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ps_syntax.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/pulse.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/rvlc.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_dct.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_dec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_e_nf.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_fbt.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_hfadj.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_hfgen.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_huff.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_qmf.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_syntax.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_tf_grid.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/specrec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ssr.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ssr_fb.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ssr_ipqf.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/syntax.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/tns.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/tools/codec_benchmark/faad_decode_probe.c",
+      "-lm",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/disabled"
+    ],
+    "packed": [
+      "gcc",
+      "-O2",
+      "-fno-strict-aliasing",
+      "-ffloat-store",
+      "-DFIXED_POINT=1",
+      "-DAPPLY_DRC",
+      "-DHAVE_INTTYPES_H=1",
+      "-DHAVE_MEMCPY=1",
+      "-DHAVE_STRING_H=1",
+      "-DHAVE_STRINGS_H=1",
+      "-DHAVE_SYS_STAT_H=1",
+      "-DHAVE_SYS_TYPES_H=1",
+      "-DHAVE_LRINTF=1",
+      "-DPACKAGE_VERSION=\"comparison\"",
+      "-DFAAD_PACKED_PS_HISTORY=1",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/idf/esp32c3-oled-native/main",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/bits.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/cfft.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/common.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/decoder.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/drc.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/drm_dec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/error.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/filtbank.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/hcr.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/huffman.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ic_predict.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/is.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/lt_predict.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/mdct.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/mp4.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ms.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/output.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/pns.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ps_dec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ps_syntax.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/pulse.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/rvlc.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_dct.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_dec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_e_nf.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_fbt.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_hfadj.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_hfgen.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_huff.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_qmf.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_syntax.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/sbr_tf_grid.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/specrec.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ssr.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ssr_fb.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/ssr_ipqf.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/syntax.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/faad2-e8e76f0a44db45aed773a3f62fe35a63c867a738/libfaad/tns.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/tools/codec_benchmark/faad_decode_probe.c",
+      "-lm",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/faad-ps-patch-20261001/packed"
+    ]
+  },
+  "rows": [
+    {
+      "input": "he-44100-stereo",
+      "input_sha256": "2ed01ee61355830629905867f1885eae99123bc73daad161ba1a5959a4f5e11a",
+      "repeats": 2,
+      "runs": {
+        "baseline": {
+          "frames": 28,
+          "samples": 110592,
+          "ps_frames": 0,
+          "sbr_frames": 28,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "9b7b57289880e49e3332a6439cf41a9f7444ac269195456b630c2d6a7354097c",
+          "frames_sha256": "ff0b9500b0a18c1410cf96e5991215afe1c7454a50c127e3a33cb69d36fadb84"
+        },
+        "disabled": {
+          "frames": 28,
+          "samples": 110592,
+          "ps_frames": 0,
+          "sbr_frames": 28,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "9b7b57289880e49e3332a6439cf41a9f7444ac269195456b630c2d6a7354097c",
+          "frames_sha256": "ff0b9500b0a18c1410cf96e5991215afe1c7454a50c127e3a33cb69d36fadb84"
+        },
+        "packed": {
+          "frames": 28,
+          "samples": 110592,
+          "ps_frames": 0,
+          "sbr_frames": 28,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "9b7b57289880e49e3332a6439cf41a9f7444ac269195456b630c2d6a7354097c",
+          "frames_sha256": "ff0b9500b0a18c1410cf96e5991215afe1c7454a50c127e3a33cb69d36fadb84"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 55296,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 1076717594954,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 55296
+          }
+        },
+        {
+          "channel": 1,
+          "samples": 55296,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 1100369013312,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 55296
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          44100,
+          2
+        ]
+      ]
+    },
+    {
+      "input": "he-48000-stereo",
+      "input_sha256": "747259aaafad92a280e793a4e0b7fce05d39443959ef3d3cba463b980d92f7da",
+      "repeats": 2,
+      "runs": {
+        "baseline": {
+          "frames": 30,
+          "samples": 118784,
+          "ps_frames": 0,
+          "sbr_frames": 30,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "770fcd7ed7309070987eb3a967e8d9c940144534cdd8e0baa9d9648a65d1fdcf",
+          "frames_sha256": "93039ceddd7aea66761766b8c1f37525654069cd27644030e27fa3020255ef01"
+        },
+        "disabled": {
+          "frames": 30,
+          "samples": 118784,
+          "ps_frames": 0,
+          "sbr_frames": 30,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "770fcd7ed7309070987eb3a967e8d9c940144534cdd8e0baa9d9648a65d1fdcf",
+          "frames_sha256": "93039ceddd7aea66761766b8c1f37525654069cd27644030e27fa3020255ef01"
+        },
+        "packed": {
+          "frames": 30,
+          "samples": 118784,
+          "ps_frames": 0,
+          "sbr_frames": 30,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "770fcd7ed7309070987eb3a967e8d9c940144534cdd8e0baa9d9648a65d1fdcf",
+          "frames_sha256": "93039ceddd7aea66761766b8c1f37525654069cd27644030e27fa3020255ef01"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 59392,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 1222129385447,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 59392
+          }
+        },
+        {
+          "channel": 1,
+          "samples": 59392,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 1172933165303,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 59392
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          48000,
+          2
+        ]
+      ]
+    },
+    {
+      "input": "hev2-44100-stereo",
+      "input_sha256": "cf66a4008ec69f9fa31ac7383b0fe8ff6d71fc60b19ee168f1c1396c7e4014ce",
+      "repeats": 2,
+      "runs": {
+        "baseline": {
+          "frames": 30,
+          "samples": 118784,
+          "ps_frames": 30,
+          "sbr_frames": 30,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "316e9e63bac157f719dddd2ce2ab7888dbf479ea1d71a22acd406341c6247cf5",
+          "frames_sha256": "318c50a607a66153454bdd374dafbd7ffefd1514a8ddf15445f158b54f31a1c5"
+        },
+        "disabled": {
+          "frames": 30,
+          "samples": 118784,
+          "ps_frames": 30,
+          "sbr_frames": 30,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "316e9e63bac157f719dddd2ce2ab7888dbf479ea1d71a22acd406341c6247cf5",
+          "frames_sha256": "318c50a607a66153454bdd374dafbd7ffefd1514a8ddf15445f158b54f31a1c5"
+        },
+        "packed": {
+          "frames": 30,
+          "samples": 118784,
+          "ps_frames": 30,
+          "sbr_frames": 30,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "100f2342dfdc2bb5476c9d7b965dde21c5fae95315aaa033b33d3fed07b982b1",
+          "frames_sha256": "318c50a607a66153454bdd374dafbd7ffefd1514a8ddf15445f158b54f31a1c5"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 59392,
+          "maximum": 1,
+          "different": 1022,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 1022,
+          "square_signal": 1127407829227,
+          "signed_error": -8,
+          "rms_lsb": 0.13117814124837762,
+          "histogram": {
+            "0": 58370,
+            "1": 1022
+          }
+        },
+        {
+          "channel": 1,
+          "samples": 59392,
+          "maximum": 2,
+          "different": 11844,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 11856,
+          "square_signal": 1187397432154,
+          "signed_error": -26,
+          "rms_lsb": 0.4467917242156419,
+          "histogram": {
+            "0": 47548,
+            "1": 11840,
+            "2": 4
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          44100,
+          2
+        ]
+      ]
+    },
+    {
+      "input": "lc-22050-mono",
+      "input_sha256": "70ca546f35396ad05b88876536557df6b43ef7d804966460fb949aa9e07b7a85",
+      "repeats": 2,
+      "runs": {
+        "baseline": {
+          "frames": 26,
+          "samples": 51200,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 26,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "1640bb7bbddada87a6b30d0c7c7928682c79be71981b5258b9be678a5815c7de",
+          "frames_sha256": "b36dd84172f724cff084364b2e26fc4ede51bf6c21570e1529a1bff2281e0027"
+        },
+        "disabled": {
+          "frames": 26,
+          "samples": 51200,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 26,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "1640bb7bbddada87a6b30d0c7c7928682c79be71981b5258b9be678a5815c7de",
+          "frames_sha256": "b36dd84172f724cff084364b2e26fc4ede51bf6c21570e1529a1bff2281e0027"
+        },
+        "packed": {
+          "frames": 26,
+          "samples": 51200,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 26,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "1640bb7bbddada87a6b30d0c7c7928682c79be71981b5258b9be678a5815c7de",
+          "frames_sha256": "b36dd84172f724cff084364b2e26fc4ede51bf6c21570e1529a1bff2281e0027"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 51200,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 1259729028215,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 51200
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          44100,
+          1
+        ]
+      ]
+    },
+    {
+      "input": "lc-44100-stereo",
+      "input_sha256": "b701428ed6cd8118f873f4cbe708b517a1089deed63792af6d0850c2ebc436bd",
+      "repeats": 2,
+      "runs": {
+        "baseline": {
+          "frames": 48,
+          "samples": 96256,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "885a9d08d14f6ff9024d625462e2ca70bbb1ec8592a51389682b7565893fdac2",
+          "frames_sha256": "e38853ae5ae09797f4283a462a5532818075bee570c45b05286e2b95f32fd395"
+        },
+        "disabled": {
+          "frames": 48,
+          "samples": 96256,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "885a9d08d14f6ff9024d625462e2ca70bbb1ec8592a51389682b7565893fdac2",
+          "frames_sha256": "e38853ae5ae09797f4283a462a5532818075bee570c45b05286e2b95f32fd395"
+        },
+        "packed": {
+          "frames": 48,
+          "samples": 96256,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "885a9d08d14f6ff9024d625462e2ca70bbb1ec8592a51389682b7565893fdac2",
+          "frames_sha256": "e38853ae5ae09797f4283a462a5532818075bee570c45b05286e2b95f32fd395"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 48128,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 1277677170761,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 48128
+          }
+        },
+        {
+          "channel": 1,
+          "samples": 48128,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 1275881423848,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 48128
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          44100,
+          2
+        ]
+      ]
+    },
+    {
+      "input": "lc-48000-stereo",
+      "input_sha256": "1b9ab71161449af230ca0628dc23ac265f8c707b82d5e68c76ddc7f42d69b0d4",
+      "repeats": 2,
+      "runs": {
+        "baseline": {
+          "frames": 52,
+          "samples": 104448,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "aecaa9bb9fbfe43dcc4de90fcd0f8ad2adb720d3aa78869ed3edb0042ea92fcf",
+          "frames_sha256": "3c638f0a38d6485081b391589ea60684d5ba96eb523f0f1ddf12a31919cb5a03"
+        },
+        "disabled": {
+          "frames": 52,
+          "samples": 104448,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "aecaa9bb9fbfe43dcc4de90fcd0f8ad2adb720d3aa78869ed3edb0042ea92fcf",
+          "frames_sha256": "3c638f0a38d6485081b391589ea60684d5ba96eb523f0f1ddf12a31919cb5a03"
+        },
+        "packed": {
+          "frames": 52,
+          "samples": 104448,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "aecaa9bb9fbfe43dcc4de90fcd0f8ad2adb720d3aa78869ed3edb0042ea92fcf",
+          "frames_sha256": "3c638f0a38d6485081b391589ea60684d5ba96eb523f0f1ddf12a31919cb5a03"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 52224,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 1390375991297,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 52224
+          }
+        },
+        {
+          "channel": 1,
+          "samples": 52224,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 1389766526840,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 52224
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          48000,
+          2
+        ]
+      ]
+    },
+    {
+      "input": "abba64",
+      "input_sha256": "1d4fd981c9ba4ed7c9a225bfd89177bfda82884316dac2159a6034cccfb325ef",
+      "repeats": 1,
+      "runs": {
+        "baseline": {
+          "frames": 646,
+          "samples": 2621440,
+          "ps_frames": 635,
+          "sbr_frames": 646,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "9bdfc4ca94933ead0d635b1d3e8512c8ee266ce0e6cf222244c05977e0548cb8",
+          "frames_sha256": "bfa7745183a05fdc1520c85ca4d2f9cb1779da38f4cae798725249b5473913fe"
+        },
+        "disabled": {
+          "frames": 646,
+          "samples": 2621440,
+          "ps_frames": 635,
+          "sbr_frames": 646,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "9bdfc4ca94933ead0d635b1d3e8512c8ee266ce0e6cf222244c05977e0548cb8",
+          "frames_sha256": "bfa7745183a05fdc1520c85ca4d2f9cb1779da38f4cae798725249b5473913fe"
+        },
+        "packed": {
+          "frames": 646,
+          "samples": 2621440,
+          "ps_frames": 635,
+          "sbr_frames": 646,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "e5e88b346e6103fd6447b30ebd97f171d57764f4d517195b15c4da35b2f13ca7",
+          "frames_sha256": "bfa7745183a05fdc1520c85ca4d2f9cb1779da38f4cae798725249b5473913fe"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 1320960,
+          "maximum": 1,
+          "different": 156000,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 156000,
+          "square_signal": 54874303737341,
+          "signed_error": -318,
+          "rms_lsb": 0.34365088423072354,
+          "histogram": {
+            "0": 1164960,
+            "1": 156000
+          }
+        },
+        {
+          "channel": 1,
+          "samples": 1300480,
+          "maximum": 2,
+          "different": 230936,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 231329,
+          "square_signal": 60575631127547,
+          "signed_error": 501,
+          "rms_lsb": 0.42175787598422443,
+          "histogram": {
+            "0": 1069544,
+            "1": 230805,
+            "2": 131
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          44100,
+          1
+        ],
+        [
+          44100,
+          2
+        ]
+      ]
+    },
+    {
+      "input": "groovesalad16",
+      "input_sha256": "26f7767872d75b25579332a1f3eb0b8efacc6a17da83d8986ec8e5395ef9b116",
+      "repeats": 1,
+      "runs": {
+        "baseline": {
+          "frames": 469,
+          "samples": 958464,
+          "ps_frames": 0,
+          "sbr_frames": 469,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "fc19f7250d25411896b24caac62641d6c2b384c27d137c8d1505869e2265b72a",
+          "frames_sha256": "f195da0f9e7a819f14fd5c3d798c709ffad0868b92850c3a8c67c0caeab2d103"
+        },
+        "disabled": {
+          "frames": 469,
+          "samples": 958464,
+          "ps_frames": 0,
+          "sbr_frames": 469,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "fc19f7250d25411896b24caac62641d6c2b384c27d137c8d1505869e2265b72a",
+          "frames_sha256": "f195da0f9e7a819f14fd5c3d798c709ffad0868b92850c3a8c67c0caeab2d103"
+        },
+        "packed": {
+          "frames": 469,
+          "samples": 958464,
+          "ps_frames": 0,
+          "sbr_frames": 469,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "fc19f7250d25411896b24caac62641d6c2b384c27d137c8d1505869e2265b72a",
+          "frames_sha256": "f195da0f9e7a819f14fd5c3d798c709ffad0868b92850c3a8c67c0caeab2d103"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 958464,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 19152072162793,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 958464
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          32000,
+          1
+        ]
+      ]
+    },
+    {
+      "input": "groovesalad32",
+      "input_sha256": "f2a920fd952982e4de18ee7d611c21c2b414cec2f7e369a3e0372241f930c120",
+      "repeats": 1,
+      "runs": {
+        "baseline": {
+          "frames": 646,
+          "samples": 2641920,
+          "ps_frames": 0,
+          "sbr_frames": 646,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "f283379003cd23a1c2c56264b10bfc80c164a83227e7ef367dedd6f0c49014b7",
+          "frames_sha256": "2de688de696778363bbe0e8398b81d451d61d293d21db848ed53b3caedc21001"
+        },
+        "disabled": {
+          "frames": 646,
+          "samples": 2641920,
+          "ps_frames": 0,
+          "sbr_frames": 646,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "f283379003cd23a1c2c56264b10bfc80c164a83227e7ef367dedd6f0c49014b7",
+          "frames_sha256": "2de688de696778363bbe0e8398b81d451d61d293d21db848ed53b3caedc21001"
+        },
+        "packed": {
+          "frames": 646,
+          "samples": 2641920,
+          "ps_frames": 0,
+          "sbr_frames": 646,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "f283379003cd23a1c2c56264b10bfc80c164a83227e7ef367dedd6f0c49014b7",
+          "frames_sha256": "2de688de696778363bbe0e8398b81d451d61d293d21db848ed53b3caedc21001"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 1320960,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 23387796616323,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 1320960
+          }
+        },
+        {
+          "channel": 1,
+          "samples": 1320960,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 23764142872849,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 1320960
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          44100,
+          2
+        ]
+      ]
+    },
+    {
+      "input": "groovesalad64",
+      "input_sha256": "cfeacfd149e624f145c5bc8a3c256fd8be8742cea70eeb1be06eca29d3e2a593",
+      "repeats": 1,
+      "runs": {
+        "baseline": {
+          "frames": 646,
+          "samples": 2641920,
+          "ps_frames": 0,
+          "sbr_frames": 646,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "64543b1eb28f180f06e940afb2c67162fa0d68c926324f56160f8013358cd193",
+          "frames_sha256": "3efcb44eb6d31407a42ffb61a2cddda80d25d0f27d543c16e18cf5f125c96cb3"
+        },
+        "disabled": {
+          "frames": 646,
+          "samples": 2641920,
+          "ps_frames": 0,
+          "sbr_frames": 646,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "64543b1eb28f180f06e940afb2c67162fa0d68c926324f56160f8013358cd193",
+          "frames_sha256": "3efcb44eb6d31407a42ffb61a2cddda80d25d0f27d543c16e18cf5f125c96cb3"
+        },
+        "packed": {
+          "frames": 646,
+          "samples": 2641920,
+          "ps_frames": 0,
+          "sbr_frames": 646,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "64543b1eb28f180f06e940afb2c67162fa0d68c926324f56160f8013358cd193",
+          "frames_sha256": "3efcb44eb6d31407a42ffb61a2cddda80d25d0f27d543c16e18cf5f125c96cb3"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 1320960,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 25720645446984,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 1320960
+          }
+        },
+        {
+          "channel": 1,
+          "samples": 1320960,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 27545549513097,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 1320960
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          44100,
+          2
+        ]
+      ]
+    },
+    {
+      "input": "groovesalad128",
+      "input_sha256": "bead24856199866f924aac9bf3302020a44e5c8b87483c63951b99d82b685f8c",
+      "repeats": 1,
+      "runs": {
+        "baseline": {
+          "frames": 1292,
+          "samples": 2643968,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "7f7fa3b5baba13b645e46f766138a1c55c26d6f77ac078f08946a8165d7dc324",
+          "frames_sha256": "90b3664b1d833c0b94109f0f598c6e9d708047116b50813d10959e2007cfeaf5"
+        },
+        "disabled": {
+          "frames": 1292,
+          "samples": 2643968,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 22744,
+          "quantizer_equivalence_cases": 0,
+          "pcm_sha256": "7f7fa3b5baba13b645e46f766138a1c55c26d6f77ac078f08946a8165d7dc324",
+          "frames_sha256": "90b3664b1d833c0b94109f0f598c6e9d708047116b50813d10959e2007cfeaf5"
+        },
+        "packed": {
+          "frames": 1292,
+          "samples": 2643968,
+          "ps_frames": 0,
+          "sbr_frames": 0,
+          "upsampled_core_frames": 0,
+          "ps_info_bytes": 13144,
+          "quantizer_equivalence_cases": 100000,
+          "pcm_sha256": "7f7fa3b5baba13b645e46f766138a1c55c26d6f77ac078f08946a8165d7dc324",
+          "frames_sha256": "90b3664b1d833c0b94109f0f598c6e9d708047116b50813d10959e2007cfeaf5"
+        }
+      },
+      "channels": [
+        {
+          "channel": 0,
+          "samples": 1321984,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 30595062213248,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 1321984
+          }
+        },
+        {
+          "channel": 1,
+          "samples": 1321984,
+          "maximum": 0,
+          "different": 0,
+          "over_two": 0,
+          "over_five": 0,
+          "square_error": 0,
+          "square_signal": 33194193778621,
+          "signed_error": 0,
+          "rms_lsb": 0.0,
+          "histogram": {
+            "0": 1321984
+          }
+        }
+      ],
+      "output_layouts": [
+        [
+          44100,
+          2
+        ]
+      ]
+    }
+  ],
+  "ps_struct_saving_bytes": 9600,
+  "note": "Actual supplied PS-only storage patch; host fixed-point test, no C3 port/CPU qualification"
+}

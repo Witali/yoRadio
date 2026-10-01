@@ -69,6 +69,11 @@ speed while preserving full format support and the two-LSB output limit.
   duplicates it to stereo. FFprobe's HE-AAC v2 label alone does not prove PS.
 - [ ] Obtain/build a compatible full-feature source backend; account for the
   confirmed Espressif/reference SBR field-order differences before layout edits.
+- [x] Test the supplied FAAD2 14+14+4 PS-storage patch at its actual write points:
+  [33 host decodes](FAAD2_PS_PATCH_QUALITY_20261001.md) reach 2 LSB on both active-PS
+  inputs, keep the disabled build bit-identical and reduce the host PS structure
+  by 9600 bytes. Xsbr is unchanged. This is not yet an ESP32-C3 backend port or
+  full-format/peak-heap/speed qualification.
 - [ ] Compact smoothing pointer tables (1,888-byte candidate), then validate
   full-format output, reset paths and PS aliases.
 - [ ] Separate stereo low-band QMF work from retained histories (6,144-byte

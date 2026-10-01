@@ -2,6 +2,12 @@
 
 ## Result
 
+**Follow-up:** the subsequently supplied source patch is now available and
+[tested directly](FAAD2_PS_PATCH_QUALITY_20261001.md). It packs PS delays at each
+write and leaves Xsbr unchanged. It reaches 2 LSB on the tested PS inputs and
+shrinks the host PS structure by 9600 bytes. The earlier comparison below retains
+its distinct frame-boundary scope and results.
+
 Downloaded and built pinned FAAD2 in **fixed-point, full complex SBR/PS, `-O2`**
 mode, matching the supplied configuration recommendation. A separate floating
 build is used only as a scaling reference. Ran **60 paired host comparisons** on

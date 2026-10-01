@@ -99,5 +99,6 @@ metadata are retained in each result. The six synthetic fixtures are tracked.
 The runner never accesses a board. Exit 0 means the selected **development** gate
 passed; consult `production_precision_pass` separately for the final ±2 gate.
 
-The separate supplied FAAD PS-storage patch has a different scope and write
-boundary; its quality cannot be inferred from these PC16 results.
+The [separately tested supplied FAAD PS-storage patch](FAAD2_PS_PATCH_QUALITY_20261001.md)
+has a different scope and write boundary; it reaches 2 LSB on its active-PS inputs.
+Its quality cannot be inferred from these PC16 results.
