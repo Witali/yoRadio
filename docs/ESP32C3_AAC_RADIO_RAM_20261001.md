@@ -184,3 +184,19 @@ This is not sufficient for a new production default: repeated switching,
 high-bitrate/load, recovery, stack, TLS and OTA acceptance remain necessary.
 The fixture server paces both finite-file and continuous routes at 1.02 times
 playback rate; the previous failures cannot be attributed to an unpaced server.
+
+The same uninstrumented bounded-Wi-Fi image also passes the three 35-second
+continuous LC48/HE48/HEv2 memory checks, with settings restored afterward.
+First-PCM free/largest heap is 77780/57344 B for LC, 23604/10752 B for HE48,
+and 23736/10752 B for HEv2. The minimum-ever free heap reaches 12204 B.
+[Memory records](../tests/results/esp32c3-aac-radio-ram-20261001/bounded-wifi/memory/report.json).
+
+Adding the HTTP profiler to the six-buffer profile still fails all six HE/v2
+starts in the 12-switch, three-cycle test: output falls back to the wrong
+rate/profile. Opus and LC pass. Settled heap is 144540–145092 B, largest
+94208 B, without a growing leak over these checkpoints.
+[Profiler switching records](../tests/results/esp32c3-aac-radio-ram-20261001/bounded-http/switch/switching.json).
+This is a separate binary/layout from the successful continuous test, so the
+two results must not be combined into a production acceptance claim. Its
+application/configuration are retained in
+`firmware/development/esp32c3-aac-bounded-http-profile/` as a rejected experiment.
