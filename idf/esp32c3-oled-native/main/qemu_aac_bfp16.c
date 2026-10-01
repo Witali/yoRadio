@@ -31,7 +31,11 @@ FIXTURE(hev2, "hev2_44100_stereo");
 #ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
 #include "qemu_aac_packed_history.h"
 #define PCM_ERROR_LIMIT CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_ERROR_LIMIT
+#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_HISTORY_TEST
+#define TEST_LABEL "PCX16"
+#else
 #define TEST_LABEL "PCX14"
+#endif
 #define VARIANT_LABEL "variant"
 #define CANDIDATE_LABEL "packed"
 static const unsigned groups[] = {1, 2, 3, 4, 5, 6, 7, 0};
@@ -417,7 +421,7 @@ static bool external_fixture(void) {
 void qemu_aac_bfp16_test(void) {
     check_counter();
 #ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
-    ESP_LOGI(TAG, "PCX14_LIMIT development=%u production=2", PCM_ERROR_LIMIT);
+    ESP_LOGI(TAG, TEST_LABEL "_LIMIT development=%u production=2", PCM_ERROR_LIMIT);
     packed_history_arithmetic_tests();
 #else
     arithmetic_tests();

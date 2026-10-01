@@ -58,8 +58,11 @@ replacement, C3 memory savings or physical decoding speed.
 The [PC16 shift and block-storage test](ESP32C3_AAC_PC16_SHIFTS_20261001.md)
 executes the `shift=exponent+1` implementation, exhaustive component codes,
 independent rounding/boundary checks and eight-sample block equivalence under
-UBSan: `python tests/test-aac-pc16-shifts.py`. Arithmetic/storage pass; decoder
-PCM, reduced live allocations and RV32 speed are not yet qualified for PC16.
+UBSan: `python tests/test-aac-pc16-shifts.py`. The subsequent
+[201 PC16 QEMU decoder comparisons](ESP32C3_AAC_PC16_QUALITY_20261001.md) pass the
+temporary ±5 gate but fail the final ±2 gate (maximum 3). Validate logs, block/tail
+coverage, scalar equivalence and both gates with `python tests/test-aac-pc16-history.py`.
+Reduced live allocations and physical CPU speed remain unqualified.
 
 | ID | Previously missing coverage | Test created | Acceptance |
 | --- | --- | --- | --- |

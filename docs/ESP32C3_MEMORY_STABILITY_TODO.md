@@ -59,8 +59,11 @@ speed while preserving full format support and the two-LSB output limit.
   four-bit exponents per word. Add block pack/unpack and verify arithmetic,
   rounding, saturation, nibble isolation and tails under UBSan. See the
   [PC16 range decision](ESP32C3_AAC_PC16_SHIFTS_20261001.md).
-- [ ] Measure this PC16 representation on retained SBR/PS histories, then qualify
-  PCM error, actual allocation reduction and C3 CPU cost before enabling storage.
+- [x] Measure PC16 on retained SBR/PS histories: [201 QEMU comparisons](ESP32C3_AAC_PC16_QUALITY_20261001.md)
+  pass temporary ±5 LSB but retain three-LSB errors, failing the final ±2 gate.
+  Block and scalar statistics match; the synthetic maximum improves from 7 to 3.
+- [ ] Qualify actual allocation reduction and physical C3 CPU cost before enabling
+  PC16 storage, and remove the remaining final-precision exceedances.
 - [ ] Verify actual PS activation when labelling streams: the Groove Salad
   16 kbps capture is mono without PS in FAAD2, while the current C3 backend
   duplicates it to stereo. FFprobe's HE-AAC v2 label alone does not prove PS.

@@ -3,6 +3,7 @@
 // See docs/ESP32C3_AAC_PACKED_HISTORY_20261001.md before changing these offsets.
 #include "qemu_aac_packed_history.h"
 #include "packed_complex14.h"
+#include "packed_complex16.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -13,12 +14,19 @@
 
 _Static_assert(sizeof(void *) == 4 && sizeof(int32_t) == 4, "Pinned decoder ABI is RV32 only");
 
+#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_HISTORY_TEST
+#define PACKED_LABEL "PCX16"
+#else
+#define PACKED_LABEL "PCX14"
+#endif
+
 static const char *TAG = "aac_packed";
 static unsigned selected, repetition;
 static struct {
     uint32_t sbr_frames, ps_frames, lc_skips, pairs, changed, max_shift;
     uint32_t exponents[16], saturated, nonzero_to_zero, zero_to_nonzero;
     uint32_t near_zero, near_zero_changed, ratios[6];
+    uint32_t blocks8, tail_pairs, scalar_pairs;
     int64_t bias_real, bias_imag;
 } stats;
 
@@ -88,6 +96,55 @@ static void ps_spans(spans_t *s, uint8_t *owner, uint8_t *ps) {
 
 static uint32_t magnitude(int32_t x) { return x < 0 ? 0u - (uint32_t)x : (uint32_t)x; }
 
+#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_HISTORY_TEST
+static void quantize(const span_t *span, pc14_mode_t unused) {
+    (void)unused;
+    stats.pairs += span->count;
+    if (selected == 7) return;
+    for (unsigned base = 0; base < span->count; base += 8) {
+        unsigned n = span->count - base;
+        if (n > 8) n = 8;
+        // Original values are retained only for diagnostics. This roundtrip is
+        // an accuracy probe, not an allocation reduction or optimized hot path.
+        int32_t r[8], q[8]; uint32_t words[8], exponents = 0;
+        memcpy(r, span->real + base, n * sizeof(int32_t));
+        memcpy(q, span->imag + base, n * sizeof(int32_t));
+        unsigned clipped = 0;
+        if (selected <= 3 && n == 8) {
+            exponents = pc16_pack8(r, q, words, &clipped);
+            pc16_unpack8(words, exponents, span->real + base, span->imag + base);
+            ++stats.blocks8;
+        } else {
+            for (unsigned i = 0; i < n; ++i) {
+                unsigned pair_clipped;
+                pc16_store(words, &exponents, i, r[i], q[i], &pair_clipped);
+                clipped += pair_clipped;
+                pc16_load(words, &exponents, i, span->real + base + i, span->imag + base + i);
+            }
+            if (selected <= 3) stats.tail_pairs += n;
+            else stats.scalar_pairs += n;
+        }
+        if (repetition == 1) stats.saturated += clipped;
+        for (unsigned i = 0; i < n; ++i) {
+            int32_t rr = span->real[base + i], qq = span->imag[base + i];
+            unsigned e = (exponents >> (4 * i)) & 15u;
+            if (e + 1 > stats.max_shift) stats.max_shift = e + 1;
+            stats.changed += (r[i] != rr) + (q[i] != qq);
+            if (repetition != 1) continue;
+            ++stats.exponents[e];
+            stats.nonzero_to_zero += (r[i] && !rr) + (q[i] && !qq);
+            stats.zero_to_nonzero += (!r[i] && rr) + (!q[i] && qq);
+            stats.near_zero += (magnitude(r[i]) < 2) + (magnitude(q[i]) < 2);
+            stats.near_zero_changed += (magnitude(r[i]) < 2 && r[i] != rr) + (magnitude(q[i]) < 2 && q[i] != qq);
+            stats.bias_real += (int64_t)rr - r[i]; stats.bias_imag += (int64_t)qq - q[i];
+            uint32_t a = magnitude(r[i]), b = magnitude(q[i]), lo = a < b ? a : b, hi = a > b ? a : b;
+            unsigned bucket = !hi ? 0 : !lo ? 1 : (uint64_t)hi < (uint64_t)lo * 2 ? 2 :
+                              (uint64_t)hi < (uint64_t)lo * 16 ? 3 : (uint64_t)hi < (uint64_t)lo * 256 ? 4 : 5;
+            ++stats.ratios[bucket];
+        }
+    }
+}
+#else
 static void quantize(const span_t *span, pc14_mode_t mode) {
     for (unsigned i = 0; i < span->count; ++i) {
         int32_t r = span->real[i], q = span->imag[i], rr, qq;
@@ -115,6 +172,7 @@ static void quantize(const span_t *span, pc14_mode_t mode) {
         span->real[i] = rr; span->imag[i] = qq;
     }
 }
+#endif
 
 void __real_sbr_dec(int16_t *, void *, void *, int32_t, int32_t *, void *, void *, void *);
 void __wrap_sbr_dec(int16_t *input, void *output, void *frame, int32_t apply,
@@ -139,21 +197,26 @@ void packed_history_report(const char *name, unsigned variant, unsigned run,
                            uint32_t *rows, uint32_t *changed, unsigned *shift) {
     *rows = stats.sbr_frames + stats.ps_frames; *changed = stats.changed; *shift = stats.max_shift;
     assert(stats.pairs == stats.sbr_frames * 544u + stats.ps_frames * 653u);
-    ESP_LOGI(TAG, "PCX14_HISTORY case=%s variant=%u run=%u sbr_frames=%" PRIu32
+    ESP_LOGI(TAG, PACKED_LABEL "_HISTORY case=%s variant=%u run=%u sbr_frames=%" PRIu32
              " ps_frames=%" PRIu32 " lc_skips=%" PRIu32 " pairs=%" PRIu32,
              name, variant, run, stats.sbr_frames, stats.ps_frames, stats.lc_skips, stats.pairs);
+#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_HISTORY_TEST
+    ESP_LOGI(TAG, "PCX16_BLOCKS case=%s variant=%u run=%u blocks8=%" PRIu32
+             " tail_pairs=%" PRIu32 " scalar_pairs=%" PRIu32,
+             name, variant, run, stats.blocks8, stats.tail_pairs, stats.scalar_pairs);
+#endif
     if (run != 1 || !variant || variant == 7) return;
-    ESP_LOGI(TAG, "PCX14_QUANT case=%s variant=%u run=%u pairs=%" PRIu32
+    ESP_LOGI(TAG, PACKED_LABEL "_QUANT case=%s variant=%u run=%u pairs=%" PRIu32
              " saturated=%" PRIu32 " nonzero_to_zero=%" PRIu32 " zero_to_nonzero=%" PRIu32
              " near_zero=%" PRIu32 " near_zero_changed=%" PRIu32
              " bias_real=%" PRId64 " bias_imag=%" PRId64,
              name, variant, run, stats.pairs, stats.saturated, stats.nonzero_to_zero,
              stats.zero_to_nonzero, stats.near_zero, stats.near_zero_changed, stats.bias_real, stats.bias_imag);
     for (unsigned i = 0; i < 16; ++i)
-        ESP_LOGI(TAG, "PCX14_EXP case=%s variant=%u run=%u exponent=%u count=%" PRIu32,
+        ESP_LOGI(TAG, PACKED_LABEL "_EXP case=%s variant=%u run=%u exponent=%u count=%" PRIu32,
                  name, variant, run, i, stats.exponents[i]);
     for (unsigned i = 0; i < 6; ++i)
-        ESP_LOGI(TAG, "PCX14_RATIO case=%s variant=%u run=%u bucket=%u count=%" PRIu32,
+        ESP_LOGI(TAG, PACKED_LABEL "_RATIO case=%s variant=%u run=%u bucket=%u count=%" PRIu32,
                  name, variant, run, i, stats.ratios[i]);
 }
 
@@ -164,6 +227,7 @@ static int64_t oracle_m(int32_t x, unsigned shift, pc14_mode_t mode) {
     return x < 0 ? -((-(int64_t)x + scale - 1) / scale) : (int64_t)x / scale;
 }
 
+#ifndef CONFIG_YORADIO_QEMU_AAC_PC16_HISTORY_TEST
 static void check_pair(int32_t r, int32_t i, pc14_mode_t mode) {
     unsigned shift = 3;
     for (; shift < 18; ++shift) {
@@ -225,3 +289,46 @@ void packed_history_arithmetic_tests(void) {
     assert(pc14_pack(8, -8, PC14_NEAREST, NULL) == 0x0fffc001u);
     ESP_LOGI(TAG, "PCX14_ARITHMETIC_PASS mantissas=16384 exponents=16 modes=2 edges random-pairs=16384");
 }
+#else
+void packed_history_arithmetic_tests(void) {
+    for (unsigned e = 0; e < 16; ++e) {
+        for (int32_t m = INT16_MIN; m <= INT16_MAX; ++m) {
+            int32_t r, i;
+            uint32_t bits = (uint32_t)m & 0xffffu;
+            pc16_unpack(bits | (bits << 16), e, &r, &i);
+            assert(r == (int64_t)m * ((int64_t)1 << (e + 1)) && r == i);
+        }
+        vTaskDelay(1);
+    }
+    uint32_t rng = 0x16160401u;
+    for (unsigned block = 0; block < 4096; ++block) {
+        int32_t real[8], imag[8], rr[8], ii[8]; uint32_t words[8];
+        for (unsigned n = 0; n < 8; ++n) {
+            rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5; memcpy(real + n, &rng, 4);
+            rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5; memcpy(imag + n, &rng, 4);
+            if (!block) { real[n] = INT32_MIN; imag[n] = INT32_MAX; }
+        }
+        unsigned clipped;
+        uint32_t exponents = pc16_pack8(real, imag, words, &clipped);
+        pc16_unpack8(words, exponents, rr, ii);
+        unsigned expected_clips = 0;
+        for (unsigned n = 0; n < 8; ++n) {
+            unsigned shift = 1;
+            int64_t r, i;
+            for (;;) {
+                r = oracle_m(real[n], shift, PC14_NEAREST); i = oracle_m(imag[n], shift, PC14_NEAREST);
+                if (shift == 16 || (r >= INT16_MIN && r <= INT16_MAX && i >= INT16_MIN && i <= INT16_MAX)) break;
+                ++shift;
+            }
+            expected_clips += (r > INT16_MAX) + (i > INT16_MAX);
+            if (r > INT16_MAX) r = INT16_MAX;
+            if (i > INT16_MAX) i = INT16_MAX;
+            assert(((exponents >> (n * 4)) & 15u) + 1 == shift);
+            assert(rr[n] == r * ((int64_t)1 << shift) && ii[n] == i * ((int64_t)1 << shift));
+        }
+        assert(clipped == expected_clips);
+        if (!(block % 128)) vTaskDelay(1);
+    }
+    ESP_LOGI(TAG, "PCX16_ARITHMETIC_PASS mantissas=65536 exponents=16 block8=4096 shift=1..16");
+}
+#endif

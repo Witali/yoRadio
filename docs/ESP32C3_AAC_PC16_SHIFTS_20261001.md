@@ -108,5 +108,6 @@ records:
 All passed with no UBSan error. This selects and checks the storage arithmetic;
 it does **not** yet qualify final PCM precision, decoding speed or reduced codec
 allocations. The old BFP16 experiment quantized analysis output at a different
-boundary. The new format still needs paired history-only decoder measurements
-against the temporary **±5 PCM LSB** and final **±2 PCM LSB** limits.
+boundary. The subsequent [201 history-only decoder comparisons](ESP32C3_AAC_PC16_QUALITY_20261001.md)
+pass the temporary **±5 PCM LSB** limit but still fail the final **±2 PCM LSB**
+limit with a maximum of 3 LSB. Block/scalar error statistics match.

@@ -113,7 +113,16 @@ config YORADIO_QEMU_AAC_PACKED_HISTORY_ERROR_LIMIT
     default 5
     help
         Temporary development tolerance, updated by the user to five LSB.
-        The final production requirement remains two LSB per sample/channel.
+          The final production requirement remains two LSB per sample/channel.
+
+config YORADIO_QEMU_AAC_PC16_HISTORY_TEST
+    bool "Use PC16 history with eight packed exponent nibbles in QEMU"
+    depends on YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    default n
+    help
+        Test 16+16 mantissas, shift=exponent+1, with block-of-eight versus
+        scalar storage paths. Retains the pinned history scope and exact
+        controls. Numerical test only: does not shrink production allocations.
 
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
