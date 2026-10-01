@@ -176,6 +176,11 @@ accuracy experiment; this result does not establish a safe reduced width.
 
 ## Reproduce
 
+The subsequent [16+16 exponent-range decision and block API](ESP32C3_AAC_PC16_SHIFTS_20261001.md)
+selects shifts 1..16 and packs eight independent exponent nibbles per word. Its
+arithmetic checks do not change the 14-bit measurements in this report or qualify
+the new format's PCM accuracy.
+
 From this worktree, with the already-installed ESP-IDF dependencies (PowerShell):
 
 ```powershell

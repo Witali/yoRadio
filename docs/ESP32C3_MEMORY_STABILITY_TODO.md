@@ -55,6 +55,12 @@ speed while preserving full format support and the two-LSB output limit.
 - [ ] Add the requested compact-storage build option, enabled by default for
   development, once an actual memory-saving implementation passes the ±5 gate.
   The QEMU pack/restore switch currently saves no heap and is not that option.
+- [x] Select `shift=exponent+1` (1..16) for 16+16 mantissas with eight independent
+  four-bit exponents per word. Add block pack/unpack and verify arithmetic,
+  rounding, saturation, nibble isolation and tails under UBSan. See the
+  [PC16 range decision](ESP32C3_AAC_PC16_SHIFTS_20261001.md).
+- [ ] Measure this PC16 representation on retained SBR/PS histories, then qualify
+  PCM error, actual allocation reduction and C3 CPU cost before enabling storage.
 - [ ] Verify actual PS activation when labelling streams: the Groove Salad
   16 kbps capture is mono without PS in FAAD2, while the current C3 backend
   duplicates it to stereo. FFprobe's HE-AAC v2 label alone does not prove PS.

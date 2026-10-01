@@ -55,6 +55,12 @@ raw evidence, source hashes and rejection of overflow-bypassed large-scale trial
 This is a reference backend comparison; it does not qualify a firmware backend
 replacement, C3 memory savings or physical decoding speed.
 
+The [PC16 shift and block-storage test](ESP32C3_AAC_PC16_SHIFTS_20261001.md)
+executes the `shift=exponent+1` implementation, exhaustive component codes,
+independent rounding/boundary checks and eight-sample block equivalence under
+UBSan: `python tests/test-aac-pc16-shifts.py`. Arithmetic/storage pass; decoder
+PCM, reduced live allocations and RV32 speed are not yet qualified for PC16.
+
 | ID | Previously missing coverage | Test created | Acceptance |
 | --- | --- | --- | --- |
 | C3-T01 | Repeatable production RAM-policy regression | `tests/test-esp32c3-acceptance.py`, `ProductionConfigTests` | Execute the actual PowerShell production wrapper against saved configs: both Wi-Fi IRAM options become disabled, other values survive, second run is idempotent; relative and absolute paths work. |
