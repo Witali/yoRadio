@@ -362,6 +362,32 @@ python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --sui
 The negative test also requires the local TLS listener to record a certificate
 rejection alert. An unreachable server alone cannot make this test pass.
 
+For public radio HTTPS plus concurrent WebUI requests, use the separate runner:
+
+```powershell
+python tests/test-esp32c3-public-streams.py
+python tools/esp32c3_tests/public_streams.py --board http://BOARD_IP --serial-port COM9 --firmware firmware/development/esp32c3-tcp-pcb-pool-fixed/app.bin --seconds 60 --interval 0.1 --output .build/c3-tests/public-https
+```
+
+Install FFprobe on the PC and use an awake profiling image already on the board.
+The firmware path verifies image identity; this command does not flash it. The
+default manifest uses official public SomaFM AAC and MP3 HTTPS links. Before each
+case, FFprobe validates TLS and identifies the live codec/profile/rate/channels.
+The board must match the full decoded PCM layout, retain playback, answer REST
+requests within two seconds and publish matching WebSocket state. Existing CPU
+and heap budgets apply; serial panics, decoder/allocation errors, unexpected
+reboots and persistent idle heap loss fail the test. At exit it reboots to the
+saved station and compares Wi-Fi, playlist and settings in memory.
+
+Use `--case NAME` to select entries, `--interval 1` for a lighter polling run,
+or `--manifest PATH` with `sources` and `streams` fields as in
+[`public_streams.json`](../tools/esp32c3_tests/public_streams.json). Only put public,
+credential-free HTTPS URLs in that manifest: they are retained in the report.
+No broadcast audio, titles or private board settings are saved. Streams and
+their encoding may change; this short live-radio test does not replace the
+controlled HTTPS fixture matrix, PCM comparisons, physical listening or one-hour
+soaks. A server/probe failure remains a failed case, not a board playback pass.
+
 ### CPU, memory, switching and soak
 
 These require the no-sleep diagnostic image with USB logs and FreeRTOS runtime
