@@ -97,5 +97,15 @@ buffers pass the initial finite/continuous tests but remain experimental.
 [Early 12 KiB scratch placement](ESP32C3_AAC_SCRATCH_PLACEMENT_20261001.md)
 is bit-exact in QEMU and passes ownership tests, but its physical switching
 test still fails the 55128-byte owner with a 53248-byte largest block. Keep it
-off alone. Next integrate the lossless 51596-byte PS-relocated owner into a
-per-decoder context and qualify the combination on hardware.
+off alone. The lossless 51596-byte PS-relocated owner is now integrated into a
+per-decoder context. Its physical switching trial still fails all six HE/v2
+starts: the largest block is 43008 B in that image. Allocation geometry changed,
+so the earlier 53248-byte observation did not guarantee combined success.
+
+At the user's request, [16+16 with grouped exponents](ESP32C3_AAC_PC16_WRITES_20261001.md)
+is also implemented as a separate, optional PS-write experiment. It passes
+81 paired development checks (maximum 3 LSB), shrinks delay payload by 2156 B,
+but frees no additional heap in the fixed owner and increases guest work.
+Do not enable it by default or count it as the full-radio memory fix. Next
+measure a small cache of reconstructed values against this exact baseline,
+then pursue a layout that can actually release the unused owner bytes.

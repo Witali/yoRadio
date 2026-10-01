@@ -70,3 +70,8 @@ experiment is not hardware qualification of their combination.
 [Physical switching/OTA records](../tests/results/esp32c3-aac-scratch-20261001/hardware/).
 The rejected image was replaced after the test. Wi-Fi, playlist and settings
 matched before/after OTA; no credential contents are included in evidence.
+
+Follow-up: the per-decoder PS-relocated owner combination was tested and also
+failed all six HE/v2 switches, with a 43008-byte largest block in the new image.
+See the [PC16/owner report](ESP32C3_AAC_PC16_WRITES_20261001.md). The earlier
+53248-byte measurement was a layout hypothesis, not a guaranteed capacity.

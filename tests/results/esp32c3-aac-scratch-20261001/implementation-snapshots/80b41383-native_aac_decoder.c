@@ -36,17 +36,6 @@ struct native_aac_decoder {
 #endif
 };
 
-static void close_codec(native_aac_decoder_t *decoder) {
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-    aac_scratch_reserve_enter(&decoder->scratch);
-#endif
-    esp_audio_simple_dec_close(decoder->codec);
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-    aac_scratch_reserve_leave();
-#endif
-    decoder->codec=NULL;
-}
-
 native_aac_decoder_t *native_aac_decoder_create(void) {
     codec_memory_trace_dump("aac-before-adts");
     AAC_MEMORY("aac-before-adts");
@@ -66,7 +55,7 @@ native_aac_decoder_t *native_aac_decoder_create(void) {
 
 void native_aac_decoder_destroy(native_aac_decoder_t *decoder) {
     if (!decoder) return;
-    if (decoder->codec) close_codec(decoder);
+    if (decoder->codec) esp_audio_simple_dec_close(decoder->codec);
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
     aac_sbr_reserve_discard(&decoder->reserve);
 #endif
@@ -124,7 +113,7 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                     ((p[2] & 0xfd) << 2) | (p[3] >> 6);
                 if (!decoder->codec || signature != decoder->signature) {
                     if (decoder->codec) {
-                        close_codec(decoder);
+                        esp_audio_simple_dec_close(decoder->codec);
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
                         aac_sbr_reserve_discard(&decoder->reserve);
                         aac_sbr_reserve_prepare(&decoder->reserve);

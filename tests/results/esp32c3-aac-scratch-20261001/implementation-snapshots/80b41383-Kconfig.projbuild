@@ -142,14 +142,6 @@ config YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
         Pinned private-ABI experiment with paired PCM and guarded allocations.
         Never enable this test owner registry in production firmware.
 
-config YORADIO_QEMU_AAC_PC16_WRITE_TEST
-    bool "Compare packed 16+16 PS writes with grouped exponent words"
-    depends on YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
-    default n
-    help
-        QEMU paired native/PC16 PS delay writes. Tests the same source allocator
-        and decorrelator as the experimental physical PC16 option.
-
 config YORADIO_COMPACT_SERVICE_STACKS
     bool "Use measured smaller BOOT, output and WebSocket task stacks"
     default n
@@ -192,26 +184,6 @@ config YORADIO_AAC_EARLY_SCRATCH_RESERVE
         Pinned-ABI placement experiment. Reserve the unchanged 12288-byte AAC
         workspace before larger allocations. Uses TLS slot 1 during SDK calls;
         no DSP or format changes. Require physical switching/heap acceptance.
-
-config YORADIO_AAC_RELOCATE_PS
-    bool "Relocate AAC PS control to unused right-channel workspace"
-    depends on YORADIO_AAC_EARLY_SCRATCH_RESERVE
-    default n
-    help
-        Pinned lossless SBR layout: owner 55128 -> 51596 bytes. Keep each
-        decoder's ownership in its TLS-scoped adapter context. Normal close/
-        reopen is supported; do not call the vendor's broken direct reset.
-        Experimental until full-radio playback/OTA/stack gates are met.
-
-config YORADIO_AAC_PS_PC16
-    bool "Store PS complex delays as 16+16 with grouped exponent nibbles"
-    depends on YORADIO_AAC_RELOCATE_PS
-    default n
-    help
-        Development compression: eight complex mantissa words plus one word
-        holding their independent four-bit exponents. Full SBR/PS arithmetic
-        remains int32. Require PCM <=5 LSB during development, <=2 finally,
-        plus speed and full-radio lifecycle qualification.
 
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"

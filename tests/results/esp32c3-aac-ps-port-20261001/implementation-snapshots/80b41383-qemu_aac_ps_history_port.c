@@ -105,14 +105,6 @@ Copyright (c) ISO/IEC 2003.
 // Pinned archive SHA256: 311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909.
 #include "qemu_aac_packed_history.h"
 #include "packed_complex14.h"
-#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
-#include "packed_complex16_fast.h"
-#define PS_TEST_NAME "PC16WRITE"
-void aac_ps_pc16_allocate(void *,uint32_t,bool);
-void aac_ps_pc16_decode(void *,void *,int32_t *,int32_t *,int32_t *,int32_t *,int32_t *);
-#else
-#define PS_TEST_NAME "PSPORT"
-#endif
 #include "esp_log.h"
 #include <assert.h>
 #include <inttypes.h>
@@ -149,23 +141,12 @@ void __real_ps_allocate_decoder(void *, uint32_t);
 
 static unsigned selected, repetition;
 static struct {
-    uint32_t calls, stores, changed, maximum_shift, allocations, pairs, guards, saturations;
+    uint32_t calls, stores, changed, maximum_shift, allocations, pairs, guards;
 } stats;
 static ps_prefix_t *owners[2];
 static unsigned owner_count;
 #define GUARD UINT32_C(0xd3adbeef)
 static const char *TAG = "ps_port";
-
-#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
-void aac_ps_pc16_test_store(uint32_t word,unsigned exponent,int32_t re,int32_t im,unsigned clipped) {
-    ++stats.stores;stats.saturations+=clipped;
-    if(repetition==1) {
-        int32_t a,b;pc16_unpack(word,exponent,&a,&b);
-        stats.changed+=(a!=re)+(b!=im);
-        if(exponent+1>stats.maximum_shift)stats.maximum_shift=exponent+1;
-    }
-}
-#endif
 
 static int32_t bits(uint32_t x) { int32_t s; memcpy(&s, &x, 4); return s; }
 static int32_t add(int32_t a, int32_t b) { return bits((uint32_t)a + (uint32_t)b); }
@@ -202,7 +183,6 @@ static void save(int32_t *r, int32_t *i, int32_t re, int32_t im) {
 
 // Only the four delay families are compacted. Hybrid analysis, energy, mixing,
 // phase coefficients, SBR QMF and native arithmetic remain unchanged.
-#ifndef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
 static void visit_span(uint8_t *owner, int32_t *r, int32_t *i, unsigned n, bool initialize) {
     uintptr_t low = (uintptr_t)owner + 0x7678, high = (uintptr_t)owner + 0x93b4;
     assert((uintptr_t)r >= low && (uintptr_t)r + 4*n <= high && !((uintptr_t)r & 3));
@@ -217,31 +197,10 @@ static void visit_span(uint8_t *owner, int32_t *r, int32_t *i, unsigned n, bool 
     }
     if (initialize) stats.pairs += n;
 }
-#endif
 
 static void visit_delays(ps_prefix_t *ps, bool initialize) {
     uint8_t *owner = (uint8_t *)ps - 0xc988;
     void *declared; memcpy(&declared, owner + 0xc984, 4); assert(declared == ps);
-#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
-    bool seen[617]={0};unsigned pairs=0;
-#define CHECK_SPAN(r,i,n) do { \
-    assert((r)==(i)); \
-    size_t begin=((uint8_t*)(r)-(owner+0x7b24))/4; \
-    assert(begin+(n)<=617); \
-    for(unsigned k=0;k<(n);++k){assert(!seen[begin+k]);seen[begin+k]=true;++pairs;} \
-} while(0)
-    for(unsigned b=0;b<61;++b){unsigned n=b<20?2:b<32?14:1;CHECK_SPAN(ps->delay_real[b],ps->delay_imag[b],n);}
-    for(unsigned b=0;b<10;++b)CHECK_SPAN(ps->sub_delay_real[b],ps->sub_delay_imag[b],2);
-    for(unsigned link=0;link<3;++link)for(unsigned row=0;row<link+3;++row){
-        CHECK_SPAN(ps->serial_real[link][row],ps->serial_imag[link][row],20);
-        CHECK_SPAN(ps->sub_serial_real[link][row],ps->sub_serial_imag[link][row],10);
-    }
-#undef CHECK_SPAN
-    assert(pairs==617);
-    uint32_t *guard=(uint32_t*)(owner+0x8600);
-    for(unsigned n=0;n<4;++n){if(initialize)guard[n]=GUARD;else assert(guard[n]==GUARD);}
-    if(initialize)stats.pairs+=pairs;else stats.guards+=pairs;
-#else
     for (unsigned b = 0; b < 61; ++b)
         visit_span(owner, ps->delay_real[b], ps->delay_imag[b], b < 20 ? 2 : b < 32 ? 14 : 1, initialize);
     for (unsigned b = 0; b < 10; ++b)
@@ -253,20 +212,9 @@ static void visit_delays(ps_prefix_t *ps, bool initialize) {
             visit_span(owner, ps->sub_serial_real[link][row], ps->sub_serial_imag[link][row], 10, initialize);
         }
     }
-#endif
 }
 
 void __wrap_ps_allocate_decoder(void *owner, uint32_t samples) {
-#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
-    if(selected!=1){__real_ps_allocate_decoder(owner,samples);return;}
-    ps_prefix_t *ps;memcpy(&ps,(uint8_t*)owner+0xc984,4);
-    bool initialize=true;
-    for(unsigned n=0;n<owner_count;++n)if(owners[n]==ps)initialize=false;
-    aac_ps_pc16_allocate(owner,samples,initialize);
-    if(!initialize){visit_delays(ps,false);return;}
-    assert(owner_count<2);owners[owner_count++]=ps;
-    visit_delays(ps,true);++stats.allocations;
-#else
     __real_ps_allocate_decoder(owner, samples);
     if (selected != 1) return;
     ps_prefix_t *ps; memcpy(&ps, (uint8_t *)owner + 0xc984, 4);
@@ -277,7 +225,6 @@ void __wrap_ps_allocate_decoder(void *owner, uint32_t samples) {
     }
     assert(owner_count < 2); owners[owner_count++] = ps;
     visit_delays(ps, true); ++stats.allocations;
-#endif
 }
 
 static void allpass(ps_prefix_t *ps, unsigned band, bool hybrid, int32_t *r, int32_t *i) {
@@ -317,9 +264,6 @@ void __wrap_ps_decorrelate(void *state, int32_t *lr, int32_t *li, int32_t *rr, i
     assert(ps->delay_index >= 0 && ps->delay_index < 2);
     int32_t usb; memcpy(&usb, (uint8_t *)state + 0x14, 4); assert(usb >= 0 && usb <= 64);
     ++stats.calls;
-#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
-    if(selected==1){aac_ps_pc16_decode((uint8_t*)ps-0xc988,state,lr,li,rr,ri,scratch);return;}
-#endif
     ps_pwr_transient_detection(state, lr, li, scratch);
     for (unsigned gr = 0; gr < 10; ++gr) {
         unsigned band = (unsigned)groupBorders[gr]; assert(band < 10);
@@ -371,14 +315,10 @@ void packed_history_report(const char *name, unsigned variant, unsigned run, uin
     for (unsigned n = 0; n < owner_count; ++n) visit_delays(owners[n], false);
     assert(stats.pairs == stats.allocations * 617u && stats.guards >= stats.pairs);
     *rows = stats.calls; *changed = stats.changed; *shift = stats.maximum_shift;
-    ESP_LOGI(TAG, PS_TEST_NAME "_STORAGE case=%s variant=%u run=%u calls=%" PRIu32 " stores=%" PRIu32
-             " allocations=%" PRIu32 " pairs=%" PRIu32 " guards=%" PRIu32 " saturations=%" PRIu32
-#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
-             " native_payload=4936 packed_payload=2780 heap_saved=0",
-#else
+    ESP_LOGI(TAG, "PSPORT_STORAGE case=%s variant=%u run=%u calls=%" PRIu32 " stores=%" PRIu32
+             " allocations=%" PRIu32 " pairs=%" PRIu32 " guards=%" PRIu32
              " native_payload=4936 packed_payload=2468 heap_saved=0",
-#endif
-             name, variant, run, stats.calls, stats.stores, stats.allocations, stats.pairs, stats.guards, stats.saturations);
+             name, variant, run, stats.calls, stats.stores, stats.allocations, stats.pairs, stats.guards);
 }
 void packed_history_arithmetic_tests(void) {
     assert(mulhi(INT32_MIN, INT32_MIN) == 0x40000000);
@@ -387,16 +327,11 @@ void packed_history_arithmetic_tests(void) {
     for (unsigned n = 0; n < 100000; ++n) {
         rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5; int32_t re = bits(rng);
         rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5; int32_t im = bits(rng);
-#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST
-        unsigned ea,eb,ca,cb;
-        assert(pc16_pack_fast(re,im,&ea,&ca)==pc16_pack(re,im,&eb,&cb));
-        assert(ea==eb && ca==cb);
-#endif
         unsigned clipped; uint32_t word = pc14_pack(re, im, PC14_MIDPOINT, &clipped);
         assert(!clipped);
         unsigned s = (word >> 28) + 3;
         uint32_t expected = ((uint32_t)(re >> s) & 0x3fff) | (((uint32_t)(im >> s) & 0x3fff) << 14) | ((s-3) << 28);
         assert(word == expected);
     }
-    ESP_LOGI(TAG, PS_TEST_NAME "_ARITHMETIC_PASS pairs=100000 storage control");
+    ESP_LOGI(TAG, "PSPORT_ARITHMETIC_PASS pairs=100000 midpoint storage");
 }
