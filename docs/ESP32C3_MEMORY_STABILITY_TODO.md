@@ -48,6 +48,10 @@ automatic reboot does not qualify OTA. Bounded pool history and a serial-health
 gate are available. The static WebUI workers have only 448/564 bytes of observed
 unused stack during OTA negative tests; keep their current stack sizes.
 
+The [half-close correction](ESP32C3_LWIP_HALF_CLOSE_20261001.md) reproduces the
+ownership error in real lwIP with both allocators and passes six fixed host
+scenarios for each. Physical OTA/mixed-codec qualification remains required.
+
 ## AAC memory reuse during decoding — planned, 2026-09-30
 
 The [AAC decompilation audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md)

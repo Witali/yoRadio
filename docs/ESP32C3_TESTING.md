@@ -42,6 +42,11 @@ Its 3584-byte capacity gain still leaves two first-cycle HE/v2 switching failure
 failures, exact configuration and source/image fingerprints; it does not turn
 this experimental image into a production-qualified build.
 
+The [TCP half-close investigation](ESP32C3_LWIP_HALF_CLOSE_20261001.md) reproduces
+the pool ownership defect with real lwIP sockets and with the ordinary heap
+allocator. `tests/run-lwip-half-close.py` checks six packet-driven scenarios
+under ASan/UBSan. Its host results do not substitute for board OTA qualification.
+
 For new hardware investigations, `diagnostic.py` wraps the existing `run`,
 `memory`, `ota_transition` or `pool_settle` runner and keeps filtered panic
 MEPC/RA/MCAUSE evidence alongside CPU/heap logs. For example:
