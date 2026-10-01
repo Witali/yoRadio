@@ -105,6 +105,16 @@ off/on, exhaustion/reuse, forwarding, alignment and 40000 concurrent lifetimes
 per variant under ASan/UBSan. Physical qualification must include early mixed-codec
 switches, WebUI traffic/OTA, TLS and the deep-sleep RTC footprint before promotion.
 
+The [physical pool trial](ESP32C3_TCP_PCB_POOL_20261001.md) passes all 21 mixed-codec
+switches but is rejected after two ownership assertions during OTA. Its 15 HTTP
+checks alone passed because the application automatically rebooted into the same
+image. For new OTA campaigns use `tools/esp32c3_tests/ota_diagnostic.py`, which
+returns failure on panic/capture errors even if HTTP/hash checks pass. Both
+`report.json` and `serial-health.json` must pass. Optional
+`sdkconfig.tcp-pcb-pool-trace.defaults` retains 128 pool lifetime events and
+dumps them on an ownership failure; its 1028-byte DRAM cost and timing effects
+make it a diagnostic build, not a performance result.
+
 The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
 standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
 AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained

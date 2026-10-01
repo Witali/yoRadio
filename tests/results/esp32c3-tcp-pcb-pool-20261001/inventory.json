@@ -1,0 +1,6344 @@
+{
+  "schema": 1,
+  "note": "Linker capacity, not measured runtime free heap. IRAM includes alignment. Missing symbols are not assumed relocated.",
+  "builds": [
+    {
+      "label": "control",
+      "fingerprints": {
+        "yoradio_esp32c3_oled_native.elf": "fb48069ca32f416a82df70cc4776fb4fcfc03c5e125fe3b13a6e79f546858a0c",
+        "yoradio_esp32c3_oled_native.map": "f0a44dd64b2905ae3b565c06adfad88aee0c158e7ac607314b259a76ff3b49e6",
+        "sdkconfig": "ef5a4a0a5f24deead8f5e1d7c3503ada32f7a235b4787a877c4ebf036577a35b"
+      },
+      "boundaries": {
+        "_bss_end": 1070159320,
+        "_bss_start": 1070127952,
+        "_data_end": 1070127948,
+        "_heap_start": 1070159328,
+        "_data_start": 1070115328,
+        "_iram_end": 1077455360,
+        "_iram_start": 1077411840
+      },
+      "iram_reserved": 43520,
+      "dram_data": 12620,
+      "dram_bss": 31368,
+      "iram_sections": [
+        {
+          "name": ".iram0.text",
+          "address": 1077411840,
+          "bytes": 43354
+        },
+        {
+          "name": ".iram0.text_end",
+          "address": 1077455194,
+          "bytes": 166
+        },
+        {
+          "name": ".iram0.data",
+          "address": 1077455360,
+          "bytes": 0
+        },
+        {
+          "name": ".iram0.bss",
+          "address": 1077455360,
+          "bytes": 0
+        },
+        {
+          "name": ".iram0.end",
+          "address": 1077455360,
+          "bytes": 0
+        }
+      ],
+      "iram_archives": [
+        {
+          "archive": "libspi_flash.a",
+          "bytes": 9822,
+          "sections": {
+            ".iram0.text": 9822
+          }
+        },
+        {
+          "archive": "libesp_hw_support.a",
+          "bytes": 6392,
+          "sections": {
+            ".iram0.text": 6392
+          }
+        },
+        {
+          "archive": "libphy.a",
+          "bytes": 4402,
+          "sections": {
+            ".iram0.text": 4402
+          }
+        },
+        {
+          "archive": "libesp_hal_mspi.a",
+          "bytes": 4250,
+          "sections": {
+            ".iram0.text": 4250
+          }
+        },
+        {
+          "archive": "libfreertos.a",
+          "bytes": 3724,
+          "sections": {
+            ".iram0.text": 3724
+          }
+        },
+        {
+          "archive": "libesp_libc.a",
+          "bytes": 3244,
+          "sections": {
+            ".iram0.text": 3244
+          }
+        },
+        {
+          "archive": "libhal.a",
+          "bytes": 2006,
+          "sections": {
+            ".iram0.text": 2006
+          }
+        },
+        {
+          "archive": "libesp_system.a",
+          "bytes": 1476,
+          "sections": {
+            ".iram0.text": 1476
+          }
+        },
+        {
+          "archive": "libesp_timer.a",
+          "bytes": 1312,
+          "sections": {
+            ".iram0.text": 1312
+          }
+        },
+        {
+          "archive": "libesp_hal_wdt.a",
+          "bytes": 1092,
+          "sections": {
+            ".iram0.text": 1092
+          }
+        },
+        {
+          "archive": "libriscv.a",
+          "bytes": 848,
+          "sections": {
+            ".iram0.text": 848
+          }
+        },
+        {
+          "archive": "libpp.a",
+          "bytes": 768,
+          "sections": {
+            ".iram0.text": 768
+          }
+        },
+        {
+          "archive": "libbootloader_support.a",
+          "bytes": 730,
+          "sections": {
+            ".iram0.text": 730
+          }
+        },
+        {
+          "archive": "libesp_driver_dma.a",
+          "bytes": 586,
+          "sections": {
+            ".iram0.text": 586
+          }
+        },
+        {
+          "archive": "liblog.a",
+          "bytes": 546,
+          "sections": {
+            ".iram0.text": 546
+          }
+        },
+        {
+          "archive": "libesp_mm.a",
+          "bytes": 494,
+          "sections": {
+            ".iram0.text": 494
+          }
+        },
+        {
+          "archive": "libesp_hal_dma.a",
+          "bytes": 468,
+          "sections": {
+            ".iram0.text": 468
+          }
+        },
+        {
+          "archive": "libesp_hal_ledc.a",
+          "bytes": 332,
+          "sections": {
+            ".iram0.text": 332
+          }
+        },
+        {
+          "archive": "libesp_driver_gpio.a",
+          "bytes": 240,
+          "sections": {
+            ".iram0.text": 240
+          }
+        },
+        {
+          "archive": "libesp_phy.a",
+          "bytes": 204,
+          "sections": {
+            ".iram0.text": 204
+          }
+        },
+        {
+          "archive": "libesp_wifi.a",
+          "bytes": 156,
+          "sections": {
+            ".iram0.text": 156
+          }
+        },
+        {
+          "archive": "libesp_driver_usb_serial_jtag.a",
+          "bytes": 112,
+          "sections": {
+            ".iram0.text": 112
+          }
+        },
+        {
+          "archive": "libtfpsacrypto.a",
+          "bytes": 82,
+          "sections": {
+            ".iram0.text": 82
+          }
+        },
+        {
+          "archive": "libesp_coex.a",
+          "bytes": 64,
+          "sections": {
+            ".iram0.text": 64
+          }
+        },
+        {
+          "archive": "libefuse.a",
+          "bytes": 4,
+          "sections": {
+            ".iram0.text": 4
+          }
+        }
+      ],
+      "iram_symbols": [
+        {
+          "name": "rtc_clk_cal_internal",
+          "address": 1077435384,
+          "bytes": 878,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_write_encrypted",
+          "address": 1077448258,
+          "bytes": 666,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_set_config",
+          "address": 1077434396,
+          "bytes": 628,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_common_command",
+          "address": 1077427914,
+          "bytes": 586,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_erase_region",
+          "address": 1077446140,
+          "bytes": 564,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bootloader_flash_execute_command_common",
+          "address": 1077417610,
+          "bytes": 512,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_configure_host_io_mode",
+          "address": 1077428802,
+          "bytes": 506,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_init",
+          "address": 1077431274,
+          "bytes": 484,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_configure_host_io_mode",
+          "address": 1077427432,
+          "bytes": 482,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskIncrementTick.part.0",
+          "address": 1077442640,
+          "bytes": 466,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_init_main",
+          "address": 1077446812,
+          "bytes": 460,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_phy_i2c_init1",
+          "address": 1077423322,
+          "bytes": 454,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_common_command",
+          "address": 1077429308,
+          "bytes": 454,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_write",
+          "address": 1077447818,
+          "bytes": 440,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xQueueGenericSendFromISR",
+          "address": 1077440876,
+          "bytes": 374,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_config_host_io_mode",
+          "address": 1077450858,
+          "bytes": 372,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_read",
+          "address": 1077447302,
+          "bytes": 350,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vTaskGenericNotifyGiveFromISR",
+          "address": 1077441884,
+          "bytes": 346,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_map_region",
+          "address": 1077443916,
+          "bytes": 342,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_setup_auto_suspend_mode",
+          "address": 1077430570,
+          "bytes": 342,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_phy_wakeup_init",
+          "address": 1077421822,
+          "bytes": 336,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_config_stage",
+          "address": 1077431758,
+          "bytes": 332,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_device_config",
+          "address": 1077430912,
+          "bytes": 322,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_sleep_pu",
+          "address": 1077435068,
+          "bytes": 316,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__assert_func",
+          "address": 1077436966,
+          "bytes": 312,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_module_reset",
+          "address": 1077432666,
+          "bytes": 308,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vTaskSwitchContext",
+          "address": 1077442292,
+          "bytes": 300,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xQueueGiveFromISR",
+          "address": 1077441250,
+          "bytes": 294,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xQueueReceiveFromISR",
+          "address": 1077441596,
+          "bytes": 288,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "strcmp",
+          "address": 1077438224,
+          "bytes": 278,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "call_start_cpu0",
+          "address": 1077413118,
+          "bytes": 274,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_read",
+          "address": 1077428500,
+          "bytes": 272,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskRemoveFromEventList",
+          "address": 1077443138,
+          "bytes": 260,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_interrupt_handler",
+          "address": 1077412312,
+          "bytes": 258,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cal",
+          "address": 1077436262,
+          "bytes": 256,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "prvNotifyQueueSetContainer",
+          "address": 1077440624,
+          "bytes": 252,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_write_encrypted",
+          "address": 1077452104,
+          "bytes": 252,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_default_rx_isr",
+          "address": 1077425638,
+          "bytes": 242,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gpio_intr_service",
+          "address": 1077417082,
+          "bytes": 240,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_read",
+          "address": 1077453952,
+          "bytes": 236,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_read",
+          "address": 1077451426,
+          "bytes": 236,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "lock_acquire_generic",
+          "address": 1077415438,
+          "bytes": 230,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rx_11b_opt",
+          "address": 1077420196,
+          "bytes": 226,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_erase_sector",
+          "address": 1077454412,
+          "bytes": 224,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_erase_block",
+          "address": 1077454188,
+          "bytes": 224,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_read",
+          "address": 1077429762,
+          "bytes": 224,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_panic_handler",
+          "address": 1077412098,
+          "bytes": 214,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_device_config",
+          "address": 1077427218,
+          "bytes": 214,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memcpy",
+          "address": 1077437342,
+          "bytes": 210,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_get_config",
+          "address": 1077434044,
+          "bytes": 208,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memmove",
+          "address": 1077437554,
+          "bytes": 204,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_erase_block",
+          "address": 1077452432,
+          "bytes": 204,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_erase_sector",
+          "address": 1077452636,
+          "bytes": 204,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_disable",
+          "address": 1077413940,
+          "bytes": 196,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_restart_noos",
+          "address": 1077439324,
+          "bytes": 194,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_fe_i2c_reg_renew",
+          "address": 1077421342,
+          "bytes": 194,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_start_periodic",
+          "address": 1077419370,
+          "bytes": 194,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_program_page",
+          "address": 1077430138,
+          "bytes": 192,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_read_unique_id",
+          "address": 1077451918,
+          "bytes": 186,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_unmap_region",
+          "address": 1077444258,
+          "bytes": 184,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_write",
+          "address": 1077451662,
+          "bytes": 182,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wDev_ProcessFiq",
+          "address": 1077424488,
+          "bytes": 182,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ets_timer_arm",
+          "address": 1077425214,
+          "bytes": 178,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "os_timer_arm",
+          "address": 1077425214,
+          "bytes": 178,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "detect_spi_flash_chip",
+          "address": 1077445958,
+          "bytes": 174,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_brownout_isr_handler",
+          "address": 1077415010,
+          "bytes": 172,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_slow_src_set",
+          "address": 1077433624,
+          "bytes": 172,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_set_io_mode",
+          "address": 1077453482,
+          "bytes": 170,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_time_us_to_slowclk",
+          "address": 1077436518,
+          "bytes": 168,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_clk_tree_enable_src",
+          "address": 1077432398,
+          "bytes": 168,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_read_encrypted",
+          "address": 1077447652,
+          "bytes": 166,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_dump_rx_linked_list",
+          "address": 1077424808,
+          "bytes": 166,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_backtrace_print",
+          "address": 1077418590,
+          "bytes": 166,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_wait_idle",
+          "address": 1077450694,
+          "bytes": 164,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bootloader_flash_reset_chip",
+          "address": 1077418176,
+          "bytes": 164,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_setup_read_suspend",
+          "address": 1077430406,
+          "bytes": 164,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "SysTickIsrHandler",
+          "address": 1077440102,
+          "bytes": 162,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_set_fade_param",
+          "address": 1077426864,
+          "bytes": 160,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_get_caps",
+          "address": 1077451230,
+          "bytes": 160,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "os_timer_arm_us",
+          "address": 1077425056,
+          "bytes": 158,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ets_timer_arm_us",
+          "address": 1077425056,
+          "bytes": 158,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_page_program",
+          "address": 1077454636,
+          "bytes": 158,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_error_check_failed_print",
+          "address": 1077439034,
+          "bytes": 156,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_page_program",
+          "address": 1077452840,
+          "bytes": 156,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_set_alarm_period",
+          "address": 1077444944,
+          "bytes": 154,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_system_reset_modules_on_exit",
+          "address": 1077439518,
+          "bytes": 154,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_read_status_16b_rdsr_rdsr2",
+          "address": 1077453110,
+          "bytes": 152,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_default_tx_isr",
+          "address": 1077425880,
+          "bytes": 152,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_do_mapping",
+          "address": 1077417358,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_wifi_bt_power_domain_on",
+          "address": 1077425414,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_start_once",
+          "address": 1077419220,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_wifi_power_domain_on",
+          "address": 1077425414,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rx_agc_reg_opt",
+          "address": 1077420046,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "pm_get_null_max_tx_time",
+          "address": 1077424288,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "read_id_core",
+          "address": 1077412958,
+          "bytes": 146,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "prvCopyDataToQueue",
+          "address": 1077440478,
+          "bytes": 146,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_module_enable",
+          "address": 1077414492,
+          "bytes": 146,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_read_id_hs",
+          "address": 1077449494,
+          "bytes": 142,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_wifi_tx_dig_gain",
+          "address": 1077422628,
+          "bytes": 140,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_erase_chip",
+          "address": 1077450466,
+          "bytes": 140,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_random",
+          "address": 1077418756,
+          "bytes": 140,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_8m_enable",
+          "address": 1077433470,
+          "bytes": 138,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_record_rx_linked_list",
+          "address": 1077424670,
+          "bytes": 138,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_remove.isra.0",
+          "address": 1077419084,
+          "bytes": 136,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_paddr_to_vaddr",
+          "address": 1077444554,
+          "bytes": 134,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_impl_set_alarm_id",
+          "address": 1077416792,
+          "bytes": 130,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "abort",
+          "address": 1077436838,
+          "bytes": 128,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_enable",
+          "address": 1077413812,
+          "bytes": 128,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_vector_table",
+          "address": 1077411840,
+          "bytes": 128,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_check_and_flush_cache",
+          "address": 1077412810,
+          "bytes": 128,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_timestamp",
+          "address": 1077445562,
+          "bytes": 122,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_release",
+          "address": 1077416478,
+          "bytes": 120,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_lock_release",
+          "address": 1077415680,
+          "bytes": 120,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_to_xtal",
+          "address": 1077415306,
+          "bytes": 118,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_chip_i2c_writeReg",
+          "address": 1077423204,
+          "bytes": 118,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "strncpy",
+          "address": 1077438710,
+          "bytes": 116,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_insert.isra.0",
+          "address": 1077418970,
+          "bytes": 114,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "strncmp",
+          "address": 1077438594,
+          "bytes": 114,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "usb_serial_jtag_sof_tick_hook",
+          "address": 1077416966,
+          "bytes": 112,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_vaddr_to_paddr",
+          "address": 1077444442,
+          "bytes": 112,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_to_pll_mhz",
+          "address": 1077434286,
+          "bytes": 110,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_chip_i2c_readReg",
+          "address": 1077423094,
+          "bytes": 110,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_os_check_yield",
+          "address": 1077455020,
+          "bytes": 108,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_start_with_desc",
+          "address": 1077426500,
+          "bytes": 108,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_get_physical_size",
+          "address": 1077446704,
+          "bytes": 108,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_32k_enable",
+          "address": 1077433316,
+          "bytes": 106,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spiflash_start_core",
+          "address": 1077449062,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "flash_end_flush_cache",
+          "address": 1077448924,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_global_interrupt_handler",
+          "address": 1077445788,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_mhz_to_config",
+          "address": 1077433940,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_module_disable",
+          "address": 1077414638,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_get_xtal",
+          "address": 1077415182,
+          "bytes": 102,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_xtal_freq_get",
+          "address": 1077415182,
+          "bytes": 102,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_noniram_disable",
+          "address": 1077414136,
+          "bytes": 100,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "get_buffer_malloc",
+          "address": 1077454816,
+          "bytes": 98,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_reset",
+          "address": 1077450370,
+          "bytes": 96,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_lock_release_recursive",
+          "address": 1077415800,
+          "bytes": 94,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_release_recursive",
+          "address": 1077416598,
+          "bytes": 94,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_crosscore_isr",
+          "address": 1077418340,
+          "bytes": 92,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortExitCritical",
+          "address": 1077439874,
+          "bytes": 92,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_program_page",
+          "address": 1077449846,
+          "bytes": 92,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_set_alarm_target",
+          "address": 1077444852,
+          "bytes": 92,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "main_flash_region_protected",
+          "address": 1077454920,
+          "bytes": 90,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_level_get_timeout",
+          "address": 1077445688,
+          "bytes": 90,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "strcpy",
+          "address": 1077438502,
+          "bytes": 90,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_prepare",
+          "address": 1077427058,
+          "bytes": 90,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "is_page_mapped_in_cache",
+          "address": 1077412722,
+          "bytes": 88,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_invalidate_addr",
+          "address": 1077443654,
+          "bytes": 88,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_i2c_bbtop_wakeup",
+          "address": 1077423776,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_crosscore_int_send_yield",
+          "address": 1077418432,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_erase_sector",
+          "address": 1077449674,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_i2c_master_reset",
+          "address": 1077422382,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_erase_block",
+          "address": 1077449760,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_tx_paon_set",
+          "address": 1077419944,
+          "bytes": 84,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_stop",
+          "address": 1077419564,
+          "bytes": 84,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_get_alignment",
+          "address": 1077438832,
+          "bytes": 82,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_freeze_caches_disable_interrupts",
+          "address": 1077438930,
+          "bytes": 82,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortYield",
+          "address": 1077439966,
+          "bytes": 80,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_compare_exchange_1",
+          "address": 1077437802,
+          "bytes": 80,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_isr",
+          "address": 1077414812,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_set_io_mode",
+          "address": 1077450234,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_set_write_protect",
+          "address": 1077450606,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_try_acquire_recursive",
+          "address": 1077416400,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_acquire",
+          "address": 1077416166,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_impl_lock",
+          "address": 1077445368,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_close",
+          "address": 1077416010,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_acquire_recursive",
+          "address": 1077416244,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_try_acquire",
+          "address": 1077416322,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_init",
+          "address": 1077443456,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_close_recursive",
+          "address": 1077416088,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_get_write_protect",
+          "address": 1077452356,
+          "bytes": 76,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_mmu_paddr_find_caps",
+          "address": 1077417534,
+          "bytes": 76,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "enable_timer_group0_for_calibration",
+          "address": 1077436740,
+          "bytes": 74,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_init_pointers",
+          "address": 1077449938,
+          "bytes": 74,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_yield",
+          "address": 1077451844,
+          "bytes": 74,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "tick_hook",
+          "address": 1077418518,
+          "bytes": 72,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_probe",
+          "address": 1077450162,
+          "bytes": 72,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_start",
+          "address": 1077426084,
+          "bytes": 72,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wait_freq_set_busy",
+          "address": 1077422260,
+          "bytes": 72,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_module_has_clock_bits",
+          "address": 1077414742,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_check_valid_ext_vaddr_region",
+          "address": 1077444688,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_impl_lock_timeout",
+          "address": 1077445446,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_reset",
+          "address": 1077426430,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_wakeup_init",
+          "address": 1077423862,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log",
+          "address": 1077445298,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_phy_close_rf",
+          "address": 1077422158,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_isr_noniram_disable",
+          "address": 1077414890,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_erase_sector",
+          "address": 1077430012,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_ptr_executable",
+          "address": 1077432566,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_stop",
+          "address": 1077426156,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_noniram_enable",
+          "address": 1077414236,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_fast_src_set",
+          "address": 1077433874,
+          "bytes": 66,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_get_io_mode",
+          "address": 1077453044,
+          "bytes": 66,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bias_dreg_i2c_set",
+          "address": 1077422828,
+          "bytes": 64,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_and_8",
+          "address": 1077438098,
+          "bytes": 64,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_or_8",
+          "address": 1077438162,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vTaskGetSnapshot",
+          "address": 1077442230,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_write_data_slicer",
+          "address": 1077449382,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_read_intr_status",
+          "address": 1077426368,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_get_counter_value",
+          "address": 1077444790,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bias_dreg_i2c_set.part.0",
+          "address": 1077422768,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_read_status_8b_rdsr2",
+          "address": 1077453268,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_resume",
+          "address": 1077443584,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortEnterCritical",
+          "address": 1077439814,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_stop",
+          "address": 1077426608,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memcmp",
+          "address": 1077437280,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_read_status_hs",
+          "address": 1077449236,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_append",
+          "address": 1077426224,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_erase_block",
+          "address": 1077430080,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_set_pbus_reg",
+          "address": 1077419886,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_init_recursive",
+          "address": 1077415952,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_get_cache_line_size",
+          "address": 1077443844,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_read_status_8b_rdsr",
+          "address": 1077453328,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_cache_hal_init_ctx",
+          "address": 1077443398,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_bt_common_module_disable",
+          "address": 1077414434,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_init",
+          "address": 1077415894,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_set_flashboot_en",
+          "address": 1077432290,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_mxic_detect_size",
+          "address": 1077453794,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_set_duty_int_part",
+          "address": 1077426762,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_get_i2c_hostid",
+          "address": 1077422892,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_va",
+          "address": 1077445242,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_detect_size",
+          "address": 1077450312,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_set_write_protect",
+          "address": 1077430330,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_bt_common_module_enable",
+          "address": 1077414380,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bootloader_read_flash_id",
+          "address": 1077418122,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_module_disable",
+          "address": 1077433034,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "check_chip_pointer_default",
+          "address": 1077445906,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "shared_intr_isr",
+          "address": 1077413760,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xQueueIsQueueFullFromISR",
+          "address": 1077441544,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_freeze",
+          "address": 1077443742,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_isr_noniram_enable",
+          "address": 1077414958,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "uxListRemove",
+          "address": 1077439674,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_reset",
+          "address": 1077426032,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_slow_freq_get_hz",
+          "address": 1077433822,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_get_eof_desc_addr",
+          "address": 1077426318,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_module_enable",
+          "address": 1077433088,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "panicHandler",
+          "address": 1077413424,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_ctrl_read_reg_mask",
+          "address": 1077433138,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_write_status_8b_wrsr2",
+          "address": 1077453432,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_unfreeze",
+          "address": 1077443794,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_suspend",
+          "address": 1077443534,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_read_data_slicer",
+          "address": 1077449444,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xt_unhandled_exception",
+          "address": 1077413474,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_sub_2",
+          "address": 1077437928,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_write_status_16b_wrsr",
+          "address": 1077452996,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_ctrl_write_reg_mask",
+          "address": 1077433228,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_32k_disable_external",
+          "address": 1077433422,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_enable",
+          "address": 1077432140,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_select_alarm_mode",
+          "address": 1077445134,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortAssertIfInISR",
+          "address": 1077439750,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_alarm_handler",
+          "address": 1077418924,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_write_status_8b_wrsr",
+          "address": 1077453386,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_set_write_protect",
+          "address": 1077449336,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_add_2",
+          "address": 1077437882,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_impl_unlock",
+          "address": 1077445516,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_set_hpoint",
+          "address": 1077426818,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_os_yield",
+          "address": 1077455128,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_close_rf",
+          "address": 1077423932,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_handle_intr",
+          "address": 1077432218,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_disable_wifi_agc",
+          "address": 1077421256,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_clk_apb_freq",
+          "address": 1077413716,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_aes_complete_isr",
+          "address": 1077419844,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_sub_4",
+          "address": 1077438056,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_enable_wifi_agc",
+          "address": 1077421300,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_vApplicationTickHook",
+          "address": 1077439260,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_get_tsf_time",
+          "address": 1077424994,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_exchange_1",
+          "address": 1077437760,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_mpi_complete_isr",
+          "address": 1077419804,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_erase_chip",
+          "address": 1077449296,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_xpd_tsens",
+          "address": 1077423976,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_exchange_4",
+          "address": 1077437976,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_add_4",
+          "address": 1077438016,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_ctrl_write_reg",
+          "address": 1077433188,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_counter_can_stall_by_cpu",
+          "address": 1077445202,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_flush_cache",
+          "address": 1077449636,
+          "bytes": 38,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_disable_source",
+          "address": 1077414342,
+          "bytes": 38,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_detect_size",
+          "address": 1077450056,
+          "bytes": 38,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_enable_source",
+          "address": 1077414304,
+          "bytes": 38,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_set_tsens_power",
+          "address": 1077416930,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_done",
+          "address": 1077427148,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_system_get_time",
+          "address": 1077416692,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_set_duty_start",
+          "address": 1077426726,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_suspend_cmd_conf",
+          "address": 1077450094,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_suspend_cmd_conf",
+          "address": 1077451390,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_suspend_cmd_conf",
+          "address": 1077453916,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spiflash_end_default",
+          "address": 1077449028,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_set_xtal",
+          "address": 1077434252,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_freq_module_resetn",
+          "address": 1077422226,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_needs_reset_check",
+          "address": 1077449172,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_clear_intr",
+          "address": 1077426284,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_ls_channel_update",
+          "address": 1077426692,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_freq_to_period",
+          "address": 1077436706,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_mxic_probe",
+          "address": 1077453760,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_freq_cal",
+          "address": 1077436706,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_issi_get_io_mode",
+          "address": 1077453728,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_get_io_mode",
+          "address": 1077450130,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_esp_error_check_failed",
+          "address": 1077439222,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cpu_wait_for_intr",
+          "address": 1077432366,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_write_protect_disable",
+          "address": 1077432090,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_esp_error_check_failed_without_abort",
+          "address": 1077439190,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_flash_encryption_enabled",
+          "address": 1077413614,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskIncrementTick",
+          "address": 1077443106,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_rcc_acquire_enter",
+          "address": 1077432974,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_clk_cpu_freq",
+          "address": 1077413686,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_chip_revision",
+          "address": 1077413524,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_blk_version",
+          "address": 1077413554,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_impl_get_time",
+          "address": 1077416762,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_get_time",
+          "address": 1077416762,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_is_quad_mode",
+          "address": 1077447272,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_disable",
+          "address": 1077432188,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_ptr_byte_accessible",
+          "address": 1077432634,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_do_cache_invalidate",
+          "address": 1077417326,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "adc_set_hw_calibration_code",
+          "address": 1077418896,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_phy_dis_hw_set_freq",
+          "address": 1077422332,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskGetSchedulerState",
+          "address": 1077442592,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_feed",
+          "address": 1077432262,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi1_end",
+          "address": 1077412590,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_alarm_isr",
+          "address": 1077416736,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_do_unmapping",
+          "address": 1077417508,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xPortSetInterruptMaskFromISR",
+          "address": 1077440076,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_slow_src_get",
+          "address": 1077433796,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_erase_chip",
+          "address": 1077429986,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_set_io_mode",
+          "address": 1077453652,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_issi_set_io_mode",
+          "address": 1077453704,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_get_minor_chip_version",
+          "address": 1077413662,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_issi_probe",
+          "address": 1077453676,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vListInsertEnd",
+          "address": 1077439726,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "delay_us",
+          "address": 1077454794,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "delay_us",
+          "address": 1077455172,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_dig_clk8m_enable",
+          "address": 1077435024,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ets_timer_disarm",
+          "address": 1077425392,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_phy_en_hw_set_freq",
+          "address": 1077422360,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_init",
+          "address": 1077444758,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_dig_clk8m_disable",
+          "address": 1077435046,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_unfreeze_caches_enable_interrupts",
+          "address": 1077439012,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_check_status",
+          "address": 1077430384,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "panic_abort",
+          "address": 1077439302,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_enable",
+          "address": 1077427024,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_apb_freq_update",
+          "address": 1077415284,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "os_timer_disarm",
+          "address": 1077425392,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "end",
+          "address": 1077412616,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "start",
+          "address": 1077412636,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_connect_alarm_counter",
+          "address": 1077445182,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_int_disable_wrapper",
+          "address": 1077425602,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_wifi_enable_set",
+          "address": 1077421536,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_enable_counter",
+          "address": 1077445114,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_suspend",
+          "address": 1077431254,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_disable_interrupts_caches_and_other_cpu",
+          "address": 1077412672,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_resume",
+          "address": 1077431234,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_th_probe",
+          "address": 1077453854,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_get_caps",
+          "address": 1077450036,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_time_get",
+          "address": 1077436686,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_rcc_acquire_exit",
+          "address": 1077433006,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_enable_interrupts_caches_and_other_cpu",
+          "address": 1077412692,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortYieldFromISR",
+          "address": 1077440046,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_brownout_need_reset",
+          "address": 1077449216,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_get_caps",
+          "address": 1077453896,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_is_enabled",
+          "address": 1077432346,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_boya_probe",
+          "address": 1077450012,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "is_from_isr_wrapper",
+          "address": 1077419648,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "zalloc_internal_wrapper",
+          "address": 1077419730,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "btbb_wifi_bb_cfg2",
+          "address": 1077420028,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_probe",
+          "address": 1077453878,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_write_protect_enable",
+          "address": 1077432122,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi1_start",
+          "address": 1077412572,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "apb_backup_dma_unlock",
+          "address": 1077413392,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "apb_backup_dma_lock",
+          "address": 1077413408,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_get_major_chip_version",
+          "address": 1077413646,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_get_disable_blk_version_major",
+          "address": 1077413598,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_enable_alarm_int",
+          "address": 1077445098,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_8md256_enabled",
+          "address": 1077433608,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_bbpll_remove_consumer",
+          "address": 1077433300,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_int_restore_wrapper",
+          "address": 1077425622,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortClearInterruptMaskFromISR",
+          "address": 1077439798,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_bbpll_add_consumer",
+          "address": 1077433284,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "flash_init_state",
+          "address": 1077413104,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "calloc_internal_wrapper",
+          "address": 1077419748,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "realloc_internal_wrapper",
+          "address": 1077419762,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_get_disable_wafer_version_major",
+          "address": 1077413584,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_check_status",
+          "address": 1077428780,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rv_utils_dbgr_is_attached",
+          "address": 1077445892,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_set_to_default_config",
+          "address": 1077415424,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_ctx_init",
+          "address": 1077443902,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_malloc_internal_wrapper",
+          "address": 1077425584,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_gpio_debug",
+          "address": 1077424438,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_poll_cmd_done",
+          "address": 1077427204,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_zalloc_wrapper",
+          "address": 1077419718,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_ticks_to_us",
+          "address": 1077436814,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_process_beacon_filter",
+          "address": 1077424476,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_us_to_ticks",
+          "address": 1077436826,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_process_tbtt",
+          "address": 1077424452,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_process_tsf_timer",
+          "address": 1077424464,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_disable",
+          "address": 1077427046,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "release_buffer_malloc",
+          "address": 1077455010,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mutex_lock_wrapper",
+          "address": 1077419794,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtos_current_tcb",
+          "address": 1077440264,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_pwr_interrupt_get_event",
+          "address": 1077425036,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskGetTickCountFromISR",
+          "address": 1077442630,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_destroy",
+          "address": 1077427184,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_mac_interrupt_clr_event",
+          "address": 1077424984,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_pwr_interrupt_clr_event",
+          "address": 1077425046,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskGetTickCount",
+          "address": 1077442620,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_guard_set",
+          "address": 1077412938,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_mac_interrupt_get_event",
+          "address": 1077424974,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_util_set_cache_enabled_cb",
+          "address": 1077445778,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_set_tick_rate_ops",
+          "address": 1077444780,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_read_reg",
+          "address": 1077450684,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_set_erasing_flag",
+          "address": 1077449206,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_check",
+          "address": 1077427194,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xPortInIsrContext",
+          "address": 1077440066,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_ant_need_update",
+          "address": 1077425564,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_is_cache_enabled",
+          "address": 1077443644,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mutex_unlock_wrapper",
+          "address": 1077419786,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_impl_get_min_period_us",
+          "address": 1077416728,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_freq_mem_backup",
+          "address": 1077424016,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_realloc",
+          "address": 1077419702,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_poll_cmd_done",
+          "address": 1077428794,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_suspend_ext_mem_cache",
+          "address": 1077438914,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_dig_reg_backup",
+          "address": 1077424280,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_resume_ext_mem_cache",
+          "address": 1077438922,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_calloc",
+          "address": 1077419710,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_malloc",
+          "address": 1077419694,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_cache_enabled",
+          "address": 1077412714,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_chip_driver_initialized",
+          "address": 1077446132,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "main_flash_op_status",
+          "address": 1077454914,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spiflash_start_default",
+          "address": 1077449166,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "queue_send_from_isr_wrapper",
+          "address": 1077419780,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_lock_acquire",
+          "address": 1077415668,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_system_abort",
+          "address": 1077439254,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_lock_acquire_recursive",
+          "address": 1077415674,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_read_unique_id_none",
+          "address": 1077453262,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_restore_cache.constprop.0",
+          "address": 1077412656,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_disable_cache.constprop.0",
+          "address": 1077412664,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_stop_cache",
+          "address": 1077417322,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_start_cache",
+          "address": 1077417354,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "coex_status_get_wrapper",
+          "address": 1077419676,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "coex_wifi_release_wrapper",
+          "address": 1077419680,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "coex_event_duration_get_wrapper",
+          "address": 1077419684,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "coex_schm_interval_set_wrapper",
+          "address": 1077419688,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_arm_wrapper",
+          "address": 1077419776,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_timer_arm_us_wrapper",
+          "address": 1077425580,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_task_yield_from_isr_wrapper",
+          "address": 1077425574,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_read_intr_status",
+          "address": 1077426676,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_probe",
+          "address": 1077450366,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_exit_critical",
+          "address": 1077433280,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_enter_critical",
+          "address": 1077433276,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_i2c_exit_critical",
+          "address": 1077416926,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_rcc_exit",
+          "address": 1077433030,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_start_with_desc",
+          "address": 1077426684,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_i2c_enter_critical",
+          "address": 1077416922,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_stop",
+          "address": 1077426688,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_restore_cache",
+          "address": 1077412660,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_get_eof_desc_addr",
+          "address": 1077426672,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_env_is_chip_wrapper",
+          "address": 1077425598,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_boya_get_caps",
+          "address": 1077450032,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_mspi_32bit_address_flash_feature_check",
+          "address": 1077412954,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_supports_direct_write",
+          "address": 1077428772,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_supports_direct_read",
+          "address": 1077428776,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_issi_get_caps",
+          "address": 1077453700,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_th_get_caps",
+          "address": 1077453874,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_efuse_is_flash_encryption_enabled",
+          "address": 1077417078,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_writev",
+          "address": 1077445684,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_mxic_get_caps",
+          "address": 1077453850,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_clear_intr",
+          "address": 1077426668,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_reset",
+          "address": 1077426680,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_init_chip_state",
+          "address": 1077412950,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_disable_cache",
+          "address": 1077412668,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_rcc_enter",
+          "address": 1077433026,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_disable.constprop.0",
+          "address": 1077412570,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_enable.constprop.0",
+          "address": 1077412588,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "task_ms_to_tick_wrapper",
+          "address": 1077419666,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_apb80m_request_wrapper",
+          "address": 1077419668,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_apb80m_release_wrapper",
+          "address": 1077419670,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_rtc_enable_iso_wrapper",
+          "address": 1077419672,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_rtc_disable_iso_wrapper",
+          "address": 1077419674,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_empty_wrapper",
+          "address": 1077419692,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_strncpy_impl",
+          "address": 1077438826,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_mspi_pin_init",
+          "address": 1077412948,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_timer_disarm_wrapper",
+          "address": 1077425578,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_sync_ops_exit_critical_section",
+          "address": 1077438830,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_memcpy_impl",
+          "address": 1077437552,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_memmove_impl",
+          "address": 1077437758,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_strcpy_impl",
+          "address": 1077438592,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_enable_cache",
+          "address": 1077412712,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_memcmp_impl",
+          "address": 1077437340,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mspi_timing_flash_tuning",
+          "address": 1077432664,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_strncmp_impl",
+          "address": 1077438708,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_assert_impl",
+          "address": 1077437278,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__ubsan_include",
+          "address": 1077439672,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_sync_ops_enter_critical_section",
+          "address": 1077438828,
+          "bytes": 2,
+          "section": ".iram0.text"
+        }
+      ],
+      "iram_released_vs_baseline": 0,
+      "heap_start_released_vs_baseline": 0,
+      "functions_moved_to_flash": []
+    },
+    {
+      "label": "tcp-pool",
+      "fingerprints": {
+        "yoradio_esp32c3_oled_native.elf": "c54563bee69ec0c2435c8c81d6dd30c98c5d77692227806563c8a7ae837053f6",
+        "yoradio_esp32c3_oled_native.map": "ea643f35d640b6e7278cfa47855b1de0a0a76c0b2f120b3d1c824e0b7c1b58c2",
+        "sdkconfig": "3e72a0bea20b8eee5b70a7632cf18d9feff507df8e8b3558fc199726547e6d88"
+      },
+      "boundaries": {
+        "_bss_end": 1070159336,
+        "_bss_start": 1070127952,
+        "_data_end": 1070127948,
+        "_heap_start": 1070159344,
+        "_data_start": 1070115328,
+        "_iram_end": 1077455360,
+        "_iram_start": 1077411840
+      },
+      "iram_reserved": 43520,
+      "dram_data": 12620,
+      "dram_bss": 31384,
+      "iram_sections": [
+        {
+          "name": ".iram0.text",
+          "address": 1077411840,
+          "bytes": 43354
+        },
+        {
+          "name": ".iram0.text_end",
+          "address": 1077455194,
+          "bytes": 166
+        },
+        {
+          "name": ".iram0.data",
+          "address": 1077455360,
+          "bytes": 0
+        },
+        {
+          "name": ".iram0.bss",
+          "address": 1077455360,
+          "bytes": 0
+        },
+        {
+          "name": ".iram0.end",
+          "address": 1077455360,
+          "bytes": 0
+        }
+      ],
+      "iram_archives": [
+        {
+          "archive": "libspi_flash.a",
+          "bytes": 9822,
+          "sections": {
+            ".iram0.text": 9822
+          }
+        },
+        {
+          "archive": "libesp_hw_support.a",
+          "bytes": 6392,
+          "sections": {
+            ".iram0.text": 6392
+          }
+        },
+        {
+          "archive": "libphy.a",
+          "bytes": 4402,
+          "sections": {
+            ".iram0.text": 4402
+          }
+        },
+        {
+          "archive": "libesp_hal_mspi.a",
+          "bytes": 4250,
+          "sections": {
+            ".iram0.text": 4250
+          }
+        },
+        {
+          "archive": "libfreertos.a",
+          "bytes": 3724,
+          "sections": {
+            ".iram0.text": 3724
+          }
+        },
+        {
+          "archive": "libesp_libc.a",
+          "bytes": 3244,
+          "sections": {
+            ".iram0.text": 3244
+          }
+        },
+        {
+          "archive": "libhal.a",
+          "bytes": 2006,
+          "sections": {
+            ".iram0.text": 2006
+          }
+        },
+        {
+          "archive": "libesp_system.a",
+          "bytes": 1476,
+          "sections": {
+            ".iram0.text": 1476
+          }
+        },
+        {
+          "archive": "libesp_timer.a",
+          "bytes": 1312,
+          "sections": {
+            ".iram0.text": 1312
+          }
+        },
+        {
+          "archive": "libesp_hal_wdt.a",
+          "bytes": 1092,
+          "sections": {
+            ".iram0.text": 1092
+          }
+        },
+        {
+          "archive": "libriscv.a",
+          "bytes": 848,
+          "sections": {
+            ".iram0.text": 848
+          }
+        },
+        {
+          "archive": "libpp.a",
+          "bytes": 768,
+          "sections": {
+            ".iram0.text": 768
+          }
+        },
+        {
+          "archive": "libbootloader_support.a",
+          "bytes": 730,
+          "sections": {
+            ".iram0.text": 730
+          }
+        },
+        {
+          "archive": "libesp_driver_dma.a",
+          "bytes": 586,
+          "sections": {
+            ".iram0.text": 586
+          }
+        },
+        {
+          "archive": "liblog.a",
+          "bytes": 546,
+          "sections": {
+            ".iram0.text": 546
+          }
+        },
+        {
+          "archive": "libesp_mm.a",
+          "bytes": 494,
+          "sections": {
+            ".iram0.text": 494
+          }
+        },
+        {
+          "archive": "libesp_hal_dma.a",
+          "bytes": 468,
+          "sections": {
+            ".iram0.text": 468
+          }
+        },
+        {
+          "archive": "libesp_hal_ledc.a",
+          "bytes": 332,
+          "sections": {
+            ".iram0.text": 332
+          }
+        },
+        {
+          "archive": "libesp_driver_gpio.a",
+          "bytes": 240,
+          "sections": {
+            ".iram0.text": 240
+          }
+        },
+        {
+          "archive": "libesp_phy.a",
+          "bytes": 204,
+          "sections": {
+            ".iram0.text": 204
+          }
+        },
+        {
+          "archive": "libesp_wifi.a",
+          "bytes": 156,
+          "sections": {
+            ".iram0.text": 156
+          }
+        },
+        {
+          "archive": "libesp_driver_usb_serial_jtag.a",
+          "bytes": 112,
+          "sections": {
+            ".iram0.text": 112
+          }
+        },
+        {
+          "archive": "libtfpsacrypto.a",
+          "bytes": 82,
+          "sections": {
+            ".iram0.text": 82
+          }
+        },
+        {
+          "archive": "libesp_coex.a",
+          "bytes": 64,
+          "sections": {
+            ".iram0.text": 64
+          }
+        },
+        {
+          "archive": "libefuse.a",
+          "bytes": 4,
+          "sections": {
+            ".iram0.text": 4
+          }
+        }
+      ],
+      "iram_symbols": [
+        {
+          "name": "rtc_clk_cal_internal",
+          "address": 1077435384,
+          "bytes": 878,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_write_encrypted",
+          "address": 1077448258,
+          "bytes": 666,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_set_config",
+          "address": 1077434396,
+          "bytes": 628,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_common_command",
+          "address": 1077427914,
+          "bytes": 586,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_erase_region",
+          "address": 1077446140,
+          "bytes": 564,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bootloader_flash_execute_command_common",
+          "address": 1077417610,
+          "bytes": 512,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_configure_host_io_mode",
+          "address": 1077428802,
+          "bytes": 506,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_init",
+          "address": 1077431274,
+          "bytes": 484,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_configure_host_io_mode",
+          "address": 1077427432,
+          "bytes": 482,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskIncrementTick.part.0",
+          "address": 1077442640,
+          "bytes": 466,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_init_main",
+          "address": 1077446812,
+          "bytes": 460,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_phy_i2c_init1",
+          "address": 1077423322,
+          "bytes": 454,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_common_command",
+          "address": 1077429308,
+          "bytes": 454,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_write",
+          "address": 1077447818,
+          "bytes": 440,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xQueueGenericSendFromISR",
+          "address": 1077440876,
+          "bytes": 374,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_config_host_io_mode",
+          "address": 1077450858,
+          "bytes": 372,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_read",
+          "address": 1077447302,
+          "bytes": 350,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vTaskGenericNotifyGiveFromISR",
+          "address": 1077441884,
+          "bytes": 346,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_map_region",
+          "address": 1077443916,
+          "bytes": 342,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_setup_auto_suspend_mode",
+          "address": 1077430570,
+          "bytes": 342,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_phy_wakeup_init",
+          "address": 1077421822,
+          "bytes": 336,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_config_stage",
+          "address": 1077431758,
+          "bytes": 332,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_device_config",
+          "address": 1077430912,
+          "bytes": 322,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_sleep_pu",
+          "address": 1077435068,
+          "bytes": 316,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__assert_func",
+          "address": 1077436966,
+          "bytes": 312,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_module_reset",
+          "address": 1077432666,
+          "bytes": 308,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vTaskSwitchContext",
+          "address": 1077442292,
+          "bytes": 300,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xQueueGiveFromISR",
+          "address": 1077441250,
+          "bytes": 294,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xQueueReceiveFromISR",
+          "address": 1077441596,
+          "bytes": 288,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "strcmp",
+          "address": 1077438224,
+          "bytes": 278,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "call_start_cpu0",
+          "address": 1077413118,
+          "bytes": 274,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_read",
+          "address": 1077428500,
+          "bytes": 272,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskRemoveFromEventList",
+          "address": 1077443138,
+          "bytes": 260,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_interrupt_handler",
+          "address": 1077412312,
+          "bytes": 258,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cal",
+          "address": 1077436262,
+          "bytes": 256,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "prvNotifyQueueSetContainer",
+          "address": 1077440624,
+          "bytes": 252,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_write_encrypted",
+          "address": 1077452104,
+          "bytes": 252,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_default_rx_isr",
+          "address": 1077425638,
+          "bytes": 242,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gpio_intr_service",
+          "address": 1077417082,
+          "bytes": 240,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_read",
+          "address": 1077453952,
+          "bytes": 236,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_read",
+          "address": 1077451426,
+          "bytes": 236,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "lock_acquire_generic",
+          "address": 1077415438,
+          "bytes": 230,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rx_11b_opt",
+          "address": 1077420196,
+          "bytes": 226,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_erase_sector",
+          "address": 1077454412,
+          "bytes": 224,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_erase_block",
+          "address": 1077454188,
+          "bytes": 224,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_read",
+          "address": 1077429762,
+          "bytes": 224,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_panic_handler",
+          "address": 1077412098,
+          "bytes": 214,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_device_config",
+          "address": 1077427218,
+          "bytes": 214,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memcpy",
+          "address": 1077437342,
+          "bytes": 210,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_get_config",
+          "address": 1077434044,
+          "bytes": 208,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memmove",
+          "address": 1077437554,
+          "bytes": 204,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_erase_block",
+          "address": 1077452432,
+          "bytes": 204,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_erase_sector",
+          "address": 1077452636,
+          "bytes": 204,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_disable",
+          "address": 1077413940,
+          "bytes": 196,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_restart_noos",
+          "address": 1077439324,
+          "bytes": 194,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_fe_i2c_reg_renew",
+          "address": 1077421342,
+          "bytes": 194,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_start_periodic",
+          "address": 1077419370,
+          "bytes": 194,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_program_page",
+          "address": 1077430138,
+          "bytes": 192,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_read_unique_id",
+          "address": 1077451918,
+          "bytes": 186,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_unmap_region",
+          "address": 1077444258,
+          "bytes": 184,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_write",
+          "address": 1077451662,
+          "bytes": 182,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wDev_ProcessFiq",
+          "address": 1077424488,
+          "bytes": 182,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ets_timer_arm",
+          "address": 1077425214,
+          "bytes": 178,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "os_timer_arm",
+          "address": 1077425214,
+          "bytes": 178,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "detect_spi_flash_chip",
+          "address": 1077445958,
+          "bytes": 174,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_brownout_isr_handler",
+          "address": 1077415010,
+          "bytes": 172,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_slow_src_set",
+          "address": 1077433624,
+          "bytes": 172,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_set_io_mode",
+          "address": 1077453482,
+          "bytes": 170,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_time_us_to_slowclk",
+          "address": 1077436518,
+          "bytes": 168,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_clk_tree_enable_src",
+          "address": 1077432398,
+          "bytes": 168,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_read_encrypted",
+          "address": 1077447652,
+          "bytes": 166,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_dump_rx_linked_list",
+          "address": 1077424808,
+          "bytes": 166,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_backtrace_print",
+          "address": 1077418590,
+          "bytes": 166,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_wait_idle",
+          "address": 1077450694,
+          "bytes": 164,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bootloader_flash_reset_chip",
+          "address": 1077418176,
+          "bytes": 164,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_setup_read_suspend",
+          "address": 1077430406,
+          "bytes": 164,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "SysTickIsrHandler",
+          "address": 1077440102,
+          "bytes": 162,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_set_fade_param",
+          "address": 1077426864,
+          "bytes": 160,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_get_caps",
+          "address": 1077451230,
+          "bytes": 160,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "os_timer_arm_us",
+          "address": 1077425056,
+          "bytes": 158,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ets_timer_arm_us",
+          "address": 1077425056,
+          "bytes": 158,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_page_program",
+          "address": 1077454636,
+          "bytes": 158,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_error_check_failed_print",
+          "address": 1077439034,
+          "bytes": 156,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_page_program",
+          "address": 1077452840,
+          "bytes": 156,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_set_alarm_period",
+          "address": 1077444944,
+          "bytes": 154,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_system_reset_modules_on_exit",
+          "address": 1077439518,
+          "bytes": 154,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_read_status_16b_rdsr_rdsr2",
+          "address": 1077453110,
+          "bytes": 152,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_default_tx_isr",
+          "address": 1077425880,
+          "bytes": 152,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_do_mapping",
+          "address": 1077417358,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_wifi_bt_power_domain_on",
+          "address": 1077425414,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_start_once",
+          "address": 1077419220,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_wifi_power_domain_on",
+          "address": 1077425414,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rx_agc_reg_opt",
+          "address": 1077420046,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "pm_get_null_max_tx_time",
+          "address": 1077424288,
+          "bytes": 150,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "read_id_core",
+          "address": 1077412958,
+          "bytes": 146,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "prvCopyDataToQueue",
+          "address": 1077440478,
+          "bytes": 146,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_module_enable",
+          "address": 1077414492,
+          "bytes": 146,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_read_id_hs",
+          "address": 1077449494,
+          "bytes": 142,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_wifi_tx_dig_gain",
+          "address": 1077422628,
+          "bytes": 140,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_erase_chip",
+          "address": 1077450466,
+          "bytes": 140,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_random",
+          "address": 1077418756,
+          "bytes": 140,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_8m_enable",
+          "address": 1077433470,
+          "bytes": 138,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_record_rx_linked_list",
+          "address": 1077424670,
+          "bytes": 138,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_remove.isra.0",
+          "address": 1077419084,
+          "bytes": 136,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_paddr_to_vaddr",
+          "address": 1077444554,
+          "bytes": 134,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_impl_set_alarm_id",
+          "address": 1077416792,
+          "bytes": 130,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "abort",
+          "address": 1077436838,
+          "bytes": 128,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_enable",
+          "address": 1077413812,
+          "bytes": 128,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_vector_table",
+          "address": 1077411840,
+          "bytes": 128,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_check_and_flush_cache",
+          "address": 1077412810,
+          "bytes": 128,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_timestamp",
+          "address": 1077445562,
+          "bytes": 122,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_release",
+          "address": 1077416478,
+          "bytes": 120,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_lock_release",
+          "address": 1077415680,
+          "bytes": 120,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_to_xtal",
+          "address": 1077415306,
+          "bytes": 118,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_chip_i2c_writeReg",
+          "address": 1077423204,
+          "bytes": 118,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "strncpy",
+          "address": 1077438710,
+          "bytes": 116,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_insert.isra.0",
+          "address": 1077418970,
+          "bytes": 114,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "strncmp",
+          "address": 1077438594,
+          "bytes": 114,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "usb_serial_jtag_sof_tick_hook",
+          "address": 1077416966,
+          "bytes": 112,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_vaddr_to_paddr",
+          "address": 1077444442,
+          "bytes": 112,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_to_pll_mhz",
+          "address": 1077434286,
+          "bytes": 110,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_chip_i2c_readReg",
+          "address": 1077423094,
+          "bytes": 110,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_os_check_yield",
+          "address": 1077455020,
+          "bytes": 108,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_start_with_desc",
+          "address": 1077426500,
+          "bytes": 108,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_get_physical_size",
+          "address": 1077446704,
+          "bytes": 108,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_32k_enable",
+          "address": 1077433316,
+          "bytes": 106,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spiflash_start_core",
+          "address": 1077449062,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "flash_end_flush_cache",
+          "address": 1077448924,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_global_interrupt_handler",
+          "address": 1077445788,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_mhz_to_config",
+          "address": 1077433940,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_module_disable",
+          "address": 1077414638,
+          "bytes": 104,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_get_xtal",
+          "address": 1077415182,
+          "bytes": 102,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_xtal_freq_get",
+          "address": 1077415182,
+          "bytes": 102,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_noniram_disable",
+          "address": 1077414136,
+          "bytes": 100,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "get_buffer_malloc",
+          "address": 1077454816,
+          "bytes": 98,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_reset",
+          "address": 1077450370,
+          "bytes": 96,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_lock_release_recursive",
+          "address": 1077415800,
+          "bytes": 94,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_release_recursive",
+          "address": 1077416598,
+          "bytes": 94,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_crosscore_isr",
+          "address": 1077418340,
+          "bytes": 92,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortExitCritical",
+          "address": 1077439874,
+          "bytes": 92,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_program_page",
+          "address": 1077449846,
+          "bytes": 92,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_set_alarm_target",
+          "address": 1077444852,
+          "bytes": 92,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "main_flash_region_protected",
+          "address": 1077454920,
+          "bytes": 90,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_level_get_timeout",
+          "address": 1077445688,
+          "bytes": 90,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "strcpy",
+          "address": 1077438502,
+          "bytes": 90,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_prepare",
+          "address": 1077427058,
+          "bytes": 90,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "is_page_mapped_in_cache",
+          "address": 1077412722,
+          "bytes": 88,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_invalidate_addr",
+          "address": 1077443654,
+          "bytes": 88,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_i2c_bbtop_wakeup",
+          "address": 1077423776,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_crosscore_int_send_yield",
+          "address": 1077418432,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_erase_sector",
+          "address": 1077449674,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_i2c_master_reset",
+          "address": 1077422382,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_erase_block",
+          "address": 1077449760,
+          "bytes": 86,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_tx_paon_set",
+          "address": 1077419944,
+          "bytes": 84,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_stop",
+          "address": 1077419564,
+          "bytes": 84,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_get_alignment",
+          "address": 1077438832,
+          "bytes": 82,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_freeze_caches_disable_interrupts",
+          "address": 1077438930,
+          "bytes": 82,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortYield",
+          "address": 1077439966,
+          "bytes": 80,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_compare_exchange_1",
+          "address": 1077437802,
+          "bytes": 80,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_isr",
+          "address": 1077414812,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_set_io_mode",
+          "address": 1077450234,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_set_write_protect",
+          "address": 1077450606,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_try_acquire_recursive",
+          "address": 1077416400,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_acquire",
+          "address": 1077416166,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_impl_lock",
+          "address": 1077445368,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_close",
+          "address": 1077416010,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_acquire_recursive",
+          "address": 1077416244,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_try_acquire",
+          "address": 1077416322,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_init",
+          "address": 1077443456,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_close_recursive",
+          "address": 1077416088,
+          "bytes": 78,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_get_write_protect",
+          "address": 1077452356,
+          "bytes": 76,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_mmu_paddr_find_caps",
+          "address": 1077417534,
+          "bytes": 76,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "enable_timer_group0_for_calibration",
+          "address": 1077436740,
+          "bytes": 74,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_init_pointers",
+          "address": 1077449938,
+          "bytes": 74,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_yield",
+          "address": 1077451844,
+          "bytes": 74,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "tick_hook",
+          "address": 1077418518,
+          "bytes": 72,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_probe",
+          "address": 1077450162,
+          "bytes": 72,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_start",
+          "address": 1077426084,
+          "bytes": 72,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wait_freq_set_busy",
+          "address": 1077422260,
+          "bytes": 72,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_module_has_clock_bits",
+          "address": 1077414742,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_check_valid_ext_vaddr_region",
+          "address": 1077444688,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_impl_lock_timeout",
+          "address": 1077445446,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_reset",
+          "address": 1077426430,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_wakeup_init",
+          "address": 1077423862,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log",
+          "address": 1077445298,
+          "bytes": 70,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_phy_close_rf",
+          "address": 1077422158,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_isr_noniram_disable",
+          "address": 1077414890,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_erase_sector",
+          "address": 1077430012,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_ptr_executable",
+          "address": 1077432566,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_stop",
+          "address": 1077426156,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_noniram_enable",
+          "address": 1077414236,
+          "bytes": 68,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_fast_src_set",
+          "address": 1077433874,
+          "bytes": 66,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_get_io_mode",
+          "address": 1077453044,
+          "bytes": 66,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bias_dreg_i2c_set",
+          "address": 1077422828,
+          "bytes": 64,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_and_8",
+          "address": 1077438098,
+          "bytes": 64,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_or_8",
+          "address": 1077438162,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vTaskGetSnapshot",
+          "address": 1077442230,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_write_data_slicer",
+          "address": 1077449382,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_read_intr_status",
+          "address": 1077426368,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_get_counter_value",
+          "address": 1077444790,
+          "bytes": 62,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bias_dreg_i2c_set.part.0",
+          "address": 1077422768,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_read_status_8b_rdsr2",
+          "address": 1077453268,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_resume",
+          "address": 1077443584,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortEnterCritical",
+          "address": 1077439814,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_stop",
+          "address": 1077426608,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memcmp",
+          "address": 1077437280,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_read_status_hs",
+          "address": 1077449236,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_append",
+          "address": 1077426224,
+          "bytes": 60,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_erase_block",
+          "address": 1077430080,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_set_pbus_reg",
+          "address": 1077419886,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_init_recursive",
+          "address": 1077415952,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_get_cache_line_size",
+          "address": 1077443844,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_read_status_8b_rdsr",
+          "address": 1077453328,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_cache_hal_init_ctx",
+          "address": 1077443398,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_bt_common_module_disable",
+          "address": 1077414434,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__retarget_lock_init",
+          "address": 1077415894,
+          "bytes": 58,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_set_flashboot_en",
+          "address": 1077432290,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_mxic_detect_size",
+          "address": 1077453794,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_set_duty_int_part",
+          "address": 1077426762,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_get_i2c_hostid",
+          "address": 1077422892,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_va",
+          "address": 1077445242,
+          "bytes": 56,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_detect_size",
+          "address": 1077450312,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_set_write_protect",
+          "address": 1077430330,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_bt_common_module_enable",
+          "address": 1077414380,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "bootloader_read_flash_id",
+          "address": 1077418122,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_module_disable",
+          "address": 1077433034,
+          "bytes": 54,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "check_chip_pointer_default",
+          "address": 1077445906,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "shared_intr_isr",
+          "address": 1077413760,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xQueueIsQueueFullFromISR",
+          "address": 1077441544,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_freeze",
+          "address": 1077443742,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_isr_noniram_enable",
+          "address": 1077414958,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "uxListRemove",
+          "address": 1077439674,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_reset",
+          "address": 1077426032,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_slow_freq_get_hz",
+          "address": 1077433822,
+          "bytes": 52,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_get_eof_desc_addr",
+          "address": 1077426318,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_module_enable",
+          "address": 1077433088,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "panicHandler",
+          "address": 1077413424,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_ctrl_read_reg_mask",
+          "address": 1077433138,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_write_status_8b_wrsr2",
+          "address": 1077453432,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_unfreeze",
+          "address": 1077443794,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_suspend",
+          "address": 1077443534,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_read_data_slicer",
+          "address": 1077449444,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xt_unhandled_exception",
+          "address": 1077413474,
+          "bytes": 50,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_sub_2",
+          "address": 1077437928,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_write_status_16b_wrsr",
+          "address": 1077452996,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_ctrl_write_reg_mask",
+          "address": 1077433228,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_32k_disable_external",
+          "address": 1077433422,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_enable",
+          "address": 1077432140,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_select_alarm_mode",
+          "address": 1077445134,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortAssertIfInISR",
+          "address": 1077439750,
+          "bytes": 48,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_alarm_handler",
+          "address": 1077418924,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_common_write_status_8b_wrsr",
+          "address": 1077453386,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_set_write_protect",
+          "address": 1077449336,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_add_2",
+          "address": 1077437882,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_impl_unlock",
+          "address": 1077445516,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_set_hpoint",
+          "address": 1077426818,
+          "bytes": 46,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_os_yield",
+          "address": 1077455128,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_close_rf",
+          "address": 1077423932,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_handle_intr",
+          "address": 1077432218,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_disable_wifi_agc",
+          "address": 1077421256,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_clk_apb_freq",
+          "address": 1077413716,
+          "bytes": 44,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_aes_complete_isr",
+          "address": 1077419844,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_sub_4",
+          "address": 1077438056,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_enable_wifi_agc",
+          "address": 1077421300,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_vApplicationTickHook",
+          "address": 1077439260,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_get_tsf_time",
+          "address": 1077424994,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_exchange_1",
+          "address": 1077437760,
+          "bytes": 42,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_mpi_complete_isr",
+          "address": 1077419804,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_erase_chip",
+          "address": 1077449296,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_xpd_tsens",
+          "address": 1077423976,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_exchange_4",
+          "address": 1077437976,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__atomic_fetch_add_4",
+          "address": 1077438016,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_ctrl_write_reg",
+          "address": 1077433188,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_counter_can_stall_by_cpu",
+          "address": 1077445202,
+          "bytes": 40,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "memspi_host_flush_cache",
+          "address": 1077449636,
+          "bytes": 38,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_disable_source",
+          "address": 1077414342,
+          "bytes": 38,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_detect_size",
+          "address": 1077450056,
+          "bytes": 38,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_intr_enable_source",
+          "address": 1077414304,
+          "bytes": 38,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_set_tsens_power",
+          "address": 1077416930,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_done",
+          "address": 1077427148,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_system_get_time",
+          "address": 1077416692,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_set_duty_start",
+          "address": 1077426726,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_suspend_cmd_conf",
+          "address": 1077450094,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_suspend_cmd_conf",
+          "address": 1077451390,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_suspend_cmd_conf",
+          "address": 1077453916,
+          "bytes": 36,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spiflash_end_default",
+          "address": 1077449028,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_freq_set_xtal",
+          "address": 1077434252,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_freq_module_resetn",
+          "address": 1077422226,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_needs_reset_check",
+          "address": 1077449172,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_ahb_hal_clear_intr",
+          "address": 1077426284,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ledc_hal_ls_channel_update",
+          "address": 1077426692,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_freq_to_period",
+          "address": 1077436706,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_mxic_probe",
+          "address": 1077453760,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_freq_cal",
+          "address": 1077436706,
+          "bytes": 34,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_issi_get_io_mode",
+          "address": 1077453728,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_get_io_mode",
+          "address": 1077450130,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_esp_error_check_failed",
+          "address": 1077439222,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cpu_wait_for_intr",
+          "address": 1077432366,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_write_protect_disable",
+          "address": 1077432090,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_esp_error_check_failed_without_abort",
+          "address": 1077439190,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_flash_encryption_enabled",
+          "address": 1077413614,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskIncrementTick",
+          "address": 1077443106,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_rcc_acquire_enter",
+          "address": 1077432974,
+          "bytes": 32,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_clk_cpu_freq",
+          "address": 1077413686,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_chip_revision",
+          "address": 1077413524,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_blk_version",
+          "address": 1077413554,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_impl_get_time",
+          "address": 1077416762,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_get_time",
+          "address": 1077416762,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_is_quad_mode",
+          "address": 1077447272,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_disable",
+          "address": 1077432188,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_ptr_byte_accessible",
+          "address": 1077432634,
+          "bytes": 30,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_do_cache_invalidate",
+          "address": 1077417326,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "adc_set_hw_calibration_code",
+          "address": 1077418896,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ram1_phy_dis_hw_set_freq",
+          "address": 1077422332,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskGetSchedulerState",
+          "address": 1077442592,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_feed",
+          "address": 1077432262,
+          "bytes": 28,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi1_end",
+          "address": 1077412590,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_alarm_isr",
+          "address": 1077416736,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_do_unmapping",
+          "address": 1077417508,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xPortSetInterruptMaskFromISR",
+          "address": 1077440076,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_slow_src_get",
+          "address": 1077433796,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_erase_chip",
+          "address": 1077429986,
+          "bytes": 26,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_set_io_mode",
+          "address": 1077453652,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_issi_set_io_mode",
+          "address": 1077453704,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_get_minor_chip_version",
+          "address": 1077413662,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_issi_probe",
+          "address": 1077453676,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vListInsertEnd",
+          "address": 1077439726,
+          "bytes": 24,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "delay_us",
+          "address": 1077454794,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "delay_us",
+          "address": 1077455172,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_dig_clk8m_enable",
+          "address": 1077435024,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "ets_timer_disarm",
+          "address": 1077425392,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rom1_phy_en_hw_set_freq",
+          "address": 1077422360,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_init",
+          "address": 1077444758,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_dig_clk8m_disable",
+          "address": 1077435046,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_unfreeze_caches_enable_interrupts",
+          "address": 1077439012,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_check_status",
+          "address": 1077430384,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "panic_abort",
+          "address": 1077439302,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_enable",
+          "address": 1077427024,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_apb_freq_update",
+          "address": 1077415284,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "os_timer_disarm",
+          "address": 1077425392,
+          "bytes": 22,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "end",
+          "address": 1077412616,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "start",
+          "address": 1077412636,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_connect_alarm_counter",
+          "address": 1077445182,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_int_disable_wrapper",
+          "address": 1077425602,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_wifi_enable_set",
+          "address": 1077421536,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_enable_counter",
+          "address": 1077445114,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_suspend",
+          "address": 1077431254,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_disable_interrupts_caches_and_other_cpu",
+          "address": 1077412672,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_resume",
+          "address": 1077431234,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_th_probe",
+          "address": 1077453854,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_gd_get_caps",
+          "address": 1077450036,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_time_get",
+          "address": 1077436686,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_rcc_acquire_exit",
+          "address": 1077433006,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_enable_interrupts_caches_and_other_cpu",
+          "address": 1077412692,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortYieldFromISR",
+          "address": 1077440046,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_brownout_need_reset",
+          "address": 1077449216,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_get_caps",
+          "address": 1077453896,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_is_enabled",
+          "address": 1077432346,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_boya_probe",
+          "address": 1077450012,
+          "bytes": 20,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "is_from_isr_wrapper",
+          "address": 1077419648,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "zalloc_internal_wrapper",
+          "address": 1077419730,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "btbb_wifi_bb_cfg2",
+          "address": 1077420028,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_winbond_probe",
+          "address": 1077453878,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdt_hal_write_protect_enable",
+          "address": 1077432122,
+          "bytes": 18,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi1_start",
+          "address": 1077412572,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "apb_backup_dma_unlock",
+          "address": 1077413392,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "apb_backup_dma_lock",
+          "address": 1077413408,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_get_major_chip_version",
+          "address": 1077413646,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_get_disable_blk_version_major",
+          "address": 1077413598,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_enable_alarm_int",
+          "address": 1077445098,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_8md256_enabled",
+          "address": 1077433608,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_bbpll_remove_consumer",
+          "address": 1077433300,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_int_restore_wrapper",
+          "address": 1077425622,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "vPortClearInterruptMaskFromISR",
+          "address": 1077439798,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_bbpll_add_consumer",
+          "address": 1077433284,
+          "bytes": 16,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "flash_init_state",
+          "address": 1077413104,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "calloc_internal_wrapper",
+          "address": 1077419748,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "realloc_internal_wrapper",
+          "address": 1077419762,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "efuse_hal_get_disable_wafer_version_major",
+          "address": 1077413584,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_check_status",
+          "address": 1077428780,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rv_utils_dbgr_is_attached",
+          "address": 1077445892,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtc_clk_cpu_set_to_default_config",
+          "address": 1077415424,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mmu_hal_ctx_init",
+          "address": 1077443902,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_malloc_internal_wrapper",
+          "address": 1077425584,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_gpio_debug",
+          "address": 1077424438,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_poll_cmd_done",
+          "address": 1077427204,
+          "bytes": 14,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_zalloc_wrapper",
+          "address": 1077419718,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_ticks_to_us",
+          "address": 1077436814,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_process_beacon_filter",
+          "address": 1077424476,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_us_to_ticks",
+          "address": 1077436826,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_process_tbtt",
+          "address": 1077424452,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wdev_process_tsf_timer",
+          "address": 1077424464,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_disable",
+          "address": 1077427046,
+          "bytes": 12,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "release_buffer_malloc",
+          "address": 1077455010,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mutex_lock_wrapper",
+          "address": 1077419794,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "rtos_current_tcb",
+          "address": 1077440264,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_pwr_interrupt_get_event",
+          "address": 1077425036,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskGetTickCountFromISR",
+          "address": 1077442630,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_destroy",
+          "address": 1077427184,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_mac_interrupt_clr_event",
+          "address": 1077424984,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_pwr_interrupt_clr_event",
+          "address": 1077425046,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xTaskGetTickCount",
+          "address": 1077442620,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_guard_set",
+          "address": 1077412938,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "hal_mac_interrupt_get_event",
+          "address": 1077424974,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_util_set_cache_enabled_cb",
+          "address": 1077445778,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "systimer_hal_set_tick_rate_ops",
+          "address": 1077444780,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_read_reg",
+          "address": 1077450684,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_set_erasing_flag",
+          "address": 1077449206,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_encryption_hal_check",
+          "address": 1077427194,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "xPortInIsrContext",
+          "address": 1077440066,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_ant_need_update",
+          "address": 1077425564,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_hal_is_cache_enabled",
+          "address": 1077443644,
+          "bytes": 10,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mutex_unlock_wrapper",
+          "address": 1077419786,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_timer_impl_get_min_period_us",
+          "address": 1077416728,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_freq_mem_backup",
+          "address": 1077424016,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_realloc",
+          "address": 1077419702,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_poll_cmd_done",
+          "address": 1077428794,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_suspend_ext_mem_cache",
+          "address": 1077438914,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_dig_reg_backup",
+          "address": 1077424280,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_resume_ext_mem_cache",
+          "address": 1077438922,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_calloc",
+          "address": 1077419710,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_malloc",
+          "address": 1077419694,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_cache_enabled",
+          "address": 1077412714,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_flash_chip_driver_initialized",
+          "address": 1077446132,
+          "bytes": 8,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "main_flash_op_status",
+          "address": 1077454914,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spiflash_start_default",
+          "address": 1077449166,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "queue_send_from_isr_wrapper",
+          "address": 1077419780,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_lock_acquire",
+          "address": 1077415668,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_system_abort",
+          "address": 1077439254,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "_lock_acquire_recursive",
+          "address": 1077415674,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_read_unique_id_none",
+          "address": 1077453262,
+          "bytes": 6,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_restore_cache.constprop.0",
+          "address": 1077412656,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_disable_cache.constprop.0",
+          "address": 1077412664,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_stop_cache",
+          "address": 1077417322,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "s_start_cache",
+          "address": 1077417354,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "coex_status_get_wrapper",
+          "address": 1077419676,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "coex_wifi_release_wrapper",
+          "address": 1077419680,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "coex_event_duration_get_wrapper",
+          "address": 1077419684,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "coex_schm_interval_set_wrapper",
+          "address": 1077419688,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "timer_arm_wrapper",
+          "address": 1077419776,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_timer_arm_us_wrapper",
+          "address": 1077425580,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_task_yield_from_isr_wrapper",
+          "address": 1077425574,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_read_intr_status",
+          "address": 1077426676,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_generic_probe",
+          "address": 1077450366,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_exit_critical",
+          "address": 1077433280,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "regi2c_enter_critical",
+          "address": 1077433276,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_i2c_exit_critical",
+          "address": 1077416926,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_rcc_exit",
+          "address": 1077433030,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_start_with_desc",
+          "address": 1077426684,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "phy_i2c_enter_critical",
+          "address": 1077416922,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_stop",
+          "address": 1077426688,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_restore_cache",
+          "address": 1077412660,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_get_eof_desc_addr",
+          "address": 1077426672,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_env_is_chip_wrapper",
+          "address": 1077425598,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_boya_get_caps",
+          "address": 1077450032,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_mspi_32bit_address_flash_feature_check",
+          "address": 1077412954,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_supports_direct_write",
+          "address": 1077428772,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_hal_gpspi_supports_direct_read",
+          "address": 1077428776,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_issi_get_caps",
+          "address": 1077453700,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_th_get_caps",
+          "address": 1077453874,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_efuse_is_flash_encryption_enabled",
+          "address": 1077417078,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_log_writev",
+          "address": 1077445684,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_chip_mxic_get_caps",
+          "address": 1077453850,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_clear_intr",
+          "address": 1077426668,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "gdma_hal_reset",
+          "address": 1077426680,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_init_chip_state",
+          "address": 1077412950,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_disable_cache",
+          "address": 1077412668,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "periph_rcc_enter",
+          "address": 1077433026,
+          "bytes": 4,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_disable.constprop.0",
+          "address": 1077412570,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "cache_enable.constprop.0",
+          "address": 1077412588,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "task_ms_to_tick_wrapper",
+          "address": 1077419666,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_apb80m_request_wrapper",
+          "address": 1077419668,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_apb80m_release_wrapper",
+          "address": 1077419670,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_rtc_enable_iso_wrapper",
+          "address": 1077419672,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "wifi_rtc_disable_iso_wrapper",
+          "address": 1077419674,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_empty_wrapper",
+          "address": 1077419692,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_strncpy_impl",
+          "address": 1077438826,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_mspi_pin_init",
+          "address": 1077412948,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_coex_common_timer_disarm_wrapper",
+          "address": 1077425578,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_sync_ops_exit_critical_section",
+          "address": 1077438830,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_memcpy_impl",
+          "address": 1077437552,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_memmove_impl",
+          "address": 1077437758,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_strcpy_impl",
+          "address": 1077438592,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "spi_flash_enable_cache",
+          "address": 1077412712,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_memcmp_impl",
+          "address": 1077437340,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "mspi_timing_flash_tuning",
+          "address": 1077432664,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_strncmp_impl",
+          "address": 1077438708,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_libc_include_assert_impl",
+          "address": 1077437278,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "__ubsan_include",
+          "address": 1077439672,
+          "bytes": 2,
+          "section": ".iram0.text"
+        },
+        {
+          "name": "esp_cache_sync_ops_enter_critical_section",
+          "address": 1077438828,
+          "bytes": 2,
+          "section": ".iram0.text"
+        }
+      ],
+      "iram_released_vs_baseline": 0,
+      "heap_start_released_vs_baseline": -16,
+      "functions_moved_to_flash": []
+    }
+  ]
+}

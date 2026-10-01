@@ -1,0 +1,26 @@
+{
+  "name": "ota:serial-health",
+  "result": "FAIL",
+  "evidence": {
+    "records": 106,
+    "faults": [
+      {
+        "at": 368631.781,
+        "line": "I (70179) tcp_pool: PERF TCP_POOL: sequence=61 action=invalid-free slot=3 state=0 owned=0 caller=0x4207958c"
+      },
+      {
+        "at": 368631.812,
+        "line": "assert failed: __wrap_memp_free ./main/tcp_pcb_pool.c:100 (TCP PCB is allocated)"
+      },
+      {
+        "at": 368631.812,
+        "line": "PANIC registers: MEPC=0x40386b58 RA=0x40386b1c"
+      },
+      {
+        "at": 368631.828,
+        "line": "PANIC registers: MCAUSE=0x00000002"
+      }
+    ]
+  },
+  "note": "Expected OTA reboot banners are allowed; panic/capture errors are not."
+}
