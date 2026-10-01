@@ -38,7 +38,15 @@ public class DecompileAacMemory extends GhidraScript {
             "get_adif_header|get_prog_config";
         HashSet<Function> selected = new HashSet<>();
         FunctionIterator candidates = currentProgram.getFunctionManager().getFunctions(true);
-        if (selection.startsWith("@")) {
+        if (selection.startsWith("inventory:")) {
+            HashSet<String> required = new HashSet<>(Files.readAllLines(Path.of(selection.substring(10))));
+            while (candidates.hasNext()) {
+                Function function = candidates.next();
+                if (currentProgram.getMemory().contains(function.getEntryPoint()) &&
+                    required.remove(function.getName())) selected.add(function);
+            }
+            if (!required.isEmpty()) throw new IllegalStateException("Missing inventory functions: " + required);
+        } else if (selection.startsWith("@")) {
             HashSet<String> allowed = new HashSet<>(Files.readAllLines(Path.of(selection.substring(1))));
             HashSet<String> roots = new HashSet<>(java.util.List.of("esp_aac_dec_open",
                 "esp_aac_dec_decode", "esp_aac_dec_close", "esp_aac_dec_reset",
@@ -111,7 +119,9 @@ public class DecompileAacMemory extends GhidraScript {
             manifest.put("language", currentProgram.getLanguageID().toString());
             manifest.put("compiler", currentProgram.getCompilerSpec().getCompilerSpecID().toString());
             manifest.put("selection", selection);
-            manifest.put("scope", "Direct-call graph only; inferred prototypes are not an ABI specification");
+            manifest.put("scope", selection.startsWith("inventory:") ?
+                "Every function in the supplied archive inventory, including local and unreferenced functions; inferred prototypes are not an ABI specification" :
+                "Direct-call graph or name selection only; inferred prototypes are not an ABI specification");
             manifest.put("functions", entries);
             Files.writeString(output.resolve("manifest.json"),
                 new GsonBuilder().setPrettyPrinting().create().toJson(manifest) + "\n",

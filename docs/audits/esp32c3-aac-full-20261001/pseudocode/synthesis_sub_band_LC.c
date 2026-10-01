@@ -1,0 +1,157 @@
+/* Ghidra pseudocode; NOT original source.
+ * ELF SHA-256: 2f7535c3d8e7e7a1cad05fa865a13c0f59ad64d48411b0276dc9fceefa5c254f
+ * Function: synthesis_sub_band_LC @ ram:43013d90
+ * Types and parameter counts are inferred; verify against disassembly. */
+
+void synthesis_sub_band_LC(int *param_1,short *param_2)
+
+{
+  int iVar1;
+  short sVar2;
+  int iVar3;
+  int iVar4;
+  short sVar5;
+  int iVar6;
+  int iVar7;
+  short sVar8;
+  undefined4 uVar9;
+  int iVar10;
+  int *piVar11;
+  short sVar12;
+  int iVar13;
+  short *psVar14;
+  short *psVar15;
+  short *psVar16;
+  short sVar17;
+  int *piVar18;
+  short sVar19;
+  short sVar20;
+  int iVar21;
+  int iVar22;
+  int iVar23;
+  int iVar24;
+  int iVar25;
+  int iVar26;
+  int iVar27;
+  int iVar28;
+
+  gp = &__global_pointer_;
+  synthesis_sub_band_LC_core2(param_2,param_1,CosTable_48);
+  pv_split_LC(param_2,param_1 + 0x20);
+  dct_16(param_2,1);
+  dct_16(param_1 + 0x20,1);
+  iVar13 = param_1[0x2f];
+  *(int *)(param_2 + 0x3e) = iVar13;
+  piVar11 = param_1 + 0x2e;
+  psVar14 = param_2 + 0x1e;
+  psVar16 = param_2 + 0x3c;
+  do {
+    iVar6 = *piVar11;
+    uVar9 = *(undefined4 *)psVar14;
+    *(int *)(psVar16 + -2) = iVar13 + iVar6;
+    *(undefined4 *)psVar16 = uVar9;
+    iVar10 = piVar11[-1];
+    uVar9 = *(undefined4 *)(psVar14 + -2);
+    psVar15 = psVar14 + -6;
+    *(int *)(psVar16 + -6) = iVar6 + iVar10;
+    *(undefined4 *)(psVar16 + -4) = uVar9;
+    iVar13 = piVar11[-2];
+    *(undefined4 *)(psVar16 + -8) = *(undefined4 *)(psVar14 + -4);
+    *(int *)(psVar16 + -10) = iVar10 + iVar13;
+    piVar11 = piVar11 + -3;
+    psVar14 = psVar15;
+    psVar16 = psVar16 + -0xc;
+  } while (param_2 != psVar15);
+  pv_split_LC(param_1,param_1 + 0x20);
+  dct_16(param_1,1);
+  dct_16(param_1 + 0x20,1);
+  iVar6 = *(int *)(param_2 + 0x3e);
+  iVar10 = param_1[0x2f];
+  iVar13 = *(int *)(param_2 + 0x3c);
+  piVar11 = (int *)(param_2 + 0x3a);
+  piVar18 = param_1 + 0xf;
+  param_2[0x5f] = (short)((ulonglong)((longlong)iVar6 * 0x4ccccd0) >> 0x20);
+  param_2[0x5e] = (short)((ulonglong)((longlong)iVar10 * 0x4ccccd0) >> 0x20);
+  psVar14 = param_2 + 0x5d;
+  do {
+    iVar27 = piVar18[0x1f];
+    iVar21 = piVar18[0x1e];
+    iVar22 = *piVar18;
+    iVar4 = *piVar11;
+    iVar28 = piVar11[-1];
+    iVar1 = piVar18[-1];
+    iVar26 = piVar11[-2];
+    iVar3 = piVar11[-3];
+    iVar24 = iVar6 + iVar13;
+    iVar6 = piVar11[-4];
+    iVar25 = piVar18[-2];
+    iVar23 = iVar27 + iVar10;
+    iVar10 = piVar18[0x1d];
+    iVar7 = iVar4 + iVar13;
+    iVar13 = piVar11[-5];
+    piVar11 = piVar11 + -6;
+    piVar18 = piVar18 + -3;
+    *psVar14 = (short)((ulonglong)((longlong)iVar24 * 0x4ccccd0) >> 0x20);
+    psVar14[-3] = (short)((ulonglong)((longlong)iVar23 * 0x4ccccd0) >> 0x20);
+    psVar14[-1] = (short)((ulonglong)((longlong)iVar22 * 0x4ccccd0) >> 0x20);
+    psVar14[-2] = (short)((ulonglong)((longlong)iVar7 * 0x4ccccd0) >> 0x20);
+    psVar14[-4] = (short)((ulonglong)((longlong)(iVar4 + iVar28) * 0x4ccccd0) >> 0x20);
+    psVar14[-5] = (short)((ulonglong)((longlong)iVar1 * 0x4ccccd0) >> 0x20);
+    psVar14[-6] = (short)((ulonglong)((longlong)(iVar28 + iVar26) * 0x4ccccd0) >> 0x20);
+    psVar14[-7] = (short)((ulonglong)((longlong)(iVar27 + iVar21) * 0x4ccccd0) >> 0x20);
+    psVar14[-8] = (short)((ulonglong)((longlong)(iVar26 + iVar3) * 0x4ccccd0) >> 0x20);
+    psVar14[-9] = (short)((ulonglong)((longlong)iVar25 * 0x4ccccd0) >> 0x20);
+    psVar14[-10] = (short)((ulonglong)((longlong)(iVar3 + iVar6) * 0x4ccccd0) >> 0x20);
+    psVar14[-0xb] = (short)((ulonglong)((longlong)(iVar21 + iVar10) * 0x4ccccd0) >> 0x20);
+    psVar14 = psVar14 + -0xc;
+  } while (piVar11 != (int *)(param_2 + -2));
+  iVar10 = *param_1;
+  sVar17 = param_2[0x5f];
+  sVar5 = param_2[0x5e];
+  sVar8 = param_2[0x5d];
+  sVar19 = param_2[0x5c];
+  param_2[0x60] = 0;
+  psVar16 = param_2 + 0x61;
+  param_2[0x21] = (short)((ulonglong)((longlong)(iVar6 + iVar13) * 0x4ccccd0) >> 0x20);
+  param_2[0x20] = (short)((ulonglong)((longlong)iVar10 * 0x4ccccd0) >> 0x20);
+  psVar14 = param_2 + 0x5b;
+  do {
+    *psVar16 = -sVar17;
+    psVar16[1] = -sVar5;
+    psVar16[2] = -sVar8;
+    psVar16[3] = -sVar19;
+    sVar17 = *psVar14;
+    sVar5 = psVar14[-1];
+    sVar8 = psVar14[-2];
+    psVar16 = psVar16 + 4;
+    sVar19 = psVar14[-3];
+    psVar14 = psVar14 + -4;
+  } while (psVar16 != param_2 + 0x7d);
+  *param_2 = sVar19;
+  sVar19 = param_2[0x3f];
+  sVar2 = param_2[0x3e];
+  sVar20 = param_2[0x3d];
+  sVar12 = param_2[0x3c];
+  param_2[0x7f] = -sVar8;
+  param_2[0x7d] = -sVar17;
+  param_2[0x7e] = -sVar5;
+  psVar16 = param_2 + 1;
+  psVar14 = param_2 + 0x3b;
+  do {
+    *psVar16 = sVar19;
+    psVar16[1] = sVar2;
+    psVar16[2] = sVar20;
+    psVar16[3] = sVar12;
+    sVar19 = *psVar14;
+    sVar2 = psVar14[-1];
+    sVar20 = psVar14[-2];
+    psVar16 = psVar16 + 4;
+    sVar12 = psVar14[-3];
+    psVar14 = psVar14 + -4;
+  } while (psVar16 != param_2 + 0x1d);
+  param_2[0x1d] = sVar19;
+  param_2[0x1e] = sVar2;
+  param_2[0x1f] = sVar20;
+  param_2[0x20] = sVar12;
+  return;
+}
