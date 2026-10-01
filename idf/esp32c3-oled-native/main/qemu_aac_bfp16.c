@@ -31,14 +31,20 @@ FIXTURE(hev2, "hev2_44100_stereo");
 #ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
 #include "qemu_aac_packed_history.h"
 #define PCM_ERROR_LIMIT CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_ERROR_LIMIT
-#ifdef CONFIG_YORADIO_QEMU_AAC_PC16_HISTORY_TEST
+#ifdef CONFIG_YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
+#define TEST_LABEL "PSPORT"
+#elif defined(CONFIG_YORADIO_QEMU_AAC_PC16_HISTORY_TEST)
 #define TEST_LABEL "PCX16"
 #else
 #define TEST_LABEL "PCX14"
 #endif
 #define VARIANT_LABEL "variant"
 #define CANDIDATE_LABEL "packed"
+#ifdef CONFIG_YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
+static const unsigned groups[] = {7, 1, 0};
+#else
 static const unsigned groups[] = {1, 2, 3, 4, 5, 6, 7, 0};
+#endif
 #else
 #define PCM_ERROR_LIMIT 1
 #define TEST_LABEL "BFP16"

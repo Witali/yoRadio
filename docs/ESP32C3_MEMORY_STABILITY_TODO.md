@@ -86,6 +86,15 @@ speed while preserving full format support and the two-LSB output limit.
   inputs, keep the disabled build bit-identical and reduce the host PS structure
   by 9600 bytes. Xsbr is unchanged. This is not yet an ESP32-C3 backend port or
   full-format/peak-heap/speed qualification.
+- [x] Port FAAD-style PS packing to the current Espressif decoder's actual delay
+  writes: [81 paired QEMU comparisons](ESP32C3_AAC_PS_WRITE_PORT_20261001.md).
+  Native-source controls are bit-identical; packing reaches 3 LSB and passes
+  temporary ±5, but fails final ±2. The 617-pair payload shrinks by 2468 bytes;
+  the 55,128-byte owner is unchanged, so heap saving remains zero.
+- [ ] Qualify packed PS reset/reconfigure and repeated stereo/PS transitions,
+  reclaim owner storage without breaking its right-SBR aliases, and remove the
+  remaining three-LSB errors. Recover the measured +26.681% / +40.658% guest
+  instruction regression on synthetic HEv2 / ABBA before physical acceptance.
 - [ ] Compact smoothing pointer tables (1,888-byte candidate), then validate
   full-format output, reset paths and PS aliases.
 - [ ] Separate stereo low-band QMF work from retained histories (6,144-byte

@@ -71,6 +71,15 @@ bit-identical controls. `python tests/test-faad-ps-patch.py` checks frame traces
 delayed mono-to-stereo PS activation, source/PCM hashes and integer error counts.
 The measured 9600-byte host PS-structure reduction is not a full-radio RAM result.
 
+The [current-decoder PS write port](ESP32C3_AAC_PS_WRITE_PORT_20261001.md) adapts
+that strategy to Espressif's actual delay/feedback writes: 81 QEMU paired
+comparisons, bit-exact native-source/bypass controls and guarded unused storage.
+The maximum is 3 LSB (temporary ±5 passes, final ±2 fails). Packed delay payload
+shrinks by 2468 bytes, but the owner allocation is unchanged and heap saving is
+zero. `python tests/test-aac-ps-history-port.py` validates retained evidence,
+implementation hashes, controls and rejection of false memory/precision claims.
+Packed transitions/reset lifetimes and full-radio performance remain unqualified.
+
 The [pristine FAAD float32/fixed comparison](FAAD2_FLOAT_FIXED_COMPARISON_20261001.md)
 adds 22 main decodes and 22 fresh-process repeatability controls. LC differs by
 up to 2 LSB, but synthetic HE/v2 and PS onset expose much larger existing

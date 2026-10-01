@@ -81,10 +81,15 @@ from **22744 to 13144 bytes**, confirming the 9600-byte structure reduction.
 This is a real layout change in this source decoder, unlike the C3 pack/restore
 probe. It is not a measurement of the complete radio's peak heap or C3 RAM use.
 
-C3 porting, stack/heap peaks, cache effects, decoding speed, longer/adversarial
+FAAD backend porting to C3, stack/heap peaks, cache effects, decoding speed, longer/adversarial
 streams and wider PS-tool coverage remain untested. Passing these eleven inputs
 does not prove the ±2 bound for every legal AAC stream. The original supplied
 study's exact input and one-LSB result have not been reproduced.
+
+A subsequent [Espressif PS write-port experiment](ESP32C3_AAC_PS_WRITE_PORT_20261001.md)
+adapts this packing strategy to the current C3 decoder and tests it in QEMU.
+It reaches 3 LSB, with 2468 bytes less delay payload but no heap saving yet.
+That is a different backend/layout from this FAAD host result.
 
 ## Reproduce and validate
 

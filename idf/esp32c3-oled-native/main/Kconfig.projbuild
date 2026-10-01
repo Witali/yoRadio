@@ -124,6 +124,16 @@ config YORADIO_QEMU_AAC_PC16_HISTORY_TEST
         scalar storage paths. Retains the pinned history scope and exact
         controls. Numerical test only: does not shrink production allocations.
 
+config YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
+    bool "Test FAAD-style packed PS writes in the current Espressif decoder"
+    depends on YORADIO_QEMU_AAC_PACKED_HISTORY_TEST && !YORADIO_QEMU_AAC_PC16_HISTORY_TEST
+    default n
+    help
+        Replace PS decorrelation with a source port of the pinned RV32 arithmetic.
+        Compare native source, packed midpoint storage and binary bypass.
+        The closed SBR owner allocation is unchanged; only delay payload shrinks.
+        QEMU-only qualification, never a production memory-saving claim.
+
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n

@@ -246,3 +246,16 @@ tests/results/faad2-arithmetic-20261001/*.state -text
 tests/results/faad2-arithmetic-20261001/*.json text eol=lf
 tests/results/faad2-arithmetic-20261001/*.csv text eol=lf
 outputs/01a0a51b-5ba3-70a3-8fba-6f4113c001fe/*.xlsx -text
+
+# Preserve the PS write-port experiment and its implementation fingerprints.
+tests/results/esp32c3-aac-ps-port-20261001/**/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
+tests/results/esp32c3-aac-ps-port-20261001/**/*.json text eol=lf
+tests/results/esp32c3-aac-ps-port-20261001/*.json text eol=lf
+tests/results/esp32c3-aac-ps-port-20261001/sdkconfig -text whitespace=cr-at-eol
+idf/esp32c3-oled-native/main/qemu_aac_ps_history_port.c text eol=lf
+idf/esp32c3-oled-native/main/qemu_aac_bfp16.c text eol=lf
+idf/esp32c3-oled-native/main/CMakeLists.txt text eol=lf
+idf/esp32c3-oled-native/main/Kconfig.projbuild text eol=lf
+idf/esp32c3-oled-native/sdkconfig.qemu-aac-ps-port.defaults text eol=lf
+tools/codec_benchmark/run_aac_ps_history_port.py text eol=lf
+tests/test-aac-ps-history-port.py text eol=lf
