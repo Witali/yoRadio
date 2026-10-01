@@ -173,3 +173,11 @@ typedef struct { bool aac_plus_enable; } esp_aac_dec_cfg_t;
         str(ROOT / "tests/native/esp32c3_aac_reserve_adapter_test.c"), "-o", str(executable),
     ], check=True)
     subprocess.run([str(executable)], check=True)
+    (tmp / "sdkconfig.h").write_text("#define CONFIG_YORADIO_AAC_PLUS 1\n#define CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE 1\n#define CONFIG_FREERTOS_THREAD_LOCAL_STORAGE_POINTERS 2\n")
+    executable = tmp / "aac-scratch-adapter"
+    subprocess.run([
+        os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
+        *SANITIZERS, "-I" + str(tmp), "-I" + str(MAIN),
+        str(ROOT / "tests/native/esp32c3_aac_scratch_test.c"), "-o", str(executable),
+    ], check=True)
+    subprocess.run([str(executable)], check=True)

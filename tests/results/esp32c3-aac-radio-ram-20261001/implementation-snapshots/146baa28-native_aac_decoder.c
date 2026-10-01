@@ -8,9 +8,6 @@
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
 #include "aac_sbr_reserve.h"
 #endif
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-#include "aac_scratch_reserve.h"
-#endif
 #if CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
 #include "cpu_profiler.h"
 #define AAC_MEMORY(stage) cpu_profiler_memory(stage)
@@ -31,9 +28,6 @@ struct native_aac_decoder {
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
     aac_sbr_reserve_t reserve;
 #endif
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-    aac_scratch_reserve_t scratch;
-#endif
 };
 
 native_aac_decoder_t *native_aac_decoder_create(void) {
@@ -46,9 +40,6 @@ native_aac_decoder_t *native_aac_decoder_create(void) {
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
         aac_sbr_reserve_prepare(&decoder->reserve);
 #endif
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-        aac_scratch_reserve_prepare(&decoder->scratch);
-#endif
     }
     return decoder;
 }
@@ -58,9 +49,6 @@ void native_aac_decoder_destroy(native_aac_decoder_t *decoder) {
     if (decoder->codec) esp_audio_simple_dec_close(decoder->codec);
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
     aac_sbr_reserve_discard(&decoder->reserve);
-#endif
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-    aac_scratch_reserve_discard(&decoder->scratch);
 #endif
     codec_memory_trace_dump("aac-close");
     if (decoder->data != decoder->header) free(decoder->data);
@@ -118,10 +106,6 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                         aac_sbr_reserve_discard(&decoder->reserve);
                         aac_sbr_reserve_prepare(&decoder->reserve);
 #endif
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-                        aac_scratch_reserve_discard(&decoder->scratch);
-                        aac_scratch_reserve_prepare(&decoder->scratch);
-#endif
                     }
                     codec_memory_trace_dump("aac-reopen-close");
                     decoder->codec = NULL;
@@ -134,21 +118,8 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                     };
                     // Reapply AAC Plus too: the library retains SBR state
                     // across incompatible ADTS configurations otherwise.
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-                    aac_scratch_reserve_enter(&decoder->scratch);
-#endif
                     esp_audio_err_t result = esp_audio_simple_dec_open(
                         &config, &decoder->codec);
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-                    aac_scratch_reserve_leave();
-                    bool retry = decoder->scratch.pending &&
-                        (result == ESP_AUDIO_ERR_MEM_LACK || result == ESP_AUDIO_ERR_FAIL);
-                    aac_scratch_reserve_discard(&decoder->scratch);
-                    if (retry) {
-                        decoder->codec = NULL;
-                        result = esp_audio_simple_dec_open(&config, &decoder->codec);
-                    }
-#endif
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
                     if ((result == ESP_AUDIO_ERR_MEM_LACK || result == ESP_AUDIO_ERR_FAIL) &&
                         decoder->reserve.pending) {
@@ -173,18 +144,8 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
                 aac_sbr_reserve_enter(&decoder->reserve);
 #endif
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-                aac_scratch_reserve_enter(&decoder->scratch);
-#endif
                 esp_audio_err_t result = esp_audio_simple_dec_process(
                     decoder->codec, &frame, output);
-#ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
-                aac_scratch_reserve_leave();
-                if (decoder->scratch.allocation_failed) {
-                    output->decoded_size = 0;
-                    result = ESP_AUDIO_ERR_MEM_LACK;
-                }
-#endif
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
                 aac_sbr_reserve_leave();
                 if (decoder->reserve.allocation_failed) {

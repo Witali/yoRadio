@@ -176,15 +176,6 @@ config YORADIO_QEMU_AAC_RESET_TEST
         QEMU-only. Pad the baseline core to contain a stale vendor offset,
         compare repaired reset and subsequent PCM on the smaller SBR owner.
 
-config YORADIO_AAC_EARLY_SCRATCH_RESERVE
-    bool "Place AAC scratch workspace before core and caller PCM"
-    depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_AAC_EARLY_SBR_RESERVE && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
-    default n
-    help
-        Pinned-ABI placement experiment. Reserve the unchanged 12288-byte AAC
-        workspace before larger allocations. Uses TLS slot 1 during SDK calls;
-        no DSP or format changes. Require physical switching/heap acceptance.
-
 config YORADIO_ROTARY_ENCODER
     bool "Enable external rotary encoder"
     default n

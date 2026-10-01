@@ -91,3 +91,11 @@ passes initial physical LC/HE/v2 playback at full rates. Early SBR reservation
 was counterproductive; ordinary allocation order with smaller service stacks
 and Wi-Fi pools succeeds. All-codec, stack, CPU, HTTPS and OTA qualification
 remain open before changing defaults.
+
+The subsequent broad matrix fails HE after station changes. Six dynamic Wi-Fi
+buffers pass the initial finite/continuous tests but remain experimental.
+[Early 12 KiB scratch placement](ESP32C3_AAC_SCRATCH_PLACEMENT_20261001.md)
+is bit-exact in QEMU and passes ownership tests, but its physical switching
+test still fails the 55128-byte owner with a 53248-byte largest block. Keep it
+off alone. Next integrate the lossless 51596-byte PS-relocated owner into a
+per-decoder context and qualify the combination on hardware.
