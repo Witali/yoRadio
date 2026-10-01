@@ -1,0 +1,38 @@
+{
+  "generator": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "source_sha256": "7653c72ea0cd7a7c556928a94a01073415018daf877737a169d97fc3223057f6",
+  "source_filter": [
+    "anoisesrc=color=white:amplitude=0.34:sample_rate=48000:duration=180:seed=12345[nl]",
+    "anoisesrc=color=pink:amplitude=0.34:sample_rate=48000:duration=180:seed=67890[nr]",
+    "sine=frequency=997:sample_rate=48000:duration=180:beep_factor=2[tl]",
+    "sine=frequency=1601:sample_rate=48000:duration=180:beep_factor=2[tr]",
+    "[nl][tl]amix=inputs=2:weights='0.72 0.28':normalize=0[left]",
+    "[nr][tr]amix=inputs=2:weights='0.72 0.28':normalize=0[right]",
+    "[left][right]amerge=inputs=2,alimiter=limit=0.95[out]"
+  ],
+  "source_bits": 16,
+  "fixtures": [
+    {
+      "name": "stress-mp3-48000-2ch-16bit-180s",
+      "file": "stress-mp3-48000-2ch-16bit-180s.mp3",
+      "seconds": 180.024,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "mp3",
+      "mime": "audio/mpeg",
+      "profile": "mp3",
+      "sha256": "3af42f95abc8c7438c0f70d7ce2356ff152988e64312bb3cbb092fc67f2f81a4",
+      "bytes": 7201005,
+      "average_kbps": 320.00199973336885,
+      "encoder_options": [
+        "-c:a",
+        "libmp3lame",
+        "-b:a",
+        "320k",
+        "-write_xing",
+        "0"
+      ]
+    }
+  ]
+}

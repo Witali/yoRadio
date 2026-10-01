@@ -45,6 +45,13 @@ Flash Auto Suspend on the tested XMC-D chip. These use supported SDK placement
 options and retain all Flash APIs. Read the measured qualification limits before
 using the profiles; they are not applied by the production build wrapper.
 
+The [Wi-Fi buffer balance follow-up](../../docs/ESP32C3_WIFI_BUFFER_BALANCE_20261001.md)
+uses that headroom to test dynamic RX/TX limits of 16, retaining static RX=6
+and the unchanged native AAC decoder. The earlier six-buffer FLAC throughput
+failures and all subsequent qualification results remain recorded.
+That follow-up also found an `Illegal instruction` panic during OTA with the
+Auto Suspend placement profile. Keep that profile disabled pending diagnosis.
+
 ### Acceptance tests
 
 The [testing guide](../../docs/ESP32C3_TESTING.md) lists missing coverage,

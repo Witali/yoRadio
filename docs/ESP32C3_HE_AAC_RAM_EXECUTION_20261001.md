@@ -86,6 +86,16 @@ options and Flash Auto Suspend on XMC-D. This changes neither AAC representation
 nor its owner allocation. Qualification and limitations are recorded there;
 it does not promote the codec compression or global production defaults.
 
+The [Wi-Fi buffer balance follow-up](ESP32C3_WIFI_BUFFER_BALANCE_20261001.md)
+tests spending some of this headroom on dynamic RX/TX limits of 16. Keep full
+AAC/SBR/PS and validate the other codec families under HTTP load; smaller Wi-Fi
+limits must not be accepted merely because a short AAC test uses less heap.
+The follow-up passed 21 mixed-codec switches and full-rate AAC load checks, but
+later reproduced an `Illegal instruction` panic during OTA in the Auto Suspend
+profile. Do not promote it. Recovery/startup verification and a conservative
+IRAM placement trial take priority; MP3 heap trend and Opus CPU margin remain
+open as well.
+
 The user's objective is reliable radio playback across the existing codec
 families, AAC first, without crashes or allocation failures. Prioritize full-radio
 allocation ownership/reservation, peak RAM and physical playback acceptance over

@@ -29,6 +29,19 @@ layouts come from FFprobe, including Opus's 48 kHz decoded rate. The existing
 FDK fixtures cover HE-AAC/v2; the generator's native AAC encoder produces LC.
 Large soak fixtures belong in ignored `.build/`, not versioned firmware.
 
+For high-bitrate 48 kHz stereo stress files with explicitly 16-bit PCM input:
+
+```powershell
+python tools/audio_test_server/generate_stress.py --output .build/audio-stress-60s --seconds 60
+python tools/audio_test_server/server.py --fixture-manifest .build/audio-stress-60s/manifest.json
+```
+
+This uses fixed-seed noise plus tones, MP3 320 kbit/s, FLAC level 8, Vorbis q10
+and Opus 510 kbit/s. The manifest records source/encoded hashes, encoder options
+and FFprobe layouts. Use a new output directory to preserve earlier fixtures.
+These transport/load fixtures supplement the general format matrix; they do
+not replace 24-bit FLAC or other depth/rate qualification.
+
 C3-specific control, verification and the complete test plan are documented in
 [ESP32C3_TESTING.md](../../docs/ESP32C3_TESTING.md). Other boards can reuse this
 server with their own playlist/WebUI or test controller unchanged.

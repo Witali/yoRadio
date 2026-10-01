@@ -1,5 +1,11 @@
 # ESP32-C3 IRAM placement audit — 2026-10-01
 
+**Later qualification failure:** the follow-up
+[Wi-Fi buffer experiment](ESP32C3_WIFI_BUFFER_BALANCE_20261001.md) records an
+`Illegal instruction` panic during OTA from this audit's Auto Suspend image.
+The larger relocation profile must remain disabled pending diagnosis. The
+successful runs below are retained historical evidence, not an all-clear.
+
 ## Scope and acceptance
 
 The objective is to make more internal SRAM available as DRAM **without
@@ -268,3 +274,8 @@ OTA restoration with:
 ```powershell
 python tests/test-esp32c3-iram.py
 ```
+
+The later [Wi-Fi buffer balance experiment](ESP32C3_WIFI_BUFFER_BALANCE_20261001.md)
+uses the same IRAM layout with dynamic RX/TX limits of 16. It investigates the
+unfinished FLAC transfers above and records a separate image, test outcomes and
+final board state; it does not rewrite this six-buffer audit's failures.

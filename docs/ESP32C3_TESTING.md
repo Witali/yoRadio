@@ -26,6 +26,15 @@ ELF/MAP files and physical playback/OTA evidence. The standalone
 double-counting IRAM as additional DRAM. Auto Suspend is an optional,
 hardware-specific experiment, not a global default.
 
+The follow-up [Wi-Fi buffer balance](ESP32C3_WIFI_BUFFER_BALANCE_20261001.md)
+checks whether that DRAM headroom permits sufficient dynamic Wi-Fi buffers
+without sacrificing full-rate HE-AAC. It retains failed six-buffer controls,
+host TCP_NODELAY experiments and high-bitrate multi-codec load evidence.
+It also retains a later OTA panic and two load failures. ROM recovery restored
+the original app; startup and saved playback were verified after a manual
+reset. The failures block promotion of the Auto Suspend profile despite
+earlier successful playback and OTA checks.
+
 The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
 standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
 AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained

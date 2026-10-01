@@ -1,0 +1,82 @@
+{
+  "before": {
+    "version": "v0.9.693-1100-g87c775c3",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "bcf37075fc7f41b92ca48fdc60d9aaa3f1f85d6f992b8150c73e5202eba0060b"
+  },
+  "target": {
+    "app_elf_sha256": "dd13414b890572c97dcbc825604ccecf8ce2ff9aaff68af34ae37af5b5f5ad77",
+    "sha256": "d8ee1f8b15b271a3d571cb2c8aa305f97b1cc12e5d79da29402d40ac92a73f69",
+    "bytes": 1533536
+  },
+  "steps": [
+    {
+      "name": "read-partitions",
+      "exit_code": 0
+    },
+    {
+      "name": "write-app1",
+      "exit_code": 0
+    },
+    {
+      "name": "reset",
+      "exit_code": 1
+    }
+  ],
+  "result": "FAIL",
+  "partitions": [
+    {
+      "name": "nvs",
+      "type": 1,
+      "subtype": 2,
+      "offset": 36864,
+      "size": 20480,
+      "flags": 0
+    },
+    {
+      "name": "otadata",
+      "type": 1,
+      "subtype": 0,
+      "offset": 57344,
+      "size": 8192,
+      "flags": 0
+    },
+    {
+      "name": "app0",
+      "type": 0,
+      "subtype": 16,
+      "offset": 65536,
+      "size": 1900544,
+      "flags": 0
+    },
+    {
+      "name": "app1",
+      "type": 0,
+      "subtype": 17,
+      "offset": 1966080,
+      "size": 1900544,
+      "flags": 0
+    },
+    {
+      "name": "spiffs",
+      "type": 1,
+      "subtype": 130,
+      "offset": 3866624,
+      "size": 262144,
+      "flags": 0
+    },
+    {
+      "name": "coredump",
+      "type": 1,
+      "subtype": 3,
+      "offset": 4128768,
+      "size": 65536,
+      "flags": 0
+    }
+  ],
+  "partition_table_sha256": "bcb26eaecb4e4ef919c5193f3bd54f82f5c41c54406e2cc12d6fe196138751c8",
+  "written_offset": 1966080,
+  "written_bytes": 1533536,
+  "error_type": "Failure"
+}
