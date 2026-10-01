@@ -44,6 +44,11 @@ within measurement variability. A temporary slowdown is allowed during RAM
 optimization, with a measured regression and an explicit follow-up to recover
 speed while preserving full format support and the two-LSB output limit.
 
+- [ ] **Do not cap AAC output at 22/22.05 kHz.** Preserve the stream's full
+  decoded sample rate, including SBR reconstruction to 44.1/48 kHz and all
+  other supported rates, in both floating-point and fixed-point backends.
+  Memory or CPU optimizations must not introduce downsampling or AAC-core
+  fallback; verify the actual PCM rate as well as OLED/WebUI metadata.
 - [x] Decompile the shipped decoder, verify critical allocations/offsets against
   disassembly and save reproducible evidence. Probe reference pointer-table
   compaction on RV32: 55,128 → 53,240 bytes; no decoder change executed.
