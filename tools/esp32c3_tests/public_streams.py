@@ -33,6 +33,14 @@ def public_url(url):
     return url
 
 
+def playback_url(url, transport):
+    # An explicit cleartext comparison uses the same public origin/path. Source
+    # probing and the default board playback retain certificate verification.
+    require(transport in ('https', 'http'), 'Unsupported comparison transport')
+    parsed = urlsplit(public_url(url))
+    return parsed._replace(scheme=transport).geturl()
+
+
 def probe_spec(value):
     streams = value.get('streams', [])
     require(len(streams) == 1, 'Expected exactly one probed audio stream')
@@ -93,6 +101,8 @@ def main():
     parser.add_argument('--seconds', type=int, default=60)
     parser.add_argument('--interval', type=float, default=.1,
                         help='Delay between status requests; .1 is concurrent WebUI load')
+    parser.add_argument('--transport', choices=('https', 'http'), default='https',
+                        help='HTTP is an explicit same-origin memory/CPU comparison')
     parser.add_argument('--ffprobe', default='ffprobe')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
@@ -105,13 +115,16 @@ def main():
     names = args.case or list(manifest['streams'])
     require(names and all(name in manifest['streams'] for name in names), 'Unknown stream case')
     urls = {name: public_url(manifest['streams'][name]) for name in names}
+    play_urls = {name: playback_url(url, args.transport) for name, url in urls.items()}
     board = Board(args.board)
+    initial_playing = board.status()['audio']
     initial = board.info()
     image = image_info(args.firmware.read_bytes())
     require(initial['app_elf_sha256'] == image['app_elf_sha256'], 'Wrong installed image')
     before = snapshot(board)
     report = Report(args.output/'report.json', initial)
-    report.data.update(image=image, public_urls=urls, sources=manifest['sources'],
+    report.data.update(image=image, public_urls=urls, playback_urls=play_urls,
+        transport=args.transport, sources=manifest['sources'],
         seconds=args.seconds, interval=args.interval,
         manifest_sha256=sha(args.manifest.read_bytes()),
         sdkconfig_sha256=sha(args.firmware.with_name('sdkconfig').read_bytes()),
@@ -134,8 +147,10 @@ def main():
         board.stop()
         time.sleep(.8)
         started = time.monotonic()
+        window = dict(start=started)
+        report.data.setdefault('windows', {})[name] = window
         try:
-            board.play(urls[name])
+            board.play(play_urls[name])
             samples = suite.observe(args.seconds, name, interval=args.interval)
             evidence = metrics(samples, capture.since(started), reference['spec'],
                                args.seconds, started, time.monotonic())
@@ -153,13 +168,16 @@ def main():
                     require(False, 'No WebSocket playback snapshot')
             return dict(reference=reference, websocket_matches_rest=True, **evidence)
         finally:
+            window['end'] = time.monotonic()
             board.stop()
 
     def recovery():
         final = suite.idle_heap()
         require(baseline is not None, 'Missing baseline heap')
         check_recovery_heap(baseline, final)
-        no_runtime_faults(capture.rows)
+        require(serial_health(capture.rows)['result'] == 'PASS', 'Serial panic or capture failure')
+        require(not any(re.search(r'^(ESP-ROM:|rst:|waiting for download)', r['line'])
+                        for r in capture.rows), 'Unexpected reboot during test')
         return dict(samples=final, no_unexpected_resets=True)
 
     def restore():
@@ -167,6 +185,10 @@ def main():
         board.reboot()
         time.sleep(3)
         wait_image(board, image['app_elf_sha256'], initial['partition'])
+        if not initial_playing:
+            board.stop()
+            require(not board.status()['audio'], 'Could not restore stopped state')
+            return dict(stopped_state_restored=True, **verify_snapshot(board, before))
         deadline = time.monotonic()+30
         state = board.status()
         while not state['audio'] and time.monotonic() < deadline:
@@ -178,7 +200,7 @@ def main():
     try:
         report.case('idle:baseline', settled_baseline)
         for name in names:
-            report.case('https:'+name, lambda n=name: play(n))
+            report.case(args.transport+':'+name, lambda n=name: play(n))
         report.case('idle:recovery', recovery)
     finally:
         report.case('restore', restore)

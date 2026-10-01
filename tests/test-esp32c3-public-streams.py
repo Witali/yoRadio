@@ -6,7 +6,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools/esp32c3_tests'))
 from common import Failure, check_playback
-from public_streams import no_runtime_faults, probe_spec, public_url
+from public_streams import no_runtime_faults, playback_url, probe_spec, public_url
 
 
 class PublicStreams(unittest.TestCase):
@@ -41,6 +41,13 @@ class PublicStreams(unittest.TestCase):
                     'https://example.com/a?token=secret', 'https://example.com/a#secret'):
             with self.assertRaises(Failure):
                 public_url(url)
+
+    def test_cleartext_comparison_is_explicit_and_keeps_public_origin(self):
+        url = 'https://example.com/radio'
+        self.assertEqual(playback_url(url, 'https'), url)
+        self.assertEqual(playback_url(url, 'http'), 'http://example.com/radio')
+        with self.assertRaises(Failure):
+            playback_url(url, 'ftp')
 
 
 if __name__ == '__main__':

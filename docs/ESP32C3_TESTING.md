@@ -380,6 +380,7 @@ reboots and persistent idle heap loss fail the test. At exit it reboots to the
 saved station and compares Wi-Fi, playlist and settings in memory.
 
 Use `--case NAME` to select entries, `--interval 1` for a lighter polling run,
+`--transport http` for an explicit public-stream cleartext RAM/CPU comparison,
 or `--manifest PATH` with `sources` and `streams` fields as in
 [`public_streams.json`](../tools/esp32c3_tests/public_streams.json). Only put public,
 credential-free HTTPS URLs in that manifest: they are retained in the report.
