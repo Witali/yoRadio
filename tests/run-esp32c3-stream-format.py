@@ -89,6 +89,7 @@ static void run_espressif_frame(uint32_t generation, native_codec_t codec,
         str(MAIN / "native_state.c"), "-o", str(executable),
     ], check=True)
     subprocess.run([str(executable)], check=True)
+
     executable = tmp / "pcm-workspace"
     subprocess.run([
         os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
@@ -130,7 +131,7 @@ static inline int64_t esp_timer_get_time(void) { static int64_t t; return ++t; }
 #include <stdbool.h>
 typedef int esp_audio_err_t;
 typedef void *esp_audio_simple_dec_handle_t;
-enum { ESP_AUDIO_ERR_OK=0, ESP_AUDIO_ERR_MEM_LACK=-2,
+enum { ESP_AUDIO_ERR_OK=0, ESP_AUDIO_ERR_FAIL=-1, ESP_AUDIO_ERR_MEM_LACK=-2,
        ESP_AUDIO_ERR_INVALID_PARAMETER=-5, ESP_AUDIO_ERR_NOT_FOUND=-7,
        ESP_AUDIO_ERR_BUFF_NOT_ENOUGH=-8, ESP_AUDIO_SIMPLE_DEC_TYPE_AAC=1 };
 typedef struct { int dec_type; void *dec_cfg; int cfg_size; bool use_frame_dec; } esp_audio_simple_dec_cfg_t;
@@ -160,5 +161,15 @@ typedef struct { bool aac_plus_enable; } esp_aac_dec_cfg_t;
         os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
         *SANITIZERS, "-I" + str(tmp), "-I" + str(MAIN),
         str(ROOT / "tests/native/esp32c3_aac_memory_test.c"), "-o", str(executable),
+    ], check=True)
+    subprocess.run([str(executable)], check=True)
+    # Optional production reservation path and SDK's silent-fallback contract.
+    (tmp / "sdkconfig.h").write_text("#define CONFIG_YORADIO_AAC_PLUS 1\n#define CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE 1\n#define CONFIG_FREERTOS_THREAD_LOCAL_STORAGE_POINTERS 2\n")
+    (tmp / "freertos/task.h").write_text("void *pvTaskGetThreadLocalStoragePointer(void *,int);\nvoid vTaskSetThreadLocalStoragePointer(void *,int,void *);\n")
+    executable = tmp / "aac-reserve-adapter"
+    subprocess.run([
+        os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
+        *SANITIZERS, "-I" + str(tmp), "-I" + str(MAIN),
+        str(ROOT / "tests/native/esp32c3_aac_reserve_adapter_test.c"), "-o", str(executable),
     ], check=True)
     subprocess.run([str(executable)], check=True)

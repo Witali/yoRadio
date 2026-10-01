@@ -142,23 +142,6 @@ config YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
         Pinned private-ABI experiment with paired PCM and guarded allocations.
         Never enable this test owner registry in production firmware.
 
-config YORADIO_COMPACT_SERVICE_STACKS
-    bool "Use measured smaller BOOT, output and WebSocket task stacks"
-    default n
-    help
-        Development RAM profile. Saves 8192 requested stack bytes; keeps the
-        shared decoder's 16384-byte stack. Require all-codec and WebUI/OTA
-        stack/load measurements before enabling in the production profile.
-
-config YORADIO_AAC_EARLY_SBR_RESERVE
-    bool "Reserve AAC SBR state before core and PCM allocations"
-    depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
-    default n
-    help
-        Private-ABI placement experiment for esp_audio_codec 2.6.2. Requires
-        FreeRTOS TLS slot 1. No DSP or allocation size changes; reject silent
-        core-only fallback when SBR allocation fails. Not qualified by default.
-
 config YORADIO_QEMU_AAC_RESET_TEST
     bool "Reproduce and repair AAC reset with guarded core allocations"
     depends on YORADIO_QEMU_AAC_SBR_LAYOUT_TEST

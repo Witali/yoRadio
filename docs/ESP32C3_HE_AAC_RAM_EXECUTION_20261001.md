@@ -85,3 +85,9 @@ families, AAC first, without crashes or allocation failures. Prioritize full-rad
 allocation ownership/reservation, peak RAM and physical playback acceptance over
 additional representation studies. Keep the existing AAC quality/rate constraints
 and test MP3, FLAC, Vorbis and Opus when changing shared memory or task resources.
+
+The [full-radio RAM profile experiment](ESP32C3_AAC_RADIO_RAM_20261001.md) now
+passes initial physical LC/HE/v2 playback at full rates. Early SBR reservation
+was counterproductive; ordinary allocation order with smaller service stacks
+and Wi-Fi pools succeeds. All-codec, stack, CPU, HTTPS and OTA qualification
+remain open before changing defaults.

@@ -1036,8 +1036,23 @@ static void decoder_task(void *argument) {
                     continue;
                 }
 #endif
+#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
+                if (codec == NATIVE_CODEC_AAC) {
+                    aac_decoder = native_aac_decoder_create();
+                    if (!aac_decoder) {
+                        state_set_audio(generation, false, "NO MEMORY");
+                        failed_generation = generation;
+                        vRingbufferReturnItem(s_encoded, packet);
+                        continue;
+                    }
+                }
+#endif
                 if (!decoder_pcm_prepare(&output, &output_size,
                                          codec == NATIVE_CODEC_AAC)) {
+#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
+                    native_aac_decoder_destroy(aac_decoder);
+                    aac_decoder = NULL;
+#endif
                     ESP_LOGE(TAG, "%s PCM buffer allocation failed",
                              codec_name(codec));
                     state_set_audio(generation, false, "NO MEMORY");
@@ -1054,7 +1069,7 @@ static void decoder_task(void *argument) {
                 esp_audio_err_t open_result;
 #ifdef CONFIG_YORADIO_AAC_DECODER_ESPRESSIF
                 if (codec == NATIVE_CODEC_AAC) {
-                    aac_decoder = native_aac_decoder_create();
+                    if (!aac_decoder) aac_decoder = native_aac_decoder_create();
                     open_result = aac_decoder ? ESP_AUDIO_ERR_OK : ESP_AUDIO_ERR_MEM_LACK;
                 } else
 #endif

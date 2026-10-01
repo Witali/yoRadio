@@ -42,7 +42,6 @@ set(NATIVE_SRCS
   "codec_memory_trace.c"
   "audio_service.c"
   "native_aac_decoder.c"
-  "aac_sbr_reserve.c"
   "cpu_profiler.c"
   "display_settings.c"
   "deep_sleep_clock.c"
@@ -136,14 +135,6 @@ if(YORADIO_CODEC_BENCHMARK)
     YORADIO_CODEC_BENCHMARK=1)
 endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
-
-if(CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE)
-  file(SHA256 "$ENV{YORADIO_AUDIO_CODEC_COMPONENT}/lib/esp32c3/libesp_audio_codec.a" AAC_RESERVE_SHA256)
-  if(NOT AAC_RESERVE_SHA256 STREQUAL "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909")
-    message(FATAL_ERROR "AAC reservation requires the audited ESP32-C3 AAC archive")
-  endif()
-  target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=media_lib_module_calloc")
-endif()
 
 if(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST)
   target_link_options(${COMPONENT_LIB} INTERFACE

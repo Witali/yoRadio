@@ -5,9 +5,6 @@
 #include "aac_decoder_config.h"
 #include "codec_memory_trace.h"
 #include "decoder_pcm.h"
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
-#include "aac_sbr_reserve.h"
-#endif
 #if CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
 #include "cpu_profiler.h"
 #define AAC_MEMORY(stage) cpu_profiler_memory(stage)
@@ -25,9 +22,6 @@ struct native_aac_decoder {
     uint8_t *data;
     uint16_t signature;
     uint8_t header[7];
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
-    aac_sbr_reserve_t reserve;
-#endif
 };
 
 native_aac_decoder_t *native_aac_decoder_create(void) {
@@ -37,9 +31,6 @@ native_aac_decoder_t *native_aac_decoder_create(void) {
     if (decoder) {
         decoder->data = decoder->header;
         decoder->capacity = sizeof(decoder->header);
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
-        aac_sbr_reserve_prepare(&decoder->reserve);
-#endif
     }
     return decoder;
 }
@@ -47,9 +38,6 @@ native_aac_decoder_t *native_aac_decoder_create(void) {
 void native_aac_decoder_destroy(native_aac_decoder_t *decoder) {
     if (!decoder) return;
     if (decoder->codec) esp_audio_simple_dec_close(decoder->codec);
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
-    aac_sbr_reserve_discard(&decoder->reserve);
-#endif
     codec_memory_trace_dump("aac-close");
     if (decoder->data != decoder->header) free(decoder->data);
     free(decoder);
@@ -100,13 +88,7 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                 uint16_t signature = ((p[1] & 8) << 8) |
                     ((p[2] & 0xfd) << 2) | (p[3] >> 6);
                 if (!decoder->codec || signature != decoder->signature) {
-                    if (decoder->codec) {
-                        esp_audio_simple_dec_close(decoder->codec);
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
-                        aac_sbr_reserve_discard(&decoder->reserve);
-                        aac_sbr_reserve_prepare(&decoder->reserve);
-#endif
-                    }
+                    if (decoder->codec) esp_audio_simple_dec_close(decoder->codec);
                     codec_memory_trace_dump("aac-reopen-close");
                     decoder->codec = NULL;
                     AAC_MEMORY("aac-before-open");
@@ -120,18 +102,6 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                     // across incompatible ADTS configurations otherwise.
                     esp_audio_err_t result = esp_audio_simple_dec_open(
                         &config, &decoder->codec);
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
-                    if ((result == ESP_AUDIO_ERR_MEM_LACK || result == ESP_AUDIO_ERR_FAIL) &&
-                        decoder->reserve.pending) {
-                        // The early block must not prevent an otherwise viable
-                        // LC decoder from opening. The SDK also reports FAIL
-                        // when one of its nested initial allocations fails.
-                        // Its failed-open path closes the partially built owner.
-                        aac_sbr_reserve_discard(&decoder->reserve);
-                        decoder->codec = NULL;
-                        result = esp_audio_simple_dec_open(&config, &decoder->codec);
-                    }
-#endif
                     codec_memory_trace_dump("aac-open");
                     if (result != ESP_AUDIO_ERR_OK) return result;
                     decoder->signature = signature;
@@ -141,21 +111,8 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                 esp_audio_simple_dec_raw_t frame = {
                     .buffer = decoder->data, .len = needed,
                 };
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
-                aac_sbr_reserve_enter(&decoder->reserve);
-#endif
                 esp_audio_err_t result = esp_audio_simple_dec_process(
                     decoder->codec, &frame, output);
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
-                aac_sbr_reserve_leave();
-                if (decoder->reserve.allocation_failed) {
-                    output->decoded_size=0;
-                    result=ESP_AUDIO_ERR_MEM_LACK;
-                }
-                // LC does not need the reserved owner. Release after the first
-                // real frame, not after a parser-only or output-retry call.
-                if (output->decoded_size) aac_sbr_reserve_discard(&decoder->reserve);
-#endif
                 codec_memory_trace_dump("aac-process");
                 if (opened) AAC_MEMORY("aac-after-first-process");
                 // Keep the frame for a larger PCM buffer retry. The caller
