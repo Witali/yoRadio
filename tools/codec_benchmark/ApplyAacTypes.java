@@ -109,6 +109,22 @@ public class ApplyAacTypes extends GhidraScript {
                 if (!found) throw new IllegalStateException("Missing field: " + entry.getKey() + "." + name);
             }
         }
+        // Use native ELF symbols, never a hardcoded absolute data address.
+        if (meta.has("data_symbols")) {
+            for (var entry : meta.getAsJsonObject("data_symbols").entrySet()) {
+                var symbols = currentProgram.getSymbolTable().getGlobalSymbols(entry.getKey());
+                if (symbols.size() != 1) throw new IllegalStateException("Missing/ambiguous data symbol: " + entry.getKey());
+                var address = symbols.get(0).getAddress();
+                DataType dataType = type(entry.getValue().getAsString());
+                byte[] before = new byte[dataType.getLength()], after = new byte[dataType.getLength()];
+                if (currentProgram.getMemory().getBytes(address, before) != before.length)
+                    throw new IllegalStateException("Incomplete table: " + entry.getKey());
+                clearListing(address, address.add(before.length - 1));
+                createData(address, dataType);
+                currentProgram.getMemory().getBytes(address, after);
+                if (!Arrays.equals(before, after)) throw new IllegalStateException("Table bytes changed");
+            }
+        }
         DecompInterface decompiler = new DecompInterface();
         if (!decompiler.openProgram(currentProgram)) throw new IllegalStateException(decompiler.getLastMessage());
         Map<Function,List<ParameterImpl>> changes = new LinkedHashMap<>();

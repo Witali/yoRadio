@@ -136,10 +136,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--compiler', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--include-core', action='store_true',
+                        help='Add verified native core, bit-reader and wrapper layouts')
     args = parser.parse_args()
     output = args.output.resolve(); output.mkdir(parents=True, exist_ok=True)
     probe = output/'types.c'; obj = output/'types.elf'
-    probe.write_text('#include "aac_analysis_regions.h"\n', encoding='utf-8')
+    include = 'aac_analysis_core.h' if args.include_core else 'aac_analysis_regions.h'
+    probe.write_text('#include "' + include + '"\n', encoding='utf-8')
     common = [str(args.compiler.resolve()), '-std=c11', '-march=rv32imc', '-mabi=ilp32',
               '-I', str(HEADER.parent), '-I', str(REGIONS.parent)]
     subprocess.run(common + ['-g', '-fno-eliminate-unused-debug-types', '-nostdlib', '-Wl,-e,0',
@@ -150,6 +153,12 @@ def main():
                 regions_sha256=hashlib.sha256(REGIONS.read_bytes()).hexdigest(),
                 **dwarf_layouts(obj), parameters=PARAMETERS)
     apply_regions(meta)
+    if args.include_core:
+        from aac_analysis_core import extend
+        extend(meta['parameters'])
+        meta['core_header_sha256'] = hashlib.sha256(REGIONS.with_name(include).read_bytes()).hexdigest()
+        meta['data_symbols'] = {'hcbbook_binary': 'aac_analysis_codebook_table_t',
+                                'samp_rate_info': 'aac_analysis_sample_rates_t'}
     (output/'types.json').write_text(json.dumps(meta, indent=2)+'\n', encoding='utf-8', newline='\n')
     print(f'Prepared {len(meta["types"])} checked types and {len(PARAMETERS)} function parameter maps')
 

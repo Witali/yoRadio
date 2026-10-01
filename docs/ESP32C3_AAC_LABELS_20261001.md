@@ -1,5 +1,11 @@
 # Remaining numeric AAC field accesses — 2026-10-01
 
+Follow-up: the [extended core audit](audits/esp32c3-aac-core-symbolic-20261001/README.md)
+adds core, bit-reader, SDK-wrapper, TNS/LTP and scratch-region names across the
+same 186 functions, with 63 checked layouts. It also records unresolved optimized
+aliases explicitly. Use that export for further memory work; the earlier evidence
+below remains unchanged.
+
 ## Compiled code
 
 The follow-up audit found private-structure offsets in two older experimental
