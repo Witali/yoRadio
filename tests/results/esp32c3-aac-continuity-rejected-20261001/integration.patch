@@ -1,0 +1,68 @@
+diff --git a/idf/esp32c3-oled-native/main/CMakeLists.txt b/idf/esp32c3-oled-native/main/CMakeLists.txt
+index 3b823a6d..68d0125d 100644
+--- a/idf/esp32c3-oled-native/main/CMakeLists.txt
++++ b/idf/esp32c3-oled-native/main/CMakeLists.txt
+@@ -43,6 +43,7 @@ set(NATIVE_SRCS
+   "audio_service.c"
+   "native_aac_decoder.c"
+   "aac_sbr_reserve.c"
++  "aac_sbr_continuity.c"
+   "cpu_profiler.c"
+   "display_settings.c"
+   "deep_sleep_clock.c"
+@@ -145,6 +146,15 @@ if(CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE)
+   target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=media_lib_module_calloc")
+ endif()
+ 
++if(CONFIG_YORADIO_AAC_SBR_CONTINUITY)
++  file(SHA256 "$ENV{YORADIO_AUDIO_CODEC_COMPONENT}/lib/esp32c3/libesp_audio_codec.a" AAC_CONTINUITY_SHA256)
++  if(NOT AAC_CONTINUITY_SHA256 STREQUAL "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909")
++    message(FATAL_ERROR "AAC continuity requires the audited ESP32-C3 AAC archive")
++  endif()
++  target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=PVMP4AudioDecodeFrame"
++    "-Wl,-u,__wrap_PVMP4AudioDecodeFrame")
++endif()
++
+ if(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST)
+   target_link_options(${COMPONENT_LIB} INTERFACE
+     "-Wl,--wrap=calc_sbr_anafilterbank"
+diff --git a/idf/esp32c3-oled-native/main/Kconfig.projbuild b/idf/esp32c3-oled-native/main/Kconfig.projbuild
+index a2dc199d..a4b6f866 100644
+--- a/idf/esp32c3-oled-native/main/Kconfig.projbuild
++++ b/idf/esp32c3-oled-native/main/Kconfig.projbuild
+@@ -150,6 +150,14 @@ config YORADIO_COMPACT_SERVICE_STACKS
+         shared decoder's 16384-byte stack. Require all-codec and WebUI/OTA
+         stack/load measurements before enabling in the production profile.
+ 
++config YORADIO_AAC_SBR_CONTINUITY
++    bool "Keep SBR detection enabled after LC frames (experiment)"
++    depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
++    default n
++    help
++        Pinned private-ABI experiment for implicit LC/SBR/PS transitions with
++        identical ADTS headers. Requires paired PCM and lifecycle acceptance.
++
+ config YORADIO_AAC_EARLY_SBR_RESERVE
+     bool "Reserve AAC SBR state before core and PCM allocations"
+     depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
+diff --git a/idf/esp32c3-oled-native/main/qemu_aac_test.c b/idf/esp32c3-oled-native/main/qemu_aac_test.c
+index 408e0413..be59dded 100644
+--- a/idf/esp32c3-oled-native/main/qemu_aac_test.c
++++ b/idf/esp32c3-oled-native/main/qemu_aac_test.c
+@@ -211,9 +211,16 @@ void qemu_aac_test(native_state_t *state, oled_display_t *display) {
+     decoder = native_aac_decoder_create();
+     assert(decoder);
+     check_fixture(decoder, state, display, "LC22 same header", lc22_start, lc22_end, 22050, 1);
++#ifdef CONFIG_YORADIO_AAC_SBR_CONTINUITY
++    check_fixture(decoder, state, display, "Implicit SBR full", hev2_start, hev2_end, 44100, 2);
++    check_fixture(decoder, state, display, "Implicit LC return", lc22_start, lc22_end, 22050, 1);
++    check_fixture(decoder, state, display, "Implicit SBR repeat", hev2_start, hev2_end, 44100, 2);
++    ESP_LOGI(TAG, "QEMU_AAC_CONTINUITY_PASS implicit LC/SBR/LC/SBR full output");
++#else
+     check_fixture(decoder, state, display, "Implicit SBR core", hev2_start, hev2_end, 22050, 1);
+     assert(strcmp(state->stream_format, "AAC PCM 22.05 kHz mono") == 0);
+     ESP_LOGW(TAG, "QEMU_AAC_LIMITATION implicit SBR/PS change needs stream restart");
++#endif
+     native_aac_decoder_destroy(decoder);
+     decoder = native_aac_decoder_create();
+     assert(decoder);

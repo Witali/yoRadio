@@ -27,6 +27,10 @@ AAC passes on this board, but the full radio has a separate heap limitation:
 - [ ] Repeat full-rate HE/v2 playback, in-stream format transitions and total
   CPU measurements after the memory fix. Isolated decoder results do not prove
   that the complete radio can allocate the same decoder state.
+- [ ] Repair late implicit SBR/PS activation with identical ADTS headers. The
+  [flag-only QEMU experiment](ESP32C3_AAC_CONTINUITY_REJECTION_20261001.md)
+  crashes and is rejected. Audit late SBR initialization and output contracts;
+  retain AAC transform history and compare actual PCM.
 
 Do not reduce the shared 16 KiB decoder task stack blindly: the retained Opus
 benchmark used about 12.2 KiB. A fix must preserve other codecs and user settings.
@@ -400,4 +404,3 @@ an acceptable implementation of this optimization.
 - [ ] Run the complete host test suite.
 - [ ] Build the normal ESP-IDF firmware with `-O3`.
 - [ ] Test repeated HTTPS AAC playback on the physical ESP32-C3 OLED board.
-
