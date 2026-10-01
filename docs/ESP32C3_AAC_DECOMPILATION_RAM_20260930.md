@@ -1,5 +1,11 @@
 # ESP32-C3 AAC decompilation and RAM candidates — 2026-09-30
 
+**2026-10-01 update:** the user increased the current error limit to **±2 PCM
+LSB per sample/channel**. The one-LSB references below preserve this audit's
+original criteria. See the [packed-history experiment](ESP32C3_AAC_PACKED_HISTORY_20261001.md)
+and [current plan](ESP32C3_MEMORY_STABILITY_TODO.md); measured errors of 3–7 LSB
+still reject 14+14+4 history storage at the new limit.
+
 ## Conclusion and acceptance criteria
 
 The shipped Espressif AAC decoder has real opportunities for smaller SBR state.

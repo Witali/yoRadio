@@ -64,8 +64,11 @@ if(CONFIG_YORADIO_QEMU)
   list(APPEND NATIVE_SRCS "native_audio_output_qemu.c")
   if(CONFIG_YORADIO_QEMU_AAC_TEST)
     list(APPEND NATIVE_SRCS "qemu_aac_test.c")
-    if(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST)
+    if(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST OR CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST)
       list(APPEND NATIVE_SRCS "qemu_aac_bfp16.c")
+    endif()
+    if(CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST)
+      list(APPEND NATIVE_SRCS "qemu_aac_packed_history.c")
     endif()
     if(CONFIG_YORADIO_QEMU_CACHE_TEST)
       list(APPEND NATIVE_SRCS "qemu_cache_test.c")
@@ -128,6 +131,10 @@ if(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST)
   target_link_options(${COMPONENT_LIB} INTERFACE
     "-Wl,--wrap=calc_sbr_anafilterbank"
     "-Wl,--wrap=calc_sbr_anafilterbank_LC")
+endif()
+
+if(CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST)
+  target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=sbr_dec")
 endif()
 
 if(CONFIG_YORADIO_QEMU_AAC_TEST)

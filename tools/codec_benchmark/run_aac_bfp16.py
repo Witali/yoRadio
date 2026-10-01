@@ -165,12 +165,12 @@ def parse_statistics(log, rows, external):
     return list(stats.values())
 
 
-def run(args):
+def run(args, *, log_parser=parse_log, config_key="YORADIO_QEMU_AAC_BFP16_TEST", axis="bands"):
     build = args.build.resolve()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     config = (build / "config/sdkconfig.h").read_text()
-    for key in ("YORADIO_QEMU", "YORADIO_QEMU_AAC_TEST", "YORADIO_QEMU_AAC_BFP16_TEST",
+    for key in ("YORADIO_QEMU", "YORADIO_QEMU_AAC_TEST", config_key,
                 "YORADIO_AAC_PLUS", "COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE"):
         if f"#define CONFIG_{key} 1\n" not in config:
             raise ValueError(f"Build is missing {key}")
@@ -230,7 +230,7 @@ def run(args):
     with (output / "qemu.log").open("w") as log:
         subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
                        timeout=args.timeout, check=True)
-    result = parse_log((output / "qemu.log").read_text(errors="replace"))
+    result = log_parser((output / "qemu.log").read_text(errors="replace"))
     result["provenance"] = {"codec_sha256": sha256(archive),
                             "elf_sha256": sha256(build / "yoradio_esp32c3_oled_native.elf"),
                             "sdkconfig_sha256": sha256(build / "sdkconfig"),
@@ -240,17 +240,19 @@ def run(args):
         result["provenance"]["recording"] = recording
     (output / "result.json").write_text(json.dumps(result, indent=2) + "\n", newline="\n")
     for row in result["summaries"]:
-        print(f"{row['case']:20s} bands={row['bands']:2d} max_error={row['max_pcm_error_lsb']:4d} LSB "
+        print(f"{row['case']:20s} {axis}={row[axis]:2d} max_error={row['max_pcm_error_lsb']:4d} LSB "
               f"instructions={row['instruction_overhead_median_percent']:+.3f}%")
-    print("PCM precision:", "PASS (corpus only)" if result["precision_pass"] else "FAIL (>1 LSB)")
+    print("PCM precision:", "PASS (corpus only)" if result["precision_pass"] else f"FAIL (>{result['precision_limit_lsb']} LSB)")
+    if result.get("quantization_exercised") is False:
+        print("No packed history exercised; this input checks controls and format behavior only.")
     return 0 if result["precision_pass"] else 2
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--build", type=Path, default=ROOT / "idf/esp32c3-oled-native/build-qemu-aac-bfp16")
+def make_parser(description=__doc__, experiment="bfp16"):
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("--build", type=Path, default=ROOT / f"idf/esp32c3-oled-native/build-qemu-aac-{experiment}")
     parser.add_argument("--dependency-root", type=Path, default=ROOT / ".idf")
-    parser.add_argument("--output", type=Path, default=ROOT / ".build/aac-bfp16")
+    parser.add_argument("--output", type=Path, default=ROOT / f".build/aac-{experiment}")
     parser.add_argument("--qemu", required=True, help="Executable path in the selected Windows/WSL environment")
     parser.add_argument("--bios", required=True, help="QEMU BIOS directory in the selected environment")
     parser.add_argument("--wsl", action="store_true", help="Run Linux QEMU via WSL from Windows")
@@ -258,4 +260,8 @@ if __name__ == "__main__":
     parser.add_argument("--input", type=Path, help="Optional real ADTS recording; default runs the synthetic matrix")
     parser.add_argument("--source-url", default=None, help="Provenance only; the runner makes no network requests")
     parser.add_argument("--ffprobe", default="ffprobe", help="FFprobe executable for external input format verification")
-    sys.exit(run(parser.parse_args()))
+    return parser
+
+
+if __name__ == "__main__":
+    sys.exit(run(make_parser().parse_args()))

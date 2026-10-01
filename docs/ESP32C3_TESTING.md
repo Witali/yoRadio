@@ -39,6 +39,15 @@ The [real-recording extension](ESP32C3_AAC_BFP16_REAL_20260930.md) adds 60 paire
 comparisons, per-channel error moments/histograms and independent FFprobe frame
 counts. Validate that retained evidence with `python tests/test-aac-bfp16-real.py`.
 
+The [packed complex history experiment](ESP32C3_AAC_PACKED_HISTORY_20261001.md)
+uses **±5 LSB during development and ±2 LSB for the final version**, maximum per
+sample/channel (2026-10-01). It tests
+14+14+4 storage on retained SBR/PS histories, nearest and floor/midpoint modes,
+lossless controls and five real recordings: 201 paired comparisons. It still
+fails precision (3 LSB real, 7 LSB synthetic). Run
+`python tests/test-aac-packed-history.py`; a passing evidence test preserves
+that rejection. Inactive history paths are explicitly marked as not exercised.
+
 | ID | Previously missing coverage | Test created | Acceptance |
 | --- | --- | --- | --- |
 | C3-T01 | Repeatable production RAM-policy regression | `tests/test-esp32c3-acceptance.py`, `ProductionConfigTests` | Execute the actual PowerShell production wrapper against saved configs: both Wi-Fi IRAM options become disabled, other values survive, second run is idempotent; relative and absolute paths work. |

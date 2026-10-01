@@ -35,12 +35,14 @@ benchmark used about 12.2 KiB. A fix must preserve other codecs and user setting
 
 The [AAC decompilation audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md)
 recovers 176 linked functions and documents RAM candidates. Preserve the complete
-existing format/tool support; the user permits at most one output PCM LSB of
-error per sample/channel. Layout-only changes should remain byte-identical.
+existing format/tool support; as updated by the user on 2026-10-01, the limit is
+**±2 output PCM LSB per sample/channel**, with **±5 LSB temporarily permitted
+during development**. Historical one-LSB experiment reports
+retain their original thresholds. Layout-only changes should remain byte-identical.
 The final speed target is no decoding slowdown versus the unmodified decoder
 within measurement variability. A temporary slowdown is allowed during RAM
 optimization, with a measured regression and an explicit follow-up to recover
-speed while preserving full format support and the one-LSB output limit.
+speed while preserving full format support and the two-LSB output limit.
 
 - [x] Decompile the shipped decoder, verify critical allocations/offsets against
   disassembly and save reproducible evidence. Probe reference pointer-table
@@ -74,6 +76,14 @@ speed while preserving full format support and the one-LSB output limit.
   [Real-radio captures](ESP32C3_AAC_BFP16_REAL_20260930.md) confirm the failure:
   finest blocking still reaches 3 LSB, with 0.925–1.383% of HE/v2 samples above
   one LSB; per-channel error distributions and repeated-run statistics are saved.
+- [x] Qualify **14+14+4 complex history** separately for SBR, PS and both, using
+  nearest and floor/midpoint reconstruction. **Rejected even at ±2 LSB**: maxima
+  are 3 LSB on real recordings and 7 LSB on synthetic HE-AAC v2. The saved
+  [experiment](ESP32C3_AAC_PACKED_HISTORY_20261001.md) includes 201 paired tests,
+  error/quantizer statistics, controls and instruction counts. Actual RAM saved
+  is zero; 4,788 bytes is only the potential history payload saving before
+  workspace/layout changes. Keep production disabled and investigate wider or
+  selectively wider storage before implementing a stage-local cache.
 - [ ] Recover speed for any precision-qualified compact representation: fuse
   scans with QMF production, unpack only active work, then repeat A/B and board
   tests. BFP16's diagnostic pack/unpack adds roughly 3.4–8.0% median QEMU guest
@@ -87,7 +97,7 @@ speed while preserving full format support and the one-LSB output limit.
 - [ ] Explore lossless delta/residual compression of inactive history blocks
   only with a bounded raw fallback and complete peak-memory accounting. Do not
   rely on average compression to fit every stream; plain mu-law/A-law does not
-  establish the required one-LSB accuracy.
+  establish the required two-LSB accuracy.
 - [ ] Split large arrays into smaller allocations and evaluate a common codec
   arena as detailed below. These address fragmentation/ownership, not payload
   size by themselves; the optional Helix arena is not reclaimable resident RAM.

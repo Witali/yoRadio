@@ -1,7 +1,6 @@
-// QEMU-only BFP16 fidelity gate for esp_audio_codec 2.6.2 / ESP32-C3.
-// The ABI was checked against calc_sbr_anafilterbank and sbr_dec disassembly.
-// Packing then expanding at the analysis boundary models low-band QMF storage
-// loss, including the history copied by sbr_dec. It DOES NOT reduce live RAM.
+// QEMU-only paired PCM comparison for esp_audio_codec 2.6.2 / ESP32-C3.
+// BFP16 uses the analysis boundary; packed 14+14+4 uses retained frame history.
+// These numerical roundtrips do not reduce live allocations.
 #include "qemu_aac_bfp16.h"
 #include "native_aac_decoder.h"
 #include "decoder_pcm.h"
@@ -27,8 +26,26 @@ FIXTURE(he44, "he_44100_stereo");
 FIXTURE(he48, "he_48000_stereo");
 FIXTURE(hev2, "hev2_44100_stereo");
 
-static const char *TAG = "aac_bfp16";
+// Shared paired-decoder harness. The alternative experiment touches history
+// only; the original BFP16 analysis-row experiment and its log ABI are retained.
+#ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+#include "qemu_aac_packed_history.h"
+#define PCM_ERROR_LIMIT CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_ERROR_LIMIT
+#define TEST_LABEL "PCX14"
+#define VARIANT_LABEL "variant"
+#define CANDIDATE_LABEL "packed"
+static const unsigned groups[] = {1, 2, 3, 4, 5, 6, 7, 0};
+#else
+#define PCM_ERROR_LIMIT 1
+#define TEST_LABEL "BFP16"
+#define VARIANT_LABEL "bands"
+#define CANDIDATE_LABEL "bfp"
+static const unsigned groups[] = {32, 8, 1, 0};
+#endif
+static const char *TAG = "aac_compare";
+#ifndef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
 static unsigned group_bands; // Zero means the unmodified reference path.
+#endif
 static uint32_t complex_rows, real_rows, changed_values;
 static unsigned max_shift;
 static unsigned fixture_repeats = 2;
@@ -38,7 +55,7 @@ static bool detailed_statistics;
 // Two channels use 32,888 bytes, allocated only for external recordings.
 #define ERROR_BINS (4096 + 15)
 typedef struct {
-    uint64_t samples, absolute_sum, square_sum, signal_square_sum, over_one;
+    uint64_t samples, absolute_sum, square_sum, signal_square_sum, over_one, over_two, over_limit;
     int64_t signed_sum;
     uint32_t maximum, clipped_ref, clipped_bfp;
     uint64_t max_at;
@@ -53,6 +70,8 @@ static void accumulate_error(error_stats_t *s, uint32_t *hist, int16_t ref, int1
     s->square_sum += (uint64_t)error * error;
     s->signal_square_sum += (uint64_t)((int64_t)ref * ref);
     s->over_one += error > 1;
+    s->over_two += error > 2;
+    s->over_limit += error > PCM_ERROR_LIMIT;
     s->clipped_ref += ref == INT16_MIN || ref == INT16_MAX;
     s->clipped_bfp += bfp == INT16_MIN || bfp == INT16_MAX;
     if (error > s->maximum) {
@@ -67,12 +86,13 @@ static void accumulate_error(error_stats_t *s, uint32_t *hist, int16_t ref, int1
 
 static void print_statistics(const char *name, unsigned bands, unsigned run,
                              unsigned channel, const error_stats_t *s, const uint32_t *hist) {
-    ESP_LOGI(TAG, "BFP16_STATS case=%s bands=%u run=%u channel=%u samples=%" PRIu64
+    ESP_LOGI(TAG, TEST_LABEL "_STATS case=%s " VARIANT_LABEL "=%u run=%u channel=%u samples=%" PRIu64
              " abs_sum=%" PRIu64 " square_sum=%" PRIu64 " signal_square_sum=%" PRIu64
-             " signed_sum=%" PRId64 " over_one=%" PRIu64 " maximum=%" PRIu32
+             " signed_sum=%" PRId64 " over_one=%" PRIu64 " over_two=%" PRIu64
+             " over_limit=%" PRIu64 " maximum=%" PRIu32
              " max_at=%" PRIu64 " max_ref=%d max_bfp=%d clipped_ref=%" PRIu32 " clipped_bfp=%" PRIu32,
              name, bands, run, channel, s->samples, s->absolute_sum, s->square_sum,
-             s->signal_square_sum, s->signed_sum, s->over_one, s->maximum, s->max_at,
+             s->signal_square_sum, s->signed_sum, s->over_one, s->over_two, s->over_limit, s->maximum, s->max_at,
              s->max_ref, s->max_bfp, s->clipped_ref, s->clipped_bfp);
     char text[512];
     unsigned used = 0, entries = 0;
@@ -82,15 +102,16 @@ static void print_statistics(const char *name, unsigned bands, unsigned run,
         assert(n > 0 && n < sizeof(text) - used);
         used += n;
         if (++entries == 32) {
-            ESP_LOGI(TAG, "BFP16_HIST case=%s bands=%u run=%u channel=%u bins=%s",
+            ESP_LOGI(TAG, TEST_LABEL "_HIST case=%s " VARIANT_LABEL "=%u run=%u channel=%u bins=%s",
                      name, bands, run, channel, text);
             used = entries = 0;
         }
     }
-    if (entries) ESP_LOGI(TAG, "BFP16_HIST case=%s bands=%u run=%u channel=%u bins=%s",
+    if (entries) ESP_LOGI(TAG, TEST_LABEL "_HIST case=%s " VARIANT_LABEL "=%u run=%u channel=%u bins=%s",
                          name, bands, run, channel, text);
 }
 
+#ifndef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
 // Complementing negative values permits the asymmetric signed range, including
 // INT32_MIN, without abs(INT32_MIN) or implementation-defined signed shifts.
 static unsigned block_shift(const int32_t *real, const int32_t *imag, unsigned n) {
@@ -209,8 +230,10 @@ static void arithmetic_tests(void) {
         }
         if (!(k % 128)) vTaskDelay(1);
     }
-    ESP_LOGI(TAG, "BFP16_ARITHMETIC_PASS int16-exhaustive int32-edges random-blocks=4096");
+    ESP_LOGI(TAG, TEST_LABEL "_ARITHMETIC_PASS int16-exhaustive int32-edges random-blocks=4096");
 }
+
+#endif
 
 static inline uint32_t instructions(void) {
     uint32_t count;
@@ -226,7 +249,7 @@ static void check_counter(void) {
                      : "=r"(before), "=r"(after) :: "memory");
     taskEXIT_CRITICAL(&lock);
     assert(after - before == 1025);
-    ESP_LOGI(TAG, "BFP16_COUNTER_PASS nop1024=%" PRIu32, after - before);
+    ESP_LOGI(TAG, TEST_LABEL "_COUNTER_PASS nop1024=%" PRIu32, after - before);
 }
 
 typedef struct {
@@ -247,11 +270,14 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
     assert(!detailed_statistics || hist);
     for (unsigned leg = 0; leg < 2; ++leg)
         memset(pcm[leg] + NATIVE_AAC_PCM_FRAME_BYTES, 0xa5, 16);
-    uint64_t work[2] = {0}, samples = 0, different = 0, over_one = 0;
+    uint64_t work[2] = {0}, samples = 0, different = 0, over_one = 0, over_two = 0, over_limit = 0;
     uint32_t worst_call[2] = {0}, max_error[2] = {0}, frames = 0;
     uint64_t first_bad = UINT64_MAX;
     int first_ref = 0, first_candidate = 0;
     complex_rows = real_rows = changed_values = max_shift = 0;
+#ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    packed_history_reset(run);
+#endif
     // A second pass through the fixture exercises retained filter/PS histories.
     // Both passes (including decoder startup) contribute to fidelity and timing.
     for (unsigned repeat = 0; repeat < fixture_repeats; ++repeat) {
@@ -267,13 +293,21 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
                     {.buffer = pcm[1], .len = NATIVE_AAC_PCM_FRAME_BYTES}};
                 for (unsigned order = 0; order < 2; ++order) {
                     unsigned leg = order ^ (run & 1);
+#ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+                    packed_history_select(leg ? bands : 0);
+#else
                     group_bands = leg ? bands : 0;
+#endif
                     uint32_t before = instructions();
                     esp_audio_err_t result = native_aac_decoder_process(dec[leg], &raw[leg], &output[leg]);
                     uint32_t elapsed = instructions() - before;
                     work[leg] += elapsed;
                     if (elapsed > worst_call[leg]) worst_call[leg] = elapsed;
+#ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+                    packed_history_select(0);
+#else
                     group_bands = 0;
+#endif
                     assert(result == ESP_AUDIO_ERR_OK);
                     assert(raw[leg].consumed <= raw[leg].len);
                     assert(raw[leg].consumed || output[leg].decoded_size);
@@ -304,7 +338,9 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
                     if (error > max_error[channel]) max_error[channel] = error;
                     different += error != 0;
                     over_one += error > 1;
-                    if (error > 1 && first_bad == UINT64_MAX) {
+                    over_two += error > 2;
+                    over_limit += error > PCM_ERROR_LIMIT;
+                    if (error > PCM_ERROR_LIMIT && first_bad == UINT64_MAX) {
                         first_bad = samples + i;
                         first_ref = reference[i]; first_candidate = candidate[i];
                     }
@@ -317,20 +353,27 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
         }
     }
     assert(frames > 10 && samples >= f->rate * f->channels / 2);
+#ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    packed_history_report(f->name, bands, run, &complex_rows, &changed_values, &max_shift);
+    if (!bands || bands == 7 || !f->sbr) assert(!different && !changed_values);
+    if (!complex_rows) assert(!different && !changed_values);
+#else
     if (f->sbr && bands) assert(complex_rows + real_rows > 0 && changed_values > 0);
     else assert(!complex_rows && !real_rows && !different);
-    ESP_LOGI(TAG, "BFP16_RESULT case=%s bands=%u run=%u samples=%" PRIu64
+#endif
+    ESP_LOGI(TAG, TEST_LABEL "_RESULT case=%s " VARIANT_LABEL "=%u run=%u samples=%" PRIu64
              " frames=%" PRIu32 " max_l=%" PRIu32 " max_r=%" PRIu32
-             " different=%" PRIu64 " over_one=%" PRIu64 " complex_rows=%" PRIu32
+             " different=%" PRIu64 " over_one=%" PRIu64 " over_two=%" PRIu64
+             " over_limit=%" PRIu64 " complex_rows=%" PRIu32
              " real_rows=%" PRIu32 " changed_qmf=%" PRIu32 " max_shift=%u"
-             " ref_work=%" PRIu64 " bfp_work=%" PRIu64 " ref_max_call=%" PRIu32
-             " bfp_max_call=%" PRIu32 " precision=%s",
+             " ref_work=%" PRIu64 " " CANDIDATE_LABEL "_work=%" PRIu64 " ref_max_call=%" PRIu32
+             " " CANDIDATE_LABEL "_max_call=%" PRIu32 " precision=%s",
              f->name, bands, run, samples, frames, max_error[0], max_error[1], different,
-             over_one, complex_rows, real_rows, changed_values, max_shift,
-             work[0], work[1], worst_call[0], worst_call[1], over_one ? "FAIL" : "PASS");
-    if (over_one)
-        ESP_LOGI(TAG, "BFP16_FIRST_ERROR case=%s bands=%u run=%u sample=%" PRIu64
-                 " ref=%d bfp=%d", f->name, bands, run, first_bad, first_ref, first_candidate);
+             over_one, over_two, over_limit, complex_rows, real_rows, changed_values, max_shift,
+             work[0], work[1], worst_call[0], worst_call[1], over_limit ? "FAIL" : "PASS");
+    if (over_limit)
+        ESP_LOGI(TAG, TEST_LABEL "_FIRST_ERROR case=%s " VARIANT_LABEL "=%u run=%u sample=%" PRIu64
+                 " ref=%d " CANDIDATE_LABEL "=%d", f->name, bands, run, first_bad, first_ref, first_candidate);
     if (hist) {
         for (unsigned channel = 0; channel < f->channels; ++channel)
             print_statistics(f->name, bands, run, channel, stats + channel, hist + channel * ERROR_BINS);
@@ -360,10 +403,9 @@ static bool external_fixture(void) {
     fixture_t fixture = {"external", start, start + header[1], header[2], header[3], header[4]};
     fixture_repeats = 1; // One continuous recording; no looping at the boundary.
     detailed_statistics = true;
-    ESP_LOGI(TAG, "BFP16_EXTERNAL bytes=%" PRIu32 " rate=%" PRIu32 " channels=%u sbr=%u runs=3 repeats=1",
+    ESP_LOGI(TAG, TEST_LABEL "_EXTERNAL bytes=%" PRIu32 " rate=%" PRIu32 " channels=%u sbr=%u runs=3 repeats=1",
              header[1], header[2], fixture.channels, fixture.sbr);
-    const unsigned groups[] = {32, 8, 1, 0};
-    for (unsigned g = 0; g < 4; ++g)
+    for (unsigned g = 0; g < sizeof(groups) / sizeof(groups[0]); ++g)
         for (unsigned run = 1; run <= 3; ++run)
             compare_fixture(&fixture, groups[g], run);
     esp_partition_munmap(handle);
@@ -374,12 +416,17 @@ static bool external_fixture(void) {
 
 void qemu_aac_bfp16_test(void) {
     check_counter();
+#ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    ESP_LOGI(TAG, "PCX14_LIMIT development=%u production=2", PCM_ERROR_LIMIT);
+    packed_history_arithmetic_tests();
+#else
     arithmetic_tests();
+#endif
     if (external_fixture()) {
-        ESP_LOGI(TAG, "BFP16_EXPERIMENT_COMPLETE external recording; inspect precision per case");
+        ESP_LOGI(TAG, TEST_LABEL "_EXPERIMENT_COMPLETE external recording; inspect precision per case");
         return;
     }
-    ESP_LOGI(TAG, "BFP16_ENV codec=%s groups=32,8,1 control=0 runs=3 repeats=2 baseline=wrap-bypass RAM_saved=0",
+    ESP_LOGI(TAG, TEST_LABEL "_ENV codec=%s control=0 runs=3 repeats=2 baseline=wrap-bypass RAM_saved=0",
              esp_audio_codec_get_version());
     const fixture_t fixtures[] = {
         {"lc44100_stereo", lc44_start, lc44_end, 44100, 2, false},
@@ -388,10 +435,9 @@ void qemu_aac_bfp16_test(void) {
         {"he44100_stereo", he44_start, he44_end, 44100, 2, true},
         {"he48000_stereo", he48_start, he48_end, 48000, 2, true},
         {"hev2_44100_stereo", hev2_start, hev2_end, 44100, 2, true}};
-    const unsigned groups[] = {32, 8, 1, 0};
     for (unsigned i = 0; i < sizeof(fixtures) / sizeof(fixtures[0]); ++i)
-        for (unsigned g = 0; g < (fixtures[i].sbr ? 4 : 1); ++g)
+        for (unsigned g = 0; g < (fixtures[i].sbr ? sizeof(groups) / sizeof(groups[0]) : 1); ++g)
             for (unsigned run = 1; run <= 3; ++run)
                 compare_fixture(fixtures + i, groups[g], run);
-    ESP_LOGI(TAG, "BFP16_EXPERIMENT_COMPLETE inspect precision per case; no production approval");
+    ESP_LOGI(TAG, TEST_LABEL "_EXPERIMENT_COMPLETE inspect precision per case; no production approval");
 }

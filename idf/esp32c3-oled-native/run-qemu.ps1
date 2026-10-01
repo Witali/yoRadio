@@ -34,6 +34,7 @@ if (-not $SkipBuild) {
 $builtConfig = Get-Content -LiteralPath (Join-Path $buildPath "config/sdkconfig.h") -Raw
 $instructionProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_PROFILE 1'
 $cacheProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_CACHE_TEST 1'
+$packedHistoryProfile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST 1'
 $bfp16Profile = $builtConfig -match '#define CONFIG_YORADIO_QEMU_AAC_BFP16_TEST 1'
 if ($CodecCalibration -and -not $instructionProfile) {
     throw "Codec calibration requires CONFIG_YORADIO_QEMU_AAC_PROFILE=y"
@@ -106,7 +107,7 @@ $qemuArguments = @(
     "-nographic", "-no-reboot", "-snapshot",
     "-audiodev", "wav,id=audio0,path=$AudioOutput,out.frequency=48000"
 )
-if ($instructionProfile -or $cacheProfile -or $bfp16Profile) {
+if ($instructionProfile -or $cacheProfile -or $bfp16Profile -or $packedHistoryProfile) {
     $qemuArguments += @("-icount", "shift=0,align=off,sleep=off")
 }
 if (-not [string]::IsNullOrWhiteSpace($QemuBiosDirectory)) {
@@ -152,5 +153,11 @@ if ($CodecCalibration -and $joinedOutput -notmatch "QEMU_CODEC_CAL_PASS codec=$C
 }
 if ($cacheProfile -and $joinedOutput -notmatch 'QEMU_CACHE_PASS') {
     throw "QEMU cache trace fixture failed; see $log"
+}
+if ($packedHistoryProfile -and $joinedOutput -notmatch 'PCX14_EXPERIMENT_COMPLETE') {
+    throw "QEMU packed history experiment incomplete; see $log"
+}
+if ($packedHistoryProfile -and $joinedOutput -match 'precision=FAIL') {
+    Write-Warning "Packed history exceeds its development PCM limit; see PCX14_LIMIT and PCX14_RESULT in $log"
 }
 Write-Host "QEMU smoke test passed; log: $log; audio: $AudioOutput"
