@@ -32,7 +32,8 @@ counts are not physical CPU/cache measurements.
 
 ## Board results
 
-Awake QIO 80 MHz build, safe IRAM profile, fixed TCP PCB pool and dynamic TLS.
+Awake DIO 80 MHz application build, safe IRAM profile, fixed TCP PCB pool and dynamic TLS.
+This was an application-only OTA; the installed bootloader was not rewritten.
 The exact image, configuration and manifest are in
 [`firmware/development/esp32c3-aac-compact-owner`](../firmware/development/esp32c3-aac-compact-owner/).
 
