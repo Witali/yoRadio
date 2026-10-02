@@ -10,7 +10,12 @@
 #include <string.h>
 
 #define ORIGINAL_SIZE sizeof(aac_sbr_owner_abi_t)
+#ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_OWNER_TEST
+#define COMPACT_SIZE sizeof(aac_sbr_compact_relocated_owner_abi_t)
+#define PS_RELOCATED 4u
+#else
 #define COMPACT_SIZE sizeof(aac_sbr_compact_owner_abi_t)
+#endif
 #define GUARD_BYTES 16u
 typedef struct { uint8_t *owner, *allocation; size_t size, physical; unsigned variant, ps; } owner_t;
 static owner_t owners[4];
@@ -29,6 +34,14 @@ void compact5_sbr_open(int,void *,void *,int);
 void ps_allocate_decoder(void *,unsigned);
 void compact5_ps_allocate_decoder(void *,unsigned);
 
+#ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_OWNER_TEST
+static void ps_pointer(owner_t *o) {
+    aac_sbr_compact_relocated_owner_abi_t *sbr=(void *)o->owner;
+    sbr->ps=o->ps&PS_RELOCATED ? &sbr->channel[1].ps_overlay.relocated_ps :
+                               (void *)&sbr->inactive_ps;
+}
+#endif
+
 static owner_t *find(void *p) {
     for(unsigned i=0;i<4;++i) if(p && owners[i].owner==p)return owners+i;
     return NULL;
@@ -40,6 +53,11 @@ static void check(owner_t *o) {
     }
 }
 void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
+#ifdef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
+    bool qemu_aac_reset_calloc(const char *,size_t,size_t,void **);
+    void *result;
+    if(qemu_aac_reset_calloc(module,n,size,&result))return result;
+#endif
     unsigned leg=selected==1;
     if(n==1 && fail_size[leg] && size==fail_size[leg]) { fail_size[leg]=0;return NULL; }
     if(n!=1 || size!=ORIGINAL_SIZE)return __real_media_lib_module_calloc(module,n,size);
@@ -56,6 +74,10 @@ void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
     return o->owner;
 }
 void __wrap_media_lib_free(void *p) {
+#ifdef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
+    bool qemu_aac_reset_free(void *);
+    if(qemu_aac_reset_free(p))return;
+#endif
     owner_t *o=find(p);
     if(!o){__real_media_lib_free(p);return;}
     check(o);void *raw=o->allocation;memset(o,0,sizeof(*o));++frees;
@@ -87,8 +109,21 @@ int __wrap_PVMP4AudioDecodeFrame(void *external,void *core) {
 }
 int __wrap_ps_read_data(void *ps,void *bits,unsigned count) {
     if(selected==1)++ps_reads;
+#ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_OWNER_TEST
+    if(active && active->variant==1) {
+        aac_sbr_compact_relocated_owner_abi_t *sbr=(void *)active->owner;
+        aac_ps_abi_t *relocated=&sbr->channel[1].ps_overlay.relocated_ps;
+        if(!(active->ps&PS_RELOCATED)) {
+            memset(relocated,0,sizeof(*relocated));
+            relocated->detected=sbr->inactive_ps;
+            active->ps|=PS_RELOCATED;ps_pointer(active);
+        }
+        return __real_ps_read_data(relocated,bits,count);
+    }
+#endif
     return __real_ps_read_data(ps,bits,count);
 }
+#ifndef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
 void __wrap_PVMP4AudioDecoderResetBuffer(void *core) {
     void *owner=((aac_core_abi_t *)core)->sbr;
     owner_t *o=find(owner);
@@ -98,6 +133,45 @@ void __wrap_PVMP4AudioDecoderResetBuffer(void *core) {
     assert(selected!=1 && (!o || o->variant!=1));
     __real_PVMP4AudioDecoderResetBuffer(core);
 }
+#endif
+
+#ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_OWNER_TEST
+int __real_compact5_sbr_applied(void *,void *,void *,void *,void *,void *,int,void *,void *,int);
+int __wrap_compact5_sbr_applied(void *owner,void *stream,void *left,void *right,
+                              void *out_l,void *out_r,int channels,void *control,void *core,int out_channels) {
+    owner_t *o=find(owner);assert(o && o->variant==1 && (!active || active==o));
+    active=o;ps_pointer(o);check(o);
+    int result=__real_compact5_sbr_applied(owner,stream,left,right,out_l,out_r,channels,control,core,out_channels);
+    check(o);active=NULL;return result;
+}
+void *aac_sbr_layout_ps(void *owner) {
+    owner_t *o=find(owner);assert(o && o->variant==1);ps_pointer(o);
+    return ((aac_sbr_compact_relocated_owner_abi_t *)owner)->ps;
+}
+void __real_compact5_sbr_open(int,void *,void *,int);
+int compact5_init_sbr_dec(int,int,void *,void *);
+extern const uint32_t compact5_defaultHeader[16];
+void __wrap_compact5_sbr_open(int rate,void *control,void *owner,int downsample) {
+    owner_t *o=find(owner);
+    if(!o || !(o->ps&PS_RELOCATED)) {
+        __real_compact5_sbr_open(rate,control,owner,downsample);return;
+    }
+    // Preserve relocated PS control across reset, like the original tail.
+    aac_sbr_compact_relocated_owner_abi_t *sbr=owner;
+    const size_t start=offsetof(aac_sbr_compact_relocated_owner_abi_t,channel[1].ps_overlay.relocated_ps);
+    const size_t end=start+sizeof(aac_ps_abi_t);
+    memset(owner,0,start);
+    memset(o->owner+end,0,offsetof(aac_sbr_compact_relocated_owner_abi_t,initialize_ps)-end);
+    for(unsigned ch=0;ch<AAC_SBR_CHANNELS;++ch) {
+        aac_sbr_compact_channel_abi_t *channel=&sbr->channel[ch];
+        memcpy(&channel->frame.header,compact5_defaultHeader,sizeof(channel->frame.header));
+        if(downsample || rate>24000)channel->frame.header.sample_rate_mode=1;
+        channel->frame_size=compact5_init_sbr_dec(rate,sbr->channel[0].frame.header.sample_rate_mode,control,&channel->frame);
+        channel->sync_state=1;channel->frame.startup=1;
+    }
+    check(o);
+}
+#endif
 void packed_history_reset(unsigned run) {
     (void)run;
     for(unsigned i=0;i<4;++i)assert(!owners[i].owner);
@@ -108,7 +182,7 @@ void packed_history_select(unsigned variant) {assert(variant==0||variant==1||var
 void packed_history_report(const char *name,unsigned variant,unsigned run,uint32_t *rows,uint32_t *changed,unsigned *shift) {
     unsigned modes=0;
     for(unsigned i=0;i<4;++i)if(owners[i].owner)check(owners+i);
-    for(unsigned i=0;i<4;++i)if(owners[i].owner && owners[i].variant==1)modes|=owners[i].ps;
+    for(unsigned i=0;i<4;++i)if(owners[i].owner && owners[i].variant==1)modes|=owners[i].ps&3u;
     *rows=calls;*changed=*shift=0;
     ESP_LOGI(TAG,"SBRLAYOUT_MEMORY case=%s variant=%u run=%u calls=%u ps_reads=%u allocations=%u frees=%u"
         " reference=%u candidate=%u physical_reference=%u physical_candidate=%u static_test_state=%u guard_bytes=%u smoothing_modes=%u",
@@ -120,7 +194,7 @@ static size_t map_offset(size_t offset) {
     const size_t old_channel=sizeof(aac_sbr_channel_abi_t);
     const size_t new_channel=sizeof(aac_sbr_compact_channel_abi_t);
     if(offset>=offsetof(aac_sbr_owner_abi_t,initialize_ps))
-        return offset-(ORIGINAL_SIZE-COMPACT_SIZE);
+        return offset-(ORIGINAL_SIZE-sizeof(aac_sbr_compact_owner_abi_t));
     size_t channel=offset/old_channel, local=offset%old_channel;
     const size_t tables=offsetof(aac_sbr_channel_abi_t,smoothing);
     const size_t old_table=sizeof(((aac_sbr_channel_abi_t *)0)->smoothing[0]);
@@ -147,13 +221,17 @@ static void compare_initial_layout(uint8_t *ref,uint8_t *candidate) {
 }
 void qemu_aac_smoothing_fir_test(void);
 void packed_history_arithmetic_tests(void) {
-    uint8_t *ref=calloc(1,ORIGINAL_SIZE),*candidate=calloc(1,COMPACT_SIZE);
+    // Compare every word of the independently patched table layout first.
+    // Relocation/shortened-tail correctness is checked by guarded PCM/reset.
+    uint8_t *ref=calloc(1,ORIGINAL_SIZE),*candidate=calloc(1,sizeof(aac_sbr_compact_owner_abi_t));
+    void *probe=calloc(1,COMPACT_SIZE);assert(probe);
     aac_sbr_control_abi_t *control1=calloc(1,sizeof(*control1)),*control2=calloc(1,sizeof(*control2));
     assert(ref && candidate && control1 && control2);
     ESP_LOGI(TAG,"SBRLAYOUT_ALLOCATOR reference_request=%u candidate_request=%u reference_block=%u candidate_block=%u guard_bytes=0",
-             (unsigned)ORIGINAL_SIZE,(unsigned)COMPACT_SIZE,(unsigned)heap_caps_get_allocated_size(ref),(unsigned)heap_caps_get_allocated_size(candidate));
+             (unsigned)ORIGINAL_SIZE,(unsigned)COMPACT_SIZE,(unsigned)heap_caps_get_allocated_size(ref),(unsigned)heap_caps_get_allocated_size(probe));
+    free(probe);
     for(unsigned down=0;down<2;++down) {
-        memset(ref,0,ORIGINAL_SIZE);memset(candidate,0,COMPACT_SIZE);
+        memset(ref,0,ORIGINAL_SIZE);memset(candidate,0,sizeof(aac_sbr_compact_owner_abi_t));
         sbr_open(22050,control1,ref,down);compact5_sbr_open(22050,control2,candidate,down);
         compare_initial_layout(ref,candidate);
         assert(!memcmp(control1,control2,sizeof(*control1)));

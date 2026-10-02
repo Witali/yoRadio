@@ -120,6 +120,7 @@ AAC_SBR_CHANNEL_TYPE(aac_sbr_compact_channel_abi_t, AAC_SBR_ROWS);
 AAC_SBR_OWNER_TYPE(aac_sbr_owner_abi_t, aac_sbr_channel_abi_t, aac_ps_abi_t, embedded_ps);
 AAC_SBR_OWNER_TYPE(aac_sbr_compact_owner_abi_t, aac_sbr_compact_channel_abi_t, aac_ps_abi_t, embedded_ps);
 AAC_SBR_OWNER_TYPE(aac_sbr_relocated_owner_abi_t, aac_sbr_channel_abi_t, int32_t, inactive_ps);
+AAC_SBR_OWNER_TYPE(aac_sbr_compact_relocated_owner_abi_t, aac_sbr_compact_channel_abi_t, int32_t, inactive_ps);
 #undef AAC_SBR_OWNER_TYPE
 
 typedef struct AAC_ABI_VIEW {
@@ -188,6 +189,9 @@ AAC_ABI_OFFSET(aac_sbr_relocated_owner_abi_t, channel[1].packed_ps.exponents, 0x
 _Static_assert(sizeof(aac_sbr_owner_abi_t)==55128, "Original SBR ABI");
 _Static_assert(sizeof(aac_sbr_compact_owner_abi_t)==53240, "Compact SBR ABI");
 _Static_assert(sizeof(aac_sbr_relocated_owner_abi_t)==51596, "Relocated SBR ABI");
+_Static_assert(sizeof(aac_sbr_compact_relocated_owner_abi_t)==49708, "Compact relocated SBR ABI");
+_Static_assert(offsetof(aac_sbr_compact_relocated_owner_abi_t,inactive_ps)==
+               offsetof(aac_sbr_compact_owner_abi_t,embedded_ps), "Compact inactive PS flag ABI");
 AAC_ABI_OFFSET(aac_sbr_control_abi_t, columns, 0x10);
 AAC_ABI_OFFSET(aac_sbr_control_abi_t, write_offset, 0x18);
 _Static_assert(sizeof(aac_sbr_control_abi_t)==1180, "SBR control ABI");
