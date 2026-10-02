@@ -1,0 +1,2772 @@
+{
+  "experiment": "qmf_analysis_storage_roundtrip",
+  "precision_limit_lsb": 5,
+  "precision_pass": true,
+  "production_precision_limit_lsb": 2,
+  "production_precision_pass": false,
+  "ram_saved_bytes": 0,
+  "quantization_exercised": true,
+  "scope": "Only new low-band QMF rows; unchanged allocation and native DSP; not compact high-band history",
+  "timing_unit": "QEMU guest instructions including roundtrip wrappers; runs 2/3",
+  "summaries": [
+    {
+      "case": "external",
+      "variant": 1,
+      "name": "shared16",
+      "max_pcm_error_lsb": 3,
+      "samples_per_run": 2646016,
+      "over_two_per_run": 412,
+      "over_limit_per_run": 0,
+      "coverage": "quantized",
+      "instruction_overhead_median_percent": 23.909
+    },
+    {
+      "case": "external",
+      "variant": 2,
+      "name": "split16",
+      "max_pcm_error_lsb": 3,
+      "samples_per_run": 2646016,
+      "over_two_per_run": 412,
+      "over_limit_per_run": 0,
+      "coverage": "quantized",
+      "instruction_overhead_median_percent": 26.04
+    },
+    {
+      "case": "external",
+      "variant": 3,
+      "name": "shared17_five",
+      "max_pcm_error_lsb": 3,
+      "samples_per_run": 2646016,
+      "over_two_per_run": 169,
+      "over_limit_per_run": 0,
+      "coverage": "quantized",
+      "instruction_overhead_median_percent": 25.149
+    },
+    {
+      "case": "external",
+      "variant": 4,
+      "name": "shared17_four",
+      "max_pcm_error_lsb": 3,
+      "samples_per_run": 2646016,
+      "over_two_per_run": 169,
+      "over_limit_per_run": 0,
+      "coverage": "quantized",
+      "instruction_overhead_median_percent": 25.168
+    },
+    {
+      "case": "external",
+      "variant": 5,
+      "name": "shared18_four",
+      "max_pcm_error_lsb": 3,
+      "samples_per_run": 2646016,
+      "over_two_per_run": 70,
+      "over_limit_per_run": 0,
+      "coverage": "quantized",
+      "instruction_overhead_median_percent": 24.77
+    },
+    {
+      "case": "external",
+      "variant": 0,
+      "name": "binary_bypass",
+      "max_pcm_error_lsb": 0,
+      "samples_per_run": 2646016,
+      "over_two_per_run": 0,
+      "over_limit_per_run": 0,
+      "coverage": "not_exercised",
+      "instruction_overhead_median_percent": 0.0
+    }
+  ],
+  "runs": [
+    {
+      "case": "external",
+      "variant": 1,
+      "run": 1,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 223256,
+      "over_one": 35662,
+      "over_two": 412,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1105595,
+      "max_shift": 15,
+      "ref_work": 894174044,
+      "packed_work": 1107925727,
+      "ref_max_call": 1664929,
+      "packed_max_call": 1998695,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 1,
+      "run": 2,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 223256,
+      "over_one": 35662,
+      "over_two": 412,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1105595,
+      "max_shift": 15,
+      "ref_work": 894139949,
+      "packed_work": 1107958802,
+      "ref_max_call": 1664929,
+      "packed_max_call": 1998695,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 1,
+      "run": 3,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 223256,
+      "over_one": 35662,
+      "over_two": 412,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1105595,
+      "max_shift": 15,
+      "ref_work": 894173529,
+      "packed_work": 1107925222,
+      "ref_max_call": 1664929,
+      "packed_max_call": 1998695,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 2,
+      "run": 1,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 223256,
+      "over_one": 35662,
+      "over_two": 412,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1105595,
+      "max_shift": 15,
+      "ref_work": 894199080,
+      "packed_work": 1126991824,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2028127,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 2,
+      "run": 2,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 223256,
+      "over_one": 35662,
+      "over_two": 412,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1105595,
+      "max_shift": 15,
+      "ref_work": 894151774,
+      "packed_work": 1127038931,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2028127,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 2,
+      "run": 3,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 223256,
+      "over_one": 35662,
+      "over_two": 412,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1105595,
+      "max_shift": 15,
+      "ref_work": 894199080,
+      "packed_work": 1126991824,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2028127,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 3,
+      "run": 1,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 146325,
+      "over_one": 22561,
+      "over_two": 169,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1049827,
+      "max_shift": 14,
+      "ref_work": 894190563,
+      "packed_work": 1119017022,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2017801,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 3,
+      "run": 2,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 146325,
+      "over_one": 22561,
+      "over_two": 169,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1049827,
+      "max_shift": 14,
+      "ref_work": 894141452,
+      "packed_work": 1119066133,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2017801,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 3,
+      "run": 3,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 146325,
+      "over_one": 22561,
+      "over_two": 169,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1049827,
+      "max_shift": 14,
+      "ref_work": 894190563,
+      "packed_work": 1119017022,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2017801,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 4,
+      "run": 1,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 146325,
+      "over_one": 22561,
+      "over_two": 169,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1049827,
+      "max_shift": 14,
+      "ref_work": 894189561,
+      "packed_work": 1119183400,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2018057,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 4,
+      "run": 2,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 146325,
+      "over_one": 22561,
+      "over_two": 169,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1049827,
+      "max_shift": 14,
+      "ref_work": 894141253,
+      "packed_work": 1119231509,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2018057,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 4,
+      "run": 3,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 146325,
+      "over_one": 22561,
+      "over_two": 169,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 1049827,
+      "max_shift": 14,
+      "ref_work": 894189561,
+      "packed_work": 1119183400,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2018057,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 5,
+      "run": 1,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 94007,
+      "over_one": 14480,
+      "over_two": 70,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 980685,
+      "max_shift": 13,
+      "ref_work": 894184551,
+      "packed_work": 1115628800,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2016561,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 5,
+      "run": 2,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 94007,
+      "over_one": 14480,
+      "over_two": 70,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 980685,
+      "max_shift": 13,
+      "ref_work": 894140951,
+      "packed_work": 1115672400,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2016561,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 5,
+      "run": 3,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 3,
+      "max_r": 3,
+      "different": 94007,
+      "over_one": 14480,
+      "over_two": 70,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 41344,
+      "changed_qmf": 980685,
+      "max_shift": 13,
+      "ref_work": 894184551,
+      "packed_work": 1115628800,
+      "ref_max_call": 1664929,
+      "packed_max_call": 2016561,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 0,
+      "run": 1,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 0,
+      "max_r": 0,
+      "different": 0,
+      "over_one": 0,
+      "over_two": 0,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 0,
+      "changed_qmf": 0,
+      "max_shift": 0,
+      "ref_work": 894129441,
+      "packed_work": 894079829,
+      "ref_max_call": 1664929,
+      "packed_max_call": 1664929,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 0,
+      "run": 2,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 0,
+      "max_r": 0,
+      "different": 0,
+      "over_one": 0,
+      "over_two": 0,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 0,
+      "changed_qmf": 0,
+      "max_shift": 0,
+      "ref_work": 894079829,
+      "packed_work": 894129441,
+      "ref_max_call": 1664929,
+      "packed_max_call": 1664929,
+      "precision": "PASS"
+    },
+    {
+      "case": "external",
+      "variant": 0,
+      "run": 3,
+      "samples": 2646016,
+      "frames": 646,
+      "max_l": 0,
+      "max_r": 0,
+      "different": 0,
+      "over_one": 0,
+      "over_two": 0,
+      "over_limit": 0,
+      "complex_rows": 0,
+      "real_rows": 0,
+      "changed_qmf": 0,
+      "max_shift": 0,
+      "ref_work": 894129441,
+      "packed_work": 894079829,
+      "ref_max_call": 1664929,
+      "packed_max_call": 1664929,
+      "precision": "PASS"
+    }
+  ],
+  "storage": [
+    {
+      "case": "external",
+      "variant": 1,
+      "run": 1,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 1,
+      "run": 2,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 1,
+      "run": 3,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 2,
+      "run": 1,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 2,
+      "run": 2,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 2,
+      "run": 3,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 3,
+      "run": 1,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 3,
+      "run": 2,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 3,
+      "run": 3,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 4,
+      "run": 1,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 4,
+      "run": 2,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 4,
+      "run": 3,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 5,
+      "run": 1,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 5,
+      "run": 2,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 5,
+      "run": 3,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 0,
+      "run": 1,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 0,
+      "run": 2,
+      "saturations": 0
+    },
+    {
+      "case": "external",
+      "variant": 0,
+      "run": 3,
+      "saturations": 0
+    }
+  ],
+  "external": {
+    "bytes": 239943,
+    "rate": 44100,
+    "channels": 2,
+    "sbr": 1,
+    "runs": 3,
+    "repeats": 1
+  },
+  "error_statistics": [
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 128032,
+      "square_sum": 163824,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 6592,
+      "over_one": 17506,
+      "over_two": 195,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 11739,
+      "max_ref": 770,
+      "max_bfp": 773,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0967734133126935,
+        "rms_error_lsb": 0.35189048812759194,
+        "mean_signed_error_lsb": 0.004982585139318886,
+        "over_one_percent": 1.3231968363003095,
+        "identical_percent": 91.66059464493034,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -99.38084814564087,
+        "signal_to_error_db": 81.96066640113648,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1212677,
+        "1": 92825,
+        "2": 17311,
+        "3": 195
+      },
+      "variant": 1
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 131298,
+      "square_sum": 168478,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6394,
+      "over_one": 18156,
+      "over_two": 217,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 13001,
+      "max_ref": -3521,
+      "max_bfp": -3524,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.09924203028250773,
+        "rms_error_lsb": 0.35685383145483224,
+        "mean_signed_error_lsb": 0.004832926180340557,
+        "over_one_percent": 1.372327302631579,
+        "identical_percent": 91.46452629160217,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -99.2591914185007,
+        "signal_to_error_db": 82.137675068076,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1210083,
+        "1": 94769,
+        "2": 17939,
+        "3": 217
+      },
+      "variant": 1
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 128032,
+      "square_sum": 163824,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 6592,
+      "over_one": 17506,
+      "over_two": 195,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 11739,
+      "max_ref": 770,
+      "max_bfp": 773,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0967734133126935,
+        "rms_error_lsb": 0.35189048812759194,
+        "mean_signed_error_lsb": 0.004982585139318886,
+        "over_one_percent": 1.3231968363003095,
+        "identical_percent": 91.66059464493034,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -99.38084814564087,
+        "signal_to_error_db": 81.96066640113648,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1212677,
+        "1": 92825,
+        "2": 17311,
+        "3": 195
+      },
+      "variant": 1
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 131298,
+      "square_sum": 168478,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6394,
+      "over_one": 18156,
+      "over_two": 217,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 13001,
+      "max_ref": -3521,
+      "max_bfp": -3524,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.09924203028250773,
+        "rms_error_lsb": 0.35685383145483224,
+        "mean_signed_error_lsb": 0.004832926180340557,
+        "over_one_percent": 1.372327302631579,
+        "identical_percent": 91.46452629160217,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -99.2591914185007,
+        "signal_to_error_db": 82.137675068076,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1210083,
+        "1": 94769,
+        "2": 17939,
+        "3": 217
+      },
+      "variant": 1
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 128032,
+      "square_sum": 163824,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 6592,
+      "over_one": 17506,
+      "over_two": 195,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 11739,
+      "max_ref": 770,
+      "max_bfp": 773,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0967734133126935,
+        "rms_error_lsb": 0.35189048812759194,
+        "mean_signed_error_lsb": 0.004982585139318886,
+        "over_one_percent": 1.3231968363003095,
+        "identical_percent": 91.66059464493034,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -99.38084814564087,
+        "signal_to_error_db": 81.96066640113648,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1212677,
+        "1": 92825,
+        "2": 17311,
+        "3": 195
+      },
+      "variant": 1
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 131298,
+      "square_sum": 168478,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6394,
+      "over_one": 18156,
+      "over_two": 217,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 13001,
+      "max_ref": -3521,
+      "max_bfp": -3524,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.09924203028250773,
+        "rms_error_lsb": 0.35685383145483224,
+        "mean_signed_error_lsb": 0.004832926180340557,
+        "over_one_percent": 1.372327302631579,
+        "identical_percent": 91.46452629160217,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -99.2591914185007,
+        "signal_to_error_db": 82.137675068076,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1210083,
+        "1": 94769,
+        "2": 17939,
+        "3": 217
+      },
+      "variant": 1
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 128032,
+      "square_sum": 163824,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 6592,
+      "over_one": 17506,
+      "over_two": 195,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 11739,
+      "max_ref": 770,
+      "max_bfp": 773,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0967734133126935,
+        "rms_error_lsb": 0.35189048812759194,
+        "mean_signed_error_lsb": 0.004982585139318886,
+        "over_one_percent": 1.3231968363003095,
+        "identical_percent": 91.66059464493034,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -99.38084814564087,
+        "signal_to_error_db": 81.96066640113648,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1212677,
+        "1": 92825,
+        "2": 17311,
+        "3": 195
+      },
+      "variant": 2
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 131298,
+      "square_sum": 168478,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6394,
+      "over_one": 18156,
+      "over_two": 217,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 13001,
+      "max_ref": -3521,
+      "max_bfp": -3524,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.09924203028250773,
+        "rms_error_lsb": 0.35685383145483224,
+        "mean_signed_error_lsb": 0.004832926180340557,
+        "over_one_percent": 1.372327302631579,
+        "identical_percent": 91.46452629160217,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -99.2591914185007,
+        "signal_to_error_db": 82.137675068076,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1210083,
+        "1": 94769,
+        "2": 17939,
+        "3": 217
+      },
+      "variant": 2
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 128032,
+      "square_sum": 163824,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 6592,
+      "over_one": 17506,
+      "over_two": 195,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 11739,
+      "max_ref": 770,
+      "max_bfp": 773,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0967734133126935,
+        "rms_error_lsb": 0.35189048812759194,
+        "mean_signed_error_lsb": 0.004982585139318886,
+        "over_one_percent": 1.3231968363003095,
+        "identical_percent": 91.66059464493034,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -99.38084814564087,
+        "signal_to_error_db": 81.96066640113648,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1212677,
+        "1": 92825,
+        "2": 17311,
+        "3": 195
+      },
+      "variant": 2
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 131298,
+      "square_sum": 168478,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6394,
+      "over_one": 18156,
+      "over_two": 217,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 13001,
+      "max_ref": -3521,
+      "max_bfp": -3524,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.09924203028250773,
+        "rms_error_lsb": 0.35685383145483224,
+        "mean_signed_error_lsb": 0.004832926180340557,
+        "over_one_percent": 1.372327302631579,
+        "identical_percent": 91.46452629160217,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -99.2591914185007,
+        "signal_to_error_db": 82.137675068076,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1210083,
+        "1": 94769,
+        "2": 17939,
+        "3": 217
+      },
+      "variant": 2
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 128032,
+      "square_sum": 163824,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 6592,
+      "over_one": 17506,
+      "over_two": 195,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 11739,
+      "max_ref": 770,
+      "max_bfp": 773,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0967734133126935,
+        "rms_error_lsb": 0.35189048812759194,
+        "mean_signed_error_lsb": 0.004982585139318886,
+        "over_one_percent": 1.3231968363003095,
+        "identical_percent": 91.66059464493034,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -99.38084814564087,
+        "signal_to_error_db": 81.96066640113648,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1212677,
+        "1": 92825,
+        "2": 17311,
+        "3": 195
+      },
+      "variant": 2
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 131298,
+      "square_sum": 168478,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6394,
+      "over_one": 18156,
+      "over_two": 217,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 13001,
+      "max_ref": -3521,
+      "max_bfp": -3524,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.09924203028250773,
+        "rms_error_lsb": 0.35685383145483224,
+        "mean_signed_error_lsb": 0.004832926180340557,
+        "over_one_percent": 1.372327302631579,
+        "identical_percent": 91.46452629160217,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -99.2591914185007,
+        "signal_to_error_db": 82.137675068076,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            2,
+            2
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1210083,
+        "1": 94769,
+        "2": 17939,
+        "3": 217
+      },
+      "variant": 2
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 83512,
+      "square_sum": 105980,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 5976,
+      "over_one": 11080,
+      "over_two": 77,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 33046,
+      "max_ref": 6542,
+      "max_bfp": 6545,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06312282314241487,
+        "rms_error_lsb": 0.2830288602242079,
+        "mean_signed_error_lsb": 0.004516979489164087,
+        "over_one_percent": 0.8374854876160991,
+        "identical_percent": 94.53102324400155,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -101.27238425040002,
+        "signal_to_error_db": 83.85220250589562,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1250653,
+        "1": 61275,
+        "2": 11003,
+        "3": 77
+      },
+      "variant": 3
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 85543,
+      "square_sum": 108873,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6253,
+      "over_one": 11481,
+      "over_two": 92,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 2462,
+      "max_ref": -1039,
+      "max_bfp": -1036,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06465796125193499,
+        "rms_error_lsb": 0.28686585610389365,
+        "mean_signed_error_lsb": 0.004726350861068112,
+        "over_one_percent": 0.8677952060758514,
+        "identical_percent": 94.40895293150155,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -101.15542150130877,
+        "signal_to_error_db": 84.03390515088407,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1249038,
+        "1": 62489,
+        "2": 11389,
+        "3": 92
+      },
+      "variant": 3
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 83512,
+      "square_sum": 105980,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 5976,
+      "over_one": 11080,
+      "over_two": 77,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 33046,
+      "max_ref": 6542,
+      "max_bfp": 6545,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06312282314241487,
+        "rms_error_lsb": 0.2830288602242079,
+        "mean_signed_error_lsb": 0.004516979489164087,
+        "over_one_percent": 0.8374854876160991,
+        "identical_percent": 94.53102324400155,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -101.27238425040002,
+        "signal_to_error_db": 83.85220250589562,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1250653,
+        "1": 61275,
+        "2": 11003,
+        "3": 77
+      },
+      "variant": 3
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 85543,
+      "square_sum": 108873,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6253,
+      "over_one": 11481,
+      "over_two": 92,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 2462,
+      "max_ref": -1039,
+      "max_bfp": -1036,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06465796125193499,
+        "rms_error_lsb": 0.28686585610389365,
+        "mean_signed_error_lsb": 0.004726350861068112,
+        "over_one_percent": 0.8677952060758514,
+        "identical_percent": 94.40895293150155,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -101.15542150130877,
+        "signal_to_error_db": 84.03390515088407,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1249038,
+        "1": 62489,
+        "2": 11389,
+        "3": 92
+      },
+      "variant": 3
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 83512,
+      "square_sum": 105980,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 5976,
+      "over_one": 11080,
+      "over_two": 77,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 33046,
+      "max_ref": 6542,
+      "max_bfp": 6545,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06312282314241487,
+        "rms_error_lsb": 0.2830288602242079,
+        "mean_signed_error_lsb": 0.004516979489164087,
+        "over_one_percent": 0.8374854876160991,
+        "identical_percent": 94.53102324400155,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -101.27238425040002,
+        "signal_to_error_db": 83.85220250589562,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1250653,
+        "1": 61275,
+        "2": 11003,
+        "3": 77
+      },
+      "variant": 3
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 85543,
+      "square_sum": 108873,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6253,
+      "over_one": 11481,
+      "over_two": 92,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 2462,
+      "max_ref": -1039,
+      "max_bfp": -1036,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06465796125193499,
+        "rms_error_lsb": 0.28686585610389365,
+        "mean_signed_error_lsb": 0.004726350861068112,
+        "over_one_percent": 0.8677952060758514,
+        "identical_percent": 94.40895293150155,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -101.15542150130877,
+        "signal_to_error_db": 84.03390515088407,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1249038,
+        "1": 62489,
+        "2": 11389,
+        "3": 92
+      },
+      "variant": 3
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 83512,
+      "square_sum": 105980,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 5976,
+      "over_one": 11080,
+      "over_two": 77,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 33046,
+      "max_ref": 6542,
+      "max_bfp": 6545,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06312282314241487,
+        "rms_error_lsb": 0.2830288602242079,
+        "mean_signed_error_lsb": 0.004516979489164087,
+        "over_one_percent": 0.8374854876160991,
+        "identical_percent": 94.53102324400155,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -101.27238425040002,
+        "signal_to_error_db": 83.85220250589562,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1250653,
+        "1": 61275,
+        "2": 11003,
+        "3": 77
+      },
+      "variant": 4
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 85543,
+      "square_sum": 108873,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6253,
+      "over_one": 11481,
+      "over_two": 92,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 2462,
+      "max_ref": -1039,
+      "max_bfp": -1036,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06465796125193499,
+        "rms_error_lsb": 0.28686585610389365,
+        "mean_signed_error_lsb": 0.004726350861068112,
+        "over_one_percent": 0.8677952060758514,
+        "identical_percent": 94.40895293150155,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -101.15542150130877,
+        "signal_to_error_db": 84.03390515088407,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1249038,
+        "1": 62489,
+        "2": 11389,
+        "3": 92
+      },
+      "variant": 4
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 83512,
+      "square_sum": 105980,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 5976,
+      "over_one": 11080,
+      "over_two": 77,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 33046,
+      "max_ref": 6542,
+      "max_bfp": 6545,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06312282314241487,
+        "rms_error_lsb": 0.2830288602242079,
+        "mean_signed_error_lsb": 0.004516979489164087,
+        "over_one_percent": 0.8374854876160991,
+        "identical_percent": 94.53102324400155,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -101.27238425040002,
+        "signal_to_error_db": 83.85220250589562,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1250653,
+        "1": 61275,
+        "2": 11003,
+        "3": 77
+      },
+      "variant": 4
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 85543,
+      "square_sum": 108873,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6253,
+      "over_one": 11481,
+      "over_two": 92,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 2462,
+      "max_ref": -1039,
+      "max_bfp": -1036,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06465796125193499,
+        "rms_error_lsb": 0.28686585610389365,
+        "mean_signed_error_lsb": 0.004726350861068112,
+        "over_one_percent": 0.8677952060758514,
+        "identical_percent": 94.40895293150155,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -101.15542150130877,
+        "signal_to_error_db": 84.03390515088407,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1249038,
+        "1": 62489,
+        "2": 11389,
+        "3": 92
+      },
+      "variant": 4
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 83512,
+      "square_sum": 105980,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 5976,
+      "over_one": 11080,
+      "over_two": 77,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 33046,
+      "max_ref": 6542,
+      "max_bfp": 6545,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06312282314241487,
+        "rms_error_lsb": 0.2830288602242079,
+        "mean_signed_error_lsb": 0.004516979489164087,
+        "over_one_percent": 0.8374854876160991,
+        "identical_percent": 94.53102324400155,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -101.27238425040002,
+        "signal_to_error_db": 83.85220250589562,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1250653,
+        "1": 61275,
+        "2": 11003,
+        "3": 77
+      },
+      "variant": 4
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 85543,
+      "square_sum": 108873,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6253,
+      "over_one": 11481,
+      "over_two": 92,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 2462,
+      "max_ref": -1039,
+      "max_bfp": -1036,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.06465796125193499,
+        "rms_error_lsb": 0.28686585610389365,
+        "mean_signed_error_lsb": 0.004726350861068112,
+        "over_one_percent": 0.8677952060758514,
+        "identical_percent": 94.40895293150155,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -101.15542150130877,
+        "signal_to_error_db": 84.03390515088407,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            1,
+            1
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1249038,
+        "1": 62489,
+        "2": 11389,
+        "3": 92
+      },
+      "variant": 4
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 53784,
+      "square_sum": 68230,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 6190,
+      "over_one": 7155,
+      "over_two": 34,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 24555,
+      "max_ref": 1017,
+      "max_bfp": 1020,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.04065281540247678,
+        "rms_error_lsb": 0.22709441336428632,
+        "mean_signed_error_lsb": 0.004678732101393189,
+        "over_one_percent": 0.5408130563080495,
+        "identical_percent": 96.47810141737617,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -103.18486968938407,
+        "signal_to_error_db": 85.76468794487967,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1276413,
+        "1": 39440,
+        "2": 7121,
+        "3": 34
+      },
+      "variant": 5
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 54773,
+      "square_sum": 69567,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6619,
+      "over_one": 7325,
+      "over_two": 36,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 28598,
+      "max_ref": -14969,
+      "max_bfp": -14966,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.04140035434404025,
+        "rms_error_lsb": 0.2293086315013832,
+        "mean_signed_error_lsb": 0.005002993179179567,
+        "over_one_percent": 0.5536625628869969,
+        "identical_percent": 96.4163482004644,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -103.10059064926469,
+        "signal_to_error_db": 85.97907429884,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1275596,
+        "1": 40087,
+        "2": 7289,
+        "3": 36
+      },
+      "variant": 5
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 53784,
+      "square_sum": 68230,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 6190,
+      "over_one": 7155,
+      "over_two": 34,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 24555,
+      "max_ref": 1017,
+      "max_bfp": 1020,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.04065281540247678,
+        "rms_error_lsb": 0.22709441336428632,
+        "mean_signed_error_lsb": 0.004678732101393189,
+        "over_one_percent": 0.5408130563080495,
+        "identical_percent": 96.47810141737617,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -103.18486968938407,
+        "signal_to_error_db": 85.76468794487967,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1276413,
+        "1": 39440,
+        "2": 7121,
+        "3": 34
+      },
+      "variant": 5
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 54773,
+      "square_sum": 69567,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6619,
+      "over_one": 7325,
+      "over_two": 36,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 28598,
+      "max_ref": -14969,
+      "max_bfp": -14966,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.04140035434404025,
+        "rms_error_lsb": 0.2293086315013832,
+        "mean_signed_error_lsb": 0.005002993179179567,
+        "over_one_percent": 0.5536625628869969,
+        "identical_percent": 96.4163482004644,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -103.10059064926469,
+        "signal_to_error_db": 85.97907429884,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1275596,
+        "1": 40087,
+        "2": 7289,
+        "3": 36
+      },
+      "variant": 5
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 53784,
+      "square_sum": 68230,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 6190,
+      "over_one": 7155,
+      "over_two": 34,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 24555,
+      "max_ref": 1017,
+      "max_bfp": 1020,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.04065281540247678,
+        "rms_error_lsb": 0.22709441336428632,
+        "mean_signed_error_lsb": 0.004678732101393189,
+        "over_one_percent": 0.5408130563080495,
+        "identical_percent": 96.47810141737617,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": -103.18486968938407,
+        "signal_to_error_db": 85.76468794487967,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1276413,
+        "1": 39440,
+        "2": 7121,
+        "3": 34
+      },
+      "variant": 5
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 54773,
+      "square_sum": 69567,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 6619,
+      "over_one": 7325,
+      "over_two": 36,
+      "over_limit": 0,
+      "maximum": 3,
+      "max_at": 28598,
+      "max_ref": -14969,
+      "max_bfp": -14966,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.04140035434404025,
+        "rms_error_lsb": 0.2293086315013832,
+        "mean_signed_error_lsb": 0.005002993179179567,
+        "over_one_percent": 0.5536625628869969,
+        "identical_percent": 96.4163482004644,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": -103.10059064926469,
+        "signal_to_error_db": 85.97907429884,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            1,
+            1
+          ],
+          "p999": [
+            2,
+            2
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1275596,
+        "1": 40087,
+        "2": 7289,
+        "3": 36
+      },
+      "variant": 5
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 0,
+      "square_sum": 0,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 0,
+      "over_one": 0,
+      "over_two": 0,
+      "over_limit": 0,
+      "maximum": 0,
+      "max_at": 0,
+      "max_ref": 0,
+      "max_bfp": 0,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0,
+        "rms_error_lsb": 0.0,
+        "mean_signed_error_lsb": 0.0,
+        "over_one_percent": 0.0,
+        "identical_percent": 100.0,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": null,
+        "signal_to_error_db": null,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            0,
+            0
+          ],
+          "p999": [
+            0,
+            0
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1323008
+      },
+      "variant": 0
+    },
+    {
+      "case": "external",
+      "run": 1,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 0,
+      "square_sum": 0,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 0,
+      "over_one": 0,
+      "over_two": 0,
+      "over_limit": 0,
+      "maximum": 0,
+      "max_at": 0,
+      "max_ref": 0,
+      "max_bfp": 0,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0,
+        "rms_error_lsb": 0.0,
+        "mean_signed_error_lsb": 0.0,
+        "over_one_percent": 0.0,
+        "identical_percent": 100.0,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": null,
+        "signal_to_error_db": null,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            0,
+            0
+          ],
+          "p999": [
+            0,
+            0
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1323008
+      },
+      "variant": 0
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 0,
+      "square_sum": 0,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 0,
+      "over_one": 0,
+      "over_two": 0,
+      "over_limit": 0,
+      "maximum": 0,
+      "max_at": 0,
+      "max_ref": 0,
+      "max_bfp": 0,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0,
+        "rms_error_lsb": 0.0,
+        "mean_signed_error_lsb": 0.0,
+        "over_one_percent": 0.0,
+        "identical_percent": 100.0,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": null,
+        "signal_to_error_db": null,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            0,
+            0
+          ],
+          "p999": [
+            0,
+            0
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1323008
+      },
+      "variant": 0
+    },
+    {
+      "case": "external",
+      "run": 2,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 0,
+      "square_sum": 0,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 0,
+      "over_one": 0,
+      "over_two": 0,
+      "over_limit": 0,
+      "maximum": 0,
+      "max_at": 0,
+      "max_ref": 0,
+      "max_bfp": 0,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0,
+        "rms_error_lsb": 0.0,
+        "mean_signed_error_lsb": 0.0,
+        "over_one_percent": 0.0,
+        "identical_percent": 100.0,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": null,
+        "signal_to_error_db": null,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            0,
+            0
+          ],
+          "p999": [
+            0,
+            0
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1323008
+      },
+      "variant": 0
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 0,
+      "samples": 1323008,
+      "abs_sum": 0,
+      "square_sum": 0,
+      "signal_square_sum": 25730259470447,
+      "signed_sum": 0,
+      "over_one": 0,
+      "over_two": 0,
+      "over_limit": 0,
+      "maximum": 0,
+      "max_at": 0,
+      "max_ref": 0,
+      "max_bfp": 0,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0,
+        "rms_error_lsb": 0.0,
+        "mean_signed_error_lsb": 0.0,
+        "over_one_percent": 0.0,
+        "identical_percent": 100.0,
+        "reference_rms_lsb": 4410.022931403175,
+        "error_to_full_scale_dbfs": null,
+        "signal_to_error_db": null,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            0,
+            0
+          ],
+          "p999": [
+            0,
+            0
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1323008
+      },
+      "variant": 0
+    },
+    {
+      "case": "external",
+      "run": 3,
+      "channel": 1,
+      "samples": 1323008,
+      "abs_sum": 0,
+      "square_sum": 0,
+      "signal_square_sum": 27561998527216,
+      "signed_sum": 0,
+      "over_one": 0,
+      "over_two": 0,
+      "over_limit": 0,
+      "maximum": 0,
+      "max_at": 0,
+      "max_ref": 0,
+      "max_bfp": 0,
+      "clipped_ref": 0,
+      "clipped_bfp": 0,
+      "derived": {
+        "mean_absolute_error_lsb": 0.0,
+        "rms_error_lsb": 0.0,
+        "mean_signed_error_lsb": 0.0,
+        "over_one_percent": 0.0,
+        "identical_percent": 100.0,
+        "reference_rms_lsb": 4564.299323872818,
+        "error_to_full_scale_dbfs": null,
+        "signal_to_error_db": null,
+        "absolute_error_percentile_bounds_lsb": {
+          "p50": [
+            0,
+            0
+          ],
+          "p90": [
+            0,
+            0
+          ],
+          "p95": [
+            0,
+            0
+          ],
+          "p99": [
+            0,
+            0
+          ],
+          "p999": [
+            0,
+            0
+          ]
+        }
+      },
+      "histogram": {
+        "0": 1323008
+      },
+      "variant": 0
+    }
+  ],
+  "provenance": {
+    "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+    "elf_sha256": "cd44fb96a7ab19689ef67b06d92ad0accfcbecc098f8c8cecd782b0f30481178",
+    "sdkconfig_sha256": "f7f6a4d065c8205974adb86b0460728d437c2d5b35d321627d8a70bc36f72e97",
+    "fixtures": {
+      "generator": "FDK AAC v2.0.3 aac-enc, original 0.5-second synthetic tones",
+      "encoder_commit": "716f4394641d53f0d79c9ddac3fa93b03a49f278",
+      "files": {
+        "lc-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 8943,
+          "sha256": "b701428ed6cd8118f873f4cbe708b517a1089deed63792af6d0850c2ebc436bd"
+        },
+        "lc-22050-mono.aac": {
+          "sample_rate": 22050,
+          "channels": 1,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9659,
+          "sha256": "70ca546f35396ad05b88876536557df6b43ef7d804966460fb949aa9e07b7a85"
+        },
+        "lc-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9012,
+          "sha256": "1b9ab71161449af230ca0628dc23ac265f8c707b82d5e68c76ddc7f42d69b0d4"
+        },
+        "he-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5202,
+          "sha256": "2ed01ee61355830629905867f1885eae99123bc73daad161ba1a5959a4f5e11a"
+        },
+        "he-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5121,
+          "sha256": "747259aaafad92a280e793a4e0b7fce05d39443959ef3d3cba463b980d92f7da"
+        },
+        "hev2-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 29,
+          "bitrate": 32000,
+          "size_bytes": 2787,
+          "sha256": "cf66a4008ec69f9fa31ac7383b0fe8ff6d71fc60b19ee168f1c1396c7e4014ce"
+        }
+      }
+    },
+    "qemu_command": [
+      "wsl.exe",
+      "--cd",
+      "/mnt/c/Work/yoRadio/.worktree/aac-storage18",
+      "--exec",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+      "-M",
+      "esp32c3,audiodev=audio0",
+      "-nographic",
+      "-no-reboot",
+      "-snapshot",
+      "-icount",
+      "shift=0,align=off,sleep=off",
+      "-audiodev",
+      "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-storage18-20261002/qmf/groovesalad64/audio.wav,out.frequency=48000",
+      "-L",
+      "/mnt/c/Work/QEMU-ESP32/share/qemu",
+      "-drive",
+      "file=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-storage18-20261002/qmf/groovesalad64/flash.bin,if=mtd,format=raw"
+    ],
+    "qemu_log_sha256": "492aaca9a96e758db866e504420bb73e3322eab2299a50e028b0f0112c64868e",
+    "recording": {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32c3-stream-format\\.build\\aac-bfp16-real-20260930\\inputs\\groovesalad64.aac",
+      "sha256": "cfeacfd149e624f145c5bc8a3c256fd8be8742cea70eeb1be06eca29d3e2a593",
+      "bytes": 239943,
+      "source_url": null,
+      "ffprobe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "aac",
+            "profile": "HE-AAC",
+            "sample_rate": "44100",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "format_name": "aac",
+          "duration": "29.860834",
+          "bit_rate": "64283"
+        }
+      },
+      "file_completed_utc": "2026-09-30T21:02:27.864909+00:00",
+      "transcoding": false
+    }
+  }
+}

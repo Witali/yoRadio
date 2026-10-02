@@ -2,6 +2,11 @@
 
 ## Result and scope
 
+The [18+18 follow-up](ESP32C3_AAC_STORAGE18_20261002.md) adds a fifth variant
+with a shared four-bit exponent and four metadata bytes per word. It fits the
+same payload as independent 16-bit component exponents and gives lower RMS
+error on the retained recordings. The consolidated table below includes it.
+
 The requested representation is implemented as a **QEMU experiment**, behind
 `CONFIG_YORADIO_QEMU_AAC_QMF_STORAGE_TEST`. Each complex pair has a 32-bit word
 containing signed 16-bit real and imaginary mantissas. A separate 32-bit word
@@ -47,6 +52,7 @@ buffers, guards and other SBR/PS state.
 | **16+16, independent four-bit exponents** | **160** | **12,800** | **7,680 (37.5%)** |
 | 17+17, shared exponent, five six-bit metadata entries/word | 156 | 12,480 | 8,000 (39.06%) |
 | 17+17, shared exponent, four byte metadata entries/word | 160 | 12,800 | 7,680 (37.5%) |
+| 18+18, shared exponent, four byte metadata entries/word | 160 | 12,800 | 7,680 (37.5%) |
 
 The 17-bit alternatives keep the low 16 bits in the mantissa word and place each
 component's extra high/sign bit with the four-bit shift. No mantissa crosses a
@@ -75,6 +81,8 @@ QMF covers ABBA64 and Groove Salad 16/32/64 (9,859,072 scalar samples); PS cover
 ABBA64 (2,646,016 scalar samples). Synthetic fixtures and inactive paths are
 excluded from this RMS aggregation. Compare variants within each area: QMF and
 PS use different active corpora and were tested separately.
+The 18-bit follow-up reran all earlier variants and verified their PCM error
+statistics and input hashes against the first batch before extending this table.
 
 | Area | Storage change | Bytes before -> after | Compression / reduction | Max error, LSB | RMS error, LSB | Samples above 2 LSB |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -82,14 +90,16 @@ PS use different active corpora and were tested separately.
 | QMF | 16+16, independent Re/Im exponents | 20,480 -> 12,800 | 1.60x / 37.50% | 3 | 0.327956 | 1,156 (0.011725%) |
 | QMF | 17+17, five metadata entries/word | 20,480 -> 12,480 | 1.64x / 39.06% | 3 | 0.266385 | 496 (0.005031%) |
 | QMF | 17+17, four metadata entries/word | 20,480 -> 12,800 | 1.60x / 37.50% | 3 | 0.266385 | 496 (0.005031%) |
+| QMF | 18+18, four metadata entries/word | 20,480 -> 12,800 | 1.60x / 37.50% | 3 | 0.209491 | 176 (0.001785%) |
 | PS delays | 16+16, shared exponent | 4,936 -> 2,780 | 1.78x / 43.68% | 3 | 0.275221 | 178 (0.006727%) |
 | PS delays | 16+16, independent Re/Im exponents | 4,936 -> 3,088 | 1.60x / 37.44% | 3 | 0.246376 | 103 (0.003893%) |
 | PS delays | 17+17, five metadata entries/word | 4,936 -> 2,964 | 1.67x / 39.95% | 3 | 0.205390 | 54 (0.002041%) |
 | PS delays | 17+17, four metadata entries/word | 4,936 -> 3,088 | 1.60x / 37.44% | 3 | 0.205390 | 54 (0.002041%) |
+| PS delays | 18+18, four metadata entries/word | 4,936 -> 3,088 | 1.60x / 37.44% | 3 | 0.164850 | 24 (0.000907%) |
 
 Independent component exponents reduce aggregate RMS error relative to shared
-16-bit exponents while using more metadata. The 17+17 variants give the lowest
-RMS error in this comparison; changing from five to four metadata entries per
+16-bit exponents while using more metadata. The 18+18 variant gives the lowest
+RMS error in this comparison. For 17+17, changing from five to four metadata entries per
 word changes storage/indexing, with identical measured PCM statistics. All
 variants stay within the temporary 5-LSB limit on this corpus, but still exceed
 the final 2-LSB limit on some samples. These measurements do not establish a
@@ -126,6 +136,11 @@ These are typed decompilations, not original source. The audit identifies migrat
 sites; it does not certify a smaller owner allocation.
 
 ## Verification and interpretation
+
+This section records the initial four-format batch. The separate
+[18-bit report](ESP32C3_AAC_STORAGE18_20261002.md) records the later five-format
+matrix and current instruction comparisons; instruction counts from different
+builds must not be compared as if only the selected format had changed.
 
 - Independent 64-bit arithmetic oracle: 1,000,000 random pairs, 74,398 additional
   boundary pairs and a Cartesian set of signed-range edge values, all four
@@ -200,7 +215,7 @@ needs both the allocation change and speed work. The final 2-LSB criterion also
 remains open. Other memory areas retain their own entries in the
 [experiment checklist](ESP32C3_AAC_MEMORY_EXPERIMENTS_20261002.md).
 
-## All measured active cases
+## Initial four-format active cases
 
 The table below combines both experiments. RMS and counts use one complete run
 (repeated counts agree); instruction percentages use the median of runs 2/3.

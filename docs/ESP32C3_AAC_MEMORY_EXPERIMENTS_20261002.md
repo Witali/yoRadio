@@ -14,8 +14,8 @@ overlays the right channel: estimates overlap and must not be added together.
 
 | Order | Area | Current bytes | Experiment | Status |
 | --- | --- | ---: | --- | --- |
-| 1 | PS decorrelation delays, 617 complex pairs | 4936 native; 2780 PC16 | Shared/independent component exponents and high mantissa bits in metadata | Four actual-write variants tested: max 3 LSB, zero saturation, unchanged heap; owner integration pending |
-| 2 | Low-band QMF matrices, two channels | 20480 | Independent Re/Im exponents, four complex pairs per metadata word; compare shared exponent layouts | Prioritized at user request: 129 paired analysis-row comparisons, max 3 LSB; smaller owner/accessors pending |
+| 1 | PS decorrelation delays, 617 complex pairs | 4936 native; 2780 PC16 | Shared/independent component exponents and high mantissa bits in metadata | Five actual-write variants tested, including 18+18: max 3 LSB, zero saturation, unchanged heap; owner integration pending |
+| 2 | Low-band QMF matrices, two channels | 20480 | Independent Re/Im exponents, four complex pairs per metadata word; compare shared exponent layouts | 18+18 follow-up: 153 paired comparisons, max 3 LSB and lower RMS; smaller owner/accessors pending |
 | 3 | High-band QMF history, two channels | 4608 | Compare compact history independently from low-band history | Pending |
 | 4 | Gain/noise smoothing matrices | 10240 | Audit four retained rows plus current scratch instead of copying a fifth row; preserve all five filter taps | Pending |
 | 5 | Smoothing exponents, included above | 5120 | Observe/check int16 range, preserving int32 arithmetic; candidate saving 2560 bytes with five rows | Pending |
@@ -34,7 +34,7 @@ silently promote that unfinished adapter.
 
 ## Packing preference
 
-The preferred new QMF experiment uses independent four-bit Re and Im exponents:
+The initial QMF experiment uses independent four-bit Re and Im exponents:
 one 32-bit metadata word for four complex pairs, with a separate 32-bit mantissa
 word per pair. This needs 12,800 bytes of row-aligned stereo payload instead of
 20,480 bytes (37.5% less), before workspace and PS aliasing are accounted for.
@@ -58,6 +58,12 @@ concern is addressed by measuring both layouts rather than densely interleaving
 | PC17, five six-bit metadata entries per word | 2964 | +184 |
 | PC17, four byte metadata entries per word | 3088 | +308 |
 | PC16, separate Re and Im exponent nibbles | 3088 | +308 |
+| PC18, shared exponent and two extra bits per component | 3088 | +308 |
+
+The [18-bit follow-up](ESP32C3_AAC_STORAGE18_20261002.md) uses the full metadata
+byte: four shift bits plus two high/sign bits for each mantissa. It lowers RMS
+error at the same payload as separate 16-bit exponents; the final 2-LSB maximum
+and actual allocation reduction remain open.
 
 ## Required procedure for each area
 
