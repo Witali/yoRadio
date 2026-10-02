@@ -9,6 +9,12 @@ error limit of 5 LSB per sample/channel; the production limit is now 3 LSB. See 
 
 ## Memory areas and execution order
 
+The [combined follow-up](ESP32C3_AAC_COMBINED_STORAGE_20261002.md) tests cumulative
+error, rather than adding the isolated verdicts. Its mixed full combination
+reaches at most 3 LSB on the retained corpus, with an estimated 21,096-byte
+persistent SBR saving after PS/SBR overlap. This is not yet a measured combined
+heap saving. The all-16-bit combination fails at 10 LSB.
+
 Sizes describe the original stereo allocation unless stated otherwise. PS
 overlays the right channel: estimates overlap and must not be added together.
 
