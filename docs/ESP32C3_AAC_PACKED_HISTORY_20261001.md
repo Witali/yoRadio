@@ -1,5 +1,9 @@
 # ESP32-C3 AAC: packed complex history (14 + 14 + 4)
 
+**Current policy (2026-10-02): production permits +/-3 PCM LSB; development permits +/-5.**
+The older acceptance statements below describe the limits at measurement time.
+Measured errors and archived evidence are unchanged. See [current precision policy](ESP32C3_AAC_PRECISION_POLICY.md).
+
 ## Decision and current accuracy requirement
 
 Implemented a **QEMU-only numerical qualification** of the proposed 32-bit

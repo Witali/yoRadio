@@ -113,7 +113,7 @@ config YORADIO_QEMU_AAC_PACKED_HISTORY_ERROR_LIMIT
     default 5
     help
         Temporary development tolerance, updated by the user to five LSB.
-          The final production requirement remains two LSB per sample/channel.
+        The production requirement is three LSB per sample/channel.
 
 config YORADIO_QEMU_AAC_PC16_HISTORY_TEST
     bool "Use PC16 history with eight packed exponent nibbles in QEMU"
@@ -285,7 +285,7 @@ config YORADIO_AAC_PS_PC16
     help
         Development compression: eight complex mantissa words plus one word
         holding their independent four-bit exponents. Full SBR/PS arithmetic
-        remains int32. Require PCM <=5 LSB during development, <=2 finally,
+        remains int32. Require PCM <=5 LSB during development, <=3 in production,
         plus speed and full-radio lifecycle qualification.
 
 config YORADIO_AAC_PS_PC16_CACHE

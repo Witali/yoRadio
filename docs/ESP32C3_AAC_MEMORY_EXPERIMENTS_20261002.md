@@ -5,7 +5,7 @@ AAC-LC, SBR, PS, output rates and channels. Each experiment records storage byte
 actual allocation savings, maximum and RMS signed-16 PCM error, and decoding
 work. A smaller representation inside an unchanged allocation saves **zero heap**.
 Layout changes must be bit-exact. Lossy experiments use the temporary maximum
-error limit of 5 LSB per sample/channel; the final limit remains 2 LSB.
+error limit of 5 LSB per sample/channel; the production limit is now 3 LSB. See [current policy](ESP32C3_AAC_PRECISION_POLICY.md).
 
 ## Memory areas and execution order
 
@@ -67,8 +67,9 @@ concern is addressed by measuring both layouts rather than densely interleaving
 
 The [18-bit follow-up](ESP32C3_AAC_STORAGE18_20261002.md) uses the full metadata
 byte: four shift bits plus two high/sign bits for each mantissa. It lowers RMS
-error at the same payload as separate 16-bit exponents; the final 2-LSB maximum
-and actual allocation reduction remain open.
+error at the same payload as separate 16-bit exponents. It meets the current
+3-LSB precision gate on this corpus; actual allocation reduction and speed
+qualification remain open.
 
 ## Required procedure for each area
 

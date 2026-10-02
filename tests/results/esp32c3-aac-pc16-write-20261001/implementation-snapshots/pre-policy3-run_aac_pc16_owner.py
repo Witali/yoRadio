@@ -6,7 +6,6 @@ from pathlib import Path
 import sys
 import wave
 import run_aac_bfp16 as common
-import aac_precision
 from run_aac_reserve import parse_log
 
 
@@ -45,8 +44,7 @@ if __name__=='__main__':
         result=parse_log(log)
         pcm=compare_pcm(args.reference_wav,args.output/'audio.wav')
         result.update(pcm=pcm,precision_pass=not pcm['over_five'],precision_limit_lsb=5,
-                      production_precision_pass=pcm['max_pcm_error_lsb'] <= aac_precision.PRODUCTION_LIMIT,
-                      production_precision_limit_lsb=aac_precision.PRODUCTION_LIMIT,
+                      production_precision_pass=not pcm['over_two'],production_precision_limit_lsb=2,
                       summaries=[])
         return result
     sys.exit(common.run(args,log_parser=check,config_key='YORADIO_AAC_PS_PC16'))

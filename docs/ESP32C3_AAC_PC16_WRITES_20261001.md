@@ -1,5 +1,9 @@
 # ESP32-C3: actual PC16 PS delay writes
 
+**Current policy (2026-10-02): production permits +/-3 PCM LSB; development permits +/-5.**
+The older acceptance statements below describe the limits at measurement time.
+Measured errors and archived evidence are unchanged. See [current precision policy](ESP32C3_AAC_PRECISION_POLICY.md).
+
 ## Result
 
 The current Espressif decoder now has an experimental source implementation of

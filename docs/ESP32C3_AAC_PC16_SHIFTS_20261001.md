@@ -1,5 +1,9 @@
 # AAC 16+16 storage: exponent range and eight-sample blocks
 
+**Current policy (2026-10-02): production permits +/-3 PCM LSB; development permits +/-5.**
+The older acceptance statements below describe the limits at measurement time.
+Measured errors and archived evidence are unchanged. See [current precision policy](ESP32C3_AAC_PRECISION_POLICY.md).
+
 ## Selected representation
 
 Use **`shift = exponent + 1`**, with a four-bit exponent `0..15` and shifts

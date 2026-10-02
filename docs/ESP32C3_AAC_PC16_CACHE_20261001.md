@@ -1,5 +1,9 @@
 # Small cache for reconstructed PC16 complex values
 
+**Current policy (2026-10-02): production permits +/-3 PCM LSB; development permits +/-5.**
+The older acceptance statements below describe the limits at measurement time.
+Measured errors and archived evidence are unchanged. See [current precision policy](ESP32C3_AAC_PRECISION_POLICY.md).
+
 ## Result and selection
 
 Implemented `CONFIG_YORADIO_AAC_PS_PC16_CACHE`, **default off**. It requires

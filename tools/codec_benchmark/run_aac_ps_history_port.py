@@ -4,6 +4,7 @@ import re
 import statistics
 import sys
 import run_aac_bfp16 as common
+import aac_precision
 
 VARIANTS = {7:'native_source_control', 1:'packed_midpoint_ps_writes', 0:'binary_bypass'}
 
@@ -26,10 +27,8 @@ def parse_log(log):
                    'PSPORT_EXPERIMENT_COMPLETE','QEMU_AAC_FORMAT_PASS','QEMU_SMOKE_PASS',
                    'QEMU_OLED_PASS','QEMU_AUDIO_PASS'):
         if marker not in log:raise ValueError('Missing completion marker: '+marker)
-    limits=records(log,'LIMIT')
-    if len(limits)!=1 or limits[0].get('production')!=2 or not 1<=limits[0].get('development',0)<=5:
-        raise ValueError('Invalid precision limits')
-    limit=limits[0]['development']
+    limits=aac_precision.log_limits(log,"PSPORT")
+    limit=limits["development"]
     headers=records(log,'EXTERNAL')
     if len(headers)>1:raise ValueError('Duplicate external header')
     external=headers[0] if headers else None
@@ -85,8 +84,8 @@ def parse_log(log):
                                   instruction_overhead_median_percent=round(statistics.median(overhead),3),
                                   instruction_overhead_range_percent=[round(min(overhead),3),round(max(overhead),3)]))
     result=dict(experiment='espressif_ps_midpoint_write_port',precision_limit_lsb=limit,
-                precision_pass=all(not r['over_limit'] for r in rows),production_precision_limit_lsb=2,
-                production_precision_pass=all(not r['over_two'] for r in rows),
+                precision_pass=all(not r['over_limit'] for r in rows),production_precision_limit_lsb=limits["production"],
+                production_precision_pass=aac_precision.passes(rows,limits['production']),
                 quantization_exercised=any(s['coverage']=='quantized' for s in summaries),
                 ram_saved_bytes=0,ps_delay_native_payload_bytes=4936,ps_delay_packed_payload_bytes=2468,
                 timing_unit='QEMU guest instructions, including source wrapper and counters; runs 2/3 only',

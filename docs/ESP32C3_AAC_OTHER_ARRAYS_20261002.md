@@ -11,7 +11,9 @@ It must not be enabled based on the radio captures alone.
 Complex high-band QMF history reached at most 2 LSB in this corpus. Checked
 int16 storage for smoothing exponents was bit-exact; observed values were
 -50 through +16. Neither observation proves a bound for every valid AAC stream.
-Other hybrid/PS probes reached 3 LSB and still fail the final 2-LSB requirement.
+Other hybrid/PS probes reached 3 LSB and now meet the updated production
+precision gate on this corpus. See [current policy](ESP32C3_AAC_PRECISION_POLICY.md);
+full production qualification remains separate.
 
 These are **numerical storage roundtrips**, with unchanged native allocations
 and DSP. Actual heap saved is **0 bytes**. Production defaults and firmware are

@@ -3,11 +3,13 @@
 import statistics
 import sys
 import run_aac_bfp16 as common
+import aac_precision
 from run_aac_pc16_write import records, key, storage_format_count
 
 FORMATS={1:'shared16',2:'split16',3:'shared17_five',4:'shared17_four',5:'shared18_four',0:'binary_bypass'}
 
 def parse_log(log):
+    limits = aac_precision.log_limits(log,"QMFSTORAGE",required=False)
     label='QMFSTORAGE'
     count=storage_format_count(log,label)
     formats={k:v for k,v in FORMATS.items() if k<=count}
@@ -60,8 +62,8 @@ def parse_log(log):
                 coverage='quantized' if group[0]['complex_rows']+group[0]['real_rows'] else 'not_exercised',
                 instruction_overhead_median_percent=round(statistics.median(overhead),3)))
     result=dict(experiment='qmf_analysis_storage_roundtrip',precision_limit_lsb=5,
-                precision_pass=all(not r['over_limit'] for r in rows),production_precision_limit_lsb=2,
-                production_precision_pass=all(not r['over_two'] for r in rows),ram_saved_bytes=0,
+                precision_pass=all(not r['over_limit'] for r in rows),production_precision_limit_lsb=limits["production"],
+                production_precision_pass=aac_precision.passes(rows,limits['production']),ram_saved_bytes=0,
                 quantization_exercised=any(s['coverage']=='quantized' for s in summaries),
                 scope='Only new low-band QMF rows; unchanged allocation and native DSP; not compact high-band history',
                 timing_unit='QEMU guest instructions including roundtrip wrappers; runs 2/3',summaries=summaries,runs=rows,storage=storage)

@@ -2,13 +2,14 @@
 """Qualify 14+14+4 complex SBR/PS history against the pinned C3 AAC decoder.
 
 No board access. Exit 2 is a completed PCM precision rejection, not a broken
-experiment. Development permits 5 LSB; production still requires 2 LSB.
+experiment. Development permits 5 LSB; production now permits 3 LSB; old logs retain their recorded limit.
 """
 import re
 import statistics
 import sys
 
 import run_aac_bfp16 as common
+import aac_precision
 
 VARIANTS = {1: "nearest_sbr", 2: "nearest_ps", 3: "nearest_both",
             4: "midpoint_sbr", 5: "midpoint_ps", 6: "midpoint_both",
@@ -31,10 +32,8 @@ def row_key(r):
 
 
 def parse_log(log):
-    limits = records(log, "LIMIT")
-    if len(limits) != 1 or limits[0].get("production") != 2 or not 1 <= limits[0].get("development", 0) <= 5:
-        raise ValueError("Missing/invalid development and production accuracy limits")
-    limit = limits[0]["development"]
+    limits = aac_precision.log_limits(log, "PCX14")
+    limit = limits["development"]
     for marker in ("PCX14_ARITHMETIC_PASS", "PCX14_COUNTER_PASS nop1024=1025",
                    "PCX14_EXPERIMENT_COMPLETE", "QEMU_AAC_FORMAT_PASS",
                    "QEMU_SMOKE_PASS", "QEMU_OLED_PASS", "QEMU_AUDIO_PASS"):
@@ -121,8 +120,8 @@ def parse_log(log):
                               "instruction_overhead_range_percent": [round(min(overhead), 3), round(max(overhead), 3)]})
     result = {"experiment": "complex_history_14_14_4", "precision_limit_lsb": limit,
               "precision_pass": all(not r["over_limit"] for r in rows),
-              "production_precision_limit_lsb": 2,
-              "production_precision_pass": all(not r["over_two"] for r in rows),
+              "production_precision_limit_lsb": limits["production"],
+              "production_precision_pass": aac_precision.passes(rows, limits["production"]),
               "quantization_exercised": any(s["coverage"] == "quantized" for s in summaries),
               "ram_saved_bytes": 0, "theoretical_history_payload_saving_bytes_hev2": 4788,
               "timing_unit": "QEMU guest instructions; includes wrapper, bounds checks and basic counters; runs 2/3 only",

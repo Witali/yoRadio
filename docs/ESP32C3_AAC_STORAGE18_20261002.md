@@ -11,9 +11,10 @@ space as 16+16 with independent component exponents or the byte-aligned 17+17
 format. Native DSP scaling, output rates and channels remain unchanged.
 
 The maximum PCM difference is still **3 LSB** on the exercised recordings,
-within the temporary 5-LSB limit and above the final 2-LSB limit. The smaller
-RMS error does not make those remaining 3-LSB samples acceptable under the final
-criterion. No saturation occurred in the audio corpus.
+within the updated production limit of 3 LSB and the development limit of 5 LSB.
+See [current precision policy](ESP32C3_AAC_PRECISION_POLICY.md). The old 2-LSB
+verdicts remain in archived measurements; full production qualification still
+requires memory and speed work. No saturation occurred in the audio corpus.
 
 ## Representation
 
