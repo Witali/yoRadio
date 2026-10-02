@@ -16,15 +16,20 @@ overlays the right channel: estimates overlap and must not be added together.
 | --- | --- | ---: | --- | --- |
 | 1 | PS decorrelation delays, 617 complex pairs | 4936 native; 2780 PC16 | Shared/independent component exponents and high mantissa bits in metadata | Five actual-write variants tested, including 18+18: max 3 LSB, zero saturation, unchanged heap; owner integration pending |
 | 2 | Low-band QMF matrices, two channels | 20480 | Independent Re/Im exponents, four complex pairs per metadata word; compare shared exponent layouts | 18+18 follow-up: 153 paired comparisons, max 3 LSB and lower RMS; smaller owner/accessors pending |
-| 3 | High-band QMF history, two channels | 4608 | Compare compact history independently from low-band history | Pending |
-| 4 | Gain/noise smoothing matrices | 10240 | Audit four retained rows plus current scratch instead of copying a fifth row; preserve all five filter taps | Pending |
-| 5 | Smoothing exponents, included above | 5120 | Observe/check int16 range, preserving int32 arithmetic; candidate saving 2560 bytes with five rows | Pending |
+| 3 | High-band QMF history, two channels | 4608 | Compare compact history independently from low-band history | Complex-history PC18: max 2 LSB; potential payload saving 1728 bytes, zero heap saved; real-only SBR excluded |
+| 4 | Gain/noise smoothing matrices | 10240 | Audit four retained rows plus current scratch instead of copying a fifth row; preserve all five filter taps | Mantissa PC18 frame-boundary probe: 0 PCM error; within-frame FIR qualification and row-lifetime redesign pending |
+| 5 | Smoothing exponents, included above | 5120 | Observe/check int16 range, preserving int32 arithmetic; candidate saving 2560 bytes with five rows | Checked int16 roundtrip bit-exact, observed -50..16; format-wide bound and compact allocation pending |
 | 6 | Right channel in PS mode | 24848 with compact pointer tables | Separate PS-specific allocation and preserve all transitions; recompute overlaps with relocated PS control | Pending |
-| 7 | Hybrid-filter history | 288 | Isolate its quantization effect; distinguish frame-boundary probe from actual within-frame writes | Pending |
-| 8 | Core IMDCT overlap, two channels | 8192 | Examine ranges and persistent-history packing, including short/long windows | Pending |
+| 7 | Hybrid-filter history | 288 | Isolate its quantization effect; distinguish frame-boundary probe from actual within-frame writes | PC18 frame-history: max 3 LSB, potential saving 108 bytes; heap unchanged |
+| 8 | Core IMDCT overlap, two channels | 8192 | Examine ranges and persistent-history packing, including short/long windows | PC18 rejected: synthetic HE error up to 2838 LSB despite <=5 LSB on real captures; both transforms/all four window sequences tested |
 | 9 | Synthesis history, two channels | 4608 | Already int16; prioritize ring/lifetime changes over blind narrowing | Pending |
 | 10 | Shared transform and SBR scratch | 12288 | Map all phase lifetimes; PS accesses reach the allocation end, so no unconditional halving | Pending |
 | 11 | IID/ICC, harmonic flags and other bounded control fields | Distributed | Audit every reader/writer, then range-check narrower exact storage | Pending |
+
+The [other-array report](ESP32C3_AAC_OTHER_ARRAYS_20261002.md) records 330 paired
+comparisons for eight isolated areas, including previous PS mixing coefficients,
+hybrid analysis output and PS energy histories. It distinguishes frame-boundary
+probes from within-frame producers and lists remaining scratch/control exclusions.
 
 The existing lossless table compaction saves 1888 requested bytes; PS relocation
 saves 3532 requested bytes. Their combined prototype requests 49708 rather than

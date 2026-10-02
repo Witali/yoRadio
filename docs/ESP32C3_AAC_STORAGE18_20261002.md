@@ -1,5 +1,8 @@
 # AAC storage with 18 bit mantissas
 
+Follow-up: [eight other AAC storage areas](ESP32C3_AAC_OTHER_ARRAYS_20261002.md),
+with isolated PCM effects, payload sizes and the rejected IMDCT result.
+
 ## Result
 
 The fifth experimental format stores **18-bit Re, 18-bit Im and one shared
