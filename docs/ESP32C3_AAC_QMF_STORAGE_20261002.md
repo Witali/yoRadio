@@ -58,6 +58,49 @@ delay buffers. A single active low-QMF matrix would save **3,840 payload bytes**
 with independent exponents. The stereo 7,680-byte estimate cannot be claimed as
 additional PS-mode heap saving or added to PS overlay savings.
 
+## Consolidated signal and storage comparison
+
+The reference representation is signed **32-bit Re + 32-bit Im**. Compression
+factor means original payload divided by packed payload; reduction means the
+percentage of original bytes removed. Metadata and its word padding are included.
+QMF sizes describe two independently row-aligned low-band matrices; PS sizes
+describe the 617 complex delay pairs. The native baselines are 20,480 and 4,936
+bytes respectively, with zero PCM difference from themselves.
+
+Signal errors are measured **after complete decoding**, against the original
+decoder's signed-16 PCM. One LSB is one integer unit in that output. RMS is
+`sqrt(sum(square_error) / sum(sample_count))`, pooled across channels and active
+recordings, using run 1 only. The three repeats have matching error counts.
+QMF covers ABBA64 and Groove Salad 16/32/64 (9,859,072 scalar samples); PS covers
+ABBA64 (2,646,016 scalar samples). Synthetic fixtures and inactive paths are
+excluded from this RMS aggregation. Compare variants within each area: QMF and
+PS use different active corpora and were tested separately.
+
+| Area | Storage change | Bytes before -> after | Compression / reduction | Max error, LSB | RMS error, LSB | Samples above 2 LSB |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| QMF | 16+16, shared exponent | 20,480 -> 11,520 | 1.78x / 43.75% | 3 | 0.343647 | 1,424 (0.014444%) |
+| QMF | 16+16, independent Re/Im exponents | 20,480 -> 12,800 | 1.60x / 37.50% | 3 | 0.327956 | 1,156 (0.011725%) |
+| QMF | 17+17, five metadata entries/word | 20,480 -> 12,480 | 1.64x / 39.06% | 3 | 0.266385 | 496 (0.005031%) |
+| QMF | 17+17, four metadata entries/word | 20,480 -> 12,800 | 1.60x / 37.50% | 3 | 0.266385 | 496 (0.005031%) |
+| PS delays | 16+16, shared exponent | 4,936 -> 2,780 | 1.78x / 43.68% | 3 | 0.275221 | 178 (0.006727%) |
+| PS delays | 16+16, independent Re/Im exponents | 4,936 -> 3,088 | 1.60x / 37.44% | 3 | 0.246376 | 103 (0.003893%) |
+| PS delays | 17+17, five metadata entries/word | 4,936 -> 2,964 | 1.67x / 39.95% | 3 | 0.205390 | 54 (0.002041%) |
+| PS delays | 17+17, four metadata entries/word | 4,936 -> 3,088 | 1.60x / 37.44% | 3 | 0.205390 | 54 (0.002041%) |
+
+Independent component exponents reduce aggregate RMS error relative to shared
+16-bit exponents while using more metadata. The 17+17 variants give the lowest
+RMS error in this comparison; changing from five to four metadata entries per
+word changes storage/indexing, with identical measured PCM statistics. All
+variants stay within the temporary 5-LSB limit on this corpus, but still exceed
+the final 2-LSB limit on some samples. These measurements do not establish a
+perceptual audibility threshold or a worst-case bound for untested recordings.
+
+**Actual heap reduction remains zero in these experiments.** The table compares
+array payload representations. The QMF probe restores native rows for existing
+readers, and PS retains the original owner allocation. Low-QMF/PS overlay savings
+must not be added together. See the lifetime audit below before changing the
+allocation.
+
 ## Readers and lifetime audit before resizing
 
 The pinned archive and the checked RV32 structures are recorded in
