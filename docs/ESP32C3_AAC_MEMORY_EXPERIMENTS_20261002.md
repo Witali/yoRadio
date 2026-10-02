@@ -14,8 +14,8 @@ overlays the right channel: estimates overlap and must not be added together.
 
 | Order | Area | Current bytes | Experiment | Status |
 | --- | --- | ---: | --- | --- |
-| 1 | PS decorrelation delays, 617 complex pairs | 4936 native; 2780 PC16 | Keep 32-bit mantissa words; put the two extra mantissa bits with the exponent, five six-bit entries per metadata word; compare four byte entries and separate component exponents | Pending |
-| 2 | Low-band QMF matrices, two channels | 20480 | Separate retained history from current work; evaluate shared workspace and compact complex history independently | Pending |
+| 1 | PS decorrelation delays, 617 complex pairs | 4936 native; 2780 PC16 | Shared/independent component exponents and high mantissa bits in metadata | Four actual-write variants tested: max 3 LSB, zero saturation, unchanged heap; owner integration pending |
+| 2 | Low-band QMF matrices, two channels | 20480 | Independent Re/Im exponents, four complex pairs per metadata word; compare shared exponent layouts | Prioritized at user request: 129 paired analysis-row comparisons, max 3 LSB; smaller owner/accessors pending |
 | 3 | High-band QMF history, two channels | 4608 | Compare compact history independently from low-band history | Pending |
 | 4 | Gain/noise smoothing matrices | 10240 | Audit four retained rows plus current scratch instead of copying a fifth row; preserve all five filter taps | Pending |
 | 5 | Smoothing exponents, included above | 5120 | Observe/check int16 range, preserving int32 arithmetic; candidate saving 2560 bytes with five rows | Pending |
@@ -33,6 +33,15 @@ saves 3532 requested bytes. Their combined prototype requests 49708 rather than
 silently promote that unfinished adapter.
 
 ## Packing preference
+
+The preferred new QMF experiment uses independent four-bit Re and Im exponents:
+one 32-bit metadata word for four complex pairs, with a separate 32-bit mantissa
+word per pair. This needs 12,800 bytes of row-aligned stereo payload instead of
+20,480 bytes (37.5% less), before workspace and PS aliasing are accounted for.
+The experiment currently saves zero allocated heap. See
+[QMF and PS measurements](ESP32C3_AAC_QMF_STORAGE_20261002.md) for quality, work,
+the consumer audit and exact scope. Shared 17-bit variants remain comparison
+candidates rather than an assumed default.
 
 Keep ordinary aligned 32-bit words containing the low 16 bits of Re and Im.
 For the 17-bit experiment, a metadata entry contains a four-bit shift plus one
@@ -76,5 +85,6 @@ Starting points: [existing execution plan](ESP32C3_HE_AAC_RAM_EXECUTION_20261001
 [native memory audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md),
 [PC16 actual writes](ESP32C3_AAC_PC16_WRITES_20261001.md), and
 [checked symbolic structures](audits/esp32c3-aac-core-symbolic-20261001/README.md).
-New experiment results and their exact source/configuration hashes will be
-linked here as each stage completes. Pending entries are not measured savings.
+The first batch is saved in [the storage experiment report](ESP32C3_AAC_QMF_STORAGE_20261002.md)
+and [raw evidence](../tests/results/esp32c3-aac-storage-20261002/), including exact
+source/configuration hashes. Pending entries are not measured savings.
