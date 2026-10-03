@@ -73,6 +73,26 @@ class PointerAuditTests(unittest.TestCase):
             self.assertEqual(hashlib.sha256((EVIDENCE/record['snapshot']).read_bytes()).hexdigest(),
                              record['sha256'], path)
 
+    def test_ps_coverage_uses_execution_not_ffprobe_label(self):
+        followup = ROOT/'tests/results/esp32c3-aac-ps-coverage-20261003'
+        reference = json.loads((followup/'result.json').read_text(encoding='utf-8'))
+        native = json.loads((EVIDENCE/'groovesalad16/result.json').read_text(encoding='utf-8'))
+        baseline = json.loads((EVIDENCE/'synthetic/result.json').read_text(encoding='utf-8'))
+        positive = json.loads((EVIDENCE/'abba64/result.json').read_text(encoding='utf-8'))
+        self.assertEqual(reference['input_sha256'], native['provenance']['recording']['sha256'])
+        self.assertEqual(reference['gdb_elf_sha256'], native['provenance']['elf_sha256'])
+        self.assertEqual(reference['ffprobe']['result']['streams'][0]['profile'], 'HE-AACv2')
+        for mode in ('fixed', 'float'):
+            decoded = json.loads((followup/f'faad-{mode}.log').read_text(encoding='utf-8'))
+            self.assertEqual(decoded, reference['faad'][mode]['result'])
+            self.assertEqual((decoded['rate'], decoded['channels'], decoded['ps_frames']),
+                             (32000, 1, 0))
+            self.assertEqual(decoded['frames'], native['capture']['frames'])
+        self.assertEqual(reference['ffmpeg']['samples'], native['capture']['samples'])
+        self.assertEqual(reference['ffmpeg']['different_lr'], 0)
+        self.assertEqual(native['pointers']['ps'], baseline['pointers']['ps'])
+        self.assertGreater(positive['pointers']['ps'], baseline['pointers']['ps'])
+
 
 if __name__ == '__main__':
     unittest.main()

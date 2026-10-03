@@ -87,12 +87,12 @@ original decoder, those control samples differ by at most 1 LSB. Capture PCM
 hashes are retained for reproducibility; this is not a new error comparison of
 the captures against an original decoder.
 
-Coverage observation for follow-up: FFprobe identifies Groove Salad 16 as
-HE-AACv2, but this capture adds no native PS dispatches to the counter. It does
-exercise complex SBR; PS-specific pointers are exercised by ABBA and the
-synthetic HEv2 file. Correct stereo reconstruction of the Groove Salad 16
-capture needs separate comparison and must not be inferred from its reported
-channel count or this address audit.
+The [reference-decoder follow-up](ESP32C3_AAC_PS_COVERAGE_20261003.md) resolves
+the Groove Salad 16 coverage question: this retained recording contains mono
+HE-AAC without active PS. Both FAAD modes decode 32 kHz mono; FFmpeg labels it
+HE-AACv2 but produces identical left/right channels. The native PS pointer checks
+are exercised by ABBA and the synthetic HEv2 file. Do not use this Groove Salad
+capture as evidence of PS coverage or apply its conclusion to future live audio.
 
 Ten negative tests reject a wrong real/imaginary delay, wrong smoothing matrix,
 interior row address, duplicated row, NULL live row, wrong decoder context,

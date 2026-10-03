@@ -21,8 +21,8 @@ core/SBR/PS targets, rotating rows, stack ownership and copy ranges for the
 PC18 + four-row smoothing adapter in QEMU. Six retained runs include station
 captures, allocation failures, resets and simultaneous decoders. Run
 `python tests/test-aac-pointer-audit.py` to validate their evidence and parser.
-The report documents unchecked views and a Groove Salad 16 PS-coverage question;
-passing address checks alone do not qualify its stereo reconstruction.
+The report documents unchecked views. The [PS coverage follow-up](ESP32C3_AAC_PS_COVERAGE_20261003.md)
+shows why FFprobe's profile/channel label alone cannot establish PS execution.
 
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
