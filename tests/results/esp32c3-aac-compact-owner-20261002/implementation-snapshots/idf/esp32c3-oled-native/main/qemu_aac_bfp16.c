@@ -4,7 +4,6 @@
 #include "qemu_aac_bfp16.h"
 #include "native_aac_decoder.h"
 #include "decoder_pcm.h"
-#include "aac_pcm_quality.h"
 #include "esp_audio_codec_version.h"
 #include "esp_log.h"
 #include "esp_partition.h"
@@ -35,11 +34,7 @@ FIXTURE(hev2, "hev2_44100_stereo");
 #ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
 #include "qemu_aac_packed_history.h"
 #define PCM_ERROR_LIMIT CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_ERROR_LIMIT
-#ifdef CONFIG_YORADIO_QEMU_AAC_COMBINED_STORAGE_TEST
-#define TEST_LABEL "AACCOMBINED"
-#elif defined(CONFIG_YORADIO_QEMU_AAC_AREA_STORAGE_TEST)
-#define TEST_LABEL "AREASTORAGE"
-#elif defined(CONFIG_YORADIO_QEMU_AAC_PS_STORAGE_TEST)
+#ifdef CONFIG_YORADIO_QEMU_AAC_PS_STORAGE_TEST
 #define TEST_LABEL "PSSTORAGE"
 #elif defined(CONFIG_YORADIO_QEMU_AAC_PC16_WRITE_TEST)
 #define TEST_LABEL "PC16WRITE"
@@ -54,12 +49,8 @@ FIXTURE(hev2, "hev2_44100_stereo");
 #endif
 #define VARIANT_LABEL "variant"
 #define CANDIDATE_LABEL "packed"
-#ifdef CONFIG_YORADIO_QEMU_AAC_COMBINED_STORAGE_TEST
-static const unsigned groups[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0};
-#elif defined(CONFIG_YORADIO_QEMU_AAC_AREA_STORAGE_TEST)
-static const unsigned groups[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
-#elif defined(CONFIG_YORADIO_QEMU_AAC_PS_STORAGE_TEST)
-static const unsigned groups[] = {7, 1, 2, 3, 4, 5, 0};
+#ifdef CONFIG_YORADIO_QEMU_AAC_PS_STORAGE_TEST
+static const unsigned groups[] = {7, 1, 2, 3, 4, 0};
 #elif defined(CONFIG_YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST) || defined(CONFIG_YORADIO_QEMU_AAC_SBR_LAYOUT_TEST)
 static const unsigned groups[] = {7, 1, 0};
 #else
@@ -72,7 +63,7 @@ static const unsigned groups[] = {1, 2, 3, 4, 5, 6, 7, 0};
 #define TEST_LABEL "QMFSTORAGE"
 #define VARIANT_LABEL "variant"
 #define CANDIDATE_LABEL "packed"
-static const unsigned groups[] = {1, 2, 3, 4, 5, 0};
+static const unsigned groups[] = {1, 2, 3, 4, 0};
 #else
 #define PCM_ERROR_LIMIT 1
 #define TEST_LABEL "BFP16"
@@ -425,13 +416,7 @@ static void compare_fixture(const fixture_t *f, unsigned bands, unsigned run) {
     assert(frames > 10 && samples >= f->rate * f->channels / 2);
 #ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
     packed_history_report(f->name, bands, run, &complex_rows, &changed_values, &max_shift);
-#ifdef CONFIG_YORADIO_QEMU_AAC_COMBINED_STORAGE_TEST
-    if (!bands || bands == 8 || !f->sbr) assert(!different && !changed_values);
-#elif defined(CONFIG_YORADIO_QEMU_AAC_AREA_STORAGE_TEST)
-    if (!bands || bands == 9 || bands == 5) assert(!different && !changed_values);
-#else
     if (!bands || bands == 7 || !f->sbr) assert(!different && !changed_values);
-#endif
     if (!complex_rows) assert(!different && !changed_values);
 #else
     if (f->sbr && bands) assert(complex_rows + real_rows > 0 && changed_values > 0);
@@ -569,7 +554,7 @@ static bool external_fixture(void) {
 void qemu_aac_bfp16_test(void) {
 #if defined(CONFIG_YORADIO_QEMU_AAC_PS_STORAGE_TEST) || defined(CONFIG_YORADIO_QEMU_AAC_QMF_STORAGE_TEST)
     pc_storage_check(10000);
-    ESP_LOGI(TAG, TEST_LABEL "_STORAGE_ARITHMETIC_PASS random_pairs=10000 formats=5");
+    ESP_LOGI(TAG, TEST_LABEL "_STORAGE_ARITHMETIC_PASS random_pairs=10000 formats=4");
 #endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_RESET_TEST
     void qemu_aac_reset_test(void);
@@ -585,9 +570,8 @@ void qemu_aac_bfp16_test(void) {
     layout_lifecycle();
 #endif
     check_counter();
-    ESP_LOGI(TAG, TEST_LABEL "_LIMIT development=%u production=%u",
-             PCM_ERROR_LIMIT, AAC_PCM_PRODUCTION_ERROR_LSB);
 #ifdef CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    ESP_LOGI(TAG, TEST_LABEL "_LIMIT development=%u production=2", PCM_ERROR_LIMIT);
 #ifndef CONFIG_YORADIO_QEMU_AAC_SMOOTHING_TEST
     packed_history_arithmetic_tests();
 #endif
@@ -612,13 +596,7 @@ void qemu_aac_bfp16_test(void) {
         {"he48000_stereo", he48_start, he48_end, 48000, 2, true},
         {"hev2_44100_stereo", hev2_start, hev2_end, 44100, 2, true}};
     for (unsigned i = 0; i < sizeof(fixtures) / sizeof(fixtures[0]); ++i)
-        for (unsigned g = 0; g <
-#ifdef CONFIG_YORADIO_QEMU_AAC_AREA_STORAGE_TEST
-             sizeof(groups) / sizeof(groups[0]);
-#else
-             (fixtures[i].sbr ? sizeof(groups) / sizeof(groups[0]) : 1);
-#endif
-             ++g)
+        for (unsigned g = 0; g < (fixtures[i].sbr ? sizeof(groups) / sizeof(groups[0]) : 1); ++g)
             for (unsigned run = 1; run <= 3; ++run)
                 compare_fixture(fixtures + i, groups[g], run);
     ESP_LOGI(TAG, TEST_LABEL "_EXPERIMENT_COMPLETE inspect precision per case; no production approval");

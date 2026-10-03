@@ -113,7 +113,7 @@ config YORADIO_QEMU_AAC_PACKED_HISTORY_ERROR_LIMIT
     default 5
     help
         Temporary development tolerance, updated by the user to five LSB.
-        The production requirement is three LSB per sample/channel.
+          The final production requirement remains two LSB per sample/channel.
 
 config YORADIO_QEMU_AAC_PC16_HISTORY_TEST
     bool "Use PC16 history with eight packed exponent nibbles in QEMU"
@@ -123,14 +123,6 @@ config YORADIO_QEMU_AAC_PC16_HISTORY_TEST
         Test 16+16 mantissas, shift=exponent+1, with block-of-eight versus
         scalar storage paths. Retains the pinned history scope and exact
         controls. Numerical test only: does not shrink production allocations.
-
-config YORADIO_QEMU_AAC_AREA_STORAGE_TEST
-    bool "Probe separate AAC state areas with 18-bit paired storage"
-    depends on YORADIO_QEMU_AAC_PACKED_HISTORY_TEST && !YORADIO_QEMU_AAC_PC16_HISTORY_TEST && !YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST && !YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
-    default n
-    help
-        Isolated numerical probes of high QMF, hybrid, IMDCT and real-valued
-        coefficient histories. Original allocations and DSP remain unchanged.
 
 config YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
     bool "Test FAAD-style packed PS writes in the current Espressif decoder"
@@ -172,15 +164,7 @@ config YORADIO_QEMU_AAC_PS_STORAGE_TEST
     default n
     help
         Actual feedback writes: original PC16, independent Re/Im exponents,
-        and 17/18-bit mantissa high bits in metadata words. No production default changes.
-
-config YORADIO_QEMU_AAC_COMBINED_STORAGE_TEST
-    bool "Combine qualified AAC storage probes and actual PS writes"
-    depends on YORADIO_QEMU_AAC_PS_STORAGE_TEST && !YORADIO_QEMU_AAC_AREA_STORAGE_TEST
-    default n
-    help
-        Paired reference/candidate PCM with cumulative compression effects.
-        Keeps original owner allocations. IMDCT compression is excluded.
+        and PC17 high bits in metadata words. No production default changes.
 
 config YORADIO_COMPACT_SERVICE_STACKS
     bool "Use measured smaller BOOT, output and WebSocket task stacks"
@@ -313,7 +297,7 @@ config YORADIO_AAC_PS_PC16
     help
         Development compression: eight complex mantissa words plus one word
         holding their independent four-bit exponents. Full SBR/PS arithmetic
-        remains int32. Require PCM <=5 LSB during development, <=3 in production,
+        remains int32. Require PCM <=5 LSB during development, <=2 finally,
         plus speed and full-radio lifecycle qualification.
 
 config YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST

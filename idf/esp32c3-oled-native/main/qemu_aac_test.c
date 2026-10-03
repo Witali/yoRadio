@@ -238,5 +238,9 @@ void qemu_aac_test(native_state_t *state, oled_display_t *display) {
 #if defined(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST) || defined(CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST)
     qemu_aac_bfp16_test();
 #endif
+#ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
+    void qemu_aac_compact_adapter_test(void);
+    qemu_aac_compact_adapter_test();
+#endif
     ESP_LOGI(TAG, "QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes");
 }
