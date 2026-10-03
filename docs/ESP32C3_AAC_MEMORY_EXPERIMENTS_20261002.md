@@ -47,6 +47,11 @@ tracked in the adapter report before considering a production default.
 
 ## Packing preference
 
+The [FAAD Q14 audit](FAAD2_Q14_APPLICABILITY_20261003.md) distinguishes
+14 fractional bits in unchanged int32 arithmetic from compact 14-bit mantissa
+storage. A binary-point change alone saves no RAM. Continue per-area packing
+and combined PCM qualification; no global Q14 arithmetic rewrite is selected.
+
 The initial QMF experiment uses independent four-bit Re and Im exponents:
 one 32-bit metadata word for four complex pairs, with a separate 32-bit mantissa
 word per pair. This needs 12,800 bytes of row-aligned stereo payload instead of

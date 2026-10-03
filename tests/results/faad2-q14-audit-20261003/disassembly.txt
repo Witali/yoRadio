@@ -1,0 +1,29 @@
+
+C:\Work\yoRadio\.worktree\aac-storage18\tests\results\faad2-q14-audit-20261003\precision_probe.o:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <faad_q14_multiply>:
+   0:	02b507b3          	mul	a5,a0,a1
+   4:	6709                	lui	a4,0x2
+   6:	02b51533          	mulh	a0,a0,a1
+   a:	973e                	add	a4,a4,a5
+   c:	00f737b3          	sltu	a5,a4,a5
+  10:	8339                	srli	a4,a4,0xe
+  12:	97aa                	add	a5,a5,a0
+  14:	07ca                	slli	a5,a5,0x12
+  16:	00e78533          	add	a0,a5,a4
+  1a:	8082                	ret
+
+0000001c <isolated_q12_multiply>:
+  1c:	02b507b3          	mul	a5,a0,a1
+  20:	02b51533          	mulh	a0,a0,a1
+  24:	7ff78713          	addi	a4,a5,2047
+  28:	0705                	addi	a4,a4,1 # 2001 <isolated_q12_multiply+0x1fe5>
+  2a:	00f737b3          	sltu	a5,a4,a5
+  2e:	8331                	srli	a4,a4,0xc
+  30:	97aa                	add	a5,a5,a0
+  32:	07d2                	slli	a5,a5,0x14
+  34:	00e78533          	add	a0,a5,a4
+  38:	8082                	ret
