@@ -116,20 +116,33 @@ int __wrap_compact5_sbr_applied(void *owner,void *stream,void *left,void *right,
     aac_compact_owner_t *state=context();
     assert(state && state->owner==owner && !state->inside_sbr);
     state->inside_sbr=true;ps_pointer(state);
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_applied(owner,stream,left,right,out_l,out_r,control,core,false);
+#endif
     int result=__real_compact5_sbr_applied(owner,stream,left,right,out_l,out_r,channels,control,core,out_channels);
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_applied(owner,stream,left,right,out_l,out_r,control,core,true);
+#endif
     state->inside_sbr=false;return result;
 }
 int __real_ps_read_data(void *,void *,unsigned);
 int __wrap_ps_read_data(void *ps,void *bits,unsigned count) {
     aac_compact_owner_t *state=context();
     if(!state || !state->inside_sbr)return __real_ps_read_data(ps,bits,count);
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_ps_bits(ps,bits,false);
+#endif
     owner_t *owner=state->owner;
     aac_ps_abi_t *relocated=&owner->channel[1].ps_overlay.relocated_ps;
     if(!state->ps_initialized) {
         memset(relocated,0,sizeof(*relocated));relocated->detected=owner->inactive_ps;
         state->ps_initialized=true;ps_pointer(state);
     }
-    return __real_ps_read_data(relocated,bits,count);
+    int result=__real_ps_read_data(relocated,bits,count);
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_ps_bits(relocated,bits,true);
+#endif
+    return result;
 }
 
 void __real_PVMP4AudioDecoderResetBuffer(void *);

@@ -2,7 +2,14 @@
 
 ## Result and scope
 
-The current **PC18 high-history + four-row smoothing** adapter passed six QEMU
+The latest **PC18 high-history + four-row smoothing** audit passed six QEMU
+runs with **2,484,371 address/range checks**, **161,368 checked SBR copies**,
+and **929 tracked allocations / 929 frees**. It also checks SBR call arguments,
+PS bit-reader ownership and invalid frees. No unexpected pointer violation was
+found. See the [extended results below](#follow-up-call-boundaries-and-free-ownership)
+and [retained summary](../tests/results/esp32c3-aac-pointer-boundaries-20261003/summary.json).
+
+The initial checkpoint of the same adapter passed six QEMU
 runs: six synthetic AAC files exercised through ten streaming/restart cases,
 plus five retained station captures. There were **2,245,980 address/range
 checks**, **161,368 checked SBR copies**, and **923 tracked allocations, all
@@ -70,6 +77,8 @@ row is copied back into its owning matrix and no stack pointer escapes.
 
 ## Run results
 
+These are the initial checkpoint counts; the extended audit is recorded below.
+
 | Input added to control sequence | Source profile | Checks, including controls | SBR copies, including controls | Allocation/free count |
 | --- | --- | ---: | ---: | ---: |
 | Synthetic controls only | LC / HE / HEv2 | 141,788 | 10,988 | 145 / 145 |
@@ -135,3 +144,89 @@ Run `python tests/test-aac-pointer-audit.py` to validate retained evidence and
 failure-rejection logic. The audit flag requires the QEMU compact-adapter test
 configuration. Its registries and expensive checks are absent from production;
 no board firmware or production default was changed by this audit.
+
+## Follow-up: call boundaries and free ownership
+
+The follow-up closes two gaps in the original test instrumentation: untracked
+non-NULL frees inside an AAC context previously fell through, and SBR input /
+output arguments were not checked independently of the frame's work pointers.
+These were gaps in the audit, not observed corrupt addresses in the decoder.
+
+| Additional pointer group | Required address and lifetime |
+| --- | --- |
+| `sbr_applied` owner, stream and control | Exact live allocations belonging to the current TLS decoder; equal to the core's corresponding fields |
+| Left/right analysis input | Exact `channel[ch].ltp_history + ltp_buffer_state`; the state selects one of the two 1,312-sample halves |
+| SBR output blocks | Exact two 4 KiB halves of the current adapter output; the complete 8 KiB span fits the supplied output allocation |
+| `sbr_dec` output pointer tables | Two-pointer tables inside the current task's stack; each entry equals its output-half base plus the current channel's one-sample interleaving offset |
+| PS right-output table | Present only for PS, with the exact right-channel sample offset in both halves |
+| `ps_read_data` state | Incoming token captured at the start of the current SBR call; actual reader always receives the relocated PS object |
+| PS cached bit reader | Descriptor inside the current task's stack; cursor inside this SBR element's payload, with exact correspondence between cursor distance and read-plus-cached bit counts |
+| External input capacity | Equals the adapter's currently supplied input length; the native wrapper cannot claim extra readable bytes |
+| Allocation/free registry | Requested bytes fit the allocator's usable block; frees require the exact allocation base and owning decoder, and remove the live record |
+
+The native SCE parser can retain its original PS detection-word token while
+processing extensions in a call. The wrapper replaces that token with the full
+relocated PS object before decoding. The check distinguishes these two lifetimes
+instead of accepting arbitrary addresses inside the owner allocation.
+
+The bit reader refills two bytes at a time. Its cursor may include lookahead
+beyond the payload's logical bit count, but must stay in the element's allocated
+payload array. This checkpoint validates cursor ownership; it does not instrument
+each individual native byte load or establish malformed-stream safety.
+
+Registry updates, IO-scope registration and shared counters are protected
+against task preemption. Two simultaneous decoders still pass. All scoped input,
+output and PS bindings are cleared when their call ends. The test's minimum
+remaining decoder-task stack is **4,908 / 8,192 bytes**; production's shared
+16 KiB decoder stack is unchanged.
+
+### Final six-run matrix
+
+Counts include the repeated synthetic controls. Call-boundary counts include
+checks both before and after the native call.
+
+| Additional recording | Address/range checks | SBR applied checks | SBR decode IO checks | PS bit-reader checks | Allocations / frees |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| None: synthetic controls | 153,335 | 296 | 382 | 210 | 146 / 146 |
+| ABBA 64 | 919,439 | 1,588 | 1,674 | 1,480 | 157 / 157 |
+| Groove Salad 16 | 332,456 | 1,234 | 1,320 | 210 | 157 / 157 |
+| Groove Salad 32 | 399,705 | 1,588 | 2,966 | 210 | 157 / 157 |
+| Groove Salad 64 | 399,485 | 1,588 | 2,966 | 210 | 157 / 157 |
+| Groove Salad 128 | 279,951 | 296 | 382 | 210 | 155 / 155 |
+| **Total** | **2,484,371** | **6,590** | **9,690** | **2,530** | **929 / 929** |
+
+All six runs reproduce the previous **657,540 control PCM samples bit for bit**;
+the original-decoder comparison remains maximum **1 LSB**. All five full station
+captures retain their previous PCM hash, frame count and **12,505,088 total
+channel samples**. Capture hashes detect regressions relative to the prior
+adapter; they are not a new per-sample comparison against the original decoder.
+
+The test now rejects **21 deliberately invalid cases per run**: the original
+ten, six invalid-free cases and five call-boundary cases. New cases cover a wrong
+free context, an interior pointer with/without TLS, a one-past-end free, a stack
+address, an already-released record, swapped left/right inputs, an input shifted
+by one sample, swapped output halves, a PS cursor pointing at the external ADTS
+buffer, and the owner base substituted for the PS object. Bad addresses are
+tested against the real check predicates and restored before DSP/free executes.
+The address-check total includes these intentional rejection checks.
+
+Reproduce with the same build defaults and runner as above, adding
+`--require-boundaries`. This switch rejects old logs that lack the new checks.
+The test suite includes five additional regressions covering all six runs,
+capture hashes, source hashes, and rejection of missing/partial/duplicated
+completion markers. Run:
+
+```text
+python tests/test-aac-pointer-audit.py
+python tests/test-aac-smoothing-adapter.py
+python tests/test-aac-low-lifetime.py
+```
+
+Evidence: [logs and results](../tests/results/esp32c3-aac-pointer-boundaries-20261003/summary.json),
+[source snapshots](../tests/results/esp32c3-aac-pointer-boundaries-20261003/implementation.json),
+[binary patch layout](../tests/results/esp32c3-aac-pointer-boundaries-20261003/binary-patch-audit.json).
+The synthetic control WAV is retained compressed. Station audio is not added
+to the repository. This audit applies to the existing 45,932-byte SBR owner;
+it does not qualify an experimental smaller low-QMF layout. It remains
+QEMU-only and does not claim that every pointer in all firmware or every native
+machine instruction has been checked.
