@@ -10,6 +10,14 @@ are not implemented savings and do not yet resolve the SBR allocation deficit.
 
 ## Physical AAC findings, 2026-09-30
 
+**2026-10-03 follow-up:** the [four-row smoothing adapter](ESP32C3_AAC_SMOOTHING_ADAPTER_20261003.md)
+reduces the SBR allocator block to 47,104 bytes (8,192 below original), passes
+14/14 local format cases and installs successfully by OTA. Public HE-AAC still
+fails HTTP/HTTPS load tests with allocation errors. Keep this goal open and
+continue the low-QMF/PS ownership work; short local success is not full-radio
+qualification. The saved Groove Salad 16 capture has no active PS according to
+both FAAD modes; use ABBA/synthetic HEv2 for PS execution coverage.
+
 See the [hardware report](ESP32C3_CACHE_HARDWARE_20260930.md). Isolated full-rate
 AAC passes on this board, but the full radio has a separate heap limitation:
 
