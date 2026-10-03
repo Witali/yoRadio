@@ -68,6 +68,11 @@ static unsigned decode(native_aac_decoder_t *decoder,uint8_t *pcm,bool expect_fa
 }
 
 typedef struct { unsigned samples; uint32_t hash; unsigned stack_free; } decode_result_t;
+#ifdef AAC_LOW_WORKSPACE
+enum { DECODE_TEST_STACK_BYTES=16384 };
+#else
+enum { DECODE_TEST_STACK_BYTES=8192 };
+#endif
 static void decode_task(void *opaque) {
     decode_result_t *result=opaque;
     native_aac_decoder_t *decoder=native_aac_decoder_create();assert(decoder);
@@ -118,7 +123,7 @@ void qemu_aac_compact_adapter_test(void) {
     aac_smoothing_history_test_interleave(true);
 #endif
     for(unsigned i=0;i<2;++i)
-        assert(xTaskCreate(decode_task,"aac_decode",8192,&results[i],5,NULL)==pdPASS);
+        assert(xTaskCreate(decode_task,"aac_decode",DECODE_TEST_STACK_BYTES,&results[i],5,NULL)==pdPASS);
     // Counting notifications also handles two completions before the first wait.
     for(unsigned i=0;i<2;++i)assert(ulTaskNotifyTake(pdFALSE,pdMS_TO_TICKS(30000)));
     for(unsigned i=0;i<2;++i)assert(results[i].samples==samples && results[i].hash==hash);
@@ -129,7 +134,7 @@ void qemu_aac_compact_adapter_test(void) {
     aac_smoothing_history_test_interleave(false);
     unsigned minimum=results[0].stack_free<results[1].stack_free ? results[0].stack_free : results[1].stack_free;
     assert(minimum>=1024);
-    ESP_LOGI(TAG,"AACSMOOTHING_STACK task_stack_bytes=8192 min_free_bytes=%u concurrent_peak=2",minimum);
+    ESP_LOGI(TAG,"AACSMOOTHING_STACK task_stack_bytes=%u min_free_bytes=%u concurrent_peak=2",DECODE_TEST_STACK_BYTES,minimum);
 #endif
     vTaskDelay(2);aac_compact_owner_test_assert_idle();
     assert(heap_caps_check_integrity_all(true));
@@ -137,6 +142,10 @@ void qemu_aac_compact_adapter_test(void) {
     ESP_LOGI(TAG,"AACCOMPACT_ADAPTER_PASS failures=2 tasks=2 resets=2 samples=%u cleanup=complete heap=valid",samples);
 #ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
     aac_pointer_audit_report();
+#endif
+#ifdef AAC_LOW_WORKSPACE
+    void aac_low_workspace_report(void);
+    aac_low_workspace_report();
 #endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_LOW_LIFETIME
     void aac_low_lifetime_report(void);

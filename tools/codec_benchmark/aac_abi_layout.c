@@ -10,7 +10,13 @@ FIELD(right_header, channel[1].frame.header);
 FIELD(right_frame, channel[1].frame);
 FIELD(right_status, channel[1].sync_state);
 FIELD(right_coupling, channel[1].frame.coupling);
+#ifdef AAC_LOW_WORKSPACE
+const uint32_t aac_abi_right_synthesis[2]={
+    offsetof(aac_sbr_owner_abi_t,channel[1].frame.synthesis),
+    offsetof(aac_sbr_compact_owner_abi_t,channel[1].ps_synthesis)};
+#else
 FIELD(right_synthesis, channel[1].frame.synthesis);
+#endif
 FIELD(right_high_real, channel[1].frame.high_real);
 FIELD(right_high_imag, channel[1].frame.high_imag);
 FIELD(ps_peak, channel[1].ps_overlay.peak);

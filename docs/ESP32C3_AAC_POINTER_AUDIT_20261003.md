@@ -2,6 +2,12 @@
 
 ## Result and scope
 
+An additional [scoped low-QMF layout audit](ESP32C3_AAC_LOW_QMF_WORKSPACE_20261003.md)
+now passes 2,583,444 checks on the smaller experimental owner. It adds exact
+stack-object bindings, six more negative cases and the correction of a missed
+header-field read in the first experimental revision. The results below retain
+the previous layout's independent checkpoint; production defaults are unchanged.
+
 The latest **PC18 high-history + four-row smoothing** audit passed six QEMU
 runs with **2,484,371 address/range checks**, **161,368 checked SBR copies**,
 and **929 tracked allocations / 929 frees**. It also checks SBR call arguments,

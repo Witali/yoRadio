@@ -77,6 +77,12 @@ not counted as a completed PCM test.
 
 ## Next implementation gate
 
+Follow-up: steps 1–4 below are now implemented and qualified in QEMU in the
+[scoped low-QMF workspace experiment](ESP32C3_AAC_LOW_QMF_WORKSPACE_20261003.md).
+Its actual owner block saves 10,240 bytes. Physical qualification and speed
+measurements in step 5 remain open. The lifetime-only results in this document
+still describe the unchanged owner and must not be credited with that saving.
+
 Retaining eight complex low rows needs 2,048 bytes per channel instead of
 10,240. The raw-data difference is 8,192 bytes per channel, **not yet a net
 owner saving**: the right-channel PS overlay still needs its own live storage.
