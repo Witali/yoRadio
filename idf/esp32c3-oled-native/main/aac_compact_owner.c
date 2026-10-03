@@ -3,6 +3,7 @@
 #include "aac_compact_owner.h"
 #include "aac_sbr_abi.h"
 #include "aac_sbr_reset.h"
+#include "aac_pointer_audit.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <assert.h>
@@ -30,6 +31,9 @@ void aac_compact_owner_test_assert_idle(void) { assert(!fail_request && !live_ow
 static aac_compact_owner_t *context(void) {
     return pvTaskGetThreadLocalStoragePointer(NULL,AAC_TLS_SLOT);
 }
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+aac_compact_owner_t *aac_compact_owner_audit_context(void) { assert(context());return context(); }
+#endif
 #ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
 aac_high_runtime_t *aac_compact_owner_high_context(void) {
     aac_compact_owner_t *state=context();assert(state);
@@ -63,6 +67,9 @@ void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
     else
 #endif
     p=__real_media_lib_module_calloc(module,n,owner_request?sizeof(owner_t):size);
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_allocate(p,n*(owner_request?sizeof(owner_t):size),state);
+#endif
     if(owner_request && p) {
         assert(!state->owner);state->owner=p;state->ps_initialized=false;
 #ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
@@ -77,6 +84,9 @@ void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
 void __real_media_lib_free(void *);
 void __wrap_media_lib_free(void *p) {
     aac_compact_owner_t *state=context();
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_free(p,state);
+#endif
     if(state && p && state->owner==p) {
         assert(!state->inside_sbr);state->owner=NULL;state->ps_initialized=false;
 #ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
@@ -91,7 +101,14 @@ int __wrap_PVMP4AudioDecodeFrame(void *external,void *core) {
     aac_compact_owner_t *state=context();
     if(!state)return __real_PVMP4AudioDecodeFrame(external,core);
     assert(!((aac_core_abi_t *)core)->sbr || ((aac_core_abi_t *)core)->sbr==state->owner);
-    return compact5_PVMP4AudioDecodeFrame(external,core);
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_core(core,external,false);
+#endif
+    int result=compact5_PVMP4AudioDecodeFrame(external,core);
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_core(core,external,true);
+#endif
+    return result;
 }
 int __real_compact5_sbr_applied(void *,void *,void *,void *,void *,void *,int,void *,void *,int);
 int __wrap_compact5_sbr_applied(void *owner,void *stream,void *left,void *right,
@@ -120,6 +137,9 @@ void __wrap_PVMP4AudioDecoderResetBuffer(void *opaque) {
     aac_compact_owner_t *state=context();
     if(!state){__real_PVMP4AudioDecoderResetBuffer(opaque);return;}
     aac_core_abi_t *core=opaque;owner_t *owner=core->sbr;
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_reset(core);
+#endif
     if(!owner){aac_sbr_reset_core(core,NULL);return;}
     assert(owner==state->owner && !state->inside_sbr);ps_pointer(state);
     aac_sbr_reset_view_t view={
@@ -128,6 +148,9 @@ void __wrap_PVMP4AudioDecoderResetBuffer(void *opaque) {
         .initialize_ps=&owner->initialize_ps,.ps=owner->ps,
         .ps_initialized=state->ps_initialized};
     aac_sbr_reset_core(core,&view);
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_reset(core);
+#endif
 }
 void __real_compact5_sbr_open(int,void *,void *,int);
 int compact5_init_sbr_dec(int,int,void *,void *);

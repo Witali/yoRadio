@@ -2,6 +2,7 @@
 // poisoning enabled in the test image. Does not add samples to the output WAV.
 #include "native_aac_decoder.h"
 #include "aac_compact_owner.h"
+#include "aac_pointer_audit.h"
 #include "aac_sbr_abi.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
@@ -134,4 +135,7 @@ void qemu_aac_compact_adapter_test(void) {
     assert(heap_caps_check_integrity_all(true));
     ESP_LOGI(TAG,"AACCOMPACT_CONCURRENT_PASS decoders=2 samples=%u pcm_hash=%08lx",samples,(unsigned long)hash);
     ESP_LOGI(TAG,"AACCOMPACT_ADAPTER_PASS failures=2 tasks=2 resets=2 samples=%u cleanup=complete heap=valid",samples);
+#ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+    aac_pointer_audit_report();
+#endif
 }

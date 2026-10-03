@@ -106,6 +106,12 @@ qualification remain open.
 
 ## Evidence
 
+The [pointer ownership audit](ESP32C3_AAC_POINTER_AUDIT_20261003.md) records
+exact targets and lifetimes for the PC18 + four-row smoothing adapter,
+including PS overlays and scoped stack rows. Retain these checks when changing
+an area's size or layout. Its address results do not replace PCM comparisons
+or physical radio qualification.
+
 Starting points: [existing execution plan](ESP32C3_HE_AAC_RAM_EXECUTION_20261001.md),
 [native memory audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md),
 [PC16 actual writes](ESP32C3_AAC_PC16_WRITES_20261001.md), and

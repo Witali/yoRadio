@@ -1,0 +1,24 @@
+0x40000000 in ?? ()
+Breakpoint 1 at 0x42010a82: file C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_pointer_audit.c, line 43.
+
+Breakpoint 1, 0x42010a82 in check (condition=<optimized out>, field=<optimized out>, actual=<optimized out>, expected=<optimized out>) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_pointer_audit.c:43
+43	        ESP_LOGE("aac_pointer", "field=%s actual=%p expected=%p",field,actual,expected);
+#0  0x42010a82 in check (condition=<optimized out>, field=<optimized out>, actual=<optimized out>, expected=<optimized out>) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_pointer_audit.c:43
+#1  check (condition=<optimized out>, field=0x3c056de0 "sbr_dec memmove source", actual=0x3fcad6e8, expected=0x0) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_pointer_audit.c:40
+#2  aac_pointer_audit_copy (dest=dest@entry=0x3fca3acc, source=source@entry=0x3fcad6e8, bytes=bytes@entry=48) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_pointer_audit.c:339
+#3  0x42011f26 in aac_high_history_memmove (dest=0x3fca3acc, source=0x3fcad6e8, bytes=48) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_high_history.c:96
+#4  0x42013bb8 in compact5_sbr_dec ()
+#5  0x42012760 in __wrap_compact5_sbr_dec (input=0x3fc9a938, output=0x3fc978a0, frame=0x3fca6a58, apply=1, control=0x3fcb2254, right_output=0x3fc978a8, ps=0x3fcaf2f4, core=0x3fc9a848) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_high_history.c:124
+#6  0x42015862 in compact5_sbr_applied ()
+#7  0x42014c26 in __wrap_compact5_sbr_applied (owner=0x3fca6a50, stream=0x3fc904fc, left=0x3fc9a938, right=0x3fc9cdec, out_l=0x3fc98644, out_r=0x3fc99644, channels=0, control=<optimized out>, core=0x3fc9a848, out_channels=1) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_compact_owner.c:119
+#8  0x42016560 in compact5_PVMP4AudioDecodeFrame ()
+Backtrace stopped: frame did not save the PC
+#2  aac_pointer_audit_copy (dest=dest@entry=0x3fca3acc, source=source@entry=0x3fcad6e8, bytes=bytes@entry=48) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_pointer_audit.c:339
+339	    assert(check(workspace_span(source,bytes,core,state->owner,state->high_history.frame),"sbr_dec memmove source",source,NULL));
+$1 = 48
+$2 = (const void *) 0x3fca3acc
+$3 = (const void *) 0x3fcad6e8
+$4 = (aac_analysis_core_t *) 0x3fc9a848
+[Inferior 1 (process 1) detached]
+C:\Work\yoRadio\.worktree\aac-storage18\.build\pointer-copy-diagnostic\inspect.gdb:13: Error in sourced command file:
+value has been optimized out
