@@ -17,6 +17,12 @@ void aac_compact_owner_test_fail_next(size_t);
 void aac_compact_owner_test_assert_idle(void);
 esp_audio_err_t native_aac_decoder_reset_for_test(native_aac_decoder_t *);
 static const char *TAG="compact_adapter";
+#ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
+typedef aac_high_owner_t tested_owner_t;
+void aac_high_history_test_interleave(bool);
+#else
+typedef aac_sbr_compact_relocated_owner_abi_t tested_owner_t;
+#endif
 static TaskHandle_t parent;
 static void independent_task(void *unused) {
     (void)unused;
@@ -33,8 +39,9 @@ static void independent_task(void *unused) {
 
 extern const uint8_t hev2_start[] asm("_binary_hev2_44100_stereo_aac_start");
 extern const uint8_t hev2_end[] asm("_binary_hev2_44100_stereo_aac_end");
-static unsigned decode(native_aac_decoder_t *decoder,uint8_t *pcm,bool expect_failure) {
+static unsigned decode(native_aac_decoder_t *decoder,uint8_t *pcm,bool expect_failure,uint32_t *hash) {
     unsigned samples=0;
+    uint32_t checksum=2166136261u; // FNV-1a of every decoded PCM byte.
     for(const uint8_t *p=hev2_start;p<hev2_end;) {
         size_t count=hev2_end-p;if(count>193)count=193;
         esp_audio_simple_dec_raw_t raw={.buffer=(uint8_t *)p,.len=count};
@@ -51,9 +58,22 @@ static unsigned decode(native_aac_decoder_t *decoder,uint8_t *pcm,bool expect_fa
             assert(native_aac_decoder_get_info(decoder,&info)==ESP_AUDIO_ERR_OK);
             assert(info.sample_rate==44100 && info.channel==2 && info.bits_per_sample==16);
             samples+=out.decoded_size/2;
+            for(unsigned i=0;i<out.decoded_size;++i)checksum=(checksum^pcm[i])*16777619u;
         }
     }
-    assert(!expect_failure && samples);return samples;
+    assert(!expect_failure && samples);
+    if(hash)*hash=checksum;
+    return samples;
+}
+
+typedef struct { unsigned samples; uint32_t hash; } decode_result_t;
+static void decode_task(void *opaque) {
+    decode_result_t *result=opaque;
+    native_aac_decoder_t *decoder=native_aac_decoder_create();assert(decoder);
+    uint8_t *pcm=malloc(8192);assert(pcm);
+    result->samples=decode(decoder,pcm,false,&result->hash);
+    native_aac_decoder_destroy(decoder);free(pcm);
+    xTaskNotifyGive(parent);vTaskDelete(NULL);
 }
 
 void qemu_aac_compact_adapter_test(void) {
@@ -61,7 +81,10 @@ void qemu_aac_compact_adapter_test(void) {
     aac_compact_owner_t state={0};aac_compact_owner_enter(&state);
     void *owner=__wrap_media_lib_module_calloc("AAC",1,sizeof(aac_sbr_owner_abi_t));
     assert(owner && state.owner==owner);
-    for(size_t i=0;i<sizeof(aac_sbr_compact_relocated_owner_abi_t);++i)assert(!((uint8_t *)owner)[i]);
+    for(size_t i=0;i<sizeof(tested_owner_t);++i)assert(!((uint8_t *)owner)[i]);
+    ESP_LOGI(TAG,"AACCOMPACT_MEMORY owner_bytes=%u block_bytes=%u context_bytes=%u",
+        (unsigned)sizeof(tested_owner_t),(unsigned)heap_caps_get_allocated_size(owner),
+        (unsigned)sizeof(aac_compact_owner_t));
     parent=xTaskGetCurrentTaskHandle();
     assert(xTaskCreate(independent_task,"aac_owner",3072,NULL,5,NULL)==pdPASS);
     assert(ulTaskNotifyTake(pdTRUE,pdMS_TO_TICKS(5000))==1);
@@ -71,17 +94,33 @@ void qemu_aac_compact_adapter_test(void) {
     for(unsigned failure=0;failure<2;++failure) {
         native_aac_decoder_t *decoder=native_aac_decoder_create();assert(decoder);
         aac_compact_owner_test_fail_next(failure?sizeof(aac_sbr_control_abi_t):sizeof(aac_sbr_owner_abi_t));
-        assert(!decode(decoder,pcm,true));
+        assert(!decode(decoder,pcm,true,NULL));
         native_aac_decoder_destroy(decoder);aac_compact_owner_test_assert_idle();
         assert(heap_caps_check_integrity_all(true));
     }
     native_aac_decoder_t *decoder=native_aac_decoder_create();assert(decoder);
-    unsigned samples=decode(decoder,pcm,false);
+    uint32_t hash;
+    unsigned samples=decode(decoder,pcm,false,&hash);
     for(unsigned i=0;i<2;++i) {
         assert(native_aac_decoder_reset_for_test(decoder)==ESP_AUDIO_ERR_OK);
-        assert(decode(decoder,pcm,false)==samples);
+        assert(decode(decoder,pcm,false,NULL)==samples);
         assert(heap_caps_check_integrity_all(true));
     }
     native_aac_decoder_destroy(decoder);free(pcm);aac_compact_owner_test_assert_idle();
+    decode_result_t results[2]={{0}};
+#ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
+    aac_high_history_test_interleave(true);
+#endif
+    for(unsigned i=0;i<2;++i)
+        assert(xTaskCreate(decode_task,"aac_decode",8192,&results[i],5,NULL)==pdPASS);
+    // Counting notifications also handles two completions before the first wait.
+    for(unsigned i=0;i<2;++i)assert(ulTaskNotifyTake(pdFALSE,pdMS_TO_TICKS(30000)));
+    for(unsigned i=0;i<2;++i)assert(results[i].samples==samples && results[i].hash==hash);
+#ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
+    aac_high_history_test_interleave(false);
+#endif
+    vTaskDelay(2);aac_compact_owner_test_assert_idle();
+    assert(heap_caps_check_integrity_all(true));
+    ESP_LOGI(TAG,"AACCOMPACT_CONCURRENT_PASS decoders=2 samples=%u pcm_hash=%08lx",samples,(unsigned long)hash);
     ESP_LOGI(TAG,"AACCOMPACT_ADAPTER_PASS failures=2 tasks=2 resets=2 samples=%u cleanup=complete heap=valid",samples);
 }

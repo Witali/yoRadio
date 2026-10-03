@@ -11,7 +11,15 @@
 #define AAC_TLS_SLOT 1
 _Static_assert(CONFIG_FREERTOS_THREAD_LOCAL_STORAGE_POINTERS>AAC_TLS_SLOT,
                "AAC compact owner needs TLS slot 1; slot 0 belongs to pthreads");
+#ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
+#include "aac_high_reset.h"
+typedef aac_high_owner_t owner_t;
+typedef aac_high_channel_t owner_channel_t;
+#define aac_sbr_reset_core aac_high_reset_core
+#else
 typedef aac_sbr_compact_relocated_owner_abi_t owner_t;
+typedef aac_sbr_compact_channel_abi_t owner_channel_t;
+#endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
 static size_t fail_request;
 static unsigned live_owners;
@@ -22,12 +30,21 @@ void aac_compact_owner_test_assert_idle(void) { assert(!fail_request && !live_ow
 static aac_compact_owner_t *context(void) {
     return pvTaskGetThreadLocalStoragePointer(NULL,AAC_TLS_SLOT);
 }
+#ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
+aac_high_runtime_t *aac_compact_owner_high_context(void) {
+    aac_compact_owner_t *state=context();assert(state);
+    return &state->high_history;
+}
+#endif
 void aac_compact_owner_enter(aac_compact_owner_t *state) {
     assert(state && !context());state->allocation_failed=false;
     vTaskSetThreadLocalStoragePointer(NULL,AAC_TLS_SLOT,state);
 }
 void aac_compact_owner_leave(void) {
     assert(context() && !context()->inside_sbr);
+#ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
+    assert(!context()->high_history.frame);
+#endif
     vTaskSetThreadLocalStoragePointer(NULL,AAC_TLS_SLOT,NULL);
 }
 static void ps_pointer(aac_compact_owner_t *state) {
@@ -106,7 +123,7 @@ void __wrap_PVMP4AudioDecoderResetBuffer(void *opaque) {
     if(!owner){aac_sbr_reset_core(core,NULL);return;}
     assert(owner==state->owner && !state->inside_sbr);ps_pointer(state);
     aac_sbr_reset_view_t view={
-        .frame={&owner->channel[0].frame,&owner->channel[1].frame},
+        .frame={(void *)&owner->channel[0].frame,(void *)&owner->channel[1].frame},
         .sync={&owner->channel[0].sync_state,&owner->channel[1].sync_state},
         .initialize_ps=&owner->initialize_ps,.ps=owner->ps,
         .ps_initialized=state->ps_initialized};
@@ -126,7 +143,7 @@ void __wrap_compact5_sbr_open(int rate,void *control,void *opaque,int downsample
     memset(owner,0,start);
     memset((uint8_t *)owner+end,0,offsetof(owner_t,initialize_ps)-end);
     for(unsigned ch=0;ch<AAC_SBR_CHANNELS;++ch) {
-        aac_sbr_compact_channel_abi_t *channel=&owner->channel[ch];
+        owner_channel_t *channel=&owner->channel[ch];
         memcpy(&channel->frame.header,compact5_defaultHeader,sizeof(channel->frame.header));
         if(downsample || rate>24000)channel->frame.header.sample_rate_mode=1;
         channel->frame_size=compact5_init_sbr_dec(rate,owner->channel[0].frame.header.sample_rate_mode,control,&channel->frame);

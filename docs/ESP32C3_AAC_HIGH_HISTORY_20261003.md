@@ -24,7 +24,9 @@ These numbers describe the SBR owner allocation, not net whole-radio RAM.
 The QEMU adapter has 144 B of shared test state; the new copy/quantization
 instrumentation adds 44 B. Native working arrays provide the unpacked rows;
 there is no extra unpack allocation or full-size history shadow. Production
-integration still needs per-decoder/task ownership and physical heap/CPU tests.
+integration is now available in the [production adapter experiment](ESP32C3_AAC_HIGH_ADAPTER_20261003.md),
+with per-decoder ownership and passing QEMU isolation/reset/failure tests.
+Physical heap/CPU qualification is tracked separately there.
 
 ## Representation and access audit
 
@@ -101,7 +103,7 @@ error**. The shared test changes therefore preserve that existing profile.
 See the [saved results](../tests/results/esp32c3-aac-high-history-20261003/)
 for both formats, including individual error distributions and allocator
 measurements. Neither candidate is promoted to a production default. Remaining
-gates include the production adapter, task isolation, malformed/truncated input,
+gates include malformed/truncated input,
 long-running radio networking, physical CPU/cache behavior and OTA. This change
 does not claim to resolve the previously recorded HE-AAC network allocations.
 The implicit SBR change with an unchanged ADTS header remains a separate issue.
