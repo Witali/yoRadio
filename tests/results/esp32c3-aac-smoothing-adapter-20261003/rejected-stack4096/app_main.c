@@ -964,7 +964,9 @@ void app_main(void) {
     ESP_ERROR_CHECK(oled_display_init(&s_display));
     ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));
     ESP_ERROR_CHECK(native_audio_output_init());
-#if defined(CONFIG_YORADIO_QEMU_AAC_TEST) || defined(CONFIG_YORADIO_QEMU_CACHE_TEST)
+#if defined(CONFIG_YORADIO_QEMU_AAC_PROFILE) || defined(CONFIG_YORADIO_QEMU_CACHE_TEST) || \
+    defined(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST) || \
+    defined(CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST)
     // Real codec implementations need the production decoder's stack, plus
     // space for the parent smoke task's PCM array and regression harness.
     const uint32_t qemu_stack = BOARD_TASK_STACK_AUDIO_DECODER + 4096;
