@@ -24,6 +24,14 @@ captures, allocation failures, resets and simultaneous decoders. Run
 The report documents unchecked views. The [PS coverage follow-up](ESP32C3_AAC_PS_COVERAGE_20261003.md)
 shows why FFprobe's profile/channel label alone cannot establish PS execution.
 
+The [low-QMF lifetime test](ESP32C3_AAC_LOW_QMF_LIFETIME_20261003.md) deliberately
+overwrites transient rows before native decoding and compares the output with
+the unmodified history. It includes a rejected bad-history control and a
+deterministic two-task rendezvous. `python tests/test-aac-low-lifetime.py`
+recomputes error statistics from retained synthetic PCM and checks capture
+hashes, pointer coverage and source fingerprints. This is a prerequisite for
+shrinking the allocation; it reports zero additional production RAM savings.
+
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.

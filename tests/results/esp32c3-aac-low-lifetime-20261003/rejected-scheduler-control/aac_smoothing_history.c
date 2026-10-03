@@ -9,8 +9,7 @@
 #include "freertos/task.h"
 #include <stdbool.h>
 static bool test_interleave;
-static volatile unsigned test_live_calls,test_peak_calls;
-static portMUX_TYPE test_calls_lock=portMUX_INITIALIZER_UNLOCKED;
+static unsigned test_live_calls,test_peak_calls;
 void aac_smoothing_history_test_interleave(bool enable) {
     assert(!test_live_calls);
     if(enable)test_peak_calls=0;
@@ -53,17 +52,9 @@ static __attribute__((noinline)) void complex_envelope(ENVELOPE_ARGS) {
 #endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
     if(test_interleave) {
-        taskENTER_CRITICAL(&test_calls_lock);
         ++test_live_calls;
         if(test_live_calls>test_peak_calls)test_peak_calls=test_live_calls;
-        taskEXIT_CRITICAL(&test_calls_lock);
-        // Keep the first stack row live until the second decoder enters.
-        // A single delay can miss the overlap when DSP instruction demand changes.
-        TickType_t started=xTaskGetTickCount();
-        while(test_peak_calls<2) {
-            assert(xTaskGetTickCount()-started<pdMS_TO_TICKS(5000));
-            vTaskDelay(1);
-        }
+        // Force two decoders to retain distinct live pointers into their stacks.
         vTaskDelay(1);
     }
 #endif
@@ -76,11 +67,7 @@ static __attribute__((noinline)) void complex_envelope(ENVELOPE_ARGS) {
     aac_pointer_audit_smoothing(frame,tables,NULL,0);
 #endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
-    if(test_interleave) {
-        taskENTER_CRITICAL(&test_calls_lock);
-        --test_live_calls;
-        taskEXIT_CRITICAL(&test_calls_lock);
-    }
+    if(test_interleave)--test_live_calls;
 #endif
 }
 void aac_smoothing_history_envelope(ENVELOPE_ARGS) {

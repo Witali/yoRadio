@@ -138,4 +138,8 @@ void qemu_aac_compact_adapter_test(void) {
 #ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
     aac_pointer_audit_report();
 #endif
+#ifdef CONFIG_YORADIO_QEMU_AAC_LOW_LIFETIME
+    void aac_low_lifetime_report(void);
+    aac_low_lifetime_report();
+#endif
 }

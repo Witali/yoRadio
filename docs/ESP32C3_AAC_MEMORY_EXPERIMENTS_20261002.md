@@ -53,6 +53,11 @@ quantization. The native initializer sets 40 rows, 32 new columns, write offset
 the beginning for the next call. A candidate can retain those rows and provide
 the complete native matrix only for the duration of decoding.
 
+The [actual lifetime probe](ESP32C3_AAC_LOW_QMF_LIFETIME_20261003.md) now passes:
+poisoning rows 8..39 preserves all control PCM and five capture hashes/counts.
+Poisoning retained row 7 instead fails precision as expected. This confirms the
+next allocation experiment on this corpus; no low-QMF allocation has shrunk yet.
+
 Before changing allocation, audit all row readers and PS aliases again:
 `sbr_dec` analysis/generation/synthesis/copy paths, `init_sbr_dec`, both reset
 modes, `sbr_open`, and `ps_allocate_decoder`. The right channel's apparent QMF

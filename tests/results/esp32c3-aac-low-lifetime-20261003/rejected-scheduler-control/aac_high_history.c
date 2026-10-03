@@ -23,8 +23,7 @@ static aac_high_runtime_t *active_history(void) { return &history; }
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 static bool test_interleave;
-static volatile unsigned test_live_calls, test_peak_calls;
-static portMUX_TYPE test_calls_lock=portMUX_INITIALIZER_UNLOCKED;
+static unsigned test_live_calls, test_peak_calls;
 void aac_high_history_test_interleave(bool enable) {
     assert(!test_live_calls);
     if(enable)test_peak_calls=0;
@@ -117,16 +116,9 @@ void __wrap_compact5_sbr_dec(void *input,void *output,void *frame,int apply,
 #endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
     if(test_interleave) {
-        taskENTER_CRITICAL(&test_calls_lock);
         ++test_live_calls;
         if(test_live_calls>test_peak_calls)test_peak_calls=test_live_calls;
-        taskEXIT_CRITICAL(&test_calls_lock);
-        // Wait for observed overlap; one tick alone depends on DSP timing.
-        TickType_t started=xTaskGetTickCount();
-        while(test_peak_calls<2) {
-            assert(xTaskGetTickCount()-started<pdMS_TO_TICKS(5000));
-            vTaskDelay(1);
-        }
+        // Force another decoder to enter with a live frame in this task's TLS.
         vTaskDelay(1);
     }
 #endif
@@ -141,11 +133,7 @@ void __wrap_compact5_sbr_dec(void *input,void *output,void *frame,int apply,
     assert(state->call_stores==(state->real_only?1:2));
     state->frame=NULL;
 #ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
-    if(test_interleave) {
-        taskENTER_CRITICAL(&test_calls_lock);
-        --test_live_calls;
-        taskEXIT_CRITICAL(&test_calls_lock);
-    }
+    if(test_interleave)--test_live_calls;
 #endif
 }
 void aac_high_history_clear(aac_high_frame_t *f,bool both) {
