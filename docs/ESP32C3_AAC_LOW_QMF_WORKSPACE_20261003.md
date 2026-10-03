@@ -15,9 +15,11 @@ quantization error. The previous control comparison against the original
 decoder remains at most 1 signed-16 LSB; capture hashes are comparisons with
 the previous adapter, not new per-sample measurements against the original.
 
-This is a **QEMU-only experiment, off by default**. Production integration,
-decode speed and physical HTTP/HTTPS, all-codec and OTA acceptance remain to be
-done. It does not yet resolve the documented public HE-AAC allocation failures.
+This report is the **QEMU experiment checkpoint, off by default**. A subsequent
+[physical adapter integration](ESP32C3_AAC_LOW_QMF_PRODUCTION_20261003.md) now
+tests the unpoisoned storage path, CPU/stack and radio behavior. Full acceptance
+remains open; the QEMU results alone do not resolve the documented public
+HE-AAC allocation failures.
 
 Evidence: [summary](../tests/results/esp32c3-aac-low-workspace-20261003/summary.json),
 [binary patch audit](../tests/results/esp32c3-aac-low-workspace-20261003/audit.json),
@@ -138,6 +140,7 @@ validates all six logs, allocation/stack totals and exact source hashes,
 reconstructs all original field-address immediates, checks the 14 load
 replacements, and rejects missing, contradictory or failed reports.
 
-Next steps are to measure copy/binding overhead without audit poisoning,
-integrate a separately gated production variant, and repeat physical stream,
-memory/stack and OTA tests before considering any default change.
+The [physical follow-up](ESP32C3_AAC_LOW_QMF_PRODUCTION_20261003.md) integrates
+a separately gated production variant and measures copy/binding overhead
+without audit poisoning. Its retained public-stream failures still block any
+default change, despite passing QEMU pointer and PCM checks.

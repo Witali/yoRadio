@@ -21,7 +21,7 @@ overlays the right channel: estimates overlap and must not be added together.
 | Order | Area | Current bytes | Experiment | Status |
 | --- | --- | ---: | --- | --- |
 | 1 | PS decorrelation delays, 617 complex pairs | 4936 native; 2780 PC16 | Shared/independent component exponents and high mantissa bits in metadata | Five actual-write variants tested, including 18+18: max 3 LSB, zero saturation, unchanged heap; owner integration pending |
-| 2 | Low-band QMF matrices, two channels | 20480 | Independent Re/Im exponents, four complex pairs per metadata word; compare shared exponent layouts | 18+18 follow-up: 153 paired comparisons, max 3 LSB and lower RMS; smaller owner/accessors pending |
+| 2 | Low-band QMF matrices, two channels | 20480 | Lifetime split first; independent/shared exponent layouts remain alternatives | [Scoped low-QMF](ESP32C3_AAC_LOW_QMF_WORKSPACE_20261003.md) saves 10240 actual owner-block bytes with exact PCM. [Physical adapter](ESP32C3_AAC_LOW_QMF_PRODUCTION_20261003.md) uses the existing 16 KiB stack; full-radio qualification is still in progress |
 | 3 | High-band QMF history, two channels | 4608 | Actual compact owner, including real-only and complex SBR | [Persistent PC18/PC16 follow-up](ESP32C3_AAC_HIGH_HISTORY_20261003.md): owner block 55,296 -> 49,152 B; 2,048 B additional block saving. PC18 max 2 LSB. [Production adapter](ESP32C3_AAC_HIGH_ADAPTER_20261003.md) integrated; QEMU concurrency/reset/failure gates pass; physical qualification tracked there |
 | 4 | Gain/noise smoothing matrices | 10240 | Four retained rows plus a temporary fifth; preserve all five filter taps | [Actual four-row owner](ESP32C3_AAC_SMOOTHING_HISTORY_20261003.md): another 2048 B owner-block saving; 144 direct FIR cases bit-exact; combined PC18 corpus max 2 LSB. Adds 1024 B temporary payload / 1184 B compiled wrapper frame. [Physical adapter](ESP32C3_AAC_SMOOTHING_ADAPTER_20261003.md): local 14/14 passes, but public HE HTTP/HTTPS allocation failures remain |
 | 5 | Smoothing exponents, included above | 5120 | Observe/check int16 range, preserving int32 arithmetic; candidate saving 2560 bytes with five rows | Checked int16 roundtrip bit-exact, observed -50..16; format-wide bound and compact allocation pending |
@@ -56,7 +56,11 @@ the complete native matrix only for the duration of decoding.
 The [actual lifetime probe](ESP32C3_AAC_LOW_QMF_LIFETIME_20261003.md) now passes:
 poisoning rows 8..39 preserves all control PCM and five capture hashes/counts.
 Poisoning retained row 7 instead fails precision as expected. This confirms the
-next allocation experiment on this corpus; no low-QMF allocation has shrunk yet.
+next allocation experiment on this corpus. The subsequent scoped-workspace
+implementation now shrinks the actual owner from 45932 to 35900 bytes (10240
+allocator bytes saved). It preserves the right PS overlay and exact PCM, with
+2824 bytes of measured remaining physical decoder stack in the controlled AAC
+tests. Public-network acceptance is tracked in the physical adapter report.
 
 Before changing allocation, audit all row readers and PS aliases again:
 `sbr_dec` analysis/generation/synthesis/copy paths, `init_sbr_dec`, both reset

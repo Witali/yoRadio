@@ -32,6 +32,14 @@ recomputes error statistics from retained synthetic PCM and checks capture
 hashes, pointer coverage and source fingerprints. This is a prerequisite for
 shrinking the allocation; it reports zero additional production RAM savings.
 
+The [scoped low-QMF adapter](ESP32C3_AAC_LOW_QMF_WORKSPACE_20261003.md) now
+retains only eight history rows per channel and moves the live full matrix to
+the existing decoder stack. Its [physical follow-up](ESP32C3_AAC_LOW_QMF_PRODUCTION_20261003.md)
+measures the 10,240-byte allocator saving, CPU, stack, local formats and OTA.
+`python tests/test-aac-low-production.py` verifies the retained evidence, including
+public HTTP/HTTPS failures that still block promotion. Passing this evidence
+test means the records are consistent; it does not mean all playback passed.
+
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.
