@@ -22,7 +22,7 @@ overlays the right channel: estimates overlap and must not be added together.
 | --- | --- | ---: | --- | --- |
 | 1 | PS decorrelation delays, 617 complex pairs | 4936 native; 2780 PC16 | Shared/independent component exponents and high mantissa bits in metadata | Five actual-write variants tested, including 18+18: max 3 LSB, zero saturation, unchanged heap; owner integration pending |
 | 2 | Low-band QMF matrices, two channels | 20480 | Independent Re/Im exponents, four complex pairs per metadata word; compare shared exponent layouts | 18+18 follow-up: 153 paired comparisons, max 3 LSB and lower RMS; smaller owner/accessors pending |
-| 3 | High-band QMF history, two channels | 4608 | Compare compact history independently from low-band history | Complex-history PC18: max 2 LSB; potential payload saving 1728 bytes, zero heap saved; real-only SBR excluded |
+| 3 | High-band QMF history, two channels | 4608 | Actual compact owner, including real-only and complex SBR | [Persistent PC18/PC16 follow-up](ESP32C3_AAC_HIGH_HISTORY_20261003.md): owner block 55,296 -> 49,152 B, including earlier lossless changes; 2,048 B additional block saving. PC18 max 2 LSB; production integration pending |
 | 4 | Gain/noise smoothing matrices | 10240 | Audit four retained rows plus current scratch instead of copying a fifth row; preserve all five filter taps | Mantissa PC18 frame-boundary probe: 0 PCM error; within-frame FIR qualification and row-lifetime redesign pending |
 | 5 | Smoothing exponents, included above | 5120 | Observe/check int16 range, preserving int32 arithmetic; candidate saving 2560 bytes with five rows | Checked int16 roundtrip bit-exact, observed -50..16; format-wide bound and compact allocation pending |
 | 6 | Right channel in PS mode | 24848 with compact pointer tables | Separate PS-specific allocation and preserve all transitions; recompute overlaps with relocated PS control | Pending |
@@ -39,9 +39,10 @@ probes from within-frame producers and lists remaining scratch/control exclusion
 
 The existing lossless table compaction saves 1888 requested bytes; PS relocation
 saves 3532 requested bytes. Their combined prototype requests 49708 rather than
-55128 bytes. Its production integration is unfinished in the separate
-`codex/esp32c3-stream-format` worktree; this experiment branch does not copy or
-silently promote that unfinished adapter.
+55128 bytes. The [production adapter experiment](ESP32C3_AAC_COMPACT_OWNER_20261002.md)
+is integrated into this branch, with retained failed physical HE-AAC/network
+qualification. The new high-history experiment builds on that layout and remains
+QEMU-only until its own production ownership, CPU, streaming and OTA gates pass.
 
 ## Packing preference
 

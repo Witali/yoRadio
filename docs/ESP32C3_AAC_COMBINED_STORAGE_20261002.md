@@ -10,6 +10,12 @@ Production tolerance is **+/-3 signed-16 PCM units per channel and sample**.
 This is a maximum-error gate, not an RMS limit or permission to discard three
 bits. See [precision policy](ESP32C3_AAC_PRECISION_POLICY.md).
 
+The [persistent high-history follow-up](ESP32C3_AAC_HIGH_HISTORY_20261003.md)
+implements one of these areas with a genuinely smaller owner and also tests
+real-only SBR. It measures 6,144 B of owner-block saving including the earlier
+lossless changes. That separate result does not turn the full combination's
+21,096-byte estimate below into a measured saving.
+
 ## What is combined
 
 - New low-QMF analysis rows and retained high-QMF history.
