@@ -56,6 +56,66 @@ retain the configuration, PCM hashes, logs and compiler patch provenance.
 This finite corpus is not a universal error bound. The known unchanged-ADTS-header
 implicit-SBR transition limitation remains; stream restart is still required.
 
+A fresh build of the shared numerical probe also passes all 36 synthetic paired
+comparisons, repaired reset and lifecycle checks, with **2 LSB maximum** and the
+same 6,144-byte cumulative owner-block saving. This rerun tests the shared source
+after its move out of the QEMU-only file.
+
+## Physical radio qualification
+
+The awake DIO/80 MHz image was installed through the native WebUI while an
+AAC-LC stream played. OTA completed in **20.953 seconds**; the running ELF hash
+matched the uploaded image. Wi-Fi, playlist and settings comparisons passed,
+with no retained panic/capture errors. Neither bootloader nor storage partitions
+were rewritten.
+
+Public streams were probed with FFprobe immediately before each test. Each
+requested run lasts 60 seconds with status polling every 0.1 seconds. A transport
+failure can end a run early; such a run is a failure, not a shorter passing test.
+
+| Public stream | HTTP | HTTPS |
+| --- | --- | --- |
+| AAC-LC 128 kbit/s | Failed: WebUI transport error after about 38 s of observations | Passed; mean CPU 53.42% |
+| HE-AAC 64 kbit/s | Failed: WebUI transport error after about 3 s | Failed: runtime allocation/TLS errors; only brief PCM |
+| HE-AAC 32 kbit/s | Failed: runtime allocation errors; full 44.1 kHz stereo observed | Failed: runtime allocation/TLS errors; intermittent PCM |
+| HE-AACv2 16 kbit/s | Failed: WebUI timeout; full 32 kHz stereo briefly observed | Failed: runtime allocation/TLS errors; no PCM observed |
+| MP3 256 kbit/s | Passed; mean CPU 58.22% | Passed; mean CPU 66.03% |
+
+HTTP records 24 allocation failures, all requesting 1,700 bytes. HTTPS records
+38 failures, including network requests and a 47,980-byte compact owner request.
+At failing allocations the minimum observed largest free block was **1,408 B**;
+aggregate free heap reached minima of **4,632 B (HTTP)** and **4,240 B (HTTPS)**.
+The extra owner saving therefore does **not** resolve full-radio memory pressure.
+Both suites recovered their settled idle heap and restored settings/saved
+playback after reboot.
+
+The failed HTTP HE-AAC 32 kbit/s window averaged 56.23% CPU, but is not a passing
+performance qualification. Failed HTTPS windows include stalled/idle time and
+must not be presented as continuous HE-AAC decoding benchmarks. RSSI ranged
+approximately -86..-74 dBm; the isolated AAC-LC HTTP transport error is not
+attributed to compression, flash mode or signal strength without a controlled
+comparison.
+
+The separate local finite-file matrix passes **14/14 playback/EOF checks**:
+MP3 320 kbit/s, FLAC level 8, Vorbis q10, Opus 510 kbit/s, HE-AAC 44.1/48 kHz
+stereo and HE-AACv2 44.1 kHz stereo, each with automatic and explicit codec
+selection. Board restoration also passes. These short LAN checks do not replace
+the failing public radio/TLS workload above or long-running codec qualification.
+Two additional HE-AACv2 EOF checks pass: REST retains `stream ended` with cleared
+PCM metadata, and WebSocket reports the stopped state. No allocation/decoder
+errors were retained during the local matrix. The saved station is playing
+again on the verified new image after the tests.
+
+Use `summarize_public_windows.py` for these logs. It clips CPU samples to each
+recorded station window and leaves aggregates unavailable for short failed runs.
+The older checkpoint-only summarizer could incorrectly use the next station's
+CPU samples after an early error; its historical summaries should not be used
+for those short cases.
+
+**Not a production default.** Further RAM reduction and physical full-radio
+qualification are required, followed by sustained playback/OTA and malformed
+input checks. Numerical precision and a successful upload alone are insufficient.
+
 ## Reproduce
 
 ```powershell

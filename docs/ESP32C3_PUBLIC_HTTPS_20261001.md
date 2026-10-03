@@ -126,7 +126,7 @@ image already installed:
 python tests/test-esp32c3-public-streams.py
 python tools/esp32c3_tests/public_streams.py --board http://BOARD_IP --serial-port COM9 --firmware firmware/development/esp32c3-tcp-pcb-pool-fixed/app.bin --seconds 60 --interval 0.1 --output .build/public-https
 python tools/esp32c3_tests/public_streams.py --board http://BOARD_IP --serial-port COM9 --firmware firmware/development/esp32c3-tcp-pcb-pool-fixed/app.bin --seconds 60 --interval 0.1 --transport http --case groovesalad-128-aac --case groovesalad-64-aac --case groovesalad-16-aac --case groovesalad-256-mp3 --output .build/public-http
-python tools/esp32c3_tests/summarize_public.py --input .build/public-https --output .build/public-https/summary.json
+python tools/esp32c3_tests/summarize_public_windows.py --input .build/public-https --output .build/public-https/summary.json
 ```
 
 Reports preserve expected failures, reference probes, exact image/config/test

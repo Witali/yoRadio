@@ -65,6 +65,24 @@ With one-second HTTP polling after a reboot, full HE 44.1 kHz starts, but later
 The next fix must preserve operating headroom after SBR allocation as well as
 make its initial allocation possible.
 
+## Current compact-owner checkpoint, 2026-10-03
+
+The [PC18 production-adapter test](ESP32C3_AAC_HIGH_ADAPTER_20261003.md) reduces
+the owner request to 47,980 B and the measured unguarded block to 49,152 B
+(6,144 B less than the original, including lossless table/PS changes). Per-decoder
+high-history state adds 16 B. QEMU PCM, reset, concurrent tasks and fail-closed
+SBR allocation tests pass; an awake app-only OTA also passes on the board.
+
+Public HTTP/HTTPS HE-AAC still fails under network/WebUI load: requests as small
+as 1,700 B cannot fit despite several KiB of aggregate free heap. HTTPS can also
+fail the compact owner allocation. Preserve both the initial contiguous-owner
+budget and sustained network/TLS headroom as open requirements. Do not enable
+this experimental profile by default or treat reduced/stalled PCM as a pass.
+Continue the audited smoothing/QMF storage checklist in
+[memory experiments](ESP32C3_AAC_MEMORY_EXPERIMENTS_20261002.md), then repeat
+physical mixed-codec, CPU, EOF, OTA and sustained-playback checks. The remaining
+large-area estimates are not measured savings yet.
+
 ## AAC memory reuse during decoding — planned, 2026-09-30
 
 The [AAC decompilation audit](ESP32C3_AAC_DECOMPILATION_RAM_20260930.md)

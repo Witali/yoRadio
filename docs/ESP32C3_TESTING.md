@@ -561,6 +561,20 @@ above cases actually ran and passed for each hand-off image.
 
 ## CPU diagnostics without a separate profiler stack
 
+For new public-stream reports, use
+`python tools/esp32c3_tests/summarize_public_windows.py --input <results> --output <summary.json>`.
+It clips every CPU window to the recorded station start/end. Short failed runs
+with fewer than four samples have no aggregate CPU value; samples from the next
+station cannot fill the gap. The older `summarize_public.py` remains available
+for historical reproduction and can overrun short failed playback windows.
+
+The [PC18 production-adapter report](ESP32C3_AAC_HIGH_ADAPTER_20261003.md)
+records the latest owner, QEMU task-interleaving, memory-failure, reset and
+physical-radio qualification. Run `tests/test-aac-high-adapter.py` for retained
+evidence/precision guards and `tests/test-public-window-summary.py` for window
+isolation. Neither passing QEMU nor a successful OTA upload certifies long-term
+HE-AAC playback on the complete radio.
+
 For tight C3 HE-AAC budgets, add `sdkconfig.cpu-profile-http.defaults` after
 `sdkconfig.cpu-profile.defaults`. This enables `CONFIG_YORADIO_CPU_PROFILE_HTTP`:
 the existing `/api/native/status` handler samples runtime counters at most once

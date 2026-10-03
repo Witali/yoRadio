@@ -157,7 +157,7 @@ allocations; it does not transfer static IRAM to DRAM.
 ```powershell
 python tools/esp32c3_tests/diagnostic.py ota_transition --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --current-firmware firmware/development/esp32c3-tcp-pcb-pool-fixed/app.bin --firmware firmware/development/esp32c3-tls-dynamic/app.bin --output .build/tls-dynamic/install
 python tools/esp32c3_tests/public_streams.py --board http://BOARD_IP --serial-port COM9 --firmware firmware/development/esp32c3-tls-dynamic/app.bin --seconds 60 --interval 0.1 --output .build/tls-dynamic/https
-python tools/esp32c3_tests/summarize_public.py --input .build/tls-dynamic/https --output .build/tls-dynamic/https/summary.json
+python tools/esp32c3_tests/summarize_public_windows.py --input .build/tls-dynamic/https --output .build/tls-dynamic/https/summary.json
 ```
 
 The [public-stream test](ESP32C3_TESTING.md#https) verifies the live reference
