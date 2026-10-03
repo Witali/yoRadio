@@ -40,6 +40,12 @@ measures the 10,240-byte allocator saving, CPU, stack, local formats and OTA.
 public HTTP/HTTPS failures that still block promotion. Passing this evidence
 test means the records are consistent; it does not mean all playback passed.
 
+The [asymmetric channel owner](ESP32C3_AAC_ASYMMETRIC_OWNER_20261003.md)
+removes the unused left PS reserve and measures another 4 KiB allocator saving
+in QEMU. `python tests/test-aac-asymmetric-owner.py --compiler <RV32-gcc>` checks
+native object edits, prefix/stride assertions, six pointer/PCM runs and the
+disabled-flag control. Physical playback and OTA remain separate pending gates.
+
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.

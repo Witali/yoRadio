@@ -147,6 +147,11 @@ void qemu_aac_compact_adapter_test(void) {
     void aac_low_workspace_report(void);
     aac_low_workspace_report();
 #endif
+#ifdef AAC_ASYMMETRIC_OWNER
+    ESP_LOGI(TAG,"AAC_ASYMMETRIC_OWNER_PASS owner_bytes=%u left_bytes=%u right_bytes=%u frame_offset=%u",
+        (unsigned)sizeof(aac_high_owner_t),(unsigned)sizeof(aac_high_channel_view_t),
+        (unsigned)sizeof(aac_high_channel_t),(unsigned)offsetof(aac_high_channel_t,frame));
+#endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_LOW_LIFETIME
     void aac_low_lifetime_report(void);
     aac_low_lifetime_report();

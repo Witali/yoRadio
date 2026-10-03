@@ -62,6 +62,13 @@ allocator bytes saved). It preserves the right PS overlay and exact PCM, with
 2824 bytes of measured remaining physical decoder stack in the controlled AAC
 tests. Public-network acceptance is tracked in the physical adapter report.
 
+The [asymmetric channel owner](ESP32C3_AAC_ASYMMETRIC_OWNER_20261003.md) then
+removes the unused left-channel PS reserve. Common prefix tables preserve
+identical frame-relative accesses. Six QEMU pointer/PCM runs prove another
+4096 B allocator saving (35900 -> 32744 requested bytes), with no additional
+PCM error or stack increase. Physical integration is pending; this does not
+yet implement the separate PS-only allocation proposed in item 6.
+
 Before changing allocation, audit all row readers and PS aliases again:
 `sbr_dec` analysis/generation/synthesis/copy paths, `init_sbr_dec`, both reset
 modes, `sbr_open`, and `ps_allocate_decoder`. The right channel's apparent QMF
