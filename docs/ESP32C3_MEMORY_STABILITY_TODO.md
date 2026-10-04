@@ -474,6 +474,13 @@ current compact precision candidate: 41 of 675,840 samples exceed 3 LSB, with a
 until precision is repaired. Also fix the HE-mono-as-HEv2 label inference:
 the SDK can duplicate mono into stereo without PS.
 
+Precision follow-up: [19-bit high-QMF history](ESP32C3_AAC_PC19_20261004.md)
+repairs that corpus to a 2-LSB maximum with no samples over 3 LSB. Keeping extra
+bits in the context costs 144 allocated bytes instead of the 2,048-byte owner
+allocation increase. Audited guest instructions increase 2.39%; production
+defaults remain unchanged. Extend to real recordings, reduce/qualify overhead,
+repair mono/PS metadata and complete malformed-input and physical gates.
+
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
 - [ ] Run the complete host test suite.

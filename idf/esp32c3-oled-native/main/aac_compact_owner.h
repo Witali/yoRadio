@@ -22,4 +22,7 @@ void aac_compact_owner_enter(aac_compact_owner_t *);
 void aac_compact_owner_leave(void);
 #ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
 aac_high_runtime_t *aac_compact_owner_high_context(void);
+#ifdef AAC_HIGH_HISTORY_PC19_SIDECAR
+unsigned aac_compact_owner_high_channel(const aac_high_frame_t *);
+#endif
 #endif

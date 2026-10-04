@@ -1,8 +1,12 @@
 # ESP32-C3: extended SBR-gap regression
 
-**Status: the current compact candidate fails the 3-LSB precision gate.**
+**Status: the recorded PC18 candidate fails the 3-LSB precision gate.**
 Memory/lifecycle and format checks pass in QEMU. This work changes test coverage,
 not production defaults or the firmware installed on the physical board.
+
+Follow-up: [PC19 high-QMF history](ESP32C3_AAC_PC19_20261004.md) passes this
+corpus at 2 LSB maximum, with 144 extra allocated bytes. The rejected PC18
+evidence below remains unchanged; production qualification is still open.
 
 ## What is tested
 
