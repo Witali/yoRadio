@@ -1,0 +1,145 @@
+{
+  "metadata_pass": true,
+  "precision_qualified": false,
+  "summaries": [],
+  "frames": 104,
+  "resets": 1,
+  "cases": [
+    {
+      "case": "hev2_44100_stereo",
+      "label": "HE-AACv2",
+      "source_channels": 2,
+      "pcm_channels": 2,
+      "rate": 44100,
+      "frames": 15
+    },
+    {
+      "case": "he_mono_metadata",
+      "label": "HE-AAC",
+      "source_channels": 1,
+      "pcm_channels": 2,
+      "rate": 32000,
+      "frames": 11
+    },
+    {
+      "case": "lc_48000_stereo",
+      "label": "AAC",
+      "source_channels": 2,
+      "pcm_channels": 2,
+      "rate": 48000,
+      "frames": 26
+    },
+    {
+      "case": "he_48000_stereo",
+      "label": "HE-AAC",
+      "source_channels": 2,
+      "pcm_channels": 2,
+      "rate": 48000,
+      "frames": 15
+    },
+    {
+      "case": "hev2_44100_stereo",
+      "label": "HE-AACv2",
+      "source_channels": 2,
+      "pcm_channels": 2,
+      "rate": 44100,
+      "frames": 15
+    },
+    {
+      "case": "he_mono_metadata",
+      "label": "HE-AAC",
+      "source_channels": 1,
+      "pcm_channels": 2,
+      "rate": 32000,
+      "frames": 11
+    },
+    {
+      "case": "he_mono_metadata",
+      "label": "HE-AAC",
+      "source_channels": 1,
+      "pcm_channels": 2,
+      "rate": 32000,
+      "frames": 11
+    }
+  ],
+  "provenance": {
+    "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+    "elf_sha256": "9b4c3a6bcf91549cfde2d1ed2187cc8799df4c5905e93b0f190fe0a7ca70aed4",
+    "sdkconfig_sha256": "04ef4d8afc4b88e828fda6a1c664dac2d233a84267130a35e5dc648593e956ab",
+    "fixtures": {
+      "generator": "FDK AAC v2.0.3 aac-enc, original 0.5-second synthetic tones",
+      "encoder_commit": "716f4394641d53f0d79c9ddac3fa93b03a49f278",
+      "files": {
+        "lc-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 8943,
+          "sha256": "b701428ed6cd8118f873f4cbe708b517a1089deed63792af6d0850c2ebc436bd"
+        },
+        "lc-22050-mono.aac": {
+          "sample_rate": 22050,
+          "channels": 1,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9659,
+          "sha256": "70ca546f35396ad05b88876536557df6b43ef7d804966460fb949aa9e07b7a85"
+        },
+        "lc-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9012,
+          "sha256": "1b9ab71161449af230ca0628dc23ac265f8c707b82d5e68c76ddc7f42d69b0d4"
+        },
+        "he-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5202,
+          "sha256": "2ed01ee61355830629905867f1885eae99123bc73daad161ba1a5959a4f5e11a"
+        },
+        "he-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5121,
+          "sha256": "747259aaafad92a280e793a4e0b7fce05d39443959ef3d3cba463b980d92f7da"
+        },
+        "hev2-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 29,
+          "bitrate": 32000,
+          "size_bytes": 2787,
+          "sha256": "cf66a4008ec69f9fa31ac7383b0fe8ff6d71fc60b19ee168f1c1396c7e4014ce"
+        }
+      }
+    },
+    "qemu_command": [
+      "wsl.exe",
+      "--cd",
+      "/mnt/c/Work/yoRadio/.worktree/aac-storage18",
+      "--exec",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+      "-M",
+      "esp32c3,audiodev=audio0",
+      "-nographic",
+      "-no-reboot",
+      "-snapshot",
+      "-icount",
+      "shift=0,align=off,sleep=off",
+      "-audiodev",
+      "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-metadata/reference/audio.wav,out.frequency=48000",
+      "-L",
+      "/mnt/c/Work/QEMU-ESP32/share/qemu",
+      "-drive",
+      "file=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-metadata/reference/flash.bin,if=mtd,format=raw"
+    ],
+    "qemu_log_sha256": "3ff665544d5fed0a4e84fab39a9e0d4e59db270606ca46c2e780978127628816"
+  }
+}

@@ -34,6 +34,8 @@ static uint32_t packet_rate;
 static unsigned packet_channels, packet_bits, packets, packet_bytes;
 static bool fail_get_info;
 static esp_audio_simple_dec_info_t next_info;
+static const char *next_aac_label="AAC";
+static unsigned next_aac_channels;
 
 size_t strlcpy(char *to, const char *from, size_t capacity) {
     size_t length = strlen(from);
@@ -79,8 +81,11 @@ static int native_aac_decoder_get_info(void *decoder,
 static const char *native_aac_decoder_label(void *decoder,
     const esp_audio_simple_dec_info_t *info, bool *format_is_pcm) {
     (void)decoder; (void)info;
-    *format_is_pcm = true;
-    return "AAC";
+    *format_is_pcm = !next_aac_channels;
+    return next_aac_label;
+}
+static unsigned native_aac_decoder_source_channels(void *decoder) {
+    (void)decoder;return next_aac_channels;
 }
 
 #include "production.inc"
@@ -192,6 +197,18 @@ int main(void) {
     assert(packet_rate == 48000 && packet_channels == 2);
     run_espressif_frame(1, NATIVE_CODEC_AAC, &cached);
     assert(strcmp(state.stream_format, "AAC PCM 48 kHz stereo") == 0);
+    // Native HE mono duplicates PCM into L/R; UI describes the source while
+    // packet routing still follows the actual two-channel PCM buffer.
+    next_aac_label="HE-AAC";next_aac_channels=1;next_info.sample_rate=32000;
+    run_espressif_frame(1, NATIVE_CODEC_AAC, &cached);
+    assert(strcmp(state.stream_format,"HE-AAC 32 kHz mono")==0);
+    assert(state.channels==1 && state.pcm_channels==2 && packet_channels==2);
+    format_status(json,sizeof(json));assert(strstr(json,"HE-AAC 32 kHz mono"));
+    format_stream_details(s_state,text,sizeof(text));assert(strstr(text,"mono"));
+    next_aac_label="HE-AACv2";next_aac_channels=2;next_info.sample_rate=44100;
+    run_espressif_frame(1,NATIVE_CODEC_AAC,&cached);
+    assert(strcmp(state.stream_format,"HE-AACv2 44.1 kHz stereo")==0);
+    assert(state.channels==2 && state.pcm_channels==2 && packet_channels==2);
     unsigned sent = packets;
     fail_get_info = true;
     run_espressif_frame(1, NATIVE_CODEC_MP3, &cached);

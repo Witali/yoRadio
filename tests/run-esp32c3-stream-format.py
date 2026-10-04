@@ -68,7 +68,7 @@ static void run_espressif_frame(uint32_t generation, native_codec_t codec,
     bool stream_info_ready = true;
     bool first_frame_memory_logged = true;
     void *decoder = NULL;
-    void *aac_decoder = NULL;
+    void *aac_decoder = codec == NATIVE_CODEC_AAC ? saved : NULL;
     struct { size_t decoded_size; } frame = {4096};
     uint8_t output[4096] = {0};
     decode_stats_t stats = {0};

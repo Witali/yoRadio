@@ -45,6 +45,8 @@ control logs are retained. Audio is not copied into the repository.
 - Keep ABBA and the synthetic HE-AACv2 fixture as active PS coverage gates.
 - Keep Groove Salad 16 as a complex-SBR mono case, even if a backend duplicates
   its output channels. Never count it as a PS case from FFprobe metadata alone.
-- The firmware's source-profile display still needs actual SBR/PS flags instead
-  of inferring PS from a mono ADTS core and stereo PCM. This is distinct from
-  the RAM failures on public radio; neither issue is fixed by changing test labels.
+- The [2026-10-04 metadata fix](ESP32C3_AAC_METADATA_20261004.md) reads actual
+  SBR/PS flags and the native core channel count. Groove Salad 16 now reports
+  HE-AAC mono with two PCM channels in the real-library QEMU test. Physical
+  OLED/WebUI verification remains open; this display fix does not itself repair
+  public-radio RAM failures.

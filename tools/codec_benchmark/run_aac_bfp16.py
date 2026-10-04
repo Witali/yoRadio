@@ -165,7 +165,8 @@ def parse_statistics(log, rows, external):
     return list(stats.values())
 
 
-def run(args, *, log_parser=parse_log, config_key="YORADIO_QEMU_AAC_BFP16_TEST", axis="bands"):
+def run(args, *, log_parser=parse_log, config_key="YORADIO_QEMU_AAC_BFP16_TEST", axis="bands",
+        pass_key="precision_pass", validation_label="PCM precision"):
     build = args.build.resolve()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -242,10 +243,12 @@ def run(args, *, log_parser=parse_log, config_key="YORADIO_QEMU_AAC_BFP16_TEST",
     for row in result["summaries"]:
         print(f"{row['case']:20s} {axis}={row[axis]:2d} max_error={row['max_pcm_error_lsb']:4d} LSB "
               f"instructions={row['instruction_overhead_median_percent']:+.3f}%")
-    print("PCM precision:", "PASS (corpus only)" if result["precision_pass"] else f"FAIL (>{result['precision_limit_lsb']} LSB)")
+    passed = result[pass_key]
+    failure = f"FAIL (>{result['precision_limit_lsb']} LSB)" if pass_key == "precision_pass" else "FAIL"
+    print(validation_label + ":", "PASS (corpus only)" if passed else failure)
     if result.get("quantization_exercised") is False:
         print("No packed history exercised; this input checks controls and format behavior only.")
-    return 0 if result["precision_pass"] else 2
+    return 0 if passed else 2
 
 
 def make_parser(description=__doc__, experiment="bfp16"):

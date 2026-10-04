@@ -141,7 +141,9 @@ typedef struct AAC_ABI_VIEW {
     uint32_t frame_number;
     int32_t status;
     uint8_t plus_enabled;
-    uint8_t configuration[0xbc-9];
+    uint8_t configuration[0x8c-9];
+    int32_t encoded_channels; // Core channels before Parametric Stereo synthesis.
+    uint8_t extension_configuration[0xbc-0x90];
     int32_t sbr_present;
     // Parametric Stereo flag, formerly mislabeled "channels". Not a channel count.
     int32_t ps_present;
@@ -199,6 +201,7 @@ AAC_ABI_OFFSET(aac_sbr_control_abi_t, write_offset, 0x18);
 _Static_assert(sizeof(aac_sbr_control_abi_t)==1180, "SBR control ABI");
 _Static_assert(sizeof(aac_sbr_ps_overlay_abi_t)<=offsetof(aac_sbr_channel_abi_t,frame.synthesis),
                "PS overlay must precede synthesis history");
+AAC_ABI_OFFSET(aac_core_abi_t, encoded_channels, 0x8c);
 AAC_ABI_OFFSET(aac_core_abi_t, sbr_present, 0xbc);
 AAC_ABI_OFFSET(aac_core_abi_t, ps_present, 0xc0);
 AAC_ABI_OFFSET(aac_core_abi_t, channel[0].overlap, 0x1570);

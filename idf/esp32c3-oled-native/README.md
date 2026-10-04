@@ -229,10 +229,14 @@ until its current scrolling line finishes. WebUI updates independently of bitrat
 `GET /api/status` also exposes `sample_rate`, `channels`, `bits_per_sample`,
 `pcm_sample_rate`, `pcm_channels`, `format_is_pcm` and `channels_are_core`.
 
-The Espressif API exposes decoded PCM, without explicit AAC profile/SBR/PS flags.
-The ADTS adapter identifies `HE-AAC` when output rate is twice the core rate and
-`HE-AACv2` when a mono core also produces stereo. Otherwise it reports, for example,
-`AAC PCM 44.1 kHz stereo`, without claiming an unconfirmed source profile.
+The Espressif public API exposes decoded PCM. The ADTS adapter additionally reads
+the audited native core's SBR/PS flags to identify `HE-AAC` and `HE-AACv2`.
+The private ABI is protected by compiler layout assertions and the pinned library
+SHA-256. Source channels and PCM channels stay separate: HE-AAC mono can produce
+two identical PCM channels without Parametric Stereo. It is displayed as
+`HE-AAC 32 kHz mono`, with `pcm_channels=2`. Base/unknown profiles still report,
+for example, `AAC PCM 44.1 kHz stereo`, without inventing an AAC object type.
+See the [metadata regression results](../../docs/ESP32C3_AAC_METADATA_20261004.md).
 With Helix, `HE-AAC 44.1 kHz core mono` means SBR was detected but PS stereo was
 not confirmed; the actual PCM may still be 22.05 kHz mono.
 

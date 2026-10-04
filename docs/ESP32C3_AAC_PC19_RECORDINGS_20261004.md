@@ -15,16 +15,21 @@ The inputs are the same complete, untranscoded radio captures used in the
 | Recording | Profile | Decoded PCM | ADTS frames | Channel samples | Changed samples | Peak error, LSB | RMS error, LSB | Above 3 LSB |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | abba64 | HE-AACv2 | 44.1 kHz stereo | 646 | 2,646,016 | 345 | 2 | 0.013342 | 0 |
-| groovesalad16 | HE-AACv2 | 32 kHz stereo | 469 | 1,921,024 | 384 | 2 | 0.017043 | 0 |
+| groovesalad16 | HE-AAC mono | 32 kHz, two PCM channels | 469 | 1,921,024 | 384 | 2 | 0.017043 | 0 |
 | groovesalad32 | HE-AAC | 44.1 kHz stereo | 646 | 2,646,016 | 0 | 0 | 0 | 0 |
 | groovesalad64 | HE-AAC | 44.1 kHz stereo | 646 | 2,646,016 | 0 | 0 | 0 | 0 |
 | groovesalad128 | AAC-LC | 44.1 kHz stereo | 1,292 | 2,646,016 | 0 | 0 | 0 | 0 |
 | **Total** | | | **3,699** | **12,505,088** | **729** | **2 maximum** | | **0** |
 
 AAC-LC is an unchanged-path control: it does not exercise SBR history storage.
-The two HE-AAC recordings decode identically in both images. The measured
-differences are confined to the two HE-AACv2 recordings. All rates and channel
+The two HE-AAC stereo recordings decode identically in both images. The measured
+differences occur in ABBA HE-AACv2 and Groove Salad 16 HE-AAC mono. All rates and channel
 counts are checked on every returned frame; there is no forced 22/24 kHz output.
+
+Profile correction: the original table copied FFprobe's HE-AACv2 classification
+for Groove Salad 16. [Reading the native SBR/PS flags](ESP32C3_AAC_METADATA_20261004.md)
+confirms HE-AAC mono; two PCM channels do not establish PS. PCM measurements and
+the checksummed evidence from the earlier run remain unchanged.
 
 ## Method and failure detection
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <stdbool.h>
+#include "aac_profile.h"
 #include "sdkconfig.h"
 #ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
 #include "aac_high_history.h"
@@ -9,6 +10,9 @@
 typedef struct {
     void *owner;
     bool ps_initialized, inside_sbr, allocation_failed;
+#ifdef YORADIO_AAC_PROFILE_METADATA
+    aac_profile_state_t profile;
+#endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
     void *late_core; // Valid only inside the scoped native frame call.
     bool late_disabled; // Per-decoder unmodified-controller PCM control.

@@ -94,7 +94,8 @@ exit code zero after a script error. The retained provenance covers the exact
 export, compiler metadata, log and tool/header snapshots. Documentation prose
 is maintained separately from those hashes.
 
-Current headers generate `ps_present` and also expose `sbr_present` at `0xbc`.
+Current headers generate `ps_present` and also expose `sbr_present` at `0xbc`
+and the core's `encoded_channels` count at `0x8c`.
 Tests compare their complete semantic layouts with the archived types, allowing
 only this documented naming/splitting correction. To reproduce the old labels
 byte for byte, use the retained implementation snapshots.

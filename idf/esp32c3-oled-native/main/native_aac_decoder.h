@@ -16,7 +16,9 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
     esp_audio_simple_dec_raw_t *raw, esp_audio_simple_dec_out_t *output);
 esp_audio_err_t native_aac_decoder_get_info(native_aac_decoder_t *decoder,
     esp_audio_simple_dec_info_t *info);
-// The SDK exposes PCM only. Identify extensions only when the decoded layout
-// proves them; an unchanged ADTS header cannot prove that SBR/PS is absent.
+// Extensions come from the pinned native core's decoded SBR/PS flags. Output
+// channel duplication is not PS evidence. Generic AAC remains PCM-labelled.
 const char *native_aac_decoder_label(native_aac_decoder_t *decoder,
     const esp_audio_simple_dec_info_t *info, bool *format_is_pcm);
+// Zero when unknown. HE mono can have one source channel and two PCM channels.
+unsigned native_aac_decoder_source_channels(native_aac_decoder_t *decoder);

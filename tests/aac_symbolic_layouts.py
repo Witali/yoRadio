@@ -26,7 +26,10 @@ def semantic_layout(meta, *, legacy_ps_name=False):
         ps = next(f for f in core if f['name'] == 'channels')
         assert configuration == dict(name='configuration', offset=9, bytes=183)
         assert ps == dict(name='channels', offset=0xc0, bytes=4)
-        configuration['bytes'] -= 4
+        configuration['bytes'] = 0x8c-9
+        index = core.index(configuration)+1
+        core[index:index] = [dict(name='encoded_channels', offset=0x8c, bytes=4),
+                            dict(name='extension_configuration', offset=0x90, bytes=0xbc-0x90)]
         ps['name'] = 'ps_present'
         core.insert(core.index(ps), dict(name='sbr_present', offset=0xbc, bytes=4))
 
@@ -36,9 +39,16 @@ def semantic_layout(meta, *, legacy_ps_name=False):
         # Clone the array type: a DWARF node can be shared with another field.
         array = deepcopy(nodes[configuration['type']])
         assert array['bytes'] == 183 and array['dimensions'] == [183]
-        array.update(bytes=179, dimensions=[179])
+        array.update(bytes=0x8c-9, dimensions=[0x8c-9])
         configuration['type'] = 'corrected_core_configuration'
         nodes[configuration['type']] = array
+        extension_array = deepcopy(array)
+        extension_array.update(bytes=0xbc-0x90, dimensions=[0xbc-0x90])
+        nodes['corrected_extension_configuration'] = extension_array
+        index = members.index(configuration)+1
+        members[index:index] = [dict(name='encoded_channels', offset=0x8c, type=ps['type']),
+                               dict(name='extension_configuration', offset=0x90,
+                                    type='corrected_extension_configuration')]
         ps['name'] = 'ps_present'
         members.insert(members.index(ps), dict(name='sbr_present', offset=0xbc, type=ps['type']))
 

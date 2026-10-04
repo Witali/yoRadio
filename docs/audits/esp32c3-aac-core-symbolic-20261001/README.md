@@ -47,6 +47,8 @@ Historical type JSON and implementation snapshots in this audit and
 They are evidence of earlier builds, not current header templates. New exports
 use the corrected names; the layout regression tests permit only the documented
 PS rename and the split of the existing configuration bytes into `sbr_present`.
+The metadata follow-up also exposes the existing core channel count as
+`encoded_channels` at `0x8c`, matching `mc.channels`; it allocates no new bytes.
 
 The analysis header is
 [`aac_analysis_core.h`](../../../tools/codec_benchmark/aac_analysis_core.h),

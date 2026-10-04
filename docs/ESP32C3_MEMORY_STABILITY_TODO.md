@@ -434,6 +434,9 @@ an acceptable implementation of this optimization.
   malformed/truncated input, output backpressure/cancellation, reset and OOM.
 - [ ] Verify source and PCM metadata, including in-stream changes, on OLED and
   WebUI. A changed output buffer size must not leave stale format information.
+  The [native profile fix](ESP32C3_AAC_METADATA_20261004.md) passes real-library
+  QEMU and host OLED/WebUI callback tests, including HE mono duplicated to stereo.
+  Physical display/browser verification is still required.
 - [ ] Run A/B on physical C3 with Wi-Fi, HTTP/HTTPS, WebUI and PDM active. Record
   total CPU, decoder CPU, heap/stack margins and underruns. Recheck other codecs;
   an isolated decoder or QEMU pass alone is insufficient for acceptance.
@@ -487,6 +490,12 @@ passes all five retained radio captures (12,505,088 channel samples), with a
 control are exact. This closes that retained-corpus check only; actual
 mono/PS reporting, malformed inputs, physical playback/OTA and broader codec
 coverage remain open.
+
+Metadata follow-up: [native SBR/PS flags and source channels](ESP32C3_AAC_METADATA_20261004.md)
+replace the mono-core/stereo-PCM inference. All three QEMU variants pass, and
+3,651,584 compared PCM samples remain exact against their respective previous
+builds. The profile byte fits existing padding. This closes the emulator/host
+metadata defect; physical metadata, malformed-input and all-codec gates remain open.
 
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
