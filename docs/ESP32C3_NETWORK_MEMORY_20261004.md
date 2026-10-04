@@ -162,3 +162,18 @@ settings were not changed for this check.
 
 The sanitized samples and calculated summary are saved in
 [signal-114641-utc.json](../tests/results/esp32c3-wifi-recheck-20261004/signal-114641-utc.json).
+
+### Follow-up at 12:25 UTC
+
+A new read-only poll at 12:25:06-12:26:06 UTC on 2026-10-04 returned **60/60
+responses**, with no transport failures. RSSI ranged from **-69 to -58 dBm**,
+with a **-63.5 dBm median** and a final reading of -69 dBm. The median was
+7.5 dB stronger than the 11:46 UTC measurement. HTTP response times were
+79 ms median, 110 ms p95 and 219 ms maximum. All 60 samples reported active
+44.1 kHz stereo, 16-bit AAC PCM playback.
+
+The measured connectivity is sufficient to continue board tests at this
+placement. This one-minute status check does not measure audible dropouts
+or prove sustained playback stability. No firmware, playback or settings
+changes were made. Sanitized samples and the summary are in
+[signal-122506-utc.json](../tests/results/esp32c3-wifi-recheck-20261004/signal-122506-utc.json).
