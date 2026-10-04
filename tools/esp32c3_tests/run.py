@@ -10,7 +10,7 @@ import time
 
 from common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
                     check_recovery_heap, check_transitions, fixtures, require,
-                    filter_tls_line, check_certificate_rejection)
+                    filter_tls_line, check_certificate_rejection, exception_details)
 from audio_test_server.server import Server
 from audio_test_server.fixtures import SEQUENCES
 
@@ -77,6 +77,7 @@ class Suite:
             # Keep partial evidence on transport failures without retaining URLs
             # or exception text that could contain station/credential details.
             batch['interrupted'] = type(error).__name__
+            batch['exception_chain'] = exception_details(error)
             batch['elapsed_seconds'] = time.monotonic() - start
             raise
         finally:

@@ -21,6 +21,22 @@ class Blocked(RuntimeError):
     pass
 
 
+def exception_details(error):
+    """Retain transport type/codes without exception text, URLs or credentials."""
+    chain, seen = [], set()
+    while isinstance(error, BaseException) and id(error) not in seen and len(chain) < 8:
+        seen.add(id(error))
+        row = {'type': type(error).__name__}
+        for key in ('errno', 'winerror'):
+            value = getattr(error, key, None)
+            if type(value) is int:
+                row[key] = value
+        chain.append(row)
+        reason = getattr(error, 'reason', None)
+        error = reason if isinstance(reason, BaseException) else error.__cause__ or error.__context__
+    return chain
+
+
 def require(condition, message):
     if not condition:
         raise Failure(message)
@@ -231,6 +247,7 @@ class Report:
         except Blocked as error:
             record.update(result='BLOCKED', reason=str(error))
         except Exception as error:
+            record['exception_chain'] = exception_details(error)
             # URL errors can include private URLs; only our controlled assertion
             # text is retained. Technical samples are saved separately by runner.
             record['reason'] = str(error) if isinstance(error, Failure) else type(error).__name__
