@@ -1,0 +1,478 @@
+{
+  "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "original_channel": 25792,
+  "compact_channel": 24848,
+  "original_owner": 55128,
+  "compact_owner": 53240,
+  "requested_saving": 1888,
+  "compiler_layout": {
+    "ps_flag": [
+      51584,
+      49696
+    ],
+    "ps_pointer": [
+      51588,
+      49700
+    ],
+    "ps_data": [
+      51592,
+      49704
+    ],
+    "right_header": [
+      25992,
+      25048
+    ],
+    "right_frame": [
+      25800,
+      24856
+    ],
+    "right_status": [
+      25796,
+      24852
+    ],
+    "right_coupling": [
+      26176,
+      25232
+    ],
+    "right_synthesis": [
+      42880,
+      41936
+    ],
+    "right_high_real": [
+      41724,
+      40780
+    ],
+    "right_high_imag": [
+      40568,
+      39624
+    ],
+    "ps_peak": [
+      30328,
+      29384
+    ],
+    "ps_energy": [
+      30408,
+      29464
+    ],
+    "ps_difference": [
+      30488,
+      29544
+    ],
+    "ps_hybrid": [
+      30568,
+      29624
+    ],
+    "ps_allpass_qmf": [
+      32960,
+      32016
+    ],
+    "ps_allpass_sub": [
+      34976,
+      34032
+    ],
+    "ps_delay_real": [
+      36032,
+      35088
+    ],
+    "ps_delay_imag": [
+      36288,
+      35344
+    ],
+    "ps_real_pointers": [
+      36800,
+      35856
+    ],
+    "ps_imag_pointers": [
+      37568,
+      36624
+    ],
+    "channel_size": [
+      25792,
+      24848
+    ],
+    "owner_size": [
+      55128,
+      53240
+    ],
+    "table_size": [
+      256,
+      20
+    ],
+    "frame_table_1": [
+      25016,
+      24780
+    ],
+    "frame_table_2": [
+      25272,
+      24800
+    ],
+    "frame_table_3": [
+      25528,
+      24820
+    ]
+  },
+  "layout_sha256": "5977784c1a1cda6b1e46ace8b3d5de6121ad4bb2fc233371bf1cac90cd923929",
+  "scope": "QEMU experiment only; original reset API is not supported",
+  "functions": {
+    "init_sbr_dec": {
+      "input_sha256": "37e4cdc77c913b0c562c3f54a8e9c77616cdd0b0b94b4804471838e3ead18c86",
+      "output_sha256": "3aa997c7ea7c58b0319217d8942faa537ebd27797ac59c6fd9d1953d2aefeef5",
+      "patches": [
+        {
+          "offset": "0x58",
+          "original": "1117a023",
+          "replacement": "0117aa23",
+          "meaning": "table 1 stride"
+        },
+        {
+          "offset": "0x5c",
+          "original": "3107a023",
+          "replacement": "0307ae23",
+          "meaning": "table 3 stride"
+        },
+        {
+          "offset": "0x60",
+          "original": "2067a023",
+          "replacement": "0267a423",
+          "meaning": "table 2 stride"
+        }
+      ]
+    },
+    "sbr_open": {
+      "input_sha256": "b2e00c4c9ca1ddf2c3fd41cfcb738b6ff53262c425c7dd1ce6c19a1921b544a7",
+      "output_sha256": "c2a00f0a50d5466d9549b51a5cc7db364cc8c49b5fe107d5d2963ae2698e4980",
+      "patches": [
+        {
+          "offset": "0xa",
+          "original": "64b5",
+          "replacement": "64b1",
+          "meaning": "two-channel end high"
+        },
+        {
+          "offset": "0x14",
+          "original": "98048493",
+          "replacement": "22048493",
+          "meaning": "two-channel end low"
+        },
+        {
+          "offset": "0x40",
+          "original": "4c098993",
+          "replacement": "11098993",
+          "meaning": "channel stride"
+        },
+        {
+          "offset": "0x4c",
+          "original": "4c060613",
+          "replacement": "11060613",
+          "meaning": "channel memset length"
+        }
+      ]
+    },
+    "sbr_read_data": {
+      "input_sha256": "9407eade32b389957146e97e6e1afafd7b319a456a17dce884eeb508434028dd",
+      "output_sha256": "5448eae52d54e69f47c8b9145b693add3ed3535d15d5b7f994b27d3f808b7b39",
+      "patches": [
+        {
+          "offset": "0x8a",
+          "original": "58870713",
+          "replacement": "1d870713",
+          "meaning": "right header"
+        },
+        {
+          "offset": "0xbe",
+          "original": "67b5",
+          "replacement": "67b1",
+          "meaning": "channel loop end high"
+        },
+        {
+          "offset": "0xc0",
+          "original": "98878793",
+          "replacement": "22878793",
+          "meaning": "channel loop end low"
+        },
+        {
+          "offset": "0xe6",
+          "original": "4c078793",
+          "replacement": "11078793",
+          "meaning": "channel stride"
+        },
+        {
+          "offset": "0xfe",
+          "original": "4c858593",
+          "replacement": "11858593",
+          "meaning": "right frame"
+        },
+        {
+          "offset": "0x15c",
+          "original": "67b5",
+          "replacement": "67b1",
+          "meaning": "PS pointer high"
+        },
+        {
+          "offset": "0x160",
+          "original": "9847a603",
+          "replacement": "2247a603",
+          "meaning": "PS pointer low"
+        }
+      ]
+    },
+    "sbr_applied": {
+      "input_sha256": "ef51802786b49e51920134ede74c201d2dba553b35d1511b16ea9c567ff65e80",
+      "output_sha256": "826741f1edf2c67b71ed8880d415a749c5e4cff358d90dffa42523ed078f5eea",
+      "patches": [
+        {
+          "offset": "0x3c",
+          "original": "67b5",
+          "replacement": "67b1",
+          "meaning": "PS pointer high"
+        },
+        {
+          "offset": "0x40",
+          "original": "9847a503",
+          "replacement": "2247a503",
+          "meaning": "PS pointer low"
+        },
+        {
+          "offset": "0x54",
+          "original": "9847a803",
+          "replacement": "2247a803",
+          "meaning": "PS pointer reload"
+        },
+        {
+          "offset": "0x62",
+          "original": "78070713",
+          "replacement": "3d070713",
+          "meaning": "right synthesis V"
+        },
+        {
+          "offset": "0x100",
+          "original": "4c47a683",
+          "replacement": "1147a683",
+          "meaning": "right status"
+        },
+        {
+          "offset": "0x10a",
+          "original": "4c860613",
+          "replacement": "11860613",
+          "meaning": "right frame"
+        },
+        {
+          "offset": "0x10e",
+          "original": "2fc7ae23",
+          "replacement": "f5c7a623",
+          "meaning": "right high real pointer"
+        },
+        {
+          "offset": "0x112",
+          "original": "e667ac23",
+          "replacement": "ac67a423",
+          "meaning": "right high imaginary pointer"
+        },
+        {
+          "offset": "0x1a8",
+          "original": "6635",
+          "replacement": "6631",
+          "meaning": "PS control high"
+        },
+        {
+          "offset": "0x1ac",
+          "original": "98062583",
+          "replacement": "22062583",
+          "meaning": "PS initialization flag"
+        },
+        {
+          "offset": "0x1b2",
+          "original": "98062023",
+          "replacement": "22062023",
+          "meaning": "PS initialization flag store"
+        },
+        {
+          "offset": "0x1b6",
+          "original": "98462603",
+          "replacement": "22462603",
+          "meaning": "PS pointer low"
+        },
+        {
+          "offset": "0x1fc",
+          "original": "4c850513",
+          "replacement": "11850513",
+          "meaning": "right frame"
+        },
+        {
+          "offset": "0x222",
+          "original": "6406a683",
+          "replacement": "2906a683",
+          "meaning": "right coupling"
+        },
+        {
+          "offset": "0x26e",
+          "original": "4c46a683",
+          "replacement": "1146a683",
+          "meaning": "right status"
+        },
+        {
+          "offset": "0x286",
+          "original": "4c868693",
+          "replacement": "11868693",
+          "meaning": "right frame"
+        }
+      ]
+    },
+    "ps_allocate_decoder": {
+      "input_sha256": "87882468f843f223ffeffc55c0d3cdf7bd4599ad0350aec8dcf112cd3cbed339",
+      "output_sha256": "2497a273b1c13aee32e0a9f219b84693afdb0242ff792d12c400fe53383b0f09",
+      "patches": [
+        {
+          "offset": "0x8",
+          "original": "67b5",
+          "replacement": "67b1",
+          "meaning": "PS pointer high"
+        },
+        {
+          "offset": "0x10",
+          "original": "9847a983",
+          "replacement": "2247a983",
+          "meaning": "PS pointer low"
+        },
+        {
+          "offset": "0x32",
+          "original": "67860613",
+          "replacement": "2c860613",
+          "meaning": "right PS workspace 0"
+        },
+        {
+          "offset": "0x38",
+          "original": "6c868693",
+          "replacement": "31868693",
+          "meaning": "right PS workspace 1"
+        },
+        {
+          "offset": "0x3c",
+          "original": "71870713",
+          "replacement": "36870713",
+          "meaning": "right PS workspace 2"
+        },
+        {
+          "offset": "0x40",
+          "original": "76878793",
+          "replacement": "3b878793",
+          "meaning": "right hybrid workspace"
+        },
+        {
+          "offset": "0x92",
+          "original": "0c0a8a93",
+          "replacement": "d10a8a93",
+          "meaning": "allpass QMF workspace"
+        },
+        {
+          "offset": "0x7c",
+          "original": "6a25",
+          "replacement": "6a21",
+          "meaning": "allpass sub-QMF workspace high"
+        },
+        {
+          "offset": "0x96",
+          "original": "8a0a0a13",
+          "replacement": "4f0a0a13",
+          "meaning": "allpass sub-QMF workspace low"
+        },
+        {
+          "offset": "0x9a",
+          "original": "cc048493",
+          "replacement": "91048493",
+          "meaning": "main QMF real history"
+        },
+        {
+          "offset": "0x9e",
+          "original": "dc090913",
+          "replacement": "a1090913",
+          "meaning": "main QMF imaginary history"
+        },
+        {
+          "offset": "0xa2",
+          "original": "fc0b8b93",
+          "replacement": "c10b8b93",
+          "meaning": "real delay pointer table"
+        },
+        {
+          "offset": "0xa6",
+          "original": "2c0b0b13",
+          "replacement": "f10b0b13",
+          "meaning": "imaginary delay pointer table"
+        },
+        {
+          "offset": "0x102",
+          "original": "fc078793",
+          "replacement": "c1078793",
+          "meaning": "real delay table initialization cursor"
+        }
+      ]
+    },
+    "sbr_dec": {
+      "input_sha256": "961c6238817027d177caf415dcae8e7c91c06ba8e27d144d4cbfc23113b5bfa7",
+      "output_sha256": "0711def8858584a809f483d70414eaea49aa4e61736fd1dc33bda468ceb57167",
+      "patches": [
+        {
+          "offset": "0x1fa",
+          "original": "3b850513",
+          "replacement": "0f450513",
+          "meaning": "smoothing pointer table 3"
+        },
+        {
+          "offset": "0x1fe",
+          "original": "2b868693",
+          "replacement": "0e068693",
+          "meaning": "smoothing pointer table 2"
+        },
+        {
+          "offset": "0x202",
+          "original": "1b870713",
+          "replacement": "0cc70713",
+          "meaning": "smoothing pointer table 1"
+        }
+      ]
+    },
+    "PVMP4AudioDecodeFrame": {
+      "input_sha256": "2b0179ec89f33abe8859c758fa912be94219e204f969ebcd398049aa8478399a",
+      "output_sha256": "398db5414faa950bf8e61e5b76774ef18b44b6e91252d94e3c49ec7f101ba163",
+      "patches": [
+        {
+          "offset": "0x800",
+          "original": "67b5",
+          "replacement": "67b1",
+          "meaning": "PS embedded address high"
+        },
+        {
+          "offset": "0x80a",
+          "original": "66b5",
+          "replacement": "66b1",
+          "meaning": "PS pointer high"
+        },
+        {
+          "offset": "0x80c",
+          "original": "98878793",
+          "replacement": "22878793",
+          "meaning": "PS embedded address low"
+        },
+        {
+          "offset": "0x816",
+          "original": "98f6a223",
+          "replacement": "22f6a223",
+          "meaning": "PS pointer store"
+        },
+        {
+          "offset": "0x98c",
+          "original": "66b5",
+          "replacement": "66b1",
+          "meaning": "PS flag high"
+        },
+        {
+          "offset": "0x996",
+          "original": "98d7a023",
+          "replacement": "22d7a023",
+          "meaning": "PS flag store"
+        }
+      ]
+    }
+  }
+}

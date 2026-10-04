@@ -3,6 +3,11 @@
 Status: **QEMU-only experiment**, not installed on the physical board.
 This extends the [late-SBR investigation](ESP32C3_AAC_LATE_SBR_20261004.md).
 
+Follow-up: the [expanded parser-derived gap corpus](ESP32C3_AAC_SBR_GAPS_20261004.md)
+finds a 5-LSB maximum error with the same compact storage, exceeding the 3-LSB
+gate. The narrower 2-LSB result below remains reproducible but does not qualify
+the expanded corpus or production deployment.
+
 ## Reference behavior changes the test expectation
 
 The first reverse-transition test assumed that a frame without an SBR payload

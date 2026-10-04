@@ -467,6 +467,13 @@ FAAD retention behavior. Raw compact-vs-full-precision PCM differs by at most
 2 LSB over 189,440 samples. This supersedes the assumed immediate LC fallback;
 expanded corpus, physical CPU/network/OTA and all-codec gates remain open.
 
+Expanded checkpoint: [parser-derived SBR gaps](ESP32C3_AAC_SBR_GAPS_20261004.md)
+pass format/memory/lifecycle checks on four HE/HEv2 cases, but **reject** the
+current compact precision candidate: 41 of 675,840 samples exceed 3 LSB, with a
+5-LSB maximum in HE stereo 44.1 kHz while SBR is absent. Keep deployment gated
+until precision is repaired. Also fix the HE-mono-as-HEv2 label inference:
+the SDK can duplicate mono into stereo without PS.
+
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
 - [ ] Run the complete host test suite.
