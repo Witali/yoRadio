@@ -1,0 +1,104 @@
+{
+  "generator": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "source_sha256": "997ca1556ecb63d9e488ab9afa6f9a0c9f0d098fd26618656a4142a0fb775f6c",
+  "source_filter": [
+    "anoisesrc=color=white:amplitude=0.34:sample_rate=48000:duration=60:seed=12345[nl]",
+    "anoisesrc=color=pink:amplitude=0.34:sample_rate=48000:duration=60:seed=67890[nr]",
+    "sine=frequency=997:sample_rate=48000:duration=60:beep_factor=2[tl]",
+    "sine=frequency=1601:sample_rate=48000:duration=60:beep_factor=2[tr]",
+    "[nl][tl]amix=inputs=2:weights='0.72 0.28':normalize=0[left]",
+    "[nr][tr]amix=inputs=2:weights='0.72 0.28':normalize=0[right]",
+    "[left][right]amerge=inputs=2,alimiter=limit=0.95[out]"
+  ],
+  "source_bits": 16,
+  "fixtures": [
+    {
+      "name": "stress-mp3-48000-2ch-16bit-60s",
+      "file": "stress-mp3-48000-2ch-16bit-60s.mp3",
+      "seconds": 60.024,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "mp3",
+      "mime": "audio/mpeg",
+      "profile": "mp3",
+      "sha256": "0744422ebba4217563ad7d73199725325f42c415400af74b845f6dd818190614",
+      "bytes": 2401005,
+      "average_kbps": 320.00599760095963,
+      "encoder_options": [
+        "-c:a",
+        "libmp3lame",
+        "-b:a",
+        "320k",
+        "-write_xing",
+        "0"
+      ]
+    },
+    {
+      "name": "stress-flac-48000-2ch-16bit-60s",
+      "file": "stress-flac-48000-2ch-16bit-60s.flac",
+      "seconds": 60.0,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "flac",
+      "mime": "audio/flac",
+      "profile": "flac",
+      "sha256": "422a52e69ddfeee65063c2e741d5156d71243f2f1f26880820c69dbbe0c16533",
+      "bytes": 9630651,
+      "average_kbps": 1284.0868,
+      "encoder_options": [
+        "-c:a",
+        "flac",
+        "-compression_level",
+        "8"
+      ]
+    },
+    {
+      "name": "stress-vorbis-48000-2ch-16bit-60s",
+      "file": "stress-vorbis-48000-2ch-16bit-60s.ogg",
+      "seconds": 60.0,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "vorbis",
+      "mime": "audio/ogg",
+      "profile": "vorbis",
+      "sha256": "2981e92db51c31f61dadf5e1c00560220eb82949ddc4e51f41e85e609eb1df3c",
+      "bytes": 3805061,
+      "average_kbps": 507.3414666666667,
+      "encoder_options": [
+        "-c:a",
+        "libvorbis",
+        "-q:a",
+        "10"
+      ]
+    },
+    {
+      "name": "stress-opus-48000-2ch-16bit-60s",
+      "file": "stress-opus-48000-2ch-16bit-60s.ogg",
+      "seconds": 60.0065,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "opus",
+      "mime": "audio/ogg",
+      "profile": "opus",
+      "sha256": "28693a406c738f89ff1fdff3876826d2fa1896ab53407882bd5921c0b87dcb1f",
+      "bytes": 3846335,
+      "average_kbps": 512.7891145125944,
+      "encoder_options": [
+        "-c:a",
+        "libopus",
+        "-b:a",
+        "510k",
+        "-vbr",
+        "off",
+        "-application",
+        "audio",
+        "-frame_duration",
+        "20"
+      ]
+    }
+  ]
+}

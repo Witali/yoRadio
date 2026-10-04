@@ -512,6 +512,15 @@ byte reads. Plain/compact QEMU comparisons and 343,475 truncated host cases pass
 saved, with no new persistent RAM. Other input readers, broader malformed syntax,
 same-decoder recovery and physical/all-codec qualification remain open.
 
+Physical integration follow-up: [PC19 and late SBR in the network image](ESP32C3_AAC_PC19_NETWORK_20261004.md)
+passes the prior QEMU suite with 865,280 identical transition/gap samples, OTA
+during playback, 20 physical matrix gates including 21 mixed-codec switches,
+and five minutes of full-rate HE-AAC HTTPS under WebUI load. The previously
+failing same-header LC-to-HEv2 transition now passes on hardware. The CPU-load
+matrix still retains a HE status timeout and free-heap decline failures for
+MP3/Vorbis/Opus. Diagnose them and repeat longer/repeated OTA and codec tests;
+do not infer production acceptance from the successful HTTPS run.
+
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
 - [ ] Run the complete host test suite.
