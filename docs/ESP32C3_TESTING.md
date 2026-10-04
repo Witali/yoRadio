@@ -66,6 +66,11 @@ The [physical receive-credit results](ESP32C3_RECEIVE_CREDIT_20261004.md) retain
 the long paced failures, a post-Vorbis fragmentation failure, subsequent HE-AAC
 HTTPS playback and three passing unpaced-file controls.
 
+The [Vorbis audit and repair plan](ESP32C3_VORBIS_REPAIR_PLAN.md) records static
+failed-open/low-memory defects, a PCM retry concern and the investigation needed
+to identify the fragmentation owner. Its ordered tests and repairs are pending;
+the linked binary evidence is not a new successful decoder qualification.
+
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.
