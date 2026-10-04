@@ -11,7 +11,6 @@
 #include "freertos/task.h"
 #include <assert.h>
 #include <inttypes.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -124,64 +123,6 @@ static unsigned decode_fixture(native_aac_decoder_t *decoder,uint8_t *pcm,
     assert(frames);return frames;
 }
 
-#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_CAPTURE
-static void capture_pcm(unsigned frame,const fixture_t *fixture,const uint8_t *pcm,unsigned bytes) {
-    enum { CAPTURE_CHUNK_BYTES=256 };
-    static const char digits[]="0123456789abcdef";
-    char hex[2*CAPTURE_CHUNK_BYTES+1];
-    printf("AAC_LATE_PCM_FRAME frame=%u rate=%" PRIu32 " channels=%u bytes=%u\n",
-           frame,fixture->rate,fixture->channels,bytes);
-    for(unsigned offset=0;offset<bytes;offset+=CAPTURE_CHUNK_BYTES) {
-        unsigned count=bytes-offset;if(count>CAPTURE_CHUNK_BYTES)count=CAPTURE_CHUNK_BYTES;
-        for(unsigned i=0;i<count;++i) {
-            hex[2*i]=digits[pcm[offset+i]>>4];hex[2*i+1]=digits[pcm[offset+i]&15];
-        }
-        hex[2*count]=0;
-        printf("AAC_LATE_PCM_DATA frame=%u offset=%u hex=%s\n",frame,offset,hex);
-    }
-}
-#endif
-
-static void check_output_independence(void) {
-    native_aac_decoder_t *a=native_aac_decoder_create(), *b=native_aac_decoder_create();
-    assert(a && b);
-    uint8_t *left=new_pcm(), *right=new_pcm();unsigned frames=0, samples=0;
-    fixture_t missing=fixtures[1];missing.rate=44100;missing.channels=2;
-    missing.name="missing-SBR-after-HEv2";
-    const fixture_t *sequence[]={&fixtures[1],&fixtures[5],&missing,&fixtures[5]};
-    for(unsigned phase=0;phase<sizeof(sequence)/sizeof(sequence[0]);++phase) {
-        const fixture_t *fixture=sequence[phase];
-        for(const uint8_t *p=fixture->start;p<fixture->end;) {
-            size_t count=fixture->end-p;if(count>CHUNK_BYTES)count=CHUNK_BYTES;
-            esp_audio_simple_dec_raw_t ar={.buffer=(uint8_t *)p,.len=count}, br=ar;
-            esp_audio_simple_dec_out_t ao={.buffer=left,.len=NATIVE_AAC_PCM_FRAME_BYTES};
-            esp_audio_simple_dec_out_t bo={.buffer=right,.len=NATIVE_AAC_PCM_FRAME_BYTES};
-            // Any returned bytes left unwritten (or stale output used as input)
-            // differ, even if a metadata-only test would accept their length.
-            memset(left,0x55,NATIVE_AAC_PCM_FRAME_BYTES);
-            memset(right,0xaa,NATIVE_AAC_PCM_FRAME_BYTES);
-            assert(native_aac_decoder_process(a,&ar,&ao)==ESP_AUDIO_ERR_OK);
-            assert(native_aac_decoder_process(b,&br,&bo)==ESP_AUDIO_ERR_OK);
-            check_pcm(left,&ao);check_pcm(right,&bo);
-            assert(ar.consumed<=count && ar.consumed==br.consumed);
-            assert(ao.decoded_size==bo.decoded_size && (ar.consumed || ao.decoded_size));
-            assert(!memcmp(left,right,ao.decoded_size));p+=ar.consumed;
-            if(ao.decoded_size) {
-                check_info(a,fixture);check_info(b,fixture);
-                ++frames;samples+=ao.decoded_size/sizeof(int16_t);
-#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_CAPTURE
-                capture_pcm(frames,fixture,left,ao.decoded_size);
-#endif
-                vTaskDelay(1);
-            }
-        }
-    }
-    native_aac_decoder_destroy(a);native_aac_decoder_destroy(b);
-    free(left-GUARD_BYTES);free(right-GUARD_BYTES);
-    assert(heap_caps_check_integrity_all(true));
-    ESP_LOGI(TAG,"AAC_LATE_SBR_OUTPUT_PASS frames=%u channel_samples=%u poison_patterns=2",frames,samples);
-}
-
 void qemu_aac_late_sbr_test(void) {
     for(unsigned i=0;i<sizeof(fixtures)/sizeof(fixtures[0]);++i)compare_ordinary(&fixtures[i]);
     // The mono LC fixture has an odd frame count. Repeating it twice exercises
@@ -192,17 +133,12 @@ void qemu_aac_late_sbr_test(void) {
         for(unsigned i=0;i<repeats;++i)lc_frames+=decode_fixture(decoder,pcm,&fixtures[1]);
         assert(lc_frames % 2==repeats % 2);
         unsigned he_frames=decode_fixture(decoder,pcm,&fixtures[5]);
-        // FAAD float/fixed retain SBR/PS after it is established. No extension
-        // in this frame does not signal a new stream or reset the format.
-        fixture_t missing=fixtures[1];missing.rate=44100;missing.channels=2;
-        missing.name="missing-SBR-after-HEv2";
-        unsigned back_frames=decode_fixture(decoder,pcm,&missing);
+        unsigned back_frames=decode_fixture(decoder,pcm,&fixtures[1]);
         unsigned again_frames=decode_fixture(decoder,pcm,&fixtures[5]);
         native_aac_decoder_destroy(decoder);free(pcm-GUARD_BYTES);
         assert(heap_caps_check_integrity_all(true));
         ESP_LOGI(TAG,"AAC_LATE_SBR_PARITY_PASS lc_frames=%u he_frames=%u rate=44100 channels=2",lc_frames,he_frames);
-        ESP_LOGI(TAG,"AAC_LATE_SBR_RETAIN_PASS missing_frames=%u resumed_frames=%u rate=44100 channels=2",back_frames,again_frames);
+        ESP_LOGI(TAG,"AAC_LATE_SBR_REVERSE_PASS lc_frames=%u he_frames=%u",back_frames,again_frames);
     }
-    check_output_independence();
     ESP_LOGI(TAG,"AAC_LATE_SBR_REGRESSION_PASS ordinary_cases=6 parities=2 transition_pcm_quality=unqualified");
 }

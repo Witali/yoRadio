@@ -461,6 +461,12 @@ bank phases in QEMU. Ordinary six-fixture PCM is unchanged over 887,808 channel
 samples; pointer/lifetime checks pass. Reverse transitions and transition PCM
 remain unqualified, so the option is QEMU-only and production gates stay open.
 
+Later checkpoint: [retained SBR/PS](ESP32C3_AAC_SBR_RETENTION_20261004.md)
+now passes absent/resumed-extension cases in both bank phases, matching the
+FAAD retention behavior. Raw compact-vs-full-precision PCM differs by at most
+2 LSB over 189,440 samples. This supersedes the assumed immediate LC fallback;
+expanded corpus, physical CPU/network/OTA and all-codec gates remain open.
+
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
 - [ ] Run the complete host test suite.

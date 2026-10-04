@@ -45,16 +45,6 @@ static aac_compact_owner_t *context(void) {
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
 enum { AAC_CORE_FRAME_SAMPLES=1024, AAC_QMF_PREFIX_SAMPLES=288,
        AAC_SBR_BANK_SAMPLES=AAC_CORE_FRAME_SAMPLES+AAC_QMF_PREFIX_SAMPLES };
-int aac_late_sbr_retain(void) {
-    aac_compact_owner_t *state=context();
-    if(!state || !state->late_core)return 0;
-    aac_analysis_core_t *core=state->late_core;
-    assert(!core->sbr_stream->elements);
-    // Missing extension data does not undo an already established SBR/PS
-    // configuration. Reuse the native no-new-data synthesis path and history.
-    return core->mc.sbr_present && state->owner && core->sbr_control &&
-           core->sbr_control->output_rate;
-}
 void __real_get_sbr_bitstream(void *,void *);
 void __wrap_get_sbr_bitstream(void *opaque_stream,void *bits) {
     __real_get_sbr_bitstream(opaque_stream,bits);

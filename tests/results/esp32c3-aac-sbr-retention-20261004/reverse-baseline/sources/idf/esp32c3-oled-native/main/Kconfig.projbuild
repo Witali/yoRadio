@@ -27,14 +27,6 @@ config YORADIO_QEMU_AAC_LATE_SBR_TEST
         initialize newly allocated SBR state and refresh PCM output metadata
         without resetting the AAC transform history. Never flash this profile.
 
-config YORADIO_QEMU_AAC_LATE_SBR_CAPTURE
-    bool "Capture exact transition PCM for storage A/B comparison"
-    depends on YORADIO_QEMU_AAC_LATE_SBR_TEST
-    default n
-    help
-        Print raw signed-16 PCM from the transition regression. Emulator-only
-        evidence; the extra output is excluded from timing measurements.
-
 config YORADIO_DEEP_SLEEP_CLOCK
     bool "Deep sleep while showing the stopped-radio clock"
     depends on !YORADIO_QEMU

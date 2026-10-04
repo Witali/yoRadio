@@ -5,6 +5,11 @@ Status: **not enabled in physical firmware or production defaults**.
 and compact SBR storage. It changes the controller, not sample precision or
 storage packing. The board still runs the network-memory diagnostic image.
 
+Follow-up: [SBR retention and raw transition PCM comparison](ESP32C3_AAC_SBR_RETENTION_20261004.md)
+corrects the earlier assumption about missing SBR data and measures a maximum
+2 LSB storage error over 189,440 transition samples. Results below remain the
+historical first-stage measurements.
+
 ## Reproduced failure and code finding
 
 The physical board passed explicit ADTS configuration changes and the
@@ -113,8 +118,9 @@ comparison passes.
 
 ## Remaining gates
 
-- Reproduce and fix reverse same-header HEv2 → LC transitions. Audit stale
-  upsampling/requested-channel state and both history-bank phases first.
+- Follow the later retention findings for same-header frames without SBR;
+  absence alone does not prove a return to LC. Broader malformed-input and
+  lifecycle coverage remains open.
 - Compare transition PCM with a suitable reference while preserving overlap,
   including streams with intermittently missing SBR data and malformed input.
 - Validate bitrate/profile reporting separately; duplicated mono output is

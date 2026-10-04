@@ -288,19 +288,6 @@ if(CONFIG_YORADIO_AAC_COMPACT_SBR OR CONFIG_YORADIO_QEMU_AAC_SMOOTHING_TEST)
   if(NOT COMPACT5_RESULT EQUAL 0)
     message(FATAL_ERROR "Compact SBR table ABI patch failed")
   endif()
-  if(CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST)
-    execute_process(COMMAND "${PYTHON}" "${YORADIO_ROOT}/../tools/codec_benchmark/patch_aac_late_sbr.py"
-      --native "${COMPACT5_DIR}/pvmp4audiodecoderframe.c.obj"
-      --bridge "${CMAKE_CURRENT_LIST_DIR}/aac_late_sbr_bridge.S"
-      --cc "${CMAKE_C_COMPILER}" --linker "${CMAKE_LINKER}" --objcopy "${CMAKE_OBJCOPY}"
-      RESULT_VARIABLE AAC_LATE_SBR_RESULT)
-    if(NOT AAC_LATE_SBR_RESULT EQUAL 0)
-      message(FATAL_ERROR "Late SBR branch verification failed")
-    endif()
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-      "${YORADIO_ROOT}/../tools/codec_benchmark/patch_aac_late_sbr.py"
-      "${CMAKE_CURRENT_LIST_DIR}/aac_late_sbr_bridge.S")
-  endif()
   foreach(FUNC init_sbr_dec sbr_open sbr_read_data sbr_applied ps_allocate_decoder sbr_dec pvmp4audiodecoderframe)
     target_sources(${COMPONENT_LIB} PRIVATE "${COMPACT5_DIR}/${FUNC}.c.obj")
   endforeach()
