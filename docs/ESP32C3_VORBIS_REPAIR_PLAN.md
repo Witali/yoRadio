@@ -2,7 +2,7 @@
 
 Date: 2026-10-04. Reviewed checkout: `8db05fed` (`codex/aac-storage18`).
 
-**Status: step 1 completed; decoder fixes and steps 2–7 remain pending.**
+**Status: steps 1 and 2 completed; steps 3–7 remain pending.**
 This review covers the native C3 audio service, the pinned Espressif Ogg/Vorbis
 objects and retained playback evidence. It is not a complete audit of every
 instruction in the decoder. No firmware was flashed during this review.
@@ -13,6 +13,12 @@ using the original objects in QEMU. Normal cycles restore all stream memory;
 189 allocation failures and all four malformed cases crash. Three more
 allocation failures silently return success with missing PCM. These failures
 are preserved as the repair baseline, not treated as a successful qualification.
+
+The [step-2 initialization report](ESP32C3_VORBIS_REPAIR_20261004.md) records
+the repaired run: all 208 fault cases handled, 100 normal cycles, exact original
+PCM and full heap recovery. The PC19 radio image builds and is retained; it has
+not been flashed or qualified on hardware. Retry/EOF precision and the physical
+fragmentation investigation remain separate pending steps.
 
 ## Conclusion
 
@@ -174,7 +180,7 @@ malformed-header cases; it is not an exhaustive malformed-stream test.
 **Deliverable:** reproducible cases for V1/V2 and an owner ledger. No successful
 physical playback result substitutes for these injected-failure tests.
 
-### 2. Repair initialization and teardown
+### 2. Repair initialization and teardown — completed
 
 - Replace the narrow affected wrapper/initializer routines with audited source
   and one cleanup path. Publish the handle only after complete initialization;

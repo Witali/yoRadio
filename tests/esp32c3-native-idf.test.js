@@ -512,8 +512,10 @@ test("native HTTPS station switching releases incompatible codec memory before T
   );
   assert.match(
     generationReset,
-    /had_simple_decoder[\s\S]*codec_uses_custom_legacy\(target_codec\)[\s\S]*free\(output\)/,
+    /target_codec == NATIVE_CODEC_AUTO[\s\S]*codec_uses_custom_legacy\(target_codec\)[\s\S]*free\(output\)/,
   );
+  // PCM can exist even when open failed: release must not depend on a handle.
+  assert.doesNotMatch(generationReset, /had_simple_decoder/);
   assert.match(generationReset, /atomic_store\(&s_decoder_released_generation/);
   assert.match(audio, /codec_from_signature[\s\S]*"fLaC"[\s\S]*"OggS"[\s\S]*"ID3"/);
   assert.match(
@@ -756,6 +758,15 @@ test("native FLAC reuses the optimized yoRadio decoder without Arduino Core", ()
   assert.doesNotMatch(adapter, /#include\s+[<"]Arduino\.h[>"]/);
 });
 
+test("native decoder errors and EOF release independent PCM before terminal publication", () => {
+  const audio = read("main", "audio_service.c");
+  // The QEMU suite executes release (twice after failed open) against the
+  // real library. These checks cover its placement in the network pipeline.
+  assert.match(audio, /if \(packet->end_of_stream \|\| failed_generation == generation\) \{\s*decoder_resources_release\(&decoder, &aac_decoder, &output, &output_size\);\s*\}\s*return_decoded_packet\(packet, failed_generation\)/);
+  assert.match(audio, /"DECODER INIT ERROR"\);\s*failed_generation = packet->generation;\s*return_decoded_packet\(packet, failed_generation\)/);
+  assert.match(audio, /failed_generation = generation;\s*decoder_resources_release\(&decoder, &aac_decoder, &output, &output_size\)/);
+});
+
 test("native FLAC decoder is selectable at compile time", () => {
   const kconfig = read("main", "Kconfig.projbuild");
   const defaults = read("sdkconfig.defaults");
@@ -765,8 +776,9 @@ test("native FLAC decoder is selectable at compile time", () => {
   assert.match(kconfig, /YORADIO_FLAC_DECODER_CUSTOM/);
   assert.match(kconfig, /YORADIO_FLAC_DECODER_ESPRESSIF/);
   assert.match(defaults, /CONFIG_YORADIO_FLAC_DECODER_CUSTOM=y/);
+  assert.match(audio, /registration_result = decoder_register_codecs\(\)/);
   assert.match(
-    audio,
+    read("main", "decoder_registration.c"),
     /CONFIG_YORADIO_FLAC_DECODER_ESPRESSIF[\s\S]*esp_flac_dec_register/,
   );
   assert.match(

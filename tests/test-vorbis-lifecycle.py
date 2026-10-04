@@ -99,6 +99,32 @@ class Lifecycle(unittest.TestCase):
         text+=line('FREE',dict(run=1,id=3,ptr='3fc90000',caller='42001010'))+text
         self.assertEqual([e['event'] for e in runner.allocation_ledger(text)],['ALLOC','FREE','ALLOC'])
 
+    def test_registration_and_service_failures_require_release_and_replay(self):
+        for direct, kind in ((2, 'REGISTRATION'), (3, 'SERVICE')):
+            boundary = dict(result=-2, injected=1, integrity=1, free_before=13000,
+                            free_after=13000, largest_before=12288, largest_after=12288,
+                            live=0, null_handle=1, released=1)
+            def evidence(changes=None, recovery=None):
+                return (line('INJECT', dict(run=0, attempt=1, phase=1, kind='calloc',
+                                           bytes=80, caller='42001000')) +
+                        line(kind, dict(boundary, **(changes or {}))) + log([recovery or row()]))
+            self.assertEqual(runner.assess(evidence(), cycles=1, fail_at=1,
+                                           direct=direct, reference=row())['status'], 'HANDLED')
+            for bad in ({'result':0}, {'free_after':12900}, {'largest_after':8192},
+                        {'integrity':0}, {'live':1} if direct==2 else {'released':0},
+                        {} if direct==2 else {'null_handle':0}):
+                if not bad: continue
+                with self.subTest(direct=direct, bad=bad):
+                    self.assertFalse(runner.assess(evidence(bad), cycles=1, fail_at=1,
+                                                   direct=direct, reference=row())['decoder_gate_pass'])
+            for recovery in (row(result=-2), row(sha256='b'*64), row(live=1)):
+                self.assertFalse(runner.assess(evidence(recovery=recovery), cycles=1, fail_at=1,
+                                               direct=direct, reference=row())['decoder_gate_pass'])
+            for bad in (evidence().replace('VTEST_'+kind,'MISSING'),
+                        evidence()+line(kind,boundary)):
+                with self.assertRaises(ValueError):
+                    runner.assess(bad, cycles=1, fail_at=1, direct=direct, reference=row())
+
     def test_fixture_payload_and_headers(self):
         data=(ROOT/'tests/fixtures/esp32c3_calibration/vorbis-q10.ogg').read_bytes()
         info,setup=runner.headers(data)
