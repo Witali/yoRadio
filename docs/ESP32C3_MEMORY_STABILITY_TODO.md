@@ -497,6 +497,14 @@ replace the mono-core/stereo-PCM inference. All three QEMU variants pass, and
 builds. The profile byte fits existing padding. This closes the emulator/host
 metadata defect; physical metadata, malformed-input and all-codec gates remain open.
 
+Fault-test follow-up: [late OOM and malformed frames](ESP32C3_AAC_FAULTS_20261004.md)
+passes four late SBR allocation failures and four malformed-input cases, with
+120 subsequent HE-AACv2 recovery frames and balanced allocation/free counts.
+Following transition/gap PCM remains exact over 865,280 samples. The SDK may
+skip a malformed frame with OK/zero output; the tests now account for that.
+This does not qualify every input read: bounded FIL parsing, broader truncation,
+same-decoder recovery, physical and all-codec gates remain open.
+
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
 - [ ] Run the complete host test suite.

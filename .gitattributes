@@ -589,3 +589,11 @@ tests/results/esp32c3-aac-metadata-20261004/** -text whitespace=cr-at-eol,-blank
 idf/esp32c3-oled-native/main/qemu_aac_recording.c text eol=lf
 tools/codec_benchmark/*aac_recording*.py text eol=lf
 tests/test-aac-recording-*.py text eol=lf
+
+# Retained fault injection and post-recovery PCM evidence.
+tests/results/esp32c3-aac-faults-20261004/** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
+tests/fixtures/aac_faults/manifest.json text eol=lf
+tests/fixtures/aac_faults/*.aac binary
+idf/esp32c3-oled-native/main/qemu_aac_faults.c text eol=lf
+tools/codec_benchmark/*aac_faults*.py text eol=lf
+tests/test-aac-faults.py text eol=lf
