@@ -2,6 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {root,hash}=require('../tools/esp8266_opus_asm/export.cjs');
 const {parseOutput}=require('../tools/esp8266_opus_qemu/run.cjs');
 const {summarize}=require('../tools/esp8266_opus_qemu/trace.cjs');
+const {spawnSync}=require('node:child_process');
 const dir=path.join(root,'tests/results/esp8266-opus-qemu-20261004');
 const read=name=>fs.readFileSync(path.join(dir,name));
 const json=name=>JSON.parse(read(name));
@@ -15,7 +16,11 @@ test('26 target-ASM PCM/arena/OOM cases pass with recorded source recipes',()=>{
  for(const label of ['accepted','n3_unroll4']){
   const r=json(label+'-extended.json');assert.equal(r.passed,true);assert.deepEqual(r,summary.correctness[label]);
   assert.equal(r.cases.length,13);assert.equal(r.oom_recovery_cases,13);assert.equal(r.state_bytes,6582);
-  for(const [name,digest] of Object.entries(r.recipe_hashes))assert.equal(hash(fs.readFileSync(path.join(root,'tools/esp8266_opus_qemu',name),'utf8').replace(/\r\n/g,'\n')),digest,name);
+  // Historical evidence pins the runner commit, not today's evolving runner.
+  for(const [name,digest] of Object.entries(r.recipe_hashes)){
+   const historical=spawnSync('git',['show','6006aefa:tools/esp8266_opus_qemu/'+name],{cwd:root,encoding:'utf8'});
+   assert.equal(historical.status,0,historical.stderr);assert.equal(hash(historical.stdout.replace(/\r\n/g,'\n')),digest,name);
+  }
   const selected=r.cases.map(c=>({...c,packet_count:c.packets,pcm_bytes:c.samples*2}));
   const p=parseOutput(zlib.gunzipSync(read(label+'-extended.stdout.log.gz')).toString(),selected);
   assert.equal(p.oom_recovery_cases,13);assert.equal(p.stack_used_in_harness,r.stack_used_in_harness);

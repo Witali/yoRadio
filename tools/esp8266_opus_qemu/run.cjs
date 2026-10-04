@@ -61,9 +61,14 @@ async function main(args=process.argv.slice(2)) {
   const host=await buildHost({bounded:true,fastInt64:0,firFlashWord:true,sanitize:true});
   extendedReference={kind:'Vendored generic32 bounded C, ASan/UBSan, not a pristine independent decoder',binary_sha256:hash(fs.readFileSync(host.binary))};
   const extra=require('../esp8266_opus_asm/high_fixtures.cjs').generate();
+  const phase=path.join(root,'tests/fixtures/opus_native/phase');
+  for(const name of fs.readdirSync(phase).filter(n=>n.endsWith('.opuspkt')).sort())extra.push({name:'phase-'+name,file:path.join(phase,name)});
   for(const [name,file,count] of [['192-120ms',available.find(f=>f.name==='stereo-192').file,6],['320-120ms',extra.find(f=>f.name==='stereo-320-20ms').file,6],['320-48frames',extra.find(f=>f.name==='stereo-320-2.5ms').file,48]]) {
    const dest=path.join(out,name+'.opuspkt');fs.writeFileSync(dest,grouped(fs.readFileSync(file),count));extra.push({name,file:dest});
   }
+  const mixed=path.join(out,'mixed.opuspkt');
+  fs.writeFileSync(mixed,Buffer.concat(['mono-12','mono-24','stereo-64','stereo-192','mono-12'].map(n=>fs.readFileSync(available.find(f=>f.name===n).file))));
+  extra.push({name:'mixed',file:mixed});
   for(const f of extra) {
    const pcmFile=path.join(out,f.name+'.reference.pcm');
    const reference=JSON.parse(execute('env',['ASAN_OPTIONS=detect_leaks=0',hostPath(host.binary),hostPath(f.file),hostPath(pcmFile),'--self-test']));
@@ -77,6 +82,7 @@ async function main(args=process.argv.slice(2)) {
  let header='struct fixture { const char *name; const unsigned char *data; unsigned bytes; };\n';
  for(const [i,f] of selected.entries()) {
   const data=fs.readFileSync(f.file);assert.equal(hash(data),f.selected_opuspkt_sha256);
+  fs.writeFileSync(path.join(out,f.name+'.input.opuspkt'),data);
   header+=`static const unsigned char fixture_${i}[]={${[...data].join(',')}};\n`;
  }
  header+=`#define FIXTURE_COUNT ${selected.length}\nstatic const struct fixture fixtures[]={\n`+selected.map((f,i)=>`{"${f.name}",fixture_${i},sizeof(fixture_${i})}`).join(',\n')+'};\n';
@@ -127,9 +133,13 @@ async function main(args=process.argv.slice(2)) {
   recipe_hashes:Object.fromEntries(['run.cjs','harness.c','boot.S','trace.cjs'].map(n=>[n,hash(fs.readFileSync(path.join(__dirname,n),'utf8').replace(/\r\n/g,'\n'))])),
   rom_substitutes:Object.keys(rom),extended_reference:extendedReference,fixtures:selected.map(f=>({name:f.name,packet_sha256:f.selected_opuspkt_sha256,pcm_sha256:f.pcm_sha256})),...parsed,cases};
  if(args.includes('--trace-pvq')) {
-  const trace=fs.readFileSync(path.join(out,'trace.log'),'utf8'),summary=require('./trace.cjs').summarize(trace);
+  // Pure SILK packets (TOC configurations 0..11) do not call CELT PVQ.
+  // Permit an empty trace only after exact PCM and packet-mode verification.
+  const {packets}=require('../esp8266_opus_profile/run_block_regressions.cjs');
+  const silkOnly=selected.every(f=>packets(fs.readFileSync(f.file)).every(p=>(p[0]>>>3)<12));
+  const trace=fs.readFileSync(path.join(out,'trace.log'),'utf8'),summary=require('./trace.cjs').summarize(trace,{helperName:variant.includes('n4-prefix')?'N4':'N3',allowEmpty:silkOnly});
   fs.writeFileSync(path.join(out,'trace-summary.json'),JSON.stringify(summary,null,2)+'\n');
-  report.instruction_trace={sha256:hash(trace),...summary};delete report.instruction_trace.pc_counts;
+  report.instruction_trace={sha256:hash(trace),silk_only:silkOnly,...summary};delete report.instruction_trace.pc_counts;
  }
  fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));return report;
 }

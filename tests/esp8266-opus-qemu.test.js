@@ -33,6 +33,10 @@ test('reject missing disassembly and unfinished translations',()=>{
  assert.throws(()=>summarize('Trace 0: 1234 [00000000/0000000040253329/00018010/ff000200]\n'));
  assert.throws(()=>summarize(trace+'0x40253330: ret.n\n'));
 });
+test('empty PVQ trace is accepted only explicitly for verified SILK-only packets',()=>{
+ assert.throws(()=>summarize(''));assert.throws(()=>summarize('not a trace',{allowEmpty:true}));
+ const r=summarize('',{allowEmpty:true});assert.equal(r.tb_executions,0);assert.equal(r.totals.pvq.instructions,0);
+});
 test('runner rejects unrelated modes and path traversal before spawning',async()=>{
  await assert.rejects(main(['--ota']));await assert.rejects(main(['--variant','../main']));await assert.rejects(main(['--qemu']));
 });

@@ -1,0 +1,348 @@
+{
+  "passed": true,
+  "scope": "QEMU LX106 instruction execution and PCM correctness; NOT hardware timing or full ESP8266 emulation",
+  "variant": "esp8266-opus-ebands-final-candidate-v2",
+  "elf_sha256": "cf8718b1c174bfb2a5fc4581a33092b5e35d39adfe048f96807836d654ff5db7",
+  "qemu": "QEMU emulator version 9.2.2 (DosToEsp QEMU-ESP32)\r\nCopyright (c) 2003-2024 Fabrice Bellard and the QEMU Project developers",
+  "qemu_sha256": "0e8af8cfdfcb76bff9f09084990852e35f2c0754ca2bdbb622ba8cfb8add59b6",
+  "compiler": "xtensa-lx106-elf-gcc.exe (crosstool-NG esp-2020r3-49-gd5524c1) 8.4.0",
+  "harness_elf_sha256": "368fbab126bfcc273ede934e255d20f6e427f8704eb16bec8f26c14df065bb23",
+  "recipe_hashes": {
+    "run.cjs": "9db1d62932c0fa115dd79b4df6c551bc916182b68b09bb3238dbedb3252a84fd",
+    "harness.c": "5a7f7389d8a2d5f83bf15e7d6d917080864bb1b69f43bd9a15da76a1310e96a5",
+    "boot.S": "39f30341e9c4328682e03958bf1dbb2baa7b38b4bbf94c778203ae124b36d445",
+    "trace.cjs": "41b2aaac5faa1708ab147ca0d1d93dc984f13b37206d4b0214dd21c9f02ef402"
+  },
+  "rom_substitutes": [
+    "memcpy",
+    "memmove",
+    "memset",
+    "__udivsi3",
+    "__umodsi3",
+    "__divsi3",
+    "__muldi3"
+  ],
+  "extended_reference": {
+    "kind": "Vendored generic32 bounded C, ASan/UBSan, not a pristine independent decoder",
+    "binary_sha256": "12bc19a566c45802b8dc40840a3ded5c4b632b98848fec8ee63fcfb5d89c5957"
+  },
+  "fixtures": [
+    {
+      "name": "mono-12",
+      "packet_sha256": "a7f7a02ab057eedb324edfe747a2acfbbfd16692fa0bef9476b53bf05006ac9e",
+      "pcm_sha256": "d37696a743b1df685447dab0d2b74585e890f71c09fde36d5d0d2de6dde7f241"
+    },
+    {
+      "name": "mono-24",
+      "packet_sha256": "0fe8dae1542848eb99f987ea8459440511f305afe381bdf34ed8743a1870f7ee",
+      "pcm_sha256": "8c2a6fca10cdc9a8936acaf335808298ffeb19c2838f64ceab80e22fe0fcd69b"
+    },
+    {
+      "name": "stereo-64",
+      "packet_sha256": "41c53944dbacbbac30a8b09d7e9510e68b2bce5f14bd39062052f7750c1d413c",
+      "pcm_sha256": "2c15e13880b82a098ae454b7ea2b6641810d4778d70858c62af5c32905232411"
+    },
+    {
+      "name": "stereo-128",
+      "packet_sha256": "4e2c4165c8391220d3c1278d6ed2bfb9529e5027aa2e5944a434f5bfbb3de4c5",
+      "pcm_sha256": "2265e622054782ac78b79129c0869f47559c0c1c5e670fa601a170da9abac4c9"
+    },
+    {
+      "name": "stereo-192",
+      "packet_sha256": "e7a1728de71ee59e8d9024036978dcb2a4bea219404db8f754cf6f0e7db90561",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6"
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "packet_sha256": "e10625ce5b722a6744120d68de610846875ddbaf5bd50bee631acb4396b188b8",
+      "pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48"
+    },
+    {
+      "name": "stereo-320-5ms",
+      "packet_sha256": "213b9f4a7b638f54cdec86f3981a2b7f24e3a3897980232f62500bbfef7d5909",
+      "pcm_sha256": "4eb3efc6c453ba1da0c36d391504a0247876521947997dab20649009cb9a3e1a"
+    },
+    {
+      "name": "stereo-320-10ms",
+      "packet_sha256": "ce81ef76fa8fbd1292ec1defb1a8164195dfd24510e2b17cbd0bc9c62d37f4ad",
+      "pcm_sha256": "9d808178dec05d38c305d1c0a858e1222eefaff3bf50a423d51562cb827f730c"
+    },
+    {
+      "name": "stereo-320-20ms",
+      "packet_sha256": "57e77698af5a7777862db1239b0c6047a951e35e64c248f4b18d1e48e9f4c65d",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142"
+    },
+    {
+      "name": "stereo-510",
+      "packet_sha256": "478933ec0c177f880a514677e3c3964276d4df99ad4c2bfadd09af256090abc1",
+      "pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e"
+    },
+    {
+      "name": "phase-mono-20ms.opuspkt",
+      "packet_sha256": "aa316afd1415f9b597afbf5e6d49da2f1459639afe34d6179afc759d3bfa69bf",
+      "pcm_sha256": "f696d62a75d1a6fe055ba2b1916fcc87a14a6a724206714febe736af30a84195"
+    },
+    {
+      "name": "phase-stereo-10ms-packed20.opuspkt",
+      "packet_sha256": "1c5350bc9c4b2cfd3e3bed37dd8e80ea7b40219b5d5009e09cd90c407396055b",
+      "pcm_sha256": "6004858b35f2d89e4ef6b513b43234fa16292f8fbf292bd2e93d582a8022e577"
+    },
+    {
+      "name": "phase-stereo-10ms-vbr-packed20.opuspkt",
+      "packet_sha256": "501ade152d7c66df7718e7e359c4f9965fe3fcde917c72dd209cadb0fd635cb9",
+      "pcm_sha256": "9688c3ca94a9b5fb2ab8ec45bf2557fc62844f77b13ba0de446abd1044fe6214"
+    },
+    {
+      "name": "phase-stereo-10ms-vbr.opuspkt",
+      "packet_sha256": "3589bf6006336e2fb72e97221ce0d0b33c7c07ab9c1ebc5aa9c33788c8e97ccb",
+      "pcm_sha256": "49aea0e8cd43b1912f0c1c007833124ef9aa95d5b87d358e7b0f959ce17c3f53"
+    },
+    {
+      "name": "phase-stereo-10ms.opuspkt",
+      "packet_sha256": "bcb44a05e3123435b54d1ba959b08a7532973e643d80e57d2c59e9926b37aa02",
+      "pcm_sha256": "f7c55e000f3fa5e066e62b6990517044efd1516c5201153a10eec0189cebc444"
+    },
+    {
+      "name": "phase-stereo-20ms.opuspkt",
+      "packet_sha256": "3ace4c3db8a1b39c6a7558274dd71fc31fc6753ad825f46cc1b3ee51ee5bebfa",
+      "pcm_sha256": "34330291ed2881c0c3ae8a1314f84900330713b5179dd85239cb8ba104e6fc95"
+    },
+    {
+      "name": "phase-stereo-2_5ms-packed20.opuspkt",
+      "packet_sha256": "3136b5863c895ea05796ad002aeca2037f2c6d3fbed55dc15be72fb1c4889324",
+      "pcm_sha256": "f4459f7089198fb3ed148165aead3ee2141a4c73f14cd22627817c96e08e279b"
+    },
+    {
+      "name": "phase-stereo-2_5ms.opuspkt",
+      "packet_sha256": "e8edba9c4b4543db8cbd0ddc8d96a3c7a2ec215f142f2264e18bf46812b351a1",
+      "pcm_sha256": "de1518cebb87de3d3f3b1c81f3e37637f2b6a6090d3daa252fccdbbbf4c70677"
+    },
+    {
+      "name": "phase-stereo-5ms-packed20.opuspkt",
+      "packet_sha256": "4610fc31766bcc409af108de4444b6760eba1ca027ee8694b49917aef4cb7849",
+      "pcm_sha256": "56a57b8a356f04338d171565484e0f8e5cf4771f2b5cf1659f998801fc6e6acd"
+    },
+    {
+      "name": "phase-stereo-5ms.opuspkt",
+      "packet_sha256": "461364e76a20c49b4307844cffe630e556de88891d5125f57818ab74368eee00",
+      "pcm_sha256": "19554938e819b41909152ad83a36113d6544512e2c7351d8d52a13cfcecd9b23"
+    },
+    {
+      "name": "192-120ms",
+      "packet_sha256": "6038c24e4b97a8725838b8cafc4ba42e11b16cad6bd32d7e447685bbcad3ed58",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6"
+    },
+    {
+      "name": "320-120ms",
+      "packet_sha256": "eeefb8f9b212cd287c461785a08d3ec795156f80cc15fa70db7d197fa12b7e20",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142"
+    },
+    {
+      "name": "320-48frames",
+      "packet_sha256": "2ee2ead41b3898cfd0c3003dc17bb67e634233e66276b9c5e8c08dcc0444756b",
+      "pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48"
+    },
+    {
+      "name": "mixed",
+      "packet_sha256": "a6ccd9728f4ad7ecb3716a777768087e529e733801d1fc8dccddaafe938d30af",
+      "pcm_sha256": "b15b5fa163d71ad8daf8fa8a8b120e4d9176fcfe355729a9dd7d39efe1a895dd"
+    }
+  ],
+  "cases": [
+    {
+      "name": "mono-12",
+      "pcm_sha256": "d37696a743b1df685447dab0d2b74585e890f71c09fde36d5d0d2de6dde7f241",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 1808,
+      "word_peak": 14112
+    },
+    {
+      "name": "mono-24",
+      "pcm_sha256": "8c2a6fca10cdc9a8936acaf335808298ffeb19c2838f64ceab80e22fe0fcd69b",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 2904,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-64",
+      "pcm_sha256": "2c15e13880b82a098ae454b7ea2b6641810d4778d70858c62af5c32905232411",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-128",
+      "pcm_sha256": "2265e622054782ac78b79129c0869f47559c0c1c5e670fa601a170da9abac4c9",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-192",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48",
+      "samples": 11640,
+      "packets": 97,
+      "byte_peak": 688,
+      "word_peak": 12240
+    },
+    {
+      "name": "stereo-320-5ms",
+      "pcm_sha256": "4eb3efc6c453ba1da0c36d391504a0247876521947997dab20649009cb9a3e1a",
+      "samples": 11760,
+      "packets": 49,
+      "byte_peak": 1408,
+      "word_peak": 12720
+    },
+    {
+      "name": "stereo-320-10ms",
+      "pcm_sha256": "9d808178dec05d38c305d1c0a858e1222eefaff3bf50a423d51562cb827f730c",
+      "samples": 12000,
+      "packets": 25,
+      "byte_peak": 2768,
+      "word_peak": 13680
+    },
+    {
+      "name": "stereo-320-20ms",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142",
+      "samples": 12480,
+      "packets": 13,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-510",
+      "pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e",
+      "samples": 58560,
+      "packets": 61,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "phase-mono-20ms.opuspkt",
+      "pcm_sha256": "f696d62a75d1a6fe055ba2b1916fcc87a14a6a724206714febe736af30a84195",
+      "samples": 16320,
+      "packets": 17,
+      "byte_peak": 3544,
+      "word_peak": 15600
+    },
+    {
+      "name": "phase-stereo-10ms-packed20.opuspkt",
+      "pcm_sha256": "6004858b35f2d89e4ef6b513b43234fa16292f8fbf292bd2e93d582a8022e577",
+      "samples": 15360,
+      "packets": 16,
+      "byte_peak": 2768,
+      "word_peak": 13680
+    },
+    {
+      "name": "phase-stereo-10ms-vbr-packed20.opuspkt",
+      "pcm_sha256": "9688c3ca94a9b5fb2ab8ec45bf2557fc62844f77b13ba0de446abd1044fe6214",
+      "samples": 15360,
+      "packets": 16,
+      "byte_peak": 2768,
+      "word_peak": 13680
+    },
+    {
+      "name": "phase-stereo-10ms-vbr.opuspkt",
+      "pcm_sha256": "49aea0e8cd43b1912f0c1c007833124ef9aa95d5b87d358e7b0f959ce17c3f53",
+      "samples": 15840,
+      "packets": 33,
+      "byte_peak": 2768,
+      "word_peak": 13680
+    },
+    {
+      "name": "phase-stereo-10ms.opuspkt",
+      "pcm_sha256": "f7c55e000f3fa5e066e62b6990517044efd1516c5201153a10eec0189cebc444",
+      "samples": 15840,
+      "packets": 33,
+      "byte_peak": 2768,
+      "word_peak": 13680
+    },
+    {
+      "name": "phase-stereo-20ms.opuspkt",
+      "pcm_sha256": "34330291ed2881c0c3ae8a1314f84900330713b5179dd85239cb8ba104e6fc95",
+      "samples": 16320,
+      "packets": 17,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "phase-stereo-2_5ms-packed20.opuspkt",
+      "pcm_sha256": "f4459f7089198fb3ed148165aead3ee2141a4c73f14cd22627817c96e08e279b",
+      "samples": 15360,
+      "packets": 16,
+      "byte_peak": 688,
+      "word_peak": 12240
+    },
+    {
+      "name": "phase-stereo-2_5ms.opuspkt",
+      "pcm_sha256": "de1518cebb87de3d3f3b1c81f3e37637f2b6a6090d3daa252fccdbbbf4c70677",
+      "samples": 15480,
+      "packets": 129,
+      "byte_peak": 688,
+      "word_peak": 12240
+    },
+    {
+      "name": "phase-stereo-5ms-packed20.opuspkt",
+      "pcm_sha256": "56a57b8a356f04338d171565484e0f8e5cf4771f2b5cf1659f998801fc6e6acd",
+      "samples": 15360,
+      "packets": 16,
+      "byte_peak": 1408,
+      "word_peak": 12720
+    },
+    {
+      "name": "phase-stereo-5ms.opuspkt",
+      "pcm_sha256": "19554938e819b41909152ad83a36113d6544512e2c7351d8d52a13cfcecd9b23",
+      "samples": 15600,
+      "packets": 65,
+      "byte_peak": 1408,
+      "word_peak": 12720
+    },
+    {
+      "name": "192-120ms",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6",
+      "samples": 11520,
+      "packets": 2,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "320-120ms",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142",
+      "samples": 12480,
+      "packets": 3,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "320-48frames",
+      "pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48",
+      "samples": 11640,
+      "packets": 3,
+      "byte_peak": 688,
+      "word_peak": 12240
+    },
+    {
+      "name": "mixed",
+      "pcm_sha256": "b15b5fa163d71ad8daf8fa8a8b120e4d9176fcfe355729a9dd7d39efe1a895dd",
+      "samples": 57600,
+      "packets": 60,
+      "byte_peak": 5968,
+      "word_peak": 15600
+    }
+  ],
+  "state_bytes": 6582,
+  "stack_used_in_harness": 2772,
+  "oom_recovery_cases": 24
+}
