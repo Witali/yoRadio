@@ -1,0 +1,124 @@
+{
+  "cases": [
+    {
+      "name": "groovesalad-32-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-32-aac",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 302.125
+      },
+      "metrics_available": false,
+      "window": {
+        "start": 608270.359,
+        "end": 608570.484
+      },
+      "samples": [],
+      "issues": [
+        "Fewer than three network heap samples",
+        "Missing or unordered sample interval"
+      ],
+      "wait_rows": [],
+      "ranges": {},
+      "bins": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 30,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 30,
+          "end_seconds": 60,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 60,
+          "end_seconds": 90,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 90,
+          "end_seconds": 120,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 120,
+          "end_seconds": 150,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 150,
+          "end_seconds": 180,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 180,
+          "end_seconds": 210,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 210,
+          "end_seconds": 240,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 240,
+          "end_seconds": 270,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 270,
+          "end_seconds": 300,
+          "count": 0,
+          "ranges": {}
+        },
+        {
+          "start_seconds": 300,
+          "end_seconds": 300.125,
+          "count": 0,
+          "ranges": {}
+        }
+      ],
+      "webui": {
+        "samples": 1613,
+        "audio_active": 1610,
+        "rssi": {
+          "rssi": {
+            "min": -76,
+            "median": -60,
+            "max": -57
+          }
+        },
+        "latency": {
+          "request_ms": {
+            "min": 45.999999972991645,
+            "median": 77.9999999795109,
+            "max": 202.9999999795109
+          }
+        }
+      }
+    }
+  ],
+  "note": "Summarize opt-in lwIP/heap snapshots without changing playback acceptance.\n\nSampling happens on the TCPIP thread; the HTTP thread logs the snapshot later.\nThe host receive timestamp minus age_ms estimates the sample time. Serial and\nhost scheduling delay still apply. Queue byte counts are logical payload, not\nunique allocated RAM; Wi-Fi/TLS/application queues are not counted.",
+  "input_sha256": {
+    "report.json": "0e2da4a565ffb7232a6aae4b919d56edb3ece18b369d6c239a5dfb195d738aac",
+    "status.json": "bc461866b5711485cbd8235abfac82053fe96295c83b569c16083af959312c20",
+    "performance.json": "0d26bcf9bf083d671246799cdb73b264480c57ced917cd9c937cf76a49fa57da"
+  },
+  "source_sha256": "3b902d5643234f851441132dad599395954e7814df67fc772cef778c9c183333"
+}

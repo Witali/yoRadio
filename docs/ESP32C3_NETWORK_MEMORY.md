@@ -74,3 +74,6 @@ the actual C sampler with GCC and AddressSanitizer/UndefinedBehaviorSanitizer
 allocation/post failures, queue snapshots and thread/lock restrictions. It also
 links the disabled header without lwIP or FreeRTOS dependencies. Missing GCC
 is a skipped native check, not a successful compilation.
+
+Hardware results and overhead are recorded separately in
+[the 2026-10-04 measurements](ESP32C3_NETWORK_MEMORY_20261004.md).
