@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
@@ -66,7 +66,37 @@ class AcceptanceTests(unittest.TestCase):
             self.assertEqual(len(rows[0]['samples']), 1)
             self.assertEqual(rows[0]['interrupted'], 'TimeoutError')
             self.assertGreaterEqual(rows[0]['elapsed_seconds'], 0)
+            self.assertGreaterEqual(rows[0]['ended_at'], rows[0]['started_at'])
+            self.assertGreaterEqual(rows[0]['ended_at'] - rows[0]['started_at'],
+                                    rows[0]['samples'][0]['seconds'])
             self.assertNotIn('private stream details', raw)
+
+    def test_long_load_checks_recovery_even_after_playback_failure(self):
+        for remaining, recovered in ((16000,True),(8000,False)):
+            board = Mock()
+            board.info.return_value = {'app_elf_sha256':'test-image'}
+            capture = Mock(rows=[])
+            suite = Mock()
+            suite.sustained.side_effect = common.Failure('injected playback failure')
+            suite.idle_heap.side_effect = [[dict(heap=16000,largest=8192,tasks=17)]*2,
+                                          [dict(heap=remaining,largest=8192,tasks=17)]*2]
+            server = MagicMock()
+            server.__enter__.return_value.events = []
+            with tempfile.TemporaryDirectory() as tmp, self.subTest(recovered=recovered), \
+                 patch.object(acceptance_run,'Board',return_value=board), \
+                 patch.object(acceptance_run,'Capture',return_value=capture), \
+                 patch.object(acceptance_run,'Suite',return_value=suite), \
+                 patch.object(acceptance_run,'Server',return_value=server), \
+                 patch.object(sys,'argv',['run.py','--board','http://localhost','--host','localhost',
+                     '--suite','load','--case','lc-48000-stereo','--serial-port','TEST',
+                     '--load-seconds','180','--load-idle-recovery','--leave-stopped','--output',tmp]):
+                self.assertEqual(acceptance_run.main(),1)
+                suite.sustained.assert_called_once_with(180,'lc-48000-stereo',cpu=True,load=True)
+                self.assertEqual(suite.idle_heap.call_count,2)
+                report = json.loads((Path(tmp)/'report.json').read_text())
+                self.assertEqual(report['load_options'],{'seconds':180,'idle_recovery':True})
+                self.assertEqual([r['result'] for r in report['cases']],
+                                 ['PASS','FAIL','PASS' if recovered else 'FAIL','PASS'])
 
     def test_eof_acceptance_rejects_resurrection_and_decode_error(self):
         terminal = dict(state(), audio=False, pcm_sample_rate=0, pcm_channels=0,

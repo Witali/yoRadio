@@ -65,7 +65,7 @@ class Suite:
     def observe(self, seconds, name, interval=.4):
         start = time.monotonic()
         samples = []
-        batch = dict(case=name, samples=samples)
+        batch = dict(case=name, started_at=start, samples=samples)
         try:
             while time.monotonic() - start < seconds:
                 requested = time.monotonic()
@@ -81,6 +81,7 @@ class Suite:
             batch['elapsed_seconds'] = time.monotonic() - start
             raise
         finally:
+            batch['ended_at'] = time.monotonic()
             self.observations.append(batch)
             (self.output / 'status.json').write_text(json.dumps(self.observations, indent=2)+'\n', encoding='utf-8')
         return samples
@@ -298,6 +299,10 @@ def main():
     parser.add_argument('--fixture-manifest', type=Path)
     parser.add_argument('--cycles', type=int, default=3)
     parser.add_argument('--soak-seconds', type=int, default=3600)
+    parser.add_argument('--load-seconds', type=int, default=40,
+                        help='Duration under frequent WebUI polling; keep the original CPU/heap gates')
+    parser.add_argument('--load-idle-recovery', action='store_true',
+                        help='Measure settled heap before and after each load case, even when playback fails')
     parser.add_argument('--https-origin', help='Trusted HTTPS origin serving identical /file routes')
     parser.add_argument('--tls-cert', type=Path)
     parser.add_argument('--tls-key', type=Path)
@@ -307,6 +312,7 @@ def main():
     parser.add_argument('--leave-stopped', action='store_true', help='Do not reboot to restore saved station')
     args = parser.parse_args()
     require(args.soak_seconds >= 60, 'Soak must last at least 60 seconds; default is one hour')
+    require(args.load_seconds >= 40, 'Load must last at least the original 40 seconds')
     specs = fixtures(args.fixture_manifest)
     names = args.case or [n for n in specs if n not in SEQUENCES]
     require(all(n in specs for n in names), 'Unknown fixture name')
@@ -318,6 +324,9 @@ def main():
     report = Report(args.output/'report.json', info)
     report.data['fixture_hashes'] = {n:specs[n]['sha256'] for n in names}
     report.data['requested_suites'] = args.suite
+    if 'load' in args.suite:
+        report.data['load_options'] = dict(seconds=args.load_seconds,
+                                          idle_recovery=args.load_idle_recovery)
     if args.sdkconfig:
         import hashlib
         config = args.sdkconfig.read_text()
@@ -367,7 +376,19 @@ def main():
                 if 'soak' in args.suite:
                     report.case('soak:'+name, lambda n=name: suite.sustained(args.soak_seconds,n,cpu=True))
                 if 'load' in args.suite:
-                    report.case('cpu-under-http-load:'+name, lambda n=name: suite.sustained(40,n,cpu=True,load=True))
+                    baseline = []
+                    if args.load_idle_recovery:
+                        def baseline_heap():
+                            baseline.extend(suite.idle_heap())
+                            return dict(samples=baseline)
+                        report.case('load-idle-baseline:'+name, baseline_heap)
+                    report.case('cpu-under-http-load:'+name, lambda n=name: suite.sustained(args.load_seconds,n,cpu=True,load=True))
+                    if args.load_idle_recovery:
+                        def recovered_heap():
+                            final = suite.idle_heap()
+                            check_recovery_heap(baseline,final)
+                            return dict(samples=final)
+                        report.case('load-idle-recovery:'+name, recovered_heap)
             report.data['server_events'] = server.events
             if tls:
                 report.data['tls_events'] = tls.events
