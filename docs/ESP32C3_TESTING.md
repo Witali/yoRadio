@@ -68,8 +68,13 @@ HTTPS playback and three passing unpaced-file controls.
 
 The [Vorbis audit and repair plan](ESP32C3_VORBIS_REPAIR_PLAN.md) records static
 failed-open/low-memory defects, a PCM retry concern and the investigation needed
-to identify the fragmentation owner. Its ordered tests and repairs are pending;
-the linked binary evidence is not a new successful decoder qualification.
+to identify the fragmentation owner. Its [first runtime step](ESP32C3_VORBIS_LIFECYCLE_20261004.md)
+is complete: 100 repeatable decode/close cycles, 198 individual allocation
+failures and four malformed headers in isolated QEMU. The original decoder
+still fails the fault-handling gate; repairs and physical fragmentation tracing
+remain pending. Run `python tests/test-vorbis-lifecycle.py` and
+`python tests/test-vorbis-lifecycle-evidence.py` to verify the classifier and
+retained results. The linked report includes full build/run commands.
 
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The

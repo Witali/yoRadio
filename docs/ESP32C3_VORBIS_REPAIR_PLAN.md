@@ -2,10 +2,17 @@
 
 Date: 2026-10-04. Reviewed checkout: `8db05fed` (`codex/aac-storage18`).
 
-**Status: investigation and plan; fixes and new runtime tests are pending.**
+**Status: step 1 completed; decoder fixes and steps 2–7 remain pending.**
 This review covers the native C3 audio service, the pinned Espressif Ogg/Vorbis
 objects and retained playback evidence. It is not a complete audit of every
 instruction in the decoder. No firmware was flashed during this review.
+
+The [step-1 runtime report](ESP32C3_VORBIS_LIFECYCLE_20261004.md) adds 100 valid
+decode/close cycles, 198 allocation-failure cases and four malformed-header cases
+using the original objects in QEMU. Normal cycles restore all stream memory;
+189 allocation failures and all four malformed cases crash. Three more
+allocation failures silently return success with missing PCM. These failures
+are preserved as the repair baseline, not treated as a successful qualification.
 
 ## Conclusion
 
@@ -70,7 +77,7 @@ In the [linked function](../tests/results/esp32c3-vorbis-audit-20261004/linked-o
 
 These addresses identify this ELF only; they must **not** become patch addresses.
 The relocatable member has the corresponding `.L52 -> .L49 -> .L57` path.
-Runtime fault-injection reproduction remains pending. This failure path is not
+Step 1 now reproduces a crash in this invalid-header cleanup path. This is not
 evidence that normal playback caused the observed fragmentation.
 
 ### V2 — DSP allocation failure is unchecked: confirmed in the linked binary
@@ -142,9 +149,14 @@ do not prove a Vorbis leak or prove that the short unpaced control fixed it.
 ## Ordered work plan
 
 Each implementation step should be a separate focused commit with its tests
-and retained results. All steps below are **pending**, unless stated otherwise.
+and retained results. Step 1 is complete; subsequent steps are **pending**.
 
 ### 1. Reproduce the failure paths without networking
+
+**Completed 2026-10-04:** [results, owner ledger and reproduction commands](ESP32C3_VORBIS_LIFECYCLE_20261004.md).
+The original decoder still fails the fault-handling gate. Coverage is the
+successful allocation path of one fixture, one failure at a time, plus four
+malformed-header cases; it is not an exhaustive malformed-stream test.
 
 - Use the actual pinned RV32 objects in a QEMU harness. Register codecs once;
   exclude deliberate process-lifetime registration allocations from per-stream
@@ -170,6 +182,10 @@ physical playback result substitutes for these injected-failure tests.
 - Audit all callees that allocate: codebooks, floor, residue, mapping and DSP.
   An outer null check cannot repair a callee that dereferences allocation
   failure internally. Extend the source replacement where the tests require it.
+- Cover the additional step-1 failures in simple-decoder initialization and
+  Ogg header/packet error propagation. In particular, allocation failures 3,
+  4 and 198 must not return success with missing PCM. Add registration failure
+  tests separately from the per-stream sweep.
 - Fix V4's PCM ownership on failed open and terminal paths. Keep generation
   guards and PCM queue ordering; add failed-open -> Stop -> valid Play tests.
 - Use named structures/fields, `sizeof`/`offsetof` assertions and pinned archive
