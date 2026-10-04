@@ -20,6 +20,33 @@ FIELDS = ('seq', 'age_ms', 'heap', 'largest', 'used', 'blocks', 'free_blocks',
 METRICS = FIELDS[2:15] + ('walk_us',)
 BIN_SECONDS = 30
 MAX_SAMPLE_GAP_SECONDS = 11  # Two nominal five-second profiler intervals.
+RX_FIELDS = ('seq', 'age_ms', 'window', 'maximum', 'refused')
+
+
+def parse_receive_snapshot(row):
+    """Optional receive-credit snapshot; uncredited bytes are not allocated RAM."""
+    if 'PERF NET_RX:' not in row['line']:
+        return None
+    tail = re.sub(r'\x1b\[[0-9;]*m', '', row['line'].split('PERF NET_RX:', 1)[1]).strip()
+    tokens = tail.split()
+    if len(tokens) != len(RX_FIELDS):
+        raise ValueError('Incomplete receive-window snapshot')
+    values = {}
+    for token, expected in zip(tokens, RX_FIELDS):
+        match = re.fullmatch(r'([a-z_]+)=(\d+)', token)
+        if not match or match[1] != expected:
+            raise ValueError('Invalid receive-window field')
+        values[expected] = int(match[2])
+    if any(values[k] > 0xffffffff for k in RX_FIELDS if k != 'age_ms'):
+        raise ValueError('Receive-window counter outside uint32 range')
+    if not values['seq'] or values['window'] > values['maximum']:
+        raise ValueError('Invalid receive-window counters')
+    logged_at = float(row['at'])
+    sample_at = logged_at - values['age_ms']/1000
+    if not math.isfinite(logged_at) or not math.isfinite(sample_at):
+        raise ValueError('Invalid receive-window timestamp')
+    return dict(logged_at=logged_at, sample_at=sample_at,
+                uncredited=values['maximum']-values['window'], **values)
 
 
 def parse_snapshot(row):

@@ -15,7 +15,14 @@ extern int test_lock, test_core;
 #define LWIP_ASSERT_CORE_LOCKED() assert(test_core && !test_lock)
 typedef struct { size_t total_free_bytes, largest_free_block, total_allocated_bytes, allocated_blocks, free_blocks; } multi_heap_info_t;
 struct tcp_seg { struct tcp_seg *next; uint16_t len; };
-struct tcp_pcb { struct tcp_pcb *next; struct tcp_seg *unsent, *unacked, *ooseq; };
+struct pbuf { uint16_t tot_len; };
+struct tcp_pcb {
+    struct tcp_pcb *next;
+    struct tcp_seg *unsent, *unacked, *ooseq;
+    uint32_t rcv_wnd, test_window_max;
+    struct pbuf *refused_data;
+};
+#define TCP_WND_MAX(pcb) ((pcb)->test_window_max)
 struct tcp_pcb_listen { struct tcp_pcb_listen *next; };
 extern struct tcp_pcb *tcp_active_pcbs, *tcp_tw_pcbs, *tcp_bound_pcbs;
 extern union test_listen { struct tcp_pcb_listen *listen_pcbs; } tcp_listen_pcbs;

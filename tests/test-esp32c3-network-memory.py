@@ -6,7 +6,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools/esp32c3_tests'))
-from network_memory import FIELDS, parse_snapshot, summarize
+from network_memory import FIELDS, parse_snapshot, parse_receive_snapshot, summarize
 
 
 def row(sample_at, sequence, age_ms=5000, **changes):
@@ -24,6 +24,22 @@ def report():
 
 
 class NetworkMemoryTests(unittest.TestCase):
+    def test_receive_credit_is_optional_delayed_and_not_added_to_refused(self):
+        self.assertIsNone(parse_receive_snapshot(row(12, 1)))
+        value = parse_receive_snapshot(dict(at=17,
+            line='PERF NET_RX: seq=1 age_ms=5000 window=15000 maximum=23040 refused=1440'))
+        self.assertEqual(value['sample_at'], 12)
+        self.assertEqual(value['uncredited'], 8040)
+        self.assertEqual(value['refused'], 1440)
+
+    def test_invalid_receive_credit_is_rejected(self):
+        good = 'PERF NET_RX: seq=1 age_ms=5000 window=10000 maximum=23040 refused=0'
+        for line in (good.replace(' refused=0',''), good.replace('window=10000','window=99999'),
+                     good.replace('seq=1','seq=0'), good.replace('refused=0','refused=-1'),
+                     good.replace('refused=0','maximum=0'), good.replace('maximum=23040',f'maximum={2**32}')):
+            with self.subTest(line=line), self.assertRaises(ValueError):
+                parse_receive_snapshot(dict(at=17, line=line))
+
     def test_delayed_sample_and_failed_acceptance_preserved(self):
         data = report()
         original = copy.deepcopy(data)

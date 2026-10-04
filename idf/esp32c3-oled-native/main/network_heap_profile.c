@@ -16,6 +16,7 @@ typedef struct {
     uint32_t free_bytes, largest_bytes, used_bytes, used_blocks, free_blocks;
     uint32_t active, time_wait, bound, listening;
     uint32_t tx_segments, tx_bytes, rx_segments, rx_bytes;
+    uint32_t rx_window, rx_window_max, rx_refused_bytes;
 } network_heap_snapshot_t;
 
 static portMUX_TYPE s_lock = portMUX_INITIALIZER_UNLOCKED;
@@ -43,6 +44,11 @@ static void collect(void *context) {
         ++next.active;
         count_segments(pcb->unsent, &next.tx_segments, &next.tx_bytes);
         count_segments(pcb->unacked, &next.tx_segments, &next.tx_bytes);
+        // Receive credit includes data queued for the application. The
+        // difference from TCP_WND_MAX is not an allocated-RAM measurement.
+        next.rx_window += pcb->rcv_wnd;
+        next.rx_window_max += TCP_WND_MAX(pcb);
+        if (pcb->refused_data) next.rx_refused_bytes += pcb->refused_data->tot_len;
 #if TCP_QUEUE_OOSEQ
         count_segments(pcb->ooseq, &next.rx_segments, &next.rx_bytes);
 #endif
@@ -105,6 +111,12 @@ void network_heap_profile_poll(void) {
                  (unsigned)previous.listening, (unsigned)previous.tx_segments,
                  (unsigned)previous.tx_bytes, (unsigned)previous.rx_segments,
                  (unsigned)previous.rx_bytes, (unsigned)s_missed, (unsigned)previous.walk_us);
+        // Keep NET_HEAP's existing schema intact for archived evidence readers.
+        // Refused data overlaps receive credit; never add the two byte counts.
+        ESP_LOGI("net_heap", "PERF NET_RX: seq=%u age_ms=%" PRId64
+                 " window=%u maximum=%u refused=%u",
+                 (unsigned)previous.sequence, age_ms, (unsigned)previous.rx_window,
+                 (unsigned)previous.rx_window_max, (unsigned)previous.rx_refused_bytes);
     }
     if (pending || tcpip_callbackmsg_trycallback(s_message) != ERR_OK) {
         ++s_missed;

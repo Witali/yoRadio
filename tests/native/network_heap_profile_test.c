@@ -10,7 +10,7 @@ static struct tcpip_callback_msg message;
 static unsigned allocations, posts;
 static int allocation_fails, posting_fails, queued;
 static int64_t now_us;
-static char last_log[768];
+static char last_log[768], last_rx_log[256];
 
 struct tcpip_callback_msg *tcpip_callbackmsg_new(void (*fn)(void *), void *context) {
     assert(!test_core && !test_lock);
@@ -33,7 +33,10 @@ int64_t esp_timer_get_time(void) { return now_us++; }
 void test_log(const char *format, ...) {
     assert(!test_core && !test_lock);
     va_list args; va_start(args, format);
-    vsnprintf(last_log, sizeof(last_log), format, args);
+    if (strstr(format, "PERF NET_RX:"))
+        vsnprintf(last_rx_log, sizeof(last_rx_log), format, args);
+    else
+        vsnprintf(last_log, sizeof(last_log), format, args);
     va_end(args);
 }
 static void deliver(void) {
@@ -54,10 +57,13 @@ int main(void) {
     assert(posts == 1 && queued && s_missed == 2); // Never queue one message twice.
 
     struct tcp_seg a = {NULL, 100}, b = {&a, 200}, c = {NULL, 73}, d = {NULL, 22};
-    struct tcp_pcb second = {NULL, NULL, &c, &d};
-    struct tcp_pcb first = {&second, &b, NULL, NULL};
-    struct tcp_pcb waiting = {NULL, NULL, NULL, NULL};
-    struct tcp_pcb bound = {NULL, NULL, NULL, NULL};
+    struct pbuf refused = {512};
+    struct tcp_pcb second = {.unacked=&c, .ooseq=&d, .rcv_wnd=80000,
+                            .test_window_max=131072, .refused_data=&refused};
+    struct tcp_pcb first = {.next=&second, .unsent=&b, .rcv_wnd=1000,
+                           .test_window_max=10000};
+    struct tcp_pcb waiting = {.rcv_wnd=9000, .test_window_max=10000};
+    struct tcp_pcb bound = {.rcv_wnd=5000, .test_window_max=10000};
     struct tcp_pcb_listen listener = {NULL};
     tcp_active_pcbs = &first; tcp_tw_pcbs = &waiting; tcp_bound_pcbs = &bound;
     tcp_listen_pcbs.listen_pcbs = &listener;
@@ -66,23 +72,30 @@ int main(void) {
     assert(s_snapshot.active == 2 && s_snapshot.time_wait == 1 && s_snapshot.bound == 1 && s_snapshot.listening == 1);
     assert(s_snapshot.tx_segments == 3 && s_snapshot.tx_bytes == 373);
     assert(s_snapshot.rx_segments == 1 && s_snapshot.rx_bytes == 22);
+    assert(s_snapshot.rx_window == 81000 && s_snapshot.rx_window_max == 141072);
+    assert(s_snapshot.rx_refused_bytes == 512);
+    assert(second.rcv_wnd == 80000 && second.refused_data == &refused && refused.tot_len == 512);
     // Snapshot must retain values, not pointers to potentially freed PCB/segments.
     first.unsent = NULL; b.len = 999;
+    second.rcv_wnd = 0; refused.tot_len = 999;
     tcp_active_pcbs = tcp_tw_pcbs = tcp_bound_pcbs = NULL;
     tcp_listen_pcbs.listen_pcbs = NULL;
     now_us += 5000000;
     posting_fails = 1;
     network_heap_profile_poll();
     assert(!s_pending && !queued && s_missed == 3 && allocations == 2);
+    assert(strstr(last_rx_log, "seq=1 age_ms=5000 window=81000 maximum=141072 refused=512"));
     posting_fails = 0;
     network_heap_profile_poll();
     deliver();
     assert(s_snapshot.sequence == 2 && !s_snapshot.active && !s_snapshot.tx_bytes && !s_snapshot.rx_bytes);
+    assert(!s_snapshot.rx_window && !s_snapshot.rx_window_max && !s_snapshot.rx_refused_bytes);
     now_us += 5000000;
     network_heap_profile_poll();
     assert(strstr(last_log, "seq=2 age_ms=5000 heap=10000 largest=4096 used=5000 blocks=40 free_blocks=5"));
     assert(strstr(last_log, "active=0 tw=0 bound=0 listen=0"));
     assert(strstr(last_log, "missed=3"));
+    assert(strstr(last_rx_log, "seq=2 age_ms=5000 window=0 maximum=0 refused=0"));
     deliver();
     assert(allocations == 2 && s_snapshot.sequence == 3 && !test_lock);
     puts("network heap callback lifecycle: PASS");
