@@ -1,0 +1,1376 @@
+{
+  "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "original_channel": 25792,
+  "compact_channel": 14776,
+  "original_owner": 55128,
+  "compact_owner": 36276,
+  "requested_saving": 18852,
+  "compiler_layout": {
+    "ps_flag": [
+      51584,
+      32732
+    ],
+    "ps_pointer": [
+      51588,
+      32736
+    ],
+    "ps_data": [
+      51592,
+      32740
+    ],
+    "right_header": [
+      25992,
+      15064
+    ],
+    "right_frame": [
+      25800,
+      14872
+    ],
+    "right_status": [
+      25796,
+      14780
+    ],
+    "right_coupling": [
+      26176,
+      15248
+    ],
+    "right_synthesis": [
+      42880,
+      30428
+    ],
+    "right_high_real": [
+      41724,
+      21452
+    ],
+    "right_high_imag": [
+      40568,
+      21448
+    ],
+    "ps_peak": [
+      30328,
+      19408
+    ],
+    "ps_energy": [
+      30408,
+      19488
+    ],
+    "ps_difference": [
+      30488,
+      19568
+    ],
+    "ps_hybrid": [
+      30568,
+      19648
+    ],
+    "ps_allpass_qmf": [
+      32960,
+      22040
+    ],
+    "ps_allpass_sub": [
+      34976,
+      24056
+    ],
+    "ps_delay_real": [
+      36032,
+      25112
+    ],
+    "ps_delay_imag": [
+      36288,
+      25368
+    ],
+    "ps_real_pointers": [
+      36800,
+      25880
+    ],
+    "ps_imag_pointers": [
+      37568,
+      26648
+    ],
+    "channel_size": [
+      25792,
+      14776
+    ],
+    "owner_size": [
+      55128,
+      36276
+    ],
+    "table_size": [
+      256,
+      20
+    ],
+    "frame_table_1": [
+      25016,
+      4294967236
+    ],
+    "frame_table_2": [
+      25272,
+      4294967256
+    ],
+    "frame_table_3": [
+      25528,
+      4294967276
+    ],
+    "frame_gain": [
+      19640,
+      10584
+    ],
+    "frame_alias": [
+      19384,
+      10328
+    ],
+    "frame_real": [
+      15924,
+      6580
+    ],
+    "frame_synthesis": [
+      17080,
+      8024
+    ],
+    "frame_real_history": [
+      15928,
+      6584
+    ],
+    "frame_imag_history": [
+      14772,
+      6588
+    ],
+    "left_real": [
+      15932,
+      6676
+    ],
+    "frame_table_0": [
+      24760,
+      4294967216
+    ],
+    "frame_table_end": [
+      24780,
+      4294967236
+    ],
+    "right_high_delta": [
+      4,
+      1
+    ],
+    "matrix_size": [
+      1280,
+      1024
+    ],
+    "gain_exponent_tail": [
+      513,
+      1
+    ],
+    "noise_exponent_tail": [
+      1793,
+      1025
+    ],
+    "left_frame": [
+      8,
+      96
+    ],
+    "left_header": [
+      200,
+      288
+    ],
+    "left_header_end": [
+      264,
+      352
+    ],
+    "left_sample_mode": [
+      212,
+      300
+    ],
+    "left_startup": [
+      1812,
+      1900
+    ],
+    "left_coupling": [
+      384,
+      472
+    ],
+    "left_imag": [
+      14776,
+      6672
+    ],
+    "frame_imag": [
+      14768,
+      6576
+    ],
+    "frame_sync": [
+      4294967292,
+      4294967204
+    ],
+    "frame_cursor_end": [
+      51592,
+      29648
+    ],
+    "frame_table_upper": [
+      6,
+      0
+    ]
+  },
+  "layout_sha256": "a3cb0ea5f4b000c9b6c11c67d60255e87ca6c83db6fc95284fdc668ce8172a40",
+  "scope": "QEMU asymmetric owner: common prefix tables, left frame only, right PS overlay",
+  "functions": {
+    "init_sbr_dec": {
+      "input_sha256": "37e4cdc77c913b0c562c3f54a8e9c77616cdd0b0b94b4804471838e3ead18c86",
+      "output_sha256": "78bf069a6bbe9e5b86cfb0185d5d57bf13ff3000f7990bcf5b4ed6e7760f9233",
+      "patches": [
+        {
+          "offset": "0x58",
+          "original": "1117a023",
+          "replacement": "0117aa23",
+          "meaning": "table 1 stride"
+        },
+        {
+          "offset": "0x5c",
+          "original": "3107a023",
+          "replacement": "0307ae23",
+          "meaning": "table 3 stride"
+        },
+        {
+          "offset": "0x60",
+          "original": "2067a023",
+          "replacement": "0267a423",
+          "meaning": "table 2 stride"
+        },
+        {
+          "offset": "0x8",
+          "original": "6715",
+          "replacement": "670d",
+          "meaning": "gain storage high"
+        },
+        {
+          "offset": "0x18",
+          "original": "cb870713",
+          "replacement": "95870713",
+          "meaning": "gain storage low"
+        },
+        {
+          "offset": "0x1c",
+          "original": "0b878793",
+          "replacement": "fb078793",
+          "meaning": "smoothing table base"
+        },
+        {
+          "offset": "0x20",
+          "original": "0cce0e13",
+          "replacement": "fc4e0e13",
+          "meaning": "five-row initialization end"
+        },
+        {
+          "offset": "0x4a",
+          "original": "50070313",
+          "replacement": "40070313",
+          "meaning": "noise matrix relative to gain matrix"
+        },
+        {
+          "offset": "0x4e",
+          "original": "20188893",
+          "replacement": "00188893",
+          "meaning": "gain exponent address after first immediate"
+        },
+        {
+          "offset": "0x52",
+          "original": "70180813",
+          "replacement": "40180813",
+          "meaning": "noise exponent address after first immediate"
+        },
+        {
+          "offset": "0xe",
+          "original": "6799",
+          "replacement": "4781",
+          "meaning": "zero upper base for signed prefix-table displacement"
+        },
+        {
+          "offset": "0x10",
+          "original": "6e19",
+          "replacement": "4e01",
+          "meaning": "zero upper base for signed prefix-table displacement"
+        }
+      ]
+    },
+    "sbr_open": {
+      "input_sha256": "b2e00c4c9ca1ddf2c3fd41cfcb738b6ff53262c425c7dd1ce6c19a1921b544a7",
+      "output_sha256": "89d164d1e57c727202c55175f2a1a6aceb755c68884e7c2bc0f5efec89b20fd1",
+      "patches": [
+        {
+          "offset": "0xa",
+          "original": "64b5",
+          "replacement": "64a1",
+          "meaning": "two-channel end high"
+        },
+        {
+          "offset": "0x14",
+          "original": "98048493",
+          "replacement": "fdc48493",
+          "meaning": "two-channel end low"
+        },
+        {
+          "offset": "0x40",
+          "original": "4c098993",
+          "replacement": "9b898993",
+          "meaning": "channel stride"
+        },
+        {
+          "offset": "0x4c",
+          "original": "4c060613",
+          "replacement": "9b860613",
+          "meaning": "channel memset length"
+        },
+        {
+          "offset": "0x1c",
+          "original": "6999",
+          "replacement": "6991",
+          "meaning": "low workspace: hi:channel_size"
+        },
+        {
+          "offset": "0x4a",
+          "original": "6619",
+          "replacement": "6611",
+          "meaning": "low workspace: hi:channel_size"
+        },
+        {
+          "offset": "0x60",
+          "original": "0c840713",
+          "replacement": "12040713",
+          "meaning": "low workspace: lo:left_header"
+        },
+        {
+          "offset": "0x80",
+          "original": "0d4b2583",
+          "replacement": "12cb2583",
+          "meaning": "low workspace: lo:left_sample_mode"
+        },
+        {
+          "offset": "0xbe",
+          "original": "0d242a23",
+          "replacement": "13242623",
+          "meaning": "low workspace: lo:left_sample_mode"
+        },
+        {
+          "offset": "0x84",
+          "original": "00840693",
+          "replacement": "06040693",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0x9a",
+          "original": "71242a23",
+          "replacement": "77242623",
+          "meaning": "low workspace: lo:left_startup"
+        }
+      ]
+    },
+    "sbr_read_data": {
+      "input_sha256": "9407eade32b389957146e97e6e1afafd7b319a456a17dce884eeb508434028dd",
+      "output_sha256": "d56ec6ee68a505454b70e6b2dbd280f9f68395760d7efdf63cedcb7847501910",
+      "patches": [
+        {
+          "offset": "0x8a",
+          "original": "58870713",
+          "replacement": "ad870713",
+          "meaning": "right header"
+        },
+        {
+          "offset": "0xbe",
+          "original": "67b5",
+          "replacement": "679d",
+          "meaning": "comparison-only reset cursor end; not the PS object"
+        },
+        {
+          "offset": "0xc0",
+          "original": "98878793",
+          "replacement": "3d078793",
+          "meaning": "comparison-only reset cursor end; not the PS object"
+        },
+        {
+          "offset": "0xe6",
+          "original": "4c078793",
+          "replacement": "9b878793",
+          "meaning": "channel stride"
+        },
+        {
+          "offset": "0xfe",
+          "original": "4c858593",
+          "replacement": "a1858593",
+          "meaning": "right frame"
+        },
+        {
+          "offset": "0x15c",
+          "original": "67b5",
+          "replacement": "67a1",
+          "meaning": "PS pointer high"
+        },
+        {
+          "offset": "0x160",
+          "original": "9847a603",
+          "replacement": "fe07a603",
+          "meaning": "PS pointer low"
+        },
+        {
+          "offset": "0x70",
+          "original": "0c848513",
+          "replacement": "12048513",
+          "meaning": "low workspace: lo:left_header"
+        },
+        {
+          "offset": "0x90",
+          "original": "0c848793",
+          "replacement": "12048793",
+          "meaning": "low workspace: lo:left_header"
+        },
+        {
+          "offset": "0x96",
+          "original": "10848693",
+          "replacement": "16048693",
+          "meaning": "low workspace: lo:left_header_end"
+        },
+        {
+          "offset": "0xcc",
+          "original": "0d44a603",
+          "replacement": "12c4a603",
+          "meaning": "low workspace: lo:left_sample_mode"
+        },
+        {
+          "offset": "0x140",
+          "original": "0d44a603",
+          "replacement": "12c4a603",
+          "meaning": "low workspace: lo:left_sample_mode"
+        },
+        {
+          "offset": "0xc8",
+          "original": "00848413",
+          "replacement": "06048413",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0x106",
+          "original": "00848513",
+          "replacement": "06048513",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0x118",
+          "original": "00848413",
+          "replacement": "06048413",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0x144",
+          "original": "00848413",
+          "replacement": "06048413",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0xe0",
+          "original": "fef42e23",
+          "replacement": "faf42223",
+          "meaning": "low workspace: lo:frame_sync"
+        },
+        {
+          "offset": "0xe4",
+          "original": "6799",
+          "replacement": "6791",
+          "meaning": "low workspace: hi:channel_size"
+        },
+        {
+          "offset": "0x88",
+          "original": "6719",
+          "replacement": "6711",
+          "meaning": "low workspace: hi:right_header"
+        },
+        {
+          "offset": "0xfc",
+          "original": "6599",
+          "replacement": "6591",
+          "meaning": "low workspace: hi:right_frame"
+        }
+      ]
+    },
+    "sbr_applied": {
+      "input_sha256": "ef51802786b49e51920134ede74c201d2dba553b35d1511b16ea9c567ff65e80",
+      "output_sha256": "fe44e1d664bfab60de2a696cdfc0adfdb3e7e7a11859b66703ee2d71272254ec",
+      "patches": [
+        {
+          "offset": "0x3c",
+          "original": "67b5",
+          "replacement": "67a1",
+          "meaning": "PS pointer high"
+        },
+        {
+          "offset": "0x40",
+          "original": "9847a503",
+          "replacement": "fe07a503",
+          "meaning": "PS pointer low"
+        },
+        {
+          "offset": "0x54",
+          "original": "9847a803",
+          "replacement": "fe07a803",
+          "meaning": "PS pointer reload"
+        },
+        {
+          "offset": "0x62",
+          "original": "78070713",
+          "replacement": "6dc70713",
+          "meaning": "right synthesis V"
+        },
+        {
+          "offset": "0x100",
+          "original": "4c47a683",
+          "replacement": "9bc7a683",
+          "meaning": "right status"
+        },
+        {
+          "offset": "0x10a",
+          "original": "4c860613",
+          "replacement": "a1860613",
+          "meaning": "right frame"
+        },
+        {
+          "offset": "0x10e",
+          "original": "2fc7ae23",
+          "replacement": "3dc7a623",
+          "meaning": "right high real pointer"
+        },
+        {
+          "offset": "0x112",
+          "original": "e667ac23",
+          "replacement": "3c67a423",
+          "meaning": "right high imaginary pointer"
+        },
+        {
+          "offset": "0x1a8",
+          "original": "6635",
+          "replacement": "6621",
+          "meaning": "PS control high"
+        },
+        {
+          "offset": "0x1ac",
+          "original": "98062583",
+          "replacement": "fdc62583",
+          "meaning": "PS initialization flag"
+        },
+        {
+          "offset": "0x1b2",
+          "original": "98062023",
+          "replacement": "fc062e23",
+          "meaning": "PS initialization flag store"
+        },
+        {
+          "offset": "0x1b6",
+          "original": "98462603",
+          "replacement": "fe062603",
+          "meaning": "PS pointer low"
+        },
+        {
+          "offset": "0x1fc",
+          "original": "4c850513",
+          "replacement": "a1850513",
+          "meaning": "right frame"
+        },
+        {
+          "offset": "0x222",
+          "original": "6406a683",
+          "replacement": "b906a683",
+          "meaning": "right coupling"
+        },
+        {
+          "offset": "0x26e",
+          "original": "4c46a683",
+          "replacement": "9bc6a683",
+          "meaning": "right status"
+        },
+        {
+          "offset": "0x286",
+          "original": "4c868693",
+          "replacement": "a1868693",
+          "meaning": "right frame"
+        },
+        {
+          "offset": "0x7a",
+          "original": "e315ae23",
+          "replacement": "a115aa23",
+          "meaning": "left high real pointer for PS"
+        },
+        {
+          "offset": "0xc8",
+          "original": "e3c7ae23",
+          "replacement": "a1c7aa23",
+          "meaning": "left high real pointer for SBR"
+        },
+        {
+          "offset": "0xf6",
+          "original": "6e91",
+          "replacement": "6e85",
+          "meaning": "shared right pointer upper-base difference"
+        },
+        {
+          "offset": "0x1e",
+          "original": "00850993",
+          "replacement": "06050993",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0x184",
+          "original": "00840993",
+          "replacement": "06040993",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0x1d2",
+          "original": "00840993",
+          "replacement": "06040993",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0x254",
+          "original": "00840993",
+          "replacement": "06040993",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0x2aa",
+          "original": "00840993",
+          "replacement": "06040993",
+          "meaning": "low workspace: lo:left_frame"
+        },
+        {
+          "offset": "0x1ee",
+          "original": "18042683",
+          "replacement": "1d842683",
+          "meaning": "low workspace: lo:left_coupling"
+        },
+        {
+          "offset": "0x2c6",
+          "original": "18042683",
+          "replacement": "1d842683",
+          "meaning": "low workspace: lo:left_coupling"
+        },
+        {
+          "offset": "0x52",
+          "original": "6729",
+          "replacement": "671d",
+          "meaning": "low workspace: hi:right_synthesis"
+        },
+        {
+          "offset": "0x6a",
+          "original": "6591",
+          "replacement": "6589",
+          "meaning": "low workspace: hi:left_real"
+        },
+        {
+          "offset": "0xb4",
+          "original": "6e91",
+          "replacement": "6e89",
+          "meaning": "low workspace: hi:left_real"
+        },
+        {
+          "offset": "0x7e",
+          "original": "9af5ac23",
+          "replacement": "a0f5a823",
+          "meaning": "low workspace: lo:left_imag"
+        },
+        {
+          "offset": "0xcc",
+          "original": "9a67ac23",
+          "replacement": "a067a823",
+          "meaning": "low workspace: lo:left_imag"
+        },
+        {
+          "offset": "0xfc",
+          "original": "6799",
+          "replacement": "6791",
+          "meaning": "low workspace: hi:right_status"
+        },
+        {
+          "offset": "0x26a",
+          "original": "6699",
+          "replacement": "6691",
+          "meaning": "low workspace: hi:right_status"
+        },
+        {
+          "offset": "0x104",
+          "original": "6619",
+          "replacement": "6611",
+          "meaning": "low workspace: hi:right_frame"
+        },
+        {
+          "offset": "0x1fa",
+          "original": "6519",
+          "replacement": "6511",
+          "meaning": "low workspace: hi:right_frame"
+        },
+        {
+          "offset": "0x284",
+          "original": "6699",
+          "replacement": "6691",
+          "meaning": "low workspace: hi:right_frame"
+        },
+        {
+          "offset": "0x21a",
+          "original": "6699",
+          "replacement": "6691",
+          "meaning": "low workspace: hi:right_coupling"
+        }
+      ]
+    },
+    "ps_allocate_decoder": {
+      "input_sha256": "87882468f843f223ffeffc55c0d3cdf7bd4599ad0350aec8dcf112cd3cbed339",
+      "output_sha256": "68d8ed43b9dcf24d34bd2653b6495adafd2fa1e95241c506aedf1c18d5cf9f2c",
+      "patches": [
+        {
+          "offset": "0x8",
+          "original": "67b5",
+          "replacement": "67a1",
+          "meaning": "PS pointer high"
+        },
+        {
+          "offset": "0x10",
+          "original": "9847a983",
+          "replacement": "fe07a983",
+          "meaning": "PS pointer low"
+        },
+        {
+          "offset": "0x32",
+          "original": "67860613",
+          "replacement": "bd060613",
+          "meaning": "right PS workspace 0"
+        },
+        {
+          "offset": "0x38",
+          "original": "6c868693",
+          "replacement": "c2068693",
+          "meaning": "right PS workspace 1"
+        },
+        {
+          "offset": "0x3c",
+          "original": "71870713",
+          "replacement": "c7070713",
+          "meaning": "right PS workspace 2"
+        },
+        {
+          "offset": "0x40",
+          "original": "76878793",
+          "replacement": "cc078793",
+          "meaning": "right hybrid workspace"
+        },
+        {
+          "offset": "0x92",
+          "original": "0c0a8a93",
+          "replacement": "618a8a93",
+          "meaning": "allpass QMF workspace"
+        },
+        {
+          "offset": "0x7c",
+          "original": "6a25",
+          "replacement": "6a19",
+          "meaning": "allpass sub-QMF workspace high"
+        },
+        {
+          "offset": "0x96",
+          "original": "8a0a0a13",
+          "replacement": "df8a0a13",
+          "meaning": "allpass sub-QMF workspace low"
+        },
+        {
+          "offset": "0x9a",
+          "original": "cc048493",
+          "replacement": "21848493",
+          "meaning": "main QMF real history"
+        },
+        {
+          "offset": "0x9e",
+          "original": "dc090913",
+          "replacement": "31890913",
+          "meaning": "main QMF imaginary history"
+        },
+        {
+          "offset": "0xa2",
+          "original": "fc0b8b93",
+          "replacement": "518b8b93",
+          "meaning": "real delay pointer table"
+        },
+        {
+          "offset": "0xa6",
+          "original": "2c0b0b13",
+          "replacement": "818b0b13",
+          "meaning": "imaginary delay pointer table"
+        },
+        {
+          "offset": "0x102",
+          "original": "fc078793",
+          "replacement": "51878793",
+          "meaning": "real delay table initialization cursor"
+        },
+        {
+          "offset": "0x82",
+          "original": "64a5",
+          "replacement": "6499",
+          "meaning": "main real history high"
+        },
+        {
+          "offset": "0x84",
+          "original": "6925",
+          "replacement": "6919",
+          "meaning": "main imaginary history high"
+        },
+        {
+          "offset": "0x86",
+          "original": "6ba5",
+          "replacement": "6b99",
+          "meaning": "real delay table high"
+        },
+        {
+          "offset": "0x88",
+          "original": "6b25",
+          "replacement": "6b1d",
+          "meaning": "imaginary delay table high"
+        },
+        {
+          "offset": "0xfc",
+          "original": "67a5",
+          "replacement": "6799",
+          "meaning": "real delay table cursor high"
+        },
+        {
+          "offset": "0x7a",
+          "original": "6aa1",
+          "replacement": "6a95",
+          "meaning": "allpass QMF workspace high after channel compaction"
+        },
+        {
+          "offset": "0x24",
+          "original": "661d",
+          "replacement": "6615",
+          "meaning": "low workspace: hi:ps_peak"
+        },
+        {
+          "offset": "0x26",
+          "original": "669d",
+          "replacement": "6695",
+          "meaning": "low workspace: hi:ps_energy"
+        },
+        {
+          "offset": "0x28",
+          "original": "671d",
+          "replacement": "6715",
+          "meaning": "low workspace: hi:ps_difference"
+        },
+        {
+          "offset": "0x2a",
+          "original": "679d",
+          "replacement": "6795",
+          "meaning": "low workspace: hi:ps_hybrid"
+        }
+      ]
+    },
+    "sbr_dec": {
+      "input_sha256": "961c6238817027d177caf415dcae8e7c91c06ba8e27d144d4cbfc23113b5bfa7",
+      "output_sha256": "184ee893300215e613a9cdc35f04ccbe556f21f49b39618127bff92d7b7fffd8",
+      "patches": [
+        {
+          "offset": "0x1fa",
+          "original": "3b850513",
+          "replacement": "fec50513",
+          "meaning": "smoothing pointer table 3"
+        },
+        {
+          "offset": "0x1fe",
+          "original": "2b868693",
+          "replacement": "fd868693",
+          "meaning": "smoothing pointer table 2"
+        },
+        {
+          "offset": "0x202",
+          "original": "1b870713",
+          "replacement": "fc470713",
+          "meaning": "smoothing pointer table 1"
+        },
+        {
+          "offset": "0x40",
+          "original": "e38a0793",
+          "replacement": "9b8a0793",
+          "meaning": "real history identity token"
+        },
+        {
+          "offset": "0x46",
+          "original": "e34a2503",
+          "replacement": "9b4a2503",
+          "meaning": "initial real working pointer"
+        },
+        {
+          "offset": "0x114",
+          "original": "e3442603",
+          "replacement": "9b442603",
+          "meaning": "HF generation real working pointer"
+        },
+        {
+          "offset": "0x1c6",
+          "original": "0b878793",
+          "replacement": "fb078793",
+          "meaning": "smoothing pointer table zero"
+        },
+        {
+          "offset": "0x1cc",
+          "original": "e3442583",
+          "replacement": "9b442583",
+          "meaning": "complex envelope real working pointer"
+        },
+        {
+          "offset": "0x314",
+          "original": "e3492583",
+          "replacement": "9b492583",
+          "meaning": "PS working real row"
+        },
+        {
+          "offset": "0x482",
+          "original": "e34a2583",
+          "replacement": "9b4a2583",
+          "meaning": "PS real history save source"
+        },
+        {
+          "offset": "0x4a2",
+          "original": "9b450513",
+          "replacement": "9bc50513",
+          "meaning": "PS imaginary history save token"
+        },
+        {
+          "offset": "0x4ce",
+          "original": "2b858593",
+          "replacement": "f5858593",
+          "meaning": "PS synthesis history load"
+        },
+        {
+          "offset": "0x670",
+          "original": "e34a2503",
+          "replacement": "9b4a2503",
+          "meaning": "inactive SBR high real zeroing"
+        },
+        {
+          "offset": "0x6b2",
+          "original": "2b858593",
+          "replacement": "f5858593",
+          "meaning": "SBR synthesis history load"
+        },
+        {
+          "offset": "0x772",
+          "original": "e34ca703",
+          "replacement": "9b4ca703",
+          "meaning": "complex SBR real synthesis row"
+        },
+        {
+          "offset": "0x8a4",
+          "original": "2b850513",
+          "replacement": "f5850513",
+          "meaning": "SBR synthesis history save"
+        },
+        {
+          "offset": "0x902",
+          "original": "e347a583",
+          "replacement": "9b47a583",
+          "meaning": "SBR real history save source"
+        },
+        {
+          "offset": "0x96c",
+          "original": "9b450513",
+          "replacement": "9bc50513",
+          "meaning": "SBR imaginary history save token"
+        },
+        {
+          "offset": "0xa18",
+          "original": "e34ca683",
+          "replacement": "9b4ca683",
+          "meaning": "real SBR synthesis row"
+        },
+        {
+          "offset": "0xb3c",
+          "original": "9b458593",
+          "replacement": "9bc58593",
+          "meaning": "imaginary history load token"
+        },
+        {
+          "offset": "0xb60",
+          "original": "6a15",
+          "replacement": "6a0d",
+          "meaning": "real SBR alias workspace high"
+        },
+        {
+          "offset": "0xb6c",
+          "original": "bb8a0a13",
+          "replacement": "858a0a13",
+          "meaning": "real SBR alias workspace low"
+        },
+        {
+          "offset": "0xbe0",
+          "original": "e3442583",
+          "replacement": "9b442583",
+          "meaning": "real envelope working pointer"
+        },
+        {
+          "offset": "0xc4a",
+          "original": "2b858593",
+          "replacement": "f5858593",
+          "meaning": "PS downsampled synthesis load"
+        },
+        {
+          "offset": "0xcde",
+          "original": "2b850513",
+          "replacement": "f5850513",
+          "meaning": "PS synthesis history save"
+        },
+        {
+          "offset": "0x3e",
+          "original": "6a11",
+          "replacement": "6a09",
+          "meaning": "low workspace: hi:frame_real"
+        },
+        {
+          "offset": "0x10e",
+          "original": "6411",
+          "replacement": "6409",
+          "meaning": "low workspace: hi:frame_real"
+        },
+        {
+          "offset": "0x30e",
+          "original": "6711",
+          "replacement": "6709",
+          "meaning": "low workspace: hi:frame_real"
+        },
+        {
+          "offset": "0x47e",
+          "original": "6a11",
+          "replacement": "6a09",
+          "meaning": "low workspace: hi:frame_real"
+        },
+        {
+          "offset": "0x664",
+          "original": "6a11",
+          "replacement": "6a09",
+          "meaning": "low workspace: hi:frame_real"
+        },
+        {
+          "offset": "0x6e4",
+          "original": "6c91",
+          "replacement": "6c89",
+          "meaning": "low workspace: hi:frame_real"
+        },
+        {
+          "offset": "0x8fe",
+          "original": "6791",
+          "replacement": "6789",
+          "meaning": "low workspace: hi:frame_real"
+        },
+        {
+          "offset": "0x14e",
+          "original": "9b042683",
+          "replacement": "9b042683",
+          "meaning": "low workspace: lo:frame_imag"
+        },
+        {
+          "offset": "0x1be",
+          "original": "9b042603",
+          "replacement": "9b042603",
+          "meaning": "low workspace: lo:frame_imag"
+        },
+        {
+          "offset": "0x33a",
+          "original": "9b092583",
+          "replacement": "9b092583",
+          "meaning": "low workspace: lo:frame_imag"
+        },
+        {
+          "offset": "0x49c",
+          "original": "9b0a2583",
+          "replacement": "9b0a2583",
+          "meaning": "low workspace: lo:frame_imag"
+        },
+        {
+          "offset": "0x684",
+          "original": "9b0a2503",
+          "replacement": "9b0a2503",
+          "meaning": "low workspace: lo:frame_imag"
+        },
+        {
+          "offset": "0x834",
+          "original": "9b0ca703",
+          "replacement": "9b0ca703",
+          "meaning": "low workspace: lo:frame_imag"
+        },
+        {
+          "offset": "0x960",
+          "original": "9b07a583",
+          "replacement": "9b07a583",
+          "meaning": "low workspace: lo:frame_imag"
+        },
+        {
+          "offset": "0xb36",
+          "original": "9b0a2503",
+          "replacement": "9b0a2503",
+          "meaning": "low workspace: lo:frame_imag"
+        },
+        {
+          "offset": "0x95c",
+          "original": "6791",
+          "replacement": "6789",
+          "meaning": "low workspace: hi:frame_imag"
+        },
+        {
+          "offset": "0x4a0",
+          "original": "6511",
+          "replacement": "6509",
+          "meaning": "low workspace: hi:frame_imag_history"
+        },
+        {
+          "offset": "0x964",
+          "original": "6511",
+          "replacement": "6509",
+          "meaning": "low workspace: hi:frame_imag_history"
+        },
+        {
+          "offset": "0xb3a",
+          "original": "6591",
+          "replacement": "6589",
+          "meaning": "low workspace: hi:frame_imag_history"
+        },
+        {
+          "offset": "0x4ca",
+          "original": "6591",
+          "replacement": "6589",
+          "meaning": "low workspace: hi:frame_synthesis"
+        },
+        {
+          "offset": "0x6a6",
+          "original": "6591",
+          "replacement": "6589",
+          "meaning": "low workspace: hi:frame_synthesis"
+        },
+        {
+          "offset": "0x8a2",
+          "original": "6511",
+          "replacement": "6509",
+          "meaning": "low workspace: hi:frame_synthesis"
+        },
+        {
+          "offset": "0xc46",
+          "original": "6591",
+          "replacement": "6589",
+          "meaning": "low workspace: hi:frame_synthesis"
+        },
+        {
+          "offset": "0xcdc",
+          "original": "6511",
+          "replacement": "6509",
+          "meaning": "low workspace: hi:frame_synthesis"
+        },
+        {
+          "offset": "0x1c4",
+          "original": "6799",
+          "replacement": "4781",
+          "meaning": "zero upper base for signed prefix-table displacement"
+        },
+        {
+          "offset": "0x1e4",
+          "original": "6519",
+          "replacement": "4501",
+          "meaning": "zero upper base for signed prefix-table displacement"
+        },
+        {
+          "offset": "0x1ea",
+          "original": "6699",
+          "replacement": "4681",
+          "meaning": "zero upper base for signed prefix-table displacement"
+        },
+        {
+          "offset": "0x1ec",
+          "original": "6719",
+          "replacement": "4701",
+          "meaning": "zero upper base for signed prefix-table displacement"
+        },
+        {
+          "offset": "0x68",
+          "original": "1b0c8c93",
+          "replacement": "fa89ac83",
+          "meaning": "real call-local frame-relative binding",
+          "slot": -88
+        },
+        {
+          "offset": "0x13a",
+          "original": "1b050513",
+          "replacement": "fa89a503",
+          "meaning": "real call-local frame-relative binding",
+          "slot": -88
+        },
+        {
+          "offset": "0x262",
+          "original": "1b078793",
+          "replacement": "fa89a783",
+          "meaning": "real call-local frame-relative binding",
+          "slot": -88
+        },
+        {
+          "offset": "0x424",
+          "original": "1b0a0a13",
+          "replacement": "fa89aa03",
+          "meaning": "real call-local frame-relative binding",
+          "slot": -88
+        },
+        {
+          "offset": "0x6e6",
+          "original": "1b078793",
+          "replacement": "fa89a783",
+          "meaning": "real call-local frame-relative binding",
+          "slot": -88
+        },
+        {
+          "offset": "0x8c8",
+          "original": "1b048493",
+          "replacement": "fa89a483",
+          "meaning": "real call-local frame-relative binding",
+          "slot": -88
+        },
+        {
+          "offset": "0xb58",
+          "original": "1b050513",
+          "replacement": "fa89a503",
+          "meaning": "real call-local frame-relative binding",
+          "slot": -88
+        },
+        {
+          "offset": "0x6c",
+          "original": "5b0a0a13",
+          "replacement": "fac9aa03",
+          "meaning": "imag call-local frame-relative binding",
+          "slot": -84
+        },
+        {
+          "offset": "0x136",
+          "original": "5b058593",
+          "replacement": "fac9a583",
+          "meaning": "imag call-local frame-relative binding",
+          "slot": -84
+        },
+        {
+          "offset": "0x26c",
+          "original": "5b0a0a13",
+          "replacement": "fac9aa03",
+          "meaning": "imag call-local frame-relative binding",
+          "slot": -84
+        },
+        {
+          "offset": "0x3a8",
+          "original": "5b0f0f13",
+          "replacement": "fac9af03",
+          "meaning": "imag call-local frame-relative binding",
+          "slot": -84
+        },
+        {
+          "offset": "0x430",
+          "original": "5b0b0b13",
+          "replacement": "fac9ab03",
+          "meaning": "imag call-local frame-relative binding",
+          "slot": -84
+        },
+        {
+          "offset": "0x7aa",
+          "original": "5b070713",
+          "replacement": "fac9a703",
+          "meaning": "imag call-local frame-relative binding",
+          "slot": -84
+        },
+        {
+          "offset": "0x928",
+          "original": "5b048493",
+          "replacement": "fac9a483",
+          "meaning": "imag call-local frame-relative binding",
+          "slot": -84
+        }
+      ]
+    },
+    "PVMP4AudioDecodeFrame": {
+      "input_sha256": "2b0179ec89f33abe8859c758fa912be94219e204f969ebcd398049aa8478399a",
+      "output_sha256": "841917bf358fded2909d7bceb65de782da32674794ce7226c2717884a563b861",
+      "patches": [
+        {
+          "offset": "0x800",
+          "original": "67b5",
+          "replacement": "67a1",
+          "meaning": "PS embedded address high"
+        },
+        {
+          "offset": "0x80a",
+          "original": "66b5",
+          "replacement": "66a1",
+          "meaning": "PS pointer high"
+        },
+        {
+          "offset": "0x80c",
+          "original": "98878793",
+          "replacement": "fe478793",
+          "meaning": "PS embedded address low"
+        },
+        {
+          "offset": "0x816",
+          "original": "98f6a223",
+          "replacement": "fef6a023",
+          "meaning": "PS pointer store"
+        },
+        {
+          "offset": "0x98c",
+          "original": "66b5",
+          "replacement": "66a1",
+          "meaning": "PS flag high"
+        },
+        {
+          "offset": "0x996",
+          "original": "98d7a023",
+          "replacement": "fcd7ae23",
+          "meaning": "PS flag store"
+        },
+        {
+          "offset": "0x89c",
+          "original": "0d4da703",
+          "replacement": "12cda703",
+          "meaning": "low workspace: lo:left_sample_mode"
+        }
+      ]
+    }
+  },
+  "history_copy_calls": {
+    "0x54": "load_real",
+    "0x452": "forward unchanged",
+    "0x468": "forward unchanged",
+    "0x494": "PS_store_real",
+    "0x4ae": "PS_store_imag",
+    "0x4e0": "forward unchanged",
+    "0x506": "forward unchanged",
+    "0x524": "forward unchanged",
+    "0x5b0": "forward unchanged",
+    "0x5c6": "forward unchanged",
+    "0x6ca": "forward unchanged",
+    "0x8ba": "forward unchanged",
+    "0x8e8": "forward unchanged",
+    "0x914": "SBR_store_real",
+    "0x946": "forward unchanged",
+    "0x978": "SBR_store_imag",
+    "0x9b6": "forward unchanged",
+    "0xb10": "forward unchanged",
+    "0xb2c": "forward unchanged",
+    "0xb46": "load_imag",
+    "0xc5a": "forward unchanged",
+    "0xcb0": "forward unchanged",
+    "0xcce": "forward unchanged",
+    "0xcea": "forward unchanged",
+    "0xd0e": "forward unchanged",
+    "0xda4": "forward unchanged",
+    "0xdb4": "forward unchanged"
+  },
+  "envelope_calls": [
+    "0x23c",
+    "0xc3a"
+  ],
+  "low_bindings": {
+    "real": -88,
+    "imag": -84
+  },
+  "native_open": "Unused: the existing typed initializer handles both first open and PS-preserving reopen"
+}

@@ -1,0 +1,280 @@
+{
+  "image": {
+    "app_elf_sha256": "7a08ff29d13eed4ffa987bfe93b86808a2fead6bc3f1ae41a389e506963dfcb1",
+    "sha256": "7d9a31012c25faaaac08aeeaf446bc4d739aa32ec908d9d96bdb60ba5c853b88",
+    "bytes": 1564304
+  },
+  "production_default": false,
+  "cases": {
+    "baseline-load": [
+      {
+        "name": "cpu-under-http-load:lc-48000-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "cpu-under-http-load:he-48000-stereo",
+        "result": "FAIL",
+        "reason": "URLError"
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "FAIL",
+        "reason": "URLError"
+      },
+      {
+        "name": "restore-board",
+        "result": "FAIL",
+        "reason": "URLError"
+      }
+    ],
+    "baseline-load-retry": [
+      {
+        "name": "cpu-under-http-load:lc-48000-stereo",
+        "result": "FAIL",
+        "reason": "WebUI response exceeded 2 s"
+      },
+      {
+        "name": "cpu-under-http-load:he-48000-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS"
+      }
+    ],
+    "candidate-load": [
+      {
+        "name": "cpu-under-http-load:lc-48000-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "cpu-under-http-load:he-48000-stereo",
+        "result": "FAIL",
+        "reason": "URLError"
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS"
+      }
+    ],
+    "ota-transition": [
+      {
+        "name": "ota:transition-while-playing",
+        "result": "PASS"
+      }
+    ],
+    "ota-repeat": [
+      {
+        "name": "ota:roundtrip:1",
+        "result": "PASS"
+      },
+      {
+        "name": "ota:roundtrip:2",
+        "result": "PASS"
+      },
+      {
+        "name": "ota:while-playing",
+        "result": "PASS"
+      },
+      {
+        "name": "restore-saved-station",
+        "result": "PASS"
+      }
+    ],
+    "local": [
+      {
+        "name": "http:mp3-320:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:mp3-320:mp3",
+        "result": "PASS"
+      },
+      {
+        "name": "http:flac-level8:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:flac-level8:flac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:vorbis-q10:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:vorbis-q10:vorbis",
+        "result": "PASS"
+      },
+      {
+        "name": "http:opus-510:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:opus-510:opus",
+        "result": "PASS"
+      },
+      {
+        "name": "http:aac-lc-320:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:aac-lc-320:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:lc-22050-mono:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:lc-22050-mono:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:he-44100-stereo:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:he-44100-stereo:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:he-48000-stereo:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:he-48000-stereo:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:hev2-44100-stereo:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:hev2-44100-stereo:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS"
+      }
+    ],
+    "https": [
+      {
+        "name": "idle:baseline",
+        "result": "PASS"
+      },
+      {
+        "name": "https:groovesalad-128-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "https:groovesalad-64-aac",
+        "result": "FAIL",
+        "reason": "Progressive heap loss during continuous playback"
+      },
+      {
+        "name": "https:groovesalad-32-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "https:groovesalad-16-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "https:groovesalad-256-mp3",
+        "result": "PASS"
+      },
+      {
+        "name": "idle:recovery",
+        "result": "PASS"
+      },
+      {
+        "name": "restore",
+        "result": "PASS"
+      }
+    ],
+    "https-relocated": [
+      {
+        "name": "idle:baseline",
+        "result": "PASS"
+      },
+      {
+        "name": "https:groovesalad-64-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "idle:recovery",
+        "result": "PASS"
+      },
+      {
+        "name": "restore",
+        "result": "PASS"
+      }
+    ],
+    "http": [
+      {
+        "name": "idle:baseline",
+        "result": "PASS"
+      },
+      {
+        "name": "http:groovesalad-128-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:groovesalad-64-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:groovesalad-32-aac",
+        "result": "FAIL",
+        "reason": "Progressive largest loss during continuous playback"
+      },
+      {
+        "name": "http:groovesalad-16-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:groovesalad-256-mp3",
+        "result": "PASS"
+      },
+      {
+        "name": "idle:recovery",
+        "result": "PASS"
+      },
+      {
+        "name": "restore",
+        "result": "PASS"
+      }
+    ],
+    "candidate-load-relocated": [
+      {
+        "name": "cpu-under-http-load:lc-48000-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "cpu-under-http-load:he-48000-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS"
+      }
+    ]
+  },
+  "bounded_suites_all_pass": false,
+  "objective_complete": false,
+  "note": "Bounded physical checks only. Public failures remain failures; no long soak, malformed-stream or every-stream claim."
+}

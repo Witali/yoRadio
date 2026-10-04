@@ -44,7 +44,11 @@ The [asymmetric channel owner](ESP32C3_AAC_ASYMMETRIC_OWNER_20261003.md)
 removes the unused left PS reserve and measures another 4 KiB allocator saving
 in QEMU. `python tests/test-aac-asymmetric-owner.py --compiler <RV32-gcc>` checks
 native object edits, prefix/stride assertions, six pointer/PCM runs and the
-disabled-flag control. Physical playback and OTA remain separate pending gates.
+disabled-flag control. The [physical follow-up](ESP32C3_AAC_ASYMMETRIC_PRODUCTION_20261004.md)
+adds the production storage flag, unpoisoned QEMU runs and actual hardware/OTA
+outcomes. `python tests/test-aac-asymmetric-production.py` validates that evidence
+while preserving unsuccessful tests. Nested transport exception types and
+numeric OS codes are retained without private exception text.
 
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The

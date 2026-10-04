@@ -151,7 +151,8 @@ sdkconfig, and separate output directories as documented in
 The [asymmetric-owner follow-up](ESP32C3_AAC_ASYMMETRIC_OWNER_20261003.md)
 implements this candidate in QEMU. Moving each channel's smoothing tables into a common
 prefix produces a 32,744 B owner and a measured further 4,096 B allocator saving.
-All six pointer/PCM runs pass; physical integration is still pending. The
+All six pointer/PCM runs pass; the [physical follow-up](ESP32C3_AAC_ASYMMETRIC_PRODUCTION_20261004.md)
+now records ordinary firmware integration and hardware qualification. The
 original estimate and required consumer audit below explain the starting point.
 
 A target-compiled size probe finds `aac_high_frame_t=14680`, channel prefix

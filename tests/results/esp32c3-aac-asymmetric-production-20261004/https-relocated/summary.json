@@ -1,0 +1,114 @@
+{
+  "board": {
+    "version": "v0.9.693-1152-gafa4a1ba-dirty",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "7a08ff29d13eed4ffa987bfe93b86808a2fead6bc3f1ae41a389e506963dfcb1"
+  },
+  "cases": [
+    {
+      "name": "groovesalad-64-aac",
+      "transport": "https",
+      "acceptance": {
+        "name": "https:groovesalad-64-aac",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "HE-AAC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "HE-AAC "
+            },
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 563,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 2.530999999959022,
+          "status_samples": 645,
+          "max_http_ms": 329.00000002700835,
+          "p95_http_ms": 109.00000005494803,
+          "median_http_ms": 77.9999999795109,
+          "mean_busy": 63.46190476190476,
+          "peak_busy": 65.7,
+          "minimum_heap": 16784.0,
+          "minimum_largest": 6912.0,
+          "audio_wall_ratio": 1.0015310877379844
+        },
+        "seconds": 122.594
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "HE-AAC 44.1 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 607032.343,
+          "busy": 63.8,
+          "decode": 36.7,
+          "heap": 22352,
+          "largest": 6912
+        },
+        {
+          "at": 607037.484,
+          "busy": 64.0,
+          "decode": 37.0,
+          "heap": 21980,
+          "largest": 15360
+        },
+        {
+          "at": 607042.64,
+          "busy": 63.6,
+          "decode": 36.6,
+          "heap": 24048,
+          "largest": 6912
+        },
+        {
+          "at": 607047.781,
+          "busy": 64.3,
+          "decode": 37.0,
+          "heap": 22108,
+          "largest": 10752
+        },
+        {
+          "at": 607052.89,
+          "busy": 63.7,
+          "decode": 36.3,
+          "heap": 22020,
+          "largest": 8192
+        },
+        {
+          "at": 607057.906,
+          "busy": 63.8,
+          "decode": 36.5,
+          "heap": 16784,
+          "largest": 6912
+        }
+      ],
+      "busy_mean": 63.867,
+      "decode_mean": 36.683,
+      "minimum_free": 16784,
+      "minimum_largest": 6912,
+      "window": {
+        "start": 607021.609,
+        "end": 607142.031
+      },
+      "allocation_failures": []
+    }
+  ],
+  "metric": "FreeRTOS CPU samples 5..35 s after first PCM, clipped to the recorded playback window",
+  "note": "Failed playback stays failed. Fewer than four in-window CPU samples give no aggregate.",
+  "panic_or_capture_errors": [],
+  "input_sha256": {
+    "report.json": "e015c4acf06b03299ba891796dd9b6257fc977416fa75b5afb20bed3a46c4c08",
+    "status.json": "2b93367261398b5917f4d1eb3d532fcfbc24eb654dd06947dac75d273d74fce9",
+    "performance.json": "c7d081de12dbdc0479356778e50e4ad36245e5293654e9e6dbe2acc86205c415"
+  },
+  "source_sha256": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709"
+}

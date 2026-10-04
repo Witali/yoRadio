@@ -1,0 +1,443 @@
+{
+  "board": {
+    "version": "v0.9.693-1152-gafa4a1ba-dirty",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "7a08ff29d13eed4ffa987bfe93b86808a2fead6bc3f1ae41a389e506963dfcb1"
+  },
+  "cases": [
+    {
+      "name": "groovesalad-128-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-128-aac",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "LC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "AAC PCM"
+            },
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 251,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 0.609000000054948,
+          "status_samples": 337,
+          "max_http_ms": 375.0,
+          "p95_http_ms": 94.0000000409782,
+          "median_http_ms": 77.9999999795109,
+          "mean_busy": 49.31111111111111,
+          "peak_busy": 50.0,
+          "minimum_heap": 62904.0,
+          "minimum_largest": 47104.0,
+          "audio_wall_ratio": 1.001553311882836
+        },
+        "seconds": 62.5
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "AAC PCM 44.1 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 607340.687,
+          "busy": 47.1,
+          "decode": 20.6,
+          "heap": 66564,
+          "largest": 49152
+        },
+        {
+          "at": 607345.843,
+          "busy": 49.9,
+          "decode": 20.6,
+          "heap": 66488,
+          "largest": 49152
+        },
+        {
+          "at": 607351.0,
+          "busy": 49.7,
+          "decode": 20.7,
+          "heap": 68264,
+          "largest": 51200
+        },
+        {
+          "at": 607356.109,
+          "busy": 49.6,
+          "decode": 20.6,
+          "heap": 62908,
+          "largest": 51200
+        },
+        {
+          "at": 607361.218,
+          "busy": 49.3,
+          "decode": 20.6,
+          "heap": 66564,
+          "largest": 51200
+        },
+        {
+          "at": 607366.375,
+          "busy": 49.2,
+          "decode": 20.5,
+          "heap": 64672,
+          "largest": 51200
+        }
+      ],
+      "busy_mean": 49.133,
+      "decode_mean": 20.6,
+      "minimum_free": 62908,
+      "minimum_largest": 49152,
+      "window": {
+        "start": 607335.015,
+        "end": 607395.484
+      },
+      "allocation_failures": []
+    },
+    {
+      "name": "groovesalad-64-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-64-aac",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "HE-AAC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "HE-AAC "
+            },
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 251,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 0.5929999999934807,
+          "status_samples": 333,
+          "max_http_ms": 202.9999999795109,
+          "p95_http_ms": 94.0000000409782,
+          "median_http_ms": 77.9999999795109,
+          "mean_busy": 61.544444444444444,
+          "peak_busy": 62.1,
+          "minimum_heap": 28848.0,
+          "minimum_largest": 14336.0,
+          "audio_wall_ratio": 1.001553311882836
+        },
+        "seconds": 62.594
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "HE-AAC 44.1 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 607407.953,
+          "busy": 61.4,
+          "decode": 36.2,
+          "heap": 27080,
+          "largest": 17408
+        },
+        {
+          "at": 607413.031,
+          "busy": 61.7,
+          "decode": 36.0,
+          "heap": 30732,
+          "largest": 15872
+        },
+        {
+          "at": 607418.14,
+          "busy": 61.6,
+          "decode": 36.0,
+          "heap": 28912,
+          "largest": 15872
+        },
+        {
+          "at": 607423.203,
+          "busy": 61.4,
+          "decode": 35.8,
+          "heap": 28848,
+          "largest": 17408
+        },
+        {
+          "at": 607428.281,
+          "busy": 61.4,
+          "decode": 36.0,
+          "heap": 28912,
+          "largest": 14336
+        }
+      ],
+      "busy_mean": 61.5,
+      "decode_mean": 36.0,
+      "minimum_free": 27080,
+      "minimum_largest": 14336,
+      "window": {
+        "start": 607397.562,
+        "end": 607458.062
+      },
+      "allocation_failures": []
+    },
+    {
+      "name": "groovesalad-32-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-32-aac",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive largest loss during continuous playback",
+        "seconds": 62.172
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "HE-AAC 44.1 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 607470.359,
+          "busy": 58.9,
+          "decode": 33.7,
+          "heap": 27424,
+          "largest": 14336
+        },
+        {
+          "at": 607475.406,
+          "busy": 59.0,
+          "decode": 33.6,
+          "heap": 29132,
+          "largest": 19456
+        },
+        {
+          "at": 607480.5,
+          "busy": 59.3,
+          "decode": 33.7,
+          "heap": 29128,
+          "largest": 15872
+        },
+        {
+          "at": 607485.515,
+          "busy": 59.0,
+          "decode": 33.6,
+          "heap": 23780,
+          "largest": 14336
+        },
+        {
+          "at": 607490.656,
+          "busy": 59.1,
+          "decode": 33.7,
+          "heap": 29196,
+          "largest": 14336
+        }
+      ],
+      "busy_mean": 59.06,
+      "decode_mean": 33.66,
+      "minimum_free": 23780,
+      "minimum_largest": 14336,
+      "window": {
+        "start": 607460.031,
+        "end": 607520.25
+      },
+      "allocation_failures": []
+    },
+    {
+      "name": "groovesalad-16-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-16-aac",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "HE-AACv2",
+              "rate": 32000,
+              "channels": 2,
+              "bits": 16,
+              "label": "HE-AACv2 "
+            },
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 255,
+            "rate": 32000,
+            "channels": 2
+          },
+          "first_pcm_seconds": 0.5939999999245629,
+          "status_samples": 338,
+          "max_http_ms": 327.9999999795109,
+          "p95_http_ms": 94.0000000409782,
+          "median_http_ms": 77.9999999795109,
+          "mean_busy": 44.0,
+          "peak_busy": 44.7,
+          "minimum_heap": 20392.0,
+          "minimum_largest": 7680.0,
+          "audio_wall_ratio": 1.0017391304347827
+        },
+        "seconds": 62.437
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "HE-AACv2 32 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 607532.578,
+          "busy": 44.1,
+          "decode": 20.4,
+          "heap": 22144,
+          "largest": 9216
+        },
+        {
+          "at": 607537.625,
+          "busy": 44.3,
+          "decode": 20.3,
+          "heap": 24040,
+          "largest": 9216
+        },
+        {
+          "at": 607542.796,
+          "busy": 40.9,
+          "decode": 20.3,
+          "heap": 20392,
+          "largest": 7680
+        },
+        {
+          "at": 607547.937,
+          "busy": 44.5,
+          "decode": 20.2,
+          "heap": 22160,
+          "largest": 9216
+        },
+        {
+          "at": 607552.968,
+          "busy": 44.4,
+          "decode": 20.4,
+          "heap": 23920,
+          "largest": 12288
+        }
+      ],
+      "busy_mean": 43.64,
+      "decode_mean": 20.32,
+      "minimum_free": 20392,
+      "minimum_largest": 7680,
+      "window": {
+        "start": 607522.187,
+        "end": 607582.687
+      },
+      "allocation_failures": []
+    },
+    {
+      "name": "groovesalad-256-mp3",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-256-mp3",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "mp3",
+              "profile": null,
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "MP3"
+            },
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 255,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 0.625,
+          "status_samples": 337,
+          "max_http_ms": 391.0000000614673,
+          "p95_http_ms": 94.0000000409782,
+          "median_http_ms": 77.9999999795109,
+          "mean_busy": 56.87777777777778,
+          "peak_busy": 57.3,
+          "minimum_heap": 86184.0,
+          "minimum_largest": 69632.0,
+          "audio_wall_ratio": 1.001553311882836
+        },
+        "seconds": 62.61
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "MP3 44.1 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 607595.328,
+          "busy": 57.0,
+          "decode": 25.6,
+          "heap": 88012,
+          "largest": 69632
+        },
+        {
+          "at": 607600.453,
+          "busy": 57.1,
+          "decode": 25.6,
+          "heap": 86184,
+          "largest": 69632
+        },
+        {
+          "at": 607605.546,
+          "busy": 57.1,
+          "decode": 25.9,
+          "heap": 89780,
+          "largest": 69632
+        },
+        {
+          "at": 607610.64,
+          "busy": 56.8,
+          "decode": 25.6,
+          "heap": 93380,
+          "largest": 69632
+        },
+        {
+          "at": 607615.765,
+          "busy": 56.9,
+          "decode": 25.7,
+          "heap": 89776,
+          "largest": 69632
+        }
+      ],
+      "busy_mean": 56.98,
+      "decode_mean": 25.68,
+      "minimum_free": 86184,
+      "minimum_largest": 69632,
+      "window": {
+        "start": 607584.843,
+        "end": 607645.296
+      },
+      "allocation_failures": []
+    }
+  ],
+  "metric": "FreeRTOS CPU samples 5..35 s after first PCM, clipped to the recorded playback window",
+  "note": "Failed playback stays failed. Fewer than four in-window CPU samples give no aggregate.",
+  "panic_or_capture_errors": [],
+  "input_sha256": {
+    "report.json": "ff347831db5229cd48ddc7742195b1a746e3f1973f8058febd6aa0a8ef5ae2e1",
+    "status.json": "6306adeb7aa7102b03abcd1a9b7e65defe45ef257a7b42a8e7a0cd3e89cba7b3",
+    "performance.json": "69494b538180e3ba2e28135f6bd7b703fccde32dbce2acd2d99fe5175f817a7d"
+  },
+  "source_sha256": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709"
+}

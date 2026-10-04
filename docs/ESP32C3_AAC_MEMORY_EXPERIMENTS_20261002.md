@@ -66,8 +66,10 @@ The [asymmetric channel owner](ESP32C3_AAC_ASYMMETRIC_OWNER_20261003.md) then
 removes the unused left-channel PS reserve. Common prefix tables preserve
 identical frame-relative accesses. Six QEMU pointer/PCM runs prove another
 4096 B allocator saving (35900 -> 32744 requested bytes), with no additional
-PCM error or stack increase. Physical integration is pending; this does not
-yet implement the separate PS-only allocation proposed in item 6.
+PCM error or stack increase. The [physical integration](ESP32C3_AAC_ASYMMETRIC_PRODUCTION_20261004.md)
+adds an opt-in build flag and records hardware/OTA evidence, with network
+qualification still incomplete. This does not yet implement the separate
+PS-only allocation proposed in item 6.
 
 Before changing allocation, audit all row readers and PS aliases again:
 `sbr_dec` analysis/generation/synthesis/copy paths, `init_sbr_dec`, both reset

@@ -4,8 +4,9 @@
 
 `CONFIG_YORADIO_QEMU_AAC_ASYMMETRIC_OWNER` removes the unused PS reserve from
 the left SBR channel. The right channel retains the complete PS overlay and
-synthesis state. This is a separately gated, **QEMU-only** experiment; it has
-not yet replaced the physical image or passed the public network/OTA gates.
+synthesis state. This report records the initial **QEMU-only** experiment.
+The [physical follow-up](ESP32C3_AAC_ASYMMETRIC_PRODUCTION_20261004.md) now adds
+an ordinary firmware flag and retains hardware/OTA results and remaining failures.
 
 | Measurement | Scoped low-QMF baseline | Asymmetric owner | Difference |
 | --- | ---: | ---: | ---: |
@@ -108,6 +109,6 @@ checks every patched function body, rejects bad reports, and compiles a
 deliberately wrong prefix to verify the layout assertions. The optional
 compiler argument is needed for that last check.
 
-Next: integrate an independent physical build flag, verify the unpoisoned path,
-then repeat matched CPU/heap, public HTTP/HTTPS, local all-codec and OTA tests.
-Keep production defaults disabled until those gates pass.
+The physical follow-up verifies the unpoisoned storage path, then records
+CPU/heap, public HTTP/HTTPS, local all-codec and OTA tests. Keep production
+defaults disabled until all acceptance gates pass.
