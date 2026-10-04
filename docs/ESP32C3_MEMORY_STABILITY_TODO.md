@@ -521,6 +521,15 @@ matrix still retains a HE status timeout and free-heap decline failures for
 MP3/Vorbis/Opus. Diagnose them and repeat longer/repeated OTA and codec tests;
 do not infer production acceptance from the successful HTTPS run.
 
+Receive-credit follow-up: [long playback and fragmentation](ESP32C3_RECEIVE_CREDIT_20261004.md)
+correlates initial MP3/Vorbis/Opus heap decline with 9–11.5 KiB of queued TCP
+receive credit. Three 60-second unpaced-file controls pass unchanged load and
+idle-recovery gates. However, one 180-second Vorbis run leaves the idle largest
+block at 59,392 B instead of 114,688 B, despite nearly unchanged total free heap.
+HE-AAC HTTPS then plays at full 44.1 kHz stereo from that state, but its progressive
+heap gate still fails. Identify the retained allocation, extend the controls,
+and distinguish bounded queue filling from a leak without dropping the failures.
+
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
 - [ ] Run the complete host test suite.

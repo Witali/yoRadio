@@ -1,0 +1,114 @@
+{
+  "window": {
+    "start": 634988.968,
+    "end": 635169.203
+  },
+  "cpu_mean": 64.85882352941177,
+  "cpu_ranges": {
+    "busy": {
+      "min": 63.2,
+      "median": 65.0,
+      "max": 65.6
+    },
+    "heap": {
+      "min": 18056.0,
+      "median": 22384.0,
+      "max": 28896.0
+    },
+    "largest": {
+      "min": 4608.0,
+      "median": 6272.0,
+      "max": 11776.0
+    }
+  },
+  "receive_ranges": {
+    "window": {
+      "min": 11520,
+      "median": 14863.5,
+      "max": 23040
+    },
+    "uncredited": {
+      "min": 0,
+      "median": 8176.5,
+      "max": 11520
+    },
+    "refused": {
+      "min": 0,
+      "median": 0.0,
+      "max": 0
+    }
+  },
+  "status_samples": 947,
+  "audio_active": 933,
+  "pcm_layouts": [
+    [
+      44100,
+      2,
+      "HE-AAC 44.1 kHz stereo"
+    ]
+  ],
+  "max_http_ms": 297.0000000204891,
+  "cases": [
+    {
+      "name": "idle:baseline",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 145892,
+            "largest": 59392,
+            "tasks": 17
+          },
+          {
+            "heap": 145892,
+            "largest": 59392,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.797
+    },
+    {
+      "name": "https:groovesalad-64-aac",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Progressive heap loss during continuous playback",
+      "seconds": 182.531
+    },
+    {
+      "name": "idle:recovery",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 145860,
+            "largest": 59392,
+            "tasks": 17
+          },
+          {
+            "heap": 145860,
+            "largest": 59392,
+            "tasks": 17
+          }
+        ],
+        "no_unexpected_resets": true
+      },
+      "seconds": 12.156
+    },
+    {
+      "name": "restore",
+      "result": "PASS",
+      "evidence": {
+        "stopped_state_restored": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 7.672
+    }
+  ]
+}

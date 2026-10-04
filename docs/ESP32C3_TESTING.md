@@ -56,6 +56,16 @@ corrects for delayed logging and keeps the public-stream PASS/FAIL decisions.
 Run `tests/test-esp32c3-network-memory.py` and `tests/test-network-heap-native.py`
 for the host parser and sanitized C callback checks.
 
+The [receive-credit extension](ESP32C3_NETWORK_RECEIVE_CREDIT.md) additionally
+observes TCP data waiting for the application. Long load runs can use
+`--load-seconds 180 --load-idle-recovery`; their outcomes remain separate from
+the post-stop memory check. `load_windows.py` uses explicit observation bounds
+and retains incomplete telemetry instead of assigning the next codec's samples
+to a failed case. Its boundary tests are `tests/test-esp32c3-load-windows.py`.
+The [physical receive-credit results](ESP32C3_RECEIVE_CREDIT_20261004.md) retain
+the long paced failures, a post-Vorbis fragmentation failure, subsequent HE-AAC
+HTTPS playback and three passing unpaced-file controls.
+
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.
