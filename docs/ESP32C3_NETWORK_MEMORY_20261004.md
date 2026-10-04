@@ -16,6 +16,27 @@ later successful runs do not replace it or establish the cause of its failure.
 
 ## Diagnostic image and installation
 
+### Later signal and playback recheck
+
+At 11:10:33–11:11:02 UTC, another 30 read-only requests all succeeded: RSSI
+−72 / −70 / −58 dBm (minimum / median / maximum), last reading −59 dBm.
+HTTP latency was median 125 ms, p95 203 ms and maximum 407 ms. The saved
+station was stopped with `stream read failed`; reachability alone did not
+establish successful playback or the cause of that earlier failure.
+
+A subsequent 60-second local HE-AACv2 stream passed at 44.1 kHz stereo:
+54 status responses, maximum 296 ms, RSSI −73 / −71 / −58 dBm. Mean CPU
+was 66.289%, peak 67.3%; minimum free heap was 43,164 B and the largest
+block was 32,768 B. The original CPU, real-time progress and heap gates
+passed. After the runner's restore reboot, the saved station was observed
+playing AAC-LC at 44.1 kHz stereo, RSSI −59 dBm. No firmware was flashed.
+
+This supports continuing tests in the current location, not a claim that all
+station/network failures are fixed. The [recheck records](../tests/results/esp32c3-wifi-recheck-20261004/)
+are separate from the earlier five-minute runs.
+
+### Image details
+
 The [network sampler](ESP32C3_NETWORK_MEMORY.md) was added to the existing
 asymmetric-owner image. Its only configuration change is
 `CONFIG_YORADIO_NETWORK_HEAP_PROFILE=y`; the AAC native patch/layout audit is
