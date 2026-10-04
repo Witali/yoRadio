@@ -1,0 +1,64 @@
+{
+  "passed": true,
+  "scope": "QEMU LX106 instruction execution and PCM correctness; NOT hardware timing or full ESP8266 emulation",
+  "variant": "esp8266-opus-pvq-n4-uniform256-candidate-v1",
+  "elf_sha256": "c068f0a3339e2fe022c94c5fd7b38b1cee9a81cc282256f6077c5cfb4913dc9a",
+  "qemu": "QEMU emulator version 9.2.2 (DosToEsp QEMU-ESP32)\r\nCopyright (c) 2003-2024 Fabrice Bellard and the QEMU Project developers",
+  "qemu_sha256": "0e8af8cfdfcb76bff9f09084990852e35f2c0754ca2bdbb622ba8cfb8add59b6",
+  "compiler": "xtensa-lx106-elf-gcc.exe (crosstool-NG esp-2020r3-49-gd5524c1) 8.4.0",
+  "harness_elf_sha256": "676699c5c5d675a9c561ba3164c588bec6447f31c24859b54e11bb753d717524",
+  "recipe_hashes": {
+    "run.cjs": "561aa15f44c6a1826bc6c3ba323ae1e81bd0ded2cefa2b4997e79ac1f791c8c2",
+    "harness.c": "5a7f7389d8a2d5f83bf15e7d6d917080864bb1b69f43bd9a15da76a1310e96a5",
+    "boot.S": "39f30341e9c4328682e03958bf1dbb2baa7b38b4bbf94c778203ae124b36d445",
+    "trace.cjs": "5c9a69f27ef1de9ce04cb330a0a78cbec7e73c69438d843649f65ea5110a3b8f"
+  },
+  "rom_substitutes": [
+    "memcpy",
+    "memmove",
+    "memset",
+    "__udivsi3",
+    "__umodsi3",
+    "__divsi3",
+    "__muldi3"
+  ],
+  "extended_reference": {
+    "kind": "Vendored generic32 bounded C, ASan/UBSan, not a pristine independent decoder",
+    "binary_sha256": "12bc19a566c45802b8dc40840a3ded5c4b632b98848fec8ee63fcfb5d89c5957"
+  },
+  "fixtures": [
+    {
+      "name": "stereo-320-20ms",
+      "packet_sha256": "57e77698af5a7777862db1239b0c6047a951e35e64c248f4b18d1e48e9f4c65d",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142"
+    }
+  ],
+  "cases": [
+    {
+      "name": "stereo-320-20ms",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142",
+      "samples": 12480,
+      "packets": 13,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    }
+  ],
+  "state_bytes": 6582,
+  "stack_used_in_harness": 2580,
+  "oom_recovery_cases": 0,
+  "instruction_trace": {
+    "sha256": "3abc56a8f46dbc8d9efdd27d5627b90b89a726b95486d67908016c4843097aa0",
+    "silk_only": false,
+    "scope": "Executed instructions in decode_pulses and N4 helper only; callees excluded. Counts are not cycles or predicted CPU percent.",
+    "tb_executions": 153296,
+    "totals": {
+      "pvq": {
+        "instructions": 760180,
+        "load_instructions": 124013,
+        "store_instructions": 38786,
+        "calls": 3689,
+        "unique_instructions": 288
+      }
+    }
+  }
+}

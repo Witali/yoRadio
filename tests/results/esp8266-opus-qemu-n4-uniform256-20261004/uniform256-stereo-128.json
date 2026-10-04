@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "scope": "QEMU LX106 instruction execution and PCM correctness; NOT hardware timing or full ESP8266 emulation",
+  "variant": "esp8266-opus-pvq-n4-uniform256-candidate-v1",
+  "elf_sha256": "c068f0a3339e2fe022c94c5fd7b38b1cee9a81cc282256f6077c5cfb4913dc9a",
+  "qemu": "QEMU emulator version 9.2.2 (DosToEsp QEMU-ESP32)\r\nCopyright (c) 2003-2024 Fabrice Bellard and the QEMU Project developers",
+  "qemu_sha256": "0e8af8cfdfcb76bff9f09084990852e35f2c0754ca2bdbb622ba8cfb8add59b6",
+  "compiler": "xtensa-lx106-elf-gcc.exe (crosstool-NG esp-2020r3-49-gd5524c1) 8.4.0",
+  "harness_elf_sha256": "31b7fa0f49bded8f8198d7cfc4f668dfe17b1423c4c20d31eb16b5bdd92b00d4",
+  "recipe_hashes": {
+    "run.cjs": "561aa15f44c6a1826bc6c3ba323ae1e81bd0ded2cefa2b4997e79ac1f791c8c2",
+    "harness.c": "5a7f7389d8a2d5f83bf15e7d6d917080864bb1b69f43bd9a15da76a1310e96a5",
+    "boot.S": "39f30341e9c4328682e03958bf1dbb2baa7b38b4bbf94c778203ae124b36d445",
+    "trace.cjs": "5c9a69f27ef1de9ce04cb330a0a78cbec7e73c69438d843649f65ea5110a3b8f"
+  },
+  "rom_substitutes": [
+    "memcpy",
+    "memmove",
+    "memset",
+    "__udivsi3",
+    "__umodsi3",
+    "__divsi3",
+    "__muldi3"
+  ],
+  "fixtures": [
+    {
+      "name": "stereo-128",
+      "packet_sha256": "4e2c4165c8391220d3c1278d6ed2bfb9529e5027aa2e5944a434f5bfbb3de4c5",
+      "pcm_sha256": "2265e622054782ac78b79129c0869f47559c0c1c5e670fa601a170da9abac4c9"
+    }
+  ],
+  "cases": [
+    {
+      "name": "stereo-128",
+      "pcm_sha256": "2265e622054782ac78b79129c0869f47559c0c1c5e670fa601a170da9abac4c9",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    }
+  ],
+  "state_bytes": 6582,
+  "stack_used_in_harness": 2580,
+  "oom_recovery_cases": 0,
+  "instruction_trace": {
+    "sha256": "08be13ee0247b76ed3f302625d233d3d6726d9e67166f32d149b723cbd128c4c",
+    "silk_only": false,
+    "scope": "Executed instructions in decode_pulses and N4 helper only; callees excluded. Counts are not cycles or predicted CPU percent.",
+    "tb_executions": 90960,
+    "totals": {
+      "pvq": {
+        "instructions": 476430,
+        "load_instructions": 68096,
+        "store_instructions": 28062,
+        "calls": 1610,
+        "unique_instructions": 287
+      }
+    }
+  }
+}
