@@ -3,6 +3,23 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-10-04: uniform256 N4 PVQ ASM experiment
+
+- Separate `esp8266-opus-pvq-n4-uniform256-{control,candidate}-v1`, 903216 B,
+  accepted eBands-final parent, unchanged 160 MHz/runtime QIO40 profile.
+- One 1020 B flash table for N4 indices 256..65535, original fast return and
+  unrestricted linear fallback elsewhere; helper 25 instructions / 67 B.
+  Original 48 B frame, no added static RAM or scratch.
+- Candidate SHA256: `de5a672635b0141e148d3cc1f9f07d409b5e936c136c7b01b7050c0e0bbb02cb`.
+- 306162 linked interval cases, 65473 dense indices, 48 QEMU exact PCM cases
+  and OOM/reinitialization checks; arena peaks 5968/15600 B match control.
+- PVQ instructions: 128 +0.58%, 192 -0.37%, 320 -0.42%, 510 +0.12%.
+  Fewer instructions than the previous N4 experiment, not necessarily faster
+  than production. Counts are not cycles or whole-decoder CPU percentages.
+- Experimental only; not flashed or promoted. Physical qualification deferred
+  by user request. Production and portable C fallback unchanged.
+- [Results and next experiment](../docs/ESP8266_OPUS_ALGORITHMIC_CANDIDATES_CHECK.md).
+
 ## Development - 2026-10-04: offline N4 PVQ ASM lookup experiment
 
 - Separate `esp8266-opus-pvq-n4-prefix-{control,candidate}-v1`,903216B,
