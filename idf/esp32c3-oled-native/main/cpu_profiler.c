@@ -1,4 +1,5 @@
 #include "cpu_profiler.h"
+#include "network_heap_profile.h"
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -164,6 +165,7 @@ static void cpu_profiler_sample(void) {
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT),
              (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_8BIT),
              (unsigned)count);
+    network_heap_profile_poll();
 }
 
 #ifdef CONFIG_YORADIO_CPU_PROFILE_HTTP

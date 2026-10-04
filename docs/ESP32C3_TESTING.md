@@ -50,6 +50,12 @@ outcomes. `python tests/test-aac-asymmetric-production.py` validates that eviden
 while preserving unsuccessful tests. Nested transport exception types and
 numeric OS codes are retained without private exception text.
 
+The optional [network heap sampler](ESP32C3_NETWORK_MEMORY.md) records heap
+blocks, TCP states and queued payload on the owning lwIP thread. Its summarizer
+corrects for delayed logging and keeps the public-stream PASS/FAIL decisions.
+Run `tests/test-esp32c3-network-memory.py` and `tests/test-network-heap-native.py`
+for the host parser and sanitized C callback checks.
+
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.

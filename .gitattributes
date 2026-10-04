@@ -542,3 +542,14 @@ idf/esp32c3-oled-native/sdkconfig.aac-asymmetric-owner.defaults text eol=lf
 firmware/development/esp32c3-aac-asymmetric-owner/** -text
 tests/results/esp32c3-aac-asymmetric-production-20261004/** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
 tests/test-aac-asymmetric-production.py text eol=lf
+
+# Network/heap snapshots and firmware provenance must remain byte-exact.
+tests/results/esp32c3-network-memory-20261004/** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
+firmware/development/esp32c3-aac-network-memory/** -text
+idf/esp32c3-oled-native/main/network_heap_profile.* text eol=lf
+tools/esp32c3_tests/network_memory.py text eol=lf
+tests/test-esp32c3-network-memory.py text eol=lf
+tests/test-network-heap-native.py text eol=lf
+tests/test-network-memory-evidence.py text eol=lf
+tests/native/network_heap_profile_test.c text eol=lf
+tests/native/network_heap_profile_stubs/** text eol=lf

@@ -199,6 +199,17 @@ config YORADIO_CPU_PROFILE_HTTP
         CPU/heap/stack logs, at most once per five seconds. Avoids allocating a
         separate 4096-byte profiler task stack. Uses the HTTP server's stack.
 
+config YORADIO_NETWORK_HEAP_PROFILE
+    bool "Sample heap and TCP queues for network memory diagnosis"
+    depends on YORADIO_CPU_PROFILE_HTTP && !YORADIO_QEMU
+    default n
+    help
+        Diagnostic only. Reuses one lwIP callback message and the HTTP profiler;
+        adds no task/stack. Traverses TCP lists only on the lwIP thread and logs
+        numeric counters, no addresses or packet contents. Reported sample age
+        must be subtracted when correlating with playback. Counts exclude Wi-Fi
+        buffers, TLS and application receive queues. Not a production default.
+
 config YORADIO_AAC_EARLY_SBR_RESERVE
     bool "Reserve AAC SBR state before core and PCM allocations"
     depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_QEMU_AAC_SBR_LAYOUT_TEST

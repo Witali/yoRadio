@@ -63,6 +63,10 @@ set(NATIVE_SRCS
   "web_ota.c"
   "websocket_service.c")
 
+if(CONFIG_YORADIO_NETWORK_HEAP_PROFILE)
+  list(APPEND NATIVE_SRCS "network_heap_profile.c")
+endif()
+
 if(CONFIG_YORADIO_QEMU)
   list(APPEND NATIVE_SRCS "native_audio_output_qemu.c")
   if(CONFIG_YORADIO_QEMU_AAC_TEST)
