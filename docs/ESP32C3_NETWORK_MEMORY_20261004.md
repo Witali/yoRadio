@@ -146,3 +146,19 @@ python tests/test-network-memory-evidence.py
 
 Passing evidence tests means the records and calculations are consistent;
 it never changes a recorded failed hardware test into a pass.
+
+## Signal recheck after the user's placement change
+
+At 11:46:41–11:47:26 UTC on 2026-10-04, a read-only status poll returned
+45 of 45 responses without a transport error. RSSI ranged from **−72 to
+−58 dBm**, with a **−71 dBm median** and final reading. HTTP response times
+were 78 ms median, 94 ms p95 and 110 ms maximum. All 45 responses reported
+active AAC PCM at 44.1 kHz stereo, 16-bit, without core-channel fallback.
+
+This placement is sufficient to continue qualification based on the observed
+connectivity and playback status. The 45-second poll does not establish
+long-duration stability or measure audible dropouts. Firmware, playback and
+settings were not changed for this check.
+
+The sanitized samples and calculated summary are saved in
+[signal-114641-utc.json](../tests/results/esp32c3-wifi-recheck-20261004/signal-114641-utc.json).
