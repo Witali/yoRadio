@@ -8,7 +8,7 @@
 #include "freertos/task.h"
 #include <assert.h>
 #include <string.h>
-#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
+#ifdef CONFIG_YORADIO_AAC_LATE_SBR
 #include "aac_analysis_core.h"
 extern const aac_analysis_sample_rates_t samp_rate_info;
 void __wrap_compact5_sbr_open(int rate,void *control,void *owner,int downsample);
@@ -42,7 +42,7 @@ void aac_compact_owner_test_assert_idle(void) { assert(!fail_request && !live_ow
 static aac_compact_owner_t *context(void) {
     return pvTaskGetThreadLocalStoragePointer(NULL,AAC_TLS_SLOT);
 }
-#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
+#ifdef CONFIG_YORADIO_AAC_LATE_SBR
 enum { AAC_CORE_FRAME_SAMPLES=1024, AAC_QMF_PREFIX_SAMPLES=288,
        AAC_SBR_BANK_SAMPLES=AAC_CORE_FRAME_SAMPLES+AAC_QMF_PREFIX_SAMPLES };
 int aac_late_sbr_retain(void) {
@@ -152,7 +152,7 @@ int __wrap_PVMP4AudioDecodeFrame(void *external,void *core) {
     aac_compact_owner_t *state=context();
     if(!state)return __real_PVMP4AudioDecodeFrame(external,core);
     assert(!((aac_core_abi_t *)core)->sbr || ((aac_core_abi_t *)core)->sbr==state->owner);
-#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
+#ifdef CONFIG_YORADIO_AAC_LATE_SBR
     aac_analysis_core_t *late_core=core;
     aac_analysis_external_t *late_external=external;
     assert(!state->late_core);
@@ -166,7 +166,7 @@ int __wrap_PVMP4AudioDecodeFrame(void *external,void *core) {
     aac_pointer_audit_core(core,external,false);
 #endif
     int result=compact5_PVMP4AudioDecodeFrame(external,core);
-#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
+#ifdef CONFIG_YORADIO_AAC_LATE_SBR
     state->late_core=NULL;
     if(!state->late_disabled && !result && late_core->plus_enabled && late_core->mc.sbr_present) {
         assert(late_core->mc.sample_rate_index>=0 && late_core->mc.sample_rate_index<12);
@@ -187,7 +187,7 @@ int __wrap_compact5_sbr_applied(void *owner,void *stream,void *left,void *right,
                               void *out_l,void *out_r,int channels,void *control,void *core,int out_channels) {
     aac_compact_owner_t *state=context();
     assert(state && state->owner==owner && !state->inside_sbr);
-#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
+#ifdef CONFIG_YORADIO_AAC_LATE_SBR
     aac_analysis_core_t *late_core=core;
     aac_sbr_control_abi_t *late_control=control;
     if(!state->late_disabled && !late_control->output_rate) {

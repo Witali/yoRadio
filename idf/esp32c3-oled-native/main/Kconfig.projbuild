@@ -18,15 +18,24 @@ config YORADIO_AAC_PLUS
         If disabled, status explicitly labels the decoder's PCM parameters;
         the public API cannot confirm the nominal source format in that mode.
 
-config YORADIO_QEMU_AAC_LATE_SBR_TEST
-    bool "Experiment with late implicit SBR activation (QEMU only)"
-    depends on YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST && YORADIO_AAC_PLUS
+config YORADIO_AAC_LATE_SBR
+    bool "Preserve implicit SBR/PS through late and missing extensions"
+    depends on YORADIO_AAC_COMPACT_SBR && YORADIO_AAC_PLUS
     default n
     help
-        Unqualified controller experiment. Keep extension parsing enabled,
-        initialize newly allocated SBR state and refresh PCM output metadata
-        without resetting the AAC transform history. Never flash this profile.
-        Requires adapter ownership/reset hooks for missing-SBR lifecycle tests.
+        Keep extension parsing active, initialize late SBR without resetting
+        AAC transform history, and retain established SBR/PS across frames
+        with no extension data. Uses the audited native controller branch.
+        QEMU PCM and fault tests pass; physical qualification remains open.
+
+config YORADIO_QEMU_AAC_LATE_SBR_TEST
+    bool "Test late implicit SBR activation and retention in QEMU"
+    depends on YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST && YORADIO_AAC_PLUS
+    select YORADIO_AAC_LATE_SBR
+    default n
+    help
+        Exercise the shared controller with PCM capture, failure injection,
+        reset and concurrent-decoder checks. Never flash the QEMU test image.
 
 config YORADIO_QEMU_AAC_LATE_SBR_CAPTURE
     bool "Capture exact transition PCM for storage A/B comparison"
@@ -379,14 +388,24 @@ config YORADIO_AAC_COMPACT_SBR
         Experimental until full-radio memory, CPU and OTA gates are met.
 
 config YORADIO_AAC_HIGH_HISTORY
-    bool "Pack retained high-QMF history with 18-bit mantissas"
+    bool "Pack retained high-QMF history"
     depends on YORADIO_AAC_COMPACT_SBR
     default n
     help
-        PC18 storage only; full-rate SBR/PS arithmetic stays int32. Shrinks
+        PC18 by default; full-rate SBR/PS arithmetic stays int32. Shrinks
         the compact owner from 49708 to 47980 bytes. Per-decoder TLS context
         isolates unpack/pack calls. Experimental until full-radio memory,
         CPU and OTA gates pass; production PCM error must be <=3 LSB.
+
+config YORADIO_AAC_HIGH_HISTORY_PC19
+    bool "Use 19-bit QMF mantissas with per-decoder extra bits"
+    depends on YORADIO_AAC_HIGH_HISTORY && !YORADIO_QEMU_AAC_HIGH_HISTORY_PC16
+    default n
+    help
+        Retain 19-bit real/imaginary mantissas and a shared four-bit shift.
+        Keep the PC18-sized owner and add 144 bytes to the decoder context.
+        Synthetic SBR-gap and retained real-recording PCM comparisons pass
+        the 3-LSB limit. Physical CPU, network/heap and OTA gates remain open.
 
 config YORADIO_AAC_SMOOTHING_HISTORY
     bool "Retain four SBR smoothing rows with a scoped fifth row"

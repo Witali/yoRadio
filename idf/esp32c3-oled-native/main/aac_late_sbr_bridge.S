@@ -1,4 +1,4 @@
-// QEMU-only branch bridge inside the pinned native AAC frame controller.
+// Audited branch bridge inside the pinned native AAC frame controller.
 // At entry a4 is the parsed SBR-element count. The original branch consumes
 // a4; the two continuations are exported from verified native local labels.
 // Preserve every other caller-saved RV32IMC register across the C predicate.

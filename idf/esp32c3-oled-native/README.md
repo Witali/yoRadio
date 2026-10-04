@@ -241,11 +241,23 @@ With Helix, `HE-AAC 44.1 kHz core mono` means SBR was detected but PS stereo was
 not confirmed; the actual PCM may still be 22.05 kHz mono.
 
 ADTS rate/channel/profile changes recreate the Espressif decoder at the frame
-boundary. **Known SDK limitation:** introducing SBR/PS with an identical ADTS
+boundary. **Unmodified SDK limitation:** introducing SBR/PS with an identical ADTS
 configuration after AAC-LC can leave core-only output until Stop/Play or a stream
 restart. The status then explicitly reports actual `AAC PCM` parameters.
 This case remains in the TODO; it is not hidden by doubling the displayed rate.
 See the [validation report](../../docs/ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md).
+
+The opt-in `sdkconfig.aac-pc19.defaults` qualification profile combines the
+compact SBR owner with `CONFIG_YORADIO_AAC_HIGH_HISTORY_PC19` and
+`CONFIG_YORADIO_AAC_LATE_SBR`. The first keeps 19-bit QMF mantissas with 144 bytes
+of extra per-decoder metadata. The second repairs late activation and retains
+SBR/PS through frames without extensions, preserving the AAC transform history.
+Both options work in the network firmware; QEMU test options remain separate.
+The shared implementation passed synthetic/recorded PCM tests within 3 LSB.
+Keep the existing 16 KiB decoder stack and the pinned AAC archive. This is an
+experimental physical-test profile; it does not change the board defaults.
+Before deployment, `tools/codec_benchmark/verify_aac_network_build.py` checks
+the actual linked calls, type sizes, image/ELF match and absence of QEMU hooks.
 
 Both native ESP-IDF profiles default to Espressif MP3. With the deterministic
 320 kbit/s fixture, the 160 MHz C3 measured 27.9% decoder time for Espressif

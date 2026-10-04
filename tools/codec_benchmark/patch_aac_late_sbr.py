@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Route one verified native branch through a QEMU-only SBR retention predicate.
+"""Route one verified native branch through the SBR retention predicate.
 
 No DSP instructions, input syntax or structure offsets are changed. Native
 continuations come from the pinned object's local symbol and branch relocation.

@@ -13,7 +13,7 @@ typedef struct {
 #ifdef YORADIO_AAC_PROFILE_METADATA
     aac_profile_state_t profile;
 #endif
-#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
+#ifdef CONFIG_YORADIO_AAC_LATE_SBR
     void *late_core; // Valid only inside the scoped native frame call.
     bool late_disabled; // Per-decoder unmodified-controller PCM control.
 #endif
