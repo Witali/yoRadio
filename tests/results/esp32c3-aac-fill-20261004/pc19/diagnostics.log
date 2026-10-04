@@ -1,0 +1,401 @@
+ESP-ROM:esp32c3-api1-20210207
+Build:Feb  7 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fcd5830,len:0x155c
+load:0x403cbf10,len:0xce0
+load:0x403ce710,len:0x2fcc
+entry 0x403cbf1a
+I (0) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (0) boot: compile time Oct  4 2026 16:16:10
+I (0) boot: chip revision: v0.3
+I (0) boot: efuse block revision: v1.3
+I (0) boot.esp32c3: SPI Speed      : 80MHz
+I (0) boot.esp32c3: SPI Mode       : SLOW READ
+I (0) boot.esp32c3: SPI Flash Size : 4MB
+I (0) boot: Enabling RNG early entropy source...
+I (0) boot: Partition Table:
+I (0) boot: ## Label            Usage          Type ST Offset   Length
+I (0) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (0) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (0) boot:  2 app0             OTA app          00 10 00010000 001d0000
+I (0) boot:  3 app1             OTA app          00 11 001e0000 001d0000
+I (0) boot:  4 spiffs           Unknown data     01 82 003b0000 00040000
+I (0) boot:  5 coredump         Unknown data     01 03 003f0000 00010000
+I (0) boot: End of partition table
+I (0) boot: No factory image, trying OTA 0
+I (0) esp_image: segment 0: paddr=00010020 vaddr=3c050020 size=2d338h (185144) map
+I (2) esp_image: segment 1: paddr=0003d360 vaddr=3fc8a800 size=01abch (  6844) load
+I (2) esp_image: segment 2: paddr=0003ee24 vaddr=40380000 size=011f4h (  4596) load
+I (3) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=4c6f4h (313076) map
+I (6) esp_image: segment 4: paddr=0008c71c vaddr=403811f4 size=09488h ( 38024) load
+I (7) esp_image: segment 5: paddr=00095bac vaddr=50000000 size=00024h (    36) load
+I (7) boot: Loaded app from partition at offset 0x10000
+I (7) boot: Set actual ota_seq=1 in otadata[0]
+I (7) boot: Disabling RNG early entropy source...
+I (7) cpu_start: Unicore app
+I (15) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
+I (15) cpu_start: Pro cpu start user code
+I (15) cpu_start: cpu freq: 160000000 Hz
+I (15) app_init: Application information:
+I (15) app_init: Project name:     yoradio_esp32c3_oled_native
+I (15) app_init: App version:      v0.9.693-1168-g257d5322-dirty
+I (15) app_init: Compile time:     Oct  4 2026 18:40:10
+I (15) app_init: ELF file SHA256:  77e33a871...
+I (15) app_init: ESP-IDF:          v6.0.2
+I (15) efuse_init: Min chip rev:     v0.3
+I (15) efuse_init: Max chip rev:     v1.99 
+I (15) efuse_init: Chip rev:         v0.3
+I (15) heap_init: Initializing. RAM available for dynamic allocation:
+I (15) heap_init: At 3FC8DBD0 len 00032430 (201 KiB): RAM
+I (15) heap_init: At 3FCC0000 len 0001C710 (113 KiB): Retention RAM
+I (15) heap_init: At 3FCDC710 len 00002950 (10 KiB): Retention RAM
+I (15) heap_init: At 50000024 len 00001FC4 (7 KiB): RTCRAM
+I (15) spi_flash: detected chip: gd
+I (15) spi_flash: flash io: dio
+I (15) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (15) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (15) main_task: Started on CPU0
+I (15) main_task: Calling app_main()
+I (15) yoradio_c3: Starting pure ESP-IDF ESP32-C3 OLED yoRadio
+I (15) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (15) runtime_settings: Restored aif=0 softap=0 abuff=10 watchdog=1 tz=0:00 timeint=60 vols=1 enca=200
+W (15) yoradio_c3: QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO disabled
+I (15) oled: SSD1306 72x40 ready at I2C 0x3c
+I (15) audio_output: QEMU stereo PCM ready at 48000 Hz
+I (15) main_task: Returned from app_main()
+I (115) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (116) yoradio_c3: QEMU_AUDIO_PASS 24000 stereo frames
+AAC_FIL_NATIVE_OVERRUN sbr_cursor=2164 fill_cursor=2164 frame_bits=16 checked_cursor=16
+AAC_FIL_PARSER_PASS valid_cases=69376 count_encodings=271 alignments=8 extension_types=16 slot_states=2
+AAC_FAULT_BEGIN kind=late_oom parity=1 allocation=owner
+Disable AAC-Plus for memory not enough, decode continue
+AAC_FAULT_OUTCOME public_error=-2 pcm_bytes=0
+AAC_LATE_OOM_PASS parity=1 allocation=owner suppressed_pcm=1 recovery_frames=15
+AAC_FAULT_BEGIN kind=late_oom parity=1 allocation=control
+Disable AAC-Plus for memory not enough, decode continue
+AAC_FAULT_OUTCOME public_error=-2 pcm_bytes=0
+AAC_LATE_OOM_PASS parity=1 allocation=control suppressed_pcm=1 recovery_frames=15
+AAC_FAULT_BEGIN kind=late_oom parity=0 allocation=owner
+Disable AAC-Plus for memory not enough, decode continue
+AAC_FAULT_OUTCOME public_error=-2 pcm_bytes=0
+AAC_LATE_OOM_PASS parity=0 allocation=owner suppressed_pcm=1 recovery_frames=15
+AAC_FAULT_BEGIN kind=late_oom parity=0 allocation=control
+Disable AAC-Plus for memory not enough, decode continue
+AAC_FAULT_OUTCOME public_error=-2 pcm_bytes=0
+AAC_LATE_OOM_PASS parity=0 allocation=control suppressed_pcm=1 recovery_frames=15
+AAC_FAULT_BEGIN kind=malformed case=header_only
+E (656) ESP_AAC_DEC: Failed to decode aac frame, error:20.
+AAC_FAULT_OUTCOME public_error=0 pcm_bytes=0
+AAC_MALFORMED_PASS case=header_only recovery_frames=15
+AAC_FAULT_BEGIN kind=malformed case=sbr_truncated
+E (688) ESP_AAC_DEC: Failed to decode aac frame, error:30.
+AAC_FAULT_OUTCOME public_error=0 pcm_bytes=0
+AAC_MALFORMED_PASS case=sbr_truncated recovery_frames=15
+AAC_FAULT_BEGIN kind=malformed case=sbr_count_overrun
+E (720) ESP_AAC_DEC: Failed to decode aac frame, error:30.
+AAC_FAULT_OUTCOME public_error=0 pcm_bytes=0
+AAC_MALFORMED_PASS case=sbr_count_overrun recovery_frames=15
+AAC_FAULT_BEGIN kind=malformed case=fill_count_overrun
+E (752) ESP_AAC_DEC: Failed to decode aac frame, error:30.
+AAC_FAULT_OUTCOME public_error=0 pcm_bytes=0
+AAC_MALFORMED_PASS case=fill_count_overrun recovery_frames=15
+AAC_FAULTS_PASS late_oom=4 malformed=4 recoveries=8 heap=valid
+AAC_METADATA_CASE case=hev2_44100_stereo label=HE-AACv2 source_channels=2 pcm_channels=2 rate=44100 frames=15
+AAC_METADATA_CASE case=he_mono_metadata label=HE-AAC source_channels=1 pcm_channels=2 rate=32000 frames=11
+AAC_METADATA_CASE case=lc_48000_stereo label=AAC source_channels=2 pcm_channels=2 rate=48000 frames=26
+AAC_METADATA_CASE case=he_48000_stereo label=HE-AAC source_channels=2 pcm_channels=2 rate=48000 frames=15
+AAC_METADATA_CASE case=hev2_44100_stereo label=HE-AACv2 source_channels=2 pcm_channels=2 rate=44100 frames=15
+AAC_METADATA_CASE case=he_mono_metadata label=HE-AAC source_channels=1 pcm_channels=2 rate=32000 frames=11
+AAC_METADATA_CASE case=he_mono_metadata label=HE-AAC source_channels=1 pcm_channels=2 rate=32000 frames=11
+AAC_METADATA_RESET_PASS
+AAC_METADATA_PASS frames=104 decoder_isolation=2 mono_duplicated=verified heap=valid
+I (970) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (998) qemu_aac: QEMU_AAC_CASE_PASS HE44 first: 44100 Hz 2 ch, 14 frames, 28672 samples, free 203384 min 115548
+I (1217) qemu_aac: QEMU_AAC_CASE_PASS LC44 stereo: 44100 Hz 2 ch, 24 frames, 24576 samples, free 237376 min 115548
+I (1217) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (1637) qemu_aac: QEMU_AAC_CASE_PASS LC22 mono: 22050 Hz 1 ch, 13 frames, 13312 samples, free 237236 min 115548
+I (1637) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (2197) qemu_aac: QEMU_AAC_CASE_PASS LC48 stereo: 48000 Hz 2 ch, 26 frames, 26624 samples, free 237236 min 115548
+I (2198) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (2847) qemu_aac: QEMU_AAC_CASE_PASS HE44 stereo: 44100 Hz 2 ch, 14 frames, 28672 samples, free 203244 min 115548
+I (2848) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (3487) qemu_aac: QEMU_AAC_CASE_PASS HE48 stereo: 48000 Hz 2 ch, 15 frames, 30720 samples, free 203244 min 115548
+I (3488) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (4177) qemu_aac: QEMU_AAC_CASE_PASS HEv2 stereo: 44100 Hz 2 ch, 15 frames, 30720 samples, free 203244 min 115548
+I (4177) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (4787) qemu_aac: QEMU_AAC_CASE_PASS LC22 same header: 22050 Hz 1 ch, 13 frames, 13312 samples, free 237248 min 115548
+I (4788) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (5477) qemu_aac: QEMU_AAC_CASE_PASS Implicit SBR full: 44100 Hz 2 ch, 15 frames, 30720 samples, free 203256 min 115548
+I (5477) qemu_aac: QEMU_AAC_LATE_SBR_FORMAT_PASS history retained; PCM quality still unqualified
+I (6177) qemu_aac: QEMU_AAC_CASE_PASS HEv2 restart: 44100 Hz 2 ch, 15 frames, 30720 samples, free 203784 min 115548
+AAC_PC19_METADATA_PASS pairs_per_channel=288 channels=2 real_clear=exact full_clear=exact reopen=zero side_bytes=144
+AAC_PC19_REOPEN_PASS channels=distinct channel_cursor=preserved sbr_open=zero ps_overlay=preserved
+I (6249) late_sbr: AAC_LATE_SBR_PCM_PASS case=lc_44100_stereo repeats=3 frames=72 channel_samples=147456 max_error_lsb=0 pcm_hash=830cc1d8
+I (6288) late_sbr: AAC_LATE_SBR_PCM_PASS case=lc_22050_mono repeats=3 frames=39 channel_samples=39936 max_error_lsb=0 pcm_hash=e71fe2d0
+I (6366) late_sbr: AAC_LATE_SBR_PCM_PASS case=lc_48000_stereo repeats=3 frames=78 channel_samples=159744 max_error_lsb=0 pcm_hash=757b7f1a
+I (6505) late_sbr: AAC_LATE_SBR_PCM_PASS case=he_44100_stereo repeats=3 frames=42 channel_samples=172032 max_error_lsb=0 pcm_hash=72a522ac
+I (6653) late_sbr: AAC_LATE_SBR_PCM_PASS case=he_48000_stereo repeats=3 frames=45 channel_samples=184320 max_error_lsb=0 pcm_hash=22097ca9
+I (6839) late_sbr: AAC_LATE_SBR_PCM_PASS case=hev2_44100_stereo repeats=3 frames=45 channel_samples=184320 max_error_lsb=0 pcm_hash=65841ae2
+I (6941) late_sbr: AAC_LATE_SBR_PARITY_PASS lc_frames=13 he_frames=15 rate=44100 channels=2
+I (6941) late_sbr: AAC_LATE_SBR_RETAIN_PASS missing_frames=13 resumed_frames=15 rate=44100 channels=2
+I (7056) late_sbr: AAC_LATE_SBR_PARITY_PASS lc_frames=26 he_frames=15 rate=44100 channels=2
+I (7056) late_sbr: AAC_LATE_SBR_RETAIN_PASS missing_frames=13 resumed_frames=15 rate=44100 channels=2
+AAC_LATE_PCM_FRAME frame=1 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=2 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=3 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=4 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=5 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=6 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=7 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=8 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=9 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=10 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=11 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=12 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=13 rate=22050 channels=1 bytes=2048
+AAC_LATE_PCM_FRAME frame=14 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=15 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=16 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=17 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=18 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=19 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=20 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=21 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=22 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=23 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=24 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=25 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=26 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=27 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=28 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=29 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=30 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=31 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=32 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=33 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=34 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=35 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=36 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=37 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=38 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=39 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=40 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=41 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=42 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=43 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=44 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=45 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=46 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=47 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=48 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=49 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=50 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=51 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=52 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=53 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=54 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=55 rate=44100 channels=2 bytes=8192
+AAC_LATE_PCM_FRAME frame=56 rate=44100 channels=2 bytes=8192
+I (7327) late_sbr: AAC_LATE_SBR_OUTPUT_PASS frames=56 channel_samples=189440 poison_patterns=2
+AAC_GAP_WORK_COUNTER nop1024=1025
+AAC_GAP_ADAPTER_MEMORY requested=204 allocated=204
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=0 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=1 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=2 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=3 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=4 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=5 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=6 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=7 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=8 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=9 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=10 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=11 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=12 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=0 frame=13 rate=44100 channels=2 bytes=8192
+AAC_GAP_WORK case=he_44100_stereo phase=0 frames=14 calls=108 instructions=20873435
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=0 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=1 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=2 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=3 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=4 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=5 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=6 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=7 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=8 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=9 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=10 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=11 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=12 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=1 frame=13 rate=44100 channels=2 bytes=8192
+AAC_GAP_WORK case=he_44100_stereo phase=1 frames=14 calls=103 instructions=21185035
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=0 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=1 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=2 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=3 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=4 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=5 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=6 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=7 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=8 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=9 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=10 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=11 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=12 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_44100_stereo phase=2 frame=13 rate=44100 channels=2 bytes=8192
+AAC_GAP_WORK case=he_44100_stereo phase=2 frames=14 calls=108 instructions=20193953
+AAC_GAP_PASS case=he_44100_stereo frames_per_phase=14 phases=3 reset_vs_fresh=exact partial_close=9
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=0 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=1 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=2 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=3 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=4 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=5 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=6 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=7 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=8 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=9 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=10 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=11 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=12 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=13 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=0 frame=14 rate=48000 channels=2 bytes=8192
+AAC_GAP_WORK case=he_48000_stereo phase=0 frames=15 calls=111 instructions=22536620
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=0 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=1 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=2 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=3 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=4 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=5 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=6 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=7 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=8 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=9 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=10 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=11 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=12 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=13 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=1 frame=14 rate=48000 channels=2 bytes=8192
+AAC_GAP_WORK case=he_48000_stereo phase=1 frames=15 calls=111 instructions=23102425
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=0 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=1 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=2 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=3 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=4 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=5 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=6 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=7 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=8 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=9 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=10 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=11 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=12 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=13 rate=48000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_48000_stereo phase=2 frame=14 rate=48000 channels=2 bytes=8192
+AAC_GAP_WORK case=he_48000_stereo phase=2 frames=15 calls=111 instructions=21859632
+AAC_GAP_PASS case=he_48000_stereo frames_per_phase=15 phases=3 reset_vs_fresh=exact partial_close=9
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=0 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=1 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=2 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=3 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=4 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=5 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=6 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=7 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=8 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=9 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=10 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=11 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=12 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=13 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=0 frame=14 rate=44100 channels=2 bytes=8192
+AAC_GAP_WORK case=hev2_44100_stereo phase=0 frames=15 calls=59 instructions=27964663
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=0 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=1 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=2 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=3 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=4 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=5 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=6 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=7 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=8 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=9 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=10 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=11 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=12 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=13 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=1 frame=14 rate=44100 channels=2 bytes=8192
+AAC_GAP_WORK case=hev2_44100_stereo phase=1 frames=15 calls=59 instructions=28222138
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=0 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=1 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=2 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=3 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=4 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=5 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=6 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=7 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=8 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=9 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=10 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=11 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=12 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=13 rate=44100 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=hev2_44100_stereo phase=2 frame=14 rate=44100 channels=2 bytes=8192
+AAC_GAP_WORK case=hev2_44100_stereo phase=2 frames=15 calls=59 instructions=28066492
+AAC_GAP_PASS case=hev2_44100_stereo frames_per_phase=15 phases=3 reset_vs_fresh=exact partial_close=9
+AAC_GAP_MONO_CONTROL_PASS source_channels=1 pcm_channels=2 rate=32000 duplicated_pairs=exact controller_pcm=exact
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=0 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=1 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=2 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=3 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=4 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=5 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=6 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=7 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=8 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=9 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=0 frame=10 rate=32000 channels=2 bytes=8192
+AAC_GAP_WORK case=he_32000_mono phase=0 frames=11 calls=43 instructions=12809376
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=0 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=1 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=2 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=3 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=4 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=5 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=6 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=7 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=8 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=9 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=1 frame=10 rate=32000 channels=2 bytes=8192
+AAC_GAP_WORK case=he_32000_mono phase=1 frames=11 calls=43 instructions=12778924
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=0 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=1 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=2 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=3 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=4 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=5 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=6 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=7 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=8 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=9 rate=32000 channels=2 bytes=8192
+AAC_GAP_PCM_FRAME case=he_32000_mono phase=2 frame=10 rate=32000 channels=2 bytes=8192
+AAC_GAP_WORK case=he_32000_mono phase=2 frames=11 calls=43 instructions=12853151
+AAC_GAP_PASS case=he_32000_mono frames_per_phase=11 phases=3 reset_vs_fresh=exact partial_close=9
+AAC_GAP_SUITE_PASS cases=4 capture_channel_samples=675840 heap=valid
+I (8604) late_sbr: AAC_LATE_SBR_REGRESSION_PASS ordinary_cases=6 parities=2 transition_pcm_quality=unqualified
+I (8604) compact_adapter: AACCOMPACT_MEMORY owner_bytes=32744 block_bytes=32756 context_bytes=176
+Disable AAC-Plus for memory not enough, decode continue
+Disable AAC-Plus for memory not enough, decode continue
+I (8755) compact_adapter: AACSMOOTHING_STACK task_stack_bytes=16384 min_free_bytes=2844 concurrent_peak=2
+I (8757) compact_adapter: AACCOMPACT_CONCURRENT_PASS decoders=2 samples=61440 pcm_hash=0a231a11
+I (8757) compact_adapter: AACCOMPACT_ADAPTER_PASS failures=2 tasks=2 resets=2 samples=61440 cleanup=complete heap=valid
+I (8757) aac_pointer: AAC_POINTER_PASS checks=1186037 core=4004 frames=3782 ps=1364 smoothing=2625 allocations=696 frees=696 negative_cases=10 envelopes=1891 resets=14 io=2002 copies=79106
+I (8757) aac_pointer: AAC_POINTER_BOUNDARY_PASS applied=2738 decode_io=3782 ps_bits=1140 release_negative_cases=6 boundary_negative_cases=5
+I (8757) aac_pointer: AAC_LOW_POINTER_PASS bindings=1891 negative_cases=6
+I (8757) low_workspace: AAC_LOW_WORKSPACE_PASS owner_bytes=32744 work_bytes=10240 stored_bytes=4096 calls=1891
+I (8757) compact_adapter: AAC_ASYMMETRIC_OWNER_PASS owner_bytes=32744 left_bytes=14776 right_bytes=17956 frame_offset=96
+I (8757) qemu_aac: QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes
+I (8757) yoradio_c3: QEMU_OLED_PASS 72x40 framebuffer presented
+I (8757) yoradio_c3: QEMU_SMOKE_PASS OLED, audio, NVS, SPIFFS and FreeRTOS; free heap: 300328 bytes

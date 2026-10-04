@@ -505,6 +505,13 @@ skip a malformed frame with OK/zero output; the tests now account for that.
 This does not qualify every input read: bounded FIL parsing, broader truncation,
 same-decoder recovery, physical and all-codec gates remain open.
 
+FIL follow-up: [bounded fill-element parsing](ESP32C3_AAC_FILL_BOUNDS_20261004.md)
+reproduces the native cursor overrun and replaces both FIL helpers with checked
+byte reads. Plain/compact QEMU comparisons and 343,475 truncated host cases pass;
+865,280 subsequent PCM samples remain exact. The physical integration image is
+saved, with no new persistent RAM. Other input readers, broader malformed syntax,
+same-decoder recovery and physical/all-codec qualification remain open.
+
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
 - [ ] Run the complete host test suite.

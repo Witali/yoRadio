@@ -192,6 +192,8 @@ static void check_fixture(native_aac_decoder_t *decoder,
 void qemu_aac_test(native_state_t *state, oled_display_t *display) {
     assert(esp_aac_dec_register() == ESP_AUDIO_ERR_OK);
     assert(esp_audio_simple_dec_register_default() == ESP_AUDIO_ERR_OK);
+    void qemu_aac_fill_test(void);
+    qemu_aac_fill_test();
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
     void qemu_aac_faults_test(void);
     qemu_aac_faults_test();

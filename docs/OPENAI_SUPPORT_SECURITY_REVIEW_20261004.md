@@ -70,14 +70,15 @@ code; QEMU and sanitizers are not a guarantee against every possible defect.
   recovery checks, followed by 120 HE-AACv2 recovery frames.
 - Following the parser change, 865,280 captured PCM channel samples remained
   byte-identical to the prior candidate output.
-- A separate build without compact SBR exposed a linker-integration error.
-  That build is not reported as passing; its correction and verification remain
-  part of ongoing development. The new parser has not been physically qualified.
+- A separate build without compact SBR initially exposed a linker-integration
+  error. Explicit wrapper linkage corrected it; subsequent plain and compact
+  QEMU builds pass. The physical integration image builds, but the new parser
+  has not been physically qualified.
 
 The committed fault-test evidence is in
-`tests/results/esp32c3-aac-faults-20261004/`. Current parser evidence is in local
-development outputs `.build/aac-fill/pc19/` and `.build/aac-fill-host/`, pending
-the next tested implementation commit. Results apply to these tested cases and
+`tests/results/esp32c3-aac-faults-20261004/`. The subsequent parser evidence is
+retained in `tests/results/esp32c3-aac-fill-20261004/`, including the initial
+link failure and final passing runs. Results apply to these tested cases and
 do not establish universal malformed-input safety or full production readiness.
 
 ## Request to support
