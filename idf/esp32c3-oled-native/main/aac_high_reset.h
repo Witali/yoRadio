@@ -14,7 +14,7 @@ static inline void aac_high_reset_core(aac_core_abi_t *core,
             memset(channel->ltp_history+1312,0,288*sizeof(channel->ltp_history[0]));
             aac_high_frame_t *frame=(void *)sbr->frame[ch];
             aac_high_channel_view_t *owner_channel=(void *)((uint8_t *)frame-offsetof(aac_high_channel_t,frame));
-            int16_t *synthesis=ch && core->channels==1 && sbr->ps_initialized ?
+            int16_t *synthesis=ch && core->ps_present==1 && sbr->ps_initialized ?
                 aac_high_ps_synthesis(owner_channel):frame->synthesis;
             memset(synthesis,0,sizeof(frame->synthesis));
             memset(frame->previous_noise,0,sizeof(frame->previous_noise));
@@ -32,7 +32,7 @@ static inline void aac_high_reset_core(aac_core_abi_t *core,
             memset(right->previous_bandwidth,0,sizeof(right->previous_bandwidth));
             memset(right->gain_mantissa,0,sizeof(right->gain_mantissa));
             memset(right->noise_mantissa,0,sizeof(right->noise_mantissa));
-        } else if(core->channels==1 && sbr->ps_initialized) {
+        } else if(core->ps_present==1 && sbr->ps_initialized) {
             aac_hybrid_abi_t *hybrid=ps->hybrid;
             for(unsigned row=0;row<3;++row) {
                 memset(hybrid->real_history[row],0,12*sizeof(int32_t));

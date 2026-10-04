@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from aac_symbolic_layouts import assert_archive_layout
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
@@ -54,7 +55,10 @@ class SymbolicTests(unittest.TestCase):
         meta = read(DATA/'types.json')
         self.assertEqual(set(meta['parameters']['sbr_applied']),{'0','7','8'})
         source = (DATA/'pseudocode/sbr_applied.c').read_text()
-        self.assertIn('core->channels',source)
+        # This immutable export used the wrong PS-field name. Check the corrected
+        # export for its meaning; old file bytes are verified by provenance above.
+        corrected = (ROOT/'docs/audits/esp32c3-aac-core-symbolic-20261001/pseudocode/sbr_applied.c').read_text()
+        self.assertIn('(core->mc).ps_present', corrected)
         self.assertIn('sbr_read_data(owner,control,',source)
         self.assertNotIn('core == (aac_core_abi_t *)0x2',source)
         self.assertIn('enable_iid',(DATA/'pseudocode/ps_read_data.c').read_text())
@@ -66,9 +70,7 @@ class SymbolicTests(unittest.TestCase):
             subprocess.run([sys.executable,str(ROOT/'tools/codec_benchmark/prepare_aac_symbolic.py'),
                             '--compiler',str(COMPILER),'--output',folder],check=True,capture_output=True)
             new = read(Path(folder)/'types.json'); old = read(DATA/'types.json')
-            self.assertEqual(new['types'],old['types'])
-            self.assertEqual(new['parameters'],old['parameters'])
-            self.assertEqual(new['nodes'],old['nodes'])
+            assert_archive_layout(self, new, old)
 
 
 if __name__ == '__main__':

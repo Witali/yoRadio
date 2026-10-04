@@ -1,5 +1,12 @@
 # AAC decompilation with named structure fields
 
+**Field-name correction (2026-10-04):** this historical export incorrectly names
+the core field at `0xc0` as `channels`. Its verified meaning is `ps_present`, the
+Parametric Stereo flag. Use the [corrected core export](../esp32c3-aac-core-symbolic-20261001/README.md)
+and the current runtime header for further work. The old pseudocode, type JSON
+and implementation snapshots retain their original bytes for checksum validation;
+their old field name must not be copied into working code.
+
 This is a separate analysis of the same pinned binary as the
 [immutable raw export](../esp32c3-aac-full-20261001/README.md). All **186 functions**
 are present at the same addresses and with the same machine-code body sizes.
@@ -86,3 +93,8 @@ exporter. Inspect the headless log and `applied-types.json`; Ghidra can return
 exit code zero after a script error. The retained provenance covers the exact
 export, compiler metadata, log and tool/header snapshots. Documentation prose
 is maintained separately from those hashes.
+
+Current headers generate `ps_present` and also expose `sbr_present` at `0xbc`.
+Tests compare their complete semantic layouts with the archived types, allowing
+only this documented naming/splitting correction. To reproduce the old labels
+byte for byte, use the retained implementation snapshots.

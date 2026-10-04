@@ -42,7 +42,7 @@ static inline void aac_sbr_reset_core(aac_core_abi_t *core,
             memset(right->previous_bandwidth,0,sizeof(right->previous_bandwidth));
             memset(right->gain_mantissa,0,sizeof(right->gain_mantissa));
             memset(right->noise_mantissa,0,sizeof(right->noise_mantissa));
-        } else if(core->channels==1 && sbr->ps_initialized) {
+        } else if(core->ps_present==1 && sbr->ps_initialized) {
             aac_hybrid_abi_t *hybrid=ps->hybrid;
             for(unsigned row=0;row<3;++row) {
                 memset(hybrid->real_history[row],0,12*sizeof(int32_t));

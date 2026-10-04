@@ -33,11 +33,20 @@ the original untyped export. Two data tables are resolved by their ELF symbols,
 | Table base + index × stride + field offset | `hcbbook_binary.entry[i].signed_codebook`, `samp_rate_info.entry[i].long_bands` | getics, huffspec_fxp, infoinit |
 
 The native core's `0xc0` field is a **PS-present flag**, not a channel count.
-The older minimal runtime view called it `channels`; the extended analysis gives
-it its verified meaning. Likewise, external API offset `0x34` is **bitrate** in
+The older minimal runtime view incorrectly called it `channels`. Since
+2026-10-04, the runtime header and all reset consumers use `ps_present`, matching
+this analysis. The neighboring `sbr_present` flag is exposed at `0xbc`; compile-time
+checks require both views to agree. The actual encoded channel count remains
+`mc.channels`, a separate field. Likewise, external API offset `0x34` is **bitrate** in
 this binary, and wrapper byte `0x50` saves the AAC-Plus setting for reset.
 These meanings were checked against computations and writers, not copied from
 an upstream structure with a different layout.
+
+Historical type JSON and implementation snapshots in this audit and
+`tests/results/` preserve the old name to keep their recorded hashes valid.
+They are evidence of earlier builds, not current header templates. New exports
+use the corrected names; the layout regression tests permit only the documented
+PS rename and the split of the existing configuration bytes into `sbr_present`.
 
 The analysis header is
 [`aac_analysis_core.h`](../../../tools/codec_benchmark/aac_analysis_core.h),
@@ -122,5 +131,6 @@ python tests/test-aac-full-decompile.py
 
 Require both the successful import/export log markers and the complete manifest;
 Ghidra may exit with code zero after a script error. Omitting `--include-core`
-preserves reproduction of the older SBR/PS export. `provenance.json` protects
+selects the smaller SBR/PS analysis with current field names. Reproducing the
+old names requires the archived implementation snapshots. `provenance.json` protects
 the exact evidence bytes; this explanatory README is maintained separately.

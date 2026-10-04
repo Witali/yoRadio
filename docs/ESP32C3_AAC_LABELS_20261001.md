@@ -6,6 +6,18 @@ same 186 functions, with 63 checked layouts. It also records unresolved optimize
 aliases explicitly. Use that export for further memory work; the earlier evidence
 below remains unchanged.
 
+Field-name correction, 2026-10-04: the runtime core field at `0xc0` is now
+`ps_present` everywhere it is consumed. The former `channels` name was wrong:
+this is the Parametric Stereo flag, not a channel count. The separate SBR flag
+at `0xbc` is named `sbr_present`. Both agree with the extended analysis view;
+structure sizes and decoder arithmetic are unchanged. Archived source snapshots
+retain their original bytes and hashes; do not reuse their obsolete field name.
+
+Rename verification: all 17 symbolic/core/ABI checks pass with the RV32 compiler.
+The complete RV32 objects containing both reset functions are byte-identical to
+their pre-rename versions in five configurations: PC18, PC16, PC19, PC19 with
+side metadata, and PC19 with side metadata plus low-workspace/four-row smoothing.
+
 ## Compiled code
 
 The follow-up audit found private-structure offsets in two older experimental

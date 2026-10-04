@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from aac_symbolic_layouts import assert_archive_layout
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools/codec_benchmark'))
@@ -97,8 +98,7 @@ class CoreSymbolicTests(unittest.TestCase):
                             '--include-core','--compiler',str(COMPILER),'--output',folder],
                            check=True,capture_output=True)
             new = read(Path(folder)/'types.json'); old = read(DATA/'types.json')
-            for key in ('types','nodes','parameters','data_symbols','analysis_regions'):
-                self.assertEqual(new[key],old[key],key)
+            assert_archive_layout(self, new, old)
 
     def test_layout_drift_fails_compilation(self):
         if COMPILER is None: self.skipTest('Pass --compiler for the negative layout test')

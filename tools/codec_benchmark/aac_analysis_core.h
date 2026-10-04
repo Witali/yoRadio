@@ -243,7 +243,12 @@ AAC_ANALYSIS_OFFSET(aac_analysis_core_t, program, 0x2c);
 AAC_ANALYSIS_OFFSET(aac_analysis_core_t, long_window, 0x70);
 AAC_ANALYSIS_OFFSET(aac_analysis_core_t, window_map, 0x78);
 AAC_ANALYSIS_OFFSET(aac_analysis_core_t, mc, 0x8c);
+AAC_ANALYSIS_OFFSET(aac_analysis_core_t, mc.sbr_present, 0xbc);
 AAC_ANALYSIS_OFFSET(aac_analysis_core_t, mc.ps_present, 0xc0);
+_Static_assert(offsetof(aac_analysis_core_t, mc.sbr_present)==offsetof(aac_core_abi_t, sbr_present),
+               "Analysis/runtime SBR flag must agree");
+_Static_assert(offsetof(aac_analysis_core_t, mc.ps_present)==offsetof(aac_core_abi_t, ps_present),
+               "Analysis/runtime PS flag must agree (not channel count)");
 AAC_ANALYSIS_OFFSET(aac_analysis_core_t, channel, 0xf0);
 AAC_ANALYSIS_OFFSET(aac_analysis_core_t, spectral, 0x4a58);
 AAC_ANALYSIS_OFFSET(aac_analysis_core_t, sbr, 0x8a58);
