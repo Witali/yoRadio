@@ -1,0 +1,208 @@
+Building/checking generic32 host PCM oracle (no target hardware)
+QEMU LX106: esp8266-opus-pvq-n3-unroll4-candidate-v1 mono-12, mono-24, stereo-64, stereo-128, stereo-192, stereo-320-2.5ms, stereo-320-5ms, stereo-320-10ms, stereo-320-20ms, stereo-510, 192-120ms, 320-120ms, 320-48frames
+{
+  "passed": true,
+  "scope": "QEMU LX106 instruction execution and PCM correctness; NOT hardware timing or full ESP8266 emulation",
+  "variant": "esp8266-opus-pvq-n3-unroll4-candidate-v1",
+  "elf_sha256": "edc7a956c844039ef9a061a349119ed558947a8ad4fb5dbe12d02708eeaf5e4c",
+  "qemu": "QEMU emulator version 9.2.2 (DosToEsp QEMU-ESP32)\r\nCopyright (c) 2003-2024 Fabrice Bellard and the QEMU Project developers",
+  "qemu_sha256": "0e8af8cfdfcb76bff9f09084990852e35f2c0754ca2bdbb622ba8cfb8add59b6",
+  "compiler": "xtensa-lx106-elf-gcc.exe (crosstool-NG esp-2020r3-49-gd5524c1) 8.4.0",
+  "harness_elf_sha256": "b2d835c40b382519f65c151d9425aa386509860ab2a5f728496d65f0977f2ba9",
+  "recipe_hashes": {
+    "run.cjs": "34918324156fcfaa7bf49f215c5addeacb5d406d9b089800aeb00530764669af",
+    "harness.c": "5a7f7389d8a2d5f83bf15e7d6d917080864bb1b69f43bd9a15da76a1310e96a5",
+    "boot.S": "39f30341e9c4328682e03958bf1dbb2baa7b38b4bbf94c778203ae124b36d445",
+    "trace.cjs": "cee2d2148310f926f8c0b92aad7a9e553be758d5d5d17a53ae530ac8c0405ed7"
+  },
+  "rom_substitutes": [
+    "memcpy",
+    "memmove",
+    "memset",
+    "__udivsi3",
+    "__umodsi3",
+    "__divsi3",
+    "__muldi3"
+  ],
+  "extended_reference": {
+    "kind": "Vendored generic32 bounded C, ASan/UBSan, not a pristine independent decoder",
+    "binary_sha256": "12bc19a566c45802b8dc40840a3ded5c4b632b98848fec8ee63fcfb5d89c5957"
+  },
+  "fixtures": [
+    {
+      "name": "mono-12",
+      "packet_sha256": "a7f7a02ab057eedb324edfe747a2acfbbfd16692fa0bef9476b53bf05006ac9e",
+      "pcm_sha256": "d37696a743b1df685447dab0d2b74585e890f71c09fde36d5d0d2de6dde7f241"
+    },
+    {
+      "name": "mono-24",
+      "packet_sha256": "0fe8dae1542848eb99f987ea8459440511f305afe381bdf34ed8743a1870f7ee",
+      "pcm_sha256": "8c2a6fca10cdc9a8936acaf335808298ffeb19c2838f64ceab80e22fe0fcd69b"
+    },
+    {
+      "name": "stereo-64",
+      "packet_sha256": "41c53944dbacbbac30a8b09d7e9510e68b2bce5f14bd39062052f7750c1d413c",
+      "pcm_sha256": "2c15e13880b82a098ae454b7ea2b6641810d4778d70858c62af5c32905232411"
+    },
+    {
+      "name": "stereo-128",
+      "packet_sha256": "4e2c4165c8391220d3c1278d6ed2bfb9529e5027aa2e5944a434f5bfbb3de4c5",
+      "pcm_sha256": "2265e622054782ac78b79129c0869f47559c0c1c5e670fa601a170da9abac4c9"
+    },
+    {
+      "name": "stereo-192",
+      "packet_sha256": "e7a1728de71ee59e8d9024036978dcb2a4bea219404db8f754cf6f0e7db90561",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6"
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "packet_sha256": "e10625ce5b722a6744120d68de610846875ddbaf5bd50bee631acb4396b188b8",
+      "pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48"
+    },
+    {
+      "name": "stereo-320-5ms",
+      "packet_sha256": "213b9f4a7b638f54cdec86f3981a2b7f24e3a3897980232f62500bbfef7d5909",
+      "pcm_sha256": "4eb3efc6c453ba1da0c36d391504a0247876521947997dab20649009cb9a3e1a"
+    },
+    {
+      "name": "stereo-320-10ms",
+      "packet_sha256": "ce81ef76fa8fbd1292ec1defb1a8164195dfd24510e2b17cbd0bc9c62d37f4ad",
+      "pcm_sha256": "9d808178dec05d38c305d1c0a858e1222eefaff3bf50a423d51562cb827f730c"
+    },
+    {
+      "name": "stereo-320-20ms",
+      "packet_sha256": "57e77698af5a7777862db1239b0c6047a951e35e64c248f4b18d1e48e9f4c65d",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142"
+    },
+    {
+      "name": "stereo-510",
+      "packet_sha256": "478933ec0c177f880a514677e3c3964276d4df99ad4c2bfadd09af256090abc1",
+      "pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e"
+    },
+    {
+      "name": "192-120ms",
+      "packet_sha256": "6038c24e4b97a8725838b8cafc4ba42e11b16cad6bd32d7e447685bbcad3ed58",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6"
+    },
+    {
+      "name": "320-120ms",
+      "packet_sha256": "eeefb8f9b212cd287c461785a08d3ec795156f80cc15fa70db7d197fa12b7e20",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142"
+    },
+    {
+      "name": "320-48frames",
+      "packet_sha256": "2ee2ead41b3898cfd0c3003dc17bb67e634233e66276b9c5e8c08dcc0444756b",
+      "pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48"
+    }
+  ],
+  "cases": [
+    {
+      "name": "mono-12",
+      "pcm_sha256": "d37696a743b1df685447dab0d2b74585e890f71c09fde36d5d0d2de6dde7f241",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 1808,
+      "word_peak": 14112
+    },
+    {
+      "name": "mono-24",
+      "pcm_sha256": "8c2a6fca10cdc9a8936acaf335808298ffeb19c2838f64ceab80e22fe0fcd69b",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 2904,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-64",
+      "pcm_sha256": "2c15e13880b82a098ae454b7ea2b6641810d4778d70858c62af5c32905232411",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-128",
+      "pcm_sha256": "2265e622054782ac78b79129c0869f47559c0c1c5e670fa601a170da9abac4c9",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-192",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-320-2.5ms",
+      "pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48",
+      "samples": 11640,
+      "packets": 97,
+      "byte_peak": 688,
+      "word_peak": 12240
+    },
+    {
+      "name": "stereo-320-5ms",
+      "pcm_sha256": "4eb3efc6c453ba1da0c36d391504a0247876521947997dab20649009cb9a3e1a",
+      "samples": 11760,
+      "packets": 49,
+      "byte_peak": 1408,
+      "word_peak": 12720
+    },
+    {
+      "name": "stereo-320-10ms",
+      "pcm_sha256": "9d808178dec05d38c305d1c0a858e1222eefaff3bf50a423d51562cb827f730c",
+      "samples": 12000,
+      "packets": 25,
+      "byte_peak": 2768,
+      "word_peak": 13680
+    },
+    {
+      "name": "stereo-320-20ms",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142",
+      "samples": 12480,
+      "packets": 13,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "stereo-510",
+      "pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e",
+      "samples": 58560,
+      "packets": 61,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "192-120ms",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6",
+      "samples": 11520,
+      "packets": 2,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "320-120ms",
+      "pcm_sha256": "465fc0a17ea018ea7c787ac90f7832283dbddfe54209e45dad278481c693d142",
+      "samples": 12480,
+      "packets": 3,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    },
+    {
+      "name": "320-48frames",
+      "pcm_sha256": "af8ba63a3033b3e8e0acb00d78f8f2db8d53a4f454e9091a5609fab22d98dd48",
+      "samples": 11640,
+      "packets": 3,
+      "byte_peak": 688,
+      "word_peak": 12240
+    }
+  ],
+  "state_bytes": 6582,
+  "stack_used_in_harness": 2580,
+  "oom_recovery_cases": 13
+}
+bounded: compiled 0/112 objects; link reused

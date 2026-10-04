@@ -230,3 +230,7 @@ firmware/development/esp8266-opus-pvq-inplace-b1-*/*.elf.gz filter=lfs diff=lfs 
 firmware/development/esp8266-opus-pvq-inplace-b1-*/patches.s text eol=lf whitespace=-blank-at-eol
 firmware/development/esp8266-opus-pvq-inplace-b1-*/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
 firmware/development/esp8266-opus-pvq-inplace-b1-*/**/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
+
+# Offline QEMU evidence is authenticated byte-for-byte by inventory.json.
+tests/results/esp8266-opus-qemu-*/*.json text eol=lf
+tests/results/esp8266-opus-qemu-*/*.log -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol

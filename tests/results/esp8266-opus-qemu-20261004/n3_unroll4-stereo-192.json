@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "scope": "QEMU LX106 instruction execution and PCM correctness; NOT hardware timing or full ESP8266 emulation",
+  "variant": "esp8266-opus-pvq-n3-unroll4-candidate-v1",
+  "elf_sha256": "edc7a956c844039ef9a061a349119ed558947a8ad4fb5dbe12d02708eeaf5e4c",
+  "qemu": "QEMU emulator version 9.2.2 (DosToEsp QEMU-ESP32)\r\nCopyright (c) 2003-2024 Fabrice Bellard and the QEMU Project developers",
+  "qemu_sha256": "0e8af8cfdfcb76bff9f09084990852e35f2c0754ca2bdbb622ba8cfb8add59b6",
+  "compiler": "xtensa-lx106-elf-gcc.exe (crosstool-NG esp-2020r3-49-gd5524c1) 8.4.0",
+  "harness_elf_sha256": "f695155e5f528def314369d8962c9b093a367aa9f888d9d37d3045ebc4bf0fb9",
+  "recipe_hashes": {
+    "run.cjs": "34918324156fcfaa7bf49f215c5addeacb5d406d9b089800aeb00530764669af",
+    "harness.c": "5a7f7389d8a2d5f83bf15e7d6d917080864bb1b69f43bd9a15da76a1310e96a5",
+    "boot.S": "39f30341e9c4328682e03958bf1dbb2baa7b38b4bbf94c778203ae124b36d445",
+    "trace.cjs": "cee2d2148310f926f8c0b92aad7a9e553be758d5d5d17a53ae530ac8c0405ed7"
+  },
+  "rom_substitutes": [
+    "memcpy",
+    "memmove",
+    "memset",
+    "__udivsi3",
+    "__umodsi3",
+    "__divsi3",
+    "__muldi3"
+  ],
+  "fixtures": [
+    {
+      "name": "stereo-192",
+      "packet_sha256": "e7a1728de71ee59e8d9024036978dcb2a4bea219404db8f754cf6f0e7db90561",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6"
+    }
+  ],
+  "cases": [
+    {
+      "name": "stereo-192",
+      "pcm_sha256": "4464cc8649337ff2b250a63bb41bacb05f697713b0d9ebdce88717127096a9e6",
+      "samples": 11520,
+      "packets": 12,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    }
+  ],
+  "state_bytes": 6582,
+  "stack_used_in_harness": 2580,
+  "oom_recovery_cases": 0,
+  "instruction_trace": {
+    "sha256": "3a313fee617e04e50d0158ec326c838483b2737097466998d66e9cab9b6b9325",
+    "scope": "Executed instructions in decode_pulses and N3 helper only; callees excluded. Counts are not cycles or predicted CPU percent.",
+    "tb_executions": 124830,
+    "totals": {
+      "pvq": {
+        "instructions": 641480,
+        "load_instructions": 88552,
+        "store_instructions": 37034,
+        "calls": 2669,
+        "unique_instructions": 290
+      }
+    }
+  }
+}

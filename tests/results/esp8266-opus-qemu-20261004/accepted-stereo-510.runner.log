@@ -1,0 +1,66 @@
+Building/checking generic32 host PCM oracle (no target hardware)
+QEMU LX106: esp8266-opus-ebands-final-candidate-v2 stereo-510
+{
+  "passed": true,
+  "scope": "QEMU LX106 instruction execution and PCM correctness; NOT hardware timing or full ESP8266 emulation",
+  "variant": "esp8266-opus-ebands-final-candidate-v2",
+  "elf_sha256": "cf8718b1c174bfb2a5fc4581a33092b5e35d39adfe048f96807836d654ff5db7",
+  "qemu": "QEMU emulator version 9.2.2 (DosToEsp QEMU-ESP32)\r\nCopyright (c) 2003-2024 Fabrice Bellard and the QEMU Project developers",
+  "qemu_sha256": "0e8af8cfdfcb76bff9f09084990852e35f2c0754ca2bdbb622ba8cfb8add59b6",
+  "compiler": "xtensa-lx106-elf-gcc.exe (crosstool-NG esp-2020r3-49-gd5524c1) 8.4.0",
+  "harness_elf_sha256": "10e00a45049879100c8eb92e7dbf8c1b31291192fabe98afd0a3297ca8ffd963",
+  "recipe_hashes": {
+    "run.cjs": "34918324156fcfaa7bf49f215c5addeacb5d406d9b089800aeb00530764669af",
+    "harness.c": "5a7f7389d8a2d5f83bf15e7d6d917080864bb1b69f43bd9a15da76a1310e96a5",
+    "boot.S": "39f30341e9c4328682e03958bf1dbb2baa7b38b4bbf94c778203ae124b36d445",
+    "trace.cjs": "cee2d2148310f926f8c0b92aad7a9e553be758d5d5d17a53ae530ac8c0405ed7"
+  },
+  "rom_substitutes": [
+    "memcpy",
+    "memmove",
+    "memset",
+    "__udivsi3",
+    "__umodsi3",
+    "__divsi3",
+    "__muldi3"
+  ],
+  "extended_reference": {
+    "kind": "Vendored generic32 bounded C, ASan/UBSan, not a pristine independent decoder",
+    "binary_sha256": "12bc19a566c45802b8dc40840a3ded5c4b632b98848fec8ee63fcfb5d89c5957"
+  },
+  "fixtures": [
+    {
+      "name": "stereo-510",
+      "packet_sha256": "478933ec0c177f880a514677e3c3964276d4df99ad4c2bfadd09af256090abc1",
+      "pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e"
+    }
+  ],
+  "cases": [
+    {
+      "name": "stereo-510",
+      "pcm_sha256": "1b282c8d35dd64988875f1be3b2db77bb05fd46c919a55b2e4535bc34b1add9e",
+      "samples": 58560,
+      "packets": 61,
+      "byte_peak": 5488,
+      "word_peak": 15600
+    }
+  ],
+  "state_bytes": 6582,
+  "stack_used_in_harness": 2580,
+  "oom_recovery_cases": 0,
+  "instruction_trace": {
+    "sha256": "bd4cdd1286bbec1e1058e1ebc8f63c1342ea1b3f5dcc65c5a3c31ab4b60e3eaf",
+    "scope": "Executed instructions in decode_pulses and N3 helper only; callees excluded. Counts are not cycles or predicted CPU percent.",
+    "tb_executions": 799997,
+    "totals": {
+      "pvq": {
+        "instructions": 4398487,
+        "load_instructions": 735880,
+        "store_instructions": 237472,
+        "calls": 19250,
+        "unique_instructions": 245
+      }
+    }
+  }
+}
+bounded: compiled 0/112 objects; link reused
