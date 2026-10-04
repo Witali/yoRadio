@@ -481,6 +481,13 @@ allocation increase. Audited guest instructions increase 2.39%; production
 defaults remain unchanged. Extend to real recordings, reduce/qualify overhead,
 repair mono/PS metadata and complete malformed-input and physical gates.
 
+Real-recording follow-up: [PC19 through the production adapter](ESP32C3_AAC_PC19_RECORDINGS_20261004.md)
+passes all five retained radio captures (12,505,088 channel samples), with a
+2-LSB maximum and no samples over 3 LSB. The two HE-AAC captures and AAC-LC
+control are exact. This closes that retained-corpus check only; actual
+mono/PS reporting, malformed inputs, physical playback/OTA and broader codec
+coverage remain open.
+
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
 - [ ] Run the complete host test suite.

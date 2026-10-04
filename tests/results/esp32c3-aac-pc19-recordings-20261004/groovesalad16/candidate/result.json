@@ -1,0 +1,208 @@
+{
+  "experiment": "qemu_late_sbr",
+  "ordinary_pcm": [
+    {
+      "case": "lc_44100_stereo",
+      "repeats": 3,
+      "frames": 72,
+      "channel_samples": 147456,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "830cc1d8"
+    },
+    {
+      "case": "lc_22050_mono",
+      "repeats": 3,
+      "frames": 39,
+      "channel_samples": 39936,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "e71fe2d0"
+    },
+    {
+      "case": "lc_48000_stereo",
+      "repeats": 3,
+      "frames": 78,
+      "channel_samples": 159744,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "757b7f1a"
+    },
+    {
+      "case": "he_44100_stereo",
+      "repeats": 3,
+      "frames": 42,
+      "channel_samples": 172032,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "72a522ac"
+    },
+    {
+      "case": "he_48000_stereo",
+      "repeats": 3,
+      "frames": 45,
+      "channel_samples": 184320,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "22097ca9"
+    },
+    {
+      "case": "hev2_44100_stereo",
+      "repeats": 3,
+      "frames": 45,
+      "channel_samples": 184320,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "65841ae2"
+    }
+  ],
+  "ordinary_channel_samples": 887808,
+  "precision_pass": true,
+  "precision_limit_lsb": 0,
+  "summaries": [],
+  "precision_scope": "Ordinary LC/HE/HEv2 streams vs unchanged controller with identical compact storage",
+  "transition_pcm_qualified": false,
+  "reverse_transition_qualified": false,
+  "production_qualified": false,
+  "pointers": {
+    "checks": 1541081,
+    "core": 6198,
+    "frames": 6170,
+    "ps": 1064,
+    "smoothing": 6255,
+    "allocations": 501,
+    "frees": 501,
+    "negative_cases": 10,
+    "envelopes": 3073,
+    "resets": 12,
+    "io": 3099,
+    "copies": 89122
+  },
+  "pointer_boundaries": {
+    "applied": 5156,
+    "decode_io": 6170,
+    "ps_bits": 840,
+    "release_negative_cases": 6,
+    "boundary_negative_cases": 5
+  },
+  "stack_bytes": 16384,
+  "stack_min_free_bytes": 2844,
+  "parities": [
+    13,
+    26
+  ],
+  "retention_format_pass": true,
+  "retention_parities": 2,
+  "output_poison_independent": true,
+  "output_poison_channel_samples": 189440,
+  "recording_capture": {
+    "bytes": 60039,
+    "rate": 32000,
+    "channels": 2,
+    "frames": 469,
+    "channel_samples": 1921024,
+    "calls": 1173,
+    "pcm_sha256": "40e8edefd4c8c3689eaa5ba66e84899b333a13472fb535e6548108281cab59a7"
+  },
+  "full_precision_history": false,
+  "recording_precision_qualified": false,
+  "provenance": {
+    "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+    "elf_sha256": "4ea017156ac9ec2176d9e363e0bb77ff66262daa0d75826f2796e0c9da0c0a8a",
+    "sdkconfig_sha256": "f88259ad77fdb7c8d7f73f74bd653c4deea639f41e37b6566eae58f1fb739029",
+    "fixtures": {
+      "generator": "FDK AAC v2.0.3 aac-enc, original 0.5-second synthetic tones",
+      "encoder_commit": "716f4394641d53f0d79c9ddac3fa93b03a49f278",
+      "files": {
+        "lc-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 8943,
+          "sha256": "b701428ed6cd8118f873f4cbe708b517a1089deed63792af6d0850c2ebc436bd"
+        },
+        "lc-22050-mono.aac": {
+          "sample_rate": 22050,
+          "channels": 1,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9659,
+          "sha256": "70ca546f35396ad05b88876536557df6b43ef7d804966460fb949aa9e07b7a85"
+        },
+        "lc-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9012,
+          "sha256": "1b9ab71161449af230ca0628dc23ac265f8c707b82d5e68c76ddc7f42d69b0d4"
+        },
+        "he-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5202,
+          "sha256": "2ed01ee61355830629905867f1885eae99123bc73daad161ba1a5959a4f5e11a"
+        },
+        "he-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5121,
+          "sha256": "747259aaafad92a280e793a4e0b7fce05d39443959ef3d3cba463b980d92f7da"
+        },
+        "hev2-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 29,
+          "bitrate": 32000,
+          "size_bytes": 2787,
+          "sha256": "cf66a4008ec69f9fa31ac7383b0fe8ff6d71fc60b19ee168f1c1396c7e4014ce"
+        }
+      }
+    },
+    "qemu_command": [
+      "wsl.exe",
+      "--cd",
+      "/mnt/c/Work/yoRadio/.worktree/aac-storage18",
+      "--exec",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+      "-M",
+      "esp32c3,audiodev=audio0",
+      "-nographic",
+      "-no-reboot",
+      "-snapshot",
+      "-icount",
+      "shift=0,align=off,sleep=off",
+      "-audiodev",
+      "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-pc19-recordings/groovesalad16/candidate/audio.wav,out.frequency=48000",
+      "-L",
+      "/mnt/c/Work/QEMU-ESP32/share/qemu",
+      "-drive",
+      "file=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-pc19-recordings/groovesalad16/candidate/flash.bin,if=mtd,format=raw"
+    ],
+    "qemu_log_sha256": "ba2b9c83077260b349ccbcb0d0c72998e4eab09c6526fd6eaedd9f8f68c96495",
+    "recording": {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32c3-stream-format\\.build\\aac-bfp16-real-20260930\\inputs\\groovesalad16.aac",
+      "sha256": "26f7767872d75b25579332a1f3eb0b8efacc6a17da83d8986ec8e5395ef9b116",
+      "bytes": 60039,
+      "source_url": null,
+      "ffprobe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "aac",
+            "profile": "HE-AACv2",
+            "sample_rate": "32000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "format_name": "aac",
+          "duration": "29.711246",
+          "bit_rate": "16165"
+        }
+      },
+      "file_completed_utc": "2026-09-30T21:03:05.664827+00:00",
+      "transcoding": false
+    }
+  }
+}
