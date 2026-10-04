@@ -1,0 +1,35 @@
+{
+  "process_exit": 0,
+  "format_pass": false,
+  "pcm_quality_qualified": false,
+  "elf_sha256": "c01f2e2ff574dac600b602f50b5759ca6b5364396c0e95f76993a45fdbfee1e4",
+  "sdkconfig_sha256": "964cef680fecd2f4dfa22d6561b8a848fedc796f29197ba1800fe609fb98c210",
+  "qemu_log_sha256": "6458554dcc08934bef92e7e63bc8e3bf77902e19209d423802435d8871e8c521",
+  "command": [
+    "wsl.exe",
+    "--cd",
+    "/mnt/c/Work/yoRadio/.worktree/aac-storage18",
+    "--exec",
+    "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+    "-M",
+    "esp32c3,audiodev=audio0",
+    "-nographic",
+    "-no-reboot",
+    "-snapshot",
+    "-icount",
+    "shift=0,align=off,sleep=off",
+    "-audiodev",
+    "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-late-sbr/initialization-only/audio.wav,out.frequency=48000",
+    "-L",
+    "/mnt/c/Work/QEMU-ESP32/share/qemu",
+    "-drive",
+    "file=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-late-sbr/initialization-only/flash.bin,if=mtd,format=raw"
+  ],
+  "source_sha256": {
+    "idf/esp32c3-oled-native/main/aac_compact_owner.c": "14e38b412ad4413fc2d9b4994c93ce0f1e37fd7b05dbd7d6cf079469d3f61b94",
+    "idf/esp32c3-oled-native/main/aac_compact_owner.h": "34244133f43ccc04550829b782c2961eacaf8033378ab6f1499b887eecf53505",
+    "idf/esp32c3-oled-native/main/qemu_aac_test.c": "9cecdca915da0689b2d91debbace60cf4ebf20364a2e8c07241a3afee4893c08",
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": "d2fedd79b94ee23868c49075a8da2e5253834f57e584689d5597d82f80834386",
+    "idf/esp32c3-oled-native/main/Kconfig.projbuild": "c8538ca17108d4303d817328d515e904530656b71a5516d43de331616efe1359"
+  }
+}

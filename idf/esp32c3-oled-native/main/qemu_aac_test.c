@@ -211,9 +211,15 @@ void qemu_aac_test(native_state_t *state, oled_display_t *display) {
     decoder = native_aac_decoder_create();
     assert(decoder);
     check_fixture(decoder, state, display, "LC22 same header", lc22_start, lc22_end, 22050, 1);
+#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
+    check_fixture(decoder, state, display, "Implicit SBR full", hev2_start, hev2_end, 44100, 2);
+    assert(strcmp(state->stream_format, "HE-AACv2 44.1 kHz stereo") == 0);
+    ESP_LOGI(TAG, "QEMU_AAC_LATE_SBR_FORMAT_PASS history retained; PCM quality still unqualified");
+#else
     check_fixture(decoder, state, display, "Implicit SBR core", hev2_start, hev2_end, 22050, 1);
     assert(strcmp(state->stream_format, "AAC PCM 22.05 kHz mono") == 0);
     ESP_LOGW(TAG, "QEMU_AAC_LIMITATION implicit SBR/PS change needs stream restart");
+#endif
     native_aac_decoder_destroy(decoder);
     decoder = native_aac_decoder_create();
     assert(decoder);
@@ -237,6 +243,10 @@ void qemu_aac_test(native_state_t *state, oled_display_t *display) {
 #endif
 #if defined(CONFIG_YORADIO_QEMU_AAC_BFP16_TEST) || defined(CONFIG_YORADIO_QEMU_AAC_PACKED_HISTORY_TEST)
     qemu_aac_bfp16_test();
+#endif
+#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
+    void qemu_aac_late_sbr_test(void);
+    qemu_aac_late_sbr_test();
 #endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
     void qemu_aac_compact_adapter_test(void);

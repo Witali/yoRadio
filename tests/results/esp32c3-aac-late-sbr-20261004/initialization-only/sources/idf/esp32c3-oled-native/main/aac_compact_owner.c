@@ -42,27 +42,6 @@ void aac_compact_owner_test_assert_idle(void) { assert(!fail_request && !live_ow
 static aac_compact_owner_t *context(void) {
     return pvTaskGetThreadLocalStoragePointer(NULL,AAC_TLS_SLOT);
 }
-#ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
-enum { AAC_CORE_FRAME_SAMPLES=1024, AAC_QMF_PREFIX_SAMPLES=288,
-       AAC_SBR_BANK_SAMPLES=AAC_CORE_FRAME_SAMPLES+AAC_QMF_PREFIX_SAMPLES };
-void __real_get_sbr_bitstream(void *,void *);
-void __wrap_get_sbr_bitstream(void *opaque_stream,void *bits) {
-    __real_get_sbr_bitstream(opaque_stream,bits);
-    aac_compact_owner_t *state=context();
-    if(!state || !state->late_core)return;
-    aac_analysis_sbr_stream_t *stream=opaque_stream;
-    if(!stream->elements)return;
-    aac_analysis_core_t *core=state->late_core;
-    assert(core->frame_length==AAC_CORE_FRAME_SAMPLES);
-    // The native SBR history copy assumes bank 0 or 1312. AAC-LC instead
-    // toggles 0/1024; its second bank would copy 288 samples BEFORE the array.
-    // Select the initial SBR bank after detecting actual extension payload,
-    // before the transform writes that frame. Keep both IMDCT overlaps intact.
-    assert(core->ltp_buffer_state==0 || core->ltp_buffer_state==AAC_CORE_FRAME_SAMPLES ||
-           core->ltp_buffer_state==AAC_SBR_BANK_SAMPLES);
-    if(core->ltp_buffer_state==AAC_CORE_FRAME_SAMPLES)core->ltp_buffer_state=0;
-}
-#endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
 aac_compact_owner_t *aac_compact_owner_audit_context(void) { assert(context());return context(); }
 #endif
@@ -136,9 +115,7 @@ int __wrap_PVMP4AudioDecodeFrame(void *external,void *core) {
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
     aac_analysis_core_t *late_core=core;
     aac_analysis_external_t *late_external=external;
-    assert(!state->late_core);
-    if(!state->late_disabled)state->late_core=core;
-    if(!state->late_disabled && late_core->requested_plus && late_core->sbr_stream) {
+    if(late_core->requested_plus && late_core->sbr_stream) {
         late_core->plus_enabled=1;
         late_external->plus_enabled=1;
     }
@@ -148,8 +125,7 @@ int __wrap_PVMP4AudioDecodeFrame(void *external,void *core) {
 #endif
     int result=compact5_PVMP4AudioDecodeFrame(external,core);
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
-    state->late_core=NULL;
-    if(!state->late_disabled && !result && late_core->plus_enabled && late_core->mc.sbr_present) {
+    if(!result && late_core->plus_enabled && late_core->mc.sbr_present) {
         assert(late_core->mc.sample_rate_index>=0 && late_core->mc.sample_rate_index<12);
         assert(late_core->mc.upsampling==1 || late_core->mc.upsampling==2);
         late_external->sample_rate=samp_rate_info.entry[late_core->mc.sample_rate_index].rate * late_core->mc.upsampling;
@@ -170,7 +146,7 @@ int __wrap_compact5_sbr_applied(void *owner,void *stream,void *left,void *right,
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
     aac_analysis_core_t *late_core=core;
     aac_sbr_control_abi_t *late_control=control;
-    if(!state->late_disabled && !late_control->output_rate) {
+    if(!late_control->output_rate) {
         assert(late_core->mc.sample_rate_index>=0 && late_core->mc.sample_rate_index<12);
         __wrap_compact5_sbr_open(samp_rate_info.entry[late_core->mc.sample_rate_index].rate,
                                 control,owner,late_core->mc.downsampled_sbr);

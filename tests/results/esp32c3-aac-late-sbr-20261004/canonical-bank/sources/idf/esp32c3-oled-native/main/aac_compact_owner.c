@@ -136,9 +136,8 @@ int __wrap_PVMP4AudioDecodeFrame(void *external,void *core) {
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
     aac_analysis_core_t *late_core=core;
     aac_analysis_external_t *late_external=external;
-    assert(!state->late_core);
-    if(!state->late_disabled)state->late_core=core;
-    if(!state->late_disabled && late_core->requested_plus && late_core->sbr_stream) {
+    assert(!state->late_core);state->late_core=core;
+    if(late_core->requested_plus && late_core->sbr_stream) {
         late_core->plus_enabled=1;
         late_external->plus_enabled=1;
     }
@@ -149,7 +148,7 @@ int __wrap_PVMP4AudioDecodeFrame(void *external,void *core) {
     int result=compact5_PVMP4AudioDecodeFrame(external,core);
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
     state->late_core=NULL;
-    if(!state->late_disabled && !result && late_core->plus_enabled && late_core->mc.sbr_present) {
+    if(!result && late_core->plus_enabled && late_core->mc.sbr_present) {
         assert(late_core->mc.sample_rate_index>=0 && late_core->mc.sample_rate_index<12);
         assert(late_core->mc.upsampling==1 || late_core->mc.upsampling==2);
         late_external->sample_rate=samp_rate_info.entry[late_core->mc.sample_rate_index].rate * late_core->mc.upsampling;
@@ -170,7 +169,7 @@ int __wrap_compact5_sbr_applied(void *owner,void *stream,void *left,void *right,
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
     aac_analysis_core_t *late_core=core;
     aac_sbr_control_abi_t *late_control=control;
-    if(!state->late_disabled && !late_control->output_rate) {
+    if(!late_control->output_rate) {
         assert(late_core->mc.sample_rate_index>=0 && late_core->mc.sample_rate_index<12);
         __wrap_compact5_sbr_open(samp_rate_info.entry[late_core->mc.sample_rate_index].rate,
                                 control,owner,late_core->mc.downsampled_sbr);

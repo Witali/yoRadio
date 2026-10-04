@@ -1,0 +1,38 @@
+{
+  "process_exit": 0,
+  "format_pass": true,
+  "pcm_quality_qualified": false,
+  "elf_sha256": "6e13554c29062350e00b4df30ef5fc8e3f31ecc565ffee975ec62082d8647ec7",
+  "sdkconfig_sha256": "93cd9cc876c0149fa387b92a467ed035b1ea85e7a098488ab36e9d737291646e",
+  "qemu_log_sha256": "b5d77f8da0a078c149a80833c35a3a47178ac4e7304fea1f5ac189ad228ced55",
+  "command": [
+    "wsl.exe",
+    "--cd",
+    "/mnt/c/Work/yoRadio/.worktree/aac-storage18",
+    "--exec",
+    "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+    "-M",
+    "esp32c3,audiodev=audio0",
+    "-nographic",
+    "-no-reboot",
+    "-snapshot",
+    "-icount",
+    "shift=0,align=off,sleep=off",
+    "-audiodev",
+    "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-late-sbr/paired-and-audit/audio.wav,out.frequency=48000",
+    "-L",
+    "/mnt/c/Work/QEMU-ESP32/share/qemu",
+    "-drive",
+    "file=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-late-sbr/paired-and-audit/flash.bin,if=mtd,format=raw"
+  ],
+  "source_sha256": {
+    "idf/esp32c3-oled-native/main/qemu_aac_late_sbr.c": "fcd2844bb1e87680cd4d4f678b83a3eba3555f82cbc1e276fc37cded37246006",
+    "idf/esp32c3-oled-native/main/native_aac_decoder.c": "28bf026c8bfc77f545af4ac2d95962c737c297f4a306f52a0cf420ff9868a5d7",
+    "idf/esp32c3-oled-native/main/native_aac_decoder.h": "92846394cb56214b9f199bb24d5995b725245e06460728f2831c1d9541b9bba2",
+    "idf/esp32c3-oled-native/main/aac_compact_owner.c": "8e908b75727d4b10abe2eaaf4fb596aa986bef92b3120085ecaef6b0a6a82924",
+    "idf/esp32c3-oled-native/main/aac_compact_owner.h": "99a4001bb9049c82b741e3ee1eb68f11c77c03312960ff03b11fe26c4ca65ff5",
+    "idf/esp32c3-oled-native/main/qemu_aac_test.c": "e85dce949691913ed64056640ad150ec7a34bcd56fe1b0c6cc2f04f8fe7c7425",
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": "825e2585920b6833837be7a351e1c008b0be207944f20411a3ac7d9de51d2835",
+    "idf/esp32c3-oled-native/main/Kconfig.projbuild": "c8538ca17108d4303d817328d515e904530656b71a5516d43de331616efe1359"
+  }
+}

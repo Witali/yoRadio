@@ -455,6 +455,12 @@ an acceptable implementation of this optimization.
 
 ## Verification
 
+2026-10-04 checkpoint: [late implicit SBR experiment](ESP32C3_AAC_LATE_SBR_20261004.md)
+reproduces the physical same-header LC → HE failure and fixes both LC history
+bank phases in QEMU. Ordinary six-fixture PCM is unchanged over 887,808 channel
+samples; pointer/lifetime checks pass. Reverse transitions and transition PCM
+remain unqualified, so the option is QEMU-only and production gates stay open.
+
 - [ ] Add regression tests for buffer lifetime, the 16 KiB default, and the
   configurable upper limit.
 - [ ] Run the complete host test suite.

@@ -11,7 +11,6 @@ typedef struct {
     bool ps_initialized, inside_sbr, allocation_failed;
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
     void *late_core; // Valid only inside the scoped native frame call.
-    bool late_disabled; // Per-decoder unmodified-controller PCM control.
 #endif
 #ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
     aac_high_runtime_t high_history;
