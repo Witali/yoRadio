@@ -9,7 +9,7 @@ from urllib.parse import urlsplit
 
 
 class Server:
-    def __init__(self, host, port, fixtures, cert=None, key=None):
+    def __init__(self, host, port, fixtures, cert=None, key=None, *, unpaced_files=False):
         self.fixtures = fixtures
         self.events = []
         self.closed = threading.Event()
@@ -61,7 +61,9 @@ class Server:
                     self.send_header('Content-Length', str(len(data)))
                 self.send_header('Connection', 'close')
                 self.end_headers()
-                event = dict(mode=mode, fixture=name, sent=0, complete=False)
+                unpaced = unpaced_files and mode == 'file'
+                event = dict(mode=mode, fixture=name, sent=0, complete=False,
+                             pacing_ratio=None if unpaced else 1.02)
                 outer.events.append(event)
                 started = time.monotonic()
                 deadline = started
@@ -84,7 +86,7 @@ class Server:
                                 deadline += len(chunk) / bps
                                 if mode == 'jitter' and offset % 8192 == 0:
                                     deadline += .035
-                                if outer.closed.wait(max(0, deadline - time.monotonic())):
+                                if not unpaced and outer.closed.wait(max(0, deadline - time.monotonic())):
                                     return
                         if mode != 'stream':
                             event['complete'] = True
@@ -128,11 +130,13 @@ def main():
     parser.add_argument('--cert', help='PEM certificate for HTTPS')
     parser.add_argument('--key', help='PEM private key; never stored in results')
     parser.add_argument('--fixture-manifest', help='Additional generated fixture manifest')
+    parser.add_argument('--unpaced-files', action='store_true',
+                        help='Serve /file at the speed allowed by TCP; retain pacing for live/fault routes')
     args = parser.parse_args()
     specs = load_fixtures(args.fixture_manifest)
     if bool(args.cert) != bool(args.key):
         parser.error('--cert and --key must be supplied together')
-    with Server(args.host,args.port,specs,args.cert,args.key):
+    with Server(args.host,args.port,specs,args.cert,args.key, unpaced_files=args.unpaced_files):
         print(f"Serving {len(specs)} fixtures on port {args.port}; /manifest.json lists them", flush=True)
         try:
             threading.Event().wait()

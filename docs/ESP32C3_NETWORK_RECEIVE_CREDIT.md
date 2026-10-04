@@ -57,3 +57,17 @@ missing `NET_RX` lines mean unavailable telemetry, not zero queued data.
 Use this summary to investigate failures, not to relabel a failed acceptance
 run. Preserve raw filtered logs, exact source/configuration hashes and the failed
 result before repeating a test.
+
+## File download control
+
+`--unpaced-files` on the shared audio server or C3 runner disables artificial
+pacing only for `/file`. TCP backpressure then limits an ordinary finite-file
+download. Live streams and fault routes retain their existing pacing. The
+default remains 1.02 times the fixture's average encoded rate; this small
+producer surplus can gradually fill the player's buffers during a long run.
+
+Record both scenarios separately. An unpaced download exercises full receive
+buffers near startup and helps distinguish initial queue filling from later
+allocation growth. It does not replace paced radio/jitter tests or change any
+CPU, latency or memory gate. `server_options` and each request's `pacing_ratio`
+identify the scenario in the results. The shared server option is board-neutral.

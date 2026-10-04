@@ -86,15 +86,17 @@ class AcceptanceTests(unittest.TestCase):
                  patch.object(acceptance_run,'Board',return_value=board), \
                  patch.object(acceptance_run,'Capture',return_value=capture), \
                  patch.object(acceptance_run,'Suite',return_value=suite), \
-                 patch.object(acceptance_run,'Server',return_value=server), \
+                 patch.object(acceptance_run,'Server',return_value=server) as make_server, \
                  patch.object(sys,'argv',['run.py','--board','http://localhost','--host','localhost',
                      '--suite','load','--case','lc-48000-stereo','--serial-port','TEST',
-                     '--load-seconds','180','--load-idle-recovery','--leave-stopped','--output',tmp]):
+                     '--load-seconds','180','--load-idle-recovery','--unpaced-files','--leave-stopped','--output',tmp]):
                 self.assertEqual(acceptance_run.main(),1)
                 suite.sustained.assert_called_once_with(180,'lc-48000-stereo',cpu=True,load=True)
                 self.assertEqual(suite.idle_heap.call_count,2)
                 report = json.loads((Path(tmp)/'report.json').read_text())
                 self.assertEqual(report['load_options'],{'seconds':180,'idle_recovery':True})
+                self.assertEqual(report['server_options'],{'unpaced_files':True})
+                self.assertTrue(make_server.call_args.kwargs['unpaced_files'])
                 self.assertEqual([r['result'] for r in report['cases']],
                                  ['PASS','FAIL','PASS' if recovered else 'FAIL','PASS'])
 
@@ -193,6 +195,19 @@ class AcceptanceTests(unittest.TestCase):
             with urlopen(base+'/manifest.json') as response:
                 manifest=json.load(response)
             self.assertNotIn('data',manifest['lc-48000-stereo'])
+
+    def test_unpaced_download_preserves_bytes_and_other_routes_keep_pacing(self):
+        # A nominal 60-second file must download immediately on loopback.
+        # Fault routes still use the original pacing even with the option set.
+        spec = dict(data=b'fixture-data'*512, seconds=60, codec='mp3', mime='audio/mpeg')
+        with Server('127.0.0.1',0,{'test':spec},unpaced_files=True) as server:
+            base = 'http://127.0.0.1:'+str(server.http.server_port)
+            with urlopen(base+'/file/test',timeout=2) as response:
+                self.assertEqual(response.read(),spec['data'])
+            self.assertIsNone(server.events[0]['pacing_ratio'])
+            with urlopen(base+'/stall/test',timeout=2) as response:
+                self.assertEqual(response.read(12),b'fixture-data')
+            self.assertEqual(server.events[1]['pacing_ratio'],1.02)
 
     def test_generic_https_requires_certificate_trust(self):
         from cryptography import x509
