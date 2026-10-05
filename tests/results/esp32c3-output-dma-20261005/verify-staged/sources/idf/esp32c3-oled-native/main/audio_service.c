@@ -43,13 +43,7 @@
 #define STREAM_CHUNK_SIZE 2048
 #define STREAM_READ_TIMEOUT_MS 250
 #define PCM_RING_SIZE (8 * 1024)
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
-// Three 512-frame stereo packets, including lease/ring headers, fit in the
-// unchanged 8 KiB queue. Larger packets can block the producer during prefill.
-#define PCM_PACKET_DATA_SIZE 2048
-#else
 #define PCM_PACKET_DATA_SIZE 3584
-#endif
 #define MAX_HTTP_REDIRECTS 5
 #define ICY_METADATA_MAX 4080
 #define DECODE_STATS_INTERVAL_US 5000000LL
@@ -84,9 +78,6 @@ typedef struct {
     uint8_t channels;
     uint16_t data_size;
     uint32_t end_of_stream; // Keep the following PCM payload word-aligned.
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
-    native_audio_pcm_lease_t lease;
-#endif
     uint8_t data[];
 } pcm_packet_t;
 
@@ -1344,30 +1335,13 @@ esp_err_t audio_service_resume_output(void) {
 }
 #endif
 
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
-static void release_pcm_lease(native_audio_pcm_lease_t *lease) {
-    pcm_packet_t *packet = (pcm_packet_t *)((uint8_t *)lease - offsetof(pcm_packet_t, lease));
-    vRingbufferReturnItem(s_pcm, packet);
-}
-#endif
-
 static void output_task(void *argument) {
     (void)argument;
 #ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
     s_output_task = xTaskGetCurrentTaskHandle();
 #endif
     uint32_t sample_rate = 0;
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
-    uint32_t generation = atomic_load(&s_generation);
-#endif
     while (true) {
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
-        uint32_t current_generation = atomic_load(&s_generation);
-        if (generation != current_generation) {
-            native_audio_output_discard_pcm();
-            generation = current_generation;
-        }
-#endif
 #ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
         if (atomic_exchange(&s_suspend_output, false)) {
             s_suspend_result = native_audio_output_suspend();
@@ -1390,22 +1364,11 @@ static void output_task(void *argument) {
             native_audio_output_idle();
             continue;
         }
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
-        current_generation = atomic_load(&s_generation);
-        if (generation != current_generation) {
-            native_audio_output_discard_pcm();
-            generation = current_generation;
-        }
-#endif
         if (packet->generation != atomic_load(&s_generation)) {
             vRingbufferReturnItem(s_pcm, packet);
             continue;
         }
         if (packet->end_of_stream) {
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
-            esp_err_t flush_result = native_audio_output_flush_pcm();
-            if (flush_result != ESP_OK) ESP_LOGW(TAG, "PCM tail flush failed: %s", esp_err_to_name(flush_result));
-#endif
             finish_pcm_stream(packet);
             vRingbufferReturnItem(s_pcm, packet);
             continue;
@@ -1423,22 +1386,14 @@ static void output_task(void *argument) {
             }
             sample_rate = packet->sample_rate;
         }
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
-        // Ownership transfers even on a write error. The final source tail is
-        // retained until another packet completes a DMA block, EOF, or Stop.
-        esp_err_t result = native_audio_output_submit_pcm(
-            &packet->lease, packet->data, packet->data_size,
-            packet->bits_per_sample, packet->channels, release_pcm_lease);
-#else
         esp_err_t result = native_audio_output_write_pcm(
             packet->data, packet->data_size, packet->bits_per_sample,
             packet->channels);
-        vRingbufferReturnItem(s_pcm, packet);
-#endif
         if (result != ESP_OK) {
             ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),
                      esp_err_to_name(result));
         }
+        vRingbufferReturnItem(s_pcm, packet);
     }
 }
 
