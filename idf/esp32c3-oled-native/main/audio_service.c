@@ -38,6 +38,7 @@
 #endif
 #include "native_audio_output.h"
 #include "rx_buffer_diagnostic.h"
+#include "heap_fragment_probe.h"
 #include "network_service.h"
 
 #include "runtime_settings.h"
@@ -934,6 +935,14 @@ static void decoder_task(void *argument) {
             decoder_resources_release(&decoder, &aac_decoder, &output, &output_size);
         }
         size_t item_size = 0;
+        heap_fragment_probe_poll(!decoder && !aac_decoder && !output
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+                                 && !flac_decoder
+#endif
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+                                 && !legacy_decoder
+#endif
+        );
         encoded_packet_t *packet = xRingbufferReceive(
             s_encoded, &item_size, pdMS_TO_TICKS(20));
         if (!packet) continue;

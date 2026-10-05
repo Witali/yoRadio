@@ -1,0 +1,129 @@
+{
+  "image": "5d91a1ce9ba6b2a739a32f5bcacafe82ff3ecefadf0f47f7d1d784b4abaa08fe",
+  "cases": {
+    "stress-mp3-48000-2ch-16bit-200s": {
+      "original_acceptance": {
+        "name": "cpu-under-http-load:stress-mp3-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 181.235
+      },
+      "maximum_http_ms": 875.0,
+      "minimum_rssi": -74,
+      "idle_after": {
+        "heap": 144786.0,
+        "largest": 114688.0,
+        "tasks": 17.0
+      },
+      "recovery_from_previous": {
+        "result": "PASS"
+      },
+      "recovery_from_first": {
+        "result": "PASS"
+      },
+      "observed_after_40_seconds": {
+        "cpu_windows": 28,
+        "decoder_windows": 28,
+        "mean_busy": 60.47857142857143,
+        "peak_busy": 62.3,
+        "audio_wall_ratio": 1.0015060668921032
+      },
+      "after_40_seconds": {
+        "result": "PASS",
+        "mean_busy": 60.47857142857143,
+        "peak_busy": 62.3,
+        "minimum_heap": 77096.0,
+        "minimum_largest": 65536.0,
+        "audio_wall_ratio": 1.0015060668921032
+      }
+    },
+    "stress-vorbis-48000-2ch-16bit-200s": {
+      "original_acceptance": {
+        "name": "cpu-under-http-load:stress-vorbis-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 181.235
+      },
+      "maximum_http_ms": 1483.9999999385327,
+      "minimum_rssi": -72,
+      "idle_after": {
+        "heap": 144780.0,
+        "largest": 114688.0,
+        "tasks": 17.0
+      },
+      "recovery_from_previous": {
+        "result": "PASS"
+      },
+      "recovery_from_first": {
+        "result": "PASS"
+      },
+      "observed_after_40_seconds": {
+        "cpu_windows": 28,
+        "decoder_windows": 27,
+        "mean_busy": 74.53571428571429,
+        "peak_busy": 75.9,
+        "audio_wall_ratio": 1.0015311103878812
+      },
+      "after_40_seconds": {
+        "result": "PASS",
+        "mean_busy": 74.53571428571429,
+        "peak_busy": 75.9,
+        "minimum_heap": 63848.0,
+        "minimum_largest": 53248.0,
+        "audio_wall_ratio": 1.0015311103878812
+      }
+    },
+    "stress-opus-48000-2ch-16bit-200s": {
+      "original_acceptance": {
+        "name": "cpu-under-http-load:stress-opus-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 181.141
+      },
+      "maximum_http_ms": 157.00000000651926,
+      "minimum_rssi": -71,
+      "idle_after": {
+        "heap": 144792,
+        "largest": 114688,
+        "tasks": 17
+      },
+      "recovery_from_previous": {
+        "result": "PASS"
+      },
+      "recovery_from_first": {
+        "result": "PASS"
+      },
+      "observed_after_40_seconds": {
+        "cpu_windows": 27,
+        "decoder_windows": 28,
+        "mean_busy": 80.82222222222222,
+        "peak_busy": 81.8,
+        "audio_wall_ratio": 1.0016532694829257
+      },
+      "after_40_seconds": {
+        "result": "PASS",
+        "mean_busy": 80.82222222222222,
+        "peak_busy": 81.8,
+        "minimum_heap": 74500.0,
+        "minimum_largest": 63488.0,
+        "audio_wall_ratio": 1.0016532694829257
+      }
+    }
+  },
+  "scope": "One paced sequence with per-case Stop; no reboot between codecs; not a 100-switch or 30-minute soak qualification"
+}

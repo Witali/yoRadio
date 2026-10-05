@@ -35,6 +35,13 @@ run reproduces persistent fragmentation: after Stop the largest free block drops
 from 114,688 to 94,208 bytes, while total free heap and task count recover. The
 owner is still unknown; this is new evidence for step 4, not its completion.
 
+The [heap-owner probe](ESP32C3_HEAP_FRAGMENT_OWNER_20261005.md) now records live
+allocation identities and task names in the initially free region. Two physical
+sequences, including a variant with unchanged ordinary DRAM layout, and 130 s
+without HTTP polling all restore that region. No residual owner is reproduced.
+Step 4 remains open; original heap-growth failures and an incomplete Opus
+CPU/heap capture are retained alongside these measurements.
+
 ## Conclusion
 
 Vorbis already plays the tested 48 kHz stereo streams. The first repair should

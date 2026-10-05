@@ -29,6 +29,20 @@ config YORADIO_RX_BUFFER_DIAGNOSTICS
         Uses about 0.6 KiB static RAM and 1.1 KiB of decoder stack between calls.
         The locked heap walk and USB logs change timing; not a CPU benchmark.
 
+config YORADIO_HEAP_FRAGMENT_PROBE
+    bool "Identify live owners in the former largest idle heap block"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU && !YORADIO_DEEP_SLEEP_CLOCK && HEAP_TRACING_OFF && HEAP_POISONING_DISABLED && !HEAP_TASK_TRACKING && HEAP_PLACE_FUNCTION_INTO_FLASH
+    select HEAP_USE_HOOKS
+    default n
+    help
+        Diagnostic only. After five seconds of decoder idle, watch the largest
+        free region. Keep 128 live allocation records and counters in about
+        3.1 KiB RTC RAM, leaving normal DRAM unchanged; report
+        overflow and unknown owners. Log metadata on the decoder stack only
+        after Stop/EOF, outside heap locks. Free/realloc use a critical section
+        on C3 to prevent address-reuse races. Changes timing, not a CPU benchmark.
+        Uses the flash-resident allocator configuration; not for cache-off ISRs.
+
 config YORADIO_AAC_PLUS
     bool "Decode full HE-AAC SBR/PS with Espressif AAC"
     depends on YORADIO_AAC_DECODER_ESPRESSIF

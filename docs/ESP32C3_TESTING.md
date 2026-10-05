@@ -86,6 +86,14 @@ without Stop, and after a separate Stop. The service now also releases custom
 FLAC/legacy state at terminal errors; the host ownership scenarios use
 `python tests/run-custom-decoder-terminal.py`.
 
+The optional [heap-owner diagnostic](ESP32C3_HEAP_FRAGMENT_OWNER_20261005.md)
+tracks live allocations in the largest initial free region, with explicit
+overflow/unknown-owner rejection. Use `heap_idle.py` for a stopped-board window
+without HTTP polling, and `tests/test-heap-fragment-evidence.py` to replay the
+retained physical results. It changes timing and is disabled by default.
+Shared-server `--delivery-stats` records completed socket-write timing for any
+board; it does not measure TCP acknowledgements or audible gaps.
+
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The
 server does not select a board, upload firmware, reset it or change credentials.
