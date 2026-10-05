@@ -41,7 +41,9 @@ enum : int8_t  {GIVE_NEXT_LOOP = +1,
                 ERR_FLAC_RESERVED_RESIDUAL_CODING = -8,
                 ERR_FLAC_WRONG_RICE_PARTITION_NR = -9,
                 ERR_FLAC_BITS_PER_SAMPLE_TOO_BIG = -10,
-                ERR_FLAG_BITS_PER_SAMPLE_UNKNOWN = 11};
+                ERR_FLAG_BITS_PER_SAMPLE_UNKNOWN = 11,
+                ERR_FLAC_TRUNCATED_INPUT = -12,
+                ERR_FLAC_INVALID_DATA = -13};
 
 typedef struct FLACMetadataBlock_t{
                               // METADATA_BLOCK_STREAMINFO
@@ -146,7 +148,7 @@ typedef struct FLACFrameHeader_t {
 
 int      FLACFindSyncWord(unsigned char *buf, int nBytes);
 int      FLACFindOggSyncWord(unsigned char *buf, int nBytes);
-int      FLACparseOggHeader(unsigned char *buf);
+int      FLACparseOggHeader(unsigned char *buf, int nBytes);
 bool     FLACDecoder_AllocateBuffers(uint16_t maxBlockSize, uint8_t channels);
 void     FLACDecoder_ClearBuffer();
 void     FLACDecoder_FreeBuffers();

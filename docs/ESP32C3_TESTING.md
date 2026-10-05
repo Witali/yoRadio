@@ -86,6 +86,14 @@ without Stop, and after a separate Stop. The service now also releases custom
 FLAC/legacy state at terminal errors; the host ownership scenarios use
 `python tests/run-custom-decoder-terminal.py`.
 
+The [FLAC input-bounds repair](ESP32C3_FLAC_INPUT_BOUNDS_20261005.md) reproduces
+truncated-frame overreads under ASan and tests the actual shared decoder against
+FFmpeg PCM. Run `tools/codec_benchmark/run_flac_bounds.py --output OUTPUT_DIR`
+(add `--contiguous` for the Arduino workspace), then use
+`flac_truncation.py --board http://BOARD_IP --host HOST_IP --serial-port COM_PORT --output OUTPUT_DIR`
+for partial-frame EOF and recovery on C3. Retained results are replayed by
+`tests/test-flac-bounds-evidence.py`.
+
 The optional [heap-owner diagnostic](ESP32C3_HEAP_FRAGMENT_OWNER_20261005.md)
 tracks live allocations in the largest initial free region, with explicit
 overflow/unknown-owner rejection. Use `heap_idle.py` for a stopped-board window

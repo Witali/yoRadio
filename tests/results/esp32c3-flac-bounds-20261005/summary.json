@@ -1,0 +1,62 @@
+{
+  "load-before": {
+    "image": "6eea8a8f2f9039999f6873fdd7d0ab48e2c9d79179f208111a536a6fd91c99ab",
+    "acceptance": {
+      "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-120s",
+      "result": "PASS",
+      "evidence": {
+        "duration": 60,
+        "status_samples": 313,
+        "max_http_ms": 125.0,
+        "mean_busy": 68.89,
+        "peak_busy": 70.0,
+        "minimum_heap": 69172.0,
+        "minimum_largest": 53248.0,
+        "audio_wall_ratio": 1.001575113211262
+      },
+      "seconds": 61.093
+    },
+    "decode_per_audio_percent": 26.015333202280324,
+    "decode_windows": 10,
+    "minimum_rssi": -75,
+    "serial_health": {
+      "name": "ota:serial-health",
+      "result": "PASS",
+      "evidence": {
+        "records": 121,
+        "faults": []
+      },
+      "note": "Expected OTA reboot banners are allowed; panic/capture errors are not."
+    }
+  },
+  "load-after": {
+    "image": "3a30ce4278babd7b1a9de879aa6bc2b912b0cf69f3a263801360060d09da6ee4",
+    "acceptance": {
+      "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-120s",
+      "result": "PASS",
+      "evidence": {
+        "duration": 60,
+        "status_samples": 313,
+        "max_http_ms": 125.0,
+        "mean_busy": 67.0,
+        "peak_busy": 67.7,
+        "minimum_heap": 70732.0,
+        "minimum_largest": 55296.0,
+        "audio_wall_ratio": 1.0015553936721073
+      },
+      "seconds": 61.156
+    },
+    "decode_per_audio_percent": 23.998427363868686,
+    "decode_windows": 10,
+    "minimum_rssi": -75,
+    "serial_health": {
+      "name": "ota:serial-health",
+      "result": "PASS",
+      "evidence": {
+        "records": 121,
+        "faults": []
+      },
+      "note": "Expected OTA reboot banners are allowed; panic/capture errors are not."
+    }
+  }
+}

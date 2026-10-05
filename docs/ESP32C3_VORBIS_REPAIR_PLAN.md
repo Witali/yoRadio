@@ -42,6 +42,12 @@ without HTTP polling all restore that region. No residual owner is reproduced.
 Step 4 remains open; original heap-growth failures and an incomplete Opus
 CPU/heap capture are retained alongside these measurements.
 
+A subsequent [105-switch control run](ESP32C3_FLAC_INPUT_BOUNDS_20261005.md)
+cycles through LC, HE, HEv2, MP3, FLAC, Vorbis and Opus fifteen times. Every
+playback window and every settled checkpoint passes; the largest block remains
+114,688 bytes. This is additional non-reproduction evidence for step 4, not
+attribution of the earlier residual allocation or full format/soak qualification.
+
 ## Conclusion
 
 Vorbis already plays the tested 48 kHz stereo streams. The first repair should
