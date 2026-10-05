@@ -25,6 +25,11 @@ private instructions of every vendor decoder have been decompiled.
 The default remains off while timing/continuity qualification is incomplete.
 The old implementation remains the explicit A/B control.
 
+The [long-playback RX ownership follow-up](ESP32C3_RX_OWNERSHIP_20261005.md)
+records bounded startup packet buffering and post-stop heap recovery on this
+prefill design. It retains the initial heap gate failures and an Opus WebUI
+latency failure; it does not promote direct DMA to the production default.
+
 The output task normalizes PCM in place in the existing queue, then writes
 gain-adjusted, resampled stereo samples directly into the driver's available
 DMA region. There is no borrowed DMA pointer in the decoder and no compressed

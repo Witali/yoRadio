@@ -37,6 +37,7 @@
 #include "custom_legacy_adapter.h"
 #endif
 #include "native_audio_output.h"
+#include "rx_buffer_diagnostic.h"
 #include "network_service.h"
 
 #include "runtime_settings.h"
@@ -879,6 +880,7 @@ static void decoder_task(void *argument) {
 #endif
 
     while (true) {
+        rx_buffer_diagnostic_poll();
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER

@@ -21,6 +21,14 @@ not been flashed or qualified on hardware. The [step-3 retry/EOF report](ESP32C3
 that old PCM reference: the original Ogg path omitted five final packets.
 The physical fragmentation investigation remains pending.
 
+The [RX ownership follow-up](ESP32C3_RX_OWNERSHIP_20261005.md) adds a diagnostic
+compatible with the current PC19 image. A complete 160-second physical Vorbis
+capture attributes roughly 14–18 KiB of settled live memory to netif RX buffers;
+all tracked RX owners disappear after Stop and the 114,688-byte largest free
+block returns. This does not reproduce or resolve the older persistent
+fragmentation. Step 4 remains open; the original initial heap FAILs, an incomplete
+MP3 ownership capture and an Opus WebUI latency FAIL remain visible.
+
 ## Conclusion
 
 Vorbis already plays the tested 48 kHz stereo streams. The first repair should
