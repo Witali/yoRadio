@@ -16,10 +16,12 @@ function(yoradio_vorbis_repair)
       message(FATAL_ERROR "Vorbis lifecycle test requires the audited ${archive} archive")
     endif()
   endforeach()
-    target_sources(${COMPONENT_LIB} PRIVATE "vorbis_repair/setup.c" "vorbis_repair/simple.c")
+  target_sources(${COMPONENT_LIB} PRIVATE "vorbis_repair/setup.c" "vorbis_repair/simple.c" "vorbis_repair/output.c")
     target_link_options(${COMPONENT_LIB} INTERFACE
-      "-Wl,--wrap=esp_vorbis_dec_open" "-Wl,--wrap=esp_vorbis_dec_register"
-      "-Wl,--wrap=esp_audio_simple_dec_open" "-Wl,--wrap=esp_audio_simple_dec_process"
+    "-Wl,--wrap=esp_vorbis_dec_open" "-Wl,--wrap=esp_vorbis_dec_register"
+    "-Wl,--wrap=esp_vorbis_dec_decode"
+    "-Wl,--wrap=esp_audio_simple_dec_open" "-Wl,--wrap=esp_audio_simple_dec_process"
+    "-Wl,--wrap=esp_audio_simple_dec_reset"
       "-Wl,--wrap=esp_es_parse_frame" "-Wl,--wrap=esp_ogg_parse_frame"
       "-Wl,--wrap=media_lib_module_realloc")
 endfunction()
@@ -39,6 +41,7 @@ if(CONFIG_YORADIO_QEMU_VORBIS_LIFECYCLE)
   idf_component_register(SRCS "qemu_vorbis_lifecycle.c" "decoder_registration.c" INCLUDE_DIRS "."
     REQUIRES esp_audio_codec esp_partition esp_system esp_rom mbedtls)
   target_compile_options(${COMPONENT_LIB} PRIVATE -O2)
+  target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=vorbis_dsp_synthesis")
   yoradio_vorbis_repair()
   return()
 endif()

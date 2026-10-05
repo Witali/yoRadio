@@ -19,9 +19,11 @@ CALLS = {
     'decoder_register_codecs': ('__wrap_esp_vorbis_dec_register', 'esp_audio_simple_dec_register_default'),
     'decoder_task': ('__wrap_esp_audio_simple_dec_open', '__wrap_esp_audio_simple_dec_process'),
     '__wrap_esp_vorbis_dec_register': ('esp_audio_dec_register',),
-    '__wrap_esp_audio_simple_dec_process': ('esp_audio_simple_dec_process',),
+    'process_checked': ('esp_audio_simple_dec_process',),
+    '__wrap_esp_audio_simple_dec_process': ('process_checked',),
+    '__wrap_esp_vorbis_dec_decode': ('esp_vorbis_dec_decode',),
 }
-OPS = ('__wrap_esp_vorbis_dec_open', 'esp_vorbis_dec_decode',
+OPS = ('__wrap_esp_vorbis_dec_open', '__wrap_esp_vorbis_dec_decode',
        'esp_vorbis_dec_reset', 'esp_vorbis_dec_close')
 WRAPPERS = (*OPS, '__wrap_esp_ogg_parse_frame', '__wrap_esp_es_parse_frame',
             '__wrap_media_lib_module_realloc')

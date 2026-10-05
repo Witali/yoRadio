@@ -2,7 +2,7 @@
 
 Date: 2026-10-04. Reviewed checkout: `8db05fed` (`codex/aac-storage18`).
 
-**Status: steps 1 and 2 completed; steps 3–7 remain pending.**
+**Status: steps 1–3 completed; steps 4–7 remain pending.**
 This review covers the native C3 audio service, the pinned Espressif Ogg/Vorbis
 objects and retained playback evidence. It is not a complete audit of every
 instruction in the decoder. No firmware was flashed during this review.
@@ -17,8 +17,9 @@ are preserved as the repair baseline, not treated as a successful qualification.
 The [step-2 initialization report](ESP32C3_VORBIS_REPAIR_20261004.md) records
 the repaired run: all 208 fault cases handled, 100 normal cycles, exact original
 PCM and full heap recovery. The PC19 radio image builds and is retained; it has
-not been flashed or qualified on hardware. Retry/EOF precision and the physical
-fragmentation investigation remain separate pending steps.
+not been flashed or qualified on hardware. The [step-3 retry/EOF report](ESP32C3_VORBIS_OUTPUT_20261005.md) supersedes
+that old PCM reference: the original Ogg path omitted five final packets.
+The physical fragmentation investigation remains pending.
 
 ## Conclusion
 
@@ -101,7 +102,7 @@ passes non-AAC allocations through; it does not supply Vorbis with a reserve
 or make allocation infallible. Check `vorbis_info_init`, header/codebook unpack
 and every floor/residue/mapping allocator in the same failure sweep.
 
-### V3 — output-too-small retry can repeat synthesis: static risk, PCM test pending
+### V3 — output-too-small retry repeats synthesis: reproduced and repaired in step 3
 
 `esp_vorbis_dec_decode` calls `vorbis_dsp_synthesis` before comparing the required
 PCM length with output capacity. If too small, it returns
@@ -155,7 +156,7 @@ do not prove a Vorbis leak or prove that the short unpaced control fixed it.
 ## Ordered work plan
 
 Each implementation step should be a separate focused commit with its tests
-and retained results. Step 1 is complete; subsequent steps are **pending**.
+and retained results. Steps 1–3 are complete; steps 4–7 are **pending**.
 
 ### 1. Reproduce the failure paths without networking
 
@@ -201,7 +202,12 @@ physical playback result substitutes for these injected-failure tests.
 **Pass:** all step-1 failures handled, no invalid/double free, no outstanding
 stream allocations, unchanged valid-stream PCM and restored replay capability.
 
-### 3. Make PCM retry and EOF behavior deterministic
+### 3. Make PCM retry and EOF behavior deterministic — completed
+
+**Completed 2026-10-05:** [results and reproduction](ESP32C3_VORBIS_OUTPUT_20261005.md).
+The seven-case matrix matches all 535 independently extracted audio packets,
+including the tail previously lost by the streaming parser. The full allocation
+failure regression passes; broader format/granule coverage remains step 5.
 
 - Compare a sufficiently large output buffer with deliberately tiny buffers,
   repeated resize attempts, and injected resize failure. Capture complete PCM.

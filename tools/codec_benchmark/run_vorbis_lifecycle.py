@@ -26,6 +26,8 @@ ARCHIVES = {
     'libesp_audio_simple_dec.a': '232650ec81ae5e10ecbe1b2c86de2d1adf8f1b793f5ef343241c6e510db3e71f',
 }
 SOURCES = ('idf/esp32c3-oled-native/main/qemu_vorbis_lifecycle.c',
+           'idf/esp32c3-oled-native/main/qemu_vorbis_output.inc',
+           'idf/esp32c3-oled-native/main/decoder_pcm.h',
            'idf/esp32c3-oled-native/main/CMakeLists.txt',
            'idf/esp32c3-oled-native/main/Kconfig.projbuild',
            'idf/esp32c3-oled-native/sdkconfig.qemu-vorbis-lifecycle.defaults',
@@ -227,6 +229,8 @@ def main():
     parser.add_argument('--wsl', action='store_true')
     parser.add_argument('--cycles', type=int, default=100)
     parser.add_argument('--baseline-only', action='store_true')
+    parser.add_argument('--pcm-reference', type=Path,
+                        help='Independent raw-packet capture when an intentional EOF fix restores PCM')
     parser.add_argument('--case', action='append', default=[], help='Run named fault cases only, plus baseline; never full qualification')
     parser.add_argument('--timeout', type=int, default=300)
     args = parser.parse_args()
@@ -322,7 +326,23 @@ def main():
         original = json.loads((ROOT/'tests/results/esp32c3-vorbis-lifecycle-20261004/report.json').read_text())['cases'][0]['reference']
         report['original_pcm_match'] = all(reference[key] == original[key] for key in ('pcm','samples','sha256'))
         save()
-        if not report['original_pcm_match']:
+        if args.pcm_reference:
+            import gzip
+            independent = json.loads((args.pcm_reference/'report.json').read_text())
+            pcm = gzip.decompress((args.pcm_reference/'ample.pcm.gz').read_bytes())
+            expected = independent['cases'][0]['rows'][0]
+            if (not independent['raw_reference'] or not independent['all_passed'] or
+                independent['fixture_sha256'] != report['fixture']['sha256'] or
+                independent['archive_sha256'] != ARCHIVES or
+                hashlib.sha256(pcm).hexdigest() != expected['sha256'] or
+                len(pcm) != expected['pcm'] or
+                any(reference[k] != expected[k] for k in ('pcm','samples','sha256'))):
+                raise ValueError('Independent packet reference did not match repaired PCM')
+            report['pcm_reference'] = dict(reference=expected,
+                report_sha256=sha(args.pcm_reference/'report.json'),
+                fixture_sha256=independent['fixture_sha256'], raw_packet_reference=True)
+            save()
+        elif not report['original_pcm_match']:
             raise ValueError('Repaired decoder changed the original valid-stream PCM')
     attempts = reference['attempts']
     report['expected_allocation_failures'] = attempts

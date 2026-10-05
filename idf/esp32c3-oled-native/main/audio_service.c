@@ -1304,7 +1304,9 @@ static void decoder_task(void *argument) {
                 failed_generation = generation;
                 break;
             }
-            if (packet->end_of_stream || raw.len == 0) break;
+            // EOF can drain several cached Ogg packets. Keep the decoder and
+            // its PCM workspace alive until a successful call yields no PCM.
+            if (raw.eos ? (!raw.len && !frame.decoded_size) : raw.len == 0) break;
         }
         if (packet->end_of_stream || failed_generation == generation) {
             decoder_resources_release(&decoder, &aac_decoder, &output, &output_size);
