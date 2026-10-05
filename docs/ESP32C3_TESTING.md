@@ -71,10 +71,20 @@ failed-open/low-memory defects, a PCM retry concern and the investigation needed
 to identify the fragmentation owner. Its [first runtime step](ESP32C3_VORBIS_LIFECYCLE_20261004.md)
 is complete: 100 repeatable decode/close cycles, 198 individual allocation
 failures and four malformed headers in isolated QEMU. The original decoder
-still fails the fault-handling gate; repairs and physical fragmentation tracing
-remain pending. Run `python tests/test-vorbis-lifecycle.py` and
+still fails the fault-handling gate; the subsequent
+[initialization repair](ESP32C3_VORBIS_REPAIR_20261004.md) and
+[retry/EOF repair](ESP32C3_VORBIS_OUTPUT_20261005.md) pass their retained target
+tests. Physical fragmentation attribution and broader format coverage remain
+pending. Run `python tests/test-vorbis-lifecycle.py` and
 `python tests/test-vorbis-lifecycle-evidence.py` to verify the classifier and
 retained results. The linked report includes full build/run commands.
+
+The [custom-decoder terminal-memory check](ESP32C3_CUSTOM_DECODER_TERMINAL_20261005.md)
+detects retained FLAC state after natural EOF which a Stop-based check hides.
+Use `diagnostic.py terminal_memory` to measure before playback, after EOF
+without Stop, and after a separate Stop. The service now also releases custom
+FLAC/legacy state at terminal errors; the host ownership scenarios use
+`python tests/run-custom-decoder-terminal.py`.
 
 The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
 client**. Only the device-control runner knows the native C3 WebUI API. The

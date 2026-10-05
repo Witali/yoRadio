@@ -44,7 +44,7 @@ class DiagnosticCapture(run.Capture):
 
 
 def main():
-    choices = ('run', 'memory', 'ota_transition', 'pool_settle', 'terminal_memory')
+    choices = ('run', 'memory', 'ota_transition', 'pool_settle')
     if len(sys.argv) < 2 or sys.argv[1] not in choices:
         raise SystemExit('Usage: diagnostic.py {'+'|'.join(choices)+'} [runner arguments]')
     name = sys.argv.pop(1)

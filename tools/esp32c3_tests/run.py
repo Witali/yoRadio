@@ -227,10 +227,11 @@ class Suite:
             time.sleep(.1)
         raise Failure('Reboot outage and client-mode return were not observed')
 
-    def idle_heap(self):
+    def idle_heap(self, *, stop=True):
         if not self.capture.port:
             raise Blocked('Settled heap test requires --serial-port and profiling firmware')
-        self.board.stop()
+        if stop:
+            self.board.stop()
         started = time.monotonic()
         self.observe(12, 'settled-idle')
         result = []

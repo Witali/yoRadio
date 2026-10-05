@@ -1143,6 +1143,14 @@ static void decoder_task(void *argument) {
                     failed_generation = generation;
                 }
             }
+            // send_pcm copied every callback's data into the output queue.
+            // The custom workspace is no longer needed after feed has drained
+            // EOF, or when this generation has failed. Stop must not be needed
+            // to return the FLAC channel/input allocations to the heap.
+            if (packet->end_of_stream || failed_generation == generation) {
+                custom_flac_decoder_destroy(flac_decoder);
+                flac_decoder = NULL;
+            }
             return_decoded_packet(packet, failed_generation);
             continue;
         }
@@ -1191,6 +1199,17 @@ static void decoder_task(void *argument) {
                     ESP_LOGW(TAG, "Custom %s decode error: %d",
                              codec_name(codec), result);
                     state_set_audio(generation, false, "decode failed");
+                    failed_generation = generation;
+                }
+            }
+            if (packet->end_of_stream || failed_generation == generation) {
+                custom_legacy_decoder_destroy(legacy_decoder);
+                legacy_decoder = NULL;
+                // Destroy releases the owner; discard returns the reusable
+                // arena itself. Queued PCM contains independent copies.
+                if (!custom_legacy_decoder_discard_arena()) {
+                    ESP_LOGE(TAG, "Completed codec arena is still in use");
+                    state_set_audio(generation, false, "decoder release failed");
                     failed_generation = generation;
                 }
             }

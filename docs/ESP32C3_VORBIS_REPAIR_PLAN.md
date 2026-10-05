@@ -29,6 +29,12 @@ block returns. This does not reproduce or resolve the older persistent
 fragmentation. Step 4 remains open; the original initial heap FAILs, an incomplete
 MP3 ownership capture and an Opus WebUI latency FAIL remain visible.
 
+The [custom-decoder terminal follow-up](ESP32C3_CUSTOM_DECODER_TERMINAL_20261005.md)
+fixes a separate FLAC/legacy EOF ownership gap. Its physical three-minute Vorbis
+run reproduces persistent fragmentation: after Stop the largest free block drops
+from 114,688 to 94,208 bytes, while total free heap and task count recover. The
+owner is still unknown; this is new evidence for step 4, not its completion.
+
 ## Conclusion
 
 Vorbis already plays the tested 48 kHz stereo streams. The first repair should
@@ -125,6 +131,12 @@ Do not apply the AAC-specific consumed-byte behavior to Ogg without measuring
 the actual simple-decoder contract.
 
 ### V4 — audio-service terminal ownership needs correction/qualification
+
+**Update 2026-10-05:** steps 2–3 implemented the native/simple-decoder cleanup
+and checked registration. The [custom-decoder follow-up](ESP32C3_CUSTOM_DECODER_TERMINAL_20261005.md)
+extends terminal cleanup to FLAC and Helix/minimp3 and adds a physical natural-EOF
+heap check. The bullets below describe the original audit findings; the earlier
+post-Stop fragmentation still needs attribution.
 
 In [audio_service.c](../idf/esp32c3-oled-native/main/audio_service.c):
 
