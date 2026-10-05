@@ -15,18 +15,14 @@ from memory import wait_ready
 from ota import snapshot, verify_snapshot
 from run import Capture, Suite
 from audio_test_server.server import Server
+from serial_lines import serial_lines
 
 
 class DiagnosticCapture(Capture):
     def read(self):
-        while not self.closed.is_set():
-            try:
-                line = self.port.readline().decode('utf-8', errors='replace').strip()
-            except OSError:
-                self.rows.append(dict(at=time.monotonic(), line='serial capture interrupted'))
-                return
+        for line in serial_lines(self.port, self.closed):
             if re.search(r'PERF |Memory .*: free=|Wi-Fi power save:|decode (?:error|failed)|'
-                         r'allocation failed|assert failed|Guru Meditation|CORRUPT HEAP', line):
+                         r'allocation failed|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted', line):
                 self.rows.append(dict(at=time.monotonic(), line=line))
 
 

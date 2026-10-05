@@ -11,6 +11,7 @@ import time
 
 import run
 from common import filter_tls_line
+from serial_lines import serial_lines
 
 
 def filter_line(line):
@@ -18,7 +19,7 @@ def filter_line(line):
     if tls:
         return tls
     if re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|'
-                 r'assert failed|Guru Meditation|CORRUPT HEAP', line):
+                 r'assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted', line):
         return line
     registers = re.findall(r'\b(MEPC|RA|MCAUSE)\s*:\s*(0x[0-9a-fA-F]+)', line)
     if registers:
@@ -36,12 +37,7 @@ def filter_line(line):
 
 class DiagnosticCapture(run.Capture):
     def read(self):
-        while not self.closed.is_set():
-            try:
-                line = self.port.readline().decode('utf-8', errors='replace').strip()
-            except OSError:
-                self.rows.append(dict(at=time.monotonic(), line='serial capture interrupted'))
-                return
+        for line in serial_lines(self.port, self.closed):
             safe = filter_line(line)
             if safe:
                 self.rows.append(dict(at=time.monotonic(), line=safe))

@@ -13,6 +13,7 @@ from common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
                     filter_tls_line, check_certificate_rejection, exception_details)
 from audio_test_server.server import Server
 from audio_test_server.fixtures import SEQUENCES
+from serial_lines import serial_lines
 
 
 class Capture:
@@ -30,16 +31,11 @@ class Capture:
             self.thread.start()
 
     def read(self):
-        while not self.closed.is_set():
-            try:
-                line = self.port.readline().decode('utf-8', errors='replace').strip()
-            except OSError:
-                self.rows.append(dict(at=time.monotonic(), line='serial capture interrupted'))
-                return
+        for line in serial_lines(self.port, self.closed):
             tls = filter_tls_line(line)
             if tls:
                 self.rows.append(dict(at=time.monotonic(), line=tls))
-            elif re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP', line):
+            elif re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted', line):
                 self.rows.append(dict(at=time.monotonic(), line=line))
 
     def since(self, at):
