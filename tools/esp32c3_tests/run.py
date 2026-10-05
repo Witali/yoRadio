@@ -302,6 +302,8 @@ def main():
                         help='Measure settled heap before and after each load case, even when playback fails')
     parser.add_argument('--unpaced-files', action='store_true',
                         help='Use normal TCP backpressure for local /file downloads; keep existing load gates')
+    parser.add_argument('--delivery-stats', action='store_true',
+                        help='Retain host socket-write timing; does not relax playback/CPU gates')
     parser.add_argument('--https-origin', help='Trusted HTTPS origin serving identical /file routes')
     parser.add_argument('--tls-cert', type=Path)
     parser.add_argument('--tls-key', type=Path)
@@ -323,7 +325,8 @@ def main():
     report = Report(args.output/'report.json', info)
     report.data['fixture_hashes'] = {n:specs[n]['sha256'] for n in names}
     report.data['requested_suites'] = args.suite
-    report.data['server_options'] = dict(unpaced_files=args.unpaced_files)
+    report.data['server_options'] = dict(unpaced_files=args.unpaced_files,
+                                       delivery_stats=args.delivery_stats)
     if 'load' in args.suite:
         report.data['load_options'] = dict(seconds=args.load_seconds,
                                           idle_recovery=args.load_idle_recovery)
@@ -337,11 +340,13 @@ def main():
     suite = Suite(board, f'http://{args.host}:{args.port}', specs, capture, args.output)
     tls = None
     try:
-        with Server(args.host, args.port, specs, unpaced_files=args.unpaced_files) as server:
+        with Server(args.host, args.port, specs, unpaced_files=args.unpaced_files,
+                    delivery_stats=args.delivery_stats) as server:
             if args.tls_cert:
                 require(args.tls_key and args.https_origin, 'TLS server requires key and HTTPS hostname')
                 tls = Server(args.host, args.tls_port, specs, args.tls_cert, args.tls_key,
-                             unpaced_files=args.unpaced_files).__enter__()
+                             unpaced_files=args.unpaced_files,
+                             delivery_stats=args.delivery_stats).__enter__()
             for protocol in ('http','https'):
                 if protocol in args.suite:
                     for name in names:

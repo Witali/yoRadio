@@ -2,14 +2,58 @@
 import argparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+from pathlib import Path
 import ssl
 import threading
 import time
 from urllib.parse import urlsplit
 
 
+class DeliveryStats:
+    """Completed host socket writes, not TCP acknowledgements or board input."""
+    MAX_WINDOWS = 4096
+
+    def __init__(self, started, event):
+        self.result = event['delivery'] = dict(started_at=started, finished=False,
+                                               windows=[], dropped_windows=0)
+        self.started = started
+        self.bytes = self.writes = 0
+        self.write_seconds = self.max_write_seconds = self.max_late_seconds = 0
+
+    def write(self, size, started, ended, planned=None):
+        self.bytes += size
+        self.writes += 1
+        elapsed = ended-started
+        self.write_seconds += elapsed
+        self.max_write_seconds = max(self.max_write_seconds, elapsed)
+        if planned is not None:
+            self.max_late_seconds = max(self.max_late_seconds, started-planned)
+        if ended-self.started >= 1:
+            self.flush(ended)
+
+    def flush(self, ended):
+        if not self.writes:
+            return
+        row = dict(started_at=self.started, ended_at=ended, bytes=self.bytes,
+                   writes=self.writes, write_seconds=self.write_seconds,
+                   max_write_seconds=self.max_write_seconds,
+                   max_late_seconds=self.max_late_seconds)
+        if len(self.result['windows']) < self.MAX_WINDOWS:
+            self.result['windows'].append(row)
+        else:
+            self.result['dropped_windows'] += 1
+        self.started = ended
+        self.bytes = self.writes = 0
+        self.write_seconds = self.max_write_seconds = self.max_late_seconds = 0
+
+    def finish(self, ended):
+        self.flush(ended)
+        self.result.update(ended_at=ended, finished=True)
+
+
 class Server:
-    def __init__(self, host, port, fixtures, cert=None, key=None, *, unpaced_files=False):
+    def __init__(self, host, port, fixtures, cert=None, key=None, *, unpaced_files=False,
+                 delivery_stats=False):
         self.fixtures = fixtures
         self.events = []
         self.closed = threading.Event()
@@ -67,6 +111,7 @@ class Server:
                 outer.events.append(event)
                 started = time.monotonic()
                 deadline = started
+                delivery = DeliveryStats(started, event) if delivery_stats else None
                 try:
                     while not outer.closed.is_set() and time.monotonic() - started < 86400:
                         for segment in spec.get('segments', [spec]):
@@ -80,9 +125,13 @@ class Server:
                                         outer.closed.wait(15)
                                     return
                                 chunk = payload[offset:offset+1024]
+                                write_started = time.monotonic() if delivery else 0
                                 self.wfile.write(chunk)
                                 self.wfile.flush()
                                 event['sent'] += len(chunk)
+                                if delivery:
+                                    delivery.write(len(chunk), write_started, time.monotonic(),
+                                                   None if unpaced else deadline)
                                 deadline += len(chunk) / bps
                                 if mode == 'jitter' and offset % 8192 == 0:
                                     deadline += .035
@@ -96,6 +145,8 @@ class Server:
                 finally:
                     self.close_connection = True
                     event['seconds'] = time.monotonic() - started
+                    if delivery:
+                        delivery.finish(time.monotonic())
 
         class TrackingServer(ThreadingHTTPServer):
             def get_request(self):
@@ -132,16 +183,24 @@ def main():
     parser.add_argument('--fixture-manifest', help='Additional generated fixture manifest')
     parser.add_argument('--unpaced-files', action='store_true',
                         help='Serve /file at the speed allowed by TCP; retain pacing for live/fault routes')
+    parser.add_argument('--delivery-stats', action='store_true',
+                        help='Record bounded host socket-write timing and pacing lag')
+    parser.add_argument('--events-output', type=Path,
+                        help='Save fixture server events when this process exits normally')
     args = parser.parse_args()
     specs = load_fixtures(args.fixture_manifest)
     if bool(args.cert) != bool(args.key):
         parser.error('--cert and --key must be supplied together')
-    with Server(args.host,args.port,specs,args.cert,args.key, unpaced_files=args.unpaced_files):
+    with Server(args.host,args.port,specs,args.cert,args.key, unpaced_files=args.unpaced_files,
+                delivery_stats=args.delivery_stats) as server:
         print(f"Serving {len(specs)} fixtures on port {args.port}; /manifest.json lists them", flush=True)
         try:
             threading.Event().wait()
         except KeyboardInterrupt:
             pass
+    if args.events_output:
+        args.events_output.parent.mkdir(parents=True, exist_ok=True)
+        args.events_output.write_text(json.dumps(server.events, indent=2)+'\n')
 
 
 if __name__ == '__main__':

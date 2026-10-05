@@ -45,3 +45,28 @@ not replace 24-bit FLAC or other depth/rate qualification.
 C3-specific control, verification and the complete test plan are documented in
 [ESP32C3_TESTING.md](../../docs/ESP32C3_TESTING.md). Other boards can reuse this
 server with their own playlist/WebUI or test controller unchanged.
+
+## Optional delivery timing
+
+Use `--delivery-stats --events-output .build/audio-delivery.json` to save bounded
+per-request timing when the standalone server exits with Ctrl+C. The C3 load
+runner accepts `--delivery-stats` and retains these events in `report.json`.
+This works for any board and preserves payloads, pacing, routes and TLS behavior.
+
+Each roughly one-second window records completed socket-write bytes/count,
+total and maximum write time, and maximum lateness against the pacing schedule.
+Absolute timestamps use the host's monotonic clock, allowing comparison with
+the controller's status/serial observations on the same host. Unpaced files
+have no scheduled delivery deadline. A long blocked write creates a longer
+window; gaps are not filled with invented samples.
+
+These are writes accepted by the host socket API, **not TCP acknowledgements or
+bytes decoded on the board**. A failed partial write may have sent some bytes
+that cannot be counted as a completed write. Combine this evidence with the
+board's compressed-input/CPU/TCP statistics before attributing a playback gap.
+At most 4096 windows are saved per request; `dropped_windows` reports truncation.
+An interrupted worker can leave `finished=false`. Reject incomplete captures
+when comparing full-stream totals. Timing is disabled by default.
+
+Run `python tests/test-audio-delivery-stats.py` for delay accounting, overflow,
+and real localhost HTTP payload comparisons with timing enabled/disabled.
