@@ -633,6 +633,16 @@ Do not create a fake internal-state test or mark this planned optimization done.
 
 ## Results and limitations
 
+### FLAC predictor and high-depth playback
+
+The [LPC optimization report](ESP32C3_FLAC_PREDICTOR_20261006.md) compares exact
+PCM through segmented/contiguous/adapter paths, dense and sparse order-32
+predictors, and physical CPU measurements. Use `summarize_terminal_cpu.py` for
+short EOF diagnostics; it preserves the original verdict and does not replace
+the sustained load gate. `diagnostic.py` now retains task-watchdog headings as
+failures even when no register dump follows. The [depth report](ESP32C3_FLAC_DEPTHS_20261005.md)
+retains the earlier CPU saturation and large-block allocation failures.
+
 ### AAC SBR layout regression
 
 `python tests/test-aac-sbr-layout.py` validates retained lossless allocation/PCM

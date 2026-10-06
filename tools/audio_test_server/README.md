@@ -46,6 +46,7 @@ For FLAC depth and stereo-mode qualification:
 
 ```powershell
 python tools/audio_test_server/generate_flac_depths.py --physical --output .build/flac-depth-tones
+python tools/audio_test_server/generate_flac_depths.py --physical --dense-lpc --depth 24 --seconds 64 --output .build/flac-dense-long
 python tools/audio_test_server/generate_flac_high_depth.py --seconds 64 --output .build/flac24-stress
 python tools/audio_test_server/generate_flac_high_depth.py --seconds 12 --block-size 8192 --output .build/flac24-large
 ```
@@ -56,6 +57,11 @@ for host comparison, not listening. The FFmpeg generator preserves 24 source
 bits and exercises all four stereo modes. Manifests include encoded hashes and
 the expected signed-16 PCM hash. Serve any manifest with `--fixture-manifest`;
 these generators do not control or flash boards.
+
+`--dense-lpc` uses all 32 predictor coefficients; `--seconds` controls physical
+tone duration and repeatable `--depth` restricts source depths. Use at least
+63 seconds of continuous input for a 60-second load test. Short EOF tests alone
+cannot establish real-time decoding under sustained load.
 
 C3-specific control, verification and the complete test plan are documented in
 [ESP32C3_TESTING.md](../../docs/ESP32C3_TESTING.md). Other boards can reuse this

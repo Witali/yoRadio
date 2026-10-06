@@ -33,7 +33,8 @@ SampleBuffer samplesBuffer[MAX_CHANNELS] = {};
 int32_t* samplesStorage = nullptr;
 int32_t* samplesBuffer[MAX_CHANNELS] = {};
 #endif
-int32_t coefs[32] = {};
+constexpr size_t kMaximumLpcOrder = 32;
+int32_t coefs[kMaximumLpcOrder] = {};
 uint8_t coefficientCount = 0;
 uint16_t allocatedBlockSize = 0;
 uint8_t allocatedChannels = 0;
@@ -672,11 +673,28 @@ int8_t decodeResiduals(uint8_t warmup, uint8_t ch) {
 }
 //----------------------------------------------------------------------------------------------------------------------
 void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
-
+    // Keep the encoded order for warm-up/residual positions. Trailing zero
+    // coefficients do not contribute, even when the encoded order is 32.
+    size_t activeCoefficients = coefficientCount;
+    while(activeCoefficients && coefs[activeCoefficients - 1] == 0)
+        --activeCoefficients;
+    if(!activeCoefficients) return;
     for (int i = coefficientCount; i < m_blockSize; i++) {
         int64_t sum = 0;
-        for (int j = 0; j < coefficientCount; j++){
-            sum += static_cast<int64_t>(samplesBuffer[ch][i - 1 - j]) * coefs[j];
+#ifdef FLAC_SEGMENTED_WORKSPACE
+        // Most predictor histories lie inside one allocation. Resolve its
+        // pointer once instead of looking up a segment for every multiply.
+        // A pointer must never walk into the separately allocated neighbour.
+        if((i - activeCoefficients) / kWorkspaceSegmentSamples !=
+           (i - 1) / kWorkspaceSegmentSamples) {
+            for(size_t j = 0; j < activeCoefficients; ++j)
+                sum += static_cast<int64_t>(samplesBuffer[ch][i - 1 - j]) * coefs[j];
+        } else
+#endif
+        {
+            const int32_t *history = &samplesBuffer[ch][i - 1];
+            for(size_t j = 0; j < activeCoefficients; ++j)
+                sum += static_cast<int64_t>(history[-static_cast<int>(j)]) * coefs[j];
         }
         const int64_t value = samplesBuffer[ch][i] + (sum >> shift);
         if(value < INT32_MIN || value > INT32_MAX) {

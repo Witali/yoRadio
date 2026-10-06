@@ -1,0 +1,89 @@
+{
+  "board": {
+    "version": "v0.9.693-1187-gc023564c-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "b3a6d1f4a72718ec1d62fcfc4c150f3af3a3255a99e1462bbb0948094092d63c"
+  },
+  "streams": [
+    {
+      "name": "flac-24bit-stereo-lpc32dense:auto",
+      "original": {
+        "name": "flac-24bit-stereo-lpc32dense:auto:play-to-eof",
+        "result": "PASS",
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 18.453
+      },
+      "start": 803363.859,
+      "end": 803381.265,
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "decoder_windows": 3,
+      "timing_records": [
+        {
+          "at": 803368.875,
+          "line": "I (309910) audio: PERF FLAC: window 5027 ms, audio 3946 ms, decode 3404 ms (86.2%, x1.15), calls 555, max 28154 us, in 1047712, pcm 757760"
+        },
+        {
+          "at": 803373.921,
+          "line": "I (314951) audio: PERF FLAC: window 5041 ms, audio 4031 ms, decode 3524 ms (87.4%, x1.14), calls 567, max 25596 us, in 1070496, pcm 774144"
+        },
+        {
+          "at": 803378.921,
+          "line": "I (319961) audio: PERF FLAC: window 5009 ms, audio 3903 ms, decode 3237 ms (82.9%, x1.20), calls 549, max 26859 us, in 1036512, pcm 749568"
+        }
+      ],
+      "diagnostic": {
+        "decode_percent": 85.56397306397307,
+        "audio_wall_ratio": 0.7879551634940638,
+        "maximum_decode_call_us": 28154
+      }
+    },
+    {
+      "name": "flac-24bit-stereo-lpc32dense:flac",
+      "original": {
+        "name": "flac-24bit-stereo-lpc32dense:flac:play-to-eof",
+        "result": "PASS",
+        "evidence": {
+          "samples": 14,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 18.219
+      },
+      "start": 803418.843,
+      "end": 803436.031,
+      "runtime": {
+        "result": "FAIL",
+        "reason": "Serial panic or capture failure"
+      },
+      "decoder_windows": 2,
+      "timing_records": [
+        {
+          "at": 803423.828,
+          "line": "I (364872) audio: PERF FLAC: window 5000 ms, audio 3946 ms, decode 3282 ms (83.1%, x1.20), calls 555, max 27445 us, in 1047712, pcm 757760"
+        },
+        {
+          "at": 803428.859,
+          "line": "MHARTID : 0x00000000  I (369894) audio: PERF FLAC: window 5022 ms, audio 4053 ms, decode 3077 ms (75.9%, x1.31), calls 570, max 25344 us, in 1076160, pcm 778240"
+        }
+      ],
+      "diagnostic": {
+        "decode_percent": 79.49743717964746,
+        "audio_wall_ratio": 0.7981440830173618,
+        "maximum_decode_call_us": 27445
+      }
+    }
+  ],
+  "runtime": {
+    "result": "FAIL",
+    "reason": "Serial panic or capture failure"
+  },
+  "note": "Short-window diagnostics only. Original failures retained; no acoustic or sustained-load qualification."
+}

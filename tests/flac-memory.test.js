@@ -63,7 +63,8 @@ test('web-file headers inspect buffered bytes after network input pauses', () =>
 });
 
 test('FLAC prediction avoids heap churn and 32-bit accumulation overflow', () => {
-  assert.match(decoderSource, /int32_t coefs\[32\]/);
+  assert.match(decoderSource, /constexpr size_t kMaximumLpcOrder = 32;/);
+  assert.match(decoderSource, /int32_t coefs\[kMaximumLpcOrder\]/);
   assert.doesNotMatch(decoderSource, /vector<int32_t>\s*coefs/);
   assert.match(decoderSource, /int64_t sum = 0/);
 });
