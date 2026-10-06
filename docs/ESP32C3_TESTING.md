@@ -635,6 +635,16 @@ Do not create a fake internal-state test or mark this planned optimization done.
 
 ### FLAC predictor and high-depth playback
 
+The [real-radio LPC study](ESP32C3_FLAC_RADIO_20261006.md) adds matched
+120-second, 24-bit FLAC recordings with maximum predictor orders 32 and 12.
+`capture_radio_flac.py` and the shared fixture server are board-independent;
+`radio_flac_study.py` measures the C3 with alternating pair order. Use
+`summarize_radio_flac.py` to separate predictor frequency, time-weighted CPU
+saturation, decoder-task CPU and elapsed decoder cost. It also retains actual
+audio/wall progress: a passed CPU gate alone does not prove gap-free output.
+Run `tests/test-radio-flac-study.py` for statistics checks and
+`tests/test-radio-flac-evidence.py` to replay the retained corpus measurements.
+
 The [LPC optimization report](ESP32C3_FLAC_PREDICTOR_20261006.md) compares exact
 PCM through segmented/contiguous/adapter paths, dense and sparse order-32
 predictors, and physical CPU measurements. Use `summarize_terminal_cpu.py` for

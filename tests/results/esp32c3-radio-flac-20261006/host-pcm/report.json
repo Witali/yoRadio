@@ -1,0 +1,645 @@
+{
+  "revision": null,
+  "sanitizers": true,
+  "sources": {
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "0da7de7b87a876bebe0d4b160997724240b6f8f4aff0e68b9372f4f57f1bc811",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "046b1f802e27de30ff2e724f5f347222cba39d48633e6b49324de1ee5258309b",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp": "484817a367de296fa5e0856fc6cf3f13a19e034dd3222b8dd88ec6185bcd8808",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.h": "a6d5ff612842864bb23fbe176d0f935dd576eb0a856e75a92c7c6a68cadcf9f2",
+    "tests/native/flac_bounds/Arduino.h": "dffa44e2a0dd4600b92300f6d9cf0b5f1c93100e657818e4723ac0dd9bf15883",
+    "tests/native/flac_bounds/main.cpp": "fe1d1fee7e3d9be4e8542f9887247ce9ce97db2e986b10e14147e255501d148e",
+    "tools/audio_test_server/generate_flac_depths.py": "1f75390e8c29949dbb5888ee0d1871187bab97a1ef48e963ff70047c01fd453a",
+    "tools/codec_benchmark/run_flac_depths.py": "e22d7c978321d2c780ea9966e732be07c4e833e36c2b5df5db6552c04c08176f",
+    "tests/native/flac_depths/adapter.cpp": "bd78ed50021de646561b9cfcadd3ba740e2484f14ca025b94a128087fb6651df",
+    "tests/native/flac_depths/esp_log.h": "16160e8541af07aa353b8dbc7e6df5fb680acd74ed6616a0dc71811b745dbbef",
+    "tests/native/flac_depths/esp_timer.h": "c5369c94033dc9ee95473bbc5748739650381ea2aac538368c580d5632ed1b21",
+    "tests/native/flac_depths/oom.cpp": "094bcf47723282f099891bc840533192aaed573270967fd2dda50721b97da8b2",
+    "tests/native/flac_depths/freertos/FreeRTOS.h": "702a3187bdbc62932a3da567af9bcf6c4465c68c5bc913d1799fbffb6557c31c",
+    "tests/native/flac_depths/freertos/task.h": "b2d6fedcdfd2b4700981e5ac63dea29c60039353c5eda36dbe9e6bef0620328e"
+  },
+  "cases": [
+    {
+      "name": "radio-groovesalad-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=58416 chunks=13692 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=59440 chunks=14700 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-dronezone-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=54320 chunks=11473 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-dronezone-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=55344 chunks=12040 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-indiepop-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=58928 chunks=15930 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-indiepop-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=60208 chunks=17050 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-sonicuniverse-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=60208 chunks=15001 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-sonicuniverse-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=60464 chunks=15169 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-bootliquor-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=60720 chunks=16282 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-bootliquor-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=60720 chunks=16471 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-7soul-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=61232 chunks=16926 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-7soul-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=61232 chunks=17199 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-folkfwd-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=62000 chunks=16723 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-folkfwd-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=62256 chunks=16863 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-illstreet-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=58672 chunks=14875 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-illstreet-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=59952 chunks=16044 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-thetrip-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=59440 chunks=14238 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-thetrip-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=59952 chunks=15211 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=62000 chunks=18088 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "output": "result=0 frames=5292000 calls=11485 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "output": "result=0 frames=5292000 calls=4594 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 21168000,
+          "sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "output": "PASS bytes=21168000 decoder_peak_bytes=62256 chunks=18308 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+        "bytes": 21168000,
+        "known_pcm_identical": true
+      }
+    }
+  ],
+  "ffmpeg": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "passed": true,
+  "failures": 0
+}
