@@ -1,0 +1,3745 @@
+{
+  "revision": null,
+  "sanitizers": true,
+  "sources": {
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "13855df4233aba79f834ae4215a5cd71c19df90ba238a858c492391499ad9ac3",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "046b1f802e27de30ff2e724f5f347222cba39d48633e6b49324de1ee5258309b",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp": "484817a367de296fa5e0856fc6cf3f13a19e034dd3222b8dd88ec6185bcd8808",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.h": "a6d5ff612842864bb23fbe176d0f935dd576eb0a856e75a92c7c6a68cadcf9f2",
+    "tests/native/flac_bounds/Arduino.h": "dffa44e2a0dd4600b92300f6d9cf0b5f1c93100e657818e4723ac0dd9bf15883",
+    "tests/native/flac_bounds/main.cpp": "fe1d1fee7e3d9be4e8542f9887247ce9ce97db2e986b10e14147e255501d148e",
+    "tools/audio_test_server/generate_flac_depths.py": "cdd199c60b896d2938a8e84dcf8167d838547fc138faf96c465e1873d34acf9e",
+    "tools/codec_benchmark/run_flac_depths.py": "e22d7c978321d2c780ea9966e732be07c4e833e36c2b5df5db6552c04c08176f",
+    "tests/native/flac_depths/adapter.cpp": "bd78ed50021de646561b9cfcadd3ba740e2484f14ca025b94a128087fb6651df",
+    "tests/native/flac_depths/esp_log.h": "16160e8541af07aa353b8dbc7e6df5fb680acd74ed6616a0dc71811b745dbbef",
+    "tests/native/flac_depths/esp_timer.h": "c5369c94033dc9ee95473bbc5748739650381ea2aac538368c580d5632ed1b21",
+    "tests/native/flac_depths/oom.cpp": "094bcf47723282f099891bc840533192aaed573270967fd2dda50721b97da8b2",
+    "tests/native/flac_depths/freertos/FreeRTOS.h": "702a3187bdbc62932a3da567af9bcf6c4465c68c5bc913d1799fbffb6557c31c",
+    "tests/native/flac_depths/freertos/task.h": "b2d6fedcdfd2b4700981e5ac63dea29c60039353c5eda36dbe9e6bef0620328e"
+  },
+  "cases": [
+    {
+      "name": "flac-4bit-mono-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "PASS bytes=2048 decoder_peak_bytes=4912 chunks=3 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-mono-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "ba7a2d943c55306bb2d2968e2d52438512037f0209dc954b6f27a5fada98afb6",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "ba7a2d943c55306bb2d2968e2d52438512037f0209dc954b6f27a5fada98afb6",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "ba7a2d943c55306bb2d2968e2d52438512037f0209dc954b6f27a5fada98afb6",
+          "output": "PASS bytes=2048 decoder_peak_bytes=5168 chunks=4 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "ba7a2d943c55306bb2d2968e2d52438512037f0209dc954b6f27a5fada98afb6",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-mono-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+          "output": "PASS bytes=2048 decoder_peak_bytes=5936 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-mono-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+          "output": "PASS bytes=2048 decoder_peak_bytes=5424 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-stereo-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-stereo-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9776 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-stereo-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11056 chunks=7 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-stereo-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "PASS bytes=4096 decoder_peak_bytes=10288 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-left-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-left-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9776 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-left-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11056 chunks=7 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-left-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "PASS bytes=4096 decoder_peak_bytes=10544 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-right-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-right-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9776 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-right-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11056 chunks=7 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-right-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "PASS bytes=4096 decoder_peak_bytes=10544 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-mid-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-mid-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+          "output": "PASS bytes=4096 decoder_peak_bytes=10032 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-mid-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11056 chunks=7 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-4bit-mid-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+          "output": "PASS bytes=4096 decoder_peak_bytes=10544 chunks=5 source_bits=4 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-mono-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "PASS bytes=2048 decoder_peak_bytes=4912 chunks=3 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-mono-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "65dd4f4b2671be5ddf1b24043d299cde6c8a38d5a858a69d466f15382a048155",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "65dd4f4b2671be5ddf1b24043d299cde6c8a38d5a858a69d466f15382a048155",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "65dd4f4b2671be5ddf1b24043d299cde6c8a38d5a858a69d466f15382a048155",
+          "output": "PASS bytes=2048 decoder_peak_bytes=5680 chunks=5 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "65dd4f4b2671be5ddf1b24043d299cde6c8a38d5a858a69d466f15382a048155",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-mono-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+          "output": "PASS bytes=2048 decoder_peak_bytes=6448 chunks=5 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-mono-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+          "output": "PASS bytes=2048 decoder_peak_bytes=5936 chunks=5 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-stereo-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-stereo-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "PASS bytes=4096 decoder_peak_bytes=10800 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-stereo-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12080 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-stereo-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11312 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-left-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-left-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "PASS bytes=4096 decoder_peak_bytes=10800 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-left-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12080 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-left-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11568 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-right-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-right-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "PASS bytes=4096 decoder_peak_bytes=10800 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-right-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12080 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-right-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11568 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-mid-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-mid-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11056 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-mid-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12080 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-8bit-mid-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11568 chunks=7 source_bits=8 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-mono-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "PASS bytes=2048 decoder_peak_bytes=4912 chunks=3 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-mono-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "37cf3de8559b0587689ad7ac0a26f8b351cf66af6c9508be2315308b987eb940",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "37cf3de8559b0587689ad7ac0a26f8b351cf66af6c9508be2315308b987eb940",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "37cf3de8559b0587689ad7ac0a26f8b351cf66af6c9508be2315308b987eb940",
+          "output": "PASS bytes=2048 decoder_peak_bytes=6192 chunks=5 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "37cf3de8559b0587689ad7ac0a26f8b351cf66af6c9508be2315308b987eb940",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-mono-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+          "output": "PASS bytes=2048 decoder_peak_bytes=6960 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-mono-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+          "output": "PASS bytes=2048 decoder_peak_bytes=6448 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-stereo-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-stereo-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11824 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-stereo-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13104 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-stereo-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12336 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-left-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-left-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11824 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-left-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13104 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-left-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12592 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-right-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-right-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "PASS bytes=4096 decoder_peak_bytes=11824 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-right-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13104 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-right-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12592 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-mid-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-mid-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12080 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-mid-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13104 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-12bit-mid-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12592 chunks=7 source_bits=12 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-mono-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "PASS bytes=2048 decoder_peak_bytes=4912 chunks=3 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-mono-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "2724fa7db96d549228780e81cbc95d7dc84be26f0e34598f8d73542b5e8b5e1a",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "2724fa7db96d549228780e81cbc95d7dc84be26f0e34598f8d73542b5e8b5e1a",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "2724fa7db96d549228780e81cbc95d7dc84be26f0e34598f8d73542b5e8b5e1a",
+          "output": "PASS bytes=2048 decoder_peak_bytes=6704 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "2724fa7db96d549228780e81cbc95d7dc84be26f0e34598f8d73542b5e8b5e1a",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-mono-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+          "output": "PASS bytes=2048 decoder_peak_bytes=7472 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-mono-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+          "output": "PASS bytes=2048 decoder_peak_bytes=6960 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-stereo-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-stereo-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12848 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-stereo-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14128 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-stereo-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13360 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-left-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-left-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12848 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-left-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14128 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-left-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13616 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-right-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-right-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "PASS bytes=4096 decoder_peak_bytes=12848 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-right-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14128 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-right-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13616 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-mid-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-mid-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13104 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-mid-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14128 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-16bit-mid-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13616 chunks=7 source_bits=16 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-mono-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "PASS bytes=2048 decoder_peak_bytes=4912 chunks=3 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-mono-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+          "output": "PASS bytes=2048 decoder_peak_bytes=7216 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-mono-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+          "output": "PASS bytes=2048 decoder_peak_bytes=7984 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-mono-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+          "output": "PASS bytes=2048 decoder_peak_bytes=7472 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-stereo-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-stereo-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13872 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-stereo-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=15152 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-stereo-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14384 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-left-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-left-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13872 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-left-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=15152 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-left-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14640 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-right-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-right-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=13872 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-right-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=15152 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-right-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14640 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-mid-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-mid-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14128 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-mid-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=15152 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-20bit-mid-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14640 chunks=7 source_bits=20 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-mono-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+          "output": "PASS bytes=2048 decoder_peak_bytes=4912 chunks=3 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-mono-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+          "output": "PASS bytes=2048 decoder_peak_bytes=7728 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-mono-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+          "output": "PASS bytes=2048 decoder_peak_bytes=8496 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-mono-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 2048,
+          "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+          "output": "PASS bytes=2048 decoder_peak_bytes=7984 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+        "bytes": 2048,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-stereo-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-stereo-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14896 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-stereo-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=16176 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-stereo-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=15408 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-left-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-left-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14896 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-left-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=16176 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-left-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=15664 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-right-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-right-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=14896 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-right-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=16176 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-right-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=15664 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-mid-constant",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+          "output": "PASS bytes=4096 decoder_peak_bytes=9008 chunks=3 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-mid-verbatim",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=15152 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-mid-fixed4",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=16176 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-mid-lpc32",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=3 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "result=0 frames=1024 calls=2 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 4096,
+          "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+          "output": "PASS bytes=4096 decoder_peak_bytes=15664 chunks=7 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+        "bytes": 4096,
+        "known_pcm_identical": true
+      }
+    }
+  ],
+  "ffmpeg": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "passed": true,
+  "failures": 0
+}

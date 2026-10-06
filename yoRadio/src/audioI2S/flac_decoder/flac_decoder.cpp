@@ -693,7 +693,18 @@ void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
 #endif
         {
             const int32_t *history = &samplesBuffer[ch][i - 1];
-            for(size_t j = 0; j < activeCoefficients; ++j)
+            // Four taps share one loop branch and pointer update on RV32.
+            // Keep every product and addition wide; high-depth FLAC can
+            // overflow a 32-bit accumulator even when the final PCM fits.
+            constexpr size_t kTapsPerGroup = 4;
+            size_t j = 0;
+            for(; j + kTapsPerGroup <= activeCoefficients; j += kTapsPerGroup) {
+                sum += static_cast<int64_t>(history[-static_cast<int>(j)]) * coefs[j];
+                sum += static_cast<int64_t>(history[-static_cast<int>(j + 1)]) * coefs[j + 1];
+                sum += static_cast<int64_t>(history[-static_cast<int>(j + 2)]) * coefs[j + 2];
+                sum += static_cast<int64_t>(history[-static_cast<int>(j + 3)]) * coefs[j + 3];
+            }
+            for(; j < activeCoefficients; ++j)
                 sum += static_cast<int64_t>(history[-static_cast<int>(j)]) * coefs[j];
         }
         const int64_t value = samplesBuffer[ch][i] + (sum >> shift);

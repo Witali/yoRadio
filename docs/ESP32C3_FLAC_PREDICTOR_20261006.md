@@ -16,6 +16,75 @@ Arduino storage. All multiply/accumulate and residual addition remain signed
 64-bit, with the existing representability check before storing signed 32-bit.
 No coefficient quantization, PCM precision reduction or format limit is added.
 
+## Follow-up: four-tap groups (6 October 2026)
+
+The inner loop now processes four consecutive coefficients per iteration, then
+handles the remaining zero to three coefficients. This removes repeated loop
+control and address updates on RV32. The production `-O3` compiler further
+expands these groups; the retained disassembly shows the actual generated code.
+Histories crossing workspace allocations retain the original indexed path.
+
+The predictor still uses signed 64-bit products and sums, performs the original
+right shift only after summing, and checks residual addition before storing the
+result. The dependency on preceding reconstructed samples is unchanged. These
+requirements follow [RFC 9639 section 9.2.6](https://www.rfc-editor.org/rfc/rfc9639.html#section-9.2.6).
+Reducing the accumulator to 32 bits without a proven range bound is unsafe for
+high-depth streams; see the [integer-width discussion](https://www.rfc-editor.org/rfc/rfc9639.html#appendix-A.3).
+
+The new image is `firmware/development/esp32c3-flac-unroll/app.bin`, built with
+the same configuration as `esp32c3-flac-predictor`. App size increases by
+**1,056 bytes**, to 1,577,600 bytes. IRAM, static DRAM and RTC section sizes are
+unchanged; no heap allocation or persistent workspace is added. The generated
+predictor stack frame is 64 bytes; this is not a claim of zero stack usage.
+
+Host validation passes **2,444 scalar-reference predictor cases**, including
+all orders 0..32, every legal shift 0..15, coefficient extrema, asymmetric
+coefficients, all four-tap remainders and a partially allocated final segment.
+Both storage modes pass ASan/UBSan. **375 full decoder comparisons** match
+known PCM and FFmpeg: 120 format fixtures, four real 24-bit/8192-block files,
+and the 64-second dense LPC32 file, each through three decoder paths. The
+truncation/overflow regressions pass in both storage modes.
+
+The immediate before/after physical test uses the identical 64-second,
+24-bit stereo, dense LPC32 fixture, 60 seconds of playback with frequent WebUI
+polling, and the same firmware configuration. The first 10 seconds are excluded
+from timing statistics using the existing rule.
+
+| Measurement | Previous predictor | Four-tap groups |
+| --- | ---: | ---: |
+| Decode-call time per second of audio | 599.1 ms | 481.5 ms |
+| Audio duration / elapsed duration | 0.8788 | 0.9867 |
+| Mean / peak CPU | 100 / 100% | 100 / 100% |
+| CPU acceptance gate | FAIL | FAIL |
+| Runtime diagnostic gate | FAIL | FAIL |
+| Heap recovery after Stop | PASS | PASS |
+
+This pair shows **19.6% less elapsed decode-call time per audio second**
+(about 1.24x decoder throughput). It is not a measurement of the LPC function
+alone: decode-call timing includes the rest of FLAC and task interruptions.
+The CPU remains saturated and runtime register dumps remain present, so the
+candidate is **not production-qualified** and this is not a real-time playback
+PASS. OTA while AAC played passed and retained Wi-Fi, playlist and settings.
+
+A second candidate run confirms the direction: 475.2 ms of decode-call time
+per audio second (20.7% below the control), audio/wall 0.9885, CPU 100%, and
+the original CPU/runtime gates still FAIL. The 60-second HE-AACv2 regression
+passes CPU, runtime and Stop recovery: mean/peak CPU 66.71/67.9%, audio/wall
+1.00138, minimum heap/largest block 44,984/32,768 bytes. Its maximum WebUI
+response is 140 ms. This short regression does not resolve the earlier
+30-minute HE-AACv2 heap failure.
+
+The 60-second 16-bit FLAC control also passes CPU, runtime and Stop recovery:
+mean/peak CPU 67.16/68.0%, audio/wall 1.00161, decode-call/audio 24.05%, and
+minimum heap/largest block 71,048/55,296 bytes. These are observed regression
+results, not an isolated predictor benchmark or a long-stream qualification.
+
+The follow-up measurements, frozen sources and disassembly are retained in
+[`esp32c3-flac-unroll-20261006`](../tests/results/esp32c3-flac-unroll-20261006/manifest.json).
+The earlier results below describe the preceding optimization and remain
+unchanged. Large-frame memory failures and the long HE-AACv2 heap gate are
+separate unresolved issues.
+
 ## Host coverage
 
 - 198 independent scalar-reference cases per storage mode: orders 0 through 32,
