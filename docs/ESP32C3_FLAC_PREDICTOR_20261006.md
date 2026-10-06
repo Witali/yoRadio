@@ -85,7 +85,56 @@ The earlier results below describe the preceding optimization and remain
 unchanged. Large-frame memory failures and the long HE-AACv2 heap gate are
 separate unresolved issues.
 
-## Host coverage
+## Follow-up: move address calculations outside the sample loop
+
+The next candidate, `esp32c3-flac-spans`, resolves the workspace segment,
+destination pointer and end pointer once per contiguous span. The normal
+sample loop then advances the destination pointer directly. Only the first
+`activeCoefficients` samples of a new allocation use per-tap segment lookup;
+their history can belong to the preceding allocation. The first span already
+has its warm-up samples. The final span is capped by the actual frame length,
+including partially allocated segments. No history is copied into a cache.
+
+The shift is validated once against its legal 0..15 range. This adds a guard
+against invalid direct calls; the compiler still lowers the signed 64-bit
+shift generically, so the guard alone is not claimed as a speed improvement.
+The coefficient count, trimming of trailing zero coefficients and group
+offsets were already outside the sample loop in the previous RV32 code.
+Products and sums depend on newly reconstructed samples and remain inside.
+
+The retained RV32 disassembly confirms that the main sample loop has no
+segment-number/offset calculation or segment-table load. The boundary prefix
+retains checked indexing. Both candidates have a 64-byte predictor stack
+frame and identical static RAM/IRAM/RTC sizes. The new app is 1,577,696 bytes,
+**96 bytes larger** than the four-tap candidate.
+
+The same **2,444 predictor comparisons and 375 full decoder comparisons** pass
+again under ASan/UBSan with exact PCM. New negative tests reject shifts 16,
+32, 64 and 255 before accessing or shifting sample values. The actual
+segmented and contiguous implementations are exercised, including all
+allocation boundaries and the partial final segment.
+
+In the physical dense LPC32 run, decode-call time is **481.1 ms per audio
+second**, audio/wall 0.98834, and CPU 100%. This is inside the preceding
+four-tap candidate's 475.2..481.5 ms range: **no additional LPC32 speedup is
+demonstrated by this experiment**. CPU and runtime gates still fail; Stop
+recovery passes. The 60-second HE-AACv2 regression passes CPU/runtime/recovery
+with mean/peak CPU 66.83/67.7%, audio/wall 1.00096 and minimum heap/largest
+block 44,704/32,768 bytes. OTA while playing AAC passes in 21.47 seconds with
+settings, playlist and Wi-Fi retained. This does not qualify the candidate
+for production or replace long-stream testing.
+
+The 16-bit FLAC control passes CPU/runtime/recovery: mean/peak CPU
+66.78/67.8%, audio/wall 1.00150 and decode-call/audio 23.18%, versus 24.05%
+in the preceding run (3.6% less elapsed decode-call time in this pair).
+This small difference is not an isolated or repeated performance proof.
+The span organization is retained for its explicit allocation boundaries;
+no additional LPC32 acceleration is claimed.
+
+Reports, exact sources and disassembly are retained in
+[`esp32c3-flac-spans-20261006`](../tests/results/esp32c3-flac-spans-20261006/manifest.json).
+
+## Host coverage for the earlier predictor
 
 - 198 independent scalar-reference cases per storage mode: orders 0 through 32,
   both channels, dense/late-nonzero/all-zero coefficients, 8192 samples spanning

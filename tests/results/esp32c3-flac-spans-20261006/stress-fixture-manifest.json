@@ -1,0 +1,36 @@
+{
+  "generator": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "source_sha256": "308349132dd2a01ebb02e991c050bff3a59456377927fb021689bddb6c6b34b6",
+  "source_filter": [
+    "anoisesrc=color=white:amplitude=0.34:sample_rate=48000:duration=120:seed=12345[nl]",
+    "anoisesrc=color=pink:amplitude=0.34:sample_rate=48000:duration=120:seed=67890[nr]",
+    "sine=frequency=997:sample_rate=48000:duration=120:beep_factor=2[tl]",
+    "sine=frequency=1601:sample_rate=48000:duration=120:beep_factor=2[tr]",
+    "[nl][tl]amix=inputs=2:weights='0.72 0.28':normalize=0[left]",
+    "[nr][tr]amix=inputs=2:weights='0.72 0.28':normalize=0[right]",
+    "[left][right]amerge=inputs=2,alimiter=limit=0.95[out]"
+  ],
+  "source_bits": 16,
+  "fixtures": [
+    {
+      "name": "stress-flac-48000-2ch-16bit-120s",
+      "file": "stress-flac-48000-2ch-16bit-120s.flac",
+      "seconds": 120.0,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "flac",
+      "mime": "audio/flac",
+      "profile": "flac",
+      "sha256": "566a9a5b52072496da38c8699341acc4225c13b2800a6756c51ce126d74f3c8e",
+      "bytes": 19253930,
+      "average_kbps": 1283.5953333333332,
+      "encoder_options": [
+        "-c:a",
+        "flac",
+        "-compression_level",
+        "8"
+      ]
+    }
+  ]
+}

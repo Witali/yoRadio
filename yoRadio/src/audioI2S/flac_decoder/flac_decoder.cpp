@@ -34,6 +34,7 @@ int32_t* samplesStorage = nullptr;
 int32_t* samplesBuffer[MAX_CHANNELS] = {};
 #endif
 constexpr size_t kMaximumLpcOrder = 32;
+constexpr uint8_t kMaximumLpcPredictionShift = 15;
 int32_t coefs[kMaximumLpcOrder] = {};
 uint8_t coefficientCount = 0;
 uint16_t allocatedBlockSize = 0;
@@ -673,26 +674,52 @@ int8_t decodeResiduals(uint8_t warmup, uint8_t ch) {
 }
 //----------------------------------------------------------------------------------------------------------------------
 void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
+    if(shift > kMaximumLpcPredictionShift) {
+        m_readError = ERR_FLAC_INVALID_DATA;
+        return;
+    }
     // Keep the encoded order for warm-up/residual positions. Trailing zero
     // coefficients do not contribute, even when the encoded order is 32.
     size_t activeCoefficients = coefficientCount;
     while(activeCoefficients && coefs[activeCoefficients - 1] == 0)
         --activeCoefficients;
     if(!activeCoefficients) return;
-    for (int i = coefficientCount; i < m_blockSize; i++) {
-        int64_t sum = 0;
+    const auto restoreSample = [shift](int32_t* sample, int64_t sum) {
+        const int64_t value = *sample + (sum >> shift);
+        if(value < INT32_MIN || value > INT32_MAX) {
+            m_readError = ERR_FLAC_INVALID_DATA;
+            return false;
+        }
+        *sample = static_cast<int32_t>(value);
+        return true;
+    };
+    size_t sampleIndex = coefficientCount;
+    while(sampleIndex < m_blockSize) {
+        int32_t* output = &samplesBuffer[ch][sampleIndex];
+        size_t spanEnd = m_blockSize;
 #ifdef FLAC_SEGMENTED_WORKSPACE
-        // Most predictor histories lie inside one allocation. Resolve its
-        // pointer once instead of looking up a segment for every multiply.
-        // A pointer must never walk into the separately allocated neighbour.
-        if((i - activeCoefficients) / kWorkspaceSegmentSamples !=
-           (i - 1) / kWorkspaceSegmentSamples) {
-            for(size_t j = 0; j < activeCoefficients; ++j)
-                sum += static_cast<int64_t>(samplesBuffer[ch][i - 1 - j]) * coefs[j];
-        } else
+        const size_t segmentOffset = sampleIndex % kWorkspaceSegmentSamples;
+        spanEnd = std::min(spanEnd,
+            sampleIndex + kWorkspaceSegmentSamples - segmentOffset);
+        // Only the prefix of an allocation can read history from its
+        // neighbour. Never walk a pointer across separate allocations.
+        if(segmentOffset < activeCoefficients) {
+            const size_t prefixEnd = std::min(spanEnd,
+                sampleIndex + activeCoefficients - segmentOffset);
+            for(; sampleIndex < prefixEnd; ++sampleIndex, ++output) {
+                int64_t sum = 0;
+                for(size_t j = 0; j < activeCoefficients; ++j)
+                    sum += static_cast<int64_t>(samplesBuffer[ch][sampleIndex - 1 - j]) * coefs[j];
+                if(!restoreSample(output, sum)) return;
+            }
+        }
 #endif
-        {
-            const int32_t *history = &samplesBuffer[ch][i - 1];
+        // Resolve segment geometry and the output pointer once per span,
+        // rather than repeating divisions/lookups for every output sample.
+        int32_t* const end = output + (spanEnd - sampleIndex);
+        for(; output != end; ++output) {
+            int64_t sum = 0;
+            const int32_t* history = output - 1;
             // Four taps share one loop branch and pointer update on RV32.
             // Keep every product and addition wide; high-depth FLAC can
             // overflow a 32-bit accumulator even when the final PCM fits.
@@ -706,13 +733,9 @@ void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
             }
             for(; j < activeCoefficients; ++j)
                 sum += static_cast<int64_t>(history[-static_cast<int>(j)]) * coefs[j];
+            if(!restoreSample(output, sum)) return;
         }
-        const int64_t value = samplesBuffer[ch][i] + (sum >> shift);
-        if(value < INT32_MIN || value > INT32_MAX) {
-            m_readError = ERR_FLAC_INVALID_DATA;
-            return;
-        }
-        samplesBuffer[ch][i] = static_cast<int32_t>(value);
+        sampleIndex = spanEnd;
     }
 }
 //----------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,169 @@
+{
+  "board": {
+    "version": "v0.9.693-1192-gb0e622ab-dirty",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "d92959cf14393d1a54d69696e08343a21a688a76b632e7c642f789ac91b3987f"
+  },
+  "cases": [
+    {
+      "name": "flac-24bit-stereo-lpc32dense",
+      "original": {
+        "name": "cpu-under-http-load:flac-24bit-stereo-lpc32dense",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "CPU budget exceeded",
+        "seconds": 61.265
+      },
+      "full_window": {
+        "start": 805419.078,
+        "end": 805469.187,
+        "seconds": 50.10900000005495,
+        "strict": {
+          "result": "FAIL",
+          "reason": "CPU budget exceeded"
+        },
+        "cpu_samples": 10,
+        "decoder_windows": 11,
+        "malformed": [],
+        "diagnostic": {
+          "mean_busy": 100.0,
+          "peak_busy": 100.0,
+          "minimum_heap": 109444.0,
+          "minimum_largest": 94208.0,
+          "first_heap": 111224.0,
+          "last_heap": 111208.0,
+          "first_largest": 94208.0,
+          "last_largest": 98304.0,
+          "audio_wall_ratio": 0.9883435916988943,
+          "decode_percent": 48.1124276660237
+        }
+      },
+      "runtime": {
+        "result": "FAIL",
+        "reason": "Serial panic or capture failure"
+      },
+      "subwindows": [
+        {
+          "start": 805419.078,
+          "end": 805469.187,
+          "seconds": 50.10900000005495,
+          "strict": {
+            "result": "FAIL",
+            "reason": "CPU budget exceeded"
+          },
+          "cpu_samples": 10,
+          "decoder_windows": 11,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 100.0,
+            "peak_busy": 100.0,
+            "minimum_heap": 109444.0,
+            "minimum_largest": 94208.0,
+            "first_heap": 111224.0,
+            "last_heap": 111208.0,
+            "first_largest": 94208.0,
+            "last_largest": 98304.0,
+            "audio_wall_ratio": 0.9883435916988943,
+            "decode_percent": 48.1124276660237
+          }
+        }
+      ],
+      "status_samples": 310,
+      "max_http_ms": 172.0000000204891,
+      "minimum_rssi": -66
+    },
+    {
+      "name": "hev2-44100-stereo",
+      "original": {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "PASS",
+        "evidence": {
+          "duration": 60,
+          "status_samples": 325,
+          "max_http_ms": 125.0,
+          "mean_busy": 66.83,
+          "peak_busy": 67.7,
+          "minimum_heap": 44704.0,
+          "minimum_largest": 32768.0,
+          "audio_wall_ratio": 1.0009580455870024
+        },
+        "seconds": 61.312
+      },
+      "full_window": {
+        "start": 805505.281,
+        "end": 805555.437,
+        "seconds": 50.15600000007544,
+        "strict": {
+          "result": "PASS",
+          "evidence": {
+            "mean_busy": 66.83,
+            "peak_busy": 67.7,
+            "minimum_heap": 44704.0,
+            "minimum_largest": 32768.0,
+            "audio_wall_ratio": 1.0009580455870024
+          }
+        },
+        "cpu_samples": 10,
+        "decoder_windows": 10,
+        "malformed": [],
+        "diagnostic": {
+          "mean_busy": 66.83,
+          "peak_busy": 67.7,
+          "minimum_heap": 44704.0,
+          "minimum_largest": 32768.0,
+          "first_heap": 44704.0,
+          "last_heap": 44704.0,
+          "first_largest": 32768.0,
+          "last_largest": 32768.0,
+          "audio_wall_ratio": 1.0009580455870024,
+          "decode_percent": 44.640079760717846
+        }
+      },
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "subwindows": [
+        {
+          "start": 805505.281,
+          "end": 805555.437,
+          "seconds": 50.15600000007544,
+          "strict": {
+            "result": "PASS",
+            "evidence": {
+              "mean_busy": 66.83,
+              "peak_busy": 67.7,
+              "minimum_heap": 44704.0,
+              "minimum_largest": 32768.0,
+              "audio_wall_ratio": 1.0009580455870024
+            }
+          },
+          "cpu_samples": 10,
+          "decoder_windows": 10,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 66.83,
+            "peak_busy": 67.7,
+            "minimum_heap": 44704.0,
+            "minimum_largest": 32768.0,
+            "first_heap": 44704.0,
+            "last_heap": 44704.0,
+            "first_largest": 32768.0,
+            "last_largest": 32768.0,
+            "audio_wall_ratio": 1.0009580455870024,
+            "decode_percent": 44.640079760717846
+          }
+        }
+      ],
+      "status_samples": 325,
+      "max_http_ms": 125.0,
+      "minimum_rssi": -67
+    }
+  ],
+  "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+}
