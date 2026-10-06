@@ -633,6 +633,12 @@ Do not create a fake internal-state test or mark this planned optimization done.
 
 ## Results and limitations
 
+The [pipeline wait investigation](ESP32C3_PIPELINE_FLOW_20261006.md) measures
+empty compressed-input queues, full PCM queues, DMA waits and completion
+overruns on the physical C3. It includes a deliberate input-starvation control,
+profile-on/off builds and exact PCM checks; it preserves the original heap
+failure and does not change task scheduling or queue timeouts.
+
 ### FLAC predictor and high-depth playback
 
 The [real-radio LPC study](ESP32C3_FLAC_RADIO_20261006.md) adds matched
