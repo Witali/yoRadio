@@ -4,6 +4,17 @@
 #include "native_i2s_generator.h"
 #include "i2s_private.h"
 
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+#include "esp_timer.h"
+static pipeline_wait_t s_dma_wait;
+
+pipeline_wait_t native_i2s_take_wait_profile(void) {
+    pipeline_wait_t result = s_dma_wait;
+    s_dma_wait = (pipeline_wait_t){0};
+    return result;
+}
+#endif
+
 // Built inside the pinned esp_driver_i2s component, using its actual types.
 // Keep the stock writer's lock, timeout, stale-buffer avoidance and preload
 // queue. Only replace memcpy with bounded PCM generation into the DMA block.
@@ -40,8 +51,20 @@ static esp_err_t write_generated(i2s_chan_handle_t channel, size_t frames,
     while (frames && (preload || channel->state == I2S_CHAN_STATE_RUNNING)) {
         if (channel->dma.rw_pos == channel->dma.buf_size || !channel->dma.curr_ptr ||
             (!preload && uxQueueSpacesAvailable(channel->msg_queue) <= 1)) {
-            if (xQueueReceive(channel->msg_queue, &channel->dma.curr_ptr,
-                              preload ? 0 : timeout) != pdTRUE) {
+            BaseType_t received;
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+            received = xQueueReceive(channel->msg_queue, &channel->dma.curr_ptr, 0);
+            if (received != pdTRUE && !preload) {
+                int64_t start = esp_timer_get_time();
+                received = xQueueReceive(channel->msg_queue, &channel->dma.curr_ptr, timeout);
+                pipeline_wait_record(&s_dma_wait,
+                    (uint32_t)(esp_timer_get_time() - start), received != pdTRUE);
+            }
+#else
+            received = xQueueReceive(channel->msg_queue, &channel->dma.curr_ptr,
+                                       preload ? 0 : timeout);
+#endif
+            if (received != pdTRUE) {
                 if (!preload) result = ESP_ERR_TIMEOUT;
                 break;
             }

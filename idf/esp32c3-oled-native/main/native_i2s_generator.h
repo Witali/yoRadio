@@ -3,6 +3,13 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "driver/i2s_common.h"
+#include "sdkconfig.h"
+
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+#include "pipeline_wait.h"
+// Read/reset only in the output task, outside a fill call.
+pipeline_wait_t native_i2s_take_wait_profile(void);
+#endif
 
 // Runs in the output task, under the driver's write lock, never in an ISR.
 // Fill exactly `frames` stereo s16 frames. Do not block, allocate, or decode

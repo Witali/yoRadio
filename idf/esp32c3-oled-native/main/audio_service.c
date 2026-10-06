@@ -37,6 +37,10 @@
 #include "custom_legacy_adapter.h"
 #endif
 #include "native_audio_output.h"
+#include "pipeline_profile.h"
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+#include "native_i2s_generator.h"
+#endif
 #include "rx_buffer_diagnostic.h"
 #include "heap_fragment_probe.h"
 #include "network_service.h"
@@ -102,6 +106,9 @@ typedef struct {
     uint32_t max_call_us;
     uint32_t input_bytes;
     uint32_t pcm_bytes;
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+    pipeline_wait_t input_empty, pcm_full;
+#endif
 } decode_stats_t;
 
 typedef struct {
@@ -287,6 +294,22 @@ static void decode_stats_report(decode_stats_t *stats, int64_t now_us) {
              (unsigned long)stats->max_call_us,
              (unsigned long)stats->input_bytes,
              (unsigned long)stats->pcm_bytes);
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+    ESP_LOGI(TAG,
+        "PERF FLOW_DEC: gen=%lu codec=%s window_us=%llu "
+        "input_us=%llu input_n=%lu input_timeouts=%lu input_max=%lu "
+        "pcm_us=%llu pcm_n=%lu pcm_timeouts=%lu pcm_max=%lu",
+        (unsigned long)stats->generation, codec_name(stats->codec),
+        (unsigned long long)window_us,
+        (unsigned long long)stats->input_empty.us,
+        (unsigned long)stats->input_empty.count,
+        (unsigned long)stats->input_empty.timeouts,
+        (unsigned long)stats->input_empty.max_us,
+        (unsigned long long)stats->pcm_full.us,
+        (unsigned long)stats->pcm_full.count,
+        (unsigned long)stats->pcm_full.timeouts,
+        (unsigned long)stats->pcm_full.max_us);
+#endif
     decode_stats_reset(stats, stats->generation, stats->codec, now_us);
 }
 
@@ -713,9 +736,10 @@ static void log_runtime_memory(const char *stage) {
              (unsigned)uxTaskGetStackHighWaterMark(NULL));
 }
 
-static bool send_pcm(uint32_t generation,
+static bool send_pcm(decode_stats_t *stats, uint32_t generation,
                      const esp_audio_simple_dec_info_t *info,
                      const uint8_t *data, size_t size) {
+    (void)stats;
     size_t frame_bytes = (size_t)info->channel * info->bits_per_sample / 8U;
     if (!frame_bytes || frame_bytes > PCM_PACKET_DATA_SIZE ||
         size % frame_bytes) return false;
@@ -726,8 +750,8 @@ static bool send_pcm(uint32_t generation,
         chunk -= chunk % frame_bytes;
         size_t packet_size = sizeof(pcm_packet_t) + chunk;
         pcm_packet_t *packet = NULL;
-        while (xRingbufferSendAcquire(s_pcm, (void **)&packet, packet_size,
-                                      pdMS_TO_TICKS(250)) != pdTRUE) {
+        while (pipeline_acquire(s_pcm, (void **)&packet, packet_size,
+                                 pdMS_TO_TICKS(250), &stats->pcm_full) != pdTRUE) {
             if (atomic_load(&s_generation) != generation) return false;
         }
         packet->generation = generation;
@@ -821,7 +845,7 @@ static bool custom_flac_output(void *user, const custom_flac_info_t *info,
     esp_audio_simple_dec_info_t pcm_info = *context->stream_info;
     pcm_info.bits_per_sample = info->pcm_bits_per_sample;
     decode_stats_add_audio(context->stats, &pcm_info, pcm_size);
-    return send_pcm(context->generation, &pcm_info, pcm, pcm_size);
+    return send_pcm(context->stats, context->generation, &pcm_info, pcm, pcm_size);
 }
 #endif
 
@@ -854,7 +878,7 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
                             info->channels_are_core, false)) return false;
     state_set_decoder_bitrate(context->generation, info->bitrate);
     decode_stats_add_audio(context->stats, context->stream_info, pcm_size);
-    return send_pcm(context->generation, context->stream_info, pcm, pcm_size);
+    return send_pcm(context->stats, context->generation, context->stream_info, pcm, pcm_size);
 }
 #endif
 
@@ -946,8 +970,8 @@ static void decoder_task(void *argument) {
                                  && !legacy_decoder
 #endif
         );
-        encoded_packet_t *packet = xRingbufferReceive(
-            s_encoded, &item_size, pdMS_TO_TICKS(20));
+        encoded_packet_t *packet = pipeline_receive(
+            s_encoded, &item_size, pdMS_TO_TICKS(20), &stats.input_empty);
         if (!packet) continue;
         if (packet->generation != atomic_load(&s_generation)) {
             vRingbufferReturnItem(s_encoded, packet);
@@ -1331,7 +1355,7 @@ static void decoder_task(void *argument) {
                     }
                     decode_stats_add_audio(&stats, &stream_info,
                                            frame.decoded_size);
-                    if (!send_pcm(generation, &stream_info, output,
+                    if (!send_pcm(&stats, generation, &stream_info, output,
                                   frame.decoded_size)) {
                         ESP_LOGW(TAG, "PCM buffer stalled");
                         break;
@@ -1384,12 +1408,52 @@ static void release_pcm_lease(native_audio_pcm_lease_t *lease) {
 }
 #endif
 
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+typedef struct {
+    int64_t start_us;
+    pipeline_wait_t empty, submit;
+    uint32_t overruns;
+} output_flow_t;
+
+static void output_flow_reset(output_flow_t *flow, bool active) {
+    *flow = (output_flow_t){
+        .start_us = active ? esp_timer_get_time() : 0,
+        .overruns = native_audio_output_dma_overruns(),
+    };
+    native_i2s_take_wait_profile();
+}
+
+static void output_flow_report(output_flow_t *flow, uint32_t generation) {
+    int64_t now = esp_timer_get_time();
+    if (!flow->start_us || now - flow->start_us < DECODE_STATS_INTERVAL_US) return;
+    pipeline_wait_t dma = native_i2s_take_wait_profile();
+    uint32_t overruns = native_audio_output_dma_overruns();
+    ESP_LOGI(TAG,
+        "PERF FLOW_OUT: gen=%lu window_us=%llu "
+        "empty_us=%llu empty_n=%lu empty_timeouts=%lu empty_max=%lu "
+        "submit_us=%llu submit_n=%lu submit_max=%lu "
+        "dma_us=%llu dma_n=%lu dma_timeouts=%lu dma_max=%lu overruns=%lu",
+        (unsigned long)generation, (unsigned long long)(now - flow->start_us),
+        (unsigned long long)flow->empty.us, (unsigned long)flow->empty.count,
+        (unsigned long)flow->empty.timeouts, (unsigned long)flow->empty.max_us,
+        (unsigned long long)flow->submit.us, (unsigned long)flow->submit.count,
+        (unsigned long)flow->submit.max_us, (unsigned long long)dma.us,
+        (unsigned long)dma.count, (unsigned long)dma.timeouts,
+        (unsigned long)dma.max_us, (unsigned long)(overruns - flow->overruns));
+    // Do not erase a completion interrupt occurring while the log is written.
+    *flow = (output_flow_t){.start_us = now, .overruns = overruns};
+}
+#endif
+
 static void output_task(void *argument) {
     (void)argument;
 #ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
     s_output_task = xTaskGetCurrentTaskHandle();
 #endif
     uint32_t sample_rate = 0;
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+    output_flow_t flow = {0};
+#endif
 #ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
     uint32_t generation = atomic_load(&s_generation);
 #endif
@@ -1399,6 +1463,9 @@ static void output_task(void *argument) {
         if (generation != current_generation) {
             native_audio_output_discard_pcm();
             generation = current_generation;
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+            output_flow_reset(&flow, false);
+#endif
         }
 #endif
 #ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
@@ -1417,10 +1484,13 @@ static void output_task(void *argument) {
         }
 #endif
         size_t item_size = 0;
-        pcm_packet_t *packet = xRingbufferReceive(s_pcm, &item_size,
-                                                  pdMS_TO_TICKS(5));
+        pcm_packet_t *packet = pipeline_receive(s_pcm, &item_size,
+                                                 pdMS_TO_TICKS(5), &flow.empty);
         if (!packet) {
             native_audio_output_idle();
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+            output_flow_report(&flow, generation);
+#endif
             continue;
         }
 #ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
@@ -1428,6 +1498,9 @@ static void output_task(void *argument) {
         if (generation != current_generation) {
             native_audio_output_discard_pcm();
             generation = current_generation;
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+            output_flow_reset(&flow, false);
+#endif
         }
 #endif
         if (packet->generation != atomic_load(&s_generation)) {
@@ -1441,6 +1514,9 @@ static void output_task(void *argument) {
 #endif
             finish_pcm_stream(packet);
             vRingbufferReturnItem(s_pcm, packet);
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+            output_flow_reset(&flow, false);
+#endif
             continue;
         }
         if (packet->sample_rate != sample_rate) {
@@ -1456,6 +1532,10 @@ static void output_task(void *argument) {
             }
             sample_rate = packet->sample_rate;
         }
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+        if (!flow.start_us) output_flow_reset(&flow, true);
+        int64_t submit_start = esp_timer_get_time();
+#endif
 #ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
         // Ownership transfers even on a write error. The final source tail is
         // retained until another packet completes a DMA block, EOF, or Stop.
@@ -1467,6 +1547,11 @@ static void output_task(void *argument) {
             packet->data, packet->data_size, packet->bits_per_sample,
             packet->channels);
         vRingbufferReturnItem(s_pcm, packet);
+#endif
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+        pipeline_wait_record(&flow.submit,
+            (uint32_t)(esp_timer_get_time() - submit_start), false);
+        output_flow_report(&flow, generation);
 #endif
         if (result != ESP_OK) {
             ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),

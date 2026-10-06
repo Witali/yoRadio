@@ -16,6 +16,8 @@ enum { ESP_OK, ESP_FAIL, ESP_ERR_INVALID_ARG, ESP_ERR_INVALID_STATE,
 #define ESP_ERROR_CHECK(expr) assert((expr)==ESP_OK)
 #define ESP_LOGI(...) ((void)0)
 #define ESP_LOGW(...) ((void)0)
+#define IRAM_ATTR
+#define DRAM_ATTR
 #define SOC_I2S_PDM_MAX_TX_LINES 2
 #define GPIO_MODE_OUTPUT 1
 #define BOARD_AUDIO_LEFT_DATA 10
@@ -27,6 +29,7 @@ static void gpio_set_level(int p,int l) {(void)p;(void)l;}
 #define pdMS_TO_TICKS(x) (x)
 #define portMAX_DELAY UINT32_MAX
 typedef uint32_t TickType_t;
+typedef int BaseType_t;
 static void vTaskDelay(unsigned ticks) {(void)ticks;}
 static int64_t test_now_us;
 static int64_t esp_timer_get_time(void) {return test_now_us;}
@@ -61,6 +64,17 @@ typedef struct i2s_channel_obj_t {
     struct {unsigned desc_num,buf_size,rw_pos;void *curr_ptr;lldesc_t **desc;} dma;
     SemaphoreHandle_t mutex,binary;QueueHandle_t msg_queue;
 } *i2s_chan_handle_t;
+typedef struct { void *dma_buf; size_t size; } i2s_event_data_t;
+typedef struct {
+    bool (*on_send_q_ovf)(i2s_chan_handle_t, i2s_event_data_t *, void *);
+} i2s_event_callbacks_t;
+static i2s_event_callbacks_t test_callbacks;
+static int i2s_channel_register_event_callback(i2s_chan_handle_t h,
+    const i2s_event_callbacks_t *callbacks, void *user) {
+    assert(h->state == I2S_CHAN_STATE_READY && !user);
+    test_callbacks = *callbacks;
+    return ESP_OK;
+}
 typedef struct {unsigned dma_desc_num,dma_frame_num;bool auto_clear_after_cb,auto_clear_before_cb;} i2s_chan_config_t;
 typedef struct {int clk_cfg,slot_cfg;struct {int clk,dout,dout2;struct {bool clk_inv;} invert_flags;} gpio_cfg;} i2s_pdm_tx_config_t;
 typedef struct {uint32_t bclk_hz;} i2s_chan_info_t;

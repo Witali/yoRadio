@@ -74,6 +74,12 @@ static void lease_failure_tests(void) {
 #endif
 int main(int argc,char **argv){
     assert(argc==2);assert(native_audio_output_init()==0);
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+    uint32_t overruns = native_audio_output_dma_overruns();
+    assert(test_callbacks.on_send_q_ovf);
+    assert(!test_callbacks.on_send_q_ovf(&channel, NULL, NULL));
+    assert(native_audio_output_dma_overruns() == overruns + 1);
+#endif
     driver_failure_tests();
 #ifndef BASELINE
     lease_failure_tests();

@@ -10,6 +10,17 @@ config YORADIO_DIRECT_DMA_PCM
         free DMA blocks. Codec workspace and the PCM queue remain separate.
         Keep disabled until matched timing and underrun tests pass on C3.
 
+config YORADIO_PIPELINE_PROFILE
+    bool "Measure decoder queue waits and DMA completion overruns"
+    depends on YORADIO_DIRECT_DMA_PCM
+    default n
+    help
+        Diagnostic only. Probe queue availability before the normal blocking
+        call and report task-local wall times every five seconds. Count I2S
+        completion-queue overruns in a bounded ISR callback. Does not change
+        timeouts, priorities, queue capacities or audio samples. Adds logging
+        and timing overhead; keep disabled in production timing comparisons.
+
 config YORADIO_CODEC_MEMORY_TRACE
     bool "Trace codec allocation lifetimes (diagnostic only)"
     default n
