@@ -6,10 +6,18 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools/esp32c3_tests'))
 from diagnostic import filter_line
+from ota_diagnostic import serial_health
 from common import TLS_CERTIFICATE_REJECTED
 
 
 class PanicFilter(unittest.TestCase):
+    def test_watchdog_without_register_dump_is_failure(self):
+        line=filter_line('\x1b[0;31mE (123) task_wdt: Task watchdog got triggered. '
+                         'The following tasks/users did not reset the watchdog in time:')
+        self.assertEqual(line,'Runtime watchdog timeout: task_watchdog=true')
+        self.assertEqual(serial_health([dict(at=1,line=line)])['result'],'FAIL')
+        self.assertIsNone(filter_line('E (123) task_wdt: private task data'))
+
     def test_measured_code_and_cause_survive(self):
         self.assertEqual(filter_line('MEPC    : 0x42012344  RA      : 0x40381234  SP : 0x3fc91200'),
                          'PANIC registers: MEPC=0x42012344 RA=0x40381234')

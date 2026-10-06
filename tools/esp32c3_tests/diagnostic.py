@@ -15,6 +15,10 @@ from serial_lines import serial_lines
 
 
 def filter_line(line):
+    if re.search(r'\btask_wdt: Task watchdog got triggered\.', line):
+        # A nonfatal watchdog dump uses a synthetic MCAUSE. Retain the actual
+        # timeout reason even when the subsequent register lines are lost.
+        return 'Runtime watchdog timeout: task_watchdog=true'
     tls = filter_tls_line(line)
     if tls:
         return tls
