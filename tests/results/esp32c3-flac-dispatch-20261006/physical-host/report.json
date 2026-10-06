@@ -1,0 +1,85 @@
+{
+  "revision": null,
+  "sanitizers": true,
+  "sources": {
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "0da7de7b87a876bebe0d4b160997724240b6f8f4aff0e68b9372f4f57f1bc811",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "046b1f802e27de30ff2e724f5f347222cba39d48633e6b49324de1ee5258309b",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp": "484817a367de296fa5e0856fc6cf3f13a19e034dd3222b8dd88ec6185bcd8808",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.h": "a6d5ff612842864bb23fbe176d0f935dd576eb0a856e75a92c7c6a68cadcf9f2",
+    "tests/native/flac_bounds/Arduino.h": "dffa44e2a0dd4600b92300f6d9cf0b5f1c93100e657818e4723ac0dd9bf15883",
+    "tests/native/flac_bounds/main.cpp": "fe1d1fee7e3d9be4e8542f9887247ce9ce97db2e986b10e14147e255501d148e",
+    "tools/audio_test_server/generate_flac_depths.py": "1f75390e8c29949dbb5888ee0d1871187bab97a1ef48e963ff70047c01fd453a",
+    "tools/codec_benchmark/run_flac_depths.py": "e22d7c978321d2c780ea9966e732be07c4e833e36c2b5df5db6552c04c08176f",
+    "tests/native/flac_depths/adapter.cpp": "bd78ed50021de646561b9cfcadd3ba740e2484f14ca025b94a128087fb6651df",
+    "tests/native/flac_depths/esp_log.h": "16160e8541af07aa353b8dbc7e6df5fb680acd74ed6616a0dc71811b745dbbef",
+    "tests/native/flac_depths/esp_timer.h": "c5369c94033dc9ee95473bbc5748739650381ea2aac538368c580d5632ed1b21",
+    "tests/native/flac_depths/oom.cpp": "094bcf47723282f099891bc840533192aaed573270967fd2dda50721b97da8b2",
+    "tests/native/flac_depths/freertos/FreeRTOS.h": "702a3187bdbc62932a3da567af9bcf6c4465c68c5bc913d1799fbffb6557c31c",
+    "tests/native/flac_depths/freertos/task.h": "b2d6fedcdfd2b4700981e5ac63dea29c60039353c5eda36dbe9e6bef0620328e"
+  },
+  "cases": [
+    {
+      "name": "flac-24bit-stereo-lpc32dense",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 12288000,
+          "sha256": "2274341922d03ed47ad7b1a7633db4fadec80738bf79dd1907691252aaba1b4c",
+          "output": "result=0 frames=3072000 calls=9000 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 12288000,
+          "sha256": "2274341922d03ed47ad7b1a7633db4fadec80738bf79dd1907691252aaba1b4c",
+          "output": "result=0 frames=3072000 calls=6000 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 12288000,
+          "sha256": "2274341922d03ed47ad7b1a7633db4fadec80738bf79dd1907691252aaba1b4c",
+          "output": "PASS bytes=12288000 decoder_peak_bytes=14640 chunks=12047 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "2274341922d03ed47ad7b1a7633db4fadec80738bf79dd1907691252aaba1b4c",
+        "bytes": 12288000,
+        "known_pcm_identical": true
+      }
+    },
+    {
+      "name": "flac-24bit-stereo-lpc32irregular",
+      "variants": {
+        "segmented": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 12288000,
+          "sha256": "2274341922d03ed47ad7b1a7633db4fadec80738bf79dd1907691252aaba1b4c",
+          "output": "result=0 frames=3072000 calls=9000 remaining=0"
+        },
+        "contiguous": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 12288000,
+          "sha256": "2274341922d03ed47ad7b1a7633db4fadec80738bf79dd1907691252aaba1b4c",
+          "output": "result=0 frames=3072000 calls=6000 remaining=0"
+        },
+        "adapter": {
+          "result": "PASS",
+          "identical": true,
+          "bytes": 12288000,
+          "sha256": "2274341922d03ed47ad7b1a7633db4fadec80738bf79dd1907691252aaba1b4c",
+          "output": "PASS bytes=12288000 decoder_peak_bytes=15152 chunks=13104 source_bits=24 pcm_bits=16"
+        }
+      },
+      "reference": {
+        "sha256": "2274341922d03ed47ad7b1a7633db4fadec80738bf79dd1907691252aaba1b4c",
+        "bytes": 12288000,
+        "known_pcm_identical": true
+      }
+    }
+  ],
+  "ffmpeg": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+}

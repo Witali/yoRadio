@@ -681,19 +681,28 @@ namespace {
 constexpr size_t kMaximumSparseLpcDeltas = 4;
 constexpr size_t kMinimumRollingLpcOrder = 8;
 
+// Keep this optional recurrence out of the ordinary dot-product loop: inlining
+// it increases that loop's stack frame and instruction-cache footprint on RV32.
+__attribute__((noinline))
 bool restoreSparseDeltaPrediction(uint8_t ch, uint8_t shift, size_t order) {
     if(order < kMinimumRollingLpcOrder) return false;
+    constexpr size_t kEndpointProducts = 2;
+    constexpr size_t kMinimumProductReduction = 2;
+    const size_t allowedDeltas = std::min(kMaximumSparseLpcDeltas,
+        order / kMinimumProductReduction - kEndpointProducts);
     size_t positiveDeltas = 0, negativeDeltas = 0;
     for(size_t j = 1; j < order; ++j) {
         positiveDeltas += coefs[j] != coefs[j - 1];
         negativeDeltas += coefs[j] != -coefs[j - 1];
+        // Counts only increase. Once both signs exceed the budget, the rest
+        // of the coefficients cannot make this recurrence worthwhile.
+        if(positiveDeltas > allowedDeltas && negativeDeltas > allowedDeltas)
+            return false;
     }
     const bool alternating = negativeDeltas < positiveDeltas;
     const size_t deltaCount = std::min(positiveDeltas, negativeDeltas);
     // The two endpoint products count too. Demand at least a halving of
     // multiply count to pay for the sparse indices and mode checks.
-    if(deltaCount > kMaximumSparseLpcDeltas || (deltaCount + 2) * 2 > order)
-        return false;
     if(coefficientCount >= m_blockSize) return true;
 
     int32_t deltaCoefficients[kMaximumSparseLpcDeltas];

@@ -228,6 +228,91 @@ general LPC32 input with `generate_flac_depths.py --physical --irregular-lpc
 running the shared board load harness. Compare it alongside `--dense-lpc`;
 testing only the coefficient pattern benefiting from the shortcut is insufficient.
 
+## Follow-up: isolate the optional recurrence (6 October 2026)
+
+The rolling helper is now a separate, non-inlined function. Its selector stops
+as soon as **both** difference counts exceed the allowed budget: counts cannot
+decrease when later coefficients are examined. The budget combines the existing
+four-delta stack limit with the requirement to halve the product count. This
+does not change which coefficient sets qualify or their reconstruction arithmetic.
+Nonperiodic LPC32 in the benchmark is rejected after five comparisons instead
+of examining all 31 adjacent pairs. The ordinary dot product remains exact and
+supports the same orders, shifts and sample depths.
+
+The saved `esp32c3-flac-dispatch` image is **1,579,120 bytes**, 976 bytes smaller
+than the rolling image, with identical SDK configuration, IRAM, static DRAM and
+RTC sections. RV32 disassembly confirms separate functions: 1,592 bytes for
+the main predictor and 1,284 for the optional recurrence. The main function's
+stack frame falls from 112 to 80 bytes, but the callee has a 96-byte frame:
+the simultaneous total is **176 bytes**, 64 bytes above the previous inlined
+version. This change does not reduce maximum stack usage. It adds no heap or
+persistent working buffers.
+
+All **8,984 scalar predictor comparisons and 378 complete decoder comparisons**
+pass, with exact PCM and ASan/UBSan, in both workspace layouts and through the
+adapter. A first host invocation accidentally included a stress-server fixture
+whose manifest lacks the known-PCM hash required by the host runner. That
+invocation stopped with `KeyError: pcm_sha256` after checking the two LPC files;
+its incomplete report is retained and excluded from the counts. The corrected
+invocation explicitly selects the two LPC files and passes.
+
+Native WebUI OTA while AAC played passes, including firmware identity and
+unchanged Wi-Fi, playlist and settings. The physical loads use the same files,
+configuration, 60-second duration, HTTP polling and 10-second warm-up as the
+rolling comparison. Elapsed decode-call measurements include task interruptions;
+they are not isolated instruction timings.
+
+The first alternating-coefficient run has low-throughput windows (for example,
+490 ms of decoded audio in 5,486 ms), followed by real-time windows. Its mean CPU
+is therefore not a speedup measurement. The complete failed run is retained;
+discarding the slow windows would hide a playback problem. This capture does
+not establish whether the pauses originate in delivery or the decoder pipeline.
+
+| Input / run | Decode-call ms / audio second | CPU mean / peak | Audio / wall | CPU gate / runtime gate |
+| --- | ---: | ---: | ---: | --- |
+| Alternating LPC32, first run including pauses | 210.7 | 67.20 / 85.8% | 0.72388 | FAIL / PASS |
+| Alternating LPC32, repeat | 206.1 | 85.61 / 86.4% | 1.00160 | FAIL / PASS |
+| Nonperiodic LPC32, first run | 469.7 | 100 / 100% | 0.93300 | FAIL / FAIL |
+| Nonperiodic LPC32, repeat | 468.9 | 100 / 100% | 0.93394 | FAIL / FAIL |
+| 16-bit FLAC control | 228.8 | 67.73 / 69.2% | 1.00154 | PASS / PASS |
+
+The repeated alternating test preserves the earlier approximately **2.3x**
+decode-call throughput improvement over the span implementation. There is no
+additional substantial gain from separating the helper, and peak CPU still
+exceeds 85%. Maximum HTTP time is 1,500 ms in the first run with pauses and
+156 ms in the repeated run. The corresponding RSSI minima are -64/-66 dBm;
+the pauses cannot be attributed to weak signal from those values alone.
+
+For nonperiodic LPC32, elapsed decode-call cost is 3.3–3.5% below the prior
+rolling observation (485.7 ms), close to the earlier span control (465.6 ms).
+Nevertheless, audio/wall is slightly worse than the rolling control's 0.94087,
+and diagnostic runtime faults remain. Thus this does **not** prove a general
+playback speedup or the absence of regression. General high-order LPC remains
+CPU-bound. All five Stop-recovery checks and both final station restorations
+pass. The repeated runs do not replace the original failed outcomes.
+
+This image remains **not production-qualified**; the large-block allocation
+and long HE-AACv2 heap issues also remain open. The demonstrated benefits of
+this follow-up are the smaller code and bounded coefficient classification,
+with the stack cost above. The exact arithmetic and the selective recurrence
+speedup are preserved. Frozen sources, build identities and all outcomes are
+in [`esp32c3-flac-dispatch-20261006`](../tests/results/esp32c3-flac-dispatch-20261006/manifest.json).
+Replay with `python tests/test-flac-dispatch-evidence.py`.
+
+### Remaining arithmetic experiments
+
+- For suitable source depths and coefficient magnitudes, calculate a proven
+  accumulator bound once per subframe and consider a 32-bit path with an exact
+  64-bit fallback. Checking only the final PCM is insufficient: intermediate
+  predictions can be wider, and malformed streams must not trigger signed
+  overflow before validation.
+- Inspect the distribution of zero, unit and power-of-two coefficients on real
+  files before adding more special paths. Preclassify once per subframe; a
+  conditional for every tap may cost more than the multiply it replaces.
+- The current recurrence does not accelerate 32 arbitrary, unrelated
+  coefficients. No coefficient removal, rounding or narrower arithmetic is
+  justified for that case without a proof and exact-reference tests.
+
 ## Host coverage for the earlier predictor
 
 - 198 independent scalar-reference cases per storage mode: orders 0 through 32,
