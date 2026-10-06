@@ -12,8 +12,9 @@ typedef struct custom_flac_decoder custom_flac_decoder_t;
 
 typedef struct {
     uint32_t sample_rate;
-    uint8_t bits_per_sample;
+    uint8_t bits_per_sample; // Encoded source depth, for stream metadata.
     uint8_t channels;
+    uint8_t pcm_bits_per_sample; // Signed PCM delivered to the callback.
     uint32_t bitrate;
 } custom_flac_info_t;
 

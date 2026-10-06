@@ -122,8 +122,8 @@ static int parse_header(custom_flac_decoder *decoder) {
 
     if (!have_streaminfo || !max_block_size ||
         decoder->info.channels < 1 || decoder->info.channels > MAX_CHANNELS ||
-        (decoder->info.bits_per_sample != 8 &&
-         decoder->info.bits_per_sample != 16) ||
+        decoder->info.bits_per_sample < FLAC_MIN_BITS_PER_SAMPLE ||
+        decoder->info.bits_per_sample > FLAC_MAX_BITS_PER_SAMPLE ||
         !decoder->info.sample_rate) {
         return -4;
     }
@@ -149,6 +149,7 @@ static int parse_header(custom_flac_decoder *decoder) {
                           static_cast<uint32_t>(total_samples), 0);
     decoder->input_size -= offset;
     decoder->header_ready = true;
+    decoder->info.pcm_bits_per_sample = FLACGetOutputBitsPerSample();
     ESP_LOGI(kTag,
              "yoRadio FLAC: %lu Hz, %u-bit, %u ch, block %u, frame %lu, buffers %lu bytes",
              static_cast<unsigned long>(decoder->info.sample_rate),
@@ -202,6 +203,7 @@ static int decode_available(custom_flac_decoder *decoder, bool eos,
                                    static_cast<size_t>(std::max(bytes_left, 0)));
         uint16_t samples = FLACGetOutputSamps();
         if (samples) {
+            decoder->info.bits_per_sample = FLACGetBitsPerSample();
             size_t frames = samples / decoder->info.channels;
             if (decoder->info.channels == 1) {
                 for (size_t i = 0; i < frames; ++i) {

@@ -94,6 +94,20 @@ FFmpeg PCM. Run `tools/codec_benchmark/run_flac_bounds.py --output OUTPUT_DIR`
 for partial-frame EOF and recovery on C3. Retained results are replayed by
 `tests/test-flac-bounds-evidence.py`.
 
+The [FLAC depth repair and matrix](ESP32C3_FLAC_DEPTHS_20261005.md) separates
+4..24-bit source metadata from signed-16 output. `run_flac_depths.py` compiles
+the actual core/adapter under sanitizers and compares with known PCM and FFmpeg;
+`--allocation-failures` also checks persistent OOM cleanup and reopen. The
+shared fixture generators cover source depths, stereo modes and 8192-sample
+blocks. `terminal_memory.py --fixture-manifest PATH` accepts those fixtures for
+physical natural-EOF heap checks using AUTO and explicit codec selection.
+
+The [30-minute HE-AACv2 load report](ESP32C3_HEV2_SOAK_20261005.md) retains
+a failed progressive-heap gate despite real-time playback and post-Stop
+recovery. `summarize_sustained.py` replays the complete window and consecutive
+five-minute windows; it does not replace the original acceptance outcome.
+This report does not satisfy the one-hour C3-T08 criterion.
+
 The optional [heap-owner diagnostic](ESP32C3_HEAP_FRAGMENT_OWNER_20261005.md)
 tracks live allocations in the largest initial free region, with explicit
 overflow/unknown-owner rejection. Use `heap_idle.py` for a stopped-board window

@@ -322,15 +322,15 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
         }
         if(FLACMetadataBlock->numChannels < 1) return ERR_FLAC_UNKNOWN_CHANNEL_ASSIGNMENT;
 
-        if(!FLACMetadataBlock->bitsPerSample){
-            if(FLACFrameHeader->sampleSizeCode == 1) FLACMetadataBlock->bitsPerSample =  8;
-            if(FLACFrameHeader->sampleSizeCode == 2) FLACMetadataBlock->bitsPerSample = 12;
-            if(FLACFrameHeader->sampleSizeCode == 4) FLACMetadataBlock->bitsPerSample = 16;
-            if(FLACFrameHeader->sampleSizeCode == 5) FLACMetadataBlock->bitsPerSample = 20;
-            if(FLACFrameHeader->sampleSizeCode == 6) FLACMetadataBlock->bitsPerSample = 24;
-        }
-        if(FLACMetadataBlock->bitsPerSample > 16) return ERR_FLAC_BITS_PER_SAMPLE_TOO_BIG;
-        if(FLACMetadataBlock->bitsPerSample < 8 ) return ERR_FLAG_BITS_PER_SAMPLE_UNKNOWN;
+        // RFC 9639 section 9.1.4: zero inherits STREAMINFO; three is reserved.
+        static const uint8_t frameDepths[] = {0, 8, 12, 0, 16, 20, 24, 32};
+        const uint8_t frameDepth = frameDepths[FLACFrameHeader->sampleSizeCode];
+        if(FLACFrameHeader->sampleSizeCode == 3) return ERR_FLAC_INVALID_DATA;
+        if(frameDepth) FLACMetadataBlock->bitsPerSample = frameDepth;
+        if(FLACMetadataBlock->bitsPerSample > FLAC_MAX_BITS_PER_SAMPLE)
+            return ERR_FLAC_BITS_PER_SAMPLE_TOO_BIG;
+        if(FLACMetadataBlock->bitsPerSample < FLAC_MIN_BITS_PER_SAMPLE)
+            return ERR_FLAG_BITS_PER_SAMPLE_UNKNOWN;
 
         if(!FLACMetadataBlock->sampleRate){
             if(FLACFrameHeader->sampleRateCode == 1)  FLACMetadataBlock->sampleRate =  88200;
@@ -376,7 +376,7 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
         if(m_readError) return m_readError;
         if(!m_blockSize) return ERR_FLAC_INVALID_DATA;
 
-        if(m_blockSize > 8192){
+        if(m_blockSize > MAX_BLOCKSIZE){
             log_e("Error: blockSize too big");
             return ERR_FLAC_BLOCKSIZE_TOO_BIG;
         }
@@ -408,6 +408,12 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
         int ret = decodeSubframes();
         if(ret != 0) return ret;
         if(m_readError) return m_readError;
+        // Invalid decorrelated channels must not wrap during s16 conversion.
+        const int32_t sourceLimit = INT32_C(1) << (FLACMetadataBlock->bitsPerSample - 1);
+        for(uint8_t ch = 0; ch < FLACMetadataBlock->numChannels; ++ch)
+            for(uint16_t i = 0; i < m_blockSize; ++i)
+                if(samplesBuffer[ch][i] < -sourceLimit || samplesBuffer[ch][i] >= sourceLimit)
+                    return ERR_FLAC_INVALID_DATA;
         // Do not expose PCM from a frame whose two-byte footer is missing.
         constexpr int kFrameFooterBytes = 2;
         if(m_bytesAvail + m_bitBufferLen / 8 < kFrameFooterBytes)
@@ -425,9 +431,16 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
 
         for (int i = 0; i < blockSize; i++) {
             for (int j = 0; j < FLACMetadataBlock->numChannels; j++) {
-                int val = samplesBuffer[j][i + outputOffset];
-                if (FLACMetadataBlock->bitsPerSample == 8) val += 128;
-                outbuf[2*i+j] = val;
+                int32_t val = samplesBuffer[j][i + outputOffset];
+                const int sourceBits = FLACMetadataBlock->bitsPerSample;
+                // Align full-scale signed PCM to the 16-bit output. Arithmetic
+                // right shift matches FFmpeg's s16 conversion without dither;
+                // multiplication avoids undefined left shift of negative PCM.
+                if(sourceBits > FLAC_PCM_BITS_PER_SAMPLE)
+                    val >>= sourceBits - FLAC_PCM_BITS_PER_SAMPLE;
+                else
+                    val *= INT32_C(1) << (FLAC_PCM_BITS_PER_SAMPLE - sourceBits);
+                outbuf[2*i+j] = static_cast<int16_t>(val);
             }
         }
 
@@ -462,6 +475,9 @@ uint64_t FLACGetTotoalSamplesInStream(){
 //----------------------------------------------------------------------------------------------------------------------
 uint8_t FLACGetBitsPerSample(){
     return FLACMetadataBlock->bitsPerSample;
+}
+uint8_t FLACGetOutputBitsPerSample(){
+    return FLAC_PCM_BITS_PER_SAMPLE;
 }
 //----------------------------------------------------------------------------------------------------------------------
 uint8_t FLACGetChannels(){
@@ -534,6 +550,8 @@ int8_t decodeSubframes(){
 }
 //----------------------------------------------------------------------------------------------------------------------
 int8_t decodeSubframe(uint8_t sampleDepth, uint8_t ch) {
+    if(sampleDepth < 1 || sampleDepth > FLAC_MAX_BITS_PER_SAMPLE + 1)
+        return ERR_FLAC_INVALID_DATA;
     int8_t ret = 0;
     readUint(1);
     uint8_t type = readUint(6);
@@ -570,11 +588,13 @@ int8_t decodeSubframe(uint8_t sampleDepth, uint8_t ch) {
         return ERR_FLAC_RESERVED_SUB_TYPE;
     }
     if(m_readError) return m_readError;
-    if(shift>0){
-        for (int i = 0; i < m_blockSize; i++){
-            samplesBuffer[ch][i] = static_cast<int32_t>(
-                static_cast<uint32_t>(samplesBuffer[ch][i]) << shift);
-        }
+    // Check the reduced-depth samples before restoring wasted bits. A valid
+    // 24-bit stereo side sample can require 25 bits.
+    const int32_t sampleLimit = INT32_C(1) << (sampleDepth - 1);
+    for (int i = 0; i < m_blockSize; i++){
+        const int32_t value = samplesBuffer[ch][i];
+        if(value < -sampleLimit || value >= sampleLimit) return ERR_FLAC_INVALID_DATA;
+        samplesBuffer[ch][i] = static_cast<int32_t>(static_cast<uint32_t>(value) << shift);
     }
     return ERR_FLAC_NONE;
 }
@@ -658,7 +678,12 @@ void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
         for (int j = 0; j < coefficientCount; j++){
             sum += static_cast<int64_t>(samplesBuffer[ch][i - 1 - j]) * coefs[j];
         }
-        samplesBuffer[ch][i] += static_cast<int32_t>(sum >> shift);
+        const int64_t value = samplesBuffer[ch][i] + (sum >> shift);
+        if(value < INT32_MIN || value > INT32_MAX) {
+            m_readError = ERR_FLAC_INVALID_DATA;
+            return;
+        }
+        samplesBuffer[ch][i] = static_cast<int32_t>(value);
     }
 }
 //----------------------------------------------------------------------------------------------------------------------

@@ -8,7 +8,7 @@
  *
  *  Restrictions:
  *  blocksize must not exceed 8192
- *  bits per sample must be 8 or 16
+ *  source bits per sample: 4..24; output: signed 16-bit PCM
  *  num Channels must be 1 or 2
  *
  *
@@ -20,6 +20,9 @@
 
 #define MAX_CHANNELS 2
 #define MAX_BLOCKSIZE 8192
+#define FLAC_MIN_BITS_PER_SAMPLE 4
+#define FLAC_MAX_BITS_PER_SAMPLE 24
+#define FLAC_PCM_BITS_PER_SAMPLE 16
 #ifndef FLAC_OUTPUT_FRAMES
 #define FLAC_OUTPUT_FRAMES 2048
 #endif
@@ -41,7 +44,7 @@ enum : int8_t  {GIVE_NEXT_LOOP = +1,
                 ERR_FLAC_RESERVED_RESIDUAL_CODING = -8,
                 ERR_FLAC_WRONG_RICE_PARTITION_NR = -9,
                 ERR_FLAC_BITS_PER_SAMPLE_TOO_BIG = -10,
-                ERR_FLAG_BITS_PER_SAMPLE_UNKNOWN = 11,
+                ERR_FLAG_BITS_PER_SAMPLE_UNKNOWN = -11,
                 ERR_FLAC_TRUNCATED_INPUT = -12,
                 ERR_FLAC_INVALID_DATA = -13};
 
@@ -159,6 +162,8 @@ int8_t   FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf);
 uint16_t FLACGetOutputSamps();
 uint64_t FLACGetTotoalSamplesInStream();
 uint8_t  FLACGetBitsPerSample();
+// Source depth and output sample representation are deliberately separate.
+uint8_t  FLACGetOutputBitsPerSample();
 uint8_t  FLACGetChannels();
 uint32_t FLACGetSampRate();
 uint32_t FLACGetBitRate();

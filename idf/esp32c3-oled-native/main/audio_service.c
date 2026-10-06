@@ -817,8 +817,11 @@ static bool custom_flac_output(void *user, const custom_flac_info_t *info,
                             context->stream_info, context->stream_info_ready,
                             0, 0, false, false)) return false;
     state_set_decoder_bitrate(context->generation, info->bitrate);
-    decode_stats_add_audio(context->stats, context->stream_info, pcm_size);
-    return send_pcm(context->generation, context->stream_info, pcm, pcm_size);
+    // Display source depth; size/time the callback's actual signed-16 PCM.
+    esp_audio_simple_dec_info_t pcm_info = *context->stream_info;
+    pcm_info.bits_per_sample = info->pcm_bits_per_sample;
+    decode_stats_add_audio(context->stats, &pcm_info, pcm_size);
+    return send_pcm(context->generation, &pcm_info, pcm, pcm_size);
 }
 #endif
 

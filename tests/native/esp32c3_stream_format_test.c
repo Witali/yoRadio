@@ -177,14 +177,19 @@ int main(void) {
     assert(custom_legacy_output(&legacy, &info, pcm, 2048));
     assert(strcmp(state.stream_format, "AAC-LC 22.05 kHz mono") == 0);
 
-    // FLAC callbacks must refresh all PCM fields, including bit depth.
+    // Source depth is metadata; the actual FLAC callback PCM remains s16.
     custom_flac_info_t fi = {.sample_rate = 48000, .bits_per_sample = 16,
-                             .channels = 2, .bitrate = 128000};
+                             .channels = 2, .pcm_bits_per_sample = 16, .bitrate = 128000};
     assert(custom_flac_output(&flac, &fi, pcm, sizeof(pcm)));
     fi.sample_rate = 32000; fi.bits_per_sample = 24; fi.channels = 1;
     assert(custom_flac_output(&flac, &fi, pcm, sizeof(pcm)));
-    assert(packet_rate == 32000 && packet_channels == 1 && packet_bits == 24);
+    assert(packet_rate == 32000 && packet_channels == 1 && packet_bits == 16);
     assert(state.bits_per_sample == 24);
+    stats.audio_us = 0;
+    fi.bits_per_sample = 8;
+    assert(custom_flac_output(&flac, &fi, pcm, 2048));
+    assert(state.bits_per_sample == 8 && packet_bits == 16);
+    assert(stats.audio_us == 1024ULL * 1000000 / fi.sample_rate);
 
     next_info = (esp_audio_simple_dec_info_t){44100, 16, 2, 128000};
     run_espressif_frame(1, NATIVE_CODEC_MP3, &cached);
