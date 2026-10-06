@@ -47,6 +47,7 @@ For FLAC depth and stereo-mode qualification:
 ```powershell
 python tools/audio_test_server/generate_flac_depths.py --physical --output .build/flac-depth-tones
 python tools/audio_test_server/generate_flac_depths.py --physical --dense-lpc --depth 24 --seconds 64 --output .build/flac-dense-long
+python tools/audio_test_server/generate_flac_depths.py --physical --irregular-lpc --depth 24 --seconds 64 --output .build/flac-irregular-long
 python tools/audio_test_server/generate_flac_high_depth.py --seconds 64 --output .build/flac24-stress
 python tools/audio_test_server/generate_flac_high_depth.py --seconds 12 --block-size 8192 --output .build/flac24-large
 ```
@@ -58,7 +59,11 @@ bits and exercises all four stereo modes. Manifests include encoded hashes and
 the expected signed-16 PCM hash. Serve any manifest with `--fixture-manifest`;
 these generators do not control or flash boards.
 
-`--dense-lpc` uses all 32 predictor coefficients; `--seconds` controls physical
+`--dense-lpc` uses 32 alternating coefficients with equal magnitude.
+`--irregular-lpc` uses 32 nonperiodic nonzero coefficients and exercises the
+general predictor without the rolling-sum shortcut. Benchmark both when
+evaluating LPC optimizations; they are different workloads.
+`--seconds` controls physical
 tone duration and repeatable `--depth` restricts source depths. Use at least
 63 seconds of continuous input for a 60-second load test. Short EOF tests alone
 cannot establish real-time decoding under sustained load.

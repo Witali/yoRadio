@@ -673,6 +673,75 @@ int8_t decodeResiduals(uint8_t warmup, uint8_t ch) {
     return ERR_FLAC_NONE;
 }
 //----------------------------------------------------------------------------------------------------------------------
+namespace {
+
+// A repeated/alternating coefficient run has only a few nonzero differences.
+// Updating the unshifted prediction then costs fewer products than a new dot
+// product. Keep a small fixed stack limit and fall back for arbitrary LPC.
+constexpr size_t kMaximumSparseLpcDeltas = 4;
+constexpr size_t kMinimumRollingLpcOrder = 8;
+
+bool restoreSparseDeltaPrediction(uint8_t ch, uint8_t shift, size_t order) {
+    if(order < kMinimumRollingLpcOrder) return false;
+    size_t positiveDeltas = 0, negativeDeltas = 0;
+    for(size_t j = 1; j < order; ++j) {
+        positiveDeltas += coefs[j] != coefs[j - 1];
+        negativeDeltas += coefs[j] != -coefs[j - 1];
+    }
+    const bool alternating = negativeDeltas < positiveDeltas;
+    const size_t deltaCount = std::min(positiveDeltas, negativeDeltas);
+    // The two endpoint products count too. Demand at least a halving of
+    // multiply count to pay for the sparse indices and mode checks.
+    if(deltaCount > kMaximumSparseLpcDeltas || (deltaCount + 2) * 2 > order)
+        return false;
+    if(coefficientCount >= m_blockSize) return true;
+
+    int32_t deltaCoefficients[kMaximumSparseLpcDeltas];
+    uint8_t deltaOffsets[kMaximumSparseLpcDeltas];
+    size_t nextDelta = 0;
+    for(size_t j = 1; j < order; ++j) {
+        const int32_t delta = alternating ? coefs[j] + coefs[j - 1]
+                                          : coefs[j] - coefs[j - 1];
+        if(delta) {
+            deltaCoefficients[nextDelta] = delta;
+            deltaOffsets[nextDelta++] = static_cast<uint8_t>(j);
+        }
+    }
+    const int32_t firstCoefficient = coefs[0];
+    const int32_t outgoingCoefficient = alternating ? -coefs[order - 1] : coefs[order - 1];
+    const bool subtractEndpoints = outgoingCoefficient == firstCoefficient;
+    const bool addEndpoints = outgoingCoefficient == -firstCoefficient;
+    int64_t prediction = 0;
+    for(size_t j = 0; j < order; ++j)
+        prediction += static_cast<int64_t>(samplesBuffer[ch][coefficientCount - 1 - j]) * coefs[j];
+
+    for(size_t i = coefficientCount; i < m_blockSize; ++i) {
+        const int64_t value = samplesBuffer[ch][i] + (prediction >> shift);
+        if(value < INT32_MIN || value > INT32_MAX) {
+            m_readError = ERR_FLAC_INVALID_DATA;
+            return true;
+        }
+        samplesBuffer[ch][i] = static_cast<int32_t>(value);
+        if(i + 1 == m_blockSize) break;
+        const int32_t outgoing = samplesBuffer[ch][i - order];
+        // P(next) = s*P + c0*x(new) + sum((cj-s*c(j-1))*x(i-j))
+        //           - s*c(last)*x(outgoing), with s = +1 or -1.
+        // Shift only when reconstructing PCM; never round the carried sum.
+        if(alternating) prediction = -prediction;
+        if(subtractEndpoints)
+            prediction += (value - outgoing) * firstCoefficient;
+        else if(addEndpoints)
+            prediction += (value + outgoing) * firstCoefficient;
+        else
+            prediction += value * firstCoefficient - static_cast<int64_t>(outgoing) * outgoingCoefficient;
+        for(size_t j = 0; j < deltaCount; ++j)
+            prediction += static_cast<int64_t>(samplesBuffer[ch][i - deltaOffsets[j]]) * deltaCoefficients[j];
+    }
+    return true;
+}
+
+} // namespace
+
 void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
     if(shift > kMaximumLpcPredictionShift) {
         m_readError = ERR_FLAC_INVALID_DATA;
@@ -684,6 +753,7 @@ void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
     while(activeCoefficients && coefs[activeCoefficients - 1] == 0)
         --activeCoefficients;
     if(!activeCoefficients) return;
+    if(restoreSparseDeltaPrediction(ch, shift, activeCoefficients)) return;
     const auto restoreSample = [shift](int32_t* sample, int64_t sum) {
         const int64_t value = *sample + (sum >> shift);
         if(value < INT32_MIN || value > INT32_MAX) {

@@ -1,0 +1,92 @@
+{
+  "board": {
+    "version": "v0.9.693-1192-gb0e622ab-dirty",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "d92959cf14393d1a54d69696e08343a21a688a76b632e7c642f789ac91b3987f"
+  },
+  "cases": [
+    {
+      "name": "flac-24bit-stereo-lpc32irregular",
+      "original": {
+        "name": "cpu-under-http-load:flac-24bit-stereo-lpc32irregular",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Incomplete CPU/heap evidence",
+        "seconds": 61.235
+      },
+      "full_window": {
+        "start": 806085.062,
+        "end": 806135.187,
+        "seconds": 50.125,
+        "strict": {
+          "result": "FAIL",
+          "reason": "Incomplete CPU/heap evidence"
+        },
+        "cpu_samples": 9,
+        "decoder_windows": 11,
+        "malformed": [
+          {
+            "at": 806092.578,
+            "line": "I (381903) cpu_profile: PERF CPU: busy=100.0% idle=0.0% stream=9.7% decode=39.9% output=5.2% wifi=24.7% tcpip=0.0% web=2.8% heapw=0 bound=0 listen=1 tx_segments=0 tx_bytes=0 rx_segments=0 rx_bytes=0 missed=0 walk_us=160"
+          }
+        ],
+        "diagnostic": {
+          "mean_busy": 99.9888888888889,
+          "peak_busy": 100.0,
+          "minimum_heap": 109108.0,
+          "minimum_largest": 94208.0,
+          "first_heap": 109144.0,
+          "last_heap": 110904.0,
+          "first_largest": 94208.0,
+          "last_largest": 94208.0,
+          "audio_wall_ratio": 0.94920116194626,
+          "decode_percent": 47.406373130331666
+        }
+      },
+      "runtime": {
+        "result": "FAIL",
+        "reason": "Serial panic or capture failure"
+      },
+      "subwindows": [
+        {
+          "start": 806085.062,
+          "end": 806135.187,
+          "seconds": 50.125,
+          "strict": {
+            "result": "FAIL",
+            "reason": "Incomplete CPU/heap evidence"
+          },
+          "cpu_samples": 9,
+          "decoder_windows": 11,
+          "malformed": [
+            {
+              "at": 806092.578,
+              "line": "I (381903) cpu_profile: PERF CPU: busy=100.0% idle=0.0% stream=9.7% decode=39.9% output=5.2% wifi=24.7% tcpip=0.0% web=2.8% heapw=0 bound=0 listen=1 tx_segments=0 tx_bytes=0 rx_segments=0 rx_bytes=0 missed=0 walk_us=160"
+            }
+          ],
+          "diagnostic": {
+            "mean_busy": 99.9888888888889,
+            "peak_busy": 100.0,
+            "minimum_heap": 109108.0,
+            "minimum_largest": 94208.0,
+            "first_heap": 109144.0,
+            "last_heap": 110904.0,
+            "first_largest": 94208.0,
+            "last_largest": 94208.0,
+            "audio_wall_ratio": 0.94920116194626,
+            "decode_percent": 47.406373130331666
+          }
+        }
+      ],
+      "status_samples": 313,
+      "max_http_ms": 202.9999999795109,
+      "minimum_rssi": -67
+    }
+  ],
+  "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+}

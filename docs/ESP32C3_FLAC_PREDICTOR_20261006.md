@@ -134,6 +134,100 @@ no additional LPC32 acceleration is claimed.
 Reports, exact sources and disassembly are retained in
 [`esp32c3-flac-spans-20261006`](../tests/results/esp32c3-flac-spans-20261006/manifest.json).
 
+## Exact rolling prediction for repeated coefficient runs
+
+For order `N`, let the unshifted prediction be
+`P(i) = sum(c[j] * x[i-1-j], j=0..N-1)`. For either `s=+1` or `s=-1`,
+the identical next prediction is:
+
+```text
+P(i+1) = s*P(i) + c[0]*x[i]
+         + sum((c[j] - s*c[j-1])*x[i-j], j=1..N-1)
+         - s*c[N-1]*x[i-N]
+```
+
+Equal neighbouring coefficients cancel for `s=+1`; alternating coefficients
+cancel for `s=-1`. The decoder counts these differences once per subframe and
+uses the update only for order >= 8, at most four nonzero interior differences,
+and at least a halving of the multiply count including the two endpoints.
+Other coefficients retain the ordinary dot product. Matching/opposite
+endpoint coefficients combine into one product of an added/subtracted sample
+pair. Thus the alternating 32-tap fixture needs one product per subsequent
+prediction, after its initial 32-product seed. This is a coefficient-dependent
+optimization, **not a general removal of 31 LPC32 multiplications**.
+
+The carried value is the full signed 64-bit sum. Rounding occurs only at the
+original prediction shift when reconstructing each sample; no rounded PCM
+prediction is fed back. Coefficients and warm-up positions are unchanged.
+Endpoint arithmetic is 64-bit because two valid int32 samples can form a
+33-bit sum/difference. With <=32 signed 15-bit coefficients and int32 history,
+the original prediction is bounded in magnitude by 2^50; the update's
+intermediate terms also fit signed 64-bit. The original final int32 check
+still rejects overflowing reconstruction before storage.
+
+The candidate `esp32c3-flac-rolling` uses no additional heap or static storage.
+Its app size is 1,580,096 bytes (+2,400 from `esp32c3-flac-spans`). IRAM/DRAM/RTC
+sizes remain identical. Its predictor stack frame is **112 bytes**, versus
+64 before (+48 bytes within the existing task stack). Four delta coefficients
+and four offsets occupy 20 bytes of local storage; no full history copy or
+mutable coefficient cache is added.
+
+Host tests pass **8,984 independent predictor comparisons** covering all
+orders/shifts, equal and alternating coefficients, piecewise coefficient
+runs, random coefficients and allocation boundaries. They also check 33-bit
+endpoint sums and an overflow reached after the initial prediction.
+**378 full decoder comparisons** match known PCM and FFmpeg: the prior
+120-case matrix, four large-block files, and two long dense LPC32 files,
+each through segmented/contiguous/adapter paths, under ASan/UBSan.
+
+The new `--irregular-lpc` fixture has deterministic nonperiodic, nonzero
+coefficients. It prevents the optimized alternating fixture from becoming
+the only performance example. Its complete decoded PCM is checked too.
+
+### Rolling-predictor board measurements
+
+The rolling image was installed by native WebUI OTA while AAC played;
+Wi-Fi, playlist and settings comparisons pass. Each load run lasts 60 seconds
+with frequent WebUI polling and the existing 10-second timing warm-up.
+The same DIO80/no-sleep/full-AAC configuration is used throughout.
+
+| Input | Decode-call ms / audio second before | After | CPU mean / peak after | Audio / wall after | CPU gate / runtime gate |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 24-bit LPC32, alternating equal-magnitude coefficients | 481.1 | 207.9 | 85.48 / 86.2% | 1.00154 | FAIL / PASS |
+| 24-bit LPC32, nonperiodic coefficients | 465.6 | 485.7 | 100 / 100% | 0.94087 | FAIL / FAIL |
+| 16-bit FLAC control | 231.8 | 229.6 | 67.19 / 68.5% | 1.00152 | PASS / PASS |
+
+The alternating case uses **56.8% less elapsed decode-call time**, about
+**2.31x throughput**, and restores real-time delivery in this observation.
+Its peak CPU remains above the unchanged 85% acceptance threshold, so the
+CPU gate is still FAIL. There are no captured runtime faults in that case.
+Maximum WebUI times are 156/203/125 ms respectively; RSSI minima are -67 dBm.
+All three Stop-recovery checks and final saved-station restoration pass.
+
+The nonperiodic case has 31 nonzero differences for either sign and uses the
+general dot product. Its control run gives audio/wall 0.95119; the candidate
+gives 0.94087. Elapsed decode-call time is 4.3% higher in this pair. This
+includes task interruptions and is not an isolated measurement of selector
+overhead; **no absence of slowdown is claimed**. A preceding control capture
+lost part of one CPU line and failed with `Incomplete CPU/heap evidence`;
+both that failure and the complete repeated control are retained. General
+high-order LPC performance remains unresolved. The short 16-bit control is
+stable; it does not establish all-format or long-stream qualification.
+
+The firmware remains **not production-qualified**. The earlier 8192-block
+FLAC memory failures and long HE-AACv2 heap failure are not resolved by this
+change. The latest image's AAC verification here is the OTA playback check;
+the full 60-second HE-AACv2 load measurement above belongs to the span image.
+
+Frozen sources, build identities, disassembly and all passing/failed results:
+[`esp32c3-flac-rolling-20261006`](../tests/results/esp32c3-flac-rolling-20261006/manifest.json).
+Replay with `python tests/test-flac-rolling-evidence.py`. Regenerate the
+general LPC32 input with `generate_flac_depths.py --physical --irregular-lpc
+--depth 24 --seconds 64 --output NEW_DIRECTORY`, then validate it with
+`run_flac_depths.py --fixtures NEW_DIRECTORY --output NEW_HOST_RESULT` before
+running the shared board load harness. Compare it alongside `--dense-lpc`;
+testing only the coefficient pattern benefiting from the shortcut is insufficient.
+
 ## Host coverage for the earlier predictor
 
 - 198 independent scalar-reference cases per storage mode: orders 0 through 32,
