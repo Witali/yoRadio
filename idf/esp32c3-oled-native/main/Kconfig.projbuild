@@ -10,6 +10,17 @@ config YORADIO_DIRECT_DMA_PCM
         free DMA blocks. Codec workspace and the PCM queue remain separate.
         Keep disabled until matched timing and underrun tests pass on C3.
 
+config YORADIO_OUTPUT_TASK_FIRST
+    bool "Service DMA output above the decoder (experimental)"
+    depends on YORADIO_DIRECT_DMA_PCM
+    default n
+    help
+        Raise the PCM output task from priority 6 to 8; decoding stays at 7
+        and compressed input at 5. A completed DMA block can then preempt a
+        long decoder call. Output blocks normally when it has no PCM or no
+        free DMA block. Keep codec arithmetic, buffers and timeouts unchanged.
+        Qualify all codecs, Stop/EOF, switching and OTA before promotion.
+
 config YORADIO_PIPELINE_PROFILE
     bool "Measure decoder queue waits and DMA completion overruns"
     depends on YORADIO_DIRECT_DMA_PCM

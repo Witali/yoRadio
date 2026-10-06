@@ -62,6 +62,15 @@
 #define BITRATE_UPDATE_INTERVAL_US 1000000LL
 #define STREAM_BITRATE_INTERVAL_US 5000000LL
 #define STREAM_STALL_TIMEOUT_US 10000000LL
+enum {
+    AUDIO_STREAM_PRIORITY = 5,
+    AUDIO_DECODE_PRIORITY = 7,
+#ifdef CONFIG_YORADIO_OUTPUT_TASK_FIRST
+    AUDIO_OUTPUT_PRIORITY = AUDIO_DECODE_PRIORITY + 1,
+#else
+    AUDIO_OUTPUT_PRIORITY = AUDIO_DECODE_PRIORITY - 1,
+#endif
+};
 #ifdef YORADIO_CODEC_BENCHMARK
 #define CODEC_FIXTURE_MAGIC 0x59434658UL
 #endif
@@ -1585,19 +1594,19 @@ esp_err_t audio_service_start(native_state_t *state) {
         return ESP_ERR_NO_MEM;
     }
     s_encoded_usable_size = xRingbufferGetCurFreeSize(s_encoded);
-    // ESP32-C3 has one core. Decode a complete compressed frame above the
-    // output task: equal-priority time slicing makes the wall-time measurement
-    // include output work and can stretch a 14 ms MP3 call past 60 ms. The
-    // small PCM ring bounds this burst; once full, backpressure yields to
-    // output. Wi-Fi/TCP driver tasks already use higher system priorities.
+    // The historical ordering favored uninterrupted decode-call timing. With
+    // OUTPUT_TASK_FIRST, a ready DMA block preempts long decode calls instead.
+    // Compare decoder task CPU separately from elapsed call time: the latter
+    // legitimately includes output preemption. Output yields through its PCM
+    // and DMA queue waits; Wi-Fi/TCP retain their higher system priorities.
     if (xTaskCreate(stream_task, "radio_stream",
-                    BOARD_TASK_STACK_RADIO_STREAM, NULL, 5, NULL) !=
+                    BOARD_TASK_STACK_RADIO_STREAM, NULL, AUDIO_STREAM_PRIORITY, NULL) !=
             pdPASS ||
         xTaskCreate(decoder_task, "audio_decode",
-                    BOARD_TASK_STACK_AUDIO_DECODER, NULL, 7, NULL) !=
+                    BOARD_TASK_STACK_AUDIO_DECODER, NULL, AUDIO_DECODE_PRIORITY, NULL) !=
             pdPASS ||
         xTaskCreate(output_task, "audio_output",
-                    BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6, NULL) !=
+                    BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, AUDIO_OUTPUT_PRIORITY, NULL) !=
             pdPASS) {
         return ESP_ERR_NO_MEM;
     }
@@ -1606,6 +1615,10 @@ esp_err_t audio_service_start(native_state_t *state) {
              native_audio_output_name(),
              (unsigned)encoded_ring_size, (unsigned)PCM_RING_SIZE,
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+    ESP_LOGI(TAG, "PERF FLOW_CONFIG: stream_priority=%u decode_priority=%u output_priority=%u",
+             AUDIO_STREAM_PRIORITY, AUDIO_DECODE_PRIORITY, AUDIO_OUTPUT_PRIORITY);
+#endif
 #ifdef YORADIO_CODEC_BENCHMARK
     ESP_RETURN_ON_ERROR(benchmark_autostart(), TAG,
                         "start codec flash fixture");
