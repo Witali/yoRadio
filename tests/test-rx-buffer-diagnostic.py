@@ -24,8 +24,16 @@ build = run(['gcc','-std=c11','-O2','-Wall','-Wextra','-fsanitize=address,undefi
 log = run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
            'UBSAN_OPTIONS=halt_on_error=1',host(binary)])
 (folder / 'run.log').write_bytes(log)
-assert b'live=3 peak=3 allocs=3 frees=0 lost=0 unmatched=0 payload=5172 metadata=96 missing=0' in log
-assert b'payload=0 metadata=32 missing=1' in log
+sys.path.insert(0, str(ROOT / 'tools/esp32c3_tests'))
+from rx_ownership import analyze, fields
+lines = log.decode().splitlines()
+headers = [fields(line, 'PERF RX_OWNER2:') for line in lines if 'PERF RX_OWNER2:' in line]
+assert any(h['live'] == 3 and h['payload'] == 5172 and h['metadata'] == 96 and not h['missing'] for h in headers)
+assert any(h['payload'] == 0 and h['metadata'] == 32 and h['missing'] == 1 for h in headers)
+# Recompute checksums in Python too, and validate the complete successful prefix.
+prefix = lines[:next(i for i, line in enumerate(lines) if line.startswith('PERF RX_OWNER2: 3,'))]
+owner = analyze([dict(at=i, line=line) for i, line in enumerate(prefix)])
+assert owner['maximum_live'] == 3 and owner['maximum_allocated_payload_bytes'] == 5268
 report = {'pass':True,'source_sha256':{p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
                                      for p in (source,harness,Path(__file__))},
           'scope':'Host ownership/range checks; target build checks RV32 stack bound; no physical timing inference'}

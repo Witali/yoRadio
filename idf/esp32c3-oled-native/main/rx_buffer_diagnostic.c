@@ -6,12 +6,31 @@
 #include "esp_netif.h"
 #include "esp_netif_net_stack.h"
 #include "esp_timer.h"
+#include "esp_rom_crc.h"
 #include "freertos/FreeRTOS.h"
 #include "lwip/esp_pbuf_ref.h"
 
 // Observe the public netif ownership transfer; never dereference packet data
 // or interpret the driver's opaque L2 handle. No changes to packet lifetimes.
 enum { RX_TRACK_SLOTS = 32 };
+#define RX_SNAPSHOT_INTERVAL_US 5000000LL
+
+// Version 2 records use the same fields as the original verbose format. CRC32
+// covers their uint32 values in this order, little endian on ESP32-C3; no packet
+// contents are transmitted. This halves a typical snapshot's USB log burst.
+typedef struct {
+    uint32_t sequence, live, peak, allocations, releases, lost, unmatched;
+    uint32_t payload, metadata, missing, walk_us;
+} rx_owner_record_t;
+typedef struct {
+    uint32_t sequence, id, payload, payload_bytes, metadata, metadata_bytes;
+} rx_block_record_t;
+_Static_assert(sizeof(rx_owner_record_t) == 11 * sizeof(uint32_t), "No wire CRC padding");
+_Static_assert(sizeof(rx_block_record_t) == 6 * sizeof(uint32_t), "No wire CRC padding");
+
+static uint32_t record_crc(const void *record, size_t size) {
+    return esp_rom_crc32_le(0, record, size);
+}
 typedef struct {
     void *l2, *payload;
     struct pbuf *metadata;
@@ -97,7 +116,7 @@ void rx_buffer_diagnostic_poll(void) {
     static int64_t previous;
     static uint32_t sequence;
     int64_t now = esp_timer_get_time();
-    if (now - previous < 5000000LL) return;
+    if (now - previous < RX_SNAPSHOT_INTERVAL_US) return;
     previous = now;
     rx_snapshot_t snapshot = {0};
     uint32_t made, freed, dropped, high, unmatched;
@@ -124,14 +143,26 @@ void rx_buffer_diagnostic_poll(void) {
             metadata_bytes += row->metadata_bytes;
         if (!row->payload_bytes || !row->metadata_bytes) ++missing;
     }
-    ESP_LOGI("rx_owner", "PERF RX_OWNER: seq=%u live=%u peak=%u allocs=%u frees=%u lost=%u unmatched=%u payload=%u metadata=%u missing=%u walk_us=%" PRId64,
-        (unsigned)++sequence, (unsigned)snapshot.count, (unsigned)high,
-        (unsigned)made, (unsigned)freed, (unsigned)dropped, (unsigned)unmatched,
-        (unsigned)payload_bytes, (unsigned)metadata_bytes, (unsigned)missing, walked);
+    const rx_owner_record_t header = {
+        .sequence = ++sequence, .live = snapshot.count, .peak = high,
+        .allocations = made, .releases = freed, .lost = dropped, .unmatched = unmatched,
+        .payload = payload_bytes, .metadata = metadata_bytes, .missing = missing,
+        .walk_us = walked > UINT32_MAX ? UINT32_MAX : (uint32_t)walked,
+    };
+    ESP_LOGI("rx_owner", "PERF RX_OWNER2: %u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%08" PRIx32,
+        (unsigned)header.sequence, (unsigned)header.live, (unsigned)header.peak,
+        (unsigned)header.allocations, (unsigned)header.releases,
+        (unsigned)header.lost, (unsigned)header.unmatched,
+        (unsigned)header.payload, (unsigned)header.metadata,
+        (unsigned)header.missing, (unsigned)header.walk_us, record_crc(&header, sizeof(header)));
     for (size_t i = 0; i < snapshot.count; ++i) {
         const rx_row_t *r = &snapshot.rows[i];
-        ESP_LOGI("rx_owner", "PERF RX_BLOCK: seq=%u id=%u payload=0x%08" PRIxPTR " payload_bytes=%u metadata=0x%08" PRIxPTR " metadata_bytes=%u",
-            (unsigned)sequence, (unsigned)r->owner.id, r->payload_allocation,
-            (unsigned)r->payload_bytes, r->metadata_allocation, (unsigned)r->metadata_bytes);
+        const rx_block_record_t block = {.sequence = sequence, .id = r->owner.id,
+            .payload = r->payload_allocation, .payload_bytes = r->payload_bytes,
+            .metadata = r->metadata_allocation, .metadata_bytes = r->metadata_bytes};
+        ESP_LOGI("rx_owner", "PERF RX_BLOCK2: %u,%u,%08" PRIx32 ",%u,%08" PRIx32 ",%u,%08" PRIx32,
+            (unsigned)block.sequence, (unsigned)block.id, block.payload,
+            (unsigned)block.payload_bytes, block.metadata, (unsigned)block.metadata_bytes,
+            record_crc(&block, sizeof(block)));
     }
 }

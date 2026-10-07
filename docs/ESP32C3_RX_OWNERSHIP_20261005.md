@@ -3,6 +3,37 @@
 Date: 2026-10-05. Follow-up to the [DMA prefill experiment](ESP32C3_OUTPUT_DMA_20261005.md)
 and step 4 of the [Vorbis plan](ESP32C3_VORBIS_REPAIR_PLAN.md).
 
+## Diagnostic transport update, 7 October
+
+The subsequent [ten-minute HE-AACv2 run](ESP32C3_HEV2_RX_OWNER_20261007.md)
+retains a truncated RX line and rejects its full ownership capture. The pinned
+IDF USB Serial/JTAG no-driver console can discard bytes after its 50 ms FIFO
+timeout while returning the requested write length. This is a possible cause,
+not proof of the specific physical interruption.
+
+New diagnostic builds emit compact, checksummed records. The ownership/range
+checks, polling interval and packet lifetimes are unchanged. No USB driver or
+extra transmit queue is installed, and ordinary builds remain unaffected.
+
+- `PERF RX_OWNER2:` has decimal fields in this order: sequence, live, peak,
+  allocations, releases, lost, unmatched, payload bytes, metadata bytes,
+  missing ranges, heap-walk microseconds.
+- `PERF RX_BLOCK2:` has sequence, lifetime ID, payload address, payload size,
+  metadata address, metadata size. Addresses are eight lowercase hexadecimal
+  digits; other fields are decimal.
+- Both use comma-separated values and a final eight-digit hexadecimal CRC32.
+  CRC32/ISO-HDLC covers the ordered values encoded as little-endian uint32
+  words, without text delimiters. The C3 ROM function starts at zero; the host
+  independently checks with `zlib.crc32`. The checksum detects accidental
+  corruption; it is not authentication. No packet contents are logged.
+- The host retains compatibility with archived verbose records. It rejects
+  invalid checksums, missing rows, duplicate/missing sequences and invalid
+  ranges; it does not reconstruct damaged data or waive completeness checks.
+
+Host tests verify known CRC vectors, C/Python agreement, deliberately damaged
+records and exact replay of previous evidence. Physical validation of the new
+transport is recorded separately; smaller output cannot guarantee lossless USB.
+
 ## Result and scope
 
 The initial drop in free heap includes retained Wi-Fi RX packet allocations.

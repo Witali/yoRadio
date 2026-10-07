@@ -34,6 +34,17 @@ static void test_log(const char *tag, const char *format, ...) {
     va_list args; va_start(args,format); vprintf(format,args); va_end(args); putchar('\n');
 }
 #define ESP_LOGI test_log
+// Independent bitwise IEEE CRC32 oracle for the target's ROM implementation.
+static uint32_t esp_rom_crc32_le(uint32_t crc, const uint8_t *bytes, uint32_t size) {
+    const uint32_t reflected_ieee_polynomial = UINT32_C(0xedb88320);
+    crc = ~crc;
+    while (size--) {
+        crc ^= *bytes++;
+        for (unsigned bit = 0; bit < 8; ++bit)
+            crc = (crc >> 1) ^ ((crc & 1) ? reflected_ieee_polynomial : 0);
+    }
+    return ~crc;
+}
 static struct pbuf *next_pbuf;
 static unsigned real_allocs, real_frees;
 struct pbuf *__real_esp_pbuf_allocate(esp_netif_t *n,void *p,size_t s,void *h) {
@@ -52,6 +63,7 @@ static void add(unsigned index) {
     assert(__wrap_esp_pbuf_allocate(NULL,payloads[index]+44,1280,&handles[index])==next_pbuf);
 }
 int main(void) {
+    assert(esp_rom_crc32_le(0, (const uint8_t *)"123456789", 9) == UINT32_C(0xcbf43926));
     now=5000000;rx_buffer_diagnostic_poll();assert(!live);
     add(0);add(1);add(2);
     for(unsigned i=0;i<3;++i) {
