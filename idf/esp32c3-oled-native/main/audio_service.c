@@ -62,6 +62,9 @@
 #define BITRATE_UPDATE_INTERVAL_US 1000000LL
 #define STREAM_BITRATE_INTERVAL_US 5000000LL
 #define STREAM_STALL_TIMEOUT_US 10000000LL
+#define STREAM_RETRY_INITIAL_MS 1000U
+#define STREAM_RETRY_MAX_MS 30000U
+#define STREAM_RETRY_POLL_MS 100U
 enum {
     AUDIO_STREAM_PRIORITY = 5,
     AUDIO_DECODE_PRIORITY = 7,
@@ -83,6 +86,14 @@ typedef struct {
 #endif
     char url[512];
 } play_command_t;
+
+// Owned by stream_task. Reuse its current command/URL between attempts;
+// retain no HTTP/TLS allocation while waiting.
+typedef struct {
+    int64_t due_us;
+    uint32_t delay_ms;
+    bool pending;
+} stream_retry_t;
 
 typedef struct {
     uint32_t generation;
@@ -332,13 +343,27 @@ static bool http_status_is_redirect(int status) {
            status == 308;
 }
 
+static bool retryable_transport_error(esp_err_t result) {
+    return result == ESP_ERR_HTTP_CONNECT ||
+           result == ESP_ERR_HTTP_WRITE_DATA ||
+           result == ESP_ERR_HTTP_EAGAIN || result == ESP_ERR_TIMEOUT;
+}
+
+static bool retryable_http_status(int status) {
+    // Request timeout, rate limit and server errors can be temporary. Client
+    // errors (including authentication/not-found) require a corrected request.
+    return status == 408 || status == 429 || (status >= 500 && status <= 599);
+}
+
 static esp_err_t open_stream(esp_http_client_handle_t client,
-                             const char *requested_url) {
+                             const char *requested_url, bool *retryable) {
+    *retryable = false;
     for (unsigned redirect = 0; redirect <= MAX_HTTP_REDIRECTS; ++redirect) {
         ESP_LOGI(TAG, "Opening stream%s: %s",
                  redirect ? " after redirect" : "", requested_url);
         esp_err_t result = esp_http_client_open(client, 0);
         if (result != ESP_OK) {
+            *retryable = retryable_transport_error(result);
             ESP_LOGE(TAG, "Stream transport open failed: %s (errno %d)",
                      esp_err_to_name(result), esp_http_client_get_errno(client));
             return result;
@@ -347,6 +372,7 @@ static esp_err_t open_stream(esp_http_client_handle_t client,
         int64_t headers = esp_http_client_fetch_headers(client);
         int status = esp_http_client_get_status_code(client);
         if (headers < 0) {
+            *retryable = true;
             ESP_LOGE(TAG,
                      "Stream response headers failed: status %d, errno %d",
                      status, esp_http_client_get_errno(client));
@@ -358,6 +384,7 @@ static esp_err_t open_stream(esp_http_client_handle_t client,
 
         if (status >= 200 && status < 300) return ESP_OK;
         if (!http_status_is_redirect(status) || redirect == MAX_HTTP_REDIRECTS) {
+            *retryable = retryable_http_status(status);
             esp_http_client_close(client);
             return http_status_is_redirect(status) ? ESP_ERR_HTTP_MAX_REDIRECT
                                                    : ESP_FAIL;
@@ -515,6 +542,47 @@ static void play_flash_fixture(const play_command_t *command,
 }
 #endif
 
+static void schedule_stream_retry(stream_retry_t *retry, uint32_t generation) {
+    if (generation != atomic_load(&s_generation) ||
+        !runtime_settings_get_watchdog()) return;
+    uint32_t delay_ms = retry->delay_ms ? retry->delay_ms * 2U
+                                      : STREAM_RETRY_INITIAL_MS;
+    if (delay_ms > STREAM_RETRY_MAX_MS) delay_ms = STREAM_RETRY_MAX_MS;
+    retry->delay_ms = delay_ms;
+    retry->due_us = esp_timer_get_time() + (int64_t)delay_ms * 1000;
+    retry->pending = true;
+    ESP_LOGW(TAG, "Retry stream connection in %lu ms", (unsigned long)delay_ms);
+}
+
+static void receive_stream_command(play_command_t *command,
+                                   stream_retry_t *retry) {
+    for (;;) {
+        if (!retry->pending) {
+            xQueueReceive(s_commands, command, portMAX_DELAY);
+            *retry = (stream_retry_t){0};
+            return;
+        }
+        if (command->generation != atomic_load(&s_generation) ||
+            !runtime_settings_get_watchdog()) {
+            *retry = (stream_retry_t){0};
+            continue;
+        }
+        int64_t remaining_us = retry->due_us - esp_timer_get_time();
+        if (remaining_us <= 0) {
+            retry->pending = false;
+            return;
+        }
+        uint32_t wait_ms = (uint32_t)((remaining_us + 999) / 1000);
+        if (wait_ms > STREAM_RETRY_POLL_MS) wait_ms = STREAM_RETRY_POLL_MS;
+        // A new Play wakes the queue immediately. Stop/watchdog changes have
+        // no queue item, so check them at bounded intervals while backing off.
+        if (xQueueReceive(s_commands, command, pdMS_TO_TICKS(wait_ms)) == pdTRUE) {
+            *retry = (stream_retry_t){0};
+            return;
+        }
+    }
+}
+
 static void stream_task(void *argument) {
     (void)argument;
     uint8_t *buffer = malloc(STREAM_CHUNK_SIZE);
@@ -522,9 +590,10 @@ static void stream_task(void *argument) {
         ESP_LOGE(TAG, "No memory for stream input buffer");
         vTaskDelete(NULL);
     }
+    play_command_t command;
+    stream_retry_t retry = {0};
     while (true) {
-        play_command_t command;
-        xQueueReceive(s_commands, &command, portMAX_DELAY);
+        receive_stream_command(&command, &retry);
 #ifdef YORADIO_CODEC_BENCHMARK
         if (command.fixture_size) {
             play_flash_fixture(&command, buffer);
@@ -541,6 +610,9 @@ static void stream_task(void *argument) {
             vTaskDelay(pdMS_TO_TICKS(1));
         }
         if (atomic_load(&s_generation) != command.generation) continue;
+
+        network_service_set_streaming(true);
+        state_set_audio(command.generation, false, "connecting");
 
         esp_http_client_config_t config = {
             .url = command.url,
@@ -562,7 +634,8 @@ static void stream_task(void *argument) {
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
-        esp_err_t result = open_stream(client, command.url);
+        bool retryable;
+        esp_err_t result = open_stream(client, command.url, &retryable);
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Stream connection failed for %s: %s", command.url,
                      esp_err_to_name(result));
@@ -571,8 +644,10 @@ static void stream_task(void *argument) {
                 network_service_set_streaming(false);
             }
             dispose_http_client(client);
+            if (retryable) schedule_stream_retry(&retry, command.generation);
             continue;
         }
+        retry = (stream_retry_t){0};
         if (strncmp(command.url, "https://", 8) == 0) {
             log_runtime_memory("after TLS handshake");
         }
