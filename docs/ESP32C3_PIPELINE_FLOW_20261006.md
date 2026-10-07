@@ -210,6 +210,10 @@ part of this evidence.
 
 ## Next scheduling experiment
 
+The subsequent [output-priority experiment](ESP32C3_OUTPUT_PRIORITY_20261006.md)
+implements and measures the first comparison below. The measurements and
+board state above describe the original diagnostic run.
+
 1. Compare output-first scheduling or bounded cooperative decode work with
    the unchanged four DMA buffers. Keep decoder **task CPU** separate from
    elapsed decode-call time, which naturally includes output preemption.

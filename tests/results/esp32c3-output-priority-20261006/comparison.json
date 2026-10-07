@@ -1,0 +1,3363 @@
+{
+  "control_image": "1a964230fa4c128740a0658eee994a79e5d3f80e82c72139738e6d403c7b7667",
+  "candidate_image": "a8f058a8405fd2698bc2e4effecee798c02dc37b071309ad1d4b2eacbe8f553a",
+  "fixtures": {
+    "radio-groovesalad-lpc12": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+    "radio-groovesalad-lpc32": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+    "radio-indiepop-lpc32": "02d5bcff9fb8a1d23c4b7443a0e355526c90e1616abe3ef99791c0df66d77846",
+    "radio-indiepop-lpc12": "28e24de31bae076d0e27c5a27bd049c30f71b9d81e5b00e020245eb16e809682"
+  },
+  "cases": [
+    {
+      "name": "load:radio-groovesalad-lpc12",
+      "control": {
+        "original": {
+          "name": "load:radio-groovesalad-lpc12",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Progressive heap loss during continuous playback",
+          "seconds": 61.109
+        },
+        "cpu": {
+          "observed_seconds": 45.815999999999995,
+          "windows": 9,
+          "peak_percent": 76.5,
+          "busy_mean_percent": 73.42816483324603,
+          "idle_mean_percent": 26.571835166753974,
+          "decode_mean_percent": 25.56762048192771,
+          "stream_mean_percent": 5.524482713462546,
+          "output_mean_percent": 7.622094901344509,
+          "wifi_mean_percent": 16.892657586869216,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.544886066003143,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "decoder": {
+          "windows": 9,
+          "intervals": [
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1340,
+              "max_call_us": 33246
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1340,
+              "max_call_us": 35858
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1256,
+              "max_call_us": 29750
+            },
+            {
+              "window_ms": 5015,
+              "audio_ms": 5015,
+              "decode_ms": 1334,
+              "max_call_us": 35821
+            },
+            {
+              "window_ms": 5008,
+              "audio_ms": 5015,
+              "decode_ms": 1294,
+              "max_call_us": 35763
+            },
+            {
+              "window_ms": 5001,
+              "audio_ms": 5015,
+              "decode_ms": 1317,
+              "max_call_us": 32788
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1339,
+              "max_call_us": 32664
+            },
+            {
+              "window_ms": 5016,
+              "audio_ms": 5015,
+              "decode_ms": 1339,
+              "max_call_us": 33453
+            },
+            {
+              "window_ms": 5016,
+              "audio_ms": 5015,
+              "decode_ms": 1343,
+              "max_call_us": 35693
+            }
+          ],
+          "wall_ms": 45076,
+          "audio_ms": 45135,
+          "decode_ms": 11902,
+          "max_call_us": 35858,
+          "audio_wall_ratio": 1.0013089005235603,
+          "audio_shortfall_percent": 0,
+          "elapsed_decode_ms_per_audio_second": 263.6977955023817,
+          "windows_decode_slower_than_audio": 0
+        },
+        "flow_decoder": {
+          "windows": [
+            {
+              "gen": 3,
+              "window_us": 5005357,
+              "input_us": 258850,
+              "input_n": 125,
+              "input_timeouts": 0,
+              "input_max": 12519,
+              "pcm_us": 3263931,
+              "pcm_n": 424,
+              "pcm_timeouts": 0,
+              "pcm_max": 23572
+            },
+            {
+              "gen": 3,
+              "window_us": 5005245,
+              "input_us": 229160,
+              "input_n": 118,
+              "input_timeouts": 0,
+              "input_max": 14578,
+              "pcm_us": 3319155,
+              "pcm_n": 423,
+              "pcm_timeouts": 0,
+              "pcm_max": 23093
+            },
+            {
+              "gen": 3,
+              "window_us": 5005209,
+              "input_us": 221740,
+              "input_n": 110,
+              "input_timeouts": 0,
+              "input_max": 11813,
+              "pcm_us": 3399082,
+              "pcm_n": 427,
+              "pcm_timeouts": 0,
+              "pcm_max": 22463
+            },
+            {
+              "gen": 3,
+              "window_us": 5015981,
+              "input_us": 134693,
+              "input_n": 86,
+              "input_timeouts": 0,
+              "input_max": 9189,
+              "pcm_us": 3431876,
+              "pcm_n": 431,
+              "pcm_timeouts": 0,
+              "pcm_max": 25187
+            },
+            {
+              "gen": 3,
+              "window_us": 5008860,
+              "input_us": 91473,
+              "input_n": 69,
+              "input_timeouts": 0,
+              "input_max": 15218,
+              "pcm_us": 3500653,
+              "pcm_n": 431,
+              "pcm_timeouts": 0,
+              "pcm_max": 24839
+            },
+            {
+              "gen": 3,
+              "window_us": 5001731,
+              "input_us": 92728,
+              "input_n": 67,
+              "input_timeouts": 0,
+              "input_max": 12206,
+              "pcm_us": 3481400,
+              "pcm_n": 431,
+              "pcm_timeouts": 0,
+              "pcm_max": 24153
+            },
+            {
+              "gen": 3,
+              "window_us": 5005310,
+              "input_us": 367461,
+              "input_n": 162,
+              "input_timeouts": 0,
+              "input_max": 11280,
+              "pcm_us": 3132291,
+              "pcm_n": 419,
+              "pcm_timeouts": 0,
+              "pcm_max": 23264
+            },
+            {
+              "gen": 3,
+              "window_us": 5016070,
+              "input_us": 397300,
+              "input_n": 151,
+              "input_timeouts": 0,
+              "input_max": 15284,
+              "pcm_us": 3145101,
+              "pcm_n": 414,
+              "pcm_timeouts": 0,
+              "pcm_max": 22921
+            },
+            {
+              "gen": 3,
+              "window_us": 5016856,
+              "input_us": 419920,
+              "input_n": 155,
+              "input_timeouts": 0,
+              "input_max": 12958,
+              "pcm_us": 3102427,
+              "pcm_n": 415,
+              "pcm_timeouts": 0,
+              "pcm_max": 22706
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.080619,
+          "input": {
+            "us": 2213325,
+            "count": 1043,
+            "wall_percent": 4.909704101445457,
+            "mean_us": 2122.0757430488975,
+            "max_us": 15284,
+            "timeouts": 0
+          },
+          "pcm": {
+            "us": 29775916,
+            "count": 3815,
+            "wall_percent": 66.05037078128852,
+            "mean_us": 7804.958322411533,
+            "max_us": 25187,
+            "timeouts": 0
+          }
+        },
+        "flow_output": {
+          "windows": [
+            {
+              "gen": 3,
+              "window_us": 5003757,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4979835,
+              "submit_n": 432,
+              "submit_max": 41922,
+              "dma_us": 4291544,
+              "dma_n": 386,
+              "dma_timeouts": 0,
+              "dma_max": 40870,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5014520,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4986557,
+              "submit_n": 432,
+              "submit_max": 39887,
+              "dma_us": 4335432,
+              "dma_n": 389,
+              "dma_timeouts": 0,
+              "dma_max": 38875,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5003767,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4979725,
+              "submit_n": 432,
+              "submit_max": 37330,
+              "dma_us": 4326711,
+              "dma_n": 393,
+              "dma_timeouts": 0,
+              "dma_max": 36333,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5005728,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4980800,
+              "submit_n": 432,
+              "submit_max": 40357,
+              "dma_us": 4305055,
+              "dma_n": 390,
+              "dma_timeouts": 0,
+              "dma_max": 38968,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5009409,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4981535,
+              "submit_n": 432,
+              "submit_max": 37675,
+              "dma_us": 4352434,
+              "dma_n": 404,
+              "dma_timeouts": 0,
+              "dma_max": 36745,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5004546,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4977429,
+              "submit_n": 432,
+              "submit_max": 35504,
+              "dma_us": 4317112,
+              "dma_n": 397,
+              "dma_timeouts": 0,
+              "dma_max": 34526,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5006104,
+              "empty_us": 25497,
+              "empty_n": 1,
+              "empty_timeouts": 0,
+              "empty_max": 25497,
+              "submit_us": 4950427,
+              "submit_n": 431,
+              "submit_max": 41160,
+              "dma_us": 4298663,
+              "dma_n": 380,
+              "dma_timeouts": 0,
+              "dma_max": 39765,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5005538,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4979679,
+              "submit_n": 430,
+              "submit_max": 43397,
+              "dma_us": 4331868,
+              "dma_n": 386,
+              "dma_timeouts": 0,
+              "dma_max": 42448,
+              "overruns": 1
+            },
+            {
+              "gen": 3,
+              "window_us": 5005525,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4973896,
+              "submit_n": 431,
+              "submit_max": 42055,
+              "dma_us": 4274757,
+              "dma_n": 378,
+              "dma_timeouts": 0,
+              "dma_max": 41005,
+              "overruns": 0
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.058894,
+          "empty": {
+            "us": 25497,
+            "count": 1,
+            "wall_percent": 0.05658594283295103,
+            "mean_us": 25497.0,
+            "max_us": 25497,
+            "timeouts": 0
+          },
+          "submit": {
+            "us": 44789883,
+            "count": 3884,
+            "wall_percent": 99.40297913215535,
+            "mean_us": 11531.895726055613,
+            "max_us": 43397,
+            "timeouts": 0
+          },
+          "dma": {
+            "us": 38833576,
+            "count": 3503,
+            "wall_percent": 86.18404171216453,
+            "mean_us": 11085.805309734513,
+            "max_us": 42448,
+            "timeouts": 0
+          },
+          "overruns": 1,
+          "overruns_per_second": 0.022193176778817516
+        },
+        "estimated_decoder_cpu_ms_per_audio_second": 255.34198755807546
+      },
+      "candidate": {
+        "original": {
+          "name": "load:radio-groovesalad-lpc12",
+          "result": "PASS",
+          "evidence": {
+            "duration": 60,
+            "status_samples": 301,
+            "max_http_ms": 141.0000000614673,
+            "mean_busy": 73.46,
+            "peak_busy": 76.3,
+            "minimum_heap": 62444.0,
+            "minimum_largest": 43008.0,
+            "audio_wall_ratio": 1.0015777595813944
+          },
+          "seconds": 61.14
+        },
+        "cpu": {
+          "observed_seconds": 45.706,
+          "windows": 9,
+          "peak_percent": 76.3,
+          "busy_mean_percent": 73.44340786767602,
+          "idle_mean_percent": 26.556592132323985,
+          "decode_mean_percent": 25.478245744541198,
+          "stream_mean_percent": 5.3557869863912835,
+          "output_mean_percent": 7.733240712379119,
+          "wifi_mean_percent": 17.03374830438017,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.4773968406773728,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "decoder": {
+          "windows": 9,
+          "intervals": [
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1411,
+              "max_call_us": 34599
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1375,
+              "max_call_us": 34711
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1384,
+              "max_call_us": 33379
+            },
+            {
+              "window_ms": 5017,
+              "audio_ms": 5015,
+              "decode_ms": 1368,
+              "max_call_us": 34761
+            },
+            {
+              "window_ms": 5004,
+              "audio_ms": 5015,
+              "decode_ms": 1354,
+              "max_call_us": 34099
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1359,
+              "max_call_us": 30932
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1421,
+              "max_call_us": 34954
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1411,
+              "max_call_us": 33577
+            },
+            {
+              "window_ms": 5015,
+              "audio_ms": 5015,
+              "decode_ms": 1448,
+              "max_call_us": 36150
+            }
+          ],
+          "wall_ms": 45066,
+          "audio_ms": 45135,
+          "decode_ms": 12531,
+          "max_call_us": 36150,
+          "audio_wall_ratio": 1.0015310877379844,
+          "audio_shortfall_percent": 0,
+          "elapsed_decode_ms_per_audio_second": 277.633765370555,
+          "windows_decode_slower_than_audio": 0
+        },
+        "flow_decoder": {
+          "windows": [
+            {
+              "gen": 3,
+              "window_us": 5005299,
+              "input_us": 278680,
+              "input_n": 125,
+              "input_timeouts": 0,
+              "input_max": 12789,
+              "pcm_us": 3127426,
+              "pcm_n": 299,
+              "pcm_timeouts": 0,
+              "pcm_max": 22899
+            },
+            {
+              "gen": 3,
+              "window_us": 5005340,
+              "input_us": 191584,
+              "input_n": 118,
+              "input_timeouts": 0,
+              "input_max": 11559,
+              "pcm_us": 3249191,
+              "pcm_n": 307,
+              "pcm_timeouts": 0,
+              "pcm_max": 25165
+            },
+            {
+              "gen": 3,
+              "window_us": 5005240,
+              "input_us": 187139,
+              "input_n": 110,
+              "input_timeouts": 0,
+              "input_max": 14838,
+              "pcm_us": 3287910,
+              "pcm_n": 310,
+              "pcm_timeouts": 0,
+              "pcm_max": 22011
+            },
+            {
+              "gen": 3,
+              "window_us": 5017062,
+              "input_us": 125414,
+              "input_n": 86,
+              "input_timeouts": 0,
+              "input_max": 9875,
+              "pcm_us": 3394943,
+              "pcm_n": 318,
+              "pcm_timeouts": 0,
+              "pcm_max": 23560
+            },
+            {
+              "gen": 3,
+              "window_us": 5004270,
+              "input_us": 74656,
+              "input_n": 69,
+              "input_timeouts": 0,
+              "input_max": 10555,
+              "pcm_us": 3447951,
+              "pcm_n": 324,
+              "pcm_timeouts": 0,
+              "pcm_max": 24694
+            },
+            {
+              "gen": 3,
+              "window_us": 5005290,
+              "input_us": 57699,
+              "input_n": 67,
+              "input_timeouts": 0,
+              "input_max": 9655,
+              "pcm_us": 3458807,
+              "pcm_n": 325,
+              "pcm_timeouts": 0,
+              "pcm_max": 25799
+            },
+            {
+              "gen": 3,
+              "window_us": 5005365,
+              "input_us": 369704,
+              "input_n": 162,
+              "input_timeouts": 0,
+              "input_max": 13212,
+              "pcm_us": 2986021,
+              "pcm_n": 284,
+              "pcm_timeouts": 0,
+              "pcm_max": 24543
+            },
+            {
+              "gen": 3,
+              "window_us": 5005149,
+              "input_us": 356377,
+              "input_n": 151,
+              "input_timeouts": 0,
+              "input_max": 14531,
+              "pcm_us": 3057635,
+              "pcm_n": 296,
+              "pcm_timeouts": 0,
+              "pcm_max": 25774
+            },
+            {
+              "gen": 3,
+              "window_us": 5015981,
+              "input_us": 354849,
+              "input_n": 155,
+              "input_timeouts": 0,
+              "input_max": 13785,
+              "pcm_us": 3012277,
+              "pcm_n": 288,
+              "pcm_timeouts": 0,
+              "pcm_max": 23210
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.068996,
+          "input": {
+            "us": 1996102,
+            "count": 1043,
+            "wall_percent": 4.428991495617075,
+            "mean_us": 1913.8082454458292,
+            "max_us": 14838,
+            "timeouts": 0
+          },
+          "pcm": {
+            "us": 29022161,
+            "count": 2751,
+            "wall_percent": 64.39495789966122,
+            "mean_us": 10549.676844783715,
+            "max_us": 25799,
+            "timeouts": 0
+          }
+        },
+        "flow_output": {
+          "windows": [
+            {
+              "gen": 3,
+              "window_us": 5001733,
+              "empty_us": 658838,
+              "empty_n": 196,
+              "empty_timeouts": 113,
+              "empty_max": 6598,
+              "submit_us": 4308812,
+              "submit_n": 432,
+              "submit_max": 25706,
+              "dma_us": 3790099,
+              "dma_n": 430,
+              "dma_timeouts": 0,
+              "dma_max": 13944,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5001680,
+              "empty_us": 578938,
+              "empty_n": 176,
+              "empty_timeouts": 98,
+              "empty_max": 6879,
+              "submit_us": 4379533,
+              "submit_n": 431,
+              "submit_max": 25220,
+              "dma_us": 3853656,
+              "dma_n": 431,
+              "dma_timeouts": 0,
+              "dma_max": 15941,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5002263,
+              "empty_us": 524097,
+              "empty_n": 160,
+              "empty_timeouts": 88,
+              "empty_max": 9296,
+              "submit_us": 4428217,
+              "submit_n": 431,
+              "submit_max": 22231,
+              "dma_us": 3951071,
+              "dma_n": 436,
+              "dma_timeouts": 0,
+              "dma_max": 16451,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5001099,
+              "empty_us": 426529,
+              "empty_n": 136,
+              "empty_timeouts": 70,
+              "empty_max": 5871,
+              "submit_us": 4540289,
+              "submit_n": 432,
+              "submit_max": 24787,
+              "dma_us": 4053419,
+              "dma_n": 445,
+              "dma_timeouts": 0,
+              "dma_max": 17064,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5004432,
+              "empty_us": 361684,
+              "empty_n": 116,
+              "empty_timeouts": 56,
+              "empty_max": 5609,
+              "submit_us": 4604512,
+              "submit_n": 432,
+              "submit_max": 24664,
+              "dma_us": 4140498,
+              "dma_n": 454,
+              "dma_timeouts": 0,
+              "dma_max": 16721,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5004173,
+              "empty_us": 359418,
+              "empty_n": 115,
+              "empty_timeouts": 57,
+              "empty_max": 6180,
+              "submit_us": 4601881,
+              "submit_n": 431,
+              "submit_max": 25620,
+              "dma_us": 4122577,
+              "dma_n": 452,
+              "dma_timeouts": 0,
+              "dma_max": 19391,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5003014,
+              "empty_us": 786246,
+              "empty_n": 234,
+              "empty_timeouts": 135,
+              "empty_max": 6797,
+              "submit_us": 4168598,
+              "submit_n": 432,
+              "submit_max": 22103,
+              "dma_us": 3652771,
+              "dma_n": 415,
+              "dma_timeouts": 0,
+              "dma_max": 16968,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5008640,
+              "empty_us": 741929,
+              "empty_n": 218,
+              "empty_timeouts": 130,
+              "empty_max": 5260,
+              "submit_us": 4216347,
+              "submit_n": 432,
+              "submit_max": 25701,
+              "dma_us": 3683767,
+              "dma_n": 424,
+              "dma_timeouts": 0,
+              "dma_max": 17651,
+              "overruns": 0
+            },
+            {
+              "gen": 3,
+              "window_us": 5005277,
+              "empty_us": 771240,
+              "empty_n": 227,
+              "empty_timeouts": 131,
+              "empty_max": 7489,
+              "submit_us": 4191581,
+              "submit_n": 432,
+              "submit_max": 23129,
+              "dma_us": 3653393,
+              "dma_n": 417,
+              "dma_timeouts": 0,
+              "dma_max": 16858,
+              "overruns": 0
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.032311,
+          "empty": {
+            "us": 5208919,
+            "count": 1578,
+            "wall_percent": 11.567070142147491,
+            "mean_us": 3300.962610899873,
+            "max_us": 9296,
+            "timeouts": 878
+          },
+          "submit": {
+            "us": 39439770,
+            "count": 3885,
+            "wall_percent": 87.58104819448418,
+            "mean_us": 10151.806949806949,
+            "max_us": 25706,
+            "timeouts": 0
+          },
+          "dma": {
+            "us": 34901251,
+            "count": 3904,
+            "wall_percent": 77.5026869040765,
+            "mean_us": 8939.86962090164,
+            "max_us": 19391,
+            "timeouts": 0
+          },
+          "overruns": 0,
+          "overruns_per_second": 0.0
+        },
+        "estimated_decoder_cpu_ms_per_audio_second": 254.3929595044851
+      }
+    },
+    {
+      "name": "load:radio-groovesalad-lpc32",
+      "control": {
+        "original": {
+          "name": "load:radio-groovesalad-lpc32",
+          "result": "PASS",
+          "evidence": {
+            "duration": 60,
+            "status_samples": 287,
+            "max_http_ms": 155.9999999590218,
+            "mean_busy": 77.49,
+            "peak_busy": 79.1,
+            "minimum_heap": 63512.0,
+            "minimum_largest": 51200.0,
+            "audio_wall_ratio": 0.9511602646390837
+          },
+          "seconds": 61.047
+        },
+        "cpu": {
+          "observed_seconds": 45.98599999999999,
+          "windows": 9,
+          "peak_percent": 79.1,
+          "busy_mean_percent": 77.51258861392597,
+          "idle_mean_percent": 22.487411386074022,
+          "decode_mean_percent": 34.72160657591441,
+          "stream_mean_percent": 4.7673444091680075,
+          "output_mean_percent": 7.088859652937851,
+          "wifi_mean_percent": 14.922441612664723,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.389024920628017,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "decoder": {
+          "windows": 9,
+          "intervals": [
+            {
+              "window_ms": 5026,
+              "audio_ms": 4806,
+              "decode_ms": 1802,
+              "max_call_us": 45225
+            },
+            {
+              "window_ms": 5028,
+              "audio_ms": 4806,
+              "decode_ms": 1757,
+              "max_call_us": 44448
+            },
+            {
+              "window_ms": 5089,
+              "audio_ms": 4910,
+              "decode_ms": 1836,
+              "max_call_us": 46133
+            },
+            {
+              "window_ms": 5090,
+              "audio_ms": 4910,
+              "decode_ms": 1852,
+              "max_call_us": 45522
+            },
+            {
+              "window_ms": 5052,
+              "audio_ms": 4910,
+              "decode_ms": 1879,
+              "max_call_us": 46641
+            },
+            {
+              "window_ms": 5032,
+              "audio_ms": 4806,
+              "decode_ms": 1893,
+              "max_call_us": 47440
+            },
+            {
+              "window_ms": 5082,
+              "audio_ms": 4806,
+              "decode_ms": 1851,
+              "max_call_us": 46474
+            },
+            {
+              "window_ms": 5056,
+              "audio_ms": 4701,
+              "decode_ms": 1776,
+              "max_call_us": 44711
+            },
+            {
+              "window_ms": 5090,
+              "audio_ms": 4701,
+              "decode_ms": 1809,
+              "max_call_us": 47430
+            }
+          ],
+          "wall_ms": 45545,
+          "audio_ms": 43356,
+          "decode_ms": 16455,
+          "max_call_us": 47440,
+          "audio_wall_ratio": 0.9519376440882643,
+          "audio_shortfall_percent": 4.806235591173569,
+          "elapsed_decode_ms_per_audio_second": 379.5322446720177,
+          "windows_decode_slower_than_audio": 0
+        },
+        "flow_decoder": {
+          "windows": [
+            {
+              "gen": 6,
+              "window_us": 5026580,
+              "input_us": 152640,
+              "input_n": 97,
+              "input_timeouts": 0,
+              "input_max": 9639,
+              "pcm_us": 2957919,
+              "pcm_n": 411,
+              "pcm_timeouts": 0,
+              "pcm_max": 25269
+            },
+            {
+              "gen": 6,
+              "window_us": 5028120,
+              "input_us": 163653,
+              "input_n": 93,
+              "input_timeouts": 0,
+              "input_max": 14310,
+              "pcm_us": 3000635,
+              "pcm_n": 414,
+              "pcm_timeouts": 0,
+              "pcm_max": 24517
+            },
+            {
+              "gen": 6,
+              "window_us": 5089169,
+              "input_us": 133867,
+              "input_n": 88,
+              "input_timeouts": 0,
+              "input_max": 10236,
+              "pcm_us": 3017242,
+              "pcm_n": 419,
+              "pcm_timeouts": 0,
+              "pcm_max": 22295
+            },
+            {
+              "gen": 6,
+              "window_us": 5090518,
+              "input_us": 68209,
+              "input_n": 66,
+              "input_timeouts": 0,
+              "input_max": 9216,
+              "pcm_us": 3055978,
+              "pcm_n": 423,
+              "pcm_timeouts": 0,
+              "pcm_max": 23449
+            },
+            {
+              "gen": 6,
+              "window_us": 5052387,
+              "input_us": 31901,
+              "input_n": 44,
+              "input_timeouts": 0,
+              "input_max": 6838,
+              "pcm_us": 3051457,
+              "pcm_n": 423,
+              "pcm_timeouts": 0,
+              "pcm_max": 25543
+            },
+            {
+              "gen": 6,
+              "window_us": 5032648,
+              "input_us": 26517,
+              "input_n": 38,
+              "input_timeouts": 0,
+              "input_max": 2408,
+              "pcm_us": 3020788,
+              "pcm_n": 414,
+              "pcm_timeouts": 0,
+              "pcm_max": 24069
+            },
+            {
+              "gen": 6,
+              "window_us": 5082411,
+              "input_us": 205032,
+              "input_n": 99,
+              "input_timeouts": 0,
+              "input_max": 11528,
+              "pcm_us": 2900132,
+              "pcm_n": 404,
+              "pcm_timeouts": 0,
+              "pcm_max": 24382
+            },
+            {
+              "gen": 6,
+              "window_us": 5056090,
+              "input_us": 238307,
+              "input_n": 115,
+              "input_timeouts": 0,
+              "input_max": 16134,
+              "pcm_us": 2925998,
+              "pcm_n": 397,
+              "pcm_timeouts": 0,
+              "pcm_max": 24550
+            },
+            {
+              "gen": 6,
+              "window_us": 5090548,
+              "input_us": 239497,
+              "input_n": 118,
+              "input_timeouts": 0,
+              "input_max": 16407,
+              "pcm_us": 2911272,
+              "pcm_n": 399,
+              "pcm_timeouts": 0,
+              "pcm_max": 23829
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.548471,
+          "input": {
+            "us": 1259623,
+            "count": 758,
+            "wall_percent": 2.765456166464951,
+            "mean_us": 1661.7717678100264,
+            "max_us": 16407,
+            "timeouts": 0
+          },
+          "pcm": {
+            "us": 26841421,
+            "count": 3704,
+            "wall_percent": 58.92935681639017,
+            "mean_us": 7246.603941684665,
+            "max_us": 25543,
+            "timeouts": 0
+          }
+        },
+        "flow_output": {
+          "windows": [
+            {
+              "gen": 6,
+              "window_us": 5005425,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4982745,
+              "submit_n": 411,
+              "submit_max": 49551,
+              "dma_us": 4377749,
+              "dma_n": 342,
+              "dma_timeouts": 0,
+              "dma_max": 48548,
+              "overruns": 22
+            },
+            {
+              "gen": 6,
+              "window_us": 5003404,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4983062,
+              "submit_n": 410,
+              "submit_max": 50858,
+              "dma_us": 4408456,
+              "dma_n": 340,
+              "dma_timeouts": 0,
+              "dma_max": 49782,
+              "overruns": 21
+            },
+            {
+              "gen": 6,
+              "window_us": 5007871,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4984964,
+              "submit_n": 418,
+              "submit_max": 51504,
+              "dma_us": 4350050,
+              "dma_n": 346,
+              "dma_timeouts": 0,
+              "dma_max": 50181,
+              "overruns": 18
+            },
+            {
+              "gen": 6,
+              "window_us": 5005743,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4985340,
+              "submit_n": 417,
+              "submit_max": 49720,
+              "dma_us": 4378030,
+              "dma_n": 347,
+              "dma_timeouts": 0,
+              "dma_max": 48732,
+              "overruns": 16
+            },
+            {
+              "gen": 6,
+              "window_us": 5005828,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4983543,
+              "submit_n": 419,
+              "submit_max": 51835,
+              "dma_us": 4194287,
+              "dma_n": 343,
+              "dma_timeouts": 0,
+              "dma_max": 47142,
+              "overruns": 14
+            },
+            {
+              "gen": 6,
+              "window_us": 5025449,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 5005520,
+              "submit_n": 411,
+              "submit_max": 63275,
+              "dma_us": 4006443,
+              "dma_n": 334,
+              "dma_timeouts": 0,
+              "dma_max": 47661,
+              "overruns": 23
+            },
+            {
+              "gen": 6,
+              "window_us": 5004668,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4982731,
+              "submit_n": 411,
+              "submit_max": 54699,
+              "dma_us": 4284021,
+              "dma_n": 339,
+              "dma_timeouts": 0,
+              "dma_max": 52157,
+              "overruns": 24
+            },
+            {
+              "gen": 6,
+              "window_us": 5007711,
+              "empty_us": 34164,
+              "empty_n": 1,
+              "empty_timeouts": 0,
+              "empty_max": 34164,
+              "submit_us": 4954043,
+              "submit_n": 399,
+              "submit_max": 51738,
+              "dma_us": 4384944,
+              "dma_n": 340,
+              "dma_timeouts": 0,
+              "dma_max": 50658,
+              "overruns": 34
+            },
+            {
+              "gen": 6,
+              "window_us": 5003141,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4979829,
+              "submit_n": 401,
+              "submit_max": 54321,
+              "dma_us": 4405482,
+              "dma_n": 340,
+              "dma_timeouts": 0,
+              "dma_max": 53322,
+              "overruns": 36
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.06924,
+          "empty": {
+            "us": 34164,
+            "count": 1,
+            "wall_percent": 0.07580336389076009,
+            "mean_us": 34164.0,
+            "max_us": 34164,
+            "timeouts": 0
+          },
+          "submit": {
+            "us": 44841777,
+            "count": 3697,
+            "wall_percent": 99.49530322676841,
+            "mean_us": 12129.233703002434,
+            "max_us": 63275,
+            "timeouts": 0
+          },
+          "dma": {
+            "us": 38789462,
+            "count": 3071,
+            "wall_percent": 86.06637697906599,
+            "mean_us": 12630.88961250407,
+            "max_us": 53322,
+            "timeouts": 0
+          },
+          "overruns": 208,
+          "overruns_per_second": 4.615121089239579
+        },
+        "estimated_decoder_cpu_ms_per_audio_second": 364.746649022055
+      },
+      "candidate": {
+        "original": {
+          "name": "load:radio-groovesalad-lpc32",
+          "result": "PASS",
+          "evidence": {
+            "duration": 60,
+            "status_samples": 285,
+            "max_http_ms": 390.00000001396984,
+            "mean_busy": 79.99,
+            "peak_busy": 83.7,
+            "minimum_heap": 63484.0,
+            "minimum_largest": 45056.0,
+            "audio_wall_ratio": 0.99281322366845
+          },
+          "seconds": 61.25
+        },
+        "cpu": {
+          "observed_seconds": 45.31,
+          "windows": 9,
+          "peak_percent": 83.7,
+          "busy_mean_percent": 79.91996027367027,
+          "idle_mean_percent": 20.08003972632973,
+          "decode_mean_percent": 36.144515559479146,
+          "stream_mean_percent": 4.91318252041492,
+          "output_mean_percent": 7.544206576914589,
+          "wifi_mean_percent": 15.381582432134188,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.32135069521077,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "decoder": {
+          "windows": 9,
+          "intervals": [
+            {
+              "window_ms": 5037,
+              "audio_ms": 4597,
+              "decode_ms": 1847,
+              "max_call_us": 49107
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2078,
+              "max_call_us": 48322
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2018,
+              "max_call_us": 47323
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2076,
+              "max_call_us": 48854
+            },
+            {
+              "window_ms": 5016,
+              "audio_ms": 5015,
+              "decode_ms": 2126,
+              "max_call_us": 48647
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2098,
+              "max_call_us": 48688
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2108,
+              "max_call_us": 50395
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2117,
+              "max_call_us": 48342
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2087,
+              "max_call_us": 47154
+            }
+          ],
+          "wall_ms": 45088,
+          "audio_ms": 44717,
+          "decode_ms": 18555,
+          "max_call_us": 50395,
+          "audio_wall_ratio": 0.9917716465578424,
+          "audio_shortfall_percent": 0.8228353442157554,
+          "elapsed_decode_ms_per_audio_second": 414.9428628933068,
+          "windows_decode_slower_than_audio": 0
+        },
+        "flow_decoder": {
+          "windows": [
+            {
+              "gen": 6,
+              "window_us": 5037314,
+              "input_us": 673939,
+              "input_n": 136,
+              "input_timeouts": 22,
+              "input_max": 27627,
+              "pcm_us": 2348957,
+              "pcm_n": 228,
+              "pcm_timeouts": 0,
+              "pcm_max": 25289
+            },
+            {
+              "gen": 6,
+              "window_us": 5005164,
+              "input_us": 107734,
+              "input_n": 96,
+              "input_timeouts": 0,
+              "input_max": 7446,
+              "pcm_us": 2633633,
+              "pcm_n": 256,
+              "pcm_timeouts": 0,
+              "pcm_max": 28986
+            },
+            {
+              "gen": 6,
+              "window_us": 5005242,
+              "input_us": 131947,
+              "input_n": 89,
+              "input_timeouts": 0,
+              "input_max": 16015,
+              "pcm_us": 2687314,
+              "pcm_n": 255,
+              "pcm_timeouts": 0,
+              "pcm_max": 24443
+            },
+            {
+              "gen": 6,
+              "window_us": 5005324,
+              "input_us": 49910,
+              "input_n": 64,
+              "input_timeouts": 0,
+              "input_max": 10956,
+              "pcm_us": 2714276,
+              "pcm_n": 257,
+              "pcm_timeouts": 0,
+              "pcm_max": 24563
+            },
+            {
+              "gen": 6,
+              "window_us": 5016053,
+              "input_us": 8229,
+              "input_n": 43,
+              "input_timeouts": 0,
+              "input_max": 3582,
+              "pcm_us": 2734866,
+              "pcm_n": 260,
+              "pcm_timeouts": 0,
+              "pcm_max": 23672
+            },
+            {
+              "gen": 6,
+              "window_us": 5005216,
+              "input_us": 5211,
+              "input_n": 39,
+              "input_timeouts": 0,
+              "input_max": 918,
+              "pcm_us": 2743265,
+              "pcm_n": 258,
+              "pcm_timeouts": 0,
+              "pcm_max": 25836
+            },
+            {
+              "gen": 6,
+              "window_us": 5005435,
+              "input_us": 166851,
+              "input_n": 122,
+              "input_timeouts": 0,
+              "input_max": 10263,
+              "pcm_us": 2508691,
+              "pcm_n": 244,
+              "pcm_timeouts": 0,
+              "pcm_max": 24170
+            },
+            {
+              "gen": 6,
+              "window_us": 5005167,
+              "input_us": 184074,
+              "input_n": 121,
+              "input_timeouts": 0,
+              "input_max": 12761,
+              "pcm_us": 2515851,
+              "pcm_n": 245,
+              "pcm_timeouts": 0,
+              "pcm_max": 24677
+            },
+            {
+              "gen": 6,
+              "window_us": 5005285,
+              "input_us": 227505,
+              "input_n": 122,
+              "input_timeouts": 0,
+              "input_max": 12922,
+              "pcm_us": 2481678,
+              "pcm_n": 235,
+              "pcm_timeouts": 0,
+              "pcm_max": 26411
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.0902,
+          "input": {
+            "us": 1555400,
+            "count": 832,
+            "wall_percent": 3.449530053093577,
+            "mean_us": 1869.4711538461538,
+            "max_us": 27627,
+            "timeouts": 22
+          },
+          "pcm": {
+            "us": 23368531,
+            "count": 2238,
+            "wall_percent": 51.826186177927795,
+            "mean_us": 10441.702859696157,
+            "max_us": 28986,
+            "timeouts": 0
+          }
+        },
+        "flow_output": {
+          "windows": [
+            {
+              "gen": 6,
+              "window_us": 5003604,
+              "empty_us": 1515469,
+              "empty_n": 401,
+              "empty_timeouts": 280,
+              "empty_max": 14989,
+              "submit_us": 3454392,
+              "submit_n": 393,
+              "submit_max": 24087,
+              "dma_us": 3006656,
+              "dma_n": 342,
+              "dma_timeouts": 0,
+              "dma_max": 17722,
+              "overruns": 42
+            },
+            {
+              "gen": 6,
+              "window_us": 5005327,
+              "empty_us": 1116802,
+              "empty_n": 326,
+              "empty_timeouts": 198,
+              "empty_max": 7387,
+              "submit_us": 3851768,
+              "submit_n": 432,
+              "submit_max": 29023,
+              "dma_us": 3390788,
+              "dma_n": 379,
+              "dma_timeouts": 0,
+              "dma_max": 16673,
+              "overruns": 0
+            },
+            {
+              "gen": 6,
+              "window_us": 5005307,
+              "empty_us": 1056829,
+              "empty_n": 316,
+              "empty_timeouts": 187,
+              "empty_max": 6743,
+              "submit_us": 3911320,
+              "submit_n": 432,
+              "submit_max": 24497,
+              "dma_us": 3421002,
+              "dma_n": 383,
+              "dma_timeouts": 0,
+              "dma_max": 14131,
+              "overruns": 0
+            },
+            {
+              "gen": 6,
+              "window_us": 5015861,
+              "empty_us": 1051758,
+              "empty_n": 313,
+              "empty_timeouts": 187,
+              "empty_max": 6619,
+              "submit_us": 3924311,
+              "submit_n": 432,
+              "submit_max": 24458,
+              "dma_us": 3467735,
+              "dma_n": 386,
+              "dma_timeouts": 0,
+              "dma_max": 13445,
+              "overruns": 0
+            },
+            {
+              "gen": 6,
+              "window_us": 5005277,
+              "empty_us": 1035188,
+              "empty_n": 307,
+              "empty_timeouts": 183,
+              "empty_max": 7757,
+              "submit_us": 3926631,
+              "submit_n": 432,
+              "submit_max": 23901,
+              "dma_us": 3473416,
+              "dma_n": 385,
+              "dma_timeouts": 0,
+              "dma_max": 17561,
+              "overruns": 0
+            },
+            {
+              "gen": 6,
+              "window_us": 5005472,
+              "empty_us": 1022051,
+              "empty_n": 307,
+              "empty_timeouts": 182,
+              "empty_max": 6865,
+              "submit_us": 3949843,
+              "submit_n": 432,
+              "submit_max": 25983,
+              "dma_us": 3485704,
+              "dma_n": 386,
+              "dma_timeouts": 0,
+              "dma_max": 16273,
+              "overruns": 0
+            },
+            {
+              "gen": 6,
+              "window_us": 5006742,
+              "empty_us": 1235217,
+              "empty_n": 362,
+              "empty_timeouts": 223,
+              "empty_max": 6630,
+              "submit_us": 3740882,
+              "submit_n": 432,
+              "submit_max": 24666,
+              "dma_us": 3288748,
+              "dma_n": 372,
+              "dma_timeouts": 0,
+              "dma_max": 14585,
+              "overruns": 0
+            },
+            {
+              "gen": 6,
+              "window_us": 5003859,
+              "empty_us": 1225973,
+              "empty_n": 361,
+              "empty_timeouts": 222,
+              "empty_max": 7442,
+              "submit_us": 3750869,
+              "submit_n": 432,
+              "submit_max": 25962,
+              "dma_us": 3262837,
+              "dma_n": 369,
+              "dma_timeouts": 0,
+              "dma_max": 17109,
+              "overruns": 0
+            },
+            {
+              "gen": 6,
+              "window_us": 5015956,
+              "empty_us": 1286743,
+              "empty_n": 384,
+              "empty_timeouts": 236,
+              "empty_max": 7067,
+              "submit_us": 3701208,
+              "submit_n": 432,
+              "submit_max": 26642,
+              "dma_us": 3214411,
+              "dma_n": 362,
+              "dma_timeouts": 0,
+              "dma_max": 17820,
+              "overruns": 0
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.067405,
+          "empty": {
+            "us": 10546030,
+            "count": 3077,
+            "wall_percent": 23.40057076727626,
+            "mean_us": 3427.3740656483587,
+            "max_us": 14989,
+            "timeouts": 1898
+          },
+          "submit": {
+            "us": 34211224,
+            "count": 3849,
+            "wall_percent": 75.91123562583645,
+            "mean_us": 8888.340867757859,
+            "max_us": 29023,
+            "timeouts": 0
+          },
+          "dma": {
+            "us": 30011297,
+            "count": 3364,
+            "wall_percent": 66.59202365878399,
+            "mean_us": 8921.313020214031,
+            "max_us": 17820,
+            "timeouts": 0
+          },
+          "overruns": 42,
+          "overruns_per_second": 0.9319373946647249
+        },
+        "estimated_decoder_cpu_ms_per_audio_second": 364.4439290528872
+      }
+    },
+    {
+      "name": "load:radio-indiepop-lpc32",
+      "control": {
+        "original": {
+          "name": "load:radio-indiepop-lpc32",
+          "result": "PASS",
+          "evidence": {
+            "duration": 60,
+            "status_samples": 289,
+            "max_http_ms": 141.0000000614673,
+            "mean_busy": 80.34,
+            "peak_busy": 81.5,
+            "minimum_heap": 62468.0,
+            "minimum_largest": 45056.0,
+            "audio_wall_ratio": 0.9313303024313105
+          },
+          "seconds": 61.172
+        },
+        "cpu": {
+          "observed_seconds": 45.803,
+          "windows": 9,
+          "peak_percent": 81.5,
+          "busy_mean_percent": 80.40143877038622,
+          "idle_mean_percent": 19.598561229613782,
+          "decode_mean_percent": 33.5323799751108,
+          "stream_mean_percent": 5.799936685369954,
+          "output_mean_percent": 6.955799838438531,
+          "wifi_mean_percent": 16.889131716263126,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.4330786193044123,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "decoder": {
+          "windows": 9,
+          "intervals": [
+            {
+              "window_ms": 5058,
+              "audio_ms": 4701,
+              "decode_ms": 1726,
+              "max_call_us": 45416
+            },
+            {
+              "window_ms": 5046,
+              "audio_ms": 4701,
+              "decode_ms": 1737,
+              "max_call_us": 49020
+            },
+            {
+              "window_ms": 5090,
+              "audio_ms": 4806,
+              "decode_ms": 1783,
+              "max_call_us": 46025
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 4597,
+              "decode_ms": 1782,
+              "max_call_us": 46506
+            },
+            {
+              "window_ms": 5083,
+              "audio_ms": 4701,
+              "decode_ms": 1717,
+              "max_call_us": 44882
+            },
+            {
+              "window_ms": 5065,
+              "audio_ms": 4701,
+              "decode_ms": 1754,
+              "max_call_us": 48725
+            },
+            {
+              "window_ms": 5058,
+              "audio_ms": 4701,
+              "decode_ms": 1733,
+              "max_call_us": 45900
+            },
+            {
+              "window_ms": 5090,
+              "audio_ms": 4806,
+              "decode_ms": 1782,
+              "max_call_us": 44273
+            },
+            {
+              "window_ms": 5079,
+              "audio_ms": 4701,
+              "decode_ms": 1733,
+              "max_call_us": 43986
+            }
+          ],
+          "wall_ms": 45574,
+          "audio_ms": 42415,
+          "decode_ms": 15747,
+          "max_call_us": 49020,
+          "audio_wall_ratio": 0.9306841620222056,
+          "audio_shortfall_percent": 6.931583797779439,
+          "elapsed_decode_ms_per_audio_second": 371.26016739361074,
+          "windows_decode_slower_than_audio": 0
+        },
+        "flow_decoder": {
+          "windows": [
+            {
+              "gen": 9,
+              "window_us": 5058850,
+              "input_us": 376252,
+              "input_n": 154,
+              "input_timeouts": 0,
+              "input_max": 14584,
+              "pcm_us": 2800409,
+              "pcm_n": 390,
+              "pcm_timeouts": 0,
+              "pcm_max": 23991
+            },
+            {
+              "gen": 9,
+              "window_us": 5046745,
+              "input_us": 397709,
+              "input_n": 151,
+              "input_timeouts": 0,
+              "input_max": 11449,
+              "pcm_us": 2756187,
+              "pcm_n": 387,
+              "pcm_timeouts": 0,
+              "pcm_max": 23029
+            },
+            {
+              "gen": 9,
+              "window_us": 5090357,
+              "input_us": 419787,
+              "input_n": 155,
+              "input_timeouts": 0,
+              "input_max": 14065,
+              "pcm_us": 2739973,
+              "pcm_n": 393,
+              "pcm_timeouts": 0,
+              "pcm_max": 21251
+            },
+            {
+              "gen": 9,
+              "window_us": 5005376,
+              "input_us": 377971,
+              "input_n": 152,
+              "input_timeouts": 0,
+              "input_max": 13859,
+              "pcm_us": 2731936,
+              "pcm_n": 382,
+              "pcm_timeouts": 0,
+              "pcm_max": 23474
+            },
+            {
+              "gen": 9,
+              "window_us": 5083077,
+              "input_us": 414427,
+              "input_n": 163,
+              "input_timeouts": 0,
+              "input_max": 13696,
+              "pcm_us": 2797909,
+              "pcm_n": 388,
+              "pcm_timeouts": 0,
+              "pcm_max": 24193
+            },
+            {
+              "gen": 9,
+              "window_us": 5065970,
+              "input_us": 469545,
+              "input_n": 174,
+              "input_timeouts": 0,
+              "input_max": 14861,
+              "pcm_us": 2702897,
+              "pcm_n": 381,
+              "pcm_timeouts": 0,
+              "pcm_max": 22838
+            },
+            {
+              "gen": 9,
+              "window_us": 5058657,
+              "input_us": 409762,
+              "input_n": 169,
+              "input_timeouts": 0,
+              "input_max": 10583,
+              "pcm_us": 2764260,
+              "pcm_n": 385,
+              "pcm_timeouts": 0,
+              "pcm_max": 23649
+            },
+            {
+              "gen": 9,
+              "window_us": 5090479,
+              "input_us": 449143,
+              "input_n": 166,
+              "input_timeouts": 0,
+              "input_max": 12438,
+              "pcm_us": 2706795,
+              "pcm_n": 389,
+              "pcm_timeouts": 0,
+              "pcm_max": 24411
+            },
+            {
+              "gen": 9,
+              "window_us": 5079890,
+              "input_us": 411131,
+              "input_n": 161,
+              "input_timeouts": 0,
+              "input_max": 14279,
+              "pcm_us": 2785542,
+              "pcm_n": 388,
+              "pcm_timeouts": 0,
+              "pcm_max": 22993
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.579401,
+          "input": {
+            "us": 3725727,
+            "count": 1445,
+            "wall_percent": 8.174146474632257,
+            "mean_us": 2578.357785467128,
+            "max_us": 14861,
+            "timeouts": 0
+          },
+          "pcm": {
+            "us": 24785908,
+            "count": 3483,
+            "wall_percent": 54.3796264457271,
+            "mean_us": 7116.252655756532,
+            "max_us": 24411,
+            "timeouts": 0
+          }
+        },
+        "flow_output": {
+          "windows": [
+            {
+              "gen": 9,
+              "window_us": 5001498,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4979419,
+              "submit_n": 403,
+              "submit_max": 55612,
+              "dma_us": 4369477,
+              "dma_n": 340,
+              "dma_timeouts": 0,
+              "dma_max": 54572,
+              "overruns": 33
+            },
+            {
+              "gen": 9,
+              "window_us": 5005452,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4976759,
+              "submit_n": 402,
+              "submit_max": 55424,
+              "dma_us": 4425792,
+              "dma_n": 336,
+              "dma_timeouts": 0,
+              "dma_max": 53316,
+              "overruns": 33
+            },
+            {
+              "gen": 9,
+              "window_us": 5009778,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4986845,
+              "submit_n": 406,
+              "submit_max": 52863,
+              "dma_us": 4446303,
+              "dma_n": 340,
+              "dma_timeouts": 0,
+              "dma_max": 51866,
+              "overruns": 28
+            },
+            {
+              "gen": 9,
+              "window_us": 5001818,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4981927,
+              "submit_n": 397,
+              "submit_max": 57526,
+              "dma_us": 4411804,
+              "dma_n": 333,
+              "dma_timeouts": 0,
+              "dma_max": 56554,
+              "overruns": 38
+            },
+            {
+              "gen": 9,
+              "window_us": 5029878,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 5010371,
+              "submit_n": 399,
+              "submit_max": 55300,
+              "dma_us": 4422008,
+              "dma_n": 338,
+              "dma_timeouts": 0,
+              "dma_max": 52900,
+              "overruns": 36
+            },
+            {
+              "gen": 9,
+              "window_us": 5001580,
+              "empty_us": 40631,
+              "empty_n": 1,
+              "empty_timeouts": 0,
+              "empty_max": 40631,
+              "submit_us": 4939004,
+              "submit_n": 401,
+              "submit_max": 56976,
+              "dma_us": 4354194,
+              "dma_n": 336,
+              "dma_timeouts": 0,
+              "dma_max": 55733,
+              "overruns": 35
+            },
+            {
+              "gen": 9,
+              "window_us": 5012680,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4982684,
+              "submit_n": 400,
+              "submit_max": 54096,
+              "dma_us": 4430564,
+              "dma_n": 338,
+              "dma_timeouts": 0,
+              "dma_max": 53107,
+              "overruns": 33
+            },
+            {
+              "gen": 9,
+              "window_us": 5012983,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4990081,
+              "submit_n": 405,
+              "submit_max": 54324,
+              "dma_us": 4401173,
+              "dma_n": 341,
+              "dma_timeouts": 0,
+              "dma_max": 53352,
+              "overruns": 30
+            },
+            {
+              "gen": 9,
+              "window_us": 5000200,
+              "empty_us": 0,
+              "empty_n": 0,
+              "empty_timeouts": 0,
+              "empty_max": 0,
+              "submit_us": 4979771,
+              "submit_n": 402,
+              "submit_max": 58013,
+              "dma_us": 4370310,
+              "dma_n": 339,
+              "dma_timeouts": 0,
+              "dma_max": 56647,
+              "overruns": 34
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.075867,
+          "empty": {
+            "us": 40631,
+            "count": 1,
+            "wall_percent": 0.09013914252608829,
+            "mean_us": 40631.0,
+            "max_us": 40631,
+            "timeouts": 0
+          },
+          "submit": {
+            "us": 44826861,
+            "count": 3615,
+            "wall_percent": 99.44758466875413,
+            "mean_us": 12400.238174273858,
+            "max_us": 58013,
+            "timeouts": 0
+          },
+          "dma": {
+            "us": 39631625,
+            "count": 3041,
+            "wall_percent": 87.92204706789111,
+            "mean_us": 13032.431765866491,
+            "max_us": 56647,
+            "timeouts": 0
+          },
+          "overruns": 300,
+          "overruns_per_second": 6.655446028359255
+        },
+        "estimated_decoder_cpu_ms_per_audio_second": 360.29816927636443
+      },
+      "candidate": {
+        "original": {
+          "name": "load:radio-indiepop-lpc32",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "CPU budget exceeded",
+          "seconds": 61.266
+        },
+        "cpu": {
+          "observed_seconds": 45.58600000000001,
+          "windows": 9,
+          "peak_percent": 85.8,
+          "busy_mean_percent": 84.8322928091958,
+          "idle_mean_percent": 15.167707190804194,
+          "decode_mean_percent": 35.935265213003994,
+          "stream_mean_percent": 6.099278287193437,
+          "output_mean_percent": 7.599999999999999,
+          "wifi_mean_percent": 17.84337954635195,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.3565239327863816,
+          "at_least_85_percent": {
+            "seconds": 20.256,
+            "observed_time_percent": 44.43469486245776
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "decoder": {
+          "windows": 10,
+          "intervals": [
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2027,
+              "max_call_us": 48358
+            },
+            {
+              "window_ms": 5015,
+              "audio_ms": 5015,
+              "decode_ms": 2069,
+              "max_call_us": 51161
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2032,
+              "max_call_us": 49015
+            },
+            {
+              "window_ms": 5016,
+              "audio_ms": 5015,
+              "decode_ms": 2110,
+              "max_call_us": 51868
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2005,
+              "max_call_us": 49569
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2056,
+              "max_call_us": 49071
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2036,
+              "max_call_us": 48458
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2042,
+              "max_call_us": 50090
+            },
+            {
+              "window_ms": 5016,
+              "audio_ms": 5015,
+              "decode_ms": 1960,
+              "max_call_us": 48458
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 2050,
+              "max_call_us": 51507
+            }
+          ],
+          "wall_ms": 50082,
+          "audio_ms": 50150,
+          "decode_ms": 20387,
+          "max_call_us": 51868,
+          "audio_wall_ratio": 1.001357773251867,
+          "audio_shortfall_percent": 0,
+          "elapsed_decode_ms_per_audio_second": 406.52043868394816,
+          "windows_decode_slower_than_audio": 0
+        },
+        "flow_decoder": {
+          "windows": [
+            {
+              "gen": 9,
+              "window_us": 5005080,
+              "input_us": 318658,
+              "input_n": 162,
+              "input_timeouts": 0,
+              "input_max": 13869,
+              "pcm_us": 2409868,
+              "pcm_n": 238,
+              "pcm_timeouts": 0,
+              "pcm_max": 23109
+            },
+            {
+              "gen": 9,
+              "window_us": 5015998,
+              "input_us": 294773,
+              "input_n": 162,
+              "input_timeouts": 0,
+              "input_max": 14182,
+              "pcm_us": 2358327,
+              "pcm_n": 230,
+              "pcm_timeouts": 0,
+              "pcm_max": 24319
+            },
+            {
+              "gen": 9,
+              "window_us": 5005308,
+              "input_us": 344030,
+              "input_n": 164,
+              "input_timeouts": 0,
+              "input_max": 12554,
+              "pcm_us": 2376882,
+              "pcm_n": 233,
+              "pcm_timeouts": 0,
+              "pcm_max": 26637
+            },
+            {
+              "gen": 9,
+              "window_us": 5016064,
+              "input_us": 312462,
+              "input_n": 165,
+              "input_timeouts": 0,
+              "input_max": 12777,
+              "pcm_us": 2336875,
+              "pcm_n": 229,
+              "pcm_timeouts": 0,
+              "pcm_max": 23989
+            },
+            {
+              "gen": 9,
+              "window_us": 5005192,
+              "input_us": 396332,
+              "input_n": 182,
+              "input_timeouts": 0,
+              "input_max": 12731,
+              "pcm_us": 2356152,
+              "pcm_n": 230,
+              "pcm_timeouts": 0,
+              "pcm_max": 24133
+            },
+            {
+              "gen": 9,
+              "window_us": 5005343,
+              "input_us": 369911,
+              "input_n": 187,
+              "input_timeouts": 0,
+              "input_max": 14059,
+              "pcm_us": 2312313,
+              "pcm_n": 226,
+              "pcm_timeouts": 0,
+              "pcm_max": 24651
+            },
+            {
+              "gen": 9,
+              "window_us": 5005251,
+              "input_us": 325971,
+              "input_n": 170,
+              "input_timeouts": 0,
+              "input_max": 11154,
+              "pcm_us": 2369541,
+              "pcm_n": 228,
+              "pcm_timeouts": 0,
+              "pcm_max": 26262
+            },
+            {
+              "gen": 9,
+              "window_us": 5005365,
+              "input_us": 322598,
+              "input_n": 174,
+              "input_timeouts": 0,
+              "input_max": 15167,
+              "pcm_us": 2372656,
+              "pcm_n": 230,
+              "pcm_timeouts": 0,
+              "pcm_max": 22853
+            },
+            {
+              "gen": 9,
+              "window_us": 5016093,
+              "input_us": 355789,
+              "input_n": 179,
+              "input_timeouts": 0,
+              "input_max": 14980,
+              "pcm_us": 2415340,
+              "pcm_n": 236,
+              "pcm_timeouts": 0,
+              "pcm_max": 25262
+            },
+            {
+              "gen": 9,
+              "window_us": 5005263,
+              "input_us": 307046,
+              "input_n": 172,
+              "input_timeouts": 0,
+              "input_max": 15469,
+              "pcm_us": 2387954,
+              "pcm_n": 234,
+              "pcm_timeouts": 0,
+              "pcm_max": 24806
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 50.084957,
+          "input": {
+            "us": 3347570,
+            "count": 1717,
+            "wall_percent": 6.683783316415745,
+            "mean_us": 1949.662201514269,
+            "max_us": 15469,
+            "timeouts": 0
+          },
+          "pcm": {
+            "us": 23695908,
+            "count": 2314,
+            "wall_percent": 47.311427261482926,
+            "mean_us": 10240.236819360414,
+            "max_us": 26637,
+            "timeouts": 0
+          }
+        },
+        "flow_output": {
+          "windows": [
+            {
+              "gen": 9,
+              "window_us": 5001968,
+              "empty_us": 1303419,
+              "empty_n": 384,
+              "empty_timeouts": 238,
+              "empty_max": 6737,
+              "submit_us": 3655256,
+              "submit_n": 432,
+              "submit_max": 23312,
+              "dma_us": 3158078,
+              "dma_n": 363,
+              "dma_timeouts": 0,
+              "dma_max": 12983,
+              "overruns": 0
+            },
+            {
+              "gen": 9,
+              "window_us": 5004014,
+              "empty_us": 1359220,
+              "empty_n": 401,
+              "empty_timeouts": 248,
+              "empty_max": 6570,
+              "submit_us": 3610701,
+              "submit_n": 432,
+              "submit_max": 24582,
+              "dma_us": 3093985,
+              "dma_n": 355,
+              "dma_timeouts": 0,
+              "dma_max": 14685,
+              "overruns": 1
+            },
+            {
+              "gen": 9,
+              "window_us": 5010355,
+              "empty_us": 1369314,
+              "empty_n": 400,
+              "empty_timeouts": 249,
+              "empty_max": 12252,
+              "submit_us": 3594339,
+              "submit_n": 432,
+              "submit_max": 24859,
+              "dma_us": 3106565,
+              "dma_n": 356,
+              "dma_timeouts": 0,
+              "dma_max": 14534,
+              "overruns": 0
+            },
+            {
+              "gen": 9,
+              "window_us": 5005279,
+              "empty_us": 1395119,
+              "empty_n": 405,
+              "empty_timeouts": 251,
+              "empty_max": 7898,
+              "submit_us": 3577673,
+              "submit_n": 432,
+              "submit_max": 23599,
+              "dma_us": 3099941,
+              "dma_n": 352,
+              "dma_timeouts": 0,
+              "dma_max": 15093,
+              "overruns": 0
+            },
+            {
+              "gen": 9,
+              "window_us": 5005353,
+              "empty_us": 1360186,
+              "empty_n": 400,
+              "empty_timeouts": 246,
+              "empty_max": 11394,
+              "submit_us": 3617682,
+              "submit_n": 432,
+              "submit_max": 24361,
+              "dma_us": 3134366,
+              "dma_n": 353,
+              "dma_timeouts": 0,
+              "dma_max": 16862,
+              "overruns": 0
+            },
+            {
+              "gen": 9,
+              "window_us": 5005186,
+              "empty_us": 1413007,
+              "empty_n": 411,
+              "empty_timeouts": 254,
+              "empty_max": 7265,
+              "submit_us": 3557045,
+              "submit_n": 432,
+              "submit_max": 24672,
+              "dma_us": 3096938,
+              "dma_n": 352,
+              "dma_timeouts": 0,
+              "dma_max": 19605,
+              "overruns": 0
+            },
+            {
+              "gen": 9,
+              "window_us": 5005385,
+              "empty_us": 1346667,
+              "empty_n": 396,
+              "empty_timeouts": 241,
+              "empty_max": 8026,
+              "submit_us": 3620899,
+              "submit_n": 432,
+              "submit_max": 26288,
+              "dma_us": 3132386,
+              "dma_n": 353,
+              "dma_timeouts": 0,
+              "dma_max": 18929,
+              "overruns": 0
+            },
+            {
+              "gen": 9,
+              "window_us": 5017243,
+              "empty_us": 1366497,
+              "empty_n": 408,
+              "empty_timeouts": 254,
+              "empty_max": 7037,
+              "submit_us": 3619748,
+              "submit_n": 432,
+              "submit_max": 25030,
+              "dma_us": 3157634,
+              "dma_n": 353,
+              "dma_timeouts": 0,
+              "dma_max": 17769,
+              "overruns": 0
+            },
+            {
+              "gen": 9,
+              "window_us": 5003991,
+              "empty_us": 1332306,
+              "empty_n": 388,
+              "empty_timeouts": 240,
+              "empty_max": 7448,
+              "submit_us": 3625549,
+              "submit_n": 432,
+              "submit_max": 25508,
+              "dma_us": 3120576,
+              "dma_n": 360,
+              "dma_timeouts": 0,
+              "dma_max": 16229,
+              "overruns": 0
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.058774,
+          "empty": {
+            "us": 12245735,
+            "count": 3593,
+            "wall_percent": 27.177248542093047,
+            "mean_us": 3408.220150292235,
+            "max_us": 12252,
+            "timeouts": 2221
+          },
+          "submit": {
+            "us": 32478892,
+            "count": 3888,
+            "wall_percent": 72.08117113883303,
+            "mean_us": 8353.624485596707,
+            "max_us": 26288,
+            "timeouts": 0
+          },
+          "dma": {
+            "us": 28100469,
+            "count": 3197,
+            "wall_percent": 62.36403369519108,
+            "mean_us": 8789.636847044103,
+            "max_us": 19605,
+            "timeouts": 0
+          },
+          "overruns": 1,
+          "overruns_per_second": 0.02219323588342639
+        },
+        "estimated_decoder_cpu_ms_per_audio_second": 358.8653942966432
+      }
+    },
+    {
+      "name": "load:radio-indiepop-lpc12",
+      "control": {
+        "original": {
+          "name": "load:radio-indiepop-lpc12",
+          "result": "PASS",
+          "evidence": {
+            "duration": 60,
+            "status_samples": 301,
+            "max_http_ms": 140.00000001396984,
+            "mean_busy": 77.87,
+            "peak_busy": 78.7,
+            "minimum_heap": 61480.0,
+            "minimum_largest": 49152.0,
+            "audio_wall_ratio": 0.996898978253091
+          },
+          "seconds": 61.219
+        },
+        "cpu": {
+          "observed_seconds": 45.69500000000002,
+          "windows": 9,
+          "peak_percent": 78.7,
+          "busy_mean_percent": 77.91310427836743,
+          "idle_mean_percent": 22.086895721632565,
+          "decode_mean_percent": 26.18832038516249,
+          "stream_mean_percent": 6.677640879746143,
+          "output_mean_percent": 7.522437903490535,
+          "wifi_mean_percent": 18.732782580151003,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.5327563190721087,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "decoder": {
+          "windows": 9,
+          "intervals": [
+            {
+              "window_ms": 5033,
+              "audio_ms": 5015,
+              "decode_ms": 1364,
+              "max_call_us": 35649
+            },
+            {
+              "window_ms": 5016,
+              "audio_ms": 5015,
+              "decode_ms": 1309,
+              "max_call_us": 29638
+            },
+            {
+              "window_ms": 5028,
+              "audio_ms": 5015,
+              "decode_ms": 1349,
+              "max_call_us": 33460
+            },
+            {
+              "window_ms": 5024,
+              "audio_ms": 5015,
+              "decode_ms": 1319,
+              "max_call_us": 33523
+            },
+            {
+              "window_ms": 5058,
+              "audio_ms": 5015,
+              "decode_ms": 1380,
+              "max_call_us": 34550
+            },
+            {
+              "window_ms": 5047,
+              "audio_ms": 5015,
+              "decode_ms": 1337,
+              "max_call_us": 35561
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1337,
+              "max_call_us": 34788
+            },
+            {
+              "window_ms": 5026,
+              "audio_ms": 5015,
+              "decode_ms": 1354,
+              "max_call_us": 37107
+            },
+            {
+              "window_ms": 5061,
+              "audio_ms": 5015,
+              "decode_ms": 1324,
+              "max_call_us": 33636
+            }
+          ],
+          "wall_ms": 45298,
+          "audio_ms": 45135,
+          "decode_ms": 12073,
+          "max_call_us": 37107,
+          "audio_wall_ratio": 0.9964016071349728,
+          "audio_shortfall_percent": 0.3598392865027167,
+          "elapsed_decode_ms_per_audio_second": 267.4864296000886,
+          "windows_decode_slower_than_audio": 0
+        },
+        "flow_decoder": {
+          "windows": [
+            {
+              "gen": 12,
+              "window_us": 5033519,
+              "input_us": 491410,
+              "input_n": 193,
+              "input_timeouts": 0,
+              "input_max": 14534,
+              "pcm_us": 3001999,
+              "pcm_n": 408,
+              "pcm_timeouts": 0,
+              "pcm_max": 27716
+            },
+            {
+              "gen": 12,
+              "window_us": 5016006,
+              "input_us": 568588,
+              "input_n": 194,
+              "input_timeouts": 0,
+              "input_max": 18883,
+              "pcm_us": 2967114,
+              "pcm_n": 398,
+              "pcm_timeouts": 0,
+              "pcm_max": 24380
+            },
+            {
+              "gen": 12,
+              "window_us": 5028797,
+              "input_us": 584344,
+              "input_n": 196,
+              "input_timeouts": 0,
+              "input_max": 13921,
+              "pcm_us": 2932617,
+              "pcm_n": 398,
+              "pcm_timeouts": 0,
+              "pcm_max": 23640
+            },
+            {
+              "gen": 12,
+              "window_us": 5024462,
+              "input_us": 585302,
+              "input_n": 197,
+              "input_timeouts": 0,
+              "input_max": 13894,
+              "pcm_us": 2948667,
+              "pcm_n": 395,
+              "pcm_timeouts": 0,
+              "pcm_max": 21925
+            },
+            {
+              "gen": 12,
+              "window_us": 5058611,
+              "input_us": 584405,
+              "input_n": 214,
+              "input_timeouts": 0,
+              "input_max": 16305,
+              "pcm_us": 2879356,
+              "pcm_n": 396,
+              "pcm_timeouts": 0,
+              "pcm_max": 24161
+            },
+            {
+              "gen": 12,
+              "window_us": 5047816,
+              "input_us": 613240,
+              "input_n": 222,
+              "input_timeouts": 0,
+              "input_max": 11667,
+              "pcm_us": 2898756,
+              "pcm_n": 394,
+              "pcm_timeouts": 0,
+              "pcm_max": 25542
+            },
+            {
+              "gen": 12,
+              "window_us": 5005412,
+              "input_us": 576609,
+              "input_n": 202,
+              "input_timeouts": 0,
+              "input_max": 14773,
+              "pcm_us": 2916737,
+              "pcm_n": 394,
+              "pcm_timeouts": 0,
+              "pcm_max": 23996
+            },
+            {
+              "gen": 12,
+              "window_us": 5026629,
+              "input_us": 575480,
+              "input_n": 205,
+              "input_timeouts": 0,
+              "input_max": 15980,
+              "pcm_us": 2892622,
+              "pcm_n": 396,
+              "pcm_timeouts": 0,
+              "pcm_max": 24687
+            },
+            {
+              "gen": 12,
+              "window_us": 5061770,
+              "input_us": 637062,
+              "input_n": 210,
+              "input_timeouts": 0,
+              "input_max": 13205,
+              "pcm_us": 2904185,
+              "pcm_n": 393,
+              "pcm_timeouts": 0,
+              "pcm_max": 24346
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.303022,
+          "input": {
+            "us": 5216440,
+            "count": 1833,
+            "wall_percent": 11.514551943135272,
+            "mean_us": 2845.848336061102,
+            "max_us": 18883,
+            "timeouts": 0
+          },
+          "pcm": {
+            "us": 26342053,
+            "count": 3572,
+            "wall_percent": 58.14634838267522,
+            "mean_us": 7374.59490481523,
+            "max_us": 27716,
+            "timeouts": 0
+          }
+        },
+        "flow_output": {
+          "windows": [
+            {
+              "gen": 12,
+              "window_us": 5008963,
+              "empty_us": 50116,
+              "empty_n": 2,
+              "empty_timeouts": 0,
+              "empty_max": 25296,
+              "submit_us": 4934001,
+              "submit_n": 431,
+              "submit_max": 43604,
+              "dma_us": 4289427,
+              "dma_n": 374,
+              "dma_timeouts": 0,
+              "dma_max": 42593,
+              "overruns": 3
+            },
+            {
+              "gen": 12,
+              "window_us": 5003752,
+              "empty_us": 58173,
+              "empty_n": 3,
+              "empty_timeouts": 1,
+              "empty_max": 26002,
+              "submit_us": 4924350,
+              "submit_n": 431,
+              "submit_max": 44293,
+              "dma_us": 4317727,
+              "dma_n": 380,
+              "dma_timeouts": 0,
+              "dma_max": 43307,
+              "overruns": 1
+            },
+            {
+              "gen": 12,
+              "window_us": 5003061,
+              "empty_us": 75429,
+              "empty_n": 3,
+              "empty_timeouts": 0,
+              "empty_max": 25407,
+              "submit_us": 4900972,
+              "submit_n": 430,
+              "submit_max": 43440,
+              "dma_us": 4315891,
+              "dma_n": 378,
+              "dma_timeouts": 0,
+              "dma_max": 42467,
+              "overruns": 2
+            },
+            {
+              "gen": 12,
+              "window_us": 5006529,
+              "empty_us": 154452,
+              "empty_n": 6,
+              "empty_timeouts": 0,
+              "empty_max": 28018,
+              "submit_us": 4828902,
+              "submit_n": 431,
+              "submit_max": 44597,
+              "dma_us": 4180268,
+              "dma_n": 381,
+              "dma_timeouts": 0,
+              "dma_max": 43639,
+              "overruns": 1
+            },
+            {
+              "gen": 12,
+              "window_us": 5031791,
+              "empty_us": 187374,
+              "empty_n": 7,
+              "empty_timeouts": 0,
+              "empty_max": 31527,
+              "submit_us": 4820558,
+              "submit_n": 427,
+              "submit_max": 46652,
+              "dma_us": 4229996,
+              "dma_n": 364,
+              "dma_timeouts": 0,
+              "dma_max": 44276,
+              "overruns": 5
+            },
+            {
+              "gen": 12,
+              "window_us": 5012287,
+              "empty_us": 52005,
+              "empty_n": 2,
+              "empty_timeouts": 0,
+              "empty_max": 26134,
+              "submit_us": 4930785,
+              "submit_n": 431,
+              "submit_max": 46395,
+              "dma_us": 4294255,
+              "dma_n": 378,
+              "dma_timeouts": 0,
+              "dma_max": 45406,
+              "overruns": 4
+            },
+            {
+              "gen": 12,
+              "window_us": 5002679,
+              "empty_us": 127789,
+              "empty_n": 5,
+              "empty_timeouts": 0,
+              "empty_max": 26299,
+              "submit_us": 4853771,
+              "submit_n": 432,
+              "submit_max": 49981,
+              "dma_us": 4219163,
+              "dma_n": 377,
+              "dma_timeouts": 0,
+              "dma_max": 40951,
+              "overruns": 0
+            },
+            {
+              "gen": 12,
+              "window_us": 5007811,
+              "empty_us": 104726,
+              "empty_n": 4,
+              "empty_timeouts": 0,
+              "empty_max": 27137,
+              "submit_us": 4879832,
+              "submit_n": 430,
+              "submit_max": 46101,
+              "dma_us": 4239310,
+              "dma_n": 373,
+              "dma_timeouts": 0,
+              "dma_max": 42971,
+              "overruns": 2
+            },
+            {
+              "gen": 12,
+              "window_us": 5011740,
+              "empty_us": 164426,
+              "empty_n": 6,
+              "empty_timeouts": 0,
+              "empty_max": 33838,
+              "submit_us": 4818710,
+              "submit_n": 427,
+              "submit_max": 46677,
+              "dma_us": 4129876,
+              "dma_n": 371,
+              "dma_timeouts": 0,
+              "dma_max": 45694,
+              "overruns": 4
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.088613,
+          "empty": {
+            "us": 974490,
+            "count": 38,
+            "wall_percent": 2.1612773939176173,
+            "mean_us": 25644.473684210527,
+            "max_us": 33838,
+            "timeouts": 1
+          },
+          "submit": {
+            "us": 43891881,
+            "count": 3870,
+            "wall_percent": 97.34582210368724,
+            "mean_us": 11341.571317829457,
+            "max_us": 49981,
+            "timeouts": 0
+          },
+          "dma": {
+            "us": 38215913,
+            "count": 3376,
+            "wall_percent": 84.7573488233049,
+            "mean_us": 11319.879443127962,
+            "max_us": 45694,
+            "timeouts": 0
+          },
+          "overruns": 22,
+          "overruns_per_second": 0.4879280717727999
+        },
+        "estimated_decoder_cpu_ms_per_audio_second": 262.82896572661804
+      },
+      "candidate": {
+        "original": {
+          "name": "load:radio-indiepop-lpc12",
+          "result": "PASS",
+          "evidence": {
+            "duration": 60,
+            "status_samples": 295,
+            "max_http_ms": 172.0000000204891,
+            "mean_busy": 78.13,
+            "peak_busy": 79.5,
+            "minimum_heap": 61512.0,
+            "minimum_largest": 45056.0,
+            "audio_wall_ratio": 1.0015777595813944
+          },
+          "seconds": 61.187
+        },
+        "cpu": {
+          "observed_seconds": 45.559,
+          "windows": 9,
+          "peak_percent": 79.5,
+          "busy_mean_percent": 78.1459909128822,
+          "idle_mean_percent": 21.854009087117806,
+          "decode_mean_percent": 26.233440154524903,
+          "stream_mean_percent": 6.533519172940583,
+          "output_mean_percent": 7.689097653592046,
+          "wifi_mean_percent": 18.900089993195635,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.422103206830703,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "decoder": {
+          "windows": 9,
+          "intervals": [
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1400,
+              "max_call_us": 36547
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1400,
+              "max_call_us": 38198
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1392,
+              "max_call_us": 37488
+            },
+            {
+              "window_ms": 5016,
+              "audio_ms": 5015,
+              "decode_ms": 1401,
+              "max_call_us": 35710
+            },
+            {
+              "window_ms": 5007,
+              "audio_ms": 5015,
+              "decode_ms": 1369,
+              "max_call_us": 39005
+            },
+            {
+              "window_ms": 5008,
+              "audio_ms": 5015,
+              "decode_ms": 1389,
+              "max_call_us": 36442
+            },
+            {
+              "window_ms": 5000,
+              "audio_ms": 5015,
+              "decode_ms": 1374,
+              "max_call_us": 35593
+            },
+            {
+              "window_ms": 5005,
+              "audio_ms": 5015,
+              "decode_ms": 1355,
+              "max_call_us": 35803
+            },
+            {
+              "window_ms": 5015,
+              "audio_ms": 5015,
+              "decode_ms": 1362,
+              "max_call_us": 32959
+            }
+          ],
+          "wall_ms": 45066,
+          "audio_ms": 45135,
+          "decode_ms": 12442,
+          "max_call_us": 39005,
+          "audio_wall_ratio": 1.0015310877379844,
+          "audio_shortfall_percent": 0,
+          "elapsed_decode_ms_per_audio_second": 275.6619031793508,
+          "windows_decode_slower_than_audio": 0
+        },
+        "flow_decoder": {
+          "windows": [
+            {
+              "gen": 12,
+              "window_us": 5005231,
+              "input_us": 503413,
+              "input_n": 193,
+              "input_timeouts": 0,
+              "input_max": 16274,
+              "pcm_us": 2857323,
+              "pcm_n": 271,
+              "pcm_timeouts": 0,
+              "pcm_max": 22982
+            },
+            {
+              "gen": 12,
+              "window_us": 5005190,
+              "input_us": 493321,
+              "input_n": 194,
+              "input_timeouts": 0,
+              "input_max": 15183,
+              "pcm_us": 2814163,
+              "pcm_n": 271,
+              "pcm_timeouts": 0,
+              "pcm_max": 24318
+            },
+            {
+              "gen": 12,
+              "window_us": 5005275,
+              "input_us": 510903,
+              "input_n": 196,
+              "input_timeouts": 0,
+              "input_max": 14755,
+              "pcm_us": 2885676,
+              "pcm_n": 274,
+              "pcm_timeouts": 0,
+              "pcm_max": 25453
+            },
+            {
+              "gen": 12,
+              "window_us": 5016068,
+              "input_us": 528147,
+              "input_n": 197,
+              "input_timeouts": 0,
+              "input_max": 15643,
+              "pcm_us": 2844239,
+              "pcm_n": 272,
+              "pcm_timeouts": 0,
+              "pcm_max": 23553
+            },
+            {
+              "gen": 12,
+              "window_us": 5007723,
+              "input_us": 645691,
+              "input_n": 214,
+              "input_timeouts": 0,
+              "input_max": 14593,
+              "pcm_us": 2734420,
+              "pcm_n": 264,
+              "pcm_timeouts": 0,
+              "pcm_max": 23469
+            },
+            {
+              "gen": 12,
+              "window_us": 5008127,
+              "input_us": 648512,
+              "input_n": 222,
+              "input_timeouts": 0,
+              "input_max": 18251,
+              "pcm_us": 2704492,
+              "pcm_n": 262,
+              "pcm_timeouts": 0,
+              "pcm_max": 24355
+            },
+            {
+              "gen": 12,
+              "window_us": 5000055,
+              "input_us": 575564,
+              "input_n": 202,
+              "input_timeouts": 0,
+              "input_max": 14248,
+              "pcm_us": 2834165,
+              "pcm_n": 267,
+              "pcm_timeouts": 0,
+              "pcm_max": 23597
+            },
+            {
+              "gen": 12,
+              "window_us": 5005564,
+              "input_us": 570919,
+              "input_n": 205,
+              "input_timeouts": 0,
+              "input_max": 19482,
+              "pcm_us": 2813740,
+              "pcm_n": 267,
+              "pcm_timeouts": 0,
+              "pcm_max": 25053
+            },
+            {
+              "gen": 12,
+              "window_us": 5015794,
+              "input_us": 566063,
+              "input_n": 210,
+              "input_timeouts": 0,
+              "input_max": 11382,
+              "pcm_us": 2814521,
+              "pcm_n": 268,
+              "pcm_timeouts": 0,
+              "pcm_max": 27611
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.069027,
+          "input": {
+            "us": 5042533,
+            "count": 1833,
+            "wall_percent": 11.188466527134034,
+            "mean_us": 2750.9727223131476,
+            "max_us": 19482,
+            "timeouts": 0
+          },
+          "pcm": {
+            "us": 25302739,
+            "count": 2416,
+            "wall_percent": 56.14219051145702,
+            "mean_us": 10472.987996688742,
+            "max_us": 27611,
+            "timeouts": 0
+          }
+        },
+        "flow_output": {
+          "windows": [
+            {
+              "gen": 12,
+              "window_us": 5002003,
+              "empty_us": 921206,
+              "empty_n": 274,
+              "empty_timeouts": 164,
+              "empty_max": 7152,
+              "submit_us": 4048187,
+              "submit_n": 429,
+              "submit_max": 23741,
+              "dma_us": 3537687,
+              "dma_n": 398,
+              "dma_timeouts": 0,
+              "dma_max": 17052,
+              "overruns": 0
+            },
+            {
+              "gen": 12,
+              "window_us": 5000454,
+              "empty_us": 933967,
+              "empty_n": 274,
+              "empty_timeouts": 160,
+              "empty_max": 6821,
+              "submit_us": 4026853,
+              "submit_n": 433,
+              "submit_max": 23589,
+              "dma_us": 3517632,
+              "dma_n": 397,
+              "dma_timeouts": 0,
+              "dma_max": 16882,
+              "overruns": 0
+            },
+            {
+              "gen": 12,
+              "window_us": 5013051,
+              "empty_us": 887356,
+              "empty_n": 264,
+              "empty_timeouts": 154,
+              "empty_max": 7366,
+              "submit_us": 4088431,
+              "submit_n": 433,
+              "submit_max": 25492,
+              "dma_us": 3618607,
+              "dma_n": 403,
+              "dma_timeouts": 0,
+              "dma_max": 18591,
+              "overruns": 0
+            },
+            {
+              "gen": 12,
+              "window_us": 5000495,
+              "empty_us": 954289,
+              "empty_n": 281,
+              "empty_timeouts": 170,
+              "empty_max": 6602,
+              "submit_us": 4012929,
+              "submit_n": 430,
+              "submit_max": 24008,
+              "dma_us": 3531077,
+              "dma_n": 395,
+              "dma_timeouts": 0,
+              "dma_max": 18710,
+              "overruns": 0
+            },
+            {
+              "gen": 12,
+              "window_us": 5001000,
+              "empty_us": 1027085,
+              "empty_n": 302,
+              "empty_timeouts": 183,
+              "empty_max": 8593,
+              "submit_us": 3927184,
+              "submit_n": 432,
+              "submit_max": 24016,
+              "dma_us": 3424339,
+              "dma_n": 391,
+              "dma_timeouts": 0,
+              "dma_max": 18453,
+              "overruns": 0
+            },
+            {
+              "gen": 12,
+              "window_us": 5001007,
+              "empty_us": 1045217,
+              "empty_n": 309,
+              "empty_timeouts": 188,
+              "empty_max": 7160,
+              "submit_us": 3899250,
+              "submit_n": 432,
+              "submit_max": 24587,
+              "dma_us": 3383063,
+              "dma_n": 388,
+              "dma_timeouts": 0,
+              "dma_max": 18318,
+              "overruns": 0
+            },
+            {
+              "gen": 12,
+              "window_us": 5003998,
+              "empty_us": 955453,
+              "empty_n": 285,
+              "empty_timeouts": 168,
+              "empty_max": 6435,
+              "submit_us": 4006548,
+              "submit_n": 432,
+              "submit_max": 23722,
+              "dma_us": 3470205,
+              "dma_n": 395,
+              "dma_timeouts": 0,
+              "dma_max": 16961,
+              "overruns": 0
+            },
+            {
+              "gen": 12,
+              "window_us": 5006335,
+              "empty_us": 965889,
+              "empty_n": 282,
+              "empty_timeouts": 166,
+              "empty_max": 9083,
+              "submit_us": 4009638,
+              "submit_n": 432,
+              "submit_max": 25283,
+              "dma_us": 3483240,
+              "dma_n": 395,
+              "dma_timeouts": 0,
+              "dma_max": 17978,
+              "overruns": 0
+            },
+            {
+              "gen": 12,
+              "window_us": 5003773,
+              "empty_us": 968272,
+              "empty_n": 284,
+              "empty_timeouts": 169,
+              "empty_max": 6878,
+              "submit_us": 3996573,
+              "submit_n": 431,
+              "submit_max": 27802,
+              "dma_us": 3516606,
+              "dma_n": 395,
+              "dma_timeouts": 0,
+              "dma_max": 16313,
+              "overruns": 0
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 45.032116,
+          "empty": {
+            "us": 8658734,
+            "count": 2555,
+            "wall_percent": 19.22790836655333,
+            "mean_us": 3388.93698630137,
+            "max_us": 9083,
+            "timeouts": 1522
+          },
+          "submit": {
+            "us": 36015593,
+            "count": 3884,
+            "wall_percent": 79.97757200660968,
+            "mean_us": 9272.80973223481,
+            "max_us": 27802,
+            "timeouts": 0
+          },
+          "dma": {
+            "us": 31482456,
+            "count": 3557,
+            "wall_percent": 69.91111854481811,
+            "mean_us": 8850.84509418049,
+            "max_us": 18710,
+            "timeouts": 0
+          },
+          "overruns": 0,
+          "overruns_per_second": 0.0
+        },
+        "estimated_decoder_cpu_ms_per_audio_second": 261.93335859174016
+      }
+    }
+  ],
+  "note": "Complete windows after 10 s warm-up; scheduler wall times include preemption. Decoder CPU per audio second is an estimate from independent CPU/audio windows. Original gate failures remain failures; no acoustic continuity claim."
+}

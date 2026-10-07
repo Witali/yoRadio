@@ -1,0 +1,2530 @@
+{
+  "control": {
+    "image": "d3f3067cd47f34a84002c0cf74d7cc54c8742a5e6b744f69296758ac95137cc6",
+    "priority": 6,
+    "cases": [
+      {
+        "name": "stress-mp3-48000-2ch-16bit-200s",
+        "original": {
+          "name": "cpu-under-http-load:stress-mp3-48000-2ch-16bit-200s",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Progressive heap loss during continuous playback",
+          "seconds": 41.218
+        },
+        "cpu": {
+          "observed_seconds": 25.595000000001164,
+          "windows": 5,
+          "peak_percent": 61.1,
+          "busy_mean_percent": 60.152557140067145,
+          "idle_mean_percent": 39.847442859932855,
+          "decode_mean_percent": 29.73964446180896,
+          "stream_mean_percent": 1.6,
+          "output_mean_percent": 6.3,
+          "wifi_mean_percent": 8.459074037898091,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.6189021293221173,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "MP3",
+            "window": 5026,
+            "audio": 5040,
+            "decode": 1560
+          },
+          {
+            "codec": "MP3",
+            "window": 5005,
+            "audio": 5016,
+            "decode": 1520
+          },
+          {
+            "codec": "MP3",
+            "window": 5004,
+            "audio": 5016,
+            "decode": 1508
+          },
+          {
+            "codec": "MP3",
+            "window": 5015,
+            "audio": 5016,
+            "decode": 1542
+          },
+          {
+            "codec": "MP3",
+            "window": 5037,
+            "audio": 5040,
+            "decode": 1539
+          }
+        ],
+        "audio_wall_ratio": 1.0016343125921792,
+        "elapsed_decode_ms_per_audio_second": 305.1973893664438,
+        "estimated_decoder_cpu_ms_per_audio_second": 296.91119890695694,
+        "minimum_rssi": -77,
+        "maximum_http_ms": 125.0
+      },
+      {
+        "name": "lc-48000-stereo",
+        "original": {
+          "name": "cpu-under-http-load:lc-48000-stereo",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 225,
+            "max_http_ms": 125.0,
+            "mean_busy": 48.2,
+            "peak_busy": 48.9,
+            "minimum_heap": 77816.0,
+            "minimum_largest": 65536.0,
+            "audio_wall_ratio": 1.0015984015984016
+          },
+          "seconds": 41.187
+        },
+        "cpu": {
+          "observed_seconds": 25.360999999997148,
+          "windows": 5,
+          "peak_percent": 48.9,
+          "busy_mean_percent": 48.164137849453795,
+          "idle_mean_percent": 51.835862150546205,
+          "decode_mean_percent": 19.659820196364482,
+          "stream_mean_percent": 1.1595165805764718,
+          "output_mean_percent": 6.260360395883439,
+          "wifi_mean_percent": 7.259201135601897,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.6197547415322844,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 992
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 1004
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 1004
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 970
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 977
+          }
+        ],
+        "audio_wall_ratio": 1.0015984015984016,
+        "elapsed_decode_ms_per_audio_second": 197.3668461998803,
+        "estimated_decoder_cpu_ms_per_audio_second": 196.2844605681313,
+        "minimum_rssi": -77,
+        "maximum_http_ms": 125.0
+      },
+      {
+        "name": "he-48000-stereo",
+        "original": {
+          "name": "cpu-under-http-load:he-48000-stereo",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 221,
+            "max_http_ms": 139.99999999941792,
+            "mean_busy": 63.56666666666666,
+            "peak_busy": 64.5,
+            "minimum_heap": 43956.0,
+            "minimum_largest": 32768.0,
+            "audio_wall_ratio": 1.001591723040191
+          },
+          "seconds": 41.188
+        },
+        "cpu": {
+          "observed_seconds": 25.63300000000163,
+          "windows": 5,
+          "peak_percent": 64.5,
+          "busy_mean_percent": 63.532520578940655,
+          "idle_mean_percent": 36.46747942105935,
+          "decode_mean_percent": 39.48058752389495,
+          "stream_mean_percent": 0.6,
+          "output_mean_percent": 5.660332384036185,
+          "wifi_mean_percent": 6.300889478406696,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.559665275231207,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "AAC",
+            "window": 5026,
+            "audio": 5034,
+            "decode": 2107
+          },
+          {
+            "codec": "AAC",
+            "window": 5026,
+            "audio": 5034,
+            "decode": 2104
+          },
+          {
+            "codec": "AAC",
+            "window": 5026,
+            "audio": 5034,
+            "decode": 2075
+          },
+          {
+            "codec": "AAC",
+            "window": 5026,
+            "audio": 5034,
+            "decode": 2092
+          },
+          {
+            "codec": "AAC",
+            "window": 5026,
+            "audio": 5034,
+            "decode": 2106
+          }
+        ],
+        "audio_wall_ratio": 1.001591723040191,
+        "elapsed_decode_ms_per_audio_second": 416.5276122367898,
+        "estimated_decoder_cpu_ms_per_audio_second": 394.17845231445375,
+        "minimum_rssi": -76,
+        "maximum_http_ms": 139.99999999941792
+      },
+      {
+        "name": "hev2-44100-stereo",
+        "original": {
+          "name": "cpu-under-http-load:hev2-44100-stereo",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 215,
+            "max_http_ms": 141.00000000325963,
+            "mean_busy": 72.88333333333333,
+            "peak_busy": 73.8,
+            "minimum_heap": 44192.0,
+            "minimum_largest": 32768.0,
+            "audio_wall_ratio": 1.0016977928692699
+          },
+          "seconds": 41.281
+        },
+        "cpu": {
+          "observed_seconds": 25.35099999999511,
+          "windows": 5,
+          "peak_percent": 73.5,
+          "busy_mean_percent": 72.70476509802346,
+          "idle_mean_percent": 27.295234901976546,
+          "decode_mean_percent": 49.33964340657167,
+          "stream_mean_percent": 0.3798706165437399,
+          "output_mean_percent": 6.640049702181346,
+          "wifi_mean_percent": 6.020425229773948,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.4,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2614
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2577
+          },
+          {
+            "codec": "AAC",
+            "window": 5015,
+            "audio": 5015,
+            "decode": 2596
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2599
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2611
+          }
+        ],
+        "audio_wall_ratio": 1.0015977631316157,
+        "elapsed_decode_ms_per_audio_second": 518.3250249252243,
+        "estimated_decoder_cpu_ms_per_audio_second": 492.6093609904374,
+        "minimum_rssi": -78,
+        "maximum_http_ms": 141.00000000325963
+      },
+      {
+        "name": "stress-vorbis-48000-2ch-16bit-200s",
+        "original": {
+          "name": "cpu-under-http-load:stress-vorbis-48000-2ch-16bit-200s",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 220,
+            "max_http_ms": 125.0,
+            "mean_busy": 73.91666666666667,
+            "peak_busy": 74.5,
+            "minimum_heap": 66248.0,
+            "minimum_largest": 55296.0,
+            "audio_wall_ratio": 1.0017981504737983
+          },
+          "seconds": 41.297
+        },
+        "cpu": {
+          "observed_seconds": 25.476999999998952,
+          "windows": 5,
+          "peak_percent": 74.5,
+          "busy_mean_percent": 73.86312752678863,
+          "idle_mean_percent": 26.136872473211362,
+          "decode_mean_percent": 40.519817874946,
+          "stream_mean_percent": 2.5,
+          "output_mean_percent": 6.319970954193993,
+          "wifi_mean_percent": 10.420877654354893,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.579801389488555,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 2125
+          },
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5021,
+            "decode": 2102
+          },
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 2118
+          },
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 2075
+          },
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 2123
+          },
+          {
+            "codec": "OGG",
+            "window": 5006,
+            "audio": 5013,
+            "decode": 2134
+          }
+        ],
+        "audio_wall_ratio": 1.0018314408444606,
+        "elapsed_decode_ms_per_audio_second": 421.35877152163795,
+        "estimated_decoder_cpu_ms_per_audio_second": 404.4574388760565,
+        "minimum_rssi": -79,
+        "maximum_http_ms": 125.0
+      },
+      {
+        "name": "stress-opus-48000-2ch-16bit-200s",
+        "original": {
+          "name": "cpu-under-http-load:stress-opus-48000-2ch-16bit-200s",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 217,
+            "max_http_ms": 139.99999999941792,
+            "mean_busy": 80.2,
+            "peak_busy": 80.7,
+            "minimum_heap": 78860.0,
+            "minimum_largest": 65536.0,
+            "audio_wall_ratio": 1.001629476904659
+          },
+          "seconds": 41.5
+        },
+        "cpu": {
+          "observed_seconds": 25.622000000003027,
+          "windows": 5,
+          "peak_percent": 80.7,
+          "busy_mean_percent": 80.162735149481,
+          "idle_mean_percent": 19.837264850519006,
+          "decode_mean_percent": 48.05973382249629,
+          "stream_mean_percent": 2.6,
+          "output_mean_percent": 6.120041370697062,
+          "wifi_mean_percent": 10.200819608149272,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.4995433611739695,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "OGG",
+            "window": 5012,
+            "audio": 5020,
+            "decode": 2529
+          },
+          {
+            "codec": "OGG",
+            "window": 5014,
+            "audio": 5020,
+            "decode": 2505
+          },
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5020,
+            "decode": 2506
+          },
+          {
+            "codec": "OGG",
+            "window": 5015,
+            "audio": 5020,
+            "decode": 2531
+          }
+        ],
+        "audio_wall_ratio": 1.0016960989723636,
+        "elapsed_decode_ms_per_audio_second": 501.5438247011952,
+        "estimated_decoder_cpu_ms_per_audio_second": 479.78357779171347,
+        "minimum_rssi": -79,
+        "maximum_http_ms": 139.99999999941792
+      },
+      {
+        "name": "stress-flac-48000-2ch-16bit-120s",
+        "original": {
+          "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-120s",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 211,
+            "max_http_ms": 172.00000000593718,
+            "mean_busy": 67.2,
+            "peak_busy": 68.0,
+            "minimum_heap": 70008.0,
+            "minimum_largest": 49152.0,
+            "audio_wall_ratio": 1.0015422477440525
+          },
+          "seconds": 41.344
+        },
+        "cpu": {
+          "observed_seconds": 25.404999999998836,
+          "windows": 5,
+          "peak_percent": 68.0,
+          "busy_mean_percent": 67.17127730761653,
+          "idle_mean_percent": 32.82872269238347,
+          "decode_mean_percent": 20.879507970871884,
+          "stream_mean_percent": 5.460314898642018,
+          "output_mean_percent": 6.079626057862627,
+          "wifi_mean_percent": 16.599838614446043,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.5795315882699787,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "FLAC",
+            "window": 5079,
+            "audio": 5087,
+            "decode": 1123
+          },
+          {
+            "codec": "FLAC",
+            "window": 5083,
+            "audio": 5087,
+            "decode": 1210
+          },
+          {
+            "codec": "FLAC",
+            "window": 5076,
+            "audio": 5087,
+            "decode": 1169
+          },
+          {
+            "codec": "FLAC",
+            "window": 5079,
+            "audio": 5087,
+            "decode": 1201
+          },
+          {
+            "codec": "FLAC",
+            "window": 5079,
+            "audio": 5087,
+            "decode": 1145
+          }
+        ],
+        "audio_wall_ratio": 1.0015356749094346,
+        "elapsed_decode_ms_per_audio_second": 229.9194023982701,
+        "estimated_decoder_cpu_ms_per_audio_second": 208.47492998948786,
+        "minimum_rssi": -78,
+        "maximum_http_ms": 172.00000000593718
+      },
+      {
+        "name": "radio-groovesalad-lpc32",
+        "original": {
+          "name": "cpu-under-http-load:radio-groovesalad-lpc32",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 190,
+            "max_http_ms": 171.00000000209548,
+            "mean_busy": 77.35,
+            "peak_busy": 78.2,
+            "minimum_heap": 63096.0,
+            "minimum_largest": 45056.0,
+            "audio_wall_ratio": 0.9588473305042929
+          },
+          "seconds": 41.218
+        },
+        "cpu": {
+          "observed_seconds": 25.523000000001048,
+          "windows": 5,
+          "peak_percent": 78.2,
+          "busy_mean_percent": 77.2582886024367,
+          "idle_mean_percent": 22.7417113975633,
+          "decode_mean_percent": 34.781820318928226,
+          "stream_mean_percent": 4.83980331465725,
+          "output_mean_percent": 6.839830740900353,
+          "wifi_mean_percent": 15.05811620890949,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.319660698193771,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "FLAC",
+            "window": 5049,
+            "audio": 4806,
+            "decode": 1778
+          },
+          {
+            "codec": "FLAC",
+            "window": 5036,
+            "audio": 4806,
+            "decode": 1780
+          },
+          {
+            "codec": "FLAC",
+            "window": 5089,
+            "audio": 4910,
+            "decode": 1846
+          },
+          {
+            "codec": "FLAC",
+            "window": 5079,
+            "audio": 4910,
+            "decode": 1878
+          },
+          {
+            "codec": "FLAC",
+            "window": 5101,
+            "audio": 4910,
+            "decode": 1886
+          }
+        ],
+        "audio_wall_ratio": 0.9600851936578054,
+        "elapsed_decode_ms_per_audio_second": 376.63298003450825,
+        "estimated_decoder_cpu_ms_per_audio_second": 362.2784785005777,
+        "minimum_rssi": -78,
+        "maximum_http_ms": 171.00000000209548
+      },
+      {
+        "name": "radio-indiepop-lpc32",
+        "original": {
+          "name": "cpu-under-http-load:radio-indiepop-lpc32",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 195,
+            "max_http_ms": 156.00000000267755,
+            "mean_busy": 80.45,
+            "peak_busy": 80.8,
+            "minimum_heap": 62352.0,
+            "minimum_largest": 45056.0,
+            "audio_wall_ratio": 0.9238434633405926
+          },
+          "seconds": 41.344
+        },
+        "cpu": {
+          "observed_seconds": 25.71600000000035,
+          "windows": 5,
+          "peak_percent": 80.8,
+          "busy_mean_percent": 80.44048841188366,
+          "idle_mean_percent": 19.559511588116333,
+          "decode_mean_percent": 33.33991289469581,
+          "stream_mean_percent": 5.8802379841344115,
+          "output_mean_percent": 6.640208430549061,
+          "wifi_mean_percent": 17.358574428371533,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.440076217141067,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "FLAC",
+            "window": 5069,
+            "audio": 4701,
+            "decode": 1759
+          },
+          {
+            "codec": "FLAC",
+            "window": 5047,
+            "audio": 4701,
+            "decode": 1764
+          },
+          {
+            "codec": "FLAC",
+            "window": 5049,
+            "audio": 4701,
+            "decode": 1787
+          },
+          {
+            "codec": "FLAC",
+            "window": 5046,
+            "audio": 4597,
+            "decode": 1781
+          },
+          {
+            "codec": "FLAC",
+            "window": 5037,
+            "audio": 4597,
+            "decode": 1751
+          }
+        ],
+        "audio_wall_ratio": 0.9227265525982256,
+        "elapsed_decode_ms_per_audio_second": 379.5338455595141,
+        "estimated_decoder_cpu_ms_per_audio_second": 361.3195350325277,
+        "minimum_rssi": -71,
+        "maximum_http_ms": 156.00000000267755
+      }
+    ],
+    "original_checks": [
+      {
+        "name": "idle-baseline",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147468,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147460,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147472,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.407
+      },
+      {
+        "name": "cpu-under-http-load:stress-mp3-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 41.218
+      },
+      {
+        "name": "idle-after:stress-mp3-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147460,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147460,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.329
+      },
+      {
+        "name": "stop-recovery:stress-mp3-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:lc-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 225,
+          "max_http_ms": 125.0,
+          "mean_busy": 48.2,
+          "peak_busy": 48.9,
+          "minimum_heap": 77816.0,
+          "minimum_largest": 65536.0,
+          "audio_wall_ratio": 1.0015984015984016
+        },
+        "seconds": 41.187
+      },
+      {
+        "name": "idle-after:lc-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147472,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147472,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147472,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.609
+      },
+      {
+        "name": "stop-recovery:lc-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:he-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 221,
+          "max_http_ms": 139.99999999941792,
+          "mean_busy": 63.56666666666666,
+          "peak_busy": 64.5,
+          "minimum_heap": 43956.0,
+          "minimum_largest": 32768.0,
+          "audio_wall_ratio": 1.001591723040191
+        },
+        "seconds": 41.188
+      },
+      {
+        "name": "idle-after:he-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147480,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147480,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.218
+      },
+      {
+        "name": "stop-recovery:he-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 215,
+          "max_http_ms": 141.00000000325963,
+          "mean_busy": 72.88333333333333,
+          "peak_busy": 73.8,
+          "minimum_heap": 44192.0,
+          "minimum_largest": 32768.0,
+          "audio_wall_ratio": 1.0016977928692699
+        },
+        "seconds": 41.281
+      },
+      {
+        "name": "idle-after:hev2-44100-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147468,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147468,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147480,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.078
+      },
+      {
+        "name": "stop-recovery:hev2-44100-stereo",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:stress-vorbis-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 220,
+          "max_http_ms": 125.0,
+          "mean_busy": 73.91666666666667,
+          "peak_busy": 74.5,
+          "minimum_heap": 66248.0,
+          "minimum_largest": 55296.0,
+          "audio_wall_ratio": 1.0017981504737983
+        },
+        "seconds": 41.297
+      },
+      {
+        "name": "idle-after:stress-vorbis-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147480,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147480,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.531
+      },
+      {
+        "name": "stop-recovery:stress-vorbis-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:stress-opus-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 217,
+          "max_http_ms": 139.99999999941792,
+          "mean_busy": 80.2,
+          "peak_busy": 80.7,
+          "minimum_heap": 78860.0,
+          "minimum_largest": 65536.0,
+          "audio_wall_ratio": 1.001629476904659
+        },
+        "seconds": 41.5
+      },
+      {
+        "name": "idle-after:stress-opus-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147480,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147468,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.094
+      },
+      {
+        "name": "stop-recovery:stress-opus-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-120s",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 211,
+          "max_http_ms": 172.00000000593718,
+          "mean_busy": 67.2,
+          "peak_busy": 68.0,
+          "minimum_heap": 70008.0,
+          "minimum_largest": 49152.0,
+          "audio_wall_ratio": 1.0015422477440525
+        },
+        "seconds": 41.344
+      },
+      {
+        "name": "idle-after:stress-flac-48000-2ch-16bit-120s",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147480,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147468,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147468,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.078
+      },
+      {
+        "name": "stop-recovery:stress-flac-48000-2ch-16bit-120s",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:radio-groovesalad-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 190,
+          "max_http_ms": 171.00000000209548,
+          "mean_busy": 77.35,
+          "peak_busy": 78.2,
+          "minimum_heap": 63096.0,
+          "minimum_largest": 45056.0,
+          "audio_wall_ratio": 0.9588473305042929
+        },
+        "seconds": 41.218
+      },
+      {
+        "name": "idle-after:radio-groovesalad-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147480,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147468,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.438
+      },
+      {
+        "name": "stop-recovery:radio-groovesalad-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:radio-indiepop-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 195,
+          "max_http_ms": 156.00000000267755,
+          "mean_busy": 80.45,
+          "peak_busy": 80.8,
+          "minimum_heap": 62352.0,
+          "minimum_largest": 45056.0,
+          "audio_wall_ratio": 0.9238434633405926
+        },
+        "seconds": 41.344
+      },
+      {
+        "name": "idle-after:radio-indiepop-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147468,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147480,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.109
+      },
+      {
+        "name": "stop-recovery:radio-indiepop-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "file-eof:mp3-320",
+        "result": "PASS",
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 17.594
+      },
+      {
+        "name": "file-eof:lc-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": 16,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 18.984
+      },
+      {
+        "name": "file-eof:he-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": 15,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 18.594
+      },
+      {
+        "name": "file-eof:hev2-44100-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": 14,
+          "rate": 44100,
+          "channels": 2
+        },
+        "seconds": 18.515
+      },
+      {
+        "name": "file-eof:vorbis-q10",
+        "result": "PASS",
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 17.859
+      },
+      {
+        "name": "file-eof:opus-510",
+        "result": "PASS",
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 17.875
+      },
+      {
+        "name": "file-eof:flac-level8",
+        "result": "PASS",
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 17.438
+      },
+      {
+        "name": "stop-play-generation",
+        "result": "PASS",
+        "evidence": {
+          "stale_generation_rejected": true
+        },
+        "seconds": 8.485
+      },
+      {
+        "name": "switching-and-heap",
+        "result": "PASS",
+        "evidence": {
+          "cycles": 3,
+          "station_changes": 21
+        },
+        "seconds": 213.157
+      },
+      {
+        "name": "runtime",
+        "result": "PASS",
+        "evidence": null,
+        "seconds": 0.0
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS",
+        "evidence": {
+          "rebooted": true,
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        },
+        "seconds": 7.657
+      }
+    ]
+  },
+  "candidate": {
+    "image": "7f7c1cd4a59c7b215c3fe55c25b1b41f083905d9d8e84137f000c0273a10ec78",
+    "priority": 8,
+    "cases": [
+      {
+        "name": "stress-mp3-48000-2ch-16bit-200s",
+        "original": {
+          "name": "cpu-under-http-load:stress-mp3-48000-2ch-16bit-200s",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Progressive heap loss during continuous playback",
+          "seconds": 41.141
+        },
+        "cpu": {
+          "observed_seconds": 25.536,
+          "windows": 5,
+          "peak_percent": 60.9,
+          "busy_mean_percent": 60.12451049498747,
+          "idle_mean_percent": 39.87548950501253,
+          "decode_mean_percent": 29.740558427318298,
+          "stream_mean_percent": 1.6,
+          "output_mean_percent": 6.1598723370927315,
+          "wifi_mean_percent": 8.479902882205513,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.559594298245614,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "MP3",
+            "window": 5024,
+            "audio": 5040,
+            "decode": 1568
+          },
+          {
+            "codec": "MP3",
+            "window": 5037,
+            "audio": 5040,
+            "decode": 1517
+          },
+          {
+            "codec": "MP3",
+            "window": 5026,
+            "audio": 5040,
+            "decode": 1551
+          },
+          {
+            "codec": "MP3",
+            "window": 5037,
+            "audio": 5040,
+            "decode": 1564
+          },
+          {
+            "codec": "MP3",
+            "window": 5029,
+            "audio": 5040,
+            "decode": 1596
+          }
+        ],
+        "audio_wall_ratio": 1.001868564385958,
+        "elapsed_decode_ms_per_audio_second": 309.36507936507934,
+        "estimated_decoder_cpu_ms_per_audio_second": 296.8508992548957,
+        "minimum_rssi": -65,
+        "maximum_http_ms": 140.99999999598367
+      },
+      {
+        "name": "lc-48000-stereo",
+        "original": {
+          "name": "cpu-under-http-load:lc-48000-stereo",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 229,
+            "max_http_ms": 125.0,
+            "mean_busy": 47.86666666666667,
+            "peak_busy": 48.6,
+            "minimum_heap": 76420.0,
+            "minimum_largest": 65536.0,
+            "audio_wall_ratio": 1.0015984015984016
+          },
+          "seconds": 41.188
+        },
+        "cpu": {
+          "observed_seconds": 25.585000000000008,
+          "windows": 5,
+          "peak_percent": 48.6,
+          "busy_mean_percent": 47.77982802423295,
+          "idle_mean_percent": 52.22017197576706,
+          "decode_mean_percent": 19.600265780730897,
+          "stream_mean_percent": 1.1401289818252882,
+          "output_mean_percent": 6.119925737736955,
+          "wifi_mean_percent": 6.980257963650576,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.640101622044167,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 943
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 990
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 994
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 975
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 941
+          }
+        ],
+        "audio_wall_ratio": 1.0015984015984016,
+        "elapsed_decode_ms_per_audio_second": 193.21763415120685,
+        "estimated_decoder_cpu_ms_per_audio_second": 195.6898668114066,
+        "minimum_rssi": -65,
+        "maximum_http_ms": 125.0
+      },
+      {
+        "name": "he-48000-stereo",
+        "original": {
+          "name": "cpu-under-http-load:he-48000-stereo",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 226,
+            "max_http_ms": 110.00000000058208,
+            "mean_busy": 64.5,
+            "peak_busy": 65.5,
+            "minimum_heap": 44348.0,
+            "minimum_largest": 32768.0,
+            "audio_wall_ratio": 1.001558510461916
+          },
+          "seconds": 41.312
+        },
+        "cpu": {
+          "observed_seconds": 25.480999999999995,
+          "windows": 5,
+          "peak_percent": 65.5,
+          "busy_mean_percent": 64.37124916604529,
+          "idle_mean_percent": 35.62875083395471,
+          "decode_mean_percent": 39.63977080962286,
+          "stream_mean_percent": 0.6,
+          "output_mean_percent": 6.400000000000001,
+          "wifi_mean_percent": 6.339248852085867,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.5995290608688824,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "AAC",
+            "window": 5027,
+            "audio": 5034,
+            "decode": 2246
+          },
+          {
+            "codec": "AAC",
+            "window": 5026,
+            "audio": 5034,
+            "decode": 2230
+          },
+          {
+            "codec": "AAC",
+            "window": 5027,
+            "audio": 5034,
+            "decode": 2219
+          },
+          {
+            "codec": "AAC",
+            "window": 5025,
+            "audio": 5034,
+            "decode": 2220
+          },
+          {
+            "codec": "AAC",
+            "window": 5026,
+            "audio": 5034,
+            "decode": 2234
+          }
+        ],
+        "audio_wall_ratio": 1.0015518682105766,
+        "elapsed_decode_ms_per_audio_second": 442.947953913389,
+        "estimated_decoder_cpu_ms_per_audio_second": 395.78350425770043,
+        "minimum_rssi": -65,
+        "maximum_http_ms": 110.00000000058208
+      },
+      {
+        "name": "hev2-44100-stereo",
+        "original": {
+          "name": "cpu-under-http-load:hev2-44100-stereo",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 216,
+            "max_http_ms": 125.0,
+            "mean_busy": 74.56666666666666,
+            "peak_busy": 75.2,
+            "minimum_heap": 44596.0,
+            "minimum_largest": 32768.0,
+            "audio_wall_ratio": 1.0010646084237143
+          },
+          "seconds": 41.125
+        },
+        "cpu": {
+          "observed_seconds": 25.38499999999999,
+          "windows": 5,
+          "peak_percent": 75.2,
+          "busy_mean_percent": 74.46320661808154,
+          "idle_mean_percent": 25.53679338191846,
+          "decode_mean_percent": 50.199294859168795,
+          "stream_mean_percent": 0.38012211936182777,
+          "output_mean_percent": 7.940196966712626,
+          "wifi_mean_percent": 5.840196966712625,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.439495765215679,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "AAC",
+            "window": 5025,
+            "audio": 5015,
+            "decode": 2780
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2805
+          },
+          {
+            "codec": "AAC",
+            "window": 5015,
+            "audio": 5015,
+            "decode": 2803
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2792
+          },
+          {
+            "codec": "AAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2820
+          }
+        ],
+        "audio_wall_ratio": 1.0007982438635004,
+        "elapsed_decode_ms_per_audio_second": 558.3250249252243,
+        "estimated_decoder_cpu_ms_per_audio_second": 501.59255541235257,
+        "minimum_rssi": -70,
+        "maximum_http_ms": 125.0
+      },
+      {
+        "name": "stress-vorbis-48000-2ch-16bit-200s",
+        "original": {
+          "name": "cpu-under-http-load:stress-vorbis-48000-2ch-16bit-200s",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 222,
+            "max_http_ms": 188.00000000192085,
+            "mean_busy": 73.45,
+            "peak_busy": 74.2,
+            "minimum_heap": 68396.0,
+            "minimum_largest": 57344.0,
+            "audio_wall_ratio": 1.0018267446838875
+          },
+          "seconds": 41.266
+        },
+        "cpu": {
+          "observed_seconds": 25.20900000000003,
+          "windows": 5,
+          "peak_percent": 74.1,
+          "busy_mean_percent": 73.29994446427862,
+          "idle_mean_percent": 26.700055535721365,
+          "decode_mean_percent": 40.39961124995041,
+          "stream_mean_percent": 2.5999999999999996,
+          "output_mean_percent": 6.3597009004720535,
+          "wifi_mean_percent": 9.859875441310644,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.5796897933277796,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "OGG",
+            "window": 5007,
+            "audio": 5013,
+            "decode": 2063
+          },
+          {
+            "codec": "OGG",
+            "window": 5004,
+            "audio": 5021,
+            "decode": 2077
+          },
+          {
+            "codec": "OGG",
+            "window": 5004,
+            "audio": 5013,
+            "decode": 2111
+          },
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 2127
+          },
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 2092
+          },
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5013,
+            "decode": 2094
+          }
+        ],
+        "audio_wall_ratio": 1.0018648018648018,
+        "elapsed_decode_ms_per_audio_second": 417.60287176759954,
+        "estimated_decoder_cpu_ms_per_audio_second": 403.2441420713989,
+        "minimum_rssi": -67,
+        "maximum_http_ms": 188.00000000192085
+      },
+      {
+        "name": "stress-opus-48000-2ch-16bit-200s",
+        "original": {
+          "name": "cpu-under-http-load:stress-opus-48000-2ch-16bit-200s",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 216,
+            "max_http_ms": 171.99999999866122,
+            "mean_busy": 80.26666666666667,
+            "peak_busy": 80.7,
+            "minimum_heap": 79344.0,
+            "minimum_largest": 61440.0,
+            "audio_wall_ratio": 1.0015390754146953
+          },
+          "seconds": 41.203
+        },
+        "cpu": {
+          "observed_seconds": 25.238,
+          "windows": 5,
+          "peak_percent": 80.7,
+          "busy_mean_percent": 80.20271416118553,
+          "idle_mean_percent": 19.79728583881449,
+          "decode_mean_percent": 47.98088596560741,
+          "stream_mean_percent": 2.5999999999999996,
+          "output_mean_percent": 6.6,
+          "wifi_mean_percent": 9.860084000316983,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.518955543228465,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "OGG",
+            "window": 5008,
+            "audio": 5020,
+            "decode": 2570
+          },
+          {
+            "codec": "OGG",
+            "window": 5013,
+            "audio": 5020,
+            "decode": 2567
+          },
+          {
+            "codec": "OGG",
+            "window": 5015,
+            "audio": 5020,
+            "decode": 2561
+          },
+          {
+            "codec": "OGG",
+            "window": 5005,
+            "audio": 5020,
+            "decode": 2568
+          },
+          {
+            "codec": "OGG",
+            "window": 5016,
+            "audio": 5020,
+            "decode": 2609
+          }
+        ],
+        "audio_wall_ratio": 1.0017160873209083,
+        "elapsed_decode_ms_per_audio_second": 512.9482071713147,
+        "estimated_decoder_cpu_ms_per_audio_second": 478.9868763506872,
+        "minimum_rssi": -67,
+        "maximum_http_ms": 171.99999999866122
+      },
+      {
+        "name": "stress-flac-48000-2ch-16bit-120s",
+        "original": {
+          "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-120s",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 211,
+            "max_http_ms": 140.99999999598367,
+            "mean_busy": 67.06666666666666,
+            "peak_busy": 67.7,
+            "minimum_heap": 68460.0,
+            "minimum_largest": 51200.0,
+            "audio_wall_ratio": 1.0016737225558727
+          },
+          "seconds": 41.281
+        },
+        "cpu": {
+          "observed_seconds": 25.78299999999996,
+          "windows": 5,
+          "peak_percent": 67.7,
+          "busy_mean_percent": 67.05611061552186,
+          "idle_mean_percent": 32.94388938447815,
+          "decode_mean_percent": 20.779897606950314,
+          "stream_mean_percent": 5.379979055967111,
+          "output_mean_percent": 6.1397820269169605,
+          "wifi_mean_percent": 16.53978202691696,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.5600395609510143,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "FLAC",
+            "window": 5079,
+            "audio": 5087,
+            "decode": 1229
+          },
+          {
+            "codec": "FLAC",
+            "window": 5081,
+            "audio": 5087,
+            "decode": 1147
+          },
+          {
+            "codec": "FLAC",
+            "window": 5077,
+            "audio": 5087,
+            "decode": 1170
+          },
+          {
+            "codec": "FLAC",
+            "window": 5079,
+            "audio": 5087,
+            "decode": 1215
+          },
+          {
+            "codec": "FLAC",
+            "window": 5080,
+            "audio": 5087,
+            "decode": 1231
+          }
+        ],
+        "audio_wall_ratio": 1.0015356749094346,
+        "elapsed_decode_ms_per_audio_second": 235.58089247100452,
+        "estimated_decoder_cpu_ms_per_audio_second": 207.48035369613137,
+        "minimum_rssi": -66,
+        "maximum_http_ms": 140.99999999598367
+      },
+      {
+        "name": "radio-groovesalad-lpc32",
+        "original": {
+          "name": "cpu-under-http-load:radio-groovesalad-lpc32",
+          "result": "PASS",
+          "evidence": {
+            "duration": 40,
+            "status_samples": 192,
+            "max_http_ms": 156.9999999992433,
+            "mean_busy": 80.05,
+            "peak_busy": 81.4,
+            "minimum_heap": 65292.0,
+            "minimum_largest": 47104.0,
+            "audio_wall_ratio": 1.0014977533699452
+          },
+          "seconds": 41.171
+        },
+        "cpu": {
+          "observed_seconds": 25.451999999999998,
+          "windows": 5,
+          "peak_percent": 81.4,
+          "busy_mean_percent": 79.93855492692126,
+          "idle_mean_percent": 20.06144507307874,
+          "decode_mean_percent": 36.322886217193144,
+          "stream_mean_percent": 4.937014772905862,
+          "output_mean_percent": 7.440138299544239,
+          "wifi_mean_percent": 15.278756089894703,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.3391482005343396,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "FLAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 1977
+          },
+          {
+            "codec": "FLAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2063
+          },
+          {
+            "codec": "FLAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2056
+          },
+          {
+            "codec": "FLAC",
+            "window": 5016,
+            "audio": 5015,
+            "decode": 2047
+          },
+          {
+            "codec": "FLAC",
+            "window": 5009,
+            "audio": 5015,
+            "decode": 2127
+          }
+        ],
+        "audio_wall_ratio": 1.0013977635782747,
+        "elapsed_decode_ms_per_audio_second": 409.5712861415753,
+        "estimated_decoder_cpu_ms_per_audio_second": 362.7218627631172,
+        "minimum_rssi": -66,
+        "maximum_http_ms": 156.9999999992433
+      },
+      {
+        "name": "radio-indiepop-lpc32",
+        "original": {
+          "name": "cpu-under-http-load:radio-indiepop-lpc32",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "CPU budget exceeded",
+          "seconds": 41.281
+        },
+        "cpu": {
+          "observed_seconds": 25.428999999999974,
+          "windows": 5,
+          "peak_percent": 87.4,
+          "busy_mean_percent": 85.88496598371938,
+          "idle_mean_percent": 14.115034016280624,
+          "decode_mean_percent": 36.0849974438633,
+          "stream_mean_percent": 6.4403043768925246,
+          "output_mean_percent": 7.420551339022376,
+          "wifi_mean_percent": 18.46159896181525,
+          "tcpip_mean_percent": 0.0,
+          "web_mean_percent": 2.358740021235597,
+          "at_least_85_percent": {
+            "seconds": 20.44999999999999,
+            "observed_time_percent": 80.41999292146765
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          }
+        },
+        "cpu_malformed": [],
+        "cpu_gaps": [],
+        "decoder_windows": [
+          {
+            "codec": "FLAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2029
+          },
+          {
+            "codec": "FLAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2103
+          },
+          {
+            "codec": "FLAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2057
+          },
+          {
+            "codec": "FLAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2087
+          },
+          {
+            "codec": "FLAC",
+            "window": 5015,
+            "audio": 5015,
+            "decode": 2075
+          },
+          {
+            "codec": "FLAC",
+            "window": 5005,
+            "audio": 5015,
+            "decode": 2078
+          }
+        ],
+        "audio_wall_ratio": 1.001664447403462,
+        "elapsed_decode_ms_per_audio_second": 413.06081754735794,
+        "estimated_decoder_cpu_ms_per_audio_second": 360.2503566678809,
+        "minimum_rssi": -66,
+        "maximum_http_ms": 405.9999999954016
+      }
+    ],
+    "original_checks": [
+      {
+        "name": "idle-baseline",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147860,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147840,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147840,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.453
+      },
+      {
+        "name": "cpu-under-http-load:stress-mp3-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 41.141
+      },
+      {
+        "name": "idle-after:stress-mp3-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147864,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147864,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.515
+      },
+      {
+        "name": "stop-recovery:stress-mp3-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:lc-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 229,
+          "max_http_ms": 125.0,
+          "mean_busy": 47.86666666666667,
+          "peak_busy": 48.6,
+          "minimum_heap": 76420.0,
+          "minimum_largest": 65536.0,
+          "audio_wall_ratio": 1.0015984015984016
+        },
+        "seconds": 41.188
+      },
+      {
+        "name": "idle-after:lc-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147892,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147884,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147892,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.359
+      },
+      {
+        "name": "stop-recovery:lc-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:he-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 226,
+          "max_http_ms": 110.00000000058208,
+          "mean_busy": 64.5,
+          "peak_busy": 65.5,
+          "minimum_heap": 44348.0,
+          "minimum_largest": 32768.0,
+          "audio_wall_ratio": 1.001558510461916
+        },
+        "seconds": 41.312
+      },
+      {
+        "name": "idle-after:he-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.235
+      },
+      {
+        "name": "stop-recovery:he-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 216,
+          "max_http_ms": 125.0,
+          "mean_busy": 74.56666666666666,
+          "peak_busy": 75.2,
+          "minimum_heap": 44596.0,
+          "minimum_largest": 32768.0,
+          "audio_wall_ratio": 1.0010646084237143
+        },
+        "seconds": 41.125
+      },
+      {
+        "name": "idle-after:hev2-44100-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.14
+      },
+      {
+        "name": "stop-recovery:hev2-44100-stereo",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:stress-vorbis-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 222,
+          "max_http_ms": 188.00000000192085,
+          "mean_busy": 73.45,
+          "peak_busy": 74.2,
+          "minimum_heap": 68396.0,
+          "minimum_largest": 57344.0,
+          "audio_wall_ratio": 1.0018267446838875
+        },
+        "seconds": 41.266
+      },
+      {
+        "name": "idle-after:stress-vorbis-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.594
+      },
+      {
+        "name": "stop-recovery:stress-vorbis-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:stress-opus-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 216,
+          "max_http_ms": 171.99999999866122,
+          "mean_busy": 80.26666666666667,
+          "peak_busy": 80.7,
+          "minimum_heap": 79344.0,
+          "minimum_largest": 61440.0,
+          "audio_wall_ratio": 1.0015390754146953
+        },
+        "seconds": 41.203
+      },
+      {
+        "name": "idle-after:stress-opus-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.469
+      },
+      {
+        "name": "stop-recovery:stress-opus-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-120s",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 211,
+          "max_http_ms": 140.99999999598367,
+          "mean_busy": 67.06666666666666,
+          "peak_busy": 67.7,
+          "minimum_heap": 68460.0,
+          "minimum_largest": 51200.0,
+          "audio_wall_ratio": 1.0016737225558727
+        },
+        "seconds": 41.281
+      },
+      {
+        "name": "idle-after:stress-flac-48000-2ch-16bit-120s",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.5
+      },
+      {
+        "name": "stop-recovery:stress-flac-48000-2ch-16bit-120s",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:radio-groovesalad-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "duration": 40,
+          "status_samples": 192,
+          "max_http_ms": 156.9999999992433,
+          "mean_busy": 80.05,
+          "peak_busy": 81.4,
+          "minimum_heap": 65292.0,
+          "minimum_largest": 47104.0,
+          "audio_wall_ratio": 1.0014977533699452
+        },
+        "seconds": 41.171
+      },
+      {
+        "name": "idle-after:radio-groovesalad-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.438
+      },
+      {
+        "name": "stop-recovery:radio-groovesalad-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "cpu-under-http-load:radio-indiepop-lpc32",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "CPU budget exceeded",
+        "seconds": 41.281
+      },
+      {
+        "name": "idle-after:radio-indiepop-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147880,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147888,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.375
+      },
+      {
+        "name": "stop-recovery:radio-indiepop-lpc32",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "file-eof:mp3-320",
+        "result": "PASS",
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 17.687
+      },
+      {
+        "name": "file-eof:lc-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": 16,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 18.75
+      },
+      {
+        "name": "file-eof:he-48000-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": 16,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 19.047
+      },
+      {
+        "name": "file-eof:hev2-44100-stereo",
+        "result": "PASS",
+        "evidence": {
+          "samples": 14,
+          "rate": 44100,
+          "channels": 2
+        },
+        "seconds": 18.313
+      },
+      {
+        "name": "file-eof:vorbis-q10",
+        "result": "PASS",
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 17.422
+      },
+      {
+        "name": "file-eof:opus-510",
+        "result": "PASS",
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 17.703
+      },
+      {
+        "name": "file-eof:flac-level8",
+        "result": "PASS",
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2
+        },
+        "seconds": 17.859
+      },
+      {
+        "name": "stop-play-generation",
+        "result": "PASS",
+        "evidence": {
+          "stale_generation_rejected": true
+        },
+        "seconds": 8.438
+      },
+      {
+        "name": "switching-and-heap",
+        "result": "PASS",
+        "evidence": {
+          "cycles": 3,
+          "station_changes": 21
+        },
+        "seconds": 214.156
+      },
+      {
+        "name": "runtime",
+        "result": "PASS",
+        "evidence": null,
+        "seconds": 0.0
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS",
+        "evidence": {
+          "rebooted": true,
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        },
+        "seconds": 7.609
+      }
+    ]
+  },
+  "note": "Independent complete CPU/audio windows after 10 s warm-up. Wall decode time includes preemption. Original thresholds and verdicts retained; short tests do not prove acoustic or one-hour stability."
+}

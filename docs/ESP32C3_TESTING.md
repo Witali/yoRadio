@@ -639,6 +639,13 @@ overruns on the physical C3. It includes a deliberate input-starvation control,
 profile-on/off builds and exact PCM checks; it preserves the original heap
 failure and does not change task scheduling or queue timeouts.
 
+The [output-priority comparison](ESP32C3_OUTPUT_PRIORITY_20261006.md) tests
+raising the direct-DMA output task from priority 6 to 8 above the decoder at 7.
+It combines matched instrumented LPC12/LPC32 captures with a profile-off
+seven-codec load, EOF, Stop/switch and OTA matrix. Original failed thresholds
+remain in the report. Use `tests/test-output-priority-matrix.py` for analysis
+boundary checks and `tests/test-output-priority-evidence.py` for retained data.
+
 ### FLAC predictor and high-depth playback
 
 The [real-radio LPC study](ESP32C3_FLAC_RADIO_20261006.md) adds matched
