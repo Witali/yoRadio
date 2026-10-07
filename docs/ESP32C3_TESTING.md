@@ -805,6 +805,24 @@ and implicit SBR introduction without changed ADTS configuration. See
 Historical reports do not certify the newest binary. Record which of the
 above cases actually ran and passed for each hand-off image.
 
+### Bounded ICY song-title parsing
+
+Run `node --test tests/esp32c3-icy-title.test.js` (WSL GCC on Windows). The
+ASan/UBSan test compares the production streaming parser with the previous
+whole-block `strstr`/`strchr` parser and the same 191-byte published prefix.
+It covers every two-chunk split and byte-at-a-time input for boundary cases,
+4080-byte blocks, empty/missing/truncated titles, quotes inside titles,
+quote-semicolon precedence, UTF-8, embedded NULs, parser reset, independent
+instances and 20,000 deterministic randomized blocks. The current corpus has
+57,227 comparisons. This checks parser semantics and memory bounds; physical
+streaming, title delivery to the WebUI and decoder output remain separate tests.
+
+The parser retains 204 bytes of state instead of a 4081-byte metadata array.
+It consumes the complete declared block even after finding the title, so the
+following audio bytes remain aligned. An absent title preserves the current
+title; an explicitly empty title clears it. Station-generation guards around
+publication remain in `audio_service.c`.
+
 ## CPU diagnostics without a separate profiler stack
 
 For new public-stream reports, use

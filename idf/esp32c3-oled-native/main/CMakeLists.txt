@@ -102,6 +102,7 @@ set(NATIVE_SRCS
   "app_main.c"
   "codec_memory_trace.c"
   "audio_service.c"
+  "icy_title.c"
   "decoder_registration.c"
   "native_aac_decoder.c"
   "aac_sbr_reserve.c"

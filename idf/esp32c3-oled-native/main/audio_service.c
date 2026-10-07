@@ -43,6 +43,7 @@
 #endif
 #include "rx_buffer_diagnostic.h"
 #include "heap_fragment_probe.h"
+#include "icy_title.h"
 #include "network_service.h"
 
 #include "runtime_settings.h"
@@ -57,7 +58,6 @@
 #define PCM_PACKET_DATA_SIZE 3584
 #endif
 #define MAX_HTTP_REDIRECTS 5
-#define ICY_METADATA_MAX 4080
 #define DECODE_STATS_INTERVAL_US 5000000LL
 #define BITRATE_UPDATE_INTERVAL_US 1000000LL
 #define STREAM_BITRATE_INTERVAL_US 5000000LL
@@ -165,9 +165,10 @@ static native_codec_t s_last_codec;
 static uint32_t s_published_bitrate_bps;
 static int64_t s_bitrate_updated_us;
 static atomic_bool s_measured_bitrate_ready;
-// One stream task owns this workspace; keeping it in BSS avoids a 4 KiB
-// allocation/free cycle whenever a station starts or stops.
-static char s_icy_metadata[ICY_METADATA_MAX + 1];
+// One stream task owns the bounded incremental metadata parser.
+static icy_title_parser_t s_icy_title;
+_Static_assert(ICY_TITLE_CAPACITY == sizeof(((native_state_t *)0)->title),
+               "ICY parsing must preserve the full published title capacity");
 static void log_runtime_memory(const char *stage);
 
 static void dispose_http_client(esp_http_client_handle_t client) {
@@ -489,17 +490,8 @@ static void state_set_decoder_bitrate(uint32_t generation, uint32_t bitrate_bps)
              (unsigned long)bitrate_bps);
 }
 
-static void parse_icy_metadata(uint32_t generation, char *metadata,
-                               size_t size) {
-    if (!metadata || !size) return;
-    metadata[size] = '\0';
-    char *title = strstr(metadata, "StreamTitle='");
+static void publish_icy_title(uint32_t generation, const char *title) {
     if (!title) return;
-    title += strlen("StreamTitle='");
-    char *end = strstr(title, "';");
-    if (!end) end = strchr(title, '\'');
-    if (!end) return;
-    *end = '\0';
     if (generation != atomic_load(&s_generation)) return;
     native_state_set_title(s_state, title);
     // A stop or station change can race the title publication between the
@@ -736,10 +728,8 @@ static void stream_task(void *argument) {
                 ESP_LOGI(TAG, "ICY bitrate: %lu kbit/s", icy_bitrate);
             }
         }
-        char *metadata = metadata_interval ? s_icy_metadata : NULL;
         size_t audio_until_metadata = metadata_interval;
         size_t metadata_remaining = 0;
-        size_t metadata_written = 0;
         bool first_chunk = true;
         bool stream_stalled = false;
         bool stream_read_failed = false;
@@ -811,8 +801,8 @@ static void stream_task(void *argument) {
                     offset += chunk;
                     audio_until_metadata -= chunk;
                 } else if (!metadata_remaining) {
-                    metadata_remaining = (size_t)buffer[offset++] * 16U;
-                    metadata_written = 0;
+                    metadata_remaining = (size_t)buffer[offset++] * ICY_METADATA_BLOCK_BYTES;
+                    icy_title_begin(&s_icy_title);
                     if (!metadata_remaining) {
                         audio_until_metadata = metadata_interval;
                     }
@@ -821,19 +811,12 @@ static void stream_task(void *argument) {
                     size_t chunk = available < metadata_remaining
                                        ? available
                                        : metadata_remaining;
-                    if (metadata && metadata_written + chunk <=
-                                        ICY_METADATA_MAX) {
-                        memcpy(metadata + metadata_written, buffer + offset,
-                               chunk);
-                    }
-                    metadata_written += chunk;
+                    icy_title_feed(&s_icy_title, buffer + offset, chunk);
                     metadata_remaining -= chunk;
                     offset += chunk;
                     if (!metadata_remaining) {
-                        if (metadata && metadata_written <= ICY_METADATA_MAX) {
-                            parse_icy_metadata(command.generation, metadata,
-                                               metadata_written);
-                        }
+                        publish_icy_title(command.generation,
+                                          icy_title_finish(&s_icy_title));
                         audio_until_metadata = metadata_interval;
                     }
                 }

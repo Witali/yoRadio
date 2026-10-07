@@ -451,9 +451,11 @@ test("native radio requests and publishes ICY song metadata", () => {
 
   assert.match(audio, /Icy-MetaData", "1"/);
   assert.match(audio, /icy-metaint/);
-  assert.match(audio, /StreamTitle='/);
+  assert.match(read("main", "icy_title.c"), /StreamTitle='/);
   assert.match(audio, /native_state_set_title\(s_state, title\)/);
-  assert.match(audio, /parse_icy_metadata\(uint32_t generation/);
+  assert.match(audio, /publish_icy_title\(uint32_t generation/);
+  assert.match(audio, /icy_title_feed\(&s_icy_title, buffer \+ offset, chunk\)/);
+  assert.match(audio, /publish_icy_title\(command.generation,\s*icy_title_finish\(&s_icy_title\)\)/);
   assert.match(
     audio,
     /generation != atomic_load\(&s_generation\)[\s\S]*native_state_set_title\(s_state, ""\)/,

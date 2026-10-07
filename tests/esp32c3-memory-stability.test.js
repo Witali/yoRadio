@@ -35,7 +35,7 @@ test("ESP32-C3 reuses stream workspaces and logs fragmentation headroom", () => 
 
   assert.match(defaults, /# CONFIG_MBEDTLS_DYNAMIC_BUFFER is not set/);
   assert.doesNotMatch(defaults, /^CONFIG_MBEDTLS_DYNAMIC_BUFFER=y$/m);
-  assert.match(audio, /static char s_icy_metadata\[ICY_METADATA_MAX \+ 1\]/);
+  assert.match(audio, /static icy_title_parser_t s_icy_title/);
   assert.doesNotMatch(audio, /malloc\(ICY_METADATA_MAX \+ 1\)/);
   // Capacity, resizing and OOM semantics execute in the host C test; this
   // check verifies that the full pipeline calls that tested helper.
