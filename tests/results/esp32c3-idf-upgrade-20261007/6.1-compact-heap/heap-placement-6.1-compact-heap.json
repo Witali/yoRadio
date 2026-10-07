@@ -1,0 +1,30 @@
+{
+  "sdkconfig_sha256": "251201496597df5de521a63dd49c4b51a7d41bedd8c5d39bae1d2fd1bd926127",
+  "required": {
+    "CONFIG_HEAP_PLACE_FUNCTION_INTO_FLASH": "y"
+  },
+  "disabled": [
+    "CONFIG_SPI_FLASH_AUTO_SUSPEND",
+    "CONFIG_SPI_MASTER_ISR_IN_IRAM",
+    "CONFIG_I2C_ISR_IRAM_SAFE",
+    "CONFIG_I2S_ISR_IRAM_SAFE",
+    "CONFIG_YORADIO_DIRECT_DMA_PCM"
+  ],
+  "reviewed_scope": [
+    "GPIO ISR service uses flags 0; encoder handlers sample GPIO/ticks and submit to an existing queue without heap calls.",
+    "I2C OLED and I2S PDM cache-independent ISR options are disabled.",
+    "Direct-DMA callback experiment is not linked; the optional callback only counts overruns.",
+    "No application SPI-master or SPI-slave client is initialized in this board source.",
+    "SPI flash driver placement and Auto Suspend remain unchanged; only supported heap placement is selected.",
+    "The SDK RAM guide permits flash heap routines when SPI_MASTER_ISR_IN_IRAM is off and cache-disabled ISRs do not call heap APIs."
+  ],
+  "source_sha256": {
+    "idf\\esp32c3-oled-native\\main\\app_main.c": "bf01f985253ec58dbf198a671a14e8bb6030d46b9f07080d18bf255da8bcf93a",
+    "idf\\esp32c3-oled-native\\main\\encoder_input.c": "19799302ab9af83182370ab00134b0a749f370ef0d749c4020bc37ab3aec408d",
+    "idf\\esp32c3-oled-native\\main\\native_audio_output_dma.c": "4a5859e0e220e91b723e3bfd44229f5d12108c569bb70a00cbd63c416b7b9a1f",
+    "idf\\esp32c3-oled-native\\main\\board_config.h": "9e984ce5fe7ef3cc9647baaad376a14319cb9706ddaa3f7281646cfccfb63efe",
+    "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\heap\\Kconfig": "49adbe48e1f2de73a644bba3e494283ce8c5a2895401f86f5125ff01973ee95a",
+    "C:\\Work\\yoRadio\\.idf\\v6.1\\docs\\en\\api-guides\\performance\\ram-usage.rst": "6bb7ada0b4a11e4a7e79cd36bbab7dd136a6f5569a571dfe659172b472779eea"
+  },
+  "limitation": "Manual source/configuration review for this board; physical OTA and load qualification are recorded separately."
+}
