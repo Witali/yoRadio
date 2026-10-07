@@ -606,6 +606,20 @@ screen, timezone and control settings are compared in memory. Neither their
 contents nor credential hashes are saved. This is not a byte-for-byte NVS
 audit; for that use a private offline backup and partition comparison.
 
+For ESP-IDF 6.0.3 and later, also exercise the HTTP parser's 64-to-32-bit
+Content-Length guard and malformed/duplicate lengths:
+
+```powershell
+python tools/esp32c3_tests/http_headers.py --board http://BOARD_IP --firmware PATH_TO_INSTALLED_APP_BIN --output .build/c3-tests/http-headers.json
+```
+
+This sends less than 256 bytes per probe, regardless of the declared length.
+Values above `UINT32_MAX` must return 413; invalid and conflicting lengths must
+return 400. Every case checks the unchanged active image and settings. The
+runner then reboots to restore the saved station. The local socket transport
+test is `python tests/test-esp32c3-http-headers.py`; it does not replace the
+actual SDK parser check on the board.
+
 ## Wi-Fi timing and external interrupt tests
 
 Build otherwise identical diagnostic variants with Wi-Fi IRAM options on/off
