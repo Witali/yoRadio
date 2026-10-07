@@ -1,8 +1,10 @@
 """Exercise malformed header bytes through a real local socket, without a board."""
+import io
 import socket
 import sys
 import threading
 import unittest
+from unittest.mock import MagicMock, patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools/esp32c3_tests'))
@@ -10,6 +12,25 @@ from http_headers import HEADER_CASES, request_bytes, request_status
 
 
 class HeaderTransportTests(unittest.TestCase):
+    def test_complete_rejection_header_does_not_require_error_page(self):
+        class HeaderThenReset(io.BytesIO):
+            def read(self, *args):
+                raise ConnectionResetError('Error page transport ended')
+        connection = MagicMock()
+        connection.__enter__.return_value = connection
+        connection.makefile.return_value = HeaderThenReset(
+            b'HTTP/1.1 400 Bad Request\r\nContent-Length: 100\r\n\r\n')
+        with patch('http_headers.socket.create_connection', return_value=connection):
+            self.assertEqual(request_status('http://127.0.0.1', ('invalid',)), 400)
+
+    def test_reset_before_response_header_is_still_a_failure(self):
+        connection = MagicMock()
+        connection.__enter__.return_value = connection
+        connection.makefile.side_effect = ConnectionResetError('No response header')
+        with patch('http_headers.socket.create_connection', return_value=connection):
+            with self.assertRaises(ConnectionResetError):
+                request_status('http://127.0.0.1', ('invalid',))
+
     def test_raw_invalid_lengths_reach_peer_without_large_body(self):
         for name, lengths, status in HEADER_CASES:
             with self.subTest(name=name), socket.socket() as server:

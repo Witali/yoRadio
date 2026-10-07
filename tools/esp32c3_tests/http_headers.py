@@ -40,8 +40,9 @@ def request_status(origin, lengths):
         response = http.client.HTTPResponse(connection)
         try:
             response.begin()
-            # The status is the evidence. Bound reads even for an invalid response.
-            response.read(4096)
+            # A complete response header proves the rejection status. The error
+            # page is outside this test: an RST while reading it must not discard
+            # an already received status. Resets before the header still fail.
             return response.status
         finally:
             response.close()
