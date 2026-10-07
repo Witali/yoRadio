@@ -2,6 +2,10 @@
 
 ## Scope and sequence
 
+All upgrade work remains on `codex/esp32c3-idf-upgrade` in the dedicated
+`.worktree/esp32c3-idf-upgrade` checkout. Do not merge the upgrade into `main`
+without a subsequent user request.
+
 Starting point: main `ff490cd4`, installed production image built from
 `a06181cf` with ESP-IDF 6.0.2. Keep the saved image under
 `firmware/development/esp32c3-main-production-20261007` available for rollback.
@@ -40,18 +44,142 @@ to the same revision so the SDK comparison does not also change the decoder.
 Automated status/PCM/DMA evidence does not replace listening or a visual OLED
 check. Manual observations and unavailable test prerequisites are reported
 separately. Historical experiment evidence replay is not a new hardware run.
+Physical SDK transitions use application-only OTA with the board's existing
+bootloader, NVS and SPIFFS. Each clean build also produces its SDK's bootloader;
+the QEMU tests use that corresponding bootloader. These checks do not claim
+a physical full-flash/bootloader migration.
 
 ## Migration references
 
 - [ESP-IDF 6.0.3 release notes](https://github.com/espressif/esp-idf/releases/tag/v6.0.3):
-  HTTP-server Content-Length handling and request body size limit change.
+  HTTP-server Content-Length handling changed. The checked-out C3 parser
+  rejects values above `UINT32_MAX` with HTTP 413 before conversion to 32 bits.
 - [ESP-IDF 6.1 release notes](https://github.com/espressif/esp-idf/releases/tag/v6.1).
 - [6.1 migration guide for ESP32-C3](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32c3/migration-guides/release-6.x/6.1/index.html).
 
 ## Execution status
 
-In progress. Results will be added as each stage completes; a planned check
-is not a passed check.
+In progress: matched 6.0.2 controls and remaining 6.0.3 hardware checks.
+Separate 6.1 builds and host/QEMU tests are being prepared in parallel;
+6.1 has not yet been installed on the board.
+A planned check is not a passed check.
+
+### Controls and completed 6.0.3 checks
+
+The physical 6.0.2 control has 48 passes and eight failures. The failures are
+the six HE-AAC/HE-AACv2 AUTO/explicit full-format checks and two full-rate
+transition checks. All 22 natural-EOF checks pass, including HE-AAC. Keep this
+distinction: successful EOF does not qualify full-rate HE-AAC playback.
+
+Production, profiling, deep-sleep and deep-sleep + RTC32k images built and are
+saved under `firmware/development/esp32c3-idf-6.0.3-*`, with exact configurations
+and image/ELF hashes. The awake profiling image was tested first, then OTA
+successfully installed the quiet production image while AAC-LC was playing.
+The external-crystal build cannot be tested on the connected crystal-free board.
+
+| Check | 6.0.3 result |
+| --- | --- |
+| C3/shared Node tests | 243 passed, no skips |
+| Python tests after historical-source repairs | 653 cases across 117 scripts; 114 scripts pass, three archival fingerprint failures, no remaining skips |
+| Stream format / EOF / decoder ownership | Native ASan/UBSan checks and 17 custom-decoder terminal cases passed |
+| FLAC bounds and prediction | Sanitizers passed; complete-file PCM matches FFmpeg |
+| FLAC depth/stereo/predictor matrix | 120 fixtures × three core/adapter configurations passed; allocation-failure cleanup/reopen passed |
+| Vorbis output in QEMU | Seven buffer/retry/EOF cases passed; ample-buffer PCM identical to the retained 6.0.2 raw-packet reference |
+| Vorbis lifetime in QEMU | 210 cases passed, including 100 decode/close cycles and individual allocation failures |
+| AAC in QEMU | Format/transition checks, guards, instruction-counter checks and calibration-window counts passed |
+| Production static memory versus 6.0.2 | IRAM unchanged at 53,760 B; data +8 B, BSS +48 B; linker heap start +64 B including alignment |
+| Production image size versus 6.0.2 | +1,632 B, total 1,402,640 B |
+
+The AAC calibration gate compares frame counts, consumed input and PCM byte
+counts with recorded hardware windows. It does not compare every PCM sample
+or establish acoustic continuity. QEMU results do not establish the board's
+Wi-Fi/decoder memory behavior.
+
+The three remaining Python failures are missing historical source snapshots
+for old IRAM/Wi-Fi experiments. Expected hashes and numerical gates were not
+relaxed. See `tests/fixtures/historical_sources/README.md` for the absent hashes.
+Their failures remain in the report; these are not new firmware measurements.
+
+The first installation attempt ended with Windows connection error 10053;
+the board remained on its original 6.0.2 hash. The attempt did not record its
+failure phase, so it cannot establish whether upload had begun. A retry after
+stopping playback installed the profiling image in 20.25 seconds and verified
+unchanged Wi-Fi, playlist and exposed settings. Keep the failed attempt too.
+
+### 6.0.3 hardware results so far
+
+The first matrix completed with 49 passes and nine failures: the same eight
+HE-AAC format/transition failures as the 6.0.2 control, plus a rejected test
+invocation specifying two switching cycles where at least three are required.
+The matrix also passed untrusted-TLS rejection, WebSocket reconnect and two
+reboots. The separate three-cycle switching attempt later timed out after the
+Opus observation, before completing its first cycle; restore/reboot passed.
+A repeated switching run subsequently completed all 33 changes without a
+transport timeout. Its nine failures were exactly the three HE-AAC fixtures
+in each of the three cycles. Settled heap medians after each cycle were
+120,148/120,692/120,692 B, largest block 69,632 B, and 17 tasks throughout.
+The suite remains failed on formats; its later heap acceptance function is
+not reached when format failures exist. The matched old-SDK control is pending.
+
+The 60-second controlled load runs used identical fixed fixtures and concurrent
+WebUI requests. CPU has no acceptance ceiling. These descriptive metrics exclude
+the first ten seconds and do not override the original failures:
+
+| Codec | Mean CPU | Minimum free heap | Audio/wall duration | Load gate |
+| --- | ---: | ---: | ---: | --- |
+| MP3 | 57.6% | 53,296 B | 1.0018 | Progressive heap loss |
+| Custom FLAC | 60.6% | 45,452 B | 1.0016 | Pass |
+| Vorbis | 69.7% | 39,868 B | 1.0016 | Progressive heap loss |
+| Opus | 77.7% | 50,856 B | 1.0018 | Progressive heap loss |
+| AAC-LC | 43.5% | 42,560 B | 1.0016 | Progressive heap loss |
+
+Both HE-AAC load inputs failed full-format acceptance; their core-fallback CPU
+measurements must not be presented as full HE-AAC decoding performance. All
+seven post-Stop heap-recovery checks passed. A matching 6.0.2 profiling build
+has been saved to investigate whether the memory failures precede the upgrade.
+
+All truncated-FLAC checks passed, including natural cleanup and subsequent
+AAC/FLAC playback. The station-availability suite passed configured 3/10-second
+deadlines, stalled-stream termination, Stop/switch/cancellation, invalid-value
+rejection and settings persistence. HE-AACv2 recovery failed full-format
+acceptance. The runtime gate also recorded failed allocations: 55,128 B during
+HE-AAC, and 1,700-byte requests with less than 5 KiB free after a planned reboot.
+Those failures remain part of the result.
+
+The public-stream profiling checks passed Groove Salad 128 kbit/s AAC and
+256 kbit/s MP3 over HTTP. The 64/32/16 kbit/s AAC cases failed runtime gates.
+Over HTTPS, MP3 passed; the 128/64/32 kbit/s AAC cases failed runtime gates
+and the 16 kbit/s case timed out. Allocation diagnostics include failed
+1,700-byte requests with a largest free block below 1,700 bytes. These are
+profiling-image results; a separate quiet-production status/format check is
+planned and will not be treated as a CPU, heap or acoustic-continuity test.
+
+The 600-second AAC-LC test had 557 successful status observations, a maximum
+HTTP response time of 406 ms and an audio/wall duration ratio of 1.0016.
+Mean CPU was 35.3%, peak 37.6%; no allocation/decoder/panic diagnostic appeared
+in the captured playback window. The original test nevertheless **failed**
+the progressive-heap-loss gate: the first/last three-sample heap medians were
+50,548/35,240 B. Minimum heap was 32,916 B. The final 291-second subwindow
+passed the same gate (36,984/35,240 B), suggesting the decline had mostly
+settled; this does not erase the full-window failure or establish its cause.
+Minimum observed RSSI was -78 dBm. Restore/reboot passed.
+
+The profile-to-production OTA transition passed while the controlled AAC
+stream was playing. The new image hash and slot were verified, along with
+unchanged Wi-Fi, playlist and exposed settings.
+All 14 subsequent OTA cases passed: invalid-image/request rejection,
+disconnect/stall handling, two same-image slot transitions, slow upload and
+restoration with settings verification.
+
+The quiet-production HTTP/transition/WebSocket/boot matrix completed with
+21 passes and the same eight HE-AAC format/transition failures as 6.0.2.
+Two oversized `Content-Length` probes returned 413; negative and conflicting
+duplicate lengths returned 400. A non-numeric probe ended with a connection
+reset whose phase was not retained, so that original run remains failed.
+The header-test client was corrected to stop after the complete response
+header, avoiding an unnecessary error-page read; a reset before receiving
+the header still fails. Three local transport tests pass. A physical recheck
+on 6.0.3 remains pending.
 
 ### 6.0.3 lwIP source audit
 
@@ -65,3 +193,43 @@ The actual 6.0.3 stack passed all six half-close scenarios with ASan/UBSan
 for both heap and pool allocation after our fix (12 passes). Both unpatched
 controls still fail the five ownership cases and pass the ordinary full-close
 case. This demonstrates that the local fix is still needed on 6.0.3.
+
+### Preparation for 6.1
+
+The SDK was downloaded separately while the board continued its 6.0.3 tests.
+SDK revision: `fff9895c82d744c7237be8847347bdd1b07c6643`. GCC remains
+15.2.0 (`esp-15.2.0_20251204`); the codec archive is unchanged. The project
+pin and installed firmware remain at 6.0.3 during this preparation.
+
+A copied build helper with an explicit `v6.1` SDK path prepares separate 6.1
+build directories without changing that pin or the board. Its source is
+retained with the test evidence. The first quiet-production build succeeds
+without application API edits: 1,418,832 B (+16,192 B versus 6.0.3).
+Its linker heap capacity is 2,016 B lower; IRAM grows by 1,024 B,
+DRAM data by 228 B and BSS by 776 B. These are static linker measurements,
+not observed runtime free heap. Physical installation remains deferred until
+the 6.0.3/control sequence finishes.
+
+Application feature flags, Wi-Fi IRAM placement and the selected DIO/80 MHz
+flash mode match 6.0.3. The only additional flag in that configuration subset
+is `CONFIG_ESPTOOLPY_FLASHMODE_VAL=3`: 6.1 adds a one-based flash-mode value
+to the application descriptor, where 3 denotes DIO. It does not select DOUT
+or change the image-header flash-mode encoding.
+
+The actual 6.1 `tcp.c` and `api_msg.c` are identical to 6.0.3, with the same
+lwIP submodule revision. The existing strict source fingerprints therefore
+accept them without extending the allowlist. The application already uses
+the public `esp_rom_gpio_*` API, and its deep-sleep hold calls remain in the
+6.1 public GPIO header. Compilation and runtime qualification are still
+required; a source inspection alone is not migration acceptance.
+
+All six actual-SDK lwIP ownership cases passed with ASan/UBSan for both heap
+and pool allocation (12 passes). Both unpatched controls reproduced the five
+ownership failures and passed the ordinary full-close case. The local TCP
+fix remains necessary for 6.1.
+
+The 6.1 preparation repeats passed all 243 Node cases. The Python run covers
+118 scripts/654 cases, with the same three missing historical-source failures
+and no skips. The subsequent HTTP-header client repair adds two passing local
+cases; original reports are retained separately. Vorbis raw-packet PCM in
+6.1 QEMU matches 6.0.3 byte for byte, and all seven output/retry cases pass.
