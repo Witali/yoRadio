@@ -1,0 +1,259 @@
+{
+  "input_sha256": {
+    "report.json": "f98943f734a966bf8276dda3c7d70e940fd9087e999d1367b47e5846c856a5b4",
+    "status.json": "a3f14ba97f42022cabdbea5ed6adeaa63439f1f97e0a918b1a0a280ca4ef7d66",
+    "performance.json": "bf70783c2b97b8699b553165b0df3b3dc2e213ddaf68e106cc052e5234b2c981",
+    "checkpoint.json": "01d4bdca9b3e183b6eeb1b73812a5a6318406bce2566880d116763034aa9b48b"
+  },
+  "image": "dcfba89b3459f71559418f315deabc3576802d940e5dfe4102211c87e1f56e6d",
+  "fixture_hashes": {
+    "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e"
+  },
+  "cpu_budget_percent": null,
+  "requested_seconds": 600,
+  "observed_seconds": 600.0149999999994,
+  "acceptance": [
+    {
+      "name": "idle-before",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 147300,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147264,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147292,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.766
+    },
+    {
+      "name": "cpu-under-http-load:hev2-44100-stereo",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Incomplete CPU/heap evidence",
+      "seconds": 601.328
+    },
+    {
+      "name": "idle-after",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 147224,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147228,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147224,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.578
+    },
+    {
+      "name": "stop-recovery",
+      "result": "PASS",
+      "evidence": {
+        "heap_recovered": true
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "runtime",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.016
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "rebooted": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 7.843
+    }
+  ],
+  "playback": {
+    "board": {
+      "version": "v0.9.693-1207-g7fa45fc1",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "dcfba89b3459f71559418f315deabc3576802d940e5dfe4102211c87e1f56e6d"
+    },
+    "cases": [
+      {
+        "name": "hev2-44100-stereo",
+        "original": {
+          "name": "cpu-under-http-load:hev2-44100-stereo",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Incomplete CPU/heap evidence",
+          "seconds": 601.328
+        },
+        "full_window": {
+          "start": 45891.578,
+          "end": 46481.593,
+          "seconds": 590.0149999999994,
+          "strict": {
+            "result": "FAIL",
+            "reason": "Incomplete CPU/heap evidence"
+          },
+          "cpu_samples": 115,
+          "decoder_windows": 118,
+          "malformed": [
+            {
+              "at": 46402.703,
+              "line": "I (562388) cpu_profile: PERF CPU: busy=76.1% idle=23.9% stream=0.2% decode=51.4% output=8.0% wifi=6.3% tcpip=0.0% web=2.4% heap=I (562900) audio_output: PERF PCM: audio 5015 ms, normalize 123 ms (2.4%), packets 432"
+            }
+          ],
+          "diagnostic": {
+            "mean_busy": 74.47652173913043,
+            "peak_busy": 77.1,
+            "minimum_heap": 21020.0,
+            "minimum_largest": 7680.0,
+            "first_heap": 44040.0,
+            "last_heap": 24552.0,
+            "first_largest": 32768.0,
+            "last_largest": 12800.0,
+            "audio_wall_ratio": 1.0015909821776146,
+            "decode_percent": 56.5782314074725
+          }
+        },
+        "runtime": {
+          "result": "PASS",
+          "evidence": null
+        },
+        "subwindows": [
+          {
+            "start": 45891.578,
+            "end": 46191.578,
+            "seconds": 300.0,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Progressive heap loss during continuous playback"
+            },
+            "cpu_samples": 59,
+            "decoder_windows": 60,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 74.24915254237288,
+              "peak_busy": 75.7,
+              "minimum_heap": 26312.0,
+              "minimum_largest": 12800.0,
+              "first_heap": 44040.0,
+              "last_heap": 29836.0,
+              "first_largest": 32768.0,
+              "last_largest": 12800.0,
+              "audio_wall_ratio": 1.0016044311592514,
+              "decode_percent": 56.83017613825191
+            }
+          },
+          {
+            "start": 46191.578,
+            "end": 46481.593,
+            "seconds": 290.0149999999994,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Incomplete CPU/heap evidence"
+            },
+            "cpu_samples": 56,
+            "decoder_windows": 58,
+            "malformed": [
+              {
+                "at": 46402.703,
+                "line": "I (562388) cpu_profile: PERF CPU: busy=76.1% idle=23.9% stream=0.2% decode=51.4% output=8.0% wifi=6.3% tcpip=0.0% web=2.4% heap=I (562900) audio_output: PERF PCM: audio 5015 ms, normalize 123 ms (2.4%), packets 432"
+              }
+            ],
+            "diagnostic": {
+              "mean_busy": 74.71607142857142,
+              "peak_busy": 77.1,
+              "minimum_heap": 21020.0,
+              "minimum_largest": 7680.0,
+              "first_heap": 26324.0,
+              "last_heap": 24552.0,
+              "first_largest": 9728.0,
+              "last_largest": 12800.0,
+              "audio_wall_ratio": 1.0015770698180515,
+              "decode_percent": 56.31759892735586
+            }
+          }
+        ],
+        "status_samples": 3059,
+        "max_http_ms": 1953.0000000013388,
+        "minimum_rssi": -70
+      }
+    ],
+    "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+  },
+  "note": "Replay a completed continuous AAC study without attributing unrelated RAM.\n\nRX ranges are actual live allocations; TCP receive credit is logical payload.\nTheir snapshots and CPU heap samples are asynchronous. Window medians are\ncomparisons, not an exact subtraction or proof of sample-level audio continuity.",
+  "acoustic_continuity_qualified": false,
+  "idle": {
+    "idle-before": {
+      "heap": {
+        "min": 147264,
+        "median": 147292,
+        "max": 147300
+      },
+      "largest": {
+        "min": 114688,
+        "median": 114688,
+        "max": 114688
+      },
+      "tasks": {
+        "min": 17,
+        "median": 17,
+        "max": 17
+      }
+    },
+    "idle-after": {
+      "heap": {
+        "min": 147224,
+        "median": 147224,
+        "max": 147228
+      },
+      "largest": {
+        "min": 114688,
+        "median": 114688,
+        "max": 114688
+      },
+      "tasks": {
+        "min": 17,
+        "median": 17,
+        "max": 17
+      }
+    }
+  },
+  "ownership": {
+    "complete": false,
+    "reason": "Missing/duplicate live RX owners"
+  }
+}

@@ -1,0 +1,250 @@
+{
+  "input_sha256": {
+    "report.json": "3fb4d732718ad2fc19d4fdf5811806b9bcbc76fc7fcef8bb88b227dfeb63ac3e",
+    "status.json": "dfb5619499858451e45d5d1f43a805739754662fa6e5f13f8967ed033359b6dc",
+    "performance.json": "f9ac46058ac0adc961aeda73cd2ae49e80ee2075688d00e928cbeb95e77ae761",
+    "checkpoint.json": "f140223b2ad929e3730cbd16802d4ba727930936efdd8f9321b2cacb824c4886"
+  },
+  "image": "a39454b779de7dc10b2202a177727e09a29b5273497d3b86885b0e0048d89aa4",
+  "fixture_hashes": {
+    "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e"
+  },
+  "cpu_budget_percent": null,
+  "requested_seconds": 600,
+  "observed_seconds": 600.0,
+  "acceptance": [
+    {
+      "name": "idle-before",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 147864,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147832,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147832,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.297
+    },
+    {
+      "name": "cpu-under-http-load:hev2-44100-stereo",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Progressive heap loss during continuous playback",
+      "seconds": 601.172
+    },
+    {
+      "name": "idle-after",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 147592,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147592,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.14
+    },
+    {
+      "name": "stop-recovery",
+      "result": "PASS",
+      "evidence": {
+        "heap_recovered": true
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "runtime",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "rebooted": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 7.578
+    }
+  ],
+  "playback": {
+    "board": {
+      "version": "v0.9.693-1207-g7fa45fc1",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "a39454b779de7dc10b2202a177727e09a29b5273497d3b86885b0e0048d89aa4"
+    },
+    "cases": [
+      {
+        "name": "hev2-44100-stereo",
+        "original": {
+          "name": "cpu-under-http-load:hev2-44100-stereo",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Progressive heap loss during continuous playback",
+          "seconds": 601.172
+        },
+        "full_window": {
+          "start": 46895.406,
+          "end": 47485.406,
+          "seconds": 590.0,
+          "strict": {
+            "result": "FAIL",
+            "reason": "Progressive heap loss during continuous playback"
+          },
+          "cpu_samples": 117,
+          "decoder_windows": 118,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 71.72735042735043,
+            "peak_busy": 73.1,
+            "minimum_heap": 28440.0,
+            "minimum_largest": 13824.0,
+            "first_heap": 44500.0,
+            "last_heap": 30972.0,
+            "first_largest": 32768.0,
+            "last_largest": 20480.0,
+            "audio_wall_ratio": 1.0015909821776146,
+            "decode_percent": 52.90383088024063
+          }
+        },
+        "runtime": {
+          "result": "PASS",
+          "evidence": null
+        },
+        "subwindows": [
+          {
+            "start": 46895.406,
+            "end": 47195.406,
+            "seconds": 300.0,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Progressive heap loss during continuous playback"
+            },
+            "cpu_samples": 59,
+            "decoder_windows": 60,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 71.82542372881356,
+              "peak_busy": 73.1,
+              "minimum_heap": 33928.0,
+              "minimum_largest": 17408.0,
+              "first_heap": 44500.0,
+              "last_heap": 35084.0,
+              "first_largest": 32768.0,
+              "last_largest": 20480.0,
+              "audio_wall_ratio": 1.0015944291510912,
+              "decode_percent": 53.021934197407774
+            }
+          },
+          {
+            "start": 47195.406,
+            "end": 47485.406,
+            "seconds": 290.0,
+            "strict": {
+              "result": "PASS",
+              "evidence": {
+                "mean_busy": 71.62758620689655,
+                "peak_busy": 72.8,
+                "minimum_heap": 28440.0,
+                "minimum_largest": 13824.0,
+                "audio_wall_ratio": 1.0015874163679501
+              }
+            },
+            "cpu_samples": 58,
+            "decoder_windows": 58,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 71.62758620689655,
+              "peak_busy": 72.8,
+              "minimum_heap": 28440.0,
+              "minimum_largest": 13824.0,
+              "first_heap": 32768.0,
+              "last_heap": 30972.0,
+              "first_largest": 18432.0,
+              "last_largest": 20480.0,
+              "audio_wall_ratio": 1.0015874163679501,
+              "decode_percent": 52.781655034895316
+            }
+          }
+        ],
+        "status_samples": 3192,
+        "max_http_ms": 515.9999999959837,
+        "minimum_rssi": -78
+      }
+    ],
+    "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+  },
+  "note": "Replay a completed continuous AAC study without attributing unrelated RAM.\n\nRX ranges are actual live allocations; TCP receive credit is logical payload.\nTheir snapshots and CPU heap samples are asynchronous. Window medians are\ncomparisons, not an exact subtraction or proof of sample-level audio continuity.",
+  "acoustic_continuity_qualified": false,
+  "idle": {
+    "idle-before": {
+      "heap": {
+        "min": 147832,
+        "median": 147832,
+        "max": 147864
+      },
+      "largest": {
+        "min": 114688,
+        "median": 114688,
+        "max": 114688
+      },
+      "tasks": {
+        "min": 17,
+        "median": 17,
+        "max": 17
+      }
+    },
+    "idle-after": {
+      "heap": {
+        "min": 147592,
+        "median": 147592.0,
+        "max": 147592
+      },
+      "largest": {
+        "min": 114688,
+        "median": 114688.0,
+        "max": 114688
+      },
+      "tasks": {
+        "min": 17,
+        "median": 17.0,
+        "max": 17
+      }
+    }
+  },
+  "ownership": {
+    "complete": false,
+    "reason": "Missing RX ownership telemetry"
+  }
+}

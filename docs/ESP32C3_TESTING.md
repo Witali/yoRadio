@@ -113,6 +113,13 @@ retains the same progressive-heap failure with an 8-byte post-Stop idle
 difference. Its full ownership trace is rejected for a truncated USB record;
 independent playback, recovery and OTA observations remain available.
 
+The [compact telemetry and native RX-copy follow-up](ESP32C3_RX_COPY_20261007.md)
+retains two further ten-minute runs. Compact CRC records still lose rows;
+native packet copies improve the observed memory minimum but retain the
+progressive-heap failure. `tests/test-rx-transport-evidence.py` replays both
+archives without treating missing telemetry as zero memory or declaring audio
+continuity from decoder progress. Both experimental images remain unqualified.
+
 The optional [heap-owner diagnostic](ESP32C3_HEAP_FRAGMENT_OWNER_20261005.md)
 tracks live allocations in the largest initial free region, with explicit
 overflow/unknown-owner rejection. Use `heap_idle.py` for a stopped-board window

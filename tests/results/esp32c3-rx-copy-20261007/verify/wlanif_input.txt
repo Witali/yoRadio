@@ -1,0 +1,79 @@
+
+C:\Work\yoRadio\.worktree\aac-storage18\idf\esp32c3-oled-native\build-rx-copy\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+420f2a56 <wlanif_input>:
+420f2a56:	4d5c                	lw	a5,28(a0)
+420f2a58:	7179                	addi	sp,sp,-48
+420f2a5a:	d04a                	sw	s2,32(sp)
+420f2a5c:	ce4e                	sw	s3,28(sp)
+420f2a5e:	d606                	sw	ra,44(sp)
+420f2a60:	8936                	mv	s2,a3
+420f2a62:	89be                	mv	s3,a5
+420f2a64:	c1ad                	beqz	a1,420f2ac6 <wlanif_input+0x70>
+420f2a66:	d422                	sw	s0,40(sp)
+420f2a68:	03954783          	lbu	a5,57(a0)
+420f2a6c:	842a                	mv	s0,a0
+420f2a6e:	01f79693          	slli	a3,a5,0x1f
+420f2a72:	01f6d793          	srli	a5,a3,0x1f
+420f2a76:	c7b9                	beqz	a5,420f2ac4 <wlanif_input+0x6e>
+420f2a78:	c62e                	sw	a1,12(sp)
+420f2a7a:	01061593          	slli	a1,a2,0x10
+420f2a7e:	c432                	sw	a2,8(sp)
+420f2a80:	81c1                	srli	a1,a1,0x10
+420f2a82:	28000613          	li	a2,640
+420f2a86:	4501                	li	a0,0
+420f2a88:	d226                	sw	s1,36(sp)
+420f2a8a:	c048c0ef          	jal	4207ee8e <pbuf_alloc>
+420f2a8e:	84aa                	mv	s1,a0
+420f2a90:	c539                	beqz	a0,420f2ade <wlanif_input+0x88>
+420f2a92:	4622                	lw	a2,8(sp)
+420f2a94:	45b2                	lw	a1,12(sp)
+420f2a96:	4148                	lw	a0,4(a0)
+420f2a98:	fe294097          	auipc	ra,0xfe294
+420f2a9c:	906080e7          	jalr	-1786(ra) # 4038639e <memcpy>
+420f2aa0:	85ca                	mv	a1,s2
+420f2aa2:	854e                	mv	a0,s3
+420f2aa4:	9c59b0ef          	jal	4208e468 <esp_netif_free_rx_buffer>
+420f2aa8:	481c                	lw	a5,16(s0)
+420f2aaa:	85a2                	mv	a1,s0
+420f2aac:	8526                	mv	a0,s1
+420f2aae:	9782                	jalr	a5
+420f2ab0:	87aa                	mv	a5,a0
+420f2ab2:	4501                	li	a0,0
+420f2ab4:	ef95                	bnez	a5,420f2af0 <wlanif_input+0x9a>
+420f2ab6:	5422                	lw	s0,40(sp)
+420f2ab8:	5492                	lw	s1,36(sp)
+420f2aba:	50b2                	lw	ra,44(sp)
+420f2abc:	5902                	lw	s2,32(sp)
+420f2abe:	49f2                	lw	s3,28(sp)
+420f2ac0:	6145                	addi	sp,sp,48
+420f2ac2:	8082                	ret
+420f2ac4:	5422                	lw	s0,40(sp)
+420f2ac6:	00090663          	beqz	s2,420f2ad2 <wlanif_input+0x7c>
+420f2aca:	85ca                	mv	a1,s2
+420f2acc:	854e                	mv	a0,s3
+420f2ace:	99b9b0ef          	jal	4208e468 <esp_netif_free_rx_buffer>
+420f2ad2:	557d                	li	a0,-1
+420f2ad4:	50b2                	lw	ra,44(sp)
+420f2ad6:	5902                	lw	s2,32(sp)
+420f2ad8:	49f2                	lw	s3,28(sp)
+420f2ada:	6145                	addi	sp,sp,48
+420f2adc:	8082                	ret
+420f2ade:	854e                	mv	a0,s3
+420f2ae0:	85ca                	mv	a1,s2
+420f2ae2:	9879b0ef          	jal	4208e468 <esp_netif_free_rx_buffer>
+420f2ae6:	10100513          	li	a0,257
+420f2aea:	5422                	lw	s0,40(sp)
+420f2aec:	5492                	lw	s1,36(sp)
+420f2aee:	b7f1                	j	420f2aba <wlanif_input+0x64>
+420f2af0:	8526                	mv	a0,s1
+420f2af2:	a768c0ef          	jal	4207ed68 <pbuf_free>
+420f2af6:	557d                	li	a0,-1
+420f2af8:	5422                	lw	s0,40(sp)
+420f2afa:	5492                	lw	s1,36(sp)
+420f2afc:	bfe1                	j	420f2ad4 <wlanif_input+0x7e>
