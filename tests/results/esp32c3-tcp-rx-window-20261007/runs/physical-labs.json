@@ -1,0 +1,127 @@
+[
+  {
+    "name": "bundle-audit",
+    "code": 0,
+    "seconds": 0.13999999999941792,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build\\c3-rx-window-20261007\\audit-bundles.py"
+    ]
+  },
+  {
+    "name": "install-lab-dynamic",
+    "code": 0,
+    "seconds": 25.843999999997322,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-tlslab-rx4-dynamic\\app.bin",
+      "--output",
+      ".build\\c3-rx-window-20261007\\install-lab-dynamic.json"
+    ]
+  },
+  {
+    "name": "physical-lab-dynamic",
+    "code": 1,
+    "seconds": 331.67200000000594,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/tls_records.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-tlslab-rx4-dynamic\\app.bin",
+      "--ca",
+      ".build\\c3-tls-records-20261007\\trust\\ca.pem",
+      "--cert",
+      ".build\\c3-tls-records-20261007\\trust\\server.pem",
+      "--key",
+      ".build\\c3-tls-records-20261007\\trust\\server.key",
+      "--seconds",
+      "75",
+      "--output",
+      ".build\\c3-rx-window-20261007\\physical-lab-dynamic"
+    ]
+  },
+  {
+    "name": "install-lab-static",
+    "code": 0,
+    "seconds": 26.812999999994645,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-tlslab-rx4-static\\app.bin",
+      "--output",
+      ".build\\c3-rx-window-20261007\\install-lab-static.json"
+    ]
+  },
+  {
+    "name": "physical-lab-static",
+    "code": 1,
+    "seconds": 331.7960000000021,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/tls_records.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-tlslab-rx4-static\\app.bin",
+      "--ca",
+      ".build\\c3-tls-records-20261007\\trust\\ca.pem",
+      "--cert",
+      ".build\\c3-tls-records-20261007\\trust\\server.pem",
+      "--key",
+      ".build\\c3-tls-records-20261007\\trust\\server.key",
+      "--seconds",
+      "75",
+      "--output",
+      ".build\\c3-rx-window-20261007\\physical-lab-static"
+    ]
+  },
+  {
+    "name": "restore-after-labs",
+    "code": 0,
+    "seconds": 25.0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware/development/esp32c3-idf-6.1-compact-icy-quiet/app.bin",
+      "--output",
+      ".build\\c3-rx-window-20261007\\restore-after-labs.json"
+    ]
+  },
+  {
+    "name": "final-board",
+    "code": 0,
+    "seconds": 16.781999999991967,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build\\c3-rx-window-20261007\\final-board.py"
+    ]
+  }
+]
