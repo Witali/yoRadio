@@ -1,0 +1,143 @@
+{
+  "board": {
+    "version": "v0.9.693-1223-g34a31c42-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "8ea0fdc7af0f8b0bd6ceb3c5bacabf170bf819bbad25a7cb60934cb9fc1b9d4c"
+  },
+  "note": "Descriptive metrics preserve every original acceptance result; core fallback is not HE-AAC qualification.",
+  "cases": [
+    {
+      "name": "stress-mp3-48000-2ch-16bit-65s",
+      "acceptance": "FAIL",
+      "reason": "Progressive heap loss during continuous playback",
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "MP3 48 kHz stereo",
+        "connected"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 57.61,
+      "peak_busy": 59.8,
+      "minimum_heap": 53296.0,
+      "minimum_largest": 36864.0,
+      "initial_heap_median": 70956.0,
+      "final_heap_median": 56824.0,
+      "audio_wall_ratio": 1.0017974835230676
+    },
+    {
+      "name": "stress-flac-48000-2ch-16bit-65s",
+      "acceptance": "PASS",
+      "reason": null,
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "FLAC",
+        "FLAC 48 kHz stereo"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 60.6,
+      "peak_busy": 61.9,
+      "minimum_heap": 45452.0,
+      "minimum_largest": 27648.0,
+      "initial_heap_median": 45456.0,
+      "final_heap_median": 45460.0,
+      "audio_wall_ratio": 1.0015553936721073
+    },
+    {
+      "name": "stress-vorbis-48000-2ch-16bit-65s",
+      "acceptance": "FAIL",
+      "reason": "Progressive heap loss during continuous playback",
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "OGG",
+        "OGG 48 kHz stereo"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 69.72,
+      "peak_busy": 73.3,
+      "minimum_heap": 39868.0,
+      "minimum_largest": 27648.0,
+      "initial_heap_median": 54004.0,
+      "final_heap_median": 39880.0,
+      "audio_wall_ratio": 1.0015571348718357
+    },
+    {
+      "name": "stress-opus-48000-2ch-16bit-65s",
+      "acceptance": "FAIL",
+      "reason": "Progressive heap loss during continuous playback",
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "OGG 48 kHz stereo"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 77.66,
+      "peak_busy": 80.2,
+      "minimum_heap": 50856.0,
+      "minimum_largest": 34816.0,
+      "initial_heap_median": 59664.0,
+      "final_heap_median": 52628.0,
+      "audio_wall_ratio": 1.0017960486928756
+    },
+    {
+      "name": "lc-48000-stereo",
+      "acceptance": "FAIL",
+      "reason": "Progressive heap loss during continuous playback",
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "AAC PCM 48 kHz stereo",
+        "connected"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 43.45,
+      "peak_busy": 45.1,
+      "minimum_heap": 42560.0,
+      "minimum_largest": 30720.0,
+      "initial_heap_median": 51392.0,
+      "final_heap_median": 46100.0,
+      "audio_wall_ratio": 1.0016384271099745
+    },
+    {
+      "name": "he-48000-stereo",
+      "acceptance": "FAIL",
+      "reason": "Wrong decoded rate/channels/profile",
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "AAC PCM 24 kHz stereo",
+        "connected"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 31.6,
+      "peak_busy": 32.7,
+      "minimum_heap": 51520.0,
+      "minimum_largest": 32768.0,
+      "initial_heap_median": 51520.0,
+      "final_heap_median": 51520.0,
+      "audio_wall_ratio": 1.0016714422158548
+    },
+    {
+      "name": "hev2-44100-stereo",
+      "acceptance": "FAIL",
+      "reason": "Wrong decoded rate/channels/profile",
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "AAC PCM 22.05 kHz mono",
+        "connected"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 26.94,
+      "peak_busy": 27.7,
+      "minimum_heap": 51776.0,
+      "minimum_largest": 32768.0,
+      "initial_heap_median": 51776.0,
+      "final_heap_median": 51776.0,
+      "audio_wall_ratio": 1.0015977631316157
+    }
+  ]
+}

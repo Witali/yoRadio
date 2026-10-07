@@ -1,0 +1,103 @@
+{
+  "board": {
+    "version": "v0.9.693-1226-g2391a777-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "53e60ccb41eb3a25d0869fcc4d8c7cb095fa9bb2273a8ec796f9c950376cf80f"
+  },
+  "note": "Descriptive metrics preserve every original acceptance result; core fallback is not HE-AAC qualification.",
+  "cases": [
+    {
+      "name": "stress-mp3-48000-2ch-16bit-65s",
+      "acceptance": "FAIL",
+      "reason": "Progressive heap loss during continuous playback",
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "MP3 48 kHz stereo"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 57.77,
+      "peak_busy": 59.8,
+      "minimum_heap": 52556.0,
+      "minimum_largest": 36864.0,
+      "initial_heap_median": 70208.0,
+      "final_heap_median": 56076.0,
+      "audio_wall_ratio": 1.0017974835230676
+    },
+    {
+      "name": "stress-flac-48000-2ch-16bit-65s",
+      "acceptance": "PASS",
+      "reason": null,
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "FLAC",
+        "FLAC 48 kHz stereo"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 60.5,
+      "peak_busy": 62.2,
+      "minimum_heap": 41732.0,
+      "minimum_largest": 26624.0,
+      "initial_heap_median": 44728.0,
+      "final_heap_median": 43496.0,
+      "audio_wall_ratio": 1.001575113211262
+    },
+    {
+      "name": "stress-vorbis-48000-2ch-16bit-65s",
+      "acceptance": "FAIL",
+      "reason": "Progressive heap loss during continuous playback",
+      "cpu_windows": 10,
+      "decoder_windows": 11,
+      "observed_formats": [
+        "OGG",
+        "OGG 48 kHz stereo"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 70.36,
+      "peak_busy": 73.3,
+      "minimum_heap": 41512.0,
+      "minimum_largest": 24576.0,
+      "initial_heap_median": 50340.0,
+      "final_heap_median": 43268.0,
+      "audio_wall_ratio": 1.001761586517507
+    },
+    {
+      "name": "stress-opus-48000-2ch-16bit-65s",
+      "acceptance": "FAIL",
+      "reason": "Progressive heap loss during continuous playback",
+      "cpu_windows": 10,
+      "decoder_windows": 10,
+      "observed_formats": [
+        "OGG 48 kHz stereo"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 77.64,
+      "peak_busy": 80.9,
+      "minimum_heap": 48868.0,
+      "minimum_largest": 32768.0,
+      "initial_heap_median": 61236.0,
+      "final_heap_median": 54168.0,
+      "audio_wall_ratio": 1.00177605715312
+    },
+    {
+      "name": "lc-48000-stereo",
+      "acceptance": "FAIL",
+      "reason": "Progressive heap loss during continuous playback",
+      "cpu_windows": 10,
+      "decoder_windows": 11,
+      "observed_formats": [
+        "AAC PCM 48 kHz stereo"
+      ],
+      "warmup_excluded_seconds": 10,
+      "mean_busy": 44.09,
+      "peak_busy": 45.2,
+      "minimum_heap": 47648.0,
+      "minimum_largest": 30720.0,
+      "initial_heap_median": 51184.0,
+      "final_heap_median": 47652.0,
+      "audio_wall_ratio": 1.0015984015984016
+    }
+  ]
+}

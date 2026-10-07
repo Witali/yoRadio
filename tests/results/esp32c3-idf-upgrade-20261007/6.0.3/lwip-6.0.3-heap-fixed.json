@@ -1,0 +1,55 @@
+{
+  "lwip_commit": "c6f2f878e7b0f86033214b85547d579be43351e3",
+  "allocator": "heap",
+  "patched": true,
+  "sources": {
+    "tests/lwip-half-close/case.c": "4c2ac1517c75e895b194480f3c97c3adb33ff07fb08fd66d8c5990d95595fa0e",
+    "tests/lwip-half-close/lwipopts.h": "d702da94b3e59c1d1f4b564fef8eb194f534638844c09cf95062fd3336175505",
+    "tools/patch_lwip_timewait.py": "759116c08d8221e14c6697894e6012485aed48a89fd9ec20e395b9dcf92988ee",
+    "idf/esp32c3-oled-native/main/tcp_pcb_pool.c": "971e826b6753db9ee21e8031f6550c0eaf3ed8f0992621b3e048440550a72e87"
+  },
+  "cases": [
+    {
+      "name": "reap",
+      "result": "PASS",
+      "returncode": 0,
+      "stdout": "PASS: reap response/data/EOF/ownership and no retained TCP PCBs\n",
+      "stderr": ""
+    },
+    {
+      "name": "reap-unread",
+      "result": "PASS",
+      "returncode": 0,
+      "stdout": "PASS: reap-unread response/data/EOF/ownership and no retained TCP PCBs\n",
+      "stderr": ""
+    },
+    {
+      "name": "expire",
+      "result": "PASS",
+      "returncode": 0,
+      "stdout": "PASS: expire response/data/EOF/ownership and no retained TCP PCBs\n",
+      "stderr": ""
+    },
+    {
+      "name": "expire-unread",
+      "result": "PASS",
+      "returncode": 0,
+      "stdout": "PASS: expire-unread response/data/EOF/ownership and no retained TCP PCBs\n",
+      "stderr": ""
+    },
+    {
+      "name": "lastack",
+      "result": "PASS",
+      "returncode": 0,
+      "stdout": "PASS: lastack response/data/EOF/ownership and no retained TCP PCBs\n",
+      "stderr": ""
+    },
+    {
+      "name": "full",
+      "result": "PASS",
+      "returncode": 0,
+      "stdout": "PASS: full response/data/EOF/ownership and no retained TCP PCBs\n",
+      "stderr": ""
+    }
+  ]
+}

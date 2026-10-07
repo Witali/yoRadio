@@ -59,9 +59,9 @@ a physical full-flash/bootloader migration.
 
 ## Execution status
 
-In progress: matched 6.0.2 controls and remaining 6.0.3 hardware checks.
-Separate 6.1 builds and host/QEMU tests are being prepared in parallel;
-6.1 has not yet been installed on the board.
+The 6.0.3 hardware sequence and matched 6.0.2 controls are complete, with
+the failures detailed below. Separate 6.1 builds and host/QEMU tests are
+complete; the next stage is physical 6.1 qualification.
 A planned check is not a passed check.
 
 ### Controls and completed 6.0.3 checks
@@ -119,7 +119,11 @@ transport timeout. Its nine failures were exactly the three HE-AAC fixtures
 in each of the three cycles. Settled heap medians after each cycle were
 120,148/120,692/120,692 B, largest block 69,632 B, and 17 tasks throughout.
 The suite remains failed on formats; its later heap acceptance function is
-not reached when format failures exist. The matched old-SDK control is pending.
+not reached when format failures exist. The matched 6.0.2 run also completed
+33 changes, with exactly the same nine HE-AAC format failures and no transport
+timeout. Its settled heap medians were 121,152/121,196/121,196 B, largest
+block 69,632 B, and 17 tasks throughout. The original 6.0.3 timeout remains
+recorded as an intermittent failure; it was not reproduced by the repeat.
 
 The 60-second controlled load runs used identical fixed fixtures and concurrent
 WebUI requests. CPU has no acceptance ceiling. These descriptive metrics exclude
@@ -136,7 +140,23 @@ the first ten seconds and do not override the original failures:
 Both HE-AAC load inputs failed full-format acceptance; their core-fallback CPU
 measurements must not be presented as full HE-AAC decoding performance. All
 seven post-Stop heap-recovery checks passed. A matching 6.0.2 profiling build
-has been saved to investigate whether the memory failures precede the upgrade.
+was then installed and tested with the same five non-HE fixtures, order and
+HTTP polling interval. All five acceptance results matched 6.0.3, and all five
+post-Stop recovery checks passed. The four continuous-playback heap failures
+therefore predate the SDK update.
+
+| Codec | Mean CPU, 6.0.2 / 6.0.3 | Minimum heap, 6.0.2 / 6.0.3 | Acceptance in both |
+| --- | ---: | ---: | --- |
+| MP3 | 57.77% / 57.61% | 52,556 / 53,296 B | Progressive heap loss |
+| Custom FLAC | 60.50% / 60.60% | 41,732 / 45,452 B | Pass |
+| Vorbis | 70.36% / 69.72% | 41,512 / 39,868 B | Progressive heap loss |
+| Opus | 77.64% / 77.66% | 48,868 / 50,856 B | Progressive heap loss |
+| AAC-LC | 44.09% / 43.45% | 47,648 / 42,560 B | Progressive heap loss |
+
+Audio/wall duration ratios were 1.0016–1.0018 in both runs. CPU differences
+were at most 0.64 percentage points. These are single sequential Wi-Fi runs,
+not randomized timing trials; heap minima also depend on network allocation
+state. The table does not turn a failed memory gate into a pass.
 
 All truncated-FLAC checks passed, including natural cleanup and subsequent
 AAC/FLAC playback. The station-availability suite passed configured 3/10-second
@@ -178,8 +198,32 @@ duplicate lengths returned 400. A non-numeric probe ended with a connection
 reset whose phase was not retained, so that original run remains failed.
 The header-test client was corrected to stop after the complete response
 header, avoiding an unnecessary error-page read; a reset before receiving
-the header still fails. Three local transport tests pass. A physical recheck
-on 6.0.3 remains pending.
+the header still fails. Three local transport tests pass. The physical 6.0.3
+recheck passed all five rejection cases and restoration/settings verification.
+
+The quiet-production HTTPS check passed AAC-LC 128 kbit/s and MP3 256 kbit/s.
+The 64/32 kbit/s HE-AAC sources were independently probed as 44.1 kHz stereo,
+but the board produced 22.05 kHz stereo PCM. The 16 kbit/s HE-AACv2 source
+was 32 kHz stereo; observed PCM was 16 kHz mono before a timeout. These are
+actual output-format differences, not merely a station-name/display mismatch.
+Restoration and settings checks passed. This quiet-image test does not
+provide profiling counters or qualify heap/CPU/acoustic continuity.
+
+### Why these HE-AAC failures coexist with earlier fixes
+
+The [main integration](ESP32C3_MAIN_INTEGRATION_20261007.md) includes the AAC
+repairs but leaves compact SBR, high-history, scoped low-QMF and asymmetric
+storage opt-in. The SDK comparison deliberately retains those main defaults:
+`CONFIG_YORADIO_AAC_PLUS=y`, but `CONFIG_YORADIO_AAC_COMPACT_SBR` is off.
+Profiling captures failed original 55,128-byte SBR allocations. The vendor
+path can return core-only PCM when SBR storage cannot be allocated.
+
+Earlier full-rate HE-AAC results, including the ten-minute HE-AACv2 run,
+belong to different experimental configurations. Their implementation and
+evidence are retained; successful decoder/PCM work was not undone by the SDK
+upgrade. This migration's default-build failures must not be generalized to
+all compact variants, or presented as a new 22 kHz limit. Compact AAC is not
+silently enabled during the SDK comparison.
 
 ### 6.0.3 lwIP source audit
 
@@ -233,3 +277,8 @@ The 6.1 preparation repeats passed all 243 Node cases. The Python run covers
 and no skips. The subsequent HTTP-header client repair adds two passing local
 cases; original reports are retained separately. Vorbis raw-packet PCM in
 6.1 QEMU matches 6.0.3 byte for byte, and all seven output/retry cases pass.
+All 210 Vorbis lifecycle cases pass, including the 100-cycle baseline and
+209 handled fault cases. AAC format/guard/calibration checks pass, as do
+the MP3/FLAC/Vorbis/Opus archive calibration runs. As with 6.0.3, the AAC and
+archive calibration markers qualify byte counts and formats, not every PCM
+sample or physical DMA continuity.
