@@ -424,7 +424,7 @@ Wait for setup to finish. The first run downloads several components and may tak
 a while, depending on your connection and computer. It installs:
 
 - Python 3.12.10;
-- ESP-IDF v6.0.2;
+- ESP-IDF at the [version pinned by this repository](../idf/esp32c3-oled-native/idf-version.txt);
 - the ESP32-C3 compiler, CMake, Ninja and flashing tools;
 - the pinned Espressif audio decoder libraries.
 

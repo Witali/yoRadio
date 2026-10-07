@@ -169,7 +169,8 @@ The same scripts can be run directly from this directory:
 downloads into the repository-local ignored `.idf` directory:
 
 - portable CPython 3.12.10, verified by SHA-256;
-- official ESP-IDF v6.0.2 and its pinned submodules;
+- official ESP-IDF at the version in [idf-version.txt](idf-version.txt), with its
+  pinned submodules;
 - the ESP32-C3 RISC-V compiler, CMake, Ninja, esptool and IDF Python packages;
 - official Espressif `esp_audio_codec` at commit
   `67b8d0e98f58c774b8652480893037273190e8dc`, including native ESP32-C3
