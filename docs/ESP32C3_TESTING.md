@@ -498,8 +498,9 @@ The firmware path verifies image identity; this command does not flash it. The
 default manifest uses official public SomaFM AAC and MP3 HTTPS links. Before each
 case, FFprobe validates TLS and identifies the live codec/profile/rate/channels.
 The board must match the full decoded PCM layout, retain playback, answer REST
-requests within two seconds and publish matching WebSocket state. Existing CPU
-and heap budgets apply; serial panics, decoder/allocation errors, unexpected
+requests within two seconds and publish matching WebSocket state. CPU is
+informational unless an explicit ceiling is supplied; heap gates apply. Serial
+panics, decoder/allocation errors, unexpected
 reboots and persistent idle heap loss fail the test. At exit it reboots to the
 saved station and compares Wi-Fi, playlist and settings in memory.
 
@@ -512,6 +513,34 @@ No broadcast audio, titles or private board settings are saved. Streams and
 their encoding may change; this short live-radio test does not replace the
 controlled HTTPS fixture matrix, PCM comparisons, physical listening or one-hour
 soaks. A server/probe failure remains a failed case, not a board playback pass.
+
+For implicit AAC, FFprobe's `HE-AACv2` label alone does not establish actual PS.
+[FFmpeg 8.1.1's AAC parser](https://github.com/FFmpeg/FFmpeg/blob/n8.1.1/libavcodec/aac/aacdec.c#L1851-L1865)
+can assume PS/stereo when first discovering SBR on a mono stream. Use
+`--aac-reference-command .build/faad-reference-command.json` to resolve this
+with the independent `faad_history_probe.c` executable from the pinned
+FAAD comparison build. Scope `0` disables all history quantization. Example
+JSON argv for a native Linux build:
+
+```json
+["/absolute/path/to/probe-float", "{input}", "0", "1", "1"]
+```
+
+For a Linux probe used from Windows/WSL:
+
+```json
+["wsl.exe", "--exec", "/absolute/linux/path/to/probe-float", "{input_wsl}", "0", "1", "1"]
+```
+
+The runner also needs FFmpeg. It temporarily captures five seconds of the
+same HTTPS source without transcoding, requires complete ADTS frames and a
+successful independent decode, and retains only hashes and statistics. It
+checks source channels separately from PCM channels; HE mono may produce two
+identical PCM channels. Actual PS still requires the HE-AACv2 label. Missing,
+silent, truncated or quantized reference output fails the test. A short source
+observation cannot guarantee that a live station never changes its format.
+Without this option the original strict FFprobe comparison remains in force;
+an ambiguous result must be investigated, not silently accepted as playback.
 The [2026-10-01 physical results](ESP32C3_PUBLIC_HTTPS_20261001.md) retain LC/MP3
 passes and HE/v2 allocation failures under both HTTPS and HTTP load.
 The [dynamic TLS follow-up](ESP32C3_TLS_DYNAMIC_20261001.md) uses the same

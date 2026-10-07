@@ -153,6 +153,7 @@ def matches(state, spec):
             and state.get('pcm_channels') == spec['channels']
             and state.get('bits_per_sample') == spec['bits']
             and state.get('format', '').startswith(spec['label'])
+            and ('source_channels' not in spec or state.get('channels') == spec['source_channels'])
             and not state.get('channels_are_core', False))
 
 

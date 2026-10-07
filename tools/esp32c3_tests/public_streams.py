@@ -54,7 +54,7 @@ def probe_spec(value):
                 label='MP3' if codec == 'mp3' else labels[profile])
 
 
-def probe(url, ffprobe):
+def probe(url, ffprobe, aac_reference_command=None):
     command = [ffprobe, '-v', 'error', '-rw_timeout', '15000000',
                '-analyzeduration', '3000000', '-probesize', '131072',
                '-tls_verify', '1', '-select_streams', 'a', '-show_entries',
@@ -64,6 +64,10 @@ def probe(url, ffprobe):
     # Do not retain arbitrary server metadata or ffprobe error text.
     require(result.returncode == 0, 'FFprobe could not verify/decode the HTTPS source')
     spec = probe_spec(json.loads(result.stdout))
+    if spec['codec'] == 'aac' and aac_reference_command is not None:
+        from aac_reference import probe_aac
+        reference = probe_aac(public_url(url), spec, aac_reference_command)
+        return dict(reference, tls_verify=True)
     return dict(spec=spec, tls_verify=True)
 
 
@@ -106,6 +110,8 @@ def main():
     parser.add_argument('--transport', choices=('https', 'http'), default='https',
                         help='HTTP is an explicit same-origin memory/CPU comparison')
     parser.add_argument('--ffprobe', default='ffprobe')
+    parser.add_argument('--aac-reference-command', type=Path,
+                        help='JSON argv for unquantized FAAD history probe; use {input} or {input_wsl}')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     require(args.seconds >= 45 and .05 <= args.interval <= 1,
@@ -143,7 +149,9 @@ def main():
         return dict(samples=baseline)
 
     def play(name):
-        reference = probe(urls[name], args.ffprobe)
+        reference = probe(urls[name], args.ffprobe,
+                          json.loads(args.aac_reference_command.read_text())
+                          if args.aac_reference_command else None)
         report.data.setdefault('reference_probes', {})[name] = reference
         report.save()
         board.stop()

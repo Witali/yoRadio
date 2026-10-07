@@ -471,3 +471,23 @@ two PCM channels. Comparing its PCM against the native-history control is
 required before attributing this to compact storage or changing its label.
 Broadcast audio and raw PCM stay outside tracked results; retain hashes and
 derived statistics only.
+
+The independent follow-up resolves this case as **HE-AAC mono**, not lost PS.
+The native-history control also produces duplicated mono. Unquantized FAAD
+decodes all 188 frames at 32 kHz with one channel and zero PS frames; FFmpeg's
+385,024 stereo pairs are identical. FFprobe's HEv2 classification is the
+[implicit-mono heuristic in its AAC parser](https://github.com/FFmpeg/FFmpeg/blob/n8.1.1/libavcodec/aac/aacdec.c#L1851-L1865).
+The new PC19/native comparison covers 770,048 channel samples: 88 changed,
+maximum 2 LSB, RMS 0.012379 LSB, zero above 3 LSB. No samples are skipped.
+This agrees with the earlier mono identification in the October 4 metadata
+report and does not constitute a new PS decoder defect.
+
+The public-stream runner now optionally resolves AAC profile/source channels
+using a fresh complete HTTPS capture and the independent FAAD probe. It retains
+the original FFprobe result and requires actual PS evidence for HEv2. The
+initial format failure remains unchanged in its historical report. The added
+reference tests pass, along with the 19 acceptance and six load-window tests.
+A fresh five-second source check again decodes all 79 frames as HE mono with
+zero PS frames. The TCP-pool-only follow-up still fails HTTPS HE64's SBR
+allocation (32,744 requested, largest block 21,504 B); dynamic TLS is evaluated
+separately while keeping 16 KiB receive capacity and certificate verification.
