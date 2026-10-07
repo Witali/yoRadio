@@ -443,6 +443,11 @@ an acceptable implementation of this optimization.
 
 ## Implementation
 
+- [ ] Evaluate a bounded startup RX packet pool using the audited netif copy
+  boundary: [allocation analysis and acceptance plan](ESP32C3_NETWORK_PACKET_POOL_PLAN.md).
+  Replace identified packet allocations, preserve refcount/free ownership and
+  reserve control-traffic capacity. Measure occupied pool bytes as well as the
+  main heap; a flat heap alone is not a RAM saving or proof of no exhaustion.
 - [ ] Keep the 16 KiB TLS receive buffer and 4 KiB transmit buffer allocated
   for the lifetime of one HTTPS connection instead of reallocating them for
   every TLS record.
