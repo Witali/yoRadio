@@ -1,5 +1,6 @@
 """Actual TLS/HTTP roundtrip; assert encrypted record lengths and exact audio."""
 import hashlib
+import copy
 from pathlib import Path
 import socket
 import ssl
@@ -10,6 +11,8 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools'))
 from audio_test_server.record_test_ca import generate
 from audio_test_server.tls_records import RecordServer
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools/esp32c3_tests'))
+from tls_records import record_evidence
 
 
 class RecordTests(unittest.TestCase):
@@ -53,6 +56,17 @@ class RecordTests(unittest.TestCase):
                 self.assertTrue(all(r['type'] == 23 for r in body))
                 writes = [w for w in event['writes'] if w['phase'].startswith('body-')]
                 self.assertEqual([w['plaintext_bytes']+24 for w in writes], [r['wire_payload_bytes'] for r in body])
+                self.assertEqual(set(record_evidence([event], mode)['record_counts']), expected)
+                with self.assertRaises(AssertionError):
+                    record_evidence([event, event], mode)
+                broken = copy.deepcopy(event)
+                next(r for r in broken['records'] if r['phase'].startswith('body-'))['wire_payload_bytes'] += 1
+                with self.assertRaises(AssertionError):
+                    record_evidence([broken], mode)
+                broken = copy.deepcopy(event)
+                broken['dropped_records'] = 1
+                with self.assertRaises(AssertionError):
+                    record_evidence([broken], mode)
 
     def test_normal_trust_rejects_ephemeral_ca(self):
         with RecordServer('127.0.0.1', 0, self.specs, self.keys['cert'], self.keys['key'], seconds=1, grow_seconds=0) as server:

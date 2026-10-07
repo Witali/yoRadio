@@ -68,6 +68,10 @@ checks actual encrypted record lengths (1048 and 16,408 bytes for this cipher),
 exact audio bytes across repeated fixtures, and rejection with ordinary trust.
 Host writes are not proof of bytes received or decoded by a board.
 
+The 16 KiB plaintext bound follows [RFC 5246 §6.2.1](https://www.rfc-editor.org/rfc/rfc5246#section-6.2.1).
+The test measures the encrypted lengths too; the TLS 1.2 GCM record construction
+is specified in [RFC 5288 §3](https://www.rfc-editor.org/rfc/rfc5288#section-3).
+
 For FLAC depth and stereo-mode qualification:
 
 ```powershell

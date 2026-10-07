@@ -847,6 +847,28 @@ failed heap gates, with exact firmware/config identities.
 
 ## CPU diagnostics without a separate profiler stack
 
+### Controlled TLS record growth
+
+`tools/esp32c3_tests/tls_records.py` checks full-rate AAC with 1 KiB and 16 KiB
+TLS plaintext records, including growth after the decoder has started. Use only
+an awake profiling image whose manifest explicitly sets `laboratory_only: true`
+and `extra_trust_ca_sha256` to the generated local CA hash. The image must keep
+the complete normal certificate bundle and full 16 KiB input capacity; only a
+dedicated lab image adds the temporary CA. Restore a normal image afterwards.
+
+```powershell
+python tools/esp32c3_tests/tls_records.py --board http://BOARD_IP --host PC_IP --serial-port COM9 --firmware firmware/development/LAB_VARIANT/app.bin --ca .build/record-ca/ca.pem --cert .build/record-ca/server.pem --key .build/record-ca/server.key --output .build/record-test-run
+```
+
+The default four modes run for 75 seconds each, with frequent WebUI polling,
+CPU/heap evidence, idle recovery and saved-settings checks. `--mode grow` limits
+the requested scope. The runner verifies exact generated TLS record lengths
+and rejects retries or truncated record evidence. For the growth case it also
+requires full-rate PCM before the first large record. A server-side successful
+write alone cannot pass the playback check. Original memory-gate failures must
+be retained. The [shared server guide](../tools/audio_test_server/README.md#full-sized-tls-record-tests)
+documents certificates and host-side byte/record checks.
+
 For new public-stream reports, use
 `python tools/esp32c3_tests/summarize_public_windows.py --input <results> --output <summary.json>`.
 It clips every CPU window to the recorded station start/end. Short failed runs
