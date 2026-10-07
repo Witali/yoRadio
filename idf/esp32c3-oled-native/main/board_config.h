@@ -37,8 +37,9 @@
 // ESP-IDF stack sizes are expressed in bytes.
 #define BOARD_TASK_STACK_DISPLAY 4096
 #ifdef CONFIG_YORADIO_COMPACT_SERVICE_STACKS
-// Development profile, based on physical high-water measurements. Preserve the
-// shared 16 KiB decoder stack (Opus needs it); qualify services under OTA/load.
+// Board RAM profile, based on physical high-water measurements. Preserve the
+// shared 16 KiB decoder stack (Opus needs it); recheck services under OTA/load
+// whenever these sizes or their call paths change.
 #define BOARD_TASK_STACK_BOOT_BUTTON 2048
 #define BOARD_TASK_STACK_AUDIO_OUTPUT 2048
 #define BOARD_TASK_STACK_WEBSOCKET_STATUS 4096
@@ -55,4 +56,3 @@
 #define BOARD_TASK_STACK_WEB_STATIC 4096
 #define BOARD_TASK_STACK_WIFI_REBOOT 2048
 #define BOARD_TASK_STACK_TIME_SYNC 2048
-

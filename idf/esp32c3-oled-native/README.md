@@ -41,6 +41,14 @@ uncompacted builds can fail the larger allocation and output only the AAC core.
 See the [compact profile evidence](../../docs/ESP32C3_AAC_PC19_NETWORK_20261004.md)
 and [current SDK qualification](../../docs/ESP32C3_IDF_UPGRADE_20261007.md).
 
+The default system RAM profile also uses the measured smaller BOOT, audio-output
+and WebSocket-status stacks (8,192 fewer requested bytes), plus 6 static Wi-Fi RX
+buffers and at most 16 dynamic RX and TX buffers each. This leaves room for the
+contiguous SBR allocation: enabling compact AAC alone still failed with a
+26,624-byte largest free block on the physical board. The shared decoder stack
+and full TLS record sizes are unchanged. The heap allocator keeps its original
+IRAM placement; the separate flash-allocator experiment is not enabled here.
+
 The optional [IRAM placement profiles](../../docs/ESP32C3_IRAM_REDUCTION_20261001.md)
 compare a 3584-byte conservative capacity saving with a 23392-byte saving using
 Flash Auto Suspend on the tested XMC-D chip. These use supported SDK placement

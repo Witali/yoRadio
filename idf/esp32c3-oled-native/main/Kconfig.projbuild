@@ -286,9 +286,10 @@ config YORADIO_COMPACT_SERVICE_STACKS
     bool "Use measured smaller BOOT, output and WebSocket task stacks"
     default n
     help
-        Development RAM profile. Saves 8192 requested stack bytes; keeps the
-        shared decoder's 16384-byte stack. Require all-codec and WebUI/OTA
-        stack/load measurements before enabling in the production profile.
+        Board RAM profile. Saves 8192 requested stack bytes; keeps the shared
+        decoder's 16384-byte stack. Selected by this board's sdkconfig.defaults
+        to leave contiguous heap for compact SBR. Repeat all-codec and WebUI/OTA
+        stack/load measurements when service stack sizes or call paths change.
 
 config YORADIO_CPU_PROFILE_HTTP
     bool "Sample runtime diagnostics in the existing HTTP task"
