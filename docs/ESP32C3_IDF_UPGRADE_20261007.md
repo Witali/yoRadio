@@ -62,8 +62,11 @@ a physical full-flash/bootloader migration.
 The original-default 6.0.3 sequence and matched 6.0.2 controls are complete,
 with the failures detailed below. Original-default 6.1 builds and host/QEMU
 tests also completed. The user then requested enabling the complete compact
-HE-AAC configuration by default. New 6.1 compact builds and qualification
-are in progress; saved original-default images remain separate controls.
+HE-AAC configuration by default. The compact code passes fresh PCM/ownership
+checks; the first physical profile exposed a fragmented-heap allocation failure.
+The corrected system RAM profile passes the isolated full-rate HE/HEv2 matrix,
+and all four firmware variants are built. Complete physical qualification is
+in progress; saved original-default images remain separate controls.
 A planned check is not a passed check.
 
 ### Controls and completed 6.0.3 checks
@@ -287,3 +290,131 @@ All 210 Vorbis lifecycle cases pass, including the 100-cycle baseline and
 the MP3/FLAC/Vorbis/Opus archive calibration runs. As with 6.0.3, the AAC and
 archive calibration markers qualify byte counts and formats, not every PCM
 sample or physical DMA continuity.
+
+### 6.1 compact defaults
+
+At the user's request, `362667c9` enables the complete PC19 compact-storage
+chain in fresh board configurations: compact SBR tables, high-QMF history,
+PC19 side metadata, smoothing history, scoped low-QMF workspace, asymmetric
+owner and late-SBR handling. AAC Plus remains enabled, including full-rate
+SBR and PS stereo. No new sample-rate limit or arithmetic change is introduced.
+Existing saved sdkconfigs retain their choices; use a fresh sdkconfig to adopt
+the defaults. The new `sdkconfig.aac-native.defaults` overlay provides an
+uncompacted AAC Plus control when applied after the board defaults.
+
+Both awake images pass the actual ELF type, linked-call and patch-provenance
+checks. The requested SBR owner decreases from 55,128 to 32,744 B: 22,384 B
+(40.6%). The adapter is 204 B, including the 160-byte high-history runtime;
+its 144-byte PC19 metadata must not be counted twice. These are allocation
+sizes, not a claim that all runtime free heap increases by exactly that amount.
+The decoder stack remains 16 KiB.
+
+Against the stock 6.1 production image, IRAM (54,784 B), static DRAM data
+(12,396 B), BSS (31,536 B) and linker heap capacity are unchanged. The compact
+application is 1,439,024 B, an increase of 20,192 B in flash. The new physical
+measurements use the `6.1-compact` label because both SDK and AAC configuration
+differ from the 6.0.3 stock control.
+
+#### PCM and ownership regression
+
+The new 6.1 QEMU capture is byte-identical to the retained passing PC19 output
+across all 865,280 transition/gap channel samples. Comparison with the retained
+full-precision native-storage reference gives:
+
+| Corpus | Channel samples | Changed samples | Maximum absolute error | RMS error |
+| --- | ---: | ---: | ---: | ---: |
+| LC to HEv2, absent/resumed SBR transition | 189,440 | 74 | 2 LSB | 0.02309 LSB |
+| Four SBR-gap cases | 675,840 | 834 | 2 LSB | 0.04208 LSB |
+
+There is no alignment, gain correction, resampling or discarded startup.
+Both remain below the requested 3-LSB acceptance limit. This is a pinned
+synthetic corpus, not a proof for every possible input or a physical PCM capture.
+The previous five-recording results remain separate historical evidence.
+The same run passes native metadata, PC19 side-metadata lifecycle, pointer
+boundaries, late-SBR parity/retention, concurrent decoders, reset/cleanup,
+four allocation-failure recoveries, four malformed-input recoveries and
+69,376 valid FIL-parser comparisons.
+The pointer audit executes 1,186,037 checks, with all 696 allocations matched
+by frees. Minimum sampled decoder stack margin is 2,824 B in this QEMU run.
+The ordinary-stream controller regression compares another 887,808 channel
+samples exactly against the unchanged controller using the same storage.
+
+All four physical variants build and are saved under
+`firmware/development/esp32c3-idf-6.1-compact-{production,profile,deep-sleep,rtc32k}`.
+Sleep and crystal variants receive compilation checks only in this stage.
+The fresh native-control configuration check confirms that its overlay disables
+all seven compact/late-SBR flags while leaving AAC Plus enabled.
+
+The compact-default Python repeat covers 118 scripts/656 cases: 115 scripts
+pass, with the same three missing historical-source failures and no skips.
+The additional two cases since the earlier full run are the already documented
+HTTP-header client tests. No new host-test failures were introduced.
+
+The first physical installation through native application-only OTA passed
+in 20.734 seconds. The running profile ELF hash is
+`5c63accef7c56a648633589e9d23fe45f39b46199960dad2c7291a97a2042ac8`.
+In-memory comparisons confirmed unchanged Wi-Fi, playlist and settings.
+Physical regression and sustained-load results are recorded below as they finish.
+
+#### Initial physical failure and RAM-profile follow-up
+
+The first `6.1-compact` profile retains the original board's system RAM
+settings. All six HE/HEv2 finite-file format checks fail with insufficient
+playing samples; captured status is `decode failed`. The two AAC transition
+checks also fail. This is a physical playback failure despite the passing
+isolated QEMU PCM/ownership tests, and it prevents sustained qualification of
+that initial profile. The complete original run is retained: 43 passes and
+14 failures (six format checks, two transitions, six HE/HEv2 EOF checks).
+Other-codec/LC EOF, network fault handling, WebSocket reconnect, untrusted TLS
+rejection, both boot checks and restoration pass.
+
+Passive serial evidence identifies the cause: the 32,744-byte SBR request
+fails with 48,296 B free but a largest block of only 26,624 B. Subsequent
+attempts reproduce the same largest-block limit and return decoder error -2
+(memory lack). Total free heap alone is insufficient for this allocation.
+
+The earlier passing PC19 network image also used smaller service stacks,
+6 static Wi-Fi RX buffers, 16 dynamic RX/TX buffers and a flash-resident heap
+allocator. Those system choices were absent from the initial compact defaults.
+A separate `6.1-compact-ram-profile` experiment applies the existing
+`sdkconfig.aac-reserve-ram.defaults` overlay: 8,192 B fewer requested service
+stack bytes and the 6/16/16 Wi-Fi buffer counts. It keeps the 16 KiB decoder
+stack, full TLS record sizes and allocator placement unchanged. This isolates
+whether the smaller system footprint suffices; its results must pass before
+these additional settings are promoted.
+
+The isolated RAM-profile check passes all ten cases: the three full-rate
+HE/HEv2 fixtures with AUTO and explicit AAC, both transition sequences,
+Stop/Play generation isolation and restoration. Passive serial capture has
+no allocation/decoder failure. After the first full HE frame, sampled free
+heap is approximately 25–29 KiB and largest blocks are 8.5–9.5 KiB. This fixes
+the initial SBR allocation, but is not yet a sustained HTTPS margin result.
+Commit `da361bc7` therefore makes the 6/16/16 buffers and measured service
+stacks part of fresh board defaults. The separate flash-heap option stays off.
+The subsequent complete test sequence uses the `6.1-compact-ram` label;
+its public HTTP/HTTPS checks precede load/soak tests to evaluate TLS headroom.
+
+Fresh default builds of production, deep-sleep, RTC32k and QEMU complete.
+The awake production image is 1,439,040 B, with ELF hash
+`a39e1f6d01b5a2956d871abeb5fb805886d174511151eef59a78fd0f57a64d0b`.
+Its linked type/call/patch audit passes. The saved profiling image was built
+with the identical RAM choices via the explicit overlay; all four physical
+configs pass a check of the complete AAC flags, buffer counts, full TLS records,
+and absence of QEMU/Auto-Suspend/flash-allocator options.
+
+The final QEMU repeat again matches all 865,280 retained PC19 PCM channel
+samples byte for byte, with maximum 2-LSB error against native full precision.
+The smaller service stacks do not change the shared decoder's stack size.
+The short physical RAM check records minimum free stacks of 2,664 B (decoder),
+1,204 B (audio output), 1,876 B (WebSocket status), 1,420 B (BOOT button) and
+4,444 B (HTTP); sustained/OTA margins still need their own measurements.
+For this compact stage the ten-minute soak targets HE-AACv2; AAC-LC remains
+in the 60-second all-codec load matrix. The earlier 6.0.3 LC ten-minute result
+is retained separately and is not substituted for the new HEv2 soak.
+
+Saved evidence is split into the
+[stock 6.1 controls](../tests/results/esp32c3-idf-upgrade-20261007/6.1/)
+and the [initial compact run](../tests/results/esp32c3-idf-upgrade-20261007/6.1-compact/).
+Their artifact indexes contain stored/original SHA-256 hashes. Large logs and
+JSON files use lossless gzip compression; temporary flash images and TLS keys
+are excluded. Final RAM-profile results are added separately after completion.
