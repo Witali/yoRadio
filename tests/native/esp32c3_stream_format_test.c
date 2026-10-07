@@ -9,6 +9,7 @@
 #include "audio_completion.h"
 #include "custom_flac_adapter.h"
 #include "custom_legacy_adapter.h"
+#include "pipeline_profile.h"
 
 #define CONFIG_YORADIO_FLAC_DECODER_CUSTOM 1
 #define YORADIO_CUSTOM_LEGACY_DECODER 1
@@ -242,7 +243,8 @@ int main(void) {
     assert(custom_legacy_output(&legacy, &info, pcm, 2048));
     format_status(json, sizeof(json));
     assert(strstr(json, "AAC-LC 11.025 kHz mono"));
-    assert(!send_pcm(1, &cached, pcm, sizeof(pcm)));
+    decode_stats_t cancelled_stats = {0};
+    assert(!send_pcm(&cancelled_stats, 1, &cached, pcm, sizeof(pcm)));
     puts("PASS: callbacks/PCM, format changes, WebUI keys/reconnect, OLED snapshots, AAC rates, stop/restart");
     return 0;
 }

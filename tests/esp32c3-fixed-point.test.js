@@ -6,12 +6,25 @@ const test = require("node:test");
 const root = path.resolve(__dirname, "..");
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8");
 
+// Comments and messages can describe floating-point reference decoders without
+// adding floating-point operations to the firmware.
+const codeOnly = (source) => source.replace(
+  /\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'/g,
+  " ",
+);
+
+test("integer-code guard distinguishes C tokens from comments and literals", () => {
+  assert.doesNotMatch(codeOnly('/* float */ int n; // double\nputs("float // double");'), /\b(?:float|double)\b/);
+  assert.match(codeOnly('/* integer */ double n = 0;'), /\bdouble\b/);
+  assert.match(codeOnly('puts("sqrtf()"); n = sqrtf(n);'), /\bsqrtf\s*\(/);
+});
+
 test("native ESP-IDF application code remains entirely integer based", () => {
   const main = path.join(root, "idf", "esp32c3-oled-native", "main");
   const sources = fs
     .readdirSync(main)
     .filter((name) => /\.[ch]$/.test(name))
-    .map((name) => fs.readFileSync(path.join(main, name), "utf8"))
+    .map((name) => codeOnly(fs.readFileSync(path.join(main, name), "utf8")))
     .join("\n");
 
   assert.doesNotMatch(sources, /\b(?:float|double|long double)\b/);

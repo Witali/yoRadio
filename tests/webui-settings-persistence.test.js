@@ -79,7 +79,8 @@ test("runtime settings use NVS and affect audio pipeline behavior", () => {
   assert.match(audio, /runtime_settings_get_audio_buffer_blocks\(\) \* 1600U/);
   assert.match(audio, /xRingbufferCreate\(encoded_ring_size/);
   assert.match(audio, /runtime_settings_get_watchdog\(\)/);
-  assert.match(audio, /STREAM_STALL_TIMEOUT_US/);
+  assert.match(audio, /runtime_settings_get_station_timeout_sec\(\)/);
+  assert.match(audio, /availability_timeout_us = \(int64_t\)retry\.timeout_sec \* 1000000/);
 });
 
 test("display settings are persisted and applied to SSD1306", () => {

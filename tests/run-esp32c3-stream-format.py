@@ -42,6 +42,8 @@ static inline void xSemaphoreGive(void *p) { (void)p; }
 size_t strlcpy(char *, const char *, size_t);
 """)
     (tmp / "freertos/semphr.h").write_text('#include "FreeRTOS.h"\n')
+    (tmp / "freertos/ringbuf.h").write_text('#include "FreeRTOS.h"\n')
+    (tmp / "sdkconfig.h").write_text("")
     audio = (MAIN / "audio_service.c").read_text()
     web = (MAIN / "websocket_service.c").read_text()
     app = (MAIN / "app_main.c").read_text()
@@ -56,6 +58,7 @@ size_t strlcpy(char *, const char *, size_t);
     generated += "\n".join(function(web, name) for name in (
         "json_escape", "format_status", "capture_status_key"))
     generated += function(app, "format_stream_details")
+    generated += function(app, "display_station_unavailable")
     generated += function(app, "display_state_changed")
     # Execute the actual Espressif decoded-frame branch, including get_info,
     # stats and send_pcm; a single-iteration loop preserves its error break.
