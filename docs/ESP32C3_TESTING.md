@@ -542,9 +542,19 @@ explicitly incomplete and is not an acceptance result. On normal completion,
 the final report records all gates, Stop recovery and reboot. For example:
 
 ```text
-python tools/esp32c3_tests/stream_memory_study.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --firmware firmware/development/esp32c3-output-first-rx-owner/app.bin --case hev2-44100-stereo --seconds 1800 --output NEW_DIRECTORY
+python tools/esp32c3_tests/stream_memory_study.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --firmware firmware/development/esp32c3-output-first-rx-owner/app.bin --case hev2-44100-stereo --seconds 600 --output NEW_DIRECTORY
+python tools/esp32c3_tests/summarize_stream_memory.py NEW_DIRECTORY --output SUMMARY.json
 python tests/test-stream-memory-study.py
+python tests/test-stream-memory-summary.py
 ```
+
+This ten-minute diagnostic is the shorter investigation requested on 7 October.
+It does not satisfy the one-hour soak criterion. The summarizer requires a
+completed study, preserves original failures, checks RX snapshot completeness
+and time coverage, and corrects aged network snapshots by their recorded age.
+It reports actual RX allocation capacity separately from inferred allocator
+headers and logical TCP receive credit. These asynchronous measurements cannot
+be subtracted as if they were one simultaneous heap snapshot.
 
 A diagnostic run identifies memory owners; its timing does not qualify the
 uninstrumented firmware. It also does not replace physical audio continuity
