@@ -1,0 +1,106 @@
+{
+  "board": {
+    "version": "v0.9.693-1237-gb05f95b5-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "8d301950de1684a4025559b94c6bcc02490e07687a57014f6a6a229789d24ab8"
+  },
+  "cases": [
+    {
+      "name": "hev2-44100-stereo",
+      "original": {
+        "name": "soak:hev2-44100-stereo",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "WebUI response exceeded 2 s",
+        "seconds": 601.656
+      },
+      "full_window": {
+        "start": 69080.281,
+        "end": 69670.875,
+        "seconds": 590.5939999999973,
+        "strict": {
+          "result": "FAIL",
+          "reason": "Runtime decoder/memory failure"
+        },
+        "cpu_samples": 107,
+        "decoder_windows": 118,
+        "malformed": [],
+        "diagnostic": {
+          "mean_busy": 56.98224299065421,
+          "peak_busy": 58.7,
+          "minimum_heap": 6060.0,
+          "minimum_largest": 1728.0,
+          "first_heap": 28716.0,
+          "last_heap": 11512.0,
+          "first_largest": 11776.0,
+          "last_largest": 3968.0,
+          "audio_wall_ratio": 1.001592677407507,
+          "decode_percent": 42.774557682883554
+        }
+      },
+      "runtime": {
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder/TLS failure"
+      },
+      "subwindows": [
+        {
+          "start": 69080.281,
+          "end": 69380.281,
+          "seconds": 300.0,
+          "strict": {
+            "result": "FAIL",
+            "reason": "Progressive heap loss during continuous playback"
+          },
+          "cpu_samples": 55,
+          "decoder_windows": 60,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 57.20727272727273,
+            "peak_busy": 58.7,
+            "minimum_heap": 13324.0,
+            "minimum_largest": 5632.0,
+            "first_heap": 28716.0,
+            "last_heap": 13388.0,
+            "first_largest": 11776.0,
+            "last_largest": 7680.0,
+            "audio_wall_ratio": 1.0016010971343356,
+            "decode_percent": 42.89963443004321
+          }
+        },
+        {
+          "start": 69380.281,
+          "end": 69670.875,
+          "seconds": 290.5939999999973,
+          "strict": {
+            "result": "FAIL",
+            "reason": "Runtime decoder/memory failure"
+          },
+          "cpu_samples": 52,
+          "decoder_windows": 58,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 56.74423076923077,
+            "peak_busy": 57.8,
+            "minimum_heap": 6060.0,
+            "minimum_largest": 1728.0,
+            "first_heap": 13388.0,
+            "last_heap": 11512.0,
+            "first_largest": 7680.0,
+            "last_largest": 3968.0,
+            "audio_wall_ratio": 1.0015839674942324,
+            "decode_percent": 42.645167944442534
+          }
+        }
+      ],
+      "status_samples": 542,
+      "max_http_ms": 3077.999999994063,
+      "minimum_rssi": -74
+    }
+  ],
+  "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+}

@@ -49,6 +49,13 @@ contiguous SBR allocation: enabling compact AAC alone still failed with a
 and full TLS record sizes are unchanged. The heap allocator keeps its original
 IRAM placement; the separate flash-allocator experiment is not enabled here.
 
+Compact storage does not by itself qualify every public stream. The ESP-IDF
+6.1 profiling tests still record HE allocation failures over HTTPS and network
+allocation failures for some public HTTP streams. Controlled local HE/HEv2
+playback passes at full rate; consult the current SDK report for the separate
+load, sustained-playback and quiet-production outcomes. Dynamic TLS buffers
+and the RTC TCP pool remain separate experiments, not board defaults.
+
 The optional [IRAM placement profiles](../../docs/ESP32C3_IRAM_REDUCTION_20261001.md)
 compare a 3584-byte conservative capacity saving with a 23392-byte saving using
 Flash Auto Suspend on the tested XMC-D chip. These use supported SDK placement

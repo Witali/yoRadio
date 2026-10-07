@@ -65,9 +65,12 @@ tests also completed. The user then requested enabling the complete compact
 HE-AAC configuration by default. The compact code passes fresh PCM/ownership
 checks; the first physical profile exposed a fragmented-heap allocation failure.
 The corrected system RAM profile passes the isolated full-rate HE/HEv2 matrix,
-and all four firmware variants are built. Complete physical qualification is
-in progress; saved original-default images remain separate controls.
-A planned check is not a passed check.
+and all four firmware variants are built. The physical sequence is complete,
+including a local backport of the HTTP length guard absent from the pinned 6.1
+source. Compact AAC is enabled in fresh board defaults on this branch, and the
+guarded awake production image is installed. Full release acceptance is **not
+met**: sustained heap/allocation failures and public HE HTTPS failures remain.
+Saved original-default images and every failed run remain separate controls.
 
 ### Controls and completed 6.0.3 checks
 
@@ -445,8 +448,9 @@ record actual allocation/decoder failures. The serial log includes a failed
 1,700-byte network allocation with 5,540 B free and a largest block of 1,344 B.
 SBR had already been allocated. This is a different failure from the initial
 32,744-byte SBR allocation and shows insufficient remaining network headroom.
-Idle recovery and settings restoration pass. The run is held before HTTPS;
-its failures are retained in the separate `6.1-compact-ram` evidence directory.
+Idle recovery and settings restoration pass. The run was initially held before
+HTTPS for the separate RAM experiments below, then resumed with the original
+RAM profile. Its failures are retained in the `6.1-compact-ram` evidence directory.
 
 The next diagnostic image, `6.1-compact-heap-profile`, moves the heap allocator
 to Flash using the SDK option. Relative to the RAM profile it frees 8,704 B of
@@ -530,3 +534,177 @@ Its ELF SHA-256 is
 `48fa2de4999bef83047c56ab9b010b6eba2bb176174773fa8a6b25857c9feae2`.
 The extra allocator/pool/TLS settings remain experimental; qualification of
 the selected compact defaults continues separately on the RAM profile.
+
+#### Selected-default load checks
+
+After restoring `6.1-compact-ram-profile`, the remaining HTTPS run retains
+failures for all three HE sources (SBR allocation), a progressive-heap-gate
+failure for LC, and a pass for MP3. Idle recovery and restoration pass.
+This does not prevent the independent local-source format/load measurements;
+it does prevent claiming complete public HTTPS acceptance for these defaults.
+
+The seven 60-second controlled-load cases then complete. No allocation,
+decoder, panic or watchdog marker is recorded during these playback windows.
+All seven settled post-Stop heap checks pass. Means below exclude the first
+ten seconds; the original gate outcomes remain unchanged:
+
+| Input | Mean CPU | Minimum free heap | Audio/wall duration | Load gate |
+| --- | ---: | ---: | ---: | --- |
+| MP3 48 kHz stereo | 57.9% | 64,592 B | 1.0017 | Progressive heap decline |
+| FLAC 48 kHz stereo | 60.9% | 55,448 B | 1.0015 | PASS |
+| Vorbis 48 kHz stereo | 70.7% | 53,504 B | 1.0016 | Progressive heap decline |
+| Opus 48 kHz stereo | 77.3% | 64,404 B | 1.0018 | Progressive heap decline |
+| AAC-LC 48 kHz stereo | 44.6% | 55,972 B | 1.0016 | PASS |
+| HE-AAC 48 kHz stereo | 60.8% | 29,136 B | 1.0016 | PASS |
+| HE-AACv2 44.1 kHz stereo | 64.8% | 29,444 B | 1.0014 | PASS |
+
+The three non-AAC heap-gate failures also occurred in the matched 6.0.2/6.0.3
+controls. Their CPU means differ from 6.0.3 by less than one percentage point
+in this sequential run; this is not a randomized speed comparison. LC improves
+from the earlier failed heap gate to a pass. HE and HEv2 now provide full-rate
+measurements where the original-default controls could not allocate SBR.
+Audio/wall progress is telemetry, not proof that every physical DMA sample
+was delivered without a gap.
+
+Sampled minimum free stacks in the complete load run are 2,656 B for the
+decoder, 1,212 B for audio output, 1,884 B for WebSocket status, 1,420 B for
+the BOOT button and 4,364 B for HTTP. The shared decoder retains its 16 KiB
+allocation; the large scoped QMF workspace does not move into a smaller stack.
+
+#### Selected-default switching and connection recovery
+
+All 15 FLAC truncation checks pass, including bounded EOF, subsequent LC/FLAC
+playback, runtime health and restoration. The station-switching suite completes
+all 33 changes across three cycles without a format failure; heap recovery and
+restoration also pass.
+
+Connection recovery passes for LC and full-rate HE-AACv2. Stop, switching,
+disabling pending retries, watchdog-off behavior, configured 3/10-second
+timeouts, stalled-stream timeout and settings persistence all pass. Runtime
+health and restoration pass too. The post-series largest-block gate fails:
+the idle median changes from 81,920 B to 69,632 B, a 12,288-byte reduction.
+Total free heap changes from 132,156 B to 130,660 B (1,496 B), with 17 tasks
+before and after. The free-heap gate passes; the largest-block gate does not.
+
+These measurements use the existing 12-second settled-idle observation. They
+do not identify a 12 KiB leak: block layout and still-live network allocations
+can affect contiguous space, and the cause is not established by this run.
+The matched 6.0.3 retry series lost 4,096 B of largest-block capacity and passed
+that gate, but failed HEv2 recovery and runtime health because SBR allocation
+failed. Preserve both outcomes; the new series is not an unconditional pass.
+
+#### Selected-default ten-minute HE-AACv2 run
+
+The 600-second local HEv2/44.1 kHz stereo run **fails**. The original runner
+reports a WebUI response above its two-second limit (maximum 3,078 ms).
+Full-window replay also fails the runtime-memory gate. Passive serial capture
+contains 45 failed 1,700-byte allocations; the first has 4,396 B free but only
+a 1,536-byte largest block. It occurs about 369 seconds into playback.
+The first five-minute subwindow already fails progressive heap decline;
+the second also contains allocation failures. Restoration/reboot passes.
+
+After the ten-second warm-up, mean CPU is 56.98%, peak 58.7%, and decoder time
+is 42.77% of reported audio duration. CPU is informational, without a percentage
+ceiling. Periodically sampled free heap falls from a 28,716-byte initial median
+to 11,512 B; its sampled minimum is 6,060 B (the allocation-failure callback
+captures lower transient values). Largest-block medians fall from 11,776 to
+3,968 B. Minimum RSSI is -74 dBm.
+
+The audio/wall ratio is 1.00159, but that counter cannot establish gap-free
+physical audio in the presence of allocation failures. No panic or watchdog
+marker is recorded. This is a sustained-memory limitation of the selected
+full-radio profiling configuration; the short passing HE load checks and
+QEMU PCM comparisons do not waive it. Quiet-production checks below evaluate
+a different workload and cannot replace this failed ten-minute result.
+Sampled minimum free stacks during the soak are 2,760 B for the decoder,
+1,120 B for audio output, 1,880 B for WebSocket status, 1,420 B for BOOT and
+4,444 B for HTTP. The recorded failures concern heap allocations, not a
+reported stack-overflow event.
+
+#### HTTP length guard retained across the SDK upgrade
+
+The initial quiet image passes all 14 OTA cases and all 29 local production
+checks (22 format selections, transitions, Stop/Play, WebSocket, two boots and
+restoration). Its malformed-header test records two failures: the two lengths
+above `UINT32_MAX` receive HTTP 400 instead of 413. The other three malformed
+headers and restoration pass. These original results are retained.
+
+Inspection of the pinned 6.1 source finds the old narrowing assignment in
+`esp_http_server/src/httpd_parse.c`; it lacks the bounds check present in 6.0.3.
+The 400 response alone does not prove rejection before truncation. The project
+therefore generates a local parser source with the exact 6.0.3 guard before
+conversion, including correct treatment of the no-body `ULLONG_MAX` sentinel.
+The shared SDK is untouched. Reviewed source fingerprints accept only the
+known 6.0.2/6.0.3/6.1 files after CRLF/LF normalization; an unknown change stops
+configuration. Already-fixed 6.0.3 source remains byte-identical.
+
+`tools/test_httpd_content_length.py` compiles the actual selected guard in a
+32-bit request-length harness under ASan/UBSan. All 33 guarded boundary cases
+pass (11 per SDK); each original 6.0.2/6.1 control fails four cases, including
+`UINT32_MAX` being mistaken for the sentinel and oversized lengths narrowing.
+Unknown-source rejection and both checkout line-ending forms also pass.
+The first C3 integration build exposed a missing private include path for the
+generated source; adding the original HTTP component's `src` path fixes the
+build without editing the SDK.
+
+The guarded production image is saved separately as
+`esp32c3-idf-6.1-compact-ram-http-production`: 1,439,072 B, ELF
+`7747cbbadf391666c1acf940e053e6081d9eac690befe13b70a9e4820faff998`.
+Its SDK configuration is byte-identical to the preceding quiet image, and the
+linked AAC audit again confirms the 32,744-byte owner, 204-byte adapter and
+all compact/late-SBR options. Original profiling CPU/heap and QEMU measurements
+remain results for their recorded images; they are not new measurements of
+this HTTP-only rebuild. The initial physical pipeline deliberately stops before
+quiet HTTPS so that the remaining check uses the guarded image.
+
+On the guarded image, all five malformed-header cases plus restoration pass,
+with the two oversized lengths returning 413. All 14 OTA checks pass again.
+The targeted production repeat passes all 13 checks: AUTO/explicit LC 48 kHz,
+HE 48 kHz and HEv2 44.1 kHz; changing formats, late SBR, Stop/Play, WebSocket,
+two boots and restoration. Wi-Fi, playlist and exposed settings are preserved.
+The profile, deep-sleep and RTC32k guarded variants also build and are saved
+separately. All four configurations match their corresponding original variants
+byte for byte, and compile commands confirm exactly one generated HTTP parser.
+The guarded profiling image is build/audit-only; it has no new physical soak.
+
+#### Final quiet HTTPS and board state
+
+The guarded quiet image passes 60-second HTTPS AAC-LC/128 and MP3/256 checks.
+HE stereo/64, HE stereo/32 and HE mono/16 all fail to produce PCM within the
+15-second startup budget. The independent reference resolves profile/channels
+before each run; the mono stream is not misclassified as a lost-PS defect.
+This production run observes status and WebSocket behavior at 0.4-second
+intervals; it supplies no CPU/heap trace identifying the exact allocation that
+fails. Its failures are consistent with the earlier profiling limitations,
+but the diagnostic allocation values must not be attributed to this image.
+Restoration passes; Wi-Fi, playlist and exposed settings are unchanged.
+
+The final independent read confirms ELF
+`7747cbbadf391666c1acf940e053e6081d9eac690befe13b70a9e4820faff998`
+in `app1`, with playback stopped and RSSI -69 dBm. The board uses the guarded
+awake production image; deep sleep and the external-crystal variant were only
+compiled. The branch remains separate from `main`.
+
+| Selected compact configuration check | Result |
+| --- | --- |
+| Full profiling format/EOF/network matrix | 56 PASS, one status-request timeout; separate EOF repeat 3 PASS |
+| Local 60-second HE and HEv2 load | Full rate, PASS; CPU approximately 61% / 65% |
+| Ten-minute HEv2 with profiling/WebUI | FAIL: allocation failures, heap decline and 3.078 s maximum HTTP response |
+| Station switching | All 33 changes PASS; restoration and heap checks PASS |
+| Retry/timeout suite | 14 PASS; one largest-block recovery failure |
+| Quiet local production matrix before HTTP backport | 29 PASS |
+| Guarded-image local AAC/transitions/WebSocket/boot repeat | 13 PASS |
+| Guarded-image malformed HTTP headers and restoration | 6 PASS |
+| Guarded-image OTA including restoration | 14 PASS |
+| Guarded-image public HTTPS | LC and MP3 PASS; three HE startup failures; restoration PASS |
+
+The remaining work is sustained network heap/contiguous-block headroom,
+including the retry-series largest-block loss, and successful HE HTTPS startup.
+These are not resolved by the measured 2-LSB PCM precision result. Do not infer
+gap-free audio from decoder counters, or call the entire SDK upgrade accepted.
+
+The [final compact evidence archive](../tests/results/esp32c3-idf-upgrade-20261007/6.1-compact-ram-final/)
+contains the original and guarded runs, boundary-test controls, exact build
+configs, per-image hashes, failure reasons and the final board read. Its summary
+retains original FAIL outcomes and distinguishes passing repeats. The earlier
+initial compact/RAM archives remain unchanged.
