@@ -59,7 +59,8 @@ def summarize(report, status, performance):
         start,end=window['started_at']+40,window['ended_at']
         rows=[r for r in performance if start<=r['at']<=end]
         item['observed_after_40_seconds']=observed_performance(rows)
-        try:item['after_40_seconds']=dict(result='PASS',**check_cpu(rows,start=start,end=end))
+        try:item['after_40_seconds']=dict(result='PASS',**check_cpu(rows,
+            max_busy=report.get('cpu_budget_percent',85),start=start,end=end))
         except Failure as error:item['after_40_seconds']=dict(result='FAIL',reason=str(error))
     result['scope']='One paced sequence with per-case Stop; no reboot between codecs; not a 100-switch or 30-minute soak qualification'
     return result

@@ -27,7 +27,7 @@ def gate(function):
         return dict(result='FAIL',reason=str(error))
 
 
-def window(rows,start,end):
+def window(rows,start,end,max_busy=85):
     subset=[r for r in rows if start <= r['at'] <= end]
     cpu=[];decode=[];malformed=[]
     for row in subset:
@@ -38,7 +38,7 @@ def window(rows,start,end):
             cpu.append(fields)
         match=re.search(r'PERF (?:AAC|MP3|FLAC|OGG): window (\d+) ms, audio (\d+) ms, decode (\d+) ms',row['line'])
         if match:decode.append(tuple(map(int,match.groups())))
-    result=dict(start=start,end=end,seconds=end-start,strict=gate(lambda:check_cpu(subset,start=start,end=end)),
+    result=dict(start=start,end=end,seconds=end-start,strict=gate(lambda:check_cpu(subset,max_busy=max_busy,start=start,end=end)),
         cpu_samples=len(cpu),decoder_windows=len(decode),malformed=malformed)
     if cpu and decode:
         result['diagnostic']=dict(mean_busy=statistics.mean(c['busy'] for c in cpu),
@@ -53,6 +53,7 @@ def window(rows,start,end):
 
 def summarize(folder):
     report,status,rows=(read(folder,n) for n in ('report.json','status.json','performance.json'))
+    budget=report.get('cpu_budget_percent',85)
     result=dict(board=report['board'],cases=[],note='Original outcomes retained. Diagnostic means do not override failed gates.')
     for batch in status:
         if not batch['case'].startswith(('load:','soak:')):continue
@@ -60,7 +61,7 @@ def summarize(folder):
         case_name=('cpu-under-http-load:' if kind=='load' else 'soak:')+name
         original=next(c for c in report['cases'] if c['name']==case_name)
         start,end=batch['started_at'],batch['ended_at']
-        item=dict(name=name,original=original,full_window=window(rows,start+10,end),
+        item=dict(name=name,original=original,full_window=window(rows,start+10,end,budget),
             runtime=gate(lambda:no_runtime_faults([r for r in rows if start <= r['at'] <= end])),subwindows=[],
             status_samples=len(batch['samples']),max_http_ms=max(s['request_ms'] for s in batch['samples']),
             minimum_rssi=min(s['rssi'] for s in batch['samples']))
@@ -68,7 +69,7 @@ def summarize(folder):
         cursor=start+10
         while end-cursor>=30:
             stop=min(cursor+300,end)
-            item['subwindows'].append(window(rows,cursor,stop));cursor=stop
+            item['subwindows'].append(window(rows,cursor,stop,budget));cursor=stop
     return result
 
 

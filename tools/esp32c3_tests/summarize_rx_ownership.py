@@ -28,7 +28,8 @@ def summarize(folder):
         selected = [r for r in records if start <= r['at'] <= end]
         item = result['phase_metrics'][name] = {}
         try:
-            item['cpu_and_heap'] = dict(result='PASS', **check_cpu(selected, start=start, end=end))
+            item['cpu_and_heap'] = dict(result='PASS', **check_cpu(selected,
+                max_busy=report.get('cpu_budget_percent', 85), start=start, end=end))
         except Failure as error:
             item['cpu_and_heap'] = dict(result='FAIL', reason=str(error))
         batches = [b for b in observations if b['case'] == name]

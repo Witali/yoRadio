@@ -2,6 +2,13 @@
 
 ## Scheduling change
 
+**Subsequent acceptance policy (7 October):** the user made CPU load
+informational and audio continuity the priority. The historical 85% failures
+below are retained as measured; they no longer independently block adoption.
+Default promotion still needs continuity evidence and investigation of the
+remaining memory behavior. Full decoder progress alone cannot certify no
+audible gaps; the instrumented Groove32 run still had 42 DMA queue overruns.
+
 `CONFIG_YORADIO_OUTPUT_TASK_FIRST=y` raises the direct-DMA output task from
 priority **6 to 8**, above the decoder (**7**). The stream task stays at **5**.
 The option currently defaults to off and requires `YORADIO_DIRECT_DMA_PCM`.

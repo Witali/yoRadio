@@ -75,14 +75,14 @@ def no_runtime_faults(rows):
                     for r in rows), 'Runtime allocation/decoder/TLS failure')
 
 
-def metrics(samples, rows, spec, seconds, start, end):
+def metrics(samples, rows, spec, seconds, start, end, max_busy=85):
     no_runtime_faults(rows)
     first = next((s['seconds'] for s in samples if s.get('audio')), None)
     require(first is not None and first <= 15, 'No PCM playback within 15 seconds')
     playback = check_playback(samples, spec, minimum=int((seconds-15)*.6), warmup=15)
     require(max(s['request_ms'] for s in samples) < 2000, 'WebUI response exceeded 2 s')
     stable = [r for r in rows if start+15 <= r['at'] <= end]
-    cpu = check_cpu(stable, start=start+15, end=end)
+    cpu = check_cpu(stable, max_busy=max_busy, start=start+15, end=end)
     times = sorted(s['request_ms'] for s in samples)
     return dict(playback=playback, first_pcm_seconds=first,
                 status_samples=len(samples), max_http_ms=max(times),
@@ -99,6 +99,8 @@ def main():
     parser.add_argument('--manifest', type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument('--case', action='append')
     parser.add_argument('--seconds', type=int, default=60)
+    parser.add_argument('--max-cpu-busy', type=float,
+                        help='Optional CPU percentage limit; default records CPU without a headroom gate')
     parser.add_argument('--interval', type=float, default=.1,
                         help='Delay between status requests; .1 is concurrent WebUI load')
     parser.add_argument('--transport', choices=('https', 'http'), default='https',
@@ -125,7 +127,7 @@ def main():
     report = Report(args.output/'report.json', initial)
     report.data.update(image=image, public_urls=urls, playback_urls=play_urls,
         transport=args.transport, sources=manifest['sources'],
-        seconds=args.seconds, interval=args.interval,
+        seconds=args.seconds, interval=args.interval, cpu_budget_percent=args.max_cpu_busy,
         manifest_sha256=sha(args.manifest.read_bytes()),
         sdkconfig_sha256=sha(args.firmware.with_name('sdkconfig').read_bytes()),
         ffprobe_version=subprocess.run([args.ffprobe, '-version'], capture_output=True,
@@ -153,7 +155,7 @@ def main():
             board.play(play_urls[name])
             samples = suite.observe(args.seconds, name, interval=args.interval)
             evidence = metrics(samples, capture.since(started), reference['spec'],
-                               args.seconds, started, time.monotonic())
+                               args.seconds, started, time.monotonic(), max_busy=args.max_cpu_busy)
             with board.websocket() as ws:
                 ws.send('getindex')
                 deadline = time.monotonic()+5

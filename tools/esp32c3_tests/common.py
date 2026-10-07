@@ -203,7 +203,10 @@ def check_cpu(records, max_busy=85, min_heap=8192, min_largest=4096, start=None,
             times = [r['at'] for r in records if re.search(pattern,r['line'])]
             require(all(b-a < 11 for a,b in zip([start]+times,times+[end])),
                     'CPU/decoder evidence has a gap longer than two intervals')
-    require(max(r['busy'] for r in cpu) <= max_busy, 'CPU budget exceeded')
+    # None makes CPU informational. Keep the historical default for replaying
+    # recorded tests that explicitly used the former headroom criterion.
+    if max_busy is not None:
+        require(max(r['busy'] for r in cpu) <= max_busy, 'CPU budget exceeded')
     require(min(r['heap'] for r in cpu) >= min_heap, 'Free heap below budget')
     require(min(r['largest'] for r in cpu) >= min_largest, 'Largest heap block below budget')
     ratio = sum(r[1] for r in decode) / sum(r[0] for r in decode)
@@ -232,6 +235,7 @@ class Report:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.data = dict(board=info, cases=[], note='PASS covers recorded checks only; no acoustic/IRQ inference')
+        self.data['cpu_budget_percent'] = None
         self.data['created_utc'] = datetime.now(timezone.utc).isoformat()
         self.data['test_sources_sha256'] = {
             str(p.relative_to(ROOT)).replace('\\','/'): sha(p.read_bytes())

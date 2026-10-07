@@ -27,6 +27,7 @@ def main():
     parser.add_argument('--case', required=True)
     parser.add_argument('--initial-seconds', type=int, default=40)
     parser.add_argument('--settled-seconds', type=int, default=80)
+    parser.add_argument('--max-cpu-busy', type=float, help='Optional CPU gate; informational by default')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     require(args.initial_seconds >= 40 and args.settled_seconds >= 60,
@@ -38,7 +39,8 @@ def main():
     board = Board(args.board)
     identity, before = board.info(), snapshot(board)
     report = Report(args.output/'report.json', identity)
-    report.data.update(fixture_hashes={args.case: spec['sha256']}, windows=[])
+    report.data.update(fixture_hashes={args.case: spec['sha256']}, windows=[],
+                       cpu_budget_percent=args.max_cpu_busy)
     capture = Capture(args.serial_port)
     suite = Suite(board, f'http://{args.host}:{args.port}', specs, capture, args.output)
     idle = []
@@ -54,7 +56,7 @@ def main():
             samples = suite.observe(seconds, name, interval=.1)
             result = check_playback(samples, spec, minimum=int(seconds*.6), warmup=warmup)
             require(max(s['request_ms'] for s in samples) < 2000, 'WebUI response exceeded 2 s')
-            result.update(check_cpu(capture.since(started+warmup), start=started+warmup,
+            result.update(check_cpu(capture.since(started+warmup), max_busy=args.max_cpu_busy, start=started+warmup,
                                     end=time.monotonic()))
             result['max_http_ms'] = max(s['request_ms'] for s in samples)
             return result

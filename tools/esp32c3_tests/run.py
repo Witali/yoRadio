@@ -49,11 +49,13 @@ class Capture:
 
 
 class Suite:
-    def __init__(self, board, origin, specs, capture, output):
+    def __init__(self, board, origin, specs, capture, output, *, checkpoint=None, cpu_budget=None):
         self.board, self.origin, self.specs = board, origin.rstrip('/'), specs
         self.capture, self.output = capture, Path(output)
         self.output.mkdir(parents=True, exist_ok=True)
         self.observations = []
+        self.checkpoint = checkpoint
+        self.cpu_budget = cpu_budget
 
     def url(self, mode, name, origin=None):
         return (origin or self.origin).rstrip('/') + '/' + mode + '/' + name
@@ -68,6 +70,8 @@ class Suite:
                 state = self.board.status()
                 row = dict(seconds=time.monotonic() - start, request_ms=(time.monotonic()-requested)*1000, **state)
                 samples.append(row)
+                if self.checkpoint:
+                    self.checkpoint(self.observations, batch)
                 time.sleep(interval)
         except Exception as error:
             # Keep partial evidence on transport failures without retaining URLs
@@ -279,7 +283,9 @@ class Suite:
             evidence = dict(duration=seconds, status_samples=len(samples),
                             max_http_ms=max(s['request_ms'] for s in samples))
             if cpu:
-                evidence.update(check_cpu(self.capture.since(started+10),start=started+10,end=time.monotonic()))
+                evidence.update(check_cpu(self.capture.since(started+10), max_busy=self.cpu_budget,
+                                          start=started+10, end=time.monotonic()))
+                evidence['cpu_budget_percent'] = self.cpu_budget
             return evidence
         finally:
             self.board.stop()
@@ -297,7 +303,9 @@ def main():
     parser.add_argument('--cycles', type=int, default=3)
     parser.add_argument('--soak-seconds', type=int, default=3600)
     parser.add_argument('--load-seconds', type=int, default=40,
-                        help='Duration under frequent WebUI polling; keep the original CPU/heap gates')
+                        help='Duration under frequent WebUI polling; retain memory and playback gates')
+    parser.add_argument('--max-cpu-busy', type=float,
+                        help='Optional CPU percentage limit; default records CPU without a headroom gate')
     parser.add_argument('--load-idle-recovery', action='store_true',
                         help='Measure settled heap before and after each load case, even when playback fails')
     parser.add_argument('--unpaced-files', action='store_true',
@@ -327,6 +335,7 @@ def main():
     report.data['requested_suites'] = args.suite
     report.data['server_options'] = dict(unpaced_files=args.unpaced_files,
                                        delivery_stats=args.delivery_stats)
+    report.data['cpu_budget_percent'] = args.max_cpu_busy
     if 'load' in args.suite:
         report.data['load_options'] = dict(seconds=args.load_seconds,
                                           idle_recovery=args.load_idle_recovery)
@@ -337,7 +346,8 @@ def main():
             wifi_iram=bool(re.search(r'^CONFIG_ESP_WIFI_IRAM_OPT=y$',config,re.M)),
             wifi_rx_iram=bool(re.search(r'^CONFIG_ESP_WIFI_RX_IRAM_OPT=y$',config,re.M)))
     capture = Capture(args.serial_port)
-    suite = Suite(board, f'http://{args.host}:{args.port}', specs, capture, args.output)
+    suite = Suite(board, f'http://{args.host}:{args.port}', specs, capture, args.output,
+                  cpu_budget=args.max_cpu_busy)
     tls = None
     try:
         with Server(args.host, args.port, specs, unpaced_files=args.unpaced_files,

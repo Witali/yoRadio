@@ -302,7 +302,7 @@ transients. This is separate from the additional error allowed for packed storag
 | C3-T05 | Full-radio AAC changes in one connection | `run.py --suite transitions` | Ordered, repeatedly confirmed full-rate formats; includes LC mono → HEv2 with identical ADTS core configuration and Stop/Play generation replacement. |
 | C3-T06 | Repeated codec switches and retained/fragmented heap | `run.py --suite switch` | At least three cycles; every start succeeds; settled heap/largest block/task count recover after warm-up. |
 | C3-T07 | Network faults with recovery | `run.py --suite faults` | Truncation, stall and HTTP 503 allow a new mono stream; redirect and jitter preserve playback and EOF. |
-| C3-T08 | Long continuous playback on the full radio | `run.py --suite soak` | Default one hour, correct format throughout, responsive HTTP, real-time PCM progress, CPU/heap budgets. A shorter run is only a smoke test. |
+| C3-T08 | Long continuous playback on the full radio | `run.py --suite soak` | Default one hour, correct format throughout, responsive HTTP, real-time PCM progress and heap budgets; CPU is recorded. A shorter run is only a smoke test. |
 | C3-T09 | CPU and memory with concurrent WebUI requests | `run.py --suite load` | 40 seconds per selected fixture, 100 ms polling, at least three stable CPU/decode windows, no allocation failure or core fallback. |
 | C3-T10 | OTA regression against the exact current app | `ota.py` | Both slots used, uploaded ELF identity checked after boot, negative cases preserve active app, Wi-Fi/playlist/settings unchanged. Includes slow and playing-state uploads. |
 | C3-T11 | Live browser-channel metadata after reconnect | `run.py --suite websocket` | Two fresh WebSocket connections receive `fmt` and playing state matching REST. Host stream-format tests already check OLED formatting and generation changes. |
@@ -516,7 +516,16 @@ Repeat soak for `he-48000-stereo` and `hev2-44100-stereo`. For non-AAC one-hour
 soak generate a **single continuous file** at least 3,603 seconds long and pass
 its manifest/name; short fixtures are BLOCKED, not looped with invalid headers.
 
-Current acceptance budgets: CPU peak ≤85%, free heap ≥8,192 bytes, largest
+As requested on 7 October, **CPU percentage is informational by default**:
+exceeding 85% alone is not a playback failure. The priority is uninterrupted
+audio, supported formats and absence of allocation failures. The physical
+runners record `cpu_budget_percent: null`; use `--max-cpu-busy 85` with `run.py`,
+`public_streams.py` or `pool_settle.py` only to reproduce the older headroom gate.
+Historical reports without the new field retain their original 85% replay
+criterion and original FAIL outcomes. This policy does not prove continuity
+from an average CPU or decoder-progress figure.
+
+Current acceptance budgets: free heap ≥8,192 bytes, largest
 block ≥4,096 bytes, decoded audio/wall time between 0.9 and 1.1, HTTP response
 <2 seconds. Switching permits ≤2,048 bytes of settled free-heap loss and
 ≤4,096 bytes largest-block loss after the warm-up cycle, with no extra tasks.
@@ -524,6 +533,22 @@ These are regression thresholds, not proof of a worst-case execution bound.
 At least three CPU and decoder windows are mandatory; quiet production cannot
 pass a CPU check by supplying no logs. Physical DMA underruns and audible
 quality require T14's capture, not inference from REST status.
+
+`stream_memory_study.py` runs a continuous paced AAC fixture with the same
+memory/progress checks and an optional RX-owner diagnostic image. It verifies
+the installed firmware hash, preserves settings, and atomically saves filtered
+performance/status checkpoints every 30 seconds. An active checkpoint is
+explicitly incomplete and is not an acceptance result. On normal completion,
+the final report records all gates, Stop recovery and reboot. For example:
+
+```text
+python tools/esp32c3_tests/stream_memory_study.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --firmware firmware/development/esp32c3-output-first-rx-owner/app.bin --case hev2-44100-stereo --seconds 1800 --output NEW_DIRECTORY
+python tests/test-stream-memory-study.py
+```
+
+A diagnostic run identifies memory owners; its timing does not qualify the
+uninstrumented firmware. It also does not replace physical audio continuity
+measurement.
 
 ## OTA on the current production image
 
