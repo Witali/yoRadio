@@ -51,6 +51,18 @@ config YORADIO_RX_BUFFER_DIAGNOSTICS
         Uses about 0.6 KiB static RAM and 1.1 KiB of decoder stack between calls.
         The locked heap walk and USB logs change timing; not a CPU benchmark.
 
+config YORADIO_RX_COPY_PROFILE
+    bool "Measure copied RX packet sizes and lifetimes (diagnostic only)"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU && LWIP_L2_TO_L3_COPY
+    depends on !YORADIO_RX_BUFFER_DIAGNOSTICS
+    default n
+    help
+        Track up to 64 native netif packet copies until their final mem_free.
+        Report live/peak bytes and five frame-size classes in one checksummed
+        row every five seconds. Preserve native allocation, copying and input
+        behavior. Adds fixed tracking RAM and per-free work; not a CPU benchmark.
+        Lost tracking entries or damaged records invalidate sizing evidence.
+
 config YORADIO_HEAP_FRAGMENT_PROBE
     bool "Identify live owners in the former largest idle heap block"
     depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU && !YORADIO_DEEP_SLEEP_CLOCK && HEAP_TRACING_OFF && HEAP_POISONING_DISABLED && !HEAP_TASK_TRACKING && HEAP_PLACE_FUNCTION_INTO_FLASH

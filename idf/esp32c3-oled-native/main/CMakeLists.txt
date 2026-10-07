@@ -276,6 +276,21 @@ if(CONFIG_YORADIO_RX_BUFFER_DIAGNOSTICS)
   target_link_options(${COMPONENT_LIB} INTERFACE
     "-Wl,--wrap=esp_pbuf_allocate" "-Wl,--wrap=esp_netif_free_rx_buffer")
 endif()
+
+if(CONFIG_YORADIO_RX_COPY_PROFILE)
+  idf_component_get_property(rx_netif_dir esp_netif COMPONENT_DIR)
+  idf_component_get_property(rx_lwip_dir lwip COMPONENT_DIR)
+  file(SHA256 "${rx_netif_dir}/lwip/netif/wlanif.c" rx_wlanif_sha)
+  file(SHA256 "${rx_lwip_dir}/lwip/src/core/mem.c" rx_mem_sha)
+  file(SHA256 "${rx_lwip_dir}/lwip/src/core/pbuf.c" rx_pbuf_sha)
+  if(NOT rx_wlanif_sha STREQUAL "0e02a9c328e5a4b08d89793b0a11a878fc02be9de007592f0e95ee2048d8f714" OR
+     NOT rx_mem_sha STREQUAL "23644c0a3fdd12a75247ecb6870c908f03a6816507cefd23157cb1ee9e9cc125" OR
+     NOT rx_pbuf_sha STREQUAL "951b1723eb1f919ca5cb408f19b00fcb9d464948a126631217ec96412dd1cc77")
+    message(FATAL_ERROR "RX copy profiling requires the audited IDF 6.0.2 packet ownership path")
+  endif()
+  target_sources(${COMPONENT_LIB} PRIVATE "rx_copy_profile.c")
+  target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=wlanif_input" "-Wl,--wrap=mem_free")
+endif()
 if(CONFIG_YORADIO_DIRECT_DMA_PCM AND NOT CONFIG_YORADIO_QEMU)
   # The generator uses the installed driver's typed DMA state. Refuse an
   # unaudited driver update rather than guessing its private ABI/ownership.

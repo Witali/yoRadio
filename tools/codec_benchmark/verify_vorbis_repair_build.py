@@ -34,6 +34,12 @@ RX_CALLS = {
     '__wrap_esp_netif_free_rx_buffer': 'esp_netif_free_rx_buffer',
     'decoder_task': 'rx_buffer_diagnostic_poll',
 }
+RX_COPY_CALLS = {
+    '__wrap_wlanif_input': ('pbuf_alloc', 'heap_caps_get_allocated_size', 'esp_netif_free_rx_buffer', 'pbuf_free'),
+    'pbuf_free': ('__wrap_mem_free',),
+    '__wrap_mem_free': ('mem_free',),
+    'decoder_task': ('rx_copy_profile_poll',),
+}
 FRAGMENT_CALLS = {
     'decoder_task': 'heap_fragment_probe_poll',
     '__wrap_heap_caps_free': 'heap_caps_free',
@@ -73,6 +79,19 @@ def verify(build, objdump, output):
                                             '.flash.text', '.flash.rodata', '.rtc.data', '.rtc.bss')}
         result['tls_sections'] = {s.name: s['sh_size'] for s in elf.iter_sections()
                                   if s['sh_flags'] & 0x400}
+        if 'CONFIG_YORADIO_RX_COPY_PROFILE=y' in (build/'sdkconfig').read_text():
+            # Verify actual Wi-Fi callback pointers, not just linked wrapper text.
+            result['rx_copy_callbacks'] = {}
+            for mode in ('sta', 'ap'):
+                table = named['s_wifi_netif_config_'+mode]
+                section = elf.get_section(table['st_shndx'])
+                start = table['st_value'] - section['sh_addr']
+                expected = struct.pack('<2I', named['wlanif_init_'+mode]['st_value'],
+                                       named['__wrap_wlanif_input']['st_value'])
+                if table['st_size'] != len(expected) or section.data()[start:start+len(expected)] != expected:
+                    raise ValueError('RX copy Wi-Fi callback not installed: '+mode)
+                result['rx_copy_callbacks'][mode] = '__wrap_wlanif_input'
+            result['rx_copy_tracking_bytes'] = {name: named[name]['st_size'] for name in ('s_owners', 's_counts')}
     output.mkdir(parents=True, exist_ok=True)
     for caller, callees in CALLS.items():
         code = subprocess.check_output([str(objdump), '-d', '--disassemble='+caller,
@@ -113,6 +132,16 @@ def verify(build, objdump, output):
             (output/(caller+'.asm')).write_text(code)
         result['fragment_probe_calls'] = FRAGMENT_CALLS
         sources += [main/'heap_fragment_probe.c', main/'heap_fragment_probe.h']
+    if 'CONFIG_YORADIO_RX_COPY_PROFILE=y' in (build/'sdkconfig').read_text():
+        for caller, callees in RX_COPY_CALLS.items():
+            code = subprocess.check_output([str(objdump), '-d', '--disassemble='+caller,
+                                            str(elf_path)], text=True)
+            for callee in callees:
+                if not re.search(r'\b(?:j|jal|jalr)\s+[^\n]*<'+re.escape(callee)+r'>', code):
+                    raise ValueError('Missing RX copy hook: '+caller+' -> '+callee)
+            (output/(caller+'.asm')).write_text(code)
+        result['rx_copy_calls'] = RX_COPY_CALLS
+        sources += [main/'rx_copy_profile.c', main/'rx_copy_profile.h']
     for source in sources:
         name = source.relative_to(ROOT)
         destination = output/'sources'/name

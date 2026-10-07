@@ -42,6 +42,7 @@
 #include "native_i2s_generator.h"
 #endif
 #include "rx_buffer_diagnostic.h"
+#include "rx_copy_profile.h"
 #include "heap_fragment_probe.h"
 #include "network_service.h"
 
@@ -1041,6 +1042,7 @@ static void decoder_task(void *argument) {
 
     while (true) {
         rx_buffer_diagnostic_poll();
+        rx_copy_profile_poll();
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER

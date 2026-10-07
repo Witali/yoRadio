@@ -66,6 +66,41 @@ memory saving. The incremental cost is the reservation minus the dynamic
 allocations it replaces, plus metadata and any simultaneous driver/copy storage.
 Idle codec switching and TLS handshakes still need their own headroom.
 
+## Optional sizing profiler
+
+`CONFIG_YORADIO_RX_COPY_PROFILE=y` requires native
+`CONFIG_LWIP_L2_TO_L3_COPY=y` and is off by default. It leaves the actual
+`PBUF_RAM` allocation and input path intact while tracking up to 64 copies until
+the final `mem_free()`. Refcount decrements that retain the packet do not release
+its tracking entry. Source hashes pin the audited IDF 6.0.2 ownership path.
+
+Every five seconds, one CRC-protected `PERF RX_COPY:` row reports cumulative
+allocations/releases, live and peak allocation bytes, failure/overflow counts,
+and five size classes: 0–128, 129–512, 513–1152, 1153–1600 and 1601–65535 bytes
+of received frame. No packet contents or addresses are logged. Bytes include
+the pbuf and allocation alignment but exclude allocator block headers. Peaks
+are since boot; class peaks need not occur at the same time. This accounts for
+buffer ownership lifetimes, not a histogram of retention time in milliseconds.
+
+The first target build adds 888 B of static RAM (768 B owner slots, 112 B counters,
+8 B report timestamp). Its per-free table search and logging affect timing;
+use it for sizing, not a production CPU benchmark. This is instrumentation,
+not the proposed fixed packet pool.
+
+Host tests compile the real SDK `pbuf.c` and `mem.c` with the unchanged profiler,
+ASan/UBSan and platform stubs. They exercise frame/class boundaries, references,
+chains, trim, input rejection, allocation failure, unrelated frees, concurrency,
+duplicate tracking and overflow. The ELF verifier checks both STA/AP callback
+tables and the final-free hook. The parser rejects damaged CRCs, lost owners,
+counter inconsistencies and sequence gaps; packet allocation/input failures make
+the result invalid for pool sizing. Window coverage is checked separately.
+
+```text
+python tools/codec_benchmark/run_rx_copy_profile_host.py --idf <IDF-6.0.2> --output <new-host-result>
+python tests/test-rx-copy-profile.py
+python tools/esp32c3_tests/rx_copy_profile.py <study>/performance.json --status <study>/status.json --output <new-summary.json>
+```
+
 ## Exhaustion and acceptance
 
 - Never wait for a slot while blocking Wi-Fi/lwIP processing. Define an explicit
