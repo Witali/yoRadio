@@ -1,5 +1,6 @@
 """Physical TLS-record growth tests on explicitly labelled laboratory firmware."""
 import argparse
+import copy
 import json
 from pathlib import Path
 import time
@@ -10,6 +11,10 @@ from ota import image_info, snapshot, verify_snapshot
 from public_streams import no_runtime_faults
 from run import Suite
 from audio_test_server.tls_records import RecordServer
+
+
+def capture_record_observation(events):
+    return dict(captured_at=time.monotonic(), events=copy.deepcopy(events))
 
 
 def record_evidence(events, mode):
@@ -86,8 +91,13 @@ def main():
         try:
             board.play(f'https://{args.host}:8772/{mode}/{args.case}', 'aac')
             samples = suite.observe(args.seconds, 'tls-record:'+mode, interval=.1)
+            # Preserve the exact evidence inspected by the gate. Stop can make
+            # the server generate one more record whose socket write fails;
+            # that later record must not mutate a previously checked snapshot.
+            observation = capture_record_observation(server.events[before:])
+            report.data.setdefault('record_observations', {})[mode] = observation
             playback = check_playback(samples, specs[args.case], warmup=5)
-            record = record_evidence(server.events[before:], mode)
+            record = record_evidence(observation['events'], mode)
             first_pcm = next(suite.observations[-1]['started_at']+s['seconds'] for s in samples if matches(s,specs[args.case]))
             if mode == 'grow':
                 require(first_pcm < record['first_large_at'], 'Record grew before full-rate decoder playback began')

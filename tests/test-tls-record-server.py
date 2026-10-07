@@ -6,13 +6,14 @@ import socket
 import ssl
 import sys
 import tempfile
+import time
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools'))
 from audio_test_server.record_test_ca import generate
 from audio_test_server.tls_records import RecordServer
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools/esp32c3_tests'))
-from tls_records import record_evidence
+from tls_records import capture_record_observation, record_evidence
 
 
 class RecordTests(unittest.TestCase):
@@ -76,6 +77,29 @@ class RecordTests(unittest.TestCase):
             with socket.create_connection(('127.0.0.1', server.server.server_address[1]), timeout=5) as plain:
                 with self.assertRaises(ssl.SSLCertVerificationError):
                     context.wrap_socket(plain, server_hostname='127.0.0.1')
+
+    def test_gate_snapshot_survives_later_server_writes(self):
+        with RecordServer('127.0.0.1', 0, self.specs, self.keys['cert'], self.keys['key'], seconds=3, grow_seconds=0) as server:
+            context = ssl.create_default_context(cafile=str(self.keys['ca']))
+            with socket.create_connection(('127.0.0.1', server.server.server_address[1]), timeout=5) as plain:
+                with context.wrap_socket(plain, server_hostname='127.0.0.1') as secure:
+                    secure.sendall(b'GET /small/fixture HTTP/1.1\r\nHost: localhost\r\n\r\n')
+                    deadline = time.monotonic()+2
+                    while True:
+                        self.assertTrue(secure.recv(4096))
+                        snapshot = capture_record_observation(server.events)
+                        try:
+                            evidence = record_evidence(snapshot['events'], 'small')
+                            break
+                        except AssertionError:
+                            self.assertLess(time.monotonic(), deadline)
+                    count = len(snapshot['events'][0]['records'])
+                    while len(server.events[0]['records']) <= count:
+                        self.assertTrue(secure.recv(4096))
+                        self.assertLess(time.monotonic(), deadline)
+            self.assertGreater(len(server.events[0]['records']), count)
+            self.assertEqual(len(snapshot['events'][0]['records']), count)
+            self.assertEqual(record_evidence(snapshot['events'], 'small'), evidence)
 
     def test_key_generation_never_overwrites(self):
         before = self.keys['key'].read_bytes()
