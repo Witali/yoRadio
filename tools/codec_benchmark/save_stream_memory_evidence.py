@@ -1,4 +1,4 @@
-"""Retain a completed C3 stream-memory run, its interruption and OTA restore."""
+"""Retain a completed C3 stream-memory run, optional interruption and OTA restore."""
 import argparse
 import json
 from pathlib import Path
@@ -15,8 +15,13 @@ def main():
     p.add_argument('--work', type=Path, required=True)
     p.add_argument('--artifact', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--run-folder', default='board-10min', choices=('board-10min', 'board'))
+    p.add_argument('--no-interrupted', action='store_true')
+    p.add_argument('--evidence-test', default='tests/test-stream-memory-evidence.py')
     args = p.parse_args()
-    result = summarize(args.work/'board-10min')
+    if args.run_folder == 'board' and not args.no_interrupted:
+        p.error('--run-folder board requires --no-interrupted')
+    result = summarize(args.work/args.run_folder)
     args.output.mkdir(parents=True, exist_ok=False)
 
     def write(name, data):
@@ -36,7 +41,10 @@ def main():
         write('sources/'+name, data)
 
     write('.gitattributes', b'* -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol\n')
-    for folder in ('ota', 'board', 'board-10min', 'restore'):
+    folders = ['ota', args.run_folder, 'restore']
+    if not args.no_interrupted:
+        folders.insert(1, 'board')
+    for folder in folders:
         report = json.loads((args.work/folder/'report.json').read_text())
         if folder in ('ota', 'restore') and (not report['cases'] or any(
                 c['result'] != 'PASS' for c in report['cases'])):
@@ -47,16 +55,18 @@ def main():
         # helper parsers, at its recorded hash rather than guessing imports.
         for name, digest in report['test_sources_sha256'].items():
             freeze(name, digest)
-    initial = json.loads((args.work/'board/checkpoint.json').read_text())
-    if initial.get('complete'):
-        raise ValueError('Expected the retained user-shortened preliminary run')
-    dump('board/termination.json', dict(complete=False,
-        reason='User requested ten minutes instead of thirty. Host session interrupted; '
-               'a fresh 600-second run performs full Stop recovery and settings checks.',
-        last_checkpoint_elapsed_seconds=initial.get('elapsed_seconds')))
-    for path in sorted((args.work/'verify').rglob('*')):
-        if path.is_file():
-            write('verify/'+path.relative_to(args.work/'verify').as_posix(), path.read_bytes())
+    if not args.no_interrupted:
+        initial = json.loads((args.work/'board/checkpoint.json').read_text())
+        if initial.get('complete'):
+            raise ValueError('Expected the retained user-shortened preliminary run')
+        dump('board/termination.json', dict(complete=False,
+            reason='User requested ten minutes instead of thirty. Host session interrupted; '
+                   'a fresh 600-second run performs full Stop recovery and settings checks.',
+            last_checkpoint_elapsed_seconds=initial.get('elapsed_seconds')))
+    for folder in ('verify', 'host', 'sdk'):
+        for path in sorted((args.work/folder).rglob('*')):
+            if path.is_file():
+                write(folder+'/'+path.relative_to(args.work/folder).as_posix(), path.read_bytes())
     build = json.loads((args.artifact/'manifest.json').read_text())
     for name, field in (('app.bin', 'app_sha256'), ('sdkconfig', 'sdkconfig_sha256')):
         if sha((args.artifact/name).read_bytes()) != build[field]:
@@ -70,15 +80,16 @@ def main():
     for name in ('tools/esp32c3_tests/summarize_stream_memory.py',
                  'tools/codec_benchmark/save_stream_memory_evidence.py',
                  'tests/test-stream-memory-summary.py', 'tests/test-stream-memory-study.py',
-                 'tests/test-stream-memory-evidence.py'):
+                 args.evidence_test):
         freeze(name)
     write('board-final.json', (args.work/'board-final.json').read_bytes())
     dump('summary.json', result)
     dump('provenance.json', dict(diagnostic_artifact=args.artifact.as_posix(),
         restore_artifact='firmware/development/esp32c3-output-first',
-        production_qualified=False, requested_seconds=600,
-        note='Physical RX-owner diagnostic; CPU is informational. Original failures and '
-             'incomplete preliminary capture retained. No physical audio capture.'))
+        production_qualified=False, requested_seconds=result['requested_seconds'],
+        run_folder=args.run_folder, interrupted_retained=not args.no_interrupted,
+        note='Physical stream-memory study; CPU is informational. Original failures retained. '
+             'No physical audio capture.'))
     manifest = {p.relative_to(args.output).as_posix(): dict(bytes=p.stat().st_size,
                  sha256=sha(p.read_bytes())) for p in sorted(args.output.rglob('*')) if p.is_file()}
     dump('manifest.json', manifest)
