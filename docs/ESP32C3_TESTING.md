@@ -833,7 +833,9 @@ The seven synthetic ICY cases play the full-rate HE-AACv2 fixture, compare the
 WebUI `meta` field with the expected title, check playback and runtime faults,
 then stop and verify unchanged Wi-Fi, playlist and settings. Run on an awake
 image with diagnostic logging for meaningful UART fault coverage. With a quiet
-image, absence of serial faults cannot prove absence of internal errors. Each
+image, use `--functional-only` and omit `--serial-port`: its report explicitly
+excludes UART runtime-fault coverage. An empty log is not evidence of fault-free
+execution. Earlier reports that failed because of missing logs are retained. Each
 case lasts seven seconds; this is a functional check, not a sustained load test.
 `tools/audio_test_server/icy.py` has no board commands and can serve any HTTP
 player. `python tests/test-icy-server.py` checks its byte framing and actual HTTP
