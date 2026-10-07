@@ -102,6 +102,7 @@ set(NATIVE_SRCS
   "app_main.c"
   "codec_memory_trace.c"
   "audio_service.c"
+  "stream_http_reader.c"
   "icy_title.c"
   "decoder_registration.c"
   "native_aac_decoder.c"
@@ -243,6 +244,7 @@ idf_component_register(
     esp_driver_i2s
     esp_event
     esp_http_client
+    esp-tls
     esp_http_server
     esp_hw_support
     esp_hal_mspi

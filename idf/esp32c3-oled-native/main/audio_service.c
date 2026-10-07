@@ -17,6 +17,7 @@
 #include "esp_check.h"
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
+#include "stream_http_reader.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -669,6 +670,9 @@ static void stream_task(void *argument) {
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
+        // One response per connection (RFC 9112 section 9.3). TCP keepalive
+        // probes above are independent of HTTP connection reuse.
+        esp_http_client_set_header(client, "Connection", "close");
         bool retryable;
         esp_err_t result = open_stream(client, command.url, retry.deadline_us,
                                        &retryable);
@@ -738,9 +742,10 @@ static void stream_task(void *argument) {
         stream_bitrate_meter_t bitrate_meter = {
             .started_us = esp_timer_get_time(),
         };
+        stream_http_reader_t reader = {0};
         while (atomic_load(&s_generation) == command.generation) {
-            int received = esp_http_client_read(client, (char *)buffer,
-                                                STREAM_CHUNK_SIZE);
+            int received = stream_http_read(&reader, client, (char *)buffer,
+                                            STREAM_CHUNK_SIZE);
             // Stop/station change may happen while the socket read is blocked.
             // Never pass data returned by that obsolete read to ICY or audio.
             if (atomic_load(&s_generation) != command.generation) break;

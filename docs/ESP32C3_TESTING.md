@@ -847,6 +847,12 @@ failed heap gates, with exact firmware/config identities.
 
 ## Controlled TLS record growth
 
+The [HTTP/TLS RFC audit](ESP32C3_HTTP_TLS_RFC_AUDIT_20261007.md) maps framing,
+timeouts, fatal-error teardown and closure requirements to reproducible host
+tests on ESP-IDF 6.0.3/6.1. It explicitly records the unresolved SDK ambiguity
+between TLS `close_notify` and raw EOF; passing body-parser tests alone does
+not certify HTTPS closure behavior.
+
 `tools/esp32c3_tests/tls_records.py` checks full-rate AAC with 1 KiB and 16 KiB
 TLS plaintext records, including growth after the decoder has started. Use only
 an awake profiling image whose manifest explicitly sets `laboratory_only: true`

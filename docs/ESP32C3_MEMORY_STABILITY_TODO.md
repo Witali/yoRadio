@@ -36,6 +36,10 @@ The remaining network-memory gates are separate from compact PCM quality:
   passes 1 KiB records with both allocators, but dynamic 16 KiB records fail a
   16,749-byte allocation and permanent buffers suffer 167 small-block allocation
   failures across the three large-record modes. Small-record success is insufficient.
+  The [four-segment TCP window follow-up](ESP32C3_TCP_RX_WINDOW_20261007.md)
+  removes allocation failures in the dynamic run, but alternating records still
+  fail the original heap-trend gate; static TLS retains three allocation failures.
+  Keep the overlay optional until phase-aware/ten-minute and throughput checks.
 - [ ] Resolve contiguous allocation with full TLS buffers. The static-TLS
   follow-up has 35,640–40,020 B free at three failed 32,744-byte SBR requests,
   but only 25,600–29,696 B in the largest block. Audit allocation order before
@@ -47,6 +51,12 @@ The remaining network-memory gates are separate from compact PCM quality:
 - [ ] Reproduce and contain fatal TLS read errors after a positive partial HTTP
   read. The alternating-record test logs a second 46,622-byte request after
   allocation failure; its exact error-state cause still needs targeted proof.
+  The [RFC audit and reader guard](ESP32C3_HTTP_TLS_RFC_AUDIT_20261007.md)
+  now reproduce/prevent the extra read in both SDKs (70 host cases each plus
+  37 stream-task cases). Physical qualification of the new guard is pending.
+- [ ] Resolve the RFC audit's remaining HTTPS closure gaps: distinguish TLS
+  `close_notify` from raw EOF below HTTP, verify outbound closure/alert behavior,
+  and cover truncation and certificate identity with actual TLS fixtures.
 
 ## Physical AAC findings, 2026-09-30
 
