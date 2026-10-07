@@ -1,0 +1,1312 @@
+{
+  "baseline": {
+    "input_sha256": {
+      "report.json": "8cd9168c5bcf1df314066d4435485592c6597f70c68b953c8a566afff37ab311",
+      "status.json": "6537bafdf99bbe4fee9050b5e110efec4e4beef1680d5a5341526f554d8e063f",
+      "performance.json": "2912df59f0d43ff98a0e1ddd6381e5d1a0a928ffa404a04b47980bd71d716bce",
+      "checkpoint.json": "95d6309c0ba9c62699ee39d65583a80ddfa6186656cdd7cbc237759dc1950477"
+    },
+    "image": "0117c66082ecfba3cc6a17f2cfe93aa91ba09a3eabf43d929ccda3beaa67dc65",
+    "fixture_hashes": {
+      "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e"
+    },
+    "cpu_budget_percent": null,
+    "requested_seconds": 600,
+    "observed_seconds": 600.0310000000027,
+    "acceptance": [
+      {
+        "name": "idle-before",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147780,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147748,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147748,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.14
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 601.266
+      },
+      {
+        "name": "idle-after",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147748,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147748,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.203
+      },
+      {
+        "name": "stop-recovery",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "runtime",
+        "result": "PASS",
+        "evidence": null,
+        "seconds": 0.0
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS",
+        "evidence": {
+          "rebooted": true,
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        },
+        "seconds": 7.609
+      }
+    ],
+    "playback": {
+      "board": {
+        "version": "v0.9.693-1213-g92bf4541-dirty",
+        "partition": "app1",
+        "max_size": 1900544,
+        "app_elf_sha256": "0117c66082ecfba3cc6a17f2cfe93aa91ba09a3eabf43d929ccda3beaa67dc65"
+      },
+      "cases": [
+        {
+          "name": "hev2-44100-stereo",
+          "original": {
+            "name": "cpu-under-http-load:hev2-44100-stereo",
+            "result": "FAIL",
+            "exception_chain": [
+              {
+                "type": "Failure"
+              }
+            ],
+            "reason": "Progressive heap loss during continuous playback",
+            "seconds": 601.266
+          },
+          "full_window": {
+            "start": 49714.64,
+            "end": 50304.671,
+            "seconds": 590.0310000000027,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Progressive heap loss during continuous playback"
+            },
+            "cpu_samples": 117,
+            "decoder_windows": 117,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 76.51452991452992,
+              "peak_busy": 77.8,
+              "minimum_heap": 19760.0,
+              "minimum_largest": 5120.0,
+              "first_heap": 44476.0,
+              "last_heap": 23312.0,
+              "first_largest": 32768.0,
+              "last_largest": 12800.0,
+              "audio_wall_ratio": 1.0015346298878987,
+              "decode_percent": 58.765177907920126
+            }
+          },
+          "runtime": {
+            "result": "PASS",
+            "evidence": null
+          },
+          "subwindows": [
+            {
+              "start": 49714.64,
+              "end": 50014.64,
+              "seconds": 300.0,
+              "strict": {
+                "result": "FAIL",
+                "reason": "Progressive heap loss during continuous playback"
+              },
+              "cpu_samples": 59,
+              "decoder_windows": 59,
+              "malformed": [],
+              "diagnostic": {
+                "mean_busy": 76.81694915254238,
+                "peak_busy": 77.8,
+                "minimum_heap": 28600.0,
+                "minimum_largest": 12800.0,
+                "first_heap": 44476.0,
+                "last_heap": 28608.0,
+                "first_largest": 32768.0,
+                "last_largest": 15872.0,
+                "audio_wall_ratio": 1.0014522238658945,
+                "decode_percent": 59.02385765182296
+              }
+            },
+            {
+              "start": 50014.64,
+              "end": 50304.671,
+              "seconds": 290.0310000000027,
+              "strict": {
+                "result": "FAIL",
+                "reason": "Progressive heap loss during continuous playback"
+              },
+              "cpu_samples": 58,
+              "decoder_windows": 58,
+              "malformed": [],
+              "diagnostic": {
+                "mean_busy": 76.20689655172414,
+                "peak_busy": 77.3,
+                "minimum_heap": 19760.0,
+                "minimum_largest": 5120.0,
+                "first_heap": 26844.0,
+                "last_heap": 23312.0,
+                "first_largest": 14336.0,
+                "last_largest": 12800.0,
+                "audio_wall_ratio": 1.0016184573002755,
+                "decode_percent": 58.50207996699557
+              }
+            }
+          ],
+          "status_samples": 3190,
+          "max_http_ms": 641.0000000032596,
+          "minimum_rssi": -71
+        }
+      ],
+      "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+    },
+    "note": "Replay a completed continuous AAC study without attributing unrelated RAM.\n\nRX ranges are actual live allocations; TCP receive credit is logical payload.\nTheir snapshots and CPU heap samples are asynchronous. Window medians are\ncomparisons, not an exact subtraction or proof of sample-level audio continuity.",
+    "acoustic_continuity_qualified": false,
+    "idle": {
+      "idle-before": {
+        "heap": {
+          "min": 147748,
+          "median": 147748,
+          "max": 147780
+        },
+        "largest": {
+          "min": 114688,
+          "median": 114688,
+          "max": 114688
+        },
+        "tasks": {
+          "min": 17,
+          "median": 17,
+          "max": 17
+        }
+      },
+      "idle-after": {
+        "heap": {
+          "min": 147748,
+          "median": 147748.0,
+          "max": 147748
+        },
+        "largest": {
+          "min": 114688,
+          "median": 114688.0,
+          "max": 114688
+        },
+        "tasks": {
+          "min": 17,
+          "median": 17.0,
+          "max": 17
+        }
+      }
+    },
+    "ownership": {
+      "complete": false,
+      "reason": "Missing RX ownership telemetry"
+    },
+    "network": {
+      "note": "Host receive time minus age_ms; transport delay remains. Uncredited/refused bytes are not allocated RAM and must not be added to RX storage.",
+      "windows": {
+        "idle-before": {
+          "samples": 3,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 147748,
+              "median": 147748,
+              "max": 147748
+            },
+            "largest": {
+              "min": 114688,
+              "median": 114688,
+              "max": 114688
+            },
+            "blocks": {
+              "min": 366,
+              "median": 366,
+              "max": 366
+            },
+            "free_blocks": {
+              "min": 19,
+              "median": 19,
+              "max": 19
+            },
+            "age_ms": {
+              "min": 5100,
+              "median": 5117,
+              "max": 5377
+            },
+            "missed": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 11520,
+              "max": 11520
+            },
+            "maximum": {
+              "min": 11520,
+              "median": 11520,
+              "max": 11520
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            },
+            "refused": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          }
+        },
+        "idle-after": {
+          "samples": 1,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 147748,
+              "median": 147748,
+              "max": 147748
+            },
+            "largest": {
+              "min": 114688,
+              "median": 114688,
+              "max": 114688
+            },
+            "blocks": {
+              "min": 366,
+              "median": 366,
+              "max": 366
+            },
+            "free_blocks": {
+              "min": 19,
+              "median": 19,
+              "max": 19
+            },
+            "age_ms": {
+              "min": 5332,
+              "median": 5332,
+              "max": 5332
+            },
+            "missed": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 11520,
+              "max": 11520
+            },
+            "maximum": {
+              "min": 11520,
+              "median": 11520,
+              "max": 11520
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            },
+            "refused": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          }
+        },
+        "load": {
+          "samples": 117,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 19760,
+              "median": 32104,
+              "max": 44476
+            },
+            "largest": {
+              "min": 5120,
+              "median": 15872,
+              "max": 32768
+            },
+            "blocks": {
+              "min": 429,
+              "median": 443,
+              "max": 457
+            },
+            "free_blocks": {
+              "min": 13,
+              "median": 16,
+              "max": 23
+            },
+            "age_ms": {
+              "min": 4954,
+              "median": 5050,
+              "max": 5507
+            },
+            "missed": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 15767,
+              "max": 23040
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 7273,
+              "max": 11520
+            },
+            "refused": {
+              "min": 0,
+              "median": 0,
+              "max": 2047
+            }
+          }
+        },
+        "first-minute": {
+          "samples": 12,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 42676,
+              "median": 44476.0,
+              "max": 44476
+            },
+            "largest": {
+              "min": 31744,
+              "median": 32768.0,
+              "max": 32768
+            },
+            "blocks": {
+              "min": 429,
+              "median": 429.0,
+              "max": 432
+            },
+            "free_blocks": {
+              "min": 13,
+              "median": 15.0,
+              "max": 17
+            },
+            "age_ms": {
+              "min": 4966,
+              "median": 5048.0,
+              "max": 5102
+            },
+            "missed": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 23040,
+              "median": 23040.0,
+              "max": 23040
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040.0,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          }
+        },
+        "last-minute": {
+          "samples": 12,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 21544,
+              "median": 26820.0,
+              "max": 32120
+            },
+            "largest": {
+              "min": 7680,
+              "median": 12800.0,
+              "max": 15872
+            },
+            "blocks": {
+              "min": 443,
+              "median": 449.0,
+              "max": 455
+            },
+            "free_blocks": {
+              "min": 15,
+              "median": 17.0,
+              "max": 20
+            },
+            "age_ms": {
+              "min": 4979,
+              "median": 5054.5,
+              "max": 5507
+            },
+            "missed": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 13567.0,
+              "max": 14175
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040.0,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 8865,
+              "median": 9473.0,
+              "max": 11520
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 1440
+            }
+          }
+        },
+        "load-10-310s": {
+          "samples": 59,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 28608,
+              "median": 44476,
+              "max": 44476
+            },
+            "largest": {
+              "min": 12800,
+              "median": 32768,
+              "max": 32768
+            },
+            "blocks": {
+              "min": 429,
+              "median": 429,
+              "max": 447
+            },
+            "free_blocks": {
+              "min": 13,
+              "median": 15,
+              "max": 18
+            },
+            "age_ms": {
+              "min": 4954,
+              "median": 5050,
+              "max": 5162
+            },
+            "missed": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 14468,
+              "median": 23040,
+              "max": 23040
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 0,
+              "max": 8572
+            },
+            "refused": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          }
+        },
+        "load-310-600s": {
+          "samples": 58,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 19760,
+              "median": 26834.0,
+              "max": 32124
+            },
+            "largest": {
+              "min": 5120,
+              "median": 12800.0,
+              "max": 17408
+            },
+            "blocks": {
+              "min": 443,
+              "median": 449.0,
+              "max": 457
+            },
+            "free_blocks": {
+              "min": 15,
+              "median": 17.0,
+              "max": 23
+            },
+            "age_ms": {
+              "min": 4972,
+              "median": 5050.0,
+              "max": 5507
+            },
+            "missed": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 13306.5,
+              "max": 17663
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040.0,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 5377,
+              "median": 9733.5,
+              "max": 11520
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 2047
+            }
+          }
+        }
+      }
+    }
+  },
+  "candidate": {
+    "input_sha256": {
+      "report.json": "bdaf342bf6b7ec5f61891739701a32c7e5b45329352dad6669ddec5d16fb246e",
+      "status.json": "cb5b068a65d5116ba959b07cf5dceb063e9c40e09c872f1ae2b03e6e0ae260d8",
+      "performance.json": "868b97c33d73464a9029d76fb00255fbb760220d403a872d2a5aa3e55ed5f6c7",
+      "checkpoint.json": "2b64a8b4d3765374fb31663039e5c7aae66e6bbabef4902c6cc1fd58cab73c72"
+    },
+    "image": "6d31f9bbe4fea05fef594b2f3039fbca5ee58c587fb3c9a0a959fab036a5ed98",
+    "fixture_hashes": {
+      "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e"
+    },
+    "cpu_budget_percent": null,
+    "requested_seconds": 600,
+    "observed_seconds": 600.0,
+    "acceptance": [
+      {
+        "name": "idle-before",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147732,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147692,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147720,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.469
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 601.203
+      },
+      {
+        "name": "idle-after",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 147456,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 147456,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.156
+      },
+      {
+        "name": "stop-recovery",
+        "result": "PASS",
+        "evidence": {
+          "heap_recovered": true
+        },
+        "seconds": 0.0
+      },
+      {
+        "name": "runtime",
+        "result": "PASS",
+        "evidence": null,
+        "seconds": 0.0
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS",
+        "evidence": {
+          "rebooted": true,
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        },
+        "seconds": 7.656
+      }
+    ],
+    "playback": {
+      "board": {
+        "version": "v0.9.693-1217-g91bc298d",
+        "partition": "app0",
+        "max_size": 1900544,
+        "app_elf_sha256": "6d31f9bbe4fea05fef594b2f3039fbca5ee58c587fb3c9a0a959fab036a5ed98"
+      },
+      "cases": [
+        {
+          "name": "hev2-44100-stereo",
+          "original": {
+            "name": "cpu-under-http-load:hev2-44100-stereo",
+            "result": "FAIL",
+            "exception_chain": [
+              {
+                "type": "Failure"
+              }
+            ],
+            "reason": "Progressive heap loss during continuous playback",
+            "seconds": 601.203
+          },
+          "full_window": {
+            "start": 50495.64,
+            "end": 51085.64,
+            "seconds": 590.0,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Progressive heap loss during continuous playback"
+            },
+            "cpu_samples": 117,
+            "decoder_windows": 118,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 76.67264957264958,
+              "peak_busy": 78.0,
+              "minimum_heap": 28256.0,
+              "minimum_largest": 12800.0,
+              "first_heap": 44448.0,
+              "last_heap": 30908.0,
+              "first_largest": 24576.0,
+              "last_largest": 22528.0,
+              "audio_wall_ratio": 1.0015977631316157,
+              "decode_percent": 58.80494110887676
+            }
+          },
+          "runtime": {
+            "result": "PASS",
+            "evidence": null
+          },
+          "subwindows": [
+            {
+              "start": 50495.64,
+              "end": 50795.64,
+              "seconds": 300.0,
+              "strict": {
+                "result": "FAIL",
+                "reason": "Progressive heap loss during continuous playback"
+              },
+              "cpu_samples": 59,
+              "decoder_windows": 60,
+              "malformed": [],
+              "diagnostic": {
+                "mean_busy": 76.89661016949152,
+                "peak_busy": 78.0,
+                "minimum_heap": 33864.0,
+                "minimum_largest": 20480.0,
+                "first_heap": 44448.0,
+                "last_heap": 36176.0,
+                "first_largest": 24576.0,
+                "last_largest": 20480.0,
+                "audio_wall_ratio": 1.0016144333671755,
+                "decode_percent": 59.08241940844134
+              }
+            },
+            {
+              "start": 50795.64,
+              "end": 51085.64,
+              "seconds": 290.0,
+              "strict": {
+                "result": "FAIL",
+                "reason": "Progressive heap loss during continuous playback"
+              },
+              "cpu_samples": 58,
+              "decoder_windows": 58,
+              "malformed": [],
+              "diagnostic": {
+                "mean_busy": 76.4448275862069,
+                "peak_busy": 77.7,
+                "minimum_heap": 28256.0,
+                "minimum_largest": 12800.0,
+                "first_heap": 33864.0,
+                "last_heap": 30908.0,
+                "first_largest": 19456.0,
+                "last_largest": 22528.0,
+                "audio_wall_ratio": 1.0015805186442663,
+                "decode_percent": 58.51789459208581
+              }
+            }
+          ],
+          "status_samples": 3205,
+          "max_http_ms": 203.00000000133878,
+          "minimum_rssi": -76
+        }
+      ],
+      "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+    },
+    "note": "Replay a completed continuous AAC study without attributing unrelated RAM.\n\nRX ranges are actual live allocations; TCP receive credit is logical payload.\nTheir snapshots and CPU heap samples are asynchronous. Window medians are\ncomparisons, not an exact subtraction or proof of sample-level audio continuity.",
+    "acoustic_continuity_qualified": false,
+    "idle": {
+      "idle-before": {
+        "heap": {
+          "min": 147692,
+          "median": 147720,
+          "max": 147732
+        },
+        "largest": {
+          "min": 114688,
+          "median": 114688,
+          "max": 114688
+        },
+        "tasks": {
+          "min": 17,
+          "median": 17,
+          "max": 17
+        }
+      },
+      "idle-after": {
+        "heap": {
+          "min": 147456,
+          "median": 147456.0,
+          "max": 147456
+        },
+        "largest": {
+          "min": 114688,
+          "median": 114688.0,
+          "max": 114688
+        },
+        "tasks": {
+          "min": 17,
+          "median": 17.0,
+          "max": 17
+        }
+      }
+    },
+    "ownership": {
+      "complete": false,
+      "reason": "Missing RX ownership telemetry"
+    },
+    "network": {
+      "note": "Host receive time minus age_ms; transport delay remains. Uncredited/refused bytes are not allocated RAM and must not be added to RX storage.",
+      "windows": {
+        "idle-before": {
+          "samples": 3,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 147692,
+              "median": 147704,
+              "max": 147720
+            },
+            "largest": {
+              "min": 114688,
+              "median": 114688,
+              "max": 114688
+            },
+            "blocks": {
+              "min": 367,
+              "median": 368,
+              "max": 368
+            },
+            "free_blocks": {
+              "min": 17,
+              "median": 18,
+              "max": 18
+            },
+            "age_ms": {
+              "min": 5117,
+              "median": 5323,
+              "max": 5345
+            },
+            "missed": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 11520,
+              "max": 11520
+            },
+            "maximum": {
+              "min": 11520,
+              "median": 11520,
+              "max": 11520
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            },
+            "refused": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          }
+        },
+        "idle-after": {
+          "samples": 1,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 147456,
+              "median": 147456,
+              "max": 147456
+            },
+            "largest": {
+              "min": 114688,
+              "median": 114688,
+              "max": 114688
+            },
+            "blocks": {
+              "min": 369,
+              "median": 369,
+              "max": 369
+            },
+            "free_blocks": {
+              "min": 24,
+              "median": 24,
+              "max": 24
+            },
+            "age_ms": {
+              "min": 5302,
+              "median": 5302,
+              "max": 5302
+            },
+            "missed": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 11520,
+              "max": 11520
+            },
+            "maximum": {
+              "min": 11520,
+              "median": 11520,
+              "max": 11520
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            },
+            "refused": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          }
+        },
+        "load": {
+          "samples": 117,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 28256,
+              "median": 35096,
+              "max": 44476
+            },
+            "largest": {
+              "min": 12800,
+              "median": 23552,
+              "max": 24576
+            },
+            "blocks": {
+              "min": 429,
+              "median": 437,
+              "max": 446
+            },
+            "free_blocks": {
+              "min": 11,
+              "median": 15,
+              "max": 20
+            },
+            "age_ms": {
+              "min": 4956,
+              "median": 5050,
+              "max": 5190
+            },
+            "missed": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 16223,
+              "max": 23040
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 6817,
+              "max": 11520
+            },
+            "refused": {
+              "min": 0,
+              "median": 0,
+              "max": 1440
+            }
+          }
+        },
+        "first-minute": {
+          "samples": 12,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 43292,
+              "median": 44448.0,
+              "max": 44448
+            },
+            "largest": {
+              "min": 24576,
+              "median": 24576.0,
+              "max": 24576
+            },
+            "blocks": {
+              "min": 430,
+              "median": 430.0,
+              "max": 431
+            },
+            "free_blocks": {
+              "min": 14,
+              "median": 14.0,
+              "max": 15
+            },
+            "age_ms": {
+              "min": 4972,
+              "median": 5034.0,
+              "max": 5153
+            },
+            "missed": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 22016,
+              "median": 23040.0,
+              "max": 23040
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040.0,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 0.0,
+              "max": 1024
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          }
+        },
+        "last-minute": {
+          "samples": 12,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 28864,
+              "median": 31390.0,
+              "max": 35096
+            },
+            "largest": {
+              "min": 16384,
+              "median": 19456.0,
+              "max": 24576
+            },
+            "blocks": {
+              "min": 439,
+              "median": 442.0,
+              "max": 446
+            },
+            "free_blocks": {
+              "min": 12,
+              "median": 13.5,
+              "max": 17
+            },
+            "age_ms": {
+              "min": 4986,
+              "median": 5053.0,
+              "max": 5141
+            },
+            "missed": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 12847.5,
+              "max": 16223
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040.0,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 6817,
+              "median": 10192.5,
+              "max": 11520
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 1440
+            }
+          }
+        },
+        "load-10-310s": {
+          "samples": 59,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 33864,
+              "median": 44448,
+              "max": 44476
+            },
+            "largest": {
+              "min": 20480,
+              "median": 24576,
+              "max": 24576
+            },
+            "blocks": {
+              "min": 429,
+              "median": 430,
+              "max": 439
+            },
+            "free_blocks": {
+              "min": 14,
+              "median": 15,
+              "max": 20
+            },
+            "age_ms": {
+              "min": 4963,
+              "median": 5051,
+              "max": 5190
+            },
+            "missed": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 14193,
+              "median": 23040,
+              "max": 23040
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 0,
+              "median": 0,
+              "max": 8847
+            },
+            "refused": {
+              "min": 0,
+              "median": 0,
+              "max": 0
+            }
+          }
+        },
+        "load-310-600s": {
+          "samples": 58,
+          "coverage_complete": true,
+          "heap": {
+            "heap": {
+              "min": 28256,
+              "median": 32230.0,
+              "max": 35096
+            },
+            "largest": {
+              "min": 12800,
+              "median": 18432.0,
+              "max": 24576
+            },
+            "blocks": {
+              "min": 437,
+              "median": 440.0,
+              "max": 446
+            },
+            "free_blocks": {
+              "min": 11,
+              "median": 15.0,
+              "max": 20
+            },
+            "age_ms": {
+              "min": 4956,
+              "median": 5050.0,
+              "max": 5183
+            },
+            "missed": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          },
+          "receive_credit": {
+            "window": {
+              "min": 11520,
+              "median": 13568.0,
+              "max": 16223
+            },
+            "maximum": {
+              "min": 23040,
+              "median": 23040.0,
+              "max": 23040
+            },
+            "uncredited": {
+              "min": 6817,
+              "median": 9472.0,
+              "max": 11520
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 1440
+            }
+          }
+        }
+      }
+    }
+  }
+}

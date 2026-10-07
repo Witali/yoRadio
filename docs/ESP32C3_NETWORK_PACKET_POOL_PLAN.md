@@ -36,8 +36,10 @@ Stop, idle heap returned to a median of 147,748 B and the largest block to
 114,688 B, exactly matching the idle baseline. Receive credit consumption
 reached 11,520 B. The original progressive-heap-loss gate remains FAIL.
 This supports investigating retained packet queues; it does not assign every
-heap byte to those queues or prove physical audio continuity. Raw baseline:
-`.build/rx-matched-20261007/baseline/`; retain with the matched comparison.
+heap byte to those queues or prove physical audio continuity. The completed
+[matched comparison](ESP32C3_RX_MATCHED_20261007.md) raises minimum free heap to
+28,256 B with native packet copies, at similar CPU load. Both original memory
+gates still fail. Retained baseline: `tests/results/esp32c3-rx-matched-20261007/baseline/`.
 
 ## Recommended boundary
 
