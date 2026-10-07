@@ -9,6 +9,7 @@
 #include "stream_http_reader.h"
 #include "esp_tls_errors.h"
 #include "http_parser.h"
+#include "mbedtls/ssl.h"
 
 enum { ERR_TCP_TRANSPORT_CONNECTION_FAILED=-2,
        ERR_TCP_TRANSPORT_CONNECTION_CLOSED_BY_FIN=-1,
@@ -101,9 +102,15 @@ enum { ESP_TLS_ERR_TYPE_MBEDTLS, ESP_TLS_ERR_TYPE_ESP };
     if((kind)==ESP_TLS_ERR_TYPE_ESP)(handle)->esp_error=(value); \
     else (handle)->tls_code=(value); \
 } while(0)
-static int mbedtls_ssl_read(int *ssl,unsigned char *data,size_t size) { (void)data;(void)size;return *ssl; }
+static bool preserve_tls_eof;
+int mbedtls_ssl_read(mbedtls_ssl_context *ssl,unsigned char *data,size_t size) { (void)data;(void)size;return *ssl; }
+static int adapter_mbedtls_ssl_read(mbedtls_ssl_context *ssl,unsigned char *data,size_t size) {
+    return preserve_tls_eof ? yoradio_mbedtls_ssl_read(ssl,data,size) : mbedtls_ssl_read(ssl,data,size);
+}
 static void mbedtls_print_error_msg(int error) { (void)error; }
+#define mbedtls_ssl_read adapter_mbedtls_ssl_read
 /* SDK_TLS_READ */
+#undef mbedtls_ssl_read
 
 static unsigned cases;
 static void test_partial_fatal(unsigned initial,bool cached,int tls_error) {
@@ -167,6 +174,38 @@ static void test_tls_adapter(void) {
     }
     puts("TLS_ADAPTER_PASS close_alert_and_raw_EOF_collapse_to_zero; timeout_records_read_failed; WANT_codes_not_recorded");
 }
+static void test_tls_eof_fix(void) {
+    preserve_tls_eof=true;
+    const int results[]={MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY,0,MBEDTLS_ERR_SSL_ALLOC_FAILED,
+        MBEDTLS_ERR_SSL_INVALID_MAC,ESP_TLS_ERR_SSL_TIMEOUT,ESP_TLS_ERR_SSL_WANT_READ,
+        ESP_TLS_ERR_SSL_WANT_WRITE,5};
+    for(unsigned i=0;i<sizeof(results)/sizeof(results[0]);++i) {
+        test_tls_error_t errors={0};esp_tls_t tls={.ssl=results[i],.error_handle=&errors};char data[8];
+        ssize_t expected=results[i]==0?MBEDTLS_ERR_SSL_CONN_EOF:results[i];
+        if(results[i]==MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)expected=0;
+        assert(esp_mbedtls_read(&tls,data,sizeof(data))==expected);
+        if(results[i]==0)assert(errors.esp_error==ESP_ERR_MBEDTLS_SSL_READ_FAILED && errors.tls_code==-MBEDTLS_ERR_SSL_CONN_EOF);
+        if(results[i]==MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)assert(errors.esp_error==0 && errors.tls_code==0);
+        ++cases;
+    }
+    mbedtls_ssl_context empty=0;unsigned char buffer[1];
+    assert(yoradio_mbedtls_ssl_read(&empty,buffer,0)==0);++cases;
+    // Drive the actual SDK adapter result into its HTTP transport seam.
+    for(unsigned clean=0;clean<2;++clean) {
+        test_tls_error_t errors={0};esp_tls_t tls={.ssl=clean?MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY:0,.error_handle=&errors};
+        char buffer[8];int transport=(int)esp_mbedtls_read(&tls,buffer,sizeof(buffer));
+        if(transport==0)transport=ERR_TCP_TRANSPORT_CONNECTION_CLOSED_BY_FIN;
+        const char *closed="HTTP/1.1 200 OK\r\nConnection: close\r\n\r\n";
+        test_framing(closed,"ABCDEFGH","ABCDEFGH",clean,1,transport,errors.tls_code);
+        // A completed, explicitly framed message must not be rejected merely
+        // because the peer would subsequently close without an alert.
+        test_framing("HTTP/1.1 200 OK\r\nContent-Length: 8\r\n\r\n","ABCDEFGH","ABCDEFGH",true,1,transport,errors.tls_code);
+        test_framing("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n","8\r\nABCDEFGH\r\n0\r\n\r\n","ABCDEFGH",true,1,transport,errors.tls_code);
+    }
+    preserve_tls_eof=false;
+    puts("TLS_EOF_FIX_PASS raw_EOF_fails_unframed_body; close_notify_completes; explicit_framing_preserved; no_extra_allocation");
+}
+
 static void test_chunked_timeout(void) {
     struct fake_client c;response_t r;esp_http_buffer_t b;
     setup_headers(&c,&r,&b,"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");
@@ -199,7 +238,7 @@ static void test_protocol(void) {
     test_framing(length,"ABCDEFGH","ABCDEFGH",true,8,-2,-MBEDTLS_ERR_SSL_INVALID_MAC);
     test_framing(chunked,"8\r\nABCDEFGH\r\n0\r\n\r\n","ABCDEFGH",true,1,-2,-MBEDTLS_ERR_SSL_INVALID_MAC);
     puts("HTTP_FRAMING_PASS content_length chunked extensions trailers truncated malformed fragmented close_delimited");
-    puts("KNOWN_SDK_LIMITATION close_notify_and_bare_TLS_EOF_are_indistinguishable_at_HTTP_API");
+    puts("UNMODIFIED_SDK_LIMITATION close_notify_and_bare_TLS_EOF_are_indistinguishable_at_HTTP_API");
 }
 
 int main(void) {
@@ -231,5 +270,6 @@ int main(void) {
     test_protocol();
     test_chunked_timeout();
     test_tls_adapter();
+    test_tls_eof_fix();
     printf("STREAM_HTTP_READER_PASS cases=%u partial_bytes_preserved=true fatal_retry=false temporary_retry=true sdk_control_retries=true\n",cases);
 }

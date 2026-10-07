@@ -10,7 +10,8 @@ from diagnostic import DiagnosticCapture
 from ota import image_info, snapshot, verify_snapshot
 from public_streams import no_runtime_faults
 from run import Suite
-from audio_test_server.tls_records import RecordServer
+from audio_test_server.tls_records import (RecordServer, MAX_OBSERVATION_SECONDS,
+                                         OBSERVATION_TAIL_SECONDS)
 
 
 def capture_record_observation(events):
@@ -52,7 +53,8 @@ def main():
     p.add_argument('--seconds', type=int, default=75)
     p.add_argument('--output', type=Path, required=True)
     args = p.parse_args()
-    require(not args.output.exists() and 60 <= args.seconds <= 585, 'Use fresh output and 60..585 seconds')
+    require(not args.output.exists() and 60 <= args.seconds <= MAX_OBSERVATION_SECONDS,
+            f'Use fresh output and 60..{MAX_OBSERVATION_SECONDS} seconds')
     cfg = args.firmware.with_name('sdkconfig').read_text()
     manifest = json.loads(args.firmware.with_name('manifest.json').read_text())
     require(manifest.get('laboratory_only') is True and manifest.get('extra_trust_ca_sha256') == sha(args.ca.read_bytes()),
@@ -110,7 +112,7 @@ def main():
 
     try:
         with RecordServer(args.host, 8772, {args.case:specs[args.case]}, args.cert, args.key,
-                          seconds=args.seconds+15, grow_seconds=30) as server:
+                          seconds=args.seconds+OBSERVATION_TAIL_SECONDS, grow_seconds=30) as server:
             report.case('idle-before', idle)
             for mode in args.mode or ('small','large','grow','alternate'):
                 report.case('tls-record:'+mode, lambda m=mode: run_case(m,server))

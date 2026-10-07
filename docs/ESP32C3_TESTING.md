@@ -849,9 +849,9 @@ failed heap gates, with exact firmware/config identities.
 
 The [HTTP/TLS RFC audit](ESP32C3_HTTP_TLS_RFC_AUDIT_20261007.md) maps framing,
 timeouts, fatal-error teardown and closure requirements to reproducible host
-tests on ESP-IDF 6.0.3/6.1. It explicitly records the unresolved SDK ambiguity
-between TLS `close_notify` and raw EOF; passing body-parser tests alone does
-not certify HTTPS closure behavior.
+tests on ESP-IDF 6.0.3/6.1. The pre-adapter EOF correction now distinguishes
+TLS `close_notify` from raw EOF, with independent linked-image and physical
+fixtures below. Passing body-parser tests alone does not certify HTTPS.
 
 `tools/esp32c3_tests/tls_records.py` checks full-rate AAC with 1 KiB and 16 KiB
 TLS plaintext records, including growth after the decoder has started. Use only
@@ -875,6 +875,37 @@ Stop; the separate final server trace can include later failed socket writes.
 See the [physical allocation-boundary results](ESP32C3_TLS_RECORD_MEMORY_20261007.md).
 The [shared server guide](../tools/audio_test_server/README.md#full-sized-tls-record-tests)
 documents certificates and host-side byte/record checks.
+
+Use `--mode alternate --seconds 600` for a full ten-minute record-allocation
+soak. The server keeps a 15-second tail beyond the observation and sends
+`close_notify` on normal completion. Intentional client Stop and failed writes
+remain visible in the separate final trace.
+
+## HTTPS completion and truncation
+
+```powershell
+python tests/test-tls-framing-server.py
+python tests/test-stream-http-reader.py --idf C:/Work/yoRadio/.idf/v6.1 --output .build/http-eof-host
+python tools/esp32c3_tests/tls_framing.py --board http://192.168.100.4 --host 192.168.100.253 --serial-port COM9 --firmware <lab-app.bin> --ca <ca.pem> --cert <server.pem> --key <server.key> --output .build/http-eof-board
+```
+
+The physical runner checks all eight modes documented by the
+[shared HTTPS server](../tools/audio_test_server/README.md#https-body-completion-fixtures).
+It requires an awake profiling image explicitly labelled with the test CA,
+the ordinary full root bundle and full-sized TLS input capacity. It does not
+flash automatically. Installed ELF identity and settings preservation are checked.
+
+Complete Content-Length/chunked bodies and an unframed body ending with
+`close_notify` must finish as `stream ended`. A short declared body, a missing
+terminal chunk or an unframed raw TLS EOF must finish as `stream read failed`.
+Every mode must first show full-rate/full-channel decoded audio. Expected TLS
+errors in negative fixtures are distinct from decoder/allocation/panic failures.
+The host runner checks real parser/adapter code with scripted transport seams;
+the server test checks real TLS on loopback; only the physical runner checks
+the board. None of these status checks establishes acoustic or PCM identity.
+
+Use `verify_http_link.py --elf <firmware.elf> --sdkconfig <sdkconfig> --objdump <riscv-objdump> --output
+<report.json>` to verify the actual linked HTTP and TLS-wrapper call paths.
 
 ## CPU diagnostics without a separate profiler stack
 

@@ -11,6 +11,9 @@ from urllib.parse import urlsplit
 
 MAX_RECORD_PLAINTEXT = 16384
 SMALL_RECORD_PLAINTEXT = 1024
+MAX_OBSERVATION_SECONDS = 600
+OBSERVATION_TAIL_SECONDS = 15
+MAX_SERVER_SECONDS = MAX_OBSERVATION_SECONDS + OBSERVATION_TAIL_SECONDS
 
 
 class Channel:
@@ -85,10 +88,26 @@ class Channel:
         else:
             self.event['dropped_writes'] += 1
 
+    def close_write(self):
+        # RFC 9112 section 9.8: send close_notify before a normal server close.
+        # Do not wait for the peer alert: the client may still be draining audio.
+        self.phase = 'close'
+        while True:
+            try:
+                self.tls.unwrap()
+            except ssl.SSLWantWriteError:
+                self.drain()
+                continue
+            except ssl.SSLWantReadError:
+                self.drain()
+                return
+            self.drain()
+            return
+
 
 class RecordServer:
     def __init__(self, host, port, fixtures, cert, key, *, seconds=90, grow_seconds=30):
-        if not 0 <= grow_seconds <= seconds or not 0 < seconds <= 600:
+        if not 0 <= grow_seconds <= seconds or not 0 < seconds <= MAX_SERVER_SECONDS:
             raise ValueError('Invalid bounded test duration')
         self.closed = threading.Event()
         self.events = []
@@ -112,6 +131,7 @@ class RecordServer:
                     parts = urlsplit(channel.request()).path.strip('/').split('/')
                     if len(parts) != 2 or parts[0] not in ('small', 'large', 'grow', 'alternate') or parts[1] not in fixtures:
                         channel.write(b'HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n', 'headers')
+                        channel.close_write()
                         return
                     mode, name = parts
                     spec = fixtures[name]
@@ -137,6 +157,7 @@ class RecordServer:
                         index += 1
                         if outer.closed.wait(max(0, started + event['audio_bytes'] / bps - time.monotonic())):
                             return
+                    channel.close_write()
                     event['complete'] = True
                 except ssl.SSLError as error:
                     event['error'] = type(error).__name__

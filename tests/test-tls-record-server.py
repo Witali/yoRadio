@@ -36,7 +36,8 @@ class RecordTests(unittest.TestCase):
                 context = ssl.create_default_context(cafile=str(self.keys['ca']))
                 port = server.server.server_address[1]
                 with socket.create_connection(('127.0.0.1', port), timeout=5) as plain:
-                    with context.wrap_socket(plain, server_hostname='127.0.0.1') as secure:
+                    with context.wrap_socket(plain, server_hostname='127.0.0.1',
+                                             suppress_ragged_eofs=False) as secure:
                         secure.sendall(f'GET /{mode}/fixture HTTP/1.1\r\nHost: localhost\r\n\r\n'.encode())
                         wire = bytearray()
                         while chunk := secure.recv(32768):
@@ -49,6 +50,8 @@ class RecordTests(unittest.TestCase):
                 self.assertEqual(event['audio_bytes'], len(audio))
                 self.assertEqual(event['dropped_records'], 0)
                 self.assertEqual(event['dropped_writes'], 0)
+                self.assertTrue(any(r['phase'] == 'close' and r['type'] == 21
+                                    for r in event['records']))
                 self.assertEqual(event['version'], 'TLSv1.2')
                 self.assertEqual(event['cipher'], 'ECDHE-RSA-AES128-GCM-SHA256')
                 body = [r for r in event['records'] if r['phase'].startswith('body-')]

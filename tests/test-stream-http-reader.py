@@ -48,7 +48,7 @@ esp_err_t esp_http_client_get_and_clear_last_tls_error(esp_http_client_handle_t,
 import re
 ssl=(args.idf/'components/mbedtls/mbedtls/include/mbedtls/ssl.h').read_text()
 with (args.output/'esp_tls_errors.h').open('a') as codes:
-    for name in ('MBEDTLS_ERR_SSL_ALLOC_FAILED','MBEDTLS_ERR_SSL_INVALID_MAC','MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY'):
+    for name in ('MBEDTLS_ERR_SSL_ALLOC_FAILED','MBEDTLS_ERR_SSL_INVALID_MAC','MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY','MBEDTLS_ERR_SSL_CONN_EOF'):
         value=re.search(r'^#define\s+'+name+r'\s+(\S+)',ssl,re.M)
         assert value, name
         literal=value[1]
@@ -58,6 +58,15 @@ with (args.output/'esp_tls_errors.h').open('a') as codes:
         assert re.fullmatch(r'-(?:0x[0-9a-fA-F]+|\d+)',literal), literal
         codes.write(f'#define {name} ({literal})\n')
 
+(args.output/'mbedtls').mkdir(exist_ok=True)
+(args.output/'mbedtls/ssl.h').write_text('''#pragma once
+#include <stddef.h>
+#include "esp_tls_errors.h"
+typedef int mbedtls_ssl_context;
+int mbedtls_ssl_read(mbedtls_ssl_context *, unsigned char *, size_t);
+int yoradio_mbedtls_ssl_read(mbedtls_ssl_context *, unsigned char *, size_t);
+''')
+
 def linux(path):
     path=path.resolve()
     return '/mnt/'+path.drive[0].lower()+path.as_posix()[2:]
@@ -66,7 +75,7 @@ binary=args.output/'test'
 command=['wsl.exe','--exec','gcc','-std=c11','-Wall','-Wextra','-Werror','-g','-O1',
     '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
     '-I'+linux(args.output),'-I'+linux(main),'-I'+linux(parser),linux(args.output/'test.c'),
-    linux(main/'stream_http_reader.c'),linux(parser/'http_parser.c'),
+    linux(main/'stream_http_reader.c'),linux(main/'tls_stream_eof.c'),linux(parser/'http_parser.c'),
     '-o',linux(binary)]
 build=subprocess.run(command,capture_output=True,text=True,timeout=120)
 (args.output/'build.log').write_text(build.stdout+build.stderr)
@@ -77,7 +86,7 @@ report=dict(result='PASS' if run.returncode==0 and 'STREAM_HTTP_READER_PASS' in 
     idf=str(args.idf), sdk_source_sha256=hashlib.sha256(sdk.read_bytes()).hexdigest(),
     extracted_function_sha256=hashlib.sha256(function.encode()).hexdigest(),
     sources_sha256={str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
-        for path in (harness,main/'stream_http_reader.c',main/'stream_http_reader.h',Path(__file__))},
+        for path in (harness,main/'stream_http_reader.c',main/'stream_http_reader.h',main/'tls_stream_eof.c',Path(__file__))},
     tls_adapter_sha256=hashlib.sha256(tls_read.encode()).hexdigest(),
     parser_sha256=hashlib.sha256((parser/'http_parser.c').read_bytes()).hexdigest(),
     body_callbacks_sha256=hashlib.sha256(body.encode()).hexdigest(),

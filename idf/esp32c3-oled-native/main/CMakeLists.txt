@@ -268,6 +268,17 @@ idf_component_register(
 
 yoradio_aac_profile()
 yoradio_vorbis_repair()
+if(CONFIG_ESP_TLS_USING_MBEDTLS)
+  target_sources(${COMPONENT_LIB} PRIVATE "tls_stream_eof.c")
+  # The SDK already owns __wrap_mbedtls_ssl_read for dynamic RX buffers.
+  # Redirect only its ESP-TLS caller, preserving the SDK's wrapper chain.
+  idf_component_get_property(tls_dir esp-tls COMPONENT_DIR)
+  idf_component_get_property(tls_lib esp-tls COMPONENT_LIB)
+  set_property(SOURCE "${tls_dir}/esp_tls_mbedtls.c" TARGET_DIRECTORY ${tls_lib}
+    APPEND PROPERTY COMPILE_DEFINITIONS "mbedtls_ssl_read=yoradio_mbedtls_ssl_read")
+  # ESP-TLS may appear after libmain in the link order; retain the entry point.
+  target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--undefined=yoradio_mbedtls_ssl_read")
+endif()
 if(CONFIG_YORADIO_HEAP_FRAGMENT_PROBE)
   target_sources(${COMPONENT_LIB} PRIVATE "heap_fragment_probe.c")
   target_link_options(${COMPONENT_LIB} INTERFACE

@@ -68,6 +68,13 @@ checks actual encrypted record lengths (1048 and 16,408 bytes for this cipher),
 exact audio bytes across repeated fixtures, and rejection with ordinary trust.
 Host writes are not proof of bytes received or decoded by a board.
 
+Normal server completion sends TLS `close_notify`; the host test disables
+Python's suppression of abrupt TLS EOF and requires the closing alert. An
+intentional Stop can still interrupt a write, recorded separately. The C3
+record runner accepts `--seconds 600` for a complete ten-minute observation;
+the server allows an additional 15 seconds so it does not end the stream before
+the observation finishes. Its total duration is bounded to 615 seconds.
+
 The 16 KiB plaintext bound follows [RFC 5246 §6.2.1](https://www.rfc-editor.org/rfc/rfc5246#section-6.2.1).
 The test measures the encrypted lengths too; the TLS 1.2 GCM record construction
 is specified in [RFC 5288 §3](https://www.rfc-editor.org/rfc/rfc5288#section-3).
@@ -101,6 +108,28 @@ cannot establish real-time decoding under sustained load.
 C3-specific control, verification and the complete test plan are documented in
 [ESP32C3_TESTING.md](../../docs/ESP32C3_TESTING.md). Other boards can reuse this
 server with their own playlist/WebUI or test controller unchanged.
+
+## HTTPS body completion fixtures
+
+From the repository root, run a server usable by any board:
+
+```powershell
+python -m tools.audio_test_server.tls_framing --host 192.168.100.253 --cert <server.pem> --key <server.key> --seconds 600 --output .build/framing-events.json
+python tests/test-tls-framing-server.py
+```
+
+Use the laboratory certificate workflow in the TLS-record section; keep
+certificate and hostname verification enabled. Routes are
+`https://<host>:8773/<mode>/<fixture>`. The eight modes are `length-notify`,
+`length-raw`, `length-short`, `chunked-notify`, `chunked-raw`, `chunked-short`,
+`close-notify`, and `close-raw`. All send the complete fixture audio. The
+`length-short` mode promises one extra byte; `chunked-short` omits the terminal
+chunk. Both send a TLS close alert. The `raw` modes deliberately omit that alert.
+
+The host test checks exact HTTP bytes and TLS closure using a verifying client
+that rejects ragged EOFs. Saved server events describe the sent bytes/records,
+not their reception or playback by a board. A fresh output path is required;
+the server never saves private keys or received request headers.
 
 ## Optional delivery timing
 
