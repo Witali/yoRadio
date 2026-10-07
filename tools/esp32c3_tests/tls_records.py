@@ -15,7 +15,8 @@ from audio_test_server.tls_records import RecordServer
 def record_evidence(events, mode):
     require(mode in ('small','large','grow','alternate'), 'Unknown record mode')
     selected = [e for e in events if e.get('mode') == mode]
-    require(len(selected) == 1, 'Expected one TLS connection, not retries')
+    # Failed handshakes have no mode yet; count them as connections too.
+    require(len(events) == 1 and len(selected) == 1, 'Expected one TLS connection, not retries')
     event = selected[0]
     require(event.get('version') == 'TLSv1.2' and event.get('cipher') == 'ECDHE-RSA-AES128-GCM-SHA256',
             'Unexpected negotiated TLS parameters')

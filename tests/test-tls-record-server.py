@@ -59,6 +59,8 @@ class RecordTests(unittest.TestCase):
                 self.assertEqual(set(record_evidence([event], mode)['record_counts']), expected)
                 with self.assertRaises(AssertionError):
                     record_evidence([event, event], mode)
+                with self.assertRaises(AssertionError):
+                    record_evidence([{'error':'SSLError'}, event], mode)
                 broken = copy.deepcopy(event)
                 next(r for r in broken['records'] if r['phase'].startswith('body-'))['wire_payload_bytes'] += 1
                 with self.assertRaises(AssertionError):
