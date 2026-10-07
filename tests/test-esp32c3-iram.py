@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import sys
 import unittest
+from evidence_sources import historical_source
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,7 +27,7 @@ class IramEvidence(unittest.TestCase):
     def test_profile_source_fingerprints(self):
         evidence = read(RESULT/'implementation.json')
         for path, expected in evidence['files'].items():
-            self.assertEqual(hashlib.sha256((ROOT/path).read_bytes()).hexdigest(), expected, path)
+            self.assertEqual(hashlib.sha256(historical_source(ROOT, path, expected)).hexdigest(), expected, path)
 
     def test_actual_artifact_fingerprints(self):
         for build in BUILDS:

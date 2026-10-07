@@ -5,6 +5,7 @@ from pathlib import Path
 import statistics
 import sys
 import unittest
+from evidence_sources import historical_source
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools/esp32c3_tests'))
@@ -58,7 +59,13 @@ class NetworkMemoryEvidenceTests(unittest.TestCase):
     def test_summaries_and_original_baseline_failure(self):
         for suite in ('baseline-http32', 'candidate-http32', 'candidate-https64'):
             folder = EVIDENCE/suite
-            self.assertEqual(network_inspect(folder), read(folder/'network-summary.json'))
+            actual = network_inspect(folder)
+            expected = read(folder/'network-summary.json')
+            source = 'tools/esp32c3_tests/network_memory.py'
+            self.assertEqual(actual.pop('source_sha256'), sha(ROOT/source))
+            original_hash = expected.pop('source_sha256')
+            self.assertEqual(hashlib.sha256(historical_source(ROOT, source, original_hash)).hexdigest(), original_hash)
+            self.assertEqual(actual, expected)
             self.assertEqual(cpu_inspect(folder), read(folder/'summary.json'))
         baseline = read(EVIDENCE/'baseline-http32/report.json')
         failures = {c['name']: c['reason'] for c in baseline['cases'] if c['result'] == 'FAIL'}

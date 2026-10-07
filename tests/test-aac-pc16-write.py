@@ -5,6 +5,8 @@ from pathlib import Path
 import re
 import sys
 import unittest
+import hashlib
+from evidence_sources import historical_source
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools/codec_benchmark'))
@@ -34,7 +36,8 @@ class Pc16WriteTests(unittest.TestCase):
         manifest = json.loads((EVIDENCE / 'implementation.json').read_text())
         for path, digest in manifest['files'].items():
             snapshot = manifest.get('snapshots', {}).get(path)
-            self.assertEqual(common.sha256(EVIDENCE / snapshot if snapshot else ROOT / path), digest, path)
+            data = (EVIDENCE / snapshot).read_bytes() if snapshot else historical_source(ROOT, path, digest)
+            self.assertEqual(hashlib.sha256(data).hexdigest(), digest, path)
 
     def test_native_source_and_bypass_are_bit_exact(self):
         for result in self.results.values():

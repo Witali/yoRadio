@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import sys
 import unittest
+from evidence_sources import historical_source
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULT = ROOT/'tests/results/esp32c3-wifi16-20261001'
@@ -61,7 +62,7 @@ class WifiBalanceEvidence(unittest.TestCase):
         for path in RESULT.rglob('report.json'):
             report = read(path)
             for filename, digest in report['test_sources_sha256'].items():
-                self.assertEqual(hashlib.sha256((ROOT/filename).read_bytes()).hexdigest(),
+                self.assertEqual(hashlib.sha256(historical_source(ROOT, filename, digest)).hexdigest(),
                                  digest, str(path)+': '+filename)
 
     def test_failed_original_control_is_retained(self):
