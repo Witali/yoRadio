@@ -88,3 +88,37 @@ stay in RAM and are compared after restoration. Reports preserve failures.
 Measured physical outcomes and exact image/source identities are retained in
 `tests/results/esp32c3-station-timeout-20261007/`. These checks cover connection
 availability, not broad codec/TLS qualification or physical audio continuity.
+
+### Physical results, 2026-10-07
+
+The final awake image (`0117c66082ec`, full ELF SHA-256 in the manifest) passed
+all **15 recorded checks** and remains installed on the board. Both application
+OTA transitions passed; the upgrade introduced the default of 10 seconds while
+preserving existing settings, Wi-Fi and the playlist.
+
+| Check | Observed result |
+| --- | --- |
+| Ordinary firmware before the change | One 503 request, no recovery; expected baseline failure retained |
+| AAC-LC 48 kHz stereo / HE-AACv2 44.1 kHz stereo | Two 503 responses, then playback; finite EOF did not restart |
+| Timeout set to 3 seconds | Unavailable observed at 3.297 s; two requests, none after the deadline |
+| Timeout set to 10 seconds | Unavailable observed at 10.422 s; four requests, none after the deadline |
+| Connected stream stalls | Stops with `station unavailable` using the 3-second setting |
+| Cancellation | Stop, another station and disabling watchdog cancel pending retries |
+| Persistence and validation | 3 seconds survives software reboot; six invalid values rejected |
+| Settled heap before / after | Median 147,702 / 147,972 B; largest block 114,688 B; 17 tasks in both windows |
+| Final restored state | Saved station playing AAC PCM 44.1 kHz stereo; timeout 10; served WebUI script matches the artifact |
+
+The observed times include status polling and are not a measurement of the
+exact internal deadline. The first full run passed its functional checks but
+reported the intentional persistence-test reboot as an unexpected reset. That
+failed report is retained unchanged. The corrected runner permits only the
+recorded software-reset banners inside the requested reboot interval; other
+resets, panics and allocation/decoder errors still fail. The repeat passed.
+
+The final host stream test passed 35 sanitizer scenarios, the EOF regression
+passed, and the WebUI/native tests passed 50 checks. A live browser preview was
+unavailable because the automation runtime failed to start. The UI control was
+tested by executing its JavaScript, checking the served asset and exercising
+the real WebSocket setting; browser layout and OLED appearance were not
+visually verified. These results do not qualify the image for every codec,
+TLS failure or uninterrupted physical audio output.

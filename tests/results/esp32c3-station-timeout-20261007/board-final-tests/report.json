@@ -1,0 +1,409 @@
+{
+  "board": {
+    "version": "v0.9.693-1213-g92bf4541-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "0117c66082ecfba3cc6a17f2cfe93aa91ba09a3eabf43d929ccda3beaa67dc65"
+  },
+  "cases": [
+    {
+      "name": "idle-before",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 147712,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147692,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.359
+    },
+    {
+      "name": "recover-lc",
+      "result": "PASS",
+      "evidence": {
+        "playback": {
+          "samples": 11,
+          "rate": 48000,
+          "channels": 2
+        },
+        "retry_intervals_seconds": [
+          1.0309999999954016,
+          2.0310000000026776
+        ],
+        "eof_not_restarted": true
+      },
+      "seconds": 27.187
+    },
+    {
+      "name": "recover-hev2",
+      "result": "PASS",
+      "evidence": {
+        "playback": {
+          "samples": 11,
+          "rate": 44100,
+          "channels": 2
+        },
+        "retry_intervals_seconds": [
+          1.014999999999418,
+          2.0319999999992433
+        ],
+        "eof_not_restarted": true
+      },
+      "seconds": 27.704
+    },
+    {
+      "name": "watchdog-off",
+      "result": "PASS",
+      "evidence": {
+        "requests_before": 1,
+        "cancelled": true,
+        "new_station_plays": false
+      },
+      "seconds": 9.125
+    },
+    {
+      "name": "stop",
+      "result": "PASS",
+      "evidence": {
+        "requests_before": 1,
+        "cancelled": true,
+        "new_station_plays": false
+      },
+      "seconds": 9.187
+    },
+    {
+      "name": "switch",
+      "result": "PASS",
+      "evidence": {
+        "requests_before": 1,
+        "cancelled": true,
+        "new_station_plays": true
+      },
+      "seconds": 9.125
+    },
+    {
+      "name": "disable-pending",
+      "result": "PASS",
+      "evidence": {
+        "requests_before": 1,
+        "cancelled": true,
+        "new_station_plays": false
+      },
+      "seconds": 8.953
+    },
+    {
+      "name": "timeout-3",
+      "result": "PASS",
+      "evidence": {
+        "timeout_seconds": 3,
+        "observed_seconds": 3.2969999999986612,
+        "attempts": 2,
+        "terminal": true
+      },
+      "seconds": 9.203
+    },
+    {
+      "name": "timeout-10",
+      "result": "PASS",
+      "evidence": {
+        "timeout_seconds": 10,
+        "observed_seconds": 10.421999999998661,
+        "attempts": 4,
+        "terminal": true
+      },
+      "seconds": 15.922
+    },
+    {
+      "name": "timeout-stall",
+      "result": "PASS",
+      "evidence": {
+        "timeout_seconds": 3,
+        "stalled_stream_stopped": true
+      },
+      "seconds": 14.891
+    },
+    {
+      "name": "settings-persistence",
+      "result": "PASS",
+      "evidence": {
+        "reboot_persisted": true,
+        "rejected_invalid_values": 6
+      },
+      "seconds": 9.969
+    },
+    {
+      "name": "idle-after",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 147988,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147956,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.453
+    },
+    {
+      "name": "stop-recovery",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "runtime",
+      "result": "PASS",
+      "evidence": {
+        "planned_software_reboots": 1
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 7.797
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "cpu_budget_percent": null,
+  "created_utc": "2026-10-07T10:33:34.386703+00:00",
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/allocations.py": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7",
+    "tools/esp32c3_tests/common.py": "fe0c810d1a55350d6aa2535a4fb7588a18179998f593504c75af8eda660f6fcd",
+    "tools/esp32c3_tests/compare_latency.py": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394",
+    "tools/esp32c3_tests/compare_output_dma.py": "7f1776e7c479489c90ab4ad36029b774a9d52e51414ac6a22cc8305faf685bad",
+    "tools/esp32c3_tests/compare_output_priority.py": "f362814eb4b281d4cc296f965f5b8709e46a378f41d9620a24fe03ac55b6fc83",
+    "tools/esp32c3_tests/compare_output_priority_matrix.py": "c6dfe2fb2d1f48572123b9d3c1c13b050fa62b04f8824c44b9e11717999e5551",
+    "tools/esp32c3_tests/connection_retry.py": "dcec5e511d5d70a17b35152405e119332cf1b89f5e7fec3b5b97f9b427605701",
+    "tools/esp32c3_tests/diagnostic.py": "4774b1d14b3d7d85e3272166593af69bcbe2b262082748c4ce8683fdbab6b5c4",
+    "tools/esp32c3_tests/flac_truncation.py": "6550ccffb7add2f4573c242e15149d6755a50497517db253b939609052f3e115",
+    "tools/esp32c3_tests/flash_constants.py": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5",
+    "tools/esp32c3_tests/heap_fragment.py": "648cb750eee9635419626f3b27437ed3a6bffe6443fabd014fff4d4ba3b4f1e4",
+    "tools/esp32c3_tests/heap_idle.py": "ac02c2f5595b16c57d6952a3084b746720b07f1baaff82ec0486759ddcccdda1",
+    "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+    "tools/esp32c3_tests/load_windows.py": "fadd0814cf77a45b120f994ff67e2df09c91f545de765310403efbe7a3d206ba",
+    "tools/esp32c3_tests/memory.py": "2d02410fb60db20f90f3131812e6db10657d99865bbc791427f04bcfa89eae81",
+    "tools/esp32c3_tests/network_memory.py": "c77cef3021fb54c9b08f07c1ee25f3938cefc97e176724689ef2b005957d2aca",
+    "tools/esp32c3_tests/ota.py": "b47b95af97e73740c1bdbeb849087c1e95d97fc47e34615ed2d0665e1b294631",
+    "tools/esp32c3_tests/ota_diagnostic.py": "0d4bd95c8dfb5389709c02345851e0141c68819451b654177e43dfc05161bf89",
+    "tools/esp32c3_tests/ota_transition.py": "28d55e1a99489c5ede457dbb6ddfc82fbf327ce0a61cac3ccb277ec0fca2c5f6",
+    "tools/esp32c3_tests/output_priority_matrix.py": "90281e97874b28b7f8c82a2d6fcd33bd86f741cdf6be723c08129037f2c0b29e",
+    "tools/esp32c3_tests/pipeline_flow.py": "95b8a80a34d61f3016e61b162f4508cbb5a2287955fa105a6f292d30ca5a7fbc",
+    "tools/esp32c3_tests/pipeline_flow_study.py": "209f9fcb87cebb80a1fcce7902adc070acb983aa0bb904da7d8b9cc9b76fd98b",
+    "tools/esp32c3_tests/pool_settle.py": "805b05ba463b0b5d91b3587abd1c7c4712cdfde37f44413ef74ca37bd63f3eb0",
+    "tools/esp32c3_tests/public_streams.py": "eca0b6b94e4b62366e16bddf32cf4a21e66cbf2655699308ef8facad8274af28",
+    "tools/esp32c3_tests/radio_flac_study.py": "bb232c611c0b323694f7a2daa887cbb62ede5cc85c14d5a00c552009da044ea1",
+    "tools/esp32c3_tests/reference_eof.py": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f",
+    "tools/esp32c3_tests/run.py": "04c4125c7d28b6c5a29081d446587122cf54263b7071b76d859916df3623599e",
+    "tools/esp32c3_tests/rx_ownership.py": "83e55baffd19b46333ca66d5bea20f3048e9b38c07feadc5b30063299eac4383",
+    "tools/esp32c3_tests/serial_lines.py": "7b409f2f90dba97b806764d9ceffeb0960e8890e2476595a5aba8901c22222fb",
+    "tools/esp32c3_tests/stream_memory_study.py": "bdd79638745ebe029fdfe0317f6cf8c92c3fd9f22ddfadeaf3d7a8fced3b7b89",
+    "tools/esp32c3_tests/summarize_codec_sequence.py": "c68310924080f07a11bd8ab4c7aa4f9832d3f7268c33422aeab2546d96fac060",
+    "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+    "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+    "tools/esp32c3_tests/summarize_public.py": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+    "tools/esp32c3_tests/summarize_public_windows.py": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709",
+    "tools/esp32c3_tests/summarize_radio_flac.py": "80106f9f6b66d1acaab528b7c2971707af28f598c7ad1454fa21c200ff6be0ea",
+    "tools/esp32c3_tests/summarize_rx_ownership.py": "d0b840c4248b7b469b79c63efbfcf1254af8c0f4e1a0faa71fe11deec1610514",
+    "tools/esp32c3_tests/summarize_stream_memory.py": "cac4e53f9e2938cfeeed69e742cc37210c12c1e5c56f643b473390ddff492e71",
+    "tools/esp32c3_tests/summarize_sustained.py": "53e93ce54b510f3ee855d2043ea79295a02578d284933834f4f9b736c0885181",
+    "tools/esp32c3_tests/summarize_terminal_cpu.py": "087a624267b015ae3b54379bfb50348493021b6ff03c03e9e38b6619a4f75aba",
+    "tools/esp32c3_tests/summarize_terminal_memory.py": "6ee0f98bbc84c5a1d8745d8cd3c7b92d6e24265c6ddd709f6e2a75300d07ae84",
+    "tools/esp32c3_tests/terminal_memory.py": "6ae0745c6170e4aa1ee92ddb702e1fb4f16b9986b94ac1ff3cba77f0547578a4",
+    "tools/esp32c3_tests/transport.py": "b3e41e4d54431fdbb5f26e88727a45e99c9958dba9097cb724fdae55f9ca1686",
+    "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+    "tools/audio_test_server/generate.py": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8",
+    "tools/audio_test_server/generate_flac_depths.py": "1f75390e8c29949dbb5888ee0d1871187bab97a1ef48e963ff70047c01fd453a",
+    "tools/audio_test_server/generate_flac_high_depth.py": "f53d0186bab15ea13f17d1dfe5fd56dfabf55f6f85a3b53dac10d2fc3fbc9d0e",
+    "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+    "tools/audio_test_server/make_test_certificate.py": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a",
+    "tools/audio_test_server/server.py": "eb8eacc5f61c123741fe24a44bf8e71a51a4ab64bf61b5071f20b7a7e0ab82ee"
+  },
+  "fixture_hashes": {
+    "lc-48000-stereo": "8b054b26ffdb49e78a50a905aee78952ae822d292e86a3c99972030d642c0982",
+    "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e",
+    "lc-22050-mono": "3709216e19cd58f1892f6287b950aa4ae83c2cb485ba5d284a01e9865f142b21"
+  },
+  "server_events": {
+    "recover-lc": [
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 1,
+        "response_status": 503,
+        "requested_at": 49248.906
+      },
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 2,
+        "response_status": 503,
+        "requested_at": 49249.937
+      },
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "sent": 198264,
+        "complete": true,
+        "pacing_ratio": 1.02,
+        "attempt": 3,
+        "response_status": 200,
+        "requested_at": 49251.968,
+        "seconds": 11.968999999997322
+      }
+    ],
+    "recover-hev2": [
+      {
+        "mode": "recover",
+        "fixture": "hev2-44100-stereo",
+        "attempt": 1,
+        "response_status": 503,
+        "requested_at": 49276.078
+      },
+      {
+        "mode": "recover",
+        "fixture": "hev2-44100-stereo",
+        "attempt": 2,
+        "response_status": 503,
+        "requested_at": 49277.093
+      },
+      {
+        "mode": "recover",
+        "fixture": "hev2-44100-stereo",
+        "sent": 47379,
+        "complete": true,
+        "pacing_ratio": 1.02,
+        "attempt": 3,
+        "response_status": 200,
+        "requested_at": 49279.125,
+        "seconds": 11.60899999999674
+      }
+    ],
+    "watchdog-off": [
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 1,
+        "response_status": 503,
+        "requested_at": 49304.015
+      }
+    ],
+    "stop": [
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 1,
+        "response_status": 503,
+        "requested_at": 49313.171
+      }
+    ],
+    "switch": [
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 1,
+        "response_status": 503,
+        "requested_at": 49322.234
+      },
+      {
+        "mode": "file",
+        "fixture": "lc-22050-mono",
+        "sent": 121856,
+        "complete": false,
+        "pacing_ratio": 1.02,
+        "seconds": 7.438000000001921
+      }
+    ],
+    "disable-pending": [
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 1,
+        "response_status": 503,
+        "requested_at": 49331.265
+      }
+    ],
+    "timeout-3": [
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 1,
+        "response_status": 503,
+        "requested_at": 49340.5
+      },
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 2,
+        "response_status": 503,
+        "requested_at": 49341.515
+      }
+    ],
+    "timeout-10": [
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 1,
+        "response_status": 503,
+        "requested_at": 49349.39
+      },
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 2,
+        "response_status": 503,
+        "requested_at": 49350.406
+      },
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 3,
+        "response_status": 503,
+        "requested_at": 49352.437
+      },
+      {
+        "mode": "recover",
+        "fixture": "lc-48000-stereo",
+        "attempt": 4,
+        "response_status": 503,
+        "requested_at": 49356.468
+      }
+    ],
+    "timeout-stall": [
+      {
+        "mode": "stall",
+        "fixture": "lc-48000-stereo",
+        "sent": 50176,
+        "complete": false,
+        "pacing_ratio": 1.02,
+        "seconds": 13.578000000001339
+      }
+    ],
+    "settings-persistence": []
+  },
+  "planned_reboots": [
+    {
+      "start": 49379.343,
+      "end": 49385.562
+    }
+  ]
+}
