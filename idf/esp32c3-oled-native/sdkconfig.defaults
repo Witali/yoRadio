@@ -91,6 +91,16 @@ CONFIG_YORADIO_MP3_DECODER_ESPRESSIF=y
 CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y
 # CONFIG_YORADIO_AAC_DECODER_HELIX is not set
 CONFIG_YORADIO_AAC_PLUS=y
+# Compact full-rate HE-AAC: preserve SBR/PS and late extension activation.
+# PC19 keeps the tested PCM error within the production 3-LSB limit.
+# Reuse the existing 16 KiB decoder stack for scoped low-QMF workspace.
+CONFIG_YORADIO_AAC_COMPACT_SBR=y
+CONFIG_YORADIO_AAC_HIGH_HISTORY=y
+CONFIG_YORADIO_AAC_HIGH_HISTORY_PC19=y
+CONFIG_YORADIO_AAC_SMOOTHING_HISTORY=y
+CONFIG_YORADIO_AAC_LOW_WORKSPACE=y
+CONFIG_YORADIO_AAC_ASYMMETRIC_OWNER=y
+CONFIG_YORADIO_AAC_LATE_SBR=y
 CONFIG_YORADIO_FLAC_DECODER_CUSTOM=y
 # CONFIG_YORADIO_FLAC_DECODER_ESPRESSIF is not set
 
@@ -100,7 +110,7 @@ CONFIG_BT_NIMBLE_ENABLED=n
 CONFIG_ESP_WIFI_SOFTAP_SUPPORT=y
 # Keep heap space for the AAC decoder on this board without PSRAM. Moving
 # these Wi-Fi routines to flash saves about 19 KiB in the measured C3 build.
-# HE-AAC's additional SBR allocation still needs separate memory work.
+# Compact SBR storage further reduces the largest decoder allocation.
 # CONFIG_ESP_WIFI_IRAM_OPT is not set
 # CONFIG_ESP_WIFI_RX_IRAM_OPT is not set
 CONFIG_ESP_WIFI_ENTERPRISE_SUPPORT=n

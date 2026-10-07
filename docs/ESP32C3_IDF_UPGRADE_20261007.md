@@ -59,9 +59,11 @@ a physical full-flash/bootloader migration.
 
 ## Execution status
 
-The 6.0.3 hardware sequence and matched 6.0.2 controls are complete, with
-the failures detailed below. Separate 6.1 builds and host/QEMU tests are
-complete; the next stage is physical 6.1 qualification.
+The original-default 6.0.3 sequence and matched 6.0.2 controls are complete,
+with the failures detailed below. Original-default 6.1 builds and host/QEMU
+tests also completed. The user then requested enabling the complete compact
+HE-AAC configuration by default. New 6.1 compact builds and qualification
+are in progress; saved original-default images remain separate controls.
 A planned check is not a passed check.
 
 ### Controls and completed 6.0.3 checks
@@ -223,7 +225,10 @@ belong to different experimental configurations. Their implementation and
 evidence are retained; successful decoder/PCM work was not undone by the SDK
 upgrade. This migration's default-build failures must not be generalized to
 all compact variants, or presented as a new 22 kHz limit. Compact AAC is not
-silently enabled during the SDK comparison.
+silently enabled during those original-default SDK comparisons. The user's
+subsequent explicit request now selects the complete PC19/asymmetric/late-SBR
+chain for fresh board builds. New measurements are labelled `6.1-compact`;
+their changes must not be attributed solely to the SDK version.
 
 ### 6.0.3 lwIP source audit
 

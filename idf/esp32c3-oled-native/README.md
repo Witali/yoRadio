@@ -33,11 +33,13 @@ that every networking callback remains cache-independent. See Espressif's
 and [interrupt allocation guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/system/intr_alloc.html).
 Use `build.ps1` with a separate sdkconfig to compare Wi-Fi IRAM settings.
 
-The default full-radio profile still needs a memory-layout fix: its 55,128-byte
-SBR allocation failed in the full radio and the codec silently output only
-the AAC core. Full-rate HE/v2 passed the isolated hardware decoder benchmark.
-See the [hardware measurements](../../docs/ESP32C3_CACHE_HARDWARE_20260930.md)
-and [remaining memory work](../../docs/ESP32C3_MEMORY_STABILITY_TODO.md).
+Fresh builds now select compact PC19 SBR storage, scoped low-QMF workspace and
+the asymmetric owner. The requested SBR owner falls from 55,128 to 32,744 bytes;
+the adapter includes the PC19 side metadata. Full SBR/PS arithmetic, output
+rates/channels and the existing 16 KiB decoder stack are retained. Original
+uncompacted builds can fail the larger allocation and output only the AAC core.
+See the [compact profile evidence](../../docs/ESP32C3_AAC_PC19_NETWORK_20261004.md)
+and [current SDK qualification](../../docs/ESP32C3_IDF_UPGRADE_20261007.md).
 
 The optional [IRAM placement profiles](../../docs/ESP32C3_IRAM_REDUCTION_20261001.md)
 compare a 3584-byte conservative capacity saving with a 23392-byte saving using
@@ -213,10 +215,15 @@ not exposed as a WebUI setting.
 Fresh builds enable `CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y` and
 `CONFIG_YORADIO_AAC_PLUS=y`. This reconstructs the HE-AAC high-frequency band
 and HE-AAC v2 stereo; HE-AAC is not capped at its 22.05/24 kHz core rate.
-The emulator tests actual 44.1/48 kHz PCM. AAC Plus uses more CPU and RAM;
-real-board playback margin with Wi-Fi still needs measurement.
+The emulator tests actual 44.1/48 kHz PCM. The compact configuration described
+below is enabled in new board builds; recorded network/heap limitations remain
+documented in the qualification reports.
 
-An existing `sdkconfig` keeps its saved decoder choice. To change it, run
+An existing `sdkconfig` keeps its saved decoder and compact-storage choices.
+Use a fresh build directory/sdkconfig to pick up all new defaults. The explicit
+`sdkconfig.aac-pc19.defaults` overlay also documents the complete feature chain;
+defaults files do not override choices in an existing sdkconfig. To change the
+decoder manually, run
 `./build.ps1 menuconfig` (PowerShell: `.\build.ps1 menuconfig`), select
 **yoRadio codec backends → AAC decoder → Espressif**, then enable
 **yoRadio ESP32-C3 OLED → Decode full HE-AAC SBR/PS with Espressif AAC**.
@@ -242,21 +249,21 @@ With Helix, `HE-AAC 44.1 kHz core mono` means SBR was detected but PS stereo was
 not confirmed; the actual PCM may still be 22.05 kHz mono.
 
 ADTS rate/channel/profile changes recreate the Espressif decoder at the frame
-boundary. **Unmodified SDK limitation:** introducing SBR/PS with an identical ADTS
-configuration after AAC-LC can leave core-only output until Stop/Play or a stream
-restart. The status then explicitly reports actual `AAC PCM` parameters.
-This case remains in the TODO; it is not hidden by doubling the displayed rate.
-See the [validation report](../../docs/ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md).
+boundary. The default late-SBR controller also handles SBR/PS activation with an
+unchanged ADTS configuration and retains established extensions across gaps.
+The unmodified control still has the historical Stop/Play requirement described
+in the [original validation report](../../docs/ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md).
 
-The opt-in `sdkconfig.aac-pc19.defaults` qualification profile combines the
+The board defaults and `sdkconfig.aac-pc19.defaults` profile combine the
 compact SBR owner with `CONFIG_YORADIO_AAC_HIGH_HISTORY_PC19` and
 `CONFIG_YORADIO_AAC_LATE_SBR`. The first keeps 19-bit QMF mantissas with 144 bytes
 of extra per-decoder metadata. The second repairs late activation and retains
 SBR/PS through frames without extensions, preserving the AAC transform history.
 Both options work in the network firmware; QEMU test options remain separate.
 The shared implementation passed synthetic/recorded PCM tests within 3 LSB.
-Keep the existing 16 KiB decoder stack and the pinned AAC archive. This is an
-experimental physical-test profile; it does not change the board defaults.
+Keep the existing 16 KiB decoder stack and the pinned AAC archive. To build an
+uncompacted reference, apply `sdkconfig.aac-native.defaults` after the board
+defaults in a separate fresh configuration. It keeps AAC Plus enabled.
 Before deployment, `tools/codec_benchmark/verify_aac_network_build.py` checks
 the actual linked calls, type sizes, image/ELF match and absence of QEMU hooks.
 
