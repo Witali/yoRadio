@@ -44,6 +44,35 @@ if(NOT yoradio_tcp_replaced EQUAL 1)
 endif()
 list(APPEND yoradio_lwip_sources "${yoradio_tcp_fixed}")
 set_property(TARGET ${yoradio_lwip_lib} PROPERTY SOURCES "${yoradio_lwip_sources}")
+
+# IDF 6.1 lacks the 6.0.3 Content-Length guard. Keep the reviewed backport
+# local to this build and reject unknown SDK sources rather than guessing.
+idf_component_get_property(yoradio_httpd_lib esp_http_server COMPONENT_LIB)
+idf_component_get_property(yoradio_httpd_dir esp_http_server COMPONENT_DIR)
+set(yoradio_httpd_original "${yoradio_httpd_dir}/src/httpd_parse.c")
+set(yoradio_httpd_generator "${CMAKE_CURRENT_LIST_DIR}/../../tools/patch_httpd_content_length.py")
+set(yoradio_httpd_fixed "${CMAKE_BINARY_DIR}/yoradio_httpd/httpd_parse.c")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+    "${yoradio_httpd_original}" "${yoradio_httpd_generator}")
+execute_process(COMMAND "${yoradio_python}" "${yoradio_httpd_generator}"
+    --input "${yoradio_httpd_original}" --output "${yoradio_httpd_fixed}"
+    RESULT_VARIABLE yoradio_httpd_patch_result)
+if(NOT yoradio_httpd_patch_result EQUAL 0)
+    message(FATAL_ERROR "Cannot preserve the audited HTTP Content-Length guard")
+endif()
+get_target_property(yoradio_httpd_sources ${yoradio_httpd_lib} SOURCES)
+set(yoradio_httpd_replaced 0)
+foreach(yoradio_source IN LISTS yoradio_httpd_sources)
+    if(yoradio_source MATCHES "(^|/)src/httpd_parse\\.c$")
+        list(REMOVE_ITEM yoradio_httpd_sources "${yoradio_source}")
+        math(EXPR yoradio_httpd_replaced "${yoradio_httpd_replaced}+1")
+    endif()
+endforeach()
+if(NOT yoradio_httpd_replaced EQUAL 1)
+    message(FATAL_ERROR "Expected exactly one HTTP parser source to replace")
+endif()
+list(APPEND yoradio_httpd_sources "${yoradio_httpd_fixed}")
+set_property(TARGET ${yoradio_httpd_lib} PROPERTY SOURCES "${yoradio_httpd_sources}")
 set_source_files_properties("${yoradio_tcp_fixed}" PROPERTIES COMPILE_OPTIONS "-Wno-type-limits")
 
 set(yoradio_api_original "${yoradio_lwip_dir}/lwip/src/api/api_msg.c")
