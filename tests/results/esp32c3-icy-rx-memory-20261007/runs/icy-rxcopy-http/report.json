@@ -1,0 +1,364 @@
+{
+  "board": {
+    "version": "v0.9.693-1253-gb6cce2f7",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "e1504439cb0158509b73ec667d2a676eb9e52d39bf50875a6ac8da19a9971828"
+  },
+  "cases": [
+    {
+      "name": "idle:baseline",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 143468,
+            "largest": 110592,
+            "tasks": 17
+          },
+          {
+            "heap": 143448,
+            "largest": 110592,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.297
+    },
+    {
+      "name": "http:groovesalad-64-aac",
+      "result": "PASS",
+      "evidence": {
+        "reference": {
+          "spec": {
+            "codec": "aac",
+            "profile": "HE-AAC",
+            "rate": 44100,
+            "channels": 2,
+            "bits": 16,
+            "label": "HE-AAC ",
+            "source_channels": 2
+          },
+          "ffprobe_spec": {
+            "codec": "aac",
+            "profile": "HE-AAC",
+            "rate": 44100,
+            "channels": 2,
+            "bits": 16,
+            "label": "HE-AAC "
+          },
+          "input_sha256": "3ce06d4eec72e9cd99f22234511e1ac7860dc2121c1e8407c7ba08dbed97adbf",
+          "input_bytes": 40083,
+          "frames": 108,
+          "faad": {
+            "samples": 438272,
+            "frames": 108,
+            "rate": 44100,
+            "channels": 2,
+            "ps_frames": 0,
+            "different": 0,
+            "over_two": 0,
+            "over_five": 0,
+            "maximum": 0,
+            "square_error": 0,
+            "square_signal": 7560359844453,
+            "scope": 0,
+            "float_scale": 1,
+            "history": [
+              {
+                "pairs": 0,
+                "changed_components": 0,
+                "saturated": 0,
+                "out_of_range": 0,
+                "rms_native": 0,
+                "peak_native": 0,
+                "exponents": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "pairs": 0,
+                "changed_components": 0,
+                "saturated": 0,
+                "out_of_range": 0,
+                "rms_native": 0,
+                "peak_native": 0,
+                "exponents": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          },
+          "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+          "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+          "tls_verify": true
+        },
+        "websocket_matches_rest": true,
+        "playback": {
+          "samples": 245,
+          "rate": 44100,
+          "channels": 2
+        },
+        "first_pcm_seconds": 0.625,
+        "status_samples": 326,
+        "max_http_ms": 125.0,
+        "p95_http_ms": 108.99999999674037,
+        "median_http_ms": 78.00000000861473,
+        "mean_busy": 63.577777777777776,
+        "peak_busy": 64.1,
+        "minimum_heap": 26692.0,
+        "minimum_largest": 15360.0,
+        "audio_wall_ratio": 1.0016866774673205
+      },
+      "seconds": 67.391
+    },
+    {
+      "name": "idle:recovery",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 143448,
+            "largest": 110592,
+            "tasks": 17
+          },
+          {
+            "heap": 143448,
+            "largest": 110592,
+            "tasks": 17
+          },
+          {
+            "heap": 143448,
+            "largest": 110592,
+            "tasks": 17
+          }
+        ],
+        "no_unexpected_resets": true
+      },
+      "seconds": 12.125
+    },
+    {
+      "name": "restore",
+      "result": "PASS",
+      "evidence": {
+        "stopped_state_restored": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 7.797
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "cpu_budget_percent": null,
+  "created_utc": "2026-10-07T17:33:53.694728+00:00",
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/aac_reference.py": "7fb171138167be63ae8503c3c39ca1f664feb13eaea3d89727d4ea617e59aaf3",
+    "tools/esp32c3_tests/allocations.py": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7",
+    "tools/esp32c3_tests/common.py": "6ab90f16336bbc966fe56749fea3c82059555db40ff2a3089c19437b8406652b",
+    "tools/esp32c3_tests/compare_latency.py": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394",
+    "tools/esp32c3_tests/compare_output_dma.py": "04de602acaed8846b3dc0c37a8ca11b061a436be1730cfadd4c2b408591e56b0",
+    "tools/esp32c3_tests/compare_output_priority.py": "073979d7a6ddd40ab324b6d06c80c35131cc180a26a1a8bc5f11780e3a1153cc",
+    "tools/esp32c3_tests/compare_output_priority_matrix.py": "680840fb1beb2d4c6a9708e460803411820f82107e1679c4d39eb8023f8962fb",
+    "tools/esp32c3_tests/connection_retry.py": "1c0a17e8c023511a0f975f63d3493c6e24bab1e3cb4b69a0615b51a7cab080b1",
+    "tools/esp32c3_tests/diagnostic.py": "4774b1d14b3d7d85e3272166593af69bcbe2b262082748c4ce8683fdbab6b5c4",
+    "tools/esp32c3_tests/flac_truncation.py": "8ed8a8dbce97bf7384be558bff1c55b0bf37f707f2c1879ca5b96058c0e49e56",
+    "tools/esp32c3_tests/flash_constants.py": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5",
+    "tools/esp32c3_tests/heap_fragment.py": "998c454faad743f4fa14bd3be960ede6944a4a5e522e45d749b42120f07fd803",
+    "tools/esp32c3_tests/heap_idle.py": "3b31cd39fb91b92b28c33a7f64633689b1535741510bd6a32b3ed9efeef3d643",
+    "tools/esp32c3_tests/http_headers.py": "845395d01169e27be0211d2deeef1a42f9ce486f5f6756a2e16b16cace269d29",
+    "tools/esp32c3_tests/icy_metadata.py": "e19599fdc2278dccc952fb0f63d828e6efa2562932a81cf187a9102eca1a7d83",
+    "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+    "tools/esp32c3_tests/load_windows.py": "eee95396e81156bb4ae8b74a1e165d0fa4f3912ff1d0a1dbb1d86584d28b9df2",
+    "tools/esp32c3_tests/memory.py": "2d02410fb60db20f90f3131812e6db10657d99865bbc791427f04bcfa89eae81",
+    "tools/esp32c3_tests/network_memory.py": "c77cef3021fb54c9b08f07c1ee25f3938cefc97e176724689ef2b005957d2aca",
+    "tools/esp32c3_tests/ota.py": "b47b95af97e73740c1bdbeb849087c1e95d97fc47e34615ed2d0665e1b294631",
+    "tools/esp32c3_tests/ota_diagnostic.py": "0d4bd95c8dfb5389709c02345851e0141c68819451b654177e43dfc05161bf89",
+    "tools/esp32c3_tests/ota_transition.py": "28d55e1a99489c5ede457dbb6ddfc82fbf327ce0a61cac3ccb277ec0fca2c5f6",
+    "tools/esp32c3_tests/output_priority_matrix.py": "d5ed53dfcd71d757576cb5e6649e14aef4b476622460d5e3bab63baa7b14c475",
+    "tools/esp32c3_tests/pipeline_flow.py": "6591feb1674d5b7ce1e1362bf8620943989f5cc1500d4d5088c2627aa4e2d492",
+    "tools/esp32c3_tests/pipeline_flow_study.py": "bf464bbdbb6b3d67d019e68b8ea1861cc34df89f4e2f2df7c272266a210d1e82",
+    "tools/esp32c3_tests/pool_settle.py": "805b05ba463b0b5d91b3587abd1c7c4712cdfde37f44413ef74ca37bd63f3eb0",
+    "tools/esp32c3_tests/public_streams.py": "5e41a2a69cb9b69d2c6f8957258285d2f9478ff6c39aaafafde00a8b83264107",
+    "tools/esp32c3_tests/radio_flac_study.py": "25c55f49cf95a2117c499a90da6b53f3a0212b76a82b36ac1fb9f3dd7ea07a76",
+    "tools/esp32c3_tests/reference_eof.py": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f",
+    "tools/esp32c3_tests/run.py": "b622e8605a6c62663c190740c58f663f0b9658113da475c87e7397262cfc3f94",
+    "tools/esp32c3_tests/rx_ownership.py": "448b976c1d915d3f413cfb055b02fa0aa9a0a3e9253e72af65127f413e992829",
+    "tools/esp32c3_tests/serial_lines.py": "54a0dfa271186f9de5206c8061423138769cffa3523a002a5c000d5d6abd2316",
+    "tools/esp32c3_tests/stream_memory_study.py": "2ec9fe9d46069143fbd4c6ca3edeace91819f7b0f74277d46753e61a58b27ade",
+    "tools/esp32c3_tests/summarize_codec_sequence.py": "90f94232cbdd247be4ac21f73a9aebcc726f3d49186c2233109b1454f63a2166",
+    "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+    "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+    "tools/esp32c3_tests/summarize_public.py": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+    "tools/esp32c3_tests/summarize_public_windows.py": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709",
+    "tools/esp32c3_tests/summarize_radio_flac.py": "72d66f872f1b511d9964e16cb72e7885791dd7bb8a9499ac0244678bf7135c47",
+    "tools/esp32c3_tests/summarize_rx_ownership.py": "0e62d6da908502efbfd4111aa7491b9f8a195219ac325a10862c93ab9e116685",
+    "tools/esp32c3_tests/summarize_stream_memory.py": "d32c496ce429750a5565b4396bcc1030b5319ebe33eee9940e390cb62d788697",
+    "tools/esp32c3_tests/summarize_sustained.py": "6f3a7786ec5c36935a2fd7714c8add9a9ccbf686b887eaa074e55e325e814245",
+    "tools/esp32c3_tests/summarize_terminal_cpu.py": "db99ad6e55f2b3e671106cdb2c3902225704d9167a2e65ef662fe23c726c69bd",
+    "tools/esp32c3_tests/summarize_terminal_memory.py": "f351cf6f73e9d256a406e8a7da5b65ab46e354b0cefca7543536f3ebac077bda",
+    "tools/esp32c3_tests/terminal_memory.py": "e920df2d0150a1e93e982c1fa06578444879e35c2158fee270ebd2f041bbe478",
+    "tools/esp32c3_tests/transport.py": "b3e41e4d54431fdbb5f26e88727a45e99c9958dba9097cb724fdae55f9ca1686",
+    "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+    "tools/audio_test_server/generate.py": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8",
+    "tools/audio_test_server/generate_flac_depths.py": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1",
+    "tools/audio_test_server/generate_flac_high_depth.py": "55417b00036c9256c5229fe51447be47b238dafa45b9f14e124771c09d515068",
+    "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+    "tools/audio_test_server/icy.py": "d9ed666a8cf63f897e414c402e4b1dab8ae52cd8066a0a30ae6f85b70f1aef29",
+    "tools/audio_test_server/make_test_certificate.py": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a",
+    "tools/audio_test_server/server.py": "7588478436f13dba581291a50524ae5dbdb2bc7fa15f13f292443926cdff410c"
+  },
+  "image": {
+    "app_elf_sha256": "e1504439cb0158509b73ec667d2a676eb9e52d39bf50875a6ac8da19a9971828",
+    "sha256": "f710a253cde180da6253f3d57a87fcf3ed7cb1f53570c990db3c6281f374419b",
+    "bytes": 1604544
+  },
+  "public_urls": {
+    "groovesalad-64-aac": "https://ice5.somafm.com/groovesalad-64-aac"
+  },
+  "playback_urls": {
+    "groovesalad-64-aac": "http://ice5.somafm.com/groovesalad-64-aac"
+  },
+  "transport": "http",
+  "sources": [
+    "https://somafm.com/groovesalad/directstreamlinks.html",
+    "https://somafm.com/about/faq.html"
+  ],
+  "seconds": 60,
+  "interval": 0.1,
+  "manifest_sha256": "a095ed8e01ab76dae105024e3a8ba0f72b3c2d9044155b0864568c76f0b6e36a",
+  "sdkconfig_sha256": "220f7c87e511c62bbee325883fac6dc713ad8372edde5b6c545dcfd3b6f16e90",
+  "ffprobe_version": "ffprobe version 8.1.1-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+  "reference_probes": {
+    "groovesalad-64-aac": {
+      "spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC ",
+        "source_channels": 2
+      },
+      "ffprobe_spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC "
+      },
+      "input_sha256": "3ce06d4eec72e9cd99f22234511e1ac7860dc2121c1e8407c7ba08dbed97adbf",
+      "input_bytes": 40083,
+      "frames": 108,
+      "faad": {
+        "samples": 438272,
+        "frames": 108,
+        "rate": 44100,
+        "channels": 2,
+        "ps_frames": 0,
+        "different": 0,
+        "over_two": 0,
+        "over_five": 0,
+        "maximum": 0,
+        "square_error": 0,
+        "square_signal": 7560359844453,
+        "scope": 0,
+        "float_scale": 1,
+        "history": [
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+      "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+      "tls_verify": true
+    }
+  },
+  "windows": {
+    "groovesalad-64-aac": {
+      "start": 74473.765,
+      "end": 74534.218
+    }
+  }
+}

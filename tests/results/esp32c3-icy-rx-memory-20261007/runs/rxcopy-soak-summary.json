@@ -1,0 +1,112 @@
+{
+  "board": {
+    "version": "v0.9.693-1251-g3445993a",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "74ad3b03070e79217eb142b6c69347297c10a5b11d16633db646c40ffc310318"
+  },
+  "cases": [
+    {
+      "name": "hev2-44100-stereo",
+      "original": {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 601.297
+      },
+      "full_window": {
+        "start": 73678.812,
+        "end": 74268.937,
+        "seconds": 590.125,
+        "strict": {
+          "result": "FAIL",
+          "reason": "Progressive heap loss during continuous playback"
+        },
+        "cpu_samples": 117,
+        "decoder_windows": 118,
+        "malformed": [],
+        "diagnostic": {
+          "mean_busy": 71.47948717948718,
+          "peak_busy": 73.1,
+          "minimum_heap": 20432.0,
+          "minimum_largest": 6400.0,
+          "first_heap": 36368.0,
+          "last_heap": 24084.0,
+          "first_largest": 19456.0,
+          "last_largest": 8192.0,
+          "audio_wall_ratio": 1.0016198018662419,
+          "decode_percent": 50.94648258613989
+        }
+      },
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "subwindows": [
+        {
+          "start": 73678.812,
+          "end": 73978.812,
+          "seconds": 300.0,
+          "strict": {
+            "result": "FAIL",
+            "reason": "Progressive heap loss during continuous playback"
+          },
+          "cpu_samples": 60,
+          "decoder_windows": 60,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 71.57333333333334,
+            "peak_busy": 73.1,
+            "minimum_heap": 27156.0,
+            "minimum_largest": 11264.0,
+            "first_heap": 36368.0,
+            "last_heap": 27156.0,
+            "first_largest": 19456.0,
+            "last_largest": 11776.0,
+            "audio_wall_ratio": 1.0016277699551615,
+            "decode_percent": 51.148222000664674
+          }
+        },
+        {
+          "start": 73978.812,
+          "end": 74268.937,
+          "seconds": 290.125,
+          "strict": {
+            "result": "PASS",
+            "evidence": {
+              "mean_busy": 71.38070175438597,
+              "peak_busy": 72.6,
+              "minimum_heap": 20432.0,
+              "minimum_largest": 6400.0,
+              "audio_wall_ratio": 1.0016115591490418
+            }
+          },
+          "cpu_samples": 57,
+          "decoder_windows": 58,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 71.38070175438597,
+            "peak_busy": 72.6,
+            "minimum_heap": 20432.0,
+            "minimum_largest": 6400.0,
+            "first_heap": 23688.0,
+            "last_heap": 24084.0,
+            "first_largest": 11264.0,
+            "last_largest": 8192.0,
+            "audio_wall_ratio": 1.0016115591490418,
+            "decode_percent": 50.73778664007976
+          }
+        }
+      ],
+      "status_samples": 3199,
+      "max_http_ms": 172.00000000593718,
+      "minimum_rssi": -78
+    }
+  ],
+  "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+}

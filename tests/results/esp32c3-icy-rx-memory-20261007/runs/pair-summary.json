@@ -1,0 +1,635 @@
+{
+  "note": "Original verdicts retained. Host builds overlapped both physical soaks; CPU means are diagnostic, not isolated timing benchmarks. One pair is not long-term network or acoustic qualification.",
+  "cases": [
+    {
+      "variant": "control",
+      "app_elf_sha256": "0aa6d83368263f9405d8a79c44cd0920a0fa627672ab8f6664f6f3af42768115",
+      "requested_seconds": 600,
+      "observed_seconds": 600.0460000000021,
+      "original_cases": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 139768,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 139736,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.594
+        },
+        {
+          "name": "cpu-under-http-load:hev2-44100-stereo",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Runtime decoder/memory failure",
+          "seconds": 601.391
+        },
+        {
+          "name": "idle-after",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 139784,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 139784,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.265
+        },
+        {
+          "name": "stop-recovery",
+          "result": "PASS",
+          "evidence": {
+            "heap_recovered": true
+          },
+          "seconds": 0.0
+        },
+        {
+          "name": "runtime",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Runtime allocation/decoder/TLS failure",
+          "seconds": 0.0
+        },
+        {
+          "name": "restore-board",
+          "result": "PASS",
+          "evidence": {
+            "rebooted": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 7.703
+        }
+      ],
+      "summary": {
+        "name": "hev2-44100-stereo",
+        "original": {
+          "name": "cpu-under-http-load:hev2-44100-stereo",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Runtime decoder/memory failure",
+          "seconds": 601.391
+        },
+        "full_window": {
+          "start": 72970.125,
+          "end": 73560.171,
+          "seconds": 590.0460000000021,
+          "strict": {
+            "result": "FAIL",
+            "reason": "Runtime decoder/memory failure"
+          },
+          "cpu_samples": 117,
+          "decoder_windows": 118,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 71.33076923076923,
+            "peak_busy": 72.9,
+            "minimum_heap": 11460.0,
+            "minimum_largest": 3200.0,
+            "first_heap": 36336.0,
+            "last_heap": 16912.0,
+            "first_largest": 17408.0,
+            "last_largest": 4608.0,
+            "audio_wall_ratio": 1.0015909821776146,
+            "decode_percent": 51.011203677104284
+          }
+        },
+        "runtime": {
+          "result": "FAIL",
+          "reason": "Runtime allocation/decoder/TLS failure"
+        },
+        "subwindows": [
+          {
+            "start": 72970.125,
+            "end": 73270.125,
+            "seconds": 300.0,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Progressive heap loss during continuous playback"
+            },
+            "cpu_samples": 60,
+            "decoder_windows": 60,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 71.68,
+              "peak_busy": 72.9,
+              "minimum_heap": 18616.0,
+              "minimum_largest": 5120.0,
+              "first_heap": 36336.0,
+              "last_heap": 20380.0,
+              "first_largest": 17408.0,
+              "last_largest": 7680.0,
+              "audio_wall_ratio": 1.0015977631316157,
+              "decode_percent": 51.07976071784646
+            }
+          },
+          {
+            "start": 73270.125,
+            "end": 73560.171,
+            "seconds": 290.0460000000021,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Runtime decoder/memory failure"
+            },
+            "cpu_samples": 57,
+            "decoder_windows": 58,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 70.96315789473684,
+              "peak_busy": 72.3,
+              "minimum_heap": 11460.0,
+              "minimum_largest": 3200.0,
+              "first_heap": 18616.0,
+              "last_heap": 16912.0,
+              "first_largest": 4864.0,
+              "last_largest": 4608.0,
+              "audio_wall_ratio": 1.0015839674942324,
+              "decode_percent": 50.94028260047444
+            }
+          }
+        ],
+        "status_samples": 3143,
+        "max_http_ms": 639.9999999994179,
+        "minimum_rssi": -77
+      },
+      "allocation_failures": [
+        {
+          "at": 73335.718,
+          "line": "E (397761) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=9944 largest=1536"
+        },
+        {
+          "at": 73418.0,
+          "line": "E (480050) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=9960 largest=1536"
+        },
+        {
+          "at": 73419.593,
+          "line": "E (481644) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=9932 largest=1536"
+        }
+      ],
+      "network_phases": {
+        "first-minute": {
+          "heap": {
+            "heap": {
+              "min": 34508,
+              "median": 36356.0,
+              "max": 36356
+            },
+            "largest": {
+              "min": 17408,
+              "median": 17408.0,
+              "max": 17408
+            },
+            "blocks": {
+              "min": 435,
+              "median": 435.0,
+              "max": 438
+            },
+            "free_blocks": {
+              "min": 12,
+              "median": 13.5,
+              "max": 15
+            }
+          },
+          "receive_credit": {
+            "uncredited": {
+              "min": 0,
+              "median": 0.0,
+              "max": 275
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          },
+          "samples": 12
+        },
+        "last-minute": {
+          "heap": {
+            "heap": {
+              "min": 15068,
+              "median": 16878.0,
+              "max": 22204
+            },
+            "largest": {
+              "min": 4608,
+              "median": 5120.0,
+              "max": 11264
+            },
+            "blocks": {
+              "min": 450,
+              "median": 456.0,
+              "max": 458
+            },
+            "free_blocks": {
+              "min": 12,
+              "median": 15.0,
+              "max": 17
+            }
+          },
+          "receive_credit": {
+            "uncredited": {
+              "min": 8865,
+              "median": 9472.5,
+              "max": 11520
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 1216
+            }
+          },
+          "samples": 12
+        }
+      },
+      "host_delivery": {
+        "windows": 583,
+        "max_late_seconds": 0.03188880353991408,
+        "max_write_seconds": 0.014999999999417923
+      },
+      "rssi": {
+        "min": -77,
+        "median": -69
+      },
+      "idle": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 139768,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 139736,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.594
+        },
+        {
+          "name": "idle-after",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 139784,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 139784,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.265
+        }
+      ]
+    },
+    {
+      "variant": "rxcopy",
+      "app_elf_sha256": "74ad3b03070e79217eb142b6c69347297c10a5b11d16633db646c40ffc310318",
+      "requested_seconds": 600,
+      "observed_seconds": 600.125,
+      "original_cases": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 139776,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 139748,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.469
+        },
+        {
+          "name": "cpu-under-http-load:hev2-44100-stereo",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Progressive heap loss during continuous playback",
+          "seconds": 601.297
+        },
+        {
+          "name": "idle-after",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 139792,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 139792,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.406
+        },
+        {
+          "name": "stop-recovery",
+          "result": "PASS",
+          "evidence": {
+            "heap_recovered": true
+          },
+          "seconds": 0.0
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.0
+        },
+        {
+          "name": "restore-board",
+          "result": "PASS",
+          "evidence": {
+            "rebooted": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 7.953
+        }
+      ],
+      "summary": {
+        "name": "hev2-44100-stereo",
+        "original": {
+          "name": "cpu-under-http-load:hev2-44100-stereo",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Progressive heap loss during continuous playback",
+          "seconds": 601.297
+        },
+        "full_window": {
+          "start": 73678.812,
+          "end": 74268.937,
+          "seconds": 590.125,
+          "strict": {
+            "result": "FAIL",
+            "reason": "Progressive heap loss during continuous playback"
+          },
+          "cpu_samples": 117,
+          "decoder_windows": 118,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 71.47948717948718,
+            "peak_busy": 73.1,
+            "minimum_heap": 20432.0,
+            "minimum_largest": 6400.0,
+            "first_heap": 36368.0,
+            "last_heap": 24084.0,
+            "first_largest": 19456.0,
+            "last_largest": 8192.0,
+            "audio_wall_ratio": 1.0016198018662419,
+            "decode_percent": 50.94648258613989
+          }
+        },
+        "runtime": {
+          "result": "PASS",
+          "evidence": null
+        },
+        "subwindows": [
+          {
+            "start": 73678.812,
+            "end": 73978.812,
+            "seconds": 300.0,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Progressive heap loss during continuous playback"
+            },
+            "cpu_samples": 60,
+            "decoder_windows": 60,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 71.57333333333334,
+              "peak_busy": 73.1,
+              "minimum_heap": 27156.0,
+              "minimum_largest": 11264.0,
+              "first_heap": 36368.0,
+              "last_heap": 27156.0,
+              "first_largest": 19456.0,
+              "last_largest": 11776.0,
+              "audio_wall_ratio": 1.0016277699551615,
+              "decode_percent": 51.148222000664674
+            }
+          },
+          {
+            "start": 73978.812,
+            "end": 74268.937,
+            "seconds": 290.125,
+            "strict": {
+              "result": "PASS",
+              "evidence": {
+                "mean_busy": 71.38070175438597,
+                "peak_busy": 72.6,
+                "minimum_heap": 20432.0,
+                "minimum_largest": 6400.0,
+                "audio_wall_ratio": 1.0016115591490418
+              }
+            },
+            "cpu_samples": 57,
+            "decoder_windows": 58,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 71.38070175438597,
+              "peak_busy": 72.6,
+              "minimum_heap": 20432.0,
+              "minimum_largest": 6400.0,
+              "first_heap": 23688.0,
+              "last_heap": 24084.0,
+              "first_largest": 11264.0,
+              "last_largest": 8192.0,
+              "audio_wall_ratio": 1.0016115591490418,
+              "decode_percent": 50.73778664007976
+            }
+          }
+        ],
+        "status_samples": 3199,
+        "max_http_ms": 172.00000000593718,
+        "minimum_rssi": -78
+      },
+      "allocation_failures": [],
+      "network_phases": {
+        "first-minute": {
+          "heap": {
+            "heap": {
+              "min": 36356,
+              "median": 36372.0,
+              "max": 36388
+            },
+            "largest": {
+              "min": 19456,
+              "median": 19456.0,
+              "max": 19456
+            },
+            "blocks": {
+              "min": 435,
+              "median": 435.5,
+              "max": 436
+            },
+            "free_blocks": {
+              "min": 13,
+              "median": 14.0,
+              "max": 15
+            }
+          },
+          "receive_credit": {
+            "uncredited": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 0
+            }
+          },
+          "samples": 12
+        },
+        "last-minute": {
+          "heap": {
+            "heap": {
+              "min": 20432,
+              "median": 22906.0,
+              "max": 26572
+            },
+            "largest": {
+              "min": 6400,
+              "median": 9216.0,
+              "max": 14336
+            },
+            "blocks": {
+              "min": 442,
+              "median": 444.5,
+              "max": 449
+            },
+            "free_blocks": {
+              "min": 13,
+              "median": 16.0,
+              "max": 18
+            }
+          },
+          "receive_credit": {
+            "uncredited": {
+              "min": 7424,
+              "median": 10192.5,
+              "max": 11520
+            },
+            "refused": {
+              "min": 0,
+              "median": 0.0,
+              "max": 1440
+            }
+          },
+          "samples": 12
+        }
+      },
+      "host_delivery": {
+        "windows": 583,
+        "max_late_seconds": 0.030952687593526207,
+        "max_write_seconds": 0
+      },
+      "rssi": {
+        "min": -78,
+        "median": -70
+      },
+      "idle": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 139776,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 139748,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.469
+        },
+        {
+          "name": "idle-after",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 139792,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 139792,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.406
+        }
+      ]
+    }
+  ]
+}

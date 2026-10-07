@@ -841,6 +841,10 @@ case lasts seven seconds; this is a functional check, not a sustained load test.
 player. `python tests/test-icy-server.py` checks its byte framing and actual HTTP
 responses, including the maximum 4080-byte metadata block.
 
+The [ICY and receive-memory report](ESP32C3_ICY_RX_MEMORY_20261007.md) retains
+the physical ICY/OTA results, matched receive-copy experiment and its original
+failed heap gates, with exact firmware/config identities.
+
 ## CPU diagnostics without a separate profiler stack
 
 For new public-stream reports, use
