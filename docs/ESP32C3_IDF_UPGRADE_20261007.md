@@ -418,3 +418,56 @@ and the [initial compact run](../tests/results/esp32c3-idf-upgrade-20261007/6.1-
 Their artifact indexes contain stored/original SHA-256 hashes. Large logs and
 JSON files use lossless gzip compression; temporary flash images and TLS keys
 are excluded. Final RAM-profile results are added separately after completion.
+
+#### Complete RAM-profile format/EOF matrix
+
+The complete matrix records 56 passes and one failure. All 22 AUTO/explicit
+format checks, both AAC transition sequences, Stop/Play generation isolation,
+all network-fault cases, WebSocket reconnect, rejection of the untrusted TLS
+certificate, both boot checks and restoration pass.
+
+The sole failure is `eof:he-44100-stereo:auto`: a status request times out
+while observing the terminal transition. Its last response reports full
+44.1 kHz stereo PCM, with RSSI -67 dBm; the observation ends after 5.516 seconds.
+The following explicit-AAC EOF case passes. The serial record contains no
+allocation/decoder failure, panic or heap-corruption marker. A separate repeat
+of both AUTO and explicit EOF checks passes, as does restoration.
+The initial timeout remains a failure with undetermined cause; the repeat
+does not overwrite or qualify that original run. Follow-on tests are allowed
+only after checking the same firmware/configuration hashes and that the repeat
+covers every failed case. The continuation record preserves this distinction.
+
+#### Public-stream memory checks
+
+The RAM-only profile does not qualify sustained public HE playback: HTTP
+AAC-LC and MP3 pass, but HE64 fails the largest-block budget, and HE32/HEv2
+record actual allocation/decoder failures. The serial log includes a failed
+1,700-byte network allocation with 5,540 B free and a largest block of 1,344 B.
+SBR had already been allocated. This is a different failure from the initial
+32,744-byte SBR allocation and shows insufficient remaining network headroom.
+Idle recovery and settings restoration pass. The run is held before HTTPS;
+its failures are retained in the separate `6.1-compact-ram` evidence directory.
+
+The next diagnostic image, `6.1-compact-heap-profile`, moves the heap allocator
+to Flash using the SDK option. Relative to the RAM profile it frees 8,704 B of
+IRAM and 872 B of initialized data, increasing linker heap capacity by 9,568 B.
+This is static capacity, not a guaranteed runtime allocation margin. Auto
+Suspend remains disabled. A saved source/configuration audit checks the board's
+GPIO, I2C, I2S and SPI ISR scope against the SDK's heap-placement requirements.
+
+HTTP AAC-LC, HE32 and MP3 pass with this image. HE64 fails the progressive-heap
+gate; HEv2 at 16 kbit/s fails the profile/channel check. HTTPS AAC-LC passes,
+but all three HE streams fail their SBR allocation: 32,744 B requested with
+only 19,456–24,576 B available as the largest block. HTTPS MP3 fails the
+progressive-heap gate. Idle recovery and restoration pass in both transports.
+Consequently allocator placement alone is not promoted or treated as a full
+HE-AAC fix. The saved diagnostic app ELF is
+`37341490d2fb648f5308ffcc75fc1a3f1426a27936ef149cc5500164f4b55fdc`.
+
+The 16-kbit/s profile discrepancy also reproduces on a newly captured complete
+ADTS recording in isolated QEMU, without Wi-Fi or TLS: FFprobe reports HE-AACv2,
+32 kHz stereo, while the adapter reports HE-AAC with one source channel and
+two PCM channels. Comparing its PCM against the native-history control is
+required before attributing this to compact storage or changing its label.
+Broadcast audio and raw PCM stay outside tracked results; retain hashes and
+derived statistics only.
