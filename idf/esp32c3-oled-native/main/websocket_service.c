@@ -216,7 +216,7 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
              "\"abuffmax\":%u,"
              "\"mp3decoder\":0,\"normalize\":%u,\"normgain\":%u,"
              "\"normtarget\":%d,\"normtime\":%u,\"telnet\":0,"
-             "\"watchdog\":%u}",
+             "\"watchdog\":%u,\"stationtimeout\":%u}",
              radio_control_smartstart_enabled() ? 1U : 0U,
              runtime_settings_get_audio_info() ? 1U : 0U,
              runtime_settings_get_softap_delay_min(), mdns, address,
@@ -226,7 +226,8 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
              native_audio_settings_get_normalization_gain_db(),
              native_audio_settings_get_normalization_target_dbfs(),
              native_audio_settings_get_normalization_time_ms(),
-             runtime_settings_get_watchdog() ? 1U : 0U);
+             runtime_settings_get_watchdog() ? 1U : 0U,
+             runtime_settings_get_station_timeout_sec());
     return ws_send_request(request, settings);
 }
 
@@ -402,6 +403,17 @@ static void handle_command(httpd_req_t *request, char *command) {
     } else if (strcmp(command, "watchdog") == 0) {
         log_setting_error("Watchdog", runtime_settings_set_watchdog(
                                           strtoul(value, NULL, 10) != 0U));
+    } else if (strcmp(command, "stationtimeout") == 0) {
+        char *end;
+        unsigned long seconds = strtoul(value, &end, 10);
+        if (!value[0] || *end || seconds < RUNTIME_MIN_STATION_TIMEOUT_SEC ||
+            seconds > RUNTIME_MAX_STATION_TIMEOUT_SEC) {
+            ws_send_request(request,
+                "{\"commandError\":\"Station timeout must be 1 to 120 seconds.\"}");
+        } else {
+            log_setting_error("Station timeout",
+                runtime_settings_set_station_timeout_sec((uint8_t)seconds));
+        }
     } else if (strcmp(command, "mdnsname") == 0) {
         log_setting_error("mDNS", runtime_settings_set_mdns_name(value));
     } else if (strcmp(command, "reboot") == 0 ||

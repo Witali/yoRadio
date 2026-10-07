@@ -9,6 +9,7 @@
 
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC } native_codec_t;
 typedef struct { uint32_t sample_rate; uint8_t bits_per_sample, channel; } esp_audio_simple_dec_info_t;
+typedef struct { unsigned unused; } decode_stats_t;
 #define PCM_PACKET_DATA_SIZE 3584
 static native_state_t state;
 static native_state_t *s_state = &state;
@@ -39,6 +40,7 @@ static int xRingbufferSendComplete(void *ring, void *packet) {
 static void vRingbufferReturnItem(void *ring, void *packet) { (void)ring; free(packet); }
 static void dispose_http_client(void *client) { (void)client; }
 static void network_service_set_streaming(bool running) { assert(!running); }
+#include "pipeline_profile.h"
 #include "production.inc"
 
 static void begin(uint32_t generation) {
@@ -53,7 +55,7 @@ static void delayed_frame(uint32_t generation) {
     native_state_set_stream_info(s_state, generation, &info);
     esp_audio_simple_dec_info_t layout = {48000,16,2};
     uint8_t samples[4096] = {0};
-    assert(send_pcm(generation, &layout, samples, sizeof(samples)));
+    assert(send_pcm(NULL, generation, &layout, samples, sizeof(samples)));
 }
 static void drain_pcm(void) {
     for (unsigned i=0; i<pcm_count; ++i) {
@@ -112,6 +114,10 @@ int main(void) {
     return_decoded_packet(encoded[--encoded_count], 0);
     drain_pcm();
     assert(!state.audio_running && strcmp(state.stream_format,"stream ended") == 0);
+    begin(8);
+    assert(send_pcm_end(8, AUDIO_END_UNAVAILABLE));
+    drain_pcm();
+    assert(!state.audio_running && strcmp(state.stream_format,"station unavailable") == 0);
     puts("PASS: delayed HE-AAC PCM, ordered EOF, errors, empty stream, stale completion and cancellation");
     return 0;
 }

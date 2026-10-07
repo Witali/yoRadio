@@ -61,7 +61,6 @@
 #define DECODE_STATS_INTERVAL_US 5000000LL
 #define BITRATE_UPDATE_INTERVAL_US 1000000LL
 #define STREAM_BITRATE_INTERVAL_US 5000000LL
-#define STREAM_STALL_TIMEOUT_US 10000000LL
 #define STREAM_RETRY_INITIAL_MS 1000U
 #define STREAM_RETRY_MAX_MS 30000U
 #define STREAM_RETRY_POLL_MS 100U
@@ -91,8 +90,10 @@ typedef struct {
 // retain no HTTP/TLS allocation while waiting.
 typedef struct {
     int64_t due_us;
+    int64_t deadline_us;
     uint32_t delay_ms;
     bool pending;
+    uint8_t timeout_sec;
 } stream_retry_t;
 
 typedef struct {
@@ -355,10 +356,19 @@ static bool retryable_http_status(int status) {
     return status == 408 || status == 429 || (status >= 500 && status <= 599);
 }
 
+static int connection_remaining_ms(int64_t deadline_us) {
+    int64_t remaining_us = deadline_us - esp_timer_get_time();
+    return remaining_us > 0 ? (int)((remaining_us + 999) / 1000) : 0;
+}
+
 static esp_err_t open_stream(esp_http_client_handle_t client,
-                             const char *requested_url, bool *retryable) {
+                             const char *requested_url, int64_t deadline_us,
+                             bool *retryable) {
     *retryable = false;
     for (unsigned redirect = 0; redirect <= MAX_HTTP_REDIRECTS; ++redirect) {
+        int remaining_ms = connection_remaining_ms(deadline_us);
+        if (!remaining_ms) return ESP_ERR_TIMEOUT;
+        esp_http_client_set_timeout_ms(client, remaining_ms);
         ESP_LOGI(TAG, "Opening stream%s: %s",
                  redirect ? " after redirect" : "", requested_url);
         esp_err_t result = esp_http_client_open(client, 0);
@@ -369,7 +379,11 @@ static esp_err_t open_stream(esp_http_client_handle_t client,
             return result;
         }
 
+        remaining_ms = connection_remaining_ms(deadline_us);
+        if (!remaining_ms) return ESP_ERR_TIMEOUT;
+        esp_http_client_set_timeout_ms(client, remaining_ms);
         int64_t headers = esp_http_client_fetch_headers(client);
+        if (!connection_remaining_ms(deadline_us)) return ESP_ERR_TIMEOUT;
         int status = esp_http_client_get_status_code(client);
         if (headers < 0) {
             *retryable = true;
@@ -542,14 +556,34 @@ static void play_flash_fixture(const play_command_t *command,
 }
 #endif
 
+static void begin_stream_deadline(stream_retry_t *retry) {
+    uint8_t timeout_sec = runtime_settings_get_station_timeout_sec();
+    *retry = (stream_retry_t){
+        .deadline_us = esp_timer_get_time() +
+            (int64_t)timeout_sec * 1000000,
+        .timeout_sec = timeout_sec,
+    };
+}
+
+static void station_unavailable(uint32_t generation) {
+    if (generation != atomic_load(&s_generation)) return;
+    state_set_audio(generation, false, AUDIO_STATUS_STATION_UNAVAILABLE);
+    network_service_set_streaming(false);
+}
+
 static void schedule_stream_retry(stream_retry_t *retry, uint32_t generation) {
     if (generation != atomic_load(&s_generation) ||
         !runtime_settings_get_watchdog()) return;
+    if (!connection_remaining_ms(retry->deadline_us)) {
+        station_unavailable(generation);
+        return;
+    }
     uint32_t delay_ms = retry->delay_ms ? retry->delay_ms * 2U
                                       : STREAM_RETRY_INITIAL_MS;
     if (delay_ms > STREAM_RETRY_MAX_MS) delay_ms = STREAM_RETRY_MAX_MS;
     retry->delay_ms = delay_ms;
     retry->due_us = esp_timer_get_time() + (int64_t)delay_ms * 1000;
+    if (retry->due_us > retry->deadline_us) retry->due_us = retry->deadline_us;
     retry->pending = true;
     ESP_LOGW(TAG, "Retry stream connection in %lu ms", (unsigned long)delay_ms);
 }
@@ -559,7 +593,7 @@ static void receive_stream_command(play_command_t *command,
     for (;;) {
         if (!retry->pending) {
             xQueueReceive(s_commands, command, portMAX_DELAY);
-            *retry = (stream_retry_t){0};
+            begin_stream_deadline(retry);
             return;
         }
         if (command->generation != atomic_load(&s_generation) ||
@@ -570,6 +604,10 @@ static void receive_stream_command(play_command_t *command,
         int64_t remaining_us = retry->due_us - esp_timer_get_time();
         if (remaining_us <= 0) {
             retry->pending = false;
+            if (!connection_remaining_ms(retry->deadline_us)) {
+                station_unavailable(command->generation);
+                continue;
+            }
             return;
         }
         uint32_t wait_ms = (uint32_t)((remaining_us + 999) / 1000);
@@ -577,7 +615,7 @@ static void receive_stream_command(play_command_t *command,
         // A new Play wakes the queue immediately. Stop/watchdog changes have
         // no queue item, so check them at bounded intervals while backing off.
         if (xQueueReceive(s_commands, command, pdMS_TO_TICKS(wait_ms)) == pdTRUE) {
-            *retry = (stream_retry_t){0};
+            begin_stream_deadline(retry);
             return;
         }
     }
@@ -606,17 +644,22 @@ static void stream_task(void *argument) {
         // allocating the next HTTP/TLS transport.
         while (atomic_load(&s_generation) == command.generation &&
                atomic_load(&s_decoder_released_generation) !=
-                   command.generation) {
+                   command.generation &&
+               connection_remaining_ms(retry.deadline_us)) {
             vTaskDelay(pdMS_TO_TICKS(1));
         }
         if (atomic_load(&s_generation) != command.generation) continue;
+        if (!connection_remaining_ms(retry.deadline_us)) {
+            station_unavailable(command.generation);
+            continue;
+        }
 
         network_service_set_streaming(true);
         state_set_audio(command.generation, false, "connecting");
 
         esp_http_client_config_t config = {
             .url = command.url,
-            .timeout_ms = 10000,
+            .timeout_ms = connection_remaining_ms(retry.deadline_us),
             .buffer_size = STREAM_CHUNK_SIZE,
             .buffer_size_tx = 4096,
             .crt_bundle_attach = esp_crt_bundle_attach,
@@ -635,7 +678,8 @@ static void stream_task(void *argument) {
         }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
         bool retryable;
-        esp_err_t result = open_stream(client, command.url, &retryable);
+        esp_err_t result = open_stream(client, command.url, retry.deadline_us,
+                                       &retryable);
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Stream connection failed for %s: %s", command.url,
                      esp_err_to_name(result));
@@ -645,8 +689,10 @@ static void stream_task(void *argument) {
             }
             dispose_http_client(client);
             if (retryable) schedule_stream_retry(&retry, command.generation);
+            if (!retry.pending) station_unavailable(command.generation);
             continue;
         }
+        const int64_t availability_timeout_us = (int64_t)retry.timeout_sec * 1000000;
         retry = (stream_retry_t){0};
         if (strncmp(command.url, "https://", 8) == 0) {
             log_runtime_memory("after TLS handshake");
@@ -697,6 +743,7 @@ static void stream_task(void *argument) {
         bool first_chunk = true;
         bool stream_stalled = false;
         bool stream_read_failed = false;
+        bool stream_unavailable = false;
         int64_t last_stream_data_us = esp_timer_get_time();
         stream_bitrate_meter_t bitrate_meter = {
             .started_us = esp_timer_get_time(),
@@ -710,8 +757,8 @@ static void stream_task(void *argument) {
             if (received == -ESP_ERR_HTTP_EAGAIN) {
                 if (runtime_settings_get_watchdog() &&
                     esp_timer_get_time() - last_stream_data_us >=
-                        STREAM_STALL_TIMEOUT_US) {
-                    stream_read_failed = true;
+                        availability_timeout_us) {
+                    stream_unavailable = true;
                     break;
                 }
                 continue;
@@ -726,9 +773,9 @@ static void stream_task(void *argument) {
                 if (esp_http_client_is_complete_data_received(client)) break;
                 if (runtime_settings_get_watchdog() &&
                     esp_timer_get_time() - last_stream_data_us >=
-                        STREAM_STALL_TIMEOUT_US) {
+                        availability_timeout_us) {
                     ESP_LOGW(TAG, "Stream watchdog timeout");
-                    stream_read_failed = true;
+                    stream_unavailable = true;
                     break;
                 }
                 vTaskDelay(pdMS_TO_TICKS(10));
@@ -797,6 +844,7 @@ static void stream_task(void *argument) {
             }
         }
         uint8_t end_reason = stream_stalled ? AUDIO_END_BUFFER_STALLED
+                             : stream_unavailable ? AUDIO_END_UNAVAILABLE
                              : stream_read_failed ? AUDIO_END_READ_FAILED
                                                   : AUDIO_END_EOF;
         send_encoded(command.generation, codec, NULL, 0, end_reason);

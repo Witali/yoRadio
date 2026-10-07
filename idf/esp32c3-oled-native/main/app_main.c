@@ -4,6 +4,7 @@
 #include <time.h>
 
 #include "audio_service.h"
+#include "audio_completion.h"
 #include "board_config.h"
 #include "cpu_profiler.h"
 #include "display_settings.h"
@@ -464,6 +465,11 @@ static bool advance_scroll(display_scroll_t *station,
     return true;
 }
 
+static bool display_station_unavailable(const native_state_t *state) {
+    return !state->audio_running &&
+           strcmp(state->stream_format, AUDIO_STATUS_STATION_UNAVAILABLE) == 0;
+}
+
 static bool display_state_changed(const native_state_t *current,
                                   const native_state_t *previous) {
     // Stream parameters are deliberately frozen for one complete secondary
@@ -472,6 +478,7 @@ static bool display_state_changed(const native_state_t *current,
     return strcmp(current->station, previous->station) != 0 ||
            strcmp(current->title, previous->title) != 0 ||
            current->audio_running != previous->audio_running ||
+           display_station_unavailable(current) != display_station_unavailable(previous) ||
            current->audio_generation != previous->audio_generation ||
            current->network_mode != previous->network_mode ||
            current->ipv4 != previous->ipv4;
@@ -658,6 +665,7 @@ static void display_task(void *argument) {
                                numbered != previous_numbered ||
                                current_item != previous_item;
         bool audio_info_changed = audio_info != previous_audio_info;
+        bool unavailable = display_station_unavailable(&state);
         if (station_changed || audio_info_changed) redraw = true;
         char stream_details[96];
         format_stream_details(&state, stream_details, sizeof(stream_details));
@@ -670,9 +678,11 @@ static void display_task(void *argument) {
         bool title_changed = strcmp(state.title, previous.title) != 0 ||
                              state.audio_generation != previous.audio_generation ||
                              state.audio_running != previous.audio_running ||
+                             unavailable != display_station_unavailable(&previous) ||
                              audio_info_changed;
         if (title_changed) {
             show_stream_info = audio_info && !state.title[0];
+            if (unavailable) show_stream_info = true;
             secondary_started_ms = now_ms;
             if (scroll_owner == DISPLAY_SCROLL_TITLE) {
                 scroll_owner = DISPLAY_SCROLL_NONE;
@@ -744,7 +754,7 @@ static void display_task(void *argument) {
                            now_ms, &completed)) {
             redraw = true;
         }
-        if (audio_info && state.title[0] &&
+        if (!unavailable && audio_info && state.title[0] &&
             (completed == DISPLAY_SCROLL_TITLE ||
              (!title_scroll.enabled &&
               now_ms - secondary_started_ms >= DISPLAY_SECONDARY_PAGE_MS))) {
@@ -758,7 +768,7 @@ static void display_task(void *argument) {
                 scroll_owner = DISPLAY_SCROLL_NONE;
             }
             redraw = true;
-        } else if (audio_info && !state.title[0] &&
+        } else if (!unavailable && audio_info && !state.title[0] &&
                    (completed == DISPLAY_SCROLL_TITLE ||
                     (!title_scroll.enabled &&
                      now_ms - secondary_started_ms >=
@@ -774,7 +784,7 @@ static void display_task(void *argument) {
             const char *display_secondary =
                 button_status_visible
                     ? button_status_text(button_status)
-                    : (state.audio_running ? secondary_text : "");
+                    : (state.audio_running || unavailable ? secondary_text : "");
             draw_status(&state, station_text, display_secondary, &station_scroll,
                         button_status_visible ? &button_status_scroll
                                               : &title_scroll,

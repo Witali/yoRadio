@@ -348,7 +348,7 @@ test("native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll",
   assert.match(app, /DISPLAY_SCROLL_HOLD_MS 3500U/);
   assert.match(app, /DISPLAY_SCROLL_STEP_MS 35U/);
   assert.match(app, /IPSTR[\s\S]*oled_display_draw_compact_text/);
-  assert.doesNotMatch(app, /state->stream_format[\s\S]*oled_display_draw/);
+  assert.doesNotMatch(app, /oled_display_draw[^;]*state->stream_format/);
 });
 
 test("native OLED defaults to software scroll and keeps hardware scroll optional", () => {
@@ -470,7 +470,7 @@ test("native radio requests and publishes ICY song metadata", () => {
   assert.match(audio, /#define STREAM_READ_TIMEOUT_MS 250/);
   assert.match(
     audio,
-    /open_stream\(client, command\.url\)[\s\S]*esp_http_client_set_timeout_ms\(client, STREAM_READ_TIMEOUT_MS\)/,
+    /open_stream\(client, command\.url, retry\.deadline_us,[\s\S]*esp_http_client_set_timeout_ms\(client, STREAM_READ_TIMEOUT_MS\)/,
   );
   assert.match(
     audio,
@@ -529,7 +529,7 @@ test("native HTTPS station switching releases incompatible codec memory before T
   );
   assert.match(
     audio,
-    /xRingbufferReceive\([\s\S]*pdMS_TO_TICKS\(20\)\)/,
+    /pipeline_receive\([\s\S]*pdMS_TO_TICKS\(20\), &stats\.input_empty\)/,
   );
 });
 
@@ -611,7 +611,7 @@ test("native BOOT gestures match the documented one-button controls", () => {
     app,
     /BUTTON_STATUS_NEXT:[\s\S]*return "next"[\s\S]*BUTTON_STATUS_PREVIOUS:[\s\S]*return "prev"/,
   );
-  assert.match(app, /state\.audio_running \? secondary_text : ""/);
+  assert.match(app, /state\.audio_running \|\| unavailable \? secondary_text : ""/);
   assert.match(app, /button_status_visible[\s\S]*button_status_scroll/);
   assert.match(
     app,
@@ -965,8 +965,10 @@ test("native audio buffers cover high-bitrate remote streams", () => {
     assert.match(defaults, /CONFIG_LWIP_TCP_WND_DEFAULT=11520/);
     assert.match(defaults, /CONFIG_LWIP_TCP_RECVMBOX_SIZE=10/);
   }
-  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_DECODER, NULL, 7, NULL/);
-  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6, NULL/);
+  assert.match(c3Audio, /AUDIO_DECODE_PRIORITY = 7/);
+  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_DECODER, NULL, AUDIO_DECODE_PRIORITY, NULL/);
+  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, AUDIO_OUTPUT_PRIORITY, NULL/);
+  assert.match(c3Audio, /#ifdef CONFIG_YORADIO_OUTPUT_TASK_FIRST[\s\S]*AUDIO_DECODE_PRIORITY \+ 1[\s\S]*#else[\s\S]*AUDIO_DECODE_PRIORITY - 1/);
   assert.match(cydAudio, /#define ENCODED_RING_SIZE \(16 \* 1024\)/);
   assert.match(cydAudio, /16 KiB compressed \+ 8 KiB PCM/);
 });
@@ -1058,7 +1060,7 @@ test("native audio buffers backpressure instead of dropping a live stream", () =
   );
   assert.match(
     audio,
-    /xRingbufferSendAcquire\(s_pcm[\s\S]*pdMS_TO_TICKS\(250\)[\s\S]*atomic_load\(&s_generation\) != generation/,
+    /pipeline_acquire\(s_pcm[\s\S]*pdMS_TO_TICKS\(250\), &stats->pcm_full\)[\s\S]*atomic_load\(&s_generation\) != generation/,
   );
 });
 

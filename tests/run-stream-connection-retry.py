@@ -24,7 +24,7 @@ def main():
                  text.index('} stream_retry_t;')+len('} stream_retry_t;')]
     start = text.index('static bool http_status_is_redirect(')
     open_code = text[start:text.index('static bool send_encoded(', start)]
-    start = text.index('static void schedule_stream_retry(')
+    start = text.index('static void begin_stream_deadline(')
     task_code = text[start:text.index('static void log_runtime_memory(const char *stage) {', start)]
     unit = args.output/'test.c'
     unit.write_text(harness.read_text().replace('/* PRODUCTION_COMMAND_TYPES */', types)
@@ -41,8 +41,8 @@ def main():
     result = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                   'UBSAN_OPTIONS=halt_on_error=1', host(binary)])
     (args.output/'run.log').write_bytes(result)
-    assert b'PASS stream retry cases=29;' in result
-    (args.output/'report.json').write_text(json.dumps(dict(passed=True, cases=29,
+    assert b'PASS stream retry cases=35;' in result
+    (args.output/'report.json').write_text(json.dumps(dict(passed=True, cases=35,
         source_sha256={p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                        for p in (source, harness, Path(__file__).resolve())},
         scope='Actual open_stream, retry scheduling and stream_task with deterministic platform stubs; '

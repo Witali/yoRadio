@@ -35,6 +35,8 @@ static inline void xSemaphoreGive(void *p) { (void)p; }
 size_t strlcpy(char *, const char *, size_t);
 ''')
     (tmp/'freertos/semphr.h').write_text('#include "FreeRTOS.h"\n')
+    (tmp/'sdkconfig.h').write_text('')
+    (tmp/'freertos/ringbuf.h').write_text('#include "FreeRTOS.h"\n')
     source = (MAIN/'audio_service.c').read_text()
     first = source.index('typedef struct {\n    uint32_t generation;\n    native_codec_t codec;')
     last = source.index('typedef struct {\n    uint32_t generation;\n    native_codec_t codec;\n    int64_t', first)
@@ -50,6 +52,7 @@ size_t strlcpy(char *, const char *, size_t);
 static void finish_network(uint32_t generation, bool stream_read_failed) {
     struct { uint32_t generation; } command = {generation};
     bool stream_stalled = false;
+    bool stream_unavailable = false;
     native_codec_t codec = NATIVE_CODEC_AAC;
     void *client = NULL;
 ''' + source[first:last] + '\n}\n'

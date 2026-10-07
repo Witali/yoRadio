@@ -15,6 +15,7 @@
 #define SETTINGS_NVS_AUDIO_BUFFER "abuff"
 #define SETTINGS_NVS_MDNS_NAME "mdns"
 #define SETTINGS_NVS_WATCHDOG "watchdog"
+#define SETTINGS_NVS_STATION_TIMEOUT "stationtimeout"
 #define SETTINGS_NVS_TZ_HOUR "tzh"
 #define SETTINGS_NVS_TZ_MINUTE "tzm"
 #define SETTINGS_NVS_SNTP1 "sntp1"
@@ -32,6 +33,7 @@ static atomic_uchar s_softap_delay_min = RUNTIME_DEFAULT_SOFTAP_DELAY_MIN;
 static atomic_uchar s_audio_buffer_blocks =
     RUNTIME_DEFAULT_AUDIO_BUFFER_BLOCKS;
 static atomic_bool s_watchdog = RUNTIME_DEFAULT_WATCHDOG;
+static atomic_uchar s_station_timeout_sec = RUNTIME_DEFAULT_STATION_TIMEOUT_SEC;
 static atomic_schar s_timezone_hour = RUNTIME_DEFAULT_TZ_HOUR;
 static atomic_uchar s_timezone_minute = RUNTIME_DEFAULT_TZ_MINUTE;
 static atomic_uint_least16_t s_time_sync_interval_min =
@@ -154,6 +156,11 @@ esp_err_t runtime_settings_init(void) {
     }
     if (nvs_get_u8(handle, SETTINGS_NVS_WATCHDOG, &u8) == ESP_OK &&
         u8 <= 1U) atomic_store(&s_watchdog, u8 != 0U);
+    if (nvs_get_u8(handle, SETTINGS_NVS_STATION_TIMEOUT, &u8) == ESP_OK &&
+        u8 >= RUNTIME_MIN_STATION_TIMEOUT_SEC &&
+        u8 <= RUNTIME_MAX_STATION_TIMEOUT_SEC) {
+        atomic_store(&s_station_timeout_sec, u8);
+    }
     if (nvs_get_i8(handle, SETTINGS_NVS_TZ_HOUR, &i8) == ESP_OK &&
         i8 >= -12 && i8 <= 14) atomic_store(&s_timezone_hour, i8);
     if (nvs_get_u8(handle, SETTINGS_NVS_TZ_MINUTE, &u8) == ESP_OK &&
@@ -196,6 +203,9 @@ uint8_t runtime_settings_get_audio_buffer_blocks(void) {
     return atomic_load(&s_audio_buffer_blocks);
 }
 bool runtime_settings_get_watchdog(void) { return atomic_load(&s_watchdog); }
+uint8_t runtime_settings_get_station_timeout_sec(void) {
+    return atomic_load(&s_station_timeout_sec);
+}
 int8_t runtime_settings_get_timezone_hour(void) {
     return atomic_load(&s_timezone_hour);
 }
@@ -260,6 +270,15 @@ esp_err_t runtime_settings_set_watchdog(bool enabled) {
     ESP_RETURN_ON_ERROR(save_u8(SETTINGS_NVS_WATCHDOG, enabled ? 1U : 0U), TAG,
                         "Save watchdog setting");
     atomic_store(&s_watchdog, enabled);
+    return ESP_OK;
+}
+esp_err_t runtime_settings_set_station_timeout_sec(uint8_t seconds) {
+    ESP_RETURN_ON_FALSE(seconds >= RUNTIME_MIN_STATION_TIMEOUT_SEC &&
+                            seconds <= RUNTIME_MAX_STATION_TIMEOUT_SEC,
+                        ESP_ERR_INVALID_ARG, TAG, "Station timeout range");
+    ESP_RETURN_ON_ERROR(save_u8(SETTINGS_NVS_STATION_TIMEOUT, seconds), TAG,
+                        "Save station timeout");
+    atomic_store(&s_station_timeout_sec, seconds);
     return ESP_OK;
 }
 esp_err_t runtime_settings_set_timezone_hour(int8_t hour) {

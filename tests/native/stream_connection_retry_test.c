@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdatomic.h>
 #include <setjmp.h>
+#define AUDIO_STATUS_STATION_UNAVAILABLE "station unavailable"
 
 typedef int esp_err_t;
 typedef int native_codec_t;
@@ -13,10 +14,9 @@ enum { ESP_OK, ESP_FAIL, ESP_ERR_HTTP_CONNECT, ESP_ERR_HTTP_WRITE_DATA,
        ESP_ERR_HTTP_EAGAIN, ESP_ERR_TIMEOUT, ESP_ERR_HTTP_FETCH_HEADER,
        ESP_ERR_HTTP_MAX_REDIRECT, ESP_ERR_HTTP_INVALID_TRANSPORT,
        NATIVE_CODEC_AUTO, NATIVE_CODEC_AAC, AUDIO_END_EOF,
-       AUDIO_END_BUFFER_STALLED, AUDIO_END_READ_FAILED };
+       AUDIO_END_BUFFER_STALLED, AUDIO_END_READ_FAILED, AUDIO_END_UNAVAILABLE };
 enum { STREAM_CHUNK_SIZE = 2048, STREAM_READ_TIMEOUT_MS = 250,
-       MAX_HTTP_REDIRECTS = 5, ICY_METADATA_MAX = 4080,
-       STREAM_STALL_TIMEOUT_US = 10000000 };
+       MAX_HTTP_REDIRECTS = 5, ICY_METADATA_MAX = 4080 };
 typedef uint32_t TickType_t;
 #define portMAX_DELAY UINT32_MAX
 #define pdTRUE 1
@@ -53,11 +53,14 @@ static jmp_buf finished;
 static void *input_buffer;
 static int read_result;
 static bool send_ok;
+static uint8_t timeout_sec;
+static int64_t open_duration_us, header_duration_us, read_step_us;
 static char last_url[512], last_state[64];
 
 static void *stream_malloc(size_t size) { assert(!input_buffer); return input_buffer = malloc(size); }
 static int64_t esp_timer_get_time(void) { return now_us; }
 static bool runtime_settings_get_watchdog(void) { return watchdog; }
+static uint8_t runtime_settings_get_station_timeout_sec(void) { return timeout_sec; }
 static const char *esp_err_to_name(int error) { (void)error; return "stub"; }
 static void vTaskDelete(void *unused) { (void)unused; assert(false); }
 static void vTaskDelay(unsigned ticks) { now_us += (int64_t)ticks * 1000; }
@@ -124,10 +127,12 @@ static void esp_http_client_set_header(esp_http_client_handle_t c, const char *k
 }
 static int esp_http_client_open(esp_http_client_handle_t c, int size) {
     (void)c; (void)size;
+    now_us += open_duration_us;
     if (cancel_in_open) atomic_fetch_add(&s_generation, 1);
     return attempts[attempt_count-1].result;
 }
 static int64_t esp_http_client_fetch_headers(esp_http_client_handle_t c) {
+    now_us += header_duration_us;
     (void)c; return attempts[attempt_count-1].bad_headers ? -1 : 100;
 }
 static int esp_http_client_get_status_code(esp_http_client_handle_t c) { (void)c; return attempts[attempt_count-1].status; }
@@ -140,6 +145,7 @@ static int esp_http_client_get_response_header(esp_http_client_handle_t c, const
     (void)c; (void)key; (void)value; return ESP_FAIL;
 }
 static int esp_http_client_read(esp_http_client_handle_t c, char *data, size_t size) {
+    now_us += read_step_us;
     (void)c; (void)data; (void)size; return read_result;
 }
 static bool esp_http_client_is_complete_data_received(esp_http_client_handle_t c) { (void)c; return true; }
@@ -157,6 +163,7 @@ static void reset(unsigned count) {
     now_us = event_us = 0; attempt_limit = count;
     watchdog = send_ok = true; init_oom = cancel_in_open = queued = false;
     input_buffer = NULL; read_result = 0; client.live = false;
+    timeout_sec = 10; open_duration_us = header_duration_us = read_step_us = 0;
     last_state[0] = last_url[0] = 0;
     for (unsigned i=0; i<count; ++i) attempts[i].status = 503;
     queue_play("http://fixture/first");
@@ -171,10 +178,10 @@ int main(void) {
     reset(3); attempts[2].status = 200; execute();
     assert(attempt_count == 3 && eos_count == 1 && eof_reason == AUDIO_END_EOF);
     assert(attempt_times[1] == 1000000 && attempt_times[2] == 3000000); ++cases;
-    reset(7); stop_after_attempt = 7; execute();
-    const int64_t schedule[] = {0, 1, 3, 7, 15, 31, 61};
-    for (unsigned i=0; i<7; ++i) assert(attempt_times[i] == schedule[i]*1000000);
-    assert(eos_count == 0); ++cases;
+    reset(4); execute();
+    const int64_t schedule[] = {0, 1, 3, 7};
+    for (unsigned i=0; i<4; ++i) assert(attempt_times[i] == schedule[i]*1000000);
+    assert(eos_count == 0 && now_us == 10000000 && !strcmp(last_state, "station unavailable")); ++cases;
     for (unsigned action=1; action<=3; ++action) {
         reset(2); event_kind = action; event_us = 500000; attempts[1].status = 200;
         execute();
@@ -208,5 +215,18 @@ int main(void) {
     assert(attempt_count==1 && eof_reason==AUDIO_END_READ_FAILED); ++cases;
     reset(1); attempts[0].status=200; read_result=1; send_ok=false; execute();
     assert(attempt_count==1 && eof_reason==AUDIO_END_BUFFER_STALLED); ++cases;
+    for (unsigned seconds=1; seconds<=2; ++seconds) {
+        reset(seconds); timeout_sec=seconds; execute();
+        assert(now_us==(int64_t)seconds*1000000 && !strcmp(last_state,"station unavailable")); ++cases;
+    }
+    reset(8); timeout_sec=120; execute();
+    assert(attempt_count==8 && now_us==120000000 && !strcmp(last_state,"station unavailable")); ++cases;
+    reset(1); attempts[0].status=200; open_duration_us=10000000; execute();
+    assert(attempt_count==1 && !eos_count && !strcmp(last_state,"station unavailable")); ++cases;
+    reset(1); attempts[0].status=200; open_duration_us=9000000; header_duration_us=1000000; execute();
+    assert(attempt_count==1 && !eos_count && !strcmp(last_state,"station unavailable")); ++cases;
+    reset(1); attempts[0].status=200; timeout_sec=2; read_result=-ESP_ERR_HTTP_EAGAIN;
+    read_step_us=1000000; execute();
+    assert(eof_reason==AUDIO_END_UNAVAILABLE && now_us==2000000); ++cases;
     printf("PASS stream retry cases=%u; HTTP ownership, cancellation, EOF and error gates\n", cases);
 }
