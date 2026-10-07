@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-07",
+  "qualification": "clean-default production build and host regressions only",
+  "hardware_tested": false,
+  "deployed": false,
+  "source_checkpoint": "7991b3127f50881cbeea50b1a95118669ab39a9d",
+  "merge_commit": "a4ef7d7735d8ed3b7f29b21e7fa618b40bc99a00",
+  "firmware_source_commit": "544ff03bb46ed2972356c98f644b97e30ffc9013",
+  "regression_source_commit": "785dd3a88c33c1c80f029d6f954e451c67f26f11",
+  "embedded_project_version": "v0.9.693-1217-ga4ef7d77-dirty",
+  "version_note": "Built before committing the TLS defaults fix; the embedded version retains the merge commit and dirty suffix.",
+  "target": "esp32c3",
+  "esp_idf": "v6.0.2",
+  "app_bytes": 1401008,
+  "app_partition_bytes": 1900544,
+  "app_sha256": "bc60345f8d86402f179f3ed47bd5a66ce0c4a8b9febacd12025419a789c422fa",
+  "elf_sha256": "40ed8a434debbcd7dd20d9af202645f6349d254d66b33c6f5c50dea26321880f",
+  "sdkconfig_sha256": "d30f72ca1ff0f68b971ccab7e57352f649c4ba49a288bf7bff9c2b46a4b3b0eb",
+  "defaults_sha256": "9cc20b6760b89058097686fe3c181124556d0bca8f1e3da097eac7d74a57d317",
+  "verified_config": {
+    "CONFIG_FREERTOS_THREAD_LOCAL_STORAGE_POINTERS": "2",
+    "CONFIG_YORADIO_VORBIS_REPAIR": "y",
+    "CONFIG_YORADIO_AAC_PLUS": "y",
+    "CONFIG_YORADIO_FLAC_DECODER_CUSTOM": "y",
+    "CONFIG_ESPTOOLPY_FLASHMODE_DIO": "y",
+    "CONFIG_ESPTOOLPY_FLASHFREQ_80M": "y"
+  },
+  "verified_disabled_options": [
+    "CONFIG_YORADIO_DIRECT_DMA_PCM",
+    "CONFIG_YORADIO_OUTPUT_TASK_FIRST",
+    "CONFIG_YORADIO_AAC_COMPACT_SBR",
+    "CONFIG_YORADIO_TCP_PCB_POOL",
+    "CONFIG_YORADIO_RX_BUFFER_DIAGNOSTICS",
+    "CONFIG_LWIP_L2_TO_L3_COPY",
+    "CONFIG_YORADIO_QEMU",
+    "CONFIG_YORADIO_DEEP_SLEEP_CLOCK",
+    "CONFIG_ESP_WIFI_IRAM_OPT",
+    "CONFIG_ESP_WIFI_RX_IRAM_OPT"
+  ],
+  "verified_elf_symbols": [
+    "aac_profile_enter",
+    "aac_profile_leave",
+    "__wrap_esp_vorbis_dec_open",
+    "__wrap_esp_vorbis_dec_decode",
+    "__wrap_esp_vorbis_dec_register",
+    "__wrap_esp_audio_simple_dec_process"
+  ],
+  "command": "pwsh -NoProfile -File idf/esp32c3-oled-native/build-production.ps1 -DependencyRoot C:/Work/yoRadio/.idf -BuildDirectory build-main-merge -Sdkconfig build-main-merge/sdkconfig -FirmwareOutputDirectory firmware/development/esp32c3-main-merge-20261007"
+}
