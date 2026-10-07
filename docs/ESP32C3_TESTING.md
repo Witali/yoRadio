@@ -823,6 +823,22 @@ following audio bytes remain aligned. An absent title preserves the current
 title; an explicitly empty title clears it. Station-generation guards around
 publication remain in `audio_service.c`.
 
+For physical publication and audio framing, run:
+
+```powershell
+python tools/esp32c3_tests/icy_metadata.py --board http://BOARD_IP --host PC_IP --serial-port COM9 --firmware firmware/development/VARIANT/app.bin --output .build/icy-new-run
+```
+
+The seven synthetic ICY cases play the full-rate HE-AACv2 fixture, compare the
+WebUI `meta` field with the expected title, check playback and runtime faults,
+then stop and verify unchanged Wi-Fi, playlist and settings. Run on an awake
+image with diagnostic logging for meaningful UART fault coverage. With a quiet
+image, absence of serial faults cannot prove absence of internal errors. Each
+case lasts seven seconds; this is a functional check, not a sustained load test.
+`tools/audio_test_server/icy.py` has no board commands and can serve any HTTP
+player. `python tests/test-icy-server.py` checks its byte framing and actual HTTP
+responses, including the maximum 4080-byte metadata block.
+
 ## CPU diagnostics without a separate profiler stack
 
 For new public-stream reports, use
