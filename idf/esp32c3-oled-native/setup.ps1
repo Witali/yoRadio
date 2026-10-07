@@ -11,8 +11,10 @@ if ([string]::IsNullOrWhiteSpace($DependencyRoot)) {
     $DependencyRoot = Join-Path $worktreeRoot ".idf"
 }
 $DependencyRoot = [IO.Path]::GetFullPath($DependencyRoot)
-$idfPath = Join-Path $DependencyRoot "v6.0.2"
-$idfToolsPath = Join-Path $DependencyRoot "tools-v6.0.2"
+$idfVersion = (Get-Content -LiteralPath (Join-Path $project 'idf-version.txt') -Raw).Trim()
+if ($idfVersion -notmatch '^v\d+\.\d+(?:\.\d+)?$') { throw 'Invalid pinned ESP-IDF version' }
+$idfPath = Join-Path $DependencyRoot $idfVersion
+$idfToolsPath = Join-Path $DependencyRoot "tools-$idfVersion"
 $audioCodecPath = Join-Path $DependencyRoot "esp-adf-libs"
 $pythonVersion = "3.12.10"
 $pythonRoot = Join-Path $DependencyRoot "python-$pythonVersion"
@@ -102,7 +104,7 @@ if (-not (Test-Path -LiteralPath $pythonExe -PathType Leaf)) {
 
 Install-GitDependency `
     -Url "https://github.com/espressif/esp-idf.git" `
-    -Revision "v6.0.2" `
+    -Revision $idfVersion `
     -Destination $idfPath `
     -Submodules
 Install-AudioCodec -Destination $audioCodecPath

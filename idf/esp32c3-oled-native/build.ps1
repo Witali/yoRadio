@@ -27,8 +27,10 @@ if ([string]::IsNullOrWhiteSpace($DependencyRoot)) {
     $DependencyRoot = Join-Path $worktreeRoot ".idf"
 }
 $DependencyRoot = [IO.Path]::GetFullPath($DependencyRoot)
-$idf = Join-Path $DependencyRoot "v6.0.2"
-$idfTools = Join-Path $DependencyRoot "tools-v6.0.2"
+$idfVersion = (Get-Content -LiteralPath (Join-Path $project 'idf-version.txt') -Raw).Trim()
+if ($idfVersion -notmatch '^v\d+\.\d+(?:\.\d+)?$') { throw 'Invalid pinned ESP-IDF version' }
+$idf = Join-Path $DependencyRoot $idfVersion
+$idfTools = Join-Path $DependencyRoot "tools-$idfVersion"
 $bootstrapPython = Join-Path $DependencyRoot "python-3.12.10\tools"
 $audioCodec = Join-Path $DependencyRoot "esp-adf-libs\esp_audio_codec"
 $required = @(

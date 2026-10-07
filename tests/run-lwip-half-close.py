@@ -20,8 +20,10 @@ parser.add_argument('--allocator', choices=('pool', 'heap'), default='pool')
 parser.add_argument('--unpatched', action='store_true', help='reproduce the SDK defect')
 parser.add_argument('--output', type=Path, help='retain source hashes and per-case output')
 args = parser.parse_args()
-lwip = args.lwip or next((p/'.idf/v6.0.2/components/lwip/lwip' for p in ROOT.parents
-                         if (p/'.idf/v6.0.2/components/lwip/lwip/src/core/tcp.c').exists()), None)
+idf_version = (ROOT/'idf/esp32c3-oled-native/idf-version.txt').read_text().strip()
+lwip_relative = Path('.idf')/idf_version/'components/lwip/lwip'
+lwip = args.lwip or next((p/lwip_relative for p in (ROOT, *ROOT.parents)
+                         if (p/lwip_relative/'src/core/tcp.c').exists()), None)
 if not lwip:
     parser.error('supply --lwip /path/to/pinned/esp-lwip')
 revision = subprocess.check_output(['git', '-C', str(lwip), 'rev-parse', 'HEAD'], text=True).strip()

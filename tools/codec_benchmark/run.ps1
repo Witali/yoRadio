@@ -2,6 +2,7 @@
 param(
     [string]$Port = "COM9",
     [string]$FixtureDirectory = "",
+    [string]$DependencyRoot = "",
     [ValidateRange(8, 30)]
     [int]$TestSeconds = 14
 )
@@ -12,7 +13,10 @@ if ([string]::IsNullOrWhiteSpace($FixtureDirectory)) {
     $FixtureDirectory = Join-Path $repository ".build\codec-benchmark"
 }
 $FixtureDirectory = [IO.Path]::GetFullPath($FixtureDirectory)
-$python = Join-Path $repository ".idf\tools-v6.0.2\python_env\idf6.0_py3.12_env\Scripts\python.exe"
+if (-not $DependencyRoot) { $DependencyRoot = Join-Path $repository '.idf' }
+$idfVersion = (Get-Content -LiteralPath (Join-Path $repository 'idf/esp32c3-oled-native/idf-version.txt') -Raw).Trim()
+$idfSeries = $idfVersion -replace '^v(\d+\.\d+).*$', '$1'
+$python = Join-Path $DependencyRoot "tools-$idfVersion\python_env\idf${idfSeries}_py3.12_env\Scripts\python.exe"
 if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
     throw "ESP-IDF Python is missing; run .\setup.ps1 first"
 }

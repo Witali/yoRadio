@@ -263,7 +263,8 @@ def main():
         raise ValueError('Fixture hash mismatch')
     data = fixture_path.read_bytes()
     info, setup = headers(data)
-    nm_candidates = list(args.deps.glob('tools-v6.0.2/tools/riscv32-esp-elf/*/riscv32-esp-elf/bin/riscv32-esp-elf-nm.exe'))
+    idf_version = (ROOT/'idf/esp32c3-oled-native/idf-version.txt').read_text().strip()
+    nm_candidates = list(args.deps.glob(f'tools-{idf_version}/tools/riscv32-esp-elf/*/riscv32-esp-elf/bin/riscv32-esp-elf-nm.exe'))
     if len(nm_candidates)!=1:
         raise ValueError('Expected one pinned RV32 nm tool')
     nm_text = subprocess.check_output([str(nm_candidates[0]),'-n','-S','--defined-only',

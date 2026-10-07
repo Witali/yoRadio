@@ -59,8 +59,10 @@ if ([string]::IsNullOrWhiteSpace($QemuBiosDirectory)) {
     }
 }
 
+$idfVersion = (Get-Content -LiteralPath (Join-Path $project 'idf-version.txt') -Raw).Trim()
+$idfSeries = $idfVersion -replace '^v(\d+\.\d+).*$', '$1'
 $esptool = Join-Path $DependencyRoot `
-    "tools-v6.0.2\python_env\idf6.0_py3.12_env\Scripts\esptool.exe"
+    "tools-$idfVersion\python_env\idf${idfSeries}_py3.12_env\Scripts\esptool.exe"
 if (-not (Test-Path -LiteralPath $esptool -PathType Leaf)) {
     throw "esptool is unavailable under $DependencyRoot; run setup.ps1 first"
 }
