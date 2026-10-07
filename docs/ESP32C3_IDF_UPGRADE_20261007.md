@@ -52,3 +52,16 @@ separately. Historical experiment evidence replay is not a new hardware run.
 
 In progress. Results will be added as each stage completes; a planned check
 is not a passed check.
+
+### 6.0.3 lwIP source audit
+
+The first clean build correctly rejected the changed `api_msg.c` hash.
+Compared with 6.0.2, this file only changes DNS result-count handling;
+close/shutdown paths and `tcp.c` are unchanged. Added its exact normalized
+source hash to the allowlist, retaining rejection of all unaudited sources.
+SDK submodule revision: `c6f2f878e7b0f86033214b85547d579be43351e3`.
+
+The actual 6.0.3 stack passed all six half-close scenarios with ASan/UBSan
+for both heap and pool allocation after our fix (12 passes). Both unpatched
+controls still fail the five ownership cases and pass the ordinary full-close
+case. This demonstrates that the local fix is still needed on 6.0.3.

@@ -1,6 +1,6 @@
 """Generate a project-local esp-lwIP TCP fix; never modify the shared SDK.
 
-Pinned to esp-lwIP fd432e4ee2cfb7f7f1c7eb7227e0173412e7b84e (IDF 6.0.2).
+Audited against the exact IDF 6.0.2 and 6.0.3 sources below.
 A SHUT_WR netconn can still own a TIME_WAIT PCB. Both reclamation paths must
 notify that owner before the storage is reused. Normal tcp_close callers have
 TF_RXCLOSED and have already relinquished ownership.
@@ -11,6 +11,9 @@ from pathlib import Path
 
 SOURCE_SHA256 = 'add731715c74fbcb50f85ce504e32168f93dd66c0d4f8aa42d355227f53fe59d'
 API_SOURCE_SHA256 = 'a793b371032ba38ca5e23fd7fede4c910aea0079ffe612d781109f203eab92a0'
+# IDF 6.0.3 (esp-lwIP c6f2f878): only DNS result-count handling changed
+# in api_msg.c. The close/shutdown ownership paths and tcp.c are unchanged.
+API_SOURCE_SHA256_IDF_603 = 'ac3c486b362318ea265e8b8c07cf74fe571fe4197415fbd7de5b74390f9019ff'
 
 
 def patch(source):
@@ -68,7 +71,8 @@ tcp_free_timewait(struct tcp_pcb *pcb)
 
 
 def patch_api(source):
-    if hashlib.sha256(source.encode()).hexdigest() != API_SOURCE_SHA256:
+    if hashlib.sha256(source.encode()).hexdigest() not in (
+            API_SOURCE_SHA256, API_SOURCE_SHA256_IDF_603):
         raise ValueError('Unaudited lwIP api_msg.c: revalidate half-close ownership fix')
     before = '''              (tpcb->state == CLOSING))) {'''
     after = '''              (tpcb->state == CLOSING) ||
