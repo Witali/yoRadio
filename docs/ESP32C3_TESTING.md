@@ -120,6 +120,13 @@ progressive-heap failure. `tests/test-rx-transport-evidence.py` replays both
 archives without treating missing telemetry as zero memory or declaring audio
 continuity from decoder progress. Both experimental images remain unqualified.
 
+The [configurable station timeout](ESP32C3_STATION_TIMEOUT.md) adds recovery
+within a bounded connection window and an unavailable terminal state. The
+default is ten seconds; WebUI accepts 1–120 seconds and persists it across
+reboot. `connection_retry.py` checks temporary 503 responses, cancellation,
+finite EOF, configured deadlines, stalled data, NVS persistence and post-Stop
+memory. The server's `/recover/FIXTURE` route is shared by all boards.
+
 The optional [heap-owner diagnostic](ESP32C3_HEAP_FRAGMENT_OWNER_20261005.md)
 tracks live allocations in the largest initial free region, with explicit
 overflow/unknown-owner rejection. Use `heap_idle.py` for a stopped-board window
@@ -324,6 +331,7 @@ transients. This is separate from the additional error allowed for packed storag
 | C3-T15 | Power interruption during OTA | Manual procedure below | Dedicated recoverable test board boots the previous/new valid app after interruption at each stage; do not assume automatic rollback exists. |
 | C3-T16 | AAC buffer-reuse equivalence and error paths | `run-esp32c3-stream-format.py`, `run-esp32c3-memory-trace.py`, `compare-pcm-wav.py`, real-decoder QEMU and full-radio matrix | Adaptive ADTS and 8 KiB PCM pass host OOM/retry checks and byte-identical fixture output. Full-radio HE/v2 and internal-state/exhaustive-profile coverage remain open. |
 | C3-T17 | Stable terminal status after buffered decoder output | `tests/run-esp32c3-eof.py`, `run.py --suite eof`, `reference_eof.py` | EOF follows queued PCM; stopped REST/WebSocket status stays stopped and clears stream parameters. Exercise all eleven fixtures with AUTO/explicit codecs, late metadata, stale generations, cancellation and failures. Profile/rate acceptance remains a separate requirement. |
+| C3-T18 | Configurable station-unavailable timeout and connection retry | `tests/run-stream-connection-retry.py`, `connection_retry.py`, `tests/test-connection-retry-runtime.py` | Temporary 503 recovers within the deadline; 3/10-second timeouts stop with an unavailable status, no later request; Stop/new station/watchdog cancel pending retries; EOF stays finite; settings survive reboot and invalid values are rejected; settled heap recovers. Only a recorded, verified software reset for the persistence test is exempt from the unexpected-reboot gate. |
 
 ## What “all formats” means here
 

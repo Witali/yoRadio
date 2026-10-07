@@ -23,6 +23,8 @@ def main():
     parser.add_argument('--firmware', type=Path, required=True)
     parser.add_argument('--serial-port')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--expect-station-timeout-default', type=int,
+                        help='Expect this newly introduced getsystem field after the upgrade')
     args = parser.parse_args()
     for path in (args.current_firmware, args.firmware):
         config = path.with_name('sdkconfig').read_text()
@@ -37,8 +39,15 @@ def main():
     require(target['app_elf_sha256'] != current['app_elf_sha256'], 'Use ota.py for same-image tests')
     require(len(target_bytes) <= initial['max_size'], 'Image exceeds OTA slot')
     before = snapshot(board)
+    if args.expect_station_timeout_default is not None:
+        require('stationtimeout' not in before['settings']['getsystem'],
+                'Station timeout already exists; compare existing settings without a migration override')
+        require(args.expect_station_timeout_default == 10, 'Expected documented station timeout default')
+        before['settings']['getsystem']['stationtimeout'] = args.expect_station_timeout_default
     report = Report(args.output/'report.json', initial)
     report.data.update(current_image=current, target_image=target)
+    if args.expect_station_timeout_default is not None:
+        report.data['expected_new_settings'] = dict(stationtimeout=args.expect_station_timeout_default)
     specs = fixtures()
     name = 'lc-48000-stereo'
     report.data['fixture_hashes'] = {name: specs[name]['sha256']}
