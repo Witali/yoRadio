@@ -42,6 +42,32 @@ and FFprobe layouts. Use a new output directory to preserve earlier fixtures.
 These transport/load fixtures supplement the general format matrix; they do
 not replace 24-bit FLAC or other depth/rate qualification.
 
+## Full-sized TLS record tests
+
+`tls_records.py` serves continuous ADTS AAC with measured TLS 1.2 AES-GCM record
+sizes. `/small/NAME` uses 1024-byte plaintext records, `/large/NAME` uses the full
+16,384 bytes, `/grow/NAME` changes from small to large after 30 seconds, and
+`/alternate/NAME` alternates. TCP packet sizes are not TLS record sizes.
+
+```powershell
+python tools/audio_test_server/record_test_ca.py --host PC_LAN_IP --output .build/record-ca
+python tools/audio_test_server/tls_records.py --host PC_LAN_IP --cert .build/record-ca/server.pem --key .build/record-ca/server.key --output .build/tls-records.json
+```
+
+The generated CA is valid for two days. Add `.build/record-ca/ca.pem` only to a
+dedicated laboratory firmware's extra certificate bundle, retaining normal
+certificate and hostname verification. Do not install it into the OS or ship
+it in a production image. The CA signing key is not saved; the server key stays
+in ignored local storage. Keep the normal public roots and restore the normal
+firmware after testing. A stock production image must reject this local CA.
+
+The server contains no board commands and can be used by other boards with
+their own test-only trust configuration. It retains only record types/lengths,
+phase timestamps and socket-write counters. `python tests/test-tls-record-server.py`
+checks actual encrypted record lengths (1048 and 16,408 bytes for this cipher),
+exact audio bytes across repeated fixtures, and rejection with ordinary trust.
+Host writes are not proof of bytes received or decoded by a board.
+
 For FLAC depth and stereo-mode qualification:
 
 ```powershell
