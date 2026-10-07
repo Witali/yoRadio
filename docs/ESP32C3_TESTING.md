@@ -560,7 +560,8 @@ python tests/test-stream-memory-study.py
 python tests/test-stream-memory-summary.py
 ```
 
-This ten-minute diagnostic is the shorter investigation requested on 7 October.
+The default duration is 600 seconds (ten minutes), as requested on 7 October;
+`--seconds` can explicitly select a different duration.
 It does not satisfy the one-hour soak criterion. The summarizer requires a
 completed study, preserves original failures, checks RX snapshot completeness
 and time coverage, and corrects aged network snapshots by their recorded age.

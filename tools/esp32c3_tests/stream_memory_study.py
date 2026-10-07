@@ -48,7 +48,8 @@ def main():
     parser.add_argument('--serial-port', required=True)
     parser.add_argument('--firmware', type=Path, required=True)
     parser.add_argument('--case', default='hev2-44100-stereo')
-    parser.add_argument('--seconds', type=int, default=1800)
+    parser.add_argument('--seconds', type=int, default=600,
+                        help='Continuous playback duration in seconds (default: %(default)s)')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     require(args.seconds >= 60, 'Use at least sixty seconds')
