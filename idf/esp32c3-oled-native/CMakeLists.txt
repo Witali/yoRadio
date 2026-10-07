@@ -73,6 +73,7 @@ if(NOT yoradio_httpd_replaced EQUAL 1)
 endif()
 list(APPEND yoradio_httpd_sources "${yoradio_httpd_fixed}")
 set_property(TARGET ${yoradio_httpd_lib} PROPERTY SOURCES "${yoradio_httpd_sources}")
+target_include_directories(${yoradio_httpd_lib} PRIVATE "${yoradio_httpd_dir}/src")
 set_source_files_properties("${yoradio_tcp_fixed}" PROPERTIES COMPILE_OPTIONS "-Wno-type-limits")
 
 set(yoradio_api_original "${yoradio_lwip_dir}/lwip/src/api/api_msg.c")

@@ -649,6 +649,20 @@ runner then reboots to restore the saved station. The local socket transport
 test is `python tests/test-esp32c3-http-headers.py`; it does not replace the
 actual SDK parser check on the board.
 
+The pinned 6.1 HTTP source lacks the 6.0.3 guard, so the C3 build applies a
+fingerprint-checked project-local backport. Do not weaken the expected 413 to
+400: a later application error can hide an earlier narrowing conversion.
+To run the source/boundary controls with the installed SDKs (Windows uses WSL
+gcc; Linux uses gcc directly):
+
+```powershell
+python tools/test_httpd_content_length.py --idf-root PATH_TO_IDF_DEPENDENCY_ROOT --output .build/c3-tests/http-length-boundaries
+```
+
+This checks all 11 boundary values on each pinned SDK with ASan/UBSan, preserves
+the already-fixed 6.0.3 file, rejects unknown sources, and demonstrates failures
+with the original 6.0.2/6.1 assignments. Use a fresh output directory.
+
 ## Wi-Fi timing and external interrupt tests
 
 Build otherwise identical diagnostic variants with Wi-Fi IRAM options on/off
