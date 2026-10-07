@@ -10,6 +10,13 @@ packet buffers. Keep it optional until memory, throughput and playback gates pas
 
 This is a design analysis, not an implemented or measured packet-pool saving.
 
+The subsequent [physical sizing run](ESP32C3_RX_COPY_PROFILE_20261007.md) observed
+16 simultaneous copied packets and 17,664 B peak allocation capacity, with all
+23,941 allocations released after Stop. No ownership/allocation failures were
+recorded. Receive queues still grew during playback and the original progressive
+heap gate remains FAIL. A 16-slot pool would leave no headroom; production sizing
+still needs HTTPS, reconnect, other codec and OTA workload coverage.
+
 ## Current implementation, 2026-10-07
 
 The measured awake `esp32c3-station-timeout` configuration uses:
