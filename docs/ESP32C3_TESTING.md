@@ -108,6 +108,11 @@ recovery. `summarize_sustained.py` replays the complete window and consecutive
 five-minute windows; it does not replace the original acceptance outcome.
 This report does not satisfy the one-hour C3-T08 criterion.
 
+The [ten-minute HE-AACv2 RX-owner investigation](ESP32C3_HEV2_RX_OWNER_20261007.md)
+retains the same progressive-heap failure with an 8-byte post-Stop idle
+difference. Its full ownership trace is rejected for a truncated USB record;
+independent playback, recovery and OTA observations remain available.
+
 The optional [heap-owner diagnostic](ESP32C3_HEAP_FRAGMENT_OWNER_20261005.md)
 tracks live allocations in the largest initial free region, with explicit
 overflow/unknown-owner rejection. Use `heap_idle.py` for a stopped-board window
