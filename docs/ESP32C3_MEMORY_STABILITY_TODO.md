@@ -40,6 +40,11 @@ The remaining network-memory gates are separate from compact PCM quality:
   removes allocation failures in the dynamic run, but alternating records still
   fail the original heap-trend gate; static TLS retains three allocation failures.
   Keep the overlay optional until phase-aware/ten-minute and throughput checks.
+  The [600-second follow-up](ESP32C3_HTTP_TLS_PHYSICAL_20261007.md) now
+  reproduces a real failure at 270.906 s: 16,749 B requested, 27,756 B free,
+  15,360 B largest block. RX4 is therefore not a production memory fix.
+  The optional RX6 window passes a public MP3-256 minute that failed on RX4,
+  but still has failing heap-trend gates and needs long-load qualification.
 - [ ] Resolve contiguous allocation with full TLS buffers. The static-TLS
   follow-up has 35,640–40,020 B free at three failed 32,744-byte SBR requests,
   but only 25,600–29,696 B in the largest block. Audit allocation order before
@@ -48,15 +53,18 @@ The remaining network-memory gates are separate from compact PCM quality:
   compact configuration. Do not enable that old switch as a shortcut.
 - [ ] Repeat all public LC/HE/mono-HE/MP3 cases, ten-minute load, mixed-codec
   switches, late SBR/PS, EOF and OTA during playback on the final memory fix.
-- [ ] Reproduce and contain fatal TLS read errors after a positive partial HTTP
+- [x] Reproduce and contain fatal TLS read errors after a positive partial HTTP
   read. The alternating-record test logs a second 46,622-byte request after
   allocation failure; its exact error-state cause still needs targeted proof.
   The [RFC audit and reader guard](ESP32C3_HTTP_TLS_RFC_AUDIT_20261007.md)
-  now reproduce/prevent the extra read in both SDKs (70 host cases each plus
-  37 stream-task cases). Physical qualification of the new guard is pending.
+  now reproduce/prevent the extra read in both SDKs (85 updated host cases each
+  plus 37 retained stream-task cases). The physical TLS allocation failure
+  terminates with read failure and does not repeat the older large request.
 - [ ] Resolve the RFC audit's remaining HTTPS closure gaps: distinguish TLS
   `close_notify` from raw EOF below HTTP, verify outbound closure/alert behavior,
   and cover truncation and certificate identity with actual TLS fixtures.
+  Incoming raw EOF/clean close and complete/incomplete HTTP framing now pass
+  eight physical cases; outgoing alerts and identity-negative fixtures remain.
 
 ## Physical AAC findings, 2026-09-30
 

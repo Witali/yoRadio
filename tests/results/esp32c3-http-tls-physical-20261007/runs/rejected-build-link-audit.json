@@ -1,0 +1,54 @@
+{
+  "result": "FAIL",
+  "dynamic_buffers": true,
+  "sdkconfig_sha256": "0c5a674df3739f762f3333a3635b98494b9292e9b57386bcd1165f078b2e51c0",
+  "elf_sha256": "f57860fbe7747285241ea6a617acdef6d03a6b814d3ab0c12a40cddfd6d3f096",
+  "calls": [
+    {
+      "caller": "stream_task",
+      "target": "stream_http_read",
+      "calls": [
+        "420129fc:\t2f7000ef          \tjal\t420134f2 <stream_http_read>",
+        "42012cda:\t019000ef          \tjal\t420134f2 <stream_http_read>"
+      ],
+      "disassembly_sha256": "8a187d78b17a9e241f8436ee56edc7e3471245b4ae45171854bd7c2efdadb768"
+    },
+    {
+      "caller": "esp_mbedtls_read",
+      "target": "yoradio_mbedtls_ssl_read",
+      "calls": [],
+      "disassembly_sha256": "4eb0d96a55cee921d9b4ae05035cbbef809949339e0faf776900517047ad45fb"
+    },
+    {
+      "caller": "yoradio_mbedtls_ssl_read",
+      "target": "__wrap_mbedtls_ssl_read",
+      "calls": [],
+      "disassembly_sha256": "6eac8aaf5ce92747ac2115e1cecb1b0e027e82dbdcec1e3f366e552b778acbf7"
+    },
+    {
+      "caller": "__wrap_mbedtls_ssl_read",
+      "target": "esp_mbedtls_add_rx_buffer",
+      "calls": [
+        "4209a442:\t288040ef          \tjal\t4209e6ca <esp_mbedtls_add_rx_buffer>"
+      ],
+      "disassembly_sha256": "1951bf509d932185632c0b8332696ca6d4188d31acaeffcbe86200eabceef07c"
+    },
+    {
+      "caller": "__wrap_mbedtls_ssl_read",
+      "target": "mbedtls_ssl_read",
+      "calls": [
+        "4209a45a:\t209010ef          \tjal\t4209be62 <mbedtls_ssl_read>"
+      ],
+      "disassembly_sha256": "1951bf509d932185632c0b8332696ca6d4188d31acaeffcbe86200eabceef07c"
+    },
+    {
+      "caller": "__wrap_mbedtls_ssl_read",
+      "target": "esp_mbedtls_free_rx_buffer",
+      "calls": [
+        "4209a474:\t3be040ef          \tjal\t4209e832 <esp_mbedtls_free_rx_buffer>"
+      ],
+      "disassembly_sha256": "1951bf509d932185632c0b8332696ca6d4188d31acaeffcbe86200eabceef07c"
+    }
+  ],
+  "scope": "Linked RISC-V call paths only; no hardware or TLS cryptography qualification"
+}

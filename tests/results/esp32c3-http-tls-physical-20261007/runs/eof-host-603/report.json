@@ -1,0 +1,20 @@
+{
+  "result": "PASS",
+  "idf": "C:\\Work\\yoRadio\\.idf\\v6.0.3",
+  "sdk_source_sha256": "d25395f9fd9d45c52944989295ace34aaa60e185e1c07328a2fb9b727a6590d4",
+  "extracted_function_sha256": "b03190255a8c0519de11d8f876e9c96413cc0049be426a0c621b6bf77b151f58",
+  "sources_sha256": {
+    "tests\\native\\stream_http_reader_test.c": "6fc3c70b6c59145540b4b2973937204ef7b3826f4b3269c0abf86343cc892f93",
+    "idf\\esp32c3-oled-native\\main\\stream_http_reader.c": "3b348ec662d77b7fd3ca16e6d2983bc0707e694456152bedb337a59b2991183c",
+    "idf\\esp32c3-oled-native\\main\\stream_http_reader.h": "bdfd5ef5fe7c4f860a548870026648da1ebed3b706f1ffe7a2b016023b3e4b97",
+    "idf\\esp32c3-oled-native\\main\\tls_stream_eof.c": "c766cc684abc5bcfd4a17317bedfb4468042aa3371fe3b2a23f5569ff7b3da74",
+    "tests\\test-stream-http-reader.py": "7b72c298281c822950fd3f31f3b7cfeccd33d5916fd6040820d3602539091384"
+  },
+  "tls_adapter_sha256": "ea9b60e4913f109eb50a5ee1d75bc2f21e1edfea700ce4e16596c03338f9308f",
+  "parser_sha256": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+  "body_callbacks_sha256": "edad5ee9114d896ac22dfbc1c32616484f0b2c39c942e4ade454c8328e1eb283",
+  "completion_function_sha256": "67a83bf993dc8f665f4e76ed63e9f6ffbc4bdcd4c2236fabd99e4d959682af90",
+  "scope": "Real SDK HTTP read/completion functions, body callbacks and HTTP parser; scripted transport and header bookkeeping; actual radio guard under ASan/UBSan. TLS cryptography, TLS close alerts and hardware are not emulated.",
+  "output": "HTTP_FRAMING_PASS content_length chunked extensions trailers truncated malformed fragmented close_delimited\nUNMODIFIED_SDK_LIMITATION close_notify_and_bare_TLS_EOF_are_indistinguishable_at_HTTP_API\nTLS_ADAPTER_PASS close_alert_and_raw_EOF_collapse_to_zero; timeout_records_read_failed; WANT_codes_not_recorded\nTLS_EOF_FIX_PASS raw_EOF_fails_unframed_body; close_notify_completes; explicit_framing_preserved; no_extra_allocation\nSTREAM_HTTP_READER_PASS cases=85 partial_bytes_preserved=true fatal_retry=false temporary_retry=true sdk_control_retries=true\n",
+  "returncode": 0
+}

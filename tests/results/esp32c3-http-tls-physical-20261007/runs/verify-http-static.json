@@ -1,0 +1,34 @@
+{
+  "result": "PASS",
+  "dynamic_buffers": false,
+  "sdkconfig_sha256": "b8d69d6632294b6050d65884550508762396386c9acdc2f2a402c2c87c4165c2",
+  "elf_sha256": "8702a9c364bb37520feab39e95e7fcd57c24dc032bab78ecff0a8ed6c725d7b0",
+  "calls": [
+    {
+      "caller": "stream_task",
+      "target": "stream_http_read",
+      "calls": [
+        "4200def8:\t2cb000ef          \tjal\t4200e9c2 <stream_http_read>",
+        "4200e208:\t7ba000ef          \tjal\t4200e9c2 <stream_http_read>"
+      ],
+      "disassembly_sha256": "a27cc6bc9cea266be6bbb7b4599795e1147315c2d4734c035aaf22fe900c4852"
+    },
+    {
+      "caller": "esp_mbedtls_read",
+      "target": "yoradio_mbedtls_ssl_read",
+      "calls": [
+        "420ee89a:\t9ad2f0ef          \tjal\t4201e246 <yoradio_mbedtls_ssl_read>"
+      ],
+      "disassembly_sha256": "597ae497f777e6041e1e075d29eead2c434887a34567759792bd318f20c1fe2e"
+    },
+    {
+      "caller": "yoradio_mbedtls_ssl_read",
+      "target": "mbedtls_ssl_read",
+      "calls": [
+        "4201e24e:\t3f96a0ef          \tjal\t42088e46 <mbedtls_ssl_read>"
+      ],
+      "disassembly_sha256": "e9caec77cd1d5a8a305a2bde30be208cbb0ee795403761381e016f465d4f96af"
+    }
+  ],
+  "scope": "Linked RISC-V call paths only; no hardware or TLS cryptography qualification"
+}

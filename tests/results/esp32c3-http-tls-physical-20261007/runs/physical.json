@@ -1,0 +1,131 @@
+[
+  {
+    "name": "install",
+    "code": 0,
+    "seconds": 25.655999999988126,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-tlslab-rx4-http-guard\\app.bin",
+      "--output",
+      ".build\\c3-rfc-qualification-20261007\\install.json"
+    ]
+  },
+  {
+    "name": "public",
+    "code": 1,
+    "seconds": 361.125,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/public_streams.py",
+      "--board",
+      "http://192.168.100.4",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-tlslab-rx4-http-guard\\app.bin",
+      "--seconds",
+      "60",
+      "--aac-reference-command",
+      ".build/idf-upgrade/faad-reference-command.json",
+      "--output",
+      ".build\\c3-rfc-qualification-20261007\\public"
+    ]
+  },
+  {
+    "name": "formats",
+    "code": 0,
+    "seconds": 802.7350000000006,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/run.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--suite",
+      "http",
+      "--suite",
+      "https",
+      "--unpaced-files",
+      "--delivery-stats",
+      "--leave-stopped",
+      "--https-origin",
+      "https://192.168.100.253:8771",
+      "--tls-cert",
+      ".build\\c3-tls-records-20261007\\trust\\server.pem",
+      "--tls-key",
+      ".build\\c3-tls-records-20261007\\trust\\server.key",
+      "--sdkconfig",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-tlslab-rx4-http-guard\\sdkconfig",
+      "--output",
+      ".build\\c3-rfc-qualification-20261007\\formats"
+    ]
+  },
+  {
+    "name": "tls-soak",
+    "code": 1,
+    "seconds": 628.6560000000027,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/tls_records.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-tlslab-rx4-http-guard\\app.bin",
+      "--ca",
+      ".build\\c3-tls-records-20261007\\trust\\ca.pem",
+      "--cert",
+      ".build\\c3-tls-records-20261007\\trust\\server.pem",
+      "--key",
+      ".build\\c3-tls-records-20261007\\trust\\server.key",
+      "--mode",
+      "alternate",
+      "--seconds",
+      "600",
+      "--output",
+      ".build\\c3-rfc-qualification-20261007\\tls-soak"
+    ]
+  },
+  {
+    "name": "restore",
+    "code": 0,
+    "seconds": 25.25,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware/development/esp32c3-idf-6.1-compact-icy-quiet/app.bin",
+      "--output",
+      ".build\\c3-rfc-qualification-20261007\\restore.json"
+    ]
+  },
+  {
+    "name": "final-board",
+    "code": 0,
+    "seconds": 16.703000000008615,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build\\c3-rfc-qualification-20261007\\final-board.py"
+    ]
+  }
+]

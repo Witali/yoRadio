@@ -1,0 +1,43 @@
+{
+  "sources_sha256": {
+    "tools/audio_test_server/tls_framing.py": "de99ac3673730263b24c9ed4a1ace1d6a2eaa0387e4977c4992e56e3cf74097c",
+    "tools/audio_test_server/tls_records.py": "0713e832cdaff69955fb27fedd6a84a4d0277d315d73dfacfa43a7612094b7be",
+    "tests/test-tls-framing-server.py": "8cd9ecc6413edb47ecdac32cf8a3b89af398ca3502c558fba6c4dc650849e87a",
+    "tests/test-tls-record-server.py": "a40e4a712428158e43392cf47171c91cddc9d22e73e00f2cc39da9ac8d3ae68e"
+  },
+  "cases": [
+    {
+      "name": "framing",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "tests/test-tls-framing-server.py"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "records",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "tests/test-tls-record-server.py"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "framing-cli",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "-m",
+        "tools.audio_test_server.tls_framing",
+        "--help"
+      ],
+      "returncode": 0
+    }
+  ],
+  "result": "PASS"
+}
