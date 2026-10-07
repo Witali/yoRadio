@@ -491,3 +491,42 @@ A fresh five-second source check again decodes all 79 frames as HE mono with
 zero PS frames. The TCP-pool-only follow-up still fails HTTPS HE64's SBR
 allocation (32,744 requested, largest block 21,504 B); dynamic TLS is evaluated
 separately while keeping 16 KiB receive capacity and certificate verification.
+
+#### Combined TLS memory experiment (separate from defaults)
+
+`6.1-compact-tls-profile` combines Flash heap placement, the RTC TCP PCB pool
+and dynamic TLS record buffers with compact AAC. Full 16,384-byte RX capacity,
+certificate verification and the ordinary certificate/configuration lifetime
+are preserved. Auto Suspend remains off. The three pool/TLS trial images pass
+the linked AAC type/call/patch audit.
+
+All five HTTP stream checks pass, as do idle recovery and settings restoration:
+
+| Input | Mean CPU | Minimum free heap | Minimum largest block |
+| --- | ---: | ---: | ---: |
+| AAC-LC 128 kbit/s | 49.34% | 56,676 B | 40,960 B |
+| HE-AAC stereo 64 kbit/s | 63.26% | 19,152 B | 6,656 B |
+| HE-AAC stereo 32 kbit/s | 60.64% | 17,668 B | 6,144 B |
+| HE-AAC mono 16 kbit/s | 44.82% | 14,208 B | 4,608 B |
+| MP3 256 kbit/s | 57.74% | 81,892 B | 63,488 B |
+
+These are the runner's stable 15–60-second windows with 0.1-second polling;
+descriptive 5–35-second summaries are saved separately and may have different
+minima. They are not simultaneous or content-matched CPU comparisons.
+
+HTTPS AAC-LC and MP3 pass. HE64 and HE32 now allocate SBR and show full 44.1 kHz
+stereo, but fail later network allocations under the diagnostic/WebUI workload.
+For example, a 1,700-byte request fails with 7,484 B free and a 1,472-byte largest
+block. The HE-mono case fails during host reference probing with `TimeoutExpired`,
+before board playback; it supplies no playback result. Idle recovery and
+restoration pass. Thus this profile is not fully qualified.
+
+The matching quiet production control installs through OTA and passes the
+HE64 stereo and HE-mono HTTPS status/WebSocket checks plus restoration. This
+control uses 0.4-second polling versus 0.1 seconds for profiling, so it does
+**not** isolate diagnostic overhead or establish equivalent heavy-load
+headroom. It has no CPU/heap counters and supplies no acoustic/IRQ guarantee.
+Its ELF SHA-256 is
+`48fa2de4999bef83047c56ab9b010b6eba2bb176174773fa8a6b25857c9feae2`.
+The extra allocator/pool/TLS settings remain experimental; qualification of
+the selected compact defaults continues separately on the RAM profile.

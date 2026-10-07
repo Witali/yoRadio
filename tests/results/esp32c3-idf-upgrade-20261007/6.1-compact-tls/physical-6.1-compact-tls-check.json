@@ -1,0 +1,64 @@
+[
+  {
+    "name": "install-6.1-compact-tls-profile",
+    "code": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-tls-profile\\app.bin",
+      "--output",
+      ".build\\idf-upgrade\\install-6.1-compact-tls-profile.json"
+    ]
+  },
+  {
+    "name": "physical-6.1-compact-tls-public-https",
+    "code": 1,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/public_streams.py",
+      "--board",
+      "http://192.168.100.4",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-tls-profile\\app.bin",
+      "--transport",
+      "https",
+      "--seconds",
+      "60",
+      "--aac-reference-command",
+      ".build\\idf-upgrade\\faad-reference-command.json",
+      "--output",
+      ".build\\idf-upgrade\\physical-6.1-compact-tls-public-https"
+    ]
+  },
+  {
+    "name": "physical-6.1-compact-tls-public-http",
+    "code": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/public_streams.py",
+      "--board",
+      "http://192.168.100.4",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-tls-profile\\app.bin",
+      "--transport",
+      "http",
+      "--seconds",
+      "60",
+      "--aac-reference-command",
+      ".build\\idf-upgrade\\faad-reference-command.json",
+      "--output",
+      ".build\\idf-upgrade\\physical-6.1-compact-tls-public-http"
+    ]
+  }
+]
