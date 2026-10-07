@@ -53,10 +53,14 @@ class DeliveryStats:
 
 class Server:
     def __init__(self, host, port, fixtures, cert=None, key=None, *, unpaced_files=False,
-                 delivery_stats=False):
+                 delivery_stats=False, initial_failures=0):
+        if type(initial_failures) is not int or initial_failures < 0:
+            raise ValueError('initial_failures must be a nonnegative integer')
         self.fixtures = fixtures
         self.events = []
         self.closed = threading.Event()
+        self.recovery_attempts = {}
+        self.recovery_lock = threading.Lock()
         outer = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -80,9 +84,26 @@ class Server:
                     self.send_error(404)
                     return
                 mode, name = parts
-                if mode not in ('file','stream','drop','stall','jitter','redirect','error'):
+                if mode not in ('file','stream','drop','stall','jitter','redirect','error','recover'):
                     self.send_error(404)
                     return
+                recovery = None
+                if mode == 'recover':
+                    with outer.recovery_lock:
+                        attempt = outer.recovery_attempts.get(name, 0) + 1
+                        outer.recovery_attempts[name] = attempt
+                    status = 503 if attempt <= initial_failures else 200
+                    recovery = dict(mode='recover', fixture=name, attempt=attempt,
+                                    response_status=status, requested_at=time.monotonic())
+                    if status == 503:
+                        outer.events.append(recovery)
+                        self.send_response(status)
+                        self.send_header('Content-Length', '0')
+                        self.send_header('Connection', 'close')
+                        self.end_headers()
+                        self.close_connection = True
+                        return
+                    mode = 'file'
                 if mode == 'error':
                     self.send_error(503)
                     return
@@ -108,6 +129,8 @@ class Server:
                 unpaced = unpaced_files and mode == 'file'
                 event = dict(mode=mode, fixture=name, sent=0, complete=False,
                              pacing_ratio=None if unpaced else 1.02)
+                if recovery:
+                    event.update(recovery)
                 outer.events.append(event)
                 started = time.monotonic()
                 deadline = started
@@ -185,6 +208,8 @@ def main():
                         help='Serve /file at the speed allowed by TCP; retain pacing for live/fault routes')
     parser.add_argument('--delivery-stats', action='store_true',
                         help='Record bounded host socket-write timing and pacing lag')
+    parser.add_argument('--initial-failures', type=int, default=0,
+                        help='On /recover/FIXTURE, return 503 for this many requests, then serve the file')
     parser.add_argument('--events-output', type=Path,
                         help='Save fixture server events when this process exits normally')
     args = parser.parse_args()
@@ -192,7 +217,7 @@ def main():
     if bool(args.cert) != bool(args.key):
         parser.error('--cert and --key must be supplied together')
     with Server(args.host,args.port,specs,args.cert,args.key, unpaced_files=args.unpaced_files,
-                delivery_stats=args.delivery_stats) as server:
+                delivery_stats=args.delivery_stats, initial_failures=args.initial_failures) as server:
         print(f"Serving {len(specs)} fixtures on port {args.port}; /manifest.json lists them", flush=True)
         try:
             threading.Event().wait()
