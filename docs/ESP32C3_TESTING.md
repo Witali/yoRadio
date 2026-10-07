@@ -845,9 +845,7 @@ The [ICY and receive-memory report](ESP32C3_ICY_RX_MEMORY_20261007.md) retains
 the physical ICY/OTA results, matched receive-copy experiment and its original
 failed heap gates, with exact firmware/config identities.
 
-## CPU diagnostics without a separate profiler stack
-
-### Controlled TLS record growth
+## Controlled TLS record growth
 
 `tools/esp32c3_tests/tls_records.py` checks full-rate AAC with 1 KiB and 16 KiB
 TLS plaintext records, including growth after the decoder has started. Use only
@@ -866,8 +864,13 @@ the requested scope. The runner verifies exact generated TLS record lengths
 and rejects retries or truncated record evidence. For the growth case it also
 requires full-rate PCM before the first large record. A server-side successful
 write alone cannot pass the playback check. Original memory-gate failures must
-be retained. The [shared server guide](../tools/audio_test_server/README.md#full-sized-tls-record-tests)
+be retained. `record_observations` freezes each checked event snapshot before
+Stop; the separate final server trace can include later failed socket writes.
+See the [physical allocation-boundary results](ESP32C3_TLS_RECORD_MEMORY_20261007.md).
+The [shared server guide](../tools/audio_test_server/README.md#full-sized-tls-record-tests)
 documents certificates and host-side byte/record checks.
+
+## CPU diagnostics without a separate profiler stack
 
 For new public-stream reports, use
 `python tools/esp32c3_tests/summarize_public_windows.py --input <results> --output <summary.json>`.

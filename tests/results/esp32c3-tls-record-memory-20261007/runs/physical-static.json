@@ -1,0 +1,57 @@
+[
+  {
+    "name": "install-static",
+    "code": 0,
+    "seconds": 25.64100000000326,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-static-profile\\app.bin",
+      "--output",
+      ".build\\c3-tls-records-20261007\\install-static.json"
+    ]
+  },
+  {
+    "name": "static-public",
+    "code": 1,
+    "seconds": 361.48399999999674,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/public_streams.py",
+      "--board",
+      "http://192.168.100.4",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-static-profile\\app.bin",
+      "--transport",
+      "https",
+      "--seconds",
+      "60",
+      "--aac-reference-command",
+      ".build/idf-upgrade/faad-reference-command.json",
+      "--output",
+      ".build\\c3-tls-records-20261007\\static-public"
+    ]
+  },
+  {
+    "name": "restore-icy-quiet",
+    "code": 0,
+    "seconds": 25.093999999997322,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware/development/esp32c3-idf-6.1-compact-icy-quiet/app.bin",
+      "--output",
+      ".build\\c3-tls-records-20261007\\restore-icy-quiet.json"
+    ]
+  }
+]

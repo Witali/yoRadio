@@ -8,6 +8,46 @@ source and ELF candidates, including string copies and SDK placement limits.
 Large application/codec constants are already in Flash; the listed candidates
 are not implemented savings and do not yet resolve the SBR allocation deficit.
 
+## Current SDK-upgrade branch checkpoint, 2026-10-07
+
+On `codex/esp32c3-idf-upgrade`, the ESP32-C3 defaults now select the compact
+PC19 owner, smoothing history, stack-scoped low-QMF workspace, asymmetric
+channel layout and late SBR activation. The linked SBR owner is **32,744 B**,
+down from 55,128 B; the native adapter is 204 B, including its PC19 sidecar.
+This supersedes the earlier PC18/default-selection checkpoints below on this
+branch. It does not describe `main` or qualify every public radio stream.
+
+The current production precision allowance is **3 output PCM LSB**. Retained
+compact-corpus measurements reach 2 LSB; the historical 1/2/5-LSB decisions
+below remain records of their original experiments. Full SBR/PS and original
+output rates remain required. See the
+[SDK qualification report](ESP32C3_IDF_UPGRADE_20261007.md) and
+[ICY/RX memory follow-up](ESP32C3_ICY_RX_MEMORY_20261007.md).
+
+The remaining network-memory gates are separate from compact PCM quality:
+
+- [x] Reduce the ICY metadata parser's static RAM: 3,888 B measured in the
+  linked quiet image, with fragmented-input and physical title/audio tests.
+- [x] Compare RX copying under a ten-minute HEv2/WebUI load. Copying eliminates
+  the observed allocation failures in that run, but the original heap-decline
+  gate still fails; retain both findings.
+- [ ] Qualify full-sized TLS records after the decoder and receive queues are
+  active. The [controlled TLS record test](ESP32C3_TLS_RECORD_MEMORY_20261007.md)
+  passes 1 KiB records with both allocators, but dynamic 16 KiB records fail a
+  16,749-byte allocation and permanent buffers suffer 167 small-block allocation
+  failures across the three large-record modes. Small-record success is insufficient.
+- [ ] Resolve contiguous allocation with full TLS buffers. The static-TLS
+  follow-up has 35,640–40,020 B free at three failed 32,744-byte SBR requests,
+  but only 25,600–29,696 B in the largest block. Audit allocation order before
+  testing an early **compact-sized** reservation; the old early-reserve switch
+  requests the original 55,128-byte structure and is incompatible with this
+  compact configuration. Do not enable that old switch as a shortcut.
+- [ ] Repeat all public LC/HE/mono-HE/MP3 cases, ten-minute load, mixed-codec
+  switches, late SBR/PS, EOF and OTA during playback on the final memory fix.
+- [ ] Reproduce and contain fatal TLS read errors after a positive partial HTTP
+  read. The alternating-record test logs a second 46,622-byte request after
+  allocation failure; its exact error-state cause still needs targeted proof.
+
 ## Physical AAC findings, 2026-09-30
 
 **2026-10-03 follow-up:** the [four-row smoothing adapter](ESP32C3_AAC_SMOOTHING_ADAPTER_20261003.md)

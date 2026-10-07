@@ -1,0 +1,18 @@
+{
+  "idf": "v6.1",
+  "files": {
+    "components/mbedtls/port/dynamic/esp_mbedtls_dynamic_impl.c": "ba44a3b41004625fbbfbd5fbb4fed6f3e40de83119f6f5b98a1d4b6e7e74577f",
+    "components/mbedtls/port/dynamic/esp_ssl_tls.c": "791079366d124d52aea2256fdf52fa0704a1ec4526fdb012104e6f0cd4044756",
+    "components/esp_http_client/esp_http_client.c": "072ae4f771dc86039412d69df0c656960fe6a3c057c34a4b6f7f47cace08a658",
+    "components/tcp_transport/transport_ssl.c": "e39267fc70a3d0376251f8262221a998cd5ebf1220a184b48790a492301a0be4",
+    "components/mbedtls/esp_crt_bundle/gen_crt_bundle.py": "aa6a9e8bb6c3d1c51d2c7c50f4deb290d5fd7a43757475b13cebf4017f7f1071"
+  },
+  "findings": [
+    "Dynamic RX allocates based on each peeked record length and may release the previous buffer before the allocation.",
+    "The dynamic RX allocator returns MBEDTLS_ERR_SSL_ALLOC_FAILED on failure; no record-size cap was changed for this experiment.",
+    "esp_http_client_read returns already accumulated bytes (ridx) after some fatal transport errors; a later application read can reach TLS again.",
+    "The application breaks on a negative non-EAGAIN read; it cannot see an error hidden by a positive partial return.",
+    "The alternate-size run logged a second 46622-byte request after a failed 16749-byte request. These sources suggest an error-retry/state issue; its exact cause has not been reproduced independently.",
+    "cpu_profiler failed-allocation free/largest metrics use the same capabilities mask as the failed request."
+  ]
+}
