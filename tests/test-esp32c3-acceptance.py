@@ -95,7 +95,8 @@ class AcceptanceTests(unittest.TestCase):
                 self.assertEqual(suite.idle_heap.call_count,2)
                 report = json.loads((Path(tmp)/'report.json').read_text())
                 self.assertEqual(report['load_options'],{'seconds':180,'idle_recovery':True})
-                self.assertEqual(report['server_options'],{'unpaced_files':True})
+                self.assertEqual(report['server_options'],{'unpaced_files':True,'delivery_stats':False})
+                self.assertIsNone(report['cpu_budget_percent'])
                 self.assertTrue(make_server.call_args.kwargs['unpaced_files'])
                 self.assertEqual([r['result'] for r in report['cases']],
                                  ['PASS','FAIL','PASS' if recovered else 'FAIL','PASS'])
