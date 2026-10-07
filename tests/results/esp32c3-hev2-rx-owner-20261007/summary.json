@@ -1,0 +1,244 @@
+{
+  "input_sha256": {
+    "report.json": "5602b7fa049252ab4d19cde46fa0b7298ca59537ee62ccaa7e9b3a2b98f65653",
+    "status.json": "3d835b5c4d3f8d1b044f936666d2c1cbdd9a61868d088329e24e65b6fe5f67a2",
+    "performance.json": "55ab0478d9aa5e944dcb7ab3145b6a45aa291e40f5eda9d5d83142f983cc76c7",
+    "checkpoint.json": "69df198fa219f04f5be32942d84e10ccc903a61caf4b3f47b2c313ecedaa6e90"
+  },
+  "image": "c043b4fe387aa33bbba590e05310a958580493e183ee7ee48ca5efd299290125",
+  "fixture_hashes": {
+    "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e"
+  },
+  "cpu_budget_percent": null,
+  "requested_seconds": 600,
+  "observed_seconds": 600.140999999996,
+  "acceptance": [
+    {
+      "name": "idle-before",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 147216,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147220,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147220,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.157
+    },
+    {
+      "name": "cpu-under-http-load:hev2-44100-stereo",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Progressive heap loss during continuous playback",
+      "seconds": 601.437
+    },
+    {
+      "name": "idle-after",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 147208,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 147216,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.375
+    },
+    {
+      "name": "stop-recovery",
+      "result": "PASS",
+      "evidence": {
+        "heap_recovered": true
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "runtime",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "rebooted": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 7.469
+    }
+  ],
+  "playback": {
+    "board": {
+      "version": "v0.9.693-1202-g305e78c3",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "c043b4fe387aa33bbba590e05310a958580493e183ee7ee48ca5efd299290125"
+    },
+    "cases": [
+      {
+        "name": "hev2-44100-stereo",
+        "original": {
+          "name": "cpu-under-http-load:hev2-44100-stereo",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Progressive heap loss during continuous playback",
+          "seconds": 601.437
+        },
+        "full_window": {
+          "start": 44562.843,
+          "end": 45152.984,
+          "seconds": 590.140999999996,
+          "strict": {
+            "result": "FAIL",
+            "reason": "Progressive heap loss during continuous playback"
+          },
+          "cpu_samples": 116,
+          "decoder_windows": 118,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 68.76896551724138,
+            "peak_busy": 70.4,
+            "minimum_heap": 20952.0,
+            "minimum_largest": 4608.0,
+            "first_heap": 43928.0,
+            "last_heap": 24508.0,
+            "first_largest": 32768.0,
+            "last_largest": 12800.0,
+            "audio_wall_ratio": 1.0015994583844623,
+            "decode_percent": 49.51062068033188
+          }
+        },
+        "runtime": {
+          "result": "PASS",
+          "evidence": null
+        },
+        "subwindows": [
+          {
+            "start": 44562.843,
+            "end": 44862.843,
+            "seconds": 300.0,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Progressive heap loss during continuous playback"
+            },
+            "cpu_samples": 59,
+            "decoder_windows": 60,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 68.92203389830509,
+              "peak_busy": 70.4,
+              "minimum_heap": 29808.0,
+              "minimum_largest": 14336.0,
+              "first_heap": 43928.0,
+              "last_heap": 31560.0,
+              "first_largest": 32768.0,
+              "last_largest": 14848.0,
+              "audio_wall_ratio": 1.0016211016167742,
+              "decode_percent": 49.559322033898304
+            }
+          },
+          {
+            "start": 44862.843,
+            "end": 45152.984,
+            "seconds": 290.140999999996,
+            "strict": {
+              "result": "FAIL",
+              "reason": "Progressive heap loss during continuous playback"
+            },
+            "cpu_samples": 57,
+            "decoder_windows": 58,
+            "malformed": [],
+            "diagnostic": {
+              "mean_busy": 68.61052631578947,
+              "peak_busy": 70.0,
+              "minimum_heap": 20952.0,
+              "minimum_largest": 4608.0,
+              "first_heap": 29796.0,
+              "last_heap": 24508.0,
+              "first_largest": 14336.0,
+              "last_largest": 12800.0,
+              "audio_wall_ratio": 1.0015770698180515,
+              "decode_percent": 49.460239969745935
+            }
+          }
+        ],
+        "status_samples": 3165,
+        "max_http_ms": 391.00000000325963,
+        "minimum_rssi": -68
+      }
+    ],
+    "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+  },
+  "note": "Replay a completed continuous AAC study without attributing unrelated RAM.\n\nRX ranges are actual live allocations; TCP receive credit is logical payload.\nTheir snapshots and CPU heap samples are asynchronous. Window medians are\ncomparisons, not an exact subtraction or proof of sample-level audio continuity.",
+  "acoustic_continuity_qualified": false,
+  "idle": {
+    "idle-before": {
+      "heap": {
+        "min": 147216,
+        "median": 147220,
+        "max": 147220
+      },
+      "largest": {
+        "min": 114688,
+        "median": 114688,
+        "max": 114688
+      },
+      "tasks": {
+        "min": 17,
+        "median": 17,
+        "max": 17
+      }
+    },
+    "idle-after": {
+      "heap": {
+        "min": 147208,
+        "median": 147212.0,
+        "max": 147216
+      },
+      "largest": {
+        "min": 114688,
+        "median": 114688.0,
+        "max": 114688
+      },
+      "tasks": {
+        "min": 17,
+        "median": 17.0,
+        "max": 17
+      }
+    }
+  },
+  "ownership": {
+    "complete": false,
+    "reason": "Merged/truncated telemetry line"
+  }
+}

@@ -1881,6 +1881,7 @@ int AACFindSyncWord(uint8_t *buf, int nBytes)
 //**************************************************************************************
 int AACGetSampRate(){return m_AACDecInfo->sampRate * (m_AACDecInfo->sbrEnabled ? 2 : 1);}
 int AACGetStreamSampRate(){return m_AACDecInfo->sampRate * (m_AACDecInfo->sbrPresent ? 2 : 1);}
+bool AACGetSBRPresent(){return m_AACDecInfo->sbrPresent != 0;}
 int AACGetChannels(){return m_AACDecInfo->nChans;}
 int AACGetBitsPerSample(){return 16;}
 int AACGetID() {return m_AACDecInfo->id;} // 0-MPEG4, 1-MPEG2

@@ -1,0 +1,57 @@
+{
+  "image": "669f15638ad88ff3e46c43e29cd7b4d2ff8c0b76202b57f12102271afd8bf9ba",
+  "input_sha256": {
+    "report": "c0dad7d7687839191eb980b3902e4207544fbe83e0773b018885a07a67139e89",
+    "performance": "7f8d3c769ca4909c04b7f0e79b71251fc156bdf1330b2627819e448c905569f7",
+    "status": "182e8f8e35a7a5476d9d38876c64b6290c13a0a4e69be2d255a91fc477f9b855"
+  },
+  "acceptance": {
+    "idle-before": "PASS",
+    "initial-load": "FAIL",
+    "settled-load": "PASS",
+    "idle-after": "PASS",
+    "settled-idle-recovery": "PASS",
+    "restore-board": "PASS"
+  },
+  "fixture_hashes": {
+    "stress-mp3-48000-2ch-16bit-200s": "7cb0f5f80c392ac1b573c956313f1a186bf63ad1002c5fa22a147ee2a463bed8"
+  },
+  "idle": {
+    "heap": {
+      "before": 147310.0,
+      "after": 147344.0
+    },
+    "largest": {
+      "before": 114688.0,
+      "after": 114688.0
+    },
+    "tasks": {
+      "before": 17.0,
+      "after": 17.0
+    }
+  },
+  "phase_metrics": {
+    "initial-load": {
+      "cpu_and_heap": {
+        "result": "FAIL",
+        "reason": "Progressive heap loss during continuous playback"
+      },
+      "maximum_http_ms": 140.99999994505197
+    },
+    "settled-load": {
+      "cpu_and_heap": {
+        "result": "PASS",
+        "mean_busy": 60.18333333333333,
+        "peak_busy": 61.4,
+        "minimum_heap": 79320.0,
+        "minimum_largest": 63488.0,
+        "audio_wall_ratio": 1.001722538757122
+      },
+      "maximum_http_ms": 125.0
+    }
+  },
+  "ownership": {
+    "complete": false,
+    "reason": "Missing/duplicate live RX owners"
+  }
+}

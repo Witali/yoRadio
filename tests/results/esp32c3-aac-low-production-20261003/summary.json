@@ -1,0 +1,222 @@
+{
+  "image": {
+    "app_elf_sha256": "5ba3d98ec9a10e0f28be59e5799767e56e106fd85c8d036081c7472e2ac2b8c4",
+    "sha256": "edda4aee3898a3a5b6845e6abbd781615861705d051555c25adf65a187295349",
+    "bytes": 1564464
+  },
+  "production_default": false,
+  "cases": {
+    "baseline-load": [
+      {
+        "name": "cpu-under-http-load:lc-48000-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "cpu-under-http-load:he-48000-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS"
+      }
+    ],
+    "candidate-load": [
+      {
+        "name": "cpu-under-http-load:lc-48000-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "cpu-under-http-load:he-48000-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "cpu-under-http-load:hev2-44100-stereo",
+        "result": "PASS"
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS"
+      }
+    ],
+    "ota-transition": [
+      {
+        "name": "ota:transition-while-playing",
+        "result": "PASS"
+      }
+    ],
+    "ota-repeat": [
+      {
+        "name": "ota:roundtrip:1",
+        "result": "PASS"
+      },
+      {
+        "name": "ota:roundtrip:2",
+        "result": "PASS"
+      },
+      {
+        "name": "ota:while-playing",
+        "result": "PASS"
+      },
+      {
+        "name": "restore-saved-station",
+        "result": "PASS"
+      }
+    ],
+    "local": [
+      {
+        "name": "http:mp3-320:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:mp3-320:mp3",
+        "result": "PASS"
+      },
+      {
+        "name": "http:flac-level8:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:flac-level8:flac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:vorbis-q10:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:vorbis-q10:vorbis",
+        "result": "PASS"
+      },
+      {
+        "name": "http:opus-510:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:opus-510:opus",
+        "result": "PASS"
+      },
+      {
+        "name": "http:aac-lc-320:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:aac-lc-320:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:lc-22050-mono:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:lc-22050-mono:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:he-44100-stereo:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:he-44100-stereo:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:he-48000-stereo:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:he-48000-stereo:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:hev2-44100-stereo:auto",
+        "result": "PASS"
+      },
+      {
+        "name": "http:hev2-44100-stereo:aac",
+        "result": "PASS"
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS"
+      }
+    ],
+    "https": [
+      {
+        "name": "idle:baseline",
+        "result": "PASS"
+      },
+      {
+        "name": "https:groovesalad-128-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "https:groovesalad-64-aac",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder/TLS failure"
+      },
+      {
+        "name": "https:groovesalad-32-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "https:groovesalad-16-aac",
+        "result": "FAIL",
+        "reason": "URLError"
+      },
+      {
+        "name": "https:groovesalad-256-mp3",
+        "result": "PASS"
+      },
+      {
+        "name": "idle:recovery",
+        "result": "PASS"
+      },
+      {
+        "name": "restore",
+        "result": "PASS"
+      }
+    ],
+    "http": [
+      {
+        "name": "idle:baseline",
+        "result": "PASS"
+      },
+      {
+        "name": "http:groovesalad-128-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:groovesalad-64-aac",
+        "result": "FAIL",
+        "reason": "URLError"
+      },
+      {
+        "name": "http:groovesalad-32-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:groovesalad-16-aac",
+        "result": "PASS"
+      },
+      {
+        "name": "http:groovesalad-256-mp3",
+        "result": "PASS"
+      },
+      {
+        "name": "idle:recovery",
+        "result": "PASS"
+      },
+      {
+        "name": "restore",
+        "result": "PASS"
+      }
+    ]
+  },
+  "bounded_suites_all_pass": false,
+  "objective_complete": false,
+  "note": "Bounded physical checks only. Public failures remain failures; no long soak, malformed-stream or every-stream claim."
+}

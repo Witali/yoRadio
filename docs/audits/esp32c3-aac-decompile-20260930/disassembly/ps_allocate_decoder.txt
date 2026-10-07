@@ -1,0 +1,204 @@
+
+idf\esp32c3-oled-native\build-constants-audit\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42046bb0 <ps_allocate_decoder>:
+42046bb0:	40000837          	lui	a6,0x40000
+42046bb4:	02b85833          	divu	a6,a6,a1
+42046bb8:	67b5                	lui	a5,0xd
+42046bba:	7139                	addi	sp,sp,-64
+42046bbc:	97aa                	add	a5,a5,a0
+42046bbe:	d64e                	sw	s3,44(sp)
+42046bc0:	9847a983          	lw	s3,-1660(a5) # c984 <CSR_UINTSTATUS+0xbcd3>
+42046bc4:	dc22                	sw	s0,56(sp)
+42046bc6:	da26                	sw	s1,52(sp)
+42046bc8:	d84a                	sw	s2,48(sp)
+42046bca:	d452                	sw	s4,40(sp)
+42046bcc:	d256                	sw	s5,36(sp)
+42046bce:	d05a                	sw	s6,32(sp)
+42046bd0:	ce5e                	sw	s7,28(sp)
+42046bd2:	de06                	sw	ra,60(sp)
+42046bd4:	661d                	lui	a2,0x7
+42046bd6:	669d                	lui	a3,0x7
+42046bd8:	671d                	lui	a4,0x7
+42046bda:	679d                	lui	a5,0x7
+42046bdc:	842a                	mv	s0,a0
+42046bde:	00b9a823          	sw	a1,16(s3)
+42046be2:	67860613          	addi	a2,a2,1656 # 7678 <CSR_UINTSTATUS+0x69c7>
+42046be6:	4589                	li	a1,2
+42046be8:	6c868693          	addi	a3,a3,1736 # 76c8 <CSR_UINTSTATUS+0x6a17>
+42046bec:	71870713          	addi	a4,a4,1816 # 7718 <CSR_UINTSTATUS+0x6a67>
+42046bf0:	76878793          	addi	a5,a5,1896 # 7768 <CSR_UINTSTATUS+0x6ab7>
+42046bf4:	972a                	add	a4,a4,a0
+42046bf6:	c62e                	sw	a1,12(sp)
+42046bf8:	962a                	add	a2,a2,a0
+42046bfa:	96aa                	add	a3,a3,a0
+42046bfc:	97a2                	add	a5,a5,s0
+42046bfe:	c42e                	sw	a1,8(sp)
+42046c00:	1ec9a023          	sw	a2,480(s3)
+42046c04:	1ed9a223          	sw	a3,484(s3)
+42046c08:	1ee9a423          	sw	a4,488(s3)
+42046c0c:	c03e                	sw	a5,0(sp)
+42046c0e:	0109a423          	sw	a6,8(s3)
+42046c12:	47a1                	li	a5,8
+42046c14:	868a                	mv	a3,sp
+42046c16:	0050                	addi	a2,sp,4
+42046c18:	458d                	li	a1,3
+42046c1a:	1fc98513          	addi	a0,s3,508
+42046c1e:	c23e                	sw	a5,4(sp)
+42046c20:	5bb000ef          	jal	420479da <ps_hybrid_filter_bank_allocation>
+42046c24:	4682                	lw	a3,0(sp)
+42046c26:	6aa1                	lui	s5,0x8
+42046c28:	6a25                	lui	s4,0x9
+42046c2a:	02868793          	addi	a5,a3,40
+42046c2e:	64a5                	lui	s1,0x9
+42046c30:	6925                	lui	s2,0x9
+42046c32:	6ba5                	lui	s7,0x9
+42046c34:	6b25                	lui	s6,0x9
+42046c36:	1ef9a823          	sw	a5,496(s3)
+42046c3a:	05068793          	addi	a5,a3,80
+42046c3e:	0c0a8a93          	addi	s5,s5,192 # 80c0 <CSR_UINTSTATUS+0x740f>
+42046c42:	8a0a0a13          	addi	s4,s4,-1888 # 88a0 <CSR_UINTSTATUS+0x7bef>
+42046c46:	cc048493          	addi	s1,s1,-832 # 8cc0 <CSR_UINTSTATUS+0x800f>
+42046c4a:	dc090913          	addi	s2,s2,-576 # 8dc0 <CSR_UINTSTATUS+0x810f>
+42046c4e:	fc0b8b93          	addi	s7,s7,-64 # 8fc0 <CSR_UINTSTATUS+0x830f>
+42046c52:	2c0b0b13          	addi	s6,s6,704 # 92c0 <CSR_UINTSTATUS+0x860f>
+42046c56:	1ef9aa23          	sw	a5,500(s3)
+42046c5a:	07868793          	addi	a5,a3,120
+42046c5e:	1ef9ac23          	sw	a5,504(s3)
+42046c62:	9aa2                	add	s5,s5,s0
+42046c64:	9a22                	add	s4,s4,s0
+42046c66:	94a2                	add	s1,s1,s0
+42046c68:	9922                	add	s2,s2,s0
+42046c6a:	9ba2                	add	s7,s7,s0
+42046c6c:	9b22                	add	s6,s6,s0
+42046c6e:	1809a823          	sw	zero,400(s3)
+42046c72:	6cc98713          	addi	a4,s3,1740
+42046c76:	1ed9a623          	sw	a3,492(s3)
+42046c7a:	0a068893          	addi	a7,a3,160
+42046c7e:	4781                	li	a5,0
+42046c80:	462d                	li	a2,11
+42046c82:	4805                	li	a6,1
+42046c84:	02900593          	li	a1,41
+42046c88:	4339                	li	t1,14
+42046c8a:	00f65a63          	bge	a2,a5,42046c9e <ps_allocate_decoder+0xee>
+42046c8e:	01072023          	sw	a6,0(a4)
+42046c92:	0785                	addi	a5,a5,1
+42046c94:	00b78a63          	beq	a5,a1,42046ca8 <ps_allocate_decoder+0xf8>
+42046c98:	0711                	addi	a4,a4,4
+42046c9a:	fef64ae3          	blt	a2,a5,42046c8e <ps_allocate_decoder+0xde>
+42046c9e:	00672023          	sw	t1,0(a4)
+42046ca2:	0785                	addi	a5,a5,1
+42046ca4:	0711                	addi	a4,a4,4
+42046ca6:	b7d5                	j	42046c8a <ps_allocate_decoder+0xda>
+42046ca8:	67a5                	lui	a5,0x9
+42046caa:	0c868713          	addi	a4,a3,200
+42046cae:	fc078793          	addi	a5,a5,-64 # 8fc0 <CSR_UINTSTATUS+0x830f>
+42046cb2:	1ce9ae23          	sw	a4,476(s3)
+42046cb6:	1d79a823          	sw	s7,464(s3)
+42046cba:	1d69aa23          	sw	s6,468(s3)
+42046cbe:	97a2                	add	a5,a5,s0
+42046cc0:	1d19ac23          	sw	a7,472(s3)
+42046cc4:	0f068693          	addi	a3,a3,240
+42046cc8:	4701                	li	a4,0
+42046cca:	464d                	li	a2,19
+42046ccc:	437d                	li	t1,31
+42046cce:	03d00e13          	li	t3,61
+42046cd2:	02e65163          	bge	a2,a4,42046cf4 <ps_allocate_decoder+0x144>
+42046cd6:	c394                	sw	a3,0(a5)
+42046cd8:	00468813          	addi	a6,a3,4
+42046cdc:	03868593          	addi	a1,a3,56
+42046ce0:	02e34263          	blt	t1,a4,42046d04 <ps_allocate_decoder+0x154>
+42046ce4:	30b7a023          	sw	a1,768(a5)
+42046ce8:	0705                	addi	a4,a4,1
+42046cea:	0791                	addi	a5,a5,4
+42046cec:	07068693          	addi	a3,a3,112
+42046cf0:	fee643e3          	blt	a2,a4,42046cd6 <ps_allocate_decoder+0x126>
+42046cf4:	c384                	sw	s1,0(a5)
+42046cf6:	3127a023          	sw	s2,768(a5)
+42046cfa:	0705                	addi	a4,a4,1
+42046cfc:	0791                	addi	a5,a5,4
+42046cfe:	0921                	addi	s2,s2,8
+42046d00:	04a1                	addi	s1,s1,8
+42046d02:	bfc1                	j	42046cd2 <ps_allocate_decoder+0x122>
+42046d04:	3107a023          	sw	a6,768(a5)
+42046d08:	0705                	addi	a4,a4,1
+42046d0a:	01c70563          	beq	a4,t3,42046d14 <ps_allocate_decoder+0x164>
+42046d0e:	0791                	addi	a5,a5,4
+42046d10:	06a1                	addi	a3,a3,8
+42046d12:	b7c1                	j	42046cd2 <ps_allocate_decoder+0x122>
+42046d14:	00868793          	addi	a5,a3,8
+42046d18:	8746                	mv	a4,a7
+42046d1a:	0a868693          	addi	a3,a3,168
+42046d1e:	00878613          	addi	a2,a5,8
+42046d22:	c31c                	sw	a5,0(a4)
+42046d24:	d710                	sw	a2,40(a4)
+42046d26:	07c1                	addi	a5,a5,16
+42046d28:	0711                	addi	a4,a4,4
+42046d2a:	fed79ae3          	bne	a5,a3,42046d1e <ps_allocate_decoder+0x16e>
+42046d2e:	3c12aeb7          	lui	t4,0x3c12a
+42046d32:	0ece8e93          	addi	t4,t4,236 # 3c12a0ec <aRevLinkDelaySer>
+42046d36:	19498e13          	addi	t3,s3,404
+42046d3a:	1a098393          	addi	t2,s3,416
+42046d3e:	000e2023          	sw	zero,0(t3)
+42046d42:	000eaf03          	lw	t5,0(t4)
+42046d46:	015e2623          	sw	s5,12(t3)
+42046d4a:	034e2223          	sw	s4,36(t3)
+42046d4e:	002f1613          	slli	a2,t5,0x2
+42046d52:	00ca88b3          	add	a7,s5,a2
+42046d56:	00ca0333          	add	t1,s4,a2
+42046d5a:	011e2c23          	sw	a7,24(t3)
+42046d5e:	026e2823          	sw	t1,48(t3)
+42046d62:	00c88fb3          	add	t6,a7,a2
+42046d66:	00c302b3          	add	t0,t1,a2
+42046d6a:	07e05f63          	blez	t5,42046de8 <ps_allocate_decoder+0x238>
+42046d6e:	8696                	mv	a3,t0
+42046d70:	877e                	mv	a4,t6
+42046d72:	4781                	li	a5,0
+42046d74:	00fa85b3          	add	a1,s5,a5
+42046d78:	c198                	sw	a4,0(a1)
+42046d7a:	05070813          	addi	a6,a4,80
+42046d7e:	00f885b3          	add	a1,a7,a5
+42046d82:	0105a023          	sw	a6,0(a1)
+42046d86:	00fa05b3          	add	a1,s4,a5
+42046d8a:	c194                	sw	a3,0(a1)
+42046d8c:	02868813          	addi	a6,a3,40
+42046d90:	00f305b3          	add	a1,t1,a5
+42046d94:	0105a023          	sw	a6,0(a1)
+42046d98:	0791                	addi	a5,a5,4
+42046d9a:	0a070713          	addi	a4,a4,160
+42046d9e:	05068693          	addi	a3,a3,80
+42046da2:	fcf619e3          	bne	a2,a5,42046d74 <ps_allocate_decoder+0x1c4>
+42046da6:	967a                	add	a2,a2,t5
+42046da8:	00461a13          	slli	s4,a2,0x4
+42046dac:	0616                	slli	a2,a2,0x5
+42046dae:	9a16                	add	s4,s4,t0
+42046db0:	00cf8ab3          	add	s5,t6,a2
+42046db4:	0e11                	addi	t3,t3,4
+42046db6:	0e91                	addi	t4,t4,4
+42046db8:	f9c393e3          	bne	t2,t3,42046d3e <ps_allocate_decoder+0x18e>
+42046dbc:	20098793          	addi	a5,s3,512
+42046dc0:	40000737          	lui	a4,0x40000
+42046dc4:	25898993          	addi	s3,s3,600
+42046dc8:	c398                	sw	a4,0(a5)
+42046dca:	cfb8                	sw	a4,88(a5)
+42046dcc:	0791                	addi	a5,a5,4
+42046dce:	ff379de3          	bne	a5,s3,42046dc8 <ps_allocate_decoder+0x218>
+42046dd2:	50f2                	lw	ra,60(sp)
+42046dd4:	5462                	lw	s0,56(sp)
+42046dd6:	54d2                	lw	s1,52(sp)
+42046dd8:	5942                	lw	s2,48(sp)
+42046dda:	59b2                	lw	s3,44(sp)
+42046ddc:	5a22                	lw	s4,40(sp)
+42046dde:	5a92                	lw	s5,36(sp)
+42046de0:	5b02                	lw	s6,32(sp)
+42046de2:	4bf2                	lw	s7,28(sp)
+42046de4:	6121                	addi	sp,sp,64
+42046de6:	8082                	ret
+42046de8:	8a16                	mv	s4,t0
+42046dea:	8afe                	mv	s5,t6
+42046dec:	b7e1                	j	42046db4 <ps_allocate_decoder+0x204>

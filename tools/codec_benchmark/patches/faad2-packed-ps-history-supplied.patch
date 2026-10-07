@@ -1,0 +1,357 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Experimental ESP32-C3 port <noreply@example.invalid>
+Date: Thu, 1 Oct 2026 12:00:00 +0300
+Subject: [PATCH] faad2: optional 32-bit packed PS history for fixed-point SBR
+
+Base: knik0/faad2 e8e76f0a44db45aed773a3f62fe35a63c867a738
+      (FAAD2 2.11.4 release)
+
+This is the first, deliberately conservative integration of the
+ESP32-C3 packed-complex experiment.
+
+It does NOT pack the main sbr_info::Xsbr working matrix yet.  Xsbr
+requires a wider SBR/QMF slot-cache conversion and should be handled
+as a separate patch.
+
+This patch:
+  * adds a 4+14+14 packed complex storage format;
+  * uses a shared 4-bit exponent with shift = exponent + 3;
+  * uses arithmetic truncation on store;
+  * restores non-zero mantissas to the midpoint of the quantization cell;
+  * preserves mantissa zero as exact zero;
+  * uses branchless midpoint reconstruction;
+  * uses a small compare tree instead of CLZ for exponent selection;
+  * optionally replaces the four large PS delay/all-pass history arrays.
+
+The four converted PS arrays contain 2400 complex values:
+
+  delay_Qmf          14 * 64      =  896
+  delay_SubQmf        2 * 32      =   64
+  delay_Qmf_ser       3 * 5 * 64  =  960
+  delay_SubQmf_ser    3 * 5 * 32  =  480
+                                    ----
+                                    2400 complex
+
+With fixed-point real_t=int32_t:
+  original: 2400 * 8 = 19200 bytes
+  packed:   2400 * 4 =  9600 bytes
+  saving:                9600 bytes (9.375 KiB)
+
+Enable with standalone CMake:
+
+  cmake -S . -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DFAAD_PACKED_PS_HISTORY=ON
+
+and build the fixed-point target:
+
+  cmake --build build --target faad_fixed
+
+For ESP-IDF, add both definitions to the FAAD component:
+
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE
+      FIXED_POINT
+      FAAD_PACKED_PS_HISTORY
+  )
+
+The format is intentionally limited to FIXED_POINT builds.
+
+---
+ CMakeLists.txt             | 10 ++++++
+ libfaad/packed_complex.h   | 98 +++++++++++++++++++++++++++++++++++++++++++++++
+ libfaad/ps_dec.c           | 54 +++++++++++++++++---------
+ libfaad/ps_dec.h           | 15 ++++++++
+ 4 files changed, 159 insertions(+), 18 deletions(-)
+ create mode 100644 libfaad/packed_complex.h
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -108,10 +108,13 @@ option(FAAD_APPLY_DRC "Apply dynamic range control" ON)
+ if(FAAD_APPLY_DRC)
+   list(APPEND FAAD_DEFINES
+     APPLY_DRC
+   )
+ endif()
+ 
++option(FAAD_PACKED_PS_HISTORY
++  "Use 4+14+14 packed persistent Parametric Stereo history in fixed-point builds" OFF)
++
+ check_library_exists(m lrintf "" HAVE_LIBM)
+ if(HAVE_LIBM)
+   list(APPEND CMAKE_REQUIRED_LIBRARIES m)
+ endif()
+@@ -166,8 +169,16 @@ foreach(LIB faad_fixed faad_drm_fixed)
+ target_compile_definitions(${LIB} PRIVATE
+   FIXED_POINT
+ )
+ endforeach()
+ 
++if(FAAD_PACKED_PS_HISTORY)
++  foreach(LIB faad_fixed faad_drm_fixed)
++    target_compile_definitions(${LIB} PRIVATE
++      FAAD_PACKED_PS_HISTORY
++    )
++  endforeach()
++endif()
++
+ # Generate a pkg-config files
+ 
+ function(generate_pkg_config_path outvar path)
+diff --git a/libfaad/packed_complex.h b/libfaad/packed_complex.h
+new file mode 100644
+--- /dev/null
++++ b/libfaad/packed_complex.h
+@@ -0,0 +1,101 @@
++/*
++ * Experimental packed complex storage for memory-constrained fixed-point
++ * SBR/PS decoders.
++ *
++ * Layout:
++ *
++ *   31        28 27            14 13             0
++ *   +-----------+----------------+----------------+
++ *   | exponent  | signed Im[13:0]| signed Re[13:0]|
++ *   +-----------+----------------+----------------+
++ *
++ *   shift = exponent + 3      (3 .. 18)
++ *
++ * Persistent storage is 32 bits instead of two int32_t values (64 bits).
++ * DSP arithmetic remains native int32_t after unpacking.
++ */
++
++#ifndef __FAAD_PACKED_COMPLEX_H__
++#define __FAAD_PACKED_COMPLEX_H__
++
++#if !defined(FIXED_POINT)
++#error "packed_complex.h is only valid for FAAD2 FIXED_POINT builds"
++#endif
++
++typedef uint32_t packed_cplx32_t;
++
++/*
++ * Return the smallest exponent that makes both arithmetic-right-shifted
++ * components fit in signed 14 bits.
++ *
++ * For x < 0, x^(all-ones) produces |x|-1.  This exactly matches the
++ * asymmetric signed interval [-8192, +8191] after an arithmetic shift.
++ *
++ * The compare tree avoids relying on Zbb/CLZ.  This is useful on the
++ * baseline ESP32-C3 RV32IMC core.
++ */
++static INLINE uint8_t pcx_exp14(int32_t re, int32_t im)
++{
++    uint32_t ur = (uint32_t)re;
++    uint32_t ui = (uint32_t)im;
++    uint32_t u;
++    uint8_t e = 0;
++
++    ur ^= 0u - (ur >> 31);
++    ui ^= 0u - (ui >> 31);
++    u = (ur > ui) ? ur : ui;
++
++    if (u >= (1u << 23)) { u >>= 8; e += 8; }
++    if (u >= (1u << 19)) { u >>= 4; e += 4; }
++    if (u >= (1u << 17)) { u >>= 2; e += 2; }
++    if (u >= (1u << 16)) {           e += 1; }
++
++    return e;
++}
++
++/*
++ * Store the lower quantization-cell index.
++ *
++ * FAAD2 fixed-point code already assumes an arithmetic right shift for
++ * signed values.  GCC/Clang for ESP32-C3/RISC-V emit SRA/SRAI here.
++ */
++static INLINE packed_cplx32_t pcx_pack_complex(int32_t re, int32_t im)
++{
++    uint32_t e = pcx_exp14(re, im);
++    uint32_t shift = e + 3;
++    int32_t mr = re >> shift;
++    int32_t mi = im >> shift;
++
++    return (e << 28) |
++           (((uint32_t)mi & 0x3fffu) << 14) |
++           ((uint32_t)mr & 0x3fffu);
++}
++
++/*
++ * Branchless midpoint reconstruction.
++ *
++ * For m != 0:
++ *     reconstructed = m * 2^shift + 2^(shift-1)
++ *
++ * m == 0 is kept at exact zero.  This intentionally introduces a small
++ * zero dead-zone instead of turning stored zeros into a DC offset.
++ *
++ * Unsigned shifts are used for reconstruction so negative signed left
++ * shift never invokes C undefined behavior.
++ */
++static INLINE void pcx_unpack_complex(packed_cplx32_t p,
++                                      int32_t *re, int32_t *im)
++{
++    uint32_t e = p >> 28;
++    uint32_t shift = e + 3;
++    uint32_t half_shift = e + 2;
++    int32_t mr = ((int32_t)(p << 18)) >> 18;
++    int32_t mi = ((int32_t)(p << 4)) >> 18;
++
++    *re = (int32_t)(((uint32_t)mr << shift) +
++                    ((uint32_t)(mr != 0) << half_shift));
++    *im = (int32_t)(((uint32_t)mi << shift) +
++                    ((uint32_t)(mi != 0) << half_shift));
++}
++
++#endif /* __FAAD_PACKED_COMPLEX_H__ */
+diff --git a/libfaad/ps_dec.h b/libfaad/ps_dec.h
+--- a/libfaad/ps_dec.h
++++ b/libfaad/ps_dec.h
+@@ -37,6 +37,10 @@ extern "C" {
+ 
+ #include "bits.h"
+ 
++#if defined(FIXED_POINT) && defined(FAAD_PACKED_PS_HISTORY)
++#include "packed_complex.h"
++#endif
++
+ #define EXTENSION_ID_PS 2
+ 
+ #define MAX_PS_ENVELOPES 5
+@@ -112,10 +116,21 @@ typedef struct
+     uint8_t *group_border;
+     uint16_t *map_group2bk;
+ 
++#if defined(FIXED_POINT) && defined(FAAD_PACKED_PS_HISTORY)
++    /*
++     * 2400 persistent complex samples:
++     * 19200 bytes native -> 9600 bytes packed.
++     */
++    packed_cplx32_t delay_Qmf[14][64];
++    packed_cplx32_t delay_SubQmf[2][32];
++    packed_cplx32_t delay_Qmf_ser[NO_ALLPASS_LINKS][5][64];
++    packed_cplx32_t delay_SubQmf_ser[NO_ALLPASS_LINKS][5][32];
++#else
+     complex_t delay_Qmf[14][64]; /* 14 samples delay max, 64 QMF channels */
+     complex_t delay_SubQmf[2][32]; /* 2 samples delay max (SubQmf is always allpass filtered) */
+     complex_t delay_Qmf_ser[NO_ALLPASS_LINKS][5][64]; /* 5 samples delay max (table 8.34), 64 QMF channels */
+     complex_t delay_SubQmf_ser[NO_ALLPASS_LINKS][5][32]; /* 5 samples delay max (table 8.34) */
++#endif
+ 
+     /* transients */
+     real_t alpha_decay;
+diff --git a/libfaad/ps_dec.c b/libfaad/ps_dec.c
+--- a/libfaad/ps_dec.c
++++ b/libfaad/ps_dec.c
+@@ -43,6 +43,28 @@
+ #define DECAY_SLOPE                FRAC_CONST(0.05)
+ #define COEF_SQRT2                 COEF_CONST(1.4142135623731)
+ 
++/*
++ * Keep the PS algorithm itself operating on native complex_t values.
++ * Only the persistent delay/all-pass state is compressed.
++ */
++#if defined(FIXED_POINT) && defined(FAAD_PACKED_PS_HISTORY)
++#define PS_HIST_LOAD(dst, src) \
++    pcx_unpack_complex((src), &RE(dst), &IM(dst))
++#define PS_HIST_STORE(dst, src) \
++    do { (dst) = pcx_pack_complex(RE(src), IM(src)); } while (0)
++#else
++#define PS_HIST_LOAD(dst, src) \
++    do { \
++        RE(dst) = RE(src); \
++        IM(dst) = IM(src); \
++    } while (0)
++#define PS_HIST_STORE(dst, src) \
++    do { \
++        RE(dst) = RE(src); \
++        IM(dst) = IM(src); \
++    } while (0)
++#endif
++
+ /* tables */
+ /* filters are mirrored in coef 6, second half left out */
+ static const real_t p8_13_20[7] =
+@@ -1228,12 +1247,10 @@ static void ps_decorrelate(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38
+                     /* delay */
+ 
+                     /* never hybrid subbands here, always QMF subbands */
+-                    RE(tmp) = RE(ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb]);
+-                    IM(tmp) = IM(ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb]);
++                    PS_HIST_LOAD(tmp, ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb]);
+                     RE(R0) = RE(tmp);
+                     IM(R0) = IM(tmp);
+-                    RE(ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb]) = RE(inputLeft);
+-                    IM(ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb]) = IM(inputLeft);
++                    PS_HIST_STORE(ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb], inputLeft);
+                 } else {
+                     /* allpass filter */
+                     complex_t Phi_Fract;
+@@ -1244,21 +1261,17 @@ static void ps_decorrelate(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38
+                     if (gr < ps->num_hybrid_groups)
+                     {
+                         /* select data from the hybrid subbands */
+-                        RE(tmp0) = RE(ps->delay_SubQmf[temp_delay][sb]);
+-                        IM(tmp0) = IM(ps->delay_SubQmf[temp_delay][sb]);
++                        PS_HIST_LOAD(tmp0, ps->delay_SubQmf[temp_delay][sb]);
+ 
+-                        RE(ps->delay_SubQmf[temp_delay][sb]) = RE(inputLeft);
+-                        IM(ps->delay_SubQmf[temp_delay][sb]) = IM(inputLeft);
++                        PS_HIST_STORE(ps->delay_SubQmf[temp_delay][sb], inputLeft);
+ 
+                         RE(Phi_Fract) = RE(Phi_Fract_SubQmf[sb]);
+                         IM(Phi_Fract) = IM(Phi_Fract_SubQmf[sb]);
+                     } else {
+                         /* select data from the QMF subbands */
+-                        RE(tmp0) = RE(ps->delay_Qmf[temp_delay][sb]);
+-                        IM(tmp0) = IM(ps->delay_Qmf[temp_delay][sb]);
++                        PS_HIST_LOAD(tmp0, ps->delay_Qmf[temp_delay][sb]);
+ 
+-                        RE(ps->delay_Qmf[temp_delay][sb]) = RE(inputLeft);
+-                        IM(ps->delay_Qmf[temp_delay][sb]) = IM(inputLeft);
++                        PS_HIST_STORE(ps->delay_Qmf[temp_delay][sb], inputLeft);
+ 
+                         RE(Phi_Fract) = RE(Phi_Fract_Qmf[sb]);
+                         IM(Phi_Fract) = IM(Phi_Fract_Qmf[sb]);
+@@ -1275,8 +1288,8 @@ static void ps_decorrelate(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38
+                         if (gr < ps->num_hybrid_groups)
+                         {
+                             /* select data from the hybrid subbands */
+-                            RE(tmp0) = RE(ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb]);
+-                            IM(tmp0) = IM(ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb]);
++                            PS_HIST_LOAD(tmp0,
++                                ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb]);
+ 
+                             if (ps->use34hybrid_bands)
+                             {
+@@ -1290,8 +1303,8 @@ static void ps_decorrelate(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38
+                             }
+                         } else {
+                             /* select data from the QMF subbands */
+-                            RE(tmp0) = RE(ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb]);
+-                            IM(tmp0) = IM(ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb]);
++                            PS_HIST_LOAD(tmp0,
++                                ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb]);
+ 
+                             RE(Q_Fract_allpass) = RE(Q_Fract_allpass_Qmf[sb][m]);
+                             IM(Q_Fract_allpass) = IM(Q_Fract_allpass_Qmf[sb][m]);
+@@ -1311,11 +1324,13 @@ static void ps_decorrelate(ps_info *ps, qmf_t X_left[38][64], qmf_t X_right[38
+                         /* store sample */
+                         if (gr < ps->num_hybrid_groups)
+                         {
+-                            RE(ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb]) = RE(tmp2);
+-                            IM(ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb]) = IM(tmp2);
++                            PS_HIST_STORE(
++                                ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb],
++                                tmp2);
+                         } else {
+-                            RE(ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb]) = RE(tmp2);
+-                            IM(ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb]) = IM(tmp2);
++                            PS_HIST_STORE(
++                                ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb],
++                                tmp2);
+                         }
+ 
+                         /* store for next iteration (or as output value if last iteration) */
+-- 
+2.39.5

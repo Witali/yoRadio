@@ -1,0 +1,97 @@
+{
+  "date": "2026-09-30",
+  "analysis_source_revision": "816ddfe4",
+  "scope": "AAC decoder direct-call closure within linked libesp_audio_codec.a symbols; excludes unlinked code and AAC encoder",
+  "ghidra": "12.0.4",
+  "language": "RISCV:LE:32:default",
+  "compiler_spec": "gcc",
+  "library_package": "esp_audio_codec 2.6.2",
+  "library_git_revision": "67b8d0e98f58c774b8652480893037273190e8dc",
+  "archive_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "elf_sha256": "6a4028f1d5ac44207d5978d7be15f43978f1ee057210b6ad18e24a6861ea4b8d",
+  "elf_path": "idf/esp32c3-oled-native/build-constants-audit/yoradio_esp32c3_oled_native.elf",
+  "elf_source_revision": "701591bb",
+  "functions_completed": 176,
+  "failed": [],
+  "pseudocode_warning_functions": [
+    "ps_allocate_decoder"
+  ],
+  "limitations": [
+    "Inferred types/prototypes are not source or a binary ABI specification.",
+    "Ghidra emitted DWARF import and non-AAC code warnings; critical memory accesses checked against GNU objdump.",
+    "No modified decoder or firmware was built, run or flashed; savings are proposals.",
+    "SBR field order differs from pinned PacketVideo even where aggregate sizes match."
+  ],
+  "smoothing_limit": {
+    "symbol": "smoothLengths",
+    "address": "0x3c12b880",
+    "section": ".flash.rodata",
+    "values": [
+      4,
+      0
+    ]
+  },
+  "reference_source": "https://android.googlesource.com/platform/frameworks/av/+/437ced8a14944bf5450df50c5e7e7a6dfe20ea40/media/libstagefright/codecs/aacdec/",
+  "reference_sha256": {
+    "s_sbr_frame_data.h": "6f4fde7f43435cfb523f44a7a5ee691de7d8a9dfc68d935f9d60d3b26892fa81",
+    "s_sbr_channel.h": "ff53b5adcd5c681136691752a07ff12851f48a9ddb8e22c348f2cc8ff0337487",
+    "s_ps_dec.h": "a5d936586e97c899a8d27111e455884249c970d25a66daff4363c7a2ddb10614",
+    "s_tdec_int_file.h": "e5b9ae07bc7faf503c52390d47e763ea2d1351aa560fd0e9384a131afd1abead",
+    "s_tdec_int_chan.h": "07662ff1cb83ad140fc58d62c0da9bc2b73ebbb2d9108aed4fa9ca4cf8514757",
+    "init_sbr_dec.cpp": "30968dbc43b7ac7a21b24012071000180e1b5971a2b133937606f489d83700c7",
+    "calc_sbr_envelope.cpp": "0ec67766df13a1715b548213afaf29e161f98b4b7c66d5f6667b3d8cd47c8efc",
+    "sbr_dec.cpp": "0376961be5762c2c33da152697d284bb09e57615a23f923b2eb690a5beaf98f3",
+    "sbr_applied.cpp": "b2e112a509a6fd27f15323f8b6541671bd6282e5ab3612092de07f5c30199c06",
+    "ps_allocate_decoder.cpp": "e06870932e6afaa41ba4329bbc98e20e7ac3104f3913b37dc1f5aa5986f79f97",
+    "ps_hybrid_filter_bank_allocation.cpp": "2b6708066aca25864ab819a3b19befd888a7bee264c057dce11379405c089d64",
+    "sbr_reset_dec.cpp": "65c97db9e6f6c377d7489ed3023068593084f394fa542005f192f152dd0dfb10"
+  },
+  "allocation_bytes": {
+    "aac_wrapper": 84,
+    "core": 35460,
+    "program_config": 860,
+    "frame_info_each": 696,
+    "frame_info_count": 2,
+    "sbr_bitstream": 1044,
+    "scratch": 12288,
+    "simple_decoder_wrappers": 72,
+    "sbr_data": 55128,
+    "sbr_control": 1180
+  },
+  "sdk_decoder_requested_before_sbr": 51200,
+  "sdk_decoder_requested_with_sbr": 107508,
+  "candidate_payload_bytes": {
+    "smoothing_pointer_arrays": 1888,
+    "low_qmf_shared_stereo_conservative": 6144,
+    "smoothing_current_row_from_existing_gain_vectors": 2048,
+    "lazy_ps_struct_without_ps": 3536,
+    "ps_right_channel_upper_bound_before_control_alignment": 16004
+  },
+  "candidate_limitations": "Not additive. No measured runtime RAM savings in this audit. Rebuilding layout consumers and full format/transition tests are required.",
+  "ps_reused_ranges_in_sbr_object": [
+    {
+      "start": "0x7678",
+      "end_exclusive": "0x93b4",
+      "bytes": 7484,
+      "meaning": "PS allocation window incl. delay data, tables and hybrid state"
+    },
+    {
+      "start": "0xa780",
+      "end_exclusive": "0xb080",
+      "bytes": 2304,
+      "meaning": "right synthesis V history"
+    }
+  ],
+  "scratch_ps_copy": {
+    "destination_offset": "0x2700",
+    "length": "0x900",
+    "end_exclusive": "0x3000"
+  },
+  "acceptance": {
+    "formats": "Preserve all currently supported AAC formats/tools, rates and channel configurations; no silent core-only fallback.",
+    "pcm_bits": 16,
+    "max_absolute_error_per_sample_per_channel": 1,
+    "layout_only_expectation": "byte-identical",
+    "precision_candidate_range_proof_completed": false
+  }
+}

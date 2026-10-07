@@ -1,0 +1,172 @@
+{
+  "board": {
+    "version": "v0.9.693-1150-g327d32c2-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "5ba3d98ec9a10e0f28be59e5799767e56e106fd85c8d036081c7472e2ac2b8c4"
+  },
+  "metric": "FreeRTOS task runtime; mean of samples 5..35 s after first PCM checkpoint",
+  "cases": [
+    {
+      "name": "cpu-under-http-load:lc-48000-stereo",
+      "playback_result": "FAIL",
+      "busy_mean": 44.017,
+      "decode_mean": 19.133,
+      "minimum_free": 75156,
+      "minimum_largest": 49152,
+      "samples": [
+        {
+          "busy": 43.7,
+          "decode": 18.9,
+          "heap": 75156,
+          "largest": 49152
+        },
+        {
+          "busy": 46.8,
+          "decode": 19.4,
+          "heap": 75156,
+          "largest": 49152
+        },
+        {
+          "busy": 46.5,
+          "decode": 19.2,
+          "heap": 75156,
+          "largest": 49152
+        },
+        {
+          "busy": 43.3,
+          "decode": 19.1,
+          "heap": 75156,
+          "largest": 49152
+        },
+        {
+          "busy": 42.4,
+          "decode": 19.0,
+          "heap": 75156,
+          "largest": 49152
+        },
+        {
+          "busy": 41.4,
+          "decode": 19.2,
+          "heap": 75156,
+          "largest": 49152
+        }
+      ],
+      "peak_busy": 46.8
+    },
+    {
+      "name": "cpu-under-http-load:he-48000-stereo",
+      "playback_result": "PASS",
+      "busy_mean": 61.383,
+      "decode_mean": 38.217,
+      "minimum_free": 37176,
+      "minimum_largest": 14848,
+      "samples": [
+        {
+          "busy": 59.1,
+          "decode": 38.2,
+          "heap": 37176,
+          "largest": 14848
+        },
+        {
+          "busy": 62.6,
+          "decode": 38.2,
+          "heap": 37176,
+          "largest": 14848
+        },
+        {
+          "busy": 62.6,
+          "decode": 38.2,
+          "heap": 37176,
+          "largest": 14848
+        },
+        {
+          "busy": 59.7,
+          "decode": 38.2,
+          "heap": 37176,
+          "largest": 14848
+        },
+        {
+          "busy": 62.0,
+          "decode": 38.3,
+          "heap": 37176,
+          "largest": 14848
+        },
+        {
+          "busy": 62.3,
+          "decode": 38.2,
+          "heap": 37176,
+          "largest": 14848
+        }
+      ],
+      "peak_busy": 62.6
+    },
+    {
+      "name": "cpu-under-http-load:hev2-44100-stereo",
+      "playback_result": "PASS",
+      "busy_mean": 66.483,
+      "decode_mean": 42.667,
+      "minimum_free": 37448,
+      "minimum_largest": 14848,
+      "samples": [
+        {
+          "busy": 65.5,
+          "decode": 42.7,
+          "heap": 37452,
+          "largest": 14848
+        },
+        {
+          "busy": 67.1,
+          "decode": 42.6,
+          "heap": 37452,
+          "largest": 14848
+        },
+        {
+          "busy": 67.1,
+          "decode": 42.6,
+          "heap": 37452,
+          "largest": 14848
+        },
+        {
+          "busy": 65.4,
+          "decode": 42.7,
+          "heap": 37448,
+          "largest": 14848
+        },
+        {
+          "busy": 66.2,
+          "decode": 42.7,
+          "heap": 37452,
+          "largest": 14848
+        },
+        {
+          "busy": 67.6,
+          "decode": 42.7,
+          "heap": 37452,
+          "largest": 14848
+        }
+      ],
+      "peak_busy": 67.6
+    }
+  ],
+  "minimum_stack_free": {
+    "httpd": 4460,
+    "IDLE": 1252,
+    "tcpip": 2592,
+    "websocket_statu": 1888,
+    "radio_stream": 2556,
+    "audio_decode": 2828,
+    "audio_output": 1224,
+    "wifi_rssi": 1596,
+    "display": 1684,
+    "web_static_1": 3796,
+    "time_sync": 1520,
+    "esp_timer": 3544,
+    "wifi": 1616,
+    "sys_evt": 2080,
+    "boot_button": 1496,
+    "web_static_0": 3792
+  },
+  "no_pcm": [],
+  "note": "Diagnostic window only; original load PASS/FAIL outcomes are retained. Do not use these samples to replace the stricter acceptance checks."
+}

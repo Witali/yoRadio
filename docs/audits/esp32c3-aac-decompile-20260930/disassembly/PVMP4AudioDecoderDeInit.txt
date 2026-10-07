@@ -1,0 +1,63 @@
+
+idf\esp32c3-oled-native\build-constants-audit\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42027ab0 <PVMP4AudioDecoderDeInit>:
+42027ab0:	c5d9                	beqz	a1,42027b3e <PVMP4AudioDecoderDeInit+0x8e>
+42027ab2:	55c8                	lw	a0,44(a1)
+42027ab4:	1101                	addi	sp,sp,-32
+42027ab6:	cc22                	sw	s0,24(sp)
+42027ab8:	ce06                	sw	ra,28(sp)
+42027aba:	842e                	mv	s0,a1
+42027abc:	c119                	beqz	a0,42027ac2 <PVMP4AudioDecoderDeInit+0x12>
+42027abe:	8ddfc0ef          	jal	4202439a <media_lib_free>
+42027ac2:	5828                	lw	a0,112(s0)
+42027ac4:	c509                	beqz	a0,42027ace <PVMP4AudioDecoderDeInit+0x1e>
+42027ac6:	8d5fc0ef          	jal	4202439a <media_lib_free>
+42027aca:	06042823          	sw	zero,112(s0)
+42027ace:	5868                	lw	a0,116(s0)
+42027ad0:	c509                	beqz	a0,42027ada <PVMP4AudioDecoderDeInit+0x2a>
+42027ad2:	8c9fc0ef          	jal	4202439a <media_lib_free>
+42027ad6:	06042a23          	sw	zero,116(s0)
+42027ada:	67a5                	lui	a5,0x9
+42027adc:	97a2                	add	a5,a5,s0
+42027ade:	a587a503          	lw	a0,-1448(a5) # 8a58 <CSR_UINTSTATUS+0x7da7>
+42027ae2:	c519                	beqz	a0,42027af0 <PVMP4AudioDecoderDeInit+0x40>
+42027ae4:	c63e                	sw	a5,12(sp)
+42027ae6:	8b5fc0ef          	jal	4202439a <media_lib_free>
+42027aea:	47b2                	lw	a5,12(sp)
+42027aec:	a407ac23          	sw	zero,-1448(a5)
+42027af0:	67a5                	lui	a5,0x9
+42027af2:	97a2                	add	a5,a5,s0
+42027af4:	a5c7a503          	lw	a0,-1444(a5) # 8a5c <CSR_UINTSTATUS+0x7dab>
+42027af8:	c519                	beqz	a0,42027b06 <PVMP4AudioDecoderDeInit+0x56>
+42027afa:	c63e                	sw	a5,12(sp)
+42027afc:	89ffc0ef          	jal	4202439a <media_lib_free>
+42027b00:	47b2                	lw	a5,12(sp)
+42027b02:	a407ae23          	sw	zero,-1444(a5)
+42027b06:	67a5                	lui	a5,0x9
+42027b08:	97a2                	add	a5,a5,s0
+42027b0a:	a607a503          	lw	a0,-1440(a5) # 8a60 <CSR_UINTSTATUS+0x7daf>
+42027b0e:	c519                	beqz	a0,42027b1c <PVMP4AudioDecoderDeInit+0x6c>
+42027b10:	c63e                	sw	a5,12(sp)
+42027b12:	889fc0ef          	jal	4202439a <media_lib_free>
+42027b16:	47b2                	lw	a5,12(sp)
+42027b18:	a607a023          	sw	zero,-1440(a5)
+42027b1c:	67a5                	lui	a5,0x9
+42027b1e:	97a2                	add	a5,a5,s0
+42027b20:	a7c7a503          	lw	a0,-1412(a5) # 8a7c <CSR_UINTSTATUS+0x7dcb>
+42027b24:	c519                	beqz	a0,42027b32 <PVMP4AudioDecoderDeInit+0x82>
+42027b26:	c63e                	sw	a5,12(sp)
+42027b28:	873fc0ef          	jal	4202439a <media_lib_free>
+42027b2c:	47b2                	lw	a5,12(sp)
+42027b2e:	a607ae23          	sw	zero,-1412(a5)
+42027b32:	8522                	mv	a0,s0
+42027b34:	4462                	lw	s0,24(sp)
+42027b36:	40f2                	lw	ra,28(sp)
+42027b38:	6105                	addi	sp,sp,32
+42027b3a:	861fc06f          	j	4202439a <media_lib_free>
+42027b3e:	8082                	ret

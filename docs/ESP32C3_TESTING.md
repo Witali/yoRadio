@@ -1,0 +1,782 @@
+# ESP32-C3 firmware testing
+
+This document defines the acceptance tests added after the 2026-09-30 audit.
+**A test exists, a test ran, and a test passed are three different states.**
+Keep failed measurements. Never accept AAC-core fallback as successful HE-AAC.
+
+The [2026-09-30 physical results](../tests/results/esp32c3-acceptance-20260930/README.md)
+record passing OTA checks and outstanding HE-AAC, EOF and HTTP-load failures.
+Tests not run are identified separately from failures.
+
+The subsequent [EOF correction and regression tests](ESP32C3_EOF_STATUS.md)
+separate terminal playback status from full-rate HE-AAC acceptance. They include
+a deterministic delayed-output regression and FFmpeg/FDK complete-file references.
+
+For allocation phases, per-task stack margins and reproducible SBR structure
+sizes, see the [AAC memory investigation](ESP32C3_AAC_MEMORY_20260930.md) and
+`tools/esp32c3_tests/memory.py`. Its survey is separate from a passing load/soak test.
+
+The [AAC pointer audit](ESP32C3_AAC_POINTER_AUDIT_20261003.md) checks exact
+core/SBR/PS targets, rotating rows, stack ownership and copy ranges for the
+PC18 + four-row smoothing adapter in QEMU. Six retained runs include station
+captures, allocation failures, resets and simultaneous decoders. Run
+`python tests/test-aac-pointer-audit.py` to validate their evidence and parser.
+The report documents unchecked views. The [PS coverage follow-up](ESP32C3_AAC_PS_COVERAGE_20261003.md)
+shows why FFprobe's profile/channel label alone cannot establish PS execution.
+
+The [low-QMF lifetime test](ESP32C3_AAC_LOW_QMF_LIFETIME_20261003.md) deliberately
+overwrites transient rows before native decoding and compares the output with
+the unmodified history. It includes a rejected bad-history control and a
+deterministic two-task rendezvous. `python tests/test-aac-low-lifetime.py`
+recomputes error statistics from retained synthetic PCM and checks capture
+hashes, pointer coverage and source fingerprints. This is a prerequisite for
+shrinking the allocation; it reports zero additional production RAM savings.
+
+The [scoped low-QMF adapter](ESP32C3_AAC_LOW_QMF_WORKSPACE_20261003.md) now
+retains only eight history rows per channel and moves the live full matrix to
+the existing decoder stack. Its [physical follow-up](ESP32C3_AAC_LOW_QMF_PRODUCTION_20261003.md)
+measures the 10,240-byte allocator saving, CPU, stack, local formats and OTA.
+`python tests/test-aac-low-production.py` verifies the retained evidence, including
+public HTTP/HTTPS failures that still block promotion. Passing this evidence
+test means the records are consistent; it does not mean all playback passed.
+
+The [asymmetric channel owner](ESP32C3_AAC_ASYMMETRIC_OWNER_20261003.md)
+removes the unused left PS reserve and measures another 4 KiB allocator saving
+in QEMU. `python tests/test-aac-asymmetric-owner.py --compiler <RV32-gcc>` checks
+native object edits, prefix/stride assertions, six pointer/PCM runs and the
+disabled-flag control. The [physical follow-up](ESP32C3_AAC_ASYMMETRIC_PRODUCTION_20261004.md)
+adds the production storage flag, unpoisoned QEMU runs and actual hardware/OTA
+outcomes. `python tests/test-aac-asymmetric-production.py` validates that evidence
+while preserving unsuccessful tests. Nested transport exception types and
+numeric OS codes are retained without private exception text.
+
+The optional [network heap sampler](ESP32C3_NETWORK_MEMORY.md) records heap
+blocks, TCP states and queued payload on the owning lwIP thread. Its summarizer
+corrects for delayed logging and keeps the public-stream PASS/FAIL decisions.
+Run `tests/test-esp32c3-network-memory.py` and `tests/test-network-heap-native.py`
+for the host parser and sanitized C callback checks.
+
+The [receive-credit extension](ESP32C3_NETWORK_RECEIVE_CREDIT.md) additionally
+observes TCP data waiting for the application. Long load runs can use
+`--load-seconds 180 --load-idle-recovery`; their outcomes remain separate from
+the post-stop memory check. `load_windows.py` uses explicit observation bounds
+and retains incomplete telemetry instead of assigning the next codec's samples
+to a failed case. Its boundary tests are `tests/test-esp32c3-load-windows.py`.
+The [physical receive-credit results](ESP32C3_RECEIVE_CREDIT_20261004.md) retain
+the long paced failures, a post-Vorbis fragmentation failure, subsequent HE-AAC
+HTTPS playback and three passing unpaced-file controls.
+
+The [Vorbis audit and repair plan](ESP32C3_VORBIS_REPAIR_PLAN.md) records static
+failed-open/low-memory defects, a PCM retry concern and the investigation needed
+to identify the fragmentation owner. Its [first runtime step](ESP32C3_VORBIS_LIFECYCLE_20261004.md)
+is complete: 100 repeatable decode/close cycles, 198 individual allocation
+failures and four malformed headers in isolated QEMU. The original decoder
+still fails the fault-handling gate; the subsequent
+[initialization repair](ESP32C3_VORBIS_REPAIR_20261004.md) and
+[retry/EOF repair](ESP32C3_VORBIS_OUTPUT_20261005.md) pass their retained target
+tests. Physical fragmentation attribution and broader format coverage remain
+pending. Run `python tests/test-vorbis-lifecycle.py` and
+`python tests/test-vorbis-lifecycle-evidence.py` to verify the classifier and
+retained results. The linked report includes full build/run commands.
+
+The [custom-decoder terminal-memory check](ESP32C3_CUSTOM_DECODER_TERMINAL_20261005.md)
+detects retained FLAC state after natural EOF which a Stop-based check hides.
+Use `diagnostic.py terminal_memory` to measure before playback, after EOF
+without Stop, and after a separate Stop. The service now also releases custom
+FLAC/legacy state at terminal errors; the host ownership scenarios use
+`python tests/run-custom-decoder-terminal.py`.
+
+The [FLAC input-bounds repair](ESP32C3_FLAC_INPUT_BOUNDS_20261005.md) reproduces
+truncated-frame overreads under ASan and tests the actual shared decoder against
+FFmpeg PCM. Run `tools/codec_benchmark/run_flac_bounds.py --output OUTPUT_DIR`
+(add `--contiguous` for the Arduino workspace), then use
+`flac_truncation.py --board http://BOARD_IP --host HOST_IP --serial-port COM_PORT --output OUTPUT_DIR`
+for partial-frame EOF and recovery on C3. Retained results are replayed by
+`tests/test-flac-bounds-evidence.py`.
+
+The [FLAC depth repair and matrix](ESP32C3_FLAC_DEPTHS_20261005.md) separates
+4..24-bit source metadata from signed-16 output. `run_flac_depths.py` compiles
+the actual core/adapter under sanitizers and compares with known PCM and FFmpeg;
+`--allocation-failures` also checks persistent OOM cleanup and reopen. The
+shared fixture generators cover source depths, stereo modes and 8192-sample
+blocks. `terminal_memory.py --fixture-manifest PATH` accepts those fixtures for
+physical natural-EOF heap checks using AUTO and explicit codec selection.
+
+The [30-minute HE-AACv2 load report](ESP32C3_HEV2_SOAK_20261005.md) retains
+a failed progressive-heap gate despite real-time playback and post-Stop
+recovery. `summarize_sustained.py` replays the complete window and consecutive
+five-minute windows; it does not replace the original acceptance outcome.
+This report does not satisfy the one-hour C3-T08 criterion.
+
+The [ten-minute HE-AACv2 RX-owner investigation](ESP32C3_HEV2_RX_OWNER_20261007.md)
+retains the same progressive-heap failure with an 8-byte post-Stop idle
+difference. Its full ownership trace is rejected for a truncated USB record;
+independent playback, recovery and OTA observations remain available.
+
+The [compact telemetry and native RX-copy follow-up](ESP32C3_RX_COPY_20261007.md)
+retains two further ten-minute runs. Compact CRC records still lose rows;
+native packet copies improve the observed memory minimum but retain the
+progressive-heap failure. `tests/test-rx-transport-evidence.py` replays both
+archives without treating missing telemetry as zero memory or declaring audio
+continuity from decoder progress. Both experimental images remain unqualified.
+
+The [configurable station timeout](ESP32C3_STATION_TIMEOUT.md) adds recovery
+within a bounded connection window and an unavailable terminal state. The
+default is ten seconds; WebUI accepts 1–120 seconds and persists it across
+reboot. `connection_retry.py` checks temporary 503 responses, cancellation,
+finite EOF, configured deadlines, stalled data, NVS persistence and post-Stop
+memory. The server's `/recover/FIXTURE` route is shared by all boards.
+
+The optional [heap-owner diagnostic](ESP32C3_HEAP_FRAGMENT_OWNER_20261005.md)
+tracks live allocations in the largest initial free region, with explicit
+overflow/unknown-owner rejection. Use `heap_idle.py` for a stopped-board window
+without HTTP polling, and `tests/test-heap-fragment-evidence.py` to replay the
+retained physical results. It changes timing and is disabled by default.
+Shared-server `--delivery-stats` records completed socket-write timing for any
+board; it does not measure TCP acknowledgements or audible gaps.
+
+The audio server is shared by **ESP32-C3, ESP8266, CYD and any other HTTP audio
+client**. Only the device-control runner knows the native C3 WebUI API. The
+server does not select a board, upload firmware, reset it or change credentials.
+
+The [IRAM placement audit](ESP32C3_IRAM_REDUCTION_20261001.md) compares matched
+ELF/MAP files and physical playback/OTA evidence. The standalone
+`tools/esp32c3_tests/iram_inventory.py` reports aliased SRAM capacity without
+double-counting IRAM as additional DRAM. Auto Suspend is an optional,
+hardware-specific experiment, not a global default.
+
+The follow-up [Wi-Fi buffer balance](ESP32C3_WIFI_BUFFER_BALANCE_20261001.md)
+checks whether that DRAM headroom permits sufficient dynamic Wi-Fi buffers
+without sacrificing full-rate HE-AAC. It retains failed six-buffer controls,
+host TCP_NODELAY experiments and high-bitrate multi-codec load evidence.
+It also retains a later OTA panic and two load failures. ROM recovery restored
+the original app; startup and saved playback were verified after a manual
+reset. The failures block promotion of the Auto Suspend profile despite
+earlier successful playback and OTA checks.
+
+The [conservative IRAM follow-up](ESP32C3_CONSERVATIVE_IRAM_20261001.md)
+disables Auto Suspend and passes all 15 repeat OTA gates from the new image.
+Its 3584-byte capacity gain still leaves two first-cycle HE/v2 switching failures.
+`tests/test-esp32c3-conservative-iram.py` validates the retained successes,
+failures, exact configuration and source/image fingerprints; it does not turn
+this experimental image into a production-qualified build.
+
+The [TCP half-close investigation](ESP32C3_LWIP_HALF_CLOSE_20261001.md) reproduces
+the pool ownership defect with real lwIP sockets and with the ordinary heap
+allocator. `tests/run-lwip-half-close.py` checks six packet-driven scenarios
+under ASan/UBSan. Its host results do not substitute for board OTA qualification.
+
+For new hardware investigations, `diagnostic.py` wraps the existing `run`,
+`memory`, `ota_transition` or `pool_settle` runner and keeps filtered panic
+MEPC/RA/MCAUSE evidence alongside CPU/heap logs. For example:
+
+```powershell
+python tools/esp32c3_tests/diagnostic.py memory --board http://BOARD_IP `
+  --host PC_LAN_IP --serial-port COM9 --output .build/c3-memory-diagnostic
+```
+
+It retains possible code addresses from stack/backtrace lines, not raw stack
+contents. These candidates are not a verified unwind. The wrapper does not
+change firmware or settings on its own; the selected runner retains its normal
+actions and restoration rules. Earlier filtered logs cannot retroactively
+recover a discarded panic PC. Host filter checks are in
+`tests/test-esp32c3-panic-capture.py`.
+
+For contiguous-allocation failures, add `sdkconfig.heap-layout.defaults` to an
+awake HTTP-profiler build. `CONFIG_YORADIO_HEAP_LAYOUT_DIAGNOSTICS` logs selected
+blocks at the existing AAC memory checkpoints: all free areas >=256 bytes and
+their immediate neighbors, plus allocations >=1024 bytes. Each capture is
+bounded at 128 rows; `dropped` must be zero before interpreting it as a complete
+selection, and received rows must match the declared count. The
+[physical heap/TCP investigation](ESP32C3_HEAP_LAYOUT_20261001.md) retains two
+incomplete serial captures and excludes them from topology conclusions.
+It does not enumerate every small block. Only addresses, sizes and
+allocation state are retained; payload memory is never read.
+
+The capture table uses at most 1600 bytes of the existing AAC task stack on
+RV32 and no persistent heap/BSS table. Callbacks only copy metadata while IDF
+holds the individual heap lock; logs are emitted afterward. Heaps are visited
+sequentially, so the combined view is not an atomic global snapshot. Raw walker
+sizes differ from the allocator's rounded maximum allocatable size. SDK codec
+malloc/calloc addresses are also logged for allocations >=1024 bytes; these
+are allocation events, not a complete ownership/lifetime trace. Logging changes
+scheduling and can change transient network demand, so do not use this image
+for performance qualification. Host ASan/UBSan selection/bounds checks:
+`python tests/run-heap-layout-capture.py` in an environment with `cc`.
+
+Add `sdkconfig.tcp-allocation.defaults` to that diagnostic build to correlate
+the selected addresses with `PERF TCP_ALLOC` and `PERF TCP_FREE` records. This
+separate option forwards lwIP allocation/free unchanged and logs the PCB state
+before release. It never logs IP addresses, ports or packet contents. Retain
+the exact ELF/config: a matching size alone does not prove block ownership.
+
+`sdkconfig.tcp-pcb-pool.defaults` enables the separate experimental PCB pool.
+Its capacity remains `CONFIG_LWIP_MAX_ACTIVE_TCP`, including active and TIME_WAIT
+PCBs, exactly as in this IDF's heap-backed allocator. The 168-byte C3 structures
+use RTC RAM, with one ownership byte per slot in ordinary DRAM. The protocol,
+TIME_WAIT duration, packet allocations and codec code are unchanged. The pool
+cost is reserved RAM, not a reduction of each PCB's payload. Allocation exhaustion
+still returns NULL to TCP's existing recovery/reaping logic; other memp types
+are forwarded unchanged. Ownership flags reset on boot independently of retained
+RTC contents, which `tcp_alloc` initializes before publishing a reused PCB.
+
+This build option is off by default and mutually exclusive with the passive
+TCP allocation trace. The implementation requires IDF's heap-backed memp mode
+without memp overflow instrumentation; static assertions reject an incompatible
+configuration. Memp usage/error statistics remain supported. Host checks run
+with `python tests/run-tcp-pcb-pool.py`: configured capacities 1/16/32, statistics
+off/on, exhaustion/reuse, forwarding, alignment and 40000 concurrent lifetimes
+per variant under ASan/UBSan. Physical qualification must include early mixed-codec
+switches, WebUI traffic/OTA, TLS and the deep-sleep RTC footprint before promotion.
+
+The [physical pool trial](ESP32C3_TCP_PCB_POOL_20261001.md) passes all 21 mixed-codec
+switches but is rejected after two ownership assertions during OTA. Its 15 HTTP
+checks alone passed because the application automatically rebooted into the same
+image. For new OTA campaigns use `tools/esp32c3_tests/ota_diagnostic.py`, which
+returns failure on panic/capture errors even if HTTP/hash checks pass. Both
+`report.json` and `serial-health.json` must pass. Optional
+`sdkconfig.tcp-pcb-pool-trace.defaults` retains 128 pool lifetime events and
+dumps them on an ownership failure; its 1028-byte DRAM cost and timing effects
+make it a diagnostic build, not a performance result.
+
+The [half-close fix](ESP32C3_LWIP_HALF_CLOSE_20261001.md) now passes the same 15
+OTA gates with serial-health PASS and exactly the five expected software resets,
+plus 21/21 mixed-codec switches. Run `tests/test-esp32c3-half-close-hardware.py`
+to validate its exact image/configuration, retained checks and CPU survey.
+These results supersede the ownership failure for the fixed image only.
+
+The [physical DIO/QIO comparison](ESP32C3_FLASH_QUAD_20260930.md) records passing
+standalone QIO 40/80 MHz tests with register checks, repeated flash reads and
+AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained
+evidence and rejection paths. This does not replace full-radio QIO acceptance.
+The subsequent [full-radio QIO 80 MHz results](ESP32C3_QIO80_ACCEPTANCE_20260930.md)
+retain both failures and passes; the production default remains DIO 80 MHz.
+
+## Gaps found and corresponding tests
+
+The [BFP16 QMF experiment](ESP32C3_AAC_BFP16_20260930.md) adds paired real-decoder
+raw-PCM comparisons in QEMU, arithmetic boundary tests, unquantized controls,
+three block sizes and instruction counts. Its harness completes, but all tested
+HE/v2 BFP16 block sizes **fail** the one-LSB limit. Run
+`python tests/test-aac-bfp16.py` to validate the retained evidence and negative
+parser cases; that regression pass preserves a measured optimization failure.
+The [real-recording extension](ESP32C3_AAC_BFP16_REAL_20260930.md) adds 60 paired
+comparisons, per-channel error moments/histograms and independent FFprobe frame
+counts. Validate that retained evidence with `python tests/test-aac-bfp16-real.py`.
+
+The [packed complex history experiment](ESP32C3_AAC_PACKED_HISTORY_20261001.md)
+uses **±5 LSB during development and ±2 LSB for the final version**, maximum per
+sample/channel (2026-10-01). It tests
+14+14+4 storage on retained SBR/PS histories, nearest and floor/midpoint modes,
+lossless controls and five real recordings: 201 paired comparisons. It still
+fails precision (3 LSB real, 7 LSB synthetic). Run
+`python tests/test-aac-packed-history.py`; a passing evidence test preserves
+that rejection. Inactive history paths are explicitly marked as not exercised.
+
+The [FAAD2 scaling comparison](FAAD2_HISTORY_SCALING_20261001.md) adds 60 paired
+host runs in fixed and float modes on the same inputs, plus 98,304 exact scaling
+invariance checks. `python tests/test-faad-history-comparison.py` validates the
+raw evidence, source hashes and rejection of overflow-bypassed large-scale trials.
+This is a reference backend comparison; it does not qualify a firmware backend
+replacement, C3 memory savings or physical decoding speed.
+
+The [PC16 shift and block-storage test](ESP32C3_AAC_PC16_SHIFTS_20261001.md)
+executes the `shift=exponent+1` implementation, exhaustive component codes,
+independent rounding/boundary checks and eight-sample block equivalence under
+UBSan: `python tests/test-aac-pc16-shifts.py`. The subsequent
+[201 PC16 QEMU decoder comparisons](ESP32C3_AAC_PC16_QUALITY_20261001.md) pass the
+temporary ±5 gate but fail the final ±2 gate (maximum 3). Validate logs, block/tail
+coverage, scalar equivalence and both gates with `python tests/test-aac-pc16-history.py`.
+Reduced live allocations and physical CPU speed remain unqualified.
+
+The [supplied FAAD PS patch test](FAAD2_PS_PATCH_QUALITY_20261001.md) adds 33 host
+decodes from pristine, patch-disabled and patch-enabled sources. Both active-PS
+inputs reach 2 LSB; nine inactive-PS inputs and every disabled-patch decode are
+bit-identical controls. `python tests/test-faad-ps-patch.py` checks frame traces,
+delayed mono-to-stereo PS activation, source/PCM hashes and integer error counts.
+The measured 9600-byte host PS-structure reduction is not a full-radio RAM result.
+
+The [current-decoder PS write port](ESP32C3_AAC_PS_WRITE_PORT_20261001.md) adapts
+that strategy to Espressif's actual delay/feedback writes: 81 QEMU paired
+comparisons, bit-exact native-source/bypass controls and guarded unused storage.
+The maximum is 3 LSB (temporary ±5 passes, final ±2 fails). Packed delay payload
+shrinks by 2468 bytes, but the owner allocation is unchanged and heap saving is
+zero. `python tests/test-aac-ps-history-port.py` validates retained evidence,
+implementation hashes, controls and rejection of false memory/precision claims.
+Packed transitions/reset lifetimes and full-radio performance remain unqualified.
+
+The [pristine FAAD float32/fixed comparison](FAAD2_FLOAT_FIXED_COMPARISON_20261001.md)
+adds 22 main decodes and 22 fresh-process repeatability controls. LC differs by
+up to 2 LSB, but synthetic HE/v2 and PS onset expose much larger existing
+arithmetic-path discrepancies. `python tests/test-faad-arithmetic-comparison.py`
+validates hashes, full output rates, channel transitions, histograms and retained
+transients. This is separate from the additional error allowed for packed storage.
+
+| ID | Previously missing coverage | Test created | Acceptance |
+| --- | --- | --- | --- |
+| C3-T01 | Repeatable production RAM-policy regression | `tests/test-esp32c3-acceptance.py`, `ProductionConfigTests` | Execute the actual PowerShell production wrapper against saved configs: both Wi-Fi IRAM options become disabled, other values survive, second run is idempotent; relative and absolute paths work. |
+| C3-T02 | All current codec families through the full HTTP pipeline | `run.py --suite http` | Every fixture plays with correct decoded rate/channels/bit depth, using both AUTO and explicit codec; finite file reaches EOF. |
+| C3-T03 | Equivalent HTTPS/TLS playback | `run.py --suite https` | Same matrix, trusted certificate, no TLS-verification bypass. Missing trusted server is BLOCKED. |
+| C3-T04 | Certificate rejection and recovery | `run.py --suite tls-rejection` | Untrusted TLS stream never plays; a subsequent HTTP stream plays normally. |
+| C3-T05 | Full-radio AAC changes in one connection | `run.py --suite transitions` | Ordered, repeatedly confirmed full-rate formats; includes LC mono → HEv2 with identical ADTS core configuration and Stop/Play generation replacement. |
+| C3-T06 | Repeated codec switches and retained/fragmented heap | `run.py --suite switch` | At least three cycles; every start succeeds; settled heap/largest block/task count recover after warm-up. |
+| C3-T07 | Network faults with recovery | `run.py --suite faults` | Truncation, stall and HTTP 503 allow a new mono stream; redirect and jitter preserve playback and EOF. |
+| C3-T08 | Long continuous playback on the full radio | `run.py --suite soak` | Default one hour, correct format throughout, responsive HTTP, real-time PCM progress and heap budgets; CPU is recorded. A shorter run is only a smoke test. |
+| C3-T09 | CPU and memory with concurrent WebUI requests | `run.py --suite load` | 40 seconds per selected fixture, 100 ms polling, at least three stable CPU/decode windows, no allocation failure or core fallback. |
+| C3-T10 | OTA regression against the exact current app | `ota.py` | Both slots used, uploaded ELF identity checked after boot, negative cases preserve active app, Wi-Fi/playlist/settings unchanged. Includes slow and playing-state uploads. |
+| C3-T11 | Live browser-channel metadata after reconnect | `run.py --suite websocket` | Two fresh WebSocket connections receive `fmt` and playing state matching REST. Host stream-format tests already check OLED formatting and generation changes. |
+| C3-T12 | Quantified Wi-Fi-placement boot/readiness A/B | `run.py --suite boot-time`, `compare_latency.py --kind boot` | At least 30 samples per configuration, same board/network conditions and selected regression/budget limits. This measures reboot-to-WebUI, not pure association time. |
+| C3-T13 | Interrupt-latency A/B under flash/Wi-Fi load | Manual procedure below + `compare_latency.py --kind irq` | External edge timing, full provenance, at least 30 samples and an explicit absolute deadline. Host HTTP timing cannot substitute. |
+| C3-T14 | Real browser rendering, OLED appearance and physical audio | Manual procedure below | Upload form/progress/errors are usable; whole OLED updates; stereo channels and audio continuity are checked physically. |
+| C3-T15 | Power interruption during OTA | Manual procedure below | Dedicated recoverable test board boots the previous/new valid app after interruption at each stage; do not assume automatic rollback exists. |
+| C3-T16 | AAC buffer-reuse equivalence and error paths | `run-esp32c3-stream-format.py`, `run-esp32c3-memory-trace.py`, `compare-pcm-wav.py`, real-decoder QEMU and full-radio matrix | Adaptive ADTS and 8 KiB PCM pass host OOM/retry checks and byte-identical fixture output. Full-radio HE/v2 and internal-state/exhaustive-profile coverage remain open. |
+| C3-T17 | Stable terminal status after buffered decoder output | `tests/run-esp32c3-eof.py`, `run.py --suite eof`, `reference_eof.py` | EOF follows queued PCM; stopped REST/WebSocket status stays stopped and clears stream parameters. Exercise all eleven fixtures with AUTO/explicit codecs, late metadata, stale generations, cancellation and failures. Profile/rate acceptance remains a separate requirement. |
+| C3-T18 | Configurable station-unavailable timeout and connection retry | `tests/run-stream-connection-retry.py`, `connection_retry.py`, `tests/test-connection-retry-runtime.py` | Temporary 503 recovers within the deadline; 3/10-second timeouts stop with an unavailable status, no later request; Stop/new station/watchdog cancel pending retries; EOF stays finite; settings survive reboot and invalid values are rejected; settled heap recovers. Only a recorded, verified software reset for the persistence test is exempt from the unexpected-reboot gate. |
+
+## What “all formats” means here
+
+The current native C3 streaming pipeline selects MP3, AAC, FLAC and Ogg
+(Vorbis/Opus). The built-in matrix contains eleven files/layouts:
+
+- MP3 320 kbit/s, FLAC level 8, Vorbis quality 10, Opus 510 kbit/s:
+  48 kHz stereo, original 11-second noise/tone fixtures.
+- AAC-LC 320 kbit/s: 48 kHz stereo, original 11-second fixture.
+- AAC-LC 44.1/48 kHz stereo and 22.05 kHz mono; HE-AAC 44.1/48 kHz stereo;
+  HE-AAC v2 44.1 kHz stereo. Short original ADTS fixtures are repeated into
+  finite approximately 12-second streams without adding another container.
+- Two extra continuous ADTS files exercise format changes. Their individual
+  phases are paced at their own encoded rates.
+
+The manifests verify source hashes before serving. These are representative
+tests of every current codec family, not exhaustive coverage of all possible
+AAC object types, sample rates, bitrates or containers. In particular, SDK
+support for M4A/TS/raw AAC does not prove those inputs are wired into this
+firmware. Add explicit fixture/routing tests before advertising them. Preserve
+all existing AAC-LC/HE/PS capability while optimizing memory.
+
+## Setup and host checks
+
+Run commands from the repository root or task worktree. Use Python 3.10+,
+Node.js, PowerShell for T01, and a host C/C++ compiler (WSL on Windows).
+
+```powershell
+python -m pip install -r tools/esp32c3_tests/requirements.txt
+python tests/test-esp32c3-acceptance.py
+python tests/test-esp32c3-cache-hardware.py
+python tests/test-esp32c3-radio-profile.py
+node --test tests/esp32c3-memory-stability.test.js tests/esp32c3-native-idf.test.js tests/esp32c3-cpu-profile.test.js tests/webui-firmware-ota.test.js tests/codec-benchmark.test.js tests/audio-stream-info.test.js
+```
+
+From a WSL shell in the same checkout:
+
+```sh
+python3 tests/run-esp32c3-ota.py
+python3 tests/run-esp32c3-stream-format.py
+python3 tests/run-esp32c3-eof.py
+python3 tests/run-esp32c3-memory-trace.py
+C3_MEMORY_SANITIZE=1 python3 tests/run-esp32c3-stream-format.py
+```
+
+The sanitizer mode instruments the host C callbacks, PCM workspace and ADTS
+adapter/fault tests with AddressSanitizer and UndefinedBehaviorSanitizer.
+It does not instrument the precompiled Espressif library or the Helix C++ test.
+
+For the same deterministic QEMU fixture sequence, compare the baseline and
+candidate captures with `python tests/compare-pcm-wav.py before.wav after.wav`.
+The tool checks layout/duration, non-silent data and every PCM byte. Keep both
+image/configuration identities with the result; equal captures alone cannot
+prove a different decoder's internal-state equivalence.
+
+`memory.py --minimal` checks existing INFO-level production RAM logs without
+requiring the extra profiler task, runtime counters or allocation-trace arrays.
+It still rejects incorrect HE/v2 output. `--audio-buffer-blocks 14` temporarily
+selects the maximum compressed buffer, reboots to apply it, then restores the
+original value and verifies Wi-Fi/playlist/settings against an in-memory snapshot.
+The original non-private buffer count is saved in the report for recovery if
+the test process is interrupted. This does not test stacks or CPU in minimal mode.
+
+The new host tests exercise the acceptance checks against valid and invalid
+evidence, including the retained physical SBR failure, actual HTTP/TLS server
+responses and the production PowerShell wrapper. Passing these tests means the
+test infrastructure detects those failures; it does not mean the board passes.
+
+## Shared audio server — every board
+
+```powershell
+python tools/audio_test_server/server.py --host 0.0.0.0 --port 8770
+```
+
+Use your PC's LAN address in the board's stream URL, for example:
+
+```text
+http://PC_LAN_IP:8770/file/mp3-320
+http://PC_LAN_IP:8770/file/flac-level8
+http://PC_LAN_IP:8770/file/vorbis-q10
+http://PC_LAN_IP:8770/file/opus-510
+http://PC_LAN_IP:8770/file/he-48000-stereo
+http://PC_LAN_IP:8770/stream/lc-48000-stereo
+http://PC_LAN_IP:8770/file/changing
+http://PC_LAN_IP:8770/file/implicit-sbr
+```
+
+`/manifest.json` lists profiles, decoded layouts, durations and hashes.
+`/file/NAME` has Content-Length and EOF. `/stream/NAME` repeats ADTS AAC only;
+it does not concatenate FLAC files or Ogg containers. `/drop/NAME`,
+`/stall/NAME`, `/error/NAME`, `/jitter/NAME` and `/redirect/NAME` inject faults.
+Unknown routes/files return 404. Stop the server with Ctrl+C.
+
+For continuous longer files and extra mono/stereo/rate combinations, install
+FFmpeg/FFprobe and generate an independent fixture directory:
+
+```powershell
+python tools/audio_test_server/generate.py --output .build/audio-60s --seconds 60
+python tools/audio_test_server/server.py --fixture-manifest .build/audio-60s/manifest.json
+```
+
+Defaults generate five codec families × two input rates × mono/stereo. Opus
+can decode at 48 kHz regardless of input rate; expected output comes from
+FFprobe. FLAC bit depth also comes from FFprobe. Native FFmpeg AAC encoding
+here is LC; the retained FDK fixtures supply HE/v2. Source audio is generated
+locally; nothing is downloaded or recorded from radio stations. To test another
+bitrate/profile, add a manifest-verified fixture rather than relabeling one.
+
+## Physical playback tests
+
+Use firmware **without deep sleep**. Choose the actual board address and PC
+address. Only one test controller should use a board at a time. The runner
+temporarily plays test URLs without saving playlist or Wi-Fi changes. It
+normally reboots via the WebUI at exit to resume the saved station;
+`--leave-stopped` avoids that reboot. Record failures of restoration too.
+
+```powershell
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --suite http --output .build/c3-tests/http
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --suite transitions --suite faults --suite websocket --output .build/c3-tests/changes
+```
+
+Every matrix fixture runs with automatic detection and explicit codec selection.
+Use repeated `--case NAME` arguments to narrow a diagnostic rerun. This is not a
+full-matrix pass. REST samples and server transfer evidence are retained even
+when a case fails. Tests check decoded layout, not merely `playing=true` in the
+POST response. Finite playback must subsequently report stopped/EOF.
+
+### HTTPS
+
+Use a hostname/certificate chain already trusted by the production ESP-IDF CA
+bundle and resolving to the test PC. Supply the leaf/chain PEM and private key
+to the local listener, or use a separately configured HTTPS origin with the
+same manifest and routes. Never commit keys, add a test CA to production, or
+disable certificate validation to obtain a passing result.
+
+```powershell
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --suite https --https-origin https://YOUR_TEST_HOST:8771 --tls-cert .build/tls/fullchain.pem --tls-key .build/tls/key.pem --output .build/c3-tests/https
+```
+
+Without `--https-origin`, each HTTPS case is **BLOCKED**, exit code 1. For the
+separate negative test use a newly generated, intentionally untrusted cert:
+
+```powershell
+python tools/audio_test_server/make_test_certificate.py --host PC_LAN_IP --output .build/untrusted-tls
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --suite tls-rejection --https-origin https://PC_LAN_IP:8771 --tls-cert .build/untrusted-tls/cert.pem --tls-key .build/untrusted-tls/key.pem --output .build/c3-tests/tls-rejection
+```
+
+The negative test also requires the local TLS listener to record a certificate
+rejection alert. An unreachable server alone cannot make this test pass.
+ESP-IDF's bundle callback can produce `TLSV1_ALERT_ACCESS_DENIED`; that alert
+is accepted only together with a fresh, sanitized serial message confirming
+certificate verification failure. Generic TLS errors or an empty bundle alone
+are insufficient. The test then requires successful HTTP playback recovery.
+
+For public radio HTTPS plus concurrent WebUI requests, use the separate runner:
+
+```powershell
+python tests/test-esp32c3-public-streams.py
+python tools/esp32c3_tests/public_streams.py --board http://BOARD_IP --serial-port COM9 --firmware firmware/development/esp32c3-tcp-pcb-pool-fixed/app.bin --seconds 60 --interval 0.1 --output .build/c3-tests/public-https
+```
+
+Install FFprobe on the PC and use an awake profiling image already on the board.
+The firmware path verifies image identity; this command does not flash it. The
+default manifest uses official public SomaFM AAC and MP3 HTTPS links. Before each
+case, FFprobe validates TLS and identifies the live codec/profile/rate/channels.
+The board must match the full decoded PCM layout, retain playback, answer REST
+requests within two seconds and publish matching WebSocket state. Existing CPU
+and heap budgets apply; serial panics, decoder/allocation errors, unexpected
+reboots and persistent idle heap loss fail the test. At exit it reboots to the
+saved station and compares Wi-Fi, playlist and settings in memory.
+
+Use `--case NAME` to select entries, `--interval 1` for a lighter polling run,
+`--transport http` for an explicit public-stream cleartext RAM/CPU comparison,
+or `--manifest PATH` with `sources` and `streams` fields as in
+[`public_streams.json`](../tools/esp32c3_tests/public_streams.json). Only put public,
+credential-free HTTPS URLs in that manifest: they are retained in the report.
+No broadcast audio, titles or private board settings are saved. Streams and
+their encoding may change; this short live-radio test does not replace the
+controlled HTTPS fixture matrix, PCM comparisons, physical listening or one-hour
+soaks. A server/probe failure remains a failed case, not a board playback pass.
+The [2026-10-01 physical results](ESP32C3_PUBLIC_HTTPS_20261001.md) retain LC/MP3
+passes and HE/v2 allocation failures under both HTTPS and HTTP load.
+The [dynamic TLS follow-up](ESP32C3_TLS_DYNAMIC_20261001.md) uses the same
+runner and records improved LC/MP3 free memory with continuing HE/v2 failures.
+TLS error logs are sanitized before retention and fail the playback check.
+
+### CPU, memory, switching and soak
+
+These require the no-sleep diagnostic image with USB logs and FreeRTOS runtime
+accounting. See [build instructions](../tools/codec_benchmark/cache/HARDWARE.md#full-radio-cpu-and-format-checks).
+The diagnostic image is separate from quiet production; run the file and OTA
+matrix on the production image as well. Save each test image under `firmware/`.
+
+```powershell
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --suite switch --cycles 3 --output .build/c3-tests/switch
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --suite load --output .build/c3-tests/cpu-aac
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --suite load --fixture-manifest .build/audio-60s/manifest.json --case mp3-48000-2ch-60s --case flac-48000-2ch-60s --case vorbis-48000-2ch-60s --case opus-48000-2ch-60s --output .build/c3-tests/cpu-other
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --suite soak --case lc-48000-stereo --soak-seconds 3600 --output .build/c3-tests/soak-lc
+```
+
+Repeat soak for `he-48000-stereo` and `hev2-44100-stereo`. For non-AAC one-hour
+soak generate a **single continuous file** at least 3,603 seconds long and pass
+its manifest/name; short fixtures are BLOCKED, not looped with invalid headers.
+
+As requested on 7 October, **CPU percentage is informational by default**:
+exceeding 85% alone is not a playback failure. The priority is uninterrupted
+audio, supported formats and absence of allocation failures. The physical
+runners record `cpu_budget_percent: null`; use `--max-cpu-busy 85` with `run.py`,
+`public_streams.py` or `pool_settle.py` only to reproduce the older headroom gate.
+Historical reports without the new field retain their original 85% replay
+criterion and original FAIL outcomes. This policy does not prove continuity
+from an average CPU or decoder-progress figure.
+
+Current acceptance budgets: free heap ≥8,192 bytes, largest
+block ≥4,096 bytes, decoded audio/wall time between 0.9 and 1.1, HTTP response
+<2 seconds. Switching permits ≤2,048 bytes of settled free-heap loss and
+≤4,096 bytes largest-block loss after the warm-up cycle, with no extra tasks.
+These are regression thresholds, not proof of a worst-case execution bound.
+At least three CPU and decoder windows are mandatory; quiet production cannot
+pass a CPU check by supplying no logs. Physical DMA underruns and audible
+quality require T14's capture, not inference from REST status.
+
+`stream_memory_study.py` runs a continuous paced AAC fixture with the same
+memory/progress checks and an optional RX-owner diagnostic image. It verifies
+the installed firmware hash, preserves settings, and atomically saves filtered
+performance/status checkpoints every 30 seconds. An active checkpoint is
+explicitly incomplete and is not an acceptance result. On normal completion,
+the final report records all gates, Stop recovery and reboot. For example:
+
+```text
+python tools/esp32c3_tests/stream_memory_study.py --board http://BOARD_IP --host PC_LAN_IP --serial-port COM9 --firmware firmware/development/esp32c3-output-first-rx-owner/app.bin --case hev2-44100-stereo --seconds 600 --output NEW_DIRECTORY
+python tools/esp32c3_tests/summarize_stream_memory.py NEW_DIRECTORY --output SUMMARY.json
+python tests/test-stream-memory-study.py
+python tests/test-stream-memory-summary.py
+```
+
+The default duration is 600 seconds (ten minutes), as requested on 7 October;
+`--seconds` can explicitly select a different duration.
+It does not satisfy the one-hour soak criterion. The summarizer requires a
+completed study, preserves original failures, checks RX snapshot completeness
+and time coverage, and corrects aged network snapshots by their recorded age.
+It reports actual RX allocation capacity separately from inferred allocator
+headers and logical TCP receive credit. These asynchronous measurements cannot
+be subtracted as if they were one simultaneous heap snapshot.
+
+A diagnostic run identifies memory owners; its timing does not qualify the
+uninstrumented firmware. It also does not replace physical audio continuity
+measurement.
+
+## OTA on the current production image
+
+The runner requires the supplied image's embedded ELF hash to match the app
+already running. This prevents accidentally testing a different build. It
+checks the C3 chip/project and app size before sending anything. Uploads use
+the same multipart contract as the browser.
+
+```powershell
+python tools/esp32c3_tests/ota.py --board http://BOARD_IP --firmware firmware/development/esp32c3-oled-native-production/app.bin --suite negative --suite roundtrip --suite slow --output .build/c3-tests/ota.json
+```
+
+For an upload during playback, start the shared server separately:
+
+```powershell
+python tools/esp32c3_tests/ota.py --board http://BOARD_IP --firmware firmware/development/esp32c3-oled-native-production/app.bin --suite while-playing --play-url http://PC_LAN_IP:8770/stream/lc-48000-stereo --output .build/c3-tests/ota-playing.json
+```
+
+The negative suite covers wrong chip/project, corruption, truncation, trailing
+bytes, missing multipart boundary, SPIFFS target, oversized request, disconnect
+and stalled sender. Positive cases verify the **other app slot and full ELF
+hash after boot**, not only HTTP 200. Wi-Fi/playlist bytes and exposed system,
+screen, timezone and control settings are compared in memory. Neither their
+contents nor credential hashes are saved. This is not a byte-for-byte NVS
+audit; for that use a private offline backup and partition comparison.
+
+## Wi-Fi timing and external interrupt tests
+
+Build otherwise identical diagnostic variants with Wi-Fi IRAM options on/off
+using `build.ps1` and separate configs. `build-production.ps1` enforces the
+RAM-saving options and is unsuitable for creating the baseline. Keep CPU/flash
+clocks, SDK/library, access point, RSSI and fixtures unchanged; record hashes.
+
+```powershell
+python tools/esp32c3_tests/run.py --board http://BOARD_IP --host PC_LAN_IP --suite boot-time --cycles 30 --sdkconfig PATH_TO_EXACT_CONFIG --output .build/c3-tests/boot-flash
+python tools/esp32c3_tests/compare_latency.py --kind boot --baseline .build/c3-tests/boot-iram/report.json --candidate .build/c3-tests/boot-flash/report.json --max-ratio 1.25 --budget 30000 --output .build/c3-tests/boot-comparison.json
+```
+
+T13 needs a signal generator/logic analyzer and a separately identified
+instrumented test build. Choose two unused pins from the actual board wiring;
+do not reuse audio, OLED, BOOT or crystal pins. Feed timed edges to a test input
+and toggle the output immediately on entry to the measured handler. Keep the
+handler's placement/priority equal between variants. Capture input-to-output
+latency during idle, playback/WebUI load and flash writes/OTA. Capture the
+**actual Wi-Fi handler path separately** if claiming Wi-Fi interrupt latency:
+a generic GPIO ISR only measures that ISR and system scheduling interference.
+
+For each condition export measured values (never invented zeros):
+
+```json
+{
+  "source": "external-edge-capture",
+  "unit": "us",
+  "firmware_sha256": "ACTUAL_IMAGE_HASH",
+  "probe_description": "Actual pins, instrument, handler, priority and workload",
+  "latency_us": []
+}
+```
+
+Supply ≥30 real values (prefer thousands), then compare with `--kind irq` and
+an application-specific `--budget` in microseconds. The parser rejects empty
+captures and missing provenance. Budget/ratio must be chosen before the A/B
+run. Without instrumentation this test is **NOT RUN**; QEMU and HTTP response
+times cannot certify interrupt deadlines or flash-disabled behavior.
+
+## Manual tests that cannot be replaced by host mocks
+
+### T14 — browser, OLED and physical output
+
+1. Open `/update.html` in an actual browser on the production board. Check the
+   firmware-only choice and board-specific filename guidance. Upload the
+   current app; verify progress, success, reconnect and changed app slot/hash.
+2. Try a wrong-board image, cancel a partial upload and interrupt connectivity.
+   Verify a readable error and working retry controls; the active app survives.
+3. Play each codec and the two AAC transition streams. Observe the whole OLED,
+   the browser format and current decoded rate/channels. There must be no stale
+   split screen or falsely reported HE/PS. Reconnect the browser while playing.
+4. Capture both audio channels through a suitable interface and the existing
+   output filter. Generated stereo tones use distinct L/R frequencies. Check
+   channel separation, duration and silent gaps during steady playback, rapid
+   Stop/Play, WebUI load and codec changes. Record scope/audio files, firmware
+   hash, settings and pass/fail; listening alone is not a bit-exact PCM test.
+
+### T15 — interrupted flash write / boot recovery
+
+Use a dedicated test board with a verified private backup and a working USB
+recovery path. Schedule controlled power interruption during early/middle/late
+app writes and around OTA activation. Restore power after each trial, query
+the running app hash/partition, check preserved settings and successful playback.
+Neither corrupted app activation nor boot loops pass. Save timing and flash
+layout. No power-cut test is run automatically by these scripts. Automatic
+first-boot rollback is currently not enabled, so a bootable crashing image is
+a separate recovery limitation, not an expected successful rollback case.
+
+### T16 — future decoder buffer reuse
+
+Before accepting implementation, run old/new decode paths against identical
+complete input and compare emitted PCM and persistent overlap/state after every
+frame. Exercise all four AAC window sequences, distinct L/R, two SCEs, every
+supported profile, reset, truncation, OOM and callback cancellation. Let the
+consumer overwrite released PCM blocks and retain in-flight DMA blocks to
+detect premature aliasing. Require identical results where bit-exact comparison
+applies, bounded lifetimes and lower **peak live** RAM, then run T02–T11 on the
+board. The current closed Espressif decoder exposes no internal overlap buffer;
+test that state through subsequent decoded output or a supported debug API.
+Do not create a fake internal-state test or mark this planned optimization done.
+
+## Results and limitations
+
+The [pipeline wait investigation](ESP32C3_PIPELINE_FLOW_20261006.md) measures
+empty compressed-input queues, full PCM queues, DMA waits and completion
+overruns on the physical C3. It includes a deliberate input-starvation control,
+profile-on/off builds and exact PCM checks; it preserves the original heap
+failure and does not change task scheduling or queue timeouts.
+
+The [output-priority comparison](ESP32C3_OUTPUT_PRIORITY_20261006.md) tests
+raising the direct-DMA output task from priority 6 to 8 above the decoder at 7.
+It combines matched instrumented LPC12/LPC32 captures with a profile-off
+seven-codec load, EOF, Stop/switch and OTA matrix. Original failed thresholds
+remain in the report. Use `tests/test-output-priority-matrix.py` for analysis
+boundary checks and `tests/test-output-priority-evidence.py` for retained data.
+
+### FLAC predictor and high-depth playback
+
+The [real-radio LPC study](ESP32C3_FLAC_RADIO_20261006.md) adds matched
+120-second, 24-bit FLAC recordings with maximum predictor orders 32 and 12.
+`capture_radio_flac.py` and the shared fixture server are board-independent;
+`radio_flac_study.py` measures the C3 with alternating pair order. Use
+`summarize_radio_flac.py` to separate predictor frequency, time-weighted CPU
+saturation, decoder-task CPU and elapsed decoder cost. It also retains actual
+audio/wall progress: a passed CPU gate alone does not prove gap-free output.
+Run `tests/test-radio-flac-study.py` for statistics checks and
+`tests/test-radio-flac-evidence.py` to replay the retained corpus measurements.
+
+The [LPC optimization report](ESP32C3_FLAC_PREDICTOR_20261006.md) compares exact
+PCM through segmented/contiguous/adapter paths, dense and sparse order-32
+predictors, and physical CPU measurements. Use `summarize_terminal_cpu.py` for
+short EOF diagnostics; it preserves the original verdict and does not replace
+the sustained load gate. `diagnostic.py` now retains task-watchdog headings as
+failures even when no register dump follows. The [depth report](ESP32C3_FLAC_DEPTHS_20261005.md)
+retains the earlier CPU saturation and large-block allocation failures.
+
+### AAC SBR layout regression
+
+`python tests/test-aac-sbr-layout.py` validates retained lossless allocation/PCM
+evidence and rejects missing measurements, false savings and failed cleanup.
+For executable RV32 tests, use the build and runner in the
+[SBR layout report](ESP32C3_AAC_SBR_LAYOUT_20261001.md). The variant tests eleven
+inputs, delayed PS, 21 lifecycle segments and two allocation failures. The
+[reset reproduction and repair](ESP32C3_AAC_RESET_20261001.md), checked by
+`python tests/test-aac-reset.py`, adds six formats and 24 native/repaired reset
+calls with byte-identical subsequent PCM. Wider streams and full-radio hardware
+acceptance remain separate gates.
+
+All automated suites return nonzero for FAIL or BLOCKED. Keep `report.json`,
+`status.json`, `performance.json`, fixture hashes and exact app/config identity
+together. Copy reviewable, sanitized results into `tests/results/` and retain
+private keys, credentials and flash backups only in ignored local directories.
+
+Known pre-existing failures: full-radio SBR allocation (HE/v2 core fallback)
+and implicit SBR introduction without changed ADTS configuration. See
+[hardware results](ESP32C3_CACHE_HARDWARE_20260930.md),
+[stream format results](ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md), and
+[the memory optimization plan](ESP32C3_MEMORY_STABILITY_TODO.md).
+
+Historical reports do not certify the newest binary. Record which of the
+above cases actually ran and passed for each hand-off image.
+
+## CPU diagnostics without a separate profiler stack
+
+For new public-stream reports, use
+`python tools/esp32c3_tests/summarize_public_windows.py --input <results> --output <summary.json>`.
+It clips every CPU window to the recorded station start/end. Short failed runs
+with fewer than four samples have no aggregate CPU value; samples from the next
+station cannot fill the gap. The older `summarize_public.py` remains available
+for historical reproduction and can overrun short failed playback windows.
+
+The [PC18 production-adapter report](ESP32C3_AAC_HIGH_ADAPTER_20261003.md)
+records the latest owner, QEMU task-interleaving, memory-failure, reset and
+physical-radio qualification. Run `tests/test-aac-high-adapter.py` for retained
+evidence/precision guards and `tests/test-public-window-summary.py` for window
+isolation. Neither passing QEMU nor a successful OTA upload certifies long-term
+HE-AAC playback on the complete radio.
+
+For tight C3 HE-AAC budgets, add `sdkconfig.cpu-profile-http.defaults` after
+`sdkconfig.cpu-profile.defaults`. This enables `CONFIG_YORADIO_CPU_PROFILE_HTTP`:
+the existing `/api/native/status` handler samples runtime counters at most once
+per five seconds, using the HTTP task's existing stack. It does not create the
+normal 4096-byte `cpu_profile` task. Runtime accounting and the small previous
+counter table still have overhead; this is not an uninstrumented production image.
+
+Poll status regularly using the physical `memory.py` or `run.py` suites. Without
+polling there are no periodic CPU samples. Preserve the exact config with the
+report, and check the HTTP task's stack high-water mark as well as decode/output
+tasks. Under `--suite switch`, use at least three cycles. Never label the CPU
+usage of reduced-rate AAC-core fallback as full HE/SBR performance.
+
+The [RAM profile report](ESP32C3_AAC_RADIO_RAM_20261001.md) includes the physical
+comparison and the distinction between elapsed decode-call time and total
+FreeRTOS CPU utilization.

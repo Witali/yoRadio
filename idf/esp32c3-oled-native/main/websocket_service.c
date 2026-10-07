@@ -36,11 +36,14 @@ typedef struct {
     uint32_t bitrate_kbps;
     uint32_t sample_rate_hz;
     uint8_t channels;
+    uint8_t bits_per_sample;
+    uint32_t pcm_sample_rate_hz;
+    uint8_t pcm_channels;
     uint16_t current_item;
     bool station_uppercase;
     char station[144];
     char title[192];
-    char codec[8];
+    char codec[16];
     char stream_format[48];
 } webui_status_key_t;
 
@@ -166,6 +169,9 @@ static void capture_status_key(webui_status_key_t *key) {
     key->bitrate_kbps = state.bitrate_kbps;
     key->sample_rate_hz = state.sample_rate_hz;
     key->channels = state.channels;
+    key->bits_per_sample = state.bits_per_sample;
+    key->pcm_sample_rate_hz = state.pcm_sample_rate_hz;
+    key->pcm_channels = state.pcm_channels;
     key->current_item = radio_control_current_item();
     key->station_uppercase = display_settings_get_station_uppercase();
     radio_control_current_name(key->station, sizeof(key->station));
@@ -210,7 +216,7 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
              "\"abuffmax\":%u,"
              "\"mp3decoder\":0,\"normalize\":%u,\"normgain\":%u,"
              "\"normtarget\":%d,\"normtime\":%u,\"telnet\":0,"
-             "\"watchdog\":%u}",
+             "\"watchdog\":%u,\"stationtimeout\":%u}",
              radio_control_smartstart_enabled() ? 1U : 0U,
              runtime_settings_get_audio_info() ? 1U : 0U,
              runtime_settings_get_softap_delay_min(), mdns, address,
@@ -220,7 +226,8 @@ static esp_err_t send_system_settings(httpd_req_t *request) {
              native_audio_settings_get_normalization_gain_db(),
              native_audio_settings_get_normalization_target_dbfs(),
              native_audio_settings_get_normalization_time_ms(),
-             runtime_settings_get_watchdog() ? 1U : 0U);
+             runtime_settings_get_watchdog() ? 1U : 0U,
+             runtime_settings_get_station_timeout_sec());
     return ws_send_request(request, settings);
 }
 
@@ -396,6 +403,17 @@ static void handle_command(httpd_req_t *request, char *command) {
     } else if (strcmp(command, "watchdog") == 0) {
         log_setting_error("Watchdog", runtime_settings_set_watchdog(
                                           strtoul(value, NULL, 10) != 0U));
+    } else if (strcmp(command, "stationtimeout") == 0) {
+        char *end;
+        unsigned long seconds = strtoul(value, &end, 10);
+        if (!value[0] || *end || seconds < RUNTIME_MIN_STATION_TIMEOUT_SEC ||
+            seconds > RUNTIME_MAX_STATION_TIMEOUT_SEC) {
+            ws_send_request(request,
+                "{\"commandError\":\"Station timeout must be 1 to 120 seconds.\"}");
+        } else {
+            log_setting_error("Station timeout",
+                runtime_settings_set_station_timeout_sec((uint8_t)seconds));
+        }
     } else if (strcmp(command, "mdnsname") == 0) {
         log_setting_error("mDNS", runtime_settings_set_mdns_name(value));
     } else if (strcmp(command, "reboot") == 0 ||

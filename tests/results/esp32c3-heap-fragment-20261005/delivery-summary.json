@@ -1,0 +1,85 @@
+{
+  "image": "6eea8a8f2f9039999f6873fdd7d0ab48e2c9d79179f208111a536a6fd91c99ab",
+  "cases": {
+    "stress-opus-48000-2ch-16bit-200s": {
+      "original_acceptance": {
+        "name": "cpu-under-http-load:stress-opus-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Incomplete CPU/heap evidence",
+        "seconds": 181.171
+      },
+      "maximum_http_ms": 140.00000001396984,
+      "minimum_rssi": -74,
+      "idle_after": {
+        "heap": 147872,
+        "largest": 114688,
+        "tasks": 17
+      },
+      "recovery_from_previous": {
+        "result": "PASS"
+      },
+      "recovery_from_first": {
+        "result": "PASS"
+      },
+      "observed_after_40_seconds": {
+        "cpu_windows": 27,
+        "decoder_windows": 28,
+        "mean_busy": 79.72222222222223,
+        "peak_busy": 80.5,
+        "audio_wall_ratio": 1.0016960989723636
+      },
+      "after_40_seconds": {
+        "result": "FAIL",
+        "reason": "Incomplete CPU/heap evidence"
+      }
+    }
+  },
+  "scope": "One paced sequence with per-case Stop; no reboot between codecs; not a 100-switch or 30-minute soak qualification",
+  "sender_runs": {
+    "rtc-sequence": [
+      {
+        "fixture": "stress-mp3-48000-2ch-16bit-200s",
+        "sent": 7311360,
+        "complete": false,
+        "pacing_ratio": 1.02,
+        "finished": true,
+        "dropped_windows": 0,
+        "windows": 180,
+        "recorded_bytes": 7311360,
+        "max_write_seconds": 0.14099999994505197,
+        "max_late_seconds": 1.1024130430305377
+      },
+      {
+        "fixture": "stress-vorbis-48000-2ch-16bit-200s",
+        "sent": 11524096,
+        "complete": false,
+        "pacing_ratio": 1.02,
+        "finished": true,
+        "dropped_windows": 0,
+        "windows": 180,
+        "recorded_bytes": 11524096,
+        "max_write_seconds": 0.0940000000409782,
+        "max_late_seconds": 2.026800423511304
+      }
+    ],
+    "opus-delivery": [
+      {
+        "fixture": "stress-opus-48000-2ch-16bit-200s",
+        "sent": 11649024,
+        "complete": false,
+        "pacing_ratio": 1.02,
+        "finished": true,
+        "dropped_windows": 0,
+        "windows": 180,
+        "recorded_bytes": 11649024,
+        "max_write_seconds": 0.10999999998603016,
+        "max_late_seconds": 1.9198138408828527
+      }
+    ]
+  }
+}

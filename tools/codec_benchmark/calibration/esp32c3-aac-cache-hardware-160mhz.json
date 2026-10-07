@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "esp32c3-aac-cache-hardware-160mhz-20260930",
+  "target": "esp32c3",
+  "cpu_hz": 160000000,
+  "scope": "Short stereo tone fixtures; isolated decoder, IRQs masked; same application image on board and QEMU; not whole-radio CPU or universal AAC factors",
+  "formula": "estimated decoder percent = instructions / PCM seconds / cpu_hz * 100 * factor",
+  "reference_cache_cost_included": true,
+  "add_full_cache_penalty": false,
+  "universal_refill_penalty_cycles": null,
+  "historical_lc_320_profile_replaced": false,
+  "report": "docs/ESP32C3_CACHE_HARDWARE_20260930.md",
+  "results": "tests/results/esp32c3-cache-hardware-20260930/summary.json",
+  "cases": {
+    "lc48000_stereo": {
+      "factor": 2.1818205182307553,
+      "cold_call_factor": 2.224667631712071,
+      "measured_decoder_cpu_percent": 16.708396935096157,
+      "cold_relative_slowdown_percent": 1.9638239315881134,
+      "sample_rate": 48000,
+      "channels": 2,
+      "qemu_instructions_per_pass": 6796226,
+      "pcm_samples_per_pass": 26624,
+      "windows": 24
+    },
+    "he48000_stereo": {
+      "factor": 1.8012169299374354,
+      "cold_call_factor": 1.8025339159188132,
+      "measured_decoder_cpu_percent": 34.55086751302083,
+      "cold_relative_slowdown_percent": 0.07311645585206758,
+      "sample_rate": 48000,
+      "channels": 2,
+      "qemu_instructions_per_pass": 19642325,
+      "pcm_samples_per_pass": 30720,
+      "windows": 24
+    },
+    "hev2_44100_stereo": {
+      "factor": 1.9553539113430065,
+      "cold_call_factor": 1.956738087691376,
+      "measured_decoder_cpu_percent": 44.58049368896485,
+      "cold_relative_slowdown_percent": 0.07078904439446329,
+      "sample_rate": 44100,
+      "channels": 2,
+      "qemu_instructions_per_pass": 25411020.333333332,
+      "pcm_samples_per_pass": 30720,
+      "windows": 24
+    }
+  }
+}

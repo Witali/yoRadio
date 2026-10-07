@@ -1,0 +1,123 @@
+{
+  "acceptance": [
+    {
+      "name": "cpu-under-http-load:lc-48000-stereo",
+      "result": "PASS",
+      "evidence": {
+        "duration": 40,
+        "status_samples": 228,
+        "max_http_ms": 108.99999993853271,
+        "mean_busy": 47.31666666666666,
+        "peak_busy": 48.7,
+        "minimum_heap": 76072.0,
+        "minimum_largest": 65536.0,
+        "audio_wall_ratio": 1.0016984713757617
+      },
+      "seconds": 41.156
+    },
+    {
+      "name": "cpu-under-http-load:he-48000-stereo",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "URLError"
+        },
+        {
+          "type": "TimeoutError"
+        }
+      ],
+      "reason": "URLError",
+      "seconds": 8.016
+    },
+    {
+      "name": "cpu-under-http-load:hev2-44100-stereo",
+      "result": "PASS",
+      "evidence": {
+        "duration": 40,
+        "status_samples": 219,
+        "max_http_ms": 140.00000001396984,
+        "mean_busy": 67.31666666666666,
+        "peak_busy": 68.0,
+        "minimum_heap": 42460.0,
+        "minimum_largest": 31744.0,
+        "audio_wall_ratio": 1.001364438084462
+      },
+      "seconds": 41.265
+    },
+    {
+      "name": "cpu-under-http-load:stress-mp3-48000-2ch-16bit-60s",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Progressive heap loss during continuous playback",
+      "seconds": 41.11
+    },
+    {
+      "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-60s",
+      "result": "PASS",
+      "evidence": {
+        "duration": 40,
+        "status_samples": 210,
+        "max_http_ms": 125.0,
+        "mean_busy": 68.33333333333333,
+        "peak_busy": 69.2,
+        "minimum_heap": 68244.0,
+        "minimum_largest": 53248.0,
+        "audio_wall_ratio": 1.0015422477440525
+      },
+      "seconds": 41.265
+    },
+    {
+      "name": "cpu-under-http-load:stress-vorbis-48000-2ch-16bit-60s",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Progressive heap loss during continuous playback",
+      "seconds": 41.281
+    },
+    {
+      "name": "cpu-under-http-load:stress-opus-48000-2ch-16bit-60s",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Progressive heap loss during continuous playback",
+      "seconds": 41.172
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "left_stopped": true
+      },
+      "seconds": 0.235
+    }
+  ],
+  "runtime_faults": [],
+  "minimum_stack_free": {
+    "httpd": 2888,
+    "display": 1684,
+    "IDLE": 1252,
+    "tcpip": 2640,
+    "radio_stream": 2544,
+    "audio_decode": 2664,
+    "audio_output": 1220,
+    "wifi_rssi": 1592,
+    "websocket_statu": 1900,
+    "time_sync": 1528,
+    "boot_button": 1496,
+    "esp_timer": 3544,
+    "wifi": 1616,
+    "sys_evt": 2080,
+    "web_static_0": 588,
+    "web_static_1": 448
+  }
+}

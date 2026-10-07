@@ -1,0 +1,46 @@
+{
+  "board": {
+    "version": "v0.9.693-1068-gfb64725c",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "fdcbb41da0bf8d41b67cb6d3795f9b921cfe8d6de06d7e2ffe150f4a67fd44ec"
+  },
+  "status": {
+    "firmware": "esp32c3-oled-native",
+    "network": "client",
+    "audio": true,
+    "format": "AAC PCM 44.1 kHz stereo",
+    "sample_rate": 44100,
+    "channels": 2,
+    "bits_per_sample": 16,
+    "pcm_sample_rate": 44100,
+    "pcm_channels": 2,
+    "format_is_pcm": true,
+    "channels_are_core": false,
+    "rssi": -74
+  },
+  "audio_buffer_blocks": 10,
+  "counts": {
+    "http": {
+      "FAIL": 6,
+      "PASS": 23
+    },
+    "eof": {
+      "PASS": 7
+    },
+    "ota-initial": {
+      "FAIL": 12,
+      "PASS": 3
+    },
+    "ota-retry": {
+      "PASS": 15
+    }
+  },
+  "firmware": "firmware/development/esp32c3-aac-buffers-quiet/app.bin",
+  "firmware_source_commit": "fb64725c",
+  "notes": [
+    "HE/v2 full-format failures remain; EOF success is separate.",
+    "Initial OTA network outage required USB watchdog reset; cause not established. Complete retry passed, original failure retained.",
+    "No trusted HTTPS matrix, one-hour full-format soak or physical acoustic/IRQ qualification."
+  ]
+}

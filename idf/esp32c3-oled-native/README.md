@@ -13,6 +13,56 @@ network, WebUI and audio pipeline sources were carried over from that target.
 
 ## Hardware profile
 
+### RAM policy for Wi-Fi and AAC
+
+The C3 defaults and `build-production.ps1` disable `CONFIG_ESP_WIFI_IRAM_OPT`
+and `CONFIG_ESP_WIFI_RX_IRAM_OPT`. The production wrapper also updates an
+existing sdkconfig, since ESP-IDF defaults alone do not replace saved choices.
+Frequently used Wi-Fi routines then execute from cached flash, freeing about
+19 KiB of internal RAM in the measured build. This resolved an AAC-LC allocation
+failure in the full radio; 48 kHz stereo playback used about 35% total CPU in
+the diagnostic LAN test. It trades peak Wi-Fi throughput and some cache-miss
+latency for heap space. Connection-time and worst-case interrupt-latency A/B
+measurements have not been performed.
+
+These are supported SDK placement options, not a manual relocation of every
+interrupt handler. The measured ELF keeps `wDev_ProcessFiq` in IRAM and `ppTask`
+in ROM; ordinary Wi-Fi receive/transmit functions move to flash. Do not infer
+that every networking callback remains cache-independent. See Espressif's
+[RAM guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32c3/api-guides/performance/ram-usage.html)
+and [interrupt allocation guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/system/intr_alloc.html).
+Use `build.ps1` with a separate sdkconfig to compare Wi-Fi IRAM settings.
+
+The default full-radio profile still needs a memory-layout fix: its 55,128-byte
+SBR allocation failed in the full radio and the codec silently output only
+the AAC core. Full-rate HE/v2 passed the isolated hardware decoder benchmark.
+See the [hardware measurements](../../docs/ESP32C3_CACHE_HARDWARE_20260930.md)
+and [remaining memory work](../../docs/ESP32C3_MEMORY_STABILITY_TODO.md).
+
+The optional [IRAM placement profiles](../../docs/ESP32C3_IRAM_REDUCTION_20261001.md)
+compare a 3584-byte conservative capacity saving with a 23392-byte saving using
+Flash Auto Suspend on the tested XMC-D chip. These use supported SDK placement
+options and retain all Flash APIs. Read the measured qualification limits before
+using the profiles; they are not applied by the production build wrapper.
+
+The [Wi-Fi buffer balance follow-up](../../docs/ESP32C3_WIFI_BUFFER_BALANCE_20261001.md)
+uses that headroom to test dynamic RX/TX limits of 16, retaining static RX=6
+and the unchanged native AAC decoder. The earlier six-buffer FLAC throughput
+failures and all subsequent qualification results remain recorded.
+That follow-up also found an `Illegal instruction` panic during OTA with the
+Auto Suspend placement profile. Keep that profile disabled pending diagnosis.
+
+### Acceptance tests
+
+The [testing guide](../../docs/ESP32C3_TESTING.md) lists missing coverage,
+executable HTTP/HTTPS, codec-switching, CPU/heap and OTA tests, plus procedures
+for physical audio, interrupt timing and power-cut recovery. Test outcomes are
+recorded separately as PASS, FAIL or BLOCKED. The
+[audio fixture server](../../tools/audio_test_server/README.md) is shared with
+ESP8266, CYD and other HTTP players; it contains no C3 control commands.
+
+### Connections and controls
+
 - ESP32-C3, one RISC-V core at 160 MHz, 4 MiB flash;
 - native USB Serial/JTAG console;
 - SSD1306 72x40 OLED at I2C address `0x3c`, SDA GPIO5, SCL GPIO6;
@@ -145,7 +195,7 @@ alternative implementation in this repository:
 | Codec | Implementations | Default |
 |---|---|---|
 | MP3 | Espressif, yoRadio Helix, yoRadio minimp3 | Espressif |
-| AAC | Espressif, yoRadio Helix AAC-LC | Helix |
+| AAC | Espressif with AAC Plus (SBR/PS), yoRadio Helix AAC core | Espressif + AAC Plus |
 | FLAC | optimized yoRadio FLAC, Espressif | yoRadio |
 
 The choices are under **yoRadio ESP32-C3 OLED** in `menuconfig`, and can also
@@ -156,6 +206,58 @@ no independent alternative for them. The yoRadio backends compile directly
 from the shared sources through a small ESP-IDF compatibility layer; Arduino
 Core is not linked. Backend alternatives are compile-time diagnostics and are
 not exposed as a WebUI setting.
+
+### AAC and current stream parameters
+
+Fresh builds enable `CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y` and
+`CONFIG_YORADIO_AAC_PLUS=y`. This reconstructs the HE-AAC high-frequency band
+and HE-AAC v2 stereo; HE-AAC is not capped at its 22.05/24 kHz core rate.
+The emulator tests actual 44.1/48 kHz PCM. AAC Plus uses more CPU and RAM;
+real-board playback margin with Wi-Fi still needs measurement.
+
+An existing `sdkconfig` keeps its saved decoder choice. To change it, run
+`./build.ps1 menuconfig` (PowerShell: `.\build.ps1 menuconfig`), select
+**yoRadio codec backends → AAC decoder → Espressif**, then enable
+**yoRadio ESP32-C3 OLED → Decode full HE-AAC SBR/PS with Espressif AAC**.
+Rebuild with the same build directory, SDK configuration and Deep Sleep options.
+Helix remains available as a smaller core-only alternative on C3.
+
+OLED and WebUI use the current confirmed format, including decimal kHz and
+mono/stereo. PCM rate/channels are tracked separately from source metadata;
+Stop and station changes clear stale parameters. OLED retains a snapshot only
+until its current scrolling line finishes. WebUI updates independently of bitrate.
+`GET /api/status` also exposes `sample_rate`, `channels`, `bits_per_sample`,
+`pcm_sample_rate`, `pcm_channels`, `format_is_pcm` and `channels_are_core`.
+
+The Espressif public API exposes decoded PCM. The ADTS adapter additionally reads
+the audited native core's SBR/PS flags to identify `HE-AAC` and `HE-AACv2`.
+The private ABI is protected by compiler layout assertions and the pinned library
+SHA-256. Source channels and PCM channels stay separate: HE-AAC mono can produce
+two identical PCM channels without Parametric Stereo. It is displayed as
+`HE-AAC 32 kHz mono`, with `pcm_channels=2`. Base/unknown profiles still report,
+for example, `AAC PCM 44.1 kHz stereo`, without inventing an AAC object type.
+See the [metadata regression results](../../docs/ESP32C3_AAC_METADATA_20261004.md).
+With Helix, `HE-AAC 44.1 kHz core mono` means SBR was detected but PS stereo was
+not confirmed; the actual PCM may still be 22.05 kHz mono.
+
+ADTS rate/channel/profile changes recreate the Espressif decoder at the frame
+boundary. **Unmodified SDK limitation:** introducing SBR/PS with an identical ADTS
+configuration after AAC-LC can leave core-only output until Stop/Play or a stream
+restart. The status then explicitly reports actual `AAC PCM` parameters.
+This case remains in the TODO; it is not hidden by doubling the displayed rate.
+See the [validation report](../../docs/ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md).
+
+The opt-in `sdkconfig.aac-pc19.defaults` qualification profile combines the
+compact SBR owner with `CONFIG_YORADIO_AAC_HIGH_HISTORY_PC19` and
+`CONFIG_YORADIO_AAC_LATE_SBR`. The first keeps 19-bit QMF mantissas with 144 bytes
+of extra per-decoder metadata. The second repairs late activation and retains
+SBR/PS through frames without extensions, preserving the AAC transform history.
+Both options work in the network firmware; QEMU test options remain separate.
+The shared implementation passed synthetic/recorded PCM tests within 3 LSB.
+Keep the existing 16 KiB decoder stack and the pinned AAC archive. This is an
+experimental physical-test profile; it does not change the board defaults.
+Before deployment, `tools/codec_benchmark/verify_aac_network_build.py` checks
+the actual linked calls, type sizes, image/ELF match and absence of QEMU hooks.
 
 Both native ESP-IDF profiles default to Espressif MP3. With the deterministic
 320 kbit/s fixture, the 160 MHz C3 measured 27.9% decoder time for Espressif

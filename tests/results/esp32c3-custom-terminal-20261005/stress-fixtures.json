@@ -1,0 +1,84 @@
+{
+  "generator": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "source_sha256": "147265557699effb6220d43faa8f9d069dbe6cd7b2202235463084f53566e8cc",
+  "source_filter": [
+    "anoisesrc=color=white:amplitude=0.34:sample_rate=48000:duration=200:seed=12345[nl]",
+    "anoisesrc=color=pink:amplitude=0.34:sample_rate=48000:duration=200:seed=67890[nr]",
+    "sine=frequency=997:sample_rate=48000:duration=200:beep_factor=2[tl]",
+    "sine=frequency=1601:sample_rate=48000:duration=200:beep_factor=2[tr]",
+    "[nl][tl]amix=inputs=2:weights='0.72 0.28':normalize=0[left]",
+    "[nr][tr]amix=inputs=2:weights='0.72 0.28':normalize=0[right]",
+    "[left][right]amerge=inputs=2,alimiter=limit=0.95[out]"
+  ],
+  "source_bits": 16,
+  "fixtures": [
+    {
+      "name": "stress-mp3-48000-2ch-16bit-200s",
+      "file": "stress-mp3-48000-2ch-16bit-200s.mp3",
+      "seconds": 200.04,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "mp3",
+      "mime": "audio/mpeg",
+      "profile": "mp3",
+      "sha256": "7cb0f5f80c392ac1b573c956313f1a186bf63ad1002c5fa22a147ee2a463bed8",
+      "bytes": 8001645,
+      "average_kbps": 320.00179964007197,
+      "encoder_options": [
+        "-c:a",
+        "libmp3lame",
+        "-b:a",
+        "320k",
+        "-write_xing",
+        "0"
+      ]
+    },
+    {
+      "name": "stress-vorbis-48000-2ch-16bit-200s",
+      "file": "stress-vorbis-48000-2ch-16bit-200s.ogg",
+      "seconds": 200.0,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "vorbis",
+      "mime": "audio/ogg",
+      "profile": "vorbis",
+      "sha256": "9f77eb12b7a702eb3212d1444d38e97f132dd810216c2c4eba66a8f622f4cbd0",
+      "bytes": 12677120,
+      "average_kbps": 507.0848,
+      "encoder_options": [
+        "-c:a",
+        "libvorbis",
+        "-q:a",
+        "10"
+      ]
+    },
+    {
+      "name": "stress-opus-48000-2ch-16bit-200s",
+      "file": "stress-opus-48000-2ch-16bit-200s.ogg",
+      "seconds": 200.0065,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "opus",
+      "mime": "audio/ogg",
+      "profile": "opus",
+      "sha256": "35a88fd7fc4b567791fb6cb8796955e7c2466dd07d49b07412f7d2b6a66d1159",
+      "bytes": 12817790,
+      "average_kbps": 512.694937414534,
+      "encoder_options": [
+        "-c:a",
+        "libopus",
+        "-b:a",
+        "510k",
+        "-vbr",
+        "off",
+        "-application",
+        "audio",
+        "-frame_duration",
+        "20"
+      ]
+    }
+  ]
+}

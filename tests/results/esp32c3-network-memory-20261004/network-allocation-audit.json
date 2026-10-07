@@ -1,0 +1,20 @@
+{
+  "source": "Local pinned ESP-IDF 6.0.2 tree",
+  "files_sha256": {
+    "components/lwip/port/include/lwipopts.h": "0fd3d876ff9a13c14186a15d617ae44ab9ef06b7701ae3ed84632dbaa2834043",
+    "components/lwip/lwip/src/core/memp.c": "db63141131ade8c4f5c78cd9a7f28b0ce1a5cc4ffff392a27d2df4b835820225",
+    "components/lwip/lwip/src/core/tcp.c": "982acb23f0c13de6b586e165b89439319bab9776e07cc0eaee970c753e853fe1"
+  },
+  "configuration": {
+    "CONFIG_LWIP_MAX_ACTIVE_TCP": 16,
+    "CONFIG_LWIP_TCP_MSL": 60000,
+    "CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM": 16,
+    "CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM": 16
+  },
+  "findings": [
+    "lwipopts.h selects MEMP_MEM_MALLOC=1, but Espressif memp.c still rejects a TCP PCB allocation when num_tcp_pcb reaches MEMP_NUM_TCP_PCB. The limit is 16 in this image.",
+    "tcp_alloc attempts to reclaim the oldest TIME_WAIT PCB after an allocation refusal. tcp_slowtmr expires TIME_WAIT after 2 * TCP_MSL.",
+    "These facts do not identify the observed fragmentation. The existing codec-only allocation trace excludes Wi-Fi, TCP, TLS and HTTP allocations."
+  ],
+  "next_measurement": "Trace bounded network allocation sizes/lifetimes or coherent heap and TCP counts during a long HE32 HTTP / HE64 HTTPS run; keep all current acceptance thresholds."
+}

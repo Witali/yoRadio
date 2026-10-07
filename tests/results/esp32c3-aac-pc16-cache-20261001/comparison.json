@@ -1,0 +1,113 @@
+{
+  "cache_payload_stack_bytes": 288,
+  "decode_function_frame_bytes": {
+    "without_cache": 128,
+    "with_cache": 448
+  },
+  "frame_note": "RV32 disassembly of aac_ps_pc16_decode, no per-write QEMU instrumentation; excludes callers/callees.",
+  "decision": "Retain opt-in experiment, default off: extra RAM and instruction work without PCM benefit.",
+  "cases": [
+    {
+      "name": "synthetic",
+      "without_cache": {
+        "case": "hev2_44100_stereo",
+        "variant": 1,
+        "name": "packed_pc16_ps_writes",
+        "coverage": "quantized",
+        "samples_per_run": 122880,
+        "max_pcm_error_lsb": 2,
+        "over_two_per_run": [
+          0,
+          0,
+          0
+        ],
+        "over_limit_per_run": [
+          0,
+          0,
+          0
+        ],
+        "instruction_overhead_median_percent": 32.387,
+        "instruction_overhead_range_percent": [
+          32.38,
+          32.393
+        ]
+      },
+      "with_cache": {
+        "case": "hev2_44100_stereo",
+        "variant": 1,
+        "name": "packed_pc16_ps_writes",
+        "coverage": "quantized",
+        "samples_per_run": 122880,
+        "max_pcm_error_lsb": 2,
+        "over_two_per_run": [
+          0,
+          0,
+          0
+        ],
+        "over_limit_per_run": [
+          0,
+          0,
+          0
+        ],
+        "instruction_overhead_median_percent": 50.359,
+        "instruction_overhead_range_percent": [
+          50.351,
+          50.367
+        ]
+      },
+      "extra_instructions_vs_pc16_percent": 13.575,
+      "cache_hit_percent": 68.299
+    },
+    {
+      "name": "abba64",
+      "without_cache": {
+        "case": "external",
+        "variant": 1,
+        "name": "packed_pc16_ps_writes",
+        "coverage": "quantized",
+        "samples_per_run": 2646016,
+        "max_pcm_error_lsb": 3,
+        "over_two_per_run": [
+          178,
+          178,
+          178
+        ],
+        "over_limit_per_run": [
+          0,
+          0,
+          0
+        ],
+        "instruction_overhead_median_percent": 42.733,
+        "instruction_overhead_range_percent": [
+          42.714,
+          42.752
+        ]
+      },
+      "with_cache": {
+        "case": "external",
+        "variant": 1,
+        "name": "packed_pc16_ps_writes",
+        "coverage": "quantized",
+        "samples_per_run": 2646016,
+        "max_pcm_error_lsb": 3,
+        "over_two_per_run": [
+          178,
+          178,
+          178
+        ],
+        "over_limit_per_run": [
+          0,
+          0,
+          0
+        ],
+        "instruction_overhead_median_percent": 60.266,
+        "instruction_overhead_range_percent": [
+          60.254,
+          60.278
+        ]
+      },
+      "extra_instructions_vs_pc16_percent": 12.284,
+      "cache_hit_percent": 70.096
+    }
+  ]
+}

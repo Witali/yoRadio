@@ -119,7 +119,7 @@ test('codec switching releases only an incompatible legacy arena', () => {
   assert.ok(officialOpen > officialStart);
   assert.match(
     audio.slice(officialStart, officialOpen),
-    /custom_legacy_decoder_discard_arena\(\)[\s\S]*realloc\(output/,
+    /custom_legacy_decoder_discard_arena\(\)[\s\S]*decoder_pcm_prepare\(&output/,
   );
 });
 

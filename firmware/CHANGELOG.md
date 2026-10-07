@@ -3,6 +3,80 @@
 Every released build is recorded here. Existing release directories and
 entries are retained; changes are published under a new firmware version.
 
+## Development - 2026-09-30: ESP32-C3 AAC buffer memory reduction
+
+- AAC caller PCM now starts at 8 KiB and shrinks a larger retained workspace at
+  a decoder boundary. Other codecs keep their capacity/growth behavior.
+- ADTS input grows to the validated frame size and reuses capacity, preserving
+  the full 8,191-byte frame limit, CRC, fragmented input and retry semantics.
+  The physical radio recovers roughly 12 KiB; no frequency/channel/profile cap
+  was added. Full-rate HE/v2 still fails its SBR allocation/format gate.
+- Retain `esp32c3-aac-buffers-radio` (diagnostics) and
+  `esp32c3-aac-buffers-quiet` (normal quiet configuration, no deep sleep), with
+  source/configuration/image identities. Host fault/sanitizer checks and real
+  QEMU PCM equivalence pass. Physical qualification is recorded in the report.
+- Quiet-image HTTP checks pass 16/16 MP3/FLAC/Vorbis/Opus/AAC-LC format cases,
+  five network-fault cases and WebSocket reconnect. Six HE/v2 format cases still
+  fail; their separate six EOF-status cases pass. Initial OTA loses network
+  after a truncated-image rejection and requires USB watchdog reset; retain
+  that failure. The independent complete retry passes all 15 OTA/restoration
+  checks with unchanged settings. The board is left on the quiet image.
+- Retain three heap-in-Flash experiments: `esp32c3-aac-heapflash-radio`,
+  `esp32c3-aac-heapflash-minimal`, and `esp32c3-aac-heapflash-minimal-usb`.
+  The middle image lacks a console and cannot supply RAM evidence. The last
+  repeats the maximum-buffer survey without profiling/trace arrays. Heap
+  placement saves another 9,072 bytes but remains disabled in board defaults.
+  Keep the failed HTTP-load check and HE/v2 cases; these images do not qualify
+  the complete AAC/SBR memory plan or a larger production arena.
+- [Implementation, memory budgets and remaining gates](../docs/ESP32C3_AAC_MEMORY_20260930.md#implementation-pcm-and-adts-buffers).
+
+## Development - 2026-09-30: ESP32-C3 AAC allocation baseline
+
+- Archive `esp32c3-aac-memory-trace-radio` from `8740af78`: DIO 80 MHz,
+  no deep sleep, CPU/heap diagnostics and the bounded codec allocation trace.
+- Installed through WebUI OTA; Wi-Fi, playlist and settings matched before/after.
+- Physical LC 48 kHz stereo passed. HE 48 kHz and HEv2 44.1 kHz failed full-rate
+  acceptance: both requested the 55,128-byte SBR object with only about 33 KiB
+  total heap and 11,776 bytes in the largest block. Retain these failures as
+  the baseline, not a qualified production update.
+- [Allocation evidence](../tests/results/esp32c3-aac-allocations-20260930/radio-baseline/report.json).
+
+## Development - 2026-09-30: ESP32-C3 terminal status after EOF
+
+- Fix the race that left playback active after a finite HE-AAC or other audio
+  file ended. Completion now follows decoder output through the PCM queue;
+  late metadata cannot turn a finished stream back into a playing stream.
+- Add deterministic ordering/error/cancellation tests, a separate physical
+  EOF matrix and complete-file FFmpeg/FDK reference checks for six AAC fixtures.
+  The AAC parsing, profiles, sample rates and known SBR memory limit are unchanged.
+- Archive `esp32c3-oled-native-{dio80,qio80}-eof` builds from `69410cd5`, with
+  their matching bootloaders/configurations. Update
+  `development/esp32c3-oled-native-production/` with the same DIO application
+  and a clean recovery image containing no saved NVS/SPIFFS data.
+- The physical DIO EOF matrix passed all 22 cases. QIO passed 21 initially;
+  the case interrupted by an HTTP observation failure passed on a separate
+  repeat. Keep both attempts. These are terminal-status tests, not full-rate
+  HE-AAC acceptance; the complete radio still falls back to the AAC core.
+- All 15 exact-image DIO OTA/restoration checks passed. Both flash modes passed
+  network-fault and WebSocket checks; DIO Stop/Play replacement also passed.
+  The board resumed the saved station with unchanged Wi-Fi/playlist/settings.
+- DIO 80 MHz remains the default, with deep sleep disabled in these images.
+  [Cause, reference sources and validation](../docs/ESP32C3_EOF_STATUS.md).
+
+## Development - 2026-09-30: ESP32-C3 Quad flash qualification
+
+- Archive standalone `esp32c3-flash-{dio80,qio40,qio80}-test` images and
+  matching bootloaders/configurations. Actual SPI0 mode/clock, 96 complete
+  image CRC passes and 432 AAC decoder windows passed on the physical C3.
+- Archive full-radio `esp32c3-oled-native-qio80-candidate` and matched
+  `esp32c3-oled-native-{dio80,qio80}-profile` builds from `6c3da5e9`.
+  All disable deep sleep; profiling variants retain CPU/heap diagnostics.
+- Keep normal production at DIO 80 MHz: the full-radio QIO acceptance gate
+  did not pass. Retain failed network/load/format results as well as passes;
+  no causal relationship between RSSI and flash mode was established.
+- [Standalone flash results](../docs/ESP32C3_FLASH_QUAD_20260930.md) and
+  [full-radio acceptance](../docs/ESP32C3_QIO80_ACCEPTANCE_20260930.md).
+
 ## Development - 2026-09-30: ESP32-C3 prebuilt installation files
 
 - Add `esp32c3-oled-native-installation` with a shared native bootloader,

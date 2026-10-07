@@ -1,0 +1,83 @@
+
+idf\esp32c3-oled-native\build-constants-audit\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4202a6e2 <sbr_open>:
+4202a6e2:	7179                	addi	sp,sp,-48
+4202a6e4:	6799                	lui	a5,0x6
+4202a6e6:	d226                	sw	s1,36(sp)
+4202a6e8:	dc078793          	addi	a5,a5,-576 # 5dc0 <CSR_UINTSTATUS+0x510f>
+4202a6ec:	64b5                	lui	s1,0xd
+4202a6ee:	ce4e                	sw	s3,28(sp)
+4202a6f0:	cc52                	sw	s4,24(sp)
+4202a6f2:	00a7a7b3          	slt	a5,a5,a0
+4202a6f6:	98048493          	addi	s1,s1,-1664 # c980 <CSR_UINTSTATUS+0xbccf>
+4202a6fa:	3c116a37          	lui	s4,0x3c116
+4202a6fe:	6999                	lui	s3,0x6
+4202a700:	d422                	sw	s0,40(sp)
+4202a702:	d04a                	sw	s2,32(sp)
+4202a704:	ca56                	sw	s5,20(sp)
+4202a706:	c85a                	sw	s6,16(sp)
+4202a708:	c65e                	sw	s7,12(sp)
+4202a70a:	c462                	sw	s8,8(sp)
+4202a70c:	c266                	sw	s9,4(sp)
+4202a70e:	d606                	sw	ra,44(sp)
+4202a710:	8aaa                	mv	s5,a0
+4202a712:	8b32                	mv	s6,a2
+4202a714:	00f6ecb3          	or	s9,a3,a5
+4202a718:	8bae                	mv	s7,a1
+4202a71a:	94b2                	add	s1,s1,a2
+4202a71c:	8432                	mv	s0,a2
+4202a71e:	f34a0a13          	addi	s4,s4,-204 # 3c115f34 <samp_rate_info>
+4202a722:	4c098993          	addi	s3,s3,1216 # 64c0 <CSR_UINTSTATUS+0x580f>
+4202a726:	3c116c37          	lui	s8,0x3c116
+4202a72a:	4905                	li	s2,1
+4202a72c:	6619                	lui	a2,0x6
+4202a72e:	4c060613          	addi	a2,a2,1216 # 64c0 <CSR_UINTSTATUS+0x580f>
+4202a732:	4581                	li	a1,0
+4202a734:	8522                	mv	a0,s0
+4202a736:	fdfd6097          	auipc	ra,0xfdfd6
+4202a73a:	c1e080e7          	jalr	-994(ra) # 40000354 <memset>
+4202a73e:	ef4c0793          	addi	a5,s8,-268 # 3c115ef4 <defaultHeader>
+4202a742:	0c840713          	addi	a4,s0,200
+4202a746:	4388                	lw	a0,0(a5)
+4202a748:	43cc                	lw	a1,4(a5)
+4202a74a:	4790                	lw	a2,8(a5)
+4202a74c:	47d4                	lw	a3,12(a5)
+4202a74e:	c308                	sw	a0,0(a4)
+4202a750:	c34c                	sw	a1,4(a4)
+4202a752:	c710                	sw	a2,8(a4)
+4202a754:	c754                	sw	a3,12(a4)
+4202a756:	07c1                	addi	a5,a5,16
+4202a758:	0741                	addi	a4,a4,16
+4202a75a:	ff4796e3          	bne	a5,s4,4202a746 <sbr_open+0x64>
+4202a75e:	020c9f63          	bnez	s9,4202a79c <sbr_open+0xba>
+4202a762:	0d4b2583          	lw	a1,212(s6)
+4202a766:	00840693          	addi	a3,s0,8
+4202a76a:	865e                	mv	a2,s7
+4202a76c:	8556                	mv	a0,s5
+4202a76e:	11c1b0ef          	jal	4204588a <init_sbr_dec>
+4202a772:	c008                	sw	a0,0(s0)
+4202a774:	01242223          	sw	s2,4(s0)
+4202a778:	71242a23          	sw	s2,1812(s0)
+4202a77c:	944e                	add	s0,s0,s3
+4202a77e:	fa9417e3          	bne	s0,s1,4202a72c <sbr_open+0x4a>
+4202a782:	50b2                	lw	ra,44(sp)
+4202a784:	5422                	lw	s0,40(sp)
+4202a786:	5492                	lw	s1,36(sp)
+4202a788:	5902                	lw	s2,32(sp)
+4202a78a:	49f2                	lw	s3,28(sp)
+4202a78c:	4a62                	lw	s4,24(sp)
+4202a78e:	4ad2                	lw	s5,20(sp)
+4202a790:	4b42                	lw	s6,16(sp)
+4202a792:	4bb2                	lw	s7,12(sp)
+4202a794:	4c22                	lw	s8,8(sp)
+4202a796:	4c92                	lw	s9,4(sp)
+4202a798:	6145                	addi	sp,sp,48
+4202a79a:	8082                	ret
+4202a79c:	0d242a23          	sw	s2,212(s0)
+4202a7a0:	b7c9                	j	4202a762 <sbr_open+0x80>

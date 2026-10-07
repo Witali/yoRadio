@@ -1,0 +1,176 @@
+ESP-ROM:esp32c3-api1-20210207
+Build:Feb  7 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fcd5830,len:0x155c
+load:0x403cbf10,len:0xce0
+load:0x403ce710,len:0x2fcc
+entry 0x403cbf1a
+I (0) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (0) boot: compile time Oct  1 2026 12:28:48
+I (0) boot: chip revision: v0.3
+I (0) boot: efuse block revision: v1.3
+I (0) boot.esp32c3: SPI Speed      : 80MHz
+I (0) boot.esp32c3: SPI Mode       : SLOW READ
+I (0) boot.esp32c3: SPI Flash Size : 4MB
+I (0) boot: Enabling RNG early entropy source...
+I (0) boot: Partition Table:
+I (0) boot: ## Label            Usage          Type ST Offset   Length
+I (0) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (0) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (0) boot:  2 app0             OTA app          00 10 00010000 001d0000
+I (0) boot:  3 app1             OTA app          00 11 001e0000 001d0000
+I (0) boot:  4 spiffs           Unknown data     01 82 003b0000 00040000
+I (0) boot:  5 coredump         Unknown data     01 03 003f0000 00010000
+I (0) boot: End of partition table
+I (0) boot: No factory image, trying OTA 0
+I (0) esp_image: segment 0: paddr=00010020 vaddr=3c040020 size=20ba8h (134056) map
+I (2) esp_image: segment 1: paddr=00030bd0 vaddr=3fc8a400 size=019d4h (  6612) load
+I (2) esp_image: segment 2: paddr=000325ac vaddr=40380000 size=0a3a0h ( 41888) load
+I (2) esp_image: segment 3: paddr=0003c954 vaddr=50000000 size=00024h (    36) load
+I (3) esp_image: segment 4: paddr=0003c980 vaddr=00000000 size=03698h ( 13976) 
+I (3) esp_image: segment 5: paddr=00040020 vaddr=42000020 size=3dee4h (253668) map
+I (6) boot: Loaded app from partition at offset 0x10000
+I (6) boot: Set actual ota_seq=1 in otadata[0]
+I (6) boot: Disabling RNG early entropy source...
+I (6) cpu_start: Unicore app
+I (14) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
+I (14) cpu_start: Pro cpu start user code
+I (14) cpu_start: cpu freq: 160000000 Hz
+I (14) app_init: Application information:
+I (14) app_init: Project name:     yoradio_esp32c3_oled_native
+I (14) app_init: App version:      v0.9.693-1089-g982ac7fd-dirty
+I (14) app_init: Compile time:     Oct  1 2026 12:38:45
+I (14) app_init: ELF file SHA256:  74d59b4b4...
+I (14) app_init: ESP-IDF:          v6.0.2
+I (14) efuse_init: Min chip rev:     v0.3
+I (14) efuse_init: Max chip rev:     v1.99 
+I (14) efuse_init: Chip rev:         v0.3
+I (14) heap_init: Initializing. RAM available for dynamic allocation:
+I (14) heap_init: At 3FC8D1D0 len 00032E30 (203 KiB): RAM
+I (14) heap_init: At 3FCC0000 len 0001C710 (113 KiB): Retention RAM
+I (14) heap_init: At 3FCDC710 len 00002950 (10 KiB): Retention RAM
+I (14) heap_init: At 50000024 len 00001FC4 (7 KiB): RTCRAM
+I (14) spi_flash: detected chip: gd
+I (14) spi_flash: flash io: dio
+I (14) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (14) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (14) main_task: Started on CPU0
+I (14) main_task: Calling app_main()
+I (14) yoradio_c3: Starting pure ESP-IDF ESP32-C3 OLED yoRadio
+I (14) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (14) runtime_settings: Restored aif=0 softap=0 abuff=10 watchdog=1 tz=0:00 timeint=60 vols=1 enca=200
+W (14) yoradio_c3: QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO disabled
+I (14) oled: SSD1306 72x40 ready at I2C 0x3c
+I (14) audio_output: QEMU stereo PCM ready at 48000 Hz
+I (14) main_task: Returned from app_main()
+I (114) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (115) yoradio_c3: QEMU_AUDIO_PASS 24000 stereo frames
+I (117) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (476) qemu_aac: QEMU_AAC_CASE_PASS HE44 first: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186620 min 186620
+I (1035) qemu_aac: QEMU_AAC_CASE_PASS LC44 stereo: 44100 Hz 2 ch, 24 frames, 24576 samples, free 243140 min 186620
+I (1035) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (1635) qemu_aac: QEMU_AAC_CASE_PASS LC22 mono: 22050 Hz 1 ch, 13 frames, 13312 samples, free 243012 min 186620
+I (1635) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (2195) qemu_aac: QEMU_AAC_CASE_PASS LC48 stereo: 48000 Hz 2 ch, 26 frames, 26624 samples, free 243012 min 186620
+I (2196) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (2845) qemu_aac: QEMU_AAC_CASE_PASS HE44 stereo: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186492 min 186492
+I (2846) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (3485) qemu_aac: QEMU_AAC_CASE_PASS HE48 stereo: 48000 Hz 2 ch, 15 frames, 30720 samples, free 186492 min 186492
+I (3486) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (4175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 stereo: 44100 Hz 2 ch, 15 frames, 30720 samples, free 186492 min 186492
+I (4175) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (4785) qemu_aac: QEMU_AAC_CASE_PASS LC22 same header: 22050 Hz 1 ch, 13 frames, 13312 samples, free 243012 min 186492
+I (5475) qemu_aac: QEMU_AAC_CASE_PASS Implicit SBR core: 22050 Hz 1 ch, 15 frames, 15360 samples, free 243012 min 186492
+W (5475) qemu_aac: QEMU_AAC_LIMITATION implicit SBR/PS change needs stream restart
+I (5476) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (6175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 restart: 44100 Hz 2 ch, 15 frames, 30720 samples, free 187004 min 186492
+I (6810) aac_compare: SBRLAYOUT_LIFECYCLE_PASS trial=0 allocation_failure=0 PCM=exact cleanup=complete
+Disable AAC-Plus for memory not enough, decode continue
+Disable AAC-Plus for memory not enough, decode continue
+I (6814) aac_compare: SBRLAYOUT_LIFECYCLE_PASS trial=1 allocation_failure=55128 PCM=exact cleanup=complete
+Disable AAC-Plus for memory not enough, decode continue
+Disable AAC-Plus for memory not enough, decode continue
+I (6818) aac_compare: SBRLAYOUT_LIFECYCLE_PASS trial=2 allocation_failure=1180 PCM=exact cleanup=complete
+I (6818) aac_compare: SBRLAYOUT_LIFECYCLE_COMPLETE samples=1102848 segments=21 failure_paths=2
+I (6818) aac_compare: SBRLAYOUT_COUNTER_PASS nop1024=1025
+I (6818) aac_compare: SBRLAYOUT_LIMIT development=5 production=2
+I (6818) sbr_layout: SBRLAYOUT_LAYOUT_PASS native DSP; PS=37812..41348 owner=51596
+I (6818) aac_compare: SBRLAYOUT_ENV codec=v2.6.0-4-gfd141ab control=0 runs=3 repeats=2 baseline=wrap-bypass RAM_saved=0
+I (6855) sbr_layout: SBRLAYOUT_MEMORY case=lc44100_stereo variant=7 run=1 calls=0 ps_reads=0 allocations=0 frees=0 reference=0 candidate=0 physical_reference=0 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (6855) aac_compare: SBRLAYOUT_RESULT case=lc44100_stereo variant=7 run=1 samples=98304 frames=48 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=12462732 packed_work=12456042 ref_max_call=385505 packed_max_call=385004 precision=PASS
+I (6892) sbr_layout: SBRLAYOUT_MEMORY case=lc44100_stereo variant=7 run=2 calls=0 ps_reads=0 allocations=0 frees=0 reference=0 candidate=0 physical_reference=0 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (6892) aac_compare: SBRLAYOUT_RESULT case=lc44100_stereo variant=7 run=2 samples=98304 frames=48 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=12455541 packed_work=12462732 ref_max_call=385004 packed_max_call=385505 precision=PASS
+I (6929) sbr_layout: SBRLAYOUT_MEMORY case=lc44100_stereo variant=7 run=3 calls=0 ps_reads=0 allocations=0 frees=0 reference=0 candidate=0 physical_reference=0 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (6929) aac_compare: SBRLAYOUT_RESULT case=lc44100_stereo variant=7 run=3 samples=98304 frames=48 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=12462732 packed_work=12455541 ref_max_call=385505 packed_max_call=385004 precision=PASS
+I (6949) sbr_layout: SBRLAYOUT_MEMORY case=lc22050_mono variant=7 run=1 calls=0 ps_reads=0 allocations=0 frees=0 reference=0 candidate=0 physical_reference=0 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (6949) aac_compare: SBRLAYOUT_RESULT case=lc22050_mono variant=7 run=1 samples=26624 frames=26 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=4040251 packed_work=3991216 ref_max_call=278573 packed_max_call=277535 precision=PASS
+I (6969) sbr_layout: SBRLAYOUT_MEMORY case=lc22050_mono variant=7 run=2 calls=0 ps_reads=0 allocations=0 frees=0 reference=0 candidate=0 physical_reference=0 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (6969) aac_compare: SBRLAYOUT_RESULT case=lc22050_mono variant=7 run=2 samples=26624 frames=26 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=3991216 packed_work=4040251 ref_max_call=277535 packed_max_call=278573 precision=PASS
+I (6989) sbr_layout: SBRLAYOUT_MEMORY case=lc22050_mono variant=7 run=3 calls=0 ps_reads=0 allocations=0 frees=0 reference=0 candidate=0 physical_reference=0 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (6989) aac_compare: SBRLAYOUT_RESULT case=lc22050_mono variant=7 run=3 samples=26624 frames=26 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=4040251 packed_work=3991216 ref_max_call=278573 packed_max_call=277535 precision=PASS
+I (7026) sbr_layout: SBRLAYOUT_MEMORY case=lc48000_stereo variant=7 run=1 calls=0 ps_reads=0 allocations=0 frees=0 reference=0 candidate=0 physical_reference=0 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7026) aac_compare: SBRLAYOUT_RESULT case=lc48000_stereo variant=7 run=1 samples=106496 frames=52 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=13425682 packed_work=13419493 ref_max_call=367189 packed_max_call=366688 precision=PASS
+I (7063) sbr_layout: SBRLAYOUT_MEMORY case=lc48000_stereo variant=7 run=2 calls=0 ps_reads=0 allocations=0 frees=0 reference=0 candidate=0 physical_reference=0 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7063) aac_compare: SBRLAYOUT_RESULT case=lc48000_stereo variant=7 run=2 samples=106496 frames=52 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=13419493 packed_work=13425682 ref_max_call=366688 packed_max_call=367189 precision=PASS
+I (7100) sbr_layout: SBRLAYOUT_MEMORY case=lc48000_stereo variant=7 run=3 calls=0 ps_reads=0 allocations=0 frees=0 reference=0 candidate=0 physical_reference=0 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7100) aac_compare: SBRLAYOUT_RESULT case=lc48000_stereo variant=7 run=3 samples=106496 frames=52 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=13425682 packed_work=13419493 ref_max_call=367189 packed_max_call=366688 precision=PASS
+I (7186) sbr_layout: SBRLAYOUT_MEMORY case=he44100_stereo variant=7 run=1 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7186) aac_compare: SBRLAYOUT_RESULT case=he44100_stereo variant=7 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997853 packed_work=36884880 ref_max_call=1751765 packed_max_call=1748025 precision=PASS
+I (7272) sbr_layout: SBRLAYOUT_MEMORY case=he44100_stereo variant=7 run=2 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7272) aac_compare: SBRLAYOUT_RESULT case=he44100_stereo variant=7 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36884879 packed_work=36997851 ref_max_call=1748025 packed_max_call=1751764 precision=PASS
+I (7358) sbr_layout: SBRLAYOUT_MEMORY case=he44100_stereo variant=7 run=3 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7358) aac_compare: SBRLAYOUT_RESULT case=he44100_stereo variant=7 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997851 packed_work=36884879 ref_max_call=1751764 packed_max_call=1748025 precision=PASS
+I (7444) sbr_layout: SBRLAYOUT_MEMORY case=he44100_stereo variant=1 run=1 calls=28 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=51596 physical_reference=55296 physical_candidate=53248 static_test_state=144 guard_bytes=32
+I (7444) aac_compare: SBRLAYOUT_RESULT case=he44100_stereo variant=1 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=28 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997851 packed_work=36888463 ref_max_call=1751764 packed_max_call=1746884 precision=PASS
+I (7530) sbr_layout: SBRLAYOUT_MEMORY case=he44100_stereo variant=1 run=2 calls=28 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=51596 physical_reference=55296 physical_candidate=53248 static_test_state=144 guard_bytes=32
+I (7530) aac_compare: SBRLAYOUT_RESULT case=he44100_stereo variant=1 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=28 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36884879 packed_work=37001435 ref_max_call=1748025 packed_max_call=1750623 precision=PASS
+I (7616) sbr_layout: SBRLAYOUT_MEMORY case=he44100_stereo variant=1 run=3 calls=28 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=51596 physical_reference=55296 physical_candidate=53248 static_test_state=144 guard_bytes=32
+I (7616) aac_compare: SBRLAYOUT_RESULT case=he44100_stereo variant=1 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=28 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997851 packed_work=36888463 ref_max_call=1751764 packed_max_call=1746884 precision=PASS
+I (7702) sbr_layout: SBRLAYOUT_MEMORY case=he44100_stereo variant=0 run=1 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7702) aac_compare: SBRLAYOUT_RESULT case=he44100_stereo variant=0 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997851 packed_work=36884879 ref_max_call=1751764 packed_max_call=1748025 precision=PASS
+I (7788) sbr_layout: SBRLAYOUT_MEMORY case=he44100_stereo variant=0 run=2 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7788) aac_compare: SBRLAYOUT_RESULT case=he44100_stereo variant=0 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36884879 packed_work=36997851 ref_max_call=1748025 packed_max_call=1751764 precision=PASS
+I (7874) sbr_layout: SBRLAYOUT_MEMORY case=he44100_stereo variant=0 run=3 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7874) aac_compare: SBRLAYOUT_RESULT case=he44100_stereo variant=0 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997851 packed_work=36884879 ref_max_call=1751764 packed_max_call=1748025 precision=PASS
+I (7969) sbr_layout: SBRLAYOUT_MEMORY case=he48000_stereo variant=7 run=1 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (7969) aac_compare: SBRLAYOUT_RESULT case=he48000_stereo variant=7 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037796 packed_work=39909230 ref_max_call=1755363 packed_max_call=1751624 precision=PASS
+I (8064) sbr_layout: SBRLAYOUT_MEMORY case=he48000_stereo variant=7 run=2 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (8064) aac_compare: SBRLAYOUT_RESULT case=he48000_stereo variant=7 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=39909230 packed_work=40037796 ref_max_call=1751624 packed_max_call=1755363 precision=PASS
+I (8159) sbr_layout: SBRLAYOUT_MEMORY case=he48000_stereo variant=7 run=3 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (8159) aac_compare: SBRLAYOUT_RESULT case=he48000_stereo variant=7 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037796 packed_work=39909230 ref_max_call=1755363 packed_max_call=1751624 precision=PASS
+I (8254) sbr_layout: SBRLAYOUT_MEMORY case=he48000_stereo variant=1 run=1 calls=30 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=51596 physical_reference=55296 physical_candidate=53248 static_test_state=144 guard_bytes=32
+I (8254) aac_compare: SBRLAYOUT_RESULT case=he48000_stereo variant=1 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037796 packed_work=39913164 ref_max_call=1755363 packed_max_call=1750483 precision=PASS
+I (8349) sbr_layout: SBRLAYOUT_MEMORY case=he48000_stereo variant=1 run=2 calls=30 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=51596 physical_reference=55296 physical_candidate=53248 static_test_state=144 guard_bytes=32
+I (8349) aac_compare: SBRLAYOUT_RESULT case=he48000_stereo variant=1 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=0 max_shift=0 ref_work=39909230 packed_work=40041730 ref_max_call=1751624 packed_max_call=1754222 precision=PASS
+I (8444) sbr_layout: SBRLAYOUT_MEMORY case=he48000_stereo variant=1 run=3 calls=30 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=51596 physical_reference=55296 physical_candidate=53248 static_test_state=144 guard_bytes=32
+I (8444) aac_compare: SBRLAYOUT_RESULT case=he48000_stereo variant=1 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037796 packed_work=39913164 ref_max_call=1755363 packed_max_call=1750483 precision=PASS
+I (8539) sbr_layout: SBRLAYOUT_MEMORY case=he48000_stereo variant=0 run=1 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (8539) aac_compare: SBRLAYOUT_RESULT case=he48000_stereo variant=0 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037796 packed_work=39909230 ref_max_call=1755363 packed_max_call=1751624 precision=PASS
+I (8634) sbr_layout: SBRLAYOUT_MEMORY case=he48000_stereo variant=0 run=2 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (8634) aac_compare: SBRLAYOUT_RESULT case=he48000_stereo variant=0 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=39909230 packed_work=40037796 ref_max_call=1751624 packed_max_call=1755363 precision=PASS
+I (8729) sbr_layout: SBRLAYOUT_MEMORY case=he48000_stereo variant=0 run=3 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (8729) aac_compare: SBRLAYOUT_RESULT case=he48000_stereo variant=0 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037796 packed_work=39909230 ref_max_call=1755363 packed_max_call=1751624 precision=PASS
+I (8839) sbr_layout: SBRLAYOUT_MEMORY case=hev2_44100_stereo variant=7 run=1 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (8839) aac_compare: SBRLAYOUT_RESULT case=hev2_44100_stereo variant=7 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50822056 packed_work=50815574 ref_max_call=1843721 packed_max_call=1843217 precision=PASS
+I (8949) sbr_layout: SBRLAYOUT_MEMORY case=hev2_44100_stereo variant=7 run=2 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (8949) aac_compare: SBRLAYOUT_RESULT case=hev2_44100_stereo variant=7 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50815574 packed_work=50822056 ref_max_call=1843217 packed_max_call=1843721 precision=PASS
+I (9059) sbr_layout: SBRLAYOUT_MEMORY case=hev2_44100_stereo variant=7 run=3 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (9059) aac_compare: SBRLAYOUT_RESULT case=hev2_44100_stereo variant=7 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50822056 packed_work=50815574 ref_max_call=1843721 packed_max_call=1843217 precision=PASS
+I (9169) sbr_layout: SBRLAYOUT_MEMORY case=hev2_44100_stereo variant=1 run=1 calls=30 ps_reads=30 allocations=2 frees=0 reference=55128 candidate=51596 physical_reference=55296 physical_candidate=53248 static_test_state=144 guard_bytes=32
+I (9169) aac_compare: SBRLAYOUT_RESULT case=hev2_44100_stereo variant=1 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50822056 packed_work=50821590 ref_max_call=1843721 packed_max_call=1843413 precision=PASS
+I (9279) sbr_layout: SBRLAYOUT_MEMORY case=hev2_44100_stereo variant=1 run=2 calls=30 ps_reads=30 allocations=2 frees=0 reference=55128 candidate=51596 physical_reference=55296 physical_candidate=53248 static_test_state=144 guard_bytes=32
+I (9279) aac_compare: SBRLAYOUT_RESULT case=hev2_44100_stereo variant=1 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50815574 packed_work=50828072 ref_max_call=1843217 packed_max_call=1843917 precision=PASS
+I (9389) sbr_layout: SBRLAYOUT_MEMORY case=hev2_44100_stereo variant=1 run=3 calls=30 ps_reads=30 allocations=2 frees=0 reference=55128 candidate=51596 physical_reference=55296 physical_candidate=53248 static_test_state=144 guard_bytes=32
+I (9389) aac_compare: SBRLAYOUT_RESULT case=hev2_44100_stereo variant=1 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50822056 packed_work=50821590 ref_max_call=1843721 packed_max_call=1843413 precision=PASS
+I (9499) sbr_layout: SBRLAYOUT_MEMORY case=hev2_44100_stereo variant=0 run=1 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (9499) aac_compare: SBRLAYOUT_RESULT case=hev2_44100_stereo variant=0 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50822056 packed_work=50815574 ref_max_call=1843721 packed_max_call=1843217 precision=PASS
+I (9609) sbr_layout: SBRLAYOUT_MEMORY case=hev2_44100_stereo variant=0 run=2 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (9609) aac_compare: SBRLAYOUT_RESULT case=hev2_44100_stereo variant=0 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50815574 packed_work=50822056 ref_max_call=1843217 packed_max_call=1843721 precision=PASS
+I (9719) sbr_layout: SBRLAYOUT_MEMORY case=hev2_44100_stereo variant=0 run=3 calls=0 ps_reads=0 allocations=2 frees=0 reference=55128 candidate=0 physical_reference=55296 physical_candidate=0 static_test_state=144 guard_bytes=32
+I (9719) aac_compare: SBRLAYOUT_RESULT case=hev2_44100_stereo variant=0 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50822056 packed_work=50815574 ref_max_call=1843721 packed_max_call=1843217 precision=PASS
+I (9719) aac_compare: SBRLAYOUT_EXPERIMENT_COMPLETE inspect precision per case; no production approval
+I (9719) qemu_aac: QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes
+I (9719) yoradio_c3: QEMU_OLED_PASS 72x40 framebuffer presented
+I (9719) yoradio_c3: QEMU_SMOKE_PASS OLED, audio, NVS, SPIFFS and FreeRTOS; free heap: 305228 bytes

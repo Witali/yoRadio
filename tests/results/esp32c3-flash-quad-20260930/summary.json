@@ -1,0 +1,111 @@
+{
+  "target": "esp32c3",
+  "cpu_hz": 160000000,
+  "deep_sleep": false,
+  "whole_radio_tested": false,
+  "power_cycle_tested": false,
+  "variants": {
+    "dio80": {
+      "boots": 2,
+      "app_sha256": "a25f18daa8603f2434094a5ce11a056161427a959e1000ead5f761380f4d3d75",
+      "image_bytes": 376464,
+      "crc32": "0x983a3c9f",
+      "registers": {
+        "configured": "dio",
+        "configured_mhz": "80m",
+        "ctrl": "0x00ac2008",
+        "clock": "0x80000000",
+        "source_mhz": "80",
+        "divider": "1",
+        "actual_mhz": "80",
+        "jedec": "0x464016",
+        "physical_bytes": "4194304"
+      },
+      "read_passes": 32,
+      "read_bytes": 12046848,
+      "cases": {
+        "lc48000_stereo": {
+          "windows": 24,
+          "decoder_cpu_pct": 16.710558143028848
+        },
+        "he48000_stereo": {
+          "windows": 24,
+          "decoder_cpu_pct": 34.606820638020835
+        },
+        "hev2_44100_stereo": {
+          "windows": 24,
+          "decoder_cpu_pct": 42.77454401855469
+        }
+      },
+      "cold_256_line_cycles": 83245
+    },
+    "qio40": {
+      "boots": 2,
+      "app_sha256": "9fb41916dbfce4353592465ae5a41f903d3b5c08754eafcd42c1daae184ab455",
+      "image_bytes": 376464,
+      "crc32": "0x19d37350",
+      "registers": {
+        "configured": "dio",
+        "configured_mhz": "40m",
+        "ctrl": "0x012c2008",
+        "clock": "0x00010001",
+        "source_mhz": "80",
+        "divider": "2",
+        "actual_mhz": "40",
+        "jedec": "0x464016",
+        "physical_bytes": "4194304"
+      },
+      "read_passes": 32,
+      "read_bytes": 12046848,
+      "cases": {
+        "lc48000_stereo": {
+          "windows": 24,
+          "decoder_cpu_pct": 17.423239558293268
+        },
+        "he48000_stereo": {
+          "windows": 24,
+          "decoder_cpu_pct": 35.56796256510416
+        },
+        "hev2_44100_stereo": {
+          "windows": 24,
+          "decoder_cpu_pct": 43.95739995117188
+        }
+      },
+      "cold_256_line_cycles": 91949
+    },
+    "qio80": {
+      "boots": 2,
+      "app_sha256": "0395a9d1697961d87c5f7bb554521253cb18eb4bd1b60de80b6163cfc7eaec5e",
+      "image_bytes": 376464,
+      "crc32": "0x9c7fd1e4",
+      "registers": {
+        "configured": "dio",
+        "configured_mhz": "80m",
+        "ctrl": "0x012c2008",
+        "clock": "0x80000000",
+        "source_mhz": "80",
+        "divider": "1",
+        "actual_mhz": "80",
+        "jedec": "0x464016",
+        "physical_bytes": "4194304"
+      },
+      "read_passes": 32,
+      "read_bytes": 12046848,
+      "cases": {
+        "lc48000_stereo": {
+          "windows": 24,
+          "decoder_cpu_pct": 14.283372145432692
+        },
+        "he48000_stereo": {
+          "windows": 24,
+          "decoder_cpu_pct": 31.197980143229163
+        },
+        "hev2_44100_stereo": {
+          "windows": 24,
+          "decoder_cpu_pct": 38.56565815429688
+        }
+      },
+      "cold_256_line_cycles": 48541
+    }
+  }
+}

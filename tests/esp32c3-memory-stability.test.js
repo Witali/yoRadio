@@ -37,7 +37,9 @@ test("ESP32-C3 reuses stream workspaces and logs fragmentation headroom", () => 
   assert.doesNotMatch(defaults, /^CONFIG_MBEDTLS_DYNAMIC_BUFFER=y$/m);
   assert.match(audio, /static char s_icy_metadata\[ICY_METADATA_MAX \+ 1\]/);
   assert.doesNotMatch(audio, /malloc\(ICY_METADATA_MAX \+ 1\)/);
-  assert.match(audio, /if \(output_size < DECODE_BUFFER_INITIAL\)/);
+  // Capacity, resizing and OOM semantics execute in the host C test; this
+  // check verifies that the full pipeline calls that tested helper.
+  assert.match(audio, /decoder_pcm_prepare\(&output, &output_size,\s*codec == NATIVE_CODEC_AAC\)/);
   assert.match(audio, /heap_caps_get_largest_free_block\(MALLOC_CAP_8BIT\)/);
   assert.match(audio, /heap_caps_get_minimum_free_size\(MALLOC_CAP_8BIT\)/);
   assert.match(audio, /uxTaskGetStackHighWaterMark\(NULL\)/);

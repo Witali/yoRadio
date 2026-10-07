@@ -1,0 +1,104 @@
+{
+  "date": "2026-09-30",
+  "base_revision": "3903c058",
+  "source_state": "working tree additions: allocation-failure profiler and Wi-Fi flash placement; artifact hashes identify tested binaries",
+  "target": "ESP32-C3 SuperMini OLED rev0.4, 160 MHz, embedded XMC 4 MB flash, DIO80",
+  "idf": "6.0.2",
+  "gcc": "15.2.0_20251204",
+  "codec_package": "2.6.2",
+  "deep_sleep": false,
+  "external_32k_crystal": false,
+  "wifi_iram_opt": false,
+  "wifi_rx_iram_opt": false,
+  "baseline": {
+    "wifi_iram_opt": true,
+    "wifi_rx_iram_opt": true,
+    "app_retained": false,
+    "result": "AAC initialization failed; 12288-byte request, 14848 free, 7680 largest"
+  },
+  "diagnostic_elf_sha256": "bbcc7b942b9ef6e165ef152e14ae67fdbbd56d16b36395c09ae49535eb289d10",
+  "production_elf_sha256": "b0f5c3a1e55bc3b309f6f56f197b7d40bf0d3b4c1c1196de9b2c8288b72832f3",
+  "production_version": "v0.9.693-1049-g3903c058-dirty",
+  "production_check": {
+    "duration_seconds": 25,
+    "stable_status_samples": 13,
+    "pcm_rate": 48000,
+    "channels": 2,
+    "cpu_profile_enabled": false,
+    "installed_via": "WebUI OTA",
+    "normal_station_resumed_after_reset": true
+  },
+  "results": {
+    "lc_48k_stereo": "pass",
+    "he_48k_stereo": "fail: SBR allocation, core fallback",
+    "hev2_44100_stereo": "fail: SBR allocation, core fallback",
+    "full_rate_in_stream_changes": "not passed"
+  },
+  "reused_production_sdkconfig_check": "both Wi-Fi IRAM options set to y, build-production.ps1 reconfigure restored both to disabled",
+  "files": {
+    "tests/results/esp32c3-radio-hardware-20260930/baseline-failure/radio-perf.json": {
+      "bytes": 3562,
+      "sha256": "15fd4a9381e262f30b38cc07c7df6db42ef0b516d859fba24af7c519412aa12d"
+    },
+    "tests/results/esp32c3-radio-hardware-20260930/baseline-failure/radio-status.json": {
+      "bytes": 7601,
+      "sha256": "cbd678dab82ecaf697765c042ee46736005554db7cc10bea404303025a336d78"
+    },
+    "tests/results/esp32c3-radio-hardware-20260930/production-check/radio-status.json": {
+      "bytes": 7233,
+      "sha256": "dca38c7d31933b4b4cde54cfe4cf9f5b1b2c5e81ab3dae74e00f133c68a5feee"
+    },
+    "tests/results/esp32c3-radio-hardware-20260930/wifi-flash/radio-perf.json": {
+      "bytes": 23434,
+      "sha256": "a90ebdffae9a288717073d19948420a9f4ed6f12a4376d5fe058f5df49e76083"
+    },
+    "tests/results/esp32c3-radio-hardware-20260930/wifi-flash/radio-status.json": {
+      "bytes": 38484,
+      "sha256": "91e68c7896a8b60e201517c6916f4a5e01d65df9712a467b777215bff5cf6b26"
+    },
+    "tests/results/esp32c3-radio-hardware-20260930/wifi-flash/radio-summary.json": {
+      "bytes": 966,
+      "sha256": "96609bbcb20b4de73d5b9e08af8e21a1064573374609a0725ea2b08dffa17744"
+    },
+    "tests/results/esp32c3-radio-hardware-20260930/diagnostic.sdkconfig": {
+      "bytes": 82174,
+      "sha256": "d0b9997f0e6a63ac1f91dfe5febe4c49ec74c497dfd61068fe5fef6b5191a4d6"
+    },
+    "tests/results/esp32c3-radio-hardware-20260930/production.sdkconfig": {
+      "bytes": 81969,
+      "sha256": "cc532fb21983e616a32624a32160921b30fed776e63066d7277dce5a3317a4f2"
+    },
+    "firmware/development/esp32c3-oled-native-production/app.bin": {
+      "bytes": 1392688,
+      "sha256": "4374ece3e0613d96003a9635c28be21964994d81a11857e785e016403e704c6c"
+    },
+    "firmware/development/esp32c3-oled-native-production/full.bin": {
+      "bytes": 4194304,
+      "sha256": "0813a12430420e8fe8802068c3632f922aa4fc4fd389a0feba59c3ce9f0ff7dc"
+    },
+    "firmware/development/esp32c3-oled-radio-profile/app.bin": {
+      "bytes": 1539376,
+      "sha256": "0f58b80256cc2d4dd10405b2b9b38765f09ffb3288f869802b99b8d69ad893d4"
+    },
+    "idf/esp32c3-oled-native/main/cpu_profiler.c": {
+      "bytes": 6201,
+      "sha256": "0f0c9203311b7b26ae6ae1da29608182957beb5222763832126ee8df3204398a"
+    },
+    "idf/esp32c3-oled-native/main/native_aac_decoder.c": {
+      "bytes": 4820,
+      "sha256": "203bf47dc38f7b36003c53605c3dda7fa6e64a8db08de4fa936297e31555be22"
+    },
+    "idf/esp32c3-oled-native/main/audio_service.c": {
+      "bytes": 64387,
+      "sha256": "bde52cfc7b514d03cbdd0618e5e42c71f63b2025c601699ceacd33227a22792e"
+    },
+    "tools/codec_benchmark/cache/profile_radio.py": {
+      "bytes": 5469,
+      "sha256": "89ad9ffbe919e9685ee97a2edb1eddbcac21021a5a25058115ad12df15b5d2fd"
+    },
+    "tools/codec_benchmark/cache/analyze_radio.py": {
+      "bytes": 4741,
+      "sha256": "dd66d6f8137a6b54a4a2179a1b6f3e857454b55cf52a0ec1dc9f461f7101ffb6"
+    }
+  }
+}

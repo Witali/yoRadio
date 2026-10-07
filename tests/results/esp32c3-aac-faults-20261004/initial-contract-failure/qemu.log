@@ -1,0 +1,136 @@
+ESP-ROM:esp32c3-api1-20210207
+Build:Feb  7 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fcd5830,len:0x155c
+load:0x403cbf10,len:0xce0
+load:0x403ce710,len:0x2fcc
+entry 0x403cbf1a
+I (0) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (0) boot: compile time Oct  4 2026 15:30:48
+I (0) boot: chip revision: v0.3
+I (0) boot: efuse block revision: v1.3
+I (0) boot.esp32c3: SPI Speed      : 80MHz
+I (0) boot.esp32c3: SPI Mode       : SLOW READ
+I (0) boot.esp32c3: SPI Flash Size : 4MB
+I (0) boot: Enabling RNG early entropy source...
+I (0) boot: Partition Table:
+I (0) boot: ## Label            Usage          Type ST Offset   Length
+I (0) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (0) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (0) boot:  2 app0             OTA app          00 10 00010000 001d0000
+I (0) boot:  3 app1             OTA app          00 11 001e0000 001d0000
+I (0) boot:  4 spiffs           Unknown data     01 82 003b0000 00040000
+I (0) boot:  5 coredump         Unknown data     01 03 003f0000 00010000
+I (0) boot: End of partition table
+I (0) boot: No factory image, trying OTA 0
+I (0) esp_image: segment 0: paddr=00010020 vaddr=3c050020 size=2d018h (184344) map
+I (2) esp_image: segment 1: paddr=0003d040 vaddr=3fc8a800 size=01abch (  6844) load
+I (2) esp_image: segment 2: paddr=0003eb04 vaddr=40380000 size=01514h (  5396) load
+I (3) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=4bb5ch (310108) map
+I (6) esp_image: segment 4: paddr=0008bb84 vaddr=40381514 size=09168h ( 37224) load
+I (7) esp_image: segment 5: paddr=00094cf4 vaddr=50000000 size=00024h (    36) load
+I (7) boot: Loaded app from partition at offset 0x10000
+I (7) boot: Set actual ota_seq=1 in otadata[0]
+I (7) boot: Disabling RNG early entropy source...
+I (7) cpu_start: Unicore app
+I (15) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
+I (15) cpu_start: Pro cpu start user code
+I (15) cpu_start: cpu freq: 160000000 Hz
+I (15) app_init: Application information:
+I (15) app_init: Project name:     yoradio_esp32c3_oled_native
+I (15) app_init: App version:      v0.9.693-1166-g5c36a1fd-dirty
+I (15) app_init: Compile time:     Oct  4 2026 15:30:20
+I (15) app_init: ELF file SHA256:  ee828c235...
+I (15) app_init: ESP-IDF:          v6.0.2
+I (15) efuse_init: Min chip rev:     v0.3
+I (15) efuse_init: Max chip rev:     v1.99 
+I (15) efuse_init: Chip rev:         v0.3
+I (15) heap_init: Initializing. RAM available for dynamic allocation:
+I (15) heap_init: At 3FC8DBD0 len 00032430 (201 KiB): RAM
+I (15) heap_init: At 3FCC0000 len 0001C710 (113 KiB): Retention RAM
+I (15) heap_init: At 3FCDC710 len 00002950 (10 KiB): Retention RAM
+I (15) heap_init: At 50000024 len 00001FC4 (7 KiB): RTCRAM
+I (15) spi_flash: detected chip: gd
+I (15) spi_flash: flash io: dio
+I (15) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (15) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (15) main_task: Started on CPU0
+I (15) main_task: Calling app_main()
+I (15) yoradio_c3: Starting pure ESP-IDF ESP32-C3 OLED yoRadio
+I (15) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (15) runtime_settings: Restored aif=0 softap=0 abuff=10 watchdog=1 tz=0:00 timeint=60 vols=1 enca=200
+W (15) yoradio_c3: QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO disabled
+I (15) oled: SSD1306 72x40 ready at I2C 0x3c
+I (15) audio_output: QEMU stereo PCM ready at 48000 Hz
+I (15) main_task: Returned from app_main()
+I (115) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (116) yoradio_c3: QEMU_AUDIO_PASS 24000 stereo frames
+AAC_FAULT_BEGIN kind=late_oom parity=1 allocation=owner
+Disable AAC-Plus for memory not enough, decode continue
+AAC_LATE_OOM_PASS parity=1 allocation=owner suppressed_pcm=1 recovery_frames=15
+AAC_FAULT_BEGIN kind=late_oom parity=1 allocation=control
+Disable AAC-Plus for memory not enough, decode continue
+AAC_LATE_OOM_PASS parity=1 allocation=control suppressed_pcm=1 recovery_frames=15
+AAC_FAULT_BEGIN kind=late_oom parity=0 allocation=owner
+Disable AAC-Plus for memory not enough, decode continue
+AAC_LATE_OOM_PASS parity=0 allocation=owner suppressed_pcm=1 recovery_frames=15
+AAC_FAULT_BEGIN kind=late_oom parity=0 allocation=control
+Disable AAC-Plus for memory not enough, decode continue
+AAC_LATE_OOM_PASS parity=0 allocation=control suppressed_pcm=1 recovery_frames=15
+AAC_FAULT_BEGIN kind=malformed case=header_only
+E (323) ESP_AAC_DEC: Failed to decode aac frame, error:20.
+
+assert failed: decode qemu_aac_faults.c:57 (!expected_error && frames)
+Core  0 register dump:
+MEPC    : 0x40384eae  RA      : 0x40384e72  SP      : 0x3fc97bc0  GP      : 0x3fc8b000  
+TP      : 0x3fc98250  T0      : 0x37363534  T1      : 0x7271706f  T2      : 0x33323130  
+S0/FP   : 0x00000081  S1      : 0x00000001  A0      : 0x3fc97c08  A1      : 0x3fc8be51  
+A2      : 0x00000001  A3      : 0x3fc8e000  A4      : 0x00000001  A5      : 0x3fc8e000  
+A6      : 0x00000018  A7      : 0x76757473  S2      : 0x3fc97c08  S3      : 0x3fc97c16  
+S4      : 0x3fc8be50  S5      : 0x3fc97c08  S6      : 0x42011676  S7      : 0x3fc8fc0c  
+S8      : 0x0000001f  S9      : 0x3c0575cc  S10     : 0x00000000  S11     : 0x00000000  
+T3      : 0x6e6d6c6b  T4      : 0x6a696867  T5      : 0x66656463  T6      : 0x62613938  
+MSTATUS : 0x00001880  MTVEC   : 0x40380001  MCAUSE  : 0x00000002  MTVAL   : 0x00000000  
+MHARTID : 0x00000000  
+
+Stack memory:
+3fc97bc0: 0x3fc97d0c 0x3fc8fd60 0x3c06133c 0x4038478c 0x3f003735 0x3fc8fd60 0x00000000 0x00000000
+3fc97be0: 0x3c000000 0x3fc8be34 0x3c06133c 0x3fc8be44 0x3c057274 0x3fc8be48 0x3fc97bd0 0x3fc8be4c
+3fc97c00: 0x3c057250 0x3fc8be50 0x65737361 0x66207472 0x656c6961 0x64203a64 0x646f6365 0x65712065
+3fc97c20: 0x615f756d 0x665f6361 0x746c7561 0x3a632e73 0x28203735 0x70786521 0x65746365 0x72655f64
+3fc97c40: 0x20726f72 0x66202626 0x656d6172 0x42002973 0x0000000b 0x3fc915dc 0x00000000 0x00000000
+3fc97c60: 0x0000000a 0x20434141 0x3fc97ca4 0x42016232 0x3fc8fc1e 0x00000007 0x3fc97cac 0x3fc8fc28
+3fc97c80: 0x00000171 0x00000000 0x00000007 0x4201bba0 0x000011b0 0x3fc8fcd8 0x3fc8dc3c 0x3fc8fbfc
+3fc97ca0: 0x00000010 0x0000bb80 0x01001001 0x3fc8fc1e 0x00000007 0x00000000 0x00000007 0x00000000
+3fc97cc0: 0x00000000 0x3c0575cc 0x0000001f 0x3fc8fc0c 0x00002000 0x3c06bdfa 0x00000007 0x3fc9a6f4
+3fc97ce0: 0x3c06bdfa 0x000000a5 0x3fc986f4 0x42011676 0x00000006 0x3fc8e000 0xffffffff 0x00000000
+3fc97d00: 0x00001080 0x00001800 0x000000cc 0x3fc986f4 0x00002000 0x00000000 0x00000000 0x3c06bdef
+3fc97d20: 0x3c06b30c 0x3fc8cea0 0x000000cc 0x3c06bdf3 0x00000007 0x00000000 0x00000007 0x00000000
+3fc97d40: 0x00000004 0x3fc986e4 0x3fc97d80 0x00000000 0x00000000 0x3c0575cc 0x3fc8fc0c 0x3c057530
+3fc97d60: 0x00000004 0x3fc986e4 0x3c066775 0x3c06bdef 0x3c06b30c 0x3fc8cea0 0x3fc97d80 0x42011a46
+3fc97d80: 0x3c0575cc 0x3c06bdf3 0x3c06bdfa 0x3c0575d8 0x3c06bdfe 0x3c06be0c 0x3c0575e8 0x3c06be10
+3fc97da0: 0x3c06beca 0x3c0575fc 0x3c06bece 0x3c06bf87 0x00000000 0x00000000 0x00000000 0x00000000
+3fc97dc0: 0x00000000 0x00000000 0x094f2095 0x00001770 0x00005e00 0x3fc8cea0 0x3fc8d010 0x4200d77c
+3fc97de0: 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x094f2095 0x00001770
+3fc97e00: 0x00005e00 0x3c055000 0x3fc8d000 0x4200ae7a 0x107e107e 0x115c115c 0x123a123a 0x13181318
+3fc97e20: 0x13f713f7 0x14d514d5 0x15b315b3 0x16911691 0x17701770 0x16961696 0x15bc15bc 0x14e214e2
+3fc97e40: 0x14081408 0x132e132e 0x12531253 0x11791179 0x109f109f 0x0fc50fc5 0x0eeb0eeb 0x0e100e10
+3fc97e60: 0x0d360d36 0x0c5c0c5c 0x0b820b82 0x0aa80aa8 0x09ce09ce 0x08f308f3 0x08190819 0x073f073f
+3fc97e80: 0x06650665 0x058b058b 0x04b004b0 0x03d603d6 0x02fc02fc 0x02220222 0x01480148 0x006e006e
+3fc97ea0: 0xff93ff93 0xfeb9feb9 0xfddffddf 0xfd05fd05 0xfc2bfc2b 0xfb50fb50 0xfa76fa76 0xf99cf99c
+3fc97ec0: 0xf8c2f8c2 0xf7e8f7e8 0xf70ef70e 0xf633f633 0xf559f559 0xf47ff47f 0xf3a5f3a5 0xf2cbf2cb
+3fc97ee0: 0xf1f0f1f0 0xf116f116 0xf03cf03c 0xef62ef62 0xee88ee88 0xedaeedae 0xecd3ecd3 0xebf9ebf9
+3fc97f00: 0xeb1feb1f 0xea45ea45 0xe96be96b 0xe890e890 0xe96ee96e 0xea4cea4c 0xeb2aeb2a 0xec08ec08
+3fc97f20: 0xece7ece7 0xedc5edc5 0xeea3eea3 0xef81ef81 0xf060f060 0xf13ef13e 0xf21cf21c 0xf2faf2fa
+3fc97f40: 0xf3d8f3d8 0xf4b7f4b7 0xf595f595 0xf673f673 0xf751f751 0xf830f830 0xf90ef90e 0xf9ecf9ec
+3fc97f60: 0xfacafaca 0xfba8fba8 0xfc87fc87 0xfd65fd65 0xfe43fe43 0xff21ff21 0x00000000 0x00de00de
+3fc97f80: 0x01bc01bc 0x029a029a 0x03780378 0x04570457 0x05350535 0x06130613 0x06f106f1 0x07d007d0
+3fc97fa0: 0x08ae08ae 0x098c098c 0x0a6a0a6a 0x0b480b48 0x0c270c27 0x0d050d05 0x0de30de3 0x0ec10ec1
+
+
+
+ELF file SHA256: ee828c235
+
+Rebooting...

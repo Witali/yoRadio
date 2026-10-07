@@ -1,0 +1,551 @@
+{
+  "board": {
+    "version": "v0.9.693-1141-gfd1b52fa-dirty",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "5d50355632d03b0e9b5cb280bae8f334a69a3c670317a2a591c0297e92918f6b"
+  },
+  "cases": [
+    {
+      "name": "groovesalad-128-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-128-aac",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "LC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "AAC PCM"
+            },
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 253,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 0.6099999999860302,
+          "status_samples": 339,
+          "max_http_ms": 109.99999998603016,
+          "p95_http_ms": 94.0000000409782,
+          "median_http_ms": 77.9999999795109,
+          "mean_busy": 49.87777777777778,
+          "peak_busy": 50.3,
+          "minimum_heap": 62888.0,
+          "minimum_largest": 49152.0,
+          "audio_wall_ratio": 1.0015310877379844
+        },
+        "seconds": 62.516
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "AAC PCM 44.1 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 547854.656,
+          "busy": 49.3,
+          "decode": 20.3,
+          "heap": 68364,
+          "largest": 51200
+        },
+        {
+          "at": 547859.656,
+          "busy": 49.9,
+          "decode": 20.5,
+          "heap": 64592,
+          "largest": 55296
+        },
+        {
+          "at": 547864.796,
+          "busy": 49.7,
+          "decode": 20.6,
+          "heap": 66460,
+          "largest": 51200
+        },
+        {
+          "at": 547869.953,
+          "busy": 49.9,
+          "decode": 20.5,
+          "heap": 62888,
+          "largest": 51200
+        },
+        {
+          "at": 547875.093,
+          "busy": 50.0,
+          "decode": 20.7,
+          "heap": 66472,
+          "largest": 51200
+        }
+      ],
+      "busy_mean": 49.76,
+      "decode_mean": 20.52,
+      "minimum_free": 62888,
+      "minimum_largest": 51200,
+      "window": {
+        "start": 547844.343,
+        "end": 547904.734
+      },
+      "allocation_failures": []
+    },
+    {
+      "name": "groovesalad-64-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-64-aac",
+        "result": "FAIL",
+        "reason": "URLError",
+        "seconds": 12.297
+      },
+      "metrics_available": false,
+      "observed_formats": [
+        "HE-AAC 44.1 kHz stereo"
+      ],
+      "samples": [],
+      "busy_mean": null,
+      "decode_mean": null,
+      "minimum_free": null,
+      "minimum_largest": null,
+      "window": {
+        "start": 547906.812,
+        "end": 547917.062
+      },
+      "allocation_failures": [],
+      "metrics_reason": "Fewer than four in-window CPU samples"
+    },
+    {
+      "name": "groovesalad-32-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-32-aac",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder/TLS failure",
+        "seconds": 62.281
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "HE-AAC 44.1 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 547929.656,
+          "busy": 59.5,
+          "decode": 34.2,
+          "heap": 13264,
+          "largest": 3072
+        },
+        {
+          "at": 547934.765,
+          "busy": 56.2,
+          "decode": 34.0,
+          "heap": 13196,
+          "largest": 4608
+        },
+        {
+          "at": 547939.859,
+          "busy": 59.8,
+          "decode": 34.4,
+          "heap": 9608,
+          "largest": 3072
+        },
+        {
+          "at": 547944.906,
+          "busy": 58.0,
+          "decode": 34.0,
+          "heap": 9552,
+          "largest": 2816
+        },
+        {
+          "at": 547950.015,
+          "busy": 59.9,
+          "decode": 34.2,
+          "heap": 13208,
+          "largest": 4608
+        }
+      ],
+      "busy_mean": 58.68,
+      "decode_mean": 34.16,
+      "minimum_free": 9552,
+      "minimum_largest": 2816,
+      "window": {
+        "start": 547919.062,
+        "end": 547979.328
+      },
+      "allocation_failures": [
+        {
+          "at": 547923.109,
+          "line": "E (161607) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4952 largest=1664"
+        },
+        {
+          "at": 547931.062,
+          "line": "E (169558) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=8268 largest=1536"
+        },
+        {
+          "at": 547932.125,
+          "line": "E (170608) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=8140 largest=1536"
+        },
+        {
+          "at": 547932.328,
+          "line": "E (170819) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=8116 largest=1536"
+        },
+        {
+          "at": 547943.734,
+          "line": "E (182228) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=8080 largest=1536"
+        },
+        {
+          "at": 547943.937,
+          "line": "E (182434) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=8080 largest=1536"
+        },
+        {
+          "at": 547962.859,
+          "line": "E (201347) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4828 largest=1664"
+        },
+        {
+          "at": 547964.375,
+          "line": "E (202867) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4828 largest=1408"
+        }
+      ]
+    },
+    {
+      "name": "groovesalad-16-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-16-aac",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder/TLS failure",
+        "seconds": 64.844
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "HE-AACv2 32 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 547990.593,
+          "busy": 37.5,
+          "decode": 19.7,
+          "heap": 7680,
+          "largest": 3072
+        },
+        {
+          "at": 547995.687,
+          "busy": 41.3,
+          "decode": 20.2,
+          "heap": 9468,
+          "largest": 3456
+        },
+        {
+          "at": 548003.625,
+          "busy": 33.3,
+          "decode": 20.4,
+          "heap": 11276,
+          "largest": 4608
+        },
+        {
+          "at": 548012.64,
+          "busy": 38.3,
+          "decode": 20.3,
+          "heap": 7696,
+          "largest": 3072
+        }
+      ],
+      "busy_mean": 37.6,
+      "decode_mean": 20.15,
+      "minimum_free": 7680,
+      "minimum_largest": 3072,
+      "window": {
+        "start": 547981.25,
+        "end": 548043.968
+      },
+      "allocation_failures": [
+        {
+          "at": 547985.046,
+          "line": "E (223539) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6196 largest=1408"
+        },
+        {
+          "at": 547986.234,
+          "line": "E (224720) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4796 largest=1344"
+        },
+        {
+          "at": 547986.781,
+          "line": "E (225273) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4820 largest=1344"
+        },
+        {
+          "at": 547987.468,
+          "line": "E (225953) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4820 largest=1344"
+        },
+        {
+          "at": 547988.39,
+          "line": "E (226885) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4776 largest=1344"
+        },
+        {
+          "at": 547990.64,
+          "line": "E (229137) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4784 largest=1664"
+        },
+        {
+          "at": 547995.937,
+          "line": "E (234427) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4744 largest=1408"
+        },
+        {
+          "at": 547997.671,
+          "line": "E (236168) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4728 largest=1408"
+        },
+        {
+          "at": 547999.296,
+          "line": "E (237781) cpu_profile: PERF allocation failed: requested=1512 caps=0x1800 function=heap_caps_malloc free=6128 largest=1408"
+        },
+        {
+          "at": 547999.343,
+          "line": "E (237835) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6128 largest=1408"
+        },
+        {
+          "at": 547999.984,
+          "line": "E (238476) cpu_profile: PERF allocation failed: requested=1512 caps=0x1800 function=heap_caps_malloc free=6148 largest=1408"
+        },
+        {
+          "at": 548000.484,
+          "line": "E (238980) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6128 largest=1408"
+        },
+        {
+          "at": 548000.656,
+          "line": "E (239155) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6128 largest=1408"
+        },
+        {
+          "at": 548000.984,
+          "line": "E (239479) cpu_profile: PERF allocation failed: requested=1512 caps=0x1800 function=heap_caps_malloc free=6148 largest=1408"
+        },
+        {
+          "at": 548004.781,
+          "line": "E (243267) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4796 largest=1664"
+        },
+        {
+          "at": 548008.515,
+          "line": "E (247001) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4844 largest=1664"
+        },
+        {
+          "at": 548009.5,
+          "line": "E (247996) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4848 largest=1664"
+        },
+        {
+          "at": 548010.14,
+          "line": "E (248637) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4848 largest=1664"
+        },
+        {
+          "at": 548010.937,
+          "line": "E (249423) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4820 largest=1664"
+        },
+        {
+          "at": 548010.968,
+          "line": "E (249456) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4852 largest=1664"
+        },
+        {
+          "at": 548011.125,
+          "line": "E (249619) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4852 largest=1664"
+        },
+        {
+          "at": 548012.703,
+          "line": "E (251188) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4788 largest=1664"
+        },
+        {
+          "at": 548012.703,
+          "line": "E (251190) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4788 largest=1664"
+        },
+        {
+          "at": 548012.968,
+          "line": "E (251458) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4788 largest=1664"
+        },
+        {
+          "at": 548014.796,
+          "line": "E (253286) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4796 largest=1664"
+        },
+        {
+          "at": 548016.89,
+          "line": "E (255377) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4784 largest=1664"
+        },
+        {
+          "at": 548018.765,
+          "line": "E (257259) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4780 largest=1664"
+        },
+        {
+          "at": 548019.875,
+          "line": "E (258361) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4780 largest=1664"
+        },
+        {
+          "at": 548020.015,
+          "line": "E (258511) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4780 largest=1664"
+        },
+        {
+          "at": 548026.437,
+          "line": "E (264935) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6252 largest=1408"
+        },
+        {
+          "at": 548026.437,
+          "line": "E (264936) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6252 largest=1408"
+        },
+        {
+          "at": 548026.937,
+          "line": "E (265430) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6400 largest=1408"
+        },
+        {
+          "at": 548026.937,
+          "line": "E (265431) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6400 largest=1408"
+        },
+        {
+          "at": 548026.937,
+          "line": "E (265432) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6400 largest=1408"
+        },
+        {
+          "at": 548026.937,
+          "line": "E (265434) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6400 largest=1408"
+        },
+        {
+          "at": 548027.078,
+          "line": "E (265565) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6400 largest=1408"
+        },
+        {
+          "at": 548029.343,
+          "line": "E (267836) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4784 largest=1344"
+        },
+        {
+          "at": 548030.703,
+          "line": "E (269203) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6540 largest=1408"
+        },
+        {
+          "at": 548030.859,
+          "line": "E (269345) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6540 largest=1408"
+        },
+        {
+          "at": 548031.359,
+          "line": "E (269849) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=6544 largest=1408"
+        },
+        {
+          "at": 548035.75,
+          "line": "E (274240) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4720 largest=1408"
+        },
+        {
+          "at": 548039.265,
+          "line": "E (277761) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4712 largest=1408"
+        },
+        {
+          "at": 548040.562,
+          "line": "E (279053) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4712 largest=1408"
+        },
+        {
+          "at": 548042.359,
+          "line": "E (280857) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4712 largest=1408"
+        },
+        {
+          "at": 548042.812,
+          "line": "E (281305) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4712 largest=1408"
+        },
+        {
+          "at": 548043.718,
+          "line": "E (282205) cpu_profile: PERF allocation failed: requested=1700 caps=0x1800 function=heap_caps_malloc free=4744 largest=1408"
+        }
+      ]
+    },
+    {
+      "name": "groovesalad-256-mp3",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-256-mp3",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "mp3",
+              "profile": null,
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "MP3"
+            },
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 249,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 0.6099999999860302,
+          "status_samples": 331,
+          "max_http_ms": 234.00000005494803,
+          "p95_http_ms": 94.0000000409782,
+          "median_http_ms": 77.9999999795109,
+          "mean_busy": 57.077777777777776,
+          "peak_busy": 57.4,
+          "minimum_heap": 87868.0,
+          "minimum_largest": 69632.0,
+          "audio_wall_ratio": 1.001553311882836
+        },
+        "seconds": 62.593
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "MP3 44.1 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 548056.812,
+          "busy": 56.6,
+          "decode": 25.0,
+          "heap": 86040,
+          "largest": 69632
+        },
+        {
+          "at": 548061.875,
+          "busy": 57.4,
+          "decode": 25.5,
+          "heap": 87928,
+          "largest": 69632
+        },
+        {
+          "at": 548066.984,
+          "busy": 57.0,
+          "decode": 25.4,
+          "heap": 91524,
+          "largest": 69632
+        },
+        {
+          "at": 548072.062,
+          "busy": 56.9,
+          "decode": 25.5,
+          "heap": 87868,
+          "largest": 69632
+        },
+        {
+          "at": 548077.203,
+          "busy": 57.3,
+          "decode": 25.2,
+          "heap": 91532,
+          "largest": 69632
+        }
+      ],
+      "busy_mean": 57.04,
+      "decode_mean": 25.32,
+      "minimum_free": 86040,
+      "minimum_largest": 69632,
+      "window": {
+        "start": 548046.328,
+        "end": 548106.781
+      },
+      "allocation_failures": []
+    }
+  ],
+  "metric": "FreeRTOS CPU samples 5..35 s after first PCM, clipped to the recorded playback window",
+  "note": "Failed playback stays failed. Fewer than four in-window CPU samples give no aggregate.",
+  "panic_or_capture_errors": [],
+  "input_sha256": {
+    "report.json": "a490a10880e1330fbd9cc9d57b900a5236de3dbb75d96672651f573531720b62",
+    "status.json": "800f9736a698a4a2f564deb12f76fc9dfb3d1db0960ce2deb72162b95d642318",
+    "performance.json": "25a52ace08556ce6001680b262aab87fe0f8135307de85377efb8b30d13b2091"
+  },
+  "source_sha256": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709"
+}

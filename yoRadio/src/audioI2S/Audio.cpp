@@ -1786,8 +1786,8 @@ int Audio::read_FLAC_Header(uint8_t *data, size_t len) {
         uint8_t bps = (nextval & 0x01) << 4;
         bps += (*(data +16) >> 4) + 1;
         m_flacBitsPerSample = bps;
-        if((bps != 8) && (bps != 16)){
-            log_e("bits per sample must be 8 or 16, is %i", bps);
+        if(bps < FLAC_MIN_BITS_PER_SAMPLE || bps > FLAC_MAX_BITS_PER_SAMPLE){
+            log_e("unsupported FLAC source bit depth: %i", bps);
             stopSong();
             return -1;
         }
@@ -2555,8 +2555,8 @@ int Audio::read_OGG_Header(uint8_t *data, size_t len){
         bps += (*(data +i) >> 4) + 1;
         i++;
         m_flacBitsPerSample = bps;
-        if((bps != 8) && (bps != 16)){
-            log_e("bits per sample must be 8 or 16, is %i", bps);
+        if(bps < FLAC_MIN_BITS_PER_SAMPLE || bps > FLAC_MAX_BITS_PER_SAMPLE){
+            log_e("unsupported FLAC source bit depth: %i", bps);
             stopSong();
             return -1;
         }
@@ -4565,7 +4565,7 @@ bool Audio::updateDecoderParameters(bool pcmAvailable) {
     } else if(m_codec == CODEC_FLAC || m_codec == CODEC_OGG_FLAC) {
         channels = FLACGetChannels();
         sampleRate = FLACGetSampRate();
-        bitsPerSample = FLACGetBitsPerSample();
+        bitsPerSample = FLACGetOutputBitsPerSample();
         bitrate = FLACGetBitRate();
     } else if(m_codec == CODEC_OGG) {
         uint8_t oggChannels = 0;

@@ -348,7 +348,7 @@ test("native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll",
   assert.match(app, /DISPLAY_SCROLL_HOLD_MS 3500U/);
   assert.match(app, /DISPLAY_SCROLL_STEP_MS 35U/);
   assert.match(app, /IPSTR[\s\S]*oled_display_draw_compact_text/);
-  assert.doesNotMatch(app, /state->stream_format[\s\S]*oled_display_draw/);
+  assert.doesNotMatch(app, /oled_display_draw[^;]*state->stream_format/);
 });
 
 test("native OLED defaults to software scroll and keeps hardware scroll optional", () => {
@@ -389,21 +389,14 @@ test("native OLED alternates ICY title with live stream parameters", () => {
 
   assert.match(stateHeader, /uint32_t sample_rate_hz/);
   assert.match(stateHeader, /uint8_t channels/);
-  assert.match(stateHeader, /char codec\[8\]/);
+  assert.match(stateHeader, /char codec\[16\]/);
   assert.match(stateHeader, /native_state_set_stream_info/);
-  assert.match(stateSource, /state->sample_rate_hz = sample_rate_hz/);
-  assert.match(stateSource, /state->channels = channels/);
-  assert.match(audio, /native_state_set_stream_info\(s_state, codec_name\(\*codec\), 0, 0\)/);
-  assert.match(
-    audio,
-    /native_state_set_stream_info\([\s\S]*codec_name\(codec\)[\s\S]*stream_info\.sample_rate[\s\S]*stream_info\.channel/,
-  );
+  assert.match(stateSource, /state->sample_rate_hz = info->sample_rate_hz/);
+  assert.match(stateSource, /state->channels = info->channels/);
+  assert.match(audio, /update_stream_info\(context->generation/);
+  assert.match(app, /native_state_format_stream_details\(state, output, output_size\)/);
+  assert.match(stateSource, /state->bitrate_kbps[\s\S]*"%s %lu kbps"/);
 
-  assert.match(app, /const char \*parts\[\] = \{state->codec, bitrate, sample_rate, channels\}/);
-  assert.match(app, /state->bitrate_kbps[\s\S]*"%lu kbps"/);
-  assert.match(app, /state->sample_rate_hz[\s\S]*"%lu\.%lu kHz"/);
-  assert.match(app, /state->channels == 1[\s\S]*"mono"/);
-  assert.match(app, /state->channels == 2[\s\S]*"stereo"/);
   assert.match(app, /show_stream_info = audio_info && !state\.title\[0\]/);
   assert.match(app, /completed == DISPLAY_SCROLL_TITLE[\s\S]*show_stream_info = !show_stream_info/);
   assert.match(app, /DISPLAY_SECONDARY_PAGE_MS 5000U/);
@@ -414,18 +407,14 @@ test("native OLED alternates ICY title with live stream parameters", () => {
   assert.match(app, /else if \(!secondary_initialized\)/);
 });
 
-test("native WebUI format keeps the codec after decoder discovery", () => {
-  const audio = read("main", "audio_service.c");
-
-  assert.match(audio, /"FLAC %lu kHz %s"/);
-  assert.match(
-    audio,
-    /custom_legacy_output[\s\S]*"%s %lu kHz %s"[\s\S]*codec_name\(context->stats->codec\)/,
-  );
-  assert.match(
-    audio,
-    /esp_audio_simple_dec_get_info[\s\S]*"%s %lu kHz %s"[\s\S]*codec_name\(codec\)/,
-  );
+test("native WebUI and OLED share the confirmed decoded format", () => {
+  const stateSource = read("main", "native_state.c");
+  const app = read("main", "app_main.c");
+  const websocket = read("main", "websocket_service.c");
+  assert.match(stateSource, /snprintf\(state->stream_format/);
+  assert.match(app, /native_state_format_stream_details/);
+  assert.match(websocket, /json_escape\(state.stream_format, format/);
+  // Executable callback/state/JSON coverage: run-esp32c3-stream-format.py.
 });
 
 test("native OLED normalizes dash variants before the replacement glyph", () => {
@@ -475,13 +464,13 @@ test("native radio requests and publishes ICY song metadata", () => {
   );
   assert.match(
     audio,
-    /audio_service_stop[\s\S]*advance_generation\(NATIVE_CODEC_AUTO\)[\s\S]*state_set_audio\(false, "stopped"\)/,
+    /audio_service_stop[\s\S]*advance_generation\(NATIVE_CODEC_AUTO\)[\s\S]*state_set_audio\(generation, false, "stopped"\)/,
   );
   assert.doesNotMatch(audio, /close_active_http_stream/);
   assert.match(audio, /#define STREAM_READ_TIMEOUT_MS 250/);
   assert.match(
     audio,
-    /open_stream\(client, command\.url\)[\s\S]*esp_http_client_set_timeout_ms\(client, STREAM_READ_TIMEOUT_MS\)/,
+    /open_stream\(client, command\.url, retry\.deadline_us,[\s\S]*esp_http_client_set_timeout_ms\(client, STREAM_READ_TIMEOUT_MS\)/,
   );
   assert.match(
     audio,
@@ -523,22 +512,24 @@ test("native HTTPS station switching releases incompatible codec memory before T
   );
   assert.match(
     generationReset,
-    /had_simple_decoder[\s\S]*codec_uses_custom_legacy\(target_codec\)[\s\S]*free\(output\)/,
+    /target_codec == NATIVE_CODEC_AUTO[\s\S]*codec_uses_custom_legacy\(target_codec\)[\s\S]*free\(output\)/,
   );
+  // PCM can exist even when open failed: release must not depend on a handle.
+  assert.doesNotMatch(generationReset, /had_simple_decoder/);
   assert.match(generationReset, /atomic_store\(&s_decoder_released_generation/);
   assert.match(audio, /codec_from_signature[\s\S]*"fLaC"[\s\S]*"OggS"[\s\S]*"ID3"/);
   assert.match(
     audio,
     /advance_generation\(codec\)[\s\S]*requested_codec = codec/,
   );
-  assert.match(audio, /state_set_audio\(false, "NO MEMORY"\)/);
+  assert.match(audio, /state_set_audio\(generation, false, "NO MEMORY"\)/);
   assert.match(
     audio,
     /open_result == ESP_AUDIO_ERR_MEM_LACK[\s\S]*"NO MEMORY"[\s\S]*"DECODER ERROR"/,
   );
   assert.match(
     audio,
-    /xRingbufferReceive\([\s\S]*pdMS_TO_TICKS\(20\)\)/,
+    /pipeline_receive\([\s\S]*pdMS_TO_TICKS\(20\), &stats\.input_empty\)/,
   );
 });
 
@@ -553,8 +544,8 @@ test("native WebUI publishes ICY or decoder bitrate instead of a constant zero",
   assert.match(stateSource, /state->bitrate_kbps = bitrate_kbps/);
   assert.match(audio, /get_response_header[\s\S]*"icy-br"/);
   assert.match(audio, /ICY bitrate: %lu kbit\/s/);
-  assert.match(audio, /state_set_decoder_bitrate\(info->bitrate\)/);
-  assert.match(audio, /state_set_decoder_bitrate\(latest_info\.bitrate\)/);
+  assert.match(audio, /state_set_decoder_bitrate\(context->generation, info->bitrate\)/);
+  assert.match(audio, /state_set_decoder_bitrate\(generation, latest_info\.bitrate\)/);
   assert.match(audio, /BITRATE_UPDATE_INTERVAL_US 1000000LL/);
   assert.match(audio, /STREAM_BITRATE_INTERVAL_US 5000000LL/);
   assert.match(
@@ -570,11 +561,11 @@ test("native WebUI publishes ICY or decoder bitrate instead of a constant zero",
   );
   assert.match(
     audio,
-    /frame\.decoded_size[\s\S]*esp_audio_simple_dec_get_info\(decoder, &latest_info\)[\s\S]*state_set_decoder_bitrate\(latest_info\.bitrate\)/,
+    /frame\.decoded_size[\s\S]*esp_audio_simple_dec_get_info\(decoder, &latest_info\)[\s\S]*state_set_decoder_bitrate\(generation, latest_info\.bitrate\)/,
   );
   assert.ok(
     audio.indexOf('client, "icy-br"') <
-      audio.indexOf("state_set_decoder_bitrate(latest_info.bitrate)"),
+      audio.indexOf("state_set_decoder_bitrate(generation, latest_info.bitrate)"),
     "decoder bitrate must override the earlier ICY fallback",
   );
   assert.match(websocket, /\\"bitrate\\",\\"value\\":%lu/);
@@ -620,7 +611,7 @@ test("native BOOT gestures match the documented one-button controls", () => {
     app,
     /BUTTON_STATUS_NEXT:[\s\S]*return "next"[\s\S]*BUTTON_STATUS_PREVIOUS:[\s\S]*return "prev"/,
   );
-  assert.match(app, /state\.audio_running \? secondary_text : ""/);
+  assert.match(app, /state\.audio_running \|\| unavailable \? secondary_text : ""/);
   assert.match(app, /button_status_visible[\s\S]*button_status_scroll/);
   assert.match(
     app,
@@ -688,7 +679,7 @@ test("native decoder reports measured real-time headroom", () => {
   assert.match(audio, /stats->audio_us \* 100ULL \/[\s\S]*stats->decode_us/);
 });
 
-test("native audio pipeline batches PCM and caches stable stream layout", () => {
+test("native audio pipeline batches PCM using the current decoded layout", () => {
   const audio = read("main", "audio_service.c");
   const output = read("main", "native_audio_output.c");
 
@@ -700,7 +691,7 @@ test("native audio pipeline batches PCM and caches stable stream layout", () => 
   assert.match(audio, /bool stream_info_ready = false/);
   assert.match(
     audio,
-    /esp_audio_simple_dec_get_info\(decoder, &latest_info\)[\s\S]*!stream_info_ready[\s\S]*stream_info = latest_info[\s\S]*stream_info_ready = true/,
+    /esp_audio_simple_dec_get_info\(decoder, &latest_info\)[\s\S]*stream_info_ready = update_stream_info\(/,
   );
   assert.match(output, /scale_sample_q15/);
   assert.match(output, /channel_gain_q15/);
@@ -767,6 +758,15 @@ test("native FLAC reuses the optimized yoRadio decoder without Arduino Core", ()
   assert.doesNotMatch(adapter, /#include\s+[<"]Arduino\.h[>"]/);
 });
 
+test("native decoder errors and EOF release independent PCM before terminal publication", () => {
+  const audio = read("main", "audio_service.c");
+  // The QEMU suite executes release (twice after failed open) against the
+  // real library. These checks cover its placement in the network pipeline.
+  assert.match(audio, /if \(packet->end_of_stream \|\| failed_generation == generation\) \{\s*decoder_resources_release\(&decoder, &aac_decoder, &output, &output_size\);\s*\}\s*return_decoded_packet\(packet, failed_generation\)/);
+  assert.match(audio, /"DECODER INIT ERROR"\);\s*failed_generation = packet->generation;\s*return_decoded_packet\(packet, failed_generation\)/);
+  assert.match(audio, /failed_generation = generation;\s*decoder_resources_release\(&decoder, &aac_decoder, &output, &output_size\)/);
+});
+
 test("native FLAC decoder is selectable at compile time", () => {
   const kconfig = read("main", "Kconfig.projbuild");
   const defaults = read("sdkconfig.defaults");
@@ -776,8 +776,9 @@ test("native FLAC decoder is selectable at compile time", () => {
   assert.match(kconfig, /YORADIO_FLAC_DECODER_CUSTOM/);
   assert.match(kconfig, /YORADIO_FLAC_DECODER_ESPRESSIF/);
   assert.match(defaults, /CONFIG_YORADIO_FLAC_DECODER_CUSTOM=y/);
+  assert.match(audio, /registration_result = decoder_register_codecs\(\)/);
   assert.match(
-    audio,
+    read("main", "decoder_registration.c"),
     /CONFIG_YORADIO_FLAC_DECODER_ESPRESSIF[\s\S]*esp_flac_dec_register/,
   );
   assert.match(
@@ -829,10 +830,11 @@ test("native MP3 and AAC alternatives are selectable at compile time", () => {
     defaults,
     /^(?!#).*CONFIG_YORADIO_MP3_DECODER_(?:HELIX|MINIMP3)=y/m,
   );
-  assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_HELIX=y/);
+  assert.match(defaults, /CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y/);
+  assert.match(defaults, /CONFIG_YORADIO_AAC_PLUS=y/);
   assert.doesNotMatch(
     defaults,
-    /^(?!#).*CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y/m,
+    /^(?!#).*CONFIG_YORADIO_AAC_DECODER_HELIX=y/m,
   );
   assert.match(component, /aac_decoder\/aac_decoder\.cpp/);
   assert.match(component, /mp3_decoder\/mp3_decoder\.cpp/);
@@ -963,8 +965,10 @@ test("native audio buffers cover high-bitrate remote streams", () => {
     assert.match(defaults, /CONFIG_LWIP_TCP_WND_DEFAULT=11520/);
     assert.match(defaults, /CONFIG_LWIP_TCP_RECVMBOX_SIZE=10/);
   }
-  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_DECODER, NULL, 7, NULL/);
-  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6, NULL/);
+  assert.match(c3Audio, /AUDIO_DECODE_PRIORITY = 7/);
+  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_DECODER, NULL, AUDIO_DECODE_PRIORITY, NULL/);
+  assert.match(c3Audio, /BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, AUDIO_OUTPUT_PRIORITY, NULL/);
+  assert.match(c3Audio, /#ifdef CONFIG_YORADIO_OUTPUT_TASK_FIRST[\s\S]*AUDIO_DECODE_PRIORITY \+ 1[\s\S]*#else[\s\S]*AUDIO_DECODE_PRIORITY - 1/);
   assert.match(cydAudio, /#define ENCODED_RING_SIZE \(16 \* 1024\)/);
   assert.match(cydAudio, /16 KiB compressed \+ 8 KiB PCM/);
 });
@@ -990,14 +994,12 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
 
   assert.match(
     audio,
-    /audio_service_play[\s\S]*state_set_audio\(false, "connecting"\)/,
+    /audio_service_play[\s\S]*state_set_audio\(command\.generation, false, "connecting"\)/,
   );
-  assert.match(audio, /open_stream[\s\S]*state_set_audio\(true, "connected"\)/);
-  assert.match(audio, /state_set_audio\(true, codec_name\(\*codec\)\)/);
-  assert.match(
-    audio,
-    /command\.generation[\s\S]*state_set_audio\(false,[\s\S]*"stream ended"/,
-  );
+  assert.match(audio, /open_stream[\s\S]*state_set_audio\(command\.generation, true, "connected"\)/);
+  assert.match(audio, /state_set_audio\(generation, true, codec_name\(\*codec\)\)/);
+  // EOF ordering is executed by run-esp32c3-eof.py. The network reader must
+  // not publish stopped before buffered decoder callbacks and PCM complete.
   assert.match(audioHeader, /audio_service_buffer_fill_percent/);
   assert.match(
     audio,
@@ -1058,7 +1060,7 @@ test("native audio buffers backpressure instead of dropping a live stream", () =
   );
   assert.match(
     audio,
-    /xRingbufferSendAcquire\(s_pcm[\s\S]*pdMS_TO_TICKS\(250\)[\s\S]*atomic_load\(&s_generation\) != generation/,
+    /pipeline_acquire\(s_pcm[\s\S]*pdMS_TO_TICKS\(250\), &stats->pcm_full\)[\s\S]*atomic_load\(&s_generation\) != generation/,
   );
 });
 

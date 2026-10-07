@@ -1,0 +1,33 @@
+{
+  "target": "esp32c3-oled-native",
+  "variant": "esp32c3-oled-native-stream-format-espressif",
+  "source_commit": "7b5d257c5d4564f551ed45a8866128dde4e5e3be",
+  "app_version": "v0.9.693-1042-g7b5d257c",
+  "esp_idf": "v6.0.2",
+  "audio_codec_version": "2.6.2",
+  "audio_codec_commit": "67b8d0e98f58c774b8652480893037273190e8dc",
+  "production": true,
+  "release": false,
+  "qemu_image": false,
+  "aac_backend": "Espressif AAC Plus",
+  "aac_plus": true,
+  "deep_sleep_clock": false,
+  "external_rtc_crystal": false,
+  "hardware_tested": false,
+  "size_bytes": 1393488,
+  "sha256": "12e5a090db4c8e6c0eb14259b4d0aa91be129054e619fcb5cee9d889bfd53d16",
+  "validation": [
+    "ESP-IDF production build and OTA partition size check",
+    "esptool image checksum and validation hash",
+    "104 C3/shared regression tests",
+    "3 executable stream-format, Helix and ADTS host suites",
+    "RTC wake-stub host test and 16 pin configurations"
+  ],
+  "emulator_validation": "Actual Espressif AAC Plus: 44.1/48 kHz HE-AAC, HE-AACv2 stereo, ADTS changes, OLED/PCM",
+  "known_limitations": [
+    "Physical Wi-Fi/TLS, CPU headroom and audio quality have not been tested for these images.",
+    "Espressif: implicit SBR/PS after LC with identical ADTS headers requires Stop/Play; status reports actual PCM.",
+    "Helix: SBR synthesis is disabled; source and core PCM rates differ and PS stereo is not claimed."
+  ],
+  "report": "../../../docs/ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md"
+}

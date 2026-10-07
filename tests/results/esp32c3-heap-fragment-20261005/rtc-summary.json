@@ -1,0 +1,84 @@
+{
+  "image": "924f81aeeec49dc9e730ebd68adf39fb5dff36df4aefdbd97107daacae73a22b",
+  "cases": {
+    "stress-mp3-48000-2ch-16bit-200s": {
+      "original_acceptance": {
+        "name": "cpu-under-http-load:stress-mp3-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 181.359
+      },
+      "maximum_http_ms": 125.0,
+      "minimum_rssi": -76,
+      "idle_after": {
+        "heap": 144784,
+        "largest": 114688,
+        "tasks": 17
+      },
+      "recovery_from_previous": {
+        "result": "PASS"
+      },
+      "recovery_from_first": {
+        "result": "PASS"
+      },
+      "observed_after_40_seconds": {
+        "cpu_windows": 27,
+        "decoder_windows": 28,
+        "mean_busy": 60.955555555555556,
+        "peak_busy": 62.2,
+        "audio_wall_ratio": 1.0016893570505814
+      },
+      "after_40_seconds": {
+        "result": "FAIL",
+        "reason": "Progressive heap loss during continuous playback"
+      }
+    },
+    "stress-vorbis-48000-2ch-16bit-200s": {
+      "original_acceptance": {
+        "name": "cpu-under-http-load:stress-vorbis-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 181.328
+      },
+      "maximum_http_ms": 140.00000001396984,
+      "minimum_rssi": -70,
+      "idle_after": {
+        "heap": 144780.0,
+        "largest": 114688.0,
+        "tasks": 17.0
+      },
+      "recovery_from_previous": {
+        "result": "PASS"
+      },
+      "recovery_from_first": {
+        "result": "PASS"
+      },
+      "observed_after_40_seconds": {
+        "cpu_windows": 28,
+        "decoder_windows": 28,
+        "mean_busy": 74.38571428571429,
+        "peak_busy": 75.5,
+        "audio_wall_ratio": 1.0015335125997675
+      },
+      "after_40_seconds": {
+        "result": "PASS",
+        "mean_busy": 74.38571428571429,
+        "peak_busy": 75.5,
+        "minimum_heap": 65444.0,
+        "minimum_largest": 55296.0,
+        "audio_wall_ratio": 1.0015335125997675
+      }
+    }
+  },
+  "scope": "One paced sequence with per-case Stop; no reboot between codecs; not a 100-switch or 30-minute soak qualification"
+}

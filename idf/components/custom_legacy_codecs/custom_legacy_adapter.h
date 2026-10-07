@@ -16,10 +16,18 @@ typedef enum {
 typedef struct custom_legacy_decoder custom_legacy_decoder_t;
 
 typedef struct {
+    // PCM layout: always use these fields for sample counts and playback.
     uint32_t sample_rate;
     uint8_t bits_per_sample;
     uint8_t channels;
     uint32_t bitrate;
+    // Source layout, before decoder downmix or optional AAC SBR synthesis.
+    uint32_t stream_sample_rate;
+    uint8_t stream_channels;
+    bool aac_sbr;
+    bool aac_profile_known;
+    uint8_t aac_profile; // Helix: 0 Main, 1 LC, 2 SSR.
+    bool channels_are_core; // SBR mono core; PS stereo is not confirmed.
 } custom_legacy_info_t;
 
 typedef struct {

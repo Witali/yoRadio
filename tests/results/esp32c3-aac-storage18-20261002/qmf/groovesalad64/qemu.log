@@ -1,0 +1,204 @@
+ESP-ROM:esp32c3-api1-20210207
+Build:Feb  7 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fcd5830,len:0x155c
+load:0x403cbf10,len:0xce0
+load:0x403ce710,len:0x2fcc
+entry 0x403cbf1a
+I (0) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (0) boot: compile time Oct  2 2026 18:56:56
+I (0) boot: chip revision: v0.3
+I (0) boot: efuse block revision: v1.3
+I (0) boot.esp32c3: SPI Speed      : 80MHz
+I (0) boot.esp32c3: SPI Mode       : SLOW READ
+I (0) boot.esp32c3: SPI Flash Size : 4MB
+I (0) boot: Enabling RNG early entropy source...
+I (0) boot: Partition Table:
+I (0) boot: ## Label            Usage          Type ST Offset   Length
+I (0) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (0) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (0) boot:  2 app0             OTA app          00 10 00010000 001d0000
+I (0) boot:  3 app1             OTA app          00 11 001e0000 001d0000
+I (0) boot:  4 spiffs           Unknown data     01 82 003b0000 00040000
+I (0) boot:  5 coredump         Unknown data     01 03 003f0000 00010000
+I (0) boot: End of partition table
+I (0) boot: No factory image, trying OTA 0
+I (0) esp_image: segment 0: paddr=00010020 vaddr=3c050020 size=20ac8h (133832) map
+I (2) esp_image: segment 1: paddr=00030af0 vaddr=3fc8a400 size=019d4h (  6612) load
+I (2) esp_image: segment 2: paddr=000324cc vaddr=40380000 size=0a3a0h ( 41888) load
+I (2) esp_image: segment 3: paddr=0003c874 vaddr=50000000 size=00024h (    36) load
+I (3) esp_image: segment 4: paddr=0003c8a0 vaddr=00000000 size=03778h ( 14200) 
+I (3) esp_image: segment 5: paddr=00040020 vaddr=42000020 size=41f30h (270128) map
+I (6) boot: Loaded app from partition at offset 0x10000
+I (6) boot: Set actual ota_seq=1 in otadata[0]
+I (6) boot: Disabling RNG early entropy source...
+I (6) cpu_start: Unicore app
+I (14) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
+I (14) cpu_start: Pro cpu start user code
+I (14) cpu_start: cpu freq: 160000000 Hz
+I (14) app_init: Application information:
+I (14) app_init: Project name:     yoradio_esp32c3_oled_native
+I (14) app_init: App version:      v0.9.693-1127-gde6b3833-dirty
+I (14) app_init: Compile time:     Oct  2 2026 18:56:10
+I (14) app_init: ELF file SHA256:  cd44fb96a...
+I (14) app_init: ESP-IDF:          v6.0.2
+I (14) efuse_init: Min chip rev:     v0.3
+I (14) efuse_init: Max chip rev:     v1.99 
+I (14) efuse_init: Chip rev:         v0.3
+I (14) heap_init: Initializing. RAM available for dynamic allocation:
+I (14) heap_init: At 3FC8D140 len 00032EC0 (203 KiB): RAM
+I (14) heap_init: At 3FCC0000 len 0001C710 (113 KiB): Retention RAM
+I (14) heap_init: At 3FCDC710 len 00002950 (10 KiB): Retention RAM
+I (14) heap_init: At 50000024 len 00001FC4 (7 KiB): RTCRAM
+I (14) spi_flash: detected chip: gd
+I (14) spi_flash: flash io: dio
+I (14) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (14) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (14) main_task: Started on CPU0
+I (14) main_task: Calling app_main()
+I (14) yoradio_c3: Starting pure ESP-IDF ESP32-C3 OLED yoRadio
+I (14) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (14) runtime_settings: Restored aif=0 softap=0 abuff=10 watchdog=1 tz=0:00 timeint=60 vols=1 enca=200
+W (14) yoradio_c3: QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO disabled
+I (14) oled: SSD1306 72x40 ready at I2C 0x3c
+I (14) audio_output: QEMU stereo PCM ready at 48000 Hz
+I (14) main_task: Returned from app_main()
+I (114) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (115) yoradio_c3: QEMU_AUDIO_PASS 24000 stereo frames
+I (117) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (476) qemu_aac: QEMU_AAC_CASE_PASS HE44 first: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186764 min 186764
+I (1036) qemu_aac: QEMU_AAC_CASE_PASS LC44 stereo: 44100 Hz 2 ch, 24 frames, 24576 samples, free 243284 min 186764
+I (1036) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (1636) qemu_aac: QEMU_AAC_CASE_PASS LC22 mono: 22050 Hz 1 ch, 13 frames, 13312 samples, free 243156 min 186764
+I (1636) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (2195) qemu_aac: QEMU_AAC_CASE_PASS LC48 stereo: 48000 Hz 2 ch, 26 frames, 26624 samples, free 243156 min 186764
+I (2196) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (2845) qemu_aac: QEMU_AAC_CASE_PASS HE44 stereo: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186636 min 186636
+I (2846) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (3485) qemu_aac: QEMU_AAC_CASE_PASS HE48 stereo: 48000 Hz 2 ch, 15 frames, 30720 samples, free 186636 min 186636
+I (3486) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (4175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 stereo: 44100 Hz 2 ch, 15 frames, 30720 samples, free 186636 min 186636
+I (4175) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (4785) qemu_aac: QEMU_AAC_CASE_PASS LC22 same header: 22050 Hz 1 ch, 13 frames, 13312 samples, free 243156 min 186636
+I (5475) qemu_aac: QEMU_AAC_CASE_PASS Implicit SBR core: 22050 Hz 1 ch, 15 frames, 15360 samples, free 243156 min 186636
+W (5475) qemu_aac: QEMU_AAC_LIMITATION implicit SBR/PS change needs stream restart
+I (5476) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (6175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 restart: 44100 Hz 2 ch, 15 frames, 30720 samples, free 187148 min 186636
+I (6294) aac_compare: QMFSTORAGE_STORAGE_ARITHMETIC_PASS random_pairs=10000 formats=5
+I (6294) aac_compare: QMFSTORAGE_COUNTER_PASS nop1024=1025
+I (6391) aac_compare: QMFSTORAGE_ARITHMETIC_PASS int16-exhaustive int32-edges random-blocks=4096
+I (6391) aac_compare: QMFSTORAGE_EXTERNAL bytes=239943 rate=44100 channels=2 sbr=1 runs=3 repeats=1
+I (8939) aac_compare: QMFSTORAGE_RESULT case=external variant=1 run=1 samples=2646016 frames=646 max_l=3 max_r=3 different=223256 over_one=35662 over_two=412 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1105595 max_shift=15 ref_work=894174044 packed_work=1107925727 ref_max_call=1664929 packed_max_call=1998695 precision=PASS
+I (8939) aac_compare: QMFSTORAGE_STORAGE case=external variant=1 run=1 saturations=0
+I (8939) aac_compare: QMFSTORAGE_STATS case=external variant=1 run=1 channel=0 samples=1323008 abs_sum=128032 square_sum=163824 signal_square_sum=25730259470447 signed_sum=6592 over_one=17506 over_two=195 over_limit=0 maximum=3 max_at=11739 max_ref=770 max_bfp=773 clipped_ref=0 clipped_bfp=0
+I (8939) aac_compare: QMFSTORAGE_HIST case=external variant=1 run=1 channel=0 bins=0:1212677,1:92825,2:17311,3:195,
+I (8939) aac_compare: QMFSTORAGE_STATS case=external variant=1 run=1 channel=1 samples=1323008 abs_sum=131298 square_sum=168478 signal_square_sum=27561998527216 signed_sum=6394 over_one=18156 over_two=217 over_limit=0 maximum=3 max_at=13001 max_ref=-3521 max_bfp=-3524 clipped_ref=0 clipped_bfp=0
+I (8939) aac_compare: QMFSTORAGE_HIST case=external variant=1 run=1 channel=1 bins=0:1210083,1:94769,2:17939,3:217,
+I (11487) aac_compare: QMFSTORAGE_RESULT case=external variant=1 run=2 samples=2646016 frames=646 max_l=3 max_r=3 different=223256 over_one=35662 over_two=412 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1105595 max_shift=15 ref_work=894139949 packed_work=1107958802 ref_max_call=1664929 packed_max_call=1998695 precision=PASS
+I (11487) aac_compare: QMFSTORAGE_STORAGE case=external variant=1 run=2 saturations=0
+I (11487) aac_compare: QMFSTORAGE_STATS case=external variant=1 run=2 channel=0 samples=1323008 abs_sum=128032 square_sum=163824 signal_square_sum=25730259470447 signed_sum=6592 over_one=17506 over_two=195 over_limit=0 maximum=3 max_at=11739 max_ref=770 max_bfp=773 clipped_ref=0 clipped_bfp=0
+I (11487) aac_compare: QMFSTORAGE_HIST case=external variant=1 run=2 channel=0 bins=0:1212677,1:92825,2:17311,3:195,
+I (11487) aac_compare: QMFSTORAGE_STATS case=external variant=1 run=2 channel=1 samples=1323008 abs_sum=131298 square_sum=168478 signal_square_sum=27561998527216 signed_sum=6394 over_one=18156 over_two=217 over_limit=0 maximum=3 max_at=13001 max_ref=-3521 max_bfp=-3524 clipped_ref=0 clipped_bfp=0
+I (11487) aac_compare: QMFSTORAGE_HIST case=external variant=1 run=2 channel=1 bins=0:1210083,1:94769,2:17939,3:217,
+I (14035) aac_compare: QMFSTORAGE_RESULT case=external variant=1 run=3 samples=2646016 frames=646 max_l=3 max_r=3 different=223256 over_one=35662 over_two=412 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1105595 max_shift=15 ref_work=894173529 packed_work=1107925222 ref_max_call=1664929 packed_max_call=1998695 precision=PASS
+I (14035) aac_compare: QMFSTORAGE_STORAGE case=external variant=1 run=3 saturations=0
+I (14035) aac_compare: QMFSTORAGE_STATS case=external variant=1 run=3 channel=0 samples=1323008 abs_sum=128032 square_sum=163824 signal_square_sum=25730259470447 signed_sum=6592 over_one=17506 over_two=195 over_limit=0 maximum=3 max_at=11739 max_ref=770 max_bfp=773 clipped_ref=0 clipped_bfp=0
+I (14035) aac_compare: QMFSTORAGE_HIST case=external variant=1 run=3 channel=0 bins=0:1212677,1:92825,2:17311,3:195,
+I (14035) aac_compare: QMFSTORAGE_STATS case=external variant=1 run=3 channel=1 samples=1323008 abs_sum=131298 square_sum=168478 signal_square_sum=27561998527216 signed_sum=6394 over_one=18156 over_two=217 over_limit=0 maximum=3 max_at=13001 max_ref=-3521 max_bfp=-3524 clipped_ref=0 clipped_bfp=0
+I (14035) aac_compare: QMFSTORAGE_HIST case=external variant=1 run=3 channel=1 bins=0:1210083,1:94769,2:17939,3:217,
+I (16611) aac_compare: QMFSTORAGE_RESULT case=external variant=2 run=1 samples=2646016 frames=646 max_l=3 max_r=3 different=223256 over_one=35662 over_two=412 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1105595 max_shift=15 ref_work=894199080 packed_work=1126991824 ref_max_call=1664929 packed_max_call=2028127 precision=PASS
+I (16611) aac_compare: QMFSTORAGE_STORAGE case=external variant=2 run=1 saturations=0
+I (16611) aac_compare: QMFSTORAGE_STATS case=external variant=2 run=1 channel=0 samples=1323008 abs_sum=128032 square_sum=163824 signal_square_sum=25730259470447 signed_sum=6592 over_one=17506 over_two=195 over_limit=0 maximum=3 max_at=11739 max_ref=770 max_bfp=773 clipped_ref=0 clipped_bfp=0
+I (16611) aac_compare: QMFSTORAGE_HIST case=external variant=2 run=1 channel=0 bins=0:1212677,1:92825,2:17311,3:195,
+I (16611) aac_compare: QMFSTORAGE_STATS case=external variant=2 run=1 channel=1 samples=1323008 abs_sum=131298 square_sum=168478 signal_square_sum=27561998527216 signed_sum=6394 over_one=18156 over_two=217 over_limit=0 maximum=3 max_at=13001 max_ref=-3521 max_bfp=-3524 clipped_ref=0 clipped_bfp=0
+I (16611) aac_compare: QMFSTORAGE_HIST case=external variant=2 run=1 channel=1 bins=0:1210083,1:94769,2:17939,3:217,
+I (19186) aac_compare: QMFSTORAGE_RESULT case=external variant=2 run=2 samples=2646016 frames=646 max_l=3 max_r=3 different=223256 over_one=35662 over_two=412 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1105595 max_shift=15 ref_work=894151774 packed_work=1127038931 ref_max_call=1664929 packed_max_call=2028127 precision=PASS
+I (19186) aac_compare: QMFSTORAGE_STORAGE case=external variant=2 run=2 saturations=0
+I (19186) aac_compare: QMFSTORAGE_STATS case=external variant=2 run=2 channel=0 samples=1323008 abs_sum=128032 square_sum=163824 signal_square_sum=25730259470447 signed_sum=6592 over_one=17506 over_two=195 over_limit=0 maximum=3 max_at=11739 max_ref=770 max_bfp=773 clipped_ref=0 clipped_bfp=0
+I (19186) aac_compare: QMFSTORAGE_HIST case=external variant=2 run=2 channel=0 bins=0:1212677,1:92825,2:17311,3:195,
+I (19186) aac_compare: QMFSTORAGE_STATS case=external variant=2 run=2 channel=1 samples=1323008 abs_sum=131298 square_sum=168478 signal_square_sum=27561998527216 signed_sum=6394 over_one=18156 over_two=217 over_limit=0 maximum=3 max_at=13001 max_ref=-3521 max_bfp=-3524 clipped_ref=0 clipped_bfp=0
+I (19186) aac_compare: QMFSTORAGE_HIST case=external variant=2 run=2 channel=1 bins=0:1210083,1:94769,2:17939,3:217,
+I (21762) aac_compare: QMFSTORAGE_RESULT case=external variant=2 run=3 samples=2646016 frames=646 max_l=3 max_r=3 different=223256 over_one=35662 over_two=412 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1105595 max_shift=15 ref_work=894199080 packed_work=1126991824 ref_max_call=1664929 packed_max_call=2028127 precision=PASS
+I (21762) aac_compare: QMFSTORAGE_STORAGE case=external variant=2 run=3 saturations=0
+I (21762) aac_compare: QMFSTORAGE_STATS case=external variant=2 run=3 channel=0 samples=1323008 abs_sum=128032 square_sum=163824 signal_square_sum=25730259470447 signed_sum=6592 over_one=17506 over_two=195 over_limit=0 maximum=3 max_at=11739 max_ref=770 max_bfp=773 clipped_ref=0 clipped_bfp=0
+I (21762) aac_compare: QMFSTORAGE_HIST case=external variant=2 run=3 channel=0 bins=0:1212677,1:92825,2:17311,3:195,
+I (21762) aac_compare: QMFSTORAGE_STATS case=external variant=2 run=3 channel=1 samples=1323008 abs_sum=131298 square_sum=168478 signal_square_sum=27561998527216 signed_sum=6394 over_one=18156 over_two=217 over_limit=0 maximum=3 max_at=13001 max_ref=-3521 max_bfp=-3524 clipped_ref=0 clipped_bfp=0
+I (21762) aac_compare: QMFSTORAGE_HIST case=external variant=2 run=3 channel=1 bins=0:1210083,1:94769,2:17939,3:217,
+I (24318) aac_compare: QMFSTORAGE_RESULT case=external variant=3 run=1 samples=2646016 frames=646 max_l=3 max_r=3 different=146325 over_one=22561 over_two=169 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1049827 max_shift=14 ref_work=894190563 packed_work=1119017022 ref_max_call=1664929 packed_max_call=2017801 precision=PASS
+I (24318) aac_compare: QMFSTORAGE_STORAGE case=external variant=3 run=1 saturations=0
+I (24318) aac_compare: QMFSTORAGE_STATS case=external variant=3 run=1 channel=0 samples=1323008 abs_sum=83512 square_sum=105980 signal_square_sum=25730259470447 signed_sum=5976 over_one=11080 over_two=77 over_limit=0 maximum=3 max_at=33046 max_ref=6542 max_bfp=6545 clipped_ref=0 clipped_bfp=0
+I (24318) aac_compare: QMFSTORAGE_HIST case=external variant=3 run=1 channel=0 bins=0:1250653,1:61275,2:11003,3:77,
+I (24318) aac_compare: QMFSTORAGE_STATS case=external variant=3 run=1 channel=1 samples=1323008 abs_sum=85543 square_sum=108873 signal_square_sum=27561998527216 signed_sum=6253 over_one=11481 over_two=92 over_limit=0 maximum=3 max_at=2462 max_ref=-1039 max_bfp=-1036 clipped_ref=0 clipped_bfp=0
+I (24318) aac_compare: QMFSTORAGE_HIST case=external variant=3 run=1 channel=1 bins=0:1249038,1:62489,2:11389,3:92,
+I (26874) aac_compare: QMFSTORAGE_RESULT case=external variant=3 run=2 samples=2646016 frames=646 max_l=3 max_r=3 different=146325 over_one=22561 over_two=169 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1049827 max_shift=14 ref_work=894141452 packed_work=1119066133 ref_max_call=1664929 packed_max_call=2017801 precision=PASS
+I (26874) aac_compare: QMFSTORAGE_STORAGE case=external variant=3 run=2 saturations=0
+I (26874) aac_compare: QMFSTORAGE_STATS case=external variant=3 run=2 channel=0 samples=1323008 abs_sum=83512 square_sum=105980 signal_square_sum=25730259470447 signed_sum=5976 over_one=11080 over_two=77 over_limit=0 maximum=3 max_at=33046 max_ref=6542 max_bfp=6545 clipped_ref=0 clipped_bfp=0
+I (26874) aac_compare: QMFSTORAGE_HIST case=external variant=3 run=2 channel=0 bins=0:1250653,1:61275,2:11003,3:77,
+I (26874) aac_compare: QMFSTORAGE_STATS case=external variant=3 run=2 channel=1 samples=1323008 abs_sum=85543 square_sum=108873 signal_square_sum=27561998527216 signed_sum=6253 over_one=11481 over_two=92 over_limit=0 maximum=3 max_at=2462 max_ref=-1039 max_bfp=-1036 clipped_ref=0 clipped_bfp=0
+I (26874) aac_compare: QMFSTORAGE_HIST case=external variant=3 run=2 channel=1 bins=0:1249038,1:62489,2:11389,3:92,
+I (29430) aac_compare: QMFSTORAGE_RESULT case=external variant=3 run=3 samples=2646016 frames=646 max_l=3 max_r=3 different=146325 over_one=22561 over_two=169 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1049827 max_shift=14 ref_work=894190563 packed_work=1119017022 ref_max_call=1664929 packed_max_call=2017801 precision=PASS
+I (29430) aac_compare: QMFSTORAGE_STORAGE case=external variant=3 run=3 saturations=0
+I (29430) aac_compare: QMFSTORAGE_STATS case=external variant=3 run=3 channel=0 samples=1323008 abs_sum=83512 square_sum=105980 signal_square_sum=25730259470447 signed_sum=5976 over_one=11080 over_two=77 over_limit=0 maximum=3 max_at=33046 max_ref=6542 max_bfp=6545 clipped_ref=0 clipped_bfp=0
+I (29430) aac_compare: QMFSTORAGE_HIST case=external variant=3 run=3 channel=0 bins=0:1250653,1:61275,2:11003,3:77,
+I (29430) aac_compare: QMFSTORAGE_STATS case=external variant=3 run=3 channel=1 samples=1323008 abs_sum=85543 square_sum=108873 signal_square_sum=27561998527216 signed_sum=6253 over_one=11481 over_two=92 over_limit=0 maximum=3 max_at=2462 max_ref=-1039 max_bfp=-1036 clipped_ref=0 clipped_bfp=0
+I (29430) aac_compare: QMFSTORAGE_HIST case=external variant=3 run=3 channel=1 bins=0:1249038,1:62489,2:11389,3:92,
+I (31986) aac_compare: QMFSTORAGE_RESULT case=external variant=4 run=1 samples=2646016 frames=646 max_l=3 max_r=3 different=146325 over_one=22561 over_two=169 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1049827 max_shift=14 ref_work=894189561 packed_work=1119183400 ref_max_call=1664929 packed_max_call=2018057 precision=PASS
+I (31986) aac_compare: QMFSTORAGE_STORAGE case=external variant=4 run=1 saturations=0
+I (31986) aac_compare: QMFSTORAGE_STATS case=external variant=4 run=1 channel=0 samples=1323008 abs_sum=83512 square_sum=105980 signal_square_sum=25730259470447 signed_sum=5976 over_one=11080 over_two=77 over_limit=0 maximum=3 max_at=33046 max_ref=6542 max_bfp=6545 clipped_ref=0 clipped_bfp=0
+I (31986) aac_compare: QMFSTORAGE_HIST case=external variant=4 run=1 channel=0 bins=0:1250653,1:61275,2:11003,3:77,
+I (31986) aac_compare: QMFSTORAGE_STATS case=external variant=4 run=1 channel=1 samples=1323008 abs_sum=85543 square_sum=108873 signal_square_sum=27561998527216 signed_sum=6253 over_one=11481 over_two=92 over_limit=0 maximum=3 max_at=2462 max_ref=-1039 max_bfp=-1036 clipped_ref=0 clipped_bfp=0
+I (31986) aac_compare: QMFSTORAGE_HIST case=external variant=4 run=1 channel=1 bins=0:1249038,1:62489,2:11389,3:92,
+I (34541) aac_compare: QMFSTORAGE_RESULT case=external variant=4 run=2 samples=2646016 frames=646 max_l=3 max_r=3 different=146325 over_one=22561 over_two=169 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1049827 max_shift=14 ref_work=894141253 packed_work=1119231509 ref_max_call=1664929 packed_max_call=2018057 precision=PASS
+I (34541) aac_compare: QMFSTORAGE_STORAGE case=external variant=4 run=2 saturations=0
+I (34541) aac_compare: QMFSTORAGE_STATS case=external variant=4 run=2 channel=0 samples=1323008 abs_sum=83512 square_sum=105980 signal_square_sum=25730259470447 signed_sum=5976 over_one=11080 over_two=77 over_limit=0 maximum=3 max_at=33046 max_ref=6542 max_bfp=6545 clipped_ref=0 clipped_bfp=0
+I (34541) aac_compare: QMFSTORAGE_HIST case=external variant=4 run=2 channel=0 bins=0:1250653,1:61275,2:11003,3:77,
+I (34541) aac_compare: QMFSTORAGE_STATS case=external variant=4 run=2 channel=1 samples=1323008 abs_sum=85543 square_sum=108873 signal_square_sum=27561998527216 signed_sum=6253 over_one=11481 over_two=92 over_limit=0 maximum=3 max_at=2462 max_ref=-1039 max_bfp=-1036 clipped_ref=0 clipped_bfp=0
+I (34541) aac_compare: QMFSTORAGE_HIST case=external variant=4 run=2 channel=1 bins=0:1249038,1:62489,2:11389,3:92,
+I (37097) aac_compare: QMFSTORAGE_RESULT case=external variant=4 run=3 samples=2646016 frames=646 max_l=3 max_r=3 different=146325 over_one=22561 over_two=169 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=1049827 max_shift=14 ref_work=894189561 packed_work=1119183400 ref_max_call=1664929 packed_max_call=2018057 precision=PASS
+I (37097) aac_compare: QMFSTORAGE_STORAGE case=external variant=4 run=3 saturations=0
+I (37097) aac_compare: QMFSTORAGE_STATS case=external variant=4 run=3 channel=0 samples=1323008 abs_sum=83512 square_sum=105980 signal_square_sum=25730259470447 signed_sum=5976 over_one=11080 over_two=77 over_limit=0 maximum=3 max_at=33046 max_ref=6542 max_bfp=6545 clipped_ref=0 clipped_bfp=0
+I (37097) aac_compare: QMFSTORAGE_HIST case=external variant=4 run=3 channel=0 bins=0:1250653,1:61275,2:11003,3:77,
+I (37097) aac_compare: QMFSTORAGE_STATS case=external variant=4 run=3 channel=1 samples=1323008 abs_sum=85543 square_sum=108873 signal_square_sum=27561998527216 signed_sum=6253 over_one=11481 over_two=92 over_limit=0 maximum=3 max_at=2462 max_ref=-1039 max_bfp=-1036 clipped_ref=0 clipped_bfp=0
+I (37097) aac_compare: QMFSTORAGE_HIST case=external variant=4 run=3 channel=1 bins=0:1249038,1:62489,2:11389,3:92,
+I (39648) aac_compare: QMFSTORAGE_RESULT case=external variant=5 run=1 samples=2646016 frames=646 max_l=3 max_r=3 different=94007 over_one=14480 over_two=70 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=980685 max_shift=13 ref_work=894184551 packed_work=1115628800 ref_max_call=1664929 packed_max_call=2016561 precision=PASS
+I (39648) aac_compare: QMFSTORAGE_STORAGE case=external variant=5 run=1 saturations=0
+I (39648) aac_compare: QMFSTORAGE_STATS case=external variant=5 run=1 channel=0 samples=1323008 abs_sum=53784 square_sum=68230 signal_square_sum=25730259470447 signed_sum=6190 over_one=7155 over_two=34 over_limit=0 maximum=3 max_at=24555 max_ref=1017 max_bfp=1020 clipped_ref=0 clipped_bfp=0
+I (39648) aac_compare: QMFSTORAGE_HIST case=external variant=5 run=1 channel=0 bins=0:1276413,1:39440,2:7121,3:34,
+I (39648) aac_compare: QMFSTORAGE_STATS case=external variant=5 run=1 channel=1 samples=1323008 abs_sum=54773 square_sum=69567 signal_square_sum=27561998527216 signed_sum=6619 over_one=7325 over_two=36 over_limit=0 maximum=3 max_at=28598 max_ref=-14969 max_bfp=-14966 clipped_ref=0 clipped_bfp=0
+I (39648) aac_compare: QMFSTORAGE_HIST case=external variant=5 run=1 channel=1 bins=0:1275596,1:40087,2:7289,3:36,
+I (42199) aac_compare: QMFSTORAGE_RESULT case=external variant=5 run=2 samples=2646016 frames=646 max_l=3 max_r=3 different=94007 over_one=14480 over_two=70 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=980685 max_shift=13 ref_work=894140951 packed_work=1115672400 ref_max_call=1664929 packed_max_call=2016561 precision=PASS
+I (42199) aac_compare: QMFSTORAGE_STORAGE case=external variant=5 run=2 saturations=0
+I (42199) aac_compare: QMFSTORAGE_STATS case=external variant=5 run=2 channel=0 samples=1323008 abs_sum=53784 square_sum=68230 signal_square_sum=25730259470447 signed_sum=6190 over_one=7155 over_two=34 over_limit=0 maximum=3 max_at=24555 max_ref=1017 max_bfp=1020 clipped_ref=0 clipped_bfp=0
+I (42199) aac_compare: QMFSTORAGE_HIST case=external variant=5 run=2 channel=0 bins=0:1276413,1:39440,2:7121,3:34,
+I (42199) aac_compare: QMFSTORAGE_STATS case=external variant=5 run=2 channel=1 samples=1323008 abs_sum=54773 square_sum=69567 signal_square_sum=27561998527216 signed_sum=6619 over_one=7325 over_two=36 over_limit=0 maximum=3 max_at=28598 max_ref=-14969 max_bfp=-14966 clipped_ref=0 clipped_bfp=0
+I (42199) aac_compare: QMFSTORAGE_HIST case=external variant=5 run=2 channel=1 bins=0:1275596,1:40087,2:7289,3:36,
+I (44750) aac_compare: QMFSTORAGE_RESULT case=external variant=5 run=3 samples=2646016 frames=646 max_l=3 max_r=3 different=94007 over_one=14480 over_two=70 over_limit=0 complex_rows=0 real_rows=41344 changed_qmf=980685 max_shift=13 ref_work=894184551 packed_work=1115628800 ref_max_call=1664929 packed_max_call=2016561 precision=PASS
+I (44750) aac_compare: QMFSTORAGE_STORAGE case=external variant=5 run=3 saturations=0
+I (44750) aac_compare: QMFSTORAGE_STATS case=external variant=5 run=3 channel=0 samples=1323008 abs_sum=53784 square_sum=68230 signal_square_sum=25730259470447 signed_sum=6190 over_one=7155 over_two=34 over_limit=0 maximum=3 max_at=24555 max_ref=1017 max_bfp=1020 clipped_ref=0 clipped_bfp=0
+I (44750) aac_compare: QMFSTORAGE_HIST case=external variant=5 run=3 channel=0 bins=0:1276413,1:39440,2:7121,3:34,
+I (44750) aac_compare: QMFSTORAGE_STATS case=external variant=5 run=3 channel=1 samples=1323008 abs_sum=54773 square_sum=69567 signal_square_sum=27561998527216 signed_sum=6619 over_one=7325 over_two=36 over_limit=0 maximum=3 max_at=28598 max_ref=-14969 max_bfp=-14966 clipped_ref=0 clipped_bfp=0
+I (44750) aac_compare: QMFSTORAGE_HIST case=external variant=5 run=3 channel=1 bins=0:1275596,1:40087,2:7289,3:36,
+I (47083) aac_compare: QMFSTORAGE_RESULT case=external variant=0 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=894129441 packed_work=894079829 ref_max_call=1664929 packed_max_call=1664929 precision=PASS
+I (47083) aac_compare: QMFSTORAGE_STORAGE case=external variant=0 run=1 saturations=0
+I (47083) aac_compare: QMFSTORAGE_STATS case=external variant=0 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=25730259470447 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=0 clipped_bfp=0
+I (47083) aac_compare: QMFSTORAGE_HIST case=external variant=0 run=1 channel=0 bins=0:1323008,
+I (47083) aac_compare: QMFSTORAGE_STATS case=external variant=0 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=27561998527216 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=0 clipped_bfp=0
+I (47083) aac_compare: QMFSTORAGE_HIST case=external variant=0 run=1 channel=1 bins=0:1323008,
+I (49416) aac_compare: QMFSTORAGE_RESULT case=external variant=0 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=894079829 packed_work=894129441 ref_max_call=1664929 packed_max_call=1664929 precision=PASS
+I (49416) aac_compare: QMFSTORAGE_STORAGE case=external variant=0 run=2 saturations=0
+I (49416) aac_compare: QMFSTORAGE_STATS case=external variant=0 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=25730259470447 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=0 clipped_bfp=0
+I (49416) aac_compare: QMFSTORAGE_HIST case=external variant=0 run=2 channel=0 bins=0:1323008,
+I (49416) aac_compare: QMFSTORAGE_STATS case=external variant=0 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=27561998527216 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=0 clipped_bfp=0
+I (49416) aac_compare: QMFSTORAGE_HIST case=external variant=0 run=2 channel=1 bins=0:1323008,
+I (51749) aac_compare: QMFSTORAGE_RESULT case=external variant=0 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=894129441 packed_work=894079829 ref_max_call=1664929 packed_max_call=1664929 precision=PASS
+I (51749) aac_compare: QMFSTORAGE_STORAGE case=external variant=0 run=3 saturations=0
+I (51749) aac_compare: QMFSTORAGE_STATS case=external variant=0 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=25730259470447 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=0 clipped_bfp=0
+I (51749) aac_compare: QMFSTORAGE_HIST case=external variant=0 run=3 channel=0 bins=0:1323008,
+I (51749) aac_compare: QMFSTORAGE_STATS case=external variant=0 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=27561998527216 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=0 clipped_bfp=0
+I (51749) aac_compare: QMFSTORAGE_HIST case=external variant=0 run=3 channel=1 bins=0:1323008,
+I (51749) aac_compare: QMFSTORAGE_EXPERIMENT_COMPLETE external recording; inspect precision per case
+I (51749) qemu_aac: QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes
+I (51749) yoradio_c3: QEMU_OLED_PASS 72x40 framebuffer presented
+I (51749) yoradio_c3: QEMU_SMOKE_PASS OLED, audio, NVS, SPIFFS and FreeRTOS; free heap: 305372 bytes

@@ -36,14 +36,22 @@
 // FreeRTOS stacks are board resources and are kept with the hardware profile.
 // ESP-IDF stack sizes are expressed in bytes.
 #define BOARD_TASK_STACK_DISPLAY 4096
+#ifdef CONFIG_YORADIO_COMPACT_SERVICE_STACKS
+// Development profile, based on physical high-water measurements. Preserve the
+// shared 16 KiB decoder stack (Opus needs it); qualify services under OTA/load.
+#define BOARD_TASK_STACK_BOOT_BUTTON 2048
+#define BOARD_TASK_STACK_AUDIO_OUTPUT 2048
+#define BOARD_TASK_STACK_WEBSOCKET_STATUS 4096
+#else
 #define BOARD_TASK_STACK_BOOT_BUTTON 4096
+#define BOARD_TASK_STACK_AUDIO_OUTPUT 4096
+#define BOARD_TASK_STACK_WEBSOCKET_STATUS 8192
+#endif
 #define BOARD_TASK_STACK_ROTARY_ENCODER 4096
 #define BOARD_TASK_STACK_SERVICES 6144
 #define BOARD_TASK_STACK_RADIO_STREAM 6144
 #define BOARD_TASK_STACK_AUDIO_DECODER 16384
-#define BOARD_TASK_STACK_AUDIO_OUTPUT 4096
 #define BOARD_TASK_STACK_WIFI_RSSI 2048
-#define BOARD_TASK_STACK_WEBSOCKET_STATUS 8192
 #define BOARD_TASK_STACK_WEB_STATIC 4096
 #define BOARD_TASK_STACK_WIFI_REBOOT 2048
 #define BOARD_TASK_STACK_TIME_SYNC 2048

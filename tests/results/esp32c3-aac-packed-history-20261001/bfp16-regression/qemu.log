@@ -1,0 +1,167 @@
+ESP-ROM:esp32c3-api1-20210207
+Build:Feb  7 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fcd5830,len:0x155c
+load:0x403cbf10,len:0xce0
+load:0x403ce710,len:0x2fcc
+entry 0x403cbf1a
+I (0) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (0) boot: compile time Sep 30 2026 22:54:25
+I (0) boot: chip revision: v0.3
+I (0) boot: efuse block revision: v1.3
+I (0) boot.esp32c3: SPI Speed      : 80MHz
+I (0) boot.esp32c3: SPI Mode       : SLOW READ
+I (0) boot.esp32c3: SPI Flash Size : 4MB
+I (0) boot: Enabling RNG early entropy source...
+I (0) boot: Partition Table:
+I (0) boot: ## Label            Usage          Type ST Offset   Length
+I (0) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (0) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (0) boot:  2 app0             OTA app          00 10 00010000 001d0000
+I (0) boot:  3 app1             OTA app          00 11 001e0000 001d0000
+I (0) boot:  4 spiffs           Unknown data     01 82 003b0000 00040000
+I (0) boot:  5 coredump         Unknown data     01 03 003f0000 00010000
+I (0) boot: End of partition table
+I (0) boot: No factory image, trying OTA 0
+I (0) esp_image: segment 0: paddr=00010020 vaddr=3c040020 size=206c8h (132808) map
+I (2) esp_image: segment 1: paddr=000306f0 vaddr=3fc8a400 size=019d4h (  6612) load
+I (2) esp_image: segment 2: paddr=000320cc vaddr=40380000 size=0a3a0h ( 41888) load
+I (2) esp_image: segment 3: paddr=0003c474 vaddr=50000000 size=00024h (    36) load
+I (3) esp_image: segment 4: paddr=0003c4a0 vaddr=00000000 size=03b78h ( 15224) 
+I (3) esp_image: segment 5: paddr=00040020 vaddr=42000020 size=3d7f4h (251892) map
+I (6) boot: Loaded app from partition at offset 0x10000
+I (6) boot: Set actual ota_seq=1 in otadata[0]
+I (6) boot: Disabling RNG early entropy source...
+I (6) cpu_start: Unicore app
+I (14) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
+I (14) cpu_start: Pro cpu start user code
+I (14) cpu_start: cpu freq: 160000000 Hz
+I (14) app_init: Application information:
+I (14) app_init: Project name:     yoradio_esp32c3_oled_native
+I (14) app_init: App version:      v0.9.693-1078-g6d7e5b7f-dirty
+I (14) app_init: Compile time:     Oct  1 2026 10:30:50
+I (14) app_init: ELF file SHA256:  21771995e...
+I (14) app_init: ESP-IDF:          v6.0.2
+I (14) efuse_init: Min chip rev:     v0.3
+I (14) efuse_init: Max chip rev:     v1.99 
+I (14) efuse_init: Chip rev:         v0.3
+I (14) heap_init: Initializing. RAM available for dynamic allocation:
+I (14) heap_init: At 3FC8D140 len 00032EC0 (203 KiB): RAM
+I (14) heap_init: At 3FCC0000 len 0001C710 (113 KiB): Retention RAM
+I (14) heap_init: At 3FCDC710 len 00002950 (10 KiB): Retention RAM
+I (14) heap_init: At 50000024 len 00001FC4 (7 KiB): RTCRAM
+I (14) spi_flash: detected chip: gd
+I (14) spi_flash: flash io: dio
+I (14) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (14) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (14) main_task: Started on CPU0
+I (14) main_task: Calling app_main()
+I (14) yoradio_c3: Starting pure ESP-IDF ESP32-C3 OLED yoRadio
+I (14) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (14) runtime_settings: Restored aif=0 softap=0 abuff=10 watchdog=1 tz=0:00 timeint=60 vols=1 enca=200
+W (14) yoradio_c3: QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO disabled
+I (14) oled: SSD1306 72x40 ready at I2C 0x3c
+I (14) audio_output: QEMU stereo PCM ready at 48000 Hz
+I (14) main_task: Returned from app_main()
+I (114) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (115) yoradio_c3: QEMU_AUDIO_PASS 24000 stereo frames
+I (117) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (476) qemu_aac: QEMU_AAC_CASE_PASS HE44 first: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186764 min 186764
+I (1035) qemu_aac: QEMU_AAC_CASE_PASS LC44 stereo: 44100 Hz 2 ch, 24 frames, 24576 samples, free 243284 min 186764
+I (1035) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (1635) qemu_aac: QEMU_AAC_CASE_PASS LC22 mono: 22050 Hz 1 ch, 13 frames, 13312 samples, free 243156 min 186764
+I (1635) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (2195) qemu_aac: QEMU_AAC_CASE_PASS LC48 stereo: 48000 Hz 2 ch, 26 frames, 26624 samples, free 243156 min 186764
+I (2196) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (2845) qemu_aac: QEMU_AAC_CASE_PASS HE44 stereo: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186636 min 186636
+I (2846) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (3485) qemu_aac: QEMU_AAC_CASE_PASS HE48 stereo: 48000 Hz 2 ch, 15 frames, 30720 samples, free 186636 min 186636
+I (3486) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (4175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 stereo: 44100 Hz 2 ch, 15 frames, 30720 samples, free 186636 min 186636
+I (4175) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (4785) qemu_aac: QEMU_AAC_CASE_PASS LC22 same header: 22050 Hz 1 ch, 13 frames, 13312 samples, free 243156 min 186636
+I (5475) qemu_aac: QEMU_AAC_CASE_PASS Implicit SBR core: 22050 Hz 1 ch, 15 frames, 15360 samples, free 243156 min 186636
+W (5475) qemu_aac: QEMU_AAC_LIMITATION implicit SBR/PS change needs stream restart
+I (5476) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (6175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 restart: 44100 Hz 2 ch, 15 frames, 30720 samples, free 187148 min 186636
+I (6175) aac_compare: BFP16_COUNTER_PASS nop1024=1025
+I (6272) aac_compare: BFP16_ARITHMETIC_PASS int16-exhaustive int32-edges random-blocks=4096
+I (6272) aac_compare: BFP16_ENV codec=v2.6.0-4-gfd141ab control=0 runs=3 repeats=2 baseline=wrap-bypass RAM_saved=0
+I (6309) aac_compare: BFP16_RESULT case=lc44100_stereo bands=32 run=1 samples=98304 frames=48 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=12462490 bfp_work=12455799 ref_max_call=385504 bfp_max_call=385003 precision=PASS
+I (6346) aac_compare: BFP16_RESULT case=lc44100_stereo bands=32 run=2 samples=98304 frames=48 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=12455297 bfp_work=12462488 ref_max_call=385003 bfp_max_call=385504 precision=PASS
+I (6383) aac_compare: BFP16_RESULT case=lc44100_stereo bands=32 run=3 samples=98304 frames=48 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=12462488 bfp_work=12455297 ref_max_call=385504 bfp_max_call=385003 precision=PASS
+I (6403) aac_compare: BFP16_RESULT case=lc22050_mono bands=32 run=1 samples=26624 frames=26 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=4040028 bfp_work=3990992 ref_max_call=278572 bfp_max_call=277534 precision=PASS
+I (6423) aac_compare: BFP16_RESULT case=lc22050_mono bands=32 run=2 samples=26624 frames=26 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=3990992 bfp_work=4040027 ref_max_call=277534 bfp_max_call=278572 precision=PASS
+I (6443) aac_compare: BFP16_RESULT case=lc22050_mono bands=32 run=3 samples=26624 frames=26 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=4040027 bfp_work=3990992 ref_max_call=278572 bfp_max_call=277534 precision=PASS
+I (6480) aac_compare: BFP16_RESULT case=lc48000_stereo bands=32 run=1 samples=106496 frames=52 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=13425432 bfp_work=13419243 ref_max_call=367188 bfp_max_call=366687 precision=PASS
+I (6517) aac_compare: BFP16_RESULT case=lc48000_stereo bands=32 run=2 samples=106496 frames=52 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=13419243 bfp_work=13425432 ref_max_call=366687 bfp_max_call=367188 precision=PASS
+I (6554) aac_compare: BFP16_RESULT case=lc48000_stereo bands=32 run=3 samples=106496 frames=52 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=13425432 bfp_work=13419243 ref_max_call=367188 bfp_max_call=366687 precision=PASS
+I (6643) aac_compare: BFP16_RESULT case=he44100_stereo bands=32 run=1 samples=114688 frames=28 max_l=5689 max_r=5453 different=89173 over_one=88391 over_two=87968 complex_rows=64 real_rows=1728 changed_qmf=42016 max_shift=14 ref_work=37019612 bfp_work=38750497 ref_max_call=1752498 bfp_max_call=1848138 precision=FAIL
+I (6643) aac_compare: BFP16_FIRST_ERROR case=he44100_stereo bands=32 run=1 sample=9111 ref=-1 bfp=1
+I (6732) aac_compare: BFP16_RESULT case=he44100_stereo bands=32 run=2 samples=114688 frames=28 max_l=5689 max_r=5453 different=89173 over_one=88391 over_two=87968 complex_rows=64 real_rows=1728 changed_qmf=42016 max_shift=14 ref_work=36906705 bfp_work=38863388 ref_max_call=1748744 bfp_max_call=1851878 precision=FAIL
+I (6732) aac_compare: BFP16_FIRST_ERROR case=he44100_stereo bands=32 run=2 sample=9111 ref=-1 bfp=1
+I (6821) aac_compare: BFP16_RESULT case=he44100_stereo bands=32 run=3 samples=114688 frames=28 max_l=5689 max_r=5453 different=89173 over_one=88391 over_two=87968 complex_rows=64 real_rows=1728 changed_qmf=42016 max_shift=14 ref_work=37019599 bfp_work=38750494 ref_max_call=1752486 bfp_max_call=1848136 precision=FAIL
+I (6821) aac_compare: BFP16_FIRST_ERROR case=he44100_stereo bands=32 run=3 sample=9111 ref=-1 bfp=1
+I (6910) aac_compare: BFP16_RESULT case=he44100_stereo bands=8 run=1 samples=114688 frames=28 max_l=3 max_r=3 different=17618 over_one=3122 over_two=89 complex_rows=64 real_rows=1728 changed_qmf=13824 max_shift=14 ref_work=37019599 bfp_work=38887433 ref_max_call=1752486 bfp_max_call=1853128 precision=FAIL
+I (6910) aac_compare: BFP16_FIRST_ERROR case=he44100_stereo bands=8 run=1 sample=9811 ref=-12 bfp=-10
+I (6999) aac_compare: BFP16_RESULT case=he44100_stereo bands=8 run=2 samples=114688 frames=28 max_l=3 max_r=3 different=17618 over_one=3122 over_two=89 complex_rows=64 real_rows=1728 changed_qmf=13824 max_shift=14 ref_work=36906705 bfp_work=39000327 ref_max_call=1748744 bfp_max_call=1856870 precision=FAIL
+I (6999) aac_compare: BFP16_FIRST_ERROR case=he44100_stereo bands=8 run=2 sample=9811 ref=-12 bfp=-10
+I (7088) aac_compare: BFP16_RESULT case=he44100_stereo bands=8 run=3 samples=114688 frames=28 max_l=3 max_r=3 different=17618 over_one=3122 over_two=89 complex_rows=64 real_rows=1728 changed_qmf=13824 max_shift=14 ref_work=37019599 bfp_work=38887433 ref_max_call=1752486 bfp_max_call=1853128 precision=FAIL
+I (7088) aac_compare: BFP16_FIRST_ERROR case=he44100_stereo bands=8 run=3 sample=9811 ref=-12 bfp=-10
+I (7177) aac_compare: BFP16_RESULT case=he44100_stereo bands=1 run=1 samples=114688 frames=28 max_l=3 max_r=3 different=7316 over_one=1179 over_two=10 complex_rows=64 real_rows=1728 changed_qmf=5800 max_shift=14 ref_work=37019599 bfp_work=39936123 ref_max_call=1752486 bfp_max_call=1899720 precision=FAIL
+I (7177) aac_compare: BFP16_FIRST_ERROR case=he44100_stereo bands=1 run=1 sample=9734 ref=-18 bfp=-16
+I (7266) aac_compare: BFP16_RESULT case=he44100_stereo bands=1 run=2 samples=114688 frames=28 max_l=3 max_r=3 different=7316 over_one=1179 over_two=10 complex_rows=64 real_rows=1728 changed_qmf=5800 max_shift=14 ref_work=36907707 bfp_work=40048015 ref_max_call=1748744 bfp_max_call=1903462 precision=FAIL
+I (7266) aac_compare: BFP16_FIRST_ERROR case=he44100_stereo bands=1 run=2 sample=9734 ref=-18 bfp=-16
+I (7355) aac_compare: BFP16_RESULT case=he44100_stereo bands=1 run=3 samples=114688 frames=28 max_l=3 max_r=3 different=7316 over_one=1179 over_two=10 complex_rows=64 real_rows=1728 changed_qmf=5800 max_shift=14 ref_work=37019599 bfp_work=39936123 ref_max_call=1752486 bfp_max_call=1899720 precision=FAIL
+I (7355) aac_compare: BFP16_FIRST_ERROR case=he44100_stereo bands=1 run=3 sample=9734 ref=-18 bfp=-16
+I (7441) aac_compare: BFP16_RESULT case=he44100_stereo bands=0 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=37019098 bfp_work=36906204 ref_max_call=1752486 bfp_max_call=1748744 precision=PASS
+I (7527) aac_compare: BFP16_RESULT case=he44100_stereo bands=0 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36906204 bfp_work=37019098 ref_max_call=1748744 bfp_max_call=1752486 precision=PASS
+I (7613) aac_compare: BFP16_RESULT case=he44100_stereo bands=0 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=37019098 bfp_work=36906204 ref_max_call=1752486 bfp_max_call=1748744 precision=PASS
+I (7708) aac_compare: BFP16_RESULT case=he48000_stereo bands=32 run=1 samples=122880 frames=30 max_l=4913 max_r=5016 different=97361 over_one=96145 over_two=95605 complex_rows=64 real_rows=1856 changed_qmf=45183 max_shift=14 ref_work=40061028 bfp_work=41921414 ref_max_call=1756085 bfp_max_call=1851735 precision=FAIL
+I (7708) aac_compare: BFP16_FIRST_ERROR case=he48000_stereo bands=32 run=1 sample=9375 ref=0 bfp=-2
+I (7803) aac_compare: BFP16_RESULT case=he48000_stereo bands=32 run=2 samples=122880 frames=30 max_l=4913 max_r=5016 different=97361 over_one=96145 over_two=95605 complex_rows=64 real_rows=1856 changed_qmf=45183 max_shift=14 ref_work=39931544 bfp_work=42050898 ref_max_call=1752343 bfp_max_call=1855477 precision=FAIL
+I (7803) aac_compare: BFP16_FIRST_ERROR case=he48000_stereo bands=32 run=2 sample=9375 ref=0 bfp=-2
+I (7898) aac_compare: BFP16_RESULT case=he48000_stereo bands=32 run=3 samples=122880 frames=30 max_l=4913 max_r=5016 different=97361 over_one=96145 over_two=95605 complex_rows=64 real_rows=1856 changed_qmf=45183 max_shift=14 ref_work=40061028 bfp_work=41921414 ref_max_call=1756085 bfp_max_call=1851735 precision=FAIL
+I (7898) aac_compare: BFP16_FIRST_ERROR case=he48000_stereo bands=32 run=3 sample=9375 ref=0 bfp=-2
+I (7993) aac_compare: BFP16_RESULT case=he48000_stereo bands=8 run=1 samples=122880 frames=30 max_l=3 max_r=3 different=18958 over_one=3266 over_two=73 complex_rows=64 real_rows=1856 changed_qmf=15431 max_shift=14 ref_work=40061529 bfp_work=42054428 ref_max_call=1756085 bfp_max_call=1856727 precision=FAIL
+I (7993) aac_compare: BFP16_FIRST_ERROR case=he48000_stereo bands=8 run=1 sample=9775 ref=-160 bfp=-158
+I (8088) aac_compare: BFP16_RESULT case=he48000_stereo bands=8 run=2 samples=122880 frames=30 max_l=3 max_r=3 different=18958 over_one=3266 over_two=73 complex_rows=64 real_rows=1856 changed_qmf=15431 max_shift=14 ref_work=39931544 bfp_work=42184413 ref_max_call=1752343 bfp_max_call=1860469 precision=FAIL
+I (8088) aac_compare: BFP16_FIRST_ERROR case=he48000_stereo bands=8 run=2 sample=9775 ref=-160 bfp=-158
+I (8183) aac_compare: BFP16_RESULT case=he48000_stereo bands=8 run=3 samples=122880 frames=30 max_l=3 max_r=3 different=18958 over_one=3266 over_two=73 complex_rows=64 real_rows=1856 changed_qmf=15431 max_shift=14 ref_work=40061529 bfp_work=42054428 ref_max_call=1756085 bfp_max_call=1856727 precision=FAIL
+I (8183) aac_compare: BFP16_FIRST_ERROR case=he48000_stereo bands=8 run=3 sample=9775 ref=-160 bfp=-158
+I (8278) aac_compare: BFP16_RESULT case=he48000_stereo bands=1 run=1 samples=122880 frames=30 max_l=3 max_r=2 different=7496 over_one=1150 over_two=7 complex_rows=64 real_rows=1856 changed_qmf=6832 max_shift=14 ref_work=40060026 bfp_work=43188691 ref_max_call=1756085 bfp_max_call=1903319 precision=FAIL
+I (8278) aac_compare: BFP16_FIRST_ERROR case=he48000_stereo bands=1 run=1 sample=10028 ref=926 bfp=924
+I (8373) aac_compare: BFP16_RESULT case=he48000_stereo bands=1 run=2 samples=122880 frames=30 max_l=3 max_r=2 different=7496 over_one=1150 over_two=7 complex_rows=64 real_rows=1856 changed_qmf=6832 max_shift=14 ref_work=39931544 bfp_work=43317173 ref_max_call=1752343 bfp_max_call=1907061 precision=FAIL
+I (8373) aac_compare: BFP16_FIRST_ERROR case=he48000_stereo bands=1 run=2 sample=10028 ref=926 bfp=924
+I (8468) aac_compare: BFP16_RESULT case=he48000_stereo bands=1 run=3 samples=122880 frames=30 max_l=3 max_r=2 different=7496 over_one=1150 over_two=7 complex_rows=64 real_rows=1856 changed_qmf=6832 max_shift=14 ref_work=40060026 bfp_work=43188691 ref_max_call=1756085 bfp_max_call=1903319 precision=FAIL
+I (8468) aac_compare: BFP16_FIRST_ERROR case=he48000_stereo bands=1 run=3 sample=10028 ref=926 bfp=924
+I (8560) aac_compare: BFP16_RESULT case=he48000_stereo bands=0 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40058523 bfp_work=39931043 ref_max_call=1756085 bfp_max_call=1752343 precision=PASS
+I (8652) aac_compare: BFP16_RESULT case=he48000_stereo bands=0 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=39931043 bfp_work=40058523 ref_max_call=1752343 bfp_max_call=1756085 precision=PASS
+I (8744) aac_compare: BFP16_RESULT case=he48000_stereo bands=0 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40058523 bfp_work=39931043 ref_max_call=1756085 bfp_max_call=1752343 precision=PASS
+I (8856) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=32 run=1 samples=122880 frames=30 max_l=1818 max_r=937 different=89135 over_one=87082 over_two=85780 complex_rows=960 real_rows=0 changed_qmf=27668 max_shift=12 ref_work=50836631 bfp_work=52541296 ref_max_call=1843734 bfp_max_call=1903181 precision=FAIL
+I (8856) aac_compare: BFP16_FIRST_ERROR case=hev2_44100_stereo bands=32 run=1 sample=13561 ref=3 bfp=5
+I (8968) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=32 run=2 samples=122880 frames=30 max_l=1818 max_r=937 different=89135 over_one=87082 over_two=85780 complex_rows=960 real_rows=0 changed_qmf=27668 max_shift=12 ref_work=50831736 bfp_work=52546191 ref_max_call=1844235 bfp_max_call=1902680 precision=FAIL
+I (8968) aac_compare: BFP16_FIRST_ERROR case=hev2_44100_stereo bands=32 run=2 sample=13561 ref=3 bfp=5
+I (9080) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=32 run=3 samples=122880 frames=30 max_l=1818 max_r=937 different=89135 over_one=87082 over_two=85780 complex_rows=960 real_rows=0 changed_qmf=27668 max_shift=12 ref_work=50836631 bfp_work=52541296 ref_max_call=1843734 bfp_max_call=1903181 precision=FAIL
+I (9080) aac_compare: BFP16_FIRST_ERROR case=hev2_44100_stereo bands=32 run=3 sample=13561 ref=3 bfp=5
+I (9192) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=8 run=1 samples=122880 frames=30 max_l=122 max_r=342 different=85216 over_one=79958 over_two=76538 complex_rows=960 real_rows=0 changed_qmf=12438 max_shift=12 ref_work=50836631 bfp_work=52527813 ref_max_call=1843734 bfp_max_call=1902725 precision=FAIL
+I (9192) aac_compare: BFP16_FIRST_ERROR case=hev2_44100_stereo bands=8 run=1 sample=13561 ref=3 bfp=5
+I (9304) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=8 run=2 samples=122880 frames=30 max_l=122 max_r=342 different=85216 over_one=79958 over_two=76538 complex_rows=960 real_rows=0 changed_qmf=12438 max_shift=12 ref_work=50832237 bfp_work=52532207 ref_max_call=1844235 bfp_max_call=1902224 precision=FAIL
+I (9304) aac_compare: BFP16_FIRST_ERROR case=hev2_44100_stereo bands=8 run=2 sample=13561 ref=3 bfp=5
+I (9416) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=8 run=3 samples=122880 frames=30 max_l=122 max_r=342 different=85216 over_one=79958 over_two=76538 complex_rows=960 real_rows=0 changed_qmf=12438 max_shift=12 ref_work=50836631 bfp_work=52527813 ref_max_call=1843734 bfp_max_call=1902725 precision=FAIL
+I (9416) aac_compare: BFP16_FIRST_ERROR case=hev2_44100_stereo bands=8 run=3 sample=13561 ref=3 bfp=5
+I (9528) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=1 run=1 samples=122880 frames=30 max_l=3 max_r=3 different=6196 over_one=945 over_two=7 complex_rows=960 real_rows=0 changed_qmf=6210 max_shift=12 ref_work=50836631 bfp_work=53317174 ref_max_call=1844235 bfp_max_call=1932638 precision=FAIL
+I (9528) aac_compare: BFP16_FIRST_ERROR case=hev2_44100_stereo bands=1 run=1 sample=13561 ref=3 bfp=5
+I (9640) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=1 run=2 samples=122880 frames=30 max_l=3 max_r=3 different=6196 over_one=945 over_two=7 complex_rows=960 real_rows=0 changed_qmf=6210 max_shift=12 ref_work=50832237 bfp_work=53321067 ref_max_call=1844235 bfp_max_call=1932638 precision=FAIL
+I (9640) aac_compare: BFP16_FIRST_ERROR case=hev2_44100_stereo bands=1 run=2 sample=13561 ref=3 bfp=5
+I (9752) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=1 run=3 samples=122880 frames=30 max_l=3 max_r=3 different=6196 over_one=945 over_two=7 complex_rows=960 real_rows=0 changed_qmf=6210 max_shift=12 ref_work=50836130 bfp_work=53317174 ref_max_call=1844235 bfp_max_call=1932638 precision=FAIL
+I (9752) aac_compare: BFP16_FIRST_ERROR case=hev2_44100_stereo bands=1 run=3 sample=13561 ref=3 bfp=5
+I (9862) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=0 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50836130 bfp_work=50831235 ref_max_call=1844235 bfp_max_call=1843734 precision=PASS
+I (9972) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=0 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50831736 bfp_work=50836130 ref_max_call=1843734 bfp_max_call=1844235 precision=PASS
+I (10082) aac_compare: BFP16_RESULT case=hev2_44100_stereo bands=0 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50836130 bfp_work=50831736 ref_max_call=1844235 bfp_max_call=1843734 precision=PASS
+I (10082) aac_compare: BFP16_EXPERIMENT_COMPLETE inspect precision per case; no production approval
+I (10082) qemu_aac: QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes
+I (10082) yoradio_c3: QEMU_OLED_PASS 72x40 framebuffer presented
+I (10082) yoradio_c3: QEMU_SMOKE_PASS OLED, audio, NVS, SPIFFS and FreeRTOS; free heap: 305372 bytes

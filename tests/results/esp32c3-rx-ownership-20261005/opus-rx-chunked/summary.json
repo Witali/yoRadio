@@ -1,0 +1,115 @@
+{
+  "image": "669f15638ad88ff3e46c43e29cd7b4d2ff8c0b76202b57f12102271afd8bf9ba",
+  "input_sha256": {
+    "report": "5f0898651074a6c77ef9bbca54867389de5137267fee2c655735ddcf3b57a98e",
+    "performance": "d7747bdb34351799f7072985d517b60c2a4173a236349093c7a616f139d221ac",
+    "status": "ec7915662e878a978e5ad7c130cf3b3c8f11eda95030a717eead7c88293199a0"
+  },
+  "acceptance": {
+    "idle-before": "PASS",
+    "initial-load": "FAIL",
+    "settled-load": "FAIL",
+    "idle-after": "PASS",
+    "settled-idle-recovery": "PASS",
+    "restore-board": "PASS"
+  },
+  "fixture_hashes": {
+    "stress-opus-48000-2ch-16bit-200s": "35a88fd7fc4b567791fb6cb8796955e7c2466dd07d49b07412f7d2b6a66d1159"
+  },
+  "idle": {
+    "heap": {
+      "before": 147430.0,
+      "after": 147468.0
+    },
+    "largest": {
+      "before": 114688.0,
+      "after": 114688.0
+    },
+    "tasks": {
+      "before": 17.0,
+      "after": 17.0
+    }
+  },
+  "phase_metrics": {
+    "initial-load": {
+      "cpu_and_heap": {
+        "result": "FAIL",
+        "reason": "Progressive heap loss during continuous playback"
+      },
+      "maximum_http_ms": 140.99999994505197
+    },
+    "settled-load": {
+      "cpu_and_heap": {
+        "result": "PASS",
+        "mean_busy": 80.06666666666666,
+        "peak_busy": 81.0,
+        "minimum_heap": 77156.0,
+        "minimum_largest": 61440.0,
+        "audio_wall_ratio": 1.001721084532688
+      },
+      "maximum_http_ms": 3078.000000095926
+    }
+  },
+  "ownership": {
+    "scope": "Live netif RX heap payload capacity; excludes allocator block headers, TCP copies and all other owners",
+    "complete": true,
+    "maximum_live": 10,
+    "maximum_allocated_payload_bytes": 17912,
+    "maximum_walk_us": 1656,
+    "observed_size_histogram": {
+      "28": 182,
+      "32": 20,
+      "36": 5,
+      "40": 39,
+      "1728": 115,
+      "1792": 131
+    }
+  },
+  "phases": {
+    "idle-before": {
+      "snapshots": 3,
+      "live_min": 0,
+      "live_max": 0,
+      "payload_bytes_min": 0,
+      "payload_bytes_max": 0,
+      "inferred_heap_bytes_max": 0,
+      "maximum_walk_us": 199,
+      "counter_high_water": 10,
+      "unmatched_releases": 0
+    },
+    "initial-load": {
+      "snapshots": 8,
+      "live_min": 1,
+      "live_max": 9,
+      "payload_bytes_min": 1824,
+      "payload_bytes_max": 16148,
+      "inferred_heap_bytes_max": 16220,
+      "maximum_walk_us": 601,
+      "counter_high_water": 12,
+      "unmatched_releases": 0
+    },
+    "settled-load": {
+      "snapshots": 24,
+      "live_min": 8,
+      "live_max": 10,
+      "payload_bytes_min": 14244,
+      "payload_bytes_max": 17912,
+      "inferred_heap_bytes_max": 17992,
+      "maximum_walk_us": 1656,
+      "counter_high_water": 12,
+      "unmatched_releases": 0
+    },
+    "idle-after": {
+      "snapshots": 3,
+      "live_min": 0,
+      "live_max": 0,
+      "payload_bytes_min": 0,
+      "payload_bytes_max": 0,
+      "inferred_heap_bytes_max": 0,
+      "maximum_walk_us": 202,
+      "counter_high_water": 12,
+      "unmatched_releases": 0
+    }
+  },
+  "inferred_allocator_header_bytes": 4
+}

@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "id": "esp32c3-espressif-codecs-160mhz-20260930",
+  "target": "esp32c3",
+  "cpu_hz": 160000000,
+  "qemu_codec_version": "2.6.2",
+  "icount": "shift=0,align=off,sleep=off",
+  "qemu_decoder_runtime_version": "v2.6.0-4-gfd141ab",
+  "formula": "estimated decoder percent = instructions_per_audio_second / cpu_hz * 100 * factor",
+  "cache_accounting": {
+    "reference_cache_stalls_included_in_factor": true,
+    "separate_cache_stall_cycles_measured": false,
+    "reference_cache_stall_cycles": null,
+    "refill_penalty_cycles": null,
+    "qemu_cache_miss_counts_available": false,
+    "cache": {
+      "bytes": 16384,
+      "ways": 8,
+      "line_bytes": 32,
+      "read_only": true,
+      "dirty_line_writeback_applicable": false
+    },
+    "policy": "Use the saved factor with its reference cache cost included; do not add an unmeasured extra cache multiplier.",
+    "future_delta_model": "cycles = instructions * factor + target_cache_stall_cycles - instructions / reference_instructions * reference_cache_stall_cycles",
+    "future_delta_model_status": "Requires separately established reference and target stall costs; unavailable in retained measurements.",
+    "hardware_reference": "https://documentation.espressif.com/esp32-c3_datasheet_en.html"
+  },
+  "universal_factor_supported": false,
+  "aac_profile": {
+    "file": "esp32c3-aac-160mhz.json",
+    "sha256_utf8_lf": "24bbf718d2232ec3c20100266945d5ae74e26569a76e92f43ad644266da502cf",
+    "factor": 2.018192916067804,
+    "observed_factor_range": [
+      1.770877919668221,
+      2.0208442837150766
+    ]
+  },
+  "codecs": [
+    {
+      "codec": "mp3",
+      "backend": "Espressif",
+      "factor": 1.7853206125572458,
+      "observed_factor_range": [
+        1.785110928206405,
+        1.7855282881709922
+      ],
+      "hardware_log_sha256_utf8_lf": "341058172393ce0db014166f89aac467ff03ae955fcb9a0d32e20dd5a431789e",
+      "qemu_log_sha256_utf8_lf": "907b644250003f3df3c933c5673bc9438628f751fd308a69316d4742432116c1",
+      "windows": [
+        {
+          "window": 1,
+          "decode_ms_floor": 1325,
+          "pcm_bytes": 972288,
+          "input_bytes": 202605,
+          "calls": 309,
+          "instructions": 118732367,
+          "hardware_decode_percent_approx": 26.165086887835702,
+          "qemu_decode_percent_at_1_cpi": 14.65397499506319,
+          "effective_cycles_per_instruction": 1.7855282881709922,
+          "qemu_run_instructions": [
+            118732367,
+            118732367,
+            118732367
+          ],
+          "qemu_run_spread_percent": 0.0
+        },
+        {
+          "window": 2,
+          "decode_ms_floor": 1312,
+          "pcm_bytes": 963072,
+          "input_bytes": 200640,
+          "calls": 307,
+          "instructions": 117594933,
+          "hardware_decode_percent_approx": 26.156299840510368,
+          "qemu_decode_percent_at_1_cpi": 14.65247869318182,
+          "effective_cycles_per_instruction": 1.785110928206405,
+          "qemu_run_instructions": [
+            117594933,
+            117594933,
+            117594933
+          ],
+          "qemu_run_spread_percent": 0.0
+        }
+      ],
+      "runs_per_window": 3,
+      "fixture": {
+        "codec": "mp3",
+        "id": 1,
+        "bytes": 441645,
+        "sha256": "6d8d1a363390c3ba01965ab034a298d58cf4ef4c6e6599cf7d0a7c8b70acc80c",
+        "file": "mp3-320.mp3"
+      }
+    },
+    {
+      "codec": "flac",
+      "backend": "Espressif",
+      "factor": 1.4133378485039576,
+      "observed_factor_range": [
+        1.4125024015259169,
+        1.4141550999424486
+      ],
+      "hardware_log_sha256_utf8_lf": "72e60658af1dce92c72ae264d5d72b55707c0af9cef865ae64cd86368b3f7d7a",
+      "qemu_log_sha256_utf8_lf": "f49195146f496737aa70a5463f1cd85a71dc7c239b06cfd74933279d3fdda905",
+      "windows": [
+        {
+          "window": 1,
+          "decode_ms_floor": 698,
+          "pcm_bytes": 976896,
+          "input_bytes": 823869,
+          "calls": 456,
+          "instructions": 78972950,
+          "hardware_decode_percent_approx": 13.718553459119494,
+          "qemu_decode_percent_at_1_cpi": 9.70088320558176,
+          "effective_cycles_per_instruction": 1.4141550999424486,
+          "qemu_run_instructions": [
+            78972977,
+            78972950,
+            78972950
+          ],
+          "qemu_run_spread_percent": 3.418892164975476e-05
+        },
+        {
+          "window": 2,
+          "decode_ms_floor": 682,
+          "pcm_bytes": 976896,
+          "input_bytes": 816013,
+          "calls": 451,
+          "instructions": 77252966,
+          "hardware_decode_percent_approx": 13.404088050314467,
+          "qemu_decode_percent_at_1_cpi": 9.489603724449685,
+          "effective_cycles_per_instruction": 1.4125024015259169,
+          "qemu_run_instructions": [
+            77252966,
+            77252966,
+            77252966
+          ],
+          "qemu_run_spread_percent": 0.0
+        }
+      ],
+      "runs_per_window": 3,
+      "fixture": {
+        "codec": "flac",
+        "id": 2,
+        "bytes": 1771852,
+        "sha256": "d9a54de9e470158428bb340d2278baa6a36a5f5571ea8083af390ec46ca39aad",
+        "file": "flac-level8.flac"
+      }
+    },
+    {
+      "codec": "vorbis",
+      "backend": "Espressif",
+      "factor": 1.5331231845622508,
+      "observed_factor_range": [
+        1.5318091100954239,
+        1.5344195866214776
+      ],
+      "hardware_log_sha256_utf8_lf": "3dab6ba55c70edefab2c977a87c6ec369a1f6b8c31fe922352990f95797eaf9d",
+      "qemu_log_sha256_utf8_lf": "bd726aa0de1d9f9cc1c62f145ac668b66c2a92f3035ba6089965bbe9f79fa54a",
+      "windows": [
+        {
+          "window": 1,
+          "decode_ms_floor": 1851,
+          "pcm_bytes": 964864,
+          "input_bytes": 325632,
+          "calls": 246,
+          "instructions": 193011092,
+          "hardware_decode_percent_approx": 36.83337755372778,
+          "qemu_decode_percent_at_1_cpi": 24.004762370655346,
+          "effective_cycles_per_instruction": 1.5344195866214776,
+          "qemu_run_instructions": [
+            193011092,
+            193011092,
+            193011092
+          ],
+          "qemu_run_spread_percent": 0.0
+        },
+        {
+          "window": 2,
+          "decode_ms_floor": 1823,
+          "pcm_bytes": 962560,
+          "input_bytes": 317440,
+          "calls": 235,
+          "instructions": 190415371,
+          "hardware_decode_percent_approx": 36.36303191489361,
+          "qemu_decode_percent_at_1_cpi": 23.738618392619678,
+          "effective_cycles_per_instruction": 1.5318091100954239,
+          "qemu_run_instructions": [
+            190415371,
+            190415371,
+            190415371
+          ],
+          "qemu_run_spread_percent": 0.0
+        }
+      ],
+      "runs_per_window": 3,
+      "fixture": {
+        "codec": "vorbis",
+        "id": 3,
+        "bytes": 703584,
+        "sha256": "09d6cfa599f2c4a25f5745e5c8a605b5a1583a42d7990b9e5242b8990adff12f",
+        "file": "vorbis-q10.ogg"
+      }
+    },
+    {
+      "codec": "opus",
+      "backend": "Espressif",
+      "factor": 1.4801273123936949,
+      "observed_factor_range": [
+        1.4784508807021657,
+        1.4817887117182091
+      ],
+      "hardware_log_sha256_utf8_lf": "4891f4f814bfdb929654f4d571e051e9bf4d88d968a63156657fab6fbbcfa84c",
+      "qemu_log_sha256_utf8_lf": "a3448ad4d2ec173ddea8c3b100f0223a558f240c35e25d09f5c81de0664978de",
+      "windows": [
+        {
+          "window": 1,
+          "decode_ms_floor": 2143,
+          "pcm_bytes": 975360,
+          "input_bytes": 327680,
+          "calls": 255,
+          "instructions": 231396013,
+          "hardware_decode_percent_approx": 42.185039370078734,
+          "qemu_decode_percent_at_1_cpi": 28.468997662401573,
+          "effective_cycles_per_instruction": 1.4817887117182091,
+          "qemu_run_instructions": [
+            231396013,
+            231396013,
+            231396013
+          ],
+          "qemu_run_spread_percent": 0.0
+        },
+        {
+          "window": 2,
+          "decode_ms_floor": 2119,
+          "pcm_bytes": 963840,
+          "input_bytes": 321536,
+          "calls": 251,
+          "instructions": 229321112,
+          "hardware_decode_percent_approx": 42.21115537848606,
+          "qemu_decode_percent_at_1_cpi": 28.55093525896415,
+          "effective_cycles_per_instruction": 1.4784508807021657,
+          "qemu_run_instructions": [
+            229321112,
+            229321112,
+            229321112
+          ],
+          "qemu_run_spread_percent": 0.0
+        }
+      ],
+      "runs_per_window": 3,
+      "fixture": {
+        "codec": "opus",
+        "id": 4,
+        "bytes": 706319,
+        "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+        "file": "opus-510.ogg"
+      }
+    }
+  ],
+  "limitations": [
+    "Empirical decoder-call elapsed-time factor, not a universal CPU CPI or emulator speed multiplier.",
+    "Reference cache refill/stall costs are already included; their separate share was not measured. Adding another cache penalty would double-count it.",
+    "Observed range spans two historical firmware builds; it is not a confidence interval or guaranteed bound.",
+    "Hardware decode times are floored to milliseconds; counter/timer overhead and preemption are included.",
+    "AAC-LC rate/bitrate/channel or adapter changes are extrapolations; HE-AAC SBR/PS transfer is unvalidated.",
+    "No estimate of total radio CPU: Wi-Fi, TLS, PDM, display and other work must be added separately.",
+    "Historical logs lack a fixture hash and codec archive hash; recovered bytes match saved lengths and both exact PCM/input/call windows.",
+    "Recalibrate when codec library, target, clock, memory placement or instruction mix changes.",
+    "These four factors fit the earlier optimized hardware build; AAC's preferred factor fits the later build.",
+    "FLAC means the Espressif decoder, not the current custom FLAC backend; Helix/minimp3 are also outside scope.",
+    "No held-out physical validation; matching source windows calibrates rather than independently validates predictions."
+  ]
+}

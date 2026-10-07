@@ -1,0 +1,132 @@
+{
+  "board": {
+    "version": "v0.9.693-1152-gafa4a1ba-dirty",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "7a08ff29d13eed4ffa987bfe93b86808a2fead6bc3f1ae41a389e506963dfcb1"
+  },
+  "cases": [
+    {
+      "name": "cpu-under-http-load:lc-48000-stereo",
+      "result": "PASS",
+      "evidence": {
+        "duration": 40,
+        "status_samples": 213,
+        "max_http_ms": 1484.9999999860302,
+        "mean_busy": 46.483333333333334,
+        "peak_busy": 47.9,
+        "minimum_heap": 76644.0,
+        "minimum_largest": 57344.0,
+        "audio_wall_ratio": 1.0006562803172974
+      },
+      "seconds": 41.343
+    },
+    {
+      "name": "cpu-under-http-load:he-48000-stereo",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "URLError"
+        },
+        {
+          "type": "TimeoutError"
+        },
+        {
+          "type": "URLError"
+        },
+        {
+          "type": "TimeoutError"
+        }
+      ],
+      "reason": "URLError",
+      "seconds": 36.954
+    },
+    {
+      "name": "cpu-under-http-load:hev2-44100-stereo",
+      "result": "PASS",
+      "evidence": {
+        "duration": 40,
+        "status_samples": 213,
+        "max_http_ms": 375.0,
+        "mean_busy": 66.58333333333333,
+        "peak_busy": 67.3,
+        "minimum_heap": 43124.0,
+        "minimum_largest": 32768.0,
+        "audio_wall_ratio": 1.001664447403462
+      },
+      "seconds": 41.484
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "rebooted": true
+      },
+      "seconds": 6.562
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "created_utc": "2026-10-04T09:59:43.108479+00:00",
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/allocations.py": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7",
+    "tools/esp32c3_tests/common.py": "fc01a2fe30dedb438b886cf58b783dcf867c0acf77a6f049deee29a640d3a685",
+    "tools/esp32c3_tests/compare_latency.py": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394",
+    "tools/esp32c3_tests/diagnostic.py": "162ea350e48fd7a29a2c4136ed999d43144fb4bc81e7e06a69901b5442fc8e81",
+    "tools/esp32c3_tests/flash_constants.py": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5",
+    "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+    "tools/esp32c3_tests/memory.py": "2d02410fb60db20f90f3131812e6db10657d99865bbc791427f04bcfa89eae81",
+    "tools/esp32c3_tests/ota.py": "b47b95af97e73740c1bdbeb849087c1e95d97fc47e34615ed2d0665e1b294631",
+    "tools/esp32c3_tests/ota_diagnostic.py": "f2a0e7af81611a13ab5fb20a7cc468b200bd2f7d6b3ee1983def841ddf2716ef",
+    "tools/esp32c3_tests/ota_transition.py": "9764cda4a1570d59d8243218492eca4c46e13dbc1fa1952fe7b6cc748b8d6707",
+    "tools/esp32c3_tests/pool_settle.py": "534d7ff3c116d99ce30210e7b8b48b307a0f9fff8cbb427acfe667f09deded64",
+    "tools/esp32c3_tests/public_streams.py": "a91a8b82feb3138d626940359080b8ef7b3fbe2d773f73253c3b5850edb31c52",
+    "tools/esp32c3_tests/reference_eof.py": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f",
+    "tools/esp32c3_tests/run.py": "7cc592787b1a9aaa350dd5edffb0891518e58270ecaf52a91b743a4d78a041ba",
+    "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+    "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+    "tools/esp32c3_tests/summarize_public.py": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+    "tools/esp32c3_tests/summarize_public_windows.py": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709",
+    "tools/esp32c3_tests/transport.py": "5f90cfbbc35df0a408ce4aff97fde14a6398742ec98eb74b54f3a7f49623f60b",
+    "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+    "tools/audio_test_server/generate.py": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8",
+    "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+    "tools/audio_test_server/make_test_certificate.py": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a",
+    "tools/audio_test_server/server.py": "70d7998de81aad34e165ee7a4e2d79f9776006b41c3ee2e03df4f0278b59c4ca"
+  },
+  "fixture_hashes": {
+    "lc-48000-stereo": "8b054b26ffdb49e78a50a905aee78952ae822d292e86a3c99972030d642c0982",
+    "he-48000-stereo": "c2ac6e74fb70efc3cbff67f50a06586fca634ceed97df05f60b410272d92f0c2",
+    "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e"
+  },
+  "requested_suites": [
+    "load"
+  ],
+  "config": {
+    "sha256": "905238d76c86e9d8241157e18ee29ec28d27b4ca228e51aa4a0725737737c2d4",
+    "wifi_iram": false,
+    "wifi_rx_iram": false
+  },
+  "server_events": [
+    {
+      "mode": "stream",
+      "fixture": "lc-48000-stereo",
+      "sent": 670568,
+      "complete": false,
+      "seconds": 40.48399999993853
+    },
+    {
+      "mode": "stream",
+      "fixture": "he-48000-stereo",
+      "sent": 274470,
+      "complete": false,
+      "seconds": 36.625
+    },
+    {
+      "mode": "stream",
+      "fixture": "hev2-44100-stereo",
+      "sent": 164665,
+      "complete": false,
+      "seconds": 40.26600000006147
+    }
+  ]
+}

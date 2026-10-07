@@ -1,0 +1,41 @@
+{
+  "process_exit": 0,
+  "format_pass": true,
+  "pcm_quality_qualified": false,
+  "elf_sha256": "4dc2be41b00330f92f8a8fc5be9faefe57638121354377d7996a2b23c8688c47",
+  "sdkconfig_sha256": "04ef4d8afc4b88e828fda6a1c664dac2d233a84267130a35e5dc648593e956ab",
+  "qemu_log_sha256": "29383501560d5fb805233e2fba92956cae9b4668e3591f7c13167359fe4a017a",
+  "command": [
+    "wsl.exe",
+    "--cd",
+    "/mnt/c/Work/yoRadio/.worktree/aac-storage18",
+    "--exec",
+    "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+    "-M",
+    "esp32c3,audiodev=audio0",
+    "-nographic",
+    "-no-reboot",
+    "-snapshot",
+    "-icount",
+    "shift=0,align=off,sleep=off",
+    "-audiodev",
+    "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-late-sbr/retention-reference/audio.wav,out.frequency=48000",
+    "-L",
+    "/mnt/c/Work/QEMU-ESP32/share/qemu",
+    "-drive",
+    "file=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-late-sbr/retention-reference/flash.bin,if=mtd,format=raw"
+  ],
+  "source_sha256": {
+    "idf/esp32c3-oled-native/main/aac_late_sbr_bridge.S": "a5e06b2d7a1ae4c873c705a2b9de8adcfebd09497d90b69416685481ee43fe19",
+    "tools/codec_benchmark/patch_aac_late_sbr.py": "ab29e0910efb4e2deaf2b7181404d19e2f596ac9b914172422da567bfafb818b",
+    "tools/codec_benchmark/compare_aac_late_sbr_pcm.py": "08a9095e58b30adf3ca2b788f4e912053caedf50bdf0ce256aeaf53d6792bd4d",
+    "idf/esp32c3-oled-native/main/qemu_aac_late_sbr.c": "4a7921fcc222a2693c1c5defc07ac4886bedb531e51ec6d5c892826a33fd64a7",
+    "idf/esp32c3-oled-native/main/native_aac_decoder.c": "28bf026c8bfc77f545af4ac2d95962c737c297f4a306f52a0cf420ff9868a5d7",
+    "idf/esp32c3-oled-native/main/native_aac_decoder.h": "92846394cb56214b9f199bb24d5995b725245e06460728f2831c1d9541b9bba2",
+    "idf/esp32c3-oled-native/main/aac_compact_owner.c": "7c10a3d3e67353ca5215bf25df482ee910f857d9c902d979b9f699486b4312e3",
+    "idf/esp32c3-oled-native/main/aac_compact_owner.h": "99a4001bb9049c82b741e3ee1eb68f11c77c03312960ff03b11fe26c4ca65ff5",
+    "idf/esp32c3-oled-native/main/qemu_aac_test.c": "e85dce949691913ed64056640ad150ec7a34bcd56fe1b0c6cc2f04f8fe7c7425",
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": "48fb713837d97ab99f6ee3af7fb694c27e9405a6947b2dfa941987aea524bc4d",
+    "idf/esp32c3-oled-native/main/Kconfig.projbuild": "9d1fd623c1e90529e628f69c33a69a206faeaa6620bdc2ff75b623c3d6b1acfc"
+  }
+}

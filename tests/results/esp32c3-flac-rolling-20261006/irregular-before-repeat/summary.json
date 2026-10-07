@@ -1,0 +1,82 @@
+{
+  "board": {
+    "version": "v0.9.693-1192-gb0e622ab-dirty",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "d92959cf14393d1a54d69696e08343a21a688a76b632e7c642f789ac91b3987f"
+  },
+  "cases": [
+    {
+      "name": "flac-24bit-stereo-lpc32irregular",
+      "original": {
+        "name": "cpu-under-http-load:flac-24bit-stereo-lpc32irregular",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "CPU budget exceeded",
+        "seconds": 61.312
+      },
+      "full_window": {
+        "start": 806209.078,
+        "end": 806259.25,
+        "seconds": 50.17200000002049,
+        "strict": {
+          "result": "FAIL",
+          "reason": "CPU budget exceeded"
+        },
+        "cpu_samples": 10,
+        "decoder_windows": 11,
+        "malformed": [],
+        "diagnostic": {
+          "mean_busy": 100.0,
+          "peak_busy": 100.0,
+          "minimum_heap": 107264.0,
+          "minimum_largest": 94208.0,
+          "first_heap": 110788.0,
+          "last_heap": 110952.0,
+          "first_largest": 94208.0,
+          "last_largest": 94208.0,
+          "audio_wall_ratio": 0.9511924872395692,
+          "decode_percent": 46.5626551579269
+        }
+      },
+      "runtime": {
+        "result": "FAIL",
+        "reason": "Serial panic or capture failure"
+      },
+      "subwindows": [
+        {
+          "start": 806209.078,
+          "end": 806259.25,
+          "seconds": 50.17200000002049,
+          "strict": {
+            "result": "FAIL",
+            "reason": "CPU budget exceeded"
+          },
+          "cpu_samples": 10,
+          "decoder_windows": 11,
+          "malformed": [],
+          "diagnostic": {
+            "mean_busy": 100.0,
+            "peak_busy": 100.0,
+            "minimum_heap": 107264.0,
+            "minimum_largest": 94208.0,
+            "first_heap": 110788.0,
+            "last_heap": 110952.0,
+            "first_largest": 94208.0,
+            "last_largest": 94208.0,
+            "audio_wall_ratio": 0.9511924872395692,
+            "decode_percent": 46.5626551579269
+          }
+        }
+      ],
+      "status_samples": 314,
+      "max_http_ms": 172.0000000204891,
+      "minimum_rssi": -63
+    }
+  ],
+  "note": "Original outcomes retained. Diagnostic means do not override failed gates."
+}

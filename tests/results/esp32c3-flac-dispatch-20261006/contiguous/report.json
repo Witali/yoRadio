@@ -1,0 +1,92 @@
+{
+  "sanitizers": true,
+  "fixture_sha256": "d9a54de9e470158428bb340d2278baa6a36a5f5571ea8083af390ec46ca39aad",
+  "sources": {
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "0da7de7b87a876bebe0d4b160997724240b6f8f4aff0e68b9372f4f57f1bc811",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "046b1f802e27de30ff2e724f5f347222cba39d48633e6b49324de1ee5258309b",
+    "tests/native/flac_bounds/Arduino.h": "dffa44e2a0dd4600b92300f6d9cf0b5f1c93100e657818e4723ac0dd9bf15883",
+    "tests/native/flac_bounds/main.cpp": "fe1d1fee7e3d9be4e8542f9887247ce9ce97db2e986b10e14147e255501d148e",
+    "tests/native/flac_bounds/edges.cpp": "dc99f2819c351e9818c1aa624d5c9dc80b12e103f60df5a9b7569f759e321842",
+    "tests/native/flac_bounds/prediction.cpp": "be4cbfa33d9307c8114069e2399570dfac261a9767fd94a4d8211ef6284d7639",
+    "tools/codec_benchmark/run_flac_bounds.py": "8471ab966f3405926d98ba725cf15ad735121d124b42be0f6eea5be7affedbac"
+  },
+  "cases": {
+    "full": {
+      "result": "PASS",
+      "output": "result=0 frames=528000 calls=459 remaining=0"
+    },
+    "0": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=0 remaining=0"
+    },
+    "1": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=0 remaining=1"
+    },
+    "2": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=0 remaining=2"
+    },
+    "3": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=0 remaining=3"
+    },
+    "4": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=0 remaining=4"
+    },
+    "7": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=1 remaining=1"
+    },
+    "8": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=1 remaining=2"
+    },
+    "16": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=1 remaining=10"
+    },
+    "64": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=1 remaining=58"
+    },
+    "512": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=1 remaining=506"
+    },
+    "2048": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=1 remaining=2042"
+    },
+    "8192": {
+      "result": "PASS",
+      "output": "result=-12 frames=0 calls=1 remaining=8186"
+    },
+    "tail-1": {
+      "result": "PASS",
+      "output": "result=-12 frames=525312 calls=457 remaining=8970"
+    },
+    "tail-2": {
+      "result": "PASS",
+      "output": "result=-12 frames=525312 calls=457 remaining=8969"
+    },
+    "tail-3": {
+      "result": "PASS",
+      "output": "result=-12 frames=525312 calls=457 remaining=8968"
+    }
+  },
+  "configuration": {
+    "segmented": false,
+    "output_frames": 2048
+  },
+  "edge_cases": "PASS",
+  "prediction_cases": "PASS",
+  "reference": {
+    "decoder": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+    "identical": true,
+    "bytes": 2112000,
+    "sha256": "a063803277ddaaac6ebb459f70c5d87a5cb35cda786a616ce43805cfb783fb20"
+  },
+  "passed": true
+}

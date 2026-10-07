@@ -4,6 +4,7 @@
 #include <time.h>
 
 #include "audio_service.h"
+#include "audio_completion.h"
 #include "board_config.h"
 #include "cpu_profiler.h"
 #include "display_settings.h"
@@ -136,6 +137,14 @@ static void qemu_smoke_task(void *argument) {
             (uint8_t *)samples, frames * 2U * sizeof(int16_t), 16, 2));
     }
     ESP_LOGI(TAG, "QEMU_AUDIO_PASS %u stereo frames", QEMU_TONE_FRAMES);
+
+#ifdef CONFIG_YORADIO_QEMU_CACHE_TEST
+    extern void qemu_cache_test(void);
+    qemu_cache_test();
+#elif defined(CONFIG_YORADIO_QEMU_AAC_TEST)
+    extern void qemu_aac_test(native_state_t *, oled_display_t *);
+    qemu_aac_test(&s_state, &s_display);
+#endif
 
     oled_display_clear(&s_display);
     oled_display_draw_large_text(&s_display, 8, 12, "QEMU OK", 0, false,
@@ -456,6 +465,11 @@ static bool advance_scroll(display_scroll_t *station,
     return true;
 }
 
+static bool display_station_unavailable(const native_state_t *state) {
+    return !state->audio_running &&
+           strcmp(state->stream_format, AUDIO_STATUS_STATION_UNAVAILABLE) == 0;
+}
+
 static bool display_state_changed(const native_state_t *current,
                                   const native_state_t *previous) {
     // Stream parameters are deliberately frozen for one complete secondary
@@ -463,6 +477,9 @@ static bool display_state_changed(const native_state_t *current,
     // updates do not interrupt an autonomous station-title scroll.
     return strcmp(current->station, previous->station) != 0 ||
            strcmp(current->title, previous->title) != 0 ||
+           current->audio_running != previous->audio_running ||
+           display_station_unavailable(current) != display_station_unavailable(previous) ||
+           current->audio_generation != previous->audio_generation ||
            current->network_mode != previous->network_mode ||
            current->ipv4 != previous->ipv4;
 }
@@ -486,45 +503,7 @@ static display_scroll_t *scroll_for_owner(display_scroll_owner_t owner,
 
 static void format_stream_details(const native_state_t *state, char *output,
                                   size_t output_size) {
-    char bitrate[20] = "";
-    char sample_rate[20] = "";
-    char channels[16] = "";
-    if (state->bitrate_kbps) {
-        snprintf(bitrate, sizeof(bitrate), "%lu kbps",
-                 (unsigned long)state->bitrate_kbps);
-    }
-    if (state->sample_rate_hz) {
-        uint32_t tenths_khz = (state->sample_rate_hz + 50U) / 100U;
-        if (tenths_khz % 10U) {
-            snprintf(sample_rate, sizeof(sample_rate), "%lu.%lu kHz",
-                     (unsigned long)(tenths_khz / 10U),
-                     (unsigned long)(tenths_khz % 10U));
-        } else {
-            snprintf(sample_rate, sizeof(sample_rate), "%lu kHz",
-                     (unsigned long)(tenths_khz / 10U));
-        }
-    }
-    if (state->channels == 1) {
-        strcpy(channels, "mono");
-    } else if (state->channels == 2) {
-        strcpy(channels, "stereo");
-    } else if (state->channels) {
-        snprintf(channels, sizeof(channels), "%u channels", state->channels);
-    }
-
-    const char *parts[] = {state->codec, bitrate, sample_rate, channels};
-    size_t written = 0;
-    output[0] = '\0';
-    for (size_t index = 0; index < sizeof(parts) / sizeof(parts[0]); ++index) {
-        if (!parts[index][0] || written + 1 >= output_size) continue;
-        int result = snprintf(output + written, output_size - written,
-                              "%s%s", written ? " " : "", parts[index]);
-        if (result < 0) break;
-        size_t added = (size_t)result;
-        written += added < output_size - written
-                       ? added
-                       : output_size - written - 1;
-    }
+    native_state_format_stream_details(state, output, output_size);
 }
 
 static void draw_status(const native_state_t *state,
@@ -686,6 +665,7 @@ static void display_task(void *argument) {
                                numbered != previous_numbered ||
                                current_item != previous_item;
         bool audio_info_changed = audio_info != previous_audio_info;
+        bool unavailable = display_station_unavailable(&state);
         if (station_changed || audio_info_changed) redraw = true;
         char stream_details[96];
         format_stream_details(&state, stream_details, sizeof(stream_details));
@@ -696,9 +676,13 @@ static void display_task(void *argument) {
             }
         }
         bool title_changed = strcmp(state.title, previous.title) != 0 ||
+                             state.audio_generation != previous.audio_generation ||
+                             state.audio_running != previous.audio_running ||
+                             unavailable != display_station_unavailable(&previous) ||
                              audio_info_changed;
         if (title_changed) {
             show_stream_info = audio_info && !state.title[0];
+            if (unavailable) show_stream_info = true;
             secondary_started_ms = now_ms;
             if (scroll_owner == DISPLAY_SCROLL_TITLE) {
                 scroll_owner = DISPLAY_SCROLL_NONE;
@@ -770,7 +754,7 @@ static void display_task(void *argument) {
                            now_ms, &completed)) {
             redraw = true;
         }
-        if (audio_info && state.title[0] &&
+        if (!unavailable && audio_info && state.title[0] &&
             (completed == DISPLAY_SCROLL_TITLE ||
              (!title_scroll.enabled &&
               now_ms - secondary_started_ms >= DISPLAY_SECONDARY_PAGE_MS))) {
@@ -784,7 +768,7 @@ static void display_task(void *argument) {
                 scroll_owner = DISPLAY_SCROLL_NONE;
             }
             redraw = true;
-        } else if (audio_info && !state.title[0] &&
+        } else if (!unavailable && audio_info && !state.title[0] &&
                    (completed == DISPLAY_SCROLL_TITLE ||
                     (!title_scroll.enabled &&
                      now_ms - secondary_started_ms >=
@@ -800,7 +784,7 @@ static void display_task(void *argument) {
             const char *display_secondary =
                 button_status_visible
                     ? button_status_text(button_status)
-                    : (state.audio_running ? secondary_text : "");
+                    : (state.audio_running || unavailable ? secondary_text : "");
             draw_status(&state, station_text, display_secondary, &station_scroll,
                         button_status_visible ? &button_status_scroll
                                               : &title_scroll,
@@ -916,7 +900,9 @@ static void button_task(void *argument) {
 
 static void services_task(void *argument) {
     (void)argument;
+    cpu_profiler_memory("before-network");
     esp_err_t result = network_service_start(&s_state);
+    cpu_profiler_memory("after-network");
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Network failed: %s", esp_err_to_name(result));
         native_state_set_network(&s_state, NATIVE_NETWORK_ERROR, 0);
@@ -926,6 +912,7 @@ static void services_task(void *argument) {
         ESP_LOGE(TAG, "Time service failed: %s", esp_err_to_name(result));
     }
     result = audio_service_start(&s_state);
+    cpu_profiler_memory("after-audio");
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Audio service failed: %s", esp_err_to_name(result));
     }
@@ -946,6 +933,7 @@ static void services_task(void *argument) {
     }
 #endif
     result = web_service_start(&s_state);
+    cpu_profiler_memory("after-web");
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Web server failed: %s", esp_err_to_name(result));
     }
@@ -960,6 +948,7 @@ void app_main(void) {
 #endif
     ESP_LOGI(TAG, "Starting pure ESP-IDF ESP32-C3 OLED yoRadio");
     native_state_init(&s_state);
+    cpu_profiler_memory("app-start");
     ESP_ERROR_CHECK(cpu_profiler_start());
 
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -985,7 +974,14 @@ void app_main(void) {
     ESP_ERROR_CHECK(oled_display_init(&s_display));
     ESP_ERROR_CHECK(oled_display_show_boot_logo(&s_display));
     ESP_ERROR_CHECK(native_audio_output_init());
-    ESP_ERROR_CHECK(xTaskCreate(qemu_smoke_task, "qemu_smoke", 4096, NULL, 3,
+#if defined(CONFIG_YORADIO_QEMU_AAC_TEST) || defined(CONFIG_YORADIO_QEMU_CACHE_TEST)
+    // Real codec implementations need the production decoder's stack, plus
+    // space for the parent smoke task's PCM array and regression harness.
+    const uint32_t qemu_stack = BOARD_TASK_STACK_AUDIO_DECODER + 4096;
+#else
+    const uint32_t qemu_stack = 4096;
+#endif
+    ESP_ERROR_CHECK(xTaskCreate(qemu_smoke_task, "qemu_smoke", qemu_stack, NULL, 3,
                                 NULL) == pdPASS
                         ? ESP_OK
                         : ESP_ERR_NO_MEM);

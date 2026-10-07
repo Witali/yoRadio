@@ -1,0 +1,25 @@
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\aac-storage18\tools\codec_benchmark\run_aac_asymmetric_owner.py", line 39, in <module>
+    sys.exit(common.run(args,log_parser=check,config_key='YORADIO_QEMU_AAC_ASYMMETRIC_OWNER'))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\aac-storage18\tools\codec_benchmark\run_aac_bfp16.py", line 233, in run
+    result = log_parser((output / "qemu.log").read_text(errors="replace"))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\aac-storage18\tools\codec_benchmark\run_aac_asymmetric_owner.py", line 25, in check
+    result=parse_log(log)
+           ^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\aac-storage18\tools\codec_benchmark\run_aac_asymmetric_owner.py", line 10, in parse_log
+    result=low.parse_log(log,owner_bytes=32744,block_bytes=32768,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\aac-storage18\tools\codec_benchmark\run_aac_low_workspace.py", line 12, in parse_log
+    result=pointers.parse_log(log,require_boundaries=True,owner_bytes=owner_bytes,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\aac-storage18\tools\codec_benchmark\run_aac_pointer_audit.py", line 12, in parse_log
+    result = smoothing.parse_log(log,owner_bytes=owner_bytes,stack_bytes=stack_bytes,block_bytes=block_bytes)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\aac-storage18\tools\codec_benchmark\run_aac_smoothing_adapter.py", line 10, in parse_log
+    result=high.parse_log(log,owner_bytes=owner_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\aac-storage18\tools\codec_benchmark\run_aac_high_adapter.py", line 16, in parse_log
+    raise ValueError('Unknown production high-history owner layout')
+ValueError: Unknown production high-history owner layout

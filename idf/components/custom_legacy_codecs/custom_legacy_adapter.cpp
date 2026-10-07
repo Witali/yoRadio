@@ -164,12 +164,17 @@ static int decode_aac(custom_legacy_decoder *decoder,
         consume_input(decoder, consumed ? consumed : 1, stats);
         return 0;
     }
-    custom_legacy_info_t info = {
-        static_cast<uint32_t>(AACGetSampRate()),
-        static_cast<uint8_t>(AACGetBitsPerSample()),
-        static_cast<uint8_t>(AACGetChannels()),
-        static_cast<uint32_t>(AACGetBitrate()),
-    };
+    custom_legacy_info_t info = {};
+    info.sample_rate = AACGetSampRate();
+    info.bits_per_sample = AACGetBitsPerSample();
+    info.channels = AACGetChannels();
+    info.bitrate = AACGetBitrate();
+    info.stream_sample_rate = AACGetStreamSampRate();
+    info.stream_channels = AACGetChannels();
+    info.aac_sbr = AACGetSBRPresent();
+    info.aac_profile_known = true;
+    info.aac_profile = AACGetProfile();
+    info.channels_are_core = info.aac_sbr && info.stream_channels == 1;
     size_t pcm_size = static_cast<size_t>(AACGetOutputSamps()) * sizeof(int16_t);
     if (!info.sample_rate || info.channels < 1 || info.channels > 2 ||
         pcm_size > sizeof(decoder->pcm)) return -12;
@@ -196,8 +201,13 @@ static int decode_mp3(custom_legacy_decoder *decoder,
     int result = 0;
     size_t consumed = parsed.frame_size;
     size_t output_samples = 0;
-    custom_legacy_info_t info = {parsed.sample_rate, 16, parsed.channels,
-                                 parsed.bitrate};
+    custom_legacy_info_t info = {};
+    info.sample_rate = parsed.sample_rate;
+    info.bits_per_sample = 16;
+    info.channels = parsed.channels;
+    info.bitrate = parsed.bitrate;
+    info.stream_sample_rate = parsed.sample_rate;
+    info.stream_channels = parsed.channels;
     int64_t started = esp_timer_get_time();
 #if defined(CONFIG_YORADIO_MP3_DECODER_HELIX)
     int bytes_left = static_cast<int>(parsed.frame_size);

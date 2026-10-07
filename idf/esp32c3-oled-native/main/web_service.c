@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "audio_service.h"
+#include "cpu_profiler.h"
 #include "deep_sleep_clock.h"
 #include "display_settings.h"
 #include "board_config.h"
@@ -82,20 +83,28 @@ static bool web_ui_available(void) {
 }
 
 static esp_err_t status_handler(httpd_req_t *request) {
+    cpu_profiler_poll();
     native_state_t state;
     native_state_snapshot(s_state, &state);
     const char *mode = "starting";
     if (state.network_mode == NATIVE_NETWORK_CLIENT) mode = "client";
     if (state.network_mode == NATIVE_NETWORK_ACCESS_POINT) mode = "ap";
     if (state.network_mode == NATIVE_NETWORK_ERROR) mode = "error";
-    char body[384];
+    char body[640];
     snprintf(body, sizeof(body),
              "{\"firmware\":\"esp32c3-oled-native\",\"arduino\":false,"
              "\"network\":\"%s\",\"rssi\":%d,\"audio\":%s,\"station\":\"%s\","
-             "\"format\":\"%s\"}",
+             "\"format\":\"%s\",\"sample_rate\":%lu,\"channels\":%u,"
+             "\"bits_per_sample\":%u,\"pcm_sample_rate\":%lu,"
+             "\"pcm_channels\":%u,\"format_is_pcm\":%s,"
+             "\"channels_are_core\":%s}",
              mode, state.wifi_rssi,
              state.audio_running ? "true" : "false", state.station,
-             state.stream_format);
+             state.stream_format, (unsigned long)state.sample_rate_hz,
+             state.channels, state.bits_per_sample,
+             (unsigned long)state.pcm_sample_rate_hz, state.pcm_channels,
+             state.format_is_pcm ? "true" : "false",
+             state.channels_are_core ? "true" : "false");
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return httpd_resp_sendstr(request, body);

@@ -1,0 +1,210 @@
+{
+  "board": {
+    "version": "v0.9.693-1057-g6c3da5e9",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "6e18d7e6c1ce989c50fdd9e17a197e91dc47a4c193f18819162cbb762ee3f251"
+  },
+  "cases": [
+    {
+      "name": "ota:wrong-chip",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 1.985
+    },
+    {
+      "name": "ota:wrong-project",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 2.062
+    },
+    {
+      "name": "ota:corrupt-image",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 13.922
+    },
+    {
+      "name": "ota:truncated-image",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 13.469
+    },
+    {
+      "name": "ota:extra-byte",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 13.516
+    },
+    {
+      "name": "ota:missing-boundary",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 13.453
+    },
+    {
+      "name": "ota:spiffs-target",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 2.344
+    },
+    {
+      "name": "ota:oversized-request",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 2.0
+    },
+    {
+      "name": "ota:disconnect",
+      "result": "PASS",
+      "evidence": {
+        "http": null,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 2.969
+    },
+    {
+      "name": "ota:stall",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 15.109
+    },
+    {
+      "name": "ota:roundtrip:1",
+      "result": "PASS",
+      "evidence": {
+        "partition": "app0",
+        "elapsed_seconds": 19.375,
+        "hash_verified": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 19.953
+    },
+    {
+      "name": "ota:roundtrip:2",
+      "result": "PASS",
+      "evidence": {
+        "partition": "app1",
+        "elapsed_seconds": 18.15700000000652,
+        "hash_verified": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 18.657
+    },
+    {
+      "name": "ota:while-playing",
+      "result": "PASS",
+      "evidence": {
+        "partition": "app0",
+        "elapsed_seconds": 18.67200000002049,
+        "hash_verified": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 19.671
+    },
+    {
+      "name": "ota:slow",
+      "result": "PASS",
+      "evidence": {
+        "partition": "app1",
+        "elapsed_seconds": 34.51500000001397,
+        "hash_verified": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 35.141
+    },
+    {
+      "name": "restore-saved-station",
+      "result": "PASS",
+      "evidence": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 4.734
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "created_utc": "2026-09-30T17:48:07.006636+00:00",
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/common.py": "114bb5dfeaae880642d9c0f8ec61ea0aa02a4cbc3e4e281e16bca13e31d25caa",
+    "tools/esp32c3_tests/compare_latency.py": "4c87e574da2d5fd58e8035412eb605f8e1ac4b86e72152c15a58b0c03e2640a0",
+    "tools/esp32c3_tests/memory.py": "84a64e0c37a41bf049df95c5a2170534f857e5df3669df944456bfe78bfdba41",
+    "tools/esp32c3_tests/ota.py": "cc73747925a07184a7f63ddacad60c98b0582e7f02fbc2858511961354a1ab7e",
+    "tools/esp32c3_tests/run.py": "ce03edd92baaa9e578100feb01b52af5494cb6da1d964a7aed716bc6741c629a",
+    "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+    "tools/audio_test_server/generate.py": "b2a445923e17b92ed4c420639a8d082f7ec82b919ee5650d6de20df9421943e9",
+    "tools/audio_test_server/make_test_certificate.py": "123f3056b2de232fa9aac8042690119b16c02339386b06d1463e03a305ff1199",
+    "tools/audio_test_server/server.py": "b29cf832e9ab196da000d2cca78189e25b3cd1f830b50c03cd368bf657d7a9f4"
+  },
+  "image": {
+    "app_elf_sha256": "6e18d7e6c1ce989c50fdd9e17a197e91dc47a4c193f18819162cbb762ee3f251",
+    "sha256": "46fce1535fdcf13bfde61c1163c56c9b0b112b5dd95dc5c85896ded7a6abee3f",
+    "bytes": 1392688
+  }
+}

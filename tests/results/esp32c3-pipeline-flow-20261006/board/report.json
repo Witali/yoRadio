@@ -1,0 +1,2753 @@
+{
+  "board": {
+    "version": "v0.9.693-1197-gd67b0d56-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "1a964230fa4c128740a0658eee994a79e5d3f80e82c72139738e6d403c7b7667"
+  },
+  "cases": [
+    {
+      "name": "load:radio-groovesalad-lpc12",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Progressive heap loss during continuous playback",
+      "seconds": 61.109
+    },
+    {
+      "name": "load:radio-groovesalad-lpc32",
+      "result": "PASS",
+      "evidence": {
+        "duration": 60,
+        "status_samples": 287,
+        "max_http_ms": 155.9999999590218,
+        "mean_busy": 77.49,
+        "peak_busy": 79.1,
+        "minimum_heap": 63512.0,
+        "minimum_largest": 51200.0,
+        "audio_wall_ratio": 0.9511602646390837
+      },
+      "seconds": 61.047
+    },
+    {
+      "name": "load:radio-indiepop-lpc32",
+      "result": "PASS",
+      "evidence": {
+        "duration": 60,
+        "status_samples": 289,
+        "max_http_ms": 141.0000000614673,
+        "mean_busy": 80.34,
+        "peak_busy": 81.5,
+        "minimum_heap": 62468.0,
+        "minimum_largest": 45056.0,
+        "audio_wall_ratio": 0.9313303024313105
+      },
+      "seconds": 61.172
+    },
+    {
+      "name": "load:radio-indiepop-lpc12",
+      "result": "PASS",
+      "evidence": {
+        "duration": 60,
+        "status_samples": 301,
+        "max_http_ms": 140.00000001396984,
+        "mean_busy": 77.87,
+        "peak_busy": 78.7,
+        "minimum_heap": 61480.0,
+        "minimum_largest": 49152.0,
+        "audio_wall_ratio": 0.996898978253091
+      },
+      "seconds": 61.219
+    },
+    {
+      "name": "control:input-jitter",
+      "result": "PASS",
+      "evidence": {
+        "input_empty_observed": true
+      },
+      "seconds": 41.172
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "left_stopped": true
+      },
+      "seconds": 0.188
+    },
+    {
+      "name": "runtime",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "created_utc": "2026-10-06T19:13:06.811374+00:00",
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/allocations.py": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7",
+    "tools/esp32c3_tests/common.py": "fc01a2fe30dedb438b886cf58b783dcf867c0acf77a6f049deee29a640d3a685",
+    "tools/esp32c3_tests/compare_latency.py": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394",
+    "tools/esp32c3_tests/compare_output_dma.py": "7f1776e7c479489c90ab4ad36029b774a9d52e51414ac6a22cc8305faf685bad",
+    "tools/esp32c3_tests/diagnostic.py": "4774b1d14b3d7d85e3272166593af69bcbe2b262082748c4ce8683fdbab6b5c4",
+    "tools/esp32c3_tests/flac_truncation.py": "6550ccffb7add2f4573c242e15149d6755a50497517db253b939609052f3e115",
+    "tools/esp32c3_tests/flash_constants.py": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5",
+    "tools/esp32c3_tests/heap_fragment.py": "648cb750eee9635419626f3b27437ed3a6bffe6443fabd014fff4d4ba3b4f1e4",
+    "tools/esp32c3_tests/heap_idle.py": "ac02c2f5595b16c57d6952a3084b746720b07f1baaff82ec0486759ddcccdda1",
+    "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+    "tools/esp32c3_tests/load_windows.py": "fadd0814cf77a45b120f994ff67e2df09c91f545de765310403efbe7a3d206ba",
+    "tools/esp32c3_tests/memory.py": "2d02410fb60db20f90f3131812e6db10657d99865bbc791427f04bcfa89eae81",
+    "tools/esp32c3_tests/network_memory.py": "c77cef3021fb54c9b08f07c1ee25f3938cefc97e176724689ef2b005957d2aca",
+    "tools/esp32c3_tests/ota.py": "b47b95af97e73740c1bdbeb849087c1e95d97fc47e34615ed2d0665e1b294631",
+    "tools/esp32c3_tests/ota_diagnostic.py": "0d4bd95c8dfb5389709c02345851e0141c68819451b654177e43dfc05161bf89",
+    "tools/esp32c3_tests/ota_transition.py": "9764cda4a1570d59d8243218492eca4c46e13dbc1fa1952fe7b6cc748b8d6707",
+    "tools/esp32c3_tests/pipeline_flow.py": "95b8a80a34d61f3016e61b162f4508cbb5a2287955fa105a6f292d30ca5a7fbc",
+    "tools/esp32c3_tests/pipeline_flow_study.py": "209f9fcb87cebb80a1fcce7902adc070acb983aa0bb904da7d8b9cc9b76fd98b",
+    "tools/esp32c3_tests/pool_settle.py": "534d7ff3c116d99ce30210e7b8b48b307a0f9fff8cbb427acfe667f09deded64",
+    "tools/esp32c3_tests/public_streams.py": "a91a8b82feb3138d626940359080b8ef7b3fbe2d773f73253c3b5850edb31c52",
+    "tools/esp32c3_tests/radio_flac_study.py": "bb232c611c0b323694f7a2daa887cbb62ede5cc85c14d5a00c552009da044ea1",
+    "tools/esp32c3_tests/reference_eof.py": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f",
+    "tools/esp32c3_tests/run.py": "f7bc52e2454da8db477e7c9ee5bc67d950aa8bcb65bc2d27b1e091358015bb6c",
+    "tools/esp32c3_tests/rx_ownership.py": "230aa218beffdb39e9101301e66990dacef015f3d294378cae8f95e0e14257a8",
+    "tools/esp32c3_tests/serial_lines.py": "7b409f2f90dba97b806764d9ceffeb0960e8890e2476595a5aba8901c22222fb",
+    "tools/esp32c3_tests/summarize_codec_sequence.py": "39f08c66f75376a53c8fcfeb288e60a1045ce7da93ab7e9fbc8f816041bb48d5",
+    "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+    "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+    "tools/esp32c3_tests/summarize_public.py": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+    "tools/esp32c3_tests/summarize_public_windows.py": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709",
+    "tools/esp32c3_tests/summarize_radio_flac.py": "80106f9f6b66d1acaab528b7c2971707af28f598c7ad1454fa21c200ff6be0ea",
+    "tools/esp32c3_tests/summarize_rx_ownership.py": "82ccd040fa2c957e90643dc0c429dfac74de55574373b73841659d0f8dcf40c1",
+    "tools/esp32c3_tests/summarize_sustained.py": "b510efffc6ced59fffdda80ef3043382fb953151ac84b12d6eaccaedd9f489f7",
+    "tools/esp32c3_tests/summarize_terminal_cpu.py": "087a624267b015ae3b54379bfb50348493021b6ff03c03e9e38b6619a4f75aba",
+    "tools/esp32c3_tests/summarize_terminal_memory.py": "6ee0f98bbc84c5a1d8745d8cd3c7b92d6e24265c6ddd709f6e2a75300d07ae84",
+    "tools/esp32c3_tests/terminal_memory.py": "6ae0745c6170e4aa1ee92ddb702e1fb4f16b9986b94ac1ff3cba77f0547578a4",
+    "tools/esp32c3_tests/transport.py": "b3e41e4d54431fdbb5f26e88727a45e99c9958dba9097cb724fdae55f9ca1686",
+    "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+    "tools/audio_test_server/generate.py": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8",
+    "tools/audio_test_server/generate_flac_depths.py": "1f75390e8c29949dbb5888ee0d1871187bab97a1ef48e963ff70047c01fd453a",
+    "tools/audio_test_server/generate_flac_high_depth.py": "f53d0186bab15ea13f17d1dfe5fd56dfabf55f6f85a3b53dac10d2fc3fbc9d0e",
+    "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+    "tools/audio_test_server/make_test_certificate.py": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a",
+    "tools/audio_test_server/server.py": "17cf691027c2caf836772ac9b84009fbda4cebf38ad8e041d081a3ae51ffeded"
+  },
+  "firmware_sha256": "5349c2ca1a39e4e2ebf3fa6dc02c60ebedb578c5f7a79a8f7d6f6aeaab9a87c7",
+  "sdkconfig_sha256": "2640833e612f63d233ccbf6b5c90074254303c8c235af3a566c260cf9cc7c9e0",
+  "fixture_hashes": {
+    "radio-groovesalad-lpc12": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+    "radio-groovesalad-lpc32": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+    "radio-indiepop-lpc32": "02d5bcff9fb8a1d23c4b7443a0e355526c90e1616abe3ef99791c0df66d77846",
+    "radio-indiepop-lpc12": "28e24de31bae076d0e27c5a27bd049c30f71b9d81e5b00e020245eb16e809682"
+  },
+  "load_seconds": 60,
+  "warmup_seconds": 10,
+  "server_options": {
+    "unpaced_files": true,
+    "delivery_stats": true
+  },
+  "control": "First case served through /jitter, paced at 1.02x with 35 ms added per 8192 bytes",
+  "server_events": [
+    {
+      "mode": "file",
+      "fixture": "radio-groovesalad-lpc12",
+      "sent": 10102784,
+      "complete": false,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 812487.281,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 812487.281,
+            "ended_at": 812488.296,
+            "bytes": 257024,
+            "writes": 251,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.06300000008195639,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812488.296,
+            "ended_at": 812489.296,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812489.296,
+            "ended_at": 812490.296,
+            "bytes": 160768,
+            "writes": 157,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812490.296,
+            "ended_at": 812491.312,
+            "bytes": 163840,
+            "writes": 160,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812491.312,
+            "ended_at": 812492.39,
+            "bytes": 174080,
+            "writes": 170,
+            "write_seconds": 1.077999999979511,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812492.39,
+            "ended_at": 812493.421,
+            "bytes": 163840,
+            "writes": 160,
+            "write_seconds": 1.0309999999590218,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812493.421,
+            "ended_at": 812494.437,
+            "bytes": 169984,
+            "writes": 166,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.07800000009592623,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812494.437,
+            "ended_at": 812495.437,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812495.437,
+            "ended_at": 812496.453,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812496.453,
+            "ended_at": 812497.468,
+            "bytes": 176128,
+            "writes": 172,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812497.468,
+            "ended_at": 812498.531,
+            "bytes": 172032,
+            "writes": 168,
+            "write_seconds": 1.062999999965541,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812498.531,
+            "ended_at": 812499.546,
+            "bytes": 174080,
+            "writes": 170,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812499.546,
+            "ended_at": 812500.546,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812500.546,
+            "ended_at": 812501.578,
+            "bytes": 173056,
+            "writes": 169,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812501.578,
+            "ended_at": 812502.578,
+            "bytes": 176128,
+            "writes": 172,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812502.578,
+            "ended_at": 812503.578,
+            "bytes": 163840,
+            "writes": 160,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812503.578,
+            "ended_at": 812504.593,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812504.593,
+            "ended_at": 812505.609,
+            "bytes": 174080,
+            "writes": 170,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812505.609,
+            "ended_at": 812506.609,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09299999999348074,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812506.609,
+            "ended_at": 812507.625,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812507.625,
+            "ended_at": 812508.64,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812508.64,
+            "ended_at": 812509.64,
+            "bytes": 163840,
+            "writes": 160,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812509.64,
+            "ended_at": 812510.64,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812510.64,
+            "ended_at": 812511.64,
+            "bytes": 169984,
+            "writes": 166,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812511.64,
+            "ended_at": 812512.64,
+            "bytes": 157696,
+            "writes": 154,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812512.64,
+            "ended_at": 812513.64,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07800000009592623,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812513.64,
+            "ended_at": 812514.64,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812514.64,
+            "ended_at": 812515.656,
+            "bytes": 151552,
+            "writes": 148,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812515.656,
+            "ended_at": 812516.671,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.09299999999348074,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812516.671,
+            "ended_at": 812517.671,
+            "bytes": 151552,
+            "writes": 148,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812517.671,
+            "ended_at": 812518.671,
+            "bytes": 143360,
+            "writes": 140,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812518.671,
+            "ended_at": 812519.687,
+            "bytes": 149504,
+            "writes": 146,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812519.687,
+            "ended_at": 812520.687,
+            "bytes": 149504,
+            "writes": 146,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812520.687,
+            "ended_at": 812521.687,
+            "bytes": 139264,
+            "writes": 136,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812521.687,
+            "ended_at": 812522.687,
+            "bytes": 151552,
+            "writes": 148,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812522.687,
+            "ended_at": 812523.687,
+            "bytes": 136192,
+            "writes": 133,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812523.687,
+            "ended_at": 812524.703,
+            "bytes": 150528,
+            "writes": 147,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812524.703,
+            "ended_at": 812525.703,
+            "bytes": 151552,
+            "writes": 148,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812525.703,
+            "ended_at": 812526.718,
+            "bytes": 139264,
+            "writes": 136,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812526.718,
+            "ended_at": 812527.718,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812527.718,
+            "ended_at": 812528.718,
+            "bytes": 181248,
+            "writes": 177,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812528.718,
+            "ended_at": 812529.718,
+            "bytes": 187392,
+            "writes": 183,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812529.718,
+            "ended_at": 812530.718,
+            "bytes": 184320,
+            "writes": 180,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812530.718,
+            "ended_at": 812531.734,
+            "bytes": 184320,
+            "writes": 180,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812531.734,
+            "ended_at": 812532.734,
+            "bytes": 188416,
+            "writes": 184,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812532.734,
+            "ended_at": 812533.734,
+            "bytes": 177152,
+            "writes": 173,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812533.734,
+            "ended_at": 812534.75,
+            "bytes": 177152,
+            "writes": 173,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812534.75,
+            "ended_at": 812535.765,
+            "bytes": 180224,
+            "writes": 176,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812535.765,
+            "ended_at": 812536.765,
+            "bytes": 184320,
+            "writes": 180,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06300000008195639,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812536.765,
+            "ended_at": 812537.765,
+            "bytes": 179200,
+            "writes": 175,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812537.765,
+            "ended_at": 812538.765,
+            "bytes": 193536,
+            "writes": 189,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812538.765,
+            "ended_at": 812539.765,
+            "bytes": 174080,
+            "writes": 170,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812539.765,
+            "ended_at": 812540.765,
+            "bytes": 182272,
+            "writes": 178,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812540.765,
+            "ended_at": 812541.765,
+            "bytes": 178176,
+            "writes": 174,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812541.765,
+            "ended_at": 812542.765,
+            "bytes": 178176,
+            "writes": 174,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812542.765,
+            "ended_at": 812543.765,
+            "bytes": 189440,
+            "writes": 185,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812543.765,
+            "ended_at": 812544.781,
+            "bytes": 181248,
+            "writes": 177,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812544.781,
+            "ended_at": 812545.796,
+            "bytes": 190464,
+            "writes": 186,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812545.796,
+            "ended_at": 812546.796,
+            "bytes": 186368,
+            "writes": 182,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06199999991804361,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812546.796,
+            "ended_at": 812547.406,
+            "bytes": 109568,
+            "writes": 107,
+            "write_seconds": 0.6099999999860302,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 812547.406
+      },
+      "seconds": 60.125
+    },
+    {
+      "mode": "file",
+      "fixture": "radio-groovesalad-lpc32",
+      "sent": 8921088,
+      "complete": false,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 812548.39,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 812548.39,
+            "ended_at": 812549.39,
+            "bytes": 233472,
+            "writes": 228,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812549.39,
+            "ended_at": 812550.421,
+            "bytes": 158720,
+            "writes": 155,
+            "write_seconds": 1.0309999999590218,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812550.421,
+            "ended_at": 812551.468,
+            "bytes": 151552,
+            "writes": 148,
+            "write_seconds": 1.047000000020489,
+            "max_write_seconds": 0.07800000009592623,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812551.468,
+            "ended_at": 812552.468,
+            "bytes": 150528,
+            "writes": 147,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812552.468,
+            "ended_at": 812553.515,
+            "bytes": 152576,
+            "writes": 149,
+            "write_seconds": 1.047000000020489,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812553.515,
+            "ended_at": 812554.515,
+            "bytes": 152576,
+            "writes": 149,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812554.515,
+            "ended_at": 812555.593,
+            "bytes": 146432,
+            "writes": 143,
+            "write_seconds": 1.077999999979511,
+            "max_write_seconds": 0.09299999999348074,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812555.593,
+            "ended_at": 812556.593,
+            "bytes": 149504,
+            "writes": 146,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09299999999348074,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812556.593,
+            "ended_at": 812557.593,
+            "bytes": 145408,
+            "writes": 142,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812557.593,
+            "ended_at": 812558.609,
+            "bytes": 149504,
+            "writes": 146,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812558.609,
+            "ended_at": 812559.609,
+            "bytes": 149504,
+            "writes": 146,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812559.609,
+            "ended_at": 812560.609,
+            "bytes": 151552,
+            "writes": 148,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812560.609,
+            "ended_at": 812561.625,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812561.625,
+            "ended_at": 812562.625,
+            "bytes": 149504,
+            "writes": 146,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09299999999348074,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812562.625,
+            "ended_at": 812563.625,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812563.625,
+            "ended_at": 812564.625,
+            "bytes": 145408,
+            "writes": 142,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812564.625,
+            "ended_at": 812565.625,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812565.625,
+            "ended_at": 812566.64,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812566.64,
+            "ended_at": 812567.64,
+            "bytes": 150528,
+            "writes": 147,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812567.64,
+            "ended_at": 812568.656,
+            "bytes": 146432,
+            "writes": 143,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812568.656,
+            "ended_at": 812569.656,
+            "bytes": 149504,
+            "writes": 146,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09299999999348074,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812569.656,
+            "ended_at": 812570.656,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812570.656,
+            "ended_at": 812571.671,
+            "bytes": 141312,
+            "writes": 138,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812571.671,
+            "ended_at": 812572.671,
+            "bytes": 145408,
+            "writes": 142,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812572.671,
+            "ended_at": 812573.671,
+            "bytes": 158720,
+            "writes": 155,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812573.671,
+            "ended_at": 812574.671,
+            "bytes": 144384,
+            "writes": 141,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812574.671,
+            "ended_at": 812575.687,
+            "bytes": 141312,
+            "writes": 138,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812575.687,
+            "ended_at": 812576.687,
+            "bytes": 143360,
+            "writes": 140,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812576.687,
+            "ended_at": 812577.687,
+            "bytes": 141312,
+            "writes": 138,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812577.687,
+            "ended_at": 812578.687,
+            "bytes": 131072,
+            "writes": 128,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812578.687,
+            "ended_at": 812579.703,
+            "bytes": 130048,
+            "writes": 127,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812579.703,
+            "ended_at": 812580.703,
+            "bytes": 142336,
+            "writes": 139,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812580.703,
+            "ended_at": 812581.703,
+            "bytes": 129024,
+            "writes": 126,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812581.703,
+            "ended_at": 812582.703,
+            "bytes": 126976,
+            "writes": 124,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812582.703,
+            "ended_at": 812583.718,
+            "bytes": 137216,
+            "writes": 134,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812583.718,
+            "ended_at": 812584.718,
+            "bytes": 126976,
+            "writes": 124,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812584.718,
+            "ended_at": 812585.718,
+            "bytes": 126976,
+            "writes": 124,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812585.718,
+            "ended_at": 812586.734,
+            "bytes": 122880,
+            "writes": 120,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812586.734,
+            "ended_at": 812587.734,
+            "bytes": 124928,
+            "writes": 122,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.10900000005494803,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812587.734,
+            "ended_at": 812588.734,
+            "bytes": 140288,
+            "writes": 137,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812588.734,
+            "ended_at": 812589.734,
+            "bytes": 128000,
+            "writes": 125,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812589.734,
+            "ended_at": 812590.734,
+            "bytes": 142336,
+            "writes": 139,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812590.734,
+            "ended_at": 812591.75,
+            "bytes": 160768,
+            "writes": 157,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.10999999998603016,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812591.75,
+            "ended_at": 812592.765,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812592.765,
+            "ended_at": 812593.765,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812593.765,
+            "ended_at": 812594.765,
+            "bytes": 163840,
+            "writes": 160,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06300000008195639,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812594.765,
+            "ended_at": 812595.765,
+            "bytes": 158720,
+            "writes": 155,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812595.765,
+            "ended_at": 812596.765,
+            "bytes": 154624,
+            "writes": 151,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07800000009592623,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812596.765,
+            "ended_at": 812597.781,
+            "bytes": 157696,
+            "writes": 154,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0940000000409782,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812597.781,
+            "ended_at": 812598.781,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09299999999348074,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812598.781,
+            "ended_at": 812599.781,
+            "bytes": 154624,
+            "writes": 151,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812599.781,
+            "ended_at": 812600.781,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812600.781,
+            "ended_at": 812601.781,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812601.781,
+            "ended_at": 812602.781,
+            "bytes": 145408,
+            "writes": 142,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07900000002700835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812602.781,
+            "ended_at": 812603.796,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812603.796,
+            "ended_at": 812604.812,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812604.812,
+            "ended_at": 812605.812,
+            "bytes": 157696,
+            "writes": 154,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09399999992456287,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812605.812,
+            "ended_at": 812606.828,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812606.828,
+            "ended_at": 812607.828,
+            "bytes": 161792,
+            "writes": 158,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07800000009592623,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812607.828,
+            "ended_at": 812608.468,
+            "bytes": 103424,
+            "writes": 101,
+            "write_seconds": 0.5770000000484288,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 812608.468
+      },
+      "seconds": 60.07799999997951
+    },
+    {
+      "mode": "file",
+      "fixture": "radio-indiepop-lpc32",
+      "sent": 10565632,
+      "complete": false,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 812609.531,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 812609.531,
+            "ended_at": 812610.562,
+            "bytes": 267264,
+            "writes": 261,
+            "write_seconds": 1.0310000000754371,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812610.562,
+            "ended_at": 812611.562,
+            "bytes": 180224,
+            "writes": 176,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812611.562,
+            "ended_at": 812612.578,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812612.578,
+            "ended_at": 812613.578,
+            "bytes": 174080,
+            "writes": 170,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812613.578,
+            "ended_at": 812614.578,
+            "bytes": 173056,
+            "writes": 169,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812614.578,
+            "ended_at": 812615.593,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812615.593,
+            "ended_at": 812616.593,
+            "bytes": 177152,
+            "writes": 173,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812616.593,
+            "ended_at": 812617.593,
+            "bytes": 169984,
+            "writes": 166,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812617.593,
+            "ended_at": 812618.593,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812618.593,
+            "ended_at": 812619.593,
+            "bytes": 174080,
+            "writes": 170,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06300000008195639,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812619.593,
+            "ended_at": 812620.609,
+            "bytes": 169984,
+            "writes": 166,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812620.609,
+            "ended_at": 812621.609,
+            "bytes": 172032,
+            "writes": 168,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06199999991804361,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812621.609,
+            "ended_at": 812622.64,
+            "bytes": 175104,
+            "writes": 171,
+            "write_seconds": 1.0309999999590218,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812622.64,
+            "ended_at": 812623.64,
+            "bytes": 172032,
+            "writes": 168,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812623.64,
+            "ended_at": 812624.64,
+            "bytes": 175104,
+            "writes": 171,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812624.64,
+            "ended_at": 812625.64,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812625.64,
+            "ended_at": 812626.64,
+            "bytes": 164864,
+            "writes": 161,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812626.64,
+            "ended_at": 812627.671,
+            "bytes": 176128,
+            "writes": 172,
+            "write_seconds": 1.0309999999590218,
+            "max_write_seconds": 0.06199999991804361,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812627.671,
+            "ended_at": 812628.671,
+            "bytes": 176128,
+            "writes": 172,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06199999991804361,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812628.671,
+            "ended_at": 812629.671,
+            "bytes": 176128,
+            "writes": 172,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812629.671,
+            "ended_at": 812630.703,
+            "bytes": 172032,
+            "writes": 168,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812630.703,
+            "ended_at": 812631.703,
+            "bytes": 172032,
+            "writes": 168,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812631.703,
+            "ended_at": 812632.703,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06199999991804361,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812632.703,
+            "ended_at": 812633.703,
+            "bytes": 183296,
+            "writes": 179,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812633.703,
+            "ended_at": 812634.703,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812634.703,
+            "ended_at": 812635.703,
+            "bytes": 179200,
+            "writes": 175,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812635.703,
+            "ended_at": 812636.703,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812636.703,
+            "ended_at": 812637.718,
+            "bytes": 174080,
+            "writes": 170,
+            "write_seconds": 0.9989999999525025,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812637.718,
+            "ended_at": 812638.75,
+            "bytes": 178176,
+            "writes": 174,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812638.75,
+            "ended_at": 812639.781,
+            "bytes": 172032,
+            "writes": 168,
+            "write_seconds": 1.0309999999590218,
+            "max_write_seconds": 0.06300000008195639,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812639.781,
+            "ended_at": 812640.781,
+            "bytes": 171008,
+            "writes": 167,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812640.781,
+            "ended_at": 812641.781,
+            "bytes": 171008,
+            "writes": 167,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812641.781,
+            "ended_at": 812642.812,
+            "bytes": 176128,
+            "writes": 172,
+            "write_seconds": 1.0310000000754371,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812642.812,
+            "ended_at": 812643.812,
+            "bytes": 180224,
+            "writes": 176,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812643.812,
+            "ended_at": 812644.812,
+            "bytes": 182272,
+            "writes": 178,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812644.812,
+            "ended_at": 812645.828,
+            "bytes": 182272,
+            "writes": 178,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812645.828,
+            "ended_at": 812646.843,
+            "bytes": 180224,
+            "writes": 176,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812646.843,
+            "ended_at": 812647.843,
+            "bytes": 182272,
+            "writes": 178,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812647.843,
+            "ended_at": 812648.859,
+            "bytes": 182272,
+            "writes": 178,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812648.859,
+            "ended_at": 812649.859,
+            "bytes": 179200,
+            "writes": 175,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812649.859,
+            "ended_at": 812650.859,
+            "bytes": 173056,
+            "writes": 169,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812650.859,
+            "ended_at": 812651.859,
+            "bytes": 184320,
+            "writes": 180,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812651.859,
+            "ended_at": 812652.89,
+            "bytes": 190464,
+            "writes": 186,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812652.89,
+            "ended_at": 812653.906,
+            "bytes": 181248,
+            "writes": 177,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812653.906,
+            "ended_at": 812654.906,
+            "bytes": 172032,
+            "writes": 168,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812654.906,
+            "ended_at": 812655.906,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812655.906,
+            "ended_at": 812656.906,
+            "bytes": 174080,
+            "writes": 170,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812656.906,
+            "ended_at": 812657.906,
+            "bytes": 173056,
+            "writes": 169,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812657.906,
+            "ended_at": 812658.906,
+            "bytes": 182272,
+            "writes": 178,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812658.906,
+            "ended_at": 812659.906,
+            "bytes": 183296,
+            "writes": 179,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812659.906,
+            "ended_at": 812660.906,
+            "bytes": 180224,
+            "writes": 176,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812660.906,
+            "ended_at": 812661.906,
+            "bytes": 160768,
+            "writes": 157,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812661.906,
+            "ended_at": 812662.921,
+            "bytes": 178176,
+            "writes": 174,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812662.921,
+            "ended_at": 812663.953,
+            "bytes": 178176,
+            "writes": 174,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812663.953,
+            "ended_at": 812664.953,
+            "bytes": 176128,
+            "writes": 172,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812664.953,
+            "ended_at": 812665.953,
+            "bytes": 184320,
+            "writes": 180,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812665.953,
+            "ended_at": 812666.953,
+            "bytes": 176128,
+            "writes": 172,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812666.953,
+            "ended_at": 812667.953,
+            "bytes": 189440,
+            "writes": 185,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812667.953,
+            "ended_at": 812668.953,
+            "bytes": 175104,
+            "writes": 171,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812668.953,
+            "ended_at": 812669.64,
+            "bytes": 119808,
+            "writes": 117,
+            "write_seconds": 0.6870000000344589,
+            "max_write_seconds": 0.06199999991804361,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 812669.64
+      },
+      "seconds": 60.10900000005495
+    },
+    {
+      "mode": "file",
+      "fixture": "radio-indiepop-lpc12",
+      "sent": 12089344,
+      "complete": false,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 812670.671,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 812670.671,
+            "ended_at": 812671.671,
+            "bytes": 285696,
+            "writes": 279,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812671.671,
+            "ended_at": 812672.671,
+            "bytes": 199680,
+            "writes": 195,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812672.671,
+            "ended_at": 812673.703,
+            "bytes": 201728,
+            "writes": 197,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812673.703,
+            "ended_at": 812674.703,
+            "bytes": 198656,
+            "writes": 194,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812674.703,
+            "ended_at": 812675.718,
+            "bytes": 192512,
+            "writes": 188,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812675.718,
+            "ended_at": 812676.734,
+            "bytes": 196608,
+            "writes": 192,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812676.734,
+            "ended_at": 812677.734,
+            "bytes": 206848,
+            "writes": 202,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812677.734,
+            "ended_at": 812678.765,
+            "bytes": 188416,
+            "writes": 184,
+            "write_seconds": 1.0309999999590218,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812678.765,
+            "ended_at": 812679.765,
+            "bytes": 194560,
+            "writes": 190,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812679.765,
+            "ended_at": 812680.765,
+            "bytes": 204800,
+            "writes": 200,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812680.765,
+            "ended_at": 812681.781,
+            "bytes": 194560,
+            "writes": 190,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812681.781,
+            "ended_at": 812682.781,
+            "bytes": 198656,
+            "writes": 194,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812682.781,
+            "ended_at": 812683.796,
+            "bytes": 194560,
+            "writes": 190,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812683.796,
+            "ended_at": 812684.796,
+            "bytes": 198656,
+            "writes": 194,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812684.796,
+            "ended_at": 812685.796,
+            "bytes": 194560,
+            "writes": 190,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812685.796,
+            "ended_at": 812686.796,
+            "bytes": 194560,
+            "writes": 190,
+            "write_seconds": 0.9849999999860302,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812686.796,
+            "ended_at": 812687.828,
+            "bytes": 196608,
+            "writes": 192,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812687.828,
+            "ended_at": 812688.828,
+            "bytes": 204800,
+            "writes": 200,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812688.828,
+            "ended_at": 812689.859,
+            "bytes": 198656,
+            "writes": 194,
+            "write_seconds": 1.0310000000754371,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812689.859,
+            "ended_at": 812690.859,
+            "bytes": 200704,
+            "writes": 196,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812690.859,
+            "ended_at": 812691.859,
+            "bytes": 189440,
+            "writes": 185,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812691.859,
+            "ended_at": 812692.859,
+            "bytes": 199680,
+            "writes": 195,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812692.859,
+            "ended_at": 812693.89,
+            "bytes": 204800,
+            "writes": 200,
+            "write_seconds": 1.0309999999590218,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812693.89,
+            "ended_at": 812694.89,
+            "bytes": 196608,
+            "writes": 192,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812694.89,
+            "ended_at": 812695.89,
+            "bytes": 198656,
+            "writes": 194,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812695.89,
+            "ended_at": 812696.89,
+            "bytes": 196608,
+            "writes": 192,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812696.89,
+            "ended_at": 812697.89,
+            "bytes": 204800,
+            "writes": 200,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812697.89,
+            "ended_at": 812698.89,
+            "bytes": 194560,
+            "writes": 190,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812698.89,
+            "ended_at": 812699.89,
+            "bytes": 195584,
+            "writes": 191,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812699.89,
+            "ended_at": 812700.906,
+            "bytes": 203776,
+            "writes": 199,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812700.906,
+            "ended_at": 812701.906,
+            "bytes": 196608,
+            "writes": 192,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812701.906,
+            "ended_at": 812702.937,
+            "bytes": 206848,
+            "writes": 202,
+            "write_seconds": 1.0310000000754371,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812702.937,
+            "ended_at": 812703.937,
+            "bytes": 211968,
+            "writes": 207,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812703.937,
+            "ended_at": 812704.953,
+            "bytes": 203776,
+            "writes": 199,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812704.953,
+            "ended_at": 812705.968,
+            "bytes": 208896,
+            "writes": 204,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812705.968,
+            "ended_at": 812706.968,
+            "bytes": 204800,
+            "writes": 200,
+            "write_seconds": 0.9839999999385327,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812706.968,
+            "ended_at": 812707.968,
+            "bytes": 208896,
+            "writes": 204,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812707.968,
+            "ended_at": 812708.968,
+            "bytes": 200704,
+            "writes": 196,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812708.968,
+            "ended_at": 812709.968,
+            "bytes": 210944,
+            "writes": 206,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06199999991804361,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812709.968,
+            "ended_at": 812710.968,
+            "bytes": 205824,
+            "writes": 201,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812710.968,
+            "ended_at": 812712.0,
+            "bytes": 209920,
+            "writes": 205,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812712.0,
+            "ended_at": 812713.0,
+            "bytes": 199680,
+            "writes": 195,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812713.0,
+            "ended_at": 812714.0,
+            "bytes": 203776,
+            "writes": 199,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812714.0,
+            "ended_at": 812715.0,
+            "bytes": 196608,
+            "writes": 192,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812715.0,
+            "ended_at": 812716.015,
+            "bytes": 206848,
+            "writes": 202,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812716.015,
+            "ended_at": 812717.015,
+            "bytes": 199680,
+            "writes": 195,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812717.015,
+            "ended_at": 812718.015,
+            "bytes": 205824,
+            "writes": 201,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812718.015,
+            "ended_at": 812719.015,
+            "bytes": 200704,
+            "writes": 196,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812719.015,
+            "ended_at": 812720.015,
+            "bytes": 194560,
+            "writes": 190,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06299999996554106,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812720.015,
+            "ended_at": 812721.015,
+            "bytes": 202752,
+            "writes": 198,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812721.015,
+            "ended_at": 812722.046,
+            "bytes": 202752,
+            "writes": 198,
+            "write_seconds": 1.0309999999590218,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812722.046,
+            "ended_at": 812723.046,
+            "bytes": 205824,
+            "writes": 201,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812723.046,
+            "ended_at": 812724.046,
+            "bytes": 197632,
+            "writes": 193,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812724.046,
+            "ended_at": 812725.046,
+            "bytes": 204800,
+            "writes": 200,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.06300000008195639,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812725.046,
+            "ended_at": 812726.046,
+            "bytes": 198656,
+            "writes": 194,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812726.046,
+            "ended_at": 812727.046,
+            "bytes": 202752,
+            "writes": 198,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812727.046,
+            "ended_at": 812728.046,
+            "bytes": 200704,
+            "writes": 196,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812728.046,
+            "ended_at": 812729.062,
+            "bytes": 202752,
+            "writes": 198,
+            "write_seconds": 1.0160000000614673,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812729.062,
+            "ended_at": 812730.078,
+            "bytes": 204800,
+            "writes": 200,
+            "write_seconds": 1.015999999945052,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 812730.078,
+            "ended_at": 812730.843,
+            "bytes": 158720,
+            "writes": 155,
+            "write_seconds": 0.7650000000139698,
+            "max_write_seconds": 0.062000000034458935,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 812730.843
+      },
+      "seconds": 60.17200000002049
+    },
+    {
+      "mode": "jitter",
+      "fixture": "radio-groovesalad-lpc12",
+      "sent": 4036608,
+      "complete": false,
+      "pacing_ratio": 1.02,
+      "delivery": {
+        "started_at": 812731.906,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 812731.906,
+            "ended_at": 812732.906,
+            "bytes": 98304,
+            "writes": 96,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.03137699770741165
+          },
+          {
+            "started_at": 812732.906,
+            "ended_at": 812733.921,
+            "bytes": 100352,
+            "writes": 98,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.030913806171156466
+          },
+          {
+            "started_at": 812733.921,
+            "ended_at": 812734.921,
+            "bytes": 103424,
+            "writes": 101,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.026533664320595562
+          },
+          {
+            "started_at": 812734.921,
+            "ended_at": 812735.953,
+            "bytes": 101376,
+            "writes": 99,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.027818049653433263
+          },
+          {
+            "started_at": 812735.953,
+            "ended_at": 812736.953,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.027332458645105362
+          },
+          {
+            "started_at": 812736.953,
+            "ended_at": 812737.968,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.015999999945051968,
+            "max_write_seconds": 0.015999999945051968,
+            "max_late_seconds": 0.03199384163599461
+          },
+          {
+            "started_at": 812737.968,
+            "ended_at": 812738.984,
+            "bytes": 99328,
+            "writes": 97,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.027926773065701127
+          },
+          {
+            "started_at": 812738.984,
+            "ended_at": 812739.984,
+            "bytes": 101376,
+            "writes": 99,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.027725567459128797
+          },
+          {
+            "started_at": 812739.984,
+            "ended_at": 812741.015,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.030904503539204597
+          },
+          {
+            "started_at": 812741.015,
+            "ended_at": 812742.015,
+            "bytes": 104448,
+            "writes": 102,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.029754385352134705
+          },
+          {
+            "started_at": 812742.015,
+            "ended_at": 812743.031,
+            "bytes": 100352,
+            "writes": 98,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.03044131211936474
+          },
+          {
+            "started_at": 812743.031,
+            "ended_at": 812744.031,
+            "bytes": 100352,
+            "writes": 98,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02703562646638602
+          },
+          {
+            "started_at": 812744.031,
+            "ended_at": 812745.031,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.03181202127598226
+          },
+          {
+            "started_at": 812745.031,
+            "ended_at": 812746.046,
+            "bytes": 100352,
+            "writes": 98,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.026859964593313634
+          },
+          {
+            "started_at": 812746.046,
+            "ended_at": 812747.046,
+            "bytes": 100352,
+            "writes": 98,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.028029338107444346
+          },
+          {
+            "started_at": 812747.046,
+            "ended_at": 812748.046,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02988563838880509
+          },
+          {
+            "started_at": 812748.046,
+            "ended_at": 812749.062,
+            "bytes": 100352,
+            "writes": 98,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.027080555562861264
+          },
+          {
+            "started_at": 812749.062,
+            "ended_at": 812750.062,
+            "bytes": 100352,
+            "writes": 98,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02794000005815178
+          },
+          {
+            "started_at": 812750.062,
+            "ended_at": 812751.062,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02678988187108189
+          },
+          {
+            "started_at": 812751.062,
+            "ended_at": 812752.062,
+            "bytes": 99328,
+            "writes": 97,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.0274736643768847
+          },
+          {
+            "started_at": 812752.062,
+            "ended_at": 812753.062,
+            "bytes": 99328,
+            "writes": 97,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02816059102769941
+          },
+          {
+            "started_at": 812753.062,
+            "ended_at": 812754.062,
+            "bytes": 99328,
+            "writes": 97,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.025042435037903488
+          },
+          {
+            "started_at": 812754.062,
+            "ended_at": 812755.062,
+            "bytes": 104448,
+            "writes": 102,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.031425851047970355
+          },
+          {
+            "started_at": 812755.062,
+            "ended_at": 812756.078,
+            "bytes": 99328,
+            "writes": 97,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.028071252978406847
+          },
+          {
+            "started_at": 812756.078,
+            "ended_at": 812757.078,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.029502612305805087
+          },
+          {
+            "started_at": 812757.078,
+            "ended_at": 812758.078,
+            "bytes": 101376,
+            "writes": 99,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.030100070987828076
+          },
+          {
+            "started_at": 812758.078,
+            "ended_at": 812759.093,
+            "bytes": 99328,
+            "writes": 97,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.032793416059575975
+          },
+          {
+            "started_at": 812759.093,
+            "ended_at": 812760.093,
+            "bytes": 101376,
+            "writes": 99,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.025831796694546938
+          },
+          {
+            "started_at": 812760.093,
+            "ended_at": 812761.093,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.028838215162977576
+          },
+          {
+            "started_at": 812761.093,
+            "ended_at": 812762.109,
+            "bytes": 99328,
+            "writes": 97,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.01730153663083911
+          },
+          {
+            "started_at": 812762.109,
+            "ended_at": 812763.109,
+            "bytes": 101376,
+            "writes": 99,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02322490548249334
+          },
+          {
+            "started_at": 812763.109,
+            "ended_at": 812764.109,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.030205780174583197
+          },
+          {
+            "started_at": 812764.109,
+            "ended_at": 812765.125,
+            "bytes": 99328,
+            "writes": 97,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02187672583386302
+          },
+          {
+            "started_at": 812765.125,
+            "ended_at": 812766.125,
+            "bytes": 101376,
+            "writes": 99,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02189912530593574
+          },
+          {
+            "started_at": 812766.125,
+            "ended_at": 812767.156,
+            "bytes": 103424,
+            "writes": 101,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.017608451540581882
+          },
+          {
+            "started_at": 812767.156,
+            "ended_at": 812768.156,
+            "bytes": 100352,
+            "writes": 98,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.022672375896945596
+          },
+          {
+            "started_at": 812768.156,
+            "ended_at": 812769.171,
+            "bytes": 102400,
+            "writes": 100,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.028963179676793516
+          },
+          {
+            "started_at": 812769.171,
+            "ended_at": 812770.187,
+            "bytes": 100352,
+            "writes": 98,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02315167849883437
+          },
+          {
+            "started_at": 812770.187,
+            "ended_at": 812771.187,
+            "bytes": 103424,
+            "writes": 101,
+            "write_seconds": 0.015000000013969839,
+            "max_write_seconds": 0.015000000013969839,
+            "max_late_seconds": 0.015819479944184422
+          },
+          {
+            "started_at": 812771.187,
+            "ended_at": 812772.078,
+            "bytes": 89088,
+            "writes": 87,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0.02111984638031572
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 812772.078
+      },
+      "seconds": 40.17200000002049
+    }
+  ]
+}

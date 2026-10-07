@@ -1,0 +1,132 @@
+{
+  "image": "6eea8a8f2f9039999f6873fdd7d0ab48e2c9d79179f208111a536a6fd91c99ab",
+  "cases": {
+    "stress-mp3-48000-2ch-16bit-200s": {
+      "original_acceptance": {
+        "name": "cpu-under-http-load:stress-mp3-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 181.25
+      },
+      "maximum_http_ms": 547.0000000204891,
+      "minimum_rssi": -75,
+      "idle_after": {
+        "heap": 147840,
+        "largest": 114688,
+        "tasks": 17
+      },
+      "recovery_from_previous": {
+        "result": "PASS"
+      },
+      "recovery_from_first": {
+        "result": "PASS"
+      },
+      "observed_after_40_seconds": {
+        "cpu_windows": 27,
+        "decoder_windows": 28,
+        "mean_busy": 60.01851851851852,
+        "peak_busy": 61.3,
+        "audio_wall_ratio": 1.0016893570505814
+      },
+      "after_40_seconds": {
+        "result": "PASS",
+        "mean_busy": 60.01851851851852,
+        "peak_busy": 61.3,
+        "minimum_heap": 80096.0,
+        "minimum_largest": 63488.0,
+        "audio_wall_ratio": 1.0016893570505814
+      }
+    },
+    "stress-vorbis-48000-2ch-16bit-200s": {
+      "original_acceptance": {
+        "name": "cpu-under-http-load:stress-vorbis-48000-2ch-16bit-200s",
+        "result": "PASS",
+        "evidence": {
+          "duration": 180,
+          "status_samples": 954,
+          "max_http_ms": 890.999999945052,
+          "mean_busy": 73.29117647058824,
+          "peak_busy": 74.7,
+          "minimum_heap": 66356.0,
+          "minimum_largest": 55296.0,
+          "audio_wall_ratio": 0.9979500011747844
+        },
+        "seconds": 181.266
+      },
+      "maximum_http_ms": 890.999999945052,
+      "minimum_rssi": -73,
+      "idle_after": {
+        "heap": 147626.0,
+        "largest": 94208.0,
+        "tasks": 17.0
+      },
+      "recovery_from_previous": {
+        "result": "FAIL",
+        "reason": "Persistent largest loss: 20480.0 bytes"
+      },
+      "recovery_from_first": {
+        "result": "FAIL",
+        "reason": "Persistent largest loss: 20480.0 bytes"
+      },
+      "observed_after_40_seconds": {
+        "cpu_windows": 28,
+        "decoder_windows": 28,
+        "mean_busy": 73.62142857142857,
+        "peak_busy": 74.7,
+        "audio_wall_ratio": 1.0015192365301493
+      },
+      "after_40_seconds": {
+        "result": "PASS",
+        "mean_busy": 73.62142857142857,
+        "peak_busy": 74.7,
+        "minimum_heap": 66356.0,
+        "minimum_largest": 55296.0,
+        "audio_wall_ratio": 1.0015192365301493
+      }
+    },
+    "stress-opus-48000-2ch-16bit-200s": {
+      "original_acceptance": {
+        "name": "cpu-under-http-load:stress-opus-48000-2ch-16bit-200s",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "WebUI response exceeded 2 s",
+        "seconds": 181.282
+      },
+      "maximum_http_ms": 2204.0000000270084,
+      "minimum_rssi": -79,
+      "idle_after": {
+        "heap": 147656,
+        "largest": 94208,
+        "tasks": 17
+      },
+      "recovery_from_previous": {
+        "result": "PASS"
+      },
+      "recovery_from_first": {
+        "result": "FAIL",
+        "reason": "Persistent largest loss: 20480.0 bytes"
+      },
+      "observed_after_40_seconds": {
+        "cpu_windows": 26,
+        "decoder_windows": 28,
+        "mean_busy": 64.4076923076923,
+        "peak_busy": 80.8,
+        "audio_wall_ratio": 0.8043344136273056
+      },
+      "after_40_seconds": {
+        "result": "FAIL",
+        "reason": "Decoded audio is not progressing in real time"
+      }
+    }
+  },
+  "scope": "One paced sequence with per-case Stop; no reboot between codecs; not a 100-switch or 30-minute soak qualification"
+}

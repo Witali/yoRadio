@@ -52,7 +52,8 @@ WebRadio PCM-счётчики/null-output, изменение буфера 5→4
   энкодер и low-priority SNTP; их сохраняем.
 - Аппаратный аудиовывод C3 GPIO10/GPIO3 и LED GPIO8 через LEDC. Это не
   software PDM32/SLC-DMA ESP8266.
-- Defaults: MP3 Espressif, AAC Helix, FLAC custom; Opus/Vorbis/Ogg включены.
+- Defaults на 2026-09-30: MP3 Espressif, AAC Espressif + AAC Plus, FLAC custom;
+  Opus/Vorbis/Ogg включены.
   Итоговый `sdkconfig` проверять: старый build cache может выбирать другой AAC.
 - Два app-слота по `0x1D0000`, SPIFFS `0x40000` (256 КиБ), coredump 64 КиБ.
   Application OTA через WebUI добавлена и проверена в C3-06; старые сохранённые
@@ -75,17 +76,19 @@ WebRadio PCM-счётчики/null-output, изменение буфера 5→4
 
 ### C3-01 · P0 · Формат потока и текстовые статусы
 
-- [ ] `decoder_task`, `custom_legacy_output`, `custom_flac_output`: обновлять
+- [x] `decoder_task`, `custom_legacy_output`, `custom_flac_output`: обновлять
   формат каждого изменившегося PCM-блока, не только первого кадра/битрейт.
-- [ ] Общий Helix adapter: source channels/rate отдельно от PCM/output;
+- [x] Общий Helix adapter: source channels/rate отдельно от PCM/output;
   `AACGetStreamSampRate()` для статуса, `AACGetSampRate()` для вывода. Не
   объявлять SBR/PS каналов больше, чем подтверждено декодером.
-- [ ] Замораживать только снимок одной OLED-прокрутки; Stop/смена поколения
+- [x] Замораживать только снимок одной OLED-прокрутки; Stop/смена поколения
   очищают старую песню/формат, reconnect даёт актуальный snapshot.
 - [ ] Исправить побайтовый `json_escape`: валидный UTF-8, границы символов,
   кавычки/escape на краю буфера. Корректный ICY, включая JSON-текст, не фильтровать.
-- [ ] Тесты stereo→mono→stereo, смены частоты при неизменном bitrate,
-  AAC-LC/HE-AAC, UTF-8/truncation, Stop/reconnect. Основа:
+- [x] Исполняемые тесты stereo→mono→stereo, смены частоты при неизменном bitrate,
+  AAC-LC/HE-AAC, Stop/reconnect; фактический AAC Plus проверен в QEMU.
+  [Отчёт и оставшиеся ограничения](ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md).
+- [ ] Тесты UTF-8/truncation. Основа:
   `tests/esp8266-stream-metadata.test.js`, `esp8266-native-websocket.test.js`.
 
 ### C3-02 · P0 · Потоковая загрузка файлов
@@ -168,6 +171,13 @@ WebRadio PCM-счётчики/null-output, изменение буфера 5→4
 
 ### C3-08 · P2 · Decoder memory и скорость
 
+- [ ] Дополнение 2026-09-30: исследовать повторное использование временной
+  памяти AAC и выдачу PCM блоками по образцу ESP8266. Обязательно сохранить
+  все поддерживаемые варианты AAC, включая HE-AAC/SBR и HE-AAC v2/PS,
+  полную частоту и stereo. Нынешний ESP8266 block API исключает SBR, а C3
+  использует бинарный Espressif decoder; прямое включение флага не подходит.
+  [Подробный план и критерии проверки](ESP32C3_MEMORY_STABILITY_TODO.md#aac-memory-reuse-during-decoding--planned-2026-09-30)
+  учитывают обнаруженную на плате нехватку блока 55 128 байт для SBR.
 - [ ] Общий Helix adapter сейчас имеет `pcm[1152*2]`. Подключить MP3 block API
   и shared reorder отдельно, сохранив stereo и владение PCM до передачи ring.
 - [ ] AAC blocks отдельно от Huffman/window ускорений. На ESP8266 вариант 512

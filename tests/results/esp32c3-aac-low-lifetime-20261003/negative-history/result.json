@@ -1,0 +1,243 @@
+{
+  "format_cases": [
+    [
+      "HE44 first",
+      "44100",
+      "2",
+      "14",
+      "28672",
+      "189344",
+      "189344"
+    ],
+    [
+      "LC44 stereo",
+      "44100",
+      "2",
+      "24",
+      "24576",
+      "237672",
+      "189344"
+    ],
+    [
+      "LC22 mono",
+      "22050",
+      "1",
+      "13",
+      "13312",
+      "237544",
+      "189344"
+    ],
+    [
+      "LC48 stereo",
+      "48000",
+      "2",
+      "26",
+      "26624",
+      "237544",
+      "189344"
+    ],
+    [
+      "HE44 stereo",
+      "44100",
+      "2",
+      "14",
+      "28672",
+      "189216",
+      "189216"
+    ],
+    [
+      "HE48 stereo",
+      "48000",
+      "2",
+      "15",
+      "30720",
+      "189216",
+      "189216"
+    ],
+    [
+      "HEv2 stereo",
+      "44100",
+      "2",
+      "15",
+      "30720",
+      "189216",
+      "189216"
+    ],
+    [
+      "LC22 same header",
+      "22050",
+      "1",
+      "13",
+      "13312",
+      "237544",
+      "189216"
+    ],
+    [
+      "Implicit SBR core",
+      "22050",
+      "1",
+      "15",
+      "15360",
+      "237544",
+      "189216"
+    ],
+    [
+      "HEv2 restart",
+      "44100",
+      "2",
+      "15",
+      "30720",
+      "189744",
+      "189216"
+    ]
+  ],
+  "known_limitations": [
+    "Implicit SBR/PS with unchanged ADTS headers still needs a restart."
+  ],
+  "adapter": {
+    "failures": 2,
+    "tasks": 2,
+    "resets": 2,
+    "samples": 61440,
+    "cleanup": "complete",
+    "heap": "valid"
+  },
+  "experiment": "aac_low_qmf_lifetime",
+  "concurrent": {
+    "decoders": 2,
+    "samples": 61440,
+    "pcm_hash": "40fdba48"
+  },
+  "memory": {
+    "owner_bytes": 45932,
+    "block_bytes": 47092,
+    "context_bytes": 24
+  },
+  "stack": {
+    "task_stack_bytes": 8192,
+    "min_free_bytes": 4924,
+    "concurrent_peak": 2
+  },
+  "pointers": {
+    "checks": 141788,
+    "core": 482,
+    "frames": 382,
+    "ps": 210,
+    "smoothing": 333,
+    "allocations": 145,
+    "frees": 145,
+    "negative_cases": 10,
+    "envelopes": 191,
+    "resets": 4,
+    "io": 241,
+    "copies": 10988
+  },
+  "low_lifetime": {
+    "first_row": 7,
+    "rows": 33,
+    "bands": 32,
+    "calls": 191,
+    "real": 80,
+    "complex": 111,
+    "ps": 105,
+    "poisoned_words": 403392
+  },
+  "pcm_without_poison": {
+    "frames": 328770,
+    "channels": 2,
+    "rate": 48000,
+    "sample_width": 2,
+    "samples": 657540,
+    "different": 302728,
+    "max_pcm_error_lsb": 32809,
+    "rms_error_lsb": 1933.1779227370182,
+    "pcm_sha256": "17f5f499331837c7f5e77ee7af7a3ba55665f3da8dbeb19d2f4499c5b399837d",
+    "reference_wav_sha256": "8ab3caf83b1ded86b03069c4860f3e726d8690880a7d85e90acd6a11beaf7f3d"
+  },
+  "capture_identical": null,
+  "precision_pass": false,
+  "precision_limit_lsb": 0,
+  "summaries": [],
+  "baseline_sha256": "5bca4bfbe3e737298788afbce9cd272af7561eef79470a3d84b06fe78c075d16",
+  "baseline_capture": null,
+  "provenance": {
+    "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+    "elf_sha256": "f6acb2ae703e266a9adc6bbf1ca8659139130807177606241b4327f73aca07f1",
+    "sdkconfig_sha256": "a4ad5a2add244e7e6ebe76b4b3467c77f941e01bdbb9a6687af693ac897eec8a",
+    "fixtures": {
+      "generator": "FDK AAC v2.0.3 aac-enc, original 0.5-second synthetic tones",
+      "encoder_commit": "716f4394641d53f0d79c9ddac3fa93b03a49f278",
+      "files": {
+        "lc-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 8943,
+          "sha256": "b701428ed6cd8118f873f4cbe708b517a1089deed63792af6d0850c2ebc436bd"
+        },
+        "lc-22050-mono.aac": {
+          "sample_rate": 22050,
+          "channels": 1,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9659,
+          "sha256": "70ca546f35396ad05b88876536557df6b43ef7d804966460fb949aa9e07b7a85"
+        },
+        "lc-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9012,
+          "sha256": "1b9ab71161449af230ca0628dc23ac265f8c707b82d5e68c76ddc7f42d69b0d4"
+        },
+        "he-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5202,
+          "sha256": "2ed01ee61355830629905867f1885eae99123bc73daad161ba1a5959a4f5e11a"
+        },
+        "he-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5121,
+          "sha256": "747259aaafad92a280e793a4e0b7fce05d39443959ef3d3cba463b980d92f7da"
+        },
+        "hev2-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 29,
+          "bitrate": 32000,
+          "size_bytes": 2787,
+          "sha256": "cf66a4008ec69f9fa31ac7383b0fe8ff6d71fc60b19ee168f1c1396c7e4014ce"
+        }
+      }
+    },
+    "qemu_command": [
+      "wsl.exe",
+      "--cd",
+      "/mnt/c/Work/yoRadio/.worktree/aac-storage18",
+      "--exec",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+      "-M",
+      "esp32c3,audiodev=audio0",
+      "-nographic",
+      "-no-reboot",
+      "-snapshot",
+      "-icount",
+      "shift=0,align=off,sleep=off",
+      "-audiodev",
+      "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-low-lifetime/negative-history-fixed/audio.wav,out.frequency=48000",
+      "-L",
+      "/mnt/c/Work/QEMU-ESP32/share/qemu",
+      "-drive",
+      "file=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-low-lifetime/negative-history-fixed/flash.bin,if=mtd,format=raw"
+    ],
+    "qemu_log_sha256": "c6d0304c9cd7fc9480e6b3edfe114030c742ae040667593be32fb56579e564a4"
+  }
+}

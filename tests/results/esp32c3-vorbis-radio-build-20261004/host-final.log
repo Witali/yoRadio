@@ -1,0 +1,328 @@
+TAP version 13
+# Subtest: ESP32-C3 defaults to 16 KiB but permits a larger compressed-audio buffer
+ok 1 - ESP32-C3 defaults to 16 KiB but permits a larger compressed-audio buffer
+  ---
+  duration_ms: 2.7333
+  type: 'test'
+  ...
+# Subtest: ESP32-C3 reuses stream workspaces and logs fragmentation headroom
+ok 2 - ESP32-C3 reuses stream workspaces and logs fragmentation headroom
+  ---
+  duration_ms: 0.7093
+  type: 'test'
+  ...
+# Subtest: repository default setup and build select native ESP-IDF firmware
+ok 3 - repository default setup and build select native ESP-IDF firmware
+  ---
+  duration_ms: 2.484
+  type: 'test'
+  ...
+# Subtest: debug and production profiles compile the same sources
+ok 4 - debug and production profiles compile the same sources
+  ---
+  duration_ms: 0.981
+  type: 'test'
+  ...
+# Subtest: production builds save the application under firmware
+ok 5 - production builds save the application under firmware
+  ---
+  duration_ms: 0.9696
+  type: 'test'
+  ...
+# Subtest: ESP32-C3 native target is Arduino-free and selects the RISC-V chip
+ok 6 - ESP32-C3 native target is Arduino-free and selects the RISC-V chip
+  ---
+  duration_ms: 1.125
+  type: 'test'
+  ...
+# Subtest: native board profile maps OLED, controls and stereo PDM pins
+ok 7 - native board profile maps OLED, controls and stereo PDM pins
+  ---
+  duration_ms: 0.5781
+  type: 'test'
+  ...
+# Subtest: native task stacks are configured by each board profile
+ok 8 - native task stacks are configured by each board profile
+  ---
+  duration_ms: 2.7586
+  type: 'test'
+  ...
+# Subtest: native OLED driver uses the 72x40 geometry and controller offset
+ok 9 - native OLED driver uses the 72x40 geometry and controller offset
+  ---
+  duration_ms: 0.3875
+  type: 'test'
+  ...
+# Subtest: native OLED presents a legible full-screen yoRadio boot logo first
+ok 10 - native OLED presents a legible full-screen yoRadio boot logo first
+  ---
+  duration_ms: 1.0069
+  type: 'test'
+  ...
+# Subtest: stopped-radio screensaver draws a full-screen clock and wakes on BOOT
+ok 11 - stopped-radio screensaver draws a full-screen clock and wakes on BOOT
+  ---
+  duration_ms: 2.4317
+  type: 'test'
+  ...
+# Subtest: native SNTP owns server names and retries at low priority after reconnect
+ok 12 - native SNTP owns server names and retries at low priority after reconnect
+  ---
+  duration_ms: 0.9296
+  type: 'test'
+  ...
+# Subtest: native OLED brightness uses the shared 0..100 setting and persists it
+ok 13 - native OLED brightness uses the shared 0..100 setting and persists it
+  ---
+  duration_ms: 0.8218
+  type: 'test'
+  ...
+# Subtest: native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll
+ok 14 - native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll
+  ---
+  duration_ms: 0.7397
+  type: 'test'
+  ...
+# Subtest: native OLED defaults to software scroll and keeps hardware scroll optional
+ok 15 - native OLED defaults to software scroll and keeps hardware scroll optional
+  ---
+  duration_ms: 0.8568
+  type: 'test'
+  ...
+# Subtest: native OLED alternates ICY title with live stream parameters
+ok 16 - native OLED alternates ICY title with live stream parameters
+  ---
+  duration_ms: 0.7923
+  type: 'test'
+  ...
+# Subtest: native WebUI and OLED share the confirmed decoded format
+ok 17 - native WebUI and OLED share the confirmed decoded format
+  ---
+  duration_ms: 0.5667
+  type: 'test'
+  ...
+# Subtest: native OLED normalizes dash variants before the replacement glyph
+ok 18 - native OLED normalizes dash variants before the replacement glyph
+  ---
+  duration_ms: 0.3228
+  type: 'test'
+  ...
+# Subtest: native radio requests and publishes ICY song metadata
+ok 19 - native radio requests and publishes ICY song metadata
+  ---
+  duration_ms: 1.0107
+  type: 'test'
+  ...
+# Subtest: native HTTPS station switching releases incompatible codec memory before TLS
+ok 20 - native HTTPS station switching releases incompatible codec memory before TLS
+  ---
+  duration_ms: 1.8742
+  type: 'test'
+  ...
+# Subtest: native WebUI publishes ICY or decoder bitrate instead of a constant zero
+ok 21 - native WebUI publishes ICY or decoder bitrate instead of a constant zero
+  ---
+  duration_ms: 0.9264
+  type: 'test'
+  ...
+# Subtest: native BOOT gestures match the documented one-button controls
+ok 22 - native BOOT gestures match the documented one-button controls
+  ---
+  duration_ms: 1.1067
+  type: 'test'
+  ...
+# Subtest: single-core pipeline never pins work to nonexistent core 1
+ok 23 - single-core pipeline never pins work to nonexistent core 1
+  ---
+  duration_ms: 0.3738
+  type: 'test'
+  ...
+# Subtest: single-core decoder yields to idle and drops obsolete station data
+ok 24 - single-core decoder yields to idle and drops obsolete station data
+  ---
+  duration_ms: 0.5724
+  type: 'test'
+  ...
+# Subtest: native ESP-IDF decoders advance past consumed compressed input
+ok 25 - native ESP-IDF decoders advance past consumed compressed input
+  ---
+  duration_ms: 0.7799
+  type: 'test'
+  ...
+# Subtest: native decoder reports measured real-time headroom
+ok 26 - native decoder reports measured real-time headroom
+  ---
+  duration_ms: 0.3263
+  type: 'test'
+  ...
+# Subtest: native audio pipeline batches PCM using the current decoded layout
+ok 27 - native audio pipeline batches PCM using the current decoded layout
+  ---
+  duration_ms: 0.6068
+  type: 'test'
+  ...
+# Subtest: native FLAC reuses the optimized yoRadio decoder without Arduino Core
+ok 28 - native FLAC reuses the optimized yoRadio decoder without Arduino Core
+  ---
+  duration_ms: 0.9642
+  type: 'test'
+  ...
+# Subtest: native decoder errors and EOF release independent PCM before terminal publication
+ok 29 - native decoder errors and EOF release independent PCM before terminal publication
+  ---
+  duration_ms: 0.3842
+  type: 'test'
+  ...
+# Subtest: native FLAC decoder is selectable at compile time
+ok 30 - native FLAC decoder is selectable at compile time
+  ---
+  duration_ms: 0.6103
+  type: 'test'
+  ...
+# Subtest: native MP3 and AAC alternatives are selectable at compile time
+ok 31 - native MP3 and AAC alternatives are selectable at compile time
+  ---
+  duration_ms: 0.7846
+  type: 'test'
+  ...
+# Subtest: native ESP-IDF boards default to Espressif MP3
+ok 32 - native ESP-IDF boards default to Espressif MP3
+  ---
+  duration_ms: 2.131
+  type: 'test'
+  ...
+# Subtest: shared WebUI does not expose MP3 backend selection
+ok 33 - shared WebUI does not expose MP3 backend selection
+  ---
+  duration_ms: 0.4355
+  type: 'test'
+  ...
+# Subtest: native benchmark build reads codec fixtures only from dedicated flash
+ok 34 - native benchmark build reads codec fixtures only from dedicated flash
+  ---
+  duration_ms: 0.446
+  type: 'test'
+  ...
+# Subtest: native partition table reserves 256 KiB for SPIFFS with dual OTA
+ok 35 - native partition table reserves 256 KiB for SPIFFS with dual OTA
+  ---
+  duration_ms: 0.3379
+  type: 'test'
+  ...
+# Subtest: native C3 uses wifi.csv as its only persistent credential source
+ok 36 - native C3 uses wifi.csv as its only persistent credential source
+  ---
+  duration_ms: 0.2185
+  type: 'test'
+  ...
+# Subtest: native C3 disables modem sleep only while audio is active
+ok 37 - native C3 disables modem sleep only while audio is active
+  ---
+  duration_ms: 0.5214
+  type: 'test'
+  ...
+# Subtest: native audio buffers cover high-bitrate remote streams
+ok 38 - native audio buffers cover high-bitrate remote streams
+  ---
+  duration_ms: 1.1224
+  type: 'test'
+  ...
+# Subtest: native C3 refreshes Wi-Fi signal strength for WebSocket status
+ok 39 - native C3 refreshes Wi-Fi signal strength for WebSocket status
+  ---
+  duration_ms: 0.3334
+  type: 'test'
+  ...
+# Subtest: native WebUI publishes player changes promptly and uses buffer percent
+ok 40 - native WebUI publishes player changes promptly and uses buffer percent
+  ---
+  duration_ms: 0.8797
+  type: 'test'
+  ...
+# Subtest: native stream connection reports HTTP failures and follows redirects
+ok 41 - native stream connection reports HTTP failures and follows redirects
+  ---
+  duration_ms: 0.6681
+  type: 'test'
+  ...
+# Subtest: native audio buffers backpressure instead of dropping a live stream
+ok 42 - native audio buffers backpressure instead of dropping a live stream
+  ---
+  duration_ms: 0.4983
+  type: 'test'
+  ...
+# Subtest: native WebUI uses only the standard ESP-IDF HTTP and WebSocket server
+ok 43 - native WebUI uses only the standard ESP-IDF HTTP and WebSocket server
+  ---
+  duration_ms: 0.7423
+  type: 'test'
+  ...
+# Subtest: native settings page is complete in client mode and Wi-Fi-only in AP mode
+ok 44 - native settings page is complete in client mode and Wi-Fi-only in AP mode
+  ---
+  duration_ms: 0.8789
+  type: 'test'
+  ...
+# Subtest: native WebUI reuses shared pages and recovers an empty filesystem
+ok 45 - native WebUI reuses shared pages and recovers an empty filesystem
+  ---
+  duration_ms: 0.5998
+  type: 'test'
+  ...
+# Subtest: native playlist reload event is emitted only after a successful upload
+ok 46 - native playlist reload event is emitted only after a successful upload
+  ---
+  duration_ms: 0.5165
+  type: 'test'
+  ...
+# Subtest: native SPIFFS image contains the shared WebUI and repository playlist
+ok 47 - native SPIFFS image contains the shared WebUI and repository playlist
+  ---
+  duration_ms: 0.2113
+  type: 'test'
+  ...
+# Subtest: native radio persists and restores the last selected station
+ok 48 - native radio persists and restores the last selected station
+  ---
+  duration_ms: 0.3247
+  type: 'test'
+  ...
+# Subtest: minimal IDF build pins the official OGG Vorbis and Opus component
+ok 49 - minimal IDF build pins the official OGG Vorbis and Opus component
+  ---
+  duration_ms: 2.8775
+  type: 'test'
+  ...
+# Subtest: Arduino audio loop reserves the stack required by the Opus decoder
+ok 50 - Arduino audio loop reserves the stack required by the Opus decoder
+  ---
+  duration_ms: 0.5866
+  type: 'test'
+  ...
+# Subtest: audio source recognizes common OGG extensions and MIME types
+ok 51 - audio source recognizes common OGG extensions and MIME types
+  ---
+  duration_ms: 1.703
+  type: 'test'
+  ...
+# Subtest: OGG owns decoder memory exclusively and grows only its PCM frame buffer
+ok 52 - OGG owns decoder memory exclusively and grows only its PCM frame buffer
+  ---
+  duration_ms: 2.7615
+  type: 'test'
+  ...
+# Subtest: Vorbis and Opus retain server bitrate and use distinct bitrate badges
+ok 53 - Vorbis and Opus retain server bitrate and use distinct bitrate badges
+  ---
+  duration_ms: 4.103
+  type: 'test'
+  ...
+1..53
+# tests 53
+# suites 0
+# pass 53
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 141.3187

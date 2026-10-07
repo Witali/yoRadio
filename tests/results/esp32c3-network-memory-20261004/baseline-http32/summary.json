@@ -1,0 +1,91 @@
+{
+  "board": {
+    "version": "v0.9.693-1152-gafa4a1ba-dirty",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "7a08ff29d13eed4ffa987bfe93b86808a2fead6bc3f1ae41a389e506963dfcb1"
+  },
+  "cases": [
+    {
+      "name": "groovesalad-32-aac",
+      "transport": "http",
+      "acceptance": {
+        "name": "http:groovesalad-32-aac",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss during continuous playback",
+        "seconds": 302.125
+      },
+      "metrics_available": true,
+      "observed_formats": [
+        "HE-AAC 44.1 kHz stereo"
+      ],
+      "samples": [
+        {
+          "at": 608276.156,
+          "busy": 56.0,
+          "decode": 33.5,
+          "heap": 25792,
+          "largest": 15360
+        },
+        {
+          "at": 608281.171,
+          "busy": 59.4,
+          "decode": 34.3,
+          "heap": 27624,
+          "largest": 16384
+        },
+        {
+          "at": 608286.218,
+          "busy": 59.7,
+          "decode": 34.3,
+          "heap": 29316,
+          "largest": 18432
+        },
+        {
+          "at": 608291.328,
+          "busy": 59.4,
+          "decode": 34.3,
+          "heap": 32984,
+          "largest": 12288
+        },
+        {
+          "at": 608296.421,
+          "busy": 59.7,
+          "decode": 34.5,
+          "heap": 31280,
+          "largest": 16384
+        },
+        {
+          "at": 608301.437,
+          "busy": 59.2,
+          "decode": 34.2,
+          "heap": 22252,
+          "largest": 11776
+        }
+      ],
+      "busy_mean": 58.9,
+      "decode_mean": 34.183,
+      "minimum_free": 22252,
+      "minimum_largest": 11776,
+      "window": {
+        "start": 608270.359,
+        "end": 608570.484
+      },
+      "allocation_failures": []
+    }
+  ],
+  "metric": "FreeRTOS CPU samples 5..35 s after first PCM, clipped to the recorded playback window",
+  "note": "Failed playback stays failed. Fewer than four in-window CPU samples give no aggregate.",
+  "panic_or_capture_errors": [],
+  "input_sha256": {
+    "report.json": "0e2da4a565ffb7232a6aae4b919d56edb3ece18b369d6c239a5dfb195d738aac",
+    "status.json": "bc461866b5711485cbd8235abfac82053fe96295c83b569c16083af959312c20",
+    "performance.json": "0d26bcf9bf083d671246799cdb73b264480c57ced917cd9c937cf76a49fa57da"
+  },
+  "source_sha256": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709"
+}

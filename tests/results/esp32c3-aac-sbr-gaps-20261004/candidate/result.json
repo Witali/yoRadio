@@ -1,0 +1,178 @@
+{
+  "precision_pass": true,
+  "precision_limit_lsb": 0,
+  "summaries": [],
+  "precision_scope": "Ordinary LC/HE/HEv2 streams vs unchanged controller with identical compact storage",
+  "capture_frames": 56,
+  "capture_channel_samples": 189440,
+  "transition_storage_precision_qualified": false,
+  "production_qualified": false,
+  "gap_capture_frames": 165,
+  "gap_capture_channel_samples": 675840,
+  "experiment": "qemu_late_sbr",
+  "ordinary_pcm": [
+    {
+      "case": "lc_44100_stereo",
+      "repeats": 3,
+      "frames": 72,
+      "channel_samples": 147456,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "830cc1d8"
+    },
+    {
+      "case": "lc_22050_mono",
+      "repeats": 3,
+      "frames": 39,
+      "channel_samples": 39936,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "e71fe2d0"
+    },
+    {
+      "case": "lc_48000_stereo",
+      "repeats": 3,
+      "frames": 78,
+      "channel_samples": 159744,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "757b7f1a"
+    },
+    {
+      "case": "he_44100_stereo",
+      "repeats": 3,
+      "frames": 42,
+      "channel_samples": 172032,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "ce57bf91"
+    },
+    {
+      "case": "he_48000_stereo",
+      "repeats": 3,
+      "frames": 45,
+      "channel_samples": 184320,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "22097ca9"
+    },
+    {
+      "case": "hev2_44100_stereo",
+      "repeats": 3,
+      "frames": 45,
+      "channel_samples": 184320,
+      "max_error_lsb": 0,
+      "pcm_fnv1a": "c1e1ff5e"
+    }
+  ],
+  "ordinary_channel_samples": 887808,
+  "transition_pcm_qualified": false,
+  "reverse_transition_qualified": false,
+  "pointers": {
+    "checks": 971369,
+    "core": 3384,
+    "frames": 3356,
+    "ps": 1064,
+    "smoothing": 2070,
+    "allocations": 466,
+    "frees": 466,
+    "negative_cases": 10,
+    "envelopes": 1678,
+    "resets": 12,
+    "io": 1692,
+    "copies": 63796
+  },
+  "pointer_boundaries": {
+    "applied": 2342,
+    "decode_io": 3356,
+    "ps_bits": 840,
+    "release_negative_cases": 6,
+    "boundary_negative_cases": 5
+  },
+  "stack_bytes": 16384,
+  "stack_min_free_bytes": 2844,
+  "parities": [
+    13,
+    26
+  ],
+  "retention_format_pass": true,
+  "retention_parities": 2,
+  "output_poison_independent": true,
+  "output_poison_channel_samples": 189440,
+  "full_precision_history": false,
+  "provenance": {
+    "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+    "elf_sha256": "11b8d447014ea269cbbd1c99c42fee02346e2e5d721a6014a47f25e34ce8f502",
+    "sdkconfig_sha256": "d590b5fcf2f28ca8140b691d871d076cf367856ec4d676f9d6be4b8c0ab5eab7",
+    "fixtures": {
+      "generator": "FDK AAC v2.0.3 aac-enc, original 0.5-second synthetic tones",
+      "encoder_commit": "716f4394641d53f0d79c9ddac3fa93b03a49f278",
+      "files": {
+        "lc-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 8943,
+          "sha256": "b701428ed6cd8118f873f4cbe708b517a1089deed63792af6d0850c2ebc436bd"
+        },
+        "lc-22050-mono.aac": {
+          "sample_rate": 22050,
+          "channels": 1,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9659,
+          "sha256": "70ca546f35396ad05b88876536557df6b43ef7d804966460fb949aa9e07b7a85"
+        },
+        "lc-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 2,
+          "bitrate": 128000,
+          "size_bytes": 9012,
+          "sha256": "1b9ab71161449af230ca0628dc23ac265f8c707b82d5e68c76ddc7f42d69b0d4"
+        },
+        "he-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5202,
+          "sha256": "2ed01ee61355830629905867f1885eae99123bc73daad161ba1a5959a4f5e11a"
+        },
+        "he-48000-stereo.aac": {
+          "sample_rate": 48000,
+          "channels": 2,
+          "audio_object_type": 5,
+          "bitrate": 64000,
+          "size_bytes": 5121,
+          "sha256": "747259aaafad92a280e793a4e0b7fce05d39443959ef3d3cba463b980d92f7da"
+        },
+        "hev2-44100-stereo.aac": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "audio_object_type": 29,
+          "bitrate": 32000,
+          "size_bytes": 2787,
+          "sha256": "cf66a4008ec69f9fa31ac7383b0fe8ff6d71fc60b19ee168f1c1396c7e4014ce"
+        }
+      }
+    },
+    "qemu_command": [
+      "wsl.exe",
+      "--cd",
+      "/mnt/c/Work/yoRadio/.worktree/aac-storage18",
+      "--exec",
+      "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+      "-M",
+      "esp32c3,audiodev=audio0",
+      "-nographic",
+      "-no-reboot",
+      "-snapshot",
+      "-icount",
+      "shift=0,align=off,sleep=off",
+      "-audiodev",
+      "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-sbr-gaps/candidate/audio.wav,out.frequency=48000",
+      "-L",
+      "/mnt/c/Work/QEMU-ESP32/share/qemu",
+      "-drive",
+      "file=/mnt/c/Work/yoRadio/.worktree/aac-storage18/.build/aac-sbr-gaps/candidate/flash.bin,if=mtd,format=raw"
+    ],
+    "qemu_log_sha256": "b153926235f07c4c386651718a690c2e16c06a95599cf23d06eac5d15a9db9af"
+  }
+}

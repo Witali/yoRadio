@@ -1,0 +1,148 @@
+ESP-ROM:esp32c3-api1-20210207
+Build:Feb  7 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fcd5830,len:0x155c
+load:0x403cbf10,len:0xce0
+load:0x403ce710,len:0x2fcc
+entry 0x403cbf1a
+I (0) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (0) boot: compile time Oct  4 2026 13:02:58
+I (0) boot: chip revision: v0.3
+I (0) boot: efuse block revision: v1.3
+I (0) boot.esp32c3: SPI Speed      : 80MHz
+I (0) boot.esp32c3: SPI Mode       : SLOW READ
+I (0) boot.esp32c3: SPI Flash Size : 4MB
+I (0) boot: Enabling RNG early entropy source...
+I (0) boot: Partition Table:
+I (0) boot: ## Label            Usage          Type ST Offset   Length
+I (0) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (0) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (0) boot:  2 app0             OTA app          00 10 00010000 001d0000
+I (0) boot:  3 app1             OTA app          00 11 001e0000 001d0000
+I (0) boot:  4 spiffs           Unknown data     01 82 003b0000 00040000
+I (0) boot:  5 coredump         Unknown data     01 03 003f0000 00010000
+I (0) boot: End of partition table
+I (0) boot: No factory image, trying OTA 0
+I (0) esp_image: segment 0: paddr=00010020 vaddr=3c050020 size=239b8h (145848) map
+I (2) esp_image: segment 1: paddr=000339e0 vaddr=3fc8a800 size=01abch (  6844) load
+I (2) esp_image: segment 2: paddr=000354a4 vaddr=40380000 size=0a67ch ( 42620) load
+I (3) esp_image: segment 3: paddr=0003fb28 vaddr=50000000 size=00024h (    36) load
+I (3) esp_image: segment 4: paddr=0003fb54 vaddr=00000000 size=004c4h (  1220) 
+I (3) esp_image: segment 5: paddr=00040020 vaddr=42000020 size=47a98h (293528) map
+I (6) boot: Loaded app from partition at offset 0x10000
+I (6) boot: Set actual ota_seq=1 in otadata[0]
+I (6) boot: Disabling RNG early entropy source...
+I (6) cpu_start: Unicore app
+I (14) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
+I (14) cpu_start: Pro cpu start user code
+I (14) cpu_start: cpu freq: 160000000 Hz
+I (14) app_init: Application information:
+I (14) app_init: Project name:     yoradio_esp32c3_oled_native
+I (14) app_init: App version:      v0.9.693-1158-g4a1f5211-dirty
+I (14) app_init: Compile time:     Oct  4 2026 13:22:09
+I (14) app_init: ELF file SHA256:  a4a692d44...
+I (14) app_init: ESP-IDF:          v6.0.2
+I (14) efuse_init: Min chip rev:     v0.3
+I (14) efuse_init: Max chip rev:     v1.99 
+I (14) efuse_init: Chip rev:         v0.3
+I (14) heap_init: Initializing. RAM available for dynamic allocation:
+I (14) heap_init: At 3FC8DBD0 len 00032430 (201 KiB): RAM
+I (14) heap_init: At 3FCC0000 len 0001C710 (113 KiB): Retention RAM
+I (14) heap_init: At 3FCDC710 len 00002950 (10 KiB): Retention RAM
+I (14) heap_init: At 50000024 len 00001FC4 (7 KiB): RTCRAM
+I (14) spi_flash: detected chip: gd
+I (14) spi_flash: flash io: dio
+I (14) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (14) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (14) main_task: Started on CPU0
+I (14) main_task: Calling app_main()
+I (14) yoradio_c3: Starting pure ESP-IDF ESP32-C3 OLED yoRadio
+I (14) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (14) runtime_settings: Restored aif=0 softap=0 abuff=10 watchdog=1 tz=0:00 timeint=60 vols=1 enca=200
+W (14) yoradio_c3: QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO disabled
+I (14) oled: SSD1306 72x40 ready at I2C 0x3c
+I (14) audio_output: QEMU stereo PCM ready at 48000 Hz
+I (14) main_task: Returned from app_main()
+I (114) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (115) yoradio_c3: QEMU_AUDIO_PASS 24000 stereo frames
+I (117) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (476) qemu_aac: QEMU_AAC_CASE_PASS HE44 first: 44100 Hz 2 ch, 14 frames, 28672 samples, free 203528 min 203528
+I (1036) qemu_aac: QEMU_AAC_CASE_PASS LC44 stereo: 44100 Hz 2 ch, 24 frames, 24576 samples, free 237520 min 203528
+I (1036) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (1636) qemu_aac: QEMU_AAC_CASE_PASS LC22 mono: 22050 Hz 1 ch, 13 frames, 13312 samples, free 237392 min 203528
+I (1636) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (2196) qemu_aac: QEMU_AAC_CASE_PASS LC48 stereo: 48000 Hz 2 ch, 26 frames, 26624 samples, free 237392 min 203528
+I (2197) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (2846) qemu_aac: QEMU_AAC_CASE_PASS HE44 stereo: 44100 Hz 2 ch, 14 frames, 28672 samples, free 203400 min 203400
+I (2847) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (3486) qemu_aac: QEMU_AAC_CASE_PASS HE48 stereo: 48000 Hz 2 ch, 15 frames, 30720 samples, free 203400 min 203400
+I (3487) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (4176) qemu_aac: QEMU_AAC_CASE_PASS HEv2 stereo: 44100 Hz 2 ch, 15 frames, 30720 samples, free 203400 min 203368
+I (4176) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (4785) qemu_aac: QEMU_AAC_CASE_PASS LC22 same header: 22050 Hz 1 ch, 13 frames, 13312 samples, free 237392 min 203368
+I (4786) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (5475) qemu_aac: QEMU_AAC_CASE_PASS Implicit SBR full: 44100 Hz 2 ch, 15 frames, 30720 samples, free 203400 min 203368
+I (5475) qemu_aac: QEMU_AAC_LATE_SBR_FORMAT_PASS history retained; PCM quality still unqualified
+I (6175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 restart: 44100 Hz 2 ch, 15 frames, 30720 samples, free 203928 min 203368
+I (6247) late_sbr: AAC_LATE_SBR_PCM_PASS case=lc_44100_stereo repeats=3 frames=72 channel_samples=147456 max_error_lsb=0 pcm_hash=830cc1d8
+I (6286) late_sbr: AAC_LATE_SBR_PCM_PASS case=lc_22050_mono repeats=3 frames=39 channel_samples=39936 max_error_lsb=0 pcm_hash=e71fe2d0
+I (6364) late_sbr: AAC_LATE_SBR_PCM_PASS case=lc_48000_stereo repeats=3 frames=78 channel_samples=159744 max_error_lsb=0 pcm_hash=757b7f1a
+I (6500) late_sbr: AAC_LATE_SBR_PCM_PASS case=he_44100_stereo repeats=3 frames=42 channel_samples=172032 max_error_lsb=0 pcm_hash=ce57bf91
+I (6645) late_sbr: AAC_LATE_SBR_PCM_PASS case=he_48000_stereo repeats=3 frames=45 channel_samples=184320 max_error_lsb=0 pcm_hash=22097ca9
+I (6831) late_sbr: AAC_LATE_SBR_PCM_PASS case=hev2_44100_stereo repeats=3 frames=45 channel_samples=184320 max_error_lsb=0 pcm_hash=c1e1ff5e
+E (6874) late_sbr: AAC_LATE_SBR_FORMAT_MISMATCH case=lc_22050_mono expected_rate=22050 expected_channels=1 actual_rate=44100 actual_channels=1 bits=16
+
+assert failed: check_info qemu_aac_late_sbr.c:63 (info.sample_rate==fixture->rate && info.channel==fixture->channels && info.bits_per_sample==16)
+Core  0 register dump:
+MEPC    : 0x40384eae  RA      : 0x40384e72  SP      : 0x3fc97b60  GP      : 0x3fc8b000  
+TP      : 0x3fc98250  T0      : 0x20262620  T1      : 0x663d3d6c  T2      : 0x6f666e69  
+S0/FP   : 0x00000036  S1      : 0x00000001  A0      : 0x3fc97ba8  A1      : 0x3fc8be51  
+A2      : 0x00000001  A3      : 0x3fc8e000  A4      : 0x00000001  A5      : 0x3fc8e000  
+A6      : 0x00000014  A7      : 0x656e6e61  S2      : 0x3fc97ba8  S3      : 0x3fc97c01  
+S4      : 0x3fc8be50  S5      : 0x3fc97ba8  S6      : 0x4200dbaa  S7      : 0x00000000  
+S8      : 0x3c055f60  S9      : 0x00000001  S10     : 0x0000000f  S11     : 0x00002000  
+T3      : 0x75747869  T4      : 0x3e2d6572  T5      : 0x6e616863  T6      : 0x736c656e  
+MSTATUS : 0x00001880  MTVEC   : 0x40380001  MCAUSE  : 0x00000002  MTVAL   : 0x00000000  
+MHARTID : 0x00000000  
+
+Stack memory:
+3fc97b60: 0x00000000 0x3fc915dc 0x3c05f8c4 0x4038478c 0x00003336 0x0000000a 0x00000000 0x00000000
+3fc97b80: 0x00000000 0x3fc8be34 0x3c05f8c4 0x3fc8be44 0x3c055adc 0x3fc8be48 0x3fc97b70 0x3fc8be4c
+3fc97ba0: 0x3c055b80 0x3fc8be50 0x65737361 0x66207472 0x656c6961 0x63203a64 0x6b636568 0x666e695f
+3fc97bc0: 0x6571206f 0x615f756d 0x6c5f6361 0x5f657461 0x2e726273 0x33363a63 0x6e692820 0x732e6f66
+3fc97be0: 0x6c706d61 0x61725f65 0x3d3d6574 0x74786966 0x2d657275 0x7461723e 0x26262065 0x666e6920
+3fc97c00: 0x68632e6f 0x656e6e61 0x663d3d6c 0x75747869 0x3e2d6572 0x6e616863 0x736c656e 0x20262620
+3fc97c20: 0x6f666e69 0x7469622e 0x65705f73 0x61735f72 0x656c706d 0x36313d3d 0x3c050029 0x00002000
+3fc97c40: 0x3c062220 0x000000c1 0x3c055afc 0x403881fa 0x00000171 0x00000000 0x000002e7 0x3fc97c7c
+3fc97c60: 0x3c05f96c 0x3fc8fc0c 0x3c05f91c 0x4200db60 0x000000c1 0x3fc8fc0c 0x3c05f91c 0x00002000
+3fc97c80: 0x3c062220 0x000000c1 0x3c05f91c 0x4200dbaa 0x0000ac44 0x00000001 0x00000010 0x00000000
+3fc97ca0: 0x0000ac44 0x00000110 0x0001f3f9 0x00000000 0x3c06217c 0x000000c1 0x3fc986f4 0x4200de1a
+3fc97cc0: 0x3fc8fc0c 0x3fc8e000 0x3fc8df88 0x3fc986f4 0x00002000 0x00000000 0x00001000 0x3c06217c
+3fc97ce0: 0x000000c1 0x00000000 0x000000a4 0x00000000 0x3fc8fc0c 0x3fc8fc0c 0x00002020 0x3c05f96c
+3fc97d00: 0x3c05f91c 0x3c056000 0x3fc986e4 0x3fc986f4 0x0000000d 0x3fc8fc0c 0x00000001 0x4200e2ee
+3fc97d20: 0x0002d000 0xc1e1ff5e 0x3fc8dbe4 0x3fca38dc 0x00000000 0x000010c4 0x0000002d 0x0002d000
+3fc97d40: 0xc1e1ff5e 0x00000000 0x00000081 0x00000081 0x00000000 0x3fc8cea0 0x3fc986f4 0x00002000
+3fc97d60: 0x00000000 0x00002000 0x3fc9a8f8 0x00002000 0x00000000 0x00002000 0x3c069aed 0x00000081
+3fc97d80: 0x00000000 0x00000081 0x00000000 0x3c069aed 0x00000081 0x00000000 0x00000081 0x00000000
+3fc97da0: 0x3fc8fc04 0x204412cd 0x3fc8dbe4 0x00000000 0x00000000 0x00000000 0x3c064000 0x3c062000
+3fc97dc0: 0x3c056000 0x3c055000 0x3c06a000 0x3c069000 0x3fc8fc0c 0x3fc8cea0 0x3fc8d010 0x4200d998
+3fc97de0: 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x094f2095 0x00001770
+3fc97e00: 0x00005e00 0x3c055000 0x3fc8d000 0x4200ae78 0x107e107e 0x115c115c 0x123a123a 0x13181318
+3fc97e20: 0x13f713f7 0x14d514d5 0x15b315b3 0x16911691 0x17701770 0x16961696 0x15bc15bc 0x14e214e2
+3fc97e40: 0x14081408 0x132e132e 0x12531253 0x11791179 0x109f109f 0x0fc50fc5 0x0eeb0eeb 0x0e100e10
+3fc97e60: 0x0d360d36 0x0c5c0c5c 0x0b820b82 0x0aa80aa8 0x09ce09ce 0x08f308f3 0x08190819 0x073f073f
+3fc97e80: 0x06650665 0x058b058b 0x04b004b0 0x03d603d6 0x02fc02fc 0x02220222 0x01480148 0x006e006e
+3fc97ea0: 0xff93ff93 0xfeb9feb9 0xfddffddf 0xfd05fd05 0xfc2bfc2b 0xfb50fb50 0xfa76fa76 0xf99cf99c
+3fc97ec0: 0xf8c2f8c2 0xf7e8f7e8 0xf70ef70e 0xf633f633 0xf559f559 0xf47ff47f 0xf3a5f3a5 0xf2cbf2cb
+3fc97ee0: 0xf1f0f1f0 0xf116f116 0xf03cf03c 0xef62ef62 0xee88ee88 0xedaeedae 0xecd3ecd3 0xebf9ebf9
+3fc97f00: 0xeb1feb1f 0xea45ea45 0xe96be96b 0xe890e890 0xe96ee96e 0xea4cea4c 0xeb2aeb2a 0xec08ec08
+3fc97f20: 0xece7ece7 0xedc5edc5 0xeea3eea3 0xef81ef81 0xf060f060 0xf13ef13e 0xf21cf21c 0xf2faf2fa
+3fc97f40: 0xf3d8f3d8 0xf4b7f4b7 0xf595f595 0xf673f673 0xf751f751 0xf830f830 0xf90ef90e 0xf9ecf9ec
+
+
+
+ELF file SHA256: a4a692d44
+
+Rebooting...

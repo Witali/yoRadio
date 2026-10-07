@@ -40,3 +40,93 @@ or Wi-Fi radio. It cannot validate RF behavior, electrical pin assignments,
 speaker quality, or real-time CPU margin; those still require the physical board.
 Hardware debug and production builds do not enable
 `CONFIG_YORADIO_QEMU` and retain their normal behavior.
+
+## Flash-cache traffic experiment
+
+`CONFIG_YORADIO_QEMU_CACHE_TEST=y` selects a short AAC-LC / HE-AAC / HE-AAC v2
+workload with markers for an optional host TCG plugin. It requires
+`CONFIG_YORADIO_QEMU_AAC_TEST=y` and the instruction profile disabled.
+`run-qemu.ps1` adds `icount` and checks `QEMU_CACHE_PASS` for this configuration.
+The plugin requires a separate Linux QEMU build with plugins enabled; it compares
+continuous LRU/FIFO caches and an LRU cache emptied before each decoder call.
+These are modelled flash accesses/misses, not physical cache counters or CPU
+timings. See the [build and repeat instructions](../../tools/codec_benchmark/cache/README.md)
+and [saved results](../../docs/ESP32C3_CACHE_QEMU_20260930.md).
+
+## Actual AAC decoder regression
+
+Use a separate configuration, enable **yoRadio ESP32-C3 OLED → Run AAC
+stream-format regression fixtures in QEMU**, and build/run it:
+
+```powershell
+.\build-qemu.ps1 -BuildDirectory build-qemu-aac `
+  -Sdkconfig build-qemu-aac/sdkconfig menuconfig
+.\build-qemu.ps1 -BuildDirectory build-qemu-aac `
+  -Sdkconfig build-qemu-aac/sdkconfig
+.\run-qemu.ps1 -SkipBuild -BuildDirectory build-qemu-aac `
+  -QemuExecutable C:\path\to\qemu-system-riscv32.exe `
+  -QemuBiosDirectory C:\path\to\qemu\pc-bios
+```
+
+This requires Espressif AAC and `CONFIG_YORADIO_AAC_PLUS=y`. It embeds original
+synthetic fixtures from `tests/fixtures/aac_stream_format/` and executes the
+actual RISC-V decoder through the production ADTS adapter. Every output frame
+is checked for its rate, channel count and 16-bit sample layout, then sent to
+the emulated PCM output. The shared state formatter is presented on the OLED.
+The runner additionally requires `QEMU_AAC_FORMAT_PASS` for this configuration.
+
+Cases cover AAC-LC 44.1 kHz stereo → 22.05 kHz mono → 48 kHz stereo,
+HE-AAC 44.1/48 kHz stereo, HE-AAC v2 44.1 kHz stereo, and stream restart.
+`QEMU_AAC_LIMITATION` records the known SDK case where SBR/PS starts after LC
+with identical ADTS headers: actual core PCM is reported honestly and a restart
+restores full decoding. It is not counted as successful full-rate playback.
+Host tests separately execute the production callback, PCM packet, OLED snapshot
+and WebSocket formatter paths (`python3 tests/run-esp32c3-stream-format.py`).
+The emulator does not serve the WebUI over Wi-Fi or establish hardware CPU margin.
+
+## AAC instruction-demand profile
+
+In the same QEMU `menuconfig`, also enable **Count AAC decoder instructions in
+QEMU (requires icount)** (`CONFIG_YORADIO_QEMU_AAC_PROFILE=y`). Rebuild and run
+using the commands above. The runner detects this option in the built configuration
+and adds `-icount shift=0,align=off,sleep=off`; it requires `QEMU_AAC_WORK_PASS`.
+
+The firmware first checks `minstret` against exactly 1,024 NOPs (1,025 instructions
+including the counter read). This rejects an ordinary QEMU run where the same CSR
+would expose host ticks. It then measures three independent runs per fixture,
+each with one unmeasured warm-up and eight measured repeats. Only ADTS/AAC decode
+calls are counted; output, UI, deliberate delays and logging are outside the interval.
+
+Summarize the log from the repository root:
+
+```powershell
+python tools/codec_benchmark/summarize_qemu_aac.py `
+  idf/esp32c3-oled-native/build-qemu-aac/qemu-smoke.log `
+  --output .build/aac-instruction-demand.json
+```
+
+Results are instructions per second of decoded audio, calculated from actual PCM
+sample counts. A separately labelled hypothetical percentage assumes one cycle
+per instruction at 160 MHz. **It is not measured ESP32-C3 CPU utilization.**
+QEMU does not model instruction latency or cache/memory stalls, and this isolated
+test excludes Wi-Fi/TLS and physical output. See the
+[measured results and limits](../../docs/ESP32C3_AAC_CPU_PROFILE_20260930.md).
+
+### Physical-board calibration suite
+
+The instruction profile also embeds the original hardware AAC-LC 320 kbit/s
+fixture and requires `QEMU_AAC_CAL_PASS`. It checks two exact input/PCM/call windows
+against retained physical measurements, for both the historical SDK parser and
+current AAC adapter. A runtime decoder build ID is logged for compatibility checks.
+
+For another original fixture, pass `-CodecCalibration mp3`, `flac`, `vorbis` or
+`opus` to `run-qemu.ps1`. The runner verifies the fixture SHA-256, injects it into
+the unused app1 region of the disposable QEMU image, and requires that codec's
+pass marker too. This never accesses a physical board. The optional profile uses
+a larger test-task stack for FLAC/Opus; production stacks are unchanged.
+
+Run all saved cases from the repository root with
+`tools/codec_benchmark/run-qemu-calibration.ps1` (same QEMU/dependency arguments).
+Results go to `.build/qemu-codec-calibration/`. See the
+[calibration report](../../docs/ESP32C3_QEMU_CALIBRATION_20260930.md) for commands,
+saved JSON profiles and the limits of transferring a factor to another workload.

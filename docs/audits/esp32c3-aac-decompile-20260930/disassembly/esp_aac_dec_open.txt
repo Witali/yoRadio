@@ -1,0 +1,167 @@
+
+idf\esp32c3-oled-native\build-constants-audit\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42026bb2 <esp_aac_dec_open>:
+42026bb2:	7179                	addi	sp,sp,-48
+42026bb4:	ce4e                	sw	s3,28(sp)
+42026bb6:	d606                	sw	ra,44(sp)
+42026bb8:	d226                	sw	s1,36(sp)
+42026bba:	89b2                	mv	s3,a2
+42026bbc:	16060263          	beqz	a2,42026d20 <esp_aac_dec_open+0x16e>
+42026bc0:	ff75f793          	andi	a5,a1,-9
+42026bc4:	14079e63          	bnez	a5,42026d20 <esp_aac_dec_open+0x16e>
+42026bc8:	d04a                	sw	s2,32(sp)
+42026bca:	3c106937          	lui	s2,0x3c106
+42026bce:	84aa                	mv	s1,a0
+42026bd0:	05400613          	li	a2,84
+42026bd4:	08490513          	addi	a0,s2,132 # 3c106084 <_esp_trace_encoder_array_end+0x5f64>
+42026bd8:	4585                	li	a1,1
+42026bda:	d422                	sw	s0,40(sp)
+42026bdc:	fa6fd0ef          	jal	42024382 <media_lib_module_calloc>
+42026be0:	842a                	mv	s0,a0
+42026be2:	16050563          	beqz	a0,42026d4c <esp_aac_dec_open+0x19a>
+42026be6:	66d000ef          	jal	42027a52 <PVMP4AudioDecoderGetMemRequirements>
+42026bea:	862a                	mv	a2,a0
+42026bec:	4585                	li	a1,1
+42026bee:	08490513          	addi	a0,s2,132
+42026bf2:	f90fd0ef          	jal	42024382 <media_lib_module_calloc>
+42026bf6:	c008                	sw	a0,0(s0)
+42026bf8:	10050163          	beqz	a0,42026cfa <esp_aac_dec_open+0x148>
+42026bfc:	c8f9                	beqz	s1,42026cd2 <esp_aac_dec_open+0x120>
+42026bfe:	0064c783          	lbu	a5,6(s1)
+42026c02:	eba1                	bnez	a5,42026c52 <esp_aac_dec_open+0xa0>
+42026c04:	4701                	li	a4,0
+42026c06:	4681                	li	a3,0
+42026c08:	567d                	li	a2,-1
+42026c0a:	0074c583          	lbu	a1,7(s1)
+42026c0e:	6805                	lui	a6,0x1
+42026c10:	4785                	li	a5,1
+42026c12:	02042c23          	sw	zero,56(s0)
+42026c16:	02042e23          	sw	zero,60(s0)
+42026c1a:	04042623          	sw	zero,76(s0)
+42026c1e:	04040823          	sb	zero,80(s0)
+42026c22:	01042623          	sw	a6,12(s0)
+42026c26:	cc5c                	sw	a5,28(s0)
+42026c28:	c581                	beqz	a1,42026c30 <esp_aac_dec_open+0x7e>
+42026c2a:	d45c                	sw	a5,44(s0)
+42026c2c:	04f40823          	sb	a5,80(s0)
+42026c30:	85aa                	mv	a1,a0
+42026c32:	01040513          	addi	a0,s0,16
+42026c36:	70b000ef          	jal	42027b40 <PVMP4AudioDecoderInitLibrary>
+42026c3a:	ed31                	bnez	a0,42026c96 <esp_aac_dec_open+0xe4>
+42026c3c:	0089a023          	sw	s0,0(s3)
+42026c40:	5902                	lw	s2,32(sp)
+42026c42:	5422                	lw	s0,40(sp)
+42026c44:	4481                	li	s1,0
+42026c46:	50b2                	lw	ra,44(sp)
+42026c48:	49f2                	lw	s3,28(sp)
+42026c4a:	8526                	mv	a0,s1
+42026c4c:	5492                	lw	s1,36(sp)
+42026c4e:	6145                	addi	sp,sp,48
+42026c50:	8082                	ret
+42026c52:	4090                	lw	a2,0(s1)
+42026c54:	3c1167b7          	lui	a5,0x3c116
+42026c58:	e5478793          	addi	a5,a5,-428 # 3c115e54 <sample_rates.2>
+42026c5c:	4681                	li	a3,0
+42026c5e:	45b1                	li	a1,12
+42026c60:	4398                	lw	a4,0(a5)
+42026c62:	0791                	addi	a5,a5,4
+42026c64:	08e60763          	beq	a2,a4,42026cf2 <esp_aac_dec_open+0x140>
+42026c68:	0685                	addi	a3,a3,1
+42026c6a:	feb69be3          	bne	a3,a1,42026c60 <esp_aac_dec_open+0xae>
+42026c6e:	fe364097          	auipc	ra,0xfe364
+42026c72:	24c080e7          	jalr	588(ra) # 4038aeba <esp_log_timestamp>
+42026c76:	409c                	lw	a5,0(s1)
+42026c78:	3c106737          	lui	a4,0x3c106
+42026c7c:	25470713          	addi	a4,a4,596 # 3c106254 <_esp_trace_encoder_array_end+0x6134>
+42026c80:	3c106637          	lui	a2,0x3c106
+42026c84:	86aa                	mv	a3,a0
+42026c86:	85ba                	mv	a1,a4
+42026c88:	41460613          	addi	a2,a2,1044 # 3c106414 <_esp_trace_encoder_array_end+0x62f4>
+42026c8c:	4505                	li	a0,1
+42026c8e:	da8ff0ef          	jal	42026236 <esp_log>
+42026c92:	54ed                	li	s1,-5
+42026c94:	a025                	j	42026cbc <esp_aac_dec_open+0x10a>
+42026c96:	fe364097          	auipc	ra,0xfe364
+42026c9a:	224080e7          	jalr	548(ra) # 4038aeba <esp_log_timestamp>
+42026c9e:	3c106737          	lui	a4,0x3c106
+42026ca2:	25470713          	addi	a4,a4,596 # 3c106254 <_esp_trace_encoder_array_end+0x6134>
+42026ca6:	3c106637          	lui	a2,0x3c106
+42026caa:	86aa                	mv	a3,a0
+42026cac:	85ba                	mv	a1,a4
+42026cae:	3e860613          	addi	a2,a2,1000 # 3c1063e8 <_esp_trace_encoder_array_end+0x62c8>
+42026cb2:	57f9                	li	a5,-2
+42026cb4:	4505                	li	a0,1
+42026cb6:	d80ff0ef          	jal	42026236 <esp_log>
+42026cba:	54fd                	li	s1,-1
+42026cbc:	8522                	mv	a0,s0
+42026cbe:	eb9ff0ef          	jal	42026b76 <esp_aac_dec_close>
+42026cc2:	50b2                	lw	ra,44(sp)
+42026cc4:	5422                	lw	s0,40(sp)
+42026cc6:	5902                	lw	s2,32(sp)
+42026cc8:	49f2                	lw	s3,28(sp)
+42026cca:	8526                	mv	a0,s1
+42026ccc:	5492                	lw	s1,36(sp)
+42026cce:	6145                	addi	sp,sp,48
+42026cd0:	8082                	ret
+42026cd2:	6785                	lui	a5,0x1
+42026cd4:	c45c                	sw	a5,12(s0)
+42026cd6:	4785                	li	a5,1
+42026cd8:	cc5c                	sw	a5,28(s0)
+42026cda:	02042c23          	sw	zero,56(s0)
+42026cde:	02042e23          	sw	zero,60(s0)
+42026ce2:	04042623          	sw	zero,76(s0)
+42026ce6:	04040823          	sb	zero,80(s0)
+42026cea:	4701                	li	a4,0
+42026cec:	4681                	li	a3,0
+42026cee:	567d                	li	a2,-1
+42026cf0:	b781                	j	42026c30 <esp_aac_dec_open+0x7e>
+42026cf2:	0044c703          	lbu	a4,4(s1)
+42026cf6:	4601                	li	a2,0
+42026cf8:	bf09                	j	42026c0a <esp_aac_dec_open+0x58>
+42026cfa:	fe364097          	auipc	ra,0xfe364
+42026cfe:	1c0080e7          	jalr	448(ra) # 4038aeba <esp_log_timestamp>
+42026d02:	3c106737          	lui	a4,0x3c106
+42026d06:	25470713          	addi	a4,a4,596 # 3c106254 <_esp_trace_encoder_array_end+0x6134>
+42026d0a:	3c106637          	lui	a2,0x3c106
+42026d0e:	86aa                	mv	a3,a0
+42026d10:	85ba                	mv	a1,a4
+42026d12:	3b060613          	addi	a2,a2,944 # 3c1063b0 <_esp_trace_encoder_array_end+0x6290>
+42026d16:	4505                	li	a0,1
+42026d18:	d1eff0ef          	jal	42026236 <esp_log>
+42026d1c:	54f9                	li	s1,-2
+42026d1e:	bf79                	j	42026cbc <esp_aac_dec_open+0x10a>
+42026d20:	c62e                	sw	a1,12(sp)
+42026d22:	fe364097          	auipc	ra,0xfe364
+42026d26:	198080e7          	jalr	408(ra) # 4038aeba <esp_log_timestamp>
+42026d2a:	4832                	lw	a6,12(sp)
+42026d2c:	3c106737          	lui	a4,0x3c106
+42026d30:	25470713          	addi	a4,a4,596 # 3c106254 <_esp_trace_encoder_array_end+0x6134>
+42026d34:	3c106637          	lui	a2,0x3c106
+42026d38:	86aa                	mv	a3,a0
+42026d3a:	87ce                	mv	a5,s3
+42026d3c:	85ba                	mv	a1,a4
+42026d3e:	34460613          	addi	a2,a2,836 # 3c106344 <_esp_trace_encoder_array_end+0x6224>
+42026d42:	4505                	li	a0,1
+42026d44:	cf2ff0ef          	jal	42026236 <esp_log>
+42026d48:	54ed                	li	s1,-5
+42026d4a:	bdf5                	j	42026c46 <esp_aac_dec_open+0x94>
+42026d4c:	fe364097          	auipc	ra,0xfe364
+42026d50:	16e080e7          	jalr	366(ra) # 4038aeba <esp_log_timestamp>
+42026d54:	3c106737          	lui	a4,0x3c106
+42026d58:	25470713          	addi	a4,a4,596 # 3c106254 <_esp_trace_encoder_array_end+0x6134>
+42026d5c:	3c106637          	lui	a2,0x3c106
+42026d60:	86aa                	mv	a3,a0
+42026d62:	85ba                	mv	a1,a4
+42026d64:	37860613          	addi	a2,a2,888 # 3c106378 <_esp_trace_encoder_array_end+0x6258>
+42026d68:	4505                	li	a0,1
+42026d6a:	cccff0ef          	jal	42026236 <esp_log>
+42026d6e:	54f9                	li	s1,-2
+42026d70:	5422                	lw	s0,40(sp)
+42026d72:	5902                	lw	s2,32(sp)
+42026d74:	bdc9                	j	42026c46 <esp_aac_dec_open+0x94>

@@ -1,0 +1,122 @@
+{
+  "app_sha256": "2885457f2b86db5d18d015e5c70595f808d65dd47f1884c4456382ac908c9614",
+  "elf_sha256": "677ec2cdc084b108513c31eb098801bbc6003af0a2895ce56509ed654e698646",
+  "sdkconfig_sha256": "c9abe45e85e5f11911ac21db6da448db231a3761288eda7de6e9900ed9eb32a2",
+  "app_bytes": 1577600,
+  "types": {
+    "native_aac_decoder": 204,
+    "aac_high_owner_t": 32744,
+    "aac_high_runtime_t": 160
+  },
+  "linked_calls": {
+    "compact5_PVMP4AudioDecodeFrame": [
+      "aac_late_sbr_select",
+      "__wrap_get_sbr_bitstream",
+      "__wrap_getfill"
+    ],
+    "__wrap_get_sbr_bitstream": [
+      "aac_fill_sbr",
+      "aac_late_sbr_after_fill"
+    ],
+    "aac_late_sbr_select": [
+      "aac_late_sbr_retain"
+    ]
+  },
+  "features": [
+    "AAC_PLUS",
+    "AAC_COMPACT_SBR",
+    "AAC_HIGH_HISTORY",
+    "AAC_HIGH_HISTORY_PC19",
+    "AAC_SMOOTHING_HISTORY",
+    "AAC_LOW_WORKSPACE",
+    "AAC_ASYMMETRIC_OWNER",
+    "AAC_LATE_SBR"
+  ],
+  "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "layout_sha256": "a3cb0ea5f4b000c9b6c11c67d60255e87ca6c83db6fc95284fdc668ce8172a40",
+  "branch_patch": {
+    "experiment": "qemu_missing_sbr_retention",
+    "input_sha256": "841917bf358fded2909d7bceb65de782da32674794ce7226c2717884a563b861",
+    "bridge_source_sha256": "91b9a5cb50760b4f3ca74a217e4c1210a454f3c17a4320b90f8709c4c47de9f8",
+    "output_sha256": "dde9f78c13f8c947f9004732df6456b2ad1a618ecf21bf3d12735bae3109fb5b",
+    "section": ".text.PVMP4AudioDecodeFrame",
+    "branch_offset": 552,
+    "original": "5a071b63",
+    "replacement": "0000006f",
+    "active_label": ".L245",
+    "active_offset": 2014,
+    "disable_offset": 556,
+    "branch_target": "aac_late_sbr_select",
+    "changed_native_bytes": 4,
+    "bridge_stack_bytes": 64,
+    "structure_offsets_changed": false
+  },
+  "hardware_tested": false,
+  "production_qualified": false,
+  "vorbis_operations": {
+    "table": "operations.0",
+    "callbacks": [
+      "__wrap_esp_vorbis_dec_open",
+      "__wrap_esp_vorbis_dec_decode",
+      "esp_vorbis_dec_reset",
+      "esp_vorbis_dec_close"
+    ]
+  },
+  "sections": {
+    ".rtc.data": 2688,
+    ".iram0.text": 43354,
+    ".dram0.data": 12620,
+    ".dram0.bss": 29464,
+    ".flash.text": 1129012,
+    ".flash.rodata": 389272
+  },
+  "tls_sections": {
+    ".flash.tdata": 16,
+    ".flash.tbss": 4
+  },
+  "vorbis_linked_calls": {
+    "decoder_register_codecs": [
+      "__wrap_esp_vorbis_dec_register",
+      "esp_audio_simple_dec_register_default"
+    ],
+    "decoder_task": [
+      "__wrap_esp_audio_simple_dec_open",
+      "__wrap_esp_audio_simple_dec_process"
+    ],
+    "__wrap_esp_vorbis_dec_register": [
+      "esp_audio_dec_register"
+    ],
+    "process_checked": [
+      "esp_audio_simple_dec_process"
+    ],
+    "__wrap_esp_audio_simple_dec_process": [
+      "process_checked"
+    ],
+    "__wrap_esp_vorbis_dec_decode": [
+      "esp_vorbis_dec_decode"
+    ]
+  },
+  "source_sha256": {
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": "36a3a5c6cf93a00fa4f96bde34d6c48908ac8adfc9612049a64a04dc8a2a1568",
+    "idf/esp32c3-oled-native/main/Kconfig.projbuild": "b6a6099ee6fd3f04dbf06fef810c51405708ae4d5a7c5be40428cfb3c19a14d3",
+    "idf/esp32c3-oled-native/main/audio_service.c": "5cee4f4873e22744be9c59278db19e8d2a44d54f986d294132c2523ec2d43ff8",
+    "idf/esp32c3-oled-native/main/vorbis_repair_abi.h": "5e677d8919814971f6d7972c24974cb46197bf60821c151e69575d7978e264df",
+    "idf/esp32c3-oled-native/main/decoder_registration.c": "4860097843f40b98a30fa28ac5bc32fa4363a040806d2956d0eef99b5bfd120d",
+    "idf/esp32c3-oled-native/main/decoder_registration.h": "2dd043a5fcca2ac2695efbfe795e460e9c1eb9faa2b13da317fcf03b2a5b941b",
+    "idf/esp32c3-oled-native/main/decoder_resources.h": "82cfefacd8fbc3afdbe374258f620dd03263b757d417555192c5a6e1a7d4080d",
+    "idf/esp32c3-oled-native/main/vorbis_repair/COPYING": "d2ab5758336489da61c12cc5bb757da5339c4ae9001f9bb0562b4370249af814",
+    "idf/esp32c3-oled-native/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "idf/esp32c3-oled-native/main/vorbis_repair/README.md": "8a0f78eeb74dcd634a20952e64e0ee9d490982386b26b6ca9c65f1b6501270b9",
+    "idf/esp32c3-oled-native/main/vorbis_repair/setup.c": "4ad52ea39c4199cb0166c6a6178d1ed236166dcf3637db972b87fcd451c0f0c7",
+    "idf/esp32c3-oled-native/main/vorbis_repair/simple.c": "61516982cbb901af180579dc038a84fda59817cf37126e20e30f4f28d62eedcc",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp": "484817a367de296fa5e0856fc6cf3f13a19e034dd3222b8dd88ec6185bcd8808",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.h": "a6d5ff612842864bb23fbe176d0f935dd576eb0a856e75a92c7c6a68cadcf9f2",
+    "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3",
+    "idf/components/custom_legacy_codecs/custom_legacy_adapter.h": "d8c89e140da3173a915a7f4dbc8c3307bb881ce7e0932a4885dd6cd1f8bc0377",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "13855df4233aba79f834ae4215a5cd71c19df90ba238a858c492391499ad9ac3",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "046b1f802e27de30ff2e724f5f347222cba39d48633e6b49324de1ee5258309b",
+    "yoRadio/src/audioI2S/CodecMemoryArena.cpp": "893f3b0b21f7d40caffba119ce54ce67911434fc5d2c7352c46fc0542e1884aa"
+  },
+  "evidence": ".build/flac-unroll/verify",
+  "qualification": "Build verified; hardware not tested"
+}

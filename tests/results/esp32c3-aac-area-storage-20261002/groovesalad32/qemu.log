@@ -1,0 +1,516 @@
+ESP-ROM:esp32c3-api1-20210207
+Build:Feb  7 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fcd5830,len:0x155c
+load:0x403cbf10,len:0xce0
+load:0x403ce710,len:0x2fcc
+entry 0x403cbf1a
+I (0) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (0) boot: compile time Oct  2 2026 19:18:37
+I (0) boot: chip revision: v0.3
+I (0) boot: efuse block revision: v1.3
+I (0) boot.esp32c3: SPI Speed      : 80MHz
+I (0) boot.esp32c3: SPI Mode       : SLOW READ
+I (0) boot.esp32c3: SPI Flash Size : 4MB
+I (0) boot: Enabling RNG early entropy source...
+I (0) boot: Partition Table:
+I (0) boot: ## Label            Usage          Type ST Offset   Length
+I (0) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (0) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (0) boot:  2 app0             OTA app          00 10 00010000 001d0000
+I (0) boot:  3 app1             OTA app          00 11 001e0000 001d0000
+I (0) boot:  4 spiffs           Unknown data     01 82 003b0000 00040000
+I (0) boot:  5 coredump         Unknown data     01 03 003f0000 00010000
+I (0) boot: End of partition table
+I (0) boot: No factory image, trying OTA 0
+I (0) esp_image: segment 0: paddr=00010020 vaddr=3c050020 size=20ca8h (134312) map
+I (2) esp_image: segment 1: paddr=00030cd0 vaddr=3fc8a400 size=019d4h (  6612) load
+I (2) esp_image: segment 2: paddr=000326ac vaddr=40380000 size=0a3a0h ( 41888) load
+I (2) esp_image: segment 3: paddr=0003ca54 vaddr=50000000 size=00024h (    36) load
+I (3) esp_image: segment 4: paddr=0003ca80 vaddr=00000000 size=03598h ( 13720) 
+I (3) esp_image: segment 5: paddr=00040020 vaddr=42000020 size=42c14h (273428) map
+I (6) boot: Loaded app from partition at offset 0x10000
+I (6) boot: Set actual ota_seq=1 in otadata[0]
+I (6) boot: Disabling RNG early entropy source...
+I (6) cpu_start: Unicore app
+I (14) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
+I (14) cpu_start: Pro cpu start user code
+I (14) cpu_start: cpu freq: 160000000 Hz
+I (14) app_init: Application information:
+I (14) app_init: Project name:     yoradio_esp32c3_oled_native
+I (14) app_init: App version:      v0.9.693-1128-g878b5598-dirty
+I (14) app_init: Compile time:     Oct  2 2026 19:18:13
+I (14) app_init: ELF file SHA256:  84af45e42...
+I (14) app_init: ESP-IDF:          v6.0.2
+I (14) efuse_init: Min chip rev:     v0.3
+I (14) efuse_init: Max chip rev:     v1.99 
+I (14) efuse_init: Chip rev:         v0.3
+I (14) heap_init: Initializing. RAM available for dynamic allocation:
+I (14) heap_init: At 3FC8D2A0 len 00032D60 (203 KiB): RAM
+I (14) heap_init: At 3FCC0000 len 0001C710 (113 KiB): Retention RAM
+I (14) heap_init: At 3FCDC710 len 00002950 (10 KiB): Retention RAM
+I (14) heap_init: At 50000024 len 00001FC4 (7 KiB): RTCRAM
+I (14) spi_flash: detected chip: gd
+I (14) spi_flash: flash io: dio
+I (14) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (14) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (14) main_task: Started on CPU0
+I (14) main_task: Calling app_main()
+I (14) yoradio_c3: Starting pure ESP-IDF ESP32-C3 OLED yoRadio
+I (14) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (14) runtime_settings: Restored aif=0 softap=0 abuff=10 watchdog=1 tz=0:00 timeint=60 vols=1 enca=200
+W (14) yoradio_c3: QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO disabled
+I (14) oled: SSD1306 72x40 ready at I2C 0x3c
+I (14) audio_output: QEMU stereo PCM ready at 48000 Hz
+I (14) main_task: Returned from app_main()
+I (114) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (115) yoradio_c3: QEMU_AUDIO_PASS 24000 stereo frames
+I (117) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (476) qemu_aac: QEMU_AAC_CASE_PASS HE44 first: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186412 min 186412
+I (1036) qemu_aac: QEMU_AAC_CASE_PASS LC44 stereo: 44100 Hz 2 ch, 24 frames, 24576 samples, free 242932 min 186412
+I (1036) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (1636) qemu_aac: QEMU_AAC_CASE_PASS LC22 mono: 22050 Hz 1 ch, 13 frames, 13312 samples, free 242804 min 186412
+I (1636) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (2196) qemu_aac: QEMU_AAC_CASE_PASS LC48 stereo: 48000 Hz 2 ch, 26 frames, 26624 samples, free 242804 min 186412
+I (2197) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (2845) qemu_aac: QEMU_AAC_CASE_PASS HE44 stereo: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186284 min 186284
+I (2846) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (3485) qemu_aac: QEMU_AAC_CASE_PASS HE48 stereo: 48000 Hz 2 ch, 15 frames, 30720 samples, free 186284 min 186284
+I (3486) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (4175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 stereo: 44100 Hz 2 ch, 15 frames, 30720 samples, free 186284 min 186284
+I (4175) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (4785) qemu_aac: QEMU_AAC_CASE_PASS LC22 same header: 22050 Hz 1 ch, 13 frames, 13312 samples, free 242804 min 186284
+I (5475) qemu_aac: QEMU_AAC_CASE_PASS Implicit SBR core: 22050 Hz 1 ch, 15 frames, 15360 samples, free 242804 min 186284
+W (5475) qemu_aac: QEMU_AAC_LIMITATION implicit SBR/PS change needs stream restart
+I (5476) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (6175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 restart: 44100 Hz 2 ch, 15 frames, 30720 samples, free 186796 min 186284
+I (6175) aac_compare: AREASTORAGE_COUNTER_PASS nop1024=1025
+I (6175) aac_compare: AREASTORAGE_LIMIT development=5 production=2
+I (6293) aac_areas: AREASTORAGE_ARITHMETIC_PASS format=shared18_four probes=8 control=9
+I (6293) aac_compare: AREASTORAGE_EXTERNAL bytes=119991 rate=44100 channels=2 sbr=1 runs=3 repeats=1
+I (8466) aac_areas: AREASTORAGE_AREA case=external variant=1 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (8466) aac_areas: AREASTORAGE_AREA case=external variant=1 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (8466) aac_areas: AREASTORAGE_AREA case=external variant=1 run=1 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (8466) aac_areas: AREASTORAGE_AREA case=external variant=1 run=1 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (8466) aac_areas: AREASTORAGE_AREA case=external variant=1 run=1 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (8466) aac_areas: AREASTORAGE_AREA case=external variant=1 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (8466) aac_areas: AREASTORAGE_AREA case=external variant=1 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (8466) aac_areas: AREASTORAGE_AREA case=external variant=1 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (8466) aac_areas: AREASTORAGE_WINDOWS case=external variant=1 run=1 mask=0 transform1=0 transform2=0
+I (8466) aac_compare: AREASTORAGE_RESULT case=external variant=1 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832222485 packed_work=832229165 ref_max_call=1429726 packed_max_call=1429247 precision=PASS
+I (8466) aac_compare: AREASTORAGE_STATS case=external variant=1 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (8466) aac_compare: AREASTORAGE_HIST case=external variant=1 run=1 channel=0 bins=0:1323008,
+I (8466) aac_compare: AREASTORAGE_STATS case=external variant=1 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (8466) aac_compare: AREASTORAGE_HIST case=external variant=1 run=1 channel=1 bins=0:1323008,
+I (10638) aac_areas: AREASTORAGE_AREA case=external variant=1 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (10638) aac_areas: AREASTORAGE_AREA case=external variant=1 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (10638) aac_areas: AREASTORAGE_AREA case=external variant=1 run=2 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (10638) aac_areas: AREASTORAGE_AREA case=external variant=1 run=2 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (10638) aac_areas: AREASTORAGE_AREA case=external variant=1 run=2 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (10638) aac_areas: AREASTORAGE_AREA case=external variant=1 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (10638) aac_areas: AREASTORAGE_AREA case=external variant=1 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (10638) aac_areas: AREASTORAGE_AREA case=external variant=1 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (10638) aac_areas: AREASTORAGE_WINDOWS case=external variant=1 run=2 mask=0 transform1=0 transform2=0
+I (10638) aac_compare: AREASTORAGE_RESULT case=external variant=1 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832214951 packed_work=832236184 ref_max_call=1429225 packed_max_call=1429748 precision=PASS
+I (10638) aac_compare: AREASTORAGE_STATS case=external variant=1 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (10638) aac_compare: AREASTORAGE_HIST case=external variant=1 run=2 channel=0 bins=0:1323008,
+I (10638) aac_compare: AREASTORAGE_STATS case=external variant=1 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (10638) aac_compare: AREASTORAGE_HIST case=external variant=1 run=2 channel=1 bins=0:1323008,
+I (12810) aac_areas: AREASTORAGE_AREA case=external variant=1 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (12810) aac_areas: AREASTORAGE_AREA case=external variant=1 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (12810) aac_areas: AREASTORAGE_AREA case=external variant=1 run=3 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (12810) aac_areas: AREASTORAGE_AREA case=external variant=1 run=3 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (12810) aac_areas: AREASTORAGE_AREA case=external variant=1 run=3 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (12810) aac_areas: AREASTORAGE_AREA case=external variant=1 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (12810) aac_areas: AREASTORAGE_AREA case=external variant=1 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (12810) aac_areas: AREASTORAGE_AREA case=external variant=1 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (12810) aac_areas: AREASTORAGE_WINDOWS case=external variant=1 run=3 mask=0 transform1=0 transform2=0
+I (12810) aac_compare: AREASTORAGE_RESULT case=external variant=1 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832229163 ref_max_call=1429726 packed_max_call=1429247 precision=PASS
+I (12810) aac_compare: AREASTORAGE_STATS case=external variant=1 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (12810) aac_compare: AREASTORAGE_HIST case=external variant=1 run=3 channel=0 bins=0:1323008,
+I (12810) aac_compare: AREASTORAGE_STATS case=external variant=1 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (12810) aac_compare: AREASTORAGE_HIST case=external variant=1 run=3 channel=1 bins=0:1323008,
+I (14982) aac_areas: AREASTORAGE_AREA case=external variant=2 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (14982) aac_areas: AREASTORAGE_AREA case=external variant=2 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (14982) aac_areas: AREASTORAGE_AREA case=external variant=2 run=1 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (14982) aac_areas: AREASTORAGE_AREA case=external variant=2 run=1 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (14982) aac_areas: AREASTORAGE_AREA case=external variant=2 run=1 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (14982) aac_areas: AREASTORAGE_AREA case=external variant=2 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (14982) aac_areas: AREASTORAGE_AREA case=external variant=2 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (14982) aac_areas: AREASTORAGE_AREA case=external variant=2 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (14982) aac_areas: AREASTORAGE_WINDOWS case=external variant=2 run=1 mask=0 transform1=0 transform2=0
+I (14982) aac_compare: AREASTORAGE_RESULT case=external variant=2 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832234331 ref_max_call=1429726 packed_max_call=1429255 precision=PASS
+I (14982) aac_compare: AREASTORAGE_STATS case=external variant=2 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (14982) aac_compare: AREASTORAGE_HIST case=external variant=2 run=1 channel=0 bins=0:1323008,
+I (14982) aac_compare: AREASTORAGE_STATS case=external variant=2 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (14982) aac_compare: AREASTORAGE_HIST case=external variant=2 run=1 channel=1 bins=0:1323008,
+I (17154) aac_areas: AREASTORAGE_AREA case=external variant=2 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (17154) aac_areas: AREASTORAGE_AREA case=external variant=2 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (17154) aac_areas: AREASTORAGE_AREA case=external variant=2 run=2 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (17154) aac_areas: AREASTORAGE_AREA case=external variant=2 run=2 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (17154) aac_areas: AREASTORAGE_AREA case=external variant=2 run=2 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (17154) aac_areas: AREASTORAGE_AREA case=external variant=2 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (17154) aac_areas: AREASTORAGE_AREA case=external variant=2 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (17154) aac_areas: AREASTORAGE_AREA case=external variant=2 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (17154) aac_areas: AREASTORAGE_WINDOWS case=external variant=2 run=2 mask=0 transform1=0 transform2=0
+I (17154) aac_compare: AREASTORAGE_RESULT case=external variant=2 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832214951 packed_work=832241352 ref_max_call=1429225 packed_max_call=1429756 precision=PASS
+I (17154) aac_compare: AREASTORAGE_STATS case=external variant=2 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (17154) aac_compare: AREASTORAGE_HIST case=external variant=2 run=2 channel=0 bins=0:1323008,
+I (17154) aac_compare: AREASTORAGE_STATS case=external variant=2 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (17154) aac_compare: AREASTORAGE_HIST case=external variant=2 run=2 channel=1 bins=0:1323008,
+I (19325) aac_areas: AREASTORAGE_AREA case=external variant=2 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (19325) aac_areas: AREASTORAGE_AREA case=external variant=2 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (19325) aac_areas: AREASTORAGE_AREA case=external variant=2 run=3 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (19325) aac_areas: AREASTORAGE_AREA case=external variant=2 run=3 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (19325) aac_areas: AREASTORAGE_AREA case=external variant=2 run=3 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (19325) aac_areas: AREASTORAGE_AREA case=external variant=2 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (19325) aac_areas: AREASTORAGE_AREA case=external variant=2 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (19325) aac_areas: AREASTORAGE_AREA case=external variant=2 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (19325) aac_areas: AREASTORAGE_WINDOWS case=external variant=2 run=3 mask=0 transform1=0 transform2=0
+I (19325) aac_compare: AREASTORAGE_RESULT case=external variant=2 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221773 packed_work=832234331 ref_max_call=1429726 packed_max_call=1429255 precision=PASS
+I (19325) aac_compare: AREASTORAGE_STATS case=external variant=2 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (19325) aac_compare: AREASTORAGE_HIST case=external variant=2 run=3 channel=0 bins=0:1323008,
+I (19325) aac_compare: AREASTORAGE_STATS case=external variant=2 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (19325) aac_compare: AREASTORAGE_HIST case=external variant=2 run=3 channel=1 bins=0:1323008,
+I (21591) aac_areas: AREASTORAGE_AREA case=external variant=3 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (21591) aac_areas: AREASTORAGE_AREA case=external variant=3 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (21591) aac_areas: AREASTORAGE_AREA case=external variant=3 run=1 area=3 calls=1292 pairs=661504 changed=903676 saturated=0 nonzero=1246774 minimum=-25977149 maximum=23498719 max_shift=8 out_of_int16=0
+I (21591) aac_areas: AREASTORAGE_AREA case=external variant=3 run=1 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (21591) aac_areas: AREASTORAGE_AREA case=external variant=3 run=1 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (21591) aac_areas: AREASTORAGE_AREA case=external variant=3 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (21591) aac_areas: AREASTORAGE_AREA case=external variant=3 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (21591) aac_areas: AREASTORAGE_AREA case=external variant=3 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (21591) aac_areas: AREASTORAGE_WINDOWS case=external variant=3 run=1 mask=15 transform1=1292 transform2=0
+I (21591) aac_compare: AREASTORAGE_RESULT case=external variant=3 run=1 samples=2646016 frames=646 max_l=3 max_r=3 different=178766 over_one=29336 over_two=570 over_limit=0 complex_rows=1292 real_rows=0 changed_qmf=903676 max_shift=8 ref_work=832228986 packed_work=938400874 ref_max_call=1429225 packed_max_call=1595917 precision=PASS
+I (21591) aac_compare: AREASTORAGE_STATS case=external variant=3 run=1 channel=0 samples=1323008 abs_sum=102284 square_sum=132158 signal_square_sum=23525203188503 signed_sum=572 over_one=14389 over_two=274 over_limit=0 maximum=3 max_at=23722 max_ref=-21 max_bfp=-24 clipped_ref=10 clipped_bfp=10
+I (21591) aac_compare: AREASTORAGE_HIST case=external variant=3 run=1 channel=0 bins=0:1235387,1:73232,2:14115,3:274,
+I (21591) aac_compare: AREASTORAGE_STATS case=external variant=3 run=1 channel=1 samples=1323008 abs_sum=106388 square_sum=137466 signal_square_sum=23933230523469 signed_sum=1136 over_one=14947 over_two=296 over_limit=0 maximum=3 max_at=3623 max_ref=-5463 max_bfp=-5460 clipped_ref=10 clipped_bfp=10
+I (21591) aac_compare: AREASTORAGE_HIST case=external variant=3 run=1 channel=1 bins=0:1231863,1:76198,2:14651,3:296,
+I (23837) aac_areas: AREASTORAGE_AREA case=external variant=3 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (23837) aac_areas: AREASTORAGE_AREA case=external variant=3 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (23837) aac_areas: AREASTORAGE_AREA case=external variant=3 run=2 area=3 calls=1292 pairs=661504 changed=903676 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=8 out_of_int16=0
+I (23837) aac_areas: AREASTORAGE_AREA case=external variant=3 run=2 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (23837) aac_areas: AREASTORAGE_AREA case=external variant=3 run=2 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (23837) aac_areas: AREASTORAGE_AREA case=external variant=3 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (23837) aac_areas: AREASTORAGE_AREA case=external variant=3 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (23837) aac_areas: AREASTORAGE_AREA case=external variant=3 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (23837) aac_areas: AREASTORAGE_WINDOWS case=external variant=3 run=2 mask=15 transform1=1292 transform2=0
+I (23837) aac_compare: AREASTORAGE_RESULT case=external variant=3 run=2 samples=2646016 frames=646 max_l=3 max_r=3 different=178766 over_one=29336 over_two=570 over_limit=0 complex_rows=1292 real_rows=0 changed_qmf=903676 max_shift=8 ref_work=832210442 packed_work=925182689 ref_max_call=1429726 packed_max_call=1575938 precision=PASS
+I (23837) aac_compare: AREASTORAGE_STATS case=external variant=3 run=2 channel=0 samples=1323008 abs_sum=102284 square_sum=132158 signal_square_sum=23525203188503 signed_sum=572 over_one=14389 over_two=274 over_limit=0 maximum=3 max_at=23722 max_ref=-21 max_bfp=-24 clipped_ref=10 clipped_bfp=10
+I (23837) aac_compare: AREASTORAGE_HIST case=external variant=3 run=2 channel=0 bins=0:1235387,1:73232,2:14115,3:274,
+I (23837) aac_compare: AREASTORAGE_STATS case=external variant=3 run=2 channel=1 samples=1323008 abs_sum=106388 square_sum=137466 signal_square_sum=23933230523469 signed_sum=1136 over_one=14947 over_two=296 over_limit=0 maximum=3 max_at=3623 max_ref=-5463 max_bfp=-5460 clipped_ref=10 clipped_bfp=10
+I (23837) aac_compare: AREASTORAGE_HIST case=external variant=3 run=2 channel=1 bins=0:1231863,1:76198,2:14651,3:296,
+I (26083) aac_areas: AREASTORAGE_AREA case=external variant=3 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (26083) aac_areas: AREASTORAGE_AREA case=external variant=3 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (26083) aac_areas: AREASTORAGE_AREA case=external variant=3 run=3 area=3 calls=1292 pairs=661504 changed=903676 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=8 out_of_int16=0
+I (26083) aac_areas: AREASTORAGE_AREA case=external variant=3 run=3 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (26083) aac_areas: AREASTORAGE_AREA case=external variant=3 run=3 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (26083) aac_areas: AREASTORAGE_AREA case=external variant=3 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (26083) aac_areas: AREASTORAGE_AREA case=external variant=3 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (26083) aac_areas: AREASTORAGE_AREA case=external variant=3 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (26083) aac_areas: AREASTORAGE_WINDOWS case=external variant=3 run=3 mask=15 transform1=1292 transform2=0
+I (26083) aac_compare: AREASTORAGE_RESULT case=external variant=3 run=3 samples=2646016 frames=646 max_l=3 max_r=3 different=178766 over_one=29336 over_two=570 over_limit=0 complex_rows=1292 real_rows=0 changed_qmf=903676 max_shift=8 ref_work=832225980 packed_work=925167151 ref_max_call=1429225 packed_max_call=1575437 precision=PASS
+I (26083) aac_compare: AREASTORAGE_STATS case=external variant=3 run=3 channel=0 samples=1323008 abs_sum=102284 square_sum=132158 signal_square_sum=23525203188503 signed_sum=572 over_one=14389 over_two=274 over_limit=0 maximum=3 max_at=23722 max_ref=-21 max_bfp=-24 clipped_ref=10 clipped_bfp=10
+I (26083) aac_compare: AREASTORAGE_HIST case=external variant=3 run=3 channel=0 bins=0:1235387,1:73232,2:14115,3:274,
+I (26083) aac_compare: AREASTORAGE_STATS case=external variant=3 run=3 channel=1 samples=1323008 abs_sum=106388 square_sum=137466 signal_square_sum=23933230523469 signed_sum=1136 over_one=14947 over_two=296 over_limit=0 maximum=3 max_at=3623 max_ref=-5463 max_bfp=-5460 clipped_ref=10 clipped_bfp=10
+I (26083) aac_compare: AREASTORAGE_HIST case=external variant=3 run=3 channel=1 bins=0:1231863,1:76198,2:14651,3:296,
+I (28273) aac_areas: AREASTORAGE_AREA case=external variant=4 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (28273) aac_areas: AREASTORAGE_AREA case=external variant=4 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (28273) aac_areas: AREASTORAGE_AREA case=external variant=4 run=1 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (28273) aac_areas: AREASTORAGE_AREA case=external variant=4 run=1 area=4 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (28273) aac_areas: AREASTORAGE_AREA case=external variant=4 run=1 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (28273) aac_areas: AREASTORAGE_AREA case=external variant=4 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (28273) aac_areas: AREASTORAGE_AREA case=external variant=4 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (28273) aac_areas: AREASTORAGE_AREA case=external variant=4 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (28273) aac_areas: AREASTORAGE_WINDOWS case=external variant=4 run=1 mask=0 transform1=0 transform2=0
+I (28273) aac_compare: AREASTORAGE_RESULT case=external variant=4 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=12920 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832234998 packed_work=884526875 ref_max_call=1429726 packed_max_call=1510197 precision=PASS
+I (28273) aac_compare: AREASTORAGE_STATS case=external variant=4 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (28273) aac_compare: AREASTORAGE_HIST case=external variant=4 run=1 channel=0 bins=0:1323008,
+I (28273) aac_compare: AREASTORAGE_STATS case=external variant=4 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (28273) aac_compare: AREASTORAGE_HIST case=external variant=4 run=1 channel=1 bins=0:1323008,
+I (30456) aac_areas: AREASTORAGE_AREA case=external variant=4 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (30456) aac_areas: AREASTORAGE_AREA case=external variant=4 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (30456) aac_areas: AREASTORAGE_AREA case=external variant=4 run=2 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (30456) aac_areas: AREASTORAGE_AREA case=external variant=4 run=2 area=4 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (30456) aac_areas: AREASTORAGE_AREA case=external variant=4 run=2 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (30456) aac_areas: AREASTORAGE_AREA case=external variant=4 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (30456) aac_areas: AREASTORAGE_AREA case=external variant=4 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (30456) aac_areas: AREASTORAGE_AREA case=external variant=4 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (30456) aac_areas: AREASTORAGE_WINDOWS case=external variant=4 run=2 mask=0 transform1=0 transform2=0
+I (30456) aac_compare: AREASTORAGE_RESULT case=external variant=4 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=12920 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832204430 packed_work=876289641 ref_max_call=1429225 packed_max_call=1497898 precision=PASS
+I (30456) aac_compare: AREASTORAGE_STATS case=external variant=4 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (30456) aac_compare: AREASTORAGE_HIST case=external variant=4 run=2 channel=0 bins=0:1323008,
+I (30456) aac_compare: AREASTORAGE_STATS case=external variant=4 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (30456) aac_compare: AREASTORAGE_HIST case=external variant=4 run=2 channel=1 bins=0:1323008,
+I (32639) aac_areas: AREASTORAGE_AREA case=external variant=4 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (32639) aac_areas: AREASTORAGE_AREA case=external variant=4 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (32639) aac_areas: AREASTORAGE_AREA case=external variant=4 run=3 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (32639) aac_areas: AREASTORAGE_AREA case=external variant=4 run=3 area=4 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (32639) aac_areas: AREASTORAGE_AREA case=external variant=4 run=3 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (32639) aac_areas: AREASTORAGE_AREA case=external variant=4 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (32639) aac_areas: AREASTORAGE_AREA case=external variant=4 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (32639) aac_areas: AREASTORAGE_AREA case=external variant=4 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (32639) aac_areas: AREASTORAGE_WINDOWS case=external variant=4 run=3 mask=0 transform1=0 transform2=0
+I (32639) aac_compare: AREASTORAGE_RESULT case=external variant=4 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=12920 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832231992 packed_work=876262079 ref_max_call=1429726 packed_max_call=1497397 precision=PASS
+I (32639) aac_compare: AREASTORAGE_STATS case=external variant=4 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (32639) aac_compare: AREASTORAGE_HIST case=external variant=4 run=3 channel=0 bins=0:1323008,
+I (32639) aac_compare: AREASTORAGE_STATS case=external variant=4 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (32639) aac_compare: AREASTORAGE_HIST case=external variant=4 run=3 channel=1 bins=0:1323008,
+I (34811) aac_areas: AREASTORAGE_AREA case=external variant=5 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (34811) aac_areas: AREASTORAGE_AREA case=external variant=5 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (34811) aac_areas: AREASTORAGE_AREA case=external variant=5 run=1 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (34811) aac_areas: AREASTORAGE_AREA case=external variant=5 run=1 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (34811) aac_areas: AREASTORAGE_AREA case=external variant=5 run=1 area=5 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (34811) aac_areas: AREASTORAGE_AREA case=external variant=5 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (34811) aac_areas: AREASTORAGE_AREA case=external variant=5 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (34811) aac_areas: AREASTORAGE_AREA case=external variant=5 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (34811) aac_areas: AREASTORAGE_WINDOWS case=external variant=5 run=1 mask=0 transform1=0 transform2=0
+I (34811) aac_compare: AREASTORAGE_RESULT case=external variant=5 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=12920 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=848303306 ref_max_call=1429726 packed_max_call=1454135 precision=PASS
+I (34811) aac_compare: AREASTORAGE_STATS case=external variant=5 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (34811) aac_compare: AREASTORAGE_HIST case=external variant=5 run=1 channel=0 bins=0:1323008,
+I (34811) aac_compare: AREASTORAGE_STATS case=external variant=5 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (34811) aac_compare: AREASTORAGE_HIST case=external variant=5 run=1 channel=1 bins=0:1323008,
+I (36983) aac_areas: AREASTORAGE_AREA case=external variant=5 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (36983) aac_areas: AREASTORAGE_AREA case=external variant=5 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (36983) aac_areas: AREASTORAGE_AREA case=external variant=5 run=2 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (36983) aac_areas: AREASTORAGE_AREA case=external variant=5 run=2 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (36983) aac_areas: AREASTORAGE_AREA case=external variant=5 run=2 area=5 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (36983) aac_areas: AREASTORAGE_AREA case=external variant=5 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (36983) aac_areas: AREASTORAGE_AREA case=external variant=5 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (36983) aac_areas: AREASTORAGE_AREA case=external variant=5 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (36983) aac_areas: AREASTORAGE_WINDOWS case=external variant=5 run=2 mask=0 transform1=0 transform2=0
+I (36983) aac_compare: AREASTORAGE_RESULT case=external variant=5 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=12920 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832211945 packed_work=840857990 ref_max_call=1429225 packed_max_call=1443096 precision=PASS
+I (36983) aac_compare: AREASTORAGE_STATS case=external variant=5 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (36983) aac_compare: AREASTORAGE_HIST case=external variant=5 run=2 channel=0 bins=0:1323008,
+I (36983) aac_compare: AREASTORAGE_STATS case=external variant=5 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (36983) aac_compare: AREASTORAGE_HIST case=external variant=5 run=2 channel=1 bins=0:1323008,
+I (39155) aac_areas: AREASTORAGE_AREA case=external variant=5 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (39155) aac_areas: AREASTORAGE_AREA case=external variant=5 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (39155) aac_areas: AREASTORAGE_AREA case=external variant=5 run=3 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (39155) aac_areas: AREASTORAGE_AREA case=external variant=5 run=3 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (39155) aac_areas: AREASTORAGE_AREA case=external variant=5 run=3 area=5 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (39155) aac_areas: AREASTORAGE_AREA case=external variant=5 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (39155) aac_areas: AREASTORAGE_AREA case=external variant=5 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (39155) aac_areas: AREASTORAGE_AREA case=external variant=5 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (39155) aac_areas: AREASTORAGE_WINDOWS case=external variant=5 run=3 mask=0 transform1=0 transform2=0
+I (39155) aac_compare: AREASTORAGE_RESULT case=external variant=5 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=12920 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832220469 packed_work=840849466 ref_max_call=1429726 packed_max_call=1442595 precision=PASS
+I (39155) aac_compare: AREASTORAGE_STATS case=external variant=5 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (39155) aac_compare: AREASTORAGE_HIST case=external variant=5 run=3 channel=0 bins=0:1323008,
+I (39155) aac_compare: AREASTORAGE_STATS case=external variant=5 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (39155) aac_compare: AREASTORAGE_HIST case=external variant=5 run=3 channel=1 bins=0:1323008,
+I (41327) aac_areas: AREASTORAGE_AREA case=external variant=6 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (41327) aac_areas: AREASTORAGE_AREA case=external variant=6 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (41327) aac_areas: AREASTORAGE_AREA case=external variant=6 run=1 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (41327) aac_areas: AREASTORAGE_AREA case=external variant=6 run=1 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (41327) aac_areas: AREASTORAGE_AREA case=external variant=6 run=1 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (41327) aac_areas: AREASTORAGE_AREA case=external variant=6 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (41327) aac_areas: AREASTORAGE_AREA case=external variant=6 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (41327) aac_areas: AREASTORAGE_AREA case=external variant=6 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (41327) aac_areas: AREASTORAGE_WINDOWS case=external variant=6 run=1 mask=0 transform1=0 transform2=0
+I (41327) aac_compare: AREASTORAGE_RESULT case=external variant=6 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832231747 ref_max_call=1429726 packed_max_call=1429251 precision=PASS
+I (41327) aac_compare: AREASTORAGE_STATS case=external variant=6 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (41327) aac_compare: AREASTORAGE_HIST case=external variant=6 run=1 channel=0 bins=0:1323008,
+I (41327) aac_compare: AREASTORAGE_STATS case=external variant=6 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (41327) aac_compare: AREASTORAGE_HIST case=external variant=6 run=1 channel=1 bins=0:1323008,
+I (43499) aac_areas: AREASTORAGE_AREA case=external variant=6 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (43499) aac_areas: AREASTORAGE_AREA case=external variant=6 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (43499) aac_areas: AREASTORAGE_AREA case=external variant=6 run=2 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (43499) aac_areas: AREASTORAGE_AREA case=external variant=6 run=2 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (43499) aac_areas: AREASTORAGE_AREA case=external variant=6 run=2 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (43499) aac_areas: AREASTORAGE_AREA case=external variant=6 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (43499) aac_areas: AREASTORAGE_AREA case=external variant=6 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (43499) aac_areas: AREASTORAGE_AREA case=external variant=6 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (43499) aac_areas: AREASTORAGE_WINDOWS case=external variant=6 run=2 mask=0 transform1=0 transform2=0
+I (43499) aac_compare: AREASTORAGE_RESULT case=external variant=6 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832214951 packed_work=832238768 ref_max_call=1429225 packed_max_call=1429752 precision=PASS
+I (43499) aac_compare: AREASTORAGE_STATS case=external variant=6 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (43499) aac_compare: AREASTORAGE_HIST case=external variant=6 run=2 channel=0 bins=0:1323008,
+I (43499) aac_compare: AREASTORAGE_STATS case=external variant=6 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (43499) aac_compare: AREASTORAGE_HIST case=external variant=6 run=2 channel=1 bins=0:1323008,
+I (45671) aac_areas: AREASTORAGE_AREA case=external variant=6 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (45671) aac_areas: AREASTORAGE_AREA case=external variant=6 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (45671) aac_areas: AREASTORAGE_AREA case=external variant=6 run=3 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (45671) aac_areas: AREASTORAGE_AREA case=external variant=6 run=3 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (45671) aac_areas: AREASTORAGE_AREA case=external variant=6 run=3 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (45671) aac_areas: AREASTORAGE_AREA case=external variant=6 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (45671) aac_areas: AREASTORAGE_AREA case=external variant=6 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (45671) aac_areas: AREASTORAGE_AREA case=external variant=6 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (45671) aac_areas: AREASTORAGE_WINDOWS case=external variant=6 run=3 mask=0 transform1=0 transform2=0
+I (45671) aac_compare: AREASTORAGE_RESULT case=external variant=6 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832231747 ref_max_call=1429726 packed_max_call=1429251 precision=PASS
+I (45671) aac_compare: AREASTORAGE_STATS case=external variant=6 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (45671) aac_compare: AREASTORAGE_HIST case=external variant=6 run=3 channel=0 bins=0:1323008,
+I (45671) aac_compare: AREASTORAGE_STATS case=external variant=6 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (45671) aac_compare: AREASTORAGE_HIST case=external variant=6 run=3 channel=1 bins=0:1323008,
+I (47843) aac_areas: AREASTORAGE_AREA case=external variant=7 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (47843) aac_areas: AREASTORAGE_AREA case=external variant=7 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (47843) aac_areas: AREASTORAGE_AREA case=external variant=7 run=1 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (47843) aac_areas: AREASTORAGE_AREA case=external variant=7 run=1 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (47843) aac_areas: AREASTORAGE_AREA case=external variant=7 run=1 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (47843) aac_areas: AREASTORAGE_AREA case=external variant=7 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (47843) aac_areas: AREASTORAGE_AREA case=external variant=7 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (47843) aac_areas: AREASTORAGE_AREA case=external variant=7 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (47843) aac_areas: AREASTORAGE_WINDOWS case=external variant=7 run=1 mask=0 transform1=0 transform2=0
+I (47843) aac_compare: AREASTORAGE_RESULT case=external variant=7 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832231747 ref_max_call=1429726 packed_max_call=1429251 precision=PASS
+I (47843) aac_compare: AREASTORAGE_STATS case=external variant=7 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (47843) aac_compare: AREASTORAGE_HIST case=external variant=7 run=1 channel=0 bins=0:1323008,
+I (47843) aac_compare: AREASTORAGE_STATS case=external variant=7 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (47843) aac_compare: AREASTORAGE_HIST case=external variant=7 run=1 channel=1 bins=0:1323008,
+I (50015) aac_areas: AREASTORAGE_AREA case=external variant=7 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (50015) aac_areas: AREASTORAGE_AREA case=external variant=7 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (50015) aac_areas: AREASTORAGE_AREA case=external variant=7 run=2 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (50015) aac_areas: AREASTORAGE_AREA case=external variant=7 run=2 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (50015) aac_areas: AREASTORAGE_AREA case=external variant=7 run=2 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (50015) aac_areas: AREASTORAGE_AREA case=external variant=7 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (50015) aac_areas: AREASTORAGE_AREA case=external variant=7 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (50015) aac_areas: AREASTORAGE_AREA case=external variant=7 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (50015) aac_areas: AREASTORAGE_WINDOWS case=external variant=7 run=2 mask=0 transform1=0 transform2=0
+I (50015) aac_compare: AREASTORAGE_RESULT case=external variant=7 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832214951 packed_work=832238768 ref_max_call=1429225 packed_max_call=1429752 precision=PASS
+I (50015) aac_compare: AREASTORAGE_STATS case=external variant=7 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (50015) aac_compare: AREASTORAGE_HIST case=external variant=7 run=2 channel=0 bins=0:1323008,
+I (50015) aac_compare: AREASTORAGE_STATS case=external variant=7 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (50015) aac_compare: AREASTORAGE_HIST case=external variant=7 run=2 channel=1 bins=0:1323008,
+I (52186) aac_areas: AREASTORAGE_AREA case=external variant=7 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (52186) aac_areas: AREASTORAGE_AREA case=external variant=7 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (52186) aac_areas: AREASTORAGE_AREA case=external variant=7 run=3 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (52186) aac_areas: AREASTORAGE_AREA case=external variant=7 run=3 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (52186) aac_areas: AREASTORAGE_AREA case=external variant=7 run=3 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (52186) aac_areas: AREASTORAGE_AREA case=external variant=7 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (52186) aac_areas: AREASTORAGE_AREA case=external variant=7 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (52186) aac_areas: AREASTORAGE_AREA case=external variant=7 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (52186) aac_areas: AREASTORAGE_WINDOWS case=external variant=7 run=3 mask=0 transform1=0 transform2=0
+I (52186) aac_compare: AREASTORAGE_RESULT case=external variant=7 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832231747 ref_max_call=1429726 packed_max_call=1429251 precision=PASS
+I (52186) aac_compare: AREASTORAGE_STATS case=external variant=7 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (52186) aac_compare: AREASTORAGE_HIST case=external variant=7 run=3 channel=0 bins=0:1323008,
+I (52186) aac_compare: AREASTORAGE_STATS case=external variant=7 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (52186) aac_compare: AREASTORAGE_HIST case=external variant=7 run=3 channel=1 bins=0:1323008,
+I (54358) aac_areas: AREASTORAGE_AREA case=external variant=8 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (54358) aac_areas: AREASTORAGE_AREA case=external variant=8 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (54358) aac_areas: AREASTORAGE_AREA case=external variant=8 run=1 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (54358) aac_areas: AREASTORAGE_AREA case=external variant=8 run=1 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (54358) aac_areas: AREASTORAGE_AREA case=external variant=8 run=1 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (54358) aac_areas: AREASTORAGE_AREA case=external variant=8 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (54358) aac_areas: AREASTORAGE_AREA case=external variant=8 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (54358) aac_areas: AREASTORAGE_AREA case=external variant=8 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (54358) aac_areas: AREASTORAGE_WINDOWS case=external variant=8 run=1 mask=0 transform1=0 transform2=0
+I (54358) aac_compare: AREASTORAGE_RESULT case=external variant=8 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832231747 ref_max_call=1429726 packed_max_call=1429251 precision=PASS
+I (54358) aac_compare: AREASTORAGE_STATS case=external variant=8 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (54358) aac_compare: AREASTORAGE_HIST case=external variant=8 run=1 channel=0 bins=0:1323008,
+I (54358) aac_compare: AREASTORAGE_STATS case=external variant=8 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (54358) aac_compare: AREASTORAGE_HIST case=external variant=8 run=1 channel=1 bins=0:1323008,
+I (56530) aac_areas: AREASTORAGE_AREA case=external variant=8 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (56530) aac_areas: AREASTORAGE_AREA case=external variant=8 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (56530) aac_areas: AREASTORAGE_AREA case=external variant=8 run=2 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (56530) aac_areas: AREASTORAGE_AREA case=external variant=8 run=2 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (56530) aac_areas: AREASTORAGE_AREA case=external variant=8 run=2 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (56530) aac_areas: AREASTORAGE_AREA case=external variant=8 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (56530) aac_areas: AREASTORAGE_AREA case=external variant=8 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (56530) aac_areas: AREASTORAGE_AREA case=external variant=8 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (56530) aac_areas: AREASTORAGE_WINDOWS case=external variant=8 run=2 mask=0 transform1=0 transform2=0
+I (56530) aac_compare: AREASTORAGE_RESULT case=external variant=8 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832214951 packed_work=832238768 ref_max_call=1429225 packed_max_call=1429752 precision=PASS
+I (56530) aac_compare: AREASTORAGE_STATS case=external variant=8 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (56530) aac_compare: AREASTORAGE_HIST case=external variant=8 run=2 channel=0 bins=0:1323008,
+I (56530) aac_compare: AREASTORAGE_STATS case=external variant=8 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (56530) aac_compare: AREASTORAGE_HIST case=external variant=8 run=2 channel=1 bins=0:1323008,
+I (58702) aac_areas: AREASTORAGE_AREA case=external variant=8 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (58702) aac_areas: AREASTORAGE_AREA case=external variant=8 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (58702) aac_areas: AREASTORAGE_AREA case=external variant=8 run=3 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (58702) aac_areas: AREASTORAGE_AREA case=external variant=8 run=3 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (58702) aac_areas: AREASTORAGE_AREA case=external variant=8 run=3 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (58702) aac_areas: AREASTORAGE_AREA case=external variant=8 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (58702) aac_areas: AREASTORAGE_AREA case=external variant=8 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (58702) aac_areas: AREASTORAGE_AREA case=external variant=8 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (58702) aac_areas: AREASTORAGE_WINDOWS case=external variant=8 run=3 mask=0 transform1=0 transform2=0
+I (58702) aac_compare: AREASTORAGE_RESULT case=external variant=8 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832231747 ref_max_call=1429726 packed_max_call=1429251 precision=PASS
+I (58702) aac_compare: AREASTORAGE_STATS case=external variant=8 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (58702) aac_compare: AREASTORAGE_HIST case=external variant=8 run=3 channel=0 bins=0:1323008,
+I (58702) aac_compare: AREASTORAGE_STATS case=external variant=8 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (58702) aac_compare: AREASTORAGE_HIST case=external variant=8 run=3 channel=1 bins=0:1323008,
+I (60894) aac_areas: AREASTORAGE_AREA case=external variant=9 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (60894) aac_areas: AREASTORAGE_AREA case=external variant=9 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (60894) aac_areas: AREASTORAGE_AREA case=external variant=9 run=1 area=3 calls=1292 pairs=661504 changed=0 saturated=0 nonzero=1246774 minimum=-25977149 maximum=23498719 max_shift=0 out_of_int16=0
+I (60894) aac_areas: AREASTORAGE_AREA case=external variant=9 run=1 area=4 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (60894) aac_areas: AREASTORAGE_AREA case=external variant=9 run=1 area=5 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (60894) aac_areas: AREASTORAGE_AREA case=external variant=9 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (60894) aac_areas: AREASTORAGE_AREA case=external variant=9 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (60894) aac_areas: AREASTORAGE_AREA case=external variant=9 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (60894) aac_areas: AREASTORAGE_WINDOWS case=external variant=9 run=1 mask=15 transform1=1292 transform2=0
+I (60894) aac_compare: AREASTORAGE_RESULT case=external variant=9 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=27132 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832236501 packed_work=886747961 ref_max_call=1429726 packed_max_call=1513635 precision=PASS
+I (60894) aac_compare: AREASTORAGE_STATS case=external variant=9 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (60894) aac_compare: AREASTORAGE_HIST case=external variant=9 run=1 channel=0 bins=0:1323008,
+I (60894) aac_compare: AREASTORAGE_STATS case=external variant=9 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (60894) aac_compare: AREASTORAGE_HIST case=external variant=9 run=1 channel=1 bins=0:1323008,
+I (63074) aac_areas: AREASTORAGE_AREA case=external variant=9 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (63074) aac_areas: AREASTORAGE_AREA case=external variant=9 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (63074) aac_areas: AREASTORAGE_AREA case=external variant=9 run=2 area=3 calls=1292 pairs=661504 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (63074) aac_areas: AREASTORAGE_AREA case=external variant=9 run=2 area=4 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (63074) aac_areas: AREASTORAGE_AREA case=external variant=9 run=2 area=5 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (63074) aac_areas: AREASTORAGE_AREA case=external variant=9 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (63074) aac_areas: AREASTORAGE_AREA case=external variant=9 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (63074) aac_areas: AREASTORAGE_AREA case=external variant=9 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (63074) aac_areas: AREASTORAGE_WINDOWS case=external variant=9 run=2 mask=15 transform1=1292 transform2=0
+I (63074) aac_compare: AREASTORAGE_RESULT case=external variant=9 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=27132 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832202426 packed_work=868096805 ref_max_call=1429225 packed_max_call=1485228 precision=PASS
+I (63074) aac_compare: AREASTORAGE_STATS case=external variant=9 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (63074) aac_compare: AREASTORAGE_HIST case=external variant=9 run=2 channel=0 bins=0:1323008,
+I (63074) aac_compare: AREASTORAGE_STATS case=external variant=9 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (63074) aac_compare: AREASTORAGE_HIST case=external variant=9 run=2 channel=1 bins=0:1323008,
+I (65254) aac_areas: AREASTORAGE_AREA case=external variant=9 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (65254) aac_areas: AREASTORAGE_AREA case=external variant=9 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (65254) aac_areas: AREASTORAGE_AREA case=external variant=9 run=3 area=3 calls=1292 pairs=661504 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (65254) aac_areas: AREASTORAGE_AREA case=external variant=9 run=3 area=4 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (65254) aac_areas: AREASTORAGE_AREA case=external variant=9 run=3 area=5 calls=12920 pairs=413440 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (65254) aac_areas: AREASTORAGE_AREA case=external variant=9 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (65254) aac_areas: AREASTORAGE_AREA case=external variant=9 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (65254) aac_areas: AREASTORAGE_AREA case=external variant=9 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (65254) aac_areas: AREASTORAGE_WINDOWS case=external variant=9 run=3 mask=15 transform1=1292 transform2=0
+I (65254) aac_compare: AREASTORAGE_RESULT case=external variant=9 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=27132 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832227984 packed_work=868071247 ref_max_call=1429726 packed_max_call=1484727 precision=PASS
+I (65254) aac_compare: AREASTORAGE_STATS case=external variant=9 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (65254) aac_compare: AREASTORAGE_HIST case=external variant=9 run=3 channel=0 bins=0:1323008,
+I (65254) aac_compare: AREASTORAGE_STATS case=external variant=9 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (65254) aac_compare: AREASTORAGE_HIST case=external variant=9 run=3 channel=1 bins=0:1323008,
+I (67425) aac_areas: AREASTORAGE_AREA case=external variant=0 run=1 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (67425) aac_areas: AREASTORAGE_AREA case=external variant=0 run=1 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (67425) aac_areas: AREASTORAGE_AREA case=external variant=0 run=1 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (67425) aac_areas: AREASTORAGE_AREA case=external variant=0 run=1 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (67425) aac_areas: AREASTORAGE_AREA case=external variant=0 run=1 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (67425) aac_areas: AREASTORAGE_AREA case=external variant=0 run=1 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (67425) aac_areas: AREASTORAGE_AREA case=external variant=0 run=1 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (67425) aac_areas: AREASTORAGE_AREA case=external variant=0 run=1 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (67425) aac_areas: AREASTORAGE_WINDOWS case=external variant=0 run=1 mask=0 transform1=0 transform2=0
+I (67425) aac_compare: AREASTORAGE_RESULT case=external variant=0 run=1 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832214752 ref_max_call=1429726 packed_max_call=1429225 precision=PASS
+I (67425) aac_compare: AREASTORAGE_STATS case=external variant=0 run=1 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (67425) aac_compare: AREASTORAGE_HIST case=external variant=0 run=1 channel=0 bins=0:1323008,
+I (67425) aac_compare: AREASTORAGE_STATS case=external variant=0 run=1 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (67425) aac_compare: AREASTORAGE_HIST case=external variant=0 run=1 channel=1 bins=0:1323008,
+I (69597) aac_areas: AREASTORAGE_AREA case=external variant=0 run=2 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (69597) aac_areas: AREASTORAGE_AREA case=external variant=0 run=2 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (69597) aac_areas: AREASTORAGE_AREA case=external variant=0 run=2 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (69597) aac_areas: AREASTORAGE_AREA case=external variant=0 run=2 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (69597) aac_areas: AREASTORAGE_AREA case=external variant=0 run=2 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (69597) aac_areas: AREASTORAGE_AREA case=external variant=0 run=2 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (69597) aac_areas: AREASTORAGE_AREA case=external variant=0 run=2 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (69597) aac_areas: AREASTORAGE_AREA case=external variant=0 run=2 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (69597) aac_areas: AREASTORAGE_WINDOWS case=external variant=0 run=2 mask=0 transform1=0 transform2=0
+I (69597) aac_compare: AREASTORAGE_RESULT case=external variant=0 run=2 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832214951 packed_work=832221972 ref_max_call=1429225 packed_max_call=1429726 precision=PASS
+I (69597) aac_compare: AREASTORAGE_STATS case=external variant=0 run=2 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (69597) aac_compare: AREASTORAGE_HIST case=external variant=0 run=2 channel=0 bins=0:1323008,
+I (69597) aac_compare: AREASTORAGE_STATS case=external variant=0 run=2 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (69597) aac_compare: AREASTORAGE_HIST case=external variant=0 run=2 channel=1 bins=0:1323008,
+I (71769) aac_areas: AREASTORAGE_AREA case=external variant=0 run=3 area=1 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (71769) aac_areas: AREASTORAGE_AREA case=external variant=0 run=3 area=2 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (71769) aac_areas: AREASTORAGE_AREA case=external variant=0 run=3 area=3 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (71769) aac_areas: AREASTORAGE_AREA case=external variant=0 run=3 area=4 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (71769) aac_areas: AREASTORAGE_AREA case=external variant=0 run=3 area=5 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (71769) aac_areas: AREASTORAGE_AREA case=external variant=0 run=3 area=6 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (71769) aac_areas: AREASTORAGE_AREA case=external variant=0 run=3 area=7 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (71769) aac_areas: AREASTORAGE_AREA case=external variant=0 run=3 area=8 calls=0 pairs=0 changed=0 saturated=0 nonzero=0 minimum=0 maximum=0 max_shift=0 out_of_int16=0
+I (71769) aac_areas: AREASTORAGE_WINDOWS case=external variant=0 run=3 mask=0 transform1=0 transform2=0
+I (71769) aac_compare: AREASTORAGE_RESULT case=external variant=0 run=3 samples=2646016 frames=646 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=832221972 packed_work=832214951 ref_max_call=1429726 packed_max_call=1429225 precision=PASS
+I (71769) aac_compare: AREASTORAGE_STATS case=external variant=0 run=3 channel=0 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23525203188503 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (71769) aac_compare: AREASTORAGE_HIST case=external variant=0 run=3 channel=0 bins=0:1323008,
+I (71769) aac_compare: AREASTORAGE_STATS case=external variant=0 run=3 channel=1 samples=1323008 abs_sum=0 square_sum=0 signal_square_sum=23933230523469 signed_sum=0 over_one=0 over_two=0 over_limit=0 maximum=0 max_at=0 max_ref=0 max_bfp=0 clipped_ref=10 clipped_bfp=10
+I (71769) aac_compare: AREASTORAGE_HIST case=external variant=0 run=3 channel=1 bins=0:1323008,
+I (71769) aac_compare: AREASTORAGE_EXPERIMENT_COMPLETE external recording; inspect precision per case
+I (71769) qemu_aac: QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes
+I (71769) yoradio_c3: QEMU_OLED_PASS 72x40 framebuffer presented
+I (71769) yoradio_c3: QEMU_SMOKE_PASS OLED, audio, NVS, SPIFFS and FreeRTOS; free heap: 305020 bytes

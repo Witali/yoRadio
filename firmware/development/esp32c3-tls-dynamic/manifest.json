@@ -1,0 +1,40 @@
+{
+  "source_commit": "eb3bac6e4b38ce63b36ce3fc2d4769a02208d8cf",
+  "status": "EXPERIMENTAL: public HTTPS LC/MP3 PASS; three public HE/v2 SBR allocations still FAIL. Measured LC/MP3 free RAM improves by about 18-21 KiB. 21 local mixed-codec switches, WebSocket reconnects, corrected untrusted-certificate rejection and 15 OTA checks PASS with clean serial health. Production defaults unchanged. Soak, trusted large-record fixtures, full public HE and remaining codec gates are not qualified. See docs/ESP32C3_TLS_DYNAMIC_20261001.md.",
+  "source_note": "Built with the added TLS dynamic defaults before its commit; source hashes below identify the candidate.",
+  "source_sha256": {
+    "idf/esp32c3-oled-native/sdkconfig.tls-dynamic.defaults": "daa6917b3957be959f693e9a2d498eda95d4573d42bea609b09c82becb1e4111",
+    "idf/esp32c3-oled-native/main/audio_service.c": "e4414786155f68db3080be172172fc6a71aabeca1e4c8e84adfbfaeff094801f",
+    "idf/esp32c3-oled-native/CMakeLists.txt": "db39c7ebafe556ee71f7bb822155de5b6ea9c05763d511f8802184428c059861",
+    "idf/esp32c3-oled-native/main/tcp_pcb_pool.c": "971e826b6753db9ee21e8031f6550c0eaf3ed8f0992621b3e048440550a72e87",
+    "tools/patch_lwip_timewait.py": "2b91a5774f9f72159d0b6b90398ad6dc3830c284014d09550c719740c0e85581"
+  },
+  "files": {
+    "app.bin": {
+      "bytes": 1545184,
+      "sha256": "e432be0f6a03215fd3078d765020dc4ca6ae4b3fab2f1ba18b8b60d10acded79"
+    },
+    "sdkconfig": {
+      "bytes": 82382,
+      "sha256": "2f3421fb8742c26e981dccc7d34cabbd2053349114ae8c3aa1378275765e09d4"
+    }
+  },
+  "image": {
+    "app_elf_sha256": "c597f9baff8001690a90198d7fea90f7968f28811d0ab25bb712d23244f40947",
+    "sha256": "e432be0f6a03215fd3078d765020dc4ca6ae4b3fab2f1ba18b8b60d10acded79",
+    "bytes": 1545184
+  },
+  "baseline_firmware": "firmware/development/esp32c3-tcp-pcb-pool-fixed/app.bin",
+  "config_change": {
+    "CONFIG_MBEDTLS_DYNAMIC_BUFFER": [
+      "n",
+      "y"
+    ]
+  },
+  "generated_source_sha256": {
+    "tcp.c": "50fa634030634fb4e8c048f4c0d65e7505bd4bdf0782eb06522224a5efc3a127",
+    "api_msg.c": "1ae7b19d71e81ed4aecd79bee972009f5b7ac415cb3e1bd257ac9300f443a9a3"
+  },
+  "evidence": "tests/results/esp32c3-tls-dynamic-20261001",
+  "aac_archive_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909"
+}

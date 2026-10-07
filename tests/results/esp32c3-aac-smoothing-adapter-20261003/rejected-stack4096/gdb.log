@@ -1,0 +1,42 @@
+0x40000000 in ?? ()
+Breakpoint 1 at 0x4200acf6: file C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/app_main.c, line 111.
+
+Breakpoint 1, qemu_smoke_task (argument=0x0) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/app_main.c:111
+111	    vTaskDelay(pdMS_TO_TICKS(100));
+$1 = (void *) 0x3fc92c80
+$2 = (StackType_t *) 0x3fc92cc8 '¥' <repeats 200 times>...
+$3 = (volatile StackType_t *) 0x3fc93c10 "ö¬"
+Hardware watchpoint 2: *$dev
+
+Hardware watchpoint 2: *$dev
+
+Old value = 1070147384
+New value = 0
+0x42021006 in calc_sbr_envelope ()
+#0  0x42021006 in calc_sbr_envelope ()
+#1  0x4200f5d8 in complex_envelope (frame=0x3fca2258, real=0x3fc9aaa0, imag=0x3fc9caa0, frequency=0x3fcada88, frequency_count=0x3fcadd64, noise_frequency=0x3fcadc60, noise_bands=3, reset=1, alias=0x0, harmonic_index=0x3fca295c, noise_index=0x3fca2960, previous_harmonics=0x3fca285c, startup=0x3fca2964, limiter_bands=0x3fcadda0, gate_mode=0x3fcadd90, gain=0x3fca7bb0, gain_exp=0x3fca7bc4, noise=0x3fca7bd8, noise_exp=0x3fca7bec, workspace=0x3fc9f04c, patch=0x3fc93300, sqrt_cache=0x3fcade70, real_only=0) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_smoothing_history.c:57
+#2  0x4201002e in compact5_sbr_dec ()
+#3  0x4200eeb2 in __wrap_compact5_sbr_dec (input=0x3fc96138, output=0x3fc933b0, frame=<optimized out>, apply=1, control=<optimized out>, right_output=0x0, ps=0x0, core=0x3fc96048) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_high_history.c:115
+#4  0x42011ef6 in compact5_sbr_applied ()
+#5  0x42011280 in __wrap_compact5_sbr_applied (owner=0x3fca2250, stream=0x3fc9025c, left=0x3fc96138, right=0x3fc985ec, out_l=0x3fc93e44, out_r=0x3fc94e44, channels=0, control=<optimized out>, core=0x3fc96048, out_channels=2) at C:/Work/yoRadio/.worktree/aac-storage18/idf/esp32c3-oled-native/main/aac_compact_owner.c:102
+#6  0x42012ba4 in compact5_PVMP4AudioDecodeFrame ()
+Backtrace stopped: frame did not save the PC
+sp             0x3fc92b40	0x3fc92b40
+$4 = (StackType_t *) 0x3fc92cc8 '¥' <repeats 200 times>...
+0x3fc92c80:	0x00000000	0x0000003c	0x00061a80	0x000007d0
+0x3fc92c90:	0x00000000	0x00000000	0x00000000	0x00000000
+Dump of assembler code from 0x42020ff6 to 0x42021016:
+   0x42020ff6 <calc_sbr_envelope+3520>:	lw	a1,12(a5)
+   0x42020ff8 <calc_sbr_envelope+3522>:	lw	a2,16(a5)
+   0x42020ffa <calc_sbr_envelope+3524>:	lw	a3,20(a5)
+   0x42020ffc <calc_sbr_envelope+3526>:	lw	a5,24(a5)
+   0x42020ffe <calc_sbr_envelope+3528>:	sw	a1,316(sp)
+   0x42021002 <calc_sbr_envelope+3532>:	sw	a2,320(sp)
+=> 0x42021006 <calc_sbr_envelope+3536>:	sw	a3,324(sp)
+   0x4202100a <calc_sbr_envelope+3540>:	mv	a2,t1
+   0x4202100c <calc_sbr_envelope+3542>:	addi	a3,sp,304
+   0x4202100e <calc_sbr_envelope+3544>:	mv	a1,s4
+   0x42021010 <calc_sbr_envelope+3546>:	sw	a5,328(sp)
+   0x42021014 <calc_sbr_envelope+3550>:	jal	0x420265e8 <sbr_create_limiter_bands>
+End of assembler dump.
+[Inferior 1 (process 1) killed]

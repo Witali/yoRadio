@@ -33,7 +33,9 @@ SampleBuffer samplesBuffer[MAX_CHANNELS] = {};
 int32_t* samplesStorage = nullptr;
 int32_t* samplesBuffer[MAX_CHANNELS] = {};
 #endif
-int32_t coefs[32] = {};
+constexpr size_t kMaximumLpcOrder = 32;
+constexpr uint8_t kMaximumLpcPredictionShift = 15;
+int32_t coefs[kMaximumLpcOrder] = {};
 uint8_t coefficientCount = 0;
 uint16_t allocatedBlockSize = 0;
 uint8_t allocatedChannels = 0;
@@ -57,7 +59,8 @@ uint8_t  m_status = 0;
 uint8_t* m_inptr;
 int32_t  m_bytesAvail;
 int32_t  m_bytesDecoded = 0;
-uint16_t m_rIndex=0;
+uint32_t m_rIndex=0;
+int8_t   m_readError = ERR_FLAC_NONE;
 uint64_t m_bitBuffer = 0;
 uint8_t  m_bitBufferLen = 0;
 bool     m_f_OggS_found = false;
@@ -121,6 +124,7 @@ void FLACDecoder_ClearBuffer(){
     coefficientCount = 0;
     outputOffset = 0;
     m_status = DECODE_FRAME;
+    m_readError = ERR_FLAC_NONE;
     return;
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,33 +158,43 @@ size_t FLACDecoder_GetAllocatedBytes(){
 //            B I T R E A D E R
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t readUint(uint8_t nBits){
+    if(m_readError) return 0;
+    if(nBits > 32) { m_readError = ERR_FLAC_INVALID_DATA; return 0; }
     while (m_bitBufferLen < nBits){
+        if(m_bytesAvail <= 0) { m_readError = ERR_FLAC_TRUNCATED_INPUT; return 0; }
         uint8_t temp = *(m_inptr + m_rIndex);
         m_rIndex++;
         m_bytesAvail--;
-        if(m_bytesAvail < 0) { log_i("error in bitreader"); }
         m_bitBuffer = (m_bitBuffer << 8) | temp;
         m_bitBufferLen += 8;
     }
     m_bitBufferLen -= nBits;
     uint32_t result = m_bitBuffer >> m_bitBufferLen;
     if (nBits < 32)
-        result &= (1 << nBits) - 1;
+        result &= (UINT32_C(1) << nBits) - 1;
     return result;
 }
 
 int32_t readSignedInt(int nBits){
+    // A residual escape width of zero encodes zero without consuming bits.
+    if(nBits == 0) return 0;
+    if(nBits < 0 || nBits > 32) { m_readError = ERR_FLAC_INVALID_DATA; return 0; }
     int32_t temp = readUint(nBits) << (32 - nBits);
     temp = temp >> (32 - nBits); // The C++ compiler uses the sign bit to fill vacated bit positions
     return temp;
 }
 
 int64_t readRiceSignedInt(uint8_t param){
-    long val = 0;
-    while (readUint(1) == 0)
-        val++;
+    if(param > 30) { m_readError = ERR_FLAC_INVALID_DATA; return 0; }
+    uint32_t val = 0;
+    while (readUint(1) == 0) {
+        if(m_readError) return 0;
+        if(val == (UINT32_MAX >> param)) { m_readError = ERR_FLAC_INVALID_DATA; return 0; }
+        ++val;
+    }
     val = (val << param) | readUint(param);
-    return (val >> 1) ^ -(val & 1);
+    if(val == UINT32_MAX) { m_readError = ERR_FLAC_INVALID_DATA; return 0; }
+    return static_cast<int64_t>(val >> 1) ^ -static_cast<int64_t>(val & 1);
 }
 
 void alignToByte() {
@@ -202,6 +216,8 @@ void FLACDecoderReset(){ // set var to default
     m_bitBuffer = 0;
     m_bitBufferLen = 0;
     outputOffset = 0;
+    m_readError = ERR_FLAC_NONE;
+    m_f_OggS_found = false;
 }
 //----------------------------------------------------------------------------------------------------------------------
 int FLACFindSyncWord(unsigned char *buf, int nBytes) {
@@ -229,7 +245,8 @@ int FLACFindOggSyncWord(unsigned char *buf, int nBytes){
         }
     }
     /* find byte-aligned OGG Magic - OggS */
-    for (i = 0; i < nBytes - 1; i++) {
+    constexpr int kOggCaptureBytes = 4;
+    for (i = 0; i <= nBytes - kOggCaptureBytes; i++) {
         if ((buf[i + 0] == 'O') && (buf[i + 1] == 'g') && (buf[i + 2] == 'g') && (buf[i + 3] == 'S')) {
             FLACDecoderReset();
             log_i("OggS found");
@@ -240,55 +257,27 @@ int FLACFindOggSyncWord(unsigned char *buf, int nBytes){
     return -1;
 }
 //----------------------------------------------------------------------------------------------------------------------
-int FLACparseOggHeader(unsigned char *buf){
-    uint16_t i = 0;
-    uint8_t ssv = *(buf + i);                  // stream_structure_version
-    (void)ssv;
-    i++;
-    uint8_t htf = *(buf + i);                  // header_type_flag
-    (void)htf;
-    i++;
-    uint32_t tmp = 0;                         // absolute granule position
-    for (int j = 0; j < 4; j++) {
-        tmp += *(buf + j + i) << (4 -j - 1) * 8;
-    }
-    i += 4;
-    uint64_t agp = (uint64_t) tmp << 32;
-    for (int j = 0; j < 4; j++) {
-        agp += *(buf + j + i) << (4 -j - 1) * 8;
-    }
-    i += 4;
-    uint32_t ssnr = 0;                        // stream serial number
-    for (int j = 0; j < 4; j++) {
-        ssnr += *(buf + j + i) << (4 -j - 1) * 8;
-    }
-    i += 4;
-    uint32_t psnr = 0;                        // page sequence no
-    for (int j = 0; j < 4; j++) {
-        psnr += *(buf + j + i) << (4 -j - 1) * 8;
-    }
-    i += 4;
-    uint32_t pchk = 0;                        // page checksum
-    for (int j = 0; j < 4; j++) {
-        pchk += *(buf + j + i) << (4 -j - 1) * 8;
-    }
-    i += 4;
-    uint8_t psegm = *(buf + i);
-    i++;
-    uint32_t pageLen = 0;
-    for(uint8_t j = 0; j < psegm; j++){
-        pageLen += *(buf + i);
-        i++;
-    }
-    (void)pageLen;
-    return i;
+int FLACparseOggHeader(unsigned char *buf, int nBytes){
+    // The capture pattern has already been consumed. Only the header length
+    // is used by this legacy path; do not read discarded fields or lacing
+    // bytes until the entire header is available.
+    constexpr int kHeaderAfterCaptureBytes = 23;
+    constexpr int kPageSegmentsOffset = kHeaderAfterCaptureBytes - 1;
+    if(nBytes < kHeaderAfterCaptureBytes) return ERR_FLAC_TRUNCATED_INPUT;
+    const int headerBytes = kHeaderAfterCaptureBytes + buf[kPageSegmentsOffset];
+    return nBytes < headerBytes ? ERR_FLAC_TRUNCATED_INPUT : headerBytes;
 }
 //----------------------------------------------------------------------------------------------------------------------
 int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
+    m_validSamples = 0;
+    if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+    if(m_readError) return m_readError;
 
     if(m_f_OggS_found == true){
         m_f_OggS_found = false;
-        *bytesLeft -= FLACparseOggHeader(inbuf);
+        const int headerBytes = FLACparseOggHeader(inbuf, *bytesLeft);
+        if(headerBytes < 0) return static_cast<int8_t>(headerBytes);
+        *bytesLeft -= headerBytes;
         return ERR_FLAC_NONE;
     }
 
@@ -300,7 +289,7 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
 
     if(m_status == DECODE_FRAME){  // Read a ton of header fields, and ignore most of them
 
-        if ((inbuf[0] == 'O') && (inbuf[1] == 'g') && (inbuf[2] == 'g') && (inbuf[3] == 'S')){
+        if (*bytesLeft >= 4 && (inbuf[0] == 'O') && (inbuf[1] == 'g') && (inbuf[2] == 'g') && (inbuf[3] == 'S')){
             *bytesLeft -= 4;
             m_f_OggS_found = true;
             return ERR_FLAC_NONE;
@@ -308,6 +297,7 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
 
         uint32_t temp = readUint(8);
         uint16_t sync = temp << 6 |readUint(6);
+        if(m_readError) return m_readError;
         if (sync != 0x3FFE){
             log_i("Sync code expected 0x3FFE but received %X", sync);
             return ERR_FLAC_SYNC_CODE_NOT_FOUND;
@@ -319,6 +309,13 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
         FLACFrameHeader->sampleRateCode = readUint(4);
         FLACFrameHeader->chanAsgn = readUint(4);
         FLACFrameHeader->sampleSizeCode = readUint(3);
+        if(m_readError) return m_readError;
+        if(FLACFrameHeader->chanAsgn > 10) return ERR_FLAC_RESERVED_CHANNEL_ASSIGNMENT;
+        const uint8_t frameChannels = FLACFrameHeader->chanAsgn <= 7 ?
+                                       FLACFrameHeader->chanAsgn + 1 : 2;
+        if(frameChannels > allocatedChannels ||
+           (FLACMetadataBlock->numChannels && frameChannels != FLACMetadataBlock->numChannels))
+            return ERR_FLAC_UNKNOWN_CHANNEL_ASSIGNMENT;
 
         if(!FLACMetadataBlock->numChannels){
             if(FLACFrameHeader->chanAsgn == 0) FLACMetadataBlock->numChannels = 1;
@@ -327,15 +324,15 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
         }
         if(FLACMetadataBlock->numChannels < 1) return ERR_FLAC_UNKNOWN_CHANNEL_ASSIGNMENT;
 
-        if(!FLACMetadataBlock->bitsPerSample){
-            if(FLACFrameHeader->sampleSizeCode == 1) FLACMetadataBlock->bitsPerSample =  8;
-            if(FLACFrameHeader->sampleSizeCode == 2) FLACMetadataBlock->bitsPerSample = 12;
-            if(FLACFrameHeader->sampleSizeCode == 4) FLACMetadataBlock->bitsPerSample = 16;
-            if(FLACFrameHeader->sampleSizeCode == 5) FLACMetadataBlock->bitsPerSample = 20;
-            if(FLACFrameHeader->sampleSizeCode == 6) FLACMetadataBlock->bitsPerSample = 24;
-        }
-        if(FLACMetadataBlock->bitsPerSample > 16) return ERR_FLAC_BITS_PER_SAMPLE_TOO_BIG;
-        if(FLACMetadataBlock->bitsPerSample < 8 ) return ERR_FLAG_BITS_PER_SAMPLE_UNKNOWN;
+        // RFC 9639 section 9.1.4: zero inherits STREAMINFO; three is reserved.
+        static const uint8_t frameDepths[] = {0, 8, 12, 0, 16, 20, 24, 32};
+        const uint8_t frameDepth = frameDepths[FLACFrameHeader->sampleSizeCode];
+        if(FLACFrameHeader->sampleSizeCode == 3) return ERR_FLAC_INVALID_DATA;
+        if(frameDepth) FLACMetadataBlock->bitsPerSample = frameDepth;
+        if(FLACMetadataBlock->bitsPerSample > FLAC_MAX_BITS_PER_SAMPLE)
+            return ERR_FLAC_BITS_PER_SAMPLE_TOO_BIG;
+        if(FLACMetadataBlock->bitsPerSample < FLAC_MIN_BITS_PER_SAMPLE)
+            return ERR_FLAG_BITS_PER_SAMPLE_UNKNOWN;
 
         if(!FLACMetadataBlock->sampleRate){
             if(FLACFrameHeader->sampleRateCode == 1)  FLACMetadataBlock->sampleRate =  88200;
@@ -378,8 +375,10 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
         else{
             return ERR_FLAC_RESERVED_BLOCKSIZE_UNSUPPORTED;
         }
+        if(m_readError) return m_readError;
+        if(!m_blockSize) return ERR_FLAC_INVALID_DATA;
 
-        if(m_blockSize > 8192){
+        if(m_blockSize > MAX_BLOCKSIZE){
             log_e("Error: blockSize too big");
             return ERR_FLAC_BLOCKSIZE_TOO_BIG;
         }
@@ -397,6 +396,7 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
             readUint(16);
         }
         readUint(8);
+        if(m_readError) return m_readError;
         m_status = DECODE_SUBFRAMES;
         *bytesLeft = m_bytesAvail;
         m_blockSizeLeft = m_blockSize;
@@ -409,6 +409,17 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
         // Decode each channel's subframe, then skip footer
         int ret = decodeSubframes();
         if(ret != 0) return ret;
+        if(m_readError) return m_readError;
+        // Invalid decorrelated channels must not wrap during s16 conversion.
+        const int32_t sourceLimit = INT32_C(1) << (FLACMetadataBlock->bitsPerSample - 1);
+        for(uint8_t ch = 0; ch < FLACMetadataBlock->numChannels; ++ch)
+            for(uint16_t i = 0; i < m_blockSize; ++i)
+                if(samplesBuffer[ch][i] < -sourceLimit || samplesBuffer[ch][i] >= sourceLimit)
+                    return ERR_FLAC_INVALID_DATA;
+        // Do not expose PCM from a frame whose two-byte footer is missing.
+        constexpr int kFrameFooterBytes = 2;
+        if(m_bytesAvail + m_bitBufferLen / 8 < kFrameFooterBytes)
+            return ERR_FLAC_TRUNCATED_INPUT;
         m_status = OUT_SAMPLES;
     }
 
@@ -422,9 +433,16 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
 
         for (int i = 0; i < blockSize; i++) {
             for (int j = 0; j < FLACMetadataBlock->numChannels; j++) {
-                int val = samplesBuffer[j][i + outputOffset];
-                if (FLACMetadataBlock->bitsPerSample == 8) val += 128;
-                outbuf[2*i+j] = val;
+                int32_t val = samplesBuffer[j][i + outputOffset];
+                const int sourceBits = FLACMetadataBlock->bitsPerSample;
+                // Align full-scale signed PCM to the 16-bit output. Arithmetic
+                // right shift matches FFmpeg's s16 conversion without dither;
+                // multiplication avoids undefined left shift of negative PCM.
+                if(sourceBits > FLAC_PCM_BITS_PER_SAMPLE)
+                    val >>= sourceBits - FLAC_PCM_BITS_PER_SAMPLE;
+                else
+                    val *= INT32_C(1) << (FLAC_PCM_BITS_PER_SAMPLE - sourceBits);
+                outbuf[2*i+j] = static_cast<int16_t>(val);
             }
         }
 
@@ -437,6 +455,7 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
 
     alignToByte();
     readUint(16);
+    if(m_readError) { m_validSamples = 0; return m_readError; }
     m_bytesDecoded = *bytesLeft - m_bytesAvail;
 //    log_i("m_bytesDecoded %i", m_bytesDecoded);
 //    m_compressionRatio = (float)m_bytesDecoded / (float)m_blockSize * FLACMetadataBlock->numChannels * (16/8);
@@ -458,6 +477,9 @@ uint64_t FLACGetTotoalSamplesInStream(){
 //----------------------------------------------------------------------------------------------------------------------
 uint8_t FLACGetBitsPerSample(){
     return FLACMetadataBlock->bitsPerSample;
+}
+uint8_t FLACGetOutputBitsPerSample(){
+    return FLAC_PCM_BITS_PER_SAMPLE;
 }
 //----------------------------------------------------------------------------------------------------------------------
 uint8_t FLACGetChannels(){
@@ -530,18 +552,24 @@ int8_t decodeSubframes(){
 }
 //----------------------------------------------------------------------------------------------------------------------
 int8_t decodeSubframe(uint8_t sampleDepth, uint8_t ch) {
+    if(sampleDepth < 1 || sampleDepth > FLAC_MAX_BITS_PER_SAMPLE + 1)
+        return ERR_FLAC_INVALID_DATA;
     int8_t ret = 0;
     readUint(1);
     uint8_t type = readUint(6);
     int shift = readUint(1);
     if (shift == 1) {
-        while (readUint(1) == 0)
-            shift++;
+        while (readUint(1) == 0) {
+            if(m_readError) return m_readError;
+            if(++shift >= sampleDepth) return ERR_FLAC_INVALID_DATA;
+        }
     }
+    if(m_readError) return m_readError;
+    if(shift >= sampleDepth) return ERR_FLAC_INVALID_DATA;
     sampleDepth -= shift;
 
     if(type == 0){  // Constant coding
-        int16_t s= readSignedInt(sampleDepth);
+        int32_t s= readSignedInt(sampleDepth);
         for(int i=0; i < m_blockSize; i++){
             samplesBuffer[ch][i] = s;
         }
@@ -561,15 +589,20 @@ int8_t decodeSubframe(uint8_t sampleDepth, uint8_t ch) {
     else{
         return ERR_FLAC_RESERVED_SUB_TYPE;
     }
-    if(shift>0){
-        for (int i = 0; i < m_blockSize; i++){
-            samplesBuffer[ch][i] <<= shift;
-        }
+    if(m_readError) return m_readError;
+    // Check the reduced-depth samples before restoring wasted bits. A valid
+    // 24-bit stereo side sample can require 25 bits.
+    const int32_t sampleLimit = INT32_C(1) << (sampleDepth - 1);
+    for (int i = 0; i < m_blockSize; i++){
+        const int32_t value = samplesBuffer[ch][i];
+        if(value < -sampleLimit || value >= sampleLimit) return ERR_FLAC_INVALID_DATA;
+        samplesBuffer[ch][i] = static_cast<int32_t>(static_cast<uint32_t>(value) << shift);
     }
     return ERR_FLAC_NONE;
 }
 //----------------------------------------------------------------------------------------------------------------------
 int8_t decodeFixedPredictionSubframe(uint8_t predOrder, uint8_t sampleDepth, uint8_t ch) {
+    if(predOrder > 4 || predOrder >= m_blockSize) return ERR_FLAC_PREORDER_TOO_BIG;
     uint8_t ret = 0;
     for(uint8_t i = 0; i < predOrder; i++)
         samplesBuffer[ch][i] = readSignedInt(sampleDepth);
@@ -587,13 +620,14 @@ int8_t decodeFixedPredictionSubframe(uint8_t predOrder, uint8_t sampleDepth, uin
 //----------------------------------------------------------------------------------------------------------------------
 int8_t decodeLinearPredictiveCodingSubframe(int lpcOrder, int sampleDepth, uint8_t ch){
     int8_t ret = 0;
+    if(lpcOrder < 1 || lpcOrder > static_cast<int>(sizeof(coefs) / sizeof(coefs[0])) ||
+       lpcOrder >= m_blockSize) return ERR_FLAC_PREORDER_TOO_BIG;
     for (int i = 0; i < lpcOrder; i++)
         samplesBuffer[ch][i] = readSignedInt(sampleDepth);
     int precision = readUint(4) + 1;
     int shift = readSignedInt(5);
-    if(lpcOrder < 1 || lpcOrder > static_cast<int>(sizeof(coefs) / sizeof(coefs[0]))) {
-        return ERR_FLAC_PREORDER_TOO_BIG;
-    }
+    if(m_readError) return m_readError;
+    if(precision == 16 || shift < 0) return ERR_FLAC_INVALID_DATA;
     coefficientCount = static_cast<uint8_t>(lpcOrder);
     for (uint8_t i = 0; i < coefficientCount; i++)
         coefs[i] = readSignedInt(precision);
@@ -616,6 +650,7 @@ int8_t decodeResiduals(uint8_t warmup, uint8_t ch) {
     if (m_blockSize % numPartitions != 0)
         return ERR_FLAC_WRONG_RICE_PARTITION_NR; //Error: Block size not divisible by number of Rice partitions
     int partitionSize = m_blockSize/ numPartitions;
+    if(partitionSize <= warmup) return ERR_FLAC_WRONG_RICE_PARTITION_NR;
 
     for (int i = 0; i < numPartitions; i++) {
         int start = i * partitionSize + (i == 0 ? warmup : 0);
@@ -625,25 +660,161 @@ int8_t decodeResiduals(uint8_t warmup, uint8_t ch) {
         if (param < escapeParam) {
             for (int j = start; j < end; j++){
                 samplesBuffer[ch][j] = readRiceSignedInt(param);
+                if(m_readError) return m_readError;
             }
         } else {
             int numBits = readUint(5);
             for (int j = start; j < end; j++){
                 samplesBuffer[ch][j] = readSignedInt(numBits);
+                if(m_readError) return m_readError;
             }
         }
     }
     return ERR_FLAC_NONE;
 }
 //----------------------------------------------------------------------------------------------------------------------
-void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
+namespace {
 
-    for (int i = coefficientCount; i < m_blockSize; i++) {
-        int64_t sum = 0;
-        for (int j = 0; j < coefficientCount; j++){
-            sum += static_cast<int64_t>(samplesBuffer[ch][i - 1 - j]) * coefs[j];
+// A repeated/alternating coefficient run has only a few nonzero differences.
+// Updating the unshifted prediction then costs fewer products than a new dot
+// product. Keep a small fixed stack limit and fall back for arbitrary LPC.
+constexpr size_t kMaximumSparseLpcDeltas = 4;
+constexpr size_t kMinimumRollingLpcOrder = 8;
+
+// Keep this optional recurrence out of the ordinary dot-product loop: inlining
+// it increases that loop's stack frame and instruction-cache footprint on RV32.
+__attribute__((noinline))
+bool restoreSparseDeltaPrediction(uint8_t ch, uint8_t shift, size_t order) {
+    if(order < kMinimumRollingLpcOrder) return false;
+    constexpr size_t kEndpointProducts = 2;
+    constexpr size_t kMinimumProductReduction = 2;
+    const size_t allowedDeltas = std::min(kMaximumSparseLpcDeltas,
+        order / kMinimumProductReduction - kEndpointProducts);
+    size_t positiveDeltas = 0, negativeDeltas = 0;
+    for(size_t j = 1; j < order; ++j) {
+        positiveDeltas += coefs[j] != coefs[j - 1];
+        negativeDeltas += coefs[j] != -coefs[j - 1];
+        // Counts only increase. Once both signs exceed the budget, the rest
+        // of the coefficients cannot make this recurrence worthwhile.
+        if(positiveDeltas > allowedDeltas && negativeDeltas > allowedDeltas)
+            return false;
+    }
+    const bool alternating = negativeDeltas < positiveDeltas;
+    const size_t deltaCount = std::min(positiveDeltas, negativeDeltas);
+    // The two endpoint products count too. Demand at least a halving of
+    // multiply count to pay for the sparse indices and mode checks.
+    if(coefficientCount >= m_blockSize) return true;
+
+    int32_t deltaCoefficients[kMaximumSparseLpcDeltas];
+    uint8_t deltaOffsets[kMaximumSparseLpcDeltas];
+    size_t nextDelta = 0;
+    for(size_t j = 1; j < order; ++j) {
+        const int32_t delta = alternating ? coefs[j] + coefs[j - 1]
+                                          : coefs[j] - coefs[j - 1];
+        if(delta) {
+            deltaCoefficients[nextDelta] = delta;
+            deltaOffsets[nextDelta++] = static_cast<uint8_t>(j);
         }
-        samplesBuffer[ch][i] += static_cast<int32_t>(sum >> shift);
+    }
+    const int32_t firstCoefficient = coefs[0];
+    const int32_t outgoingCoefficient = alternating ? -coefs[order - 1] : coefs[order - 1];
+    const bool subtractEndpoints = outgoingCoefficient == firstCoefficient;
+    const bool addEndpoints = outgoingCoefficient == -firstCoefficient;
+    int64_t prediction = 0;
+    for(size_t j = 0; j < order; ++j)
+        prediction += static_cast<int64_t>(samplesBuffer[ch][coefficientCount - 1 - j]) * coefs[j];
+
+    for(size_t i = coefficientCount; i < m_blockSize; ++i) {
+        const int64_t value = samplesBuffer[ch][i] + (prediction >> shift);
+        if(value < INT32_MIN || value > INT32_MAX) {
+            m_readError = ERR_FLAC_INVALID_DATA;
+            return true;
+        }
+        samplesBuffer[ch][i] = static_cast<int32_t>(value);
+        if(i + 1 == m_blockSize) break;
+        const int32_t outgoing = samplesBuffer[ch][i - order];
+        // P(next) = s*P + c0*x(new) + sum((cj-s*c(j-1))*x(i-j))
+        //           - s*c(last)*x(outgoing), with s = +1 or -1.
+        // Shift only when reconstructing PCM; never round the carried sum.
+        if(alternating) prediction = -prediction;
+        if(subtractEndpoints)
+            prediction += (value - outgoing) * firstCoefficient;
+        else if(addEndpoints)
+            prediction += (value + outgoing) * firstCoefficient;
+        else
+            prediction += value * firstCoefficient - static_cast<int64_t>(outgoing) * outgoingCoefficient;
+        for(size_t j = 0; j < deltaCount; ++j)
+            prediction += static_cast<int64_t>(samplesBuffer[ch][i - deltaOffsets[j]]) * deltaCoefficients[j];
+    }
+    return true;
+}
+
+} // namespace
+
+void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
+    if(shift > kMaximumLpcPredictionShift) {
+        m_readError = ERR_FLAC_INVALID_DATA;
+        return;
+    }
+    // Keep the encoded order for warm-up/residual positions. Trailing zero
+    // coefficients do not contribute, even when the encoded order is 32.
+    size_t activeCoefficients = coefficientCount;
+    while(activeCoefficients && coefs[activeCoefficients - 1] == 0)
+        --activeCoefficients;
+    if(!activeCoefficients) return;
+    if(restoreSparseDeltaPrediction(ch, shift, activeCoefficients)) return;
+    const auto restoreSample = [shift](int32_t* sample, int64_t sum) {
+        const int64_t value = *sample + (sum >> shift);
+        if(value < INT32_MIN || value > INT32_MAX) {
+            m_readError = ERR_FLAC_INVALID_DATA;
+            return false;
+        }
+        *sample = static_cast<int32_t>(value);
+        return true;
+    };
+    size_t sampleIndex = coefficientCount;
+    while(sampleIndex < m_blockSize) {
+        int32_t* output = &samplesBuffer[ch][sampleIndex];
+        size_t spanEnd = m_blockSize;
+#ifdef FLAC_SEGMENTED_WORKSPACE
+        const size_t segmentOffset = sampleIndex % kWorkspaceSegmentSamples;
+        spanEnd = std::min(spanEnd,
+            sampleIndex + kWorkspaceSegmentSamples - segmentOffset);
+        // Only the prefix of an allocation can read history from its
+        // neighbour. Never walk a pointer across separate allocations.
+        if(segmentOffset < activeCoefficients) {
+            const size_t prefixEnd = std::min(spanEnd,
+                sampleIndex + activeCoefficients - segmentOffset);
+            for(; sampleIndex < prefixEnd; ++sampleIndex, ++output) {
+                int64_t sum = 0;
+                for(size_t j = 0; j < activeCoefficients; ++j)
+                    sum += static_cast<int64_t>(samplesBuffer[ch][sampleIndex - 1 - j]) * coefs[j];
+                if(!restoreSample(output, sum)) return;
+            }
+        }
+#endif
+        // Resolve segment geometry and the output pointer once per span,
+        // rather than repeating divisions/lookups for every output sample.
+        int32_t* const end = output + (spanEnd - sampleIndex);
+        for(; output != end; ++output) {
+            int64_t sum = 0;
+            const int32_t* history = output - 1;
+            // Four taps share one loop branch and pointer update on RV32.
+            // Keep every product and addition wide; high-depth FLAC can
+            // overflow a 32-bit accumulator even when the final PCM fits.
+            constexpr size_t kTapsPerGroup = 4;
+            size_t j = 0;
+            for(; j + kTapsPerGroup <= activeCoefficients; j += kTapsPerGroup) {
+                sum += static_cast<int64_t>(history[-static_cast<int>(j)]) * coefs[j];
+                sum += static_cast<int64_t>(history[-static_cast<int>(j + 1)]) * coefs[j + 1];
+                sum += static_cast<int64_t>(history[-static_cast<int>(j + 2)]) * coefs[j + 2];
+                sum += static_cast<int64_t>(history[-static_cast<int>(j + 3)]) * coefs[j + 3];
+            }
+            for(; j < activeCoefficients; ++j)
+                sum += static_cast<int64_t>(history[-static_cast<int>(j)]) * coefs[j];
+            if(!restoreSample(output, sum)) return;
+        }
+        sampleIndex = spanEnd;
     }
 }
 //----------------------------------------------------------------------------------------------------------------------

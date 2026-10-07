@@ -1,0 +1,18 @@
+PASS: callbacks/PCM, format changes, WebUI keys/reconnect, OLED snapshots, AAC rates, stop/restart
+PASS: AAC/other-codec PCM transitions, retained capacity, shrink, grow and OOM preservation
+PASS: real Helix AAC adapter stereo/mono/rate transitions and SBR source/PCM separation
+PASS: AAC framing, 1..53-byte chunks, CRC, resync, buffer retry, configuration changes
+PASS: adaptive ADTS 7..8191 bytes, CRC, fragmented input, no-growth reuse, pending frame retry, create/grow/open OOM and truncated cleanup
+PASS: delayed HE-AAC PCM, ordered EOF, errors, empty stream, stale completion and cancellation
+PERF ALLOC: phase=closed live=0 peak=320 lost=0 storage=4608
+PERF ALLOC: phase=closed op=+ id=1 module=aac size=32 live=32 pointer=0x5e57721e82a0
+PERF ALLOC: phase=closed op=! id=1 module=aac size=128 live=32 pointer=(nil)
+PERF ALLOC: phase=closed op=- id=1 module=aac size=32 live=0 pointer=0x5e57721e82a0
+PERF ALLOC: phase=closed op=+ id=2 module=aac size=64 live=64 pointer=0x5e57721e82a0
+PERF ALLOC: phase=closed op=+ id=3 module=ps size=256 live=320 pointer=0x5e57721e82f0
+PERF ALLOC: phase=closed op=- id=2 module=aac size=64 live=256 pointer=0x5e57721e82a0
+PERF ALLOC: phase=closed op=- id=3 module=ps size=256 live=0 pointer=0x5e57721e82f0
+PASS: live/peak accounting, zeroing, realloc failure, cleanup and bounded overflow
+PASS: trace analyzer rejects overflow and missing lifetime events
+C3 OTA streaming, partition selection and failure cleanup tests passed
+C3 OTA HTTP deadlines, failure cleanup, deep-sleep lease and reboot ordering passed

@@ -1,0 +1,174 @@
+{
+  "board": {
+    "version": "v0.9.693-1049-g3903c058-dirty",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "b0f5c3a1e55bc3b309f6f56f197b7d40bf0d3b4c1c1196de9b2c8288b72832f3"
+  },
+  "cases": [
+    {
+      "name": "ota:wrong-chip",
+      "result": "FAIL",
+      "reason": "ConnectionAbortedError",
+      "seconds": 0.391
+    },
+    {
+      "name": "ota:wrong-project",
+      "result": "FAIL",
+      "reason": "ConnectionAbortedError",
+      "seconds": 0.39
+    },
+    {
+      "name": "ota:corrupt-image",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 14.422
+    },
+    {
+      "name": "ota:truncated-image",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 13.5
+    },
+    {
+      "name": "ota:extra-byte",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 13.5
+    },
+    {
+      "name": "ota:missing-boundary",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 13.688
+    },
+    {
+      "name": "ota:spiffs-target",
+      "result": "FAIL",
+      "reason": "ConnectionAbortedError",
+      "seconds": 0.609
+    },
+    {
+      "name": "ota:oversized-request",
+      "result": "FAIL",
+      "reason": "Expected HTTP 400, received 408",
+      "seconds": 5.078
+    },
+    {
+      "name": "ota:disconnect",
+      "result": "PASS",
+      "evidence": {
+        "http": null,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 2.89
+    },
+    {
+      "name": "ota:stall",
+      "result": "PASS",
+      "evidence": {
+        "http": 400,
+        "active_image_unchanged": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 15.172
+    },
+    {
+      "name": "ota:roundtrip:1",
+      "result": "PASS",
+      "evidence": {
+        "partition": "app1",
+        "elapsed_seconds": 18.81299999996554,
+        "hash_verified": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 19.578
+    },
+    {
+      "name": "ota:roundtrip:2",
+      "result": "PASS",
+      "evidence": {
+        "partition": "app0",
+        "elapsed_seconds": 19.360000000044238,
+        "hash_verified": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 19.891
+    },
+    {
+      "name": "ota:while-playing",
+      "result": "PASS",
+      "evidence": {
+        "partition": "app1",
+        "elapsed_seconds": 21.40600000001723,
+        "hash_verified": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 22.703
+    },
+    {
+      "name": "ota:slow",
+      "result": "PASS",
+      "evidence": {
+        "partition": "app0",
+        "elapsed_seconds": 34.40599999995902,
+        "hash_verified": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 35.297
+    },
+    {
+      "name": "restore-saved-station",
+      "result": "PASS",
+      "evidence": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 7.156
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "image": {
+    "app_elf_sha256": "b0f5c3a1e55bc3b309f6f56f197b7d40bf0d3b4c1c1196de9b2c8288b72832f3",
+    "sha256": "4374ece3e0613d96003a9635c28be21964994d81a11857e785e016403e704c6c",
+    "bytes": 1392688
+  }
+}

@@ -1,0 +1,66 @@
+
+idf\esp32c3-oled-native\build-constants-audit\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4204588a <init_sbr_dec>:
+4204588a:	0ec6a883          	lw	a7,236(a3)
+4204588e:	0506                	slli	a0,a0,0x1
+42045890:	c208                	sw	a0,0(a2)
+42045892:	6715                	lui	a4,0x5
+42045894:	00559513          	slli	a0,a1,0x5
+42045898:	6799                	lui	a5,0x6
+4204589a:	6e19                	lui	t3,0x6
+4204589c:	d208                	sw	a0,32(a2)
+4204589e:	d608                	sw	a0,40(a2)
+420458a0:	587d                	li	a6,-1
+420458a2:	cb870713          	addi	a4,a4,-840 # 4cb8 <CSR_UINTSTATUS+0x4007>
+420458a6:	0b878793          	addi	a5,a5,184 # 60b8 <CSR_UINTSTATUS+0x5407>
+420458aa:	0cce0e13          	addi	t3,t3,204 # 60cc <CSR_UINTSTATUS+0x541b>
+420458ae:	0b16a223          	sw	a7,164(a3)
+420458b2:	00a59513          	slli	a0,a1,0xa
+420458b6:	0806ae23          	sw	zero,156(a3)
+420458ba:	0a06a023          	sw	zero,160(a3)
+420458be:	0a06a423          	sw	zero,168(a3)
+420458c2:	0b06ac23          	sw	a6,184(a3)
+420458c6:	9736                	add	a4,a4,a3
+420458c8:	97b6                	add	a5,a5,a3
+420458ca:	9e36                	add	t3,t3,a3
+420458cc:	7ff70893          	addi	a7,a4,2047
+420458d0:	7ff70813          	addi	a6,a4,2047
+420458d4:	50070313          	addi	t1,a4,1280
+420458d8:	20188893          	addi	a7,a7,513
+420458dc:	70180813          	addi	a6,a6,1793
+420458e0:	c398                	sw	a4,0(a5)
+420458e2:	1117a023          	sw	a7,256(a5)
+420458e6:	3107a023          	sw	a6,768(a5)
+420458ea:	2067a023          	sw	t1,512(a5)
+420458ee:	0791                	addi	a5,a5,4
+420458f0:	10070713          	addi	a4,a4,256
+420458f4:	fdc79ce3          	bne	a5,t3,420458cc <init_sbr_dec+0x42>
+420458f8:	1406a823          	sw	zero,336(a3)
+420458fc:	1406aa23          	sw	zero,340(a3)
+42045900:	1406ac23          	sw	zero,344(a3)
+42045904:	1406ae23          	sw	zero,348(a3)
+42045908:	1606a023          	sw	zero,352(a3)
+4204590c:	1606a223          	sw	zero,356(a3)
+42045910:	1606a423          	sw	zero,360(a3)
+42045914:	1606a623          	sw	zero,364(a3)
+42045918:	1606a823          	sw	zero,368(a3)
+4204591c:	1606aa23          	sw	zero,372(a3)
+42045920:	02000793          	li	a5,32
+42045924:	4821                	li	a6,8
+42045926:	4589                	li	a1,2
+42045928:	02800693          	li	a3,40
+4204592c:	12000713          	li	a4,288
+42045930:	00062423          	sw	zero,8(a2)
+42045934:	ca1c                	sw	a5,16(a2)
+42045936:	d25c                	sw	a5,36(a2)
+42045938:	01062c23          	sw	a6,24(a2)
+4204593c:	ce4c                	sw	a1,28(a2)
+4204593e:	ca54                	sw	a3,20(a2)
+42045940:	c658                	sw	a4,12(a2)
+42045942:	8082                	ret

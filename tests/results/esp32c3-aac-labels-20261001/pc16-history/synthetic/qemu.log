@@ -1,0 +1,822 @@
+ESP-ROM:esp32c3-api1-20210207
+Build:Feb  7 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fcd5830,len:0x155c
+load:0x403cbf10,len:0xce0
+load:0x403ce710,len:0x2fcc
+entry 0x403cbf1a
+I (0) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (0) boot: compile time Oct  1 2026 11:20:52
+I (0) boot: chip revision: v0.3
+I (0) boot: efuse block revision: v1.3
+I (0) boot.esp32c3: SPI Speed      : 80MHz
+I (0) boot.esp32c3: SPI Mode       : SLOW READ
+I (0) boot.esp32c3: SPI Flash Size : 4MB
+I (0) boot: Enabling RNG early entropy source...
+I (0) boot: Partition Table:
+I (0) boot: ## Label            Usage          Type ST Offset   Length
+I (0) boot:  0 nvs              WiFi data        01 02 00009000 00005000
+I (0) boot:  1 otadata          OTA data         01 00 0000e000 00002000
+I (0) boot:  2 app0             OTA app          00 10 00010000 001d0000
+I (0) boot:  3 app1             OTA app          00 11 001e0000 001d0000
+I (0) boot:  4 spiffs           Unknown data     01 82 003b0000 00040000
+I (0) boot:  5 coredump         Unknown data     01 03 003f0000 00010000
+I (0) boot: End of partition table
+I (0) boot: No factory image, trying OTA 0
+I (0) esp_image: segment 0: paddr=00010020 vaddr=3c050020 size=20bc0h (134080) map
+I (2) esp_image: segment 1: paddr=00030be8 vaddr=3fc8a400 size=019d4h (  6612) load
+I (2) esp_image: segment 2: paddr=000325c4 vaddr=40380000 size=0a3a0h ( 41888) load
+I (2) esp_image: segment 3: paddr=0003c96c vaddr=50000000 size=00024h (    36) load
+I (3) esp_image: segment 4: paddr=0003c998 vaddr=00000000 size=03680h ( 13952) 
+I (3) esp_image: segment 5: paddr=00040020 vaddr=42000020 size=40760h (264032) map
+I (6) boot: Loaded app from partition at offset 0x10000
+I (6) boot: Set actual ota_seq=1 in otadata[0]
+I (6) boot: Disabling RNG early entropy source...
+I (6) cpu_start: Unicore app
+I (14) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
+I (14) cpu_start: Pro cpu start user code
+I (14) cpu_start: cpu freq: 160000000 Hz
+I (14) app_init: Application information:
+I (14) app_init: Project name:     yoradio_esp32c3_oled_native
+I (14) app_init: App version:      v0.9.693-1119-ge88b4f79-dirty
+I (14) app_init: Compile time:     Oct  1 2026 22:27:15
+I (14) app_init: ELF file SHA256:  dca785f4d...
+I (14) app_init: ESP-IDF:          v6.0.2
+I (14) efuse_init: Min chip rev:     v0.3
+I (14) efuse_init: Max chip rev:     v1.99 
+I (14) efuse_init: Chip rev:         v0.3
+I (14) heap_init: Initializing. RAM available for dynamic allocation:
+I (14) heap_init: At 3FC8D1F0 len 00032E10 (203 KiB): RAM
+I (14) heap_init: At 3FCC0000 len 0001C710 (113 KiB): Retention RAM
+I (14) heap_init: At 3FCDC710 len 00002950 (10 KiB): Retention RAM
+I (14) heap_init: At 50000024 len 00001FC4 (7 KiB): RTCRAM
+I (14) spi_flash: detected chip: gd
+I (14) spi_flash: flash io: dio
+I (14) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (14) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (14) main_task: Started on CPU0
+I (14) main_task: Calling app_main()
+I (14) yoradio_c3: Starting pure ESP-IDF ESP32-C3 OLED yoRadio
+I (14) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (14) runtime_settings: Restored aif=0 softap=0 abuff=10 watchdog=1 tz=0:00 timeint=60 vols=1 enca=200
+W (14) yoradio_c3: QEMU profile: SSD1306 I2C and PCM enabled; Wi-Fi and GPIO disabled
+I (14) oled: SSD1306 72x40 ready at I2C 0x3c
+I (14) audio_output: QEMU stereo PCM ready at 48000 Hz
+I (14) main_task: Returned from app_main()
+I (114) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (115) yoradio_c3: QEMU_AUDIO_PASS 24000 stereo frames
+I (117) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (476) qemu_aac: QEMU_AAC_CASE_PASS HE44 first: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186588 min 186588
+I (1036) qemu_aac: QEMU_AAC_CASE_PASS LC44 stereo: 44100 Hz 2 ch, 24 frames, 24576 samples, free 243108 min 186588
+I (1036) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (1635) qemu_aac: QEMU_AAC_CASE_PASS LC22 mono: 22050 Hz 1 ch, 13 frames, 13312 samples, free 242980 min 186588
+I (1635) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (2195) qemu_aac: QEMU_AAC_CASE_PASS LC48 stereo: 48000 Hz 2 ch, 26 frames, 26624 samples, free 242980 min 186588
+I (2196) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (2845) qemu_aac: QEMU_AAC_CASE_PASS HE44 stereo: 44100 Hz 2 ch, 14 frames, 28672 samples, free 186460 min 186460
+I (2846) audio_output: QEMU PCM resampler input changed to 48000 Hz
+I (3485) qemu_aac: QEMU_AAC_CASE_PASS HE48 stereo: 48000 Hz 2 ch, 15 frames, 30720 samples, free 186460 min 186460
+I (3486) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (4175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 stereo: 44100 Hz 2 ch, 15 frames, 30720 samples, free 186460 min 186460
+I (4175) audio_output: QEMU PCM resampler input changed to 22050 Hz
+I (4785) qemu_aac: QEMU_AAC_CASE_PASS LC22 same header: 22050 Hz 1 ch, 13 frames, 13312 samples, free 242980 min 186460
+I (5475) qemu_aac: QEMU_AAC_CASE_PASS Implicit SBR core: 22050 Hz 1 ch, 15 frames, 15360 samples, free 242980 min 186460
+W (5475) qemu_aac: QEMU_AAC_LIMITATION implicit SBR/PS change needs stream restart
+I (5476) audio_output: QEMU PCM resampler input changed to 44100 Hz
+I (6175) qemu_aac: QEMU_AAC_CASE_PASS HEv2 restart: 44100 Hz 2 ch, 15 frames, 30720 samples, free 186972 min 186460
+I (6175) aac_compare: PCX16_COUNTER_PASS nop1024=1025
+I (6175) aac_compare: PCX16_LIMIT development=5 production=2
+I (6272) aac_packed: PCX16_ARITHMETIC_PASS mantissas=65536 exponents=16 block8=4096 shift=1..16
+I (6272) aac_compare: PCX16_ENV codec=v2.6.0-4-gfd141ab control=0 runs=3 repeats=2 baseline=wrap-bypass RAM_saved=0
+I (6309) aac_packed: PCX16_HISTORY case=lc44100_stereo variant=1 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6309) aac_packed: PCX16_BLOCKS case=lc44100_stereo variant=1 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6309) aac_packed: PCX16_QUANT case=lc44100_stereo variant=1 run=1 pairs=0 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=0 near_zero_changed=0 bias_real=0 bias_imag=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=0 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=1 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=2 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=3 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=4 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=5 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=6 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=7 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=8 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=9 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=10 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=11 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=12 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=13 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=14 count=0
+I (6309) aac_packed: PCX16_EXP case=lc44100_stereo variant=1 run=1 exponent=15 count=0
+I (6309) aac_packed: PCX16_RATIO case=lc44100_stereo variant=1 run=1 bucket=0 count=0
+I (6309) aac_packed: PCX16_RATIO case=lc44100_stereo variant=1 run=1 bucket=1 count=0
+I (6309) aac_packed: PCX16_RATIO case=lc44100_stereo variant=1 run=1 bucket=2 count=0
+I (6309) aac_packed: PCX16_RATIO case=lc44100_stereo variant=1 run=1 bucket=3 count=0
+I (6309) aac_packed: PCX16_RATIO case=lc44100_stereo variant=1 run=1 bucket=4 count=0
+I (6309) aac_packed: PCX16_RATIO case=lc44100_stereo variant=1 run=1 bucket=5 count=0
+I (6309) aac_compare: PCX16_RESULT case=lc44100_stereo variant=1 run=1 samples=98304 frames=48 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=12462554 packed_work=12455863 ref_max_call=385505 packed_max_call=385004 precision=PASS
+I (6346) aac_packed: PCX16_HISTORY case=lc44100_stereo variant=1 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6346) aac_packed: PCX16_BLOCKS case=lc44100_stereo variant=1 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6346) aac_compare: PCX16_RESULT case=lc44100_stereo variant=1 run=2 samples=98304 frames=48 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=12455361 packed_work=12463053 ref_max_call=385004 packed_max_call=385505 precision=PASS
+I (6383) aac_packed: PCX16_HISTORY case=lc44100_stereo variant=1 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6383) aac_packed: PCX16_BLOCKS case=lc44100_stereo variant=1 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6383) aac_compare: PCX16_RESULT case=lc44100_stereo variant=1 run=3 samples=98304 frames=48 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=12462552 packed_work=12455361 ref_max_call=385505 packed_max_call=385004 precision=PASS
+I (6403) aac_packed: PCX16_HISTORY case=lc22050_mono variant=1 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6403) aac_packed: PCX16_BLOCKS case=lc22050_mono variant=1 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6403) aac_packed: PCX16_QUANT case=lc22050_mono variant=1 run=1 pairs=0 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=0 near_zero_changed=0 bias_real=0 bias_imag=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=0 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=1 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=2 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=3 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=4 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=5 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=6 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=7 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=8 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=9 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=10 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=11 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=12 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=13 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=14 count=0
+I (6403) aac_packed: PCX16_EXP case=lc22050_mono variant=1 run=1 exponent=15 count=0
+I (6403) aac_packed: PCX16_RATIO case=lc22050_mono variant=1 run=1 bucket=0 count=0
+I (6403) aac_packed: PCX16_RATIO case=lc22050_mono variant=1 run=1 bucket=1 count=0
+I (6403) aac_packed: PCX16_RATIO case=lc22050_mono variant=1 run=1 bucket=2 count=0
+I (6403) aac_packed: PCX16_RATIO case=lc22050_mono variant=1 run=1 bucket=3 count=0
+I (6403) aac_packed: PCX16_RATIO case=lc22050_mono variant=1 run=1 bucket=4 count=0
+I (6403) aac_packed: PCX16_RATIO case=lc22050_mono variant=1 run=1 bucket=5 count=0
+I (6403) aac_compare: PCX16_RESULT case=lc22050_mono variant=1 run=1 samples=26624 frames=26 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=4040072 packed_work=3991036 ref_max_call=278573 packed_max_call=277535 precision=PASS
+I (6423) aac_packed: PCX16_HISTORY case=lc22050_mono variant=1 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6423) aac_packed: PCX16_BLOCKS case=lc22050_mono variant=1 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6423) aac_compare: PCX16_RESULT case=lc22050_mono variant=1 run=2 samples=26624 frames=26 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=3991036 packed_work=4040071 ref_max_call=277535 packed_max_call=278573 precision=PASS
+I (6443) aac_packed: PCX16_HISTORY case=lc22050_mono variant=1 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6443) aac_packed: PCX16_BLOCKS case=lc22050_mono variant=1 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6443) aac_compare: PCX16_RESULT case=lc22050_mono variant=1 run=3 samples=26624 frames=26 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=4040071 packed_work=3991036 ref_max_call=278573 packed_max_call=277535 precision=PASS
+I (6480) aac_packed: PCX16_HISTORY case=lc48000_stereo variant=1 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6480) aac_packed: PCX16_BLOCKS case=lc48000_stereo variant=1 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6480) aac_packed: PCX16_QUANT case=lc48000_stereo variant=1 run=1 pairs=0 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=0 near_zero_changed=0 bias_real=0 bias_imag=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=0 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=1 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=2 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=3 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=4 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=5 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=6 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=7 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=8 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=9 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=10 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=11 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=12 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=13 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=14 count=0
+I (6480) aac_packed: PCX16_EXP case=lc48000_stereo variant=1 run=1 exponent=15 count=0
+I (6480) aac_packed: PCX16_RATIO case=lc48000_stereo variant=1 run=1 bucket=0 count=0
+I (6480) aac_packed: PCX16_RATIO case=lc48000_stereo variant=1 run=1 bucket=1 count=0
+I (6480) aac_packed: PCX16_RATIO case=lc48000_stereo variant=1 run=1 bucket=2 count=0
+I (6480) aac_packed: PCX16_RATIO case=lc48000_stereo variant=1 run=1 bucket=3 count=0
+I (6480) aac_packed: PCX16_RATIO case=lc48000_stereo variant=1 run=1 bucket=4 count=0
+I (6480) aac_packed: PCX16_RATIO case=lc48000_stereo variant=1 run=1 bucket=5 count=0
+I (6480) aac_compare: PCX16_RESULT case=lc48000_stereo variant=1 run=1 samples=106496 frames=52 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=13425502 packed_work=13419313 ref_max_call=367189 packed_max_call=366688 precision=PASS
+I (6517) aac_packed: PCX16_HISTORY case=lc48000_stereo variant=1 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6517) aac_packed: PCX16_BLOCKS case=lc48000_stereo variant=1 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6517) aac_compare: PCX16_RESULT case=lc48000_stereo variant=1 run=2 samples=106496 frames=52 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=13419313 packed_work=13426003 ref_max_call=366688 packed_max_call=367189 precision=PASS
+I (6554) aac_packed: PCX16_HISTORY case=lc48000_stereo variant=1 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6554) aac_packed: PCX16_BLOCKS case=lc48000_stereo variant=1 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6554) aac_compare: PCX16_RESULT case=lc48000_stereo variant=1 run=3 samples=106496 frames=52 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=13425502 packed_work=13419313 ref_max_call=367189 packed_max_call=366688 precision=PASS
+I (6641) aac_packed: PCX16_HISTORY case=he44100_stereo variant=1 run=1 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (6641) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=1 run=1 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (6641) aac_packed: PCX16_QUANT case=he44100_stereo variant=1 run=1 pairs=1088 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=1984 near_zero_changed=4 bias_real=98 bias_imag=98
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=0 count=1088
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=1 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=2 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=3 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=4 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=5 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=6 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=7 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=8 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=9 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=10 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=11 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=12 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=13 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=14 count=0
+I (6641) aac_packed: PCX16_EXP case=he44100_stereo variant=1 run=1 exponent=15 count=0
+I (6641) aac_packed: PCX16_RATIO case=he44100_stereo variant=1 run=1 bucket=0 count=990
+I (6641) aac_packed: PCX16_RATIO case=he44100_stereo variant=1 run=1 bucket=1 count=0
+I (6641) aac_packed: PCX16_RATIO case=he44100_stereo variant=1 run=1 bucket=2 count=98
+I (6641) aac_packed: PCX16_RATIO case=he44100_stereo variant=1 run=1 bucket=3 count=0
+I (6641) aac_packed: PCX16_RATIO case=he44100_stereo variant=1 run=1 bucket=4 count=0
+I (6641) aac_packed: PCX16_RATIO case=he44100_stereo variant=1 run=1 bucket=5 count=0
+I (6641) aac_compare: PCX16_RESULT case=he44100_stereo variant=1 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36997387 packed_work=37095258 ref_max_call=1750948 packed_max_call=1928703 precision=PASS
+I (6728) aac_packed: PCX16_HISTORY case=he44100_stereo variant=1 run=2 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (6728) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=1 run=2 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (6728) aac_compare: PCX16_RESULT case=he44100_stereo variant=1 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36884981 packed_work=37128399 ref_max_call=1748196 packed_max_call=1852693 precision=PASS
+I (6815) aac_packed: PCX16_HISTORY case=he44100_stereo variant=1 run=3 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (6815) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=1 run=3 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (6815) aac_compare: PCX16_RESULT case=he44100_stereo variant=1 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36997875 packed_work=37016006 ref_max_call=1751437 packed_max_call=1849452 precision=PASS
+I (6902) aac_packed: PCX16_HISTORY case=he44100_stereo variant=2 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6902) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=2 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6902) aac_packed: PCX16_QUANT case=he44100_stereo variant=2 run=1 pairs=0 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=0 near_zero_changed=0 bias_real=0 bias_imag=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=0 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=1 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=2 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=3 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=4 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=5 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=6 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=7 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=8 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=9 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=10 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=11 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=12 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=13 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=14 count=0
+I (6902) aac_packed: PCX16_EXP case=he44100_stereo variant=2 run=1 exponent=15 count=0
+I (6902) aac_packed: PCX16_RATIO case=he44100_stereo variant=2 run=1 bucket=0 count=0
+I (6902) aac_packed: PCX16_RATIO case=he44100_stereo variant=2 run=1 bucket=1 count=0
+I (6902) aac_packed: PCX16_RATIO case=he44100_stereo variant=2 run=1 bucket=2 count=0
+I (6902) aac_packed: PCX16_RATIO case=he44100_stereo variant=2 run=1 bucket=3 count=0
+I (6902) aac_packed: PCX16_RATIO case=he44100_stereo variant=2 run=1 bucket=4 count=0
+I (6902) aac_packed: PCX16_RATIO case=he44100_stereo variant=2 run=1 bucket=5 count=0
+I (6902) aac_compare: PCX16_RESULT case=he44100_stereo variant=2 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997875 packed_work=36914773 ref_max_call=1751437 packed_max_call=1748759 precision=PASS
+I (6989) aac_packed: PCX16_HISTORY case=he44100_stereo variant=2 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (6989) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=2 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (6989) aac_compare: PCX16_RESULT case=he44100_stereo variant=2 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36884981 packed_work=37027166 ref_max_call=1748196 packed_max_call=1752000 precision=PASS
+I (7076) aac_packed: PCX16_HISTORY case=he44100_stereo variant=2 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (7076) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=2 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (7076) aac_compare: PCX16_RESULT case=he44100_stereo variant=2 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997875 packed_work=36914773 ref_max_call=1751437 packed_max_call=1748759 precision=PASS
+I (7163) aac_packed: PCX16_HISTORY case=he44100_stereo variant=3 run=1 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (7163) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=3 run=1 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (7163) aac_packed: PCX16_QUANT case=he44100_stereo variant=3 run=1 pairs=1088 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=1984 near_zero_changed=4 bias_real=98 bias_imag=98
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=0 count=1088
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=1 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=2 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=3 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=4 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=5 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=6 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=7 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=8 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=9 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=10 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=11 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=12 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=13 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=14 count=0
+I (7163) aac_packed: PCX16_EXP case=he44100_stereo variant=3 run=1 exponent=15 count=0
+I (7163) aac_packed: PCX16_RATIO case=he44100_stereo variant=3 run=1 bucket=0 count=990
+I (7163) aac_packed: PCX16_RATIO case=he44100_stereo variant=3 run=1 bucket=1 count=0
+I (7163) aac_packed: PCX16_RATIO case=he44100_stereo variant=3 run=1 bucket=2 count=98
+I (7163) aac_packed: PCX16_RATIO case=he44100_stereo variant=3 run=1 bucket=3 count=0
+I (7163) aac_packed: PCX16_RATIO case=he44100_stereo variant=3 run=1 bucket=4 count=0
+I (7163) aac_packed: PCX16_RATIO case=he44100_stereo variant=3 run=1 bucket=5 count=0
+I (7163) aac_compare: PCX16_RESULT case=he44100_stereo variant=3 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36997374 packed_work=37095311 ref_max_call=1750936 packed_max_call=1928703 precision=PASS
+I (7250) aac_packed: PCX16_HISTORY case=he44100_stereo variant=3 run=2 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (7250) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=3 run=2 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (7250) aac_compare: PCX16_RESULT case=he44100_stereo variant=3 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36884981 packed_work=37128455 ref_max_call=1748196 packed_max_call=1852695 precision=PASS
+I (7337) aac_packed: PCX16_HISTORY case=he44100_stereo variant=3 run=3 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (7337) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=3 run=3 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (7337) aac_compare: PCX16_RESULT case=he44100_stereo variant=3 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36997875 packed_work=37016062 ref_max_call=1751437 packed_max_call=1849454 precision=PASS
+I (7424) aac_packed: PCX16_HISTORY case=he44100_stereo variant=4 run=1 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (7424) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=4 run=1 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (7424) aac_packed: PCX16_QUANT case=he44100_stereo variant=4 run=1 pairs=1088 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=1984 near_zero_changed=4 bias_real=98 bias_imag=98
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=0 count=1088
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=1 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=2 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=3 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=4 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=5 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=6 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=7 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=8 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=9 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=10 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=11 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=12 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=13 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=14 count=0
+I (7424) aac_packed: PCX16_EXP case=he44100_stereo variant=4 run=1 exponent=15 count=0
+I (7424) aac_packed: PCX16_RATIO case=he44100_stereo variant=4 run=1 bucket=0 count=990
+I (7424) aac_packed: PCX16_RATIO case=he44100_stereo variant=4 run=1 bucket=1 count=0
+I (7424) aac_packed: PCX16_RATIO case=he44100_stereo variant=4 run=1 bucket=2 count=98
+I (7424) aac_packed: PCX16_RATIO case=he44100_stereo variant=4 run=1 bucket=3 count=0
+I (7424) aac_packed: PCX16_RATIO case=he44100_stereo variant=4 run=1 bucket=4 count=0
+I (7424) aac_packed: PCX16_RATIO case=he44100_stereo variant=4 run=1 bucket=5 count=0
+I (7424) aac_compare: PCX16_RESULT case=he44100_stereo variant=4 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36997374 packed_work=37101375 ref_max_call=1750936 packed_max_call=1934821 precision=PASS
+I (7511) aac_packed: PCX16_HISTORY case=he44100_stereo variant=4 run=2 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (7511) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=4 run=2 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (7511) aac_compare: PCX16_RESULT case=he44100_stereo variant=4 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36884981 packed_work=37134519 ref_max_call=1748196 packed_max_call=1858813 precision=PASS
+I (7598) aac_packed: PCX16_HISTORY case=he44100_stereo variant=4 run=3 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (7598) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=4 run=3 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (7598) aac_compare: PCX16_RESULT case=he44100_stereo variant=4 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36997875 packed_work=37022126 ref_max_call=1751437 packed_max_call=1855572 precision=PASS
+I (7685) aac_packed: PCX16_HISTORY case=he44100_stereo variant=5 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (7685) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=5 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (7685) aac_packed: PCX16_QUANT case=he44100_stereo variant=5 run=1 pairs=0 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=0 near_zero_changed=0 bias_real=0 bias_imag=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=0 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=1 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=2 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=3 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=4 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=5 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=6 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=7 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=8 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=9 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=10 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=11 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=12 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=13 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=14 count=0
+I (7685) aac_packed: PCX16_EXP case=he44100_stereo variant=5 run=1 exponent=15 count=0
+I (7685) aac_packed: PCX16_RATIO case=he44100_stereo variant=5 run=1 bucket=0 count=0
+I (7685) aac_packed: PCX16_RATIO case=he44100_stereo variant=5 run=1 bucket=1 count=0
+I (7685) aac_packed: PCX16_RATIO case=he44100_stereo variant=5 run=1 bucket=2 count=0
+I (7685) aac_packed: PCX16_RATIO case=he44100_stereo variant=5 run=1 bucket=3 count=0
+I (7685) aac_packed: PCX16_RATIO case=he44100_stereo variant=5 run=1 bucket=4 count=0
+I (7685) aac_packed: PCX16_RATIO case=he44100_stereo variant=5 run=1 bucket=5 count=0
+I (7685) aac_compare: PCX16_RESULT case=he44100_stereo variant=5 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997875 packed_work=36914773 ref_max_call=1751437 packed_max_call=1748759 precision=PASS
+I (7772) aac_packed: PCX16_HISTORY case=he44100_stereo variant=5 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (7772) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=5 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (7772) aac_compare: PCX16_RESULT case=he44100_stereo variant=5 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36884981 packed_work=37027166 ref_max_call=1748196 packed_max_call=1752000 precision=PASS
+I (7859) aac_packed: PCX16_HISTORY case=he44100_stereo variant=5 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (7859) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=5 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (7859) aac_compare: PCX16_RESULT case=he44100_stereo variant=5 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997875 packed_work=36914773 ref_max_call=1751437 packed_max_call=1748759 precision=PASS
+I (7946) aac_packed: PCX16_HISTORY case=he44100_stereo variant=6 run=1 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (7946) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=6 run=1 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (7946) aac_packed: PCX16_QUANT case=he44100_stereo variant=6 run=1 pairs=1088 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=1984 near_zero_changed=4 bias_real=98 bias_imag=98
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=0 count=1088
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=1 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=2 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=3 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=4 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=5 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=6 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=7 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=8 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=9 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=10 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=11 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=12 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=13 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=14 count=0
+I (7946) aac_packed: PCX16_EXP case=he44100_stereo variant=6 run=1 exponent=15 count=0
+I (7946) aac_packed: PCX16_RATIO case=he44100_stereo variant=6 run=1 bucket=0 count=990
+I (7946) aac_packed: PCX16_RATIO case=he44100_stereo variant=6 run=1 bucket=1 count=0
+I (7946) aac_packed: PCX16_RATIO case=he44100_stereo variant=6 run=1 bucket=2 count=98
+I (7946) aac_packed: PCX16_RATIO case=he44100_stereo variant=6 run=1 bucket=3 count=0
+I (7946) aac_packed: PCX16_RATIO case=he44100_stereo variant=6 run=1 bucket=4 count=0
+I (7946) aac_packed: PCX16_RATIO case=he44100_stereo variant=6 run=1 bucket=5 count=0
+I (7946) aac_compare: PCX16_RESULT case=he44100_stereo variant=6 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36997374 packed_work=37101431 ref_max_call=1750936 packed_max_call=1934823 precision=PASS
+I (8033) aac_packed: PCX16_HISTORY case=he44100_stereo variant=6 run=2 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (8033) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=6 run=2 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (8033) aac_compare: PCX16_RESULT case=he44100_stereo variant=6 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36884981 packed_work=37134575 ref_max_call=1748196 packed_max_call=1858815 precision=PASS
+I (8120) aac_packed: PCX16_HISTORY case=he44100_stereo variant=6 run=3 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (8120) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=6 run=3 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (8120) aac_compare: PCX16_RESULT case=he44100_stereo variant=6 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=36997875 packed_work=37022182 ref_max_call=1751437 packed_max_call=1855574 precision=PASS
+I (8207) aac_packed: PCX16_HISTORY case=he44100_stereo variant=7 run=1 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (8207) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=7 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (8207) aac_compare: PCX16_RESULT case=he44100_stereo variant=7 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997875 packed_work=36914983 ref_max_call=1751437 packed_max_call=1749131 precision=PASS
+I (8294) aac_packed: PCX16_HISTORY case=he44100_stereo variant=7 run=2 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (8294) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=7 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (8294) aac_compare: PCX16_RESULT case=he44100_stereo variant=7 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36884981 packed_work=37027803 ref_max_call=1747695 packed_max_call=1752799 precision=PASS
+I (8381) aac_packed: PCX16_HISTORY case=he44100_stereo variant=7 run=3 sbr_frames=2 ps_frames=0 lc_skips=54 pairs=1088
+I (8381) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=7 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (8381) aac_compare: PCX16_RESULT case=he44100_stereo variant=7 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997875 packed_work=36914909 ref_max_call=1751437 packed_max_call=1749057 precision=PASS
+I (8467) aac_packed: PCX16_HISTORY case=he44100_stereo variant=0 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (8467) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=0 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (8467) aac_compare: PCX16_RESULT case=he44100_stereo variant=0 run=1 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997875 packed_work=36884981 ref_max_call=1751437 packed_max_call=1747695 precision=PASS
+I (8553) aac_packed: PCX16_HISTORY case=he44100_stereo variant=0 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (8553) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=0 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (8553) aac_compare: PCX16_RESULT case=he44100_stereo variant=0 run=2 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36884981 packed_work=36997875 ref_max_call=1747695 packed_max_call=1751437 precision=PASS
+I (8639) aac_packed: PCX16_HISTORY case=he44100_stereo variant=0 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (8639) aac_packed: PCX16_BLOCKS case=he44100_stereo variant=0 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (8639) aac_compare: PCX16_RESULT case=he44100_stereo variant=0 run=3 samples=114688 frames=28 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=36997875 packed_work=36884981 ref_max_call=1751437 packed_max_call=1747695 precision=PASS
+I (8734) aac_packed: PCX16_HISTORY case=he48000_stereo variant=1 run=1 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (8734) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=1 run=1 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (8734) aac_packed: PCX16_QUANT case=he48000_stereo variant=1 run=1 pairs=1088 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=1984 near_zero_changed=4 bias_real=98 bias_imag=98
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=0 count=1088
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=1 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=2 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=3 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=4 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=5 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=6 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=7 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=8 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=9 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=10 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=11 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=12 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=13 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=14 count=0
+I (8734) aac_packed: PCX16_EXP case=he48000_stereo variant=1 run=1 exponent=15 count=0
+I (8734) aac_packed: PCX16_RATIO case=he48000_stereo variant=1 run=1 bucket=0 count=990
+I (8734) aac_packed: PCX16_RATIO case=he48000_stereo variant=1 run=1 bucket=1 count=0
+I (8734) aac_packed: PCX16_RATIO case=he48000_stereo variant=1 run=1 bucket=2 count=98
+I (8734) aac_packed: PCX16_RATIO case=he48000_stereo variant=1 run=1 bucket=3 count=0
+I (8734) aac_packed: PCX16_RATIO case=he48000_stereo variant=1 run=1 bucket=4 count=0
+I (8734) aac_packed: PCX16_RATIO case=he48000_stereo variant=1 run=1 bucket=5 count=0
+I (8734) aac_compare: PCX16_RESULT case=he48000_stereo variant=1 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=40037345 packed_work=40121806 ref_max_call=1754535 packed_max_call=1932300 precision=PASS
+I (8829) aac_packed: PCX16_HISTORY case=he48000_stereo variant=1 run=2 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (8829) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=1 run=2 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (8829) aac_compare: PCX16_RESULT case=he48000_stereo variant=1 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=39909364 packed_work=40170538 ref_max_call=1751795 packed_max_call=1856292 precision=PASS
+I (8924) aac_packed: PCX16_HISTORY case=he48000_stereo variant=1 run=3 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (8924) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=1 run=3 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (8924) aac_compare: PCX16_RESULT case=he48000_stereo variant=1 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=40037846 packed_work=40042557 ref_max_call=1755036 packed_max_call=1853051 precision=PASS
+I (9019) aac_packed: PCX16_HISTORY case=he48000_stereo variant=2 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (9019) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=2 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (9019) aac_packed: PCX16_QUANT case=he48000_stereo variant=2 run=1 pairs=0 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=0 near_zero_changed=0 bias_real=0 bias_imag=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=0 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=1 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=2 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=3 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=4 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=5 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=6 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=7 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=8 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=9 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=10 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=11 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=12 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=13 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=14 count=0
+I (9019) aac_packed: PCX16_EXP case=he48000_stereo variant=2 run=1 exponent=15 count=0
+I (9019) aac_packed: PCX16_RATIO case=he48000_stereo variant=2 run=1 bucket=0 count=0
+I (9019) aac_packed: PCX16_RATIO case=he48000_stereo variant=2 run=1 bucket=1 count=0
+I (9019) aac_packed: PCX16_RATIO case=he48000_stereo variant=2 run=1 bucket=2 count=0
+I (9019) aac_packed: PCX16_RATIO case=he48000_stereo variant=2 run=1 bucket=3 count=0
+I (9019) aac_packed: PCX16_RATIO case=he48000_stereo variant=2 run=1 bucket=4 count=0
+I (9019) aac_packed: PCX16_RATIO case=he48000_stereo variant=2 run=1 bucket=5 count=0
+I (9019) aac_compare: PCX16_RESULT case=he48000_stereo variant=2 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037846 packed_work=39941284 ref_max_call=1755036 packed_max_call=1752358 precision=PASS
+I (9114) aac_packed: PCX16_HISTORY case=he48000_stereo variant=2 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (9114) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=2 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (9114) aac_compare: PCX16_RESULT case=he48000_stereo variant=2 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=39909364 packed_work=40069265 ref_max_call=1751795 packed_max_call=1755599 precision=PASS
+I (9209) aac_packed: PCX16_HISTORY case=he48000_stereo variant=2 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (9209) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=2 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (9209) aac_compare: PCX16_RESULT case=he48000_stereo variant=2 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037846 packed_work=39941284 ref_max_call=1755036 packed_max_call=1752358 precision=PASS
+I (9304) aac_packed: PCX16_HISTORY case=he48000_stereo variant=3 run=1 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (9304) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=3 run=1 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (9304) aac_packed: PCX16_QUANT case=he48000_stereo variant=3 run=1 pairs=1088 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=1984 near_zero_changed=4 bias_real=98 bias_imag=98
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=0 count=1088
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=1 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=2 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=3 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=4 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=5 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=6 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=7 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=8 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=9 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=10 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=11 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=12 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=13 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=14 count=0
+I (9304) aac_packed: PCX16_EXP case=he48000_stereo variant=3 run=1 exponent=15 count=0
+I (9304) aac_packed: PCX16_RATIO case=he48000_stereo variant=3 run=1 bucket=0 count=990
+I (9304) aac_packed: PCX16_RATIO case=he48000_stereo variant=3 run=1 bucket=1 count=0
+I (9304) aac_packed: PCX16_RATIO case=he48000_stereo variant=3 run=1 bucket=2 count=98
+I (9304) aac_packed: PCX16_RATIO case=he48000_stereo variant=3 run=1 bucket=3 count=0
+I (9304) aac_packed: PCX16_RATIO case=he48000_stereo variant=3 run=1 bucket=4 count=0
+I (9304) aac_packed: PCX16_RATIO case=he48000_stereo variant=3 run=1 bucket=5 count=0
+I (9304) aac_compare: PCX16_RESULT case=he48000_stereo variant=3 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=40037345 packed_work=40121866 ref_max_call=1754535 packed_max_call=1932302 precision=PASS
+I (9399) aac_packed: PCX16_HISTORY case=he48000_stereo variant=3 run=2 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (9399) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=3 run=2 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (9399) aac_compare: PCX16_RESULT case=he48000_stereo variant=3 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=39909364 packed_work=40170598 ref_max_call=1751795 packed_max_call=1856294 precision=PASS
+I (9494) aac_packed: PCX16_HISTORY case=he48000_stereo variant=3 run=3 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (9494) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=3 run=3 blocks8=136 tail_pairs=0 scalar_pairs=0
+I (9494) aac_compare: PCX16_RESULT case=he48000_stereo variant=3 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=40037846 packed_work=40042617 ref_max_call=1755036 packed_max_call=1853053 precision=PASS
+I (9589) aac_packed: PCX16_HISTORY case=he48000_stereo variant=4 run=1 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (9589) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=4 run=1 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (9589) aac_packed: PCX16_QUANT case=he48000_stereo variant=4 run=1 pairs=1088 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=1984 near_zero_changed=4 bias_real=98 bias_imag=98
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=0 count=1088
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=1 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=2 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=3 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=4 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=5 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=6 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=7 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=8 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=9 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=10 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=11 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=12 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=13 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=14 count=0
+I (9589) aac_packed: PCX16_EXP case=he48000_stereo variant=4 run=1 exponent=15 count=0
+I (9589) aac_packed: PCX16_RATIO case=he48000_stereo variant=4 run=1 bucket=0 count=990
+I (9589) aac_packed: PCX16_RATIO case=he48000_stereo variant=4 run=1 bucket=1 count=0
+I (9589) aac_packed: PCX16_RATIO case=he48000_stereo variant=4 run=1 bucket=2 count=98
+I (9589) aac_packed: PCX16_RATIO case=he48000_stereo variant=4 run=1 bucket=3 count=0
+I (9589) aac_packed: PCX16_RATIO case=he48000_stereo variant=4 run=1 bucket=4 count=0
+I (9589) aac_packed: PCX16_RATIO case=he48000_stereo variant=4 run=1 bucket=5 count=0
+I (9589) aac_compare: PCX16_RESULT case=he48000_stereo variant=4 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=40037345 packed_work=40127926 ref_max_call=1754535 packed_max_call=1938420 precision=PASS
+I (9684) aac_packed: PCX16_HISTORY case=he48000_stereo variant=4 run=2 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (9684) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=4 run=2 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (9684) aac_compare: PCX16_RESULT case=he48000_stereo variant=4 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=39909364 packed_work=40176658 ref_max_call=1751795 packed_max_call=1862412 precision=PASS
+I (9779) aac_packed: PCX16_HISTORY case=he48000_stereo variant=4 run=3 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (9779) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=4 run=3 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (9779) aac_compare: PCX16_RESULT case=he48000_stereo variant=4 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=40037846 packed_work=40048677 ref_max_call=1755036 packed_max_call=1859171 precision=PASS
+I (9874) aac_packed: PCX16_HISTORY case=he48000_stereo variant=5 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (9874) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=5 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (9874) aac_packed: PCX16_QUANT case=he48000_stereo variant=5 run=1 pairs=0 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=0 near_zero_changed=0 bias_real=0 bias_imag=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=0 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=1 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=2 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=3 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=4 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=5 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=6 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=7 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=8 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=9 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=10 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=11 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=12 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=13 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=14 count=0
+I (9874) aac_packed: PCX16_EXP case=he48000_stereo variant=5 run=1 exponent=15 count=0
+I (9874) aac_packed: PCX16_RATIO case=he48000_stereo variant=5 run=1 bucket=0 count=0
+I (9874) aac_packed: PCX16_RATIO case=he48000_stereo variant=5 run=1 bucket=1 count=0
+I (9874) aac_packed: PCX16_RATIO case=he48000_stereo variant=5 run=1 bucket=2 count=0
+I (9874) aac_packed: PCX16_RATIO case=he48000_stereo variant=5 run=1 bucket=3 count=0
+I (9874) aac_packed: PCX16_RATIO case=he48000_stereo variant=5 run=1 bucket=4 count=0
+I (9874) aac_packed: PCX16_RATIO case=he48000_stereo variant=5 run=1 bucket=5 count=0
+I (9874) aac_compare: PCX16_RESULT case=he48000_stereo variant=5 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037846 packed_work=39941284 ref_max_call=1755036 packed_max_call=1752358 precision=PASS
+I (9969) aac_packed: PCX16_HISTORY case=he48000_stereo variant=5 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (9969) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=5 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (9969) aac_compare: PCX16_RESULT case=he48000_stereo variant=5 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=39909364 packed_work=40069265 ref_max_call=1751795 packed_max_call=1755599 precision=PASS
+I (10064) aac_packed: PCX16_HISTORY case=he48000_stereo variant=5 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (10064) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=5 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (10064) aac_compare: PCX16_RESULT case=he48000_stereo variant=5 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037846 packed_work=39941284 ref_max_call=1755036 packed_max_call=1752358 precision=PASS
+I (10159) aac_packed: PCX16_HISTORY case=he48000_stereo variant=6 run=1 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (10159) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=6 run=1 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (10159) aac_packed: PCX16_QUANT case=he48000_stereo variant=6 run=1 pairs=1088 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=1984 near_zero_changed=4 bias_real=98 bias_imag=98
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=0 count=1088
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=1 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=2 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=3 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=4 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=5 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=6 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=7 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=8 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=9 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=10 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=11 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=12 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=13 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=14 count=0
+I (10159) aac_packed: PCX16_EXP case=he48000_stereo variant=6 run=1 exponent=15 count=0
+I (10159) aac_packed: PCX16_RATIO case=he48000_stereo variant=6 run=1 bucket=0 count=990
+I (10159) aac_packed: PCX16_RATIO case=he48000_stereo variant=6 run=1 bucket=1 count=0
+I (10159) aac_packed: PCX16_RATIO case=he48000_stereo variant=6 run=1 bucket=2 count=98
+I (10159) aac_packed: PCX16_RATIO case=he48000_stereo variant=6 run=1 bucket=3 count=0
+I (10159) aac_packed: PCX16_RATIO case=he48000_stereo variant=6 run=1 bucket=4 count=0
+I (10159) aac_packed: PCX16_RATIO case=he48000_stereo variant=6 run=1 bucket=5 count=0
+I (10159) aac_compare: PCX16_RESULT case=he48000_stereo variant=6 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=40037345 packed_work=40127986 ref_max_call=1754535 packed_max_call=1938422 precision=PASS
+I (10254) aac_packed: PCX16_HISTORY case=he48000_stereo variant=6 run=2 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (10254) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=6 run=2 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (10254) aac_compare: PCX16_RESULT case=he48000_stereo variant=6 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=39909364 packed_work=40176718 ref_max_call=1751795 packed_max_call=1862414 precision=PASS
+I (10349) aac_packed: PCX16_HISTORY case=he48000_stereo variant=6 run=3 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (10349) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=6 run=3 blocks8=0 tail_pairs=0 scalar_pairs=1088
+I (10349) aac_compare: PCX16_RESULT case=he48000_stereo variant=6 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=196 max_shift=1 ref_work=40037846 packed_work=40048737 ref_max_call=1755036 packed_max_call=1859173 precision=PASS
+I (10444) aac_packed: PCX16_HISTORY case=he48000_stereo variant=7 run=1 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (10444) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=7 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (10444) aac_compare: PCX16_RESULT case=he48000_stereo variant=7 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037846 packed_work=39941482 ref_max_call=1755036 packed_max_call=1752730 precision=PASS
+I (10539) aac_packed: PCX16_HISTORY case=he48000_stereo variant=7 run=2 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (10539) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=7 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (10539) aac_compare: PCX16_RESULT case=he48000_stereo variant=7 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=0 max_shift=0 ref_work=39909364 packed_work=40069890 ref_max_call=1751294 packed_max_call=1756398 precision=PASS
+I (10634) aac_packed: PCX16_HISTORY case=he48000_stereo variant=7 run=3 sbr_frames=2 ps_frames=0 lc_skips=58 pairs=1088
+I (10634) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=7 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (10634) aac_compare: PCX16_RESULT case=he48000_stereo variant=7 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=2 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037846 packed_work=39941408 ref_max_call=1755036 packed_max_call=1752656 precision=PASS
+I (10729) aac_packed: PCX16_HISTORY case=he48000_stereo variant=0 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (10729) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=0 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (10729) aac_compare: PCX16_RESULT case=he48000_stereo variant=0 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037846 packed_work=39909364 ref_max_call=1755036 packed_max_call=1751294 precision=PASS
+I (10824) aac_packed: PCX16_HISTORY case=he48000_stereo variant=0 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (10824) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=0 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (10824) aac_compare: PCX16_RESULT case=he48000_stereo variant=0 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=39909364 packed_work=40037846 ref_max_call=1751294 packed_max_call=1755036 precision=PASS
+I (10919) aac_packed: PCX16_HISTORY case=he48000_stereo variant=0 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (10919) aac_packed: PCX16_BLOCKS case=he48000_stereo variant=0 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (10919) aac_compare: PCX16_RESULT case=he48000_stereo variant=0 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=40037846 packed_work=39909364 ref_max_call=1755036 packed_max_call=1751294 precision=PASS
+I (11033) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=1 run=1 sbr_frames=30 ps_frames=0 lc_skips=0 pairs=16320
+I (11033) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=1 run=1 blocks8=2040 tail_pairs=0 scalar_pairs=0
+I (11033) aac_packed: PCX16_QUANT case=hev2_44100_stereo variant=1 run=1 pairs=16320 saturated=0 nonzero_to_zero=264 zero_to_nonzero=0 near_zero=16403 near_zero_changed=266 bias_real=-228509 bias_imag=12040
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=0 count=8885
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=1 count=439
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=2 count=104
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=3 count=52
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=4 count=79
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=5 count=164
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=6 count=200
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=7 count=123
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=8 count=186
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=9 count=355
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=10 count=970
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=11 count=2124
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=12 count=2358
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=13 count=281
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=14 count=0
+I (11033) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=1 run=1 exponent=15 count=0
+I (11033) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=1 run=1 bucket=0 count=5122
+I (11033) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=1 run=1 bucket=1 count=5893
+I (11033) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=1 run=1 bucket=2 count=1725
+I (11033) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=1 run=1 bucket=3 count=2190
+I (11033) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=1 run=1 bucket=4 count=603
+I (11033) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=1 run=1 bucket=5 count=787
+I (11033) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=1 run=1 samples=122880 frames=30 max_l=3 max_r=2 different=1237 over_one=170 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=9035 max_shift=14 ref_work=50821416 packed_work=54265957 ref_max_call=1843711 packed_max_call=1943387 precision=PASS
+I (11146) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=1 run=2 sbr_frames=30 ps_frames=0 lc_skips=0 pairs=16320
+I (11146) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=1 run=2 blocks8=2040 tail_pairs=0 scalar_pairs=0
+I (11146) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=1 run=2 samples=122880 frames=30 max_l=3 max_r=2 different=1237 over_one=170 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=9035 max_shift=14 ref_work=50816521 packed_work=53003390 ref_max_call=1843711 packed_max_call=1901059 precision=PASS
+I (11258) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=1 run=3 sbr_frames=30 ps_frames=0 lc_skips=0 pairs=16320
+I (11258) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=1 run=3 blocks8=2040 tail_pairs=0 scalar_pairs=0
+I (11258) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=1 run=3 samples=122880 frames=30 max_l=3 max_r=2 different=1237 over_one=170 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=9035 max_shift=14 ref_work=50820414 packed_work=52998996 ref_max_call=1843711 packed_max_call=1901059 precision=PASS
+I (11376) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=2 run=1 sbr_frames=0 ps_frames=30 lc_skips=0 pairs=19590
+I (11376) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=2 run=1 blocks8=1530 tail_pairs=7350 scalar_pairs=0
+I (11376) aac_packed: PCX16_QUANT case=hev2_44100_stereo variant=2 run=1 pairs=19590 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=6040 near_zero_changed=445 bias_real=182801 bias_imag=59837
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=0 count=16326
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=1 count=526
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=2 count=296
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=3 count=213
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=4 count=133
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=5 count=78
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=6 count=100
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=7 count=78
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=8 count=78
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=9 count=733
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=10 count=481
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=11 count=202
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=12 count=346
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=13 count=0
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=14 count=0
+I (11376) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=2 run=1 exponent=15 count=0
+I (11376) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=2 run=1 bucket=0 count=2359
+I (11376) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=2 run=1 bucket=1 count=877
+I (11376) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=2 run=1 bucket=2 count=6808
+I (11376) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=2 run=1 bucket=3 count=8339
+I (11376) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=2 run=1 bucket=4 count=1128
+I (11376) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=2 run=1 bucket=5 count=79
+I (11376) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=2 run=1 samples=122880 frames=30 max_l=3 max_r=2 different=1093 over_one=163 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=14544 max_shift=13 ref_work=50822418 packed_work=57615356 ref_max_call=1843711 packed_max_call=2075023 precision=PASS
+I (11490) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=2 run=2 sbr_frames=0 ps_frames=30 lc_skips=0 pairs=19590
+I (11490) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=2 run=2 blocks8=1530 tail_pairs=7350 scalar_pairs=0
+I (11490) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=2 run=2 samples=122880 frames=30 max_l=3 max_r=2 different=1093 over_one=163 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=14544 max_shift=13 ref_work=50818024 packed_work=53289204 ref_max_call=1843711 packed_max_call=1929982 precision=PASS
+I (11604) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=2 run=3 sbr_frames=0 ps_frames=30 lc_skips=0 pairs=19590
+I (11604) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=2 run=3 blocks8=1530 tail_pairs=7350 scalar_pairs=0
+I (11604) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=2 run=3 samples=122880 frames=30 max_l=3 max_r=2 different=1093 over_one=163 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=14544 max_shift=13 ref_work=50819412 packed_work=53287315 ref_max_call=1843711 packed_max_call=1929982 precision=PASS
+I (11726) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=3 run=1 sbr_frames=30 ps_frames=30 lc_skips=0 pairs=35910
+I (11726) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=3 run=1 blocks8=3570 tail_pairs=7350 scalar_pairs=0
+I (11726) aac_packed: PCX16_QUANT case=hev2_44100_stereo variant=3 run=1 pairs=35910 saturated=0 nonzero_to_zero=264 zero_to_nonzero=0 near_zero=22443 near_zero_changed=711 bias_real=-48427 bias_imag=88314
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=0 count=25211
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=1 count=965
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=2 count=400
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=3 count=265
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=4 count=212
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=5 count=242
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=6 count=300
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=7 count=201
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=8 count=264
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=9 count=1088
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=10 count=1451
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=11 count=2326
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=12 count=2704
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=13 count=281
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=14 count=0
+I (11726) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=3 run=1 exponent=15 count=0
+I (11726) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=3 run=1 bucket=0 count=7481
+I (11726) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=3 run=1 bucket=1 count=6770
+I (11726) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=3 run=1 bucket=2 count=8533
+I (11726) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=3 run=1 bucket=3 count=10530
+I (11726) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=3 run=1 bucket=4 count=1730
+I (11726) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=3 run=1 bucket=5 count=866
+I (11726) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=3 run=1 samples=122880 frames=30 max_l=3 max_r=2 different=1696 over_one=233 over_two=1 over_limit=0 complex_rows=60 real_rows=0 changed_qmf=23578 max_shift=14 ref_work=50816907 packed_work=61198255 ref_max_call=1843711 packed_max_call=2180019 precision=PASS
+I (11842) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=3 run=2 sbr_frames=30 ps_frames=30 lc_skips=0 pairs=35910
+I (11842) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=3 run=2 blocks8=3570 tail_pairs=7350 scalar_pairs=0
+I (11842) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=3 run=2 samples=122880 frames=30 max_l=3 max_r=2 different=1696 over_one=233 over_two=1 over_limit=0 complex_rows=60 real_rows=0 changed_qmf=23578 max_shift=14 ref_work=50819026 packed_work=55454641 ref_max_call=1843711 packed_max_call=1987256 precision=PASS
+I (11958) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=3 run=3 sbr_frames=30 ps_frames=30 lc_skips=0 pairs=35910
+I (11958) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=3 run=3 blocks8=3570 tail_pairs=7350 scalar_pairs=0
+I (11958) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=3 run=3 samples=122880 frames=30 max_l=3 max_r=2 different=1696 over_one=233 over_two=1 over_limit=0 complex_rows=60 real_rows=0 changed_qmf=23578 max_shift=14 ref_work=50821416 packed_work=55452752 ref_max_call=1843711 packed_max_call=1987256 precision=PASS
+I (12072) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=4 run=1 sbr_frames=30 ps_frames=0 lc_skips=0 pairs=16320
+I (12072) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=4 run=1 blocks8=0 tail_pairs=0 scalar_pairs=16320
+I (12072) aac_packed: PCX16_QUANT case=hev2_44100_stereo variant=4 run=1 pairs=16320 saturated=0 nonzero_to_zero=264 zero_to_nonzero=0 near_zero=16403 near_zero_changed=266 bias_real=-228509 bias_imag=12040
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=0 count=8885
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=1 count=439
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=2 count=104
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=3 count=52
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=4 count=79
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=5 count=164
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=6 count=200
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=7 count=123
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=8 count=186
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=9 count=355
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=10 count=970
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=11 count=2124
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=12 count=2358
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=13 count=281
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=14 count=0
+I (12072) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=4 run=1 exponent=15 count=0
+I (12072) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=4 run=1 bucket=0 count=5122
+I (12072) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=4 run=1 bucket=1 count=5893
+I (12072) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=4 run=1 bucket=2 count=1725
+I (12072) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=4 run=1 bucket=3 count=2190
+I (12072) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=4 run=1 bucket=4 count=603
+I (12072) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=4 run=1 bucket=5 count=787
+I (12072) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=4 run=1 samples=122880 frames=30 max_l=3 max_r=2 different=1237 over_one=170 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=9035 max_shift=14 ref_work=50821416 packed_work=54236932 ref_max_call=1843711 packed_max_call=1942796 precision=PASS
+I (12185) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=4 run=2 sbr_frames=30 ps_frames=0 lc_skips=0 pairs=16320
+I (12185) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=4 run=2 blocks8=0 tail_pairs=0 scalar_pairs=16320
+I (12185) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=4 run=2 samples=122880 frames=30 max_l=3 max_r=2 different=1237 over_one=170 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=9035 max_shift=14 ref_work=50817022 packed_work=52973864 ref_max_call=1843711 packed_max_call=1901206 precision=PASS
+I (12297) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=4 run=3 sbr_frames=30 ps_frames=0 lc_skips=0 pairs=16320
+I (12297) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=4 run=3 blocks8=0 tail_pairs=0 scalar_pairs=16320
+I (12297) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=4 run=3 samples=122880 frames=30 max_l=3 max_r=2 different=1237 over_one=170 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=9035 max_shift=14 ref_work=50820414 packed_work=52969971 ref_max_call=1843711 packed_max_call=1901206 precision=PASS
+I (12415) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=5 run=1 sbr_frames=0 ps_frames=30 lc_skips=0 pairs=19590
+I (12415) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=5 run=1 blocks8=0 tail_pairs=0 scalar_pairs=19590
+I (12415) aac_packed: PCX16_QUANT case=hev2_44100_stereo variant=5 run=1 pairs=19590 saturated=0 nonzero_to_zero=0 zero_to_nonzero=0 near_zero=6040 near_zero_changed=445 bias_real=182801 bias_imag=59837
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=0 count=16326
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=1 count=526
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=2 count=296
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=3 count=213
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=4 count=133
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=5 count=78
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=6 count=100
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=7 count=78
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=8 count=78
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=9 count=733
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=10 count=481
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=11 count=202
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=12 count=346
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=13 count=0
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=14 count=0
+I (12415) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=5 run=1 exponent=15 count=0
+I (12415) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=5 run=1 bucket=0 count=2359
+I (12415) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=5 run=1 bucket=1 count=877
+I (12415) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=5 run=1 bucket=2 count=6808
+I (12415) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=5 run=1 bucket=3 count=8339
+I (12415) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=5 run=1 bucket=4 count=1128
+I (12415) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=5 run=1 bucket=5 count=79
+I (12415) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=5 run=1 samples=122880 frames=30 max_l=3 max_r=2 different=1093 over_one=163 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=14544 max_shift=13 ref_work=50822418 packed_work=57685630 ref_max_call=1843711 packed_max_call=2077254 precision=PASS
+I (12529) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=5 run=2 sbr_frames=0 ps_frames=30 lc_skips=0 pairs=19590
+I (12529) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=5 run=2 blocks8=0 tail_pairs=0 scalar_pairs=19590
+I (12529) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=5 run=2 samples=122880 frames=30 max_l=3 max_r=2 different=1093 over_one=163 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=14544 max_shift=13 ref_work=50818024 packed_work=53359478 ref_max_call=1843711 packed_max_call=1932213 precision=PASS
+I (12643) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=5 run=3 sbr_frames=0 ps_frames=30 lc_skips=0 pairs=19590
+I (12643) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=5 run=3 blocks8=0 tail_pairs=0 scalar_pairs=19590
+I (12643) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=5 run=3 samples=122880 frames=30 max_l=3 max_r=2 different=1093 over_one=163 over_two=1 over_limit=0 complex_rows=30 real_rows=0 changed_qmf=14544 max_shift=13 ref_work=50819412 packed_work=53357589 ref_max_call=1843711 packed_max_call=1932213 precision=PASS
+I (12765) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=6 run=1 sbr_frames=30 ps_frames=30 lc_skips=0 pairs=35910
+I (12765) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=6 run=1 blocks8=0 tail_pairs=0 scalar_pairs=35910
+I (12765) aac_packed: PCX16_QUANT case=hev2_44100_stereo variant=6 run=1 pairs=35910 saturated=0 nonzero_to_zero=264 zero_to_nonzero=0 near_zero=22443 near_zero_changed=711 bias_real=-48427 bias_imag=88314
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=0 count=25211
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=1 count=965
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=2 count=400
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=3 count=265
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=4 count=212
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=5 count=242
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=6 count=300
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=7 count=201
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=8 count=264
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=9 count=1088
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=10 count=1451
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=11 count=2326
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=12 count=2704
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=13 count=281
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=14 count=0
+I (12765) aac_packed: PCX16_EXP case=hev2_44100_stereo variant=6 run=1 exponent=15 count=0
+I (12765) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=6 run=1 bucket=0 count=7481
+I (12765) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=6 run=1 bucket=1 count=6770
+I (12765) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=6 run=1 bucket=2 count=8533
+I (12765) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=6 run=1 bucket=3 count=10530
+I (12765) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=6 run=1 bucket=4 count=1730
+I (12765) aac_packed: PCX16_RATIO case=hev2_44100_stereo variant=6 run=1 bucket=5 count=866
+I (12765) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=6 run=1 samples=122880 frames=30 max_l=3 max_r=2 different=1696 over_one=233 over_two=1 over_limit=0 complex_rows=60 real_rows=0 changed_qmf=23578 max_shift=14 ref_work=50816907 packed_work=61239504 ref_max_call=1843711 packed_max_call=2181068 precision=PASS
+I (12881) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=6 run=2 sbr_frames=30 ps_frames=30 lc_skips=0 pairs=35910
+I (12881) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=6 run=2 blocks8=0 tail_pairs=0 scalar_pairs=35910
+I (12881) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=6 run=2 samples=122880 frames=30 max_l=3 max_r=2 different=1696 over_one=233 over_two=1 over_limit=0 complex_rows=60 real_rows=0 changed_qmf=23578 max_shift=14 ref_work=50819026 packed_work=55495890 ref_max_call=1843711 packed_max_call=1989157 precision=PASS
+I (12997) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=6 run=3 sbr_frames=30 ps_frames=30 lc_skips=0 pairs=35910
+I (12997) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=6 run=3 blocks8=0 tail_pairs=0 scalar_pairs=35910
+I (12997) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=6 run=3 samples=122880 frames=30 max_l=3 max_r=2 different=1696 over_one=233 over_two=1 over_limit=0 complex_rows=60 real_rows=0 changed_qmf=23578 max_shift=14 ref_work=50821416 packed_work=55494001 ref_max_call=1843711 packed_max_call=1989157 precision=PASS
+I (13111) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=7 run=1 sbr_frames=30 ps_frames=30 lc_skips=0 pairs=35910
+I (13111) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=7 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (13111) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=7 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=60 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50819412 packed_work=53867065 ref_max_call=1843711 packed_max_call=1945329 precision=PASS
+I (13221) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=7 run=2 sbr_frames=30 ps_frames=30 lc_skips=0 pairs=35910
+I (13221) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=7 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (13221) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=7 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=60 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50816521 packed_work=51044055 ref_max_call=1843711 packed_max_call=1850648 precision=PASS
+I (13331) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=7 run=3 sbr_frames=30 ps_frames=30 lc_skips=0 pairs=35910
+I (13331) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=7 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (13331) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=7 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=60 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50820915 packed_work=51039661 ref_max_call=1843210 packed_max_call=1851149 precision=PASS
+I (13441) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=0 run=1 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (13441) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=0 run=1 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (13441) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=0 run=1 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50821416 packed_work=50815018 ref_max_call=1843711 packed_max_call=1843210 precision=PASS
+I (13551) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=0 run=2 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (13551) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=0 run=2 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (13551) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=0 run=2 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50815018 packed_work=50821416 ref_max_call=1843210 packed_max_call=1843711 precision=PASS
+I (13661) aac_packed: PCX16_HISTORY case=hev2_44100_stereo variant=0 run=3 sbr_frames=0 ps_frames=0 lc_skips=0 pairs=0
+I (13661) aac_packed: PCX16_BLOCKS case=hev2_44100_stereo variant=0 run=3 blocks8=0 tail_pairs=0 scalar_pairs=0
+I (13661) aac_compare: PCX16_RESULT case=hev2_44100_stereo variant=0 run=3 samples=122880 frames=30 max_l=0 max_r=0 different=0 over_one=0 over_two=0 over_limit=0 complex_rows=0 real_rows=0 changed_qmf=0 max_shift=0 ref_work=50821416 packed_work=50815018 ref_max_call=1843711 packed_max_call=1843210 precision=PASS
+I (13661) aac_compare: PCX16_EXPERIMENT_COMPLETE inspect precision per case; no production approval
+I (13661) qemu_aac: QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes
+I (13661) yoradio_c3: QEMU_OLED_PASS 72x40 framebuffer presented
+I (13661) yoradio_c3: QEMU_SMOKE_PASS OLED, audio, NVS, SPIFFS and FreeRTOS; free heap: 305196 bytes

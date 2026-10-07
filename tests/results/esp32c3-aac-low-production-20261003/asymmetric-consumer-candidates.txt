@@ -1,0 +1,60 @@
+tools/codec_benchmark/aac_abi_layout.c:9:FIELD(right_header, channel[1].frame.header);
+tools/codec_benchmark/aac_abi_layout.c:10:FIELD(right_frame, channel[1].frame);
+tools/codec_benchmark/aac_abi_layout.c:11:FIELD(right_status, channel[1].sync_state);
+tools/codec_benchmark/aac_abi_layout.c:12:FIELD(right_coupling, channel[1].frame.coupling);
+tools/codec_benchmark/aac_abi_layout.c:15:    offsetof(aac_sbr_owner_abi_t,channel[1].frame.synthesis),
+tools/codec_benchmark/aac_abi_layout.c:16:    offsetof(aac_sbr_compact_owner_abi_t,channel[1].ps_synthesis)};
+tools/codec_benchmark/aac_abi_layout.c:18:FIELD(right_synthesis, channel[1].frame.synthesis);
+tools/codec_benchmark/aac_abi_layout.c:20:FIELD(right_high_real, channel[1].frame.high_real);
+tools/codec_benchmark/aac_abi_layout.c:21:FIELD(right_high_imag, channel[1].frame.high_imag);
+tools/codec_benchmark/aac_abi_layout.c:22:FIELD(ps_peak, channel[1].ps_overlay.peak);
+tools/codec_benchmark/aac_abi_layout.c:23:FIELD(ps_energy, channel[1].ps_overlay.previous_energy);
+tools/codec_benchmark/aac_abi_layout.c:24:FIELD(ps_difference, channel[1].ps_overlay.previous_peak_difference);
+tools/codec_benchmark/aac_abi_layout.c:25:FIELD(ps_hybrid, channel[1].ps_overlay.hybrid_and_long_delays);
+tools/codec_benchmark/aac_abi_layout.c:26:FIELD(ps_allpass_qmf, channel[1].ps_overlay.allpass_qmf);
+tools/codec_benchmark/aac_abi_layout.c:27:FIELD(ps_allpass_sub, channel[1].ps_overlay.allpass_sub_qmf);
+tools/codec_benchmark/aac_abi_layout.c:28:FIELD(ps_delay_real, channel[1].ps_overlay.main_delay_real);
+tools/codec_benchmark/aac_abi_layout.c:29:FIELD(ps_delay_imag, channel[1].ps_overlay.main_delay_imag);
+tools/codec_benchmark/aac_abi_layout.c:30:FIELD(ps_real_pointers, channel[1].ps_overlay.delay_real);
+tools/codec_benchmark/aac_abi_layout.c:31:FIELD(ps_imag_pointers, channel[1].ps_overlay.delay_imag);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:164:    assert(frame==&owner->channel[0].frame || frame==&owner->channel[1].frame);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:182:        aac_high_frame_t *other=frame==&owner->channel[0].frame?
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:183:            &owner->channel[1].frame:&owner->channel[0].frame;
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:209:    EXACT(left,core->channel[0].ltp_history+core->ltp_buffer_state);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:210:    EXACT(right,core->channel[1].ltp_history+core->ltp_buffer_state);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:247:    unsigned channel=frame==&owner->channel[0].frame?0:1;
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:248:    EXACT(frame,&owner->channel[channel].frame);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:250:    REQUIRE(span(input,LTP_HALF_SAMPLES*sizeof(int16_t),core->channel[channel].ltp_history,
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:251:                 sizeof(core->channel[channel].ltp_history),2));
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:276:    EXACT(ps,after?(void *)&owner->channel[1].ps_overlay.relocated_ps:current_io()->initial_ps);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:368:    aac_sbr_ps_overlay_abi_t *overlay=&owner->channel[1].ps_overlay;
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:372:    EXACT(ps->right_synthesis,aac_high_ps_synthesis(&owner->channel[1]));
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:412:        EXACT(ps->qmf_real,&core->channel[1]);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:448:    aac_high_channel_t *ch=frame==&owner->channel[0].frame?&owner->channel[0]:&owner->channel[1];
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:470:        EXACT(core->channel[ch].spectrum.coefficients,core->spectral[ch].coefficients);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:471:        EXACT(core->channel[ch].spectrum.shared,&core->spectral[ch].shared);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:484:            REQUIRE(!owner->channel[ch].low_real_relative);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:485:            REQUIRE(!owner->channel[ch].low_imag_relative);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:489:                           (void *)&owner->channel[1].ps_overlay.relocated_ps:(void *)&owner->inactive_ps);
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:542:        {aac_high_ps_synthesis(&owner->channel[1]),sizeof(owner->channel[1].frame.synthesis),_Alignof(int16_t)},
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:549:        hybrid_storage_t *hybrid=(void *)owner->channel[1].ps_overlay.hybrid_and_long_delays;
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:553:        if(span(p,bytes,&core->channel[1],QMF_ROWS*QMF_ROW_WORDS*sizeof(int32_t),4))return true;
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:570:    aac_high_channel_t *ch=frame==&owner->channel[0].frame?&owner->channel[0]:&owner->channel[1];
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:604:    assert(f==&owner->channel[0].frame || (!ps && f==&owner->channel[1].frame));
+idf/esp32c3-oled-native/main/aac_pointer_audit.c:609:        assert(f==&owner->channel[0].frame && state->ps_initialized && owner->ps==ps);
+tools/codec_benchmark/aac_high_abi_layout.c:31:    UPPER(aac_sbr_owner_abi_t,channel[1].frame.high_real)-UPPER(aac_sbr_owner_abi_t,channel[1].sync_state),
+tools/codec_benchmark/aac_high_abi_layout.c:32:    UPPER(aac_high_full_owner_t,channel[1].frame.high_real)-UPPER(aac_high_full_owner_t,channel[1].sync_state)};
+idf/esp32c3-oled-native/main/aac_high_reset.h:8:        memset(core->channel[ch].overlap,0,sizeof(core->channel[ch].overlap));
+idf/esp32c3-oled-native/main/aac_high_reset.h:12:            aac_core_channel_abi_t *channel=&core->channel[ch];
+idf/esp32c3-oled-native/main/aac_compact_owner.c:56:    owner->ps=state->ps_initialized ? &owner->channel[1].ps_overlay.relocated_ps :
+idf/esp32c3-oled-native/main/aac_compact_owner.c:136:    aac_ps_abi_t *relocated=&owner->channel[1].ps_overlay.relocated_ps;
+idf/esp32c3-oled-native/main/aac_compact_owner.c:159:        .frame={(void *)&owner->channel[0].frame,(void *)&owner->channel[1].frame},
+idf/esp32c3-oled-native/main/aac_compact_owner.c:160:        .sync={&owner->channel[0].sync_state,&owner->channel[1].sync_state},
+idf/esp32c3-oled-native/main/aac_compact_owner.c:177:    const size_t start=offsetof(owner_t,channel[1].ps_overlay.relocated_ps);
+idf/esp32c3-oled-native/main/aac_compact_owner.c:182:        owner_channel_t *channel=&owner->channel[ch];
+idf/esp32c3-oled-native/main/aac_compact_owner.c:185:        channel->frame_size=compact5_init_sbr_dec(rate,owner->channel[0].frame.header.sample_rate_mode,control,&channel->frame);
+idf/esp32c3-oled-native/main/aac_high_history_abi.h:83:    aac_high_channel_t channel[AAC_SBR_CHANNELS];
+idf/esp32c3-oled-native/main/aac_high_history_abi.h:87:    uint32_t frame_cursor_padding[2];
+idf/esp32c3-oled-native/main/aac_high_history_abi.h:92:    aac_high_channel_t channel[AAC_SBR_CHANNELS];
+idf/esp32c3-oled-native/main/aac_high_history_abi.h:96:    uint32_t frame_cursor_padding[2];
+idf/esp32c3-oled-native/main/aac_high_history_abi.h:130:               2*sizeof(aac_high_channel_t)+offsetof(aac_high_channel_t,frame),

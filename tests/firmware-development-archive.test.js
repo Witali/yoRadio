@@ -28,17 +28,23 @@ for (const variant of variants) {
       "utf8",
     );
 
-    assert.match(manifest, /Embedded source revision: `eef49d1`/);
+    const app = fs.readFileSync(path.join(firmwareDirectory, "app.bin"));
+    const version = app.subarray(48, 80).toString("utf8").split("\0")[0];
+    const embeddedVersion = manifest.match(/Embedded version: `([^`]+)`/);
+    const embeddedRevision = manifest.match(/Embedded source revision: `([0-9a-f]+)`/i);
+    assert.ok(embeddedVersion || embeddedRevision, "manifest must identify its source");
+    if (embeddedVersion) assert.equal(embeddedVersion[1], version);
+    if (embeddedRevision) assert.ok(version.includes(`-g${embeddedRevision[1]}`));
 
     for (const [name, offset] of artifacts) {
       const binary = fs.readFileSync(path.join(firmwareDirectory, name));
       const hash = crypto.createHash("sha256").update(binary).digest("hex");
-      const formattedSize = binary.length.toLocaleString("en-US");
-
-      assert.ok(
-        manifest.includes(`| \`${name}\` | ${formattedSize} | \`${offset}\` |`),
-      );
-      assert.match(manifest.toLowerCase(), new RegExp(hash));
+      const row = manifest.split(/\r?\n/).find(line => line.startsWith(`| \`${name}\` |`));
+      assert.ok(row, `missing manifest row for ${name}`);
+      const cells = row.split("|").map(cell => cell.trim());
+      assert.equal(Number(cells[2].replaceAll(",", "")), binary.length);
+      assert.equal(cells[3], `\`${offset}\``);
+      assert.equal(cells[4].toLowerCase(), `\`${hash}\``);
     }
 
     assert.equal(

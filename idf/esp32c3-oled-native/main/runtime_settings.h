@@ -16,6 +16,9 @@
 #define RUNTIME_DEFAULT_AUDIO_BUFFER_BLOCKS 10U
 #define RUNTIME_DEFAULT_MDNS_NAME "yoradio"
 #define RUNTIME_DEFAULT_WATCHDOG true
+#define RUNTIME_DEFAULT_STATION_TIMEOUT_SEC 10U
+#define RUNTIME_MIN_STATION_TIMEOUT_SEC 1U
+#define RUNTIME_MAX_STATION_TIMEOUT_SEC 120U
 #define RUNTIME_DEFAULT_TZ_HOUR 0
 #define RUNTIME_DEFAULT_TZ_MINUTE 0U
 #define RUNTIME_DEFAULT_SNTP1 "pool.ntp.org"
@@ -33,6 +36,7 @@ uint8_t runtime_settings_get_softap_delay_min(void);
 uint8_t runtime_settings_get_audio_buffer_blocks(void);
 void runtime_settings_get_mdns_name(char *output, size_t output_size);
 bool runtime_settings_get_watchdog(void);
+uint8_t runtime_settings_get_station_timeout_sec(void);
 int8_t runtime_settings_get_timezone_hour(void);
 uint8_t runtime_settings_get_timezone_minute(void);
 void runtime_settings_get_sntp1(char *output, size_t output_size);
@@ -46,6 +50,7 @@ esp_err_t runtime_settings_set_softap_delay_min(uint8_t minutes);
 esp_err_t runtime_settings_set_audio_buffer_blocks(uint8_t blocks);
 esp_err_t runtime_settings_set_mdns_name(const char *name);
 esp_err_t runtime_settings_set_watchdog(bool enabled);
+esp_err_t runtime_settings_set_station_timeout_sec(uint8_t seconds);
 esp_err_t runtime_settings_set_timezone_hour(int8_t hour);
 esp_err_t runtime_settings_set_timezone_minute(uint8_t minute);
 esp_err_t runtime_settings_set_sntp1(const char *server);

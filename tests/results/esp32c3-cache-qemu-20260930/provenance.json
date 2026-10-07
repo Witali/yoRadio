@@ -1,0 +1,74 @@
+{
+  "qemu_source_revision": "413834d79a1ac46570cdf4839f136e3b9a8e6ffd",
+  "qemu_version": "QEMU emulator version 9.2.2\nCopyright (c) 2003-2024 Fabrice Bellard and the QEMU Project developers",
+  "qemu_sha256": "baa25933ff0dff82b5602ad7abc2dfa9e167163a2af3fb2486f8036e87ee2aca",
+  "plugin_sha256": "63623dfadb7c31e7e8b1d650757f80c339d2e2f310726e8feedd76ce706b4940",
+  "flash_sha256": "4e8b1dec185296a81e265199f7bdd1fa9a743146e40cfce7a96619b6db34d5cd",
+  "sources_sha256": {
+    "esp32c3_cache.c": "76481759f0826b637317ea8d5944a3221b1b6c0c9fc8f71d0fbd0e70707f720a",
+    "cache_model.h": "290032bcf1171a46cde25a3990b8f8f89dc6bb99e49f262708edbe80d2b4b5ee",
+    "qemu_cache_test.c": "7d7f6a31e6e1c31effbc3e035b6d4197a24a6283f7e2a095315df31076551818"
+  },
+  "fixture_manifest_sha256": "c267864d81abcbe617a7b48c1179b4d35fc517e0f11a43439283ec072a0c69e1",
+  "fixtures_sha256": {
+    "lc-48000-stereo.aac": "1b9ab71161449af230ca0628dc23ac265f8c707b82d5e68c76ddc7f42d69b0d4",
+    "he-48000-stereo.aac": "747259aaafad92a280e793a4e0b7fce05d39443959ef3d3cba463b980d92f7da",
+    "hev2-44100-stereo.aac": "cf66a4008ec69f9fa31ac7383b0fe8ff6d71fc60b19ee168f1c1396c7e4014ce"
+  },
+  "host_wall_time_is_not_guest_cpu_time": true,
+  "runs": [
+    {
+      "run": 1,
+      "host_elapsed_seconds": 3.9816663270000845,
+      "command": [
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+        "-M",
+        "esp32c3,audiodev=audio0",
+        "-nographic",
+        "-no-reboot",
+        "-snapshot",
+        "-icount",
+        "shift=0,align=off,sleep=off",
+        "-L",
+        "/mnt/c/Work/QEMU-ESP32/.worktree/esp32c3-oled-audio/share/qemu",
+        "-audiodev",
+        "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-results/run-1.wav,out.frequency=48000",
+        "-drive",
+        "file=/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/idf/esp32c3-oled-native/build-qemu-cache/qemu-flash.bin,if=mtd,format=raw",
+        "-plugin",
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/esp32c3_cache.so,out=/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-results/run-1.json"
+      ],
+      "log_sha256": "1500ea92ae433c74393b9e8f97b9778cf8da84137696dc14806e60f576a3bb26",
+      "trace_sha256": "bd29d0d80e7eb6eb189d5697f473735ca3dc45396ea74d2448174580bc5bee87"
+    },
+    {
+      "run": 2,
+      "host_elapsed_seconds": 3.9809536179998304,
+      "command": [
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+        "-M",
+        "esp32c3,audiodev=audio0",
+        "-nographic",
+        "-no-reboot",
+        "-snapshot",
+        "-icount",
+        "shift=0,align=off,sleep=off",
+        "-L",
+        "/mnt/c/Work/QEMU-ESP32/.worktree/esp32c3-oled-audio/share/qemu",
+        "-audiodev",
+        "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-results/run-2.wav,out.frequency=48000",
+        "-drive",
+        "file=/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/idf/esp32c3-oled-native/build-qemu-cache/qemu-flash.bin,if=mtd,format=raw",
+        "-plugin",
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/esp32c3_cache.so,out=/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-results/run-2.json"
+      ],
+      "log_sha256": "1500ea92ae433c74393b9e8f97b9778cf8da84137696dc14806e60f576a3bb26",
+      "trace_sha256": "bd29d0d80e7eb6eb189d5697f473735ca3dc45396ea74d2448174580bc5bee87"
+    }
+  ],
+  "firmware_build_files_sha256": {
+    "sdkconfig": "163b816aef6237f388fa64c30ccddc828c1f70330264d8c3ebf31c5422217516",
+    "yoradio_esp32c3_oled_native.elf": "62744c1c521b7dec328cb02704cd9666d99b6cbb47b9c37b904333054b15b031",
+    "yoradio_esp32c3_oled_native.bin": "2d6f17d3357099db2410d6ae3689ff2db9bf5cf2ac5c3c41ae38922733df5965"
+  }
+}
