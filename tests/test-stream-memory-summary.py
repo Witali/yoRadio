@@ -48,10 +48,10 @@ class StreamSummary(unittest.TestCase):
                             (report, batches, sorted(rows, key=lambda r:r['at']),
                              dict(finished=True, complete=True, all_cases_pass=False))))
 
-    def run_summary(self):
+    def run_summary(self, **options):
         for name, value in self.data.items():
             (self.folder/name).write_text(json.dumps(value), encoding='utf-8')
-        return summarize(self.folder)
+        return summarize(self.folder, **options)
 
     def test_measured_ranges_headers_aged_credit_and_original_failure(self):
         result = self.run_summary()
@@ -101,6 +101,28 @@ class StreamSummary(unittest.TestCase):
         records.pop(next(i for i, r in enumerate(records) if 'NET_RX:' in r['line'] and r['at'] > 30))
         result = self.run_summary()
         self.assertFalse(result['network']['windows']['load']['coverage_complete'])
+
+    def test_independent_network_without_ownership(self):
+        self.data['performance.json'] = [r for r in self.data['performance.json']
+                                         if 'RX_OWNER:' not in r['line'] and 'RX_BLOCK:' not in r['line']]
+        self.assertNotIn('network', self.run_summary())  # Existing archive replay.
+        result = self.run_summary(independent_network=True)
+        self.assertEqual(result['ownership'], dict(complete=False, reason='Missing RX ownership telemetry'))
+        self.assertNotIn('owner_phases', result)
+        self.assertEqual(result['acceptance'][1]['result'], 'FAIL')
+        self.assertTrue(result['network']['windows']['load']['coverage_complete'])
+        self.assertEqual(result['network']['windows']['load']['receive_credit']['uncredited']['median'], 1000)
+
+    def test_independent_network_does_not_hide_damaged_records(self):
+        records = self.data['performance.json']
+        records.pop(next(i for i,r in enumerate(records) if 'RX_BLOCK:' in r['line']))
+        result = self.run_summary(independent_network=True)
+        self.assertFalse(result['ownership']['complete'])
+        self.assertTrue(result['network']['windows']['load']['coverage_complete'])
+        records.append(dict(at=40, line='PERF NET_RX: seq=10'))
+        result = self.run_summary(independent_network=True)
+        self.assertEqual(result['network'], dict(complete=False, reason='Incomplete receive-window snapshot'))
+        self.assertEqual(result['acceptance'][1]['result'], 'FAIL')
 
 
 if __name__ == '__main__':

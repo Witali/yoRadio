@@ -18,7 +18,7 @@ WARMUP_SECONDS = 10
 SUBWINDOW_SECONDS = 300
 
 
-def summarize(folder):
+def summarize(folder, *, independent_network=False):
     names = ('report.json', 'status.json', 'performance.json', 'checkpoint.json')
     raw = {name: (folder/name).read_bytes() for name in names}
     report, batches, records, checkpoint = (json.loads(raw[name]) for name in names)
@@ -51,20 +51,6 @@ def summarize(folder):
         if case['result'] == 'PASS':
             result['idle'][case['name']] = ranges(case['evidence']['samples'], ('heap', 'largest', 'tasks'))
 
-    # Never drop a damaged RX row to make the remaining capture pass.
-    try:
-        owners = analyze(records)
-    except ValueError as error:
-        result['ownership'] = dict(complete=False, reason=str(error))
-        return result
-    result['ownership'] = {k: v for k, v in owners.items() if k != 'snapshots'}
-    snapshots = owners['snapshots']
-    # Inferred pinned TLSF headers, explicitly separate from measured ranges.
-    # This is specific to this C3 build with heap poisoning/task tracking off.
-    for s in snapshots:
-        s['inferred_heap_bytes'] = s['allocated_payload_bytes'] + TLSF_HEADER_BYTES*s['unique_blocks']
-    result['inferred_allocator_header_bytes'] = TLSF_HEADER_BYTES
-    result['owner_phases'] = {}
     windows = [(label, b['started_at'], b['ended_at'])
                for label, b in zip(('idle-before', 'idle-after'), idle_batches)]
     steady_start = start+WARMUP_SECONDS
@@ -75,16 +61,35 @@ def summarize(folder):
         stop = min(cursor+SUBWINDOW_SECONDS, end)
         windows.append((f'load-{round(cursor-start)}-{round(stop-start)}s', cursor, stop))
         cursor = stop
-    for label, begin, finish in windows:
-        selected = [s for s in snapshots if begin <= s['at'] < finish]
-        times = [begin]+[s['at'] for s in selected]+[finish]
-        gaps = [b-a for a, b in zip(times, times[1:])]
-        result['owner_phases'][label] = dict(start=begin, end=finish, snapshots=len(selected),
-            coverage_complete=bool(selected) and all(0 <= gap <= MAX_SAMPLE_GAP_SECONDS for gap in gaps),
-            maximum_sample_gap_seconds=max(gaps),
-            ranges=ranges(selected, ('live', 'allocated_payload_bytes', 'inferred_heap_bytes',
-                                     'walk_us', 'unmatched')))
-    result['ownership']['load_coverage_complete'] = result['owner_phases']['load']['coverage_complete']
+    # Never drop a damaged RX row to make the remaining capture pass. The
+    # opt-in path can still summarize independent NET_HEAP/NET_RX records on
+    # ordinary firmware, which has no RX-owner hooks. Default output preserves
+    # byte-for-byte replay of existing evidence archives.
+    try:
+        owners = analyze(records)
+    except ValueError as error:
+        result['ownership'] = dict(complete=False, reason=str(error))
+        if not independent_network:
+            return result
+    else:
+        result['ownership'] = {k: v for k, v in owners.items() if k != 'snapshots'}
+        snapshots = owners['snapshots']
+        # Inferred pinned TLSF headers, separate from measured ranges. Specific
+        # to this C3 build with heap poisoning/task tracking off.
+        for s in snapshots:
+            s['inferred_heap_bytes'] = s['allocated_payload_bytes'] + TLSF_HEADER_BYTES*s['unique_blocks']
+        result['inferred_allocator_header_bytes'] = TLSF_HEADER_BYTES
+        result['owner_phases'] = {}
+        for label, begin, finish in windows:
+            selected = [s for s in snapshots if begin <= s['at'] < finish]
+            times = [begin]+[s['at'] for s in selected]+[finish]
+            gaps = [b-a for a, b in zip(times, times[1:])]
+            result['owner_phases'][label] = dict(start=begin, end=finish, snapshots=len(selected),
+                coverage_complete=bool(selected) and all(0 <= gap <= MAX_SAMPLE_GAP_SECONDS for gap in gaps),
+                maximum_sample_gap_seconds=max(gaps),
+                ranges=ranges(selected, ('live', 'allocated_payload_bytes', 'inferred_heap_bytes',
+                                         'walk_us', 'unmatched')))
+        result['ownership']['load_coverage_complete'] = result['owner_phases']['load']['coverage_complete']
     # Aged TCP snapshots must be assigned by their estimated collection time,
     # not by when the UART reader received them five seconds later.
     try:
@@ -115,8 +120,10 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('folder', type=Path)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--independent-network', action='store_true',
+                   help='Summarize NET telemetry even if optional RX-owner telemetry is missing or damaged')
     args = p.parse_args()
-    result = summarize(args.folder)
+    result = summarize(args.folder, independent_network=args.independent_network)
     args.output.write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8', newline='\n')
     print(json.dumps({k: v for k, v in result.items() if k in
                      ('requested_seconds', 'observed_seconds', 'ownership', 'owner_phases', 'idle')}, indent=2))
