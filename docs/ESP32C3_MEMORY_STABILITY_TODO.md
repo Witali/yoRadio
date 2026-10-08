@@ -66,6 +66,33 @@ The remaining network-memory gates are separate from compact PCM quality:
   additional contexts, and do not change certificate validation, full record
   capacity or AAC features. This is a placement experiment, not a claimed
   RAM saving; repeat the failing record-growth case and all codec/OTA gates.
+- [ ] Compare the RX-only reservation with an isolated allocator for all
+  mbedTLS allocations. The pinned SDK exposes `MBEDTLS_CUSTOM_MEM_ALLOC` and
+  `mbedtls_platform_set_calloc_free()`; install the allocator before the first
+  crypto/TLS allocation and retain it for every matching free. Measure peak
+  live bytes, largest requests, allocator overhead and retained crypto state
+  during handshake, certificate verification, playback, reconnect and OTA
+  before choosing a capacity. A measured sample peak is not a bound for every
+  certificate chain or concurrent connection. Keep a separate full-record RX
+  slot so small TLS allocations cannot fragment that required contiguous block.
+  Check full record capacity and normal certificate validation in every test.
+  This remains a proposal; no private allocator is enabled by this audit.
+  - The hook does **not** cover all memory needed by HTTPS: pinned
+    `esp_tls.c`/`esp_tls_mbedtls.c` also use libc allocations; the PSA AES/GCM
+    driver uses `malloc`, and the SHA driver uses `heap_caps_malloc` with
+    `MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL`. Audit the enabled driver paths and
+    their frees/alignment separately, as well as socket/network buffers.
+    Do not claim complete TLS reservation based only on mbedTLS hook counters.
+  - Do not implement transparent relocation of existing library allocations.
+    The SDK's `components/heap/tlsf/tlsf.c::tlsf_free` already merges adjacent
+    free blocks using `block_merge_prev/next`; it cannot join holes separated
+    by live allocations without moving them. Moving live C objects requires
+    updating every alias/interior pointer and respecting hardware ownership.
+    Handles or offsets could support compaction in a separately owned data
+    structure, but are not a drop-in replacement for TLS, Wi-Fi or DMA buffers.
+  - Reference: [mbedTLS allocator hooks and static-buffer allocation](https://mbed-tls.readthedocs.io/en/latest/kb/how-to/using-static-memory-instead-of-the-heap/).
+    Reserving RAM changes ownership and placement, not total RAM capacity;
+    also measure the remaining codec/network/WebUI headroom.
 - [ ] Resolve contiguous allocation with full TLS buffers. The static-TLS
   follow-up has 35,640–40,020 B free at three failed 32,744-byte SBR requests,
   but only 25,600–29,696 B in the largest block. Audit allocation order before
