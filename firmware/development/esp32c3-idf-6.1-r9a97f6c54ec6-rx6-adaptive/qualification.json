@@ -1,0 +1,95 @@
+{
+  "status": "NOT_QUALIFIED_FOR_PRODUCTION",
+  "report": "docs/ESP32C3_ADAPTIVE_INPUT_TLS_20261008.md",
+  "physical_runs": [
+    {
+      "name": "physical",
+      "cases": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "reason": null
+        },
+        {
+          "name": "tls-record:alternate",
+          "result": "FAIL",
+          "reason": "Insufficient actual playback samples"
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "reason": null
+        },
+        {
+          "name": "runtime",
+          "result": "FAIL",
+          "reason": "Runtime allocation/decoder/TLS failure"
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "reason": null
+        }
+      ],
+      "first_full_pcm_seconds": 0.8129999999946449,
+      "full_format_samples": 24,
+      "allocation_failure_seconds": 4.937999999994645,
+      "requested": 16749,
+      "free": 34400,
+      "largest": 15360,
+      "first_terminal_seconds": 5.51600000000326,
+      "reclaim_events": [],
+      "observed_seconds": 75.09400000001187,
+      "rssi_min": -82,
+      "rssi_max": -59,
+      "restoration": "PASS"
+    },
+    {
+      "name": "physical-counters",
+      "cases": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "reason": null
+        },
+        {
+          "name": "tls-record:alternate",
+          "result": "FAIL",
+          "reason": "Insufficient actual playback samples"
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "reason": null
+        },
+        {
+          "name": "runtime",
+          "result": "FAIL",
+          "reason": "Runtime allocation/decoder/TLS failure"
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "reason": null
+        }
+      ],
+      "first_full_pcm_seconds": 0.7809999999881256,
+      "full_format_samples": 24,
+      "allocation_failure_seconds": 4.952999999979511,
+      "requested": 16749,
+      "free": 33920,
+      "largest": 12288,
+      "first_terminal_seconds": 5.405999999988126,
+      "reclaim_events": [
+        {
+          "at": 144921.109,
+          "line": "TLS_INPUT released=4 retries=0 request=16749 resident=4 minimum=4 target=8 occupied=0 capacity=8240"
+        }
+      ],
+      "observed_seconds": 75.07799999997951,
+      "rssi_min": -83,
+      "rssi_max": -59,
+      "restoration": "PASS"
+    }
+  ]
+}

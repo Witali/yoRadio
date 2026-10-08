@@ -66,6 +66,15 @@ The remaining network-memory gates are separate from compact PCM quality:
   additional contexts, and do not change certificate validation, full record
   capacity or AAC features. This is a placement experiment, not a claimed
   RAM saving; repeat the failing record-growth case and all codec/OTA gates.
+- [ ] Qualify the optional [adaptive input queue](ESP32C3_ADAPTIVE_INPUT_TLS_20261008.md):
+  reclaim only idle packet slots above a configured minimum when mbedTLS needs
+  memory, preserving queued bytes and outstanding leases. It is implemented
+  behind an off-by-default build option; host ownership/concurrency and linked
+  allocator checks pass. Two physical full-record tests still fail at about
+  five seconds. The repeat confirms four idle slots (8,240 B) are released,
+  with 33,920 B free but only a 12,288-byte largest block for a 16,749-byte TLS
+  request. Preserve the feature as an optional experiment; physical TLS,
+  all-codec and continuity gates remain.
 - [ ] Compare the RX-only reservation with an isolated allocator for all
   mbedTLS allocations. The pinned SDK exposes `MBEDTLS_CUSTOM_MEM_ALLOC` and
   `mbedtls_platform_set_calloc_free()`; install the allocator before the first
