@@ -2,6 +2,14 @@
 
 ## Scheduling change
 
+**Default update (8 October):** at the user's request, fresh ESP32-C3 builds
+now enable `YORADIO_OUTPUT_TASK_FIRST`: output **8**, decoder **7**, stream
+**5**. The option also applies to ordinary staged PCM output and no longer
+requires direct DMA. It remains switchable for matched comparisons. This
+adopts the scheduling policy; it does not close the memory, runtime-fault or
+audio-continuity issues recorded below. Existing explicit `sdkconfig` values
+remain in effect until changed.
+
 **Subsequent acceptance policy (7 October):** the user made CPU load
 informational and audio continuity the priority. The historical 85% failures
 below are retained as measured; they no longer independently block adoption.
@@ -11,7 +19,8 @@ audible gaps; the instrumented Groove32 run still had 42 DMA queue overruns.
 
 `CONFIG_YORADIO_OUTPUT_TASK_FIRST=y` raises the direct-DMA output task from
 priority **6 to 8**, above the decoder (**7**). The stream task stays at **5**.
-The option currently defaults to off and requires `YORADIO_DIRECT_DMA_PCM`.
+At the time of this comparison the option defaulted to off and required
+`YORADIO_DIRECT_DMA_PCM`; the 8 October update above supersedes that default.
 
 The [preceding investigation](ESP32C3_PIPELINE_FLOW_20261006.md) found that
 long FLAC LPC32 decode calls could delay refilling completed DMA blocks even
@@ -166,8 +175,9 @@ failure is recorded. The candidate OTA transition while AAC plays also passes.
 Both full matrix runs complete on 7 October; the instrumented comparison was
 completed on 6 October.
 
-**Keep priority 8 in the development image, but leave the fresh-build Kconfig
-default off until the remaining qualification issues are resolved.** The
+**Historical recommendation (superseded by the 8 October default update):**
+keep priority 8 in the development image and leave the fresh-build Kconfig
+default off until the remaining qualification issues are resolved. The
 scheduling change improves both difficult FLAC recordings without adding RAM
 or changing codec output arithmetic. The MP3 heap gate and insufficient CPU
 headroom on Indie LPC32 still prevent a clean acceptance result. A short

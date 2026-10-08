@@ -218,6 +218,21 @@ Useful commands:
 .\build.ps1 -IdfArguments @('-p', 'COM7', 'monitor')
 ```
 
+### Audio task priorities
+
+By default, audio output runs at priority **8**, decoding at **7**, and stream
+input at **5**. `CONFIG_YORADIO_OUTPUT_TASK_FIRST=y` applies to both ordinary
+staged PCM output and the optional direct-DMA path. The output task waits when
+PCM or a free DMA block is unavailable, allowing decoding and input to proceed.
+This setting changes scheduling only; codec arithmetic, buffer sizes and
+timeouts are unchanged.
+
+For a comparison build, disable `YORADIO_OUTPUT_TASK_FIRST` in `menuconfig`
+(output returns to priority 6). Existing `sdkconfig` files retain an explicit
+disabled value; enable the option there or use a fresh build configuration.
+See the [priority measurements](../../docs/ESP32C3_OUTPUT_PRIORITY_20261006.md)
+for previous results and their limitations.
+
 ### Decoder selection
 
 The native build exposes one compile-time choice for every codec that has an
