@@ -129,6 +129,10 @@ class Server:
                 unpaced = unpaced_files and mode == 'file'
                 event = dict(mode=mode, fixture=name, sent=0, complete=False,
                              pacing_ratio=None if unpaced else 1.02)
+                if isinstance(self.connection, ssl.SSLSocket):
+                    # Record negotiated algorithms, never certificates/keys.
+                    event['tls_version'] = self.connection.version()
+                    event['tls_cipher'] = self.connection.cipher()[0]
                 if recovery:
                     event.update(recovery)
                 outer.events.append(event)
