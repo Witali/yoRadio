@@ -656,6 +656,11 @@ static void stream_task(void *argument) {
             .buffer_size = STREAM_CHUNK_SIZE,
             .buffer_size_tx = 4096,
             .crt_bundle_attach = esp_crt_bundle_attach,
+#ifdef CONFIG_YORADIO_TLS_RETAIN_RX_BUFFER
+            // Allocate the full RX record once after the handshake. TX and
+            // handshake allocations still use the SDK's dynamic strategy.
+            .tls_dyn_buf_strategy = HTTP_TLS_DYN_BUF_RX_STATIC,
+#endif
             .disable_auto_redirect = false,
             .max_redirection_count = MAX_HTTP_REDIRECTS,
             .keep_alive_enable = true,

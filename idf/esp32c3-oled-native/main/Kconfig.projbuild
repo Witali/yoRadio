@@ -1,5 +1,18 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_TLS_RETAIN_RX_BUFFER
+    bool "Retain the full TLS receive buffer after handshake (experimental)"
+    depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_DYNAMIC_BUFFER
+    default n
+    help
+        Use ESP-IDF's HTTP_TLS_DYN_BUF_RX_STATIC strategy for radio streams.
+        It allocates a full receive buffer after a successful TLS handshake
+        and retains it until connection teardown, avoiding record-by-record
+        heap fragmentation. Transmit buffers remain dynamic. Keep the full
+        TLS record size and certificate validation. Qualify SBR allocation,
+        mixed codecs, Stop/EOF, redirects, long playback and OTA before use
+        as a production default.
+
 config YORADIO_DIRECT_DMA_PCM
     bool "Generate processed PCM directly in I2S DMA (experimental)"
     depends on !YORADIO_QEMU

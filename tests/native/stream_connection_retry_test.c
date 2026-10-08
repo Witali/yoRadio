@@ -41,7 +41,9 @@ typedef struct {
     unsigned timeout_ms, buffer_size, buffer_size_tx, max_redirection_count;
     bool disable_auto_redirect, keep_alive_enable;
     void *crt_bundle_attach;
+    unsigned tls_dyn_buf_strategy;
 } esp_http_client_config_t;
+enum { HTTP_TLS_DYN_BUF_RX_STATIC=1 };
 #define esp_crt_bundle_attach NULL
 typedef struct { bool live; } fake_client_t;
 typedef fake_client_t *esp_http_client_handle_t;
@@ -121,6 +123,11 @@ static int xQueueReceive(void *queue, void *destination, TickType_t wait) {
 }
 static esp_http_client_handle_t esp_http_client_init(const esp_http_client_config_t *config) {
     assert(!client.live);
+#ifdef CONFIG_YORADIO_TLS_RETAIN_RX_BUFFER
+    assert(config->tls_dyn_buf_strategy==HTTP_TLS_DYN_BUF_RX_STATIC);
+#else
+    assert(config->tls_dyn_buf_strategy==0);
+#endif
     if (init_oom) return NULL;
     assert(attempt_count < attempt_limit);
     attempt_times[attempt_count++] = now_us;

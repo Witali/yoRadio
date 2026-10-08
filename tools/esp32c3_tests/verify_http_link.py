@@ -15,6 +15,9 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     args = p.parse_args()
     dynamic = 'CONFIG_MBEDTLS_DYNAMIC_BUFFER=y' in args.sdkconfig.read_text()
+    retained = 'CONFIG_YORADIO_TLS_RETAIN_RX_BUFFER=y' in args.sdkconfig.read_text()
+    if retained and not dynamic:
+        raise ValueError('Retained RX strategy requires the SDK dynamic adapter')
     pairs = [
         ('stream_task', 'stream_http_read'),
         ('esp_mbedtls_read', 'yoradio_mbedtls_ssl_read'),
@@ -25,6 +28,11 @@ def main():
             ('__wrap_mbedtls_ssl_read', 'esp_mbedtls_add_rx_buffer'),
             ('__wrap_mbedtls_ssl_read', 'mbedtls_ssl_read'),
             ('__wrap_mbedtls_ssl_read', 'esp_mbedtls_free_rx_buffer'),
+        ])
+    if retained:
+        pairs.extend([
+            ('esp_mbedtls_handshake', 'esp_mbedtls_dynamic_set_rx_buf_static'),
+            ('__wrap_mbedtls_ssl_free', 'esp_mbedtls_free_buf'),
         ])
     evidence = []
     for caller, target in pairs:
@@ -38,6 +46,7 @@ def main():
     passed = all(e['calls'] for e in evidence)
     result = dict(result='PASS' if passed else 'FAIL',
                   dynamic_buffers=dynamic,
+                  retained_rx=retained,
                   sdkconfig_sha256=hashlib.sha256(args.sdkconfig.read_bytes()).hexdigest(),
                   elf_sha256=hashlib.sha256(args.elf.read_bytes()).hexdigest(),
                   calls=evidence, scope='Linked RISC-V call paths only; no hardware or TLS cryptography qualification')
