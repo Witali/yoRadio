@@ -20,8 +20,12 @@ MAX_SAMPLE_GAP_SECONDS = 11
 
 def parse(row):
     marker = 'PERF STAGED_DMA:'
-    if marker not in row['line']:
+    if 'serial capture interrupted' in row['line']:
+        raise ValueError('Interrupted telemetry capture')
+    if 'PERF STAGED_DMA' not in row['line']:
         return None
+    if marker not in row['line']:
+        raise ValueError('Damaged staged-DMA marker')
     line = re.sub(r'\x1b\[[0-9;]*m', '', row['line'])
     tokens = line.split(marker, 1)[1].strip().split()
     if len(tokens) != len(FIELDS) or line.count('PERF ') != 1:

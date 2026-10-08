@@ -44,6 +44,18 @@ class StagedDma(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse(row(10, 0, writes=1, errors=2))
 
+    def test_capture_failure_outside_window_is_rejected(self):
+        rows = [row(10, 0), row(15, 0), row(20, 0),
+                dict(at=30, line='serial capture interrupted: incomplete final line')]
+        with self.assertRaisesRegex(ValueError, 'Interrupted telemetry'):
+            summarize(rows, 10, 20)
+
+    def test_damaged_marker_is_not_missing_data(self):
+        broken = row(10, 0)
+        broken['line'] = broken['line'].replace('STAGED_DMA:', 'STAGED_DMA')
+        with self.assertRaisesRegex(ValueError, 'Damaged staged-DMA marker'):
+            summarize([broken, row(15, 0), row(20, 0), row(25, 0)], 15, 25)
+
 
 if __name__ == '__main__':
     unittest.main()
