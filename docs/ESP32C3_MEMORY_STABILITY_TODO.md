@@ -55,6 +55,17 @@ The remaining network-memory gates are separate from compact PCM quality:
   run again fails a 16,749-byte request: 27,040 B free / 15,360 B largest.
   RX6 is still not a complete memory fix. A separate MP3 WebUI timeout also
   requires diagnosis; no decoder/allocation fault was recorded in that window.
+  The [static Wi-Fi RX4 experiment](ESP32C3_WIFI_STATIC_RX_20261008.md) frees
+  about 3.3 KB and passes 75 seconds, but its longer repeat fails at 30.515 s:
+  16,749 B requested / 27,248 B free / 15,872 B largest. Keep it optional.
+- [ ] Test a dedicated, early-placed TLS RX allocation block on the pinned
+  SDK, so unrelated allocations cannot split the next full-record buffer.
+  First audit every dynamic RX allocation and free path, including setup,
+  error cleanup, retained-RX conversion, context destruction and concurrent
+  TLS contexts. Derive capacity from SDK symbols, retain a heap fallback for
+  additional contexts, and do not change certificate validation, full record
+  capacity or AAC features. This is a placement experiment, not a claimed
+  RAM saving; repeat the failing record-growth case and all codec/OTA gates.
 - [ ] Resolve contiguous allocation with full TLS buffers. The static-TLS
   follow-up has 35,640–40,020 B free at three failed 32,744-byte SBR requests,
   but only 25,600–29,696 B in the largest block. Audit allocation order before

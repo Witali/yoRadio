@@ -190,8 +190,10 @@ checks; their earlier SDK evidence is not a new run on this revision.
 The new SDK is the active development target, but these short results do not
 justify promoting the experimental network settings or merging the upgrade.
 
-The next isolated memory experiment reduces only static Wi-Fi RX buffers and
-their block-ack window; see the [candidate and acceptance plan](ESP32C3_WIFI_STATIC_RX_20261008.md).
+The follow-up reducing static Wi-Fi RX buffers gains about 3.3 KB but still
+fails the full-record allocation in its longer repeat; see the
+[candidate results](ESP32C3_WIFI_STATIC_RX_20261008.md). The next experiment
+must control placement and ownership of the large TLS allocation.
 
 ## Evidence
 

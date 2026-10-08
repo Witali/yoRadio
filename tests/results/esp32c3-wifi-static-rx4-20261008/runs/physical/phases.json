@@ -1,0 +1,63 @@
+[
+  {
+    "name": "install",
+    "code": 0,
+    "seconds": 25.280999999988126,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-r9a97f6c54ec6-rx6-srx4\\app.bin",
+      "--output",
+      ".build\\c3-static-rx4-20261008\\physical\\install.json"
+    ]
+  },
+  {
+    "name": "tls-alternate",
+    "code": 0,
+    "seconds": 102.98399999999674,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/tls_records.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-r9a97f6c54ec6-rx6-srx4\\app.bin",
+      "--ca",
+      ".build\\c3-tls-records-20261007\\trust\\ca.pem",
+      "--cert",
+      ".build\\c3-tls-records-20261007\\trust\\server.pem",
+      "--key",
+      ".build\\c3-tls-records-20261007\\trust\\server.key",
+      "--mode",
+      "alternate",
+      "--seconds",
+      "75",
+      "--output",
+      ".build\\c3-static-rx4-20261008\\physical\\tls-alternate"
+    ]
+  },
+  {
+    "name": "restore",
+    "code": 0,
+    "seconds": 24.875,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware/development/esp32c3-idf-6.1-compact-icy-quiet/app.bin",
+      "--output",
+      ".build\\c3-static-rx4-20261008\\physical\\restore.json"
+    ]
+  }
+]
