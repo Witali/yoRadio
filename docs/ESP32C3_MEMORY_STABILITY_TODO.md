@@ -38,6 +38,18 @@ all other supported codecs. These are research items, not production defaults.
    the largest allocatable block for each required memory capability. Reserving
    TLS RAM must not cause smaller network or crypto allocations to fail.
 
+### Allocation order experiment
+
+Compare early placement of large, long-lived TLS/decoder buffers with the
+current allocation order before short-lived network/WebUI allocations begin.
+Correct allocations already occupy disjoint regions; this experiment targets
+free holes between live objects. Use stack-style allocation only for scratch
+whose releases are strictly last-in, first-out, or reset an entire session
+arena after all its users have released their pointers. TLS, packet queues and
+decoders have independent lifetimes and must not share an assumed global LIFO
+order. Check peak simultaneous use, late SBR activation, mixed-codec switches,
+reconnect and OTA; early reservation may reduce headroom for smaller requests.
+
 The [startup-minimum reserve experiment](ESP32C3_TLS_RESERVE_20261008.md) uses
 **17,058 bytes** for the TLS slot and releases **8,240 bytes** of input-packet
 storage. Its 44-case HTTP/HTTPS file matrix records **zero allocation failures**
