@@ -66,6 +66,15 @@ The remaining network-memory gates are separate from compact PCM quality:
   additional contexts, and do not change certificate validation, full record
   capacity or AAC features. This is a placement experiment, not a claimed
   RAM saving; repeat the failing record-growth case and all codec/OTA gates.
+  The [static-slot implementation](ESP32C3_TLS_RESERVE_20261008.md) and host/link
+  audits are complete behind an off-by-default option. Its late-reclamation
+  image passes all four paced record modes for 75 seconds each, but fails all
+  eight framing cases and 13/44 file cases through smaller allocation failures.
+  The startup-minimum follow-up funds the reserve before input packets arrive;
+  framing improves to 8/8 and files to 43/44, with zero captured allocation
+  failures. The remaining FLAC case has an unresolved nonfatal diagnostic dump;
+  a small-record WebUI timeout passes a timed repeat but remains unexplained.
+  Retain the separate results and keep production qualification open.
 - [ ] Qualify the optional [adaptive input queue](ESP32C3_ADAPTIVE_INPUT_TLS_20261008.md):
   reclaim only idle packet slots above a configured minimum when mbedTLS needs
   memory, preserving queued bytes and outstanding leases. It is implemented

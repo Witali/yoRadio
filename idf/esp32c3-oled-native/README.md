@@ -56,6 +56,12 @@ playback passes at full rate; consult the current SDK report for the separate
 load, sustained-playback and quiet-production outcomes. Dynamic TLS buffers
 and the RTC TCP pool remain separate experiments, not board defaults.
 
+The optional [minimum input / TLS reservation experiment](../../docs/ESP32C3_TLS_RESERVE_20261008.md)
+reclaims only idle compressed-input slots and can reserve one full-record TLS
+allocation in static DRAM. Both options are off by default. A contiguous TLS
+slot does not guarantee enough memory for networking or every codec; consult
+the report before enabling these overlays.
+
 The optional [IRAM placement profiles](../../docs/ESP32C3_IRAM_REDUCTION_20261001.md)
 compare a 3584-byte conservative capacity saving with a 23392-byte saving using
 Flash Auto Suspend on the tested XMC-D chip. These use supported SDK placement

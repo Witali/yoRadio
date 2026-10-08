@@ -1,0 +1,1101 @@
+{
+  "status": "NOT_QUALIFIED_FOR_PRODUCTION",
+  "report": "docs/ESP32C3_TLS_RESERVE_20261008.md",
+  "physical_runs": [
+    {
+      "name": "matrix/framing",
+      "cases": [
+        {
+          "name": "framing:length-notify",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 49,
+            "first_full_pcm_seconds": 0.5469999999913853
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "framing:length-raw",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 49,
+            "first_full_pcm_seconds": 0.5620000000053551
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "framing:length-short",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "expected_terminal": "stream read failed",
+            "observed_terminal": "stream read failed",
+            "full_format_samples": 50,
+            "first_full_pcm_seconds": 0.5620000000053551
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "framing:chunked-notify",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 49,
+            "first_full_pcm_seconds": 0.5629999999946449
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "framing:chunked-raw",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 49,
+            "first_full_pcm_seconds": 0.5629999999946449
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "framing:chunked-short",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "expected_terminal": "stream read failed",
+            "observed_terminal": "stream read failed",
+            "full_format_samples": 50,
+            "first_full_pcm_seconds": 0.5470000000204891
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "framing:close-notify",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 49,
+            "first_full_pcm_seconds": 0.5779999999795109
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "framing:close-raw",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "expected_terminal": "stream read failed",
+            "observed_terminal": "stream read failed",
+            "full_format_samples": 49,
+            "first_full_pcm_seconds": 0.5629999999946449
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "settings-preserved",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "exception_chain": null
+        }
+      ],
+      "allocation_failures": 0,
+      "first_allocation_failure": [],
+      "pool_events": [],
+      "input_events": []
+    },
+    {
+      "name": "matrix/records",
+      "cases": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133116,
+                "largest": 98304,
+                "tasks": 17
+              },
+              {
+                "heap": 133116,
+                "largest": 98304,
+                "tasks": 17
+              },
+              {
+                "heap": 133104,
+                "largest": 98304,
+                "tasks": 17
+              }
+            ]
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "tls-record:small",
+          "result": "FAIL",
+          "reason": "URLError",
+          "evidence": null,
+          "exception_chain": [
+            {
+              "type": "URLError"
+            },
+            {
+              "type": "TimeoutError"
+            }
+          ]
+        },
+        {
+          "name": "tls-record:large",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 378,
+            "rate": 44100,
+            "channels": 2,
+            "record_counts": {
+              "16408": 19
+            },
+            "first_large_at": 148378.609,
+            "mean_busy": 67.56666666666666,
+            "peak_busy": 69.0,
+            "minimum_heap": 26240.0,
+            "minimum_largest": 15360.0,
+            "audio_wall_ratio": 1.0020953602736797,
+            "first_full_pcm_seconds": 0.7030000000086147
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "tls-record:grow",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 378,
+            "rate": 44100,
+            "channels": 2,
+            "record_counts": {
+              "1048": 120,
+              "16408": 12
+            },
+            "first_large_at": 148485.046,
+            "mean_busy": 67.58666666666667,
+            "peak_busy": 70.0,
+            "minimum_heap": 17848.0,
+            "minimum_largest": 6656.0,
+            "audio_wall_ratio": 1.0017835485481914,
+            "first_full_pcm_seconds": 1.0789999999979045
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "tls-record:alternate",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 380,
+            "rate": 44100,
+            "channels": 2,
+            "record_counts": {
+              "1048": 18,
+              "16408": 18
+            },
+            "first_large_at": 148531.343,
+            "mean_busy": 67.27333333333334,
+            "peak_busy": 69.0,
+            "minimum_heap": 25736.0,
+            "minimum_largest": 16384.0,
+            "audio_wall_ratio": 1.0020824418770504,
+            "first_full_pcm_seconds": 0.875
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133088,
+                "largest": 98304,
+                "tasks": 17
+              },
+              {
+                "heap": 133088,
+                "largest": 98304,
+                "tasks": 17
+              },
+              {
+                "heap": 133088,
+                "largest": 98304,
+                "tasks": 17
+              }
+            ]
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "reason": null,
+          "evidence": null,
+          "exception_chain": null
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "exception_chain": null
+        }
+      ],
+      "allocation_failures": 0,
+      "first_allocation_failure": [],
+      "pool_events": [
+        {
+          "at": 148378.625,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=1 releases=0 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148383.703,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=2 releases=1 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148388.812,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=3 releases=3 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148393.906,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=4 releases=4 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148399.015,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=6 releases=5 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148404.156,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=7 releases=6 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148409.265,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=8 releases=8 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148414.359,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=9 releases=9 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148419.453,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=11 releases=10 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148424.593,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=12 releases=11 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148429.703,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=13 releases=13 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148434.796,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=14 releases=14 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148439.906,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=16 releases=15 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148445.015,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=17 releases=16 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148450.156,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=18 releases=18 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148455.156,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=19 releases=19 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148485.484,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=20 releases=19 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148490.593,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=21 releases=20 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148495.703,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=22 releases=21 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148500.843,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=23 releases=23 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148505.937,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=25 releases=24 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148511.046,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=26 releases=25 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148516.14,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=27 releases=26 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148521.234,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=29 releases=28 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148526.39,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=30 releases=29 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148531.859,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=32 releases=31 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148537.187,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=33 releases=32 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148542.562,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=34 releases=34 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148547.671,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=35 releases=35 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148552.765,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=37 releases=36 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148557.859,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=38 releases=37 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148563.234,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=39 releases=38 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148568.609,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=40 releases=40 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148574.015,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=42 releases=41 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148579.093,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=43 releases=42 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148584.468,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=44 releases=43 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148589.843,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=45 releases=44 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148595.187,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=46 releases=46 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        },
+        {
+          "at": 148600.562,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=48 releases=47 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148605.656,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=49 releases=48 busy_fallbacks=0 oversize=0 busy=1 used=16749"
+        },
+        {
+          "at": 148610.671,
+          "line": "TLS_RESERVE capacity=17058 minimum=16384 allocations=49 releases=49 busy_fallbacks=0 oversize=0 busy=0 used=0"
+        }
+      ],
+      "input_events": []
+    },
+    {
+      "name": "extended/formats",
+      "cases": [
+        {
+          "name": "http:mp3-320:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:mp3-320:mp3",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:flac-level8:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:flac-level8:flac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:vorbis-q10:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:vorbis-q10:vorbis",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:opus-510:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:opus-510:opus",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:aac-lc-320:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:aac-lc-320:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 12,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:lc-44100-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 16,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:lc-44100-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 16,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:lc-22050-mono:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 16,
+            "rate": 22050,
+            "channels": 1,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:lc-22050-mono:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 22050,
+            "channels": 1,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:lc-48000-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 16,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:lc-48000-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 16,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:he-44100-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 14,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:he-44100-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 14,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:he-48000-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:he-48000-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:hev2-44100-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "http:hev2-44100-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:mp3-320:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:mp3-320:mp3",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:flac-level8:auto",
+          "result": "FAIL",
+          "reason": "Runtime failure during file playback",
+          "evidence": null,
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ]
+        },
+        {
+          "name": "https:flac-level8:flac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:vorbis-q10:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:vorbis-q10:vorbis",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:opus-510:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:opus-510:opus",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:aac-lc-320:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:aac-lc-320:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 13,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:lc-44100-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 16,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:lc-44100-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 16,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:lc-22050-mono:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 14,
+            "rate": 22050,
+            "channels": 1,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:lc-22050-mono:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 22050,
+            "channels": 1,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:lc-48000-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:lc-48000-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 16,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:he-44100-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 14,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:he-44100-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 14,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:he-48000-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 16,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:he-48000-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 48000,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:hev2-44100-stereo:auto",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "https:hev2-44100-stereo:aac",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 15,
+            "rate": 44100,
+            "channels": 2,
+            "serial_capture_enabled": true
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "restore-board",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "left_stopped": true
+          },
+          "exception_chain": null
+        }
+      ],
+      "allocation_failures": 0,
+      "first_allocation_failure": [],
+      "pool_events": [],
+      "input_events": []
+    },
+    {
+      "name": "extended/small-repeat",
+      "result": "NOT_RUN"
+    },
+    {
+      "name": "extended/alternate-600",
+      "result": "NOT_RUN"
+    },
+    {
+      "name": "repeat/tls-small",
+      "cases": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133024,
+                "largest": 98304,
+                "tasks": 17
+              },
+              {
+                "heap": 133000,
+                "largest": 98304,
+                "tasks": 17
+              }
+            ]
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "tls-record:small",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": 379,
+            "rate": 44100,
+            "channels": 2,
+            "record_counts": {
+              "1048": 298
+            },
+            "first_large_at": null,
+            "mean_busy": 65.25333333333333,
+            "peak_busy": 70.3,
+            "minimum_heap": 26064.0,
+            "minimum_largest": 18432.0,
+            "audio_wall_ratio": 1.0019681108987706,
+            "first_full_pcm_seconds": 0.9690000000118744
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133032,
+                "largest": 98304,
+                "tasks": 17
+              },
+              {
+                "heap": 133032,
+                "largest": 98304,
+                "tasks": 17
+              },
+              {
+                "heap": 133032,
+                "largest": 98304,
+                "tasks": 17
+              }
+            ]
+          },
+          "exception_chain": null
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "reason": null,
+          "evidence": null,
+          "exception_chain": null
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "reason": null,
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "exception_chain": null
+        }
+      ],
+      "allocation_failures": 0,
+      "first_allocation_failure": [],
+      "pool_events": [],
+      "input_events": []
+    }
+  ],
+  "restoration": {
+    "matrix": "PASS",
+    "extended": "PASS",
+    "repeat": "PASS"
+  },
+  "limits": [
+    "Retain original small-record WebUI timeout as a failure; do not replace it with a repeat.",
+    "Separate physical memory/format gates from acoustic/DMA continuity and PCM identity.",
+    "Public stations, negative certificate cases, high-depth FLAC/LPC32 and extended reconnect/load/OTA qualification remain."
+  ]
+}

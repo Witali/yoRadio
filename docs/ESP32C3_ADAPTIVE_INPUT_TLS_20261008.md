@@ -4,6 +4,11 @@ This ESP-IDF 6.1 experiment lets mbedTLS reclaim **idle** compressed-audio
 packet slots above a configured minimum. It remains disabled by default.
 It does not compact the heap or guarantee a full-sized TLS allocation.
 
+The later [static TLS reserve experiment](ESP32C3_TLS_RESERVE_20261008.md)
+can be combined with this queue. In that combination only, input capacity is
+reduced at startup and remains at its minimum to fund the permanent reserve.
+The adaptive-only behavior and historical measurements below remain separate.
+
 ## Configuration and capacity
 
 Use `sdkconfig.adaptive-input.defaults` with the C3 native build, or set:
@@ -42,7 +47,7 @@ The ordinary configuration continues to use its existing ring and fill metric.
 - Never wait for the decoder from the TLS allocation callback. A completely
   occupied queue cannot help that allocation immediately. The original heap
   failure logs are not suppressed, including a failure recovered on retry.
-- Restore absent slots between connections, after the old HTTP/TLS client is
+- In adaptive-only mode, restore absent slots between connections, after the old HTTP/TLS client is
   closed. Do not regrow storage during playback and repeatedly compete with TLS.
 - The wrapper intercepts `esp_mbedtls_mem_calloc` in internal-memory mode.
   Its matching frees remain unchanged. It is not a general heap allocator and
