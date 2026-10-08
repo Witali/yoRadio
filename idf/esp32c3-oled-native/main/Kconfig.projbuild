@@ -14,6 +14,18 @@ config YORADIO_TLS_LARGE_BLOCK_RESERVE
         contexts, all codecs and OTA pass. With adaptive input, keep its queue
         at the configured minimum from startup to fund this permanent reserve.
 
+config YORADIO_TLS_RX_ONLY_RESERVE
+    bool "Use the static TLS reserve only for RX allocations (experimental)"
+    depends on YORADIO_TLS_LARGE_BLOCK_RESERVE
+    default n
+    help
+        Route the audited SDK RX allocation sites, including small records
+        and cached state, through the existing reserved slot. Other handshake,
+        TX and context allocations stay on the ordinary heap. A simultaneous
+        RX allocation falls back to the ordinary allocator. No additional large
+        buffer is reserved. Requires the audited pinned SDK source; keep off
+        until lifecycle, all record sizes, concurrent contexts and OTA pass.
+
 config YORADIO_ADAPTIVE_INPUT_BUFFER
     bool "Release idle compressed-input blocks for TLS (experimental)"
     depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC

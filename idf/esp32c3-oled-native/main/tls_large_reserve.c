@@ -11,7 +11,11 @@
 // Match the largest standard RX allocation in the pinned dynamic adapter,
 // including its post-handshake static-RX conversion. No record-size reduction.
 enum {
+#ifdef CONFIG_YORADIO_TLS_RX_ONLY_RESERVE
+    TLS_RESERVE_MIN_REQUEST = 1,
+#else
     TLS_RESERVE_MIN_REQUEST = MBEDTLS_SSL_IN_CONTENT_LEN,
+#endif
     TLS_RESERVE_CAPACITY = SSL_BUF_HEAD_OFFSET_SIZE + MBEDTLS_SSL_IN_BUFFER_LEN +
                           MBEDTLS_SSL_HEADER_LEN + MBEDTLS_SSL_PAYLOAD_OVERHEAD,
 };

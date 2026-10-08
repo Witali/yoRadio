@@ -51,7 +51,7 @@ static bool reclaim_one(adaptive_input_t *input, size_t requested) {
 void *__real_esp_mbedtls_mem_calloc(size_t count, size_t size);
 
 static void *allocate(size_t count, size_t size) {
-#ifdef CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE
+#if defined(CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE) && !defined(CONFIG_YORADIO_TLS_RX_ONLY_RESERVE)
     void *reserved = tls_large_reserve_calloc(count * size);
     if (reserved) return reserved;
 #endif
@@ -83,6 +83,18 @@ void *__wrap_esp_mbedtls_mem_calloc(size_t count, size_t size) {
     }
     return result;
 }
+
+#ifdef CONFIG_YORADIO_TLS_RX_ONLY_RESERVE
+void *yoradio_tls_rx_calloc(size_t count, size_t size) {
+    if (!count || !size || size > SIZE_MAX / count)
+        return __real_esp_mbedtls_mem_calloc(count, size);
+    // Only the four audited RX call sites use this entry point. Do not tag
+    // allocations by size or temporarily swap a process-wide allocator hook.
+    void *reserved = tls_large_reserve_calloc(count * size);
+    if (reserved) return reserved;
+    return __wrap_esp_mbedtls_mem_calloc(count, size);
+}
+#endif
 
 void tls_input_reserve_poll(void) {
 #ifdef CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE

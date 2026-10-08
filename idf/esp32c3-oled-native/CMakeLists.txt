@@ -15,6 +15,37 @@ set(EXTRA_COMPONENT_DIRS
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yoradio_esp32c3_oled_native)
 
+if(CONFIG_YORADIO_TLS_RX_ONLY_RESERVE)
+    idf_component_get_property(yoradio_tls_dir mbedtls COMPONENT_DIR)
+    idf_build_get_property(yoradio_tls_python PYTHON)
+    set(yoradio_tls_original "${yoradio_tls_dir}/port/dynamic/esp_mbedtls_dynamic_impl.c")
+    set(yoradio_tls_generator "${CMAKE_CURRENT_LIST_DIR}/../../tools/patch_tls_rx_reserve.py")
+    set(yoradio_tls_rx_fixed "${CMAKE_BINARY_DIR}/yoradio_mbedtls/esp_mbedtls_dynamic_impl.c")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+        "${yoradio_tls_original}" "${yoradio_tls_generator}")
+    execute_process(COMMAND "${yoradio_tls_python}" "${yoradio_tls_generator}"
+        --input "${yoradio_tls_original}" --output "${yoradio_tls_rx_fixed}"
+        RESULT_VARIABLE yoradio_tls_patch_result)
+    if(NOT yoradio_tls_patch_result EQUAL 0)
+        message(FATAL_ERROR "Cannot apply the audited TLS RX allocation routing")
+    endif()
+    get_target_property(yoradio_tls_sources mbedtls SOURCES)
+    set(yoradio_tls_replaced 0)
+    foreach(yoradio_source IN LISTS yoradio_tls_sources)
+        if(yoradio_source MATCHES "(^|/)port/dynamic/esp_mbedtls_dynamic_impl\\.c$")
+            list(REMOVE_ITEM yoradio_tls_sources "${yoradio_source}")
+            math(EXPR yoradio_tls_replaced "${yoradio_tls_replaced}+1")
+        endif()
+    endforeach()
+    if(NOT yoradio_tls_replaced EQUAL 1)
+        message(FATAL_ERROR "Expected exactly one dynamic TLS source to replace")
+    endif()
+    list(APPEND yoradio_tls_sources "${yoradio_tls_rx_fixed}")
+    set_property(TARGET mbedtls PROPERTY SOURCES "${yoradio_tls_sources}")
+    # The generated source no longer sits beside this private SDK header.
+    target_include_directories(mbedtls PRIVATE "${yoradio_tls_dir}/port/dynamic")
+endif()
+
 # Keep the audited TIME_WAIT ownership fix local to this application. Never
 # patch a shared IDF checkout, and fail configuration if its TCP source changes.
 idf_component_get_property(yoradio_lwip_lib lwip COMPONENT_LIB)
