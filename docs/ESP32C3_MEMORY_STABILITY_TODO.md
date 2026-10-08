@@ -10,6 +10,12 @@ are not implemented savings and do not yet resolve the SBR allocation deficit.
 
 ## Further memory research priorities
 
+The [RX-only implementation and extended control tests](ESP32C3_TLS_RX_RESERVE_20261008.md)
+record the optional implementation, host/link checks and remaining physical
+gates. The preceding reserve image still fails the ten-minute AAC heap-trend
+check; extended FLAC testing confirms task-watchdog events. Neither issue is
+closed by the allocator implementation or the new audio-priority default.
+
 The next experiments should control allocation ownership and lifetime while
 preserving full AAC/SBR/PS, original sample rates, the 3-LSB PCM allowance and
 all other supported codecs. These are research items, not production defaults.

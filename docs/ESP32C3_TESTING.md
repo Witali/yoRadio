@@ -754,6 +754,14 @@ Do not create a fake internal-state test or mark this planned optimization done.
 
 ## Results and limitations
 
+For sustained HTTPS playback, add `--sustained-protocol https` and a trusted
+`--https-origin https://PC_LAN_IP:PORT` to `run.py --suite load` or `--suite soak`.
+The default remains HTTP. Supply the laboratory certificate/key to the test
+server and a matching trusted firmware image. Runtime fault checks also apply
+when CPU profiling is disabled; serial capture is needed to observe UART faults.
+See the [extended reserve tests](ESP32C3_TLS_RX_RESERVE_20261008.md), including
+the original heap-trend, watchdog and host-transport failures.
+
 The [pipeline wait investigation](ESP32C3_PIPELINE_FLOW_20261006.md) measures
 empty compressed-input queues, full PCM queues, DMA waits and completion
 overruns on the physical C3. It includes a deliberate input-starvation control,

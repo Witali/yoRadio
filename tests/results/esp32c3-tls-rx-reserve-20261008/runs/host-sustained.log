@@ -1,0 +1,335 @@
+EEEEEEE
+======================================================================
+ERROR: test_default_http_and_explicit_https_origins (__main__.SustainedRuntimeTests.test_default_http_and_explicit_https_origins)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 637, in _rmtree_unsafe
+    os.rmdir(path)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmp882217dy'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 48, in test_default_http_and_explicit_https_origins
+    board = self.exercise(['PERF PCM: audio 5000 ms'])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 24, in exercise
+    with tempfile.TemporaryDirectory() as output:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 639, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmp882217dy'
+
+======================================================================
+ERROR: test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate (__main__.SustainedRuntimeTests.test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate) (line='PANIC registers: MCAUSE=0xdeadc0de')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 30, in exercise
+    result = suite.sustained(60, 'fixture', origin=origin)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\run.py", line 288, in sustained
+    check_file_runtime(self.capture.since(runtime_started))
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 167, in check_file_runtime
+    require(not any(re.search(faults, r['line']) for r in records),
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 42, in require
+    raise Failure(message)
+common.Failure: Runtime failure during file playback
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 637, in _rmtree_unsafe
+    os.rmdir(path)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpthnapltt'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 45, in test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate
+    self.exercise([line])
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 24, in exercise
+    with tempfile.TemporaryDirectory() as output:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 639, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpthnapltt'
+
+======================================================================
+ERROR: test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate (__main__.SustainedRuntimeTests.test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate) (line='Runtime watchdog timeout: task_watchdog=true events=1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 30, in exercise
+    result = suite.sustained(60, 'fixture', origin=origin)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\run.py", line 288, in sustained
+    check_file_runtime(self.capture.since(runtime_started))
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 167, in check_file_runtime
+    require(not any(re.search(faults, r['line']) for r in records),
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 42, in require
+    raise Failure(message)
+common.Failure: Runtime failure during file playback
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 637, in _rmtree_unsafe
+    os.rmdir(path)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpkzvxs1iv'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 45, in test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate
+    self.exercise([line])
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 24, in exercise
+    with tempfile.TemporaryDirectory() as output:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 639, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpkzvxs1iv'
+
+======================================================================
+ERROR: test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate (__main__.SustainedRuntimeTests.test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate) (line='PERF watchdog: task_timeouts=1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 30, in exercise
+    result = suite.sustained(60, 'fixture', origin=origin)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\run.py", line 288, in sustained
+    check_file_runtime(self.capture.since(runtime_started))
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 167, in check_file_runtime
+    require(not any(re.search(faults, r['line']) for r in records),
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 42, in require
+    raise Failure(message)
+common.Failure: Runtime failure during file playback
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 637, in _rmtree_unsafe
+    os.rmdir(path)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpiq3nbjvr'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 45, in test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate
+    self.exercise([line])
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 24, in exercise
+    with tempfile.TemporaryDirectory() as output:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 639, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpiq3nbjvr'
+
+======================================================================
+ERROR: test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate (__main__.SustainedRuntimeTests.test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate) (line='E (12) audio: allocation failed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 30, in exercise
+    result = suite.sustained(60, 'fixture', origin=origin)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\run.py", line 288, in sustained
+    check_file_runtime(self.capture.since(runtime_started))
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 167, in check_file_runtime
+    require(not any(re.search(faults, r['line']) for r in records),
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 42, in require
+    raise Failure(message)
+common.Failure: Runtime failure during file playback
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 637, in _rmtree_unsafe
+    os.rmdir(path)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpporhphzp'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 45, in test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate
+    self.exercise([line])
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 24, in exercise
+    with tempfile.TemporaryDirectory() as output:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 639, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpporhphzp'
+
+======================================================================
+ERROR: test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate (__main__.SustainedRuntimeTests.test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate) (line='rst:0x1 (POWERON_RESET)')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 30, in exercise
+    result = suite.sustained(60, 'fixture', origin=origin)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\run.py", line 288, in sustained
+    check_file_runtime(self.capture.since(runtime_started))
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 167, in check_file_runtime
+    require(not any(re.search(faults, r['line']) for r in records),
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 42, in require
+    raise Failure(message)
+common.Failure: Runtime failure during file playback
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 637, in _rmtree_unsafe
+    os.rmdir(path)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmp14oobsu1'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 45, in test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate
+    self.exercise([line])
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 24, in exercise
+    with tempfile.TemporaryDirectory() as output:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 639, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmp14oobsu1'
+
+======================================================================
+ERROR: test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate (__main__.SustainedRuntimeTests.test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate) (line='serial capture interrupted')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 30, in exercise
+    result = suite.sustained(60, 'fixture', origin=origin)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\run.py", line 288, in sustained
+    check_file_runtime(self.capture.since(runtime_started))
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 167, in check_file_runtime
+    require(not any(re.search(faults, r['line']) for r in records),
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 42, in require
+    raise Failure(message)
+common.Failure: Runtime failure during file playback
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 637, in _rmtree_unsafe
+    os.rmdir(path)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpluanelex'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 45, in test_runtime_faults_fail_even_with_valid_playback_and_without_cpu_gate
+    self.exercise([line])
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-esp32c3-sustained-runtime.py", line 24, in exercise
+    with tempfile.TemporaryDirectory() as output:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 639, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{2e7da14f-7fd6-42aa-8bbe-e611ce3c2125}\\AC\\Temp\\tmpluanelex'
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.023s
+
+FAILED (errors=7)
