@@ -14,11 +14,47 @@ from common import filter_tls_line
 from serial_lines import serial_lines
 
 
+WATCHDOG_TASKS = frozenset(('IDLE0', 'IDLE1', 'main', 'radio_stream',
+                          'audio_decode', 'audio_output', 'wifi', 'tcpip',
+                          'tiT', 'tcpip_task', 'httpd', 'websocket_statu',
+                          'websocket_status', 'cpu_profile', 'esp_timer',
+                          'sys_evt', 'Tmr Svc', 'ipc0', 'ipc1'))
+
+
+def watchdog_line(line):
+    """Keep SDK watchdog context even if its first line was lost on UART.
+
+    User watchdog entries can contain arbitrary names. Only known firmware
+    task names are retained; all others get a fixed redacted identifier.
+    Context alone still fails runtime gates, just like the timeout caption.
+    """
+    clean = re.sub(r'\x1b\[[0-9;]*m', '', line)
+    match = re.search(r'\btask_wdt: (.*)$', clean)
+    if not match:
+        return None
+    body = match.group(1).strip()
+    prefix = 'Runtime watchdog timeout: task_watchdog=true'
+    if body.startswith('Task watchdog got triggered.'):
+        return prefix
+    if body == 'Tasks currently running:':
+        return prefix + ' phase=current-tasks'
+    entry = re.fullmatch(r'- (.+) \(CPU (0|1|0/1)\)', body)
+    current = re.fullmatch(r'CPU (0|1): (.+)', body)
+    if entry or current:
+        name, cpu = entry.groups() if entry else current.groups()[::-1]
+        task = name.replace(' ', '_') if name in WATCHDOG_TASKS else 'redacted'
+        phase = 'starved' if entry else 'running'
+        return f'{prefix} phase={phase} cpu={cpu} task={task}'
+    backtrace = re.fullmatch(r'Print CPU (0|1)(?: \(current core\))? backtrace', body)
+    if backtrace:
+        return f'{prefix} phase=backtrace cpu={backtrace.group(1)}'
+    return None
+
+
 def filter_line(line):
-    if re.search(r'\btask_wdt: Task watchdog got triggered\.', line):
-        # A nonfatal watchdog dump uses a synthetic MCAUSE. Retain the actual
-        # timeout reason even when the subsequent register lines are lost.
-        return 'Runtime watchdog timeout: task_watchdog=true'
+    watchdog = watchdog_line(line)
+    if watchdog:
+        return watchdog
     tls = filter_tls_line(line)
     if tls:
         return tls

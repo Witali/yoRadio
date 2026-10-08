@@ -8,9 +8,39 @@ sys.path.insert(0, str(ROOT/'tools/esp32c3_tests'))
 from diagnostic import filter_line
 from ota_diagnostic import serial_health
 from common import TLS_CERTIFICATE_REJECTED
+from common import check_file_runtime, Failure
 
 
 class PanicFilter(unittest.TestCase):
+    def test_watchdog_context_survives_lost_caption_and_fails_runtime(self):
+        cases = {
+            ' - IDLE0 (CPU 0)': 'phase=starved cpu=0 task=IDLE0',
+            ' - radio_stream (CPU 0/1)': 'phase=starved cpu=0/1 task=radio_stream',
+            'CPU 0: tcpip': 'phase=running cpu=0 task=tcpip',
+            'CPU 1: audio_decode': 'phase=running cpu=1 task=audio_decode',
+            'Tasks currently running:': 'phase=current-tasks',
+            'Print CPU 0 (current core) backtrace': 'phase=backtrace cpu=0',
+        }
+        for source, expected in cases.items():
+            with self.subTest(source=source):
+                result = filter_line('\x1b[0;31mE (123) task_wdt: '+source+'\x1b[0m')
+                self.assertEqual(result, 'Runtime watchdog timeout: task_watchdog=true '+expected)
+                rows = [dict(at=1, line=result)]
+                self.assertEqual(serial_health(rows)['result'], 'FAIL')
+                with self.assertRaises(Failure):
+                    check_file_runtime(rows)
+
+    def test_watchdog_unknown_names_are_redacted(self):
+        for source, phase in [(' - private-secret (CPU 0)', 'starved'),
+                              ('CPU 0: private-secret', 'running'),
+                              ('CPU 0: tcpip private-secret', 'running')]:
+            with self.subTest(source=source):
+                result = filter_line('E (123) task_wdt: '+source)
+                self.assertEqual(result, 'Runtime watchdog timeout: task_watchdog=true '
+                                 'phase='+phase+' cpu=0 task=redacted')
+        self.assertIsNone(filter_line('E (123) unrelated: CPU 0: tcpip'))
+        self.assertIsNone(filter_line('E (123) task_wdt: Tasks currently running: private-secret'))
+
     def test_tls_reserve_retains_only_numeric_counters(self):
         counters = ('TLS_RESERVE capacity=17058 minimum=16384 allocations=10 '
                     'releases=9 busy_fallbacks=0 oversize=0 busy=1 used=16749')
