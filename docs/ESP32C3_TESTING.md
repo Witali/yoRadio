@@ -762,6 +762,16 @@ when CPU profiling is disabled; serial capture is needed to observe UART faults.
 See the [extended reserve tests](ESP32C3_TLS_RX_RESERVE_20261008.md), including
 the original heap-trend, watchdog and host-transport failures.
 
+For host-side HTTP failures, prefix the runner with
+`python tools/esp32c3_tests/trace_transport.py --runner diagnostic -- run`,
+followed by the same `run.py` arguments. For TLS wire tests, use
+`--runner tls_records --` or `--runner tls_framing --` and their normal arguments.
+The wrapper records connect/request/header/body timings, local TCP ports and
+exception types/codes for the board's native HTTP endpoint only. It preserves
+timeouts and exceptions, adds no retries or connection reuse, and saves no
+URLs, headers or payloads. JSONL traces and a summary appear beside the output
+directory. Run `tests/test-esp32c3-transport-trace.py` for behavior/privacy checks.
+
 The [pipeline wait investigation](ESP32C3_PIPELINE_FLOW_20261006.md) measures
 empty compressed-input queues, full PCM queues, DMA waits and completion
 overruns on the physical C3. It includes a deliberate input-starvation control,
