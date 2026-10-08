@@ -15,6 +15,40 @@ set(EXTRA_COMPONENT_DIRS
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yoradio_esp32c3_oled_native)
 
+if(CONFIG_YORADIO_GCM_BYTE_GHASH)
+    idf_component_get_property(yoradio_gcm_dir mbedtls COMPONENT_DIR)
+    idf_build_get_property(yoradio_gcm_python PYTHON)
+    set(yoradio_gcm_original "${yoradio_gcm_dir}/port/aes/esp_aes_gcm.c")
+    set(yoradio_gcm_header "${yoradio_gcm_dir}/port/include/aes/esp_aes_gcm.h")
+    set(yoradio_gcm_generator "${CMAKE_CURRENT_LIST_DIR}/../../tools/patch_gcm_byte_ghash.py")
+    set(yoradio_gcm_fixed "${CMAKE_BINARY_DIR}/yoradio_gcm/esp_aes_gcm.c")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+        "${yoradio_gcm_original}" "${yoradio_gcm_header}" "${yoradio_gcm_generator}")
+    execute_process(COMMAND "${yoradio_gcm_python}" "${yoradio_gcm_generator}"
+        --input "${yoradio_gcm_original}" --header "${yoradio_gcm_header}"
+        --output "${yoradio_gcm_fixed}" RESULT_VARIABLE yoradio_gcm_patch_result)
+    if(NOT yoradio_gcm_patch_result EQUAL 0)
+        message(FATAL_ERROR "Cannot apply the audited GHASH experiment")
+    endif()
+    get_target_property(yoradio_gcm_sources tfpsacrypto SOURCES)
+    set(yoradio_gcm_replaced 0)
+    foreach(yoradio_source IN LISTS yoradio_gcm_sources)
+        if(yoradio_source MATCHES "(^|/)port/aes/esp_aes_gcm\\.c$")
+            list(REMOVE_ITEM yoradio_gcm_sources "${yoradio_source}")
+            math(EXPR yoradio_gcm_replaced "${yoradio_gcm_replaced}+1")
+        endif()
+    endforeach()
+    if(NOT yoradio_gcm_replaced EQUAL 1)
+        message(FATAL_ERROR "Expected exactly one AES-GCM source to replace")
+    endif()
+    list(APPEND yoradio_gcm_sources "${yoradio_gcm_fixed}")
+    set_property(TARGET tfpsacrypto PROPERTY SOURCES "${yoradio_gcm_sources}")
+    target_include_directories(tfpsacrypto PRIVATE "${CMAKE_CURRENT_LIST_DIR}/main"
+        "${CMAKE_BINARY_DIR}/yoradio_gcm")
+    set_property(SOURCE "${yoradio_gcm_fixed}" TARGET_DIRECTORY tfpsacrypto
+        APPEND PROPERTY COMPILE_OPTIONS "-fstack-usage")
+endif()
+
 if(CONFIG_YORADIO_TLS_RX_ONLY_RESERVE)
     idf_component_get_property(yoradio_tls_dir mbedtls COMPONENT_DIR)
     idf_build_get_property(yoradio_tls_python PYTHON)

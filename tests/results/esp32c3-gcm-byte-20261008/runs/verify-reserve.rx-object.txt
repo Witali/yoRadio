@@ -1,0 +1,1548 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof-ghash8\esp-idf\mbedtls\mbedtls\library\CMakeFiles\mbedtls.dir\__\__\__\__\yoradio_mbedtls\esp_mbedtls_dynamic_impl.c.obj:     file format elf32-littleriscv
+
+
+Disassembly of section .text.init_tx_buffer:
+
+00000000 <init_tx_buffer>:
+   0:	0b852703          	lw	a4,184(a0)
+
+00000004 <.LBE55>:
+   4:	ed95                	bnez	a1,40 <.L2>
+			4: R_RISCV_RVC_BRANCH	.L2
+
+00000006 <.LBB56>:
+   6:	0a452683          	lw	a3,164(a0)
+   a:	40d707b3          	sub	a5,a4,a3
+
+0000000e <.LM7>:
+   e:	00d71363          	bne	a4,a3,14 <.L3>
+			e: R_RISCV_BRANCH	.L3
+
+00000012 <.LM9>:
+  12:	47b5                	li	a5,13
+
+00000014 <.L3>:
+  14:	4801                	li	a6,0
+  16:	4601                	li	a2,0
+  18:	4681                	li	a3,0
+
+0000001a <.L4>:
+  1a:	0ab52223          	sw	a1,164(a0)
+
+0000001e <.LM17>:
+  1e:	0ab52423          	sw	a1,168(a0)
+
+00000022 <.LM18>:
+  22:	0b052623          	sw	a6,172(a0)
+
+00000026 <.LM19>:
+  26:	0ac52823          	sw	a2,176(a0)
+
+0000002a <.LM20>:
+  2a:	0ad52a23          	sw	a3,180(a0)
+
+0000002e <.LM21>:
+  2e:	0af52c23          	sw	a5,184(a0)
+
+00000032 <.LBB58>:
+  32:	0a052e23          	sw	zero,188(a0)
+
+00000036 <.LM27>:
+  36:	0c052023          	sw	zero,192(a0)
+
+0000003a <.LM29>:
+  3a:	0c052223          	sw	zero,196(a0)
+
+0000003e <.LM31>:
+  3e:	8082                	ret
+
+00000040 <.L2>:
+  40:	00858813          	addi	a6,a1,8
+
+00000044 <.LM37>:
+  44:	00b58613          	addi	a2,a1,11
+
+00000048 <.LM39>:
+  48:	00d58693          	addi	a3,a1,13
+
+0000004c <.LM41>:
+  4c:	00e587b3          	add	a5,a1,a4
+
+00000050 <.LM43>:
+  50:	b7e9                	j	1a <.L4>
+			50: R_RISCV_RVC_JUMP	.L4
+
+Disassembly of section .text.init_rx_buffer:
+
+00000000 <init_rx_buffer>:
+   0:	5d38                	lw	a4,120(a0)
+
+00000002 <.LBE60>:
+   2:	e985                	bnez	a1,32 <.L7>
+			2: R_RISCV_RVC_BRANCH	.L7
+
+00000004 <.LBB61>:
+   4:	5174                	lw	a3,100(a0)
+   6:	40d707b3          	sub	a5,a4,a3
+
+0000000a <.LM52>:
+   a:	00d71363          	bne	a4,a3,10 <.L8>
+			a: R_RISCV_BRANCH	.L8
+
+0000000e <.LM54>:
+   e:	47b5                	li	a5,13
+
+00000010 <.L8>:
+  10:	4801                	li	a6,0
+  12:	4601                	li	a2,0
+  14:	4681                	li	a3,0
+
+00000016 <.L9>:
+  16:	d16c                	sw	a1,100(a0)
+
+00000018 <.LM62>:
+  18:	d52c                	sw	a1,104(a0)
+
+0000001a <.LM63>:
+  1a:	07052623          	sw	a6,108(a0)
+
+0000001e <.LM64>:
+  1e:	d930                	sw	a2,112(a0)
+
+00000020 <.LM65>:
+  20:	d974                	sw	a3,116(a0)
+
+00000022 <.LM66>:
+  22:	dd3c                	sw	a5,120(a0)
+
+00000024 <.LBB63>:
+  24:	08052023          	sw	zero,128(a0)
+
+00000028 <.LM72>:
+  28:	08052223          	sw	zero,132(a0)
+
+0000002c <.LM74>:
+  2c:	08052423          	sw	zero,136(a0)
+
+00000030 <.LM76>:
+  30:	8082                	ret
+
+00000032 <.L7>:
+  32:	00858813          	addi	a6,a1,8
+
+00000036 <.LM82>:
+  36:	00b58613          	addi	a2,a1,11
+
+0000003a <.LM84>:
+  3a:	00d58693          	addi	a3,a1,13
+
+0000003e <.LM86>:
+  3e:	00e587b3          	add	a5,a1,a4
+
+00000042 <.LM88>:
+  42:	bfd1                	j	16 <.L9>
+			42: R_RISCV_RVC_JUMP	.L9
+
+Disassembly of section .text.esp_mbedtls_free_buf:
+
+00000000 <esp_mbedtls_free_buf>:
+   0:	1561                	addi	a0,a0,-8
+
+00000002 <.LM103>:
+   2:	00000317          	auipc	t1,0x0
+			2: R_RISCV_CALL_PLT	mbedtls_free
+			2: R_RISCV_RELAX	*ABS*
+   6:	00030067          	jr	t1 # 2 <.LM103>
+
+Disassembly of section .text.esp_mbedtls_alloc_tx_buf:
+
+00000000 <esp_mbedtls_alloc_tx_buf>:
+   0:	1141                	addi	sp,sp,-16
+   2:	c422                	sw	s0,8(sp)
+   4:	842a                	mv	s0,a0
+
+00000006 <.LM109>:
+   6:	0a452503          	lw	a0,164(a0)
+
+0000000a <.LM110>:
+   a:	c226                	sw	s1,4(sp)
+   c:	c606                	sw	ra,12(sp)
+   e:	c04a                	sw	s2,0(sp)
+
+00000010 <.LM111>:
+  10:	84ae                	mv	s1,a1
+
+00000012 <.LM112>:
+  12:	c519                	beqz	a0,20 <.L13>
+			12: R_RISCV_RVC_BRANCH	.L13
+
+00000014 <.LM113>:
+  14:	00000097          	auipc	ra,0x0
+			14: R_RISCV_CALL_PLT	esp_mbedtls_free_buf
+			14: R_RISCV_RELAX	*ABS*
+  18:	000080e7          	jalr	ra # 14 <.LM113>
+
+0000001c <.LM114>:
+  1c:	0a042223          	sw	zero,164(s0)
+
+00000020 <.L13>:
+  20:	00848593          	addi	a1,s1,8
+  24:	4505                	li	a0,1
+  26:	00000097          	auipc	ra,0x0
+			26: R_RISCV_CALL_PLT	mbedtls_calloc
+			26: R_RISCV_RELAX	*ABS*
+  2a:	000080e7          	jalr	ra # 26 <.L13+0x6>
+
+0000002e <.LM118>:
+  2e:	ed15                	bnez	a0,6a <.L14>
+			2e: R_RISCV_RVC_BRANCH	.L14
+
+00000030 <.LM120>:
+  30:	00000097          	auipc	ra,0x0
+			30: R_RISCV_CALL_PLT	esp_log_timestamp
+			30: R_RISCV_RELAX	*ABS*
+  34:	000080e7          	jalr	ra # 30 <.LM120>
+
+00000038 <.LM126>:
+  38:	00000737          	lui	a4,0x0
+			38: R_RISCV_HI20	.LC0
+			38: R_RISCV_RELAX	*ABS*
+  3c:	00070713          	mv	a4,a4
+			3c: R_RISCV_LO12_I	.LC0
+			3c: R_RISCV_RELAX	*ABS*
+  40:	00000637          	lui	a2,0x0
+			40: R_RISCV_HI20	.LC1
+			40: R_RISCV_RELAX	*ABS*
+
+00000044 <.LM127>:
+  44:	86aa                	mv	a3,a0
+
+00000046 <.LM128>:
+  46:	00848793          	addi	a5,s1,8
+  4a:	4505                	li	a0,1
+  4c:	00060613          	mv	a2,a2
+			4c: R_RISCV_LO12_I	.LC1
+			4c: R_RISCV_RELAX	*ABS*
+  50:	85ba                	mv	a1,a4
+  52:	00000097          	auipc	ra,0x0
+			52: R_RISCV_CALL_PLT	esp_log
+			52: R_RISCV_RELAX	*ABS*
+  56:	000080e7          	jalr	ra # 52 <.LM128+0xc>
+
+0000005a <.LM129>:
+  5a:	f7300513          	li	a0,-141
+
+0000005e <.L12>:
+  5e:	40b2                	lw	ra,12(sp)
+  60:	4422                	lw	s0,8(sp)
+
+00000062 <.LM135>:
+  62:	4492                	lw	s1,4(sp)
+
+00000064 <.LM136>:
+  64:	4902                	lw	s2,0(sp)
+  66:	0141                	addi	sp,sp,16
+  68:	8082                	ret
+
+0000006a <.L14>:
+  6a:	00052023          	sw	zero,0(a0)
+
+0000006e <.LM148>:
+  6e:	c144                	sw	s1,4(a0)
+
+00000070 <.LBE67>:
+  70:	47b5                	li	a5,13
+
+00000072 <.LM153>:
+  72:	00850593          	addi	a1,a0,8
+
+00000076 <.LM154>:
+  76:	0af42c23          	sw	a5,184(s0)
+
+0000007a <.LM155>:
+  7a:	8522                	mv	a0,s0
+
+0000007c <.LM156>:
+  7c:	00000097          	auipc	ra,0x0
+			7c: R_RISCV_CALL_PLT	init_tx_buffer
+			7c: R_RISCV_RELAX	*ABS*
+  80:	000080e7          	jalr	ra # 7c <.LM156>
+
+00000084 <.LM157>:
+  84:	4501                	li	a0,0
+  86:	bfe1                	j	5e <.L12>
+			86: R_RISCV_RVC_JUMP	.L12
+
+Disassembly of section .text.esp_mbedtls_setup_tx_buffer:
+
+00000000 <esp_mbedtls_setup_tx_buffer>:
+   0:	1141                	addi	sp,sp,-16
+
+00000002 <.LBB70>:
+   2:	02500593          	li	a1,37
+
+00000006 <.LBE70>:
+   6:	c422                	sw	s0,8(sp)
+   8:	c606                	sw	ra,12(sp)
+
+0000000a <.LM172>:
+   a:	842a                	mv	s0,a0
+
+0000000c <.LBB71>:
+   c:	00000097          	auipc	ra,0x0
+			c: R_RISCV_CALL_PLT	esp_mbedtls_alloc_tx_buf
+			c: R_RISCV_RELAX	*ABS*
+  10:	000080e7          	jalr	ra # c <.LBB71>
+
+00000014 <.LM174>:
+  14:	e511                	bnez	a0,20 <.L20>
+			14: R_RISCV_RVC_BRANCH	.L20
+
+00000016 <.LBB72>:
+  16:	0a442783          	lw	a5,164(s0)
+  1a:	4705                	li	a4,1
+  1c:	fee7ac23          	sw	a4,-8(a5)
+
+00000020 <.L20>:
+  20:	40b2                	lw	ra,12(sp)
+  22:	4422                	lw	s0,8(sp)
+
+00000024 <.LM189>:
+  24:	0141                	addi	sp,sp,16
+  26:	8082                	ret
+
+Disassembly of section .text.esp_mbedtls_setup_rx_buffer:
+
+00000000 <esp_mbedtls_setup_rx_buffer>:
+   0:	06052223          	sw	zero,100(a0)
+
+00000004 <.LM193>:
+   4:	06052c23          	sw	zero,120(a0)
+
+00000008 <.LM194>:
+   8:	4581                	li	a1,0
+   a:	00000317          	auipc	t1,0x0
+			a: R_RISCV_CALL_PLT	init_rx_buffer
+			a: R_RISCV_RELAX	*ABS*
+   e:	00030067          	jr	t1 # a <.LM194+0x2>
+
+Disassembly of section .text.esp_mbedtls_reset_add_tx_buffer:
+
+00000000 <esp_mbedtls_reset_add_tx_buffer>:
+   0:	6585                	lui	a1,0x1
+   2:	14d58593          	addi	a1,a1,333 # 114d <.LASF101+0x1>
+   6:	00000317          	auipc	t1,0x0
+			6: R_RISCV_CALL_PLT	esp_mbedtls_alloc_tx_buf
+			6: R_RISCV_RELAX	*ABS*
+   a:	00030067          	jr	t1 # 6 <esp_mbedtls_reset_add_tx_buffer+0x6>
+
+Disassembly of section .text.esp_mbedtls_reset_free_tx_buffer:
+
+00000000 <esp_mbedtls_reset_free_tx_buffer>:
+   0:	1141                	addi	sp,sp,-16
+   2:	c422                	sw	s0,8(sp)
+   4:	842a                	mv	s0,a0
+
+00000006 <.LM203>:
+   6:	0a452503          	lw	a0,164(a0)
+
+0000000a <.LM204>:
+   a:	c606                	sw	ra,12(sp)
+
+0000000c <.LM205>:
+   c:	00000097          	auipc	ra,0x0
+			c: R_RISCV_CALL_PLT	esp_mbedtls_free_buf
+			c: R_RISCV_RELAX	*ABS*
+  10:	000080e7          	jalr	ra # c <.LM205>
+
+00000014 <.LM206>:
+  14:	8522                	mv	a0,s0
+  16:	4581                	li	a1,0
+  18:	00000097          	auipc	ra,0x0
+			18: R_RISCV_CALL_PLT	init_tx_buffer
+			18: R_RISCV_RELAX	*ABS*
+  1c:	000080e7          	jalr	ra # 18 <.LM206+0x4>
+
+00000020 <.LBB74>:
+  20:	8522                	mv	a0,s0
+  22:	00000097          	auipc	ra,0x0
+			22: R_RISCV_CALL_PLT	esp_mbedtls_setup_tx_buffer
+			22: R_RISCV_RELAX	*ABS*
+  26:	000080e7          	jalr	ra # 22 <.LBB74+0x2>
+
+0000002a <.LM216>:
+  2a:	c119                	beqz	a0,30 <.L25>
+			2a: R_RISCV_RVC_BRANCH	.L25
+
+0000002c <.LM217>:
+  2c:	f7300513          	li	a0,-141
+
+00000030 <.L25>:
+  30:	40b2                	lw	ra,12(sp)
+  32:	4422                	lw	s0,8(sp)
+
+00000034 <.LM220>:
+  34:	0141                	addi	sp,sp,16
+  36:	8082                	ret
+
+Disassembly of section .text.esp_mbedtls_reset_add_rx_buffer:
+
+00000000 <esp_mbedtls_reset_add_rx_buffer>:
+   0:	1141                	addi	sp,sp,-16
+   2:	c422                	sw	s0,8(sp)
+   4:	842a                	mv	s0,a0
+
+00000006 <.LM225>:
+   6:	5168                	lw	a0,100(a0)
+
+00000008 <.LM226>:
+   8:	c606                	sw	ra,12(sp)
+
+0000000a <.LM227>:
+   a:	c519                	beqz	a0,18 <.L30>
+			a: R_RISCV_RVC_BRANCH	.L30
+
+0000000c <.LM228>:
+   c:	00000097          	auipc	ra,0x0
+			c: R_RISCV_CALL_PLT	esp_mbedtls_free_buf
+			c: R_RISCV_RELAX	*ABS*
+  10:	000080e7          	jalr	ra # c <.LM228>
+
+00000014 <.LM229>:
+  14:	06042223          	sw	zero,100(s0)
+
+00000018 <.L30>:
+  18:	6591                	lui	a1,0x4
+  1a:	15558593          	addi	a1,a1,341 # 4155 <.LASF453+0x232b>
+  1e:	4505                	li	a0,1
+  20:	00000097          	auipc	ra,0x0
+			20: R_RISCV_CALL_PLT	yoradio_tls_rx_calloc
+			20: R_RISCV_RELAX	*ABS*
+  24:	000080e7          	jalr	ra # 20 <.L30+0x8>
+
+00000028 <.LM233>:
+  28:	ed0d                	bnez	a0,62 <.L31>
+			28: R_RISCV_RVC_BRANCH	.L31
+
+0000002a <.LM235>:
+  2a:	00000097          	auipc	ra,0x0
+			2a: R_RISCV_CALL_PLT	esp_log_timestamp
+			2a: R_RISCV_RELAX	*ABS*
+  2e:	000080e7          	jalr	ra # 2a <.LM235>
+
+00000032 <.LM241>:
+  32:	00000737          	lui	a4,0x0
+			32: R_RISCV_HI20	.LC0
+			32: R_RISCV_RELAX	*ABS*
+  36:	00070713          	mv	a4,a4
+			36: R_RISCV_LO12_I	.LC0
+			36: R_RISCV_RELAX	*ABS*
+  3a:	6791                	lui	a5,0x4
+  3c:	00000637          	lui	a2,0x0
+			3c: R_RISCV_HI20	.LC1
+			3c: R_RISCV_RELAX	*ABS*
+
+00000040 <.LM242>:
+  40:	86aa                	mv	a3,a0
+
+00000042 <.LM243>:
+  42:	15578793          	addi	a5,a5,341 # 4155 <.LASF453+0x232b>
+  46:	4505                	li	a0,1
+  48:	00060613          	mv	a2,a2
+			48: R_RISCV_LO12_I	.LC1
+			48: R_RISCV_RELAX	*ABS*
+  4c:	85ba                	mv	a1,a4
+  4e:	00000097          	auipc	ra,0x0
+			4e: R_RISCV_CALL_PLT	esp_log
+			4e: R_RISCV_RELAX	*ABS*
+  52:	000080e7          	jalr	ra # 4e <.LM243+0xc>
+
+00000056 <.LM244>:
+  56:	f7300513          	li	a0,-141
+
+0000005a <.L29>:
+  5a:	40b2                	lw	ra,12(sp)
+  5c:	4422                	lw	s0,8(sp)
+
+0000005e <.LM250>:
+  5e:	0141                	addi	sp,sp,16
+  60:	8082                	ret
+
+00000062 <.L31>:
+  62:	6791                	lui	a5,0x4
+  64:	14d78793          	addi	a5,a5,333 # 414d <.LASF453+0x2323>
+  68:	c15c                	sw	a5,4(a0)
+
+0000006a <.LM262>:
+  6a:	00052023          	sw	zero,0(a0)
+
+0000006e <.LBE76>:
+  6e:	47b5                	li	a5,13
+
+00000070 <.LM267>:
+  70:	00850593          	addi	a1,a0,8
+
+00000074 <.LM268>:
+  74:	dc3c                	sw	a5,120(s0)
+
+00000076 <.LM269>:
+  76:	8522                	mv	a0,s0
+
+00000078 <.LM270>:
+  78:	00000097          	auipc	ra,0x0
+			78: R_RISCV_CALL_PLT	init_rx_buffer
+			78: R_RISCV_RELAX	*ABS*
+  7c:	000080e7          	jalr	ra # 78 <.LM270>
+
+00000080 <.LM271>:
+  80:	4501                	li	a0,0
+  82:	bfe1                	j	5a <.L29>
+			82: R_RISCV_RVC_JUMP	.L29
+
+Disassembly of section .text.esp_mbedtls_reset_free_rx_buffer:
+
+00000000 <esp_mbedtls_reset_free_rx_buffer>:
+   0:	1141                	addi	sp,sp,-16
+   2:	c422                	sw	s0,8(sp)
+   4:	842a                	mv	s0,a0
+
+00000006 <.LM276>:
+   6:	5168                	lw	a0,100(a0)
+
+00000008 <.LM277>:
+   8:	c606                	sw	ra,12(sp)
+
+0000000a <.LM278>:
+   a:	00000097          	auipc	ra,0x0
+			a: R_RISCV_CALL_PLT	esp_mbedtls_free_buf
+			a: R_RISCV_RELAX	*ABS*
+   e:	000080e7          	jalr	ra # a <.LM278>
+
+00000012 <.LM279>:
+  12:	8522                	mv	a0,s0
+
+00000014 <.LM280>:
+  14:	4422                	lw	s0,8(sp)
+
+00000016 <.LM281>:
+  16:	40b2                	lw	ra,12(sp)
+
+00000018 <.LM282>:
+  18:	4581                	li	a1,0
+
+0000001a <.LM283>:
+  1a:	0141                	addi	sp,sp,16
+
+0000001c <.LM284>:
+  1c:	00000317          	auipc	t1,0x0
+			1c: R_RISCV_CALL_PLT	init_rx_buffer
+			1c: R_RISCV_RELAX	*ABS*
+  20:	00030067          	jr	t1 # 1c <.LM284>
+
+Disassembly of section .text.esp_mbedtls_dynamic_set_rx_buf_static:
+
+00000000 <esp_mbedtls_dynamic_set_rx_buf_static>:
+   0:	516c                	lw	a1,100(a0)
+
+00000002 <.LM289>:
+   2:	1101                	addi	sp,sp,-32
+   4:	cc22                	sw	s0,24(sp)
+
+00000006 <.LM290>:
+   6:	4641                	li	a2,16
+
+00000008 <.LM291>:
+   8:	842a                	mv	s0,a0
+
+0000000a <.LM292>:
+   a:	850a                	mv	a0,sp
+
+0000000c <.LM293>:
+   c:	ce06                	sw	ra,28(sp)
+
+0000000e <.LM294>:
+   e:	00000097          	auipc	ra,0x0
+			e: R_RISCV_CALL_PLT	memcpy
+			e: R_RISCV_RELAX	*ABS*
+  12:	000080e7          	jalr	ra # e <.LM294>
+
+00000016 <.LM295>:
+  16:	8522                	mv	a0,s0
+  18:	00000097          	auipc	ra,0x0
+			18: R_RISCV_CALL_PLT	esp_mbedtls_reset_free_rx_buffer
+			18: R_RISCV_RELAX	*ABS*
+  1c:	000080e7          	jalr	ra # 18 <.LM295+0x2>
+
+00000020 <.LM296>:
+  20:	6591                	lui	a1,0x4
+  22:	2a258593          	addi	a1,a1,674 # 42a2 <.LASF453+0x2478>
+  26:	4505                	li	a0,1
+  28:	00000097          	auipc	ra,0x0
+			28: R_RISCV_CALL_PLT	yoradio_tls_rx_calloc
+			28: R_RISCV_RELAX	*ABS*
+  2c:	000080e7          	jalr	ra # 28 <.LM296+0x8>
+
+00000030 <.LM300>:
+  30:	ed0d                	bnez	a0,6a <.L40>
+			30: R_RISCV_RVC_BRANCH	.L40
+
+00000032 <.LM302>:
+  32:	00000097          	auipc	ra,0x0
+			32: R_RISCV_CALL_PLT	esp_log_timestamp
+			32: R_RISCV_RELAX	*ABS*
+  36:	000080e7          	jalr	ra # 32 <.LM302>
+
+0000003a <.LM308>:
+  3a:	00000737          	lui	a4,0x0
+			3a: R_RISCV_HI20	.LC0
+			3a: R_RISCV_RELAX	*ABS*
+  3e:	00070713          	mv	a4,a4
+			3e: R_RISCV_LO12_I	.LC0
+			3e: R_RISCV_RELAX	*ABS*
+  42:	6791                	lui	a5,0x4
+  44:	00000637          	lui	a2,0x0
+			44: R_RISCV_HI20	.LC2
+			44: R_RISCV_RELAX	*ABS*
+
+00000048 <.LM309>:
+  48:	86aa                	mv	a3,a0
+
+0000004a <.LM310>:
+  4a:	2a278793          	addi	a5,a5,674 # 42a2 <.LASF453+0x2478>
+  4e:	4505                	li	a0,1
+  50:	00060613          	mv	a2,a2
+			50: R_RISCV_LO12_I	.LC2
+			50: R_RISCV_RELAX	*ABS*
+  54:	85ba                	mv	a1,a4
+  56:	00000097          	auipc	ra,0x0
+			56: R_RISCV_CALL_PLT	esp_log
+			56: R_RISCV_RELAX	*ABS*
+  5a:	000080e7          	jalr	ra # 56 <.LM310+0xc>
+
+0000005e <.LM311>:
+  5e:	10100513          	li	a0,257
+
+00000062 <.L39>:
+  62:	40f2                	lw	ra,28(sp)
+  64:	4462                	lw	s0,24(sp)
+
+00000066 <.LM317>:
+  66:	6105                	addi	sp,sp,32
+  68:	8082                	ret
+
+0000006a <.L40>:
+  6a:	6791                	lui	a5,0x4
+  6c:	29a78793          	addi	a5,a5,666 # 429a <.LASF453+0x2470>
+  70:	c15c                	sw	a5,4(a0)
+
+00000072 <.LM323>:
+  72:	00052023          	sw	zero,0(a0)
+
+00000076 <.LBE79>:
+  76:	00850593          	addi	a1,a0,8
+  7a:	8522                	mv	a0,s0
+
+0000007c <.LM327>:
+  7c:	00000097          	auipc	ra,0x0
+			7c: R_RISCV_CALL_PLT	init_rx_buffer
+			7c: R_RISCV_RELAX	*ABS*
+  80:	000080e7          	jalr	ra # 7c <.LM327>
+
+00000084 <.LM328>:
+  84:	543c                	lw	a5,104(s0)
+  86:	4702                	lw	a4,0(sp)
+
+00000088 <.LM329>:
+  88:	4501                	li	a0,0
+
+0000008a <.LM330>:
+  8a:	c398                	sw	a4,0(a5)
+  8c:	4712                	lw	a4,4(sp)
+  8e:	c3d8                	sw	a4,4(a5)
+
+00000090 <.LM331>:
+  90:	587c                	lw	a5,116(s0)
+  92:	4722                	lw	a4,8(sp)
+  94:	c398                	sw	a4,0(a5)
+  96:	4732                	lw	a4,12(sp)
+  98:	c3d8                	sw	a4,4(a5)
+
+0000009a <.LBB81>:
+  9a:	507c                	lw	a5,100(s0)
+  9c:	4709                	li	a4,2
+  9e:	fee7ac23          	sw	a4,-8(a5)
+
+000000a2 <.LBE81>:
+  a2:	b7c1                	j	62 <.L39>
+			a2: R_RISCV_RVC_JUMP	.L39
+
+Disassembly of section .text.esp_mbedtls_add_tx_buffer:
+
+00000000 <esp_mbedtls_add_tx_buffer>:
+   0:	7139                	addi	sp,sp,-64
+   2:	da26                	sw	s1,52(sp)
+
+00000004 <.LM353>:
+   4:	0a452483          	lw	s1,164(a0)
+
+00000008 <.LM354>:
+   8:	dc22                	sw	s0,56(sp)
+   a:	d64e                	sw	s3,44(sp)
+   c:	de06                	sw	ra,60(sp)
+   e:	d84a                	sw	s2,48(sp)
+
+00000010 <.LM355>:
+  10:	842a                	mv	s0,a0
+  12:	89ae                	mv	s3,a1
+
+00000014 <.LM356>:
+  14:	c4c1                	beqz	s1,9c <.L51>
+			14: R_RISCV_RVC_BRANCH	.L51
+
+00000016 <.LBB83>:
+  16:	ff84a783          	lw	a5,-8(s1)
+  1a:	cfd5                	beqz	a5,d6 <.L46>
+			1a: R_RISCV_RVC_BRANCH	.L46
+
+0000001c <.LM363>:
+  1c:	4661                	li	a2,24
+  1e:	85a6                	mv	a1,s1
+
+00000020 <.LM364>:
+  20:	0028                	addi	a0,sp,8
+
+00000022 <.LM365>:
+  22:	00000097          	auipc	ra,0x0
+			22: R_RISCV_CALL_PLT	memcpy
+			22: R_RISCV_RELAX	*ABS*
+  26:	000080e7          	jalr	ra # 22 <.LM365>
+
+0000002a <.LM366>:
+  2a:	8526                	mv	a0,s1
+  2c:	00000097          	auipc	ra,0x0
+			2c: R_RISCV_CALL_PLT	esp_mbedtls_free_buf
+			2c: R_RISCV_RELAX	*ABS*
+  30:	000080e7          	jalr	ra # 2c <.LM366+0x2>
+
+00000034 <.LM367>:
+  34:	4581                	li	a1,0
+  36:	8522                	mv	a0,s0
+  38:	00000097          	auipc	ra,0x0
+			38: R_RISCV_CALL_PLT	init_tx_buffer
+			38: R_RISCV_RELAX	*ABS*
+  3c:	000080e7          	jalr	ra # 38 <.LM367+0x4>
+
+00000040 <.LM368>:
+  40:	4905                	li	s2,1
+
+00000042 <.L44>:
+  42:	6485                	lui	s1,0x1
+  44:	14d48493          	addi	s1,s1,333 # 114d <.LASF101+0x1>
+
+00000048 <.LM375>:
+  48:	00098463          	beqz	s3,50 <.L47>
+			48: R_RISCV_BRANCH	.L47
+
+0000004c <.LM376>:
+  4c:	14d98493          	addi	s1,s3,333
+
+00000050 <.L47>:
+  50:	00848593          	addi	a1,s1,8
+  54:	4505                	li	a0,1
+  56:	00000097          	auipc	ra,0x0
+			56: R_RISCV_CALL_PLT	mbedtls_calloc
+			56: R_RISCV_RELAX	*ABS*
+  5a:	000080e7          	jalr	ra # 56 <.L47+0x6>
+
+0000005e <.LM381>:
+  5e:	e129                	bnez	a0,a0 <.L48>
+			5e: R_RISCV_RVC_BRANCH	.L48
+
+00000060 <.LM383>:
+  60:	00000097          	auipc	ra,0x0
+			60: R_RISCV_CALL_PLT	esp_log_timestamp
+			60: R_RISCV_RELAX	*ABS*
+  64:	000080e7          	jalr	ra # 60 <.LM383>
+
+00000068 <.LM389>:
+  68:	00000737          	lui	a4,0x0
+			68: R_RISCV_HI20	.LC0
+			68: R_RISCV_RELAX	*ABS*
+  6c:	00070713          	mv	a4,a4
+			6c: R_RISCV_LO12_I	.LC0
+			6c: R_RISCV_RELAX	*ABS*
+  70:	00000637          	lui	a2,0x0
+			70: R_RISCV_HI20	.LC3
+			70: R_RISCV_RELAX	*ABS*
+
+00000074 <.LM390>:
+  74:	86aa                	mv	a3,a0
+
+00000076 <.LM391>:
+  76:	00848793          	addi	a5,s1,8
+  7a:	4505                	li	a0,1
+  7c:	00060613          	mv	a2,a2
+			7c: R_RISCV_LO12_I	.LC3
+			7c: R_RISCV_RELAX	*ABS*
+  80:	85ba                	mv	a1,a4
+  82:	00000097          	auipc	ra,0x0
+			82: R_RISCV_CALL_PLT	esp_log
+			82: R_RISCV_RELAX	*ABS*
+  86:	000080e7          	jalr	ra # 82 <.LM391+0xc>
+
+0000008a <.LM392>:
+  8a:	f7300513          	li	a0,-141
+
+0000008e <.L43>:
+  8e:	50f2                	lw	ra,60(sp)
+  90:	5462                	lw	s0,56(sp)
+
+00000092 <.LM399>:
+  92:	54d2                	lw	s1,52(sp)
+  94:	5942                	lw	s2,48(sp)
+  96:	59b2                	lw	s3,44(sp)
+  98:	6121                	addi	sp,sp,64
+  9a:	8082                	ret
+
+0000009c <.L51>:
+  9c:	4901                	li	s2,0
+  9e:	b755                	j	42 <.L44>
+			9e: R_RISCV_RVC_JUMP	.L44
+
+000000a0 <.L48>:
+  a0:	00052023          	sw	zero,0(a0)
+
+000000a4 <.LM412>:
+  a4:	c144                	sw	s1,4(a0)
+
+000000a6 <.LBE88>:
+  a6:	00850593          	addi	a1,a0,8
+  aa:	8522                	mv	a0,s0
+
+000000ac <.LM416>:
+  ac:	00000097          	auipc	ra,0x0
+			ac: R_RISCV_CALL_PLT	init_tx_buffer
+			ac: R_RISCV_RELAX	*ABS*
+  b0:	000080e7          	jalr	ra # ac <.LM416>
+
+000000b4 <.LM417>:
+  b4:	02090163          	beqz	s2,d6 <.L46>
+			b4: R_RISCV_BRANCH	.L46
+
+000000b8 <.LM419>:
+  b8:	0a842783          	lw	a5,168(s0)
+  bc:	4722                	lw	a4,8(sp)
+
+000000be <.LM420>:
+  be:	4641                	li	a2,16
+  c0:	00c105b3          	add	a1,sp,a2
+
+000000c4 <.LM421>:
+  c4:	c398                	sw	a4,0(a5)
+  c6:	4732                	lw	a4,12(sp)
+  c8:	c3d8                	sw	a4,4(a5)
+
+000000ca <.LM422>:
+  ca:	0b442503          	lw	a0,180(s0)
+  ce:	00000097          	auipc	ra,0x0
+			ce: R_RISCV_CALL_PLT	memcpy
+			ce: R_RISCV_RELAX	*ABS*
+  d2:	000080e7          	jalr	ra # ce <.LM422+0x4>
+
+000000d6 <.L46>:
+  d6:	4501                	li	a0,0
+
+000000d8 <.LM434>:
+  d8:	bf5d                	j	8e <.L43>
+			d8: R_RISCV_RVC_JUMP	.L43
+
+Disassembly of section .text.esp_mbedtls_free_tx_buffer:
+
+00000000 <esp_mbedtls_free_tx_buffer>:
+   0:	7179                	addi	sp,sp,-48
+   2:	d04a                	sw	s2,32(sp)
+
+00000004 <.LM447>:
+   4:	0a452903          	lw	s2,164(a0)
+
+00000008 <.LM448>:
+   8:	d606                	sw	ra,44(sp)
+   a:	d422                	sw	s0,40(sp)
+   c:	d226                	sw	s1,36(sp)
+
+0000000e <.LM449>:
+   e:	0a090d63          	beqz	s2,c8 <.L58>
+			e: R_RISCV_BRANCH	.L58
+
+00000012 <.LBB90>:
+  12:	ff892783          	lw	a5,-8(s2)
+  16:	4485                	li	s1,1
+  18:	0a978863          	beq	a5,s1,c8 <.L58>
+			18: R_RISCV_BRANCH	.L58
+
+0000001c <.LM455>:
+  1c:	0a852783          	lw	a5,168(a0)
+
+00000020 <.LM456>:
+  20:	0b452583          	lw	a1,180(a0)
+  24:	4641                	li	a2,16
+
+00000026 <.LM457>:
+  26:	4398                	lw	a4,0(a5)
+  28:	43dc                	lw	a5,4(a5)
+  2a:	842a                	mv	s0,a0
+
+0000002c <.LM458>:
+  2c:	00c10533          	add	a0,sp,a2
+
+00000030 <.LM460>:
+  30:	c43a                	sw	a4,8(sp)
+  32:	c63e                	sw	a5,12(sp)
+
+00000034 <.LM461>:
+  34:	00000097          	auipc	ra,0x0
+			34: R_RISCV_CALL_PLT	memcpy
+			34: R_RISCV_RELAX	*ABS*
+  38:	000080e7          	jalr	ra # 34 <.LM461>
+
+0000003c <.LM462>:
+  3c:	854a                	mv	a0,s2
+  3e:	00000097          	auipc	ra,0x0
+			3e: R_RISCV_CALL_PLT	esp_mbedtls_free_buf
+			3e: R_RISCV_RELAX	*ABS*
+  42:	000080e7          	jalr	ra # 3e <.LM462+0x2>
+
+00000046 <.LM463>:
+  46:	4581                	li	a1,0
+  48:	8522                	mv	a0,s0
+  4a:	00000097          	auipc	ra,0x0
+			4a: R_RISCV_CALL_PLT	init_tx_buffer
+			4a: R_RISCV_RELAX	*ABS*
+  4e:	000080e7          	jalr	ra # 4a <.LM463+0x4>
+
+00000052 <.LM464>:
+  52:	02d00593          	li	a1,45
+  56:	8526                	mv	a0,s1
+  58:	00000097          	auipc	ra,0x0
+			58: R_RISCV_CALL_PLT	mbedtls_calloc
+			58: R_RISCV_RELAX	*ABS*
+  5c:	000080e7          	jalr	ra # 58 <.LM464+0x6>
+
+00000060 <.LM466>:
+  60:	ed15                	bnez	a0,9c <.L59>
+			60: R_RISCV_RVC_BRANCH	.L59
+
+00000062 <.LM468>:
+  62:	00000097          	auipc	ra,0x0
+			62: R_RISCV_CALL_PLT	esp_log_timestamp
+			62: R_RISCV_RELAX	*ABS*
+  66:	000080e7          	jalr	ra # 62 <.LM468>
+
+0000006a <.LM474>:
+  6a:	00000737          	lui	a4,0x0
+			6a: R_RISCV_HI20	.LC0
+			6a: R_RISCV_RELAX	*ABS*
+  6e:	00070713          	mv	a4,a4
+			6e: R_RISCV_LO12_I	.LC0
+			6e: R_RISCV_RELAX	*ABS*
+  72:	00000637          	lui	a2,0x0
+			72: R_RISCV_HI20	.LC1
+			72: R_RISCV_RELAX	*ABS*
+
+00000076 <.LM475>:
+  76:	86aa                	mv	a3,a0
+
+00000078 <.LM476>:
+  78:	02d00793          	li	a5,45
+  7c:	8526                	mv	a0,s1
+  7e:	00060613          	mv	a2,a2
+			7e: R_RISCV_LO12_I	.LC1
+			7e: R_RISCV_RELAX	*ABS*
+  82:	85ba                	mv	a1,a4
+  84:	00000097          	auipc	ra,0x0
+			84: R_RISCV_CALL_PLT	esp_log
+			84: R_RISCV_RELAX	*ABS*
+  88:	000080e7          	jalr	ra # 84 <.LM476+0xc>
+
+0000008c <.LM477>:
+  8c:	f7300513          	li	a0,-141
+
+00000090 <.L57>:
+  90:	50b2                	lw	ra,44(sp)
+  92:	5422                	lw	s0,40(sp)
+  94:	5492                	lw	s1,36(sp)
+  96:	5902                	lw	s2,32(sp)
+  98:	6145                	addi	sp,sp,48
+  9a:	8082                	ret
+
+0000009c <.L59>:
+  9c:	02500793          	li	a5,37
+  a0:	c15c                	sw	a5,4(a0)
+
+000000a2 <.LM488>:
+  a2:	00052023          	sw	zero,0(a0)
+
+000000a6 <.LBE93>:
+  a6:	4661                	li	a2,24
+  a8:	002c                	addi	a1,sp,8
+  aa:	0521                	addi	a0,a0,8
+
+000000ac <.LM492>:
+  ac:	00000097          	auipc	ra,0x0
+			ac: R_RISCV_CALL_PLT	memcpy
+			ac: R_RISCV_RELAX	*ABS*
+  b0:	000080e7          	jalr	ra # ac <.LM492>
+
+000000b4 <.LM493>:
+  b4:	85aa                	mv	a1,a0
+  b6:	8522                	mv	a0,s0
+  b8:	00000097          	auipc	ra,0x0
+			b8: R_RISCV_CALL_PLT	init_tx_buffer
+			b8: R_RISCV_RELAX	*ABS*
+  bc:	000080e7          	jalr	ra # b8 <.LM493+0x4>
+
+000000c0 <.LBB95>:
+  c0:	0a442783          	lw	a5,164(s0)
+  c4:	fe97ac23          	sw	s1,-8(a5)
+
+000000c8 <.L58>:
+  c8:	4501                	li	a0,0
+
+000000ca <.LM501>:
+  ca:	b7d9                	j	90 <.L57>
+			ca: R_RISCV_RVC_JUMP	.L57
+
+Disassembly of section .text.esp_mbedtls_add_rx_buffer:
+
+00000000 <esp_mbedtls_add_rx_buffer>:
+   0:	517c                	lw	a5,100(a0)
+
+00000002 <.LM505>:
+   2:	715d                	addi	sp,sp,-80
+   4:	c686                	sw	ra,76(sp)
+   6:	c4a2                	sw	s0,72(sp)
+   8:	c2a6                	sw	s1,68(sp)
+   a:	c0ca                	sw	s2,64(sp)
+   c:	de4e                	sw	s3,60(sp)
+   e:	dc52                	sw	s4,56(sp)
+  10:	da56                	sw	s5,52(sp)
+
+00000012 <.LM506>:
+  12:	cb81                	beqz	a5,22 <.L75>
+			12: R_RISCV_RVC_BRANCH	.L75
+
+00000014 <.LBB110>:
+  14:	ff87a783          	lw	a5,-8(a5)
+
+00000018 <.LBE110>:
+  18:	4905                	li	s2,1
+
+0000001a <.LBB113>:
+  1a:	9bf5                	andi	a5,a5,-3
+
+0000001c <.LM516>:
+  1c:	e781                	bnez	a5,24 <.L66>
+			1c: R_RISCV_RVC_BRANCH	.L66
+
+0000001e <.L67>:
+  1e:	4481                	li	s1,0
+  20:	a0ad                	j	8a <.L65>
+			20: R_RISCV_RVC_JUMP	.L65
+
+00000022 <.L75>:
+  22:	4901                	li	s2,0
+
+00000024 <.L66>:
+  24:	01b10793          	addi	a5,sp,27
+
+00000028 <.LM521>:
+  28:	01810993          	addi	s3,sp,24
+  2c:	07352623          	sw	s3,108(a0)
+
+00000030 <.LM522>:
+  30:	d93c                	sw	a5,112(a0)
+
+00000032 <.LM523>:
+  32:	4595                	li	a1,5
+  34:	842a                	mv	s0,a0
+
+00000036 <.LM524>:
+  36:	00000097          	auipc	ra,0x0
+			36: R_RISCV_CALL_PLT	mbedtls_ssl_fetch_input
+			36: R_RISCV_RELAX	*ABS*
+  3a:	000080e7          	jalr	ra # 36 <.LM524>
+
+0000003e <.LM528>:
+  3e:	84aa                	mv	s1,a0
+
+00000040 <.LM529>:
+  40:	cd39                	beqz	a0,9e <.L68>
+			40: R_RISCV_RVC_BRANCH	.L68
+
+00000042 <.LM530>:
+  42:	77e9                	lui	a5,0xffffa
+  44:	80078793          	addi	a5,a5,-2048 # ffff9800 <.LASF453+0xffff79d6>
+  48:	04f50163          	beq	a0,a5,8a <.L65>
+			48: R_RISCV_BRANCH	.L65
+
+0000004c <.LM532>:
+  4c:	77e5                	lui	a5,0xffff9
+  4e:	70078793          	addi	a5,a5,1792 # ffff9700 <.LASF453+0xffff78d6>
+  52:	02f50c63          	beq	a0,a5,8a <.L65>
+			52: R_RISCV_BRANCH	.L65
+
+00000056 <.LM534>:
+  56:	77e5                	lui	a5,0xffff9
+  58:	d8078793          	addi	a5,a5,-640 # ffff8d80 <.LASF453+0xffff6f56>
+  5c:	02f50763          	beq	a0,a5,8a <.L65>
+			5c: R_RISCV_BRANCH	.L65
+
+00000060 <.LM536>:
+  60:	00000097          	auipc	ra,0x0
+			60: R_RISCV_CALL_PLT	esp_log_timestamp
+			60: R_RISCV_RELAX	*ABS*
+  64:	000080e7          	jalr	ra # 60 <.LM536>
+
+00000068 <.LM542>:
+  68:	00000737          	lui	a4,0x0
+			68: R_RISCV_HI20	.LC0
+			68: R_RISCV_RELAX	*ABS*
+  6c:	00070713          	mv	a4,a4
+			6c: R_RISCV_LO12_I	.LC0
+			6c: R_RISCV_RELAX	*ABS*
+  70:	00000637          	lui	a2,0x0
+			70: R_RISCV_HI20	.LC4
+			70: R_RISCV_RELAX	*ABS*
+
+00000074 <.LM543>:
+  74:	86aa                	mv	a3,a0
+
+00000076 <.LM544>:
+  76:	409007b3          	neg	a5,s1
+  7a:	00060613          	mv	a2,a2
+			7a: R_RISCV_LO12_I	.LC4
+			7a: R_RISCV_RELAX	*ABS*
+  7e:	85ba                	mv	a1,a4
+  80:	4505                	li	a0,1
+  82:	00000097          	auipc	ra,0x0
+			82: R_RISCV_CALL_PLT	esp_log
+			82: R_RISCV_RELAX	*ABS*
+  86:	000080e7          	jalr	ra # 82 <.LM544+0xc>
+
+0000008a <.L65>:
+  8a:	40b6                	lw	ra,76(sp)
+  8c:	4426                	lw	s0,72(sp)
+  8e:	4906                	lw	s2,64(sp)
+  90:	59f2                	lw	s3,60(sp)
+  92:	5a62                	lw	s4,56(sp)
+  94:	5ad2                	lw	s5,52(sp)
+  96:	8526                	mv	a0,s1
+  98:	4496                	lw	s1,68(sp)
+  9a:	6161                	addi	sp,sp,80
+  9c:	8082                	ret
+
+0000009e <.L68>:
+  9e:	547c                	lw	a5,108(s0)
+
+000000a0 <.LBB119>:
+  a0:	6485                	lui	s1,0x1
+
+000000a2 <.LBE119>:
+  a2:	08842a03          	lw	s4,136(s0)
+
+000000a6 <.LBB123>:
+  a6:	0007c783          	lbu	a5,0(a5)
+
+000000aa <.LBB124>:
+  aa:	14d48493          	addi	s1,s1,333 # 114d <.LASF101+0x1>
+
+000000ae <.LBB125>:
+  ae:	08f42023          	sw	a5,128(s0)
+
+000000b2 <.LM557>:
+  b2:	583c                	lw	a5,112(s0)
+  b4:	0007d703          	lhu	a4,0(a5)
+  b8:	00875793          	srli	a5,a4,0x8
+  bc:	0722                	slli	a4,a4,0x8
+  be:	97ba                	add	a5,a5,a4
+  c0:	07c2                	slli	a5,a5,0x10
+  c2:	83c1                	srli	a5,a5,0x10
+
+000000c4 <.LM558>:
+  c4:	08f42223          	sw	a5,132(s0)
+
+000000c8 <.LBB126>:
+  c8:	c399                	beqz	a5,ce <.L71>
+			c8: R_RISCV_RVC_BRANCH	.L71
+
+000000ca <.LM567>:
+  ca:	14d78493          	addi	s1,a5,333
+
+000000ce <.L71>:
+  ce:	02090563          	beqz	s2,f8 <.L72>
+			ce: R_RISCV_BRANCH	.L72
+
+000000d2 <.LM578>:
+  d2:	506c                	lw	a1,100(s0)
+
+000000d4 <.LM580>:
+  d4:	4641                	li	a2,16
+  d6:	1008                	addi	a0,sp,32
+
+000000d8 <.LM581>:
+  d8:	c62e                	sw	a1,12(sp)
+  da:	00000097          	auipc	ra,0x0
+			da: R_RISCV_CALL_PLT	memcpy
+			da: R_RISCV_RELAX	*ABS*
+  de:	000080e7          	jalr	ra # da <.LM581+0x2>
+
+000000e2 <.LM582>:
+  e2:	4532                	lw	a0,12(sp)
+  e4:	00000097          	auipc	ra,0x0
+			e4: R_RISCV_CALL_PLT	esp_mbedtls_free_buf
+			e4: R_RISCV_RELAX	*ABS*
+  e8:	000080e7          	jalr	ra # e4 <.LM582+0x2>
+
+000000ec <.LM583>:
+  ec:	4581                	li	a1,0
+  ee:	8522                	mv	a0,s0
+  f0:	00000097          	auipc	ra,0x0
+			f0: R_RISCV_CALL_PLT	init_rx_buffer
+			f0: R_RISCV_RELAX	*ABS*
+  f4:	000080e7          	jalr	ra # f0 <.LM583+0x4>
+
+000000f8 <.L72>:
+  f8:	00848593          	addi	a1,s1,8
+  fc:	4505                	li	a0,1
+  fe:	00000097          	auipc	ra,0x0
+			fe: R_RISCV_CALL_PLT	yoradio_tls_rx_calloc
+			fe: R_RISCV_RELAX	*ABS*
+ 102:	000080e7          	jalr	ra # fe <.L72+0x6>
+
+00000106 <.LM586>:
+ 106:	e90d                	bnez	a0,138 <.L73>
+			106: R_RISCV_RVC_BRANCH	.L73
+
+00000108 <.LM588>:
+ 108:	00000097          	auipc	ra,0x0
+			108: R_RISCV_CALL_PLT	esp_log_timestamp
+			108: R_RISCV_RELAX	*ABS*
+ 10c:	000080e7          	jalr	ra # 108 <.LM588>
+
+00000110 <.LM594>:
+ 110:	00000737          	lui	a4,0x0
+			110: R_RISCV_HI20	.LC0
+			110: R_RISCV_RELAX	*ABS*
+ 114:	00070713          	mv	a4,a4
+			114: R_RISCV_LO12_I	.LC0
+			114: R_RISCV_RELAX	*ABS*
+ 118:	00000637          	lui	a2,0x0
+			118: R_RISCV_HI20	.LC1
+			118: R_RISCV_RELAX	*ABS*
+
+0000011c <.LM595>:
+ 11c:	86aa                	mv	a3,a0
+
+0000011e <.LM596>:
+ 11e:	00848793          	addi	a5,s1,8
+ 122:	00060613          	mv	a2,a2
+			122: R_RISCV_LO12_I	.LC1
+			122: R_RISCV_RELAX	*ABS*
+ 126:	85ba                	mv	a1,a4
+ 128:	4505                	li	a0,1
+ 12a:	00000097          	auipc	ra,0x0
+			12a: R_RISCV_CALL_PLT	esp_log
+			12a: R_RISCV_RELAX	*ABS*
+ 12e:	000080e7          	jalr	ra # 12a <.LM596+0xc>
+
+00000132 <.LM597>:
+ 132:	f7300493          	li	s1,-141
+
+00000136 <.LM603>:
+ 136:	bf91                	j	8a <.L65>
+			136: R_RISCV_RVC_JUMP	.L65
+
+00000138 <.L73>:
+ 138:	00052023          	sw	zero,0(a0)
+
+0000013c <.LM615>:
+ 13c:	c144                	sw	s1,4(a0)
+
+0000013e <.LBE128>:
+ 13e:	00850593          	addi	a1,a0,8
+ 142:	8522                	mv	a0,s0
+
+00000144 <.LM619>:
+ 144:	00000097          	auipc	ra,0x0
+			144: R_RISCV_CALL_PLT	init_rx_buffer
+			144: R_RISCV_RELAX	*ABS*
+ 148:	000080e7          	jalr	ra # 144 <.LM619>
+
+0000014c <.LM620>:
+ 14c:	00090c63          	beqz	s2,164 <.L74>
+			14c: R_RISCV_BRANCH	.L74
+
+00000150 <.LM622>:
+ 150:	543c                	lw	a5,104(s0)
+ 152:	5702                	lw	a4,32(sp)
+ 154:	c398                	sw	a4,0(a5)
+ 156:	5712                	lw	a4,36(sp)
+ 158:	c3d8                	sw	a4,4(a5)
+
+0000015a <.LM623>:
+ 15a:	587c                	lw	a5,116(s0)
+ 15c:	5722                	lw	a4,40(sp)
+ 15e:	c398                	sw	a4,0(a5)
+ 160:	5732                	lw	a4,44(sp)
+ 162:	c3d8                	sw	a4,4(a5)
+
+00000164 <.L74>:
+ 164:	5468                	lw	a0,108(s0)
+ 166:	8652                	mv	a2,s4
+ 168:	85ce                	mv	a1,s3
+ 16a:	00000097          	auipc	ra,0x0
+			16a: R_RISCV_CALL_PLT	memcpy
+			16a: R_RISCV_RELAX	*ABS*
+ 16e:	000080e7          	jalr	ra # 16a <.L74+0x6>
+
+00000172 <.LM625>:
+ 172:	09442423          	sw	s4,136(s0)
+
+00000176 <.LM627>:
+ 176:	08042223          	sw	zero,132(s0)
+ 17a:	b555                	j	1e <.L67>
+			17a: R_RISCV_RVC_JUMP	.L67
+
+Disassembly of section .text.esp_mbedtls_free_rx_buffer:
+
+00000000 <esp_mbedtls_free_rx_buffer>:
+   0:	517c                	lw	a5,100(a0)
+   2:	cfe1                	beqz	a5,da <.L100>
+			2: R_RISCV_RVC_BRANCH	.L100
+
+00000004 <.LBB130>:
+   4:	ff87a683          	lw	a3,-8(a5)
+
+00000008 <.LBE131>:
+   8:	4709                	li	a4,2
+   a:	0ce68863          	beq	a3,a4,da <.L100>
+			a: R_RISCV_BRANCH	.L100
+
+0000000e <.LBE130>:
+   e:	08c52703          	lw	a4,140(a0)
+
+00000012 <.LM651>:
+  12:	c709                	beqz	a4,1c <.L89>
+			12: R_RISCV_RVC_BRANCH	.L89
+
+00000014 <.LM652>:
+  14:	08452603          	lw	a2,132(a0)
+  18:	0cc76163          	bltu	a4,a2,da <.L100>
+			18: R_RISCV_BRANCH	.L100
+
+0000001c <.L89>:
+  1c:	4705                	li	a4,1
+  1e:	0ae68e63          	beq	a3,a4,da <.L100>
+			1e: R_RISCV_BRANCH	.L100
+
+00000022 <.LM654>:
+  22:	08052683          	lw	a3,128(a0)
+
+00000026 <.LM656>:
+  26:	ea91                	bnez	a3,3a <.L90>
+			26: R_RISCV_RVC_BRANCH	.L90
+
+00000028 <.LM657>:
+  28:	4114                	lw	a3,0(a0)
+
+0000002a <.LM658>:
+  2a:	0086c683          	lbu	a3,8(a3)
+  2e:	0ae69663          	bne	a3,a4,da <.L100>
+			2e: R_RISCV_BRANCH	.L100
+
+00000032 <.LM659>:
+  32:	4154                	lw	a3,4(a0)
+  34:	4709                	li	a4,2
+  36:	0ae69263          	bne	a3,a4,da <.L100>
+			36: R_RISCV_BRANCH	.L100
+
+0000003a <.L90>:
+  3a:	5538                	lw	a4,104(a0)
+
+0000003c <.LM661>:
+  3c:	1101                	addi	sp,sp,-32
+  3e:	ce06                	sw	ra,28(sp)
+  40:	cc22                	sw	s0,24(sp)
+
+00000042 <.LM662>:
+  42:	4314                	lw	a3,0(a4)
+  44:	4358                	lw	a4,4(a4)
+  46:	842a                	mv	s0,a0
+
+00000048 <.LM663>:
+  48:	c036                	sw	a3,0(sp)
+  4a:	c23a                	sw	a4,4(sp)
+
+0000004c <.LM664>:
+  4c:	5978                	lw	a4,116(a0)
+
+0000004e <.LM665>:
+  4e:	853e                	mv	a0,a5
+
+00000050 <.LM666>:
+  50:	4314                	lw	a3,0(a4)
+  52:	4358                	lw	a4,4(a4)
+  54:	c436                	sw	a3,8(sp)
+  56:	c63a                	sw	a4,12(sp)
+
+00000058 <.LM667>:
+  58:	00000097          	auipc	ra,0x0
+			58: R_RISCV_CALL_PLT	esp_mbedtls_free_buf
+			58: R_RISCV_RELAX	*ABS*
+  5c:	000080e7          	jalr	ra # 58 <.LM667>
+
+00000060 <.LM668>:
+  60:	4581                	li	a1,0
+  62:	8522                	mv	a0,s0
+  64:	00000097          	auipc	ra,0x0
+			64: R_RISCV_CALL_PLT	init_rx_buffer
+			64: R_RISCV_RELAX	*ABS*
+  68:	000080e7          	jalr	ra # 64 <.LM668+0x4>
+
+0000006c <.LM669>:
+  6c:	45e1                	li	a1,24
+  6e:	4505                	li	a0,1
+  70:	00000097          	auipc	ra,0x0
+			70: R_RISCV_CALL_PLT	yoradio_tls_rx_calloc
+			70: R_RISCV_RELAX	*ABS*
+  74:	000080e7          	jalr	ra # 70 <.LM669+0x4>
+
+00000078 <.LM671>:
+  78:	e91d                	bnez	a0,ae <.L91>
+			78: R_RISCV_RVC_BRANCH	.L91
+
+0000007a <.LM673>:
+  7a:	00000097          	auipc	ra,0x0
+			7a: R_RISCV_CALL_PLT	esp_log_timestamp
+			7a: R_RISCV_RELAX	*ABS*
+  7e:	000080e7          	jalr	ra # 7a <.LM673>
+
+00000082 <.LM679>:
+  82:	00000737          	lui	a4,0x0
+			82: R_RISCV_HI20	.LC0
+			82: R_RISCV_RELAX	*ABS*
+  86:	00070713          	mv	a4,a4
+			86: R_RISCV_LO12_I	.LC0
+			86: R_RISCV_RELAX	*ABS*
+  8a:	00000637          	lui	a2,0x0
+			8a: R_RISCV_HI20	.LC1
+			8a: R_RISCV_RELAX	*ABS*
+
+0000008e <.LM680>:
+  8e:	86aa                	mv	a3,a0
+
+00000090 <.LM681>:
+  90:	47e1                	li	a5,24
+  92:	4505                	li	a0,1
+  94:	00060613          	mv	a2,a2
+			94: R_RISCV_LO12_I	.LC1
+			94: R_RISCV_RELAX	*ABS*
+  98:	85ba                	mv	a1,a4
+  9a:	00000097          	auipc	ra,0x0
+			9a: R_RISCV_CALL_PLT	esp_log
+			9a: R_RISCV_RELAX	*ABS*
+  9e:	000080e7          	jalr	ra # 9a <.LM681+0xa>
+
+000000a2 <.LM682>:
+  a2:	f7300513          	li	a0,-141
+
+000000a6 <.L87>:
+  a6:	40f2                	lw	ra,28(sp)
+  a8:	4462                	lw	s0,24(sp)
+
+000000aa <.LM689>:
+  aa:	6105                	addi	sp,sp,32
+  ac:	8082                	ret
+
+000000ae <.L91>:
+  ae:	4641                	li	a2,16
+  b0:	c150                	sw	a2,4(a0)
+
+000000b2 <.LM695>:
+  b2:	00052023          	sw	zero,0(a0)
+
+000000b6 <.LBE134>:
+  b6:	858a                	mv	a1,sp
+  b8:	0521                	addi	a0,a0,8
+
+000000ba <.LM699>:
+  ba:	00000097          	auipc	ra,0x0
+			ba: R_RISCV_CALL_PLT	memcpy
+			ba: R_RISCV_RELAX	*ABS*
+  be:	000080e7          	jalr	ra # ba <.LM699>
+
+000000c2 <.LM700>:
+  c2:	85aa                	mv	a1,a0
+  c4:	8522                	mv	a0,s0
+  c6:	00000097          	auipc	ra,0x0
+			c6: R_RISCV_CALL_PLT	init_rx_buffer
+			c6: R_RISCV_RELAX	*ABS*
+  ca:	000080e7          	jalr	ra # c6 <.LM700+0x4>
+
+000000ce <.LBB136>:
+  ce:	507c                	lw	a5,100(s0)
+  d0:	4705                	li	a4,1
+
+000000d2 <.LBB139>:
+  d2:	4501                	li	a0,0
+
+000000d4 <.LBB140>:
+  d4:	fee7ac23          	sw	a4,-8(a5)
+
+000000d8 <.LM708>:
+  d8:	b7f9                	j	a6 <.L87>
+			d8: R_RISCV_RVC_JUMP	.L87
+
+000000da <.L100>:
+  da:	4501                	li	a0,0
+
+000000dc <.LBE141>:
+  dc:	8082                	ret
+
+Disassembly of section .text.esp_mbedtls_get_crt_size:
+
+00000000 <esp_mbedtls_get_crt_size>:
+   0:	87aa                	mv	a5,a0
+
+00000002 <.LM718>:
+   2:	4701                	li	a4,0
+
+00000004 <.LM719>:
+   4:	4501                	li	a0,0
+
+00000006 <.L104>:
+   6:	e399                	bnez	a5,c <.L105>
+			6: R_RISCV_RVC_BRANCH	.L105
+
+00000008 <.LM721>:
+   8:	c198                	sw	a4,0(a1)
+
+0000000a <.LM723>:
+   a:	8082                	ret
+
+0000000c <.L105>:
+   c:	4794                	lw	a3,8(a5)
+
+0000000e <.LM727>:
+   e:	0705                	addi	a4,a4,1 # 1 <esp_mbedtls_get_crt_size+0x1>
+
+00000010 <.LM728>:
+  10:	3b47a783          	lw	a5,948(a5)
+
+00000014 <.LM729>:
+  14:	9536                	add	a0,a0,a3
+
+00000016 <.LM730>:
+  16:	bfc5                	j	6 <.L104>
+			16: R_RISCV_RVC_JUMP	.L104

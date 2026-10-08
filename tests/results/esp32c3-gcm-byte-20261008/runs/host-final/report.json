@@ -1,0 +1,57 @@
+{
+  "result": "PASS",
+  "variants": {
+    "baseline": {
+      "result": "PASS",
+      "output": "PASS 16 zero/ones/alternating pairs; 16384 basis pairs; 8192 random products, in-place and all 16 alignments\nPASS 640 lengths including every short tail, threshold and large unaligned input\nPASS 176 independent AES-GCM tag equations in whole, byte and mixed chunks\nPASS GHASH: exact bits, guarded buffers, no sanitizer errors\n",
+      "command": [
+        "gcc",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Wno-unused-function",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-gcm-byte-20261008/host-final",
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-gcm-byte-20261008/host-final/baseline.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-gcm-byte-20261008/host-final/baseline"
+      ]
+    },
+    "candidate": {
+      "result": "PASS",
+      "output": "PASS 16 zero/ones/alternating pairs; 16384 basis pairs; 8192 random products, in-place and all 16 alignments\nPASS 640 lengths including every short tail, threshold and large unaligned input\nPASS 176 independent AES-GCM tag equations in whole, byte and mixed chunks\nPASS GHASH: exact bits, guarded buffers, no sanitizer errors\n",
+      "command": [
+        "gcc",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Wno-unused-function",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-gcm-byte-20261008/host-final",
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-gcm-byte-20261008/host-final/candidate.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-gcm-byte-20261008/host-final/candidate"
+      ]
+    }
+  },
+  "sources": {
+    "tools/codec_benchmark/run_gcm_ghash_host.py": "a71ba2c10f4f037b8f6d5b9aed92ada743c4a9c56416c2c560c022df8f683961",
+    "tools/patch_gcm_byte_ghash.py": "3bbe0d96eb63f6546db7484b8b101e7609394ab5d1a0bbcdf8ac78f020f0bb60",
+    "idf/esp32c3-oled-native/main/gcm_byte_ghash.inc": "ea885bacf9c0cff0bc566aefa5c92a507bde46ff24599ee360b047cc4c946ef1",
+    "tests/native/gcm_ghash_test.c": "e480760d998367d29d73d600a1ec6b898b1aedf04651f31907b61c6539a534d7"
+  },
+  "scope": "Test actual guarded SDK GHASH against bit-serial NIST and AES-GCM tag equations.\n\nOnly platform types/includes are substituted. No hardware AES performance or\ncomplete TLS/side-channel qualification is inferred from this host seam.",
+  "original_sha256": "5fc13c1a27b6b67ef192a4790411522b748cc78989453490a9456e0bfb0ece39",
+  "patched_sha256": "abb4cdef2870a770519e998a0803f46e9d967ad94d28932a7ebd181e7241a8d7",
+  "vectors_sha256": "a38d590a37411dd954d0d5c093b1c2952108e12b86d53157a7288e2dbcf25714"
+}

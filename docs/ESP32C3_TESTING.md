@@ -935,6 +935,11 @@ Use `verify_http_link.py --elf <firmware.elf> --sdkconfig <sdkconfig> --objdump 
 
 ## CPU diagnostics without a separate profiler stack
 
+The [GHASH experiment](ESP32C3_GHASH_EXPERIMENT_20261008.md) preserves exact
+field arithmetic and independently generated GCM tag checks, but does not
+improve the heavy physical FLAC case. Its optional build flag stays disabled;
+the host math seam does not qualify complete TLS authentication or performance.
+
 The [1/2/5 ms FreeRTOS tick experiment](ESP32C3_FREERTOS_TICK_20261008.md)
 compares only the heavy HTTPS FLAC and HE-AACv2 cases. It retains original
 runtime and heap gates, uses staged-DMA counter deltas after warmup, and treats
