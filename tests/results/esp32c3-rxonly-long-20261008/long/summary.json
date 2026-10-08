@@ -1,0 +1,480 @@
+{
+  "note": "Complete CPU/decoder intervals after 10 seconds. Original gates retained. TCP credit is logical payload, not allocated RAM; no acoustic qualification.",
+  "cases": [
+    {
+      "name": "output8-aac-alternate-600",
+      "image": "8f1a86ef61f8c5e56beeccf8a85f3dde7052ab480a02a227e0a80c02fb41ff1c",
+      "original_acceptance": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133012,
+                "largest": 102400,
+                "tasks": 17
+              },
+              {
+                "heap": 132992,
+                "largest": 102400,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.172
+        },
+        {
+          "name": "tls-record:alternate",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Progressive heap loss during continuous playback",
+          "seconds": 601.188
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133052,
+                "largest": 102400,
+                "tasks": 17
+              },
+              {
+                "heap": 133052,
+                "largest": 102400,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.5
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.031
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 1.062
+        }
+      ],
+      "interrupted": false,
+      "seconds": 600.0309999999881,
+      "cpu": {
+        "observed_seconds": 587.58,
+        "windows": 116,
+        "peak_percent": 72.5,
+        "busy_mean_percent": 71.03217195956294,
+        "idle_mean_percent": 28.96782804043704,
+        "decode_mean_percent": 47.37333350352292,
+        "stream_mean_percent": 0.43265512781238297,
+        "output_mean_percent": 7.802600326764014,
+        "wifi_mean_percent": 5.771895401477245,
+        "tcpip_mean_percent": 3.829417100650124,
+        "web_mean_percent": 2.5084197896456653,
+        "at_least_85_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_95_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_99.9_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        }
+      },
+      "cpu_malformed": [],
+      "cpu_gaps": [],
+      "decoder_windows": 117,
+      "audio_wall_ratio": 1.0015754133113037,
+      "elapsed_decode_ms_per_audio_second": 520.4081110972885,
+      "heap": {
+        "heap": {
+          "min": 16508,
+          "median": 17344,
+          "max": 26200
+        },
+        "largest": {
+          "min": 4608,
+          "median": 7680,
+          "max": 18432
+        }
+      },
+      "network_metrics_available": true,
+      "network_issues": [],
+      "receive_credit": {
+        "uncredited": {
+          "min": 0,
+          "median": 7158,
+          "max": 8588
+        },
+        "refused": {
+          "min": 0,
+          "median": 0,
+          "max": 0
+        }
+      },
+      "watchdog_counter_max": 0,
+      "watchdog_fault_rows": 0,
+      "allocation_fault_rows": [],
+      "maximum_http_ms": 453.9999999979045,
+      "minimum_rssi": -84,
+      "failed_transport_phases": [],
+      "hashes": {
+        "report": "6d652debb684d86a5f9391939a49fd07363ee6cc0bfc12a2f82602071cb74d2f",
+        "status": "03bdd53b93c2a3411e80daad902bf9005ac10dd3ca6e768f5d69b1f463ef1400",
+        "performance": "3d41d123d4c3dd48295c8e1725cd248c2e7fd209e717302f946678eccf2b51bf"
+      }
+    },
+    {
+      "name": "rxonly-aac-alternate-600",
+      "image": "cc16813f6dc499951d1976a0e47dbe0f01c8b4f1d570258d5cb9ec686f5dc4e9",
+      "original_acceptance": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133060,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 133040,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.25
+        },
+        {
+          "name": "tls-record:alternate",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Progressive heap loss during continuous playback",
+          "seconds": 601.266
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133080,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 133080,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.343
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.0
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 0.703
+        }
+      ],
+      "interrupted": false,
+      "seconds": 600.0780000000086,
+      "cpu": {
+        "observed_seconds": 587.298,
+        "windows": 116,
+        "peak_percent": 72.0,
+        "busy_mean_percent": 70.83379851455308,
+        "idle_mean_percent": 29.166201485446916,
+        "decode_mean_percent": 47.44846381223842,
+        "stream_mean_percent": 0.40405058420086565,
+        "output_mean_percent": 7.799130424418268,
+        "wifi_mean_percent": 5.59682103463659,
+        "tcpip_mean_percent": 3.79690463784995,
+        "web_mean_percent": 2.4694044590650743,
+        "at_least_85_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_95_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_99.9_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        }
+      },
+      "cpu_malformed": [],
+      "cpu_gaps": [],
+      "decoder_windows": 117,
+      "audio_wall_ratio": 1.0015909242211385,
+      "elapsed_decode_ms_per_audio_second": 519.6734582577055,
+      "heap": {
+        "heap": {
+          "min": 16700,
+          "median": 17356,
+          "max": 26220
+        },
+        "largest": {
+          "min": 4608,
+          "median": 7680,
+          "max": 17408
+        }
+      },
+      "network_metrics_available": false,
+      "network_issues": [
+        "Nonconsecutive snapshot sequence"
+      ],
+      "receive_credit": {
+        "uncredited": {
+          "min": 0,
+          "median": 7161.0,
+          "max": 8598
+        },
+        "refused": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        }
+      },
+      "watchdog_counter_max": 0,
+      "watchdog_fault_rows": 0,
+      "allocation_fault_rows": [],
+      "maximum_http_ms": 530.9999999881256,
+      "minimum_rssi": -85,
+      "failed_transport_phases": [],
+      "hashes": {
+        "report": "c024c930e16eb2747642f4dba452989026fe4bf0022e1b8c7d33a10c9aa2d4ca",
+        "status": "8246519a077b583427f3db6e6a11f557850305ec3a20574916fb42896e54ee74",
+        "performance": "a1aa45903c9631f174675c86fb873e16874a67c55fc2013a59790e4ceaa8fbdf"
+      }
+    },
+    {
+      "name": "rxonly-flac-https-600",
+      "image": "cc16813f6dc499951d1976a0e47dbe0f01c8b4f1d570258d5cb9ec686f5dc4e9",
+      "original_acceptance": [
+        {
+          "name": "load-idle-baseline:stress-flac-48000-2ch-16bit-610s",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133092,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 133092,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.266
+        },
+        {
+          "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-610s",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Runtime failure during file playback",
+          "seconds": 601.25
+        },
+        {
+          "name": "load-idle-recovery:stress-flac-48000-2ch-16bit-610s",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133100,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 133100,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.156
+        },
+        {
+          "name": "restore-board",
+          "result": "PASS",
+          "evidence": {
+            "left_stopped": true
+          },
+          "seconds": 0.156
+        }
+      ],
+      "interrupted": false,
+      "seconds": 600.0629999999946,
+      "cpu": {
+        "observed_seconds": 586.1909999999999,
+        "windows": 115,
+        "peak_percent": 100.0,
+        "busy_mean_percent": 99.63278300076256,
+        "idle_mean_percent": 0.36721699923745116,
+        "decode_mean_percent": 19.843502032613944,
+        "stream_mean_percent": 34.7903969866477,
+        "output_mean_percent": 5.919170031610857,
+        "wifi_mean_percent": 19.834528848105823,
+        "tcpip_mean_percent": 14.765167155415217,
+        "web_mean_percent": 2.614654779756086,
+        "at_least_85_percent": {
+          "seconds": 576.0199999999999,
+          "observed_time_percent": 98.2649000069943
+        },
+        "at_least_95_percent": {
+          "seconds": 576.0199999999999,
+          "observed_time_percent": 98.2649000069943
+        },
+        "at_least_99.9_percent": {
+          "seconds": 560.6449999999999,
+          "observed_time_percent": 95.64203476341328
+        }
+      },
+      "cpu_malformed": [],
+      "cpu_gaps": [],
+      "decoder_windows": 117,
+      "audio_wall_ratio": 0.9743577953528294,
+      "elapsed_decode_ms_per_audio_second": 200.75541083547878,
+      "heap": {
+        "heap": {
+          "min": 57232,
+          "median": 59242.0,
+          "max": 67052
+        },
+        "largest": {
+          "min": 40960,
+          "median": 40960.0,
+          "max": 40960
+        }
+      },
+      "network_metrics_available": true,
+      "network_issues": [],
+      "receive_credit": {
+        "uncredited": {
+          "min": 0,
+          "median": 7582.0,
+          "max": 8640
+        },
+        "refused": {
+          "min": 0,
+          "median": 0.0,
+          "max": 0
+        }
+      },
+      "watchdog_counter_max": 114,
+      "watchdog_fault_rows": 114,
+      "allocation_fault_rows": [],
+      "maximum_http_ms": 530.9999999881256,
+      "minimum_rssi": -80,
+      "failed_transport_phases": [],
+      "hashes": {
+        "report": "8eb15c9c22e5dbfa135217a77d3b795b27ee8c209c4d65c7f594c04433a5ea7e",
+        "status": "99495a80c53893a1be026ee7b104126521beda97cdecb09cc078c9c4d52f3295",
+        "performance": "82a5063b536d04498cf58dbad45b59b09d14b77207cf7a77068e503889070c97"
+      }
+    }
+  ],
+  "restoration": {
+    "result": "PASS",
+    "info": {
+      "version": "v0.9.693-1252-g941b935c",
+      "partition": "app1",
+      "max_size": 1900544,
+      "app_elf_sha256": "da2f5dfeac6a51f55387f833ddcf5401b23b610709bb36126b2e28d2657aaad0"
+    },
+    "status": [
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -60
+      },
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -71
+      },
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -71
+      }
+    ],
+    "persistence": {
+      "wifi_unchanged": true,
+      "playlist_unchanged": true,
+      "settings_unchanged": true
+    },
+    "playback_state_restored": true
+  }
+}

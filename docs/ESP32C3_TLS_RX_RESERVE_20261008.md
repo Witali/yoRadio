@@ -130,8 +130,8 @@ A matched generic-reserve control is saved as
 Its ELF is `8f1a86ef61f8c5e56beeccf8a85f3dde7052ab480a02a227e0a80c02fb41ff1c`.
 Both images use output priority 8, decoder priority 7 and stream priority 5;
 their saved configurations differ only in `CONFIG_YORADIO_TLS_RX_ONLY_RESERVE`.
-The control passes build and linked-code audits; its physical comparison is
-pending at this checkpoint. Both images remain laboratory-only and
+The control passes build and linked-code audits; its completed physical
+comparison is recorded below. Both images remain laboratory-only and
 **NOT_QUALIFIED** for production.
 
 The [short-run evidence archive](../tests/results/esp32c3-rxonly-physical-20261008/)
@@ -141,6 +141,43 @@ controller, which was not executed as part of this archive. The host fixture
 server's separate TLS 1.3 loopback check does not establish board TLS 1.3 support.
 
 ## Saved candidate and remaining work
+
+### Completed ten-minute comparison and DMA follow-up
+
+The matched output-priority-8 runs completed all 600 seconds per case. CPU
+values use complete telemetry intervals after ten seconds of warmup. Audio/wall
+is decoded audio duration divided by elapsed time, not an acoustic measurement.
+
+| Image / HTTPS case | Mean CPU busy | Audio/wall | Minimum free / largest block | New watchdog events | Original result |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Generic reserve, HE-AACv2 alternating TLS records | 71.03% | 1.00158 | 16,508 / 4,608 B | 0 | FAIL: progressive heap loss |
+| RX-only reserve, HE-AACv2 alternating TLS records | 70.83% | 1.00159 | 16,700 / 4,608 B | 0 | FAIL: progressive heap loss |
+| RX-only reserve, FLAC 48 kHz stereo over HTTPS | 99.63% | 0.97436 | 57,232 / 40,960 B | 114 | FAIL: runtime watchdog |
+
+Both AAC runs retain their heap-trend failure even though playback continued
+and memory recovered after Stop. Increasing outstanding TCP payload credit
+correlates with the heap decrease; credit counts payload bytes, not allocated
+owner memory, so it does not prove that all of the decrease is expected queue
+storage. One RX-only AAC receive-snapshot sequence is incomplete; its network
+coverage remains unavailable rather than being reported as a full pass.
+
+The FLAC run lagged real time by about 2.56%. Mean task CPU was 34.79% stream,
+19.84% decoder, 19.83% Wi-Fi, 14.77% TCP/IP and 5.92% output. No allocation
+failure was captured. This run completed without the earlier host socket
+failure; it does not establish that the host issue can never recur.
+
+A separate instrumented staged-output run measured **154 DMA completion-queue
+overruns over 45.109 observed seconds** of a 60-second FLAC test, versus **zero
+over 75.110 seconds** of a 90-second HE-AACv2 test. The FLAC runtime gate failed;
+the short AAC gates passed. A discarded completion notification indicates
+delayed output service, not an exact count of lost audio samples. See the
+[DMA notes](ESP32C3_OUTPUT_DMA_20261005.md).
+
+Both controllers restored the quiet image, verified unchanged Wi-Fi, playlist
+and settings, and observed the original playing state over 15 seconds. Raw
+reports, original failures, image identities, controllers and hashes are in the
+[long-run evidence archive](../tests/results/esp32c3-rxonly-long-20261008/).
+These results do not qualify the reserve configuration for production.
 
 The RX-only laboratory build is saved under
 [`firmware/development/esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly/`](../firmware/development/esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly/).
@@ -152,10 +189,10 @@ attribute memory results specifically to the allocator.
 
 Before promotion, extend the short record/framing coverage above, test certificate rejection,
 concurrent contexts, Stop/EOF/reset/error cleanup, codec switching, late SBR/PS,
-ten-minute playback and OTA. Investigate FLAC idle-task starvation with bounded
+longer playback after resolving the retained failures, and OTA. Investigate FLAC idle-task starvation with bounded
 cooperative work and measured output continuity; do not disable the watchdog
-or extend its deadline merely to pass. Resolve the host socket failure before
-claiming a complete FLAC soak. Retain the AAC heap-trend failure for comparison.
+or extend its deadline merely to pass. Preserve host transport diagnostics in
+future soaks. Retain the AAC heap-trend failure for comparison.
 
 Exact configurations, source hashes, host/physical logs, failed attempts and
 restoration checks are in the [evidence archive](../tests/results/esp32c3-tls-rx-reserve-20261008/).

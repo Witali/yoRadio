@@ -1,0 +1,100 @@
+{
+  "board": {
+    "version": "idf61-9a97-dmaprof",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "bfeb06c3114b1c1c3dc8a377eb091c8c33bcf4df58a92adbabea5dd3b06250f9"
+  },
+  "cases": [
+    {
+      "name": "load:stress-flac-48000-2ch-16bit-610s",
+      "interrupted": false,
+      "samples": 10,
+      "start": 157308.859,
+      "end": 157353.968,
+      "observed_seconds": 45.10899999999674,
+      "coverage_complete": true,
+      "maximum_sample_gap_seconds": 5.0310000000172295,
+      "delta": {
+        "q_overruns": 154,
+        "writes": 4082,
+        "written_bytes": 8359936,
+        "write_us": 24271845,
+        "errors": 0
+      },
+      "maximum_write_us_since_boot": 20490,
+      "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+      "acoustic_continuity_qualified": false
+    }
+  ],
+  "original_acceptance": [
+    {
+      "name": "load-idle-baseline:stress-flac-48000-2ch-16bit-610s",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 133000,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132968,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.141
+    },
+    {
+      "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-610s",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Runtime failure during file playback",
+      "seconds": 61.219
+    },
+    {
+      "name": "load-idle-recovery:stress-flac-48000-2ch-16bit-610s",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 132964,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132964,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132964,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.125
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "left_stopped": true
+      },
+      "seconds": 0.188
+    }
+  ],
+  "source_sha256": "84412aaaae33491863411207c01c7b9c8702a9e232a899459d91845bb4d5e1fc",
+  "input_sha256": {
+    "performance.json": "95064e367dae9e9aef72684a04eba4e277006a4ffb153daec6a1bc65141ef86b",
+    "status.json": "48aee6e5eeca8f0ae9c0e9d6d0cc0c6e0b78073768c084c37ecaaadedba2f6e8",
+    "report.json": "abac45cc5c944d438a50304af7452f2760226105e722e32c552ab0d44dcffc5e"
+  }
+}

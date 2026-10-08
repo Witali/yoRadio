@@ -50,10 +50,10 @@ The host ASan/UBSan comparison passes all 432 PCM cases for staged, direct,
 and both instrumented variants, with the same 12,331,776-byte PCM hash shown
 below. Normalizer checks pass all 648 settings with zero LSB differences.
 Additional fault injection covers failed callback registration, SDK timeout,
-short writes and cumulative counter retention. Four parser tests reject
+short writes and cumulative counter retention. Six parser tests reject
 damaged rows/resets and preserve gaps in telemetry coverage. The optional
-6.1 image builds and passes linked AAC/HTTP/TLS allocation audits, but has
-not been installed or physically qualified at this checkpoint.
+6.1 image builds and passes linked AAC/HTTP/TLS allocation audits. Its physical
+follow-up below retains the failed FLAC qualification.
 
 ```text
 python tools/codec_benchmark/run_output_dma_host.py --profile --output <new-host-directory>
@@ -68,6 +68,24 @@ selected samples, without extrapolation. Evidence is retained under
 `firmware/development/esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof/`.
 It includes a test CA and experimental TLS settings and is not a production
 default recommendation.
+
+### Physical staged-output baseline
+
+On the pinned 6.1 build above, the 60-second HTTPS FLAC case recorded 154
+completion-queue overruns across 45.109 seconds between sustained-playback
+samples after warmup (3.414/s). Its runtime gate failed with 11 new watchdog
+events. The 90-second HE-AACv2 case with alternating 1/16 KiB TLS records passed
+its original gates and recorded zero overruns across 75.110 observed seconds.
+Telemetry coverage was complete in both selected windows; SDK write errors
+were zero. The 20,490 microsecond maximum write duration was since boot and
+carried into the subsequent AAC run; it is not an AAC-specific maximum.
+
+The separate ten-minute FLAC run lagged real time by 2.56% and captured 114
+watchdog events. Memory shortage was not observed in that run. These counters
+establish delayed DMA service, but no electrical or acoustic capture was made.
+The controller restored the quiet image and verified settings and playback.
+See the [immutable raw evidence](../tests/results/esp32c3-rxonly-long-20261008/)
+and the [matched TLS comparison](ESP32C3_TLS_RX_RESERVE_20261008.md).
 
 ## Implementation (final experimental variant)
 

@@ -1,0 +1,85 @@
+import hashlib, json, subprocess, sys, threading, time
+from pathlib import Path
+sys.path.insert(0, 'tools/esp32c3_tests')
+from common import Board, require
+from ota import snapshot, verify_snapshot
+
+root=Path('.build/c3-rxonly-physical-20261008/long')
+root.mkdir(exist_ok=False)
+trust=Path('.build/c3-tls-records-20261007/trust')
+board=Board('http://192.168.100.4')
+before=snapshot(board)
+initial=board.status()
+results=[]
+(root/'before.json').write_text(json.dumps(dict(info=board.info(),status=initial),indent=2)+'\n')
+paths=[Path(__file__),Path('tools/esp32c3_tests/trace_transport.py'),
+       Path('tools/esp32c3_tests/diagnostic.py'),Path('tools/esp32c3_tests/run.py'),
+       Path('tools/esp32c3_tests/tls_records.py'),Path('tools/audio_test_server/server.py')]
+(root/'sources.json').write_text(json.dumps({str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths},indent=2)+'\n')
+closed=threading.Event()
+
+def tcp_samples():
+    # Aggregate state counts only: no process names or unrelated peer addresses.
+    command="[pscustomobject]@{All=@(Get-NetTCPConnection -ErrorAction Stop | Group-Object State | Select-Object Name,Count);Board=@(Get-NetTCPConnection -RemoteAddress 192.168.100.4 -ErrorAction SilentlyContinue | Group-Object State | Select-Object Name,Count)} | ConvertTo-Json -Compress -Depth 5"
+    with (root/'host-tcp-counts.jsonl').open('x') as log:
+        while not closed.is_set():
+            row=dict(at=time.monotonic())
+            try:
+                value=subprocess.run(['pwsh.exe','-NoProfile','-Command',command],capture_output=True,text=True,timeout=12,creationflags=subprocess.CREATE_NO_WINDOW)
+                row['result']=json.loads(value.stdout) if value.returncode==0 else dict(returncode=value.returncode)
+            except Exception as error:
+                row['error_type']=type(error).__name__
+            log.write(json.dumps(row)+'\n');log.flush()
+            closed.wait(30)
+
+sampler=threading.Thread(target=tcp_samples,daemon=True)
+sampler.start()
+
+def run(name,script,args,required=False):
+    print('START',name,flush=True)
+    command=[sys.executable,'-X','utf8',script,*map(str,args)]
+    started=time.monotonic()
+    with (root/(name+'.log')).open('xb') as log:
+        code=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,timeout=1800).returncode
+    results.append(dict(name=name,code=code,seconds=time.monotonic()-started,command=command))
+    (root/'phases.json').write_text(json.dumps(results,indent=2)+'\n')
+    print('END',name,code,flush=True)
+    if required and code:raise RuntimeError('Required phase failed: '+name)
+    return code
+
+try:
+    for label in ('output8','rxonly'):
+        image=Path('firmware/development/esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-'+label+'/app.bin')
+        run('install-'+label,'.build/idf-upgrade/install.py',['--firmware',image,'--output',root/('install-'+label+'.json')],True)
+        shared=['--board',board.origin,'--host','192.168.100.253','--serial-port','COM9',
+            '--firmware',image,'--ca',trust/'ca.pem','--cert',trust/'server.pem','--key',trust/'server.key']
+        run(label+'-aac-alternate-600','tools/esp32c3_tests/trace_transport.py',[
+            '--runner','tls_records','--',*shared,'--mode','alternate','--seconds','600',
+            '--output',root/(label+'-aac-alternate-600')])
+    run('rxonly-flac-https-600','tools/esp32c3_tests/trace_transport.py',[
+        '--runner','diagnostic','--','run','--board',board.origin,'--host','192.168.100.253',
+        '--serial-port','COM9','--suite','load','--load-seconds','600','--load-idle-recovery',
+        '--case','stress-flac-48000-2ch-16bit-610s',
+        '--fixture-manifest','.build/c3-reserve-soak-20261008/fixtures/manifest.json',
+        '--sustained-protocol','https','--unpaced-files','--delivery-stats','--leave-stopped',
+        '--https-origin','https://192.168.100.253:8771','--tls-cert',trust/'server.pem','--tls-key',trust/'server.key',
+        '--sdkconfig',image.with_name('sdkconfig'),'--output',root/'rxonly-flac-https-600'])
+finally:
+    try:
+        run('restore','.build/idf-upgrade/install.py',[
+            '--firmware','firmware/development/esp32c3-idf-6.1-compact-icy-quiet/app.bin',
+            '--output',root/'restore.json'],True)
+        identity=board.info()
+        require(identity['app_elf_sha256']=='da2f5dfeac6a51f55387f833ddcf5401b23b610709bb36126b2e28d2657aaad0','Wrong restored image')
+        if not initial['audio']:board.stop()
+        samples=[]
+        for _ in range(3):
+            time.sleep(5);samples.append(board.status())
+        state_matches=all(s['audio']==initial['audio'] for s in samples)
+        final=dict(result='PASS' if state_matches else 'FAIL',info=identity,status=samples,
+            persistence=verify_snapshot(board,before),playback_state_restored=state_matches)
+        (root/'final-board.json').write_text(json.dumps(final,indent=2)+'\n')
+        require(state_matches,'Initial playback state not restored')
+    finally:
+        closed.set();sampler.join(timeout=15)
+print('RX_ONLY_LONG_COMPLETE',flush=True)
