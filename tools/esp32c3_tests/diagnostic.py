@@ -29,6 +29,10 @@ def filter_line(line):
                          r'resident=\d+ minimum=\d+ target=\d+ occupied=\d+ capacity=\d+\b', line)
     if adaptive:
         return adaptive.group(0)
+    reserved = re.search(r'\bTLS_RESERVE capacity=\d+ minimum=\d+ allocations=\d+ '
+                         r'releases=\d+ busy_fallbacks=\d+ oversize=\d+ busy=\d+ used=\d+\b', line)
+    if reserved:
+        return reserved.group(0)
     registers = re.findall(r'\b(MEPC|RA|MCAUSE)\s*:\s*(0x[0-9a-fA-F]+)', line)
     if registers:
         return 'PANIC registers: '+' '.join(name+'='+value for name, value in registers)

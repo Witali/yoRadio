@@ -35,7 +35,7 @@ def main():
                     .replace('/* PRODUCTION_TLS */', body(inputs[2])))
     binary = args.output / 'test'
     (args.output / 'build.log').write_bytes(run([
-        'gcc', '-std=c11', '-O2', '-g', '-Wall', '-Wextra', '-Werror',
+        'gcc', '-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1', '-std=c11', '-O2', '-g', '-Wall', '-Wextra', '-Werror',
         '-Wno-unused-variable', '-pthread', '-fsanitize=address,undefined',
         '-fno-pie', '-no-pie', host(unit), '-o', host(binary)]))
     result = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',

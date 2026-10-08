@@ -11,6 +11,12 @@ from common import TLS_CERTIFICATE_REJECTED
 
 
 class PanicFilter(unittest.TestCase):
+    def test_tls_reserve_retains_only_numeric_counters(self):
+        counters = ('TLS_RESERVE capacity=17058 minimum=16384 allocations=10 '
+                    'releases=9 busy_fallbacks=0 oversize=0 busy=1 used=16749')
+        self.assertEqual(filter_line('I (12) tls_reserve: '+counters+' private-secret'), counters)
+        self.assertIsNone(filter_line('I (12) tls_reserve: private-secret'))
+
     def test_adaptive_input_retains_only_numeric_counters(self):
         counters = ('TLS_INPUT released=4 retries=0 request=16749 resident=4 '
                     'minimum=4 target=8 occupied=2 capacity=8240')

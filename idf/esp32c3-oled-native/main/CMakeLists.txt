@@ -269,10 +269,20 @@ idf_component_register(
 yoradio_aac_profile()
 yoradio_vorbis_repair()
 if(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER)
-  target_sources(${COMPONENT_LIB} PRIVATE "adaptive_input.c" "tls_input_reserve.c")
+  target_sources(${COMPONENT_LIB} PRIVATE "adaptive_input.c")
+endif()
+if(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER OR CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE)
+  target_sources(${COMPONENT_LIB} PRIVATE "tls_input_reserve.c")
   target_link_options(${COMPONENT_LIB} INTERFACE
     "-Wl,--wrap=esp_mbedtls_mem_calloc"
     "-Wl,--undefined=__wrap_esp_mbedtls_mem_calloc")
+endif()
+if(CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE)
+  idf_component_get_property(tls_reserve_mbedtls_dir mbedtls COMPONENT_DIR)
+  target_sources(${COMPONENT_LIB} PRIVATE "tls_large_reserve.c")
+  target_include_directories(${COMPONENT_LIB} PRIVATE "${tls_reserve_mbedtls_dir}/port/dynamic")
+  target_link_options(${COMPONENT_LIB} INTERFACE
+    "-Wl,--wrap=esp_mbedtls_mem_free" "-Wl,--undefined=__wrap_esp_mbedtls_mem_free")
 endif()
 if(CONFIG_ESP_TLS_USING_MBEDTLS)
   target_sources(${COMPONENT_LIB} PRIVATE "tls_stream_eof.c")

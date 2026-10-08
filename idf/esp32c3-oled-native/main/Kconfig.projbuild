@@ -1,5 +1,18 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_TLS_LARGE_BLOCK_RESERVE
+    bool "Reserve one large TLS allocation in static RAM (experimental)"
+    depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC && MBEDTLS_DYNAMIC_BUFFER
+    default n
+    help
+        Place one full-record-sized allocation slot in aligned static RAM,
+        deriving its capacity from the SDK's dynamic TLS buffer definitions.
+        Small allocations, oversize requests and simultaneous allocations use
+        the normal heap. The slot is not tied to a specific connection or RX
+        allocation site; it may also serve large handshake allocations.
+        Keep disabled until full-record playback, certificates, concurrent
+        contexts, all codecs and OTA pass. Can combine with adaptive input.
+
 config YORADIO_ADAPTIVE_INPUT_BUFFER
     bool "Release idle compressed-input blocks for TLS (experimental)"
     depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC

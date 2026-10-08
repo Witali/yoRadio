@@ -48,7 +48,7 @@
 #include "network_service.h"
 
 #include "runtime_settings.h"
-#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+#if defined(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER) || defined(CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE)
 #include "tls_input_reserve.h"
 #endif
 #define STREAM_CHUNK_SIZE 2048
@@ -1054,7 +1054,7 @@ static void decoder_task(void *argument) {
 
     while (true) {
         rx_buffer_diagnostic_poll();
-#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+#if defined(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER) || defined(CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE)
         tls_input_reserve_poll();
 #endif
         uint32_t current_generation = atomic_load(&s_generation);
