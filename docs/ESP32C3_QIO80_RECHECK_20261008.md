@@ -1,5 +1,10 @@
 # ESP32-C3 DIO and QIO recheck on ESP-IDF 6.1
 
+After this comparison, the user requested a
+[quiet QIO production build and installation](ESP32C3_PRODUCTION_QIO80_20261008.md).
+That separate deployment preserves the laboratory outcomes and qualification
+limits below; the generic board default remains DIO.
+
 ## Why the previous promotion stopped
 
 The [30 September full-radio comparison](ESP32C3_QIO80_ACCEPTANCE_20260930.md)

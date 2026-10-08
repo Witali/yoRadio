@@ -142,6 +142,11 @@ The following decisions combine that guidance with our measured configuration:
   before the EOF and compact-AAC repairs. The
   [ESP-IDF 6.1 recheck](ESP32C3_QIO80_RECHECK_20261008.md) verifies actual
   DIO/QIO 80 MHz operation and retains the current full-radio comparison.
+  Later that day the user requested the
+  [quiet QIO 80 MHz production variant](ESP32C3_PRODUCTION_QIO80_20261008.md),
+  which was installed with its matching bootloader (ELF SHA starts
+  `54ec71b49326`). Its remaining checks were skipped at the user's request;
+  the earlier DIO identity above describes the board before this installation.
   Application OTA leaves the bootloader intact; verify runtime controller mode
   before attributing a timing change to Quad operation.
 - **Compiler and checks:** the measured configuration selects performance

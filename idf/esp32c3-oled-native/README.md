@@ -82,6 +82,12 @@ Auto Suspend placement profile. Keep that profile disabled pending diagnosis.
 
 ### Acceptance tests
 
+The optional `sdkconfig.qio80.defaults` selects QIO 80 MHz for the tested XMC
+4 MiB board. A mode change requires the matching bootloader as well as the
+application. See the [quiet QIO production deployment](../../docs/ESP32C3_PRODUCTION_QIO80_20261008.md)
+for its saved image, build recipe and completed/skipped checks; the generic
+board default remains DIO.
+
 The [testing guide](../../docs/ESP32C3_TESTING.md) lists missing coverage,
 executable HTTP/HTTPS, codec-switching, CPU/heap and OTA tests, plus procedures
 for physical audio, interrupt timing and power-cut recovery. Test outcomes are
