@@ -13,6 +13,11 @@ network, WebUI and audio pipeline sources were carried over from that target.
 
 ## Hardware profile
 
+Agents optimizing this target should start with the
+[ESP32-C3 optimization reference](../../docs/ESP32C3_OPTIMIZATION_REFERENCE.md)
+for CPU/memory capabilities, cycle-counter usage, measurement limits and the
+ESP-IDF 6.1 speed recommendations relevant to this board.
+
 ### RAM policy for Wi-Fi and AAC
 
 The C3 defaults and `build-production.ps1` disable `CONFIG_ESP_WIFI_IRAM_OPT`

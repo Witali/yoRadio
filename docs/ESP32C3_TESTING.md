@@ -4,6 +4,10 @@ This document defines the acceptance tests added after the 2026-09-30 audit.
 **A test exists, a test ran, and a test passed are three different states.**
 Keep failed measurements. Never accept AAC-core fallback as successful HE-AAC.
 
+For processor capabilities, hardware cycle counters, cache-aware measurements
+and the applicable ESP-IDF 6.1 speed guidance, read the
+[ESP32-C3 optimization reference](ESP32C3_OPTIMIZATION_REFERENCE.md).
+
 Since 2026-10-08, positive HTTP/HTTPS file cases also reject captured allocation,
 decoder, TLS, panic, watchdog, reboot and serial-capture failures, even if the
 format status and EOF look correct. The result records whether serial capture
