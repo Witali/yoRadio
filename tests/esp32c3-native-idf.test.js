@@ -476,7 +476,7 @@ test("native radio requests and publishes ICY song metadata", () => {
   );
   assert.match(
     audio,
-    /esp_http_client_read\(client,[\s\S]*atomic_load\(&s_generation\) != command\.generation[\s\S]*received == -ESP_ERR_HTTP_EAGAIN/,
+    /stream_http_read\(&reader, client,[\s\S]*atomic_load\(&s_generation\) != command\.generation[\s\S]*received == -ESP_ERR_HTTP_EAGAIN/,
   );
   assert.match(
     audio,
