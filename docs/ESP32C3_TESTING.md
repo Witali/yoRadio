@@ -893,7 +893,7 @@ remain visible in the separate final trace.
 
 ```powershell
 python tests/test-tls-framing-server.py
-python tests/test-stream-http-reader.py --idf C:/Work/yoRadio/.idf/v6.1 --output .build/http-eof-host
+python tests/test-stream-http-reader.py --idf C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6 --output .build/http-eof-host
 python tools/esp32c3_tests/tls_framing.py --board http://192.168.100.4 --host 192.168.100.253 --serial-port COM9 --firmware <lab-app.bin> --ca <ca.pem> --cert <server.pem> --key <server.key> --output .build/http-eof-board
 ```
 

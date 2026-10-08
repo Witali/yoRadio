@@ -80,8 +80,13 @@ The full profiling build and linked AAC/TLS audits pass. The saved application
 is `firmware/development/esp32c3-idf-6.1-r9a97f6c54ec6-rx6-dynamic/app.bin`;
 its ELF identity is `e51ff9fd08123d5aa5da09441818777eb6c04eca99c0279dfd396d1e88247e75`.
 It has the full PC19 configuration and a 32,744-byte SBR owner. This explicitly
-labelled laboratory image adds the test CA to normal roots. Physical acceptance
-of this revision remains open.
+labelled laboratory image adds the test CA to normal roots. The
+[latest-revision report](ESP32C3_IDF61_REVISION_20261008.md) records the new
+QEMU PCM checks, 44 passing physical HTTP/HTTPS file cases, format transitions,
+and four passing public AAC streams. Full-sized TLS records still cause a
+16,749-byte allocation failure during HEv2, and a public MP3 WebUI timeout is
+under investigation. Physical acceptance of the complete revision is not yet
+established.
 
 ### Earlier release tag qualification
 

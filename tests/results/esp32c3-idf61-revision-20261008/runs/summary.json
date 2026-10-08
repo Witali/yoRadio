@@ -1,0 +1,4012 @@
+{
+  "physical/framing": {
+    "cases": [
+      {
+        "name": "framing:length-notify",
+        "result": "PASS",
+        "seconds": 20.094,
+        "evidence": {
+          "expected_terminal": "stream ended",
+          "observed_terminal": "stream ended",
+          "full_format_samples": 47,
+          "first_full_pcm_seconds": 0.5629999999946449
+        }
+      },
+      {
+        "name": "framing:length-raw",
+        "result": "PASS",
+        "seconds": 20.125,
+        "evidence": {
+          "expected_terminal": "stream ended",
+          "observed_terminal": "stream ended",
+          "full_format_samples": 47,
+          "first_full_pcm_seconds": 0.5780000000086147
+        }
+      },
+      {
+        "name": "framing:length-short",
+        "result": "PASS",
+        "seconds": 20.328,
+        "evidence": {
+          "expected_terminal": "stream read failed",
+          "observed_terminal": "stream read failed",
+          "full_format_samples": 48,
+          "first_full_pcm_seconds": 0.5469999999913853
+        }
+      },
+      {
+        "name": "framing:chunked-notify",
+        "result": "PASS",
+        "seconds": 20.125,
+        "evidence": {
+          "expected_terminal": "stream ended",
+          "observed_terminal": "stream ended",
+          "full_format_samples": 47,
+          "first_full_pcm_seconds": 0.5629999999946449
+        }
+      },
+      {
+        "name": "framing:chunked-raw",
+        "result": "PASS",
+        "seconds": 20.094,
+        "evidence": {
+          "expected_terminal": "stream ended",
+          "observed_terminal": "stream ended",
+          "full_format_samples": 47,
+          "first_full_pcm_seconds": 0.5620000000053551
+        }
+      },
+      {
+        "name": "framing:chunked-short",
+        "result": "PASS",
+        "seconds": 20.265,
+        "evidence": {
+          "expected_terminal": "stream read failed",
+          "observed_terminal": "stream read failed",
+          "full_format_samples": 48,
+          "first_full_pcm_seconds": 0.5310000000172295
+        }
+      },
+      {
+        "name": "framing:close-notify",
+        "result": "PASS",
+        "seconds": 20.156,
+        "evidence": {
+          "expected_terminal": "stream ended",
+          "observed_terminal": "stream ended",
+          "full_format_samples": 48,
+          "first_full_pcm_seconds": 0.5629999999946449
+        }
+      },
+      {
+        "name": "framing:close-raw",
+        "result": "PASS",
+        "seconds": 20.063,
+        "evidence": {
+          "expected_terminal": "stream read failed",
+          "observed_terminal": "stream read failed",
+          "full_format_samples": 48,
+          "first_full_pcm_seconds": 0.5309999999881256
+        }
+      },
+      {
+        "name": "settings-preserved",
+        "result": "PASS",
+        "seconds": 0.75,
+        "evidence": {
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        }
+      }
+    ],
+    "allocation_failures": 0,
+    "all_phase_fault_lines": [
+      {
+        "at": 139650.406,
+        "line": "TLS failure: component=esp-tls-mbedtls"
+      },
+      {
+        "at": 139710.953,
+        "line": "TLS failure: component=esp-tls-mbedtls"
+      },
+      {
+        "at": 139750.843,
+        "line": "TLS failure: component=esp-tls-mbedtls"
+      }
+    ],
+    "status": [
+      {
+        "case": "framing:length-notify",
+        "samples": 71,
+        "duration": 18.85999999998603,
+        "interrupted": null,
+        "rssi_min": -76,
+        "rssi_max": -59
+      },
+      {
+        "case": "framing:length-raw",
+        "samples": 71,
+        "duration": 18.98399999999674,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "framing:length-short",
+        "samples": 72,
+        "duration": 19.10999999998603,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -60
+      },
+      {
+        "case": "framing:chunked-notify",
+        "samples": 71,
+        "duration": 19.0,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "framing:chunked-raw",
+        "samples": 71,
+        "duration": 18.905999999988126,
+        "interrupted": null,
+        "rssi_min": -76,
+        "rssi_max": -60
+      },
+      {
+        "case": "framing:chunked-short",
+        "samples": 72,
+        "duration": 19.04700000002049,
+        "interrupted": null,
+        "rssi_min": -81,
+        "rssi_max": -59
+      },
+      {
+        "case": "framing:close-notify",
+        "samples": 72,
+        "duration": 19.062999999994645,
+        "interrupted": null,
+        "rssi_min": -83,
+        "rssi_max": -60
+      },
+      {
+        "case": "framing:close-raw",
+        "samples": 71,
+        "duration": 18.937999999994645,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      }
+    ],
+    "observed_cpu_including_startup": [
+      {
+        "case": "framing:length-notify",
+        "windows": 4,
+        "mean_busy": 49.475,
+        "peak_busy": 65.6,
+        "minimum_heap": 26568.0,
+        "minimum_largest": 16384.0,
+        "first_three_medians": {
+          "heap": 31108.0,
+          "largest": 17408.0
+        },
+        "last_three_medians": {
+          "heap": 142844.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "framing:length-raw",
+        "windows": 4,
+        "mean_busy": 44.824999999999996,
+        "peak_busy": 65.6,
+        "minimum_heap": 26128.0,
+        "minimum_largest": 13312.0,
+        "first_three_medians": {
+          "heap": 32748.0,
+          "largest": 17408.0
+        },
+        "last_three_medians": {
+          "heap": 142844.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "framing:length-short",
+        "windows": 4,
+        "mean_busy": 45.475,
+        "peak_busy": 65.8,
+        "minimum_heap": 27368.0,
+        "minimum_largest": 13824.0,
+        "first_three_medians": {
+          "heap": 35292.0,
+          "largest": 20480.0
+        },
+        "last_three_medians": {
+          "heap": 142844.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "framing:chunked-notify",
+        "windows": 3,
+        "mean_busy": 54.699999999999996,
+        "peak_busy": 66.1,
+        "minimum_heap": 26580.0,
+        "minimum_largest": 16384.0,
+        "first_three_medians": {
+          "heap": 35392.0,
+          "largest": 20480.0
+        },
+        "last_three_medians": {
+          "heap": 35392.0,
+          "largest": 20480.0
+        }
+      },
+      {
+        "case": "framing:chunked-raw",
+        "windows": 4,
+        "mean_busy": 44.9,
+        "peak_busy": 67.4,
+        "minimum_heap": 25484.0,
+        "minimum_largest": 9216.0,
+        "first_three_medians": {
+          "heap": 47432.0,
+          "largest": 18432.0
+        },
+        "last_three_medians": {
+          "heap": 47432.0,
+          "largest": 18432.0
+        }
+      },
+      {
+        "case": "framing:chunked-short",
+        "windows": 4,
+        "mean_busy": 45.3,
+        "peak_busy": 65.2,
+        "minimum_heap": 23972.0,
+        "minimum_largest": 10752.0,
+        "first_three_medians": {
+          "heap": 25368.0,
+          "largest": 13312.0
+        },
+        "last_three_medians": {
+          "heap": 47444.0,
+          "largest": 18432.0
+        }
+      },
+      {
+        "case": "framing:close-notify",
+        "windows": 4,
+        "mean_busy": 45.5,
+        "peak_busy": 65.2,
+        "minimum_heap": 27860.0,
+        "minimum_largest": 9728.0,
+        "first_three_medians": {
+          "heap": 28748.0,
+          "largest": 11776.0
+        },
+        "last_three_medians": {
+          "heap": 47528.0,
+          "largest": 19456.0
+        }
+      },
+      {
+        "case": "framing:close-raw",
+        "windows": 4,
+        "mean_busy": 44.975,
+        "peak_busy": 64.9,
+        "minimum_heap": 28732.0,
+        "minimum_largest": 15360.0,
+        "first_three_medians": {
+          "heap": 28736.0,
+          "largest": 15872.0
+        },
+        "last_three_medians": {
+          "heap": 47496.0,
+          "largest": 20480.0
+        }
+      }
+    ]
+  },
+  "physical/formats": {
+    "cases": [
+      {
+        "name": "http:mp3-320:auto",
+        "result": "PASS",
+        "seconds": 17.469,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:mp3-320:mp3",
+        "result": "PASS",
+        "seconds": 17.437,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:flac-level8:auto",
+        "result": "PASS",
+        "seconds": 17.375,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:flac-level8:flac",
+        "result": "PASS",
+        "seconds": 17.563,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:vorbis-q10:auto",
+        "result": "PASS",
+        "seconds": 17.687,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:vorbis-q10:vorbis",
+        "result": "PASS",
+        "seconds": 17.438,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:opus-510:auto",
+        "result": "PASS",
+        "seconds": 17.562,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:opus-510:opus",
+        "result": "PASS",
+        "seconds": 17.516,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:aac-lc-320:auto",
+        "result": "PASS",
+        "seconds": 17.875,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:aac-lc-320:aac",
+        "result": "PASS",
+        "seconds": 17.906,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:lc-44100-stereo:auto",
+        "result": "PASS",
+        "seconds": 19.0,
+        "evidence": {
+          "samples": 16,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:lc-44100-stereo:aac",
+        "result": "PASS",
+        "seconds": 19.047,
+        "evidence": {
+          "samples": 16,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:lc-22050-mono:auto",
+        "result": "PASS",
+        "seconds": 18.718,
+        "evidence": {
+          "samples": 15,
+          "rate": 22050,
+          "channels": 1,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:lc-22050-mono:aac",
+        "result": "PASS",
+        "seconds": 18.641,
+        "evidence": {
+          "samples": 15,
+          "rate": 22050,
+          "channels": 1,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:lc-48000-stereo:auto",
+        "result": "PASS",
+        "seconds": 18.953,
+        "evidence": {
+          "samples": 16,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:lc-48000-stereo:aac",
+        "result": "PASS",
+        "seconds": 19.078,
+        "evidence": {
+          "samples": 16,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:he-44100-stereo:auto",
+        "result": "PASS",
+        "seconds": 18.203,
+        "evidence": {
+          "samples": 14,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:he-44100-stereo:aac",
+        "result": "PASS",
+        "seconds": 18.563,
+        "evidence": {
+          "samples": 14,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:he-48000-stereo:auto",
+        "result": "PASS",
+        "seconds": 18.641,
+        "evidence": {
+          "samples": 15,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:he-48000-stereo:aac",
+        "result": "PASS",
+        "seconds": 18.531,
+        "evidence": {
+          "samples": 15,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:hev2-44100-stereo:auto",
+        "result": "PASS",
+        "seconds": 18.5,
+        "evidence": {
+          "samples": 14,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "http:hev2-44100-stereo:aac",
+        "result": "PASS",
+        "seconds": 18.531,
+        "evidence": {
+          "samples": 14,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:mp3-320:auto",
+        "result": "PASS",
+        "seconds": 17.297,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:mp3-320:mp3",
+        "result": "PASS",
+        "seconds": 17.562,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:flac-level8:auto",
+        "result": "PASS",
+        "seconds": 17.907,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:flac-level8:flac",
+        "result": "PASS",
+        "seconds": 17.718,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:vorbis-q10:auto",
+        "result": "PASS",
+        "seconds": 17.61,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:vorbis-q10:vorbis",
+        "result": "PASS",
+        "seconds": 17.781,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:opus-510:auto",
+        "result": "PASS",
+        "seconds": 17.938,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:opus-510:opus",
+        "result": "PASS",
+        "seconds": 17.703,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:aac-lc-320:auto",
+        "result": "PASS",
+        "seconds": 17.437,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:aac-lc-320:aac",
+        "result": "PASS",
+        "seconds": 17.485,
+        "evidence": {
+          "samples": 13,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:lc-44100-stereo:auto",
+        "result": "PASS",
+        "seconds": 18.734,
+        "evidence": {
+          "samples": 16,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:lc-44100-stereo:aac",
+        "result": "PASS",
+        "seconds": 19.14,
+        "evidence": {
+          "samples": 16,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:lc-22050-mono:auto",
+        "result": "PASS",
+        "seconds": 18.828,
+        "evidence": {
+          "samples": 15,
+          "rate": 22050,
+          "channels": 1,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:lc-22050-mono:aac",
+        "result": "PASS",
+        "seconds": 18.844,
+        "evidence": {
+          "samples": 15,
+          "rate": 22050,
+          "channels": 1,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:lc-48000-stereo:auto",
+        "result": "PASS",
+        "seconds": 18.844,
+        "evidence": {
+          "samples": 16,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:lc-48000-stereo:aac",
+        "result": "PASS",
+        "seconds": 18.734,
+        "evidence": {
+          "samples": 16,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:he-44100-stereo:auto",
+        "result": "PASS",
+        "seconds": 18.109,
+        "evidence": {
+          "samples": 14,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:he-44100-stereo:aac",
+        "result": "PASS",
+        "seconds": 18.266,
+        "evidence": {
+          "samples": 14,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:he-48000-stereo:auto",
+        "result": "PASS",
+        "seconds": 18.953,
+        "evidence": {
+          "samples": 15,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:he-48000-stereo:aac",
+        "result": "PASS",
+        "seconds": 18.734,
+        "evidence": {
+          "samples": 15,
+          "rate": 48000,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:hev2-44100-stereo:auto",
+        "result": "PASS",
+        "seconds": 18.907,
+        "evidence": {
+          "samples": 15,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "https:hev2-44100-stereo:aac",
+        "result": "PASS",
+        "seconds": 18.578,
+        "evidence": {
+          "samples": 15,
+          "rate": 44100,
+          "channels": 2,
+          "serial_capture_enabled": true
+        }
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS",
+        "seconds": 0.297,
+        "evidence": {
+          "left_stopped": true
+        }
+      }
+    ],
+    "allocation_failures": 0,
+    "all_phase_fault_lines": [],
+    "status": [
+      {
+        "case": "mp3-320",
+        "samples": 17,
+        "duration": 8.187000000005355,
+        "interrupted": null,
+        "rssi_min": -81,
+        "rssi_max": -61
+      },
+      {
+        "case": "mp3-320:eof",
+        "samples": 16,
+        "duration": 8.10999999998603,
+        "interrupted": null,
+        "rssi_min": -82,
+        "rssi_max": -61
+      },
+      {
+        "case": "mp3-320",
+        "samples": 17,
+        "duration": 8.21899999998277,
+        "interrupted": null,
+        "rssi_min": -82,
+        "rssi_max": -59
+      },
+      {
+        "case": "mp3-320:eof",
+        "samples": 16,
+        "duration": 8.047000000020489,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -59
+      },
+      {
+        "case": "flac-level8",
+        "samples": 17,
+        "duration": 8.171999999991385,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -59
+      },
+      {
+        "case": "flac-level8:eof",
+        "samples": 16,
+        "duration": 8.109000000025844,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -61
+      },
+      {
+        "case": "flac-level8",
+        "samples": 17,
+        "duration": 8.171999999991385,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "flac-level8:eof",
+        "samples": 16,
+        "duration": 8.125,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "vorbis-q10",
+        "samples": 17,
+        "duration": 8.296999999991385,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "vorbis-q10:eof",
+        "samples": 16,
+        "duration": 8.296999999991385,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      },
+      {
+        "case": "vorbis-q10",
+        "samples": 17,
+        "duration": 8.26500000001397,
+        "interrupted": null,
+        "rssi_min": -76,
+        "rssi_max": -60
+      },
+      {
+        "case": "vorbis-q10:eof",
+        "samples": 16,
+        "duration": 8.0,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -60
+      },
+      {
+        "case": "opus-510",
+        "samples": 17,
+        "duration": 8.46899999998277,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -61
+      },
+      {
+        "case": "opus-510:eof",
+        "samples": 16,
+        "duration": 8.01600000000326,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -61
+      },
+      {
+        "case": "opus-510",
+        "samples": 17,
+        "duration": 8.34299999999348,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -61
+      },
+      {
+        "case": "opus-510:eof",
+        "samples": 16,
+        "duration": 8.03200000000652,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -61
+      },
+      {
+        "case": "aac-lc-320",
+        "samples": 17,
+        "duration": 8.171000000002095,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      },
+      {
+        "case": "aac-lc-320:eof",
+        "samples": 16,
+        "duration": 8.34399999998277,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -61
+      },
+      {
+        "case": "aac-lc-320",
+        "samples": 17,
+        "duration": 8.296999999991385,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "aac-lc-320:eof",
+        "samples": 16,
+        "duration": 8.203000000008615,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-44100-stereo",
+        "samples": 20,
+        "duration": 9.625,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.280999999988126,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-44100-stereo",
+        "samples": 20,
+        "duration": 9.60999999998603,
+        "interrupted": null,
+        "rssi_min": -82,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.28100000001723,
+        "interrupted": null,
+        "rssi_min": -82,
+        "rssi_max": -59
+      },
+      {
+        "case": "lc-22050-mono",
+        "samples": 19,
+        "duration": 9.14100000000326,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -59
+      },
+      {
+        "case": "lc-22050-mono:eof",
+        "samples": 16,
+        "duration": 8.39000000001397,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -59
+      },
+      {
+        "case": "lc-22050-mono",
+        "samples": 19,
+        "duration": 9.10899999999674,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -59
+      },
+      {
+        "case": "lc-22050-mono:eof",
+        "samples": 16,
+        "duration": 8.328000000008615,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -59
+      },
+      {
+        "case": "lc-48000-stereo",
+        "samples": 20,
+        "duration": 9.547000000020489,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -59
+      },
+      {
+        "case": "lc-48000-stereo:eof",
+        "samples": 16,
+        "duration": 8.25,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-48000-stereo",
+        "samples": 20,
+        "duration": 9.594000000011874,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -59
+      },
+      {
+        "case": "lc-48000-stereo:eof",
+        "samples": 16,
+        "duration": 8.296999999991385,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-44100-stereo",
+        "samples": 18,
+        "duration": 8.85999999998603,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -59
+      },
+      {
+        "case": "he-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.125,
+        "interrupted": null,
+        "rssi_min": -72,
+        "rssi_max": -59
+      },
+      {
+        "case": "he-44100-stereo",
+        "samples": 18,
+        "duration": 8.89100000000326,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.5,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -61
+      },
+      {
+        "case": "he-48000-stereo",
+        "samples": 19,
+        "duration": 9.375,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -61
+      },
+      {
+        "case": "he-48000-stereo:eof",
+        "samples": 16,
+        "duration": 8.125,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-48000-stereo",
+        "samples": 19,
+        "duration": 9.23399999999674,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -59
+      },
+      {
+        "case": "he-48000-stereo:eof",
+        "samples": 15,
+        "duration": 8.077999999979511,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -61
+      },
+      {
+        "case": "hev2-44100-stereo",
+        "samples": 18,
+        "duration": 8.921999999991385,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -59
+      },
+      {
+        "case": "hev2-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.202999999979511,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -60
+      },
+      {
+        "case": "hev2-44100-stereo",
+        "samples": 18,
+        "duration": 8.921999999991385,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -59
+      },
+      {
+        "case": "hev2-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.469000000011874,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      },
+      {
+        "case": "mp3-320",
+        "samples": 17,
+        "duration": 8.15700000000652,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "mp3-320:eof",
+        "samples": 16,
+        "duration": 8.0,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      },
+      {
+        "case": "mp3-320",
+        "samples": 17,
+        "duration": 8.155999999988126,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -59
+      },
+      {
+        "case": "mp3-320:eof",
+        "samples": 16,
+        "duration": 8.219000000011874,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -60
+      },
+      {
+        "case": "flac-level8",
+        "samples": 17,
+        "duration": 8.312999999994645,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -59
+      },
+      {
+        "case": "flac-level8:eof",
+        "samples": 16,
+        "duration": 8.421999999991385,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -59
+      },
+      {
+        "case": "flac-level8",
+        "samples": 17,
+        "duration": 8.25,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "flac-level8:eof",
+        "samples": 16,
+        "duration": 8.264999999984866,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "vorbis-q10",
+        "samples": 17,
+        "duration": 8.297000000020489,
+        "interrupted": null,
+        "rssi_min": -76,
+        "rssi_max": -60
+      },
+      {
+        "case": "vorbis-q10:eof",
+        "samples": 16,
+        "duration": 8.171999999991385,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "vorbis-q10",
+        "samples": 17,
+        "duration": 8.35999999998603,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -61
+      },
+      {
+        "case": "vorbis-q10:eof",
+        "samples": 16,
+        "duration": 8.312999999994645,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -59
+      },
+      {
+        "case": "opus-510",
+        "samples": 17,
+        "duration": 8.437000000005355,
+        "interrupted": null,
+        "rssi_min": -76,
+        "rssi_max": -60
+      },
+      {
+        "case": "opus-510:eof",
+        "samples": 16,
+        "duration": 8.328000000008615,
+        "interrupted": null,
+        "rssi_min": -76,
+        "rssi_max": -60
+      },
+      {
+        "case": "opus-510",
+        "samples": 17,
+        "duration": 8.327999999979511,
+        "interrupted": null,
+        "rssi_min": -76,
+        "rssi_max": -60
+      },
+      {
+        "case": "opus-510:eof",
+        "samples": 16,
+        "duration": 8.25,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -59
+      },
+      {
+        "case": "aac-lc-320",
+        "samples": 17,
+        "duration": 8.187999999994645,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -59
+      },
+      {
+        "case": "aac-lc-320:eof",
+        "samples": 16,
+        "duration": 8.094000000011874,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -59
+      },
+      {
+        "case": "aac-lc-320",
+        "samples": 17,
+        "duration": 8.23399999999674,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "aac-lc-320:eof",
+        "samples": 16,
+        "duration": 8.0,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-44100-stereo",
+        "samples": 20,
+        "duration": 9.515999999974156,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.078999999997905,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-44100-stereo",
+        "samples": 20,
+        "duration": 9.625,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -59
+      },
+      {
+        "case": "lc-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.28200000000652,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-22050-mono",
+        "samples": 20,
+        "duration": 9.51500000001397,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-22050-mono:eof",
+        "samples": 16,
+        "duration": 8.171999999991385,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -59
+      },
+      {
+        "case": "lc-22050-mono",
+        "samples": 20,
+        "duration": 9.46899999998277,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-22050-mono:eof",
+        "samples": 16,
+        "duration": 8.203000000008615,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-48000-stereo",
+        "samples": 20,
+        "duration": 9.53200000000652,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-48000-stereo:eof",
+        "samples": 16,
+        "duration": 8.09399999998277,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-48000-stereo",
+        "samples": 20,
+        "duration": 9.562999999994645,
+        "interrupted": null,
+        "rssi_min": -76,
+        "rssi_max": -60
+      },
+      {
+        "case": "lc-48000-stereo:eof",
+        "samples": 16,
+        "duration": 8.046000000002095,
+        "interrupted": null,
+        "rssi_min": -81,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-44100-stereo",
+        "samples": 18,
+        "duration": 8.703999999997905,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.280999999988126,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-44100-stereo",
+        "samples": 18,
+        "duration": 8.703000000008615,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.39000000001397,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-48000-stereo",
+        "samples": 20,
+        "duration": 9.530999999988126,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-48000-stereo:eof",
+        "samples": 16,
+        "duration": 8.25,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "he-48000-stereo",
+        "samples": 19,
+        "duration": 9.235000000015134,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -57
+      },
+      {
+        "case": "he-48000-stereo:eof",
+        "samples": 16,
+        "duration": 8.28200000000652,
+        "interrupted": null,
+        "rssi_min": -72,
+        "rssi_max": -57
+      },
+      {
+        "case": "hev2-44100-stereo",
+        "samples": 19,
+        "duration": 9.312000000005355,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -59
+      },
+      {
+        "case": "hev2-44100-stereo:eof",
+        "samples": 16,
+        "duration": 8.39100000000326,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -61
+      },
+      {
+        "case": "hev2-44100-stereo",
+        "samples": 19,
+        "duration": 9.171000000002095,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -59
+      },
+      {
+        "case": "hev2-44100-stereo:eof",
+        "samples": 15,
+        "duration": 8.0,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      }
+    ],
+    "observed_cpu_including_startup": [
+      {
+        "case": "mp3-320",
+        "windows": 2,
+        "mean_busy": 33.8,
+        "peak_busy": 50.0,
+        "minimum_heap": 82636.0,
+        "minimum_largest": 69632.0,
+        "first_three_medians": {
+          "heap": 84108.0,
+          "largest": 69632.0
+        },
+        "last_three_medians": {
+          "heap": 84108.0,
+          "largest": 69632.0
+        }
+      },
+      {
+        "case": "mp3-320:eof",
+        "windows": 2,
+        "mean_busy": 33.05,
+        "peak_busy": 53.1,
+        "minimum_heap": 100976.0,
+        "minimum_largest": 69632.0,
+        "first_three_medians": {
+          "heap": 121934.0,
+          "largest": 92160.0
+        },
+        "last_three_medians": {
+          "heap": 121934.0,
+          "largest": 92160.0
+        }
+      },
+      {
+        "case": "mp3-320",
+        "windows": 1,
+        "mean_busy": 38.0,
+        "peak_busy": 38.0,
+        "minimum_heap": 83444.0,
+        "minimum_largest": 69632.0,
+        "first_three_medians": {
+          "heap": 83444.0,
+          "largest": 69632.0
+        },
+        "last_three_medians": {
+          "heap": 83444.0,
+          "largest": 69632.0
+        }
+      },
+      {
+        "case": "mp3-320:eof",
+        "windows": 2,
+        "mean_busy": 41.05,
+        "peak_busy": 53.1,
+        "minimum_heap": 85564.0,
+        "minimum_largest": 69632.0,
+        "first_three_medians": {
+          "heap": 114228.0,
+          "largest": 92160.0
+        },
+        "last_three_medians": {
+          "heap": 114228.0,
+          "largest": 92160.0
+        }
+      },
+      {
+        "case": "flac-level8",
+        "windows": 2,
+        "mean_busy": 41.05,
+        "peak_busy": 58.7,
+        "minimum_heap": 71248.0,
+        "minimum_largest": 49152.0,
+        "first_three_medians": {
+          "heap": 71606.0,
+          "largest": 49152.0
+        },
+        "last_three_medians": {
+          "heap": 71606.0,
+          "largest": 49152.0
+        }
+      },
+      {
+        "case": "flac-level8:eof",
+        "windows": 1,
+        "mean_busy": 48.8,
+        "peak_busy": 48.8,
+        "minimum_heap": 142892.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142892.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142892.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "flac-level8",
+        "windows": 2,
+        "mean_busy": 35.45,
+        "peak_busy": 58.4,
+        "minimum_heap": 74208.0,
+        "minimum_largest": 59392.0,
+        "first_three_medians": {
+          "heap": 74242.0,
+          "largest": 59392.0
+        },
+        "last_three_medians": {
+          "heap": 74242.0,
+          "largest": 59392.0
+        }
+      },
+      {
+        "case": "flac-level8:eof",
+        "windows": 2,
+        "mean_busy": 37.0,
+        "peak_busy": 60.1,
+        "minimum_heap": 71388.0,
+        "minimum_largest": 57344.0,
+        "first_three_medians": {
+          "heap": 107140.0,
+          "largest": 86016.0
+        },
+        "last_three_medians": {
+          "heap": 107140.0,
+          "largest": 86016.0
+        }
+      },
+      {
+        "case": "vorbis-q10",
+        "windows": 1,
+        "mean_busy": 46.4,
+        "peak_busy": 46.4,
+        "minimum_heap": 72200.0,
+        "minimum_largest": 59392.0,
+        "first_three_medians": {
+          "heap": 72200.0,
+          "largest": 59392.0
+        },
+        "last_three_medians": {
+          "heap": 72200.0,
+          "largest": 59392.0
+        }
+      },
+      {
+        "case": "vorbis-q10:eof",
+        "windows": 2,
+        "mean_busy": 50.849999999999994,
+        "peak_busy": 67.3,
+        "minimum_heap": 71492.0,
+        "minimum_largest": 59392.0,
+        "first_three_medians": {
+          "heap": 107192.0,
+          "largest": 87040.0
+        },
+        "last_three_medians": {
+          "heap": 107192.0,
+          "largest": 87040.0
+        }
+      },
+      {
+        "case": "vorbis-q10",
+        "windows": 2,
+        "mean_busy": 46.75,
+        "peak_busy": 66.5,
+        "minimum_heap": 69256.0,
+        "minimum_largest": 59392.0,
+        "first_three_medians": {
+          "heap": 70732.0,
+          "largest": 59392.0
+        },
+        "last_three_medians": {
+          "heap": 70732.0,
+          "largest": 59392.0
+        }
+      },
+      {
+        "case": "vorbis-q10:eof",
+        "windows": 1,
+        "mean_busy": 54.0,
+        "peak_busy": 54.0,
+        "minimum_heap": 142892.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142892.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142892.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "opus-510",
+        "windows": 2,
+        "mean_busy": 41.35,
+        "peak_busy": 71.8,
+        "minimum_heap": 83120.0,
+        "minimum_largest": 69632.0,
+        "first_three_medians": {
+          "heap": 84080.0,
+          "largest": 69632.0
+        },
+        "last_three_medians": {
+          "heap": 84080.0,
+          "largest": 69632.0
+        }
+      },
+      {
+        "case": "opus-510:eof",
+        "windows": 2,
+        "mean_busy": 42.2,
+        "peak_busy": 73.9,
+        "minimum_heap": 98476.0,
+        "minimum_largest": 69632.0,
+        "first_three_medians": {
+          "heap": 120684.0,
+          "largest": 92160.0
+        },
+        "last_three_medians": {
+          "heap": 120684.0,
+          "largest": 92160.0
+        }
+      },
+      {
+        "case": "opus-510",
+        "windows": 1,
+        "mean_busy": 53.8,
+        "peak_busy": 53.8,
+        "minimum_heap": 80296.0,
+        "minimum_largest": 69632.0,
+        "first_three_medians": {
+          "heap": 80296.0,
+          "largest": 69632.0
+        },
+        "last_three_medians": {
+          "heap": 80296.0,
+          "largest": 69632.0
+        }
+      },
+      {
+        "case": "opus-510:eof",
+        "windows": 2,
+        "mean_busy": 55.2,
+        "peak_busy": 73.7,
+        "minimum_heap": 83184.0,
+        "minimum_largest": 69632.0,
+        "first_three_medians": {
+          "heap": 113032.0,
+          "largest": 92160.0
+        },
+        "last_three_medians": {
+          "heap": 113032.0,
+          "largest": 92160.0
+        }
+      },
+      {
+        "case": "aac-lc-320",
+        "windows": 2,
+        "mean_busy": 32.0,
+        "peak_busy": 45.5,
+        "minimum_heap": 62536.0,
+        "minimum_largest": 51200.0,
+        "first_three_medians": {
+          "heap": 63594.0,
+          "largest": 52224.0
+        },
+        "last_three_medians": {
+          "heap": 63594.0,
+          "largest": 52224.0
+        }
+      },
+      {
+        "case": "aac-lc-320:eof",
+        "windows": 1,
+        "mean_busy": 38.2,
+        "peak_busy": 38.2,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "aac-lc-320",
+        "windows": 2,
+        "mean_busy": 28.25,
+        "peak_busy": 45.5,
+        "minimum_heap": 64700.0,
+        "minimum_largest": 51200.0,
+        "first_three_medians": {
+          "heap": 66042.0,
+          "largest": 52224.0
+        },
+        "last_three_medians": {
+          "heap": 66042.0,
+          "largest": 52224.0
+        }
+      },
+      {
+        "case": "aac-lc-320:eof",
+        "windows": 2,
+        "mean_busy": 28.849999999999998,
+        "peak_busy": 46.8,
+        "minimum_heap": 80704.0,
+        "minimum_largest": 53248.0,
+        "first_three_medians": {
+          "heap": 111792.0,
+          "largest": 83968.0
+        },
+        "last_three_medians": {
+          "heap": 111792.0,
+          "largest": 83968.0
+        }
+      },
+      {
+        "case": "lc-44100-stereo",
+        "windows": 2,
+        "mean_busy": 33.2,
+        "peak_busy": 39.4,
+        "minimum_heap": 62912.0,
+        "minimum_largest": 49152.0,
+        "first_three_medians": {
+          "heap": 64350.0,
+          "largest": 50176.0
+        },
+        "last_three_medians": {
+          "heap": 64350.0,
+          "largest": 50176.0
+        }
+      },
+      {
+        "case": "lc-44100-stereo:eof",
+        "windows": 1,
+        "mean_busy": 28.7,
+        "peak_busy": 28.7,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "lc-44100-stereo",
+        "windows": 2,
+        "mean_busy": 25.85,
+        "peak_busy": 37.9,
+        "minimum_heap": 62872.0,
+        "minimum_largest": 49152.0,
+        "first_three_medians": {
+          "heap": 64284.0,
+          "largest": 51200.0
+        },
+        "last_three_medians": {
+          "heap": 64284.0,
+          "largest": 51200.0
+        }
+      },
+      {
+        "case": "lc-44100-stereo:eof",
+        "windows": 2,
+        "mean_busy": 28.299999999999997,
+        "peak_busy": 39.4,
+        "minimum_heap": 70540.0,
+        "minimum_largest": 53248.0,
+        "first_three_medians": {
+          "heap": 106710.0,
+          "largest": 83968.0
+        },
+        "last_three_medians": {
+          "heap": 106710.0,
+          "largest": 83968.0
+        }
+      },
+      {
+        "case": "lc-22050-mono",
+        "windows": 2,
+        "mean_busy": 19.05,
+        "peak_busy": 23.6,
+        "minimum_heap": 62720.0,
+        "minimum_largest": 49152.0,
+        "first_three_medians": {
+          "heap": 64934.0,
+          "largest": 51200.0
+        },
+        "last_three_medians": {
+          "heap": 64934.0,
+          "largest": 51200.0
+        }
+      },
+      {
+        "case": "lc-22050-mono:eof",
+        "windows": 1,
+        "mean_busy": 22.2,
+        "peak_busy": 22.2,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "lc-22050-mono",
+        "windows": 2,
+        "mean_busy": 17.45,
+        "peak_busy": 23.3,
+        "minimum_heap": 62784.0,
+        "minimum_largest": 49152.0,
+        "first_three_medians": {
+          "heap": 64202.0,
+          "largest": 50176.0
+        },
+        "last_three_medians": {
+          "heap": 64202.0,
+          "largest": 50176.0
+        }
+      },
+      {
+        "case": "lc-22050-mono:eof",
+        "windows": 2,
+        "mean_busy": 19.299999999999997,
+        "peak_busy": 24.9,
+        "minimum_heap": 67596.0,
+        "minimum_largest": 51200.0,
+        "first_three_medians": {
+          "heap": 105238.0,
+          "largest": 82944.0
+        },
+        "last_three_medians": {
+          "heap": 105238.0,
+          "largest": 82944.0
+        }
+      },
+      {
+        "case": "lc-48000-stereo",
+        "windows": 2,
+        "mean_busy": 30.5,
+        "peak_busy": 38.9,
+        "minimum_heap": 62832.0,
+        "minimum_largest": 51200.0,
+        "first_three_medians": {
+          "heap": 63956.0,
+          "largest": 51200.0
+        },
+        "last_three_medians": {
+          "heap": 63956.0,
+          "largest": 51200.0
+        }
+      },
+      {
+        "case": "lc-48000-stereo:eof",
+        "windows": 1,
+        "mean_busy": 33.9,
+        "peak_busy": 33.9,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "lc-48000-stereo",
+        "windows": 2,
+        "mean_busy": 24.85,
+        "peak_busy": 37.9,
+        "minimum_heap": 65776.0,
+        "minimum_largest": 49152.0,
+        "first_three_medians": {
+          "heap": 65782.0,
+          "largest": 50176.0
+        },
+        "last_three_medians": {
+          "heap": 65782.0,
+          "largest": 50176.0
+        }
+      },
+      {
+        "case": "lc-48000-stereo:eof",
+        "windows": 2,
+        "mean_busy": 29.700000000000003,
+        "peak_busy": 39.7,
+        "minimum_heap": 65788.0,
+        "minimum_largest": 49152.0,
+        "first_three_medians": {
+          "heap": 104340.0,
+          "largest": 81920.0
+        },
+        "last_three_medians": {
+          "heap": 104340.0,
+          "largest": 81920.0
+        }
+      },
+      {
+        "case": "he-44100-stereo",
+        "windows": 2,
+        "mean_busy": 39.3,
+        "peak_busy": 53.3,
+        "minimum_heap": 28712.0,
+        "minimum_largest": 17408.0,
+        "first_three_medians": {
+          "heap": 30220.0,
+          "largest": 17920.0
+        },
+        "last_three_medians": {
+          "heap": 30220.0,
+          "largest": 17920.0
+        }
+      },
+      {
+        "case": "he-44100-stereo:eof",
+        "windows": 1,
+        "mean_busy": 47.3,
+        "peak_busy": 47.3,
+        "minimum_heap": 142892.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142892.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142892.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "he-44100-stereo",
+        "windows": 2,
+        "mean_busy": 32.55,
+        "peak_busy": 52.4,
+        "minimum_heap": 31668.0,
+        "minimum_largest": 14848.0,
+        "first_three_medians": {
+          "heap": 32500.0,
+          "largest": 16640.0
+        },
+        "last_three_medians": {
+          "heap": 32500.0,
+          "largest": 16640.0
+        }
+      },
+      {
+        "case": "he-44100-stereo:eof",
+        "windows": 2,
+        "mean_busy": 35.35,
+        "peak_busy": 54.2,
+        "minimum_heap": 47132.0,
+        "minimum_largest": 21504.0,
+        "first_three_medians": {
+          "heap": 95006.0,
+          "largest": 68096.0
+        },
+        "last_three_medians": {
+          "heap": 95006.0,
+          "largest": 68096.0
+        }
+      },
+      {
+        "case": "he-48000-stereo",
+        "windows": 2,
+        "mean_busy": 46.0,
+        "peak_busy": 55.7,
+        "minimum_heap": 29024.0,
+        "minimum_largest": 19456.0,
+        "first_three_medians": {
+          "heap": 30404.0,
+          "largest": 19968.0
+        },
+        "last_three_medians": {
+          "heap": 30404.0,
+          "largest": 19968.0
+        }
+      },
+      {
+        "case": "he-48000-stereo:eof",
+        "windows": 1,
+        "mean_busy": 43.7,
+        "peak_busy": 43.7,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "he-48000-stereo",
+        "windows": 2,
+        "mean_busy": 33.95,
+        "peak_busy": 54.6,
+        "minimum_heap": 28948.0,
+        "minimum_largest": 17408.0,
+        "first_three_medians": {
+          "heap": 30432.0,
+          "largest": 18432.0
+        },
+        "last_three_medians": {
+          "heap": 30432.0,
+          "largest": 18432.0
+        }
+      },
+      {
+        "case": "he-48000-stereo:eof",
+        "windows": 2,
+        "mean_busy": 38.7,
+        "peak_busy": 56.1,
+        "minimum_heap": 47236.0,
+        "minimum_largest": 20480.0,
+        "first_three_medians": {
+          "heap": 95058.0,
+          "largest": 67584.0
+        },
+        "last_three_medians": {
+          "heap": 95058.0,
+          "largest": 67584.0
+        }
+      },
+      {
+        "case": "hev2-44100-stereo",
+        "windows": 2,
+        "mean_busy": 47.25,
+        "peak_busy": 60.3,
+        "minimum_heap": 31944.0,
+        "minimum_largest": 17408.0,
+        "first_three_medians": {
+          "heap": 35458.0,
+          "largest": 17920.0
+        },
+        "last_three_medians": {
+          "heap": 35458.0,
+          "largest": 17920.0
+        }
+      },
+      {
+        "case": "hev2-44100-stereo:eof",
+        "windows": 1,
+        "mean_busy": 47.9,
+        "peak_busy": 47.9,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "hev2-44100-stereo",
+        "windows": 2,
+        "mean_busy": 36.25,
+        "peak_busy": 59.0,
+        "minimum_heap": 29420.0,
+        "minimum_largest": 17408.0,
+        "first_three_medians": {
+          "heap": 30794.0,
+          "largest": 17408.0
+        },
+        "last_three_medians": {
+          "heap": 30794.0,
+          "largest": 17408.0
+        }
+      },
+      {
+        "case": "hev2-44100-stereo:eof",
+        "windows": 2,
+        "mean_busy": 41.0,
+        "peak_busy": 60.4,
+        "minimum_heap": 47488.0,
+        "minimum_largest": 20480.0,
+        "first_three_medians": {
+          "heap": 95184.0,
+          "largest": 67584.0
+        },
+        "last_three_medians": {
+          "heap": 95184.0,
+          "largest": 67584.0
+        }
+      },
+      {
+        "case": "mp3-320",
+        "windows": 2,
+        "mean_busy": 49.55,
+        "peak_busy": 60.8,
+        "minimum_heap": 78920.0,
+        "minimum_largest": 65536.0,
+        "first_three_medians": {
+          "heap": 78922.0,
+          "largest": 65536.0
+        },
+        "last_three_medians": {
+          "heap": 78922.0,
+          "largest": 65536.0
+        }
+      },
+      {
+        "case": "mp3-320:eof",
+        "windows": 1,
+        "mean_busy": 44.0,
+        "peak_busy": 44.0,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "mp3-320",
+        "windows": 2,
+        "mean_busy": 42.1,
+        "peak_busy": 60.9,
+        "minimum_heap": 78564.0,
+        "minimum_largest": 65536.0,
+        "first_three_medians": {
+          "heap": 80042.0,
+          "largest": 65536.0
+        },
+        "last_three_medians": {
+          "heap": 80042.0,
+          "largest": 65536.0
+        }
+      },
+      {
+        "case": "mp3-320:eof",
+        "windows": 1,
+        "mean_busy": 58.2,
+        "peak_busy": 58.2,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "flac-level8",
+        "windows": 2,
+        "mean_busy": 53.15,
+        "peak_busy": 96.0,
+        "minimum_heap": 70616.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 96692.0,
+          "largest": 76800.0
+        },
+        "last_three_medians": {
+          "heap": 96692.0,
+          "largest": 76800.0
+        }
+      },
+      {
+        "case": "flac-level8:eof",
+        "windows": 2,
+        "mean_busy": 57.75,
+        "peak_busy": 95.8,
+        "minimum_heap": 67536.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 105208.0,
+          "largest": 80896.0
+        },
+        "last_three_medians": {
+          "heap": 105208.0,
+          "largest": 80896.0
+        }
+      },
+      {
+        "case": "flac-level8",
+        "windows": 1,
+        "mean_busy": 67.5,
+        "peak_busy": 67.5,
+        "minimum_heap": 69216.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 69216.0,
+          "largest": 47104.0
+        },
+        "last_three_medians": {
+          "heap": 69216.0,
+          "largest": 47104.0
+        }
+      },
+      {
+        "case": "flac-level8:eof",
+        "windows": 2,
+        "mean_busy": 74.8,
+        "peak_busy": 96.1,
+        "minimum_heap": 67676.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 105278.0,
+          "largest": 80896.0
+        },
+        "last_three_medians": {
+          "heap": 105278.0,
+          "largest": 80896.0
+        }
+      },
+      {
+        "case": "vorbis-q10",
+        "windows": 2,
+        "mean_busy": 55.699999999999996,
+        "peak_busy": 79.6,
+        "minimum_heap": 65184.0,
+        "minimum_largest": 53248.0,
+        "first_three_medians": {
+          "heap": 66872.0,
+          "largest": 54272.0
+        },
+        "last_three_medians": {
+          "heap": 66872.0,
+          "largest": 54272.0
+        }
+      },
+      {
+        "case": "vorbis-q10:eof",
+        "windows": 1,
+        "mean_busy": 71.7,
+        "peak_busy": 71.7,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "vorbis-q10",
+        "windows": 2,
+        "mean_busy": 46.4,
+        "peak_busy": 81.5,
+        "minimum_heap": 67432.0,
+        "minimum_largest": 53248.0,
+        "first_three_medians": {
+          "heap": 95110.0,
+          "largest": 79872.0
+        },
+        "last_three_medians": {
+          "heap": 95110.0,
+          "largest": 79872.0
+        }
+      },
+      {
+        "case": "vorbis-q10:eof",
+        "windows": 2,
+        "mean_busy": 51.5,
+        "peak_busy": 80.5,
+        "minimum_heap": 65100.0,
+        "minimum_largest": 55296.0,
+        "first_three_medians": {
+          "heap": 103996.0,
+          "largest": 84992.0
+        },
+        "last_three_medians": {
+          "heap": 103996.0,
+          "largest": 84992.0
+        }
+      },
+      {
+        "case": "opus-510",
+        "windows": 1,
+        "mean_busy": 56.0,
+        "peak_busy": 56.0,
+        "minimum_heap": 79540.0,
+        "minimum_largest": 61440.0,
+        "first_three_medians": {
+          "heap": 79540.0,
+          "largest": 61440.0
+        },
+        "last_three_medians": {
+          "heap": 79540.0,
+          "largest": 61440.0
+        }
+      },
+      {
+        "case": "opus-510:eof",
+        "windows": 2,
+        "mean_busy": 69.7,
+        "peak_busy": 87.0,
+        "minimum_heap": 76184.0,
+        "minimum_largest": 61440.0,
+        "first_three_medians": {
+          "heap": 109538.0,
+          "largest": 88064.0
+        },
+        "last_three_medians": {
+          "heap": 109538.0,
+          "largest": 88064.0
+        }
+      },
+      {
+        "case": "opus-510",
+        "windows": 2,
+        "mean_busy": 57.0,
+        "peak_busy": 87.2,
+        "minimum_heap": 77692.0,
+        "minimum_largest": 55296.0,
+        "first_three_medians": {
+          "heap": 78488.0,
+          "largest": 59392.0
+        },
+        "last_three_medians": {
+          "heap": 78488.0,
+          "largest": 59392.0
+        }
+      },
+      {
+        "case": "opus-510:eof",
+        "windows": 1,
+        "mean_busy": 84.8,
+        "peak_busy": 84.8,
+        "minimum_heap": 142892.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142892.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142892.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "aac-lc-320",
+        "windows": 2,
+        "mean_busy": 33.55,
+        "peak_busy": 56.9,
+        "minimum_heap": 59864.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 91378.0,
+          "largest": 80896.0
+        },
+        "last_three_medians": {
+          "heap": 91378.0,
+          "largest": 80896.0
+        }
+      },
+      {
+        "case": "aac-lc-320:eof",
+        "windows": 2,
+        "mean_busy": 36.15,
+        "peak_busy": 55.9,
+        "minimum_heap": 60028.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 101460.0,
+          "largest": 80896.0
+        },
+        "last_three_medians": {
+          "heap": 101460.0,
+          "largest": 80896.0
+        }
+      },
+      {
+        "case": "aac-lc-320",
+        "windows": 1,
+        "mean_busy": 43.3,
+        "peak_busy": 43.3,
+        "minimum_heap": 60180.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 60180.0,
+          "largest": 47104.0
+        },
+        "last_three_medians": {
+          "heap": 60180.0,
+          "largest": 47104.0
+        }
+      },
+      {
+        "case": "aac-lc-320:eof",
+        "windows": 2,
+        "mean_busy": 43.6,
+        "peak_busy": 55.9,
+        "minimum_heap": 61336.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 102108.0,
+          "largest": 80896.0
+        },
+        "last_three_medians": {
+          "heap": 102108.0,
+          "largest": 80896.0
+        }
+      },
+      {
+        "case": "lc-44100-stereo",
+        "windows": 2,
+        "mean_busy": 34.0,
+        "peak_busy": 41.8,
+        "minimum_heap": 59868.0,
+        "minimum_largest": 43008.0,
+        "first_three_medians": {
+          "heap": 60822.0,
+          "largest": 45056.0
+        },
+        "last_three_medians": {
+          "heap": 60822.0,
+          "largest": 45056.0
+        }
+      },
+      {
+        "case": "lc-44100-stereo:eof",
+        "windows": 1,
+        "mean_busy": 42.1,
+        "peak_busy": 42.1,
+        "minimum_heap": 81136.0,
+        "minimum_largest": 53248.0,
+        "first_three_medians": {
+          "heap": 81136.0,
+          "largest": 53248.0
+        },
+        "last_three_medians": {
+          "heap": 81136.0,
+          "largest": 53248.0
+        }
+      },
+      {
+        "case": "lc-44100-stereo",
+        "windows": 2,
+        "mean_busy": 28.9,
+        "peak_busy": 45.3,
+        "minimum_heap": 59856.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 91294.0,
+          "largest": 76800.0
+        },
+        "last_three_medians": {
+          "heap": 91294.0,
+          "largest": 76800.0
+        }
+      },
+      {
+        "case": "lc-44100-stereo:eof",
+        "windows": 2,
+        "mean_busy": 32.35,
+        "peak_busy": 42.9,
+        "minimum_heap": 61784.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 102332.0,
+          "largest": 80896.0
+        },
+        "last_three_medians": {
+          "heap": 102332.0,
+          "largest": 80896.0
+        }
+      },
+      {
+        "case": "lc-22050-mono",
+        "windows": 2,
+        "mean_busy": 23.9,
+        "peak_busy": 26.8,
+        "minimum_heap": 58928.0,
+        "minimum_largest": 43008.0,
+        "first_three_medians": {
+          "heap": 60260.0,
+          "largest": 45056.0
+        },
+        "last_three_medians": {
+          "heap": 60260.0,
+          "largest": 45056.0
+        }
+      },
+      {
+        "case": "lc-22050-mono:eof",
+        "windows": 1,
+        "mean_busy": 26.7,
+        "peak_busy": 26.7,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "lc-22050-mono",
+        "windows": 2,
+        "mean_busy": 21.55,
+        "peak_busy": 32.0,
+        "minimum_heap": 59304.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 91034.0,
+          "largest": 76800.0
+        },
+        "last_three_medians": {
+          "heap": 91034.0,
+          "largest": 76800.0
+        }
+      },
+      {
+        "case": "lc-22050-mono:eof",
+        "windows": 2,
+        "mean_busy": 21.9,
+        "peak_busy": 28.2,
+        "minimum_heap": 60068.0,
+        "minimum_largest": 47104.0,
+        "first_three_medians": {
+          "heap": 101474.0,
+          "largest": 80896.0
+        },
+        "last_three_medians": {
+          "heap": 101474.0,
+          "largest": 80896.0
+        }
+      },
+      {
+        "case": "lc-48000-stereo",
+        "windows": 2,
+        "mean_busy": 33.6,
+        "peak_busy": 42.1,
+        "minimum_heap": 59088.0,
+        "minimum_largest": 45056.0,
+        "first_three_medians": {
+          "heap": 59798.0,
+          "largest": 48128.0
+        },
+        "last_three_medians": {
+          "heap": 59798.0,
+          "largest": 48128.0
+        }
+      },
+      {
+        "case": "lc-48000-stereo:eof",
+        "windows": 1,
+        "mean_busy": 42.1,
+        "peak_busy": 42.1,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "lc-48000-stereo",
+        "windows": 2,
+        "mean_busy": 28.4,
+        "peak_busy": 45.3,
+        "minimum_heap": 58988.0,
+        "minimum_largest": 45056.0,
+        "first_three_medians": {
+          "heap": 90864.0,
+          "largest": 75776.0
+        },
+        "last_three_medians": {
+          "heap": 90864.0,
+          "largest": 75776.0
+        }
+      },
+      {
+        "case": "lc-48000-stereo:eof",
+        "windows": 2,
+        "mean_busy": 32.650000000000006,
+        "peak_busy": 43.2,
+        "minimum_heap": 59788.0,
+        "minimum_largest": 45056.0,
+        "first_three_medians": {
+          "heap": 101334.0,
+          "largest": 79872.0
+        },
+        "last_three_medians": {
+          "heap": 101334.0,
+          "largest": 79872.0
+        }
+      },
+      {
+        "case": "he-44100-stereo",
+        "windows": 2,
+        "mean_busy": 43.1,
+        "peak_busy": 55.2,
+        "minimum_heap": 25020.0,
+        "minimum_largest": 13312.0,
+        "first_three_medians": {
+          "heap": 25750.0,
+          "largest": 14336.0
+        },
+        "last_three_medians": {
+          "heap": 25750.0,
+          "largest": 14336.0
+        }
+      },
+      {
+        "case": "he-44100-stereo:eof",
+        "windows": 1,
+        "mean_busy": 49.0,
+        "peak_busy": 49.0,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "he-44100-stereo",
+        "windows": 2,
+        "mean_busy": 34.95,
+        "peak_busy": 57.6,
+        "minimum_heap": 24896.0,
+        "minimum_largest": 10752.0,
+        "first_three_medians": {
+          "heap": 73818.0,
+          "largest": 58624.0
+        },
+        "last_three_medians": {
+          "heap": 73818.0,
+          "largest": 58624.0
+        }
+      },
+      {
+        "case": "he-44100-stereo:eof",
+        "windows": 2,
+        "mean_busy": 38.0,
+        "peak_busy": 55.6,
+        "minimum_heap": 47080.0,
+        "minimum_largest": 19456.0,
+        "first_three_medians": {
+          "heap": 94980.0,
+          "largest": 67072.0
+        },
+        "last_three_medians": {
+          "heap": 94980.0,
+          "largest": 67072.0
+        }
+      },
+      {
+        "case": "he-48000-stereo",
+        "windows": 2,
+        "mean_busy": 50.3,
+        "peak_busy": 58.2,
+        "minimum_heap": 26756.0,
+        "minimum_largest": 12800.0,
+        "first_three_medians": {
+          "heap": 27446.0,
+          "largest": 12800.0
+        },
+        "last_three_medians": {
+          "heap": 27446.0,
+          "largest": 12800.0
+        }
+      },
+      {
+        "case": "he-48000-stereo:eof",
+        "windows": 1,
+        "mean_busy": 45.6,
+        "peak_busy": 45.6,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "he-48000-stereo",
+        "windows": 2,
+        "mean_busy": 35.85,
+        "peak_busy": 59.9,
+        "minimum_heap": 25144.0,
+        "minimum_largest": 9216.0,
+        "first_three_medians": {
+          "heap": 74260.0,
+          "largest": 59904.0
+        },
+        "last_three_medians": {
+          "heap": 74260.0,
+          "largest": 59904.0
+        }
+      },
+      {
+        "case": "he-48000-stereo:eof",
+        "windows": 2,
+        "mean_busy": 41.95,
+        "peak_busy": 57.9,
+        "minimum_heap": 35532.0,
+        "minimum_largest": 18432.0,
+        "first_three_medians": {
+          "heap": 89206.0,
+          "largest": 66560.0
+        },
+        "last_three_medians": {
+          "heap": 89206.0,
+          "largest": 66560.0
+        }
+      },
+      {
+        "case": "hev2-44100-stereo",
+        "windows": 2,
+        "mean_busy": 48.5,
+        "peak_busy": 60.7,
+        "minimum_heap": 25304.0,
+        "minimum_largest": 13824.0,
+        "first_three_medians": {
+          "heap": 29036.0,
+          "largest": 16640.0
+        },
+        "last_three_medians": {
+          "heap": 29036.0,
+          "largest": 16640.0
+        }
+      },
+      {
+        "case": "hev2-44100-stereo:eof",
+        "windows": 1,
+        "mean_busy": 51.9,
+        "peak_busy": 51.9,
+        "minimum_heap": 142880.0,
+        "minimum_largest": 114688.0,
+        "first_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142880.0,
+          "largest": 114688.0
+        }
+      },
+      {
+        "case": "hev2-44100-stereo",
+        "windows": 2,
+        "mean_busy": 37.4,
+        "peak_busy": 63.4,
+        "minimum_heap": 26900.0,
+        "minimum_largest": 12800.0,
+        "first_three_medians": {
+          "heap": 74832.0,
+          "largest": 59648.0
+        },
+        "last_three_medians": {
+          "heap": 74832.0,
+          "largest": 59648.0
+        }
+      },
+      {
+        "case": "hev2-44100-stereo:eof",
+        "windows": 2,
+        "mean_busy": 44.35,
+        "peak_busy": 61.2,
+        "minimum_heap": 47484.0,
+        "minimum_largest": 20480.0,
+        "first_three_medians": {
+          "heap": 95182.0,
+          "largest": 67584.0
+        },
+        "last_three_medians": {
+          "heap": 95182.0,
+          "largest": 67584.0
+        }
+      }
+    ]
+  },
+  "physical/transitions": {
+    "cases": [
+      {
+        "name": "transition:changing",
+        "result": "PASS",
+        "seconds": 49.141,
+        "evidence": {
+          "sequence": [
+            "lc-44100-stereo",
+            "lc-48000-stereo",
+            "he-48000-stereo",
+            "hev2-44100-stereo"
+          ]
+        }
+      },
+      {
+        "name": "transition:implicit-sbr",
+        "result": "PASS",
+        "seconds": 36.562,
+        "evidence": {
+          "sequence": [
+            "lc-22050-mono",
+            "hev2-44100-stereo",
+            "lc-48000-stereo"
+          ]
+        }
+      },
+      {
+        "name": "stop-play-generation",
+        "result": "PASS",
+        "seconds": 8.453,
+        "evidence": {
+          "stale_generation_rejected": true
+        }
+      },
+      {
+        "name": "websocket-format-and-reconnect",
+        "result": "PASS",
+        "seconds": 8.813,
+        "evidence": {
+          "reconnects": 2,
+          "format_matches_rest": true
+        }
+      },
+      {
+        "name": "restore-board",
+        "result": "PASS",
+        "seconds": 0.297,
+        "evidence": {
+          "left_stopped": true
+        }
+      }
+    ],
+    "allocation_failures": 0,
+    "all_phase_fault_lines": [],
+    "status": [
+      {
+        "case": "changing",
+        "samples": 100,
+        "duration": 47.937999999994645,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -59
+      },
+      {
+        "case": "implicit-sbr",
+        "samples": 74,
+        "duration": 35.34399999998277,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -59
+      },
+      {
+        "case": "stop-play-generation",
+        "samples": 15,
+        "duration": 7.094000000011874,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -59
+      },
+      {
+        "case": "ws-warmup",
+        "samples": 15,
+        "duration": 7.25,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      }
+    ],
+    "observed_cpu_including_startup": [
+      {
+        "case": "changing",
+        "windows": 9,
+        "mean_busy": 43.5,
+        "peak_busy": 61.2,
+        "minimum_heap": 28576.0,
+        "minimum_largest": 15360.0,
+        "first_three_medians": {
+          "heap": 62788.0,
+          "largest": 53248.0
+        },
+        "last_three_medians": {
+          "heap": 28668.0,
+          "largest": 17408.0
+        }
+      },
+      {
+        "case": "implicit-sbr",
+        "windows": 7,
+        "mean_busy": 42.785714285714285,
+        "peak_busy": 58.7,
+        "minimum_heap": 30736.0,
+        "minimum_largest": 16384.0,
+        "first_three_medians": {
+          "heap": 62760.0,
+          "largest": 51200.0
+        },
+        "last_three_medians": {
+          "heap": 65528.0,
+          "largest": 47104.0
+        }
+      },
+      {
+        "case": "stop-play-generation",
+        "windows": 2,
+        "mean_busy": 27.3,
+        "peak_busy": 33.2,
+        "minimum_heap": 62664.0,
+        "minimum_largest": 51200.0,
+        "first_three_medians": {
+          "heap": 62684.0,
+          "largest": 51200.0
+        },
+        "last_three_medians": {
+          "heap": 62684.0,
+          "largest": 51200.0
+        }
+      },
+      {
+        "case": "ws-warmup",
+        "windows": 1,
+        "mean_busy": 27.6,
+        "peak_busy": 27.6,
+        "minimum_heap": 73176.0,
+        "minimum_largest": 63488.0,
+        "first_three_medians": {
+          "heap": 73176.0,
+          "largest": 63488.0
+        },
+        "last_three_medians": {
+          "heap": 73176.0,
+          "largest": 63488.0
+        }
+      }
+    ]
+  },
+  "physical/public": {
+    "cases": [
+      {
+        "name": "idle:baseline",
+        "result": "PASS",
+        "seconds": 12.469,
+        "evidence": {
+          "samples": [
+            {
+              "heap": 142892,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 142892,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        }
+      },
+      {
+        "name": "https:groovesalad-128-aac",
+        "result": "PASS",
+        "seconds": 67.891,
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "LC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "AAC PCM"
+            },
+            "ffprobe_spec": {
+              "codec": "aac",
+              "profile": "LC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "AAC PCM"
+            },
+            "input_sha256": "955adf0a24298375c47f0fb2ffd620da3a524835b10cc72ccb38542a73b59daf",
+            "input_bytes": 80358,
+            "frames": 216,
+            "faad": {
+              "samples": 440320,
+              "frames": 216,
+              "rate": 44100,
+              "channels": 2,
+              "ps_frames": 0,
+              "different": 0,
+              "over_two": 0,
+              "over_five": 0,
+              "maximum": 0,
+              "square_error": 0,
+              "square_signal": 7906841604522,
+              "scope": 0,
+              "float_scale": 1,
+              "history": [
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            },
+            "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+            "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 251,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 1.8910000000032596,
+          "status_samples": 334,
+          "max_http_ms": 108.99999999674037,
+          "p95_http_ms": 94.00000001187436,
+          "median_http_ms": 78.00000000861473,
+          "mean_busy": 54.03333333333333,
+          "peak_busy": 54.9,
+          "minimum_heap": 58804.0,
+          "minimum_largest": 43008.0,
+          "audio_wall_ratio": 1.001553311882836
+        }
+      },
+      {
+        "name": "https:groovesalad-64-aac",
+        "result": "PASS",
+        "seconds": 68.218,
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "HE-AAC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "HE-AAC ",
+              "source_channels": 2
+            },
+            "ffprobe_spec": {
+              "codec": "aac",
+              "profile": "HE-AAC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "HE-AAC "
+            },
+            "input_sha256": "f723e0b43edb55cf83dcb6cf76cba5f12d8806fb69807c28c7dfe2cac5d9bc7b",
+            "input_bytes": 39990,
+            "frames": 108,
+            "faad": {
+              "samples": 438272,
+              "frames": 108,
+              "rate": 44100,
+              "channels": 2,
+              "ps_frames": 0,
+              "different": 0,
+              "over_two": 0,
+              "over_five": 0,
+              "maximum": 0,
+              "square_error": 0,
+              "square_signal": 5834225894636,
+              "scope": 0,
+              "float_scale": 1,
+              "history": [
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            },
+            "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+            "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 244,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 2.01500000001397,
+          "status_samples": 322,
+          "max_http_ms": 141.00000000325963,
+          "p95_http_ms": 108.99999999674037,
+          "median_http_ms": 78.99999999790452,
+          "mean_busy": 65.78888888888889,
+          "peak_busy": 66.5,
+          "minimum_heap": 23448.0,
+          "minimum_largest": 7936.0,
+          "audio_wall_ratio": 1.001553311882836
+        }
+      },
+      {
+        "name": "https:groovesalad-32-aac",
+        "result": "PASS",
+        "seconds": 66.485,
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "HE-AAC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "HE-AAC ",
+              "source_channels": 2
+            },
+            "ffprobe_spec": {
+              "codec": "aac",
+              "profile": "HE-AAC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "HE-AAC "
+            },
+            "input_sha256": "5419959618a17a77d22f9632935907883d4818a8973e19b6ba1792c0c29b6fef",
+            "input_bytes": 20094,
+            "frames": 108,
+            "faad": {
+              "samples": 438272,
+              "frames": 108,
+              "rate": 44100,
+              "channels": 2,
+              "ps_frames": 0,
+              "different": 0,
+              "over_two": 0,
+              "over_five": 0,
+              "maximum": 0,
+              "square_error": 0,
+              "square_signal": 5114438997551,
+              "scope": 0,
+              "float_scale": 1,
+              "history": [
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            },
+            "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+            "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 246,
+            "rate": 44100,
+            "channels": 2
+          },
+          "first_pcm_seconds": 1.8439999999827705,
+          "status_samples": 327,
+          "max_http_ms": 141.00000000325963,
+          "p95_http_ms": 94.00000001187436,
+          "median_http_ms": 78.00000000861473,
+          "mean_busy": 61.75555555555556,
+          "peak_busy": 62.1,
+          "minimum_heap": 21872.0,
+          "minimum_largest": 9216.0,
+          "audio_wall_ratio": 1.0017756075907225
+        }
+      },
+      {
+        "name": "https:groovesalad-16-aac",
+        "result": "PASS",
+        "seconds": 65.766,
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "HE-AAC",
+              "rate": 32000,
+              "channels": 2,
+              "bits": 16,
+              "label": "HE-AAC ",
+              "source_channels": 1
+            },
+            "ffprobe_spec": {
+              "codec": "aac",
+              "profile": "HE-AACv2",
+              "rate": 32000,
+              "channels": 2,
+              "bits": 16,
+              "label": "HE-AACv2 "
+            },
+            "input_sha256": "70caf7bfb6ce9b7b25cce9c358b261e92126d47a4713a63fe257cb0028b5fd74",
+            "input_bytes": 10093,
+            "frames": 79,
+            "faad": {
+              "samples": 159744,
+              "frames": 79,
+              "rate": 32000,
+              "channels": 1,
+              "ps_frames": 0,
+              "different": 0,
+              "over_two": 0,
+              "over_five": 0,
+              "maximum": 0,
+              "square_error": 0,
+              "square_signal": 2504346591198,
+              "scope": 0,
+              "float_scale": 1,
+              "history": [
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            },
+            "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+            "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+            "tls_verify": true
+          },
+          "websocket_matches_rest": true,
+          "playback": {
+            "samples": 248,
+            "rate": 32000,
+            "channels": 2
+          },
+          "first_pcm_seconds": 1.8900000000139698,
+          "status_samples": 329,
+          "max_http_ms": 125.0,
+          "p95_http_ms": 94.00000001187436,
+          "median_http_ms": 78.00000000861473,
+          "mean_busy": 45.48888888888889,
+          "peak_busy": 46.1,
+          "minimum_heap": 23940.0,
+          "minimum_largest": 10240.0,
+          "audio_wall_ratio": 1.0016509278214356
+        }
+      },
+      {
+        "name": "https:groovesalad-256-mp3",
+        "result": "FAIL",
+        "reason": "URLError",
+        "seconds": 31.797
+      },
+      {
+        "name": "idle:recovery",
+        "result": "PASS",
+        "seconds": 12.156,
+        "evidence": {
+          "samples": [
+            {
+              "heap": 142664,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 142656,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 142656,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ],
+          "no_unexpected_resets": true
+        }
+      },
+      {
+        "name": "restore",
+        "result": "PASS",
+        "seconds": 7.969,
+        "evidence": {
+          "stopped_state_restored": true,
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        }
+      }
+    ],
+    "allocation_failures": 0,
+    "all_phase_fault_lines": [
+      {
+        "at": 140995.937,
+        "line": "ESP-ROM:esp32c3-api1-20210207"
+      },
+      {
+        "at": 140995.937,
+        "line": "rst:0xc (RTC_SW_CPU_RST),boot:0xc (SPI_FAST_FLASH_BOOT)"
+      }
+    ],
+    "status": [
+      {
+        "case": "settled-idle",
+        "samples": 24,
+        "duration": 12.39100000000326,
+        "interrupted": null,
+        "rssi_min": -62,
+        "rssi_max": -60
+      },
+      {
+        "case": "groovesalad-128-aac",
+        "samples": 334,
+        "duration": 60.15700000000652,
+        "interrupted": null,
+        "rssi_min": -82,
+        "rssi_max": -59
+      },
+      {
+        "case": "groovesalad-64-aac",
+        "samples": 322,
+        "duration": 60.078000000008615,
+        "interrupted": null,
+        "rssi_min": -79,
+        "rssi_max": -60
+      },
+      {
+        "case": "groovesalad-32-aac",
+        "samples": 327,
+        "duration": 60.062999999994645,
+        "interrupted": null,
+        "rssi_min": -77,
+        "rssi_max": -59
+      },
+      {
+        "case": "groovesalad-16-aac",
+        "samples": 329,
+        "duration": 60.046000000002095,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      },
+      {
+        "case": "groovesalad-256-mp3",
+        "samples": 135,
+        "duration": 29.421999999991385,
+        "interrupted": "URLError",
+        "rssi_min": -74,
+        "rssi_max": -59
+      },
+      {
+        "case": "settled-idle",
+        "samples": 23,
+        "duration": 12.062999999994645,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -60
+      }
+    ],
+    "observed_cpu_including_startup": [
+      {
+        "case": "groovesalad-128-aac",
+        "windows": 12,
+        "mean_busy": 50.03333333333333,
+        "peak_busy": 54.9,
+        "minimum_heap": 58804.0,
+        "minimum_largest": 43008.0,
+        "first_three_medians": {
+          "heap": 63688.0,
+          "largest": 47104.0
+        },
+        "last_three_medians": {
+          "heap": 63044.0,
+          "largest": 49152.0
+        }
+      },
+      {
+        "case": "groovesalad-64-aac",
+        "windows": 12,
+        "mean_busy": 61.9,
+        "peak_busy": 66.5,
+        "minimum_heap": 23448.0,
+        "minimum_largest": 7936.0,
+        "first_three_medians": {
+          "heap": 27648.0,
+          "largest": 10752.0
+        },
+        "last_three_medians": {
+          "heap": 25216.0,
+          "largest": 10752.0
+        }
+      },
+      {
+        "case": "groovesalad-32-aac",
+        "windows": 12,
+        "mean_busy": 58.958333333333336,
+        "peak_busy": 62.1,
+        "minimum_heap": 21872.0,
+        "minimum_largest": 8704.0,
+        "first_three_medians": {
+          "heap": 24036.0,
+          "largest": 12288.0
+        },
+        "last_three_medians": {
+          "heap": 22792.0,
+          "largest": 12800.0
+        }
+      },
+      {
+        "case": "groovesalad-16-aac",
+        "windows": 12,
+        "mean_busy": 44.425,
+        "peak_busy": 47.4,
+        "minimum_heap": 23864.0,
+        "minimum_largest": 10240.0,
+        "first_three_medians": {
+          "heap": 25172.0,
+          "largest": 13312.0
+        },
+        "last_three_medians": {
+          "heap": 27216.0,
+          "largest": 10752.0
+        }
+      },
+      {
+        "case": "groovesalad-256-mp3",
+        "windows": 5,
+        "mean_busy": 59.02,
+        "peak_busy": 67.2,
+        "minimum_heap": 84124.0,
+        "minimum_largest": 69632.0,
+        "first_three_medians": {
+          "heap": 85408.0,
+          "largest": 73728.0
+        },
+        "last_three_medians": {
+          "heap": 85472.0,
+          "largest": 73728.0
+        }
+      }
+    ]
+  },
+  "soak/tls-alternate": {
+    "cases": [
+      {
+        "name": "idle-before",
+        "result": "PASS",
+        "seconds": 12.437,
+        "evidence": {
+          "samples": [
+            {
+              "heap": 142884,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 142860,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        }
+      },
+      {
+        "name": "tls-record:alternate",
+        "result": "FAIL",
+        "reason": "Insufficient actual playback samples",
+        "seconds": 601.219
+      },
+      {
+        "name": "idle-recovery",
+        "result": "PASS",
+        "seconds": 12.484,
+        "evidence": {
+          "samples": [
+            {
+              "heap": 142912,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 142912,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 142912,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        }
+      },
+      {
+        "name": "runtime",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder/TLS failure",
+        "seconds": 0.0
+      },
+      {
+        "name": "restore",
+        "result": "PASS",
+        "seconds": 0.641,
+        "evidence": {
+          "stopped": true,
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        }
+      }
+    ],
+    "allocation_failures": 1,
+    "all_phase_fault_lines": [
+      {
+        "at": 141102.093,
+        "line": "E (26230) cpu_profile: PERF allocation failed: requested=16749 caps=0x804 function=heap_caps_calloc free=27040 largest=15360"
+      },
+      {
+        "at": 141102.093,
+        "line": "TLS failure: component=Dynamic Impl allocation_bytes=16749"
+      },
+      {
+        "at": 141102.093,
+        "line": "TLS failure: component=esp-tls-mbedtls"
+      }
+    ],
+    "status": [
+      {
+        "case": "settled-idle",
+        "samples": 24,
+        "duration": 12.359000000025844,
+        "interrupted": null,
+        "rssi_min": -75,
+        "rssi_max": -59
+      },
+      {
+        "case": "tls-record:alternate",
+        "samples": 2709,
+        "duration": 600.0320000000065,
+        "interrupted": null,
+        "rssi_min": -81,
+        "rssi_max": -58
+      },
+      {
+        "case": "settled-idle",
+        "samples": 24,
+        "duration": 12.39100000000326,
+        "interrupted": null,
+        "rssi_min": -73,
+        "rssi_max": -60
+      }
+    ],
+    "observed_cpu_including_startup": [
+      {
+        "case": "tls-record:alternate",
+        "windows": 118,
+        "mean_busy": 12.922881355932203,
+        "peak_busy": 64.0,
+        "minimum_heap": 122712.0,
+        "minimum_largest": 106496.0,
+        "first_three_medians": {
+          "heap": 142872.0,
+          "largest": 114688.0
+        },
+        "last_three_medians": {
+          "heap": 142912.0,
+          "largest": 114688.0
+        }
+      }
+    ]
+  },
+  "mp3-followup/public-mp3": {
+    "cases": [
+      {
+        "name": "idle:baseline",
+        "result": "PASS",
+        "seconds": 12.078,
+        "evidence": {
+          "samples": [
+            {
+              "heap": 143004,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 142984,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ]
+        }
+      },
+      {
+        "name": "https:groovesalad-256-mp3",
+        "result": "FAIL",
+        "reason": "URLError",
+        "seconds": 468.437
+      },
+      {
+        "name": "idle:recovery",
+        "result": "PASS",
+        "seconds": 12.25,
+        "evidence": {
+          "samples": [
+            {
+              "heap": 143016,
+              "largest": 114688,
+              "tasks": 17
+            },
+            {
+              "heap": 143008,
+              "largest": 114688,
+              "tasks": 17
+            }
+          ],
+          "no_unexpected_resets": true
+        }
+      },
+      {
+        "name": "restore",
+        "result": "PASS",
+        "seconds": 7.5,
+        "evidence": {
+          "stopped_state_restored": true,
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        }
+      }
+    ],
+    "allocation_failures": 0,
+    "all_phase_fault_lines": [
+      {
+        "at": 142288.906,
+        "line": "ESP-ROM:esp32c3-api1-20210207"
+      },
+      {
+        "at": 142288.906,
+        "line": "rst:0xc (RTC_SW_CPU_RST),boot:0xc (SPI_FAST_FLASH_BOOT)"
+      }
+    ],
+    "status": [
+      {
+        "case": "settled-idle",
+        "samples": 23,
+        "duration": 12.0,
+        "interrupted": null,
+        "rssi_min": -74,
+        "rssi_max": -59
+      },
+      {
+        "case": "groovesalad-256-mp3",
+        "samples": 2579,
+        "duration": 466.1559999999881,
+        "interrupted": "URLError",
+        "rssi_min": -82,
+        "rssi_max": -59
+      },
+      {
+        "case": "settled-idle",
+        "samples": 23,
+        "duration": 12.14100000000326,
+        "interrupted": null,
+        "rssi_min": -78,
+        "rssi_max": -60
+      }
+    ],
+    "observed_cpu_including_startup": [
+      {
+        "case": "groovesalad-256-mp3",
+        "windows": 92,
+        "mean_busy": 65.52826086956522,
+        "peak_busy": 68.2,
+        "minimum_heap": 82292.0,
+        "minimum_largest": 65536.0,
+        "first_three_medians": {
+          "heap": 84420.0,
+          "largest": 69632.0
+        },
+        "last_three_medians": {
+          "heap": 85884.0,
+          "largest": 69632.0
+        }
+      }
+    ]
+  }
+}

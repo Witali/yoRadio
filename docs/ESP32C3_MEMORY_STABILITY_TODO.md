@@ -48,8 +48,13 @@ The remaining network-memory gates are separate from compact PCM quality:
   The [retained RX experiment](ESP32C3_RETAINED_TLS_RX_20261008.md) avoids
   per-record large allocation but fails small network allocations instead:
   181 failures across eight framing cases and 51 in the interrupted soak.
-  Keep it disabled. The next qualification target is the pinned latest
+  Keep it disabled. The active qualification target is the pinned latest
   `release/v6.1` revision `9a97f6c54ec6`, rather than the original release tag.
+  Its [physical follow-up](ESP32C3_IDF61_REVISION_20261008.md) passes all 44
+  HTTP/HTTPS file cases and four public AAC minutes, but the alternating-record
+  run again fails a 16,749-byte request: 27,040 B free / 15,360 B largest.
+  RX6 is still not a complete memory fix. A separate MP3 WebUI timeout also
+  requires diagnosis; no decoder/allocation fault was recorded in that window.
 - [ ] Resolve contiguous allocation with full TLS buffers. The static-TLS
   follow-up has 35,640–40,020 B free at three failed 32,744-byte SBR requests,
   but only 25,600–29,696 B in the largest block. Audit allocation order before
