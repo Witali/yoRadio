@@ -84,6 +84,31 @@ int main(void) {
     adaptive_input_t *q = adaptive_input_create(16000, 8000, 2060);
     assert(q);
     tls_input_reserve_bind(q);
+    // A permanent reservation is funded before streaming, even if the heap
+    // could currently satisfy TLS. Preparing another connection never regrows.
+    adaptive_input_stats_t initial = adaptive_input_stats(q);
+    assert(initial.resident == 4 && initial.target == 8 && initial.released == 4);
+    assert(atomic_load(&s_last_request) == 0);
+    void *packets[4];
+    for (unsigned i = 0; i < 4; ++i) {
+        assert(adaptive_input_acquire(q, &packets[i], 4, 0));
+        memcpy(packets[i], &i, 4);
+        assert(adaptive_input_commit(q, packets[i]));
+    }
+    size_t packet_size;
+    assert(adaptive_input_receive(q, &packet_size, 0) == packets[0]);
+    tls_input_reserve_prepare_connection();
+    initial = adaptive_input_stats(q);
+    assert(initial.resident == 4 && initial.occupied == 4 && initial.released == 4);
+    for (unsigned i = 0; i < 4; ++i) {
+        if (i) assert(adaptive_input_receive(q, &packet_size, 0) == packets[i]);
+        unsigned actual;
+        memcpy(&actual, packets[i], 4);
+        assert(packet_size == 4 && actual == i);
+        assert(adaptive_input_return(q, packets[i]));
+    }
+    tls_input_reserve_prepare_connection();
+    assert(adaptive_input_stats(q).resident == 4);
 #endif
     fake_largest = 0;
     unsigned calls_before = atomic_load(&normal_allocations);

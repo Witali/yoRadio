@@ -266,7 +266,8 @@ int main(void) {
     pressure_setup(q, 15360, false);
     assert(!__wrap_esp_mbedtls_mem_calloc(1, 16749));
     assert(adaptive_input_stats(q).resident == 4 && allocator_calls == 1);
-    adaptive_input_restore(q);
+    tls_input_reserve_prepare_connection();
+    assert(adaptive_input_stats(q).resident == 8);
     pressure_setup(q, 0, true);
     assert(!__wrap_esp_mbedtls_mem_calloc(SIZE_MAX, 2));
     assert(!__wrap_esp_mbedtls_mem_calloc(0, 16749));

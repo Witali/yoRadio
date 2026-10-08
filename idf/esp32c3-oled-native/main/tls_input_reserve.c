@@ -16,6 +16,9 @@ static atomic_size_t s_last_request;
 
 void tls_input_reserve_bind(adaptive_input_t *input) {
     atomic_store(&s_input, input);
+#ifdef CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE
+    tls_input_reserve_prepare_connection();
+#endif
 }
 
 static bool reclaim_one(adaptive_input_t *input, size_t requested) {
@@ -23,6 +26,19 @@ static bool reclaim_one(adaptive_input_t *input, size_t requested) {
     atomic_store(&s_last_request, requested);
     atomic_fetch_add(&s_reclaimed, 1);
     return true;
+}
+
+void tls_input_reserve_prepare_connection(void) {
+    adaptive_input_t *input = atomic_load(&s_input);
+#ifdef CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE
+    // The static TLS slot consumes RAM even for HTTP and small TLS records.
+    // Fund it before input slots fill; later allocation hooks cannot reclaim
+    // producer/decoder leases or queued bytes. request=0 denotes this policy,
+    // rather than an allocation failure. Never regrow while the reserve exists.
+    while (reclaim_one(input, 0)) {}
+#else
+    adaptive_input_restore(input);
+#endif
 }
 #else
 static bool reclaim_one(adaptive_input_t *input, size_t requested) {

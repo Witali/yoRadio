@@ -11,7 +11,8 @@ config YORADIO_TLS_LARGE_BLOCK_RESERVE
         the normal heap. The slot is not tied to a specific connection or RX
         allocation site; it may also serve large handshake allocations.
         Keep disabled until full-record playback, certificates, concurrent
-        contexts, all codecs and OTA pass. Can combine with adaptive input.
+        contexts, all codecs and OTA pass. With adaptive input, keep its queue
+        at the configured minimum from startup to fund this permanent reserve.
 
 config YORADIO_ADAPTIVE_INPUT_BUFFER
     bool "Release idle compressed-input blocks for TLS (experimental)"
@@ -21,7 +22,9 @@ config YORADIO_ADAPTIVE_INPUT_BUFFER
         Replace the compressed-input ring with independently allocated packet
         slots. Before a failing mbedTLS allocation, reclaim only idle slots
         above the minimum; never discard queued data or decoder/producer leases.
-        Refill available capacity between connections. Slots are rounded to
+        Refill available capacity between connections, unless the permanent
+        TLS large-block reserve is enabled; that combination keeps the input
+        at its minimum from startup, including for HTTP. Slots are rounded to
         complete stream packets, so the effective size differs from the legacy
         ring. This cannot guarantee a contiguous TLS allocation or enough jitter
         tolerance. Keep disabled until all-codec and long-playback tests pass.

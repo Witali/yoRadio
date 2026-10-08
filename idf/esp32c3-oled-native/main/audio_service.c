@@ -663,9 +663,9 @@ static void stream_task(void *argument) {
         }
 
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
-        // Previous HTTP/TLS client is closed. Refill only absent slots; any old
-        // queued packets remain owned until the decoder returns them.
-        adaptive_input_restore(s_encoded);
+        // Previous HTTP/TLS client is closed. Apply the TLS memory budget;
+        // queued packets and outstanding leases keep their owners.
+        tls_input_reserve_prepare_connection();
 #endif
         network_service_set_streaming(true);
         state_set_audio(command.generation, false, "connecting");

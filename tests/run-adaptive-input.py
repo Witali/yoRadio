@@ -22,7 +22,8 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     main = ROOT / 'idf/esp32c3-oled-native/main'
     harness = ROOT / 'tests/native/adaptive_input_test.c'
-    inputs = [main / name for name in ('adaptive_input.h', 'adaptive_input.c', 'tls_input_reserve.c')]
+    inputs = [main / name for name in ('adaptive_input.h', 'adaptive_input.c',
+                                      'tls_input_reserve.c', 'tls_input_reserve.h')]
     inputs += [harness, Path(__file__).resolve()]
     for source in inputs:
         saved = args.output / 'sources' / source.relative_to(ROOT)
@@ -30,7 +31,7 @@ def main():
         saved.write_bytes(source.read_bytes())
     unit = args.output / 'test.c'
     unit.write_text(harness.read_text()
-                    .replace('/* PRODUCTION_HEADER */', body(inputs[0]))
+                    .replace('/* PRODUCTION_HEADER */', body(inputs[0]) + body(inputs[3]))
                     .replace('/* PRODUCTION_QUEUE */', body(inputs[1]))
                     .replace('/* PRODUCTION_TLS */', body(inputs[2])))
     binary = args.output / 'test'

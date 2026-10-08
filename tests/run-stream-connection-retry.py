@@ -17,7 +17,7 @@ def main():
     parser.add_argument('--tls-retain-rx', action='store_true',
                         help='Verify the SDK retained-RX strategy on every connection attempt')
     parser.add_argument('--adaptive-input', action='store_true',
-                        help='Verify input capacity restores only after previous TLS cleanup')
+                        help='Verify input-memory preparation follows previous TLS cleanup')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     source = ROOT/'idf/esp32c3-oled-native/main/audio_service.c'

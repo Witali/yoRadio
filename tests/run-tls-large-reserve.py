@@ -24,14 +24,15 @@ def main():
     support = ROOT / 'tests/native/adaptive_input_test.c'
     harness = ROOT / 'tests/native/tls_large_reserve_test.c'
     inputs = [main / name for name in ('adaptive_input.h', 'adaptive_input.c',
-              'tls_input_reserve.c', 'tls_large_reserve.h', 'tls_large_reserve.c')]
+              'tls_input_reserve.c', 'tls_large_reserve.h', 'tls_large_reserve.c',
+              'tls_input_reserve.h')]
     inputs += [support, harness, Path(__file__).resolve()]
     for source in inputs:
         target = args.output / 'sources' / source.relative_to(ROOT)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(source.read_bytes())
     common = support.read_text().split('/* PRODUCTION_HEADER */')[0]
-    common += body(inputs[0]) + body(inputs[3])
+    common += body(inputs[0]) + body(inputs[3]) + body(inputs[5])
     variants = []
     for adaptive in (False, True):
         name = 'adaptive' if adaptive else 'pool-only'
