@@ -270,22 +270,26 @@ class Suite:
         check_recovery_heap(checkpoints[0], checkpoints[-1])
         return dict(cycles=cycles, station_changes=len(names)*cycles)
 
-    def sustained(self, seconds, name='lc-48000-stereo', cpu=False, load=False):
+    def sustained(self, seconds, name='lc-48000-stereo', cpu=False, load=False,
+                  origin=None):
         if cpu and not self.capture.port:
             raise Blocked('CPU/heap checks require --serial-port and profiling firmware')
         spec = self.specs[name]
         mode = 'stream' if spec['codec'] == 'aac' else 'file'
         if mode == 'file' and spec['seconds'] < seconds+3:
             raise Blocked('Generate a continuous fixture at least 3 s longer than this test')
-        self.start(name, mode, spec['codec'])
+        runtime_started = time.monotonic()
+        self.start(name, mode, spec['codec'], origin)
         started = time.monotonic()
         try:
             samples = self.observe(seconds, ('load:' if load else 'soak:') + name,
                                    interval=.1 if load else 1)
             check_playback(samples, self.specs[name], minimum=max(5, int(seconds*.6)), warmup=5)
+            check_file_runtime(self.capture.since(runtime_started))
             require(max(s['request_ms'] for s in samples) < 2000, 'WebUI response exceeded 2 s')
             evidence = dict(duration=seconds, status_samples=len(samples),
-                            max_http_ms=max(s['request_ms'] for s in samples))
+                            max_http_ms=max(s['request_ms'] for s in samples),
+                            serial_capture_enabled=self.capture.port is not None)
             if cpu:
                 evidence.update(check_cpu(self.capture.since(started+10), max_busy=self.cpu_budget,
                                           start=started+10, end=time.monotonic()))
@@ -317,6 +321,8 @@ def main():
     parser.add_argument('--delivery-stats', action='store_true',
                         help='Retain host socket-write timing; does not relax playback/CPU gates')
     parser.add_argument('--https-origin', help='Trusted HTTPS origin serving identical /file routes')
+    parser.add_argument('--sustained-protocol', choices=('http', 'https'), default='http',
+                        help='Transport for soak/load cases; HTTPS requires --https-origin')
     parser.add_argument('--tls-cert', type=Path)
     parser.add_argument('--tls-key', type=Path)
     parser.add_argument('--tls-port', type=int, default=8771)
@@ -326,6 +332,9 @@ def main():
     args = parser.parse_args()
     require(args.soak_seconds >= 60, 'Soak must last at least 60 seconds; default is one hour')
     require(args.load_seconds >= 40, 'Load must last at least the original 40 seconds')
+    if args.sustained_protocol == 'https':
+        require(args.https_origin and args.https_origin.startswith('https://'),
+                'HTTPS soak/load requires a trusted --https-origin')
     specs = fixtures(args.fixture_manifest)
     names = args.case or [n for n in specs if n not in SEQUENCES]
     require(all(n in specs for n in names), 'Unknown fixture name')
@@ -337,6 +346,7 @@ def main():
     report = Report(args.output/'report.json', info)
     report.data['fixture_hashes'] = {n:specs[n]['sha256'] for n in names}
     report.data['requested_suites'] = args.suite
+    report.data['sustained_protocol'] = args.sustained_protocol
     report.data['server_options'] = dict(unpaced_files=args.unpaced_files,
                                        delivery_stats=args.delivery_stats)
     report.data['cpu_budget_percent'] = args.max_cpu_busy
@@ -393,8 +403,9 @@ def main():
                 for cycle in range(args.cycles):
                     report.case('boot-ready:'+str(cycle+1),suite.boot_time)
             for name in (names if args.case else ['lc-48000-stereo','he-48000-stereo','hev2-44100-stereo']):
+                origin = args.https_origin if args.sustained_protocol == 'https' else None
                 if 'soak' in args.suite:
-                    report.case('soak:'+name, lambda n=name: suite.sustained(args.soak_seconds,n,cpu=True))
+                    report.case('soak:'+name, lambda n=name: suite.sustained(args.soak_seconds,n,cpu=True,origin=origin))
                 if 'load' in args.suite:
                     baseline = []
                     if args.load_idle_recovery:
@@ -402,7 +413,7 @@ def main():
                             baseline.extend(suite.idle_heap())
                             return dict(samples=baseline)
                         report.case('load-idle-baseline:'+name, baseline_heap)
-                    report.case('cpu-under-http-load:'+name, lambda n=name: suite.sustained(args.load_seconds,n,cpu=True,load=True))
+                    report.case('cpu-under-http-load:'+name, lambda n=name: suite.sustained(args.load_seconds,n,cpu=True,load=True,origin=origin))
                     if args.load_idle_recovery:
                         def recovered_heap():
                             final = suite.idle_heap()
