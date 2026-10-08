@@ -185,6 +185,10 @@ TLS framing/record-size, ten-minute playback, reconnect and OTA gates pass.
 
 ## Follow-up work
 
+The [further memory research priorities](ESP32C3_MEMORY_STABILITY_TODO.md#further-memory-research-priorities)
+track RX-owned reuse for small and large TLS records, bounded packet pools,
+decoder lifetime reuse and operating headroom for networking, crypto and WebUI.
+
 - Reproduce the FLAC diagnostic with the timeout reason and task names retained
   safely. Check scheduling and actual output continuity; keep the original
   diagnostic failure and do not replace it with a CPU-budget exemption.

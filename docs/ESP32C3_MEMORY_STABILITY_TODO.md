@@ -8,6 +8,51 @@ source and ELF candidates, including string copies and SDK placement limits.
 Large application/codec constants are already in Flash; the listed candidates
 are not implemented savings and do not yet resolve the SBR allocation deficit.
 
+## Further memory research priorities
+
+The next experiments should control allocation ownership and lifetime while
+preserving full AAC/SBR/PS, original sample rates, the 3-LSB PCM allowance and
+all other supported codecs. These are research items, not production defaults.
+
+1. **Reserve one large buffer specifically for TLS reception.** Reuse it for
+   both small and full-sized records. The current 17,058-byte generic reserve
+   can be claimed by a large handshake allocation and does not serve small RX
+   allocations. Audit RX setup, cached state, retained-buffer conversion,
+   errors, reset, destruction and simultaneous contexts before changing its
+   owner. Derive capacity from SDK symbols and retain certificate validation
+   and full 16 KiB incoming records. Measure allocation churn, CPU and peak RAM.
+2. **Keep a bounded pool of compressed-audio packets.** Release only unused
+   blocks above the configured minimum; preserve queued data, FIFO order and
+   producer/decoder pointer leases. The optional adaptive queue is the starting
+   implementation. Compare effective buffering for short packets, network
+   jitter, output underruns and stop/reconnect behavior at each pool size.
+3. **Reuse decoder memory between sessions where lifetimes permit it.** Audit
+   every user of each region, including interior pointers, output callbacks,
+   cancellation and late SBR/PS activation. Retain or reset storage only after
+   the previous owner has released it; release incompatible retained storage
+   before another codec or TLS handshake needs that RAM. Measure total peak
+   use and fragmentation across mixed-codec switches, not just allocation count.
+4. **Budget separate operating headroom for Wi-Fi, cryptography and WebUI.**
+   Include allocations outside the mbedTLS hooks, DMA/alignment requirements,
+   certificate verification, reconnect and OTA. Measure total free memory and
+   the largest allocatable block for each required memory capability. Reserving
+   TLS RAM must not cause smaller network or crypto allocations to fail.
+
+The [startup-minimum reserve experiment](ESP32C3_TLS_RESERVE_20261008.md) uses
+**17,058 bytes** for the TLS slot and releases **8,240 bytes** of input-packet
+storage. Its 44-case HTTP/HTTPS file matrix records **zero allocation failures**
+and **43/44 passes**. The remaining FLAC case contains an unresolved diagnostic
+dump. This result supports further investigation; it does not establish full
+stability or a net RAM saving. Keep the failed case and the separate WebUI
+timeout in the qualification record.
+
+For each experiment, retain an unchanged control image, exact configuration
+and source hashes, peak RAM and largest-block measurements, CPU, playback
+continuity and PCM quality results. Acceptance requires all-codec HTTP/HTTPS,
+small/growing/full TLS records, ten-minute playback, mixed-codec transitions,
+reconnect, EOF and OTA tests. CPU percentage alone is not a rejection gate;
+runtime faults and output gaps remain failures.
+
 ## Current SDK-upgrade branch checkpoint, 2026-10-07
 
 On `codex/esp32c3-idf-upgrade`, the ESP32-C3 defaults now select the compact
