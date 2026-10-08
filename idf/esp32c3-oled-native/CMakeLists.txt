@@ -15,6 +15,18 @@ set(EXTRA_COMPONENT_DIRS
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yoradio_esp32c3_oled_native)
 
+# Optional full-radio flash-mode probe. It reports actual SPI0 registers and
+# checks mapped application bytes before starting the ordinary application.
+if(YORADIO_FLASH_MODE_PROBE)
+    if(YORADIO_HARDWARE_FLAC_CLZ_TEST)
+        message(FATAL_ERROR "Select only one app_main laboratory wrapper")
+    endif()
+    idf_component_get_property(yoradio_main_lib main COMPONENT_LIB)
+    target_sources(${yoradio_main_lib} PRIVATE
+        "${CMAKE_CURRENT_LIST_DIR}/../../tests/native/flash_mode/boot_probe.c")
+    target_link_options(${yoradio_main_lib} INTERFACE "-Wl,--wrap=app_main")
+endif()
+
 if(CONFIG_YORADIO_GCM_BYTE_GHASH)
     idf_component_get_property(yoradio_gcm_dir mbedtls COMPONENT_DIR)
     idf_build_get_property(yoradio_gcm_python PYTHON)
