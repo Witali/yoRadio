@@ -11,6 +11,14 @@ from common import TLS_CERTIFICATE_REJECTED
 
 
 class PanicFilter(unittest.TestCase):
+    def test_adaptive_input_retains_only_numeric_counters(self):
+        counters = ('TLS_INPUT released=4 retries=0 request=16749 resident=4 '
+                    'minimum=4 target=8 occupied=2 capacity=8240')
+        self.assertEqual(filter_line('I (12) tls_input: '+counters+' private-secret'), counters)
+        self.assertIsNone(filter_line('I (12) tls_input: private-secret'))
+        fault = 'allocation failed '+counters
+        self.assertEqual(filter_line(fault), fault)
+
     def test_watchdog_without_register_dump_is_failure(self):
         line=filter_line('\x1b[0;31mE (123) task_wdt: Task watchdog got triggered. '
                          'The following tasks/users did not reset the watchdog in time:')

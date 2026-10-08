@@ -48,6 +48,9 @@
 #include "network_service.h"
 
 #include "runtime_settings.h"
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+#include "tls_input_reserve.h"
+#endif
 #define STREAM_CHUNK_SIZE 2048
 #define STREAM_READ_TIMEOUT_MS 250
 #define PCM_RING_SIZE (8 * 1024)
@@ -152,9 +155,21 @@ static esp_err_t benchmark_autostart(void);
 static const char *const TAG = "audio";
 static native_state_t *s_state;
 static QueueHandle_t s_commands;
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+static adaptive_input_t *s_encoded;
+#define encoded_acquire adaptive_input_acquire
+#define encoded_commit adaptive_input_commit
+#define encoded_return adaptive_input_return
+#else
 static RingbufHandle_t s_encoded;
+#define encoded_acquire xRingbufferSendAcquire
+#define encoded_commit xRingbufferSendComplete
+#define encoded_return vRingbufferReturnItem
+#endif
 static RingbufHandle_t s_pcm;
+#ifndef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 static size_t s_encoded_usable_size;
+#endif
 static atomic_uint s_generation;
 static atomic_uint s_decoder_target_codec;
 static atomic_uint s_decoder_released_generation;
@@ -420,7 +435,7 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
                          const uint8_t *data, size_t size, uint8_t eos) {
     size_t packet_size = sizeof(encoded_packet_t) + size;
     encoded_packet_t *packet = NULL;
-    while (xRingbufferSendAcquire(s_encoded, (void **)&packet, packet_size,
+    while (encoded_acquire(s_encoded, (void **)&packet, packet_size,
                                   pdMS_TO_TICKS(250)) != pdTRUE) {
         // A slow decoder must apply TCP backpressure, not terminate the
         // station. Short waits still let a station change cancel promptly.
@@ -431,7 +446,7 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
     packet->data_size = (uint16_t)size;
     packet->end_of_stream = eos;
     if (size) memcpy(packet->data, data, size);
-    return xRingbufferSendComplete(s_encoded, packet) == pdTRUE;
+    return encoded_commit(s_encoded, packet) == pdTRUE;
 }
 
 static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
@@ -647,6 +662,11 @@ static void stream_task(void *argument) {
             continue;
         }
 
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+        // Previous HTTP/TLS client is closed. Refill only absent slots; any old
+        // queued packets remain owned until the decoder returns them.
+        adaptive_input_restore(s_encoded);
+#endif
         network_service_set_streaming(true);
         state_set_audio(command.generation, false, "connecting");
 
@@ -911,7 +931,7 @@ static void return_decoded_packet(encoded_packet_t *packet,
     if (packet->end_of_stream && packet->generation != failed_generation) {
         send_pcm_end(packet->generation, packet->end_of_stream);
     }
-    vRingbufferReturnItem(s_encoded, packet);
+    encoded_return(s_encoded, packet);
 }
 
 static void finish_pcm_stream(const pcm_packet_t *packet) {
@@ -1034,6 +1054,9 @@ static void decoder_task(void *argument) {
 
     while (true) {
         rx_buffer_diagnostic_poll();
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+        tls_input_reserve_poll();
+#endif
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
@@ -1095,15 +1118,29 @@ static void decoder_task(void *argument) {
                                  && !legacy_decoder
 #endif
         );
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+        encoded_packet_t *packet = adaptive_input_receive(s_encoded, &item_size, 0);
+        if (!packet) {
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+            int64_t wait_started = esp_timer_get_time();
+#endif
+            packet = adaptive_input_receive(s_encoded, &item_size, pdMS_TO_TICKS(20));
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+            pipeline_wait_record(&stats.input_empty,
+                (uint32_t)(esp_timer_get_time() - wait_started), packet == NULL);
+#endif
+        }
+#else
         encoded_packet_t *packet = pipeline_receive(
             s_encoded, &item_size, pdMS_TO_TICKS(20), &stats.input_empty);
+#endif
         if (!packet) continue;
         if (packet->generation != atomic_load(&s_generation)) {
-            vRingbufferReturnItem(s_encoded, packet);
+            encoded_return(s_encoded, packet);
             continue;
         }
         if (packet->generation == failed_generation) {
-            vRingbufferReturnItem(s_encoded, packet);
+            encoded_return(s_encoded, packet);
             continue;
         }
         if (packet->codec == NATIVE_CODEC_AUTO && packet->end_of_stream) {
@@ -1204,7 +1241,7 @@ static void decoder_task(void *argument) {
                     ESP_LOGE(TAG, "Old codec arena is still in use");
                     state_set_audio(generation, false, "decoder release failed");
                     failed_generation = generation;
-                    vRingbufferReturnItem(s_encoded, packet);
+                    encoded_return(s_encoded, packet);
                     continue;
                 }
 #endif
@@ -1214,7 +1251,7 @@ static void decoder_task(void *argument) {
                     if (!aac_decoder) {
                         state_set_audio(generation, false, "NO MEMORY");
                         failed_generation = generation;
-                        vRingbufferReturnItem(s_encoded, packet);
+                        encoded_return(s_encoded, packet);
                         continue;
                     }
                 }
@@ -1229,7 +1266,7 @@ static void decoder_task(void *argument) {
                              codec_name(codec));
                     state_set_audio(generation, false, "NO MEMORY");
                     failed_generation = generation;
-                    vRingbufferReturnItem(s_encoded, packet);
+                    encoded_return(s_encoded, packet);
                     continue;
                 }
                 esp_audio_simple_dec_cfg_t cfg = {
@@ -1379,7 +1416,7 @@ static void decoder_task(void *argument) {
         }
 #endif
         if (!decoder && !aac_decoder) {
-            vRingbufferReturnItem(s_encoded, packet);
+            encoded_return(s_encoded, packet);
             continue;
         }
         esp_audio_simple_dec_raw_t raw = {
@@ -1704,12 +1741,27 @@ esp_err_t audio_service_start(native_state_t *state) {
     size_t encoded_ring_size =
         (size_t)runtime_settings_get_audio_buffer_blocks() * 1600U;
     s_commands = xQueueCreate(1, sizeof(play_command_t));
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    s_encoded = adaptive_input_create(encoded_ring_size,
+        CONFIG_YORADIO_INPUT_MIN_BLOCKS * 1600U,
+        sizeof(encoded_packet_t) + STREAM_CHUNK_SIZE);
+    tls_input_reserve_bind(s_encoded);
+#else
     s_encoded = xRingbufferCreate(encoded_ring_size, RINGBUF_TYPE_NOSPLIT);
+#endif
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     if (!s_commands || !s_encoded || !s_pcm) {
         return ESP_ERR_NO_MEM;
     }
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    adaptive_input_stats_t input_stats = adaptive_input_stats(s_encoded);
+    encoded_ring_size = input_stats.resident * input_stats.packet_capacity;
+    ESP_LOGI(TAG, "Adaptive input: slots=%u minimum=%u target=%u slot_bytes=%u",
+             input_stats.resident, input_stats.minimum, input_stats.target,
+             (unsigned)input_stats.packet_capacity);
+#else
     s_encoded_usable_size = xRingbufferGetCurFreeSize(s_encoded);
+#endif
     // The historical ordering favored uninterrupted decode-call timing. With
     // OUTPUT_TASK_FIRST, a ready DMA block preempts long decode calls instead.
     // Compare decoder task CPU separately from elapsed call time: the latter
@@ -1837,6 +1889,10 @@ void audio_service_stop(void) {
 }
 
 uint8_t audio_service_buffer_fill_percent(void) {
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    adaptive_input_stats_t stats = adaptive_input_stats(s_encoded);
+    return stats.resident ? (uint8_t)(stats.occupied * 100U / stats.resident) : 0;
+#else
     if (!s_encoded || !s_encoded_usable_size) return 0;
     size_t free_size = xRingbufferGetCurFreeSize(s_encoded);
     if (free_size >= s_encoded_usable_size) return 0;
@@ -1844,4 +1900,5 @@ uint8_t audio_service_buffer_fill_percent(void) {
     unsigned percent =
         (unsigned)((used_size * 100U) / s_encoded_usable_size);
     return (uint8_t)(percent > 100U ? 100U : percent);
+#endif
 }

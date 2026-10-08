@@ -1,5 +1,29 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_ADAPTIVE_INPUT_BUFFER
+    bool "Release idle compressed-input blocks for TLS (experimental)"
+    depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC
+    default n
+    help
+        Replace the compressed-input ring with independently allocated packet
+        slots. Before a failing mbedTLS allocation, reclaim only idle slots
+        above the minimum; never discard queued data or decoder/producer leases.
+        Refill available capacity between connections. Slots are rounded to
+        complete stream packets, so the effective size differs from the legacy
+        ring. This cannot guarantee a contiguous TLS allocation or enough jitter
+        tolerance. Keep disabled until all-codec and long-playback tests pass.
+
+config YORADIO_INPUT_MIN_BLOCKS
+    int "Minimum compressed-input capacity (1600-byte units)"
+    depends on YORADIO_ADAPTIVE_INPUT_BUFFER
+    range 5 14
+    default 5
+    help
+        Reserve at least this many bytes in complete packet slots, rounded up
+        and capped by the user's configured target capacity. The target itself
+        is rounded up to complete slots. A slot being written, queued, or read
+        cannot be released, even above this minimum. NVS settings are unchanged.
+
 config YORADIO_TLS_RETAIN_RX_BUFFER
     bool "Retain the full TLS receive buffer after handshake (experimental)"
     depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_DYNAMIC_BUFFER

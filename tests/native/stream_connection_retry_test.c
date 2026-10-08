@@ -50,6 +50,14 @@ typedef fake_client_t *esp_http_client_handle_t;
 /* PRODUCTION_HTTP_READER_TYPE */
 typedef struct { int result, status; bool bad_headers; } attempt_t;
 static fake_client_t client;
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+static void *s_encoded;
+static bool input_restored;
+static void adaptive_input_restore(void *input) {
+    assert(input == s_encoded && !client.live && !input_restored);
+    input_restored = true;
+}
+#endif
 static attempt_t attempts[16];
 static unsigned attempt_count, attempt_limit, eos_count, eof_reason, close_count;
 static unsigned connection_close_headers;
@@ -123,6 +131,10 @@ static int xQueueReceive(void *queue, void *destination, TickType_t wait) {
 }
 static esp_http_client_handle_t esp_http_client_init(const esp_http_client_config_t *config) {
     assert(!client.live);
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    assert(input_restored);
+    input_restored = false;
+#endif
 #ifdef CONFIG_YORADIO_TLS_RETAIN_RX_BUFFER
     assert(config->tls_dyn_buf_strategy==HTTP_TLS_DYN_BUF_RX_STATIC);
 #else
@@ -179,6 +191,9 @@ static int esp_http_client_get_and_clear_last_tls_error(esp_http_client_handle_t
 #undef malloc
 
 static void reset(unsigned count) {
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    input_restored = false;
+#endif
     memset(attempts, 0, sizeof(attempts));
     memset(attempt_times, 0, sizeof(attempt_times));
     atomic_store(&s_generation, 0); atomic_store(&s_decoder_released_generation, 0);

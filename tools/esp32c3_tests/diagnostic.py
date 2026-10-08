@@ -25,6 +25,10 @@ def filter_line(line):
     if re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|'
                  r'assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted', line):
         return line
+    adaptive = re.search(r'\bTLS_INPUT released=\d+ retries=\d+ request=\d+ '
+                         r'resident=\d+ minimum=\d+ target=\d+ occupied=\d+ capacity=\d+\b', line)
+    if adaptive:
+        return adaptive.group(0)
     registers = re.findall(r'\b(MEPC|RA|MCAUSE)\s*:\s*(0x[0-9a-fA-F]+)', line)
     if registers:
         return 'PANIC registers: '+' '.join(name+'='+value for name, value in registers)

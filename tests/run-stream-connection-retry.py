@@ -16,6 +16,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--tls-retain-rx', action='store_true',
                         help='Verify the SDK retained-RX strategy on every connection attempt')
+    parser.add_argument('--adaptive-input', action='store_true',
+                        help='Verify input capacity restores only after previous TLS cleanup')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     source = ROOT/'idf/esp32c3-oled-native/main/audio_service.c'
@@ -50,6 +52,7 @@ def main():
     (args.output/'build.log').write_bytes(run(['gcc', '-std=c11', '-O2', '-g', '-Wall', '-Wextra',
         '-Werror', '-fsanitize=address,undefined', '-fno-pie', '-no-pie',
         *(['-DCONFIG_YORADIO_TLS_RETAIN_RX_BUFFER=1'] if args.tls_retain_rx else []),
+        *(['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1'] if args.adaptive_input else []),
         '-I'+host(source.parent), host(unit), host(icy), '-o', host(binary)]))
     result = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                   'UBSAN_OPTIONS=halt_on_error=1', host(binary)])
@@ -57,6 +60,7 @@ def main():
     assert b'PASS stream retry cases=37;' in result
     (args.output/'report.json').write_text(json.dumps(dict(passed=True, cases=37,
         tls_retain_rx=args.tls_retain_rx,
+        adaptive_input=args.adaptive_input,
         source_sha256={p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                        for p in inputs},
         scope='Actual open_stream, retry scheduling and stream_task with deterministic platform stubs; '
