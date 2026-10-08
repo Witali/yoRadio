@@ -17,8 +17,10 @@ the explicitly labelled temporary laboratory CA.
 All **44 local file cases pass**: 11 fixtures through HTTP and HTTPS, each
 with automatic detection and an explicit codec hint. These cover MP3 320,
 FLAC level 8, Vorbis q10, Opus 510, AAC-LC 320, LC at 22.05/44.1/48 kHz,
-HE at 44.1/48 kHz, and HEv2 at 44.1 kHz. Settings restoration is a separate
-45th passing check. File playback/EOF observations do not replace long soaks.
+HE at 44.1/48 kHz, and HEv2 at 44.1 kHz. The separate 45th passing check
+leaves the board stopped; settings preservation is verified by the surrounding
+OTA sequence. These file results cover status and EOF. They predate the
+runtime-fault gate added on 2026-10-08 and do not replace long soaks.
 
 The public sources were independently probed with FFprobe; AAC additionally
 uses the unquantized FAAD reference. Audio/metadata are not retained.
