@@ -1,0 +1,113 @@
+{
+  "result": "PASS",
+  "elf_sha256": "5aee16bafd5d2c2817456563aaea44db7dab2254648d839a4a233d62c8db7e85",
+  "sdkconfig_sha256": "aa7dd920aff173220da337b208cd1e1ee624c2a89a9bc879dbb8e5ea7b263914",
+  "calls": [
+    {
+      "caller": "stream_http_read",
+      "target": "esp_http_client_read",
+      "calls": [
+        "42013aa8:\t7a17f0ef          \tjal\t42093a48 <esp_http_client_read>"
+      ],
+      "disassembly_sha256": "70700363958860cfa4b266f206c0be321708734e4211555e1d3b0404809d1fb3"
+    },
+    {
+      "caller": "stream_http_read",
+      "target": "tls_path_profile_end",
+      "calls": [
+        "42013acc:\t667140ef          \tjal\t42028932 <tls_path_profile_end>",
+        "42013b36:\t5fd140ef          \tjal\t42028932 <tls_path_profile_end>"
+      ],
+      "disassembly_sha256": "70700363958860cfa4b266f206c0be321708734e4211555e1d3b0404809d1fb3"
+    },
+    {
+      "caller": "yoradio_mbedtls_ssl_read",
+      "target": "tls_path_profile_end",
+      "calls": [
+        "42028746:\t22f5                \tjal\t42028932 <tls_path_profile_end>",
+        "42028772:\t22c1                \tjal\t42028932 <tls_path_profile_end>"
+      ],
+      "disassembly_sha256": "eb1b91a3d3be7cd31587f705974bddbff31d050fbd76c91bde0989dfaae22e97"
+    },
+    {
+      "caller": "ssl_read",
+      "target": "__wrap_esp_transport_poll_read",
+      "calls": [
+        "421053b6:\t807230ef          \tjal\t42028bbc <__wrap_esp_transport_poll_read>"
+      ],
+      "disassembly_sha256": "471790466e73e047b95d209f3ab3637ae601870eb7cdb7ac304386aa1cedefc6"
+    },
+    {
+      "caller": "esp_crypto_aes_gcm_decrypt",
+      "target": "__wrap_esp_aes_gcm_auth_decrypt",
+      "calls": [
+        "420b3616:\tec2750ef          \tjal\t42028cd8 <__wrap_esp_aes_gcm_auth_decrypt>"
+      ],
+      "disassembly_sha256": "d6705c64ccd00ef6513669beb01ef346f3fef5de1a49f7b09e2baace4270c8be"
+    },
+    {
+      "caller": "esp_aes_gcm_update",
+      "target": "__wrap_esp_aes_crypt_ctr",
+      "calls": [
+        "420affea:\tdc9780ef          \tjal\t42028db2 <__wrap_esp_aes_crypt_ctr>"
+      ],
+      "disassembly_sha256": "e19c8fa4d317d8c5a589de18337ae7d8e183bc1688054c20ff2c676b37a449f4"
+    },
+    {
+      "caller": "esp_aes_gcm_finish",
+      "target": "__wrap_esp_aes_crypt_ctr",
+      "calls": [
+        "420b00e2:\tcd1780ef          \tjal\t42028db2 <__wrap_esp_aes_crypt_ctr>"
+      ],
+      "disassembly_sha256": "ed2e05b607e6517276675de308e7cf4391398c721631cba4f53a3525aac8b620"
+    },
+    {
+      "caller": "__wrap_esp_transport_poll_read",
+      "target": "esp_transport_poll_read",
+      "calls": [
+        "42028bf4:\t4866a0ef          \tjal\t4209307a <esp_transport_poll_read>",
+        "42028cd4:\t3a66a06f          \tj\t4209307a <esp_transport_poll_read>"
+      ],
+      "disassembly_sha256": "3773c4d771a03af855cb7c4e7119308208d0d7fa7099eda892bd2381d93695bc"
+    },
+    {
+      "caller": "__wrap_esp_aes_gcm_auth_decrypt",
+      "target": "esp_aes_gcm_auth_decrypt",
+      "calls": [
+        "42028d40:\t45c870ef          \tjal\t420b019c <esp_aes_gcm_auth_decrypt>",
+        "42028dae:\t3ee8706f          \tj\t420b019c <esp_aes_gcm_auth_decrypt>"
+      ],
+      "disassembly_sha256": "684773da05a358fa8386fdec9d2d2782a37d73495763371cc02e710538bf6783"
+    },
+    {
+      "caller": "__wrap_esp_aes_crypt_ctr",
+      "target": "esp_aes_crypt_ctr",
+      "calls": [
+        "42028e08:\t760860ef          \tjal\t420af568 <esp_aes_crypt_ctr>",
+        "42028e68:\t7008606f          \tj\t420af568 <esp_aes_crypt_ctr>"
+      ],
+      "disassembly_sha256": "dfe57f9dac1149dd9fde0f9b74dee76b21c92cb9f1ab441768ecec77c63f8399"
+    }
+  ],
+  "counter_bodies": [
+    {
+      "wrapper": "__wrap_esp_transport_poll_read",
+      "end_call": false,
+      "inlined_counter_references": true,
+      "disassembly": "\nidf\\esp32c3-oled-native\\build-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof-tlspath\\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv\n\n\nDisassembly of section .iram0.text:\n\nDisassembly of section .flash.text:\n\n42028bbc <__wrap_esp_transport_poll_read>:\n42028bbc:\t7179                \taddi\tsp,sp,-48\n42028bbe:\td422                \tsw\ts0,40(sp)\n42028bc0:\t842a                \tmv\ts0,a0\n42028bc2:\t4501                \tli\ta0,0\n42028bc4:\td04a                \tsw\ts2,32(sp)\n42028bc6:\td606                \tsw\tra,44(sp)\n42028bc8:\t892e                \tmv\ts2,a1\n42028bca:\t340f10ef          \tjal\t42119f0a <pcTaskGetName>\n42028bce:\t3c1265b7          \tlui\ta1,0x3c126\n42028bd2:\t31858593          \taddi\ta1,a1,792 # 3c126318 <_esp_libc_clock_array_end+0x61c8>\n42028bd6:\tfe35e097          \tauipc\tra,0xfe35e\n42028bda:\t396080e7          \tjalr\t918(ra) # 40386f6c <strcmp>\n42028bde:\te56d                \tbnez\ta0,42028cc8 <__wrap_esp_transport_poll_read+0x10c>\n42028be0:\td226                \tsw\ts1,36(sp)\n42028be2:\tce4e                \tsw\ts3,28(sp)\n42028be4:\tfe358097          \tauipc\tra,0xfe358\n42028be8:\t7f0080e7          \tjalr\t2032(ra) # 403813d4 <esp_timer_get_time>\n42028bec:\t89aa                \tmv\ts3,a0\n42028bee:\t84ae                \tmv\ts1,a1\n42028bf0:\t8522                \tmv\ta0,s0\n42028bf2:\t85ca                \tmv\ta1,s2\n42028bf4:\t4866a0ef          \tjal\t4209307a <esp_transport_poll_read>\n42028bf8:\t842a                \tmv\ts0,a0\n42028bfa:\t4681                \tli\ta3,0\n42028bfc:\t0aa05063          \tblez\ta0,42028c9c <__wrap_esp_transport_poll_read+0xe0>\n42028c00:\t0804c663          \tbltz\ts1,42028c8c <__wrap_esp_transport_poll_read+0xd0>\n42028c04:\tc636                \tsw\ta3,12(sp)\n42028c06:\tfe358097          \tauipc\tra,0xfe358\n42028c0a:\t7ce080e7          \tjalr\t1998(ra) # 403813d4 <esp_timer_get_time>\n42028c0e:\t413507b3          \tsub\ta5,a0,s3\n42028c12:\t00f53533          \tsltu\ta0,a0,a5\n42028c16:\t8d85                \tsub\ta1,a1,s1\n42028c18:\t8d89                \tsub\ta1,a1,a0\n42028c1a:\t84be                \tmv\ts1,a5\n42028c1c:\tc42e                \tsw\ta1,8(sp)\n42028c1e:\tfe35f097          \tauipc\tra,0xfe35f\n42028c22:\t3f0080e7          \tjalr\t1008(ra) # 4038800e <vPortEnterCritical>\n42028c26:\t3fc967b7          \tlui\ta5,0x3fc96\n42028c2a:\t17878793          \taddi\ta5,a5,376 # 3fc96178 <s_samples>\n42028c2e:\t0807a703          \tlw\ta4,128(a5)\n42028c32:\t0847a803          \tlw\ta6,132(a5)\n42028c36:\t45a2                \tlw\ta1,8(sp)\n42028c38:\t0987a603          \tlw\ta2,152(a5)\n42028c3c:\t009708b3          \tadd\ta7,a4,s1\n42028c40:\t00e8b733          \tsltu\ta4,a7,a4\n42028c44:\t982e                \tadd\ta6,a6,a1\n42028c46:\t0605                \taddi\ta2,a2,1\n42028c48:\t9742                \tadd\ta4,a4,a6\n42028c4a:\t08c7ac23          \tsw\ta2,152(a5)\n42028c4e:\t0917a023          \tsw\ta7,128(a5)\n42028c52:\t08e7a223          \tsw\ta4,132(a5)\n42028c56:\t46b2                \tlw\ta3,12(sp)\n42028c58:\tc191                \tbeqz\ta1,42028c5c <__wrap_esp_transport_poll_read+0xa0>\n42028c5a:\t54fd                \tli\ts1,-1\n42028c5c:\t09c7a703          \tlw\ta4,156(a5)\n42028c60:\t04976363          \tbltu\ta4,s1,42028ca6 <__wrap_esp_transport_poll_read+0xea>\n42028c64:\t470d                \tli\ta4,3\n42028c66:\t04e68563          \tbeq\ta3,a4,42028cb0 <__wrap_esp_transport_poll_read+0xf4>\n42028c6a:\t4705                \tli\ta4,1\n42028c6c:\t04e69863          \tbne\ta3,a4,42028cbc <__wrap_esp_transport_poll_read+0x100>\n42028c70:\t0a47a703          \tlw\ta4,164(a5)\n42028c74:\t0705                \taddi\ta4,a4,1\n42028c76:\t0ae7a223          \tsw\ta4,164(a5)\n42028c7a:\t0b07a703          \tlw\ta4,176(a5)\n42028c7e:\t0705                \taddi\ta4,a4,1\n42028c80:\t0ae7a823          \tsw\ta4,176(a5)\n42028c84:\tfe35f097          \tauipc\tra,0xfe35f\n42028c88:\t3c6080e7          \tjalr\t966(ra) # 4038804a <vPortExitCritical>\n42028c8c:\t50b2                \tlw\tra,44(sp)\n42028c8e:\t8522                \tmv\ta0,s0\n42028c90:\t5422                \tlw\ts0,40(sp)\n42028c92:\t5492                \tlw\ts1,36(sp)\n42028c94:\t49f2                \tlw\ts3,28(sp)\n42028c96:\t5902                \tlw\ts2,32(sp)\n42028c98:\t6145                \taddi\tsp,sp,48\n42028c9a:\t8082                \tret\n42028c9c:\t00a036b3          \tsnez\ta3,a0\n42028ca0:\t0686                \tslli\ta3,a3,0x1\n42028ca2:\t0685                \taddi\ta3,a3,1\n42028ca4:\tbfb1                \tj\t42028c00 <__wrap_esp_transport_poll_read+0x44>\n42028ca6:\t0897ae23          \tsw\ts1,156(a5)\n42028caa:\t470d                \tli\ta4,3\n42028cac:\tfae69fe3          \tbne\ta3,a4,42028c6a <__wrap_esp_transport_poll_read+0xae>\n42028cb0:\t0ac7a703          \tlw\ta4,172(a5)\n42028cb4:\t0705                \taddi\ta4,a4,1\n42028cb6:\t0ae7a623          \tsw\ta4,172(a5)\n42028cba:\tb7c1                \tj\t42028c7a <__wrap_esp_transport_poll_read+0xbe>\n42028cbc:\t0a07a703          \tlw\ta4,160(a5)\n42028cc0:\t0705                \taddi\ta4,a4,1\n42028cc2:\t0ae7a023          \tsw\ta4,160(a5)\n42028cc6:\tbf55                \tj\t42028c7a <__wrap_esp_transport_poll_read+0xbe>\n42028cc8:\t8522                \tmv\ta0,s0\n42028cca:\t5422                \tlw\ts0,40(sp)\n42028ccc:\t50b2                \tlw\tra,44(sp)\n42028cce:\t85ca                \tmv\ta1,s2\n42028cd0:\t5902                \tlw\ts2,32(sp)\n42028cd2:\t6145                \taddi\tsp,sp,48\n42028cd4:\t3a66a06f          \tj\t4209307a <esp_transport_poll_read>\n"
+    },
+    {
+      "wrapper": "__wrap_esp_aes_gcm_auth_decrypt",
+      "end_call": true,
+      "inlined_counter_references": false,
+      "disassembly": "\nidf\\esp32c3-oled-native\\build-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof-tlspath\\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv\n\n\nDisassembly of section .iram0.text:\n\nDisassembly of section .flash.text:\n\n42028cd8 <__wrap_esp_aes_gcm_auth_decrypt>:\n42028cd8:\t715d                \taddi\tsp,sp,-80\n42028cda:\td06a                \tsw\ts10,32(sp)\n42028cdc:\t8d2a                \tmv\ts10,a0\n42028cde:\t4501                \tli\ta0,0\n42028ce0:\tc4a2                \tsw\ts0,72(sp)\n42028ce2:\tc0ca                \tsw\ts2,64(sp)\n42028ce4:\tde4e                \tsw\ts3,60(sp)\n42028ce6:\tdc52                \tsw\ts4,56(sp)\n42028ce8:\tda56                \tsw\ts5,52(sp)\n42028cea:\td85a                \tsw\ts6,48(sp)\n42028cec:\td65e                \tsw\ts7,44(sp)\n42028cee:\td462                \tsw\ts8,40(sp)\n42028cf0:\td266                \tsw\ts9,36(sp)\n42028cf2:\tc686                \tsw\tra,76(sp)\n42028cf4:\t842e                \tmv\ts0,a1\n42028cf6:\t4946                \tlw\ts2,80(sp)\n42028cf8:\t49d6                \tlw\ts3,84(sp)\n42028cfa:\t8cb2                \tmv\ts9,a2\n42028cfc:\t8c36                \tmv\ts8,a3\n42028cfe:\t8bba                \tmv\ts7,a4\n42028d00:\t8b3e                \tmv\ts6,a5\n42028d02:\t8ac2                \tmv\ts5,a6\n42028d04:\t8a46                \tmv\ts4,a7\n42028d06:\t204f10ef          \tjal\t42119f0a <pcTaskGetName>\n42028d0a:\t3c1265b7          \tlui\ta1,0x3c126\n42028d0e:\t31858593          \taddi\ta1,a1,792 # 3c126318 <_esp_libc_clock_array_end+0x61c8>\n42028d12:\tfe35e097          \tauipc\tra,0xfe35e\n42028d16:\t25a080e7          \tjalr\t602(ra) # 40386f6c <strcmp>\n42028d1a:\te525                \tbnez\ta0,42028d82 <__wrap_esp_aes_gcm_auth_decrypt+0xaa>\n42028d1c:\tc2a6                \tsw\ts1,68(sp)\n42028d1e:\tce6e                \tsw\ts11,28(sp)\n42028d20:\tfe358097          \tauipc\tra,0xfe358\n42028d24:\t6b4080e7          \tjalr\t1716(ra) # 403813d4 <esp_timer_get_time>\n42028d28:\t8daa                \tmv\ts11,a0\n42028d2a:\tc04a                \tsw\ts2,0(sp)\n42028d2c:\t84ae                \tmv\ts1,a1\n42028d2e:\tc24e                \tsw\ts3,4(sp)\n42028d30:\t88d2                \tmv\ta7,s4\n42028d32:\t8856                \tmv\ta6,s5\n42028d34:\t87da                \tmv\ta5,s6\n42028d36:\t875e                \tmv\ta4,s7\n42028d38:\t86e2                \tmv\ta3,s8\n42028d3a:\t8666                \tmv\ta2,s9\n42028d3c:\t856a                \tmv\ta0,s10\n42028d3e:\t85a2                \tmv\ta1,s0\n42028d40:\t45c870ef          \tjal\t420b019c <esp_aes_gcm_auth_decrypt>\n42028d44:\t892a                \tmv\ts2,a0\n42028d46:\te91d                \tbnez\ta0,42028d7c <__wrap_esp_aes_gcm_auth_decrypt+0xa4>\n42028d48:\t8722                \tmv\ta4,s0\n42028d4a:\t4781                \tli\ta5,0\n42028d4c:\t0004c863          \tbltz\ts1,42028d5c <__wrap_esp_aes_gcm_auth_decrypt+0x84>\n42028d50:\t86a2                \tmv\ta3,s0\n42028d52:\t85ee                \tmv\ta1,s11\n42028d54:\t8626                \tmv\ta2,s1\n42028d56:\t450d                \tli\ta0,3\n42028d58:\ta2dff0ef          \tjal\t42028784 <tls_path_profile_end.part.0>\n42028d5c:\t40b6                \tlw\tra,76(sp)\n42028d5e:\t4426                \tlw\ts0,72(sp)\n42028d60:\t4496                \tlw\ts1,68(sp)\n42028d62:\t4df2                \tlw\ts11,28(sp)\n42028d64:\t59f2                \tlw\ts3,60(sp)\n42028d66:\t5a62                \tlw\ts4,56(sp)\n42028d68:\t5ad2                \tlw\ts5,52(sp)\n42028d6a:\t5b42                \tlw\ts6,48(sp)\n42028d6c:\t5bb2                \tlw\ts7,44(sp)\n42028d6e:\t5c22                \tlw\ts8,40(sp)\n42028d70:\t5c92                \tlw\ts9,36(sp)\n42028d72:\t5d02                \tlw\ts10,32(sp)\n42028d74:\t854a                \tmv\ta0,s2\n42028d76:\t4906                \tlw\ts2,64(sp)\n42028d78:\t6161                \taddi\tsp,sp,80\n42028d7a:\t8082                \tret\n42028d7c:\t4701                \tli\ta4,0\n42028d7e:\t478d                \tli\ta5,3\n42028d80:\tb7f1                \tj\t42028d4c <__wrap_esp_aes_gcm_auth_decrypt+0x74>\n42028d82:\t85a2                \tmv\ta1,s0\n42028d84:\t4426                \tlw\ts0,72(sp)\n42028d86:\tcace                \tsw\ts3,84(sp)\n42028d88:\tc8ca                \tsw\ts2,80(sp)\n42028d8a:\t40b6                \tlw\tra,76(sp)\n42028d8c:\t4906                \tlw\ts2,64(sp)\n42028d8e:\t59f2                \tlw\ts3,60(sp)\n42028d90:\t88d2                \tmv\ta7,s4\n42028d92:\t8856                \tmv\ta6,s5\n42028d94:\t5a62                \tlw\ts4,56(sp)\n42028d96:\t5ad2                \tlw\ts5,52(sp)\n42028d98:\t87da                \tmv\ta5,s6\n42028d9a:\t875e                \tmv\ta4,s7\n42028d9c:\t5b42                \tlw\ts6,48(sp)\n42028d9e:\t5bb2                \tlw\ts7,44(sp)\n42028da0:\t86e2                \tmv\ta3,s8\n42028da2:\t8666                \tmv\ta2,s9\n42028da4:\t5c22                \tlw\ts8,40(sp)\n42028da6:\t5c92                \tlw\ts9,36(sp)\n42028da8:\t856a                \tmv\ta0,s10\n42028daa:\t5d02                \tlw\ts10,32(sp)\n42028dac:\t6161                \taddi\tsp,sp,80\n42028dae:\t3ee8706f          \tj\t420b019c <esp_aes_gcm_auth_decrypt>\n"
+    },
+    {
+      "wrapper": "__wrap_esp_aes_crypt_ctr",
+      "end_call": true,
+      "inlined_counter_references": false,
+      "disassembly": "\nidf\\esp32c3-oled-native\\build-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof-tlspath\\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv\n\n\nDisassembly of section .iram0.text:\n\nDisassembly of section .flash.text:\n\n42028db2 <__wrap_esp_aes_crypt_ctr>:\n42028db2:\t7139                \taddi\tsp,sp,-64\n42028db4:\tce5e                \tsw\ts7,28(sp)\n42028db6:\t8baa                \tmv\ts7,a0\n42028db8:\t4501                \tli\ta0,0\n42028dba:\tdc22                \tsw\ts0,56(sp)\n42028dbc:\td84a                \tsw\ts2,48(sp)\n42028dbe:\td64e                \tsw\ts3,44(sp)\n42028dc0:\td452                \tsw\ts4,40(sp)\n42028dc2:\td256                \tsw\ts5,36(sp)\n42028dc4:\td05a                \tsw\ts6,32(sp)\n42028dc6:\tde06                \tsw\tra,60(sp)\n42028dc8:\t842e                \tmv\ts0,a1\n42028dca:\t8b32                \tmv\ts6,a2\n42028dcc:\t8ab6                \tmv\ts5,a3\n42028dce:\t8a3a                \tmv\ts4,a4\n42028dd0:\t89be                \tmv\ts3,a5\n42028dd2:\t8942                \tmv\ts2,a6\n42028dd4:\t136f10ef          \tjal\t42119f0a <pcTaskGetName>\n42028dd8:\t3c1265b7          \tlui\ta1,0x3c126\n42028ddc:\t31858593          \taddi\ta1,a1,792 # 3c126318 <_esp_libc_clock_array_end+0x61c8>\n42028de0:\tfe35e097          \tauipc\tra,0xfe35e\n42028de4:\t18c080e7          \tjalr\t396(ra) # 40386f6c <strcmp>\n42028de8:\te125                \tbnez\ta0,42028e48 <__wrap_esp_aes_crypt_ctr+0x96>\n42028dea:\tda26                \tsw\ts1,52(sp)\n42028dec:\tcc62                \tsw\ts8,24(sp)\n42028dee:\tfe358097          \tauipc\tra,0xfe358\n42028df2:\t5e6080e7          \tjalr\t1510(ra) # 403813d4 <esp_timer_get_time>\n42028df6:\t884a                \tmv\ta6,s2\n42028df8:\t8c2a                \tmv\ts8,a0\n42028dfa:\t84ae                \tmv\ts1,a1\n42028dfc:\t87ce                \tmv\ta5,s3\n42028dfe:\t8752                \tmv\ta4,s4\n42028e00:\t86d6                \tmv\ta3,s5\n42028e02:\t865a                \tmv\ta2,s6\n42028e04:\t85a2                \tmv\ta1,s0\n42028e06:\t855e                \tmv\ta0,s7\n42028e08:\t760860ef          \tjal\t420af568 <esp_aes_crypt_ctr>\n42028e0c:\t882a                \tmv\ta6,a0\n42028e0e:\te915                \tbnez\ta0,42028e42 <__wrap_esp_aes_crypt_ctr+0x90>\n42028e10:\t8722                \tmv\ta4,s0\n42028e12:\t4781                \tli\ta5,0\n42028e14:\t0004ca63          \tbltz\ts1,42028e28 <__wrap_esp_aes_crypt_ctr+0x76>\n42028e18:\t86a2                \tmv\ta3,s0\n42028e1a:\t85e2                \tmv\ta1,s8\n42028e1c:\t8626                \tmv\ta2,s1\n42028e1e:\t4511                \tli\ta0,4\n42028e20:\tc642                \tsw\ta6,12(sp)\n42028e22:\t963ff0ef          \tjal\t42028784 <tls_path_profile_end.part.0>\n42028e26:\t4832                \tlw\ta6,12(sp)\n42028e28:\t50f2                \tlw\tra,60(sp)\n42028e2a:\t5462                \tlw\ts0,56(sp)\n42028e2c:\t54d2                \tlw\ts1,52(sp)\n42028e2e:\t4c62                \tlw\ts8,24(sp)\n42028e30:\t5942                \tlw\ts2,48(sp)\n42028e32:\t59b2                \tlw\ts3,44(sp)\n42028e34:\t5a22                \tlw\ts4,40(sp)\n42028e36:\t5a92                \tlw\ts5,36(sp)\n42028e38:\t5b02                \tlw\ts6,32(sp)\n42028e3a:\t4bf2                \tlw\ts7,28(sp)\n42028e3c:\t8542                \tmv\ta0,a6\n42028e3e:\t6121                \taddi\tsp,sp,64\n42028e40:\t8082                \tret\n42028e42:\t4701                \tli\ta4,0\n42028e44:\t478d                \tli\ta5,3\n42028e46:\tb7f9                \tj\t42028e14 <__wrap_esp_aes_crypt_ctr+0x62>\n42028e48:\t85a2                \tmv\ta1,s0\n42028e4a:\t5462                \tlw\ts0,56(sp)\n42028e4c:\t50f2                \tlw\tra,60(sp)\n42028e4e:\t884a                \tmv\ta6,s2\n42028e50:\t87ce                \tmv\ta5,s3\n42028e52:\t5942                \tlw\ts2,48(sp)\n42028e54:\t59b2                \tlw\ts3,44(sp)\n42028e56:\t8752                \tmv\ta4,s4\n42028e58:\t86d6                \tmv\ta3,s5\n42028e5a:\t5a22                \tlw\ts4,40(sp)\n42028e5c:\t5a92                \tlw\ts5,36(sp)\n42028e5e:\t865a                \tmv\ta2,s6\n42028e60:\t855e                \tmv\ta0,s7\n42028e62:\t5b02                \tlw\ts6,32(sp)\n42028e64:\t4bf2                \tlw\ts7,28(sp)\n42028e66:\t6121                \taddi\tsp,sp,64\n42028e68:\t7008606f          \tj\t420af568 <esp_aes_crypt_ctr>\n"
+    }
+  ],
+  "scope": "Linked call routes and counter-body references only; run verify_http_link.py separately for the SDK dynamic RX chain. Physical counter growth is separate evidence."
+}

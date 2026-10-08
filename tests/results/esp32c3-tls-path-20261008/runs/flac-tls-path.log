@@ -1,0 +1,181 @@
+{
+  "cases": [
+    {
+      "name": "load:stress-flac-48000-2ch-16bit-610s",
+      "snapshots": 10,
+      "observed_seconds": 45.628992,
+      "first_sequence": 5,
+      "last_sequence": 14,
+      "coverage_complete": true,
+      "maximum_sample_gap_seconds": 5.1560000000172295,
+      "stages": {
+        "http": {
+          "delta": {
+            "calls": 3293,
+            "elapsed_us": 34977576,
+            "requested": 6744064,
+            "completed": 6744064,
+            "ok": 3293,
+            "zero": 0,
+            "retry": 0,
+            "errors": 0,
+            "le1024": 0,
+            "le4096": 3293,
+            "le16384": 0,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 76.65647314759879,
+          "mean_call_us": 10621.796538111144,
+          "max_us_since_boot": 187794
+        },
+        "tls": {
+          "delta": {
+            "calls": 6585,
+            "elapsed_us": 30471805,
+            "requested": 10114048,
+            "completed": 6743040,
+            "ok": 6585,
+            "zero": 0,
+            "retry": 0,
+            "errors": 0,
+            "le1024": 3293,
+            "le4096": 3292,
+            "le16384": 0,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 66.78167468612938,
+          "mean_call_us": 4627.457099468489,
+          "max_us_since_boot": 184624
+        },
+        "poll": {
+          "delta": {
+            "calls": 6585,
+            "elapsed_us": 1021052,
+            "requested": 0,
+            "completed": 0,
+            "ok": 6585,
+            "zero": 0,
+            "retry": 0,
+            "errors": 0,
+            "le1024": 6585,
+            "le4096": 0,
+            "le16384": 0,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 2.237726399916965,
+          "mean_call_us": 155.0572513287775,
+          "max_us_since_boot": 288165
+        },
+        "gcm": {
+          "delta": {
+            "calls": 6586,
+            "elapsed_us": 13954020,
+            "requested": 6744064,
+            "completed": 6744064,
+            "ok": 6586,
+            "zero": 0,
+            "retry": 0,
+            "errors": 0,
+            "le1024": 6586,
+            "le4096": 0,
+            "le16384": 0,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 30.581477671038623,
+          "mean_call_us": 2118.739750986942,
+          "max_us_since_boot": 16172
+        },
+        "ctr": {
+          "delta": {
+            "calls": 13172,
+            "elapsed_us": 2744322,
+            "requested": 6849440,
+            "completed": 6849440,
+            "ok": 13172,
+            "zero": 0,
+            "retry": 0,
+            "errors": 0,
+            "le1024": 13172,
+            "le4096": 0,
+            "le16384": 0,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 6.014426091200963,
+          "mean_call_us": 208.3451260249013,
+          "max_us_since_boot": 14926
+        }
+      },
+      "note": "Summarize inclusive HTTP/TLS/poll/AES wall times, never CPU attribution.\n\nCounters are charged when each call returns. Nested stages overlap and a call\ncan cross a sampling boundary. Do not add their times or infer exact exclusive\nCPU time by subtraction. max_us is the lifetime maximum, not a window maximum."
+    }
+  ],
+  "original_acceptance": [
+    {
+      "name": "load-idle-baseline:stress-flac-48000-2ch-16bit-610s",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 132788,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132768,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.484
+    },
+    {
+      "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-610s",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Runtime failure during file playback",
+      "seconds": 61.266
+    },
+    {
+      "name": "load-idle-recovery:stress-flac-48000-2ch-16bit-610s",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 132800,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132800,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132800,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.094
+    },
+    {
+      "name": "restore-board",
+      "result": "PASS",
+      "evidence": {
+        "left_stopped": true
+      },
+      "seconds": 0.172
+    }
+  ],
+  "source_sha256": "52d1199afc26194e266252f7fd6a141875c03190a5abfb3e68068f957f7fbe42",
+  "input_sha256": {
+    "performance": "48526af9cb115b0b7945d0178696ba30ac4da76ac25ea06a347e26e44c1a8603",
+    "status": "c97a4c2129a35fb144380181b7c9751fa75c1492f2abafffc67f42c7453efde3",
+    "report": "296a4fd3c908bfb87109157d0e783f6f3ef1e14c914d18b662f7baadfd223336"
+  }
+}

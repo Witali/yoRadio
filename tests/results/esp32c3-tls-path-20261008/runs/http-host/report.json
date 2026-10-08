@@ -1,0 +1,20 @@
+{
+  "result": "PASS",
+  "idf": "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6",
+  "sdk_source_sha256": "f8b22097c220376a4007b7ce1fdbf827935090c865f2c8a673ffa2cddcfa8b67",
+  "extracted_function_sha256": "b03190255a8c0519de11d8f876e9c96413cc0049be426a0c621b6bf77b151f58",
+  "sources_sha256": {
+    "tests\\native\\stream_http_reader_test.c": "700b579176a7008f665921c1d0e12cb464541dbfc5161e4adcdf1e022eacaf84",
+    "idf\\esp32c3-oled-native\\main\\stream_http_reader.c": "dac25e4fc71f818c48be49f62543287a9939d8aa65afafd4287880a2d502c200",
+    "idf\\esp32c3-oled-native\\main\\stream_http_reader.h": "bdfd5ef5fe7c4f860a548870026648da1ebed3b706f1ffe7a2b016023b3e4b97",
+    "idf\\esp32c3-oled-native\\main\\tls_stream_eof.c": "da6ae4e1a94df23331def54e690e8ff0a53065528140cfd3c4391f8a61054c9c",
+    "tests\\test-stream-http-reader.py": "b95e6b490e72d63d306fa7963d30e2da09b538727d697f3841083d54235ed7f5"
+  },
+  "tls_adapter_sha256": "b4b7652b39347fc0a90039baac03697a019d8a542fece5f6de46c7f67d92683a",
+  "parser_sha256": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+  "body_callbacks_sha256": "edad5ee9114d896ac22dfbc1c32616484f0b2c39c942e4ade454c8328e1eb283",
+  "completion_function_sha256": "67a83bf993dc8f665f4e76ed63e9f6ffbc4bdcd4c2236fabd99e4d959682af90",
+  "scope": "Real SDK HTTP read/completion functions, body callbacks and HTTP parser; scripted transport and header bookkeeping; actual radio guard under ASan/UBSan. TLS cryptography, TLS close alerts and hardware are not emulated.",
+  "output": "HTTP_FRAMING_PASS content_length chunked extensions trailers truncated malformed fragmented close_delimited\nUNMODIFIED_SDK_LIMITATION close_notify_and_bare_TLS_EOF_are_indistinguishable_at_HTTP_API\nTLS_ADAPTER_PASS close_alert_and_raw_EOF_collapse_to_zero; timeout_records_read_failed; WANT_codes_not_recorded\nTLS_EOF_FIX_PASS raw_EOF_fails_unframed_body; close_notify_completes; explicit_framing_preserved; no_extra_allocation\nSTREAM_HTTP_READER_PASS cases=85 partial_bytes_preserved=true fatal_retry=false temporary_retry=true sdk_control_retries=true\n",
+  "returncode": 0
+}

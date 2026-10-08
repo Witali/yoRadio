@@ -935,6 +935,12 @@ Use `verify_http_link.py --elf <firmware.elf> --sdkconfig <sdkconfig> --objdump 
 
 ## CPU diagnostics without a separate profiler stack
 
+The optional [TLS receive-path profiler](ESP32C3_TLS_PATH_PROFILE_20261008.md)
+measures nested HTTP, TLS, socket readiness, GCM and hardware AES-CTR calls in
+`radio_stream`. Its counters measure inclusive wall time, not CPU time. Replay
+them with `tools/esp32c3_tests/tls_path.py`; preserve damaged/incomplete captures
+as failures rather than silently dropping them from the comparison.
+
 The [GHASH experiment](ESP32C3_GHASH_EXPERIMENT_20261008.md) preserves exact
 field arithmetic and independently generated GCM tag checks, but does not
 improve the heavy physical FLAC case. Its optional build flag stays disabled;

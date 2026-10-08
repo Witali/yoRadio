@@ -8,6 +8,7 @@ p.add_argument('--idf',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
 args=p.parse_args()
 args.output.mkdir(parents=True,exist_ok=True)
+(args.output/'sdkconfig.h').write_text('#pragma once\n')
 sdk=args.idf/'components/esp_http_client/esp_http_client.c'
 source=sdk.read_text()
 start=source.index('int esp_http_client_read(')
