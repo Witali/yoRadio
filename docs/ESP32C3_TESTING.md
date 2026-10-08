@@ -4,6 +4,14 @@ This document defines the acceptance tests added after the 2026-09-30 audit.
 **A test exists, a test ran, and a test passed are three different states.**
 Keep failed measurements. Never accept AAC-core fallback as successful HE-AAC.
 
+Since 2026-10-08, positive HTTP/HTTPS file cases also reject captured allocation,
+decoder, TLS, panic, watchdog, reboot and serial-capture failures, even if the
+format status and EOF look correct. The result records whether serial capture
+was enabled. Without it, status observations cannot prove the absence of runtime
+faults. `tests/test-file-playback-runtime.py` injects these failures after valid
+HEv2 PCM observations and verifies that the case fails and still stops the board.
+Older file-matrix PASS records retain their original, narrower status/EOF scope.
+
 The [2026-09-30 physical results](../tests/results/esp32c3-acceptance-20260930/README.md)
 record passing OTA checks and outstanding HE-AAC, EOF and HTTP-load failures.
 Tests not run are identified separately from failures.

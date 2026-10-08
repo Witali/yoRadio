@@ -10,7 +10,8 @@ import time
 
 from common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
                     check_recovery_heap, check_transitions, fixtures, require,
-                    filter_tls_line, check_certificate_rejection, exception_details)
+                    filter_tls_line, check_certificate_rejection, exception_details,
+                    check_file_runtime)
 from audio_test_server.server import Server
 from audio_test_server.fixtures import SEQUENCES
 from serial_lines import serial_lines
@@ -35,7 +36,7 @@ class Capture:
             tls = filter_tls_line(line)
             if tls:
                 self.rows.append(dict(at=time.monotonic(), line=tls))
-            elif re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted', line):
+            elif re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted|task_wdt: Task watchdog got triggered|^(?:ESP-ROM:|rst:|waiting for download)', line):
                 self.rows.append(dict(at=time.monotonic(), line=line))
 
     def since(self, at):
@@ -93,12 +94,15 @@ class Suite:
 
     def file(self, name, hint='auto', origin=None, mode='file'):
         spec = self.specs[name]
+        started = time.monotonic()
         self.start(name, mode, hint, origin)
         try:
             samples = self.observe(max(7, spec['seconds']-3), name)
             evidence = check_playback(samples, spec)
             tail = self.observe(8, name + ':eof')
             require(any(not s['audio'] for s in tail), 'Finite stream never reached EOF')
+            check_file_runtime(self.capture.since(started))
+            evidence['serial_capture_enabled'] = self.capture.port is not None
             # No explicit stop: test that the next playback recovers from EOF.
             return evidence
         finally:

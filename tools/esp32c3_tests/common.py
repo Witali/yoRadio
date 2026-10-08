@@ -157,6 +157,16 @@ def matches(state, spec):
             and not state.get('channels_are_core', False))
 
 
+def check_file_runtime(records):
+    """Positive file cases must not hide recorded failures behind valid PCM status."""
+    faults = (r'allocation failed|decode (?:error|failed)|TLS failure:|'
+              r'assert failed|Guru Meditation|CORRUPT HEAP|PANIC|'
+              r'serial capture interrupted|task_wdt: Task watchdog got triggered|'
+              r'Runtime watchdog timeout|^(?:ESP-ROM:|rst:|waiting for download)')
+    require(not any(re.search(faults, r['line']) for r in records),
+            'Runtime failure during file playback')
+
+
 def check_playback(samples, spec, minimum=5, warmup=2):
     stable = [s for s in samples if s['seconds'] >= warmup and s.get('audio')]
     require(len(stable) >= minimum, 'Insufficient actual playback samples')
