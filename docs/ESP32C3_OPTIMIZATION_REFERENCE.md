@@ -138,7 +138,10 @@ The following decisions combine that guidance with our measured configuration:
   selects DIO 80 MHz, with QIO/QOUT disabled. This identity check did not read
   the live SPI controller registers.
   [Standalone QIO 40/80 MHz tests](ESP32C3_FLASH_QUAD_20260930.md) worked, but
-  [full-radio QIO acceptance](ESP32C3_QIO80_ACCEPTANCE_20260930.md) failed.
+  [September full-radio acceptance](ESP32C3_QIO80_ACCEPTANCE_20260930.md) failed
+  before the EOF and compact-AAC repairs. The
+  [ESP-IDF 6.1 recheck](ESP32C3_QIO80_RECHECK_20261008.md) verifies actual
+  DIO/QIO 80 MHz operation and retains the current full-radio comparison.
   Application OTA leaves the bootloader intact; verify runtime controller mode
   before attributing a timing change to Quad operation.
 - **Compiler and checks:** the measured configuration selects performance

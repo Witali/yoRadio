@@ -1,5 +1,9 @@
 # ESP32-C3 full-radio QIO 80 MHz acceptance — 30 September 2026
 
+For the repeat with ESP-IDF 6.1 and later EOF/compact-AAC fixes, see the
+[8 October DIO/QIO recheck](ESP32C3_QIO80_RECHECK_20261008.md). The historical
+outcomes below remain unchanged.
+
 ## Decision
 
 **Keep DIO 80 MHz as the production default.** The full-radio acceptance gate

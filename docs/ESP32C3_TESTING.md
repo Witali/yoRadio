@@ -263,6 +263,11 @@ AAC decoding. Run `python tests/test-esp32c3-flash-quad.py` to validate retained
 evidence and rejection paths. This does not replace full-radio QIO acceptance.
 The subsequent [full-radio QIO 80 MHz results](ESP32C3_QIO80_ACCEPTANCE_20260930.md)
 retain both failures and passes; the production default remains DIO 80 MHz.
+The [ESP-IDF 6.1 repeat](ESP32C3_QIO80_RECHECK_20261008.md) separates actual
+bus/read verification from current HTTP/HTTPS, switching, sustained load,
+OTA and boot acceptance. Run `python tests/test-flash-mode-probe.py` and
+`python tests/test-qio80-recheck-evidence.py` to check the parser and retained
+physical evidence, including unsuccessful cases and restoration of the board.
 
 ## Gaps found and corresponding tests
 

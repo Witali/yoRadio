@@ -1,0 +1,5 @@
+# Optional ESP32-C3 memory experiment; keep out of production defaults until
+# full TLS record growth and high-bitrate codec/OTA tests pass on hardware.
+# Dynamic RX/TX remain at 16. Match the RX block-ack window to static RX count.
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=4
+CONFIG_ESP_WIFI_RX_BA_WIN=4
