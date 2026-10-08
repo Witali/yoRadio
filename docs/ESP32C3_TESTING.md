@@ -935,6 +935,12 @@ Use `verify_http_link.py --elf <firmware.elf> --sdkconfig <sdkconfig> --objdump 
 
 ## CPU diagnostics without a separate profiler stack
 
+The [1/2/5 ms FreeRTOS tick experiment](ESP32C3_FREERTOS_TICK_20261008.md)
+compares only the heavy HTTPS FLAC and HE-AACv2 cases. It retains original
+runtime and heap gates, uses staged-DMA counter deltas after warmup, and treats
+CPU utilization as informational. Tick changes also affect delay quantization;
+the experimental overlays do not change the production default.
+
 For new public-stream reports, use
 `python tools/esp32c3_tests/summarize_public_windows.py --input <results> --output <summary.json>`.
 It clips every CPU window to the recorded station start/end. Short failed runs
