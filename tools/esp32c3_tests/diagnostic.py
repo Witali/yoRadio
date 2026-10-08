@@ -45,9 +45,9 @@ def watchdog_line(line):
         task = name.replace(' ', '_') if name in WATCHDOG_TASKS else 'redacted'
         phase = 'starved' if entry else 'running'
         return f'{prefix} phase={phase} cpu={cpu} task={task}'
-    backtrace = re.fullmatch(r'Print CPU (0|1)(?: \(current core\))? backtrace', body)
+    backtrace = re.fullmatch(r'Print CPU (0|1)(?: \(current core\))? (backtrace|registers)', body)
     if backtrace:
-        return f'{prefix} phase=backtrace cpu={backtrace.group(1)}'
+        return f'{prefix} phase={backtrace.group(2)} cpu={backtrace.group(1)}'
     return None
 
 

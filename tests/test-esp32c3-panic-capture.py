@@ -20,6 +20,7 @@ class PanicFilter(unittest.TestCase):
             'CPU 1: audio_decode': 'phase=running cpu=1 task=audio_decode',
             'Tasks currently running:': 'phase=current-tasks',
             'Print CPU 0 (current core) backtrace': 'phase=backtrace cpu=0',
+            'Print CPU 0 (current core) registers': 'phase=registers cpu=0',
         }
         for source, expected in cases.items():
             with self.subTest(source=source):
