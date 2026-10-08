@@ -162,6 +162,7 @@ def check_file_runtime(records):
     faults = (r'allocation failed|decode (?:error|failed)|TLS failure:|'
               r'assert failed|Guru Meditation|CORRUPT HEAP|PANIC|'
               r'serial capture interrupted|task_wdt: Task watchdog got triggered|'
+              r'PERF watchdog: task_timeouts=[1-9][0-9]*\b|'
               r'Runtime watchdog timeout|^(?:ESP-ROM:|rst:|waiting for download)')
     require(not any(re.search(faults, r['line']) for r in records),
             'Runtime failure during file playback')

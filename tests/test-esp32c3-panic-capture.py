@@ -12,6 +12,19 @@ from common import check_file_runtime, Failure
 
 
 class PanicFilter(unittest.TestCase):
+    def test_watchdog_counter_replay_without_isr_output(self):
+        raw = 'E (123) cpu_profile: PERF watchdog: task_timeouts=2 private-secret'
+        result = filter_line(raw)
+        self.assertEqual(result, 'Runtime watchdog timeout: task_watchdog=true events=2')
+        for line in (raw, result):
+            rows = [dict(at=1, line=line)]
+            self.assertEqual(serial_health(rows)['result'], 'FAIL')
+            with self.assertRaises(Failure):
+                check_file_runtime(rows)
+        zero = [dict(at=1, line='PERF watchdog: task_timeouts=0')]
+        check_file_runtime(zero)
+        self.assertEqual(serial_health(zero)['result'], 'PASS')
+
     def test_watchdog_context_survives_lost_caption_and_fails_runtime(self):
         cases = {
             ' - IDLE0 (CPU 0)': 'phase=starved cpu=0 task=IDLE0',

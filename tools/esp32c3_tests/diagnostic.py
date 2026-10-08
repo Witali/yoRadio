@@ -52,6 +52,11 @@ def watchdog_line(line):
 
 
 def filter_line(line):
+    # Task-context replay survives native-USB loss of early ISR log captions.
+    counter = re.search(r'\bPERF watchdog: task_timeouts=([1-9][0-9]*)\b', line)
+    if counter:
+        return ('Runtime watchdog timeout: task_watchdog=true '
+                'events=' + counter.group(1))
     watchdog = watchdog_line(line)
     if watchdog:
         return watchdog

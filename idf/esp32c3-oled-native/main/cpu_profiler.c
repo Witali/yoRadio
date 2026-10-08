@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "esp_attr.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_timer.h"
@@ -18,6 +19,28 @@
 #define CPU_PROFILE_STACK_BYTES 4096U
 
 static const char *const TAG = "cpu_profile";
+
+#if CONFIG_ESP_TASK_WDT_EN
+// One ISR writer and one sampler on this single-core C3. Aligned 32-bit
+// volatile loads/stores do not tear; the counter publishes no other state.
+// Keep the callback in IRAM with no logging, allocation or helper calls.
+static DRAM_ATTR volatile uint32_t s_task_watchdog_events;
+
+void IRAM_ATTR esp_task_wdt_isr_user_handler(void) {
+    ++s_task_watchdog_events;
+}
+
+static void report_task_watchdog(void) {
+    static uint32_t reported;
+    uint32_t current = s_task_watchdog_events;
+    if (current != reported) {
+        reported = current;
+        ESP_LOGE(TAG, "PERF watchdog: task_timeouts=%" PRIu32, current);
+    }
+}
+#else
+static void report_task_watchdog(void) {}
+#endif
 
 void cpu_profiler_memory(const char *stage) {
     multi_heap_info_t info;
@@ -63,10 +86,14 @@ static uint32_t percent_tenths(configRUN_TIME_COUNTER_TYPE part,
 }
 
 static bool name_is(const char *actual, const char *expected) {
-    return actual != NULL && strcmp(actual, expected) == 0;
+    // FreeRTOS stores at most configMAX_TASK_NAME_LEN - 1 characters.
+    // In the C3 configuration, "websocket_status" becomes "websocket_statu".
+    return actual != NULL &&
+           strncmp(actual, expected, configMAX_TASK_NAME_LEN - 1U) == 0;
 }
 
 static void cpu_profiler_sample(void) {
+    report_task_watchdog();
     TaskStatus_t current[CPU_PROFILE_MAX_TASKS];
     task_sample_t next[CPU_PROFILE_MAX_TASKS];
     static bool primed = false;
@@ -116,7 +143,8 @@ static void cpu_profiler_sample(void) {
             output += delta;
         } else if (name_is(name, "wifi")) {
             wifi += delta;
-        } else if (name_is(name, "tiT") || name_is(name, "tcpip_task")) {
+        } else if (name_is(name, "tcpip") || name_is(name, "tiT") ||
+                   name_is(name, "tcpip_task")) {
             tcpip += delta;
         } else if (name_is(name, "httpd") ||
                    name_is(name, "websocket_status")) {
@@ -171,6 +199,8 @@ static void cpu_profiler_sample(void) {
 #ifdef CONFIG_YORADIO_CPU_PROFILE_HTTP
 void cpu_profiler_poll(void) {
     // Called only by the single HTTP server task; no second sampler/task.
+    // Report an ISR event on the next request, without waiting five seconds.
+    report_task_watchdog();
     static int64_t previous_us;
     int64_t now = esp_timer_get_time();
     if (now - previous_us < CPU_PROFILE_INTERVAL_MS * 1000LL) return;

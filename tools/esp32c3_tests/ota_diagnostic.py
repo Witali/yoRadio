@@ -13,6 +13,7 @@ import ota
 
 
 FAULT = re.compile(r'assert failed|Guru Meditation|CORRUPT HEAP|PANIC registers:|'
+                   r'PERF watchdog: task_timeouts=[1-9][0-9]*\b|'
                    r'Runtime watchdog timeout:|serial capture interrupted|TCP_POOL:.*\baction=invalid-free')
 
 
