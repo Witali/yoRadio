@@ -69,9 +69,11 @@ typedef struct {
     bool (*on_send_q_ovf)(i2s_chan_handle_t, i2s_event_data_t *, void *);
 } i2s_event_callbacks_t;
 static i2s_event_callbacks_t test_callbacks;
+static esp_err_t test_callback_registration_result;
 static int i2s_channel_register_event_callback(i2s_chan_handle_t h,
     const i2s_event_callbacks_t *callbacks, void *user) {
     assert(h->state == I2S_CHAN_STATE_READY && !user);
+    if (test_callback_registration_result) return test_callback_registration_result;
     test_callbacks = *callbacks;
     return ESP_OK;
 }
@@ -156,7 +158,11 @@ static esp_err_t native_i2s_write_full_block(i2s_chan_handle_t h,native_i2s_fill
 }
 typedef struct {const uint8_t *data;} copy_t;
 static void fill_copy(void *ctx,int16_t *dma,size_t frames){copy_t *c=ctx;memcpy(dma,c->data,frames*4);c->data+=frames*4;}
+static unsigned test_write_delay_us;
+static size_t test_short_write_bytes;
 static int i2s_channel_write(i2s_chan_handle_t h,const void *p,size_t n,size_t *written,unsigned timeout){
+    test_now_us += test_write_delay_us;
+    if (test_short_write_bytes) {assert(test_short_write_bytes<n); *written=test_short_write_bytes; return ESP_OK;}
     (void)timeout;copy_t c={p};size_t frames=0;int e=native_i2s_write_generated(h,n/4,fill_copy,&c,false,&frames);*written=frames*4;return e;
 }
 static int i2s_channel_preload_data(i2s_chan_handle_t h,const void *p,size_t n,size_t *written){

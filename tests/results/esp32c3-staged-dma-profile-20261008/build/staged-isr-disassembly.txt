@@ -1,0 +1,15 @@
+
+C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\idf\esp32c3-oled-native\build-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+40381520 <dma_queue_overrun>:
+40381520:	3fc8d737          	lui	a4,0x3fc8d
+40381524:	69c72783          	lw	a5,1692(a4) # 3fc8d69c <s_dma_overruns>
+40381528:	4501                	li	a0,0
+4038152a:	0785                	addi	a5,a5,1
+4038152c:	68f72e23          	sw	a5,1692(a4)
+40381530:	8082                	ret
+
+Disassembly of section .flash.text:

@@ -45,17 +45,21 @@ def main():
         destination.parent.mkdir(parents=True,exist_ok=True)
         destination.write_bytes(path.read_bytes())
     variants = [('staged','native_audio_output.c'),('dma','native_audio_output_dma.c')]
-    if args.profile: variants += [('dma-profile','native_audio_output_dma.c')]
+    if args.profile: variants += [('dma-profile','native_audio_output_dma.c'),
+                                 ('staged-profile','native_audio_output.c')]
     for name,filename in variants:
         unit=args.output/(name+'.c');binary=args.output/name
         unit.write_text('#include "stubs.h"\n'+
-            '#define CONFIG_YORADIO_DIRECT_DMA_PCM 1\n'+source(MAIN/'native_audio_output.h')+
+            ('#define CONFIG_YORADIO_DIRECT_DMA_PCM 1\n' if not name.startswith('staged') else '')+
             ('#define CONFIG_YORADIO_PIPELINE_PROFILE 1\n'+source(MAIN/'pipeline_wait.h')
              if name == 'dma-profile' else '')+
+            ('#define CONFIG_YORADIO_STAGED_DMA_PROFILE 1\n'
+             if name == 'staged-profile' else '')+
+            source(MAIN/'native_audio_output.h')+
             '#define native_i2s_write_generated tested_i2s_write_generated\n'+
             '#define native_i2s_write_full_block tested_i2s_write_full_block\n'+
             source(MAIN/'native_i2s_generator.c')+'\n#undef native_i2s_write_generated\n#undef native_i2s_write_full_block\n'+
-            ('#define BASELINE 1\n' if name=='staged' else '')+
+            ('#define BASELINE 1\n' if name.startswith('staged') else '')+
             source(MAIN/filename)+'\n#include "test.c"\n')
         cmd=['gcc','-std=c11','-O2','-g','-Wall','-Wextra','-Wno-unused-function',
              '-Wno-unused-variable','-fsanitize=address,undefined','-fno-omit-frame-pointer',
@@ -71,6 +75,8 @@ def main():
     if args.profile:
         report['profile_pcm_identical'] = report['variants']['dma-profile'] == report['variants']['dma']
         report['profile_metadata_identical'] = (args.output/'dma-profile.log').read_bytes() == (args.output/'dma.log').read_bytes()
+        report['staged_profile_pcm_identical'] = report['variants']['staged-profile'] == report['variants']['staged']
+        report['staged_profile_metadata_identical'] = (args.output/'staged-profile.log').read_bytes() == (args.output/'staged.log').read_bytes()
     normalizer=ROOT/'yoRadio/src/audioI2S'
     binary=args.output/'normalizer-chunks'
     (args.output/'normalizer-build.log').write_bytes(run([
@@ -84,6 +90,7 @@ def main():
     (args.output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))
     return 0 if all(report.get(key, True) for key in ('pcm_identical', 'case_metadata_identical',
-                 'profile_pcm_identical', 'profile_metadata_identical')) else 1
+                 'profile_pcm_identical', 'profile_metadata_identical',
+                 'staged_profile_pcm_identical', 'staged_profile_metadata_identical')) else 1
 
 if __name__=='__main__':sys.exit(main())

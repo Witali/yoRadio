@@ -7,7 +7,7 @@
 #include "esp_err.h"
 #include "sdkconfig.h"
 
-#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+#if defined(CONFIG_YORADIO_PIPELINE_PROFILE) || defined(CONFIG_YORADIO_STAGED_DMA_PROFILE)
 // Monotonic counter; one ISR writer, aligned word read on the single-core C3.
 // Queue overrun means a completed descriptor was discarded before reuse.
 uint32_t native_audio_output_dma_overruns(void);
