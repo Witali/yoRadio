@@ -642,8 +642,10 @@ test("single-core decoder yields to idle and drops obsolete station data", () =>
   assert.match(audio, /\(stats\.calls & 31U\) == 0U[\s\S]*vTaskDelay\(1\)/);
   assert.match(
     audio,
-    /packet->generation != atomic_load\(&s_generation\)[\s\S]*vRingbufferReturnItem\(s_encoded, packet\)/,
+    /packet->generation != atomic_load\(&s_generation\)[\s\S]*encoded_return\(s_encoded, packet\)/,
   );
+  assert.match(audio, /#define encoded_return vRingbufferReturnItem/);
+  assert.match(audio, /#define encoded_return adaptive_input_return/);
   assert.match(
     audio,
     /packet->generation != atomic_load\(&s_generation\)[\s\S]*vRingbufferReturnItem\(s_pcm, packet\)/,
@@ -1058,8 +1060,10 @@ test("native audio buffers backpressure instead of dropping a live stream", () =
 
   assert.match(
     audio,
-    /xRingbufferSendAcquire\(s_encoded[\s\S]*pdMS_TO_TICKS\(250\)[\s\S]*atomic_load\(&s_generation\) != generation/,
+    /encoded_acquire\(s_encoded[\s\S]*pdMS_TO_TICKS\(250\)[\s\S]*atomic_load\(&s_generation\) != generation/,
   );
+  assert.match(audio, /#define encoded_acquire xRingbufferSendAcquire/);
+  assert.match(audio, /#define encoded_acquire adaptive_input_acquire/);
   assert.match(
     audio,
     /pipeline_acquire\(s_pcm[\s\S]*pdMS_TO_TICKS\(250\), &stats->pcm_full\)[\s\S]*atomic_load\(&s_generation\) != generation/,
