@@ -71,6 +71,51 @@ small/growing/full TLS records, ten-minute playback, mixed-codec transitions,
 reconnect, EOF and OTA tests. CPU percentage alone is not a rejection gate;
 runtime faults and output gaps remain failures.
 
+### Next ownership measurement: copied RX packets (2026-10-08)
+
+The [matched ten-minute runs](../tests/results/esp32c3-rxonly-long-20261008/long/summary.json)
+still fail the original heap-trend gate: first/last steady-state median free
+heap falls by 9,352 B with the generic reserve and 9,440 B with RX-only.
+Stop restores the settled heap and largest block, but this does not identify
+the allocations retained while playing. TCP uncredited payload grows to about
+8 KiB; it is not allocated RAM and must not be subtracted from the heap loss.
+The RX-only network snapshot series is incomplete and remains rejected.
+
+The [copy-path audit](ESP32C3_RX_COPY_20261007.md) establishes why the existing
+`esp_pbuf_allocate` tracer cannot answer this question: enabled L2-to-L3 copies
+use `pbuf_alloc(PBUF_RAW, len, PBUF_RAM)` instead.
+
+- [ ] Generate guarded, build-local copies of pinned `wlanif.c` and `pbuf.c`.
+  Register successful copied-RX allocations before network handoff; remove an
+  owner only in the reference-count-zero `STD_HEAP` branch immediately before
+  `mem_free(p)`. A non-final `pbuf_free()` is not a release. Preserve SDK sources,
+  allocation behavior, error cleanup and packet traffic.
+- [ ] Verify the exact allocator mapping before querying block size. The
+  current pinned configuration uses `MEM_LIBC_MALLOC=1` and no lwIP memory
+  statistics prefix, so the PBUF_RAM pointer is the malloc base. Record
+  `heap_caps_get_allocated_size(p)` separately from payload length and allocator
+  header overhead. Reject incompatible allocator settings at build time.
+- [ ] Use a fixed registry, initially 32 entries of pointer, allocated size,
+  birth time and allocation ID (512 B on RV32), plus bounded counters. Record
+  live/peak count and allocated bytes, oldest live age, maximum completed
+  lifetime, alloc/free totals, sequence and CRC. Overflow, duplicate live
+  registration and incomplete telemetry invalidate coverage. The global
+  final-free hook also sees legitimate unregistered TX/control pbufs; ignore
+  those rather than reporting false missing releases.
+- [ ] Keep registry locking short. Query size/time before registration locking;
+  copy counters under the lock and log afterward. Remove the owner before the
+  actual free to prevent address reuse races. Never dereference freed pointers,
+  allocate tracker entries on the heap, walk the heap under the lock or log
+  packet contents. Account for tracker BSS and execution overhead separately.
+- [ ] Repeat the same 600-second alternating-record HE-AACv2 test, original
+  memory/runtime gates, and settled Stop recovery. Use a compact periodic
+  snapshot plus post-Stop observation. Attribute measured live RX blocks and
+  their lifetimes first; investigate remaining heap movement separately.
+
+This is a diagnostic plan, not evidence that the heap decline is harmless or
+that copied RX packets explain all of it. Codec precision, full TLS record
+capacity and certificate verification remain unchanged.
+
 ## Current SDK-upgrade branch checkpoint, 2026-10-07
 
 On `codex/esp32c3-idf-upgrade`, the ESP32-C3 defaults now select the compact
