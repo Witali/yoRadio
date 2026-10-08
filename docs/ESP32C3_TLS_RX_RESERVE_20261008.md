@@ -92,9 +92,53 @@ decoder function. Runtime replay independently fails even though the transport
 exception ended observation before the normal end-of-run runtime check.
 The socket exception belongs to the host test; its cause still needs diagnosis.
 
-The controller restored the quiet application by native OTA, verified its ELF
-identity, unchanged Wi-Fi/playlist/settings and three playing AAC status samples
-over 15 seconds. The board is running that restored image, not RX-only reserve.
+At the end of the control run, the controller restored the quiet application by
+native OTA, verified its ELF identity, unchanged Wi-Fi/playlist/settings and
+three playing AAC status samples over 15 seconds.
+
+## RX-only short physical qualification
+
+The RX-only candidate below passed **44/44 HTTP/HTTPS format cases** on the
+physical board: MP3, FLAC, Vorbis, Opus, AAC-LC, HE-AAC and HE-AACv2, using
+automatic and explicit codec selection. The HTTPS format server recorded
+TLS 1.2 with `ECDHE-RSA-AES256-GCM-SHA384`. These were short finite-file tests;
+they do not resolve the earlier ten-minute FLAC failure.
+
+Four HE-AACv2 record-size tests ran for **75 seconds each** with verified TLS
+1.2 and `ECDHE-RSA-AES128-GCM-SHA256`. Record payload sizes were 1 and 16 KiB.
+
+| Record mode | Mean / peak CPU | Minimum free heap / largest block | Decoded audio / elapsed time |
+| --- | ---: | ---: | ---: |
+| Small | 68.19% / 73.3% | 26,172 / 15,360 B | 1.00193 |
+| Large | 70.45% / 71.8% | 26,148 / 12,288 B | 1.00202 |
+| Small then large | 70.57% / 72.9% | 25,748 / 15,360 B | 1.00200 |
+| Alternating | 70.38% / 72.0% | 25,772 / 15,360 B | 1.00204 |
+
+All **eight framing/closure cases** also passed: fixed-length and chunked
+responses with close-notify, raw closure and truncation, plus close-delimited
+responses with close-notify or raw closure. The truncated responses retained
+the expected read-error status instead of being accepted as normal EOF.
+
+No allocation-failure, panic or task-watchdog evidence was captured in these
+short runs. The record suite's idle-recovery and runtime gates passed. The
+controller restored the quiet image and verified unchanged Wi-Fi, playlist and
+settings plus three playing AAC samples over 15 seconds. Decoded audio duration
+and status polling do not replace acoustic or DMA continuity measurements.
+
+A matched generic-reserve control is saved as
+[`esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-output8`](../firmware/development/esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-output8/).
+Its ELF is `8f1a86ef61f8c5e56beeccf8a85f3dde7052ab480a02a227e0a80c02fb41ff1c`.
+Both images use output priority 8, decoder priority 7 and stream priority 5;
+their saved configurations differ only in `CONFIG_YORADIO_TLS_RX_ONLY_RESERVE`.
+The control passes build and linked-code audits; its physical comparison is
+pending at this checkpoint. Both images remain laboratory-only and
+**NOT_QUALIFIED** for production.
+
+The [short-run evidence archive](../tests/results/esp32c3-rxonly-physical-20261008/)
+contains raw reports, configuration and image identities, source snapshots,
+build audits and restoration checks. It also saves the prepared long-run
+controller, which was not executed as part of this archive. The host fixture
+server's separate TLS 1.3 loopback check does not establish board TLS 1.3 support.
 
 ## Saved candidate and remaining work
 
@@ -106,7 +150,7 @@ It also incorporates the new output-priority default, so comparison with the
 physical control would change two variables. Use matched-priority images to
 attribute memory results specifically to the allocator.
 
-Before promotion, test all TLS record sizes/framing, certificate rejection,
+Before promotion, extend the short record/framing coverage above, test certificate rejection,
 concurrent contexts, Stop/EOF/reset/error cleanup, codec switching, late SBR/PS,
 ten-minute playback and OTA. Investigate FLAC idle-task starvation with bounded
 cooperative work and measured output continuity; do not disable the watchdog

@@ -1,0 +1,164 @@
+{
+  "result": "PASS",
+  "scope": "Short physical qualification only",
+  "report_case_counts": {
+    "records": 8,
+    "framing": 9,
+    "formats": 45
+  },
+  "format_cases": 44,
+  "format_algorithms": [
+    [
+      "TLSv1.2",
+      "ECDHE-RSA-AES256-GCM-SHA384"
+    ]
+  ],
+  "captured_fault_rows": {
+    "records": [],
+    "framing": [],
+    "formats": []
+  },
+  "records": [
+    {
+      "name": "tls-record:small",
+      "result": "PASS",
+      "evidence": {
+        "samples": 374,
+        "rate": 44100,
+        "channels": 2,
+        "record_counts": {
+          "1048": 298
+        },
+        "first_large_at": null,
+        "mean_busy": 68.18666666666667,
+        "peak_busy": 73.3,
+        "minimum_heap": 26172.0,
+        "minimum_largest": 15360.0,
+        "audio_wall_ratio": 1.001925243507651,
+        "first_full_pcm_seconds": 0.9379999999946449
+      },
+      "seconds": 76.234
+    },
+    {
+      "name": "tls-record:large",
+      "result": "PASS",
+      "evidence": {
+        "samples": 377,
+        "rate": 44100,
+        "channels": 2,
+        "record_counts": {
+          "16408": 19
+        },
+        "first_large_at": 153883.343,
+        "mean_busy": 70.45333333333333,
+        "peak_busy": 71.8,
+        "minimum_heap": 26148.0,
+        "minimum_largest": 12288.0,
+        "audio_wall_ratio": 1.002023945267959,
+        "first_full_pcm_seconds": 0.7029999999795109
+      },
+      "seconds": 76.203
+    },
+    {
+      "name": "tls-record:grow",
+      "result": "PASS",
+      "evidence": {
+        "samples": 373,
+        "rate": 44100,
+        "channels": 2,
+        "record_counts": {
+          "1048": 120,
+          "16408": 12
+        },
+        "first_large_at": 153989.656,
+        "mean_busy": 70.57333333333334,
+        "peak_busy": 72.9,
+        "minimum_heap": 25748.0,
+        "minimum_largest": 15360.0,
+        "audio_wall_ratio": 1.0019966911974443,
+        "first_full_pcm_seconds": 0.9059999999881256
+      },
+      "seconds": 76.109
+    },
+    {
+      "name": "tls-record:alternate",
+      "result": "PASS",
+      "evidence": {
+        "samples": 378,
+        "rate": 44100,
+        "channels": 2,
+        "record_counts": {
+          "1048": 18,
+          "16408": 18
+        },
+        "first_large_at": 154035.953,
+        "mean_busy": 70.38,
+        "peak_busy": 72.0,
+        "minimum_heap": 25772.0,
+        "minimum_largest": 15360.0,
+        "audio_wall_ratio": 1.0020395647026943,
+        "first_full_pcm_seconds": 0.9059999999881256
+      },
+      "seconds": 76.234
+    }
+  ],
+  "restoration": {
+    "result": "PASS",
+    "info": {
+      "version": "v0.9.693-1252-g941b935c",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "da2f5dfeac6a51f55387f833ddcf5401b23b610709bb36126b2e28d2657aaad0"
+    },
+    "status": [
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -59
+      },
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -76
+      },
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -77
+      }
+    ],
+    "persistence": {
+      "wifi_unchanged": true,
+      "playlist_unchanged": true,
+      "settings_unchanged": true
+    },
+    "playback_state_restored": true
+  }
+}
