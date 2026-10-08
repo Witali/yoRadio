@@ -192,6 +192,10 @@ decoder lifetime reuse and operating headroom for networking, crypto and WebUI.
 - Reproduce the FLAC diagnostic with the timeout reason and task names retained
   safely. Check scheduling and actual output continuity; keep the original
   diagnostic failure and do not replace it with a CPU-budget exemption.
+  The [targeted FLAC repeat](ESP32C3_FLAC_WATCHDOG_20261008.md) reproduces one
+  diagnostic failure in 12 control cases, with no allocation failures. An
+  improved profiler/counter image passes 12/12 but does not reproduce the
+  event; the original fault remains unresolved.
 - Classify the small-record WebUI timeout using request-phase timing without
   increasing timeouts or adding hidden retries. The instrumented 75-second
   repeat passes; a failed-request phase trace has not yet been captured.
