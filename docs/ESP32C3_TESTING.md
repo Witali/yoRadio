@@ -793,6 +793,14 @@ unrolling experiments. It includes differential reader-state tests, exact PCM
 checks and RV32 object-size audits. Host timing is not physical C3 timing;
 both experimental compile definitions remain disabled by default.
 
+The [physical Rice comparison](ESP32C3_FLAC_RICE_PHYSICAL_20261008.md) uses fresh
+matched IDF images and the default-off `CONFIG_YORADIO_FLAC_BYTEWISE_RICE`
+switch. It compares two radio FLAC files, demanding HTTPS FLAC and a full-rate
+HE-AACv2 control. `tests/test-flac-rice-physical-evidence.py` replays the archive,
+checks firmware identities and verifies that missing/malformed telemetry cannot
+be reported as a complete comparison. Original runtime and memory failures are
+retained; DMA diagnostics do not establish acoustic continuity.
+
 The [real-radio LPC study](ESP32C3_FLAC_RADIO_20261006.md) adds matched
 120-second, 24-bit FLAC recordings with maximum predictor orders 32 and 12.
 `capture_radio_flac.py` and the shared fixture server are board-independent;

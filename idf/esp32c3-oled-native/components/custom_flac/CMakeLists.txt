@@ -18,3 +18,7 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
   FLAC_OUTPUT_FRAMES=512
   FLAC_SEGMENTED_WORKSPACE=1)
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+
+if(CONFIG_YORADIO_FLAC_BYTEWISE_RICE)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE FLAC_BYTEWISE_RICE=1)
+endif()

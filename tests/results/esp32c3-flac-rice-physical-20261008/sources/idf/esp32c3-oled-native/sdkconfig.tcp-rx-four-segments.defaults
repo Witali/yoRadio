@@ -1,0 +1,7 @@
+# Optional receive-burst memory experiment; not board defaults.
+# Four 1440-byte TCP segments plus two mailbox entries. TLS still accepts
+# full 16 KiB records, assembled across successive TCP receive windows.
+# Requalify throughput at realistic RTT before promotion: halving the window
+# can halve the bandwidth-delay budget, especially for high-bitrate streams.
+CONFIG_LWIP_TCP_WND_DEFAULT=5760
+CONFIG_LWIP_TCP_RECVMBOX_SIZE=6

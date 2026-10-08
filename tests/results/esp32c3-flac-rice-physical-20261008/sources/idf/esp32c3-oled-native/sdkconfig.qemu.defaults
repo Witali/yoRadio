@@ -1,0 +1,11 @@
+# Headless ESP32-C3 QEMU smoke profile. Hardware production defaults remain in
+# sdkconfig.defaults and are overridden only by build-qemu.ps1.
+CONFIG_YORADIO_QEMU=y
+
+# The QEMU esp32c3 machine exposes UART0, not USB Serial/JTAG.
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+# CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG is not set
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
+
+CONFIG_BOOTLOADER_LOG_LEVEL_INFO=y
+CONFIG_BOOTLOADER_LOG_LEVEL=3

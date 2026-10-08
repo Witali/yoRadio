@@ -21,9 +21,11 @@ Both retained switches are **off by default**, including explicit `=0`:
 - `FLAC_LPC_NO_AUTO_UNROLL=1`: retain manual four-tap groups, but prevent GCC
   from further expanding that loop across all 32 taps.
 
-These are experimental C++ compile definitions, not WebUI settings or new
-production Kconfig defaults. No application image or board state was changed
-by this study. RAM allocations and the existing 4–24-bit, mono/stereo,
+The initial host study used experimental C++ compile definitions. The
+[physical follow-up](ESP32C3_FLAC_RICE_PHYSICAL_20261008.md) adds a default-off
+Kconfig option for Rice and compares matched application images on the C3.
+No application image or board state was changed by the host study itself.
+RAM allocations and the existing 4–24-bit, mono/stereo,
 maximum-8192-sample-block support remain unchanged. PCM output remains s16.
 
 ## What is hot
