@@ -1,0 +1,29 @@
+C:/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/flac-hotloops-20261008/lpc-codegen/final-source-audit/bytewise-rice.obj: \
+ C:/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/flac-hotloops-20261008/lpc-codegen/final-source-audit/inputs/flac_decoder.cpp \
+ C:/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/flac-hotloops-20261008/lpc-codegen/final-source-audit/inputs/flac_decoder.h \
+ C:/Work/yoRadio/.worktree/esp32c3-idf-upgrade/idf/components/custom_codec_support/Arduino.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/include/esp_heap_caps.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/include/multi_heap.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include/esp_err.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/stdio.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/assert.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include/esp_compiler.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include/esp_attr.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include/esp_assert.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/include/esp_rom_sys.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c3/include/soc/reset_reasons.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c3/include/soc/soc_caps.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/include/soc/soc_caps_eval.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log_config.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log_level.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include/esp_assert.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log_color.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log_buffer.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log_timestamp.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log_write.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log_format.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log_args.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include/esp_macros.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_log_attr.h \
+ C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include/esp_private/log_attr.h

@@ -18,6 +18,7 @@ def main():
     parser.add_argument('--fixtures',type=Path,help='Reuse a generated manifest directory')
     parser.add_argument('--case',action='append',help='Restrict fixture names, e.g. for the old-code baseline')
     parser.add_argument('--allocation-failures',action='store_true',help='Fail persistent C malloc/realloc points and verify cleanup/reopen')
+    parser.add_argument('--define',action='append',default=[],help='Decoder experiment compiler definition')
     args=parser.parse_args();out=args.output.resolve();out.mkdir(parents=True,exist_ok=False)
     folder=args.fixtures.resolve() if args.fixtures else out/'fixtures'
     manifest=json.loads((folder/'manifest.json').read_text()) if args.fixtures else generate(folder)
@@ -31,7 +32,7 @@ def main():
         'tests/native/flac_bounds/Arduino.h','tests/native/flac_bounds/main.cpp',
         'tools/audio_test_server/generate_flac_depths.py',Path(__file__).relative_to(ROOT).as_posix()]
     files += [p.relative_to(ROOT).as_posix() for p in (ROOT/'tests/native/flac_depths').rglob('*') if p.is_file()]
-    report=dict(revision=args.revision,sanitizers=True,sources={},cases=[],ffmpeg=subprocess.check_output(['ffmpeg','-version'],text=True).splitlines()[0])
+    report=dict(revision=args.revision,defines=args.define,sanitizers=True,sources={},cases=[],ffmpeg=subprocess.check_output(['ffmpeg','-version'],text=True).splitlines()[0])
     for name in files:
         data=subprocess.check_output(['git','show',args.revision+':'+name],cwd=ROOT) if args.revision and name.startswith((decoder,adapter)) else (ROOT/name).read_bytes()
         path=out/'sources'/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data)
@@ -39,6 +40,7 @@ def main():
     source=out/'sources'
     common=['g++','-std=c++14','-O2','-g','-fsanitize=address,undefined','-fno-pie','-no-pie',
         '-I'+host(source/'tests/native/flac_bounds'),'-I'+host(source/decoder)]
+    common+=['-D'+value for value in args.define]
     for variant in ('segmented','contiguous','adapter'):
         flags=common+([] if variant=='contiguous' else ['-DFLAC_SEGMENTED_WORKSPACE=1','-DFLAC_OUTPUT_FRAMES=512'])
         if variant=='adapter':

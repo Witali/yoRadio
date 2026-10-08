@@ -12,6 +12,7 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--baseline', action='store_true', help='Record sanitizer failures without calling them PASS')
     p.add_argument('--contiguous', action='store_true', help='Exercise the Arduino workspace and 2048-frame output size')
+    p.add_argument('--define', action='append', default=[], help='Decoder experiment compiler definition')
     args=p.parse_args(); out=args.output.resolve();out.mkdir(parents=True, exist_ok=True)
     src=ROOT/'yoRadio/src/audioI2S/flac_decoder'
     test=ROOT/'tests/native/flac_bounds'
@@ -25,7 +26,8 @@ def main():
     flags=['g++','-std=c++14','-O2','-g',
            '-fsanitize=address,undefined','-fno-pie','-no-pie','-I'+host(test),'-I'+host(src)]
     if not args.contiguous:flags+=['-DFLAC_OUTPUT_FRAMES=512','-DFLAC_SEGMENTED_WORKSPACE=1']
-    report['configuration']=dict(segmented=not args.contiguous,output_frames=2048 if args.contiguous else 512)
+    flags+=['-D'+value for value in args.define]
+    report['configuration']=dict(segmented=not args.contiguous,output_frames=2048 if args.contiguous else 512,defines=args.define)
     (out/'build.log').write_bytes(run(flags+[host(src/'flac_decoder.cpp'),host(test/'main.cpp'),'-o',host(binary)]))
     cases=['full','0','1','2','3','4','7','8','16','64','512','2048','8192']
     if not args.baseline: cases += ['tail-1','tail-2','tail-3']

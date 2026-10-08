@@ -1,0 +1,838 @@
+{
+  "platform": "WSL x86_64 host; not ESP32-C3 timing",
+  "clock": "CLOCK_THREAD_CPUTIME_ID",
+  "rounds": 4,
+  "repeats": 3,
+  "definitions": {
+    "scalar": [],
+    "rice": [
+      "FLAC_BYTEWISE_RICE=1"
+    ],
+    "lpc": [
+      "FLAC_LPC_NO_AUTO_UNROLL=1"
+    ],
+    "combined": [
+      "FLAC_BYTEWISE_RICE=1",
+      "FLAC_LPC_NO_AUTO_UNROLL=1"
+    ]
+  },
+  "sources": {
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "b305f00b0f1093ed05007c041fce40091a93368dff0163f877d0ff68e2a37452",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "17d21ad00a3b057fd6ae73c3e24d0f9910d82101de8f0d57656b25c5bc23c2be",
+    "tests/native/flac_bounds/Arduino.h": "628aa1fa77fc1f1f89201aca3c8b03b5ba7a09806ee4ef143929a42f3bc12713",
+    "tests/native/flac_hotloops/profile.h": "963f6839cfdbab83f4668463259bec0734a984222bcab9bb4e2a8f9a444dd6eb",
+    "tests/native/flac_hotloops/main.cpp": "a28c71143bbd95c70e0320ce5405182abc307aa496a6aa1c1fcca2d196e25881",
+    "tools/codec_benchmark/profile_flac_hotloops.py": "f1cb9e92d20ebc92e82ba0be0b5c36642cb7ee6b7bb3954177ae008af7c4d943",
+    "tools/codec_benchmark/compare_flac_hotloops.py": "e01415aee38b0b17bb93fa2eb1f9e283e61c76110162d99c5b6c7ff5f5d91633"
+  },
+  "rows": [
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 0,
+      "variant": "scalar",
+      "decode_ns": 724278434,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 0,
+      "variant": "rice",
+      "decode_ns": 655106727,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 0,
+      "variant": "lpc",
+      "decode_ns": 757021138,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 0,
+      "variant": "combined",
+      "decode_ns": 742284155,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 1,
+      "variant": "combined",
+      "decode_ns": 744828045,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 1,
+      "variant": "lpc",
+      "decode_ns": 758726798,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 1,
+      "variant": "rice",
+      "decode_ns": 647747802,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 1,
+      "variant": "scalar",
+      "decode_ns": 707131228,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 2,
+      "variant": "scalar",
+      "decode_ns": 705638530,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 2,
+      "variant": "rice",
+      "decode_ns": 698748199,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 2,
+      "variant": "lpc",
+      "decode_ns": 765397633,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 2,
+      "variant": "combined",
+      "decode_ns": 712294691,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 3,
+      "variant": "combined",
+      "decode_ns": 773986234,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 3,
+      "variant": "lpc",
+      "decode_ns": 751833729,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 3,
+      "variant": "rice",
+      "decode_ns": 667850168,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "round": 3,
+      "variant": "scalar",
+      "decode_ns": 730459675,
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 0,
+      "variant": "scalar",
+      "decode_ns": 610201633,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 0,
+      "variant": "rice",
+      "decode_ns": 521812464,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 0,
+      "variant": "lpc",
+      "decode_ns": 587088179,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 0,
+      "variant": "combined",
+      "decode_ns": 531090627,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 1,
+      "variant": "combined",
+      "decode_ns": 515999877,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 1,
+      "variant": "lpc",
+      "decode_ns": 580964023,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 1,
+      "variant": "rice",
+      "decode_ns": 516092943,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 1,
+      "variant": "scalar",
+      "decode_ns": 598978554,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 2,
+      "variant": "scalar",
+      "decode_ns": 570836491,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 2,
+      "variant": "rice",
+      "decode_ns": 532453784,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 2,
+      "variant": "lpc",
+      "decode_ns": 590848231,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 2,
+      "variant": "combined",
+      "decode_ns": 550369668,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 3,
+      "variant": "combined",
+      "decode_ns": 545722476,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 3,
+      "variant": "lpc",
+      "decode_ns": 587603845,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 3,
+      "variant": "rice",
+      "decode_ns": 516512931,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "round": 3,
+      "variant": "scalar",
+      "decode_ns": 596616639,
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 0,
+      "variant": "scalar",
+      "decode_ns": 769644754,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 0,
+      "variant": "rice",
+      "decode_ns": 730264922,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 0,
+      "variant": "lpc",
+      "decode_ns": 825749632,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 0,
+      "variant": "combined",
+      "decode_ns": 762503563,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 1,
+      "variant": "combined",
+      "decode_ns": 758491425,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 1,
+      "variant": "lpc",
+      "decode_ns": 816707272,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 1,
+      "variant": "rice",
+      "decode_ns": 706767560,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 1,
+      "variant": "scalar",
+      "decode_ns": 758431161,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 2,
+      "variant": "scalar",
+      "decode_ns": 781891032,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 2,
+      "variant": "rice",
+      "decode_ns": 699666611,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 2,
+      "variant": "lpc",
+      "decode_ns": 866381207,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 2,
+      "variant": "combined",
+      "decode_ns": 762685444,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 3,
+      "variant": "combined",
+      "decode_ns": 757811914,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 3,
+      "variant": "lpc",
+      "decode_ns": 817913076,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 3,
+      "variant": "rice",
+      "decode_ns": 704562607,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "round": 3,
+      "variant": "scalar",
+      "decode_ns": 777651796,
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 0,
+      "variant": "scalar",
+      "decode_ns": 599871936,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 0,
+      "variant": "rice",
+      "decode_ns": 524914682,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 0,
+      "variant": "lpc",
+      "decode_ns": 603169761,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 0,
+      "variant": "combined",
+      "decode_ns": 547034273,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 1,
+      "variant": "combined",
+      "decode_ns": 544108796,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 1,
+      "variant": "lpc",
+      "decode_ns": 606369155,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 1,
+      "variant": "rice",
+      "decode_ns": 548024422,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 1,
+      "variant": "scalar",
+      "decode_ns": 622391461,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 2,
+      "variant": "scalar",
+      "decode_ns": 592816637,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 2,
+      "variant": "rice",
+      "decode_ns": 541573565,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 2,
+      "variant": "lpc",
+      "decode_ns": 584892071,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 2,
+      "variant": "combined",
+      "decode_ns": 563658286,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 3,
+      "variant": "combined",
+      "decode_ns": 534575541,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 3,
+      "variant": "lpc",
+      "decode_ns": 595748396,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 3,
+      "variant": "rice",
+      "decode_ns": 569100047,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "round": 3,
+      "variant": "scalar",
+      "decode_ns": 606211379,
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+      "pcm_bytes": 21168000,
+      "identical": true
+    }
+  ],
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "summary": [
+    {
+      "name": "radio-bossa-lpc12",
+      "measurements_ns": {
+        "scalar": [
+          599871936,
+          622391461,
+          592816637,
+          606211379
+        ],
+        "rice": [
+          524914682,
+          548024422,
+          541573565,
+          569100047
+        ],
+        "lpc": [
+          603169761,
+          606369155,
+          584892071,
+          595748396
+        ],
+        "combined": [
+          547034273,
+          544108796,
+          563658286,
+          534575541
+        ]
+      },
+      "median_ns": {
+        "scalar": 603041657.5,
+        "rice": 544798993.5,
+        "lpc": 599459078.5,
+        "combined": 545571534.5
+      },
+      "change_percent": {
+        "scalar": 0.0,
+        "rice": -9.658149362591917,
+        "lpc": -0.5940848290401868,
+        "combined": -9.53004196065842
+      }
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "measurements_ns": {
+        "scalar": [
+          769644754,
+          758431161,
+          781891032,
+          777651796
+        ],
+        "rice": [
+          730264922,
+          706767560,
+          699666611,
+          704562607
+        ],
+        "lpc": [
+          825749632,
+          816707272,
+          866381207,
+          817913076
+        ],
+        "combined": [
+          762503563,
+          758491425,
+          762685444,
+          757811914
+        ]
+      },
+      "median_ns": {
+        "scalar": 773648275.0,
+        "rice": 705665083.5,
+        "lpc": 821831354.0,
+        "combined": 760497494.0
+      },
+      "change_percent": {
+        "scalar": 0.0,
+        "rice": -8.787351267602839,
+        "lpc": 6.2280341800025285,
+        "combined": -1.6998397624553574
+      }
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "measurements_ns": {
+        "scalar": [
+          610201633,
+          598978554,
+          570836491,
+          596616639
+        ],
+        "rice": [
+          521812464,
+          516092943,
+          532453784,
+          516512931
+        ],
+        "lpc": [
+          587088179,
+          580964023,
+          590848231,
+          587603845
+        ],
+        "combined": [
+          531090627,
+          515999877,
+          550369668,
+          545722476
+        ]
+      },
+      "median_ns": {
+        "scalar": 597797596.5,
+        "rice": 519162697.5,
+        "lpc": 587346012.0,
+        "combined": 538406551.5
+      },
+      "change_percent": {
+        "scalar": 0.0,
+        "rice": -13.154100896422726,
+        "lpc": -1.7483483642611097,
+        "combined": -9.934975541508384
+      }
+    },
+    {
+      "name": "radio-groovesalad-lpc32",
+      "measurements_ns": {
+        "scalar": [
+          724278434,
+          707131228,
+          705638530,
+          730459675
+        ],
+        "rice": [
+          655106727,
+          647747802,
+          698748199,
+          667850168
+        ],
+        "lpc": [
+          757021138,
+          758726798,
+          765397633,
+          751833729
+        ],
+        "combined": [
+          742284155,
+          744828045,
+          712294691,
+          773986234
+        ]
+      },
+      "median_ns": {
+        "scalar": 715704831.0,
+        "rice": 661478447.5,
+        "lpc": 757873968.0,
+        "combined": 743556100.0
+      },
+      "change_percent": {
+        "scalar": 0.0,
+        "rice": -7.576640697567127,
+        "lpc": 5.891973223246283,
+        "combined": 3.8914462769638725
+      }
+    }
+  ],
+  "passed": true
+}

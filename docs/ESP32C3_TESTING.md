@@ -787,6 +787,12 @@ boundary checks and `tests/test-output-priority-evidence.py` for retained data.
 
 ### FLAC predictor and high-depth playback
 
+The [hot-loop study](ESP32C3_FLAC_HOTLOOPS_20261008.md) profiles exclusive host
+CPU time in the actual decoder and compares optional bytewise Rice and LPC
+unrolling experiments. It includes differential reader-state tests, exact PCM
+checks and RV32 object-size audits. Host timing is not physical C3 timing;
+both experimental compile definitions remain disabled by default.
+
 The [real-radio LPC study](ESP32C3_FLAC_RADIO_20261006.md) adds matched
 120-second, 24-bit FLAC recordings with maximum predictor orders 32 and 12.
 `capture_radio_flac.py` and the shared fixture server are board-independent;
