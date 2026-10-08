@@ -186,8 +186,8 @@ The same scripts can be run directly from this directory:
 downloads into the repository-local ignored `.idf` directory:
 
 - portable CPython 3.12.10, verified by SHA-256;
-- official ESP-IDF at the version in [idf-version.txt](idf-version.txt), with its
-  pinned submodules;
+- official ESP-IDF from the series in [idf-version.txt](idf-version.txt), at
+  the exact commit in [idf-revision.txt](idf-revision.txt), with pinned submodules;
 - the ESP32-C3 RISC-V compiler, CMake, Ninja, esptool and IDF Python packages;
 - official Espressif `esp_audio_codec` at commit
   `67b8d0e98f58c774b8652480893037273190e8dc`, including native ESP32-C3
@@ -195,6 +195,13 @@ downloads into the repository-local ignored `.idf` directory:
 
 Application sources compile with `-O3`. The ESP-IDF component manager is
 disabled, so builds cannot silently update dependencies.
+
+The current SDK pin is `release/v6.1` commit
+`9a97f6c54ec638111ce55cd36581b3c192f15207`, checked on 2026-10-08.
+It is newer than the `v6.1` release tag. Setup keeps this checkout in
+`.idf/v6.1-9a97f6c54ec6`, alongside older SDKs, and build verifies its commit.
+The toolchain lives in `.idf/tools-v6.1`; setup installs the versions required
+by the pinned SDK. Updating the upstream branch does not silently move this pin.
 
 Useful commands:
 

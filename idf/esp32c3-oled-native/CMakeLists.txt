@@ -45,8 +45,9 @@ endif()
 list(APPEND yoradio_lwip_sources "${yoradio_tcp_fixed}")
 set_property(TARGET ${yoradio_lwip_lib} PROPERTY SOURCES "${yoradio_lwip_sources}")
 
-# IDF 6.1 lacks the 6.0.3 Content-Length guard. Keep the reviewed backport
-# local to this build and reject unknown SDK sources rather than guessing.
+# The original IDF 6.1 tag lacks the Content-Length guard; the pinned newer
+# revision has it. Preserve native guarded sources or generate a local
+# backport for audited older SDKs. Reject unknown sources rather than guessing.
 idf_component_get_property(yoradio_httpd_lib esp_http_server COMPONENT_LIB)
 idf_component_get_property(yoradio_httpd_dir esp_http_server COMPONENT_DIR)
 set(yoradio_httpd_original "${yoradio_httpd_dir}/src/httpd_parse.c")

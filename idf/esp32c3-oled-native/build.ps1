@@ -27,9 +27,10 @@ if ([string]::IsNullOrWhiteSpace($DependencyRoot)) {
     $DependencyRoot = Join-Path $worktreeRoot ".idf"
 }
 $DependencyRoot = [IO.Path]::GetFullPath($DependencyRoot)
-$idfVersion = (Get-Content -LiteralPath (Join-Path $project 'idf-version.txt') -Raw).Trim()
-if ($idfVersion -notmatch '^v\d+\.\d+(?:\.\d+)?$') { throw 'Invalid pinned ESP-IDF version' }
-$idf = Join-Path $DependencyRoot $idfVersion
+. (Join-Path $project 'idf-pin.ps1')
+$idfPin = Get-YoRadioIdfPin -Project $project
+$idfVersion = $idfPin.Version
+$idf = Join-Path $DependencyRoot $idfPin.Directory
 $idfTools = Join-Path $DependencyRoot "tools-$idfVersion"
 $bootstrapPython = Join-Path $DependencyRoot "python-3.12.10\tools"
 $audioCodec = Join-Path $DependencyRoot "esp-adf-libs\esp_audio_codec"
@@ -52,6 +53,11 @@ if ($Setup -or $missing.Count) {
     })
 }
 if ($missing.Count) { throw "Missing dependencies: $($missing -join ', ')" }
+$actualRevision = (& git -C $idf rev-parse HEAD).Trim()
+$expectedRevision = (& git -C $idf rev-parse --verify "$($idfPin.Revision)^{commit}").Trim()
+if ($LASTEXITCODE -ne 0 -or $actualRevision -ne $expectedRevision) {
+    throw "ESP-IDF checkout does not match pinned revision $($idfPin.Revision)"
+}
 
 $saved = @{
     Path = $env:Path

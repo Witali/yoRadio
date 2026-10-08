@@ -2,6 +2,13 @@
 
 ## Scope and sequence
 
+**Priority updated on 2026-10-08:** adapt and qualify the latest revision of
+the official `release/v6.1` branch. Its checked head is
+`9a97f6c54ec638111ce55cd36581b3c192f15207` (commit date 2026-09-22), newer than
+the published `v6.1` tag `fff9895c82d744c7237be8847347bdd1b07c6643`.
+The former SDK comparisons below remain historical controls. Further work
+targets this exact revision instead of repeating the 6.0.3 upgrade sequence.
+
 All upgrade work remains on `codex/esp32c3-idf-upgrade` in the dedicated
 `.worktree/esp32c3-idf-upgrade` checkout. Do not merge the upgrade into `main`
 without a subsequent user request.
@@ -18,9 +25,11 @@ Starting point: main `ff490cd4`, installed production image built from
 5. Leave the board on a verified production image and preserve its Wi-Fi,
    playlist and settings. Do not overwrite an existing versioned release.
 
-`idf/esp32c3-oled-native/idf-version.txt` is the SDK pin used by setup, build
-and the dependent QEMU/benchmark tools. Each SDK has its own checkout,
-tool directory and build directories. The audio-codec archive stays pinned
+`idf/esp32c3-oled-native/idf-version.txt` selects the toolchain series, and
+`idf-revision.txt` pins the full SDK commit. Setup places each revision in a
+separate checkout; build verifies HEAD before using it. Tool installations
+are shared within the series, with versions selected by the pinned SDK.
+Each test image has its own build directory. The audio-codec archive stays pinned
 to the same revision so the SDK comparison does not also change the decoder.
 
 ## Validation matrix for each SDK
@@ -58,6 +67,23 @@ a physical full-flash/bootloader migration.
 - [6.1 migration guide for ESP32-C3](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32c3/migration-guides/release-6.x/6.1/index.html).
 
 ## Execution status
+
+### Latest revision adaptation on 2026-10-08
+
+The SDK source and tools for `9a97f6c54ec6` are installed separately from the
+release-tag checkout. The actual revised HTTP/TLS reader passes 85 ASan/UBSan
+cases. The lwIP TCP and netconn sources still match the audited ownership fix;
+all six host cases pass with each of the pool and heap allocators. The updated HTTP server already has
+the same Content-Length overflow guard as 6.0.3. The build adapter recognizes
+this reviewed revision and preserves the upstream source without rewriting it.
+The full profiling build and linked AAC/TLS audits pass. The saved application
+is `firmware/development/esp32c3-idf-6.1-r9a97f6c54ec6-rx6-dynamic/app.bin`;
+its ELF identity is `e51ff9fd08123d5aa5da09441818777eb6c04eca99c0279dfd396d1e88247e75`.
+It has the full PC19 configuration and a 32,744-byte SBR owner. This explicitly
+labelled laboratory image adds the test CA to normal roots. Physical acceptance
+of this revision remains open.
+
+### Earlier release tag qualification
 
 The original-default 6.0.3 sequence and matched 6.0.2 controls are complete,
 with the failures detailed below. Original-default 6.1 builds and host/QEMU

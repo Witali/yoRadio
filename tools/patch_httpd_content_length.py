@@ -13,6 +13,8 @@ SOURCE_SHA256 = {
     'd733639df6561f2879f668aacb16c12749d9516fe80a00d1c3781e1750c6dcd4': '6.0.2',
     '9ec387ffc4f42a6b572d54aa8a9231d2cc05d809a82810759a7d595b1dc99349': '6.0.3',
     'e71ab6fb21dccc1138e3cf8afb54871f38d215c292c66bc894e506c495a9f864': '6.1',
+    # release/v6.1 9a97f6c54ec6 already contains the identical upstream guard.
+    '2121bc06c00656fd2ad85b1a8a7eb3fe5d6010ccf3756b57d5520c3b8286df3e': '6.1-9a97f6c54ec6',
 }
 
 OLD = '''    /* In absence of body/chunked encoding, http_parser sets content_len to -1 */
@@ -49,9 +51,9 @@ def patch(source):
     version = SOURCE_SHA256.get(hashlib.sha256(text.encode('utf-8')).hexdigest())
     if version is None:
         raise ValueError('Unaudited HTTP server source: review the Content-Length guard')
-    if version == '6.0.3':
+    if version in ('6.0.3', '6.1-9a97f6c54ec6'):
         if text.count(GUARD) != 1:
-            raise ValueError('Expected the audited native 6.0.3 guard')
+            raise ValueError('Expected the audited native Content-Length guard')
         return source
     if text.count(OLD) != 1:
         raise ValueError('Expected exactly one legacy Content-Length assignment')
