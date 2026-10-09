@@ -9,6 +9,12 @@ HTTPS run records 84 DMA completion-queue overruns in three groups. Original
 PASS verdicts are retained separately from this finding. They do not establish
 uninterrupted sound.
 
+The [matched follow-up](ESP32C3_PREFILL_MATCHED_20261009.md) passes all eight
+targeted HTTP/HTTPS AAC EOF checks and does not reproduce the 84-event FLAC
+finding in a 0 → 250 → 0 ms comparison. It retains one early DMA event in
+the 250 ms run. Both this report's original failures and the new observations
+remain recorded; the follow-up does not establish their cause.
+
 The candidate is `idf61-prefill-min250`, application SHA-256
 `89d320f663bda6439456c95b6f47d09cd5cac2d434ff9fe85df568fa07fbae9c`, ELF identity
 `5a17d251e0a7b308dd011e850b1b1016afba0b46bc7dee6263b82f8c624a4ff3`.
@@ -69,7 +75,7 @@ frequent WebUI polling. The server uses normal TCP backpressure for file
 delivery. Its average encoded rate is 1,283.224 kbit/s. Both runs use the same
 fixture bytes and delivery settings; their conditions are sequential.
 
-| Measurement after the first 10 s | Earlier PCM-tail candidate | Minimum-prefill candidate |
+| Measurement | Earlier PCM-tail candidate | Minimum-prefill candidate |
 | --- | ---: | ---: |
 | Mean CPU busy | 79.480% | 79.566% |
 | Selected DMA queue-overrun count | 0 | 84 |
@@ -78,6 +84,9 @@ fixture bytes and delivery settings; their conditions are sequential.
 | Minimum sampled largest free block | 34,816 B | 34,816 B |
 | Median / minimum RSSI | -66 / -70 dBm | -67 / -70 dBm |
 | Maximum WebUI response | 125 ms | 141 ms |
+
+CPU, heap and selected DMA measurements exclude the first ten seconds.
+RSSI and maximum WebUI response use the full playback observation.
 
 CPU, decoder, queue and DMA telemetry cover the required windows. The
 candidate's full observed DMA counter interval also records 84 overruns,
