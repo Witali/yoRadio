@@ -1,0 +1,4212 @@
+{
+  "board": {
+    "version": "idf61-web-tcp-probe",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "197034196e6b1a5523fcabc1135a5326411238280747473301fa5847c31b658c"
+  },
+  "cases": [
+    {
+      "name": "initial-idle-owner-capture",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 128980,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 128980,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ],
+        "snapshots": 3,
+        "first_sequence": 1
+      },
+      "seconds": 12.594
+    },
+    {
+      "name": "switching-and-heap",
+      "result": "PASS",
+      "evidence": {
+        "cycles": 3,
+        "station_changes": 9
+      },
+      "seconds": 111.047
+    },
+    {
+      "name": "eof:https:flac-level8:auto",
+      "result": "PASS",
+      "evidence": {
+        "scope": "EOF state only; decoded profile acceptance is separate",
+        "observed_formats": [
+          "FLAC",
+          "FLAC 48 kHz stereo"
+        ],
+        "terminal_samples": 12,
+        "websocket_stopped": true
+      },
+      "seconds": 19.328
+    },
+    {
+      "name": "eof:https:flac-level8:flac",
+      "result": "PASS",
+      "evidence": {
+        "scope": "EOF state only; decoded profile acceptance is separate",
+        "observed_formats": [
+          "FLAC",
+          "FLAC 48 kHz stereo"
+        ],
+        "terminal_samples": 12,
+        "websocket_stopped": true
+      },
+      "seconds": 19.359
+    },
+    {
+      "name": "eof:https:hev2-44100-stereo:auto",
+      "result": "PASS",
+      "evidence": {
+        "scope": "EOF state only; decoded profile acceptance is separate",
+        "observed_formats": [
+          "AAC",
+          "HE-AACv2 44.1 kHz stereo"
+        ],
+        "terminal_samples": 12,
+        "websocket_stopped": true
+      },
+      "seconds": 20.328
+    },
+    {
+      "name": "eof:https:hev2-44100-stereo:aac",
+      "result": "PASS",
+      "evidence": {
+        "scope": "EOF state only; decoded profile acceptance is separate",
+        "observed_formats": [
+          "AAC",
+          "HE-AACv2 44.1 kHz stereo"
+        ],
+        "terminal_samples": 13,
+        "websocket_stopped": true
+      },
+      "seconds": 20.812
+    },
+    {
+      "name": "idle-before-records",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 129040,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 129040,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.406
+    },
+    {
+      "name": "tls-record:grow",
+      "result": "PASS",
+      "evidence": {
+        "samples": 388,
+        "rate": 44100,
+        "channels": 2,
+        "record_counts": {
+          "1048": 118,
+          "16408": 11
+        },
+        "first_large_at": 252054.296,
+        "mean_busy": 59.346666666666664,
+        "peak_busy": 63.9,
+        "minimum_heap": 20968.0,
+        "minimum_largest": 14848.0,
+        "audio_wall_ratio": 1.000555421051882,
+        "first_full_pcm_seconds": 1.4210000000020955
+      },
+      "seconds": 76.125
+    },
+    {
+      "name": "idle-after-records",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 129040,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 129040,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.421
+    },
+    {
+      "name": "quiet-without-http",
+      "result": "PASS",
+      "evidence": {
+        "started_at": 252111.796,
+        "ended_at": 252171.796,
+        "http_polls": 0
+      },
+      "seconds": 60.234
+    },
+    {
+      "name": "idle-after-quiet",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 128740,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 129040,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 129040,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 14.078
+    },
+    {
+      "name": "cross-stage-recovery",
+      "result": "PASS",
+      "evidence": {
+        "baseline": "first-switch-cycle",
+        "checked": 3
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "runtime",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "stop-and-settings",
+      "result": "PASS",
+      "evidence": {
+        "stopped": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 1.0
+    },
+    {
+      "name": "runtime-after-capture-close",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "owners-complete",
+      "result": "PASS",
+      "evidence": {
+        "snapshots": 33,
+        "peak_live": 23,
+        "final_live": 0
+      },
+      "seconds": 0.0
+    }
+  ],
+  "note": "Continuous serial owner capture changes timing; diagnostic ownership evidence, not production CPU qualification.",
+  "cpu_budget_percent": null,
+  "created_utc": "2026-10-09T18:49:48.273471+00:00",
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/aac_reference.py": "7fb171138167be63ae8503c3c39ca1f664feb13eaea3d89727d4ea617e59aaf3",
+    "tools/esp32c3_tests/allocations.py": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7",
+    "tools/esp32c3_tests/common.py": "88969816d5215e05d0a01361cbbe6f26e4fd2b08746be0e0a51ef71570fa88a5",
+    "tools/esp32c3_tests/compare_latency.py": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394",
+    "tools/esp32c3_tests/compare_output_dma.py": "04de602acaed8846b3dc0c37a8ca11b061a436be1730cfadd4c2b408591e56b0",
+    "tools/esp32c3_tests/compare_output_priority.py": "073979d7a6ddd40ab324b6d06c80c35131cc180a26a1a8bc5f11780e3a1153cc",
+    "tools/esp32c3_tests/compare_output_priority_matrix.py": "680840fb1beb2d4c6a9708e460803411820f82107e1679c4d39eb8023f8962fb",
+    "tools/esp32c3_tests/connection_retry.py": "1c0a17e8c023511a0f975f63d3493c6e24bab1e3cb4b69a0615b51a7cab080b1",
+    "tools/esp32c3_tests/diagnostic.py": "9ed286e6931eb74d683a417ddeeea654847412f1b088b2d88f80a9afbcc82ac4",
+    "tools/esp32c3_tests/flac_truncation.py": "8ed8a8dbce97bf7384be558bff1c55b0bf37f707f2c1879ca5b96058c0e49e56",
+    "tools/esp32c3_tests/flash_constants.py": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5",
+    "tools/esp32c3_tests/flash_mode.py": "16ada30f8abf9d66937e82e21e041c4aabceccd319f0c756109becaa61532ffb",
+    "tools/esp32c3_tests/heap_fragment.py": "998c454faad743f4fa14bd3be960ede6944a4a5e522e45d749b42120f07fd803",
+    "tools/esp32c3_tests/heap_idle.py": "3b31cd39fb91b92b28c33a7f64633689b1535741510bd6a32b3ed9efeef3d643",
+    "tools/esp32c3_tests/heap_receive_correlation.py": "0fbe6924928b89aecf6d37cf4b8a6368e3eaf0746b55a989b24fed73de62b212",
+    "tools/esp32c3_tests/http_headers.py": "845395d01169e27be0211d2deeef1a42f9ce486f5f6756a2e16b16cace269d29",
+    "tools/esp32c3_tests/icy_metadata.py": "1b2260230a21d2526bc2a737125d956f105000c2bdeae2054a574f639d66a03e",
+    "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+    "tools/esp32c3_tests/load_windows.py": "eee95396e81156bb4ae8b74a1e165d0fa4f3912ff1d0a1dbb1d86584d28b9df2",
+    "tools/esp32c3_tests/memory.py": "2d02410fb60db20f90f3131812e6db10657d99865bbc791427f04bcfa89eae81",
+    "tools/esp32c3_tests/network_memory.py": "c77cef3021fb54c9b08f07c1ee25f3938cefc97e176724689ef2b005957d2aca",
+    "tools/esp32c3_tests/ota.py": "b893602a1faf034846b74e594cd1594d504f73271f905fab2ea87270b0ab6ee5",
+    "tools/esp32c3_tests/ota_diagnostic.py": "1ef7902be1cd8b686a8952a41d9aa80941b0e1301ac29b9a6670a7b28e568af8",
+    "tools/esp32c3_tests/ota_transition.py": "28d55e1a99489c5ede457dbb6ddfc82fbf327ce0a61cac3ccb277ec0fca2c5f6",
+    "tools/esp32c3_tests/output_priority_matrix.py": "d5ed53dfcd71d757576cb5e6649e14aef4b476622460d5e3bab63baa7b14c475",
+    "tools/esp32c3_tests/pcm_tail.py": "60725e812321a0140e0498ada8ab8ac5450c7d0c71ba264aef2de32284294406",
+    "tools/esp32c3_tests/pdm_clock.py": "9858b6b13dd76cc6d083d8f854e5a285984fca54156b7e1d8c5c1c4844cdec02",
+    "tools/esp32c3_tests/pipeline_flow.py": "0de43140ad727f21d5068d611a5c31fa3c62de9451175ab1bf0033454307c239",
+    "tools/esp32c3_tests/pipeline_flow_study.py": "bf464bbdbb6b3d67d019e68b8ea1861cc34df89f4e2f2df7c272266a210d1e82",
+    "tools/esp32c3_tests/pool_settle.py": "805b05ba463b0b5d91b3587abd1c7c4712cdfde37f44413ef74ca37bd63f3eb0",
+    "tools/esp32c3_tests/public_streams.py": "5e41a2a69cb9b69d2c6f8957258285d2f9478ff6c39aaafafde00a8b83264107",
+    "tools/esp32c3_tests/radio_flac_study.py": "25c55f49cf95a2117c499a90da6b53f3a0212b76a82b36ac1fb9f3dd7ea07a76",
+    "tools/esp32c3_tests/reboot_tls.py": "39bc4b53db14bf5eda5352dbee3bcb03e14ee70128e6c9109771bdaabe5bfde2",
+    "tools/esp32c3_tests/reference_eof.py": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f",
+    "tools/esp32c3_tests/run.py": "3333f089a23825189a63efd803210daa9edb0eb776292beabed075b9094cc512",
+    "tools/esp32c3_tests/rx_ownership.py": "448b976c1d915d3f413cfb055b02fa0aa9a0a3e9253e72af65127f413e992829",
+    "tools/esp32c3_tests/serial_lines.py": "1b18634ddd14a044759d59c1612faca5ab842eb60fd3fa02644f9d532e8a7c7f",
+    "tools/esp32c3_tests/staged_dma.py": "84412aaaae33491863411207c01c7b9c8702a9e232a899459d91845bb4d5e1fc",
+    "tools/esp32c3_tests/stream_memory_study.py": "2ec9fe9d46069143fbd4c6ca3edeace91819f7b0f74277d46753e61a58b27ade",
+    "tools/esp32c3_tests/summarize_codec_sequence.py": "90f94232cbdd247be4ac21f73a9aebcc726f3d49186c2233109b1454f63a2166",
+    "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+    "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+    "tools/esp32c3_tests/summarize_public.py": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+    "tools/esp32c3_tests/summarize_public_windows.py": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709",
+    "tools/esp32c3_tests/summarize_radio_flac.py": "72d66f872f1b511d9964e16cb72e7885791dd7bb8a9499ac0244678bf7135c47",
+    "tools/esp32c3_tests/summarize_rx_ownership.py": "0e62d6da908502efbfd4111aa7491b9f8a195219ac325a10862c93ab9e116685",
+    "tools/esp32c3_tests/summarize_stream_memory.py": "d32c496ce429750a5565b4396bcc1030b5319ebe33eee9940e390cb62d788697",
+    "tools/esp32c3_tests/summarize_sustained.py": "6f3a7786ec5c36935a2fd7714c8add9a9ccbf686b887eaa074e55e325e814245",
+    "tools/esp32c3_tests/summarize_terminal_cpu.py": "db99ad6e55f2b3e671106cdb2c3902225704d9167a2e65ef662fe23c726c69bd",
+    "tools/esp32c3_tests/summarize_terminal_memory.py": "f351cf6f73e9d256a406e8a7da5b65ab46e354b0cefca7543536f3ebac077bda",
+    "tools/esp32c3_tests/terminal_memory.py": "e920df2d0150a1e93e982c1fa06578444879e35c2158fee270ebd2f041bbe478",
+    "tools/esp32c3_tests/tls_error_codes.py": "d7b8baa6309ed2d14b8c825ebdd29b3e7461bc8cfea565a8268e5e69d638f6f4",
+    "tools/esp32c3_tests/tls_framing.py": "c937d76cedefeb7a56ae5cef783bd2ca796b0987d4d43eab99ba952a467b1910",
+    "tools/esp32c3_tests/tls_path.py": "52d1199afc26194e266252f7fd6a141875c03190a5abfb3e68068f957f7fbe42",
+    "tools/esp32c3_tests/tls_records.py": "7527068b5255dc1a3319b5986c0f1b0a4bf186b2be6b69d7ef68dad7bbd04fee",
+    "tools/esp32c3_tests/trace_transport.py": "48c0ef50e5165fc52501418636aea0cc38bf0494063fac8d5ca66477537af768",
+    "tools/esp32c3_tests/transport.py": "b3e41e4d54431fdbb5f26e88727a45e99c9958dba9097cb724fdae55f9ca1686",
+    "tools/esp32c3_tests/verify_adaptive_input_link.py": "d2c2bbe2c2cde72665828318aab4ee6f02e7245852fb57cbfd0ca9cf3e5ee247",
+    "tools/esp32c3_tests/verify_gcm_byte_link.py": "d46f80cabf959514832f70b50ca6817714039e4091195575b8af16da9235b5f1",
+    "tools/esp32c3_tests/verify_http_link.py": "caf7314d37464b1f4aeb7bdaa0e49cd84fb901bfacbef3c9dfc5caceb1124f73",
+    "tools/esp32c3_tests/verify_tls_path_link.py": "75f102153680aac6a11092bfeec9cc0b04ba899080c0d56ab473f757087cff6e",
+    "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+    "tools/audio_test_server/generate.py": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8",
+    "tools/audio_test_server/generate_flac_depths.py": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1",
+    "tools/audio_test_server/generate_flac_high_depth.py": "55417b00036c9256c5229fe51447be47b238dafa45b9f14e124771c09d515068",
+    "tools/audio_test_server/generate_pcm_tails.py": "a928505b88ea9c439bcf87aa0626de7ed2395129f9caf6b79e6081cc902d9c23",
+    "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+    "tools/audio_test_server/icy.py": "d9ed666a8cf63f897e414c402e4b1dab8ae52cd8066a0a30ae6f85b70f1aef29",
+    "tools/audio_test_server/make_test_certificate.py": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a",
+    "tools/audio_test_server/record_test_ca.py": "de680e4970d042e9d18744c9779822897c6b5e8930a75aa7cc9184dace79aaeb",
+    "tools/audio_test_server/server.py": "d61ebdb382efe2c2cfa01a8146b17124ca7c101fd7899734c4d0037b46c0d433",
+    "tools/audio_test_server/tls_framing.py": "de99ac3673730263b24c9ed4a1ace1d6a2eaa0387e4977c4992e56e3cf74097c",
+    "tools/audio_test_server/tls_records.py": "f4054958ab794eaf687572a13c144a4f9256120d274d031d8c8333f3f8fc2aa4"
+  },
+  "controller_sha256": "ee11c94f5d03ba8be35d1fb218d9bbf56e1973f9d91036c1a39265cddbc37b4b",
+  "firmware_sha256": "2a4a2505141e2e85421112bb3cc4d10db1e64b65800e11bd2b47e38c0b1e8762",
+  "sdkconfig_sha256": "766cddb351695807db7a0079e3488c78aa2702f43852fa13dee47f737385d44b",
+  "test_ca_sha256": "3e0dd1f8593cc0f7b42f881a7ff233f7bfeb5ea32aa27a5061d36092b6dbfe5e",
+  "leaf_certificate_sha256": "c98806d332eb649b0bac10a65633bbfc009eca43776564e4e580f137b1f1a322",
+  "fixture_hashes": {
+    "flac-level8": "d9a54de9e470158428bb340d2278baa6a36a5f5571ea8083af390ec46ca39aad",
+    "he-48000-stereo": "c2ac6e74fb70efc3cbff67f50a06586fca634ceed97df05f60b410272d92f0c2",
+    "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e"
+  },
+  "idle_checkpoints": {
+    "initial": [
+      {
+        "heap": 128980,
+        "largest": 106496,
+        "tasks": 17
+      },
+      {
+        "heap": 128980,
+        "largest": 106496,
+        "tasks": 17
+      }
+    ],
+    "before-records": [
+      {
+        "heap": 129040,
+        "largest": 106496,
+        "tasks": 17
+      },
+      {
+        "heap": 129040,
+        "largest": 106496,
+        "tasks": 17
+      }
+    ],
+    "after-records": [
+      {
+        "heap": 129040,
+        "largest": 106496,
+        "tasks": 17
+      },
+      {
+        "heap": 129040,
+        "largest": 106496,
+        "tasks": 17
+      }
+    ],
+    "after-quiet": [
+      {
+        "heap": 128740,
+        "largest": 106496,
+        "tasks": 17
+      },
+      {
+        "heap": 129040,
+        "largest": 106496,
+        "tasks": 17
+      },
+      {
+        "heap": 129040,
+        "largest": 106496,
+        "tasks": 17
+      }
+    ]
+  },
+  "actions": [
+    {
+      "name": "initial-idle-owner-capture",
+      "started_at": 251806.39,
+      "ended_at": 251818.984
+    },
+    {
+      "name": "switching-and-heap",
+      "started_at": 251818.984,
+      "ended_at": 251930.031
+    },
+    {
+      "name": "eof:https:flac-level8:auto",
+      "started_at": 251930.25,
+      "ended_at": 251949.578
+    },
+    {
+      "name": "eof:https:flac-level8:flac",
+      "started_at": 251949.578,
+      "ended_at": 251968.953
+    },
+    {
+      "name": "eof:https:hev2-44100-stereo:auto",
+      "started_at": 251968.953,
+      "ended_at": 251989.281
+    },
+    {
+      "name": "eof:https:hev2-44100-stereo:aac",
+      "started_at": 251989.281,
+      "ended_at": 252010.093
+    },
+    {
+      "name": "idle-before-records",
+      "started_at": 252010.312,
+      "ended_at": 252022.718
+    },
+    {
+      "name": "tls-record:grow",
+      "started_at": 252022.734,
+      "ended_at": 252098.859
+    },
+    {
+      "name": "idle-after-records",
+      "started_at": 252098.875,
+      "ended_at": 252111.296
+    },
+    {
+      "name": "quiet-without-http",
+      "started_at": 252111.562,
+      "ended_at": 252171.796
+    },
+    {
+      "name": "idle-after-quiet",
+      "started_at": 252171.812,
+      "ended_at": 252185.89
+    },
+    {
+      "name": "cross-stage-recovery",
+      "started_at": 252185.906,
+      "ended_at": 252185.906
+    },
+    {
+      "name": "runtime",
+      "started_at": 252185.937,
+      "ended_at": 252185.937
+    },
+    {
+      "name": "stop-and-settings",
+      "started_at": 252185.953,
+      "ended_at": 252186.968
+    },
+    {
+      "name": "runtime-after-capture-close",
+      "started_at": 252187.187,
+      "ended_at": 252187.203
+    },
+    {
+      "name": "owners-complete",
+      "started_at": 252187.218,
+      "ended_at": 252187.218
+    }
+  ],
+  "http_events": [
+    {
+      "mode": "file",
+      "fixture": "flac-level8",
+      "sent": 1233920,
+      "complete": false,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 251820.046,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251820.046,
+            "ended_at": 251821.078,
+            "bytes": 221184,
+            "writes": 216,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.25,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251821.078,
+            "ended_at": 251822.125,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0469999999913853,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251822.125,
+            "ended_at": 251823.125,
+            "bytes": 172032,
+            "writes": 168,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251823.125,
+            "ended_at": 251824.125,
+            "bytes": 151552,
+            "writes": 148,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251824.125,
+            "ended_at": 251825.125,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07899999999790452,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251825.125,
+            "ended_at": 251826.125,
+            "bytes": 158720,
+            "writes": 155,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251826.125,
+            "ended_at": 251827.125,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251827.125,
+            "ended_at": 251827.343,
+            "bytes": 41984,
+            "writes": 41,
+            "write_seconds": 0.20300000000861473,
+            "max_write_seconds": 0.07800000000861473,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251827.343
+      },
+      "seconds": 7.296999999991385
+    },
+    {
+      "mode": "file",
+      "fixture": "he-48000-stereo",
+      "sent": 97299,
+      "complete": true,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 251828.328,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251828.328,
+            "ended_at": 251829.546,
+            "bytes": 89088,
+            "writes": 87,
+            "write_seconds": 1.2179999999934807,
+            "max_write_seconds": 0.6559999999881256,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251829.546,
+            "ended_at": 251830.578,
+            "bytes": 8192,
+            "writes": 8,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.45300000000861473,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251830.578,
+            "ended_at": 251830.578,
+            "bytes": 19,
+            "writes": 1,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251830.578
+      },
+      "seconds": 2.25
+    },
+    {
+      "mode": "file",
+      "fixture": "hev2-44100-stereo",
+      "sent": 47379,
+      "complete": true,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 251836.531,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251836.531,
+            "ended_at": 251836.531,
+            "bytes": 47379,
+            "writes": 47,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251836.531
+      },
+      "seconds": 0.0
+    },
+    {
+      "mode": "file",
+      "fixture": "flac-level8",
+      "sent": 1222656,
+      "complete": false,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 251857.015,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251857.015,
+            "ended_at": 251858.062,
+            "bytes": 222208,
+            "writes": 217,
+            "write_seconds": 1.0469999999913853,
+            "max_write_seconds": 0.17100000000209548,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251858.062,
+            "ended_at": 251859.109,
+            "bytes": 169984,
+            "writes": 166,
+            "write_seconds": 1.0469999999913853,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251859.109,
+            "ended_at": 251860.125,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0160000000032596,
+            "max_write_seconds": 0.07899999999790452,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251860.125,
+            "ended_at": 251861.125,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251861.125,
+            "ended_at": 251862.187,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.062000000005355,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251862.187,
+            "ended_at": 251863.234,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0469999999913853,
+            "max_write_seconds": 0.07899999999790452,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251863.234,
+            "ended_at": 251864.25,
+            "bytes": 169984,
+            "writes": 166,
+            "write_seconds": 0.9839999999967404,
+            "max_write_seconds": 0.07899999999790452,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251864.25
+      },
+      "seconds": 7.23499999998603
+    },
+    {
+      "mode": "file",
+      "fixture": "he-48000-stereo",
+      "sent": 97299,
+      "complete": true,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 251865.203,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251865.203,
+            "ended_at": 251866.375,
+            "bytes": 90112,
+            "writes": 88,
+            "write_seconds": 1.1719999999913853,
+            "max_write_seconds": 0.5,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251866.375,
+            "ended_at": 251867.375,
+            "bytes": 7187,
+            "writes": 8,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.3120000000053551,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251867.375
+      },
+      "seconds": 2.1719999999913853
+    },
+    {
+      "mode": "file",
+      "fixture": "hev2-44100-stereo",
+      "sent": 47379,
+      "complete": true,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 251873.406,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251873.406,
+            "ended_at": 251873.406,
+            "bytes": 47379,
+            "writes": 47,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251873.406
+      },
+      "seconds": 0.0
+    },
+    {
+      "mode": "file",
+      "fixture": "flac-level8",
+      "sent": 1233920,
+      "complete": false,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 251893.968,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251893.968,
+            "ended_at": 251895.0,
+            "bytes": 221184,
+            "writes": 216,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.125,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251895.0,
+            "ended_at": 251896.062,
+            "bytes": 169984,
+            "writes": 166,
+            "write_seconds": 1.062000000005355,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251896.062,
+            "ended_at": 251897.109,
+            "bytes": 169984,
+            "writes": 166,
+            "write_seconds": 1.0469999999913853,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251897.109,
+            "ended_at": 251898.125,
+            "bytes": 169984,
+            "writes": 166,
+            "write_seconds": 1.0160000000032596,
+            "max_write_seconds": 0.09299999999348074,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251898.125,
+            "ended_at": 251899.125,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.09299999999348074,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251899.125,
+            "ended_at": 251900.14,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.09399999998277053,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251900.14,
+            "ended_at": 251901.14,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.07899999999790452,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251901.14,
+            "ended_at": 251901.265,
+            "bytes": 25600,
+            "writes": 25,
+            "write_seconds": 0.125,
+            "max_write_seconds": 0.09400000001187436,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251901.265
+      },
+      "seconds": 7.297000000020489
+    },
+    {
+      "mode": "file",
+      "fixture": "he-48000-stereo",
+      "sent": 97299,
+      "complete": true,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 251902.281,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251902.281,
+            "ended_at": 251903.5,
+            "bytes": 89088,
+            "writes": 87,
+            "write_seconds": 1.2190000000118744,
+            "max_write_seconds": 0.6559999999881256,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251903.5,
+            "ended_at": 251904.531,
+            "bytes": 8192,
+            "writes": 8,
+            "write_seconds": 1.0309999999881256,
+            "max_write_seconds": 0.3909999999741558,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251904.531,
+            "ended_at": 251904.531,
+            "bytes": 19,
+            "writes": 1,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251904.531
+      },
+      "seconds": 2.25
+    },
+    {
+      "mode": "file",
+      "fixture": "hev2-44100-stereo",
+      "sent": 47379,
+      "complete": true,
+      "pacing_ratio": null,
+      "delivery": {
+        "started_at": 251910.453,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251910.453,
+            "ended_at": 251910.453,
+            "bytes": 47379,
+            "writes": 47,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251910.453
+      },
+      "seconds": 0.0
+    }
+  ],
+  "https_events": [
+    {
+      "mode": "file",
+      "fixture": "flac-level8",
+      "sent": 1771852,
+      "complete": true,
+      "pacing_ratio": null,
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "delivery": {
+        "started_at": 251931.609,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251931.609,
+            "ended_at": 251932.609,
+            "bytes": 216064,
+            "writes": 211,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.1720000000204891,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251932.609,
+            "ended_at": 251933.625,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0160000000032596,
+            "max_write_seconds": 0.062000000005355105,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251933.625,
+            "ended_at": 251934.625,
+            "bytes": 161792,
+            "writes": 158,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251934.625,
+            "ended_at": 251935.64,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251935.64,
+            "ended_at": 251936.64,
+            "bytes": 163840,
+            "writes": 160,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251936.64,
+            "ended_at": 251937.656,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0159999999741558,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251937.656,
+            "ended_at": 251938.703,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.047000000020489,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251938.703,
+            "ended_at": 251939.703,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251939.703,
+            "ended_at": 251940.703,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251940.703,
+            "ended_at": 251941.703,
+            "bytes": 156672,
+            "writes": 153,
+            "write_seconds": 0.985000000015134,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251941.703,
+            "ended_at": 251942.312,
+            "bytes": 100684,
+            "writes": 99,
+            "write_seconds": 0.6089999999967404,
+            "max_write_seconds": 0.0470000000204891,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251942.312
+      },
+      "seconds": 10.703000000008615
+    },
+    {
+      "mode": "file",
+      "fixture": "flac-level8",
+      "sent": 1771852,
+      "complete": true,
+      "pacing_ratio": null,
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "delivery": {
+        "started_at": 251950.859,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251950.859,
+            "ended_at": 251951.859,
+            "bytes": 211968,
+            "writes": 207,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.21899999998277053,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251951.859,
+            "ended_at": 251952.89,
+            "bytes": 163840,
+            "writes": 160,
+            "write_seconds": 1.0310000000172295,
+            "max_write_seconds": 0.062000000005355105,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251952.89,
+            "ended_at": 251953.89,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251953.89,
+            "ended_at": 251954.906,
+            "bytes": 160768,
+            "writes": 157,
+            "write_seconds": 1.0159999999741558,
+            "max_write_seconds": 0.0779999999795109,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251954.906,
+            "ended_at": 251955.906,
+            "bytes": 164864,
+            "writes": 161,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251955.906,
+            "ended_at": 251956.921,
+            "bytes": 156672,
+            "writes": 153,
+            "write_seconds": 1.0150000000139698,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251956.921,
+            "ended_at": 251957.953,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0320000000065193,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251957.953,
+            "ended_at": 251958.953,
+            "bytes": 161792,
+            "writes": 158,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251958.953,
+            "ended_at": 251959.953,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251959.953,
+            "ended_at": 251960.953,
+            "bytes": 152576,
+            "writes": 149,
+            "write_seconds": 1.0,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 251960.953,
+            "ended_at": 251961.578,
+            "bytes": 105804,
+            "writes": 104,
+            "write_seconds": 0.625,
+            "max_write_seconds": 0.0629999999946449,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251961.578
+      },
+      "seconds": 10.719000000011874
+    },
+    {
+      "mode": "file",
+      "fixture": "hev2-44100-stereo",
+      "sent": 47379,
+      "complete": true,
+      "pacing_ratio": null,
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "delivery": {
+        "started_at": 251970.343,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251970.343,
+            "ended_at": 251970.343,
+            "bytes": 47379,
+            "writes": 47,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251970.343
+      },
+      "seconds": 0.0
+    },
+    {
+      "mode": "file",
+      "fixture": "hev2-44100-stereo",
+      "sent": 47379,
+      "complete": true,
+      "pacing_ratio": null,
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "delivery": {
+        "started_at": 251990.593,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 251990.593,
+            "ended_at": 251990.593,
+            "bytes": 47379,
+            "writes": 47,
+            "write_seconds": 0.0,
+            "max_write_seconds": 0,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 251990.593
+      },
+      "seconds": 0.0
+    }
+  ],
+  "record_observation": {
+    "captured_at": 252098.781,
+    "events": [
+      {
+        "records": [
+          {
+            "phase": "handshake",
+            "type": 22,
+            "wire_payload_bytes": 65,
+            "at": 252023.718
+          },
+          {
+            "phase": "handshake",
+            "type": 22,
+            "wire_payload_bytes": 807,
+            "at": 252023.718
+          },
+          {
+            "phase": "handshake",
+            "type": 22,
+            "wire_payload_bytes": 300,
+            "at": 252023.718
+          },
+          {
+            "phase": "handshake",
+            "type": 22,
+            "wire_payload_bytes": 4,
+            "at": 252023.718
+          },
+          {
+            "phase": "handshake",
+            "type": 22,
+            "wire_payload_bytes": 186,
+            "at": 252024.093
+          },
+          {
+            "phase": "handshake",
+            "type": 20,
+            "wire_payload_bytes": 1,
+            "at": 252024.093
+          },
+          {
+            "phase": "handshake",
+            "type": 22,
+            "wire_payload_bytes": 40,
+            "at": 252024.093
+          },
+          {
+            "phase": "headers",
+            "type": 23,
+            "wire_payload_bytes": 87,
+            "at": 252024.093
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252024.093
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252024.359
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252024.609
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252024.875
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252025.125
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252025.39
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252025.64
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252025.89
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252026.156
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252026.406
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252026.656
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252026.921
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252027.171
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252027.421
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252027.687
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252027.937
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252028.203
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252028.437
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252028.703
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252028.984
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252029.218
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252029.468
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252029.734
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252029.984
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252030.25
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252030.5
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252030.75
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252031.015
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252031.265
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252031.515
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252031.781
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252032.031
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252032.296
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252032.546
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252032.796
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252033.062
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252033.312
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252033.593
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252033.828
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252034.078
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252034.343
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252034.593
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252034.859
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252035.109
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252035.343
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252035.64
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252035.875
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252036.125
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252036.39
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252036.64
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252036.89
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252037.156
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252037.406
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252037.671
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252037.937
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252038.171
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252038.437
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252038.687
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252038.937
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252039.203
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252039.453
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252039.734
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252039.968
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252040.218
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252040.484
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252040.75
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252040.984
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252041.25
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252041.5
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252041.765
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252042.015
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252042.281
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252042.531
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252042.781
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252043.046
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252043.296
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252043.546
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252043.812
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252044.062
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252044.328
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252044.578
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252044.828
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252045.093
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252045.343
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252045.593
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252045.859
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252046.109
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252046.375
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252046.625
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252046.875
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252047.14
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252047.39
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252047.656
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252047.906
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252048.156
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252048.421
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252048.671
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252048.921
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252049.203
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252049.437
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252049.687
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252049.953
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252050.203
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252050.468
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252050.718
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252050.984
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252051.234
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252051.484
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252051.75
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252052.015
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252052.25
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252052.515
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252052.765
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252053.031
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252053.281
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252053.531
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252053.796
+          },
+          {
+            "phase": "body-small",
+            "type": 23,
+            "wire_payload_bytes": 1048,
+            "at": 252054.046
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252054.296
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252058.406
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252062.5
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252066.578
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252070.671
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252074.781
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252078.875
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252082.968
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252087.062
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252091.156
+          },
+          {
+            "phase": "body-large",
+            "type": 23,
+            "wire_payload_bytes": 16408,
+            "at": 252095.25
+          }
+        ],
+        "writes": [
+          {
+            "phase": "headers",
+            "plaintext_bytes": 63,
+            "at": 252024.093
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252024.093
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252024.359
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252024.609
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252024.875
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252025.125
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252025.39
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252025.64
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252025.89
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252026.156
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252026.406
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252026.656
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252026.921
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252027.171
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252027.421
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252027.687
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252027.937
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252028.203
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252028.437
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252028.703
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252028.984
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252029.218
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252029.468
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252029.734
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252029.984
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252030.25
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252030.5
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252030.75
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252031.015
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252031.265
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252031.515
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252031.781
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252032.031
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252032.296
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252032.546
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252032.796
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252033.062
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252033.312
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252033.593
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252033.828
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252034.078
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252034.343
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252034.593
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252034.859
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252035.109
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252035.343
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252035.64
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252035.875
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252036.125
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252036.39
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252036.64
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252036.89
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252037.156
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252037.406
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252037.671
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252037.937
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252038.171
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252038.437
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252038.687
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252038.937
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252039.203
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252039.453
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252039.734
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252039.968
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252040.218
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252040.484
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252040.75
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252040.984
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252041.25
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252041.5
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252041.765
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252042.015
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252042.281
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252042.531
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252042.781
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252043.046
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252043.296
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252043.546
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252043.812
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252044.062
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252044.328
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252044.578
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252044.828
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252045.093
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252045.343
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252045.593
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252045.859
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252046.109
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252046.375
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252046.625
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252046.875
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252047.14
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252047.39
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252047.656
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252047.906
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252048.156
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252048.421
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252048.671
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252048.921
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252049.203
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252049.437
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252049.687
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252049.953
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252050.203
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252050.468
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252050.718
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252050.984
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252051.234
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252051.484
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252051.75
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252052.015
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252052.25
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252052.515
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252052.765
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252053.031
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252053.281
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252053.531
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252053.796
+          },
+          {
+            "phase": "body-small",
+            "plaintext_bytes": 1024,
+            "at": 252054.046
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252054.296
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252058.406
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252062.5
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252066.578
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252070.671
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252074.781
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252078.875
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252082.968
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252087.062
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252091.156
+          },
+          {
+            "phase": "body-large",
+            "plaintext_bytes": 16384,
+            "at": 252095.25
+          }
+        ],
+        "dropped_records": 0,
+        "dropped_writes": 0,
+        "completed_socket_bytes": 306327,
+        "audio_bytes": 301056,
+        "complete": false,
+        "pacing_ratio": 1.0,
+        "version": "TLSv1.2",
+        "cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "mode": "grow",
+        "fixture": "hev2-44100-stereo",
+        "fixture_sha256": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e",
+        "started_at": 252024.093,
+        "target_audio_bytes_per_second": 4000.8691406250005
+      }
+    ]
+  },
+  "record_server_events": [
+    {
+      "records": [
+        {
+          "phase": "handshake",
+          "type": 22,
+          "wire_payload_bytes": 65,
+          "at": 252023.718
+        },
+        {
+          "phase": "handshake",
+          "type": 22,
+          "wire_payload_bytes": 807,
+          "at": 252023.718
+        },
+        {
+          "phase": "handshake",
+          "type": 22,
+          "wire_payload_bytes": 300,
+          "at": 252023.718
+        },
+        {
+          "phase": "handshake",
+          "type": 22,
+          "wire_payload_bytes": 4,
+          "at": 252023.718
+        },
+        {
+          "phase": "handshake",
+          "type": 22,
+          "wire_payload_bytes": 186,
+          "at": 252024.093
+        },
+        {
+          "phase": "handshake",
+          "type": 20,
+          "wire_payload_bytes": 1,
+          "at": 252024.093
+        },
+        {
+          "phase": "handshake",
+          "type": 22,
+          "wire_payload_bytes": 40,
+          "at": 252024.093
+        },
+        {
+          "phase": "headers",
+          "type": 23,
+          "wire_payload_bytes": 87,
+          "at": 252024.093
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252024.093
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252024.359
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252024.609
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252024.875
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252025.125
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252025.39
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252025.64
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252025.89
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252026.156
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252026.406
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252026.656
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252026.921
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252027.171
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252027.421
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252027.687
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252027.937
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252028.203
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252028.437
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252028.703
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252028.984
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252029.218
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252029.468
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252029.734
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252029.984
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252030.25
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252030.5
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252030.75
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252031.015
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252031.265
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252031.515
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252031.781
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252032.031
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252032.296
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252032.546
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252032.796
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252033.062
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252033.312
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252033.593
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252033.828
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252034.078
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252034.343
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252034.593
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252034.859
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252035.109
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252035.343
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252035.64
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252035.875
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252036.125
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252036.39
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252036.64
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252036.89
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252037.156
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252037.406
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252037.671
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252037.937
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252038.171
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252038.437
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252038.687
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252038.937
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252039.203
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252039.453
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252039.734
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252039.968
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252040.218
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252040.484
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252040.75
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252040.984
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252041.25
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252041.5
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252041.765
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252042.015
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252042.281
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252042.531
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252042.781
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252043.046
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252043.296
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252043.546
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252043.812
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252044.062
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252044.328
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252044.578
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252044.828
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252045.093
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252045.343
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252045.593
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252045.859
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252046.109
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252046.375
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252046.625
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252046.875
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252047.14
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252047.39
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252047.656
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252047.906
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252048.156
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252048.421
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252048.671
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252048.921
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252049.203
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252049.437
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252049.687
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252049.953
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252050.203
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252050.468
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252050.718
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252050.984
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252051.234
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252051.484
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252051.75
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252052.015
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252052.25
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252052.515
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252052.765
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252053.031
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252053.281
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252053.531
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252053.796
+        },
+        {
+          "phase": "body-small",
+          "type": 23,
+          "wire_payload_bytes": 1048,
+          "at": 252054.046
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252054.296
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252058.406
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252062.5
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252066.578
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252070.671
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252074.781
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252078.875
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252082.968
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252087.062
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252091.156
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252095.25
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252099.343
+        },
+        {
+          "phase": "body-large",
+          "type": 23,
+          "wire_payload_bytes": 16408,
+          "at": 252103.453
+        }
+      ],
+      "writes": [
+        {
+          "phase": "headers",
+          "plaintext_bytes": 63,
+          "at": 252024.093
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252024.093
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252024.359
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252024.609
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252024.875
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252025.125
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252025.39
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252025.64
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252025.89
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252026.156
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252026.406
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252026.656
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252026.921
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252027.171
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252027.421
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252027.687
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252027.937
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252028.203
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252028.437
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252028.703
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252028.984
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252029.218
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252029.468
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252029.734
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252029.984
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252030.25
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252030.5
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252030.75
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252031.015
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252031.265
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252031.515
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252031.781
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252032.031
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252032.296
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252032.546
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252032.796
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252033.062
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252033.312
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252033.593
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252033.828
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252034.078
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252034.343
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252034.593
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252034.859
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252035.109
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252035.343
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252035.64
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252035.875
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252036.125
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252036.39
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252036.64
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252036.89
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252037.156
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252037.406
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252037.671
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252037.937
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252038.171
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252038.437
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252038.687
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252038.937
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252039.203
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252039.453
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252039.734
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252039.968
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252040.218
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252040.484
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252040.75
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252040.984
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252041.25
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252041.5
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252041.765
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252042.015
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252042.281
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252042.531
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252042.781
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252043.046
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252043.296
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252043.546
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252043.812
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252044.062
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252044.328
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252044.578
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252044.828
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252045.093
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252045.343
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252045.593
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252045.859
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252046.109
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252046.375
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252046.625
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252046.875
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252047.14
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252047.39
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252047.656
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252047.906
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252048.156
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252048.421
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252048.671
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252048.921
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252049.203
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252049.437
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252049.687
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252049.953
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252050.203
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252050.468
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252050.718
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252050.984
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252051.234
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252051.484
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252051.75
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252052.015
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252052.25
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252052.515
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252052.765
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252053.031
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252053.281
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252053.531
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252053.796
+        },
+        {
+          "phase": "body-small",
+          "plaintext_bytes": 1024,
+          "at": 252054.046
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252054.296
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252058.406
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252062.5
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252066.578
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252070.671
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252074.781
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252078.875
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252082.968
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252087.062
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252091.156
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252095.25
+        },
+        {
+          "phase": "body-large",
+          "plaintext_bytes": 16384,
+          "at": 252099.343
+        }
+      ],
+      "dropped_records": 0,
+      "dropped_writes": 0,
+      "completed_socket_bytes": 322740,
+      "audio_bytes": 317440,
+      "complete": false,
+      "pacing_ratio": 1.0,
+      "version": "TLSv1.2",
+      "cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+      "mode": "grow",
+      "fixture": "hev2-44100-stereo",
+      "fixture_sha256": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e",
+      "started_at": 252024.093,
+      "target_audio_bytes_per_second": 4000.8691406250005,
+      "error": "ConnectionAbortedError",
+      "ended_at": 252103.453
+    }
+  ],
+  "quiet_window": {
+    "started_at": 252111.796,
+    "ended_at": 252171.796,
+    "http_polls": 0
+  },
+  "cross_phase_failures": []
+}

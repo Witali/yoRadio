@@ -1268,3 +1268,8 @@ original connection attempt, timeout and exception. Pair that port and time
 window with device events; do not count the enclosing request's repeated
 exception as another failed TCP connection. A firmware ELF audit must verify
 both input/output wrappers are actually linked into lwIP before deployment.
+
+The [first physical TCP-probe repeat](ESP32C3_WEB_TCP_PROBE_20261009.md)
+passes application checks but rejects the complete TCP trace because USB
+output loses characters and merges lines. Preserve this distinction:
+successful offline replay reproduces the failed telemetry gate too.

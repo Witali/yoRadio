@@ -1,0 +1,385 @@
+42082d06:	7179                	addi	sp,sp,-48
+42082d08:	d606                	sw	ra,44(sp)
+42082d0a:	d422                	sw	s0,40(sp)
+42082d0c:	44050063          	beqz	a0,4208314c <tcp_output+0x446>
+42082d10:	4958                	lw	a4,20(a0)
+42082d12:	4785                	li	a5,1
+42082d14:	842a                	mv	s0,a0
+42082d16:	40f70063          	beq	a4,a5,42083116 <tcp_output+0x410>
+42082d1a:	3fc9a7b7          	lui	a5,0x3fc9a
+42082d1e:	f787a783          	lw	a5,-136(a5) # 3fc99f78 <tcp_input_pcb>
+42082d22:	08a78263          	beq	a5,a0,42082da6 <tcp_output+0xa0>
+42082d26:	d226                	sw	s1,36(sp)
+42082d28:	5924                	lw	s1,112(a0)
+42082d2a:	c0d9                	beqz	s1,42082db0 <tcp_output+0xaa>
+42082d2c:	d04a                	sw	s2,32(sp)
+42082d2e:	cc52                	sw	s4,24(sp)
+42082d30:	c85a                	sw	s6,16(sp)
+42082d32:	00854783          	lbu	a5,8(a0)
+42082d36:	04c55903          	lhu	s2,76(a0)
+42082d3a:	06455a03          	lhu	s4,100(a0)
+42082d3e:	34079263          	bnez	a5,42083082 <tcp_output+0x37c>
+42082d42:	00450593          	addi	a1,a0,4
+42082d46:	0b9040ef          	jal	420875fe <ip4_route_src>
+42082d4a:	8b2a                	mv	s6,a0
+42082d4c:	360b0963          	beqz	s6,420830be <tcp_output+0x3b8>
+42082d50:	ce4e                	sw	s3,28(sp)
+42082d52:	89ca                	mv	s3,s2
+42082d54:	012a7363          	bgeu	s4,s2,42082d5a <tcp_output+0x54>
+42082d58:	89d2                	mv	s3,s4
+42082d5a:	401c                	lw	a5,0(s0)
+42082d5c:	09c2                	slli	s3,s3,0x10
+42082d5e:	0109d993          	srli	s3,s3,0x10
+42082d62:	e781                	bnez	a5,42082d6a <tcp_output+0x64>
+42082d64:	004b2783          	lw	a5,4(s6)
+42082d68:	c01c                	sw	a5,0(s0)
+42082d6a:	44dc                	lw	a5,12(s1)
+42082d6c:	43c8                	lw	a0,4(a5)
+42082d6e:	b96fa0ef          	jal	4207d104 <lwip_htonl>
+42082d72:	0084d783          	lhu	a5,8(s1)
+42082d76:	4438                	lw	a4,72(s0)
+42082d78:	8f99                	sub	a5,a5,a4
+42082d7a:	97aa                	add	a5,a5,a0
+42082d7c:	04f9f663          	bgeu	s3,a5,42082dc8 <tcp_output+0xc2>
+42082d80:	06445783          	lhu	a5,100(s0)
+42082d84:	2d378663          	beq	a5,s3,42083050 <tcp_output+0x34a>
+42082d88:	01e45783          	lhu	a5,30(s0)
+42082d8c:	0027f713          	andi	a4,a5,2
+42082d90:	2c071e63          	bnez	a4,4208306c <tcp_output+0x366>
+42082d94:	5492                	lw	s1,36(sp)
+42082d96:	f7f7f793          	andi	a5,a5,-129
+42082d9a:	5902                	lw	s2,32(sp)
+42082d9c:	49f2                	lw	s3,28(sp)
+42082d9e:	4a62                	lw	s4,24(sp)
+42082da0:	4b42                	lw	s6,16(sp)
+42082da2:	00f41f23          	sh	a5,30(s0)
+42082da6:	4501                	li	a0,0
+42082da8:	5422                	lw	s0,40(sp)
+42082daa:	50b2                	lw	ra,44(sp)
+42082dac:	6145                	addi	sp,sp,48
+42082dae:	8082                	ret
+42082db0:	01e55783          	lhu	a5,30(a0)
+42082db4:	0027f713          	andi	a4,a5,2
+42082db8:	2c071a63          	bnez	a4,4208308c <tcp_output+0x386>
+42082dbc:	f7f7f793          	andi	a5,a5,-129
+42082dc0:	5492                	lw	s1,36(sp)
+42082dc2:	00f41f23          	sh	a5,30(s0)
+42082dc6:	b7c5                	j	42082da6 <tcp_output+0xa0>
+42082dc8:	587c                	lw	a5,116(s0)
+42082dca:	c65e                	sw	s7,12(sp)
+42082dcc:	c462                	sw	s8,8(sp)
+42082dce:	c266                	sw	s9,4(sp)
+42082dd0:	0a0402a3          	sb	zero,165(s0)
+42082dd4:	4a01                	li	s4,0
+42082dd6:	c781                	beqz	a5,42082dde <tcp_output+0xd8>
+42082dd8:	8a3e                	mv	s4,a5
+42082dda:	439c                	lw	a5,0(a5)
+42082ddc:	fff5                	bnez	a5,42082dd8 <tcp_output+0xd2>
+42082dde:	4909                	li	s2,2
+42082de0:	4b85                	li	s7,1
+42082de2:	44dc                	lw	a5,12(s1)
+42082de4:	43c8                	lw	a0,4(a5)
+42082de6:	b1efa0ef          	jal	4207d104 <lwip_htonl>
+42082dea:	4438                	lw	a4,72(s0)
+42082dec:	0084d783          	lhu	a5,8(s1)
+42082df0:	8d19                	sub	a0,a0,a4
+42082df2:	953e                	add	a0,a0,a5
+42082df4:	2aa9e263          	bltu	s3,a0,42083098 <tcp_output+0x392>
+42082df8:	44dc                	lw	a5,12(s1)
+42082dfa:	00c7d503          	lhu	a0,12(a5)
+42082dfe:	af8fa0ef          	jal	4207d0f6 <lwip_htons>
+42082e02:	8911                	andi	a0,a0,4
+42082e04:	2c051363          	bnez	a0,420830ca <tcp_output+0x3c4>
+42082e08:	587c                	lw	a5,116(s0)
+42082e0a:	cf81                	beqz	a5,42082e22 <tcp_output+0x11c>
+42082e0c:	01e45783          	lhu	a5,30(s0)
+42082e10:	0447f713          	andi	a4,a5,68
+42082e14:	e719                	bnez	a4,42082e22 <tcp_output+0x11c>
+42082e16:	5838                	lw	a4,112(s0)
+42082e18:	1c070b63          	beqz	a4,42082fee <tcp_output+0x2e8>
+42082e1c:	4314                	lw	a3,0(a4)
+42082e1e:	1c068263          	beqz	a3,42082fe2 <tcp_output+0x2dc>
+42082e22:	485c                	lw	a5,20(s0)
+42082e24:	00c4ac03          	lw	s8,12(s1)
+42082e28:	01278d63          	beq	a5,s2,42082e42 <tcp_output+0x13c>
+42082e2c:	00cc5c83          	lhu	s9,12(s8)
+42082e30:	4541                	li	a0,16
+42082e32:	ac4fa0ef          	jal	4207d0f6 <lwip_htons>
+42082e36:	00c4ac03          	lw	s8,12(s1)
+42082e3a:	00acecb3          	or	s9,s9,a0
+42082e3e:	019c1623          	sh	s9,12(s8)
+42082e42:	40dc                	lw	a5,4(s1)
+42082e44:	00e7c783          	lbu	a5,14(a5)
+42082e48:	0b779d63          	bne	a5,s7,42082f02 <tcp_output+0x1fc>
+42082e4c:	5408                	lw	a0,40(s0)
+42082e4e:	ab6fa0ef          	jal	4207d104 <lwip_htonl>
+42082e52:	87aa                	mv	a5,a0
+42082e54:	02e45503          	lhu	a0,46(s0)
+42082e58:	00fc2423          	sw	a5,8(s8)
+42082e5c:	00c4ac03          	lw	s8,12(s1)
+42082e60:	a96fa0ef          	jal	4207d0f6 <lwip_htons>
+42082e64:	02e45703          	lhu	a4,46(s0)
+42082e68:	541c                	lw	a5,40(s0)
+42082e6a:	00ac1723          	sh	a0,14(s8)
+42082e6e:	00c4ac03          	lw	s8,12(s1)
+42082e72:	97ba                	add	a5,a5,a4
+42082e74:	d81c                	sw	a5,48(s0)
+42082e76:	00a4c783          	lbu	a5,10(s1)
+42082e7a:	014c0c93          	addi	s9,s8,20
+42082e7e:	8b85                	andi	a5,a5,1
+42082e80:	12079163          	bnez	a5,42082fa2 <tcp_output+0x29c>
+42082e84:	03441783          	lh	a5,52(s0)
+42082e88:	0007d463          	bgez	a5,42082e90 <tcp_output+0x18a>
+42082e8c:	02041a23          	sh	zero,52(s0)
+42082e90:	5c1c                	lw	a5,56(s0)
+42082e92:	12078b63          	beqz	a5,42082fc8 <tcp_output+0x2c2>
+42082e96:	40c8                	lw	a0,4(s1)
+42082e98:	415c                	lw	a5,4(a0)
+42082e9a:	00855603          	lhu	a2,8(a0)
+42082e9e:	00a55703          	lhu	a4,10(a0)
+42082ea2:	40fc07b3          	sub	a5,s8,a5
+42082ea6:	8e1d                	sub	a2,a2,a5
+42082ea8:	0642                	slli	a2,a2,0x10
+42082eaa:	40f707b3          	sub	a5,a4,a5
+42082eae:	8241                	srli	a2,a2,0x10
+42082eb0:	01852223          	sw	s8,4(a0)
+42082eb4:	00f51523          	sh	a5,10(a0)
+42082eb8:	00c51423          	sh	a2,8(a0)
+42082ebc:	000c1823          	sh	zero,16(s8)
+42082ec0:	00a4c783          	lbu	a5,10(s1)
+42082ec4:	8b85                	andi	a5,a5,1
+42082ec6:	17fd                	addi	a5,a5,-1
+42082ec8:	9bf1                	andi	a5,a5,-4
+42082eca:	07e1                	addi	a5,a5,24
+42082ecc:	97e2                	add	a5,a5,s8
+42082ece:	22fc9163          	bne	s9,a5,420830f0 <tcp_output+0x3ea>
+42082ed2:	00440713          	addi	a4,s0,4
+42082ed6:	86a2                	mv	a3,s0
+42082ed8:	4599                	li	a1,6
+42082eda:	222080ef          	jal	4208b0fc <ip_chksum_pseudo>
+42082ede:	00ac1823          	sh	a0,16(s8)
+42082ee2:	00a44703          	lbu	a4,10(s0)
+42082ee6:	00b44683          	lbu	a3,11(s0)
+42082eea:	40c8                	lw	a0,4(s1)
+42082eec:	885a                	mv	a6,s6
+42082eee:	00440613          	addi	a2,s0,4
+42082ef2:	85a2                	mv	a1,s0
+42082ef4:	4799                	li	a5,6
+42082ef6:	ae99f0ef          	jal	420229de <__wrap_ip4_output_if>
+42082efa:	1a051363          	bnez	a0,420830a0 <tcp_output+0x39a>
+42082efe:	00c4ac03          	lw	s8,12(s1)
+42082f02:	4098                	lw	a4,0(s1)
+42082f04:	485c                	lw	a5,20(s0)
+42082f06:	d838                	sw	a4,112(s0)
+42082f08:	01278763          	beq	a5,s2,42082f16 <tcp_output+0x210>
+42082f0c:	01e45783          	lhu	a5,30(s0)
+42082f10:	9bf1                	andi	a5,a5,-4
+42082f12:	00f41f23          	sh	a5,30(s0)
+42082f16:	004c2503          	lw	a0,4(s8)
+42082f1a:	9eafa0ef          	jal	4207d104 <lwip_htonl>
+42082f1e:	44dc                	lw	a5,12(s1)
+42082f20:	0084dc83          	lhu	s9,8(s1)
+42082f24:	01950c33          	add	s8,a0,s9
+42082f28:	00c7d503          	lhu	a0,12(a5)
+42082f2c:	9cafa0ef          	jal	4207d0f6 <lwip_htons>
+42082f30:	4878                	lw	a4,84(s0)
+42082f32:	00357793          	andi	a5,a0,3
+42082f36:	00f037b3          	snez	a5,a5
+42082f3a:	97e2                	add	a5,a5,s8
+42082f3c:	8f1d                	sub	a4,a4,a5
+42082f3e:	00075363          	bgez	a4,42082f44 <tcp_output+0x23e>
+42082f42:	c87c                	sw	a5,84(s0)
+42082f44:	44dc                	lw	a5,12(s1)
+42082f46:	0084dc03          	lhu	s8,8(s1)
+42082f4a:	00c7d503          	lhu	a0,12(a5)
+42082f4e:	9a8fa0ef          	jal	4207d0f6 <lwip_htons>
+42082f52:	890d                	andi	a0,a0,3
+42082f54:	00ac6c33          	or	s8,s8,a0
+42082f58:	040c0163          	beqz	s8,42082f9a <tcp_output+0x294>
+42082f5c:	587c                	lw	a5,116(s0)
+42082f5e:	0004a023          	sw	zero,0(s1)
+42082f62:	cb95                	beqz	a5,42082f96 <tcp_output+0x290>
+42082f64:	44dc                	lw	a5,12(s1)
+42082f66:	43c8                	lw	a0,4(a5)
+42082f68:	99cfa0ef          	jal	4207d104 <lwip_htonl>
+42082f6c:	00ca2783          	lw	a5,12(s4)
+42082f70:	8c2a                	mv	s8,a0
+42082f72:	43c8                	lw	a0,4(a5)
+42082f74:	990fa0ef          	jal	4207d104 <lwip_htonl>
+42082f78:	40ac0c33          	sub	s8,s8,a0
+42082f7c:	080c4f63          	bltz	s8,4208301a <tcp_output+0x314>
+42082f80:	009a2023          	sw	s1,0(s4)
+42082f84:	8a26                	mv	s4,s1
+42082f86:	5824                	lw	s1,112(s0)
+42082f88:	e4049de3          	bnez	s1,42082de2 <tcp_output+0xdc>
+42082f8c:	01e45783          	lhu	a5,30(s0)
+42082f90:	06041623          	sh	zero,108(s0)
+42082f94:	a89d                	j	4208300a <tcp_output+0x304>
+42082f96:	d864                	sw	s1,116(s0)
+42082f98:	b7f5                	j	42082f84 <tcp_output+0x27e>
+42082f9a:	8526                	mv	a0,s1
+42082f9c:	318060ef          	jal	420892b4 <tcp_seg_free>
+42082fa0:	b7dd                	j	42082f86 <tcp_output+0x280>
+42082fa2:	00440613          	addi	a2,s0,4
+42082fa6:	85da                	mv	a1,s6
+42082fa8:	5a000513          	li	a0,1440
+42082fac:	516070ef          	jal	4208a4c2 <tcp_eff_send_mss_netif>
+42082fb0:	020407b7          	lui	a5,0x2040
+42082fb4:	8d5d                	or	a0,a0,a5
+42082fb6:	94efa0ef          	jal	4207d104 <lwip_htonl>
+42082fba:	00ac2a23          	sw	a0,20(s8)
+42082fbe:	018c0c93          	addi	s9,s8,24
+42082fc2:	00c4ac03          	lw	s8,12(s1)
+42082fc6:	bd7d                	j	42082e84 <tcp_output+0x17e>
+42082fc8:	3fc9a7b7          	lui	a5,0x3fc9a
+42082fcc:	ff07a783          	lw	a5,-16(a5) # 3fc99ff0 <tcp_ticks>
+42082fd0:	004c2503          	lw	a0,4(s8)
+42082fd4:	dc1c                	sw	a5,56(s0)
+42082fd6:	92efa0ef          	jal	4207d104 <lwip_htonl>
+42082fda:	00c4ac03          	lw	s8,12(s1)
+42082fde:	dc48                	sw	a0,60(s0)
+42082fe0:	bd5d                	j	42082e96 <tcp_output+0x190>
+42082fe2:	00875603          	lhu	a2,8(a4)
+42082fe6:	03645683          	lhu	a3,54(s0)
+42082fea:	e2d67ce3          	bgeu	a2,a3,42082e22 <tcp_output+0x11c>
+42082fee:	06845683          	lhu	a3,104(s0)
+42082ff2:	e20688e3          	beqz	a3,42082e22 <tcp_output+0x11c>
+42082ff6:	06a45683          	lhu	a3,106(s0)
+42082ffa:	463d                	li	a2,15
+42082ffc:	e2d663e3          	bltu	a2,a3,42082e22 <tcp_output+0x11c>
+42083000:	0a07f693          	andi	a3,a5,160
+42083004:	e0069fe3          	bnez	a3,42082e22 <tcp_output+0x11c>
+42083008:	d741                	beqz	a4,42082f90 <tcp_output+0x28a>
+4208300a:	5902                	lw	s2,32(sp)
+4208300c:	49f2                	lw	s3,28(sp)
+4208300e:	4a62                	lw	s4,24(sp)
+42083010:	4b42                	lw	s6,16(sp)
+42083012:	4bb2                	lw	s7,12(sp)
+42083014:	4c22                	lw	s8,8(sp)
+42083016:	4c92                	lw	s9,4(sp)
+42083018:	b355                	j	42082dbc <tcp_output+0xb6>
+4208301a:	587c                	lw	a5,116(s0)
+4208301c:	07440c93          	addi	s9,s0,116
+42083020:	e789                	bnez	a5,4208302a <tcp_output+0x324>
+42083022:	a01d                	j	42083048 <tcp_output+0x342>
+42083024:	8cbe                	mv	s9,a5
+42083026:	439c                	lw	a5,0(a5)
+42083028:	c385                	beqz	a5,42083048 <tcp_output+0x342>
+4208302a:	47dc                	lw	a5,12(a5)
+4208302c:	43c8                	lw	a0,4(a5)
+4208302e:	8d6fa0ef          	jal	4207d104 <lwip_htonl>
+42083032:	44dc                	lw	a5,12(s1)
+42083034:	8c2a                	mv	s8,a0
+42083036:	43c8                	lw	a0,4(a5)
+42083038:	8ccfa0ef          	jal	4207d104 <lwip_htonl>
+4208303c:	40ac0c33          	sub	s8,s8,a0
+42083040:	000ca783          	lw	a5,0(s9)
+42083044:	fe0c40e3          	bltz	s8,42083024 <tcp_output+0x31e>
+42083048:	c09c                	sw	a5,0(s1)
+4208304a:	009ca023          	sw	s1,0(s9)
+4208304e:	bf25                	j	42082f86 <tcp_output+0x280>
+42083050:	587c                	lw	a5,116(s0)
+42083052:	d2079be3          	bnez	a5,42082d88 <tcp_output+0x82>
+42083056:	0a544783          	lbu	a5,165(s0)
+4208305a:	d20797e3          	bnez	a5,42082d88 <tcp_output+0x82>
+4208305e:	10000793          	li	a5,256
+42083062:	0a040323          	sb	zero,166(s0)
+42083066:	0af41223          	sh	a5,164(s0)
+4208306a:	bb39                	j	42082d88 <tcp_output+0x82>
+4208306c:	8522                	mv	a0,s0
+4208306e:	5422                	lw	s0,40(sp)
+42083070:	5492                	lw	s1,36(sp)
+42083072:	5902                	lw	s2,32(sp)
+42083074:	49f2                	lw	s3,28(sp)
+42083076:	4a62                	lw	s4,24(sp)
+42083078:	4b42                	lw	s6,16(sp)
+4208307a:	50b2                	lw	ra,44(sp)
+4208307c:	6145                	addi	sp,sp,48
+4208307e:	bf1ff06f          	j	42082c6e <tcp_send_empty_ack>
+42083082:	853e                	mv	a0,a5
+42083084:	b6ffb0ef          	jal	4207ebf2 <netif_get_by_index>
+42083088:	8b2a                	mv	s6,a0
+4208308a:	b1c9                	j	42082d4c <tcp_output+0x46>
+4208308c:	5422                	lw	s0,40(sp)
+4208308e:	5492                	lw	s1,36(sp)
+42083090:	50b2                	lw	ra,44(sp)
+42083092:	6145                	addi	sp,sp,48
+42083094:	bdbff06f          	j	42082c6e <tcp_send_empty_ack>
+42083098:	5838                	lw	a4,112(s0)
+4208309a:	01e45783          	lhu	a5,30(s0)
+4208309e:	b7ad                	j	42083008 <tcp_output+0x302>
+420830a0:	01e45783          	lhu	a5,30(s0)
+420830a4:	5492                	lw	s1,36(sp)
+420830a6:	5902                	lw	s2,32(sp)
+420830a8:	0807e793          	ori	a5,a5,128
+420830ac:	49f2                	lw	s3,28(sp)
+420830ae:	4a62                	lw	s4,24(sp)
+420830b0:	4b42                	lw	s6,16(sp)
+420830b2:	4bb2                	lw	s7,12(sp)
+420830b4:	4c22                	lw	s8,8(sp)
+420830b6:	4c92                	lw	s9,4(sp)
+420830b8:	00f41f23          	sh	a5,30(s0)
+420830bc:	b1f5                	j	42082da8 <tcp_output+0xa2>
+420830be:	5492                	lw	s1,36(sp)
+420830c0:	5902                	lw	s2,32(sp)
+420830c2:	4a62                	lw	s4,24(sp)
+420830c4:	4b42                	lw	s6,16(sp)
+420830c6:	5571                	li	a0,-4
+420830c8:	b1c5                	j	42082da8 <tcp_output+0xa2>
+420830ca:	3c1336b7          	lui	a3,0x3c133
+420830ce:	3c176637          	lui	a2,0x3c176
+420830d2:	3c133537          	lui	a0,0x3c133
+420830d6:	d9c68693          	addi	a3,a3,-612 # 3c132d9c <_esp_libc_clock_array_end+0x12c4c>
+420830da:	a9860613          	addi	a2,a2,-1384 # 3c175a98 <__func__.16>
+420830de:	95c50513          	addi	a0,a0,-1700 # 3c13295c <_esp_libc_clock_array_end+0x1280c>
+420830e2:	53a00593          	li	a1,1338
+420830e6:	ca56                	sw	s5,20(sp)
+420830e8:	fe304097          	auipc	ra,0xfe304
+420830ec:	974080e7          	jalr	-1676(ra) # 40386a5c <__assert_func>
+420830f0:	3c1336b7          	lui	a3,0x3c133
+420830f4:	3c176637          	lui	a2,0x3c176
+420830f8:	3c133537          	lui	a0,0x3c133
+420830fc:	db468693          	addi	a3,a3,-588 # 3c132db4 <_esp_libc_clock_array_end+0x12c64>
+42083100:	a8460613          	addi	a2,a2,-1404 # 3c175a84 <__func__.15>
+42083104:	95c50513          	addi	a0,a0,-1700 # 3c13295c <_esp_libc_clock_array_end+0x1280c>
+42083108:	62000593          	li	a1,1568
+4208310c:	ca56                	sw	s5,20(sp)
+4208310e:	fe304097          	auipc	ra,0xfe304
+42083112:	94e080e7          	jalr	-1714(ra) # 40386a5c <__assert_func>
+42083116:	3c1336b7          	lui	a3,0x3c133
+4208311a:	3c176637          	lui	a2,0x3c176
+4208311e:	3c133537          	lui	a0,0x3c133
+42083122:	d7468693          	addi	a3,a3,-652 # 3c132d74 <_esp_libc_clock_array_end+0x12c24>
+42083126:	a9860613          	addi	a2,a2,-1384 # 3c175a98 <__func__.16>
+4208312a:	95c50513          	addi	a0,a0,-1700 # 3c13295c <_esp_libc_clock_array_end+0x1280c>
+4208312e:	4e700593          	li	a1,1255
+42083132:	d226                	sw	s1,36(sp)
+42083134:	d04a                	sw	s2,32(sp)
+42083136:	ce4e                	sw	s3,28(sp)
+42083138:	cc52                	sw	s4,24(sp)
+4208313a:	ca56                	sw	s5,20(sp)
+4208313c:	c85a                	sw	s6,16(sp)
+4208313e:	c65e                	sw	s7,12(sp)
+42083140:	c462                	sw	s8,8(sp)
+42083142:	c266                	sw	s9,4(sp)
+42083144:	fe304097          	auipc	ra,0xfe304
+42083148:	918080e7          	jalr	-1768(ra) # 40386a5c <__assert_func>
+4208314c:	3c1336b7          	lui	a3,0x3c133
+42083150:	3c176637          	lui	a2,0x3c176
+42083154:	3c133537          	lui	a0,0x3c133
+42083158:	d5c68693          	addi	a3,a3,-676 # 3c132d5c <_esp_libc_clock_array_end+0x12c0c>
+4208315c:	a9860613          	addi	a2,a2,-1384 # 3c175a98 <__func__.16>
+42083160:	95c50513          	addi	a0,a0,-1700 # 3c13295c <_esp_libc_clock_array_end+0x1280c>
+42083164:	4e500593          	li	a1,1253
+42083168:	d226                	sw	s1,36(sp)
+4208316a:	d04a                	sw	s2,32(sp)
+4208316c:	ce4e                	sw	s3,28(sp)
+4208316e:	cc52                	sw	s4,24(sp)
+42083170:	ca56                	sw	s5,20(sp)
+42083172:	c85a                	sw	s6,16(sp)
+42083174:	c65e                	sw	s7,12(sp)
+42083176:	c462                	sw	s8,8(sp)
+42083178:	c266                	sw	s9,4(sp)
+4208317a:	fe304097          	auipc	ra,0xfe304
+4208317e:	8e2080e7          	jalr	-1822(ra) # 40386a5c <__assert_func>
+

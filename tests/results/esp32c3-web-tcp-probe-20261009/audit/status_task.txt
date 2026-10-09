@@ -1,0 +1,556 @@
+420209aa:	3fc91637          	lui	a2,0x3fc91
+420209ae:	3c12a6b7          	lui	a3,0x3c12a
+420209b2:	3fc91737          	lui	a4,0x3fc91
+420209b6:	3fc917b7          	lui	a5,0x3fc91
+420209ba:	7111                	addi	sp,sp,-256
+420209bc:	f5860613          	addi	a2,a2,-168 # 3fc90f58 <s_previous_status_key>
+420209c0:	b1068693          	addi	a3,a3,-1264 # 3c129b10 <_esp_libc_clock_array_end+0x99c0>
+420209c4:	13470713          	addi	a4,a4,308 # 3fc91134 <s_broadcast_status>
+420209c8:	f5078793          	addi	a5,a5,-176 # 3fc90f50 <s_current_status_key+0x1a4>
+420209cc:	d9ca                	sw	s2,240(sp)
+420209ce:	d7ce                	sw	s3,236(sp)
+420209d0:	cfde                	sw	s7,220(sp)
+420209d2:	cde2                	sw	s8,216(sp)
+420209d4:	cbe6                	sw	s9,212(sp)
+420209d6:	c9ea                	sw	s10,208(sp)
+420209d8:	c7ee                	sw	s11,204(sp)
+420209da:	df86                	sw	ra,252(sp)
+420209dc:	dda2                	sw	s0,248(sp)
+420209de:	dba6                	sw	s1,244(sp)
+420209e0:	d5d2                	sw	s4,232(sp)
+420209e2:	d3d6                	sw	s5,228(sp)
+420209e4:	d1da                	sw	s6,224(sp)
+420209e6:	dc82                	sw	zero,120(sp)
+420209e8:	de82                	sw	zero,124(sp)
+420209ea:	c102                	sw	zero,128(sp)
+420209ec:	c302                	sw	zero,132(sp)
+420209ee:	c502                	sw	zero,136(sp)
+420209f0:	c702                	sw	zero,140(sp)
+420209f2:	c902                	sw	zero,144(sp)
+420209f4:	cb02                	sw	zero,148(sp)
+420209f6:	c2b2                	sw	a2,68(sp)
+420209f8:	ccb6                	sw	a3,88(sp)
+420209fa:	ceba                	sw	a4,92(sp)
+420209fc:	c6be                	sw	a5,76(sp)
+420209fe:	4b81                	li	s7,0
+42020a00:	4c01                	li	s8,0
+42020a02:	4c81                	li	s9,0
+42020a04:	4901                	li	s2,0
+42020a06:	d802                	sw	zero,48(sp)
+42020a08:	4d01                	li	s10,0
+42020a0a:	4d81                	li	s11,0
+42020a0c:	da02                	sw	zero,52(sp)
+42020a0e:	de02                	sw	zero,60(sp)
+42020a10:	3fc9a9b7          	lui	s3,0x3fc9a
+42020a14:	06400513          	li	a0,100
+42020a18:	7f6fa0ef          	jal	4211b20e <vTaskDelay>
+42020a1c:	fe361097          	auipc	ra,0xfe361
+42020a20:	9b8080e7          	jalr	-1608(ra) # 403813d4 <esp_timer_get_time>
+42020a24:	d62a                	sw	a0,44(sp)
+42020a26:	8b2e                	mv	s6,a1
+42020a28:	148020ef          	jal	42022b70 <web_tcp_probe_poll>
+42020a2c:	c3dff0ef          	jal	42020668 <capture_status_key.constprop.0>
+42020a30:	fe368097          	auipc	ra,0xfe368
+42020a34:	0d4080e7          	jalr	212(ra) # 40388b04 <xTaskGetTickCount>
+42020a38:	57f2                	lw	a5,60(sp)
+42020a3a:	dc2a                	sw	a0,56(sp)
+42020a3c:	4485                	li	s1,1
+42020a3e:	cf91                	beqz	a5,42020a5a <status_task+0xb0>
+42020a40:	4596                	lw	a1,68(sp)
+42020a42:	3fc917b7          	lui	a5,0x3fc91
+42020a46:	1ac00613          	li	a2,428
+42020a4a:	dac78513          	addi	a0,a5,-596 # 3fc90dac <s_current_status_key>
+42020a4e:	fe366097          	auipc	ra,0xfe366
+42020a52:	148080e7          	jalr	328(ra) # 40386b96 <memcmp>
+42020a56:	00a034b3          	snez	s1,a0
+42020a5a:	57d2                	lw	a5,52(sp)
+42020a5c:	4615                	li	a2,5
+42020a5e:	4581                	li	a1,0
+42020a60:	18078e63          	beqz	a5,42020bfc <status_task+0x252>
+42020a64:	3fc9a7b7          	lui	a5,0x3fc9a
+42020a68:	da478513          	addi	a0,a5,-604 # 3fc99da4 <s_playlist_changed_pending>
+42020a6c:	fe366097          	auipc	ra,0xfe366
+42020a70:	30a080e7          	jalr	778(ra) # 40386d76 <__atomic_exchange_1>
+42020a74:	57e2                	lw	a5,56(sp)
+42020a76:	5752                	lw	a4,52(sp)
+42020a78:	d402                	sw	zero,40(sp)
+42020a7a:	4a01                	li	s4,0
+42020a7c:	40e78433          	sub	s0,a5,a4
+42020a80:	7d043413          	sltiu	s0,s0,2000
+42020a84:	00143413          	seqz	s0,s0
+42020a88:	009467b3          	or	a5,s0,s1
+42020a8c:	c0be                	sw	a5,64(sp)
+42020a8e:	36051a63          	bnez	a0,42020e02 <status_task+0x458>
+42020a92:	4786                	lw	a5,64(sp)
+42020a94:	18079063          	bnez	a5,42020c14 <status_task+0x26a>
+42020a98:	fe361097          	auipc	ra,0xfe361
+42020a9c:	93c080e7          	jalr	-1732(ra) # 403813d4 <esp_timer_get_time>
+42020aa0:	01bd67b3          	or	a5,s10,s11
+42020aa4:	842a                	mv	s0,a0
+42020aa6:	8aae                	mv	s5,a1
+42020aa8:	e399                	bnez	a5,42020aae <status_task+0x104>
+42020aaa:	5d32                	lw	s10,44(sp)
+42020aac:	8dda                	mv	s11,s6
+42020aae:	57a2                	lw	a5,40(sp)
+42020ab0:	41a40633          	sub	a2,s0,s10
+42020ab4:	9c52                	add	s8,s8,s4
+42020ab6:	9bbe                	add	s7,s7,a5
+42020ab8:	57b2                	lw	a5,44(sp)
+42020aba:	0c85                	addi	s9,s9,1
+42020abc:	40f404b3          	sub	s1,s0,a5
+42020ac0:	00943733          	sltu	a4,s0,s1
+42020ac4:	416a87b3          	sub	a5,s5,s6
+42020ac8:	8f99                	sub	a5,a5,a4
+42020aca:	5742                	lw	a4,48(sp)
+42020acc:	94ca                	add	s1,s1,s2
+42020ace:	0124bb33          	sltu	s6,s1,s2
+42020ad2:	97ba                	add	a5,a5,a4
+42020ad4:	9b3e                	add	s6,s6,a5
+42020ad6:	00c43733          	sltu	a4,s0,a2
+42020ada:	41ba87b3          	sub	a5,s5,s11
+42020ade:	d85a                	sw	s6,48(sp)
+42020ae0:	8926                	mv	s2,s1
+42020ae2:	40e786b3          	sub	a3,a5,a4
+42020ae6:	00e79863          	bne	a5,a4,42020af6 <status_task+0x14c>
+42020aea:	004c57b7          	lui	a5,0x4c5
+42020aee:	b3f78793          	addi	a5,a5,-1217 # 4c4b3f <_rtc_slow_length+0x4c3063>
+42020af2:	f2c7f1e3          	bgeu	a5,a2,42020a14 <status_task+0x6a>
+42020af6:	3e800513          	li	a0,1000
+42020afa:	02a4b7b3          	mulhu	a5,s1,a0
+42020afe:	02ab05b3          	mul	a1,s6,a0
+42020b02:	02a48533          	mul	a0,s1,a0
+42020b06:	95be                	add	a1,a1,a5
+42020b08:	fdfe0097          	auipc	ra,0xfdfe0
+42020b0c:	da4080e7          	jalr	-604(ra) # 400008ac <__udivdi3>
+42020b10:	892a                	mv	s2,a0
+42020b12:	8a2e                	mv	s4,a1
+42020b14:	fe369097          	auipc	ra,0xfe369
+42020b18:	98a080e7          	jalr	-1654(ra) # 4038949e <esp_log_timestamp>
+42020b1c:	012a07b3          	add	a5,s4,s2
+42020b20:	0127b733          	sltu	a4,a5,s2
+42020b24:	ccccd5b7          	lui	a1,0xccccd
+42020b28:	ccd58593          	addi	a1,a1,-819 # cccccccd <SYSTEM+0x6cc0cccd>
+42020b2c:	97ba                	add	a5,a5,a4
+42020b2e:	02b7b633          	mulhu	a2,a5,a1
+42020b32:	86aa                	mv	a3,a0
+42020b34:	ccccd337          	lui	t1,0xccccd
+42020b38:	ccc30313          	addi	t1,t1,-820 # cccccccc <SYSTEM+0x6cc0cccc>
+42020b3c:	3fc9a737          	lui	a4,0x3fc9a
+42020b40:	d9872703          	lw	a4,-616(a4) # 3fc99d98 <s_last_ws_clients>
+42020b44:	cc5e                	sw	s7,24(sp)
+42020b46:	ca62                	sw	s8,20(sp)
+42020b48:	ce3a                	sw	a4,28(sp)
+42020b4a:	3c12a737          	lui	a4,0x3c12a
+42020b4e:	00265513          	srli	a0,a2,0x2
+42020b52:	9a71                	andi	a2,a2,-4
+42020b54:	962a                	add	a2,a2,a0
+42020b56:	8f91                	sub	a5,a5,a2
+42020b58:	40f907b3          	sub	a5,s2,a5
+42020b5c:	00f93633          	sltu	a2,s2,a5
+42020b60:	40ca0633          	sub	a2,s4,a2
+42020b64:	02678333          	mul	t1,a5,t1
+42020b68:	98870713          	addi	a4,a4,-1656 # 3c129988 <_esp_libc_clock_array_end+0x9838>
+42020b6c:	c866                	sw	s9,16(sp)
+42020b6e:	8826                	mv	a6,s1
+42020b70:	88da                	mv	a7,s6
+42020b72:	4b81                	li	s7,0
+42020b74:	4c01                	li	s8,0
+42020b76:	4c81                	li	s9,0
+42020b78:	02b60633          	mul	a2,a2,a1
+42020b7c:	02b7b533          	mulhu	a0,a5,a1
+42020b80:	961a                	add	a2,a2,t1
+42020b82:	02b787b3          	mul	a5,a5,a1
+42020b86:	962a                	add	a2,a2,a0
+42020b88:	01f61513          	slli	a0,a2,0x1f
+42020b8c:	8205                	srli	a2,a2,0x1
+42020b8e:	00261313          	slli	t1,a2,0x2
+42020b92:	c232                	sw	a2,4(sp)
+42020b94:	85ba                	mv	a1,a4
+42020b96:	8385                	srli	a5,a5,0x1
+42020b98:	97aa                	add	a5,a5,a0
+42020b9a:	01e7de13          	srli	t3,a5,0x1e
+42020b9e:	00279513          	slli	a0,a5,0x2
+42020ba2:	9372                	add	t1,t1,t3
+42020ba4:	9332                	add	t1,t1,a2
+42020ba6:	00f50633          	add	a2,a0,a5
+42020baa:	c03e                	sw	a5,0(sp)
+42020bac:	00a637b3          	sltu	a5,a2,a0
+42020bb0:	979a                	add	a5,a5,t1
+42020bb2:	00161513          	slli	a0,a2,0x1
+42020bb6:	0786                	slli	a5,a5,0x1
+42020bb8:	827d                	srli	a2,a2,0x1f
+42020bba:	40a90533          	sub	a0,s2,a0
+42020bbe:	97b2                	add	a5,a5,a2
+42020bc0:	00a93933          	sltu	s2,s2,a0
+42020bc4:	40fa0a33          	sub	s4,s4,a5
+42020bc8:	412a0a33          	sub	s4,s4,s2
+42020bcc:	3c12a7b7          	lui	a5,0x3c12a
+42020bd0:	c42a                	sw	a0,8(sp)
+42020bd2:	c652                	sw	s4,12(sp)
+42020bd4:	b4078613          	addi	a2,a5,-1216 # 3c129b40 <_esp_libc_clock_array_end+0x99f0>
+42020bd8:	450d                	li	a0,3
+42020bda:	fe368097          	auipc	ra,0xfe368
+42020bde:	7bc080e7          	jalr	1980(ra) # 40389396 <esp_log>
+42020be2:	4901                	li	s2,0
+42020be4:	dcea                	sw	s10,120(sp)
+42020be6:	deee                	sw	s11,124(sp)
+42020be8:	c102                	sw	zero,128(sp)
+42020bea:	c302                	sw	zero,132(sp)
+42020bec:	c502                	sw	zero,136(sp)
+42020bee:	c702                	sw	zero,140(sp)
+42020bf0:	c902                	sw	zero,144(sp)
+42020bf2:	cb02                	sw	zero,148(sp)
+42020bf4:	8d22                	mv	s10,s0
+42020bf6:	8dd6                	mv	s11,s5
+42020bf8:	d802                	sw	zero,48(sp)
+42020bfa:	bd29                	j	42020a14 <status_task+0x6a>
+42020bfc:	3fc9a7b7          	lui	a5,0x3fc9a
+42020c00:	da478513          	addi	a0,a5,-604 # 3fc99da4 <s_playlist_changed_pending>
+42020c04:	fe366097          	auipc	ra,0xfe366
+42020c08:	172080e7          	jalr	370(ra) # 40386d76 <__atomic_exchange_1>
+42020c0c:	1e051963          	bnez	a0,42020dfe <status_task+0x454>
+42020c10:	d402                	sw	zero,40(sp)
+42020c12:	4a01                	li	s4,0
+42020c14:	3fc9a7b7          	lui	a5,0x3fc9a
+42020c18:	da078793          	addi	a5,a5,-608 # 3fc99da0 <s_status_send_pending>
+42020c1c:	0330000f          	fence	rw,rw
+42020c20:	439c                	lw	a5,0(a5)
+42020c22:	0230000f          	fence	r,rw
+42020c26:	c0be                	sw	a5,64(sp)
+42020c28:	4786                	lw	a5,64(sp)
+42020c2a:	e60797e3          	bnez	a5,42020a98 <status_task+0xee>
+42020c2e:	57f2                	lw	a5,60(sp)
+42020c30:	cf81                	beqz	a5,42020c48 <status_task+0x29e>
+42020c32:	3fc917b7          	lui	a5,0x3fc91
+42020c36:	dac78793          	addi	a5,a5,-596 # 3fc90dac <s_current_status_key>
+42020c3a:	0167d703          	lhu	a4,22(a5)
+42020c3e:	4796                	lw	a5,68(sp)
+42020c40:	0167d783          	lhu	a5,22(a5)
+42020c44:	28f70e63          	beq	a4,a5,42020ee0 <status_task+0x536>
+42020c48:	af1ff0ef          	jal	42020738 <format_status.constprop.0>
+42020c4c:	3fc9a7b7          	lui	a5,0x3fc9a
+42020c50:	d9c78793          	addi	a5,a5,-612 # 3fc99d9c <s_current_send_pending>
+42020c54:	0330000f          	fence	rw,rw
+42020c58:	439c                	lw	a5,0(a5)
+42020c5a:	0230000f          	fence	r,rw
+42020c5e:	30078563          	beqz	a5,42020f68 <status_task+0x5be>
+42020c62:	dac9a503          	lw	a0,-596(s3) # 3fc99dac <s_server>
+42020c66:	28050363          	beqz	a0,42020eec <status_task+0x542>
+42020c6a:	47a9                	li	a5,10
+42020c6c:	0930                	addi	a2,sp,152
+42020c6e:	108c                	addi	a1,sp,96
+42020c70:	d0be                	sw	a5,96(sp)
+42020c72:	4a4760ef          	jal	42097116 <httpd_get_client_list>
+42020c76:	26051b63          	bnez	a0,42020eec <status_task+0x542>
+42020c7a:	5786                	lw	a5,96(sp)
+42020c7c:	4701                	li	a4,0
+42020c7e:	34078963          	beqz	a5,42020fd0 <status_task+0x626>
+42020c82:	3fc9a7b7          	lui	a5,0x3fc9a
+42020c86:	da078793          	addi	a5,a5,-608 # 3fc99da0 <s_status_send_pending>
+42020c8a:	da3e                	sw	a5,52(sp)
+42020c8c:	420207b7          	lui	a5,0x42020
+42020c90:	0920                	addi	s0,sp,152
+42020c92:	5ec78793          	addi	a5,a5,1516 # 420205ec <ws_send_complete>
+42020c96:	caca                	sw	s2,84(sp)
+42020c98:	8aa2                	mv	s5,s0
+42020c9a:	de3e                	sw	a5,60(sp)
+42020c9c:	c4d2                	sw	s4,72(sp)
+42020c9e:	c8ba                	sw	a4,80(sp)
+42020ca0:	4481                	li	s1,0
+42020ca2:	4901                	li	s2,0
+42020ca4:	4401                	li	s0,0
+42020ca6:	a031                	j	42020cb2 <status_task+0x308>
+42020ca8:	5706                	lw	a4,96(sp)
+42020caa:	0905                	addi	s2,s2,1
+42020cac:	0a91                	addi	s5,s5,4
+42020cae:	06e97563          	bgeu	s2,a4,42020d18 <status_task+0x36e>
+42020cb2:	000aa583          	lw	a1,0(s5)
+42020cb6:	dac9a503          	lw	a0,-596(s3)
+42020cba:	01d790ef          	jal	4209a4d6 <httpd_ws_get_fd_info>
+42020cbe:	4789                	li	a5,2
+42020cc0:	fef514e3          	bne	a0,a5,42020ca8 <status_task+0x2fe>
+42020cc4:	47f6                	lw	a5,92(sp)
+42020cc6:	d282                	sw	zero,100(sp)
+42020cc8:	4705                	li	a4,1
+42020cca:	853e                	mv	a0,a5
+42020ccc:	06e10223          	sb	a4,100(sp)
+42020cd0:	4705                	li	a4,1
+42020cd2:	d4ba                	sw	a4,104(sp)
+42020cd4:	d6be                	sw	a5,108(sp)
+42020cd6:	d882                	sw	zero,112(sp)
+42020cd8:	da82                	sw	zero,116(sp)
+42020cda:	fdfdf097          	auipc	ra,0xfdfdf
+42020cde:	69a080e7          	jalr	1690(ra) # 40000374 <strlen>
+42020ce2:	d8aa                	sw	a0,112(sp)
+42020ce4:	5552                	lw	a0,52(sp)
+42020ce6:	4615                	li	a2,5
+42020ce8:	4585                	li	a1,1
+42020cea:	000aaa03          	lw	s4,0(s5)
+42020cee:	fe366097          	auipc	ra,0xfe366
+42020cf2:	188080e7          	jalr	392(ra) # 40386e76 <__atomic_fetch_add_4>
+42020cf6:	5752                	lw	a4,52(sp)
+42020cf8:	56f2                	lw	a3,60(sp)
+42020cfa:	dac9a503          	lw	a0,-596(s3)
+42020cfe:	10d0                	addi	a2,sp,100
+42020d00:	85d2                	mv	a1,s4
+42020d02:	0485                	addi	s1,s1,1
+42020d04:	7fc790ef          	jal	4209a500 <httpd_ws_send_data_async>
+42020d08:	24051563          	bnez	a0,42020f52 <status_task+0x5a8>
+42020d0c:	5706                	lw	a4,96(sp)
+42020d0e:	0905                	addi	s2,s2,1
+42020d10:	0405                	addi	s0,s0,1
+42020d12:	0a91                	addi	s5,s5,4
+42020d14:	f8e96fe3          	bltu	s2,a4,42020cb2 <status_task+0x308>
+42020d18:	3fc9a7b7          	lui	a5,0x3fc9a
+42020d1c:	d897ac23          	sw	s1,-616(a5) # 3fc99d98 <s_last_ws_clients>
+42020d20:	57a2                	lw	a5,40(sp)
+42020d22:	4746                	lw	a4,80(sp)
+42020d24:	4a26                	lw	s4,72(sp)
+42020d26:	97a2                	add	a5,a5,s0
+42020d28:	d43e                	sw	a5,40(sp)
+42020d2a:	4956                	lw	s2,84(sp)
+42020d2c:	1c070063          	beqz	a4,42020eec <status_task+0x542>
+42020d30:	dac9a503          	lw	a0,-596(s3)
+42020d34:	c179                	beqz	a0,42020dfa <status_task+0x450>
+42020d36:	47a9                	li	a5,10
+42020d38:	0930                	addi	a2,sp,152
+42020d3a:	108c                	addi	a1,sp,96
+42020d3c:	d0be                	sw	a5,96(sp)
+42020d3e:	3d8760ef          	jal	42097116 <httpd_get_client_list>
+42020d42:	ed45                	bnez	a0,42020dfa <status_task+0x450>
+42020d44:	5686                	lw	a3,96(sp)
+42020d46:	28068a63          	beqz	a3,42020fda <status_task+0x630>
+42020d4a:	3fc9a737          	lui	a4,0x3fc9a
+42020d4e:	d9c70713          	addi	a4,a4,-612 # 3fc99d9c <s_current_send_pending>
+42020d52:	da3a                	sw	a4,52(sp)
+42020d54:	42020737          	lui	a4,0x42020
+42020d58:	4401                	li	s0,0
+42020d5a:	5ec70713          	addi	a4,a4,1516 # 420205ec <ws_send_complete>
+42020d5e:	c4d2                	sw	s4,72(sp)
+42020d60:	c8ca                	sw	s2,80(sp)
+42020d62:	4a89                	li	s5,2
+42020d64:	de3a                	sw	a4,60(sp)
+42020d66:	09810a13          	addi	s4,sp,152
+42020d6a:	8922                	mv	s2,s0
+42020d6c:	a031                	j	42020d78 <status_task+0x3ce>
+42020d6e:	5706                	lw	a4,96(sp)
+42020d70:	0905                	addi	s2,s2,1
+42020d72:	0a11                	addi	s4,s4,4
+42020d74:	06e97863          	bgeu	s2,a4,42020de4 <status_task+0x43a>
+42020d78:	000a2583          	lw	a1,0(s4)
+42020d7c:	dac9a503          	lw	a0,-596(s3)
+42020d80:	756790ef          	jal	4209a4d6 <httpd_ws_get_fd_info>
+42020d84:	ff5515e3          	bne	a0,s5,42020d6e <status_task+0x3c4>
+42020d88:	4706                	lw	a4,64(sp)
+42020d8a:	3fc917b7          	lui	a5,0x3fc91
+42020d8e:	d282                	sw	zero,100(sp)
+42020d90:	0705                	addi	a4,a4,1
+42020d92:	c0ba                	sw	a4,64(sp)
+42020d94:	4705                	li	a4,1
+42020d96:	10478513          	addi	a0,a5,260 # 3fc91104 <s_broadcast_current>
+42020d9a:	06e10223          	sb	a4,100(sp)
+42020d9e:	4705                	li	a4,1
+42020da0:	d4ba                	sw	a4,104(sp)
+42020da2:	d882                	sw	zero,112(sp)
+42020da4:	da82                	sw	zero,116(sp)
+42020da6:	d6aa                	sw	a0,108(sp)
+42020da8:	fdfdf097          	auipc	ra,0xfdfdf
+42020dac:	5cc080e7          	jalr	1484(ra) # 40000374 <strlen>
+42020db0:	d8aa                	sw	a0,112(sp)
+42020db2:	5552                	lw	a0,52(sp)
+42020db4:	4615                	li	a2,5
+42020db6:	4585                	li	a1,1
+42020db8:	000a2483          	lw	s1,0(s4)
+42020dbc:	fe366097          	auipc	ra,0xfe366
+42020dc0:	0ba080e7          	jalr	186(ra) # 40386e76 <__atomic_fetch_add_4>
+42020dc4:	5752                	lw	a4,52(sp)
+42020dc6:	56f2                	lw	a3,60(sp)
+42020dc8:	dac9a503          	lw	a0,-596(s3)
+42020dcc:	10d0                	addi	a2,sp,100
+42020dce:	85a6                	mv	a1,s1
+42020dd0:	730790ef          	jal	4209a500 <httpd_ws_send_data_async>
+42020dd4:	1e051163          	bnez	a0,42020fb6 <status_task+0x60c>
+42020dd8:	5706                	lw	a4,96(sp)
+42020dda:	0905                	addi	s2,s2,1
+42020ddc:	0405                	addi	s0,s0,1
+42020dde:	0a11                	addi	s4,s4,4
+42020de0:	f8e96ce3          	bltu	s2,a4,42020d78 <status_task+0x3ce>
+42020de4:	4a26                	lw	s4,72(sp)
+42020de6:	4946                	lw	s2,80(sp)
+42020de8:	86a2                	mv	a3,s0
+42020dea:	4706                	lw	a4,64(sp)
+42020dec:	3fc9a7b7          	lui	a5,0x3fc9a
+42020df0:	d8e7ac23          	sw	a4,-616(a5) # 3fc99d98 <s_last_ws_clients>
+42020df4:	57a2                	lw	a5,40(sp)
+42020df6:	97b6                	add	a5,a5,a3
+42020df8:	d43e                	sw	a5,40(sp)
+42020dfa:	0a09                	addi	s4,s4,2
+42020dfc:	a8cd                	j	42020eee <status_task+0x544>
+42020dfe:	4785                	li	a5,1
+42020e00:	c0be                	sw	a5,64(sp)
+42020e02:	fe368097          	auipc	ra,0xfe368
+42020e06:	69c080e7          	jalr	1692(ra) # 4038949e <esp_log_timestamp>
+42020e0a:	3c12a7b7          	lui	a5,0x3c12a
+42020e0e:	98878713          	addi	a4,a5,-1656 # 3c129988 <_esp_libc_clock_array_end+0x9838>
+42020e12:	3c12a7b7          	lui	a5,0x3c12a
+42020e16:	86aa                	mv	a3,a0
+42020e18:	85ba                	mv	a1,a4
+42020e1a:	450d                	li	a0,3
+42020e1c:	adc78613          	addi	a2,a5,-1316 # 3c129adc <_esp_libc_clock_array_end+0x998c>
+42020e20:	fe368097          	auipc	ra,0xfe368
+42020e24:	576080e7          	jalr	1398(ra) # 40389396 <esp_log>
+42020e28:	dac9a503          	lw	a0,-596(s3)
+42020e2c:	10050563          	beqz	a0,42020f36 <status_task+0x58c>
+42020e30:	47a9                	li	a5,10
+42020e32:	0930                	addi	a2,sp,152
+42020e34:	108c                	addi	a1,sp,96
+42020e36:	d0be                	sw	a5,96(sp)
+42020e38:	2de760ef          	jal	42097116 <httpd_get_client_list>
+42020e3c:	0e051d63          	bnez	a0,42020f36 <status_task+0x58c>
+42020e40:	5786                	lw	a5,96(sp)
+42020e42:	18078563          	beqz	a5,42020fcc <status_task+0x622>
+42020e46:	3fc9a737          	lui	a4,0x3fc9a
+42020e4a:	da070713          	addi	a4,a4,-608 # 3fc99da0 <s_status_send_pending>
+42020e4e:	0920                	addi	s0,sp,152
+42020e50:	c4ba                	sw	a4,72(sp)
+42020e52:	42020737          	lui	a4,0x42020
+42020e56:	c8ca                	sw	s2,80(sp)
+42020e58:	cada                	sw	s6,84(sp)
+42020e5a:	d402                	sw	zero,40(sp)
+42020e5c:	8b22                	mv	s6,s0
+42020e5e:	4a09                	li	s4,2
+42020e60:	4901                	li	s2,0
+42020e62:	5ec70a93          	addi	s5,a4,1516 # 420205ec <ws_send_complete>
+42020e66:	4401                	li	s0,0
+42020e68:	a031                	j	42020e74 <status_task+0x4ca>
+42020e6a:	5706                	lw	a4,96(sp)
+42020e6c:	0905                	addi	s2,s2,1
+42020e6e:	0b11                	addi	s6,s6,4
+42020e70:	04e97f63          	bgeu	s2,a4,42020ece <status_task+0x524>
+42020e74:	000b2583          	lw	a1,0(s6)
+42020e78:	dac9a503          	lw	a0,-596(s3)
+42020e7c:	65a790ef          	jal	4209a4d6 <httpd_ws_get_fd_info>
+42020e80:	ff4515e3          	bne	a0,s4,42020e6a <status_task+0x4c0>
+42020e84:	d282                	sw	zero,100(sp)
+42020e86:	4785                	li	a5,1
+42020e88:	06f10223          	sb	a5,100(sp)
+42020e8c:	47e6                	lw	a5,88(sp)
+42020e8e:	4526                	lw	a0,72(sp)
+42020e90:	4585                	li	a1,1
+42020e92:	4615                	li	a2,5
+42020e94:	d6be                	sw	a5,108(sp)
+42020e96:	47f5                	li	a5,29
+42020e98:	000b2483          	lw	s1,0(s6)
+42020e9c:	942e                	add	s0,s0,a1
+42020e9e:	d4ae                	sw	a1,104(sp)
+42020ea0:	da82                	sw	zero,116(sp)
+42020ea2:	d8be                	sw	a5,112(sp)
+42020ea4:	fe366097          	auipc	ra,0xfe366
+42020ea8:	fd2080e7          	jalr	-46(ra) # 40386e76 <__atomic_fetch_add_4>
+42020eac:	4726                	lw	a4,72(sp)
+42020eae:	dac9a503          	lw	a0,-596(s3)
+42020eb2:	86d6                	mv	a3,s5
+42020eb4:	10d0                	addi	a2,sp,100
+42020eb6:	85a6                	mv	a1,s1
+42020eb8:	648790ef          	jal	4209a500 <httpd_ws_send_data_async>
+42020ebc:	e141                	bnez	a0,42020f3c <status_task+0x592>
+42020ebe:	57a2                	lw	a5,40(sp)
+42020ec0:	5706                	lw	a4,96(sp)
+42020ec2:	0905                	addi	s2,s2,1
+42020ec4:	0785                	addi	a5,a5,1
+42020ec6:	d43e                	sw	a5,40(sp)
+42020ec8:	0b11                	addi	s6,s6,4
+42020eca:	fae965e3          	bltu	s2,a4,42020e74 <status_task+0x4ca>
+42020ece:	4946                	lw	s2,80(sp)
+42020ed0:	4b56                	lw	s6,84(sp)
+42020ed2:	87a2                	mv	a5,s0
+42020ed4:	3fc9a737          	lui	a4,0x3fc9a
+42020ed8:	d8f72c23          	sw	a5,-616(a4) # 3fc99d98 <s_last_ws_clients>
+42020edc:	4a05                	li	s4,1
+42020ede:	be55                	j	42020a92 <status_task+0xe8>
+42020ee0:	859ff0ef          	jal	42020738 <format_status.constprop.0>
+42020ee4:	dac9a503          	lw	a0,-596(s3)
+42020ee8:	d80511e3          	bnez	a0,42020c6a <status_task+0x2c0>
+42020eec:	0a05                	addi	s4,s4,1
+42020eee:	4716                	lw	a4,68(sp)
+42020ef0:	3fc917b7          	lui	a5,0x3fc91
+42020ef4:	dac78793          	addi	a5,a5,-596 # 3fc90dac <s_current_status_key>
+42020ef8:	4390                	lw	a2,0(a5)
+42020efa:	43d4                	lw	a3,4(a5)
+42020efc:	07d1                	addi	a5,a5,20
+42020efe:	c310                	sw	a2,0(a4)
+42020f00:	c354                	sw	a3,4(a4)
+42020f02:	ff87a683          	lw	a3,-8(a5)
+42020f06:	ff47a603          	lw	a2,-12(a5)
+42020f0a:	0751                	addi	a4,a4,20
+42020f0c:	fed72c23          	sw	a3,-8(a4)
+42020f10:	fec72a23          	sw	a2,-12(a4)
+42020f14:	ffc7a683          	lw	a3,-4(a5)
+42020f18:	fed72e23          	sw	a3,-4(a4)
+42020f1c:	46b6                	lw	a3,76(sp)
+42020f1e:	fcd79de3          	bne	a5,a3,42020ef8 <status_task+0x54e>
+42020f22:	4394                	lw	a3,0(a5)
+42020f24:	57e2                	lw	a5,56(sp)
+42020f26:	da3e                	sw	a5,52(sp)
+42020f28:	47b6                	lw	a5,76(sp)
+42020f2a:	43dc                	lw	a5,4(a5)
+42020f2c:	c314                	sw	a3,0(a4)
+42020f2e:	4685                	li	a3,1
+42020f30:	de36                	sw	a3,60(sp)
+42020f32:	c35c                	sw	a5,4(a4)
+42020f34:	b695                	j	42020a98 <status_task+0xee>
+42020f36:	d402                	sw	zero,40(sp)
+42020f38:	4a05                	li	s4,1
+42020f3a:	bea1                	j	42020a92 <status_task+0xe8>
+42020f3c:	3fc9a7b7          	lui	a5,0x3fc9a
+42020f40:	4615                	li	a2,5
+42020f42:	4585                	li	a1,1
+42020f44:	da078513          	addi	a0,a5,-608 # 3fc99da0 <s_status_send_pending>
+42020f48:	fe366097          	auipc	ra,0xfe366
+42020f4c:	f56080e7          	jalr	-170(ra) # 40386e9e <__atomic_fetch_sub_4>
+42020f50:	bf29                	j	42020e6a <status_task+0x4c0>
+42020f52:	3fc9a7b7          	lui	a5,0x3fc9a
+42020f56:	4615                	li	a2,5
+42020f58:	4585                	li	a1,1
+42020f5a:	da078513          	addi	a0,a5,-608 # 3fc99da0 <s_status_send_pending>
+42020f5e:	fe366097          	auipc	ra,0xfe366
+42020f62:	f40080e7          	jalr	-192(ra) # 40386e9e <__atomic_fetch_sub_4>
+42020f66:	b389                	j	42020ca8 <status_task+0x2fe>
+42020f68:	3fc917b7          	lui	a5,0x3fc91
+42020f6c:	dac78793          	addi	a5,a5,-596 # 3fc90dac <s_current_status_key>
+42020f70:	0167d683          	lhu	a3,22(a5)
+42020f74:	3c12a7b7          	lui	a5,0x3c12a
+42020f78:	b3078613          	addi	a2,a5,-1232 # 3c129b30 <_esp_libc_clock_array_end+0x99e0>
+42020f7c:	3fc917b7          	lui	a5,0x3fc91
+42020f80:	03000593          	li	a1,48
+42020f84:	10478513          	addi	a0,a5,260 # 3fc91104 <s_broadcast_current>
+42020f88:	4a7e80ef          	jal	42109c2e <snprintf>
+42020f8c:	dac9a503          	lw	a0,-596(s3)
+42020f90:	e60505e3          	beqz	a0,42020dfa <status_task+0x450>
+42020f94:	47a9                	li	a5,10
+42020f96:	0930                	addi	a2,sp,152
+42020f98:	108c                	addi	a1,sp,96
+42020f9a:	d0be                	sw	a5,96(sp)
+42020f9c:	17a760ef          	jal	42097116 <httpd_get_client_list>
+42020fa0:	d80518e3          	bnez	a0,42020d30 <status_task+0x386>
+42020fa4:	5786                	lw	a5,96(sp)
+42020fa6:	4705                	li	a4,1
+42020fa8:	cc079de3          	bnez	a5,42020c82 <status_task+0x2d8>
+42020fac:	3fc9a7b7          	lui	a5,0x3fc9a
+42020fb0:	d807ac23          	sw	zero,-616(a5) # 3fc99d98 <s_last_ws_clients>
+42020fb4:	bbb5                	j	42020d30 <status_task+0x386>
+42020fb6:	3fc9a7b7          	lui	a5,0x3fc9a
+42020fba:	4615                	li	a2,5
+42020fbc:	4585                	li	a1,1
+42020fbe:	d9c78513          	addi	a0,a5,-612 # 3fc99d9c <s_current_send_pending>
+42020fc2:	fe366097          	auipc	ra,0xfe366
+42020fc6:	edc080e7          	jalr	-292(ra) # 40386e9e <__atomic_fetch_sub_4>
+42020fca:	b355                	j	42020d6e <status_task+0x3c4>
+42020fcc:	d402                	sw	zero,40(sp)
+42020fce:	b719                	j	42020ed4 <status_task+0x52a>
+42020fd0:	3fc9a7b7          	lui	a5,0x3fc9a
+42020fd4:	d807ac23          	sw	zero,-616(a5) # 3fc99d98 <s_last_ws_clients>
+42020fd8:	bf11                	j	42020eec <status_task+0x542>
+42020fda:	c082                	sw	zero,64(sp)
+42020fdc:	b539                	j	42020dea <status_task+0x440>
+

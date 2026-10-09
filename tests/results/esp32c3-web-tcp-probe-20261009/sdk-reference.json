@@ -1,0 +1,29 @@
+{
+  "revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+  "files": [
+    {
+      "path": "components/lwip/port/include/lwipopts.h",
+      "sha256": "6337c209bd374a8ca684b84d12347aab06e3203e4ade5bdb00b4927b9c5d7094",
+      "snippets": [
+        {
+          "first_line": 633,
+          "text": "TCP_LISTEN_BACKLOG              1"
+        }
+      ]
+    },
+    {
+      "path": "components/esp_driver_usb_serial_jtag/src/usb_serial_jtag_vfs.c",
+      "sha256": "f2891d144f3b6a2e109df2cfe754696f2335f2a577ea0448d667d141a28599f6",
+      "snippets": [
+        {
+          "first_line": 148,
+          "text": "static void usb_serial_jtag_tx_char_no_driver(int fd, int c)\n{\n    uint8_t cc = (uint8_t)c;\n    // Try to write to the buffer as long as we still expect the buffer to have\n    // a chance of being emptied by an active host. Just drop the data if there's\n    // no chance anymore.\n    // When we first try to send a character and the buffer is not accessible yet,\n    // we wait until the time has been more than TX_FLUSH_TIMEOUT_US since we successfully\n    // sent the last byte. If it takes longer than TX_FLUSH_TIMEOUT_US, we drop every\n    // byte until the buffer can be accessible again.\n    do {\n        if (usb_serial_jtag_ll_txfifo_writable()) {\n            usb_serial_jtag_ll_write_txfifo(&cc, 1);\n            if (c == '\\n') {\n                //Make sure line doesn't linger in fifo\n                usb_serial_jtag_ll_txfifo_flush();\n            }\n            //update time of last successful tx to now.\n            s_ctx.last_tx_ts = esp_timer_get_time();\n            break;\n        }\n    } while ((esp_timer_get_time() - s_ctx.last_tx_ts) < TX_FLUSH_TIMEOUT_US);\n\n}\n"
+        },
+        {
+          "first_line": 78,
+          "text": "#define TX_FLUSH_TIMEOUT_US (50*1000LL)"
+        }
+      ]
+    }
+  ]
+}

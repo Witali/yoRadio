@@ -1,0 +1,88 @@
+42082b8a:	cd49                	beqz	a0,42082c24 <tcp_rst_netif+0x9a>
+42082b8c:	7179                	addi	sp,sp,-48
+42082b8e:	d422                	sw	s0,40(sp)
+42082b90:	d226                	sw	s1,36(sp)
+42082b92:	d04a                	sw	s2,32(sp)
+42082b94:	ce4e                	sw	s3,28(sp)
+42082b96:	cc52                	sw	s4,24(sp)
+42082b98:	ca56                	sw	s5,20(sp)
+42082b9a:	d606                	sw	ra,44(sp)
+42082b9c:	89c2                	mv	s3,a6
+42082b9e:	893e                	mv	s2,a5
+42082ba0:	843a                	mv	s0,a4
+42082ba2:	8ab6                	mv	s5,a3
+42082ba4:	84b2                	mv	s1,a2
+42082ba6:	8a2a                	mv	s4,a0
+42082ba8:	c2cd                	beqz	a3,42082c4a <tcp_rst_netif+0xc0>
+42082baa:	cf35                	beqz	a4,42082c26 <tcp_rst_netif+0x9c>
+42082bac:	852e                	mv	a0,a1
+42082bae:	d56fa0ef          	jal	4207d104 <lwip_htonl>
+42082bb2:	6831                	lui	a6,0xc
+42082bb4:	862a                	mv	a2,a0
+42082bb6:	874e                	mv	a4,s3
+42082bb8:	86ca                	mv	a3,s2
+42082bba:	8526                	mv	a0,s1
+42082bbc:	02180813          	addi	a6,a6,33 # c021 <_rtc_slow_length+0xa545>
+42082bc0:	47d1                	li	a5,20
+42082bc2:	4581                	li	a1,0
+42082bc4:	9faff0ef          	jal	42081dbe <tcp_output_alloc_header_common.constprop.0>
+42082bc8:	c529                	beqz	a0,42082c12 <tcp_rst_netif+0x88>
+42082bca:	415c                	lw	a5,4(a0)
+42082bcc:	00855603          	lhu	a2,8(a0)
+42082bd0:	8722                	mv	a4,s0
+42082bd2:	86d6                	mv	a3,s5
+42082bd4:	4599                	li	a1,6
+42082bd6:	c43e                	sw	a5,8(sp)
+42082bd8:	c62a                	sw	a0,12(sp)
+42082bda:	522080ef          	jal	4208b0fc <ip_chksum_pseudo>
+42082bde:	47a2                	lw	a5,8(sp)
+42082be0:	48b2                	lw	a7,12(sp)
+42082be2:	8852                	mv	a6,s4
+42082be4:	00a79823          	sh	a0,16(a5)
+42082be8:	8622                	mv	a2,s0
+42082bea:	85d6                	mv	a1,s5
+42082bec:	8546                	mv	a0,a7
+42082bee:	4799                	li	a5,6
+42082bf0:	4701                	li	a4,0
+42082bf2:	04000693          	li	a3,64
+42082bf6:	c446                	sw	a7,8(sp)
+42082bf8:	de79f0ef          	jal	420229de <__wrap_ip4_output_if>
+42082bfc:	5422                	lw	s0,40(sp)
+42082bfe:	4522                	lw	a0,8(sp)
+42082c00:	50b2                	lw	ra,44(sp)
+42082c02:	5492                	lw	s1,36(sp)
+42082c04:	5902                	lw	s2,32(sp)
+42082c06:	49f2                	lw	s3,28(sp)
+42082c08:	4a62                	lw	s4,24(sp)
+42082c0a:	4ad2                	lw	s5,20(sp)
+42082c0c:	6145                	addi	sp,sp,48
+42082c0e:	b76fc06f          	j	4207ef84 <pbuf_free>
+42082c12:	50b2                	lw	ra,44(sp)
+42082c14:	5422                	lw	s0,40(sp)
+42082c16:	5492                	lw	s1,36(sp)
+42082c18:	5902                	lw	s2,32(sp)
+42082c1a:	49f2                	lw	s3,28(sp)
+42082c1c:	4a62                	lw	s4,24(sp)
+42082c1e:	4ad2                	lw	s5,20(sp)
+42082c20:	6145                	addi	sp,sp,48
+42082c22:	8082                	ret
+42082c24:	8082                	ret
+42082c26:	3c1336b7          	lui	a3,0x3c133
+42082c2a:	3c176637          	lui	a2,0x3c176
+42082c2e:	3c133537          	lui	a0,0x3c133
+42082c32:	d2068693          	addi	a3,a3,-736 # 3c132d20 <_esp_libc_clock_array_end+0x12bd0>
+42082c36:	a1860613          	addi	a2,a2,-1512 # 3c175a18 <__func__.8>
+42082c3a:	95c50513          	addi	a0,a0,-1700 # 3c13295c <_esp_libc_clock_array_end+0x1280c>
+42082c3e:	7c500593          	li	a1,1989
+42082c42:	fe304097          	auipc	ra,0xfe304
+42082c46:	e1a080e7          	jalr	-486(ra) # 40386a5c <__assert_func>
+42082c4a:	3c1336b7          	lui	a3,0x3c133
+42082c4e:	3c176637          	lui	a2,0x3c176
+42082c52:	3c133537          	lui	a0,0x3c133
+42082c56:	d0468693          	addi	a3,a3,-764 # 3c132d04 <_esp_libc_clock_array_end+0x12bb4>
+42082c5a:	a1860613          	addi	a2,a2,-1512 # 3c175a18 <__func__.8>
+42082c5e:	95c50513          	addi	a0,a0,-1700 # 3c13295c <_esp_libc_clock_array_end+0x1280c>
+42082c62:	7c400593          	li	a1,1988
+42082c66:	fe304097          	auipc	ra,0xfe304
+42082c6a:	df6080e7          	jalr	-522(ra) # 40386a5c <__assert_func>
+

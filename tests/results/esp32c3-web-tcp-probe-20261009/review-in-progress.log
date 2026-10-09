@@ -1,0 +1,92 @@
+{
+  "passed": 9,
+  "total": 9,
+  "full_capture_runtime": {
+    "result": "PASS"
+  },
+  "trace_complete": false,
+  "trace_issues": [
+    {
+      "at": 251806.515,
+      "error": "Malformed TCP event"
+    },
+    {
+      "at": 251931.578,
+      "error": "Malformed TCP event"
+    },
+    {
+      "at": 251931.578,
+      "error": "Missing or reordered TCP event"
+    },
+    {
+      "at": 251935.203,
+      "error": "Malformed TCP event"
+    },
+    {
+      "at": 251935.218,
+      "error": "Missing or reordered TCP event"
+    },
+    {
+      "at": 251939.625,
+      "error": "Malformed listener sample"
+    },
+    {
+      "at": 251941.734,
+      "error": "Malformed listener sample"
+    },
+    {
+      "at": 251950.812,
+      "error": "Missing or reordered TCP event"
+    },
+    {
+      "at": 252024.031,
+      "error": "Malformed TCP event"
+    },
+    {
+      "at": 252024.046,
+      "error": "Missing or reordered TCP event"
+    },
+    {
+      "at": 252069.656,
+      "error": "Missing or reordered TCP event"
+    }
+  ],
+  "tcp_event_count": 2690,
+  "listener_sample_count": 290,
+  "listener_max_age_ms": 1113,
+  "failed_connects": [],
+  "rx_syn": 897,
+  "tx_syn": 895,
+  "established": 898,
+  "tx_errors": [],
+  "owner_complete": true,
+  "owner_initial_raw_free": 106604,
+  "owner_final_raw_free": 106604,
+  "owner_final_live": 0,
+  "records": [
+    {
+      "case": "tls-record:grow",
+      "interrupted": false,
+      "start": 252023.75,
+      "end": 252098.781,
+      "dma": {
+        "samples": 13,
+        "start": 252034.984,
+        "end": 252095.078,
+        "observed_seconds": 60.094000000011874,
+        "coverage_complete": true,
+        "maximum_sample_gap_seconds": 5.030999999988126,
+        "delta": {
+          "q_overruns": 0,
+          "writes": 5634,
+          "written_bytes": 11538432,
+          "write_us": 55293984,
+          "errors": 0
+        },
+        "maximum_write_us_since_boot": 18222,
+        "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+        "acoustic_continuity_qualified": false
+      }
+    }
+  ]
+}

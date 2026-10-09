@@ -1,0 +1,79 @@
+42086cb2:	00855783          	lhu	a5,8(a0)
+42086cb6:	7179                	addi	sp,sp,-48
+42086cb8:	d226                	sw	s1,36(sp)
+42086cba:	ce4e                	sw	s3,28(sp)
+42086cbc:	cc52                	sw	s4,24(sp)
+42086cbe:	4771                	li	a4,28
+42086cc0:	d606                	sw	ra,44(sp)
+42086cc2:	d422                	sw	s0,40(sp)
+42086cc4:	d04a                	sw	s2,32(sp)
+42086cc6:	89aa                	mv	s3,a0
+42086cc8:	8a2e                	mv	s4,a1
+42086cca:	84ba                	mv	s1,a4
+42086ccc:	00f76363          	bltu	a4,a5,42086cd2 <icmp_dest_unreach+0x20>
+42086cd0:	84be                	mv	s1,a5
+42086cd2:	04c2                	slli	s1,s1,0x10
+42086cd4:	80c1                	srli	s1,s1,0x10
+42086cd6:	00848593          	addi	a1,s1,8
+42086cda:	01059913          	slli	s2,a1,0x10
+42086cde:	01095913          	srli	s2,s2,0x10
+42086ce2:	28000613          	li	a2,640
+42086ce6:	02200513          	li	a0,34
+42086cea:	85ca                	mv	a1,s2
+42086cec:	bbef80ef          	jal	4207f0aa <pbuf_alloc>
+42086cf0:	842a                	mv	s0,a0
+42086cf2:	c52d                	beqz	a0,42086d5c <icmp_dest_unreach+0xaa>
+42086cf4:	00a55783          	lhu	a5,10(a0)
+42086cf8:	0727ea63          	bltu	a5,s2,42086d6c <icmp_dest_unreach+0xba>
+42086cfc:	00452903          	lw	s2,4(a0)
+42086d00:	478d                	li	a5,3
+42086d02:	8626                	mv	a2,s1
+42086d04:	0049a483          	lw	s1,4(s3)
+42086d08:	85ce                	mv	a1,s3
+42086d0a:	00f90023          	sb	a5,0(s2)
+42086d0e:	46a1                	li	a3,8
+42086d10:	014900a3          	sb	s4,1(s2)
+42086d14:	00092223          	sw	zero,4(s2)
+42086d18:	fa0f80ef          	jal	4207f4b8 <pbuf_copy_partial_pbuf>
+42086d1c:	44d8                	lw	a4,12(s1)
+42086d1e:	489c                	lw	a5,16(s1)
+42086d20:	002c                	addi	a1,sp,8
+42086d22:	0068                	addi	a0,sp,12
+42086d24:	c43a                	sw	a4,8(sp)
+42086d26:	c63e                	sw	a5,12(sp)
+42086d28:	0d7000ef          	jal	420875fe <ip4_route_src>
+42086d2c:	84aa                	mv	s1,a0
+42086d2e:	c505                	beqz	a0,42086d56 <icmp_dest_unreach+0xa4>
+42086d30:	00a45583          	lhu	a1,10(s0)
+42086d34:	854a                	mv	a0,s2
+42086d36:	00091123          	sh	zero,2(s2)
+42086d3a:	3c6040ef          	jal	4208b100 <inet_chksum>
+42086d3e:	00a91123          	sh	a0,2(s2)
+42086d42:	8826                	mv	a6,s1
+42086d44:	0030                	addi	a2,sp,8
+42086d46:	8522                	mv	a0,s0
+42086d48:	4785                	li	a5,1
+42086d4a:	4701                	li	a4,0
+42086d4c:	04000693          	li	a3,64
+42086d50:	4581                	li	a1,0
+42086d52:	c8d9b0ef          	jal	420229de <__wrap_ip4_output_if>
+42086d56:	8522                	mv	a0,s0
+42086d58:	a2cf80ef          	jal	4207ef84 <pbuf_free>
+42086d5c:	50b2                	lw	ra,44(sp)
+42086d5e:	5422                	lw	s0,40(sp)
+42086d60:	5492                	lw	s1,36(sp)
+42086d62:	5902                	lw	s2,32(sp)
+42086d64:	49f2                	lw	s3,28(sp)
+42086d66:	4a62                	lw	s4,24(sp)
+42086d68:	6145                	addi	sp,sp,48
+42086d6a:	8082                	ret
+42086d6c:	3c1336b7          	lui	a3,0x3c133
+42086d70:	3c176637          	lui	a2,0x3c176
+42086d74:	3c133537          	lui	a0,0x3c133
+42086d78:	42c68693          	addi	a3,a3,1068 # 3c13342c <_esp_libc_clock_array_end+0x132dc>
+42086d7c:	d0460613          	addi	a2,a2,-764 # 3c175d04 <__func__.0>
+42086d80:	3c850513          	addi	a0,a0,968 # 3c1333c8 <_esp_libc_clock_array_end+0x13278>
+42086d84:	16d00593          	li	a1,365
+42086d88:	fe300097          	auipc	ra,0xfe300
+42086d8c:	cd4080e7          	jalr	-812(ra) # 40386a5c <__assert_func>
+
