@@ -113,7 +113,8 @@ config YORADIO_OUTPUT_TASK_FIRST
 
 config YORADIO_PIPELINE_PROFILE
     bool "Measure decoder queue waits and DMA completion overruns"
-    depends on YORADIO_DIRECT_DMA_PCM
+    depends on !YORADIO_QEMU
+    select YORADIO_STAGED_DMA_PROFILE if !YORADIO_DIRECT_DMA_PCM
     default n
     help
         Diagnostic only. Probe queue availability before the normal blocking
@@ -121,6 +122,8 @@ config YORADIO_PIPELINE_PROFILE
         completion-queue overruns in a bounded ISR callback. Does not change
         timeouts, priorities, queue capacities or audio samples. Adds logging
         and timing overhead; keep disabled in production timing comparisons.
+        Works with staged and direct output. Staged output reports PCM-empty
+        and total submission time, without claiming a separate DMA wait time.
 
 config YORADIO_STAGED_DMA_PROFILE
     bool "Measure staged PCM writes and DMA queue overruns"

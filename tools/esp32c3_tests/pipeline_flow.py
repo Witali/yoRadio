@@ -9,6 +9,7 @@ from summarize_radio_flac import cpu_intervals, cpu_summary, decode_summary
 FIELDS = {
     'DEC': ('input', 'pcm'),
     'OUT': ('empty', 'submit', 'dma'),
+    'STAGED_OUT': ('empty', 'submit'),
 }
 
 
@@ -23,7 +24,7 @@ def flow_summary(rows, start, end, kind):
             required += [field+'_us', field+'_n', field+'_max']
             if field != 'submit':
                 required += [field+'_timeouts']
-        if kind == 'OUT':
+        if kind in ('OUT', 'STAGED_OUT'):
             required += ['overruns']
         if not all(k in values for k in required) or not values.get('window_us'):
             if start <= row['at'] <= end:
@@ -49,7 +50,7 @@ def flow_summary(rows, start, end, kind):
             mean_us=us/count if count else 0,
             max_us=max(w[field+'_max'] for w in windows),
             timeouts=sum(w.get(field+'_timeouts', 0) for w in windows))
-    if kind == 'OUT':
+    if kind in ('OUT', 'STAGED_OUT'):
         result['overruns'] = sum(w['overruns'] for w in windows)
         result['overruns_per_second'] = result['overruns']/(total/1e6)
     return result
@@ -59,7 +60,7 @@ def summarize(directory):
     rows = json.loads((directory/'performance.json').read_text())
     cases = []
     for batch in json.loads((directory/'status.json').read_text()):
-        if not batch['case'].startswith(('load:', 'input-jitter:')):
+        if not batch['case'].startswith(('load:', 'input-jitter:', 'tls-record:')):
             continue
         start, end = batch['started_at']+10, batch['ended_at']
         cpu, malformed, gaps = cpu_intervals(rows, start, end)
@@ -68,6 +69,8 @@ def summarize(directory):
             decoder=decode_summary(rows, start, end),
             flow_decoder=flow_summary(rows, start, end, 'DEC'),
             flow_output=flow_summary(rows, start, end, 'OUT')))
+        if any('PERF FLOW_STAGED_OUT:' in row['line'] for row in rows):
+            cases[-1]['flow_staged_output'] = flow_summary(rows, start, end, 'STAGED_OUT')
     return dict(cases=cases, warmup_seconds=10,
         note='Wall time includes scheduling. Task windows overlap; do not sum waits as CPU load. '
              'DMA overruns are discarded completion notifications, not an exact count of audible gaps.')
@@ -81,14 +84,17 @@ def main():
     result = summarize(args.results)
     args.output.write_text(json.dumps(result, indent=2)+'\n')
     for case in result['cases']:
+        staged = case.get('flow_staged_output', dict(windows=[], malformed=[]))
+        output = staged if staged['windows'] or staged['malformed'] else case['flow_output']
         print(case['name'], json.dumps({
             'cpu': case['cpu'].get('busy_mean_percent'),
             'audio_wall': case['decoder']['audio_wall_ratio'],
             'input': case['flow_decoder'].get('input'),
             'pcm_full': case['flow_decoder'].get('pcm'),
-            'pcm_empty': case['flow_output'].get('empty'),
-            'dma_wait': case['flow_output'].get('dma'),
-            'dma_overruns': case['flow_output'].get('overruns')}))
+            'pcm_empty': output.get('empty'),
+            'submit': output.get('submit'),
+            'dma_wait': output.get('dma'),
+            'dma_overruns': output.get('overruns')}))
 
 
 if __name__ == '__main__':

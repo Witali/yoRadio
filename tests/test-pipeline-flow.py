@@ -36,6 +36,25 @@ class Flow(unittest.TestCase):
         self.assertEqual(result['input']['wall_percent'], 0)
         self.assertEqual(result['input']['count'], 0)
 
+    def test_staged_wait_is_distinct_from_unmeasured_dma_wait(self):
+        entry = dict(at=10, line='PERF FLOW_STAGED_OUT: gen=3 window_us=5000000 '
+            'empty_us=100000 empty_n=5 empty_timeouts=2 empty_max=20000 '
+            'submit_us=4800000 submit_n=400 submit_max=18000 overruns=3')
+        result = flow_summary([entry], 0, 10, 'STAGED_OUT')
+        self.assertEqual(result['empty']['wall_percent'], 2)
+        self.assertEqual(result['submit']['wall_percent'], 96)
+        self.assertEqual(result['overruns'], 3)
+        self.assertNotIn('dma', result)
+        self.assertEqual(flow_summary([entry], 0, 10, 'OUT')['windows'], [])
+
+    def test_staged_missing_overrun_counter_is_not_a_pass(self):
+        entry = dict(at=10, line='PERF FLOW_STAGED_OUT: gen=3 window_us=5000000 '
+            'empty_us=0 empty_n=0 empty_timeouts=0 empty_max=0 '
+            'submit_us=1 submit_n=1 submit_max=1')
+        result = flow_summary([entry], 0, 10, 'STAGED_OUT')
+        self.assertEqual(result['malformed'], [entry])
+        self.assertEqual(result['windows'], [])
+
 
 if __name__ == '__main__':
     unittest.main()

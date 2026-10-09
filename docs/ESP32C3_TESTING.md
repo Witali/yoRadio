@@ -787,6 +787,21 @@ overruns on the physical C3. It includes a deliberate input-starvation control,
 profile-on/off builds and exact PCM checks; it preserves the original heap
 failure and does not change task scheduling or queue timeouts.
 
+`CONFIG_YORADIO_PIPELINE_PROFILE=y` also supports the staged output backend.
+It automatically selects staged DMA counters. `PERF FLOW_DEC` measures empty
+encoded input and full PCM queues; `PERF FLOW_STAGED_OUT` measures empty PCM
+queues, total submission time and completion-queue events. A separate DMA
+wait is unavailable with the stock staged driver, so it is omitted rather
+than reported as zero. Direct output retains `PERF FLOW_OUT` and its measured
+DMA wait. These task-local wall times overlap and must not be added as CPU
+usage. Leave profiling disabled for production timing comparisons.
+
+`run_pipeline_profile_host.py` tests the real queue wrappers and extracted
+staged/direct report helpers under ASan/UBSan, including disabled probes,
+counter wrap, reset and ISR events during logging. `test-pipeline-flow.py`
+checks both log formats; `test-pipeline-flow-evidence.py` verifies that the
+older direct-output evidence still produces the same summaries.
+
 The [output-priority comparison](ESP32C3_OUTPUT_PRIORITY_20261006.md) tests
 raising the direct-DMA output task from priority 6 to 8 above the decoder at 7.
 It combines matched instrumented LPC12/LPC32 captures with a profile-off
