@@ -9,6 +9,7 @@ import http.client
 import importlib
 import json
 from pathlib import Path
+import socket
 import sys
 import threading
 import time
@@ -16,14 +17,41 @@ from urllib.parse import urlsplit
 
 
 class TransportTrace:
-    def __init__(self, host, stream):
+    def __init__(self, host, stream, *, capture_socket_ports=False):
         self.host, self.stream = host, stream
+        self.capture_socket_ports = capture_socket_ports
+        self.context = threading.local()
         self.connections = 0
         self.lock = threading.Lock()
 
     def __enter__(self):
         owner = self
         self.original = original = http.client.HTTPConnection
+        self.original_connect = socket.socket.connect
+
+        def traced_socket_connect(sock, address):
+            row = getattr(owner.context, 'connect_row', None)
+            watched = row is not None and address[:2] == (owner.host, 80)
+            attempt = dict(at=time.monotonic()) if watched else None
+            try:
+                result = owner.original_connect(sock, address)
+                if watched:
+                    attempt['result'] = 'PASS'
+                return result
+            except BaseException:
+                if watched:
+                    attempt['result'] = 'FAIL'
+                raise
+            finally:
+                if watched:
+                    # create_connection closes failed sockets before raising.
+                    # Read only the local port here, while it is still open.
+                    try:
+                        attempt['local_port'] = sock.getsockname()[1]
+                    except OSError:
+                        attempt['port_unavailable'] = True
+                    attempt['ms'] = (time.monotonic() - attempt['at']) * 1000
+                    row.setdefault('socket_attempts', []).append(attempt)
 
         class TracedConnection(original):
             def __init__(self, *args, **kwargs):
@@ -39,6 +67,9 @@ class TransportTrace:
                     return action()
                 started = time.monotonic()
                 row = dict(request=self.trace_number, phase=phase, at=started)
+                previous_row = getattr(owner.context, 'connect_row', None)
+                if phase == 'connect':
+                    owner.context.connect_row = row
                 try:
                     result = action()
                     row['result'] = 'PASS'
@@ -53,6 +84,8 @@ class TransportTrace:
                             row[key] = value
                     raise
                 finally:
+                    if phase == 'connect':
+                        owner.context.connect_row = previous_row
                     row['ms'] = (time.monotonic() - started) * 1000
                     with owner.lock:
                         owner.stream.write(json.dumps(row) + '\n')
@@ -74,10 +107,14 @@ class TransportTrace:
                 return response
 
         http.client.HTTPConnection = TracedConnection
+        if self.capture_socket_ports:
+            socket.socket.connect = traced_socket_connect
         return self
 
     def __exit__(self, *exception):
         http.client.HTTPConnection = self.original
+        if self.capture_socket_ports:
+            socket.socket.connect = self.original_connect
 
 
 def main():

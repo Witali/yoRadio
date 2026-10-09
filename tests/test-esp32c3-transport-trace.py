@@ -2,6 +2,7 @@
 import http.client
 import io
 import json
+import socket
 from pathlib import Path
 import sys
 import unittest
@@ -34,6 +35,49 @@ class FakeConnection:
 
 
 class TransportTraceTests(unittest.TestCase):
+    def test_failed_socket_port_is_captured_before_close(self):
+        output = io.StringIO()
+        failure = TimeoutError('private-detail')
+
+        class SocketConnection(FakeConnection):
+            def connect(self):
+                self.connect_calls += 1
+                try:
+                    socket.socket.connect(self.sock, (self.host, 80))
+                finally:
+                    self.sock.close()
+
+        original = Mock(side_effect=failure)
+        with patch.object(http.client, 'HTTPConnection', SocketConnection), \
+             patch.object(socket.socket, 'connect', original):
+            with self.assertRaises(TimeoutError) as raised:
+                with TransportTrace('board.test', output, capture_socket_ports=True):
+                    connection = http.client.HTTPConnection('board.test', timeout=5)
+                    connection.request('GET', '/private')
+            self.assertIs(socket.socket.connect, original)
+        self.assertIs(raised.exception, failure)
+        self.assertEqual(connection.connect_calls, 1)
+        original.assert_called_once_with(connection.sock, ('board.test', 80))
+        self.assertEqual(connection.sock.method_calls[0][0], 'getsockname')
+        self.assertEqual(connection.sock.method_calls[1][0], 'close')
+        row = json.loads(output.getvalue().splitlines()[0])
+        self.assertEqual(row['socket_attempts'][0]['local_port'], 54321)
+        self.assertEqual(row['socket_attempts'][0]['result'], 'FAIL')
+        self.assertNotIn('private', output.getvalue())
+        self.assertNotIn('board.test', output.getvalue())
+
+    def test_socket_trace_ignores_unrelated_connections(self):
+        output = io.StringIO()
+        original = Mock(return_value=None)
+        sock = Mock()
+        with patch.object(socket.socket, 'connect', original):
+            with TransportTrace('board.test', output, capture_socket_ports=True):
+                socket.socket.connect(sock, ('server.test', 8772))
+            self.assertIs(socket.socket.connect, original)
+        original.assert_called_once_with(sock, ('server.test', 8772))
+        sock.getsockname.assert_not_called()
+        self.assertEqual(output.getvalue(), '')
+
     def test_request_response_timeout_and_private_contents(self):
         output = io.StringIO()
         with patch.object(http.client, 'HTTPConnection', FakeConnection):
