@@ -39,8 +39,12 @@ void tls_input_reserve_prepare_connection(void) {
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
     adaptive_input_stats_t stats = adaptive_input_stats(input);
     adaptive_input_set_limit(input, stats.minimum);
-#endif
+    // The limit retires busy extras when their leases end. Preserve the
+    // original floor buffers here; allocation-pressure reclaim stays enabled
+    // in the TLS allocator if memory is actually needed before then.
+#else
     while (reclaim_one(input, 0)) {}
+#endif
 #else
     adaptive_input_restore(input);
 #endif

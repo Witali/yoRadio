@@ -120,6 +120,35 @@ static void test_flac_growth(void) {
         assert(adaptive_input_return(q, packets[i]));
     }
     assert(adaptive_input_stats(q).resident == 4);
+    // A new connection can begin while only the added slots remain occupied.
+    // Its ordinary preparation must leave the idle floor buffers in place.
+    void *baseline[4];
+    for (unsigned i = 0; i < 4; ++i) baseline[i] = q->slots[i].data;
+    tls_input_reserve_expand_flac();
+    for (unsigned i = 0; i < 8; ++i) {
+        assert(adaptive_input_acquire(q, &packets[i], sizeof(i), 0));
+        memcpy(packets[i], &i, sizeof(i));
+        if (i != 7) assert(adaptive_input_commit(q, packets[i]));
+    }
+    for (unsigned i = 0; i < 4; ++i) {
+        assert(adaptive_input_receive(q, &size, 0) == packets[i]);
+        assert(adaptive_input_return(q, packets[i]));
+    }
+    assert(adaptive_input_receive(q, &size, 0) == packets[4]);
+    tls_input_reserve_finish_connection();
+    tls_input_reserve_prepare_connection();
+    assert(adaptive_input_stats(q).resident == 8);
+    for (unsigned i = 0; i < 4; ++i) assert(q->slots[i].data == baseline[i]);
+    assert(adaptive_input_commit(q, packets[7]));
+    for (unsigned i = 4; i < 8; ++i) {
+        if (i != 4) assert(adaptive_input_receive(q, &size, 0) == packets[i]);
+        unsigned actual;
+        memcpy(&actual, packets[i], sizeof(actual));
+        assert(size == sizeof(i) && actual == i);
+        assert(adaptive_input_return(q, packets[i]));
+    }
+    assert(adaptive_input_stats(q).resident == 4);
+    for (unsigned i = 0; i < 4; ++i) assert(q->slots[i].data == baseline[i]);
     for (unsigned i = 0; i < 16749; ++i) assert(tls[i] == 0x72);
     __wrap_esp_mbedtls_mem_free(tls);
     tls_input_reserve_bind(NULL);

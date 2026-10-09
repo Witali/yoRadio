@@ -1181,9 +1181,13 @@ The FLAC adapter allocates its channel workspace and encoded-frame window
 while parsing STREAMINFO. Expansion is deferred until PCM exists, after
 those initial allocations. It does not change sample precision or codec
 arithmetic. Stop, EOF, errors and station changes reduce the slot limit again.
-Idle slots are freed immediately; queued packets and producer/consumer leases
-are freed only after the consumer returns them. A subsequent connection
-starts with the minimum limit even while old leases are being returned.
+Ordinary shrink retains the earliest resident buffers and frees idle excess
+slots immediately. Busy excess slots retire only after the consumer returns
+them. A subsequent connection starts with the minimum limit even while old
+leases are being returned. It must not replace idle baseline buffers with
+later allocations that divide a previously contiguous free region. Actual
+TLS allocation pressure can still reclaim any idle slot above the minimum
+resident count; retention ranks existing pointers and tolerates those holes.
 
 Host checks compile the actual queue, TLS allocator policy, HTTP disposal and
 stream task under AddressSanitizer and UndefinedBehaviorSanitizer:
@@ -1199,7 +1203,10 @@ python tests/run-input-prefill.py --output .build/flac-growth-prefill-new
 The reserve suite includes an enabled four-slot variant: insufficient heap,
 partial allocation failure, changing heap headroom, a smaller saved target,
 occupied-slot retirement, intact FIFO payloads and an unchanged live TLS
-reserve. The stream suite checks one expansion per generation, delayed
+reserve. Queue and reserve regressions also cover idle baseline buffers with
+busy added buffers (READING, READY and WRITING), Stop/new-connection overlap,
+stable baseline addresses, and reclamation holes without dropping below the
+minimum. The stream suite checks one expansion per generation, delayed
 readiness, stale generations, AAC exclusion and cleanup after read errors.
 Queue stress includes 30,000 packets with concurrent consumption, reclamation
 and limit changes. These checks validate lifetimes, not hardware scheduling.

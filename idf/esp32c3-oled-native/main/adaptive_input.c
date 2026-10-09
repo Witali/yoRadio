@@ -74,6 +74,18 @@ void adaptive_input_restore(adaptive_input_t *input) {
     }
 }
 
+// Caller holds the queue lock. Keep the first limit resident buffers stable
+// through ordinary stream shutdown. Busy later buffers retire on return.
+// Emergency reclamation can leave holes, so rank resident pointers instead
+// of assuming that every lower slot index still contains an allocation.
+static bool should_retire_slot(const adaptive_input_t *input, unsigned index) {
+    if (input->resident <= input->limit) return false;
+    unsigned earlier = 0;
+    for (unsigned i = 0; i < index; ++i)
+        if (input->slots[i].data) ++earlier;
+    return earlier >= input->limit;
+}
+
 void adaptive_input_set_limit(adaptive_input_t *input, unsigned slots) {
     if (!input) return;
     portENTER_CRITICAL(&input->lock);
@@ -85,7 +97,7 @@ void adaptive_input_set_limit(adaptive_input_t *input, unsigned slots) {
         void *data = NULL;
         portENTER_CRITICAL(&input->lock);
         input_slot_t *slot = &input->slots[i - 1];
-        if (input->resident > input->limit && slot->state == IDLE) {
+        if (slot->state == IDLE && should_retire_slot(input, i - 1)) {
             data = slot->data;
             slot->data = NULL;
             slot->state = ABSENT;
@@ -215,7 +227,7 @@ bool adaptive_input_return(adaptive_input_t *input, void *packet) {
     for (unsigned i = 0; i < input->target; ++i) {
         input_slot_t *slot = &input->slots[i];
         if (slot->data != packet || slot->state != READING) continue;
-        bool release = input->resident > input->limit;
+        bool release = should_retire_slot(input, i);
         if (release) {
             slot->data = NULL;
             --input->resident;

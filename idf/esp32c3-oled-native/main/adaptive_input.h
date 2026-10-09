@@ -30,7 +30,9 @@ void adaptive_input_restore(adaptive_input_t *input);
 // limit. Existing leases/queued bytes are untouched; allocation stays unlocked.
 bool adaptive_input_restore_one(adaptive_input_t *input);
 // Bound resident storage between minimum and configured target. Shrink idle
-// slots immediately and leased slots only when the consumer returns them.
+// excess slots immediately and busy excess slots on consumer return, keeping
+// the earliest resident buffers. Real allocation-pressure reclamation can
+// still free any idle slot above the minimum resident count.
 // May overlap reclamation/consumer return and a producer allocation in flight.
 void adaptive_input_set_limit(adaptive_input_t *input, unsigned slots);
 adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *input);

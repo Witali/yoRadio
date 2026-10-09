@@ -190,6 +190,57 @@ static void shrink_during_allocation(void) {
     adaptive_input_set_limit(queue, 4);
 }
 
+static void test_retained_baseline(void) {
+    // Extra buffers may still carry queued/leased data when a stream closes.
+    // Keep the original floor buffers; retire the extras as their leases end.
+    for (unsigned pressure = 0; pressure < 2; ++pressure) {
+        adaptive_input_t *q = adaptive_input_create(16000, 8000, PACKET_CAPACITY);
+        assert(q);
+        adaptive_input_set_limit(q, 4);
+        void *baseline[4];
+        for (unsigned i = 0; i < 4; ++i) baseline[i] = q->slots[i].data;
+        adaptive_input_set_limit(q, 8);
+        adaptive_input_restore(q);
+        void *packets[8];
+        for (unsigned i = 0; i < 8; ++i) {
+            assert(adaptive_input_acquire(q, &packets[i], 4, 0));
+            memcpy(packets[i], &i, 4);
+            if (i != 7) assert(adaptive_input_commit(q, packets[i]));
+        }
+        size_t size;
+        for (unsigned i = 0; i < 4; ++i) {
+            void *p = adaptive_input_receive(q, &size, 0);
+            assert(p == baseline[i] && size == 4);
+            assert(adaptive_input_return(q, p));
+        }
+        void *reading = adaptive_input_receive(q, &size, 0);
+        assert(reading == packets[4]);
+        if (pressure) {
+            // Real allocation pressure may reclaim any idle buffer while
+            // preserving the count floor. The resulting holes are valid.
+            for (unsigned i = 0; i < 4; ++i) assert(adaptive_input_release_one(q));
+            assert(!adaptive_input_release_one(q));
+        }
+        adaptive_input_set_limit(q, 4);
+        assert(adaptive_input_stats(q).resident == (pressure ? 4 : 8));
+        for (unsigned i = 0; i < 4; ++i)
+            assert(q->slots[i].data == (pressure ? NULL : baseline[i]));
+        assert(adaptive_input_commit(q, packets[7]));
+        for (unsigned i = 4; i < 8; ++i) {
+            void *p = i == 4 ? reading : adaptive_input_receive(q, &size, 0);
+            unsigned value;
+            memcpy(&value, p, 4);
+            assert(value == i && size == 4);
+            assert(adaptive_input_return(q, p));
+            assert(adaptive_input_stats(q).resident == (pressure ? 4 : 11 - i));
+        }
+        assert(adaptive_input_stats(q).resident == 4);
+        for (unsigned i = 0; i < 4; ++i)
+            assert(q->slots[i].data == (pressure ? NULL : baseline[i]));
+        cleanup(q);
+    }
+}
+
 static void test_deferred_limit(void) {
     adaptive_input_t *q = adaptive_input_create(16000, 8000, PACKET_CAPACITY);
     assert(q);
@@ -213,7 +264,7 @@ static void test_deferred_limit(void) {
         memcpy(&value, p, 4);
         assert(value == i && size == 4);
         assert(adaptive_input_return(q, p));
-        assert(adaptive_input_stats(q).resident == (i == 0 ? 5 : 4));
+        assert(adaptive_input_stats(q).resident == (i < 4 ? 6 : 9 - i));
     }
     adaptive_input_restore(q);
     assert(adaptive_input_stats(q).resident == 4);
@@ -243,6 +294,7 @@ static void test_deferred_limit(void) {
 }
 
 int main(void) {
+    test_retained_baseline();
     test_deferred_limit();
     assert(!adaptive_input_create(1000, 0, PACKET_CAPACITY));
     assert(!adaptive_input_create(SIZE_MAX, 0, PACKET_CAPACITY));
@@ -351,5 +403,5 @@ int main(void) {
     for (unsigned i = 0; i < 3; ++i) assert(!pthread_join(threads[i], NULL));
     assert(adaptive_input_stats(queue).occupied == 0);
     cleanup(queue);
-    puts("PASS adaptive input: ownership, FIFO, deferred limit, allocation race/faults, TLS pressure, tick wrap, 30000 concurrent packets");
+    puts("PASS adaptive input: ownership, FIFO, retained baseline, deferred limit, allocation race/faults, TLS pressure, tick wrap, 30000 concurrent packets");
 }
