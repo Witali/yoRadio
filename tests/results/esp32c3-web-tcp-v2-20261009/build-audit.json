@@ -1,0 +1,75 @@
+{
+  "result": "PASS",
+  "image": {
+    "app_elf_sha256": "3a7765831c0c7a109ce02d7a9fdc40e3b47809267e745607ec357c461ec501d5",
+    "sha256": "991f29dd04a1458fea7adaaa377b5ee2165a6e900c601bd8ffb5e5e165674cbc",
+    "bytes": 1631904
+  },
+  "config_changes": {
+    "CONFIG_YORADIO_WEB_TCP_PROBE": [
+      null,
+      "y"
+    ]
+  },
+  "sections": {
+    ".rtc.text": 0,
+    ".rtc.force_fast": 0,
+    ".rtc.data": 6840,
+    ".rtc.force_slow": 36,
+    ".iram0.text": 47690,
+    ".iram0.text_end": 438,
+    ".iram0.data": 0,
+    ".iram0.bss": 0,
+    ".iram0.end": 0,
+    ".dram0.dummy": 48128,
+    ".dram0.data": 12856,
+    ".dram0.bss": 45696,
+    ".flash.text": 1166704,
+    ".flash.rodata": 397148,
+    ".dram0.heap_start": 0
+  },
+  "section_size_delta": {
+    ".iram0.text": 0,
+    ".iram0.text_end": 0,
+    ".dram0.data": 0,
+    ".dram0.heap_start": -8,
+    ".iram0.bss": 0,
+    ".flash.text": 1772,
+    ".iram0.end": 0,
+    ".dram0.dummy": 0,
+    ".rtc.force_fast": 0,
+    ".dram0.bss": 24,
+    ".flash.rodata": 16,
+    ".rtc.data": 1024,
+    ".iram0.data": 0,
+    ".rtc.text": 0,
+    ".rtc.force_slow": 0
+  },
+  "routes": {
+    "__wrap_tcp_input": [
+      "ip4_input"
+    ],
+    "tcp_input": [
+      "__wrap_tcp_input"
+    ],
+    "__wrap_ip4_output_if": [
+      "raw_sendto_if_src",
+      "tcp_output_control_segment",
+      "tcp_rst_netif",
+      "tcp_output",
+      "icmp_input",
+      "icmp_dest_unreach"
+    ],
+    "ip4_output_if": [
+      "__wrap_ip4_output_if"
+    ],
+    "web_tcp_probe_poll": [
+      "status_task"
+    ],
+    "network_heap_profile_poll": [
+      "web_tcp_probe_poll"
+    ]
+  },
+  "codec_objects": 18,
+  "codec_sections": 128
+}

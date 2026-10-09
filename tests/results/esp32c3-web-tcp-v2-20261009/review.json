@@ -1,0 +1,413 @@
+{
+  "passed": 17,
+  "total": 17,
+  "original_cases": [
+    {
+      "name": "initial-idle-owner-capture",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 128972,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 128972,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ],
+        "snapshots": 3,
+        "first_sequence": 1
+      },
+      "seconds": 12.313
+    },
+    {
+      "name": "switching-and-heap",
+      "result": "PASS",
+      "evidence": {
+        "cycles": 3,
+        "station_changes": 9
+      },
+      "seconds": 111.406
+    },
+    {
+      "name": "eof:https:flac-level8:auto",
+      "result": "PASS",
+      "evidence": {
+        "scope": "EOF state only; decoded profile acceptance is separate",
+        "observed_formats": [
+          "FLAC",
+          "FLAC 48 kHz stereo"
+        ],
+        "terminal_samples": 12,
+        "websocket_stopped": true
+      },
+      "seconds": 19.312
+    },
+    {
+      "name": "eof:https:flac-level8:flac",
+      "result": "PASS",
+      "evidence": {
+        "scope": "EOF state only; decoded profile acceptance is separate",
+        "observed_formats": [
+          "FLAC",
+          "FLAC 48 kHz stereo"
+        ],
+        "terminal_samples": 12,
+        "websocket_stopped": true
+      },
+      "seconds": 19.344
+    },
+    {
+      "name": "eof:https:hev2-44100-stereo:auto",
+      "result": "PASS",
+      "evidence": {
+        "scope": "EOF state only; decoded profile acceptance is separate",
+        "observed_formats": [
+          "AAC",
+          "HE-AACv2 44.1 kHz stereo"
+        ],
+        "terminal_samples": 13,
+        "websocket_stopped": true
+      },
+      "seconds": 20.344
+    },
+    {
+      "name": "eof:https:hev2-44100-stereo:aac",
+      "result": "PASS",
+      "evidence": {
+        "scope": "EOF state only; decoded profile acceptance is separate",
+        "observed_formats": [
+          "AAC",
+          "HE-AACv2 44.1 kHz stereo"
+        ],
+        "terminal_samples": 13,
+        "websocket_stopped": true
+      },
+      "seconds": 20.375
+    },
+    {
+      "name": "idle-before-records",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 129028,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 129028,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 129028,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.547
+    },
+    {
+      "name": "tls-record:grow",
+      "result": "PASS",
+      "evidence": {
+        "samples": 966,
+        "rate": 44100,
+        "channels": 2,
+        "record_counts": {
+          "1048": 118,
+          "16408": 37
+        },
+        "first_large_at": 253199.328,
+        "mean_busy": 58.78857142857143,
+        "peak_busy": 61.1,
+        "minimum_heap": 22260.0,
+        "minimum_largest": 16384.0,
+        "audio_wall_ratio": 1.000193691358517,
+        "first_full_pcm_seconds": 1.5780000000086147
+      },
+      "seconds": 181.234
+    },
+    {
+      "name": "idle-after-records",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 129024,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 129012,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 129028,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.5
+    },
+    {
+      "name": "tcp-v2-record-telemetry",
+      "result": "PASS",
+      "evidence": {
+        "events": 2955,
+        "listeners": 170,
+        "watermarks": 171,
+        "start": 253169.578,
+        "end": 253348.187,
+        "first_edge_seconds": 0.7970000000204891,
+        "last_edge_seconds": 0.6879999999946449,
+        "playback_interrupted": false
+      },
+      "seconds": 0.047
+    },
+    {
+      "name": "quiet-without-http",
+      "result": "PASS",
+      "evidence": {
+        "started_at": 253361.859,
+        "ended_at": 253421.859,
+        "http_polls": 0
+      },
+      "seconds": 60.156
+    },
+    {
+      "name": "idle-after-quiet",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 129012,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 129012,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 129012,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.312
+    },
+    {
+      "name": "cross-stage-recovery",
+      "result": "PASS",
+      "evidence": {
+        "baseline": "first-switch-cycle",
+        "checked": 3
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "runtime",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.015
+    },
+    {
+      "name": "stop-and-settings",
+      "result": "PASS",
+      "evidence": {
+        "stopped": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 0.765
+    },
+    {
+      "name": "runtime-after-capture-close",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "owners-complete",
+      "result": "PASS",
+      "evidence": {
+        "snapshots": 33,
+        "peak_live": 26,
+        "final_live": 0
+      },
+      "seconds": 0.0
+    }
+  ],
+  "full_capture_runtime": {
+    "result": "PASS"
+  },
+  "crc_frames": 5450,
+  "malformed": [],
+  "event_count": 4516,
+  "watermark_count": 467,
+  "listener_count": 467,
+  "listener_max_age_ms": 1282,
+  "max_pending": 0,
+  "ring_drops": 0,
+  "host_connections": 1501,
+  "max_connect_ms": 141.00000000325963,
+  "failed_connects": [],
+  "tx_errors": [],
+  "owner_complete": true,
+  "owner_initial_raw_free": 115616,
+  "owner_final_raw_free": 115616,
+  "owner_final_live": 0,
+  "records": [
+    {
+      "case": "tls-record:grow",
+      "interrupted": false,
+      "start": 253168.781,
+      "end": 253348.875,
+      "dma": {
+        "samples": 34,
+        "start": 253180.062,
+        "end": 253345.343,
+        "observed_seconds": 165.28099999998813,
+        "coverage_complete": true,
+        "maximum_sample_gap_seconds": 5.01600000000326,
+        "delta": {
+          "q_overruns": 0,
+          "writes": 15495,
+          "written_bytes": 31733760,
+          "write_us": 152141092,
+          "errors": 0
+        },
+        "maximum_write_us_since_boot": 16315,
+        "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+        "acoustic_continuity_qualified": false
+      },
+      "tcp": {
+        "result": "PASS",
+        "start": 253169.578,
+        "end": 253348.187,
+        "events": 2955,
+        "listeners": 170,
+        "watermarks": 171,
+        "first_edge_seconds": 0.7970000000204891,
+        "last_edge_seconds": 0.6879999999946449
+      }
+    }
+  ],
+  "phase_integrity": {
+    "initial-idle-owner-capture": {
+      "result": "PASS",
+      "start": 252952.75,
+      "end": 252963.796,
+      "events": 66,
+      "listeners": 11,
+      "watermarks": 12,
+      "first_edge_seconds": 0.9539999999979045,
+      "last_edge_seconds": 0.3129999999946449
+    },
+    "switching-and-heap": {
+      "result": "PASS",
+      "start": 252964.796,
+      "end": 253074.906,
+      "events": 702,
+      "listeners": 107,
+      "watermarks": 108,
+      "first_edge_seconds": 0.6870000000053551,
+      "last_edge_seconds": 0.6090000000258442
+    },
+    "eof:https:flac-level8:auto": {
+      "result": "PASS",
+      "start": 253075.89,
+      "end": 253093.953,
+      "events": 111,
+      "listeners": 17,
+      "watermarks": 18,
+      "first_edge_seconds": 0.28100000001722947,
+      "last_edge_seconds": 0.9679999999934807
+    },
+    "eof:https:flac-level8:flac": {
+      "result": "PASS",
+      "start": 253094.968,
+      "end": 253114.218,
+      "events": 120,
+      "listeners": 18,
+      "watermarks": 19,
+      "first_edge_seconds": 0.030999999988125637,
+      "last_edge_seconds": 0.0629999999946449
+    },
+    "eof:https:hev2-44100-stereo:auto": {
+      "result": "FAIL",
+      "reason": "Missing or duplicate TCP event"
+    },
+    "eof:https:hev2-44100-stereo:aac": {
+      "result": "FAIL",
+      "reason": "Missing or duplicate TCP event"
+    },
+    "idle-before-records": {
+      "result": "PASS",
+      "start": 253155.406,
+      "end": 253167.468,
+      "events": 69,
+      "listeners": 12,
+      "watermarks": 13,
+      "first_edge_seconds": 0.21899999998277053,
+      "last_edge_seconds": 0.26600000000325963
+    },
+    "tls-record:grow": {
+      "result": "PASS",
+      "start": 253168.484,
+      "end": 253348.187,
+      "events": 2973,
+      "listeners": 171,
+      "watermarks": 172,
+      "first_edge_seconds": 0.7339999999967404,
+      "last_edge_seconds": 0.7969999999913853
+    },
+    "idle-after-records": {
+      "result": "PASS",
+      "start": 253349.25,
+      "end": 253361.296,
+      "events": 69,
+      "listeners": 12,
+      "watermarks": 13,
+      "first_edge_seconds": 0.25,
+      "last_edge_seconds": 0.20399999999790452
+    },
+    "quiet-without-http": {
+      "result": "PASS",
+      "start": 253362.296,
+      "end": 253421.468,
+      "events": 0,
+      "listeners": 59,
+      "watermarks": 60,
+      "first_edge_seconds": 0.5929999999934807,
+      "last_edge_seconds": 0.39100000000325963
+    },
+    "idle-after-quiet": {
+      "result": "PASS",
+      "start": 253422.484,
+      "end": 253433.531,
+      "events": 63,
+      "listeners": 11,
+      "watermarks": 12,
+      "first_edge_seconds": 0.6089999999967404,
+      "last_edge_seconds": 0.6560000000172295
+    }
+  },
+  "input_sha256": {
+    "report.json": "343e41ed2c98e60229a02d030785b37bd3f309ab48f16eecc5f0b85607418445",
+    "performance.json": "f2c61ad899c853d86af04b9840dcc1575aa91ac65728cb7ea8c4a44ac878a283",
+    "status.json": "e275c9c1a757462aa750c89ddfb53aa009e954563f31bcb8bf5d0a025da24ed9",
+    "request-phases.jsonl": "a07931e533c73ca9db7d1896c78114644a8217cc924f90fd57ab8641f145c2ae"
+  }
+}

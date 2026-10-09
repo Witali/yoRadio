@@ -1300,3 +1300,8 @@ Short records reduce output traffic but do not guarantee USB delivery.
 Host sanitizer runs decode actual C-generated frames independently with
 Python's CRC implementation. Parser tests also delete/change every hex digit,
 merge lines and remove final events to check that corruption is rejected.
+
+The [compact-probe physical repeat](ESP32C3_WEB_TCP_V2_20261009.md) checks
+three minutes of HE-AACv2 record growth and passes its separate TCP integrity
+gate. It retains the explicit anchor boundaries and does not declare the
+earlier intermittent connection timeout fixed.
