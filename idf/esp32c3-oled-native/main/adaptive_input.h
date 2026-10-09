@@ -7,7 +7,7 @@
 typedef struct adaptive_input adaptive_input_t;
 typedef struct {
     size_t packet_capacity;
-    unsigned resident, minimum, target, occupied;
+    unsigned resident, minimum, target, occupied, limit;
     unsigned released;
 } adaptive_input_stats_t;
 
@@ -26,4 +26,11 @@ bool adaptive_input_release_one(adaptive_input_t *input);
 // Only the producer calls restore, between connections after old TLS closes.
 // Does not change queued data or leases and never waits for consumers.
 void adaptive_input_restore(adaptive_input_t *input);
+// Producer only. Best-effort allocation of one absent slot, up to the current
+// limit. Existing leases/queued bytes are untouched; allocation stays unlocked.
+bool adaptive_input_restore_one(adaptive_input_t *input);
+// Bound resident storage between minimum and configured target. Shrink idle
+// slots immediately and leased slots only when the consumer returns them.
+// May overlap reclamation/consumer return and a producer allocation in flight.
+void adaptive_input_set_limit(adaptive_input_t *input, unsigned slots);
 adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *input);

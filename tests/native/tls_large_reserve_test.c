@@ -13,6 +13,11 @@ static void mbedtls_platform_zeroize(void *data, size_t bytes) {
     while (bytes--) *p++ = 0;
 }
 static size_t fake_largest;
+static size_t fake_free;
+static size_t heap_caps_get_free_size(unsigned caps) {
+    assert(caps == (MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
+    return fake_free;
+}
 static atomic_uint normal_allocations, normal_releases;
 static size_t heap_caps_get_largest_free_block(unsigned caps) {
     assert(caps == (MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT));
@@ -59,6 +64,77 @@ static void *concurrent_client(void *argument) {
     }
     return NULL;
 }
+
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+static void consume_headroom(void) {
+    fake_free = FLAC_INPUT_HEAP_HEADROOM + 2060 - 1;
+}
+static void test_flac_growth(void) {
+    tls_input_reserve_expand_flac(); // Unbound lifetime is safe.
+    tls_input_reserve_finish_connection();
+    adaptive_input_t *q = adaptive_input_create(16000, 8000, 2060);
+    assert(q);
+    tls_input_reserve_bind(q);
+    for (unsigned boundary = 0; boundary < 3; ++boundary) {
+        const size_t low[] = {0, FLAC_INPUT_HEAP_HEADROOM - 1,
+                             FLAC_INPUT_HEAP_HEADROOM + 2060 - 1};
+        fake_free = low[boundary];
+        tls_input_reserve_expand_flac();
+        assert(adaptive_input_stats(q).resident == 4);
+    }
+    fake_free = 100000;
+    atomic_store(&fail_after, 2);
+    tls_input_reserve_expand_flac();
+    assert(adaptive_input_stats(q).resident == 6); // Partial OOM preserves data.
+    atomic_store(&fail_after, -1);
+    tls_input_reserve_finish_connection();
+    assert(adaptive_input_stats(q).resident == 4);
+    after_allocation = consume_headroom;
+    tls_input_reserve_expand_flac();
+    assert(adaptive_input_stats(q).resident == 5); // Recheck before each slot.
+    tls_input_reserve_finish_connection();
+    fake_free = 100000;
+    unsigned char *tls = test_tls_calloc(1, 16749);
+    assert(tls == s_tls_large_storage);
+    memset(tls, 0x72, 16749);
+    tls_input_reserve_expand_flac();
+    assert(adaptive_input_stats(q).resident == 8);
+    // End a fully queued stream with one consumer lease and one producer lease.
+    void *packets[8];
+    for (unsigned i = 0; i < 8; ++i) {
+        assert(adaptive_input_acquire(q, &packets[i], sizeof(i), 0));
+        memcpy(packets[i], &i, sizeof(i));
+        if (i != 7) assert(adaptive_input_commit(q, packets[i]));
+    }
+    size_t size;
+    assert(adaptive_input_receive(q, &size, 0) == packets[0]);
+    tls_input_reserve_finish_connection();
+    tls_input_reserve_prepare_connection();
+    assert(adaptive_input_stats(q).resident == 8);
+    assert(adaptive_input_commit(q, packets[7]));
+    for (unsigned i = 0; i < 8; ++i) {
+        if (i) assert(adaptive_input_receive(q, &size, 0) == packets[i]);
+        unsigned actual;
+        memcpy(&actual, packets[i], sizeof(actual));
+        assert(size == sizeof(i) && actual == i);
+        assert(adaptive_input_return(q, packets[i]));
+    }
+    assert(adaptive_input_stats(q).resident == 4);
+    for (unsigned i = 0; i < 16749; ++i) assert(tls[i] == 0x72);
+    __wrap_esp_mbedtls_mem_free(tls);
+    tls_input_reserve_bind(NULL);
+    adaptive_input_destroy(q);
+    // The saved user target is an independent upper bound on expansion.
+    q = adaptive_input_create(12000, 8000, 2060);
+    tls_input_reserve_bind(q);
+    tls_input_reserve_expand_flac();
+    assert(adaptive_input_stats(q).resident == 6);
+    assert(adaptive_input_stats(q).limit == 6);
+    tls_input_reserve_bind(NULL);
+    adaptive_input_destroy(q);
+    assert(!atomic_load(&live_allocations));
+}
+#endif
 
 int main(void) {
     assert(TLS_RESERVE_CAPACITY == 17058);
@@ -161,6 +237,9 @@ int main(void) {
     assert(!atomic_load(&live_allocations));
 #endif
     fake_largest = 200000;
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+    test_flac_growth();
+#endif
     pthread_t clients[4];
     for (uintptr_t i = 0; i < 4; ++i)
         assert(!pthread_create(&clients[i], NULL, concurrent_client, (void *)(i + 1)));

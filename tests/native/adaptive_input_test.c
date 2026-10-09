@@ -28,6 +28,7 @@ typedef struct {
 } *SemaphoreHandle_t;
 static atomic_int fail_after = -1;
 static atomic_uint live_allocations, slot_frees;
+static void (*after_allocation)(void);
 typedef union { max_align_t alignment; size_t size; } allocation_header_t;
 static void *checked_calloc(size_t count, size_t size) {
     if (size && count > SIZE_MAX / size) return NULL;
@@ -40,6 +41,11 @@ static void *checked_calloc(size_t count, size_t size) {
     if (!header) return NULL;
     header->size = bytes;
     atomic_fetch_add(&live_allocations, 1);
+    if (after_allocation) {
+        void (*hook)(void) = after_allocation;
+        after_allocation = NULL;
+        hook();
+    }
     return header + 1;
 }
 static void *checked_malloc(size_t bytes) { return checked_calloc(1, bytes); }
@@ -134,7 +140,10 @@ static void *producer(void *unused) {
         memcpy(p, &n, sizeof(n));
         memset((uint8_t *)p + 4, (uint8_t)n, size - 4);
         assert(adaptive_input_commit(queue, p));
-        if (n % 97 == 0) adaptive_input_restore(queue);
+        if (n % 97 == 0) {
+            adaptive_input_set_limit(queue, (n / 97) % 2 ? 4 : 8);
+            adaptive_input_restore(queue);
+        }
     }
     return NULL;
 }
@@ -177,7 +186,64 @@ static void pressure_setup(adaptive_input_t *q, size_t largest, bool merging) {
     coalesce = merging;
 }
 
+static void shrink_during_allocation(void) {
+    adaptive_input_set_limit(queue, 4);
+}
+
+static void test_deferred_limit(void) {
+    adaptive_input_t *q = adaptive_input_create(16000, 8000, PACKET_CAPACITY);
+    assert(q);
+    void *packets[6];
+    for (unsigned i = 0; i < 6; ++i) {
+        assert(adaptive_input_acquire(q, &packets[i], 4, 0));
+        memcpy(packets[i], &i, 4);
+        if (i != 5) assert(adaptive_input_commit(q, packets[i]));
+    }
+    size_t size;
+    assert(adaptive_input_receive(q, &size, 0) == packets[0]);
+    // One READING, four READY, one WRITING: shrink only the two idle slots.
+    adaptive_input_set_limit(q, 0);
+    adaptive_input_stats_t s = adaptive_input_stats(q);
+    assert(s.limit == 4 && s.resident == 6 && s.occupied == 6);
+    assert(!adaptive_input_restore_one(q));
+    assert(adaptive_input_commit(q, packets[5]));
+    for (unsigned i = 0; i < 6; ++i) {
+        void *p = i ? adaptive_input_receive(q, &size, 0) : packets[0];
+        unsigned value;
+        memcpy(&value, p, 4);
+        assert(value == i && size == 4);
+        assert(adaptive_input_return(q, p));
+        assert(adaptive_input_stats(q).resident == (i == 0 ? 5 : 4));
+    }
+    adaptive_input_restore(q);
+    assert(adaptive_input_stats(q).resident == 4);
+    adaptive_input_set_limit(q, UINT32_MAX);
+    assert(adaptive_input_stats(q).limit == 8);
+    atomic_store(&fail_after, 0);
+    assert(!adaptive_input_restore_one(q));
+    atomic_store(&fail_after, -1);
+    assert(adaptive_input_restore_one(q) && adaptive_input_stats(q).resident == 5);
+    adaptive_input_restore(q);
+    assert(adaptive_input_stats(q).resident == 8);
+    cleanup(q);
+
+    // A successful malloc is discarded if a concurrent policy shrinks first.
+    queue = adaptive_input_create(16000, 8000, PACKET_CAPACITY);
+    adaptive_input_set_limit(queue, 4);
+    adaptive_input_set_limit(queue, 8);
+    unsigned allocations = atomic_load(&live_allocations);
+    after_allocation = shrink_during_allocation;
+    assert(!adaptive_input_restore_one(queue));
+    assert(adaptive_input_stats(queue).resident == 4);
+    assert(atomic_load(&live_allocations) == allocations);
+    cleanup(queue);
+    queue = NULL;
+    adaptive_input_set_limit(NULL, 2);
+    assert(!adaptive_input_restore_one(NULL));
+}
+
 int main(void) {
+    test_deferred_limit();
     assert(!adaptive_input_create(1000, 0, PACKET_CAPACITY));
     assert(!adaptive_input_create(SIZE_MAX, 0, PACKET_CAPACITY));
     assert(!adaptive_input_create(16000, 8000, 0));
@@ -285,5 +351,5 @@ int main(void) {
     for (unsigned i = 0; i < 3; ++i) assert(!pthread_join(threads[i], NULL));
     assert(adaptive_input_stats(queue).occupied == 0);
     cleanup(queue);
-    puts("PASS adaptive input: ownership, FIFO, allocation faults, TLS pressure, tick wrap, 30000 concurrent packets");
+    puts("PASS adaptive input: ownership, FIFO, deferred limit, allocation race/faults, TLS pressure, tick wrap, 30000 concurrent packets");
 }

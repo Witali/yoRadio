@@ -34,8 +34,12 @@ def main():
     common = support.read_text().split('/* PRODUCTION_HEADER */')[0]
     common += body(inputs[0]) + body(inputs[3]) + body(inputs[5])
     variants = []
-    for adaptive, rx_only in ((False, False), (True, False), (False, True), (True, True)):
+    for adaptive, rx_only, flac_slots in ((False, False, 0), (True, False, 0),
+                                         (False, True, 0), (True, True, 0),
+                                         (True, True, 4)):
         name = ('adaptive' if adaptive else 'pool-only') + ('-rx-only' if rx_only else '')
+        if flac_slots:
+            name += '-flac4'
         queue = ('#define calloc checked_calloc\n#define malloc checked_malloc\n#define free checked_free\n'
                  + body(inputs[1]) + '\n#undef calloc\n#undef malloc\n#undef free\n') if adaptive else ''
         unit = args.output / (name + '.c')
@@ -47,6 +51,7 @@ def main():
             'gcc', '-std=c11', '-O2', '-g', '-Wall', '-Wextra', '-Werror',
             '-Wno-unused-variable', '-Wno-unused-function', '-pthread',
             '-DCONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE=1',
+            f'-DCONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS={flac_slots}',
             *(['-DCONFIG_YORADIO_TLS_RX_ONLY_RESERVE=1'] if rx_only else []),
             *(['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1'] if adaptive else []),
             '-fsanitize=address,undefined', '-fno-pie', '-no-pie', host(unit), '-o', host(binary)]))
@@ -54,14 +59,14 @@ def main():
                       'UBSAN_OPTIONS=halt_on_error=1', host(binary)])
         (args.output / (name + '.log')).write_bytes(result)
         assert result.startswith(b'PASS TLS large reserve:')
-        variants.append(dict(adaptive_input=adaptive, rx_only=rx_only,
+        variants.append(dict(adaptive_input=adaptive, rx_only=rx_only, flac_extra_slots=flac_slots,
                              passed=True, concurrent_allocations=8000))
     (args.output / 'report.json').write_text(json.dumps(dict(
         variants=variants, sanitizers=['address', 'undefined'],
         scope='Actual C allocators; pthread platform and simulated heap. SDK sizing separately verified in ELF; no physical qualification.',
         sources={p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
     ), indent=2) + '\n')
-    print('PASS TLS reserve, generic/RX-only with pool-only/adaptive variants')
+    print('PASS TLS reserve: four baseline variants and bounded FLAC expansion')
 
 
 if __name__ == '__main__':

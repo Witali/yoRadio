@@ -174,6 +174,9 @@ static size_t s_encoded_usable_size;
 static atomic_uint s_generation;
 static atomic_uint s_decoder_target_codec;
 static atomic_uint s_decoder_released_generation;
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+static atomic_uint s_flac_input_ready_generation;
+#endif
 static portMUX_TYPE s_generation_lock = portMUX_INITIALIZER_UNLOCKED;
 static char s_last_url[sizeof(((play_command_t *)0)->url)];
 static native_codec_t s_last_codec;
@@ -190,6 +193,9 @@ static void log_runtime_memory(const char *stage);
 
 static void dispose_http_client(esp_http_client_handle_t client) {
     if (!client) return;
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+    tls_input_reserve_finish_connection();
+#endif
     esp_http_client_close(client);
     esp_http_client_cleanup(client);
 }
@@ -769,7 +775,17 @@ static void stream_task(void *argument) {
             .started_us = esp_timer_get_time(),
         };
         stream_http_reader_t reader = {0};
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+        bool input_growth_attempted = false;
+#endif
         while (atomic_load(&s_generation) == command.generation) {
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+            if (!input_growth_attempted && codec == NATIVE_CODEC_FLAC &&
+                atomic_load(&s_flac_input_ready_generation) == command.generation) {
+                input_growth_attempted = true;
+                tls_input_reserve_expand_flac();
+            }
+#endif
             int received = stream_http_read(&reader, client, (char *)buffer,
                                             STREAM_CHUNK_SIZE);
             // Stop/station change may happen while the socket read is blocked.
@@ -1379,6 +1395,10 @@ static void decoder_task(void *argument) {
                 }
 #endif
                 if (!first_frame_memory_logged && stream_info_ready) {
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+                    if (result >= 0 && !packet->end_of_stream)
+                        atomic_store(&s_flac_input_ready_generation, generation);
+#endif
                     log_runtime_memory("after first FLAC frame");
                     first_frame_memory_logged = true;
                 }
@@ -1797,6 +1817,9 @@ esp_err_t audio_service_start(native_state_t *state) {
     atomic_init(&s_generation, 0);
     atomic_init(&s_decoder_target_codec, NATIVE_CODEC_AUTO);
     atomic_init(&s_decoder_released_generation, 0);
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+    atomic_init(&s_flac_input_ready_generation, 0);
+#endif
     atomic_init(&s_measured_bitrate_ready, false);
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;

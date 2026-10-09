@@ -17,7 +17,7 @@ struct adaptive_input {
     portMUX_TYPE lock;
     SemaphoreHandle_t data_ready, space_ready;
     size_t packet_capacity;
-    unsigned target, minimum, resident, released;
+    unsigned target, minimum, resident, released, limit;
     unsigned head, tail;
     input_slot_t slots[INPUT_MAX_SLOTS];
 };
@@ -30,6 +30,7 @@ adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *input) {
     result.resident = input->resident;
     result.minimum = input->minimum;
     result.target = input->target;
+    result.limit = input->limit;
     result.released = input->released;
     for (unsigned i = 0; i < input->target; ++i) {
         slot_state_t state = input->slots[i].state;
@@ -40,22 +41,59 @@ adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *input) {
     return result;
 }
 
-void adaptive_input_restore(adaptive_input_t *input) {
-    if (!input) return;
+bool adaptive_input_restore_one(adaptive_input_t *input) {
+    if (!input) return false;
     for (unsigned i = 0; i < input->target; ++i) {
         portENTER_CRITICAL(&input->lock);
-        bool allocate = input->slots[i].state == ABSENT;
+        bool allocate = input->resident < input->limit &&
+                        input->slots[i].state == ABSENT;
         if (allocate) input->slots[i].state = ALLOCATING;
         portEXIT_CRITICAL(&input->lock);
         if (!allocate) continue;
         void *data = malloc(input->packet_capacity);
         portENTER_CRITICAL(&input->lock);
-        input->slots[i].data = data;
-        input->slots[i].state = data ? IDLE : ABSENT;
-        if (data) ++input->resident;
+        // The policy can shrink while malloc runs. Never publish a new slot
+        // beyond that limit, even if allocation itself succeeded.
+        bool publish = data && input->resident < input->limit;
+        input->slots[i].data = publish ? data : NULL;
+        input->slots[i].state = publish ? IDLE : ABSENT;
+        if (publish) ++input->resident;
         portEXIT_CRITICAL(&input->lock);
-        if (!data) break;
-        xSemaphoreGive(input->space_ready);
+        if (publish) xSemaphoreGive(input->space_ready);
+        else free(data);
+        return publish;
+    }
+    return false;
+}
+
+void adaptive_input_restore(adaptive_input_t *input) {
+    if (!input) return;
+    // Bound work even if TLS keeps reclaiming slots during this refill.
+    for (unsigned attempt = 0; attempt < input->target; ++attempt) {
+        if (!adaptive_input_restore_one(input)) break;
+    }
+}
+
+void adaptive_input_set_limit(adaptive_input_t *input, unsigned slots) {
+    if (!input) return;
+    portENTER_CRITICAL(&input->lock);
+    if (slots < input->minimum) slots = input->minimum;
+    if (slots > input->target) slots = input->target;
+    input->limit = slots;
+    portEXIT_CRITICAL(&input->lock);
+    for (unsigned i = input->target; i > 0; --i) {
+        void *data = NULL;
+        portENTER_CRITICAL(&input->lock);
+        input_slot_t *slot = &input->slots[i - 1];
+        if (input->resident > input->limit && slot->state == IDLE) {
+            data = slot->data;
+            slot->data = NULL;
+            slot->state = ABSENT;
+            --input->resident;
+            ++input->released;
+        }
+        portEXIT_CRITICAL(&input->lock);
+        free(data);
     }
 }
 
@@ -71,6 +109,7 @@ adaptive_input_t *adaptive_input_create(size_t budget, size_t minimum_bytes,
     input->lock = (portMUX_TYPE)portMUX_INITIALIZER_UNLOCKED;
     input->packet_capacity = packet_capacity;
     input->target = (unsigned)target;
+    input->limit = input->target;
     // Round the minimum up, without overflowing on a malformed size argument.
     size_t minimum = minimum_bytes / packet_capacity +
                      (minimum_bytes % packet_capacity != 0);
@@ -176,9 +215,16 @@ bool adaptive_input_return(adaptive_input_t *input, void *packet) {
     for (unsigned i = 0; i < input->target; ++i) {
         input_slot_t *slot = &input->slots[i];
         if (slot->data != packet || slot->state != READING) continue;
-        slot->state = IDLE;
+        bool release = input->resident > input->limit;
+        if (release) {
+            slot->data = NULL;
+            --input->resident;
+            ++input->released;
+        }
+        slot->state = release ? ABSENT : IDLE;
         slot->size = 0;
         portEXIT_CRITICAL(&input->lock);
+        if (release) free(packet);
         xSemaphoreGive(input->space_ready);
         return true;
     }

@@ -1156,3 +1156,51 @@ message still yields `REVIEW_REQUIRED`, including during Stop or reboot.
 The numeric code and controlled comparison must explain its scope; proximity
 to a reset alone never makes it harmless. These short controls do not replace
 sustained playback or analog checks.
+
+## Experimental FLAC input capacity after decoder initialization
+
+`CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS` defaults to `0`. With adaptive input,
+the permanent TLS reserve and the custom FLAC decoder enabled, a nonzero
+value lets the stream task restore additional packet slots after the current
+FLAC generation produces PCM. The saved input-buffer target remains the
+upper bound. AAC, MP3, Vorbis and Opus do not request this expansion.
+
+At the usual minimum of four 2,060-byte slots, value `4` allows eight slots:
+8,240 additional payload-storage bytes, plus allocator overhead. Before each
+allocation, the producer checks for 32 KiB of remaining internal free heap.
+This is advisory headroom, not a reservation: concurrent allocations and
+fragmentation can still make allocation fail. A partial expansion is allowed.
+
+The FLAC adapter allocates its channel workspace and encoded-frame window
+while parsing STREAMINFO. Expansion is deferred until PCM exists, after
+those initial allocations. It does not change sample precision or codec
+arithmetic. Stop, EOF, errors and station changes reduce the slot limit again.
+Idle slots are freed immediately; queued packets and producer/consumer leases
+are freed only after the consumer returns them. A subsequent connection
+starts with the minimum limit even while old leases are being returned.
+
+Host checks compile the actual queue, TLS allocator policy, HTTP disposal and
+stream task under AddressSanitizer and UndefinedBehaviorSanitizer:
+
+```powershell
+python tests/run-adaptive-input.py --output .build/input-queue-new
+python tests/run-tls-large-reserve.py --output .build/input-reserve-new
+python tests/run-stream-connection-retry.py --flac-input-growth --output .build/flac-growth-stream-new
+python tests/run-stream-connection-retry.py --adaptive-input --output .build/flac-growth-disabled-new
+python tests/run-input-prefill.py --output .build/flac-growth-prefill-new
+```
+
+The reserve suite includes an enabled four-slot variant: insufficient heap,
+partial allocation failure, changing heap headroom, a smaller saved target,
+occupied-slot retirement, intact FIFO payloads and an unchanged live TLS
+reserve. The stream suite checks one expansion per generation, delayed
+readiness, stale generations, AAC exclusion and cleanup after read errors.
+Queue stress includes 30,000 packets with concurrent consumption, reclamation
+and limit changes. These checks validate lifetimes, not hardware scheduling.
+
+Before changing the default, compare matched firmware with extra slots `0`
+and `4` on heavy HTTPS FLAC. Record whole-run and steady-state DMA events,
+input waits, CPU, heap/largest block and settled recovery. Then exercise
+FLAC-to-full-HE-AAC/PS switching, EOF, TLS record growth and OTA. Preserve all
+failed observations; zero DMA events alone do not prove unchanged analog
+sound quality.

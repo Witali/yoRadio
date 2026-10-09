@@ -12,7 +12,8 @@ config YORADIO_TLS_LARGE_BLOCK_RESERVE
         allocation site; it may also serve large handshake allocations.
         Keep disabled until full-record playback, certificates, concurrent
         contexts, all codecs and OTA pass. With adaptive input, keep its queue
-        at the configured minimum from startup to fund this permanent reserve.
+        at the configured minimum from startup to fund this permanent reserve,
+        unless the separate post-frame FLAC expansion experiment is selected.
 
 config YORADIO_TLS_RX_ONLY_RESERVE
     bool "Use the static TLS reserve only for RX allocations (experimental)"
@@ -48,7 +49,9 @@ config YORADIO_ADAPTIVE_INPUT_BUFFER
         above the minimum; never discard queued data or decoder/producer leases.
         Refill available capacity between connections, unless the permanent
         TLS large-block reserve is enabled; that combination keeps the input
-        at its minimum from startup, including for HTTP. Slots are rounded to
+        at its minimum from startup, including for HTTP. The separate FLAC
+        expansion option can restore slots after decoder initialization.
+        Slots are rounded to
         complete stream packets, so the effective size differs from the legacy
         ring. This cannot guarantee a contiguous TLS allocation or enough jitter
         tolerance. Keep disabled until all-codec and long-playback tests pass.
@@ -76,6 +79,22 @@ config YORADIO_INPUT_PREFILL_MS
         or audio copy is introduced. Zero preserves immediate decoding.
         Short finite files can be delayed by this bounded startup interval.
         Keep zero until continuity, TLS memory peaks, EOF and switching pass.
+
+config YORADIO_FLAC_INPUT_EXTRA_SLOTS
+    int "Extra input slots after the first FLAC frame (experimental)"
+    depends on YORADIO_ADAPTIVE_INPUT_BUFFER && YORADIO_TLS_LARGE_BLOCK_RESERVE && YORADIO_FLAC_DECODER_CUSTOM
+    range 0 8
+    default 0
+    help
+        After the custom FLAC decoder has allocated its working memory and
+        decoded a complete frame, let the stream task restore this many input
+        slots above the minimum, capped by the saved input-buffer target.
+        Each allocation checks for at least 32 KiB of remaining internal heap;
+        this is advisory headroom, not another reservation. The TLS reserve
+        remains intact. Stop, EOF and station changes shrink the queue again,
+        reclaiming queued or leased slots only when the decoder returns them.
+        Zero preserves the existing policy. Keep disabled until heavy FLAC,
+        AAC switching, memory recovery, TLS and OTA checks pass.
 
 config YORADIO_INPUT_PREFILL_MIN_MS
     int "Minimum initial compressed-input prefill time (experimental, ms)"
