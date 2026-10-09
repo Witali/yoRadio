@@ -194,7 +194,9 @@ static void cpu_profiler_sample(void) {
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT),
              (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_8BIT),
              (unsigned)count);
+#ifndef CONFIG_YORADIO_WEB_TCP_PROBE
     network_heap_profile_poll();
+#endif
     tls_path_profile_poll();
 }
 

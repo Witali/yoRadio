@@ -15,6 +15,7 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "web_tcp_probe.h"
 #include "native_audio_output.h"
 #include "native_audio_settings.h"
 #include "network_service.h"
@@ -646,6 +647,7 @@ static void status_task(void *argument) {
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(WS_STATUS_POLL_MS));
         int64_t cycle_started_us = esp_timer_get_time();
+        web_tcp_probe_poll();
         uint32_t publications = 0;
         uint32_t deliveries = 0;
         capture_status_key(&s_current_status_key);

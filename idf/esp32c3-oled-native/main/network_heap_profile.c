@@ -9,6 +9,7 @@
 #include "freertos/FreeRTOS.h"
 #include "lwip/priv/tcp_priv.h"
 #include "lwip/tcpip.h"
+#include "web_tcp_probe.h"
 
 typedef struct {
     int64_t sampled_us;
@@ -17,6 +18,9 @@ typedef struct {
     uint32_t active, time_wait, bound, listening;
     uint32_t tx_segments, tx_bytes, rx_segments, rx_bytes;
     uint32_t rx_window, rx_window_max, rx_refused_bytes;
+#ifdef CONFIG_YORADIO_WEB_TCP_PROBE
+    uint32_t web_syn, web_established, web_listeners, web_backlog, web_pending;
+#endif
 } network_heap_snapshot_t;
 
 static portMUX_TYPE s_lock = portMUX_INITIALIZER_UNLOCKED;
@@ -42,6 +46,12 @@ static void collect(void *context) {
     const int64_t started = esp_timer_get_time();
     for (const struct tcp_pcb *pcb = tcp_active_pcbs; pcb; pcb = pcb->next) {
         ++next.active;
+#ifdef CONFIG_YORADIO_WEB_TCP_PROBE
+        if (pcb->local_port == WEB_TCP_PROBE_PORT) {
+            if (pcb->state == SYN_RCVD) ++next.web_syn;
+            if (pcb->state == ESTABLISHED) ++next.web_established;
+        }
+#endif
         count_segments(pcb->unsent, &next.tx_segments, &next.tx_bytes);
         count_segments(pcb->unacked, &next.tx_segments, &next.tx_bytes);
         // Receive credit includes data queued for the application. The
@@ -56,7 +66,18 @@ static void collect(void *context) {
     for (const struct tcp_pcb *pcb = tcp_tw_pcbs; pcb; pcb = pcb->next) ++next.time_wait;
     for (const struct tcp_pcb *pcb = tcp_bound_pcbs; pcb; pcb = pcb->next) ++next.bound;
     for (const struct tcp_pcb_listen *pcb = tcp_listen_pcbs.listen_pcbs;
-         pcb; pcb = pcb->next) ++next.listening;
+         pcb; pcb = pcb->next) {
+        ++next.listening;
+#ifdef CONFIG_YORADIO_WEB_TCP_PROBE
+        if (pcb->local_port == WEB_TCP_PROBE_PORT) {
+            ++next.web_listeners;
+#if TCP_LISTEN_BACKLOG
+            next.web_backlog += pcb->backlog;
+            next.web_pending += pcb->accepts_pending;
+#endif
+        }
+#endif
+    }
 
     multi_heap_info_t heap;
     heap_caps_get_info(&heap, MALLOC_CAP_8BIT);
@@ -79,7 +100,7 @@ static void collect(void *context) {
 
 void network_heap_profile_poll(void) {
     // One persistent lwIP callback message; no per-sample message allocation.
-    // Only this HTTP-thread function creates/posts it. It lives until reboot.
+    // One configured profiler task creates/posts it. It lives until reboot.
     if (!s_message) {
         s_message = tcpip_callbackmsg_new(collect, NULL);
         if (!s_message) {
@@ -117,6 +138,14 @@ void network_heap_profile_poll(void) {
                  " window=%u maximum=%u refused=%u",
                  (unsigned)previous.sequence, age_ms, (unsigned)previous.rx_window,
                  (unsigned)previous.rx_window_max, (unsigned)previous.rx_refused_bytes);
+#ifdef CONFIG_YORADIO_WEB_TCP_PROBE
+        ESP_LOGI("net_heap", "PERF WEB_LISTEN: seq=%u age_ms=%" PRId64
+                 " syn_rcvd=%u established=%u listeners=%u backlog=%u pending=%u backlog_supported=%u",
+                 (unsigned)previous.sequence, age_ms, (unsigned)previous.web_syn,
+                 (unsigned)previous.web_established, (unsigned)previous.web_listeners,
+                 (unsigned)previous.web_backlog, (unsigned)previous.web_pending,
+                 (unsigned)TCP_LISTEN_BACKLOG);
+#endif
     }
     if (pending || tcpip_callbackmsg_trycallback(s_message) != ERR_OK) {
         ++s_missed;

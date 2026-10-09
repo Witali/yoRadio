@@ -1224,3 +1224,47 @@ Keep the initial free-region baseline as well as the first switch baseline:
 loss during the first cycle or within a size-class tolerance must remain
 visible. Its offline replay retains the original early TLS-server shutdown
 faults and the corrected-harness comparison separately.
+
+## WebUI TCP handshake diagnostic
+
+`CONFIG_YORADIO_WEB_TCP_PROBE=y` is a default-off physical diagnostic,
+requiring `CONFIG_YORADIO_NETWORK_HEAP_PROFILE`. It records port-80 handshake
+metadata in a bounded 64-event ring (1,024 RTC bytes). It does not allocate
+packets, change TCP return values, add retries or extend request timeouts.
+The existing WebSocket status task drains the ring and requests network
+snapshots once per second, independently of incoming HTTP requests. Its
+profiling interval includes the diagnostic work; these builds are not
+production CPU benchmarks.
+
+`PERF WEB_TCP` contains a sequence number, low 32 bits of the device's
+microsecond clock, peer port, direction (`0` receive, `1` transmit), flags,
+PCB state before/after receive, output result, pending accepts and dropped
+event count. State/pending `255` means unavailable; receive result `0` is
+not evidence of packet acceptance. IPv4 SYN/SYN-ACK and RST output is
+observed. Established data payloads, IP addresses, HTTP headers, URLs and
+credentials are not retained. Outgoing success means acceptance by the IP
+output path, not delivery to the computer.
+
+Events are recorded on wrapper return: a SYN-ACK generated inside input can
+appear before its corresponding received SYN. Serial arrival time includes
+the consumer/logging delay. Reject incomplete sequences or nonzero dropped
+counts as a complete connection trace. `PERF WEB_LISTEN` reports SYN_RCVD,
+ESTABLISHED and listener counts, with `backlog_supported` explicitly stating
+whether the SDK has TCP listen-backlog accounting. Zero pending/backlog
+values with this flag off must not be interpreted as an empty accept queue.
+
+Host wrapper checks free/mutate input packets inside the real-call double,
+verify argument/result preservation, handshake states, filtering, queue
+saturation and unsigned index wrap, under ASan/UBSan with backlog on/off:
+
+```powershell
+python tests/run-web-tcp-probe.py --output NEW_DIRECTORY
+python tests/test-esp32c3-transport-trace.py
+```
+
+`TransportTrace(..., capture_socket_ports=True)` additionally saves the local
+port before `socket.create_connection` closes a failed socket. It retains the
+original connection attempt, timeout and exception. Pair that port and time
+window with device events; do not count the enclosing request's repeated
+exception as another failed TCP connection. A firmware ELF audit must verify
+both input/output wrappers are actually linked into lwIP before deployment.

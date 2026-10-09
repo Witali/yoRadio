@@ -570,6 +570,17 @@ config YORADIO_QEMU_AAC_SMOOTHING_HISTORY_TEST
         owner bytes using 1024 temporary stack bytes during envelope processing.
         QEMU-only; physical stack, full-radio memory and CPU gates remain open.
 
+config YORADIO_WEB_TCP_PROBE
+    bool "Trace native WebUI TCP handshakes"
+    depends on YORADIO_NETWORK_HEAP_PROFILE && !YORADIO_QEMU
+    default n
+    help
+        Diagnostic only: record bounded TCP handshake metadata for port 80,
+        including the peer port, flags and PCB state. Never retain addresses,
+        packet contents or payload. Uses 1024 RTC bytes plus small counters.
+        The existing WebSocket task drains events and samples network heap
+        independently of HTTP requests. TCP behavior remains unchanged.
+
 config YORADIO_TCP_ALLOCATION_DIAGNOSTICS
     bool "Trace TCP control-block allocation and release"
     depends on YORADIO_HEAP_LAYOUT_DIAGNOSTICS

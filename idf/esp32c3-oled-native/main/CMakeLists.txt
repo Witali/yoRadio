@@ -130,6 +130,9 @@ set(NATIVE_SRCS
 if(CONFIG_YORADIO_NETWORK_HEAP_PROFILE)
   list(APPEND NATIVE_SRCS "network_heap_profile.c")
 endif()
+if(CONFIG_YORADIO_WEB_TCP_PROBE)
+  list(APPEND NATIVE_SRCS "web_tcp_probe.c")
+endif()
 
 if(CONFIG_YORADIO_QEMU)
   list(APPEND NATIVE_SRCS "native_audio_output_qemu.c")
@@ -359,6 +362,11 @@ if(CONFIG_YORADIO_TCP_PCB_POOL)
   target_link_options(${COMPONENT_LIB} INTERFACE
     "-Wl,--wrap=memp_malloc" "-Wl,--wrap=memp_free"
     "-Wl,--undefined=__wrap_memp_malloc")
+endif()
+
+if(CONFIG_YORADIO_WEB_TCP_PROBE)
+  target_link_options(${COMPONENT_LIB} INTERFACE
+    "-Wl,--wrap=tcp_input" "-Wl,--wrap=ip4_output_if")
 endif()
 
 if(CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE OR CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE)
