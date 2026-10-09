@@ -1,0 +1,295 @@
+{
+  "missing": [],
+  "phases": {
+    "control-before": {
+      "passed": 6,
+      "total": 6,
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "connection_failures": [],
+      "recovery": {
+        "after-flac": {
+          "result": "PASS",
+          "evidence": null
+        }
+      }
+    },
+    "expanded": {
+      "passed": 9,
+      "total": 9,
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "connection_failures": [],
+      "recovery": {
+        "after-flac": {
+          "result": "PASS",
+          "evidence": null
+        },
+        "after-aac": {
+          "result": "PASS",
+          "evidence": null
+        }
+      }
+    },
+    "control-after": {
+      "passed": 5,
+      "total": 6,
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "connection_failures": [],
+      "recovery": {
+        "after-flac": {
+          "result": "PASS",
+          "evidence": null
+        }
+      }
+    }
+  },
+  "sustained": [
+    {
+      "phase": "control-before",
+      "case": "load:stress-flac-48000-2ch-16bit-610s",
+      "cpu": 79.31670465201857,
+      "dma": {
+        "q_overruns": 64,
+        "writes": 15458,
+        "written_bytes": 31657984,
+        "write_us": 133916900,
+        "errors": 0
+      },
+      "whole": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 36,
+          "start": 254524.203,
+          "end": 254699.515,
+          "observed_seconds": 175.31200000000536,
+          "coverage_complete": true,
+          "maximum_sample_gap_seconds": 5.14000000001397,
+          "delta": {
+            "q_overruns": 64,
+            "writes": 16402,
+            "written_bytes": 33591296,
+            "write_us": 142100247,
+            "errors": 0
+          },
+          "maximum_write_us_since_boot": 16854,
+          "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+          "acoustic_continuity_qualified": false
+        }
+      },
+      "input_wait": {
+        "us": 41539553,
+        "count": 7877,
+        "wall_percent": 24.98978845735961,
+        "mean_us": 5273.524565189793,
+        "max_us": 25801,
+        "timeouts": 56
+      },
+      "empty_wait": {
+        "us": 19694735,
+        "count": 5936,
+        "wall_percent": 11.923628083068975,
+        "mean_us": 3317.846192722372,
+        "max_us": 10348,
+        "timeouts": 3181
+      },
+      "telemetry": true,
+      "digital_acceptance": false,
+      "heap": {
+        "heap": {
+          "min": 57308,
+          "first_median": 60328,
+          "last_median": 59300
+        },
+        "largest": {
+          "min": 36864,
+          "first_median": 36864,
+          "last_median": 36864
+        }
+      },
+      "rssi": -65.0
+    },
+    {
+      "phase": "expanded",
+      "case": "load:stress-flac-48000-2ch-16bit-610s",
+      "cpu": 79.85473021989131,
+      "dma": {
+        "q_overruns": 7,
+        "writes": 15503,
+        "written_bytes": 31750144,
+        "write_us": 152717765,
+        "errors": 0
+      },
+      "whole": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 36,
+          "start": 254761.859,
+          "end": 254937.046,
+          "observed_seconds": 175.18700000000536,
+          "coverage_complete": true,
+          "maximum_sample_gap_seconds": 5.01600000000326,
+          "delta": {
+            "q_overruns": 7,
+            "writes": 16446,
+            "written_bytes": 33681408,
+            "write_us": 161980064,
+            "errors": 0
+          },
+          "maximum_write_us_since_boot": 18134,
+          "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+          "acoustic_continuity_qualified": false
+        }
+      },
+      "input_wait": {
+        "us": 395455,
+        "count": 939,
+        "wall_percent": 0.23593208518436057,
+        "mean_us": 421.14483493077745,
+        "max_us": 22839,
+        "timeouts": 6
+      },
+      "empty_wait": {
+        "us": 228851,
+        "count": 60,
+        "wall_percent": 0.13854921557815025,
+        "mean_us": 3814.1833333333334,
+        "max_us": 8865,
+        "timeouts": 42
+      },
+      "telemetry": true,
+      "digital_acceptance": false,
+      "heap": {
+        "heap": {
+          "min": 48556,
+          "first_median": 49680,
+          "last_median": 49040
+        },
+        "largest": {
+          "min": 34816,
+          "first_median": 36864,
+          "last_median": 36864
+        }
+      },
+      "rssi": -67
+    },
+    {
+      "phase": "expanded",
+      "case": "load:hev2-44100-stereo",
+      "cpu": 62.089770544226624,
+      "dma": {
+        "q_overruns": 0,
+        "writes": 15516,
+        "written_bytes": 31776768,
+        "write_us": 151113694,
+        "errors": 0
+      },
+      "whole": {
+        "result": "FAIL",
+        "reason": "Duplicate or unordered sample time"
+      },
+      "input_wait": {
+        "us": 0,
+        "count": 0,
+        "wall_percent": 0.0,
+        "mean_us": 0,
+        "max_us": 0,
+        "timeouts": 0
+      },
+      "empty_wait": {
+        "us": 2153763,
+        "count": 5500,
+        "wall_percent": 1.303420830394035,
+        "mean_us": 391.59327272727273,
+        "max_us": 5156,
+        "timeouts": 54
+      },
+      "telemetry": true,
+      "digital_acceptance": true,
+      "heap": {
+        "heap": {
+          "min": 25560,
+          "first_median": 25996,
+          "last_median": 25996
+        },
+        "largest": {
+          "min": 15360,
+          "first_median": 15360,
+          "last_median": 15360
+        }
+      },
+      "rssi": -69
+    },
+    {
+      "phase": "control-after",
+      "case": "load:stress-flac-48000-2ch-16bit-610s",
+      "cpu": 78.99555285091252,
+      "dma": {
+        "q_overruns": 0,
+        "writes": 15510,
+        "written_bytes": 31764480,
+        "write_us": 135463261,
+        "errors": 0
+      },
+      "whole": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 36,
+          "start": 255194.0,
+          "end": 255369.187,
+          "observed_seconds": 175.18700000000536,
+          "coverage_complete": true,
+          "maximum_sample_gap_seconds": 5.01600000000326,
+          "delta": {
+            "q_overruns": 1,
+            "writes": 16453,
+            "written_bytes": 33695744,
+            "write_us": 143733978,
+            "errors": 0
+          },
+          "maximum_write_us_since_boot": 15114,
+          "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+          "acoustic_continuity_qualified": false
+        }
+      },
+      "input_wait": {
+        "us": 40173991,
+        "count": 7839,
+        "wall_percent": 24.158478039836915,
+        "mean_us": 5124.887230514096,
+        "max_us": 16574,
+        "timeouts": 0
+      },
+      "empty_wait": {
+        "us": 17935840,
+        "count": 5474,
+        "wall_percent": 10.858501714512538,
+        "mean_us": 3276.5509682133725,
+        "max_us": 6428,
+        "timeouts": 2825
+      },
+      "telemetry": true,
+      "digital_acceptance": false,
+      "heap": {
+        "heap": {
+          "min": 57128,
+          "first_median": 60816,
+          "last_median": 57340
+        },
+        "largest": {
+          "min": 34816,
+          "first_median": 34816,
+          "last_median": 34816
+        }
+      },
+      "rssi": -63
+    }
+  ]
+}

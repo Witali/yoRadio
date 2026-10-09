@@ -187,3 +187,10 @@ The [matched switching follow-up](ESP32C3_SWITCH_CAPACITY_CONTROL_20261009.md)
 now records two fresh boots per capacity in 0/4/4/0 order. Both controls retain
 contiguous idle capacity; both expanded runs lose capacity across the full
 sequence. The option remains off. Original failures above are unchanged.
+
+After the input-retention correction, the [integer-clock comparison](ESP32C3_FLAC_INTEGER_20261009.md)
+repeats heavy HTTPS FLAC in 0/4/0 order. Settled memory recovers, input waiting
+drops with expansion, but measured DMA events are 64/7/0. The last control's
+progressive-heap gate fails even though Stop recovery passes. HEv2 after
+expanded FLAC passes its measured interval. Extra slots remain default-off;
+controlled delivery pauses are needed to separate capacity from network variation.

@@ -1,0 +1,89 @@
+{
+  "missing": [
+    "expanded",
+    "control-after"
+  ],
+  "phases": {
+    "control-before": {
+      "passed": 6,
+      "total": 6,
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "connection_failures": [],
+      "recovery": {
+        "after-flac": {
+          "result": "PASS",
+          "evidence": null
+        }
+      }
+    }
+  },
+  "sustained": [
+    {
+      "phase": "control-before",
+      "case": "load:stress-flac-48000-2ch-16bit-610s",
+      "cpu": 79.31670465201857,
+      "dma": {
+        "q_overruns": 64,
+        "writes": 15458,
+        "written_bytes": 31657984,
+        "write_us": 133916900,
+        "errors": 0
+      },
+      "whole": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 36,
+          "start": 254524.203,
+          "end": 254699.515,
+          "observed_seconds": 175.31200000000536,
+          "coverage_complete": true,
+          "maximum_sample_gap_seconds": 5.14000000001397,
+          "delta": {
+            "q_overruns": 64,
+            "writes": 16402,
+            "written_bytes": 33591296,
+            "write_us": 142100247,
+            "errors": 0
+          },
+          "maximum_write_us_since_boot": 16854,
+          "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+          "acoustic_continuity_qualified": false
+        }
+      },
+      "input_wait": {
+        "us": 41539553,
+        "count": 7877,
+        "wall_percent": 24.98978845735961,
+        "mean_us": 5273.524565189793,
+        "max_us": 25801,
+        "timeouts": 56
+      },
+      "empty_wait": {
+        "us": 19694735,
+        "count": 5936,
+        "wall_percent": 11.923628083068975,
+        "mean_us": 3317.846192722372,
+        "max_us": 10348,
+        "timeouts": 3181
+      },
+      "telemetry": true,
+      "digital_acceptance": false,
+      "heap": {
+        "heap": {
+          "min": 57308,
+          "first_median": 60328,
+          "last_median": 59300
+        },
+        "largest": {
+          "min": 36864,
+          "first_median": 36864,
+          "last_median": 36864
+        }
+      },
+      "rssi": -65.0
+    }
+  ]
+}

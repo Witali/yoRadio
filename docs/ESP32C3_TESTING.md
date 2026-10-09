@@ -1305,3 +1305,13 @@ The [compact-probe physical repeat](ESP32C3_WEB_TCP_V2_20261009.md) checks
 three minutes of HE-AACv2 record growth and passes its separate TCP integrity
 gate. It retains the explicit anchor boundaries and does not declare the
 earlier intermittent connection timeout fixed.
+
+## Integer-clock FLAC capacity follow-up
+
+The [matched integer-clock trial](ESP32C3_FLAC_INTEGER_20261009.md) tests the
+input-retention fix with 4/8/4 input slots, three-minute heavy HTTPS FLAC,
+and three-minute HE-AACv2 after expanded FLAC. Its saved controller checks
+actual QIO/80 MHz and PDM registers and restores the prior quiet application.
+Offline replay retains the progressive-heap failure, nonzero FLAC DMA
+counters and the rejected whole-AAC timestamp interval. Extra FLAC slots
+remain disabled by default; CPU is informational.
