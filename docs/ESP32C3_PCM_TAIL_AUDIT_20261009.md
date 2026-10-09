@@ -56,8 +56,12 @@ PCM arithmetic parity, but do not cover production EOF and same-rate switching.
   harness's manual staged-tail workaround in favor of the public API.
 - [x] Test the actual output-task integration with deterministic queue/output
   stubs, including generation changes during receive, write and flush.
-- [ ] Complete final firmware linking and physical EOF/transitions, Stop/Play
+- [x] Complete final firmware linking and physical EOF/transitions, Stop/Play
   races and continuous playback qualification of the repaired image.
+  [Hardware follow-up](ESP32C3_PCM_TAIL_BOARD_20261009.md): 60 measured short-file
+  cases, 44 format/transport cases, sustained HE-AACv2/FLAC, transitions and
+  switching pass. Analog output quality and final production configuration
+  remain separate qualification work.
 
 ## Source repair and validation
 
@@ -96,7 +100,10 @@ also retained; both test setup issues were corrected before the passing runs.
 
 The completed prefill experiment used the unchanged baseline output. Its
 physical passes cannot be reused as hardware qualification of this repair.
-The connected board remains on the restored production image.
+At that source-repair checkpoint, the connected board remained on the restored
+production image. The subsequent [linked-image and hardware follow-up](ESP32C3_PCM_TAIL_BOARD_20261009.md)
+qualifies this repair's recorded digital/runtime checks and restores production
+again. It does not qualify analog noise or replace the original failure record.
 
 Run the repair tests from the repository root (use new output directories):
 

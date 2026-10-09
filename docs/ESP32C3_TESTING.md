@@ -1038,6 +1038,9 @@ These counters prove submission to the driver, not physical DMA drain or
 analog PCM identity. Idle queue-overrun counts are not a continuity test for
 these tiny files. Run separate sustained and transition checks; see the
 [original defect and repair](ESP32C3_PCM_TAIL_AUDIT_20261009.md).
+The [2026-10-09 physical follow-up](ESP32C3_PCM_TAIL_BOARD_20261009.md) records
+60 successful measured short-file cases plus sustained/all-codec regression,
+with a frozen archive that can be replayed without a board.
 
 The [RAM profile report](ESP32C3_AAC_RADIO_RAM_20261001.md) includes the physical
 comparison and the distinction between elapsed decode-call time and total

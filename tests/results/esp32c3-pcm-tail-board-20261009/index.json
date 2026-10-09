@@ -1,0 +1,799 @@
+{
+  "kind": "Physical PCM-tail submission, EOF and playback regression",
+  "git_head": "66e0e4e01dad7a0b877d1fb4a74037ea3cfc8e0a",
+  "scope": "Actual linked code, host PCM parity and physical playback diagnostics. Original failures retained; no acoustic capture. Keys and private settings excluded.",
+  "files": {
+    "archive.py": {
+      "bytes": 4240,
+      "sha256": "3085170766f08a29f224fabda3695805e1fb3fdebc7d8afee86af67c81b21aa6"
+    },
+    "audit_build.py": {
+      "bytes": 4569,
+      "sha256": "2ecb8bf14804e4b9fff46679115e0d1b9ae8a38b2045411140330afd7cc5500c"
+    },
+    "build-audit.json": {
+      "bytes": 1952,
+      "sha256": "3c30840d4e8b7a13bfc2e8b30808b5ac4108fc6ff6ab805f3014ecb28ce7a2a5"
+    },
+    "build.log": {
+      "bytes": 851,
+      "sha256": "02baabdf114996cdcb3d92eed39350424f00bdaf7caac0cbbc0f9e5ff079c8a9"
+    },
+    "build.ps1": {
+      "bytes": 1485,
+      "sha256": "7722b1eb2294cf8bad6e9bb651b050c925efb674872d58e025ce2250d3ca1567"
+    },
+    "build/compiler-log/idf_py_stderr_output_13912": {
+      "bytes": 19,
+      "sha256": "5eb58ab1d91ac65bda96080c4fce86570cb90b87825d7662ee6ba4da01c569ec"
+    },
+    "build/compiler-log/idf_py_stderr_output_29536": {
+      "bytes": 6948,
+      "sha256": "63ad5ba00c3ff047ee8418c1f09b4c385b197d76fed57b1a3820041b27f9ef25"
+    },
+    "build/compiler-log/idf_py_stdout_output_13912": {
+      "bytes": 140083,
+      "sha256": "c6f6a6beb0eed189fa73f791f71ab6a8ca97456c9d82c991375f8119ab0bc2e4"
+    },
+    "build/compiler-log/idf_py_stdout_output_29536": {
+      "bytes": 17769,
+      "sha256": "a5d381f835842cb0ba0b2a4a108f3bf9f8558d9483d0d25e162898083681c179"
+    },
+    "build/i2s_pdm.c": {
+      "bytes": 39030,
+      "sha256": "e62707098116d332a3e3709421dd76f56ee16f03b25a455e93c0d38bd411f84b"
+    },
+    "build/manifest.json": {
+      "bytes": 3406,
+      "sha256": "8d4b2cd06847b9c3d2da4e1aadd535f1a46efb48cee47b965a9992784d9d3f5f"
+    },
+    "build/sdkconfig": {
+      "bytes": 89543,
+      "sha256": "9732e1f5bb628029c6fe95bdaf9c6597eaf1c79eb89f8bdfca3e7dfbadc7d4da"
+    },
+    "fixtures/manifest.json": {
+      "bytes": 18794,
+      "sha256": "ccd117181eda532d20d36a6b31f69a2409e970812d485b698d7825c576e381f2"
+    },
+    "fixtures/tail-flac-44100-1ch-127frames.flac": {
+      "bytes": 8440,
+      "sha256": "eac9fd4e021ff522c9feadddc42f8aacae6005e3c2b54dae7c1955c46652e44e"
+    },
+    "fixtures/tail-flac-44100-1ch-1frames.flac": {
+      "bytes": 8268,
+      "sha256": "263ed07a1db99fa20e6a1c233a4bd3b323db52ba06f81569cae60eb472bda1c7"
+    },
+    "fixtures/tail-flac-44100-1ch-511frames.flac": {
+      "bytes": 8972,
+      "sha256": "eabb542794c37005622fd7ffdd1a023cae618bde6af739883519933aa5108e2a"
+    },
+    "fixtures/tail-flac-44100-1ch-512frames.flac": {
+      "bytes": 8925,
+      "sha256": "15b03e2f3cf45c07d04e10e34497f88d92d66a0cc25492286791970326fc28d0"
+    },
+    "fixtures/tail-flac-44100-1ch-513frames.flac": {
+      "bytes": 8971,
+      "sha256": "d84a050828712b752ee5da63323b16d2bca657f29c60f0b16068fb5e76405a4c"
+    },
+    "fixtures/tail-flac-44100-2ch-127frames.flac": {
+      "bytes": 8459,
+      "sha256": "6c3e54fe722fc6f923eca565bd79316f27c00e16a8cc72648bca1f0b48d60496"
+    },
+    "fixtures/tail-flac-44100-2ch-1frames.flac": {
+      "bytes": 8271,
+      "sha256": "23207290f17b752fdf2ef2a9c4995c4a22a5d1c3c649256937f145e63739080a"
+    },
+    "fixtures/tail-flac-44100-2ch-511frames.flac": {
+      "bytes": 9039,
+      "sha256": "71f29cac63ff0bdd9ab758b74ae08310049bb14240d1c1333aaad80453150e0a"
+    },
+    "fixtures/tail-flac-44100-2ch-512frames.flac": {
+      "bytes": 8993,
+      "sha256": "a164d4d9dcc09f7c29faf1a3b12ab11709c730b5d117c37a760ef01edf12ff3a"
+    },
+    "fixtures/tail-flac-44100-2ch-513frames.flac": {
+      "bytes": 9039,
+      "sha256": "beaeb5d32ccf59dee35a01f74b615d8feafbd277425bb24e07121199722f2a46"
+    },
+    "fixtures/tail-flac-48000-1ch-127frames.flac": {
+      "bytes": 8440,
+      "sha256": "f6c94a3aff1ccad5e4034bec6b64efc308569300b5f07a5f7bdb16fcd4b4d527"
+    },
+    "fixtures/tail-flac-48000-1ch-1frames.flac": {
+      "bytes": 8268,
+      "sha256": "e3695def0fe714363abc0e7efdf4add5023d85167e8a14e803b717fc4880bc07"
+    },
+    "fixtures/tail-flac-48000-1ch-511frames.flac": {
+      "bytes": 8972,
+      "sha256": "38ee0afd8d788201f9925d24e455855d7e173fafd4686eda49a5d63f68c40783"
+    },
+    "fixtures/tail-flac-48000-1ch-512frames.flac": {
+      "bytes": 8925,
+      "sha256": "a43c15490cf5af77039fdaff49265e1e3152378a663951ce3fccda67f681e33e"
+    },
+    "fixtures/tail-flac-48000-1ch-513frames.flac": {
+      "bytes": 8971,
+      "sha256": "f6f10aab5dd39d1338c5d4919dd332a73208c94f490865bbd1d50eb73440164e"
+    },
+    "fixtures/tail-flac-48000-2ch-127frames.flac": {
+      "bytes": 8459,
+      "sha256": "f8009e0d8648511eeda1c62838e7a4b75b75b4454cf2b698447b5d3983e41198"
+    },
+    "fixtures/tail-flac-48000-2ch-1frames.flac": {
+      "bytes": 8271,
+      "sha256": "f4f9d53fffcbdfa45ff1a460cd5d5353ee42391571d59a054b2c2fed71923d84"
+    },
+    "fixtures/tail-flac-48000-2ch-511frames.flac": {
+      "bytes": 9039,
+      "sha256": "1b1c071e1bd0e715c09fc51a036e05d90b2fe7a9ba673973c38bff418be4a75c"
+    },
+    "fixtures/tail-flac-48000-2ch-512frames.flac": {
+      "bytes": 8993,
+      "sha256": "db9781c39f30fe1ceb20366a26acc4ad176075f0e0079e2eac46c9f86988a8c8"
+    },
+    "fixtures/tail-flac-48000-2ch-513frames.flac": {
+      "bytes": 9039,
+      "sha256": "79a8115c96fc9697b324f56f43312ee5b9caf835e9bf0c80d3ef6b6775ae53df"
+    },
+    "fixtures/tail-flac-8000-1ch-127frames.flac": {
+      "bytes": 8440,
+      "sha256": "87ae22948147ab599f4de79486cf9a02af8a521043626c50e4b074fa6f281fb4"
+    },
+    "fixtures/tail-flac-8000-1ch-1frames.flac": {
+      "bytes": 8268,
+      "sha256": "bfb05a9acea7d31f8e71a3fab8ecf72a56c1d4340ad7777915fa89b6172be4f1"
+    },
+    "fixtures/tail-flac-8000-1ch-511frames.flac": {
+      "bytes": 8972,
+      "sha256": "0db9efcf8290e8a91ae3e785fa8667d887e93a789a95212c5108bd81bd03cd85"
+    },
+    "fixtures/tail-flac-8000-1ch-512frames.flac": {
+      "bytes": 8925,
+      "sha256": "27927b2402c96ceea2e4f334831f867576bc58c7e14ca4c316302152577c0355"
+    },
+    "fixtures/tail-flac-8000-1ch-513frames.flac": {
+      "bytes": 8971,
+      "sha256": "65fd88990d5dd3b8450676430a51b71b84c0ee7d9e448bd6ca7e1229842ed69a"
+    },
+    "fixtures/tail-flac-8000-2ch-127frames.flac": {
+      "bytes": 8459,
+      "sha256": "06785227f9abd398460c1bb44f68054c51cdacea7a5c781082e1f1d97e38d173"
+    },
+    "fixtures/tail-flac-8000-2ch-1frames.flac": {
+      "bytes": 8271,
+      "sha256": "8e25c19d34144fd9d34cc7d848edf115c91291b4b7ea0b3b2a2b9c1d46e49f4f"
+    },
+    "fixtures/tail-flac-8000-2ch-511frames.flac": {
+      "bytes": 9039,
+      "sha256": "63e0b09b98768777e0cd1628fc760e3a65186002bc3a642d882a28bd59c46abf"
+    },
+    "fixtures/tail-flac-8000-2ch-512frames.flac": {
+      "bytes": 8993,
+      "sha256": "12c7c3f11206aaaa9e81e5813ca5e8050f5cf464b3c48eed6f40f2d2629d9bef"
+    },
+    "fixtures/tail-flac-8000-2ch-513frames.flac": {
+      "bytes": 9039,
+      "sha256": "f320aa1dd9f40c0cbc0a067d7422b6eeb1862d97bd2d1961c0834500aed3d6cb"
+    },
+    "host-profile/dma-build.log": {
+      "bytes": 716,
+      "sha256": "12a050253b81bbe8b165c72442aac4d3c54aeb55f81d506d1b5769e43dfc585f"
+    },
+    "host-profile/dma-profile-build.log": {
+      "bytes": 934,
+      "sha256": "5ee635ca431e4ccacf643c792525a1b688b83a68cdf45bf571cee8a646faa5f5"
+    },
+    "host-profile/dma-profile.c": {
+      "bytes": 31370,
+      "sha256": "9b3a0aeba117af4f9b5daaa9ab27a5dab5ace9a8e6452b1272590eba13b0bfe3"
+    },
+    "host-profile/dma-profile.log": {
+      "bytes": 45074,
+      "sha256": "3b262f721bc4f6d91c4c9d92f14e5c443817b22c08d0be270f059c408d71762a"
+    },
+    "host-profile/dma.c": {
+      "bytes": 30795,
+      "sha256": "bb56a3ab333ab4c3309b525820e7a088a5d43fe955cdc28cf2222a3ce5c50869"
+    },
+    "host-profile/dma.log": {
+      "bytes": 45074,
+      "sha256": "3b262f721bc4f6d91c4c9d92f14e5c443817b22c08d0be270f059c408d71762a"
+    },
+    "host-profile/normalizer-build.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "host-profile/normalizer.log": {
+      "bytes": 42,
+      "sha256": "f682cc7d5f4d1fb109dc3dcbd5efd7bb9a59360fbcfaa079a24994aa29ab5dff"
+    },
+    "host-profile/report.json": {
+      "bytes": 2376,
+      "sha256": "480ff0f910961feab865c929bae5c1a068be61eeb8af278586ef33fdcd9d9f2b"
+    },
+    "host-profile/sources/idf/esp32c3-oled-native/main/native_audio_output.c": {
+      "bytes": 20604,
+      "sha256": "3d93e0e069b2483603478d8dba11029dcf85842c1f741f0e3436e4cf12329b62"
+    },
+    "host-profile/sources/idf/esp32c3-oled-native/main/native_audio_output.h": {
+      "bytes": 2250,
+      "sha256": "0331612bc0c3274223a0c6b5ce3982189d2520ca0ef13c7cd6b8199a2b7584d4"
+    },
+    "host-profile/sources/idf/esp32c3-oled-native/main/native_audio_output_dma.c": {
+      "bytes": 24312,
+      "sha256": "4a5859e0e220e91b723e3bfd44229f5d12108c569bb70a00cbd63c416b7b9a1f"
+    },
+    "host-profile/sources/idf/esp32c3-oled-native/main/native_i2s_generator.c": {
+      "bytes": 4689,
+      "sha256": "b9b030839a3f23682bbe3d22d80cc3d45ab2e4c98ca9d3a8abb69dfe5f90e099"
+    },
+    "host-profile/sources/idf/esp32c3-oled-native/main/native_i2s_generator.h": {
+      "bytes": 1061,
+      "sha256": "f44ee5047cd1193ff1c8f54d6a75452bfbf5e827be9ee45b36bb8cc32753cc5f"
+    },
+    "host-profile/sources/idf/esp32c3-oled-native/main/pipeline_wait.h": {
+      "bytes": 575,
+      "sha256": "a8b9b6c01e78e620d052955c91072444a1ed6715212206ce018c65f461735ad1"
+    },
+    "host-profile/sources/tests/native/output_dma/normalizer_chunks.cpp": {
+      "bytes": 1445,
+      "sha256": "d547dff36cba3bde23690d7a5ffedceb3dc66212744e13200fc641fdbfdb8f18"
+    },
+    "host-profile/sources/tests/native/output_dma/stubs.h": {
+      "bytes": 9172,
+      "sha256": "9319f8e5edbd5529feed5c350f2e1594a96ec289c4d913fb7107228158122c70"
+    },
+    "host-profile/sources/tests/native/output_dma/test.c": {
+      "bytes": 8372,
+      "sha256": "c9752cd274da944f2a285037d30fc05bcc599fb913f6f6f97a6ddb23a8aba6c1"
+    },
+    "host-profile/sources/tools/codec_benchmark/run_output_dma_host.py": {
+      "bytes": 5772,
+      "sha256": "c1f13fa39b7401cae62c8fee411c23c93dd470cc684d56b2d605bcea89a13d05"
+    },
+    "host-profile/sources/yoRadio/src/audioI2S/AudioNormalizer.cpp": {
+      "bytes": 5570,
+      "sha256": "6f63381940380c24a667cfdc6b984ea761bf87a21efcf6c9029a6fb2c52cb67e"
+    },
+    "host-profile/sources/yoRadio/src/audioI2S/AudioNormalizer.h": {
+      "bytes": 4048,
+      "sha256": "56cedb155a270a8914fc87ff33126b1b57e82fbda4389743c45fe49f323f7515"
+    },
+    "host-profile/staged-build.log": {
+      "bytes": 725,
+      "sha256": "4658bf8ec69708b9e8198153b11582550ba5c270a44c07bda94169265b169b44"
+    },
+    "host-profile/staged-profile-build.log": {
+      "bytes": 749,
+      "sha256": "8c83c50b32f5d21f2c6875c89248c9d287d14a156beb1d12ea9311a8aa671aeb"
+    },
+    "host-profile/staged-profile.c": {
+      "bytes": 27165,
+      "sha256": "9c1015dc9dbe3de416e9025140d925f24b3dad612164384c789e38f2846072c3"
+    },
+    "host-profile/staged-profile.log": {
+      "bytes": 45074,
+      "sha256": "3b262f721bc4f6d91c4c9d92f14e5c443817b22c08d0be270f059c408d71762a"
+    },
+    "host-profile/staged.c": {
+      "bytes": 27120,
+      "sha256": "e31b1693b9d24ca59dcf669e1ce8786ff8e723257485c1fd018559e03937765e"
+    },
+    "host-profile/staged.log": {
+      "bytes": 45074,
+      "sha256": "3b262f721bc4f6d91c4c9d92f14e5c443817b22c08d0be270f059c408d71762a"
+    },
+    "native_audio_output_discard_pcm-disassembly.txt": {
+      "bytes": 1391,
+      "sha256": "530dec1a8b99c1651ef0b790392ae935218d0d5b1529561834f14503fefe0565"
+    },
+    "native_audio_output_flush_pcm-disassembly.txt": {
+      "bytes": 6845,
+      "sha256": "36846859d2e5a7113e507525ababbbca072b78539422ae9926fc8c77e664fd22"
+    },
+    "output_task-disassembly.txt": {
+      "bytes": 13097,
+      "sha256": "e83f60ee9d1697fbc4fd97a24a04cde0f885be3b20a87fa14c078419dafedd6e"
+    },
+    "physical.py": {
+      "bytes": 9398,
+      "sha256": "a68bc847e889d0561b142d4c2994ecbb1b4a3b07434e72342c88c6225c8e8939"
+    },
+    "physical/fractional-clock.json": {
+      "bytes": 1836,
+      "sha256": "a9b0085cbb64865c4e037499027a8a46514df5f689067599c2aac6d3d738bf06"
+    },
+    "physical/heavy-flac.log": {
+      "bytes": 199,
+      "sha256": "822f1f2817d9c9f59928d3bfa29c81542cb0df05c54d6b201d34efd39aab1547"
+    },
+    "physical/heavy-flac/performance.json": {
+      "bytes": 68449,
+      "sha256": "c34a9892959827b71293331f93476585b3af6b1feb6074049dd5b8bf336ab7ef"
+    },
+    "physical/heavy-flac/report.json": {
+      "bytes": 63206,
+      "sha256": "ca9d5ddf77cb48884fcee7cde5b0fd80cc909fe2abe274433384b599c4b801d6"
+    },
+    "physical/heavy-flac/status.json": {
+      "bytes": 499172,
+      "sha256": "5bc6612d0c29d86325e155c92b19cf168066d278dd797a635eea0235f1e7eeb7"
+    },
+    "physical/hev2-ten-minutes.log": {
+      "bytes": 154,
+      "sha256": "809c40ee595241a926554e9fe6b1559d8b92723e9ec8fdf8c3bc9470d74d9403"
+    },
+    "physical/hev2-ten-minutes/performance.json": {
+      "bytes": 215344,
+      "sha256": "d3f8219cedb7df7d8dafc0ceb8c53aeadbf43f2a520d78c3284f961b47d4b020"
+    },
+    "physical/hev2-ten-minutes/report.json": {
+      "bytes": 175908,
+      "sha256": "8019f33c89abaf3b853febe0bfe5864d1c4ff95ba43e2357f76db610efc91d77"
+    },
+    "physical/hev2-ten-minutes/status.json": {
+      "bytes": 1613638,
+      "sha256": "791d0d0b51dc5ed07749e68aad47b3f060c18ba4d313d8be395ecfdc1aa5c2dd"
+    },
+    "physical/initial.json": {
+      "bytes": 1089,
+      "sha256": "5129f3795a6bc9d3c7e76b94753b82388b4ebb4b10f548fc21e0c9a54b201f80"
+    },
+    "physical/installed.json": {
+      "bytes": 324,
+      "sha256": "920161388ec667112a7b48abc964c95d9b8ebf1de739aba3e8c127d6be97d830"
+    },
+    "physical/matrix.log": {
+      "bytes": 1367,
+      "sha256": "719de3902b6427de5d8b53c07a3b4ab40a2760cd9d6c4140b1130c5298497ae1"
+    },
+    "physical/matrix/performance.json": {
+      "bytes": 299782,
+      "sha256": "48113ee505f307476847445a73a1332cd0cc400ff71983b8da309f0dda760117"
+    },
+    "physical/matrix/report.json": {
+      "bytes": 126951,
+      "sha256": "ae50a09629330a6c9e9461d3348c56cfed5913b5c608cf4b240b2917ba449b92"
+    },
+    "physical/matrix/status.json": {
+      "bytes": 740601,
+      "sha256": "f318c6af08639a81f64b9a3e14ee3b8bf2db70cd68b756ec303fccc12f1310ae"
+    },
+    "physical/phases.json": {
+      "bytes": 547,
+      "sha256": "2528192fc0327890440fb3aaec3fa01de6fcd52127a4f49048421ca9a418979b"
+    },
+    "physical/restoration.json": {
+      "bytes": 1475,
+      "sha256": "e08051c922903645c779510eb0eb8f89df3484a506d488ff82ebf4e04b9f328f"
+    },
+    "physical/settings-after-tests.json": {
+      "bytes": 94,
+      "sha256": "b9c8e7834a8940d1f943a4a81c4f6e4f3547de0eda530a8d5d4f646b782a7fa5"
+    },
+    "physical/short-pcm-tails.log": {
+      "bytes": 2541,
+      "sha256": "453bfae4c61b819af88da25f72d29fc0ee5bc495637eab69022675bcb37c130c"
+    },
+    "physical/short-pcm-tails/performance.json": {
+      "bytes": 59348,
+      "sha256": "176113b3b97534b0b0b5f43dcf5008b621755331b3ff53e449b1f2867b60aada"
+    },
+    "physical/short-pcm-tails/report.json": {
+      "bytes": 65416,
+      "sha256": "b785abfa0f271a92425e78716fe98fe6570225cdda8667d030027fce4e0c9c54"
+    },
+    "physical/short-pcm-tails/status.json": {
+      "bytes": 55991,
+      "sha256": "ab631626c503f948040a244dd75ca834fa171c032733347152623acc104e1117"
+    },
+    "physical/switch.log": {
+      "bytes": 47,
+      "sha256": "ef0ddb317dbef43a612f6017ed02dbd8a31889b3ff526901e3957916d9f308b9"
+    },
+    "physical/switch/performance.json": {
+      "bytes": 50021,
+      "sha256": "c668b89904adff0ba1f986414f237bcbf92a440e2ef4f47a6d2bf22fc77aad77"
+    },
+    "physical/switch/report.json": {
+      "bytes": 29799,
+      "sha256": "44d0a9fbb4f6827afbeeaf7955b2d234f25a41f94793e524999956787102a2c5"
+    },
+    "physical/switch/status.json": {
+      "bytes": 121731,
+      "sha256": "3a99be323b5935c4074e4e7122f3b64567f60726486eb3afdd0573047cd2b7e3"
+    },
+    "physical/transitions-faults-websocket.log": {
+      "bytes": 253,
+      "sha256": "95545f2da7bfafd598829475d8389a34bba1d612e71b3b752119472a500aa0a4"
+    },
+    "physical/transitions-faults-websocket/performance.json": {
+      "bytes": 78355,
+      "sha256": "d2755dddcb108be8c4fa2a3929e688a020ee1dd55287e7e5dac673a25f41b14e"
+    },
+    "physical/transitions-faults-websocket/report.json": {
+      "bytes": 52048,
+      "sha256": "f97316754a8340ed4a6526a5977ea13ea4cd66d9824ba5c6920875660e0912c0"
+    },
+    "physical/transitions-faults-websocket/status.json": {
+      "bytes": 203588,
+      "sha256": "722d132bbc3fd3004b42cfd12aea9b29ed1450d5903edb4cf4669f28fc6ac71f"
+    },
+    "prepare_analysis.py": {
+      "bytes": 2140,
+      "sha256": "3b6a8eb312b1d616fed5ad45be095d6da80d121eda3c89fc3e292e84326a2e6d"
+    },
+    "replay.py": {
+      "bytes": 1725,
+      "sha256": "59539acec33eec8759c263e0cfeea07345e67910e42b1006ea499637dcace8a3"
+    },
+    "save-head.py": {
+      "bytes": 1947,
+      "sha256": "d9cde17dde366753de802d09e505bbf9efc3d16272d03628be34c955dab9555b"
+    },
+    "short-summary.json": {
+      "bytes": 43476,
+      "sha256": "8973ff8e2d81c6bc965ffd408d1310b6a2c932c6d8431f070eb6480ff79705a6"
+    },
+    "short_summary.py": {
+      "bytes": 3808,
+      "sha256": "8545fdee076e02c377ec9e519ce305a6b2c725e2cd364b70463f123325770688"
+    },
+    "sources/idf/esp32c3-oled-native/main/CMakeLists.txt": {
+      "bytes": 27100,
+      "sha256": "728eccbea81999a6f06879b860a6b1c206083d24266103e203c55eca08e4d867"
+    },
+    "sources/idf/esp32c3-oled-native/main/Kconfig.projbuild": {
+      "bytes": 37600,
+      "sha256": "bbdae0d3ed3fc9ee3d1209fadbfb4fd909b32796d5ca5d5d4c60ceff5aa896a4"
+    },
+    "sources/idf/esp32c3-oled-native/main/audio_service.c": {
+      "bytes": 84670,
+      "sha256": "4ba30f8a609025721b580be1a1298442ce1bdb4e16f2772bcbe617a4723c83a8"
+    },
+    "sources/idf/esp32c3-oled-native/main/native_audio_output.c": {
+      "bytes": 20604,
+      "sha256": "3d93e0e069b2483603478d8dba11029dcf85842c1f741f0e3436e4cf12329b62"
+    },
+    "sources/idf/esp32c3-oled-native/main/native_audio_output.h": {
+      "bytes": 2250,
+      "sha256": "0331612bc0c3274223a0c6b5ce3982189d2520ca0ef13c7cd6b8199a2b7584d4"
+    },
+    "sources/idf/esp32c3-oled-native/main/native_audio_output_qemu.c": {
+      "bytes": 9591,
+      "sha256": "e994b86f37b5dfd826079445404d17d1383fda9444c70ed71dd1548ba9b7c7f5"
+    },
+    "sources/idf/esp32c3-oled-native/sdkconfig.input-prefill.defaults": {
+      "bytes": 109,
+      "sha256": "36ab0a3ebddcf79ae0883573dc21c9fc3af37c5addda0f66d4afbd1dcbc4e3b1"
+    },
+    "sources/idf/esp32c3-oled-native/sdkconfig.pdm-fractional-clock.defaults": {
+      "bytes": 121,
+      "sha256": "957d477a8c63a82b03cc19ab131942e7e08c2ff97d9d67061962979aedddbad5"
+    },
+    "sources/tests/results/esp32c3-qio80-recheck-20261008/sustained_summary.py": {
+      "bytes": 14657,
+      "sha256": "f11bd8c73d1d5ddd500c1dfa10903d0ea46cd269488080db2dfd4d3f4188cb2e"
+    },
+    "sources/tests/test-pcm-tail.py": {
+      "bytes": 3437,
+      "sha256": "86fa5ae0f6484773ae3ff7e72f4a291cc93c66a08ea8b86b4a9595ade101a079"
+    },
+    "sources/tools/audio_test_server/fixtures.py": {
+      "bytes": 3651,
+      "sha256": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642"
+    },
+    "sources/tools/audio_test_server/generate.py": {
+      "bytes": 3615,
+      "sha256": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8"
+    },
+    "sources/tools/audio_test_server/generate_flac_depths.py": {
+      "bytes": 9140,
+      "sha256": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1"
+    },
+    "sources/tools/audio_test_server/generate_flac_high_depth.py": {
+      "bytes": 2457,
+      "sha256": "55417b00036c9256c5229fe51447be47b238dafa45b9f14e124771c09d515068"
+    },
+    "sources/tools/audio_test_server/generate_pcm_tails.py": {
+      "bytes": 2997,
+      "sha256": "a928505b88ea9c439bcf87aa0626de7ed2395129f9caf6b79e6081cc902d9c23"
+    },
+    "sources/tools/audio_test_server/generate_stress.py": {
+      "bytes": 4244,
+      "sha256": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e"
+    },
+    "sources/tools/audio_test_server/icy.py": {
+      "bytes": 4619,
+      "sha256": "d9ed666a8cf63f897e414c402e4b1dab8ae52cd8066a0a30ae6f85b70f1aef29"
+    },
+    "sources/tools/audio_test_server/make_test_certificate.py": {
+      "bytes": 2030,
+      "sha256": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a"
+    },
+    "sources/tools/audio_test_server/record_test_ca.py": {
+      "bytes": 3222,
+      "sha256": "de680e4970d042e9d18744c9779822897c6b5e8930a75aa7cc9184dace79aaeb"
+    },
+    "sources/tools/audio_test_server/server.py": {
+      "bytes": 11941,
+      "sha256": "d61ebdb382efe2c2cfa01a8146b17124ca7c101fd7899734c4d0037b46c0d433"
+    },
+    "sources/tools/audio_test_server/tls_framing.py": {
+      "bytes": 5174,
+      "sha256": "de99ac3673730263b24c9ed4a1ace1d6a2eaa0387e4977c4992e56e3cf74097c"
+    },
+    "sources/tools/audio_test_server/tls_records.py": {
+      "bytes": 9460,
+      "sha256": "0713e832cdaff69955fb27fedd6a84a4d0277d315d73dfacfa43a7612094b7be"
+    },
+    "sources/tools/esp32c3_tests/aac_reference.py": {
+      "bytes": 4023,
+      "sha256": "7fb171138167be63ae8503c3c39ca1f664feb13eaea3d89727d4ea617e59aaf3"
+    },
+    "sources/tools/esp32c3_tests/allocations.py": {
+      "bytes": 2975,
+      "sha256": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7"
+    },
+    "sources/tools/esp32c3_tests/common.py": {
+      "bytes": 12968,
+      "sha256": "27c4b2c818b89c1b4903bf8b15d0c1cd611084464111bfd9adcaaba92cb03085"
+    },
+    "sources/tools/esp32c3_tests/compare_latency.py": {
+      "bytes": 2585,
+      "sha256": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394"
+    },
+    "sources/tools/esp32c3_tests/compare_output_dma.py": {
+      "bytes": 4236,
+      "sha256": "04de602acaed8846b3dc0c37a8ca11b061a436be1730cfadd4c2b408591e56b0"
+    },
+    "sources/tools/esp32c3_tests/compare_output_priority.py": {
+      "bytes": 2819,
+      "sha256": "073979d7a6ddd40ab324b6d06c80c35131cc180a26a1a8bc5f11780e3a1153cc"
+    },
+    "sources/tools/esp32c3_tests/compare_output_priority_matrix.py": {
+      "bytes": 3885,
+      "sha256": "680840fb1beb2d4c6a9708e460803411820f82107e1679c4d39eb8023f8962fb"
+    },
+    "sources/tools/esp32c3_tests/connection_retry.py": {
+      "bytes": 11903,
+      "sha256": "1c0a17e8c023511a0f975f63d3493c6e24bab1e3cb4b69a0615b51a7cab080b1"
+    },
+    "sources/tools/esp32c3_tests/diagnostic.py": {
+      "bytes": 4772,
+      "sha256": "9ed286e6931eb74d683a417ddeeea654847412f1b088b2d88f80a9afbcc82ac4"
+    },
+    "sources/tools/esp32c3_tests/flac_truncation.py": {
+      "bytes": 4217,
+      "sha256": "8ed8a8dbce97bf7384be558bff1c55b0bf37f707f2c1879ca5b96058c0e49e56"
+    },
+    "sources/tools/esp32c3_tests/flash_constants.py": {
+      "bytes": 10034,
+      "sha256": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5"
+    },
+    "sources/tools/esp32c3_tests/flash_mode.py": {
+      "bytes": 2450,
+      "sha256": "16ada30f8abf9d66937e82e21e041c4aabceccd319f0c756109becaa61532ffb"
+    },
+    "sources/tools/esp32c3_tests/heap_fragment.py": {
+      "bytes": 4858,
+      "sha256": "998c454faad743f4fa14bd3be960ede6944a4a5e522e45d749b42120f07fd803"
+    },
+    "sources/tools/esp32c3_tests/heap_idle.py": {
+      "bytes": 2013,
+      "sha256": "3b31cd39fb91b92b28c33a7f64633689b1535741510bd6a32b3ed9efeef3d643"
+    },
+    "sources/tools/esp32c3_tests/heap_receive_correlation.py": {
+      "bytes": 5201,
+      "sha256": "0fbe6924928b89aecf6d37cf4b8a6368e3eaf0746b55a989b24fed73de62b212"
+    },
+    "sources/tools/esp32c3_tests/http_headers.py": {
+      "bytes": 3576,
+      "sha256": "845395d01169e27be0211d2deeef1a42f9ce486f5f6756a2e16b16cace269d29"
+    },
+    "sources/tools/esp32c3_tests/icy_metadata.py": {
+      "bytes": 4607,
+      "sha256": "1b2260230a21d2526bc2a737125d956f105000c2bdeae2054a574f639d66a03e"
+    },
+    "sources/tools/esp32c3_tests/iram_inventory.py": {
+      "bytes": 5543,
+      "sha256": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f"
+    },
+    "sources/tools/esp32c3_tests/load_windows.py": {
+      "bytes": 5360,
+      "sha256": "eee95396e81156bb4ae8b74a1e165d0fa4f3912ff1d0a1dbb1d86584d28b9df2"
+    },
+    "sources/tools/esp32c3_tests/memory.py": {
+      "bytes": 5571,
+      "sha256": "2d02410fb60db20f90f3131812e6db10657d99865bbc791427f04bcfa89eae81"
+    },
+    "sources/tools/esp32c3_tests/network_memory.py": {
+      "bytes": 7392,
+      "sha256": "c77cef3021fb54c9b08f07c1ee25f3938cefc97e176724689ef2b005957d2aca"
+    },
+    "sources/tools/esp32c3_tests/ota.py": {
+      "bytes": 8426,
+      "sha256": "b47b95af97e73740c1bdbeb849087c1e95d97fc47e34615ed2d0665e1b294631"
+    },
+    "sources/tools/esp32c3_tests/ota_diagnostic.py": {
+      "bytes": 3068,
+      "sha256": "1f99c6d9c840ee7c410cd3e3aa0948b41c8a34ab2c8f259801a03c9a74ba0dd6"
+    },
+    "sources/tools/esp32c3_tests/ota_transition.py": {
+      "bytes": 4066,
+      "sha256": "28d55e1a99489c5ede457dbb6ddfc82fbf327ce0a61cac3ccb277ec0fca2c5f6"
+    },
+    "sources/tools/esp32c3_tests/output_priority_matrix.py": {
+      "bytes": 5097,
+      "sha256": "d5ed53dfcd71d757576cb5e6649e14aef4b476622460d5e3bab63baa7b14c475"
+    },
+    "sources/tools/esp32c3_tests/pcm_tail.py": {
+      "bytes": 7485,
+      "sha256": "60725e812321a0140e0498ada8ab8ac5450c7d0c71ba264aef2de32284294406"
+    },
+    "sources/tools/esp32c3_tests/pdm_clock.py": {
+      "bytes": 2380,
+      "sha256": "9858b6b13dd76cc6d083d8f854e5a285984fca54156b7e1d8c5c1c4844cdec02"
+    },
+    "sources/tools/esp32c3_tests/pipeline_flow.py": {
+      "bytes": 4047,
+      "sha256": "6591feb1674d5b7ce1e1362bf8620943989f5cc1500d4d5088c2627aa4e2d492"
+    },
+    "sources/tools/esp32c3_tests/pipeline_flow_study.py": {
+      "bytes": 4450,
+      "sha256": "bf464bbdbb6b3d67d019e68b8ea1861cc34df89f4e2f2df7c272266a210d1e82"
+    },
+    "sources/tools/esp32c3_tests/pool_settle.py": {
+      "bytes": 4358,
+      "sha256": "805b05ba463b0b5d91b3587abd1c7c4712cdfde37f44413ef74ca37bd63f3eb0"
+    },
+    "sources/tools/esp32c3_tests/public_streams.py": {
+      "bytes": 11124,
+      "sha256": "5e41a2a69cb9b69d2c6f8957258285d2f9478ff6c39aaafafde00a8b83264107"
+    },
+    "sources/tools/esp32c3_tests/radio_flac_study.py": {
+      "bytes": 3672,
+      "sha256": "25c55f49cf95a2117c499a90da6b53f3a0212b76a82b36ac1fb9f3dd7ea07a76"
+    },
+    "sources/tools/esp32c3_tests/reference_eof.py": {
+      "bytes": 3001,
+      "sha256": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f"
+    },
+    "sources/tools/esp32c3_tests/run.py": {
+      "bytes": 24386,
+      "sha256": "f293dbaae586ff44412edea9124a6bd528d1cb6c1ed98ecad44c126176742320"
+    },
+    "sources/tools/esp32c3_tests/rx_ownership.py": {
+      "bytes": 5411,
+      "sha256": "448b976c1d915d3f413cfb055b02fa0aa9a0a3e9253e72af65127f413e992829"
+    },
+    "sources/tools/esp32c3_tests/serial_lines.py": {
+      "bytes": 842,
+      "sha256": "54a0dfa271186f9de5206c8061423138769cffa3523a002a5c000d5d6abd2316"
+    },
+    "sources/tools/esp32c3_tests/staged_dma.py": {
+      "bytes": 4717,
+      "sha256": "84412aaaae33491863411207c01c7b9c8702a9e232a899459d91845bb4d5e1fc"
+    },
+    "sources/tools/esp32c3_tests/stream_memory_study.py": {
+      "bytes": 5806,
+      "sha256": "2ec9fe9d46069143fbd4c6ca3edeace91819f7b0f74277d46753e61a58b27ade"
+    },
+    "sources/tools/esp32c3_tests/summarize_codec_sequence.py": {
+      "bytes": 4063,
+      "sha256": "90f94232cbdd247be4ac21f73a9aebcc726f3d49186c2233109b1454f63a2166"
+    },
+    "sources/tools/esp32c3_tests/summarize_load.py": {
+      "bytes": 1635,
+      "sha256": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133"
+    },
+    "sources/tools/esp32c3_tests/summarize_memory.py": {
+      "bytes": 2976,
+      "sha256": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae"
+    },
+    "sources/tools/esp32c3_tests/summarize_public.py": {
+      "bytes": 2995,
+      "sha256": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de"
+    },
+    "sources/tools/esp32c3_tests/summarize_public_windows.py": {
+      "bytes": 4371,
+      "sha256": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709"
+    },
+    "sources/tools/esp32c3_tests/summarize_radio_flac.py": {
+      "bytes": 10401,
+      "sha256": "72d66f872f1b511d9964e16cb72e7885791dd7bb8a9499ac0244678bf7135c47"
+    },
+    "sources/tools/esp32c3_tests/summarize_rx_ownership.py": {
+      "bytes": 4013,
+      "sha256": "0e62d6da908502efbfd4111aa7491b9f8a195219ac325a10862c93ab9e116685"
+    },
+    "sources/tools/esp32c3_tests/summarize_stream_memory.py": {
+      "bytes": 7104,
+      "sha256": "d32c496ce429750a5565b4396bcc1030b5319ebe33eee9940e390cb62d788697"
+    },
+    "sources/tools/esp32c3_tests/summarize_sustained.py": {
+      "bytes": 4059,
+      "sha256": "6f3a7786ec5c36935a2fd7714c8add9a9ccbf686b887eaa074e55e325e814245"
+    },
+    "sources/tools/esp32c3_tests/summarize_terminal_cpu.py": {
+      "bytes": 2776,
+      "sha256": "db99ad6e55f2b3e671106cdb2c3902225704d9167a2e65ef662fe23c726c69bd"
+    },
+    "sources/tools/esp32c3_tests/summarize_terminal_memory.py": {
+      "bytes": 1889,
+      "sha256": "f351cf6f73e9d256a406e8a7da5b65ab46e354b0cefca7543536f3ebac077bda"
+    },
+    "sources/tools/esp32c3_tests/terminal_memory.py": {
+      "bytes": 4268,
+      "sha256": "e920df2d0150a1e93e982c1fa06578444879e35c2158fee270ebd2f041bbe478"
+    },
+    "sources/tools/esp32c3_tests/tls_framing.py": {
+      "bytes": 5550,
+      "sha256": "c937d76cedefeb7a56ae5cef783bd2ca796b0987d4d43eab99ba952a467b1910"
+    },
+    "sources/tools/esp32c3_tests/tls_path.py": {
+      "bytes": 6420,
+      "sha256": "52d1199afc26194e266252f7fd6a141875c03190a5abfb3e68068f957f7fbe42"
+    },
+    "sources/tools/esp32c3_tests/tls_records.py": {
+      "bytes": 7814,
+      "sha256": "ca5c2ec6991427c68bddf7b09cde8db47a9fa865106a0be89c665172ea138cb3"
+    },
+    "sources/tools/esp32c3_tests/trace_transport.py": {
+      "bytes": 4654,
+      "sha256": "0a50fe3ed2a8058529f18cfa7086286b9a973a9eeeaa7514b800a7ef9d1320ce"
+    },
+    "sources/tools/esp32c3_tests/transport.py": {
+      "bytes": 3618,
+      "sha256": "b3e41e4d54431fdbb5f26e88727a45e99c9958dba9097cb724fdae55f9ca1686"
+    },
+    "sources/tools/esp32c3_tests/verify_adaptive_input_link.py": {
+      "bytes": 7921,
+      "sha256": "d2c2bbe2c2cde72665828318aab4ee6f02e7245852fb57cbfd0ca9cf3e5ee247"
+    },
+    "sources/tools/esp32c3_tests/verify_gcm_byte_link.py": {
+      "bytes": 1909,
+      "sha256": "d46f80cabf959514832f70b50ca6817714039e4091195575b8af16da9235b5f1"
+    },
+    "sources/tools/esp32c3_tests/verify_http_link.py": {
+      "bytes": 2693,
+      "sha256": "caf7314d37464b1f4aeb7bdaa0e49cd84fb901bfacbef3c9dfc5caceb1124f73"
+    },
+    "sources/tools/esp32c3_tests/verify_tls_path_link.py": {
+      "bytes": 3587,
+      "sha256": "75f102153680aac6a11092bfeec9cc0b04ba899080c0d56ab473f757087cff6e"
+    },
+    "summarize.py": {
+      "bytes": 6370,
+      "sha256": "61c79d242f5578c4ae1713032fecf12b93ecb441de71e6850aadd2b3f8a64a28"
+    },
+    "summary.json": {
+      "bytes": 337648,
+      "sha256": "597b0ad65c7fa014f083c299d2836ab93bd2a85a5baaaa7856171a8ed005c33b"
+    },
+    "verified.json": {
+      "bytes": 1272,
+      "sha256": "fb395cfe404d4f1a86bbde425632cb3d1a118ea471744d626944c34104425ade"
+    },
+    "verify-aac.json": {
+      "bytes": 1919,
+      "sha256": "4604ba61ce6f0f3e9c0e1827b672e708487fae01fa8b6801fdeecc733362d64c"
+    },
+    "verify-aac.json.log": {
+      "bytes": 1921,
+      "sha256": "ce526ac2a3693b7c53cec193dd1a0d72a467d44bac16c89aae3ac21856b27b56"
+    },
+    "verify-http.json": {
+      "bytes": 2266,
+      "sha256": "0cc7e0cc006668ef0e509c6bd7ce041123f66556ce5bea0ea254bf451fcf548c"
+    },
+    "verify-http.json.log": {
+      "bytes": 2266,
+      "sha256": "0cc7e0cc006668ef0e509c6bd7ce041123f66556ce5bea0ea254bf451fcf548c"
+    },
+    "verify_evidence.py": {
+      "bytes": 4153,
+      "sha256": "5dcead8e204d02abb53117cc07bd44d7d6364f178b8a235236b5a3bdd77f3d31"
+    }
+  }
+}

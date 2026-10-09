@@ -1,0 +1,37 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-pcm-tail\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42023660 <native_audio_output_discard_pcm>:
+int8_t native_audio_output_get_balance(void) {
+    return native_audio_settings_get_balance();
+}
+
+void native_audio_output_discard_pcm(void) {
+    s_buffered_frames = 0;
+42023660:	3fc9a5b7          	lui	a1,0x3fc9a
+    s_resampler_has_previous = false;
+42023664:	3fc9a637          	lui	a2,0x3fc9a
+    s_previous_left = 0;
+42023668:	3fc9a6b7          	lui	a3,0x3fc9a
+    s_previous_right = 0;
+4202366c:	3fc9a737          	lui	a4,0x3fc9a
+    s_resampler_next_phase = 0;
+42023670:	3fc9a7b7          	lui	a5,0x3fc9a
+    s_buffered_frames = 0;
+42023674:	de05a223          	sw	zero,-540(a1) # 3fc99de4 <s_buffered_frames>
+    s_resampler_has_previous = false;
+42023678:	de060023          	sb	zero,-544(a2) # 3fc99de0 <s_resampler_has_previous>
+    s_previous_left = 0;
+4202367c:	dc069f23          	sh	zero,-546(a3) # 3fc99dde <s_previous_left>
+    s_previous_right = 0;
+42023680:	dc071e23          	sh	zero,-548(a4) # 3fc99ddc <s_previous_right>
+    s_resampler_next_phase = 0;
+42023684:	dc07ac23          	sw	zero,-552(a5) # 3fc99dd8 <s_resampler_next_phase>
+    reset_resampler();
+}
+42023688:	8082                	ret
