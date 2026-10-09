@@ -4,11 +4,14 @@ from pathlib import Path
 import sys
 import threading
 import unittest
+from unittest.mock import patch
+import itertools
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools/esp32c3_tests'))
 from run import Capture
 from diagnostic import DiagnosticCapture
 from transport import DiagnosticCapture as TransportCapture
+from serial_lines import serial_lines
 
 
 class Port:
@@ -75,6 +78,41 @@ class SerialTelemetry(unittest.TestCase):
         cap.port = Broken()
         cap.read()
         self.assertEqual(cap.rows[0]['line'], 'serial capture interrupted')
+
+    def test_requested_shutdown_finishes_only_the_current_line(self):
+        closed = threading.Event()
+        class ClosingPort(Port):
+            def read(self, size):
+                data = super().read(size)
+                closed.set()
+                return data
+        port = ClosingPort([b'PERF caf\xc3', b'\xa9\nnext private line\n'], closed)
+        self.assertEqual(list(serial_lines(port, closed)), ['PERF caf\u00e9'])
+        self.assertEqual(b''.join(port.chunks), b'next private line\n')
+        self.assertTrue(all(size == 1 for size in port.read_sizes[1:]))
+
+    def test_requested_shutdown_without_newline_still_fails(self):
+        closed = threading.Event()
+        port = Port([b'PERF partial'], closed)
+        with patch('serial_lines.time.monotonic', side_effect=itertools.count(0, .1)):
+            self.assertEqual(list(serial_lines(port, closed)),
+                             ['serial capture interrupted: incomplete final line'])
+        self.assertLess(len(port.read_sizes), 10)
+
+    def test_closed_empty_capture_does_not_read(self):
+        closed = threading.Event(); closed.set()
+        port = Port([b'unread'], closed)
+        self.assertEqual(list(serial_lines(port, closed)), [])
+        self.assertEqual(port.read_sizes, [])
+
+    def test_shutdown_read_error_remains_visible(self):
+        closed = threading.Event()
+        class BrokenOnClose(Port):
+            def read(self, size):
+                if closed.is_set(): raise OSError('private device detail')
+                data = super().read(size); closed.set(); return data
+        self.assertEqual(list(serial_lines(BrokenOnClose([b'PERF partial'], closed), closed)),
+                         ['serial capture interrupted'])
 
 
 if __name__ == '__main__': unittest.main()
