@@ -1352,3 +1352,17 @@ with such samples. No artificial timestamp increments, parser exemptions,
 socket retries, longer timeouts or altered pacing ratios are introduced.
 Host receive time still includes transport and logging delay; high clock
 resolution does not turn it into device-event or packet-arrival time.
+
+The [integer-clock qualification](ESP32C3_INTEGER_QUALIFICATION_20261009.md)
+replays the HTTPS matrix, transitions, 33 switches and ten-minute growing-record
+TLS test using this clock. It retains the initial-idle connection failure and
+late DMA events; complete timestamps do not turn those failures into passes.
+
+### Legacy WebSocket `heap` field
+
+The legacy WebSocket message with `id: "heap"` reports compressed-input buffer
+fill percentage, from `audio_service_buffer_fill_percent()`. It is not free RAM.
+In particular, zero while stopped does not mean the heap is exhausted. Use
+the diagnostic `PERF CPU`/heap records for free-memory and largest-block
+measurements. A quiet image without those diagnostics has no equivalent RAM
+measurement through this legacy field.

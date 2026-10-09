@@ -10,6 +10,13 @@ implemented; the retained PC19 PCM comparisons meet the 3-LSB allowance.
 Historical unchecked items below are not all descriptions of today's code.
 The remaining release work concerns the complete network/audio application:
 
+Latest [integer-clock cross-codec qualification](ESP32C3_INTEGER_QUALIFICATION_20261009.md)
+passes the HTTPS matrix and 33 codec switches. Ten-minute HE-AACv2 retains one
+initial-idle TCP timeout and 11 late delayed-DMA notifications. Compare rate
+compensation in the resampler against the nominal integer PDM clock before
+claiming continuous AAC output. This diagnostic image does not qualify the
+separately built quiet production candidate.
+
 1. Resolve or bound heavy-FLAC input starvation and delayed DMA service.
    Compare buffering against reproducible delivery interruptions, not just
    mean CPU usage. The [integer-clock baseline](ESP32C3_FLAC_INTEGER_20261009.md)
