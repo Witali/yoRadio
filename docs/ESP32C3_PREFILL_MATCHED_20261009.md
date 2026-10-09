@@ -135,6 +135,12 @@ image, resolving the previously unclassified OTA TLS errors, and testing
 the quiet build with public radio and OTA. Keep original failures alongside
 new observations rather than replacing them with a successful rerun.
 
+The [subsequent TLS/EOF/OTA campaign](ESP32C3_MIN250_TLS_OTA_20261009.md)
+on the same minimum-250 image completes all 22 exact HTTPS EOF cases and
+all 15 original OTA entries. It preserves a failed certificate-recovery
+observation and identifies two TLS socket-read messages before an explicit
+reboot. It does not resolve the intermittent FLAC or analog qualification.
+
 ## Reproducible evidence
 
 The [archive](../tests/results/esp32c3-prefill-matched-20261009/) contains 170

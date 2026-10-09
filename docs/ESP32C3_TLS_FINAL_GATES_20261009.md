@@ -165,3 +165,13 @@ demonstrated cause.
 The original failed run and all service events remain evidence. This
 laboratory memory configuration does not yet qualify the quiet production
 image or all public radio stations.
+
+## Subsequent numeric TLS capture
+
+The [minimum-250 follow-up](ESP32C3_MIN250_TLS_OTA_20261009.md) reproduces
+two TLS messages 94 ms before the explicit restoration reboot, now with
+persisted action timestamps and return `-76` (`MBEDTLS_ERR_NET_RECV_FAILED`).
+This is a socket-read error; its underlying errno remains unknown. It narrows
+the investigation without retroactively proving the cause of this earlier
+capture. All 15 original OTA entries pass again, while extended TLS review
+remains open. Both campaigns and their original failures are retained.
