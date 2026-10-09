@@ -91,6 +91,15 @@ record runner accepts `--seconds 600` for a complete ten-minute observation;
 the server allows an additional 15 seconds so it does not end the stream before
 the observation finishes. Its total duration is bounded to 615 seconds.
 
+Both the standalone record server and C3 record runner accept
+`--pacing-ratio 1.0` for real-time AAC delivery. The default remains `1.02`
+to reproduce historical tests. Specify the ratio explicitly in new reports;
+2% excess delivery can fill receive queues during long tests. This option
+changes delivery deadlines only, preserving encoded bytes, record sizes,
+TLS verification and the HTTP body. Each connection records the selected
+ratio and target audio bytes per second. Socket backpressure may slow actual
+delivery, so declared pacing alone is not a board-consumption measurement.
+
 The 16 KiB plaintext bound follows [RFC 5246 §6.2.1](https://www.rfc-editor.org/rfc/rfc5246#section-6.2.1).
 The test measures the encrypted lengths too; the TLS 1.2 GCM record construction
 is specified in [RFC 5288 §3](https://www.rfc-editor.org/rfc/rfc5288#section-3).

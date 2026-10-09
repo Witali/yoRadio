@@ -2,6 +2,7 @@
 import argparse
 import copy
 import json
+import math
 from pathlib import Path
 import time
 
@@ -51,10 +52,14 @@ def main():
     p.add_argument('--case', default='hev2-44100-stereo')
     p.add_argument('--mode', choices=('small','large','grow','alternate'), action='append')
     p.add_argument('--seconds', type=int, default=75)
+    p.add_argument('--pacing-ratio', type=float, default=1.02,
+                   help='Audio seconds per wall second; use 1.0 for real-time delivery')
     p.add_argument('--output', type=Path, required=True)
     args = p.parse_args()
     require(not args.output.exists() and 60 <= args.seconds <= MAX_OBSERVATION_SECONDS,
             f'Use fresh output and 60..{MAX_OBSERVATION_SECONDS} seconds')
+    require(math.isfinite(args.pacing_ratio) and args.pacing_ratio > 0,
+            'Use a finite positive pacing ratio')
     cfg = args.firmware.with_name('sdkconfig').read_text()
     manifest = json.loads(args.firmware.with_name('manifest.json').read_text())
     require(manifest.get('laboratory_only') is True and manifest.get('extra_trust_ca_sha256') == sha(args.ca.read_bytes()),
@@ -75,6 +80,7 @@ def main():
     report.data.update(firmware_sha256=sha(args.firmware.read_bytes()), sdkconfig_sha256=sha(args.firmware.with_name('sdkconfig').read_bytes()),
         test_ca_sha256=sha(args.ca.read_bytes()), leaf_certificate_sha256=sha(args.cert.read_bytes()),
         fixture_hashes={args.case: specs[args.case]['sha256']}, seconds=args.seconds,
+        pacing_ratio=args.pacing_ratio,
         note='Laboratory CA extends normal roots; verification stays enabled. Record lengths are observed at the server; playback/status provide separate board evidence.')
     capture = DiagnosticCapture(args.serial_port)
     suite = Suite(board, f'https://{args.host}:8772', specs, capture, args.output, cpu_budget=None)
@@ -100,6 +106,8 @@ def main():
             report.data.setdefault('record_observations', {})[mode] = observation
             playback = check_playback(samples, specs[args.case], warmup=5)
             record = record_evidence(observation['events'], mode)
+            require(all(e.get('pacing_ratio') == args.pacing_ratio for e in observation['events']),
+                    'Server pacing differs from requested mode')
             first_pcm = next(suite.observations[-1]['started_at']+s['seconds'] for s in samples if matches(s,specs[args.case]))
             if mode == 'grow':
                 require(first_pcm < record['first_large_at'], 'Record grew before full-rate decoder playback began')
@@ -112,7 +120,8 @@ def main():
 
     try:
         with RecordServer(args.host, 8772, {args.case:specs[args.case]}, args.cert, args.key,
-                          seconds=args.seconds+OBSERVATION_TAIL_SECONDS, grow_seconds=30) as server:
+                          seconds=args.seconds+OBSERVATION_TAIL_SECONDS, grow_seconds=30,
+                          pacing_ratio=args.pacing_ratio) as server:
             report.case('idle-before', idle)
             for mode in args.mode or ('small','large','grow','alternate'):
                 report.case('tls-record:'+mode, lambda m=mode: run_case(m,server))

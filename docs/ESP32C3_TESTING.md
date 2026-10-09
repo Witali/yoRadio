@@ -913,6 +913,11 @@ dedicated lab image adds the temporary CA. Restore a normal image afterwards.
 python tools/esp32c3_tests/tls_records.py --board http://BOARD_IP --host PC_IP --serial-port COM9 --firmware firmware/development/LAB_VARIANT/app.bin --ca .build/record-ca/ca.pem --cert .build/record-ca/server.pem --key .build/record-ca/server.key --output .build/record-test-run
 ```
 
+Add `--pacing-ratio 1.0` for real-time delivery. The historical default is
+`1.02`; keep that explicit when reproducing earlier queue/heap-growth failures.
+Reports and server events record the ratio. Changing delivery timing does
+not change or relax the original runtime, heap, full-format or record-size gates.
+
 The default four modes run for 75 seconds each, with frequent WebUI polling,
 CPU/heap evidence, idle recovery and saved-settings checks. `--mode grow` limits
 the requested scope. The runner verifies exact generated TLS record lengths

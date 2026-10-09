@@ -3,6 +3,7 @@
 Only record types/lengths and completed socket-write counts are retained.
 No plaintext requests, ciphertext, TLS secrets or private keys enter reports.
 """
+import math
 import socketserver
 import ssl
 import threading
@@ -106,9 +107,13 @@ class Channel:
 
 
 class RecordServer:
-    def __init__(self, host, port, fixtures, cert, key, *, seconds=90, grow_seconds=30):
+    def __init__(self, host, port, fixtures, cert, key, *, seconds=90, grow_seconds=30,
+                 pacing_ratio=1.02):
         if not 0 <= grow_seconds <= seconds or not 0 < seconds <= MAX_SERVER_SECONDS:
             raise ValueError('Invalid bounded test duration')
+        if (type(pacing_ratio) not in (int, float) or
+                not math.isfinite(pacing_ratio) or pacing_ratio <= 0):
+            raise ValueError('pacing_ratio must be finite and positive')
         self.closed = threading.Event()
         self.events = []
         outer = self
@@ -122,7 +127,8 @@ class RecordServer:
         class Handler(socketserver.BaseRequestHandler):
             def handle(self):
                 event = dict(records=[], writes=[], dropped_records=0, dropped_writes=0,
-                             completed_socket_bytes=0, audio_bytes=0, complete=False)
+                             completed_socket_bytes=0, audio_bytes=0, complete=False,
+                             pacing_ratio=pacing_ratio)
                 outer.events.append(event)
                 self.request.settimeout(10)
                 channel = Channel(self.request, context, event)
@@ -143,7 +149,8 @@ class RecordServer:
                     started = time.monotonic()
                     event['started_at'] = started
                     data, offset, index = spec['data'], 0, 0
-                    bps = len(data) / spec['seconds'] * 1.02
+                    bps = len(data) / spec['seconds'] * pacing_ratio
+                    event['target_audio_bytes_per_second'] = bps
                     while not outer.closed.is_set() and time.monotonic() - started < seconds:
                         large = mode == 'large' or mode == 'grow' and time.monotonic() - started >= grow_seconds or mode == 'alternate' and index % 2
                         count = MAX_RECORD_PLAINTEXT if large else SMALL_RECORD_PLAINTEXT
@@ -201,12 +208,15 @@ def main():
     parser.add_argument('--fixture-manifest')
     parser.add_argument('--seconds', type=float, default=90)
     parser.add_argument('--grow-seconds', type=float, default=30)
+    parser.add_argument('--pacing-ratio', type=float, default=1.02,
+                        help='Audio seconds per wall second; 1.0 is real time, 1.02 preserves the historical control')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():
         parser.error('Use a new report path')
     with RecordServer(args.host, args.port, load_fixtures(args.fixture_manifest),
-                      args.cert, args.key, seconds=args.seconds, grow_seconds=args.grow_seconds) as server:
+                      args.cert, args.key, seconds=args.seconds, grow_seconds=args.grow_seconds,
+                      pacing_ratio=args.pacing_ratio) as server:
         print('Serving /small/NAME, /large/NAME, /grow/NAME and /alternate/NAME; Ctrl+C saves numeric record evidence.', flush=True)
         try:
             threading.Event().wait()

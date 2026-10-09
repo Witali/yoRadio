@@ -46,6 +46,7 @@ class RecordTests(unittest.TestCase):
                 self.assertIn(b'200 OK', header)
                 self.assertEqual(audio, (self.data * (len(audio)//len(self.data)+1))[:len(audio)])
                 event = server.events[0]
+                self.assertEqual(event['pacing_ratio'], 1.02)
                 self.assertTrue(event['complete'])
                 self.assertEqual(event['audio_bytes'], len(audio))
                 self.assertEqual(event['dropped_records'], 0)
@@ -80,6 +81,44 @@ class RecordTests(unittest.TestCase):
             with socket.create_connection(('127.0.0.1', server.server.server_address[1]), timeout=5) as plain:
                 with self.assertRaises(ssl.SSLCertVerificationError):
                     context.wrap_socket(plain, server_hostname='127.0.0.1')
+
+    def test_explicit_pacing_controls_real_tls_delivery(self):
+        duration = .8
+        for ratio in (.5, 1.0, 2.0):
+            with self.subTest(ratio=ratio), RecordServer('127.0.0.1', 0, self.specs,
+                    self.keys['cert'], self.keys['key'], seconds=duration,
+                    grow_seconds=0, pacing_ratio=ratio) as server:
+                context = ssl.create_default_context(cafile=str(self.keys['ca']))
+                with socket.create_connection(server.server.server_address, timeout=5) as plain:
+                    with context.wrap_socket(plain, server_hostname='127.0.0.1',
+                                             suppress_ragged_eofs=False) as secure:
+                        secure.sendall(b'GET /small/fixture HTTP/1.1\r\nHost: localhost\r\n\r\n')
+                        received = bytearray()
+                        while chunk := secure.recv(32768):
+                            received.extend(chunk)
+                _, audio = bytes(received).split(b'\r\n\r\n', 1)
+                event = server.events[0]
+                deadline = time.monotonic()+1
+                while 'ended_at' not in event and time.monotonic() < deadline:
+                    time.sleep(.005)
+                self.assertTrue(event['complete'])
+                self.assertEqual(event['pacing_ratio'], ratio)
+                bps = len(self.data) / self.specs['fixture']['seconds'] * ratio
+                self.assertEqual(event['target_audio_bytes_per_second'], bps)
+                self.assertEqual(audio, (self.data * (len(audio)//len(self.data)+1))[:len(audio)])
+                # Check delivered bytes over wall time, with scheduling slack
+                # and at most one record sent ahead of its pacing deadline.
+                elapsed = event['ended_at'] - event['started_at']
+                self.assertAlmostEqual(len(audio)/bps, elapsed, delta=.15)
+                self.assertGreaterEqual(len(audio), (duration-.15)*bps)
+                self.assertLessEqual(len(audio), (duration+.15)*bps+1024)
+                self.assertEqual(set(record_evidence([event], 'small')['record_counts']), {1048})
+
+    def test_invalid_pacing_rejected_before_listening(self):
+        for ratio in (0, -1, float('nan'), float('inf'), -float('inf'), True, '1.0'):
+            with self.subTest(ratio=ratio), self.assertRaises(ValueError):
+                RecordServer('127.0.0.1', 0, self.specs, self.keys['cert'], self.keys['key'],
+                             seconds=1, grow_seconds=0, pacing_ratio=ratio)
 
     def test_gate_snapshot_survives_later_server_writes(self):
         with RecordServer('127.0.0.1', 0, self.specs, self.keys['cert'], self.keys['key'], seconds=3, grow_seconds=0) as server:
