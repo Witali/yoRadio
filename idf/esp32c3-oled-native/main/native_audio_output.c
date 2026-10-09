@@ -486,14 +486,22 @@ void native_audio_output_discard_pcm(void) {
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
-    if (!s_buffered_frames) return ESP_OK;
-    // The output task is the sole owner. Consume this tail once, even on
-    // a partial/failed driver write, so a later stream cannot replay it.
-    memset(s_frame_buffer + s_buffered_frames * 2U, 0,
-           (PDM_DMA_FRAMES - s_buffered_frames) * 2U * sizeof(*s_frame_buffer));
-    s_buffered_frames = 0;
-    esp_err_t result = pdm_write_block(s_frame_buffer, PDM_DMA_FRAMES);
-    if (result != ESP_OK) reset_resampler();
+    size_t tail_frames = s_buffered_frames;
+    esp_err_t result = ESP_OK;
+    if (tail_frames) {
+        // The output task is the sole owner. Consume this tail once, even on
+        // a partial/failed driver write, so a later stream cannot replay it.
+        memset(s_frame_buffer + tail_frames * 2U, 0,
+               (PDM_DMA_FRAMES - tail_frames) * 2U * sizeof(*s_frame_buffer));
+        s_buffered_frames = 0;
+        result = pdm_write_block(s_frame_buffer, PDM_DMA_FRAMES);
+        if (result != ESP_OK) reset_resampler();
+    }
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+    ESP_LOGI(TAG, "PERF PCM_FLUSH: frames=%lu result=%d",
+             (unsigned long)tail_frames, (int)result);
+    staged_dma_report();
+#endif
     return result;
 }
 

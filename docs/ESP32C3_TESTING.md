@@ -1002,6 +1002,43 @@ report, and check the HTTP task's stack high-water mark as well as decode/output
 tasks. Under `--suite switch`, use at least three cycles. Never label the CPU
 usage of reduced-rate AAC-core fallback as full HE/SBR performance.
 
+## PCM-tail submission and EOF
+
+The staged output must flush its final partial block before publishing EOF and
+discard software PCM/resampler history at a new stream generation. Host tests
+cover real output/task code, including failed writes and Stop/Play races:
+
+```powershell
+python tools/codec_benchmark/run_output_boundary_host.py --output .build/output-boundaries
+python tests/run-output-task-boundaries.py --output .build/output-task-boundaries
+python tests/test-pcm-tail.py
+```
+
+For physical driver-submission checks, use an awake C3 image built with
+`CONFIG_YORADIO_STAGED_DMA_PROFILE=y`, the staged PDM backend, and the current
+PCM flush/end diagnostic markers. Generate the shared short FLAC fixtures:
+
+```powershell
+python -m tools.audio_test_server.generate_pcm_tails --output .build/pcm-tail-fixtures
+python tools/esp32c3_tests/pcm_tail.py --board http://192.168.100.4 --host 192.168.100.253 --serial-port COM9 --fixture-manifest .build/pcm-tail-fixtures/manifest.json --output .build/pcm-tail-board
+```
+
+The runner controls playback, starts its local server, and leaves the board
+stopped. It does not flash or restore firmware. Supply `--tls-cert <server.pem>
+--tls-key <server.key>` to add HTTPS; the image must trust that valid test CA
+and verify the server hostname/address. Keep private keys outside saved evidence.
+
+One warmup establishes cumulative counters, then 30 files per protocol check
+fresh EOF, exact remaining frames, padded driver bytes, zero write errors and
+inactive playback status. Missing, merged or out-of-order diagnostic records
+fail the test. It stops at the first mismatch, preserving reports and raw
+diagnostic rows. The 512-frame stereo output pads only its final partial block.
+
+These counters prove submission to the driver, not physical DMA drain or
+analog PCM identity. Idle queue-overrun counts are not a continuity test for
+these tiny files. Run separate sustained and transition checks; see the
+[original defect and repair](ESP32C3_PCM_TAIL_AUDIT_20261009.md).
+
 The [RAM profile report](ESP32C3_AAC_RADIO_RAM_20261001.md) includes the physical
 comparison and the distinction between elapsed decode-call time and total
 FreeRTOS CPU utilization.

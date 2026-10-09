@@ -171,3 +171,24 @@ when comparing full-stream totals. Timing is disabled by default.
 
 Run `python tests/test-audio-delivery-stats.py` for delay accounting, overflow,
 and real localhost HTTP payload comparisons with timing enabled/disabled.
+
+## Short PCM tail fixtures
+
+Generate 30 deterministic lossless FLAC files without contacting a board:
+
+```powershell
+python -m tools.audio_test_server.generate_pcm_tails --output .build/pcm-tail-fixtures
+```
+
+FFmpeg must be available on PATH, or supplied with `--ffmpeg <path>`. Use a new
+output directory. The generator checks an exact signed-16 PCM round trip and
+saves encoded/PCM hashes in `manifest.json`. Cases combine 1, 127, 511, 512 and
+513 source frames, mono/stereo, and 8/44.1/48 kHz. These fixtures exercise very
+short EOF and partial output blocks; they do not measure sustained playback.
+
+A FLAC final block may contain fewer than 16 samples, while STREAMINFO block
+bounds remain at least 16; see [RFC 9639](https://www.rfc-editor.org/rfc/rfc9639.html#section-4.1).
+Any board can use these files through the existing server's
+`--fixture-manifest .build/pcm-tail-fixtures/manifest.json` option.
+The C3-specific [PCM-tail runner](../../docs/ESP32C3_TESTING.md#pcm-tail-submission-and-eof)
+also checks the driver-submitted frame count and final playback status.

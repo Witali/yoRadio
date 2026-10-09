@@ -1705,6 +1705,11 @@ static void output_task(void *argument) {
         if (packet->end_of_stream) {
             esp_err_t flush_result = native_audio_output_flush_pcm();
             if (flush_result != ESP_OK) ESP_LOGW(TAG, "PCM tail flush failed: %s", esp_err_to_name(flush_result));
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+            ESP_LOGI(TAG, "PERF PCM_END: generation=%lu completion=%lu result=%d",
+                     (unsigned long)packet->generation,
+                     (unsigned long)packet->end_of_stream, (int)flush_result);
+#endif
             finish_pcm_stream(packet);
             vRingbufferReturnItem(s_pcm, packet);
 #ifdef CONFIG_YORADIO_PIPELINE_PROFILE
