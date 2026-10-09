@@ -1,0 +1,108 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-quiet-int4\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4200f354 <output_task>:
+4200f354:	715d                	addi	sp,sp,-80
+4200f356:	c2a6                	sw	s1,68(sp)
+4200f358:	c686                	sw	ra,76(sp)
+4200f35a:	c4a2                	sw	s0,72(sp)
+4200f35c:	c0ca                	sw	s2,64(sp)
+4200f35e:	de4e                	sw	s3,60(sp)
+4200f360:	dc52                	sw	s4,56(sp)
+4200f362:	da56                	sw	s5,52(sp)
+4200f364:	d85a                	sw	s6,48(sp)
+4200f366:	d65e                	sw	s7,44(sp)
+4200f368:	d462                	sw	s8,40(sp)
+4200f36a:	d266                	sw	s9,36(sp)
+4200f36c:	d06a                	sw	s10,32(sp)
+4200f36e:	ce6e                	sw	s11,28(sp)
+4200f370:	3fc994b7          	lui	s1,0x3fc99
+4200f374:	ec448793          	addi	a5,s1,-316 # 3fc98ec4 <s_generation>
+4200f378:	0330000f          	fence	rw,rw
+4200f37c:	0007ad83          	lw	s11,0(a5)
+4200f380:	0230000f          	fence	r,rw
+4200f384:	4981                	li	s3,0
+4200f386:	3fc99937          	lui	s2,0x3fc99
+4200f38a:	3c114b37          	lui	s6,0x3c114
+4200f38e:	3c114c37          	lui	s8,0x3c114
+4200f392:	3c114d37          	lui	s10,0x3c114
+4200f396:	3fc99ab7          	lui	s5,0x3fc99
+4200f39a:	4a0d                	li	s4,3
+4200f39c:	4b91                	li	s7,4
+4200f39e:	ec448793          	addi	a5,s1,-316
+4200f3a2:	0330000f          	fence	rw,rw
+4200f3a6:	4380                	lw	s0,0(a5)
+4200f3a8:	0230000f          	fence	r,rw
+4200f3ac:	01b40463          	beq	s0,s11,4200f3b4 <output_task+0x60>
+4200f3b0:	2030d0ef          	jal	4201cdb2 <native_audio_output_discard_pcm>
+4200f3b4:	ec892503          	lw	a0,-312(s2) # 3fc98ec8 <s_pcm>
+4200f3b8:	4615                	li	a2,5
+4200f3ba:	006c                	addi	a1,sp,12
+4200f3bc:	c602                	sw	zero,12(sp)
+4200f3be:	7cef60ef          	jal	42105b8c <xRingbufferReceive>
+4200f3c2:	8caa                	mv	s9,a0
+4200f3c4:	cd2d                	beqz	a0,4200f43e <output_task+0xea>
+4200f3c6:	ec448793          	addi	a5,s1,-316
+4200f3ca:	0330000f          	fence	rw,rw
+4200f3ce:	0007ad83          	lw	s11,0(a5)
+4200f3d2:	0230000f          	fence	r,rw
+4200f3d6:	01b40463          	beq	s0,s11,4200f3de <output_task+0x8a>
+4200f3da:	1d90d0ef          	jal	4201cdb2 <native_audio_output_discard_pcm>
+4200f3de:	000ca603          	lw	a2,0(s9)
+4200f3e2:	ec448793          	addi	a5,s1,-316
+4200f3e6:	0330000f          	fence	rw,rw
+4200f3ea:	4394                	lw	a3,0(a5)
+4200f3ec:	0230000f          	fence	r,rw
+4200f3f0:	04d61b63          	bne	a2,a3,4200f446 <output_task+0xf2>
+4200f3f4:	00cca683          	lw	a3,12(s9)
+4200f3f8:	eea9                	bnez	a3,4200f452 <output_task+0xfe>
+4200f3fa:	004ca503          	lw	a0,4(s9)
+4200f3fe:	01350763          	beq	a0,s3,4200f40c <output_task+0xb8>
+4200f402:	2810d0ef          	jal	4201ce82 <native_audio_output_configure>
+4200f406:	e121                	bnez	a0,4200f446 <output_task+0xf2>
+4200f408:	004ca983          	lw	s3,4(s9)
+4200f40c:	009cc683          	lbu	a3,9(s9)
+4200f410:	008cc603          	lbu	a2,8(s9)
+4200f414:	00acd583          	lhu	a1,10(s9)
+4200f418:	010c8513          	addi	a0,s9,16
+4200f41c:	35a0d0ef          	jal	4201c776 <native_audio_output_write_pcm>
+4200f420:	ec892503          	lw	a0,-312(s2)
+4200f424:	85e6                	mv	a1,s9
+4200f426:	7e2f60ef          	jal	42105c08 <vRingbufferReturnItem>
+4200f42a:	ec448793          	addi	a5,s1,-316
+4200f42e:	0330000f          	fence	rw,rw
+4200f432:	4380                	lw	s0,0(a5)
+4200f434:	0230000f          	fence	r,rw
+4200f438:	f7b40ee3          	beq	s0,s11,4200f3b4 <output_task+0x60>
+4200f43c:	bf95                	j	4200f3b0 <output_task+0x5c>
+4200f43e:	2c90d0ef          	jal	4201cf06 <native_audio_output_idle>
+4200f442:	8da2                	mv	s11,s0
+4200f444:	bfa9                	j	4200f39e <output_task+0x4a>
+4200f446:	ec892503          	lw	a0,-312(s2)
+4200f44a:	85e6                	mv	a1,s9
+4200f44c:	7bcf60ef          	jal	42105c08 <vRingbufferReturnItem>
+4200f450:	b7b9                	j	4200f39e <output_task+0x4a>
+4200f452:	18b0d0ef          	jal	4201cddc <native_audio_output_flush_pcm>
+4200f456:	00cca603          	lw	a2,12(s9)
+4200f45a:	000ca583          	lw	a1,0(s9)
+4200f45e:	37cb0693          	addi	a3,s6,892 # 3c11437c <_esp_libc_clock_array_end+0x422c>
+4200f462:	01460f63          	beq	a2,s4,4200f480 <output_task+0x12c>
+4200f466:	ec8c0693          	addi	a3,s8,-312 # 3c113ec8 <_esp_libc_clock_array_end+0x3d78>
+4200f46a:	01760b63          	beq	a2,s7,4200f480 <output_task+0x12c>
+4200f46e:	4789                	li	a5,2
+4200f470:	368d0693          	addi	a3,s10,872 # 3c114368 <_esp_libc_clock_array_end+0x4218>
+4200f474:	00f60663          	beq	a2,a5,4200f480 <output_task+0x12c>
+4200f478:	3c1147b7          	lui	a5,0x3c114
+4200f47c:	38c78693          	addi	a3,a5,908 # 3c11438c <_esp_libc_clock_array_end+0x423c>
+4200f480:	ed4aa503          	lw	a0,-300(s5) # 3fc98ed4 <s_state>
+4200f484:	4601                	li	a2,0
+4200f486:	39e040ef          	jal	42013824 <native_state_set_audio>
+4200f48a:	ec892503          	lw	a0,-312(s2)
+4200f48e:	85e6                	mv	a1,s9
+4200f490:	778f60ef          	jal	42105c08 <vRingbufferReturnItem>
+4200f494:	b729                	j	4200f39e <output_task+0x4a>
