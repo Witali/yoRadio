@@ -192,6 +192,11 @@ or identify the allocator/caller responsible for growth during playback. It
 does establish that the behavior is not specific to QIO. Trace allocations
 and separate audio, TLS and WebUI polling lifetimes before assigning a cause.
 
+The [9 October paired-snapshot analysis](ESP32C3_HEAP_RECEIVE_20261009.md)
+quantifies receive-credit correlation and identifies the test server's 2%
+delivery surplus. It adds a rate-controlled follow-up without changing these
+original acceptance results.
+
 ### Decision
 
 **QIO 80 MHz works and remains a promising candidate.** The repeat clears the
