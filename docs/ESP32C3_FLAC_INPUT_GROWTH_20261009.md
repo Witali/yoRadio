@@ -182,3 +182,8 @@ compare fragmentation before changing allocation policy, and use controlled
 jitter plus paired runs of at most ten minutes to test continuity. Keep the
 option off by default until those checks and candidate OTA regression pass.
 Analog clock qualification still requires a later listening or capture test.
+
+The [matched switching follow-up](ESP32C3_SWITCH_CAPACITY_CONTROL_20261009.md)
+now records two fresh boots per capacity in 0/4/4/0 order. Both controls retain
+contiguous idle capacity; both expanded runs lose capacity across the full
+sequence. The option remains off. Original failures above are unchanged.

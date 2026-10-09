@@ -183,5 +183,14 @@
   "evidence": "tests/results/esp32c3-flac-input-growth-20261009",
   "measurement_source_commit": "bfcd15f7edb6a84a157089fe3a2a0c5fa3718a5e",
   "hardware_tested": true,
-  "physical_restoration_verified": true
+  "physical_restoration_verified": true,
+  "follow_up_switch_capacity": {
+    "report": "docs/ESP32C3_SWITCH_CAPACITY_CONTROL_20261009.md",
+    "evidence": "tests/results/esp32c3-switch-capacity-control-20261009",
+    "original_passed": 22,
+    "original_total": 24,
+    "cross_stage_recovery": "FAIL",
+    "notes": "Fresh-boot 0/4/4/0 comparison. Both controls retain largest idle blocks; both expanded runs lose contiguous capacity. One expanded run also aborts a TLS test on a WebUI connect timeout. Preserve original failures; production and analog qualification remain open.",
+    "restoration_verified": true
+  }
 }

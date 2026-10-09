@@ -1159,6 +1159,12 @@ sustained playback or analog checks.
 
 ## Experimental FLAC input capacity after decoder initialization
 
+The [matched switching comparison](ESP32C3_SWITCH_CAPACITY_CONTROL_20261009.md)
+adds a cross-stage recovery check: compare every later settled idle endpoint
+to the first switch-cycle baseline, including after EOF and TLS record
+growth. A new local baseline must not hide earlier contiguous-capacity loss.
+Its frozen replay retains interrupted requests and original failed verdicts.
+
 `CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS` defaults to `0`. With adaptive input,
 the permanent TLS reserve and the custom FLAC decoder enabled, a nonzero
 value lets the stream task restore additional packet slots after the current
